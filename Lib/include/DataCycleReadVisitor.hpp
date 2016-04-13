@@ -1,34 +1,32 @@
 //===========================================================================
-//                           DataCycleWriteVisitor.hpp
+//                           DataCycleReadVisitor.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file DataCycleWriteVisitor.hpp
+//! @file DataCycleReadVisitor.hpp
 //!
-//! Declares class DataCycleWriteVisitor
+//! Declares class DataCycleReadVisitor
 //!
 //===========================================================================
 
 
-#ifndef DATACYCLEWRITEVISITOR_H__690A42A6_C51E_45E8_EA8B_6D8DF98F8FA8__INCLUDED_
-  #define DATACYCLEWRITEVISITOR_H__690A42A6_C51E_45E8_EA8B_6D8DF98F8FA8__INCLUDED_
-
-#include "SystemModelVisitor.hpp"
+#ifndef DATACYCLEREADVISITOR_H__5BE9418F_DF46_43F6_6B9B_5EDE6F8EEC8B__INCLUDED_
+  #define DATACYCLEREADVISITOR_H__5BE9418F_DF46_43F6_6B9B_5EDE6F8EEC8B__INCLUDED_
 
 namespace mast
 {
-//! System model visitors for packing register bits in order to latter shift them into SUT
+//! System model visitors for unpacking register bits shifted from SUT and updating
+//! Register nodes.
 //!
-class DataCycleWriteVisitor : public SystemModelVisitor
+class DataCycleReadVisitor : public SystemModelVisitor
 {
   // ---------------- Public  Methods
   //
   public:
-  ~DataCycleWriteVisitor() = default;
-  DataCycleWriteVisitor()  = default;
-
+  ~DataCycleReadVisitor() = default;
+  DataCycleReadVisitor()  = default;
 
   // ---------------- Protected Methods
   //
@@ -43,15 +41,15 @@ class DataCycleWriteVisitor : public SystemModelVisitor
   private:
 };
 //
-//  End of DataCycleWriteVisitor class declaration
+//  End of DataCycleReadVisitor class declaration
 //---------------------------------------------------------------------------
 } // End of namespace mast
 
 
 
 
-#endif  // not defined DATACYCLEWRITEVISITOR_H__690A42A6_C51E_45E8_EA8B_6D8DF98F8FA8__INCLUDED_
+#endif  // not defined DATACYCLEREADVISITOR_H__5BE9418F_DF46_43F6_6B9B_5EDE6F8EEC8B__INCLUDED_
 
 //===========================================================================
-// End of DataCycleWriteVisitor.hpp
+// End of DataCycleReadVisitor.hpp
 //===========================================================================

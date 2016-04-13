@@ -41,8 +41,9 @@ class SystemModel
   // ---------------- Private  Fields
   //
   private:
-  uint32_t         m_totalRegister = 0;       //!< Total number of register in the model
-  AccessInterface* m_root          = nullptr; //!< First (top) node of system model tree
+  uint32_t         m_totalRegister        = 0;       //!< Total number of register in the model
+  uint32_t         m_totalPendingRegister = 0;       //!< Number of register currently "pending"
+  AccessInterface* m_root                 = nullptr; //!< First (top) node of system model tree
 };
 //
 //  End of SystemModel class declaration

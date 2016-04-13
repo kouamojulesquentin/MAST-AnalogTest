@@ -36,6 +36,21 @@ void SystemModelNode::AppendSibling (SystemModelNode* pSibling)
 //---------------------------------------------------------------------------
 
 
+//! Provides unique node identifier
+//!
+//! @note This method IS NOT THREAD SAFE
+//!
+//! @return New node identifier
+uint32_t SystemModelNode::GetNextIdentifier ()
+{
+  static uint32_t nextIdentifier = 0;
+  return ++nextIdentifier;
+}
+//
+//  End of: SystemModelNode::GetNextIdentifier
+//---------------------------------------------------------------------------
+
+
 
 //===========================================================================
 // End of SystemModelNode.cpp

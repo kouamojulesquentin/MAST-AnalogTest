@@ -38,10 +38,12 @@ class Linker : Chain
   ~Linker() = default;
   Linker()  = default;
 
-  bool IsActive (uint32_t pathIdentifier);  //!< Returns true when the specified path is already selected
-  void Deselect (uint32_t pathIdentifier);  //!< Request desactivation of the specified path
-  void Select   (uint32_t pathIdentifier);  //!< Request activation of the specified path
+  bool IsActive (uint32_t pathIdentifier) const ; //!< Returns true when the specified path is already selected
+  void Deselect (uint32_t pathIdentifier);        //!< Request desactivation of the specified path
+  void Select   (uint32_t pathIdentifier);        //!< Request activation of the specified path
 
+  const char* GetLastSequence() const;  //!< Returns pointer on byte-stream for last sequence shifted from sut
+  const char* GetNextSequence() const;  //!< Returns pointer on byte-stream for next sequence to shift into sut
 
   // ---------------- Protected Methods
   //
@@ -54,6 +56,8 @@ class Linker : Chain
   // ---------------- Private  Fields
   //
   private:
+  uint32_t m_pathsCount = 0;
+
 };
 //
 //  End of Linker class declaration

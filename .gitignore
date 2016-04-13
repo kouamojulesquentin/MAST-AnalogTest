@@ -1,0 +1,9 @@
+*.bak
+/NewMast.cfg
+/NewMast.mep
+/NewMast.workspace
+/NewMast.workspace.layout
+/C.TAG
+/Multi_Edit.LOG
+/bin
+/obj

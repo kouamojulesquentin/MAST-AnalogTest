@@ -1,9 +1,13 @@
 *.bak
 /NewMast.cfg
 /NewMast.mep
-/NewMast.workspace
 /NewMast.workspace.layout
 /C.TAG
 /Multi_Edit.LOG
 /bin
 /obj
+/MeFind0.tmp
+/MeFind1.tmp
+/ProjectFiles.txt
+/TMP_LIST.TMP
+/TMP_RSLT.TMP

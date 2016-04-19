@@ -16,6 +16,7 @@
 
 
 using mast::SystemModelNode;
+SystemModelNode::NodeIdentifier SystemModelNode::sm_nextIdentifier = 0;
 
 
 //! Appends a new sibling node
@@ -41,10 +42,9 @@ void SystemModelNode::AppendSibling (SystemModelNode* pSibling)
 //! @note This method IS NOT THREAD SAFE
 //!
 //! @return New node identifier
-uint32_t SystemModelNode::GetNextIdentifier ()
+SystemModelNode::NodeIdentifier SystemModelNode::GetNextIdentifier ()
 {
-  static uint32_t nextIdentifier = 0;
-  return ++nextIdentifier;
+  return sm_nextIdentifier++; // Root node must have identifier 0
 }
 //
 //  End of: SystemModelNode::GetNextIdentifier

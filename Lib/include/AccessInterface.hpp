@@ -15,10 +15,13 @@
   #define ACCESSINTERFACE_H__83C3E64E_7289_4AE9_9AA5_235446B1544__INCLUDED_
 
 #include "ParentNode.hpp"
+#include "BinaryVector.hpp"
+#include <functional>
+#include <vector>
 
 namespace mast
 {
-//! Represents an access point to scan chain
+//! Represents an access point to scan chain (the physical interface to the SUT)
 //!
 class AccessInterface : public ParentNode
 {
@@ -27,6 +30,23 @@ class AccessInterface : public ParentNode
   public:
   ~AccessInterface() = default;
   AccessInterface()  = default;
+
+  //+ (JFC April/19/2016): Is AccessInterface abstract?
+
+  //! Primitives interface defining the Access Interface prototocol
+  //! @note The argument is a void* so it can be recast to the actual parameters
+  //!
+  using Primitive = std::function<int(void*)>; //!< Defines pre- and post- condition functors
+
+  //! Prototype of the commands used to access a derivation with as parameters:
+  //!  - The protocol table of available functions
+  //!  - The optional data the AI might requite
+  //!  - The total number of the derivations
+  //!  - The vector to push into the SUT (obtained from the current System Model)
+  //!  - The vector received from the SUT, which must be used to update the System Model
+  //!    after the command finishes
+  //!
+  using Command  = std::function<void(Primitive*, void*, int, BinaryVector*, BinaryVector*)>;
 
 
   // ---------------- Protected Methods
@@ -40,6 +60,9 @@ class AccessInterface : public ParentNode
   // ---------------- Private  Fields
   //
   private:
+  uint32_t               m_totalNumberOfNodes = 0; //!< Number of nodes (derivations) accessible through the access interface
+  std::vector<Primitive> m_primitives;             //!< Primitives composing the protocol
+  std::vector<Command>   m_actions;                //!< Provide Actions to access the derivations based on the set of primitives
 };
 //
 //  End of AccessInterface class declaration

@@ -29,6 +29,12 @@ enum class MibEncoding
 };
 
 //! Represents dynamically selectable chains of registers
+//! It models dynamic topologies, like for instance the ScanMux/SIB of 1687.
+//! Like the Chain node it has some derivations stored as child, but they are not always available (i.e. "active") for
+//! data access.
+//!
+//! Based on its status, the LINKER can determine if each of its derivations is "active", and is therefore part of the
+//! active scan path.
 //!
 class Linker : Chain
 {
@@ -36,14 +42,26 @@ class Linker : Chain
   //
   public:
   ~Linker() = default;
-  Linker()  = default;
+  Linker()  = delete;
+  Linker(std::string name = DEFAULT_NAME);
 
   bool IsActive (uint32_t pathIdentifier) const ; //!< Returns true when the specified path is already selected
   void Deselect (uint32_t pathIdentifier);        //!< Request desactivation of the specified path
   void Select   (uint32_t pathIdentifier);        //!< Request activation of the specified path
 
-  const char* GetLastSequence() const;  //!< Returns pointer on byte-stream for last sequence shifted from sut
-  const char* GetNextSequence() const;  //!< Returns pointer on byte-stream for next sequence to shift into sut
+  //+ (JFC April/19/2016): Consider how to manage multiple kind of selectors:
+  //+ 1 - A selector instance that wrapped the knowledge of how to select/deselect and check of isActive
+  //+ 2 - A specialization of a Register with the knowlege of -1-
+  //+ 3 - An aggregate of a Register and knowlege of -1-
+  //+ Take note that the selection/deselection depends on encoding and possilbly support for multiple selections
+  //+ The bit size of the MIBS must be defined (a char seems to be not much at all): I propose unsigned long but solution 2 and 3
+  //+ above allow for better tuning
+  //+ Probably most selector/deselector LUT can be shared
+
+
+
+  virtual const char* GetLastSequence() const override;  //!< Returns pointer on byte-stream for last sequence shifted from sut
+  virtual const char* GetNextSequence() const override;  //!< Returns pointer on byte-stream for next sequence to shift into sut
 
   // ---------------- Protected Methods
   //
@@ -56,8 +74,8 @@ class Linker : Chain
   // ---------------- Private  Fields
   //
   private:
-  uint32_t m_pathsCount = 0;
-
+  uint32_t m_pathsCount      = 0;       //!< Maximum number of derivations that can be appended to the node
+  void*    m_applicationData = nullptr; //!< Application specific data (semantic managed by the application)
 };
 //
 //  End of Linker class declaration

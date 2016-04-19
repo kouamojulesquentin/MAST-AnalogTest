@@ -29,6 +29,14 @@ class SystemModel
   ~SystemModel() = default;
   SystemModel()  = default;
 
+  Tap*             CreateTap             (std::string name = SystemModelNode::DEFAULT_TAP_NAME); //!< Creates a new Tap node
+  AccessInterface* CreateAccessInterface (std::string name);                                     //!< Creates a new AccessInterface node
+
+  Chain*   CreateChain    (SystemModelNode* parentNode, std::string name); //!< Creates a new Chain node
+  Linker*  CreateLinker   (SystemModelNode* parentNode, std::string name); //!< Creates a new Linker node
+  Register CreateRegister (SystemModelNode* parentNode, std::string name); //!< Creates a new Register node
+
+  AccessInterface* GetRoot() const { return m_root; }
 
   // ---------------- Protected Methods
   //
@@ -37,6 +45,7 @@ class SystemModel
   // ---------------- Private  Methods
   //
   private:
+  void RegisterNode(SystemModelNode::NodeIdentifier identifier, SystemModelNode* node);  //!< Saves relation between node identifier and its instance
 
   // ---------------- Private  Fields
   //

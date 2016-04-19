@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Lib" />
+		<Option platforms="Windows;Unix;" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="../bin/Debug/Lib" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../obj/Debug/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-DBUILD_DLL" />
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add library="user32" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="../bin/Release/Lib" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../obj/Release/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-DBUILD_DLL" />
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="user32" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add directory="include" />
+			<Add directory="public_include" />
+		</Compiler>
+		<Unit filename="include/AccessInterface.hpp" />
+		<Unit filename="include/Chain.hpp" />
+		<Unit filename="include/ConfigureVisitor.hpp" />
+		<Unit filename="include/DataCycleWriteVisitor.hpp" />
+		<Unit filename="include/GmlPrinterVisitor.hpp" />
+		<Unit filename="include/Linker.hpp" />
+		<Unit filename="include/ParentNode" />
+		<Unit filename="include/ParentNode.hpp" />
+		<Unit filename="include/PostConditionVisitor.hpp" />
+		<Unit filename="include/PreconditionVisitor.hpp" />
+		<Unit filename="include/Register.hpp" />
+		<Unit filename="include/SystemModel.hpp" />
+		<Unit filename="include/SystemModelNode.hpp" />
+		<Unit filename="include/SystemModelNodes.hpp" />
+		<Unit filename="include/SystemModelVisitor.hpp" />
+		<Unit filename="include/Tap.hpp" />
+		<Unit filename="main.cpp" />
+		<Unit filename="main.h" />
+		<Unit filename="public_include/PDLAdapter.h" />
+		<Unit filename="public_include/SystemModelAdapter.h" />
+		<Unit filename="src/Register.cpp" />
+		<Unit filename="src/SystemModelNode.cpp" />
+		<Unit filename="src/Tap.cpp" />
+		<Extensions>
+			<code_completion />
+			<editor_config active="1" use_tabs="0" tab_indents="1" tab_width="2" indent="2" eol_mode="0" />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+			<DoxyBlocks>
+				<comment_style block="1" line="1" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

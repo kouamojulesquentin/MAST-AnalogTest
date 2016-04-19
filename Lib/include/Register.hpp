@@ -33,6 +33,11 @@ class Register : public SystemModelNode
   Register()  = delete;
   Register(std::string name, uint32_t bitsCount, RegisterBits bypassSequence);
 
+
+  void                SetSequenceToSend (RegisterBits sequenceToSend) { m_sequenceToSend = sequenceToSend; }  //!< Sets the bits sequence to send during the next iApply cycle
+  const RegisterBits& GetLastReceivedSequence() const { return m_lastReceivedSequence; };
+
+
   // ---------------- Protected Methods
   //
   protected:
@@ -45,17 +50,20 @@ class Register : public SystemModelNode
   //
   private:
 
-  const uint32_t     m_bitsCount            = 0; //!< Exact number of bits in the register
-  const uint32_t     m_bytesCount           = 0; //!< Number of bytes necessary to represent all the bytes
-  bool               m_manageAging          = false;
+  const uint32_t     m_bitsCount            = 0;       //!< Exact number of bits in the register
+  const uint32_t     m_bytesCount           = 0;       //!< Number of bytes necessary to represent all the bytes
+  bool               m_pendingSelect        = false;   //!< True when the tdr value has been changed following a selection action
+  bool               m_manageAging          = true;
   uint32_t           m_pendingSelectCount   = 0;
-  bool               m_checkExpected        = false;
+  bool               m_checkExpected        = false;   //!< When true, it triggers a check of received vs expected data during the following shift from sut
   bool               m_checkExpectedFailure = false;
-  RegisterBits       m_sequenceToSend;           //!< Sequence of bits that should be shifted to SUT (after an iApply cycle)
-  RegisterBits       m_lastSentSequence;         //!< Last sent sequence of bits: It stores the status of the SUT (SIBs, etc...) after an apply cycle
-  RegisterBits       m_lastReceivedSequence;     //!< Last sequence of bits that have been shifted from SUT
-  RegisterBits       m_expectedSequence;         //!< Sequence of expected bits when scanning from SUT
-  const RegisterBits m_bypassSequence;           //!< Sequence used when in bypass mode
+  uint32_t           m_mismatches           = 0;       //!< Number of mismatches following IEEE 1687 rules
+  RegisterBits       m_sequenceToSend;                 //!< Sequence of bits that should be shifted into SUT (during the next iApply cycle)
+  RegisterBits       m_lastSentSequence;               //!< Last sent sequence of bits: It stores the status of the SUT (SIBs, etc...) after an apply cycle
+  RegisterBits       m_lastReceivedSequence;           //!< Last sequence of bits that have been shifted from SUT
+  RegisterBits       m_expectedSequence;               //!< Sequence of expected bits when scanning from SUT
+  const RegisterBits m_bypassSequence;                 //!< Sequence to shift into the sut when no iApply cycle has been defined on the register
+  void*              m_applicationData      = nullptr; //!< Application specific data (semantic managed by the application)
 };
 //
 //  End of Register class declaration

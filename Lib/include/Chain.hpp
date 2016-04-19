@@ -18,8 +18,13 @@
 
 namespace mast
 {
-//! Represents a fix chain of registers
+
+//! Represents a (fix) chain of registers, allowing nodes to be concatenated to replicate a scan chain composed of TDRs.
+//! This node represents the concatenation of elements (register, ScanMuxes etc..) in the SUT through the cardinality
+//! of children nodes: node(i+1) follows node (i).
 //!
+//! @note note that a CHAIN node with only one derivation has no functional effect on the execution, but it can be
+//! used to package some sub-system and exploit the "append" method to assure correct construction.
 //!
 class Chain : public ParentNode
 {
@@ -29,18 +34,8 @@ class Chain : public ParentNode
   ~Chain() = default;
   Chain()  = default;
 
-
-  // ---------------- Protected Methods
-  //
-  protected:
-
-  // ---------------- Private  Methods
-  //
-  private:
-
-  // ---------------- Private  Fields
-  //
-  private:
+  virtual const char* GetLastSequence() const;  //!< Returns pointer on byte-stream for last sequence shifted from sut
+  virtual const char* GetNextSequence() const;  //!< Returns pointer on byte-stream for next sequence to shift into sut
 };
 //
 //  End of Chain class declaration

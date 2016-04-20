@@ -34,8 +34,10 @@ class Chain : public ParentNode
   ~Chain() = default;
   Chain()  = default;
 
-  virtual const char* GetLastSequence() const;  //!< Returns pointer on byte-stream for last sequence shifted from sut
-  virtual const char* GetNextSequence() const;  //!< Returns pointer on byte-stream for next sequence to shift into sut
+  virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
+
+  virtual const uint8_t* GetLastSequence() const;  //!< Returns pointer on byte-stream for last sequence shifted from sut
+  virtual const uint8_t* GetNextSequence() const;  //!< Returns pointer on byte-stream for next sequence to shift into sut
 };
 //
 //  End of Chain class declaration

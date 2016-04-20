@@ -39,13 +39,13 @@ class ParentNode : public SystemModelNode
     }
   }
 
-  SystemModelNode* GetFirstChild()   const { return m_pFirstChild;   }; //!< Returns first child or nullptr
+  SystemModelNode* GetFirstChild()   const { return m_pFirstChild; } //!< Returns first child or nullptr
 
 
   // ---------------- Protected Methods
   //
   protected:
-  ~ParentNode() = default;
+  virtual ~ParentNode() = default;
   ParentNode()  = default;
 
   // ---------------- Private  Methods
@@ -55,7 +55,7 @@ class ParentNode : public SystemModelNode
   // ---------------- Private  Fields
   //
   private:
-  SystemModelNode* m_pFirstChild   = nullptr;
+  SystemModelNode* m_pFirstChild = nullptr;
 };
 //
 //  End of ParentNode class declaration

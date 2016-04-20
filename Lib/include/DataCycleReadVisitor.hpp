@@ -28,6 +28,12 @@ class DataCycleReadVisitor : public SystemModelVisitor
   ~DataCycleReadVisitor() = default;
   DataCycleReadVisitor()  = default;
 
+  virtual void VisitAccessInterface (AccessInterface& accessInterface) override;
+  virtual void VisitChain           (Chain&           chain)           override;
+  virtual void VisitLinker          (Linker&          linker)          override;
+  virtual void VisitRegister        (Register&        reg)             override;
+  virtual void VisitTap             (Tap&             tap)             override;
+
   // ---------------- Protected Methods
   //
   protected:

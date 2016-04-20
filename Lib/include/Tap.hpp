@@ -28,6 +28,7 @@ class Tap : public AccessInterface
   ~Tap() = default;
   Tap()  = default;
 
+  virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
 
   // ---------------- Protected Methods
   //

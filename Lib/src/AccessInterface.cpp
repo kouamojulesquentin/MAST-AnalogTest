@@ -1,30 +1,29 @@
 //===========================================================================
-//                           Tap.cpp
+//                           AccessInterface.cpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file Tap.cpp
+//! @file AccessInterface.cpp
 //!
-//! Implements class Tap node class
+//! Implements class AccessInterface
 //!
 //===========================================================================
 
-
-#include "Tap.hpp"
+#include "AccessInterface.hpp"
 #include "SystemModelVisitor.hpp"
 
 using namespace mast;
 
 //! Visited part of the Visitor pattern
 //!
-void Tap::Accept (SystemModelVisitor& visitor)
+void AccessInterface::Accept (SystemModelVisitor& visitor)
 {
-  visitor.VisitTap(*this);
+  visitor.VisitAccessInterface(*this);
 }
 
 
 //===========================================================================
-// End of Tap.cpp
+// End of AccessInterface.cpp
 //===========================================================================

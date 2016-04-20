@@ -1,5 +1,6 @@
 #include "main.h"
 #include "SystemModel.hpp"
+#include "PreconditionVisitor.hpp"
 
 // a sample exported function
 void DLL_EXPORT SomeFunction(const LPCSTR sometext)

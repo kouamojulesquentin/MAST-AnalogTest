@@ -51,11 +51,11 @@
 		<Unit filename="include/DataCycleWriteVisitor.hpp" />
 		<Unit filename="include/GmlPrinterVisitor.hpp" />
 		<Unit filename="include/Linker.hpp" />
-		<Unit filename="include/ParentNode" />
 		<Unit filename="include/ParentNode.hpp" />
 		<Unit filename="include/PostConditionVisitor.hpp" />
 		<Unit filename="include/PreconditionVisitor.hpp" />
 		<Unit filename="include/Register.hpp" />
+		<Unit filename="include/ScanVectors.hpp" />
 		<Unit filename="include/SystemModel.hpp" />
 		<Unit filename="include/SystemModelNode.hpp" />
 		<Unit filename="include/SystemModelNodes.hpp" />
@@ -65,6 +65,9 @@
 		<Unit filename="main.h" />
 		<Unit filename="public_include/PDLAdapter.h" />
 		<Unit filename="public_include/SystemModelAdapter.h" />
+		<Unit filename="src/AccessInterface.cpp" />
+		<Unit filename="src/Chain.cpp" />
+		<Unit filename="src/Linker.cpp" />
 		<Unit filename="src/Register.cpp" />
 		<Unit filename="src/SystemModelNode.cpp" />
 		<Unit filename="src/Tap.cpp" />

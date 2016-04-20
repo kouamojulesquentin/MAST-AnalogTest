@@ -20,19 +20,15 @@
 
 namespace mast
 {
-//! Common features of a system model node
+class SystemModelVisitor;
+
+//! Abstract base for common features for system model nodes
 //!
 class SystemModelNode
 {
   // ---------------- Public  Methods
   //
   public:
-  virtual ~SystemModelNode() = default;
-  SystemModelNode()  = delete;
-  SystemModelNode(std::string name)
-    : m_identifier (GetNextIdentifier())
-    , m_name       (name)
-  {}
 
   using NodeIdentifier   = uint32_t;                              //!< Uniquely identifies a node
   using ConditionFunctor = std::function<bool(SystemModelNode*)>; //!< Defines pre- and post- condition functors
@@ -40,7 +36,8 @@ class SystemModelNode
   NodeIdentifier   GetIdentifier()  const { return m_identifier;   } //!< Returns node unique identifier
   SystemModelNode* GetNextSibling() const { return m_pNextSibling; } //!< Returns first sibling or nullptr
 
-  void             AppendSibling (SystemModelNode* pSibling); //!< Appends a new sibling node
+  void         AppendSibling (SystemModelNode*    pSibling);      //!< Appends a new sibling node
+  virtual void Accept        (SystemModelVisitor& visitor) = 0;   //!< Visited part of the Visitor pattern
 
   static constexpr char DEFAULT_NAME[]      = "unnamed";
   static constexpr char DEFAULT_MIB_NAME[]  = "MIB";
@@ -50,10 +47,15 @@ class SystemModelNode
   static constexpr char DEFAULT_1500_NAME[] = "1500_wrapper";
   static constexpr char DEFAULT_TAP_NAME[]  = "1149_1_TAP";
 
-
   // ---------------- Protected Methods
   //
   protected:
+  virtual ~SystemModelNode() = default;
+  SystemModelNode()  = delete;
+  SystemModelNode(std::string name)
+    : m_identifier (GetNextIdentifier())
+    , m_name       (name)
+  {}
 
   // ---------------- Private  Methods
   //

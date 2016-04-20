@@ -27,7 +27,7 @@ class Register : public SystemModelNode
   // ---------------- Public  Methods
   //
   public:
-  using RegisterBits = std::vector<unsigned char>;
+  using RegisterBits = std::vector<uint8_t>;
 
   ~Register() = default;
   Register()  = delete;
@@ -35,8 +35,9 @@ class Register : public SystemModelNode
 
 
   void                SetSequenceToSend (RegisterBits sequenceToSend) { m_sequenceToSend = sequenceToSend; }  //!< Sets the bits sequence to send during the next iApply cycle
-  const RegisterBits& GetLastReceivedSequence() const { return m_lastReceivedSequence; };
+  const RegisterBits& GetLastReceivedSequence() const { return m_lastReceivedSequence; }
 
+  virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
 
   // ---------------- Protected Methods
   //

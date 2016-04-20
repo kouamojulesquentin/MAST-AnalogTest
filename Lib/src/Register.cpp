@@ -11,6 +11,7 @@
 //===========================================================================
 
 #include "Register.hpp"
+#include "SystemModelVisitor.hpp"
 #include <utility>
 
 using std::string;
@@ -34,6 +35,14 @@ Register::Register (string name, uint32_t bitsCount, RegisterBits bypassSequence
 //  End of: Register::Register
 //---------------------------------------------------------------------------
 
+
+
+//! Visited part of the Visitor pattern
+//!
+void Register::Accept (SystemModelVisitor& visitor)
+{
+  visitor.VisitRegister(*this);
+}
 
 //===========================================================================
 // End of Register.cpp

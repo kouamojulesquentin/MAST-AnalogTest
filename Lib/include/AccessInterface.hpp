@@ -15,7 +15,7 @@
   #define ACCESSINTERFACE_H__83C3E64E_7289_4AE9_9AA5_235446B1544__INCLUDED_
 
 #include "ParentNode.hpp"
-#include "BinaryVector.hpp"
+#include "ScanVectors.hpp"
 #include <functional>
 #include <vector>
 
@@ -48,6 +48,7 @@ class AccessInterface : public ParentNode
   //!
   using Command  = std::function<void(Primitive*, void*, int, BinaryVector*, BinaryVector*)>;
 
+  virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
 
   // ---------------- Protected Methods
   //

@@ -22,7 +22,7 @@ namespace mast
 //! System model tree visitor for configuration
 //!
 //!
-class ConfigureVisitor final : SystemModelVisitor
+class ConfigureVisitor : SystemModelVisitor
 {
   // ---------------- Public  Methods
   //
@@ -30,6 +30,11 @@ class ConfigureVisitor final : SystemModelVisitor
   ~ConfigureVisitor() = default;
   ConfigureVisitor()  = default;
 
+  virtual void VisitAccessInterface (AccessInterface& accessInterface) override;
+  virtual void VisitChain           (Chain&           chain)           override;
+  virtual void VisitLinker          (Linker&          linker)          override;
+  virtual void VisitRegister        (Register&        reg)             override;
+  virtual void VisitTap             (Tap&             tap)             override;
 
   // ---------------- Protected Methods
   //

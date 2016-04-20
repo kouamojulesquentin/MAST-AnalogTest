@@ -13,8 +13,23 @@
 
 #include "Linker.hpp"
 #include "SystemModelVisitor.hpp"
+#include "PathSelector.hpp"
+
 
 using namespace mast;
+
+
+//! Initialized parent and ...
+Linker::Linker (std::string name, PathSelector* pathSelector)
+  : ParentNode     (name)
+  , m_pathSelector (pathSelector)
+{
+
+}
+//
+//  End of: Linker::Linker
+//---------------------------------------------------------------------------
+
 
 //! Visited part of the Visitor pattern
 //!

@@ -15,6 +15,7 @@
   #define SYSTEMMODEL_H__A9ED8877_8B39_4480_2B8B_2E92C212179C__INCLUDED_
 
 #include "SystemModelNodes.hpp"
+#include <string>
 
 namespace mast
 {
@@ -29,14 +30,19 @@ class SystemModel
   ~SystemModel() = default;
   SystemModel()  = default;
 
-  Tap*             CreateTap             (std::string name = SystemModelNode::DEFAULT_TAP_NAME); //!< Creates a new Tap node
-  AccessInterface* CreateAccessInterface (std::string name);                                     //!< Creates a new AccessInterface node
+  Tap*             CreateTap             (std::string name = std::string(mast::DEFAULT_TAP_NAME)); //!< Creates a new Tap node
+  AccessInterface* CreateAccessInterface (std::string name);                                       //!< Creates a new AccessInterface node
 
-  Chain*    CreateChain    (SystemModelNode* parentNode, std::string name); //!< Creates a new Chain node
-  Linker*   CreateLinker   (SystemModelNode* parentNode, std::string name); //!< Creates a new Linker node
-  Register* CreateRegister (SystemModelNode* parentNode, std::string name); //!< Creates a new Register node
+  Chain*    CreateChain    (ParentNode* parentNode, std::string name);                                                   //!< Creates a new Chain node
+  Linker*   CreateLinker   (ParentNode* parentNode, std::string name);                   //!< Creates a new Linker node
+  Register* CreateRegister (ParentNode* parentNode, std::string name, uint32_t  bitsCount, Register::RegisterBits bypassSequence); //!< Creates a new Register node
 
   AccessInterface* GetRoot() const { return m_root; }
+
+  //! Releases the resources occupied by node data structure recursively
+  //!
+  void DestroyNode(SystemModelNode* node);
+  //+ (JFC April/20/2016): How to report parent node that a node has been destroyed
 
   // ---------------- Protected Methods
   //

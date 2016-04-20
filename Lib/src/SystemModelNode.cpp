@@ -14,9 +14,29 @@
 
 #include "SystemModelNode.hpp"
 
+using namespace mast;
 
-using mast::SystemModelNode;
 SystemModelNode::NodeIdentifier SystemModelNode::sm_nextIdentifier = 0;
+
+//! Sets unique identifier and name (using default one if unspecified)
+//!
+SystemModelNode::SystemModelNode (std::string name)
+  : m_identifier (GetNextIdentifier())
+  , m_name       (std::move(name))
+{
+  // ---------------- Make sure there is at least a default name
+  //
+  if (m_name.empty())
+  {
+    m_name = std::string(mast::DEFAULT_NODE_NAME);
+  }
+}
+//
+//  End of: SystemModelNode::SystemModelNode
+//---------------------------------------------------------------------------
+//
+
+
 
 
 //! Appends a new sibling node

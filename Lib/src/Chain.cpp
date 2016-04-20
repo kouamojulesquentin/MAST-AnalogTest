@@ -23,31 +23,6 @@ void Chain::Accept (SystemModelVisitor& visitor)
   visitor.VisitChain(*this);
 }
 
-
-//! Returns pointer on byte-stream for last sequence shifted from sut
-//!
-const uint8_t* Chain::GetLastSequence () const
-{
-  return nullptr;
-}
-//
-//  End of: Chain::GetLastSequence
-//---------------------------------------------------------------------------
-
-
-//! Returns pointer on byte-stream for next sequence to shift into sut
-//!
-const uint8_t* Chain::GetNextSequence () const
-{
-  return nullptr;
-}
-//
-//  End of: Chain::GetNextSequence
-//---------------------------------------------------------------------------
-
-
-
-
 //===========================================================================
 // End of Chain.cpp
 //===========================================================================

@@ -29,9 +29,8 @@ class AccessInterface : public ParentNode
   //
   public:
   ~AccessInterface() = default;
-  AccessInterface()  = default;
-
-  //+ (JFC April/19/2016): Is AccessInterface abstract?
+  AccessInterface()  = delete;
+  AccessInterface(std::string name) : ParentNode(name) {}
 
   //! Primitives interface defining the Access Interface prototocol
   //! @note The argument is a void* so it can be recast to the actual parameters

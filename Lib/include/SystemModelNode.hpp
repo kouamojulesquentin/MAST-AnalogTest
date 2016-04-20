@@ -22,6 +22,14 @@ namespace mast
 {
 class SystemModelVisitor;
 
+constexpr char DEFAULT_NODE_NAME[] = "unnamed";
+constexpr char DEFAULT_MIB_NAME[]  = "MIB";
+constexpr char MIB_CTRL_EXT[]      = "_ctrl";
+constexpr char MIB_MUX_EXT[]       = "_mux";
+constexpr char DEFAULT_SIB_NAME[]  = "SIB";
+constexpr char DEFAULT_1500_NAME[] = "1500_wrapper";
+constexpr char DEFAULT_TAP_NAME[]  = "1149_1_TAP";
+
 //! Abstract base for common features for system model nodes
 //!
 class SystemModelNode
@@ -39,23 +47,13 @@ class SystemModelNode
   void         AppendSibling (SystemModelNode*    pSibling);      //!< Appends a new sibling node
   virtual void Accept        (SystemModelVisitor& visitor) = 0;   //!< Visited part of the Visitor pattern
 
-  static constexpr char DEFAULT_NAME[]      = "unnamed";
-  static constexpr char DEFAULT_MIB_NAME[]  = "MIB";
-  static constexpr char MIB_CTRL_EXT[]      = "_ctrl";
-  static constexpr char MIB_MUX_EXT[]       = "_mux";
-  static constexpr char DEFAULT_SIB_NAME[]  = "SIB";
-  static constexpr char DEFAULT_1500_NAME[] = "1500_wrapper";
-  static constexpr char DEFAULT_TAP_NAME[]  = "1149_1_TAP";
 
   // ---------------- Protected Methods
   //
   protected:
   virtual ~SystemModelNode() = default;
   SystemModelNode()  = delete;
-  SystemModelNode(std::string name)
-    : m_identifier (GetNextIdentifier())
-    , m_name       (name)
-  {}
+  SystemModelNode(std::string name);
 
   // ---------------- Private  Methods
   //

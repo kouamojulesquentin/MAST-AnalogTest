@@ -28,6 +28,8 @@ enum class MibEncoding
   Binary_No_Idle,   //!< Binary encoding ensuring that at least one chain is selected
 };
 
+class PathSelector;
+
 //! Represents dynamically selectable chains of registers
 //! It models dynamic topologies, like for instance the ScanMux/SIB of 1687.
 //! Like the Chain node it has some derivations stored as child, but they are not always available (i.e. "active") for
@@ -36,14 +38,17 @@ enum class MibEncoding
 //! Based on its status, the LINKER can determine if each of its derivations is "active", and is therefore part of the
 //! active scan path.
 //!
-class Linker : Chain
+class Linker : public ParentNode
 {
+  public:
+
   // ---------------- Public  Methods
   //
   public:
   ~Linker() = default;
   Linker()  = delete;
-  Linker(std::string name = SystemModelNode::DEFAULT_NAME);
+//+  Linker(std::string name, PathSelector* linkerInformation, selectTable, deselectTable);
+  Linker(std::string name, PathSelector* pathSelector);
 
   bool IsActive (uint32_t pathIdentifier) const ; //!< Returns true when the specified path is already selected
   void Deselect (uint32_t pathIdentifier);        //!< Request desactivation of the specified path
@@ -61,9 +66,9 @@ class Linker : Chain
 
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
 
-
-  virtual const uint8_t* GetLastSequence() const override;  //!< Returns pointer on byte-stream for last sequence shifted from sut
-  virtual const uint8_t* GetNextSequence() const override;  //!< Returns pointer on byte-stream for next sequence to shift into sut
+     //+ (JFC April/20/2016): Move to linkerInfo
+  virtual const uint8_t* GetLastSequence() const;  //!< Returns pointer on byte-stream for last sequence shifted from sut
+  virtual const uint8_t* GetNextSequence() const;  //!< Returns pointer on byte-stream for next sequence to shift into sut
 
   // ---------------- Protected Methods
   //
@@ -76,8 +81,9 @@ class Linker : Chain
   // ---------------- Private  Fields
   //
   private:
-  uint32_t m_pathsCount      = 0;       //!< Maximum number of derivations that can be appended to the node
-  void*    m_applicationData = nullptr; //!< Application specific data (semantic managed by the application)
+  uint32_t            m_pathsCount      = 0;       //!< Maximum number of derivations that can be appended to the node
+  PathSelector* const m_pathSelector    = nullptr; //!< Provides genericity of how to manage path(s) selection
+  void*               m_applicationData = nullptr; //!< Application specific data (semantic managed by the application)
 };
 //
 //  End of Linker class declaration

@@ -49,6 +49,7 @@ class ParentNode : public SystemModelNode
   ParentNode() = delete;
   ParentNode(std::string name) : SystemModelNode(name) {}
 
+
   // ---------------- Private  Methods
   //
   private:

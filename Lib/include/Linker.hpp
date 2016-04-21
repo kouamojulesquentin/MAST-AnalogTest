@@ -47,12 +47,11 @@ class Linker : public ParentNode
   public:
   ~Linker() = default;
   Linker()  = delete;
-//+  Linker(std::string name, PathSelector* linkerInformation, selectTable, deselectTable);
   Linker(std::string name, PathSelector* pathSelector);
 
   bool IsActive (uint32_t pathIdentifier) const ; //!< Returns true when the specified path is already selected
-  void Deselect (uint32_t pathIdentifier);        //!< Request desactivation of the specified path
-  void Select   (uint32_t pathIdentifier);        //!< Request activation of the specified path
+  void Deselect (uint32_t pathIdentifier);        //!< Requests desactivation of the specified path
+  void Select   (uint32_t pathIdentifier);        //!< Requests activation of the specified path
 
 
   //+ (JFC April/19/2016): Consider how to manage multiple kind of selectors:
@@ -81,9 +80,8 @@ class Linker : public ParentNode
   // ---------------- Private  Fields
   //
   private:
-  uint32_t            m_pathsCount      = 0;       //!< Maximum number of derivations that can be appended to the node
-  PathSelector* const m_pathSelector    = nullptr; //!< Provides genericity of how to manage path(s) selection
-  void*               m_applicationData = nullptr; //!< Application specific data (semantic managed by the application)
+  uint32_t            m_pathsCount   = 0;       //!< Maximum number of derivations that can be appended to the node
+  PathSelector* const m_pathSelector = nullptr; //!< Provides genericity of how to manage path(s) selection
 };
 //
 //  End of Linker class declaration

@@ -61,6 +61,7 @@
 		<Unit filename="include/SystemModelNodes.hpp" />
 		<Unit filename="include/SystemModelVisitor.hpp" />
 		<Unit filename="include/Tap.hpp" />
+		<Unit filename="include/Utility.hpp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="main.h" />
 		<Unit filename="public_include/PDLAdapter.h" />
@@ -68,7 +69,9 @@
 		<Unit filename="src/AccessInterface.cpp" />
 		<Unit filename="src/Chain.cpp" />
 		<Unit filename="src/Linker.cpp" />
+		<Unit filename="src/ParentNode.cpp" />
 		<Unit filename="src/Register.cpp" />
+		<Unit filename="src/SystemModel.cpp" />
 		<Unit filename="src/SystemModelNode.cpp" />
 		<Unit filename="src/Tap.cpp" />
 		<Extensions>

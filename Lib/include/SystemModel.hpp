@@ -19,6 +19,7 @@
 
 namespace mast
 {
+
 //! Manages the system model tree
 //!
 //!
@@ -33,9 +34,9 @@ class SystemModel
   Tap*             CreateTap             (std::string name = std::string(mast::DEFAULT_TAP_NAME)); //!< Creates a new Tap node
   AccessInterface* CreateAccessInterface (std::string name);                                       //!< Creates a new AccessInterface node
 
-  Chain*    CreateChain    (ParentNode* parentNode, std::string name);                                                   //!< Creates a new Chain node
-  Linker*   CreateLinker   (ParentNode* parentNode, std::string name);                   //!< Creates a new Linker node
-  Register* CreateRegister (ParentNode* parentNode, std::string name, uint32_t  bitsCount, Register::RegisterBits bypassSequence); //!< Creates a new Register node
+  Chain*    CreateChain    (ParentNode* parentNode, std::string name);                                                                 //!< Creates a new Chain node
+  Linker*   CreateLinker   (ParentNode* parentNode, std::string name, PathSelector* pathSelector);                                     //!< Creates a new Linker node
+  Register* CreateRegister (ParentNode* parentNode, std::string name, uint32_t      bitsCount, Register::RegisterBits bypassSequence); //!< Creates a new Register node
 
   AccessInterface* GetRoot() const { return m_root; }
 
@@ -57,7 +58,7 @@ class SystemModel
   //
   private:
   uint32_t         m_totalRegister        = 0;       //!< Total number of register in the model
-  uint32_t         m_totalPendingRegister = 0;       //!< Number of register currently "pending"
+  uint32_t         m_totalPendingRegister = 0;       //!< Number of registers currently "pending"
   AccessInterface* m_root                 = nullptr; //!< First (top) node of system model tree
 };
 //

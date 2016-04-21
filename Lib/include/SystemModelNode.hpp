@@ -47,7 +47,6 @@ class SystemModelNode
   void         AppendSibling (SystemModelNode*    pSibling);      //!< Appends a new sibling node
   virtual void Accept        (SystemModelVisitor& visitor) = 0;   //!< Visited part of the Visitor pattern
 
-
   // ---------------- Protected Methods
   //
   protected:
@@ -61,16 +60,26 @@ class SystemModelNode
 
   static NodeIdentifier GetNextIdentifier();
 
+  //! Retrieve application specific data
+  //!
+  void* GetApplicationData() const { return m_applicationData; };
+
+  //! Sets application specific data
+  //! @note System node does not used this data (this is an optional extension point for applications using the system model)
+  void  SetApplicationData (void* applicationData) { m_applicationData = applicationData; }
+
+
   // ---------------- Private  Fields
   //
   private:
   static NodeIdentifier sm_nextIdentifier;   //!< Identifier for the next node to create
 
-  NodeIdentifier   m_identifier;             //!< Uniquely identifies a node
-  std::string      m_name;                   //!< Node readable name
-  SystemModelNode* m_pNextSibling = nullptr; //!< Points to next node at same level (forming a singly linked list)
-  bool             m_pending      = false;   //!< True when at least one node in the hierarchy is pending
-  bool             m_hasCondition = false;   //!< True when the node has some condition to check (either pre- or post-)
+  NodeIdentifier   m_identifier;                     //!< Uniquely identifies a node
+  std::string      m_name;                           //!< Node readable name
+  bool             m_pending         = false;        //!< True when at least one node in the hierarchy is pending
+  bool             m_hasCondition    = false;        //!< True when the node has some condition to check (either pre- or post-)
+  SystemModelNode* m_pNextSibling    = nullptr;      //!< Points to next node at same level (forming a singly linked list)
+  void*            m_applicationData = nullptr;      //!< Application specific data (semantic managed by the application)
 };
 //
 //  End of SystemModelNode class declaration

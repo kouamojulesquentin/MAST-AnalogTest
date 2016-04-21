@@ -39,6 +39,13 @@ class Register : public SystemModelNode
 
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
 
+  //!< Checks that last received sequence equals expected one
+  //!<
+  //!< @note  It increments internal mismatch count in case of failure
+  //!<
+  //!< @return  true when received sequence equals expected one, false otherwise
+  bool CheckAgainstExpected();
+
   // ---------------- Protected Methods
   //
   protected:
@@ -55,14 +62,13 @@ class Register : public SystemModelNode
   const uint32_t     m_bytesCount           = 0;       //!< Number of bytes necessary to represent all the bytes
   bool               m_pendingSelect        = false;   //!< True when the tdr value has been changed following a selection action
   bool               m_checkExpected        = false;   //!< When true, it triggers a check of received vs expected data during the following shift from sut
-  uint32_t           m_priority             = 0;    //!< Defines priority for configuration
+  uint32_t           m_priority             = 0;       //!< Defines priority for configuration (when multiple path should be selected but only one can be)
   uint32_t           m_mismatches           = 0;       //!< Number of mismatches following IEEE 1687 rules
   RegisterBits       m_sequenceToSend;                 //!< Sequence of bits that should be shifted into SUT (during the next iApply cycle)
   RegisterBits       m_lastSentSequence;               //!< Last sent sequence of bits: It stores the status of the SUT (SIBs, etc...) after an apply cycle
   RegisterBits       m_lastReceivedSequence;           //!< Last sequence of bits that have been shifted from SUT
   RegisterBits       m_expectedSequence;               //!< Sequence of expected bits when scanning from SUT
   const RegisterBits m_bypassSequence;                 //!< Sequence to shift into the sut when no iApply cycle has been defined on the register
-  void*              m_applicationData      = nullptr; //!< Application specific data (semantic managed by the application)
 };
 //
 //  End of Register class declaration

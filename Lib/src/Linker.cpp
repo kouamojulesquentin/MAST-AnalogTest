@@ -15,6 +15,7 @@
 #include "SystemModelVisitor.hpp"
 #include "PathSelector.hpp"
 
+#include <cassert>
 
 using namespace mast;
 
@@ -24,7 +25,7 @@ Linker::Linker (std::string name, PathSelector* pathSelector)
   : ParentNode     (name)
   , m_pathSelector (pathSelector)
 {
-
+  assert(pathSelector && "A valid pathSelector is mandatory");
 }
 //
 //  End of: Linker::Linker
@@ -36,6 +37,27 @@ Linker::Linker (std::string name, PathSelector* pathSelector)
 void Linker::Accept (SystemModelVisitor& visitor)
 {
   visitor.VisitLinker(*this);
+}
+
+//! Returns true when the specified path is already selected
+//!
+bool Linker::IsActive (uint32_t pathIdentifier) const
+{
+  return m_pathSelector->IsActive(pathIdentifier);
+}
+
+//! Requests desactivation of the specified path
+//!
+void Linker::Deselect (uint32_t pathIdentifier)
+{
+  m_pathSelector->Deselect(pathIdentifier);
+}
+
+//! Requests activation of the specified path
+//!
+void Linker::Select   (uint32_t pathIdentifier)
+{
+  m_pathSelector->Select(pathIdentifier);
 }
 
 

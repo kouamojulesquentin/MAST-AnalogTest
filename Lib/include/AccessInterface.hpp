@@ -21,6 +21,8 @@
 
 namespace mast
 {
+class AccessInterfaceProtocol;
+
 //! Represents an access point to scan chain (the physical interface to the SUT)
 //!
 class AccessInterface : public ParentNode
@@ -30,7 +32,10 @@ class AccessInterface : public ParentNode
   public:
   ~AccessInterface() = default;
   AccessInterface()  = delete;
-  AccessInterface(std::string name) : ParentNode(name) {}
+  AccessInterface(std::string name, AccessInterfaceProtocol* protocol)
+    : ParentNode (name)
+    , m_protocol (protocol)
+  {}
 
   //! Primitives interface defining the Access Interface prototocol
   //! @note The argument is a void* so it can be recast to the actual parameters
@@ -60,9 +65,10 @@ class AccessInterface : public ParentNode
   // ---------------- Private  Fields
   //
   private:
-  uint32_t               m_totalNumberOfNodes = 0; //!< Number of nodes (derivations) accessible through the access interface
-  std::vector<Primitive> m_primitives;             //!< Primitives composing the protocol
-  std::vector<Command>   m_actions;                //!< Provide Actions to access the derivations based on the set of primitives
+  uint32_t                       m_numberOfDerivations = 0;      //!< Number of nodes (derivations) accessible through the access interface
+  AccessInterfaceProtocol* const m_protocol           = nullptr; //!< Protocol to use to manage physical interface
+//+  std::vector<Primitive>         m_primitives;                   //!< Primitives composing the protocol
+//+  std::vector<Command>           m_actions;                      //!< Provide Actions to access the derivations based on the set of primitives
 };
 //
 //  End of AccessInterface class declaration

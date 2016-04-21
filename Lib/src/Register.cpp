@@ -12,6 +12,7 @@
 
 #include "Register.hpp"
 #include "SystemModelVisitor.hpp"
+#include "Utility.hpp"
 #include <utility>
 
 using std::string;
@@ -23,7 +24,7 @@ using namespace mast;
 Register::Register (string name, uint32_t bitsCount, RegisterBits bypassSequence)
   : SystemModelNode        (std::move(name))
   , m_bitsCount            (bitsCount)
-  , m_bytesCount           ((bitsCount + 7) / 8)
+  , m_bytesCount           (Utility::BytesCountFromBitsCount(bitsCount))
   , m_sequenceToSend       (m_bytesCount, 0)
   , m_lastSentSequence     (m_bytesCount, 0)
   , m_lastReceivedSequence (m_bytesCount, 0)

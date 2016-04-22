@@ -50,7 +50,7 @@ class Linker : public ParentNode
   Linker(std::string name, PathSelector* pathSelector);
 
   bool IsActive (uint32_t pathIdentifier) const ; //!< Returns true when the specified path is already selected
-  void Deselect (uint32_t pathIdentifier);        //!< Requests desactivation of the specified path
+  void Deselect (uint32_t pathIdentifier);        //!< Requests deactivation of the specified path
   void Select   (uint32_t pathIdentifier);        //!< Requests activation of the specified path
 
 
@@ -72,6 +72,7 @@ class Linker : public ParentNode
   // ---------------- Protected Methods
   //
   protected:
+  void CheckPathIdentifier(uint32_t pathIdentifier) const;
 
   // ---------------- Private  Methods
   //

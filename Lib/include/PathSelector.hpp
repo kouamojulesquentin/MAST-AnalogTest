@@ -15,8 +15,13 @@
 #ifndef LINKERINFORMATION_H__9B76DEAF_2DDC_4FFA_9F8A_EC2E62431F68__INCLUDED_
   #define LINKERINFORMATION_H__9B76DEAF_2DDC_4FFA_9F8A_EC2E62431F68__INCLUDED_
 
+#include <cstdint>
+
 namespace mast
 {
+
+class Linker;
+
 //! Extension point interface used by Linker to manage paths selection
 //!
 class PathSelector
@@ -25,8 +30,22 @@ class PathSelector
   //
   public:
 
+  //! Returns true when the specified path is already selected
+  //!
+  //! @param pathIdentifier   Path identifier in range [1..nb_path]
+  //!
   virtual bool IsActive (uint32_t pathIdentifier) const = 0; //!< Returns true when the specified path is already selected
-  virtual void Deselect (uint32_t pathIdentifier) = 0;       //!< Request desactivation of the specified path
+
+  //! Request deactivation of the specified path
+  //!
+  //! @param pathIdentifier   Path identifier in range [1..nb_path]
+  //!
+  virtual void Deselect (uint32_t pathIdentifier) = 0;       //!< Request deactivation of the specified path
+
+  //! Request activation of the specified path
+  //!
+  //! @param pathIdentifier   Path identifier in range [1..nb_path]
+  //!
   virtual void Select   (uint32_t pathIdentifier) = 0;       //!< Request activation of the specified path
 
   // ---------------- Protected Methods

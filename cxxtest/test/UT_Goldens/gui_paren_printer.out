@@ -1,0 +1,28 @@
+{Start 7 tests} Running cxxtest tests (7 tests)
+{GreenYellowRed::test_Start_green()}
+. {GreenYellowRed::test_Green_again()}
+
+In GreenYellowRed::test_Green_again:
+GreenYellowRed.h(27): Trace: Still green {Yellow}
+GreenYellowRed.h(25): Warning: No assertion found in this test !!! {GreenYellowRed::test_Now_yellow()}
+
+In GreenYellowRed::test_Now_yellow:
+GreenYellowRed.h(33): Warning: Yellow
+GreenYellowRed.h(31): Warning: No assertion found in this test !!! {GreenYellowRed::test_Cannot_go_back()}
+
+In GreenYellowRed::test_Cannot_go_back:
+GreenYellowRed.h(37): Warning: No assertion found in this test !!! {GreenYellowRed::test_Finally_red()}  {Red}
+
+In GreenYellowRed::test_Finally_red:
+GreenYellowRed.h(44): Error: Red {GreenYellowRed::test_Cannot_go_back_to_yellow()}
+
+In GreenYellowRed::test_Cannot_go_back_to_yellow:
+GreenYellowRed.h(50): Warning: Yellow?
+GreenYellowRed.h(48): Warning: No assertion found in this test !!! {GreenYellowRed::test_Cannot_go_back_to_green()}
+
+In GreenYellowRed::test_Cannot_go_back_to_green:
+GreenYellowRed.h(54): Warning: No assertion found in this test !!! {Stop}
+
+Failed 1 and Skipped 0 of 7 tests
+Success rate: 85%
+Error level = 1

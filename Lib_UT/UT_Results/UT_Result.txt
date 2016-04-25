@@ -1,0 +1,9 @@
+Running Mast_Lib tests (5 tests)
+
+....
+
+In UT_BinaryVector::test_No_test_yet_for_Guard: 
+UT_BinaryVector.cpp:103: Warning: No test yet for: `method_name`
+UT_BinaryVector.hpp:44: Warning: No assertion found in this test !!!
+
+OK! (5 tests)

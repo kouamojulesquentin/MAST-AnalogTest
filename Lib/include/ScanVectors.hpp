@@ -14,6 +14,8 @@
 
 #ifndef SCANVECTORS_H__3E0880BD_14C4_4089_BA8F_A382FB9EE011__INCLUDED_
   #define SCANVECTORS_H__3E0880BD_14C4_4089_BA8F_A382FB9EE011__INCLUDED_
+
+#include "Platform.hpp"
 #include <vector>
 #include <string>
 
@@ -25,7 +27,7 @@ class BinaryVectorRef;
 
 //! Contains bitstream vector in compact binary format
 //!
-class BinaryVector final
+class DLL_EXPORT BinaryVector final
 {
   // ---------------- Public  Methods
   //
@@ -33,21 +35,32 @@ class BinaryVector final
   ~BinaryVector() = default;
   BinaryVector()  = default;
   BinaryVector(const SVFVector& svfVector);   //!< Converts a SVFVector to a BinaryVector
-  explicit BinaryVector(const BinaryVector&  rhs);
+  explicit BinaryVector(const BinaryVector& rhs);
   explicit BinaryVector(BinaryVector&& rhs) noexcept;
 
   BinaryVector& operator=(const BinaryVector&);
   BinaryVector& operator=(BinaryVector&&) noexcept;
 
-  BinaryVector& operator=(uint8_t  value);
-  BinaryVector& operator=(uint16_t value);
-  BinaryVector& operator=(uint32_t value);
-  BinaryVector& operator=(uint64_t value);
 
   BinaryVector& operator~(); //!< Toggles (flips) every bits of the vector
 
   BinaryVector& operator<< (const BinaryVector& rhs);       //!< Appends another scan vector
   BinaryVector  operator+  (const BinaryVector& rhs) const; //!< Concatenate two scan vectors
+
+  BinaryVector& Append(uint8_t  value); //!< Appends  8 bits value the BinaryVector
+  BinaryVector& Append(uint16_t value); //!< Appends 16 bits value the BinaryVector
+  BinaryVector& Append(uint32_t value); //!< Appends 32 bits value the BinaryVector
+  BinaryVector& Append(uint64_t value); //!< Appends 64 bits value the BinaryVector
+
+  void          Clear();                //!< Clears all content
+  void          Set(uint8_t     value); //!< Assigns  8 bits value the BinaryVector
+  void          Set(uint16_t    value); //!< Assigns 16 bits value the BinaryVector
+  void          Set(uint32_t    value); //!< Assigns 32 bits value the BinaryVector
+  void          Set(uint64_t    value); //!< Assigns 64 bits value the BinaryVector
+
+  uint32_t       BitCount()   const { return m_usedBits;    } //!< Returns total number of valid bits in the BinaryVector
+  uint32_t       BytesCount() const { return m_data.size(); } //!< Returns total number of valid bits in the BinaryVector
+  const uint8_t* Data()       const { return m_data.data(); } //!< Returns pointer on raw bits stream data (only valid as long as content is not modified)
 
   BinaryVector    Slice    (uint32_t firstBit, uint32_t lastBit); //!< Returns a slice from BinaryVector
   BinaryVectorRef SliceRef (uint32_t firstBit, uint32_t lastBit); //!< Returns a reference to a slice from BinaryVector

@@ -1,0 +1,119 @@
+Running UT_AbortTestOnFailure tests (30 tests)
+
+
+In UT_AbortTestOnFail::test_ASSERT_AbortTestOnFail_True:
+UT_AbortTestOnFail.cpp:80: Error: Expected (lhs == rhs)to be true, but found it is false
+
+In UT_AbortTestOnFail::test_ASSERT_FALSE_AbortTestOnFail_True:
+UT_AbortTestOnFail.cpp:92: Error: Expected (lhs == rhs)to be false, but found it is true
+
+In UT_AbortTestOnFail::test_ASSERT_EQUALS_AbortTestOnFail_True:
+UT_AbortTestOnFail.cpp:104: Error: Expected (lhs == rhs), but found (2 != 1)
+
+In UT_AbortTestOnFail::test_ASSERT_DIFFERS_AbortTestOnFail_True:
+UT_AbortTestOnFail.cpp:118: Error: Expected (lhs != rhs), but found (2 == 2)
+
+In UT_AbortTestOnFail::test_ASSERT_GREATER_THAN_AbortTestOnFail_True:
+UT_AbortTestOnFail.cpp:134: Error: Expected (sutValue > expectedValue), but found (3 <= 10)
+
+In UT_AbortTestOnFail::test_ASSERT_GREATER_THAN_EQUAL_AbortTestOnFail_True:
+UT_AbortTestOnFail.cpp:147: Error: Expected (sutValue >= expectedValue), but found (4 < 10)
+
+In UT_AbortTestOnFail::test_ASSERT_LESS_THAN_AbortTestOnFail_True:
+UT_AbortTestOnFail.cpp:162: Error: Expected (sutValue < expectedValue), but found (3 >= 2)
+
+In UT_AbortTestOnFail::test_ASSERT_LESS_THAN_EQUAL_AbortTestOnFail_True:
+UT_AbortTestOnFail.cpp:175: Error: Expected (sutValue <= expectedValue), but found (3 > 2)
+
+In UT_AbortTestOnFail::test_ASSERT_DELTA_AbortTestOnFail_True:
+UT_AbortTestOnFail.cpp:190: Error: Expected (lhs == rhs) within delta: (acceptedDelta), but found (2.0 != 2.0000998973846435) and delta = 0.0000001000000011
+
+In UT_AbortTestOnFail::test_ASSERT_PREDICATE_AbortTestOnFail_True:
+UT_AbortTestOnFail.cpp:205: Error: Expected IsOddPredicate()(value) to be true, but found IsOddPredicate()(44) is false
+
+In UT_AbortTestOnFail::test_ASSERT_RELATION_AbortTestOnFail_True:
+UT_AbortTestOnFail.cpp:219: Error: Expected AreEqualRelation()(lhs, rhs) to be true, but found AreEqualRelation()(999, 1000) is false
+
+In UT_AbortTestOnFail::test_ASSERT_SAME_DATA_AbortTestOnFail_True:
+UT_AbortTestOnFail.cpp:236: Error: Expected first (sizeof(lhs))  (6) bytes to be equal at (lhs)  and (rhs),
+But found:
+{ 77 6F 72 6C 64 00 }
+Differing from:
+{ 57 6F 72 6C 64 00 }
+
+In UT_AbortTestOnFail::test_ASSERT_THROWS_AbortTestOnFail_True:
+UT_AbortTestOnFail.cpp:247: Error: Expected (doNothing()) to throw (std::exception), but found it didn't throw
+
+In UT_AbortTestOnFail::test_ASSERT_THROWS_ANYTHING_AbortTestOnFail_True:
+UT_AbortTestOnFail.cpp:259: Error: Expected (doNothing())to throw anything, but found it did not throw
+
+In UT_AbortTestOnFail::test_ASSERT_THROWS_NOTHING_AbortTestOnFail_True:
+UT_AbortTestOnFail.cpp:271: Error: Expected (throwException()) not to throw, but found it did throw
+
+In UT_AbortTestOnFail::test_ASSERT_AbortTestOnFail_False:
+UT_AbortTestOnFail.cpp:286: Error: Expected (lhs == rhs)to be true, but found it is false
+UT_AbortTestOnFail.cpp:288: Warning: This is expected message for test_ASSERT_AbortTestOnFail_False
+
+In UT_AbortTestOnFail::test_ASSERT_FALSE_AbortTestOnFail_False:
+UT_AbortTestOnFail.cpp:301: Error: Expected (lhs == rhs)to be false, but found it is true
+UT_AbortTestOnFail.cpp:303: Warning: This is expected message for test_ASSERT_AbortTestOnFail_False
+
+In UT_AbortTestOnFail::test_ASSERT_EQUALS_AbortTestOnFail_False:
+UT_AbortTestOnFail.cpp:316: Error: Expected (lhs == rhs), but found (2 != 1)
+UT_AbortTestOnFail.cpp:318: Warning: This is expected message for test_ASSERT_EQUALS_AbortTestOnFail_False
+
+In UT_AbortTestOnFail::test_ASSERT_DIFFERS_AbortTestOnFail_False:
+UT_AbortTestOnFail.cpp:331: Error: Expected (lhs != rhs), but found (2 == 2)
+UT_AbortTestOnFail.cpp:333: Warning: This is expected message for test_ASSERT_DIFFERS_AbortTestOnFail_False
+
+In UT_AbortTestOnFail::test_ASSERT_GREATER_THAN_AbortTestOnFail_False:
+UT_AbortTestOnFail.cpp:345: Error: Expected (sutValue > expectedValue), but found (3 <= 20)
+UT_AbortTestOnFail.cpp:347: Warning: This is expected message for test_ASSERT_GREATER_THAN_AbortTestOnFail_False
+
+In UT_AbortTestOnFail::test_ASSERT_GREATER_THAN_EQUAL_AbortTestOnFail_False:
+UT_AbortTestOnFail.cpp:358: Error: Expected (sutValue >= expectedValue), but found (8 < 20)
+UT_AbortTestOnFail.cpp:360: Warning: This is expected message for test_ASSERT_GREATER_THAN_EQUAL_AbortTestOnFail_False
+
+In UT_AbortTestOnFail::test_ASSERT_LESS_THAN_AbortTestOnFail_False:
+UT_AbortTestOnFail.cpp:374: Error: Expected (sutValue < expectedValue), but found (3 >= 2)
+UT_AbortTestOnFail.cpp:376: Warning: This is expected message for test_ASSERT_LESS_THAN_AbortTestOnFail_False
+
+In UT_AbortTestOnFail::test_ASSERT_LESS_THAN_EQUAL_AbortTestOnFail_False:
+UT_AbortTestOnFail.cpp:387: Error: Expected (sutValue <= expectedValue), but found (3 > 2)
+UT_AbortTestOnFail.cpp:389: Warning: This is expected message for test_ASSERT_LESS_THAN_EQUAL_AbortTestOnFail_False
+
+In UT_AbortTestOnFail::test_ASSERT_DELTA_AbortTestOnFail_False:
+UT_AbortTestOnFail.cpp:402: Error: Expected (lhs == rhs) within delta: (acceptedDelta), but found (2.0 != 2.0000998973846435) and delta = 0.0000001000000011
+UT_AbortTestOnFail.cpp:404: Warning: This is expected message for test_ASSERT_DELTA_AbortTestOnFail_False
+
+In UT_AbortTestOnFail::test_ASSERT_PREDICATE_AbortTestOnFail_False:
+UT_AbortTestOnFail.cpp:435: Error: Expected IsOddPredicate()(value) to be true, but found IsOddPredicate()(22) is false
+UT_AbortTestOnFail.cpp:437: Warning: This is expected message for test_ASSERT_PREDICATE_AbortTestOnFail_False
+
+In UT_AbortTestOnFail::test_ASSERT_RELATION_AbortTestOnFail_False:
+UT_AbortTestOnFail.cpp:449: Error: Expected AreEqualRelation()(lhs, rhs) to be true, but found AreEqualRelation()(999, 1000) is false
+UT_AbortTestOnFail.cpp:451: Warning: This is expected message for test_ASSERT_RELATION_AbortTestOnFail_False
+
+In UT_AbortTestOnFail::test_ASSERT_SAME_DATA_AbortTestOnFail_False:
+UT_AbortTestOnFail.cpp:466: Error: Expected first (sizeof(lhs))  (12) bytes to be equal at (lhs)  and (rhs),
+But found:
+{ 48 65 6C 6C 6F 20 77 6F 72 6C 64 00 }
+Differing from:
+{ 48 65 6C 6C 6F 20 57 6F 72 6C 64 00 }
+UT_AbortTestOnFail.cpp:468: Warning: This is expected message for test_ASSERT_SAME_DATA_AbortTestOnFail_False
+
+In UT_AbortTestOnFail::test_ASSERT_THROWS_AbortTestOnFail_False:
+UT_AbortTestOnFail.cpp:477: Error: Expected (doNothing()) to throw (std::exception), but found it didn't throw
+UT_AbortTestOnFail.cpp:479: Warning: This is expected message for test_ASSERT_THROWS_AbortTestOnFail_False
+
+In UT_AbortTestOnFail::test_ASSERT_THROWS_ANYTHING_AbortTestOnFail_False:
+UT_AbortTestOnFail.cpp:488: Error: Expected (doNothing())to throw anything, but found it did not throw
+UT_AbortTestOnFail.cpp:490: Warning: This is expected message for test_ASSERT_THROWS_ANYTHING_AbortTestOnFail_False
+
+In UT_AbortTestOnFail::test_ASSERT_THROWS_NOTHING_AbortTestOnFail_False:
+UT_AbortTestOnFail.cpp:500: Error: Expected (throwException()) not to throw, but found it did throw
+UT_AbortTestOnFail.cpp:502: Warning: This is expected message for test_ASSERT_THROWS_ANYTHING_AbortTestOnFail_False
+
+Failed 30 and Skipped 0 of 30 tests
+Success rate: 0%
+Error level = 30

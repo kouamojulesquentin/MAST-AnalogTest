@@ -1,0 +1,26 @@
+Running cxxtest tests (4 tests)
+
+
+In Traits_Integrals::testIntegerTraits:
+Traits_Integrals.h:14: Error: 1
+Traits_Integrals.h:15: Error: '\x0F'
+Traits_Integrals.h:16: Error: -12
+Traits_Integrals.h:17: Error: 34
+Traits_Integrals.h:18: Error: -123
+Traits_Integrals.h:19: Error: 456
+Traits_Integrals.h:20: Error: -12345
+Traits_Integrals.h:21: Error: 67890
+
+In Traits_Integrals::testFloatTraits:
+Traits_Integrals.h:26: Error: 5.0123457908630371
+
+In Traits_Integrals::testDoubleTrait:
+Traits_Integrals.h:31: Error: 5.0123456789012346
+
+In Traits_Integrals::testBoolTraits:
+Traits_Integrals.h:36: Error: true
+Traits_Integrals.h:37: Error: false
+
+Failed 4 and Skipped 0 of 4 tests
+Success rate: 0%
+Error level = 4

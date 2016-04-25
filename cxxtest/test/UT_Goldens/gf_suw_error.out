@@ -1,0 +1,9 @@
+Running cxxtest tests (2 tests)
+
+
+In <no suite>::<no test>:
+SetUpWorldError.h:12: Error: THIS IS BAD
+RealDescriptions.cpp:5: Warning: Error setting up world
+
+OK! (2 tests)
+Error level = 0

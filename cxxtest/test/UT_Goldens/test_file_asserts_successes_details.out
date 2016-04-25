@@ -1,0 +1,78 @@
+Running UT_FileAsserts_Successes tests (17 tests)
+
+
+In UT_FileAsserts_Successes::test_TS_ASSERT_SAME_FILES_std_string:
+UT_FileAsserts_Successes.cpp:50: Success: Expected  file: "UT_Sources/Files_to_compare/TwoLines - Copie.txt" shall be equal to file "UT_Sources/Files_to_compare/TwoLines.txt", Result:  files are equal
+.
+
+In UT_FileAsserts_Successes::test_TS_ASSERT_FILE_EXISTS:
+UT_FileAsserts_Successes.cpp:58: Success: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file to exist, Result: it exists
+.
+
+In UT_FileAsserts_Successes::test_TS_ASSERT_FILE_EXISTS_message:
+UT_FileAsserts_Successes.cpp:65: Message: Message from test_TS_ASSERT_FILE_EXISTS_message
+UT_FileAsserts_Successes.cpp:65: Success: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file to exist, Result: it exists
+.
+
+In UT_FileAsserts_Successes::test_TS_ASSERT_FILE_EXISTS_std_string:
+UT_FileAsserts_Successes.cpp:73: Success: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file to exist, Result: it exists
+.
+
+In UT_FileAsserts_Successes::test_TS_ASSERT_FILE_NOT_EXISTS:
+UT_FileAsserts_Successes.cpp:81: Success: Expected "UT_Sources/Files_to_compare/!!! Please_delete_this_file_!!!.txt" file to not exist, Result: it does not exist
+.
+
+In UT_FileAsserts_Successes::test_TS_ASSERT_FILE_NOT_EXISTS_message:
+UT_FileAsserts_Successes.cpp:88: Message: Message from test_TS_ASSERT_FILE_NOT_EXISTS_message
+UT_FileAsserts_Successes.cpp:88: Success: Expected "UT_Sources/Files_to_compare/!!! Please_delete_this_file_!!!.txt" file to not exist, Result: it does not exist
+.
+
+In UT_FileAsserts_Successes::test_TS_ASSERT_FILE_NOT_EXISTS_std_string:
+UT_FileAsserts_Successes.cpp:96: Success: Expected "UT_Sources/Files_to_compare/!!! Please_delete_this_file_!!!.txt" file to not exist, Result: it does not exist
+.
+
+In UT_FileAsserts_Successes::test_TS_ASSERT_FILE_SIZE:
+UT_FileAsserts_Successes.cpp:104: Success: Expected "UT_Sources/Files_to_compare/MediumSize.txt" file size = 6126, Result: effective file size = 6126
+.
+
+In UT_FileAsserts_Successes::test_TS_ASSERT_FILE_SIZE_message:
+UT_FileAsserts_Successes.cpp:111: Message: Message from test_TS_ASSERT_FILE_SIZE_message
+UT_FileAsserts_Successes.cpp:111: Success: Expected "UT_Sources/Files_to_compare/MediumSize.txt" file size = 6126, Result: effective file size = 6126
+.
+
+In UT_FileAsserts_Successes::test_TS_ASSERT_FILE_SIZE_std_string:
+UT_FileAsserts_Successes.cpp:119: Success: Expected "UT_Sources/Files_to_compare/MediumSize.txt" file size = 6126, Result: effective file size = 6126
+.
+
+In UT_FileAsserts_Successes::test_TS_ASSERT_FILE_EMPTY:
+UT_FileAsserts_Successes.cpp:126: Success: Expected "UT_Sources/Files_to_compare/Empty.txt" file size = 0, Result: effective file size = 0
+.
+
+In UT_FileAsserts_Successes::test_TS_ASSERT_FILE_EMPTY_message:
+UT_FileAsserts_Successes.cpp:133: Message: Message from test_TS_ASSERT_FILE_EMPTY_message
+UT_FileAsserts_Successes.cpp:133: Success: Expected "UT_Sources/Files_to_compare/Empty.txt" file size = 0, Result: effective file size = 0
+.
+
+In UT_FileAsserts_Successes::test_TS_ASSERT_FILE_EMPTY_std_string:
+UT_FileAsserts_Successes.cpp:141: Success: Expected "UT_Sources/Files_to_compare/Empty.txt" file size = 0, Result: effective file size = 0
+.
+
+In UT_FileAsserts_Successes::test_TS_ASSERT_FILE_CONTENT:
+UT_FileAsserts_Successes.cpp:149: Success: Expected "UT_Sources/Files_to_compare/FiveLines.txt" file content (5 lines) to be equal to ("1st Line\n2nd Line from resources !!!\n    This is third line\n\n      This is fifth line (after empty 4th one)."), Result: its content is as expected
+.
+
+In UT_FileAsserts_Successes::test_TS_ASSERT_FILE_CONTENT_message:
+UT_FileAsserts_Successes.cpp:157: Message: Message from test_TS_ASSERT_FILE_CONTENT_message
+UT_FileAsserts_Successes.cpp:157: Success: Expected "UT_Sources/Files_to_compare/FiveLines.txt" file content (5 lines) to be equal to (expectedContent), Result: its content is as expected
+.
+
+In UT_FileAsserts_Successes::test_TS_ASSERT_FILE_CONTENT_std_string:
+UT_FileAsserts_Successes.cpp:164: Success: Expected "UT_Sources/Files_to_compare/FiveLines.txt" file content (5 lines) to be equal to (std::string("1st Line\n2nd Line from resources !!!\n    This is third line\n\n      This is fifth line (after empty 4th one).")), Result: its content is as expected
+.
+
+In UT_FileAsserts_Successes::test_TS_ASSERT_FILE_CONTENT_both_empty:
+UT_FileAsserts_Successes.cpp:171: Success: Expected "UT_Sources/Files_to_compare/Empty.txt" file content (empty) to be equal to (""), Result: its content is as expected
+.
+
+OK! (17 tests)
+Error level = 0

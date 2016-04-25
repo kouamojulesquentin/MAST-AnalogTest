@@ -1,0 +1,28 @@
+Running UT_NotAssertMacros tests (6 tests)
+
+
+In UT_NotAssertMacros::test_WARN:
+UT_NotAssertMacros.cpp:31: Warning: 'This is expected message from test_WARN'
+UT_NotAssertMacros.h:37: Warning: No assertion found in this test !!!
+
+In UT_NotAssertMacros::test_TRACE:
+UT_NotAssertMacros.cpp:38: Trace: 'This is expected message from test_TRACE'
+UT_NotAssertMacros.h:38: Warning: No assertion found in this test !!!
+
+In UT_NotAssertMacros::test_SKIP:
+UT_NotAssertMacros.cpp:45: Warning: Test skipped: 'This is expected message from test_SKIP'
+s
+
+In UT_NotAssertMacros::test_SKIP_Empty_Message:
+UT_NotAssertMacros.cpp:52: Warning: Test skipped: Missing message !!!
+s
+
+In UT_NotAssertMacros::test_FAIL:
+UT_NotAssertMacros.cpp:60: Error: 'This is TS_FAIL message'
+
+In UT_NotAssertMacros::test_EmptyTest:
+UT_NotAssertMacros.h:45: Warning: No assertion found in this test !!!
+
+Failed 1 and Skipped 2 of 6 tests
+Success rate: 75%
+Error level = 1

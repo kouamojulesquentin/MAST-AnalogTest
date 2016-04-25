@@ -1,0 +1,73 @@
+Running UT_PointerAsserts_Failures tests (22 tests)
+
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_NULLPTR:
+UT_PointerAsserts_Failures.cpp:55: Error: Expected (&value) to be nullptr, but found it is not nullptr
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_NULLPTR_shared_ptr:
+UT_PointerAsserts_Failures.cpp:63: Error: Expected (make_shared<int>()) to be nullptr, but found it is not nullptr
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_NULLPTR_unique_ptr:
+UT_PointerAsserts_Failures.cpp:70: Error: Expected (make_unique<int>()) to be nullptr, but found it is not nullptr
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_NULLPTR_Exception_inside:
+UT_PointerAsserts_Failures.cpp:77: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getPointerThrowing() !!!'
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_NULLPTR_Exception_before:
+UT_PointerAsserts_Failures.h:40: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().'
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_NULLPTR_Exception_after:
+UT_PointerAsserts_Failures.cpp:92: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_NOT_NULLPTR:
+UT_PointerAsserts_Failures.cpp:102: Error: Expected (pValue) to be not nullptr, but found it is nullptr
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_NOT_NULLPTR_shared_ptr:
+UT_PointerAsserts_Failures.cpp:111: Error: Expected (nullSharedPtr) to be not nullptr, but found it is nullptr
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_NOT_NULLPTR_unique_ptr:
+UT_PointerAsserts_Failures.cpp:119: Error: Expected (nullUniquePtr) to be not nullptr, but found it is nullptr
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_NOT_NULLPTR_Exception_inside:
+UT_PointerAsserts_Failures.cpp:127: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getPointerThrowing() !!!'
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_NOT_NULLPTR_Exception_before:
+UT_PointerAsserts_Failures.h:49: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().'
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_NOT_NULLPTR_Exception_after:
+UT_PointerAsserts_Failures.cpp:142: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_EQUALS_PTR_When_First_NullPtr:
+UT_PointerAsserts_Failures.cpp:154: Error: Expected (pValue_1 == pValue_2), but found (nullptr != not nullptr)
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_EQUALS_PTR_When_First_Not_NullPtr:
+UT_PointerAsserts_Failures.cpp:164: Error: Expected (pValue_1 == pValue_2), but found (not nullptr != nullptr)
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_EQUALS_PTR_Exception_inside:
+UT_PointerAsserts_Failures.cpp:173: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getPointerThrowing() !!!'
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_EQUALS_PTR_Exception_before:
+UT_PointerAsserts_Failures.h:57: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().'
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_EQUALS_PTR_Exception_after:
+UT_PointerAsserts_Failures.cpp:196: Error: Expected (pValue_1 == pValue_2), but found (not nullptr != nullptr)
+UT_PointerAsserts_Failures.cpp:196: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_DIFFERS_PTR_When_Both_NullPtr:
+UT_PointerAsserts_Failures.cpp:206: Error: Expected (pValue_1 != pValue_2), but found (nullptr == nullptr)
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_DIFFERS_PTR_When_Both_Not_NullPtr:
+UT_PointerAsserts_Failures.cpp:216: Error: Expected (pValue_1 != pValue_2), but found (not nullptr == not nullptr)
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_DIFFERS_PTR_Exception_inside:
+UT_PointerAsserts_Failures.cpp:225: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getPointerThrowing() !!!'
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_DIFFERS_PTR_Exception_before:
+UT_PointerAsserts_Failures.h:65: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().'
+
+In UT_PointerAsserts_Failures::test_TS_ASSERT_DIFFERS_PTR_Exception_after:
+UT_PointerAsserts_Failures.cpp:248: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
+
+Failed 22 and Skipped 0 of 22 tests
+Success rate: 0%
+Error level = 22

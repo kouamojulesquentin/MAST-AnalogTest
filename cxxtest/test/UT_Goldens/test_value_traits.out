@@ -1,0 +1,192 @@
+Running UT_CxxtestValueTraits tests (62 tests)
+
+
+In UT_ValueTraits::test_ValueTraits_With_char:
+UT_ValueTraits.cpp:42: Error: Expected (lhs == rhs), but found ('A' != 'z')
+
+In UT_ValueTraits::test_ValueTraits_With_const_char:
+UT_ValueTraits.cpp:56: Error: Expected (lhs == rhs), but found ('A' != 'z')
+
+In UT_ValueTraits::test_ValueTraits_With_signed_char:
+UT_ValueTraits.cpp:72: Error: Expected (lhs == rhs), but found ('\xF4' != '\xF3')
+
+In UT_ValueTraits::test_ValueTraits_With_const_signed_char:
+UT_ValueTraits.cpp:86: Error: Expected (lhs == rhs), but found ('\xF4' != '\xF3')
+
+In UT_ValueTraits::test_ValueTraits_With_unsigned_char:
+UT_ValueTraits.cpp:100: Error: Expected (lhs == rhs), but found (45 != 54)
+
+In UT_ValueTraits::test_ValueTraits_With_const_unsigned_char:
+UT_ValueTraits.cpp:114: Error: Expected (lhs == rhs), but found (45 != 54)
+
+In UT_ValueTraits::test_ValueTraits_With_char_Pointer:
+UT_ValueTraits.cpp:129: Error: Expected (lhs == rhs), but found ("Hello" != "World")
+
+In UT_ValueTraits::test_ValueTraits_With_const_char_Pointer:
+UT_ValueTraits.cpp:143: Error: Expected (lhs == rhs), but found ("Hello" != "World")
+
+In UT_ValueTraits::test_ValueTraits_With_signed_char_Pointer:
+UT_ValueTraits.cpp:159: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_const_signed_char_Pointer:
+UT_ValueTraits.cpp:173: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_unsigned_char_Pointer:
+UT_ValueTraits.cpp:187: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_const_unsigned_char_Pointer:
+UT_ValueTraits.cpp:201: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_int:
+UT_ValueTraits.cpp:215: Error: Expected (lhs == rhs), but found (99 != 55)
+
+In UT_ValueTraits::test_ValueTraits_With_const_int:
+UT_ValueTraits.cpp:229: Error: Expected (lhs == rhs), but found (199 != 155)
+
+In UT_ValueTraits::test_ValueTraits_With_signed_int:
+UT_ValueTraits.cpp:245: Error: Expected (lhs == rhs), but found (-12 != -13)
+
+In UT_ValueTraits::test_ValueTraits_With_const_signed_int:
+UT_ValueTraits.cpp:259: Error: Expected (lhs == rhs), but found (-12 != -13)
+
+In UT_ValueTraits::test_ValueTraits_With_unsigned_int:
+UT_ValueTraits.cpp:273: Error: Expected (lhs == rhs), but found (4567 != 5432)
+
+In UT_ValueTraits::test_ValueTraits_With_const_unsigned_int:
+UT_ValueTraits.cpp:287: Error: Expected (lhs == rhs), but found (4567 != 5432)
+
+In UT_ValueTraits::test_ValueTraits_With_int_Pointer:
+UT_ValueTraits.cpp:302: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_const_int_Pointer:
+UT_ValueTraits.cpp:316: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_signed_int_Pointer:
+UT_ValueTraits.cpp:332: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_const_signed_int_Pointer:
+UT_ValueTraits.cpp:346: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_unsigned_int_Pointer:
+UT_ValueTraits.cpp:360: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_const_unsigned_int_Pointer:
+UT_ValueTraits.cpp:374: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_long_int:
+UT_ValueTraits.cpp:389: Error: Expected (lhs == rhs), but found (1234567890 != 1234567899)
+
+In UT_ValueTraits::test_ValueTraits_With_const_long_int:
+UT_ValueTraits.cpp:403: Error: Expected (lhs == rhs), but found (1234567890 != 1234567899)
+
+In UT_ValueTraits::test_ValueTraits_With_signed_long_int:
+UT_ValueTraits.cpp:419: Error: Expected (lhs == rhs), but found (-1234567890 != -1234567899)
+
+In UT_ValueTraits::test_ValueTraits_With_const_signed_long_int:
+UT_ValueTraits.cpp:433: Error: Expected (lhs == rhs), but found (-1234567890 != -1234567899)
+
+In UT_ValueTraits::test_ValueTraits_With_unsigned_long_int:
+UT_ValueTraits.cpp:447: Error: Expected (lhs == rhs), but found (1234567890 != 1234567899)
+
+In UT_ValueTraits::test_ValueTraits_With_const_unsigned_long_int:
+UT_ValueTraits.cpp:461: Error: Expected (lhs == rhs), but found (1234567890 != 1234567899)
+
+In UT_ValueTraits::test_ValueTraits_With_long_int_Pointer:
+UT_ValueTraits.cpp:476: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_const_long_int_Pointer:
+UT_ValueTraits.cpp:490: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_signed_long_int_Pointer:
+UT_ValueTraits.cpp:506: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_const_signed_long_int_Pointer:
+UT_ValueTraits.cpp:520: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_unsigned_long_int_Pointer:
+UT_ValueTraits.cpp:534: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_const_unsigned_long_int_Pointer:
+UT_ValueTraits.cpp:548: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_long_long:
+UT_ValueTraits.cpp:563: Error: Expected (lhs == rhs), but found (1234567890123456789 != 3876543210987654321)
+
+In UT_ValueTraits::test_ValueTraits_With_const_long_long:
+UT_ValueTraits.cpp:577: Error: Expected (lhs == rhs), but found (1234567890123456789 != 3876543210987654321)
+
+In UT_ValueTraits::test_ValueTraits_With_signed_long_long:
+UT_ValueTraits.cpp:593: Error: Expected (lhs == rhs), but found (-1234567890123456789 != -3876543210987654321)
+
+In UT_ValueTraits::test_ValueTraits_With_const_signed_long_long:
+UT_ValueTraits.cpp:607: Error: Expected (lhs == rhs), but found (-1234567890123456789 != -3876543210987654321)
+
+In UT_ValueTraits::test_ValueTraits_With_unsigned_long_long:
+UT_ValueTraits.cpp:621: Error: Expected (lhs == rhs), but found (8234567890123456789 != 8234567890123456788)
+
+In UT_ValueTraits::test_ValueTraits_With_const_unsigned_long_long:
+UT_ValueTraits.cpp:635: Error: Expected (lhs == rhs), but found (8234567890123456789 != 8234567890123456788)
+
+In UT_ValueTraits::test_ValueTraits_With_long_long_Pointer:
+UT_ValueTraits.cpp:650: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_const_long_long_Pointer:
+UT_ValueTraits.cpp:664: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_signed_long_long_Pointer:
+UT_ValueTraits.cpp:680: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_const_signed_long_long_Pointer:
+UT_ValueTraits.cpp:694: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_unsigned_long_long_Pointer:
+UT_ValueTraits.cpp:708: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_const_unsigned_long_long_Pointer:
+UT_ValueTraits.cpp:722: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_bool:
+UT_ValueTraits.cpp:737: Error: Expected (lhs == rhs), but found (true != false)
+
+In UT_ValueTraits::test_ValueTraits_With_const_bool:
+UT_ValueTraits.cpp:751: Error: Expected (lhs == rhs), but found (true != false)
+
+In UT_ValueTraits::test_ValueTraits_With_const_nonconst_bool:
+UT_ValueTraits.cpp:765: Error: Expected (lhs == rhs), but found (true != false)
+
+In UT_ValueTraits::test_ValueTraits_With_bool_Pointer:
+UT_ValueTraits.cpp:779: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_const_bool_Pointer:
+UT_ValueTraits.cpp:793: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_float:
+UT_ValueTraits.cpp:809: Error: Expected (lhs == rhs), but found (99.9000015258789062 != 55.5)
+
+In UT_ValueTraits::test_ValueTraits_With_const_float:
+UT_ValueTraits.cpp:823: Error: Expected (lhs == rhs), but found (19.8999996185302734 != 15.5)
+
+In UT_ValueTraits::test_ValueTraits_With_const_nonconst_float:
+UT_ValueTraits.cpp:837: Error: Expected (lhs == rhs), but found (98.6500015258789062 != 55.4399986267089843)
+
+In UT_ValueTraits::test_ValueTraits_With_float_Pointer:
+UT_ValueTraits.cpp:852: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_const_float_Pointer:
+UT_ValueTraits.cpp:866: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_double:
+UT_ValueTraits.cpp:880: Error: Expected (lhs == rhs), but found (99.9000000000000056 != 55.5)
+
+In UT_ValueTraits::test_ValueTraits_With_const_double:
+UT_ValueTraits.cpp:894: Error: Expected (lhs == rhs), but found (19.8999999999999985 != 15.5)
+
+In UT_ValueTraits::test_ValueTraits_With_double_Pointer:
+UT_ValueTraits.cpp:909: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+In UT_ValueTraits::test_ValueTraits_With_const_double_Pointer:
+UT_ValueTraits.cpp:923: Error: Expected (lhs == rhs), but found (0x78563412 != 0x78563499)
+
+Failed 62 and Skipped 0 of 62 tests
+Success rate: 0%
+Error level = 62

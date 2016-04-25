@@ -1,0 +1,32 @@
+Running UT_DataDriven_Successes tests (19 tests)
+
+..................................................
+
+In UT_DataDriven_Successes::test_WithNoAssert_Before:
+UT_DataDriven_Successes.cpp:350: Warning: Warning message for UT_DataDriven_Successes
+........
+
+In UT_DataDriven_Successes::test_WithNoAssert_After:
+UT_DataDriven_Successes.cpp:388: Warning: Warning message for UT_DataDriven_Successes
+
+
+In UT_DataDriven_Successes::test_MissingAssertion_First:
+==> In data driven test with id: 0 and input sample: 0
+Warning: No assertion found for this data driven test sample !!!
+.....
+
+In UT_DataDriven_Successes::test_MissingAssertion_Middle:
+==> In data driven test with id: 2 and input sample: 2
+Warning: No assertion found for this data driven test sample !!!
+....
+
+In UT_DataDriven_Successes::test_MissingAssertion_Last:
+==> In data driven test with id: 3 and input sample: -1000
+Warning: No assertion found for this data driven test sample !!!
+
+In UT_DataDriven_Successes::test_No_test_yet_for_Guard:
+UT_DataDriven_Successes.cpp:466: Warning: No test yet for: all kind of assertions with all successes
+UT_DataDriven_Successes.h:82: Warning: No assertion found in this test !!!
+
+OK! (71 tests including 70 'sub' tests from 18 data driven tests)
+Error level = 0

@@ -75,7 +75,7 @@ DefaultBinaryPathSelector::TablesType DefaultBinaryPathSelector::CreateSelectTab
 
   for (uint32_t pathId = 1 ; pathId <= pathCount ; ++pathId)
   {
-    table[pathId] = noIdle ? pathId - 1 : pathId;
+    table[pathId].Append(noIdle ? pathId - 1 : pathId);
   }
 
   if (isInverted)

@@ -1,0 +1,9 @@
+Running cxxtest tests (1 test)
+
+
+In Suite::testOne:
+TearDownWorldFails.h:24: Warning: No assertion found in this test !!!
+RealDescriptions.cpp:5: Warning: Error tearing down world
+
+OK! (1 test)
+Error level = 0

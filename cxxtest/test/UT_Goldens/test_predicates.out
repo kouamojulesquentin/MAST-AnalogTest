@@ -1,0 +1,26 @@
+Running UT_Predicates tests (19 tests)
+
+.......
+
+In UT_Predicates::test_ASSERT_PREDICATE_PredicateInstance_failure:
+UT_Predicates.cpp:141: Error: Expected IsOddPredicate()(value) to be true, but found IsOddPredicate()(2) is false
+
+In UT_Predicates::test_ASSERT_PREDICATE_LambdaExpression_failure:
+UT_Predicates.cpp:149: Error: Expected [](int v) -> bool { return (v % 2) != 0; }(value) to be true, but found [](int v) -> bool { return (v % 2) != 0; }(4) is false
+
+In UT_Predicates::test_ASSERT_PREDICATE_StaticMemberMethod_failure:
+UT_Predicates.cpp:157: Error: Expected IsOddStaticMemberPredicate(value) to be true, but found IsOddStaticMemberPredicate(6) is false
+
+In UT_Predicates::test_ASSERT_PREDICATE_Standalone_failure:
+UT_Predicates.cpp:165: Error: Expected IsOddStandalonePredicate(value) to be true, but found IsOddStandalonePredicate(8) is false
+
+In UT_Predicates::test_ASSERT_THROWS_PREDICATE_LambdaExpression_failure:
+UT_Predicates.cpp:173: Error: Expected exceptionValueCheck(exc) to be true, but found exceptionValueCheck(3) is false
+......
+
+In UT_Predicates::test_ASSERT_THROWS_RELATION_LambdaExpression_failure:
+UT_Predicates.cpp:235: Error: Expected exceptionValueCheck(exc, 9) to be true, but found exceptionValueCheck(5, 9) is false
+
+Failed 6 and Skipped 0 of 19 tests
+Success rate: 68%
+Error level = 6

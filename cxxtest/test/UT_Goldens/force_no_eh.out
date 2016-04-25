@@ -1,0 +1,10 @@
+Running cxxtest tests (1 test)
+
+
+In ForceNoEh::testCxxTestCanCompileWithoutExceptionHandling:
+ForceNoEh.h:8: Error: Expected (1 == 2), but found (1 != 2)
+ForceNoEh.h:9: Error: Expected (2 == 3), but found (2 != 3)
+
+Failed 1 and Skipped 0 of 1 test
+Success rate: 0%
+Error level = 1

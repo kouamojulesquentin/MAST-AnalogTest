@@ -1,0 +1,10 @@
+Running cxxtest tests (1 test)
+
+
+In IncludesTest::testTraits:
+IncludeTest.h:12: Warning: (void *)
+IncludeTest.h:13: Warning: (long *)
+IncludeTest.h:10: Warning: No assertion found in this test !!!
+
+OK! (1 test)
+Error level = 0

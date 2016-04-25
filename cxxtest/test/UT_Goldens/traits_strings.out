@@ -1,0 +1,27 @@
+Running cxxtest tests (3 tests)
+
+
+In Traits_Strings::testCharTraits:
+Traits_Strings.h:14: Error: 'A'
+Traits_Strings.h:15: Error: '\x04'
+Traits_Strings.h:16: Error: '\x1B'
+Traits_Strings.h:17: Error: '\0'
+Traits_Strings.h:18: Error: '\r'
+Traits_Strings.h:19: Error: '\n'
+Traits_Strings.h:20: Error: '\b'
+Traits_Strings.h:21: Error: '\t'
+Traits_Strings.h:22: Error: '\a'
+Traits_Strings.h:23: Error: '\xFB'
+
+In Traits_Strings::testStringTraits:
+Traits_Strings.h:28: Error: (char *) is displayed as-is
+
+
+In Traits_Strings::testStdStringTraits:
+Traits_Strings.h:35: Error: "std::string is displayed with \"\""
+Traits_Strings.h:36: Error: "Escapes\rAre\rTranslated"
+Traits_Strings.h:37: Error: "As are unprintable chars: \x124Vx"
+
+Failed 3 and Skipped 0 of 3 tests
+Success rate: 0%
+Error level = 3

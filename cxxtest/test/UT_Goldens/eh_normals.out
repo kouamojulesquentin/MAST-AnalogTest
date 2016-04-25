@@ -1,0 +1,53 @@
+Running cxxtest tests (13 tests)
+
+
+In NullCreate::<no test>:
+Exceptions.h:10: Message: createSuite() failed
+Exceptions.h:10: Error: Expected (suite() != NULL)to be true, but found it is false
+
+In ThrowCreate::<no test>:
+Exceptions.h:22: Error: Expected (createSuite()) not to throw, but found it did throw
+
+In ThrowDestroy::testNothing:
+Exceptions.h:37: Warning: No assertion found in this test !!!
+Exceptions.h:35: Error: Expected (destroySuite()) not to throw, but found it did throw
+
+In ThrowSetUp::testNothing:
+Exceptions.h:46: Error: Expected (suite()->setUp()) not to throw, but found it did throw
+
+In ThrowTearDown::testNothing:
+Exceptions.h:55: Error: Expected (suite()->tearDown()) not to throw, but found it did throw
+
+In TestThrowFromTest::testThrowSomething:
+Exceptions.h:61: Error: Unexpected 'int' exception thrown from test with value: '582'
+
+In TestThrowFromTest::testMoveOn:
+Exceptions.h:68: Trace: One failed test doesn't affect the others
+Exceptions.h:66: Warning: No assertion found in this test !!!
+
+In DynamicAbort::test_Abort_on_fail_in_this_test:
+DynamicAbort.h:8: Error: Expected (1 == 2), but found (1 != 2)
+DynamicAbort.h:9: Error: Expected (2 == 3), but found (2 != 3)
+
+In DynamicAbort::test_Dont_abort_in_this_test:
+DynamicAbort.h:15: Error: Expected (1 == 2), but found (1 != 2)
+DynamicAbort.h:16: Error: Expected (2 == 3), but found (2 != 3)
+
+In DynamicAbort::test_Revert_to_abort:
+DynamicAbort.h:21: Error: Expected (1 == 2), but found (1 != 2)
+DynamicAbort.h:22: Error: Expected (2 == 3), but found (2 != 3)
+
+In SetUpWorksAllTests::test_Dont_abort_in_this_test:
+DynamicAbort.h:36: Error: Expected (1 == 2), but found (1 != 2)
+DynamicAbort.h:37: Error: Expected (2 == 3), but found (2 != 3)
+
+In SetUpWorksAllTests::test_Dont_abort_in_this_test_either:
+DynamicAbort.h:42: Error: Expected (1 == 2), but found (1 != 2)
+DynamicAbort.h:43: Error: Expected (2 == 3), but found (2 != 3)
+
+In SetUpWorksAllTests::test_Override_in_this_test:
+DynamicAbort.h:49: Error: Expected (1 == 2), but found (1 != 2)
+
+Failed 12 and Skipped 0 of 13 tests
+Success rate: 7%
+Error level = 12

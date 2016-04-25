@@ -1,0 +1,10 @@
+Running cxxtest tests (1 test)
+
+
+In Suite::testOne:
+GfSetUpThrows.h:24: Message: Got unexpected exception for some GlobalFixture::setUp()
+GfSetUpThrows.h:24: Error: Expected (gf->setUp()) not to throw, but found it did throw
+
+Failed 1 and Skipped 0 of 1 test
+Success rate: 0%
+Error level = 1

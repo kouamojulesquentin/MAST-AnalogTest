@@ -1,0 +1,230 @@
+Running UT_UnexpectedExceptions tests (70 tests)
+
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_ASSERT:
+UT_UnexpectedExceptions.cpp:135: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_ASSERT_FALSE:
+UT_UnexpectedExceptions.cpp:143: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_ASSERT_EQUALS:
+UT_UnexpectedExceptions.cpp:150: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_ASSERT_EQUALS_AUTO_Value:
+UT_UnexpectedExceptions.cpp:157: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_ASSERT_EQUALS_AUTO_Pointer:
+UT_UnexpectedExceptions.cpp:165: Error: Unexpected 'std::exception' exception thrown from test with value: 'How boy'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_ASSERT_DIFFERS:
+UT_UnexpectedExceptions.cpp:174: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_ASSERT_GREATER_THAN:
+UT_UnexpectedExceptions.cpp:183: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_ASSERT_GREATER_THAN_EQUAL:
+UT_UnexpectedExceptions.cpp:191: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_ASSERT_LESS_THAN:
+UT_UnexpectedExceptions.cpp:201: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_ASSERT_LESS_THAN_EQUAL:
+UT_UnexpectedExceptions.cpp:209: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_ASSERT_DELTA:
+UT_UnexpectedExceptions.cpp:218: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_ASSERT_PREDICATE:
+UT_UnexpectedExceptions.cpp:228: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_ASSERT_RELATION:
+UT_UnexpectedExceptions.cpp:236: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_ASSERT_SAME_DATA:
+UT_UnexpectedExceptions.cpp:249: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_Message_ASSERT:
+UT_UnexpectedExceptions.cpp:258: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_Message_ASSERT_FALSE:
+UT_UnexpectedExceptions.cpp:266: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_Message_ASSERT_EQUALS:
+UT_UnexpectedExceptions.cpp:275: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_Message_ASSERT_EQUALS_AUTO_Value:
+UT_UnexpectedExceptions.cpp:283: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_Message_ASSERT_EQUALS_AUTO_Pointer:
+UT_UnexpectedExceptions.cpp:291: Error: Unexpected 'std::exception' exception thrown from test with value: 'How boy'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_Message_ASSERT_DIFFERS:
+UT_UnexpectedExceptions.cpp:301: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_Message_ASSERT_GREATER_THAN:
+UT_UnexpectedExceptions.cpp:310: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_Message_ASSERT_GREATER_THAN_EQUAL:
+UT_UnexpectedExceptions.cpp:318: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_Message_ASSERT_LESS_THAN:
+UT_UnexpectedExceptions.cpp:327: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_Message_ASSERT_LESS_THAN_EQUAL:
+UT_UnexpectedExceptions.cpp:335: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_Message_ASSERT_DELTA:
+UT_UnexpectedExceptions.cpp:344: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_Message_ASSERT_PREDICATE:
+UT_UnexpectedExceptions.cpp:369: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_Message_ASSERT_RELATION:
+UT_UnexpectedExceptions.cpp:378: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception'
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_Message_ASSERT_SAME_DATA:
+UT_UnexpectedExceptions.cpp:391: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception'
+
+In UT_UnexpectedExceptions::test_Unexpected_Before_ASSERT:
+UT_UnexpectedExceptions.h:69: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Before_ASSERT_FALSE:
+UT_UnexpectedExceptions.h:70: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Before_ASSERT_EQUALS:
+UT_UnexpectedExceptions.h:71: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Before_ASSERT_EQUALS_AUTO_Value:
+UT_UnexpectedExceptions.h:72: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Before_ASSERT_EQUALS_AUTO_Pointer:
+UT_UnexpectedExceptions.h:73: Error: Unexpected 'std::exception' exception thrown from test with value: 'How boy'
+
+In UT_UnexpectedExceptions::test_Unexpected_Before_ASSERT_DIFFERS:
+UT_UnexpectedExceptions.h:74: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Before_ASSERT_GREATER_THAN:
+UT_UnexpectedExceptions.h:75: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Before_ASSERT_GREATER_THAN_EQUAL:
+UT_UnexpectedExceptions.h:76: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Before_ASSERT_LESS_THAN:
+UT_UnexpectedExceptions.h:77: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Before_ASSERT_LESS_THAN_EQUAL:
+UT_UnexpectedExceptions.h:78: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+
+In UT_UnexpectedExceptions::test_Unexpected_Before_ASSERT_DELTA:
+UT_UnexpectedExceptions.h:79: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception'
+
+In UT_UnexpectedExceptions::test_Unexpected_Before_ASSERT_PREDICATE:
+UT_UnexpectedExceptions.h:80: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception'
+
+In UT_UnexpectedExceptions::test_Unexpected_Before_ASSERT_RELATION:
+UT_UnexpectedExceptions.h:81: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception'
+
+In UT_UnexpectedExceptions::test_Unexpected_Before_ASSERT_SAME_DATA:
+UT_UnexpectedExceptions.h:82: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception'
+
+In UT_UnexpectedExceptions::test_Unexpected_After_ASSERT:
+UT_UnexpectedExceptions.cpp:548: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_After_ASSERT_FALSE:
+UT_UnexpectedExceptions.cpp:559: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_After_ASSERT_EQUALS:
+UT_UnexpectedExceptions.cpp:569: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_After_ASSERT_EQUALS_AUTO_Value:
+UT_UnexpectedExceptions.cpp:579: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_After_ASSERT_EQUALS_AUTO_Pointer:
+UT_UnexpectedExceptions.cpp:588: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_After_ASSERT_DIFFERS:
+UT_UnexpectedExceptions.cpp:599: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_After_ASSERT_GREATER_THAN:
+UT_UnexpectedExceptions.cpp:610: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_After_ASSERT_GREATER_THAN_EQUAL:
+UT_UnexpectedExceptions.cpp:620: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_After_ASSERT_LESS_THAN:
+UT_UnexpectedExceptions.cpp:631: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_After_ASSERT_LESS_THAN_EQUAL:
+UT_UnexpectedExceptions.cpp:641: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_After_ASSERT_DELTA:
+UT_UnexpectedExceptions.cpp:652: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_After_ASSERT_PREDICATE:
+UT_UnexpectedExceptions.cpp:663: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_After_ASSERT_RELATION:
+UT_UnexpectedExceptions.cpp:675: Error: Unexpected 'std::exception' exception thrown from test with value: 'input expected to be [0, 100[' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_After_ASSERT_SAME_DATA:
+UT_UnexpectedExceptions.cpp:690: Error: Unexpected 'std::exception' exception thrown from test with value: 'Invalid argument 'foo'' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_and_After_ASSERT:
+UT_UnexpectedExceptions.cpp:701: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+UT_UnexpectedExceptions.cpp:701: Error: Unexpected 'std::exception' exception thrown from test with value: 'Invalid argument in 'ThrowSomething'' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_and_After_ASSERT_FALSE:
+UT_UnexpectedExceptions.cpp:710: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+UT_UnexpectedExceptions.cpp:710: Error: Unexpected 'std::exception' exception thrown from test with value: 'Invalid argument in 'ThrowSomething'' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_and_After_ASSERT_EQUALS:
+UT_UnexpectedExceptions.cpp:720: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+UT_UnexpectedExceptions.cpp:720: Error: Unexpected 'std::exception' exception thrown from test with value: 'Invalid argument in 'ThrowSomething'' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_and_After_ASSERT_EQUALS_AUTO_Value:
+UT_UnexpectedExceptions.cpp:729: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+UT_UnexpectedExceptions.cpp:729: Error: Unexpected 'std::exception' exception thrown from test with value: 'Invalid argument in 'ThrowSomething'' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_and_After_ASSERT_EQUALS_AUTO_Pointer:
+UT_UnexpectedExceptions.cpp:738: Error: Unexpected 'std::exception' exception thrown from test with value: 'How boy'
+UT_UnexpectedExceptions.cpp:738: Error: Unexpected 'std::exception' exception thrown from test with value: 'Invalid argument in 'ThrowSomething'' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_and_After_ASSERT_DIFFERS:
+UT_UnexpectedExceptions.cpp:749: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+UT_UnexpectedExceptions.cpp:749: Error: Unexpected 'std::exception' exception thrown from test with value: 'Invalid argument in 'ThrowSomething'' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_and_After_ASSERT_GREATER_THAN:
+UT_UnexpectedExceptions.cpp:759: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+UT_UnexpectedExceptions.cpp:759: Error: Unexpected 'std::exception' exception thrown from test with value: 'Invalid argument in 'ThrowSomething'' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_and_After_ASSERT_GREATER_THAN_EQUAL:
+UT_UnexpectedExceptions.cpp:768: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+UT_UnexpectedExceptions.cpp:768: Error: Unexpected 'std::exception' exception thrown from test with value: 'Invalid argument in 'ThrowSomething'' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_and_After_ASSERT_LESS_THAN:
+UT_UnexpectedExceptions.cpp:778: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+UT_UnexpectedExceptions.cpp:778: Error: Unexpected 'std::exception' exception thrown from test with value: 'Invalid argument in 'ThrowSomething'' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_and_After_ASSERT_LESS_THAN_EQUAL:
+UT_UnexpectedExceptions.cpp:787: Error: Unexpected 'std::exception' exception thrown from test with value: 'You are dead !!!'
+UT_UnexpectedExceptions.cpp:787: Error: Unexpected 'std::exception' exception thrown from test with value: 'Invalid argument in 'ThrowSomething'' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_and_After_ASSERT_DELTA:
+UT_UnexpectedExceptions.cpp:797: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception'
+UT_UnexpectedExceptions.cpp:797: Error: Unexpected 'std::exception' exception thrown from test with value: 'Invalid argument in 'ThrowSomething'' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_and_After_ASSERT_PREDICATE:
+UT_UnexpectedExceptions.cpp:807: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception'
+UT_UnexpectedExceptions.cpp:807: Error: Unexpected 'std::exception' exception thrown from test with value: 'Invalid argument in 'ThrowSomething'' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_and_After_ASSERT_RELATION:
+UT_UnexpectedExceptions.cpp:817: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception'
+UT_UnexpectedExceptions.cpp:817: Error: Unexpected 'std::exception' exception thrown from test with value: 'Invalid argument in 'ThrowSomething'' (After assertion at specified line)
+
+In UT_UnexpectedExceptions::test_Unexpected_Within_and_After_ASSERT_SAME_DATA:
+UT_UnexpectedExceptions.cpp:826: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::exception'
+UT_UnexpectedExceptions.cpp:826: Error: Unexpected 'std::exception' exception thrown from test with value: 'Invalid argument in 'ThrowSomething'' (After assertion at specified line)
+
+Failed 70 and Skipped 0 of 70 tests
+Success rate: 0%
+Error level = 70

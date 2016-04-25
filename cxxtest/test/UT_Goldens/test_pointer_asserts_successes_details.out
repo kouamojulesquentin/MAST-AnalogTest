@@ -1,0 +1,45 @@
+Running UT_PointerAsserts_Successes tests (10 tests)
+
+
+In UT_PointerAsserts_Successes::test_TS_ASSERT_NULLPTR:
+UT_PointerAsserts_Successes.cpp:43: Success: Expected (pValue) to be nullptr, Result: It is nullptr
+.
+
+In UT_PointerAsserts_Successes::test_TS_ASSERT_NULLPTR_shared_ptr:
+UT_PointerAsserts_Successes.cpp:52: Success: Expected (nullSharedPtr) to be nullptr, Result: It is nullptr
+.
+
+In UT_PointerAsserts_Successes::test_TS_ASSERT_NULLPTR_unique_ptr:
+UT_PointerAsserts_Successes.cpp:60: Success: Expected (nullUniquePtr) to be nullptr, Result: It is nullptr
+.
+
+In UT_PointerAsserts_Successes::test_TS_ASSERT_NOT_NULLPTR:
+UT_PointerAsserts_Successes.cpp:69: Success: Expected (&value) to not be nullptr, Result: It is not nullptr
+.
+
+In UT_PointerAsserts_Successes::test_TS_ASSERT_NOT_NULLPTR_shared_ptr:
+UT_PointerAsserts_Successes.cpp:77: Success: Expected (make_shared<int>()) to not be nullptr, Result: It is not nullptr
+.
+
+In UT_PointerAsserts_Successes::test_TS_ASSERT_NOT_NULLPTR_unique_ptr:
+UT_PointerAsserts_Successes.cpp:84: Success: Expected (make_unique<bool>()) to not be nullptr, Result: It is not nullptr
+.
+
+In UT_PointerAsserts_Successes::test_TS_ASSERT_EQUALS_PTR_When_Both_NullPtr:
+UT_PointerAsserts_Successes.cpp:93: Success: Expected (pValue_1 == pValue_2), Result: (nullptr == nullptr)
+.
+
+In UT_PointerAsserts_Successes::test_TS_ASSERT_EQUALS_PTR_When_Both_Not_NullPtr:
+UT_PointerAsserts_Successes.cpp:103: Success: Expected (pValue_1 == pValue_2), Result: (not nullptr == not nullptr)
+.
+
+In UT_PointerAsserts_Successes::test_TS_ASSERT_DIFFERS_PTR_When_First_NullPtr:
+UT_PointerAsserts_Successes.cpp:113: Success: Expected (pValue_1 != pValue_2), Result: (nullptr != not nullptr)
+.
+
+In UT_PointerAsserts_Successes::test_TS_ASSERT_DIFFERS_PTR_When_First_Not_NullPtr:
+UT_PointerAsserts_Successes.cpp:123: Success: Expected (pValue_1 != pValue_2), Result: (not nullptr != nullptr)
+.
+
+OK! (10 tests)
+Error level = 0

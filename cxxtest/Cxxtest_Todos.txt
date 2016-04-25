@@ -1,0 +1,64 @@
+====
+BUGS:
+====
+
+===============
+Add tests for:
+===============
+  - float  equality/inequality/less/greater
+  - double equality/inequality/less/greater
+  - mix float and double equality/inequality/less/greater
+  - very long strings
+
+====================
+Presentation changes:
+====================
+  - Consider changing TS_ASSERT_SAME_FILES to displays results similar to TS_ASSERT_FILE_CONTENT (see refactoring of fileHasExpectedContent bellow)
+
+========
+Behavior:
+========
+
+
+====================================
+Implementation details / Refactoring
+====================================
+  - Consider changing fileHasExpectedContent (used by TS_ASSERT_FILE_CONTENT) as compareContent template taking input streams to be more general
+  - In doDataDrivenTests:  Replace, when available with gcc lib, begin(xxx) with cbegin(xxx)
+
+============
+New feature:
+============
+  - Assertion
+
+======
+Traits:
+======
+  - For STL   + tests
+  - For STL11 + tests
+  - For Qt    + tests
+================================================================================================================================================================
+
+FIXED:
+=====
+
+
+DONE:
+====
+  - Move countAssert to header file (to avoid stepping in it when debugging)
+  - Add TS_ASSERT_EQUALS_PTR and TS_ASSERT_DIFFERS_PTR  that report value of pointers as nullptr or not nullptr
+  - Consider displaying strings in user code in double quotes
+  - Add TS_ASSERT_FILE_EMPTY      (support char* and std::string)
+  - Add TS_ASSERT_FILE_CONTENT    (support char* and std::string)
+  - Add TS_ASSERT_FILE_SIZE       (for char* and std::string files name)
+  - Add TS_ASSERT_FILE_NOT_EXISTS (for char* and std::string files name)
+  - Add TS_ASSERT_FILE_EXISTS     (for char* and std::string files name)
+  - Add traits to get 'what()' message for std::exception (and use it to for 'exception messages')
+  - Homogenize display of expressions (between parentheses)
+  - Align error messages on warning/success
+  - Add TS_ASSERT_NULLPTR     (for raw and smart pointers)
+  - Add TS_ASSERT_NOT_NULLPTR (for raw and smart pointers)
+  - For unexpected exception in test, try to report that it has occur after some 'last' assertion ==> must save file/line for each assertion (and clear them at end of each test)
+  - Add support for lambda expression in TS_ASSERT_PREDICATE and TS_ASSERT_RELATION ==> require instance instead of type name
+  - Remove some needless empty lines (but keep an empty line before report of each test method)
+  - Add data driven support

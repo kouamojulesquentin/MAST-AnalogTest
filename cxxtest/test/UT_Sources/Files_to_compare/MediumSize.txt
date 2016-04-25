@@ -1,0 +1,167 @@
+//==========================================================================1
+//                           EndianBufferEx.cpp                             2
+//==========================================================================3
+// Copyright © 2004
+//
+// Project :
+//
+/** @file EndianBufferEx.cpp
+*
+*   Implements CEndianBufferEx class that...
+*/
+// Some Tags are inserted for Doxygen
+//===========================================================================
+// Revision history:
+// Revision : 1.00 on dd-MMM-yyyy by JFC --> First release
+//===========================================================================
+// Modifications history:
+// Created by JFC on 17-mars-2004
+// Updated by JFC on 17-mars-2004
+//===========================================================================
+
+#include "stdafx.h"
+#include "export:exportjunk/export\export/export.export/EndianBufferEx.export"
+#include " far/foo/bar/boo/test.i_64   "
+#include "far/foo/bar/boo/test._i_64 tx "
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
+
+typedef vector<string>::const_iterator TIter;
+typedef vector<string>::const_iterator TITER;
+typedef std::vector<string*>::const_iterator TITERa;
+
+typedef vector<string>::const_iterator TVectorIter;
+typedef map<int, string>::iterator TMapIter;
+
+typedef std::map<Xdm_Name*, PortLoadModel>  TPortLoadModels;      /**< pointer type should not prevent tagging this typedef */
+
+static const int csm_var1 = 12;
+const string ClassName::csm_var2 = "var value" ;   const string ClassName::sm_var3 = "var3 value" ;
+
+
+const Xst_PropertyName Xst_Security::scm_var4 = Xst_PropertyNameLibrary::CreatePropertyNamePreservingCase(Xdh_PropNames::SecureBitstream);
+static const char *sm_VAR_5 = "XST_DEFINITION_PROPERTIES";
+
+
+static int NotAStaticVariable_1( Xst_Port* srcPort);
+Xst_LdmTypeLib::NotAStaticVariable_2();
+Xst_NameMatchingForFxPattern::NotAStaticVariable_3();
+
+
+//+last best: ((?<=^|;)(([\w\s<,>]+::)?(\s*\w+\s*)\s+)([\w\s<,>]+::)?(\s*\w+\s*)(={1}.*)\s*;)
+
+Xst_Eqn::NotAStaticVariable_4a = -1;                     //+ Should not be tagged because there is no type
+ Xst_Eqn::NotAStaticVariable_4b = -1;                     //+ Should not be tagged because there is no type
+ int NotAStaticVariable_4c = 6 ;
+
+
+Key Xst_TimeBlockModel::sm_var6a=Xst_UserObj::GetNewKey();
+Xst_UserObj::Key Xst_TimeBlockModel::sm_var6b = Xst::Utility::Xst_UserObj::GetNewKey();
+
+//+     (\bstatic\b\((\s+\w+\s*::\w+)?\s+[\w\s<,>\s*]+)((={1}.*)|(\([^;]*\)))\s*;)
+//+     \bstatic\b\s+((\w+\s*::\w+\s+)?[\w\s<,>\s*]+)((={1}.*)|(\([^;]*\)))\s*;
+//+     \bstatic\b\s+((\w+\s*::\w+\s+)?[\w\s<,>\s*]+)
+//+     \bstatic\b((\w+\s*::\w+)\s+([\w\s<,>\s*])+)
+//+     ((={1}.*)|(\([^;]*\)))\s*;
+namespace
+{
+  static const char* sm_VAR_7= "    Select alg mode to map %s ... < [gain arr = %.3f (%.3f alg | %.3f bdd)]; [gain size = %.3f (%.3f alg | %.3f bdd | %d insts)] >\n";
+
+
+  vector<string> ClassName::sm_var8;                        //+ Not tagged yet because it is not preceded with static nor has equal sign
+  std::vector<Xst_Edge*> Xst_RamRegPatternImp::sm_Var9;     //+ Not tagged yet because it is not preceded with static nor has equal sign
+  static string ClassName::NotAStaticVariable_5 ("var£ value");         // Not tagged because static keyword is incompatible with scoped variable ?
+
+  static format sm_IsAStaticVar_10("Format %s %1%") ;
+  static boost::format sm_IsAStaticVar_11(sm_IsAStaticVar_10) ;
+
+
+  static boost::format sm_constructor_12a("%s+%s");
+  static boost::format sm_constructor_12b("");
+
+
+Last best:  \((\w+|".*")((\s*,\s*)(\w+|".*"))*\)
+
+  std::int Xst_Eqn::sm_var13a = -1;
+std::int Xst_Eqn::sm_var13b=-1         ;
+
+  static string sm_var13 (foo());         //+ Not tagged because of internal parenthesis ==> consider also tagging it
+
+  static string sm_var14_a ("var3", "baqsdf", "tto", var);
+  static string sm_var14_b ("var3", var);
+  static string sm_var14_c (var, "test");
+  static string sm_var14_d (var1, "test", var2, "text");
+  static string sm_var14_e ("var3", var, "test");
+  static string sm_var14_f (var1,var2);
+  static string sm_var14_g (var1,var2,"test");
+  static string sm_var14_h (var1,var2,"");
+
+  string NotStaticVar_1 ("not at static var") ;
+
+  static std::map<Xst_HierBlock*,int> sm_var15;
+  static format sm_StaticVar_16_Last(toto);
+
+  static XST_CORE_DLL void       NotStaticVar_2();
+  static const char* NotStaticVar_3a();
+  static char * NotStaticVar_3b();
+  static char NotStaticVar_3c();
+
+
+
+
+
+//+static inline bool HasAbcScript (void) { return (Xst_Env::GetNbInputPerLut() == 6) && (ParamDefGetStr("asam_map_script") || ParamDefGetStr("asam_seq_script")); }
+//+static inline bool IsVerbose    (void) { return ParamDefGetInt("mappingverbosity") == 1; }
+
+static bool IsVerbose () { ParamDefGetInt() == 1; }
+
+  Xst_Property* optMode = graph->GetTopNode()->GetProperty(Xst_PropNames::OPTIMIZATION_TRADEOFF);
+
+
+  static inline bool IsOptModeArea(Xst_Graph* graph) {
+
+    return optMode && Port::isstrequal(optMode->GetPropertyString(),Xst_PropNames::STR_AREA.GetString().c_str());
+  }
+}
+
+
+namespace Xst
+{
+
+}
+//---------------------------------------------------------------------------
+// Fct__Test
+//---------------------------------------------------------------------------
+/**
+*  `Does ...`
+*
+*  <b>Presuppositions:</b>
+*
+*/
+// Test Status : NOT Traced, NOT Tested ( 06-Apr-2010 )
+//---------------------------------------------------------------------------
+void Test Cpp Language_6::Test ()
+{
+  boost::format formatter("%44%%46%, %55$4d") ;
+  var   = foo    + bar;
+  bar   = var    + foo  ;
+  junky = donots * foo ;
+}
+//
+//  End of fct_Test Cpp Language_6::Test
+//---------------------------------------------------------------------------
+//
+
+int toto , titi , tutu ;
+
+
+
+
+//===========================================================================
+// End of EndianBufferEx.cpp
+//===============================================================@===========

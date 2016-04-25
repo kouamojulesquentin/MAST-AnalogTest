@@ -1,0 +1,9 @@
+Running cxxtest tests (1 test)
+
+
+In Comments::test_Something:
+Comments2.h:12: Warning: Something
+Comments2.h:10: Warning: No assertion found in this test !!!
+
+OK! (1 test)
+Error level = 0

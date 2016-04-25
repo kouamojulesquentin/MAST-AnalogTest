@@ -1,0 +1,15 @@
+Running cxxtest tests (2 tests)
+
+
+In Suite::testOne:
+GfTearDownThrows.h:24: Message: Got unexpected exception for some GlobalFixture::tearDown()
+GfTearDownThrows.h:24: Error: Expected (gf->tearDown()) not to throw, but found it did throw
+
+In Suite::testTwo:
+GfTearDownThrows.h:25: Warning: Testing should go on!
+GfTearDownThrows.h:25: Message: Got unexpected exception for some GlobalFixture::tearDown()
+GfTearDownThrows.h:25: Error: Expected (gf->tearDown()) not to throw, but found it did throw
+
+Failed 2 and Skipped 0 of 2 tests
+Success rate: 0%
+Error level = 2

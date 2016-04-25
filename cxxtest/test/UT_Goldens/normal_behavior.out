@@ -1,0 +1,244 @@
+Running cxxtest tests (36 tests)
+
+
+In LessThanEquals::testLessThanEquals:
+LessThanEquals.h:16: Error: Expected (1 <= 0), but found (1 > 0)
+LessThanEquals.h:17: Message: 1 <=? 0
+LessThanEquals.h:17: Error: Expected (1 <= 0), but found (1 > 0)
+LessThanEquals.h:19: Error: Expected (1 < 0), but found (1 >= 0)
+LessThanEquals.h:20: Message: 1 <=? 0
+LessThanEquals.h:20: Error: Expected (1 <= 0), but found (1 > 0)
+
+In Relation::testPredicate:
+Relation.h:19: Error: Expected MyNegative()(1) to be true, but found MyNegative()(1) is false
+Relation.h:20: Message: 1 <? 0
+Relation.h:20: Error: Expected MyNegative()(1) to be true, but found MyNegative()(1) is false
+Relation.h:22: Warning: 1
+Relation.h:24: Warning: 1
+
+In Relation::testRelation:
+Relation.h:29: Error: Expected MyLess<int>()(2, 1) to be true, but found MyLess<int>()(2, 1) is false
+Relation.h:30: Message: 2 <? 1
+Relation.h:30: Error: Expected MyLess<int>()(2, 1) to be true, but found MyLess<int>()(2, 1) is false
+Relation.h:32: Warning: 1
+Relation.h:34: Warning: 1
+
+In DefaultTraits::testSmallDefaultTraits:
+Traits_Default.h:23: Error: { 00 01 02 03 04 05 06 07  }
+
+In DefaultTraits::testBigDefaultTraits:
+Traits_Default.h:39: Error: { 98 99 9A 9B 9C 9D 9E 9F ... }
+
+In DoubleCall::testAssertEqualsWithSideEffects:
+DoubleCall.h:21: Error: Expected (increment() == 3), but found (1 != 3)
+
+In DoubleCall::testAssertDiffersWithSideEffects:
+DoubleCall.h:26: Error: Expected (increment() != 1), but found (1 == 1)
+
+In DoubleCall::testAssertDeltaWithSideEffects:
+DoubleCall.h:31: Error: Expected (increment() == 2.0) within delta: (0.5), but found (1 != 2.0) and delta = 0.5
+
+In SameData::testAssertSameData:
+SameData.h:24: Error: Expected first (DATA_SIZE)  (24) bytes to be equal at (x)  and (y),
+But found:
+{ 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14 15 16 17 }
+Differing from:
+{ FF FE FD FC FB FA F9 F8 F7 F6 F5 F4 F3 F2 F1 F0 EF EE ED EC EB EA E9 E8 }
+
+In SameData::testAssertMessageSameData:
+SameData.h:29: Message: Not same data
+SameData.h:29: Error: Expected first (DATA_SIZE)  (24) bytes to be equal at (x)  and (y),
+But found:
+{ 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14 15 16 17 }
+Differing from:
+{ FF FE FD FC FB FA F9 F8 F7 F6 F5 F4 F3 F2 F1 F0 EF EE ED EC EB EA E9 E8 }
+
+In SameData::testSafeAssertSameData:
+SameData.h:34: Error: Expected first (DATA_SIZE)  (24) bytes to be equal at (x)  and (y),
+But found:
+{ 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14 15 16 17 }
+Differing from:
+{ FF FE FD FC FB FA F9 F8 F7 F6 F5 F4 F3 F2 F1 F0 EF EE ED EC EB EA E9 E8 }
+
+In SameData::testSafeAssertMessageSameData:
+SameData.h:39: Message: Not same data
+SameData.h:39: Error: Expected first (DATA_SIZE)  (24) bytes to be equal at (x)  and (y),
+But found:
+{ 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14 15 16 17 }
+Differing from:
+{ FF FE FD FC FB FA F9 F8 F7 F6 F5 F4 F3 F2 F1 F0 EF EE ED EC EB EA E9 E8 }
+.
+
+In SameFiles::testAssertFileShorter:
+SameFiles.h:19: Error: File 'UT_Sources/SameFiles.h' ended before file 'UT_Sources/SameFilesLonger.h' (line 43)
+=     }
+=  };
+=
+<
+
+
+In SameFiles::testAssertFileLonger:
+SameFiles.h:24: Error: File 'UT_Sources/SameFiles.h' ended before file 'UT_Sources/SameFilesLonger.h' (line 43)
+=     }
+=  };
+=
+>
+
+
+In SameFiles::testAssertMessageSameFiles:
+SameFiles.h:29: Message: Not same files
+SameFiles.h:29: Error: Files 'UT_Sources/SameFiles.h' and 'UT_Sources/SameData.h' differ at line 4
+= #include <cxxtest/TestSuite.h>
+=
+= //
+< // This test suite demonstrates TS_ASSERT_SAME_ATA
+
+> // This test suite demonstrates TS_ASSERT_SAME_//
+
+.
+
+In SameFiles::testSafeAssertMessageSameFiles:
+SameFiles.h:39: Message: Not same files
+SameFiles.h:39: Error: Files 'UT_Sources/SameFiles.h' and 'UT_Sources/SameData.h' differ at line 4
+= #include <cxxtest/TestSuite.h>
+=
+= //
+< // This test suite demonstrates TS_ASSERT_SAME_ATA
+
+> // This test suite demonstrates TS_ASSERT_SAME_//
+
+
+In TestMessageMacros::testMessageMacros:
+Tsm.h:15: Message: String
+Tsm.h:15: Error: Expected (false)to be true, but found it is false
+Tsm.h:16: Message: 42
+Tsm.h:16: Error: Expected (false)to be true, but found it is false
+Tsm.h:17: Message: String
+Tsm.h:17: Error: Expected (2 + 2 == 5), but found (4 != 5)
+Tsm.h:18: Message: 42
+Tsm.h:18: Error: Expected (2 + 2 == 5), but found (4 != 5)
+Tsm.h:19: Message: String
+Tsm.h:19: Error: Expected first (1)  (1) bytes to be equal at (&x)  and (&y),
+But found:
+{ 78 }
+Differing from:
+{ 79 }
+Tsm.h:20: Message: 42
+Tsm.h:20: Error: Expected first (1)  (1) bytes to be equal at (&x)  and (&y),
+But found:
+{ 78 }
+Differing from:
+{ 79 }
+Tsm.h:21: Message: String
+Tsm.h:21: Error: Expected (1.0 == 2.0) within delta: (0.5), but found (1.0 != 2.0) and delta = 0.5
+Tsm.h:22: Message: 42
+Tsm.h:22: Error: Expected (1.0 == 2.0) within delta: (0.5), but found (1.0 != 2.0) and delta = 0.5
+Tsm.h:23: Message: String
+Tsm.h:23: Error: Expected (0 != 0), but found (0 == 0)
+Tsm.h:24: Message: 42
+Tsm.h:24: Error: Expected (0 != 0), but found (0 == 0)
+Tsm.h:25: Message: String
+Tsm.h:25: Error: Expected (2 < 1), but found (2 >= 1)
+Tsm.h:26: Message: 42
+Tsm.h:26: Error: Expected (2 < 1), but found (2 >= 1)
+Tsm.h:27: Message: String
+Tsm.h:27: Error: Expected (throwNothing()) to throw (int), but found it didn't throw
+Tsm.h:28: Message: 42
+Tsm.h:28: Error: Expected (throwNothing()) to throw (int), but found it didn't throw
+Tsm.h:29: Message: String
+Tsm.h:29: Error: Expected (throwNothing())to throw anything, but found it did not throw
+Tsm.h:30: Message: 42
+Tsm.h:30: Error: Expected (throwNothing())to throw anything, but found it did not throw
+Tsm.h:31: Message: String
+Tsm.h:31: Error: Expected (throwInteger(n)) not to throw, but found it did throw
+Tsm.h:32: Message: 42
+Tsm.h:32: Error: Expected (throwInteger(n)) not to throw, but found it did throw
+Tsm.h:33: Message: String
+Tsm.h:33: Error: Expected (throwNothing()) to throw (int), but found it didn't throw
+Tsm.h:34: Message: 42
+Tsm.h:34: Error: Expected (throwNothing()) to throw (int), but found it didn't throw
+Tsm.h:35: Message: String
+Tsm.h:35: Error: Expected (throwNothing()) to throw (int), but found it didn't throw
+Tsm.h:36: Message: 42
+Tsm.h:36: Error: Expected (throwNothing()) to throw (int), but found it didn't throw
+Tsm.h:37: Message: String
+Tsm.h:37: Error: Expected (i == 43), but found (42 != 43)
+Tsm.h:38: Message: 42
+Tsm.h:38: Error: Expected (i == 43), but found (42 != 43)
+
+In Traits_Strings::testCharTraits:
+Traits_Strings.h:14: Error: 'A'
+Traits_Strings.h:15: Error: '\x04'
+Traits_Strings.h:16: Error: '\x1B'
+Traits_Strings.h:17: Error: '\0'
+Traits_Strings.h:18: Error: '\r'
+Traits_Strings.h:19: Error: '\n'
+Traits_Strings.h:20: Error: '\b'
+Traits_Strings.h:21: Error: '\t'
+Traits_Strings.h:22: Error: '\a'
+Traits_Strings.h:23: Error: '\xFB'
+
+In Traits_Strings::testStringTraits:
+Traits_Strings.h:28: Error: (char *) is displayed as-is
+
+
+In Traits_Strings::testStdStringTraits:
+Traits_Strings.h:35: Error: "std::string is displayed with \"\""
+Traits_Strings.h:36: Error: "Escapes\rAre\rTranslated"
+Traits_Strings.h:37: Error: "As are unprintable chars: \x124Vx"
+
+In Traits_Integrals::testIntegerTraits:
+Traits_Integrals.h:14: Error: 1
+Traits_Integrals.h:15: Error: '\x0F'
+Traits_Integrals.h:16: Error: -12
+Traits_Integrals.h:17: Error: 34
+Traits_Integrals.h:18: Error: -123
+Traits_Integrals.h:19: Error: 456
+Traits_Integrals.h:20: Error: -12345
+Traits_Integrals.h:21: Error: 67890
+
+In Traits_Integrals::testFloatTraits:
+Traits_Integrals.h:26: Error: 5.0123457908630371
+
+In Traits_Integrals::testDoubleTrait:
+Traits_Integrals.h:31: Error: 5.0123456789012346
+
+In Traits_Integrals::testBoolTraits:
+Traits_Integrals.h:36: Error: true
+Traits_Integrals.h:37: Error: false
+..
+
+In MockTest::test_Unimplemented:
+MockTest.h:33: Error: T::one(void) called with no T::Base_one object
+MockTest.h:129: Error: Expected (T::one() == 1), but found (0 != 1)
+.
+
+In MockTest::test_Mock_traits:
+MockTest.h:40: Error: T::getOpaque(int i) called with no T::Base_getOpaque object
+MockTest.h:143: Error: Expected (T::getOpaque(3).value == 72), but found (42 != 72)
+
+In MockTest::test_Override:
+MockTest.h:33: Error: T::one(void) called with no T::Base_one object
+MockTest.h:157: Error: Expected (T::one() == 1), but found (0 != 1)
+.
+
+In MockTest::test_Unimplemented_supply:
+MockTest.h:42: Error: T::supplyOne(void) called with no T::Base_supplyOne object
+MockTest.h:168: Error: Expected (supplyOne() == 1), but found (0 != 1)
+.
+
+In SameZero::test_TS_ASSERT_SAME_DATA_passed_zero:
+SameZero.h:22: Error: Expected first (sizeof(data))  (4) bytes to be equal at (data)  and (0),
+But found:
+{ 00 01 02 03 }
+Differing from:
+(null)
+SameZero.h:23: Error: Expected first (sizeof(data))  (4) bytes to be equal at (0)  and (data),
+But found:
+(null)
+Differing from:
+{ 00 01 02 03 }
+
+Failed 29 and Skipped 0 of 36 tests
+Success rate: 19%
+Error level = 29

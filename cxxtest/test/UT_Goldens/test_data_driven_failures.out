@@ -1,0 +1,336 @@
+Running UT_DataDriven_Failures tests (42 tests)
+
+
+In UT_DataDriven_Failures::test_ParameterCountMismatch:
+UT_DataDriven_Failures.cpp:78: Message: Parameterized tests ARE NOT EXECUTED when inputs and expected results sets have not the same size!!!
+UT_DataDriven_Failures.cpp:78: Error: Expected (inputsSize == expectedResultsSize), but found (6 != 5)
+..
+
+In UT_DataDriven_Failures::test_Array_Int_Int:
+==> In data driven test with id: 2 and input sample: 5
+UT_DataDriven_Failures.cpp:90: Error: Expected (computedValue == expected), but found (15 != 12)
+..
+
+In UT_DataDriven_Failures::test_Initializer_Int_Int:
+==> In data driven test with id: 0 and input sample: 0
+UT_DataDriven_Failures.cpp:111: Error: Expected (computedValue == expected), but found (0 != 1)
+.
+==> In data driven test with id: 2 and input sample: 2
+UT_DataDriven_Failures.cpp:111: Error: Expected (computedValue == expected), but found (6 != 7)
+....
+
+In UT_DataDriven_Failures::test_Vector_Int_Int:
+==> In data driven test with id: 3 and input sample: 5
+UT_DataDriven_Failures.cpp:131: Error: Expected (computedValue == expected), but found (15 != 12)
+==> In data driven test with id: 4 and input sample: -1
+UT_DataDriven_Failures.cpp:131: Error: Expected (computedValue == expected), but found (-3 != 3)
+.
+==> In data driven test with id: 6 and input sample: -1
+UT_DataDriven_Failures.cpp:131: Error: Expected (computedValue == expected), but found (-3 != 3)
+..
+
+In UT_DataDriven_Failures::test_StdString_Int:
+==> In data driven test with id: 2 and input sample: "Hello World"
+UT_DataDriven_Failures.cpp:150: Error: Expected (input.length() == expectedLength), but found (11 != 7)
+==> In data driven test with id: 3 and input sample: "How are you?"
+UT_DataDriven_Failures.cpp:150: Error: Expected (input.length() == expectedLength), but found (12 != -30)
+.
+
+In UT_DataDriven_Failures::test_StdString_Compound:
+==> In data driven test with id: 1 and input sample: "Hi"
+UT_DataDriven_Failures.cpp:173: Error: Expected (isOdd == get<bool>(expected)), but found (false != true)
+==> In data driven test with id: 2 and input sample: "Hello World"
+UT_DataDriven_Failures.cpp:172: Error: Expected (inputLength == get<int>(expected)), but found (11 != 9)
+==> In data driven test with id: 3 and input sample: "How are you?"
+UT_DataDriven_Failures.cpp:172: Error: Expected (inputLength == get<int>(expected)), but found (12 != -30)
+UT_DataDriven_Failures.cpp:173: Error: Expected (isOdd == get<bool>(expected)), but found (false != true)
+
+In UT_DataDriven_Failures::test_Standalone_Function:
+==> In data driven test with id: 0 and input sample: 0
+UT_DataDriven_Failures.cpp:47: Error: Expected (computedValue == expected), but found (0 != 1)
+.
+==> In data driven test with id: 2 and input sample: 2
+UT_DataDriven_Failures.cpp:47: Error: Expected (computedValue == expected), but found (6 != 7)
+.
+
+In UT_DataDriven_Failures::test_StaticMember_Function:
+==> In data driven test with id: 0 and input sample: 0
+UT_DataDriven_Failures.cpp:58: Error: Expected (computedValue == expected), but found (0 != 1)
+.
+==> In data driven test with id: 2 and input sample: 2
+UT_DataDriven_Failures.cpp:58: Error: Expected (computedValue == expected), but found (6 != 7)
+...
+
+In UT_DataDriven_Failures::test_ASSERT:
+==> In data driven test with id: 2 and input sample: -5
+UT_DataDriven_Failures.cpp:221: Error: Expected (input == -expected)to be true, but found it is false
+==> In data driven test with id: 3 and input sample: -1
+UT_DataDriven_Failures.cpp:221: Error: Expected (input == -expected)to be true, but found it is false
+==> In data driven test with id: 4 and input sample: -1000
+UT_DataDriven_Failures.cpp:221: Error: Expected (input == -expected)to be true, but found it is false
+..
+
+In UT_DataDriven_Failures::test_ASSERT_TRUE:
+==> In data driven test with id: 2 and input sample: -5
+UT_DataDriven_Failures.cpp:240: Error: Expected (input == -expected)to be true, but found it is false
+==> In data driven test with id: 3 and input sample: -1
+UT_DataDriven_Failures.cpp:240: Error: Expected (input == -expected)to be true, but found it is false
+==> In data driven test with id: 4 and input sample: -1000
+UT_DataDriven_Failures.cpp:240: Error: Expected (input == -expected)to be true, but found it is false
+
+In UT_DataDriven_Failures::test_ASSERT_FALSE:
+==> In data driven test with id: 0 and input sample: 1
+UT_DataDriven_Failures.cpp:260: Error: Expected (input == -expected)to be false, but found it is true
+==> In data driven test with id: 1 and input sample: -2
+UT_DataDriven_Failures.cpp:260: Error: Expected (input == -expected)to be false, but found it is true
+.....
+
+In UT_DataDriven_Failures::test_ASSERT_EQUALS_AUTO_Value:
+==> In data driven test with id: 2 and input sample: -5
+UT_DataDriven_Failures.cpp:281: Error: Expected (input == -expected), but found (-5 != 5)
+==> In data driven test with id: 3 and input sample: -1
+UT_DataDriven_Failures.cpp:281: Error: Expected (input == -expected), but found (-1 != -2)
+==> In data driven test with id: 4 and input sample: -1000
+UT_DataDriven_Failures.cpp:281: Error: Expected (input == -expected), but found (-1000 != -3000)
+.
+
+In UT_DataDriven_Failures::test_ASSERT_EQUALS_AUTO_Pointer:
+==> In data driven test with id: 1 and input sample: a not null pointer
+UT_DataDriven_Failures.cpp:300: Error: Expected (pValue == pExpected)to be true, but found it is false
+==> In data driven test with id: 2 and input sample: a null pointer
+UT_DataDriven_Failures.cpp:300: Error: Expected (pValue == pExpected)to be true, but found it is false
+==> In data driven test with id: 3 and input sample: a not null pointer
+UT_DataDriven_Failures.cpp:300: Error: Expected (pValue == pExpected)to be true, but found it is false
+
+In UT_DataDriven_Failures::test_ASSERT_DIFFERS:
+==> In data driven test with id: 0 and input sample: 1
+UT_DataDriven_Failures.cpp:325: Error: Expected (input != expected), but found (1 == 1)
+==> In data driven test with id: 1 and input sample: 2
+UT_DataDriven_Failures.cpp:325: Error: Expected (input != expected), but found (2 == 2)
+...
+
+In UT_DataDriven_Failures::test_ASSERT_GREATER_THAN_Equal:
+==> In data driven test with id: 0 and input sample: 1.1999999999999999
+UT_DataDriven_Failures.cpp:346: Error: Expected (input > expected), but found (1.1999999999999999 <= 1.3999999999999999)
+...
+==> In data driven test with id: 4 and input sample: -1000.0
+UT_DataDriven_Failures.cpp:346: Error: Expected (input > expected), but found (-1000.0 <= 3000.0)
+....
+
+In UT_DataDriven_Failures::test_ASSERT_GREATER_THAN_EQUAL_GreaterThan:
+==> In data driven test with id: 4 and input sample: -1000.0
+UT_DataDriven_Failures.cpp:365: Error: Expected (input >= expected), but found (-1000.0 < 3000.0)
+.
+
+In UT_DataDriven_Failures::test_ASSERT_LESS_THAN_Equal:
+==> In data driven test with id: 1 and input sample: 3.0
+UT_DataDriven_Failures.cpp:385: Error: Expected (input < expected), but found (3.0 >= 2.1)
+==> In data driven test with id: 2 and input sample: -5.4000000000000003
+UT_DataDriven_Failures.cpp:385: Error: Expected (input < expected), but found (-5.4000000000000003 >= -5.5)
+==> In data driven test with id: 3 and input sample: 1.0
+UT_DataDriven_Failures.cpp:385: Error: Expected (input < expected), but found (1.0 >= 0.2)
+..
+
+In UT_DataDriven_Failures::test_ASSERT_LESS_THAN_EQUAL_GreaterThan:
+==> In data driven test with id: 1 and input sample: 3.0
+UT_DataDriven_Failures.cpp:404: Error: Expected (input <= expected), but found (3.0 > 2.1)
+==> In data driven test with id: 2 and input sample: -5.4000000000000003
+UT_DataDriven_Failures.cpp:404: Error: Expected (input <= expected), but found (-5.4000000000000003 > -5.5)
+==> In data driven test with id: 3 and input sample: 1.0
+UT_DataDriven_Failures.cpp:404: Error: Expected (input <= expected), but found (1.0 > 0.2)
+....
+
+In UT_DataDriven_Failures::test_ASSERT_DELTA:
+==> In data driven test with id: 3 and input sample: 1.0
+UT_DataDriven_Failures.cpp:424: Error: Expected (input == expected) within delta: (acceptedDelta), but found (1.0 != 0.4) and delta = 0.5
+==> In data driven test with id: 4 and input sample: -1.5
+UT_DataDriven_Failures.cpp:424: Error: Expected (input == expected) within delta: (acceptedDelta), but found (-1.5 != -2.1) and delta = 0.5
+
+In UT_DataDriven_Failures::test_ASSERT_SAME_DATA:
+==> In data driven test with id: 0 and input sample: "Lazy dog"
+UT_DataDriven_Failures.cpp:444: Error: Expected first (5)  (5) bytes to be equal at (lhs)  and (rhs),
+But found:
+{ 4C 61 7A 79 20 }
+Differing from:
+{ 4C 61 64 79 20 }
+==> In data driven test with id: 1 and input sample: "Hello"
+UT_DataDriven_Failures.cpp:444: Error: Expected first (5)  (5) bytes to be equal at (lhs)  and (rhs),
+But found:
+{ 48 65 6C 6C 6F }
+Differing from:
+{ 68 65 6C 6C 6F }
+.
+==> In data driven test with id: 3 and input sample: "Ho    "
+UT_DataDriven_Failures.cpp:444: Error: Expected first (5)  (5) bytes to be equal at (lhs)  and (rhs),
+But found:
+{ 48 6F 20 20 20 }
+Differing from:
+{ 48 6F 77 20 20 }
+..
+
+In UT_DataDriven_Failures::test_setAbortDataDrivenTestsOnFailure_True:
+==> In data driven test with id: 2 and input sample: 2
+UT_DataDriven_Failures.cpp:464: Error: Expected (computedValue == expected), but found (6 != 7)
+.
+
+In UT_DataDriven_Failures::test_Expected_Exception:
+==> In data driven test with id: 0 and input sample: ""
+UT_DataDriven_Failures.cpp:489: Error: Expected (throwException(expectedLength)) to throw (std::exception), but found it didn't throw
+.
+==> In data driven test with id: 2 and input sample: "Hi"
+UT_DataDriven_Failures.cpp:489: Error: Expected (throwException(expectedLength)) to throw (std::exception), but found it didn't throw
+.
+
+In UT_DataDriven_Failures::test_Throw_Nothing:
+==> In data driven test with id: 0 and input sample: "Hello World"
+UT_DataDriven_Failures.cpp:513: Message: Bad
+UT_DataDriven_Failures.cpp:513: Error: Expected (mayThrow(expectedLength)) not to throw, but found it did throw
+.
+==> In data driven test with id: 2 and input sample: "This one is so long that it will trigger an exception of some sort !!!!"
+UT_DataDriven_Failures.cpp:513: Message: Bad
+UT_DataDriven_Failures.cpp:513: Error: Expected (mayThrow(expectedLength)) not to throw, but found it did throw
+UT_DataDriven_Failures.cpp:514: Message: Luck
+UT_DataDriven_Failures.cpp:514: Error: Expected (inputLength == expectedLength), but found (71 != 50)
+
+In UT_DataDriven_Failures::test_Unexpected_UnknownType_Exception:
+==> In data driven test with id: 0 and input sample: "Hello World"
+UT_DataDriven_Failures.cpp:537: Error: Unexpected (unknown type) exception thrown from test (After assertion at specified line)
+.
+
+In UT_DataDriven_Failures::test_Unexpected_Bool_Exception:
+==> In data driven test with id: 0 and input sample: "Hello World"
+UT_DataDriven_Failures.cpp:562: Error: Unexpected 'bool' exception thrown from test with value: 'true' (After assertion at specified line)
+.
+==> In data driven test with id: 2 and input sample: "How are you?"
+UT_DataDriven_Failures.cpp:562: Error: Unexpected 'bool' exception thrown from test with value: 'false' (After assertion at specified line)
+
+In UT_DataDriven_Failures::test_Unexpected_Int_Exception:
+==> In data driven test with id: 0 and input sample: "Hello World"
+UT_DataDriven_Failures.cpp:585: Error: Unexpected 'int' exception thrown from test with value: '11' (After assertion at specified line)
+.
+==> In data driven test with id: 2 and input sample: "How are you?"
+UT_DataDriven_Failures.cpp:585: Error: Unexpected 'int' exception thrown from test with value: '12' (After assertion at specified line)
+.
+
+In UT_DataDriven_Failures::test_Unexpected_Std_Exception:
+==> In data driven test with id: 1 and input sample: "Hello World"
+UT_DataDriven_Failures.cpp:609: Error: Unexpected 'std::exception' exception thrown from test with value: 'trigger > 10' (After assertion at specified line)
+.
+==> In data driven test with id: 3 and input sample: "How are you?"
+UT_DataDriven_Failures.cpp:609: Error: Unexpected 'std::exception' exception thrown from test with value: 'trigger > 10' (After assertion at specified line)
+
+In UT_DataDriven_Failures::test_Int:
+==> In data driven test with id: 0 and input sample: 0
+UT_DataDriven_Failures.cpp:630: Error: Expected (isOdd(input))to be true, but found it is false
+.
+==> In data driven test with id: 2 and input sample: 2
+UT_DataDriven_Failures.cpp:630: Error: Expected (isOdd(input))to be true, but found it is false
+==> In data driven test with id: 3 and input sample: -1000
+UT_DataDriven_Failures.cpp:630: Error: Expected (isOdd(input))to be true, but found it is false
+..
+
+In UT_DataDriven_Failures::test_StdString:
+==> In data driven test with id: 2 and input sample: "Hello World"
+UT_DataDriven_Failures.cpp:648: Error: Expected (input.length() < 10), but found (11 >= 10)
+==> In data driven test with id: 3 and input sample: "How are you?"
+UT_DataDriven_Failures.cpp:648: Error: Expected (input.length() < 10), but found (12 >= 10)
+
+In UT_DataDriven_Failures::test_ASSERT_PREDICATE:
+==> In data driven test with id: 0 and input sample: 0
+UT_DataDriven_Failures.cpp:668: Error: Expected IsOddPredicate()(value) to be true, but found IsOddPredicate()(0) is false
+.
+==> In data driven test with id: 2 and input sample: 2
+UT_DataDriven_Failures.cpp:668: Error: Expected IsOddPredicate()(value) to be true, but found IsOddPredicate()(2) is false
+..
+
+In UT_DataDriven_Failures::test_ASSERT_RELATION:
+==> In data driven test with id: 1 and input sample: { FF FF FF FF 01 00 00 00  }
+UT_DataDriven_Failures.cpp:686: Error: Expected std::equal_to<decltype(lhs)>()(lhs, rhs) to be true, but found std::equal_to<decltype(lhs)>()(1, -1) is false
+==> In data driven test with id: 2 and input sample: { 05 00 00 00 04 00 00 00  }
+UT_DataDriven_Failures.cpp:686: Error: Expected std::equal_to<decltype(lhs)>()(lhs, rhs) to be true, but found std::equal_to<decltype(lhs)>()(4, 5) is false
+.
+
+In UT_DataDriven_Failures::test_SingleData_Expected_Exception:
+==> In data driven test with id: 0 and input sample: "?"
+UT_DataDriven_Failures.cpp:708: Error: Expected (throwException(inputLength)) to throw (std::exception), but found it didn't throw
+==> In data driven test with id: 1 and input sample: "Hi"
+UT_DataDriven_Failures.cpp:708: Error: Expected (throwException(inputLength)) to throw (std::exception), but found it didn't throw
+.
+
+In UT_DataDriven_Failures::test_SingleData_Throw_Nothing:
+==> In data driven test with id: 0 and input sample: "Hello World"
+UT_DataDriven_Failures.cpp:729: Error: Expected (mayThrow(inputLength)) not to throw, but found it did throw
+==> In data driven test with id: 1 and input sample: "Hi"
+UT_DataDriven_Failures.cpp:730: Error: Expected (inputLength > 5U), but found (2 <= 5)
+
+In UT_DataDriven_Failures::test_SingleData_Unexpected_UnknownType_Exception:
+==> In data driven test with id: 0 and input sample: "Hello World"
+UT_DataDriven_Failures.cpp:759: Error: Unexpected (unknown type) exception thrown from test
+==> In data driven test with id: 1 and input sample: "Hi"
+UT_DataDriven_Failures.cpp:752: Error: Expected (inputLength > 5U), but found (2 <= 5)
+
+In UT_DataDriven_Failures::test_SingleData_Unexpected_Std_Exception:
+==> In data driven test with id: 0 and input sample: ""
+UT_DataDriven_Failures.cpp:775: Error: Expected (inputLength > 5U), but found (0 <= 5)
+==> In data driven test with id: 1 and input sample: "Hello World"
+UT_DataDriven_Failures.cpp:775: Error: Unexpected 'std::exception' exception thrown from test with value: 'trigger > 10' (After assertion at specified line)
+==> In data driven test with id: 2 and input sample: "Hi"
+UT_DataDriven_Failures.cpp:775: Error: Expected (inputLength > 5U), but found (2 <= 5)
+==> In data driven test with id: 3 and input sample: "How are you?"
+UT_DataDriven_Failures.cpp:775: Error: Unexpected 'std::exception' exception thrown from test with value: 'trigger > 10' (After assertion at specified line)
+..
+
+In UT_DataDriven_Failures::test_Mixed_StdString_Int:
+==> In data driven test with id: 2 and input sample: "Hello World"
+UT_DataDriven_Failures.cpp:794: Error: Expected (input.length() == expectedLength), but found (11 != 7)
+==> In data driven test with id: 3 and input sample: "How are you?"
+UT_DataDriven_Failures.cpp:794: Error: Expected (input.length() == expectedLength), but found (12 != -30)
+.
+
+In UT_DataDriven_Failures::test_Mixed_StdString_Compound:
+==> In data driven test with id: 1 and input sample: "Hi"
+UT_DataDriven_Failures.cpp:822: Error: Expected (isOdd == get<bool>(expected)), but found (false != true)
+==> In data driven test with id: 2 and input sample: "Hello World"
+UT_DataDriven_Failures.cpp:821: Error: Expected (inputLength == get<int>(expected)), but found (11 != 9)
+==> In data driven test with id: 3 and input sample: "How are you?"
+UT_DataDriven_Failures.cpp:821: Error: Expected (inputLength == get<int>(expected)), but found (12 != 7)
+UT_DataDriven_Failures.cpp:822: Error: Expected (isOdd == get<bool>(expected)), but found (false != true)
+
+In UT_DataDriven_Failures::test_WithNoAssert_Before:
+UT_DataDriven_Failures.cpp:844: Warning: Warning message for test_WithNoAssert_Before
+.
+==> In data driven test with id: 1 and input sample: 1
+UT_DataDriven_Failures.cpp:851: Error: Expected (computedValue == expected), but found (3 != 4)
+...
+
+In UT_DataDriven_Failures::test_WithNoAssert_After:
+==> In data driven test with id: 1 and input sample: 1
+UT_DataDriven_Failures.cpp:872: Error: Expected (computedValue == expected), but found (3 != 4)
+..
+UT_DataDriven_Failures.cpp:882: Warning: Warning message for test_WithNoAssert_After
+
+
+In UT_DataDriven_Failures::test_MissingAssertion_First:
+==> In data driven test with id: 0 and input sample: 0
+Warning: No assertion found for this data driven test sample !!!
+==> In data driven test with id: 1 and input sample: 1
+UT_DataDriven_Failures.cpp:897: Error: Expected (computedValue == expected), but found (3 != 4)
+...
+
+In UT_DataDriven_Failures::test_MissingAssertion_Middle:
+==> In data driven test with id: 1 and input sample: 1
+UT_DataDriven_Failures.cpp:920: Error: Expected (computedValue == expected), but found (3 != 4)
+==> In data driven test with id: 2 and input sample: 2
+Warning: No assertion found for this data driven test sample !!!
+..
+
+In UT_DataDriven_Failures::test_MissingAssertion_Last:
+==> In data driven test with id: 1 and input sample: 1
+UT_DataDriven_Failures.cpp:943: Error: Expected (computedValue == expected), but found (3 != 4)
+.
+==> In data driven test with id: 3 and input sample: -1000
+Warning: No assertion found for this data driven test sample !!!
+
+Failed 87 and Skipped 0 of 169 tests including 168 'sub' tests from 41 data driven tests
+Success rate: 48%
+Error level = 87

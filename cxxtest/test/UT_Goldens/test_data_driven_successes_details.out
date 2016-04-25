@@ -1,0 +1,283 @@
+Running UT_DataDriven_Successes tests (19 tests)
+
+
+In UT_DataDriven_Successes::test_Array_Int_Int:
+==> In data driven test with id: 0 and input sample: 1
+UT_DataDriven_Successes.cpp:54: Success: Expected (computedValue == expected), Result: (3 == 3)
+.
+==> In data driven test with id: 1 and input sample: 2
+UT_DataDriven_Successes.cpp:54: Success: Expected (computedValue == expected), Result: (6 == 6)
+.
+==> In data driven test with id: 2 and input sample: -1
+UT_DataDriven_Successes.cpp:54: Success: Expected (computedValue == expected), Result: (-3 == -3)
+.
+==> In data driven test with id: 3 and input sample: -1000
+UT_DataDriven_Successes.cpp:54: Success: Expected (computedValue == expected), Result: (-3000 == -3000)
+.
+
+In UT_DataDriven_Successes::test_Initializer_Int_Int:
+==> In data driven test with id: 0 and input sample: 0
+UT_DataDriven_Successes.cpp:75: Success: Expected (computedValue == expected), Result: (0 == 0)
+.
+==> In data driven test with id: 1 and input sample: 1
+UT_DataDriven_Successes.cpp:75: Success: Expected (computedValue == expected), Result: (3 == 3)
+.
+==> In data driven test with id: 2 and input sample: 2
+UT_DataDriven_Successes.cpp:75: Success: Expected (computedValue == expected), Result: (6 == 6)
+.
+==> In data driven test with id: 3 and input sample: -1000
+UT_DataDriven_Successes.cpp:75: Success: Expected (computedValue == expected), Result: (-3000 == -3000)
+.
+
+In UT_DataDriven_Successes::test_Vector_Int_Int:
+==> In data driven test with id: 0 and input sample: 0
+UT_DataDriven_Successes.cpp:95: Success: Expected (computedValue == expected), Result: (0 == 0)
+.
+==> In data driven test with id: 1 and input sample: 5
+UT_DataDriven_Successes.cpp:95: Success: Expected (computedValue == expected), Result: (15 == 15)
+.
+==> In data driven test with id: 2 and input sample: -1
+UT_DataDriven_Successes.cpp:95: Success: Expected (computedValue == expected), Result: (-3 == -3)
+.
+==> In data driven test with id: 3 and input sample: -1000
+UT_DataDriven_Successes.cpp:95: Success: Expected (computedValue == expected), Result: (-3000 == -3000)
+.
+==> In data driven test with id: 4 and input sample: -1
+UT_DataDriven_Successes.cpp:95: Success: Expected (computedValue == expected), Result: (-3 == -3)
+.
+
+In UT_DataDriven_Successes::test_Expected_Exception:
+==> In data driven test with id: 0 and input sample: ""
+UT_DataDriven_Successes.cpp:117: Success: Expected (doThrow(expectedLength)) to throw (std::exception), Result: It did throw (std::exception)
+UT_DataDriven_Successes.cpp:118: Success: Expected (inputLength == expectedLength), Result: (0 == 0)
+.
+==> In data driven test with id: 1 and input sample: "Hello World"
+UT_DataDriven_Successes.cpp:117: Success: Expected (doThrow(expectedLength)) to throw (std::exception), Result: It did throw (std::exception)
+UT_DataDriven_Successes.cpp:118: Success: Expected (inputLength == expectedLength), Result: (11 == 11)
+.
+==> In data driven test with id: 2 and input sample: "Hi"
+UT_DataDriven_Successes.cpp:117: Success: Expected (doThrow(expectedLength)) to throw (std::exception), Result: It did throw (std::exception)
+UT_DataDriven_Successes.cpp:118: Success: Expected (inputLength == expectedLength), Result: (2 == 2)
+.
+==> In data driven test with id: 3 and input sample: "How are you?"
+UT_DataDriven_Successes.cpp:117: Success: Expected (doThrow(expectedLength)) to throw (std::exception), Result: It did throw (std::exception)
+UT_DataDriven_Successes.cpp:118: Success: Expected (inputLength == expectedLength), Result: (12 == 12)
+.
+
+In UT_DataDriven_Successes::test_Throw_Nothing:
+==> In data driven test with id: 0 and input sample: "Hello World"
+UT_DataDriven_Successes.cpp:141: Message: Bad
+UT_DataDriven_Successes.cpp:141: Success: Expected (doNotThrow(expectedLength)) to not throw any type of exceptions, Result: It did not throw
+UT_DataDriven_Successes.cpp:142: Message: Luck
+UT_DataDriven_Successes.cpp:142: Success: Expected (inputLength == expectedLength), Result: (11 == 11)
+.
+==> In data driven test with id: 1 and input sample: "Hi"
+UT_DataDriven_Successes.cpp:141: Message: Bad
+UT_DataDriven_Successes.cpp:141: Success: Expected (doNotThrow(expectedLength)) to not throw any type of exceptions, Result: It did not throw
+UT_DataDriven_Successes.cpp:142: Message: Luck
+UT_DataDriven_Successes.cpp:142: Success: Expected (inputLength == expectedLength), Result: (2 == 2)
+.
+==> In data driven test with id: 2 and input sample: "This one is so long that it will trigger an exception of some sort !!!!"
+UT_DataDriven_Successes.cpp:141: Message: Bad
+UT_DataDriven_Successes.cpp:141: Success: Expected (doNotThrow(expectedLength)) to not throw any type of exceptions, Result: It did not throw
+UT_DataDriven_Successes.cpp:142: Message: Luck
+UT_DataDriven_Successes.cpp:142: Success: Expected (inputLength == expectedLength), Result: (71 == 71)
+.
+
+In UT_DataDriven_Successes::test_Setup_Teardown:
+==> In data driven test with id: 0 and input sample: 1
+UT_DataDriven_Successes.cpp:166: Success: Expected (m_setupCount == expectedSetupCount), Result: (1 == 1)
+UT_DataDriven_Successes.cpp:167: Success: Expected (m_teardownCount == expectedTeardownCount), Result: (1 == 1)
+.
+==> In data driven test with id: 1 and input sample: 2
+UT_DataDriven_Successes.cpp:166: Success: Expected (m_setupCount == expectedSetupCount), Result: (2 == 2)
+UT_DataDriven_Successes.cpp:167: Success: Expected (m_teardownCount == expectedTeardownCount), Result: (2 == 2)
+.
+==> In data driven test with id: 2 and input sample: 3
+UT_DataDriven_Successes.cpp:166: Success: Expected (m_setupCount == expectedSetupCount), Result: (3 == 3)
+UT_DataDriven_Successes.cpp:167: Success: Expected (m_teardownCount == expectedTeardownCount), Result: (3 == 3)
+.
+==> In data driven test with id: 3 and input sample: 4
+UT_DataDriven_Successes.cpp:166: Success: Expected (m_setupCount == expectedSetupCount), Result: (4 == 4)
+UT_DataDriven_Successes.cpp:167: Success: Expected (m_teardownCount == expectedTeardownCount), Result: (4 == 4)
+.
+==> In data driven test with id: 4 and input sample: 5
+UT_DataDriven_Successes.cpp:166: Success: Expected (m_setupCount == expectedSetupCount), Result: (5 == 5)
+UT_DataDriven_Successes.cpp:167: Success: Expected (m_teardownCount == expectedTeardownCount), Result: (5 == 5)
+.
+
+In UT_DataDriven_Successes::test_Int:
+==> In data driven test with id: 0 and input sample: 9
+UT_DataDriven_Successes.cpp:188: Success: Expected (isOdd(input)) to be true, Result: It is true
+.
+==> In data driven test with id: 1 and input sample: 1
+UT_DataDriven_Successes.cpp:188: Success: Expected (isOdd(input)) to be true, Result: It is true
+.
+==> In data driven test with id: 2 and input sample: 3
+UT_DataDriven_Successes.cpp:188: Success: Expected (isOdd(input)) to be true, Result: It is true
+.
+==> In data driven test with id: 3 and input sample: -1001
+UT_DataDriven_Successes.cpp:188: Success: Expected (isOdd(input)) to be true, Result: It is true
+.
+
+In UT_DataDriven_Successes::test_StdString:
+==> In data driven test with id: 0 and input sample: ""
+UT_DataDriven_Successes.cpp:206: Success: Expected (input.length() < 20), Result: (0 < 20)
+.
+==> In data driven test with id: 1 and input sample: "Hi"
+UT_DataDriven_Successes.cpp:206: Success: Expected (input.length() < 20), Result: (2 < 20)
+.
+==> In data driven test with id: 2 and input sample: "Hello World"
+UT_DataDriven_Successes.cpp:206: Success: Expected (input.length() < 20), Result: (11 < 20)
+.
+==> In data driven test with id: 3 and input sample: "How are you?"
+UT_DataDriven_Successes.cpp:206: Success: Expected (input.length() < 20), Result: (12 < 20)
+.
+
+In UT_DataDriven_Successes::test_Mixed_StdString_Int:
+==> In data driven test with id: 0 and input sample: ""
+UT_DataDriven_Successes.cpp:299: Success: Expected (input.length() == expectedLength), Result: (0 == 0)
+.
+==> In data driven test with id: 1 and input sample: "Hi"
+UT_DataDriven_Successes.cpp:299: Success: Expected (input.length() == expectedLength), Result: (2 == 2)
+.
+==> In data driven test with id: 2 and input sample: "Hello World"
+UT_DataDriven_Successes.cpp:299: Success: Expected (input.length() == expectedLength), Result: (11 == 11)
+.
+==> In data driven test with id: 3 and input sample: "How are you?"
+UT_DataDriven_Successes.cpp:299: Success: Expected (input.length() == expectedLength), Result: (12 == 12)
+.
+
+In UT_DataDriven_Successes::test_Mixed_StdString_Compound:
+==> In data driven test with id: 0 and input sample: ""
+UT_DataDriven_Successes.cpp:326: Success: Expected (inputLength == std::get<int>(expected)), Result: (0 == 0)
+UT_DataDriven_Successes.cpp:327: Success: Expected (isOdd == std::get<bool>(expected)), Result: (false == false)
+.
+==> In data driven test with id: 1 and input sample: "Hi"
+UT_DataDriven_Successes.cpp:326: Success: Expected (inputLength == std::get<int>(expected)), Result: (2 == 2)
+UT_DataDriven_Successes.cpp:327: Success: Expected (isOdd == std::get<bool>(expected)), Result: (false == false)
+.
+==> In data driven test with id: 2 and input sample: "Hello World"
+UT_DataDriven_Successes.cpp:326: Success: Expected (inputLength == std::get<int>(expected)), Result: (11 == 11)
+UT_DataDriven_Successes.cpp:327: Success: Expected (isOdd == std::get<bool>(expected)), Result: (true == true)
+.
+==> In data driven test with id: 3 and input sample: "How are you?"
+UT_DataDriven_Successes.cpp:326: Success: Expected (inputLength == std::get<int>(expected)), Result: (12 == 12)
+UT_DataDriven_Successes.cpp:327: Success: Expected (isOdd == std::get<bool>(expected)), Result: (false == false)
+.
+
+In UT_DataDriven_Successes::test_SingleData_Expected_Exception:
+==> In data driven test with id: 0 and input sample: "?"
+UT_DataDriven_Successes.cpp:229: Success: Expected (mayThrow(inputLength)) to throw (std::exception), Result: It did throw (std::exception)
+.
+==> In data driven test with id: 1 and input sample: "Hi"
+UT_DataDriven_Successes.cpp:229: Success: Expected (mayThrow(inputLength)) to throw (std::exception), Result: It did throw (std::exception)
+.
+==> In data driven test with id: 2 and input sample: "How are you?"
+UT_DataDriven_Successes.cpp:229: Success: Expected (mayThrow(inputLength)) to throw (std::exception), Result: It did throw (std::exception)
+.
+
+In UT_DataDriven_Successes::test_SingleData_Throw_Nothing:
+==> In data driven test with id: 0 and input sample: "Hello World"
+UT_DataDriven_Successes.cpp:250: Success: Expected (mayThrow(inputLength)) to not throw any type of exceptions, Result: It did not throw
+UT_DataDriven_Successes.cpp:251: Success: Expected (inputLength > 1U), Result: (11 > 1)
+.
+==> In data driven test with id: 1 and input sample: "Hi"
+UT_DataDriven_Successes.cpp:250: Success: Expected (mayThrow(inputLength)) to not throw any type of exceptions, Result: It did not throw
+UT_DataDriven_Successes.cpp:251: Success: Expected (inputLength > 1U), Result: (2 > 1)
+.
+
+In UT_DataDriven_Successes::test_SingleData_Setup_Teardown:
+==> In data driven test with id: 0 and input sample: { 01 00 00 00 01 00 00 00  }
+UT_DataDriven_Successes.cpp:279: Success: Expected (m_setupCount == expectedSetupCount), Result: (1 == 1)
+UT_DataDriven_Successes.cpp:280: Success: Expected (m_teardownCount == expectedTeardownCount), Result: (1 == 1)
+.
+==> In data driven test with id: 1 and input sample: { 02 00 00 00 02 00 00 00  }
+UT_DataDriven_Successes.cpp:279: Success: Expected (m_setupCount == expectedSetupCount), Result: (2 == 2)
+UT_DataDriven_Successes.cpp:280: Success: Expected (m_teardownCount == expectedTeardownCount), Result: (2 == 2)
+.
+==> In data driven test with id: 2 and input sample: { 03 00 00 00 03 00 00 00  }
+UT_DataDriven_Successes.cpp:279: Success: Expected (m_setupCount == expectedSetupCount), Result: (3 == 3)
+UT_DataDriven_Successes.cpp:280: Success: Expected (m_teardownCount == expectedTeardownCount), Result: (3 == 3)
+.
+==> In data driven test with id: 3 and input sample: { 04 00 00 00 04 00 00 00  }
+UT_DataDriven_Successes.cpp:279: Success: Expected (m_setupCount == expectedSetupCount), Result: (4 == 4)
+UT_DataDriven_Successes.cpp:280: Success: Expected (m_teardownCount == expectedTeardownCount), Result: (4 == 4)
+.
+
+In UT_DataDriven_Successes::test_WithNoAssert_Before:
+UT_DataDriven_Successes.cpp:350: Warning: Warning message for UT_DataDriven_Successes
+==> In data driven test with id: 0 and input sample: 0
+UT_DataDriven_Successes.cpp:357: Success: Expected (computedValue == expected), Result: (0 == 0)
+.
+==> In data driven test with id: 1 and input sample: 1
+UT_DataDriven_Successes.cpp:357: Success: Expected (computedValue == expected), Result: (3 == 3)
+.
+==> In data driven test with id: 2 and input sample: 2
+UT_DataDriven_Successes.cpp:357: Success: Expected (computedValue == expected), Result: (6 == 6)
+.
+==> In data driven test with id: 3 and input sample: -1000
+UT_DataDriven_Successes.cpp:357: Success: Expected (computedValue == expected), Result: (-3000 == -3000)
+.
+
+In UT_DataDriven_Successes::test_WithNoAssert_After:
+==> In data driven test with id: 0 and input sample: 0
+UT_DataDriven_Successes.cpp:378: Success: Expected (computedValue == expected), Result: (0 == 0)
+.
+==> In data driven test with id: 1 and input sample: 1
+UT_DataDriven_Successes.cpp:378: Success: Expected (computedValue == expected), Result: (3 == 3)
+.
+==> In data driven test with id: 2 and input sample: 2
+UT_DataDriven_Successes.cpp:378: Success: Expected (computedValue == expected), Result: (6 == 6)
+.
+==> In data driven test with id: 3 and input sample: -1000
+UT_DataDriven_Successes.cpp:378: Success: Expected (computedValue == expected), Result: (-3000 == -3000)
+.
+UT_DataDriven_Successes.cpp:388: Warning: Warning message for UT_DataDriven_Successes
+
+
+In UT_DataDriven_Successes::test_MissingAssertion_First:
+==> In data driven test with id: 0 and input sample: 0
+Warning: No assertion found for this data driven test sample !!!
+==> In data driven test with id: 1 and input sample: 1
+UT_DataDriven_Successes.cpp:403: Success: Expected (computedValue == expected), Result: (3 == 3)
+.
+==> In data driven test with id: 2 and input sample: 2
+UT_DataDriven_Successes.cpp:403: Success: Expected (computedValue == expected), Result: (6 == 6)
+.
+==> In data driven test with id: 3 and input sample: -1000
+UT_DataDriven_Successes.cpp:403: Success: Expected (computedValue == expected), Result: (-3000 == -3000)
+.
+
+In UT_DataDriven_Successes::test_MissingAssertion_Middle:
+==> In data driven test with id: 0 and input sample: 0
+UT_DataDriven_Successes.cpp:426: Success: Expected (computedValue == expected), Result: (0 == 0)
+.
+==> In data driven test with id: 1 and input sample: 1
+UT_DataDriven_Successes.cpp:426: Success: Expected (computedValue == expected), Result: (3 == 3)
+.
+==> In data driven test with id: 2 and input sample: 2
+Warning: No assertion found for this data driven test sample !!!
+==> In data driven test with id: 3 and input sample: -1000
+UT_DataDriven_Successes.cpp:426: Success: Expected (computedValue == expected), Result: (-3000 == -3000)
+.
+
+In UT_DataDriven_Successes::test_MissingAssertion_Last:
+==> In data driven test with id: 0 and input sample: 0
+UT_DataDriven_Successes.cpp:449: Success: Expected (computedValue == expected), Result: (0 == 0)
+.
+==> In data driven test with id: 1 and input sample: 1
+UT_DataDriven_Successes.cpp:449: Success: Expected (computedValue == expected), Result: (3 == 3)
+.
+==> In data driven test with id: 2 and input sample: 2
+UT_DataDriven_Successes.cpp:449: Success: Expected (computedValue == expected), Result: (6 == 6)
+.
+==> In data driven test with id: 3 and input sample: -1000
+Warning: No assertion found for this data driven test sample !!!
+
+In UT_DataDriven_Successes::test_No_test_yet_for_Guard:
+UT_DataDriven_Successes.cpp:466: Warning: No test yet for: all kind of assertions with all successes
+UT_DataDriven_Successes.h:82: Warning: No assertion found in this test !!!
+
+OK! (71 tests including 70 'sub' tests from 18 data driven tests)
+Error level = 0

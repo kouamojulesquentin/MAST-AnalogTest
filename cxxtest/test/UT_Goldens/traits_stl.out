@@ -1,0 +1,135 @@
+Running cxxtest tests (9 tests)
+
+
+In StlTraits::test_Pair:
+Traits_Stl.h:13: Error: <3, "Three">
+Traits_Stl.h:15: Error: <"Four", 4.0>
+
+In StlTraits::test_Vector:
+Traits_Stl.h:21: Trace: {}
+Traits_Stl.h:25: Error: {
+1,
+2,
+3,
+}
+
+Traits_Stl.h:28: Trace: {}
+Traits_Stl.h:32: Error: {
+"One",
+"Two",
+"Three",
+}
+
+Traits_Stl.h:35: Trace: {}
+Traits_Stl.h:39: Error: {
+<1, "One">,
+<2, "Two">,
+<3, "Three">,
+}
+
+
+In StlTraits::test_List:
+Traits_Stl.h:45: Trace: {}
+Traits_Stl.h:49: Error: {
+1,
+2,
+3,
+}
+
+Traits_Stl.h:52: Trace: {}
+Traits_Stl.h:56: Error: {
+"One",
+"Two",
+"Three",
+}
+
+Traits_Stl.h:59: Trace: {}
+Traits_Stl.h:63: Error: {
+<1, "One">,
+<2, "Two">,
+<3, "Three">,
+}
+
+
+In StlTraits::test_Set:
+Traits_Stl.h:69: Trace: {}
+Traits_Stl.h:73: Error: {
+1,
+2,
+3,
+}
+
+Traits_Stl.h:76: Trace: {}
+Traits_Stl.h:80: Error: {
+"One",
+"Three",
+"Two",
+}
+
+Traits_Stl.h:83: Trace: {}
+Traits_Stl.h:87: Error: {
+<1, "One">,
+<2, "Two">,
+<3, "Three">,
+}
+
+
+In StlTraits::test_Map:
+Traits_Stl.h:93: Trace: {}
+Traits_Stl.h:99: Error: {
+<"Humpty", "Dumpty">,
+<"Jack", "Jill">,
+<"Ren", "Stimpy">,
+}
+
+Traits_Stl.h:102: Trace: {}
+Traits_Stl.h:111: Error: {
+<6, {
+2,
+3,
+}
+>,
+<210, {
+2,
+3,
+5,
+7,
+}
+>,
+}
+
+
+In StlTraits::test_Deque:
+Traits_Stl.h:117: Trace: {}
+Traits_Stl.h:122: Error: {
+4,
+3,
+2,
+1,
+}
+
+
+In StlTraits::test_MultiMap:
+Traits_Stl.h:128: Trace: {}
+Traits_Stl.h:132: Error: {
+<"One", 1.0>,
+<"Two", 2.0>,
+}
+
+
+In StlTraits::test_MultiSet:
+Traits_Stl.h:138: Trace: {}
+Traits_Stl.h:142: Error: {
+123,
+456,
+}
+
+
+In StlTraits::test_Complex:
+Traits_Stl.h:148: Error: (3.1400000000000001 + 2.7099999999999999 * i)
+Traits_Stl.h:149: Error: (1.0 * i)
+Traits_Stl.h:150: Error: 1.0
+
+Failed 9 and Skipped 0 of 9 tests
+Success rate: 0%
+Error level = 9

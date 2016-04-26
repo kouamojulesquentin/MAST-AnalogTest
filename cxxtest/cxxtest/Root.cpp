@@ -14,7 +14,7 @@
 
 //
 // This file holds the "root" of CxxTest, i.e.
-// the parts that must be in a source file file.
+// the parts that must be in a runner source file.
 //
 
 #include <cxxtest/ValueTraits.cpp>
@@ -26,6 +26,5 @@
 #include <cxxtest/TestSuite.cpp>
 #include <cxxtest/TestTracker.cpp>
 #if (__cplusplus >= 201103L)
-#include <cxxtest/TestSuiteEx.cpp>
 #endif
 #endif // __cxxtest__Root_cpp__

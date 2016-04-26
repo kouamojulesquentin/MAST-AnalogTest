@@ -265,16 +265,18 @@ namespace CxxTest
     tracker.countDataDrivenTests(inputsSize);
     auto& testDescription = tracker.test();
 
+    auto nextInput    = std::begin(inputs);
     auto nextExpected = std::begin(expectedResults);
 
     testDescription.tearDown();   // This tearDown is to balance the setup already done for the data driven test "master" before doing a setup for the 1st parameterized test
-    auto testId = 0;
-    for (auto& input : inputs)
+    for (size_t testId = 0; testId < inputsSize; ++testId)
     {
       _TS_TRY_DDT
       {
         TestStateGuard stateGuard;
-        auto& expected = *nextExpected++;
+
+        auto& expected = *nextExpected;
+        auto& input    = *nextInput;
 
         auto inputNoRefWT = traits_NoReferenceWrapper(input);
         auto inputNoRefW  = inputNoRefWT.get();                 // Remove potential reference_wrapper (added by split when using TS_DATA_DRIVEN_TEST_MIX)
@@ -287,10 +289,11 @@ namespace CxxTest
         testFunction(input, expected);
         tracker.leaveDataDrivenTest();
         testDescription.tearDown();
+
+        ++nextInput;
+        ++nextExpected;
       }
       _TS_CATCH_DDT
-
-      ++testId;
     }
     tracker.leaveDataDrivenTests();
     testDescription.setUp();    // This setUp is to balance the tearDown that will be made by the runner for the data driven test "master"
@@ -509,9 +512,12 @@ namespace CxxTest
   //!
   //!   @endcode
   //!
+  //!   @note TS_DATA_DRIVEN_TEST_MIX must be only used once per scope (or a name conflict will be reported by the compiler)
+//+  auto UNIQUE_NAME(splitDataVar) = CxxTest::split(dataSet); CxxTest::doDataDrivenTests(__FILE__, __LINE__, (paramerizedTestFunction), std::get<0>(UNIQUE_NAME(splitDataVar)), std::get<1>(UNIQUE_NAME(splitDataVar)))
   #define TS_DATA_DRIVEN_TEST_MIX(paramerizedTestFunction, dataSet)    \
   CxxTest::countAssert();                                              \
-  auto UNIQUE_NAME(splitDataVar) = CxxTest::split(dataSet); CxxTest::doDataDrivenTests(__FILE__, __LINE__, (paramerizedTestFunction), std::get<0>(UNIQUE_NAME(splitDataVar)), std::get<1>(UNIQUE_NAME(splitDataVar)))
+  auto _cxxtest_splitDataVar_ = CxxTest::split(dataSet); \
+  CxxTest::doDataDrivenTests(__FILE__, __LINE__, (paramerizedTestFunction), std::get<0>(_cxxtest_splitDataVar_), std::get<1>(_cxxtest_splitDataVar_))
 
 } // End of namespace CxxTest
 

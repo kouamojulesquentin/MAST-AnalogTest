@@ -18,8 +18,6 @@
 #ifndef TESTSTATEGUARD_H__DD2CCD92_D582_4C06_518E_5544858D636B__INCLUDED_
   #define TESTSTATEGUARD_H__DD2CCD92_D582_4C06_518E_5544858D636B__INCLUDED_
 
-#include <cxxtest/Flags.h>
-
 namespace CxxTest
 {
 //! Saves, tests related, global variables in constructor and restores them in destructor
@@ -29,28 +27,22 @@ namespace CxxTest
 //!
 class TestStateGuard
 {
-  unsigned _maxDumpSize;
-#ifdef _CXXTEST_HAVE_EH
-    bool _abortTestOnFail;
-    bool _abortDataDrivenTestsOnFailure;
-#endif // _CXXTEST_HAVE_EH
+    unsigned _maxDumpSize;
+    bool     _abortTestOnFail;
+    bool     _abortDataDrivenTestsOnFailure;
 
 public:
     TestStateGuard()
       : _maxDumpSize                   (maxDumpSize())
-  #ifdef _CXXTEST_HAVE_EH
       , _abortTestOnFail               (abortTestOnFail())
       , _abortDataDrivenTestsOnFailure (abortDataDrivenTestsOnFailure())
-  #endif // _CXXTEST_HAVE_EH
     {}
 
     virtual ~TestStateGuard()
     {
         setMaxDumpSize(_maxDumpSize);
-#ifdef _CXXTEST_HAVE_EH
         setAbortTestOnFail               (_abortTestOnFail);
         setAbortDataDrivenTestsOnFailure (_abortDataDrivenTestsOnFailure);
-#endif // _CXXTEST_HAVE_EH
     }
 };
 } // End of namespace CxxTest

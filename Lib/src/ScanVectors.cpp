@@ -12,8 +12,8 @@
 //===========================================================================
 
 
-
 #include "ScanVectors.hpp"
+#include "Utility.hpp"
 
 using namespace mast;
 
@@ -75,10 +75,22 @@ BinaryVector& BinaryVector::operator= (BinaryVector&& rhs) noexcept
 
 //! Appends from 8 bits
 //!
-BinaryVector& BinaryVector::Append (uint8_t value)
+BinaryVector& BinaryVector::Append (uint8_t value, uint8_t numberOfBits)
 {
+  if (numberOfBits == 0)
+  {
+    THROW_INVALID_ARGUMENT("Number of bits to append must be != 0");
+  }
+
+  if (numberOfBits > 8 * sizeof(uint8_t))
+  {
+    THROW_INVALID_ARGUMENT("Number of append bits cannot exceed number of bits of value.");
+  }
+
+  uint8_t freeBits = m_usedBits % 8;
+
   m_data.push_back(value);
-  m_usedBits += 8;
+  m_usedBits += numberOfBits;
 
   return *this;
 }
@@ -93,8 +105,8 @@ BinaryVector& BinaryVector::Append (uint16_t value)
 {
   //! @todo [JFC]-[April/25/2016]: Use Boost.Endian to manage properly endianness
   //!
-  m_data.push_back((value >>  8) && 0xff);
-  m_data.push_back((value >>  0) && 0xff);
+  m_data.push_back((value >>  8) & 0xff);
+  m_data.push_back((value >>  0) & 0xff);
 
   m_usedBits += 16;
 
@@ -110,10 +122,10 @@ BinaryVector& BinaryVector::Append (uint32_t value)
 {
   //! @todo [JFC]-[April/25/2016]: Use Boost.Endian to manage properly endianness
   //!
-  m_data.push_back((value >> 24) && 0xff);
-  m_data.push_back((value >> 16) && 0xff);
-  m_data.push_back((value >>  8) && 0xff);
-  m_data.push_back((value >>  0) && 0xff);
+  m_data.push_back((value >> 24) & 0xff);
+  m_data.push_back((value >> 16) & 0xff);
+  m_data.push_back((value >>  8) & 0xff);
+  m_data.push_back((value >>  0) & 0xff);
 
   m_usedBits += 32;
 
@@ -130,14 +142,14 @@ BinaryVector& BinaryVector::Append (uint64_t value)
 {
   //! @todo [JFC]-[April/25/2016]: Use Boost.Endian to manage properly endianness
   //!
-  m_data.push_back((value >> 56) && 0xff);
-  m_data.push_back((value >> 48) && 0xff);
-  m_data.push_back((value >> 40) && 0xff);
-  m_data.push_back((value >> 32) && 0xff);
-  m_data.push_back((value >> 24) && 0xff);
-  m_data.push_back((value >> 16) && 0xff);
-  m_data.push_back((value >>  8) && 0xff);
-  m_data.push_back((value >>  0) && 0xff);
+  m_data.push_back((value >> 56) & 0xff);
+  m_data.push_back((value >> 48) & 0xff);
+  m_data.push_back((value >> 40) & 0xff);
+  m_data.push_back((value >> 32) & 0xff);
+  m_data.push_back((value >> 24) & 0xff);
+  m_data.push_back((value >> 16) & 0xff);
+  m_data.push_back((value >>  8) & 0xff);
+  m_data.push_back((value >>  0) & 0xff);
 
   m_usedBits += 64;
 

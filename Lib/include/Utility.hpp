@@ -11,10 +11,11 @@
 //!
 //===========================================================================
 
-
-
 #ifndef UTILITY_H__AB0B55F8_1F3A_4D8D_893_CA234E5BFD9D__INCLUDED_
   #define UTILITY_H__AB0B55F8_1F3A_4D8D_893_CA234E5BFD9D__INCLUDED_
+
+#include <string>
+#include <stdexcept>
 
 namespace mast
 {
@@ -31,11 +32,21 @@ class Utility final
   //! Computes the minimal number of bytes to hold a number of bits
   //!
   static uint32_t BytesCountFromBitsCount(uint32_t bitsCount) { return (bitsCount + 7) / 8; }
+
+  //! Formats message for (std) exception
+  //!
+  static std::string MakeExceptionMessage(const char* file, uint32_t line, const char* issueKind, const char* userMessage);
 };
 //
 //  End of Utility class declaration
 //---------------------------------------------------------------------------
 } // End of namespace mast
+
+
+//! Helper to format message and throw exception
+//!
+#define THROW_IMPL(exc,msg)         throw exc(mast::Utility::MakeExceptionMessage(__FILE__, __LINE__, #exc, msg))
+#define THROW_INVALID_ARGUMENT(msg) THROW_IMPL(std::invalid_argument, msg)
 
 
 #endif  // not defined UTILITY_H__AB0B55F8_1F3A_4D8D_893_CA234E5BFD9D__INCLUDED_

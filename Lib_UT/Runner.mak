@@ -49,6 +49,9 @@ $(info - Python:         $(python))
 #+$(info - Runner path:    $(RunnerFile))
 $(info )
 
+# DO NOT FORGET to define CXXTEST_HAVE_EH and CXXTEST_HAVE_STD to compile UT Files
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 $(RunnerFile): $(Suites) $(ProjectFile) $(TemplateFile) $(MAKEFILE_LIST)
 #+	$(python) "$(Generator)" --runner=ParenPrinter --have-eh --have-std --fog-parse --root  -o $(RunnerFile) $(Suites)
 	$(python) "$(Generator)" --error-printer --have-eh --have-std --fog-parse --root  -o $(RunnerFile) --template $(TemplateFile) $(Suites)

@@ -60,6 +60,8 @@
 			<Add option="-Wfatal-errors" />
 			<Add option="-Wextra" />
 			<Add option="-fexceptions" />
+			<Add option="-DCXXTEST_HAVE_EH" />
+			<Add option="-DCXXTEST_HAVE_STD" />
 			<Add directory="../cxxtest" />
 			<Add directory="../Lib/include" />
 			<Add directory="../Lib/public_include" />

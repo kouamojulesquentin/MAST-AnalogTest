@@ -112,6 +112,7 @@
 		<Unit filename="src/SystemModel.cpp" />
 		<Unit filename="src/SystemModelNode.cpp" />
 		<Unit filename="src/Tap.cpp" />
+		<Unit filename="src/Utility.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

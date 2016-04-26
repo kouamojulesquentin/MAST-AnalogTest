@@ -47,7 +47,7 @@ class DLL_EXPORT BinaryVector final
   BinaryVector& operator<< (const BinaryVector& rhs);       //!< Appends another scan vector
   BinaryVector  operator+  (const BinaryVector& rhs) const; //!< Concatenate two scan vectors
 
-  BinaryVector& Append(uint8_t  value); //!< Appends  8 bits value the BinaryVector
+  BinaryVector& Append(uint8_t  value, uint8_t numberOfBits = 8); //!< Appends  8 bits value the BinaryVector
   BinaryVector& Append(uint16_t value); //!< Appends 16 bits value the BinaryVector
   BinaryVector& Append(uint32_t value); //!< Appends 32 bits value the BinaryVector
   BinaryVector& Append(uint64_t value); //!< Appends 64 bits value the BinaryVector

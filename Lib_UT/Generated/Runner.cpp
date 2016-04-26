@@ -75,9 +75,57 @@ public:
  void runTest() { suite_UT_BinaryVector.test_Append_8_bits_When_Empty(); }
 } testDescription_suite_UT_BinaryVector_test_Append_8_bits_When_Empty;
 
+static class TestDescription_suite_UT_BinaryVector_test_Append_16_bits_When_Empty : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_BinaryVector_test_Append_16_bits_When_Empty() : CxxTest::RealTestDescription( Tests_UT_BinaryVector, suiteDescription_UT_BinaryVector, 41, "test_Append_16_bits_When_Empty" ) {}
+ void runTest() { suite_UT_BinaryVector.test_Append_16_bits_When_Empty(); }
+} testDescription_suite_UT_BinaryVector_test_Append_16_bits_When_Empty;
+
+static class TestDescription_suite_UT_BinaryVector_test_Append_32_bits_When_Empty : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_BinaryVector_test_Append_32_bits_When_Empty() : CxxTest::RealTestDescription( Tests_UT_BinaryVector, suiteDescription_UT_BinaryVector, 42, "test_Append_32_bits_When_Empty" ) {}
+ void runTest() { suite_UT_BinaryVector.test_Append_32_bits_When_Empty(); }
+} testDescription_suite_UT_BinaryVector_test_Append_32_bits_When_Empty;
+
+static class TestDescription_suite_UT_BinaryVector_test_Append_64_bits_When_Empty : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_BinaryVector_test_Append_64_bits_When_Empty() : CxxTest::RealTestDescription( Tests_UT_BinaryVector, suiteDescription_UT_BinaryVector, 43, "test_Append_64_bits_When_Empty" ) {}
+ void runTest() { suite_UT_BinaryVector.test_Append_64_bits_When_Empty(); }
+} testDescription_suite_UT_BinaryVector_test_Append_64_bits_When_Empty;
+
+static class TestDescription_suite_UT_BinaryVector_test_Append_8_bits_When_NotEmpty : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_BinaryVector_test_Append_8_bits_When_NotEmpty() : CxxTest::RealTestDescription( Tests_UT_BinaryVector, suiteDescription_UT_BinaryVector, 45, "test_Append_8_bits_When_NotEmpty" ) {}
+ void runTest() { suite_UT_BinaryVector.test_Append_8_bits_When_NotEmpty(); }
+} testDescription_suite_UT_BinaryVector_test_Append_8_bits_When_NotEmpty;
+
+static class TestDescription_suite_UT_BinaryVector_test_Append_16_bits_When_NotEmpty : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_BinaryVector_test_Append_16_bits_When_NotEmpty() : CxxTest::RealTestDescription( Tests_UT_BinaryVector, suiteDescription_UT_BinaryVector, 46, "test_Append_16_bits_When_NotEmpty" ) {}
+ void runTest() { suite_UT_BinaryVector.test_Append_16_bits_When_NotEmpty(); }
+} testDescription_suite_UT_BinaryVector_test_Append_16_bits_When_NotEmpty;
+
+static class TestDescription_suite_UT_BinaryVector_test_Append_32_bits_When_NotEmpty : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_BinaryVector_test_Append_32_bits_When_NotEmpty() : CxxTest::RealTestDescription( Tests_UT_BinaryVector, suiteDescription_UT_BinaryVector, 47, "test_Append_32_bits_When_NotEmpty" ) {}
+ void runTest() { suite_UT_BinaryVector.test_Append_32_bits_When_NotEmpty(); }
+} testDescription_suite_UT_BinaryVector_test_Append_32_bits_When_NotEmpty;
+
+static class TestDescription_suite_UT_BinaryVector_test_Append_64_bits_When_NotEmpty : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_BinaryVector_test_Append_64_bits_When_NotEmpty() : CxxTest::RealTestDescription( Tests_UT_BinaryVector, suiteDescription_UT_BinaryVector, 48, "test_Append_64_bits_When_NotEmpty" ) {}
+ void runTest() { suite_UT_BinaryVector.test_Append_64_bits_When_NotEmpty(); }
+} testDescription_suite_UT_BinaryVector_test_Append_64_bits_When_NotEmpty;
+
+static class TestDescription_suite_UT_BinaryVector_test_Append_1_to_7_bits_Empty : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_BinaryVector_test_Append_1_to_7_bits_Empty() : CxxTest::RealTestDescription( Tests_UT_BinaryVector, suiteDescription_UT_BinaryVector, 50, "test_Append_1_to_7_bits_Empty" ) {}
+ void runTest() { suite_UT_BinaryVector.test_Append_1_to_7_bits_Empty(); }
+} testDescription_suite_UT_BinaryVector_test_Append_1_to_7_bits_Empty;
+
 static class TestDescription_suite_UT_BinaryVector_test_No_test_yet_for_Guard : public CxxTest::RealTestDescription {
 public:
- TestDescription_suite_UT_BinaryVector_test_No_test_yet_for_Guard() : CxxTest::RealTestDescription( Tests_UT_BinaryVector, suiteDescription_UT_BinaryVector, 44, "test_No_test_yet_for_Guard" ) {}
+ TestDescription_suite_UT_BinaryVector_test_No_test_yet_for_Guard() : CxxTest::RealTestDescription( Tests_UT_BinaryVector, suiteDescription_UT_BinaryVector, 54, "test_No_test_yet_for_Guard" ) {}
  void runTest() { suite_UT_BinaryVector.test_No_test_yet_for_Guard(); }
 } testDescription_suite_UT_BinaryVector_test_No_test_yet_for_Guard;
 

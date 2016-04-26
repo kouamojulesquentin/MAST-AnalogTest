@@ -45,27 +45,63 @@
 			<Add directory="include" />
 			<Add directory="public_include" />
 		</Compiler>
-		<Unit filename="include/AccessInterface.hpp" />
-		<Unit filename="include/Chain.hpp" />
-		<Unit filename="include/ConfigureVisitor.hpp" />
-		<Unit filename="include/DataCycleWriteVisitor.hpp" />
-		<Unit filename="include/GmlPrinterVisitor.hpp" />
-		<Unit filename="include/Linker.hpp" />
-		<Unit filename="include/ParentNode.hpp" />
-		<Unit filename="include/PostConditionVisitor.hpp" />
-		<Unit filename="include/PreconditionVisitor.hpp" />
-		<Unit filename="include/Register.hpp" />
-		<Unit filename="include/ScanVectors.hpp" />
-		<Unit filename="include/SystemModel.hpp" />
-		<Unit filename="include/SystemModelNode.hpp" />
-		<Unit filename="include/SystemModelNodes.hpp" />
-		<Unit filename="include/SystemModelVisitor.hpp" />
-		<Unit filename="include/Tap.hpp" />
-		<Unit filename="include/Utility.hpp" />
-		<Unit filename="main.cpp" />
-		<Unit filename="main.h" />
-		<Unit filename="public_include/PDLAdapter.h" />
-		<Unit filename="public_include/SystemModelAdapter.h" />
+		<Unit filename="include/AccessInterface.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="include/Chain.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="include/ConfigureVisitor.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="include/DataCycleWriteVisitor.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="include/GmlPrinterVisitor.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="include/Linker.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="include/ParentNode.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="include/PostConditionVisitor.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="include/PreconditionVisitor.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="include/Register.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="include/ScanVectors.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="include/SystemModel.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="include/SystemModelNode.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="include/SystemModelNodes.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="include/SystemModelVisitor.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="include/Tap.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="include/Utility.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="public_include/PDLAdapter.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="public_include/SystemModelAdapter.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="src/AccessInterface.cpp" />
 		<Unit filename="src/Chain.cpp" />
 		<Unit filename="src/DefaultBinaryPathSelector.cpp" />
@@ -78,19 +114,8 @@
 		<Unit filename="src/Tap.cpp" />
 		<Extensions>
 			<code_completion />
-			<editor_config active="1" use_tabs="0" tab_indents="1" tab_width="2" indent="2" eol_mode="0" />
 			<envvars />
 			<debugger />
-			<lib_finder disable_auto="1" />
-			<DoxyBlocks>
-				<comment_style block="1" line="1" />
-				<doxyfile_project />
-				<doxyfile_build />
-				<doxyfile_warnings />
-				<doxyfile_output />
-				<doxyfile_dot />
-				<general />
-			</DoxyBlocks>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

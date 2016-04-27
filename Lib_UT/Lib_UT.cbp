@@ -62,6 +62,7 @@
 			<Add option="-fexceptions" />
 			<Add option="-DCXXTEST_HAVE_EH" />
 			<Add option="-DCXXTEST_HAVE_STD" />
+			<Add option="-DCXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION" />
 			<Add directory="../cxxtest" />
 			<Add directory="../Lib/include" />
 			<Add directory="../Lib/public_include" />

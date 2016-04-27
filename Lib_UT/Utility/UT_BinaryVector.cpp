@@ -14,17 +14,17 @@
 #include "UT_BinaryVector.hpp"
 #include "ScanVectors.hpp"
 
-#include <cxxtest/ValueTraits.h>
+#include <cxxtest/StdValueTraits.h>
 #include <vector>
 #include <memory>
 #include <tuple>
+#include <sstream>
 
 using std::vector;
 using std::tuple;
 using std::make_tuple;
-//+using std::pair;
-//+using std::make_pair;
 using std::initializer_list;
+using std::ostringstream;
 
 using mast::BinaryVector;
 
@@ -449,9 +449,10 @@ void UT_BinaryVector::test_Append_64_bits_When_NotEmpty ()
 }
 
 
-//! Checks Append when sut is empty and adding from 1 to 7 bits from uint8_t
+//! Checks Append when sut is empty and adding from 1 to 8 bits from uint8_t
 //!
-void UT_BinaryVector::test_Append_1_to_7_bits_Empty ()
+//! @note Each time a new BinaryVector is used
+void UT_BinaryVector::test_Append_1_to_8_bits_When_Empty ()
 {
   // ---------------- DDT Setup
   //
@@ -494,27 +495,124 @@ void UT_BinaryVector::test_Append_1_to_7_bits_Empty ()
   };
 
   const vector<TInput> inputs =
-  {
-    TInput(0x0, 1),
-    TInput(0x1, 1),
-    TInput(0x2, 2),
-    TInput(0x3, 2),
-    TInput(0x3, 4),
+  {   // Value, bits
+    TInput(0x00, 1),    // 00
+    TInput(0x01, 1),    // 01
+    TInput(0x02, 2),    // 02
+    TInput(0x03, 2),    // 03
+    TInput(0x03, 3),    // 04
+    TInput(0x09, 4),    // 05
+    TInput(0x11, 5),    // 06
+    TInput(0x12, 6),    // 07
+    TInput(0x4A, 7),    // 08
+    TInput(0x7B, 8),    // 09
   };
 
   const vector<TExpected> expected =
-  {
-    TExpected(1, 1, {0b0000'0000}),
-    TExpected(1, 1, {0b1000'0000}),
-    TExpected(2, 1, {0b0100'0000}),
-    TExpected(2, 1, {0b1100'0000}),
-    TExpected(4, 1, {0b0011'0000}),
+  {     // Bits, Bytes, Values
+    TExpected(1, 1, {0b00000000}),   // 00
+    TExpected(1, 1, {0b10000000}),   // 01
+    TExpected(2, 1, {0b10000000}),   // 02
+    TExpected(2, 1, {0b11000000}),   // 03
+    TExpected(3, 1, {0b01100000}),   // 04
+    TExpected(4, 1, {0b10010000}),   // 05
+    TExpected(5, 1, {0b10001000}),   // 06
+    TExpected(6, 1, {0b01001000}),   // 07
+    TExpected(7, 1, {0b10010100}),   // 08
+    TExpected(8, 1, {0b01111011}),   // 09
   };
 
   // ---------------- DDT Exercise
   //
   TS_DATA_DRIVEN_TEST (checker, inputs, expected);
 }
+
+//! Checks Append when sut is not empty (from 1 to 8 bits) and adding from 1 to 8 bits from uint8_t
+//!
+//! @note Each time a new BinaryVector is used
+void UT_BinaryVector::test_Append_1_to_8_bits_When_NotEmpty ()
+{
+  // ---------------- DDT Setup
+  //
+  using TInput    = tuple<uint8_t, uint8_t, uint8_t, uint8_t>;  // First value and number of bits, second value and number of bits
+  using TExpected = tuple<uint32_t, uint32_t, vector<uint8_t>>; // Expected bits count, bytes count and bytes
+
+  auto checker = [](const auto& input, const auto& expected)
+  {
+    // ---------------- Check parameters
+    //
+    CxxTest::setAbortTestOnFail(true);
+
+    // ---------------- Setup
+    //
+    auto value_1        = std::get<0>(input);
+    auto numberOfBits_1 = std::get<1>(input);
+    auto value_2        = std::get<2>(input);
+    auto numberOfBits_2 = std::get<3>(input);
+
+    BinaryVector sut;
+    sut.Append(value_1, numberOfBits_1);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Append(value_2, numberOfBits_2));
+
+    // ---------------- Verify
+    //
+    const auto  expectedBitsCount  = std::get<0>(expected);
+    const auto  expectedBytesCount = std::get<1>(expected);
+    const auto& expectedContent    = std::get<2>(expected);
+
+    TS_ASSERT_EQUALS (sut.BitCount(),   expectedBitsCount);
+    TS_ASSERT_EQUALS (sut.BytesCount(), expectedBytesCount);
+
+    const uint8_t* pData = sut.Data();
+
+    TS_ASSERT_GREATER_THAN_EQUALS (expectedContent.size(), expectedBytesCount);
+    TS_ASSERT_NOT_NULLPTR (pData);
+    ostringstream os;
+    for (int ii = 0 ; ii < expectedBytesCount ; ++ii)
+    {
+      os.str("");
+      os << "pData[" << ii << "]";
+      auto msg = os.str().c_str();
+      TSM_ASSERT_EQUALS (msg, pData[ii], expectedContent[ii]);
+    }
+  };
+
+  const vector<TInput> inputs =
+  {   // Value, bits, value, bits
+    TInput(0x00, 1, 0x01, 1),    // 00
+    TInput(0x01, 1, 0x00, 1),    // 01
+    TInput(0x02, 2, 0x03, 2),    // 02
+    TInput(0x03, 2, 0x41, 7),    // 03
+    TInput(0x03, 3, 0x05, 5),    // 04
+    TInput(0x09, 4, 0x81, 8),    // 05
+    TInput(0x11, 5, 0x77, 8),    // 06
+    TInput(0x12, 6, 0x29, 6),    // 07
+    TInput(0x4A, 7, 0x4A, 8),    // 08
+    TInput(0x7B, 8, 0x05, 3),    // 09
+  };
+
+  const vector<TExpected> expected =
+  {     // Bits, Bytes, Values
+    TExpected(2,  1, {0b01000000}),              // 00
+    TExpected(2,  1, {0b10000000}),              // 01
+    TExpected(4,  1, {0b10110000}),              // 02
+    TExpected(9,  2, {0b11100000, 0b10000000}),  // 03
+    TExpected(8,  1, {0b01100101}),              // 04
+    TExpected(12, 2, {0b10011000, 0b00010000}),  // 05
+    TExpected(13, 2, {0b10001011, 0b10111000}),  // 06
+    TExpected(12, 2, {0b01001010, 0b10010000}),  // 07
+    TExpected(15, 2, {0b10010100, 0b10010100}),  // 08
+    TExpected(11, 2, {0b01111011, 0b10100000}),  // 09
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, inputs, expected);
+}
+
 
 
 

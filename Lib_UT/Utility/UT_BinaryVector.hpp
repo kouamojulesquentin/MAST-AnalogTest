@@ -47,7 +47,8 @@ class UT_BinaryVector : public CxxTest::TestSuite
   void test_Append_32_bits_When_NotEmpty ();
   void test_Append_64_bits_When_NotEmpty ();
 
-  void test_Append_1_to_7_bits_Empty ();
+  void test_Append_1_to_8_bits_When_Empty ();
+  void test_Append_1_to_8_bits_When_NotEmpty ();
 
   //! @todo [JFC]-[April/25/2016]: Remove "test_No_test_yet_for_Guard" method when all tests are implemented
   //!

@@ -87,9 +87,59 @@ BinaryVector& BinaryVector::Append (uint8_t value, uint8_t numberOfBits)
     THROW_INVALID_ARGUMENT("Number of append bits cannot exceed number of bits of value.");
   }
 
-  uint8_t freeBits = m_usedBits % 8;
+  static constexpr uint8_t mask[] =
+  {
+    0b10000000, // 0 bits
+    0b10000000, // 1 bits
+    0b11000000, // 2 bits
+    0b11100000, // 3 bits
+    0b11110000, // 4 bits
+    0b11111000, // 5 bits
+    0b11111100, // 6 bits
+    0b11111110, // 7 bits
+    0b11111111, // 8 bits
+  };
 
-  m_data.push_back(value);
+  // ---------------- Align (pack) added bits to the MSB
+  //                  This make sure that unused bits are set to zero (at least for test and debug purpose)
+  //
+  value <<= 8 - numberOfBits;
+  value &=  mask[numberOfBits];
+
+  const uint8_t lastByteBits = m_usedBits % 8;
+  const uint8_t freeBits     = (lastByteBits == 0) ? 8 : 8 - lastByteBits;
+
+  if (freeBits == 8)
+  {
+    m_data.push_back(value);    // Value is already aligned on MSB
+  }
+  else if (freeBits >= numberOfBits)
+  {
+    auto lastByte     = m_data.back();
+    auto shiftCount   = 8 - freeBits;
+    auto shiftedValue = value    >> shiftCount;
+    auto newByte      = lastByte |  shiftedValue;
+
+    m_data.back()     = newByte;
+  }
+  else
+  { // Added value must be split into 2 bytes
+
+    // ---------------- First part (mixed with previous last value)
+    //
+    uint8_t lastByte       = m_data.back();
+    uint8_t shiftedValue_1 = value    >> lastByteBits;
+    uint8_t newByte_1      = lastByte |  shiftedValue_1;
+
+    m_data.back()       = newByte_1;
+
+    // ---------------- Second part
+    //
+    uint8_t newByte_2 = value << freeBits;  // Free bits have been used for first part of value
+
+    m_data.push_back(newByte_2);
+  }
+
   m_usedBits += numberOfBits;
 
   return *this;

@@ -28,6 +28,9 @@
 #include <set>
 #include <string>
 #include <vector>
+#if (__cplusplus >= 201103L)
+#include <tuple>
+#endif
 
 #ifdef _MSC_VER
 #   pragma warning( pop )

@@ -201,6 +201,71 @@ public:
     }
 };
 
+#if (__cplusplus >= 201103L)
+//
+// std::tuple
+//
+template<class First, class Second>
+class ValueTraits< CXXTEST_STD(tuple)<First, Second> > : public StdTraitsBase
+{
+public:
+    ValueTraits(const CXXTEST_STD(tuple)<First, Second> &p)
+    {
+      auto item_0 = std::get<0>(p);
+      auto item_1 = std::get<1>(p);
+
+      *this << "tuple(" << TS_AS_STRING(item_0)
+            << ", "     << TS_AS_STRING(item_1)
+            << ")";
+    }
+};
+
+template<typename _0, typename _1, typename _2>
+class ValueTraits< CXXTEST_STD(tuple)<_0, _1, _2> > : public StdTraitsBase
+{
+public:
+    ValueTraits(const CXXTEST_STD(tuple)<_0, _1, _2> &p)
+    {
+        *this << "tuple(" << TS_AS_STRING(std::get<0>(p))
+              << ", "     << TS_AS_STRING(std::get<1>(p))
+              << ", "     << TS_AS_STRING(std::get<2>(p))
+              << ")";
+    }
+};
+
+template<typename _0, typename _1, typename _2, typename _3>
+class ValueTraits< CXXTEST_STD(tuple)<_0, _1, _2, _3> > : public StdTraitsBase
+{
+public:
+    ValueTraits(const CXXTEST_STD(tuple)<_0, _1, _2, _3> &p)
+    {
+        *this << "tuple(" << TS_AS_STRING(std::get<0>(p))
+              << ", "     << TS_AS_STRING(std::get<1>(p))
+              << ", "     << TS_AS_STRING(std::get<2>(p))
+              << ", "     << TS_AS_STRING(std::get<3>(p))
+              << ")";
+    }
+};
+
+template<typename _0, typename _1, typename _2, typename _3, typename _4>
+class ValueTraits< CXXTEST_STD(tuple)<_0, _1, _2, _3, _4> > : public StdTraitsBase
+{
+public:
+    ValueTraits(const CXXTEST_STD(tuple)<_0, _1, _2, _3, _4> &p)
+    {
+        *this << "tuple(" << TS_AS_STRING(std::get<0>(p))
+              << ", "     << TS_AS_STRING(std::get<1>(p))
+              << ", "     << TS_AS_STRING(std::get<2>(p))
+              << ", "     << TS_AS_STRING(std::get<3>(p))
+              << ", "     << TS_AS_STRING(std::get<4>(p))
+              << ")";
+    }
+};
+
+
+
+#endif
+
 //
 // std::vector
 //

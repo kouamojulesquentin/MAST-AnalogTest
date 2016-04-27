@@ -35,6 +35,23 @@ class UT_BinaryVector : public CxxTest::TestSuite
   void test_Constructor_Copy_When_SrcIsEmpty ();
   void test_Constructor_Move_When_SrcIsEmpty ();
 
+  // ---------------- CreateFromBinaryString
+  //
+  void test_CreateFromBinaryString ();
+  void test_CreateFromHexString ();
+
+  // ---------------- Operator==
+  //
+  void test_operator_eq_With_Self ();
+  void test_operator_eq_When_Equal ();
+  void test_operator_eq_When_NotEqual ();
+
+  // ---------------- Operator!=
+  //
+  void test_operator_neq_With_Self ();
+  void test_operator_neq_When_Equal ();
+  void test_operator_neq_When_NotEqual ();
+
   // ---------------- Append
   //
   void test_Append_8_bits_When_Empty ();
@@ -49,6 +66,13 @@ class UT_BinaryVector : public CxxTest::TestSuite
 
   void test_Append_1_to_8_bits_When_Empty ();
   void test_Append_1_to_8_bits_When_NotEmpty ();
+
+  void test_Append_Other_When_Empty ();
+  void test_Append_Other_When_NotEmpty ();
+
+  // ---------------- operator<<
+  //
+  void test_Operator_Shift_When_Empty ();
 
   //! @todo [JFC]-[April/25/2016]: Remove "test_No_test_yet_for_Guard" method when all tests are implemented
   //!

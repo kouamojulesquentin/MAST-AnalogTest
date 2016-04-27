@@ -18,6 +18,7 @@
 #include "Platform.hpp"
 #include <vector>
 #include <string>
+#include <experimental/string_view>
 
 namespace mast
 {
@@ -34,9 +35,12 @@ class DLL_EXPORT BinaryVector final
   public:
   ~BinaryVector() = default;
   BinaryVector()  = default;
-  BinaryVector(const SVFVector& svfVector);   //!< Converts a SVFVector to a BinaryVector
+//+  explicit BinaryVector(const SVFVector& svfVector);   //!< Converts a SVFVector to a BinaryVector
   explicit BinaryVector(const BinaryVector& rhs);
-  explicit BinaryVector(BinaryVector&& rhs) noexcept;
+  BinaryVector(BinaryVector&& rhs) noexcept;
+
+  static BinaryVector CreateFromBinaryString (std::experimental::string_view bits);   //!< Creates a BinaryVector from text binary representation
+  static BinaryVector CreateFromHexString    (std::experimental::string_view bits);   //!< Creates a BinaryVector from text hexadecimal representation
 
   BinaryVector& operator=(const BinaryVector&);
   BinaryVector& operator=(BinaryVector&&) noexcept;
@@ -47,18 +51,22 @@ class DLL_EXPORT BinaryVector final
   BinaryVector& operator<< (const BinaryVector& rhs);       //!< Appends another scan vector
   BinaryVector  operator+  (const BinaryVector& rhs) const; //!< Concatenate two scan vectors
 
-  BinaryVector& Append(uint8_t  value, uint8_t numberOfBits = 8); //!< Appends  8 bits value the BinaryVector
-  BinaryVector& Append(uint16_t value); //!< Appends 16 bits value the BinaryVector
-  BinaryVector& Append(uint32_t value); //!< Appends 32 bits value the BinaryVector
-  BinaryVector& Append(uint64_t value); //!< Appends 64 bits value the BinaryVector
+  bool operator==(const BinaryVector& rhs) const;                                 //!< Compares to other for equality
+  bool operator!=(const BinaryVector& rhs) const { return !operator==(rhs); };    //!< Compares to other for inequality
 
-  void          Clear();                //!< Clears all content
-  void          Set(uint8_t     value); //!< Assigns  8 bits value the BinaryVector
-  void          Set(uint16_t    value); //!< Assigns 16 bits value the BinaryVector
-  void          Set(uint32_t    value); //!< Assigns 32 bits value the BinaryVector
-  void          Set(uint64_t    value); //!< Assigns 64 bits value the BinaryVector
+  BinaryVector& Append(const BinaryVector& rhs);                               //!< Appends another scan vector
+  BinaryVector& Append(uint8_t             value, uint8_t numberOfBits = 8);   //!< Appends  8 bits value the BinaryVector
+  BinaryVector& Append(uint16_t            value);                             //!< Appends 16 bits value the BinaryVector
+  BinaryVector& Append(uint32_t            value);                             //!< Appends 32 bits value the BinaryVector
+  BinaryVector& Append(uint64_t            value);                             //!< Appends 64 bits value the BinaryVector
 
-  uint32_t       BitCount()   const { return m_usedBits;    } //!< Returns total number of valid bits in the BinaryVector
+  void          Clear();            //!< Clears all content
+  void          Set(uint8_t  value); //!< Assigns  8 bits value the BinaryVector
+  void          Set(uint16_t value); //!< Assigns 16 bits value the BinaryVector
+  void          Set(uint32_t value); //!< Assigns 32 bits value the BinaryVector
+  void          Set(uint64_t value); //!< Assigns 64 bits value the BinaryVector
+
+  uint32_t       BitsCount()  const { return m_usedBits;    } //!< Returns total number of valid bits in the BinaryVector
   uint32_t       BytesCount() const { return m_data.size(); } //!< Returns total number of valid bits in the BinaryVector
   const uint8_t* Data()       const { return m_data.data(); } //!< Returns pointer on raw bits stream data (only valid as long as content is not modified)
 
@@ -119,7 +127,7 @@ class SVFVector final
   public:
   ~SVFVector() = default;
   SVFVector()  = default;
-  SVFVector(const BinaryVector& binaryVector);  //!< Converts a BinaryVector to a SVFVector
+//+  SVFVector(const BinaryVector& binaryVector);  //!< Converts a BinaryVector to a SVFVector
 
 
   // ---------------- Protected Methods

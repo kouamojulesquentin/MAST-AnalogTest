@@ -275,8 +275,8 @@ namespace CxxTest
       {
         TestStateGuard stateGuard;
 
-        auto& expected = *nextExpected;
-        auto& input    = *nextInput;
+        auto& expected = *nextExpected++;     // Pointers must be incremented there because of potential exception due to test failure
+        auto& input    = *nextInput++;
 
         auto inputNoRefWT = traits_NoReferenceWrapper(input);
         auto inputNoRefW  = inputNoRefWT.get();                 // Remove potential reference_wrapper (added by split when using TS_DATA_DRIVEN_TEST_MIX)
@@ -289,9 +289,6 @@ namespace CxxTest
         testFunction(input, expected);
         tracker.leaveDataDrivenTest();
         testDescription.tearDown();
-
-        ++nextInput;
-        ++nextExpected;
       }
       _TS_CATCH_DDT
     }

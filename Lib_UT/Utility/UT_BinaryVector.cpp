@@ -13,12 +13,13 @@
 
 #include "UT_BinaryVector.hpp"
 #include "ScanVectors.hpp"
+#include "BinaryVector_Traits.hpp"
 
-#include <cxxtest/StdValueTraits.h>
 #include <vector>
 #include <memory>
 #include <tuple>
 #include <sstream>
+#include <stdexcept>
 #include <experimental/string_view>
 
 using std::vector;
@@ -26,6 +27,7 @@ using std::tuple;
 using std::make_tuple;
 using std::initializer_list;
 using std::ostringstream;
+using std::string;
 using std::experimental::string_view;
 
 using mast::BinaryVector;
@@ -42,8 +44,9 @@ void UT_BinaryVector::test_Constructor_Default ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS  (sut.BitsCount(),   0);
+  TS_ASSERT_EQUALS  (sut.BitsCount(),  0);
   TS_ASSERT_EQUALS  (sut.BytesCount(), 0);
+  TS_ASSERT_TRUE    (sut.IsEmpty());
   TS_ASSERT_NULLPTR (sut.Data());
 }
 
@@ -62,8 +65,9 @@ void UT_BinaryVector::test_Constructor_Copy_When_SrcIsEmpty ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS  (sut.BitsCount(),   0);
+  TS_ASSERT_EQUALS  (sut.BitsCount(),  0);
   TS_ASSERT_EQUALS  (sut.BytesCount(), 0);
+  TS_ASSERT_TRUE    (sut.IsEmpty());
   TS_ASSERT_NULLPTR (sut.Data());
 }
 
@@ -81,8 +85,9 @@ void UT_BinaryVector::test_Constructor_Move_When_SrcIsEmpty ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS  (sut.BitsCount(),   0);
+  TS_ASSERT_EQUALS  (sut.BitsCount(),  0);
   TS_ASSERT_EQUALS  (sut.BytesCount(), 0);
+  TS_ASSERT_TRUE    (sut.IsEmpty());
   TS_ASSERT_NULLPTR (sut.Data());
 }
 
@@ -108,8 +113,9 @@ void UT_BinaryVector::test_CreateFromBinaryString ()
     const auto  expectedBytesCount = std::get<1>(expected);
     const auto& expectedContent    = std::get<2>(expected);
 
-    TS_ASSERT_EQUALS (sut.BitsCount(),   expectedBitsCount);
+    TS_ASSERT_EQUALS (sut.BitsCount(),  expectedBitsCount);
     TS_ASSERT_EQUALS (sut.BytesCount(), expectedBytesCount);
+    TS_ASSERT_EQUALS (sut.IsEmpty(),    expectedBitsCount == 0);
 
     if (expectedBytesCount != 0)
     {
@@ -266,6 +272,179 @@ void UT_BinaryVector::test_CreateFromHexString ()
   //
   TS_DATA_DRIVEN_TEST (checker, inputs, expected);
 }
+
+
+//! Checks BinaryVector::DataAsBinaryString()
+//!
+void UT_BinaryVector::test_DataAsBinaryString_Without_NewLine ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits  = std::get<0>(data);
+    string      expected = std::get<1>(data);
+
+    auto sut   = BinaryVector::CreateFromBinaryString(sutBits);
+
+    // ---------------- Exercise
+    //
+    auto sutAsString = sut.DataAsBinaryString(", ", "-");
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sutAsString, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,            result
+    make_tuple("0",                            "0"),                              // 00
+    make_tuple("1",                            "1"),                              // 01
+    make_tuple("10",                           "10"),                             // 02
+    make_tuple("11",                           "11"),                             // 03
+    make_tuple("100",                          "100"),                            // 04
+    make_tuple("101",                          "101"),                            // 05
+    make_tuple("110",                          "110"),                            // 06
+    make_tuple("111",                          "111"),                            // 07
+    make_tuple("1000",                         "1000"),                           // 08
+    make_tuple("1001",                         "1001"),                           // 09
+    make_tuple("1010",                         "1010"),                           // 10
+    make_tuple("1011",                         "1011"),                           // 11
+    make_tuple("1100",                         "1100"),                           // 12
+    make_tuple("1101",                         "1101"),                           // 13
+    make_tuple("1110",                         "1110"),                           // 14
+    make_tuple("1111",                         "1111"),                           // 15
+    make_tuple("1011_0",                       "1011-0"),                         // 16
+    make_tuple("1011_1",                       "1011-1"),                         // 17
+    make_tuple("1011_10",                      "1011-10"),                        // 18
+    make_tuple("1011_11",                      "1011-11"),                        // 19
+    make_tuple("1011_100",                     "1011-100"),                       // 20
+    make_tuple("1011_101",                     "1011-101"),                       // 21
+    make_tuple("1011_110",                     "1011-110"),                       // 22
+    make_tuple("1011_111",                     "1011-111"),                       // 23
+    make_tuple("1011_1000",                    "1011-1000"),                      // 24
+    make_tuple("1011_1001",                    "1011-1001"),                      // 25
+    make_tuple("1011_1010",                    "1011-1010"),                      // 26
+    make_tuple("1011_1011",                    "1011-1011"),                      // 27
+    make_tuple("1011_1100",                    "1011-1100"),                      // 28
+    make_tuple("1011_1101",                    "1011-1101"),                      // 29
+    make_tuple("1011_1110",                    "1011-1110"),                      // 30
+    make_tuple("1011_1111",                    "1011-1111"),                      // 31
+    make_tuple("1110_0000:1",                  "1110-0000, 1"),                   // 32
+    make_tuple("1110_0000:11",                 "1110-0000, 11"),                  // 33
+    make_tuple("1110_0000:1100_1011:1010",     "1110-0000, 1100-1011, 1010"),     // 34
+    make_tuple("1110_0000:1100_1011:1010_1",   "1110-0000, 1100-1011, 1010-1"),   // 35
+    make_tuple("1110_0000:1100_1011:1010_101", "1110-0000, 1100-1011, 1010-101"), // 36
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::DataAsBinaryString() with nibble and bytes separators and new lines every N bytes
+//!
+void UT_BinaryVector::test_DataAsBinaryString_With_NewLine ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits  = std::get<0>(data);
+    string      expected = std::get<1>(data);
+
+    auto sut   = BinaryVector::CreateFromBinaryString(sutBits);
+
+    // ---------------- Exercise
+    //
+    auto sutAsString = sut.DataAsBinaryString(", ", "-", 3, ";");
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sutAsString, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,            result
+    make_tuple("0",                                     "0"),                                         // 00
+    make_tuple("01",                                    "01"),                                        // 01
+    make_tuple("1001",                                  "1001"),                                      // 02
+    make_tuple("1011_1",                                "1011-1"),                                    // 03
+    make_tuple("0110_01",                               "0110-01"),                                   // 04
+    make_tuple("0110_011",                              "0110-011"),                                  // 05
+    make_tuple("0110_0111",                             "0110-0111"),                                 // 06
+    make_tuple("1110_0000:1",                           "1110-0000, 1"),                              // 07
+    make_tuple("1110_0000:1100_1011:1010",              "1110-0000, 1100-1011, 1010"),                // 08
+    make_tuple("1110_0000:1100_1011:1010_1010",         "1110-0000, 1100-1011, 1010-1010"),           // 09
+    make_tuple("1110_0000:1100_1011:1010_1010:1",       "1110-0000, 1100-1011, 1010-1010;\n1"),       // 10
+    make_tuple("1110_0000:1100_1011:1010_1010:1100_01", "1110-0000, 1100-1011, 1010-1010;\n1100-01"), // 11
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::DataAsBinaryString()
+//!
+void UT_BinaryVector::test_DataAsBinaryString_Without_Separators ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits  = std::get<0>(data);
+    string      expected = std::get<1>(data);
+
+    auto sut   = BinaryVector::CreateFromBinaryString(sutBits);
+
+    // ---------------- Exercise
+    //
+    auto sutAsString = sut.DataAsBinaryString("", "");
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sutAsString, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,            result
+    make_tuple("0",                            "0"),                       // 00
+    make_tuple("1",                            "1"),                       // 01
+    make_tuple("11",                           "11"),                      // 02
+    make_tuple("01",                           "01"),                      // 03
+    make_tuple("1001",                         "1001"),                    // 04
+    make_tuple("1011_1",                       "10111"),                   // 05
+    make_tuple("1011",                         "1011"),                    // 06
+    make_tuple("0110_0",                       "01100"),                   // 07
+    make_tuple("0110_01",                      "011001"),                  // 08
+    make_tuple("0110_011",                     "0110011"),                 // 09
+    make_tuple("0110_0111",                    "01100111"),                // 10
+    make_tuple("1110_0000:1",                  "111000001"),               // 11
+    make_tuple("1110_0000:11",                 "1110000011"),              // 12
+    make_tuple("1110_0000:1100_1011:1010",     "11100000110010111010"),    // 13
+    make_tuple("1110_0000:1100_1011:1010_1",   "111000001100101110101"),   // 14
+    make_tuple("1110_0000:1100_1011:1010_101", "11100000110010111010101"), // 15
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+
 
 
 //! Checks BinaryVector::operator== when comparing with same instance
@@ -1122,19 +1301,19 @@ void UT_BinaryVector::test_Append_Other_When_NotEmpty ()
   auto data =
   {
     //   Bits: sut,            other,   result
-    make_tuple("1",            "", ""), // 00
-    make_tuple("0",            "", ""), // 01
-    make_tuple("1",            "", ""), // 02
-    make_tuple("01",           "", ""), // 03
-    make_tuple("10",           "", ""), // 04
-    make_tuple("101",          "", ""), // 05
-    make_tuple("1011",         "", ""), // 06
-    make_tuple("0110_0",       "", ""), // 07
-    make_tuple("0110_01",      "", ""), // 08
-    make_tuple("0110_011",     "", ""), // 09
-    make_tuple("0110_0111",    "", ""), // 10
-    make_tuple("1110_0000:1",  "", ""), // 11
-    make_tuple("1110_0000:11", "", ""), // 12
+    make_tuple("1",            "",              "1"),                      // 00
+    make_tuple("0",            "",              "0"),                      // 01
+    make_tuple("1",            "1",             "11"),                     // 02
+    make_tuple("01",           "101",           "0110_1"),                 // 03
+    make_tuple("10",           "1001",          "1010_01"),                // 04
+    make_tuple("101",          "1100_11",       "1011_1001_1"),            // 05
+    make_tuple("1011",         "0100",          "1011_0100"),              // 06
+    make_tuple("0110_0",       "1010_1111",     "0110_0101:0111_1"),       // 07
+    make_tuple("0110_01",      "1111_0000:111", "0110_0111:1100_0011:1"),  // 08
+    make_tuple("0110_011",     "0110_1001:0",   "0110_0110:1101_0010"),    // 09
+    make_tuple("0110_0111",    "1011_1101",     "0110_0111:1011_1101"),    // 10
+    make_tuple("1110_0000:1",  "0001_0010:1",   "1110_0000:1000_1001:01"), // 11
+    make_tuple("1110_0000:11", "0",             "1110_0000:110"),          // 12
   };
 
   // ---------------- DDT Exercise
@@ -1148,15 +1327,465 @@ void UT_BinaryVector::test_Append_Other_When_NotEmpty ()
 //!
 void UT_BinaryVector::test_Operator_Shift_When_Empty ()
 {
-  // ---------------- Setup
+  // ---------------- DDT Setup
   //
+  auto checker = [](string_view otherBits)
+  {
+    // ---------------- Setup
+    //
+    auto sut   = BinaryVector();
+    auto other = BinaryVector::CreateFromBinaryString(otherBits);
 
-  // ---------------- Exercise
-  //
+    // ---------------- Exercise
+    //
+    auto& sutRef = sut << other;
 
-  // ---------------- Verify
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, other);
+    TS_ASSERT_EQUALS (sut, sutRef);
+  };
+
+  auto data =
+  {
+    "",             // 00
+    "0",            // 01
+    "1",            // 02
+    "01",           // 03
+    "10",           // 04
+    "101",          // 05
+    "1011",         // 06
+    "0110_0",       // 07
+    "0110_01",      // 08
+    "0110_011",     // 09
+    "0110_0111",    // 10
+    "1110_0000:1",  // 11
+    "1110_0000:11", // 12
+  };
+
+  // ---------------- DDT Exercise
   //
-  TS_WARN ("Test not yet implemented");
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::Operator<< when the sut is not empty
+//!
+void UT_BinaryVector::test_Operator_Shift_When_NotEmpty ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits      = std::get<0>(data);
+    string_view otherBits    = std::get<1>(data);
+    string_view expectedBits = std::get<2>(data);
+
+    auto sut   = BinaryVector::CreateFromBinaryString(sutBits);
+    auto other = BinaryVector::CreateFromBinaryString(otherBits);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut << other);
+
+    // ---------------- Verify
+    //
+    auto expected = BinaryVector::CreateFromBinaryString(expectedBits);
+
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,            other,   result
+    make_tuple("1",            "",              "1"),                      // 00
+    make_tuple("0",            "",              "0"),                      // 01
+    make_tuple("1",            "1",             "11"),                     // 02
+    make_tuple("01",           "101",           "0110_1"),                 // 03
+    make_tuple("10",           "1001",          "1010_01"),                // 04
+    make_tuple("101",          "1100_11",       "1011_1001_1"),            // 05
+    make_tuple("1011",         "0100",          "1011_0100"),              // 06
+    make_tuple("0110_0",       "1010_1111",     "0110_0101:0111_1"),       // 07
+    make_tuple("0110_01",      "1111_0000:111", "0110_0111:1100_0011:1"),  // 08
+    make_tuple("0110_011",     "0110_1001:0",   "0110_0110:1101_0010"),    // 09
+    make_tuple("0110_0111",    "1011_1101",     "0110_0111:1011_1101"),    // 10
+    make_tuple("1110_0000:1",  "0001_0010:1",   "1110_0000:1000_1001:01"), // 11
+    make_tuple("1110_0000:11", "0",             "1110_0000:110"),          // 12
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::Operator<< when cascaded
+//!
+void UT_BinaryVector::test_Operator_Shift_When_Cascaded ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits      = std::get<0>(data);
+    string_view otherBits_1  = std::get<1>(data);
+    string_view otherBits_2  = std::get<2>(data);
+    string_view expectedBits = std::get<3>(data);
+
+    auto sut     = BinaryVector::CreateFromBinaryString(sutBits);
+    auto other_1 = BinaryVector::CreateFromBinaryString(otherBits_1);
+    auto other_2 = BinaryVector::CreateFromBinaryString(otherBits_2);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut << other_1 << other_2);
+
+    // ---------------- Verify
+    //
+    auto expected = BinaryVector::CreateFromBinaryString(expectedBits);
+
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,            other_1,         other_2,         result
+    make_tuple("1",            "",              "",              "1"),                          // 00
+    make_tuple("0",            "",              "1",             "01"),                         // 01
+    make_tuple("1",            "1",             "",              "11"),                         // 02
+    make_tuple("01",           "101",           "01",            "0110_101"),                   // 03
+    make_tuple("10",           "1001",          "001",           "1010_0100:1"),                // 04
+    make_tuple("101",          "1100_11",       "11",            "1011_1001:111"),              // 05
+    make_tuple("1011",         "0100",          "0",             "1011_0100:0"),                // 06
+    make_tuple("0110_0",       "1010_1111",     "0000_1111",     "0110_0101:0111_1000:0111_1"), // 07
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::Operator+ when the sut is still empty
+//!
+void UT_BinaryVector::test_Operator_Plus_When_Empty ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](string_view otherBits)
+  {
+    // ---------------- Setup
+    //
+    auto sut   = BinaryVector();
+    auto other = BinaryVector::CreateFromBinaryString(otherBits);
+
+    // ---------------- Exercise
+    //
+    auto result = sut + other;
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (result, other);
+  };
+
+  auto data =
+  {
+    "",             // 00
+    "0",            // 01
+    "1",            // 02
+    "01",           // 03
+    "10",           // 04
+    "101",          // 05
+    "1011",         // 06
+    "0110_0",       // 07
+    "0110_01",      // 08
+    "0110_011",     // 09
+    "0110_0111",    // 10
+    "1110_0000:1",  // 11
+    "1110_0000:11", // 12
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::Operator+ when the sut is not empty
+//!
+void UT_BinaryVector::test_Operator_Plus_When_NotEmpty ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits      = std::get<0>(data);
+    string_view otherBits    = std::get<1>(data);
+    string_view expectedBits = std::get<2>(data);
+
+    auto sut   = BinaryVector::CreateFromBinaryString(sutBits);
+    auto other = BinaryVector::CreateFromBinaryString(otherBits);
+
+    // ---------------- Exercise
+    //
+    auto result = sut + other;
+
+    // ---------------- Verify
+    //
+    auto expected = BinaryVector::CreateFromBinaryString(expectedBits);
+
+    TS_ASSERT_EQUALS (result, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,                                     other,                                     result
+    make_tuple("1",                                      "",                                       "1"),                                                                             // 00
+    make_tuple("0",                                      "",                                       "0"),                                                                             // 01
+    make_tuple("1",                                      "1",                                      "11"),                                                                            // 02
+    make_tuple("01",                                     "101",                                    "0110_1"),                                                                        // 03
+    make_tuple("10",                                     "1001",                                   "1010_01"),                                                                       // 04
+    make_tuple("101",                                    "1100_11",                                "1011_1001_1"),                                                                   // 05
+    make_tuple("1011",                                   "0100",                                   "1011_0100"),                                                                     // 06
+    make_tuple("0110_0",                                 "1010_1111",                              "0110_0101:0111_1"),                                                              // 07
+    make_tuple("0110_01",                                "1111_0000:111",                          "0110_0111:1100_0011:1"),                                                         // 08
+    make_tuple("0110_011",                               "0110_1001:0",                            "0110_0110:1101_0010"),                                                           // 09
+    make_tuple("0110_0111",                              "1011_1101",                              "0110_0111:1011_1101"),                                                           // 10
+    make_tuple("1110_0000:1",                            "0001_0010:1",                            "1110_0000:1000_1001:01"),                                                        // 11
+    make_tuple("1110_0000:11",                           "0",                                      "1110_0000:110"),                                                                 // 12
+    make_tuple("1110_0000:0011_1",                       "1110_0000:1000_1001:01",                 "1110_0000:0011_1111:0000_0100:0100_101"),                                        // 13
+    make_tuple("1110_0000:0011_1111:0000_0100:0100_101", "1110_0000:0011_1111:0000_0100:0100_101", "1110_0000:0011_1111:0000_0100:0100_101:1110_0000:0011_1111:0000_0100:0100_101"), // 14
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+
+
+//! Checks BinaryVector::ToggleBits()
+//!
+//! @note Require DataAsBinaryString to work properly
+//!
+void UT_BinaryVector::test_ToggleBits ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits  = std::get<0>(data);
+    string      expected = std::get<1>(data);
+
+    auto sut   = BinaryVector::CreateFromBinaryString(sutBits);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.ToggleBits());
+
+    // ---------------- Verify
+    //
+    auto sutBit = sut.DataAsBinaryString();
+    TS_ASSERT_EQUALS (sutBit, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,            result
+    make_tuple("1",                            "0"),                            // 00
+    make_tuple("0",                            "1"),                            // 01
+    make_tuple("11",                           "00"),                           // 02
+    make_tuple("01",                           "10"),                           // 03
+    make_tuple("1001",                         "0110"),                         // 04
+    make_tuple("1011_1",                       "0100_0"),                       // 05
+    make_tuple("1011",                         "0100"),                         // 06
+    make_tuple("0110_0",                       "1001_1"),                       // 07
+    make_tuple("0110_01",                      "1001_10"),                      // 08
+    make_tuple("0110_011",                     "1001_100"),                     // 09
+    make_tuple("0110_0111",                    "1001_1000"),                    // 10
+    make_tuple("1110_0000:1",                  "0001_1111:0"),                  // 11
+    make_tuple("1110_0000:11",                 "0001_1111:00"),                 // 12
+    make_tuple("1110_0000:1100_1011:1010",     "0001_1111:0011_0100:0101"),     // 13
+    make_tuple("1110_0000:1100_1011:1010_1",   "0001_1111:0011_0100:0101_0"),   // 14
+    make_tuple("1110_0000:1100_1011:1010_101", "0001_1111:0011_0100:0101_010"), // 15
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::ToggleBits()
+//!
+//! @note Require DataAsBinaryString to work properly
+//!
+void UT_BinaryVector::test_Operator_Tilde ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits  = std::get<0>(data);
+    string      expected = std::get<1>(data);
+
+    auto sut   = BinaryVector::CreateFromBinaryString(sutBits);
+
+    // ---------------- Exercise
+    //
+    auto result = ~sut;
+
+    // ---------------- Verify
+    //
+    auto resultBit = result.DataAsBinaryString();
+    TS_ASSERT_EQUALS (resultBit, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,                            result
+    make_tuple("1",                            "0"),                            // 00
+    make_tuple("0",                            "1"),                            // 01
+    make_tuple("11",                           "00"),                           // 02
+    make_tuple("01",                           "10"),                           // 03
+    make_tuple("1001",                         "0110"),                         // 04
+    make_tuple("1011_1",                       "0100_0"),                       // 05
+    make_tuple("1011",                         "0100"),                         // 06
+    make_tuple("0110_0",                       "1001_1"),                       // 07
+    make_tuple("0110_01",                      "1001_10"),                      // 08
+    make_tuple("0110_011",                     "1001_100"),                     // 09
+    make_tuple("0110_0111",                    "1001_1000"),                    // 10
+    make_tuple("1110_0000:1",                  "0001_1111:0"),                  // 11
+    make_tuple("1110_0000:11",                 "0001_1111:00"),                 // 12
+    make_tuple("1110_0000:1100_1011:1010",     "0001_1111:0011_0100:0101"),     // 13
+    make_tuple("1110_0000:1100_1011:1010_1",   "0001_1111:0011_0100:0101_0"),   // 14
+    make_tuple("1110_0000:1100_1011:1010_101", "0001_1111:0011_0100:0101_010"), // 15
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+
+//! Checks BinaryVector::Slice()
+//!
+void UT_BinaryVector::test_Slice ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits      = std::get<0>(data);
+    uint32_t    firstBit     = std::get<1>(data);
+    uint32_t    bitsCount    = std::get<2>(data);
+    string_view expectedBits = std::get<3>(data);
+
+    auto sut      = BinaryVector::CreateFromBinaryString(sutBits);
+    auto expected = BinaryVector::CreateFromBinaryString(expectedBits);
+
+    // ---------------- Exercise
+    //
+    auto result = sut.Slice(firstBit, bitsCount);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (result, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,                              firstBit, bitsCount, expected
+    make_tuple("",                                            0,  0,  ""),                       // 00
+    make_tuple("",                                            1,  0,  ""),                       // 01
+    make_tuple("0",                                           0,  1,  "0"),                      // 02
+    make_tuple("1",                                           0,  1,  "1"),                      // 03
+    make_tuple("10",                                          0,  1,  "1"),                      // 04
+    make_tuple("10",                                          0,  2,  "10"),                     // 05
+    make_tuple("1011",                                        1,  1,  "0"),                      // 06
+    make_tuple("1001",                                        1,  2,  "00"),                     // 07
+    make_tuple("1011_0",                                      1,  3,  "011"),                    // 08
+    make_tuple("1011_1",                                      1,  4,  "0111"),                   // 09
+    make_tuple("1011_1101:101",                               1,  5,  "0111_1"),                 // 10
+    make_tuple("1011_1101:101",                               1,  6,  "0111_10"),                // 11
+    make_tuple("1011_1101:101",                               1,  7,  "0111_101"),               // 12
+    make_tuple("1011_1101:101",                               1,  8,  "0111_1011"),              // 13
+    make_tuple("1011_0101:101",                               2,  3,  "110"),                    // 14
+    make_tuple("1011_1101:101",                               2,  5,  "1111_0"),                 // 15
+    make_tuple("1011_1101:101",                               2,  6,  "1111_01"),                // 16
+    make_tuple("1011_1101:101",                               2,  7,  "1111_011"),               // 17
+    make_tuple("1011_1101:101",                               2,  8,  "1111_0110"),              // 18
+    make_tuple("1011_1101:101",                               2,  9,  "1111_0110:1"),            // 19
+    make_tuple("1011_1101:1011_1110:0101",                    3,  10, "1110_1101:11"),           // 20
+    make_tuple("1011_1101:1011_1110:0101",                    4,  10, "1101_1011:11"),           // 21
+    make_tuple("1011_1101:1011_1110:0101",                    5,  11, "1011_0111:110"),          // 22
+    make_tuple("1011_1101:1011_1110:0101",                    6,  12, "0110_1111:1001"),         // 23
+    make_tuple("1011_1101:1011_1110:0101",                    7,  12, "1101_1111:0010"),         // 24
+    make_tuple("1011_1101:1011_1110:0101_1001",               8,  13, "1011_1110:0101_1"),       // 25
+    make_tuple("1011_1101:1011_1110:0101_1001",               9,  14, "0111_1100:1011_00"),      // 26
+    make_tuple("1011_1101:1011_1110:0101_1001:0101_1010:11",  14, 15, "1001_0110:0101_011"),     // 27
+    make_tuple("1011_1101:1011_1110:0101_1001:0101_1010:11",  15, 16, "0010_1100:1010_1101"),    // 28
+    make_tuple("1011_1101:1011_1110:0101_1001:0101_1010:11",  16, 17, "0101_1001:0101_1010:1"),  // 29
+    make_tuple("1011_1101:1011_1110:0101_1001:0101_1010:110", 17, 18, "1011_0010:1011_0101:10"), // 30
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::Slice() when required slice exceed BinaryVector capacity
+//!
+void UT_BinaryVector::test_Slice_When_Exceeding_Capacity ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits   = std::get<0>(data);
+    uint32_t    firstBit  = std::get<1>(data);
+    uint32_t    bitsCount = std::get<2>(data);
+
+    auto sut   = BinaryVector::CreateFromBinaryString(sutBits);
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (sut.Slice(firstBit, bitsCount), std::invalid_argument);
+  };
+
+  auto data =
+  {
+    //   Bits: sut, firstBit, bitsCount
+    make_tuple("",       0, 1), // 00
+    make_tuple("1",      0, 2), // 01
+    make_tuple("0",      0, 2), // 02
+    make_tuple("11",     1, 2), // 03
+    make_tuple("01",     2, 1), // 04
+    make_tuple("1001",   4, 1), // 05
+    make_tuple("1011_1", 0, 6), // 06
+    make_tuple("1011",   1, 5), // 07
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
 }
 
 

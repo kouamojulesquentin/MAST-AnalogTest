@@ -42,40 +42,44 @@ class DLL_EXPORT BinaryVector final
   static BinaryVector CreateFromBinaryString (std::experimental::string_view bits);   //!< Creates a BinaryVector from text binary representation
   static BinaryVector CreateFromHexString    (std::experimental::string_view bits);   //!< Creates a BinaryVector from text hexadecimal representation
 
+  std::string DataAsBinaryString(std::experimental::string_view byteSeparator   = ":",
+                                 std::experimental::string_view nibbleSeparator = "_",
+                                 uint32_t                       bytesPerLine    = 0,
+                                 std::experimental::string_view eolSeparator    = ","
+                                ) const; //!< Gets content as formatted binary string
+
   BinaryVector& operator=(const BinaryVector&);
   BinaryVector& operator=(BinaryVector&&) noexcept;
 
+  BinaryVector  operator~() const; //!< Returns another BinaryVector with every bits toggles
+  BinaryVector& ToggleBits();      //!< Toggles (flips) every bits of the vector
 
-  BinaryVector& operator~(); //!< Toggles (flips) every bits of the vector
-
-  BinaryVector& operator<< (const BinaryVector& rhs);       //!< Appends another scan vector
-  BinaryVector  operator+  (const BinaryVector& rhs) const; //!< Concatenate two scan vectors
+  BinaryVector& operator<< (const BinaryVector& rhs) { return this->Append(rhs); }; //!< Appends another BinaryVector
+  BinaryVector  operator+  (const BinaryVector& rhs) const;                         //!< Concatenate two BinaryVector
 
   bool operator==(const BinaryVector& rhs) const;                                 //!< Compares to other for equality
   bool operator!=(const BinaryVector& rhs) const { return !operator==(rhs); };    //!< Compares to other for inequality
 
-  BinaryVector& Append(const BinaryVector& rhs);                               //!< Appends another scan vector
-  BinaryVector& Append(uint8_t             value, uint8_t numberOfBits = 8);   //!< Appends  8 bits value the BinaryVector
-  BinaryVector& Append(uint16_t            value);                             //!< Appends 16 bits value the BinaryVector
-  BinaryVector& Append(uint32_t            value);                             //!< Appends 32 bits value the BinaryVector
-  BinaryVector& Append(uint64_t            value);                             //!< Appends 64 bits value the BinaryVector
+  BinaryVector& Append(const BinaryVector& rhs); //!< Appends another scan vector
 
-  void          Clear();            //!< Clears all content
+  BinaryVector& Append(uint8_t  value, uint8_t numberOfBits = 8); //!< Appends  8 bits value the BinaryVector
+  BinaryVector& Append(uint16_t value);                           //!< Appends 16 bits value the BinaryVector
+  BinaryVector& Append(uint32_t value);                           //!< Appends 32 bits value the BinaryVector
+  BinaryVector& Append(uint64_t value);                           //!< Appends 64 bits value the BinaryVector
+
+  void          Clear();             //!< Clears all content
   void          Set(uint8_t  value); //!< Assigns  8 bits value the BinaryVector
   void          Set(uint16_t value); //!< Assigns 16 bits value the BinaryVector
   void          Set(uint32_t value); //!< Assigns 32 bits value the BinaryVector
   void          Set(uint64_t value); //!< Assigns 64 bits value the BinaryVector
 
-  uint32_t       BitsCount()  const { return m_usedBits;    } //!< Returns total number of valid bits in the BinaryVector
-  uint32_t       BytesCount() const { return m_data.size(); } //!< Returns total number of valid bits in the BinaryVector
-  const uint8_t* Data()       const { return m_data.data(); } //!< Returns pointer on raw bits stream data (only valid as long as content is not modified)
+  bool           IsEmpty()    const { return m_usedBits     == 0; }   //!< Returns true when there is no bit in the BinaryVector, false otherwise
+  uint32_t       BitsCount()  const { return m_usedBits;    }         //!< Returns total number of valid bits in the BinaryVector
+  uint32_t       BytesCount() const { return m_data.size(); }         //!< Returns total number of valid bits in the BinaryVector
+  const uint8_t* Data()       const { return m_data.data(); }         //!< Returns pointer on raw bits stream data (only valid as long as content is not modified)
 
-  BinaryVector    Slice    (uint32_t firstBit, uint32_t lastBit); //!< Returns a slice from BinaryVector
-  BinaryVectorRef SliceRef (uint32_t firstBit, uint32_t lastBit); //!< Returns a reference to a slice from BinaryVector
-
-  // ---------------- Private  Methods
-  //
-  private:
+  BinaryVector    Slice    (uint32_t firstBitOffset, uint32_t bitsCount) const; //!< Returns a slice from BinaryVector
+//+  BinaryVectorRef SliceRef (uint32_t firstBitOffset, uint32_t bitsCount) const; //!< Returns a reference to a slice from BinaryVector
 
   // ---------------- Private  Fields
   //

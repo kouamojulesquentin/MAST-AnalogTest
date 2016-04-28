@@ -14,7 +14,13 @@
 
 #include "ScanVectors.hpp"
 #include "Utility.hpp"
+#include <sstream>
+#include <array>
 
+using std::array;
+using std::ostringstream;
+using std::string;
+using std::experimental::string_view;
 using namespace mast;
 
 //! Copy constructor
@@ -40,61 +46,6 @@ BinaryVector::BinaryVector (mast::BinaryVector&& rhs) noexcept
 //  End of: BinaryVector::BinaryVector
 //---------------------------------------------------------------------------
 
-
-//! Copy assignment
-//!
-BinaryVector& BinaryVector::operator= (const BinaryVector& rhs)
-{
-  if (this != &rhs)
-  {
-    m_data     = rhs.m_data;
-    m_usedBits = std::move(rhs.m_usedBits);
-  }
-  return *this;
-}
-//
-//  End of: ScanVectors::ScanVectors
-//---------------------------------------------------------------------------
-
-
-//! Move assignment
-//!
-BinaryVector& BinaryVector::operator= (BinaryVector&& rhs) noexcept
-{
-  if (this != &rhs)
-  {
-    m_data     = rhs.m_data;
-    m_usedBits = std::move(rhs.m_usedBits);
-  }
-  return *this;
-}
-//
-//  End of: ScanVectors::ScanVectors
-//---------------------------------------------------------------------------
-
-
-
-//! Returns true when *this is equal to another BinaryVector
-//!
-bool BinaryVector::operator== (const BinaryVector& rhs) const
-{
-  if (m_usedBits != rhs.m_usedBits)
-  {
-    return false;
-  }
-
-  if (m_usedBits == 0)
-  {
-    return true;
-  }
-
-  bool areEqual = m_data == rhs.m_data;
-
-  return areEqual;
-}
-//
-//  End of: BinaryVector::operator==
-//---------------------------------------------------------------------------
 
 
 //! Appends another scan vector
@@ -276,6 +227,195 @@ void BinaryVector::Clear ()
 //
 //  End of: BinaryVector::Clear
 //---------------------------------------------------------------------------
+
+
+
+//! Gets content as formatted binary string
+//! @param byteSeparator    Characters to insert every 8 bits
+//! @param nibbleSeparator  Characters to insert every 4 bits
+//! @param bytesPerLine     Number of bytes (sequence of 8 bits) to write per line.
+//!                         When zero, all is on the "same line"
+//! @param eolSeparator     Characters to insert just before new lines (when bytesPerLine != 0)
+//!
+string BinaryVector::DataAsBinaryString (string_view byteSeparator,
+                                         string_view nibbleSeparator,
+                                         uint32_t    bytesPerLine,
+                                         string_view eolSeparator
+                                        ) const
+{
+  static const std::array<string_view, 16> nibbles =
+  {
+    "0000",  // 00
+    "0001",  // 01
+    "0010",  // 02
+    "0011",  // 03
+    "0100",  // 04
+    "0101",  // 05
+    "0110",  // 06
+    "0111",  // 07
+    "1000",  // 08
+    "1001",  // 09
+    "1010",  // 10
+    "1011",  // 11
+    "1100",  // 12
+    "1101",  // 13
+    "1110",  // 14
+    "1111",  // 15
+  };
+
+  ostringstream os;
+  uint32_t      nibblesCount = 0;
+  uint32_t      bytesCount   = 0;
+
+  auto appendNibble = [&](string_view nibble)
+  {
+    if (nibblesCount == 1)
+    {
+      os << nibbleSeparator;
+    }
+    else if (nibblesCount == 2)
+    {
+      nibblesCount = 0;
+      ++bytesCount;
+      if (bytesCount == bytesPerLine)
+      {
+        os << eolSeparator << std::endl;
+      }
+      else
+      {
+        os << byteSeparator;
+      }
+    }
+
+    ++nibblesCount;
+    os << nibble;
+  };
+
+  auto appendBits = [&](uint8_t bitsOnLsb, uint32_t bitsCount)
+  {
+    if (bitsCount != 0)
+    {
+      auto nibble = nibbles[bitsOnLsb];       // Get string representation with padded zero on the right
+      nibble = string_view(nibble.data(), bitsCount);
+      appendNibble(nibble);
+    }
+  };
+
+  auto bitsCount = m_usedBits;
+
+  for (auto byte : m_data)
+  {
+    if (bitsCount >= 8)
+    {
+      appendNibble(nibbles[byte >> 4]);
+      appendNibble(nibbles[byte &  0x0F]);
+      bitsCount -= 8;
+    }
+    else if (bitsCount >= 4)
+    {
+      appendNibble(nibbles[byte >> 4]);
+      bitsCount -= 4;
+      appendBits(byte & 0x0F, bitsCount);
+    }
+    else
+    {
+      byte = (byte >> 4) & 0x0F; // Put bits on LSB
+      appendBits(byte, bitsCount);
+    }
+  }
+
+  return os.str();
+}
+//
+//  End of: BinaryVector::DataAsBinaryString
+//---------------------------------------------------------------------------
+
+
+//! Copy assignment
+//!
+BinaryVector& BinaryVector::operator= (const BinaryVector& rhs)
+{
+  if (this != &rhs)
+  {
+    m_data     = rhs.m_data;
+    m_usedBits = rhs.m_usedBits;
+  }
+  return *this;
+}
+//
+//  End of: ScanVectors::ScanVectors
+//---------------------------------------------------------------------------
+
+
+//! Move assignment
+//!
+BinaryVector& BinaryVector::operator= (BinaryVector&& rhs) noexcept
+{
+  if (this != &rhs)
+  {
+    m_data     = std::move(rhs.m_data);
+    m_usedBits = rhs.m_usedBits;
+  }
+  return *this;
+}
+//
+//  End of: ScanVectors::ScanVectors
+//---------------------------------------------------------------------------
+
+
+
+//! Returns true when *this is equal to another BinaryVector
+//!
+bool BinaryVector::operator== (const BinaryVector& rhs) const
+{
+  if (m_usedBits != rhs.m_usedBits)
+  {
+    return false;
+  }
+
+  if (m_usedBits == 0)
+  {
+    return true;
+  }
+
+  bool areEqual = m_data == rhs.m_data;
+
+  return areEqual;
+}
+//
+//  End of: BinaryVector::operator==
+//---------------------------------------------------------------------------
+
+
+
+//! Returns another BinaryVector with every bits toggles
+//!
+BinaryVector BinaryVector::operator~ () const
+{
+  BinaryVector toggled(*this);
+
+  toggled.ToggleBits();
+  return toggled;
+}
+//
+//  End of: BinaryVector::operator~
+//---------------------------------------------------------------------------
+
+
+//! Concatenate two scan vectors
+//!
+BinaryVector BinaryVector::operator+ (const BinaryVector& rhs) const
+{
+  BinaryVector result(*this);
+
+  result.Append(rhs);
+
+  return result;
+}
+//
+//  End of: BinaryVector::operator~
+//---------------------------------------------------------------------------
+
 
 
 //! Sets from 8 bits
@@ -486,14 +626,91 @@ void BinaryVector::Set (uint64_t value)
   Append(value);
 }
 //
-//  End of: ScanVectors::ScanVectors
+//  End of: ScanVectors::Set
 //---------------------------------------------------------------------------
+
+
+//! Returns a slice from BinaryVector
+//!
+//! @note   This call is not valid if it define a slice that exceed the actual
+//!         bits count
+//!
+//! @param firstBitOffset Zero based offset of first bit of slice
+//! @param bitsCount      Number of bits
+//!
+//! @return A new BinaryVector containing a copy of defined slice
+BinaryVector BinaryVector::Slice (uint32_t firstBitOffset, uint32_t bitsCount) const
+{
+  BinaryVector result;
+
+  if (bitsCount != 0)
+  {
+    // ---------------- Check parameters validity
+    //
+    if (firstBitOffset >= m_usedBits)
+    {
+      THROW_INVALID_ARGUMENT("Slice first bit must be within bits range");
+    }
+    if ((firstBitOffset + bitsCount) > m_usedBits)
+    {
+      THROW_INVALID_ARGUMENT("Bits count must be such that slice is within bits range");
+    }
+
+    auto byteOffset           = firstBitOffset / 8;
+    auto bitOffsetInFirstByte = firstBitOffset % 8;
+    auto bitsInFirstByte      = std::min(bitsCount, 8 - bitOffsetInFirstByte);
+
+    // ---------------- Copies first bits of source
+    //
+    if (bitsInFirstByte != 0)
+    {
+      auto byte = m_data[byteOffset];
+
+      //+ (begin JFC April/28/2016): for debug purpose til a better solution is implemented
+      auto ignoredLsb = 8 - (bitOffsetInFirstByte + bitsInFirstByte);
+      byte = byte >> ignoredLsb; // This is to compensate the fact that appending a byte supposed that the bits are right (LSB) aligned
+      //+ (end   JFC April/28/2016):
+
+      result.Append(byte, bitsInFirstByte);
+
+      bitsCount -= bitsInFirstByte;
+      ++byteOffset;
+    }
+
+    // ---------------- Copy full bytes from source
+    //
+    while (bitsCount >= 8)
+    {
+      bitsCount -= 8;
+      result.Append(m_data[byteOffset++]);
+    }
+
+    // ---------------- Copy remaining bits from source
+    //
+    if (bitsCount != 0)
+    {
+      auto byte = m_data[byteOffset];
+      //+ (begin JFC April/28/2016): for debug purpose til a better solution is implemented
+      byte = byte >> (8 - bitsCount); // This is to compensate the fact that appending a byte supposed that the bits are right (LSB) aligned
+      //+ (end   JFC April/28/2016):
+
+      result.Append(byte, bitsCount);
+      bitsCount = 0;
+    }
+  }
+
+  return result;
+}
+//
+//  End of: BinaryVector::Slice
+//---------------------------------------------------------------------------
+
 
 
 //! Toggles (flips) every bits of the vector
 //!
 //! @return Same vector with all the bits toggled
-BinaryVector& BinaryVector::operator~()
+BinaryVector& BinaryVector::ToggleBits()
 {
   for (auto& byte : m_data)
   {
@@ -502,7 +719,7 @@ BinaryVector& BinaryVector::operator~()
   return *this;
 }
 //
-//  End of: BinaryVectoroperator~
+//  End of: BinaryVector::ToggleBits
 //---------------------------------------------------------------------------
 
 

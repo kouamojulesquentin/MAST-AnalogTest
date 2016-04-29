@@ -126,6 +126,28 @@ inline ValueTraits<CXXTEST_STD(string)> traits(const CXXTEST_STD(string)& value)
     return ValueTraits<CXXTEST_STD(string)>(value);
 }
 
+//+#if defined(__cpp_lib_experimental_string_view)
+#if (__cplusplus > 201103L)  // C++11
+CXXTEST_TEMPLATE_INSTANTIATION
+class ValueTraits<std::experimental::string_view> : public ValueTraits<std::string>
+{
+    public:
+    ~ValueTraits(){}
+    ValueTraits(const std::experimental::string_view& sv)
+      : ValueTraits<std::string>(sv.to_string())
+    {
+    }
+};
+
+// Overloads "traits" function template for string_view
+//
+inline ValueTraits<std::experimental::string_view> traits(const std::experimental::string_view& value)
+{
+    return ValueTraits<std::experimental::string_view>(value);
+}
+#endif // (__cplusplus > 201103L)
+
+
 inline const char* asCStyleString(const std::string& text) { return text.c_str(); }
 
 // Returns string without quotes for std::string

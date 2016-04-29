@@ -32,6 +32,11 @@
 #include <tuple>
 #endif
 
+//+#if defined(__cpp_lib_experimental_string_view)
+#if (__cplusplus >= 201103L)
+#include <experimental/string_view>
+#endif // (__cplusplus >= 201511)
+
 #ifdef _MSC_VER
 #   pragma warning( pop )
 #endif // _MSC_VER

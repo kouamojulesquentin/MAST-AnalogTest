@@ -58,6 +58,12 @@ class UT_BinaryVector : public CxxTest::TestSuite
   void test_operator_neq_When_Equal ();
   void test_operator_neq_When_NotEqual ();
 
+  // ---------------- Constructors when making it not empty
+  //
+  void test_Constructor_With_Count_and_Pattern ();
+  void test_Constructor_Copy ();
+  void test_Constructor_Move ();
+
   // ---------------- Append
   //
   void test_Append_8_bits_When_Empty ();
@@ -96,11 +102,6 @@ class UT_BinaryVector : public CxxTest::TestSuite
   //
   void test_Slice ();
   void test_Slice_When_Exceeding_Capacity ();
-
-
-  //! @todo [JFC]-[April/25/2016]: Remove "test_No_test_yet_for_Guard" method when all tests are implemented
-  //!
-  void test_No_test_yet_for_Guard ();
 };
 //
 //  End of UT_BinaryVector class declaration

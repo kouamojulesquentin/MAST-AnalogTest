@@ -23,6 +23,42 @@ using std::string;
 using std::experimental::string_view;
 using namespace mast;
 
+namespace
+{
+  //! Defines a mask to keep most significant bits of a uint8_t
+  //!
+  constexpr uint8_t LEFT_BITS_MASK_8[] =
+  {
+    0b10000000, // 0 bits
+    0b10000000, // 1 bits
+    0b11000000, // 2 bits
+    0b11100000, // 3 bits
+    0b11110000, // 4 bits
+    0b11111000, // 5 bits
+    0b11111100, // 6 bits
+    0b11111110, // 7 bits
+    0b11111111, // 8 bits
+  };
+} // End of unnamed namespace
+
+//! Initializes with constant value for all bits
+//!
+BinaryVector::BinaryVector (uint32_t bitsCount, uint8_t fillPattern)
+  : m_data     ((bitsCount + 7) / 8, fillPattern)
+  , m_usedBits (bitsCount)
+{
+  auto lastByteBitsCount = bitsCount % 8;
+  if (lastByteBitsCount != 0)
+  {
+    m_data.back() &= LEFT_BITS_MASK_8[lastByteBitsCount];
+  }
+}
+//
+//  End of: BinaryVector::BinaryVector
+//---------------------------------------------------------------------------
+
+
+
 //! Copy constructor
 //!
 BinaryVector::BinaryVector (const mast::BinaryVector& rhs)
@@ -38,9 +74,10 @@ BinaryVector::BinaryVector (const mast::BinaryVector& rhs)
 //! Move constructor
 //!
 BinaryVector::BinaryVector (mast::BinaryVector&& rhs) noexcept
-  : m_data     (rhs.m_data)
-  , m_usedBits (std::move(rhs.m_usedBits))
+  : m_data     (std::move(rhs.m_data))
+  , m_usedBits (rhs.m_usedBits)
 {
+  rhs.m_usedBits = 0;
 }
 //
 //  End of: BinaryVector::BinaryVector
@@ -91,24 +128,12 @@ BinaryVector& BinaryVector::Append (uint8_t value, uint8_t numberOfBits)
     THROW_INVALID_ARGUMENT("Number of append bits cannot exceed number of bits of value.");
   }
 
-  static constexpr uint8_t mask[] =
-  {
-    0b10000000, // 0 bits
-    0b10000000, // 1 bits
-    0b11000000, // 2 bits
-    0b11100000, // 3 bits
-    0b11110000, // 4 bits
-    0b11111000, // 5 bits
-    0b11111100, // 6 bits
-    0b11111110, // 7 bits
-    0b11111111, // 8 bits
-  };
 
   // ---------------- Align (pack) added bits to the MSB
   //                  This make sure that unused bits are set to zero (at least for test and debug purpose)
   //
   value <<= 8 - numberOfBits;
-  value &=  mask[numberOfBits];
+  value &=  LEFT_BITS_MASK_8[numberOfBits];
 
   const uint8_t lastByteBits = m_usedBits % 8;
   const uint8_t freeBits     = (lastByteBits == 0) ? 8 : 8 - lastByteBits;

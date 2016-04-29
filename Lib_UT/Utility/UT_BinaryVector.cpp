@@ -703,6 +703,151 @@ void UT_BinaryVector::test_operator_neq_When_NotEqual ()
 }
 
 
+
+//! Checks BinaryVector constructor with a count and pattern
+//!
+//! @note Suppose that operator== is working properly
+void UT_BinaryVector::test_Constructor_With_Count_and_Pattern ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    uint32_t    bitsCount    = std::get<0>(data);
+    uint8_t     pattern      = std::get<1>(data);
+    string_view expectedBits = std::get<2>(data);
+
+    // ---------------- Exercise
+    //
+    BinaryVector sut(bitsCount, pattern);
+
+    // ---------------- Verify
+    //
+    auto expected = BinaryVector::CreateFromBinaryString(expectedBits);
+
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto data =
+  {
+    //     bitsCount, pattern, expected
+    make_tuple(0,  0b00000000, ""),                           // 00
+    make_tuple(1,  0b00000000, "0"),                          // 01
+    make_tuple(2,  0b00000000, "00"),                         // 02
+    make_tuple(3,  0b00000000, "000"),                        // 03
+    make_tuple(4,  0b00000000, "0000"),                       // 04
+    make_tuple(5,  0b00000000, "0000_0"),                     // 05
+    make_tuple(6,  0b00000000, "0000_00"),                    // 06
+    make_tuple(7,  0b00000000, "0000_000"),                   // 07
+    make_tuple(8,  0b00000000, "0000_0000"),                  // 08
+    make_tuple(9,  0b00000000, "0000_0000_0"),                // 09
+    make_tuple(0,  0b11111111, ""),                           // 10
+    make_tuple(1,  0b11111111, "1"),                          // 11
+    make_tuple(2,  0b11111111, "11"),                         // 12
+    make_tuple(3,  0b11111111, "111"),                        // 13
+    make_tuple(4,  0b11111111, "1111"),                       // 14
+    make_tuple(5,  0b11111111, "1111_1"),                     // 15
+    make_tuple(6,  0b11111111, "1111_11"),                    // 16
+    make_tuple(7,  0b11111111, "1111_111"),                   // 17
+    make_tuple(8,  0b11111111, "1111_1111"),                  // 18
+    make_tuple(9,  0b11111111, "1111_1111_1"),                // 19
+    make_tuple(10, 0b11001101, "1100_1101:11"),               // 20
+    make_tuple(20, 0b11001101, "1100_1101:1100_1101:1100"),   // 21
+    make_tuple(21, 0b11001101, "1100_1101:1100_1101:1100_1"), // 22
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector copy constructor
+//!
+//! @note Suppose that operator== is working properly
+void UT_BinaryVector::test_Constructor_Copy ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto sourceBits)
+  {
+    // ---------------- Setup
+    //
+    auto source = BinaryVector::CreateFromBinaryString(sourceBits);
+
+    // ---------------- Exercise
+    //
+    BinaryVector sut(source);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, source);
+  };
+
+  auto data =
+  {
+    string_view(""),             // 00
+    string_view("0"),            // 01
+    string_view("1"),            // 02
+    string_view("01"),           // 03
+    string_view("0111_00"),      // 04
+    string_view("0111_001"),     // 05
+    string_view("0111_0011"),    // 06
+    string_view("0111_0011:0"),  // 07
+    string_view("0111_0011:01"), // 08
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector move constructor
+//!
+//! @note Suppose that operator== is working properly
+void UT_BinaryVector::test_Constructor_Move ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto sourceBits)
+  {
+    // ---------------- Setup
+    //
+    auto source = BinaryVector::CreateFromBinaryString(sourceBits);
+
+    // ---------------- Exercise
+    //
+    BinaryVector sut(std::move(source));
+
+    // ---------------- Verify
+    //
+    auto expected = BinaryVector::CreateFromBinaryString(sourceBits);
+
+    TS_ASSERT_EQUALS  (sut, expected);
+    TS_ASSERT_TRUE    (source.IsEmpty());
+  };
+
+  auto data =
+  {
+    string_view(""),             // 00
+    string_view("0"),            // 01
+    string_view("1"),            // 02
+    string_view("01"),           // 03
+    string_view("0111_00"),      // 04
+    string_view("0111_001"),     // 05
+    string_view("0111_0011"),    // 06
+    string_view("0111_0011:0"),  // 07
+    string_view("0111_0011:01"), // 08
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
 //! Checks Append when sut is empty and adding 8 bits from uint8_t
 //!
 void UT_BinaryVector::test_Append_8_bits_When_Empty ()
@@ -1787,16 +1932,6 @@ void UT_BinaryVector::test_Slice_When_Exceeding_Capacity ()
   //
   TS_DATA_DRIVEN_TEST (checker, data);
 }
-
-
-//! @todo [JFC]-[April/25/2016]: Remove "No_test_yet_for_Guard" method when all tests are implemented
-//!
-void UT_BinaryVector::test_No_test_yet_for_Guard ()
-{
-  TS_WARN ("No test yet for: append with different width and bits count");
-}
-
-
 
 
 //===========================================================================

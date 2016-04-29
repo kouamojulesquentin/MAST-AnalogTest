@@ -244,9 +244,9 @@ UT_DataDriven_Failures.cpp:668: Error: Expected IsOddPredicate()(value) to be tr
 ..
 
 In UT_DataDriven_Failures::test_ASSERT_RELATION:
-==> In data driven test with id: 1 and input sample: { FF FF FF FF 01 00 00 00  }
+==> In data driven test with id: 1 and input sample: tuple(1, -1)
 UT_DataDriven_Failures.cpp:686: Error: Expected std::equal_to<decltype(lhs)>()(lhs, rhs) to be true, but found std::equal_to<decltype(lhs)>()(1, -1) is false
-==> In data driven test with id: 2 and input sample: { 05 00 00 00 04 00 00 00  }
+==> In data driven test with id: 2 and input sample: tuple(4, 5)
 UT_DataDriven_Failures.cpp:686: Error: Expected std::equal_to<decltype(lhs)>()(lhs, rhs) to be true, but found std::equal_to<decltype(lhs)>()(4, 5) is false
 .
 

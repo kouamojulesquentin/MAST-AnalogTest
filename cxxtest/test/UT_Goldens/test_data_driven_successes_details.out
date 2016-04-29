@@ -188,19 +188,19 @@ UT_DataDriven_Successes.cpp:251: Success: Expected (inputLength > 1U), Result: (
 .
 
 In UT_DataDriven_Successes::test_SingleData_Setup_Teardown:
-==> In data driven test with id: 0 and input sample: { 01 00 00 00 01 00 00 00  }
+==> In data driven test with id: 0 and input sample: tuple(1, 1)
 UT_DataDriven_Successes.cpp:279: Success: Expected (m_setupCount == expectedSetupCount), Result: (1 == 1)
 UT_DataDriven_Successes.cpp:280: Success: Expected (m_teardownCount == expectedTeardownCount), Result: (1 == 1)
 .
-==> In data driven test with id: 1 and input sample: { 02 00 00 00 02 00 00 00  }
+==> In data driven test with id: 1 and input sample: tuple(2, 2)
 UT_DataDriven_Successes.cpp:279: Success: Expected (m_setupCount == expectedSetupCount), Result: (2 == 2)
 UT_DataDriven_Successes.cpp:280: Success: Expected (m_teardownCount == expectedTeardownCount), Result: (2 == 2)
 .
-==> In data driven test with id: 2 and input sample: { 03 00 00 00 03 00 00 00  }
+==> In data driven test with id: 2 and input sample: tuple(3, 3)
 UT_DataDriven_Successes.cpp:279: Success: Expected (m_setupCount == expectedSetupCount), Result: (3 == 3)
 UT_DataDriven_Successes.cpp:280: Success: Expected (m_teardownCount == expectedTeardownCount), Result: (3 == 3)
 .
-==> In data driven test with id: 3 and input sample: { 04 00 00 00 04 00 00 00  }
+==> In data driven test with id: 3 and input sample: tuple(4, 4)
 UT_DataDriven_Successes.cpp:279: Success: Expected (m_setupCount == expectedSetupCount), Result: (4 == 4)
 UT_DataDriven_Successes.cpp:280: Success: Expected (m_teardownCount == expectedTeardownCount), Result: (4 == 4)
 .

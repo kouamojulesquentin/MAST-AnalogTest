@@ -14,3 +14,17 @@
 /NewMast.mps
 /ProjectFiles_CodeStat.txt
 /ProjectFiles_FilesStat.txt
+/*.tag
+/Lib/*.depend
+/Lib/*.layout
+/Lib_UT/*.depend
+/Lib_UT/*.layout
+/cxxtest/cxxtest/*.TAG
+/cxxtest/cxxtest/Cxxtest.cfg
+/cxxtest/cxxtest/Cxxtest.mep
+/cxxtest/cxxtest/MeFind0.tmp
+/cxxtest/cxxtest/Multi_Edit.LOG
+/cxxtest/cxxtest/ProjectFiles.txt
+/*.LOG
+/Note.txt
+/Lib_UT/Lib_UT_build_log.html

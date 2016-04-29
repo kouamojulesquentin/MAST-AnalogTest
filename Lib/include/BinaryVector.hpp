@@ -1,11 +1,11 @@
 //===========================================================================
-//                           ScanVectors.hpp
+//                           BinaryVector.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file ScanVectors.hpp
+//! @file BinaryVector.hpp
 //!
 //! Declares BinaryVector and
 //===========================================================================
@@ -123,35 +123,6 @@ class BinaryVectorRef final
 
 
 
-//! Contains bitstream vector in SVR string format (using ASCII '1' for 1 and '0' for 0)
-//!
-class SVFVector final
-{
-  // ---------------- Public  Methods
-  //
-  public:
-  ~SVFVector() = default;
-  SVFVector()  = default;
-//+  SVFVector(const BinaryVector& binaryVector);  //!< Converts a BinaryVector to a SVFVector
-
-
-  // ---------------- Protected Methods
-  //
-  protected:
-
-  // ---------------- Private  Methods
-  //
-  private:
-
-  // ---------------- Private  Fields
-  //
-  private:
-  std::string m_data;              //!< ASCII formatted bit stream
-  uint32_t    m_usedBits = 0;      //!< Number of effective bits (last byte may be not all used)
-};
-//
-//  End of SVFVector class declaration
-//---------------------------------------------------------------------------
 
 } // End of namespace mast
 

@@ -15,7 +15,7 @@
 #ifndef DEFAULTBINARYPATHSELECTOR_H__8EA048FA_454_4D96_79A2_13E04D156F73__INCLUDED_
   #define DEFAULTBINARYPATHSELECTOR_H__8EA048FA_454_4D96_79A2_13E04D156F73__INCLUDED_
 
-#include "ScanVectors.hpp"
+#include "BinaryVector.hpp"
 #include "PathSelector.hpp"
 #include <vector>
 

@@ -1,18 +1,18 @@
 //===========================================================================
-//                           ScanVectors.cpp
+//                           BinaryVector.cpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file ScanVectors.cpp
+//! @file BinaryVector.cpp
 //!
 //! Implements BinaryVector and SVFVector classes
 //!
 //===========================================================================
 
 
-#include "ScanVectors.hpp"
+#include "BinaryVector.hpp"
 #include "Utility.hpp"
 #include <sstream>
 #include <array>
@@ -174,7 +174,7 @@ BinaryVector& BinaryVector::Append (uint8_t value, uint8_t numberOfBits)
   return *this;
 }
 //
-//  End of: ScanVectors::ScanVectors
+//  End of: BinaryVector::BinaryVector
 //---------------------------------------------------------------------------
 
 
@@ -192,7 +192,7 @@ BinaryVector& BinaryVector::Append (uint16_t value)
   return *this;
 }
 //
-//  End of: ScanVectors::ScanVectors
+//  End of: BinaryVector::BinaryVector
 //---------------------------------------------------------------------------
 
 //! Appends from 32 bits
@@ -211,7 +211,7 @@ BinaryVector& BinaryVector::Append (uint32_t value)
   return *this;
 }
 //
-//  End of: ScanVectors::ScanVectors
+//  End of: BinaryVector::BinaryVector
 //---------------------------------------------------------------------------
 
 
@@ -235,7 +235,7 @@ BinaryVector& BinaryVector::Append (uint64_t value)
   return *this;
 }
 //
-//  End of: ScanVectors::ScanVectors
+//  End of: BinaryVector::BinaryVector
 //---------------------------------------------------------------------------
 
 
@@ -368,7 +368,7 @@ BinaryVector& BinaryVector::operator= (const BinaryVector& rhs)
   return *this;
 }
 //
-//  End of: ScanVectors::ScanVectors
+//  End of: BinaryVector::BinaryVector
 //---------------------------------------------------------------------------
 
 
@@ -384,7 +384,7 @@ BinaryVector& BinaryVector::operator= (BinaryVector&& rhs) noexcept
   return *this;
 }
 //
-//  End of: ScanVectors::ScanVectors
+//  End of: BinaryVector::BinaryVector
 //---------------------------------------------------------------------------
 
 
@@ -451,7 +451,7 @@ void BinaryVector::Set (uint8_t value)
   Append(value);
 }
 //
-//  End of: ScanVectors::ScanVectors
+//  End of: BinaryVector::BinaryVector
 //---------------------------------------------------------------------------
 
 
@@ -628,7 +628,7 @@ void BinaryVector::Set (uint16_t value)
   Append(value);
 }
 //
-//  End of: ScanVectors::ScanVectors
+//  End of: BinaryVector::BinaryVector
 //---------------------------------------------------------------------------
 
 //! Sets from 32 bits
@@ -639,7 +639,7 @@ void BinaryVector::Set (uint32_t value)
   Append(value);
 }
 //
-//  End of: ScanVectors::ScanVectors
+//  End of: BinaryVector::BinaryVector
 //---------------------------------------------------------------------------
 
 
@@ -651,7 +651,7 @@ void BinaryVector::Set (uint64_t value)
   Append(value);
 }
 //
-//  End of: ScanVectors::Set
+//  End of: BinaryVector::Set
 //---------------------------------------------------------------------------
 
 
@@ -750,5 +750,5 @@ BinaryVector& BinaryVector::ToggleBits()
 
 
 //===========================================================================
-// End of ScanVectors.cpp
+// End of BinaryVector.cpp
 //===========================================================================

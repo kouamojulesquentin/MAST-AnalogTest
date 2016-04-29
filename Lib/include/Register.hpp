@@ -15,7 +15,7 @@
   #define REGISTER_H__AC94642C_6C5D_4241_B69A_C5DE634D3EAA__INCLUDED_
 
 #include "SystemModelNode.hpp"
-#include "ScanVectors.hpp"
+#include "BinaryVector.hpp"
 
 namespace mast
 {

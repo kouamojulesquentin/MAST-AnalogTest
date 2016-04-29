@@ -18,7 +18,7 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
-#include "ScanVectors.hpp"
+#include "BinaryVector.hpp"
 
 namespace CxxTest
 {

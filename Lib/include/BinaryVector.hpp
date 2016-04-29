@@ -35,8 +35,8 @@ class DLL_EXPORT BinaryVector final
   public:
   ~BinaryVector() = default;
   BinaryVector()  = default;
+  BinaryVector(const BinaryVector& rhs);  //!< Copy constructor
 //+  explicit BinaryVector(const SVFVector& svfVector);   //!< Converts a SVFVector to a BinaryVector
-  explicit BinaryVector(const BinaryVector& rhs);
   explicit BinaryVector(uint32_t bitsCount, uint8_t fillPattern = 0);                   //!< Initializes with constant pattern for all bits
   BinaryVector(BinaryVector&& rhs) noexcept;
 

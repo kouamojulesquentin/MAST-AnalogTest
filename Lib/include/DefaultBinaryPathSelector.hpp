@@ -18,6 +18,7 @@
 #include "BinaryVector.hpp"
 #include "PathSelector.hpp"
 #include <vector>
+#include <memory>
 
 namespace mast
 {
@@ -36,7 +37,8 @@ class DefaultBinaryPathSelector : public PathSelector
   public:
   ~DefaultBinaryPathSelector() = default;
   DefaultBinaryPathSelector()  = delete;
-  DefaultBinaryPathSelector(SystemModelNode* associatedNode, uint32_t pathCount, bool isInverted = false, bool canSelectNone = false);
+//+  DefaultBinaryPathSelector(std::shared_ptr<SystemModelNode> associatedNode, uint32_t pathCount, bool isInverted = false, bool canSelectNone = false);
+  DefaultBinaryPathSelector(Register* associatedNode, uint32_t pathCount, bool isInverted = false, bool canSelectNone = false);
 
   virtual bool IsActive (uint32_t pathIdentifier) const override; //!< Returns true when the specified path is already selected
   virtual void Deselect (uint32_t pathIdentifier) override;       //!< Request deactivation of the specified path
@@ -61,9 +63,10 @@ class DefaultBinaryPathSelector : public PathSelector
   //
   private:
 
-  const TablesType m_select;                   //!< Selection LUT
-  const TablesType m_deselect;                 //!< Deselection LUT
-  Register*        m_muxRegister = nullptr;    //!< Register that drives the paths multiplexer
+  const TablesType          m_select;      //!< Selection LUT
+  const TablesType          m_deselect;    //!< Deselection LUT
+//+  std::shared_ptr<Register> m_muxRegister; //!< Register that drives the paths multiplexer
+  Register* m_muxRegister = nullptr; //!< Register that drives the paths multiplexer
 };
 //
 //  End of DefaultBinaryPathSelector class declaration

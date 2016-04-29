@@ -14,14 +14,17 @@
 #ifndef SYSTEMMODELNODE_H__1BEF31DB_FB8A_405C_78B9_75CDBD328A52__INCLUDED_
   #define SYSTEMMODELNODE_H__1BEF31DB_FB8A_405C_78B9_75CDBD328A52__INCLUDED_
 
+#include "Platform.hpp"
 #include <cstdint>
 #include <string>
-#include <functional>
 #include <experimental/string_view>
+#include <functional>
+#include <memory>
 
 namespace mast
 {
 class SystemModelVisitor;
+class ConditionsChecker;
 
 constexpr char DEFAULT_NODE_NAME[] = "unnamed";
 constexpr char DEFAULT_MIB_NAME[]  = "MIB";
@@ -33,20 +36,39 @@ constexpr char DEFAULT_TAP_NAME[]  = "1149_1_TAP";
 
 //! Abstract base for common features for system model nodes
 //!
-class SystemModelNode
+class DLL_EXPORT SystemModelNode
 {
   // ---------------- Public  Methods
   //
   public:
 
   using NodeIdentifier   = uint32_t;                              //!< Uniquely identifies a node
-  using ConditionFunctor = std::function<bool(SystemModelNode*)>; //!< Defines pre- and post- condition functors
+//+  using ConditionFunctor = std::function<bool(SystemModelNode*)>; //!< Defines pre- and post- condition functors
 
-  NodeIdentifier   GetIdentifier()  const { return m_identifier;   } //!< Returns node unique identifier
-  SystemModelNode* GetNextSibling() const { return m_pNextSibling; } //!< Returns first sibling or nullptr
 
-  void         AppendSibling (SystemModelNode*    pSibling);      //!< Appends a new sibling node
   virtual void Accept        (SystemModelVisitor& visitor) = 0;   //!< Visited part of the Visitor pattern
+
+  // ---------------- Setters
+  //
+  void AppendSibling (SystemModelNode*    pSibling);      //!< Appends a new sibling node
+
+  //! Sets application specific data
+  //! @note System node does not used this data (this is an optional extension point for applications using the system model)
+  void SetApplicationData   (void* applicationData)                                { m_applicationData = applicationData; }
+  void SetConditionsChecker (std::shared_ptr<ConditionsChecker> conditionsChecker) { m_conditionChecker = conditionsChecker; }  //!< Sets condition checker
+  void ResetConditionsChecker ()                                                   { m_conditionChecker.reset(); }              //!< Removes current condition checker
+  void SetPriority            (uint32_t priority)                                  { m_priority = priority; }                   //!< Sets new priority (application defined semantic)
+
+  // ---------------- Getters
+  //
+  void*                              GetApplicationData()   const { return m_applicationData;  }                 //!< Retrieve application specific data
+  std::shared_ptr<ConditionsChecker> GetConditionsChecker() const { return m_conditionChecker; }                 //!< Returns current condition checker
+  NodeIdentifier                     GetIdentifier()        const { return m_identifier;       }                 //!< Returns node unique identifier
+  std::experimental::string_view     GetName()              const { return m_name;             }                 //!< Returns current node name
+  SystemModelNode*                   GetNextSibling()       const { return m_pNextSibling;     }                 //!< Returns next sibling or nullptr
+  uint32_t                           GetPriority()          const { return m_priority;         }                 //!< Returns currently assigned priority
+  bool                               HasConditions()        const { return m_conditionChecker  ? true : false ;} //!< Returns true if there is some condition to check
+  bool                               IsPending()            const { return m_pending;          }                 //!< Returns true if at least one node in the hierarchy is pending (need an update cycle)
 
   // ---------------- Protected Methods
   //
@@ -61,26 +83,18 @@ class SystemModelNode
 
   static NodeIdentifier GetNextIdentifier();
 
-  //! Retrieve application specific data
-  //!
-  void* GetApplicationData() const { return m_applicationData; };
-
-  //! Sets application specific data
-  //! @note System node does not used this data (this is an optional extension point for applications using the system model)
-  void  SetApplicationData (void* applicationData) { m_applicationData = applicationData; }
-
-
   // ---------------- Private  Fields
   //
   private:
   static NodeIdentifier sm_nextIdentifier;   //!< Identifier for the next node to create
 
-  NodeIdentifier   m_identifier;                     //!< Uniquely identifies a node
-  std::string      m_name;                           //!< Node readable name
-  bool             m_pending         = false;        //!< True when at least one node in the hierarchy is pending
-  bool             m_hasCondition    = false;        //!< True when the node has some condition to check (either pre- or post-)
-  SystemModelNode* m_pNextSibling    = nullptr;      //!< Points to next node at same level (forming a singly linked list)
-  void*            m_applicationData = nullptr;      //!< Application specific data (semantic managed by the application)
+  NodeIdentifier                     m_identifier;                     //!< Uniquely identifies a node
+  std::string                        m_name;                           //!< Node readable name
+  bool                               m_pending         = false;        //!< True when at least one node in the hierarchy is pending
+  uint32_t                           m_priority        = 0;            //!< Defines application specific priority to the node(e.g for configuration when multiple paths should be selected but only one can be)
+  std::shared_ptr<ConditionsChecker> m_conditionChecker;               //!< Optional condition(s) checker
+  SystemModelNode*                   m_pNextSibling    = nullptr;      //!< Points to next node at same level (forming a singly linked list)
+  void*                              m_applicationData = nullptr;      //!< Application specific data (semantic managed by the application)
 };
 //
 //  End of SystemModelNode class declaration

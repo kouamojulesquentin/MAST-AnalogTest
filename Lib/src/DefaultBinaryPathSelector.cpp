@@ -16,6 +16,8 @@
 #include <stdexcept>
 #include <limits>
 
+using std::shared_ptr;
+
 using namespace mast;
 
 //! Initializes selector for fast selection/deselection of a path
@@ -24,10 +26,12 @@ using namespace mast;
 //! @param isInverted   When true the bits for selecting a path are inverted (relative to the path identifier number)
 //! @param noIdle       When true zero is used to select first path, otherwise 1 is used instead (provided it is not inverted)
 //!
-DefaultBinaryPathSelector::DefaultBinaryPathSelector (SystemModelNode* associatedNode, uint32_t pathCount, bool isInverted, bool noIdle)
+//+DefaultBinaryPathSelector::DefaultBinaryPathSelector(shared_ptr<SystemModelNode> associatedNode, uint32_t pathCount, bool isInverted, bool noIdle)
+DefaultBinaryPathSelector::DefaultBinaryPathSelector(Register* associatedNode, uint32_t pathCount, bool isInverted, bool noIdle)
   : m_select      (CreateSelectTable   (pathCount, isInverted, noIdle))
   , m_deselect    (CreateDeselectTable (pathCount, isInverted))
   , m_muxRegister (dynamic_cast<Register*>(associatedNode))
+//+  , m_muxRegister (shared_ptr<Register>(associatedNode))
 {
   if (!m_muxRegister)
   {

@@ -68,8 +68,18 @@
 			<Add directory="../Lib/public_include" />
 			<Add directory="CxxTest_Traits" />
 		</Compiler>
-		<Unit filename="CxxTest_Traits/BinaryVector_Traits.hpp" />
+		<Unit filename="CxxTest_Traits/BinaryVector_Traits.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="Generated/Runner.cpp" />
+		<Unit filename="SystemModel/UT_DefaultBinaryPathSelector.cpp" />
+		<Unit filename="SystemModel/UT_DefaultBinaryPathSelector.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="SystemModel/UT_Register.cpp" />
+		<Unit filename="SystemModel/UT_Register.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="Utility/UT_BinaryVector.cpp" />
 		<Unit filename="Utility/UT_BinaryVector.hpp">
 			<Option target="&lt;{~None~}&gt;" />

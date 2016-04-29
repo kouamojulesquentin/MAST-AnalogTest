@@ -12,7 +12,7 @@
 //===========================================================================
 
 #include "UT_BinaryVector.hpp"
-#include "ScanVectors.hpp"
+#include "BinaryVector.hpp"
 #include "BinaryVector_Traits.hpp"
 
 #include <vector>

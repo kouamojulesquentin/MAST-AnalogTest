@@ -12,8 +12,9 @@ endif
 
 UT_RootPath	 = $(RootPath)
 
-Suites       = \
-               $(UT_RootPath)/Utility/UT_*.hpp                  \
+Suites = \
+           $(UT_RootPath)/Utility/UT_*.hpp      \
+           $(UT_RootPath)/SystemModel/UT_*.hpp  \
 
 
 ProjectFile  = $(RootPath)/Lib_UT.cbp

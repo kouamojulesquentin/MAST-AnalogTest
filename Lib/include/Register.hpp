@@ -24,19 +24,18 @@ class SystemModel;
 //! Represents a register in the scan chain
 //!
 //!
-class Register : public SystemModelNode
+class DLL_EXPORT Register : public SystemModelNode
 {
   // ---------------- Public  Methods
   //
   public:
   ~Register() = default;
   Register()  = delete;
-  Register(std::experimental::string_view name, uint32_t bitsCount, mast::BinaryVector bypassSequence);
+  Register(std::experimental::string_view name, mast::BinaryVector bypassSequence);
   friend SystemModel;
 
-  void                SetSequenceToSend (BinaryVector sequenceToSend) { m_sequenceToSend = sequenceToSend; }  //!< Sets the bits sequence to send during the next iApply cycle
-  const BinaryVector& GetLastReceivedSequence() const { return m_lastReceivedSequence; }
-
+  // ---------------- Miscellaneous
+  //
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
 
   //!< Checks that last received sequence equals expected one
@@ -45,6 +44,23 @@ class Register : public SystemModelNode
   //!<
   //!< @return  true when received sequence equals expected one, false otherwise
   bool CheckAgainstExpected();
+
+  // ---------------- Getters
+  //
+  const BinaryVector& GetBypassSequence()       const { return m_bypassSequence;       } //!< Returns bypass sequence
+  const BinaryVector& GetExpectedSequence()     const { return m_expectedSequence;     } //!< Returns expected sequence
+  const BinaryVector& GetLastReceivedSequence() const { return m_lastReceivedSequence; }
+  const BinaryVector& GetSequenceToSend()       const { return m_sequenceToSend;       }
+  const BinaryVector& GetLastSendSequence()     const { return m_lastSentSequence;;    }
+  bool                MustCheckExpected()       const { return m_mustCheckExpected;    } //!< Returns true when received data must be checked against expected data
+
+  // ---------------- Setters
+  //
+  void SetSequenceToSend       (BinaryVector sequenceToSend)       { m_sequenceToSend       = std::move(sequenceToSend);       } //!< Sets the bits sequence to send during the next iApply cycle
+  void SetExpectedSequence     (BinaryVector expectedSequence)     { m_expectedSequence     = std::move(expectedSequence);     } //!< Sets expected sequence (when updating from SUT)
+  void SetLastReceivedSequence (BinaryVector lastReceivedSequence) { m_lastReceivedSequence = std::move(lastReceivedSequence); } //!< Sets last sequence of bits that have been shifted from SUT
+  void SetCheckExpected        (bool         checkExpected)        { m_mustCheckExpected    = checkExpected;                   } //!< Sets whether data updated from SUT must be check agains expected data
+
 
   // ---------------- Protected Methods
   //
@@ -58,12 +74,9 @@ class Register : public SystemModelNode
   //
   private:
 
-  const uint32_t     m_bitsCount            = 0;       //!< Exact number of bits in the register
-  const uint32_t     m_bytesCount           = 0;       //!< Number of bytes necessary to represent all the bytes
-  bool               m_pendingSelect        = false;   //!< True when the tdr value has been changed following a selection action
-  bool               m_checkExpected        = false;   //!< When true, it triggers a check of received vs expected data during the following shift from sut
-  uint32_t           m_priority             = 0;       //!< Defines priority for configuration (when multiple path should be selected but only one can be)
-  uint32_t           m_mismatches           = 0;       //!< Number of mismatches following IEEE 1687 rules
+//+  bool               m_pendingSelect        = false;   //!< True when the tdr value has been changed following a selection action
+  bool               m_mustCheckExpected        = false;   //!< When true, it triggers a check of received vs expected data during the following shift from sut
+//+  uint32_t           m_mismatches           = 0;       //!< Number of mismatches following IEEE 1687 rules
   BinaryVector       m_sequenceToSend;                 //!< Sequence of bits that should be shifted into SUT (during the next iApply cycle)
   BinaryVector       m_lastSentSequence;               //!< Last sent sequence of bits: It stores the status of the SUT (SIBs, etc...) after an apply cycle
   BinaryVector       m_lastReceivedSequence;           //!< Last sequence of bits that have been shifted from SUT

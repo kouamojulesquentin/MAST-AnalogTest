@@ -11,8 +11,8 @@ AR = ar
 LD = g++
 WINDRES = windres
 
-INC = -I../cxxtest -I../Lib/include -I../Lib/public_include
-CFLAGS = -Wnon-virtual-dtor -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equal -Winline -Wunreachable-code -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default -Weffc++ -Wmain -pedantic-errors -pedantic -w -Wfatal-errors -Wextra -fexceptions -DCXXTEST_HAVE_EH -DCXXTEST_HAVE_STD
+INC = -I../cxxtest -I../Lib/include -I../Lib/public_include -ICxxTest_Traits
+CFLAGS = -Wnon-virtual-dtor -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equal -Winline -Wunreachable-code -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default -Weffc++ -Wmain -pedantic-errors -pedantic -w -Wfatal-errors -Wextra -fexceptions -DCXXTEST_HAVE_EH -DCXXTEST_HAVE_STD -DCXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION
 RESINC = 
 LIBDIR = 
 LIB = 
@@ -40,9 +40,9 @@ OBJDIR_RELEASE = ../obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = ../bin/Release/Lib_UT
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/Generated/Runner.o $(OBJDIR_DEBUG)/Utility/UT_BinaryVector.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/Generated/Runner.o $(OBJDIR_DEBUG)/SystemModel/UT_DefaultBinaryPathSelector.o $(OBJDIR_DEBUG)/SystemModel/UT_Register.o $(OBJDIR_DEBUG)/Utility/UT_BinaryVector.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/Generated/Runner.o $(OBJDIR_RELEASE)/Utility/UT_BinaryVector.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/Generated/Runner.o $(OBJDIR_RELEASE)/SystemModel/UT_DefaultBinaryPathSelector.o $(OBJDIR_RELEASE)/SystemModel/UT_Register.o $(OBJDIR_RELEASE)/Utility/UT_BinaryVector.o
 
 all: debug release
 
@@ -52,6 +52,7 @@ before_debug:
 	mingw32-make.exe -f runner.mak
 	test -d ../bin/Debug || mkdir -p ../bin/Debug
 	test -d $(OBJDIR_DEBUG)/Generated || mkdir -p $(OBJDIR_DEBUG)/Generated
+	test -d $(OBJDIR_DEBUG)/SystemModel || mkdir -p $(OBJDIR_DEBUG)/SystemModel
 	test -d $(OBJDIR_DEBUG)/Utility || mkdir -p $(OBJDIR_DEBUG)/Utility
 
 after_debug: 
@@ -64,6 +65,12 @@ out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 $(OBJDIR_DEBUG)/Generated/Runner.o: Generated/Runner.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Generated/Runner.cpp -o $(OBJDIR_DEBUG)/Generated/Runner.o
 
+$(OBJDIR_DEBUG)/SystemModel/UT_DefaultBinaryPathSelector.o: SystemModel/UT_DefaultBinaryPathSelector.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_DefaultBinaryPathSelector.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_DefaultBinaryPathSelector.o
+
+$(OBJDIR_DEBUG)/SystemModel/UT_Register.o: SystemModel/UT_Register.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_Register.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_Register.o
+
 $(OBJDIR_DEBUG)/Utility/UT_BinaryVector.o: Utility/UT_BinaryVector.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Utility/UT_BinaryVector.cpp -o $(OBJDIR_DEBUG)/Utility/UT_BinaryVector.o
 
@@ -71,11 +78,13 @@ clean_debug:
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
 	rm -rf ../bin/Debug
 	rm -rf $(OBJDIR_DEBUG)/Generated
+	rm -rf $(OBJDIR_DEBUG)/SystemModel
 	rm -rf $(OBJDIR_DEBUG)/Utility
 
 before_release: 
 	test -d ../bin/Release || mkdir -p ../bin/Release
 	test -d $(OBJDIR_RELEASE)/Generated || mkdir -p $(OBJDIR_RELEASE)/Generated
+	test -d $(OBJDIR_RELEASE)/SystemModel || mkdir -p $(OBJDIR_RELEASE)/SystemModel
 	test -d $(OBJDIR_RELEASE)/Utility || mkdir -p $(OBJDIR_RELEASE)/Utility
 
 after_release: 
@@ -88,6 +97,12 @@ out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 $(OBJDIR_RELEASE)/Generated/Runner.o: Generated/Runner.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Generated/Runner.cpp -o $(OBJDIR_RELEASE)/Generated/Runner.o
 
+$(OBJDIR_RELEASE)/SystemModel/UT_DefaultBinaryPathSelector.o: SystemModel/UT_DefaultBinaryPathSelector.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_DefaultBinaryPathSelector.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_DefaultBinaryPathSelector.o
+
+$(OBJDIR_RELEASE)/SystemModel/UT_Register.o: SystemModel/UT_Register.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_Register.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_Register.o
+
 $(OBJDIR_RELEASE)/Utility/UT_BinaryVector.o: Utility/UT_BinaryVector.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Utility/UT_BinaryVector.cpp -o $(OBJDIR_RELEASE)/Utility/UT_BinaryVector.o
 
@@ -95,6 +110,7 @@ clean_release:
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
 	rm -rf ../bin/Release
 	rm -rf $(OBJDIR_RELEASE)/Generated
+	rm -rf $(OBJDIR_RELEASE)/SystemModel
 	rm -rf $(OBJDIR_RELEASE)/Utility
 
 .PHONY: before_debug after_debug clean_debug before_release after_release clean_release

@@ -48,7 +48,9 @@
 		<Unit filename="include/AccessInterface.hpp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="include/BinaryVector.hpp" />
+		<Unit filename="include/BinaryVector.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="include/Chain.hpp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>

@@ -37,6 +37,7 @@ class DLL_EXPORT BinaryVector final
   BinaryVector()  = default;
 //+  explicit BinaryVector(const SVFVector& svfVector);   //!< Converts a SVFVector to a BinaryVector
   explicit BinaryVector(const BinaryVector& rhs);
+  explicit BinaryVector(uint32_t bitsCount, uint8_t fillPattern = 0);                   //!< Initializes with constant pattern for all bits
   BinaryVector(BinaryVector&& rhs) noexcept;
 
   static BinaryVector CreateFromBinaryString (std::experimental::string_view bits);   //!< Creates a BinaryVector from text binary representation
@@ -73,10 +74,10 @@ class DLL_EXPORT BinaryVector final
   void          Set(uint32_t value); //!< Assigns 32 bits value the BinaryVector
   void          Set(uint64_t value); //!< Assigns 64 bits value the BinaryVector
 
-  bool           IsEmpty()    const { return m_usedBits     == 0; }   //!< Returns true when there is no bit in the BinaryVector, false otherwise
-  uint32_t       BitsCount()  const { return m_usedBits;    }         //!< Returns total number of valid bits in the BinaryVector
-  uint32_t       BytesCount() const { return m_data.size(); }         //!< Returns total number of valid bits in the BinaryVector
-  const uint8_t* Data()       const { return m_data.data(); }         //!< Returns pointer on raw bits stream data (only valid as long as content is not modified)
+  bool           IsEmpty()    const { return m_data.empty();}      //!< Returns true when there is no bit in the BinaryVector, false otherwise
+  uint32_t       BitsCount()  const { return m_usedBits;    }      //!< Returns total number of valid bits in the BinaryVector
+  uint32_t       BytesCount() const { return m_data.size(); }      //!< Returns total number of valid bits in the BinaryVector
+  const uint8_t* Data()       const { return m_data.data(); }      //!< Returns pointer on raw bits stream data (only valid as long as content is not modified)
 
   BinaryVector    Slice    (uint32_t firstBitOffset, uint32_t bitsCount) const; //!< Returns a slice from BinaryVector
 //+  BinaryVectorRef SliceRef (uint32_t firstBitOffset, uint32_t bitsCount) const; //!< Returns a reference to a slice from BinaryVector

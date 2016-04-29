@@ -17,6 +17,7 @@
 #include <cstdint>
 #include <string>
 #include <functional>
+#include <experimental/string_view>
 
 namespace mast
 {
@@ -52,7 +53,7 @@ class SystemModelNode
   protected:
   virtual ~SystemModelNode() = default;
   SystemModelNode()  = delete;
-  SystemModelNode(std::string name);
+  SystemModelNode(std::experimental::string_view name);
 
   // ---------------- Private  Methods
   //

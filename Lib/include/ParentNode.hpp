@@ -47,7 +47,7 @@ class ParentNode : public SystemModelNode
   protected:
   virtual ~ParentNode() = default;
   ParentNode() = delete;
-  ParentNode(std::string name) : SystemModelNode(name) {}
+  ParentNode(std::experimental::string_view name) : SystemModelNode(name) {}
 
 
   // ---------------- Private  Methods

@@ -14,15 +14,16 @@
 
 #include "SystemModelNode.hpp"
 
+using std::experimental::string_view;
 using namespace mast;
 
 SystemModelNode::NodeIdentifier SystemModelNode::sm_nextIdentifier = 0;
 
 //! Sets unique identifier and name (using default one if unspecified)
 //!
-SystemModelNode::SystemModelNode (std::string name)
+SystemModelNode::SystemModelNode (string_view name)
   : m_identifier (GetNextIdentifier())
-  , m_name       (std::move(name))
+  , m_name       (name)
 {
   // ---------------- Make sure there is at least a default name
   //
@@ -34,9 +35,6 @@ SystemModelNode::SystemModelNode (std::string name)
 //
 //  End of: SystemModelNode::SystemModelNode
 //---------------------------------------------------------------------------
-//
-
-
 
 
 //! Appends a new sibling node

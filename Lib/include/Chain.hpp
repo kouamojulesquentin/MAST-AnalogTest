@@ -33,7 +33,7 @@ class Chain : public ParentNode
   public:
   ~Chain() = default;
   Chain()  = delete;
-  Chain(std::string name) : ParentNode(name) {}
+  Chain(std::experimental::string_view name) : ParentNode(name) {}
 
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
 };

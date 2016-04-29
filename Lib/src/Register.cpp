@@ -17,19 +17,19 @@
 
 using std::string;
 using std::experimental::string_view;
+
 using namespace mast;
 
 
-//! Initialize a new Register
+//! Initializes a new Register
 //!
-Register::Register (string_view name, uint32_t bitsCount, mast::BinaryVector bypassSequence)
+//! @note All registers are initialized like the bypass sequence
+Register::Register (string_view name, mast::BinaryVector bypassSequence)
   : SystemModelNode        (name)
-  , m_bitsCount            (bitsCount)
-  , m_bytesCount           (Utility::BytesCountFromBitsCount(bitsCount))
-  , m_sequenceToSend       (m_bytesCount)
-  , m_lastSentSequence     (m_bytesCount)
-  , m_lastReceivedSequence (m_bytesCount)
-  , m_expectedSequence     (m_bytesCount)
+  , m_sequenceToSend       (bypassSequence)
+  , m_lastSentSequence     (bypassSequence)
+  , m_lastReceivedSequence (bypassSequence)
+  , m_expectedSequence     (bypassSequence)
   , m_bypassSequence       (std::move(bypassSequence))
 {
 }

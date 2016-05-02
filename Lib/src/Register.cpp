@@ -25,11 +25,11 @@ using namespace mast;
 //! @note All registers are initialized like the bypass sequence
 Register::Register (string_view name, mast::BinaryVector bypassSequence)
   : SystemModelNode        (name)
-  , m_sequenceToSend       (bypassSequence)
-  , m_lastSentSequence     (bypassSequence)
-  , m_lastReceivedSequence (bypassSequence)
-  , m_expectedSequence     (bypassSequence)
-  , m_bypassSequence       (std::move(bypassSequence))
+  , m_nextToSut       (bypassSequence)
+  , m_lastToSut     (bypassSequence)
+  , m_lastFromSut (bypassSequence)
+  , m_expectedFromSut     (bypassSequence)
+  , m_bypass       (std::move(bypassSequence))
 {
 }
 //
@@ -48,41 +48,20 @@ void Register::Accept (SystemModelVisitor& visitor)
 
 //! Sets last sequence of bits that have been shifted from SUT
 //!
-//! @param lastReceivedSequence   Sequence received from SUT during last scan
+//! @param sequence   Sequence received from SUT during last scan
 //!
-void Register::SetLastReceivedSequence (BinaryVector lastReceivedSequence)
+void Register::SetFromSut (BinaryVector sequence)
 {
-  m_lastReceivedSequence = std::move(lastReceivedSequence);
+  m_lastFromSut = std::move(sequence);
 
-  if (m_mustCheckExpected && (m_lastReceivedSequence != m_expectedSequence))
+  if (m_mustCheckExpected && (m_lastFromSut != m_expectedFromSut))
   {
     ++m_mismatches;
   }
 }
 //
-//  End of: Register::SetLastReceivedSequence
+//  End of: Register::SetFromSut
 //---------------------------------------------------------------------------
-
-//! Sets the bits sequence to send during the next iApply cycle and set selection
-//! pending flag when the value is different
-//!
-void Register::SetSequenceToSend (BinaryVector sequenceToSend)
-{
-  m_sequenceToSend = sequenceToSend;
-
-  if (m_sequenceToSend != m_lastSentSequence)
-  {
-    m_pendingSelect = true;
-  }
-}
-//
-//  End of: Register::SetSequenceToSend
-//---------------------------------------------------------------------------
-
-
-
-
-
 
 //===========================================================================
 // End of Register.cpp

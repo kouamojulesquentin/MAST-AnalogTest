@@ -60,6 +60,7 @@ class DLL_EXPORT SystemModelNode
   void SetPriority            (uint32_t priority)                                  { m_priority = priority; }                   //!< Sets new priority (application defined semantic)
   void ForcePending ()                                                             { m_pending = true; }                        //!< Changes state in order that IsPending will return true
   void ResetPending ()                                                             { m_pending = false; }                       //!< Changes state in order that IsPending will return false
+  void SetName (std::experimental::string_view name)                               { m_name = MakeNodeName(name); }             //!< Changes node name
 
   // ---------------- Getters
   //
@@ -84,6 +85,7 @@ class DLL_EXPORT SystemModelNode
   private:
 
   static NodeIdentifier GetNextIdentifier();
+  static std::string    MakeNodeName (std::experimental::string_view name);
 
   // ---------------- Private  Fields
   //

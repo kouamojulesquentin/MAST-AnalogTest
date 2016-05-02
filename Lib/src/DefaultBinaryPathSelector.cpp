@@ -39,17 +39,6 @@ DefaultBinaryPathSelector::DefaultBinaryPathSelector(shared_ptr<SystemModelNode>
   {
     THROW_INVALID_ARGUMENT("associatedNode must be a Register");
   }
-
-  //+ (begin JFC May/02/2016): What to do when initialing a path selector
-//+  if (m_canSelectNone)
-//+  {
-//+    Select(0);
-//+  }
-//+  else
-//+  {
-//+    Select(1U);
-//+  }
-  //+ (end   JFC May/02/2016):
 }
 //
 //  End of: DefaultBinaryPathSelector::DefaultBinaryPathSelector
@@ -180,13 +169,16 @@ bool DefaultBinaryPathSelector::IsActive (uint32_t pathIdentifier) const
 
 
 
-//! Request deactivation of the specified path
+//! Requests deactivation of the specified path
 //!
+//! @note Also report that a selection is pending and this is now the default value for the mux register
 void DefaultBinaryPathSelector::Deselect (uint32_t pathIdentifier)
 {
   CheckPathIdentifier(pathIdentifier);
 
-  m_muxRegister->SetSequenceToSend(m_deselect[pathIdentifier]);
+  m_muxRegister->SetToSut(m_deselect[pathIdentifier]);
+  m_muxRegister->SetBypass(m_deselect[pathIdentifier]);
+  m_muxRegister->ForcePending();
 }
 //
 //  End of: DefaultBinaryPathSelector::Deselect
@@ -194,13 +186,16 @@ void DefaultBinaryPathSelector::Deselect (uint32_t pathIdentifier)
 
 
 
-//! Request activation of the specified path
+//! Requests activation of the specified path
 //!
+//! @note Also report that a selection is pending and this is now the default value for the mux register
 void DefaultBinaryPathSelector::Select (uint32_t pathIdentifier)
 {
   CheckPathIdentifier(pathIdentifier);
 
-  m_muxRegister->SetSequenceToSend(m_select[pathIdentifier]);
+  m_muxRegister->SetToSut(m_select[pathIdentifier]);
+  m_muxRegister->SetBypass(m_select[pathIdentifier]);
+  m_muxRegister->ForcePending();
 }
 //
 //  End of: DefaultBinaryPathSelector::Select

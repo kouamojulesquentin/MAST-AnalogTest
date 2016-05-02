@@ -14,6 +14,7 @@
 
 #include "SystemModelNode.hpp"
 
+using std::string;
 using std::experimental::string_view;
 using namespace mast;
 
@@ -23,14 +24,8 @@ SystemModelNode::NodeIdentifier SystemModelNode::sm_nextIdentifier = 0;
 //!
 SystemModelNode::SystemModelNode (string_view name)
   : m_identifier (GetNextIdentifier())
-  , m_name       (name)
+  , m_name       (MakeNodeName(name))
 {
-  // ---------------- Make sure there is at least a default name
-  //
-  if (m_name.empty())
-  {
-    m_name = std::string(mast::DEFAULT_NODE_NAME);
-  }
 }
 //
 //  End of: SystemModelNode::SystemModelNode
@@ -67,6 +62,26 @@ SystemModelNode::NodeIdentifier SystemModelNode::GetNextIdentifier ()
 //
 //  End of: SystemModelNode::GetNextIdentifier
 //---------------------------------------------------------------------------
+
+
+//! Makes a valid node name
+//!
+//! @note Returns name if it is valid, a default one when not valid
+string SystemModelNode::MakeNodeName (string_view name)
+{
+  // ---------------- Make sure there is at least a default name
+  //
+  if (name.empty())
+  {
+    return string(mast::DEFAULT_NODE_NAME);
+  }
+
+  return string(name);
+}
+//
+//  End of: SystemModelNode::MakeNodeName
+//---------------------------------------------------------------------------
+
 
 
 

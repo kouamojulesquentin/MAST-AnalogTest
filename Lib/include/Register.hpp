@@ -53,12 +53,17 @@ class DLL_EXPORT Register : public SystemModelNode
   const BinaryVector& GetSequenceToSend()       const { return m_sequenceToSend;       }
   const BinaryVector& GetLastSendSequence()     const { return m_lastSentSequence;;    }
   bool                MustCheckExpected()       const { return m_mustCheckExpected;    } //!< Returns true when received data must be checked against expected data
+  uint32_t            GetMismatches()           const { return m_mismatches;           } //!< Returns current mismatch count
+
+
+
 
   // ---------------- Setters
   //
-  void SetSequenceToSend       (BinaryVector sequenceToSend)       { m_sequenceToSend       = std::move(sequenceToSend);       } //!< Sets the bits sequence to send during the next iApply cycle
+  void ResetMismatches         ()  { m_mismatches = 0; }            //!< Clears the mismatch count
+  void SetSequenceToSend       (BinaryVector sequenceToSend);       //!< Sets the bits sequence to send during the next iApply cycle
+  void SetLastReceivedSequence (BinaryVector lastReceivedSequence); //!< Sets last sequence of bits that have been shifted from SUT
   void SetExpectedSequence     (BinaryVector expectedSequence)     { m_expectedSequence     = std::move(expectedSequence);     } //!< Sets expected sequence (when updating from SUT)
-  void SetLastReceivedSequence (BinaryVector lastReceivedSequence) { m_lastReceivedSequence = std::move(lastReceivedSequence); } //!< Sets last sequence of bits that have been shifted from SUT
   void SetCheckExpected        (bool         checkExpected)        { m_mustCheckExpected    = checkExpected;                   } //!< Sets whether data updated from SUT must be check agains expected data
 
 
@@ -74,14 +79,14 @@ class DLL_EXPORT Register : public SystemModelNode
   //
   private:
 
-//+  bool               m_pendingSelect        = false;   //!< True when the tdr value has been changed following a selection action
-  bool               m_mustCheckExpected        = false;   //!< When true, it triggers a check of received vs expected data during the following shift from sut
-//+  uint32_t           m_mismatches           = 0;       //!< Number of mismatches following IEEE 1687 rules
-  BinaryVector       m_sequenceToSend;                 //!< Sequence of bits that should be shifted into SUT (during the next iApply cycle)
-  BinaryVector       m_lastSentSequence;               //!< Last sent sequence of bits: It stores the status of the SUT (SIBs, etc...) after an apply cycle
-  BinaryVector       m_lastReceivedSequence;           //!< Last sequence of bits that have been shifted from SUT
-  BinaryVector       m_expectedSequence;               //!< Sequence of expected bits when scanning from SUT
-  const BinaryVector m_bypassSequence;                 //!< Sequence to shift into the sut when no iApply cycle has been defined on the register
+  bool               m_pendingSelect     = false; //!< True when the tdr value has been changed following a selection action
+  bool               m_mustCheckExpected = false; //!< When true, it triggers a check of received vs expected data during the following shift from sut
+  uint32_t           m_mismatches        = 0;     //!< Number of mismatches following IEEE 1687 rules
+  BinaryVector       m_sequenceToSend;            //!< Sequence of bits that should be shifted into SUT (during the next iApply cycle)
+  BinaryVector       m_lastSentSequence;          //!< Last sent sequence of bits: It stores the status of the SUT (SIBs, etc...) after an apply cycle
+  BinaryVector       m_lastReceivedSequence;      //!< Last sequence of bits that have been shifted from SUT
+  BinaryVector       m_expectedSequence;          //!< Sequence of expected bits when scanning from SUT
+  const BinaryVector m_bypassSequence;            //!< Sequence to shift into the sut when no iApply cycle has been defined on the register
 };
 //
 //  End of Register class declaration

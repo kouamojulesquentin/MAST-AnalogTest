@@ -14,8 +14,9 @@
 #ifndef UTILITY_H__AB0B55F8_1F3A_4D8D_893_CA234E5BFD9D__INCLUDED_
   #define UTILITY_H__AB0B55F8_1F3A_4D8D_893_CA234E5BFD9D__INCLUDED_
 
-#include <string>
 #include <stdexcept>
+#include <string>
+#include <experimental/string_view>
 
 namespace mast
 {
@@ -35,7 +36,10 @@ class Utility final
 
   //! Formats message for (std) exception
   //!
-  static std::string MakeExceptionMessage(const char* file, uint32_t line, const char* issueKind, const char* userMessage);
+  static std::string MakeExceptionMessage(const char*                    file,
+                                          uint32_t                       line,
+                                          std::experimental::string_view issueKind,
+                                          std::experimental::string_view userMessage);
 };
 //
 //  End of Utility class declaration
@@ -46,7 +50,9 @@ class Utility final
 //! Helper to format message and throw exception
 //!
 #define THROW_IMPL(exc,msg)         throw exc(mast::Utility::MakeExceptionMessage(__FILE__, __LINE__, #exc, msg))
+
 #define THROW_INVALID_ARGUMENT(msg) THROW_IMPL(std::invalid_argument, msg)
+#define THROW_OUT_OF_RANGE(msg)     THROW_IMPL(std::out_of_range,     msg)
 
 
 #endif  // not defined UTILITY_H__AB0B55F8_1F3A_4D8D_893_CA234E5BFD9D__INCLUDED_

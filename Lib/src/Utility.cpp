@@ -28,7 +28,10 @@ using namespace mast;
 //!   File: C:\Users\Jean-Francois\Documents\Tima\NewMast\Lib\src\BinaryVector.cpp
 //!   Line: 87'
 //!
-string Utility::MakeExceptionMessage(const char* file, uint32_t line, const char* issueKind, const char* userMessage)
+string Utility::MakeExceptionMessage(const char*                    file,
+                                     uint32_t                       line,
+                                     std::experimental::string_view issueKind,
+                                     std::experimental::string_view userMessage)
 {
   std::ostringstream os;
 

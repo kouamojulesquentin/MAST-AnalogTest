@@ -19,7 +19,7 @@
 using namespace mast;
 
 
-//! Checks Register::Constructor() `...`
+//! Checks Register:: constructor
 //!
 void UT_Register::test_Constructor ()
 {

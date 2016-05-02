@@ -14,20 +14,24 @@
 #include "Linker.hpp"
 #include "SystemModelVisitor.hpp"
 #include "PathSelector.hpp"
+#include "BinaryVector.hpp"
+#include "Utility.hpp"
 
 #include <stdexcept>
+using std::shared_ptr;
+using std::experimental::string_view;
 
 using namespace mast;
 
 
 //! Initialized parent and ...
-Linker::Linker (std::string name, PathSelector* pathSelector)
+Linker::Linker (string_view name, shared_ptr<PathSelector> pathSelector)
   : ParentNode     (name)
   , m_pathSelector (pathSelector)
 {
   if (!pathSelector)
   {
-    throw std::invalid_argument("A valid pathSelector is mandatory");
+    THROW_INVALID_ARGUMENT("A valid pathSelector is mandatory");
   }
 }
 //
@@ -51,7 +55,7 @@ void Linker::CheckPathIdentifier (uint32_t pathIdentifier) const
 {
   if (pathIdentifier > m_pathsCount)
   {
-    throw std::out_of_range("pathIdentifier is too large");
+    THROW_OUT_OF_RANGE("pathIdentifier is too large");
   }
 }
 //
@@ -91,9 +95,9 @@ void Linker::Select   (uint32_t pathIdentifier)
 
 //! Returns pointer on byte-stream for last sequence shifted from sut
 //!
-const uint8_t* Linker::GetLastSequence () const
+BinaryVector Linker::GetLastSequence () const
 {
-  return nullptr;
+  return BinaryVector();
 }
 //
 //  End of: Linker::GetLastSequence
@@ -102,9 +106,9 @@ const uint8_t* Linker::GetLastSequence () const
 
 //! Returns pointer on byte-stream for next sequence to shift into sut
 //!
-const uint8_t* Linker::GetNextSequence () const
+BinaryVector Linker::GetNextSequence () const
 {
-  return nullptr;
+  return BinaryVector();
 }
 //
 //  End of: Linker::GetNextSequence

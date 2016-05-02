@@ -15,6 +15,9 @@
   #define LINKER_H__4E199FE8_B1BC_4778_4A89_2A5817AEECE__INCLUDED_
 
 #include "Chain.hpp"
+#include <memory>
+#include <experimental/string_view>
+
 namespace mast
 {
 
@@ -29,6 +32,7 @@ enum class MibEncoding
 };
 
 class PathSelector;
+class BinaryVector;
 
 //! Represents dynamically selectable chains of registers
 //! It models dynamic topologies, like for instance the ScanMux/SIB of 1687.
@@ -47,7 +51,7 @@ class Linker : public ParentNode
   public:
   ~Linker() = default;
   Linker()  = delete;
-  Linker(std::string name, PathSelector* pathSelector);
+  Linker(std::experimental::string_view name, std::shared_ptr<PathSelector> pathSelector);
 
   bool IsActive (uint32_t pathIdentifier) const ; //!< Returns true when the specified path is already selected
   void Deselect (uint32_t pathIdentifier);        //!< Requests deactivation of the specified path
@@ -66,8 +70,8 @@ class Linker : public ParentNode
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
 
      //+ (JFC April/20/2016): Move to linkerInfo
-  virtual const uint8_t* GetLastSequence() const;  //!< Returns pointer on byte-stream for last sequence shifted from sut
-  virtual const uint8_t* GetNextSequence() const;  //!< Returns pointer on byte-stream for next sequence to shift into sut
+  virtual BinaryVector GetLastSequence() const;  //!< Returns last sequence shifted from sut
+  virtual BinaryVector GetNextSequence() const;  //!< Returns sequence to shift into sut
 
   // ---------------- Protected Methods
   //
@@ -81,8 +85,8 @@ class Linker : public ParentNode
   // ---------------- Private  Fields
   //
   private:
-  uint32_t            m_pathsCount   = 0;       //!< Maximum number of derivations that can be appended to the node
-  PathSelector* const m_pathSelector = nullptr; //!< Provides genericity of how to manage path(s) selection
+  uint32_t                      m_pathsCount = 0; //!< Maximum number of derivations that can be appended to the node
+  std::shared_ptr<PathSelector> m_pathSelector;   //!< Provides genericity of how to manage path(s) selection
 };
 //
 //  End of Linker class declaration

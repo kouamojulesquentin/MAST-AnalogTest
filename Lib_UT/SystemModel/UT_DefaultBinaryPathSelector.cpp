@@ -29,14 +29,18 @@ void UT_DefaultBinaryPathSelector::test_Constructor ()
 {
   // ---------------- Setup
   //
-  auto bypassSequence = BinaryVector::CreateFromBinaryString("1111_1111:0");
+  auto bypassSequence = BinaryVector::CreateFromBinaryString("000");
   auto associatedNode = make_shared<Register>("My register name", bypassSequence);
+  auto isInverted     = false;
+  auto canSelectNone  = false;
 
   // ---------------- Exercise
   //
+  auto sut = DefaultBinaryPathSelector(associatedNode, 5, isInverted, canSelectNone);
 
   // ---------------- Verify
   //
+  TS_ASSERT_EQUALS (sut.ActiveCount(), 0);
 }
 
 //! @todo [JFC]-[April/29/2016]: Remove "No_test_yet_for_Guard" method when all tests are implemented

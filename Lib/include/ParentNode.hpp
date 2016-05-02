@@ -27,9 +27,13 @@ class ParentNode : public SystemModelNode
   public:
   //! Appends a new child node
   //! @note It forms a singly linked list of children
-  void AppendChild (SystemModelNode* pChild)
+  void AppendChild (std::shared_ptr<SystemModelNode> pChild)
   {
-    if (m_pFirstChild)
+    if (m_pOptionalChildAppender)
+    {
+      m_pOptionalChildAppender->AppendChild(pChild);
+    }
+    else if (m_pFirstChild)
     {
       m_pFirstChild->AppendSibling(pChild);
     }
@@ -39,7 +43,7 @@ class ParentNode : public SystemModelNode
     }
   }
 
-  SystemModelNode* GetFirstChild()   const { return m_pFirstChild; } //!< Returns first child or nullptr
+  std::shared_ptr<SystemModelNode> GetFirstChild()   const { return m_pFirstChild; } //!< Returns first child or nullptr
 
 
   // ---------------- Protected Methods
@@ -57,7 +61,8 @@ class ParentNode : public SystemModelNode
   // ---------------- Private  Fields
   //
   private:
-  SystemModelNode* m_pFirstChild = nullptr;
+  std::shared_ptr<SystemModelNode> m_pFirstChild;
+  std::shared_ptr<ParentNode>      m_pOptionalChildAppender;  //!< To be used when "logical child" does not include "first child"
 };
 //
 //  End of ParentNode class declaration

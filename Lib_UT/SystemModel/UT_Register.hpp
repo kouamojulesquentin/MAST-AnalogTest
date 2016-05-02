@@ -32,6 +32,18 @@ class UT_Register : public CxxTest::TestSuite
   //
   void test_Constructor ();
 
+  // ---------------- Sibbling
+  //
+
+  // ---------------- Sequence to send
+  //
+
+  // ---------------- Received
+  //
+
+  // ---------------- Mismatches
+  //
+
 };
 //
 //  End of UT_Register class declaration

@@ -39,7 +39,7 @@ SystemModelNode::SystemModelNode (string_view name)
 
 //! Appends a new sibling node
 //!
-void SystemModelNode::AppendSibling (SystemModelNode* pSibling)
+void SystemModelNode::AppendSibling (std::shared_ptr<SystemModelNode> pSibling)
 {
   if (m_pNextSibling)
   {

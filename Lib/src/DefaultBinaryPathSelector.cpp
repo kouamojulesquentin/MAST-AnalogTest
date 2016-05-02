@@ -13,6 +13,7 @@
 
 #include "DefaultBinaryPathSelector.hpp"
 #include "Register.hpp"
+#include "Utility.hpp"
 #include <stdexcept>
 #include <limits>
 
@@ -22,26 +23,59 @@ using namespace mast;
 
 //! Initializes selector for fast selection/deselection of a path
 //!
-//! @param pathCount    Number of managed paths (it must be compatible with the type defined by TablesElementType)
-//! @param isInverted   When true the bits for selecting a path are inverted (relative to the path identifier number)
-//! @param noIdle       When true zero is used to select first path, otherwise 1 is used instead (provided it is not inverted)
+//! @param associatedNode   Register that is used to drive the path multiplexer
+//! @param pathCount        Number of managed paths
+//! @param isInverted       When true the bits for selecting a path are inverted (relative to the path identifier number)
+//! @param canSelectNone    When true zero is reserved to select 'no path' otherwise 0 is used to select first path
+//!                         (provided it is not inverted)
 //!
-//+DefaultBinaryPathSelector::DefaultBinaryPathSelector(shared_ptr<SystemModelNode> associatedNode, uint32_t pathCount, bool isInverted, bool noIdle)
-DefaultBinaryPathSelector::DefaultBinaryPathSelector(Register* associatedNode, uint32_t pathCount, bool isInverted, bool noIdle)
-  : m_select      (CreateSelectTable   (pathCount, isInverted, noIdle))
-  , m_deselect    (CreateDeselectTable (pathCount, isInverted))
-  , m_muxRegister (dynamic_cast<Register*>(associatedNode))
-//+  , m_muxRegister (shared_ptr<Register>(associatedNode))
+DefaultBinaryPathSelector::DefaultBinaryPathSelector(shared_ptr<SystemModelNode> associatedNode, uint32_t pathCount, bool isInverted, bool canSelectNone)
+  : m_select        (CreateSelectTable   (pathCount, isInverted, canSelectNone))
+  , m_deselect      (CreateDeselectTable (pathCount, isInverted))
+  , m_muxRegister   (std::dynamic_pointer_cast<Register>(associatedNode))
+  , m_canSelectNone (canSelectNone)
 {
   if (!m_muxRegister)
   {
-    throw std::invalid_argument("associatedNode must be a Register");
+    THROW_INVALID_ARGUMENT("associatedNode must be a Register");
   }
+
+  //+ (begin JFC May/02/2016): What to do when initialing a path selector
+//+  if (m_canSelectNone)
+//+  {
+//+    Select(0);
+//+  }
+//+  else
+//+  {
+//+    Select(1U);
+//+  }
+  //+ (end   JFC May/02/2016):
 }
 //
 //  End of: DefaultBinaryPathSelector::DefaultBinaryPathSelector
 //---------------------------------------------------------------------------
 //
+
+
+//! Returns the number of paths that are currently active
+//!
+uint32_t DefaultBinaryPathSelector::ActiveCount () const
+{
+  uint32_t activeCount = 0u;
+
+  for (uint32_t pathId = 1u ; pathId < m_select.size() ; ++pathId)
+  {
+    if (IsActive(pathId))
+    {
+      ++activeCount;
+    }
+  }
+  return activeCount;
+}
+//
+//  End of: DefaultBinaryPathSelector::ActiveCount
+//---------------------------------------------------------------------------
+
 
 
 //! Checks that path identifier is compatible with currently managed scan paths
@@ -50,14 +84,14 @@ DefaultBinaryPathSelector::DefaultBinaryPathSelector(Register* associatedNode, u
 //!
 void DefaultBinaryPathSelector::CheckPathIdentifier (uint32_t pathIdentifier) const
 {
-  if (pathIdentifier == 0)
+  if (pathIdentifier == 0u)
   {
-    throw std::out_of_range("pathIdentifier must be >= 1");
+    THROW_OUT_OF_RANGE("pathIdentifier must be >= 1");
   }
 
   if (pathIdentifier >= m_select.size())
   {
-    throw std::out_of_range("pathIdentifier is too large");
+    THROW_OUT_OF_RANGE("pathIdentifier is too large");
   }
 }
 //
@@ -69,17 +103,18 @@ void DefaultBinaryPathSelector::CheckPathIdentifier (uint32_t pathIdentifier) co
 //!
 //! @note A slot in select LUT is reserved for no path selection
 //!
-//! @param pathCount
-//! @param isInverted
-//! @param noIdle
+//! @param pathCount        Number of managed paths
+//! @param isInverted       When true the bits for selecting a path are inverted (relative to the path identifier number)
+//! @param canSelectNone    When true zero is reserved to select 'no path' otherwise 0 is used to select first path
+//!                         (provided it is not inverted)
 //!
-DefaultBinaryPathSelector::TablesType DefaultBinaryPathSelector::CreateSelectTable (uint32_t pathCount, bool isInverted, bool noIdle)
+DefaultBinaryPathSelector::TablesType DefaultBinaryPathSelector::CreateSelectTable (uint32_t pathCount, bool isInverted, bool canSelectNone)
 {
   TablesType table(pathCount + 1);
 
   for (uint32_t pathId = 1 ; pathId <= pathCount ; ++pathId)
   {
-    table[pathId].Append(noIdle ? pathId - 1 : pathId);
+    table[pathId].Append(canSelectNone ? pathId : pathId - 1);
   }
 
   if (isInverted)
@@ -135,9 +170,9 @@ bool DefaultBinaryPathSelector::IsActive (uint32_t pathIdentifier) const
 {
   CheckPathIdentifier(pathIdentifier);
 
+  bool isActive = m_muxRegister->GetLastSendSequence() == m_select[pathIdentifier];
 
-
-  return false;
+  return isActive;
 }
 //
 //  End of: DefaultBinaryPathSelector::IsActive
@@ -150,6 +185,8 @@ bool DefaultBinaryPathSelector::IsActive (uint32_t pathIdentifier) const
 void DefaultBinaryPathSelector::Deselect (uint32_t pathIdentifier)
 {
   CheckPathIdentifier(pathIdentifier);
+
+  m_muxRegister->SetSequenceToSend(m_deselect[pathIdentifier]);
 }
 //
 //  End of: DefaultBinaryPathSelector::Deselect
@@ -162,6 +199,8 @@ void DefaultBinaryPathSelector::Deselect (uint32_t pathIdentifier)
 void DefaultBinaryPathSelector::Select (uint32_t pathIdentifier)
 {
   CheckPathIdentifier(pathIdentifier);
+
+  m_muxRegister->SetSequenceToSend(m_select[pathIdentifier]);
 }
 //
 //  End of: DefaultBinaryPathSelector::Select

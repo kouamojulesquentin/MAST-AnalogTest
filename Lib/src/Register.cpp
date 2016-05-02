@@ -15,7 +15,6 @@
 #include "Utility.hpp"
 #include <utility>
 
-using std::string;
 using std::experimental::string_view;
 
 using namespace mast;
@@ -45,6 +44,45 @@ void Register::Accept (SystemModelVisitor& visitor)
 {
   visitor.VisitRegister(*this);
 }
+
+
+//! Sets last sequence of bits that have been shifted from SUT
+//!
+//! @param lastReceivedSequence   Sequence received from SUT during last scan
+//!
+void Register::SetLastReceivedSequence (BinaryVector lastReceivedSequence)
+{
+  m_lastReceivedSequence = std::move(lastReceivedSequence);
+
+  if (m_mustCheckExpected && (m_lastReceivedSequence != m_expectedSequence))
+  {
+    ++m_mismatches;
+  }
+}
+//
+//  End of: Register::SetLastReceivedSequence
+//---------------------------------------------------------------------------
+
+//! Sets the bits sequence to send during the next iApply cycle and set selection
+//! pending flag when the value is different
+//!
+void Register::SetSequenceToSend (BinaryVector sequenceToSend)
+{
+  m_sequenceToSend = sequenceToSend;
+
+  if (m_sequenceToSend != m_lastSentSequence)
+  {
+    m_pendingSelect = true;
+  }
+}
+//
+//  End of: Register::SetSequenceToSend
+//---------------------------------------------------------------------------
+
+
+
+
+
 
 //===========================================================================
 // End of Register.cpp

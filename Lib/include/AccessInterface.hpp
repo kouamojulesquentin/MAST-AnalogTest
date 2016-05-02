@@ -32,7 +32,7 @@ class AccessInterface : public ParentNode
   public:
   ~AccessInterface() = default;
   AccessInterface()  = delete;
-  AccessInterface(std::string name, AccessInterfaceProtocol* protocol)
+  AccessInterface(std::experimental::string_view name, std::shared_ptr<AccessInterfaceProtocol> protocol)
     : ParentNode (name)
     , m_protocol (protocol)
   {}
@@ -65,8 +65,8 @@ class AccessInterface : public ParentNode
   // ---------------- Private  Fields
   //
   private:
-  uint32_t                       m_numberOfDerivations = 0;      //!< Number of nodes (derivations) accessible through the access interface
-  AccessInterfaceProtocol* const m_protocol           = nullptr; //!< Protocol to use to manage physical interface
+  uint32_t                                 m_numberOfDerivations = 0; //!< Number of nodes (derivations) accessible through the access interface
+  std::shared_ptr<AccessInterfaceProtocol> m_protocol;                //!< Protocol to use to manage physical interface
 //+  std::vector<Primitive>         m_primitives;                   //!< Primitives composing the protocol
 //+  std::vector<Command>           m_actions;                      //!< Provide Actions to access the derivations based on the set of primitives
 };

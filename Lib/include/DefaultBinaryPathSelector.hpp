@@ -30,20 +30,20 @@ class Register;
 //!
 //! @note Path identifier are one based (in range [1..path_count])
 //! @note Internal table contains a reserved slot at index zero
-class DefaultBinaryPathSelector : public PathSelector
+class DLL_EXPORT DefaultBinaryPathSelector : public PathSelector
 {
   // ---------------- Public  Methods
   //
   public:
   ~DefaultBinaryPathSelector() = default;
   DefaultBinaryPathSelector()  = delete;
-//+  DefaultBinaryPathSelector(std::shared_ptr<SystemModelNode> associatedNode, uint32_t pathCount, bool isInverted = false, bool canSelectNone = false);
-  DefaultBinaryPathSelector(Register* associatedNode, uint32_t pathCount, bool isInverted = false, bool canSelectNone = false);
+  DefaultBinaryPathSelector(std::shared_ptr<SystemModelNode> associatedNode, uint32_t pathCount, bool isInverted = false, bool canSelectNone = false);
 
   virtual bool IsActive (uint32_t pathIdentifier) const override; //!< Returns true when the specified path is already selected
   virtual void Deselect (uint32_t pathIdentifier) override;       //!< Request deactivation of the specified path
   virtual void Select   (uint32_t pathIdentifier) override;       //!< Request activation of the specified path
 
+  uint32_t ActiveCount() const;    //!< Returns the number of paths that are currently active
 
   // ---------------- Protected Methods
   //
@@ -53,9 +53,9 @@ class DefaultBinaryPathSelector : public PathSelector
   // ---------------- Private  Methods
   //
   private:
-  using TablesType = std::vector<BinaryVector > ; //!< Selection/deselection LUT types
+  using TablesType = std::vector<BinaryVector> ; //!< Selection/deselection LUT types
 
-  static TablesType CreateSelectTable   (uint32_t pathCount, bool isInverted, bool noIdle);
+  static TablesType CreateSelectTable   (uint32_t pathCount, bool isInverted, bool canSelectNone);
   static TablesType CreateDeselectTable (uint32_t pathCount, bool isInverted);
   static void       InvertTable         (TablesType& table);
 
@@ -63,10 +63,10 @@ class DefaultBinaryPathSelector : public PathSelector
   //
   private:
 
-  const TablesType          m_select;      //!< Selection LUT
-  const TablesType          m_deselect;    //!< Deselection LUT
-//+  std::shared_ptr<Register> m_muxRegister; //!< Register that drives the paths multiplexer
-  Register* m_muxRegister = nullptr; //!< Register that drives the paths multiplexer
+  const TablesType          m_select;                //!< Selection LUT
+  const TablesType          m_deselect;              //!< Deselection LUT
+  std::shared_ptr<Register> m_muxRegister;           //!< Register that drives the paths multiplexer
+  const bool                m_canSelectNone = false; //!< When true zero is reserved to select 'no path' otherwise 0 is used to select first path
 };
 //
 //  End of DefaultBinaryPathSelector class declaration

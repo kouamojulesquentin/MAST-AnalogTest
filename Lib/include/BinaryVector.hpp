@@ -17,7 +17,6 @@
 
 #include "Platform.hpp"
 #include <vector>
-#include <string>
 #include <experimental/string_view>
 
 namespace mast

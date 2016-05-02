@@ -8,12 +8,18 @@
 @REM @echo Dir: %cd%
 @REM @dir
 @set Path=C:\MinGW\bin;%Path%
+@set DestFile=Lib_UT\UT_Results\UT_Result.txt
+@set DestFileFromExe=..\..\%DestFile%
 
-Lib_UT.exe %Options% | mtee ..\..\Lib_UT\UT_Results\UT_Result.txt
+@if     "%Options%"=="--display_success"  Lib_UT.exe %Options% >      %DestFileFromExe%
+@if not "%Options%"=="--display_success"  Lib_UT.exe %Options% | mtee %DestFileFromExe%
+
 
 @set Build=
 @set Options=
 @popd
+@echo.
+@echo Results have been saved into: "%DestFile%"
 
 @goto :EOF
 :Syntax

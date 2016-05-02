@@ -41,8 +41,12 @@ namespace CxxTest
       auto bitsCount  = instance.BitsCount();
       auto bytesCount = instance.BytesCount();
 
+      if (bitsCount > 16)
+      {
+        os << std::endl;
+      }
       os << string("BinaryVector(");
-      os << bitsCount << "/" << bytesCount << " bits/bytes: ";
+      os << "b:" << bitsCount << "/B:" << bytesCount << "/";
       if (bitsCount > 80)
       {
         os << std::endl;

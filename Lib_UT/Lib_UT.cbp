@@ -76,6 +76,10 @@
 		<Unit filename="SystemModel/UT_DefaultBinaryPathSelector.hpp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="SystemModel/UT_PrettyPrinterVisitor.cpp" />
+		<Unit filename="SystemModel/UT_PrettyPrinterVisitor.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="SystemModel/UT_Register.cpp" />
 		<Unit filename="SystemModel/UT_Register.hpp">
 			<Option target="&lt;{~None~}&gt;" />

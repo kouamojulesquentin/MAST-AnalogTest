@@ -75,6 +75,9 @@
 		<Unit filename="include/PreconditionVisitor.hpp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="include/PrettyPrinterVisitor.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="include/Register.hpp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
@@ -111,6 +114,7 @@
 		<Unit filename="src/DefaultBinaryPathSelector.cpp" />
 		<Unit filename="src/Linker.cpp" />
 		<Unit filename="src/ParentNode.cpp" />
+		<Unit filename="src/PrettyPrinterVisitor.cpp" />
 		<Unit filename="src/Register.cpp" />
 		<Unit filename="src/SystemModel.cpp" />
 		<Unit filename="src/SystemModelNode.cpp" />

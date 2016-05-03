@@ -42,7 +42,7 @@ class BinaryVector;
 //! Based on its status, the LINKER can determine if each of its derivations is "active", and is therefore part of the
 //! active scan path.
 //!
-class Linker : public ParentNode
+class DLL_EXPORT Linker : public ParentNode
 {
   public:
 

@@ -62,6 +62,8 @@ class DLL_EXPORT SystemModelNode
   void ResetPending ()                                                             { m_pending = false; }                       //!< Changes state in order that IsPending will return false
   void SetName (std::experimental::string_view name)                               { m_name = MakeNodeName(name); }             //!< Changes node name
 
+  static void ResetNodeIdentifier() { sm_nextIdentifier = 0; } //!< For debug purpose only, reset node identifier (e.g to be able to check construction order, or printers...)
+
   // ---------------- Getters
   //
   void*                              GetApplicationData()   const { return m_applicationData;  }                 //!< Retrieve application specific data

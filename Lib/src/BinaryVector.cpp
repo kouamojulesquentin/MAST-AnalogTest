@@ -404,7 +404,8 @@ bool BinaryVector::operator== (const BinaryVector& rhs) const
   }
 
   bool areEqual = m_data == rhs.m_data;
-
+  //! @todo [JFC]-[May/02/2016]: Does not compare unused bits
+  //!
   return areEqual;
 }
 //

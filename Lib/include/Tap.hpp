@@ -20,13 +20,17 @@ namespace mast
 {
 //! Represent JTAG Test Access Point
 //!
-class Tap : public AccessInterface
+class DLL_EXPORT Tap : public AccessInterface
 {
   // ---------------- Public  Methods
   //
   public:
   ~Tap() = default;
-  Tap()  = default;
+  Tap()  = delete;
+  Tap(std::experimental::string_view name, std::shared_ptr<AccessInterfaceProtocol> protocol)
+    : AccessInterface(name, protocol)
+  {
+  }
 
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
 

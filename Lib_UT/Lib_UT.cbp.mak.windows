@@ -40,9 +40,9 @@ OBJDIR_RELEASE = ..\\obj\\Release
 DEP_RELEASE = 
 OUT_RELEASE = ..\\bin\\Release\\Lib_UT.exe
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)\\Generated\\Runner.o $(OBJDIR_DEBUG)\\SystemModel\\UT_DefaultBinaryPathSelector.o $(OBJDIR_DEBUG)\\SystemModel\\UT_Register.o $(OBJDIR_DEBUG)\\Utility\\UT_BinaryVector.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)\\Generated\\Runner.o $(OBJDIR_DEBUG)\\SystemModel\\UT_DefaultBinaryPathSelector.o $(OBJDIR_DEBUG)\\SystemModel\\UT_PrettyPrinterVisitor.o $(OBJDIR_DEBUG)\\SystemModel\\UT_Register.o $(OBJDIR_DEBUG)\\Utility\\UT_BinaryVector.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)\\Generated\\Runner.o $(OBJDIR_RELEASE)\\SystemModel\\UT_DefaultBinaryPathSelector.o $(OBJDIR_RELEASE)\\SystemModel\\UT_Register.o $(OBJDIR_RELEASE)\\Utility\\UT_BinaryVector.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)\\Generated\\Runner.o $(OBJDIR_RELEASE)\\SystemModel\\UT_DefaultBinaryPathSelector.o $(OBJDIR_RELEASE)\\SystemModel\\UT_PrettyPrinterVisitor.o $(OBJDIR_RELEASE)\\SystemModel\\UT_Register.o $(OBJDIR_RELEASE)\\Utility\\UT_BinaryVector.o
 
 all: debug release
 
@@ -67,6 +67,9 @@ $(OBJDIR_DEBUG)\\Generated\\Runner.o: Generated\\Runner.cpp
 
 $(OBJDIR_DEBUG)\\SystemModel\\UT_DefaultBinaryPathSelector.o: SystemModel\\UT_DefaultBinaryPathSelector.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel\\UT_DefaultBinaryPathSelector.cpp -o $(OBJDIR_DEBUG)\\SystemModel\\UT_DefaultBinaryPathSelector.o
+
+$(OBJDIR_DEBUG)\\SystemModel\\UT_PrettyPrinterVisitor.o: SystemModel\\UT_PrettyPrinterVisitor.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel\\UT_PrettyPrinterVisitor.cpp -o $(OBJDIR_DEBUG)\\SystemModel\\UT_PrettyPrinterVisitor.o
 
 $(OBJDIR_DEBUG)\\SystemModel\\UT_Register.o: SystemModel\\UT_Register.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel\\UT_Register.cpp -o $(OBJDIR_DEBUG)\\SystemModel\\UT_Register.o
@@ -99,6 +102,9 @@ $(OBJDIR_RELEASE)\\Generated\\Runner.o: Generated\\Runner.cpp
 
 $(OBJDIR_RELEASE)\\SystemModel\\UT_DefaultBinaryPathSelector.o: SystemModel\\UT_DefaultBinaryPathSelector.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel\\UT_DefaultBinaryPathSelector.cpp -o $(OBJDIR_RELEASE)\\SystemModel\\UT_DefaultBinaryPathSelector.o
+
+$(OBJDIR_RELEASE)\\SystemModel\\UT_PrettyPrinterVisitor.o: SystemModel\\UT_PrettyPrinterVisitor.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel\\UT_PrettyPrinterVisitor.cpp -o $(OBJDIR_RELEASE)\\SystemModel\\UT_PrettyPrinterVisitor.o
 
 $(OBJDIR_RELEASE)\\SystemModel\\UT_Register.o: SystemModel\\UT_Register.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel\\UT_Register.cpp -o $(OBJDIR_RELEASE)\\SystemModel\\UT_Register.o

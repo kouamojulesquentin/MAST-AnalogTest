@@ -13,8 +13,12 @@
 #ifndef SYSTEMMODELVISITOR_H__D20D9DFE_5339_4A93_CAAB_34F1335416B2__INCLUDED_
   #define SYSTEMMODELVISITOR_H__D20D9DFE_5339_4A93_CAAB_34F1335416B2__INCLUDED_
 
+#include "Platform.hpp"
+
 namespace mast
 {
+class SystemModelNode;
+class ParentNode;
 class AccessInterface;
 class Chain;
 class Linker;
@@ -23,7 +27,7 @@ class Tap;
 
 //! System model visitors interface
 //!
-class SystemModelVisitor
+class DLL_EXPORT SystemModelVisitor
 {
   // ---------------- Public  Methods
   //

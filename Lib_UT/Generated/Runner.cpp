@@ -292,6 +292,61 @@ public:
  void runTest() { suite_UT_DefaultBinaryPathSelector.test_Constructor(); }
 } testDescription_suite_UT_DefaultBinaryPathSelector_test_Constructor;
 
+#include "C:\Users\Jean-Francois\Documents\Tima\NewMast\Lib_UT\SystemModel\UT_PrettyPrinterVisitor.hpp"
+
+static UT_PrettyPrinterVisitor suite_UT_PrettyPrinterVisitor;
+
+static CxxTest::List Tests_UT_PrettyPrinterVisitor = { 0, 0 };
+CxxTest::StaticSuiteDescription suiteDescription_UT_PrettyPrinterVisitor( ".//SystemModel/UT_PrettyPrinterVisitor.hpp", 22, "UT_PrettyPrinterVisitor", suite_UT_PrettyPrinterVisitor, Tests_UT_PrettyPrinterVisitor );
+
+static class TestDescription_suite_UT_PrettyPrinterVisitor_test_Constructor : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_PrettyPrinterVisitor_test_Constructor() : CxxTest::RealTestDescription( Tests_UT_PrettyPrinterVisitor, suiteDescription_UT_PrettyPrinterVisitor, 33, "test_Constructor" ) {}
+ void runTest() { suite_UT_PrettyPrinterVisitor.test_Constructor(); }
+} testDescription_suite_UT_PrettyPrinterVisitor_test_Constructor;
+
+static class TestDescription_suite_UT_PrettyPrinterVisitor_test_VisitAccessInterface : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_PrettyPrinterVisitor_test_VisitAccessInterface() : CxxTest::RealTestDescription( Tests_UT_PrettyPrinterVisitor, suiteDescription_UT_PrettyPrinterVisitor, 37, "test_VisitAccessInterface" ) {}
+ void runTest() { suite_UT_PrettyPrinterVisitor.test_VisitAccessInterface(); }
+} testDescription_suite_UT_PrettyPrinterVisitor_test_VisitAccessInterface;
+
+static class TestDescription_suite_UT_PrettyPrinterVisitor_test_VisitChain : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_PrettyPrinterVisitor_test_VisitChain() : CxxTest::RealTestDescription( Tests_UT_PrettyPrinterVisitor, suiteDescription_UT_PrettyPrinterVisitor, 38, "test_VisitChain" ) {}
+ void runTest() { suite_UT_PrettyPrinterVisitor.test_VisitChain(); }
+} testDescription_suite_UT_PrettyPrinterVisitor_test_VisitChain;
+
+static class TestDescription_suite_UT_PrettyPrinterVisitor_test_VisitLinker : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_PrettyPrinterVisitor_test_VisitLinker() : CxxTest::RealTestDescription( Tests_UT_PrettyPrinterVisitor, suiteDescription_UT_PrettyPrinterVisitor, 39, "test_VisitLinker" ) {}
+ void runTest() { suite_UT_PrettyPrinterVisitor.test_VisitLinker(); }
+} testDescription_suite_UT_PrettyPrinterVisitor_test_VisitLinker;
+
+static class TestDescription_suite_UT_PrettyPrinterVisitor_test_VisitRegister : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_PrettyPrinterVisitor_test_VisitRegister() : CxxTest::RealTestDescription( Tests_UT_PrettyPrinterVisitor, suiteDescription_UT_PrettyPrinterVisitor, 40, "test_VisitRegister" ) {}
+ void runTest() { suite_UT_PrettyPrinterVisitor.test_VisitRegister(); }
+} testDescription_suite_UT_PrettyPrinterVisitor_test_VisitRegister;
+
+static class TestDescription_suite_UT_PrettyPrinterVisitor_test_VisitTap : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_PrettyPrinterVisitor_test_VisitTap() : CxxTest::RealTestDescription( Tests_UT_PrettyPrinterVisitor, suiteDescription_UT_PrettyPrinterVisitor, 41, "test_VisitTap" ) {}
+ void runTest() { suite_UT_PrettyPrinterVisitor.test_VisitTap(); }
+} testDescription_suite_UT_PrettyPrinterVisitor_test_VisitTap;
+
+static class TestDescription_suite_UT_PrettyPrinterVisitor_test_VisitChain_with_Register : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_PrettyPrinterVisitor_test_VisitChain_with_Register() : CxxTest::RealTestDescription( Tests_UT_PrettyPrinterVisitor, suiteDescription_UT_PrettyPrinterVisitor, 45, "test_VisitChain_with_Register" ) {}
+ void runTest() { suite_UT_PrettyPrinterVisitor.test_VisitChain_with_Register(); }
+} testDescription_suite_UT_PrettyPrinterVisitor_test_VisitChain_with_Register;
+
+static class TestDescription_suite_UT_PrettyPrinterVisitor_test_VisitChain_with_Registers : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_PrettyPrinterVisitor_test_VisitChain_with_Registers() : CxxTest::RealTestDescription( Tests_UT_PrettyPrinterVisitor, suiteDescription_UT_PrettyPrinterVisitor, 49, "test_VisitChain_with_Registers" ) {}
+ void runTest() { suite_UT_PrettyPrinterVisitor.test_VisitChain_with_Registers(); }
+} testDescription_suite_UT_PrettyPrinterVisitor_test_VisitChain_with_Registers;
+
 #include "C:\Users\Jean-Francois\Documents\Tima\NewMast\Lib_UT\SystemModel\UT_Register.hpp"
 
 static UT_Register suite_UT_Register;

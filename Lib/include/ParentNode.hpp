@@ -20,7 +20,7 @@ namespace mast
 {
 //! Abstract class to represent nodes that can have children
 //!
-class ParentNode : public SystemModelNode
+class DLL_EXPORT ParentNode : public SystemModelNode
 {
   // ---------------- Public  Methods
   //

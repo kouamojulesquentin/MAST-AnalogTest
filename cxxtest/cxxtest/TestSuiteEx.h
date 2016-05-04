@@ -281,8 +281,12 @@ namespace CxxTest
         auto inputNoRefWT = traits_NoReferenceWrapper(input);
         auto inputNoRefW  = inputNoRefWT.get();                 // Remove potential reference_wrapper (added by split when using TS_DATA_DRIVEN_TEST_MIX)
 
+        // ---------------- Get printable value for input sample
+        //
+        auto previousState = setStringResultsOnNewLine(false);
         auto inputTraits = traits_NoPointer(inputNoRefW);
         auto inputAsText = inputTraits.asString();
+        setStringResultsOnNewLine(previousState);
 
         testDescription.setUp();
         tracker.enterDataDrivenTest(testId, inputAsText);
@@ -333,9 +337,12 @@ namespace CxxTest
       _TS_TRY_DDT
       {
         TestStateGuard stateGuard;
+
+        auto previousState = setStringResultsOnNewLine(false);
         auto inputNoRefW = traits_NoReferenceWrapper(sample).get();  // Remove potential reference_wrapper (for better result display)
         auto inputTraits = traits_NoPointer(inputNoRefW);
         auto inputAsText = inputTraits.asString();
+        setStringResultsOnNewLine(previousState);
 
         testDescription.setUp();
         tracker.enterDataDrivenTest(testId, inputAsText);

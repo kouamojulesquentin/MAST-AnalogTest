@@ -94,7 +94,9 @@ public:
     ~ValueTraits(){}
     ValueTraits(const CXXTEST_STD(string)& s)
     {
-        *this << "\"";
+        const char* bound = stringResultsOnNewLine() ? "\n" : "\"";
+
+        *this << bound;
         for (unsigned i = 0; i < s.length(); ++ i)
         {
             if (is_mb(s, i))
@@ -113,7 +115,7 @@ public:
                 *this << c;
             }
         }
-        *this << "\"";
+        *this << bound;
     }
 };
 

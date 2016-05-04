@@ -55,10 +55,11 @@ enum  CharacterMapping
   MAP_CHARS_MINIMAL,  //!< Only re-maps those that would make the display "unreadable"
 };
 
-CharacterMapping charactersMapping();                               //!< Returns current character mapping
-CharacterMapping setCharactersMapping(CharacterMapping newMapping); //!< Changes characters mapping mode
-CharacterMapping setDefaultCharactersMapping();                     //!< Restores default characters mapping mode
-
+CharacterMapping charactersMapping();                                 //!< Returns current character mapping
+CharacterMapping setCharactersMapping(CharacterMapping newMapping);   //!< Changes characters mapping mode
+CharacterMapping setDefaultCharactersMapping();                       //!< Restores default characters mapping mode
+bool             stringResultsOnNewLine();                            //!< Returns true when a new line is used (instead of quote) when displaying string results (either got and expected)
+bool             setStringResultsOnNewLine(bool newState);            //!< Tells whether a new line is used (instead of quote) when displaying string results
 
 // Char representation of a digit
 //
@@ -157,11 +158,12 @@ class ValueTraits<char*>
       }
       else
       {
-        char* pFreePos = m_valueAsString;
+        char*       pFreePos = m_valueAsString;
+        const char* bound    = stringResultsOnNewLine() ? "\n" : "\"";
 
-        pFreePos = copyStringN(pFreePos, "\"",  BUFFER_SIZE);
+        pFreePos = copyStringN(pFreePos, bound, BUFFER_SIZE);
         pFreePos = copyStringN(pFreePos, pText, BUFFER_SIZE);
-        pFreePos = copyStringN(pFreePos, "\"",  BUFFER_SIZE);
+        pFreePos = copyStringN(pFreePos, bound, BUFFER_SIZE);
       }
     }
 

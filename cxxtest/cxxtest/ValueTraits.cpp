@@ -16,7 +16,7 @@ namespace CxxTest
 {
 
 static CharacterMapping currentCharacterMapping = MAP_CHARS_FULL;
-
+static bool             stringResultsOnNewLines = false;
 
 //! Returns current character mapping
 CharacterMapping charactersMapping ()
@@ -40,6 +40,19 @@ CharacterMapping setCharactersMapping ()
   return setCharactersMapping(CharacterMapping::MAP_CHARS_FULL);
 }
 
+//!< Returns true when a new line is used (instead of quote) when displaying string
+//!< results (either got and expected)
+//!<
+bool stringResultsOnNewLine() { return stringResultsOnNewLines; }
+
+//!< Tells whether a new line is used (instead of quote) when displaying string results
+//!<
+bool setStringResultsOnNewLine(bool newState)
+{
+  bool previousState = stringResultsOnNewLines;
+  stringResultsOnNewLines = newState;
+  return previousState;
+}
 
 //
 // Non-inline functions from ValueTraits.h

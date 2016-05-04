@@ -49,6 +49,34 @@ namespace CxxTest
     static size_t size(const T[N]) { return N; }
   };
 
+  //! ValueTraits: signed long long (64 bits)
+  //!
+  CXXTEST_TEMPLATE_INSTANTIATION
+  class ValueTraits<signed long long>
+  {
+      typedef signed long long T;
+      char _asString[80];   // Must support binary display of 64 bits
+  public:
+      ValueTraits(T t) { numberToString<T>(t, _asString); }
+      ~ValueTraits() {}
+      const char* asString(void) const { return _asString; }
+  };
+
+
+  //! ValueTraits: unsigned long long (64 bits)
+  //!
+  CXXTEST_TEMPLATE_INSTANTIATION
+  class ValueTraits<unsigned long long>
+  {
+      typedef unsigned long long T;
+      char _asString[80];   // Must support binary display of 64 bits
+  public:
+      ValueTraits(T t) { numberToString<T>(t, _asString); }
+      ~ValueTraits() {}
+      const char* asString(void) const { return _asString; }
+  };
+
+
   //! Defines a variant of ValueTrait that avoid displaying pointer.
   //!
   //! @note This instance of template is not intended to be instantiated

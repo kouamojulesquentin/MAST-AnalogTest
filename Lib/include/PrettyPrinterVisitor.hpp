@@ -62,7 +62,9 @@ class DLL_EXPORT PrettyPrinterVisitor : public SystemModelVisitor
   }
 
   void StreamBinaryVector (std::experimental::string_view name, const BinaryVector&    bits);
+  void StreamNodeCommon   (const SystemModelNode&         node);
   void StreamNodeHeader   (std::experimental::string_view type, const SystemModelNode& node);
+  void StreamParentNode   (std::experimental::string_view type, const ParentNode&      parentNode);
 
   // ---------------- Private  Fields
   //

@@ -94,9 +94,30 @@ void PrettyPrinterVisitor::StreamBinaryVector (std::experimental::string_view na
 //---------------------------------------------------------------------------
 
 
+//! Prints SystemModelNode data
+//!
+//! @param node   The node for which header is to be streamed
+//!
+void PrettyPrinterVisitor::StreamNodeCommon (const SystemModelNode& node)
+{
+  if (m_verbose)
+  {
+    m_os.setf(std::ios_base::boolalpha);
+    m_os << ", pending: "       << node.IsPending();
+    m_os << ", has_condition: " << node.HasConditions();
+    m_os << ", priority: "      << node.GetPriority();
+  }
+}
+//
+//  End of: PrettyPrinterVisitor::StreamNodeCommon
+//---------------------------------------------------------------------------
+
+
 
 //! Streams node common information: identifier, name and type
 //!
+//! @param type   Text representation of the node type
+//! @param node   The node for which header is to be streamed
 //!
 void PrettyPrinterVisitor::StreamNodeHeader(std::experimental::string_view type, const SystemModelNode& node)
 {
@@ -117,14 +138,35 @@ void PrettyPrinterVisitor::StreamNodeHeader(std::experimental::string_view type,
   m_first = false;
 }
 
+
+//! Appends content of parent node in text representation and visits
+//! sub-nodes
+//!
+//! @param type   Text representation of the node type
+//! @param node   The node for which header is to be streamed
+//!
+void PrettyPrinterVisitor::StreamParentNode (std::experimental::string_view type, const ParentNode& parentNode)
+{
+  StreamNodeHeader(type, parentNode);
+
+  if (m_verbose)
+  {
+    StreamNodeCommon(parentNode);
+  }
+  PrintChildren(parentNode);
+}
+//
+//  End of: PrettyPrinterVisitor::StreamParentNode
+//---------------------------------------------------------------------------
+
+
+
 //! Appends content of AccessInterface node in text representation and visits
 //! sub-nodes
 //!
 void PrettyPrinterVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 {
-  StreamNodeHeader("Access_I", accessInterface);
-
-  PrintChildren(accessInterface);
+  StreamParentNode("Access_I", accessInterface);
 }
 
 //! Appends content of Chain node in text representation and visits
@@ -132,9 +174,7 @@ void PrettyPrinterVisitor::VisitAccessInterface (AccessInterface& accessInterfac
 //!
 void PrettyPrinterVisitor::VisitChain (Chain& chain)
 {
-  StreamNodeHeader("Chain", chain);
-
-  PrintChildren(chain);
+  StreamParentNode("Chain", chain);
 }
 
 //! Appends content of Linker node in text representation and visits
@@ -142,9 +182,7 @@ void PrettyPrinterVisitor::VisitChain (Chain& chain)
 //!
 void PrettyPrinterVisitor::VisitLinker (Linker& linker)
 {
-  StreamNodeHeader("Linker", linker);
-
-  PrintChildren(linker);
+  StreamParentNode("Linker", linker);
 }
 
 //! Appends content of Register node in text representation and visits
@@ -169,12 +207,7 @@ void PrettyPrinterVisitor::VisitRegister (Register& reg)
     AlignOnNewLine(targetPosInLine); StreamBinaryVector("last_to_sut:       ", reg.GetLastToSut());
     AlignOnNewLine(targetPosInLine); StreamBinaryVector("last_from_sut:     ", reg.GetLastFromSut());
     AlignOnNewLine(targetPosInLine); StreamBinaryVector("expected_from_sut: ", reg.GetExpectedFromSut());
-
-    AlignOnNewLine(targetPosInLine);
-    m_os.setf(std::ios_base::boolalpha);
-    m_os << ", pending: "       << reg.IsPending();
-    m_os << ", has_condition: " << reg.HasConditions();
-    m_os << ", priority: "      << reg.GetPriority();
+    AlignOnNewLine(targetPosInLine); StreamNodeCommon(reg);
   }
 }
 
@@ -183,9 +216,7 @@ void PrettyPrinterVisitor::VisitRegister (Register& reg)
 //!
 void PrettyPrinterVisitor::VisitTap (Tap& tap)
 {
-  StreamNodeHeader("Tap", tap);
-
-  PrintChildren(tap);
+  StreamParentNode("Tap", tap);
 }
 
 //===========================================================================

@@ -22,27 +22,30 @@ namespace CxxTest
 {
 //! Saves, tests related, global variables in constructor and restores them in destructor
 //!
-//! @note Supports data driven tests global variables even though it is not available by default;
+//! @note Supports data driven tests global variables even though it is not available by default
 //!       This is necessary to be sure that following data driven test used default settings (whatever where changes have been made)
 //!
 class TestStateGuard
 {
-    unsigned _maxDumpSize;
-    bool     _abortTestOnFail;
-    bool     _abortDataDrivenTestsOnFailure;
+    unsigned         _maxDumpSize;
+    bool             _abortTestOnFail;
+    bool             _abortDataDrivenTestsOnFailure;
+    CharacterMapping _characterMapping;
 
 public:
     TestStateGuard()
       : _maxDumpSize                   (maxDumpSize())
       , _abortTestOnFail               (abortTestOnFail())
       , _abortDataDrivenTestsOnFailure (abortDataDrivenTestsOnFailure())
+      , _characterMapping              (charactersMapping())
     {}
 
     virtual ~TestStateGuard()
     {
-        setMaxDumpSize(_maxDumpSize);
+        setMaxDumpSize                   (_maxDumpSize);
         setAbortTestOnFail               (_abortTestOnFail);
         setAbortDataDrivenTestsOnFailure (_abortDataDrivenTestsOnFailure);
+        setCharactersMapping             (_characterMapping);
     }
 };
 } // End of namespace CxxTest

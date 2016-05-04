@@ -14,6 +14,33 @@
 
 namespace CxxTest
 {
+
+static CharacterMapping currentCharacterMapping = MAP_CHARS_FULL;
+
+
+//! Returns current character mapping
+CharacterMapping charactersMapping ()
+{
+  return currentCharacterMapping;
+}
+
+
+//! Changes characters mapping mode
+//! @see charToString
+CharacterMapping setCharactersMapping (CharacterMapping newMapping)
+{
+  CharacterMapping prev = currentCharacterMapping;
+  currentCharacterMapping = newMapping;
+  return currentCharacterMapping;
+}
+
+//! Restores default characters mapping mode
+CharacterMapping setCharactersMapping ()
+{
+  return setCharactersMapping(CharacterMapping::MAP_CHARS_FULL);
+}
+
+
 //
 // Non-inline functions from ValueTraits.h
 //
@@ -86,35 +113,55 @@ bool stringsEqual(const char* s1, const char* s2)
 
 char* charToString(unsigned long c, char* s)
 {
+    // ---------------- Minimal character mapping
+    //
     switch (c)
     {
-    case '\\': return copyString(s, "\\\\");
-    case '\"': return copyString(s, "\\\"");
-    case '\'': return copyString(s, "\\\'");
-    case '\0': return copyString(s, "\\0");
-    case '\a': return copyString(s, "\\a");
-    case '\b': return copyString(s, "\\b");
-    case '\n': return copyString(s, "\\n");
-    case '\r': return copyString(s, "\\r");
-    case '\t': return copyString(s, "\\t");
+      case '\0': return copyString(s, "\\0");
+      case '\a': return copyString(s, "\\a");
+      case '\b': return copyString(s, "\\b");
     }
-    if (c >= 32 && c <= 127)
+
+    auto keepCharAsIs = false;
+    if (currentCharacterMapping == CharacterMapping::MAP_CHARS_FULL)
+    {
+      switch (c)
+      {
+        case '\\': return copyString(s, "\\\\");
+        case '\"': return copyString(s, "\\\"");
+        case '\'': return copyString(s, "\\\'");
+        case '\n': return copyString(s, "\\n");
+        case '\r': return copyString(s, "\\r");
+        case '\t': return copyString(s, "\\t");
+      }
+    }
+    else
+    {
+      switch (c)
+      {
+        case '\n':
+        case '\r':
+        case '\t':
+          keepCharAsIs = true;
+          break;
+      }
+    }
+
+    if ((c >= 32 && c <= 127) || keepCharAsIs)
     {
         s[0] = (char)c;
         s[1] = '\0';
         return s + 1;
     }
-    else
+
+    s[0] = '\\';
+    s[1] = 'x';
+    if (c < 0x10)
     {
-        s[0] = '\\';
-        s[1] = 'x';
-        if (c < 0x10)
-        {
-            s[2] = '0';
-            ++ s;
-        }
-        return numberToString(c, s + 2, 16UL);
+        s[2] = '0';
+        ++ s;
     }
+    return numberToString(c, s + 2, 16UL);
 }
 
 char* charToString(char c, char* s)

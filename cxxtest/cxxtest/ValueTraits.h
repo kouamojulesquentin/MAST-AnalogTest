@@ -45,6 +45,20 @@ namespace CxxTest
 #define TS_AS_STRING(x)           CxxTest::traits(x).asString()
 #define TS_AS_STRING_NO_QUOTES(x) CxxTest::traits_no_quotes(x).asString()
 
+//! Non visible and some other character like quotes, backslash... are remapped to equivalent escaped string char.
+//! This enum defines which kind of characters are remapped
+//!
+//! @see charToString
+enum  CharacterMapping
+{
+  MAP_CHARS_FULL,     //!< By default there is 9 characters that are re-mapped to escaped and non ASCII and control are replaced with their hex value
+  MAP_CHARS_MINIMAL,  //!< Only re-maps those that would make the display "unreadable"
+};
+
+CharacterMapping charactersMapping();                               //!< Returns current character mapping
+CharacterMapping setCharactersMapping(CharacterMapping newMapping); //!< Changes characters mapping mode
+CharacterMapping setDefaultCharactersMapping();                     //!< Restores default characters mapping mode
+
 
 // Char representation of a digit
 //

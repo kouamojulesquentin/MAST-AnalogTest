@@ -159,7 +159,7 @@ bool DefaultBinaryPathSelector::IsActive (uint32_t pathIdentifier) const
 {
   CheckPathIdentifier(pathIdentifier);
 
-  bool isActive = m_muxRegister->GetLastSendSequence() == m_select[pathIdentifier];
+  bool isActive = m_muxRegister->GetLastToSut() == m_select[pathIdentifier];
 
   return isActive;
 }

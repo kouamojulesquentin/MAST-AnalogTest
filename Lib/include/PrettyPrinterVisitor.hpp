@@ -22,6 +22,7 @@
 
 namespace mast
 {
+class BinaryVector;
 
 //! System model visitors for creation of a text, readable, and hierarchical
 //! representation of the system mode tree
@@ -40,7 +41,11 @@ class DLL_EXPORT PrettyPrinterVisitor : public SystemModelVisitor
   virtual void VisitRegister        (Register&        reg)             override;
   virtual void VisitTap             (Tap&             tap)             override;
 
-  std::string GetPrettyPrint() const { return m_os.str(); }     //!< Returns currently visited nodes representation
+  std::string GetPrettyPrint() const { return m_os.str(); }       //!< Returns currently visited nodes representation
+  bool        GetVerbose()     const { return m_verbose;  }       //!< Returns whether verbose mode is active
+
+  void        SetVerbose (bool verbose) { m_verbose = verbose; }  //!< Changes verbosity mode
+
 
   // ---------------- Private  Methods
   //
@@ -48,18 +53,25 @@ class DLL_EXPORT PrettyPrinterVisitor : public SystemModelVisitor
 
   void PrintChildren (const ParentNode& parentNode);
 
+  void AlignOnNewLine  (std::fpos<int> targetPos);
+  void AlignRelativeTo (std::fpos<int> refPos, std::fpos<int> targetPos);
+
   void StreamDepth()
   {
-    m_os << std::string(m_depth * 2, '-');
+    m_os << std::string(m_depth, '-');
   }
 
-  void StreamNodeHeader(std::experimental::string_view type, const SystemModelNode& node);
+  void StreamBinaryVector (std::experimental::string_view name, const BinaryVector&    bits);
+  void StreamNodeHeader   (std::experimental::string_view type, const SystemModelNode& node);
 
   // ---------------- Private  Fields
   //
   private:
-  uint32_t           m_depth = 0u; //!< Current nodes tree depth
-  std::ostringstream m_os;         //!< Stream to build up a representation of visited system model nodes
+  uint32_t           m_depth    = 0u;    //!< Current nodes tree depth
+  std::ostringstream m_os;               //!< Stream to build up a representation of visited system model nodes
+  std::fpos<int>     m_startPos = 0;     //!< Position, in stream, of first character of current line
+  bool               m_verbose  = false; //!< When true, more information are printed
+  bool               m_first    = true;  //!< True when nothing as been streamed yet (useful to add first new line)
 };
 //
 //  End of PrettyPrinterVisitor class declaration

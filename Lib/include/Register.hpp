@@ -47,13 +47,13 @@ class DLL_EXPORT Register : public SystemModelNode
 
   // ---------------- Getters
   //
-  const BinaryVector& GetBypassSequence()       const { return m_bypass;            } //!< Returns bypass sequence
-  const BinaryVector& GetExpectedSequence()     const { return m_expectedFromSut;   } //!< Returns expected sequence
-  const BinaryVector& GetLastReceivedSequence() const { return m_lastFromSut;       }
-  const BinaryVector& GetSequenceToSend()       const { return m_nextToSut;         }
-  const BinaryVector& GetLastSendSequence()     const { return m_lastToSut;         }
-  bool                MustCheckExpected()       const { return m_mustCheckExpected; } //!< Returns true when received data must be checked against expected data
-  uint32_t            GetMismatches()           const { return m_mismatches;        } //!< Returns current mismatch count
+  const BinaryVector& GetBypassSequence()  const { return m_bypass;            } //!< Returns bypass sequence
+  const BinaryVector& GetExpectedFromSut() const { return m_expectedFromSut;   } //!< Returns expected sequence
+  const BinaryVector& GetLastFromSut()     const { return m_lastFromSut;       }
+  const BinaryVector& GetNextToSut()       const { return m_nextToSut;         }
+  const BinaryVector& GetLastToSut()       const { return m_lastToSut;         }
+  bool                MustCheckExpected()  const { return m_mustCheckExpected; } //!< Returns true when received data must be checked against expected data
+  uint32_t            GetMismatches()      const { return m_mismatches;        } //!< Returns current mismatch count
 
 
 

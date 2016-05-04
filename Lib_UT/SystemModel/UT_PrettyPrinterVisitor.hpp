@@ -38,6 +38,7 @@ class UT_PrettyPrinterVisitor : public CxxTest::TestSuite
   void test_VisitChain ();
   void test_VisitLinker ();
   void test_VisitRegister ();
+  void test_VisitRegister_Verbose ();
   void test_VisitTap ();
 
   // ---------------- Visit - Two nodes
@@ -47,6 +48,7 @@ class UT_PrettyPrinterVisitor : public CxxTest::TestSuite
   // ---------------- Visit - Several nodes
   //
   void test_VisitChain_with_Registers ();
+  void test_VisitChain_with_Registers_Verbose ();
 
   // ---------------- Private  Methods
   //

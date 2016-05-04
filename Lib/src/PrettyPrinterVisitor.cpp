@@ -44,15 +44,77 @@ void PrettyPrinterVisitor::PrintChildren (const ParentNode& parentNode)
 //---------------------------------------------------------------------------
 
 
+//! Adds spaces to force next insertion point to be at target position relative
+//! to reference position
+//!
+//! @param refPos       Reference position
+//! @param targetPos    Target position relative to refPos
+//!
+void PrettyPrinterVisitor::AlignRelativeTo (std::fpos<int> refPos, std::fpos<int> targetPos)
+{
+  auto curPos      = m_os.tellp();
+  auto startLength = curPos - refPos;
 
+  if (startLength < targetPos)
+  {
+    m_os << string(targetPos - startLength, ' ');
+  }
+}
+//
+//  End of: PrettyPrinterVisitor::AlignRelativeTo
+//---------------------------------------------------------------------------
+
+
+//! Inserts new line and align position on target position oin newly added line
+//!
+//! @param targetPos  Position set after adding a new line
+//!
+void PrettyPrinterVisitor::AlignOnNewLine (std::fpos<int> targetPos)
+{
+  m_os << std::endl;
+  m_os << string(targetPos, ' ');
+}
+//
+//  End of: PrettyPrinterVisitor::AlignOnNewLine
+//---------------------------------------------------------------------------
+
+
+
+//! Streams content of binary vector, prefixed with given name
+//!
+//! @param bits  Binary vector to print
+//! @param name  Name given to the binary vector (can be empty)
+//!
+void PrettyPrinterVisitor::StreamBinaryVector (std::experimental::string_view name, const BinaryVector& bits)
+{
+  m_os << ", " << name << bits.DataAsBinaryString(":", "_");
+}
+//
+//  End of: PrettyPrinterVisitor::StreamBinaryVector
+//---------------------------------------------------------------------------
+
+
+
+//! Streams node common information: identifier, name and type
+//!
+//!
 void PrettyPrinterVisitor::StreamNodeHeader(std::experimental::string_view type, const SystemModelNode& node)
 {
-  constexpr char nameLead  = '"';
-  constexpr char nameTrail = '"';
+  if (!m_first)
+  {
+    m_os << std::endl;
+  }
+
+  m_startPos = m_os.tellp();
   StreamDepth();
-  m_os << type << '(';
-  m_os << node.GetIdentifier() << ", ";
-  m_os << nameLead << node.GetName() << nameTrail;
+
+  m_os << '(' << node.GetIdentifier() << ") ";
+  m_os << "[" << type                 << "]";
+
+  AlignRelativeTo(m_startPos, 15 + m_depth);
+  m_os << '"' << node.GetName()       << '"';
+
+  m_first = false;
 }
 
 //! Appends content of AccessInterface node in text representation and visits
@@ -60,9 +122,7 @@ void PrettyPrinterVisitor::StreamNodeHeader(std::experimental::string_view type,
 //!
 void PrettyPrinterVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 {
-  StreamNodeHeader("AccessInterface", accessInterface);
-//+  m_os << ", " << reg.GetBypassSequence().DataAsBinaryString();
-  m_os << ")"  << std::endl;
+  StreamNodeHeader("Access_I", accessInterface);
 
   PrintChildren(accessInterface);
 }
@@ -73,7 +133,6 @@ void PrettyPrinterVisitor::VisitAccessInterface (AccessInterface& accessInterfac
 void PrettyPrinterVisitor::VisitChain (Chain& chain)
 {
   StreamNodeHeader("Chain", chain);
-  m_os << ")"  << std::endl;
 
   PrintChildren(chain);
 }
@@ -84,8 +143,6 @@ void PrettyPrinterVisitor::VisitChain (Chain& chain)
 void PrettyPrinterVisitor::VisitLinker (Linker& linker)
 {
   StreamNodeHeader("Linker", linker);
-//+  m_os << ", " << reg.GetBypassSequence().DataAsBinaryString();
-  m_os << ")"  << std::endl;
 
   PrintChildren(linker);
 }
@@ -96,8 +153,29 @@ void PrettyPrinterVisitor::VisitLinker (Linker& linker)
 void PrettyPrinterVisitor::VisitRegister (Register& reg)
 {
   StreamNodeHeader("Register", reg);
-  m_os << ", " << reg.GetBypassSequence().DataAsBinaryString();
-  m_os << ")"  << std::endl;
+
+  m_os << ", length: " << reg.GetBypassSequence().BitsCount();
+
+  if (!m_verbose)
+  {
+    StreamBinaryVector("bypass: ", reg.GetBypassSequence());
+  }
+  else
+  {
+    auto targetPosInLine = m_os.tellp() - m_startPos;
+
+                                     StreamBinaryVector("bypass:            ", reg.GetBypassSequence());
+    AlignOnNewLine(targetPosInLine); StreamBinaryVector("next_to_sut:       ", reg.GetNextToSut());
+    AlignOnNewLine(targetPosInLine); StreamBinaryVector("last_to_sut:       ", reg.GetLastToSut());
+    AlignOnNewLine(targetPosInLine); StreamBinaryVector("last_from_sut:     ", reg.GetLastFromSut());
+    AlignOnNewLine(targetPosInLine); StreamBinaryVector("expected_from_sut: ", reg.GetExpectedFromSut());
+
+    AlignOnNewLine(targetPosInLine);
+    m_os.setf(std::ios_base::boolalpha);
+    m_os << ", pending: "       << reg.IsPending();
+    m_os << ", has_condition: " << reg.HasConditions();
+    m_os << ", priority: "      << reg.GetPriority();
+  }
 }
 
 //! Appends content of tap node in text representation and visits
@@ -106,7 +184,6 @@ void PrettyPrinterVisitor::VisitRegister (Register& reg)
 void PrettyPrinterVisitor::VisitTap (Tap& tap)
 {
   StreamNodeHeader("Tap", tap);
-  m_os << ")"  << std::endl;
 
   PrintChildren(tap);
 }

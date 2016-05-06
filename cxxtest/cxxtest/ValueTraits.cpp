@@ -29,15 +29,17 @@ CharacterMapping charactersMapping ()
 //! @see charToString
 CharacterMapping setCharactersMapping (CharacterMapping newMapping)
 {
-  CharacterMapping prev = currentCharacterMapping;
+  CharacterMapping prev   = currentCharacterMapping;
+
   currentCharacterMapping = newMapping;
-  return currentCharacterMapping;
+
+  return prev;
 }
 
 //! Restores default characters mapping mode
-CharacterMapping setCharactersMapping ()
+CharacterMapping setDefaultCharactersMapping ()
 {
-  return setCharactersMapping(CharacterMapping::MAP_CHARS_FULL);
+  return setCharactersMapping(MAP_CHARS_FULL);
 }
 
 //!< Returns true when a new line is used (instead of quote) when displaying string
@@ -135,8 +137,8 @@ char* charToString(unsigned long c, char* s)
       case '\b': return copyString(s, "\\b");
     }
 
-    auto keepCharAsIs = false;
-    if (currentCharacterMapping == CharacterMapping::MAP_CHARS_FULL)
+    bool keepCharAsIs = false;
+    if (currentCharacterMapping == MAP_CHARS_FULL)
     {
       switch (c)
       {

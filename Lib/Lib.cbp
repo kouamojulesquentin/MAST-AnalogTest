@@ -112,6 +112,7 @@
 		<Unit filename="src/BinaryVector.cpp" />
 		<Unit filename="src/Chain.cpp" />
 		<Unit filename="src/DefaultBinaryPathSelector.cpp" />
+		<Unit filename="src/GmlPrinterVisitor.cpp" />
 		<Unit filename="src/Linker.cpp" />
 		<Unit filename="src/ParentNode.cpp" />
 		<Unit filename="src/PrettyPrinterVisitor.cpp" />

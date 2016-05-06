@@ -129,8 +129,8 @@ void PrettyPrinterVisitor::StreamNodeHeader(std::experimental::string_view type,
   m_startPos = m_os.tellp();
   StreamDepth();
 
-  m_os << '(' << node.GetIdentifier() << ") ";
   m_os << "[" << type                 << "]";
+  m_os << '(' << node.GetIdentifier() << ") ";
 
   AlignRelativeTo(m_startPos, 15 + m_depth);
   m_os << '"' << node.GetName()       << '"';

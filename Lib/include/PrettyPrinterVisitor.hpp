@@ -58,7 +58,7 @@ class DLL_EXPORT PrettyPrinterVisitor : public SystemModelVisitor
 
   void StreamDepth()
   {
-    m_os << std::string(m_depth, '-');
+    m_os << std::string(m_depth, ' ');
   }
 
   void StreamBinaryVector (std::experimental::string_view name, const BinaryVector&    bits);

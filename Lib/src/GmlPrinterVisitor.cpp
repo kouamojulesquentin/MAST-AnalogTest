@@ -223,16 +223,17 @@ void GmlPrinterVisitor::VisitChain (Chain& chain)
 
 //! Appends Linker node to GML graph
 //!
+//! @note Supposes that path selector associated with linker will be made of SystemModelNode too
 void GmlPrinterVisitor::VisitLinker (Linker& linker)
 {
   AppendParentNode(m_shape_Linker, m_color_Linker, "Linker", linker);
 
+  // ---------------- Deal with path selector
+  //
   auto selector = linker.GetPathSelector();
   m_linker = &linker;
   selector->Accept(*this);
   m_linker = nullptr;
-
-
 }
 
  //! Appends Register node to GML graph
@@ -240,9 +241,13 @@ void GmlPrinterVisitor::VisitLinker (Linker& linker)
 void GmlPrinterVisitor::VisitRegister (Register& reg)
 {
   AppendNode(m_shape_Register, m_color_Register, "Register", reg);
+
+  // ---------------- Deal with path selector associated with Linker nodes
+  //
   if (m_linker)
   {
     PrintEdge(*m_linker, reg, 0, "dashed");
+    m_linker = nullptr;   // Only first SystemModelNode is connected to the linker
   }
 }
 

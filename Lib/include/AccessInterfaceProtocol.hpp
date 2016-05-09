@@ -29,10 +29,10 @@ class AccessInterfaceProtocol final
   //!
   //! @param derivationId   Identifies the derivation to act for (zero based)
   //! @param interfaceData  Application data stored in the AccessInterface
-  //! @param outputVector   Bits stream to transfert to SUT
+  //! @param toSutData      Bits stream to transfert to SUT
   //!
   //! @return Bits stream retrieved from SUT
-  virtual BinaryVector DoAction(uint32_t derivationId, void* interfaceData, const BinaryVector& outputVector) = 0;
+  virtual BinaryVector DoAction(uint32_t derivationId, void* interfaceData, const BinaryVector& toSutData) = 0;
 
   // ---------------- Protected Methods
   //

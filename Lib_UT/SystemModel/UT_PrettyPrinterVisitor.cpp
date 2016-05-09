@@ -144,7 +144,7 @@ void UT_PrettyPrinterVisitor::test_VisitLinker ()
   auto bypassSequence = BinaryVector::CreateFromBinaryString("000");
   auto isInverted     = false;
   auto canSelectNone  = false;
-  auto associatedNode = make_shared<Register>("My register name", bypassSequence);
+  auto associatedNode = make_shared<Register>("Mux register name", bypassSequence);
   auto pathSelector   = make_shared<DefaultBinaryPathSelector>(associatedNode, 5, isInverted, canSelectNone);
 
   auto linker = Linker("Linker name", pathSelector);
@@ -158,7 +158,8 @@ void UT_PrettyPrinterVisitor::test_VisitLinker ()
   // ---------------- Verify
   //
   auto got      = sut.GetPrettyPrint();
-  auto expected = string("[Linker](1)    \"Linker name\"");
+  auto expected = string("[Linker](1)    \"Linker name\"\n"
+                         " [Register](0)  \"Mux register name\", length: 3, bypass: 000");
   TS_ASSERT_EQUALS (got, expected);
 }
 
@@ -172,7 +173,7 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_Verbose ()
   auto bypassSequence = BinaryVector::CreateFromBinaryString("000");
   auto isInverted     = false;
   auto canSelectNone  = false;
-  auto associatedNode = make_shared<Register>("My register name", bypassSequence);
+  auto associatedNode = make_shared<Register>("Mux register name", bypassSequence);
   auto pathSelector   = make_shared<DefaultBinaryPathSelector>(associatedNode, 5, isInverted, canSelectNone);
 
   auto linker = Linker("Linker name", pathSelector);
@@ -187,7 +188,14 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_Verbose ()
   // ---------------- Verify
   //
   auto got      = sut.GetPrettyPrint();
-  auto expected = string("[Linker](1)    \"Linker name\", pending: false, has_condition: false, priority: 0");
+  auto expected = string("[Linker](1)    \"Linker name\", pending: false, has_condition: false, priority: 0\n"
+                         " [Register](0)  \"Mux register name\", length: 3, bypass:            000\n"
+                         "                                              , next_to_sut:       000\n"
+                         "                                              , last_to_sut:       000\n"
+                         "                                              , last_from_sut:     000\n"
+                         "                                              , expected_from_sut: 000\n"
+                         "                                              , pending: false, has_condition: false, priority: 0"
+                        );
   TS_ASSERT_EQUALS (got, expected);
 }
 
@@ -434,7 +442,8 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_with_Child ()
                          "  [Register](2)  \"Reg_2\", length: 6, bypass: 1010_10\n"
                          "  [Register](3)  \"Reg_3\", length: 7, bypass: 1010_111\n"
                          " [Register](4)  \"R_A\", length: 15, bypass: 1110_1110:1111_101\n"
-                         " [Register](5)  \"R_b\", length: 20, bypass: 1110_1110:1111_1010:1110"
+                         " [Register](5)  \"R_b\", length: 20, bypass: 1110_1110:1111_1010:1110\n"
+                         " [Register](6)  \"Selector\", length: 2, bypass: 01"
                         );
   TS_ASSERT_EQUALS (got, expected);
 }
@@ -457,7 +466,7 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_with_Child_Verbose ()
   chain->AppendChild(reg_2);
   chain->AppendChild(reg_3);
 
-  auto muxNode = make_shared<Register>("Selector", BinaryVector::CreateFromBinaryString("01"));
+  auto muxNode = make_shared<Register>("Sel_1", BinaryVector::CreateFromBinaryString("01"));
   auto pathSelector   = make_shared<DefaultBinaryPathSelector>(muxNode, 2);
   auto linker         = make_shared<Linker>("Link", pathSelector);
   linker->AppendChild(chain);
@@ -505,7 +514,13 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_with_Child_Verbose ()
                          "                                 , last_to_sut:       1110_1110:1111_1010:1110\n"
                          "                                 , last_from_sut:     1110_1110:1111_1010:1110\n"
                          "                                 , expected_from_sut: 1110_1110:1111_1010:1110\n"
-                         "                                 , pending: false, has_condition: false, priority: 0"
+                         "                                 , pending: false, has_condition: false, priority: 0\n"
+                         " [Register](6)  \"Selector\", length: 2, bypass:            01\n"
+                         "                                     , next_to_sut:       01\n"
+                         "                                     , last_to_sut:       01\n"
+                         "                                     , last_from_sut:     01\n"
+                         "                                     , expected_from_sut: 01\n"
+                         "                                     , pending: false, has_condition: false, priority: 0"
                         );
   TS_ASSERT_EQUALS (got, expected);
 }
@@ -516,12 +531,13 @@ void UT_PrettyPrinterVisitor::test_VisitAccessInterface_with_Child ()
 {
   // ---------------- Setup
   //
-  auto chain = make_shared<Chain>    ("Chain");
-  auto reg_1 = make_shared<Register> ("Reg_1", BinaryVector::CreateFromBinaryString("1010_1"));
-  auto reg_2 = make_shared<Register> ("Reg_2", BinaryVector::CreateFromBinaryString("1010_10"));
-  auto reg_3 = make_shared<Register> ("Reg_3", BinaryVector::CreateFromBinaryString("1010_111"));
-  auto reg_a = make_shared<Register> ("R_A",   BinaryVector::CreateFromBinaryString("1110_1110:1111_101"));
-  auto reg_b = make_shared<Register> ("R_b",   BinaryVector::CreateFromBinaryString("1110_1110:1111_1010:1110"));
+  auto tap   = make_shared<Tap>      ("Tap name", nullptr);
+  auto chain = make_shared<Chain>    ("Chain name");
+  auto reg_1 = make_shared<Register> ("Reg_1",        BinaryVector::CreateFromBinaryString("1010_1"));
+  auto reg_2 = make_shared<Register> ("Reg_2",        BinaryVector::CreateFromBinaryString("1010_10"));
+  auto reg_3 = make_shared<Register> ("Reg_3",        BinaryVector::CreateFromBinaryString("1010_111"));
+  auto reg_a = make_shared<Register> ("R_A",          BinaryVector::CreateFromBinaryString("1110_1110:1111_101"));
+  auto reg_b = make_shared<Register> ("the register", BinaryVector::CreateFromBinaryString("1110_1110:1111_1010:1110"));
 
   chain->AppendChild(reg_1);
   chain->AppendChild(reg_2);
@@ -529,9 +545,10 @@ void UT_PrettyPrinterVisitor::test_VisitAccessInterface_with_Child ()
 
   auto muxNode         = make_shared<Register>("Selector", BinaryVector::CreateFromBinaryString("01"));
   auto pathSelector    = make_shared<DefaultBinaryPathSelector>(muxNode, 2);
-  auto linker          = make_shared<Linker>("Link", pathSelector);
+  auto linker          = make_shared<Linker>("Linker name", pathSelector);
   auto accessInterface = make_shared<AccessInterface>("Access interface name", nullptr);
 
+  accessInterface->AppendChild(tap);
   accessInterface->AppendChild(chain);
   accessInterface->AppendChild(linker);
   linker->AppendChild(reg_a);
@@ -547,14 +564,16 @@ void UT_PrettyPrinterVisitor::test_VisitAccessInterface_with_Child ()
   // ---------------- Verify
   //
   auto got      = sut.GetPrettyPrint();
-  auto expected = string("[Access_I](8)  \"Access interface name\"\n"
-                         " [Chain](0)     \"Chain\"\n"
-                         "  [Register](1)  \"Reg_1\", length: 5, bypass: 1010_1\n"
-                         "  [Register](2)  \"Reg_2\", length: 6, bypass: 1010_10\n"
-                         "  [Register](3)  \"Reg_3\", length: 7, bypass: 1010_111\n"
-                         " [Linker](7)    \"Link\"\n"
-                         "  [Register](4)  \"R_A\", length: 15, bypass: 1110_1110:1111_101\n"
-                         "  [Register](5)  \"R_b\", length: 20, bypass: 1110_1110:1111_1010:1110"
+  auto expected = string("[Access_I](9)  \"Access interface name\"\n"
+                         " [Tap](0)       \"Tap name\"\n"
+                         " [Chain](1)     \"Chain name\"\n"
+                         "  [Register](2)  \"Reg_1\", length: 5, bypass: 1010_1\n"
+                         "  [Register](3)  \"Reg_2\", length: 6, bypass: 1010_10\n"
+                         "  [Register](4)  \"Reg_3\", length: 7, bypass: 1010_111\n"
+                         " [Linker](8)    \"Linker name\"\n"
+                         "  [Register](5)  \"R_A\", length: 15, bypass: 1110_1110:1111_101\n"
+                         "  [Register](6)  \"the register\", length: 20, bypass: 1110_1110:1111_1010:1110\n"
+                         "  [Register](7)  \"Selector\", length: 2, bypass: 01"
                         );
   TS_ASSERT_EQUALS (got, expected);
 }

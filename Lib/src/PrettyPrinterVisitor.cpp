@@ -13,8 +13,8 @@
 
 #include "PrettyPrinterVisitor.hpp"
 #include "SystemModelNodes.hpp"
+#include "PathSelector.hpp"
 #include "Utility.hpp"
-
 
 using std::string;
 
@@ -128,6 +128,10 @@ void PrettyPrinterVisitor::StreamNodeHeader(std::experimental::string_view type,
 
   m_startPos = m_os.tellp();
   StreamDepth();
+  if (m_processingSelector)
+  {
+    m_os << ":Selector: ";
+  }
 
   m_os << "[" << type                 << "]";
   m_os << '(' << node.GetIdentifier() << ") ";
@@ -180,9 +184,34 @@ void PrettyPrinterVisitor::VisitChain (Chain& chain)
 //! Appends content of Linker node in text representation and visits
 //! sub-nodes
 //!
+//! @note Supposes that path selector associated with linker will be made of SystemModelNode too
 void PrettyPrinterVisitor::VisitLinker (Linker& linker)
 {
-  StreamParentNode("Linker", linker);
+  StreamNodeHeader("Linker", linker);
+
+  if (m_verbose)
+  {
+    StreamNodeCommon(linker);
+  }
+
+  // ---------------- Deal with path selector
+  //
+  {
+    auto restoreMembers = [this, initialValue = m_depth]()
+    {
+      this->m_depth              = initialValue;
+      this->m_processingSelector = false;
+    };
+    AT_SCOPE_EXIT(restoreMembers);
+
+    ++m_depth;
+    m_processingSelector = true;
+
+    auto selector = linker.GetPathSelector();
+    selector->Accept(*this);
+  }
+
+  PrintChildren(linker);
 }
 
 //! Appends content of Register node in text representation and visits

@@ -69,11 +69,12 @@ class DLL_EXPORT PrettyPrinterVisitor : public SystemModelVisitor
   // ---------------- Private  Fields
   //
   private:
-  uint32_t           m_depth    = 0u;    //!< Current nodes tree depth
-  std::ostringstream m_os;               //!< Stream to build up a representation of visited system model nodes
-  std::fpos<int>     m_startPos = 0;     //!< Position, in stream, of first character of current line
-  bool               m_verbose  = false; //!< When true, more information are printed
-  bool               m_first    = true;  //!< True when nothing as been streamed yet (useful to add first new line)
+  uint32_t           m_depth              = 0u;    //!< Current nodes tree depth
+  std::ostringstream m_os;                         //!< Stream to build up a representation of visited system model nodes
+  bool               m_processingSelector = false; //!< When true, we are visiting a path selector (while visiting a linker)
+  std::fpos<int>     m_startPos           = 0;     //!< Position, in stream, of first character of current line
+  bool               m_verbose            = false; //!< When true, more information are printed
+  bool               m_first              = true;  //!< True when nothing as been streamed yet (useful to add first new line)
 };
 //
 //  End of PrettyPrinterVisitor class declaration

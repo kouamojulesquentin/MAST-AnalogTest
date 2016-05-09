@@ -45,6 +45,8 @@ class DLL_EXPORT DefaultBinaryPathSelector : public PathSelector
 
   uint32_t ActiveCount() const;    //!< Returns the number of paths that are currently active
 
+  virtual void Accept   (SystemModelVisitor& visitor) override;   //!< Forwards call to any embedded Register
+
   // ---------------- Protected Methods
   //
   protected:

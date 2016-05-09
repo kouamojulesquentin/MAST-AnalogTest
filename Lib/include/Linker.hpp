@@ -69,6 +69,9 @@ class DLL_EXPORT Linker : public ParentNode
 
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
 
+
+  std::shared_ptr<PathSelector> GetPathSelector() const { return m_pathSelector; }
+
      //+ (JFC April/20/2016): Move to linkerInfo
   virtual BinaryVector GetLastSequence() const;  //!< Returns last sequence shifted from sut
   virtual BinaryVector GetNextSequence() const;  //!< Returns sequence to shift into sut

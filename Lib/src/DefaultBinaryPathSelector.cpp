@@ -43,7 +43,20 @@ DefaultBinaryPathSelector::DefaultBinaryPathSelector(shared_ptr<SystemModelNode>
 //
 //  End of: DefaultBinaryPathSelector::DefaultBinaryPathSelector
 //---------------------------------------------------------------------------
-//
+
+
+//! Forwards call to any embedded Register
+//!
+//! @note Visitor should keep track that it is visiting something within a PathSelector
+//!
+void DefaultBinaryPathSelector::Accept (SystemModelVisitor& visitor)
+{
+  m_muxRegister->Accept(visitor);
+}
+//
+//  End of: DefaultBinaryPathSelector::Accept
+//---------------------------------------------------------------------------
+
 
 
 //! Returns the number of paths that are currently active

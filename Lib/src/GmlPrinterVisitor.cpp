@@ -11,11 +11,10 @@
 //!
 //===========================================================================
 
-
-
 #include "GmlPrinterVisitor.hpp"
 #include "SystemModelNodes.hpp"
 #include "Utility.hpp"
+#include "PathSelector.hpp"
 
 #include <algorithm>
 using std::string;
@@ -25,7 +24,7 @@ using namespace mast;
 
 const std::experimental::string_view GmlPrinterVisitor::m_shape_AccessInterface = "octagon";
 const std::experimental::string_view GmlPrinterVisitor::m_shape_Tap             = "ellipse";
-const std::experimental::string_view GmlPrinterVisitor::m_shape_Linker          = "ellipse";
+const std::experimental::string_view GmlPrinterVisitor::m_shape_Linker          = "trapezoid";
 const std::experimental::string_view GmlPrinterVisitor::m_shape_Chain           = "ellipse";
 const std::experimental::string_view GmlPrinterVisitor::m_shape_Register        = "rectangle";
 
@@ -94,8 +93,8 @@ void GmlPrinterVisitor::AppendNode (string_view            shapeName,
   m_os << " graphics [";
   m_os << " type \"" << shapeName       << "\"";
   m_os << " fill \"" << backgroundColor << "\"";
-  m_os << " w "  << std::max(50u, 9u * node.GetName().length());
-  m_os << " h "  << std::max(35u, 3u * node.GetName().length());
+  m_os << " w "  << std::max(50u, 11u * node.GetName().length());
+  m_os << " h "  << std::max(35u, 3u  * node.GetName().length());
   m_os << " ] ";
 
   if (!node.GetName().empty())
@@ -115,13 +114,26 @@ void GmlPrinterVisitor::AppendNode (string_view            shapeName,
 //! @param parentNode   A parent node
 //! @param childNode    A child of the parent node
 //!
-void GmlPrinterVisitor::PrintEdge (const ParentNode& parentNode, const SystemModelNode& childNode, uint32_t childId)
+void GmlPrinterVisitor::PrintEdge (const ParentNode&              parentNode,
+                                   const SystemModelNode&         childNode,
+                                   uint32_t                       childId,
+                                   std::experimental::string_view style)
 {
   m_os << "   edge ["
        << " source "  << parentNode.GetIdentifier()
        << " target "  << childNode.GetIdentifier()
-       << " label \"" << childId << "\""
-       << " ]" << std::endl;
+       << " label \"" << childId << "\"";
+
+  if (!style.empty())
+  {
+    m_os << " graphics ["
+         << " width 1"
+         << " style \"" << style << "\""
+         << " targetArrow \"standard\""
+         << " ]";
+  }
+
+  m_os << " ]" << std::endl;
 }
 //
 //  End of: GmlPrinterVisitor::PrintEdge
@@ -214,13 +226,24 @@ void GmlPrinterVisitor::VisitChain (Chain& chain)
 void GmlPrinterVisitor::VisitLinker (Linker& linker)
 {
   AppendParentNode(m_shape_Linker, m_color_Linker, "Linker", linker);
+
+  auto selector = linker.GetPathSelector();
+  m_linker = &linker;
+  selector->Accept(*this);
+  m_linker = nullptr;
+
+
 }
 
-//! Appends Register node to GML graph
+ //! Appends Register node to GML graph
 //!
 void GmlPrinterVisitor::VisitRegister (Register& reg)
 {
   AppendNode(m_shape_Register, m_color_Register, "Register", reg);
+  if (m_linker)
+  {
+    PrintEdge(*m_linker, reg, 0, "dashed");
+  }
 }
 
 //! Appends content of tap node in text representation and visits

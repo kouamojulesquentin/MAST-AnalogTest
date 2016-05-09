@@ -19,8 +19,7 @@
 
 namespace mast
 {
-
-class Linker;
+class SystemModelVisitor;
 
 //! Extension point interface used by Linker to manage paths selection
 //!
@@ -47,6 +46,8 @@ class PathSelector
   //! @param pathIdentifier   Path identifier in range [1..nb_path]
   //!
   virtual void Select   (uint32_t pathIdentifier) = 0;       //!< Request activation of the specified path
+
+  virtual void Accept   (SystemModelVisitor& visitor) = 0;   //!< Forward call to any embedded SystemModelNode (or do nothing)
 
   // ---------------- Protected Methods
   //

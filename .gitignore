@@ -28,3 +28,6 @@
 /*.LOG
 /Note.txt
 /Lib_UT/Lib_UT_build_log.html
+/*.twi
+/Backup.bat
+/Backup_to_UsbKey.bat

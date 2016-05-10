@@ -87,7 +87,16 @@ void PrettyPrinterVisitor::AlignOnNewLine (std::fpos<int> targetPos)
 //!
 void PrettyPrinterVisitor::StreamBinaryVector (std::experimental::string_view name, const BinaryVector& bits)
 {
-  m_os << ", " << name << bits.DataAsBinaryString(":", "_");
+  m_os << ", " << name;
+
+  if (m_useHexFormat)
+  {
+    m_os << "0x" << bits.DataAsHexString(":", "_");
+  }
+  else
+  {
+    m_os << bits.DataAsBinaryString(":", "_");
+  }
 }
 //
 //  End of: PrettyPrinterVisitor::StreamBinaryVector

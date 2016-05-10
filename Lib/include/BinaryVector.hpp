@@ -48,6 +48,13 @@ class DLL_EXPORT BinaryVector final
                                  std::experimental::string_view eolSeparator    = ","
                                 ) const; //!< Gets content as formatted binary string
 
+  std::string DataAsHexString (std::experimental::string_view intSeparator    = ":",
+                               std::experimental::string_view shortSeparator  = "_",
+                               uint32_t                       bytesPerLine    = 0,
+                               std::experimental::string_view eolSeparator    = ","
+                              ) const;         //!< Gets content as formatted hexadecimal string
+
+
   BinaryVector& operator=(const BinaryVector&);
   BinaryVector& operator=(BinaryVector&&) noexcept;
 

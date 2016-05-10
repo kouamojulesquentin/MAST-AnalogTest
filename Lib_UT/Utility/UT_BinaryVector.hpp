@@ -45,6 +45,9 @@ class UT_BinaryVector : public CxxTest::TestSuite
   void test_DataAsBinaryString_Without_NewLine ();
   void test_DataAsBinaryString_With_NewLine ();
   void test_DataAsBinaryString_Without_Separators ();
+  void test_DataAsHexString_Without_NewLine ();
+  void test_DataAsHexString_With_NewLine ();
+  void test_DataAsHexString_Without_Separators ();
 
   // ---------------- Operator==
   //
@@ -96,6 +99,7 @@ class UT_BinaryVector : public CxxTest::TestSuite
   // ---------------- ToggleBits
   //
   void test_ToggleBits ();
+  void test_ToggleBits_Using_HexString ();
   void test_Operator_Tilde ();
 
   // ---------------- Slice

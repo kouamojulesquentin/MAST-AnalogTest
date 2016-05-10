@@ -247,6 +247,8 @@ void UT_BinaryVector::test_CreateFromHexString ()
     "ABCDEF_456",    // 12
     "F-A",           // 13
     "'BAD",          // 14
+    "A",             // 15
+    "5",             // 16
   };
 
   auto expected =
@@ -266,6 +268,8 @@ void UT_BinaryVector::test_CreateFromHexString ()
     "1010_1011:1100_1101:1110_1111:0100_0101:0110",      // 12
     "1111_1010",                                         // 13
     "1011_1010:1101",                                    // 14
+    "1010",                                              // 15
+    "0101",                                              // 16
   };
 
   // ---------------- DDT Exercise
@@ -482,6 +486,177 @@ void UT_BinaryVector::test_operator_eq_With_Self ()
   TS_DATA_DRIVEN_TEST (checker, inputs);
 }
 
+
+//! Checks HexVector::DataAsHexString() with 16 and 32 bits separators
+//!
+void UT_BinaryVector::test_DataAsHexString_Without_NewLine ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits  = std::get<0>(data);
+    string      expected = std::get<1>(data);
+
+    auto sut   = BinaryVector::CreateFromBinaryString(sutBits);
+
+    // ---------------- Exercise
+    //
+    auto sutAsString = sut.DataAsHexString(", ", "-");
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sutAsString, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,            result
+    make_tuple("0000",                                         "0"),            // 00
+    make_tuple("0001",                                         "1"),            // 01
+    make_tuple("0010",                                         "2"),            // 02
+    make_tuple("0011",                                         "3"),            // 03
+    make_tuple("0100",                                         "4"),            // 04
+    make_tuple("0101",                                         "5"),            // 05
+    make_tuple("0110",                                         "6"),            // 06
+    make_tuple("0111",                                         "7"),            // 07
+    make_tuple("1000",                                         "8"),            // 08
+    make_tuple("1001",                                         "9"),            // 09
+    make_tuple("1010",                                         "A"),            // 10
+    make_tuple("1011",                                         "B"),            // 11
+    make_tuple("1100",                                         "C"),            // 12
+    make_tuple("1101",                                         "D"),            // 13
+    make_tuple("1110",                                         "E"),            // 14
+    make_tuple("1111",                                         "F"),            // 15
+    make_tuple("0",                                            "0"),            // 16
+    make_tuple("1",                                            "8"),            // 17
+    make_tuple("10",                                           "8"),            // 18
+    make_tuple("11",                                           "C"),            // 19
+    make_tuple("100",                                          "8"),            // 20
+    make_tuple("101",                                          "A"),            // 21
+    make_tuple("110",                                          "C"),            // 22
+    make_tuple("111",                                          "E"),            // 23
+    make_tuple("1011_0",                                       "B0"),           // 24
+    make_tuple("1011_1",                                       "B8"),           // 25
+    make_tuple("1011_10",                                      "B8"),           // 26
+    make_tuple("1011_11",                                      "BC"),           // 27
+    make_tuple("1011_100",                                     "B8"),           // 28
+    make_tuple("1011_101",                                     "BA"),           // 29
+    make_tuple("1011_110",                                     "BC"),           // 30
+    make_tuple("1011_111",                                     "BE"),           // 31
+    make_tuple("1011_1000",                                    "B8"),           // 32
+    make_tuple("1011_1001",                                    "B9"),           // 33
+    make_tuple("1011_1010",                                    "BA"),           // 34
+    make_tuple("1011_1011",                                    "BB"),           // 35
+    make_tuple("1011_1100",                                    "BC"),           // 36
+    make_tuple("1011_1101",                                    "BD"),           // 37
+    make_tuple("1011_1110",                                    "BE"),           // 38
+    make_tuple("1011_1111",                                    "BF"),           // 39
+    make_tuple("1110_0000:1",                                  "E08"),          // 40
+    make_tuple("1110_0000:11",                                 "E0C"),          // 41
+    make_tuple("1110_0000:1100_1011:1010",                     "E0CB-A"),       // 42
+    make_tuple("1110_0000:1100_1011:1010_1",                   "E0CB-A8"),      // 43
+    make_tuple("1110_0000:1100_1011:1010_101",                 "E0CB-AA"),      // 44
+    make_tuple("1110_0000:1100_1011:1010_1011:1010_0101",      "E0CB-ABA5"),    // 45
+    make_tuple("1110_0000:1100_1011:1010_1011:1010_0101:1100", "E0CB-ABA5, C"), // 46
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::DataAsHexString() with 16 and 32 bits separators and new lines every N bytes
+//!
+void UT_BinaryVector::test_DataAsHexString_With_NewLine ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits  = std::get<0>(data);
+    string      expected = std::get<1>(data);
+
+    auto sut   = BinaryVector::CreateFromBinaryString(sutBits);
+
+    // ---------------- Exercise
+    //
+    auto sutAsString = sut.DataAsHexString(", ", "-", 4, ";");
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sutAsString, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,            result
+    make_tuple("0",                                                                                 "0"),                         // 00
+    make_tuple("01",                                                                                "4"),                         // 01
+    make_tuple("1001",                                                                              "9"),                         // 02
+    make_tuple("1011_1",                                                                            "B8"),                        // 03
+    make_tuple("0110_01",                                                                           "64"),                        // 04
+    make_tuple("0110_011",                                                                          "66"),                        // 05
+    make_tuple("0110_0111",                                                                         "67"),                        // 06
+    make_tuple("1110_0000:1",                                                                       "E08"),                       // 07
+    make_tuple("1110_0000:1100_1011:1010",                                                          "E0CB-A"),                    // 08
+    make_tuple("1110_0000:1100_1011:1010_1010",                                                     "E0CB-AA"),                   // 09
+    make_tuple("1110_0000:1100_1011:1010_1010:1",                                                   "E0CB-AA8"),                  // 10
+    make_tuple("1110_0000:1100_1011:1010_1010:1100_01",                                             "E0CB-AAC4"),                 // 11
+    make_tuple("1110_0000:1100_1011:1010_1010:1100_0111:1110_0000:1100_1011:1010_1010:1100_0111:1", "E0CB-AAC7;\nE0CB-AAC7;\n8"), // 12
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::DataAsHexString()
+//!
+void UT_BinaryVector::test_DataAsHexString_Without_Separators ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits  = std::get<0>(data);
+    string      expected = std::get<1>(data);
+
+    auto sut   = BinaryVector::CreateFromBinaryString(sutBits);
+
+    // ---------------- Exercise
+    //
+    auto sutAsString = sut.DataAsHexString("", "");
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sutAsString, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,                                           result
+    make_tuple("1110_0000:1",                                 "EF8"),       // 00
+    make_tuple("1110_0000:1100_111",                          "EFCE"),      // 01
+    make_tuple("1110_0000:1100_1011:1010",                    "EFCBA"),     // 02
+    make_tuple("1110_0000:1100_1011:1010_1",                  "EFCBA8"),    // 03
+    make_tuple("1110_0000:1100_1011:1010_0011:1010_0001:000", "EFCBA3210"), // 04
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
 //! Checks BinaryVector::operator== when both are equal
 //!
 void UT_BinaryVector::test_operator_eq_When_Equal ()
@@ -546,26 +721,30 @@ void UT_BinaryVector::test_operator_eq_When_NotEqual ()
 
   auto sutBits =
   {
-    "",            // 00
-    "0",           // 01
-    "1",           // 02
-    "01",          // 03
-    "10",          // 04
-    "1011",        // 05
-    "0110_0101",   // 06
-    "1110_0000:1", // 07
+    "",                           // 00
+    "0",                          // 01
+    "1",                          // 02
+    "01",                         // 03
+    "10",                         // 04
+    "1011",                       // 05
+    "0110_0101",                  // 06
+    "1110_0000:1",                // 07
+    "1110_0010:10",               // 08
+    "1110_0010:1001_1110:1010_1", // 09
   };
 
   auto rhsBits =
   {
-    "0",           // 00
-    "1",           // 01
-    "11",          // 02
-    "001",         // 03
-    "",            // 04
-    "1010",        // 05
-    "0110_010",    // 06
-    "1110_0000:0", // 07
+    "0",                          // 00
+    "1",                          // 01
+    "11",                         // 02
+    "001",                        // 03
+    "",                           // 04
+    "1010",                       // 05
+    "0110_010",                   // 06
+    "1110_0000:0",                // 07
+    "1110_0110:10",               // 08
+    "1110_0010:1001_1100:1010_1", // 09
   };
 
 
@@ -1745,7 +1924,7 @@ void UT_BinaryVector::test_ToggleBits ()
 
   auto data =
   {
-    //   Bits: sut,            result
+    //   Bits: sut,                            result
     make_tuple("1",                            "0"),                            // 00
     make_tuple("0",                            "1"),                            // 01
     make_tuple("11",                           "00"),                           // 02
@@ -1768,6 +1947,53 @@ void UT_BinaryVector::test_ToggleBits ()
   //
   TS_DATA_DRIVEN_TEST (checker, data);
 }
+
+
+//! Checks BinaryVector::ToggleBits()
+//!
+//! @note Require DataAsBinaryString to work properly
+//!
+void UT_BinaryVector::test_ToggleBits_Using_HexString ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits  = std::get<0>(data);
+    string      expected = std::get<1>(data);
+
+    auto sut   = BinaryVector::CreateFromHexString(sutBits);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.ToggleBits());
+
+    // ---------------- Verify
+    //
+    auto sutBit = sut.DataAsHexString();
+    TS_ASSERT_EQUALS (sutBit, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,                    result
+    make_tuple("0",                    "F"),                      // 00
+    make_tuple("F",                    "0"),                      // 01
+    make_tuple("81",                   "7E"),                     // 02
+    make_tuple("5A2",                  "A5D"),                    // 03
+    make_tuple("6B34",                 "94CB"),                   // 04
+    make_tuple("7C89_0",               "8376_F"),                 // 05
+    make_tuple("8D00_1E",              "72FF_E1"),                // 06
+    make_tuple("0123456789:ABCDEF:A5", "FEDC_BA98:7654_3210:5A"), // 15
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
 
 
 //! Checks BinaryVector::ToggleBits()

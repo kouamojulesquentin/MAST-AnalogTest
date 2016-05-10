@@ -16,6 +16,7 @@
 #include "Utility.hpp"
 #include <sstream>
 #include <array>
+#include <algorithm>
 
 using std::array;
 using std::ostringstream;
@@ -29,7 +30,7 @@ namespace
   //!
   constexpr uint8_t LEFT_BITS_MASK_8[] =
   {
-    0b10000000, // 0 bits
+    0b00000000, // 0 bits
     0b10000000, // 1 bits
     0b11000000, // 2 bits
     0b11100000, // 3 bits
@@ -39,6 +40,18 @@ namespace
     0b11111110, // 7 bits
     0b11111111, // 8 bits
   };
+
+  //! Defines a mask to keep most significant bits of a nibble
+  //!
+  constexpr uint8_t LEFT_BITS_MASK_4[] =
+  {
+    0b0000, // 0 bits
+    0b1000, // 1 bits
+    0b1100, // 2 bits
+    0b1110, // 3 bits
+    0b1111, // 4 bits
+  };
+
 } // End of unnamed namespace
 
 //! Initializes with constant value for all bits
@@ -256,6 +269,9 @@ void BinaryVector::Clear ()
 
 
 //! Gets content as formatted binary string
+//!
+//! @note An example of formatting is: 0001_1111:0011_0100:0101_010
+//!
 //! @param byteSeparator    Characters to insert every 8 bits
 //! @param nibbleSeparator  Characters to insert every 4 bits
 //! @param bytesPerLine     Number of bytes (sequence of 8 bits) to write per line.
@@ -356,6 +372,106 @@ string BinaryVector::DataAsBinaryString (string_view byteSeparator,
 //---------------------------------------------------------------------------
 
 
+//! Gets content as formatted hexadecimal string
+//!
+//! @note An example of formatting is: FACE_DEAD:BEEF_0123:CAFE_4
+//!
+//! @param intSeparator    Characters to insert every 32 bits
+//! @param shortSeparator  Characters to insert every 16 bits
+//! @param bytesPerLine    Number of bytes (sequence of 8 bits) to write per line.
+//!                        When zero, all is on the "same line"
+//! @param eolSeparator    Characters to insert just before new lines character (when bytesPerLine != 0)
+//!
+string BinaryVector::DataAsHexString (string_view intSeparator,
+                                      string_view shortSeparator,
+                                      uint32_t    bytesPerLine,
+                                      string_view eolSeparator
+                                     ) const
+{
+  // ---------------- Associate 4 bits value with its hexadecimal representation
+  //
+  static const std::array<string_view, 16> nibbles =
+  {
+    "0",  // 00
+    "1",  // 01
+    "2",  // 02
+    "3",  // 03
+    "4",  // 04
+    "5",  // 05
+    "6",  // 06
+    "7",  // 07
+    "8",  // 08
+    "9",  // 09
+    "A",  // 10
+    "B",  // 11
+    "C",  // 12
+    "D",  // 13
+    "E",  // 14
+    "F",  // 15
+  };
+
+  ostringstream os;
+  uint32_t      nibblesCount = 0;
+  uint32_t      bytesCount   = 0;
+
+  auto appendNibble = [&](string_view nibble)
+  {
+    if ((nibblesCount != 0) && ((nibblesCount % 2) == 0))
+    {
+      ++bytesCount;
+      if (bytesCount == bytesPerLine)
+      {
+        nibblesCount = 0;
+        bytesCount   = 0;
+
+        os << eolSeparator << std::endl;
+      }
+      else if (nibblesCount == 4)
+      {
+        os << shortSeparator;
+      }
+      else if (nibblesCount == 8)
+      {
+        nibblesCount = 0;
+        os << intSeparator;
+      }
+    }
+
+    ++nibblesCount;
+    os << nibble;
+  };
+
+
+  auto bitsCount = m_usedBits;
+
+  for (auto byte : m_data)
+  {
+    if (bitsCount >= 8)
+    {
+      appendNibble(nibbles[byte >> 4]);
+      appendNibble(nibbles[byte &  0x0F]);
+      bitsCount -= 8;
+    }
+    else if (bitsCount > 4)
+    {
+      appendNibble(nibbles[byte >> 4]);
+      bitsCount -= 4;
+      appendNibble(nibbles[byte & LEFT_BITS_MASK_4[bitsCount]]);
+    }
+    else
+    {
+      byte >>= 4;         // Put bits on least significant nibble
+      appendNibble(nibbles[byte & LEFT_BITS_MASK_4[bitsCount]]);
+    }
+  }
+
+  return os.str();
+}
+//
+//  End of: BinaryVector::DataAsHexString
+//---------------------------------------------------------------------------
+
+
 //! Copy assignment
 //!
 BinaryVector& BinaryVector::operator= (const BinaryVector& rhs)
@@ -403,9 +519,30 @@ bool BinaryVector::operator== (const BinaryVector& rhs) const
     return true;
   }
 
-  bool areEqual = m_data == rhs.m_data;
-  //! @todo [JFC]-[May/02/2016]: Does not compare unused bits
-  //!
+
+  auto bitsOnLastByte = m_usedBits % 8;
+  auto areEqual       = true;
+
+  if (bitsOnLastByte == 0)
+  {
+    areEqual = m_data == rhs.m_data;
+  }
+  else
+  {
+    if (m_data.size() > 1)
+    {
+      areEqual = std::equal(m_data.cbegin(), m_data.cend() - 1, rhs.m_data.cbegin(), rhs.m_data.cend() - 1);
+    }
+
+    if (areEqual)
+    {
+      auto left  = m_data.back()     & LEFT_BITS_MASK_8[bitsOnLastByte];
+      auto right = rhs.m_data.back() & LEFT_BITS_MASK_8[bitsOnLastByte];
+
+      areEqual = left == right;
+    }
+  }
+
   return areEqual;
 }
 //
@@ -735,13 +872,22 @@ BinaryVector BinaryVector::Slice (uint32_t firstBitOffset, uint32_t bitsCount) c
 
 //! Toggles (flips) every bits of the vector
 //!
-//! @return Same vector with all the bits toggled
+//! @note Unused bits remains forced to zero
+//!
+//! @return Same vector with all the used bits toggled
 BinaryVector& BinaryVector::ToggleBits()
 {
   for (auto& byte : m_data)
   {
     byte = ~byte;
   }
+
+  auto bitsOnLastByte = m_usedBits % 8;
+  if (bitsOnLastByte != 0)
+  {
+    m_data.back() &= LEFT_BITS_MASK_8[bitsOnLastByte];
+  }
+
   return *this;
 }
 //

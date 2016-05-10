@@ -159,7 +159,7 @@ void UT_PrettyPrinterVisitor::test_VisitLinker ()
   //
   auto got      = sut.GetPrettyPrint();
   auto expected = string("[Linker](1)    \"Linker name\"\n"
-                         " [Register](0)  \"Mux register name\", length: 3, bypass: 000");
+                         " :Selector: [Register](0) \"Mux register name\", length: 3, bypass: 000");
   TS_ASSERT_EQUALS (got, expected);
 }
 
@@ -189,12 +189,12 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_Verbose ()
   //
   auto got      = sut.GetPrettyPrint();
   auto expected = string("[Linker](1)    \"Linker name\", pending: false, has_condition: false, priority: 0\n"
-                         " [Register](0)  \"Mux register name\", length: 3, bypass:            000\n"
-                         "                                              , next_to_sut:       000\n"
-                         "                                              , last_to_sut:       000\n"
-                         "                                              , last_from_sut:     000\n"
-                         "                                              , expected_from_sut: 000\n"
-                         "                                              , pending: false, has_condition: false, priority: 0"
+                         " :Selector: [Register](0) \"Mux register name\", length: 3, bypass:            000\n"
+                         "                                                        , next_to_sut:       000\n"
+                         "                                                        , last_to_sut:       000\n"
+                         "                                                        , last_from_sut:     000\n"
+                         "                                                        , expected_from_sut: 000\n"
+                         "                                                        , pending: false, has_condition: false, priority: 0"
                         );
   TS_ASSERT_EQUALS (got, expected);
 }
@@ -437,13 +437,13 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_with_Child ()
   //
   auto got      = sut.GetPrettyPrint();
   auto expected = string("[Linker](7)    \"Link\"\n"
+                         " :Selector: [Register](6) \"Selector\", length: 2, bypass: 01\n"
                          " [Chain](0)     \"Chain\"\n"
                          "  [Register](1)  \"Reg_1\", length: 5, bypass: 1010_1\n"
                          "  [Register](2)  \"Reg_2\", length: 6, bypass: 1010_10\n"
                          "  [Register](3)  \"Reg_3\", length: 7, bypass: 1010_111\n"
                          " [Register](4)  \"R_A\", length: 15, bypass: 1110_1110:1111_101\n"
-                         " [Register](5)  \"R_b\", length: 20, bypass: 1110_1110:1111_1010:1110\n"
-                         " [Register](6)  \"Selector\", length: 2, bypass: 01"
+                         " [Register](5)  \"R_b\", length: 20, bypass: 1110_1110:1111_1010:1110"
                         );
   TS_ASSERT_EQUALS (got, expected);
 }
@@ -484,6 +484,12 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_with_Child_Verbose ()
   //
   auto got      = sut.GetPrettyPrint();
   auto expected = string("[Linker](7)    \"Link\", pending: false, has_condition: false, priority: 0\n"
+                         " :Selector: [Register](6) \"Sel_1\", length: 2, bypass:            01\n"
+                         "                                            , next_to_sut:       01\n"
+                         "                                            , last_to_sut:       01\n"
+                         "                                            , last_from_sut:     01\n"
+                         "                                            , expected_from_sut: 01\n"
+                         "                                            , pending: false, has_condition: false, priority: 0\n"
                          " [Chain](0)     \"Chain\", pending: false, has_condition: false, priority: 0\n"
                          "  [Register](1)  \"Reg_1\", length: 5, bypass:            1010_1\n"
                          "                                   , next_to_sut:       1010_1\n"
@@ -514,13 +520,7 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_with_Child_Verbose ()
                          "                                 , last_to_sut:       1110_1110:1111_1010:1110\n"
                          "                                 , last_from_sut:     1110_1110:1111_1010:1110\n"
                          "                                 , expected_from_sut: 1110_1110:1111_1010:1110\n"
-                         "                                 , pending: false, has_condition: false, priority: 0\n"
-                         " [Register](6)  \"Selector\", length: 2, bypass:            01\n"
-                         "                                     , next_to_sut:       01\n"
-                         "                                     , last_to_sut:       01\n"
-                         "                                     , last_from_sut:     01\n"
-                         "                                     , expected_from_sut: 01\n"
-                         "                                     , pending: false, has_condition: false, priority: 0"
+                         "                                 , pending: false, has_condition: false, priority: 0"
                         );
   TS_ASSERT_EQUALS (got, expected);
 }
@@ -571,9 +571,9 @@ void UT_PrettyPrinterVisitor::test_VisitAccessInterface_with_Child ()
                          "  [Register](3)  \"Reg_2\", length: 6, bypass: 1010_10\n"
                          "  [Register](4)  \"Reg_3\", length: 7, bypass: 1010_111\n"
                          " [Linker](8)    \"Linker name\"\n"
+                         "  :Selector: [Register](7) \"Selector\", length: 2, bypass: 01\n"
                          "  [Register](5)  \"R_A\", length: 15, bypass: 1110_1110:1111_101\n"
-                         "  [Register](6)  \"the register\", length: 20, bypass: 1110_1110:1111_1010:1110\n"
-                         "  [Register](7)  \"Selector\", length: 2, bypass: 01"
+                         "  [Register](6)  \"the register\", length: 20, bypass: 1110_1110:1111_1010:1110"
                         );
   TS_ASSERT_EQUALS (got, expected);
 }

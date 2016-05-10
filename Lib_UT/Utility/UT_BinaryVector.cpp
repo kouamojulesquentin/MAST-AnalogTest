@@ -644,11 +644,11 @@ void UT_BinaryVector::test_DataAsHexString_Without_Separators ()
   auto data =
   {
     //   Bits: sut,                                           result
-    make_tuple("1110_0000:1",                                 "EF8"),       // 00
-    make_tuple("1110_0000:1100_111",                          "EFCE"),      // 01
-    make_tuple("1110_0000:1100_1011:1010",                    "EFCBA"),     // 02
-    make_tuple("1110_0000:1100_1011:1010_1",                  "EFCBA8"),    // 03
-    make_tuple("1110_0000:1100_1011:1010_0011:1010_0001:000", "EFCBA3210"), // 04
+    make_tuple("1110_0000:1",                                 "E08"),       // 00
+    make_tuple("1110_0000:1100_111",                          "E0CE"),      // 01
+    make_tuple("1110_0000:1100_1011:1010",                    "E0CBA"),     // 02
+    make_tuple("1110_0000:1100_1011:1010_1",                  "E0CBA8"),    // 03
+    make_tuple("1110_0000:1100_1011:1010_0011:0010_0001:000", "E0CBA3210"), // 04
   };
 
   // ---------------- DDT Exercise

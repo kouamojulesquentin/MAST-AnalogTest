@@ -15,6 +15,8 @@
 #ifndef SVFVECTOR_H__7556F5F5_5280_4133_9BAA_389FCC347CE5__INCLUDED_
   #define SVFVECTOR_H__7556F5F5_5280_4133_9BAA_389FCC347CE5__INCLUDED_
 
+#include "BinaryVector.hpp"
+
 namespace mast
 {
 //! Contains bitstream vector in SVR string format (using ASCII '1' for 1 and '0' for 0)
@@ -26,7 +28,7 @@ class SVFVector final
   public:
   ~SVFVector() = default;
   SVFVector()  = default;
-//+  SVFVector(const BinaryVector& binaryVector);  //!< Converts a BinaryVector to a SVFVector
+  explicit SVFVector(const BinaryVector& binaryVector);  //!< Converts a BinaryVector to a SVFVector
 
 
   // ---------------- Protected Methods

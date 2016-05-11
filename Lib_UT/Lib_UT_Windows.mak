@@ -12,7 +12,7 @@ LD = g++.exe
 WINDRES = windres.exe
 
 INC = -I..\\cxxtest -I..\\Lib\\include -I..\\Lib\\public_include -ICxxTest_Traits
-CFLAGS = -Wnon-virtual-dtor -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equal -Winline -Wunreachable-code -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default -Weffc++ -Wmain -pedantic-errors -pedantic -w -Wfatal-errors -Wextra -fexceptions -DCXXTEST_HAVE_EH -DCXXTEST_HAVE_STD -DCXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION
+CFLAGS = -Wnon-virtual-dtor -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equal -Winline -Wunreachable-code -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default -Weffc++ -Wmain -pedantic-errors -pedantic -w -Wfatal-errors -Wextra -fexceptions -std=c++14 -DCXXTEST_HAVE_EH -DCXXTEST_HAVE_STD -DCXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION
 RESINC = 
 LIBDIR = 
 LIB = 

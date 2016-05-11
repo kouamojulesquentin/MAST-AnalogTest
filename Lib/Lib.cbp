@@ -16,10 +16,11 @@
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-Wall" />
-					<Add option="-DBUILD_DLL" />
 					<Add option="-g" />
+					<Add option="-DBUILD_DLL" />
 				</Compiler>
 				<Linker>
+					<Add option="-Wl,--output-def=..\lib\Debug\libLib.def -Wl,--out-implib=..\bin\Debug\libLib.a -Wl,--dll" />
 					<Add library="user32" />
 				</Linker>
 			</Target>
@@ -31,17 +32,19 @@
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
+					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-DBUILD_DLL" />
-					<Add option="-O2" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-Wl,--output-def=..\bin\Release\libLib.def -Wl,--out-implib=..\bin\Release\libLib.a -Wl,--dll" />
 					<Add library="user32" />
 				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-std=c++14" />
 			<Add directory="include" />
 			<Add directory="public_include" />
 		</Compiler>
@@ -117,6 +120,7 @@
 		<Unit filename="src/ParentNode.cpp" />
 		<Unit filename="src/PrettyPrinterVisitor.cpp" />
 		<Unit filename="src/Register.cpp" />
+		<Unit filename="src/SVFVector.cpp" />
 		<Unit filename="src/SystemModel.cpp" />
 		<Unit filename="src/SystemModelNode.cpp" />
 		<Unit filename="src/Tap.cpp" />

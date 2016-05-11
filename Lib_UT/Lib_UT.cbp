@@ -60,6 +60,7 @@
 			<Add option="-Wfatal-errors" />
 			<Add option="-Wextra" />
 			<Add option="-fexceptions" />
+			<Add option="-std=c++14" />
 			<Add option="-DCXXTEST_HAVE_EH" />
 			<Add option="-DCXXTEST_HAVE_STD" />
 			<Add option="-DCXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION" />

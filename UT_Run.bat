@@ -5,6 +5,8 @@
 @if "%Build%"=="" goto Syntax
 
 @pushd bin\%Build%
+
+@if not exist Lib_UT.exe goto No_exe
 @REM @echo Dir: %cd%
 @REM @dir
 @set Path=C:\MinGW\bin;%Path%
@@ -22,6 +24,13 @@
 @echo Results have been saved into: "%DestFile%"
 
 @goto :EOF
+:No_exe
+@echo.
+@echo. ---- file %CD%\Lib_UT.exe does not exist! ----
+@echo.
+@goto :EOF
 :Syntax
-@echo Syntax is: Ut_Run Debug|Release
+@echo.
+@echo. Syntax is: "UT_Run Debug|Release"
+@echo.
 @goto :EOF

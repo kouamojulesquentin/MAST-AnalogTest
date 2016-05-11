@@ -12,37 +12,37 @@ LD = g++.exe
 WINDRES = windres.exe
 
 INC = -Iinclude -Ipublic_include
-CFLAGS = 
+CFLAGS = -std=c++14
 RESINC = 
 LIBDIR = 
 LIB = 
 LDFLAGS = 
 
 INC_DEBUG = $(INC)
-CFLAGS_DEBUG = $(CFLAGS) -Wall -DBUILD_DLL -g
+CFLAGS_DEBUG = $(CFLAGS) -Wall -g -DBUILD_DLL
 RESINC_DEBUG = $(RESINC)
 RCFLAGS_DEBUG = $(RCFLAGS)
 LIBDIR_DEBUG = $(LIBDIR)
 LIB_DEBUG = $(LIB)-luser32
-LDFLAGS_DEBUG = $(LDFLAGS)
+LDFLAGS_DEBUG = $(LDFLAGS) -Wl,--output-def=..\lib\Debug\libLib.def -Wl,--out-implib=..\bin\Debug\libLib.a -Wl,--dll
 OBJDIR_DEBUG = ..\\obj\\Debug
 DEP_DEBUG = 
 OUT_DEBUG = ..\\bin\\Debug\\Lib.dll
 
 INC_RELEASE = $(INC)
-CFLAGS_RELEASE = $(CFLAGS) -Wall -DBUILD_DLL -O2
+CFLAGS_RELEASE = $(CFLAGS) -O2 -Wall -DBUILD_DLL
 RESINC_RELEASE = $(RESINC)
 RCFLAGS_RELEASE = $(RCFLAGS)
 LIBDIR_RELEASE = $(LIBDIR)
 LIB_RELEASE = $(LIB)-luser32
-LDFLAGS_RELEASE = $(LDFLAGS) -s
+LDFLAGS_RELEASE = $(LDFLAGS) -s -Wl,--output-def=..\bin\Release\libLib.def -Wl,--out-implib=..\bin\Release\libLib.a -Wl,--dll
 OBJDIR_RELEASE = ..\\obj\\Release
 DEP_RELEASE = 
 OUT_RELEASE = ..\\bin\\Release\\Lib.dll
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)\\src\\Tap.o $(OBJDIR_DEBUG)\\src\\SystemModelNode.o $(OBJDIR_DEBUG)\\src\\SystemModel.o $(OBJDIR_DEBUG)\\src\\ScanVectors.o $(OBJDIR_DEBUG)\\src\\Register.o $(OBJDIR_DEBUG)\\src\\ParentNode.o $(OBJDIR_DEBUG)\\src\\Linker.o $(OBJDIR_DEBUG)\\src\\DefaultBinaryPathSelector.o $(OBJDIR_DEBUG)\\src\\Chain.o $(OBJDIR_DEBUG)\\src\\AccessInterface.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)\\src\\AccessInterface.o $(OBJDIR_DEBUG)\\src\\BinaryVector.o $(OBJDIR_DEBUG)\\src\\Chain.o $(OBJDIR_DEBUG)\\src\\DefaultBinaryPathSelector.o $(OBJDIR_DEBUG)\\src\\GmlPrinterVisitor.o $(OBJDIR_DEBUG)\\src\\Linker.o $(OBJDIR_DEBUG)\\src\\ParentNode.o $(OBJDIR_DEBUG)\\src\\PrettyPrinterVisitor.o $(OBJDIR_DEBUG)\\src\\Register.o $(OBJDIR_DEBUG)\\src\\SVFVector.o $(OBJDIR_DEBUG)\\src\\SystemModel.o $(OBJDIR_DEBUG)\\src\\SystemModelNode.o $(OBJDIR_DEBUG)\\src\\Tap.o $(OBJDIR_DEBUG)\\src\\Utility.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)\\src\\Tap.o $(OBJDIR_RELEASE)\\src\\SystemModelNode.o $(OBJDIR_RELEASE)\\src\\SystemModel.o $(OBJDIR_RELEASE)\\src\\ScanVectors.o $(OBJDIR_RELEASE)\\src\\Register.o $(OBJDIR_RELEASE)\\src\\ParentNode.o $(OBJDIR_RELEASE)\\src\\Linker.o $(OBJDIR_RELEASE)\\src\\DefaultBinaryPathSelector.o $(OBJDIR_RELEASE)\\src\\Chain.o $(OBJDIR_RELEASE)\\src\\AccessInterface.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)\\src\\AccessInterface.o $(OBJDIR_RELEASE)\\src\\BinaryVector.o $(OBJDIR_RELEASE)\\src\\Chain.o $(OBJDIR_RELEASE)\\src\\DefaultBinaryPathSelector.o $(OBJDIR_RELEASE)\\src\\GmlPrinterVisitor.o $(OBJDIR_RELEASE)\\src\\Linker.o $(OBJDIR_RELEASE)\\src\\ParentNode.o $(OBJDIR_RELEASE)\\src\\PrettyPrinterVisitor.o $(OBJDIR_RELEASE)\\src\\Register.o $(OBJDIR_RELEASE)\\src\\SVFVector.o $(OBJDIR_RELEASE)\\src\\SystemModel.o $(OBJDIR_RELEASE)\\src\\SystemModelNode.o $(OBJDIR_RELEASE)\\src\\Tap.o $(OBJDIR_RELEASE)\\src\\Utility.o
 
 all: debug release
 
@@ -59,35 +59,47 @@ debug: before_debug out_debug after_debug
 out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 	$(LD) -shared $(LIBDIR_DEBUG) $(OBJ_DEBUG)  -o $(OUT_DEBUG) $(LDFLAGS_DEBUG) $(LIB_DEBUG)
 
-$(OBJDIR_DEBUG)\\src\\Tap.o: src\\Tap.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\Tap.cpp -o $(OBJDIR_DEBUG)\\src\\Tap.o
+$(OBJDIR_DEBUG)\\src\\AccessInterface.o: src\\AccessInterface.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\AccessInterface.cpp -o $(OBJDIR_DEBUG)\\src\\AccessInterface.o
 
-$(OBJDIR_DEBUG)\\src\\SystemModelNode.o: src\\SystemModelNode.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\SystemModelNode.cpp -o $(OBJDIR_DEBUG)\\src\\SystemModelNode.o
-
-$(OBJDIR_DEBUG)\\src\\SystemModel.o: src\\SystemModel.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\SystemModel.cpp -o $(OBJDIR_DEBUG)\\src\\SystemModel.o
-
-$(OBJDIR_DEBUG)\\src\\ScanVectors.o: src\\ScanVectors.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\ScanVectors.cpp -o $(OBJDIR_DEBUG)\\src\\ScanVectors.o
-
-$(OBJDIR_DEBUG)\\src\\Register.o: src\\Register.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\Register.cpp -o $(OBJDIR_DEBUG)\\src\\Register.o
-
-$(OBJDIR_DEBUG)\\src\\ParentNode.o: src\\ParentNode.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\ParentNode.cpp -o $(OBJDIR_DEBUG)\\src\\ParentNode.o
-
-$(OBJDIR_DEBUG)\\src\\Linker.o: src\\Linker.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\Linker.cpp -o $(OBJDIR_DEBUG)\\src\\Linker.o
-
-$(OBJDIR_DEBUG)\\src\\DefaultBinaryPathSelector.o: src\\DefaultBinaryPathSelector.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\DefaultBinaryPathSelector.cpp -o $(OBJDIR_DEBUG)\\src\\DefaultBinaryPathSelector.o
+$(OBJDIR_DEBUG)\\src\\BinaryVector.o: src\\BinaryVector.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\BinaryVector.cpp -o $(OBJDIR_DEBUG)\\src\\BinaryVector.o
 
 $(OBJDIR_DEBUG)\\src\\Chain.o: src\\Chain.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\Chain.cpp -o $(OBJDIR_DEBUG)\\src\\Chain.o
 
-$(OBJDIR_DEBUG)\\src\\AccessInterface.o: src\\AccessInterface.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\AccessInterface.cpp -o $(OBJDIR_DEBUG)\\src\\AccessInterface.o
+$(OBJDIR_DEBUG)\\src\\DefaultBinaryPathSelector.o: src\\DefaultBinaryPathSelector.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\DefaultBinaryPathSelector.cpp -o $(OBJDIR_DEBUG)\\src\\DefaultBinaryPathSelector.o
+
+$(OBJDIR_DEBUG)\\src\\GmlPrinterVisitor.o: src\\GmlPrinterVisitor.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\GmlPrinterVisitor.cpp -o $(OBJDIR_DEBUG)\\src\\GmlPrinterVisitor.o
+
+$(OBJDIR_DEBUG)\\src\\Linker.o: src\\Linker.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\Linker.cpp -o $(OBJDIR_DEBUG)\\src\\Linker.o
+
+$(OBJDIR_DEBUG)\\src\\ParentNode.o: src\\ParentNode.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\ParentNode.cpp -o $(OBJDIR_DEBUG)\\src\\ParentNode.o
+
+$(OBJDIR_DEBUG)\\src\\PrettyPrinterVisitor.o: src\\PrettyPrinterVisitor.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\PrettyPrinterVisitor.cpp -o $(OBJDIR_DEBUG)\\src\\PrettyPrinterVisitor.o
+
+$(OBJDIR_DEBUG)\\src\\Register.o: src\\Register.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\Register.cpp -o $(OBJDIR_DEBUG)\\src\\Register.o
+
+$(OBJDIR_DEBUG)\\src\\SVFVector.o: src\\SVFVector.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\SVFVector.cpp -o $(OBJDIR_DEBUG)\\src\\SVFVector.o
+
+$(OBJDIR_DEBUG)\\src\\SystemModel.o: src\\SystemModel.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\SystemModel.cpp -o $(OBJDIR_DEBUG)\\src\\SystemModel.o
+
+$(OBJDIR_DEBUG)\\src\\SystemModelNode.o: src\\SystemModelNode.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\SystemModelNode.cpp -o $(OBJDIR_DEBUG)\\src\\SystemModelNode.o
+
+$(OBJDIR_DEBUG)\\src\\Tap.o: src\\Tap.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\Tap.cpp -o $(OBJDIR_DEBUG)\\src\\Tap.o
+
+$(OBJDIR_DEBUG)\\src\\Utility.o: src\\Utility.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\Utility.cpp -o $(OBJDIR_DEBUG)\\src\\Utility.o
 
 clean_debug: 
 	cmd /c del /f $(OBJ_DEBUG) $(OUT_DEBUG)
@@ -105,35 +117,47 @@ release: before_release out_release after_release
 out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 	$(LD) -shared $(LIBDIR_RELEASE) $(OBJ_RELEASE)  -o $(OUT_RELEASE) $(LDFLAGS_RELEASE) $(LIB_RELEASE)
 
-$(OBJDIR_RELEASE)\\src\\Tap.o: src\\Tap.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\Tap.cpp -o $(OBJDIR_RELEASE)\\src\\Tap.o
+$(OBJDIR_RELEASE)\\src\\AccessInterface.o: src\\AccessInterface.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\AccessInterface.cpp -o $(OBJDIR_RELEASE)\\src\\AccessInterface.o
 
-$(OBJDIR_RELEASE)\\src\\SystemModelNode.o: src\\SystemModelNode.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\SystemModelNode.cpp -o $(OBJDIR_RELEASE)\\src\\SystemModelNode.o
-
-$(OBJDIR_RELEASE)\\src\\SystemModel.o: src\\SystemModel.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\SystemModel.cpp -o $(OBJDIR_RELEASE)\\src\\SystemModel.o
-
-$(OBJDIR_RELEASE)\\src\\ScanVectors.o: src\\ScanVectors.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\ScanVectors.cpp -o $(OBJDIR_RELEASE)\\src\\ScanVectors.o
-
-$(OBJDIR_RELEASE)\\src\\Register.o: src\\Register.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\Register.cpp -o $(OBJDIR_RELEASE)\\src\\Register.o
-
-$(OBJDIR_RELEASE)\\src\\ParentNode.o: src\\ParentNode.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\ParentNode.cpp -o $(OBJDIR_RELEASE)\\src\\ParentNode.o
-
-$(OBJDIR_RELEASE)\\src\\Linker.o: src\\Linker.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\Linker.cpp -o $(OBJDIR_RELEASE)\\src\\Linker.o
-
-$(OBJDIR_RELEASE)\\src\\DefaultBinaryPathSelector.o: src\\DefaultBinaryPathSelector.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\DefaultBinaryPathSelector.cpp -o $(OBJDIR_RELEASE)\\src\\DefaultBinaryPathSelector.o
+$(OBJDIR_RELEASE)\\src\\BinaryVector.o: src\\BinaryVector.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\BinaryVector.cpp -o $(OBJDIR_RELEASE)\\src\\BinaryVector.o
 
 $(OBJDIR_RELEASE)\\src\\Chain.o: src\\Chain.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\Chain.cpp -o $(OBJDIR_RELEASE)\\src\\Chain.o
 
-$(OBJDIR_RELEASE)\\src\\AccessInterface.o: src\\AccessInterface.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\AccessInterface.cpp -o $(OBJDIR_RELEASE)\\src\\AccessInterface.o
+$(OBJDIR_RELEASE)\\src\\DefaultBinaryPathSelector.o: src\\DefaultBinaryPathSelector.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\DefaultBinaryPathSelector.cpp -o $(OBJDIR_RELEASE)\\src\\DefaultBinaryPathSelector.o
+
+$(OBJDIR_RELEASE)\\src\\GmlPrinterVisitor.o: src\\GmlPrinterVisitor.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\GmlPrinterVisitor.cpp -o $(OBJDIR_RELEASE)\\src\\GmlPrinterVisitor.o
+
+$(OBJDIR_RELEASE)\\src\\Linker.o: src\\Linker.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\Linker.cpp -o $(OBJDIR_RELEASE)\\src\\Linker.o
+
+$(OBJDIR_RELEASE)\\src\\ParentNode.o: src\\ParentNode.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\ParentNode.cpp -o $(OBJDIR_RELEASE)\\src\\ParentNode.o
+
+$(OBJDIR_RELEASE)\\src\\PrettyPrinterVisitor.o: src\\PrettyPrinterVisitor.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\PrettyPrinterVisitor.cpp -o $(OBJDIR_RELEASE)\\src\\PrettyPrinterVisitor.o
+
+$(OBJDIR_RELEASE)\\src\\Register.o: src\\Register.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\Register.cpp -o $(OBJDIR_RELEASE)\\src\\Register.o
+
+$(OBJDIR_RELEASE)\\src\\SVFVector.o: src\\SVFVector.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\SVFVector.cpp -o $(OBJDIR_RELEASE)\\src\\SVFVector.o
+
+$(OBJDIR_RELEASE)\\src\\SystemModel.o: src\\SystemModel.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\SystemModel.cpp -o $(OBJDIR_RELEASE)\\src\\SystemModel.o
+
+$(OBJDIR_RELEASE)\\src\\SystemModelNode.o: src\\SystemModelNode.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\SystemModelNode.cpp -o $(OBJDIR_RELEASE)\\src\\SystemModelNode.o
+
+$(OBJDIR_RELEASE)\\src\\Tap.o: src\\Tap.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\Tap.cpp -o $(OBJDIR_RELEASE)\\src\\Tap.o
+
+$(OBJDIR_RELEASE)\\src\\Utility.o: src\\Utility.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\Utility.cpp -o $(OBJDIR_RELEASE)\\src\\Utility.o
 
 clean_release: 
 	cmd /c del /f $(OBJ_RELEASE) $(OUT_RELEASE)

@@ -108,15 +108,13 @@ BinaryVector& BinaryVector::Append (const BinaryVector& rhs)
   while (bitsToAppend >= 8)
   {
     bitsToAppend -= 8;
-    Append(*pRhsData++, 8);
+    Append(*pRhsData++);
   }
 
   if (bitsToAppend != 0)
   {
-    //+ (begin JFC April/27/2016): for debug purpose til a better solution is implemented
-    auto lastValue = *pRhsData >> (8 - bitsToAppend); // This is to compensate the fact that appending a byte supposed that the bits are right aligned
-    //+ (end   JFC April/27/2016):
-    Append(lastValue, bitsToAppend);
+    auto lastValue = *pRhsData;
+    Append(lastValue, bitsToAppend, BitsAlignment::Left);
   }
 
   return *this;
@@ -129,7 +127,11 @@ BinaryVector& BinaryVector::Append (const BinaryVector& rhs)
 
 //! Appends from 8 bits
 //!
-BinaryVector& BinaryVector::Append (uint8_t value, uint8_t numberOfBits)
+//! @param value          The value to append to the vector
+//! @param numberOfBits   Number of useful bits in the value
+//! @param alignment      Tells whether bits are left (msb) or right (lsb) aligned
+//!
+BinaryVector& BinaryVector::Append (uint8_t value, uint8_t numberOfBits, BitsAlignment alignment)
 {
   if (numberOfBits == 0)
   {
@@ -145,7 +147,10 @@ BinaryVector& BinaryVector::Append (uint8_t value, uint8_t numberOfBits)
   // ---------------- Align (pack) added bits to the MSB
   //                  This make sure that unused bits are set to zero (at least for test and debug purpose)
   //
-  value <<= 8 - numberOfBits;
+  if (alignment == BitsAlignment::Right)
+  {
+    value <<= 8 - numberOfBits;
+  }
   value &=  LEFT_BITS_MASK_8[numberOfBits];
 
   const uint8_t lastByteBits = m_usedBits % 8;
@@ -829,12 +834,9 @@ BinaryVector BinaryVector::Slice (uint32_t firstBitOffset, uint32_t bitsCount) c
     {
       auto byte = m_data[byteOffset];
 
-      //+ (begin JFC April/28/2016): for debug purpose til a better solution is implemented
-      auto ignoredLsb = 8 - (bitOffsetInFirstByte + bitsInFirstByte);
-      byte = byte >> ignoredLsb; // This is to compensate the fact that appending a byte supposed that the bits are right (LSB) aligned
-      //+ (end   JFC April/28/2016):
+      byte <<= bitOffsetInFirstByte;
 
-      result.Append(byte, bitsInFirstByte);
+      result.Append(byte, bitsInFirstByte, BitsAlignment::Left);
 
       bitsCount -= bitsInFirstByte;
       ++byteOffset;
@@ -853,11 +855,7 @@ BinaryVector BinaryVector::Slice (uint32_t firstBitOffset, uint32_t bitsCount) c
     if (bitsCount != 0)
     {
       auto byte = m_data[byteOffset];
-      //+ (begin JFC April/28/2016): for debug purpose til a better solution is implemented
-      byte = byte >> (8 - bitsCount); // This is to compensate the fact that appending a byte supposed that the bits are right (LSB) aligned
-      //+ (end   JFC April/28/2016):
-
-      result.Append(byte, bitsCount);
+      result.Append(byte, bitsCount, BitsAlignment::Left);
       bitsCount = 0;
     }
   }

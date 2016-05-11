@@ -31,6 +31,7 @@ using std::string;
 using std::experimental::string_view;
 
 using mast::BinaryVector;
+using mast::BitsAlignment;
 
 
 
@@ -1042,7 +1043,7 @@ void UT_BinaryVector::test_Append_8_bits_When_Empty ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS      (sut.BitsCount(),   8);
+  TS_ASSERT_EQUALS      (sut.BitsCount(),  8);
   TS_ASSERT_EQUALS      (sut.BytesCount(), 1);
 
   CxxTest::setAbortTestOnFail(true);
@@ -1391,10 +1392,10 @@ void UT_BinaryVector::test_Append_64_bits_When_NotEmpty ()
 }
 
 
-//! Checks Append when sut is empty and adding from 1 to 8 bits from uint8_t
+//! Checks Append when sut is empty and adding from 1 to 8 bits from uint8_t (right aligned)
 //!
 //! @note Each time a new BinaryVector is used
-void UT_BinaryVector::test_Append_1_to_8_bits_When_Empty ()
+void UT_BinaryVector::test_Append_1_to_8_bits_When_Empty_Right_Aligned ()
 {
   // ---------------- DDT Setup
   //
@@ -1411,7 +1412,7 @@ void UT_BinaryVector::test_Append_1_to_8_bits_When_Empty ()
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS_NOTHING (sut.Append(value, numberOfBits));
+    TS_ASSERT_THROWS_NOTHING (sut.Append(value, numberOfBits, BitsAlignment::Right));
 
     // ---------------- Verify
     //
@@ -1466,10 +1467,86 @@ void UT_BinaryVector::test_Append_1_to_8_bits_When_Empty ()
   TS_DATA_DRIVEN_TEST (checker, inputs, expected);
 }
 
-//! Checks Append when sut is not empty (from 1 to 8 bits) and adding from 1 to 8 bits from uint8_t
+//! Checks Append when sut is empty and adding from 1 to 8 bits from uint8_t (left aligned)
 //!
 //! @note Each time a new BinaryVector is used
-void UT_BinaryVector::test_Append_1_to_8_bits_When_NotEmpty ()
+void UT_BinaryVector::test_Append_1_to_8_bits_When_Empty_Left_Aligned ()
+{
+  // ---------------- DDT Setup
+  //
+  using TInput    = tuple<uint8_t,  uint8_t>; // Value, Number of bits (taken from LSB)
+  using TExpected = tuple<uint32_t, uint32_t, vector<uint8_t>>; // Expected bits count, bytes count, bytes
+
+  auto checker = [](const auto& input, const auto& expected)
+  {
+    // ---------------- Setup
+    //
+    auto value        = std::get<0>(input);
+    auto numberOfBits = std::get<1>(input);
+    BinaryVector sut;
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Append(value, numberOfBits, BitsAlignment::Left));
+
+    // ---------------- Verify
+    //
+    const auto  expectedBitsCount  = std::get<0>(expected);
+    const auto  expectedBytesCount = std::get<1>(expected);
+    const auto& expectedContent    = std::get<2>(expected);
+
+    TS_ASSERT_EQUALS (sut.BitsCount(),  expectedBitsCount);
+    TS_ASSERT_EQUALS (sut.BytesCount(), expectedBytesCount);
+
+    const uint8_t* pData = sut.Data();
+
+    TS_ASSERT_GREATER_THAN_EQUALS (expectedContent.size(), expectedBytesCount);
+    CxxTest::setAbortTestOnFail(true);
+    TS_ASSERT_NOT_NULLPTR (pData);
+    for (int ii = 0 ; ii < expectedBytesCount ; ++ii)
+    {
+      TS_ASSERT_EQUALS (pData[ii], expectedContent[ii]);
+    }
+  };
+
+  const vector<TInput> inputs =
+  {   // Value, bits
+    TInput(0x7F, 1),    // 00
+    TInput(0x80, 1),    // 01
+    TInput(0xB0, 2),    // 02
+    TInput(0xC0, 2),    // 03
+    TInput(0x7F, 3),    // 04
+    TInput(0x9F, 4),    // 05
+    TInput(0x8F, 5),    // 06
+    TInput(0x4B, 6),    // 07
+    TInput(0x94, 7),    // 08
+    TInput(0x7B, 8),    // 09
+  };
+
+  const vector<TExpected> expected =
+  {     // Bits, Bytes, Values
+    TExpected(1, 1, {0b00000000}),   // 00
+    TExpected(1, 1, {0b10000000}),   // 01
+    TExpected(2, 1, {0b10000000}),   // 02
+    TExpected(2, 1, {0b11000000}),   // 03
+    TExpected(3, 1, {0b01100000}),   // 04
+    TExpected(4, 1, {0b10010000}),   // 05
+    TExpected(5, 1, {0b10001000}),   // 06
+    TExpected(6, 1, {0b01001000}),   // 07
+    TExpected(7, 1, {0b10010100}),   // 08
+    TExpected(8, 1, {0b01111011}),   // 09
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, inputs, expected);
+}
+
+
+//! Checks Append when sut is not empty (from 1 to 8 bits) and adding from 1 to 8 bits (right aliqned) from uint8_t
+//!
+//! @note Each time a new BinaryVector is used
+void UT_BinaryVector::test_Append_1_to_8_bits_When_NotEmpty_Right_Aligned ()
 {
   // ---------------- DDT Setup
   //
@@ -1490,7 +1567,7 @@ void UT_BinaryVector::test_Append_1_to_8_bits_When_NotEmpty ()
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS_NOTHING (sut.Append(value_2, numberOfBits_2));
+    TS_ASSERT_THROWS_NOTHING (sut.Append(value_2, numberOfBits_2, BitsAlignment::Right));
 
     // ---------------- Verify
     //
@@ -1548,6 +1625,91 @@ void UT_BinaryVector::test_Append_1_to_8_bits_When_NotEmpty ()
   //
   TS_DATA_DRIVEN_TEST (checker, inputs, expected);
 }
+
+
+//! Checks Append when sut is not empty (from 1 to 8 bits) and adding from 1 to 8 bits (left aliqned) from uint8_t
+//!
+//! @note Each time a new BinaryVector is used
+void UT_BinaryVector::test_Append_1_to_8_bits_When_NotEmpty_Left_Aligned ()
+{
+  // ---------------- DDT Setup
+  //
+  using TInput    = tuple<uint8_t, uint8_t, uint8_t, uint8_t>;  // First value and number of bits, second value and number of bits
+  using TExpected = tuple<uint32_t, uint32_t, vector<uint8_t>>; // Expected bits count, bytes count and bytes
+
+  auto checker = [](const auto& input, const auto& expected)
+  {
+    // ---------------- Setup
+    //
+    auto value_1        = std::get<0>(input);
+    auto numberOfBits_1 = std::get<1>(input);
+    auto value_2        = std::get<2>(input);
+    auto numberOfBits_2 = std::get<3>(input);
+
+    BinaryVector sut;
+    sut.Append(value_1, numberOfBits_1, BitsAlignment::Right);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Append(value_2, numberOfBits_2, BitsAlignment::Left));
+
+    // ---------------- Verify
+    //
+    const auto  expectedBitsCount  = std::get<0>(expected);
+    const auto  expectedBytesCount = std::get<1>(expected);
+    const auto& expectedContent    = std::get<2>(expected);
+
+    TS_ASSERT_EQUALS (sut.BitsCount(),  expectedBitsCount);
+    TS_ASSERT_EQUALS (sut.BytesCount(), expectedBytesCount);
+
+    const uint8_t* pData = sut.Data();
+
+    TS_ASSERT_GREATER_THAN_EQUALS (expectedContent.size(), expectedBytesCount);
+    CxxTest::setAbortTestOnFail(true);
+    TS_ASSERT_NOT_NULLPTR (pData);
+    ostringstream os;
+    for (int ii = 0 ; ii < expectedBytesCount ; ++ii)
+    {
+      os.str("");
+      os << "pData[" << ii << "]";
+      auto msg = os.str().c_str();
+      TSM_ASSERT_EQUALS (msg, pData[ii], expectedContent[ii]);
+    }
+  };
+
+  const vector<TInput> inputs =
+  {   // Value, bits(right aligned), value, bits (left aligned)
+    TInput(0x00, 1, 0b10000000, 1), // 00
+    TInput(0x01, 1, 0b01111111, 1), // 01
+    TInput(0x02, 2, 0b11000000, 2), // 02
+    TInput(0x03, 2, 0b10000010, 7), // 03
+    TInput(0x03, 3, 0b00101011, 5), // 04
+    TInput(0x09, 4, 0b10000001, 8), // 05
+    TInput(0x11, 5, 0b01110111, 8), // 06
+    TInput(0x12, 6, 0b10100100, 6), // 07
+    TInput(0x4A, 7, 0b01001010, 8), // 08
+    TInput(0x7B, 8, 0b10100000, 3), // 09
+  };
+
+  const vector<TExpected> expected =
+  {     // Bits, Bytes, Values
+    TExpected(2,  1, {0b01000000}),              // 00
+    TExpected(2,  1, {0b10000000}),              // 01
+    TExpected(4,  1, {0b10110000}),              // 02
+    TExpected(9,  2, {0b11100000, 0b10000000}),  // 03
+    TExpected(8,  1, {0b01100101}),              // 04
+    TExpected(12, 2, {0b10011000, 0b00010000}),  // 05
+    TExpected(13, 2, {0b10001011, 0b10111000}),  // 06
+    TExpected(12, 2, {0b01001010, 0b10010000}),  // 07
+    TExpected(15, 2, {0b10010100, 0b10010100}),  // 08
+    TExpected(11, 2, {0b01111011, 0b10100000}),  // 09
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, inputs, expected);
+}
+
 
 //! Checks Append with another BinaryVector when sut is empty
 //!
@@ -2107,7 +2269,7 @@ void UT_BinaryVector::test_Slice ()
     make_tuple("1011_1101:1011_1110:0101",                    6,  12, "0110_1111:1001"),         // 23
     make_tuple("1011_1101:1011_1110:0101",                    7,  12, "1101_1111:0010"),         // 24
     make_tuple("1011_1101:1011_1110:0101_1001",               8,  13, "1011_1110:0101_1"),       // 25
-    make_tuple("1011_1101:1011_1110:0101_1001",               9,  14, "0111_1100:1011_00"),      // 26
+    make_tuple("1001_1010:1011_1100:1101_1110",               9,  14, "0111_1001:1011_11"),      // 26
     make_tuple("1011_1101:1011_1110:0101_1001:0101_1010:11",  14, 15, "1001_0110:0101_011"),     // 27
     make_tuple("1011_1101:1011_1110:0101_1001:0101_1010:11",  15, 16, "0010_1100:1010_1101"),    // 28
     make_tuple("1011_1101:1011_1110:0101_1001:0101_1010:11",  16, 17, "0101_1001:0101_1010:1"),  // 29

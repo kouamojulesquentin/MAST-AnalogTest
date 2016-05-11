@@ -79,8 +79,10 @@ class UT_BinaryVector : public CxxTest::TestSuite
   void test_Append_32_bits_When_NotEmpty ();
   void test_Append_64_bits_When_NotEmpty ();
 
-  void test_Append_1_to_8_bits_When_Empty ();
-  void test_Append_1_to_8_bits_When_NotEmpty ();
+  void test_Append_1_to_8_bits_When_Empty_Right_Aligned ();
+  void test_Append_1_to_8_bits_When_Empty_Left_Aligned ();
+  void test_Append_1_to_8_bits_When_NotEmpty_Right_Aligned ();
+  void test_Append_1_to_8_bits_When_NotEmpty_Left_Aligned ();
 
   void test_Append_Other_When_Empty ();
   void test_Append_Other_When_NotEmpty ();

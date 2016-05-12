@@ -18,9 +18,6 @@
 				<Linker>
 					<Add library="../bin/Debug/libLib.a" />
 				</Linker>
-				<ExtraCommands>
-					<Add before="mingw32-make.exe -f runner.mak" />
-				</ExtraCommands>
 			</Target>
 			<Target title="Release">
 				<Option output="../bin/Release/Lib_UT" prefix_auto="1" extension_auto="1" />
@@ -69,6 +66,9 @@
 			<Add directory="../Lib/public_include" />
 			<Add directory="CxxTest_Traits" />
 		</Compiler>
+		<ExtraCommands>
+			<Add before="make.exe -f runner.mak" />
+		</ExtraCommands>
 		<Unit filename="CxxTest_Traits/BinaryVector_Traits.hpp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
@@ -93,6 +93,8 @@
 		<Unit filename="Utility/UT_BinaryVector.hpp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="Utility/UT_SVFVector.cpp" />
+		<Unit filename="Utility/UT_SVFVector.hpp" />
 		<Extensions>
 			<code_completion>
 				<search_path add="..\cxxtest" />

@@ -21,15 +21,20 @@ namespace mast
 {
 //! Contains bitstream vector in SVR string format (using ASCII '1' for 1 and '0' for 0)
 //!
-class SVFVector final
+class DLL_EXPORT SVFVector final
 {
   // ---------------- Public  Methods
   //
   public:
   ~SVFVector() = default;
   SVFVector()  = default;
-  explicit SVFVector(const BinaryVector& binaryVector);  //!< Converts a BinaryVector to a SVFVector
+  SVFVector(const BinaryVector& binaryVector);  //!< Converts a BinaryVector to a SVFVector
 
+  BinaryVector  ToBinaryVector() const;         //!< Create a BinaryVector from content
+
+  bool               IsEmpty()   const { return m_data.empty();}             //!< Returns true when there is no bit in the SVFVector, false otherwise
+  uint32_t           BitsCount() const { return m_usedBits; }                //!< Returns total number of valid bits in the SVFVector
+  const std::string& Data()      const { return m_data;     }                //!< Returns string SVF representation of bits (righ aligned)
 
   // ---------------- Protected Methods
   //

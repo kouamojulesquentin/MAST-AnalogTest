@@ -16,10 +16,16 @@
   #define SVFVECTOR_H__7556F5F5_5280_4133_9BAA_389FCC347CE5__INCLUDED_
 
 #include "BinaryVector.hpp"
+#include <experimental/string_view>
 
 namespace mast
 {
-//! Contains bitstream vector in SVR string format (using ASCII '1' for 1 and '0' for 0)
+//! Contains bitstream vector in SVF string (using ASCII '1' for 1 and '0' for 0)
+//!
+//! @note Internal representation is such as The bit order for scan data follows the convention that the least
+//!       significant bit (right-most bit) is the first bit scanned into the hardware for TDI and SMASK scan data and
+//!       is the first bit scanned out for TDO and MASK data.
+//!       This bit ordering is consistent with the IEEE 1149.1 convention.
 //!
 class DLL_EXPORT SVFVector final
 {
@@ -28,21 +34,19 @@ class DLL_EXPORT SVFVector final
   public:
   ~SVFVector() = default;
   SVFVector()  = default;
-  SVFVector(const BinaryVector& binaryVector);  //!< Converts a BinaryVector to a SVFVector
 
-  BinaryVector  ToBinaryVector() const;         //!< Create a BinaryVector from content
+  SVFVector(std::experimental::string_view svfString, uint32_t bitsCount); //!< Converts a plain SVF string stream to SVFVector
+  SVFVector(const BinaryVector&            binaryVector);                  //!< Converts a BinaryVector to a SVFVector
+
+  BinaryVector       ToBinaryVector() const;         //!< Create a BinaryVector from content
 
   bool               IsEmpty()   const { return m_data.empty();}             //!< Returns true when there is no bit in the SVFVector, false otherwise
   uint32_t           BitsCount() const { return m_usedBits; }                //!< Returns total number of valid bits in the SVFVector
   const std::string& Data()      const { return m_data;     }                //!< Returns string SVF representation of bits (righ aligned)
 
-  // ---------------- Protected Methods
-  //
-  protected:
-
   // ---------------- Private  Methods
   //
-  private:
+  static std::string CleanSvfString (std::experimental::string_view svfString, uint32_t bitsCount);
 
   // ---------------- Private  Fields
   //

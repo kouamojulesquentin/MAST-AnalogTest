@@ -32,10 +32,14 @@ class UT_SVFVector : public CxxTest::TestSuite
   // ---------------- Constructor
   //
   void test_Constructor_Default ();
+  void test_Constructor_FromString ();
+  void test_Constructor_FromString_With_Separators ();
+  void test_Constructor_FromString_Not_Valid_Parameters ();
   void test_Constructor_FromBinary ();
 
+  // ---------------- Other methods
+  //
   void test_ToBinaryVector ();
-
 };
 //
 //  End of UT_SVFVector class declaration

@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <iomanip>
 
+using std::string;
 using std::ostringstream;
 
 using namespace mast;
@@ -56,6 +57,128 @@ namespace
 
 
 } // End of unnamed namespace
+
+
+
+//! Converts a plain SVF string stream to SVFVector
+//!
+SVFVector::SVFVector (std::experimental::string_view svfString, uint32_t bitsCount)
+  : m_data     (CleanSvfString(svfString, bitsCount))
+  , m_usedBits (bitsCount)
+{
+}
+//
+//  End of: SVFVector::SVFVector
+//---------------------------------------------------------------------------
+
+
+
+//! Removes, from SVF string any new lines, spaces, and usual separator while forcing a multiple of
+//! two characters (that ease other algorithms)
+//!
+//! @param svfString  A SVF compatible string embedding optional new lines, spaces and usual separator (-_:)
+//! @param bitsCount
+//!
+string SVFVector::CleanSvfString (std::experimental::string_view svfString, uint32_t bitsCount)
+{
+  if (bitsCount > (svfString.length() * 4))
+  {
+    THROW_INVALID_ARGUMENT("bitsCount is too large relative to svfString");
+  }
+
+  auto expectedBytesCount = (bitsCount + 7) / 8;
+  auto expectedCharCount  = expectedBytesCount * 2;
+
+  auto   pChar = svfString.cbegin();
+  string data;
+  data.  reserve(expectedCharCount);
+
+  while (pChar != svfString.cend())
+  {
+    auto nextChar = *pChar++;
+
+    // ---------------- Validate nextChar
+    //
+    switch (nextChar)
+    {
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      case 'A':
+      case 'B':
+      case 'C':
+      case 'D':
+      case 'E':
+      case 'F':
+        break;
+      case 'a': nextChar = 'A'; break;
+      case 'b': nextChar = 'B'; break;
+      case 'c': nextChar = 'C'; break;
+      case 'd': nextChar = 'D'; break;
+      case 'e': nextChar = 'E'; break;
+      case 'f': nextChar = 'F'; break;
+      case '-':
+      case '_':
+      case ':':
+      case ',':
+      case ' ':
+      case '\t':
+      case '\'':
+      case '\r':
+      case '\n':
+      case '\0':
+        nextChar = '\0';
+        break;  // Ignored characters
+      default:
+        THROW_INVALID_ARGUMENT("SVFVector only support characters in '01,\':_-\\x20\\t'");
+    }
+
+    if (nextChar != '\0')
+    {
+      data.push_back(nextChar);
+    }
+  }
+
+  // ---------------- Make sure result has minimal characters and is a
+  //                  multiple of two characters (that ease other algorithm)
+  //
+  if (data.length() == (expectedCharCount - 1))
+  {
+    auto bitsOnLastBytes = bitsCount % 8;
+    if ((bitsOnLastBytes != 0) && (bitsOnLastBytes <= 4))
+    {
+      return string("0") + data;
+    }
+
+    THROW_INVALID_ARGUMENT("There is not enough hexadecimal character for specified bits count");
+  }
+
+  if (data.length() > expectedCharCount)
+  {
+    auto skipCount = data.length() - expectedCharCount;
+    return data.substr(skipCount);
+  }
+
+  if (data.length() < expectedCharCount)
+  {
+    THROW_INVALID_ARGUMENT("There is not enough hexadecimal character for specified bits count");
+  }
+
+
+
+  return data;
+}
+//
+//  End of: SVFVector::CleanSvfString
+//---------------------------------------------------------------------------
+
 
 
 
@@ -132,38 +255,56 @@ SVFVector::SVFVector (const BinaryVector& binaryVector)
 //---------------------------------------------------------------------------
 
 
-//! Create a BinaryVector from content
+//! Creates a BinaryVector from content
 //!
 //! @note Takes packet of 8 bits from BinaryVector end to form hexadimal string representation;
 //!       then move backward in BinaryVector and forward in SVFVector string
+//! @note A pre-condition is that internal string is a multiple of two characters
 //!
+//! @note Supposing that the internal representation is 01234567890A and number of used bits is 44,
+//!       then BinaryVector will be: A8967452301
 BinaryVector SVFVector::ToBinaryVector () const
 {
   BinaryVector result;
 
-  auto    endWithNibble      = m_data.size() % 2; // SVF vector may not be alway a multiple of 2 char
+  auto endWithNibble = m_data.size() % 2; // SVF vector may not be always a multiple of 2 char
 
   if (endWithNibble)
   {
     THROW_LOGIC_ERROR("Expected SVFVector to end with a 2 digits");
   }
 
-  auto makeByteFromChars = [](auto msbChar, auto lsbChar) -> uint8_t
+  auto charToNibble = [](auto aChar) -> uint8_t
   {
-    //+ (JFC May/12/2016): To real code
-    return 0xA5;
+    switch (aChar)
+    {
+      case '0': return 0;
+      case '1': return 1;
+      case '2': return 2;
+      case '3': return 3;
+      case '4': return 4;
+      case '5': return 5;
+      case '6': return 6;
+      case '7': return 7;
+      case '8': return 8;
+      case '9': return 9;
+      case 'A':
+      case 'a': return 0xA;
+      case 'B':
+      case 'b': return 0xB;
+      case 'C':
+      case 'c': return 0xC;
+      case 'D':
+      case 'd': return 0xD;
+      case 'E':
+      case 'e': return 0xE;
+      case 'F':
+      case 'f': return 0xF;
+      default: THROW_LOGIC_ERROR("Cannot convert non hexadecimal character");
+        break;
+    }
   };
 
-  auto pChar = m_data.crbegin();
-//+  if (usedBitsOnLastByte != 0)
-//+  {
-//+    auto lsbChar = *pChar++;
-//+    auto msbChar = *pChar++;
-
-//+    uint8_t byte = makeByteFromChars(msbChar, lsbChar);
-//+    result.Append(byte, usedBitsOnLastByte, BitsAlignment::Right);
-//+    usedBitsOnLastByte = 8;
-//+  }
 
   uint8_t usedBitsOnLastByte = m_usedBits % 8;
   if (usedBitsOnLastByte == 0)
@@ -171,12 +312,16 @@ BinaryVector SVFVector::ToBinaryVector () const
     usedBitsOnLastByte = 8;
   }
 
+  auto pChar = m_data.crbegin();
   while (pChar != m_data.crend())
   {
     auto lsbChar = *pChar++;
     auto msbChar = *pChar++;
 
-    uint8_t byte = makeByteFromChars(msbChar, lsbChar);
+    uint8_t lsb = charToNibble(lsbChar);
+    uint8_t msb = charToNibble(msbChar);
+    uint8_t byte = (msb << 4) + lsb;
+
     result.Append(byte, usedBitsOnLastByte, BitsAlignment::Right);
     usedBitsOnLastByte = 8;
   }

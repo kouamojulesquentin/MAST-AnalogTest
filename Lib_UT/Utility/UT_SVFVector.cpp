@@ -42,6 +42,185 @@ void UT_SVFVector::test_Constructor_Default ()
 }
 
 
+//! Checks SVFVector constructor from SVF string (hexadecimal)
+//!
+void UT_SVFVector::test_Constructor_FromString ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto   bitsCount         = std::get<0>(data);
+    auto   input             = std::get<1>(data);
+    auto   expectedBitsCount = std::get<2>(data);
+    string expectedData      = std::get<3>(data);
+
+    // ---------------- Exercise
+    //
+    SVFVector sut(input, bitsCount);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.BitsCount(), expectedBitsCount);
+    TS_ASSERT_EQUALS (sut.Data(),      expectedData);
+  };
+
+
+  auto data =
+  {           // input, bitsCount, expected bitsCount, expected data
+    make_tuple(0,  "",        0,  ""),       // 00
+    make_tuple(1,  "0",       1,  "00"),     // 01
+    make_tuple(1,  "01",      1,  "01"),     // 02
+    make_tuple(2,  "2",       2,  "02"),     // 03
+    make_tuple(3,  "05",      3,  "05"),     // 04
+    make_tuple(4,  "0",       4,  "00"),     // 05
+    make_tuple(4,  "1",       4,  "01"),     // 06
+    make_tuple(4,  "002",     4,  "02"),     // 07
+    make_tuple(4,  "3",       4,  "03"),     // 08
+    make_tuple(4,  "4",       4,  "04"),     // 09
+    make_tuple(4,  "5",       4,  "05"),     // 10
+    make_tuple(4,  "6",       4,  "06"),     // 11
+    make_tuple(4,  "7",       4,  "07"),     // 12
+    make_tuple(4,  "8",       4,  "08"),     // 13
+    make_tuple(4,  "9",       4,  "09"),     // 14
+    make_tuple(4,  "a",       4,  "0A"),     // 15
+    make_tuple(4,  "b",       4,  "0B"),     // 16
+    make_tuple(4,  "c",       4,  "0C"),     // 17
+    make_tuple(4,  "d",       4,  "0D"),     // 18
+    make_tuple(4,  "e",       4,  "0E"),     // 19
+    make_tuple(4,  "f",       4,  "0F"),     // 20
+    make_tuple(5,  "17",      5,  "17"),     // 21
+    make_tuple(6,  "02B",     6,  "2B"),     // 22
+    make_tuple(7,  "75",      7,  "75"),     // 23
+    make_tuple(8,  "00",      8,  "00"),     // 24
+    make_tuple(8,  "01",      8,  "01"),     // 25
+    make_tuple(8,  "002",     8,  "02"),     // 26
+    make_tuple(8,  "04",      8,  "04"),     // 27
+    make_tuple(8,  "08",      8,  "08"),     // 28
+    make_tuple(8,  "10",      8,  "10"),     // 29
+    make_tuple(8,  "20",      8,  "20"),     // 30
+    make_tuple(8,  "40",      8,  "40"),     // 31
+    make_tuple(8,  "80",      8,  "80"),     // 32
+    make_tuple(8,  "A5",      8,  "A5"),     // 33
+    make_tuple(8,  "5A",      8,  "5A"),     // 34
+    make_tuple(9,  "1BD",     9,  "01BD"),   // 35
+    make_tuple(11, "06F5",    11, "06F5"),   // 36
+    make_tuple(16, "030E",    16, "030E"),   // 37
+    make_tuple(17, "0061CDE", 17, "061CDE"), // 38
+    make_tuple(20, "5E123",   20, "05E123"), // 39
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks SVFVector constructor from SVF string (hexadecimal) with embedded separators
+//!
+void UT_SVFVector::test_Constructor_FromString_With_Separators ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto   bitsCount         = std::get<0>(data);
+    auto   input             = std::get<1>(data);
+    auto   expectedBitsCount = std::get<2>(data);
+    string expectedData      = std::get<3>(data);
+
+    // ---------------- Exercise
+    //
+    SVFVector sut(input, bitsCount);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.BitsCount(), expectedBitsCount);
+    TS_ASSERT_EQUALS (sut.Data(),      expectedData);
+  };
+
+
+  auto data = // input, bitsCount, expected bitsCount, expected data
+  {
+    make_tuple(0,  " ",         0,  ""),       // 00
+    make_tuple(1,  " 0 ",       1,  "00"),     // 01
+    make_tuple(1,  "0 1",       1,  "01"),     // 02
+    make_tuple(2,  " 2",        2,  "02"),     // 03
+    make_tuple(3,  "05 ",       3,  "05"),     // 04
+    make_tuple(6,  "02_B",      6,  "2B"),     // 05
+    make_tuple(15, "75:98",     15, "7598"),   // 06
+    make_tuple(15, "75-98",     15, "7598"),   // 07
+    make_tuple(8,  "5,A",       8,  "5A"),     // 08
+    make_tuple(9,  "1B'D",      9,  "01BD"),   // 09
+    make_tuple(11, "06F5",      11, "06F5"),   // 10
+    make_tuple(16, "030E",      16, "030E"),   // 11
+    make_tuple(17, "0061\tCDE", 17, "061CDE"), // 12
+    make_tuple(19, "071\nCDE",  19, "071CDE"), // 13
+    make_tuple(19, "071\rCDE",  19, "071CDE"), // 14
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks SVFVector constructor from SVF string (hexadecimal) with not valid parameters
+//!
+void UT_SVFVector::test_Constructor_FromString_Not_Valid_Parameters ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto   bitsCount         = std::get<0>(data);
+    auto   input             = std::get<1>(data);
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (SVFVector sut(input, bitsCount), std::exception);
+  };
+
+
+  auto data = // input, bitsCount, expected bitsCount, expected data
+  {
+    // ---------------- Not enough charaters
+    //
+    make_tuple(1,  "  "),        // 00
+    make_tuple(5,  "2"),         // 01
+    make_tuple(5,  " 2"),        // 02
+    make_tuple(15, "_98_"),      // 03
+    make_tuple(25, "5-98"),      // 04
+
+    // ---------------- Not valid characters
+    //
+    make_tuple(8,  "5?A"),        // 05
+    make_tuple(9,  "0x1BD"),      // 06
+    make_tuple(11, "0g1110111"),  // 07
+    make_tuple(16, "03&0E"),      // 08
+    make_tuple(17, "006\\CDE"),   // 09
+    make_tuple(19, "(071CDE)"),   // 10
+    make_tuple(19, "[071\rCDE]"), // 11
+    make_tuple(19, "\"07CDE\""),  // 12
+    make_tuple(8,  "5OA"),        // 13
+    make_tuple(8,  "5IA"),        // 14
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+
+
+
 //! Checks SVFVector constructor from BinaryVector
 //!
 void UT_SVFVector::test_Constructor_FromBinary ()
@@ -110,6 +289,8 @@ void UT_SVFVector::test_Constructor_FromBinary ()
     make_tuple("0000_1110:0000_0011",      16, "030E"),   // 37
     make_tuple("0000_1110:0000_00110",     17, "061C00"), // 38
     make_tuple("0000_1110:0000_0011:0101", 20, "35E000"), // 39
+
+    make_tuple("1010_1000:1001_0110:0111_0100:0101_0010:0011_0000:0001", 44, "01234567890A"), // 40
   };
 
   // ---------------- DDT Exercise
@@ -188,6 +369,8 @@ void UT_SVFVector::test_ToBinaryVector ()
     make_tuple("0000_1110:0000_0011",      "0000_1110:0000_0011"),      // 37
     make_tuple("0000_1110:0000_00110",     "0000_1110:0000_00110"),     // 38
     make_tuple("0000_1110:0000_0011:0101", "0000_1110:0000_0011:0101"), // 39
+
+    make_tuple("1010_1000:1001_0110:0111_0100:0101_0010:0011_0000:0001", "1010_1000:1001_0110:0111_0100:0101_0010:0011_0000:0001"), // 40
   };
 
   // ---------------- DDT Exercise

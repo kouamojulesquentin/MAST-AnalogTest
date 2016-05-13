@@ -44,8 +44,12 @@ class DLL_EXPORT SVFVector final
   uint32_t           BitsCount() const { return m_usedBits; }                //!< Returns total number of valid bits in the SVFVector
   const std::string& Data()      const { return m_data;     }                //!< Returns string SVF representation of bits (righ aligned)
 
+  bool operator==(const SVFVector& rhs) const;                               //!< Compares to other for equality
+  bool operator!=(const SVFVector& rhs) const { return !operator==(rhs); };  //!< Compares to other for inequality
+
   // ---------------- Private  Methods
   //
+  static uint8_t     CharToNibble (char achar);
   static std::string CleanSvfString (std::experimental::string_view svfString, uint32_t bitsCount);
 
   // ---------------- Private  Fields

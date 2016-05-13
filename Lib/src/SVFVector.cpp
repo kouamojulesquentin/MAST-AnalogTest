@@ -73,6 +73,122 @@ SVFVector::SVFVector (std::experimental::string_view svfString, uint32_t bitsCou
 
 
 
+
+
+
+
+//! Constructs from BinaryVector
+//!
+//! @note Take into account that all bits in a BinaryVector are left aligned
+//! @note Takes packet of 8 bits from BinaryVector end to form hexadimal string representation;
+//!       then move backward in BinaryVector and forward in SVFVector string
+//!
+SVFVector::SVFVector (const BinaryVector& binaryVector)
+{
+  auto bitsCount = binaryVector.BitsCount();
+
+  if (bitsCount != 0)
+  {
+    ostringstream os;
+    os << std::uppercase << std::hex << std::setw(2) << std::right << std::setfill('0');
+
+    auto bitsOnLastBytes = bitsCount % 8;
+
+    auto pBegin = binaryVector.Data();
+    auto pEnd   = pBegin + binaryVector.BytesCount();
+    auto pByte  = pEnd;
+
+    if (bitsOnLastBytes == 0) // Deal with fast case
+    {
+      do
+      {
+        --pByte;
+
+        os << std::setw(2) << static_cast<int>(*pByte);
+      } while (pByte != pBegin);
+    }
+    else                    // Deal with case, each SVF byte is stranded on two bytes of BinaryVector
+    {
+      uint32_t bitsOnPreviousBytes = 8 - bitsOnLastBytes;
+      uint32_t byte = 0;
+
+      --pByte;  // Points on last byte
+      while (pByte != pBegin)
+      {
+        uint8_t lsb = *pByte--;  // lsb for SVFVector is on msb of BinaryVector
+        uint8_t msb = *pByte;    // msb for SVFVector is on lsb of BinaryVector
+
+        // ---------------- Merge bytes
+        //
+        // e.g. : [xxxmmmmm][lllyyyyy] ==> [mmmmmlll]
+        //
+        lsb >>= bitsOnPreviousBytes;
+        msb <<= bitsOnLastBytes;
+        lsb &= RIGHT_BITS_MASK_8[bitsOnLastBytes];
+        msb &= LEFT_BITS_MASK_8[bitsOnPreviousBytes];
+
+        unsigned int byte = msb | lsb;
+        os << std::setw(2) << static_cast<int>(byte);
+      }
+
+      // ---------------- Process last bits (on first byte)
+      //
+      byte   = *pByte;
+      byte >>= bitsOnPreviousBytes;
+      byte  &= RIGHT_BITS_MASK_8[bitsOnLastBytes];
+
+      os << std::setw(2) << static_cast<int>(byte);
+    }
+
+    m_usedBits = bitsCount;
+    m_data     = os.str();
+  }
+
+}
+//
+//  End of: SVFVector::SVFVector
+//---------------------------------------------------------------------------
+
+
+
+//! Transforms an hexadecimal character into its integral value (from 0 to F)
+//!
+uint8_t SVFVector::CharToNibble (char aChar)
+{
+  switch (aChar)
+  {
+    case '0': return 0;
+    case '1': return 1;
+    case '2': return 2;
+    case '3': return 3;
+    case '4': return 4;
+    case '5': return 5;
+    case '6': return 6;
+    case '7': return 7;
+    case '8': return 8;
+    case '9': return 9;
+    case 'A':
+    case 'a': return 0xA;
+    case 'B':
+    case 'b': return 0xB;
+    case 'C':
+    case 'c': return 0xC;
+    case 'D':
+    case 'd': return 0xD;
+    case 'E':
+    case 'e': return 0xE;
+    case 'F':
+    case 'f': return 0xF;
+    default: THROW_LOGIC_ERROR("Cannot convert non hexadecimal character");
+      break;
+  }
+}
+//
+//  End of: SVFVector::CharToNibble
+//---------------------------------------------------------------------------
+
+
+
 //! Removes, from SVF string any new lines, spaces, and usual separator while forcing a multiple of
 //! two characters (that ease other algorithms)
 //!
@@ -180,78 +296,25 @@ string SVFVector::CleanSvfString (std::experimental::string_view svfString, uint
 //---------------------------------------------------------------------------
 
 
-
-
-//! Constructs from BinaryVector
+//! Returns true when *this is equal to another SVFVector
 //!
-//! @note Take into account that all bits in a BinaryVector are left aligned
-//! @note Takes packet of 8 bits from BinaryVector end to form hexadimal string representation;
-//!       then move backward in BinaryVector and forward in SVFVector string
-//!
-SVFVector::SVFVector (const BinaryVector& binaryVector)
+bool SVFVector::operator== (const SVFVector& rhs) const
 {
-  auto bitsCount = binaryVector.BitsCount();
-
-  if (bitsCount != 0)
+  if (m_usedBits != rhs.m_usedBits)
   {
-    ostringstream os;
-    os << std::uppercase << std::hex << std::setw(2) << std::right << std::setfill('0');
-
-    auto bitsOnLastBytes = bitsCount % 8;
-
-    auto pBegin = binaryVector.Data();
-    auto pEnd   = pBegin + binaryVector.BytesCount();
-    auto pByte  = pEnd;
-
-    if (bitsOnLastBytes == 0) // Deal with fast case
-    {
-      do
-      {
-        --pByte;
-
-        os << std::setw(2) << static_cast<int>(*pByte);
-      } while (pByte != pBegin);
-    }
-    else                    // Deal with case, each SVF byte is stranded on two bytes of BinaryVector
-    {
-      uint32_t bitsOnPreviousBytes = 8 - bitsOnLastBytes;
-      uint32_t byte = 0;
-
-      --pByte;  // Points on last byte
-      while (pByte != pBegin)
-      {
-        uint8_t lsb = *pByte--;  // lsb for SVFVector is on msb of BinaryVector
-        uint8_t msb = *pByte;    // msb for SVFVector is on lsb of BinaryVector
-
-        // ---------------- Merge bytes
-        //
-        // e.g. : [xxxmmmmm][lllyyyyy] ==> [mmmmmlll]
-        //
-        lsb >>= bitsOnPreviousBytes;
-        msb <<= bitsOnLastBytes;
-        lsb &= RIGHT_BITS_MASK_8[bitsOnLastBytes];
-        msb &= LEFT_BITS_MASK_8[bitsOnPreviousBytes];
-
-        unsigned int byte = msb | lsb;
-        os << std::setw(2) << static_cast<int>(byte);
-      }
-
-      // ---------------- Process last bits (on first byte)
-      //
-      byte   = *pByte;
-      byte >>= bitsOnPreviousBytes;
-      byte  &= RIGHT_BITS_MASK_8[bitsOnLastBytes];
-
-      os << std::setw(2) << static_cast<int>(byte);
-    }
-
-    m_usedBits = bitsCount;
-    m_data     = os.str();
+    return false;
   }
 
+  if (m_usedBits == 0)
+  {
+    return true;
+  }
+
+  auto areEqual = m_data == rhs.m_data;
+  return areEqual;
 }
 //
-//  End of: SVFVector::SVFVector
+//  End of: SVFVector::operator==
 //---------------------------------------------------------------------------
 
 
@@ -274,37 +337,6 @@ BinaryVector SVFVector::ToBinaryVector () const
     THROW_LOGIC_ERROR("Expected SVFVector to end with a 2 digits");
   }
 
-  auto charToNibble = [](auto aChar) -> uint8_t
-  {
-    switch (aChar)
-    {
-      case '0': return 0;
-      case '1': return 1;
-      case '2': return 2;
-      case '3': return 3;
-      case '4': return 4;
-      case '5': return 5;
-      case '6': return 6;
-      case '7': return 7;
-      case '8': return 8;
-      case '9': return 9;
-      case 'A':
-      case 'a': return 0xA;
-      case 'B':
-      case 'b': return 0xB;
-      case 'C':
-      case 'c': return 0xC;
-      case 'D':
-      case 'd': return 0xD;
-      case 'E':
-      case 'e': return 0xE;
-      case 'F':
-      case 'f': return 0xF;
-      default: THROW_LOGIC_ERROR("Cannot convert non hexadecimal character");
-        break;
-    }
-  };
-
 
   uint8_t usedBitsOnLastByte = m_usedBits % 8;
   if (usedBitsOnLastByte == 0)
@@ -318,8 +350,8 @@ BinaryVector SVFVector::ToBinaryVector () const
     auto lsbChar = *pChar++;
     auto msbChar = *pChar++;
 
-    uint8_t lsb = charToNibble(lsbChar);
-    uint8_t msb = charToNibble(msbChar);
+    uint8_t lsb = CharToNibble(lsbChar);
+    uint8_t msb = CharToNibble(msbChar);
     uint8_t byte = (msb << 4) + lsb;
 
     result.Append(byte, usedBitsOnLastByte, BitsAlignment::Right);

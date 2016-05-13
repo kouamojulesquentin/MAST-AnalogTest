@@ -37,7 +37,19 @@ class UT_SVFVector : public CxxTest::TestSuite
   void test_Constructor_FromString_Not_Valid_Parameters ();
   void test_Constructor_FromBinary ();
 
-  // ---------------- Other methods
+  // ---------------- Operator==
+  //
+  void test_operator_eq_With_Self ();
+  void test_operator_eq_When_Equal ();
+  void test_operator_eq_When_NotEqual ();
+
+  // ---------------- Operator!=
+  //
+  void test_operator_neq_With_Self ();
+  void test_operator_neq_When_Equal ();
+  void test_operator_neq_When_NotEqual ();
+
+  // ---------------- Miscellaneous methods
   //
   void test_ToBinaryVector ();
 };

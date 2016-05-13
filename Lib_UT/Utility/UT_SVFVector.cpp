@@ -299,6 +299,253 @@ void UT_SVFVector::test_Constructor_FromBinary ()
 }
 
 
+//! Checks SVFVector::operator== when both are equal
+//!
+void UT_SVFVector::test_operator_eq_With_Self ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto svfString = std::get<0>(data);
+    auto bitsCount = std::get<1>(data);
+    auto sut = SVFVector(svfString, bitsCount);
+
+    // ---------------- Exercise
+    //
+    bool areEqual = sut == sut;
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_TRUE (areEqual);
+  };
+
+  auto inputs =
+  {
+    make_tuple("",        0),  // 00
+    make_tuple("0",       1),  // 01
+    make_tuple("1",       1),  // 02
+    make_tuple("1",       3),  // 03
+    make_tuple("51",      7),  // 04
+    make_tuple("1ABCDEF", 25), // 05
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, inputs);
+}
+
+
+
+//! Checks SVFVector::operator== when both are equal
+//!
+void UT_SVFVector::test_operator_eq_When_Equal ()
+{
+// ---------------- DDT Setup
+//
+auto checker = [](auto data)
+{
+  // ---------------- Setup
+  //
+  auto svfString = std::get<0>(data);
+  auto bitsCount = std::get<1>(data);
+  auto sut = SVFVector(svfString, bitsCount);
+  auto rhs = SVFVector(svfString, bitsCount);
+
+  // ---------------- Exercise
+  //
+  bool areEqual = sut == rhs;
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE (areEqual);
+};
+
+auto inputs =
+{
+  make_tuple("",        0),  // 00
+  make_tuple("0",       1),  // 01
+  make_tuple("1",       1),  // 02
+  make_tuple("1",       3),  // 03
+  make_tuple("51",      7),  // 04
+  make_tuple("1ABCDEF", 25), // 05
+};
+
+// ---------------- DDT Exercise
+//
+TS_DATA_DRIVEN_TEST (checker, inputs);
+}
+
+
+//! Checks SVFVector::operator== when both are not equal
+//!
+void UT_SVFVector::test_operator_eq_When_NotEqual ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto sutSvfString = std::get<0>(data);
+    auto sutBitsCount = std::get<1>(data);
+    auto rhsSvfString = std::get<2>(data);
+    auto rhsBitsCount = std::get<3>(data);
+
+    auto sut = SVFVector(sutSvfString, sutBitsCount);
+    auto rhs = SVFVector(rhsSvfString, rhsBitsCount);
+
+    // ---------------- Exercise
+    //
+    bool areEqual = sut == rhs;
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_FALSE (areEqual);
+  };
+
+  auto inputs =
+  {
+    make_tuple("",        0,  "0",       1),  // 00
+    make_tuple("0",       1,  "0",       2),  // 01
+    make_tuple("0",       2,  "0",       1),  // 02
+    make_tuple("0",       1,  "1",       1),  // 03
+    make_tuple("1",       1,  "0",       1),  // 04
+    make_tuple("1",       3,  "2",       3),  // 05
+    make_tuple("51",      7,  "71",      7),  // 06
+    make_tuple("1ABCDEF", 25, "1ABDDEF", 25), // 07
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, inputs);
+}
+
+//! Checks SVFVector::operator!= when comparing with same instance
+//!
+void UT_SVFVector::test_operator_neq_With_Self ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto svfString = std::get<0>(data);
+    auto bitsCount = std::get<1>(data);
+    auto sut = SVFVector(svfString, bitsCount);
+
+    // ---------------- Exercise
+    //
+    bool areNotEqual = sut != sut;
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_FALSE (areNotEqual);
+  };
+
+  auto inputs =
+  {
+    make_tuple("",        0),  // 00
+    make_tuple("0",       1),  // 01
+    make_tuple("1",       1),  // 02
+    make_tuple("1",       3),  // 03
+    make_tuple("51",      7),  // 04
+    make_tuple("1ABCDEF", 25), // 05
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, inputs);
+}
+
+
+//! Checks SVFVector::operator!= when both are equal
+//!
+void UT_SVFVector::test_operator_neq_When_Equal ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto svfString = std::get<0>(data);
+    auto bitsCount = std::get<1>(data);
+    auto sut = SVFVector(svfString, bitsCount);
+    auto rhs = SVFVector(svfString, bitsCount);
+
+    // ---------------- Exercise
+    //
+    bool areNotEqual = sut != rhs;
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_FALSE (areNotEqual);
+  };
+
+  auto inputs =
+  {
+    make_tuple("",        0),  // 00
+    make_tuple("0",       1),  // 01
+    make_tuple("1",       1),  // 02
+    make_tuple("1",       3),  // 03
+    make_tuple("51",      7),  // 04
+    make_tuple("1ABCDEF", 25), // 05
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, inputs);
+}
+
+
+//! Checks SVFVector::operator!= when both are not equal
+//!
+void UT_SVFVector::test_operator_neq_When_NotEqual ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto sutSvfString = std::get<0>(data);
+    auto sutBitsCount = std::get<1>(data);
+    auto rhsSvfString = std::get<2>(data);
+    auto rhsBitsCount = std::get<3>(data);
+
+    auto sut = SVFVector(sutSvfString, sutBitsCount);
+    auto rhs = SVFVector(rhsSvfString, rhsBitsCount);
+
+    // ---------------- Exercise
+    //
+    bool areNotEqual = sut != rhs;
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_TRUE (areNotEqual);
+  };
+
+  auto inputs =
+  {
+    make_tuple("",        0,  "0",       1),  // 00
+    make_tuple("0",       1,  "0",       2),  // 01
+    make_tuple("0",       2,  "0",       1),  // 02
+    make_tuple("0",       1,  "1",       1),  // 03
+    make_tuple("1",       1,  "0",       1),  // 04
+    make_tuple("1",       3,  "2",       3),  // 05
+    make_tuple("51",      7,  "71",      7),  // 06
+    make_tuple("1ABCDEF", 25, "1ABDDEF", 25), // 07
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, inputs);
+}
+
 
 //! Checks SVFVector::ToBinaryVector()
 //!
@@ -377,7 +624,6 @@ void UT_SVFVector::test_ToBinaryVector ()
   //
   TS_DATA_DRIVEN_TEST(checker, data);
 }
-
 
 
 //===========================================================================

@@ -7,7 +7,7 @@ $(info )
 
 #+$(info RootPath: $(RootPath))
 ifeq ($(RootPath), )
-    RootPath     = ./
+    RootPath     = .
 endif
 
 UT_RootPath	 = $(RootPath)
@@ -20,14 +20,14 @@ Suites = \
 ProjectFile  = $(RootPath)/Lib_UT.cbp
 
 #+Generator    = ..\..\CxxTest\bin\cxxtestgen.py
-Generator    = $(RootPath)\..\CxxTest\bin\cxxtestgen.py
+Generator    = $(RootPath)/../cxxtest/bin/cxxtestgen.py
 RunnerFile   = $(UT_RootPath)/Generated/Runner.cpp
 TemplateFile = $(UT_RootPath)/Runner.tpl
 TestListener = ParenPrinter
 
 
 # cxxtestgen needs Python
-python="python.exe"
+python="python3"
 
 #+ifeq ($(wildcard $(python)),)
 #+    $(warning Python is not defined)

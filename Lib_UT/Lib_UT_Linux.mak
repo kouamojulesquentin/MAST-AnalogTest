@@ -19,26 +19,27 @@ LIB =
 LDFLAGS = 
 
 INC_DEBUG = $(INC)
-CFLAGS_DEBUG = $(CFLAGS) -g
+CFLAGS_DEBUG = $(CFLAGS) -g -fpermissive
 RESINC_DEBUG = $(RESINC)
 RCFLAGS_DEBUG = $(RCFLAGS)
 LIBDIR_DEBUG = $(LIBDIR)
-LIB_DEBUG = $(LIB)../bin/Debug/libLib.a
+LIB_DEBUG = $(LIB) ../bin/debug/Lib.so
+#LIB_DEBUG = $(LIB)../bin/debug/Lib.so
 LDFLAGS_DEBUG = $(LDFLAGS)
-OBJDIR_DEBUG = ../obj/Debug
+OBJDIR_DEBUG = ../obj/debug
 DEP_DEBUG = 
-OUT_DEBUG = ../bin/Debug/Lib_UT
+OUT_DEBUG = ../bin/debug/Lib_UT
 
 INC_RELEASE = $(INC)
-CFLAGS_RELEASE = $(CFLAGS) -O2
+CFLAGS_RELEASE = $(CFLAGS) -O2 -fpermissive
 RESINC_RELEASE = $(RESINC)
 RCFLAGS_RELEASE = $(RCFLAGS)
 LIBDIR_RELEASE = $(LIBDIR)
-LIB_RELEASE = $(LIB)../bin/Release/libLib.a
+LIB_RELEASE = $(LIB)../bin/release/Lib.so
 LDFLAGS_RELEASE = $(LDFLAGS) -s
-OBJDIR_RELEASE = ../obj/Release
+OBJDIR_RELEASE = ../obj/release
 DEP_RELEASE = 
-OUT_RELEASE = ../bin/Release/Lib_UT
+OUT_RELEASE = ../bin/release/Lib_UT
 
 OBJ_DEBUG = $(OBJDIR_DEBUG)/Generated/Runner.o $(OBJDIR_DEBUG)/SystemModel/UT_DefaultBinaryPathSelector.o $(OBJDIR_DEBUG)/SystemModel/UT_GmlPrinterVisitor.o $(OBJDIR_DEBUG)/SystemModel/UT_PrettyPrinterVisitor.o $(OBJDIR_DEBUG)/SystemModel/UT_Register.o $(OBJDIR_DEBUG)/Utility/UT_BinaryVector.o $(OBJDIR_DEBUG)/Utility/UT_SVFVector.o
 
@@ -49,12 +50,12 @@ all: before_build build_debug build_release after_build
 clean: clean_debug clean_release
 
 before_build: 
-	make.exe -f runner.mak
+	make -f Runner.mak
 
 after_build: 
 
 before_debug: 
-	test -d ../bin/Debug || mkdir -p ../bin/Debug
+	test -d ../bin/debug || mkdir -p ../bin/debug
 	test -d $(OBJDIR_DEBUG)/Generated || mkdir -p $(OBJDIR_DEBUG)/Generated
 	test -d $(OBJDIR_DEBUG)/SystemModel || mkdir -p $(OBJDIR_DEBUG)/SystemModel
 	test -d $(OBJDIR_DEBUG)/Utility || mkdir -p $(OBJDIR_DEBUG)/Utility
@@ -91,13 +92,13 @@ $(OBJDIR_DEBUG)/Utility/UT_SVFVector.o: Utility/UT_SVFVector.cpp
 
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
-	rm -rf ../bin/Debug
+	rm -rf ../bin/debug
 	rm -rf $(OBJDIR_DEBUG)/Generated
 	rm -rf $(OBJDIR_DEBUG)/SystemModel
 	rm -rf $(OBJDIR_DEBUG)/Utility
 
 before_release: 
-	test -d ../bin/Release || mkdir -p ../bin/Release
+	test -d ../bin/release || mkdir -p ../bin/release
 	test -d $(OBJDIR_RELEASE)/Generated || mkdir -p $(OBJDIR_RELEASE)/Generated
 	test -d $(OBJDIR_RELEASE)/SystemModel || mkdir -p $(OBJDIR_RELEASE)/SystemModel
 	test -d $(OBJDIR_RELEASE)/Utility || mkdir -p $(OBJDIR_RELEASE)/Utility
@@ -134,7 +135,7 @@ $(OBJDIR_RELEASE)/Utility/UT_SVFVector.o: Utility/UT_SVFVector.cpp
 
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
-	rm -rf ../bin/Release
+	rm -rf ../bin/release
 	rm -rf $(OBJDIR_RELEASE)/Generated
 	rm -rf $(OBJDIR_RELEASE)/SystemModel
 	rm -rf $(OBJDIR_RELEASE)/Utility

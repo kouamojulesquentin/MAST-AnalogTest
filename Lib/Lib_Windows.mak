@@ -24,10 +24,10 @@ RESINC_DEBUG = $(RESINC)
 RCFLAGS_DEBUG = $(RCFLAGS)
 LIBDIR_DEBUG = $(LIBDIR)
 LIB_DEBUG = $(LIB)-luser32
-LDFLAGS_DEBUG = $(LDFLAGS) -Wl,--output-def=..\lib\Debug\libLib.def -Wl,--out-implib=..\bin\Debug\libLib.a -Wl,--dll
-OBJDIR_DEBUG = ..\\obj\\Debug
+LDFLAGS_DEBUG = $(LDFLAGS) -Wl,--output-def=..\lib\debug\Lib.def -Wl,--out-implib=..\bin\debug\Lib.a -Wl,--dll
+OBJDIR_DEBUG = ..\\obj\\debug
 DEP_DEBUG = 
-OUT_DEBUG = ..\\bin\\Debug\\Lib.dll
+OUT_DEBUG = ..\\bin\\debug\\Lib.dll
 
 INC_RELEASE = $(INC)
 CFLAGS_RELEASE = $(CFLAGS) -O2 -Wall -DBUILD_DLL
@@ -35,10 +35,10 @@ RESINC_RELEASE = $(RESINC)
 RCFLAGS_RELEASE = $(RCFLAGS)
 LIBDIR_RELEASE = $(LIBDIR)
 LIB_RELEASE = $(LIB)-luser32
-LDFLAGS_RELEASE = $(LDFLAGS) -s -Wl,--output-def=..\bin\Release\libLib.def -Wl,--out-implib=..\bin\Release\libLib.a -Wl,--dll
-OBJDIR_RELEASE = ..\\obj\\Release
+LDFLAGS_RELEASE = $(LDFLAGS) -s -Wl,--output-def=..\bin\release\Lib.def -Wl,--out-implib=..\bin\release\Lib.a -Wl,--dll
+OBJDIR_RELEASE = ..\\obj\\release
 DEP_RELEASE = 
-OUT_RELEASE = ..\\bin\\Release\\Lib.dll
+OUT_RELEASE = ..\\bin\\release\\Lib.dll
 
 OBJ_DEBUG = $(OBJDIR_DEBUG)\\src\\AccessInterface.o $(OBJDIR_DEBUG)\\src\\BinaryVector.o $(OBJDIR_DEBUG)\\src\\Chain.o $(OBJDIR_DEBUG)\\src\\DefaultBinaryPathSelector.o $(OBJDIR_DEBUG)\\src\\GmlPrinterVisitor.o $(OBJDIR_DEBUG)\\src\\Linker.o $(OBJDIR_DEBUG)\\src\\ParentNode.o $(OBJDIR_DEBUG)\\src\\PrettyPrinterVisitor.o $(OBJDIR_DEBUG)\\src\\Register.o $(OBJDIR_DEBUG)\\src\\SVFVector.o $(OBJDIR_DEBUG)\\src\\SystemModel.o $(OBJDIR_DEBUG)\\src\\SystemModelNode.o $(OBJDIR_DEBUG)\\src\\Tap.o $(OBJDIR_DEBUG)\\src\\Utility.o
 
@@ -49,7 +49,7 @@ all: debug release
 clean: clean_debug clean_release
 
 before_debug: 
-	cmd /c if not exist ..\\bin\\Debug md ..\\bin\\Debug
+	cmd /c if not exist ..\\bin\\debug md ..\\bin\\debug
 	cmd /c if not exist $(OBJDIR_DEBUG)\\src md $(OBJDIR_DEBUG)\\src
 
 after_debug: 
@@ -103,11 +103,11 @@ $(OBJDIR_DEBUG)\\src\\Utility.o: src\\Utility.cpp
 
 clean_debug: 
 	cmd /c del /f $(OBJ_DEBUG) $(OUT_DEBUG)
-	cmd /c rd ..\\bin\\Debug
+	cmd /c rd ..\\bin\\debug
 	cmd /c rd $(OBJDIR_DEBUG)\\src
 
 before_release: 
-	cmd /c if not exist ..\\bin\\Release md ..\\bin\\Release
+	cmd /c if not exist ..\\bin\\release md ..\\bin\\release
 	cmd /c if not exist $(OBJDIR_RELEASE)\\src md $(OBJDIR_RELEASE)\\src
 
 after_release: 
@@ -161,7 +161,7 @@ $(OBJDIR_RELEASE)\\src\\Utility.o: src\\Utility.cpp
 
 clean_release: 
 	cmd /c del /f $(OBJ_RELEASE) $(OUT_RELEASE)
-	cmd /c rd ..\\bin\\Release
+	cmd /c rd ..\\bin\\release
 	cmd /c rd $(OBJDIR_RELEASE)\\src
 
 .PHONY: before_debug after_debug clean_debug before_release after_release clean_release

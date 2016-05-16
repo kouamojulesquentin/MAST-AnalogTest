@@ -12,18 +12,18 @@ LD = g++.exe
 WINDRES = windres.exe
 
 INC = -I..\\cxxtest -I..\\Lib\\include -I..\\Lib\\public_include -ICxxTest_Traits
-CFLAGS = -Wnon-virtual-dtor -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equal -Winline -Wunreachable-code -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default -Weffc++ -Wmain -pedantic-errors -pedantic -w -Wfatal-errors -Wextra -fexceptions -std=c++14 -DCXXTEST_HAVE_EH -DCXXTEST_HAVE_STD -DCXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION
+CFLAGS = -Wnon-virtual-dtor -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equal -Winline -Wunreachable-code -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default -Weffc++ -Wmain -pedantic-errors -pedantic -w -Wfatal-errors -Wextra -m32 -fexceptions -std=c++14 -DCXXTEST_HAVE_EH -DCXXTEST_HAVE_STD -DCXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION
 RESINC = 
 LIBDIR = 
 LIB = 
-LDFLAGS = 
+LDFLAGS = -m32
 
 INC_DEBUG = $(INC)
 CFLAGS_DEBUG = $(CFLAGS) -g
 RESINC_DEBUG = $(RESINC)
 RCFLAGS_DEBUG = $(RCFLAGS)
 LIBDIR_DEBUG = $(LIBDIR)
-LIB_DEBUG = $(LIB)..\bin\Debug\libLib.a
+LIB_DEBUG = $(LIB)..\bin\debug\Lib.a
 LDFLAGS_DEBUG = $(LDFLAGS)
 OBJDIR_DEBUG = ..\\obj\\Debug
 DEP_DEBUG = 
@@ -34,7 +34,7 @@ CFLAGS_RELEASE = $(CFLAGS) -O2
 RESINC_RELEASE = $(RESINC)
 RCFLAGS_RELEASE = $(RCFLAGS)
 LIBDIR_RELEASE = $(LIBDIR)
-LIB_RELEASE = $(LIB)..\bin\Release\libLib.a
+LIB_RELEASE = $(LIB)..\bin\release\Lib.a
 LDFLAGS_RELEASE = $(LDFLAGS) -s
 OBJDIR_RELEASE = ..\\obj\\Release
 DEP_RELEASE = 
@@ -49,7 +49,7 @@ all: before_build build_debug build_release after_build
 clean: clean_debug clean_release
 
 before_build: 
-	make.exe -f runner.mak
+	make.exe -f Runner.mak
 
 after_build: 
 

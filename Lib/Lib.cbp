@@ -8,8 +8,8 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="../bin/Debug/Lib" prefix_auto="1" extension_auto="1" />
-				<Option object_output="../obj/Debug/" />
+				<Option output="../bin/debug/Lib" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../obj/debug/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -20,13 +20,13 @@
 					<Add option="-DBUILD_DLL" />
 				</Compiler>
 				<Linker>
-					<Add option="-Wl,--output-def=..\lib\Debug\libLib.def -Wl,--out-implib=..\bin\Debug\libLib.a -Wl,--dll" />
+					<Add option="-Wl,--output-def=..\lib\debug\Lib.def -Wl,--out-implib=..\bin\debug\Lib.a -Wl,--dll" />
 					<Add library="user32" />
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="../bin/Release/Lib" prefix_auto="1" extension_auto="1" />
-				<Option object_output="../obj/Release/" />
+				<Option output="../bin/release/Lib" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../obj/release/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -38,7 +38,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-Wl,--output-def=..\bin\Release\libLib.def -Wl,--out-implib=..\bin\Release\libLib.a -Wl,--dll" />
+					<Add option="-Wl,--output-def=..\bin\release\Lib.def -Wl,--out-implib=..\bin\release\Lib.a -Wl,--dll" />
 					<Add library="user32" />
 				</Linker>
 			</Target>

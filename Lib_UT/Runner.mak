@@ -27,7 +27,7 @@ TestListener = ParenPrinter
 
 
 # cxxtestgen needs Python
-python="python3"
+python=$(Python3)
 
 #+ifeq ($(wildcard $(python)),)
 #+    $(warning Python is not defined)
@@ -54,5 +54,4 @@ $(info )
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 $(RunnerFile): $(Suites) $(ProjectFile) $(TemplateFile) $(MAKEFILE_LIST)
-#+	$(python) "$(Generator)" --runner=ParenPrinter --have-eh --have-std --fog-parse --root  -o $(RunnerFile) $(Suites)
 	$(python) "$(Generator)" --error-printer --have-eh --have-std --fog-parse --root  -o $(RunnerFile) --template $(TemplateFile) $(Suites)

@@ -16,7 +16,7 @@
 					<Add option="-g" />
 				</Compiler>
 				<Linker>
-					<Add library="../bin/Debug/libLib.a" />
+					<Add library="../bin/debug/Lib.a" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -24,14 +24,14 @@
 				<Option object_output="../obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="--display_success | mtee ..\..\Lib_UT\UT_Results\UT_Result.txt" />
+				<Option parameters="| mtee ..\..\Lib_UT\UT_Results\UT_Result.txt" />
 				<Option projectIncludeDirsRelation="0" />
 				<Compiler>
 					<Add option="-O2" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="../bin/Release/libLib.a" />
+					<Add library="../bin/release/Lib.a" />
 				</Linker>
 			</Target>
 		</Build>
@@ -56,6 +56,7 @@
 			<Add option="-w" />
 			<Add option="-Wfatal-errors" />
 			<Add option="-Wextra" />
+			<Add option="-m32" />
 			<Add option="-fexceptions" />
 			<Add option="-std=c++14" />
 			<Add option="-DCXXTEST_HAVE_EH" />
@@ -66,8 +67,11 @@
 			<Add directory="../Lib/public_include" />
 			<Add directory="CxxTest_Traits" />
 		</Compiler>
+		<Linker>
+			<Add option="-m32" />
+		</Linker>
 		<ExtraCommands>
-			<Add before="make.exe -f runner.mak" />
+			<Add before="make.exe -f Runner.mak" />
 		</ExtraCommands>
 		<Unit filename="CxxTest_Traits/BinaryVector_Traits.hpp">
 			<Option target="&lt;{~None~}&gt;" />
@@ -94,7 +98,9 @@
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="Utility/UT_SVFVector.cpp" />
-		<Unit filename="Utility/UT_SVFVector.hpp" />
+		<Unit filename="Utility/UT_SVFVector.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Extensions>
 			<code_completion>
 				<search_path add="..\cxxtest" />

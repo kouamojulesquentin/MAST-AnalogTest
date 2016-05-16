@@ -14,9 +14,6 @@
 #ifndef PLATFORM_H__31EE6B85_BB3D_4B14_E288_56C12101BFE0__INCLUDED_
   #define PLATFORM_H__31EE6B85_BB3D_4B14_E288_56C12101BFE0__INCLUDED_
 
-  //+ (begin JFC April/25/2016): Temporary til we find a better solution to differentiate Windows/Linux build
-  //#define WINDOWS
-  //+ (end   JFC April/25/2016):
   #if defined(WINDOWS)
     #include <windows.h>
     #ifdef BUILD_DLL

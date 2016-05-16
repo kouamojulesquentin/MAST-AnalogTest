@@ -284,13 +284,13 @@ void UT_SVFVector::test_Constructor_FromBinary ()
     make_tuple("1000_0000",                8,  "80"),     // 32
     make_tuple("1010_0101",                8,  "A5"),     // 33
     make_tuple("0101_1010",                8,  "5A"),     // 34
-    make_tuple("1101_1110:1",              9,  "BD01"),   // 35
-    make_tuple("1101_1110:101",            11, "F506"),   // 36
-    make_tuple("0000_1110:0000_0011",      16, "030E"),   // 37
-    make_tuple("0000_1110:0000_00110",     17, "061C00"), // 38
-    make_tuple("0000_1110:0000_0011:0101", 20, "35E000"), // 39
+    make_tuple("1101_1110:1",              9,  "01BD"),   // 35
+    make_tuple("1101_1110:101",            11, "06F5"),   // 36
+    make_tuple("0000_1110:0000_0011",      16, "0E03"),   // 37
+    make_tuple("0000_1110:0000_0011:0",    17, "001C06"), // 38
+    make_tuple("0000_1110:0000_0011:0101", 20, "00E035"), // 39
 
-    make_tuple("1010_1000:1001_0110:0111_0100:0101_0010:0011_0000:0001", 44, "01234567890A"), // 40
+    make_tuple("1010_1000:1001_0110:0111_0100:0101_0010:0011_0000:0001", 44, "0A8967452301"), // 40
   };
 
   // ---------------- DDT Exercise
@@ -549,6 +549,9 @@ void UT_SVFVector::test_operator_neq_When_NotEqual ()
 
 //! Checks SVFVector::ToBinaryVector()
 //!
+//! @note This is a kind of roundtrip test that checks that both construction from BinaryVector and export to binary vector are compatible
+//!       BinaryVector ==> SVFVector ==> BinaryVector
+//!
 void UT_SVFVector::test_ToBinaryVector ()
 {
   // ---------------- DDT Setup
@@ -576,6 +579,7 @@ void UT_SVFVector::test_ToBinaryVector ()
 
   auto data =
   {           // input,                    expected data
+    make_tuple("1101_1110:1",              "1101_1110:1"),              // 35
     make_tuple("",                         ""),                         // 00
     make_tuple("0",                        "0"),                        // 01
     make_tuple("1",                        "1"),                        // 02
@@ -611,10 +615,9 @@ void UT_SVFVector::test_ToBinaryVector ()
     make_tuple("1000_0000",                "1000_0000"),                // 32
     make_tuple("1010_0101",                "1010_0101"),                // 33
     make_tuple("0101_1010",                "0101_1010"),                // 34
-    make_tuple("1101_1110:1",              "1101_1110:1"),              // 35
     make_tuple("1101_1110:101",            "1101_1110:101"),            // 36
     make_tuple("0000_1110:0000_0011",      "0000_1110:0000_0011"),      // 37
-    make_tuple("0000_1110:0000_00110",     "0000_1110:0000_00110"),     // 38
+    make_tuple("0000_1110:0000_0011:0",    "0000_1110:0000_0011:0"),    // 38
     make_tuple("0000_1110:0000_0011:0101", "0000_1110:0000_0011:0101"), // 39
 
     make_tuple("1010_1000:1001_0110:0111_0100:0101_0010:0011_0000:0001", "1010_1000:1001_0110:0111_0100:0101_0010:0011_0000:0001"), // 40

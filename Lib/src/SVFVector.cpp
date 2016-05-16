@@ -92,58 +92,59 @@ SVFVector::SVFVector (const BinaryVector& binaryVector)
     ostringstream os;
     os << std::uppercase << std::hex << std::setw(2) << std::right << std::setfill('0');
 
-    auto bitsOnLastBytes = bitsCount % 8;
+    auto binVectorLsbBits = bitsCount % 8;
 
     auto pBegin = binaryVector.Data();
     auto pEnd   = pBegin + binaryVector.BytesCount();
-    auto pByte  = pEnd;
+    auto pByte  = pBegin;
 
-    if (bitsOnLastBytes == 0) // Deal with fast case
+    if (binVectorLsbBits == 0) // Deal with fast case
     {
       do
       {
-        --pByte;
-
         os << std::setw(2) << static_cast<int>(*pByte);
-      } while (pByte != pBegin);
+        ++pByte;
+      } while (pByte != pEnd);
     }
     else                    // Deal with case, each SVF byte is stranded on two bytes of BinaryVector
     {
-      uint32_t bitsOnPreviousBytes = 8 - bitsOnLastBytes;
+      uint32_t remainingBitsCount = bitsCount;
+      uint32_t binVectorMsbBits = 8 - binVectorLsbBits;
       uint32_t byte = 0;
 
-      --pByte;  // Points on last byte
-      while (pByte != pBegin)
+      // ---------------- Process first bits (on first byte)
+      //
+      byte   = *pByte;
+      byte >>= binVectorMsbBits;
+      byte  &= RIGHT_BITS_MASK_8[binVectorLsbBits];
+
+      os << std::setw(2) << static_cast<int>(byte);
+
+      remainingBitsCount -= binVectorLsbBits;
+      while ((remainingBitsCount != 0) && (pByte < pEnd))
       {
-        uint8_t lsb = *pByte--;  // lsb for SVFVector is on msb of BinaryVector
-        uint8_t msb = *pByte;    // msb for SVFVector is on lsb of BinaryVector
+        uint8_t msb = *pByte++;   // msb for SVFVector is on lsb of "left" byte of binary BinaryVector
+        uint8_t lsb = *pByte;     // lsb for SVFVector is on msb of "right" byte of binary BinaryVector
 
         // ---------------- Merge bytes
         //
         // e.g. : [xxxmmmmm][lllyyyyy] ==> [mmmmmlll]
         //
-        lsb >>= bitsOnPreviousBytes;
-        msb <<= bitsOnLastBytes;
-        lsb &= RIGHT_BITS_MASK_8[bitsOnLastBytes];
-        msb &= LEFT_BITS_MASK_8[bitsOnPreviousBytes];
+        msb <<= binVectorLsbBits;
+        lsb >>= binVectorMsbBits;
+        msb &= LEFT_BITS_MASK_8[binVectorMsbBits];
+        lsb &= RIGHT_BITS_MASK_8[binVectorMsbBits];
 
         unsigned int byte = msb | lsb;
         os << std::setw(2) << static_cast<int>(byte);
+
+        remainingBitsCount -= 8;
       }
-
-      // ---------------- Process last bits (on first byte)
-      //
-      byte   = *pByte;
-      byte >>= bitsOnPreviousBytes;
-      byte  &= RIGHT_BITS_MASK_8[bitsOnLastBytes];
-
-      os << std::setw(2) << static_cast<int>(byte);
     }
 
     m_usedBits = bitsCount;
     m_data     = os.str();
   }
-
 }
 //
 //  End of: SVFVector::SVFVector
@@ -320,8 +321,6 @@ bool SVFVector::operator== (const SVFVector& rhs) const
 
 //! Creates a BinaryVector from content
 //!
-//! @note Takes packet of 8 bits from BinaryVector end to form hexadimal string representation;
-//!       then move backward in BinaryVector and forward in SVFVector string
 //! @note A pre-condition is that internal string is a multiple of two characters
 //!
 //! @note Supposing that the internal representation is 01234567890A and number of used bits is 44,
@@ -344,14 +343,14 @@ BinaryVector SVFVector::ToBinaryVector () const
     usedBitsOnLastByte = 8;
   }
 
-  auto pChar = m_data.crbegin();
-  while (pChar != m_data.crend())
+  auto pChar = m_data.cbegin();
+  while (pChar != m_data.cend())
   {
-    auto lsbChar = *pChar++;
     auto msbChar = *pChar++;
+    auto lsbChar = *pChar++;
 
-    uint8_t lsb = CharToNibble(lsbChar);
     uint8_t msb = CharToNibble(msbChar);
+    uint8_t lsb = CharToNibble(lsbChar);
     uint8_t byte = (msb << 4) + lsb;
 
     result.Append(byte, usedBitsOnLastByte, BitsAlignment::Right);

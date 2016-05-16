@@ -27,7 +27,12 @@ TestListener = ParenPrinter
 
 
 # cxxtestgen needs Python
-python=$(Python3)
+ifeq ($(OS), Windows_NT)
+  python=$(Python3)
+else
+  python=python3
+endif
+
 
 #+ifeq ($(wildcard $(python)),)
 #+    $(warning Python is not defined)

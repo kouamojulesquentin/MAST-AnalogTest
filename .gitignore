@@ -31,13 +31,8 @@
 /*.twi
 /Backup.bat
 /Backup_to_UsbKey.bat
+/cxxtest/python/cxxtest/*.pyc
 /cxxtest/python/python3/cxxtest/__pycache__/*.pyc
-/cxxtest/python/python3/cxxtest/__pycache__/__release__.cpython-35.pyc
-/cxxtest/python/python3/cxxtest/__pycache__/cxx_parser.cpython-35.pyc
-/cxxtest/python/python3/cxxtest/__pycache__/cxxtest_fog.cpython-35.pyc
-/cxxtest/python/python3/cxxtest/__pycache__/cxxtest_misc.cpython-35.pyc
-/cxxtest/python/python3/cxxtest/__pycache__/cxxtest_parser.cpython-35.pyc
-/cxxtest/python/python3/cxxtest/__pycache__/cxxtestgen.cpython-35.pyc
-/cxxtest/python/python3/cxxtest/__pycache__/parsetab.cpython-35.pyc
+/cxxtest/python/python3/cxxtest/*.pyc
 /cxxtest/python/python3/cxxtest/parsetab.py
 /Lib_UT/Generated/Runner.cpp

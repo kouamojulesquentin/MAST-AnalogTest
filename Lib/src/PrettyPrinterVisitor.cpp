@@ -50,7 +50,7 @@ void PrettyPrinterVisitor::PrintChildren (const ParentNode& parentNode)
 //! @param refPos       Reference position
 //! @param targetPos    Target position relative to refPos
 //!
-void PrettyPrinterVisitor::AlignRelativeTo (std::fpos<int> refPos, std::fpos<int> targetPos)
+void PrettyPrinterVisitor::AlignRelativeTo (pos_type refPos, pos_type targetPos)
 {
   auto curPos      = m_os.tellp();
   auto startLength = curPos - refPos;
@@ -69,7 +69,7 @@ void PrettyPrinterVisitor::AlignRelativeTo (std::fpos<int> refPos, std::fpos<int
 //!
 //! @param targetPos  Position set after adding a new line
 //!
-void PrettyPrinterVisitor::AlignOnNewLine (std::fpos<int> targetPos)
+void PrettyPrinterVisitor::AlignOnNewLine (pos_type targetPos)
 {
   m_os << std::endl;
   m_os << string(targetPos, ' ');
@@ -145,7 +145,7 @@ void PrettyPrinterVisitor::StreamNodeHeader(std::experimental::string_view type,
   m_os << "[" << type                 << "]";
   m_os << '(' << node.GetIdentifier() << ") ";
 
-  AlignRelativeTo(m_startPos, 15 + m_depth);
+  AlignRelativeTo(m_startPos, 15u + m_depth);
   m_os << '"' << node.GetName()       << '"';
 
   m_first = false;

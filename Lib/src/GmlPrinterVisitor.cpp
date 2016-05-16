@@ -93,8 +93,8 @@ void GmlPrinterVisitor::AppendNode (string_view            shapeName,
   m_os << " graphics [";
   m_os << " type \"" << shapeName       << "\"";
   m_os << " fill \"" << backgroundColor << "\"";
-  m_os << " w "  << std::max(50u, 11u * node.GetName().length());
-  m_os << " h "  << std::max(35u, 3u  * node.GetName().length());
+  m_os << " w "  << std::max(static_cast<size_t>(50u), 11u * node.GetName().length());
+  m_os << " h "  << std::max(static_cast<size_t>(35u), 3u  * node.GetName().length());
   m_os << " ] ";
 
   if (!node.GetName().empty())

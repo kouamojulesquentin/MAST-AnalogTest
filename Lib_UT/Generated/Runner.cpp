@@ -44,12 +44,12 @@ int main( int argc, char *argv[] )
 }
 
 bool suite_UT_BinaryVector_init = false;
-#include "D:\Projects\Tima\NewMast\Lib_UT\Utility\UT_BinaryVector.hpp"
+#include "/home/j-f-for-work/Tima/NewMast/Lib_UT/Utility/UT_BinaryVector.hpp"
 
 static UT_BinaryVector suite_UT_BinaryVector;
 
 static CxxTest::List Tests_UT_BinaryVector = { 0, 0 };
-CxxTest::StaticSuiteDescription suiteDescription_UT_BinaryVector( ".//Utility/UT_BinaryVector.hpp", 23, "UT_BinaryVector", suite_UT_BinaryVector, Tests_UT_BinaryVector );
+CxxTest::StaticSuiteDescription suiteDescription_UT_BinaryVector( "./Utility/UT_BinaryVector.hpp", 23, "UT_BinaryVector", suite_UT_BinaryVector, Tests_UT_BinaryVector );
 
 static class TestDescription_suite_UT_BinaryVector_test_Constructor_Default : public CxxTest::RealTestDescription {
 public:
@@ -315,12 +315,91 @@ public:
  void runTest() { suite_UT_BinaryVector.test_Slice_When_Exceeding_Capacity(); }
 } testDescription_suite_UT_BinaryVector_test_Slice_When_Exceeding_Capacity;
 
-#include "D:\Projects\Tima\NewMast\Lib_UT\SystemModel\UT_DefaultBinaryPathSelector.hpp"
+#include "/home/j-f-for-work/Tima/NewMast/Lib_UT/Utility/UT_SVFVector.hpp"
+
+static UT_SVFVector suite_UT_SVFVector;
+
+static CxxTest::List Tests_UT_SVFVector = { 0, 0 };
+CxxTest::StaticSuiteDescription suiteDescription_UT_SVFVector( "./Utility/UT_SVFVector.hpp", 23, "UT_SVFVector", suite_UT_SVFVector, Tests_UT_SVFVector );
+
+static class TestDescription_suite_UT_SVFVector_test_Constructor_Default : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_SVFVector_test_Constructor_Default() : CxxTest::RealTestDescription( Tests_UT_SVFVector, suiteDescription_UT_SVFVector, 34, "test_Constructor_Default" ) {}
+ void runTest() { suite_UT_SVFVector.test_Constructor_Default(); }
+} testDescription_suite_UT_SVFVector_test_Constructor_Default;
+
+static class TestDescription_suite_UT_SVFVector_test_Constructor_FromString : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_SVFVector_test_Constructor_FromString() : CxxTest::RealTestDescription( Tests_UT_SVFVector, suiteDescription_UT_SVFVector, 35, "test_Constructor_FromString" ) {}
+ void runTest() { suite_UT_SVFVector.test_Constructor_FromString(); }
+} testDescription_suite_UT_SVFVector_test_Constructor_FromString;
+
+static class TestDescription_suite_UT_SVFVector_test_Constructor_FromString_With_Separators : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_SVFVector_test_Constructor_FromString_With_Separators() : CxxTest::RealTestDescription( Tests_UT_SVFVector, suiteDescription_UT_SVFVector, 36, "test_Constructor_FromString_With_Separators" ) {}
+ void runTest() { suite_UT_SVFVector.test_Constructor_FromString_With_Separators(); }
+} testDescription_suite_UT_SVFVector_test_Constructor_FromString_With_Separators;
+
+static class TestDescription_suite_UT_SVFVector_test_Constructor_FromString_Not_Valid_Parameters : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_SVFVector_test_Constructor_FromString_Not_Valid_Parameters() : CxxTest::RealTestDescription( Tests_UT_SVFVector, suiteDescription_UT_SVFVector, 37, "test_Constructor_FromString_Not_Valid_Parameters" ) {}
+ void runTest() { suite_UT_SVFVector.test_Constructor_FromString_Not_Valid_Parameters(); }
+} testDescription_suite_UT_SVFVector_test_Constructor_FromString_Not_Valid_Parameters;
+
+static class TestDescription_suite_UT_SVFVector_test_Constructor_FromBinary : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_SVFVector_test_Constructor_FromBinary() : CxxTest::RealTestDescription( Tests_UT_SVFVector, suiteDescription_UT_SVFVector, 38, "test_Constructor_FromBinary" ) {}
+ void runTest() { suite_UT_SVFVector.test_Constructor_FromBinary(); }
+} testDescription_suite_UT_SVFVector_test_Constructor_FromBinary;
+
+static class TestDescription_suite_UT_SVFVector_test_operator_eq_With_Self : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_SVFVector_test_operator_eq_With_Self() : CxxTest::RealTestDescription( Tests_UT_SVFVector, suiteDescription_UT_SVFVector, 42, "test_operator_eq_With_Self" ) {}
+ void runTest() { suite_UT_SVFVector.test_operator_eq_With_Self(); }
+} testDescription_suite_UT_SVFVector_test_operator_eq_With_Self;
+
+static class TestDescription_suite_UT_SVFVector_test_operator_eq_When_Equal : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_SVFVector_test_operator_eq_When_Equal() : CxxTest::RealTestDescription( Tests_UT_SVFVector, suiteDescription_UT_SVFVector, 43, "test_operator_eq_When_Equal" ) {}
+ void runTest() { suite_UT_SVFVector.test_operator_eq_When_Equal(); }
+} testDescription_suite_UT_SVFVector_test_operator_eq_When_Equal;
+
+static class TestDescription_suite_UT_SVFVector_test_operator_eq_When_NotEqual : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_SVFVector_test_operator_eq_When_NotEqual() : CxxTest::RealTestDescription( Tests_UT_SVFVector, suiteDescription_UT_SVFVector, 44, "test_operator_eq_When_NotEqual" ) {}
+ void runTest() { suite_UT_SVFVector.test_operator_eq_When_NotEqual(); }
+} testDescription_suite_UT_SVFVector_test_operator_eq_When_NotEqual;
+
+static class TestDescription_suite_UT_SVFVector_test_operator_neq_With_Self : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_SVFVector_test_operator_neq_With_Self() : CxxTest::RealTestDescription( Tests_UT_SVFVector, suiteDescription_UT_SVFVector, 48, "test_operator_neq_With_Self" ) {}
+ void runTest() { suite_UT_SVFVector.test_operator_neq_With_Self(); }
+} testDescription_suite_UT_SVFVector_test_operator_neq_With_Self;
+
+static class TestDescription_suite_UT_SVFVector_test_operator_neq_When_Equal : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_SVFVector_test_operator_neq_When_Equal() : CxxTest::RealTestDescription( Tests_UT_SVFVector, suiteDescription_UT_SVFVector, 49, "test_operator_neq_When_Equal" ) {}
+ void runTest() { suite_UT_SVFVector.test_operator_neq_When_Equal(); }
+} testDescription_suite_UT_SVFVector_test_operator_neq_When_Equal;
+
+static class TestDescription_suite_UT_SVFVector_test_operator_neq_When_NotEqual : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_SVFVector_test_operator_neq_When_NotEqual() : CxxTest::RealTestDescription( Tests_UT_SVFVector, suiteDescription_UT_SVFVector, 50, "test_operator_neq_When_NotEqual" ) {}
+ void runTest() { suite_UT_SVFVector.test_operator_neq_When_NotEqual(); }
+} testDescription_suite_UT_SVFVector_test_operator_neq_When_NotEqual;
+
+static class TestDescription_suite_UT_SVFVector_test_ToBinaryVector : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UT_SVFVector_test_ToBinaryVector() : CxxTest::RealTestDescription( Tests_UT_SVFVector, suiteDescription_UT_SVFVector, 54, "test_ToBinaryVector" ) {}
+ void runTest() { suite_UT_SVFVector.test_ToBinaryVector(); }
+} testDescription_suite_UT_SVFVector_test_ToBinaryVector;
+
+#include "/home/j-f-for-work/Tima/NewMast/Lib_UT/SystemModel/UT_DefaultBinaryPathSelector.hpp"
 
 static UT_DefaultBinaryPathSelector suite_UT_DefaultBinaryPathSelector;
 
 static CxxTest::List Tests_UT_DefaultBinaryPathSelector = { 0, 0 };
-CxxTest::StaticSuiteDescription suiteDescription_UT_DefaultBinaryPathSelector( ".//SystemModel/UT_DefaultBinaryPathSelector.hpp", 23, "UT_DefaultBinaryPathSelector", suite_UT_DefaultBinaryPathSelector, Tests_UT_DefaultBinaryPathSelector );
+CxxTest::StaticSuiteDescription suiteDescription_UT_DefaultBinaryPathSelector( "./SystemModel/UT_DefaultBinaryPathSelector.hpp", 23, "UT_DefaultBinaryPathSelector", suite_UT_DefaultBinaryPathSelector, Tests_UT_DefaultBinaryPathSelector );
 
 static class TestDescription_suite_UT_DefaultBinaryPathSelector_test_Constructor : public CxxTest::RealTestDescription {
 public:
@@ -328,12 +407,12 @@ public:
  void runTest() { suite_UT_DefaultBinaryPathSelector.test_Constructor(); }
 } testDescription_suite_UT_DefaultBinaryPathSelector_test_Constructor;
 
-#include "D:\Projects\Tima\NewMast\Lib_UT\SystemModel\UT_GmlPrinterVisitor.hpp"
+#include "/home/j-f-for-work/Tima/NewMast/Lib_UT/SystemModel/UT_GmlPrinterVisitor.hpp"
 
 static UT_GmlPrinterVisitor suite_UT_GmlPrinterVisitor;
 
 static CxxTest::List Tests_UT_GmlPrinterVisitor = { 0, 0 };
-CxxTest::StaticSuiteDescription suiteDescription_UT_GmlPrinterVisitor( ".//SystemModel/UT_GmlPrinterVisitor.hpp", 23, "UT_GmlPrinterVisitor", suite_UT_GmlPrinterVisitor, Tests_UT_GmlPrinterVisitor );
+CxxTest::StaticSuiteDescription suiteDescription_UT_GmlPrinterVisitor( "./SystemModel/UT_GmlPrinterVisitor.hpp", 23, "UT_GmlPrinterVisitor", suite_UT_GmlPrinterVisitor, Tests_UT_GmlPrinterVisitor );
 
 static class TestDescription_suite_UT_GmlPrinterVisitor_test_Constructor : public CxxTest::RealTestDescription {
 public:
@@ -353,12 +432,12 @@ public:
  void runTest() { suite_UT_GmlPrinterVisitor.test_Visit_After_GetGraph(); }
 } testDescription_suite_UT_GmlPrinterVisitor_test_Visit_After_GetGraph;
 
-#include "D:\Projects\Tima\NewMast\Lib_UT\SystemModel\UT_PrettyPrinterVisitor.hpp"
+#include "/home/j-f-for-work/Tima/NewMast/Lib_UT/SystemModel/UT_PrettyPrinterVisitor.hpp"
 
 static UT_PrettyPrinterVisitor suite_UT_PrettyPrinterVisitor;
 
 static CxxTest::List Tests_UT_PrettyPrinterVisitor = { 0, 0 };
-CxxTest::StaticSuiteDescription suiteDescription_UT_PrettyPrinterVisitor( ".//SystemModel/UT_PrettyPrinterVisitor.hpp", 22, "UT_PrettyPrinterVisitor", suite_UT_PrettyPrinterVisitor, Tests_UT_PrettyPrinterVisitor );
+CxxTest::StaticSuiteDescription suiteDescription_UT_PrettyPrinterVisitor( "./SystemModel/UT_PrettyPrinterVisitor.hpp", 22, "UT_PrettyPrinterVisitor", suite_UT_PrettyPrinterVisitor, Tests_UT_PrettyPrinterVisitor );
 
 static class TestDescription_suite_UT_PrettyPrinterVisitor_test_Constructor : public CxxTest::RealTestDescription {
 public:
@@ -468,12 +547,12 @@ public:
  void runTest() { suite_UT_PrettyPrinterVisitor.test_VisitAccessInterface_Hex_Format(); }
 } testDescription_suite_UT_PrettyPrinterVisitor_test_VisitAccessInterface_Hex_Format;
 
-#include "D:\Projects\Tima\NewMast\Lib_UT\SystemModel\UT_Register.hpp"
+#include "/home/j-f-for-work/Tima/NewMast/Lib_UT/SystemModel/UT_Register.hpp"
 
 static UT_Register suite_UT_Register;
 
 static CxxTest::List Tests_UT_Register = { 0, 0 };
-CxxTest::StaticSuiteDescription suiteDescription_UT_Register( ".//SystemModel/UT_Register.hpp", 22, "UT_Register", suite_UT_Register, Tests_UT_Register );
+CxxTest::StaticSuiteDescription suiteDescription_UT_Register( "./SystemModel/UT_Register.hpp", 22, "UT_Register", suite_UT_Register, Tests_UT_Register );
 
 static class TestDescription_suite_UT_Register_test_Constructor : public CxxTest::RealTestDescription {
 public:

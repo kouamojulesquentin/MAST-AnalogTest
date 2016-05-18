@@ -15,12 +15,14 @@
   #define SYSTEMMODEL_H__A9ED8877_8B39_4480_2B8B_2E92C212179C__INCLUDED_
 
 #include "SystemModelNodes.hpp"
+#include <memory>
+#include <vector>
+#include <experimental/string_view>
 
 namespace mast
 {
 
 //! Manages the system model tree
-//!
 //!
 class DLL_EXPORT SystemModel
 {
@@ -30,19 +32,43 @@ class DLL_EXPORT SystemModel
   ~SystemModel() = default;
   SystemModel()  = default;
 
-  Tap*             CreateTap             (std::experimental::string_view name = mast::DEFAULT_TAP_NAME); //!< Creates a new Tap node
-  AccessInterface* CreateAccessInterface (std::experimental::string_view name);                          //!< Creates a new AccessInterface node
+  //! Creates a new AccessInterface node
+  //!
+  std::shared_ptr<AccessInterface> CreateAccessInterface (std::experimental::string_view           name,
+                                                          std::shared_ptr<AccessInterfaceProtocol> protocol);
 
-  Chain*    CreateChain    (ParentNode* parentNode, std::experimental::string_view name);                                                       //!< Creates a new Chain node
-  Linker*   CreateLinker   (ParentNode* parentNode, std::experimental::string_view name, PathSelector* pathSelector);                           //!< Creates a new Linker node
-  Register* CreateRegister (ParentNode* parentNode, std::experimental::string_view name, uint32_t      bitsCount, BinaryVector bypassSequence); //!< Creates a new Register node
+  //! Creates a new Tap sub-tree
+  //!
+  std::shared_ptr<AccessInterface> CreateTap             (std::experimental::string_view           name,
+                                                          uint32_t                                 irBitsCount,
+                                                          uint32_t                                 muxPathsCount);
 
-  AccessInterface* GetRoot() const { return m_root; }
+  // ---------------- Creates a new Chain node
+  //
+  std::shared_ptr<Chain>    CreateChain    (std::experimental::string_view name,
+                                            std::shared_ptr<ParentNode>    parentNode = nullptr);
+
+  //! Creates a new Linker node
+  //!
+  std::shared_ptr<Linker>   CreateLinker   (std::experimental::string_view name,
+                                            std::shared_ptr<PathSelector>  pathSelector,
+                                            std::shared_ptr<ParentNode>    parentNode = nullptr);
+
+  //! Creates a new Register node
+  //!
+  std::shared_ptr<Register> CreateRegister (std::experimental::string_view name,
+                                            BinaryVector                   bypassSequence,
+                                            std::shared_ptr<ParentNode>    parentNode = nullptr);
+
+  std::shared_ptr<ParentNode>      GetRoot() const { return m_root; }                         //!< Returns root node
+  std::shared_ptr<SystemModelNode> GetNode(SystemModelNode::NodeIdentifier identifier) const; //!< Returns node associated with a node identifier
 
   //! Releases the resources occupied by node data structure recursively
   //!
-  void DestroyNode(SystemModelNode* node);
-  //+ (JFC April/20/2016): How to report parent node that a node has been destroyed
+  void RemoveNodeFromModel(std::shared_ptr<SystemModelNode> node);
+  //+ (JFC April/20/2016): How to report parent node that a node has been destroyed?
+
+  uint32_t GetRegistersCount() const { return m_totalRegisters; }
 
   // ---------------- Protected Methods
   //
@@ -51,14 +77,15 @@ class DLL_EXPORT SystemModel
   // ---------------- Private  Methods
   //
   private:
-  void RegisterNode(SystemModelNode::NodeIdentifier identifier, SystemModelNode* node);  //!< Saves relation between node identifier and its instance
+  void RegisterNode(std::shared_ptr<SystemModelNode> node);  //!< Saves relation between node identifier and its instance
 
   // ---------------- Private  Fields
   //
   private:
-  uint32_t         m_totalRegister        = 0;       //!< Total number of register in the model
-  uint32_t         m_totalPendingRegister = 0;       //!< Number of registers currently "pending"
-  AccessInterface* m_root                 = nullptr; //!< First (top) node of system model tree
+  uint32_t                                      m_totalRegisters        = 0; //!< Total number of registers in the model
+  uint32_t                                      m_totalPendingRegisters = 0; //!< Number of registers currently "pending"
+  std::shared_ptr<ParentNode>                   m_root;                      //!< First (top) node of system model tree
+  std::vector<std::shared_ptr<SystemModelNode>> m_identifierMapping;         //!< Maps a node identifier to a node instance
 };
 //
 //  End of SystemModel class declaration

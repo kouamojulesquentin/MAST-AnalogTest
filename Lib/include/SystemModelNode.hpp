@@ -26,13 +26,16 @@ namespace mast
 class SystemModelVisitor;
 class ConditionsChecker;
 
-constexpr char DEFAULT_NODE_NAME[] = "unnamed";
-constexpr char DEFAULT_MIB_NAME[]  = "MIB";
-constexpr char MIB_CTRL_EXT[]      = "_ctrl";
-constexpr char MIB_MUX_EXT[]       = "_mux";
-constexpr char DEFAULT_SIB_NAME[]  = "SIB";
-constexpr char DEFAULT_1500_NAME[] = "1500_wrapper";
-constexpr char DEFAULT_TAP_NAME[]  = "1149_1_TAP";
+constexpr char DEFAULT_NODE_NAME[]        = "unnamed";
+constexpr char DEFAULT_MIB_NAME[]         = "MIB";
+constexpr char MIB_CTRL_EXT[]             = "_ctrl";
+constexpr char MIB_MUX_EXT[]              = "_mux";
+constexpr char DEFAULT_SIB_NAME[]         = "SIB";
+constexpr char DEFAULT_1500_NAME[]        = "1500_wrapper";
+constexpr char DEFAULT_TAP_NAME[]         = "1149_1_TAP";
+constexpr char DEFAULT_TAP_IR_NAME[]      = "IR";
+constexpr char DEFAULT_TAP_MUX_NAME[]     = "DR_Mux";
+constexpr char DEFAULT_TAP_MUX_BPY_NAME[] = "DR_Mux_BPY";
 
 //! Abstract base for common features for system model nodes
 //!

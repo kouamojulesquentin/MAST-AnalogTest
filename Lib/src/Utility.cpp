@@ -36,8 +36,8 @@ string Utility::MakeExceptionMessage(const char*                    file,
   std::ostringstream os;
 
   os << issueKind << ": " << userMessage << "." << std::endl;
-  os << "File: "  << file << std::endl;
-  os << "Line: "  << line;
+  os << "In file: "  << file << std::endl;
+  os << "At line: "  << line << std::endl;
 
   return os.str();
 }

@@ -93,6 +93,8 @@
 		<Unit filename="SystemModel/UT_Register.hpp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="SystemModel/UT_SystemModel.cpp" />
+		<Unit filename="SystemModel/UT_SystemModel.hpp" />
 		<Unit filename="Utility/UT_BinaryVector.cpp" />
 		<Unit filename="Utility/UT_BinaryVector.hpp">
 			<Option target="&lt;{~None~}&gt;" />

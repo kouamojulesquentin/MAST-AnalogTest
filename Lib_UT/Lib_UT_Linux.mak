@@ -13,10 +13,10 @@ WINDRES = windres
 
 INC = -I../cxxtest -I../Lib/include -I../Lib/public_include -ICxxTest_Traits
 CFLAGS = -Wnon-virtual-dtor -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equal -Winline -Wunreachable-code -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default -Weffc++ -Wmain -pedantic-errors -pedantic -w -Wfatal-errors -Wextra -fexceptions -std=c++14 -DCXXTEST_HAVE_EH -DCXXTEST_HAVE_STD -DCXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION
-RESINC = 
-LIBDIR = 
-LIB = 
-LDFLAGS = 
+RESINC =
+LIBDIR =
+LIB =
+LDFLAGS =
 
 INC_DEBUG = $(INC)
 CFLAGS_DEBUG = $(CFLAGS) -g -fpermissive
@@ -27,7 +27,7 @@ LIB_DEBUG = $(LIB) ../bin/debug/Lib.so
 #LIB_DEBUG = $(LIB)../bin/debug/Lib.so
 LDFLAGS_DEBUG = $(LDFLAGS)
 OBJDIR_DEBUG = ../obj/debug
-DEP_DEBUG = 
+DEP_DEBUG =
 OUT_DEBUG = ../bin/debug/Lib_UT
 
 INC_RELEASE = $(INC)
@@ -38,29 +38,43 @@ LIBDIR_RELEASE = $(LIBDIR)
 LIB_RELEASE = $(LIB)../bin/release/Lib.so
 LDFLAGS_RELEASE = $(LDFLAGS) -s
 OBJDIR_RELEASE = ../obj/release
-DEP_RELEASE = 
+DEP_RELEASE =
 OUT_RELEASE = ../bin/release/Lib_UT
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/Generated/Runner.o $(OBJDIR_DEBUG)/SystemModel/UT_DefaultBinaryPathSelector.o $(OBJDIR_DEBUG)/SystemModel/UT_GmlPrinterVisitor.o $(OBJDIR_DEBUG)/SystemModel/UT_PrettyPrinterVisitor.o $(OBJDIR_DEBUG)/SystemModel/UT_Register.o $(OBJDIR_DEBUG)/Utility/UT_BinaryVector.o $(OBJDIR_DEBUG)/Utility/UT_SVFVector.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/Generated/Runner.o                          \
+            $(OBJDIR_DEBUG)/SystemModel/UT_SystemModel.o                \
+            $(OBJDIR_DEBUG)/SystemModel/UT_DefaultBinaryPathSelector.o  \
+            $(OBJDIR_DEBUG)/SystemModel/UT_GmlPrinterVisitor.o          \
+            $(OBJDIR_DEBUG)/SystemModel/UT_PrettyPrinterVisitor.o       \
+            $(OBJDIR_DEBUG)/SystemModel/UT_Register.o                   \
+            $(OBJDIR_DEBUG)/Utility/UT_BinaryVector.o                   \
+            $(OBJDIR_DEBUG)/Utility/UT_SVFVector.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/Generated/Runner.o $(OBJDIR_RELEASE)/SystemModel/UT_DefaultBinaryPathSelector.o $(OBJDIR_RELEASE)/SystemModel/UT_GmlPrinterVisitor.o $(OBJDIR_RELEASE)/SystemModel/UT_PrettyPrinterVisitor.o $(OBJDIR_RELEASE)/SystemModel/UT_Register.o $(OBJDIR_RELEASE)/Utility/UT_BinaryVector.o $(OBJDIR_RELEASE)/Utility/UT_SVFVector.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/Generated/Runner.o 													\
+              $(OBJDIR_RELEASE)/SystemModel/UT_SystemModel.o                \
+              $(OBJDIR_RELEASE)/SystemModel/UT_DefaultBinaryPathSelector.o  \
+              $(OBJDIR_RELEASE)/SystemModel/UT_GmlPrinterVisitor.o          \
+              $(OBJDIR_RELEASE)/SystemModel/UT_PrettyPrinterVisitor.o       \
+              $(OBJDIR_RELEASE)/SystemModel/UT_Register.o                   \
+              $(OBJDIR_RELEASE)/Utility/UT_BinaryVector.o                   \
+              $(OBJDIR_RELEASE)/Utility/UT_SVFVector.o
 
 all: before_build build_debug build_release after_build
 
 clean: clean_debug clean_release
 
-before_build: 
+before_build:
 	make -f Runner.mak
 
-after_build: 
+after_build:
 
-before_debug: 
+before_debug:
 	test -d ../bin/debug || mkdir -p ../bin/debug
 	test -d $(OBJDIR_DEBUG)/Generated || mkdir -p $(OBJDIR_DEBUG)/Generated
 	test -d $(OBJDIR_DEBUG)/SystemModel || mkdir -p $(OBJDIR_DEBUG)/SystemModel
 	test -d $(OBJDIR_DEBUG)/Utility || mkdir -p $(OBJDIR_DEBUG)/Utility
 
-after_debug: 
+after_debug:
 
 build_debug: before_debug out_debug after_debug
 
@@ -84,26 +98,29 @@ $(OBJDIR_DEBUG)/SystemModel/UT_PrettyPrinterVisitor.o: SystemModel/UT_PrettyPrin
 $(OBJDIR_DEBUG)/SystemModel/UT_Register.o: SystemModel/UT_Register.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_Register.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_Register.o
 
+$(OBJDIR_DEBUG)/SystemModel/UT_SystemModel.o: SystemModel/UT_SystemModel.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_SystemModel.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_SystemModel.o
+
 $(OBJDIR_DEBUG)/Utility/UT_BinaryVector.o: Utility/UT_BinaryVector.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Utility/UT_BinaryVector.cpp -o $(OBJDIR_DEBUG)/Utility/UT_BinaryVector.o
 
 $(OBJDIR_DEBUG)/Utility/UT_SVFVector.o: Utility/UT_SVFVector.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Utility/UT_SVFVector.cpp -o $(OBJDIR_DEBUG)/Utility/UT_SVFVector.o
 
-clean_debug: 
+clean_debug:
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
 	rm -rf ../bin/debug
 	rm -rf $(OBJDIR_DEBUG)/Generated
 	rm -rf $(OBJDIR_DEBUG)/SystemModel
 	rm -rf $(OBJDIR_DEBUG)/Utility
 
-before_release: 
+before_release:
 	test -d ../bin/release || mkdir -p ../bin/release
 	test -d $(OBJDIR_RELEASE)/Generated || mkdir -p $(OBJDIR_RELEASE)/Generated
 	test -d $(OBJDIR_RELEASE)/SystemModel || mkdir -p $(OBJDIR_RELEASE)/SystemModel
 	test -d $(OBJDIR_RELEASE)/Utility || mkdir -p $(OBJDIR_RELEASE)/Utility
 
-after_release: 
+after_release:
 
 build_release: before_release out_release after_release
 
@@ -127,13 +144,16 @@ $(OBJDIR_RELEASE)/SystemModel/UT_PrettyPrinterVisitor.o: SystemModel/UT_PrettyPr
 $(OBJDIR_RELEASE)/SystemModel/UT_Register.o: SystemModel/UT_Register.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_Register.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_Register.o
 
+$(OBJDIR_RELEASE)/SystemModel/UT_SystemModel.o: SystemModel/UT_SystemModel.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_SystemModel.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_SystemModel.o
+
 $(OBJDIR_RELEASE)/Utility/UT_BinaryVector.o: Utility/UT_BinaryVector.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Utility/UT_BinaryVector.cpp -o $(OBJDIR_RELEASE)/Utility/UT_BinaryVector.o
 
 $(OBJDIR_RELEASE)/Utility/UT_SVFVector.o: Utility/UT_SVFVector.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Utility/UT_SVFVector.cpp -o $(OBJDIR_RELEASE)/Utility/UT_SVFVector.o
 
-clean_release: 
+clean_release:
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
 	rm -rf ../bin/release
 	rm -rf $(OBJDIR_RELEASE)/Generated

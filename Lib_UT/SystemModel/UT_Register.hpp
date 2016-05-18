@@ -32,7 +32,7 @@ class UT_Register : public CxxTest::TestSuite
   //
   void test_Constructor ();
 
-  // ---------------- Sibbling
+  // ---------------- Sibling
   //
 
   // ---------------- Sequence to send

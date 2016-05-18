@@ -1,31 +1,33 @@
 //===========================================================================
-//                           AccessInterfaceProtocol.hpp
+//                           AccessInterfaceProtocol_1149_1.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file AccessInterfaceProtocol.hpp
+//! @file AccessInterfaceProtocol_1149_1.hpp
 //!
-//! Declares class AccessInterfaceProtocol
+//! Declares AccessInterfaceProtocol_1149_1 class
 //!
 //===========================================================================
 
 
-#ifndef ACCESSINTERFACEPROTOCOL_H__B0FE4245_A913_4634_F1BD_725570BFDC80__INCLUDED_
-  #define ACCESSINTERFACEPROTOCOL_H__B0FE4245_A913_4634_F1BD_725570BFDC80__INCLUDED_
+#ifndef ACCESSINTERFACEPROTOCOL_1149_1_H__A048AC53_C7DE_47DE_E5AB_F9A8AB33D31F__INCLUDED_
+  #define ACCESSINTERFACEPROTOCOL_1149_1_H__A048AC53_C7DE_47DE_E5AB_F9A8AB33D31F__INCLUDED_
 
-#include "BinaryVector.hpp"
+#include "AccessInterfaceProtocol.hpp"
 
 namespace mast
 {
-//! Defines interface for protocols used by AccessInterface
+//! Implements AccessInterfaceProtocol for tap (1149.1)
 //!
-class AccessInterfaceProtocol
+class AccessInterfaceProtocol_1149_1 : public AccessInterfaceProtocol
 {
   // ---------------- Public  Methods
   //
   public:
+  ~AccessInterfaceProtocol_1149_1() = default;
+  AccessInterfaceProtocol_1149_1()  = default;
 
   //! Does any action required to transfert scan data to and from SUT
   //!
@@ -34,24 +36,30 @@ class AccessInterfaceProtocol
   //! @param toSutData      Bits stream to transfert to SUT
   //!
   //! @return Bits stream retrieved from SUT
-  virtual BinaryVector DoAction(uint32_t derivationId, void* interfaceData, const BinaryVector& toSutData) = 0;
+  virtual BinaryVector DoAction(uint32_t derivationId, void* interfaceData, const BinaryVector& toSutData) override;
 
   // ---------------- Protected Methods
   //
   protected:
-  virtual ~AccessInterfaceProtocol() = default;
-  AccessInterfaceProtocol()          = default;
+
+  // ---------------- Private  Methods
+  //
+  private:
+
+  // ---------------- Private  Fields
+  //
+  private:
 };
 //
-//  End of AccessInterfaceProtocol class declaration
+//  End of AccessInterfaceProtocol_1149_1 class declaration
 //---------------------------------------------------------------------------
 } // End of namespace mast
 
 
 
 
-#endif  // not defined ACCESSINTERFACEPROTOCOL_H__B0FE4245_A913_4634_F1BD_725570BFDC80__INCLUDED_
+#endif  // not defined ACCESSINTERFACEPROTOCOL_1149_1_H__A048AC53_C7DE_47DE_E5AB_F9A8AB33D31F__INCLUDED_
 
 //===========================================================================
-// End of AccessInterfaceProtocol.hpp
+// End of AccessInterfaceProtocol_1149_1.hpp
 //===========================================================================

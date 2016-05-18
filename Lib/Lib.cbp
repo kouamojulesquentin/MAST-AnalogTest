@@ -51,6 +51,7 @@
 		<Unit filename="include/AccessInterface.hpp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="include/AccessInterfaceProtocol_1149_1.hpp" />
 		<Unit filename="include/BinaryVector.hpp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
@@ -112,6 +113,7 @@
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="src/AccessInterface.cpp" />
+		<Unit filename="src/AccessInterfaceProtocol_1149_1.cpp" />
 		<Unit filename="src/BinaryVector.cpp" />
 		<Unit filename="src/Chain.cpp" />
 		<Unit filename="src/DefaultBinaryPathSelector.cpp" />

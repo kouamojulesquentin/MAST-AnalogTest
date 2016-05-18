@@ -13,10 +13,10 @@ WINDRES = windres
 
 INC = -Iinclude -Ipublic_include
 CFLAGS = -std=c++14  -fPIC
-RESINC = 
-LIBDIR = 
-LIB = 
-LDFLAGS = 
+RESINC =
+LIBDIR =
+LIB =
+LDFLAGS =
 
 INC_DEBUG = $(INC)
 CFLAGS_DEBUG = $(CFLAGS) -Wall -g -DBUILD_DLL
@@ -26,7 +26,7 @@ LIBDIR_DEBUG = $(LIBDIR)
 LIB_DEBUG = $(LIB)
 LDFLAGS_DEBUG = $(LDFLAGS) -Wl,--dll
 OBJDIR_DEBUG = ../obj/debug
-DEP_DEBUG = 
+DEP_DEBUG =
 OUT_DEBUG = ../bin/debug/Lib.so
 
 INC_RELEASE = $(INC)
@@ -37,22 +37,50 @@ LIBDIR_RELEASE = $(LIBDIR)
 LIB_RELEASE = $(LIB)
 LDFLAGS_RELEASE = $(LDFLAGS) -s -Wl,--dll
 OBJDIR_RELEASE = ../obj/release
-DEP_RELEASE = 
+DEP_RELEASE =
 OUT_RELEASE = ../bin/release/Lib.so
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/src/AccessInterface.o $(OBJDIR_DEBUG)/src/BinaryVector.o $(OBJDIR_DEBUG)/src/Chain.o $(OBJDIR_DEBUG)/src/DefaultBinaryPathSelector.o $(OBJDIR_DEBUG)/src/GmlPrinterVisitor.o $(OBJDIR_DEBUG)/src/Linker.o $(OBJDIR_DEBUG)/src/ParentNode.o $(OBJDIR_DEBUG)/src/PrettyPrinterVisitor.o $(OBJDIR_DEBUG)/src/Register.o $(OBJDIR_DEBUG)/src/SVFVector.o $(OBJDIR_DEBUG)/src/SystemModel.o $(OBJDIR_DEBUG)/src/SystemModelNode.o $(OBJDIR_DEBUG)/src/Tap.o $(OBJDIR_DEBUG)/src/Utility.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/src/AccessInterface.o                	\
+            $(OBJDIR_DEBUG)/src/AccessInterfaceProtocol_1149_1.o  \
+            $(OBJDIR_DEBUG)/src/BinaryVector.o                    \
+            $(OBJDIR_DEBUG)/src/Chain.o                           \
+            $(OBJDIR_DEBUG)/src/DefaultBinaryPathSelector.o       \
+            $(OBJDIR_DEBUG)/src/GmlPrinterVisitor.o               \
+            $(OBJDIR_DEBUG)/src/Linker.o                          \
+            $(OBJDIR_DEBUG)/src/ParentNode.o                      \
+            $(OBJDIR_DEBUG)/src/PrettyPrinterVisitor.o            \
+            $(OBJDIR_DEBUG)/src/Register.o                        \
+            $(OBJDIR_DEBUG)/src/SVFVector.o                       \
+            $(OBJDIR_DEBUG)/src/SystemModel.o                     \
+            $(OBJDIR_DEBUG)/src/SystemModelNode.o                 \
+            $(OBJDIR_DEBUG)/src/Tap.o                             \
+            $(OBJDIR_DEBUG)/src/Utility.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/src/AccessInterface.o $(OBJDIR_RELEASE)/src/BinaryVector.o $(OBJDIR_RELEASE)/src/Chain.o $(OBJDIR_RELEASE)/src/DefaultBinaryPathSelector.o $(OBJDIR_RELEASE)/src/GmlPrinterVisitor.o $(OBJDIR_RELEASE)/src/Linker.o $(OBJDIR_RELEASE)/src/ParentNode.o $(OBJDIR_RELEASE)/src/PrettyPrinterVisitor.o $(OBJDIR_RELEASE)/src/Register.o $(OBJDIR_RELEASE)/src/SVFVector.o $(OBJDIR_RELEASE)/src/SystemModel.o $(OBJDIR_RELEASE)/src/SystemModelNode.o $(OBJDIR_RELEASE)/src/Tap.o $(OBJDIR_RELEASE)/src/Utility.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/src/AccessInterface.o                	\
+            $(OBJDIR_RELEASE)/src/AccessInterfaceProtocol_1149_1.o  \
+            $(OBJDIR_RELEASE)/src/BinaryVector.o                    \
+            $(OBJDIR_RELEASE)/src/Chain.o                           \
+            $(OBJDIR_RELEASE)/src/DefaultBinaryPathSelector.o       \
+            $(OBJDIR_RELEASE)/src/GmlPrinterVisitor.o               \
+            $(OBJDIR_RELEASE)/src/Linker.o                          \
+            $(OBJDIR_RELEASE)/src/ParentNode.o                      \
+            $(OBJDIR_RELEASE)/src/PrettyPrinterVisitor.o            \
+            $(OBJDIR_RELEASE)/src/Register.o                        \
+            $(OBJDIR_RELEASE)/src/SVFVector.o                       \
+            $(OBJDIR_RELEASE)/src/SystemModel.o                     \
+            $(OBJDIR_RELEASE)/src/SystemModelNode.o                 \
+            $(OBJDIR_RELEASE)/src/Tap.o                             \
+            $(OBJDIR_RELEASE)/src/Utility.o
 
 all: debug release
 
 clean: clean_debug clean_release
 
-before_debug: 
+before_debug:
 	test -d ../bin/debug || mkdir -p ../bin/debug
 	test -d $(OBJDIR_DEBUG)/src || mkdir -p $(OBJDIR_DEBUG)/src
 
-after_debug: 
+after_debug:
 
 debug: before_debug out_debug after_debug
 
@@ -61,6 +89,9 @@ out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 
 $(OBJDIR_DEBUG)/src/AccessInterface.o: src/AccessInterface.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/AccessInterface.cpp -o $(OBJDIR_DEBUG)/src/AccessInterface.o
+
+$(OBJDIR_DEBUG)/src/AccessInterface.o: src/AccessInterfaceProtocol_1149_1.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/AccessInterfaceProtocol_1149_1.cpp -o $(OBJDIR_DEBUG)/src/AccessInterfaceProtocol_1149_1.o
 
 $(OBJDIR_DEBUG)/src/BinaryVector.o: src/BinaryVector.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/BinaryVector.cpp -o $(OBJDIR_DEBUG)/src/BinaryVector.o
@@ -101,16 +132,16 @@ $(OBJDIR_DEBUG)/src/Tap.o: src/Tap.cpp
 $(OBJDIR_DEBUG)/src/Utility.o: src/Utility.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/Utility.cpp -o $(OBJDIR_DEBUG)/src/Utility.o
 
-clean_debug: 
+clean_debug:
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
 	rm -rf ../bin/debug
 	rm -rf $(OBJDIR_DEBUG)/src
 
-before_release: 
+before_release:
 	test -d ../bin/release || mkdir -p ../bin/release
 	test -d $(OBJDIR_RELEASE)/src || mkdir -p $(OBJDIR_RELEASE)/src
 
-after_release: 
+after_release:
 
 release: before_release out_release after_release
 
@@ -119,6 +150,9 @@ out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 
 $(OBJDIR_RELEASE)/src/AccessInterface.o: src/AccessInterface.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/AccessInterface.cpp -o $(OBJDIR_RELEASE)/src/AccessInterface.o
+
+$(OBJDIR_RELEASE)/src/AccessInterface.o: src/AccessInterfaceProtocol_1149_1.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/AccessInterfaceProtocol_1149_1.cpp -o $(OBJDIR_RELEASE)/src/AccessInterfaceProtocol_1149_1.o
 
 $(OBJDIR_RELEASE)/src/BinaryVector.o: src/BinaryVector.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/BinaryVector.cpp -o $(OBJDIR_RELEASE)/src/BinaryVector.o
@@ -159,7 +193,7 @@ $(OBJDIR_RELEASE)/src/Tap.o: src/Tap.cpp
 $(OBJDIR_RELEASE)/src/Utility.o: src/Utility.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/Utility.cpp -o $(OBJDIR_RELEASE)/src/Utility.o
 
-clean_release: 
+clean_release:
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
 	rm -rf ../bin/release
 	rm -rf $(OBJDIR_RELEASE)/src

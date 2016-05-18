@@ -62,7 +62,6 @@ void UT_GmlPrinterVisitor::test_VisitAccessInterface_with_Child ()
 {
   // ---------------- Setup
   //
-  auto tap   = make_shared<Tap>      ("Tap name", nullptr);
   auto chain = make_shared<Chain>    ("Chain name");
   auto reg_1 = make_shared<Register> ("Reg_1",        BinaryVector::CreateFromBinaryString("1010_1"));
   auto reg_2 = make_shared<Register> ("Reg_2",        BinaryVector::CreateFromBinaryString("1010_10"));
@@ -79,7 +78,6 @@ void UT_GmlPrinterVisitor::test_VisitAccessInterface_with_Child ()
   auto linker          = make_shared<Linker>("Linker name", pathSelector);
   auto accessInterface = make_shared<AccessInterface>("Access interface name", nullptr);
 
-  accessInterface->AppendChild(tap);
   accessInterface->AppendChild(chain);
   accessInterface->AppendChild(linker);
   linker->AppendChild(reg_a);
@@ -98,25 +96,23 @@ void UT_GmlPrinterVisitor::test_VisitAccessInterface_with_Child ()
   auto expected = string("graph\n"
                          "[\n"
                          "   hierarchic 1 directed 1\n"
-                         "   node [ id 9 graphics [ type \"octagon\" fill \"#10FFFF\" w 231 h 63 ] LabelGraphics [ text \"Access interface name\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   node [ id 0 graphics [ type \"ellipse\" fill \"#AA55AA\" w 88 h 35 ] LabelGraphics [ text \"Tap name\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   edge [ source 9 target 0 label \"1\" ]\n"
-                         "   node [ id 1 graphics [ type \"ellipse\" fill \"#FFCC20\" w 110 h 35 ] LabelGraphics [ text \"Chain name\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   node [ id 2 graphics [ type \"rectangle\" fill \"#59FF20\" w 55 h 35 ] LabelGraphics [ text \"Reg_1\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   edge [ source 1 target 2 label \"1\" ]\n"
-                         "   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 55 h 35 ] LabelGraphics [ text \"Reg_2\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   edge [ source 1 target 3 label \"2\" ]\n"
-                         "   node [ id 4 graphics [ type \"rectangle\" fill \"#59FF20\" w 55 h 35 ] LabelGraphics [ text \"Reg_3\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   edge [ source 1 target 4 label \"3\" ]\n"
-                         "   edge [ source 9 target 1 label \"2\" ]\n"
-                         "   node [ id 8 graphics [ type \"trapezoid\" fill \"#FF3060\" w 121 h 35 ] LabelGraphics [ text \"Linker name\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"R_A\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   edge [ source 8 target 5 label \"1\" ]\n"
-                         "   node [ id 6 graphics [ type \"rectangle\" fill \"#59FF20\" w 132 h 36 ] LabelGraphics [ text \"the register\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   edge [ source 8 target 6 label \"2\" ]\n"
-                         "   node [ id 7 graphics [ type \"rectangle\" fill \"#59FF20\" w 88 h 35 ] LabelGraphics [ text \"Selector\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   edge [ source 8 target 7 label \"0\" graphics [ width 1 style \"dashed\" targetArrow \"standard\" ] ]\n"
-                         "   edge [ source 9 target 8 label \"3\" ]\n"
+                         "   node [ id 8 graphics [ type \"octagon\" fill \"#10FFFF\" w 231 h 63 ] LabelGraphics [ text \"Access interface name\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 0 graphics [ type \"ellipse\" fill \"#FFCC20\" w 110 h 35 ] LabelGraphics [ text \"Chain name\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 1 graphics [ type \"rectangle\" fill \"#59FF20\" w 55 h 35 ] LabelGraphics [ text \"Reg_1\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   edge [ source 0 target 1 label \"1\" ]\n"
+                         "   node [ id 2 graphics [ type \"rectangle\" fill \"#59FF20\" w 55 h 35 ] LabelGraphics [ text \"Reg_2\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   edge [ source 0 target 2 label \"2\" ]\n"
+                         "   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 55 h 35 ] LabelGraphics [ text \"Reg_3\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   edge [ source 0 target 3 label \"3\" ]\n"
+                         "   edge [ source 8 target 0 label \"1\" ]\n"
+                         "   node [ id 7 graphics [ type \"trapezoid\" fill \"#FF3060\" w 121 h 35 ] LabelGraphics [ text \"Linker name\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 4 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"R_A\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   edge [ source 7 target 4 label \"1\" ]\n"
+                         "   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 132 h 36 ] LabelGraphics [ text \"the register\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   edge [ source 7 target 5 label \"2\" ]\n"
+                         "   node [ id 6 graphics [ type \"rectangle\" fill \"#59FF20\" w 88 h 35 ] LabelGraphics [ text \"Selector\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   edge [ source 7 target 6 label \"0\" graphics [ width 1 style \"dashed\" targetArrow \"standard\" ] ]\n"
+                         "   edge [ source 8 target 7 label \"2\" ]\n"
                          "]"
                         );
   TS_ASSERT_EQUALS (gotGraph, expected);

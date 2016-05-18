@@ -46,7 +46,6 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
   virtual void VisitChain           (Chain&           chain)           override;
   virtual void VisitLinker          (Linker&          linker)          override;
   virtual void VisitRegister        (Register&        reg)             override;
-  virtual void VisitTap             (Tap&             tap)             override;
 
   std::string  GetGraph();  //!< Returns currently visited nodes graph representation
 
@@ -82,17 +81,14 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
   std::ostringstream m_os;                //!< Stream to build up a representation of visited system model nodes
 
   static const std::experimental::string_view m_shape_AccessInterface;
-  static const std::experimental::string_view m_shape_Tap;
   static const std::experimental::string_view m_shape_Linker;
   static const std::experimental::string_view m_shape_Chain;
   static const std::experimental::string_view m_shape_Register;
 
   static const std::experimental::string_view m_color_AccessInterface;
-  static const std::experimental::string_view m_color_Tap;
   static const std::experimental::string_view m_color_Linker;
   static const std::experimental::string_view m_color_Chain;
   static const std::experimental::string_view m_color_Register;
-
 };
 //
 //  End of GmlPrinterVisitor class declaration

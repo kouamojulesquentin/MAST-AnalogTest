@@ -103,9 +103,10 @@ void UT_SystemModel::test_CreateRegister_Without_ParentNode ()
   // ---------------- Setup
   //
   SystemModel sut;
-  auto        tap    = sut.CreateAccessInterface("AI name", nullptr);
   string_view name   = "Reg name";
   auto        bypass = BinaryVector::CreateFromBinaryString("1010_1");
+
+  sut.CreateAccessInterface("", nullptr); // Necessary to have a root node
 
   // ---------------- Exercise
   //

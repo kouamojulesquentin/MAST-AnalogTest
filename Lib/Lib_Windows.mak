@@ -40,9 +40,9 @@ OBJDIR_RELEASE = ..\\obj\\release
 DEP_RELEASE = 
 OUT_RELEASE = ..\\bin\\release\\Lib.dll
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)\\src\\AccessInterface.o $(OBJDIR_DEBUG)\\src\\AccessInterfaceProtocol_1149_1.o $(OBJDIR_DEBUG)\\src\\BinaryVector.o $(OBJDIR_DEBUG)\\src\\Chain.o $(OBJDIR_DEBUG)\\src\\DefaultBinaryPathSelector.o $(OBJDIR_DEBUG)\\src\\GmlPrinterVisitor.o $(OBJDIR_DEBUG)\\src\\Linker.o $(OBJDIR_DEBUG)\\src\\ParentNode.o $(OBJDIR_DEBUG)\\src\\PrettyPrinterVisitor.o $(OBJDIR_DEBUG)\\src\\Register.o $(OBJDIR_DEBUG)\\src\\SVFVector.o $(OBJDIR_DEBUG)\\src\\SystemModel.o $(OBJDIR_DEBUG)\\src\\SystemModelNode.o $(OBJDIR_DEBUG)\\src\\Tap.o $(OBJDIR_DEBUG)\\src\\Utility.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)\\src\\AccessInterface.o $(OBJDIR_DEBUG)\\src\\AccessInterfaceProtocol_1149_1.o $(OBJDIR_DEBUG)\\src\\BinaryVector.o $(OBJDIR_DEBUG)\\src\\Chain.o $(OBJDIR_DEBUG)\\src\\DefaultBinaryPathSelector.o $(OBJDIR_DEBUG)\\src\\GmlPrinterVisitor.o $(OBJDIR_DEBUG)\\src\\Linker.o $(OBJDIR_DEBUG)\\src\\ParentNode.o $(OBJDIR_DEBUG)\\src\\PrettyPrinterVisitor.o $(OBJDIR_DEBUG)\\src\\Register.o $(OBJDIR_DEBUG)\\src\\SVFVector.o $(OBJDIR_DEBUG)\\src\\SystemModel.o $(OBJDIR_DEBUG)\\src\\SystemModelNode.o $(OBJDIR_DEBUG)\\src\\Utility.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)\\src\\AccessInterface.o $(OBJDIR_RELEASE)\\src\\AccessInterfaceProtocol_1149_1.o $(OBJDIR_RELEASE)\\src\\BinaryVector.o $(OBJDIR_RELEASE)\\src\\Chain.o $(OBJDIR_RELEASE)\\src\\DefaultBinaryPathSelector.o $(OBJDIR_RELEASE)\\src\\GmlPrinterVisitor.o $(OBJDIR_RELEASE)\\src\\Linker.o $(OBJDIR_RELEASE)\\src\\ParentNode.o $(OBJDIR_RELEASE)\\src\\PrettyPrinterVisitor.o $(OBJDIR_RELEASE)\\src\\Register.o $(OBJDIR_RELEASE)\\src\\SVFVector.o $(OBJDIR_RELEASE)\\src\\SystemModel.o $(OBJDIR_RELEASE)\\src\\SystemModelNode.o $(OBJDIR_RELEASE)\\src\\Tap.o $(OBJDIR_RELEASE)\\src\\Utility.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)\\src\\AccessInterface.o $(OBJDIR_RELEASE)\\src\\AccessInterfaceProtocol_1149_1.o $(OBJDIR_RELEASE)\\src\\BinaryVector.o $(OBJDIR_RELEASE)\\src\\Chain.o $(OBJDIR_RELEASE)\\src\\DefaultBinaryPathSelector.o $(OBJDIR_RELEASE)\\src\\GmlPrinterVisitor.o $(OBJDIR_RELEASE)\\src\\Linker.o $(OBJDIR_RELEASE)\\src\\ParentNode.o $(OBJDIR_RELEASE)\\src\\PrettyPrinterVisitor.o $(OBJDIR_RELEASE)\\src\\Register.o $(OBJDIR_RELEASE)\\src\\SVFVector.o $(OBJDIR_RELEASE)\\src\\SystemModel.o $(OBJDIR_RELEASE)\\src\\SystemModelNode.o $(OBJDIR_RELEASE)\\src\\Utility.o
 
 all: debug release
 
@@ -97,9 +97,6 @@ $(OBJDIR_DEBUG)\\src\\SystemModel.o: src\\SystemModel.cpp
 
 $(OBJDIR_DEBUG)\\src\\SystemModelNode.o: src\\SystemModelNode.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\SystemModelNode.cpp -o $(OBJDIR_DEBUG)\\src\\SystemModelNode.o
-
-$(OBJDIR_DEBUG)\\src\\Tap.o: src\\Tap.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\Tap.cpp -o $(OBJDIR_DEBUG)\\src\\Tap.o
 
 $(OBJDIR_DEBUG)\\src\\Utility.o: src\\Utility.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\Utility.cpp -o $(OBJDIR_DEBUG)\\src\\Utility.o
@@ -158,9 +155,6 @@ $(OBJDIR_RELEASE)\\src\\SystemModel.o: src\\SystemModel.cpp
 
 $(OBJDIR_RELEASE)\\src\\SystemModelNode.o: src\\SystemModelNode.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\SystemModelNode.cpp -o $(OBJDIR_RELEASE)\\src\\SystemModelNode.o
-
-$(OBJDIR_RELEASE)\\src\\Tap.o: src\\Tap.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\Tap.cpp -o $(OBJDIR_RELEASE)\\src\\Tap.o
 
 $(OBJDIR_RELEASE)\\src\\Utility.o: src\\Utility.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\Utility.cpp -o $(OBJDIR_RELEASE)\\src\\Utility.o

@@ -53,7 +53,6 @@ OBJ_DEBUG = $(OBJDIR_DEBUG)/src/AccessInterface.o                	\
             $(OBJDIR_DEBUG)/src/SVFVector.o                       \
             $(OBJDIR_DEBUG)/src/SystemModel.o                     \
             $(OBJDIR_DEBUG)/src/SystemModelNode.o                 \
-            $(OBJDIR_DEBUG)/src/Tap.o                             \
             $(OBJDIR_DEBUG)/src/Utility.o
 
 OBJ_RELEASE = $(OBJDIR_RELEASE)/src/AccessInterface.o                	\
@@ -69,7 +68,6 @@ OBJ_RELEASE = $(OBJDIR_RELEASE)/src/AccessInterface.o                	\
             $(OBJDIR_RELEASE)/src/SVFVector.o                       \
             $(OBJDIR_RELEASE)/src/SystemModel.o                     \
             $(OBJDIR_RELEASE)/src/SystemModelNode.o                 \
-            $(OBJDIR_RELEASE)/src/Tap.o                             \
             $(OBJDIR_RELEASE)/src/Utility.o
 
 all: debug release
@@ -125,9 +123,6 @@ $(OBJDIR_DEBUG)/src/SystemModel.o: src/SystemModel.cpp
 
 $(OBJDIR_DEBUG)/src/SystemModelNode.o: src/SystemModelNode.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/SystemModelNode.cpp -o $(OBJDIR_DEBUG)/src/SystemModelNode.o
-
-$(OBJDIR_DEBUG)/src/Tap.o: src/Tap.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/Tap.cpp -o $(OBJDIR_DEBUG)/src/Tap.o
 
 $(OBJDIR_DEBUG)/src/Utility.o: src/Utility.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/Utility.cpp -o $(OBJDIR_DEBUG)/src/Utility.o
@@ -186,9 +181,6 @@ $(OBJDIR_RELEASE)/src/SystemModel.o: src/SystemModel.cpp
 
 $(OBJDIR_RELEASE)/src/SystemModelNode.o: src/SystemModelNode.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/SystemModelNode.cpp -o $(OBJDIR_RELEASE)/src/SystemModelNode.o
-
-$(OBJDIR_RELEASE)/src/Tap.o: src/Tap.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/Tap.cpp -o $(OBJDIR_RELEASE)/src/Tap.o
 
 $(OBJDIR_RELEASE)/src/Utility.o: src/Utility.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/Utility.cpp -o $(OBJDIR_RELEASE)/src/Utility.o

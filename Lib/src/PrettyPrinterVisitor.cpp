@@ -249,14 +249,6 @@ void PrettyPrinterVisitor::VisitRegister (Register& reg)
   }
 }
 
-//! Appends content of tap node in text representation and visits
-//! sub-nodes
-//!
-void PrettyPrinterVisitor::VisitTap (Tap& tap)
-{
-  StreamParentNode("Tap", tap);
-}
-
 //===========================================================================
 // End of PrettyPrinterVisitor.cpp
 //===========================================================================

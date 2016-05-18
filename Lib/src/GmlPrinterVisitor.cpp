@@ -23,13 +23,11 @@ using namespace mast;
 
 
 const std::experimental::string_view GmlPrinterVisitor::m_shape_AccessInterface = "octagon";
-const std::experimental::string_view GmlPrinterVisitor::m_shape_Tap             = "ellipse";
 const std::experimental::string_view GmlPrinterVisitor::m_shape_Linker          = "trapezoid";
 const std::experimental::string_view GmlPrinterVisitor::m_shape_Chain           = "ellipse";
 const std::experimental::string_view GmlPrinterVisitor::m_shape_Register        = "rectangle";
 
 const std::experimental::string_view GmlPrinterVisitor::m_color_AccessInterface = "#10FFFF";
-const std::experimental::string_view GmlPrinterVisitor::m_color_Tap             = "#AA55AA";
 const std::experimental::string_view GmlPrinterVisitor::m_color_Linker          = "#FF3060";
 const std::experimental::string_view GmlPrinterVisitor::m_color_Chain           = "#FFCC20";
 const std::experimental::string_view GmlPrinterVisitor::m_color_Register        = "#59FF20";
@@ -251,13 +249,6 @@ void GmlPrinterVisitor::VisitRegister (Register& reg)
   }
 }
 
-//! Appends content of tap node in text representation and visits
-//! sub-nodes
-//!
-void GmlPrinterVisitor::VisitTap (Tap& tap)
-{
-  AppendParentNode(m_shape_Tap, m_color_Tap, "Tap", tap);
-}
 //===========================================================================
 // End of GmlPrinterVisitor.cpp
 //===========================================================================

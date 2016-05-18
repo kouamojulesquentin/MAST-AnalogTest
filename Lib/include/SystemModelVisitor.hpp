@@ -23,7 +23,6 @@ class AccessInterface;
 class Chain;
 class Linker;
 class Register;
-class Tap;
 
 //! System model visitors interface
 //!
@@ -36,7 +35,6 @@ class DLL_EXPORT SystemModelVisitor
   virtual void VisitChain           (Chain&           chain)           = 0;
   virtual void VisitLinker          (Linker&          linker)          = 0;
   virtual void VisitRegister        (Register&        reg)             = 0;
-  virtual void VisitTap             (Tap&             tap)             = 0;
 
   // ---------------- Protected Methods
   //

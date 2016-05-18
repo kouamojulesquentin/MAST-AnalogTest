@@ -42,8 +42,6 @@ class UT_PrettyPrinterVisitor : public CxxTest::TestSuite
   void test_VisitLinker_Verbose ();
   void test_VisitRegister ();
   void test_VisitRegister_Verbose ();
-  void test_VisitTap ();
-  void test_VisitTap_Verbose ();
 
   // ---------------- Visit - Two nodes
   //

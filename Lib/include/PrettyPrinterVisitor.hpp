@@ -39,7 +39,6 @@ class DLL_EXPORT PrettyPrinterVisitor : public SystemModelVisitor
   virtual void VisitChain           (Chain&           chain)           override;
   virtual void VisitLinker          (Linker&          linker)          override;
   virtual void VisitRegister        (Register&        reg)             override;
-  virtual void VisitTap             (Tap&             tap)             override;
 
   std::string GetPrettyPrint() const { return m_os.str();     } //!< Returns currently visited nodes representation
   bool        GetVerbose()     const { return m_verbose;      } //!< Returns whether verbose mode is active

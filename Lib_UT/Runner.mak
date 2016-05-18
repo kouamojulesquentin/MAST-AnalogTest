@@ -13,8 +13,13 @@ endif
 UT_RootPath	 = $(RootPath)
 
 Suites = \
-           $(UT_RootPath)/Utility/UT_*.hpp      \
-           $(UT_RootPath)/SystemModel/UT_*.hpp  \
+           $(UT_RootPath)/Utility/UT_BinaryVector.hpp                  \
+           $(UT_RootPath)/Utility/UT_SVFVector.hpp                     \
+           $(UT_RootPath)/SystemModel/UT_Register.hpp                  \
+           $(UT_RootPath)/SystemModel/UT_DefaultBinaryPathSelector.hpp \
+           $(UT_RootPath)/SystemModel/UT_SystemModel.hpp               \
+           $(UT_RootPath)/SystemModel/UT_PrettyPrinterVisitor.hpp      \
+           $(UT_RootPath)/SystemModel/UT_GmlPrinterVisitor.hpp
 
 
 ProjectFile  = $(RootPath)/Lib_UT.cbp

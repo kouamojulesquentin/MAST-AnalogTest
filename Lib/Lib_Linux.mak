@@ -88,7 +88,7 @@ out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 $(OBJDIR_DEBUG)/src/AccessInterface.o: src/AccessInterface.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/AccessInterface.cpp -o $(OBJDIR_DEBUG)/src/AccessInterface.o
 
-$(OBJDIR_DEBUG)/src/AccessInterface.o: src/AccessInterfaceProtocol_1149_1.cpp
+$(OBJDIR_DEBUG)/src/AccessInterfaceProtocol_1149_1.o: src/AccessInterfaceProtocol_1149_1.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/AccessInterfaceProtocol_1149_1.cpp -o $(OBJDIR_DEBUG)/src/AccessInterfaceProtocol_1149_1.o
 
 $(OBJDIR_DEBUG)/src/BinaryVector.o: src/BinaryVector.cpp
@@ -146,7 +146,7 @@ out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 $(OBJDIR_RELEASE)/src/AccessInterface.o: src/AccessInterface.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/AccessInterface.cpp -o $(OBJDIR_RELEASE)/src/AccessInterface.o
 
-$(OBJDIR_RELEASE)/src/AccessInterface.o: src/AccessInterfaceProtocol_1149_1.cpp
+$(OBJDIR_RELEASE)/src/AccessInterfaceProtocol_1149_1.o: src/AccessInterfaceProtocol_1149_1.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/AccessInterfaceProtocol_1149_1.cpp -o $(OBJDIR_RELEASE)/src/AccessInterfaceProtocol_1149_1.o
 
 $(OBJDIR_RELEASE)/src/BinaryVector.o: src/BinaryVector.cpp

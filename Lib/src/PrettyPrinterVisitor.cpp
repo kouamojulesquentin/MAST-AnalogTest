@@ -137,12 +137,16 @@ void PrettyPrinterVisitor::StreamNodeHeader(std::experimental::string_view type,
 
   m_startPos = m_os.tellp();
   StreamDepth();
-  if (m_processingSelector)
+
+  if (!m_processingSelector)
   {
-    m_os << ":Selector: ";
+    m_os << "[" << type                 << "]";
+  }
+  else
+  {
+    m_os << ":Selector:";
   }
 
-  m_os << "[" << type                 << "]";
   m_os << '(' << node.GetIdentifier() << ") ";
 
   AlignRelativeTo(m_startPos, 15u + m_depth);
@@ -228,24 +232,31 @@ void PrettyPrinterVisitor::VisitLinker (Linker& linker)
 //!
 void PrettyPrinterVisitor::VisitRegister (Register& reg)
 {
-  StreamNodeHeader("Register", reg);
-
-  m_os << ", length: " << reg.GetBypassSequence().BitsCount();
-
-  if (!m_verbose)
+  if (m_processingSelector)
   {
-    StreamBinaryVector("bypass: ", reg.GetBypassSequence());
+    StreamNodeHeader("", reg);
   }
   else
   {
-    auto targetPosInLine = m_os.tellp() - m_startPos;
+    StreamNodeHeader("Register", reg);
 
-                                     StreamBinaryVector("bypass:            ", reg.GetBypassSequence());
-    AlignOnNewLine(targetPosInLine); StreamBinaryVector("next_to_sut:       ", reg.GetNextToSut());
-    AlignOnNewLine(targetPosInLine); StreamBinaryVector("last_to_sut:       ", reg.GetLastToSut());
-    AlignOnNewLine(targetPosInLine); StreamBinaryVector("last_from_sut:     ", reg.GetLastFromSut());
-    AlignOnNewLine(targetPosInLine); StreamBinaryVector("expected_from_sut: ", reg.GetExpectedFromSut());
-    AlignOnNewLine(targetPosInLine); StreamNodeCommon(reg);
+    m_os << ", length: " << reg.GetBypassSequence().BitsCount();
+
+    if (!m_verbose)
+    {
+      StreamBinaryVector("bypass: ", reg.GetBypassSequence());
+    }
+    else
+    {
+      auto targetPosInLine = m_os.tellp() - m_startPos;
+
+                                       StreamBinaryVector("bypass:            ", reg.GetBypassSequence());
+      AlignOnNewLine(targetPosInLine); StreamBinaryVector("next_to_sut:       ", reg.GetNextToSut());
+      AlignOnNewLine(targetPosInLine); StreamBinaryVector("last_to_sut:       ", reg.GetLastToSut());
+      AlignOnNewLine(targetPosInLine); StreamBinaryVector("last_from_sut:     ", reg.GetLastFromSut());
+      AlignOnNewLine(targetPosInLine); StreamBinaryVector("expected_from_sut: ", reg.GetExpectedFromSut());
+      AlignOnNewLine(targetPosInLine); StreamNodeCommon(reg);
+    }
   }
 }
 

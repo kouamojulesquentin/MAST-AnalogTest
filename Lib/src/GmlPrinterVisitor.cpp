@@ -119,8 +119,12 @@ void GmlPrinterVisitor::PrintEdge (const ParentNode&              parentNode,
 {
   m_os << "   edge ["
        << " source "  << parentNode.GetIdentifier()
-       << " target "  << childNode.GetIdentifier()
-       << " label \"" << childId << "\"";
+       << " target "  << childNode.GetIdentifier();
+
+  if (childId != 0)
+  {
+    m_os << " label \"" << childId << "\"";
+  }
 
   if (!style.empty())
   {
@@ -229,23 +233,28 @@ void GmlPrinterVisitor::VisitLinker (Linker& linker)
   // ---------------- Deal with path selector
   //
   auto selector = linker.GetPathSelector();
-  m_linker = &linker;
-  selector->Accept(*this);
-  m_linker = nullptr;
+  if (selector)
+  {
+    m_linker = &linker;
+    selector->Accept(*this);
+    m_linker = nullptr;
+  }
 }
 
  //! Appends Register node to GML graph
 //!
 void GmlPrinterVisitor::VisitRegister (Register& reg)
 {
-  AppendNode(m_shape_Register, m_color_Register, "Register", reg);
-
   // ---------------- Deal with path selector associated with Linker nodes
   //
   if (m_linker)
   {
     PrintEdge(*m_linker, reg, 0, "dashed");
     m_linker = nullptr;   // Only first SystemModelNode is connected to the linker
+  }
+  else
+  {
+    AppendNode(m_shape_Register, m_color_Register, "Register", reg);
   }
 }
 

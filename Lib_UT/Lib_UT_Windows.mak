@@ -40,36 +40,26 @@ OBJDIR_RELEASE = ..\\obj\\Release
 DEP_RELEASE = 
 OUT_RELEASE = ..\\bin\\Release\\Lib_UT.exe
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)\\Generated\\Runner.o $(OBJDIR_DEBUG)\\SystemModel\\UT_DefaultBinaryPathSelector.o $(OBJDIR_DEBUG)\\SystemModel\\UT_GmlPrinterVisitor.o $(OBJDIR_DEBUG)\\SystemModel\\UT_PrettyPrinterVisitor.o $(OBJDIR_DEBUG)\\SystemModel\\UT_Register.o $(OBJDIR_DEBUG)\\SystemModel\\UT_SystemModel.o $(OBJDIR_DEBUG)\\Utility\\UT_BinaryVector.o $(OBJDIR_DEBUG)\\Utility\\UT_SVFVector.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)\\SystemModel\\UT_DefaultBinaryPathSelector.o $(OBJDIR_DEBUG)\\SystemModel\\UT_GmlPrinterVisitor.o $(OBJDIR_DEBUG)\\SystemModel\\UT_PrettyPrinterVisitor.o $(OBJDIR_DEBUG)\\SystemModel\\UT_Register.o $(OBJDIR_DEBUG)\\SystemModel\\UT_SystemModel.o $(OBJDIR_DEBUG)\\Utility\\UT_BinaryVector.o $(OBJDIR_DEBUG)\\Utility\\UT_SVFVector.o $(OBJDIR_DEBUG)\\Generated\\Runner.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)\\Generated\\Runner.o $(OBJDIR_RELEASE)\\SystemModel\\UT_DefaultBinaryPathSelector.o $(OBJDIR_RELEASE)\\SystemModel\\UT_GmlPrinterVisitor.o $(OBJDIR_RELEASE)\\SystemModel\\UT_PrettyPrinterVisitor.o $(OBJDIR_RELEASE)\\SystemModel\\UT_Register.o $(OBJDIR_RELEASE)\\SystemModel\\UT_SystemModel.o $(OBJDIR_RELEASE)\\Utility\\UT_BinaryVector.o $(OBJDIR_RELEASE)\\Utility\\UT_SVFVector.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)\\SystemModel\\UT_DefaultBinaryPathSelector.o $(OBJDIR_RELEASE)\\SystemModel\\UT_GmlPrinterVisitor.o $(OBJDIR_RELEASE)\\SystemModel\\UT_PrettyPrinterVisitor.o $(OBJDIR_RELEASE)\\SystemModel\\UT_Register.o $(OBJDIR_RELEASE)\\SystemModel\\UT_SystemModel.o $(OBJDIR_RELEASE)\\Utility\\UT_BinaryVector.o $(OBJDIR_RELEASE)\\Utility\\UT_SVFVector.o $(OBJDIR_RELEASE)\\Generated\\Runner.o
 
-all: before_build build_debug build_release after_build
+all: debug release
 
 clean: clean_debug clean_release
 
-before_build: 
-	make.exe -f Runner.mak
-
-after_build: 
-
 before_debug: 
 	cmd /c if not exist ..\\bin\\Debug md ..\\bin\\Debug
-	cmd /c if not exist $(OBJDIR_DEBUG)\\Generated md $(OBJDIR_DEBUG)\\Generated
 	cmd /c if not exist $(OBJDIR_DEBUG)\\SystemModel md $(OBJDIR_DEBUG)\\SystemModel
 	cmd /c if not exist $(OBJDIR_DEBUG)\\Utility md $(OBJDIR_DEBUG)\\Utility
+	cmd /c if not exist $(OBJDIR_DEBUG)\\Generated md $(OBJDIR_DEBUG)\\Generated
 
 after_debug: 
 
-build_debug: before_debug out_debug after_debug
-
-debug: before_build build_debug after_build
+debug: before_debug out_debug after_debug
 
 out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 	$(LD) $(LIBDIR_DEBUG) -o $(OUT_DEBUG) $(OBJ_DEBUG)  $(LDFLAGS_DEBUG) $(LIB_DEBUG)
-
-$(OBJDIR_DEBUG)\\Generated\\Runner.o: Generated\\Runner.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Generated\\Runner.cpp -o $(OBJDIR_DEBUG)\\Generated\\Runner.o
 
 $(OBJDIR_DEBUG)\\SystemModel\\UT_DefaultBinaryPathSelector.o: SystemModel\\UT_DefaultBinaryPathSelector.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel\\UT_DefaultBinaryPathSelector.cpp -o $(OBJDIR_DEBUG)\\SystemModel\\UT_DefaultBinaryPathSelector.o
@@ -92,30 +82,28 @@ $(OBJDIR_DEBUG)\\Utility\\UT_BinaryVector.o: Utility\\UT_BinaryVector.cpp
 $(OBJDIR_DEBUG)\\Utility\\UT_SVFVector.o: Utility\\UT_SVFVector.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Utility\\UT_SVFVector.cpp -o $(OBJDIR_DEBUG)\\Utility\\UT_SVFVector.o
 
+$(OBJDIR_DEBUG)\\Generated\\Runner.o: Generated\\Runner.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Generated\\Runner.cpp -o $(OBJDIR_DEBUG)\\Generated\\Runner.o
+
 clean_debug: 
 	cmd /c del /f $(OBJ_DEBUG) $(OUT_DEBUG)
 	cmd /c rd ..\\bin\\Debug
-	cmd /c rd $(OBJDIR_DEBUG)\\Generated
 	cmd /c rd $(OBJDIR_DEBUG)\\SystemModel
 	cmd /c rd $(OBJDIR_DEBUG)\\Utility
+	cmd /c rd $(OBJDIR_DEBUG)\\Generated
 
 before_release: 
 	cmd /c if not exist ..\\bin\\Release md ..\\bin\\Release
-	cmd /c if not exist $(OBJDIR_RELEASE)\\Generated md $(OBJDIR_RELEASE)\\Generated
 	cmd /c if not exist $(OBJDIR_RELEASE)\\SystemModel md $(OBJDIR_RELEASE)\\SystemModel
 	cmd /c if not exist $(OBJDIR_RELEASE)\\Utility md $(OBJDIR_RELEASE)\\Utility
+	cmd /c if not exist $(OBJDIR_RELEASE)\\Generated md $(OBJDIR_RELEASE)\\Generated
 
 after_release: 
 
-build_release: before_release out_release after_release
-
-release: before_build build_release after_build
+release: before_release out_release after_release
 
 out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 	$(LD) $(LIBDIR_RELEASE) -o $(OUT_RELEASE) $(OBJ_RELEASE)  $(LDFLAGS_RELEASE) $(LIB_RELEASE)
-
-$(OBJDIR_RELEASE)\\Generated\\Runner.o: Generated\\Runner.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Generated\\Runner.cpp -o $(OBJDIR_RELEASE)\\Generated\\Runner.o
 
 $(OBJDIR_RELEASE)\\SystemModel\\UT_DefaultBinaryPathSelector.o: SystemModel\\UT_DefaultBinaryPathSelector.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel\\UT_DefaultBinaryPathSelector.cpp -o $(OBJDIR_RELEASE)\\SystemModel\\UT_DefaultBinaryPathSelector.o
@@ -138,12 +126,15 @@ $(OBJDIR_RELEASE)\\Utility\\UT_BinaryVector.o: Utility\\UT_BinaryVector.cpp
 $(OBJDIR_RELEASE)\\Utility\\UT_SVFVector.o: Utility\\UT_SVFVector.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Utility\\UT_SVFVector.cpp -o $(OBJDIR_RELEASE)\\Utility\\UT_SVFVector.o
 
+$(OBJDIR_RELEASE)\\Generated\\Runner.o: Generated\\Runner.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Generated\\Runner.cpp -o $(OBJDIR_RELEASE)\\Generated\\Runner.o
+
 clean_release: 
 	cmd /c del /f $(OBJ_RELEASE) $(OUT_RELEASE)
 	cmd /c rd ..\\bin\\Release
-	cmd /c rd $(OBJDIR_RELEASE)\\Generated
 	cmd /c rd $(OBJDIR_RELEASE)\\SystemModel
 	cmd /c rd $(OBJDIR_RELEASE)\\Utility
+	cmd /c rd $(OBJDIR_RELEASE)\\Generated
 
-.PHONY: before_build after_build before_debug after_debug clean_debug before_release after_release clean_release
+.PHONY: before_debug after_debug clean_debug before_release after_release clean_release
 

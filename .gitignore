@@ -19,6 +19,7 @@
 /Lib/*.layout
 /Lib_UT/*.depend
 /Lib_UT/*.layout
+/Lib_UT_Runner/*.layout
 /cxxtest/cxxtest/*.TAG
 /cxxtest/cxxtest/Cxxtest.cfg
 /cxxtest/cxxtest/Cxxtest.mep

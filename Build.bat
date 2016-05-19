@@ -11,7 +11,15 @@
 @set makefile_lib=Lib_Windows.mak
 @set makefile_lib_UT=Lib_UT_Windows.mak
 
-%make_exe% -j4 -C Lib    -f %makefile_lib%    %target%
+@echo ===================== Building Lib =====================
+%make_exe% -j4 -C Lib -f %makefile_lib%    %target%
+
+@echo.
+@echo ===================== Building Lib_UT Runner.cpp =====================
+%make_exe% -C Lib_UT -f Runner.mak
+
+@echo.
+@echo ===================== Building Lib_UT =====================
 %make_exe% -j4 -C Lib_UT -f %makefile_lib_UT% %target%
 
 @REM pushd Lib

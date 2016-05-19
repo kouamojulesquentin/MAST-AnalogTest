@@ -63,8 +63,8 @@ all: before_build build_debug build_release after_build
 
 clean: clean_debug clean_release
 
+# UT Runner construction is supposed to have been done beforehand
 before_build:
-	make -f Runner.mak
 
 after_build:
 

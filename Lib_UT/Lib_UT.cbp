@@ -70,13 +70,12 @@
 		<Linker>
 			<Add option="-m32" />
 		</Linker>
-		<ExtraCommands>
-			<Add before="make.exe -f Runner.mak" />
-		</ExtraCommands>
 		<Unit filename="CxxTest_Traits/BinaryVector_Traits.hpp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="Generated/Runner.cpp" />
+		<Unit filename="Generated/Runner.cpp">
+			<Option weight="100" />
+		</Unit>
 		<Unit filename="SystemModel/UT_DefaultBinaryPathSelector.cpp" />
 		<Unit filename="SystemModel/UT_DefaultBinaryPathSelector.hpp">
 			<Option target="&lt;{~None~}&gt;" />

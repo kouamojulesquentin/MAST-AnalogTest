@@ -11,7 +11,7 @@ AR = ar
 LD = g++
 WINDRES = windres
 
-INC = -I../cxxtest -I../Lib/include -I../Lib/public_include -ICxxTest_Traits
+INC = -I../cxxtest -I../Lib/include -I../Lib/public_include -ICxxTest_Traits -IUT_Helpers
 CFLAGS = -Wnon-virtual-dtor -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equal -Winline -Wunreachable-code -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default -Weffc++ -Wmain -pedantic-errors -pedantic -w -Wfatal-errors -Wextra -fexceptions -std=c++14 -DCXXTEST_HAVE_EH -DCXXTEST_HAVE_STD -DCXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION
 RESINC =
 LIBDIR =
@@ -71,11 +71,11 @@ all: debug release
 clean: clean_debug clean_release
 
 before_debug:
-	test -d ../bin/debug || mkdir -p ../bin/debug
-  test -d $(OBJDIR_DEBUG)/Generated   || mkdir -p $(OBJDIR_DEBUG)/Generated
-  test -d $(OBJDIR_DEBUG)/SystemModel || mkdir -p $(OBJDIR_DEBUG)/SystemModel
-  test -d $(OBJDIR_DEBUG)/Utility     || mkdir -p $(OBJDIR_DEBUG)/Utility
-  test -d $(OBJDIR_DEBUG)/UT_Helpers  || mkdir -p $(OBJDIR_DEBUG)/UT_Helpers
+	test -d ../bin/debug || mkdir -p ../bin/debug   
+	test -d $(OBJDIR_DEBUG)/Generated   || mkdir -p $(OBJDIR_DEBUG)/Generated   
+	test -d $(OBJDIR_DEBUG)/SystemModel || mkdir -p $(OBJDIR_DEBUG)/SystemModel 
+	test -d $(OBJDIR_DEBUG)/Utility     || mkdir -p $(OBJDIR_DEBUG)/Utility     
+	test -d $(OBJDIR_DEBUG)/UT_Helpers  || mkdir -p $(OBJDIR_DEBUG)/UT_Helpers 
 
 after_debug:
 
@@ -126,12 +126,12 @@ clean_debug:
 	rm -rf $(OBJDIR_DEBUG)/Generated
 
 before_release:
-	test -d ../bin/release || mkdir -p ../bin/release
-  test -d $(OBJDIR_RELEASE)/Generated   || mkdir -p $(OBJDIR_RELEASE)/Generated
-  test -d $(OBJDIR_RELEASE)/SystemModel || mkdir -p $(OBJDIR_RELEASE)/SystemModel
-  test -d $(OBJDIR_RELEASE)/Utility     || mkdir -p $(OBJDIR_RELEASE)/Utility
-  test -d $(OBJDIR_RELEASE)/UT_Helpers  || mkdir -p $(OBJDIR_RELEASE)/UT_Helpers
-
+	test -d ../bin/release || mkdir -p ../bin/release 	 
+	test -d $(OBJDIR_RELEASE)/Generated   || mkdir -p $(OBJDIR_RELEASE)/Generated 	  
+	test -d $(OBJDIR_RELEASE)/SystemModel || mkdir -p $(OBJDIR_RELEASE)/SystemModel 	
+	test -d $(OBJDIR_RELEASE)/Utility     || mkdir -p $(OBJDIR_RELEASE)/Utility     	
+	test -d $(OBJDIR_RELEASE)/UT_Helpers  || mkdir -p $(OBJDIR_RELEASE)/UT_Helpers 	 
+	
 after_release:
 
 build_release: before_release out_release after_release

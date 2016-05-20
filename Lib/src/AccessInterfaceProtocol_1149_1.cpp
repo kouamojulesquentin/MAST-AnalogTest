@@ -16,11 +16,11 @@
 using namespace mast;
 
 
-//! Does any action required to transfert scan data to and from SUT
+//! Does any action required to transfer scan data to and from SUT
 //!
 //! @param derivationId   Identifies the derivation to act for (zero based)
 //! @param interfaceData  Application data stored in the AccessInterface
-//! @param toSutData      Bits stream to transfert to SUT
+//! @param toSutData      Bits stream to transfer to SUT
 //!
 //! @return Bits stream retrieved from SUT
 BinaryVector AccessInterfaceProtocol_1149_1::DoAction (uint32_t derivationId, void* interfaceData, const BinaryVector& toSutData)

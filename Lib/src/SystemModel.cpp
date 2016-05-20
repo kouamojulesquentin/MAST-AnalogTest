@@ -12,6 +12,7 @@
 //===========================================================================
 
 #include "SystemModel.hpp"
+#include "SystemModelNode.hpp"
 #include "Utility.hpp"
 #include "DefaultBinaryPathSelector.hpp"
 #include "AccessInterfaceProtocol_1149_1.hpp"
@@ -127,7 +128,17 @@ shared_ptr<Register> SystemModel::CreateRegister (string_view            name,
 
 
 //! Creates a new Tap node
-//!
+//!  ______________________________
+//! |                              |
+//! |     (ACCESS_I:Tap)           |
+//! |      /      \                |
+//! |     /       _\__________     |
+//! | [REG:Ir]  /Linker:Dr_Mux\    |
+//! |           ---------------    |
+//! |             /                |
+//! |        [REG:Bypass]          |
+//! |                              |
+//!  ------------------------------
 shared_ptr<AccessInterface> SystemModel::CreateTap (string_view name,
                                                     uint32_t    irBitsCount,
                                                     uint32_t    muxPathsCount)
@@ -145,7 +156,6 @@ shared_ptr<AccessInterface> SystemModel::CreateTap (string_view name,
   auto irBypassSequence = BinaryVector(irBitsCount, 0xFF);
   auto ir               = CreateRegister(DEFAULT_TAP_IR_NAME, irBypassSequence, accessInterface);
 
-
   // ---------------- Create Linker
   //
   auto pathSelector = make_shared<DefaultBinaryPathSelector>(ir, muxPathsCount);
@@ -159,15 +169,6 @@ shared_ptr<AccessInterface> SystemModel::CreateTap (string_view name,
   // ---------------- Set AccessInterface to forward append to the linker
   //
   accessInterface->SetChildAppender(linker);
-
-  //! @todo [JFC]-[May/17/2016]: Create: - Remove tap node
-  //!                                    - Create an access interface with 1149.1 protocol and name it "ACCESS_LINK_1149_1" (if name is empty)
-  //!                                    - a Register (SIR with specified width) and initialize it with 1s
-  //!                                    - a bypass Register (Bpy) with 1 bit
-  //!                                    - Create a DefaultBinaryPathSelector with SIR Register
-  //!                                    - a Linker (SDR) with the path selector
-  //!                                    - Set access interface to forward append to the linker
-  //!
 
   return accessInterface;
 }

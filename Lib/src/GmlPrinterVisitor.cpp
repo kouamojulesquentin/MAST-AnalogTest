@@ -85,22 +85,22 @@ void GmlPrinterVisitor::AppendNode (string_view            shapeName,
                                     string_view            nodeTypeName,
                                     const SystemModelNode& node)
 {
-  m_os << "   node [ id " << node.GetIdentifier();
+  m_osGraph << "   node [ id " << node.GetIdentifier();
 
 
-  m_os << " graphics [";
-  m_os << " type \"" << shapeName       << "\"";
-  m_os << " fill \"" << backgroundColor << "\"";
-  m_os << " w "  << std::max(static_cast<size_t>(50u), 11u * node.GetName().length());
-  m_os << " h "  << std::max(static_cast<size_t>(35u), 3u  * node.GetName().length());
-  m_os << " ] ";
+  m_osGraph << " graphics [";
+  m_osGraph << " type \"" << shapeName       << "\"";
+  m_osGraph << " fill \"" << backgroundColor << "\"";
+  m_osGraph << " w "  << std::max(static_cast<size_t>(50u), 11u * node.GetName().length());
+  m_osGraph << " h "  << std::max(static_cast<size_t>(35u), 3u  * node.GetName().length());
+  m_osGraph << " ] ";
 
   if (!node.GetName().empty())
   {
-    m_os << "LabelGraphics [ text \"" << node.GetName() << "\" fontSize 13 fontStyle \"bold\" ]";
+    m_osGraph << "LabelGraphics [ text \"" << node.GetName() << "\" fontSize 13 fontStyle \"bold\" ]";
   }
 
-  m_os << " ]" << std::endl;
+  m_osGraph << " ]" << std::endl;
 }
 //
 //  End of: GmlPrinterVisitor::AppendNode
@@ -117,25 +117,25 @@ void GmlPrinterVisitor::PrintEdge (const ParentNode&              parentNode,
                                    uint32_t                       childId,
                                    std::experimental::string_view style)
 {
-  m_os << "   edge ["
-       << " source "  << parentNode.GetIdentifier()
-       << " target "  << childNode.GetIdentifier();
+  m_osEdges << "   edge ["
+            << " source "  << parentNode.GetIdentifier()
+            << " target "  << childNode.GetIdentifier();
 
   if (childId != 0)
   {
-    m_os << " label \"" << childId << "\"";
+    m_osEdges << " label \"" << childId << "\"";
   }
 
   if (!style.empty())
   {
-    m_os << " graphics ["
-         << " width 1"
-         << " style \"" << style << "\""
-         << " targetArrow \"standard\""
-         << " ]";
+    m_osEdges << " graphics ["
+              << " width 1"
+              << " style \"" << style << "\""
+              << " targetArrow \"standard\""
+              << " ]";
   }
 
-  m_os << " ]" << std::endl;
+  m_osEdges << " ]" << std::endl;
 }
 //
 //  End of: GmlPrinterVisitor::PrintEdge
@@ -151,7 +151,8 @@ void GmlPrinterVisitor::CloseRoot ()
     THROW_LOGIC_ERROR("Closing GML graph should only occur when terminating visiting System Model tree root node");
   }
 
-  m_os << "]";
+  m_osGraph << m_osEdges.str();
+  m_osGraph << "]";
 }
 //
 //  End of: GmlPrinterVisitor::CloseRoot
@@ -167,15 +168,15 @@ void GmlPrinterVisitor::CreateRoot ()
     THROW_LOGIC_ERROR("Creating GML graph should only occur when starting visiting System Model tree root node");
   }
 
-  m_os << "graph" << std::endl;
-  m_os << "["     << std::endl;
-  m_os << "   hierarchic 1 directed 1";
+  m_osGraph << "graph" << std::endl;
+  m_osGraph << "["     << std::endl;
+  m_osGraph << "   hierarchic 1 directed 1";
 
   if (!m_graphName.empty())
   {
-    m_os << " label \"" << m_graphName << "\"";
+    m_osGraph << " label \"" << m_graphName << "\"";
   }
-  m_os << std::endl;
+  m_osGraph << std::endl;
 }
 //
 //  End of: GmlPrinterVisitor::CloseRoot
@@ -183,7 +184,7 @@ void GmlPrinterVisitor::CreateRoot ()
 
 
 
-//! Returns currently visited nodes representation
+//! Returns currently visited nodes representation and edges
 //!
 string GmlPrinterVisitor::GetGraph ()
 {
@@ -191,13 +192,14 @@ string GmlPrinterVisitor::GetGraph ()
 
   if ( m_visited)
   {
-    graph = m_os.str();
+    graph = m_osGraph.str();
   }
   else
   {
     CloseRoot();
-    graph = m_os.str();
-    m_os.seekp(0);
+    graph = m_osGraph.str();
+    m_osGraph.seekp(0);
+    m_osEdges.seekp(0);
     CreateRoot();
   }
 

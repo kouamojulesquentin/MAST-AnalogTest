@@ -583,10 +583,10 @@ void UT_PrettyPrinterVisitor::test_VisitTap ()
   //
   auto got      = sut.GetPrettyPrint();
   auto expected = string("[Access_I](0)  \"1149_1_TAP\"\n"
-                         " [Register](1)  \"IR\", length: 6, bypass: 1111_11\n"
-                         " [Linker](2)    \"DR_Mux\"\n"
-                         "  :Selector:(1)  \"IR\"\n"
-                         "  [Register](3)  \"DR_Mux_BPY\", length: 1, bypass: 1"
+                         " [Register](1)  \"TAP_IR\", length: 6, bypass: 1111_11\n"
+                         " [Linker](2)    \"TAP_DR_Mux\"\n"
+                         "  :Selector:(1)  \"TAP_IR\"\n"
+                         "  [Register](3)  \"TAP_BPY\", length: 1, bypass: 1"
                         );
   TS_ASSERT_EQUALS (got, expected);
 }
@@ -618,10 +618,10 @@ void UT_PrettyPrinterVisitor::test_VisitTap_With_SubNodes ()
   //
   auto got      = sut.GetPrettyPrint();
   auto expected = string("[Access_I](0)  \"1149_1_TAP\"\n"
-                         " [Register](1)  \"IR\", length: 6, bypass: 1111_11\n"
-                         " [Linker](2)    \"DR_Mux\"\n"
-                         "  :Selector:(1)  \"IR\"\n"
-                         "  [Register](3)  \"DR_Mux_BPY\", length: 1, bypass: 1\n"
+                         " [Register](1)  \"TAP_IR\", length: 6, bypass: 1111_11\n"
+                         " [Linker](2)    \"TAP_DR_Mux\"\n"
+                         "  :Selector:(1)  \"TAP_IR\"\n"
+                         "  [Register](3)  \"TAP_BPY\", length: 1, bypass: 1\n"
                          "  [Chain](4)     \"Chain name\"\n"
                          "  [Register](5)  \"Reg_1\", length: 6, bypass: 1010_01\n"
                          "  [Register](6)  \"Reg_2\", length: 6, bypass: 1010_10"

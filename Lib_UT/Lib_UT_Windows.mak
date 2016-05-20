@@ -11,11 +11,11 @@ AR = ar.exe
 LD = g++.exe
 WINDRES = windres.exe
 
-INC = -I..\\cxxtest -I..\\Lib\\include -I..\\Lib\\public_include -ICxxTest_Traits
+INC = -I..\\cxxtest -I..\\Lib\\include -I..\\Lib\\public_include -ICxxTest_Traits -IUT_Helpers
 CFLAGS = -Wnon-virtual-dtor -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equal -Winline -Wunreachable-code -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default -Weffc++ -Wmain -pedantic-errors -pedantic -w -Wfatal-errors -Wextra -m32 -fexceptions -std=c++14 -DCXXTEST_HAVE_EH -DCXXTEST_HAVE_STD -DCXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION
-RESINC = 
-LIBDIR = 
-LIB = 
+RESINC =
+LIBDIR =
+LIB =
 LDFLAGS = -m32
 
 INC_DEBUG = $(INC)
@@ -26,7 +26,7 @@ LIBDIR_DEBUG = $(LIBDIR)
 LIB_DEBUG = $(LIB)..\bin\debug\Lib.a
 LDFLAGS_DEBUG = $(LDFLAGS)
 OBJDIR_DEBUG = ..\\obj\\Debug
-DEP_DEBUG = 
+DEP_DEBUG =
 OUT_DEBUG = ..\\bin\\Debug\\Lib_UT.exe
 
 INC_RELEASE = $(INC)
@@ -37,103 +37,147 @@ LIBDIR_RELEASE = $(LIBDIR)
 LIB_RELEASE = $(LIB)..\bin\release\Lib.a
 LDFLAGS_RELEASE = $(LDFLAGS) -s
 OBJDIR_RELEASE = ..\\obj\\Release
-DEP_RELEASE = 
+DEP_RELEASE =
 OUT_RELEASE = ..\\bin\\Release\\Lib_UT.exe
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)\\SystemModel\\UT_DefaultBinaryPathSelector.o $(OBJDIR_DEBUG)\\SystemModel\\UT_GmlPrinterVisitor.o $(OBJDIR_DEBUG)\\SystemModel\\UT_PrettyPrinterVisitor.o $(OBJDIR_DEBUG)\\SystemModel\\UT_Register.o $(OBJDIR_DEBUG)\\SystemModel\\UT_SystemModel.o $(OBJDIR_DEBUG)\\Utility\\UT_BinaryVector.o $(OBJDIR_DEBUG)\\Utility\\UT_SVFVector.o $(OBJDIR_DEBUG)\\Generated\\Runner.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)\\Utility\\UT_Utility.o                            \
+            $(OBJDIR_DEBUG)\\Utility\\UT_SVFVector.o                          \
+            $(OBJDIR_DEBUG)\\Utility\\UT_BinaryVector.o                       \
+            $(OBJDIR_DEBUG)\\UT_Helpers\\UT_SystemModelBuilder.o              \
+            $(OBJDIR_DEBUG)\\UT_Helpers\\SystemModelBuilder.o                 \
+            $(OBJDIR_DEBUG)\\SystemModel\\UT_SystemModel.o                    \
+            $(OBJDIR_DEBUG)\\SystemModel\\UT_Register.o                       \
+            $(OBJDIR_DEBUG)\\SystemModel\\UT_PrettyPrinterVisitor.o           \
+            $(OBJDIR_DEBUG)\\SystemModel\\UT_GmlPrinterVisitor.o              \
+            $(OBJDIR_DEBUG)\\SystemModel\\UT_DefaultBinaryPathSelector.o      \
+            $(OBJDIR_DEBUG)\\Generated\\Runner.o                              \
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)\\SystemModel\\UT_DefaultBinaryPathSelector.o $(OBJDIR_RELEASE)\\SystemModel\\UT_GmlPrinterVisitor.o $(OBJDIR_RELEASE)\\SystemModel\\UT_PrettyPrinterVisitor.o $(OBJDIR_RELEASE)\\SystemModel\\UT_Register.o $(OBJDIR_RELEASE)\\SystemModel\\UT_SystemModel.o $(OBJDIR_RELEASE)\\Utility\\UT_BinaryVector.o $(OBJDIR_RELEASE)\\Utility\\UT_SVFVector.o $(OBJDIR_RELEASE)\\Generated\\Runner.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)\\Utility\\UT_Utility.o                      \
+              $(OBJDIR_RELEASE)\\Utility\\UT_SVFVector.o                      \
+              $(OBJDIR_RELEASE)\\Utility\\UT_BinaryVector.o                   \
+              $(OBJDIR_RELEASE)\\UT_Helpers\\UT_SystemModelBuilder.o          \
+              $(OBJDIR_RELEASE)\\UT_Helpers\\SystemModelBuilder.o             \
+              $(OBJDIR_RELEASE)\\SystemModel\\UT_SystemModel.o                \
+              $(OBJDIR_RELEASE)\\SystemModel\\UT_Register.o                   \
+              $(OBJDIR_RELEASE)\\SystemModel\\UT_PrettyPrinterVisitor.o       \
+              $(OBJDIR_RELEASE)\\SystemModel\\UT_GmlPrinterVisitor.o          \
+              $(OBJDIR_RELEASE)\\SystemModel\\UT_DefaultBinaryPathSelector.o  \
+              $(OBJDIR_RELEASE)\\Generated\\Runner.o
+
+
 
 all: debug release
 
 clean: clean_debug clean_release
 
-before_debug: 
+before_debug:
 	cmd /c if not exist ..\\bin\\Debug md ..\\bin\\Debug
-	cmd /c if not exist $(OBJDIR_DEBUG)\\SystemModel md $(OBJDIR_DEBUG)\\SystemModel
 	cmd /c if not exist $(OBJDIR_DEBUG)\\Utility md $(OBJDIR_DEBUG)\\Utility
+	cmd /c if not exist $(OBJDIR_DEBUG)\\UT_Helpers md $(OBJDIR_DEBUG)\\UT_Helpers
+	cmd /c if not exist $(OBJDIR_DEBUG)\\SystemModel md $(OBJDIR_DEBUG)\\SystemModel
 	cmd /c if not exist $(OBJDIR_DEBUG)\\Generated md $(OBJDIR_DEBUG)\\Generated
 
-after_debug: 
+after_debug:
 
 debug: before_debug out_debug after_debug
 
 out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 	$(LD) $(LIBDIR_DEBUG) -o $(OUT_DEBUG) $(OBJ_DEBUG)  $(LDFLAGS_DEBUG) $(LIB_DEBUG)
 
-$(OBJDIR_DEBUG)\\SystemModel\\UT_DefaultBinaryPathSelector.o: SystemModel\\UT_DefaultBinaryPathSelector.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel\\UT_DefaultBinaryPathSelector.cpp -o $(OBJDIR_DEBUG)\\SystemModel\\UT_DefaultBinaryPathSelector.o
-
-$(OBJDIR_DEBUG)\\SystemModel\\UT_GmlPrinterVisitor.o: SystemModel\\UT_GmlPrinterVisitor.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel\\UT_GmlPrinterVisitor.cpp -o $(OBJDIR_DEBUG)\\SystemModel\\UT_GmlPrinterVisitor.o
-
-$(OBJDIR_DEBUG)\\SystemModel\\UT_PrettyPrinterVisitor.o: SystemModel\\UT_PrettyPrinterVisitor.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel\\UT_PrettyPrinterVisitor.cpp -o $(OBJDIR_DEBUG)\\SystemModel\\UT_PrettyPrinterVisitor.o
-
-$(OBJDIR_DEBUG)\\SystemModel\\UT_Register.o: SystemModel\\UT_Register.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel\\UT_Register.cpp -o $(OBJDIR_DEBUG)\\SystemModel\\UT_Register.o
-
-$(OBJDIR_DEBUG)\\SystemModel\\UT_SystemModel.o: SystemModel\\UT_SystemModel.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel\\UT_SystemModel.cpp -o $(OBJDIR_DEBUG)\\SystemModel\\UT_SystemModel.o
-
-$(OBJDIR_DEBUG)\\Utility\\UT_BinaryVector.o: Utility\\UT_BinaryVector.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Utility\\UT_BinaryVector.cpp -o $(OBJDIR_DEBUG)\\Utility\\UT_BinaryVector.o
+$(OBJDIR_DEBUG)\\Utility\\UT_Utility.o: Utility\\UT_Utility.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Utility\\UT_Utility.cpp -o $(OBJDIR_DEBUG)\\Utility\\UT_Utility.o
 
 $(OBJDIR_DEBUG)\\Utility\\UT_SVFVector.o: Utility\\UT_SVFVector.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Utility\\UT_SVFVector.cpp -o $(OBJDIR_DEBUG)\\Utility\\UT_SVFVector.o
 
+$(OBJDIR_DEBUG)\\Utility\\UT_BinaryVector.o: Utility\\UT_BinaryVector.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Utility\\UT_BinaryVector.cpp -o $(OBJDIR_DEBUG)\\Utility\\UT_BinaryVector.o
+
+$(OBJDIR_DEBUG)\\UT_Helpers\\UT_SystemModelBuilder.o: UT_Helpers\\UT_SystemModelBuilder.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c UT_Helpers\\UT_SystemModelBuilder.cpp -o $(OBJDIR_DEBUG)\\UT_Helpers\\UT_SystemModelBuilder.o
+
+$(OBJDIR_DEBUG)\\UT_Helpers\\SystemModelBuilder.o: UT_Helpers\\SystemModelBuilder.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c UT_Helpers\\SystemModelBuilder.cpp -o $(OBJDIR_DEBUG)\\UT_Helpers\\SystemModelBuilder.o
+
+$(OBJDIR_DEBUG)\\SystemModel\\UT_SystemModel.o: SystemModel\\UT_SystemModel.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel\\UT_SystemModel.cpp -o $(OBJDIR_DEBUG)\\SystemModel\\UT_SystemModel.o
+
+$(OBJDIR_DEBUG)\\SystemModel\\UT_Register.o: SystemModel\\UT_Register.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel\\UT_Register.cpp -o $(OBJDIR_DEBUG)\\SystemModel\\UT_Register.o
+
+$(OBJDIR_DEBUG)\\SystemModel\\UT_PrettyPrinterVisitor.o: SystemModel\\UT_PrettyPrinterVisitor.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel\\UT_PrettyPrinterVisitor.cpp -o $(OBJDIR_DEBUG)\\SystemModel\\UT_PrettyPrinterVisitor.o
+
+$(OBJDIR_DEBUG)\\SystemModel\\UT_GmlPrinterVisitor.o: SystemModel\\UT_GmlPrinterVisitor.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel\\UT_GmlPrinterVisitor.cpp -o $(OBJDIR_DEBUG)\\SystemModel\\UT_GmlPrinterVisitor.o
+
+$(OBJDIR_DEBUG)\\SystemModel\\UT_DefaultBinaryPathSelector.o: SystemModel\\UT_DefaultBinaryPathSelector.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel\\UT_DefaultBinaryPathSelector.cpp -o $(OBJDIR_DEBUG)\\SystemModel\\UT_DefaultBinaryPathSelector.o
+
 $(OBJDIR_DEBUG)\\Generated\\Runner.o: Generated\\Runner.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Generated\\Runner.cpp -o $(OBJDIR_DEBUG)\\Generated\\Runner.o
 
-clean_debug: 
+clean_debug:
 	cmd /c del /f $(OBJ_DEBUG) $(OUT_DEBUG)
 	cmd /c rd ..\\bin\\Debug
-	cmd /c rd $(OBJDIR_DEBUG)\\SystemModel
 	cmd /c rd $(OBJDIR_DEBUG)\\Utility
+	cmd /c rd $(OBJDIR_DEBUG)\\UT_Helpers
+	cmd /c rd $(OBJDIR_DEBUG)\\SystemModel
 	cmd /c rd $(OBJDIR_DEBUG)\\Generated
 
-before_release: 
+before_release:
 	cmd /c if not exist ..\\bin\\Release md ..\\bin\\Release
-	cmd /c if not exist $(OBJDIR_RELEASE)\\SystemModel md $(OBJDIR_RELEASE)\\SystemModel
 	cmd /c if not exist $(OBJDIR_RELEASE)\\Utility md $(OBJDIR_RELEASE)\\Utility
+	cmd /c if not exist $(OBJDIR_RELEASE)\\UT_Helpers md $(OBJDIR_RELEASE)\\UT_Helpers
+	cmd /c if not exist $(OBJDIR_RELEASE)\\SystemModel md $(OBJDIR_RELEASE)\\SystemModel
 	cmd /c if not exist $(OBJDIR_RELEASE)\\Generated md $(OBJDIR_RELEASE)\\Generated
 
-after_release: 
+after_release:
 
 release: before_release out_release after_release
 
 out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 	$(LD) $(LIBDIR_RELEASE) -o $(OUT_RELEASE) $(OBJ_RELEASE)  $(LDFLAGS_RELEASE) $(LIB_RELEASE)
 
-$(OBJDIR_RELEASE)\\SystemModel\\UT_DefaultBinaryPathSelector.o: SystemModel\\UT_DefaultBinaryPathSelector.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel\\UT_DefaultBinaryPathSelector.cpp -o $(OBJDIR_RELEASE)\\SystemModel\\UT_DefaultBinaryPathSelector.o
-
-$(OBJDIR_RELEASE)\\SystemModel\\UT_GmlPrinterVisitor.o: SystemModel\\UT_GmlPrinterVisitor.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel\\UT_GmlPrinterVisitor.cpp -o $(OBJDIR_RELEASE)\\SystemModel\\UT_GmlPrinterVisitor.o
-
-$(OBJDIR_RELEASE)\\SystemModel\\UT_PrettyPrinterVisitor.o: SystemModel\\UT_PrettyPrinterVisitor.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel\\UT_PrettyPrinterVisitor.cpp -o $(OBJDIR_RELEASE)\\SystemModel\\UT_PrettyPrinterVisitor.o
-
-$(OBJDIR_RELEASE)\\SystemModel\\UT_Register.o: SystemModel\\UT_Register.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel\\UT_Register.cpp -o $(OBJDIR_RELEASE)\\SystemModel\\UT_Register.o
-
-$(OBJDIR_RELEASE)\\SystemModel\\UT_SystemModel.o: SystemModel\\UT_SystemModel.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel\\UT_SystemModel.cpp -o $(OBJDIR_RELEASE)\\SystemModel\\UT_SystemModel.o
-
-$(OBJDIR_RELEASE)\\Utility\\UT_BinaryVector.o: Utility\\UT_BinaryVector.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Utility\\UT_BinaryVector.cpp -o $(OBJDIR_RELEASE)\\Utility\\UT_BinaryVector.o
+$(OBJDIR_RELEASE)\\Utility\\UT_Utility.o: Utility\\UT_Utility.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Utility\\UT_Utility.cpp -o $(OBJDIR_RELEASE)\\Utility\\UT_Utility.o
 
 $(OBJDIR_RELEASE)\\Utility\\UT_SVFVector.o: Utility\\UT_SVFVector.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Utility\\UT_SVFVector.cpp -o $(OBJDIR_RELEASE)\\Utility\\UT_SVFVector.o
 
+$(OBJDIR_RELEASE)\\Utility\\UT_BinaryVector.o: Utility\\UT_BinaryVector.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Utility\\UT_BinaryVector.cpp -o $(OBJDIR_RELEASE)\\Utility\\UT_BinaryVector.o
+
+$(OBJDIR_RELEASE)\\UT_Helpers\\UT_SystemModelBuilder.o: UT_Helpers\\UT_SystemModelBuilder.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c UT_Helpers\\UT_SystemModelBuilder.cpp -o $(OBJDIR_RELEASE)\\UT_Helpers\\UT_SystemModelBuilder.o
+
+$(OBJDIR_RELEASE)\\UT_Helpers\\SystemModelBuilder.o: UT_Helpers\\SystemModelBuilder.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c UT_Helpers\\SystemModelBuilder.cpp -o $(OBJDIR_RELEASE)\\UT_Helpers\\SystemModelBuilder.o
+
+$(OBJDIR_RELEASE)\\SystemModel\\UT_SystemModel.o: SystemModel\\UT_SystemModel.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel\\UT_SystemModel.cpp -o $(OBJDIR_RELEASE)\\SystemModel\\UT_SystemModel.o
+
+$(OBJDIR_RELEASE)\\SystemModel\\UT_Register.o: SystemModel\\UT_Register.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel\\UT_Register.cpp -o $(OBJDIR_RELEASE)\\SystemModel\\UT_Register.o
+
+$(OBJDIR_RELEASE)\\SystemModel\\UT_PrettyPrinterVisitor.o: SystemModel\\UT_PrettyPrinterVisitor.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel\\UT_PrettyPrinterVisitor.cpp -o $(OBJDIR_RELEASE)\\SystemModel\\UT_PrettyPrinterVisitor.o
+
+$(OBJDIR_RELEASE)\\SystemModel\\UT_GmlPrinterVisitor.o: SystemModel\\UT_GmlPrinterVisitor.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel\\UT_GmlPrinterVisitor.cpp -o $(OBJDIR_RELEASE)\\SystemModel\\UT_GmlPrinterVisitor.o
+
+$(OBJDIR_RELEASE)\\SystemModel\\UT_DefaultBinaryPathSelector.o: SystemModel\\UT_DefaultBinaryPathSelector.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel\\UT_DefaultBinaryPathSelector.cpp -o $(OBJDIR_RELEASE)\\SystemModel\\UT_DefaultBinaryPathSelector.o
+
 $(OBJDIR_RELEASE)\\Generated\\Runner.o: Generated\\Runner.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Generated\\Runner.cpp -o $(OBJDIR_RELEASE)\\Generated\\Runner.o
 
-clean_release: 
+clean_release:
 	cmd /c del /f $(OBJ_RELEASE) $(OUT_RELEASE)
 	cmd /c rd ..\\bin\\Release
-	cmd /c rd $(OBJDIR_RELEASE)\\SystemModel
 	cmd /c rd $(OBJDIR_RELEASE)\\Utility
+	cmd /c rd $(OBJDIR_RELEASE)\\UT_Helpers
+	cmd /c rd $(OBJDIR_RELEASE)\\SystemModel
 	cmd /c rd $(OBJDIR_RELEASE)\\Generated
 
 .PHONY: before_debug after_debug clean_debug before_release after_release clean_release

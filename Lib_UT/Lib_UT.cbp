@@ -66,6 +66,7 @@
 			<Add directory="../Lib/include" />
 			<Add directory="../Lib/public_include" />
 			<Add directory="CxxTest_Traits" />
+			<Add directory="UT_Helpers" />
 		</Compiler>
 		<Linker>
 			<Add option="-m32" />
@@ -94,6 +95,10 @@
 		</Unit>
 		<Unit filename="SystemModel/UT_SystemModel.cpp" />
 		<Unit filename="SystemModel/UT_SystemModel.hpp" />
+		<Unit filename="UT_Helpers/SystemModelBuilder.cpp" />
+		<Unit filename="UT_Helpers/SystemModelBuilder.hpp" />
+		<Unit filename="UT_Helpers/UT_SystemModelBuilder.cpp" />
+		<Unit filename="UT_Helpers/UT_SystemModelBuilder.hpp" />
 		<Unit filename="Utility/UT_BinaryVector.cpp" />
 		<Unit filename="Utility/UT_BinaryVector.hpp">
 			<Option target="&lt;{~None~}&gt;" />
@@ -102,6 +107,8 @@
 		<Unit filename="Utility/UT_SVFVector.hpp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="Utility/UT_Utility.cpp" />
+		<Unit filename="Utility/UT_Utility.hpp" />
 		<Extensions>
 			<code_completion>
 				<search_path add="..\cxxtest" />

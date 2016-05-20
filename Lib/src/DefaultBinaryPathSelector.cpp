@@ -13,7 +13,6 @@
 
 #include "DefaultBinaryPathSelector.hpp"
 #include "Register.hpp"
-#include "Utility.hpp"
 #include <stdexcept>
 #include <limits>
 

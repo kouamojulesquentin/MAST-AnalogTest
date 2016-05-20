@@ -30,6 +30,10 @@ class Utility final
   ~Utility() = delete;
   Utility()  = delete;
 
+  //! Returns the minimal number of bits to encode a binary value
+  //!
+  static uint32_t MinimalBitsForValue(uint32_t value);
+
   //! Computes the minimal number of bytes to hold a number of bits
   //!
   static uint32_t BytesCountFromBitsCount(uint32_t bitsCount) { return (bitsCount + 7) / 8; }

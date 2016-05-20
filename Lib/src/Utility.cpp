@@ -15,6 +15,7 @@
 
 #include <string>
 #include <sstream>
+#include <array>
 
 using std::string;
 
@@ -41,6 +42,51 @@ string Utility::MakeExceptionMessage(const char*                    file,
 
   return os.str();
 }
+
+
+//! Returns the minimal number of bits to encode a binary value
+//!
+//! @note This is not optimized (is faster for small value than for large one)
+//!
+//! @param value  A value for which the minimal number of bits is required
+//!
+uint32_t Utility::MinimalBitsForValue (uint32_t value)
+{
+  constexpr std::array<uint32_t, 16> bitsForVal =
+  {
+    1,  // 00
+    1,  // 01
+    2,  // 02
+    2,  // 03
+    3,  // 04
+    3,  // 05
+    3,  // 06
+    3,  // 07
+    4,  // 08
+    4,  // 09
+    4,  // 10
+    4,  // 11
+    4,  // 12
+    4,  // 13
+    4,  // 14
+    4,  // 15
+  };
+
+  uint32_t bitsCount = 0;
+
+  while (value > 15)
+  {
+    bitsCount +=  4;
+    value     >>= 4;
+  }
+
+  bitsCount += bitsForVal[value];
+
+  return bitsCount;
+}
+//
+//  End of: Utility::MinimalBitsForValue
+//---------------------------------------------------------------------------
 
 
 

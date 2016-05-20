@@ -17,6 +17,7 @@
 
 #include "BinaryVector.hpp"
 #include "PathSelector.hpp"
+#include "Utility.hpp"
 #include <vector>
 #include <memory>
 
@@ -46,6 +47,10 @@ class DLL_EXPORT DefaultBinaryPathSelector : public PathSelector
   uint32_t ActiveCount() const;    //!< Returns the number of paths that are currently active
 
   virtual void Accept   (SystemModelVisitor& visitor) override;   //!< Forwards call to any embedded Register
+
+  //! Returns minimal bits count a register should have to drive a mux for number of path
+  //!
+  static uint32_t RegWidthForPathCount(uint32_t pathCount) { return Utility::MinimalBitsForValue(pathCount); }
 
   // ---------------- Protected Methods
   //

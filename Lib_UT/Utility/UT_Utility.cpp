@@ -1,0 +1,90 @@
+//===========================================================================
+//                           UT_Utility.cpp
+//===========================================================================
+// Copyright (C) 2016 G-INP/Tima. All rights reserved.
+//
+// Project : Mast
+//
+//! @file UT_Utility.cpp
+//!
+//! Implements test fixture for testing Utility
+//!
+//===========================================================================
+
+#include "UT_Utility.hpp"
+#include "Utility.hpp"
+#include <tuple>
+#include <cxxtest/ValueTraits.h>
+
+using std::tuple;
+using std::make_tuple;
+using mast::Utility;
+
+
+
+//! Checks MinimalBitsForValue::MinimalBitsForValue() `...`
+//!
+void UT_Utility::test_MinimalBitsForValue ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto input          = std::get<0>(data);
+    auto expectedResult = std::get<1>(data);
+
+    // ---------------- Exercise
+    //
+    auto bitsCount = Utility::MinimalBitsForValue(input);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (bitsCount, expectedResult);
+  };
+
+  auto data =
+  {
+    make_tuple(0U,          1U),  // 00
+    make_tuple(1U,          1U),  // 01
+    make_tuple(2U,          2U),  // 02
+    make_tuple(4U,          3U),  // 03
+    make_tuple(5U,          3U),  // 04
+    make_tuple(7U,          3U),  // 05
+    make_tuple(8U,          4U),  // 06
+    make_tuple(9U,          4U),  // 07
+    make_tuple(9U,          4U),  // 08
+    make_tuple(16U,         5U),  // 09
+    make_tuple(17U,         5U),  // 10
+    make_tuple(31U,         5U),  // 11
+    make_tuple(32U,         6U),  // 12
+    make_tuple(63U,         6U),  // 13
+    make_tuple(64U,         7U),  // 14
+    make_tuple(127U,        7U),  // 15
+    make_tuple(128U,        8U),  // 16
+    make_tuple(255U,        8U),  // 17
+    make_tuple(256U,        9U),  // 18
+    make_tuple(1023U,       10U), // 19
+    make_tuple(1024U,       11U), // 20
+    make_tuple(65535U,      16U), // 21
+    make_tuple(65536U,      17U), // 22
+    make_tuple(16777215U,   24U), // 23
+    make_tuple(16777216U,   25U), // 24
+    make_tuple(416777216U,  29U), // 25
+    make_tuple(2147483647U, 31U), // 26
+    make_tuple(2147483648U, 32U), // 27
+    make_tuple(2147483649U, 32U), // 28
+    make_tuple(4294967295U, 32U), // 29
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+
+//===========================================================================
+// End of UT_Utility.cpp
+//===========================================================================

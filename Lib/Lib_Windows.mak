@@ -13,10 +13,10 @@ WINDRES = windres.exe
 
 INC = -Iinclude -Ipublic_include
 CFLAGS = -std=c++14
-RESINC = 
-LIBDIR = 
-LIB = 
-LDFLAGS = 
+RESINC =
+LIBDIR =
+LIB =
+LDFLAGS =
 
 INC_DEBUG = $(INC)
 CFLAGS_DEBUG = $(CFLAGS) -Wall -g -DBUILD_DLL
@@ -26,7 +26,7 @@ LIBDIR_DEBUG = $(LIBDIR)
 LIB_DEBUG = $(LIB)-luser32
 LDFLAGS_DEBUG = $(LDFLAGS) -Wl,--output-def=..\lib\debug\Lib.def -Wl,--out-implib=..\bin\debug\Lib.a -Wl,--dll
 OBJDIR_DEBUG = ..\\obj\\debug
-DEP_DEBUG = 
+DEP_DEBUG =
 OUT_DEBUG = ..\\bin\\debug\\Lib.dll
 
 INC_RELEASE = $(INC)
@@ -37,22 +37,52 @@ LIBDIR_RELEASE = $(LIBDIR)
 LIB_RELEASE = $(LIB)-luser32
 LDFLAGS_RELEASE = $(LDFLAGS) -s -Wl,--output-def=..\bin\release\Lib.def -Wl,--out-implib=..\bin\release\Lib.a -Wl,--dll
 OBJDIR_RELEASE = ..\\obj\\release
-DEP_RELEASE = 
+DEP_RELEASE =
 OUT_RELEASE = ..\\bin\\release\\Lib.dll
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)\\src\\AccessInterface.o $(OBJDIR_DEBUG)\\src\\AccessInterfaceProtocol_1149_1.o $(OBJDIR_DEBUG)\\src\\BinaryVector.o $(OBJDIR_DEBUG)\\src\\Chain.o $(OBJDIR_DEBUG)\\src\\DefaultBinaryPathSelector.o $(OBJDIR_DEBUG)\\src\\GmlPrinterVisitor.o $(OBJDIR_DEBUG)\\src\\Linker.o $(OBJDIR_DEBUG)\\src\\ParentNode.o $(OBJDIR_DEBUG)\\src\\PrettyPrinterVisitor.o $(OBJDIR_DEBUG)\\src\\Register.o $(OBJDIR_DEBUG)\\src\\SVFVector.o $(OBJDIR_DEBUG)\\src\\SystemModel.o $(OBJDIR_DEBUG)\\src\\SystemModelNode.o $(OBJDIR_DEBUG)\\src\\Utility.o
+OBJ_DEBUG = \
+  $(OBJDIR_DEBUG)\\src\\AccessInterface.o                \
+  $(OBJDIR_DEBUG)\\src\\AccessInterfaceProtocol_1149_1.o \
+  $(OBJDIR_DEBUG)\\src\\BinaryVector.o                   \
+  $(OBJDIR_DEBUG)\\src\\Chain.o                          \
+  $(OBJDIR_DEBUG)\\src\\DefaultBinaryPathSelector.o      \
+  $(OBJDIR_DEBUG)\\src\\GmlPrinterVisitor.o              \
+  $(OBJDIR_DEBUG)\\src\\Linker.o                         \
+  $(OBJDIR_DEBUG)\\src\\ParentNode.o                     \
+  $(OBJDIR_DEBUG)\\src\\PrettyPrinterVisitor.o           \
+  $(OBJDIR_DEBUG)\\src\\Register.o                       \
+  $(OBJDIR_DEBUG)\\src\\SVFVector.o                      \
+  $(OBJDIR_DEBUG)\\src\\SystemModel.o                    \
+  $(OBJDIR_DEBUG)\\src\\SystemModelCheckerVisitor.o      \
+  $(OBJDIR_DEBUG)\\src\\SystemModelNode.o                \
+  $(OBJDIR_DEBUG)\\src\\Utility.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)\\src\\AccessInterface.o $(OBJDIR_RELEASE)\\src\\AccessInterfaceProtocol_1149_1.o $(OBJDIR_RELEASE)\\src\\BinaryVector.o $(OBJDIR_RELEASE)\\src\\Chain.o $(OBJDIR_RELEASE)\\src\\DefaultBinaryPathSelector.o $(OBJDIR_RELEASE)\\src\\GmlPrinterVisitor.o $(OBJDIR_RELEASE)\\src\\Linker.o $(OBJDIR_RELEASE)\\src\\ParentNode.o $(OBJDIR_RELEASE)\\src\\PrettyPrinterVisitor.o $(OBJDIR_RELEASE)\\src\\Register.o $(OBJDIR_RELEASE)\\src\\SVFVector.o $(OBJDIR_RELEASE)\\src\\SystemModel.o $(OBJDIR_RELEASE)\\src\\SystemModelNode.o $(OBJDIR_RELEASE)\\src\\Utility.o
+OBJ_RELEASE = \
+  $(OBJDIR_RELEASE)\\src\\AccessInterface.o                \
+  $(OBJDIR_RELEASE)\\src\\AccessInterfaceProtocol_1149_1.o \
+  $(OBJDIR_RELEASE)\\src\\BinaryVector.o                   \
+  $(OBJDIR_RELEASE)\\src\\Chain.o                          \
+  $(OBJDIR_RELEASE)\\src\\DefaultBinaryPathSelector.o      \
+  $(OBJDIR_RELEASE)\\src\\GmlPrinterVisitor.o              \
+  $(OBJDIR_RELEASE)\\src\\Linker.o                         \
+  $(OBJDIR_RELEASE)\\src\\ParentNode.o                     \
+  $(OBJDIR_RELEASE)\\src\\PrettyPrinterVisitor.o           \
+  $(OBJDIR_RELEASE)\\src\\Register.o                       \
+  $(OBJDIR_RELEASE)\\src\\SVFVector.o                      \
+  $(OBJDIR_RELEASE)\\src\\SystemModel.o                    \
+  $(OBJDIR_RELEASE)\\src\\SystemModelCheckerVisitor.o      \
+  $(OBJDIR_RELEASE)\\src\\SystemModelNode.o                \
+  $(OBJDIR_RELEASE)\\src\\Utility.o
 
 all: debug release
 
 clean: clean_debug clean_release
 
-before_debug: 
+before_debug:
 	cmd /c if not exist ..\\bin\\debug md ..\\bin\\debug
 	cmd /c if not exist $(OBJDIR_DEBUG)\\src md $(OBJDIR_DEBUG)\\src
 
-after_debug: 
+after_debug:
 
 debug: before_debug out_debug after_debug
 
@@ -95,22 +125,25 @@ $(OBJDIR_DEBUG)\\src\\SVFVector.o: src\\SVFVector.cpp
 $(OBJDIR_DEBUG)\\src\\SystemModel.o: src\\SystemModel.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\SystemModel.cpp -o $(OBJDIR_DEBUG)\\src\\SystemModel.o
 
+$(OBJDIR_DEBUG)\\src\\SystemModelCheckerVisitor.o: src\\SystemModelCheckerVisitor.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\SystemModelCheckerVisitor.cpp -o $(OBJDIR_DEBUG)\\src\\SystemModelCheckerVisitor.o
+
 $(OBJDIR_DEBUG)\\src\\SystemModelNode.o: src\\SystemModelNode.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\SystemModelNode.cpp -o $(OBJDIR_DEBUG)\\src\\SystemModelNode.o
 
 $(OBJDIR_DEBUG)\\src\\Utility.o: src\\Utility.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\Utility.cpp -o $(OBJDIR_DEBUG)\\src\\Utility.o
 
-clean_debug: 
+clean_debug:
 	cmd /c del /f $(OBJ_DEBUG) $(OUT_DEBUG)
 	cmd /c rd ..\\bin\\debug
 	cmd /c rd $(OBJDIR_DEBUG)\\src
 
-before_release: 
+before_release:
 	cmd /c if not exist ..\\bin\\release md ..\\bin\\release
 	cmd /c if not exist $(OBJDIR_RELEASE)\\src md $(OBJDIR_RELEASE)\\src
 
-after_release: 
+after_release:
 
 release: before_release out_release after_release
 
@@ -153,13 +186,16 @@ $(OBJDIR_RELEASE)\\src\\SVFVector.o: src\\SVFVector.cpp
 $(OBJDIR_RELEASE)\\src\\SystemModel.o: src\\SystemModel.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\SystemModel.cpp -o $(OBJDIR_RELEASE)\\src\\SystemModel.o
 
+$(OBJDIR_RELEASE)\\src\\SystemModelCheckerVisitor.o: src\\SystemModelCheckerVisitor.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\SystemModelCheckerVisitor.cpp -o $(OBJDIR_RELEASE)\\src\\SystemModelCheckerVisitor.o
+
 $(OBJDIR_RELEASE)\\src\\SystemModelNode.o: src\\SystemModelNode.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\SystemModelNode.cpp -o $(OBJDIR_RELEASE)\\src\\SystemModelNode.o
 
 $(OBJDIR_RELEASE)\\src\\Utility.o: src\\Utility.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\Utility.cpp -o $(OBJDIR_RELEASE)\\src\\Utility.o
 
-clean_release: 
+clean_release:
 	cmd /c del /f $(OBJ_RELEASE) $(OUT_RELEASE)
 	cmd /c rd ..\\bin\\release
 	cmd /c rd $(OBJDIR_RELEASE)\\src

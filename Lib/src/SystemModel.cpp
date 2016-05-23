@@ -16,12 +16,36 @@
 #include "Utility.hpp"
 #include "DefaultBinaryPathSelector.hpp"
 #include "AccessInterfaceProtocol_1149_1.hpp"
+#include "SystemModelCheckerVisitor.hpp"
 
 using namespace mast;
 using std::shared_ptr;
 using std::make_shared;
 using std::experimental::string_view;
 
+
+//! Checks model coherence
+//!
+//! @note
+//!   - Each node has one and only one parent (except root that has no parent)
+//!   - Each parent node has at least one child otherwise a warning is issued
+//!   - Each child is only appended once in its parent
+//!   - Each node is reachable (no dangling node)
+//!   - Unused id generate a warning
+//!   - Each linker has a number of chidren that matches its selector or an warning is issued when there are to few
+//!     children and an error when there are too much
+//!
+SystemModelCheckResult SystemModel::Check () const
+{
+  SystemModelCheckerVisitor checker(*this);
+
+  auto result = checker.Check();
+
+  return result;
+}
+//
+//  End of: SystemModel::Check
+//---------------------------------------------------------------------------
 
 
 //! Creates a new AccessInterface node

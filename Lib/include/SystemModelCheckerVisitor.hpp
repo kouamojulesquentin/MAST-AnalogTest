@@ -1,0 +1,106 @@
+//===========================================================================
+//                           SystemModelCheckerVisitor.hpp
+//===========================================================================
+// Copyright (C) 2016 G-INP/Tima. All rights reserved.
+//
+// Project : Mast
+//
+//! @file SystemModelCheckerVisitor.hpp
+//!
+//! Declares SystemModelCheckerVisitor class
+//!
+//===========================================================================
+
+
+#ifndef SYSTEMMODELCHECKERVISITOR_H__51E1518C_6330_4646_7A6_B51ECBAB1C6A__INCLUDED_
+  #define SYSTEMMODELCHECKERVISITOR_H__51E1518C_6330_4646_7A6_B51ECBAB1C6A__INCLUDED_
+
+#include "SystemModelCheckResult.hpp"
+#include "SystemModelVisitor.hpp"
+#include "SystemModel.hpp"
+
+#include <memory>
+#include <vector>
+#include <sstream>
+
+namespace mast
+{
+//! Visits all nodes of a SystemModel to detect coherence issues
+//!
+//! @note This is intended to be used by SystemModel::Check()
+//!
+class DLL_EXPORT SystemModelCheckerVisitor final : public SystemModelVisitor
+{
+  // ---------------- Public  Methods
+  //
+  public:
+  ~SystemModelCheckerVisitor() = default;
+  SystemModelCheckerVisitor()  = delete;
+  SystemModelCheckerVisitor(const SystemModel& model)
+    : m_root              (model.GetRoot())
+    , m_identifierMapping (model.GetIdentifierMapping())
+  {}
+
+
+  virtual void VisitAccessInterface (AccessInterface& accessInterface) override;
+  virtual void VisitChain           (Chain&           chain)           override;
+  virtual void VisitLinker          (Linker&          linker)          override;
+  virtual void VisitRegister        (Register&        reg)             override;
+
+  //! Checks SystemModel coherence
+  //!
+  //! @note
+  //!   - Each node has one and only one parent (except root that has no parent)
+  //!   - Each parent node has at least one child otherwise a warning is issued
+  //!   - Each child is only appended once in its parent
+  //!   - Each node is reachable (no dangling node)
+  //!   - Unused id generates a warning
+  //!   - Each linker has a number of chidren that matches its selector or an warning is issued when there are to few
+  //!     children and an error when there are too much
+  //!
+  SystemModelCheckResult Check();
+
+  //! Checks coherence of identifiers:
+  //!
+  //! @note - Each used identifier must refere to a node that has the very same identifier
+  //!       - Unused identifiers are collected as "info"
+  //!
+  void CheckIdentifiers ();
+
+  //! Builds up a SystemModelCheckResult from currently selected issues
+  //!
+  SystemModelCheckResult  MakeCheckResult();
+
+  // ---------------- Protected Methods
+  //
+  protected:
+
+  // ---------------- Private  Methods
+  //
+  private:
+
+
+  // ---------------- Private  Fields
+  //
+  private:
+  using TIdentifierMapping = SystemModel::TIdentifierMapping;
+
+  std::shared_ptr<const ParentNode> m_root;              //!< First (top) node of system model tree
+  TIdentifierMapping                m_identifierMapping; //!< Maps a node identifier to a node instance
+  std::ostringstream                m_infos;             //!< Collects info messages
+  std::ostringstream                m_warnings;          //!< Collects warning messages
+  std::ostringstream                m_errors;            //!< Collects error messages
+};
+//
+//  End of SystemModelCheckerVisitor class declaration
+//---------------------------------------------------------------------------
+} // End of namespace mast
+
+
+
+
+#endif  // not defined SYSTEMMODELCHECKERVISITOR_H__51E1518C_6330_4646_7A6_B51ECBAB1C6A__INCLUDED_
+
+//===========================================================================
+// End of SystemModelCheckerVisitor.hpp
+//===========================================================================

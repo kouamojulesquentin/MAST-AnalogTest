@@ -91,6 +91,8 @@
 		<Unit filename="include/SystemModel.hpp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="include/SystemModelCheckResult.hpp" />
+		<Unit filename="include/SystemModelCheckerVisitor.hpp" />
 		<Unit filename="include/SystemModelNode.hpp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
@@ -121,6 +123,7 @@
 		<Unit filename="src/Register.cpp" />
 		<Unit filename="src/SVFVector.cpp" />
 		<Unit filename="src/SystemModel.cpp" />
+		<Unit filename="src/SystemModelCheckerVisitor.cpp" />
 		<Unit filename="src/SystemModelNode.cpp" />
 		<Unit filename="src/Utility.cpp" />
 		<Extensions>

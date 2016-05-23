@@ -40,11 +40,13 @@ OBJDIR_RELEASE = ..\\obj\\Release
 DEP_RELEASE =
 OUT_RELEASE = ..\\bin\\Release\\Lib_UT.exe
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)\\Utility\\UT_Utility.o                            \
+OBJ_DEBUG = \
+            $(OBJDIR_DEBUG)\\Utility\\UT_Utility.o                            \
             $(OBJDIR_DEBUG)\\Utility\\UT_SVFVector.o                          \
             $(OBJDIR_DEBUG)\\Utility\\UT_BinaryVector.o                       \
             $(OBJDIR_DEBUG)\\UT_Helpers\\UT_SystemModelBuilder.o              \
             $(OBJDIR_DEBUG)\\UT_Helpers\\SystemModelBuilder.o                 \
+            $(OBJDIR_DEBUG)\\SystemModel\\UT_SystemModelCheckerVisitor.o      \
             $(OBJDIR_DEBUG)\\SystemModel\\UT_SystemModel.o                    \
             $(OBJDIR_DEBUG)\\SystemModel\\UT_Register.o                       \
             $(OBJDIR_DEBUG)\\SystemModel\\UT_PrettyPrinterVisitor.o           \
@@ -52,16 +54,18 @@ OBJ_DEBUG = $(OBJDIR_DEBUG)\\Utility\\UT_Utility.o                            \
             $(OBJDIR_DEBUG)\\SystemModel\\UT_DefaultBinaryPathSelector.o      \
             $(OBJDIR_DEBUG)\\Generated\\Runner.o                              \
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)\\Utility\\UT_Utility.o                      \
-              $(OBJDIR_RELEASE)\\Utility\\UT_SVFVector.o                      \
-              $(OBJDIR_RELEASE)\\Utility\\UT_BinaryVector.o                   \
-              $(OBJDIR_RELEASE)\\UT_Helpers\\UT_SystemModelBuilder.o          \
-              $(OBJDIR_RELEASE)\\UT_Helpers\\SystemModelBuilder.o             \
-              $(OBJDIR_RELEASE)\\SystemModel\\UT_SystemModel.o                \
-              $(OBJDIR_RELEASE)\\SystemModel\\UT_Register.o                   \
-              $(OBJDIR_RELEASE)\\SystemModel\\UT_PrettyPrinterVisitor.o       \
-              $(OBJDIR_RELEASE)\\SystemModel\\UT_GmlPrinterVisitor.o          \
-              $(OBJDIR_RELEASE)\\SystemModel\\UT_DefaultBinaryPathSelector.o  \
+OBJ_RELEASE = \
+              $(OBJDIR_RELEASE)\\Utility\\UT_Utility.o                       \
+              $(OBJDIR_RELEASE)\\Utility\\UT_SVFVector.o                     \
+              $(OBJDIR_RELEASE)\\Utility\\UT_BinaryVector.o                  \
+              $(OBJDIR_RELEASE)\\UT_Helpers\\UT_SystemModelBuilder.o         \
+              $(OBJDIR_RELEASE)\\UT_Helpers\\SystemModelBuilder.o            \
+              $(OBJDIR_RELEASE)\\SystemModel\\UT_SystemModel.o               \
+              $(OBJDIR_RELEASE)\\SystemModel\\UT_SystemModelCheckerVisitor.o \
+              $(OBJDIR_RELEASE)\\SystemModel\\UT_Register.o                  \
+              $(OBJDIR_RELEASE)\\SystemModel\\UT_PrettyPrinterVisitor.o      \
+              $(OBJDIR_RELEASE)\\SystemModel\\UT_GmlPrinterVisitor.o         \
+              $(OBJDIR_RELEASE)\\SystemModel\\UT_DefaultBinaryPathSelector.o \
               $(OBJDIR_RELEASE)\\Generated\\Runner.o
 
 
@@ -101,6 +105,9 @@ $(OBJDIR_DEBUG)\\UT_Helpers\\SystemModelBuilder.o: UT_Helpers\\SystemModelBuilde
 
 $(OBJDIR_DEBUG)\\SystemModel\\UT_SystemModel.o: SystemModel\\UT_SystemModel.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel\\UT_SystemModel.cpp -o $(OBJDIR_DEBUG)\\SystemModel\\UT_SystemModel.o
+
+$(OBJDIR_DEBUG)\\SystemModel\\UT_SystemModelCheckerVisitor.o: SystemModel\\UT_SystemModelCheckerVisitor.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel\\UT_SystemModelCheckerVisitor.cpp -o $(OBJDIR_DEBUG)\\SystemModel\\UT_SystemModelCheckerVisitor.o
 
 $(OBJDIR_DEBUG)\\SystemModel\\UT_Register.o: SystemModel\\UT_Register.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel\\UT_Register.cpp -o $(OBJDIR_DEBUG)\\SystemModel\\UT_Register.o
@@ -156,6 +163,9 @@ $(OBJDIR_RELEASE)\\UT_Helpers\\SystemModelBuilder.o: UT_Helpers\\SystemModelBuil
 
 $(OBJDIR_RELEASE)\\SystemModel\\UT_SystemModel.o: SystemModel\\UT_SystemModel.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel\\UT_SystemModel.cpp -o $(OBJDIR_RELEASE)\\SystemModel\\UT_SystemModel.o
+
+$(OBJDIR_RELEASE)\\SystemModel\\UT_SystemModelCheckerVisitor.o: SystemModel\\UT_SystemModelCheckerVisitor.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel\\UT_SystemModelCheckerVisitor.cpp -o $(OBJDIR_RELEASE)\\SystemModel\\UT_SystemModelCheckerVisitor.o
 
 $(OBJDIR_RELEASE)\\SystemModel\\UT_Register.o: SystemModel\\UT_Register.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel\\UT_Register.cpp -o $(OBJDIR_RELEASE)\\SystemModel\\UT_Register.o

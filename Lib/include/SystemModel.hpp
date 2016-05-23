@@ -15,6 +15,7 @@
   #define SYSTEMMODEL_H__A9ED8877_8B39_4480_2B8B_2E92C212179C__INCLUDED_
 
 #include "SystemModelNodes.hpp"
+#include "SystemModelCheckResult.hpp"
 #include <memory>
 #include <vector>
 #include <experimental/string_view>
@@ -31,6 +32,22 @@ class DLL_EXPORT SystemModel
   public:
   ~SystemModel() = default;
   SystemModel()  = default;
+
+  friend class SystemModelCheckerVisitor;
+
+  //! Checks model coherence
+  //!
+  //! @note
+  //!   - Each node has one and only one parent (except root that has no parent)
+  //!   - Each parent node has at least one child otherwise a warning is issued
+  //!   - Each child is only appended once in its parent
+  //!   - Each node is reachable (no dangling node)
+  //!   - Unused id generate a warning
+  //!   - Each linker has a number of chidren that matches its selector or an warning is issued when there are to few
+  //!     children and an error when there are too much
+  //!
+  SystemModelCheckResult Check() const;
+
 
   //! Creates a new AccessInterface node
   //!
@@ -79,13 +96,17 @@ class DLL_EXPORT SystemModel
   private:
   void RegisterNode(std::shared_ptr<SystemModelNode> node);  //!< Saves relation between node identifier and its instance
 
+  using TIdentifierMapping = std::vector<std::shared_ptr<SystemModelNode>>;
+
+  TIdentifierMapping GetIdentifierMapping() const { return m_identifierMapping; }
+
   // ---------------- Private  Fields
   //
   private:
-  uint32_t                                      m_totalRegisters        = 0; //!< Total number of registers in the model
-  uint32_t                                      m_totalPendingRegisters = 0; //!< Number of registers currently "pending"
-  std::shared_ptr<ParentNode>                   m_root;                      //!< First (top) node of system model tree
-  std::vector<std::shared_ptr<SystemModelNode>> m_identifierMapping;         //!< Maps a node identifier to a node instance
+  uint32_t                    m_totalRegisters        = 0; //!< Total number of registers in the model
+  uint32_t                    m_totalPendingRegisters = 0; //!< Number of registers currently "pending"
+  std::shared_ptr<ParentNode> m_root;                      //!< First (top) node of system model tree
+  TIdentifierMapping          m_identifierMapping;         //!< Maps a node identifier to a node instance
 };
 //
 //  End of SystemModel class declaration

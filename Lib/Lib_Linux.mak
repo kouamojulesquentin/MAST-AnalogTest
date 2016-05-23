@@ -52,10 +52,11 @@ OBJ_DEBUG = $(OBJDIR_DEBUG)/src/AccessInterface.o                	\
             $(OBJDIR_DEBUG)/src/Register.o                        \
             $(OBJDIR_DEBUG)/src/SVFVector.o                       \
             $(OBJDIR_DEBUG)/src/SystemModel.o                     \
+            $(OBJDIR_DEBUG)/src/SystemModelCheckerVisitor.o       \
             $(OBJDIR_DEBUG)/src/SystemModelNode.o                 \
             $(OBJDIR_DEBUG)/src/Utility.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/src/AccessInterface.o                	\
+OBJ_RELEASE = $(OBJDIR_RELEASE)/src/AccessInterface.o              	\
             $(OBJDIR_RELEASE)/src/AccessInterfaceProtocol_1149_1.o  \
             $(OBJDIR_RELEASE)/src/BinaryVector.o                    \
             $(OBJDIR_RELEASE)/src/Chain.o                           \
@@ -67,6 +68,7 @@ OBJ_RELEASE = $(OBJDIR_RELEASE)/src/AccessInterface.o                	\
             $(OBJDIR_RELEASE)/src/Register.o                        \
             $(OBJDIR_RELEASE)/src/SVFVector.o                       \
             $(OBJDIR_RELEASE)/src/SystemModel.o                     \
+            $(OBJDIR_RELEASE)/src/SystemModelCheckerVisitor.o       \
             $(OBJDIR_RELEASE)/src/SystemModelNode.o                 \
             $(OBJDIR_RELEASE)/src/Utility.o
 
@@ -120,6 +122,9 @@ $(OBJDIR_DEBUG)/src/SVFVector.o: src/SVFVector.cpp
 
 $(OBJDIR_DEBUG)/src/SystemModel.o: src/SystemModel.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/SystemModel.cpp -o $(OBJDIR_DEBUG)/src/SystemModel.o
+
+$(OBJDIR_DEBUG)/src/SystemModelCheckerVisitor.o: src/SystemModelCheckerVisitor.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/SystemModelCheckerVisitor.cpp -o $(OBJDIR_DEBUG)/src/SystemModelCheckerVisitor.o
 
 $(OBJDIR_DEBUG)/src/SystemModelNode.o: src/SystemModelNode.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/SystemModelNode.cpp -o $(OBJDIR_DEBUG)/src/SystemModelNode.o
@@ -178,6 +183,9 @@ $(OBJDIR_RELEASE)/src/SVFVector.o: src/SVFVector.cpp
 
 $(OBJDIR_RELEASE)/src/SystemModel.o: src/SystemModel.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/SystemModel.cpp -o $(OBJDIR_RELEASE)/src/SystemModel.o
+
+$(OBJDIR_RELEASE)/src/SystemModelCheckerVisitor.o: src/SystemModelCheckerVisitor.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/SystemModelCheckerVisitor.cpp -o $(OBJDIR_RELEASE)/src/SystemModelCheckerVisitor.o
 
 $(OBJDIR_RELEASE)/src/SystemModelNode.o: src/SystemModelNode.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/SystemModelNode.cpp -o $(OBJDIR_RELEASE)/src/SystemModelNode.o

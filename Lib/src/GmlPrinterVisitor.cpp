@@ -19,6 +19,7 @@
 #include <algorithm>
 using std::string;
 using std::experimental::string_view;
+using namespace std::string_literals;
 using namespace mast;
 
 
@@ -32,6 +33,8 @@ const std::experimental::string_view GmlPrinterVisitor::m_color_Linker          
 const std::experimental::string_view GmlPrinterVisitor::m_color_Chain           = "#FFCC20";
 const std::experimental::string_view GmlPrinterVisitor::m_color_Register        = "#59FF20";
 
+const std::experimental::string_view GmlPrinterVisitor::m_fontName              = "Lucida Console";
+
 //! Appends a parent node and its children to the GML graph
 //!
 //! @param type   Text representation of the node type
@@ -39,10 +42,10 @@ const std::experimental::string_view GmlPrinterVisitor::m_color_Register        
 //!
 void GmlPrinterVisitor::AppendParentNode (std::experimental::string_view shapeName,
                                           std::experimental::string_view backgroundColor,
-                                          std::experimental::string_view typeName,
+                                          std::experimental::string_view ,
                                           const ParentNode&              parentNode)
 {
-  AppendNode(shapeName, backgroundColor, typeName, parentNode);
+  AppendNode(shapeName, backgroundColor, "", parentNode);
 
   // ---------------- Print children
   //
@@ -82,32 +85,70 @@ void GmlPrinterVisitor::AppendParentNode (std::experimental::string_view shapeNa
 //!
 void GmlPrinterVisitor::AppendNode (string_view            shapeName,
                                     string_view            backgroundColor,
-                                    string_view            nodeTypeName,
+                                    string_view            notes,
                                     const SystemModelNode& node)
 {
   m_osGraph << "   node [ id " << node.GetIdentifier();
 
+  auto displayName  = !node.GetName().empty();
+  auto displayNotes = !notes.empty();
+  auto displayLabel = displayName || m_displayIdentifier || displayNotes;
+
+  // ---------------- Compute height and width for the graphic
+  //
+  size_t labelCharWidth = node.GetName().length();
+  size_t linesCount     = 1;
+
+  if (displayNotes)
+  {
+    ++linesCount;
+    size_t startPos = 0;
+    size_t foundPos = 0;
+    while ((foundPos = notes.find('\n', startPos)) != string_view::npos)
+    {
+      ++linesCount;
+      auto noteWidth = foundPos - startPos;
+      labelCharWidth = std::max(labelCharWidth, noteWidth);
+
+      startPos = ++foundPos;
+    }
+  }
+  auto nodeWidth  = std::max(static_cast<size_t>(50u), (95u * labelCharWidth) / 10u);
+  auto nodeHeight = std::max(static_cast<size_t>(35u), 18u * linesCount);
+
+  if (shapeName != "rectangle"s)
+  {
+    nodeHeight += 8u;
+    nodeWidth  += 40u;
+  }
 
   m_osGraph << " graphics [";
   m_osGraph << " type \"" << shapeName       << "\"";
   m_osGraph << " fill \"" << backgroundColor << "\"";
-  m_osGraph << " w "  << std::max(static_cast<size_t>(50u), 11u * node.GetName().length());
-  m_osGraph << " h "  << std::max(static_cast<size_t>(35u), 3u  * node.GetName().length());
+  m_osGraph << " w "  << nodeWidth;
+  m_osGraph << " h "  << nodeHeight;
   m_osGraph << " ] ";
 
-  if (!node.GetName().empty() || m_displayIdentifier)
+  if (displayLabel)
   {
     m_osGraph << "LabelGraphics [ text \"";
+
     if (m_displayIdentifier)
     {
       m_osGraph << "(" << node.GetIdentifier() << ")\n";
     }
 
-    if (!node.GetName().empty())
+    if (displayName)
     {
       m_osGraph << node.GetName();
     }
-    m_osGraph << "\" fontSize 13 fontStyle \"bold\" ]";
+
+    if (displayNotes)
+    {
+      m_osGraph << "\n" << notes;
+    }
+
+    m_osGraph << "\" fontSize 13 fontStyle \"bold\" fontName \"" << m_fontName << "\"]";
   }
 
   m_osGraph << " ]" << std::endl;
@@ -266,7 +307,26 @@ void GmlPrinterVisitor::VisitRegister (Register& reg)
   }
   else
   {
-    AppendNode(m_shape_Register, m_color_Register, "Register", reg);
+    if (m_displayRegisterValue)
+    {
+      std::ostringstream os;
+
+      auto regValue = [this](auto& regValue) { return m_displayValueAsHex ? "0x"s + regValue.DataAsHexString() : regValue.DataAsBinaryString(); };
+
+      os << "Width: "     << reg.GetBypassSequence().BitsCount() << std::endl;
+
+      os << "Bypass:    " << regValue(reg.GetBypassSequence())  << std::endl;
+      os << "Next to:   " << regValue(reg.GetNextToSut())       << std::endl;
+      os << "Last to:   " << regValue(reg.GetLastToSut())       << std::endl;
+      os << "Last from: " << regValue(reg.GetLastFromSut())     << std::endl;
+      os << "Expected:  " << regValue(reg.GetExpectedFromSut());
+
+      AppendNode(m_shape_Register, m_color_Register, os.str(), reg);
+    }
+    else
+    {
+      AppendNode(m_shape_Register, m_color_Register, "", reg);
+    }
   }
 }
 

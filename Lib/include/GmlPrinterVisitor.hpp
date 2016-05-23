@@ -50,9 +50,14 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
   std::string  GetGraph();  //!< Returns currently visited nodes graph representation
 
 
-  bool  DisplayIdentifier() const { return m_displayIdentifier; } //!< Tells whether node identifier are displayed or not
+  bool DisplayIdentifier()    const { return m_displayIdentifier;    } //!< Returns whether node identifier are displayed or not
+  bool DisplayRegisterValue() const { return m_displayRegisterValue; } //!< Returns whether registers value are displayed (below the name)
+  bool DisplayValueAsHex()    const { return m_displayValueAsHex;    } //!< Returns whether registers value are displayed as hexadecimal string (otherwise they are displayed as binary)
 
-  void  DisplayIdentifier (bool displayIdentifier) { m_displayIdentifier = displayIdentifier; } //!< Changes whether node identifier are displayed or not
+  void DisplayIdentifier    (bool displayIdentifier)    { m_displayIdentifier    = displayIdentifier;    } //!< Sets whether node identifier are displayed or not
+  void DisplayRegisterValue (bool displayRegisterValue) { m_displayRegisterValue = displayRegisterValue; } //!< Sets whether registers value are displayed (below the name)
+  void DisplayValueAsHex    (bool displayValueAsHex)    { m_displayValueAsHex    = displayValueAsHex;    } //!< Sets whether registers value are displayed as hexadecimal string (otherwise they are displayed as binary)
+
 
 
   // ---------------- Private  Methods
@@ -62,7 +67,6 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
   void CreateRoot();
   void CloseRoot();
 
-  void AppendNode       (std::experimental::string_view typeName, const SystemModelNode& node);
   void AppendParentNode (std::experimental::string_view shapeName,
                          std::experimental::string_view backgroundColor,
                          std::experimental::string_view typeName,
@@ -71,7 +75,7 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
 
   void AppendNode       (std::experimental::string_view shapeName,
                          std::experimental::string_view backgroundColor,
-                         std::experimental::string_view nodeTypeName,
+                         std::experimental::string_view notes,
                          const SystemModelNode&         node
                          );
 
@@ -80,13 +84,15 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
   // ---------------- Private  Fields
   //
   private:
-  std::string        m_graphName;                       //!< Name associated to the all graph
-  uint32_t           m_depth             = 0u;          //!< Current nodes tree depth
-  bool               m_visited           = false;       //!< Becomes true when a tree traversal has been completely done
-  bool               m_displayIdentifier = false;       //!< When true, node identifiers are displayed along with their name
-  const Linker*      m_linker            = nullptr;     //!< When not nullptr, we are visiting a path selector (while visiting a linker)
-  std::ostringstream m_osGraph;                         //!< Stream to build up a representation of visited system model nodes
-  std::ostringstream m_osEdges;                         //!< Stream to build up links between nodes
+  std::string        m_graphName;                          //!< Name associated to the all graph
+  uint32_t           m_depth                = 0u;          //!< Current nodes tree depth
+  bool               m_visited              = false;       //!< Becomes true when a tree traversal has been completely done
+  bool               m_displayIdentifier    = false;       //!< When true, node identifiers are displayed along with their name
+  bool               m_displayRegisterValue = false;       //!< When true, register values are displayed (below its name)
+  bool               m_displayValueAsHex    = false;       //!< When true, register values are displayed as hexadecimal string
+  const Linker*      m_linker               = nullptr;     //!< When not nullptr, we are visiting a path selector (while visiting a linker)
+  std::ostringstream m_osGraph;                            //!< Stream to build up a representation of visited system model nodes
+  std::ostringstream m_osEdges;                            //!< Stream to build up links between nodes
 
   static const std::experimental::string_view m_shape_AccessInterface;
   static const std::experimental::string_view m_shape_Linker;
@@ -97,6 +103,8 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
   static const std::experimental::string_view m_color_Linker;
   static const std::experimental::string_view m_color_Chain;
   static const std::experimental::string_view m_color_Register;
+
+  static const std::experimental::string_view m_fontName;
 };
 //
 //  End of GmlPrinterVisitor class declaration

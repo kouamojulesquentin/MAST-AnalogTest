@@ -95,9 +95,19 @@ void GmlPrinterVisitor::AppendNode (string_view            shapeName,
   m_osGraph << " h "  << std::max(static_cast<size_t>(35u), 3u  * node.GetName().length());
   m_osGraph << " ] ";
 
-  if (!node.GetName().empty())
+  if (!node.GetName().empty() || m_displayIdentifier)
   {
-    m_osGraph << "LabelGraphics [ text \"" << node.GetName() << "\" fontSize 13 fontStyle \"bold\" ]";
+    m_osGraph << "LabelGraphics [ text \"";
+    if (m_displayIdentifier)
+    {
+      m_osGraph << "(" << node.GetIdentifier() << ")\n";
+    }
+
+    if (!node.GetName().empty())
+    {
+      m_osGraph << node.GetName();
+    }
+    m_osGraph << "\" fontSize 13 fontStyle \"bold\" ]";
   }
 
   m_osGraph << " ]" << std::endl;

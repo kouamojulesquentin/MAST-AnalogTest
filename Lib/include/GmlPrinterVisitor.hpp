@@ -49,6 +49,12 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
 
   std::string  GetGraph();  //!< Returns currently visited nodes graph representation
 
+
+  bool  DisplayIdentifier() const { return m_displayIdentifier; } //!< Tells whether node identifier are displayed or not
+
+  void  DisplayIdentifier (bool displayIdentifier) { m_displayIdentifier = displayIdentifier; } //!< Changes whether node identifier are displayed or not
+
+
   // ---------------- Private  Methods
   //
   private:
@@ -74,12 +80,13 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
   // ---------------- Private  Fields
   //
   private:
-  std::string        m_graphName;             //!< Name associated to the all graph
-  uint32_t           m_depth   = 0u;          //!< Current nodes tree depth
-  bool               m_visited = false;       //!< Becomes true when a tree traversal has been completely done
-  const Linker*      m_linker  = nullptr;     //!< When not nullptr, we are visiting a path selector (while visiting a linker)
-  std::ostringstream m_osGraph;               //!< Stream to build up a representation of visited system model nodes
-  std::ostringstream m_osEdges;               //!< Stream to build up links between nodes
+  std::string        m_graphName;                       //!< Name associated to the all graph
+  uint32_t           m_depth             = 0u;          //!< Current nodes tree depth
+  bool               m_visited           = false;       //!< Becomes true when a tree traversal has been completely done
+  bool               m_displayIdentifier = false;       //!< When true, node identifiers are displayed along with their name
+  const Linker*      m_linker            = nullptr;     //!< When not nullptr, we are visiting a path selector (while visiting a linker)
+  std::ostringstream m_osGraph;                         //!< Stream to build up a representation of visited system model nodes
+  std::ostringstream m_osEdges;                         //!< Stream to build up links between nodes
 
   static const std::experimental::string_view m_shape_AccessInterface;
   static const std::experimental::string_view m_shape_Linker;

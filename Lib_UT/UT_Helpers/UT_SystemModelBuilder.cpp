@@ -105,29 +105,31 @@ void UT_SystemModelBuilder::test_Create_TestCase_1500_3_Chains ()
 
   // With GML printer
   GmlPrinterVisitor printer;
+  printer.DisplayIdentifier(true);
+
   tap->Accept(printer);
 
   auto gotGraph = printer.GetGraph();
   auto expected = string("graph\n"
                          "[\n"
                          "   hierarchic 1 directed 1\n"
-                         "   node [ id 0 graphics [ type \"octagon\" fill \"#10FFFF\" w 50 h 35 ] LabelGraphics [ text \"TAP\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   node [ id 1 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"TAP_IR\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" w 110 h 35 ] LabelGraphics [ text \"TAP_DR_Mux\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 77 h 35 ] LabelGraphics [ text \"TAP_BPY\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   node [ id 4 graphics [ type \"ellipse\" fill \"#FFCC20\" w 50 h 35 ] LabelGraphics [ text \"sut\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"static\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   node [ id 6 graphics [ type \"ellipse\" fill \"#FFCC20\" w 132 h 36 ] LabelGraphics [ text \"1500_wrapper\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   node [ id 8 graphics [ type \"ellipse\" fill \"#FFCC20\" w 50 h 35 ] LabelGraphics [ text \"SWIR\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   node [ id 7 graphics [ type \"rectangle\" fill \"#59FF20\" w 99 h 35 ] LabelGraphics [ text \"SWIR_ctrl\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   node [ id 9 graphics [ type \"trapezoid\" fill \"#FF3060\" w 88 h 35 ] LabelGraphics [ text \"SWIR_mux\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   node [ id 11 graphics [ type \"ellipse\" fill \"#FFCC20\" w 50 h 35 ] LabelGraphics [ text \"WIR\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   node [ id 12 graphics [ type \"trapezoid\" fill \"#FF3060\" w 77 h 35 ] LabelGraphics [ text \"WIR_mux\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   node [ id 13 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"WBY\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   node [ id 14 graphics [ type \"rectangle\" fill \"#59FF20\" w 99 h 35 ] LabelGraphics [ text \"dynamic_0\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   node [ id 15 graphics [ type \"rectangle\" fill \"#59FF20\" w 99 h 35 ] LabelGraphics [ text \"dynamic_1\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   node [ id 16 graphics [ type \"rectangle\" fill \"#59FF20\" w 99 h 35 ] LabelGraphics [ text \"dynamic_2\" fontSize 13 fontStyle \"bold\" ] ]\n"
-                         "   node [ id 10 graphics [ type \"rectangle\" fill \"#59FF20\" w 77 h 35 ] LabelGraphics [ text \"WIR_reg\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 0 graphics [ type \"octagon\" fill \"#10FFFF\" w 50 h 35 ] LabelGraphics [ text \"(0)\nTAP\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 1 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(1)\nTAP_IR\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" w 110 h 35 ] LabelGraphics [ text \"(2)\nTAP_DR_Mux\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 77 h 35 ] LabelGraphics [ text \"(3)\nTAP_BPY\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 4 graphics [ type \"ellipse\" fill \"#FFCC20\" w 50 h 35 ] LabelGraphics [ text \"(4)\nsut\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(5)\nstatic\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 6 graphics [ type \"ellipse\" fill \"#FFCC20\" w 132 h 36 ] LabelGraphics [ text \"(6)\n1500_wrapper\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 8 graphics [ type \"ellipse\" fill \"#FFCC20\" w 50 h 35 ] LabelGraphics [ text \"(8)\nSWIR\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 7 graphics [ type \"rectangle\" fill \"#59FF20\" w 99 h 35 ] LabelGraphics [ text \"(7)\nSWIR_ctrl\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 9 graphics [ type \"trapezoid\" fill \"#FF3060\" w 88 h 35 ] LabelGraphics [ text \"(9)\nSWIR_mux\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 11 graphics [ type \"ellipse\" fill \"#FFCC20\" w 50 h 35 ] LabelGraphics [ text \"(11)\nWIR\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 12 graphics [ type \"trapezoid\" fill \"#FF3060\" w 77 h 35 ] LabelGraphics [ text \"(12)\nWIR_mux\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 13 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(13)\nWBY\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 14 graphics [ type \"rectangle\" fill \"#59FF20\" w 99 h 35 ] LabelGraphics [ text \"(14)\ndynamic_0\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 15 graphics [ type \"rectangle\" fill \"#59FF20\" w 99 h 35 ] LabelGraphics [ text \"(15)\ndynamic_1\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 16 graphics [ type \"rectangle\" fill \"#59FF20\" w 99 h 35 ] LabelGraphics [ text \"(16)\ndynamic_2\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 10 graphics [ type \"rectangle\" fill \"#59FF20\" w 77 h 35 ] LabelGraphics [ text \"(10)\nWIR_reg\" fontSize 13 fontStyle \"bold\" ] ]\n"
                          "   edge [ source 0 target 1 label \"1\" ]\n"
                          "   edge [ source 2 target 3 label \"1\" ]\n"
                          "   edge [ source 4 target 5 label \"1\" ]\n"

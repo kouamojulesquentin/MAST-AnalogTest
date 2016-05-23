@@ -279,6 +279,80 @@ void UT_GmlPrinterVisitor::test_VisitTap_With_SubNodes ()
 }
 
 
+//! Checks GmlPrinterVisitor::Visit_xxx() when DisplayIdentifier is true
+//!
+void UT_GmlPrinterVisitor::test_Visit_With_DisplayIdentifier_true ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder buider(sm);
+
+  string_view noName;
+  uint32_t    irBitsCount   = 6u;
+  uint32_t    muxPathsCount = 5u;
+  auto        tap           = sm.CreateTap(noName, irBitsCount, muxPathsCount);
+
+  auto chain_1 = sm.CreateChain("Chain_1", tap);
+
+  auto reg_1 = sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("1010_01"), tap);
+  auto reg_2 = sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("1010_10"), tap);
+
+  auto chain_2 = sm.CreateChain("Chain_2", chain_1);
+
+  buider.AppendRegisters(4, "Reg_a_", BinaryVector(5,  0xff), chain_1);
+  buider.AppendRegisters(3, "Reg_b_", BinaryVector(15, 0x03), chain_2);
+
+  GmlPrinterVisitor sut;
+  sut.DisplayIdentifier(true);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (tap->Accept(sut)); // Will indirectly call Visit for several types of nodes
+
+  // ---------------- Verify
+  //
+  auto got      = sut.GetGraph();
+  auto expected = string("graph\n"
+                         "[\n"
+                         "   hierarchic 1 directed 1\n"
+                         "   node [ id 0 graphics [ type \"octagon\" fill \"#10FFFF\" w 110 h 35 ] LabelGraphics [ text \"(0)\n1149_1_TAP\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 1 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(1)\nTAP_IR\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" w 110 h 35 ] LabelGraphics [ text \"(2)\nTAP_DR_Mux\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 77 h 35 ] LabelGraphics [ text \"(3)\nTAP_BPY\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 4 graphics [ type \"ellipse\" fill \"#FFCC20\" w 77 h 35 ] LabelGraphics [ text \"(4)\nChain_1\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 7 graphics [ type \"ellipse\" fill \"#FFCC20\" w 77 h 35 ] LabelGraphics [ text \"(7)\nChain_2\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 12 graphics [ type \"rectangle\" fill \"#59FF20\" w 77 h 35 ] LabelGraphics [ text \"(12)\nReg_b_0\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 13 graphics [ type \"rectangle\" fill \"#59FF20\" w 77 h 35 ] LabelGraphics [ text \"(13)\nReg_b_1\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 14 graphics [ type \"rectangle\" fill \"#59FF20\" w 77 h 35 ] LabelGraphics [ text \"(14)\nReg_b_2\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 8 graphics [ type \"rectangle\" fill \"#59FF20\" w 77 h 35 ] LabelGraphics [ text \"(8)\nReg_a_0\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 9 graphics [ type \"rectangle\" fill \"#59FF20\" w 77 h 35 ] LabelGraphics [ text \"(9)\nReg_a_1\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 10 graphics [ type \"rectangle\" fill \"#59FF20\" w 77 h 35 ] LabelGraphics [ text \"(10)\nReg_a_2\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 11 graphics [ type \"rectangle\" fill \"#59FF20\" w 77 h 35 ] LabelGraphics [ text \"(11)\nReg_a_3\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 55 h 35 ] LabelGraphics [ text \"(5)\nReg_1\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   node [ id 6 graphics [ type \"rectangle\" fill \"#59FF20\" w 55 h 35 ] LabelGraphics [ text \"(6)\nReg_2\" fontSize 13 fontStyle \"bold\" ] ]\n"
+                         "   edge [ source 0 target 1 label \"1\" ]\n"
+                         "   edge [ source 2 target 3 label \"1\" ]\n"
+                         "   edge [ source 7 target 12 label \"1\" ]\n"
+                         "   edge [ source 7 target 13 label \"2\" ]\n"
+                         "   edge [ source 7 target 14 label \"3\" ]\n"
+                         "   edge [ source 4 target 7 label \"1\" ]\n"
+                         "   edge [ source 4 target 8 label \"2\" ]\n"
+                         "   edge [ source 4 target 9 label \"3\" ]\n"
+                         "   edge [ source 4 target 10 label \"4\" ]\n"
+                         "   edge [ source 4 target 11 label \"5\" ]\n"
+                         "   edge [ source 2 target 4 label \"2\" ]\n"
+                         "   edge [ source 2 target 5 label \"3\" ]\n"
+                         "   edge [ source 2 target 6 label \"4\" ]\n"
+                         "   edge [ source 2 target 1 graphics [ width 1 style \"dashed\" targetArrow \"standard\" ] ]\n"
+                         "   edge [ source 0 target 2 label \"2\" ]\n"
+                         "]"
+                        );
+  TS_ASSERT_EQUALS (got, expected);
+}
+
+
+
 
 
 //===========================================================================

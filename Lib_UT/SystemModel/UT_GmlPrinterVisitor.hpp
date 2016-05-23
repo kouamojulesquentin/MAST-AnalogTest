@@ -37,6 +37,9 @@ class UT_GmlPrinterVisitor : public CxxTest::TestSuite
   void test_VisitTap ();
   void test_VisitTap_With_SubNodes ();
 
+  // ---------------- Options
+  //
+  void test_Visit_With_DisplayIdentifier_true ();
 
   // ---------------- Private  Methods
   //

@@ -15,6 +15,8 @@
 #ifndef SYSTEMMODELCHECKRESULT_H__FFBEA6CE_417E_43A0_32B5_EA2A1A0AF395__INCLUDED_
   #define SYSTEMMODELCHECKRESULT_H__FFBEA6CE_417E_43A0_32B5_EA2A1A0AF395__INCLUDED_
 
+#include "Platform.hpp"
+
 #include <string>
 #include <sstream>
 #include <cstdint>
@@ -24,33 +26,32 @@ namespace mast
 {
 //! Collects warning and error while SystemModel is being checked
 //!
-class SystemModelCheckResult final
+class DLL_EXPORT SystemModelCheckResult final
 {
   public:
   ~SystemModelCheckResult() = default;
   SystemModelCheckResult()  = default;
 
+  bool operator==(const SystemModelCheckResult& rhs) const
+  {
+    return    (infosCount    == rhs.infosCount)
+           && (warningsCount == rhs.warningsCount)
+           && (errorsCount   == rhs.errorsCount)
+           && (infos         == rhs.infos)
+           && (warnings      == rhs.warnings)
+           && (errors        == rhs.errors);
+  }
+
+  bool operator!=(const SystemModelCheckResult& rhs) const
+  {
+    return !operator==(rhs);
+  }
+
   bool HasIssues() const { return (warningsCount != 0) || (errorsCount != 0); }
 
-  std::string MakeReport()
-  {
-    std::ostringstream os;
+  std::string MakeReport() const; //!< Returns a string representing the check result
 
-    auto reportCollected = [&os](auto header, auto count, auto& collected)
-    {
-      os << header << count << "):\n";
-      if (!collected.empty())
-      {
-        os << collected << "\n\n";
-      }
-    };
-
-    reportCollected("Errors   (", errorsCount,   errors);
-    reportCollected("Warnings (", warningsCount, warnings);
-    reportCollected("Infos    (", infosCount,    infos);
-
-    return os.str();
-  }
+  static const SystemModelCheckResult None; //!< Instance to compare for no error (very useful in unit tests along with traits to show the issues)
 
   uint32_t    infosCount    = 0; //!< Total number of collected info messages
   uint32_t    warningsCount = 0; //!< Total number of collected warnings messages

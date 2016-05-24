@@ -78,7 +78,11 @@ class DLL_EXPORT SystemModelCheckerVisitor final : public SystemModelVisitor
   // ---------------- Private  Methods
   //
   private:
+  void Report (std::experimental::string_view  message, uint32_t& counter, std::ostringstream& os);
 
+  void ReportInfo    (std::experimental::string_view message) { Report(message, m_infosCount,    m_infos);    }
+  void ReportWarning (std::experimental::string_view message) { Report(message, m_warningsCount, m_warnings); }
+  void ReportError   (std::experimental::string_view message) { Report(message, m_errorsCount,   m_errors);   }
 
   // ---------------- Private  Fields
   //
@@ -90,6 +94,9 @@ class DLL_EXPORT SystemModelCheckerVisitor final : public SystemModelVisitor
   std::ostringstream                m_infos;             //!< Collects info messages
   std::ostringstream                m_warnings;          //!< Collects warning messages
   std::ostringstream                m_errors;            //!< Collects error messages
+  uint32_t                          m_infosCount    = 0; //!< Total number of collected info messages
+  uint32_t                          m_warningsCount = 0; //!< Total number of collected warnings messages
+  uint32_t                          m_errorsCount   = 0; //!< Total number of collected errors messages
 };
 //
 //  End of SystemModelCheckerVisitor class declaration

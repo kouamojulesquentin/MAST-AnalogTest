@@ -15,6 +15,8 @@
 #include "SystemModelCheckerVisitor.hpp"
 
 using namespace mast;
+using std::string;
+using std::experimental::string_view;
 using std::shared_ptr;
 using std::vector;
 using std::ostringstream;
@@ -53,6 +55,27 @@ SystemModelCheckResult SystemModelCheckerVisitor::Check ()
 //!
 void SystemModelCheckerVisitor::CheckIdentifiers ()
 {
+  auto idCount = m_identifierMapping.size();
+
+  for (size_t id = 0 ; id < idCount ; ++id)
+  {
+    auto node = m_identifierMapping[id];
+    if (node)
+    {
+      if (node->GetIdentifier() != static_cast<SystemModelNode::NodeIdentifier>(id))
+      {
+        ostringstream os;
+        os << "Found node '" << node->GetName() << "' with identifier '" << node->GetIdentifier() << "' while expecting '" << id << "'";
+        ReportError(os.str());
+      }
+    }
+    else
+    {
+      ostringstream os;
+      os << "Identifier '" << id << "' is not used";
+      ReportInfo(os.str());
+    }
+  }
 }
 //
 //  End of: SystemModelCheckerVisitor::CheckIdentifiers
@@ -66,12 +89,36 @@ SystemModelCheckResult SystemModelCheckerVisitor::MakeCheckResult ()
 {
   SystemModelCheckResult result;
 
+  result.errors        = m_errors.str();
+  result.warnings      = m_warnings.str();
+  result.infos         = m_infos.str();
+
+  result.errorsCount   = m_errorsCount;
+  result.warningsCount = m_warningsCount;
+  result.infosCount    = m_infosCount;
+
   return result;
 }
 //
 //  End of: SystemModelCheckerVisitor::MakeCheckResult
 //---------------------------------------------------------------------------
 
+
+//! Reports an error, warning or info
+//!
+void SystemModelCheckerVisitor::Report (string_view message, uint32_t& counter, ostringstream& os)
+{
+  if (counter != 0)
+  {
+    os << std::endl;
+  }
+
+  os << "  - " << message;
+  ++counter;
+}
+//
+//  End of: SystemModelCheckerVisitor::ReportError
+//---------------------------------------------------------------------------
 
 
 //! Visits AccessInterface

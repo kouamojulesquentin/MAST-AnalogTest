@@ -21,6 +21,7 @@
 using namespace mast;
 using std::shared_ptr;
 using std::make_shared;
+using std::dynamic_pointer_cast;
 using std::experimental::string_view;
 
 
@@ -265,6 +266,43 @@ void SystemModel::RegisterNode (std::shared_ptr<SystemModelNode> node)
 //
 //  End of: SystemModel::RegisterNode
 //---------------------------------------------------------------------------
+
+
+//! Releases the resources occupied by a node data structure recursively
+//!
+void SystemModel::RemoveNodeFromModel (shared_ptr<SystemModelNode> node)
+{
+  if (!node)
+  {
+    THROW_INVALID_ARGUMENT("Expecting not nullptr");
+  }
+
+  //! @todo [JFC]-[May/24/2016]: Find node parent to remove node from its children
+  //!                            - To void browsing tree structure each time, add method RemoveNodeFromParent giving it the parent node
+  //!                            - In that case, check the node is indeed of child of declared parent
+
+
+  auto asParentNode = dynamic_pointer_cast<ParentNode>(node);
+  if (asParentNode)
+  {
+    //! @todo [JFC]-[May/24/2016]: Recurse all children to remove them too
+    //!
+  }
+
+  auto id     = node->GetIdentifier();
+  auto offset = static_cast<TIdentifierMapping::size_type>(id);
+
+  if (offset >= m_identifierMapping.size())
+  {
+    THROW_LOGIC_ERROR("Cannot remove a node that is not managed by the SystemModel");
+  }
+
+  m_identifierMapping[offset] = nullptr;
+}
+//
+//  End of: SystemModel::RemoveNodeFromModel
+//---------------------------------------------------------------------------
+
 
 
 //===========================================================================

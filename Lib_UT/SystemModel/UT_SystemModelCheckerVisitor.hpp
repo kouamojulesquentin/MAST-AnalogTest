@@ -32,6 +32,7 @@ class UT_SystemModelCheckerVisitor : public CxxTest::TestSuite
   void test_Constructor_From_ModelWithTap ();
 
   void test_CheckIdentifiers_With_ModelWithTap ();
+  void test_CheckIdentifiers_With_UnusedIdentifier ();
 
   // ================ Other Methods ================
 

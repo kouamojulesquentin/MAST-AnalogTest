@@ -54,6 +54,7 @@ OBJ_DEBUG = \
   $(OBJDIR_DEBUG)\\src\\SVFVector.o                      \
   $(OBJDIR_DEBUG)\\src\\SystemModel.o                    \
   $(OBJDIR_DEBUG)\\src\\SystemModelCheckerVisitor.o      \
+  $(OBJDIR_DEBUG)\\src\\SystemModelCheckResult.o         \
   $(OBJDIR_DEBUG)\\src\\SystemModelNode.o                \
   $(OBJDIR_DEBUG)\\src\\Utility.o
 
@@ -71,6 +72,7 @@ OBJ_RELEASE = \
   $(OBJDIR_RELEASE)\\src\\SVFVector.o                      \
   $(OBJDIR_RELEASE)\\src\\SystemModel.o                    \
   $(OBJDIR_RELEASE)\\src\\SystemModelCheckerVisitor.o      \
+  $(OBJDIR_RELEASE)\\src\\SystemModelCheckResult.o         \
   $(OBJDIR_RELEASE)\\src\\SystemModelNode.o                \
   $(OBJDIR_RELEASE)\\src\\Utility.o
 
@@ -127,6 +129,9 @@ $(OBJDIR_DEBUG)\\src\\SystemModel.o: src\\SystemModel.cpp
 
 $(OBJDIR_DEBUG)\\src\\SystemModelCheckerVisitor.o: src\\SystemModelCheckerVisitor.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\SystemModelCheckerVisitor.cpp -o $(OBJDIR_DEBUG)\\src\\SystemModelCheckerVisitor.o
+
+$(OBJDIR_DEBUG)\\src\\SystemModelCheckResult.o: src\\SystemModelCheckResult.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\SystemModelCheckResult.cpp -o $(OBJDIR_DEBUG)\\src\\SystemModelCheckResult.o
 
 $(OBJDIR_DEBUG)\\src\\SystemModelNode.o: src\\SystemModelNode.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src\\SystemModelNode.cpp -o $(OBJDIR_DEBUG)\\src\\SystemModelNode.o
@@ -188,6 +193,9 @@ $(OBJDIR_RELEASE)\\src\\SystemModel.o: src\\SystemModel.cpp
 
 $(OBJDIR_RELEASE)\\src\\SystemModelCheckerVisitor.o: src\\SystemModelCheckerVisitor.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\SystemModelCheckerVisitor.cpp -o $(OBJDIR_RELEASE)\\src\\SystemModelCheckerVisitor.o
+
+$(OBJDIR_RELEASE)\\src\\SystemModelCheckResult.o: src\\SystemModelCheckResult.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\SystemModelCheckResult.cpp -o $(OBJDIR_RELEASE)\\src\\SystemModelCheckResult.o
 
 $(OBJDIR_RELEASE)\\src\\SystemModelNode.o: src\\SystemModelNode.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src\\SystemModelNode.cpp -o $(OBJDIR_RELEASE)\\src\\SystemModelNode.o

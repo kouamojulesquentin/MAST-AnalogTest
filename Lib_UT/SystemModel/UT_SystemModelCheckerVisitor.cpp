@@ -15,7 +15,7 @@
 #include "UT_SystemModelCheckerVisitor.hpp"
 #include "SystemModelCheckerVisitor.hpp"
 
-#include <cxxtest/ValueTraits.h>
+#include "SystemModelCheckResult_Traits.hpp"
 
 using std::string;
 using namespace mast;
@@ -85,6 +85,41 @@ void UT_SystemModelCheckerVisitor::test_CheckIdentifiers_With_ModelWithTap ()
   string expectedReport = "Errors   (0):\n"
                           "Warnings (0):\n"
                           "Infos    (0):\n";
+
+  TS_ASSERT_EQUALS (report, expectedReport);
+  TS_ASSERT_EQUALS (result, SystemModelCheckResult::None);
+}
+
+
+//! Checks SystemModelCheckerVisitor::CheckIdentifiers() with unused identifier
+//!
+void UT_SystemModelCheckerVisitor::test_CheckIdentifiers_With_UnusedIdentifier ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  auto tap   = sm.CreateTap("", 6u, 4u);
+  auto reg_1 = sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("1100_111"), tap);
+  auto reg_2 = sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("111"),      tap);
+
+  sm.RemoveNodeFromModel(reg_1);
+  SystemModelCheckerVisitor sut(sm);
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.CheckIdentifiers());
+
+  // ---------------- Verify
+  //
+  auto result = sut.MakeCheckResult();
+  TS_ASSERT_FALSE   (result.HasIssues());
+  TS_ASSERT_DIFFERS (result, SystemModelCheckResult::None);
+
+  auto   report         = result.MakeReport();
+  string expectedReport = "Errors   (0):\n"
+                          "Warnings (0):\n"
+                          "Infos    (1):\n"
+                          "  - Identifier '4' is not used\n";
 
   TS_ASSERT_EQUALS (report, expectedReport);
 }

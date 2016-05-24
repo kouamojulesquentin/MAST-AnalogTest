@@ -80,7 +80,7 @@ class DLL_EXPORT SystemModel
   std::shared_ptr<ParentNode>      GetRoot() const { return m_root; }                         //!< Returns root node
   std::shared_ptr<SystemModelNode> GetNode(SystemModelNode::NodeIdentifier identifier) const; //!< Returns node associated with a node identifier
 
-  //! Releases the resources occupied by node data structure recursively
+  //! Releases the resources occupied by a node data structure recursively
   //!
   void RemoveNodeFromModel(std::shared_ptr<SystemModelNode> node);
   //+ (JFC April/20/2016): How to report parent node that a node has been destroyed?
@@ -95,6 +95,7 @@ class DLL_EXPORT SystemModel
   //
   private:
   void RegisterNode(std::shared_ptr<SystemModelNode> node);  //!< Saves relation between node identifier and its instance
+  void RemoveParentNode(std::shared_ptr<ParentNode> parent); //!< Releases the resources occupied by a node and its child recursively
 
   using TIdentifierMapping = std::vector<std::shared_ptr<SystemModelNode>>;
 

@@ -123,6 +123,7 @@
 		<Unit filename="src/Register.cpp" />
 		<Unit filename="src/SVFVector.cpp" />
 		<Unit filename="src/SystemModel.cpp" />
+		<Unit filename="src/SystemModelCheckResult.cpp" />
 		<Unit filename="src/SystemModelCheckerVisitor.cpp" />
 		<Unit filename="src/SystemModelNode.cpp" />
 		<Unit filename="src/Utility.cpp" />

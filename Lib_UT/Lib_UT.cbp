@@ -74,6 +74,7 @@
 		<Unit filename="CxxTest_Traits/BinaryVector_Traits.hpp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="CxxTest_Traits/SystemModelCheckResult_Traits.hpp" />
 		<Unit filename="Generated/Runner.cpp">
 			<Option weight="100" />
 		</Unit>

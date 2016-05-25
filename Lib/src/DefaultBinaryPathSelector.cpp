@@ -23,7 +23,7 @@ using namespace mast;
 //! Initializes selector for fast selection/deselection of a path
 //!
 //! @param associatedNode   Register that is used to drive the path multiplexer
-//! @param pathsount        Number of managed paths (including, optional, bypass register)
+//! @param pathsCount       Number of managed paths (including, optional, bypass register)
 //! @param isInverted       When true the bits for selecting a path are inverted (relative to the path identifier number)
 //! @param canSelectNone    When true zero is reserved to select 'no path' otherwise 0 is used to select first path
 //!                         (provided it is not inverted)
@@ -213,6 +213,29 @@ void DefaultBinaryPathSelector::Select (uint32_t pathIdentifier)
 //
 //  End of: DefaultBinaryPathSelector::Select
 //---------------------------------------------------------------------------
+
+
+
+//! Returns minimal bits count a register should have to drive a mux for a number of paths
+//!
+//! @param pathCount      Number of managed paths (including, optional, bypass register)
+//! @param canSelectNone  When true zero is reserved to select 'no path' otherwise 0 is used to select first path
+//!                       (provided it is not inverted)
+//!
+uint32_t DefaultBinaryPathSelector::RegWidthForPathCount (uint32_t pathCount, bool canSelectNone)
+{
+  if (pathCount < 2)
+  {
+    THROW_INVALID_ARGUMENT("A path selector with less than 2 paths count is not valid");
+  }
+
+  uint32_t maxValue = canSelectNone ? pathCount : pathCount - 1;
+  return Utility::MinimalBitsForValue(maxValue);
+}
+//
+//  End of: DefaultBinaryPathSelector::RegWidthForPathCount
+//---------------------------------------------------------------------------
+
 
 //===========================================================================
 // End of DefaultBinaryPathSelector.cpp

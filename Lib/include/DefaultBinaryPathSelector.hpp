@@ -52,7 +52,7 @@ class DLL_EXPORT DefaultBinaryPathSelector : public PathSelector
 
   //! Returns minimal bits count a register should have to drive a mux for number of path
   //!
-  static uint32_t RegWidthForPathCount(uint32_t pathCount) { return Utility::MinimalBitsForValue(pathCount); }
+  static uint32_t RegWidthForPathCount(uint32_t pathCount, bool canSelectNone);
 
   // ---------------- Protected Methods
   //

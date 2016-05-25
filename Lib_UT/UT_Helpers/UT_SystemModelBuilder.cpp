@@ -127,6 +127,160 @@ void UT_SystemModelBuilder::test_Create_TestCase_AccessInterface ()
 }
 
 
+//! Checks SystemModelBuilder::Create_TestCase_MIB()
+//!
+void UT_SystemModelBuilder::test_Create_TestCase_MIB_4_Chains ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder builder(sm);
+
+  // ---------------- Exercise
+  //
+  auto tap = builder.Create_TestCase_MIB("TAP", 4u);
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+  TS_ASSERT_NOT_NULLPTR (tap);
+  CxxTest::setAbortTestOnFail(false);
+
+  // With SystemModel checker
+  auto result = sm.Check();
+  TS_ASSERT_EQUALS (result, SystemModelCheckResult::None);
+
+  // Check with GmlPrinterVisitor
+
+  // With GML printer
+  GmlPrinterVisitor printer;
+  printer.DisplayIdentifier(true);
+  printer.DisplayRegisterValue(true);
+  printer.DisplayValueAsHex(true);
+
+  tap->Accept(printer);
+
+  auto gotGraph = printer.GetGraph();
+  auto expected = string("graph\n"
+                         "[\n"
+                         "   hierarchic 1 directed 1\n"
+                         "   node [ id 0 graphics [ type \"octagon\" fill \"#10FFFF\" w 90 h 43 ] LabelGraphics [ text \"(0)\n"
+                         "TAP\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 1 graphics [ type \"rectangle\" fill \"#59FF20\" w 142 h 126 ] LabelGraphics [ text \"(1)\n"
+                         "TAP_IR\n"
+                         "Width: 8\n"
+                         "Bypass:    0xFF\n"
+                         "Next to:   0xFF\n"
+                         "Last to:   0xFF\n"
+                         "Last from: 0xFF\n"
+                         "Expected:  0xFF\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" w 135 h 43 ] LabelGraphics [ text \"(2)\n"
+                         "TAP_DR_Mux\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 133 h 126 ] LabelGraphics [ text \"(3)\n"
+                         "TAP_BPY\n"
+                         "Width: 1\n"
+                         "Bypass:    0x8\n"
+                         "Next to:   0x8\n"
+                         "Last to:   0x8\n"
+                         "Last from: 0x8\n"
+                         "Expected:  0x8\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 4 graphics [ type \"ellipse\" fill \"#FFCC20\" w 90 h 43 ] LabelGraphics [ text \"(4)\n"
+                         "sut\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 304 h 126 ] LabelGraphics [ text \"(5)\n"
+                         "static\n"
+                         "Width: 64\n"
+                         "Bypass:    0x0000_0000:0000_0000\n"
+                         "Next to:   0x0000_0000:0000_0000\n"
+                         "Last to:   0x0000_0000:0000_0000\n"
+                         "Last from: 0x0000_0000:0000_0000\n"
+                         "Expected:  0x0000_0000:0000_0000\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 7 graphics [ type \"ellipse\" fill \"#FFCC20\" w 90 h 43 ] LabelGraphics [ text \"(7)\n"
+                         "MIB\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 6 graphics [ type \"rectangle\" fill \"#59FF20\" w 133 h 126 ] LabelGraphics [ text \"(6)\n"
+                         "MIB_ctrl\n"
+                         "Width: 2\n"
+                         "Bypass:    0x0\n"
+                         "Next to:   0x0\n"
+                         "Last to:   0x0\n"
+                         "Last from: 0x0\n"
+                         "Expected:  0x0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 8 graphics [ type \"trapezoid\" fill \"#FF3060\" w 106 h 43 ] LabelGraphics [ text \"(8)\n"
+                         "MIB_mux\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 9 graphics [ type \"rectangle\" fill \"#59FF20\" w 494 h 126 ] LabelGraphics [ text \"(9)\n"
+                         "dynamic_0\n"
+                         "Width: 128\n"
+                         "Bypass:    0x0000_0000:0000_0000:0000_0000:0000_0000\n"
+                         "Next to:   0x0000_0000:0000_0000:0000_0000:0000_0000\n"
+                         "Last to:   0x0000_0000:0000_0000:0000_0000:0000_0000\n"
+                         "Last from: 0x0000_0000:0000_0000:0000_0000:0000_0000\n"
+                         "Expected:  0x0000_0000:0000_0000:0000_0000:0000_0000\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 10 graphics [ type \"rectangle\" fill \"#59FF20\" w 494 h 126 ] LabelGraphics [ text \"(10)\n"
+                         "dynamic_1\n"
+                         "Width: 128\n"
+                         "Bypass:    0x0000_0000:0000_0000:0000_0000:0000_0000\n"
+                         "Next to:   0x0000_0000:0000_0000:0000_0000:0000_0000\n"
+                         "Last to:   0x0000_0000:0000_0000:0000_0000:0000_0000\n"
+                         "Last from: 0x0000_0000:0000_0000:0000_0000:0000_0000\n"
+                         "Expected:  0x0000_0000:0000_0000:0000_0000:0000_0000\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 11 graphics [ type \"rectangle\" fill \"#59FF20\" w 494 h 126 ] LabelGraphics [ text \"(11)\n"
+                         "dynamic_2\n"
+                         "Width: 128\n"
+                         "Bypass:    0x0000_0000:0000_0000:0000_0000:0000_0000\n"
+                         "Next to:   0x0000_0000:0000_0000:0000_0000:0000_0000\n"
+                         "Last to:   0x0000_0000:0000_0000:0000_0000:0000_0000\n"
+                         "Last from: 0x0000_0000:0000_0000:0000_0000:0000_0000\n"
+                         "Expected:  0x0000_0000:0000_0000:0000_0000:0000_0000\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 12 graphics [ type \"rectangle\" fill \"#59FF20\" w 494 h 126 ] LabelGraphics [ text \"(12)\n"
+                         "dynamic_3\n"
+                         "Width: 128\n"
+                         "Bypass:    0x0000_0000:0000_0000:0000_0000:0000_0000\n"
+                         "Next to:   0x0000_0000:0000_0000:0000_0000:0000_0000\n"
+                         "Last to:   0x0000_0000:0000_0000:0000_0000:0000_0000\n"
+                         "Last from: 0x0000_0000:0000_0000:0000_0000:0000_0000\n"
+                         "Expected:  0x0000_0000:0000_0000:0000_0000:0000_0000\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   edge [ source 0 target 1 label \"1\" ]\n"
+                         "   edge [ source 2 target 3 label \"1\" ]\n"
+                         "   edge [ source 4 target 5 label \"1\" ]\n"
+                         "   edge [ source 7 target 6 label \"1\" ]\n"
+                         "   edge [ source 8 target 9 label \"1\" ]\n"
+                         "   edge [ source 8 target 10 label \"2\" ]\n"
+                         "   edge [ source 8 target 11 label \"3\" ]\n"
+                         "   edge [ source 8 target 12 label \"4\" ]\n"
+                         "   edge [ source 8 target 6 graphics [ width 1 style \"dashed\" targetArrow \"standard\" ] ]\n"
+                         "   edge [ source 7 target 8 label \"2\" ]\n"
+                         "   edge [ source 4 target 7 label \"2\" ]\n"
+                         "   edge [ source 2 target 4 label \"2\" ]\n"
+                         "   edge [ source 2 target 1 graphics [ width 1 style \"dashed\" targetArrow \"standard\" ] ]\n"
+                         "   edge [ source 0 target 2 label \"2\" ]\n"
+                         "]"
+                        );
+  TS_ASSERT_EQUALS (gotGraph, expected);
+
+  // With "Pretty" printer
+  PrettyPrinterVisitor prettyPrinter;
+  tap->Accept(prettyPrinter);
+
+  auto gotPretty      = prettyPrinter.GetPrettyPrint();
+  auto expectedPretty = string("[Access_I](0)  \"TAP\"\n"
+                               " [Register](1)  \"TAP_IR\", length: 8, bypass: 1111_1111\n"
+                               " [Linker](2)    \"TAP_DR_Mux\"\n"
+                               "  :Selector:(1)  \"TAP_IR\"\n"
+                               "  [Register](3)  \"TAP_BPY\", length: 1, bypass: 1\n"
+                               "  [Chain](4)     \"sut\"\n"
+                               "   [Register](5)  \"static\", length: 64, bypass: 0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000\n"
+                               "   [Chain](7)     \"MIB\"\n"
+                               "    [Register](6)  \"MIB_ctrl\", length: 2, bypass: 00\n"
+                               "    [Linker](8)    \"MIB_mux\"\n"
+                               "     :Selector:(6)  \"MIB_ctrl\"\n"
+                               "     [Register](9)  \"dynamic_0\", length: 128, bypass: 0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000\n"
+                               "     [Register](10) \"dynamic_1\", length: 128, bypass: 0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000\n"
+                               "     [Register](11) \"dynamic_2\", length: 128, bypass: 0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000\n"
+                               "     [Register](12) \"dynamic_3\", length: 128, bypass: 0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000"
+                              );
+  TS_ASSERT_EQUALS (gotPretty, expectedPretty);
+}
+
+
 //! Checks SystemModelBuilder::Create_TestCase_1500()
 //!
 void UT_SystemModelBuilder::test_Create_TestCase_1500_3_Chains ()
@@ -246,7 +400,7 @@ void UT_SystemModelBuilder::test_Create_TestCase_1500_3_Chains ()
                          "Expected:  0x0000_0000:0000_0000:0000_0000:0000_0000\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 10 graphics [ type \"rectangle\" fill \"#59FF20\" w 133 h 126 ] LabelGraphics [ text \"(10)\n"
                          "WIR_reg\n"
-                         "Width: 3\n"
+                         "Width: 2\n"
                          "Bypass:    0x0\n"
                          "Next to:   0x0\n"
                          "Last to:   0x0\n"
@@ -300,7 +454,7 @@ void UT_SystemModelBuilder::test_Create_TestCase_1500_3_Chains ()
                                "        [Register](14) \"dynamic_0\", length: 128, bypass: 0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000\n"
                                "        [Register](15) \"dynamic_1\", length: 128, bypass: 0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000\n"
                                "        [Register](16) \"dynamic_2\", length: 128, bypass: 0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000\n"
-                               "      [Register](10) \"WIR_reg\", length: 3, bypass: 000"
+                               "      [Register](10) \"WIR_reg\", length: 2, bypass: 00"
                               );
   TS_ASSERT_EQUALS (gotPretty, expectedPretty);
 }

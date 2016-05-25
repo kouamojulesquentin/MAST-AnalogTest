@@ -67,11 +67,13 @@ class SystemModelBuilder final
                                                      );
 
   std::shared_ptr<mast::AccessInterface> Create_TestCase_AccessInterface (std::experimental::string_view name = "TAP");
-  std::shared_ptr<mast::AccessInterface> Create_TestCase_1500            (std::experimental::string_view name = "", uint32_t chainsCount = DEFAULT_WRAPPED_CORES);
+  std::shared_ptr<mast::AccessInterface> Create_TestCase_MIB             (std::experimental::string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
+  std::shared_ptr<mast::AccessInterface> Create_TestCase_1500            (std::experimental::string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
 
 
-  std::shared_ptr<mast::Chain>           Create_1500_Wrapper (std::experimental::string_view name,
-                                                              uint32_t                       maxDerivations);
+  std::shared_ptr<mast::AccessInterface> Create_Default_SUT  (std::experimental::string_view name);
+  std::shared_ptr<mast::Chain>           Create_Default_MIB  (std::experimental::string_view name, uint32_t maxDerivations);
+  std::shared_ptr<mast::Chain>           Create_1500_Wrapper (std::experimental::string_view name, uint32_t maxDerivations);
 
 
 //+  static std::shared_ptr<ParentNode>  Append (std::shared_ptr<SystemModelNode> child, std::shared_ptr<ParentNode> parent);

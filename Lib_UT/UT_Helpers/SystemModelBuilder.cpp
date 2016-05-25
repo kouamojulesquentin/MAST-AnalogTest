@@ -46,7 +46,55 @@ void SystemModelBuilder::AppendRegisters (uint32_t               count,
 //---------------------------------------------------------------------------
 
 
-//! Creates a wrapper for TAP
+//! Creates a MIB with a default (binary) selector
+//!
+std::shared_ptr<Chain> SystemModelBuilder::Create_Default_MIB (string_view name, uint32_t maxDerivations)
+{
+  // ---------------- Prepare default selector
+  //
+  auto selectorRegName = name.empty() ? string(DEFAULT_MIB_NAME) + MIB_CTRL_EXT : string(name) + MIB_CTRL_EXT;
+  auto selectorRegSize = DefaultBinaryPathSelector::RegWidthForPathCount(maxDerivations, false);
+  auto selectorReg     = m_model.CreateRegister (selectorRegName, BinaryVector(selectorRegSize, 0));
+  auto selector        = make_shared<DefaultBinaryPathSelector>(selectorReg, maxDerivations);
+
+  // ---------------- Create the mib
+  //
+  auto mib = Create_MIB(name, selector, selectorReg, MuxRegPlacement::BeforeMux);
+
+  return mib;
+}
+//
+//  End of: SystemModelBuilder::Create_Default_MIB
+//---------------------------------------------------------------------------
+
+
+
+//! Creates a default sut below a TAP
+//!
+shared_ptr<AccessInterface> SystemModelBuilder::Create_Default_SUT (string_view name)
+{
+  // ---------------- Create tap
+  //
+  auto tap   = m_model.CreateTap (name, DEFAULT_IR_LEN, DEFAULT_TDR_LEN);
+
+  // ---------------- Append "SUT"
+  //
+  auto sut = m_model.CreateChain    ("sut", tap);
+  auto reg = m_model.CreateRegister ("static", BinaryVector(STATIC_TDR_LEN, 0), sut);
+
+  // ---------------- Forward node appender from tap to sut
+  //
+  tap->SetChildAppender(sut);
+
+  return tap;
+}
+//
+//  End of: SystemModelBuilder::Create_Default_Sut
+//---------------------------------------------------------------------------
+
+
+
+//! Creates a "1500" style wrapper
 //!
 std::shared_ptr<Chain> SystemModelBuilder::Create_1500_Wrapper (string_view name, uint32_t maxDerivations)
 {
@@ -68,7 +116,7 @@ std::shared_ptr<Chain> SystemModelBuilder::Create_1500_Wrapper (string_view name
   // ---------------- WIR
   //
   auto totalDerivations = maxDerivations + 1u;   // +1 is to take into account bypass register (wirBypass)
-  auto wirSize          = DefaultBinaryPathSelector::RegWidthForPathCount(totalDerivations);
+  auto wirSize          = DefaultBinaryPathSelector::RegWidthForPathCount(totalDerivations, false);
   auto wirReg           = m_model.CreateRegister ("WIR_reg", BinaryVector(wirSize, 0));
   auto wirSelector      = make_shared<DefaultBinaryPathSelector>(wirReg, totalDerivations);
   auto wirMib           = Create_MIB("WIR", wirSelector, wirReg, MuxRegPlacement::Remote);
@@ -110,11 +158,43 @@ shared_ptr<AccessInterface> SystemModelBuilder::Create_TestCase_AccessInterface 
 //---------------------------------------------------------------------------
 
 
+//! Creates a MIB structure (with multiple insertion bits configuration)
+//!
+//! @note - There are multiple "dynamic" registers
+//!       - The control register is composed with multiple bits
+//!
+//! @param name           Name for top node
+//! @param registersCount Number of MIB mux derivations
+//!
+//! @return Top node of created sub-tree
+//!
+shared_ptr<AccessInterface> SystemModelBuilder::Create_TestCase_MIB (string_view name, uint32_t registersCount)
+{
+  // ---------------- Create SUT
+  //
+  auto tap = Create_Default_SUT(name);
+
+  // ---------------- Append MIB
+  //
+  auto mib = Create_Default_MIB("", registersCount);
+  tap->AppendChild(mib);
+  tap->SetChildAppender(mib);
+
+  // ---------------- Add registers
+  //
+  AppendRegisters(registersCount, "dynamic_", BinaryVector(DYNAMIC_TDR_LEN, 0), tap);
+
+  return tap;
+}
+//
+//  End of: SystemModelBuilder::Create_TestCase_MIB
+//---------------------------------------------------------------------------
+
+
 //! Creates a 1687 structure with multiple insertion bits configuration
 //!
 //! @note - There are multiple "dynamic" registers
 //!       - The control register is composed with multiple bits
-//!       - Many coding may be defined for segment selection
 //!
 //! @param name         Name for top node
 //! @param chainsCount  Number of mux derivations (excluding bypass register)
@@ -122,19 +202,14 @@ shared_ptr<AccessInterface> SystemModelBuilder::Create_TestCase_AccessInterface 
 //! @return Top node of created sub-tree
 shared_ptr<AccessInterface> SystemModelBuilder::Create_TestCase_1500 (string_view name, uint32_t chainsCount)
 {
-  // ---------------- Create tap
+  // ---------------- Create SUT
   //
-  auto tap   = m_model.CreateTap (name, DEFAULT_IR_LEN, DEFAULT_TDR_LEN);
-
-  // ---------------- Append "SUT"
-  //
-  auto chain = m_model.CreateChain    ("sut", tap);
-  auto reg   = m_model.CreateRegister ("static", BinaryVector(STATIC_TDR_LEN, 0), chain);
+  auto tap = Create_Default_SUT(name);
 
   // ---------------- Append 1500 wrapper
   //
   auto wrapper = Create_1500_Wrapper("", chainsCount);
-  chain->AppendChild(wrapper);
+  tap->AppendChild(wrapper);
 
   // ---------------- Add 1500 wrapped cores (registers)
   //

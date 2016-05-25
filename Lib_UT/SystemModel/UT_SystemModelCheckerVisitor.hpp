@@ -49,6 +49,8 @@ class UT_SystemModelCheckerVisitor : public CxxTest::TestSuite
   void test_CheckTree_NodeAppendedTwice ();
   void test_CheckTree_NodeAppendedTwice_SameParent_1 ();
   void test_CheckTree_NodeAppendedTwice_SameParent_2 ();
+  void test_CheckTree_NodeAppended_ToSelf_Last();
+  void test_CheckTree_NodeAppended_ToSelf_Middle();
 
   void test_CheckTree_When_Linker_Less_Children ();
   void test_CheckTree_When_Linker_More_Children ();

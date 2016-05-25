@@ -414,6 +414,77 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_NodeAppendedTwice_SameParent_2
   TS_ASSERT_EQUALS (report, expectedReport);
 }
 
+
+//! Checks SystemModelCheckerVisitor::CheckTree() with a node has been added into itself (last child)
+//!
+void UT_SystemModelCheckerVisitor::test_CheckTree_NodeAppended_ToSelf_Last ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  auto tap   = sm.CreateTap("", 6u, 2u);
+  auto chain = sm.CreateChain("Chain_1", tap);
+  auto reg_1 = sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("1"),  chain);
+  auto reg_2 = sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("10"), chain);
+  chain->AppendChild(chain);
+
+  SystemModelCheckerVisitor sut(sm);
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.CheckTree());
+
+  // ---------------- Verify
+  //
+  auto result = sut.MakeCheckResult();
+  TS_ASSERT_TRUE   (result.HasIssues());
+
+  auto   report         = result.MakeReport();
+  string expectedReport = "Errors   (1):\n"
+                          "  - Chain 'Chain_1' (id: 4) has been appended into itself\n"
+                          "Warnings (0):\n"
+                          "Infos    (0):\n";
+
+  TS_ASSERT_EQUALS (report, expectedReport);
+}
+
+
+//! Checks SystemModelCheckerVisitor::CheckTree() with a node has been added into itself (middle child)
+//!
+void UT_SystemModelCheckerVisitor::test_CheckTree_NodeAppended_ToSelf_Middle ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  auto tap   = sm.CreateTap("", 6u, 2u);
+  auto chain = sm.CreateChain("Chain_1", tap);
+  auto reg_1 = sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("1"),  chain);
+  chain->AppendChild(chain);
+  auto reg_2 = sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("10"), chain);
+
+  SystemModelCheckerVisitor sut(sm);
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.CheckTree());
+
+  // ---------------- Verify
+  //
+  auto result = sut.MakeCheckResult();
+  TS_ASSERT_TRUE   (result.HasIssues());
+
+  auto   report         = result.MakeReport();
+  string expectedReport = "Errors   (3):\n"
+                          "  - Linker 'TAP_DR_Mux' (id: 2) has 3 children, even though it can only multiplex 2 paths\n"
+                          "  - Chain 'Chain_1' (id: 4) has been appended into itself\n"
+                          "  - Register 'Reg_2' (id: 6), child of Linker 'TAP_DR_Mux' (id: 2), is also child of Chain 'Chain_1' (id: 4)\n"
+                          "Warnings (0):\n"
+                          "Infos    (0):\n";
+
+  TS_ASSERT_EQUALS (report, expectedReport);
+}
+
+
 //! Checks SystemModelCheckerVisitor::CheckTree() when linker has less children than can be selected
 //!
 void UT_SystemModelCheckerVisitor::test_CheckTree_When_Linker_Less_Children ()
@@ -439,7 +510,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_When_Linker_Less_Children ()
   auto   report         = result.MakeReport();
   string expectedReport = "Errors   (0):\n"
                           "Warnings (1):\n"
-                          "  - Linker 'TAP_DR_Mux' (id: 2) has only 3 children, even so it can multiplex 4 paths\n"
+                          "  - Linker 'TAP_DR_Mux' (id: 2) has only 3 children, even though it can multiplex 4 paths\n"
                           "Infos    (0):\n";
 
   TS_ASSERT_EQUALS (report, expectedReport);
@@ -472,7 +543,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_When_Linker_More_Children ()
 
   auto   report         = result.MakeReport();
   string expectedReport = "Errors   (1):\n"
-                          "  - Linker 'TAP_DR_Mux' (id: 2) has 5 children, even so it can only multiplex 4 paths\n"
+                          "  - Linker 'TAP_DR_Mux' (id: 2) has 5 children, even though it can only multiplex 4 paths\n"
                           "Warnings (0):\n"
                           "Infos    (0):\n";
 
@@ -503,7 +574,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_When_Linker_CanSelect_0_Path (
   auto   report         = result.MakeReport();
   string expectedReport = "Errors   (2):\n"
                           "  - Linker 'TAP_DR_Mux' (id: 2) has a selector that can multiplex no path at all\n"
-                          "  - Linker 'TAP_DR_Mux' (id: 2) has 1 child, even so it can only multiplex 0 paths\n"
+                          "  - Linker 'TAP_DR_Mux' (id: 2) has 1 child, even though it can only multiplex 0 paths\n"
                           "Warnings (0):\n"
                           "Infos    (0):\n";
 

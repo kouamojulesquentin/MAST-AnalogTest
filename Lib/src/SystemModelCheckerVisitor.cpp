@@ -174,22 +174,29 @@ void SystemModelCheckerVisitor::CheckParentNode (shared_ptr<const ParentNode> pa
   {
     while (nextChild)
     {
-      auto checkedOnce = CheckChildNode(parent, nextChild);
-
-      if (!checkedOnce)
+      if (nextChild == parent)
       {
-        break;  // Avoid infinite loop when a node has been appended twice (same parent or not)
+        ReportError(*nextChild, " has been appended into itself");
       }
       else
       {
-        nextChild->Accept(*this);   // Do check specific to node type
+        auto checkedOnce = CheckChildNode(parent, nextChild);
 
-        // ---------------- Recurse when child is also a parent
-        //
-        auto asParentNode = dynamic_pointer_cast<const ParentNode>(nextChild);
-        if (asParentNode)
+        if (!checkedOnce)
         {
-          CheckParentNode(asParentNode);
+          break;  // Avoid infinite loop when a node has been appended twice (same parent or not)
+        }
+        else
+        {
+          nextChild->Accept(*this);   // Do check specific to node type
+
+          // ---------------- Recurse when child is also a parent
+          //
+          auto asParentNode = dynamic_pointer_cast<const ParentNode>(nextChild);
+          if (asParentNode)
+          {
+            CheckParentNode(asParentNode);
+          }
         }
       }
 
@@ -396,7 +403,7 @@ void SystemModelCheckerVisitor::VisitLinker (Linker& linker)
     {
       ostringstream os;
       Stream(os, linker) << " has only "  << childrenCount   << (childrenCount == 1 ? " child" : " children");
-      os << ", even so it can multiplex " << selectablePaths << " paths";
+      os << ", even though it can multiplex " << selectablePaths << " paths";
 
       ReportWarning(os.str());
     }
@@ -404,7 +411,7 @@ void SystemModelCheckerVisitor::VisitLinker (Linker& linker)
     {
       ostringstream os;
       Stream(os, linker) << " has "  << childrenCount << (childrenCount == 1 ? " child" : " children");
-      os << ", even so it can only multiplex " << selectablePaths << " paths";
+      os << ", even though it can only multiplex " << selectablePaths << " paths";
 
       ReportError(os.str());
     }

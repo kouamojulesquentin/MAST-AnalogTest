@@ -38,6 +38,8 @@ class DLL_EXPORT Register : public SystemModelNode
   //
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
 
+  virtual std::experimental::string_view TypeName() const override { return "Register"; } //!< Returns readable type name
+
   //!< Checks that last received sequence equals expected one
   //!<
   //!< @note  It increments internal mismatch count in case of failure

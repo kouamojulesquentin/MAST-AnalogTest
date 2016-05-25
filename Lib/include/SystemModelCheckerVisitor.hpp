@@ -47,47 +47,66 @@ class DLL_EXPORT SystemModelCheckerVisitor final : public SystemModelVisitor
   virtual void VisitLinker          (Linker&          linker)          override;
   virtual void VisitRegister        (Register&        reg)             override;
 
-  //! Checks SystemModel coherence
+  //! Checks SystemModel consistency
   //!
-  //! @note
-  //!   - Each node has one and only one parent (except root that has no parent)
-  //!   - Each parent node has at least one child otherwise a warning is issued
-  //!   - Each child is only appended once in its parent
-  //!   - Each node is reachable (no dangling node)
-  //!   - Unused id generates a warning
-  //!   - Each linker has a number of chidren that matches its selector or an warning is issued when there are to few
-  //!     children and an error when there are too much
+  //! @see CheckIdentifiers and CheckTree
   //!
   SystemModelCheckResult Check();
 
-  //! Checks coherence of identifiers:
+  //! Checks consistency of identifiers:
   //!
   //! @note - Each used identifier must refere to a node that has the very same identifier
   //!       - Unused identifiers are collected as "info"
   //!
   void CheckIdentifiers ();
 
+  //! Checks consistency of SystemModel tree structure
+  //!
+  //! @note
+  //!   - Each parent node has at least one child otherwise a warning is issued
+  //!   - Each node is managed by the SystemModel
+  //!   - Each node is reachable (no dangling node)
+  //!   - Each node has one and only one parent (except root that has no parent)
+  //!   - Each child is only appended once in its parent
+  //!   - Each linker has a number of children that matches its selector or an warning is issued when there are to few
+  //!     children and an error when there are too much
+  //!
+  void CheckTree ();
+
   //! Builds up a SystemModelCheckResult from currently selected issues
   //!
   SystemModelCheckResult  MakeCheckResult();
 
-  // ---------------- Protected Methods
-  //
-  protected:
-
   // ---------------- Private  Methods
   //
   private:
+  void CheckParentNode (std::shared_ptr<const ParentNode> parent);
+  bool CheckChildNode  (std::shared_ptr<const ParentNode> parent, std::shared_ptr<const SystemModelNode> child);
+
   void Report (std::experimental::string_view  message, uint32_t& counter, std::ostringstream& os);
 
   void ReportInfo    (std::experimental::string_view message) { Report(message, m_infosCount,    m_infos);    }
   void ReportWarning (std::experimental::string_view message) { Report(message, m_warningsCount, m_warnings); }
   void ReportError   (std::experimental::string_view message) { Report(message, m_errorsCount,   m_errors);   }
 
+  void ReportWarning (const SystemModelNode& node, std::experimental::string_view message);
+  void ReportError   (const SystemModelNode& node, std::experimental::string_view message);
+
+  static std::ostringstream& Stream(std::ostringstream& os, std::experimental::string_view header, const SystemModelNode& node);
+  static std::ostringstream& Stream(std::ostringstream& os, const SystemModelNode& node) { return Stream(os, "", node); }
+
   // ---------------- Private  Fields
   //
   private:
   using TIdentifierMapping = SystemModel::TIdentifierMapping;
+  struct CollectedNodeInfo
+  {
+    std::shared_ptr<const ParentNode>      parent;
+    std::shared_ptr<const SystemModelNode> node;
+  };
+
+  using TCollectedNodeInfo = std::vector<CollectedNodeInfo>;
+  TCollectedNodeInfo                m_collectedNodeInfo; //!< Collects nodes info when scanning tree structure
 
   std::shared_ptr<const ParentNode> m_root;              //!< First (top) node of system model tree
   TIdentifierMapping                m_identifierMapping; //!< Maps a node identifier to a node instance

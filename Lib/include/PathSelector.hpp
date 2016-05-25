@@ -49,6 +49,8 @@ class PathSelector
 
   virtual void Accept   (SystemModelVisitor& visitor) = 0;   //!< Forward call to any embedded SystemModelNode (or do nothing)
 
+  virtual uint32_t SelectablePaths() const = 0; //!< Returns the maximum number of selectable paths (max value for IsActive, Select and Deselect)
+
   // ---------------- Protected Methods
   //
   virtual ~PathSelector() = default;

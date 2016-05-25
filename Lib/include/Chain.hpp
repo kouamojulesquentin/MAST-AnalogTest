@@ -36,6 +36,8 @@ class DLL_EXPORT Chain : public ParentNode
   Chain(std::experimental::string_view name) : ParentNode(name) {}
 
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
+
+  virtual std::experimental::string_view TypeName() const override { return "Chain"; } //!< Returns readable type name
 };
 //
 //  End of Chain class declaration

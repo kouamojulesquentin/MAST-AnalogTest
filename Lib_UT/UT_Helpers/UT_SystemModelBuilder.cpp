@@ -17,6 +17,8 @@
 #include "GmlPrinterVisitor.hpp"
 #include "PrettyPrinterVisitor.hpp"
 
+#include "SystemModelCheckResult_Traits.hpp"
+
 #include <cxxtest/ValueTraits.h>
 
 using std::string;
@@ -54,6 +56,12 @@ void UT_SystemModelBuilder::test_Create_TestCase_AccessInterface ()
   CxxTest::setAbortTestOnFail(true);
 
   TS_ASSERT_NOT_NULLPTR (tap);
+
+  // Check with SystemModel checker
+  auto result = sm.Check();
+  TS_ASSERT_EQUALS (result, SystemModelCheckResult::None);
+
+  // Check with GmlPrinterVisitor
   GmlPrinterVisitor printer;
   printer.DisplayIdentifier(true);
   printer.DisplayRegisterValue(true);
@@ -137,6 +145,12 @@ void UT_SystemModelBuilder::test_Create_TestCase_1500_3_Chains ()
   CxxTest::setAbortTestOnFail(true);
   TS_ASSERT_NOT_NULLPTR (tap);
   CxxTest::setAbortTestOnFail(false);
+
+  // With SystemModel checker
+  auto result = sm.Check();
+  TS_ASSERT_EQUALS (result, SystemModelCheckResult::None);
+
+  // Check with GmlPrinterVisitor
 
   // With GML printer
   GmlPrinterVisitor printer;

@@ -23,14 +23,15 @@ using namespace mast;
 //! Initializes selector for fast selection/deselection of a path
 //!
 //! @param associatedNode   Register that is used to drive the path multiplexer
-//! @param pathCount        Number of managed paths
+//! @param pathsount        Number of managed paths (including, optional, bypass register)
 //! @param isInverted       When true the bits for selecting a path are inverted (relative to the path identifier number)
 //! @param canSelectNone    When true zero is reserved to select 'no path' otherwise 0 is used to select first path
 //!                         (provided it is not inverted)
 //!
-DefaultBinaryPathSelector::DefaultBinaryPathSelector(shared_ptr<SystemModelNode> associatedNode, uint32_t pathCount, bool isInverted, bool canSelectNone)
-  : m_select        (CreateSelectTable   (pathCount, isInverted, canSelectNone))
-  , m_deselect      (CreateDeselectTable (pathCount, isInverted))
+DefaultBinaryPathSelector::DefaultBinaryPathSelector(shared_ptr<SystemModelNode> associatedNode, uint32_t pathsCount, bool isInverted, bool canSelectNone)
+  : m_pathsCount    (pathsCount)
+  , m_select        (CreateSelectTable   (pathsCount, isInverted, canSelectNone))
+  , m_deselect      (CreateDeselectTable (pathsCount, isInverted))
   , m_muxRegister   (std::dynamic_pointer_cast<Register>(associatedNode))
   , m_canSelectNone (canSelectNone)
 {

@@ -28,11 +28,32 @@ class UT_SystemModelCheckerVisitor : public CxxTest::TestSuite
 
   // ================ Test Methods ================
 
+  // ---------------- Constructor
+  //
   void test_Constructor_From_EmptyModel ();
   void test_Constructor_From_ModelWithTap ();
 
+  // ---------------- CheckIdentifiers
+  //
+  void test_CheckIdentifiers_With_EmptyModel ();
   void test_CheckIdentifiers_With_ModelWithTap ();
   void test_CheckIdentifiers_With_UnusedIdentifier ();
+
+  // ---------------- CheckTree
+  //
+  void test_CheckTree_With_EmptyModel ();
+  void test_CheckTree_With_ModelWithTap ();
+  void test_CheckTree_ParentWithoutChild ();
+  void test_CheckTree_UnmanagedNode ();
+  void test_CheckTree_UnreachableNode ();
+  void test_CheckTree_NodeAppendedTwice ();
+  void test_CheckTree_NodeAppendedTwice_SameParent_1 ();
+  void test_CheckTree_NodeAppendedTwice_SameParent_2 ();
+
+  void test_CheckTree_When_Linker_Less_Children ();
+  void test_CheckTree_When_Linker_More_Children ();
+  void test_CheckTree_When_Linker_CanSelect_0_Path ();
+  void test_CheckTree_When_Linker_CanSelect_1_Path ();
 
   // ================ Other Methods ================
 

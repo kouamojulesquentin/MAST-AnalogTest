@@ -69,6 +69,7 @@ class DLL_EXPORT Linker : public ParentNode
 
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
 
+  virtual std::experimental::string_view TypeName() const override { return "Linker"; } //!< Returns readable type name
 
   std::shared_ptr<PathSelector> GetPathSelector() const { return m_pathSelector; }
 

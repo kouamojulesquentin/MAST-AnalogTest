@@ -37,7 +37,7 @@ constexpr char DEFAULT_TAP_IR_NAME[]      = "TAP_IR";
 constexpr char DEFAULT_TAP_MUX_NAME[]     = "TAP_DR_Mux";
 constexpr char DEFAULT_TAP_MUX_BPY_NAME[] = "TAP_BPY";
 
-//! Abstract base for common features for system model nodes
+//! Abstract base for common features of system model nodes
 //!
 class DLL_EXPORT SystemModelNode
 {
@@ -50,6 +50,8 @@ class DLL_EXPORT SystemModelNode
 
 
   virtual void Accept        (SystemModelVisitor& visitor) = 0;   //!< Visited part of the Visitor pattern
+
+  virtual std::experimental::string_view TypeName() const = 0;          //!< Returns readable type name
 
   // ---------------- Setters
   //

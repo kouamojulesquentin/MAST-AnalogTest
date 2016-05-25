@@ -54,6 +54,8 @@ class DLL_EXPORT AccessInterface : public ParentNode
 
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
 
+  virtual std::experimental::string_view TypeName() const override { return "AccessInterface"; } //!< Returns readable type name
+
   // ---------------- Protected Methods
   //
   protected:

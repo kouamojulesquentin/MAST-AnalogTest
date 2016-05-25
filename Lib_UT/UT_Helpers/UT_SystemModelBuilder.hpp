@@ -29,6 +29,7 @@ class UT_SystemModelBuilder : public CxxTest::TestSuite
 
   void test_Create_TestCase_AccessInterface ();
   void test_Create_TestCase_MIB_4_Chains ();
+  void test_Create_TestCase_1687 ();
   void test_Create_TestCase_1500_3_Chains ();
 
   // ================ Other Methods ================

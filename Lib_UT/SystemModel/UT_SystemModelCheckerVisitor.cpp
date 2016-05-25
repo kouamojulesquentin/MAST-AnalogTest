@@ -475,7 +475,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_NodeAppended_ToSelf_Middle ()
 
   auto   report         = result.MakeReport();
   string expectedReport = "Errors   (3):\n"
-                          "  - Linker 'TAP_DR_Mux' (id: 2) has 3 children, even though it can only multiplex 2 paths\n"
+                          "  - Linker 'TAP_DR_Mux' (id: 2) has 3 children, even though it can only select 2 paths\n"
                           "  - Chain 'Chain_1' (id: 4) has been appended into itself\n"
                           "  - Register 'Reg_2' (id: 6), child of Linker 'TAP_DR_Mux' (id: 2), is also child of Chain 'Chain_1' (id: 4)\n"
                           "Warnings (0):\n"
@@ -510,7 +510,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_When_Linker_Less_Children ()
   auto   report         = result.MakeReport();
   string expectedReport = "Errors   (0):\n"
                           "Warnings (1):\n"
-                          "  - Linker 'TAP_DR_Mux' (id: 2) has only 3 children, even though it can multiplex 4 paths\n"
+                          "  - Linker 'TAP_DR_Mux' (id: 2) has only 3 children, even though it can select 4 paths\n"
                           "Infos    (0):\n";
 
   TS_ASSERT_EQUALS (report, expectedReport);
@@ -543,7 +543,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_When_Linker_More_Children ()
 
   auto   report         = result.MakeReport();
   string expectedReport = "Errors   (1):\n"
-                          "  - Linker 'TAP_DR_Mux' (id: 2) has 5 children, even though it can only multiplex 4 paths\n"
+                          "  - Linker 'TAP_DR_Mux' (id: 2) has 5 children, even though it can only select 4 paths\n"
                           "Warnings (0):\n"
                           "Infos    (0):\n";
 
@@ -573,8 +573,8 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_When_Linker_CanSelect_0_Path (
 
   auto   report         = result.MakeReport();
   string expectedReport = "Errors   (2):\n"
-                          "  - Linker 'TAP_DR_Mux' (id: 2) has a selector that can multiplex no path at all\n"
-                          "  - Linker 'TAP_DR_Mux' (id: 2) has 1 child, even though it can only multiplex 0 paths\n"
+                          "  - Linker 'TAP_DR_Mux' (id: 2) has a selector that can select no path at all\n"
+                          "  - Linker 'TAP_DR_Mux' (id: 2) has 1 child, even though it can only select 0 paths\n"
                           "Warnings (0):\n"
                           "Infos    (0):\n";
 
@@ -605,7 +605,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_When_Linker_CanSelect_1_Path (
   auto   report         = result.MakeReport();
   string expectedReport = "Errors   (0):\n"
                           "Warnings (1):\n"
-                          "  - Linker 'TAP_DR_Mux' (id: 2) has a selector that can multiplex only 1 path\n"
+                          "  - Linker 'TAP_DR_Mux' (id: 2) has a selector that can select only 1 path (and cannot select none)\n"
                           "Infos    (0):\n";
 
   TS_ASSERT_EQUALS (report, expectedReport);

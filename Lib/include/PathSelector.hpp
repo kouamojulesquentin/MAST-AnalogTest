@@ -29,27 +29,36 @@ class PathSelector
   //
   public:
 
+
   //! Returns true when the specified path is already selected
   //!
   //! @param pathIdentifier   Path identifier in range [1..nb_path]
   //!
-  virtual bool IsActive (uint32_t pathIdentifier) const = 0; //!< Returns true when the specified path is already selected
+  virtual bool IsActive (uint32_t pathIdentifier) const = 0;
 
   //! Request deactivation of the specified path
   //!
   //! @param pathIdentifier   Path identifier in range [1..nb_path]
   //!
-  virtual void Deselect (uint32_t pathIdentifier) = 0;       //!< Request deactivation of the specified path
+  virtual void Deselect (uint32_t pathIdentifier) = 0;
 
   //! Request activation of the specified path
   //!
   //! @param pathIdentifier   Path identifier in range [1..nb_path]
   //!
-  virtual void Select   (uint32_t pathIdentifier) = 0;       //!< Request activation of the specified path
+  virtual void Select   (uint32_t pathIdentifier) = 0;
 
-  virtual void Accept   (SystemModelVisitor& visitor) = 0;   //!< Forward call to any embedded SystemModelNode (or do nothing)
+  //! Forwards call to any embedded SystemModelNode (or do nothing)
+  //!
+  virtual void Accept   (SystemModelVisitor& visitor) = 0;
 
-  virtual uint32_t SelectablePaths() const = 0; //!< Returns the maximum number of selectable paths (max value for IsActive, Select and Deselect)
+  //! Returns the maximum number of selectable paths (max value for IsActive, Select and Deselect)
+  //!
+  virtual uint32_t SelectablePaths() const = 0;
+
+  //! Returns true if selector can select nothing (passthrough mode), false otherwise
+  //!
+  virtual bool CanSelectNone() const = 0;
 
   // ---------------- Protected Methods
   //

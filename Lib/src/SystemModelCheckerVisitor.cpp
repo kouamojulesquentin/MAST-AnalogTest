@@ -392,18 +392,21 @@ void SystemModelCheckerVisitor::VisitLinker (Linker& linker)
 
     if      (selectablePaths == 0)
     {
-      ReportError(linker, " has a selector that can multiplex no path at all");
+      ReportError(linker, " has a selector that can select no path at all");
     }
     else if (selectablePaths == 1)
     {
-      ReportWarning(linker, " has a selector that can multiplex only 1 path");
+      if (!pathSelector->CanSelectNone())
+      {
+        ReportWarning(linker, " has a selector that can select only 1 path (and cannot select none)");
+      }
     }
 
     if (childrenCount < selectablePaths)
     {
       ostringstream os;
       Stream(os, linker) << " has only "  << childrenCount   << (childrenCount == 1 ? " child" : " children");
-      os << ", even though it can multiplex " << selectablePaths << " paths";
+      os << ", even though it can select " << selectablePaths << " paths";
 
       ReportWarning(os.str());
     }
@@ -411,12 +414,11 @@ void SystemModelCheckerVisitor::VisitLinker (Linker& linker)
     {
       ostringstream os;
       Stream(os, linker) << " has "  << childrenCount << (childrenCount == 1 ? " child" : " children");
-      os << ", even though it can only multiplex " << selectablePaths << " paths";
+      os << ", even though it can only select " << selectablePaths << " paths";
 
       ReportError(os.str());
     }
   }
-
 }
 //
 //  End of: SystemModelCheckerVisitor::VisitLinker

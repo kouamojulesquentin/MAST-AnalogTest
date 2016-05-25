@@ -18,6 +18,7 @@
 #include "SystemModel.hpp"
 #include <memory>
 #include <experimental/string_view>
+using namespace std::string_literals;
 
 namespace mast
 {
@@ -66,12 +67,24 @@ class SystemModelBuilder final
                                                      MuxRegPlacement                     muxRegPlacement
                                                      );
 
+  std::shared_ptr<mast::Chain>           Create_SIB (std::experimental::string_view      name,
+                                                     std::shared_ptr<mast::PathSelector> selector,
+                                                     std::shared_ptr<mast::Register>     selectorRegister,
+                                                     MuxRegPlacement                     muxRegPlacement
+                                                     )
+  {
+    return Create_MIB(name, selector, selectorRegister, muxRegPlacement);
+  }
+
+
   std::shared_ptr<mast::AccessInterface> Create_TestCase_AccessInterface (std::experimental::string_view name = "TAP");
+  std::shared_ptr<mast::AccessInterface> Create_TestCase_1687            (std::experimental::string_view name = "");
   std::shared_ptr<mast::AccessInterface> Create_TestCase_MIB             (std::experimental::string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
   std::shared_ptr<mast::AccessInterface> Create_TestCase_1500            (std::experimental::string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
 
 
   std::shared_ptr<mast::AccessInterface> Create_Default_SUT  (std::experimental::string_view name);
+  std::shared_ptr<mast::Chain>           Create_Default_SIB  (std::experimental::string_view name);
   std::shared_ptr<mast::Chain>           Create_Default_MIB  (std::experimental::string_view name, uint32_t maxDerivations);
   std::shared_ptr<mast::Chain>           Create_1500_Wrapper (std::experimental::string_view name, uint32_t maxDerivations);
 
@@ -99,7 +112,8 @@ class SystemModelBuilder final
   static constexpr char*    DEFAULT_SIB_NAME      = "SIB";
   static constexpr char*    MIB_CTRL_EXT          = "_ctrl";
   static constexpr char*    MIB_MUX_EXT           = "_mux";
-
+  static constexpr char*    SIB_CTRL_EXT          = "_ctrl";
+  static constexpr char*    SIB_MUX_EXT           = "_mux";
   mast::SystemModel& m_model;
 };
 //

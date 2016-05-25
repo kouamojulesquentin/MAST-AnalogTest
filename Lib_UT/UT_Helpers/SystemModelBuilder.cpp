@@ -68,6 +68,30 @@ std::shared_ptr<Chain> SystemModelBuilder::Create_Default_MIB (string_view name,
 //---------------------------------------------------------------------------
 
 
+//! Creates a SIB (1687) with a default (binary) selector
+//!
+std::shared_ptr<Chain> SystemModelBuilder::Create_Default_SIB (string_view name)
+{
+  // ---------------- Prepare default selector
+  //
+  auto sibName = name.empty() ? string_view(DEFAULT_SIB_NAME) : name;
+
+  auto selectorRegName = string(sibName) + SIB_CTRL_EXT;
+  auto selectorRegSize = DefaultBinaryPathSelector::RegWidthForPathCount(1u, true);
+  auto selectorReg     = m_model.CreateRegister (selectorRegName, BinaryVector(selectorRegSize, 0));
+  auto selector        = make_shared<DefaultBinaryPathSelector>(selectorReg, 1, false, true);
+
+  // ---------------- Create the sib (a mib with only one possible derivation)
+  //
+  auto sib = Create_MIB(sibName, selector, selectorReg, MuxRegPlacement::BeforeMux);
+
+  return sib;
+}
+//
+//  End of: SystemModelBuilder::Create_Default_SIB
+//---------------------------------------------------------------------------
+
+
 
 //! Creates a default sut below a TAP
 //!
@@ -75,7 +99,7 @@ shared_ptr<AccessInterface> SystemModelBuilder::Create_Default_SUT (string_view 
 {
   // ---------------- Create tap
   //
-  auto tap   = m_model.CreateTap (name, DEFAULT_IR_LEN, DEFAULT_TDR_LEN);
+  auto tap = m_model.CreateTap (name, DEFAULT_IR_LEN, DEFAULT_TDR_LEN);
 
   // ---------------- Append "SUT"
   //
@@ -188,6 +212,38 @@ shared_ptr<AccessInterface> SystemModelBuilder::Create_TestCase_MIB (string_view
 }
 //
 //  End of: SystemModelBuilder::Create_TestCase_MIB
+//---------------------------------------------------------------------------
+
+
+//! Creates a SIB (1687) structure (single insertion bits configuration)
+//!
+//! @note - There is single "dynamic" register
+//!       - The control register has a single bit
+//!
+//! @param name Name for top node
+//!
+//! @return Top node of created sub-tree
+//!
+shared_ptr<AccessInterface> SystemModelBuilder::Create_TestCase_1687 (string_view name)
+{
+  // ---------------- Create SUT
+  //
+  auto tap = Create_Default_SUT(name);
+
+  // ---------------- Append SIB
+  //
+  auto sib = Create_Default_SIB(DEFAULT_SIB_NAME);
+  tap->AppendChild(sib);
+  tap->SetChildAppender(sib);
+
+  // ---------------- Add register
+  //
+  m_model.CreateRegister("dynamic", BinaryVector(DYNAMIC_TDR_LEN, 0), tap);
+
+  return tap;
+}
+//
+//  End of: SystemModelBuilder::Create_TestCase_1687
 //---------------------------------------------------------------------------
 
 

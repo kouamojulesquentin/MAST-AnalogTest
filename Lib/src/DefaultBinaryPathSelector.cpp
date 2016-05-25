@@ -224,9 +224,13 @@ void DefaultBinaryPathSelector::Select (uint32_t pathIdentifier)
 //!
 uint32_t DefaultBinaryPathSelector::RegWidthForPathCount (uint32_t pathCount, bool canSelectNone)
 {
-  if (pathCount < 2)
+  if       (pathCount == 0)
   {
-    THROW_INVALID_ARGUMENT("A path selector with less than 2 paths count is not valid");
+    THROW_INVALID_ARGUMENT("A path selector with 0 path count is not valid");
+  }
+  else if ((pathCount == 1) && !canSelectNone)
+  {
+    THROW_INVALID_ARGUMENT("A path selector with 1 path count is not valid when cannot select none");
   }
 
   uint32_t maxValue = canSelectNone ? pathCount : pathCount - 1;

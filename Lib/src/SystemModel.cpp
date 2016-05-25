@@ -17,11 +17,13 @@
 #include "DefaultBinaryPathSelector.hpp"
 #include "AccessInterfaceProtocol_1149_1.hpp"
 #include "SystemModelCheckerVisitor.hpp"
+#include <string>
 
 using namespace mast;
 using std::shared_ptr;
 using std::make_shared;
 using std::dynamic_pointer_cast;
+using std::string;
 using std::experimental::string_view;
 
 
@@ -168,28 +170,29 @@ shared_ptr<AccessInterface> SystemModel::CreateTap (string_view name,
                                                     uint32_t    irBitsCount,
                                                     uint32_t    muxPathsCount)
 {
-  if (name.empty())
-  {
-    name = DEFAULT_TAP_NAME;
-  }
+  auto noName     = name.empty();
+  auto rootName   = noName ? DEFAULT_TAP_NAME         : name;
+  auto irName     = noName ? DEFAULT_TAP_IR_NAME      : string(name) + DEFAULT_TAP_IR_EXT;
+  auto muxName    = noName ? DEFAULT_TAP_MUX_NAME     : string(name) + DEFAULT_TAP_MUX_EXT;
+  auto muxBpyName = noName ? DEFAULT_TAP_MUX_BPY_NAME : string(name) + DEFAULT_TAP_MUX_BPY_EXT;
 
   auto protocol        = make_shared<AccessInterfaceProtocol_1149_1>();
-  auto accessInterface = CreateAccessInterface(name, protocol);
+  auto accessInterface = CreateAccessInterface(rootName, protocol);
 
   // ---------------- Create IR
   //
   auto irBypassSequence = BinaryVector(irBitsCount, 0xFF);
-  auto ir               = CreateRegister(DEFAULT_TAP_IR_NAME, irBypassSequence, accessInterface);
+  auto ir               = CreateRegister(irName, irBypassSequence, accessInterface);
 
   // ---------------- Create Linker
   //
   auto pathSelector = make_shared<DefaultBinaryPathSelector>(ir, muxPathsCount);
-  auto linker       = CreateLinker(DEFAULT_TAP_MUX_NAME, pathSelector, accessInterface);
+  auto linker       = CreateLinker(muxName, pathSelector, accessInterface);
 
   // ---------------- Create bypass register
   //
   auto bypassBypassSequence = BinaryVector(1, 0xFF);
-  auto bypassRegister       = CreateRegister(DEFAULT_TAP_MUX_BPY_NAME, bypassBypassSequence, linker);
+  auto bypassRegister       = CreateRegister(muxBpyName, bypassBypassSequence, linker);
 
   // ---------------- Set AccessInterface to forward append to the linker
   //

@@ -36,6 +36,9 @@ constexpr char DEFAULT_TAP_NAME[]         = "1149_1_TAP";
 constexpr char DEFAULT_TAP_IR_NAME[]      = "TAP_IR";
 constexpr char DEFAULT_TAP_MUX_NAME[]     = "TAP_DR_Mux";
 constexpr char DEFAULT_TAP_MUX_BPY_NAME[] = "TAP_BPY";
+constexpr char DEFAULT_TAP_IR_EXT[]       = "_IR";
+constexpr char DEFAULT_TAP_MUX_EXT[]      = "_DR_Mux";
+constexpr char DEFAULT_TAP_MUX_BPY_EXT[]  = "_BPY";
 
 //! Abstract base for common features of system model nodes
 //!

@@ -58,19 +58,21 @@ std::shared_ptr<Chain> SystemModelBuilder::Create_1500_Wrapper (string_view name
   }
   auto wrapper = m_model.CreateChain (name);
 
-  // ---------------- Create MIB
+  // ---------------- SWIR
   //
-  auto        selectorReg  = m_model.CreateRegister ("SWIR"s + MIB_CTRL_EXT, BinaryVector::CreateFromBinaryString("01"));
-  auto        pathSelector = make_shared<DefaultBinaryPathSelector>(selectorReg, 2);
-
-  auto swirMib = Create_MIB("SWIR", pathSelector, selectorReg, MuxRegPlacement::BeforeMux);
+  auto swirSelectorReg = m_model.CreateRegister ("SWIR"s + MIB_CTRL_EXT, BinaryVector::CreateFromBinaryString("01"));
+  auto swirSelector    = make_shared<DefaultBinaryPathSelector>(swirSelectorReg, 2);
+  auto swirMib         = Create_MIB("SWIR", swirSelector, swirSelectorReg, MuxRegPlacement::BeforeMux);
   wrapper->AppendChild(swirMib);
 
-  auto wirSize     = DefaultBinaryPathSelector::RegWidthForPathCount(maxDerivations + 1u);
-  auto wirReg      = m_model.CreateRegister ("WIR_reg", BinaryVector(wirSize, 0));
-  auto wirSelector = make_shared<DefaultBinaryPathSelector>(wirReg, 2);
-  auto wirMib      = Create_MIB("WIR", wirSelector, wirReg, MuxRegPlacement::Remote);
-  auto wirBypass   = m_model.CreateRegister ("WBY", BinaryVector(1, 0), wirMib);
+  // ---------------- WIR
+  //
+  auto totalDerivations = maxDerivations + 1u;   // +1 is to take into account bypass register (wirBypass)
+  auto wirSize          = DefaultBinaryPathSelector::RegWidthForPathCount(totalDerivations);
+  auto wirReg           = m_model.CreateRegister ("WIR_reg", BinaryVector(wirSize, 0));
+  auto wirSelector      = make_shared<DefaultBinaryPathSelector>(wirReg, totalDerivations);
+  auto wirMib           = Create_MIB("WIR", wirSelector, wirReg, MuxRegPlacement::Remote);
+  auto wirBypass        = m_model.CreateRegister ("WBY", BinaryVector(1, 0), wirMib);
 
   swirMib->AppendChild(wirMib);
   swirMib->AppendChild(wirReg);
@@ -115,17 +117,14 @@ shared_ptr<AccessInterface> SystemModelBuilder::Create_TestCase_AccessInterface 
 //!       - Many coding may be defined for segment selection
 //!
 //! @param name         Name for top node
-//! @param chainsCount  Number of mux derivations
+//! @param chainsCount  Number of mux derivations (excluding bypass register)
 //!
 //! @return Top node of created sub-tree
 shared_ptr<AccessInterface> SystemModelBuilder::Create_TestCase_1500 (string_view name, uint32_t chainsCount)
 {
   // ---------------- Create tap
   //
-  uint32_t    irBitsCount   = 8;
-  uint32_t    muxPathsCount = chainsCount + 1u; // +1 is for the (hidden) bypass register
-
-  auto tap   = m_model.CreateTap      (name, irBitsCount, muxPathsCount);
+  auto tap   = m_model.CreateTap (name, DEFAULT_IR_LEN, DEFAULT_TDR_LEN);
 
   // ---------------- Append "SUT"
   //
@@ -134,13 +133,12 @@ shared_ptr<AccessInterface> SystemModelBuilder::Create_TestCase_1500 (string_vie
 
   // ---------------- Append 1500 wrapper
   //
-  auto wrapper = Create_1500_Wrapper("", WRAPPED_CORES);
+  auto wrapper = Create_1500_Wrapper("", chainsCount);
   chain->AppendChild(wrapper);
 
   // ---------------- Add 1500 wrapped cores (registers)
   //
   AppendRegisters(chainsCount, "dynamic_", BinaryVector(DYNAMIC_TDR_LEN, 0), wrapper);
-
 
   return tap;
 }

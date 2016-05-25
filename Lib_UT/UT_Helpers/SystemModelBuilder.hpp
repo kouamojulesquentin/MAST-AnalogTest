@@ -67,7 +67,7 @@ class SystemModelBuilder final
                                                      );
 
   std::shared_ptr<mast::AccessInterface> Create_TestCase_AccessInterface (std::experimental::string_view name = "TAP");
-  std::shared_ptr<mast::AccessInterface> Create_TestCase_1500            (std::experimental::string_view name = "", uint32_t chainsCount = 2);
+  std::shared_ptr<mast::AccessInterface> Create_TestCase_1500            (std::experimental::string_view name = "", uint32_t chainsCount = DEFAULT_WRAPPED_CORES);
 
 
   std::shared_ptr<mast::Chain>           Create_1500_Wrapper (std::experimental::string_view name,
@@ -87,15 +87,16 @@ class SystemModelBuilder final
   // ---------------- Private  Fields
   //
   private:
-  static constexpr uint32_t STATIC_TDR_LEN    = 64u;
-  static constexpr uint32_t DYNAMIC_TDR_LEN   = 128u;
-  static constexpr uint32_t WRAPPED_CORES     = 3u;
-  static constexpr uint32_t DEFAULT_IR_LEN    = 8u;
-  static constexpr char*    DEFAULT_1500_NAME = "1500_wrapper";
-  static constexpr char*    DEFAULT_MIB_NAME  = "MIB";
-  static constexpr char*    DEFAULT_SIB_NAME  = "SIB";
-  static constexpr char*    MIB_CTRL_EXT      = "_ctrl";
-  static constexpr char*    MIB_MUX_EXT       = "_mux";
+  static constexpr uint32_t STATIC_TDR_LEN        = 64u;
+  static constexpr uint32_t DYNAMIC_TDR_LEN       = 128u;
+  static constexpr uint32_t DEFAULT_WRAPPED_CORES = 3u;
+  static constexpr uint32_t DEFAULT_IR_LEN        = 8u;
+  static constexpr uint32_t DEFAULT_TDR_LEN       = 2u;
+  static constexpr char*    DEFAULT_1500_NAME     = "1500_wrapper";
+  static constexpr char*    DEFAULT_MIB_NAME      = "MIB";
+  static constexpr char*    DEFAULT_SIB_NAME      = "SIB";
+  static constexpr char*    MIB_CTRL_EXT          = "_ctrl";
+  static constexpr char*    MIB_MUX_EXT           = "_mux";
 
   mast::SystemModel& m_model;
 };

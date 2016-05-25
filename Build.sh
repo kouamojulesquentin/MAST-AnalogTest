@@ -25,7 +25,7 @@ makefile_lib=Lib_Linux.mak
 makefile_lib_ut=Lib_UT_Linux.mak
 
 echo ===================== Building Lib =====================
-make -C Lib -f $makefile_lib $target
+make -C Lib -j9 -f $makefile_lib $target
 
 echo
 echo ===================== Building Lib_UT Runner.cpp =====================
@@ -33,7 +33,7 @@ make -C Lib_UT -f Runner.mak
 
 echo
 echo ===================== Building Lib_UT =====================
-make -C Lib_UT -f $makefile_lib_ut $target
+make -C Lib_UT -j9 -f $makefile_lib_ut $target
 
 echo
 echo Executing \"$target\" unit tests...

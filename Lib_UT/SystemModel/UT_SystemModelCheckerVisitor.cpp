@@ -142,7 +142,7 @@ void UT_SystemModelCheckerVisitor::test_CheckIdentifiers_With_UnusedIdentifier (
   string expectedReport = "Errors   (0):\n"
                           "Warnings (0):\n"
                           "Infos    (1):\n"
-                          "  - Identifier '4' is not used\n";
+                          "  - Identifier '4' is not associated with a node\n";
 
   TS_ASSERT_EQUALS (report, expectedReport);
 }
@@ -298,7 +298,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_UnreachableNode ()
 
   auto   report         = result.MakeReport();
   string expectedReport = "Errors   (1):\n"
-                          "  - Register 'Reg_1' (id: 5) is not reachable by tree traversal\n"
+                          "  - Register 'Reg_1' (id: 5) has not been seen by checker tree traversal (may be unconnected)\n"
                           "Warnings (0):\n"
                           "Infos    (0):\n";
 

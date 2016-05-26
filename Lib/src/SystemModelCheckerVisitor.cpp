@@ -66,7 +66,7 @@ void SystemModelCheckerVisitor::CheckIdentifiers ()
     else
     {
       ostringstream os;
-      os << "Identifier '" << id << "' is not used";
+      os << "Identifier '" << id << "' is not associated with a node";
       ReportInfo(os.str());
     }
   }
@@ -250,7 +250,7 @@ void SystemModelCheckerVisitor::CheckTree ()
 
       if (!collectedNodeInfo.node)
       {
-        ReportError(*node, " is not reachable by tree traversal");
+        ReportError(*node, " has not been seen by checker tree traversal (may be unconnected)");
       }
     }
   }

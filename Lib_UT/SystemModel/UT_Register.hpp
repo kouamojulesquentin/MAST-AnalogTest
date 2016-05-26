@@ -34,6 +34,21 @@ class UT_Register : public CxxTest::TestSuite
 
   // ---------------- BinaryVector setters
   //
+  void test_SetBypass ();
+  void test_SetBypass_TooSmall ();
+  void test_SetBypass_TooLarge ();
+
+  void test_SetToSut ();
+  void test_SetToSut_DifferentSize ();
+
+  void test_SetExpectedFromSut ();
+  void test_SetExpectedFromSut_DifferentSize ();
+
+  void test_SetFromSut_DifferingFromExpected_WithoutCheck ();
+  void test_SetFromSut_DifferingFromExpected_WithCheck ();
+  void test_SetFromSut_DifferentSize ();
+
+  void test_UpdateLastToSut ();
 
   // ---------------- Sibling
   //
@@ -46,7 +61,7 @@ class UT_Register : public CxxTest::TestSuite
 
   // ---------------- Mismatches
   //
-
+  void test_ResetMismatches ();
 };
 //
 //  End of UT_Register class declaration

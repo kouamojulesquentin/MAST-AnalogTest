@@ -24,12 +24,12 @@ using namespace mast;
 //!
 //! @note All registers are initialized like the bypass sequence
 Register::Register (string_view name, mast::BinaryVector bypassSequence)
-  : SystemModelNode        (name)
-  , m_nextToSut       (bypassSequence)
-  , m_lastToSut     (bypassSequence)
-  , m_lastFromSut (bypassSequence)
-  , m_expectedFromSut     (bypassSequence)
-  , m_bypass       (std::move(bypassSequence))
+  : SystemModelNode   (name)
+  , m_nextToSut       (bypassSequence, BinaryVector::FIX_SIZE)
+  , m_lastToSut       (bypassSequence, BinaryVector::FIX_SIZE)
+  , m_lastFromSut     (bypassSequence, BinaryVector::FIX_SIZE)
+  , m_expectedFromSut (bypassSequence, BinaryVector::FIX_SIZE)
+  , m_bypass          (std::move(bypassSequence), BinaryVector::FIX_SIZE)
 {
 }
 //

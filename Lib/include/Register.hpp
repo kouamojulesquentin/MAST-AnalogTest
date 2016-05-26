@@ -23,7 +23,6 @@ class SystemModel;
 
 //! Represents a register in the scan chain
 //!
-//!
 class DLL_EXPORT Register : public SystemModelNode
 {
   // ---------------- Public  Methods
@@ -45,7 +44,7 @@ class DLL_EXPORT Register : public SystemModelNode
   //!< @note  It increments internal mismatch count in case of failure
   //!<
   //!< @return  true when received sequence equals expected one, false otherwise
-  bool CheckAgainstExpected();
+//+  bool CheckAgainstExpected();
 
   // ---------------- Getters
   //
@@ -66,6 +65,8 @@ class DLL_EXPORT Register : public SystemModelNode
 
   void SetCheckExpected   (bool checkExpected) { m_mustCheckExpected  = checkExpected; } //!< Sets whether data updated from SUT must be check agains expected data
   void ResetMismatches    ()                   { m_mismatches = 0; }                     //!< Clears the mismatch count
+
+  void UpdateLastToSut() { m_lastToSut = m_nextToSut; } //!< Updates "last to sut" field from "next to sut" field (should be called when "next to sut" has effectively been shifted to SUT)
 
   // ---------------- Private  Fields
   //

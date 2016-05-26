@@ -313,13 +313,13 @@ void GmlPrinterVisitor::VisitRegister (Register& reg)
 
       auto regValue = [this](auto& regValue) { return m_displayValueAsHex ? "0x"s + regValue.DataAsHexString() : regValue.DataAsBinaryString(); };
 
-      os << "Width: "     << reg.GetBypassSequence().BitsCount() << std::endl;
+      os << "Width: "     << reg.BypassSequence().BitsCount() << std::endl;
 
-      os << "Bypass:    " << regValue(reg.GetBypassSequence())  << std::endl;
-      os << "Next to:   " << regValue(reg.GetNextToSut())       << std::endl;
-      os << "Last to:   " << regValue(reg.GetLastToSut())       << std::endl;
-      os << "Last from: " << regValue(reg.GetLastFromSut())     << std::endl;
-      os << "Expected:  " << regValue(reg.GetExpectedFromSut());
+      os << "Bypass:    " << regValue(reg.BypassSequence())  << std::endl;
+      os << "Next to:   " << regValue(reg.NextToSut())       << std::endl;
+      os << "Last to:   " << regValue(reg.LastToSut())       << std::endl;
+      os << "Last from: " << regValue(reg.LastFromSut())     << std::endl;
+      os << "Expected:  " << regValue(reg.ExpectedFromSut());
 
       AppendNode(m_shape_Register, m_color_Register, os.str(), reg);
     }

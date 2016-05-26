@@ -280,7 +280,7 @@ void UT_SystemModel::test_CreateTap ()
 
   auto irAsRegister = dynamic_pointer_cast<Register>(irNode);
   TS_ASSERT_NOT_NULLPTR (irAsRegister);
-  TS_ASSERT_EQUALS      (irAsRegister->GetBypassSequence(), BinaryVector::CreateFromBinaryString("1111_11"));
+  TS_ASSERT_EQUALS      (irAsRegister->BypassSequence(), BinaryVector::CreateFromBinaryString("1111_11"));
 
   // DR MUX
   auto muxNode = irNode->GetNextSibling();

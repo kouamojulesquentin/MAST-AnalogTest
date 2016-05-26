@@ -240,21 +240,21 @@ void PrettyPrinterVisitor::VisitRegister (Register& reg)
   {
     StreamNodeHeader("Register", reg);
 
-    m_os << ", length: " << reg.GetBypassSequence().BitsCount();
+    m_os << ", length: " << reg.BypassSequence().BitsCount();
 
     if (!m_verbose)
     {
-      StreamBinaryVector("bypass: ", reg.GetBypassSequence());
+      StreamBinaryVector("bypass: ", reg.BypassSequence());
     }
     else
     {
       auto targetPosInLine = m_os.tellp() - m_startPos;
 
-                                       StreamBinaryVector("bypass:            ", reg.GetBypassSequence());
-      AlignOnNewLine(targetPosInLine); StreamBinaryVector("next_to_sut:       ", reg.GetNextToSut());
-      AlignOnNewLine(targetPosInLine); StreamBinaryVector("last_to_sut:       ", reg.GetLastToSut());
-      AlignOnNewLine(targetPosInLine); StreamBinaryVector("last_from_sut:     ", reg.GetLastFromSut());
-      AlignOnNewLine(targetPosInLine); StreamBinaryVector("expected_from_sut: ", reg.GetExpectedFromSut());
+                                       StreamBinaryVector("bypass:            ", reg.BypassSequence());
+      AlignOnNewLine(targetPosInLine); StreamBinaryVector("next_to_sut:       ", reg.NextToSut());
+      AlignOnNewLine(targetPosInLine); StreamBinaryVector("last_to_sut:       ", reg.LastToSut());
+      AlignOnNewLine(targetPosInLine); StreamBinaryVector("last_from_sut:     ", reg.LastFromSut());
+      AlignOnNewLine(targetPosInLine); StreamBinaryVector("expected_from_sut: ", reg.ExpectedFromSut());
       AlignOnNewLine(targetPosInLine); StreamNodeCommon(reg);
     }
   }

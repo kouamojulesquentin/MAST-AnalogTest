@@ -14,6 +14,7 @@
 #ifndef UTILITY_H__AB0B55F8_1F3A_4D8D_893_CA234E5BFD9D__INCLUDED_
   #define UTILITY_H__AB0B55F8_1F3A_4D8D_893_CA234E5BFD9D__INCLUDED_
 
+#include "Platform.hpp"
 #include <stdexcept>
 #include <string>
 #include <experimental/string_view>
@@ -22,7 +23,7 @@ namespace mast
 {
 //! Provides functions utilities that are not related to a specific class hierarchy
 //!
-class Utility final
+class DLL_EXPORT Utility final
 {
   // ---------------- Public  Methods
   //

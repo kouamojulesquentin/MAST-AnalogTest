@@ -44,11 +44,11 @@ void UT_Register::test_Constructor ()
   // ---------------- Verify Register part
   //
   TS_ASSERT_FALSE  (sut.MustCheckExpected());
-  TS_ASSERT_EQUALS (sut.GetBypassSequence(),  bypassSequence);
-  TS_ASSERT_EQUALS (sut.GetNextToSut(),       bypassSequence);
-  TS_ASSERT_EQUALS (sut.GetLastToSut(),       bypassSequence);
-  TS_ASSERT_EQUALS (sut.GetExpectedFromSut(), bypassSequence);
-  TS_ASSERT_EQUALS (sut.GetLastFromSut(),     bypassSequence);
+  TS_ASSERT_EQUALS (sut.BypassSequence(),  bypassSequence);
+  TS_ASSERT_EQUALS (sut.NextToSut(),       bypassSequence);
+  TS_ASSERT_EQUALS (sut.LastToSut(),       bypassSequence);
+  TS_ASSERT_EQUALS (sut.ExpectedFromSut(), bypassSequence);
+  TS_ASSERT_EQUALS (sut.LastFromSut(),     bypassSequence);
 }
 
 //===========================================================================

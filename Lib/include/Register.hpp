@@ -49,16 +49,13 @@ class DLL_EXPORT Register : public SystemModelNode
 
   // ---------------- Getters
   //
-  const BinaryVector& GetBypassSequence()  const { return m_bypass;            } //!< Returns bypass sequence
-  const BinaryVector& GetExpectedFromSut() const { return m_expectedFromSut;   } //!< Returns expected sequence
-  const BinaryVector& GetLastFromSut()     const { return m_lastFromSut;       }
-  const BinaryVector& GetNextToSut()       const { return m_nextToSut;         }
-  const BinaryVector& GetLastToSut()       const { return m_lastToSut;         }
-  bool                MustCheckExpected()  const { return m_mustCheckExpected; } //!< Returns true when received data must be checked against expected data
-  uint32_t            GetMismatches()      const { return m_mismatches;        } //!< Returns current mismatch count
-
-
-
+  const BinaryVector& BypassSequence()    const { return m_bypass;            } //!< Returns bypass sequence
+  const BinaryVector& ExpectedFromSut()   const { return m_expectedFromSut;   } //!< Returns expected sequence
+  const BinaryVector& LastFromSut()       const { return m_lastFromSut;       } //!< Returns last sequence received from SUT
+  const BinaryVector& NextToSut()         const { return m_nextToSut;         } //!< Returns next sequence to send to SUT
+  const BinaryVector& LastToSut()         const { return m_lastToSut;         } //!< Returns last sequence effectively sent to SUT
+  bool                MustCheckExpected() const { return m_mustCheckExpected; } //!< Returns true when received data must be checked against expected data
+  uint32_t            Mismatches()        const { return m_mismatches;        } //!< Returns current mismatch count
 
   // ---------------- Setters
   //
@@ -67,8 +64,8 @@ class DLL_EXPORT Register : public SystemModelNode
   void SetExpectedFromSut (BinaryVector sequence) { m_expectedFromSut = std::move(sequence); } //!< Sets expected sequence (when updating from SUT)
   void SetBypass          (BinaryVector sequence) { m_bypass          = std::move(sequence); } //!< Sets sequence to shift into the sut when no iApply cycle has been defined on the register
 
-  void SetCheckExpected        (bool checkExpected) { m_mustCheckExpected  = checkExpected; } //!< Sets whether data updated from SUT must be check agains expected data
-  void ResetMismatches         ()                   { m_mismatches = 0; }                     //!< Clears the mismatch count
+  void SetCheckExpected   (bool checkExpected) { m_mustCheckExpected  = checkExpected; } //!< Sets whether data updated from SUT must be check agains expected data
+  void ResetMismatches    ()                   { m_mismatches = 0; }                     //!< Clears the mismatch count
 
   // ---------------- Private  Fields
   //

@@ -32,11 +32,11 @@ void PrettyPrinterVisitor::PrintChildren (const ParentNode& parentNode)
 
   ++m_depth;
 
-  auto child = parentNode.GetFirstChild();
+  auto child = parentNode.FirstChild();
   while (child)
   {
     child->Accept(*this);
-    child = child->GetNextSibling();
+    child = child->NextSibling();
   }
 }
 //
@@ -114,7 +114,7 @@ void PrettyPrinterVisitor::StreamNodeCommon (const SystemModelNode& node)
     m_os.setf(std::ios_base::boolalpha);
     m_os << ", pending: "       << node.IsPending();
     m_os << ", has_condition: " << node.HasConditions();
-    m_os << ", priority: "      << node.GetPriority();
+    m_os << ", priority: "      << node.Priority();
   }
 }
 //
@@ -147,10 +147,10 @@ void PrettyPrinterVisitor::StreamNodeHeader(std::experimental::string_view type,
     m_os << ":Selector:";
   }
 
-  m_os << '(' << node.GetIdentifier() << ") ";
+  m_os << '(' << node.Identifier() << ") ";
 
   AlignRelativeTo(m_startPos, 15u + m_depth);
-  m_os << '"' << node.GetName()       << '"';
+  m_os << '"' << node.Name()       << '"';
 
   m_first = false;
 }
@@ -220,7 +220,7 @@ void PrettyPrinterVisitor::VisitLinker (Linker& linker)
     ++m_depth;
     m_processingSelector = true;
 
-    auto selector = linker.GetPathSelector();
+    auto selector = linker.Selector();
     selector->Accept(*this);
   }
 

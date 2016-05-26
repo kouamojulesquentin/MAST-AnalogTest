@@ -32,6 +32,9 @@ class UT_Register : public CxxTest::TestSuite
   //
   void test_Constructor ();
 
+  // ---------------- BinaryVector setters
+  //
+
   // ---------------- Sibling
   //
 

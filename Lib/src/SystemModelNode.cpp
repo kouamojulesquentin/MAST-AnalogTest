@@ -23,7 +23,7 @@ SystemModelNode::NodeIdentifier SystemModelNode::sm_nextIdentifier = 0;
 //! Sets unique identifier and name (using default one if unspecified)
 //!
 SystemModelNode::SystemModelNode (string_view name)
-  : m_identifier (GetNextIdentifier())
+  : m_identifier (NextIdentifier())
   , m_name       (MakeNodeName(name))
 {
 }
@@ -55,12 +55,12 @@ void SystemModelNode::AppendSibling (std::shared_ptr<SystemModelNode> pSibling)
 //! @note This method IS NOT THREAD SAFE
 //!
 //! @return New node identifier
-SystemModelNode::NodeIdentifier SystemModelNode::GetNextIdentifier ()
+SystemModelNode::NodeIdentifier SystemModelNode::NextIdentifier ()
 {
   return sm_nextIdentifier++; // Root node must have identifier 0
 }
 //
-//  End of: SystemModelNode::GetNextIdentifier
+//  End of: SystemModelNode::NextIdentifier
 //---------------------------------------------------------------------------
 
 

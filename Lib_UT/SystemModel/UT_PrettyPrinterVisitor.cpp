@@ -46,7 +46,7 @@ void UT_PrettyPrinterVisitor::test_Constructor ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS (sut.GetPrettyPrint(), "");
+  TS_ASSERT_EQUALS (sut.PrettyPrint(), "");
 }
 
 //! Checks PrettyPrinterVisitor::VisitAccessInterface()
@@ -65,7 +65,7 @@ void UT_PrettyPrinterVisitor::test_VisitAccessInterface ()
 
   // ---------------- Verify
   //
-  auto got      = sut.GetPrettyPrint();
+  auto got      = sut.PrettyPrint();
   auto expected = string("[Access_I](0)  \"Access interface name\"");
   TS_ASSERT_EQUALS (got, expected);
 }
@@ -87,7 +87,7 @@ void UT_PrettyPrinterVisitor::test_VisitAccessInterface_Verbose ()
 
   // ---------------- Verify
   //
-  auto got      = sut.GetPrettyPrint();
+  auto got      = sut.PrettyPrint();
   auto expected = string("[Access_I](0)  \"Access interface name\", pending: false, has_condition: false, priority: 0");
   TS_ASSERT_EQUALS (got, expected);
 }
@@ -109,7 +109,7 @@ void UT_PrettyPrinterVisitor::test_VisitChain ()
 
   // ---------------- Verify
   //
-  auto got      = sut.GetPrettyPrint();
+  auto got      = sut.PrettyPrint();
   auto expected = string("[Chain](0)     \"Chain name\"");
   TS_ASSERT_EQUALS (got, expected);
 }
@@ -132,7 +132,7 @@ void UT_PrettyPrinterVisitor::test_VisitChain_Verbose ()
 
   // ---------------- Verify
   //
-  auto got      = sut.GetPrettyPrint();
+  auto got      = sut.PrettyPrint();
   auto expected = string("[Chain](0)     \"Chain name\", pending: false, has_condition: false, priority: 0");
   TS_ASSERT_EQUALS (got, expected);
 }
@@ -160,7 +160,7 @@ void UT_PrettyPrinterVisitor::test_VisitLinker ()
 
   // ---------------- Verify
   //
-  auto got      = sut.GetPrettyPrint();
+  auto got      = sut.PrettyPrint();
   auto expected = string("[Linker](2)    \"Linker name\"\n"
                          " :Selector:(1)  \"Mux register name\"");
   TS_ASSERT_EQUALS (got, expected);
@@ -191,7 +191,7 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_Verbose ()
 
   // ---------------- Verify
   //
-  auto got      = sut.GetPrettyPrint();
+  auto got      = sut.PrettyPrint();
   auto expected = string("[Linker](2)    \"Linker name\", pending: false, has_condition: false, priority: 0\n"
                          " :Selector:(1)  \"Mux register name\""
                         );
@@ -216,7 +216,7 @@ void UT_PrettyPrinterVisitor::test_VisitRegister ()
 
   // ---------------- Verify
   //
-  auto got      = sut.GetPrettyPrint();
+  auto got      = sut.PrettyPrint();
   auto expected = string("[Register](0)  \"A register name\", length: 9, bypass: 1111_1111:0");
   TS_ASSERT_EQUALS (got, expected);
 }
@@ -239,7 +239,7 @@ void UT_PrettyPrinterVisitor::test_VisitRegister_Verbose ()
 
   // ---------------- Verify
   //
-  auto got      = sut.GetPrettyPrint();
+  auto got      = sut.PrettyPrint();
   auto expected = string("[Register](0)  \"A register name\", length: 9, bypass:            1111_1111:0\n"
                          "                                           , next_to_sut:       1111_1111:0\n"
                          "                                           , last_to_sut:       1111_1111:0\n"
@@ -270,7 +270,7 @@ void UT_PrettyPrinterVisitor::test_VisitChain_with_Register ()
 
   // ---------------- Verify
   //
-  auto got      = sut.GetPrettyPrint();
+  auto got      = sut.PrettyPrint();
   auto expected = string("[Chain](0)     \"Chain\"\n"
                          " [Register](1)  \"Reg_1\", length: 6, bypass: 1010_11");
 
@@ -298,7 +298,7 @@ void UT_PrettyPrinterVisitor::test_VisitChain_with_Registers ()
 
   // ---------------- Verify
   //
-  auto got      = sut.GetPrettyPrint();
+  auto got      = sut.PrettyPrint();
   auto expected = string("[Chain](0)     \"Chain\"\n"
                          " [Register](1)  \"Reg_1\", length: 6, bypass: 1010_01\n"
                          " [Register](2)  \"Reg_2\", length: 6, bypass: 1010_10"
@@ -332,7 +332,7 @@ void UT_PrettyPrinterVisitor::test_VisitChain_with_Registers_Verbose ()
 
   // ---------------- Verify
   //
-  auto got      = sut.GetPrettyPrint();
+  auto got      = sut.PrettyPrint();
   auto expected = string("[Chain](0)     \"Chain\", pending: false, has_condition: false, priority: 0\n"
                          " [Register](1)  \"Reg_1\", length: 6, bypass:            1010_01\n"
                          "                                  , next_to_sut:       1010_01\n"
@@ -389,7 +389,7 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_with_Child ()
 
   // ---------------- Verify
   //
-  auto got      = sut.GetPrettyPrint();
+  auto got      = sut.PrettyPrint();
   auto expected = string("[Linker](7)    \"Link\"\n"
                          " :Selector:(6)  \"Mux_Reg\"\n"
                          " [Chain](0)     \"Chain\"\n"
@@ -437,7 +437,7 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_with_Child_Verbose ()
 
   // ---------------- Verify
   //
-  auto got      = sut.GetPrettyPrint();
+  auto got      = sut.PrettyPrint();
   auto expected = string("[Linker](7)    \"Link\", pending: false, has_condition: false, priority: 0\n"
                          " :Selector:(6)  \"Sel_1\"\n"
                          " [Register](4)  \"R_A\", length: 15, bypass:            1110_1110:1111_101\n"
@@ -493,7 +493,7 @@ void UT_PrettyPrinterVisitor::test_VisitAccessInterface_with_Child ()
 
   // ---------------- Verify
   //
-  auto got      = sut.GetPrettyPrint();
+  auto got      = sut.PrettyPrint();
   auto expected = string("[Access_I](8)  \"Access interface name\"\n"
                          " [Chain](0)     \"Chain name\"\n"
                          "  [Register](1)  \"Reg_1\", length: 5, bypass: 1010_1\n"
@@ -544,7 +544,7 @@ void UT_PrettyPrinterVisitor::test_VisitAccessInterface_Hex_Format ()
 
   // ---------------- Verify
   //
-  auto got      = sut.GetPrettyPrint();
+  auto got      = sut.PrettyPrint();
   auto expected = string(
                          "[Access_I](0)  \"Access interface name\"\n"
                          " [Register](1)  \"Mux_reg\", length: 2, bypass: 0x4\n"
@@ -581,7 +581,7 @@ void UT_PrettyPrinterVisitor::test_VisitTap ()
 
   // ---------------- Verify
   //
-  auto got      = sut.GetPrettyPrint();
+  auto got      = sut.PrettyPrint();
   auto expected = string("[Access_I](0)  \"1149_1_TAP\"\n"
                          " [Register](1)  \"TAP_IR\", length: 6, bypass: 1111_11\n"
                          " [Linker](2)    \"TAP_DR_Mux\"\n"
@@ -616,7 +616,7 @@ void UT_PrettyPrinterVisitor::test_VisitTap_With_SubNodes ()
 
   // ---------------- Verify
   //
-  auto got      = sut.GetPrettyPrint();
+  auto got      = sut.PrettyPrint();
   auto expected = string("[Access_I](0)  \"1149_1_TAP\"\n"
                          " [Register](1)  \"TAP_IR\", length: 6, bypass: 1111_11\n"
                          " [Linker](2)    \"TAP_DR_Mux\"\n"

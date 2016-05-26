@@ -33,7 +33,7 @@ uint32_t ParentNode::DirectChildrenCount () const
       THROW_LOGIC_ERROR("There seems a child has been appended twice");
     }
 
-    child = child->GetNextSibling();
+    child = child->NextSibling();
   }
   return count;
 }

@@ -207,7 +207,7 @@ shared_ptr<AccessInterface> SystemModel::CreateTap (string_view name,
 
 //! Returns node associated with a node identifier
 //!
-std::shared_ptr<SystemModelNode> SystemModel::GetNode (SystemModelNode::NodeIdentifier identifier) const
+std::shared_ptr<SystemModelNode> SystemModel::NodeWithId (SystemModelNode::NodeIdentifier identifier) const
 {
   auto offset     = static_cast<decltype(m_identifierMapping.size())>(identifier);
   auto nodesCount = m_identifierMapping.size();
@@ -227,7 +227,7 @@ std::shared_ptr<SystemModelNode> SystemModel::GetNode (SystemModelNode::NodeIden
   return node;
 }
 //
-//  End of: SystemModel::GetNode
+//  End of: SystemModel::NodeWithId
 //---------------------------------------------------------------------------
 
 
@@ -243,7 +243,7 @@ void SystemModel::RegisterNode (std::shared_ptr<SystemModelNode> node)
     THROW_INVALID_ARGUMENT("Cannot register node from nullptr");
   }
 
-  auto identifier = node->GetIdentifier();
+  auto identifier = node->Identifier();
   auto offset     = static_cast<decltype(m_identifierMapping.size())>(identifier);
   auto nodesCount = m_identifierMapping.size();
 
@@ -292,7 +292,7 @@ void SystemModel::RemoveNodeFromModel (shared_ptr<SystemModelNode> node)
     //!
   }
 
-  auto id     = node->GetIdentifier();
+  auto id     = node->Identifier();
   auto offset = static_cast<TIdentifierMapping::size_type>(id);
 
   if (offset >= m_identifierMapping.size())

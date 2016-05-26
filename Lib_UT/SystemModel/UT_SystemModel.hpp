@@ -29,7 +29,7 @@ class UT_SystemModel : public CxxTest::TestSuite
   // ================ Test Methods ================
 
   void test_Constructor ();
-  void test_GetNode_When_Empty ();
+  void test_NodeWithId_When_Empty ();
 
   void test_CreateAccessInterface ();
   void test_CreateRegister_Without_ParentNode ();

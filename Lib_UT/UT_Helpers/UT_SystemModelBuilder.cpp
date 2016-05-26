@@ -69,7 +69,7 @@ void UT_SystemModelBuilder::test_Create_TestCase_AccessInterface ()
 
   tap->Accept(printer);
 
-  auto gotGraph = printer.GetGraph();
+  auto gotGraph = printer.Graph();
   auto expected = string("graph\n"
                          "[\n"
                          "   hierarchic 1 directed 1\n"
@@ -160,7 +160,7 @@ void UT_SystemModelBuilder::test_Create_TestCase_MIB_4_Chains ()
 
   tap->Accept(printer);
 
-  auto gotGraph = printer.GetGraph();
+  auto gotGraph = printer.Graph();
   auto expected = string("graph\n"
                          "[\n"
                          "   hierarchic 1 directed 1\n"
@@ -260,7 +260,7 @@ void UT_SystemModelBuilder::test_Create_TestCase_MIB_4_Chains ()
   PrettyPrinterVisitor prettyPrinter;
   tap->Accept(prettyPrinter);
 
-  auto gotPretty      = prettyPrinter.GetPrettyPrint();
+  auto gotPretty      = prettyPrinter.PrettyPrint();
   auto expectedPretty = string("[Access_I](0)  \"TAP\"\n"
                                " [Register](1)  \"TAP_IR\", length: 8, bypass: 1111_1111\n"
                                " [Linker](2)    \"TAP_DR_Mux\"\n"
@@ -314,7 +314,7 @@ void UT_SystemModelBuilder::test_Create_TestCase_1687 ()
 
   tap->Accept(printer);
 
-  auto gotGraph = printer.GetGraph();
+  auto gotGraph = printer.Graph();
   auto expected = string("graph\n"
                          "[\n"
                          "   hierarchic 1 directed 1\n"
@@ -387,7 +387,7 @@ void UT_SystemModelBuilder::test_Create_TestCase_1687 ()
   PrettyPrinterVisitor prettyPrinter;
   tap->Accept(prettyPrinter);
 
-  auto gotPretty      = prettyPrinter.GetPrettyPrint();
+  auto gotPretty      = prettyPrinter.PrettyPrint();
   auto expectedPretty = string("[Access_I](0)  \"sut\"\n"
                                " [Register](1)  \"sut_IR\", length: 8, bypass: 1111_1111\n"
                                " [Linker](2)    \"sut_DR_Mux\"\n"
@@ -437,7 +437,7 @@ void UT_SystemModelBuilder::test_Create_TestCase_1500_3_Chains ()
 
   tap->Accept(printer);
 
-  auto gotGraph = printer.GetGraph();
+  auto gotGraph = printer.Graph();
   auto expected = string("graph\n"
                          "[\n"
                          "   hierarchic 1 directed 1\n"
@@ -556,7 +556,7 @@ void UT_SystemModelBuilder::test_Create_TestCase_1500_3_Chains ()
   PrettyPrinterVisitor prettyPrinter;
   tap->Accept(prettyPrinter);
 
-  auto gotPretty      = prettyPrinter.GetPrettyPrint();
+  auto gotPretty      = prettyPrinter.PrettyPrint();
   auto expectedPretty = string(
                                "[Access_I](0)  \"TAP\"\n"
                                " [Register](1)  \"TAP_IR\", length: 8, bypass: 1111_1111\n"

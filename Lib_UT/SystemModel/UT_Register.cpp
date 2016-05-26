@@ -34,12 +34,12 @@ void UT_Register::test_Constructor ()
 
   // ---------------- Verify SystemModelNode part
   //
-  TS_ASSERT_EQUALS  (sut.GetName(),     name);
-  TS_ASSERT_EQUALS  (sut.GetPriority(), 0);
+  TS_ASSERT_EQUALS  (sut.Name(),     name);
+  TS_ASSERT_EQUALS  (sut.Priority(), 0);
   TS_ASSERT_FALSE   (sut.IsPending());
   TS_ASSERT_FALSE   (sut.HasConditions());
-  TS_ASSERT_NULLPTR (sut.GetApplicationData());
-  TS_ASSERT_NULLPTR (sut.GetNextSibling());
+  TS_ASSERT_NULLPTR (sut.ApplicationData());
+  TS_ASSERT_NULLPTR (sut.NextSibling());
 
   // ---------------- Verify Register part
   //
@@ -50,6 +50,7 @@ void UT_Register::test_Constructor ()
   TS_ASSERT_EQUALS (sut.ExpectedFromSut(), bypassSequence);
   TS_ASSERT_EQUALS (sut.LastFromSut(),     bypassSequence);
 }
+
 
 //===========================================================================
 // End of UT_Register.cpp

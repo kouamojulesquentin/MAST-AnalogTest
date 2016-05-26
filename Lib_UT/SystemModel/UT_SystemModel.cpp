@@ -45,14 +45,14 @@ void UT_SystemModel::test_Constructor ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_NULLPTR (sut.GetRoot());
-  TS_ASSERT_EQUALS  (sut.GetRegistersCount(), 0);
+  TS_ASSERT_NULLPTR (sut.Root());
+  TS_ASSERT_EQUALS  (sut.RegistersCount(), 0);
 }
 
 
-//! Checks SystemModel::GetNode() when empty
+//! Checks SystemModel::NodeWithId() when empty
 //!
-void UT_SystemModel::test_GetNode_When_Empty ()
+void UT_SystemModel::test_NodeWithId_When_Empty ()
 {
   // ---------------- Setup
   //
@@ -61,7 +61,7 @@ void UT_SystemModel::test_GetNode_When_Empty ()
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (sut.GetNode(id), std::exception);
+  TS_ASSERT_THROWS (sut.NodeWithId(id), std::exception);
 }
 
 
@@ -84,14 +84,14 @@ void UT_SystemModel::test_CreateAccessInterface ()
   CxxTest::setAbortTestOnFail(true);
 
   TS_ASSERT_NOT_NULLPTR (node);
-  TS_ASSERT_EQUALS      (node->GetName(), name);
+  TS_ASSERT_EQUALS      (node->Name(), name);
 
-  auto id = node->GetIdentifier();
+  auto id = node->Identifier();
 
   TS_ASSERT_EQUALS      (id, 0);
-  TS_ASSERT_NOT_NULLPTR (sut.GetRoot());
-  TS_ASSERT_NOT_NULLPTR (sut.GetNode(id));
-  TS_ASSERT_EQUALS_PTR  (sut.GetRoot(), sut.GetNode(id));
+  TS_ASSERT_NOT_NULLPTR (sut.Root());
+  TS_ASSERT_NOT_NULLPTR (sut.NodeWithId(id));
+  TS_ASSERT_EQUALS_PTR  (sut.Root(), sut.NodeWithId(id));
 }
 
 
@@ -117,11 +117,11 @@ void UT_SystemModel::test_CreateRegister_Without_ParentNode ()
   CxxTest::setAbortTestOnFail(true);
 
   TS_ASSERT_NOT_NULLPTR (node);
-  TS_ASSERT_EQUALS      (node->GetName(), name);
+  TS_ASSERT_EQUALS      (node->Name(), name);
 
-  auto id = node->GetIdentifier();
+  auto id = node->Identifier();
 
-  TS_ASSERT_EQUALS_PTR (sut.GetNode(id), node);
+  TS_ASSERT_EQUALS_PTR (sut.NodeWithId(id), node);
 }
 
 
@@ -143,11 +143,11 @@ void UT_SystemModel::test_CreateChain_Without_ParentNode ()
   CxxTest::setAbortTestOnFail(true);
 
   TS_ASSERT_NOT_NULLPTR (node);
-  TS_ASSERT_EQUALS      (node->GetName(), name);
+  TS_ASSERT_EQUALS      (node->Name(), name);
 
-  auto id = node->GetIdentifier();
+  auto id = node->Identifier();
 
-  TS_ASSERT_EQUALS_PTR (sut.GetNode(id), node);
+  TS_ASSERT_EQUALS_PTR (sut.NodeWithId(id), node);
 }
 
 
@@ -170,12 +170,12 @@ void UT_SystemModel::test_CreateChain_With_ParentNode ()
   CxxTest::setAbortTestOnFail(true);
 
   TS_ASSERT_NOT_NULLPTR (node);
-  TS_ASSERT_EQUALS      (node->GetName(), name);
+  TS_ASSERT_EQUALS      (node->Name(), name);
 
-  auto id = node->GetIdentifier();
+  auto id = node->Identifier();
 
-  TS_ASSERT_EQUALS_PTR (node, sut.GetNode(id));
-  TS_ASSERT_EQUALS_PTR (node, ai->GetFirstChild());
+  TS_ASSERT_EQUALS_PTR (node, sut.NodeWithId(id));
+  TS_ASSERT_EQUALS_PTR (node, ai->FirstChild());
 }
 
 
@@ -202,11 +202,11 @@ void UT_SystemModel::test_CreateLinker_Without_ParentNode ()
   CxxTest::setAbortTestOnFail(true);
 
   TS_ASSERT_NOT_NULLPTR (linker);
-  TS_ASSERT_EQUALS      (linker->GetName(), name);
+  TS_ASSERT_EQUALS      (linker->Name(), name);
 
-  auto id = linker->GetIdentifier();
+  auto id = linker->Identifier();
 
-  TS_ASSERT_EQUALS_PTR (sut.GetNode(id), linker);
+  TS_ASSERT_EQUALS_PTR (sut.NodeWithId(id), linker);
 }
 
 
@@ -232,13 +232,13 @@ void UT_SystemModel::test_CreateLinker_With_ParentNode ()
   CxxTest::setAbortTestOnFail(true);
 
   TS_ASSERT_NOT_NULLPTR (linker);
-  TS_ASSERT_EQUALS      (linker->GetName(), name);
+  TS_ASSERT_EQUALS      (linker->Name(), name);
 
-  auto id            = linker->GetIdentifier();
-  auto aiFirstChild = ai->GetFirstChild();
-  auto muxSibling    = muxNode->GetNextSibling();
+  auto id            = linker->Identifier();
+  auto aiFirstChild = ai->FirstChild();
+  auto muxSibling    = muxNode->NextSibling();
 
-  TS_ASSERT_EQUALS_PTR (linker,  sut.GetNode(id));
+  TS_ASSERT_EQUALS_PTR (linker,  sut.NodeWithId(id));
   TS_ASSERT_EQUALS_PTR (muxNode, aiFirstChild);
   TS_ASSERT_EQUALS_PTR (linker,  muxSibling);
 }
@@ -264,47 +264,47 @@ void UT_SystemModel::test_CreateTap ()
   CxxTest::setAbortTestOnFail(true);
 
   TS_ASSERT_NOT_NULLPTR (tapNode);
-  TS_ASSERT_EQUALS      (tapNode->GetName(), DEFAULT_TAP_NAME);
+  TS_ASSERT_EQUALS      (tapNode->Name(), DEFAULT_TAP_NAME);
 
-  auto id = tapNode->GetIdentifier();
+  auto id = tapNode->Identifier();
 
   TS_ASSERT_EQUALS      (id, 0);
-  TS_ASSERT_NOT_NULLPTR (sut.GetRoot());
-  TS_ASSERT_NOT_NULLPTR (sut.GetNode(id));
-  TS_ASSERT_EQUALS_PTR  (sut.GetRoot(), sut.GetNode(id));
+  TS_ASSERT_NOT_NULLPTR (sut.Root());
+  TS_ASSERT_NOT_NULLPTR (sut.NodeWithId(id));
+  TS_ASSERT_EQUALS_PTR  (sut.Root(), sut.NodeWithId(id));
 
   // IR
-  auto irNode = tapNode->GetFirstChild();
+  auto irNode = tapNode->FirstChild();
   TS_ASSERT_NOT_NULLPTR (irNode);
-  TS_ASSERT_EQUALS      (irNode->GetName(), DEFAULT_TAP_IR_NAME);
+  TS_ASSERT_EQUALS      (irNode->Name(), DEFAULT_TAP_IR_NAME);
 
   auto irAsRegister = dynamic_pointer_cast<Register>(irNode);
   TS_ASSERT_NOT_NULLPTR (irAsRegister);
   TS_ASSERT_EQUALS      (irAsRegister->BypassSequence(), BinaryVector::CreateFromBinaryString("1111_11"));
 
   // DR MUX
-  auto muxNode = irNode->GetNextSibling();
+  auto muxNode = irNode->NextSibling();
   TS_ASSERT_NOT_NULLPTR (muxNode);
   auto muxAsLinker = dynamic_pointer_cast<Linker>(muxNode);
   TS_ASSERT_NOT_NULLPTR (muxAsLinker);
-  TS_ASSERT_EQUALS      (muxAsLinker->GetName(), DEFAULT_TAP_MUX_NAME);
+  TS_ASSERT_EQUALS      (muxAsLinker->Name(), DEFAULT_TAP_MUX_NAME);
 
   // DR bypass
-  auto bypassNode = muxAsLinker->GetFirstChild();
+  auto bypassNode = muxAsLinker->FirstChild();
   TS_ASSERT_NOT_NULLPTR (bypassNode);
   auto bypassAsRegister = dynamic_pointer_cast<Register>(bypassNode);
   TS_ASSERT_NOT_NULLPTR (bypassAsRegister);
-  TS_ASSERT_EQUALS (bypassAsRegister->GetName(), DEFAULT_TAP_MUX_BPY_NAME);
+  TS_ASSERT_EQUALS (bypassAsRegister->Name(), DEFAULT_TAP_MUX_BPY_NAME);
 
   // Check appending nodes to tap
-  auto linkerSecondChild = bypassAsRegister->GetNextSibling();
+  auto linkerSecondChild = bypassAsRegister->NextSibling();
   TS_ASSERT_NULLPTR (linkerSecondChild);
 
   auto newReg = sut.CreateRegister("New reg", BinaryVector::CreateFromBinaryString("1010"), tapNode);
 
-  linkerSecondChild = bypassAsRegister->GetNextSibling();
+  linkerSecondChild = bypassAsRegister->NextSibling();
   TS_ASSERT_NOT_NULLPTR (linkerSecondChild);
-  TS_ASSERT_EQUALS      (linkerSecondChild->GetName(), "New reg");
+  TS_ASSERT_EQUALS      (linkerSecondChild->Name(), "New reg");
 }
 
 

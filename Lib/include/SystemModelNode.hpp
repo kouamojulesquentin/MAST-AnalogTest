@@ -74,14 +74,14 @@ class DLL_EXPORT SystemModelNode
 
   // ---------------- Getters
   //
-  void*                              GetApplicationData()   const { return m_applicationData;  }                 //!< Retrieve application specific data
-  std::shared_ptr<ConditionsChecker> GetConditionsChecker() const { return m_conditionChecker; }                 //!< Returns current condition checker
-  NodeIdentifier                     GetIdentifier()        const { return m_identifier;       }                 //!< Returns node unique identifier
-  std::experimental::string_view     GetName()              const { return m_name;             }                 //!< Returns current node name
-  std::shared_ptr<SystemModelNode>   GetNextSibling()       const { return m_pNextSibling;     }                 //!< Returns next sibling or nullptr
-  uint32_t                           GetPriority()          const { return m_priority;         }                 //!< Returns currently assigned priority
-  bool                               HasConditions()        const { return m_conditionChecker  ? true : false ;} //!< Returns true if there is some condition to check
-  bool                               IsPending()            const { return m_pending;          }                 //!< Returns true if at least one node in the hierarchy is pending (need an update cycle)
+  void*                              ApplicationData() const { return m_applicationData;  }                 //!< Retrieve application specific data
+  std::shared_ptr<ConditionsChecker> Checker()         const { return m_conditionChecker; }                 //!< Returns current condition checker
+  NodeIdentifier                     Identifier()      const { return m_identifier;       }                 //!< Returns node unique identifier
+  std::experimental::string_view     Name()            const { return m_name;             }                 //!< Returns current node name
+  std::shared_ptr<SystemModelNode>   NextSibling()     const { return m_pNextSibling;     }                 //!< Returns next sibling or nullptr
+  uint32_t                           Priority()        const { return m_priority;         }                 //!< Returns currently assigned priority
+  bool                               HasConditions()   const { return m_conditionChecker  ? true : false ;} //!< Returns true if there is some condition to check
+  bool                               IsPending()       const { return m_pending;          }                 //!< Returns true if at least one node in the hierarchy is pending (need an update cycle)
 
   // ---------------- Protected Methods
   //
@@ -94,7 +94,7 @@ class DLL_EXPORT SystemModelNode
   //
   private:
 
-  static NodeIdentifier GetNextIdentifier();
+  static NodeIdentifier NextIdentifier();
   static std::string    MakeNodeName (std::experimental::string_view name);
 
   // ---------------- Private  Fields

@@ -40,9 +40,9 @@ class DLL_EXPORT PrettyPrinterVisitor : public SystemModelVisitor
   virtual void VisitLinker          (Linker&          linker)          override;
   virtual void VisitRegister        (Register&        reg)             override;
 
-  std::string GetPrettyPrint() const { return m_os.str();     } //!< Returns currently visited nodes representation
-  bool        GetVerbose()     const { return m_verbose;      } //!< Returns whether verbose mode is active
-  bool        UseHexFormat()   const { return m_useHexFormat; } //!< Returns true if pretty printer is configured to print Register values as hexadecimal string
+  std::string PrettyPrint()  const { return m_os.str();     } //!< Returns currently visited nodes representation
+  bool        IsVerbose()    const { return m_verbose;      } //!< Returns whether verbose mode is active
+  bool        UseHexFormat() const { return m_useHexFormat; } //!< Returns true if pretty printer is configured to print Register values as hexadecimal string
 
   void SetVerbose   (bool verbose)      { m_verbose      = verbose;      } //!< Changes verbosity mode
   void UseHexFormat (bool useHexFormat) { m_useHexFormat = useHexFormat; } //!< Sets whether pretty printer is configured to print Register values as hexadecimal string

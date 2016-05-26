@@ -45,12 +45,10 @@ class DLL_EXPORT ParentNode : public SystemModelNode
 
   uint32_t DirectChildrenCount() const;  //!< Returns current number of direct children
 
-  std::shared_ptr<SystemModelNode> GetFirstChild()    const { return m_pFirstChild;            } //!< Returns first child or nullptr
-  std::shared_ptr<ParentNode>      GetChildAppender() const { return m_pOptionalChildAppender; }
+  std::shared_ptr<SystemModelNode> FirstChild()    const { return m_pFirstChild;            } //!< Returns first child or nullptr
+  std::shared_ptr<ParentNode>      ChildAppender() const { return m_pOptionalChildAppender; }
 
   void  SetChildAppender (std::shared_ptr<ParentNode> childAppender) { m_pOptionalChildAppender = childAppender; }
-
-
 
   // ---------------- Protected Methods
   //

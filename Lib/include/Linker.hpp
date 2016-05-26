@@ -71,11 +71,11 @@ class DLL_EXPORT Linker : public ParentNode
 
   virtual std::experimental::string_view TypeName() const override { return "Linker"; } //!< Returns readable type name
 
-  std::shared_ptr<PathSelector> GetPathSelector() const { return m_pathSelector; }
+  std::shared_ptr<PathSelector> Selector() const { return m_pathSelector; }
 
      //+ (JFC April/20/2016): Move to linkerInfo
-  virtual BinaryVector GetLastSequence() const;  //!< Returns last sequence shifted from sut
-  virtual BinaryVector GetNextSequence() const;  //!< Returns sequence to shift into sut
+//+  virtual BinaryVector GetLastSequence() const;  //!< Returns last sequence shifted from sut
+//+  virtual BinaryVector GetNextSequence() const;  //!< Returns sequence to shift into sut
 
   // ---------------- Protected Methods
   //

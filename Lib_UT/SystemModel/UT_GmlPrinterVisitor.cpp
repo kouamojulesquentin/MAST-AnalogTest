@@ -50,7 +50,7 @@ void UT_GmlPrinterVisitor::test_Constructor ()
 
   // ---------------- Verify
   //
-  string graph    = sut.GetGraph();   // Should return valid empty graph
+  string graph    = sut.Graph();   // Should return valid empty graph
   string expected = "graph\n"
                     "[\n"
                     "   hierarchic 1 directed 1\n"
@@ -97,7 +97,7 @@ void UT_GmlPrinterVisitor::test_VisitAccessInterface_with_Child ()
 
   // ---------------- Verify
   //
-  auto gotGraph = sut.GetGraph();
+  auto gotGraph = sut.Graph();
   auto expected = string("graph\n"
                          "[\n"
                          "   hierarchic 1 directed 1\n"
@@ -127,7 +127,7 @@ void UT_GmlPrinterVisitor::test_VisitAccessInterface_with_Child ()
 
 //! Checks GmlPrinterVisitor::VisitAccessInterface() when there are several child beneath
 //!
-void UT_GmlPrinterVisitor::test_Visit_After_GetGraph ()
+void UT_GmlPrinterVisitor::test_Visit_After_Graph ()
 {
   // ---------------- Setup
   //
@@ -143,7 +143,7 @@ void UT_GmlPrinterVisitor::test_Visit_After_GetGraph ()
   accessInterface->AppendChild(chain);
 
   GmlPrinterVisitor sut;
-  sut.GetGraph();   // Should return valid empty graph
+  sut.Graph();   // Should return valid empty graph
 
   // ---------------- Exercise
   //
@@ -151,7 +151,7 @@ void UT_GmlPrinterVisitor::test_Visit_After_GetGraph ()
 
   // ---------------- Verify
   //
-  auto gotGraph = sut.GetGraph();
+  auto gotGraph = sut.Graph();
   auto expected = string("graph\n"
                          "[\n"
                          "   hierarchic 1 directed 1\n"
@@ -189,7 +189,7 @@ void UT_GmlPrinterVisitor::test_VisitTap ()
 
   // ---------------- Verify
   //
-  auto got      = sut.GetGraph();
+  auto got      = sut.Graph();
   auto expected = string("graph\n"
                          "[\n"
                          "   hierarchic 1 directed 1\n"
@@ -239,7 +239,7 @@ void UT_GmlPrinterVisitor::test_VisitTap_With_SubNodes ()
 
   // ---------------- Verify
   //
-  auto got      = sut.GetGraph();
+  auto got      = sut.Graph();
   auto expected = string("graph\n"
                          "[\n"
                          "   hierarchic 1 directed 1\n"
@@ -312,7 +312,7 @@ void UT_GmlPrinterVisitor::test_Visit_With_DisplayIdentifier_true ()
 
   // ---------------- Verify
   //
-  auto got      = sut.GetGraph();
+  auto got      = sut.Graph();
   auto expected = string("graph\n"
                          "[\n"
                          "   hierarchic 1 directed 1\n"
@@ -401,7 +401,7 @@ void UT_GmlPrinterVisitor::test_Visit_With_DisplayIdentifierAndRegister_true ()
 
   // ---------------- Verify
   //
-  auto got      = sut.GetGraph();
+  auto got      = sut.Graph();
   auto expected = string("graph\n"
                          "[\n"
                          "   hierarchic 1 directed 1\n"

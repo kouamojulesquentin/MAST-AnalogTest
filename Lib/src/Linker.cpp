@@ -24,7 +24,11 @@ using std::experimental::string_view;
 using namespace mast;
 
 
-//! Initialized parent and ...
+//! Initializes parent and path selector
+//!
+//! @param name           Name associated with the Linker node
+//! @param pathSelector   PathSelector associated with the Linker
+//!
 Linker::Linker (string_view name, shared_ptr<PathSelector> pathSelector)
   : ParentNode     (name)
   , m_pathSelector (pathSelector)
@@ -95,10 +99,10 @@ void Linker::Select   (uint32_t pathIdentifier)
 
 //! Returns pointer on byte-stream for last sequence shifted from sut
 //!
-BinaryVector Linker::GetLastSequence () const
-{
-  return BinaryVector();
-}
+//+BinaryVector Linker::GetLastSequence () const
+//+{
+//+  return BinaryVector();
+//+}
 //
 //  End of: Linker::GetLastSequence
 //---------------------------------------------------------------------------
@@ -106,10 +110,10 @@ BinaryVector Linker::GetLastSequence () const
 
 //! Returns pointer on byte-stream for next sequence to shift into sut
 //!
-BinaryVector Linker::GetNextSequence () const
-{
-  return BinaryVector();
-}
+//+BinaryVector Linker::GetNextSequence () const
+//+{
+//+  return BinaryVector();
+//+}
 //
 //  End of: Linker::GetNextSequence
 //---------------------------------------------------------------------------

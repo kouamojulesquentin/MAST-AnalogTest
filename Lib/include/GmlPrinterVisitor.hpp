@@ -47,7 +47,7 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
   virtual void VisitLinker          (Linker&          linker)          override;
   virtual void VisitRegister        (Register&        reg)             override;
 
-  std::string  GetGraph();  //!< Returns currently visited nodes graph representation
+  std::string  Graph();  //!< Returns currently visited nodes graph representation
 
 
   bool DisplayIdentifier()    const { return m_displayIdentifier;    } //!< Returns whether node identifier are displayed or not

@@ -58,14 +58,14 @@ void GmlPrinterVisitor::AppendParentNode (std::experimental::string_view shapeNa
     ++m_depth;
 
     auto childId = 1u;
-    auto child   = parentNode.GetFirstChild();
+    auto child   = parentNode.FirstChild();
     while (child)
     {
       child->Accept(*this);
       PrintEdge(parentNode, *child, childId);
 
       ++childId;
-      child = child->GetNextSibling();
+      child = child->NextSibling();
     }
   }
 
@@ -88,15 +88,15 @@ void GmlPrinterVisitor::AppendNode (string_view            shapeName,
                                     string_view            notes,
                                     const SystemModelNode& node)
 {
-  m_osGraph << "   node [ id " << node.GetIdentifier();
+  m_osGraph << "   node [ id " << node.Identifier();
 
-  auto displayName  = !node.GetName().empty();
+  auto displayName  = !node.Name().empty();
   auto displayNotes = !notes.empty();
   auto displayLabel = displayName || m_displayIdentifier || displayNotes;
 
   // ---------------- Compute height and width for the graphic
   //
-  size_t labelCharWidth = node.GetName().length();
+  size_t labelCharWidth = node.Name().length();
   size_t linesCount     = 1;
 
   if (displayNotes)
@@ -135,12 +135,12 @@ void GmlPrinterVisitor::AppendNode (string_view            shapeName,
 
     if (m_displayIdentifier)
     {
-      m_osGraph << "(" << node.GetIdentifier() << ")\n";
+      m_osGraph << "(" << node.Identifier() << ")\n";
     }
 
     if (displayName)
     {
-      m_osGraph << node.GetName();
+      m_osGraph << node.Name();
     }
 
     if (displayNotes)
@@ -169,8 +169,8 @@ void GmlPrinterVisitor::PrintEdge (const ParentNode&              parentNode,
                                    std::experimental::string_view style)
 {
   m_osEdges << "   edge ["
-            << " source "  << parentNode.GetIdentifier()
-            << " target "  << childNode.GetIdentifier();
+            << " source "  << parentNode.Identifier()
+            << " target "  << childNode.Identifier();
 
   if (childId != 0)
   {
@@ -237,7 +237,7 @@ void GmlPrinterVisitor::CreateRoot ()
 
 //! Returns currently visited nodes representation and edges
 //!
-string GmlPrinterVisitor::GetGraph ()
+string GmlPrinterVisitor::Graph ()
 {
   string graph;
 
@@ -257,7 +257,7 @@ string GmlPrinterVisitor::GetGraph ()
   return graph;
 }
 //
-//  End of: GmlPrinterVisitor::GetGraph
+//  End of: GmlPrinterVisitor::Graph
 //---------------------------------------------------------------------------
 
 
@@ -285,7 +285,7 @@ void GmlPrinterVisitor::VisitLinker (Linker& linker)
 
   // ---------------- Deal with path selector
   //
-  auto selector = linker.GetPathSelector();
+  auto selector = linker.Selector();
   if (selector)
   {
     m_linker = &linker;

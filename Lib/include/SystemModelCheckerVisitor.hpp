@@ -37,8 +37,8 @@ class DLL_EXPORT SystemModelCheckerVisitor final : public SystemModelVisitor
   ~SystemModelCheckerVisitor() = default;
   SystemModelCheckerVisitor()  = delete;
   SystemModelCheckerVisitor(const SystemModel& model)
-    : m_root              (model.GetRoot())
-    , m_identifierMapping (model.GetIdentifierMapping())
+    : m_root              (model.Root())
+    , m_identifierMapping (model.IdentifierMapping())
   {}
 
 

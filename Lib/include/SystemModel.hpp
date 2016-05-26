@@ -77,15 +77,15 @@ class DLL_EXPORT SystemModel
                                             BinaryVector                   bypassSequence,
                                             std::shared_ptr<ParentNode>    parentNode = nullptr);
 
-  std::shared_ptr<ParentNode>      GetRoot() const { return m_root; }                         //!< Returns root node
-  std::shared_ptr<SystemModelNode> GetNode(SystemModelNode::NodeIdentifier identifier) const; //!< Returns node associated with a node identifier
+  std::shared_ptr<ParentNode>      Root() const { return m_root; }                         //!< Returns root node
+  std::shared_ptr<SystemModelNode> NodeWithId(SystemModelNode::NodeIdentifier identifier) const; //!< Returns node associated with a node identifier
 
   //! Releases the resources occupied by a node data structure recursively
   //!
   void RemoveNodeFromModel(std::shared_ptr<SystemModelNode> node);
   //+ (JFC April/20/2016): How to report parent node that a node has been destroyed?
 
-  uint32_t GetRegistersCount() const { return m_totalRegisters; }
+  uint32_t RegistersCount() const { return m_totalRegisters; }
 
   // ---------------- Protected Methods
   //
@@ -99,7 +99,7 @@ class DLL_EXPORT SystemModel
 
   using TIdentifierMapping = std::vector<std::shared_ptr<SystemModelNode>>;
 
-  TIdentifierMapping GetIdentifierMapping() const { return m_identifierMapping; }
+  TIdentifierMapping IdentifierMapping() const { return m_identifierMapping; }
 
   // ---------------- Private  Fields
   //

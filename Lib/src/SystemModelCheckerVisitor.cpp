@@ -56,7 +56,7 @@ void SystemModelCheckerVisitor::CheckIdentifiers ()
     auto node = m_identifierMapping[id];
     if (node)
     {
-      if (node->GetIdentifier() != static_cast<SystemModelNode::NodeIdentifier>(id))
+      if (node->Identifier() != static_cast<SystemModelNode::NodeIdentifier>(id))
       {
         ostringstream os;
         Stream(os, "Found", *node) << "' while expecting it to have id: '" << id << "'";
@@ -91,7 +91,7 @@ bool SystemModelCheckerVisitor::CheckChildNode (shared_ptr<const ParentNode> par
 
   // ---------------- Check identifier mapping consistency for that node
   //
-  auto id = static_cast<TCollectedNodeInfo::size_type>(child->GetIdentifier());
+  auto id = static_cast<TCollectedNodeInfo::size_type>(child->Identifier());
 
   if (    (id >= m_collectedNodeInfo.size())
       ||  !m_identifierMapping[id]
@@ -128,7 +128,7 @@ bool SystemModelCheckerVisitor::CheckChildNode (shared_ptr<const ParentNode> par
         Stream(os, ", child of",         *parent);
         Stream(os, ", is also child of", *nodeInfos.parent);
       }
-      else if (child == child->GetNextSibling())
+      else if (child == child->NextSibling())
       {
         Stream(os, " has been appended twice in a row to", *parent);
       }
@@ -164,7 +164,7 @@ bool SystemModelCheckerVisitor::CheckChildNode (shared_ptr<const ParentNode> par
 //!
 void SystemModelCheckerVisitor::CheckParentNode (shared_ptr<const ParentNode> parent)
 {
-  auto nextChild = parent->GetFirstChild();
+  auto nextChild = parent->FirstChild();
 
   if (!nextChild)
   {
@@ -200,7 +200,7 @@ void SystemModelCheckerVisitor::CheckParentNode (shared_ptr<const ParentNode> pa
         }
       }
 
-      nextChild = nextChild->GetNextSibling();
+      nextChild = nextChild->NextSibling();
     }
   }
 }
@@ -337,7 +337,7 @@ ostringstream& SystemModelCheckerVisitor::Stream (ostringstream& os, string_view
     os << header << " ";
   }
 
-  os << node.TypeName() << " '" << node.GetName() << "' (id: " << node.GetIdentifier() << ")";
+  os << node.TypeName() << " '" << node.Name() << "' (id: " << node.Identifier() << ")";
   return os;
 }
 //
@@ -381,7 +381,7 @@ void SystemModelCheckerVisitor::VisitLinker (Linker& linker)
   //! @todo [JFC]-[May/24/2016]: Implement SystemModelCheckerVisitor::VisitLinker()
 
   auto childrenCount = linker.DirectChildrenCount();
-  auto pathSelector  = linker.GetPathSelector();
+  auto pathSelector  = linker.Selector();
   if (!pathSelector)
   {
     ReportError(linker, " has no path selector");

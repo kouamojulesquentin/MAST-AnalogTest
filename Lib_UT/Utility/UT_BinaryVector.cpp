@@ -48,6 +48,7 @@ void UT_BinaryVector::test_Constructor_Default ()
   TS_ASSERT_EQUALS  (sut.BitsCount(),  0);
   TS_ASSERT_EQUALS  (sut.BytesCount(), 0);
   TS_ASSERT_TRUE    (sut.IsEmpty());
+  TS_ASSERT_FALSE   (sut.HasFixedSize());
   TS_ASSERT_NULLPTR (sut.Data());
 }
 
@@ -69,6 +70,7 @@ void UT_BinaryVector::test_Constructor_Copy_When_SrcIsEmpty ()
   TS_ASSERT_EQUALS  (sut.BitsCount(),  0);
   TS_ASSERT_EQUALS  (sut.BytesCount(), 0);
   TS_ASSERT_TRUE    (sut.IsEmpty());
+  TS_ASSERT_FALSE   (sut.HasFixedSize());
   TS_ASSERT_NULLPTR (sut.Data());
 }
 
@@ -89,6 +91,7 @@ void UT_BinaryVector::test_Constructor_Move_When_SrcIsEmpty ()
   TS_ASSERT_EQUALS  (sut.BitsCount(),  0);
   TS_ASSERT_EQUALS  (sut.BytesCount(), 0);
   TS_ASSERT_TRUE    (sut.IsEmpty());
+  TS_ASSERT_FALSE   (sut.HasFixedSize());
   TS_ASSERT_NULLPTR (sut.Data());
 }
 
@@ -117,6 +120,7 @@ void UT_BinaryVector::test_CreateFromBinaryString ()
     TS_ASSERT_EQUALS (sut.BitsCount(),  expectedBitsCount);
     TS_ASSERT_EQUALS (sut.BytesCount(), expectedBytesCount);
     TS_ASSERT_EQUALS (sut.IsEmpty(),    expectedBitsCount == 0);
+    TS_ASSERT_FALSE  (sut.HasFixedSize());
 
     if (expectedBytesCount != 0)
     {
@@ -1392,6 +1396,63 @@ void UT_BinaryVector::test_Append_64_bits_When_NotEmpty ()
 }
 
 
+//! Checks Append when sut size has been fixed (at construction)
+//!
+void UT_BinaryVector::test_Append_8_bits_When_FixedSize ()
+{
+  // ---------------- Setup
+  //
+  const uint8_t value = 0xA5;
+  BinaryVector sut(12, 0, BinaryVector::FIX_SIZE);
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut.Append(value), std::exception);
+}
+
+//! Checks Append when sut size has been fixed (at construction)
+//!
+void UT_BinaryVector::test_Append_16_bits_When_FixedSize ()
+{
+  // ---------------- Setup
+  //
+  const uint16_t value = 0xCAFE;
+  BinaryVector sut(12, 0, BinaryVector::FIX_SIZE);
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut.Append(value), std::exception);
+}
+
+//! Checks Append when sut size has been fixed (at construction)
+//!
+void UT_BinaryVector::test_Append_32_bits_When_FixedSize ()
+{
+  // ---------------- Setup
+  //
+  const uint32_t value = 0xFACEDEAD;
+  BinaryVector sut(12, 0, BinaryVector::FIX_SIZE);
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut.Append(value), std::exception);
+}
+
+//! Checks Append when sut size has been fixed (at construction)
+//!
+void UT_BinaryVector::test_Append_64_bits_When_FixedSize ()
+{
+  // ---------------- Setup
+  //
+  const uint64_t value = 0xA51234578B;
+  BinaryVector sut(12, 0, BinaryVector::FIX_SIZE);
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut.Append(value), std::exception);
+}
+
+
 //! Checks Append when sut is empty and adding from 1 to 8 bits from uint8_t (right aligned)
 //!
 //! @note Each time a new BinaryVector is used
@@ -1807,6 +1868,20 @@ void UT_BinaryVector::test_Append_Other_When_NotEmpty ()
   TS_DATA_DRIVEN_TEST (checker, data);
 }
 
+//! Checks Append when sut size has been fixed (at construction)
+//!
+void UT_BinaryVector::test_Append_Other_When_FixedSize ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector sut   (12, 0x00, BinaryVector::FIX_SIZE);
+  BinaryVector other (12, 0xFF);
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut.Append(other), std::exception);
+}
+
 
 
 //! Checks BinaryVector::Operator<< when the sut is still empty
@@ -1955,6 +2030,19 @@ void UT_BinaryVector::test_Operator_Shift_When_Cascaded ()
   TS_DATA_DRIVEN_TEST (checker, data);
 }
 
+//! Checks shift operator when sut size has been fixed (at construction)
+//!
+void UT_BinaryVector::test_Operator_Shift_When_FixedSize ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector sut   (12, 0x00, BinaryVector::FIX_SIZE);
+  BinaryVector other (12, 0xFF);
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut << other, std::exception);
+}
 
 //! Checks BinaryVector::Operator+ when the sut is still empty
 //!
@@ -2055,6 +2143,213 @@ void UT_BinaryVector::test_Operator_Plus_When_NotEmpty ()
 }
 
 
+//! Checks addition operator when both operand have their size fixed (at construction)
+//!
+void UT_BinaryVector::test_Operator_Plus_When_FixedSize ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector lhs (7, 0x00, BinaryVector::FIX_SIZE);
+  BinaryVector rhs (3, 0xFF, BinaryVector::FIX_SIZE);
+
+  // ---------------- Exercise
+  //
+  auto result = lhs + rhs;
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE  (result.HasFixedSize());
+
+  auto expected = BinaryVector::CreateFromBinaryString("0000_0001:11");
+
+  TS_ASSERT_EQUALS (result, expected);
+}
+
+
+//! Checks BinaryVector::FixSize() when it was initially not fixed
+//!
+void UT_BinaryVector::test_FixSize_When_WasNotFixed ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector sut(12, 3);
+
+  // ---------------- Exercise
+  //
+  sut.FixSize(true);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE   (sut.HasFixedSize());
+  TS_ASSERT_THROWS (sut.Set(8U), std::exception);
+}
+
+//! Checks BinaryVector::FixSize() when it was initially fixed
+//!
+void UT_BinaryVector::test_FixSize_When_WasFixed ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector sut(12, 2, BinaryVector::FIX_SIZE);
+
+  // ---------------- Exercise
+  //
+  sut.FixSize(false);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE          (sut.HasFixedSize());
+  TS_ASSERT_THROWS_NOTHING (sut.Set(8U));
+}
+
+//! Checks assigment operator
+//!
+void UT_BinaryVector::test_CopyAssignmentOperator ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector sut   (3, 0x00);
+  BinaryVector other (4, 0xFF);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut = other);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE  (sut.HasFixedSize());
+  TS_ASSERT_EQUALS (sut, other);
+}
+
+
+//! Checks assigment operator when sut has its size fixed and other has same size
+//!
+void UT_BinaryVector::test_CopyAssignmentOperator_When_FixedSize_SameSize ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector sut   (3, 0x00, BinaryVector::FIX_SIZE);
+  BinaryVector other (3, 0xFF);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut = other);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE   (sut.HasFixedSize());
+  TS_ASSERT_EQUALS (sut, other);
+}
+
+//! Checks assigment operator when sut has its size fixed (and other has not)
+//!
+void UT_BinaryVector::test_CopyAssignmentOperator_When_FixedSize_DifferentSize ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector sut   (3, 0x00, BinaryVector::FIX_SIZE);
+  BinaryVector other (2, 0xFF);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS (sut = other, std::exception);
+}
+
+//! Checks copy assigment operator when other has its size fixed
+//!
+void UT_BinaryVector::test_CopyAssignmentOperator_From_FixedSize ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector sut   (3, 0x00);
+  BinaryVector other (4, 0xFF, BinaryVector::FIX_SIZE);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut = other);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE  (sut.HasFixedSize());
+  TS_ASSERT_EQUALS (sut, other);
+}
+
+//! Checks assigment operator
+//!
+void UT_BinaryVector::test_MoveAssignmentOperator ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector sut (3, 0x00);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut = BinaryVector(4, 0xFF, BinaryVector::FIX_SIZE));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE  (sut.HasFixedSize());
+
+  BinaryVector expected = BinaryVector(4, 0xFF);
+  TS_ASSERT_EQUALS (sut, expected);
+}
+
+
+//! Checks move assigment operator when sut has its size fixed and other has same size
+//!
+void UT_BinaryVector::test_MoveAssignmentOperator_When_FixedSize_SameSize ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector sut   (3, 0x00, BinaryVector::FIX_SIZE);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut = BinaryVector(3, 0xFF, BinaryVector::FIX_SIZE));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE   (sut.HasFixedSize());
+
+  BinaryVector expected = BinaryVector(3, 0xFF);
+  TS_ASSERT_EQUALS (sut, expected);
+}
+
+//! Checks move assigment operator when sut has its size fixed (and other has not)
+//!
+void UT_BinaryVector::test_MoveAssignmentOperator_When_FixedSize_DifferentSize ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector sut   (3, 0x00, BinaryVector::FIX_SIZE);
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut = BinaryVector(4, 0xFF), std::exception);
+}
+
+//! Checks move assigment operator when other has its size fixed
+//!
+void UT_BinaryVector::test_MoveAssignmentOperator_From_FixedSize ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector sut   (3, 0x00);
+  BinaryVector other (4, 0xFF, BinaryVector::FIX_SIZE);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut = std::move(other));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE  (sut.HasFixedSize());
+
+  BinaryVector expected = BinaryVector(4, 0xFF);
+  TS_ASSERT_EQUALS (sut, expected);
+
+  TS_ASSERT_TRUE (other.IsEmpty());
+}
 
 
 //! Checks BinaryVector::ToggleBits()

@@ -26,7 +26,6 @@ class UT_BinaryVector : public CxxTest::TestSuite
    UT_BinaryVector() = default;
   ~UT_BinaryVector() = default;
 
-
   // ================ Test Methods ================
 
   // ---------------- Constructors
@@ -79,6 +78,11 @@ class UT_BinaryVector : public CxxTest::TestSuite
   void test_Append_32_bits_When_NotEmpty ();
   void test_Append_64_bits_When_NotEmpty ();
 
+  void test_Append_8_bits_When_FixedSize ();
+  void test_Append_16_bits_When_FixedSize ();
+  void test_Append_32_bits_When_FixedSize ();
+  void test_Append_64_bits_When_FixedSize ();
+
   void test_Append_1_to_8_bits_When_Empty_Right_Aligned ();
   void test_Append_1_to_8_bits_When_Empty_Left_Aligned ();
   void test_Append_1_to_8_bits_When_NotEmpty_Right_Aligned ();
@@ -86,17 +90,36 @@ class UT_BinaryVector : public CxxTest::TestSuite
 
   void test_Append_Other_When_Empty ();
   void test_Append_Other_When_NotEmpty ();
+  void test_Append_Other_When_FixedSize ();
 
   // ---------------- operator<<
   //
   void test_Operator_Shift_When_Empty ();
   void test_Operator_Shift_When_NotEmpty ();
   void test_Operator_Shift_When_Cascaded ();
+  void test_Operator_Shift_When_FixedSize ();
 
   // ---------------- operator+
   //
   void test_Operator_Plus_When_Empty ();
   void test_Operator_Plus_When_NotEmpty ();
+  void test_Operator_Plus_When_FixedSize ();
+
+  // ---------------- FixSize
+  //
+  void test_FixSize_When_WasNotFixed ();
+  void test_FixSize_When_WasFixed ();
+
+  // ---------------- operator=
+  //
+  void test_CopyAssignmentOperator ();
+  void test_CopyAssignmentOperator_When_FixedSize_SameSize ();
+  void test_CopyAssignmentOperator_When_FixedSize_DifferentSize ();
+  void test_CopyAssignmentOperator_From_FixedSize ();
+  void test_MoveAssignmentOperator ();
+  void test_MoveAssignmentOperator_When_FixedSize_SameSize ();
+  void test_MoveAssignmentOperator_When_FixedSize_DifferentSize ();
+  void test_MoveAssignmentOperator_From_FixedSize ();
 
   // ---------------- ToggleBits
   //

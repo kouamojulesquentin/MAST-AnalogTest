@@ -11,7 +11,6 @@
 //!
 //===========================================================================
 
-
 #include "BinaryVector.hpp"
 #include "Utility.hpp"
 #include <sstream>
@@ -23,6 +22,9 @@ using std::ostringstream;
 using std::string;
 using std::experimental::string_view;
 using namespace mast;
+
+#define CHECK_FIXED_SIZE                      if (m_fixedSize)                            THROW_LOGIC_ERROR("BinaryVector size has been fixed")
+#define CHECK_FIXED_SIZE_ASSIGNMENT(newSize)  if (m_fixedSize && (newSize != m_usedBits)) THROW_LOGIC_ERROR("BinaryVector size has been fixed")
 
 namespace
 {
@@ -56,9 +58,10 @@ namespace
 
 //! Initializes with constant value for all bits
 //!
-BinaryVector::BinaryVector (uint32_t bitsCount, uint8_t fillPattern)
-  : m_data     ((bitsCount + 7) / 8, fillPattern)
-  , m_usedBits (bitsCount)
+BinaryVector::BinaryVector (uint32_t bitsCount, uint8_t fillPattern, bool fixSize)
+  : m_data      ((bitsCount + 7) / 8, fillPattern)
+  , m_usedBits  (bitsCount)
+  , m_fixedSize (fixSize)
 {
   auto lastByteBitsCount = bitsCount % 8;
   if (lastByteBitsCount != 0)
@@ -102,6 +105,8 @@ BinaryVector::BinaryVector (mast::BinaryVector&& rhs) noexcept
 //!
 BinaryVector& BinaryVector::Append (const BinaryVector& rhs)
 {
+  CHECK_FIXED_SIZE;
+
   uint32_t       bitsToAppend = rhs.BitsCount();
   const uint8_t* pRhsData     = rhs.Data();
 
@@ -138,11 +143,12 @@ BinaryVector& BinaryVector::Append (uint8_t value, uint8_t numberOfBits, BitsAli
     THROW_INVALID_ARGUMENT("Number of bits to append must be != 0");
   }
 
+  CHECK_FIXED_SIZE;
+
   if (numberOfBits > 8 * sizeof(uint8_t))
   {
-    THROW_INVALID_ARGUMENT("Number of append bits cannot exceed number of bits of value.");
+    THROW_INVALID_ARGUMENT("Number of bits to append cannot exceed the number of bits of value.");
   }
-
 
   // ---------------- Align (pack) added bits to the MSB
   //                  This make sure that unused bits are set to zero (at least for test and debug purpose)
@@ -200,6 +206,8 @@ BinaryVector& BinaryVector::Append (uint8_t value, uint8_t numberOfBits, BitsAli
 //!
 BinaryVector& BinaryVector::Append (uint16_t value)
 {
+  CHECK_FIXED_SIZE;
+
   //! @todo [JFC]-[April/25/2016]: Use Boost.Endian to manage properly endianness
   //!
   m_data.push_back((value >>  8) & 0xff);
@@ -217,6 +225,7 @@ BinaryVector& BinaryVector::Append (uint16_t value)
 //!
 BinaryVector& BinaryVector::Append (uint32_t value)
 {
+  CHECK_FIXED_SIZE;
   //! @todo [JFC]-[April/25/2016]: Use Boost.Endian to manage properly endianness
   //!
   m_data.push_back((value >> 24) & 0xff);
@@ -237,6 +246,7 @@ BinaryVector& BinaryVector::Append (uint32_t value)
 //!
 BinaryVector& BinaryVector::Append (uint64_t value)
 {
+  CHECK_FIXED_SIZE;
   //! @todo [JFC]-[April/25/2016]: Use Boost.Endian to manage properly endianness
   //!
   m_data.push_back((value >> 56) & 0xff);
@@ -479,8 +489,12 @@ string BinaryVector::DataAsHexString (string_view intSeparator,
 
 //! Copy assignment
 //!
+//! @note Does not change the fixed size property
+//!
 BinaryVector& BinaryVector::operator= (const BinaryVector& rhs)
 {
+  CHECK_FIXED_SIZE_ASSIGNMENT(rhs.m_usedBits);
+
   if (this != &rhs)
   {
     m_data     = rhs.m_data;
@@ -495,8 +509,12 @@ BinaryVector& BinaryVector::operator= (const BinaryVector& rhs)
 
 //! Move assignment
 //!
-BinaryVector& BinaryVector::operator= (BinaryVector&& rhs) noexcept
+//! @note Does not change the fixed size property
+//!
+BinaryVector& BinaryVector::operator= (BinaryVector&& rhs)
 {
+  CHECK_FIXED_SIZE_ASSIGNMENT(rhs.m_usedBits);
+
   if (this != &rhs)
   {
     m_data     = std::move(rhs.m_data);
@@ -511,6 +529,8 @@ BinaryVector& BinaryVector::operator= (BinaryVector&& rhs) noexcept
 
 
 //! Returns true when *this is equal to another BinaryVector
+//!
+//! @note Fixed size property is not compare (only the value)
 //!
 bool BinaryVector::operator== (const BinaryVector& rhs) const
 {
@@ -609,7 +629,7 @@ void BinaryVector::Set (uint8_t value)
 //!               set "01,':_- \t"
 //!
 //! @return A new BinaryVector initialized as defined by bits text
-BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_view bits)
+BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_view bits, bool fixSize)
 {
   BinaryVector result;
 
@@ -661,6 +681,7 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
     result.m_usedBits += bitCount;
   }
 
+  result.m_fixedSize = fixSize;
   return result;
 }
 //
@@ -678,7 +699,7 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
 //!               set "0123456789abcdefABCDEF,':_- \t"
 //!
 //! @return A new BinaryVector initialized as defined by bits text
-BinaryVector BinaryVector::CreateFromHexString (std::experimental::string_view bits)
+BinaryVector BinaryVector::CreateFromHexString (std::experimental::string_view bits, bool fixSize)
 {
   BinaryVector result;
 
@@ -755,6 +776,8 @@ BinaryVector BinaryVector::CreateFromHexString (std::experimental::string_view b
     result.m_usedBits += bitCount;
   }
 
+  result.m_fixedSize = fixSize;
+
   return result;
 }
 //
@@ -767,6 +790,7 @@ BinaryVector BinaryVector::CreateFromHexString (std::experimental::string_view b
 //!
 void BinaryVector::Set (uint16_t value)
 {
+  CHECK_FIXED_SIZE_ASSIGNMENT(8u * sizeof(value));
   Clear();
   Append(value);
 }
@@ -778,6 +802,7 @@ void BinaryVector::Set (uint16_t value)
 //!
 void BinaryVector::Set (uint32_t value)
 {
+  CHECK_FIXED_SIZE_ASSIGNMENT(8u * sizeof(value));
   Clear();
   Append(value);
 }
@@ -790,6 +815,7 @@ void BinaryVector::Set (uint32_t value)
 //!
 void BinaryVector::Set (uint64_t value)
 {
+  CHECK_FIXED_SIZE_ASSIGNMENT(8u * sizeof(value));
   Clear();
   Append(value);
 }

@@ -42,15 +42,20 @@ class DLL_EXPORT BinaryVector final
   // ---------------- Public  Methods
   //
   public:
+  static constexpr bool FIX_SIZE = true;  //!< Meaningfull, optional, value to provide to copy constructor  when bits count must not be changed (is fixed)
+
   ~BinaryVector() = default;
   BinaryVector()  = default;
   BinaryVector(const BinaryVector& rhs);  //!< Copy constructor
-//+  explicit BinaryVector(const SVFVector& svfVector);   //!< Converts a SVFVector to a BinaryVector
-  explicit BinaryVector(uint32_t bitsCount, uint8_t fillPattern = 0);                   //!< Initializes with constant pattern for all bits
-  BinaryVector(BinaryVector&& rhs) noexcept;
+  BinaryVector(const BinaryVector& rhs, bool fixSize) : BinaryVector(rhs) { m_fixedSize = fixSize; } //!< Copy constructor with fixed size
 
-  static BinaryVector CreateFromBinaryString (std::experimental::string_view bits);   //!< Creates a BinaryVector from text binary representation
-  static BinaryVector CreateFromHexString    (std::experimental::string_view bits);   //!< Creates a BinaryVector from text hexadecimal representation
+  explicit BinaryVector(uint32_t bitsCount, uint8_t fillPattern = 0, bool fixSize = false);          //!< Initializes with constant pattern for all bits
+
+  BinaryVector(BinaryVector&& rhs) noexcept;    //!< Move constructor
+  BinaryVector(BinaryVector&& rhs, bool fixSize) noexcept : BinaryVector(std::move(rhs)) { m_fixedSize = fixSize; }    //!< Move constructor with fixed size
+
+  static BinaryVector CreateFromBinaryString (std::experimental::string_view bits, bool fixSize = false);   //!< Creates a BinaryVector from text binary representation
+  static BinaryVector CreateFromHexString    (std::experimental::string_view bits, bool fixSize = false);   //!< Creates a BinaryVector from text hexadecimal representation
 
   std::string DataAsBinaryString(std::experimental::string_view byteSeparator   = ":",
                                  std::experimental::string_view nibbleSeparator = "_",
@@ -65,8 +70,8 @@ class DLL_EXPORT BinaryVector final
                               ) const;         //!< Gets content as formatted hexadecimal string
 
 
-  BinaryVector& operator=(const BinaryVector&);
-  BinaryVector& operator=(BinaryVector&&) noexcept;
+  BinaryVector& operator=(const BinaryVector&);   //!< Copy assignment
+  BinaryVector& operator=(BinaryVector&&);        //!< Move assignment
 
   BinaryVector  operator~() const; //!< Returns another BinaryVector with every bits toggles
   BinaryVector& ToggleBits();      //!< Toggles (flips) every bits of the vector
@@ -74,7 +79,7 @@ class DLL_EXPORT BinaryVector final
   BinaryVector& operator<< (const BinaryVector& rhs) { return this->Append(rhs); }; //!< Appends another BinaryVector
   BinaryVector  operator+  (const BinaryVector& rhs) const;                         //!< Concatenate two BinaryVector
 
-  bool operator==(const BinaryVector& rhs) const;                                 //!< Compares to other for equality
+  bool operator==(const BinaryVector& rhs) const;                                 //!< Compares to other for equality (excepted fixed size property)
   bool operator!=(const BinaryVector& rhs) const { return !operator==(rhs); };    //!< Compares to other for inequality
 
   BinaryVector& Append(const BinaryVector& rhs); //!< Appends another scan vector
@@ -90,19 +95,23 @@ class DLL_EXPORT BinaryVector final
   void          Set(uint32_t value); //!< Assigns 32 bits value the BinaryVector
   void          Set(uint64_t value); //!< Assigns 64 bits value the BinaryVector
 
-  bool           IsEmpty()    const { return m_data.empty();}      //!< Returns true when there is no bit in the BinaryVector, false otherwise
-  uint32_t       BitsCount()  const { return m_usedBits;    }      //!< Returns total number of valid bits in the BinaryVector
-  uint32_t       BytesCount() const { return m_data.size(); }      //!< Returns total number of valid bits in the BinaryVector
-  const uint8_t* Data()       const { return m_data.data(); }      //!< Returns pointer on raw bits stream data (only valid as long as content is not modified)
+  void          FixSize(bool fixSize) { m_fixedSize = fixSize; } //!< Sets whether the number of used bits cannot be changed
+
+  bool           HasFixedSize() const { return m_fixedSize;   }   //!< Returns true if number of used bits cannot be changed
+  bool           IsEmpty()      const { return m_data.empty();}   //!< Returns true when there is no bit in the BinaryVector, false otherwise
+  uint32_t       BitsCount()    const { return m_usedBits;    }   //!< Returns total number of valid bits in the BinaryVector
+  uint32_t       BytesCount()   const { return m_data.size(); }   //!< Returns total number of valid bits in the BinaryVector
+  const uint8_t* Data()         const { return m_data.data(); }   //!< Returns pointer on raw bits stream data (only valid as long as content is not modified)
 
   BinaryVector    Slice    (uint32_t firstBitOffset, uint32_t bitsCount) const; //!< Returns a slice from BinaryVector
-//+  BinaryVectorRef SliceRef (uint32_t firstBitOffset, uint32_t bitsCount) const; //!< Returns a reference to a slice from BinaryVector
+//+  BinaryVector_View Slice_View (uint32_t firstBitOffset, uint32_t bitsCount) const; //!< Returns a reference to a slice from BinaryVector
 
   // ---------------- Private  Fields
   //
   private:
-  std::vector<uint8_t> m_data;              //!< Bytes formatted bit stream
-  uint32_t             m_usedBits = 0;      //!< Number of effective bits (last byte may be not all used)
+  std::vector<uint8_t> m_data;               //!< Bytes formatted bit stream
+  uint32_t             m_usedBits  = 0;      //!< Number of effective bits (last byte may be not all used)
+  bool                 m_fixedSize = false;  //!< When true, the number of used bits cannot be changed (once constructed)
 };
 //
 //  End of BinaryVector class declaration

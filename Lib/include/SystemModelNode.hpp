@@ -66,7 +66,7 @@ class DLL_EXPORT SystemModelNode
   void SetConditionsChecker (std::shared_ptr<ConditionsChecker> conditionsChecker) { m_conditionChecker = conditionsChecker; }  //!< Sets condition checker
   void ResetConditionsChecker ()                                                   { m_conditionChecker.reset(); }              //!< Removes current condition checker
   void SetPriority            (uint32_t priority)                                  { m_priority = priority; }                   //!< Sets new priority (application defined semantic)
-  void ForcePending ()                                                             { m_pending = true; }                        //!< Changes state in order that IsPending will return true
+  void SetPending ()                                                               { m_pending = true; }                        //!< Changes state in order that IsPending will return true
   void ResetPending ()                                                             { m_pending = false; }                       //!< Changes state in order that IsPending will return false
   void SetName (std::experimental::string_view name)                               { m_name = MakeNodeName(name); }             //!< Changes node name
 

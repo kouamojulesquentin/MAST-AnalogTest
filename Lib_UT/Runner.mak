@@ -16,6 +16,7 @@ Suites = \
            $(UT_RootPath)/Utility/UT_Utility.hpp                 			 \
            $(UT_RootPath)/Utility/UT_BinaryVector.hpp                  \
            $(UT_RootPath)/Utility/UT_SVFVector.hpp                     \
+           $(UT_RootPath)/SystemModel/UT_SystemModelNode.hpp           \
            $(UT_RootPath)/SystemModel/UT_Register.hpp                  \
            $(UT_RootPath)/SystemModel/UT_DefaultBinaryPathSelector.hpp \
            $(UT_RootPath)/SystemModel/UT_SystemModel.hpp               \

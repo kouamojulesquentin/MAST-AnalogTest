@@ -191,7 +191,7 @@ void DefaultBinaryPathSelector::Deselect (uint32_t pathIdentifier)
 
   m_muxRegister->SetToSut(m_deselect[pathIdentifier]);
   m_muxRegister->SetBypass(m_deselect[pathIdentifier]);
-  m_muxRegister->ForcePending();
+  m_muxRegister->SetPending();
 }
 //
 //  End of: DefaultBinaryPathSelector::Deselect
@@ -208,7 +208,7 @@ void DefaultBinaryPathSelector::Select (uint32_t pathIdentifier)
 
   m_muxRegister->SetToSut(m_select[pathIdentifier]);
   m_muxRegister->SetBypass(m_select[pathIdentifier]);
-  m_muxRegister->ForcePending();
+  m_muxRegister->SetPending();
 }
 //
 //  End of: DefaultBinaryPathSelector::Select

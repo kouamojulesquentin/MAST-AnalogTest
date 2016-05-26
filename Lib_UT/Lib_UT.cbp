@@ -98,6 +98,8 @@
 		<Unit filename="SystemModel/UT_SystemModel.hpp" />
 		<Unit filename="SystemModel/UT_SystemModelCheckerVisitor.cpp" />
 		<Unit filename="SystemModel/UT_SystemModelCheckerVisitor.hpp" />
+		<Unit filename="SystemModel/UT_SystemModelNode.cpp" />
+		<Unit filename="SystemModel/UT_SystemModelNode.hpp" />
 		<Unit filename="UT_Helpers/SystemModelBuilder.cpp" />
 		<Unit filename="UT_Helpers/SystemModelBuilder.hpp" />
 		<Unit filename="UT_Helpers/UT_SystemModelBuilder.cpp" />

@@ -21,27 +21,19 @@ using namespace mast;
 
 //! Checks Register:: constructor
 //!
+//! @note SystemModelNode parts have been test elsewhere
 void UT_Register::test_Constructor ()
 {
   // ---------------- Setup
   //
-  auto name           = "My register name";
-  const auto bypassSequence = BinaryVector::CreateFromBinaryString("1111_1111:0");
+  auto name           = "A name";
+  auto bypassSequence = BinaryVector::CreateFromBinaryString("1111_1111:0");
 
   // ---------------- Exercise
   //
   Register sut(name, bypassSequence);
 
-  // ---------------- Verify SystemModelNode part
-  //
-  TS_ASSERT_EQUALS  (sut.Name(),     name);
-  TS_ASSERT_EQUALS  (sut.Priority(), 0);
-  TS_ASSERT_FALSE   (sut.IsPending());
-  TS_ASSERT_FALSE   (sut.HasConditions());
-  TS_ASSERT_NULLPTR (sut.ApplicationData());
-  TS_ASSERT_NULLPTR (sut.NextSibling());
-
-  // ---------------- Verify Register part
+  // ---------------- Verify
   //
   TS_ASSERT_FALSE  (sut.MustCheckExpected());
   TS_ASSERT_EQUALS (sut.BypassSequence(),  bypassSequence);

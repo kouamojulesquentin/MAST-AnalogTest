@@ -49,6 +49,7 @@ OBJ_DEBUG = \
             $(OBJDIR_DEBUG)\\SystemModel\\UT_SystemModelCheckerVisitor.o      \
             $(OBJDIR_DEBUG)\\SystemModel\\UT_SystemModel.o                    \
             $(OBJDIR_DEBUG)\\SystemModel\\UT_Register.o                       \
+            $(OBJDIR_DEBUG)\\SystemModel\\UT_SystemModelNode.o                \
             $(OBJDIR_DEBUG)\\SystemModel\\UT_PrettyPrinterVisitor.o           \
             $(OBJDIR_DEBUG)\\SystemModel\\UT_GmlPrinterVisitor.o              \
             $(OBJDIR_DEBUG)\\SystemModel\\UT_DefaultBinaryPathSelector.o      \
@@ -63,6 +64,7 @@ OBJ_RELEASE = \
               $(OBJDIR_RELEASE)\\SystemModel\\UT_SystemModel.o               \
               $(OBJDIR_RELEASE)\\SystemModel\\UT_SystemModelCheckerVisitor.o \
               $(OBJDIR_RELEASE)\\SystemModel\\UT_Register.o                  \
+              $(OBJDIR_RELEASE)\\SystemModel\\UT_SystemModelNode.o           \
               $(OBJDIR_RELEASE)\\SystemModel\\UT_PrettyPrinterVisitor.o      \
               $(OBJDIR_RELEASE)\\SystemModel\\UT_GmlPrinterVisitor.o         \
               $(OBJDIR_RELEASE)\\SystemModel\\UT_DefaultBinaryPathSelector.o \
@@ -111,6 +113,9 @@ $(OBJDIR_DEBUG)\\SystemModel\\UT_SystemModelCheckerVisitor.o: SystemModel\\UT_Sy
 
 $(OBJDIR_DEBUG)\\SystemModel\\UT_Register.o: SystemModel\\UT_Register.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel\\UT_Register.cpp -o $(OBJDIR_DEBUG)\\SystemModel\\UT_Register.o
+
+$(OBJDIR_DEBUG)\\SystemModel\\UT_SystemModelNode.o: SystemModel\\UT_SystemModelNode.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel\\UT_SystemModelNode.cpp -o $(OBJDIR_DEBUG)\\SystemModel\\UT_SystemModelNode.o
 
 $(OBJDIR_DEBUG)\\SystemModel\\UT_PrettyPrinterVisitor.o: SystemModel\\UT_PrettyPrinterVisitor.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel\\UT_PrettyPrinterVisitor.cpp -o $(OBJDIR_DEBUG)\\SystemModel\\UT_PrettyPrinterVisitor.o
@@ -169,6 +174,9 @@ $(OBJDIR_RELEASE)\\SystemModel\\UT_SystemModelCheckerVisitor.o: SystemModel\\UT_
 
 $(OBJDIR_RELEASE)\\SystemModel\\UT_Register.o: SystemModel\\UT_Register.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel\\UT_Register.cpp -o $(OBJDIR_RELEASE)\\SystemModel\\UT_Register.o
+
+$(OBJDIR_RELEASE)\\SystemModel\\UT_SystemModelNode.o: SystemModel\\UT_SystemModelNode.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel\\UT_SystemModelNode.cpp -o $(OBJDIR_RELEASE)\\SystemModel\\UT_SystemModelNode.o
 
 $(OBJDIR_RELEASE)\\SystemModel\\UT_PrettyPrinterVisitor.o: SystemModel\\UT_PrettyPrinterVisitor.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel\\UT_PrettyPrinterVisitor.cpp -o $(OBJDIR_RELEASE)\\SystemModel\\UT_PrettyPrinterVisitor.o

@@ -75,7 +75,7 @@ class DLL_EXPORT SystemModelNode
   // ---------------- Getters
   //
   void*                            ApplicationData() const { return m_applicationData; }             //!< Retrieve application specific data
-  std::shared_ptr<Conditioners>    Conditioners()    const { return m_conditioners;    }             //!< Returns current condition checker
+  std::shared_ptr<mast::Conditioners> Conditioners()    const { return m_conditioners;    }             //!< Returns current condition checker
   NodeIdentifier                   Identifier()      const { return m_identifier;      }             //!< Returns node unique identifier
   std::experimental::string_view   Name()            const { return m_name;            }             //!< Returns current node name
   std::shared_ptr<SystemModelNode> NextSibling()     const { return m_pNextSibling;    }             //!< Returns next sibling or nullptr

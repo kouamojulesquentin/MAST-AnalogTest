@@ -23,7 +23,7 @@ using namespace mast;
 //! @param toSutData      Bits stream to transfer to SUT
 //!
 //! @return Bits stream retrieved from SUT
-BinaryVector AccessInterfaceProtocol_1149_1::DoAction (uint32_t derivationId, void* interfaceData, const BinaryVector& toSutData)
+BinaryVector AccessInterfaceProtocol_1149_1::DoAction (uint32_t /* derivationId */, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   auto fromSut = toSutData;
 

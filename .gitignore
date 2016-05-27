@@ -37,3 +37,5 @@
 /cxxtest/python/python3/cxxtest/*.pyc
 /cxxtest/python/python3/cxxtest/parsetab.py
 /Lib_UT/Generated/Runner.cpp
+/Build_Qt
+/NewMast.pro.user

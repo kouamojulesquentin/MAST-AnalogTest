@@ -23,8 +23,8 @@ using std::string;
 using std::experimental::string_view;
 using namespace mast;
 
-#define CHECK_FIXED_SIZE                      if (m_fixedSize)                            THROW_LOGIC_ERROR("BinaryVector size has been fixed")
-#define CHECK_FIXED_SIZE_ASSIGNMENT(newSize)  if (m_fixedSize && (newSize != m_usedBits)) THROW_LOGIC_ERROR("BinaryVector size has been fixed")
+#define CHECK_FIXED_SIZE                      if (FixedSize())                            THROW_LOGIC_ERROR("BinaryVector size has been fixed")
+#define CHECK_FIXED_SIZE_ASSIGNMENT(newSize)  if (FixedSize() && (newSize != m_usedBits)) THROW_LOGIC_ERROR("BinaryVector size has been fixed")
 
 namespace
 {
@@ -58,10 +58,10 @@ namespace
 
 //! Initializes with constant value for all bits
 //!
-BinaryVector::BinaryVector (uint32_t bitsCount, uint8_t fillPattern, bool fixSize)
-  : m_data      ((bitsCount + 7) / 8, fillPattern)
-  , m_usedBits  (bitsCount)
-  , m_fixedSize (fixSize)
+BinaryVector::BinaryVector (uint32_t bitsCount, uint8_t fillPattern, SizeProperty sizeProperty)
+  : m_data         ((bitsCount + 7) / 8, fillPattern)
+  , m_usedBits     (bitsCount)
+  , m_sizeProperty (sizeProperty)
 {
   auto lastByteBitsCount = bitsCount % 8;
   if (lastByteBitsCount != 0)
@@ -629,7 +629,7 @@ void BinaryVector::Set (uint8_t value)
 //!               set "01,':_- \t"
 //!
 //! @return A new BinaryVector initialized as defined by bits text
-BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_view bits, bool fixSize)
+BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_view bits, SizeProperty sizeProperty)
 {
   BinaryVector result;
 
@@ -681,7 +681,7 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
     result.m_usedBits += bitCount;
   }
 
-  result.m_fixedSize = fixSize;
+  result.m_sizeProperty = sizeProperty;
   return result;
 }
 //
@@ -699,7 +699,7 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
 //!               set "0123456789abcdefABCDEF,':_- \t"
 //!
 //! @return A new BinaryVector initialized as defined by bits text
-BinaryVector BinaryVector::CreateFromHexString (std::experimental::string_view bits, bool fixSize)
+BinaryVector BinaryVector::CreateFromHexString (std::experimental::string_view bits, SizeProperty sizeProperty)
 {
   BinaryVector result;
 
@@ -776,7 +776,7 @@ BinaryVector BinaryVector::CreateFromHexString (std::experimental::string_view b
     result.m_usedBits += bitCount;
   }
 
-  result.m_fixedSize = fixSize;
+  result.m_sizeProperty = sizeProperty;
 
   return result;
 }

@@ -38,14 +38,14 @@ class DLL_EXPORT DefaultBinaryPathSelector : public PathSelector
   public:
   ~DefaultBinaryPathSelector() = default;
   DefaultBinaryPathSelector()  = delete;
-  DefaultBinaryPathSelector(std::shared_ptr<SystemModelNode> associatedNode, uint32_t pathsCount, bool isInverted = false, bool canSelectNone = false);
+  DefaultBinaryPathSelector(std::shared_ptr<Register> associatedRegister, uint32_t pathsCount, bool isInverted = false, bool canSelectNone = false);
 
   virtual bool IsActive (uint32_t pathIdentifier) const override; //!< Returns true when the specified path is already selected
   virtual void Deselect (uint32_t pathIdentifier) override;       //!< Request deactivation of the specified path
   virtual void Select   (uint32_t pathIdentifier) override;       //!< Request activation of the specified path
 
   virtual uint32_t SelectablePaths() const override { return m_pathsCount; };   //!< Returns the maximum number of selectable paths (max value for IsActive, Select and Deselect)
-  virtual bool     CanSelectNone() const override { return m_canSelectNone; }   //!< Returns true if selector can select nothing (passthrough mode), false otherwise
+  virtual bool     CanSelectNone()   const override { return m_canSelectNone; }   //!< Returns true if selector can select nothing (passthrough mode), false otherwise
 
   uint32_t ActiveCount() const;    //!< Returns the number of paths that are currently active
 
@@ -65,8 +65,9 @@ class DLL_EXPORT DefaultBinaryPathSelector : public PathSelector
   private:
   using TablesType = std::vector<BinaryVector> ; //!< Selection/deselection LUT types
 
-  static TablesType CreateSelectTable   (uint32_t pathCount, bool isInverted, bool canSelectNone);
-  static TablesType CreateDeselectTable (uint32_t pathCount, bool isInverted);
+  static void       CheckRegisterLength (uint32_t registerLength, uint32_t pathsCount, bool canSelectNone);
+  static TablesType CreateSelectTable   (uint32_t registerLength, uint32_t pathsCount, bool isInverted, bool canSelectNone);
+  static TablesType CreateDeselectTable (uint32_t registerLength, uint32_t pathsCount, bool isInverted, bool canSelectNone);
   static void       InvertTable         (TablesType& table);
 
   // ---------------- Private  Fields
@@ -74,9 +75,9 @@ class DLL_EXPORT DefaultBinaryPathSelector : public PathSelector
   private:
 
   uint32_t                  m_pathsCount;                    //!< Number of managed paths
+  std::shared_ptr<Register> m_muxRegister;                   //!< Register that drives the paths multiplexer
   const TablesType          m_select;                        //!< Selection LUT
   const TablesType          m_deselect;                      //!< Deselection LUT
-  std::shared_ptr<Register> m_muxRegister;                   //!< Register that drives the paths multiplexer
   const bool                m_canSelectNone = false;         //!< When true zero is reserved to select 'no path' otherwise 0 is used to select first path
 };
 //

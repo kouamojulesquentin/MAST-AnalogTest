@@ -89,6 +89,20 @@ ScopeExit<F> MakeScopeExit (F f)
 #define THROW_LOGIC_ERROR(msg)      THROW_IMPL(std::logic_error,      msg)
 #define THROW_OUT_OF_RANGE(msg)     THROW_IMPL(std::out_of_range,     msg)
 
+//! Checks that a pointer (parameter) is not nullptr, otherwise it throws an exception
+//!
+//! @return given parameter if not nullptr
+template<typename T>
+T CheckParameterIsNotNullptr(const char* file, int line, T ptr, std::experimental::string_view  msg)
+{
+  if (!ptr)
+  {
+    throw std::invalid_argument(mast::Utility::MakeExceptionMessage(file, line, "std::invalid_argument", msg));
+  }
+  return ptr;
+}
+
+#define CHECK_NOT_NULL_PARAMETER(ptr, msg) CheckParameterIsNotNullptr(__FILE__, __LINE__, ptr, msg)
 
 #endif  // not defined UTILITY_H__AB0B55F8_1F3A_4D8D_893_CA234E5BFD9D__INCLUDED_
 

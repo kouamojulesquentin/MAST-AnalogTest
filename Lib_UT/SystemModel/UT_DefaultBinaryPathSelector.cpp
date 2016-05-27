@@ -25,7 +25,7 @@ using namespace mast;
 
 //! Checks DefaultBinaryPathSelector constructor
 //!
-void UT_DefaultBinaryPathSelector::test_Constructor ()
+void UT_DefaultBinaryPathSelector::test_Constructor_CannotSelectNone ()
 {
   // ---------------- Setup
   //
@@ -40,8 +40,43 @@ void UT_DefaultBinaryPathSelector::test_Constructor ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS (sut.ActiveCount(), 0);
+  TS_ASSERT_FALSE  (sut.CanSelectNone());
+  TS_ASSERT_EQUALS (sut.ActiveCount(),     1);
+  TS_ASSERT_EQUALS (sut.SelectablePaths(), 5);
+  TS_ASSERT_TRUE   (sut.IsActive(1));
+  TS_ASSERT_FALSE  (sut.IsActive(2));
+  TS_ASSERT_FALSE  (sut.IsActive(3));
+  TS_ASSERT_FALSE  (sut.IsActive(4));
+  TS_ASSERT_FALSE  (sut.IsActive(5));
 }
+
+//! Checks DefaultBinaryPathSelector constructor
+//!
+void UT_DefaultBinaryPathSelector::test_Constructor_CanSelectNone ()
+{
+  // ---------------- Setup
+  //
+  auto bypassSequence = BinaryVector::CreateFromBinaryString("000");
+  auto associatedNode = make_shared<Register>("My register name", bypassSequence);
+  auto isInverted     = false;
+  auto canSelectNone  = true;
+
+  // ---------------- Exercise
+  //
+  auto sut = DefaultBinaryPathSelector(associatedNode, 5, isInverted, canSelectNone);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE   (sut.CanSelectNone());
+  TS_ASSERT_EQUALS (sut.ActiveCount(),     0);
+  TS_ASSERT_EQUALS (sut.SelectablePaths(), 5);
+  TS_ASSERT_FALSE  (sut.IsActive(1));
+  TS_ASSERT_FALSE  (sut.IsActive(2));
+  TS_ASSERT_FALSE  (sut.IsActive(3));
+  TS_ASSERT_FALSE  (sut.IsActive(4));
+  TS_ASSERT_FALSE  (sut.IsActive(5));
+}
+
 
 //! @todo [JFC]-[April/29/2016]: Remove "No_test_yet_for_Guard" method when all tests are implemented
 //!

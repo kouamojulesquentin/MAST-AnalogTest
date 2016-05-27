@@ -13,32 +13,32 @@
 
 #include "DefaultBinaryPathSelector.hpp"
 #include "Register.hpp"
+#include "Utility.hpp"
+
 #include <stdexcept>
 #include <limits>
+#include <sstream>
 
+using std::ostringstream;
 using std::shared_ptr;
 
 using namespace mast;
 
 //! Initializes selector for fast selection/deselection of a path
 //!
-//! @param associatedNode   Register that is used to drive the path multiplexer
+//! @param associatedRegister   Register that is used to drive the path multiplexer
 //! @param pathsCount       Number of managed paths (including, optional, bypass register)
 //! @param isInverted       When true the bits for selecting a path are inverted (relative to the path identifier number)
 //! @param canSelectNone    When true zero is reserved to select 'no path' otherwise 0 is used to select first path
 //!                         (provided it is not inverted)
 //!
-DefaultBinaryPathSelector::DefaultBinaryPathSelector(shared_ptr<SystemModelNode> associatedNode, uint32_t pathsCount, bool isInverted, bool canSelectNone)
+DefaultBinaryPathSelector::DefaultBinaryPathSelector(shared_ptr<Register> associatedRegister, uint32_t pathsCount, bool isInverted, bool canSelectNone)
   : m_pathsCount    (pathsCount)
-  , m_select        (CreateSelectTable   (pathsCount, isInverted, canSelectNone))
-  , m_deselect      (CreateDeselectTable (pathsCount, isInverted))
-  , m_muxRegister   (std::dynamic_pointer_cast<Register>(associatedNode))
+  , m_muxRegister   (CHECK_NOT_NULL_PARAMETER (associatedRegister, "associatedRegister must be a valid Register"))
+  , m_select        (CreateSelectTable   (associatedRegister->BitsCount(), pathsCount, isInverted, canSelectNone))
+  , m_deselect      (CreateDeselectTable (associatedRegister->BitsCount(), pathsCount, isInverted, canSelectNone))
   , m_canSelectNone (canSelectNone)
 {
-  if (!m_muxRegister)
-  {
-    THROW_INVALID_ARGUMENT("associatedNode must be a Register");
-  }
 }
 //
 //  End of: DefaultBinaryPathSelector::DefaultBinaryPathSelector
@@ -101,22 +101,58 @@ void DefaultBinaryPathSelector::CheckPathIdentifier (uint32_t pathIdentifier) co
 //---------------------------------------------------------------------------
 
 
+//! Checks that register length is enough to select all path count
+//!
+void DefaultBinaryPathSelector::CheckRegisterLength (uint32_t registerLength, uint32_t pathsCount, bool canSelectNone)
+{
+  //+ (JFC May/27/2016): consider using RegWidthForPathCount that throw when pathsCount is zero !!!
+  auto maxSelectorValue = pathsCount;
+  if (!canSelectNone && (pathsCount != 0))
+  {
+    maxSelectorValue = pathsCount - 1;
+  }
+
+  auto selectorMinWidth = Utility::MinimalBitsForValue(maxSelectorValue);
+
+  if (registerLength < selectorMinWidth)
+  {
+    ostringstream os;
+    os << "Register associated with DefaultBinaryPathSelector has '" << registerLength;
+    os << "' bits even though a minimum of '"                        << selectorMinWidth << "' bits are necessary";
+    THROW_LOGIC_ERROR(os.str());
+  }
+}
+//
+//  End of: DefaultBinaryPathSelector::CheckRegisterLength
+//---------------------------------------------------------------------------
+
+
 //! Creates a table for selection of a path
 //!
 //! @note A slot in select LUT is reserved for no path selection
 //!
-//! @param pathCount        Number of managed paths
+//! @param pathsCount        Number of managed paths
 //! @param isInverted       When true the bits for selecting a path are inverted (relative to the path identifier number)
 //! @param canSelectNone    When true zero is reserved to select 'no path' otherwise 0 is used to select first path
 //!                         (provided it is not inverted)
 //!
-DefaultBinaryPathSelector::TablesType DefaultBinaryPathSelector::CreateSelectTable (uint32_t pathCount, bool isInverted, bool canSelectNone)
+DefaultBinaryPathSelector::TablesType DefaultBinaryPathSelector::CreateSelectTable (uint32_t registerLength, uint32_t pathsCount, bool isInverted, bool canSelectNone)
 {
-  TablesType table(pathCount + 1);
+  CheckRegisterLength(registerLength, pathsCount, canSelectNone);
 
-  for (uint32_t pathId = 1 ; pathId <= pathCount ; ++pathId)
+  TablesType table;
+
+  table.emplace_back(registerLength, 0, SizeProperty::Fixed); // Dummy entry for no selection and for path identifier starting from 1
+
+  BinaryVector temp;
+  for (uint32_t pathId = 1 ; pathId <= pathsCount ; ++pathId)
   {
-    table[pathId].Append(canSelectNone ? pathId : pathId - 1);
+    uint32_t selectValue = canSelectNone ? pathId : pathId - 1;
+
+    temp.Clear();
+    temp.Append(selectValue, registerLength, BitsAlignment::Right);
+
+    table.emplace_back(temp, SizeProperty::Fixed);
   }
 
   if (isInverted)
@@ -135,9 +171,11 @@ DefaultBinaryPathSelector::TablesType DefaultBinaryPathSelector::CreateSelectTab
 //! Creates a table for deselection of a path
 //!
 //! @note A slot in select LUT is reserved for any paths deselection
-DefaultBinaryPathSelector::TablesType DefaultBinaryPathSelector::CreateDeselectTable (uint32_t pathCount, bool isInverted)
+DefaultBinaryPathSelector::TablesType DefaultBinaryPathSelector::CreateDeselectTable (uint32_t registerLength, uint32_t pathsCount, bool isInverted, bool canSelectNone)
 {
-  TablesType table(pathCount + 1);
+  CheckRegisterLength(registerLength, pathsCount, canSelectNone);
+
+  TablesType table(pathsCount + 1, BinaryVector(registerLength, 0, SizeProperty::Fixed));
 
   if (isInverted)
   {
@@ -172,7 +210,10 @@ bool DefaultBinaryPathSelector::IsActive (uint32_t pathIdentifier) const
 {
   CheckPathIdentifier(pathIdentifier);
 
-  bool isActive = m_muxRegister->LastToSut() == m_select[pathIdentifier];
+  auto& lastToSut   = m_muxRegister->LastToSut();
+  auto& selectValue = m_select[pathIdentifier];
+
+  bool  isActive    = lastToSut == selectValue;
 
   return isActive;
 }
@@ -218,22 +259,22 @@ void DefaultBinaryPathSelector::Select (uint32_t pathIdentifier)
 
 //! Returns minimal bits count a register should have to drive a mux for a number of paths
 //!
-//! @param pathCount      Number of managed paths (including, optional, bypass register)
+//! @param pathsCount      Number of managed paths (including, optional, bypass register)
 //! @param canSelectNone  When true zero is reserved to select 'no path' otherwise 0 is used to select first path
 //!                       (provided it is not inverted)
 //!
-uint32_t DefaultBinaryPathSelector::RegWidthForPathCount (uint32_t pathCount, bool canSelectNone)
+uint32_t DefaultBinaryPathSelector::RegWidthForPathCount (uint32_t pathsCount, bool canSelectNone)
 {
-  if       (pathCount == 0)
+  if       (pathsCount == 0)
   {
     THROW_INVALID_ARGUMENT("A path selector with 0 path count is not valid");
   }
-  else if ((pathCount == 1) && !canSelectNone)
+  else if ((pathsCount == 1) && !canSelectNone)
   {
     THROW_INVALID_ARGUMENT("A path selector with 1 path count is not valid when cannot select none");
   }
 
-  uint32_t maxValue = canSelectNone ? pathCount : pathCount - 1;
+  uint32_t maxValue = canSelectNone ? pathsCount : pathsCount - 1;
   return Utility::MinimalBitsForValue(maxValue);
 }
 //

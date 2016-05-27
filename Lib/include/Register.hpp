@@ -48,13 +48,14 @@ class DLL_EXPORT Register : public SystemModelNode
 
   // ---------------- Getters
   //
-  const BinaryVector& BypassSequence()    const { return m_bypass;            } //!< Returns bypass sequence
-  const BinaryVector& ExpectedFromSut()   const { return m_expectedFromSut;   } //!< Returns expected sequence
-  const BinaryVector& LastFromSut()       const { return m_lastFromSut;       } //!< Returns last sequence received from SUT
-  const BinaryVector& NextToSut()         const { return m_nextToSut;         } //!< Returns next sequence to send to SUT
-  const BinaryVector& LastToSut()         const { return m_lastToSut;         } //!< Returns last sequence effectively sent to SUT
-  bool                MustCheckExpected() const { return m_mustCheckExpected; } //!< Returns true when received data must be checked against expected data
-  uint32_t            Mismatches()        const { return m_mismatches;        } //!< Returns current mismatch count
+  uint32_t            BitsCount()         const { return m_bypass.BitsCount(); } //!< Returns Register numbers of bits
+  const BinaryVector& BypassSequence()    const { return m_bypass;             } //!< Returns bypass sequence
+  const BinaryVector& ExpectedFromSut()   const { return m_expectedFromSut;    } //!< Returns expected sequence
+  const BinaryVector& LastFromSut()       const { return m_lastFromSut;        } //!< Returns last sequence received from SUT
+  const BinaryVector& NextToSut()         const { return m_nextToSut;          } //!< Returns next sequence to send to SUT
+  const BinaryVector& LastToSut()         const { return m_lastToSut;          } //!< Returns last sequence effectively sent to SUT
+  bool                MustCheckExpected() const { return m_mustCheckExpected;  } //!< Returns true when received data must be checked against expected data
+  uint32_t            Mismatches()        const { return m_mismatches;         } //!< Returns current mismatch count
 
   // ---------------- Setters
   //

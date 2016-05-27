@@ -12,14 +12,15 @@ LD = g++
 WINDRES = windres
 
 INC = -Iinclude -Ipublic_include
-CFLAGS = -std=c++14  -fPIC
+WARNINGS = -Wall -Wextra -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default
+CFLAGS = $(WARNINGS) -std=c++14
 RESINC =
 LIBDIR =
 LIB =
 LDFLAGS =
 
 INC_DEBUG = $(INC)
-CFLAGS_DEBUG = $(CFLAGS) -Wall -g -DBUILD_DLL
+CFLAGS_DEBUG = $(CFLAGS) -g -DBUILD_DLL
 RESINC_DEBUG = $(RESINC)
 RCFLAGS_DEBUG = $(RCFLAGS)
 LIBDIR_DEBUG = $(LIBDIR)
@@ -30,7 +31,7 @@ DEP_DEBUG =
 OUT_DEBUG = ../bin/debug/Lib.so
 
 INC_RELEASE = $(INC)
-CFLAGS_RELEASE = $(CFLAGS) -O2 -Wall -DBUILD_DLL
+CFLAGS_RELEASE = $(CFLAGS) -O2 -DBUILD_DLL
 RESINC_RELEASE = $(RESINC)
 RCFLAGS_RELEASE = $(RCFLAGS)
 LIBDIR_RELEASE = $(LIBDIR)

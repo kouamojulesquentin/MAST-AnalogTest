@@ -35,7 +35,7 @@ void SystemModelBuilder::AppendRegisters (uint32_t               count,
                                           const BinaryVector&    bypass,
                                           shared_ptr<ParentNode> parent)
 {
-  for (int ii = 0 ; ii < count ; ++ii)
+  for (uint32_t ii = 0 ; ii < count ; ++ii)
   {
     auto regName = baseName + std::to_string(ii);
     m_model.CreateRegister (regName, bypass, parent);

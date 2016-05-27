@@ -34,20 +34,29 @@ RunnerFile   = $(UT_RootPath)/Generated/Runner.cpp
 TemplateFile = $(UT_RootPath)/Runner.tpl
 TestListener = ParenPrinter
 
+$(info OS is: $(OS))
+
+#+ifeq ($(OS), Windows_NT)
+#+  $(info Python3: '$(PYTHON3)')
+#+endif
 
 # cxxtestgen needs Python
 ifeq ($(OS), Windows_NT)
-  python=$(Python3)
+  python=$(PYTHON3)
+	ifeq ($(wildcard $(python)),)
+      $(info PYTHON3 environment variable is not defined ==> Will try with Python3)
+      python=$(Python3)
+	endif
 else
   python=python3
 endif
 
 
-#+ifeq ($(wildcard $(python)),)
-#+    $(warning Python is not defined)
-#+else
-#+    $(warning Using python: $(python))
-#+endif
+ifeq ($(wildcard $(python)),)
+    $(warning Python is not defined)
+else
+    $(info Using python: $(python))
+endif
 
 #To debug variables
 
@@ -61,7 +70,7 @@ endif
 $(info - RootPath:       $(RootPath))
 $(info - Python:         $(python))
 #+$(info - Generator:      $(Generator))
-#+$(info - Runner path:    $(RunnerFile))
+$(info - Runner path:    $(RunnerFile))
 $(info )
 
 # DO NOT FORGET to define CXXTEST_HAVE_EH and CXXTEST_HAVE_STD to compile UT Files

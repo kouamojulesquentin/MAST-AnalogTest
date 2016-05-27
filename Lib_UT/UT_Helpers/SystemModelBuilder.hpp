@@ -32,6 +32,19 @@ namespace mast
 namespace test
 {
 
+constexpr uint32_t STATIC_TDR_LEN        = 64u;
+constexpr uint32_t DYNAMIC_TDR_LEN       = 128u;
+constexpr uint32_t DEFAULT_WRAPPED_CORES = 3u;
+constexpr uint32_t DEFAULT_IR_LEN        = 8u;
+constexpr uint32_t DEFAULT_TDR_LEN       = 2u;
+constexpr char     DEFAULT_1500_NAME[]   = "1500_wrapper";
+constexpr char     DEFAULT_MIB_NAME[]    = "MIB";
+constexpr char     DEFAULT_SIB_NAME[]    = "SIB";
+constexpr char     MIB_CTRL_EXT[]        = "_ctrl";
+constexpr char     MIB_MUX_EXT[]         = "_mux";
+constexpr char     SIB_CTRL_EXT[]        = "_ctrl";
+constexpr char     SIB_MUX_EXT[]         = "_mux";
+
 //! Provides facilities to create SystemModel tree example
 //!
 //! @note This is mainly intended to be used in unit tests
@@ -102,18 +115,7 @@ class SystemModelBuilder final
   // ---------------- Private  Fields
   //
   private:
-  static constexpr uint32_t STATIC_TDR_LEN        = 64u;
-  static constexpr uint32_t DYNAMIC_TDR_LEN       = 128u;
-  static constexpr uint32_t DEFAULT_WRAPPED_CORES = 3u;
-  static constexpr uint32_t DEFAULT_IR_LEN        = 8u;
-  static constexpr uint32_t DEFAULT_TDR_LEN       = 2u;
-  static constexpr char*    DEFAULT_1500_NAME     = "1500_wrapper";
-  static constexpr char*    DEFAULT_MIB_NAME      = "MIB";
-  static constexpr char*    DEFAULT_SIB_NAME      = "SIB";
-  static constexpr char*    MIB_CTRL_EXT          = "_ctrl";
-  static constexpr char*    MIB_MUX_EXT           = "_mux";
-  static constexpr char*    SIB_CTRL_EXT          = "_ctrl";
-  static constexpr char*    SIB_MUX_EXT           = "_mux";
+
   mast::SystemModel& m_model;
 };
 //

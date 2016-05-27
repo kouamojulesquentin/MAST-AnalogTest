@@ -122,7 +122,7 @@ void UT_BinaryVector::test_CreateFromBinaryString ()
     TS_ASSERT_EQUALS (sut.IsEmpty(),    expectedBitsCount == 0);
     TS_ASSERT_FALSE  (sut.HasFixedSize());
 
-    if (expectedBytesCount != 0)
+    if (expectedBytesCount != 0u)
     {
       const uint8_t* pData = sut.Data();
 
@@ -131,7 +131,7 @@ void UT_BinaryVector::test_CreateFromBinaryString ()
       CxxTest::setAbortTestOnFail(true);
       TS_ASSERT_NOT_NULLPTR (pData);
       ostringstream os;
-      for (int ii = 0 ; ii < expectedBytesCount ; ++ii)
+      for (uint32_t ii = 0 ; ii < expectedBytesCount ; ++ii)
       {
         os.str("");
         os << "pData[" << ii << "]";
@@ -215,7 +215,7 @@ void UT_BinaryVector::test_CreateFromHexString ()
     TS_ASSERT_EQUALS (sut.BitsCount(),  expectedBitsCount);
     TS_ASSERT_EQUALS (sut.BytesCount(), expectedBytesCount);
 
-    if (expectedBytesCount != 0)
+    if (expectedBytesCount != 0u)
     {
       const uint8_t* pSutData      = sut.Data();
       const uint8_t* pExpectedData = expectedBinaryVector.Data();
@@ -1162,8 +1162,8 @@ void UT_BinaryVector::test_Append_8_bits_When_NotEmpty ()
     // ---------------- Setup
     //
     BinaryVector sut;
-    auto         expectedBitsCount  = 0;
-    auto         expectedBytesCount = 0;
+    auto         expectedBitsCount  = 0u;
+    auto         expectedBytesCount = 0u;
 
     for (uint8_t input : inputs)
     {
@@ -1173,8 +1173,8 @@ void UT_BinaryVector::test_Append_8_bits_When_NotEmpty ()
 
       // ---------------- Verify
       //
-      expectedBitsCount  += 8;
-      expectedBytesCount += 1;
+      expectedBitsCount  += 8u;
+      expectedBytesCount += 1u;
 
       TS_ASSERT_EQUALS      (sut.BitsCount(),   expectedBitsCount);
       TS_ASSERT_EQUALS      (sut.BytesCount(), expectedBytesCount);
@@ -1183,7 +1183,7 @@ void UT_BinaryVector::test_Append_8_bits_When_NotEmpty ()
 
       TS_ASSERT_GREATER_THAN_EQUALS (expectedContent.size(), expectedBytesCount);
       TS_ASSERT_NOT_NULLPTR (pData);
-      for (int ii = 0 ; ii < expectedBytesCount ; ++ii)
+      for (uint32_t ii = 0 ; ii < expectedBytesCount ; ++ii)
       {
         TS_ASSERT_EQUALS (pData[ii], expectedContent[ii]);
       }
@@ -1220,8 +1220,8 @@ void UT_BinaryVector::test_Append_16_bits_When_NotEmpty ()
     // ---------------- Setup
     //
     BinaryVector sut;
-    auto         expectedBitsCount  = 0;
-    auto         expectedBytesCount = 0;
+    auto         expectedBitsCount  = 0u;
+    auto         expectedBytesCount = 0u;
 
     for (uint16_t input : inputs)
     {
@@ -1241,7 +1241,7 @@ void UT_BinaryVector::test_Append_16_bits_When_NotEmpty ()
 
       TS_ASSERT_GREATER_THAN_EQUALS (expectedContent.size(), expectedBytesCount);
       TS_ASSERT_NOT_NULLPTR (pData);
-      for (int ii = 0 ; ii < expectedBytesCount ; ++ii)
+      for (uint32_t ii = 0 ; ii < expectedBytesCount ; ++ii)
       {
         TS_ASSERT_EQUALS (pData[ii], expectedContent[ii]);
       }
@@ -1286,8 +1286,8 @@ void UT_BinaryVector::test_Append_32_bits_When_NotEmpty ()
     // ---------------- Setup
     //
     BinaryVector sut;
-    auto         expectedBitsCount  = 0;
-    auto         expectedBytesCount = 0;
+    auto         expectedBitsCount  = 0u;
+    auto         expectedBytesCount = 0u;
 
     for (uint32_t input : inputs)
     {
@@ -1307,7 +1307,7 @@ void UT_BinaryVector::test_Append_32_bits_When_NotEmpty ()
 
       TS_ASSERT_GREATER_THAN_EQUALS (expectedContent.size(), expectedBytesCount);
       TS_ASSERT_NOT_NULLPTR (pData);
-      for (int ii = 0 ; ii < expectedBytesCount ; ++ii)
+      for (uint32_t ii = 0 ; ii < expectedBytesCount ; ++ii)
       {
         TS_ASSERT_EQUALS (pData[ii], expectedContent[ii]);
       }
@@ -1350,8 +1350,8 @@ void UT_BinaryVector::test_Append_64_bits_When_NotEmpty ()
     // ---------------- Setup
     //
     BinaryVector sut;
-    auto         expectedBitsCount  = 0;
-    auto         expectedBytesCount = 0;
+    auto         expectedBitsCount  = 0u;
+    auto         expectedBytesCount = 0u;
 
     for (uint64_t input : inputs)
     {
@@ -1361,7 +1361,7 @@ void UT_BinaryVector::test_Append_64_bits_When_NotEmpty ()
 
       // ---------------- Verify
       //
-      expectedBitsCount  += 64;
+      expectedBitsCount  += 64u;
       expectedBytesCount += sizeof(uint64_t);
 
       TS_ASSERT_EQUALS (sut.BitsCount(),   expectedBitsCount);
@@ -1371,7 +1371,7 @@ void UT_BinaryVector::test_Append_64_bits_When_NotEmpty ()
 
       TS_ASSERT_GREATER_THAN_EQUALS (expectedContent.size(), expectedBytesCount);
       TS_ASSERT_NOT_NULLPTR (pData);
-      for (int ii = 0 ; ii < expectedBytesCount ; ++ii)
+      for (uint32_t ii = 0 ; ii < expectedBytesCount ; ++ii)
       {
         TS_ASSERT_EQUALS (pData[ii], expectedContent[ii]);
       }
@@ -1489,7 +1489,7 @@ void UT_BinaryVector::test_Append_1_to_8_bits_When_Empty_Right_Aligned ()
     TS_ASSERT_GREATER_THAN_EQUALS (expectedContent.size(), expectedBytesCount);
     CxxTest::setAbortTestOnFail(true);
     TS_ASSERT_NOT_NULLPTR (pData);
-    for (int ii = 0 ; ii < expectedBytesCount ; ++ii)
+    for (uint32_t ii = 0 ; ii < expectedBytesCount ; ++ii)
     {
       TS_ASSERT_EQUALS (pData[ii], expectedContent[ii]);
     }
@@ -1564,7 +1564,7 @@ void UT_BinaryVector::test_Append_1_to_8_bits_When_Empty_Left_Aligned ()
     TS_ASSERT_GREATER_THAN_EQUALS (expectedContent.size(), expectedBytesCount);
     CxxTest::setAbortTestOnFail(true);
     TS_ASSERT_NOT_NULLPTR (pData);
-    for (int ii = 0 ; ii < expectedBytesCount ; ++ii)
+    for (uint32_t ii = 0 ; ii < expectedBytesCount ; ++ii)
     {
       TS_ASSERT_EQUALS (pData[ii], expectedContent[ii]);
     }
@@ -1645,7 +1645,7 @@ void UT_BinaryVector::test_Append_1_to_8_bits_When_NotEmpty_Right_Aligned ()
     CxxTest::setAbortTestOnFail(true);
     TS_ASSERT_NOT_NULLPTR (pData);
     ostringstream os;
-    for (int ii = 0 ; ii < expectedBytesCount ; ++ii)
+    for (uint32_t ii = 0 ; ii < expectedBytesCount ; ++ii)
     {
       os.str("");
       os << "pData[" << ii << "]";
@@ -1729,7 +1729,7 @@ void UT_BinaryVector::test_Append_1_to_8_bits_When_NotEmpty_Left_Aligned ()
     CxxTest::setAbortTestOnFail(true);
     TS_ASSERT_NOT_NULLPTR (pData);
     ostringstream os;
-    for (int ii = 0 ; ii < expectedBytesCount ; ++ii)
+    for (uint32_t ii = 0 ; ii < expectedBytesCount ; ++ii)
     {
       os.str("");
       os << "pData[" << ii << "]";

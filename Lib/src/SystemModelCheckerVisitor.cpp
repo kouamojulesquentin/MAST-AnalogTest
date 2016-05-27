@@ -348,7 +348,7 @@ ostringstream& SystemModelCheckerVisitor::Stream (ostringstream& os, string_view
 
 //! Checks consistency specific to AccessInterface nodes
 //!
-void SystemModelCheckerVisitor::VisitAccessInterface (AccessInterface& accessInterface)
+void SystemModelCheckerVisitor::VisitAccessInterface (AccessInterface& )
 {
   //! @todo [JFC]-[May/24/2016]: Implement SystemModelCheckerVisitor::VisitAccessInterface()
   //!

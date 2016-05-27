@@ -135,6 +135,7 @@ char* charToString(unsigned long c, char* s)
       case '\0': return copyString(s, "\\0");
       case '\a': return copyString(s, "\\a");
       case '\b': return copyString(s, "\\b");
+      default : break;
     }
 
     bool keepCharAsIs = false;
@@ -148,6 +149,7 @@ char* charToString(unsigned long c, char* s)
         case '\n': return copyString(s, "\\n");
         case '\r': return copyString(s, "\\r");
         case '\t': return copyString(s, "\\t");
+        default : break;
       }
     }
     else
@@ -159,6 +161,7 @@ char* charToString(unsigned long c, char* s)
         case '\t':
           keepCharAsIs = true;
           break;
+        default : break;
       }
     }
 

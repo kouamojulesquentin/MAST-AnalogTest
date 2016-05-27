@@ -374,7 +374,10 @@ public:
       switch (diffInfo.reason)
       {
         case DifferenceInfo::LEFT_NOT_EXIST:
-          resultMessage << "file does not exist (or cannot be opened)";
+          resultMessage << "Left file does not exist (or cannot be opened)";
+          break;
+        case DifferenceInfo::RIGHT_NOT_EXIST:
+          resultMessage << "Right file does not exist (or cannot be opened)";
           break;
         case DifferenceInfo::LEFT_SHORTER:
           resultMessage << "file is shorter: (" << DifferenceInfo::lineStr(diffInfo.leftLine) << ") than expected content (" << DifferenceInfo::lineStr(diffInfo.rightLine) << ")";
@@ -386,6 +389,9 @@ public:
           resultMessage << "file differ at line " << diffInfo.leftLine;
           resultMessage << std::endl << "Expected content at line " << diffInfo.leftLine << ": " << _preStr << diffInfo.rightDifferingLine << _postStr;
           resultMessage << std::endl << "File content at line     " << diffInfo.leftLine << ": " << _preStr << diffInfo.leftDifferingLine  << _postStr;
+          break;
+        case DifferenceInfo::ARE_EQUAL:
+          resultMessage << "Houps, internal error, failedAssertFileContent should not be called when reason = DifferenceInfo::ARE_EQUAL";
           break;
         default:
           resultMessage << "Houps, internal error, reason is not valid";

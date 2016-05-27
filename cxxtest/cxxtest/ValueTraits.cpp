@@ -237,13 +237,13 @@ char* pointerToString(const void* pointer, size_t maxBytes, char* dest)
 
         dest = copyString(dest, "0x");
 
-        unsigned int pointerValue = reinterpret_cast<unsigned int>(pointer);
+        unsigned long pointerValue = reinterpret_cast<unsigned long>(pointer);
         size_t       bitsShift    = (sizeof(void*) - 1) * 8;
 
         char asHex[3];
         for (size_t ii = 0; ii < loopCount; ++ii)
         {
-            unsigned int byte = (pointerValue >> bitsShift) & 0xff;
+            unsigned long byte = (pointerValue >> bitsShift) & 0xff;
 
             byteToHex(static_cast<unsigned char>(byte), asHex);
             dest = copyString(dest, asHex);

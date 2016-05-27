@@ -13,7 +13,7 @@ WINDRES = windres
 
 INC = -Iinclude -Ipublic_include
 WARNINGS = -Wall -Wextra -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default
-CFLAGS = $(WARNINGS) -std=c++14
+CFLAGS = $(WARNINGS) -std=c++14 -fPIC
 RESINC =
 LIBDIR =
 LIB =

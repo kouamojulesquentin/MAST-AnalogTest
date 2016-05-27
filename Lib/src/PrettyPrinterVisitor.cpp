@@ -112,9 +112,9 @@ void PrettyPrinterVisitor::StreamNodeCommon (const SystemModelNode& node)
   if (m_verbose)
   {
     m_os.setf(std::ios_base::boolalpha);
-    m_os << ", pending: "       << node.IsPending();
-    m_os << ", has_condition: " << node.HasConditions();
-    m_os << ", priority: "      << node.Priority();
+    m_os << ", pending: "         << node.IsPending();
+    m_os << ", has_conditioner: " << node.HasConditioner();
+    m_os << ", priority: "        << node.Priority();
   }
 }
 //

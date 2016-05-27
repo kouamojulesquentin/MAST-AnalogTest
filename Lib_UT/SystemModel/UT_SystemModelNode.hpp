@@ -35,15 +35,8 @@ class UT_SystemModelNode : public CxxTest::TestSuite
   void test_SetPriority ();
   void test_SetName ();
   void test_SetApplicationData ();
-
-
-  //! @todo [JFC]-[May/26/2016]: Remove "test_No_test_yet_for_Guard" method when all tests are implemented
-  //!
-  void test_No_test_yet_for_Guard ();
-
-  // ================ Other Methods ================
-
-  void setUp(); //!< Initializes test (called for each test)
+  void test_SetConditioners ();
+  void test_ResetConditioners ();
 };
 //
 //  End of UT_SystemModelNode class declaration

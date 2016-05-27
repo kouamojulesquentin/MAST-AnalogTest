@@ -88,7 +88,7 @@ void UT_PrettyPrinterVisitor::test_VisitAccessInterface_Verbose ()
   // ---------------- Verify
   //
   auto got      = sut.PrettyPrint();
-  auto expected = string("[Access_I](0)  \"Access interface name\", pending: false, has_condition: false, priority: 0");
+  auto expected = string("[Access_I](0)  \"Access interface name\", pending: false, has_conditioner: false, priority: 0");
   TS_ASSERT_EQUALS (got, expected);
 }
 
@@ -133,7 +133,7 @@ void UT_PrettyPrinterVisitor::test_VisitChain_Verbose ()
   // ---------------- Verify
   //
   auto got      = sut.PrettyPrint();
-  auto expected = string("[Chain](0)     \"Chain name\", pending: false, has_condition: false, priority: 0");
+  auto expected = string("[Chain](0)     \"Chain name\", pending: false, has_conditioner: false, priority: 0");
   TS_ASSERT_EQUALS (got, expected);
 }
 
@@ -192,7 +192,7 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_Verbose ()
   // ---------------- Verify
   //
   auto got      = sut.PrettyPrint();
-  auto expected = string("[Linker](2)    \"Linker name\", pending: false, has_condition: false, priority: 0\n"
+  auto expected = string("[Linker](2)    \"Linker name\", pending: false, has_conditioner: false, priority: 0\n"
                          " :Selector:(1)  \"Mux register name\""
                         );
   TS_ASSERT_EQUALS (got, expected);
@@ -245,7 +245,7 @@ void UT_PrettyPrinterVisitor::test_VisitRegister_Verbose ()
                          "                                           , last_to_sut:       1111_1111:0\n"
                          "                                           , last_from_sut:     1111_1111:0\n"
                          "                                           , expected_from_sut: 1111_1111:0\n"
-                         "                                           , pending: false, has_condition: false, priority: 0"
+                         "                                           , pending: false, has_conditioner: false, priority: 0"
                         );
   TS_ASSERT_EQUALS (got, expected);
 }
@@ -333,25 +333,25 @@ void UT_PrettyPrinterVisitor::test_VisitChain_with_Registers_Verbose ()
   // ---------------- Verify
   //
   auto got      = sut.PrettyPrint();
-  auto expected = string("[Chain](0)     \"Chain\", pending: false, has_condition: false, priority: 0\n"
+  auto expected = string("[Chain](0)     \"Chain\", pending: false, has_conditioner: false, priority: 0\n"
                          " [Register](1)  \"Reg_1\", length: 6, bypass:            1010_01\n"
                          "                                  , next_to_sut:       1010_01\n"
                          "                                  , last_to_sut:       1010_01\n"
                          "                                  , last_from_sut:     1010_01\n"
                          "                                  , expected_from_sut: 1010_01\n"
-                         "                                  , pending: false, has_condition: false, priority: 0\n"
+                         "                                  , pending: false, has_conditioner: false, priority: 0\n"
                          " [Register](2)  \"Reg_2\", length: 6, bypass:            1010_10\n"
                          "                                  , next_to_sut:       1010_10\n"
                          "                                  , last_to_sut:       1010_10\n"
                          "                                  , last_from_sut:     1010_10\n"
                          "                                  , expected_from_sut: 1010_10\n"
-                         "                                  , pending: false, has_condition: false, priority: 0\n"
+                         "                                  , pending: false, has_conditioner: false, priority: 0\n"
                          " [Register](3)  \"Register Foo\", length: 15, bypass:            1110_1110:1111_101\n"
                          "                                          , next_to_sut:       1110_1110:1111_101\n"
                          "                                          , last_to_sut:       1110_1110:1111_101\n"
                          "                                          , last_from_sut:     1110_1110:1111_101\n"
                          "                                          , expected_from_sut: 1110_1110:1111_101\n"
-                         "                                          , pending: false, has_condition: false, priority: 0"
+                         "                                          , pending: false, has_conditioner: false, priority: 0"
                         );
   TS_ASSERT_EQUALS (got, expected);
 }
@@ -438,20 +438,20 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_with_Child_Verbose ()
   // ---------------- Verify
   //
   auto got      = sut.PrettyPrint();
-  auto expected = string("[Linker](7)    \"Link\", pending: false, has_condition: false, priority: 0\n"
+  auto expected = string("[Linker](7)    \"Link\", pending: false, has_conditioner: false, priority: 0\n"
                          " :Selector:(6)  \"Sel_1\"\n"
                          " [Register](4)  \"R_A\", length: 15, bypass:            1110_1110:1111_101\n"
                          "                                 , next_to_sut:       1110_1110:1111_101\n"
                          "                                 , last_to_sut:       1110_1110:1111_101\n"
                          "                                 , last_from_sut:     1110_1110:1111_101\n"
                          "                                 , expected_from_sut: 1110_1110:1111_101\n"
-                         "                                 , pending: false, has_condition: false, priority: 0\n"
+                         "                                 , pending: false, has_conditioner: false, priority: 0\n"
                          " [Register](5)  \"R_b\", length: 20, bypass:            1110_1110:1111_1010:1110\n"
                          "                                 , next_to_sut:       1110_1110:1111_1010:1110\n"
                          "                                 , last_to_sut:       1110_1110:1111_1010:1110\n"
                          "                                 , last_from_sut:     1110_1110:1111_1010:1110\n"
                          "                                 , expected_from_sut: 1110_1110:1111_1010:1110\n"
-                         "                                 , pending: false, has_condition: false, priority: 0"
+                         "                                 , pending: false, has_conditioner: false, priority: 0"
                         );
   TS_ASSERT_EQUALS (got, expected);
 }

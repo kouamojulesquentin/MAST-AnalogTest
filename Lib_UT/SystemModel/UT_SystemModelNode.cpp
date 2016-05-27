@@ -13,6 +13,8 @@
 
 #include "UT_SystemModelNode.hpp"
 #include "Chain.hpp"
+#include "Conditioners.hpp"
+
 #include <memory>
 #include <cxxtest/ValueTraits.h>
 
@@ -20,11 +22,16 @@ using std::shared_ptr;
 using std::make_shared;
 using namespace mast;
 
-//! Initializes test (called for each test)
-void UT_SystemModelNode::setUp ()
+namespace
 {
-}
-
+  //! Instantiable Conditioners that do nothing at all
+  //!
+  class DummyConditioner : public Conditioners
+  {
+    virtual void DoPreConditioning  (std::shared_ptr<SystemModelNode> ) override {}
+    virtual void DoPostConditioning (std::shared_ptr<SystemModelNode> ) override {}
+  };
+} // End of unnamed namespace
 
 //! Checks SystemModelNode constructor
 //!
@@ -45,7 +52,7 @@ void UT_SystemModelNode::test_Constructor ()
   TS_ASSERT_EQUALS  (sut.Name(),     name);
   TS_ASSERT_EQUALS  (sut.Priority(), 0);
   TS_ASSERT_FALSE   (sut.IsPending());
-  TS_ASSERT_FALSE   (sut.HasConditions());
+  TS_ASSERT_FALSE   (sut.HasConditioner());
   TS_ASSERT_NULLPTR (sut.ApplicationData());
   TS_ASSERT_NULLPTR (sut.NextSibling());
 }
@@ -161,16 +168,46 @@ void UT_SystemModelNode::test_SetApplicationData ()
 }
 
 
-//! @todo [JFC]-[May/26/2016]: Remove "No_test_yet_for_Guard" method when all tests are implemented
+//! Checks SystemModelNode::SetConditioners()
 //!
-void UT_SystemModelNode::test_No_test_yet_for_Guard ()
+void UT_SystemModelNode::test_SetConditioners ()
 {
-  TS_WARN ("Not all tests yet for: ConditionChecker");
-  TS_ASSERT_TRUE (true); // Avoid the "no assertion" warning (there is already a message)
+  // ---------------- Setup
+  //
+  auto sut         = Chain("");
+  auto conditioner = make_shared<DummyConditioner>();
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.SetConditioners(conditioner));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (sut.Conditioners(), conditioner);
+  TS_ASSERT_TRUE   (sut.HasConditioner());
 }
 
 
+//! Checks SystemModelNode::ResetConditioners()
+//!
+void UT_SystemModelNode::test_ResetConditioners ()
+{
+  // ---------------- Setup
+  //
+  auto sut         = Chain("");
+  auto conditioner = make_shared<DummyConditioner>();
 
+  sut.SetConditioners(conditioner);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.ResetConditioners());
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_NULLPTR (sut.Conditioners());
+  TS_ASSERT_FALSE   (sut.HasConditioner());
+}
 
 //===========================================================================
 // End of UT_SystemModelNode.cpp

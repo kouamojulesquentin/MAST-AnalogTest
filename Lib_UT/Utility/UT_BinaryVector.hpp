@@ -64,7 +64,11 @@ class UT_BinaryVector : public CxxTest::TestSuite
   //
   void test_Constructor_With_Count_and_Pattern ();
   void test_Constructor_Copy ();
+  void test_Constructor_Copy_FixedSize ();
+  void test_Constructor_Copy_FixedSizeOnCopy ();
   void test_Constructor_Move ();
+  void test_Constructor_Move_FixedSize ();
+  void test_Constructor_Move_FixedSizeOnCopy ();
 
   // ---------------- Append
   //
@@ -116,10 +120,12 @@ class UT_BinaryVector : public CxxTest::TestSuite
   void test_CopyAssignmentOperator_When_FixedSize_SameSize ();
   void test_CopyAssignmentOperator_When_FixedSize_DifferentSize ();
   void test_CopyAssignmentOperator_From_FixedSize ();
+  void test_CopyAssignmentOperator_From_FixedSizeOnCopy ();
   void test_MoveAssignmentOperator ();
   void test_MoveAssignmentOperator_When_FixedSize_SameSize ();
   void test_MoveAssignmentOperator_When_FixedSize_DifferentSize ();
   void test_MoveAssignmentOperator_From_FixedSize ();
+  void test_MoveAssignmentOperator_From_FixedSizeOnCopy ();
 
   // ---------------- ToggleBits
   //

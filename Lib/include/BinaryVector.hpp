@@ -38,8 +38,9 @@ enum class BitsAlignment
 //!
 enum class SizeProperty
 {
-  NotFixed, //!< BinaryVector bits count can be changed at will
-  Fixed,    //!< After construction, the BinaryVector bits count cannot be changed
+  NotFixed,    //!< BinaryVector bits count can be changed at will
+  Fixed,       //!< After construction, the BinaryVector bits count cannot be changed (this property is not copied)
+  FixedOnCopy, //!< Same as Fixed, except the property is copied (and moved)
 };
 
 //! Contains bitstream vector in compact binary format
@@ -103,11 +104,11 @@ class DLL_EXPORT BinaryVector final
 
   void          FixSize(bool fixSize) { m_sizeProperty = fixSize ? SizeProperty::Fixed : SizeProperty::NotFixed; } //!< Sets whether the number of used bits cannot be changed
 
-  bool           HasFixedSize() const { return m_sizeProperty == SizeProperty::Fixed; } //!< Returns true if number of used bits cannot be changed
-  bool           IsEmpty()      const { return m_data.empty();}                         //!< Returns true when there is no bit in the BinaryVector, false otherwise
-  uint32_t       BitsCount()    const { return m_usedBits;    }                         //!< Returns total number of valid bits in the BinaryVector
-  uint32_t       BytesCount()   const { return m_data.size(); }                         //!< Returns total number of valid bits in the BinaryVector
-  const uint8_t* Data()         const { return m_data.data(); }                         //!< Returns pointer on raw bits stream data (only valid as long as content is not modified)
+  bool           HasFixedSize() const { return m_sizeProperty != SizeProperty::NotFixed; } //!< Returns true if number of used bits cannot be changed
+  bool           IsEmpty()      const { return m_data.empty();}                            //!< Returns true when there is no bit in the BinaryVector, false otherwise
+  uint32_t       BitsCount()    const { return m_usedBits;    }                            //!< Returns total number of valid bits in the BinaryVector
+  uint32_t       BytesCount()   const { return m_data.size(); }                            //!< Returns total number of valid bits in the BinaryVector
+  const uint8_t* Data()         const { return m_data.data(); }                            //!< Returns pointer on raw bits stream data (only valid as long as content is not modified)
 
   BinaryVector    Slice    (uint32_t firstBitOffset, uint32_t bitsCount) const; //!< Returns a slice from BinaryVector
 //+  BinaryVector_View Slice_View (uint32_t firstBitOffset, uint32_t bitsCount) const; //!< Returns a reference to a slice from BinaryVector

@@ -142,7 +142,7 @@ DefaultBinaryPathSelector::TablesType DefaultBinaryPathSelector::CreateSelectTab
 
   TablesType table;
 
-  table.emplace_back(registerLength, 0, SizeProperty::Fixed); // Dummy entry for no selection and for path identifier starting from 1
+  table.emplace_back(registerLength, 0, SizeProperty::FixedOnCopy); // Dummy entry for no selection and for path identifier starting from 1
 
   BinaryVector temp;
   for (uint32_t pathId = 1 ; pathId <= pathsCount ; ++pathId)
@@ -152,7 +152,7 @@ DefaultBinaryPathSelector::TablesType DefaultBinaryPathSelector::CreateSelectTab
     temp.Clear();
     temp.Append(selectValue, registerLength, BitsAlignment::Right);
 
-    table.emplace_back(temp, SizeProperty::Fixed);
+    table.emplace_back(temp, SizeProperty::FixedOnCopy);
   }
 
   if (isInverted)
@@ -175,7 +175,7 @@ DefaultBinaryPathSelector::TablesType DefaultBinaryPathSelector::CreateDeselectT
 {
   CheckRegisterLength(registerLength, pathsCount, canSelectNone);
 
-  TablesType table(pathsCount + 1, BinaryVector(registerLength, 0, SizeProperty::Fixed));
+  TablesType table(pathsCount + 1, BinaryVector(registerLength, 0, SizeProperty::FixedOnCopy));
 
   if (isInverted)
   {

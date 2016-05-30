@@ -986,6 +986,83 @@ void UT_BinaryVector::test_Constructor_Copy ()
   TS_DATA_DRIVEN_TEST (checker, data);
 }
 
+//! Checks copy constructor when other has its size fixed
+//!
+void UT_BinaryVector::test_Constructor_Copy_FixedSize ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector sut   (3, 0x00);
+  BinaryVector other (4, 0xFF, SizeProperty::Fixed);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut = other);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE  (sut.HasFixedSize());
+  TS_ASSERT_EQUALS (sut, other);
+}
+
+
+//! Checks copy constructor when other has its size fixed property that must be copied
+//!
+void UT_BinaryVector::test_Constructor_Copy_FixedSizeOnCopy ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector sut   (3, 0x00);
+  BinaryVector other (4, 0xFF, SizeProperty::FixedOnCopy);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut = other);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE   (sut.HasFixedSize());
+  TS_ASSERT_EQUALS (sut, other);
+}
+
+
+//! Checks move constructor when other has its size fixed property that must NOT be copied
+//!
+void UT_BinaryVector::test_Constructor_Move_FixedSize ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector other (4, 0xFF, SizeProperty::Fixed);
+
+  // ---------------- Exercise
+  //
+  BinaryVector sut(std::move(other));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE  (sut.HasFixedSize());
+  TS_ASSERT_EQUALS (sut, BinaryVector(4, 0xFF));
+}
+
+
+//! Checks move constructor when other has its size fixed property that must be copied
+//!
+void UT_BinaryVector::test_Constructor_Move_FixedSizeOnCopy ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector other (4, 0xFF, SizeProperty::FixedOnCopy);
+
+  // ---------------- Exercise
+  //
+  BinaryVector sut(std::move(other));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE   (sut.HasFixedSize());
+  TS_ASSERT_EQUALS (sut, BinaryVector(4, 0xFF));
+}
+
 
 //! Checks BinaryVector move constructor
 //!
@@ -2272,6 +2349,27 @@ void UT_BinaryVector::test_CopyAssignmentOperator_From_FixedSize ()
   TS_ASSERT_EQUALS (sut, other);
 }
 
+
+//! Checks copy assigment operator when other has its size fixed (the property must be copied)
+//!
+void UT_BinaryVector::test_CopyAssignmentOperator_From_FixedSizeOnCopy ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector sut   (3, 0x00);
+  BinaryVector other (4, 0xFF, SizeProperty::FixedOnCopy);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut = other);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE   (sut.HasFixedSize());
+  TS_ASSERT_EQUALS (sut, other);
+}
+
+
 //! Checks assigment operator
 //!
 void UT_BinaryVector::test_MoveAssignmentOperator ()
@@ -2348,6 +2446,31 @@ void UT_BinaryVector::test_MoveAssignmentOperator_From_FixedSize ()
 
   TS_ASSERT_TRUE (other.IsEmpty());
 }
+
+
+//! Checks move assigment operator when other has its size fixed that must be copied
+//!
+void UT_BinaryVector::test_MoveAssignmentOperator_From_FixedSizeOnCopy ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector sut   (3, 0x00);
+  BinaryVector other (4, 0xFF, SizeProperty::FixedOnCopy);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut = std::move(other));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE  (sut.HasFixedSize());
+
+  BinaryVector expected = BinaryVector(4, 0xFF);
+  TS_ASSERT_EQUALS (sut, expected);
+
+  TS_ASSERT_TRUE (other.IsEmpty());
+}
+
 
 
 //! Checks BinaryVector::ToggleBits()

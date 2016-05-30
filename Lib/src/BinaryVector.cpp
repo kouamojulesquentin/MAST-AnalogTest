@@ -78,8 +78,9 @@ BinaryVector::BinaryVector (uint32_t bitsCount, uint8_t fillPattern, SizePropert
 //! Copy constructor
 //!
 BinaryVector::BinaryVector (const mast::BinaryVector& rhs)
-  : m_data     (rhs.m_data)
-  , m_usedBits (rhs.m_usedBits)
+  : m_data         (rhs.m_data)
+  , m_usedBits     (rhs.m_usedBits)
+  , m_sizeProperty (rhs.m_sizeProperty == SizeProperty::FixedOnCopy ? SizeProperty::FixedOnCopy : SizeProperty::NotFixed)
 {
 }
 //
@@ -90,8 +91,9 @@ BinaryVector::BinaryVector (const mast::BinaryVector& rhs)
 //! Move constructor
 //!
 BinaryVector::BinaryVector (mast::BinaryVector&& rhs) noexcept
-  : m_data     (std::move(rhs.m_data))
-  , m_usedBits (rhs.m_usedBits)
+  : m_data         (std::move(rhs.m_data))
+  , m_usedBits     (rhs.m_usedBits)
+  , m_sizeProperty (rhs.m_sizeProperty == SizeProperty::FixedOnCopy ? SizeProperty::FixedOnCopy : SizeProperty::NotFixed)
 {
   rhs.m_usedBits = 0;
 }
@@ -497,8 +499,9 @@ BinaryVector& BinaryVector::operator= (const BinaryVector& rhs)
 
   if (this != &rhs)
   {
-    m_data     = rhs.m_data;
-    m_usedBits = rhs.m_usedBits;
+    m_data         = rhs.m_data;
+    m_usedBits     = rhs.m_usedBits;
+    m_sizeProperty = rhs.m_sizeProperty == SizeProperty::FixedOnCopy ? SizeProperty::FixedOnCopy : m_sizeProperty;
   }
   return *this;
 }
@@ -517,8 +520,9 @@ BinaryVector& BinaryVector::operator= (BinaryVector&& rhs)
 
   if (this != &rhs)
   {
-    m_data     = std::move(rhs.m_data);
-    m_usedBits = rhs.m_usedBits;
+    m_data         = std::move(rhs.m_data);
+    m_usedBits     = rhs.m_usedBits;
+    m_sizeProperty = rhs.m_sizeProperty == SizeProperty::FixedOnCopy ? SizeProperty::FixedOnCopy : m_sizeProperty;
   }
   return *this;
 }

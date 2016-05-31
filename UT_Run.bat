@@ -4,14 +4,28 @@
 
 @if "%Build%"=="" goto Syntax
 
-@pushd bin\%Build%
+@set Path=C:\MinGW\bin;%Path%
+@set DestFile=Lib_UT\UT_Results\UT_Result.txt
+
+@if not defined chain  (set chain=Build_Qt)
+@REM @if not defined chain  (set chain=Build_CB)
+
+@set Build_Qt=Build_Qt
+@if /i %chain% equ %Build_Qt% (
+set targetDir=".\Build_Qt\bin\%Build%"
+@set DestFileFromExe=..\..\..\%DestFile%
+) else (
+set  targetDir=".\bin\%Build%"
+@set DestFileFromExe=..\..\%DestFile%
+)
+
+@echo ===== Target dir: %targetDir%
+@pushd %targetDir%
 
 @if not exist Lib_UT.exe goto No_exe
 @REM @echo Dir: %cd%
 @REM @dir
-@set Path=C:\MinGW\bin;%Path%
-@set DestFile=Lib_UT\UT_Results\UT_Result.txt
-@set DestFileFromExe=..\..\%DestFile%
+
 
 @if     "%Options%"=="--display_success"  Lib_UT.exe %Options% >      %DestFileFromExe%
 @if not "%Options%"=="--display_success"  Lib_UT.exe %Options% | mtee %DestFileFromExe%

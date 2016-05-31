@@ -1847,6 +1847,939 @@ void UT_BinaryVector::test_Append_1_to_8_bits_When_NotEmpty_Left_Aligned ()
 }
 
 
+//! Checks Append when sut is empty and adding from 1 to 16 bits from uint16_t (right aligned)
+//!
+//! @note Each time a new BinaryVector is used
+void UT_BinaryVector::test_Append_1_to_16_bits_When_Empty_Right_Aligned ()
+{
+  // ---------------- DDT Setup
+  //
+  using TInput = tuple<uint16_t, uint8_t> ; // Value, Number of bits (taken from LSB)
+
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto& input    = std::get<0>(data);
+    const auto& expected = std::get<1>(data) ;
+    auto value           = std::get<0>(input);
+    auto numberOfBits    = std::get<1>(input);
+
+    BinaryVector sut;
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Append(value, numberOfBits, BitsAlignment::Right));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto data =
+  {             // Value, bits
+    make_tuple(TInput(0x0000, 1),  BinaryVector::CreateFromBinaryString("0")),                   // 00
+    make_tuple(TInput(0x0001, 1),  BinaryVector::CreateFromBinaryString("1")),                   // 01
+    make_tuple(TInput(0x0002, 2),  BinaryVector::CreateFromBinaryString("10")),                  // 02
+    make_tuple(TInput(0x0003, 2),  BinaryVector::CreateFromBinaryString("11")),                  // 03
+    make_tuple(TInput(0x0003, 3),  BinaryVector::CreateFromBinaryString("011")),                 // 04
+    make_tuple(TInput(0x0009, 4),  BinaryVector::CreateFromBinaryString("1001")),                // 05
+    make_tuple(TInput(0x0011, 5),  BinaryVector::CreateFromBinaryString("1000_1")),              // 06
+    make_tuple(TInput(0x0012, 6),  BinaryVector::CreateFromBinaryString("0100_10")),             // 07
+    make_tuple(TInput(0x004A, 7),  BinaryVector::CreateFromBinaryString("1001_010")),            // 08
+    make_tuple(TInput(0x007B, 8),  BinaryVector::CreateFromBinaryString("0111_1011")),           // 09
+    make_tuple(TInput(0x017B, 9),  BinaryVector::CreateFromBinaryString("1:0111_1011")),         // 10
+    make_tuple(TInput(0x037B, 11), BinaryVector::CreateFromBinaryString("011:0111_1011")),       // 11
+    make_tuple(TInput(0x5ACE, 15), BinaryVector::CreateFromBinaryString("101:1010_1100:1110")),  // 12
+    make_tuple(TInput(0xFACE, 16), BinaryVector::CreateFromBinaryString("1111_1010:1100_1110")), // 13
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+//! Checks Append when sut is empty and adding from 1 to 16 bits from uint16_t (left aligned)
+//!
+//! @note Each time a new BinaryVector is used
+void UT_BinaryVector::test_Append_1_to_16_bits_When_Empty_Left_Aligned ()
+{
+  // ---------------- DDT Setup
+  //
+  using TInput = tuple<uint16_t, uint8_t> ; // Value, Number of bits (taken from LSB)
+
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto& input    = std::get<0>(data);
+    const auto& expected = std::get<1>(data) ;
+    auto value           = std::get<0>(input);
+    auto numberOfBits    = std::get<1>(input);
+
+    BinaryVector sut;
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Append(value, numberOfBits, BitsAlignment::Left));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto data =     // Value, bits, Expected
+  {
+    make_tuple(TInput(0x0000, 1),  BinaryVector::CreateFromBinaryString("0")),                   // 00
+    make_tuple(TInput(0x0001, 1),  BinaryVector::CreateFromBinaryString("0")),                   // 01
+    make_tuple(TInput(0x4000, 1),  BinaryVector::CreateFromBinaryString("0")),                   // 02
+    make_tuple(TInput(0x8000, 1),  BinaryVector::CreateFromBinaryString("1")),                   // 03
+    make_tuple(TInput(0xFFFF, 1),  BinaryVector::CreateFromBinaryString("1")),                   // 04
+    make_tuple(TInput(0x8000, 2),  BinaryVector::CreateFromBinaryString("10")),                  // 05
+    make_tuple(TInput(0xC000, 2),  BinaryVector::CreateFromBinaryString("11")),                  // 06
+    make_tuple(TInput(0x7000, 3),  BinaryVector::CreateFromBinaryString("011")),                 // 07
+    make_tuple(TInput(0x9000, 4),  BinaryVector::CreateFromBinaryString("1001")),                // 08
+    make_tuple(TInput(0x8800, 5),  BinaryVector::CreateFromBinaryString("1000_1")),              // 09
+    make_tuple(TInput(0x4800, 6),  BinaryVector::CreateFromBinaryString("0100_10")),             // 10
+    make_tuple(TInput(0x9400, 7),  BinaryVector::CreateFromBinaryString("1001_010")),            // 11
+    make_tuple(TInput(0x7B00, 8),  BinaryVector::CreateFromBinaryString("0111_1011")),           // 12
+    make_tuple(TInput(0xBD80, 9),  BinaryVector::CreateFromBinaryString("1011_1101:1")),         // 13
+    make_tuple(TInput(0x6F60, 11), BinaryVector::CreateFromBinaryString("0110_1111:011")),       // 14
+    make_tuple(TInput(0xB59C, 15), BinaryVector::CreateFromBinaryString("1011_0101:1001_110")),  // 15
+    make_tuple(TInput(0xFACE, 16), BinaryVector::CreateFromBinaryString("1111_1010:1100_1110")), // 16
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks Append when sut is not empty (from 1 to 16 bits) and adding from 1 to 16 bits (right aliqned) from uint16_t
+//!
+//! @note Each time a new BinaryVector is used
+void UT_BinaryVector::test_Append_1_to_16_bits_When_NotEmpty_Right_Aligned ()
+{
+  // ---------------- DDT Setup
+  //
+  using TInput = tuple<BinaryVector, uint16_t, uint8_t> ; // Value, Number of bits (taken from LSB)
+
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto& input    = std::get<0>(data);
+    const auto& expected = std::get<1>(data);
+    auto sut             = std::get<0>(input);
+    auto value           = std::get<1>(input);
+    auto numberOfBits    = std::get<2>(input);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Append(value, numberOfBits, BitsAlignment::Right));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto bbv = [](string_view asBinaryString) { return BinaryVector::CreateFromBinaryString(asBinaryString); };
+
+  auto data =
+  {                   // initial, Value, bits
+    make_tuple(TInput(bbv("1"),        0x0000, 1),  bbv("1:0")),                         // 00
+    make_tuple(TInput(bbv("0"),        0x0001, 1),  bbv("0:1")),                         // 01
+    make_tuple(TInput(bbv("01"),       0x0002, 2),  bbv("01:10")),                       // 02
+    make_tuple(TInput(bbv("00"),       0x0003, 2),  bbv("00:11")),                       // 03
+    make_tuple(TInput(bbv("100"),      0x0003, 3),  bbv("100:011")),                     // 04
+    make_tuple(TInput(bbv("101"),      0x0009, 4),  bbv("101:1001")),                    // 05
+    make_tuple(TInput(bbv("110"),      0x0011, 5),  bbv("110:1_0001")),                  // 06
+    make_tuple(TInput(bbv("111"),      0x0012, 6),  bbv("111:01_0010")),                 // 07
+    make_tuple(TInput(bbv("1000"),     0x004A, 7),  bbv("1000:100_1010")),               // 08
+    make_tuple(TInput(bbv("1000_0"),   0x007B, 8),  bbv("1_0000:0111_1011")),            // 09
+    make_tuple(TInput(bbv("1010_11"),  0x037B, 11), bbv("1010_11:011:0111_1011")),       // 10
+    make_tuple(TInput(bbv("1111_001"), 0x5ACE, 15), bbv("1111_001:101:1010_1100:1110")), // 11
+    make_tuple(TInput(bbv("1001"),     0xFACE, 16), bbv("1001:1111_1010:1100_1110")),    // 12
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks Append when sut is not empty (from 1 to 16 bits) and adding from 1 to 16 bits (left aliqned) from uint16_t
+//!
+//! @note Each time a new BinaryVector is used
+void UT_BinaryVector::test_Append_1_to_16_bits_When_NotEmpty_Left_Aligned ()
+{
+  // ---------------- DDT Setup
+  //
+  using TInput = tuple<BinaryVector, uint16_t, uint8_t> ; // Value, Number of bits (taken from LSB)
+
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto& input    = std::get<0>(data);
+    const auto& expected = std::get<1>(data);
+    auto sut             = std::get<0>(input);
+    auto value           = std::get<1>(input);
+    auto numberOfBits    = std::get<2>(input);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Append(value, numberOfBits, BitsAlignment::Left));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto bbv = [](string_view asBinaryString) { return BinaryVector::CreateFromBinaryString(asBinaryString); };
+
+  auto data =         // Initial, Value, bits
+  {
+    make_tuple(TInput(bbv("1"),         0x0000, 1),  bbv("1:0")),                           // 00
+    make_tuple(TInput(bbv("0"),         0x0001, 1),  bbv("0:0")),                           // 01
+    make_tuple(TInput(bbv("01"),        0x4000, 2),  bbv("01:01")),                         // 02
+    make_tuple(TInput(bbv("00"),        0x8000, 2),  bbv("00:10")),                         // 03
+    make_tuple(TInput(bbv("100"),       0xFFFF, 3),  bbv("100:111")),                       // 04
+    make_tuple(TInput(bbv("101"),       0x8000, 4),  bbv("101:1000")),                      // 05
+    make_tuple(TInput(bbv("110"),       0xC000, 5),  bbv("110:1100_0")),                    // 06
+    make_tuple(TInput(bbv("111"),       0x7000, 6),  bbv("111:0111_00")),                   // 07
+    make_tuple(TInput(bbv("1000"),      0x9400, 7),  bbv("1000:1001_010")),                 // 08
+    make_tuple(TInput(bbv("1000_0"),    0x8800, 8),  bbv("1_0000:1000_1000")),              // 09
+    make_tuple(TInput(bbv("1001_1"),    0xBD80, 9),  bbv("1001_1:1011_1101:1")),            // 10
+    make_tuple(TInput(bbv("1001_10"),   0x6F60, 10), bbv("1001_10:0110_1111:01")),          // 11
+    make_tuple(TInput(bbv("1010_11"),   0x4800, 11), bbv("1010_11:0100_1000:000")),         // 12
+    make_tuple(TInput(bbv("1001_111"),  0xB59C, 12), bbv("1001_111:1011_0101:1001")),       // 13
+    make_tuple(TInput(bbv("1001_111"),  0xB59C, 13), bbv("1001_111:1011_0101:1001_1")),     // 14
+    make_tuple(TInput(bbv("1001"),      0x7B02, 14), bbv("1001:0111_1011:0000_00")),        // 15
+    make_tuple(TInput(bbv("1111_001"),  0x940A, 15), bbv("1111_001:1001_0100:0000_101")),   // 16
+    make_tuple(TInput(bbv("1001_111"),  0xFACE, 16), bbv("1001_111:1111_1010:1100_1110")),  // 17
+    make_tuple(TInput(bbv("1001_1111"), 0xFACE, 16), bbv("1001_1111:1111_1010:1100_1110")), // 18
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks Append when sut is empty and adding from 1 to 32 bits from uint32_t (right aligned)
+//!
+//! @note Each time a new BinaryVector is used
+void UT_BinaryVector::test_Append_1_to_32_bits_When_Empty_Right_Aligned ()
+{
+  // ---------------- DDT Setup
+  //
+
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto& input    = std::get<0>(data);
+    const auto& expected = std::get<1>(data) ;
+    auto value           = std::get<0>(input);
+    auto numberOfBits    = std::get<1>(input);
+
+    BinaryVector sut;
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Append(value, numberOfBits, BitsAlignment::Right));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  using TInput = tuple<uint32_t, uint8_t> ; // Value, Number of bits (taken from LSB)
+  auto data =   // Value, bits
+  {
+    make_tuple(TInput(0x00000000, 1),  BinaryVector::CreateFromBinaryString("0")),                                       // 00
+    make_tuple(TInput(0x00000001, 1),  BinaryVector::CreateFromBinaryString("1")),                                       // 01
+    make_tuple(TInput(0x00000002, 2),  BinaryVector::CreateFromBinaryString("10")),                                      // 02
+    make_tuple(TInput(0x00000003, 2),  BinaryVector::CreateFromBinaryString("11")),                                      // 03
+    make_tuple(TInput(0x00000003, 3),  BinaryVector::CreateFromBinaryString("011")),                                     // 04
+    make_tuple(TInput(0x00000009, 4),  BinaryVector::CreateFromBinaryString("1001")),                                    // 05
+    make_tuple(TInput(0x00000011, 5),  BinaryVector::CreateFromBinaryString("1000_1")),                                  // 06
+    make_tuple(TInput(0x00000012, 6),  BinaryVector::CreateFromBinaryString("0100_10")),                                 // 07
+    make_tuple(TInput(0x0000004A, 7),  BinaryVector::CreateFromBinaryString("1001_010")),                                // 08
+    make_tuple(TInput(0x0000007B, 8),  BinaryVector::CreateFromBinaryString("0111_1011")),                               // 09
+    make_tuple(TInput(0x0000017B, 9),  BinaryVector::CreateFromBinaryString("1:0111_1011")),                             // 10
+    make_tuple(TInput(0x0000017B, 10), BinaryVector::CreateFromBinaryString("01:0111_1011")),                            // 11
+    make_tuple(TInput(0x0000037B, 11), BinaryVector::CreateFromBinaryString("011:0111_1011")),                           // 12
+    make_tuple(TInput(0x0000037B, 12), BinaryVector::CreateFromBinaryString("0011:0111_1011")),                          // 13
+    make_tuple(TInput(0x00005ACE, 13), BinaryVector::CreateFromBinaryString("1:1010_1100:1110")),                        // 14
+    make_tuple(TInput(0x00005ACE, 14), BinaryVector::CreateFromBinaryString("01:1010_1100:1110")),                       // 15
+    make_tuple(TInput(0x00005ACE, 15), BinaryVector::CreateFromBinaryString("101:1010_1100:1110")),                      // 16
+    make_tuple(TInput(0x0000FACE, 16), BinaryVector::CreateFromBinaryString("1111_1010:1100_1110")),                     // 17
+    make_tuple(TInput(0x8164BACE, 17), BinaryVector::CreateFromBinaryString("0:1011_1010:1100_1110")),                   // 18
+    make_tuple(TInput(0x8164BACE, 18), BinaryVector::CreateFromBinaryString("00:1011_1010:1100_1110")),                  // 19
+    make_tuple(TInput(0x8164BACE, 19), BinaryVector::CreateFromBinaryString("100:1011_1010:1100_1110")),                 // 20
+    make_tuple(TInput(0x8164BACE, 20), BinaryVector::CreateFromBinaryString("0100:1011_1010:1100_1110")),                // 21
+    make_tuple(TInput(0x8164BACE, 21), BinaryVector::CreateFromBinaryString("0_0100:1011_1010:1100_1110")),              // 22
+    make_tuple(TInput(0x8164BACE, 22), BinaryVector::CreateFromBinaryString("10_0100:1011_1010:1100_1110")),             // 23
+    make_tuple(TInput(0x8164BACE, 23), BinaryVector::CreateFromBinaryString("110_0100:1011_1010:1100_1110")),            // 24
+    make_tuple(TInput(0x8164BACE, 24), BinaryVector::CreateFromBinaryString("0110_0100:1011_1010:1100_1110")),           // 25
+    make_tuple(TInput(0x8164BACE, 25), BinaryVector::CreateFromBinaryString("1:0110_0100:1011_1010:1100_1110")),         // 26
+    make_tuple(TInput(0x8164BACE, 26), BinaryVector::CreateFromBinaryString("01:0110_0100:1011_1010:1100_1110")),        // 27
+    make_tuple(TInput(0x8164BACE, 27), BinaryVector::CreateFromBinaryString("001:0110_0100:1011_1010:1100_1110")),       // 28
+    make_tuple(TInput(0x8164BACE, 28), BinaryVector::CreateFromBinaryString("0001:0110_0100:1011_1010:1100_1110")),      // 29
+    make_tuple(TInput(0x8164BACE, 29), BinaryVector::CreateFromBinaryString("0_0001:0110_0100:1011_1010:1100_1110")),    // 30
+    make_tuple(TInput(0x8164BACE, 30), BinaryVector::CreateFromBinaryString("00_0001:0110_0100:1011_1010:1100_1110")),   // 31
+    make_tuple(TInput(0x8164BACE, 31), BinaryVector::CreateFromBinaryString("000_0001:0110_0100:1011_1010:1100_1110")),  // 32
+    make_tuple(TInput(0x8164BACE, 32), BinaryVector::CreateFromBinaryString("1000_0001:0110_0100:1011_1010:1100_1110")), // 33
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+//! Checks Append when sut is empty and adding from 1 to 32 bits from uint32_t (left aligned)
+//!
+//! @note Each time a new BinaryVector is used
+void UT_BinaryVector::test_Append_1_to_32_bits_When_Empty_Left_Aligned ()
+{
+  // ---------------- DDT Setup
+  //
+  using TInput = tuple<uint32_t, uint8_t> ; // Value, Number of bits (taken from LSB)
+
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto& input    = std::get<0>(data);
+    const auto& expected = std::get<1>(data) ;
+    auto value           = std::get<0>(input);
+    auto numberOfBits    = std::get<1>(input);
+
+    BinaryVector sut;
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Append(value, numberOfBits, BitsAlignment::Left));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto data =     // Value, bits, Expected
+  {
+    make_tuple(TInput(0x00000000, 1),  BinaryVector::CreateFromBinaryString("0")),                                       // 00
+    make_tuple(TInput(0x80000000, 1),  BinaryVector::CreateFromBinaryString("1")),                                       // 01
+    make_tuple(TInput(0x80000000, 2),  BinaryVector::CreateFromBinaryString("10")),                                      // 02
+    make_tuple(TInput(0xC0000000, 2),  BinaryVector::CreateFromBinaryString("11")),                                      // 03
+    make_tuple(TInput(0x70000000, 3),  BinaryVector::CreateFromBinaryString("011")),                                     // 04
+    make_tuple(TInput(0x90000000, 4),  BinaryVector::CreateFromBinaryString("1001")),                                    // 05
+    make_tuple(TInput(0x88000000, 5),  BinaryVector::CreateFromBinaryString("1000_1")),                                  // 06
+    make_tuple(TInput(0x48000000, 6),  BinaryVector::CreateFromBinaryString("0100_10")),                                 // 07
+    make_tuple(TInput(0x94000000, 7),  BinaryVector::CreateFromBinaryString("1001_010")),                                // 08
+    make_tuple(TInput(0x7B000000, 8),  BinaryVector::CreateFromBinaryString("0111_1011")),                               // 09
+    make_tuple(TInput(0xBD800000, 9),  BinaryVector::CreateFromBinaryString("1011_1101:1")),                             // 10
+    make_tuple(TInput(0x5EC00000, 10), BinaryVector::CreateFromBinaryString("0101_1110:11")),                            // 11
+    make_tuple(TInput(0x6F600000, 11), BinaryVector::CreateFromBinaryString("0110_1111:011")),                           // 12
+    make_tuple(TInput(0x37B00000, 12), BinaryVector::CreateFromBinaryString("0011_0111:1011")),                          // 13
+    make_tuple(TInput(0xD6700000, 13), BinaryVector::CreateFromBinaryString("1101_0110:0111_0")),                        // 14
+    make_tuple(TInput(0x6B380000, 14), BinaryVector::CreateFromBinaryString("0110_1011:0011_10")),                       // 15
+    make_tuple(TInput(0xB59D0000, 15), BinaryVector::CreateFromBinaryString("1011_0101:1001_110")),                      // 16
+    make_tuple(TInput(0xFACE0000, 16), BinaryVector::CreateFromBinaryString("1111_1010:1100_1110")),                     // 17
+    make_tuple(TInput(0x8164BACE, 17), BinaryVector::CreateFromBinaryString("1000_0001:0110_0100:1")),                   // 18
+    make_tuple(TInput(0x8164BACE, 18), BinaryVector::CreateFromBinaryString("1000_0001:0110_0100:10")),                  // 19
+    make_tuple(TInput(0x8164BACE, 19), BinaryVector::CreateFromBinaryString("1000_0001:0110_0100:101")),                 // 20
+    make_tuple(TInput(0x8164BACE, 20), BinaryVector::CreateFromBinaryString("1000_0001:0110_0100:1011")),                // 21
+    make_tuple(TInput(0x8164BACE, 21), BinaryVector::CreateFromBinaryString("1000_0001:0110_0100:1011_1")),              // 22
+    make_tuple(TInput(0x8164BACE, 22), BinaryVector::CreateFromBinaryString("1000_0001:0110_0100:1011_10")),             // 23
+    make_tuple(TInput(0x8164BACE, 23), BinaryVector::CreateFromBinaryString("1000_0001:0110_0100:1011_101")),            // 24
+    make_tuple(TInput(0x8164BACE, 24), BinaryVector::CreateFromBinaryString("1000_0001:0110_0100:1011_1010")),           // 25
+    make_tuple(TInput(0x8164BACE, 25), BinaryVector::CreateFromBinaryString("1000_0001:0110_0100:1011_1010:1")),         // 26
+    make_tuple(TInput(0x8164BACE, 26), BinaryVector::CreateFromBinaryString("1000_0001:0110_0100:1011_1010:11")),        // 27
+    make_tuple(TInput(0x8164BACE, 27), BinaryVector::CreateFromBinaryString("1000_0001:0110_0100:1011_1010:110")),       // 28
+    make_tuple(TInput(0x8164BACE, 28), BinaryVector::CreateFromBinaryString("1000_0001:0110_0100:1011_1010:1100")),      // 29
+    make_tuple(TInput(0x8164BACE, 29), BinaryVector::CreateFromBinaryString("1000_0001:0110_0100:1011_1010:1100_1")),    // 30
+    make_tuple(TInput(0x8164BACE, 30), BinaryVector::CreateFromBinaryString("1000_0001:0110_0100:1011_1010:1100_11")),   // 31
+    make_tuple(TInput(0x8164BACE, 31), BinaryVector::CreateFromBinaryString("1000_0001:0110_0100:1011_1010:1100_111")),  // 32
+    make_tuple(TInput(0x8164BACE, 32), BinaryVector::CreateFromBinaryString("1000_0001:0110_0100:1011_1010:1100_1110")), // 33
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks Append when sut is not empty (from 1 to 32 bits) and adding from 1 to 32 bits (right aliqned) from uint32_t
+//!
+//! @note Each time a new BinaryVector is used
+void UT_BinaryVector::test_Append_1_to_32_bits_When_NotEmpty_Right_Aligned ()
+{
+  // ---------------- DDT Setup
+  //
+  using TInput = tuple<BinaryVector, uint32_t, uint8_t> ; // Value, Number of bits (taken from LSB)
+
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto& input    = std::get<0>(data);
+    const auto& expected = std::get<1>(data);
+    auto sut             = std::get<0>(input);
+    auto value           = std::get<1>(input);
+    auto numberOfBits    = std::get<2>(input);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Append(value, numberOfBits, BitsAlignment::Right));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto bbv = [](string_view asBinaryString) { return BinaryVector::CreateFromBinaryString(asBinaryString); };
+
+  auto data =         // initial, Value, bits
+  {
+    make_tuple(TInput(bbv("1"),        0x00000000, 1),  bbv("1:0")),                                              // 00
+    make_tuple(TInput(bbv("0"),        0x00000001, 1),  bbv("0:1")),                                              // 01
+    make_tuple(TInput(bbv("01"),       0x00000002, 2),  bbv("01:10")),                                            // 02
+    make_tuple(TInput(bbv("00"),       0x00000003, 2),  bbv("00:11")),                                            // 03
+    make_tuple(TInput(bbv("100"),      0x00000003, 3),  bbv("100:011")),                                          // 04
+    make_tuple(TInput(bbv("101"),      0x00000009, 4),  bbv("101:1001")),                                         // 05
+    make_tuple(TInput(bbv("110"),      0x00000011, 5),  bbv("110:1000_1")),                                       // 06
+    make_tuple(TInput(bbv("111"),      0x00000012, 6),  bbv("111:0100_10")),                                      // 07
+    make_tuple(TInput(bbv("1000"),     0x0000004A, 7),  bbv("1000:1001_010")),                                    // 08
+    make_tuple(TInput(bbv("1000_0"),   0x0000007B, 8),  bbv("1000_0:0111_1011")),                                 // 09
+    make_tuple(TInput(bbv("1010_11"),  0x0000017B, 9),  bbv("1010_11:1:0111_1011")),                              // 10
+    make_tuple(TInput(bbv("1111_001"), 0x0000017B, 10), bbv("1111_001:01:0111_1011")),                            // 11
+    make_tuple(TInput(bbv("1001"),     0x0000037B, 11), bbv("1001:011:0111_1011")),                               // 12
+    make_tuple(TInput(bbv("1"),        0x0000037B, 12), bbv("1:0011:0111_1011")),                                 // 13
+    make_tuple(TInput(bbv("0"),        0x00005ACE, 13), bbv("0:1:1010_1100:1110")),                               // 14
+    make_tuple(TInput(bbv("01"),       0x00005ACE, 14), bbv("01:01:1010_1100:1110")),                             // 15
+    make_tuple(TInput(bbv("00"),       0x00005ACE, 15), bbv("00:101:1010_1100:1110")),                            // 16
+    make_tuple(TInput(bbv("100"),      0x0000FACE, 16), bbv("100:1111_1010:1100_1110")),                          // 17
+    make_tuple(TInput(bbv("101"),      0x8164BACE, 17), bbv("101:0:1011_1010:1100_1110")),                        // 18
+    make_tuple(TInput(bbv("110"),      0x8164BACE, 18), bbv("110:00:1011_1010:1100_1110")),                       // 19
+    make_tuple(TInput(bbv("111"),      0x8164BACE, 19), bbv("111:100:1011_1010:1100_1110")),                      // 20
+    make_tuple(TInput(bbv("1000"),     0x8164BACE, 20), bbv("1000:0100:1011_1010:1100_1110")),                    // 21
+    make_tuple(TInput(bbv("1000_0"),   0x8164BACE, 21), bbv("1000_0:0_0100:1011_1010:1100_1110")),                // 22
+    make_tuple(TInput(bbv("1010_11"),  0x8164BACE, 22), bbv("1010_11:10_0100:1011_1010:1100_1110")),              // 23
+    make_tuple(TInput(bbv("1111_001"), 0x8164BACE, 23), bbv("1111_001:110_0100:1011_1010:1100_1110")),            // 24
+    make_tuple(TInput(bbv("1001"),     0x8164BACE, 24), bbv("1001:0110_0100:1011_1010:1100_1110")),               // 25
+    make_tuple(TInput(bbv("110"),      0x8164BACE, 25), bbv("110:1:0110_0100:1011_1010:1100_1110")),              // 26
+    make_tuple(TInput(bbv("111"),      0x8164BACE, 26), bbv("111:01:0110_0100:1011_1010:1100_1110")),             // 27
+    make_tuple(TInput(bbv("1000"),     0x8164BACE, 27), bbv("1000:001:0110_0100:1011_1010:1100_1110")),           // 28
+    make_tuple(TInput(bbv("1000_0"),   0x8164BACE, 28), bbv("1000_0:0001:0110_0100:1011_1010:1100_1110")),        // 29
+    make_tuple(TInput(bbv("1010_11"),  0x8164BACE, 29), bbv("1010_11:0_0001:0110_0100:1011_1010:1100_1110")),     // 30
+    make_tuple(TInput(bbv("1111_001"), 0x8164BACE, 30), bbv("1111_001:00_0001:0110_0100:1011_1010:1100_1110")),   // 31
+    make_tuple(TInput(bbv("1010_11"),  0x8164BACE, 31), bbv("1010_11:000_0001:0110_0100:1011_1010:1100_1110")),   // 32
+    make_tuple(TInput(bbv("1111_001"), 0x8164BACE, 32), bbv("1111_001:1000_0001:0110_0100:1011_1010:1100_1110")), // 33
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks Append when sut is not empty (from 1 to 312 bits) and adding from 1 to 32 bits (left aliqned) from uint32_t
+//!
+//! @note Each time a new BinaryVector is used
+void UT_BinaryVector::test_Append_1_to_32_bits_When_NotEmpty_Left_Aligned ()
+{
+  // ---------------- DDT Setup
+  //
+  using TInput = tuple<BinaryVector, uint32_t, uint8_t> ; // Value, Number of bits (taken from LSB)
+
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto& input    = std::get<0>(data);
+    const auto& expected = std::get<1>(data);
+    auto sut             = std::get<0>(input);
+    auto value           = std::get<1>(input);
+    auto numberOfBits    = std::get<2>(input);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Append(value, numberOfBits, BitsAlignment::Left));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto bbv = [](string_view asBinaryString) { return BinaryVector::CreateFromBinaryString(asBinaryString); };
+
+  auto data =         // Initial, Value, bits
+  {
+    make_tuple(TInput(bbv("1"),        0x00000000, 1),  bbv("1:0")),                                              // 00
+    make_tuple(TInput(bbv("0"),        0x80000000, 1),  bbv("0:1")),                                              // 01
+    make_tuple(TInput(bbv("01"),       0x80000000, 2),  bbv("01:10")),                                            // 02
+    make_tuple(TInput(bbv("00"),       0xC0000000, 2),  bbv("00:11")),                                            // 03
+    make_tuple(TInput(bbv("100"),      0x70000000, 3),  bbv("100:011")),                                          // 04
+    make_tuple(TInput(bbv("101"),      0x90000000, 4),  bbv("101:1001")),                                         // 05
+    make_tuple(TInput(bbv("110"),      0x88000000, 5),  bbv("110:1000_1")),                                       // 06
+    make_tuple(TInput(bbv("111"),      0x48000000, 6),  bbv("111:0100_10")),                                      // 07
+    make_tuple(TInput(bbv("1000"),     0x94000000, 7),  bbv("1000:1001_010")),                                    // 08
+    make_tuple(TInput(bbv("1000_0"),   0x7B000000, 8),  bbv("1000_0:0111_1011")),                                 // 09
+    make_tuple(TInput(bbv("1010_11"),  0xBD800000, 9),  bbv("1010_11:1011_1101:1")),                              // 10
+    make_tuple(TInput(bbv("1111_001"), 0x5EC00000, 10), bbv("1111_001:0101_1110:11")),                            // 11
+    make_tuple(TInput(bbv("1001"),     0x6F600000, 11), bbv("1001:0110_1111:011")),                               // 12
+    make_tuple(TInput(bbv("1"),        0x37B00000, 12), bbv("1:0011_0111:1011")),                                 // 13
+    make_tuple(TInput(bbv("0"),        0xD6700000, 13), bbv("0:1101_0110:0111_0")),                               // 14
+    make_tuple(TInput(bbv("01"),       0x6B380000, 14), bbv("01:0110_1011:0011_10")),                             // 15
+    make_tuple(TInput(bbv("00"),       0xB59D0000, 15), bbv("00:1011_0101:1001_110")),                            // 16
+    make_tuple(TInput(bbv("100"),      0xFACE0000, 16), bbv("100:1111_1010:1100_1110")),                          // 17
+    make_tuple(TInput(bbv("101"),      0x8164BACE, 17), bbv("101:1000_0001:0110_0100:1")),                        // 18
+    make_tuple(TInput(bbv("110"),      0x8164BACE, 18), bbv("110:1000_0001:0110_0100:10")),                       // 19
+    make_tuple(TInput(bbv("111"),      0x8164BACE, 19), bbv("111:1000_0001:0110_0100:101")),                      // 20
+    make_tuple(TInput(bbv("1000"),     0x8164BACE, 20), bbv("1000:1000_0001:0110_0100:1011")),                    // 21
+    make_tuple(TInput(bbv("1000_0"),   0x8164BACE, 21), bbv("1000_0:1000_0001:0110_0100:1011_1")),                // 22
+    make_tuple(TInput(bbv("1010_11"),  0x8164BACE, 22), bbv("1010_11:1000_0001:0110_0100:1011_10")),              // 23
+    make_tuple(TInput(bbv("1111_001"), 0x8164BACE, 23), bbv("1111_001:1000_0001:0110_0100:1011_101")),            // 24
+    make_tuple(TInput(bbv("1001"),     0x8164BACE, 24), bbv("1001:1000_0001:0110_0100:1011_1010")),               // 25
+    make_tuple(TInput(bbv("110"),      0x8164BACE, 25), bbv("110:1000_0001:0110_0100:1011_1010:1")),              // 26
+    make_tuple(TInput(bbv("111"),      0x8164BACE, 26), bbv("111:1000_0001:0110_0100:1011_1010:11")),             // 27
+    make_tuple(TInput(bbv("1000"),     0x8164BACE, 27), bbv("1000:1000_0001:0110_0100:1011_1010:110")),           // 28
+    make_tuple(TInput(bbv("1000_0"),   0x8164BACE, 28), bbv("1000_0:1000_0001:0110_0100:1011_1010:1100")),        // 29
+    make_tuple(TInput(bbv("1010_11"),  0x8164BACE, 29), bbv("1010_11:1000_0001:0110_0100:1011_1010:1100_1")),     // 30
+    make_tuple(TInput(bbv("1111_001"), 0x8164BACE, 30), bbv("1111_001:1000_0001:0110_0100:1011_1010:1100_11")),   // 31
+    make_tuple(TInput(bbv("1010_11"),  0x8164BACE, 31), bbv("1010_11:1000_0001:0110_0100:1011_1010:1100_111")),   // 32
+    make_tuple(TInput(bbv("1111_001"), 0x8164BACE, 32), bbv("1111_001:1000_0001:0110_0100:1011_1010:1100_1110")), // 33
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks Append when sut is empty and adding from 1 to 64 bits from uint64_t (right aligned)
+//!
+//! @note Each time a new BinaryVector is used
+void UT_BinaryVector::test_Append_1_to_64_bits_When_Empty_Right_Aligned ()
+{
+  // ---------------- DDT Setup
+  //
+
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto& input    = std::get<0>(data);
+    const auto& expected = std::get<1>(data) ;
+    auto value           = std::get<0>(input);
+    auto numberOfBits    = std::get<1>(input);
+
+    BinaryVector sut;
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Append(value, numberOfBits, BitsAlignment::Right));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto bbv     = [](string_view asBinaryString) { return BinaryVector::CreateFromBinaryString(asBinaryString); };
+  using TInput = tuple<uint64_t, uint8_t> ; // Value, Number of bits (taken from LSB)
+
+  auto data    =   // Value, bits
+  {
+    make_tuple(TInput(0x0000000000000000, 1),  bbv("0")),                                                                               // 00
+    make_tuple(TInput(0x0000000000000001, 1),  bbv("1")),                                                                               // 01
+    make_tuple(TInput(0x0000000000000002, 2),  bbv("10")),                                                                              // 02
+    make_tuple(TInput(0x0000000000000003, 2),  bbv("11")),                                                                              // 03
+    make_tuple(TInput(0x0000000000000003, 3),  bbv("011")),                                                                             // 04
+    make_tuple(TInput(0x0000000000000009, 4),  bbv("1001")),                                                                            // 05
+    make_tuple(TInput(0x0000000000000011, 5),  bbv("1000_1")),                                                                          // 06
+    make_tuple(TInput(0x0000000000000012, 6),  bbv("0100_10")),                                                                         // 07
+    make_tuple(TInput(0x000000000000004A, 7),  bbv("1001_010")),                                                                        // 08
+    make_tuple(TInput(0x000000000000007B, 8),  bbv("0111_1011")),                                                                       // 09
+    make_tuple(TInput(0x000000000000017B, 9),  bbv("1:0111_1011")),                                                                     // 10
+    make_tuple(TInput(0x000000000000017B, 10), bbv("01:0111_1011")),                                                                    // 11
+    make_tuple(TInput(0x000000000000037B, 11), bbv("011:0111_1011")),                                                                   // 12
+    make_tuple(TInput(0x000000000000037B, 12), bbv("0011:0111_1011")),                                                                  // 13
+    make_tuple(TInput(0x0000000000005ACE, 13), bbv("1:1010_1100:1110")),                                                                // 14
+    make_tuple(TInput(0x0000000000005ACE, 14), bbv("01:1010_1100:1110")),                                                               // 15
+    make_tuple(TInput(0x0000000000005ACE, 15), bbv("101:1010_1100:1110")),                                                              // 16
+    make_tuple(TInput(0x000000000000FACE, 16), bbv("1111_1010:1100_1110")),                                                             // 17
+    make_tuple(TInput(0x000000008164BACE, 17), bbv("0:1011_1010:1100_1110")),                                                           // 18
+    make_tuple(TInput(0x000000008164BACE, 18), bbv("00:1011_1010:1100_1110")),                                                          // 19
+    make_tuple(TInput(0x000000008164BACE, 19), bbv("100:1011_1010:1100_1110")),                                                         // 20
+    make_tuple(TInput(0x000000008164BACE, 20), bbv("0100:1011_1010:1100_1110")),                                                        // 21
+    make_tuple(TInput(0x000000008164BACE, 21), bbv("0_0100:1011_1010:1100_1110")),                                                      // 22
+    make_tuple(TInput(0x000000008164BACE, 22), bbv("10_0100:1011_1010:1100_1110")),                                                     // 23
+    make_tuple(TInput(0x000000008164BACE, 23), bbv("110_0100:1011_1010:1100_1110")),                                                    // 24
+    make_tuple(TInput(0x000000008164BACE, 24), bbv("0110_0100:1011_1010:1100_1110")),                                                   // 25
+    make_tuple(TInput(0x000000008164BACE, 25), bbv("1:0110_0100:1011_1010:1100_1110")),                                                 // 26
+    make_tuple(TInput(0x000000008164BACE, 26), bbv("01:0110_0100:1011_1010:1100_1110")),                                                // 27
+    make_tuple(TInput(0x000000008164BACE, 27), bbv("001:0110_0100:1011_1010:1100_1110")),                                               // 28
+    make_tuple(TInput(0x000000008164BACE, 28), bbv("0001:0110_0100:1011_1010:1100_1110")),                                              // 29
+    make_tuple(TInput(0x000000008164BACE, 29), bbv("0_0001:0110_0100:1011_1010:1100_1110")),                                            // 30
+    make_tuple(TInput(0x000000008164BACE, 30), bbv("00_0001:0110_0100:1011_1010:1100_1110")),                                           // 31
+    make_tuple(TInput(0x000000008164BACE, 31), bbv("000_0001:0110_0100:1011_1010:1100_1110")),                                          // 32
+    make_tuple(TInput(0x000000008164BACE, 32), bbv("1000_0001:0110_0100:1011_1010:1100_1110")),                                         // 33
+    make_tuple(TInput(0xFaceB01d98765432, 33), bbv("1:1001_1000:0111_0110:0101_0100:0011_0010")),                                       // 34
+    make_tuple(TInput(0xFaceB01d98765432, 34), bbv("01:1001_1000:0111_0110:0101_0100:0011_0010")),                                      // 35
+    make_tuple(TInput(0xFaceB01d98765432, 35), bbv("101:1001_1000:0111_0110:0101_0100:0011_0010")),                                     // 36
+    make_tuple(TInput(0xFaceB01d98765432, 36), bbv("1101:1001_1000:0111_0110:0101_0100:0011_0010")),                                    // 37
+    make_tuple(TInput(0xFaceB01d98765432, 37), bbv("1_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                                  // 38
+    make_tuple(TInput(0xFaceB01d98765432, 38), bbv("01_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                                 // 39
+    make_tuple(TInput(0xFaceB01d98765432, 39), bbv("001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                                // 40
+    make_tuple(TInput(0xFaceB01d98765432, 40), bbv("0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                               // 41
+    make_tuple(TInput(0xFaceB01d98765432, 41), bbv("0:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                             // 42
+    make_tuple(TInput(0xFaceB01d98765432, 42), bbv("00:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                            // 43
+    make_tuple(TInput(0xFaceB01d98765432, 43), bbv("000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                           // 44
+    make_tuple(TInput(0xFaceB01d98765432, 44), bbv("0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                          // 45
+    make_tuple(TInput(0xFaceB01d98765432, 45), bbv("1_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                        // 46
+    make_tuple(TInput(0xFaceB01d98765432, 46), bbv("11_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                       // 47
+    make_tuple(TInput(0xFaceB01d98765432, 47), bbv("011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                      // 48
+    make_tuple(TInput(0xFaceB01d98765432, 48), bbv("1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                     // 49
+    make_tuple(TInput(0xFaceB01d98765432, 49), bbv("0:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                   // 50
+    make_tuple(TInput(0xFaceB01d98765432, 50), bbv("10:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                  // 51
+    make_tuple(TInput(0xFaceB01d98765432, 51), bbv("110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                 // 52
+    make_tuple(TInput(0xFaceB01d98765432, 52), bbv("1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                // 53
+    make_tuple(TInput(0xFaceB01d98765432, 53), bbv("0_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),              // 54
+    make_tuple(TInput(0xFaceB01d98765432, 54), bbv("00_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),             // 55
+    make_tuple(TInput(0xFaceB01d98765432, 55), bbv("100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),            // 56
+    make_tuple(TInput(0xFaceB01d98765432, 56), bbv("1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),           // 57
+    make_tuple(TInput(0xFaceB01d98765432, 57), bbv("0:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),         // 58
+    make_tuple(TInput(0xFaceB01d98765432, 58), bbv("10:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),        // 59
+    make_tuple(TInput(0xFaceB01d98765432, 59), bbv("010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),       // 60
+    make_tuple(TInput(0xFaceB01d98765432, 60), bbv("1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),      // 61
+    make_tuple(TInput(0xFaceB01d98765432, 61), bbv("1_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),    // 62
+    make_tuple(TInput(0xFaceB01d98765432, 62), bbv("11_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),   // 63
+    make_tuple(TInput(0xFaceB01d98765432, 63), bbv("111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),  // 64
+    make_tuple(TInput(0xFaceB01d98765432, 64), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")), // 65
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+//! Checks Append when sut is empty and adding from 1 to 64 bits from uint64_t (left aligned)
+//!
+//! @note Each time a new BinaryVector is used
+void UT_BinaryVector::test_Append_1_to_64_bits_When_Empty_Left_Aligned ()
+{
+  // ---------------- DDT Setup
+  //
+  using TInput = tuple<uint64_t, uint8_t> ; // Value, Number of bits (taken from LSB)
+
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto& input    = std::get<0>(data);
+    const auto& expected = std::get<1>(data) ;
+    auto value           = std::get<0>(input);
+    auto numberOfBits    = std::get<1>(input);
+
+    BinaryVector sut;
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Append(value, numberOfBits, BitsAlignment::Left));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto bbv     = [](string_view asBinaryString) { return BinaryVector::CreateFromBinaryString(asBinaryString); };
+  auto data =     // Value, bits, Expected
+  {
+    make_tuple(TInput(0xFaceB01d98765432, 1),  bbv("1")),                                                                               // 00
+    make_tuple(TInput(0xFaceB01d98765432, 2),  bbv("11")),                                                                              // 01
+    make_tuple(TInput(0xFaceB01d98765432, 3),  bbv("111")),                                                                             // 02
+    make_tuple(TInput(0xFaceB01d98765432, 4),  bbv("1111")),                                                                            // 03
+    make_tuple(TInput(0xFaceB01d98765432, 5),  bbv("1111_1")),                                                                          // 04
+    make_tuple(TInput(0xFaceB01d98765432, 6),  bbv("1111_10")),                                                                         // 05
+    make_tuple(TInput(0xFaceB01d98765432, 7),  bbv("1111_101")),                                                                        // 06
+    make_tuple(TInput(0xFaceB01d98765432, 8),  bbv("1111_1010")),                                                                       // 07
+    make_tuple(TInput(0xFaceB01d98765432, 9),  bbv("1111_1010:1")),                                                                     // 08
+    make_tuple(TInput(0xFaceB01d98765432, 10), bbv("1111_1010:11")),                                                                    // 09
+    make_tuple(TInput(0xFaceB01d98765432, 11), bbv("1111_1010:110")),                                                                   // 10
+    make_tuple(TInput(0xFaceB01d98765432, 12), bbv("1111_1010:1100")),                                                                  // 11
+    make_tuple(TInput(0xFaceB01d98765432, 13), bbv("1111_1010:1100_1")),                                                                // 12
+    make_tuple(TInput(0xFaceB01d98765432, 14), bbv("1111_1010:1100_11")),                                                               // 13
+    make_tuple(TInput(0xFaceB01d98765432, 15), bbv("1111_1010:1100_111")),                                                              // 14
+    make_tuple(TInput(0xFaceB01d98765432, 16), bbv("1111_1010:1100_1110")),                                                             // 15
+    make_tuple(TInput(0xFaceB01d98765432, 17), bbv("1111_1010:1100_1110:1")),                                                           // 16
+    make_tuple(TInput(0xFaceB01d98765432, 18), bbv("1111_1010:1100_1110:10")),                                                          // 17
+    make_tuple(TInput(0xFaceB01d98765432, 19), bbv("1111_1010:1100_1110:101")),                                                         // 18
+    make_tuple(TInput(0xFaceB01d98765432, 20), bbv("1111_1010:1100_1110:1011")),                                                        // 19
+    make_tuple(TInput(0xFaceB01d98765432, 21), bbv("1111_1010:1100_1110:1011_0")),                                                      // 20
+    make_tuple(TInput(0xFaceB01d98765432, 22), bbv("1111_1010:1100_1110:1011_00")),                                                     // 21
+    make_tuple(TInput(0xFaceB01d98765432, 23), bbv("1111_1010:1100_1110:1011_000")),                                                    // 22
+    make_tuple(TInput(0xFaceB01d98765432, 24), bbv("1111_1010:1100_1110:1011_0000")),                                                   // 23
+    make_tuple(TInput(0xFaceB01d98765432, 25), bbv("1111_1010:1100_1110:1011_0000:0")),                                                 // 24
+    make_tuple(TInput(0xFaceB01d98765432, 26), bbv("1111_1010:1100_1110:1011_0000:00")),                                                // 25
+    make_tuple(TInput(0xFaceB01d98765432, 27), bbv("1111_1010:1100_1110:1011_0000:000")),                                               // 26
+    make_tuple(TInput(0xFaceB01d98765432, 28), bbv("1111_1010:1100_1110:1011_0000:0001")),                                              // 27
+    make_tuple(TInput(0xFaceB01d98765432, 29), bbv("1111_1010:1100_1110:1011_0000:0001_1")),                                            // 28
+    make_tuple(TInput(0xFaceB01d98765432, 30), bbv("1111_1010:1100_1110:1011_0000:0001_11")),                                           // 29
+    make_tuple(TInput(0xFaceB01d98765432, 31), bbv("1111_1010:1100_1110:1011_0000:0001_110")),                                          // 30
+    make_tuple(TInput(0xFaceB01d98765432, 32), bbv("1111_1010:1100_1110:1011_0000:0001_1101")),                                         // 31
+    make_tuple(TInput(0xFaceB01d98765432, 33), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1")),                                       // 32
+    make_tuple(TInput(0xFaceB01d98765432, 34), bbv("1111_1010:1100_1110:1011_0000:0001_1101:10")),                                      // 33
+    make_tuple(TInput(0xFaceB01d98765432, 35), bbv("1111_1010:1100_1110:1011_0000:0001_1101:100")),                                     // 34
+    make_tuple(TInput(0xFaceB01d98765432, 36), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001")),                                    // 35
+    make_tuple(TInput(0xFaceB01d98765432, 37), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1")),                                  // 36
+    make_tuple(TInput(0xFaceB01d98765432, 38), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_10")),                                 // 37
+    make_tuple(TInput(0xFaceB01d98765432, 39), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_100")),                                // 38
+    make_tuple(TInput(0xFaceB01d98765432, 40), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000")),                               // 39
+    make_tuple(TInput(0xFaceB01d98765432, 41), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0")),                             // 40
+    make_tuple(TInput(0xFaceB01d98765432, 42), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:01")),                            // 41
+    make_tuple(TInput(0xFaceB01d98765432, 43), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:011")),                           // 42
+    make_tuple(TInput(0xFaceB01d98765432, 44), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111")),                          // 43
+    make_tuple(TInput(0xFaceB01d98765432, 45), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0")),                        // 44
+    make_tuple(TInput(0xFaceB01d98765432, 46), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_01")),                       // 45
+    make_tuple(TInput(0xFaceB01d98765432, 47), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_011")),                      // 46
+    make_tuple(TInput(0xFaceB01d98765432, 48), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110")),                     // 47
+    make_tuple(TInput(0xFaceB01d98765432, 49), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0")),                   // 48
+    make_tuple(TInput(0xFaceB01d98765432, 50), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:01")),                  // 49
+    make_tuple(TInput(0xFaceB01d98765432, 51), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:010")),                 // 50
+    make_tuple(TInput(0xFaceB01d98765432, 52), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101")),                // 51
+    make_tuple(TInput(0xFaceB01d98765432, 53), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0")),              // 52
+    make_tuple(TInput(0xFaceB01d98765432, 54), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_01")),             // 53
+    make_tuple(TInput(0xFaceB01d98765432, 55), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_010")),            // 54
+    make_tuple(TInput(0xFaceB01d98765432, 56), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:")),          // 55
+    make_tuple(TInput(0xFaceB01d98765432, 57), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0")),         // 56
+    make_tuple(TInput(0xFaceB01d98765432, 58), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:00")),        // 57
+    make_tuple(TInput(0xFaceB01d98765432, 59), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:001")),       // 58
+    make_tuple(TInput(0xFaceB01d98765432, 60), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011")),      // 59
+    make_tuple(TInput(0xFaceB01d98765432, 61), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0")),    // 60
+    make_tuple(TInput(0xFaceB01d98765432, 62), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_00")),   // 61
+    make_tuple(TInput(0xFaceB01d98765432, 63), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_001")),  // 62
+    make_tuple(TInput(0xFaceB01d98765432, 64), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")), // 63
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks Append when sut is not empty (from 1 to 64 bits) and adding from 1 to 64 bits (right aliqned) from uint64_t
+//!
+//! @note Each time a new BinaryVector is used
+void UT_BinaryVector::test_Append_1_to_64_bits_When_NotEmpty_Right_Aligned ()
+{
+  // ---------------- DDT Setup
+  //
+  using TInput = tuple<BinaryVector, uint64_t, uint8_t> ; // Value, Number of bits (taken from LSB)
+
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto& input    = std::get<0>(data);
+    const auto& expected = std::get<1>(data);
+    auto sut             = std::get<0>(input);
+    auto value           = std::get<1>(input);
+    auto numberOfBits    = std::get<2>(input);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Append(value, numberOfBits, BitsAlignment::Right));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto bbv = [](string_view asBinaryString) { return BinaryVector::CreateFromBinaryString(asBinaryString); };
+
+  auto data =         // initial, Value, bits
+  {
+    make_tuple(TInput(bbv("0"),                 0x0000000000000000, 1),  bbv("0:0")),                                                                                       // 00
+    make_tuple(TInput(bbv("1"),                 0x0000000000000001, 1),  bbv("1:1")),                                                                                       // 01
+    make_tuple(TInput(bbv("10"),                0x0000000000000002, 2),  bbv("10:10")),                                                                                     // 02
+    make_tuple(TInput(bbv("11"),                0x0000000000000003, 2),  bbv("11:11")),                                                                                     // 03
+    make_tuple(TInput(bbv("100"),               0x0000000000000003, 3),  bbv("100:011")),                                                                                   // 04
+    make_tuple(TInput(bbv("101"),               0x0000000000000009, 4),  bbv("101:1001")),                                                                                  // 05
+    make_tuple(TInput(bbv("110"),               0x0000000000000011, 5),  bbv("110:1000_1")),                                                                                // 06
+    make_tuple(TInput(bbv("111"),               0x0000000000000012, 6),  bbv("111:0100_10")),                                                                               // 07
+    make_tuple(TInput(bbv("1000"),              0x000000000000004A, 7),  bbv("1000:1001_010")),                                                                             // 08
+    make_tuple(TInput(bbv("1000_1"),            0x000000000000007B, 8),  bbv("1000_1:0111_1011")),                                                                          // 09
+    make_tuple(TInput(bbv("1000_01"),           0x000000000000017B, 9),  bbv("1000_01:1:0111_1011")),                                                                       // 10
+    make_tuple(TInput(bbv("1000_001"),          0x000000000000017B, 10), bbv("1000_001:01:0111_1011")),                                                                     // 11
+    make_tuple(TInput(bbv("1000_0001"),         0x000000000000037B, 11), bbv("1000_0001:011:0111_1011")),                                                                   // 12
+    make_tuple(TInput(bbv("1000_0001:0"),       0x000000000000037B, 12), bbv("1000_0001:0:0011:0111_1011")),                                                                // 13
+    make_tuple(TInput(bbv("1000_0001:01"),      0x0000000000005ACE, 13), bbv("1000_0001:01:1:1010_1100:1110")),                                                             // 14
+    make_tuple(TInput(bbv("1000_0001:011"),     0x0000000000005ACE, 14), bbv("1000_0001:011:01:1010_1100:1110")),                                                           // 15
+    make_tuple(TInput(bbv("1000_0001:0110"),    0x0000000000005ACE, 15), bbv("1000_0001:0110:101:1010_1100:1110")),                                                         // 16
+    make_tuple(TInput(bbv("1000_0001:0110_1"),  0x000000000000FACE, 16), bbv("1000_0001:0110_1:1111_1010:1100_1110")),                                                      // 17
+    make_tuple(TInput(bbv("1000_0001:0110_11"), 0x000000008164BACE, 17), bbv("1000_0001:0110_11:0:1011_1010:1100_1110")),                                                   // 18
+    make_tuple(TInput(bbv("1"),                 0x000000008164BACE, 18), bbv("1:00:1011_1010:1100_1110")),                                                                  // 19
+    make_tuple(TInput(bbv("0"),                 0x000000008164BACE, 19), bbv("0:100:1011_1010:1100_1110")),                                                                 // 20
+    make_tuple(TInput(bbv("1"),                 0x000000008164BACE, 20), bbv("1:0100:1011_1010:1100_1110")),                                                                // 21
+    make_tuple(TInput(bbv("10"),                0x000000008164BACE, 21), bbv("10:0_0100:1011_1010:1100_1110")),                                                             // 22
+    make_tuple(TInput(bbv("11"),                0x000000008164BACE, 22), bbv("11:10_0100:1011_1010:1100_1110")),                                                            // 23
+    make_tuple(TInput(bbv("100"),               0x000000008164BACE, 23), bbv("100:110_0100:1011_1010:1100_1110")),                                                          // 24
+    make_tuple(TInput(bbv("101"),               0x000000008164BACE, 24), bbv("101:0110_0100:1011_1010:1100_1110")),                                                         // 25
+    make_tuple(TInput(bbv("110"),               0x000000008164BACE, 25), bbv("110:1:0110_0100:1011_1010:1100_1110")),                                                       // 26
+    make_tuple(TInput(bbv("111"),               0x000000008164BACE, 26), bbv("111:01:0110_0100:1011_1010:1100_1110")),                                                      // 27
+    make_tuple(TInput(bbv("1000"),              0x000000008164BACE, 27), bbv("1000:001:0110_0100:1011_1010:1100_1110")),                                                    // 28
+    make_tuple(TInput(bbv("1000_1"),            0x000000008164BACE, 28), bbv("1000_1:0001:0110_0100:1011_1010:1100_1110")),                                                 // 29
+    make_tuple(TInput(bbv("1000_01"),           0x000000008164BACE, 29), bbv("1000_01:0_0001:0110_0100:1011_1010:1100_1110")),                                              // 30
+    make_tuple(TInput(bbv("1000_001"),          0x000000008164BACE, 30), bbv("1000_001:00_0001:0110_0100:1011_1010:1100_1110")),                                            // 31
+    make_tuple(TInput(bbv("1000_0001"),         0x000000008164BACE, 31), bbv("1000_0001:000_0001:0110_0100:1011_1010:1100_1110")),                                          // 32
+    make_tuple(TInput(bbv("1000_0001:0"),       0x000000008164BACE, 32), bbv("1000_0001:0:1000_0001:0110_0100:1011_1010:1100_1110")),                                       // 33
+    make_tuple(TInput(bbv("1000_0001:01"),      0xFaceB01d98765432, 33), bbv("1000_0001:01:1:1001_1000:0111_0110:0101_0100:0011_0010")),                                    // 34
+    make_tuple(TInput(bbv("1000_0001:011"),     0xFaceB01d98765432, 34), bbv("1000_0001:011:01:1001_1000:0111_0110:0101_0100:0011_0010")),                                  // 35
+    make_tuple(TInput(bbv("1000_0001:0110"),    0xFaceB01d98765432, 35), bbv("1000_0001:0110:101:1001_1000:0111_0110:0101_0100:0011_0010")),                                // 36
+    make_tuple(TInput(bbv("1000_0001:0110_1"),  0xFaceB01d98765432, 36), bbv("1000_0001:0110_1:1101:1001_1000:0111_0110:0101_0100:0011_0010")),                             // 37
+    make_tuple(TInput(bbv("1000_0001:0110_11"), 0xFaceB01d98765432, 37), bbv("1000_0001:0110_11:1_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                          // 38
+    make_tuple(TInput(bbv("1"),                 0xFaceB01d98765432, 38), bbv("1:01_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                                         // 39
+    make_tuple(TInput(bbv("0"),                 0xFaceB01d98765432, 39), bbv("0:001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                                        // 40
+    make_tuple(TInput(bbv("1"),                 0xFaceB01d98765432, 40), bbv("1:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                                       // 41
+    make_tuple(TInput(bbv("10"),                0xFaceB01d98765432, 41), bbv("10:0:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                                    // 42
+    make_tuple(TInput(bbv("11"),                0xFaceB01d98765432, 42), bbv("11:00:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                                   // 43
+    make_tuple(TInput(bbv("100"),               0xFaceB01d98765432, 43), bbv("100:000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                                 // 44
+    make_tuple(TInput(bbv("101"),               0xFaceB01d98765432, 44), bbv("101:0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                                // 45
+    make_tuple(TInput(bbv("110"),               0xFaceB01d98765432, 45), bbv("110:1_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                              // 46
+    make_tuple(TInput(bbv("111"),               0xFaceB01d98765432, 46), bbv("111:11_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                             // 47
+    make_tuple(TInput(bbv("1000"),              0xFaceB01d98765432, 47), bbv("1000:011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                           // 48
+    make_tuple(TInput(bbv("1000_1"),            0xFaceB01d98765432, 48), bbv("1000_1:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                        // 49
+    make_tuple(TInput(bbv("1000_01"),           0xFaceB01d98765432, 49), bbv("1000_01:0:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                     // 50
+    make_tuple(TInput(bbv("1000_001"),          0xFaceB01d98765432, 50), bbv("1000_001:10:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                   // 51
+    make_tuple(TInput(bbv("1000_0001"),         0xFaceB01d98765432, 51), bbv("1000_0001:110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                 // 52
+    make_tuple(TInput(bbv("1000_0001:0"),       0xFaceB01d98765432, 52), bbv("1000_0001:0:1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),              // 53
+    make_tuple(TInput(bbv("1000_0001:01"),      0xFaceB01d98765432, 53), bbv("1000_0001:01:0_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),           // 54
+    make_tuple(TInput(bbv("1000_0001:011"),     0xFaceB01d98765432, 54), bbv("1000_0001:011:00_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),         // 55
+    make_tuple(TInput(bbv("1000_0001:0110"),    0xFaceB01d98765432, 55), bbv("1000_0001:0110:100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),       // 56
+    make_tuple(TInput(bbv("1000_0001:0110_1"),  0xFaceB01d98765432, 56), bbv("1000_0001:0110_1:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),    // 57
+    make_tuple(TInput(bbv("1000_0001:0110_11"), 0xFaceB01d98765432, 57), bbv("1000_0001:0110_11:0:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")), // 58
+    make_tuple(TInput(bbv("1"),                 0xFaceB01d98765432, 58), bbv("1:10:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                // 59
+    make_tuple(TInput(bbv("0"),                 0xFaceB01d98765432, 59), bbv("0:010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),               // 60
+    make_tuple(TInput(bbv("1"),                 0xFaceB01d98765432, 60), bbv("1:1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),              // 61
+    make_tuple(TInput(bbv("10"),                0xFaceB01d98765432, 61), bbv("10:1_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),           // 62
+    make_tuple(TInput(bbv("11"),                0xFaceB01d98765432, 62), bbv("11:11_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),          // 63
+    make_tuple(TInput(bbv("100"),               0xFaceB01d98765432, 63), bbv("100:111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),        // 64
+    make_tuple(TInput(bbv("101"),               0xFaceB01d98765432, 64), bbv("101:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),       // 65
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks Append when sut is not empty (from 1 to 312 bits) and adding from 1 to 64 bits (left aliqned) from uint64_t
+//!
+//! @note Each time a new BinaryVector is used
+void UT_BinaryVector::test_Append_1_to_64_bits_When_NotEmpty_Left_Aligned ()
+{
+  // ---------------- DDT Setup
+  //
+  using TInput = tuple<BinaryVector, uint64_t, uint8_t> ; // Value, Number of bits (taken from LSB)
+
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto& input    = std::get<0>(data);
+    const auto& expected = std::get<1>(data);
+    auto sut             = std::get<0>(input);
+    auto value           = std::get<1>(input);
+    auto numberOfBits    = std::get<2>(input);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Append(value, numberOfBits, BitsAlignment::Left));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto bbv = [](string_view asBinaryString) { return BinaryVector::CreateFromBinaryString(asBinaryString); };
+
+  auto data =         // Initial, Value, bits
+  {
+    make_tuple(TInput(bbv("0"),                 0xFaceB01d98765432, 1),  bbv("0:1")),                                                                                         // 00
+    make_tuple(TInput(bbv("1"),                 0xFaceB01d98765432, 2),  bbv("1:11")),                                                                                        // 01
+    make_tuple(TInput(bbv("10"),                0xFaceB01d98765432, 3),  bbv("10:111")),                                                                                      // 02
+    make_tuple(TInput(bbv("11"),                0xFaceB01d98765432, 4),  bbv("11:1111")),                                                                                     // 03
+    make_tuple(TInput(bbv("100"),               0xFaceB01d98765432, 5),  bbv("100:1111_1")),                                                                                  // 04
+    make_tuple(TInput(bbv("101"),               0xFaceB01d98765432, 6),  bbv("101:1111_10")),                                                                                 // 05
+    make_tuple(TInput(bbv("110"),               0xFaceB01d98765432, 7),  bbv("110:1111_101")),                                                                                // 06
+    make_tuple(TInput(bbv("111"),               0xFaceB01d98765432, 8),  bbv("111:1111_1010")),                                                                               // 07
+    make_tuple(TInput(bbv("1000"),              0xFaceB01d98765432, 9),  bbv("1000:1111_1010:1")),                                                                            // 08
+    make_tuple(TInput(bbv("1000_1"),            0xFaceB01d98765432, 10), bbv("1000_1:1111_1010:11")),                                                                         // 09
+    make_tuple(TInput(bbv("1000_01"),           0xFaceB01d98765432, 11), bbv("1000_01:1111_1010:110")),                                                                       // 10
+    make_tuple(TInput(bbv("1000_001"),          0xFaceB01d98765432, 12), bbv("1000_001:1111_1010:1100")),                                                                     // 11
+    make_tuple(TInput(bbv("1000_0001"),         0xFaceB01d98765432, 13), bbv("1000_0001:1111_1010:1100_1")),                                                                  // 12
+    make_tuple(TInput(bbv("1000_0001:0"),       0xFaceB01d98765432, 14), bbv("1000_0001:0:1111_1010:1100_11")),                                                               // 13
+    make_tuple(TInput(bbv("1000_0001:01"),      0xFaceB01d98765432, 15), bbv("1000_0001:01:1111_1010:1100_111")),                                                             // 14
+    make_tuple(TInput(bbv("1000_0001:011"),     0xFaceB01d98765432, 16), bbv("1000_0001:011:1111_1010:1100_1110")),                                                           // 15
+    make_tuple(TInput(bbv("1000_0001:0110"),    0xFaceB01d98765432, 17), bbv("1000_0001:0110:1111_1010:1100_1110:1")),                                                        // 16
+    make_tuple(TInput(bbv("1000_0001:0110_1"),  0xFaceB01d98765432, 18), bbv("1000_0001:0110_1:1111_1010:1100_1110:10")),                                                     // 17
+    make_tuple(TInput(bbv("1000_0001:0110_11"), 0xFaceB01d98765432, 19), bbv("1000_0001:0110_11:1111_1010:1100_1110:101")),                                                   // 18
+    make_tuple(TInput(bbv("1"),                 0xFaceB01d98765432, 20), bbv("1:1111_1010:1100_1110:1011")),                                                                  // 19
+    make_tuple(TInput(bbv("0"),                 0xFaceB01d98765432, 21), bbv("0:1111_1010:1100_1110:1011_0")),                                                                // 20
+    make_tuple(TInput(bbv("1"),                 0xFaceB01d98765432, 22), bbv("1:1111_1010:1100_1110:1011_00")),                                                               // 21
+    make_tuple(TInput(bbv("10"),                0xFaceB01d98765432, 23), bbv("10:1111_1010:1100_1110:1011_000")),                                                             // 22
+    make_tuple(TInput(bbv("11"),                0xFaceB01d98765432, 24), bbv("11:1111_1010:1100_1110:1011_0000")),                                                            // 23
+    make_tuple(TInput(bbv("100"),               0xFaceB01d98765432, 25), bbv("100:1111_1010:1100_1110:1011_0000:0")),                                                         // 24
+    make_tuple(TInput(bbv("101"),               0xFaceB01d98765432, 26), bbv("101:1111_1010:1100_1110:1011_0000:00")),                                                        // 25
+    make_tuple(TInput(bbv("110"),               0xFaceB01d98765432, 27), bbv("110:1111_1010:1100_1110:1011_0000:000")),                                                       // 26
+    make_tuple(TInput(bbv("111"),               0xFaceB01d98765432, 28), bbv("111:1111_1010:1100_1110:1011_0000:0001")),                                                      // 27
+    make_tuple(TInput(bbv("1000"),              0xFaceB01d98765432, 29), bbv("1000:1111_1010:1100_1110:1011_0000:0001_1")),                                                   // 28
+    make_tuple(TInput(bbv("1000_1"),            0xFaceB01d98765432, 30), bbv("1000_1:1111_1010:1100_1110:1011_0000:0001_11")),                                                // 29
+    make_tuple(TInput(bbv("1000_01"),           0xFaceB01d98765432, 31), bbv("1000_01:1111_1010:1100_1110:1011_0000:0001_110")),                                              // 30
+    make_tuple(TInput(bbv("1000_001"),          0xFaceB01d98765432, 32), bbv("1000_001:1111_1010:1100_1110:1011_0000:0001_1101")),                                            // 31
+    make_tuple(TInput(bbv("1000_0001"),         0xFaceB01d98765432, 33), bbv("1000_0001:1111_1010:1100_1110:1011_0000:0001_1101:1")),                                         // 32
+    make_tuple(TInput(bbv("1000_0001:0"),       0xFaceB01d98765432, 34), bbv("1000_0001:0:1111_1010:1100_1110:1011_0000:0001_1101:10")),                                      // 33
+    make_tuple(TInput(bbv("1000_0001:01"),      0xFaceB01d98765432, 35), bbv("1000_0001:01:1111_1010:1100_1110:1011_0000:0001_1101:100")),                                    // 34
+    make_tuple(TInput(bbv("1000_0001:011"),     0xFaceB01d98765432, 36), bbv("1000_0001:011:1111_1010:1100_1110:1011_0000:0001_1101:1001")),                                  // 35
+    make_tuple(TInput(bbv("1000_0001:0110"),    0xFaceB01d98765432, 37), bbv("1000_0001:0110:1111_1010:1100_1110:1011_0000:0001_1101:1001_1")),                               // 36
+    make_tuple(TInput(bbv("1000_0001:0110_1"),  0xFaceB01d98765432, 38), bbv("1000_0001:0110_1:1111_1010:1100_1110:1011_0000:0001_1101:1001_10")),                            // 37
+    make_tuple(TInput(bbv("1000_0001:0110_11"), 0xFaceB01d98765432, 39), bbv("1000_0001:0110_11:1111_1010:1100_1110:1011_0000:0001_1101:1001_100")),                          // 38
+    make_tuple(TInput(bbv("1"),                 0xFaceB01d98765432, 40), bbv("1:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000")),                                         // 39
+    make_tuple(TInput(bbv("0"),                 0xFaceB01d98765432, 41), bbv("0:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0")),                                       // 40
+    make_tuple(TInput(bbv("1"),                 0xFaceB01d98765432, 42), bbv("1:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:01")),                                      // 41
+    make_tuple(TInput(bbv("10"),                0xFaceB01d98765432, 43), bbv("10:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:011")),                                    // 42
+    make_tuple(TInput(bbv("11"),                0xFaceB01d98765432, 44), bbv("11:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111")),                                   // 43
+    make_tuple(TInput(bbv("100"),               0xFaceB01d98765432, 45), bbv("100:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0")),                                // 44
+    make_tuple(TInput(bbv("101"),               0xFaceB01d98765432, 46), bbv("101:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_01")),                               // 45
+    make_tuple(TInput(bbv("110"),               0xFaceB01d98765432, 47), bbv("110:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_011")),                              // 46
+    make_tuple(TInput(bbv("111"),               0xFaceB01d98765432, 48), bbv("111:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110")),                             // 47
+    make_tuple(TInput(bbv("1000"),              0xFaceB01d98765432, 49), bbv("1000:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0")),                          // 48
+    make_tuple(TInput(bbv("1000_1"),            0xFaceB01d98765432, 50), bbv("1000_1:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:01")),                       // 49
+    make_tuple(TInput(bbv("1000_01"),           0xFaceB01d98765432, 51), bbv("1000_01:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:010")),                     // 50
+    make_tuple(TInput(bbv("1000_001"),          0xFaceB01d98765432, 52), bbv("1000_001:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101")),                   // 51
+    make_tuple(TInput(bbv("1000_0001"),         0xFaceB01d98765432, 53), bbv("1000_0001:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0")),                // 52
+    make_tuple(TInput(bbv("1000_0001:0"),       0xFaceB01d98765432, 54), bbv("1000_0001:0:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_01")),             // 53
+    make_tuple(TInput(bbv("1000_0001:01"),      0xFaceB01d98765432, 55), bbv("1000_0001:01:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_010")),           // 54
+    make_tuple(TInput(bbv("1000_0001:011"),     0xFaceB01d98765432, 56), bbv("1000_0001:011:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:")),        // 55
+    make_tuple(TInput(bbv("1000_0001:0110"),    0xFaceB01d98765432, 57), bbv("1000_0001:0110:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0")),      // 56
+    make_tuple(TInput(bbv("1000_0001:0110_1"),  0xFaceB01d98765432, 58), bbv("1000_0001:0110_1:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:00")),   // 57
+    make_tuple(TInput(bbv("1000_0001:0110_11"), 0xFaceB01d98765432, 59), bbv("1000_0001:0110_11:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:001")), // 58
+    make_tuple(TInput(bbv("1"),                 0xFaceB01d98765432, 60), bbv("1:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011")),                // 59
+    make_tuple(TInput(bbv("0"),                 0xFaceB01d98765432, 61), bbv("0:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0")),              // 60
+    make_tuple(TInput(bbv("1"),                 0xFaceB01d98765432, 62), bbv("1:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_00")),             // 61
+    make_tuple(TInput(bbv("10"),                0xFaceB01d98765432, 63), bbv("10:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_001")),           // 62
+    make_tuple(TInput(bbv("11"),                0xFaceB01d98765432, 64), bbv("11:1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),          // 63
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
 //! Checks Append with another BinaryVector when sut is empty
 //!
 void UT_BinaryVector::test_Append_Other_When_Empty ()

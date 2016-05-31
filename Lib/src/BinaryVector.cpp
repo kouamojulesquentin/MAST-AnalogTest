@@ -18,6 +18,7 @@
 #include <algorithm>
 
 using std::array;
+using std::initializer_list;
 using std::ostringstream;
 using std::string;
 using std::experimental::string_view;
@@ -25,6 +26,7 @@ using namespace mast;
 
 #define CHECK_FIXED_SIZE                      if (FixedSize())                            THROW_LOGIC_ERROR("BinaryVector size has been fixed")
 #define CHECK_FIXED_SIZE_ASSIGNMENT(newSize)  if (FixedSize() && (newSize != m_usedBits)) THROW_LOGIC_ERROR("BinaryVector size has been fixed")
+#define CHECK_AT_LEAST_1_BIT(numBits)         if (numBits == 0)                           THROW_INVALID_ARGUMENT("Number of bits to append must be != 0")
 
 namespace
 {
@@ -206,38 +208,50 @@ BinaryVector& BinaryVector::Append (uint8_t value, uint8_t numberOfBits, BitsAli
 
 //! Appends from 16 bits
 //!
-BinaryVector& BinaryVector::Append (uint16_t value)
+//! @param value          The value to append to the vector
+//! @param numberOfBits   Number of useful bits in the value
+//! @param alignment      Tells whether bits are left (msb) or right (lsb) aligned
+//!
+BinaryVector& BinaryVector::Append (uint16_t value, uint8_t numberOfBits, BitsAlignment alignment)
 {
   CHECK_FIXED_SIZE;
+  CHECK_AT_LEAST_1_BIT(numberOfBits);
 
   //! @todo [JFC]-[April/25/2016]: Use Boost.Endian to manage properly endianness
   //!
-  m_data.push_back((value >>  8) & 0xff);
-  m_data.push_back((value >>  0) & 0xff);
 
-  m_usedBits += 16;
+  uint8_t byte_1 = (value >>  8) & 0xff;
+  uint8_t byte_2 = (value >>  0) & 0xff;
 
-  return *this;
+  auto chunksList = {byte_1, byte_2};
+  return AppendChunks(numberOfBits, alignment, chunksList);
 }
 //
 //  End of: BinaryVector::BinaryVector
 //---------------------------------------------------------------------------
 
+
+
 //! Appends from 32 bits
 //!
-BinaryVector& BinaryVector::Append (uint32_t value)
+//! @param value          The value to append to the vector
+//! @param numberOfBits   Number of useful bits in the value
+//! @param alignment      Tells whether bits are left (msb) or right (lsb) aligned
+//!
+BinaryVector& BinaryVector::Append (uint32_t value, uint8_t numberOfBits, BitsAlignment alignment)
 {
   CHECK_FIXED_SIZE;
+  CHECK_AT_LEAST_1_BIT(numberOfBits);
+
   //! @todo [JFC]-[April/25/2016]: Use Boost.Endian to manage properly endianness
   //!
-  m_data.push_back((value >> 24) & 0xff);
-  m_data.push_back((value >> 16) & 0xff);
-  m_data.push_back((value >>  8) & 0xff);
-  m_data.push_back((value >>  0) & 0xff);
+  uint8_t byte_1 = (value >> 24) & 0xff;
+  uint8_t byte_2 = (value >> 16) & 0xff;
+  uint8_t byte_3 = (value >>  8) & 0xff;
+  uint8_t byte_4 = (value >>  0) & 0xff;
 
-  m_usedBits += 32;
-
-  return *this;
+  auto chunksList = {byte_1, byte_2, byte_3, byte_4};
+  return AppendChunks(numberOfBits, alignment, chunksList);
 }
 //
 //  End of: BinaryVector::BinaryVector
@@ -246,29 +260,88 @@ BinaryVector& BinaryVector::Append (uint32_t value)
 
 //! Appends from 64 bits
 //!
-BinaryVector& BinaryVector::Append (uint64_t value)
+//! @param value          The value to append to the vector
+//! @param numberOfBits   Number of useful bits in the value
+//! @param alignment      Tells whether bits are left (msb) or right (lsb) aligned
+//!
+BinaryVector& BinaryVector::Append (uint64_t value, uint8_t numberOfBits, BitsAlignment alignment)
 {
   CHECK_FIXED_SIZE;
+  CHECK_AT_LEAST_1_BIT(numberOfBits);
+
   //! @todo [JFC]-[April/25/2016]: Use Boost.Endian to manage properly endianness
   //!
-  m_data.push_back((value >> 56) & 0xff);
-  m_data.push_back((value >> 48) & 0xff);
-  m_data.push_back((value >> 40) & 0xff);
-  m_data.push_back((value >> 32) & 0xff);
-  m_data.push_back((value >> 24) & 0xff);
-  m_data.push_back((value >> 16) & 0xff);
-  m_data.push_back((value >>  8) & 0xff);
-  m_data.push_back((value >>  0) & 0xff);
 
-  m_usedBits += 64;
+  uint8_t byte_1 = (value >> 56) & 0xff;
+  uint8_t byte_2 = (value >> 48) & 0xff;
+  uint8_t byte_3 = (value >> 40) & 0xff;
+  uint8_t byte_4 = (value >> 32) & 0xff;
+  uint8_t byte_5 = (value >> 24) & 0xff;
+  uint8_t byte_6 = (value >> 16) & 0xff;
+  uint8_t byte_7 = (value >>  8) & 0xff;
+  uint8_t byte_8 = (value >>  0) & 0xff;
 
-  return *this;
+  auto chunksList = {byte_1, byte_2, byte_3, byte_4, byte_5, byte_6, byte_7, byte_8};
+
+  return AppendChunks(numberOfBits, alignment, chunksList);
 }
 //
 //  End of: BinaryVector::BinaryVector
 //---------------------------------------------------------------------------
 
 
+//! Appends from a list of uint8_t ordered from msb to lsb
+//!
+//! @param numberOfBits   Number of bits to use from chunksList
+//! @param alignment      Tells whether bits are left (msb) or right (lsb) aligned
+//! @param chunksList     A set of uint8_t from msb to lsb
+//!
+BinaryVector& BinaryVector::AppendChunks (uint8_t numberOfBits, BitsAlignment alignment, initializer_list<uint8_t> chunksList)
+{
+  CHECK_FIXED_SIZE;
+  CHECK_AT_LEAST_1_BIT(numberOfBits);
+
+  uint8_t maxBits   = chunksList.size() * 8u;
+  if (numberOfBits > maxBits)
+  {
+    THROW_INVALID_ARGUMENT("Numbers of bits cannot exceed bits count of chunks list");
+  }
+
+  uint8_t threshold = maxBits - 8u;
+  auto    chunks    = chunksList.begin();
+  uint8_t chunkId   = 0;
+
+  while (threshold >= numberOfBits)
+  {
+    threshold -= 8;
+    if (alignment == BitsAlignment::Right)
+    {
+      ++chunkId;
+    }
+  }
+
+  while (numberOfBits > threshold)
+  {
+    uint8_t bits              = chunks[chunkId];
+    uint8_t maxBits           = std::min(numberOfBits, static_cast<uint8_t>(8u));
+    uint8_t chunkNumberOfBits = (alignment == BitsAlignment::Left) ? maxBits
+                                                                   : numberOfBits - threshold;
+
+    Append(bits, chunkNumberOfBits, alignment);
+    numberOfBits -= chunkNumberOfBits;
+
+    if (threshold == 0)
+    {
+      break;
+    }
+    threshold -= 8u;
+    ++chunkId;
+  }
+  return *this;
+}
+//
+//  End of: BinaryVector::AppendChunks
+//---------------------------------------------------------------------------
 
 //! Clears all content
 //!

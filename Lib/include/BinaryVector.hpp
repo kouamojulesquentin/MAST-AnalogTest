@@ -17,6 +17,7 @@
 
 #include "Platform.hpp"
 #include <vector>
+#include <initializer_list>
 #include <experimental/string_view>
 
 namespace mast
@@ -91,10 +92,12 @@ class DLL_EXPORT BinaryVector final
 
   BinaryVector& Append(const BinaryVector& rhs); //!< Appends another scan vector
 
-  BinaryVector& Append(uint8_t  value, uint8_t numberOfBits = 8, BitsAlignment alignment = BitsAlignment::Right); //!< Appends  8 bits value the BinaryVector
-  BinaryVector& Append(uint16_t value);                           //!< Appends 16 bits value the BinaryVector
-  BinaryVector& Append(uint32_t value);                           //!< Appends 32 bits value the BinaryVector
-  BinaryVector& Append(uint64_t value);                           //!< Appends 64 bits value the BinaryVector
+  BinaryVector& Append(uint8_t  value, uint8_t numberOfBits = 8,  BitsAlignment alignment = BitsAlignment::Right); //!< Appends  8 bits value the BinaryVector
+  BinaryVector& Append(uint16_t value, uint8_t numberOfBits = 16, BitsAlignment alignment = BitsAlignment::Right); //!< Appends 16 bits value the BinaryVector
+  BinaryVector& Append(uint32_t value, uint8_t numberOfBits = 32, BitsAlignment alignment = BitsAlignment::Right); //!< Appends 32 bits value the BinaryVector
+  BinaryVector& Append(uint64_t value, uint8_t numberOfBits = 64, BitsAlignment alignment = BitsAlignment::Right); //!< Appends 64 bits value the BinaryVector
+
+  BinaryVector& AppendChunks (uint8_t numberOfBits, BitsAlignment alignment, std::initializer_list<uint8_t> chunks); // Appends from a list of uint8_t ordered from msb to lsb
 
   void          Clear();             //!< Clears all content
   void          Set(uint8_t  value); //!< Assigns  8 bits value the BinaryVector
@@ -116,6 +119,7 @@ class DLL_EXPORT BinaryVector final
   // ---------------- Private  Methods
   //
   bool FixedSize() const { return m_sizeProperty == SizeProperty::Fixed; }
+
 
   // ---------------- Private  Fields
   //

@@ -11,6 +11,7 @@ TEMPLATE = lib
 
 DEFINES += LIB_LIBRARY
 CONFIG  += c++14
+QMAKE_CXXFLAGS += -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default
 
 INCLUDEPATH = include public_include
 

@@ -1,9 +1,15 @@
 TEMPLATE = app
 
+DEFINES += CXXTEST_HAVE_EH CXXTEST_HAVE_STD CXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION
 CONFIG += console c++14
 CONFIG -= app_bundle
 CONFIG -= qt
-DEFINES += CXXTEST_HAVE_EH CXXTEST_HAVE_STD CXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION
+QMAKE_CXXFLAGS += -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default
+
+
+!exists( Generated/Runner.cpp ) {
+    error("Generated/Runner.cpp has not been generated")
+}
 
 INCLUDEPATH += $$PWD/../Lib/include \
                $$PWD/../Lib/public_include \

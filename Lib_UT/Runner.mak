@@ -26,7 +26,8 @@ Suites = \
            $(UT_RootPath)/UT_Helpers/UT_SystemModelBuilder.hpp
 
 
-ProjectFile  = $(RootPath)/Lib_UT.cbp
+ProjectFile  = $(RootPath)/Lib_UT.cbp \
+							 $(RootPath)/Lib_UT.pro
 
 #+Generator    = ..\..\CxxTest\bin\cxxtestgen.py
 Generator    = $(RootPath)/../cxxtest/bin/cxxtestgen.py
@@ -47,8 +48,12 @@ ifeq ($(OS), Windows_NT)
       $(info PYTHON3 environment variable is not defined ==> Will try with Python3)
       python=$(Python3)
 	endif
+	DEL_FILE = del
+	RunnerFile   = $(UT_RootPath)\Generated\Runner.cpp
 else
   python=python3
+  DEL_FILE = rm
+	RunnerFile   = $(UT_RootPath)/Generated/Runner.cpp
 endif
 
 
@@ -76,5 +81,11 @@ $(info )
 # DO NOT FORGET to define CXXTEST_HAVE_EH and CXXTEST_HAVE_STD to compile UT Files
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-$(RunnerFile): $(Suites) $(ProjectFile) $(TemplateFile) $(MAKEFILE_LIST)
+$(RunnerFile): $(Suites) $(ProjectFile) $(TemplateFile)
 	$(python) "$(Generator)" --error-printer --have-eh --have-std --fog-parse --root  -o $(RunnerFile) --template $(TemplateFile) $(Suites)
+
+
+
+
+clean:
+	$(DEL_FILE) $(RunnerFile)

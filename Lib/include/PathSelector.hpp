@@ -29,12 +29,23 @@ class PathSelector
   //
   public:
 
-
   //! Returns true when the specified path is already selected
   //!
   //! @param pathIdentifier   Path identifier in range [1..nb_path]
   //!
   virtual bool IsActive (uint32_t pathIdentifier) const = 0;
+
+  //! Returns true when the specified path is already selected
+  //!
+  //! @param pathIdentifier   Path identifier in range [1..nb_path]
+  //!
+  virtual bool IsSelected (uint32_t pathIdentifier) const = 0;
+
+  //! Request activation of the specified path
+  //!
+  //! @param pathIdentifier   Path identifier in range [1..nb_path]
+  //!
+  virtual void Select   (uint32_t pathIdentifier) = 0;
 
   //! Request deactivation of the specified path
   //!
@@ -42,11 +53,6 @@ class PathSelector
   //!
   virtual void Deselect (uint32_t pathIdentifier) = 0;
 
-  //! Request activation of the specified path
-  //!
-  //! @param pathIdentifier   Path identifier in range [1..nb_path]
-  //!
-  virtual void Select   (uint32_t pathIdentifier) = 0;
 
   //! Forwards call to any embedded SystemModelNode (or do nothing)
   //!

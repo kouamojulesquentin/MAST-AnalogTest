@@ -34,11 +34,13 @@ class UT_DefaultBinaryPathSelector : public CxxTest::TestSuite
   void test_Constructor_CannotSelectNone ();
   void test_Constructor_CanSelectNone ();
 
+  // ---------------- Select
+  //
+  void test_Select_CannotSelectNone ();
+  void test_Select_CanSelectNone ();
+  void test_Select_CanSelectNoneInverted ();
 
-
-  //! @todo [JFC]-[April/29/2016]: Remove "test_No_test_yet_for_Guard" method when all tests are implemented
-  //!
-//+  void test_No_test_yet_for_Guard ();
+  void test_Deselect ();
 };
 //
 //  End of UT_DefaultBinaryPathSelector class declaration

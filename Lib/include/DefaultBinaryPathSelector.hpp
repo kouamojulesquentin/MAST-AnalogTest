@@ -40,9 +40,10 @@ class DLL_EXPORT DefaultBinaryPathSelector : public PathSelector
   DefaultBinaryPathSelector()  = delete;
   DefaultBinaryPathSelector(std::shared_ptr<Register> associatedRegister, uint32_t pathsCount, bool isInverted = false, bool canSelectNone = false);
 
-  virtual bool IsActive (uint32_t pathIdentifier) const override; //!< Returns true when the specified path is already selected
-  virtual void Deselect (uint32_t pathIdentifier) override;       //!< Request deactivation of the specified path
-  virtual void Select   (uint32_t pathIdentifier) override;       //!< Request activation of the specified path
+  virtual bool IsActive   (uint32_t pathIdentifier) const override; //!< Returns true when the specified path is already selected
+  virtual bool IsSelected (uint32_t pathIdentifier) const override; //!< Returns true when the specified path is already selected
+  virtual void Select     (uint32_t pathIdentifier) override;       //!< Request activation of the specified path
+  virtual void Deselect   (uint32_t pathIdentifier) override;       //!< Request deactivation of the specified path
 
   virtual uint32_t SelectablePaths() const override { return m_pathsCount; };   //!< Returns the maximum number of selectable paths (max value for IsActive, Select and Deselect)
   virtual bool     CanSelectNone()   const override { return m_canSelectNone; }   //!< Returns true if selector can select nothing (passthrough mode), false otherwise

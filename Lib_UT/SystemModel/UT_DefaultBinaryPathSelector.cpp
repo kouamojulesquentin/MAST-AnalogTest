@@ -17,13 +17,71 @@
 #include "BinaryVector_Traits.hpp"
 #include "Register.hpp"
 
+#include <utility>
 #include <memory>
+#include <sstream>
+using std::ostringstream;
 using std::make_shared;
 
 using namespace mast;
 
+namespace
+{
 
-//! Checks DefaultBinaryPathSelector constructor
+//! Checks that a path is selected and all others are not
+//!
+void Check_IsSelected (const DefaultBinaryPathSelector& sut, uint32_t pathToSelect, uint32_t maxPaths)
+{
+  for (uint32_t pathId = 1 ; pathId <= maxPaths ; ++pathId)
+  {
+    ostringstream os;
+    os << "Path id: " << pathId;
+    auto message = os.str();
+
+    if (pathId == pathToSelect)
+    {
+      TSM_ASSERT_TRUE   (message, sut.IsSelected(pathId));
+    }
+    else
+    {
+      TSM_ASSERT_FALSE  (message, sut.IsSelected(pathId));
+    }
+  }
+}
+//
+//  End of: Check_IsSelected
+//---------------------------------------------------------------------------
+
+
+
+//! Checks that a path is active and all others are not
+//!
+void Check_IsActive (const DefaultBinaryPathSelector& sut, uint32_t pathToSelect, uint32_t maxPaths)
+{
+  for (uint32_t pathId = 1 ; pathId <= maxPaths ; ++pathId)
+  {
+    ostringstream os;
+    os << "Path id: " << pathId;
+    auto message = os.str();
+
+    if (pathId == pathToSelect)
+    {
+      TSM_ASSERT_TRUE   (message, sut.IsActive(pathId));
+    }
+    else
+    {
+      TSM_ASSERT_FALSE  (message, sut.IsActive(pathId));
+    }
+  }
+}
+//
+//  End of: Check_IsActive
+//---------------------------------------------------------------------------
+
+
+} // End of unnamed namespace
+
+//! Checks DefaultBinaryPathSelector constructor when cannot select no path
 //!
 void UT_DefaultBinaryPathSelector::test_Constructor_CannotSelectNone ()
 {
@@ -50,7 +108,7 @@ void UT_DefaultBinaryPathSelector::test_Constructor_CannotSelectNone ()
   TS_ASSERT_FALSE  (sut.IsActive(5));
 }
 
-//! Checks DefaultBinaryPathSelector constructor
+//! Checks DefaultBinaryPathSelector constructor when can select no path
 //!
 void UT_DefaultBinaryPathSelector::test_Constructor_CanSelectNone ()
 {
@@ -78,14 +136,168 @@ void UT_DefaultBinaryPathSelector::test_Constructor_CanSelectNone ()
 }
 
 
-//! @todo [JFC]-[April/29/2016]: Remove "No_test_yet_for_Guard" method when all tests are implemented
+//! Checks DefaultBinaryPathSelector::Select() when cannot select no path
 //!
-//+void UT_DefaultBinaryPathSelector::test_No_test_yet_for_Guard ()
-//+{
-//+  TS_WARN ("No test yet for: `method_name`");
-//+}
+void UT_DefaultBinaryPathSelector::test_Select_CannotSelectNone ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& pathToSelect)
+  {
+    // ---------------- Setup
+    //
+    auto bypassSequence = BinaryVector::CreateFromBinaryString("100");
+    auto associatedNode = make_shared<Register>("", bypassSequence);
+    auto isInverted     = false;
+    auto canSelectNone  = false;
+    auto maxPath        = 5u;
+
+    auto sut = DefaultBinaryPathSelector(associatedNode, maxPath, isInverted, canSelectNone);
+
+    // ---------------- Exercise
+    //
+    sut.Select(pathToSelect);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.ActiveCount(),     1);
+    TS_ASSERT_EQUALS (sut.SelectablePaths(), 5);
+
+    Check_IsSelected (sut, pathToSelect, maxPath);
+
+    associatedNode->UpdateLastToSut();   // Force update
+    Check_IsActive   (sut, pathToSelect, maxPath);
+  };
+
+  auto inputs = {1u, 2u, 3u, 4u, 5u};
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, inputs);
+}
 
 
+//! Checks DefaultBinaryPathSelector::Select() when can select no path
+//!
+void UT_DefaultBinaryPathSelector::test_Select_CanSelectNone ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& pathToSelect)
+  {
+    // ---------------- Setup
+    //
+    auto bypassSequence = BinaryVector::CreateFromBinaryString("010");
+    auto associatedNode = make_shared<Register>("Reg", bypassSequence);
+    auto isInverted     = true;
+    auto canSelectNone  = true;
+    auto maxPath        = 5u;
+
+    auto sut = DefaultBinaryPathSelector(associatedNode, maxPath, isInverted, canSelectNone);
+
+    // ---------------- Exercise
+    //
+    sut.Select(pathToSelect);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.ActiveCount(),     1);
+    TS_ASSERT_EQUALS (sut.SelectablePaths(), 5);
+
+    Check_IsSelected (sut, pathToSelect, maxPath);
+
+    associatedNode->UpdateLastToSut();   // Force update
+    Check_IsActive   (sut, pathToSelect, maxPath);
+  };
+
+  auto inputs = {1u, 2u, 3u, 4u, 5u};
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, inputs);
+}
+
+//! Checks DefaultBinaryPathSelector::Select() when can select no path and selection table is inverted
+//!
+void UT_DefaultBinaryPathSelector::test_Select_CanSelectNoneInverted ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& pathToSelect)
+  {
+    // ---------------- Setup
+    //
+    auto bypassSequence = BinaryVector::CreateFromBinaryString("110");
+    auto associatedNode = make_shared<Register>("My register name", bypassSequence);
+    auto isInverted     = true;
+    auto canSelectNone  = true;
+    auto maxPath        = 5u;
+
+    auto sut = DefaultBinaryPathSelector(associatedNode, maxPath, isInverted, canSelectNone);
+
+    // ---------------- Exercise
+    //
+    sut.Select(pathToSelect);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.ActiveCount(),     1);
+
+    Check_IsSelected (sut, pathToSelect, maxPath);
+
+    associatedNode->UpdateLastToSut();   // Force update
+    Check_IsActive   (sut, pathToSelect, maxPath);
+  };
+
+  auto inputs = {1u, 2u, 3u, 4u, 5u};
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, inputs);
+}
+
+
+//! Checks DefaultBinaryPathSelector::Deselect() when can select no path
+//!
+void UT_DefaultBinaryPathSelector::test_Deselect ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& pathToDeselect)
+  {
+    // ---------------- Setup
+    //
+    auto bypassSequence = BinaryVector::CreateFromBinaryString("010");
+    auto associatedNode = make_shared<Register>("Reg", bypassSequence);
+    auto isInverted     = false;
+    auto canSelectNone  = true;
+    auto maxPath        = 5u;
+
+    auto sut = DefaultBinaryPathSelector(associatedNode, maxPath, isInverted, canSelectNone);
+
+    // ---------------- Exercise
+    //
+    sut.Deselect(pathToDeselect);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_FALSE  (sut.IsSelected(pathToDeselect));
+
+    associatedNode->UpdateLastToSut();   // Force update
+    TS_ASSERT_FALSE  (sut.IsActive(pathToDeselect));
+
+    if (pathToDeselect != 2u)
+    {
+      TS_ASSERT_FALSE  (sut.IsActive(2u));
+    }
+  };
+
+  auto inputs = {1u, 2u, 3u, 4u, 5u};
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, inputs);
+}
 
 
 //===========================================================================

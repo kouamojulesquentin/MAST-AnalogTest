@@ -222,6 +222,24 @@ bool DefaultBinaryPathSelector::IsActive (uint32_t pathIdentifier) const
 //---------------------------------------------------------------------------
 
 
+//! Returns true when the specified path is already selected
+//!
+bool DefaultBinaryPathSelector::IsSelected (uint32_t pathIdentifier) const
+{
+  CheckPathIdentifier(pathIdentifier);
+
+  auto& nextToSut   = m_muxRegister->NextToSut();
+  auto& selectValue = m_select[pathIdentifier];
+
+  bool  isSelected  = nextToSut == selectValue;
+
+  return isSelected;
+}
+//
+//  End of: DefaultBinaryPathSelector::IsSelected
+//---------------------------------------------------------------------------
+
+
 
 //! Requests deactivation of the specified path
 //!

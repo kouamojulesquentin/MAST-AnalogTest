@@ -1,6 +1,10 @@
 
 From projects root directory (where this file is):
 
+[SETUP]
+ MAST uses C++ 2014, so gcc should be version 4.9 or higher.
+ The unitary test interface Needs "phyton3" "phyton3-ply"and installed
+
 [BUILD]
 To Build in release mode, either run  ./Build.sh release or ./Build_Release.sh
 To Build in debug mode, either run:   ./Build.sh debug   or ./Build_Debug.sh

@@ -22,7 +22,7 @@ namespace mast
 //! System model tree visitor for configuration
 //!
 //!
-class ConfigureVisitor : SystemModelVisitor
+class DLL_EXPORT ConfigureVisitor : public SystemModelVisitor
 {
   // ---------------- Public  Methods
   //
@@ -38,6 +38,7 @@ class ConfigureVisitor : SystemModelVisitor
   // ---------------- Protected Methods
   //
   protected:
+  bool VisitChildren (const ParentNode& parentNode);
 
   // ---------------- Private  Methods
   //

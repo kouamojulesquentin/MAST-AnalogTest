@@ -57,7 +57,7 @@ void Linker::Accept (SystemModelVisitor& visitor)
 //!
 void Linker::CheckPathIdentifier (uint32_t pathIdentifier) const
 {
-  if (pathIdentifier > m_pathsCount)
+  if (pathIdentifier > m_pathSelector->SelectablePaths())
   {
     THROW_OUT_OF_RANGE("pathIdentifier is too large");
   }
@@ -76,6 +76,18 @@ bool Linker::IsActive (uint32_t pathIdentifier) const
   CheckPathIdentifier(pathIdentifier);
   return m_pathSelector->IsActive(pathIdentifier);
 }
+
+//! Returns true when the specified path is currently pending to be selected
+//!
+//! @note path may be selected but not active yet
+//!
+//! @param pathIdentifier   Path identifier in range [1..nb_path]
+bool Linker::IsSelected (uint32_t pathIdentifier) const
+{
+  CheckPathIdentifier(pathIdentifier);
+  return m_pathSelector->IsSelected(pathIdentifier);
+}
+
 
 //! Requests deactivation of the specified path
 //!

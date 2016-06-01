@@ -16,53 +16,53 @@ QMAKE_CXXFLAGS += -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmis
 INCLUDEPATH = include public_include
 
 SOURCES +=  \
-    src/AccessInterface.cpp \
+    src/AccessInterface.cpp                \
     src/AccessInterfaceProtocol_1149_1.cpp \
-    src/BinaryVector.cpp \
-    src/Chain.cpp \
-    src/ConfigureVisitor.cpp \
-    src/DefaultBinaryPathSelector.cpp \
-    src/GmlPrinterVisitor.cpp \
-    src/Linker.cpp \
-    src/ParentNode.cpp \
-    src/PrettyPrinterVisitor.cpp \
-    src/Register.cpp \
-    src/SVFVector.cpp \
-    src/SystemModel.cpp \
-    src/SystemModelCheckerVisitor.cpp \
-    src/SystemModelCheckResult.cpp \
-    src/SystemModelNode.cpp \
+    src/BinaryVector.cpp                   \
+    src/Chain.cpp                          \
+    src/ConfigureVisitor.cpp               \
+    src/DefaultBinaryPathSelector.cpp      \
+    src/GmlPrinterVisitor.cpp              \
+    src/Linker.cpp                         \
+    src/ParentNode.cpp                     \
+    src/PrettyPrinterVisitor.cpp           \
+    src/Register.cpp                       \
+    src/SVFVector.cpp                      \
+    src/SystemModel.cpp                    \
+    src/SystemModelCheckerVisitor.cpp      \
+    src/SystemModelCheckResult.cpp         \
+    src/SystemModelNode.cpp                \
     src/Utility.cpp
 
 HEADERS += \
-    include/AccessInterface.hpp \
-    include/AccessInterfaceProtocol.hpp \
+    include/AccessInterface.hpp                \
+    include/AccessInterfaceProtocol.hpp        \
     include/AccessInterfaceProtocol_1149_1.hpp \
-    include/BinaryVector.hpp \
-    include/Chain.hpp \
-    include/ConfigureVisitor.hpp \
-    include/DataCycleReadVisitor.hpp \
-    include/DataCycleWriteVisitor.hpp \
-    include/DefaultBinaryPathSelector.hpp \
-    include/GmlPrinterVisitor.hpp \
-    include/Linker.hpp \
-    include/ParentNode.hpp \
-    include/PathSelector.hpp \
-    include/PostConditionVisitor.hpp \
-    include/PreconditionVisitor.hpp \
-    include/PrettyPrinterVisitor.hpp \
-    include/Register.hpp \
-    include/SVFVector.hpp \
-    include/SystemModel.hpp \
-    include/SystemModelCheckerVisitor.hpp \
-    include/SystemModelCheckResult.hpp \
-    include/SystemModelNode.hpp \
-    include/SystemModelNodes.hpp \
-    include/SystemModelVisitor.hpp \
-    include/TableBasedPathSelector.hpp \
-    include/Utility.hpp \
-    public_include/PDLAdapter.h \
-    public_include/Platform.hpp \
+    include/BinaryVector.hpp                   \
+    include/Chain.hpp                          \
+    include/ConfigureVisitor.hpp               \
+    include/DataCycleReadVisitor.hpp           \
+    include/DataCycleWriteVisitor.hpp          \
+    include/DefaultBinaryPathSelector.hpp      \
+    include/GmlPrinterVisitor.hpp              \
+    include/Linker.hpp                         \
+    include/ParentNode.hpp                     \
+    include/PathSelector.hpp                   \
+    include/PostConditionVisitor.hpp           \
+    include/PreconditionVisitor.hpp            \
+    include/PrettyPrinterVisitor.hpp           \
+    include/Register.hpp                       \
+    include/SVFVector.hpp                      \
+    include/SystemModel.hpp                    \
+    include/SystemModelCheckerVisitor.hpp      \
+    include/SystemModelCheckResult.hpp         \
+    include/SystemModelNode.hpp                \
+    include/SystemModelNodes.hpp               \
+    include/SystemModelVisitor.hpp             \
+    include/TableBasedPathSelector.hpp         \
+    include/Utility.hpp                        \
+    public_include/PDLAdapter.h                \
+    public_include/Platform.hpp                \
     public_include/SystemModelAdapter.h
 
 unix {

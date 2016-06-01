@@ -35,7 +35,7 @@ RunnerFile   = $(UT_RootPath)/Generated/Runner.cpp
 TemplateFile = $(UT_RootPath)/Runner.tpl
 TestListener = ParenPrinter
 
-$(info OS is: $(OS))
+$(info Variable OS is: '$(OS)')
 
 #+ifeq ($(OS), Windows_NT)
 #+  $(info Python3: '$(PYTHON3)')
@@ -43,25 +43,28 @@ $(info OS is: $(OS))
 
 # cxxtestgen needs Python
 ifeq ($(OS), Windows_NT)
+	$(info Running on: Windows)
   python=$(PYTHON3)
 	ifeq ($(wildcard $(python)),)
       $(info PYTHON3 environment variable is not defined ==> Will try with Python3)
       python=$(Python3)
 	endif
+	ifeq ($(wildcard $(python)),)
+    $(warning Python is not defined)
+	else
+    $(info Using python: $(python))
+	endif
 	DEL_FILE = del
 	RunnerFile   = $(UT_RootPath)\Generated\Runner.cpp
 else
+  $(info Running on: Linux)
   python=python3
   DEL_FILE = rm
 	RunnerFile   = $(UT_RootPath)/Generated/Runner.cpp
 endif
 
 
-ifeq ($(wildcard $(python)),)
-    $(warning Python is not defined)
-else
-    $(info Using python: $(python))
-endif
+
 
 #To debug variables
 
@@ -83,6 +86,7 @@ $(info )
 
 $(RunnerFile): $(Suites) $(ProjectFile) $(TemplateFile)
 	$(python) "$(Generator)" --error-printer --have-eh --have-std --fog-parse --root  -o $(RunnerFile) --template $(TemplateFile) $(Suites)
+
 
 
 

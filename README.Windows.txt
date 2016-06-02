@@ -1,4 +1,6 @@
 
+Building Unit Tests (and Lib):
+=============================
 From projects root directory (where this file is):
 
 To Build in release mode, either run  "Build release" or "Build_Release"
@@ -17,7 +19,14 @@ So, when modifying an header, it is recommended to clean the project(s) - unless
 
 To clean the projects, run "Build clean"
 
-Unit tests can be run:
+Qt Build:
+=======
+Add custom build step using make with parameters: -C  %{CurrentProject:Path}/Lib_UT -f Runner.mak
+Place it before project make or even as first step (before Qmake is run)
+
+
+Running Unit tests:
+==================
 Debug   version: "UT_Run debug"   or "UT_Run_Debug"
 Release version: "UT_Run release" or "UT_Run_Release" or "UT_Run_Release_Verbose"
 

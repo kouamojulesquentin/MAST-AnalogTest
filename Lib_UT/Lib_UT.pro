@@ -23,35 +23,38 @@ DEPENDPATH += $$PWD/../Lib/include \
 
 
 SOURCES += \
+    Generated/Runner.cpp                         \
+    SystemModel/UT_ConfigureVisitor.cpp          \
     SystemModel/UT_DefaultBinaryPathSelector.cpp \
-    SystemModel/UT_GmlPrinterVisitor.cpp \
-    SystemModel/UT_PrettyPrinterVisitor.cpp \
-    SystemModel/UT_Register.cpp \
-    SystemModel/UT_SystemModel.cpp \
+    SystemModel/UT_GmlPrinterVisitor.cpp         \
+    SystemModel/UT_PrettyPrinterVisitor.cpp      \
+    SystemModel/UT_Register.cpp                  \
+    SystemModel/UT_SystemModel.cpp               \
     SystemModel/UT_SystemModelCheckerVisitor.cpp \
-    UT_Helpers/SystemModelBuilder.cpp \
-    UT_Helpers/UT_SystemModelBuilder.cpp \
-    Utility/UT_BinaryVector.cpp \
-    Utility/UT_SVFVector.cpp \
-    Utility/UT_Utility.cpp \
-    Generated/Runner.cpp \
-    SystemModel/UT_SystemModelNode.cpp
+    SystemModel/UT_SystemModelNode.cpp           \
+    UT_Helpers/SystemModelBuilder.cpp            \
+    UT_Helpers/UT_SystemModelBuilder.cpp         \
+    Utility/UT_BinaryVector.cpp                  \
+    Utility/UT_SVFVector.cpp                     \
+    Utility/UT_Utility.cpp
+
 
 HEADERS += \
-    SystemModel/UT_DefaultBinaryPathSelector.hpp \
-    SystemModel/UT_GmlPrinterVisitor.hpp \
-    SystemModel/UT_PrettyPrinterVisitor.hpp \
-    SystemModel/UT_Register.hpp \
-    SystemModel/UT_SystemModel.hpp \
-    SystemModel/UT_SystemModelCheckerVisitor.hpp \
-    UT_Helpers/SystemModelBuilder.hpp \
-    UT_Helpers/UT_SystemModelBuilder.hpp \
-    Utility/UT_BinaryVector.hpp \
-    Utility/UT_SVFVector.hpp \
-    Utility/UT_Utility.hpp \
-    CxxTest_Traits/BinaryVector_Traits.hpp \
+    CxxTest_Traits/BinaryVector_Traits.hpp           \
     CxxTest_Traits/SystemModelCheckResult_Traits.hpp \
-    SystemModel/UT_SystemModelNode.hpp
+    SystemModel/UT_ConfigureVisitor.cpp              \
+    SystemModel/UT_DefaultBinaryPathSelector.hpp     \
+    SystemModel/UT_GmlPrinterVisitor.hpp             \
+    SystemModel/UT_PrettyPrinterVisitor.hpp          \
+    SystemModel/UT_Register.hpp                      \
+    SystemModel/UT_SystemModel.hpp                   \
+    SystemModel/UT_SystemModelCheckerVisitor.hpp     \
+    SystemModel/UT_SystemModelNode.hpp               \
+    UT_Helpers/SystemModelBuilder.hpp                \
+    UT_Helpers/UT_SystemModelBuilder.hpp             \
+    Utility/UT_BinaryVector.hpp                      \
+    Utility/UT_SVFVector.hpp                         \
+    Utility/UT_Utility.hpp
 
 #+SUBDIRS += \
 #+    ../Lib/Lib.pro

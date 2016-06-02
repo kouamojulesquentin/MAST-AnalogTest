@@ -77,8 +77,15 @@ class DLL_EXPORT SystemModel
                                             BinaryVector                   bypassSequence,
                                             std::shared_ptr<ParentNode>    parentNode = nullptr);
 
-  std::shared_ptr<ParentNode>      Root() const { return m_root; }                         //!< Returns root node
-  std::shared_ptr<SystemModelNode> NodeWithId(SystemModelNode::NodeIdentifier identifier) const; //!< Returns node associated with a node identifier
+  std::shared_ptr<ParentNode > Root() const { return m_root; } //!< Returns root node
+
+  using NodeIdentifier = SystemModelNode::NodeIdentifier;
+
+  std::shared_ptr<SystemModelNode> NodeWithId            (NodeIdentifier identifier) const;                                                                                //!< Returns node associated with a node identifier
+  std::shared_ptr<AccessInterface> AccessInterfaceWithId (NodeIdentifier identifier) const { return std::dynamic_pointer_cast<AccessInterface> (NodeWithId(identifier)); } //!< Returns AccessInterface associated with a node identifier
+  std::shared_ptr<Register>        RegisterWithId        (NodeIdentifier identifier) const { return std::dynamic_pointer_cast<Register>        (NodeWithId(identifier)); } //!< Returns Register associated with a node identifier
+  std::shared_ptr<Linker>          LinkerWithId          (NodeIdentifier identifier) const { return std::dynamic_pointer_cast<Linker>          (NodeWithId(identifier)); } //!< Returns Linker associated with a node identifier
+  std::shared_ptr<Chain>           ChainWithId           (NodeIdentifier identifier) const { return std::dynamic_pointer_cast<Chain>           (NodeWithId(identifier)); } //!< Returns Chain associated with a node identifier
 
   //! Releases the resources occupied by a node data structure recursively
   //!

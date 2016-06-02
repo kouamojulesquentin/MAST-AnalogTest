@@ -12,6 +12,7 @@ TEMPLATE = lib
 DEFINES += LIB_LIBRARY
 CONFIG  += c++14
 QMAKE_CXXFLAGS += -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default
+QMAKE_CXXFLAGS += -fmax-errors=3
 
 INCLUDEPATH = include public_include
 
@@ -21,6 +22,7 @@ SOURCES +=  \
     src/BinaryVector.cpp                   \
     src/Chain.cpp                          \
     src/ConfigureVisitor.cpp               \
+    src/DefaultTableBasedPathSelector.cpp  \
     src/DefaultBinaryPathSelector.cpp      \
     src/GmlPrinterVisitor.cpp              \
     src/Linker.cpp                         \
@@ -46,6 +48,7 @@ HEADERS += \
     include/DataCycleReadVisitor.hpp           \
     include/DataCycleWriteVisitor.hpp          \
     include/DefaultBinaryPathSelector.hpp      \
+    include/DefaultTableBasedPathSelector.hpp  \
     include/GmlPrinterVisitor.hpp              \
     include/Linker.hpp                         \
     include/ParentNode.hpp                     \
@@ -62,7 +65,6 @@ HEADERS += \
     include/SystemModelNodes.hpp               \
     include/SystemModelVisitor.hpp             \
     include/ToSutVisitor.hpp                   \
-    include/TableBasedPathSelector.hpp         \
     include/Utility.hpp                        \
     public_include/PDLAdapter.h                \
     public_include/Platform.hpp                \
@@ -82,11 +84,11 @@ win32 {
 #+CONFIG(debug,   debug|release): OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Lib/debug)
 #+else: CONFIG(release, debug|release): OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Lib/release)
 
-CONFIG(debug,   debug|release): {
+CONFIG(debug,   debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Lib/debug)
   DESTDIR     = $$clean_path($$PWD/../Build_Qt/bin/debug)
 }
-else: CONFIG(release, debug|release): {
+else: CONFIG(release, debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Lib/release)
   DESTDIR     = $$clean_path($$PWD/../Build_Qt/bin/release)
 }

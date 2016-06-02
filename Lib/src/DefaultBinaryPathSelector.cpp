@@ -33,72 +33,18 @@ using namespace mast;
 //!                         (provided it is not inverted)
 //!
 DefaultBinaryPathSelector::DefaultBinaryPathSelector(shared_ptr<Register> associatedRegister, uint32_t pathsCount, bool isInverted, bool canSelectNone)
-  : m_pathsCount    (pathsCount)
-  , m_muxRegister   (CHECK_NOT_NULL_PARAMETER (associatedRegister, "associatedRegister must be a valid Register"))
-  , m_select        (CreateSelectTable   (associatedRegister->BitsCount(), pathsCount, isInverted, canSelectNone))
-  , m_deselect      (CreateDeselectTable (associatedRegister->BitsCount(), pathsCount, isInverted, canSelectNone))
-  , m_canSelectNone (canSelectNone)
+  : DefaultTableBasedPathSelector (associatedRegister,
+                                   pathsCount,
+                                   CreateSelectTable   (associatedRegister->BitsCount(), pathsCount, isInverted, canSelectNone),
+                                   CreateDeselectTable (associatedRegister->BitsCount(), pathsCount, isInverted, canSelectNone),
+                                   canSelectNone
+                                  )
 {
 }
 //
 //  End of: DefaultBinaryPathSelector::DefaultBinaryPathSelector
 //---------------------------------------------------------------------------
 
-
-//! Forwards call to any embedded Register
-//!
-//! @note Visitor should keep track that it is visiting something within a PathSelector
-//!
-void DefaultBinaryPathSelector::Accept (SystemModelVisitor& visitor)
-{
-  m_muxRegister->Accept(visitor);
-}
-//
-//  End of: DefaultBinaryPathSelector::Accept
-//---------------------------------------------------------------------------
-
-
-
-//! Returns the number of paths that are currently active
-//!
-uint32_t DefaultBinaryPathSelector::ActiveCount () const
-{
-  uint32_t activeCount = 0u;
-
-  for (uint32_t pathId = 1u ; pathId < m_select.size() ; ++pathId)
-  {
-    if (IsActive(pathId))
-    {
-      ++activeCount;
-    }
-  }
-  return activeCount;
-}
-//
-//  End of: DefaultBinaryPathSelector::ActiveCount
-//---------------------------------------------------------------------------
-
-
-
-//! Checks that path identifier is compatible with currently managed scan paths
-//!
-//! @param pathIdentifier
-//!
-void DefaultBinaryPathSelector::CheckPathIdentifier (uint32_t pathIdentifier) const
-{
-  if (pathIdentifier == 0u)
-  {
-    THROW_OUT_OF_RANGE("pathIdentifier must be >= 1");
-  }
-
-  if (pathIdentifier >= m_select.size())
-  {
-    THROW_OUT_OF_RANGE("pathIdentifier is too large");
-  }
-}
-//
-//  End of: DefaultBinaryPathSelector::CheckPathIdentifier
-//---------------------------------------------------------------------------
 
 
 //! Checks that register length is enough to select all path count
@@ -186,91 +132,6 @@ DefaultBinaryPathSelector::TablesType DefaultBinaryPathSelector::CreateDeselectT
 }
 //
 //  End of: DefaultBinaryPathSelector::CreateDeselectTable
-//---------------------------------------------------------------------------
-
-
-//! Inverts all bits of a LUT
-//!
-void DefaultBinaryPathSelector::InvertTable (TablesType& table)
-{
-  for (auto& elem : table)
-  {
-    elem = ~elem;
-  }
-}
-//
-//  End of: DefaultBinaryPathSelector::InvertTable
-//---------------------------------------------------------------------------
-
-
-
-//! Returns true when the specified path is already selected
-//!
-bool DefaultBinaryPathSelector::IsActive (uint32_t pathIdentifier) const
-{
-  CheckPathIdentifier(pathIdentifier);
-
-  auto& lastToSut   = m_muxRegister->LastToSut();
-  auto& selectValue = m_select[pathIdentifier];
-
-  bool  isActive    = lastToSut == selectValue;
-
-  return isActive;
-}
-//
-//  End of: DefaultBinaryPathSelector::IsActive
-//---------------------------------------------------------------------------
-
-
-//! Returns true when the specified path is already selected
-//!
-bool DefaultBinaryPathSelector::IsSelected (uint32_t pathIdentifier) const
-{
-  CheckPathIdentifier(pathIdentifier);
-
-  auto& nextToSut   = m_muxRegister->NextToSut();
-  auto& selectValue = m_select[pathIdentifier];
-
-  bool  isSelected  = nextToSut == selectValue;
-
-  return isSelected;
-}
-//
-//  End of: DefaultBinaryPathSelector::IsSelected
-//---------------------------------------------------------------------------
-
-
-
-//! Requests deactivation of the specified path
-//!
-//! @note Also report that a selection is pending and this is now the default value for the mux register
-void DefaultBinaryPathSelector::Deselect (uint32_t pathIdentifier)
-{
-  CheckPathIdentifier(pathIdentifier);
-
-  m_muxRegister->SetToSut(m_deselect[pathIdentifier]);
-  m_muxRegister->SetBypass(m_deselect[pathIdentifier]);
-  m_muxRegister->SetPending();
-}
-//
-//  End of: DefaultBinaryPathSelector::Deselect
-//---------------------------------------------------------------------------
-
-
-
-//! Requests activation of the specified path
-//!
-//! @note Also report that a selection is pending and this is now the default value for the mux register
-void DefaultBinaryPathSelector::Select (uint32_t pathIdentifier)
-{
-  CheckPathIdentifier(pathIdentifier);
-
-  m_muxRegister->SetToSut(m_select[pathIdentifier]);
-  m_muxRegister->SetBypass(m_select[pathIdentifier]);
-  m_muxRegister->SetPending();
-}
-//
-//  End of: DefaultBinaryPathSelector::Select
 //---------------------------------------------------------------------------
 
 

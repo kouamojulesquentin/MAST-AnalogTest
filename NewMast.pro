@@ -1,5 +1,6 @@
 TEMPLATE = subdirs
 CONFIG  += ordered
+CONFIG  -= qml_debug
 
 SUBDIRS += \
     Lib            \

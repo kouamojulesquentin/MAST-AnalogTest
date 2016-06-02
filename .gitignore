@@ -39,3 +39,5 @@
 /Lib_UT/Generated/Runner.cpp
 /Build_Qt
 /NewMast.pro.user
+/cxxtest/.hg
+/cxxtest/*.hgignore

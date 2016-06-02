@@ -5,6 +5,7 @@ CONFIG += console c++14
 CONFIG -= app_bundle
 CONFIG -= qt
 QMAKE_CXXFLAGS += -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default
+QMAKE_CXXFLAGS += -fmax-errors=3
 
 
 !exists( Generated/Runner.cpp ) {
@@ -61,12 +62,12 @@ HEADERS += \
 #+SUBDIRS += \
 #+    ../Lib/Lib.pro
 
-CONFIG(debug,   debug|release): {
+CONFIG(debug,   debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Lib_UT/debug)
   DESTDIR     = $$clean_path($$PWD/../Build_Qt/bin/debug)
   LIBS       += -L$$clean_path($$PWD/../Build_Qt/bin/debug)   -lLib
 }
-else: CONFIG(release, debug|release): {
+else: CONFIG(release, debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Lib_UT/release)
   DESTDIR     = $$clean_path($$PWD/../Build_Qt/bin/release)
   LIBS       += -L$$clean_path($$PWD/../Build_Qt/bin/release) -lLib

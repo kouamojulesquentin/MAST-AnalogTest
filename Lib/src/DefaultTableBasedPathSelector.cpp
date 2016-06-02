@@ -1,0 +1,198 @@
+//===========================================================================
+//                           DefaultTableBasedPathSelector.cpp
+//===========================================================================
+// Copyright (C) 2016 G-INP/Tima. All rights reserved.
+//
+// Project : Mast
+//
+//! @file DefaultTableBasedPathSelector.cpp
+//!
+//! Implements class DefaultTableBasedPathSelector
+//!
+//===========================================================================
+
+#include "DefaultTableBasedPathSelector.hpp"
+#include "Register.hpp"
+#include "Utility.hpp"
+
+#include <stdexcept>
+#include <limits>
+#include <sstream>
+
+using std::ostringstream;
+using std::shared_ptr;
+
+using namespace mast;
+
+//! Initializes selector for fast selection/deselection of a path
+//!
+//! @param associatedRegister   Register that is used to drive the path multiplexer
+//! @param pathsCount           Number of managed paths (including, optional, bypass register)
+//! @param selectTable          Table to use for selecting a path
+//! @param deselectTable        Table to use for deselecting a path
+//! @param isInverted           When true the bits for selecting a path are inverted (relative to the path identifier number)
+//! @param canSelectNone        When true zero is reserved to select 'no path' otherwise 0 is used to select first path
+//!                             (provided it is not inverted)
+//!
+DefaultTableBasedPathSelector::DefaultTableBasedPathSelector (shared_ptr<Register> associatedRegister,
+                                                              uint32_t             pathsCount,
+                                                              TablesType           selectTable,
+                                                              TablesType           deselectTable,
+                                                              bool                 canSelectNone)
+  : m_pathsCount    (pathsCount)
+  , m_muxRegister   (CHECK_NOT_NULL_PARAMETER (associatedRegister, "associatedRegister must be a valid Register"))
+  , m_select        (selectTable)
+  , m_deselect      (deselectTable)
+  , m_canSelectNone (canSelectNone)
+{
+}
+//
+//  End of: DefaultTableBasedPathSelector::DefaultTableBasedPathSelector
+//---------------------------------------------------------------------------
+
+
+//! Forwards call to any embedded Register
+//!
+//! @note Visitor should keep track that it is visiting something within a PathSelector
+//!
+void DefaultTableBasedPathSelector::Accept (SystemModelVisitor& visitor)
+{
+  m_muxRegister->Accept(visitor);
+}
+//
+//  End of: DefaultTableBasedPathSelector::Accept
+//---------------------------------------------------------------------------
+
+
+
+//! Returns the number of paths that are currently active
+//!
+uint32_t DefaultTableBasedPathSelector::ActiveCount () const
+{
+  uint32_t activeCount = 0u;
+
+  for (uint32_t pathId = 1u ; pathId < m_select.size() ; ++pathId)
+  {
+    if (IsActive(pathId))
+    {
+      ++activeCount;
+    }
+  }
+  return activeCount;
+}
+//
+//  End of: DefaultTableBasedPathSelector::ActiveCount
+//---------------------------------------------------------------------------
+
+
+
+//! Checks that path identifier is compatible with currently managed scan paths
+//!
+//! @param pathIdentifier
+//!
+void DefaultTableBasedPathSelector::CheckPathIdentifier (uint32_t pathIdentifier) const
+{
+  if (pathIdentifier == 0u)
+  {
+    THROW_OUT_OF_RANGE("pathIdentifier must be >= 1");
+  }
+
+  if (pathIdentifier >= m_select.size())
+  {
+    THROW_OUT_OF_RANGE("pathIdentifier is too large");
+  }
+}
+//
+//  End of: DefaultTableBasedPathSelector::CheckPathIdentifier
+//---------------------------------------------------------------------------
+
+
+//! Inverts all bits of a LUT
+//!
+void DefaultTableBasedPathSelector::InvertTable (TablesType& table)
+{
+  for (auto& elem : table)
+  {
+    elem = ~elem;
+  }
+}
+//
+//  End of: DefaultTableBasedPathSelector::InvertTable
+//---------------------------------------------------------------------------
+
+
+
+//! Returns true when the specified path is already selected
+//!
+bool DefaultTableBasedPathSelector::IsActive (uint32_t pathIdentifier) const
+{
+  CheckPathIdentifier(pathIdentifier);
+
+  auto& lastToSut   = m_muxRegister->LastToSut();
+  auto& selectValue = m_select[pathIdentifier];
+
+  bool  isActive    = lastToSut == selectValue;
+
+  return isActive;
+}
+//
+//  End of: DefaultTableBasedPathSelector::IsActive
+//---------------------------------------------------------------------------
+
+
+//! Returns true when the specified path is already selected
+//!
+bool DefaultTableBasedPathSelector::IsSelected (uint32_t pathIdentifier) const
+{
+  CheckPathIdentifier(pathIdentifier);
+
+  auto& nextToSut   = m_muxRegister->NextToSut();
+  auto& selectValue = m_select[pathIdentifier];
+
+  bool  isSelected  = nextToSut == selectValue;
+
+  return isSelected;
+}
+//
+//  End of: DefaultTableBasedPathSelector::IsSelected
+//---------------------------------------------------------------------------
+
+
+
+//! Requests deactivation of the specified path
+//!
+//! @note Also report that a selection is pending and this is now the default value for the mux register
+void DefaultTableBasedPathSelector::Deselect (uint32_t pathIdentifier)
+{
+  CheckPathIdentifier(pathIdentifier);
+
+  m_muxRegister->SetToSut(m_deselect[pathIdentifier]);
+  m_muxRegister->SetBypass(m_deselect[pathIdentifier]);
+  m_muxRegister->SetPending();
+}
+//
+//  End of: DefaultTableBasedPathSelector::Deselect
+//---------------------------------------------------------------------------
+
+
+
+//! Requests activation of the specified path
+//!
+//! @note Also report that a selection is pending and this is now the default value for the mux register
+void DefaultTableBasedPathSelector::Select (uint32_t pathIdentifier)
+{
+  CheckPathIdentifier(pathIdentifier);
+
+  m_muxRegister->SetToSut(m_select[pathIdentifier]);
+  m_muxRegister->SetBypass(m_select[pathIdentifier]);
+  m_muxRegister->SetPending();
+}
+//
+//  End of: DefaultTableBasedPathSelector::Select
+//---------------------------------------------------------------------------
+
+
+
+//===========================================================================
+// End of DefaultTableBasedPathSelector.cpp
+//===========================================================================

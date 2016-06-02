@@ -16,7 +16,7 @@
   #define DEFAULTBINARYPATHSELECTOR_H__8EA048FA_454_4D96_79A2_13E04D156F73__INCLUDED_
 
 #include "BinaryVector.hpp"
-#include "PathSelector.hpp"
+#include "DefaultTableBasedPathSelector.hpp"
 #include "Utility.hpp"
 #include <vector>
 #include <memory>
@@ -31,7 +31,7 @@ class Register;
 //!
 //! @note Path identifier are one based (in range [1..path_count])
 //! @note Internal table contains a reserved slot at index zero
-class DLL_EXPORT DefaultBinaryPathSelector : public PathSelector
+class DLL_EXPORT DefaultBinaryPathSelector : public DefaultTableBasedPathSelector
 {
   // ---------------- Public  Methods
   //
@@ -40,17 +40,6 @@ class DLL_EXPORT DefaultBinaryPathSelector : public PathSelector
   DefaultBinaryPathSelector()  = delete;
   DefaultBinaryPathSelector(std::shared_ptr<Register> associatedRegister, uint32_t pathsCount, bool isInverted = false, bool canSelectNone = false);
 
-  virtual bool IsActive   (uint32_t pathIdentifier) const override; //!< Returns true when the specified path is already selected
-  virtual bool IsSelected (uint32_t pathIdentifier) const override; //!< Returns true when the specified path is already selected
-  virtual void Select     (uint32_t pathIdentifier) override;       //!< Request activation of the specified path
-  virtual void Deselect   (uint32_t pathIdentifier) override;       //!< Request deactivation of the specified path
-
-  virtual uint32_t SelectablePaths() const override { return m_pathsCount; };   //!< Returns the maximum number of selectable paths (max value for IsActive, Select and Deselect)
-  virtual bool     CanSelectNone()   const override { return m_canSelectNone; }   //!< Returns true if selector can select nothing (passthrough mode), false otherwise
-
-  uint32_t ActiveCount() const;    //!< Returns the number of paths that are currently active
-
-  virtual void Accept   (SystemModelVisitor& visitor) override;   //!< Forwards call to any embedded Register
 
   //! Returns minimal bits count a register should have to drive a mux for number of path
   //!
@@ -59,27 +48,20 @@ class DLL_EXPORT DefaultBinaryPathSelector : public PathSelector
   // ---------------- Protected Methods
   //
   protected:
-  void CheckPathIdentifier (uint32_t pathIdentifier) const;
 
   // ---------------- Private  Methods
   //
   private:
-  using TablesType = std::vector<BinaryVector> ; //!< Selection/deselection LUT types
+  using TablesType = DefaultTableBasedPathSelector::TablesType;
 
   static void       CheckRegisterLength (uint32_t registerLength, uint32_t pathsCount, bool canSelectNone);
   static TablesType CreateSelectTable   (uint32_t registerLength, uint32_t pathsCount, bool isInverted, bool canSelectNone);
   static TablesType CreateDeselectTable (uint32_t registerLength, uint32_t pathsCount, bool isInverted, bool canSelectNone);
-  static void       InvertTable         (TablesType& table);
 
   // ---------------- Private  Fields
   //
   private:
 
-  uint32_t                  m_pathsCount;                    //!< Number of managed paths
-  std::shared_ptr<Register> m_muxRegister;                   //!< Register that drives the paths multiplexer
-  const TablesType          m_select;                        //!< Selection LUT
-  const TablesType          m_deselect;                      //!< Deselection LUT
-  const bool                m_canSelectNone = false;         //!< When true zero is reserved to select 'no path' otherwise 0 is used to select first path
 };
 //
 //  End of DefaultBinaryPathSelector class declaration

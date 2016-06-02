@@ -21,9 +21,11 @@ To clean the projects, run "Build clean"
 
 Qt Build:
 =======
-Add custom build step using make with parameters: -C  %{CurrentProject:Path}/Lib_UT -f Runner.mak
+For debug and release configurations: Add custom build step using make with parameters: -C  %{CurrentProject:Path}/Lib_UT -f Runner.mak
 Place it before project make or even as first step (before Qmake is run)
 
+To create makefiles from the command line (when a project file is modified), use MakeQtMakefiles.bat
+Note that 'QMake' environment variable should point to qmake application (something like: "C:\Qt\5.6\mingw49_32\bin\qmake.exe")
 
 Running Unit tests:
 ==================

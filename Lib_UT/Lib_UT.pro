@@ -31,6 +31,7 @@ SOURCES += \
     SystemModel/UT_Register.cpp                  \
     SystemModel/UT_SystemModel.cpp               \
     SystemModel/UT_SystemModelCheckerVisitor.cpp \
+    SystemModel/UT_ToSutVisitor.cpp              \
     SystemModel/UT_SystemModelNode.cpp           \
     UT_Helpers/SystemModelBuilder.cpp            \
     UT_Helpers/UT_SystemModelBuilder.cpp         \
@@ -49,6 +50,7 @@ HEADERS += \
     SystemModel/UT_Register.hpp                      \
     SystemModel/UT_SystemModel.hpp                   \
     SystemModel/UT_SystemModelCheckerVisitor.hpp     \
+    SystemModel/UT_ToSutVisitor.hpp                  \
     SystemModel/UT_SystemModelNode.hpp               \
     UT_Helpers/SystemModelBuilder.hpp                \
     UT_Helpers/UT_SystemModelBuilder.hpp             \

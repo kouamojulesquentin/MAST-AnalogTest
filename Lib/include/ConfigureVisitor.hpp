@@ -38,7 +38,7 @@ class DLL_EXPORT ConfigureVisitor : public SystemModelVisitor
   // ---------------- Protected Methods
   //
   protected:
-  bool VisitChildren (const ParentNode& parentNode);
+  virtual bool IsChildrenPending (const ParentNode& parentNode);
 
   // ---------------- Private  Methods
   //

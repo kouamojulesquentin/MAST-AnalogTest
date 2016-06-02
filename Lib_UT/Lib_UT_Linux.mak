@@ -49,6 +49,7 @@ OBJ_DEBUG = \
             $(OBJDIR_DEBUG)/UT_Helpers/UT_SystemModelBuilder.o             \
             $(OBJDIR_DEBUG)/UT_Helpers/SystemModelBuilder.o                \
             $(OBJDIR_DEBUG)/SystemModel/UT_SystemModel.o                   \
+            $(OBJDIR_DEBUG)/SystemModel/UT_ToSutVisitor.o                  \
             $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelCheckerVisitor.o     \
             $(OBJDIR_DEBUG)/SystemModel/UT_Register.o                      \
             $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelNode.o               \
@@ -65,6 +66,7 @@ OBJ_RELEASE = \
               $(OBJDIR_RELEASE)/UT_Helpers/UT_SystemModelBuilder.o         \
               $(OBJDIR_RELEASE)/UT_Helpers/SystemModelBuilder.o            \
               $(OBJDIR_RELEASE)/SystemModel/UT_SystemModel.o               \
+              $(OBJDIR_RELEASE)/SystemModel/UT_ToSutVisitor.o              \
               $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelCheckerVisitor.o \
               $(OBJDIR_RELEASE)/SystemModel/UT_Register.o                  \
               $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelNode.o           \
@@ -122,6 +124,9 @@ $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelNode.o: SystemModel/UT_SystemModelNode
 
 $(OBJDIR_DEBUG)/SystemModel/UT_SystemModel.o: SystemModel/UT_SystemModel.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_SystemModel.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_SystemModel.o
+
+$(OBJDIR_DEBUG)/SystemModel/UT_ToSutVisitor.o: SystemModel/UT_ToSutVisitor.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_ToSutVisitor.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_ToSutVisitor.o
 
 $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelCheckerVisitor.o: SystemModel/UT_SystemModelCheckerVisitor.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_SystemModelCheckerVisitor.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelCheckerVisitor.o
@@ -188,6 +193,9 @@ $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelNode.o: SystemModel/UT_SystemModelNo
 
 $(OBJDIR_RELEASE)/SystemModel/UT_SystemModel.o: SystemModel/UT_SystemModel.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_SystemModel.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_SystemModel.o
+
+$(OBJDIR_RELEASE)/SystemModel/UT_ToSutVisitor.o: SystemModel/UT_ToSutVisitor.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_ToSutVisitor.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_ToSutVisitor.o
 
 $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelCheckerVisitor.o: SystemModel/UT_SystemModelCheckerVisitor.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_SystemModelCheckerVisitor.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelCheckerVisitor.o

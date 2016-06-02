@@ -35,6 +35,7 @@ namespace test
 constexpr uint32_t STATIC_TDR_LEN        = 64u;
 constexpr uint32_t DYNAMIC_TDR_LEN       = 128u;
 constexpr uint32_t DEFAULT_WRAPPED_CORES = 3u;
+constexpr uint32_t DEFAULT_BPY_LEN       = 1u;
 constexpr uint32_t DEFAULT_IR_LEN        = 8u;
 constexpr uint32_t DEFAULT_TDR_LEN       = 2u;
 constexpr char     DEFAULT_1500_NAME[]   = "1500_wrapper";

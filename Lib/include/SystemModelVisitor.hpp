@@ -26,6 +26,8 @@ class Register;
 
 //! System model visitors interface
 //!
+//! @note In fact, this is an abstract base class as it provides 3 helpers to ease visits of parents children
+//!
 class DLL_EXPORT SystemModelVisitor
 {
   // ---------------- Public  Methods
@@ -35,6 +37,18 @@ class DLL_EXPORT SystemModelVisitor
   virtual void VisitChain           (Chain&           chain)           = 0;
   virtual void VisitLinker          (Linker&          linker)          = 0;
   virtual void VisitRegister        (Register&        reg)             = 0;
+
+  //! Helper to visit only active children of a Linker node
+  //!
+  virtual void VisitActiveRegisters (const Linker& linker);
+
+  //! Helper to visit only pending children
+  //!
+  virtual void VisitPendingChildren (const ParentNode& parentNode);
+
+  //! Helper to visit all children of a parent node
+  //!
+  virtual void VisitChildren (const ParentNode& parentNode);
 
   // ---------------- Protected Methods
   //

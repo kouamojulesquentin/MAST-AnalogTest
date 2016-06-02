@@ -58,6 +58,7 @@ OBJ_DEBUG = $(OBJDIR_DEBUG)/src/AccessInterface.o                 \
             $(OBJDIR_DEBUG)/src/SystemModelCheckerVisitor.o       \
             $(OBJDIR_DEBUG)/src/SystemModelCheckResult.o          \
             $(OBJDIR_DEBUG)/src/SystemModelNode.o                 \
+            $(OBJDIR_DEBUG)/src/ToSutVisitor.o                    \
             $(OBJDIR_DEBUG)/src/Utility.o
 
 OBJ_RELEASE = $(OBJDIR_RELEASE)/src/AccessInterface.o               \
@@ -76,6 +77,7 @@ OBJ_RELEASE = $(OBJDIR_RELEASE)/src/AccessInterface.o               \
             $(OBJDIR_RELEASE)/src/SystemModelCheckerVisitor.o       \
             $(OBJDIR_RELEASE)/src/SystemModelCheckResult.o          \
             $(OBJDIR_RELEASE)/src/SystemModelNode.o                 \
+            $(OBJDIR_RELEASE)/src/ToSutVisitor.o                    \
             $(OBJDIR_RELEASE)/src/Utility.o
 
 all: debug release
@@ -140,6 +142,9 @@ $(OBJDIR_DEBUG)/src/SystemModelCheckResult.o: src/SystemModelCheckResult.cpp
 
 $(OBJDIR_DEBUG)/src/SystemModelNode.o: src/SystemModelNode.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/SystemModelNode.cpp -o $(OBJDIR_DEBUG)/src/SystemModelNode.o
+
+$(OBJDIR_DEBUG)/src/ToSutVisitor.o: src/ToSutVisitor.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/ToSutVisitor.cpp -o $(OBJDIR_DEBUG)/src/ToSutVisitor.o
 
 $(OBJDIR_DEBUG)/src/Utility.o: src/Utility.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/Utility.cpp -o $(OBJDIR_DEBUG)/src/Utility.o
@@ -207,6 +212,10 @@ $(OBJDIR_RELEASE)/src/SystemModelCheckResult.o: src/SystemModelCheckResult.cpp
 
 $(OBJDIR_RELEASE)/src/SystemModelNode.o: src/SystemModelNode.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/SystemModelNode.cpp -o $(OBJDIR_RELEASE)/src/SystemModelNode.o
+
+$(OBJDIR_RELEASE)/src/ToSutVisitor.o: src/ToSutVisitor.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/ToSutVisitor.cpp -o $(OBJDIR_RELEASE)/src/ToSutVisitor.o
+
 
 $(OBJDIR_RELEASE)/src/Utility.o: src/Utility.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/Utility.cpp -o $(OBJDIR_RELEASE)/src/Utility.o

@@ -31,6 +31,8 @@ SOURCES +=  \
     src/SystemModel.cpp                    \
     src/SystemModelCheckerVisitor.cpp      \
     src/SystemModelCheckResult.cpp         \
+    src/SystemModelVisitor.cpp             \
+    src/ToSutVisitor.cpp                   \
     src/SystemModelNode.cpp                \
     src/Utility.cpp
 
@@ -59,6 +61,7 @@ HEADERS += \
     include/SystemModelNode.hpp                \
     include/SystemModelNodes.hpp               \
     include/SystemModelVisitor.hpp             \
+    include/ToSutVisitor.hpp                   \
     include/TableBasedPathSelector.hpp         \
     include/Utility.hpp                        \
     public_include/PDLAdapter.h                \

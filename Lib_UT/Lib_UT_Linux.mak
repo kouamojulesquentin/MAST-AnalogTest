@@ -6,10 +6,10 @@
 
 WORKDIR = `pwd`
 
-CC = gcc
-CXX = g++
-AR = ar
-LD = g++
+CC = gcc-4.9
+CXX = g++-4.9
+AR = ar-4.9
+LD = g++-4.9
 WINDRES = windres
 
 INC = -I../cxxtest -I../Lib/include -I../Lib/public_include -ICxxTest_Traits -IUT_Helpers

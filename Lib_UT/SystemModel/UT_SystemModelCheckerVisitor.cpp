@@ -550,68 +550,6 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_When_Linker_More_Children ()
   TS_ASSERT_EQUALS (report, expectedReport);
 }
 
-
-//! Checks SystemModelCheckerVisitor::CheckTree() when linker has can only select no path
-//!
-void UT_SystemModelCheckerVisitor::test_CheckTree_When_Linker_CanSelect_0_Path ()
-{
-  // ---------------- Setup
-  //
-  SystemModel sm;
-  auto tap = sm.CreateTap("", 6u, 0u);
-
-  SystemModelCheckerVisitor sut(sm);
-
-  // ---------------- Exercise & Verify
-  //
-  TS_ASSERT_THROWS_NOTHING (sut.CheckTree());
-
-  // ---------------- Verify
-  //
-  auto result = sut.MakeCheckResult();
-  TS_ASSERT_TRUE   (result.HasIssues());
-
-  auto   report         = result.MakeReport();
-  string expectedReport = "Errors   (2):\n"
-                          "  - Linker 'TAP_DR_Mux' (id: 2) has a selector that can select no path at all\n"
-                          "  - Linker 'TAP_DR_Mux' (id: 2) has 1 child, even though it can only select 0 paths\n"
-                          "Warnings (0):\n"
-                          "Infos    (0):\n";
-
-  TS_ASSERT_EQUALS (report, expectedReport);
-}
-
-
-//! Checks SystemModelCheckerVisitor::CheckTree() when linker has can only select one path
-//!
-void UT_SystemModelCheckerVisitor::test_CheckTree_When_Linker_CanSelect_1_Path ()
-{
-  // ---------------- Setup
-  //
-  SystemModel sm;
-  sm.CreateTap("", 6u, 1u);
-
-  SystemModelCheckerVisitor sut(sm);
-
-  // ---------------- Exercise & Verify
-  //
-  TS_ASSERT_THROWS_NOTHING (sut.CheckTree());
-
-  // ---------------- Verify
-  //
-  auto result = sut.MakeCheckResult();
-  TS_ASSERT_TRUE   (result.HasIssues());
-
-  auto   report         = result.MakeReport();
-  string expectedReport = "Errors   (0):\n"
-                          "Warnings (1):\n"
-                          "  - Linker 'TAP_DR_Mux' (id: 2) has a selector that can select only 1 path (and cannot select none)\n"
-                          "Infos    (0):\n";
-
-  TS_ASSERT_EQUALS (report, expectedReport);
-}
-
-
 //===========================================================================
 // End of UT_SystemModelCheckerVisitor.cpp
 //===========================================================================

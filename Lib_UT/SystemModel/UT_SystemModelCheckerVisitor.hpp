@@ -54,8 +54,6 @@ class UT_SystemModelCheckerVisitor : public CxxTest::TestSuite
 
   void test_CheckTree_When_Linker_Less_Children ();
   void test_CheckTree_When_Linker_More_Children ();
-  void test_CheckTree_When_Linker_CanSelect_0_Path ();
-  void test_CheckTree_When_Linker_CanSelect_1_Path ();
 
   // ================ Other Methods ================
 

@@ -71,9 +71,43 @@ void UT_ToSutVisitor::test_Accept_Testcase_1500_Nothing_Pending ()
   TS_ASSERT_TRUE (sut.ToSutVector().IsEmpty());
 }
 
+//! Checks ToSutVisitor::Accept using Testcase_1500() when a nothing is pending but ToSutVisitor
+//! set to ignore pending state
+//!
+void UT_ToSutVisitor::test_Accept_Testcase_1500_BypassMode_IgnorePending ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder builder(sm);
+  auto tap = builder.Create_TestCase_1500("TAP", 3u);
+
+  ToSutVisitor sut;
+  sut.IgnorePendingState(true);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (tap->Accept(sut));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  const auto& identifiers = sut.ActiveRegistersIdentifiers();
+  const auto& sutVector   = sut.ToSutVector();
+
+  size_t   expectedActiveRegistersCount = 2u;
+  uint32_t expectedBitsCount            = test::DEFAULT_IR_LEN + test::DEFAULT_BPY_LEN;         // Tap is still in bypass mode
+  auto     expectedVector               = BinaryVector::CreateFromBinaryString("1111_1111:1");
+
+  TS_ASSERT_EQUALS (identifiers.size(),    expectedActiveRegistersCount);
+  TS_ASSERT_EQUALS (sutVector.BitsCount(), expectedBitsCount);
+  TS_ASSERT_EQUALS (sutVector,             expectedVector);
+}
+
 //! Checks ToSutVisitor::Accept using Testcase_AccessInterface when a (single) register is pending
 //!
-void UT_ToSutVisitor::test_Accept_Testcase_AccessInterface_1_Pending_Register ()
+void UT_ToSutVisitor::test_Accept_Testcase_AccessInterface_1_Pending ()
 {
   // ---------------- Setup
   //
@@ -102,50 +136,15 @@ void UT_ToSutVisitor::test_Accept_Testcase_AccessInterface_1_Pending_Register ()
   const auto& identifiers = sut.ActiveRegistersIdentifiers();
   const auto& sutVector   = sut.ToSutVector();
 
-  size_t   expectedActiveRegistersCount = 1u;
-  uint32_t expectedBitsCount            = test::DEFAULT_IR_LEN + test::DEFAULT_BPY_LEN + test::STATIC_TDR_LEN;
+  size_t   expectedActiveRegistersCount = 2u;
+  uint32_t expectedBitsCount            = test::DEFAULT_IR_LEN + test::DEFAULT_BPY_LEN;
+  auto     expectedVector               = BinaryVector::CreateFromBinaryString("0000_0010:1");  // Request to select 3rd path
 
   TS_ASSERT_EQUALS (identifiers.size(),    expectedActiveRegistersCount);
   TS_ASSERT_EQUALS (sutVector.BitsCount(), expectedBitsCount);
+  TS_ASSERT_EQUALS (sutVector,             expectedVector);
 }
 
-//! Checks ToSutVisitor::Accept using Testcase_1500() when a (single) register is pending
-//!
-void UT_ToSutVisitor::test_Accept_Testcase_1500_Register_1_Pending ()
-{
-  // ---------------- Setup
-  //
-  SystemModel        sm;
-  SystemModelBuilder builder(sm);
-  auto tap    = builder.Create_TestCase_1500("TAP", 3u);
-  auto reg    = sm.RegisterWithId(15u);
-
-  TS_ASSERT_NOT_NULLPTR (reg);
-
-  reg->SetToSut(BinaryVector(DYNAMIC_TDR_LEN, 0x5A));  // Make the register pending
-
-  ConfigureVisitor configurator;
-  tap->Accept(configurator);
-
-  ToSutVisitor sut;
-
-  // ---------------- Exercise
-  //
-  TS_ASSERT_THROWS_NOTHING (tap->Accept(sut));
-
-  // ---------------- Verify
-  //
-  CxxTest::setAbortTestOnFail(true);
-
-  const auto& identifiers = sut.ActiveRegistersIdentifiers();
-  const auto& sutVector   = sut.ToSutVector();
-
-  size_t   expectedActiveRegistersCount = 1u;
-  uint32_t expectedBitsCount            = test::DYNAMIC_TDR_LEN;
-
-  TS_ASSERT_EQUALS (identifiers.size(),    expectedActiveRegistersCount);
-  TS_ASSERT_EQUALS (sutVector.BitsCount(), expectedBitsCount);
-}
 
 
 

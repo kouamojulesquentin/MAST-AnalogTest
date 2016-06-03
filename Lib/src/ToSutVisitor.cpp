@@ -22,7 +22,14 @@ using namespace mast;
 //!
 void ToSutVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 {
-  VisitPendingChildren(accessInterface);
+  if (m_ignorePendingState)
+  {
+    VisitChildren(accessInterface);
+  }
+  else
+  {
+    VisitPendingChildren(accessInterface);
+  }
 }
 //
 //  End of: ToSutVisitor::VisitAccessInterface
@@ -34,7 +41,14 @@ void ToSutVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 //!
 void ToSutVisitor::VisitChain (Chain& chain)
 {
-  VisitPendingChildren(chain);
+  if (m_ignorePendingState)
+  {
+    VisitChildren(chain);
+  }
+  else
+  {
+    VisitPendingChildren(chain);
+  }
 }
 //
 //  End of: ToSutVisitor::VisitChain

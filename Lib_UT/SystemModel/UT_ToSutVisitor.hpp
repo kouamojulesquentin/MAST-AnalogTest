@@ -31,9 +31,9 @@ class UT_ToSutVisitor : public CxxTest::TestSuite
   void test_Constructor ();
 
   void test_Accept_Testcase_1500_Nothing_Pending ();
-  void test_Accept_Testcase_AccessInterface_1_Pending_Register ();
-  void test_Accept_Testcase_1500_Register_1_Pending ();
-//+  void test_Accept_Testcase_1500_Register_2_Pending ();
+  void test_Accept_Testcase_1500_BypassMode_IgnorePending ();
+  void test_Accept_Testcase_AccessInterface_1_Pending ();
+//+  void test_Accept_Testcase_1500_2_Pending ();
 
   void test_Reset ();
 

@@ -19,6 +19,8 @@
 #include <string>
 #include <experimental/string_view>
 
+//+#define __func__ nullptr // For compiler that does not support __func__
+
 namespace mast
 {
 //! Provides functions utilities that are not related to a specific class hierarchy
@@ -42,6 +44,7 @@ class DLL_EXPORT Utility final
   //! Formats message for (std) exception
   //!
   static std::string MakeExceptionMessage(const char*                    file,
+                                          const char*                    function,
                                           uint32_t                       line,
                                           std::experimental::string_view issueKind,
                                           std::experimental::string_view userMessage);
@@ -83,7 +86,7 @@ ScopeExit<F> MakeScopeExit (F f)
 
 //! Helper to format message and throw exception
 //!
-#define THROW_IMPL(exc,msg)         throw exc(mast::Utility::MakeExceptionMessage(__FILE__, __LINE__, #exc, msg))
+#define THROW_IMPL(exc,msg)         throw exc(mast::Utility::MakeExceptionMessage(__FILE__, __func__, __LINE__, #exc, msg))
 
 #define THROW_INVALID_ARGUMENT(msg) THROW_IMPL(std::invalid_argument, msg)
 #define THROW_LOGIC_ERROR(msg)      THROW_IMPL(std::logic_error,      msg)
@@ -93,24 +96,24 @@ ScopeExit<F> MakeScopeExit (F f)
 //!
 //! @return given parameter if not nullptr
 template<typename T>
-T CheckParameterIsNotNullptr(const char* file, int line, T ptr, std::experimental::string_view  msg)
+T CheckParameterIsNotNullptr(const char* file, const char* function, int line, T ptr, std::experimental::string_view  msg)
 {
   if (!ptr)
   {
-    throw std::invalid_argument(mast::Utility::MakeExceptionMessage(file, line, "std::invalid_argument", msg));
+    throw std::invalid_argument(mast::Utility::MakeExceptionMessage(file, function, line, "std::invalid_argument", msg));
   }
   return ptr;
 }
 
-//! Checks that a value (parameter) is != 0, otherwise it throws an exception
+//! Checks that a parameter value is != 0, otherwise it throws an exception
 //!
 //! @return given parameter if not zero
 template<typename T>
-T CheckParameterIsNotZero(const char* file, int line, T value, std::experimental::string_view  msg)
+T CheckParameterIsNotZero(const char* file, const char* function, int line, T value, std::experimental::string_view  msg)
 {
   if (value == 0)
   {
-    throw std::invalid_argument(mast::Utility::MakeExceptionMessage(file, line, "std::invalid_argument", msg));
+    throw std::invalid_argument(mast::Utility::MakeExceptionMessage(file, function, line, "std::invalid_argument", msg));
   }
   return value;
 }
@@ -119,21 +122,34 @@ T CheckParameterIsNotZero(const char* file, int line, T value, std::experimental
 //!
 //! @return given parameter if not zero
 template<typename T>
-T CheckParameterCondition(const char* file, int line, T value, bool conditionMet, std::experimental::string_view  msg)
+T CheckParameterCondition(const char* file, const char* function, int line, T value, bool conditionMet, std::experimental::string_view  msg)
 {
   if (!conditionMet)
   {
-    throw std::invalid_argument(mast::Utility::MakeExceptionMessage(file, line, "std::invalid_argument", msg));
+    throw std::invalid_argument(mast::Utility::MakeExceptionMessage(file, function, line, "std::invalid_argument", msg));
+  }
+  return value;
+}
+
+//! Checks that a parameter value is != 0, otherwise it throws an exception
+//!
+//! @return given parameter if not zero
+template<typename T>
+T CheckValueIsNotNullptr(const char* file, const char* function, int line, T value, std::experimental::string_view  msg)
+{
+  if (value == 0)
+  {
+    throw std::logic_error(mast::Utility::MakeExceptionMessage(file, function, line, "std::logic_error", msg));
   }
   return value;
 }
 
 
+#define CHECK_PARAMETER_NOT_NULL(ptr, msg) CheckParameterIsNotNullptr (__FILE__, __func__, __LINE__, ptr, msg)
+#define CHECK_PARAMETER_NOT_ZERO(val, msg) CheckParameterIsNotZero    (__FILE__, __func__, __LINE__, val, msg)
+#define CHECK_PARAMETER_GT(val, minVal, msg) CheckParameterCondition  (__FILE__, __func__, __LINE__, (val),(val > minVal), msg)
 
-#define CHECK_PARAMETER_NOT_NULL(ptr, msg) CheckParameterIsNotNullptr (__FILE__, __LINE__, ptr, msg)
-#define CHECK_PARAMETER_NOT_ZERO(val, msg) CheckParameterIsNotZero    (__FILE__, __LINE__, val, msg)
-
-#define CHECK_PARAMETER_GT(val, minVal, msg) CheckParameterCondition (__FILE__, __LINE__, (val),(val > minVal), msg)
+#define CHECK_VALUE_NOT_NULL(ptr, msg) CheckValueIsNotNullptr (__FILE__, __func__, __LINE__, ptr, msg)
 
 #endif  // not defined UTILITY_H__AB0B55F8_1F3A_4D8D_893_CA234E5BFD9D__INCLUDED_
 

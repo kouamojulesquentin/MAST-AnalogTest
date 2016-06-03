@@ -26,10 +26,12 @@ using namespace mast;
 //! @note It can also be used for non std::exception derived class
 //! @note Format example:
 //!   std::invalid_argument: Number of append bits cannot exceed number of bits of value.
-//!   File: C:\Users\Jean-Francois\Documents\Tima\NewMast\Lib\src\BinaryVector.cpp
-//!   Line: 87'
+//!   In File:     C:\Users\Jean-Francois\Documents\Tima\NewMast\Lib\src\BinaryVector.cpp
+//!   In Function:
+//!   At Line:     87'
 //!
 string Utility::MakeExceptionMessage(const char*                    file,
+                                     const char*                    function,
                                      uint32_t                       line,
                                      std::experimental::string_view issueKind,
                                      std::experimental::string_view userMessage)
@@ -37,8 +39,12 @@ string Utility::MakeExceptionMessage(const char*                    file,
   std::ostringstream os;
 
   os << issueKind << ": " << userMessage << "." << std::endl;
-  os << "In file: "  << file << std::endl;
-  os << "At line: "  << line << std::endl;
+  os << "In file:     "  << file << std::endl;
+  if (function)
+  {
+    os << "In function: "  << function << std::endl;
+  }
+  os << "At line:     "  << line << std::endl;
 
   return os.str();
 }

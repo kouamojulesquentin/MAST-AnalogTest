@@ -167,7 +167,9 @@ std::shared_ptr<Chain> SystemModelBuilder::Create_1500_Wrapper (string_view name
 //!
 shared_ptr<AccessInterface> SystemModelBuilder::Create_TestCase_AccessInterface (string_view name)
 {
-  auto tap     = m_model.CreateTap      (name,       DEFAULT_IR_LEN, 3u);
+  uint32_t muxDrPathCount = 3u;
+
+  auto tap     = m_model.CreateTap      (name,       DEFAULT_IR_LEN, muxDrPathCount);
 
   auto chain_1 = m_model.CreateChain    ("sut_1",    tap);
   auto reg_1   = m_model.CreateRegister ("static_1", BinaryVector(STATIC_TDR_LEN, 0), chain_1);

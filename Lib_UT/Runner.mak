@@ -27,6 +27,7 @@ Suites = \
       $(UT_RootPath)/SystemModel/UT_GmlPrinterVisitor.hpp         \
       $(UT_RootPath)/UT_Helpers/UT_SystemModelBuilder.hpp         \
       $(UT_RootPath)/SystemModel/UT_ConfigureVisitor.hpp          \
+      $(UT_RootPath)/SystemModel/UT_FromSutUpdater.hpp            \
       $(UT_RootPath)/SystemModel/UT_ToSutVisitor.hpp
 
 

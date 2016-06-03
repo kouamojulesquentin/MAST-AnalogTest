@@ -24,6 +24,7 @@ SOURCES +=  \
     src/ConfigureVisitor.cpp               \
     src/DefaultTableBasedPathSelector.cpp  \
     src/DefaultBinaryPathSelector.cpp      \
+    src/FromSutUpdater.cpp                 \
     src/GmlPrinterVisitor.cpp              \
     src/Linker.cpp                         \
     src/ParentNode.cpp                     \
@@ -50,6 +51,7 @@ HEADERS += \
     include/DefaultBinaryPathSelector.hpp      \
     include/DefaultTableBasedPathSelector.hpp  \
     include/GmlPrinterVisitor.hpp              \
+    include/FromSutUpdater.hpp                 \
     include/Linker.hpp                         \
     include/ParentNode.hpp                     \
     include/PathSelector.hpp                   \

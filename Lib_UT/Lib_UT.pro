@@ -27,6 +27,7 @@ SOURCES += \
     Generated/Runner.cpp                         \
     SystemModel/UT_ConfigureVisitor.cpp          \
     SystemModel/UT_DefaultBinaryPathSelector.cpp \
+    SystemModel/UT_FromSutUpdater.cpp            \
     SystemModel/UT_GmlPrinterVisitor.cpp         \
     SystemModel/UT_PrettyPrinterVisitor.cpp      \
     SystemModel/UT_Register.cpp                  \
@@ -46,6 +47,7 @@ HEADERS += \
     CxxTest_Traits/SystemModelCheckResult_Traits.hpp \
     SystemModel/UT_ConfigureVisitor.cpp              \
     SystemModel/UT_DefaultBinaryPathSelector.hpp     \
+    SystemModel/UT_FromSutUpdater.hpp                \
     SystemModel/UT_GmlPrinterVisitor.hpp             \
     SystemModel/UT_PrettyPrinterVisitor.hpp          \
     SystemModel/UT_Register.hpp                      \
@@ -59,8 +61,6 @@ HEADERS += \
     Utility/UT_SVFVector.hpp                         \
     Utility/UT_Utility.hpp
 
-#+SUBDIRS += \
-#+    ../Lib/Lib.pro
 
 CONFIG(debug,   debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Lib_UT/debug)
@@ -72,12 +72,4 @@ else: CONFIG(release, debug|release) {
   DESTDIR     = $$clean_path($$PWD/../Build_Qt/bin/release)
   LIBS       += -L$$clean_path($$PWD/../Build_Qt/bin/release) -lLib
 }
-
-#+CONFIG(release, debug|release):    LIBS += -L$$clean_path($$OUT_PWD/../Lib/release) -lLib
-#+else:CONFIG(debug, debug|release): LIBS += -L$$clean_path($$OUT_PWD/../Lib/debug)   -lLib
-
-#+win32:CONFIG(release, debug|release):    LIBS += -L$$clean_path($$OUT_PWD/../Lib/release) -lLib
-#+else:win32:CONFIG(debug, debug|release): LIBS += -L$$clean_path($$OUT_PWD/../Lib/debug)   -lLib
-#+else:unix:CONFIG(debug, debug|release):  LIBS += -L$$clean_path($$OUT_PWD/../Lib)         -lLib
-
 

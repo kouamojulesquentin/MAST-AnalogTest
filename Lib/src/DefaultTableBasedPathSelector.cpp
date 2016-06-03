@@ -39,12 +39,26 @@ DefaultTableBasedPathSelector::DefaultTableBasedPathSelector (shared_ptr<Registe
                                                               TablesType           selectTable,
                                                               TablesType           deselectTable,
                                                               bool                 canSelectNone)
-  : m_pathsCount    (pathsCount)
-  , m_muxRegister   (CHECK_NOT_NULL_PARAMETER (associatedRegister, "associatedRegister must be a valid Register"))
-  , m_select        (selectTable)
-  , m_deselect      (deselectTable)
+  : m_pathsCount    (CHECK_PARAMETER_NOT_ZERO (pathsCount,         "pathsCount must be != 0"))
+  , m_muxRegister   (CHECK_PARAMETER_NOT_NULL (associatedRegister, "associatedRegister must be a valid Register"))
+  , m_selectTable   (FixTable(selectTable))
+  , m_deselectTable (FixTable(deselectTable))
   , m_canSelectNone (canSelectNone)
 {
+  if (m_selectTable.size() != m_deselectTable.size())
+  {
+    ostringstream os;
+    os << "(de)Selection tables size differ, got " << m_selectTable.size();
+    os << " for select and "                       << m_deselectTable.size() << " for deselect";
+    THROW_INVALID_ARGUMENT(os.str());
+  }
+
+  if (m_deselectTable.size() <= m_pathsCount)
+  {
+    ostringstream os;
+    os << "Selection and deselection table must have an entry for not used path identifier zero";
+    THROW_INVALID_ARGUMENT(os.str());
+  }
 }
 //
 //  End of: DefaultTableBasedPathSelector::DefaultTableBasedPathSelector
@@ -71,7 +85,7 @@ uint32_t DefaultTableBasedPathSelector::ActiveCount () const
 {
   uint32_t activeCount = 0u;
 
-  for (uint32_t pathId = 1u ; pathId < m_select.size() ; ++pathId)
+  for (uint32_t pathId = 1u ; pathId < m_selectTable.size() ; ++pathId)
   {
     if (IsActive(pathId))
     {
@@ -94,12 +108,14 @@ void DefaultTableBasedPathSelector::CheckPathIdentifier (uint32_t pathIdentifier
 {
   if (pathIdentifier == 0u)
   {
-    THROW_OUT_OF_RANGE("pathIdentifier must be >= 1");
+    ostringstream os; os << "pathIdentifier must be >= 1, got: " << pathIdentifier;
+    THROW_OUT_OF_RANGE(os.str());
   }
 
-  if (pathIdentifier >= m_select.size())
+  if (pathIdentifier > m_selectTable.size())
   {
-    THROW_OUT_OF_RANGE("pathIdentifier is too large");
+    ostringstream os; os << "pathIdentifier must be <= " << m_selectTable.size() << ", got: " << pathIdentifier;
+    THROW_OUT_OF_RANGE(os.str());
   }
 }
 //
@@ -109,17 +125,32 @@ void DefaultTableBasedPathSelector::CheckPathIdentifier (uint32_t pathIdentifier
 
 //! Inverts all bits of a LUT
 //!
-void DefaultTableBasedPathSelector::InvertTable (TablesType& table)
+DefaultTableBasedPathSelector::TablesType& DefaultTableBasedPathSelector::InvertTable (TablesType& table)
 {
   for (auto& elem : table)
   {
     elem = ~elem;
   }
+  return table;
 }
 //
 //  End of: DefaultTableBasedPathSelector::InvertTable
 //---------------------------------------------------------------------------
 
+
+//! Makes table entry fix (cannot modify size)
+//!
+DefaultTableBasedPathSelector::TablesType& DefaultTableBasedPathSelector::FixTable (TablesType& table)
+{
+  for (auto& elem : table)
+  {
+    elem.FixSize(true);
+  }
+  return table;
+}
+//
+//  End of: DefaultTableBasedPathSelector::FixTable
+//---------------------------------------------------------------------------
 
 
 //! Returns true when the specified path is already selected
@@ -129,7 +160,7 @@ bool DefaultTableBasedPathSelector::IsActive (uint32_t pathIdentifier) const
   CheckPathIdentifier(pathIdentifier);
 
   auto& lastToSut   = m_muxRegister->LastToSut();
-  auto& selectValue = m_select[pathIdentifier];
+  auto& selectValue = m_selectTable[pathIdentifier];
 
   bool  isActive    = lastToSut == selectValue;
 
@@ -147,7 +178,7 @@ bool DefaultTableBasedPathSelector::IsSelected (uint32_t pathIdentifier) const
   CheckPathIdentifier(pathIdentifier);
 
   auto& nextToSut   = m_muxRegister->NextToSut();
-  auto& selectValue = m_select[pathIdentifier];
+  auto& selectValue = m_selectTable[pathIdentifier];
 
   bool  isSelected  = nextToSut == selectValue;
 
@@ -166,8 +197,8 @@ void DefaultTableBasedPathSelector::Deselect (uint32_t pathIdentifier)
 {
   CheckPathIdentifier(pathIdentifier);
 
-  m_muxRegister->SetToSut(m_deselect[pathIdentifier]);
-  m_muxRegister->SetBypass(m_deselect[pathIdentifier]);
+  m_muxRegister->SetToSut(m_deselectTable[pathIdentifier]);
+  m_muxRegister->SetBypass(m_deselectTable[pathIdentifier]);
   m_muxRegister->SetPending();
 }
 //
@@ -183,8 +214,8 @@ void DefaultTableBasedPathSelector::Select (uint32_t pathIdentifier)
 {
   CheckPathIdentifier(pathIdentifier);
 
-  m_muxRegister->SetToSut(m_select[pathIdentifier]);
-  m_muxRegister->SetBypass(m_select[pathIdentifier]);
+  m_muxRegister->SetToSut(m_selectTable[pathIdentifier]);
+  m_muxRegister->SetBypass(m_selectTable[pathIdentifier]);
   m_muxRegister->SetPending();
 }
 //

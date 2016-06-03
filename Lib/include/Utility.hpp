@@ -102,7 +102,38 @@ T CheckParameterIsNotNullptr(const char* file, int line, T ptr, std::experimenta
   return ptr;
 }
 
-#define CHECK_NOT_NULL_PARAMETER(ptr, msg) CheckParameterIsNotNullptr(__FILE__, __LINE__, ptr, msg)
+//! Checks that a value (parameter) is != 0, otherwise it throws an exception
+//!
+//! @return given parameter if not zero
+template<typename T>
+T CheckParameterIsNotZero(const char* file, int line, T value, std::experimental::string_view  msg)
+{
+  if (value == 0)
+  {
+    throw std::invalid_argument(mast::Utility::MakeExceptionMessage(file, line, "std::invalid_argument", msg));
+  }
+  return value;
+}
+
+//! Checks that a value (parameter) meet a condition, otherwise it throws an exception
+//!
+//! @return given parameter if not zero
+template<typename T>
+T CheckParameterCondition(const char* file, int line, T value, bool conditionMet, std::experimental::string_view  msg)
+{
+  if (!conditionMet)
+  {
+    throw std::invalid_argument(mast::Utility::MakeExceptionMessage(file, line, "std::invalid_argument", msg));
+  }
+  return value;
+}
+
+
+
+#define CHECK_PARAMETER_NOT_NULL(ptr, msg) CheckParameterIsNotNullptr (__FILE__, __LINE__, ptr, msg)
+#define CHECK_PARAMETER_NOT_ZERO(val, msg) CheckParameterIsNotZero    (__FILE__, __LINE__, val, msg)
+
+#define CHECK_PARAMETER_GT(val, minVal, msg) CheckParameterCondition (__FILE__, __LINE__, (val),(val > minVal), msg)
 
 #endif  // not defined UTILITY_H__AB0B55F8_1F3A_4D8D_893_CA234E5BFD9D__INCLUDED_
 

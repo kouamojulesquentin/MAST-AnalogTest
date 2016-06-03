@@ -45,23 +45,15 @@ class DLL_EXPORT DefaultBinaryPathSelector : public DefaultTableBasedPathSelecto
   //!
   static uint32_t RegWidthForPathCount(uint32_t pathCount, bool canSelectNone);
 
-  // ---------------- Protected Methods
-  //
-  protected:
-
-  // ---------------- Private  Methods
-  //
-  private:
   using TablesType = DefaultTableBasedPathSelector::TablesType;
 
-  static void       CheckRegisterLength (uint32_t registerLength, uint32_t pathsCount, bool canSelectNone);
   static TablesType CreateSelectTable   (uint32_t registerLength, uint32_t pathsCount, bool isInverted, bool canSelectNone);
   static TablesType CreateDeselectTable (uint32_t registerLength, uint32_t pathsCount, bool isInverted, bool canSelectNone);
 
-  // ---------------- Private  Fields
+  // ---------------- Protected Methods
   //
-  private:
-
+  protected:
+  static void CheckRegisterLength (uint32_t registerLength, uint32_t pathsCount, bool canSelectNone);
 };
 //
 //  End of DefaultBinaryPathSelector class declaration

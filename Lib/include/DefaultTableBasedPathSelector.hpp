@@ -60,12 +60,16 @@ class DLL_EXPORT DefaultTableBasedPathSelector  : public PathSelector
 
   virtual void Accept   (SystemModelVisitor& visitor) override;   //!< Forwards call to any embedded Register
 
+  static TablesType& InvertTable (TablesType& table);  //!< Inverts table bits
+  static TablesType& FixTable    (TablesType& table);  //!< Makes table entry fix (cannot modify size)
+
   // ---------------- Protected Methods
   //
   protected:
 
   void CheckPathIdentifier (uint32_t pathIdentifier) const;
-  static void       InvertTable         (TablesType& table);
+
+
 
   // ---------------- Private  Methods
   //
@@ -75,11 +79,11 @@ class DLL_EXPORT DefaultTableBasedPathSelector  : public PathSelector
   //
   private:
 
-  uint32_t                  m_pathsCount;                    //!< Number of managed paths
-  std::shared_ptr<Register> m_muxRegister;                   //!< Register that drives the paths multiplexer
-  const TablesType          m_select;                        //!< Selection LUT
-  const TablesType          m_deselect;                      //!< Deselection LUT
-  const bool                m_canSelectNone = false;         //!< When true zero is reserved to select 'no path' otherwise 0 is used to select first path
+  uint32_t                  m_pathsCount;             //!< Number of managed paths
+  std::shared_ptr<Register> m_muxRegister;            //!< Register that drives the paths multiplexer
+  const TablesType          m_selectTable;            //!< Selection LUT
+  const TablesType          m_deselectTable;          //!< Deselection LUT
+  const bool                m_canSelectNone = false;  //!< When true zero is reserved to select 'no path' otherwise 0 is used to select first path
 };
 //
 //  End of DefaultTableBasedPathSelector class declaration

@@ -39,6 +39,7 @@ class UT_DefaultBinaryPathSelector : public CxxTest::TestSuite
   void test_Select_CannotSelectNone ();
   void test_Select_CanSelectNone ();
   void test_Select_CanSelectNoneInverted ();
+  void test_Select_Path_Zero ();
 
   void test_Deselect ();
 };

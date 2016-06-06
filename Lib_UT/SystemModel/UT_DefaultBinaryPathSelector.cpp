@@ -255,6 +255,36 @@ void UT_DefaultBinaryPathSelector::test_Select_CanSelectNoneInverted ()
   //
   TS_DATA_DRIVEN_TEST(checker, inputs);
 }
+//! Checks DefaultBinaryPathSelector::Select() when can select no path
+//!
+void UT_DefaultBinaryPathSelector::test_Select_Path_Zero ()
+{
+  // ---------------- Setup
+  //
+  auto bypassSequence = BinaryVector::CreateFromBinaryString("010");
+  auto reg            = make_shared<Register>("Reg", bypassSequence);
+  auto isInverted     = true;
+  auto canSelectNone  = true;
+  auto maxPath        = 5u;
+
+  auto sut = DefaultBinaryPathSelector(reg, maxPath, isInverted, canSelectNone);
+
+  // ---------------- Exercise
+  //
+  sut.Select(0u);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (sut.ActiveCount(),     1);
+  TS_ASSERT_EQUALS (sut.SelectablePaths(), 5);
+
+  TS_ASSERT_TRUE   (sut.IsSelected(0u));
+  TS_ASSERT_FALSE  (sut.IsSelected(1u));
+  TS_ASSERT_FALSE  (sut.IsSelected(2u));
+  TS_ASSERT_FALSE  (sut.IsSelected(3u));
+  TS_ASSERT_FALSE  (sut.IsSelected(4u));
+  TS_ASSERT_EQUALS (reg->NextToSut(), reg->BypassSequence());
+}
 
 
 //! Checks DefaultBinaryPathSelector::Deselect() when can select no path

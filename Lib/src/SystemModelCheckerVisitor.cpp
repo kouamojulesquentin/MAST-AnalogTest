@@ -386,13 +386,13 @@ void SystemModelCheckerVisitor::VisitLinker (Linker& linker)
   {
     ReportError(linker, " has no path selector");
   }
-  else if (childrenCount != 0)  // No child has already been reported by CheckParentNode
+  else
   {
     auto selectablePaths = pathSelector->SelectablePaths();
 
     if      (selectablePaths == 0)
     {
-      ReportError(linker, " has a selector that can select no path at all");
+      ReportWarning(linker, " has a selector that can select no path at all");
     }
     else if (selectablePaths == 1)
     {
@@ -402,21 +402,24 @@ void SystemModelCheckerVisitor::VisitLinker (Linker& linker)
       }
     }
 
-    if (childrenCount < selectablePaths)
+    if (childrenCount != 0)  // No child has already been reported by CheckParentNode
     {
-      ostringstream os;
-      Stream(os, linker) << " has only "  << childrenCount   << (childrenCount == 1 ? " child" : " children");
-      os << ", even though it can select " << selectablePaths << " paths";
+      if (childrenCount < selectablePaths)
+      {
+        ostringstream os;
+        Stream(os, linker) << " has only "  << childrenCount   << (childrenCount == 1 ? " child" : " children");
+        os << ", even though it can select " << selectablePaths << " paths";
 
-      ReportWarning(os.str());
-    }
-    else if (childrenCount > selectablePaths)
-    {
-      ostringstream os;
-      Stream(os, linker) << " has "  << childrenCount << (childrenCount == 1 ? " child" : " children");
-      os << ", even though it can only select " << selectablePaths << " paths";
+        ReportWarning(os.str());
+      }
+      else if (childrenCount > selectablePaths)
+      {
+        ostringstream os;
+        Stream(os, linker) << " has "  << childrenCount << (childrenCount == 1 ? " child" : " children");
+        os << ", even though it can only select " << selectablePaths << " paths";
 
-      ReportError(os.str());
+        ReportError(os.str());
+      }
     }
   }
 }

@@ -39,7 +39,7 @@ DefaultTableBasedPathSelector::DefaultTableBasedPathSelector (shared_ptr<Registe
                                                               TablesType           selectTable,
                                                               TablesType           deselectTable,
                                                               bool                 canSelectNone)
-  : m_pathsCount    (CHECK_PARAMETER_NOT_ZERO (pathsCount,         "pathsCount must be != 0"))
+  : m_pathsCount    (pathsCount)
   , m_muxRegister   (CHECK_PARAMETER_NOT_NULL (associatedRegister, "associatedRegister must be a valid Register"))
   , m_selectTable   (FixTable(selectTable))
   , m_deselectTable (FixTable(deselectTable))
@@ -106,13 +106,7 @@ uint32_t DefaultTableBasedPathSelector::ActiveCount () const
 //!
 void DefaultTableBasedPathSelector::CheckPathIdentifier (uint32_t pathIdentifier) const
 {
-  if (pathIdentifier == 0u)
-  {
-    ostringstream os; os << "pathIdentifier must be >= 1, got: " << pathIdentifier;
-    THROW_OUT_OF_RANGE(os.str());
-  }
-
-  if (pathIdentifier > m_selectTable.size())
+  if (pathIdentifier >= m_selectTable.size())
   {
     ostringstream os; os << "pathIdentifier must be <= " << m_selectTable.size() << ", got: " << pathIdentifier;
     THROW_OUT_OF_RANGE(os.str());

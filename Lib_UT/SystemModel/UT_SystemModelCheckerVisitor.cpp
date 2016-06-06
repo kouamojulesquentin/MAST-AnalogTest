@@ -14,7 +14,7 @@
 
 #include "UT_SystemModelCheckerVisitor.hpp"
 #include "SystemModelCheckerVisitor.hpp"
-
+#include "DefaultBinaryPathSelector.hpp"
 #include "SystemModelCheckResult_Traits.hpp"
 
 using std::string;
@@ -549,6 +549,42 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_When_Linker_More_Children ()
 
   TS_ASSERT_EQUALS (report, expectedReport);
 }
+
+
+//! Checks SystemModelCheckerVisitor::CheckTree() when linker has a selector that can select no path at all
+//!
+void UT_SystemModelCheckerVisitor::test_CheckTree_When_MaxPath_Zero ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  auto tap          = sm.CreateTap("", 6u, 3u);
+  auto reg_1        = sm.CreateRegister("reg_1", BinaryVector::CreateFromBinaryString("10"),  tap);
+  auto pathSelector = make_shared<DefaultBinaryPathSelector>(reg_1, 0u, false, false);
+  auto linker       = sm.CreateLinker("linker", pathSelector, tap);
+//+  auto reg_2        = sm.CreateRegister("reg_2", BinaryVector::CreateFromBinaryString("10"),  linker);
+
+  SystemModelCheckerVisitor sut(sm);
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.CheckTree());
+
+  // ---------------- Verify
+  //
+  auto result = sut.MakeCheckResult();
+  TS_ASSERT_TRUE   (result.HasIssues());
+
+  auto   report         = result.MakeReport();
+  string expectedReport = "Errors   (0):\n"
+                          "Warnings (2):\n"
+                          "  - Linker 'linker' (id: 5) has a selector that can select no path at all\n"
+                          "  - Linker 'linker' (id: 5) has no child\n"
+                          "Infos    (0):\n";
+
+  TS_ASSERT_EQUALS (report, expectedReport);
+}
+
 
 //===========================================================================
 // End of UT_SystemModelCheckerVisitor.cpp

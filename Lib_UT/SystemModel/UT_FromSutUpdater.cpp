@@ -92,6 +92,7 @@ void UT_FromSutUpdater::test_UpdateRegisters_1 ()
   // ---------------- Verify
   //
   TS_ASSERT_EQUALS (reg->LastFromSut(), newValue);
+  TS_ASSERT_EQUALS (reg->LastToSut(),   reg->NextToSut());
 }
 
 
@@ -129,6 +130,8 @@ void UT_FromSutUpdater::test_UpdateRegisters_2 ()
   //
   TS_ASSERT_EQUALS (reg_1->LastFromSut(), newValue_1);
   TS_ASSERT_EQUALS (reg_2->LastFromSut(), newValue_2);
+  TS_ASSERT_EQUALS (reg_1->LastToSut(),   reg_1->NextToSut());
+  TS_ASSERT_EQUALS (reg_2->LastToSut(),   reg_2->NextToSut());
 }
 
 

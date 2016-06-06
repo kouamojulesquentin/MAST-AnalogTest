@@ -67,7 +67,7 @@ void UT_ConfigureVisitor::test_Accept_Testcase_1500_Nothing_Pending ()
 
 //! Checks ConfigureVisitor::Accept_Testcase_1500() when a (single) register is pending
 //!
-void UT_ConfigureVisitor::test_Accept_Testcase_1500_Register_1_Pending ()
+void UT_ConfigureVisitor::test_Accept_Testcase_1500_1_Pending ()
 {
   // ---------------- Setup
   //
@@ -75,14 +75,13 @@ void UT_ConfigureVisitor::test_Accept_Testcase_1500_Register_1_Pending ()
   SystemModelBuilder builder(sm);
 
   auto tap    = builder.Create_TestCase_1500("TAP", 3u);
-  auto reg    = sm.RegisterWithId(15u);
+  auto ir     = sm.RegisterWithId(1u);
+  auto reg_1  = sm.RegisterWithId(14u);
+  auto reg_2  = sm.RegisterWithId(15u);
+  auto reg_3  = sm.RegisterWithId(16u);
   auto linker = sm.LinkerWithId(12u);
 
-  TS_ASSERT_NOT_NULLPTR (reg);
-  TS_ASSERT_NOT_NULLPTR (linker);
-  TS_ASSERT_FALSE       (linker->IsSelected(3u));
-
-  reg->SetToSut(BinaryVector(DYNAMIC_TDR_LEN, 0x5A));  // Make the register pending
+  reg_2->SetToSut(BinaryVector(DYNAMIC_TDR_LEN, 0x5A));  // Make the register pending
   ConfigureVisitor sut;
 
   // ---------------- Exercise
@@ -92,6 +91,11 @@ void UT_ConfigureVisitor::test_Accept_Testcase_1500_Register_1_Pending ()
   // ---------------- Verify
   //
   TS_ASSERT_TRUE  (tap->IsPending());
+  TS_ASSERT_TRUE  (ir->IsPending());
+  TS_ASSERT_FALSE (reg_1->IsPending());
+  TS_ASSERT_TRUE  (reg_2->IsPending());
+  TS_ASSERT_FALSE (reg_3->IsPending());
+
   TS_ASSERT_FALSE (linker->IsSelected(1u));
   TS_ASSERT_FALSE (linker->IsSelected(2u));
   TS_ASSERT_TRUE  (linker->IsSelected(3u));
@@ -104,9 +108,9 @@ void UT_ConfigureVisitor::test_Accept_Testcase_1500_Register_1_Pending ()
 }
 
 
-//! Checks ConfigureVisitor::Accept_Testcase_1500() when a (single) register is pending
+//! Checks ConfigureVisitor::Accept_Testcase_1500() when a 2 registers are pending
 //!
-void UT_ConfigureVisitor::test_Accept_Testcase_1500_Register_2_Pending ()
+void UT_ConfigureVisitor::test_Accept_Testcase_1500_2_Pending ()
 {
   // ---------------- Setup
   //
@@ -140,6 +144,42 @@ void UT_ConfigureVisitor::test_Accept_Testcase_1500_Register_2_Pending ()
   TS_ASSERT_FALSE (linker->IsActive(4u));
 }
 
+//! Checks ConfigureVisitor::Accept with Testcase_1500() reset pending flags when no more register are pending
+//!
+void UT_ConfigureVisitor::test_Accept_Testcase_1500_Pending_Reset ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder builder(sm);
+
+  auto tap      = builder.Create_TestCase_1500("TAP", 3u);
+  auto ir       = sm.RegisterWithId(1u);
+  auto swirCtrl = sm.RegisterWithId(7u);
+  auto wirReg   = sm.RegisterWithId(10u);
+  auto reg_1    = sm.RegisterWithId(14u);
+  auto reg_2    = sm.RegisterWithId(16u);
+
+  reg_1->SetToSut(BinaryVector(DYNAMIC_TDR_LEN, 0xA1));  // Make the register pending
+  reg_2->SetToSut(BinaryVector(DYNAMIC_TDR_LEN, 0x52));  // Make the register pending
+  ConfigureVisitor sut;
+
+  tap->Accept(sut); // Make the SystemModel pending
+
+  ir       ->UpdateLastToSut();
+  swirCtrl ->UpdateLastToSut();
+  wirReg   ->UpdateLastToSut();
+  reg_1    ->UpdateLastToSut();
+  reg_2    ->UpdateLastToSut();
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (tap->Accept(sut));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE (tap->IsPending());
+}
 
 //===========================================================================
 // End of UT_ConfigureVisitor.cpp

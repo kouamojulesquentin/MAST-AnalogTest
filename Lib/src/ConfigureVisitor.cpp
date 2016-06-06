@@ -22,6 +22,7 @@ using namespace mast;
 //!
 void ConfigureVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 {
+  accessInterface.ResetPending();
   if (IsChildrenPending(accessInterface))
   {
     accessInterface.SetPending();
@@ -37,6 +38,7 @@ void ConfigureVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 //!
 void ConfigureVisitor::VisitChain (Chain& chain)
 {
+  chain.ResetPending();
   if (IsChildrenPending(chain))
   {
     chain.SetPending();
@@ -75,6 +77,8 @@ bool ConfigureVisitor::IsChildrenPending (const ParentNode& parentNode)
 //!
 void ConfigureVisitor::VisitLinker (Linker& linker)
 {
+  linker.ResetPending();
+
   uint32_t pathIdentifier = 1u;
   auto     isPending      = false;
   auto     child          = linker.FirstChild();
@@ -108,6 +112,7 @@ void ConfigureVisitor::VisitLinker (Linker& linker)
 //!
 void ConfigureVisitor::VisitRegister (Register& reg)
 {
+  reg.ResetPending();
   auto isPending = reg.NextToSut() != reg.LastToSut();
   if (isPending)
   {

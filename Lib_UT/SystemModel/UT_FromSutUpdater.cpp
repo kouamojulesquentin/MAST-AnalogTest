@@ -93,6 +93,7 @@ void UT_FromSutUpdater::test_UpdateRegisters_1 ()
   //
   TS_ASSERT_EQUALS (reg->LastFromSut(), newValue);
   TS_ASSERT_EQUALS (reg->LastToSut(),   reg->NextToSut());
+  TS_ASSERT_FALSE  (reg->IsPending());
 }
 
 
@@ -132,6 +133,8 @@ void UT_FromSutUpdater::test_UpdateRegisters_2 ()
   TS_ASSERT_EQUALS (reg_2->LastFromSut(), newValue_2);
   TS_ASSERT_EQUALS (reg_1->LastToSut(),   reg_1->NextToSut());
   TS_ASSERT_EQUALS (reg_2->LastToSut(),   reg_2->NextToSut());
+  TS_ASSERT_FALSE  (reg_1->IsPending());
+  TS_ASSERT_FALSE  (reg_2->IsPending());
 }
 
 

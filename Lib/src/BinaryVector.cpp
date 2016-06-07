@@ -701,10 +701,11 @@ void BinaryVector::Set (uint8_t value)
 //! @note Firstly intended for test purposes, but can be used for anything else
 //!
 //! @param bits   Sequence of characters representing content of BinaryVector to create
-//!               Characters in ",':_- \t" are ignored (can be used to ease display of string)
+//!               Characters in ",':_- \t/\" are ignored (can be used to ease display of string)
 //!               An exception is thrown if there is any character different from
 //!               set "01,':_- \t"
 //!               '0b' is ignored at start of string. An exception is thrown everywhere else
+//!               '/b', '/B', '\b', '\B' constructions are ignored anywhere
 //!
 //! @return A new BinaryVector initialized as defined by bits text
 BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_view bits, SizeProperty sizeProperty)
@@ -717,13 +718,14 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
   // ---------------- Tolerate strings beginning with "0b"
   //
   if (bits.length() >= 2
-      && (bits[1] == 'b')
-      && (bits[0] == '0')
+      && ((bits[1] == 'b') || (bits[1] == 'B'))
+      &&  (bits[0] == '0')
      )
   {
     bits.remove_prefix(2);
   }
 
+  string_view::value_type previousChar = '\0'; // To detect construction like '\b' and '/b' that are tolerated
   for (const auto& nextChar : bits)
   {
     switch (nextChar)
@@ -753,11 +755,21 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
       case '\t':
       case ' ':
       case '\0':
+      case '/':
+      case '\\':
         break;  // Ignored characters
+      case 'b':
+      case 'B':
+        if ((previousChar != '\\') && (previousChar != '/'))
+        {
+          THROW_INVALID_ARGUMENT("CreateFromBinaryString support only constructions: '\\b' and '/b'");
+        }
+        break;
       default:
         THROW_INVALID_ARGUMENT("CreateFromBinaryString only support characters in '01,\':_-\\x20\\t'");
         break;
     }
+    previousChar = nextChar;
   }
 
   // ---------------- Append remaining bits (when not a multiple of 8 bits)
@@ -782,14 +794,15 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
 //! @note Firstly intended for test purposes, but can be used for anything else
 //!
 //! @param bits   Sequence of characters representing content of BinaryVector to create
-//!               Characters in ",':_- \t" are ignored (can be used to ease display of string)
+//!               Characters in ",':_- \t/\" are ignored (can be used to ease display of string)
 //!               An exception is thrown if there is any character different from
 //!               set "0123456789abcdefABCDEF,':_- \t"
 //!               '0x' is ignored at start of string. An exception is thrown everywhere else
+//!               '/x', '/X', '\x', '\X' constructions are ignored anywhere
 //!
 //! @return A new BinaryVector initialized as defined by bits text
 //!
-BinaryVector BinaryVector::CreateFromHexString (std::experimental::string_view bits, SizeProperty sizeProperty)
+BinaryVector BinaryVector::CreateFromHexString (string_view bits, SizeProperty sizeProperty)
 {
   BinaryVector result;
 
@@ -799,13 +812,14 @@ BinaryVector BinaryVector::CreateFromHexString (std::experimental::string_view b
   // ---------------- Tolerate strings beginning with "0x"
   //
   if (bits.length() >= 2
-      && (bits[1] == 'x')
-      && (bits[0] == '0')
+      && ((bits[1] == 'x') || (bits[1] == 'X'))
+      &&  (bits[0] == '0')
      )
   {
     bits.remove_prefix(2);
   }
 
+  string_view::value_type previousChar = '\0'; // To detect construction like '\x' and '/x' that are tolerated
   for (const auto& nextChar : bits)
   {
     auto    hasValue = true;
@@ -843,10 +857,23 @@ BinaryVector BinaryVector::CreateFromHexString (std::experimental::string_view b
       case '\t':
       case ' ':
       case '\0':
+      case '/':
+      case '\\':
         hasValue = false;
         break;  // Ignored characters
+      case 'x':
+      case 'X':
+        if ((previousChar == '\\') || (previousChar == '/'))
+        {
+          hasValue = false;
+        }
+        else
+        {
+          THROW_INVALID_ARGUMENT("CreateFromBinaryString support only constructions: '\\x' and '/x'");
+        }
+        break;
       default:
-        THROW_INVALID_ARGUMENT("CreateFromBinaryString only support characters in '01,\':_-\\x20\\t'");
+        THROW_INVALID_ARGUMENT("CreateFromBinaryString only support characters in '01,\':_-\\x20\\t/\\'");
     }
 
     if (hasValue)
@@ -866,6 +893,8 @@ BinaryVector BinaryVector::CreateFromHexString (std::experimental::string_view b
         nextByte <<= 4;
       }
     }
+
+    previousChar = nextChar;
   }
 
   // ---------------- Append remaining bits (when not a multiple of 8 bits)

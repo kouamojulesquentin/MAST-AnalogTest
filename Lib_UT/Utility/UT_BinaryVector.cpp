@@ -160,6 +160,11 @@ void UT_BinaryVector::test_CreateFromBinaryString ()
     "1001-0110-1100",    // 16
     "1001:0110:1100",    // 17
     "0b1001:0110:1100",  // 18
+    "0B1001:0110:1100",  // 19
+    "1001:0110:\\b1100", // 20
+    "1001:0110:\\B1100", // 21
+    "1001:0110:/b1100",  // 22
+    "1001:0110:/B1100",  // 23
   };
 
   const vector<TExpected> expected =
@@ -183,11 +188,58 @@ void UT_BinaryVector::test_CreateFromBinaryString ()
     TExpected(12, 2, {0b10010110, 0b11000000}),  // 16
     TExpected(12, 2, {0b10010110, 0b11000000}),  // 17
     TExpected(12, 2, {0b10010110, 0b11000000}),  // 18
+    TExpected(12, 2, {0b10010110, 0b11000000}),  // 19
+    TExpected(12, 2, {0b10010110, 0b11000000}),  // 20
+    TExpected(12, 2, {0b10010110, 0b11000000}),  // 21
+    TExpected(12, 2, {0b10010110, 0b11000000}),  // 22
+    TExpected(12, 2, {0b10010110, 0b11000000}),  // 23
   };
 
   // ---------------- DDT Exercise
   //
   TS_DATA_DRIVEN_TEST (checker, inputs, expected);
+}
+
+
+//! Checks BinaryVector::CreateFromBinaryString() when invalid characters are used
+//!
+void UT_BinaryVector::test_CreateFromBinaryString_InvalidChars ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](string_view bits)
+  {
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (BinaryVector::CreateFromBinaryString(bits), std::exception);
+  };
+
+  auto inputs =
+  {
+    "b",      // 00
+    "B",      // 01
+    "01b01",  // 02
+    "01B01",  // 03
+    "01/x01", // 04
+    "01/X01", // 05
+    "10/bx0", // 06
+    "10I0",   // 07
+    "10i0",   // 08
+    "1(00",   // 09
+    "100)0",  // 10
+    "1[00",   // 11
+    "100]1",  // 12
+    "@101",   // 13
+    "@b101",  // 14
+    "#101",   // 15
+    "#b101",  // 16
+    "10&1",   // 17
+    "~101",   // 18
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, inputs);
 }
 
 
@@ -255,6 +307,11 @@ void UT_BinaryVector::test_CreateFromHexString ()
     "A",             // 15
     "5",             // 16
     "0xCAFE",        // 17
+    "0XCAFE",        // 18
+    "CA\\xFE",       // 19
+    "CA\\XFE",       // 20
+    "CA/xFE",        // 21
+    "CA/XFE",        // 22
   };
 
   auto expected =
@@ -277,6 +334,11 @@ void UT_BinaryVector::test_CreateFromHexString ()
     "1010",                                              // 15
     "0101",                                              // 16
     "1100_1010:1111_1110",                               // 17
+    "1100_1010:1111_1110",                               // 18
+    "1100_1010:1111_1110",                               // 19
+    "1100_1010:1111_1110",                               // 20
+    "1100_1010:1111_1110",                               // 21
+    "1100_1010:1111_1110",                               // 22
   };
 
   // ---------------- DDT Exercise
@@ -284,6 +346,46 @@ void UT_BinaryVector::test_CreateFromHexString ()
   TS_DATA_DRIVEN_TEST (checker, inputs, expected);
 }
 
+//! Checks BinaryVector::CreateFromHexString() when invalid characters are used
+//!
+void UT_BinaryVector::test_CreateFromHexString_InvalidChars ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](string_view bits)
+  {
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (BinaryVector::CreateFromHexString(bits), std::exception);
+  };
+
+  auto inputs =
+  {
+    "x",      // 00
+    "X",      // 01
+    "2Ax27",  // 02
+    "2AX27",  // 03
+    "2A0x27", // 04
+    "2A0X27", // 05
+    "A2/xx2", // 06
+    "A2I2",   // 07
+    "A2i2",   // 08
+    "A(22",   // 09
+    "A22)2",  // 10
+    "A[22",   // 11
+    "A22]7",  // 12
+    "@A27",   // 13
+    "@x727",  // 14
+    "#A27",   // 15
+    "#x72B",  // 16
+    "A2&5",   // 17
+    "~A2C",   // 18
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, inputs);
+}
 
 //! Checks BinaryVector::DataAsBinaryString()
 //!

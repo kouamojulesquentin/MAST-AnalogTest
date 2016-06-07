@@ -987,7 +987,7 @@ BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty size
     // ---------------- Find format change
     //
     auto foundFormatChange = false;
-    auto offset            = 0u;
+    auto offset            = string_view::size_type(0u);
 
     do
     {

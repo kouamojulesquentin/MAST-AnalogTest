@@ -562,6 +562,19 @@ string BinaryVector::DataAsHexString (string_view intSeparator,
 //---------------------------------------------------------------------------
 
 
+//! Returns a string representing state
+//!
+//! @note For debug purpose only
+string BinaryVector::DebugString () const
+{
+  return DataAsBinaryString();
+}
+//
+//  End of: BinaryVector::DebugString
+//---------------------------------------------------------------------------
+
+
+
 //! Copy assignment
 //!
 //! @note Does not change the fixed size property
@@ -796,7 +809,7 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
 //! @param bits   Sequence of characters representing content of BinaryVector to create
 //!               Characters in ",':_- \t/\" are ignored (can be used to ease display of string)
 //!               An exception is thrown if there is any character different from
-//!               set "0123456789abcdefABCDEF,':_- \t"
+//!               set "0123456789abcdefABCDEF,':_- \t/\"
 //!               '0x' is ignored at start of string. An exception is thrown everywhere else
 //!               '/x', '/X', '\x', '\X' constructions are ignored anywhere
 //!
@@ -907,6 +920,137 @@ BinaryVector BinaryVector::CreateFromHexString (string_view bits, SizeProperty s
 
   result.m_sizeProperty = sizeProperty;
 
+  return result;
+}
+//
+//  End of: BinaryVector::CreateFromBinaryString
+//---------------------------------------------------------------------------
+
+
+//! Creates a BinaryVector from mix of hexadecimal and binary representation
+//!
+//! @note Firstly intended for test purposes, but can be used for anything else
+//!
+//! @param bits   Sequence of characters representing content of BinaryVector to create
+//!               Characters in ",':_- \t/\" are ignored (can be used to ease display of string)
+//!               An exception is thrown if there is any character different from
+//!               set "0123456789abcdefABCDEF,':_- \t/\"
+//!               '0x' is ignored at start of string. An exception is thrown everywhere else
+//!               '/x', '/X', '\x', '\X' constructions are interpreted as: What follow is hexadecimal
+//!               '/b', '/B', '\b', '\B' constructions are interpreted as: What follow is binary
+//!
+//! @return A new BinaryVector initialized as defined by bits text
+//!
+BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty sizeProperty)
+{
+  //! Defines how a string is formatted to represent BinaryVector content
+  //!
+  enum class StringFormat
+  {
+    Undefined,   //!< Format is not defined
+    Binary,      //!< Format is recognized as binary
+    Hexadecimal, //!< Format is recognized hexadecimal
+  };
+
+  // ---------------- Skip leading blank spaces
+  //
+  Utility::TrimLeft(bits);
+
+  // ---------------- Tolerate strings beginning with "0x"
+  //
+  if (bits.length() == 0)
+  {
+    return BinaryVector();
+  }
+
+  if (bits.length() == 1)
+  {
+    THROW_INVALID_ARGUMENT("Cannot interpret one, non space, character");
+  }
+
+  auto format = StringFormat::Undefined;
+  bool firstCharOk = (bits[0] == '0') || (bits[0] == '/') || (bits[0] == '\\');
+
+  if      (firstCharOk && ((bits[1] == 'x') || (bits[1] == 'X')))
+  {
+    format = StringFormat::Hexadecimal;
+  }
+  else if (firstCharOk && ((bits[1] == 'b') || (bits[1] == 'B')))
+  {
+    format = StringFormat::Binary;
+  }
+
+  // ---------------- Defines how to get next, largest, chunk of current format
+  //
+  auto getNextChunk = [&bits, &format]()
+  {
+    // ---------------- Find format change
+    //
+    auto foundFormatChange = false;
+    auto offset            = 0u;
+
+    do
+    {
+      offset = bits.find_first_of("/\\", offset);
+      if (   (offset == string_view::npos)  // Not found
+          || (offset == bits.length())      // Found at end of string ==> can be ignored
+         )
+      {
+        break;
+      }
+
+      auto nextChar     = bits[offset + 1];
+      foundFormatChange = (format == StringFormat::Binary) ? (nextChar == 'x') || (nextChar == 'X')
+                                                           : (nextChar == 'b') || (nextChar == 'B');
+      if (!foundFormatChange)
+      {
+        ++offset;
+      }
+    } while (!foundFormatChange);
+
+
+    auto chunk = bits;
+
+    if (!foundFormatChange)
+    {
+      bits.remove_prefix(bits.length());  // Clear remaining (this was the last chunk)
+    }
+    else
+    {
+      chunk = bits.substr(0, offset);
+      bits.remove_prefix(offset + 2u);
+    }
+
+    return chunk;
+  };
+
+  if (format == StringFormat::Undefined)
+  {
+    THROW_INVALID_ARGUMENT("Cannot tell if bits start as binary or hexadecimal");
+  }
+
+  BinaryVector result;
+  BinaryVector chunkVector;
+
+  bits.remove_prefix(2);  // Remove one of: '0x', '/x', '\x', '0b', '/b' and '\b'
+  while (!bits.empty())
+  {
+    auto bitsChunk = getNextChunk();
+
+    if (format == StringFormat::Binary)
+    {
+      chunkVector = BinaryVector::CreateFromBinaryString(bitsChunk);
+      format      = StringFormat::Hexadecimal;
+    }
+    else
+    {
+      chunkVector = BinaryVector::CreateFromHexString(bitsChunk);
+      format      = StringFormat::Binary;
+    }
+    result.Append(chunkVector);
+  }
+
+  result.m_sizeProperty = sizeProperty;
   return result;
 }
 //

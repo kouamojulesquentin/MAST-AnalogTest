@@ -219,22 +219,23 @@ void UT_BinaryVector::test_CreateFromBinaryString_InvalidChars ()
     "b",      // 00
     "B",      // 01
     "01b01",  // 02
-    "01B01",  // 03
-    "01/x01", // 04
-    "01/X01", // 05
-    "10/bx0", // 06
-    "10I0",   // 07
-    "10i0",   // 08
-    "1(00",   // 09
-    "100)0",  // 10
-    "1[00",   // 11
-    "100]1",  // 12
-    "@101",   // 13
-    "@b101",  // 14
-    "#101",   // 15
-    "#b101",  // 16
-    "10&1",   // 17
-    "~101",   // 18
+    "01201",  // 03
+    "01B01",  // 04
+    "01/x01", // 05
+    "01/X01", // 06
+    "10/bx0", // 07
+    "10I0",   // 08
+    "10i0",   // 09
+    "1(00",   // 10
+    "100)0",  // 11
+    "1[00",   // 12
+    "100]1",  // 13
+    "@101",   // 14
+    "@b101",  // 15
+    "#101",   // 16
+    "#b101",  // 17
+    "10&1",   // 18
+    "~101",   // 19
   };
 
   // ---------------- DDT Exercise
@@ -243,7 +244,7 @@ void UT_BinaryVector::test_CreateFromBinaryString_InvalidChars ()
 }
 
 
-//! Checks BinaryVector::CreateFromBinaryString()
+//! Checks BinaryVector::CreateFromHexString()
 //!
 //! @note Suppose that CreateFromBinaryString is working properly
 //!
@@ -368,24 +369,143 @@ void UT_BinaryVector::test_CreateFromHexString_InvalidChars ()
     "2A0x27", // 04
     "2A0X27", // 05
     "A2/xx2", // 06
-    "A2I2",   // 07
-    "A2i2",   // 08
-    "A(22",   // 09
-    "A22)2",  // 10
-    "A[22",   // 11
-    "A22]7",  // 12
-    "@A27",   // 13
-    "@x727",  // 14
-    "#A27",   // 15
-    "#x72B",  // 16
-    "A2&5",   // 17
-    "~A2C",   // 18
+    "A2G2",   // 07
+    "A2I2",   // 08
+    "A2i2",   // 09
+    "A(22",   // 10
+    "A22)2",  // 11
+    "A[22",   // 12
+    "A22]7",  // 13
+    "@A27",   // 14
+    "@x727",  // 15
+    "#A27",   // 16
+    "#x72B",  // 17
+    "A2&5",   // 18
+    "~A2C",   // 19
   };
 
   // ---------------- DDT Exercise
   //
   TS_DATA_DRIVEN_TEST (checker, inputs);
 }
+
+
+//! Checks BinaryVector::CreateFromString()
+//!
+//! @note Suppose that CreateFromString is working properly
+//!
+void UT_BinaryVector::test_CreateFromString ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto text            = std::get<0>(data);
+    auto expectedBinBits = std::get<1>(data);
+
+    // ---------------- Exercise
+    //
+    auto sut = BinaryVector::CreateFromString(text);
+
+    // ---------------- Verify
+    //
+    const auto expectedBinaryVector = BinaryVector::CreateFromBinaryString(expectedBinBits);
+
+    uint32_t expectedBitsCount  = expectedBinaryVector.BitsCount();
+    uint32_t expectedBytesCount = expectedBinaryVector.BytesCount();
+
+    TS_ASSERT_EQUALS (sut.BitsCount(),  expectedBitsCount);
+    TS_ASSERT_EQUALS (sut.BytesCount(), expectedBytesCount);
+
+    if (expectedBytesCount != 0u)
+    {
+      const uint8_t* pSutData      = sut.Data();
+      const uint8_t* pExpectedData = expectedBinaryVector.Data();
+
+      CxxTest::setAbortTestOnFail(true);
+      TS_ASSERT_NOT_NULLPTR (pSutData);
+      TS_ASSERT_NOT_NULLPTR (pExpectedData);
+
+      ostringstream os;
+      for (uint32_t ii = 0 ; ii < expectedBytesCount ; ++ii)
+      {
+        os.str("");
+        os << "pSutData[" << ii << "]";
+        auto msg = os.str().c_str();
+        TSM_ASSERT_EQUALS (msg, pSutData[ii], pExpectedData[ii]);
+      }
+    }
+  };
+
+  auto data =
+  {
+    make_tuple(" ",                   ""),                                        // 00
+    make_tuple("0b01",                "01"),                                      // 01
+    make_tuple("/b101",               "101"),                                     // 02
+    make_tuple("0x01234567",          "0000_0001:0010_0011:0100_0101:0110_0111"), // 03
+    make_tuple("/x89AbcDeF",          "1000_1001:1010_1011:1100_1101:1110_1111"), // 04
+    make_tuple("/xab/b01",            "1010_1011:01"),                            // 05
+    make_tuple("/b01/x01",            "01:0000_0001"),                            // 06
+    make_tuple("0xBAD\\b101",         "1011_1010_1101:101"),                      // 07
+    make_tuple("0XA /B1",             "1010:1"),                                  // 08
+    make_tuple("0B1101:/XA",          "1101:1010"),                               // 09
+    make_tuple("0xCA/X",              "1100_1010"),                               // 10
+    make_tuple("0XFE/b",              "1111_1110"),                               // 11
+    make_tuple("  0x5A/xFE  /b1",     "0101_1010:1111_1110:1"),                   // 12
+    make_tuple("  0b00010   /x  7",   "0001_0:0111"),                             // 13
+    make_tuple("  0b00010   /x  7/",  "0001_0:0111"),                             // 14
+    make_tuple("  0b00010   /x  7\\", "0001_0:0111"),                             // 15
+    make_tuple("  0b00010   /x  7/b", "0001_0:0111"),                             // 16
+    make_tuple("  0b00010   /x  7/x", "0001_0:0111"),                             // 17
+    make_tuple("/x89Ab/XcDeF",        "1000_1001:1010_1011:1100_1101:1110_1111"), // 18
+    make_tuple("/xab/b01/b11/x2",     "1010_1011:01:11:0010"),                    // 19
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::CreateFromString when passing invalid characters
+//!
+void UT_BinaryVector::test_CreateFromString_InvalidChars ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](string_view bits)
+  {
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (BinaryVector::CreateFromString(bits), std::exception);
+  };
+
+  auto inputs =
+  {
+    "x",          // 00
+    "X",          // 01
+    "x/xAF",      // 02
+    "b/b01",      // 03
+    "2Ax27",      // 04
+    "2AX27",      // 05
+    "2A0x27",     // 06
+    "2A0X27",     // 07
+    "A2/xx2",     // 08
+    "/xx2",       // 09
+    "/x2x/b01",   // 10
+    "/x2/bb01",   // 11
+    "/x2/b01b",   // 12
+    "/x2/b01x",   // 13
+    "/x2AG/b01x", // 14
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, inputs);
+}
+
 
 //! Checks BinaryVector::DataAsBinaryString()
 //!

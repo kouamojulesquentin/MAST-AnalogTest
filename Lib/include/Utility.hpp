@@ -41,6 +41,10 @@ class DLL_EXPORT Utility final
   //!
   static uint32_t BytesCountFromBitsCount(uint32_t bitsCount) { return (bitsCount + 7) / 8; }
 
+  //! Trims leading space characters (including \t)
+  //!
+  static void TrimLeft(std::experimental::string_view& text);
+
   //! Formats message for (std) exception
   //!
   static std::string MakeExceptionMessage(const char*                    file,

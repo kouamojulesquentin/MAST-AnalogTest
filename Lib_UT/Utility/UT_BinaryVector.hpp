@@ -40,6 +40,8 @@ class UT_BinaryVector : public CxxTest::TestSuite
   void test_CreateFromBinaryString_InvalidChars ();
   void test_CreateFromHexString ();
   void test_CreateFromHexString_InvalidChars ();
+  void test_CreateFromString ();
+  void test_CreateFromString_InvalidChars ();
 
   // ---------------- DataAsBinaryString
   //

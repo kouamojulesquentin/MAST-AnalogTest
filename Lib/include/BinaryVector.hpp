@@ -64,6 +64,7 @@ class DLL_EXPORT BinaryVector final
 
   static BinaryVector CreateFromBinaryString (std::experimental::string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed);   //!< Creates a BinaryVector from text binary representation
   static BinaryVector CreateFromHexString    (std::experimental::string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed);   //!< Creates a BinaryVector from text hexadecimal representation
+  static BinaryVector CreateFromString       (std::experimental::string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed);   //!< Creates a BinaryVector from mixed hexadecimal and binary representation
 
   std::string DataAsBinaryString(std::experimental::string_view byteSeparator   = ":",
                                  std::experimental::string_view nibbleSeparator = "_",
@@ -77,6 +78,7 @@ class DLL_EXPORT BinaryVector final
                                std::experimental::string_view eolSeparator    = ","
                               ) const;         //!< Gets content as formatted hexadecimal string
 
+  std::string DebugString() const;  //!< Returns a string representing state (for debug purpose only)
 
   BinaryVector& operator=(const BinaryVector&);   //!< Copy assignment
   BinaryVector& operator=(BinaryVector&&);        //!< Move assignment

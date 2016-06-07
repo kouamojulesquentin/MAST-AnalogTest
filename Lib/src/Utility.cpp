@@ -18,6 +18,7 @@
 #include <array>
 
 using std::string;
+using std::experimental::string_view;
 
 using namespace mast;
 
@@ -92,6 +93,28 @@ uint32_t Utility::MinimalBitsForValue (uint32_t value)
 }
 //
 //  End of: Utility::MinimalBitsForValue
+//---------------------------------------------------------------------------
+
+
+
+//! Trims leading space characters (including \t)
+//!
+//! @param text A string_view to trim
+//!
+void Utility::TrimLeft (string_view& text)
+{
+  if (!text.empty())
+  {
+    if ((text[0] == ' ') || (text[0] == '\t'))
+    {
+      auto startPos  = text.find_first_not_of(" \t");
+      auto trimCount = (startPos == text.npos) ? text.length() : startPos;
+      text.remove_prefix(trimCount);
+    }
+  }
+}
+//
+//  End of: Utility::TrimLeft
 //---------------------------------------------------------------------------
 
 

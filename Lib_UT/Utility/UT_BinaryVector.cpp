@@ -159,6 +159,7 @@ void UT_BinaryVector::test_CreateFromBinaryString ()
     "1001_0110_1100",    // 15
     "1001-0110-1100",    // 16
     "1001:0110:1100",    // 17
+    "0b1001:0110:1100",  // 18
   };
 
   const vector<TExpected> expected =
@@ -181,6 +182,7 @@ void UT_BinaryVector::test_CreateFromBinaryString ()
     TExpected(12, 2, {0b10010110, 0b11000000}),  // 15
     TExpected(12, 2, {0b10010110, 0b11000000}),  // 16
     TExpected(12, 2, {0b10010110, 0b11000000}),  // 17
+    TExpected(12, 2, {0b10010110, 0b11000000}),  // 18
   };
 
   // ---------------- DDT Exercise
@@ -252,6 +254,7 @@ void UT_BinaryVector::test_CreateFromHexString ()
     "'BAD",          // 14
     "A",             // 15
     "5",             // 16
+    "0xCAFE",        // 17
   };
 
   auto expected =
@@ -273,6 +276,7 @@ void UT_BinaryVector::test_CreateFromHexString ()
     "1011_1010:1101",                                    // 14
     "1010",                                              // 15
     "0101",                                              // 16
+    "1100_1010:1111_1110",                               // 17
   };
 
   // ---------------- DDT Exercise

@@ -704,6 +704,7 @@ void BinaryVector::Set (uint8_t value)
 //!               Characters in ",':_- \t" are ignored (can be used to ease display of string)
 //!               An exception is thrown if there is any character different from
 //!               set "01,':_- \t"
+//!               '0b' is ignored at start of string. An exception is thrown everywhere else
 //!
 //! @return A new BinaryVector initialized as defined by bits text
 BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_view bits, SizeProperty sizeProperty)
@@ -712,6 +713,16 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
 
   uint8_t nextByte = 0;
   auto    bitCount = 0;
+
+  // ---------------- Tolerate strings beginning with "0b"
+  //
+  if (bits.length() >= 2
+      && (bits[1] == 'b')
+      && (bits[0] == '0')
+     )
+  {
+    bits.remove_prefix(2);
+  }
 
   for (const auto& nextChar : bits)
   {
@@ -774,14 +785,26 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
 //!               Characters in ",':_- \t" are ignored (can be used to ease display of string)
 //!               An exception is thrown if there is any character different from
 //!               set "0123456789abcdefABCDEF,':_- \t"
+//!               '0x' is ignored at start of string. An exception is thrown everywhere else
 //!
 //! @return A new BinaryVector initialized as defined by bits text
+//!
 BinaryVector BinaryVector::CreateFromHexString (std::experimental::string_view bits, SizeProperty sizeProperty)
 {
   BinaryVector result;
 
   uint8_t nextByte = 0;
   auto    bitCount = 0;
+
+  // ---------------- Tolerate strings beginning with "0x"
+  //
+  if (bits.length() >= 2
+      && (bits[1] == 'x')
+      && (bits[0] == '0')
+     )
+  {
+    bits.remove_prefix(2);
+  }
 
   for (const auto& nextChar : bits)
   {

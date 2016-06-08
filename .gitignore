@@ -41,3 +41,8 @@
 /NewMast.pro.user
 /cxxtest/.hg
 /cxxtest/*.hgignore
+/Lib_UT/*.user
+/Lib_UT_Runner/*.user
+/.tgitconfig
+/Temp.py
+/Temp.txt

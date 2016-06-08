@@ -3787,6 +3787,472 @@ void UT_BinaryVector::test_Operator_Tilde ()
 }
 
 
+//! Checks BinaryVector::operator &=
+//!
+void UT_BinaryVector::test_Operator_Bitwise_And_Assignment ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto sut      = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    auto rhs      = BinaryVector::CreateFromBinaryString(std::get<1>(data));
+    auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    // ---------------- Exercise
+    //
+    sut &= rhs;
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,                          other                         result
+    make_tuple("",                           "",                           ""),                           // 00
+    make_tuple("1",                          "1",                          "1"),                          // 01
+    make_tuple("0",                          "0",                          "0"),                          // 02
+    make_tuple("11",                         "10",                         "10"),                         // 03
+    make_tuple("01",                         "10",                         "00"),                         // 04
+    make_tuple("1001",                       "1111",                       "1001"),                       // 05
+    make_tuple("1011_1",                     "0110_0",                     "0010_0"),                     // 06
+    make_tuple("1110_0000:1",                "1010_1010:1",                "1010_0000:1"),                // 07
+    make_tuple("1110_0000:1100_1011:1010",   "0001_1111:0011_0100:0101",   "0000_0000:0000_0000:0000"),   // 08
+    make_tuple("1110_0000:1100_1011:1010_1", "1010_0111:1100_0011:1010_0", "1010_0000:1100_0011:1010_0"), // 09
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::operator |=
+//!
+void UT_BinaryVector::test_Operator_Bitwise_Or_Assignment ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto sut      = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    auto rhs      = BinaryVector::CreateFromBinaryString(std::get<1>(data));
+    auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    // ---------------- Exercise
+    //
+    sut |= rhs;
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,                          other                         result
+    make_tuple("",                           "",                           ""),                           // 00
+    make_tuple("1",                          "1",                          "1"),                          // 01
+    make_tuple("0",                          "0",                          "0"),                          // 02
+    make_tuple("11",                         "10",                         "11"),                         // 03
+    make_tuple("01",                         "10",                         "11"),                         // 04
+    make_tuple("1001",                       "1111",                       "1111"),                       // 05
+    make_tuple("1011_0",                     "0110_0",                     "1111_0"),                     // 06
+    make_tuple("1110_0000:1",                "1010_1010:1",                "1110_1010:1"),                // 07
+    make_tuple("1110_0000:1100_1011:1010",   "0001_1111:0011_0100:0001",   "1111_1111:1111_1111:1011"),   // 08
+    make_tuple("1110_0000:1100_1011:1010_1", "1010_0111:1100_0011:1010_0", "1110_0111:1100_1011:1010_1"), // 09
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+
+
+//! Checks BinaryVector::operator ^=
+//!
+void UT_BinaryVector::test_Operator_Bitwise_Xor_Assignment ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto sut      = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    auto rhs      = BinaryVector::CreateFromBinaryString(std::get<1>(data));
+    auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    // ---------------- Exercise
+    //
+    sut ^= rhs;
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,                          other                         result
+    make_tuple("",                           "",                           ""),                           // 00
+    make_tuple("1",                          "1",                          "0"),                          // 01
+    make_tuple("0",                          "0",                          "0"),                          // 02
+    make_tuple("11",                         "10",                         "01"),                         // 03
+    make_tuple("01",                         "10",                         "11"),                         // 04
+    make_tuple("1001",                       "1111",                       "0110"),                       // 05
+    make_tuple("1011_0",                     "0110_0",                     "1101_0"),                     // 06
+    make_tuple("1110_0000:1",                "1010_1010:1",                "0100_1010:0"),                // 07
+    make_tuple("1110_0000:1100_1011:1010",   "0001_1111:0011_0100:0001",   "1111_1111:1111_1111:1011"),   // 08
+    make_tuple("1110_0000:1100_1011:1010_1", "1010_0111:1100_0011:1010_0", "0100_0111:0000_1000:0000_1"), // 09
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::operator &= when vectors have incompatible sizes
+//!
+void UT_BinaryVector::test_Operator_Bitwise_And_Assignment_SizeMismatch ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto sut = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    auto rhs = BinaryVector::CreateFromBinaryString(std::get<1>(data));
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (sut &= rhs, std::exception);
+  };
+
+  auto data =
+  {
+    //  Bits:  sut,  other
+    make_tuple("",   "1"),   // 00
+    make_tuple("1",  ""),    // 01
+    make_tuple("01", "0"),   // 02
+    make_tuple("11", "110"), // 03
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::operator |= when vectors have incompatible sizes
+//!
+void UT_BinaryVector::test_Operator_Bitwise_Or_Assignment_SizeMismatch ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto sut = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    auto rhs = BinaryVector::CreateFromBinaryString(std::get<1>(data));
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (sut |= rhs, std::exception);
+  };
+
+  auto data =
+  {
+    //  Bits:  sut,  other
+    make_tuple("",   "1"),   // 00
+    make_tuple("1",  ""),    // 01
+    make_tuple("01", "0"),   // 02
+    make_tuple("11", "110"), // 03
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::operator ^= when vectors have incompatible sizes
+//!
+void UT_BinaryVector::test_Operator_Bitwise_Xor_Assignment_SizeMismatch ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto sut = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    auto rhs = BinaryVector::CreateFromBinaryString(std::get<1>(data));
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (sut ^= rhs, std::exception);
+  };
+
+  auto data =
+  {
+    //  Bits:  sut,  other
+    make_tuple("",   "1"),   // 00
+    make_tuple("1",  ""),    // 01
+    make_tuple("01", "0"),   // 02
+    make_tuple("11", "110"), // 03
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::operator &=
+//!
+void UT_BinaryVector::test_Operator_Bitwise_And ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto lhs      = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    auto rhs      = BinaryVector::CreateFromBinaryString(std::get<1>(data));
+    auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    // ---------------- Exercise
+    //
+    auto result = lhs & rhs;
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (result, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: lhs,                          other                         result
+    make_tuple("",                           "",                           ""),                           // 00
+    make_tuple("1",                          "1",                          "1"),                          // 01
+    make_tuple("0",                          "0",                          "0"),                          // 02
+    make_tuple("11",                         "10",                         "10"),                         // 03
+    make_tuple("01",                         "10",                         "00"),                         // 04
+    make_tuple("1001",                       "1111",                       "1001"),                       // 05
+    make_tuple("1011_1",                     "0110_0",                     "0010_0"),                     // 06
+    make_tuple("1110_0000:1",                "1010_1010:1",                "1010_0000:1"),                // 07
+    make_tuple("1110_0000:1100_1011:1010",   "0001_1111:0011_0100:0101",   "0000_0000:0000_0000:0000"),   // 08
+    make_tuple("1110_0000:1100_1011:1010_1", "1010_0111:1100_0011:1010_0", "1010_0000:1100_0011:1010_0"), // 09
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::operator |=
+//!
+void UT_BinaryVector::test_Operator_Bitwise_Or ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto lhs      = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    auto rhs      = BinaryVector::CreateFromBinaryString(std::get<1>(data));
+    auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    // ---------------- Exercise
+    //
+    auto result = lhs | rhs;
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (result, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: lhs,                          other                         result
+    make_tuple("",                           "",                           ""),                           // 00
+    make_tuple("1",                          "1",                          "1"),                          // 01
+    make_tuple("0",                          "0",                          "0"),                          // 02
+    make_tuple("11",                         "10",                         "11"),                         // 03
+    make_tuple("01",                         "10",                         "11"),                         // 04
+    make_tuple("1001",                       "1111",                       "1111"),                       // 05
+    make_tuple("1011_0",                     "0110_0",                     "1111_0"),                     // 06
+    make_tuple("1110_0000:1",                "1010_1010:1",                "1110_1010:1"),                // 07
+    make_tuple("1110_0000:1100_1011:1010",   "0001_1111:0011_0100:0001",   "1111_1111:1111_1111:1011"),   // 08
+    make_tuple("1110_0000:1100_1011:1010_1", "1010_0111:1100_0011:1010_0", "1110_0111:1100_1011:1010_1"), // 09
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+
+
+//! Checks BinaryVector::operator ^=
+//!
+void UT_BinaryVector::test_Operator_Bitwise_Xor ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto lhs      = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    auto rhs      = BinaryVector::CreateFromBinaryString(std::get<1>(data));
+    auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    // ---------------- Exercise
+    //
+    auto result = lhs ^ rhs;
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (result, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: lhs,                          other                         result
+    make_tuple("",                           "",                           ""),                           // 00
+    make_tuple("1",                          "1",                          "0"),                          // 01
+    make_tuple("0",                          "0",                          "0"),                          // 02
+    make_tuple("11",                         "10",                         "01"),                         // 03
+    make_tuple("01",                         "10",                         "11"),                         // 04
+    make_tuple("1001",                       "1111",                       "0110"),                       // 05
+    make_tuple("1011_0",                     "0110_0",                     "1101_0"),                     // 06
+    make_tuple("1110_0000:1",                "1010_1010:1",                "0100_1010:0"),                // 07
+    make_tuple("1110_0000:1100_1011:1010",   "0001_1111:0011_0100:0001",   "1111_1111:1111_1111:1011"),   // 08
+    make_tuple("1110_0000:1100_1011:1010_1", "1010_0111:1100_0011:1010_0", "0100_0111:0000_1000:0000_1"), // 09
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::operator &= when vectors have incompatible sizes
+//!
+void UT_BinaryVector::test_Operator_Bitwise_And_SizeMismatch ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto lhs = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    auto rhs = BinaryVector::CreateFromBinaryString(std::get<1>(data));
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (lhs & rhs, std::exception);
+  };
+
+  auto data =
+  {
+    //  Bits:  lhs,  other
+    make_tuple("",   "1"),   // 00
+    make_tuple("1",  ""),    // 01
+    make_tuple("01", "0"),   // 02
+    make_tuple("11", "110"), // 03
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::operator |= when vectors have incompatible sizes
+//!
+void UT_BinaryVector::test_Operator_Bitwise_Or_SizeMismatch ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto lhs = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    auto rhs = BinaryVector::CreateFromBinaryString(std::get<1>(data));
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (lhs | rhs, std::exception);
+  };
+
+  auto data =
+  {
+    //  Bits:  lhs,  other
+    make_tuple("",   "1"),   // 00
+    make_tuple("1",  ""),    // 01
+    make_tuple("01", "0"),   // 02
+    make_tuple("11", "110"), // 03
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::operator ^= when vectors have incompatible sizes
+//!
+void UT_BinaryVector::test_Operator_Bitwise_Xor_SizeMismatch ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto lhs = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    auto rhs = BinaryVector::CreateFromBinaryString(std::get<1>(data));
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (lhs ^ rhs, std::exception);
+  };
+
+  auto data =
+  {
+    //  Bits:  lhs,  other
+    make_tuple("",   "1"),   // 00
+    make_tuple("1",  ""),    // 01
+    make_tuple("01", "0"),   // 02
+    make_tuple("11", "110"), // 03
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
 
 //! Checks BinaryVector::Slice()
 //!

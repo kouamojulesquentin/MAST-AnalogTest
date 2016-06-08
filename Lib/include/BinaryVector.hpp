@@ -83,14 +83,25 @@ class DLL_EXPORT BinaryVector final
   BinaryVector& operator=(const BinaryVector&);   //!< Copy assignment
   BinaryVector& operator=(BinaryVector&&);        //!< Move assignment
 
+  // Bitwise operators and methods
   BinaryVector  operator~() const; //!< Returns another BinaryVector with every bits toggles
   BinaryVector& ToggleBits();      //!< Toggles (flips) every bits of the vector
 
-  BinaryVector& operator<< (const BinaryVector& rhs) { return this->Append(rhs); }; //!< Appends another BinaryVector
-  BinaryVector  operator+  (const BinaryVector& rhs) const;                         //!< Concatenate two BinaryVector
+  BinaryVector& operator&= (const BinaryVector& rhs); //!< Bitwise and assignment
+  BinaryVector& operator|= (const BinaryVector& rhs); //!< Bitwise or assignment
+  BinaryVector& operator^= (const BinaryVector& rhs); //!< Bitwise xor assignment
 
+  BinaryVector operator& (const BinaryVector& rhs) { auto result = *this; result &= rhs; return result; } //!< Bitwise and
+  BinaryVector operator| (const BinaryVector& rhs) { auto result = *this; result |= rhs; return result; } //!< Bitwise or
+  BinaryVector operator^ (const BinaryVector& rhs) { auto result = *this; result ^= rhs; return result; } //!< Bitwise xor
+
+  // Logical operators
   bool operator==(const BinaryVector& rhs) const;                                 //!< Compares to other for equality (excepted fixed size property)
   bool operator!=(const BinaryVector& rhs) const { return !operator==(rhs); };    //!< Compares to other for inequality
+
+  // Append operator and methods
+  BinaryVector& operator<< (const BinaryVector& rhs) { return this->Append(rhs); }; //!< Appends another BinaryVector
+  BinaryVector  operator+  (const BinaryVector& rhs) const;                         //!< Concatenate two BinaryVector
 
   BinaryVector& Append(const BinaryVector& rhs); //!< Appends another scan vector
 
@@ -121,6 +132,7 @@ class DLL_EXPORT BinaryVector final
   // ---------------- Private  Methods
   //
   bool FixedSize() const { return m_sizeProperty == SizeProperty::Fixed; }
+  void MaskLastByte ();
 
 
   // ---------------- Private  Fields

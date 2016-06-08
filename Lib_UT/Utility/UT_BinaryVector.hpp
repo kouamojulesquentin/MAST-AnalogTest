@@ -152,6 +152,22 @@ class UT_BinaryVector : public CxxTest::TestSuite
   void test_ToggleBits_Using_HexString ();
   void test_Operator_Tilde ();
 
+  // ---------------- Binary operators
+  //
+  void test_Operator_Bitwise_And_Assignment ();
+  void test_Operator_Bitwise_Or_Assignment ();
+  void test_Operator_Bitwise_Xor_Assignment ();
+  void test_Operator_Bitwise_And_Assignment_SizeMismatch ();
+  void test_Operator_Bitwise_Or_Assignment_SizeMismatch ();
+  void test_Operator_Bitwise_Xor_Assignment_SizeMismatch ();
+
+  void test_Operator_Bitwise_And ();
+  void test_Operator_Bitwise_Or ();
+  void test_Operator_Bitwise_Xor ();
+  void test_Operator_Bitwise_And_SizeMismatch ();
+  void test_Operator_Bitwise_Or_SizeMismatch ();
+  void test_Operator_Bitwise_Xor_SizeMismatch ();
+
   // ---------------- Slice
   //
   void test_Slice ();

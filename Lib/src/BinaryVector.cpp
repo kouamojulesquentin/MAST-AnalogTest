@@ -24,6 +24,7 @@ using std::string;
 using std::experimental::string_view;
 using namespace mast;
 
+#define CHECK_SAME_SIZE(other)                if (other.m_usedBits != m_usedBits)         THROW_LOGIC_ERROR("BinaryVectors must have same size")
 #define CHECK_FIXED_SIZE                      if (FixedSize())                            THROW_LOGIC_ERROR("BinaryVector size has been fixed")
 #define CHECK_FIXED_SIZE_ASSIGNMENT(newSize)  if (FixedSize() && (newSize != m_usedBits)) THROW_LOGIC_ERROR("BinaryVector size has been fixed")
 #define CHECK_AT_LEAST_1_BIT(numBits)         if (numBits == 0)                           THROW_INVALID_ARGUMENT("Number of bits to append must be != 0")
@@ -680,6 +681,75 @@ BinaryVector BinaryVector::operator~ () const
 //---------------------------------------------------------------------------
 
 
+//! Bitwise and with another vector
+//!
+BinaryVector& BinaryVector::operator&= (const BinaryVector& rhs)
+{
+  CHECK_SAME_SIZE(rhs);
+
+  auto left  = m_data.begin();
+  auto right = rhs.m_data.cbegin();
+
+  while (left != m_data.end())
+  {
+    *left++ &= *right++;
+  }
+
+  MaskLastByte();
+
+  return *this;
+}
+//
+//  End of: BinaryVector::operator&=
+//---------------------------------------------------------------------------
+
+
+//! Bitwise or with another vector
+//!
+BinaryVector& BinaryVector::operator|= (const BinaryVector& rhs)
+{
+  CHECK_SAME_SIZE(rhs);
+
+  auto left  = m_data.begin();
+  auto right = rhs.m_data.cbegin();
+
+  while (left != m_data.end())
+  {
+    *left++ |= *right++;
+  }
+
+  MaskLastByte();
+
+  return *this;
+}
+//
+//  End of: BinaryVector::operator&=
+//---------------------------------------------------------------------------
+
+
+//! Bitwise xor with another vector
+//!
+BinaryVector& BinaryVector::operator^= (const BinaryVector& rhs)
+{
+  CHECK_SAME_SIZE(rhs);
+
+  auto left  = m_data.begin();
+  auto right = rhs.m_data.cbegin();
+
+  while (left != m_data.end())
+  {
+    *left++ ^= *right++;
+  }
+
+  MaskLastByte();
+
+  return *this;
+}
+//
+//  End of: BinaryVector::operator&=
+//---------------------------------------------------------------------------
+
+
 //! Concatenate two scan vectors
 //!
 BinaryVector BinaryVector::operator+ (const BinaryVector& rhs) const
@@ -1059,6 +1129,22 @@ BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty size
 
 
 
+//! Masks last byte to be sure that unused bits are always set to zero
+//!
+void BinaryVector::MaskLastByte ()
+{
+  auto bitsOnLastByte = m_usedBits % 8;
+  if (bitsOnLastByte != 0)
+  {
+    m_data.back() &= LEFT_BITS_MASK_8[bitsOnLastByte];
+  }
+}
+//
+//  End of: BinaryVector::MaskLastByte
+//---------------------------------------------------------------------------
+
+
+
 //! Sets from 16 bits
 //!
 void BinaryVector::Set (uint16_t value)
@@ -1179,11 +1265,7 @@ BinaryVector& BinaryVector::ToggleBits()
     byte = ~byte;
   }
 
-  auto bitsOnLastByte = m_usedBits % 8;
-  if (bitsOnLastByte != 0)
-  {
-    m_data.back() &= LEFT_BITS_MASK_8[bitsOnLastByte];
-  }
+  MaskLastByte();
 
   return *this;
 }

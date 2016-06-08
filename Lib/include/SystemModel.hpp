@@ -77,6 +77,16 @@ class DLL_EXPORT SystemModel
                                             BinaryVector                   bypassSequence,
                                             std::shared_ptr<ParentNode>    parentNode = nullptr);
 
+  std::shared_ptr<Register> CreateRegister (std::experimental::string_view name,
+                                            BinaryVector                   bypassSequence,
+                                            bool                           holdValue,
+                                            std::shared_ptr<ParentNode>    parentNode = nullptr)
+  {
+    auto reg = CreateRegister(name, bypassSequence, parentNode);
+    reg->SetHoldValue(holdValue);
+    return reg;
+  }
+
   std::shared_ptr<ParentNode > Root() const { return m_root; } //!< Returns root node
 
   using NodeIdentifier = SystemModelNode::NodeIdentifier;

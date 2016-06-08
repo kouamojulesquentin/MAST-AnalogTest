@@ -192,7 +192,7 @@ shared_ptr<AccessInterface> SystemModel::CreateTap (string_view name,
   // ---------------- Create IR
   //
   auto irBypassSequence = BinaryVector(irBitsCount, 0xFF);
-  auto ir               = CreateRegister(irName, irBypassSequence, accessInterface);
+  auto ir               = CreateRegister(irName, irBypassSequence, true, accessInterface);
 
   // ---------------- Create path selector
   //

@@ -23,8 +23,9 @@ using namespace mast;
 //! Initializes a new Register
 //!
 //! @note All registers are initialized like the bypass sequence
-Register::Register (string_view name, mast::BinaryVector bypassSequence)
+Register::Register (string_view name, mast::BinaryVector bypassSequence, bool holdValue)
   : SystemModelNode   (name)
+  , m_holdValue       (holdValue)
   , m_nextToSut       (bypassSequence, SizeProperty::Fixed)
   , m_lastToSut       (bypassSequence, SizeProperty::Fixed)
   , m_lastFromSut     (bypassSequence, SizeProperty::Fixed)

@@ -75,7 +75,14 @@ void ToSutVisitor::VisitLinker (Linker& linker)
 //!
 void ToSutVisitor::VisitRegister (Register& reg)
 {
-  m_toSutVector.Append(reg.NextToSut());
+  if (m_ignorePendingState || reg.IsPending())
+  {
+    m_toSutVector.Append(reg.NextToSut());
+  }
+  else
+  {
+    m_toSutVector.Append(reg.BypassSequence());
+  }
   m_activeRegisters.emplace_back(reg.Identifier());
 }
 //

@@ -86,7 +86,7 @@ void UT_ToSutVisitor::test_Accept_Mib_Binary_CanSelectNone ()
   auto root         = sm.CreateChain    ("Sut");
   auto regStatic    = sm.CreateRegister ("static",    BinaryVector(STATIC_TDR_LEN),  root);
   auto mib          = sm.CreateChain    ("MIB",       root);
-  auto reg_Ctrl     = sm.CreateRegister ("MIB_Ctrl",  BinaryVector(3U, 0u, SizeProperty::Fixed), mib);
+  auto reg_Ctrl     = sm.CreateRegister ("MIB_Ctrl",  BinaryVector(3U, 0u, SizeProperty::Fixed), true, mib);
   auto pathSelector = make_shared<DefaultBinaryPathSelector>(reg_Ctrl, 4u, false, true);
   auto mux          = sm.CreateLinker   ("MIB_Mux",   pathSelector,                  mib);
   auto regDyn_0     = sm.CreateRegister ("dynamic_0", BinaryVector(DYNAMIC_TDR_LEN), mux);
@@ -95,11 +95,11 @@ void UT_ToSutVisitor::test_Accept_Mib_Binary_CanSelectNone ()
   auto regDyn_3     = sm.CreateRegister ("dynamic_3", BinaryVector(DYNAMIC_TDR_LEN), mux);
 
   regStatic->SetBypass (BinaryVector(STATIC_TDR_LEN,  0x05));
-  regStatic->SetToSut  (BinaryVector(STATIC_TDR_LEN,  0x08));
-  regDyn_0->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x01));
-  regDyn_1->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x02));
-  regDyn_2->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x03));
-  regDyn_3->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x04));
+  regStatic->SetToSut  (BinaryVector(STATIC_TDR_LEN,  0x08)); regStatic->SetPending();
+  regDyn_0->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x01)); regDyn_0->SetPending();
+  regDyn_1->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x02)); regDyn_1->SetPending();
+  regDyn_2->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x03)); regDyn_2->SetPending();
+  regDyn_3->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x04)); regDyn_3->SetPending();
 
   ToSutVisitor sut;
   sut.IgnorePendingState(true);
@@ -148,7 +148,7 @@ void UT_ToSutVisitor::test_Accept_Mib_Binary_CannotSelectNone ()
   auto root         = sm.CreateChain    ("Sut");
   auto regStatic    = sm.CreateRegister ("static",    BinaryVector(STATIC_TDR_LEN),  root);
   auto mib          = sm.CreateChain    ("MIB",       root);
-  auto reg_Ctrl     = sm.CreateRegister ("MIB_Ctrl",  BinaryVector(2U, 0u, SizeProperty::Fixed), mib);
+  auto reg_Ctrl     = sm.CreateRegister ("MIB_Ctrl",  BinaryVector(2U, 0u, SizeProperty::Fixed), true, mib);
   auto pathSelector = make_shared<DefaultBinaryPathSelector>(reg_Ctrl, 4u);
   auto mux          = sm.CreateLinker   ("MIB_Mux",   pathSelector,                  mib);
   auto regDyn_0     = sm.CreateRegister ("dynamic_0", BinaryVector(DYNAMIC_TDR_LEN), mux);
@@ -157,11 +157,11 @@ void UT_ToSutVisitor::test_Accept_Mib_Binary_CannotSelectNone ()
   auto regDyn_3     = sm.CreateRegister ("dynamic_3", BinaryVector(DYNAMIC_TDR_LEN), mux);
 
   regStatic->SetBypass (BinaryVector(STATIC_TDR_LEN,  0x05));
-  regStatic->SetToSut  (BinaryVector(STATIC_TDR_LEN,  0x08));
-  regDyn_0->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x01));
-  regDyn_1->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x02));
-  regDyn_2->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x03));
-  regDyn_3->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x04));
+  regStatic->SetToSut  (BinaryVector(STATIC_TDR_LEN,  0x08));  regStatic->SetPending();
+  regDyn_0->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x01));  regDyn_0->SetPending();
+  regDyn_1->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x02));  regDyn_1->SetPending();
+  regDyn_2->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x03));  regDyn_2->SetPending();
+  regDyn_3->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x04));  regDyn_3->SetPending();
 
   ToSutVisitor sut;
   sut.IgnorePendingState(true);
@@ -349,7 +349,11 @@ void UT_ToSutVisitor::test_Reset ()
 {
   // ---------------- Setup
   //
+  auto sm  = CreateSystemModel_AccessInterface(0x5A);
+  auto tap = sm.Root();
+
   ToSutVisitor sut;
+  tap->Accept(sut);
 
   // ---------------- Exercise
   //
@@ -357,6 +361,11 @@ void UT_ToSutVisitor::test_Reset ()
 
   // ---------------- Verify
   //
+  const auto& identifiers = sut.ActiveRegistersIdentifiers();
+  const auto& sutVector   = sut.ToSutVector();
+
+  TS_ASSERT_TRUE (identifiers.empty());
+  TS_ASSERT_TRUE (sutVector.IsEmpty());
 }
 
 //===========================================================================

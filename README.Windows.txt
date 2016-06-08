@@ -1,6 +1,9 @@
+[SETUP]
+ MAST uses C++ 2014, so gcc should be version 4.9 or higher.
+ MAST uses Gnu Make with version >= 3.82
+ The unitary test interface Needs "phyton3" and "phyton3-ply" module
 
-Building Unit Tests (and Lib):
-=============================
+[Building Unit Tests (and Lib)]
 From projects root directory (where this file is):
 
 To Build in release mode, either run  "Build release" or "Build_Release"
@@ -19,16 +22,15 @@ So, when modifying an header, it is recommended to clean the project(s) - unless
 
 To clean the projects, run "Build clean"
 
-Qt Build:
-=======
+[Qt Build]
+
 For debug and release configurations: Add custom build step using make with parameters: -C  %{CurrentProject:Path}/Lib_UT -f Runner.mak
 Place it before project make or even as first step (before Qmake is run)
 
 To create makefiles from the command line (when a project file is modified), use MakeQtMakefiles.bat
 Note that 'QMake' environment variable should point to qmake application (something like: "C:\Qt\5.6\mingw49_32\bin\qmake.exe")
 
-Running Unit tests:
-==================
+[Running Unit tests]
 Debug   version: "UT_Run debug"   or "UT_Run_Debug"
 Release version: "UT_Run release" or "UT_Run_Release" or "UT_Run_Release_Verbose"
 

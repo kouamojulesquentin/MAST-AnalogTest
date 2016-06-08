@@ -23,17 +23,17 @@ using namespace mast;
 //!
 void SystemModelVisitor::VisitActiveRegisters (const Linker& linker)
 {
-  uint32_t pathSelector = 1u;
+  uint32_t pathIdentifier = 1u;
 
   auto child = linker.FirstChild();
   while (child)
   {
-    if (linker.IsActive(pathSelector))
+    if (linker.IsActive(pathIdentifier))
     {
       child->Accept(*this);
     }
     child = child->NextSibling();
-    ++pathSelector;
+    ++pathIdentifier;
   }
 }
 //

@@ -285,6 +285,32 @@ void UT_Register::test_ResetMismatches ()
   TS_ASSERT_EQUALS (sut.Mismatches(), 0);
 }
 
+
+
+//! Checks when Register::HoldValue() is true, "bypass sequence" is updated whenever "next to sut" is
+//!
+void UT_Register::test_HoldValue ()
+{
+  // ---------------- Setup
+  //
+  const auto initial  = BinaryVector::CreateFromBinaryString("1111_1111:0");
+
+  Register sut("Reg", initial);
+
+  // ---------------- Exercise
+  //
+  sut.SetHoldValue(true);
+
+  // ---------------- Verify
+  //
+  const auto newValue = BinaryVector::CreateFromBinaryString("1110_0111:0");
+
+  sut.SetToSut(newValue);
+
+  TS_ASSERT_EQUALS (sut.NextToSut(),      newValue);
+  TS_ASSERT_EQUALS (sut.BypassSequence(), newValue);
+}
+
 //===========================================================================
 // End of UT_Register.cpp
 //===========================================================================

@@ -50,14 +50,7 @@ class UT_Register : public CxxTest::TestSuite
 
   void test_UpdateLastToSut ();
 
-  // ---------------- Sibling
-  //
-
-  // ---------------- Sequence to send
-  //
-
-  // ---------------- Received
-  //
+  void test_HoldValue ();
 
   // ---------------- Mismatches
   //

@@ -315,6 +315,11 @@ void GmlPrinterVisitor::VisitRegister (Register& reg)
 
       os << "Width: "     << reg.BypassSequence().BitsCount() << std::endl;
 
+      if (reg.HoldValue())
+      {
+        os << "Hold value: true" << std::endl;
+      }
+
       os << "Bypass:    " << regValue(reg.BypassSequence())  << std::endl;
       os << "Next to:   " << regValue(reg.NextToSut())       << std::endl;
       os << "Last to:   " << regValue(reg.LastToSut())       << std::endl;

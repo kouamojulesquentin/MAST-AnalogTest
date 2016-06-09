@@ -36,8 +36,11 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
     : GmlPrinterVisitor("")
   {}
 
-  GmlPrinterVisitor(std::experimental::string_view graphName)
-    : m_graphName (graphName)
+  GmlPrinterVisitor(std::experimental::string_view graphName, bool displayIdentifiers = false, bool displayRegisterValue = false, bool displayValueAsHex = false)
+    : m_graphName            (graphName)
+    , m_displayIdentifier    (displayIdentifiers)
+    , m_displayRegisterValue (displayRegisterValue)
+    , m_displayValueAsHex    (displayValueAsHex)
   {
     CreateRoot();
   }

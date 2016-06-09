@@ -22,14 +22,7 @@ using namespace mast;
 //!
 void ToSutVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 {
-  if (m_ignorePendingState)
-  {
-    VisitChildren(accessInterface);
-  }
-  else
-  {
-    VisitPendingChildren(accessInterface);
-  }
+  VisitChildren(accessInterface);
 }
 //
 //  End of: ToSutVisitor::VisitAccessInterface
@@ -41,14 +34,7 @@ void ToSutVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 //!
 void ToSutVisitor::VisitChain (Chain& chain)
 {
-  if (m_ignorePendingState)
-  {
-    VisitChildren(chain);
-  }
-  else
-  {
-    VisitPendingChildren(chain);
-  }
+  VisitChildren(chain);
 }
 //
 //  End of: ToSutVisitor::VisitChain
@@ -71,7 +57,8 @@ void ToSutVisitor::VisitLinker (Linker& linker)
 
 //! Appends Register value to send to SUT while saving the fact that it was active
 //!
-//! @note Should be only used for active Registers
+//! @note Should be only used (indirectly called) for active (currently selected) Registers
+//!       =================================================================================
 //!
 void ToSutVisitor::VisitRegister (Register& reg)
 {

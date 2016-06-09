@@ -207,11 +207,11 @@ void UT_ToSutVisitor::test_Accept_Testcase_1500_Nothing_Pending ()
   //
   SystemModel        sm;
   SystemModelBuilder builder(sm);
+
   auto tap = builder.Create_TestCase_1500("TAP", 3u);
 
   ConfigureVisitor configurator;
   tap->Accept(configurator);
-
   ToSutVisitor sut;
 
   // ---------------- Exercise
@@ -220,8 +220,16 @@ void UT_ToSutVisitor::test_Accept_Testcase_1500_Nothing_Pending ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_TRUE (sut.ActiveRegistersIdentifiers().empty());
-  TS_ASSERT_TRUE (sut.ToSutVector().IsEmpty());
+  const auto& identifiers = sut.ActiveRegistersIdentifiers();
+  const auto& sutVector   = sut.ToSutVector();
+
+  size_t   expectedActiveRegistersCount = 2u;  // Tap_IR and Tap_BPY
+  uint32_t expectedBitsCount            = test::DEFAULT_IR_LEN + test::DEFAULT_BPY_LEN;         // Tap is still in bypass mode
+  auto     expectedVector               = BinaryVector::CreateFromBinaryString("1111_1111:1");
+
+  TS_ASSERT_EQUALS (identifiers.size(),    expectedActiveRegistersCount);
+  TS_ASSERT_EQUALS (sutVector.BitsCount(), expectedBitsCount);
+  TS_ASSERT_EQUALS (sutVector,             expectedVector);
 }
 
 //! Checks ToSutVisitor::Accept using Testcase_1500() when a nothing is pending but ToSutVisitor
@@ -297,25 +305,31 @@ void UT_ToSutVisitor::test_Accept_Testcase_AccessInterface_1_Pending_Step_1 ()
 
 //! Checks ToSutVisitor::Accept using Testcase_AccessInterface when a (single) register is pending
 //!
+//! Step 1: Request to select the branch where the register stands
 //! Step 2: The branch where the register stands should be active and the register value should be send to JTAG
 //!
 void UT_ToSutVisitor::test_Accept_Testcase_AccessInterface_1_Pending_Step_2 ()
 {
   // ---------------- Setup
   //
-  auto sm      = CreateSystemModel_AccessInterface(0x5A);
+  auto sm      = CreateSystemModel_AccessInterface(0x5A);  // static_2 register is made pending
   auto tap     = sm.Root();
+  auto reg_2   = sm.RegisterWithId(7u);
   auto updater = FromSutUpdater(sm);
+
+  TS_ASSERT_TRUE (reg_2->IsPending());
 
   ToSutVisitor sut;
   // Step 1:
-  tap->Accept(sut);
-  updater.UpdateRegisters(sut.ActiveRegistersIdentifiers(), sut.ToSutVector());
+  tap->Accept(sut);                                                             // New value for Tap_Ir is build up
+  updater.UpdateRegisters(sut.ActiveRegistersIdentifiers(), sut.ToSutVector()); // Kind of loop back, static_2 register is reported to be selected
+  TS_ASSERT_TRUE (reg_2->IsPending());
 
   // Step 2:
-  sut.Reset();
   ConfigureVisitor configurator;
-  tap->Accept(configurator);
+  tap->Accept(configurator);          // Mark static_2 register to be still pending
+  TS_ASSERT_TRUE (reg_2->IsPending());
+  sut.Reset();
 
   // ---------------- Exercise (step 2)
   //
@@ -339,7 +353,8 @@ void UT_ToSutVisitor::test_Accept_Testcase_AccessInterface_1_Pending_Step_2 ()
   // Check that register value has been "served"
   updater.UpdateRegisters(identifiers, sutVector);
   tap->Accept(configurator);
-  TS_ASSERT_FALSE  (tap->IsPending());
+  TS_ASSERT_FALSE (reg_2->IsPending());
+  TS_ASSERT_FALSE (tap->IsPending());
 }
 
 

@@ -72,8 +72,9 @@ bool ConfigureVisitor::IsChildrenPending (const ParentNode& parentNode)
 //! Updates Linker pending flag while selecting a pending register
 //!
 //! @note Selected register is the last sibling that is pending
-//! @note More elaborate register selection may be possible but actual needs may be
+//! @note More elaborate register selection may be possible but actual needs must be
 //!       defined to provide an appropriate solution
+//! @note When no child is pending, path 0 is selected
 //!
 void ConfigureVisitor::VisitLinker (Linker& linker)
 {
@@ -100,6 +101,10 @@ void ConfigureVisitor::VisitLinker (Linker& linker)
   if (isPending)
   {
     linker.SetPending();
+  }
+  else
+  {
+    linker.Select(0u);  // Select reserved "path"
   }
 }
 //

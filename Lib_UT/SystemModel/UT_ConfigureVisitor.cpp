@@ -157,6 +157,7 @@ void UT_ConfigureVisitor::test_Accept_Testcase_1500_Pending_Reset ()
   auto ir       = sm.RegisterWithId(1u);
   auto swirCtrl = sm.RegisterWithId(7u);
   auto wirReg   = sm.RegisterWithId(10u);
+  auto wirMux   = sm.LinkerWithId(12);
   auto reg_1    = sm.RegisterWithId(14u);
   auto reg_2    = sm.RegisterWithId(16u);
 
@@ -171,6 +172,9 @@ void UT_ConfigureVisitor::test_Accept_Testcase_1500_Pending_Reset ()
   wirReg   ->UpdateLastToSut();
   reg_1    ->UpdateLastToSut();
   reg_2    ->UpdateLastToSut();
+
+  tap->Accept(sut); // Make the wirReg pending again
+  wirReg   ->UpdateLastToSut();
 
   // ---------------- Exercise
   //

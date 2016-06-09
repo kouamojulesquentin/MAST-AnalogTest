@@ -54,7 +54,7 @@ std::shared_ptr<Chain> SystemModelBuilder::Create_Default_MIB (string_view name,
   //
   auto selectorRegName = name.empty() ? string(DEFAULT_MIB_NAME) + MIB_CTRL_EXT : string(name) + MIB_CTRL_EXT;
   auto selectorRegSize = DefaultBinaryPathSelector::RegWidthForPathCount(maxDerivations, false);
-  auto selectorReg     = m_model.CreateRegister (selectorRegName, BinaryVector(selectorRegSize, 0));
+  auto selectorReg     = m_model.CreateRegister (selectorRegName, BinaryVector(selectorRegSize, 0), true);
   auto selector        = make_shared<DefaultBinaryPathSelector>(selectorReg, maxDerivations);
 
   // ---------------- Create the mib
@@ -78,7 +78,7 @@ std::shared_ptr<Chain> SystemModelBuilder::Create_Default_SIB (string_view name)
 
   auto selectorRegName = string(sibName) + SIB_CTRL_EXT;
   auto selectorRegSize = DefaultBinaryPathSelector::RegWidthForPathCount(1u, true);
-  auto selectorReg     = m_model.CreateRegister (selectorRegName, BinaryVector(selectorRegSize, 0));
+  auto selectorReg     = m_model.CreateRegister (selectorRegName, BinaryVector(selectorRegSize, 0), true);
   auto selector        = make_shared<DefaultBinaryPathSelector>(selectorReg, 1, false, true);
 
   // ---------------- Create the sib (a mib with only one possible derivation)
@@ -132,7 +132,7 @@ std::shared_ptr<Chain> SystemModelBuilder::Create_1500_Wrapper (string_view name
 
   // ---------------- SWIR
   //
-  auto swirSelectorReg = m_model.CreateRegister ("SWIR"s + MIB_CTRL_EXT, BinaryVector::CreateFromBinaryString("01"));
+  auto swirSelectorReg = m_model.CreateRegister ("SWIR"s + MIB_CTRL_EXT, BinaryVector::CreateFromBinaryString("01"), true);
   auto swirSelector    = make_shared<DefaultBinaryPathSelector>(swirSelectorReg, 2);
   auto swirMib         = Create_MIB("SWIR", swirSelector, swirSelectorReg, MuxRegPlacement::BeforeMux);
   wrapper->AppendChild(swirMib);
@@ -141,7 +141,7 @@ std::shared_ptr<Chain> SystemModelBuilder::Create_1500_Wrapper (string_view name
   //
   auto totalDerivations = maxDerivations + 1u;   // +1 is to take into account bypass register (wirBypass)
   auto wirSize          = DefaultBinaryPathSelector::RegWidthForPathCount(totalDerivations, false);
-  auto wirReg           = m_model.CreateRegister ("WIR_reg", BinaryVector(wirSize, 0));
+  auto wirReg           = m_model.CreateRegister ("WIR_reg", BinaryVector(wirSize, 0), true);
   auto wirSelector      = make_shared<DefaultBinaryPathSelector>(wirReg, totalDerivations);
   auto wirMib           = Create_MIB("WIR", wirSelector, wirReg, MuxRegPlacement::Remote);
   auto wirBypass        = m_model.CreateRegister ("WBY", BinaryVector(1, 0), wirMib);

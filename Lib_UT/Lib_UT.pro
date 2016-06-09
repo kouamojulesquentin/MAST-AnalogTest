@@ -26,6 +26,7 @@ DEPENDPATH += $$PWD/../Lib/include \
 SOURCES += \
     Generated/Runner.cpp                         \
     SystemModel/UT_ConfigureVisitor.cpp          \
+    SystemModel/UT_DataCycle.cpp                 \
     SystemModel/UT_DefaultBinaryPathSelector.cpp \
     SystemModel/UT_FromSutUpdater.cpp            \
     SystemModel/UT_GmlPrinterVisitor.cpp         \
@@ -46,6 +47,7 @@ HEADERS += \
     CxxTest_Traits/BinaryVector_Traits.hpp           \
     CxxTest_Traits/SystemModelCheckResult_Traits.hpp \
     SystemModel/UT_ConfigureVisitor.cpp              \
+    SystemModel/UT_DataCycle.hpp                     \
     SystemModel/UT_DefaultBinaryPathSelector.hpp     \
     SystemModel/UT_FromSutUpdater.hpp                \
     SystemModel/UT_GmlPrinterVisitor.hpp             \

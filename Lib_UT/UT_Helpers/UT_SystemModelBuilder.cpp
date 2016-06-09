@@ -262,7 +262,7 @@ void UT_SystemModelBuilder::test_Create_TestCase_MIB_4_Chains ()
 
   auto gotPretty      = prettyPrinter.PrettyPrint();
   auto expectedPretty = string("[Access_I](0)  \"TAP\"\n"
-                               " [Register](1)  \"TAP_IR\", length: 8, bypass: 1111_1111\n"
+                               " [Register](1)  \"TAP_IR\", length: 8, Hold value: true, bypass: 1111_1111\n"
                                " [Linker](2)    \"TAP_DR_Mux\"\n"
                                "  :Selector:(1)  \"TAP_IR\"\n"
                                "  [Register](3)  \"TAP_BPY\", length: 1, bypass: 1\n"
@@ -389,7 +389,7 @@ void UT_SystemModelBuilder::test_Create_TestCase_1687 ()
 
   auto gotPretty      = prettyPrinter.PrettyPrint();
   auto expectedPretty = string("[Access_I](0)  \"sut\"\n"
-                               " [Register](1)  \"sut_IR\", length: 8, bypass: 1111_1111\n"
+                               " [Register](1)  \"sut_IR\", length: 8, Hold value: true, bypass: 1111_1111\n"
                                " [Linker](2)    \"sut_DR_Mux\"\n"
                                "  :Selector:(1)  \"sut_IR\"\n"
                                "  [Register](3)  \"sut_BPY\", length: 1, bypass: 1\n"
@@ -559,7 +559,7 @@ void UT_SystemModelBuilder::test_Create_TestCase_1500_3_Chains ()
   auto gotPretty      = prettyPrinter.PrettyPrint();
   auto expectedPretty = string(
                                "[Access_I](0)  \"TAP\"\n"
-                               " [Register](1)  \"TAP_IR\", length: 8, bypass: 1111_1111\n"
+                               " [Register](1)  \"TAP_IR\", length: 8, Hold value: true, bypass: 1111_1111\n"
                                " [Linker](2)    \"TAP_DR_Mux\"\n"
                                "  :Selector:(1)  \"TAP_IR\"\n"
                                "  [Register](3)  \"TAP_BPY\", length: 1, bypass: 1\n"

@@ -241,6 +241,10 @@ void PrettyPrinterVisitor::VisitRegister (Register& reg)
     StreamNodeHeader("Register", reg);
 
     m_os << ", length: " << reg.BypassSequence().BitsCount();
+    if (reg.HoldValue())
+    {
+      m_os << ", Hold value: true";
+    }
 
     if (!m_verbose)
     {

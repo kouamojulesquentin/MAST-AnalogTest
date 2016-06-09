@@ -583,7 +583,7 @@ void UT_PrettyPrinterVisitor::test_VisitTap ()
   //
   auto got      = sut.PrettyPrint();
   auto expected = string("[Access_I](0)  \"1149_1_TAP\"\n"
-                         " [Register](1)  \"TAP_IR\", length: 6, bypass: 1111_11\n"
+                         " [Register](1)  \"TAP_IR\", length: 6, Hold value: true, bypass: 1111_11\n"
                          " [Linker](2)    \"TAP_DR_Mux\"\n"
                          "  :Selector:(1)  \"TAP_IR\"\n"
                          "  [Register](3)  \"TAP_BPY\", length: 1, bypass: 1"
@@ -618,7 +618,7 @@ void UT_PrettyPrinterVisitor::test_VisitTap_With_SubNodes ()
   //
   auto got      = sut.PrettyPrint();
   auto expected = string("[Access_I](0)  \"1149_1_TAP\"\n"
-                         " [Register](1)  \"TAP_IR\", length: 6, bypass: 1111_11\n"
+                         " [Register](1)  \"TAP_IR\", length: 6, Hold value: true, bypass: 1111_11\n"
                          " [Linker](2)    \"TAP_DR_Mux\"\n"
                          "  :Selector:(1)  \"TAP_IR\"\n"
                          "  [Register](3)  \"TAP_BPY\", length: 1, bypass: 1\n"

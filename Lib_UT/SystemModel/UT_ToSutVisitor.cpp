@@ -124,11 +124,11 @@ void UT_ToSutVisitor::test_Accept_Mib_Binary_CanSelectNone ()
 
   auto data =
   {
-    make_tuple("000", "0x0808_0808:0808_0808:/b000"),
-    make_tuple("001", "0x0808_0808:0808_0808:/b001:/x0101_0101_0101_0101_0101_0101_0101_0101"),
-    make_tuple("010", "0x0808_0808:0808_0808:/b010:/x0202_0202_0202_0202_0202_0202_0202_0202"),
-    make_tuple("011", "0x0808_0808:0808_0808:/b011:/x0303_0303_0303_0303_0303_0303_0303_0303"),
-    make_tuple("100", "0x0808_0808:0808_0808:/b100:/x0404_0404_0404_0404_0404_0404_0404_0404"),
+    make_tuple("000", "0x0808:/b000"),
+    make_tuple("001", "0x0808:/b001:/x0101_0101"),
+    make_tuple("010", "0x0808:/b010:/x0202_0202"),
+    make_tuple("011", "0x0808:/b011:/x0303_0303"),
+    make_tuple("100", "0x0808:/b100:/x0404_0404"),
   };
 
   // ---------------- DDT Exercise
@@ -186,10 +186,10 @@ void UT_ToSutVisitor::test_Accept_Mib_Binary_CannotSelectNone ()
 
   auto data =
   {
-    make_tuple("00", "0x0808_0808:0808_0808:/b00:/x0101_0101_0101_0101_0101_0101_0101_0101"),
-    make_tuple("01", "0x0808_0808:0808_0808:/b01:/x0202_0202_0202_0202_0202_0202_0202_0202"),
-    make_tuple("10", "0x0808_0808:0808_0808:/b10:/x0303_0303_0303_0303_0303_0303_0303_0303"),
-    make_tuple("11", "0x0808_0808:0808_0808:/b11:/x0404_0404_0404_0404_0404_0404_0404_0404"),
+    make_tuple("00", "0x0808:/b00:/x0101_0101"),
+    make_tuple("01", "0x0808:/b01:/x0202_0202"),
+    make_tuple("10", "0x0808:/b10:/x0303_0303"),
+    make_tuple("11", "0x0808:/b11:/x0404_0404"),
   };
 
   // ---------------- DDT Exercise
@@ -330,7 +330,7 @@ void UT_ToSutVisitor::test_Accept_Testcase_AccessInterface_1_Pending_Step_2 ()
 
   size_t   expectedActiveRegistersCount = 2u;
   uint32_t expectedBitsCount            = test::DEFAULT_IR_LEN + test::STATIC_TDR_LEN;
-  auto     expectedVector               = BinaryVector::CreateFromHexString("02:5A5A5A5A_5A5A5A5A_");
+  auto     expectedVector               = BinaryVector::CreateFromHexString("02:5A5A");
 
   TS_ASSERT_EQUALS (identifiers.size(),    expectedActiveRegistersCount);
   TS_ASSERT_EQUALS (sutVector.BitsCount(), expectedBitsCount);

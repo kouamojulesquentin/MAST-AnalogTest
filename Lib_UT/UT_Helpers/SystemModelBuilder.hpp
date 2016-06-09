@@ -32,8 +32,8 @@ namespace mast
 namespace test
 {
 
-constexpr uint32_t STATIC_TDR_LEN        = 64u;
-constexpr uint32_t DYNAMIC_TDR_LEN       = 128u;
+constexpr uint32_t STATIC_TDR_LEN        = 16u;
+constexpr uint32_t DYNAMIC_TDR_LEN       = 32u;
 constexpr uint32_t DEFAULT_WRAPPED_CORES = 3u;
 constexpr uint32_t DEFAULT_BPY_LEN       = 1u;
 constexpr uint32_t DEFAULT_IR_LEN        = 8u;

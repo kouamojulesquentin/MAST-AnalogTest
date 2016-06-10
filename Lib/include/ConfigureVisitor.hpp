@@ -16,6 +16,9 @@
   #define CONFIGUREVISITOR_H__9C86FE0D_78AA_4852_8CA8_25CA6E34AC9__INCLUDED_
 
 #include "SystemModelVisitor.hpp"
+#include "DefaultConfigurationAlgorithm.hpp"
+
+#include <memory>
 
 namespace mast
 {
@@ -28,7 +31,10 @@ class DLL_EXPORT ConfigureVisitor : public SystemModelVisitor
   //
   public:
   ~ConfigureVisitor() = default;
-  ConfigureVisitor()  = default;
+  ConfigureVisitor(std::shared_ptr<ConfigurationAlgorithm> configurationAlgorithm = std::make_shared<DefaultConfigurationAlgorithm>())
+  : m_configurationAlgorithm (configurationAlgorithm)
+  {
+  }
 
   virtual void VisitAccessInterface (AccessInterface& accessInterface) override;
   virtual void VisitChain           (Chain&           chain)           override;
@@ -40,13 +46,10 @@ class DLL_EXPORT ConfigureVisitor : public SystemModelVisitor
   protected:
   virtual bool IsChildrenPending (const ParentNode& parentNode);
 
-  // ---------------- Private  Methods
-  //
-  private:
-
   // ---------------- Private  Fields
   //
   private:
+  std::shared_ptr<ConfigurationAlgorithm>  m_configurationAlgorithm;
 };
 //
 //  End of ConfigureVisitor class declaration

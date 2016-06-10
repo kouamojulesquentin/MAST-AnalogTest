@@ -22,8 +22,9 @@ SOURCES +=  \
     src/BinaryVector.cpp                   \
     src/Chain.cpp                          \
     src/ConfigureVisitor.cpp               \
-    src/DefaultTableBasedPathSelector.cpp  \
+    src/DefaultConfigurationAlgorithm.cpp  \
     src/DefaultBinaryPathSelector.cpp      \
+    src/DefaultTableBasedPathSelector.cpp  \
     src/FromSutUpdater.cpp                 \
     src/GmlPrinterVisitor.cpp              \
     src/Linker.cpp                         \
@@ -45,10 +46,12 @@ HEADERS += \
     include/AccessInterfaceProtocol_1149_1.hpp \
     include/BinaryVector.hpp                   \
     include/Chain.hpp                          \
+    include/ConfigurationAlgorithm.hpp         \
     include/ConfigureVisitor.hpp               \
     include/DataCycleReadVisitor.hpp           \
     include/DataCycleWriteVisitor.hpp          \
     include/DefaultBinaryPathSelector.hpp      \
+    include/DefaultConfigurationAlgorithm.hpp  \
     include/DefaultTableBasedPathSelector.hpp  \
     include/GmlPrinterVisitor.hpp              \
     include/FromSutUpdater.hpp                 \

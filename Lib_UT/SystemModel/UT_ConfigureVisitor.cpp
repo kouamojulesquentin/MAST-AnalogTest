@@ -163,7 +163,7 @@ void UT_ConfigureVisitor::test_Accept_Testcase_1500_Pending_Reset ()
 
   reg_1->SetToSut(BinaryVector(DYNAMIC_TDR_LEN, 0xA1));  // Make the register pending
   reg_2->SetToSut(BinaryVector(DYNAMIC_TDR_LEN, 0x52));  // Make the register pending
-  ConfigureVisitor sut;
+  ConfigureVisitor sut(nullptr);    // No special algorithm ==> select last pending
 
   tap->Accept(sut); // Make the SystemModel pending
 

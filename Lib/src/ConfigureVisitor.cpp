@@ -79,6 +79,10 @@ bool ConfigureVisitor::IsChildrenPending (const ParentNode& parentNode)
 void ConfigureVisitor::VisitLinker (Linker& linker)
 {
   linker.ResetPending();
+  if (m_configurationAlgorithm)
+  {
+    m_configurationAlgorithm->StartLinkerProcessing(linker);
+  }
 
   uint32_t pathIdentifier = 1u;
   auto     isPending      = false;
@@ -91,7 +95,14 @@ void ConfigureVisitor::VisitLinker (Linker& linker)
     {
       isPending = true;
 
-      linker.Select(pathIdentifier);
+      if (m_configurationAlgorithm)
+      {
+        m_configurationAlgorithm->ProcessPending(linker, pathIdentifier, child);
+      }
+      else
+      {
+        linker.Select(pathIdentifier);
+      }
     }
 
     child = child->NextSibling();
@@ -102,7 +113,12 @@ void ConfigureVisitor::VisitLinker (Linker& linker)
   {
     linker.SetPending();
   }
-  else
+
+  if (m_configurationAlgorithm)
+  {
+    m_configurationAlgorithm->ResolvePendings(linker);
+  }
+  else if (!linker.IsPending())
   {
     linker.Select(0u);  // Select reserved "path"
   }

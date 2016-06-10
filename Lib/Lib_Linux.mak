@@ -47,6 +47,7 @@ OBJ_DEBUG = $(OBJDIR_DEBUG)/src/AccessInterface.o                 \
             $(OBJDIR_DEBUG)/src/BinaryVector.o                    \
             $(OBJDIR_DEBUG)/src/Chain.o                           \
             $(OBJDIR_DEBUG)/src/DefaultBinaryPathSelector.o       \
+            $(OBJDIR_DEBUG)/src/DefaultConfigurationAlgorithm.o   \
             $(OBJDIR_DEBUG)/src/DefaultTableBasedPathSelector.o   \
             $(OBJDIR_DEBUG)/src/FromSutUpdater.o                  \
             $(OBJDIR_DEBUG)/src/GmlPrinterVisitor.o               \
@@ -69,6 +70,7 @@ OBJ_RELEASE = $(OBJDIR_RELEASE)/src/AccessInterface.o               \
             $(OBJDIR_RELEASE)/src/BinaryVector.o                    \
             $(OBJDIR_RELEASE)/src/Chain.o                           \
             $(OBJDIR_RELEASE)/src/DefaultBinaryPathSelector.o       \
+            $(OBJDIR_RELEASE)/src/DefaultConfigurationAlgorithm.o   \
             $(OBJDIR_RELEASE)/src/DefaultTableBasedPathSelector.o   \
             $(OBJDIR_RELEASE)/src/FromSutUpdater.o                  \
             $(OBJDIR_RELEASE)/src/GmlPrinterVisitor.o               \
@@ -115,6 +117,9 @@ $(OBJDIR_DEBUG)/src/Chain.o: src/Chain.cpp
 
 $(OBJDIR_DEBUG)/src/DefaultBinaryPathSelector.o: src/DefaultBinaryPathSelector.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/DefaultBinaryPathSelector.cpp -o $(OBJDIR_DEBUG)/src/DefaultBinaryPathSelector.o
+
+$(OBJDIR_DEBUG)/src/DefaultConfigurationAlgorithm.o: src/DefaultConfigurationAlgorithm.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/DefaultConfigurationAlgorithm.cpp -o $(OBJDIR_DEBUG)/src/DefaultConfigurationAlgorithm.o
 
 $(OBJDIR_DEBUG)/src/DefaultTableBasedPathSelector.o: src/DefaultTableBasedPathSelector.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/DefaultTableBasedPathSelector.cpp -o $(OBJDIR_DEBUG)/src/DefaultTableBasedPathSelector.o
@@ -194,6 +199,9 @@ $(OBJDIR_RELEASE)/src/Chain.o: src/Chain.cpp
 
 $(OBJDIR_RELEASE)/src/DefaultBinaryPathSelector.o: src/DefaultBinaryPathSelector.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/DefaultBinaryPathSelector.cpp -o $(OBJDIR_RELEASE)/src/DefaultBinaryPathSelector.o
+
+$(OBJDIR_RELEASE)/src/DefaultConfigurationAlgorithm.o: src/DefaultConfigurationAlgorithm.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/DefaultConfigurationAlgorithm.cpp -o $(OBJDIR_RELEASE)/src/DefaultConfigurationAlgorithm.o
 
 $(OBJDIR_RELEASE)/src/DefaultTableBasedPathSelector.o: src/DefaultTableBasedPathSelector.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/DefaultTableBasedPathSelector.cpp -o $(OBJDIR_RELEASE)/src/DefaultTableBasedPathSelector.o

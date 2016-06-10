@@ -29,7 +29,8 @@ class UT_DataCycle : public CxxTest::TestSuite
 
   // ================ Test Methods ================
 
-  void test_SimpleDataCycle ();
+  void test_SimpleDataCycle_Without_ConfAlgo ();
+  void test_SimpleDataCycle_With_DefaultConfAlgo ();
 
   // ================ Other Methods ================
 

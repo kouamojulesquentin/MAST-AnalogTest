@@ -102,21 +102,11 @@ class SystemModelBuilder final
   std::shared_ptr<mast::Chain>           Create_Default_MIB  (std::experimental::string_view name, uint32_t maxDerivations);
   std::shared_ptr<mast::Chain>           Create_1500_Wrapper (std::experimental::string_view name, uint32_t maxDerivations);
 
-
-//+  static std::shared_ptr<ParentNode>  Append (std::shared_ptr<SystemModelNode> child, std::shared_ptr<ParentNode> parent);
-
-  // ---------------- Protected Methods
-  //
-  protected:
-
-  // ---------------- Private  Methods
-  //
-  private:
+  std::shared_ptr<mast::Chain>           Create_Simple_MIB   (std::experimental::string_view rootName = "Sut");
 
   // ---------------- Private  Fields
   //
   private:
-
   mast::SystemModel& m_model;
 };
 //

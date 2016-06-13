@@ -29,6 +29,7 @@ using std::make_tuple;
 
 namespace
 {
+
 //! Creates SystemModel structure for tests using "AccessInterface" scenario
 //!
 SystemModel Create_SimpleMIB ()
@@ -36,16 +37,13 @@ SystemModel Create_SimpleMIB ()
   SystemModel        sm;
   SystemModelBuilder builder(sm);
 
-  auto root         = sm.CreateChain    ("Sut");
-  auto regStatic    = sm.CreateRegister ("static",    BinaryVector(STATIC_TDR_LEN, 0x00, SizeProperty::Fixed),  root);
-  auto mib          = sm.CreateChain    ("MIB",       root);
-  auto mib_Ctrl     = sm.CreateRegister ("MIB_Ctrl",  BinaryVector(2U, 0u, SizeProperty::Fixed), true, mib);
-  auto pathSelector = make_shared<DefaultBinaryPathSelector>(mib_Ctrl, 4u);
-  auto mux          = sm.CreateLinker   ("MIB_Mux",   pathSelector,                  mib);
-  auto regDyn_0     = sm.CreateRegister ("dynamic_0", BinaryVector(DYNAMIC_TDR_LEN), mux);
-  auto regDyn_1     = sm.CreateRegister ("dynamic_1", BinaryVector(DYNAMIC_TDR_LEN), mux);
-  auto regDyn_2     = sm.CreateRegister ("dynamic_2", BinaryVector(DYNAMIC_TDR_LEN), mux);
-  auto regDyn_3     = sm.CreateRegister ("dynamic_3", BinaryVector(DYNAMIC_TDR_LEN), mux);
+  auto root      = builder.Create_Simple_MIB();
+  auto mib_Ctrl  = sm.RegisterWithId(3u);
+  auto regStatic = sm.RegisterWithId(1u);
+  auto regDyn_0  = sm.RegisterWithId(5u);
+  auto regDyn_1  = sm.RegisterWithId(6u);
+  auto regDyn_2  = sm.RegisterWithId(7u);
+  auto regDyn_3  = sm.RegisterWithId(8u);
 
   mib_Ctrl->SetToSut   (BinaryVector::CreateFromBinaryString("11"));
   regStatic->SetToSut  (BinaryVector(STATIC_TDR_LEN,  0x05));

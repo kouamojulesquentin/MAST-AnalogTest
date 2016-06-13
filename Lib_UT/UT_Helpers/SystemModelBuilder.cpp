@@ -334,6 +334,30 @@ shared_ptr<Chain> SystemModelBuilder::Create_MIB (string_view              name,
 //---------------------------------------------------------------------------
 
 
+//! Creates very simple MIB structure
+//!
+shared_ptr<mast::Chain> SystemModelBuilder::Create_Simple_MIB (std::experimental::string_view rootName)
+{
+  auto root         = m_model.CreateChain    (rootName);
+  auto regStatic    = m_model.CreateRegister ("static",    BinaryVector(STATIC_TDR_LEN, 0x00, SizeProperty::Fixed),  root);
+  auto mib          = m_model.CreateChain    ("MIB",       root);
+  auto mib_Ctrl     = m_model.CreateRegister ("MIB_Ctrl",  BinaryVector(2U, 0u, SizeProperty::Fixed), true, mib);
+  auto pathSelector = make_shared<DefaultBinaryPathSelector>(mib_Ctrl, 4u);
+  auto mux          = m_model.CreateLinker   ("MIB_Mux",   pathSelector, mib);
+
+  m_model.CreateRegister ("dynamic_0", BinaryVector(DYNAMIC_TDR_LEN), mux);
+  m_model.CreateRegister ("dynamic_1", BinaryVector(DYNAMIC_TDR_LEN), mux);
+  m_model.CreateRegister ("dynamic_2", BinaryVector(DYNAMIC_TDR_LEN), mux);
+  m_model.CreateRegister ("dynamic_3", BinaryVector(DYNAMIC_TDR_LEN), mux);
+
+  return root;
+}
+//
+//  End of SystemModelBuilder::Create_Simple_MIB
+//---------------------------------------------------------------------------
+
+
+
 
 //===========================================================================
 // End of SystemModelBuilder.cpp

@@ -25,6 +25,7 @@ DEPENDPATH += $$PWD/../Lib/include \
 
 SOURCES += \
     Generated/Runner.cpp                         \
+    SystemModel/Spy_AccessInterfaceProtocols.cpp \
     SystemModel/UT_ConfigureVisitor.cpp          \
     SystemModel/UT_DataCycle.cpp                 \
     SystemModel/UT_DefaultBinaryPathSelector.cpp \
@@ -36,6 +37,7 @@ SOURCES += \
     SystemModel/UT_SystemModel.cpp               \
     SystemModel/UT_SystemModelCheckerVisitor.cpp \
     SystemModel/UT_ToSutVisitor.cpp              \
+    SystemModel/UT_SystemModelManager.cpp        \
     SystemModel/UT_SystemModelNode.cpp           \
     UT_Helpers/SystemModelBuilder.cpp            \
     UT_Helpers/UT_SystemModelBuilder.cpp         \
@@ -47,6 +49,7 @@ SOURCES += \
 HEADERS += \
     CxxTest_Traits/BinaryVector_Traits.hpp           \
     CxxTest_Traits/SystemModelCheckResult_Traits.hpp \
+    SystemModel/Spy_AccessInterfaceProtocols.cpp     \
     SystemModel/UT_ConfigureVisitor.cpp              \
     SystemModel/UT_DataCycle.hpp                     \
     SystemModel/UT_DefaultBinaryPathSelector.hpp     \
@@ -58,6 +61,7 @@ HEADERS += \
     SystemModel/UT_SystemModel.hpp                   \
     SystemModel/UT_SystemModelCheckerVisitor.hpp     \
     SystemModel/UT_ToSutVisitor.hpp                  \
+    SystemModel/UT_SystemModelManager.hpp            \
     SystemModel/UT_SystemModelNode.hpp               \
     UT_Helpers/SystemModelBuilder.hpp                \
     UT_Helpers/UT_SystemModelBuilder.hpp             \

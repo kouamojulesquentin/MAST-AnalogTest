@@ -30,7 +30,8 @@ Suites = \
       $(UT_RootPath)/SystemModel/UT_ConfigureVisitor.hpp          \
       $(UT_RootPath)/SystemModel/UT_FromSutUpdater.hpp            \
       $(UT_RootPath)/SystemModel/UT_ToSutVisitor.hpp              \
-      $(UT_RootPath)/SystemModel/UT_DataCycle.hpp
+      $(UT_RootPath)/SystemModel/UT_DataCycle.hpp                 \
+      $(UT_RootPath)/SystemModel/UT_SystemModelManager.hpp
 
 
 ProjectFile  = $(RootPath)/Lib_UT.cbp \

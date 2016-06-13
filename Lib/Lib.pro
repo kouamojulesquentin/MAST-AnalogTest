@@ -34,6 +34,7 @@ SOURCES +=  \
     src/Register.cpp                       \
     src/SVFVector.cpp                      \
     src/SystemModel.cpp                    \
+    src/SystemModelManager.cpp             \
     src/SystemModelCheckerVisitor.cpp      \
     src/SystemModelCheckResult.cpp         \
     src/SystemModelVisitor.cpp             \
@@ -66,6 +67,7 @@ HEADERS += \
     include/Register.hpp                       \
     include/SVFVector.hpp                      \
     include/SystemModel.hpp                    \
+    include/SystemModelManager.hpp             \
     include/SystemModelCheckerVisitor.hpp      \
     include/SystemModelCheckResult.hpp         \
     include/SystemModelNode.hpp                \

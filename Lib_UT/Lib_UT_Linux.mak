@@ -48,12 +48,14 @@ OBJ_DEBUG = \
             $(OBJDIR_DEBUG)/Utility/UT_BinaryVector.o                      \
             $(OBJDIR_DEBUG)/UT_Helpers/UT_SystemModelBuilder.o             \
             $(OBJDIR_DEBUG)/UT_Helpers/SystemModelBuilder.o                \
+            $(OBJDIR_DEBUG)/SystemModel/Spy_AccessInterfaceProtocols.o     \
             $(OBJDIR_DEBUG)/SystemModel/UT_SystemModel.o                   \
             $(OBJDIR_DEBUG)/SystemModel/UT_FromSutUpdater.o                \
             $(OBJDIR_DEBUG)/SystemModel/UT_ToSutVisitor.o                  \
             $(OBJDIR_DEBUG)/SystemModel/UT_DataCycle.o                     \
             $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelCheckerVisitor.o     \
             $(OBJDIR_DEBUG)/SystemModel/UT_Register.o                      \
+            $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelManager.o            \
             $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelNode.o               \
             $(OBJDIR_DEBUG)/SystemModel/UT_PrettyPrinterVisitor.o          \
             $(OBJDIR_DEBUG)/SystemModel/UT_PropagatePendingVisitor.o       \
@@ -68,12 +70,14 @@ OBJ_RELEASE = \
               $(OBJDIR_RELEASE)/Utility/UT_BinaryVector.o                  \
               $(OBJDIR_RELEASE)/UT_Helpers/UT_SystemModelBuilder.o         \
               $(OBJDIR_RELEASE)/UT_Helpers/SystemModelBuilder.o            \
+              $(OBJDIR_RELEASE)/SystemModel/Spy_AccessInterfaceProtocols.o \
               $(OBJDIR_RELEASE)/SystemModel/UT_SystemModel.o               \
               $(OBJDIR_RELEASE)/SystemModel/UT_FromSutUpdater.o            \
               $(OBJDIR_RELEASE)/SystemModel/UT_ToSutVisitor.o              \
               $(OBJDIR_RELEASE)/SystemModel/UT_DataCycle.o                 \
               $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelCheckerVisitor.o \
               $(OBJDIR_RELEASE)/SystemModel/UT_Register.o                  \
+              $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelManager.o        \
               $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelNode.o           \
               $(OBJDIR_RELEASE)/SystemModel/UT_PrettyPrinterVisitor.o      \
               $(OBJDIR_RELEASE)/SystemModel/UT_PropagatePendingVisitor.o   \
@@ -110,6 +114,9 @@ $(OBJDIR_DEBUG)/UT_Helpers/SystemModelBuilder.o: UT_Helpers/SystemModelBuilder.c
 $(OBJDIR_DEBUG)/UT_Helpers/UT_SystemModelBuilder.o: UT_Helpers/UT_SystemModelBuilder.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c UT_Helpers/UT_SystemModelBuilder.cpp -o $(OBJDIR_DEBUG)/UT_Helpers/UT_SystemModelBuilder.o
 
+$(OBJDIR_DEBUG)/SystemModel/Spy_AccessInterfaceProtocols.o: SystemModel/Spy_AccessInterfaceProtocols.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/Spy_AccessInterfaceProtocols.cpp -o $(OBJDIR_DEBUG)/SystemModel/Spy_AccessInterfaceProtocols.o
+
 $(OBJDIR_DEBUG)/SystemModel/UT_DefaultBinaryPathSelector.o: SystemModel/UT_DefaultBinaryPathSelector.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_DefaultBinaryPathSelector.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_DefaultBinaryPathSelector.o
 
@@ -127,6 +134,9 @@ $(OBJDIR_DEBUG)/SystemModel/UT_PropagatePendingVisitor.o: SystemModel/UT_Propaga
 
 $(OBJDIR_DEBUG)/SystemModel/UT_Register.o: SystemModel/UT_Register.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_Register.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_Register.o
+
+$(OBJDIR_DEBUG)/SystemModel/UT_SystemModelManager.o: SystemModel/UT_SystemModelManager.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_SystemModelManager.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelManager.o
 
 $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelNode.o: SystemModel/UT_SystemModelNode.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_SystemModelNode.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelNode.o
@@ -188,6 +198,9 @@ $(OBJDIR_RELEASE)/UT_Helpers/SystemModelBuilder.o: UT_Helpers/SystemModelBuilder
 $(OBJDIR_RELEASE)/UT_Helpers/UT_SystemModelBuilder.o: UT_Helpers/UT_SystemModelBuilder.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c UT_Helpers/UT_SystemModelBuilder.cpp -o $(OBJDIR_RELEASE)/UT_Helpers/UT_SystemModelBuilder.o
 
+$(OBJDIR_RELEASE)/SystemModel/Spy_AccessInterfaceProtocols.o: SystemModel/Spy_AccessInterfaceProtocols.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/Spy_AccessInterfaceProtocols.cpp -o $(OBJDIR_RELEASE)/SystemModel/Spy_AccessInterfaceProtocols.o
+
 $(OBJDIR_RELEASE)/SystemModel/UT_DefaultBinaryPathSelector.o: SystemModel/UT_DefaultBinaryPathSelector.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_DefaultBinaryPathSelector.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_DefaultBinaryPathSelector.o
 
@@ -205,6 +218,9 @@ $(OBJDIR_RELEASE)/SystemModel/UT_PropagatePendingVisitor.o: SystemModel/UT_Propa
 
 $(OBJDIR_RELEASE)/SystemModel/UT_Register.o: SystemModel/UT_Register.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_Register.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_Register.o
+
+$(OBJDIR_RELEASE)/SystemModel/UT_SystemModelManager.o: SystemModel/UT_SystemModelManager.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_SystemModelManager.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelManager.o
 
 $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelNode.o: SystemModel/UT_SystemModelNode.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_SystemModelNode.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelNode.o

@@ -30,6 +30,7 @@ SOURCES +=  \
     src/Linker.cpp                         \
     src/ParentNode.cpp                     \
     src/PrettyPrinterVisitor.cpp           \
+    src/PropagatePendingVisitor.cpp        \
     src/Register.cpp                       \
     src/SVFVector.cpp                      \
     src/SystemModel.cpp                    \
@@ -61,6 +62,7 @@ HEADERS += \
     include/PostConditionVisitor.hpp           \
     include/PreconditionVisitor.hpp            \
     include/PrettyPrinterVisitor.hpp           \
+    include/PropagatePendingVisitor.hpp        \
     include/Register.hpp                       \
     include/SVFVector.hpp                      \
     include/SystemModel.hpp                    \

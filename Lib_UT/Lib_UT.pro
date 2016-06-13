@@ -31,6 +31,7 @@ SOURCES += \
     SystemModel/UT_FromSutUpdater.cpp            \
     SystemModel/UT_GmlPrinterVisitor.cpp         \
     SystemModel/UT_PrettyPrinterVisitor.cpp      \
+    SystemModel/UT_PropagatePendingVisitor.cpp   \
     SystemModel/UT_Register.cpp                  \
     SystemModel/UT_SystemModel.cpp               \
     SystemModel/UT_SystemModelCheckerVisitor.cpp \
@@ -52,6 +53,7 @@ HEADERS += \
     SystemModel/UT_FromSutUpdater.hpp                \
     SystemModel/UT_GmlPrinterVisitor.hpp             \
     SystemModel/UT_PrettyPrinterVisitor.hpp          \
+    SystemModel/UT_PropagatePendingVisitor.hpp       \
     SystemModel/UT_Register.hpp                      \
     SystemModel/UT_SystemModel.hpp                   \
     SystemModel/UT_SystemModelCheckerVisitor.hpp     \

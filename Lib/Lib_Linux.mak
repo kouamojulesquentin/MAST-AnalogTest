@@ -55,6 +55,7 @@ OBJ_DEBUG = $(OBJDIR_DEBUG)/src/AccessInterface.o                 \
             $(OBJDIR_DEBUG)/src/Linker.o                          \
             $(OBJDIR_DEBUG)/src/ParentNode.o                      \
             $(OBJDIR_DEBUG)/src/PrettyPrinterVisitor.o            \
+            $(OBJDIR_DEBUG)/src/PropagatePendingVisitor.o         \
             $(OBJDIR_DEBUG)/src/Register.o                        \
             $(OBJDIR_DEBUG)/src/SVFVector.o                       \
             $(OBJDIR_DEBUG)/src/SystemModel.o                     \
@@ -78,6 +79,7 @@ OBJ_RELEASE = $(OBJDIR_RELEASE)/src/AccessInterface.o               \
             $(OBJDIR_RELEASE)/src/Linker.o                          \
             $(OBJDIR_RELEASE)/src/ParentNode.o                      \
             $(OBJDIR_RELEASE)/src/PrettyPrinterVisitor.o            \
+            $(OBJDIR_RELEASE)/src/PropagatePendingVisitor.o         \
             $(OBJDIR_RELEASE)/src/Register.o                        \
             $(OBJDIR_RELEASE)/src/SVFVector.o                       \
             $(OBJDIR_RELEASE)/src/SystemModel.o                     \
@@ -141,6 +143,9 @@ $(OBJDIR_DEBUG)/src/ParentNode.o: src/ParentNode.cpp
 
 $(OBJDIR_DEBUG)/src/PrettyPrinterVisitor.o: src/PrettyPrinterVisitor.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/PrettyPrinterVisitor.cpp -o $(OBJDIR_DEBUG)/src/PrettyPrinterVisitor.o
+
+$(OBJDIR_DEBUG)/src/PropagatePendingVisitor.o: src/PropagatePendingVisitor.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/PropagatePendingVisitor.cpp -o $(OBJDIR_DEBUG)/src/PropagatePendingVisitor.o
 
 $(OBJDIR_DEBUG)/src/Register.o: src/Register.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/Register.cpp -o $(OBJDIR_DEBUG)/src/Register.o
@@ -223,6 +228,9 @@ $(OBJDIR_RELEASE)/src/ParentNode.o: src/ParentNode.cpp
 
 $(OBJDIR_RELEASE)/src/PrettyPrinterVisitor.o: src/PrettyPrinterVisitor.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/PrettyPrinterVisitor.cpp -o $(OBJDIR_RELEASE)/src/PrettyPrinterVisitor.o
+
+$(OBJDIR_RELEASE)/src/PropagatePendingVisitor.o: src/PropagatePendingVisitor.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/PropagatePendingVisitor.cpp -o $(OBJDIR_RELEASE)/src/PropagatePendingVisitor.o
 
 $(OBJDIR_RELEASE)/src/Register.o: src/Register.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/Register.cpp -o $(OBJDIR_RELEASE)/src/Register.o

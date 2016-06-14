@@ -132,7 +132,7 @@ std::shared_ptr<Chain> SystemModelBuilder::Create_1500_Wrapper (string_view name
 
   // ---------------- SWIR
   //
-  auto swirSelectorReg = m_model.CreateRegister ("SWIR"s + MIB_CTRL_EXT, BinaryVector::CreateFromBinaryString("01"), true);
+  auto swirSelectorReg = m_model.CreateRegister ("SWIR"s + MIB_CTRL_EXT, BinaryVector::CreateFromBinaryString("0"), true);
   auto swirSelector    = make_shared<DefaultBinaryPathSelector>(swirSelectorReg, 2);
   auto swirMib         = Create_MIB("SWIR", swirSelector, swirSelectorReg, MuxRegPlacement::BeforeMux);
   wrapper->AppendChild(swirMib);

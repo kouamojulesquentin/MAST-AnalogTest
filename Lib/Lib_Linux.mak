@@ -43,7 +43,7 @@ DEP_RELEASE =
 OUT_RELEASE = ../bin/release/Lib.so
 
 OBJ_DEBUG = $(OBJDIR_DEBUG)/src/AccessInterface.o                 \
-            $(OBJDIR_DEBUG)/src/AccessInterfaceProtocol_1149_1.o  \
+            $(OBJDIR_DEBUG)/src/LoopbackAccessInterfaceProtocol.o  \
             $(OBJDIR_DEBUG)/src/BinaryVector.o                    \
             $(OBJDIR_DEBUG)/src/Chain.o                           \
             $(OBJDIR_DEBUG)/src/DefaultBinaryPathSelector.o       \
@@ -68,7 +68,7 @@ OBJ_DEBUG = $(OBJDIR_DEBUG)/src/AccessInterface.o                 \
             $(OBJDIR_DEBUG)/src/Utility.o
 
 OBJ_RELEASE = $(OBJDIR_RELEASE)/src/AccessInterface.o               \
-            $(OBJDIR_RELEASE)/src/AccessInterfaceProtocol_1149_1.o  \
+            $(OBJDIR_RELEASE)/src/LoopbackAccessInterfaceProtocol.o  \
             $(OBJDIR_RELEASE)/src/BinaryVector.o                    \
             $(OBJDIR_RELEASE)/src/Chain.o                           \
             $(OBJDIR_RELEASE)/src/DefaultBinaryPathSelector.o       \
@@ -110,8 +110,8 @@ out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 $(OBJDIR_DEBUG)/src/AccessInterface.o: src/AccessInterface.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/AccessInterface.cpp -o $(OBJDIR_DEBUG)/src/AccessInterface.o
 
-$(OBJDIR_DEBUG)/src/AccessInterfaceProtocol_1149_1.o: src/AccessInterfaceProtocol_1149_1.cpp
-> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/AccessInterfaceProtocol_1149_1.cpp -o $(OBJDIR_DEBUG)/src/AccessInterfaceProtocol_1149_1.o
+$(OBJDIR_DEBUG)/src/LoopbackAccessInterfaceProtocol.o: src/LoopbackAccessInterfaceProtocol.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/LoopbackAccessInterfaceProtocol.cpp -o $(OBJDIR_DEBUG)/src/LoopbackAccessInterfaceProtocol.o
 
 $(OBJDIR_DEBUG)/src/BinaryVector.o: src/BinaryVector.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/BinaryVector.cpp -o $(OBJDIR_DEBUG)/src/BinaryVector.o
@@ -198,8 +198,8 @@ out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 $(OBJDIR_RELEASE)/src/AccessInterface.o: src/AccessInterface.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/AccessInterface.cpp -o $(OBJDIR_RELEASE)/src/AccessInterface.o
 
-$(OBJDIR_RELEASE)/src/AccessInterfaceProtocol_1149_1.o: src/AccessInterfaceProtocol_1149_1.cpp
-> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/AccessInterfaceProtocol_1149_1.cpp -o $(OBJDIR_RELEASE)/src/AccessInterfaceProtocol_1149_1.o
+$(OBJDIR_RELEASE)/src/LoopbackAccessInterfaceProtocol.o: src/LoopbackAccessInterfaceProtocol.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/LoopbackAccessInterfaceProtocol.cpp -o $(OBJDIR_RELEASE)/src/LoopbackAccessInterfaceProtocol.o
 
 $(OBJDIR_RELEASE)/src/BinaryVector.o: src/BinaryVector.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/BinaryVector.cpp -o $(OBJDIR_RELEASE)/src/BinaryVector.o

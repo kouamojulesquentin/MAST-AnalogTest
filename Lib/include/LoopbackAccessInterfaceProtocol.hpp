@@ -1,33 +1,34 @@
 //===========================================================================
-//                           AccessInterfaceProtocol_1149_1.hpp
+//                           LoopbackAccessInterfaceProtocol.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file AccessInterfaceProtocol_1149_1.hpp
+//! @file LoopbackAccessInterfaceProtocol.hpp
 //!
-//! Declares AccessInterfaceProtocol_1149_1 class
+//! Declares LoopbackAccessInterfaceProtocol class
 //!
 //===========================================================================
 
-
-#ifndef ACCESSINTERFACEPROTOCOL_1149_1_H__A048AC53_C7DE_47DE_E5AB_F9A8AB33D31F__INCLUDED_
-  #define ACCESSINTERFACEPROTOCOL_1149_1_H__A048AC53_C7DE_47DE_E5AB_F9A8AB33D31F__INCLUDED_
+#ifndef LOOPBACKACCESSINTERFACEPROTOCOL_H__7EA95A6E_19D8_4B68_B28A_6C501BCEC0FA__INCLUDED_
+  #define LOOPBACKACCESSINTERFACEPROTOCOL_H__7EA95A6E_19D8_4B68_B28A_6C501BCEC0FA__INCLUDED_
 
 #include "AccessInterfaceProtocol.hpp"
 
 namespace mast
 {
-//! Implements AccessInterfaceProtocol for tap (1149.1)
+//! Implements AccessInterfaceProtocol that only loop back.
 //!
-class AccessInterfaceProtocol_1149_1 : public AccessInterfaceProtocol
+//! @note This is mainly provided for tests purposes
+//!
+class LoopbackAccessInterfaceProtocol : public AccessInterfaceProtocol
 {
   // ---------------- Public  Methods
   //
   public:
-  ~AccessInterfaceProtocol_1149_1() = default;
-  AccessInterfaceProtocol_1149_1()  = default;
+  ~LoopbackAccessInterfaceProtocol() = default;
+  LoopbackAccessInterfaceProtocol()  = default;
 
   //! Does any action required to transfer scan data to and from SUT
   //!
@@ -51,15 +52,12 @@ class AccessInterfaceProtocol_1149_1 : public AccessInterfaceProtocol
   private:
 };
 //
-//  End of AccessInterfaceProtocol_1149_1 class declaration
+//  End of LoopbackAccessInterfaceProtocol class declaration
 //---------------------------------------------------------------------------
 } // End of namespace mast
 
-
-
-
-#endif  // not defined ACCESSINTERFACEPROTOCOL_1149_1_H__A048AC53_C7DE_47DE_E5AB_F9A8AB33D31F__INCLUDED_
+#endif  // not defined LOOPBACKACCESSINTERFACEPROTOCOL_H__7EA95A6E_19D8_4B68_B28A_6C501BCEC0FA__INCLUDED_
 
 //===========================================================================
-// End of AccessInterfaceProtocol_1149_1.hpp
+// End of LoopbackAccessInterfaceProtocol.hpp
 //===========================================================================

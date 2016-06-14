@@ -1,17 +1,17 @@
 //===========================================================================
-//                           AccessInterfaceProtocol_1149_1.cpp
+//                           LoopbackAccessInterfaceProtocol.cpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file AccessInterfaceProtocol_1149_1.cpp
+//! @file LoopbackAccessInterfaceProtocol.cpp
 //!
-//! Implements class AccessInterfaceProtocol_1149_1
+//! Implements class LoopbackAccessInterfaceProtocol
 //!
 //===========================================================================
 
-#include "AccessInterfaceProtocol_1149_1.hpp"
+#include "LoopbackAccessInterfaceProtocol.hpp"
 
 using namespace mast;
 
@@ -23,19 +23,19 @@ using namespace mast;
 //! @param toSutData      Bits stream to transfer to SUT
 //!
 //! @return Bits stream retrieved from SUT
-BinaryVector AccessInterfaceProtocol_1149_1::DoAction (uint32_t /* derivationId */, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector LoopbackAccessInterfaceProtocol::DoAction (uint32_t /* derivationId */, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   auto fromSut = toSutData;
 
   return fromSut;
 }
 //
-//  End of: AccessInterfaceProtocol_1149_1::DoAction
+//  End of: LoopbackAccessInterfaceProtocol::DoAction
 //---------------------------------------------------------------------------
 
 
 
 
 //===========================================================================
-// End of AccessInterfaceProtocol_1149_1.cpp
+// End of LoopbackAccessInterfaceProtocol.cpp
 //===========================================================================

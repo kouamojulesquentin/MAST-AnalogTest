@@ -16,7 +16,7 @@
 #include "Utility.hpp"
 #include "DefaultTableBasedPathSelector.hpp"
 #include "DefaultBinaryPathSelector.hpp"
-#include "AccessInterfaceProtocol_1149_1.hpp"
+#include "LoopbackAccessInterfaceProtocol.hpp"
 #include "SystemModelCheckerVisitor.hpp"
 #include <string>
 
@@ -186,7 +186,7 @@ shared_ptr<AccessInterface> SystemModel::CreateTap (string_view name,
   auto muxName    = noName ? DEFAULT_TAP_MUX_NAME     : string(name) + DEFAULT_TAP_MUX_EXT;
   auto muxBpyName = noName ? DEFAULT_TAP_MUX_BPY_NAME : string(name) + DEFAULT_TAP_MUX_BPY_EXT;
 
-  auto protocol        = make_shared<AccessInterfaceProtocol_1149_1>();
+  auto protocol        = make_shared<LoopbackAccessInterfaceProtocol>(); // This is the default for test, use must provide its own
   auto accessInterface = CreateAccessInterface(rootName, protocol);
 
   // ---------------- Create IR

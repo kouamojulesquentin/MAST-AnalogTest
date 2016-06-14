@@ -18,7 +18,7 @@ INCLUDEPATH = include public_include
 
 SOURCES +=  \
     src/AccessInterface.cpp                \
-    src/AccessInterfaceProtocol_1149_1.cpp \
+    src/LoopbackAccessInterfaceProtocol.cpp \
     src/BinaryVector.cpp                   \
     src/Chain.cpp                          \
     src/ConfigureVisitor.cpp               \
@@ -45,7 +45,7 @@ SOURCES +=  \
 HEADERS += \
     include/AccessInterface.hpp                \
     include/AccessInterfaceProtocol.hpp        \
-    include/AccessInterfaceProtocol_1149_1.hpp \
+    include/LoopbackAccessInterfaceProtocol.hpp \
     include/BinaryVector.hpp                   \
     include/Chain.hpp                          \
     include/ConfigurationAlgorithm.hpp         \

@@ -15,6 +15,7 @@
 #include "SystemModelManager.hpp"
 #include "SystemModelBuilder.hpp"
 #include "Spy_AccessInterfaceProtocols.hpp"
+#include "Spy_SVF_Protocol.hpp"
 #include "GmlPrinterVisitor.hpp"
 #include "BinaryVector_Traits.hpp"
 
@@ -22,7 +23,51 @@ using namespace mast;
 using namespace test;
 using std::make_shared;
 using std::make_tuple;
+using std::string;
+using std::vector;
 
+namespace
+{
+
+//! Creates test case "1500", setting some register "next to sut" values
+//!
+std::shared_ptr<AccessInterface> Create_TestCase_1500 (SystemModel& sm)
+{
+  SystemModelBuilder builder(sm);
+
+  auto ai        = builder.Create_TestCase_1500("Tap", 4u);
+  auto ir        = sm.RegisterWithId(1u);
+  auto bpy       = sm.RegisterWithId(3u);
+  auto regStatic = sm.RegisterWithId(5u);
+  auto regDyn_0  = sm.RegisterWithId(14u);
+  auto regDyn_1  = sm.RegisterWithId(15u);
+  auto regDyn_2  = sm.RegisterWithId(16u);
+  auto regDyn_3  = sm.RegisterWithId(17u);
+
+  regStatic->SetToSut  (BinaryVector(STATIC_TDR_LEN,  0x05));
+  regDyn_0->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x09));
+  regDyn_1->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x0A));
+  regDyn_2->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0xB0));
+  regDyn_3->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0xC0));
+
+  regStatic->SetBypass (BinaryVector(STATIC_TDR_LEN,  0x36));
+  regDyn_0->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x40));
+  regDyn_1->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x41));
+  regDyn_2->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x42));
+  regDyn_3->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x43));
+
+//+  GmlPrinterVisitor gmlPrinter("Testcase_1500", true, true, true);
+//+  ai->Accept(gmlPrinter);
+//+  TS_ASSERT_EQUALS (gmlPrinter.Graph(), "");
+
+  return ai;
+}
+//
+//  End of: Create_TestCase_1500
+//---------------------------------------------------------------------------
+
+
+} // End of unnamed namespace
 
 //! Initializes test (called for each test)
 void UT_SystemModelManager::setUp ()
@@ -170,7 +215,6 @@ void UT_SystemModelManager::test_DoDataCycles_AccessInterface ()
     BinaryVector::CreateFromString("/x01"),   // 02 : IR
     BinaryVector::CreateFromString("/x0A0A"), // 03 : DR (reg_1)
     BinaryVector::CreateFromString("/xFF"),   // 04 : IR
-    BinaryVector::CreateFromString("/b1"),    // 05 : DR (BPY)
   };
 
   TS_ASSERT_EQUALS (gotSutVectors, expected);
@@ -186,33 +230,10 @@ void UT_SystemModelManager::test_DoDataCycles_1500 ()
   SystemModel sm;
   SystemModelBuilder builder(sm);
 
-  auto ai        = builder.Create_TestCase_1500("Tap", 4u);
-  auto ir        = sm.RegisterWithId(1u);
-  auto bpy       = sm.RegisterWithId(3u);
-  auto regStatic = sm.RegisterWithId(5u);
-  auto regDyn_0  = sm.RegisterWithId(14u);
-  auto regDyn_1  = sm.RegisterWithId(15u);
-  auto regDyn_2  = sm.RegisterWithId(16u);
-  auto regDyn_3  = sm.RegisterWithId(17u);
-
-  regStatic->SetToSut  (BinaryVector(STATIC_TDR_LEN,  0x05));
-  regDyn_0->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x09));
-  regDyn_1->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x0A));
-  regDyn_2->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0xB0));
-  regDyn_3->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0xC0));
-
-  regStatic->SetBypass (BinaryVector(STATIC_TDR_LEN,  0x36));
-  regDyn_0->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x40));
-  regDyn_1->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x41));
-  regDyn_2->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x42));
-  regDyn_3->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x43));
+  auto ai        = Create_TestCase_1500(sm);
 
   auto spy = make_shared<Spy_AccessInterfaceProtocols>();
   ai->SetProtocol (spy);
-
-//+  GmlPrinterVisitor gmlPrinter("Testcase_1500", true, true, true);
-//+  ai->Accept(gmlPrinter);
-//+  TS_ASSERT_EQUALS (gmlPrinter.Graph(), "");
 
   SystemModelManager sut(sm);
 
@@ -226,36 +247,77 @@ void UT_SystemModelManager::test_DoDataCycles_1500 ()
 
   std::vector<mast::BinaryVector> expected
   {
-    BinaryVector::CreateFromString("/x01"),                  // 00 : IR
-    BinaryVector::CreateFromString("/x0505/b00:100"),        // 01 : DR
-    BinaryVector::CreateFromString("/x01"),                  // 02 : IR
-    BinaryVector::CreateFromString("/x3636/b01/xC0C0_C0C0"), // 03 : DR
-    BinaryVector::CreateFromString("/x01"),                  // 04 : IR
-    BinaryVector::CreateFromString("/x3636/b00:011"),        // 05 : DR
-    BinaryVector::CreateFromString("/x01"),                  // 06 : IR
-    BinaryVector::CreateFromString("/x3636/b01/xB0B0_B0B0"), // 07 : DR
-    BinaryVector::CreateFromString("/x01"),                  // 08 : IR
-    BinaryVector::CreateFromString("/x3636/b00:010"),        // 09 : DR
-    BinaryVector::CreateFromString("/x01"),                  // 10 : IR
-    BinaryVector::CreateFromString("/x3636/b01/x0A0A_0A0A"), // 11 : DR
-    BinaryVector::CreateFromString("/x01"),                  // 12 : IR
-    BinaryVector::CreateFromString("/x3636/b00:001"),        // 13 : DR
-    BinaryVector::CreateFromString("/x01"),                  // 14 : IR
-    BinaryVector::CreateFromString("/x3636/b00/x0909_0909"), // 15 : DR
-    BinaryVector::CreateFromString("/x01"),                  // 16 : IR
-    BinaryVector::CreateFromString("/x3636/b01/x4040_4040"), // 17 : DR
-    BinaryVector::CreateFromString("/x01"),                  // 18 : IR
-    BinaryVector::CreateFromString("/x3636/b01:000"),        // 19 : DR
-    BinaryVector::CreateFromString("/xFF"),                  // 20 : IR
-    BinaryVector::CreateFromString("/b1"),                   // 21 : DR
-    BinaryVector::CreateFromString("/x01"),                  // 22 : IR
-    BinaryVector::CreateFromString("/x3636/b00:000"),        // 23 : DR
-    BinaryVector::CreateFromString("/xFF"),                  // 24 : IR
-    BinaryVector::CreateFromString("/b1"),                   // 25 : DR
+    BinaryVector::CreateFromString("/x01"),                 // 00 : IR
+    BinaryVector::CreateFromString("/x0505/b10"),           // 01 : DR
+    BinaryVector::CreateFromString("/x3636/b0:100"),        // 02 : DR
+    BinaryVector::CreateFromString("/x3636/b1/xC0C0_C0C0"), // 03 : DR
+    BinaryVector::CreateFromString("/x3636/b0:011"),        // 04 : DR
+    BinaryVector::CreateFromString("/x3636/b1/xB0B0_B0B0"), // 05 : DR
+    BinaryVector::CreateFromString("/x3636/b0:010"),        // 06 : DR
+    BinaryVector::CreateFromString("/x3636/b1/x0A0A_0A0A"), // 07 : DR
+    BinaryVector::CreateFromString("/x3636/b0:001"),        // 08 : DR
+    BinaryVector::CreateFromString("/x3636/b0/x0909_0909"), // 09 : DR
+    BinaryVector::CreateFromString("/x3636/b1/x4040_4040"), // 10 : DR
+    BinaryVector::CreateFromString("/x3636/b1:000"),        // 11 : DR
+    BinaryVector::CreateFromString("/xFF"),                 // 12 : IR
+    BinaryVector::CreateFromString("/b1"),                  // 13 : DR
+    BinaryVector::CreateFromString("/x01"),                 // 14 : IR
+    BinaryVector::CreateFromString("/x3636/b0:000"),        // 15 : DR
+    BinaryVector::CreateFromString("/xFF"),                 // 16 : IR
   };
 
   TS_ASSERT_EQUALS (gotSutVectors, expected);
 }
+
+
+//! Checks SystemModelManager DoDataCycles when using "1500" testcase and SVF protocol
+//!
+void UT_SystemModelManager::test_DoDataCycles_1500_SVF ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  SystemModelBuilder builder(sm);
+
+  auto ai        = Create_TestCase_1500(sm);
+
+  auto spy = make_shared<Spy_SVF_Protocol>();
+  ai->SetProtocol (spy);
+
+  SystemModelManager sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.DoDataCycles());
+
+  // ---------------- Verify
+  //
+  auto gotSvfCommands = spy->SVFCommands();
+
+  vector<string> expected
+  {
+     "SIR 8 TDI(01);\n",
+     "SDR 18 TDI(001416);\n",
+     "SDR 20 TDI(036364);\n",
+     "SDR 49 TDI(006C6DC0C0C0C0);\n",
+     "SDR 20 TDI(036363);\n",
+     "SDR 49 TDI(006C6DB0B0B0B0);\n",
+     "SDR 20 TDI(036362);\n",
+     "SDR 49 TDI(006C6D0A0A0A0A);\n",
+     "SDR 20 TDI(036361);\n",
+     "SDR 49 TDI(006C6C09090909);\n",
+     "SDR 49 TDI(006C6D40404040);\n",
+     "SDR 20 TDI(036368);\n",
+     "SIR 8 TDI(FF);\n",
+     "SDR 1 TDI(01);\n",
+     "SIR 8 TDI(01);\n",
+     "SDR 20 TDI(036360);\n",
+     "SIR 8 TDI(FF);\n",
+  };
+
+  TS_ASSERT_EQUALS (gotSvfCommands, expected);
+}
+
 
 
 

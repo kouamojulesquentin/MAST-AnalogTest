@@ -46,25 +46,32 @@ void SystemModelManager::DoDataCycles ()
 
       while (nextAccessInterface)
       {
-        auto protocol = nextAccessInterface->Protocol();
-        CHECK_VALUE_NOT_NULL(protocol, "All AccessInterface must be associated with a valid protocol");
-
-        uint32_t derivationId   = 1u;
-        auto     nextDerivation = nextAccessInterface->FirstChild();
-
-        while (nextDerivation)
+        if (nextAccessInterface->IsPending())
         {
-          m_toSutVisitor.Reset();
-          nextDerivation->Accept(m_toSutVisitor);
+          auto protocol = nextAccessInterface->Protocol();
+          CHECK_VALUE_NOT_NULL(protocol, "All AccessInterface must be associated with a valid protocol");
 
-          const auto& toSutVector = m_toSutVisitor.ToSutVector();
-          const auto& activeRegs  = m_toSutVisitor.ActiveRegistersIdentifiers();
+          uint32_t derivationId   = 1u;
+          auto     nextDerivation = nextAccessInterface->FirstChild();
 
-          auto fromSutVector = protocol->DoAction(derivationId, nextDerivation->ApplicationData(), toSutVector);
+          while (nextDerivation)
+          {
+            if (nextDerivation->IsPending())
+            {
+              m_toSutVisitor.Reset();
+              nextDerivation->Accept(m_toSutVisitor);
 
-          m_fromSutUpdater.UpdateRegisters(activeRegs, fromSutVector);
+              const auto& toSutVector = m_toSutVisitor.ToSutVector();
+              const auto& activeRegs  = m_toSutVisitor.ActiveRegistersIdentifiers();
 
-          nextDerivation = nextDerivation->NextSibling();
+              auto fromSutVector = protocol->DoAction(derivationId, nextDerivation->ApplicationData(), toSutVector);
+
+              m_fromSutUpdater.UpdateRegisters(activeRegs, fromSutVector);
+            }
+
+            nextDerivation = nextDerivation->NextSibling();
+            ++derivationId;
+          }
         }
 
         nextAccessInterface = dynamic_pointer_cast<AccessInterface>(nextAccessInterface->NextSibling());;

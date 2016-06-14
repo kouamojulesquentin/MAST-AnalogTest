@@ -49,6 +49,7 @@ OBJ_DEBUG = \
             $(OBJDIR_DEBUG)/UT_Helpers/UT_SystemModelBuilder.o             \
             $(OBJDIR_DEBUG)/UT_Helpers/SystemModelBuilder.o                \
             $(OBJDIR_DEBUG)/SystemModel/Spy_AccessInterfaceProtocols.o     \
+            $(OBJDIR_DEBUG)/SystemModel/Spy_SVF_Protocol.o                 \
             $(OBJDIR_DEBUG)/SystemModel/UT_SystemModel.o                   \
             $(OBJDIR_DEBUG)/SystemModel/UT_FromSutUpdater.o                \
             $(OBJDIR_DEBUG)/SystemModel/UT_ToSutVisitor.o                  \
@@ -71,6 +72,7 @@ OBJ_RELEASE = \
               $(OBJDIR_RELEASE)/UT_Helpers/UT_SystemModelBuilder.o         \
               $(OBJDIR_RELEASE)/UT_Helpers/SystemModelBuilder.o            \
               $(OBJDIR_RELEASE)/SystemModel/Spy_AccessInterfaceProtocols.o \
+              $(OBJDIR_RELEASE)/SystemModel/Spy_SVF_Protocol.o             \
               $(OBJDIR_RELEASE)/SystemModel/UT_SystemModel.o               \
               $(OBJDIR_RELEASE)/SystemModel/UT_FromSutUpdater.o            \
               $(OBJDIR_RELEASE)/SystemModel/UT_ToSutVisitor.o              \
@@ -116,6 +118,9 @@ $(OBJDIR_DEBUG)/UT_Helpers/UT_SystemModelBuilder.o: UT_Helpers/UT_SystemModelBui
 
 $(OBJDIR_DEBUG)/SystemModel/Spy_AccessInterfaceProtocols.o: SystemModel/Spy_AccessInterfaceProtocols.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/Spy_AccessInterfaceProtocols.cpp -o $(OBJDIR_DEBUG)/SystemModel/Spy_AccessInterfaceProtocols.o
+
+$(OBJDIR_DEBUG)/SystemModel/Spy_SVF_Protocol.o: SystemModel/Spy_SVF_Protocol.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/Spy_SVF_Protocol.cpp -o $(OBJDIR_DEBUG)/SystemModel/Spy_SVF_Protocol.o
 
 $(OBJDIR_DEBUG)/SystemModel/UT_DefaultBinaryPathSelector.o: SystemModel/UT_DefaultBinaryPathSelector.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_DefaultBinaryPathSelector.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_DefaultBinaryPathSelector.o
@@ -200,6 +205,9 @@ $(OBJDIR_RELEASE)/UT_Helpers/UT_SystemModelBuilder.o: UT_Helpers/UT_SystemModelB
 
 $(OBJDIR_RELEASE)/SystemModel/Spy_AccessInterfaceProtocols.o: SystemModel/Spy_AccessInterfaceProtocols.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/Spy_AccessInterfaceProtocols.cpp -o $(OBJDIR_RELEASE)/SystemModel/Spy_AccessInterfaceProtocols.o
+
+$(OBJDIR_RELEASE)/SystemModel/Spy_SVF_Protocol.o: SystemModel/Spy_SVF_Protocol.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/Spy_SVF_Protocol.cpp -o $(OBJDIR_RELEASE)/SystemModel/Spy_SVF_Protocol.o
 
 $(OBJDIR_RELEASE)/SystemModel/UT_DefaultBinaryPathSelector.o: SystemModel/UT_DefaultBinaryPathSelector.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_DefaultBinaryPathSelector.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_DefaultBinaryPathSelector.o

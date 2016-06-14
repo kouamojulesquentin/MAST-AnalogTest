@@ -26,6 +26,7 @@ DEPENDPATH += $$PWD/../Lib/include \
 SOURCES += \
     Generated/Runner.cpp                         \
     SystemModel/Spy_AccessInterfaceProtocols.cpp \
+    SystemModel/Spy_SVF_Protocol.cpp             \
     SystemModel/UT_ConfigureVisitor.cpp          \
     SystemModel/UT_DataCycle.cpp                 \
     SystemModel/UT_DefaultBinaryPathSelector.cpp \
@@ -49,8 +50,9 @@ SOURCES += \
 HEADERS += \
     CxxTest_Traits/BinaryVector_Traits.hpp           \
     CxxTest_Traits/SystemModelCheckResult_Traits.hpp \
-    SystemModel/Spy_AccessInterfaceProtocols.cpp     \
-    SystemModel/UT_ConfigureVisitor.cpp              \
+    SystemModel/Spy_AccessInterfaceProtocols.hpp     \
+    SystemModel/Spy_SVF_Protocol.hpp                 \
+    SystemModel/UT_ConfigureVisitor.hpp              \
     SystemModel/UT_DataCycle.hpp                     \
     SystemModel/UT_DefaultBinaryPathSelector.hpp     \
     SystemModel/UT_FromSutUpdater.hpp                \

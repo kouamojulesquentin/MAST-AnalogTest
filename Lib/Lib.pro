@@ -32,6 +32,7 @@ SOURCES +=  \
     src/PrettyPrinterVisitor.cpp           \
     src/PropagatePendingVisitor.cpp        \
     src/Register.cpp                       \
+    src/SVF_Player.cpp                     \
     src/SVFVector.cpp                      \
     src/SystemModel.cpp                    \
     src/SystemModelManager.cpp             \
@@ -43,40 +44,41 @@ SOURCES +=  \
     src/Utility.cpp
 
 HEADERS += \
-    include/AccessInterface.hpp                \
-    include/AccessInterfaceProtocol.hpp        \
+    include/AccessInterface.hpp                 \
+    include/AccessInterfaceProtocol.hpp         \
     include/LoopbackAccessInterfaceProtocol.hpp \
-    include/BinaryVector.hpp                   \
-    include/Chain.hpp                          \
-    include/ConfigurationAlgorithm.hpp         \
-    include/ConfigureVisitor.hpp               \
-    include/DataCycleReadVisitor.hpp           \
-    include/DataCycleWriteVisitor.hpp          \
-    include/DefaultBinaryPathSelector.hpp      \
-    include/DefaultConfigurationAlgorithm.hpp  \
-    include/DefaultTableBasedPathSelector.hpp  \
-    include/GmlPrinterVisitor.hpp              \
-    include/FromSutUpdater.hpp                 \
-    include/Linker.hpp                         \
-    include/ParentNode.hpp                     \
-    include/PathSelector.hpp                   \
-    include/PostConditionVisitor.hpp           \
-    include/PreconditionVisitor.hpp            \
-    include/PrettyPrinterVisitor.hpp           \
-    include/PropagatePendingVisitor.hpp        \
-    include/Register.hpp                       \
-    include/SVFVector.hpp                      \
-    include/SystemModel.hpp                    \
-    include/SystemModelManager.hpp             \
-    include/SystemModelCheckerVisitor.hpp      \
-    include/SystemModelCheckResult.hpp         \
-    include/SystemModelNode.hpp                \
-    include/SystemModelNodes.hpp               \
-    include/SystemModelVisitor.hpp             \
-    include/ToSutVisitor.hpp                   \
-    include/Utility.hpp                        \
-    public_include/PDLAdapter.h                \
-    public_include/Platform.hpp                \
+    include/BinaryVector.hpp                    \
+    include/Chain.hpp                           \
+    include/ConfigurationAlgorithm.hpp          \
+    include/ConfigureVisitor.hpp                \
+    include/DataCycleReadVisitor.hpp            \
+    include/DataCycleWriteVisitor.hpp           \
+    include/DefaultBinaryPathSelector.hpp       \
+    include/DefaultConfigurationAlgorithm.hpp   \
+    include/DefaultTableBasedPathSelector.hpp   \
+    include/GmlPrinterVisitor.hpp               \
+    include/FromSutUpdater.hpp                  \
+    include/Linker.hpp                          \
+    include/ParentNode.hpp                      \
+    include/PathSelector.hpp                    \
+    include/PostConditionVisitor.hpp            \
+    include/PreconditionVisitor.hpp             \
+    include/PrettyPrinterVisitor.hpp            \
+    include/PropagatePendingVisitor.hpp         \
+    include/Register.hpp                        \
+    include/SVF_Player.hpp                      \
+    include/SVFVector.hpp                       \
+    include/SystemModel.hpp                     \
+    include/SystemModelManager.hpp              \
+    include/SystemModelCheckerVisitor.hpp       \
+    include/SystemModelCheckResult.hpp          \
+    include/SystemModelNode.hpp                 \
+    include/SystemModelNodes.hpp                \
+    include/SystemModelVisitor.hpp              \
+    include/ToSutVisitor.hpp                    \
+    include/Utility.hpp                         \
+    public_include/PDLAdapter.h                 \
+    public_include/Platform.hpp                 \
     public_include/SystemModelAdapter.h
 
 unix {

@@ -524,7 +524,7 @@ void UT_BinaryVector::test_DataAsBinaryString_Without_NewLine ()
 
     // ---------------- Exercise
     //
-    auto sutAsString = sut.DataAsBinaryString(", ", "-");
+    auto sutAsString = sut.DataAsBinaryString("-", ", ");
 
     // ---------------- Verify
     //
@@ -596,7 +596,7 @@ void UT_BinaryVector::test_DataAsBinaryString_With_NewLine ()
 
     // ---------------- Exercise
     //
-    auto sutAsString = sut.DataAsBinaryString(", ", "-", 3, ";");
+    auto sutAsString = sut.DataAsBinaryString("-", ", ", 3, ";");
 
     // ---------------- Verify
     //
@@ -733,7 +733,7 @@ void UT_BinaryVector::test_DataAsHexString_Without_NewLine ()
 
     // ---------------- Exercise
     //
-    auto sutAsString = sut.DataAsHexString(", ", "-");
+    auto sutAsString = sut.DataAsHexString("-", ", ");
 
     // ---------------- Verify
     //
@@ -815,7 +815,7 @@ void UT_BinaryVector::test_DataAsHexString_With_NewLine ()
 
     // ---------------- Exercise
     //
-    auto sutAsString = sut.DataAsHexString(", ", "-", 4, ";");
+    auto sutAsString = sut.DataAsHexString("-", ", ", 4, ";");
 
     // ---------------- Verify
     //
@@ -963,7 +963,7 @@ void UT_BinaryVector::test_DataAsMixString_Without_NewLine ()
 
   auto data =
   {
-    //   Bits: sut,                                           result
+    //   Bits: sut,                                                                                 result
     make_tuple("",                                                                                  ""),                          // 00
     make_tuple("1",                                                                                 "0b1"),                       // 01
     make_tuple("10",                                                                                "0b10"),                      // 02
@@ -1004,7 +1004,7 @@ void UT_BinaryVector::test_DataAsMixString_With_NewLine ()
 
     // ---------------- Exercise
     //
-    auto sutAsString = sut.DataAsMixString(8, "_", ":", 4, ";");
+    auto sutAsString = sut.DataAsMixString(8, "_", ":", 8, ";");
 
     // ---------------- Verify
     //
@@ -1014,21 +1014,21 @@ void UT_BinaryVector::test_DataAsMixString_With_NewLine ()
   auto data =
   {
     //   Bits: sut,                                                                                 result
-    make_tuple("",                                                                                  ""),                              // 00
-    make_tuple("1",                                                                                 "0b1"),                           // 01
-    make_tuple("10",                                                                                "0b10"),                          // 02
-    make_tuple("010",                                                                               "0b010"),                         // 03
-    make_tuple("1110_0000:1",                                                                       "0xE0/b1"),                       // 04
-    make_tuple("1110_0000:10",                                                                      "0xE0/b10"),                      // 05
-    make_tuple("1110_0000:101",                                                                     "0xE0/b101"),                     // 06
-    make_tuple("1110_0000:1010",                                                                    "0xE0A"),                         // 07
-    make_tuple("1110_0000:1010_1",                                                                  "0xE0A/b1"),                      // 08
-    make_tuple("1110_0000:1010_10",                                                                 "0xE0A/b10"),                     // 09
-    make_tuple("1110_0000:1100_111",                                                                "0xE0C/b111"),                    // 10
-    make_tuple("1110_0000:1100_1011:1010",                                                          "0xE0CB_A"),                      // 11
-    make_tuple("1110_0000:1100_1011:1010_1",                                                        "0xE0CB_A/b1"),                   // 12
-    make_tuple("1110_0000:1100_1011:1010_0011:0010_0001:001",                                       "0xE0CB_A321;\n/b001"),           // 13
-    make_tuple("1110_0000:1100_1011:1010_1010:1100_0111:1110_0000:1100_1011:1010_1010:1100_0111:1", "0xE0CB_AAC7;\nE0CB_AAC7;\n/b1"), // 14
+    make_tuple("",                                                                                  ""),                            // 00
+    make_tuple("1",                                                                                 "0b1"),                         // 01
+    make_tuple("10",                                                                                "0b10"),                        // 02
+    make_tuple("010",                                                                               "0b010"),                       // 03
+    make_tuple("1110_0000:1",                                                                       "0xE0/b1"),                     // 04
+    make_tuple("1110_0000:10",                                                                      "0xE0/b10"),                    // 05
+    make_tuple("1110_0000:101",                                                                     "0xE0/b101"),                   // 06
+    make_tuple("1110_0000:1010",                                                                    "0xE0A"),                       // 07
+    make_tuple("1110_0000:1010_1",                                                                  "0xE0A/b1"),                    // 08
+    make_tuple("1110_0000:1010_10",                                                                 "0xE0A/b10"),                   // 09
+    make_tuple("1110_0000:1100_111",                                                                "0xE0C/b111"),                  // 10
+    make_tuple("1110_0000:1100_1011:1010",                                                          "0xE0CB_A"),                    // 11
+    make_tuple("1110_0000:1100_1011:1010_1",                                                        "0xE0CB_A/b1"),                 // 12
+    make_tuple("1110_0000:1100_1011:1010_0011:0010_0001:001",                                       "0xE0CB_A321:/b001"),           // 13
+    make_tuple("1110_0000:1100_1011:1010_1010:1100_0111:1110_0000:1100_1011:1010_1010:1100_0111:1", "0xE0CB_AAC7:E0CB_AAC7;\n/b1"), // 14
   };
 
   // ---------------- DDT Exercise

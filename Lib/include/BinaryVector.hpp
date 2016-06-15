@@ -66,21 +66,21 @@ class DLL_EXPORT BinaryVector final
   static BinaryVector CreateFromHexString    (std::experimental::string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed);   //!< Creates a BinaryVector from text hexadecimal representation
   static BinaryVector CreateFromString       (std::experimental::string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed);   //!< Creates a BinaryVector from mixed hexadecimal and binary representation
 
-  std::string DataAsBinaryString(std::experimental::string_view byteSeparator   = ":",
-                                 std::experimental::string_view nibbleSeparator = "_",
-                                 uint32_t                       bytesPerLine    = 0,
-                                 std::experimental::string_view eolSeparator    = ","
+  std::string DataAsBinaryString(std::experimental::string_view quadSeparator = "_",
+                                 std::experimental::string_view octoSeparator = ":",
+                                 uint32_t                       bytesPerLine  = 0,
+                                 std::experimental::string_view eolSeparator  = ","
                                 ) const; //!< Gets content as formatted binary string
 
-  std::string DataAsHexString (std::experimental::string_view intSeparator    = ":",
-                               std::experimental::string_view shortSeparator  = "_",
-                               uint32_t                       bytesPerLine    = 0,
-                               std::experimental::string_view eolSeparator    = ","
+  std::string DataAsHexString (std::experimental::string_view quadSeparator = "_",
+                               std::experimental::string_view octoSeparator = ":",
+                               uint32_t                       bytesPerLine  = 0,
+                               std::experimental::string_view eolSeparator  = ","
                               ) const;         //!< Gets content as formatted hexadecimal string
 
   std::string DataAsMixString (uint32_t                       hexStyleThreshold = 8,
-                               std::experimental::string_view octoSeparator     = ":",
                                std::experimental::string_view quadSeparator     = "_",
+                               std::experimental::string_view octoSeparator     = ":",
                                uint32_t                       bytesPerLine      = 0,
                                std::experimental::string_view eolSeparator      = ","
                               ) const;         //!< Gets content as mix of hex and binary digits (size dependent)

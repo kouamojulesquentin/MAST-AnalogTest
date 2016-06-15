@@ -65,7 +65,7 @@ void UT_SystemModelBuilder::test_Create_TestCase_AccessInterface ()
   GmlPrinterVisitor printer;
   printer.DisplayIdentifier(true);
   printer.DisplayRegisterValue(true);
-  printer.DisplayValueAsHex(true);
+  printer.DisplayValueAuto(true);
 
   tap->Accept(printer);
 
@@ -89,11 +89,11 @@ void UT_SystemModelBuilder::test_Create_TestCase_AccessInterface ()
                          "   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 133 h 126 ] LabelGraphics [ text \"(3)\n"
                          "TAP_BPY\n"
                          "Width: 1\n"
-                         "Bypass:    0x8\n"
-                         "Next to:   0x8\n"
-                         "Last to:   0x8\n"
-                         "Last from: 0x8\n"
-                         "Expected:  0x8\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "Bypass:    0b1\n"
+                         "Next to:   0b1\n"
+                         "Last to:   0b1\n"
+                         "Last from: 0b1\n"
+                         "Expected:  0b1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 4 graphics [ type \"ellipse\" fill \"#FFCC20\" w 90 h 43 ] LabelGraphics [ text \"(4)\n"
                          "sut_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 161 h 126 ] LabelGraphics [ text \"(5)\n"
@@ -157,7 +157,7 @@ void UT_SystemModelBuilder::test_Create_TestCase_MIB_4_Chains ()
   GmlPrinterVisitor printer;
   printer.DisplayIdentifier(true);
   printer.DisplayRegisterValue(true);
-  printer.DisplayValueAsHex(true);
+  printer.DisplayValueAuto(true);
 
   tap->Accept(printer);
 
@@ -181,11 +181,11 @@ void UT_SystemModelBuilder::test_Create_TestCase_MIB_4_Chains ()
                          "   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 133 h 126 ] LabelGraphics [ text \"(3)\n"
                          "TAP_BPY\n"
                          "Width: 1\n"
-                         "Bypass:    0x8\n"
-                         "Next to:   0x8\n"
-                         "Last to:   0x8\n"
-                         "Last from: 0x8\n"
-                         "Expected:  0x8\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "Bypass:    0b1\n"
+                         "Next to:   0b1\n"
+                         "Last to:   0b1\n"
+                         "Last from: 0b1\n"
+                         "Expected:  0b1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 4 graphics [ type \"ellipse\" fill \"#FFCC20\" w 90 h 43 ] LabelGraphics [ text \"(4)\n"
                          "sut\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 161 h 126 ] LabelGraphics [ text \"(5)\n"
@@ -202,11 +202,11 @@ void UT_SystemModelBuilder::test_Create_TestCase_MIB_4_Chains ()
                          "MIB_ctrl\n"
                          "Width: 2\n"
                          "Hold value: true\n"
-                         "Bypass:    0x0\n"
-                         "Next to:   0x0\n"
-                         "Last to:   0x0\n"
-                         "Last from: 0x0\n"
-                         "Expected:  0x0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "Bypass:    0b00\n"
+                         "Next to:   0b00\n"
+                         "Last to:   0b00\n"
+                         "Last from: 0b00\n"
+                         "Expected:  0b00\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 8 graphics [ type \"trapezoid\" fill \"#FF3060\" w 106 h 43 ] LabelGraphics [ text \"(8)\n"
                          "MIB_mux\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 9 graphics [ type \"rectangle\" fill \"#59FF20\" w 209 h 126 ] LabelGraphics [ text \"(9)\n"
@@ -313,7 +313,7 @@ void UT_SystemModelBuilder::test_Create_TestCase_1687 ()
   GmlPrinterVisitor printer;
   printer.DisplayIdentifier(true);
   printer.DisplayRegisterValue(true);
-  printer.DisplayValueAsHex(true);
+  printer.DisplayValueAuto(true);
 
   tap->Accept(printer);
 
@@ -337,11 +337,11 @@ void UT_SystemModelBuilder::test_Create_TestCase_1687 ()
                          "   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 133 h 126 ] LabelGraphics [ text \"(3)\n"
                          "sut_BPY\n"
                          "Width: 1\n"
-                         "Bypass:    0x8\n"
-                         "Next to:   0x8\n"
-                         "Last to:   0x8\n"
-                         "Last from: 0x8\n"
-                         "Expected:  0x8\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "Bypass:    0b1\n"
+                         "Next to:   0b1\n"
+                         "Last to:   0b1\n"
+                         "Last from: 0b1\n"
+                         "Expected:  0b1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 4 graphics [ type \"ellipse\" fill \"#FFCC20\" w 90 h 43 ] LabelGraphics [ text \"(4)\n"
                          "sut\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 161 h 126 ] LabelGraphics [ text \"(5)\n"
@@ -358,11 +358,11 @@ void UT_SystemModelBuilder::test_Create_TestCase_1687 ()
                          "SIB_ctrl\n"
                          "Width: 1\n"
                          "Hold value: true\n"
-                         "Bypass:    0x0\n"
-                         "Next to:   0x0\n"
-                         "Last to:   0x0\n"
-                         "Last from: 0x0\n"
-                         "Expected:  0x0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "Bypass:    0b0\n"
+                         "Next to:   0b0\n"
+                         "Last to:   0b0\n"
+                         "Last from: 0b0\n"
+                         "Expected:  0b0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 8 graphics [ type \"trapezoid\" fill \"#FF3060\" w 106 h 43 ] LabelGraphics [ text \"(8)\n"
                          "SIB_mux\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 9 graphics [ type \"rectangle\" fill \"#59FF20\" w 209 h 126 ] LabelGraphics [ text \"(9)\n"
@@ -438,7 +438,7 @@ void UT_SystemModelBuilder::test_Create_TestCase_1500_3_Chains ()
   GmlPrinterVisitor printer;
   printer.DisplayIdentifier(true);
   printer.DisplayRegisterValue(true);
-  printer.DisplayValueAsHex(true);
+  printer.DisplayValueAuto(true);
 
   tap->Accept(printer);
 
@@ -462,11 +462,11 @@ void UT_SystemModelBuilder::test_Create_TestCase_1500_3_Chains ()
                          "   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 133 h 126 ] LabelGraphics [ text \"(3)\n"
                          "TAP_BPY\n"
                          "Width: 1\n"
-                         "Bypass:    0x8\n"
-                         "Next to:   0x8\n"
-                         "Last to:   0x8\n"
-                         "Last from: 0x8\n"
-                         "Expected:  0x8\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "Bypass:    0b1\n"
+                         "Next to:   0b1\n"
+                         "Last to:   0b1\n"
+                         "Last from: 0b1\n"
+                         "Expected:  0b1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 4 graphics [ type \"ellipse\" fill \"#FFCC20\" w 90 h 43 ] LabelGraphics [ text \"(4)\n"
                          "sut\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 161 h 126 ] LabelGraphics [ text \"(5)\n"
@@ -485,11 +485,11 @@ void UT_SystemModelBuilder::test_Create_TestCase_1500_3_Chains ()
                          "SWIR_ctrl\n"
                          "Width: 1\n"
                          "Hold value: true\n"
-                         "Bypass:    0x0\n"
-                         "Next to:   0x0\n"
-                         "Last to:   0x0\n"
-                         "Last from: 0x0\n"
-                         "Expected:  0x0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "Bypass:    0b0\n"
+                         "Next to:   0b0\n"
+                         "Last to:   0b0\n"
+                         "Last from: 0b0\n"
+                         "Expected:  0b0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 9 graphics [ type \"trapezoid\" fill \"#FF3060\" w 116 h 43 ] LabelGraphics [ text \"(9)\n"
                          "SWIR_mux\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 11 graphics [ type \"ellipse\" fill \"#FFCC20\" w 90 h 43 ] LabelGraphics [ text \"(11)\n"
@@ -499,11 +499,11 @@ void UT_SystemModelBuilder::test_Create_TestCase_1500_3_Chains ()
                          "   node [ id 13 graphics [ type \"rectangle\" fill \"#59FF20\" w 133 h 126 ] LabelGraphics [ text \"(13)\n"
                          "WBY\n"
                          "Width: 1\n"
-                         "Bypass:    0x0\n"
-                         "Next to:   0x0\n"
-                         "Last to:   0x0\n"
-                         "Last from: 0x0\n"
-                         "Expected:  0x0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "Bypass:    0b0\n"
+                         "Next to:   0b0\n"
+                         "Last to:   0b0\n"
+                         "Last from: 0b0\n"
+                         "Expected:  0b0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 14 graphics [ type \"rectangle\" fill \"#59FF20\" w 209 h 126 ] LabelGraphics [ text \"(14)\n"
                          "dynamic_0\n"
                          "Width: 32\n"
@@ -532,11 +532,11 @@ void UT_SystemModelBuilder::test_Create_TestCase_1500_3_Chains ()
                          "WIR_reg\n"
                          "Width: 2\n"
                          "Hold value: true\n"
-                         "Bypass:    0x0\n"
-                         "Next to:   0x0\n"
-                         "Last to:   0x0\n"
-                         "Last from: 0x0\n"
-                         "Expected:  0x0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "Bypass:    0b00\n"
+                         "Next to:   0b00\n"
+                         "Last to:   0b00\n"
+                         "Last from: 0b00\n"
+                         "Expected:  0b00\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   edge [ source 0 target 1 label \"1\" ]\n"
                          "   edge [ source 2 target 3 label \"1\" ]\n"
                          "   edge [ source 4 target 5 label \"1\" ]\n"

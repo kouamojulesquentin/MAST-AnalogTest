@@ -311,7 +311,7 @@ void GmlPrinterVisitor::VisitRegister (Register& reg)
     {
       std::ostringstream os;
 
-      auto regValue = [this](auto& regValue) { return m_displayValueAsHex ? "0x"s + regValue.DataAsHexString() : regValue.DataAsBinaryString(); };
+      auto regValue = [this](auto& regValue) { return m_displayRegValueAuto ? regValue.DataAsMixString() : regValue.DataAsBinaryString(); };
 
       os << "Width: "     << reg.BypassSequence().BitsCount() << std::endl;
 

@@ -36,11 +36,11 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
     : GmlPrinterVisitor("")
   {}
 
-  GmlPrinterVisitor(std::experimental::string_view graphName, bool displayIdentifiers = false, bool displayRegisterValue = false, bool displayValueAsHex = false)
+  GmlPrinterVisitor(std::experimental::string_view graphName, bool displayIdentifiers = false, bool displayRegisterValue = false, bool displayValueAuto = false)
     : m_graphName            (graphName)
     , m_displayIdentifier    (displayIdentifiers)
     , m_displayRegisterValue (displayRegisterValue)
-    , m_displayValueAsHex    (displayValueAsHex)
+    , m_displayRegValueAuto (displayValueAuto)
   {
     CreateRoot();
   }
@@ -55,11 +55,11 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
 
   bool DisplayIdentifier()    const { return m_displayIdentifier;    } //!< Returns whether node identifier are displayed or not
   bool DisplayRegisterValue() const { return m_displayRegisterValue; } //!< Returns whether registers value are displayed (below the name)
-  bool DisplayValueAsHex()    const { return m_displayValueAsHex;    } //!< Returns whether registers value are displayed as hexadecimal string (otherwise they are displayed as binary)
+  bool DisplayValueAuto()    const { return m_displayRegValueAuto;    } //!< Returns whether registers value are displayed as hexadecimal string (otherwise they are displayed as binary)
 
   void DisplayIdentifier    (bool displayIdentifier)    { m_displayIdentifier    = displayIdentifier;    } //!< Sets whether node identifier are displayed or not
   void DisplayRegisterValue (bool displayRegisterValue) { m_displayRegisterValue = displayRegisterValue; } //!< Sets whether registers value are displayed (below the name)
-  void DisplayValueAsHex    (bool displayValueAsHex)    { m_displayValueAsHex    = displayValueAsHex;    } //!< Sets whether registers value are displayed as hexadecimal string (otherwise they are displayed as binary)
+  void DisplayValueAuto     (bool displayValueAuto)     { m_displayRegValueAuto  = displayValueAuto;     } //!< Sets whether registers values are displayed as hexadecimal string if large enough and not complete nibble as binary
 
 
 
@@ -92,7 +92,7 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
   bool               m_visited              = false;       //!< Becomes true when a tree traversal has been completely done
   bool               m_displayIdentifier    = false;       //!< When true, node identifiers are displayed along with their name
   bool               m_displayRegisterValue = false;       //!< When true, register values are displayed (below its name)
-  bool               m_displayValueAsHex    = false;       //!< When true, register values are displayed as hexadecimal string
+  bool               m_displayRegValueAuto  = false;       //!< When true, register values are displayed as hexadecimal string if large enough and not complete nibble as binary
   const Linker*      m_linker               = nullptr;     //!< When not nullptr, we are visiting a path selector (while visiting a linker)
   std::ostringstream m_osGraph;                            //!< Stream to build up a representation of visited system model nodes
   std::ostringstream m_osEdges;                            //!< Stream to build up links between nodes

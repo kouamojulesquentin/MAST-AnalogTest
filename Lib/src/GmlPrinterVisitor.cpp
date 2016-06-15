@@ -19,6 +19,7 @@
 #include <algorithm>
 using std::string;
 using std::experimental::string_view;
+using std::ostringstream;
 using namespace std::string_literals;
 using namespace mast;
 
@@ -56,10 +57,11 @@ GmlPrinterVisitor::GmlPrinterVisitor(std::experimental::string_view graphName, G
   : m_graphName (graphName)
 {
   CreateRoot();
-  m_displayIdentifier     = IsEnumFlagSet(options, GmlPrinterOptions::DisplayIdentifiers);
-  m_displayRegisterValue  = IsEnumFlagSet(options, GmlPrinterOptions::DisplayRegisterValue);
-  m_displayRegValueAuto   = IsEnumFlagSet(options, GmlPrinterOptions::DisplayValueAuto);
-  m_bShowSelectorWithEdge = IsEnumFlagSet(options, GmlPrinterOptions::ShowSelectorWithEdge);
+  m_displayIdentifier    = IsEnumFlagSet(options, GmlPrinterOptions::DisplayIdentifiers);
+  m_displayRegisterValue = IsEnumFlagSet(options, GmlPrinterOptions::DisplayRegisterValue);
+  m_displayRegValueAuto  = IsEnumFlagSet(options, GmlPrinterOptions::DisplayValueAuto);
+  m_showSelectorWithEdge = IsEnumFlagSet(options, GmlPrinterOptions::ShowSelectorWithEdge);
+  m_showSelectionValues  = IsEnumFlagSet(options, GmlPrinterOptions::ShowSelectionValues);
 }
 //
 //  End of: GmlPrinterVisitor::GmlPrinterVisitor
@@ -74,12 +76,15 @@ GmlPrinterVisitor::GmlPrinterVisitor(std::experimental::string_view graphName, G
 //! @param type   Text representation of the node type
 //! @param node   The node for which a gml element is to be added
 //!
-void GmlPrinterVisitor::AppendParentNode (std::experimental::string_view shapeName,
-                                          std::experimental::string_view backgroundColor,
-                                          std::experimental::string_view notes,
-                                          const ParentNode&              parentNode)
+void GmlPrinterVisitor::AppendParentNode (string_view       shapeName,
+                                          string_view       backgroundColor,
+                                          string_view       notes,
+                                          const ParentNode& parentNode)
 {
   AppendNode(shapeName, backgroundColor, notes, parentNode);
+
+  auto linker   = dynamic_cast<const Linker*>(&parentNode);
+  auto selector = m_showSelectionValues && linker ? linker->Selector() : nullptr;
 
   // ---------------- Print children
   //
@@ -96,7 +101,23 @@ void GmlPrinterVisitor::AppendParentNode (std::experimental::string_view shapeNa
     while (child)
     {
       child->Accept(*this);
-      PrintEdge(parentNode, *child, childId);
+
+      if (selector)
+      {
+        ostringstream os;
+        os << "/[" << selector->SelectionValue(childId).DataAsMixString(8, "", ":");
+        if (selector->IsSelected(childId))
+        {
+          os << ":S";
+        }
+        os << "]";
+        auto note = os.str();
+        PrintEdge(parentNode, *child, childId, "", note);
+      }
+      else
+      {
+        PrintEdge(parentNode, *child, childId);
+      }
 
       ++childId;
       child = child->NextSibling();
@@ -197,10 +218,11 @@ void GmlPrinterVisitor::AppendNode (string_view            shapeName,
 //! @param parentNode   A parent node
 //! @param childNode    A child of the parent node
 //!
-void GmlPrinterVisitor::PrintEdge (const ParentNode&              parentNode,
-                                   const SystemModelNode&         childNode,
-                                   uint32_t                       childId,
-                                   std::experimental::string_view style)
+void GmlPrinterVisitor::PrintEdge (const ParentNode&      parentNode,
+                                   const SystemModelNode& childNode,
+                                   uint32_t               childId,
+                                   string_view            style,
+                                   string_view            note)
 {
   m_osEdges << "   edge ["
             << " source "  << parentNode.Identifier()
@@ -208,7 +230,12 @@ void GmlPrinterVisitor::PrintEdge (const ParentNode&              parentNode,
 
   if (childId != 0)
   {
-    m_osEdges << " label \"" << childId << "\"";
+    m_osEdges << " label \"" << childId;
+    if (!note.empty())
+    {
+      m_osEdges << note;
+    }
+    m_osEdges << "\"";
   }
 
   if (!style.empty())
@@ -317,13 +344,13 @@ void GmlPrinterVisitor::VisitLinker (Linker& linker)
 {
   string notes;
 
-  if (!m_bShowSelectorWithEdge)
+  if (!m_showSelectorWithEdge)
   {
     auto selector           = linker.Selector();
     auto associatedRegister = selector->AssociatedRegister();
     if (associatedRegister)
     {
-      std::ostringstream os;
+      ostringstream os;
       os << ":" << associatedRegister->Identifier() << ":";
       notes = os.str();
     }
@@ -350,7 +377,7 @@ void GmlPrinterVisitor::VisitRegister (Register& reg)
   //
   if (m_linker)
   {
-    if (m_bShowSelectorWithEdge)
+    if (m_showSelectorWithEdge)
     {
       PrintEdge(*m_linker, reg, 0, "dashed");
     }
@@ -360,7 +387,7 @@ void GmlPrinterVisitor::VisitRegister (Register& reg)
   {
     if (m_displayRegisterValue)
     {
-      std::ostringstream os;
+      ostringstream os;
 
       auto regValue = [this](auto& regValue) { return m_displayRegValueAuto ? regValue.DataAsMixString() : regValue.DataAsBinaryString(); };
 

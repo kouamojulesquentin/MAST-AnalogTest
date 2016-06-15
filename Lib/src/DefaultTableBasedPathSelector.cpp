@@ -227,6 +227,25 @@ void DefaultTableBasedPathSelector::Select (uint32_t pathIdentifier)
 
 
 
+//! Returns some value associated with specified path selection
+//!
+//! @note When cannot provide a value, an empty BinaryVector is returned
+//!
+//! @param pathIdentifier   Path identifier in range [1..nb_path]
+//!
+const BinaryVector& DefaultTableBasedPathSelector::SelectionValue (uint32_t pathIdentifier) const
+{
+  CheckPathIdentifier(pathIdentifier);
+
+  const auto& selectValue = m_selectTable[pathIdentifier];
+  return selectValue;
+}
+//
+//  End of: DefaultTableBasedPathSelector::SelectionValue
+//---------------------------------------------------------------------------
+
+
+
 //===========================================================================
 // End of DefaultTableBasedPathSelector.cpp
 //===========================================================================

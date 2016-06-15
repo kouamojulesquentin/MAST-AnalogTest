@@ -62,8 +62,17 @@ class DLL_EXPORT DefaultTableBasedPathSelector  : public PathSelector
 
   virtual void Accept   (SystemModelVisitor& visitor) override;   //!< Forwards call to any embedded Register
 
+  //! Returns some value associated with specified path selection
+  //!
+  //! @note When cannot provide a value, an empty BinaryVector is returned
+  //!
+  //! @param pathIdentifier   Path identifier in range [1..nb_path]
+  //!
+  virtual const BinaryVector& SelectionValue (uint32_t pathIdentifier) const override;
+
   static TablesType& InvertTable (TablesType& table);  //!< Inverts table bits
   static TablesType& FixTable    (TablesType& table);  //!< Makes table entry fix (cannot modify size)
+
 
   // ---------------- Protected Methods
   //

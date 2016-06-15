@@ -22,6 +22,7 @@ namespace mast
 {
 class SystemModelVisitor;
 class Register;
+class BinaryVector;
 
 //! Extension point interface used by Linker to manage paths selection
 //!
@@ -43,7 +44,7 @@ class PathSelector
   //!
   virtual bool IsSelected (uint32_t pathIdentifier) const = 0;
 
-  //! Request activation of the specified path
+  //! Requests activation of the specified path
   //!
   //! @param pathIdentifier   Path identifier in range [1..nb_path]
   //!
@@ -68,7 +69,17 @@ class PathSelector
   //!
   virtual bool CanSelectNone() const = 0;
 
-  virtual std::shared_ptr<const Register> AssociatedRegister() const = 0;  //!< Returns associated Register or nullptr when there is none
+  //! Returns associated Register or nullptr when there is none
+  //!
+  virtual std::shared_ptr<const Register> AssociatedRegister() const = 0;
+
+  //! Returns some value associated with specified path selection
+  //!
+  //! @note When cannot provide a value, an empty BinaryVector is returned
+  //!
+  //! @param pathIdentifier   Path identifier in range [1..nb_path]
+  //!
+  virtual const BinaryVector& SelectionValue (uint32_t pathIdentifier) const = 0;
 
   // ---------------- Protected Methods
   //

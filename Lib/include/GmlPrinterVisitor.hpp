@@ -29,10 +29,11 @@ namespace mast
 enum class GmlPrinterOptions
 {
   Default              = 0,
-  DisplayIdentifiers   = 0b0001,  //!< To display node identifier
-  DisplayRegisterValue = 0b0010,  //!< To show Register values
-  DisplayValueAuto     = 0b0100,  //!< To show Register values as binary when small, hexa when large and end of large string as binary when cannot form a plain nibble
-  ShowSelectorWithEdge = 0b1000,  //!< To show Linker selector associated register with an edge between the Linker and the Register
+  DisplayIdentifiers   = 0b00001,  //!< To display node identifier
+  DisplayRegisterValue = 0b00010,  //!< To show Register values
+  DisplayValueAuto     = 0b00100,  //!< To show Register values as binary when small, hexa when large and end of large string as binary when cannot form a plain nibble
+  ShowSelectorWithEdge = 0b01000,  //!< To show Linker selector associated register with an edge between the Linker and the Register
+  ShowSelectionValues  = 0b10000,  //!< To show Selector Register value along edge between linker and derivations
 };
 
 #include <type_traits>
@@ -104,21 +105,22 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
                          const SystemModelNode&         node
                          );
 
-  void PrintEdge        (const ParentNode& parentNode, const SystemModelNode& childNode, uint32_t childId, std::experimental::string_view style = "");
+  void PrintEdge        (const ParentNode& parentNode, const SystemModelNode& childNode, uint32_t childId, std::experimental::string_view style = "", std::experimental::string_view note = "");
 
   // ---------------- Private  Fields
   //
   private:
-  std::string        m_graphName;                       //!< Name associated to the all graph
-  uint32_t           m_depth                 = 0u;      //!< Current nodes tree depth
-  bool               m_visited               = false;   //!< Becomes true when a tree traversal has been completely done
-  bool               m_displayIdentifier     = false;   //!< When true, node identifiers are displayed along with their name
-  bool               m_displayRegisterValue  = false;   //!< When true, register values are displayed (below its name)
-  bool               m_displayRegValueAuto   = false;   //!< When true, register values are displayed as hexadecimal string if large enough and not complete nibble as binary
-  bool               m_bShowSelectorWithEdge = false;   //!< When true an edge is drawn from Linkers and Registers used by the selector
-  const Linker*      m_linker                = nullptr; //!< When not nullptr, we are visiting a path selector (while visiting a linker)
-  std::ostringstream m_osGraph;                         //!< Stream to build up a representation of visited system model nodes
-  std::ostringstream m_osEdges;                         //!< Stream to build up links between nodes
+  std::string        m_graphName;                          //!< Name associated to the all graph
+  uint32_t           m_depth                = 0u;          //!< Current nodes tree depth
+  bool               m_visited              = false;       //!< Becomes true when a tree traversal has been completely done
+  bool               m_displayIdentifier    = false;       //!< When true, node identifiers are displayed along with their name
+  bool               m_displayRegisterValue = false;       //!< When true, register values are displayed (below its name)
+  bool               m_displayRegValueAuto  = false;       //!< When true, register values are displayed as hexadecimal string if large enough and not complete nibble as binary
+  bool               m_showSelectorWithEdge = false;       //!< When true an edge is drawn from Linkers and Registers used by the selector
+  bool               m_showSelectionValues  = false;       //!< When true the value to select a Linker derivation is displayed along side of derivation id (label of the edge)
+  const Linker*      m_linker               = nullptr;     //!< When not nullptr, we are visiting a path selector (while visiting a linker)
+  std::ostringstream m_osGraph;                            //!< Stream to build up a representation of visited system model nodes
+  std::ostringstream m_osEdges;                            //!< Stream to build up links between nodes
 
   static const std::experimental::string_view m_shape_AccessInterface;
   static const std::experimental::string_view m_shape_Linker;

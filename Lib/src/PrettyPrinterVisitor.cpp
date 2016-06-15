@@ -89,9 +89,9 @@ void PrettyPrinterVisitor::StreamBinaryVector (std::experimental::string_view na
 {
   m_os << ", " << name;
 
-  if (m_useHexFormat)
+  if (m_useAutoFormat)
   {
-    m_os << "0x" << bits.DataAsHexString("_", ":");
+    m_os << bits.DataAsMixString(8u, "_", ":");
   }
   else
   {

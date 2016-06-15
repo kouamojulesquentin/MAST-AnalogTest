@@ -42,10 +42,10 @@ class DLL_EXPORT PrettyPrinterVisitor : public SystemModelVisitor
 
   std::string PrettyPrint()  const { return m_os.str();     } //!< Returns currently visited nodes representation
   bool        IsVerbose()    const { return m_verbose;      } //!< Returns whether verbose mode is active
-  bool        UseHexFormat() const { return m_useHexFormat; } //!< Returns true if pretty printer is configured to print Register values as hexadecimal string
+  bool        UseAutoFormat() const { return m_useAutoFormat; } //!< Returns true if pretty printer is configured to print Register values as hexadecimal string
 
-  void SetVerbose   (bool verbose)      { m_verbose      = verbose;      } //!< Changes verbosity mode
-  void UseHexFormat (bool useHexFormat) { m_useHexFormat = useHexFormat; } //!< Sets whether pretty printer is configured to print Register values as hexadecimal string
+  void SetVerbose    (bool verbose)       { m_verbose       = verbose;       } //!< Changes verbosity mode
+  void UseAutoFormat (bool useAutoFormat) { m_useAutoFormat = useAutoFormat; } //!< Sets whether pretty printer is configured to print Register values as hexadecimal string (except not complete nibbles that are displayed using binary format)
 
 
   // ---------------- Private  Methods
@@ -75,7 +75,7 @@ class DLL_EXPORT PrettyPrinterVisitor : public SystemModelVisitor
   std::ostringstream m_os;                         //!< Stream to build up a representation of visited system model nodes
   bool               m_processingSelector = false; //!< When true, we are visiting a path selector (while visiting a linker)
   pos_type           m_startPos           = 0;     //!< Position, in stream, of first character of current line
-  bool               m_useHexFormat       = false; //!< When true, register contents are displayed using hexadecimal value string
+  bool               m_useAutoFormat      = false; //!< When true, register values are displayed as hexadecimal string if large enough and not complete nibble as binary
   bool               m_verbose            = false; //!< When true, more information are printed
   bool               m_first              = true;  //!< True when nothing as been streamed yet (useful to add first new line)
 };

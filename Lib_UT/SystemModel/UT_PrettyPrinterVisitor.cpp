@@ -536,7 +536,7 @@ void UT_PrettyPrinterVisitor::test_VisitAccessInterface_Hex_Format ()
   chain->AppendChild(reg_3);
 
   PrettyPrinterVisitor sut;
-  sut.UseHexFormat(true);
+  sut.UseAutoFormat(true);
 
   // ---------------- Exercise
   //
@@ -547,14 +547,14 @@ void UT_PrettyPrinterVisitor::test_VisitAccessInterface_Hex_Format ()
   auto got      = sut.PrettyPrint();
   auto expected = string(
                          "[Access_I](0)  \"Access interface name\"\n"
-                         " [Register](1)  \"Mux_reg\", length: 2, bypass: 0x4\n"
+                         " [Register](1)  \"Mux_reg\", length: 2, bypass: 0b01\n"
                          " [Chain](3)     \"Chain name\"\n"
-                         "  [Register](4)  \"Reg_1\", length: 9, bypass: 0xAD8\n"
-                         "  [Register](5)  \"Reg_2\", length: 10, bypass: 0xAD8\n"
-                         "  [Register](6)  \"Reg_3\", length: 11, bypass: 0xADE\n"
+                         "  [Register](4)  \"Reg_1\", length: 9, bypass: 0xAD/b1\n"
+                         "  [Register](5)  \"Reg_2\", length: 10, bypass: 0xAD/b10\n"
+                         "  [Register](6)  \"Reg_3\", length: 11, bypass: 0xAD/b111\n"
                          " [Linker](2)    \"Linker name\"\n"
                          "  :Selector:(1)  \"Mux_reg\"\n"
-                         "  [Register](7)  \"R_A\", length: 19, bypass: 0xEDEF_A\n"
+                         "  [Register](7)  \"R_A\", length: 19, bypass: 0xEDEF_/b101\n"
                          "  [Register](8)  \"the register\", length: 80, bypass: 0xFACE_DEAD:BEEF_CAFE:DECA"
                         );
   TS_ASSERT_EQUALS (got, expected);

@@ -89,7 +89,7 @@ void UT_GmlPrinterVisitor::test_VisitAccessInterface_with_Child ()
   linker->AppendChild(reg_a);
   linker->AppendChild(reg_b);
 
-  GmlPrinterVisitor sut;
+  GmlPrinterVisitor sut("", GmlPrinterOptions::ShowSelectorWithEdge);
 
   // ---------------- Exercise
   //
@@ -181,7 +181,7 @@ void UT_GmlPrinterVisitor::test_VisitTap ()
   uint32_t    muxPathsCount = 5u;
   auto        tap           = sm.CreateTap(noName, irBitsCount, muxPathsCount);
 
-  GmlPrinterVisitor sut;
+  GmlPrinterVisitor sut("", GmlPrinterOptions::ShowSelectorWithEdge);
 
   // ---------------- Exercise
   //
@@ -231,7 +231,7 @@ void UT_GmlPrinterVisitor::test_VisitTap_With_SubNodes ()
   buider.AppendRegisters(4, "Reg_a_", BinaryVector(5,  0xff), chain_1);
   buider.AppendRegisters(3, "Reg_b_", BinaryVector(15, 0x03), chain_2);
 
-  GmlPrinterVisitor sut;
+  GmlPrinterVisitor sut("", GmlPrinterOptions::ShowSelectorWithEdge);
 
   // ---------------- Exercise
   //
@@ -279,6 +279,76 @@ void UT_GmlPrinterVisitor::test_VisitTap_With_SubNodes ()
 }
 
 
+//! Checks GmlPrinterVisitor::Visit_xxx() when does not use edge between Linker and Selector Register
+//!
+void UT_GmlPrinterVisitor::test_Visit_NoEdgeForSelector ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder buider(sm);
+
+  string_view noName;
+  uint32_t    irBitsCount   = 6u;
+  uint32_t    muxPathsCount = 5u;
+  auto        tap           = sm.CreateTap(noName, irBitsCount, muxPathsCount);
+
+  auto chain_1 = sm.CreateChain("Chain_1", tap);
+
+  auto reg_1 = sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("1010_01"), tap);
+  auto reg_2 = sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("1010_10"), tap);
+
+  auto chain_2 = sm.CreateChain("Chain_2", chain_1);
+
+  buider.AppendRegisters(4, "Reg_a_", BinaryVector(5,  0xff), chain_1);
+  buider.AppendRegisters(3, "Reg_b_", BinaryVector(15, 0x03), chain_2);
+
+  GmlPrinterVisitor sut;
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (tap->Accept(sut)); // Will indirectly call Visit for several types of nodes
+
+  // ---------------- Verify
+  //
+  auto got      = sut.Graph();
+  auto expected = string("graph\n"
+                         "[\n"
+                         "   hierarchic 1 directed 1\n"
+                         "   node [ id 0 graphics [ type \"octagon\" fill \"#10FFFF\" w 135 h 43 ] LabelGraphics [ text \"1149_1_TAP\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 1 graphics [ type \"rectangle\" fill \"#59FF20\" w 57 h 35 ] LabelGraphics [ text \"TAP_IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" w 135 h 44 ] LabelGraphics [ text \"TAP_DR_Mux\n:1:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"TAP_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 4 graphics [ type \"ellipse\" fill \"#FFCC20\" w 106 h 43 ] LabelGraphics [ text \"Chain_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 7 graphics [ type \"ellipse\" fill \"#FFCC20\" w 106 h 43 ] LabelGraphics [ text \"Chain_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 12 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"Reg_b_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 13 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"Reg_b_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 14 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"Reg_b_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 8 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"Reg_a_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 9 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"Reg_a_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 10 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"Reg_a_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 11 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"Reg_a_3\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"Reg_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 6 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"Reg_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   edge [ source 0 target 1 label \"1\" ]\n"
+                         "   edge [ source 2 target 3 label \"1\" ]\n"
+                         "   edge [ source 7 target 12 label \"1\" ]\n"
+                         "   edge [ source 7 target 13 label \"2\" ]\n"
+                         "   edge [ source 7 target 14 label \"3\" ]\n"
+                         "   edge [ source 4 target 7 label \"1\" ]\n"
+                         "   edge [ source 4 target 8 label \"2\" ]\n"
+                         "   edge [ source 4 target 9 label \"3\" ]\n"
+                         "   edge [ source 4 target 10 label \"4\" ]\n"
+                         "   edge [ source 4 target 11 label \"5\" ]\n"
+                         "   edge [ source 2 target 4 label \"2\" ]\n"
+                         "   edge [ source 2 target 5 label \"3\" ]\n"
+                         "   edge [ source 2 target 6 label \"4\" ]\n"
+                         "   edge [ source 0 target 2 label \"2\" ]\n"
+                         "]"
+                        );
+  TS_ASSERT_EQUALS (got, expected);
+}
+
 //! Checks GmlPrinterVisitor::Visit_xxx() when DisplayIdentifier is true
 //!
 void UT_GmlPrinterVisitor::test_Visit_With_DisplayIdentifier_true ()
@@ -303,7 +373,7 @@ void UT_GmlPrinterVisitor::test_Visit_With_DisplayIdentifier_true ()
   buider.AppendRegisters(4, "Reg_a_", BinaryVector(5,  0xff), chain_1);
   buider.AppendRegisters(3, "Reg_b_", BinaryVector(15, 0x03), chain_2);
 
-  GmlPrinterVisitor sut;
+  GmlPrinterVisitor sut("", GmlPrinterOptions::ShowSelectorWithEdge);
   sut.DisplayIdentifier(true);
 
   // ---------------- Exercise
@@ -391,7 +461,7 @@ void UT_GmlPrinterVisitor::test_Visit_With_DisplayIdentifierAndRegister_true ()
   buider.AppendRegisters(4, "Reg_a_", BinaryVector(5,  0xff), chain_1);
   buider.AppendRegisters(3, "Reg_b_", BinaryVector(15, 0x03), chain_2);
 
-  GmlPrinterVisitor sut;
+  GmlPrinterVisitor sut("", GmlPrinterOptions::ShowSelectorWithEdge);
   sut.DisplayIdentifier(true);
     sut.DisplayRegisterValue(true);
 

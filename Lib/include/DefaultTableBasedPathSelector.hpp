@@ -53,6 +53,8 @@ class DLL_EXPORT DefaultTableBasedPathSelector  : public PathSelector
   virtual void Select     (uint32_t pathIdentifier) override;       //!< Request activation of the specified path
   virtual void Deselect   (uint32_t pathIdentifier) override;       //!< Request deactivation of the specified path
 
+  virtual std::shared_ptr<const Register> AssociatedRegister() const override { return m_muxRegister; }  //!< Returns associated Register
+
   virtual uint32_t SelectablePaths() const override { return m_pathsCount; };   //!< Returns the maximum number of selectable paths (max value for IsActive, Select and Deselect)
   virtual bool     CanSelectNone()   const override { return m_canSelectNone; }   //!< Returns true if selector can select nothing (passthrough mode), false otherwise
 

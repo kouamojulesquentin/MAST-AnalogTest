@@ -35,6 +35,40 @@ const std::experimental::string_view GmlPrinterVisitor::m_color_Register        
 
 const std::experimental::string_view GmlPrinterVisitor::m_fontName              = "Lucida Console";
 
+
+inline GmlPrinterOptions& operator |= (GmlPrinterOptions& X, GmlPrinterOptions Y)
+{
+  X = X | Y;
+  return X;
+}
+
+inline bool IsEnumFlagSet(GmlPrinterOptions options, GmlPrinterOptions flag)
+{
+  auto rawOption = static_cast<std::underlying_type_t<GmlPrinterOptions>>(options);
+  auto rawFlag   = static_cast<std::underlying_type_t<GmlPrinterOptions>>(flag);
+
+  return (rawOption & rawFlag) == rawFlag;
+}
+
+//! Initializes with given options
+//!
+GmlPrinterVisitor::GmlPrinterVisitor(std::experimental::string_view graphName, GmlPrinterOptions options)
+  : m_graphName (graphName)
+{
+  CreateRoot();
+  m_displayIdentifier     = IsEnumFlagSet(options, GmlPrinterOptions::DisplayIdentifiers);
+  m_displayRegisterValue  = IsEnumFlagSet(options, GmlPrinterOptions::DisplayRegisterValue);
+  m_displayRegValueAuto   = IsEnumFlagSet(options, GmlPrinterOptions::DisplayValueAuto);
+  m_bShowSelectorWithEdge = IsEnumFlagSet(options, GmlPrinterOptions::ShowSelectorWithEdge);
+}
+//
+//  End of: GmlPrinterVisitor::GmlPrinterVisitor
+//---------------------------------------------------------------------------
+
+
+
+
+
 //! Appends a parent node and its children to the GML graph
 //!
 //! @param type   Text representation of the node type
@@ -42,10 +76,10 @@ const std::experimental::string_view GmlPrinterVisitor::m_fontName              
 //!
 void GmlPrinterVisitor::AppendParentNode (std::experimental::string_view shapeName,
                                           std::experimental::string_view backgroundColor,
-                                          std::experimental::string_view ,
+                                          std::experimental::string_view notes,
                                           const ParentNode&              parentNode)
 {
-  AppendNode(shapeName, backgroundColor, "", parentNode);
+  AppendNode(shapeName, backgroundColor, notes, parentNode);
 
   // ---------------- Print children
   //
@@ -266,14 +300,14 @@ string GmlPrinterVisitor::Graph ()
 //!
 void GmlPrinterVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 {
-  AppendParentNode(m_shape_AccessInterface, m_color_AccessInterface, "Access_I", accessInterface);
+  AppendParentNode(m_shape_AccessInterface, m_color_AccessInterface, "", accessInterface);
 }
 
 //! Appends Chain node to GML graph
 //!
 void GmlPrinterVisitor::VisitChain (Chain& chain)
 {
-  AppendParentNode(m_shape_Chain, m_color_Chain, "Chain", chain);
+  AppendParentNode(m_shape_Chain, m_color_Chain, "", chain);
 }
 
 //! Appends Linker node to GML graph
@@ -281,7 +315,21 @@ void GmlPrinterVisitor::VisitChain (Chain& chain)
 //! @note Supposes that path selector associated with linker will be made of SystemModelNode too
 void GmlPrinterVisitor::VisitLinker (Linker& linker)
 {
-  AppendParentNode(m_shape_Linker, m_color_Linker, "Linker", linker);
+  string notes;
+
+  if (!m_bShowSelectorWithEdge)
+  {
+    auto selector           = linker.Selector();
+    auto associatedRegister = selector->AssociatedRegister();
+    if (associatedRegister)
+    {
+      std::ostringstream os;
+      os << ":" << associatedRegister->Identifier() << ":";
+      notes = os.str();
+    }
+  }
+
+  AppendParentNode(m_shape_Linker, m_color_Linker, notes, linker);
 
   // ---------------- Deal with path selector
   //
@@ -302,7 +350,10 @@ void GmlPrinterVisitor::VisitRegister (Register& reg)
   //
   if (m_linker)
   {
-    PrintEdge(*m_linker, reg, 0, "dashed");
+    if (m_bShowSelectorWithEdge)
+    {
+      PrintEdge(*m_linker, reg, 0, "dashed");
+    }
     m_linker = nullptr;   // Only first SystemModelNode is connected to the linker
   }
   else

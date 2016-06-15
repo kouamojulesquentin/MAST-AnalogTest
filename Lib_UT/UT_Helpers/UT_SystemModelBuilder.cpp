@@ -62,7 +62,7 @@ void UT_SystemModelBuilder::test_Create_TestCase_AccessInterface ()
   TS_ASSERT_EQUALS (result, SystemModelCheckResult::None);
 
   // Check with GmlPrinterVisitor
-  GmlPrinterVisitor printer;
+  GmlPrinterVisitor printer("", GmlPrinterOptions::ShowSelectorWithEdge);
   printer.DisplayIdentifier(true);
   printer.DisplayRegisterValue(true);
   printer.DisplayValueAuto(true);
@@ -154,7 +154,7 @@ void UT_SystemModelBuilder::test_Create_TestCase_MIB_4_Chains ()
   // Check with GmlPrinterVisitor
 
   // With GML printer
-  GmlPrinterVisitor printer;
+  GmlPrinterVisitor printer("", GmlPrinterOptions::ShowSelectorWithEdge);
   printer.DisplayIdentifier(true);
   printer.DisplayRegisterValue(true);
   printer.DisplayValueAuto(true);
@@ -310,7 +310,7 @@ void UT_SystemModelBuilder::test_Create_TestCase_1687 ()
   // Check with GmlPrinterVisitor
 
   // With GML printer
-  GmlPrinterVisitor printer;
+  GmlPrinterVisitor printer("", GmlPrinterOptions::ShowSelectorWithEdge);
   printer.DisplayIdentifier(true);
   printer.DisplayRegisterValue(true);
   printer.DisplayValueAuto(true);
@@ -435,7 +435,7 @@ void UT_SystemModelBuilder::test_Create_TestCase_1500_3_Chains ()
   // Check with GmlPrinterVisitor
 
   // With GML printer
-  GmlPrinterVisitor printer;
+  GmlPrinterVisitor printer("", GmlPrinterOptions::ShowSelectorWithEdge);
   printer.DisplayIdentifier(true);
   printer.DisplayRegisterValue(true);
   printer.DisplayValueAuto(true);

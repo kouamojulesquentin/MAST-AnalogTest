@@ -39,6 +39,7 @@ class UT_GmlPrinterVisitor : public CxxTest::TestSuite
 
   // ---------------- Options
   //
+  void test_Visit_NoEdgeForSelector ();
   void test_Visit_With_DisplayIdentifier_true ();
   void test_Visit_With_DisplayIdentifierAndRegister_true ();
 

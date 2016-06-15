@@ -16,10 +16,12 @@
   #define LINKERINFORMATION_H__9B76DEAF_2DDC_4FFA_9F8A_EC2E62431F68__INCLUDED_
 
 #include <cstdint>
+#include <memory>
 
 namespace mast
 {
 class SystemModelVisitor;
+class Register;
 
 //! Extension point interface used by Linker to manage paths selection
 //!
@@ -65,6 +67,8 @@ class PathSelector
   //! Returns true if selector can select nothing (passthrough mode), false otherwise
   //!
   virtual bool CanSelectNone() const = 0;
+
+  virtual std::shared_ptr<const Register> AssociatedRegister() const = 0;  //!< Returns associated Register or nullptr when there is none
 
   // ---------------- Protected Methods
   //

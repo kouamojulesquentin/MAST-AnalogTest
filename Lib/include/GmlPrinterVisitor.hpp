@@ -23,6 +23,26 @@
 
 namespace mast
 {
+
+//! Options of Gml graph constructions
+//!
+enum class GmlPrinterOptions
+{
+  Default              = 0,
+  DisplayIdentifiers   = 0b0001,  //!< To display node identifier
+  DisplayRegisterValue = 0b0010,  //!< To show Register values
+  DisplayValueAuto     = 0b0100,  //!< To show Register values as binary when small, hexa when large and end of large string as binary when cannot form a plain nibble
+  ShowSelectorWithEdge = 0b1000,  //!< To show Linker selector associated register with an edge between the Linker and the Register
+};
+
+#include <type_traits>
+constexpr GmlPrinterOptions operator | (GmlPrinterOptions X, GmlPrinterOptions Y)
+{
+  return static_cast<GmlPrinterOptions>(  static_cast<std::underlying_type_t<GmlPrinterOptions>>(X)
+                                        | static_cast<std::underlying_type_t<GmlPrinterOptions>>(Y)
+                                       );
+}
+
 //! System model visitors for creation of a GML formated representation of the
 //! system mode tree
 //!
@@ -33,17 +53,19 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
   public:
   ~GmlPrinterVisitor() = default;
   GmlPrinterVisitor()
-    : GmlPrinterVisitor("")
+    : GmlPrinterVisitor("", GmlPrinterOptions::Default)
   {}
 
   GmlPrinterVisitor(std::experimental::string_view graphName, bool displayIdentifiers = false, bool displayRegisterValue = false, bool displayValueAuto = false)
     : m_graphName            (graphName)
     , m_displayIdentifier    (displayIdentifiers)
     , m_displayRegisterValue (displayRegisterValue)
-    , m_displayRegValueAuto (displayValueAuto)
+    , m_displayRegValueAuto  (displayValueAuto)
   {
     CreateRoot();
   }
+
+  GmlPrinterVisitor(std::experimental::string_view graphName, GmlPrinterOptions options = GmlPrinterOptions::Default);
 
   virtual void VisitAccessInterface (AccessInterface& accessInterface) override;
   virtual void VisitChain           (Chain&           chain)           override;
@@ -55,7 +77,7 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
 
   bool DisplayIdentifier()    const { return m_displayIdentifier;    } //!< Returns whether node identifier are displayed or not
   bool DisplayRegisterValue() const { return m_displayRegisterValue; } //!< Returns whether registers value are displayed (below the name)
-  bool DisplayValueAuto()    const { return m_displayRegValueAuto;    } //!< Returns whether registers value are displayed as hexadecimal string (otherwise they are displayed as binary)
+  bool DisplayValueAuto()     const { return m_displayRegValueAuto;  } //!< Returns whether registers value are displayed as hexadecimal string (otherwise they are displayed as binary)
 
   void DisplayIdentifier    (bool displayIdentifier)    { m_displayIdentifier    = displayIdentifier;    } //!< Sets whether node identifier are displayed or not
   void DisplayRegisterValue (bool displayRegisterValue) { m_displayRegisterValue = displayRegisterValue; } //!< Sets whether registers value are displayed (below the name)
@@ -72,7 +94,7 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
 
   void AppendParentNode (std::experimental::string_view shapeName,
                          std::experimental::string_view backgroundColor,
-                         std::experimental::string_view typeName,
+                         std::experimental::string_view notes,
                          const ParentNode&              parentNode
                         );
 
@@ -87,15 +109,16 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
   // ---------------- Private  Fields
   //
   private:
-  std::string        m_graphName;                          //!< Name associated to the all graph
-  uint32_t           m_depth                = 0u;          //!< Current nodes tree depth
-  bool               m_visited              = false;       //!< Becomes true when a tree traversal has been completely done
-  bool               m_displayIdentifier    = false;       //!< When true, node identifiers are displayed along with their name
-  bool               m_displayRegisterValue = false;       //!< When true, register values are displayed (below its name)
-  bool               m_displayRegValueAuto  = false;       //!< When true, register values are displayed as hexadecimal string if large enough and not complete nibble as binary
-  const Linker*      m_linker               = nullptr;     //!< When not nullptr, we are visiting a path selector (while visiting a linker)
-  std::ostringstream m_osGraph;                            //!< Stream to build up a representation of visited system model nodes
-  std::ostringstream m_osEdges;                            //!< Stream to build up links between nodes
+  std::string        m_graphName;                       //!< Name associated to the all graph
+  uint32_t           m_depth                 = 0u;      //!< Current nodes tree depth
+  bool               m_visited               = false;   //!< Becomes true when a tree traversal has been completely done
+  bool               m_displayIdentifier     = false;   //!< When true, node identifiers are displayed along with their name
+  bool               m_displayRegisterValue  = false;   //!< When true, register values are displayed (below its name)
+  bool               m_displayRegValueAuto   = false;   //!< When true, register values are displayed as hexadecimal string if large enough and not complete nibble as binary
+  bool               m_bShowSelectorWithEdge = false;   //!< When true an edge is drawn from Linkers and Registers used by the selector
+  const Linker*      m_linker                = nullptr; //!< When not nullptr, we are visiting a path selector (while visiting a linker)
+  std::ostringstream m_osGraph;                         //!< Stream to build up a representation of visited system model nodes
+  std::ostringstream m_osEdges;                         //!< Stream to build up links between nodes
 
   static const std::experimental::string_view m_shape_AccessInterface;
   static const std::experimental::string_view m_shape_Linker;

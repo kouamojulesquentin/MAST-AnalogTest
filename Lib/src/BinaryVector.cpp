@@ -17,11 +17,14 @@
 #include <array>
 #include <algorithm>
 
+
 using std::array;
 using std::initializer_list;
 using std::ostringstream;
 using std::string;
 using std::experimental::string_view;
+
+using namespace std::string_literals;
 using namespace mast;
 
 #define CHECK_SAME_SIZE(other)                if (other.m_usedBits != m_usedBits)         THROW_LOGIC_ERROR("BinaryVectors must have same size")
@@ -56,6 +59,27 @@ namespace
     0b1110, // 3 bits
     0b1111, // 4 bits
   };
+
+  static const std::array<string_view, 16> BINARY_NIBBLES =
+  {
+    "0000",  // 00
+    "0001",  // 01
+    "0010",  // 02
+    "0011",  // 03
+    "0100",  // 04
+    "0101",  // 05
+    "0110",  // 06
+    "0111",  // 07
+    "1000",  // 08
+    "1001",  // 09
+    "1010",  // 10
+    "1011",  // 11
+    "1100",  // 12
+    "1101",  // 13
+    "1110",  // 14
+    "1111",  // 15
+  };
+
 
 } // End of unnamed namespace
 
@@ -375,25 +399,6 @@ string BinaryVector::DataAsBinaryString (string_view byteSeparator,
                                          string_view eolSeparator
                                         ) const
 {
-  static const std::array<string_view, 16> nibbles =
-  {
-    "0000",  // 00
-    "0001",  // 01
-    "0010",  // 02
-    "0011",  // 03
-    "0100",  // 04
-    "0101",  // 05
-    "0110",  // 06
-    "0111",  // 07
-    "1000",  // 08
-    "1001",  // 09
-    "1010",  // 10
-    "1011",  // 11
-    "1100",  // 12
-    "1101",  // 13
-    "1110",  // 14
-    "1111",  // 15
-  };
 
   ostringstream os;
   uint32_t      nibblesCount = 0;
@@ -427,7 +432,7 @@ string BinaryVector::DataAsBinaryString (string_view byteSeparator,
   {
     if (bitsCount != 0)
     {
-      auto nibble = nibbles[bitsOnLsb];       // Get string representation with padded zero on the right
+      auto nibble = BINARY_NIBBLES[bitsOnLsb];       // Get string representation with padded zero on the right
       nibble = string_view(nibble.data(), bitsCount);
       appendNibble(nibble);
     }
@@ -439,13 +444,13 @@ string BinaryVector::DataAsBinaryString (string_view byteSeparator,
   {
     if (bitsCount >= 8)
     {
-      appendNibble(nibbles[byte >> 4]);
-      appendNibble(nibbles[byte &  0x0F]);
+      appendNibble(BINARY_NIBBLES[byte >> 4]);
+      appendNibble(BINARY_NIBBLES[byte &  0x0F]);
       bitsCount -= 8;
     }
     else if (bitsCount >= 4)
     {
-      appendNibble(nibbles[byte >> 4]);
+      appendNibble(BINARY_NIBBLES[byte >> 4]);
       bitsCount -= 4;
       appendBits(byte & 0x0F, bitsCount);
     }
@@ -463,9 +468,10 @@ string BinaryVector::DataAsBinaryString (string_view byteSeparator,
 //---------------------------------------------------------------------------
 
 
-//! Gets content as formatted hexadecimal string
+//! Gets content as formatted hexadecimal string (as saved internally - bits are appended from left to right)
 //!
-//! @note An example of formatting is: FACE_DEAD:BEEF_0123:CAFE_4
+//! @note An example of formatting is: FACE_DEAD:BEEF_0123:CAFE_4 (where last '4' may mean '0b0100' or '0b010' or '0b01')
+//! @note For precise display of last bits, please use DataAsMixString (or DataAsBinaryString)
 //!
 //! @param intSeparator    Characters to insert every 32 bits
 //! @param shortSeparator  Characters to insert every 16 bits
@@ -563,15 +569,52 @@ string BinaryVector::DataAsHexString (string_view intSeparator,
 //---------------------------------------------------------------------------
 
 
-//! Returns a string representing state
+//! Gets content as formatted hexadecimal or/and binary string
 //!
-//! @note For debug purpose only
-string BinaryVector::DebugString () const
+//!
+//! @note An example of formatting is: 0xFACE_DEAD:BEEF_0123:CAFE_/b01
+//!
+//! @param hexStyleThreshold  The number of bits that makes the result starting as hex string (preference is to be >= 8)
+//! @param octaSeparator      Characters to insert every 8 digits
+//! @param quadSeparator      Characters to insert every 4 digits
+//! @param bytesPerLine       Number of bytes (sequence of 8 bits) to write per line.
+//!                           When zero, all is on the "same line"
+//! @param eolSeparator       Characters to insert just before new lines character (when bytesPerLine != 0)
+//!
+string BinaryVector::DataAsMixString (uint32_t    hexStyleThreshold,
+                                      string_view quadSeparator,
+                                      string_view octaSeparator,
+                                      uint32_t    bytesPerLine,
+                                      string_view eolSeparator) const
 {
-  return DataAsBinaryString();
+  if (m_usedBits == 0)
+  {
+    return "";
+  }
+
+  if (m_usedBits < hexStyleThreshold)
+  {
+    return "0b"s + DataAsBinaryString(octaSeparator, quadSeparator, bytesPerLine, eolSeparator);
+  }
+
+  auto smartString       = "0x"s + DataAsHexString(octaSeparator, quadSeparator, bytesPerLine, eolSeparator);
+  auto lastByteBitsCount = m_usedBits % 8;
+  auto lastQuadBitsCount = m_usedBits % 4;
+
+  if (lastQuadBitsCount != 0)
+  {
+    // ---------------- Replace last digit with its binary equivalent
+    //
+    auto shiftCount = (lastByteBitsCount < 4) ? 8u - lastQuadBitsCount    // For cases last bits are on msb
+                                              : 4u - lastQuadBitsCount;   // For cases last bits are on lsb
+    auto byte       = (m_data.back() >> shiftCount) & 0x0F;
+    auto lastBits   = BINARY_NIBBLES[byte].substr(4u - lastQuadBitsCount, lastQuadBitsCount);
+    smartString     = smartString.substr(0, smartString.length() - 1) + "/b"s + string(lastBits);
+  }
+  return smartString;
 }
 //
-//  End of: BinaryVector::DebugString
+//  End of: BinaryVector::DataAsMixString
 //---------------------------------------------------------------------------
 
 

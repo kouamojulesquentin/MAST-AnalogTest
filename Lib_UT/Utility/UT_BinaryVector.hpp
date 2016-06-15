@@ -51,6 +51,9 @@ class UT_BinaryVector : public CxxTest::TestSuite
   void test_DataAsHexString_Without_NewLine ();
   void test_DataAsHexString_With_NewLine ();
   void test_DataAsHexString_Without_Separators ();
+  void test_DataAsMixString_Without_Separators ();
+  void test_DataAsMixString_Without_NewLine ();
+  void test_DataAsMixString_With_NewLine ();
 
   // ---------------- Operator==
   //

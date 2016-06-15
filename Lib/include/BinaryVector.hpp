@@ -78,7 +78,12 @@ class DLL_EXPORT BinaryVector final
                                std::experimental::string_view eolSeparator    = ","
                               ) const;         //!< Gets content as formatted hexadecimal string
 
-  std::string DebugString() const;  //!< Returns a string representing state (for debug purpose only)
+  std::string DataAsMixString (uint32_t                       hexStyleThreshold = 8,
+                               std::experimental::string_view octoSeparator     = ":",
+                               std::experimental::string_view quadSeparator     = "_",
+                               uint32_t                       bytesPerLine      = 0,
+                               std::experimental::string_view eolSeparator      = ","
+                              ) const;         //!< Gets content as mix of hex and binary digits (size dependent)
 
   BinaryVector& operator=(const BinaryVector&);   //!< Copy assignment
   BinaryVector& operator=(BinaryVector&&);        //!< Move assignment

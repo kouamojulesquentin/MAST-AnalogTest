@@ -34,6 +34,7 @@ enum class GmlPrinterOptions
   DisplayValueAuto     = 0b00100,  //!< To show Register values as binary when small, hexa when large and end of large string as binary when cannot form a plain nibble
   ShowSelectorWithEdge = 0b01000,  //!< To show Linker selector associated register with an edge between the Linker and the Register
   ShowSelectionValues  = 0b10000,  //!< To show Selector Register value along edge between linker and derivations
+  Std                  = DisplayIdentifiers | DisplayRegisterValue | DisplayValueAuto | ShowSelectionValues,
 };
 
 #include <type_traits>

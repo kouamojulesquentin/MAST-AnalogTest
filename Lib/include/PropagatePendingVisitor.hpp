@@ -43,7 +43,7 @@ class DLL_EXPORT PropagatePendingVisitor final : public SystemModelVisitor
   // ---------------- Protected Methods
   //
   protected:
-  virtual bool IsChildrenPending (const ParentNode& parentNode);
+  virtual bool HasChildPending (const ParentNode& parentNode);
 };
 //
 //  End of PropagatePendingVisitor class declaration

@@ -21,7 +21,7 @@ using namespace mast;
 //!
 void PropagatePendingVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 {
-  if (IsChildrenPending(accessInterface))
+  if (HasChildPending(accessInterface))
   {
     accessInterface.SetPending();
   }
@@ -36,7 +36,7 @@ void PropagatePendingVisitor::VisitAccessInterface (AccessInterface& accessInter
 //!
 void PropagatePendingVisitor::VisitChain (Chain& chain)
 {
-  if (IsChildrenPending(chain))
+  if (HasChildPending(chain))
   {
     chain.SetPending();
   }
@@ -48,7 +48,7 @@ void PropagatePendingVisitor::VisitChain (Chain& chain)
 
 //! Visits direct children of a parent node, returning true if at least one is pending
 //!
-bool PropagatePendingVisitor::IsChildrenPending (const ParentNode& parentNode)
+bool PropagatePendingVisitor::HasChildPending (const ParentNode& parentNode)
 {
   auto isPending = false;
   auto child     = parentNode.FirstChild();
@@ -63,7 +63,7 @@ bool PropagatePendingVisitor::IsChildrenPending (const ParentNode& parentNode)
   return isPending;
 }
 //
-//  End of: PropagatePendingVisitor::IsChildrenPending
+//  End of: PropagatePendingVisitor::HasChildPending
 //---------------------------------------------------------------------------
 
 
@@ -71,7 +71,7 @@ bool PropagatePendingVisitor::IsChildrenPending (const ParentNode& parentNode)
 //!
 void PropagatePendingVisitor::VisitLinker (Linker& linker)
 {
-  if (IsChildrenPending(linker))
+  if (HasChildPending(linker))
   {
     linker.SetPending();
   }

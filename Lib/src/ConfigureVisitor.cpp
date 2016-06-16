@@ -23,7 +23,7 @@ using namespace mast;
 void ConfigureVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 {
   accessInterface.ResetPending();
-  if (IsChildrenPending(accessInterface))
+  if (ConfigureChildren(accessInterface))
   {
     accessInterface.SetPending();
   }
@@ -39,7 +39,7 @@ void ConfigureVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 void ConfigureVisitor::VisitChain (Chain& chain)
 {
   chain.ResetPending();
-  if (IsChildrenPending(chain))
+  if (ConfigureChildren(chain))
   {
     chain.SetPending();
   }
@@ -51,10 +51,16 @@ void ConfigureVisitor::VisitChain (Chain& chain)
 
 //! Visits direct children of a parent node, returning true if at least one is pending
 //!
-bool ConfigureVisitor::IsChildrenPending (const ParentNode& parentNode)
+//! @note For pending state, there are two pass on children because configuring a child
+//!       may change pending state of a previous sibling
+//!
+//! @return true when at least one child is pending
+//!
+bool ConfigureVisitor::ConfigureChildren (const ParentNode& parentNode)
 {
   auto isPending = false;
-  auto child = parentNode.FirstChild();
+  auto child     = parentNode.FirstChild();
+
   while (child)
   {
     child->Accept(*this);
@@ -62,10 +68,29 @@ bool ConfigureVisitor::IsChildrenPending (const ParentNode& parentNode)
 
     child = child->NextSibling();
   }
+
+  if (!isPending)
+  {
+    // ---------------- Check again pending state
+    //                 (a child may be changed while a sibling is configured)
+    //
+    child = parentNode.FirstChild();
+    while (child)
+    {
+      isPending = child->IsPending();
+      if (isPending)
+      {
+        break;
+      }
+
+      child = child->NextSibling();
+    }
+  }
+
   return isPending;
 }
 //
-//  End of: ConfigureVisitor::IsChildrenPending
+//  End of: ConfigureVisitor::ConfigureChildren
 //---------------------------------------------------------------------------
 
 

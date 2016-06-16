@@ -31,7 +31,7 @@ namespace
 
 //! Creates test case "1500", setting some register "next to sut" values
 //!
-std::shared_ptr<AccessInterface> Create_TestCase_1500 (SystemModel& sm)
+std::shared_ptr<AccessInterface> Create_TestCase_1500 (SystemModel& sm, bool reportGml = false)
 {
   SystemModelBuilder builder(sm);
 
@@ -56,9 +56,12 @@ std::shared_ptr<AccessInterface> Create_TestCase_1500 (SystemModel& sm)
   regDyn_2->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x42));
   regDyn_3->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x43));
 
-//+  GmlPrinterVisitor gmlPrinter("Testcase_1500", true, true, true);
-//+  ai->Accept(gmlPrinter);
-//+  TS_ASSERT_EQUALS (gmlPrinter.Graph(), "");
+  if (reportGml)
+  {
+    GmlPrinterVisitor gmlPrinter("Testcase_1500", GmlPrinterOptions::Std);
+    ai->Accept(gmlPrinter);
+    TS_ASSERT_EQUALS (gmlPrinter.Graph(), "");
+  }
 
   return ai;
 }
@@ -194,7 +197,7 @@ void UT_SystemModelManager::test_DoDataCycles_AccessInterface ()
   auto spy = make_shared<Spy_AccessInterfaceProtocols>();
   ai->SetProtocol (spy);
 
-//+  GmlPrinterVisitor gmlPrinter("Testcase_AccessInterface", true, true, true);
+//+  GmlPrinterVisitor gmlPrinter("Testcase_AccessInterface", GmlPrinterOptions::Std);
 //+  ai->Accept(gmlPrinter);
 //+  TS_ASSERT_EQUALS (gmlPrinter.Graph(), "");
 
@@ -230,7 +233,7 @@ void UT_SystemModelManager::test_DoDataCycles_1500 ()
   SystemModel sm;
   SystemModelBuilder builder(sm);
 
-  auto ai        = Create_TestCase_1500(sm);
+  auto ai = Create_TestCase_1500(sm, false);
 
   auto spy = make_shared<Spy_AccessInterfaceProtocols>();
   ai->SetProtocol (spy);
@@ -259,11 +262,26 @@ void UT_SystemModelManager::test_DoDataCycles_1500 ()
     BinaryVector::CreateFromString("/x3636/b0/x0909_0909"), // 09 : DR
     BinaryVector::CreateFromString("/x3636/b1/x4040_4040"), // 10 : DR
     BinaryVector::CreateFromString("/x3636/b1:000"),        // 11 : DR
-    BinaryVector::CreateFromString("/xFF"),                 // 12 : IR
-    BinaryVector::CreateFromString("/b1"),                  // 13 : DR
-    BinaryVector::CreateFromString("/x01"),                 // 14 : IR
+//+    BinaryVector::CreateFromString("/xFF"),                 // 12 : IR
+//+    BinaryVector::CreateFromString("/b1"),                  // 13 : DR
+//+    BinaryVector::CreateFromString("/x01"),                 // 14 : IR
     BinaryVector::CreateFromString("/x3636/b0:000"),        // 15 : DR
     BinaryVector::CreateFromString("/xFF"),                 // 16 : IR
+
+//+    BinaryVector::CreateFromString("/b0000:0001"),                                                     // 00 : DR
+//+    BinaryVector::CreateFromString("/b0000:0101_0000:0101_10"),                                        // 01 : DR
+//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_0100"),                                      // 02 : DR
+//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_1110:0000_0110:0000_0110:0000_0110:0000_0"), // 03 : DR
+//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_0011"),                                      // 04 : DR
+//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_1101:1000_0101:1000_0101:1000_0101:1000_0"), // 05 : DR
+//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_0010"),                                      // 06 : DR
+//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_1000:0101_0000:0101_0000:0101_0000:0101_0"), // 07 : DR
+//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_0001"),                                      // 08 : DR
+//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_0000:0100_1000:0100_1000:0100_1000:0100_1"), // 09 : DR
+//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_1010:0000_0010:0000_0010:0000_0010:0000_0"), // 10 : DR
+//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_1000"),                                      // 11 : DR
+//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_0000"),                                      // 12 : DR
+//+    BinaryVector::CreateFromString("/b1111:1111"),                                                     // 13 : DR
   };
 
   TS_ASSERT_EQUALS (gotSutVectors, expected);
@@ -296,23 +314,23 @@ void UT_SystemModelManager::test_DoDataCycles_1500_SVF ()
 
   vector<string> expected
   {
-     "SIR 8 TDI(01);\n",
-     "SDR 18 TDI(001416);\n",
-     "SDR 20 TDI(036364);\n",
-     "SDR 49 TDI(006C6DC0C0C0C0);\n",
-     "SDR 20 TDI(036363);\n",
-     "SDR 49 TDI(006C6DB0B0B0B0);\n",
-     "SDR 20 TDI(036362);\n",
-     "SDR 49 TDI(006C6D0A0A0A0A);\n",
-     "SDR 20 TDI(036361);\n",
-     "SDR 49 TDI(006C6C09090909);\n",
-     "SDR 49 TDI(006C6D40404040);\n",
-     "SDR 20 TDI(036368);\n",
-     "SIR 8 TDI(FF);\n",
-     "SDR 1 TDI(01);\n",
-     "SIR 8 TDI(01);\n",
-     "SDR 20 TDI(036360);\n",
-     "SIR 8 TDI(FF);\n",
+     "SIR 8 TDI(01);\n",                   // 00
+     "SDR 18 TDI(001416);\n",              // 01
+     "SDR 20 TDI(036364);\n",              // 02
+     "SDR 49 TDI(006C6DC0C0C0C0);\n",      // 03
+     "SDR 20 TDI(036363);\n",              // 04
+     "SDR 49 TDI(006C6DB0B0B0B0);\n",      // 05
+     "SDR 20 TDI(036362);\n",              // 06
+     "SDR 49 TDI(006C6D0A0A0A0A);\n",      // 07
+     "SDR 20 TDI(036361);\n",              // 08
+     "SDR 49 TDI(006C6C09090909);\n",      // 09
+     "SDR 49 TDI(006C6D40404040);\n",      // 10
+     "SDR 20 TDI(036368);\n",              // 11
+//+     "SIR 8 TDI(FF);\n",                   // 12
+//+     "SDR 1 TDI(01);\n",                   // 13
+//+     "SIR 8 TDI(01);\n",                   // 14
+     "SDR 20 TDI(036360);\n",              // 15
+     "SIR 8 TDI(FF);\n",                   // 16
   };
 
   TS_ASSERT_EQUALS (gotSvfCommands, expected);

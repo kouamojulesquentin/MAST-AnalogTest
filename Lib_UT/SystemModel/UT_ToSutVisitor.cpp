@@ -314,6 +314,7 @@ void UT_ToSutVisitor::test_Accept_Testcase_AccessInterface_1_Pending_Step_2 ()
   //
   auto sm      = CreateSystemModel_AccessInterface(0x5A);  // static_2 register is made pending
   auto tap     = sm.Root();
+  auto ir      = sm.RegisterWithId(1u);
   auto reg_2   = sm.RegisterWithId(7u);
   auto updater = FromSutUpdater(sm);
 
@@ -353,8 +354,10 @@ void UT_ToSutVisitor::test_Accept_Testcase_AccessInterface_1_Pending_Step_2 ()
   // Check that register value has been "served"
   updater.UpdateRegisters(identifiers, sutVector);
   tap->Accept(configurator);
+
   TS_ASSERT_FALSE (reg_2->IsPending());
-  TS_ASSERT_FALSE (tap->IsPending());
+  TS_ASSERT_TRUE  (ir->IsPending());   // This is to select Tap Bypass register
+  TS_ASSERT_TRUE  (tap->IsPending());
 }
 
 

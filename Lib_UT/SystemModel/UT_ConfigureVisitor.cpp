@@ -146,35 +146,30 @@ void UT_ConfigureVisitor::test_Accept_Testcase_1500_2_Pending ()
 
 //! Checks ConfigureVisitor::Accept with Testcase_1500() reset pending flags when no more register are pending
 //!
-void UT_ConfigureVisitor::test_Accept_Testcase_1500_Pending_Reset ()
+void UT_ConfigureVisitor::test_Accept_Testcase_AI_Pending_Reset ()
 {
   // ---------------- Setup
   //
   SystemModel        sm;
   SystemModelBuilder builder(sm);
 
-  auto tap      = builder.Create_TestCase_1500("TAP", 3u);
+  auto tap      = builder.Create_TestCase_AccessInterface("TAP");
   auto ir       = sm.RegisterWithId(1u);
-  auto swirCtrl = sm.RegisterWithId(7u);
-  auto wirReg   = sm.RegisterWithId(10u);
-  auto wirMux   = sm.LinkerWithId(12);
-  auto reg_1    = sm.RegisterWithId(14u);
-  auto reg_2    = sm.RegisterWithId(16u);
+  auto reg_1    = sm.RegisterWithId(5u);
+  auto reg_2    = sm.RegisterWithId(7u);
 
-  reg_1->SetToSut(BinaryVector(DYNAMIC_TDR_LEN, 0xA1));  // Make the register pending
-  reg_2->SetToSut(BinaryVector(DYNAMIC_TDR_LEN, 0x52));  // Make the register pending
+  reg_1->SetToSut(BinaryVector(STATIC_TDR_LEN, 0xA1));  // Make the register pending
+  reg_2->SetToSut(BinaryVector(STATIC_TDR_LEN, 0x52));  // Make the register pending
   ConfigureVisitor sut(nullptr);    // No special algorithm ==> select last pending
 
   tap->Accept(sut); // Make the SystemModel pending
 
-  ir       ->UpdateLastToSut();
-  swirCtrl ->UpdateLastToSut();
-  wirReg   ->UpdateLastToSut();
-  reg_1    ->UpdateLastToSut();
-  reg_2    ->UpdateLastToSut();
+  ir    ->UpdateLastToSut();
+  reg_1 ->UpdateLastToSut();
+  reg_2 ->UpdateLastToSut();
 
   tap->Accept(sut); // Make the wirReg pending again
-  wirReg   ->UpdateLastToSut();
+  ir->UpdateLastToSut();
 
   // ---------------- Exercise
   //

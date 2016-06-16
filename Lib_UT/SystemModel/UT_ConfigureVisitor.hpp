@@ -32,10 +32,12 @@ class UT_ConfigureVisitor : public CxxTest::TestSuite
   //
   void test_Constructor ();
 
+  // ---------------- Accept
+  //
   void test_Accept_Testcase_1500_Nothing_Pending ();
   void test_Accept_Testcase_1500_1_Pending ();
   void test_Accept_Testcase_1500_2_Pending ();
-  void test_Accept_Testcase_1500_Pending_Reset ();
+  void test_Accept_Testcase_AI_Pending_Reset ();
 
   // ================ Other Methods ================
 

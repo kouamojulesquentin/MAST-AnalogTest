@@ -87,3 +87,6 @@ else: CONFIG(release, debug|release) {
   LIBS       += -L$$clean_path($$PWD/../Build_Qt/bin/release) -lLib
 }
 
+unix {
+    LIBS += -lpthread
+}

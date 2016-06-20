@@ -107,31 +107,6 @@ void Linker::Select   (uint32_t pathIdentifier)
   m_pathSelector->Select(pathIdentifier);
 }
 
-
-
-//! Returns pointer on byte-stream for last sequence shifted from sut
-//!
-//+BinaryVector Linker::GetLastSequence () const
-//+{
-//+  return BinaryVector();
-//+}
-//
-//  End of: Linker::GetLastSequence
-//---------------------------------------------------------------------------
-
-
-//! Returns pointer on byte-stream for next sequence to shift into sut
-//!
-//+BinaryVector Linker::GetNextSequence () const
-//+{
-//+  return BinaryVector();
-//+}
-//
-//  End of: Linker::GetNextSequence
-//---------------------------------------------------------------------------
-
-
-
 //===========================================================================
 // End of Linker.cpp
 //===========================================================================

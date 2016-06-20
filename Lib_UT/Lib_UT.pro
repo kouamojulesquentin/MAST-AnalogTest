@@ -25,6 +25,7 @@ DEPENDPATH += $$PWD/../Lib/include \
 
 SOURCES += \
     Generated/Runner.cpp                         \
+    SystemModel/Fake_SVF_Simulator.cpp           \
     SystemModel/Spy_AccessInterfaceProtocols.cpp \
     SystemModel/Spy_SVF_Protocol.cpp             \
     SystemModel/UT_ConfigureVisitor.cpp          \
@@ -35,6 +36,7 @@ SOURCES += \
     SystemModel/UT_PrettyPrinterVisitor.cpp      \
     SystemModel/UT_PropagatePendingVisitor.cpp   \
     SystemModel/UT_Register.cpp                  \
+    SystemModel/UT_SVF_SimulationProtocol.cpp    \
     SystemModel/UT_SystemModel.cpp               \
     SystemModel/UT_SystemModelCheckerVisitor.cpp \
     SystemModel/UT_ToSutVisitor.cpp              \
@@ -50,6 +52,7 @@ SOURCES += \
 HEADERS += \
     CxxTest_Traits/BinaryVector_Traits.hpp           \
     CxxTest_Traits/SystemModelCheckResult_Traits.hpp \
+    SystemModel/Fake_SVF_Simulator.hpp               \
     SystemModel/Spy_AccessInterfaceProtocols.hpp     \
     SystemModel/Spy_SVF_Protocol.hpp                 \
     SystemModel/UT_ConfigureVisitor.hpp              \
@@ -60,6 +63,7 @@ HEADERS += \
     SystemModel/UT_PrettyPrinterVisitor.hpp          \
     SystemModel/UT_PropagatePendingVisitor.hpp       \
     SystemModel/UT_Register.hpp                      \
+    SystemModel/UT_SVF_SimulationProtocol.hpp        \
     SystemModel/UT_SystemModel.hpp                   \
     SystemModel/UT_SystemModelCheckerVisitor.hpp     \
     SystemModel/UT_ToSutVisitor.hpp                  \

@@ -48,8 +48,10 @@ OBJ_DEBUG = \
             $(OBJDIR_DEBUG)/Utility/UT_BinaryVector.o                      \
             $(OBJDIR_DEBUG)/UT_Helpers/UT_SystemModelBuilder.o             \
             $(OBJDIR_DEBUG)/UT_Helpers/SystemModelBuilder.o                \
+            $(OBJDIR_DEBUG)/SystemModel/Fake_SVF_Simulator.o               \
             $(OBJDIR_DEBUG)/SystemModel/Spy_AccessInterfaceProtocols.o     \
             $(OBJDIR_DEBUG)/SystemModel/Spy_SVF_Protocol.o                 \
+            $(OBJDIR_DEBUG)/SystemModel/UT_SVF_SimulationProtocol.o        \
             $(OBJDIR_DEBUG)/SystemModel/UT_SystemModel.o                   \
             $(OBJDIR_DEBUG)/SystemModel/UT_FromSutUpdater.o                \
             $(OBJDIR_DEBUG)/SystemModel/UT_ToSutVisitor.o                  \
@@ -71,8 +73,10 @@ OBJ_RELEASE = \
               $(OBJDIR_RELEASE)/Utility/UT_BinaryVector.o                  \
               $(OBJDIR_RELEASE)/UT_Helpers/UT_SystemModelBuilder.o         \
               $(OBJDIR_RELEASE)/UT_Helpers/SystemModelBuilder.o            \
+              $(OBJDIR_RELEASE)/SystemModel/Fake_SVF_Simulator.o           \
               $(OBJDIR_RELEASE)/SystemModel/Spy_AccessInterfaceProtocols.o \
               $(OBJDIR_RELEASE)/SystemModel/Spy_SVF_Protocol.o             \
+              $(OBJDIR_RELEASE)/SystemModel/UT_SVF_SimulationProtocol.o    \
               $(OBJDIR_RELEASE)/SystemModel/UT_SystemModel.o               \
               $(OBJDIR_RELEASE)/SystemModel/UT_FromSutUpdater.o            \
               $(OBJDIR_RELEASE)/SystemModel/UT_ToSutVisitor.o              \
@@ -116,6 +120,9 @@ $(OBJDIR_DEBUG)/UT_Helpers/SystemModelBuilder.o: UT_Helpers/SystemModelBuilder.c
 $(OBJDIR_DEBUG)/UT_Helpers/UT_SystemModelBuilder.o: UT_Helpers/UT_SystemModelBuilder.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c UT_Helpers/UT_SystemModelBuilder.cpp -o $(OBJDIR_DEBUG)/UT_Helpers/UT_SystemModelBuilder.o
 
+$(OBJDIR_DEBUG)/SystemModel/Fake_SVF_Simulator.o: SystemModel/Fake_SVF_Simulator.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/Fake_SVF_Simulator.cpp -o $(OBJDIR_DEBUG)/SystemModel/Fake_SVF_Simulator.o
+
 $(OBJDIR_DEBUG)/SystemModel/Spy_AccessInterfaceProtocols.o: SystemModel/Spy_AccessInterfaceProtocols.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/Spy_AccessInterfaceProtocols.cpp -o $(OBJDIR_DEBUG)/SystemModel/Spy_AccessInterfaceProtocols.o
 
@@ -145,6 +152,9 @@ $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelManager.o: SystemModel/UT_SystemModelM
 
 $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelNode.o: SystemModel/UT_SystemModelNode.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_SystemModelNode.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelNode.o
+
+$(OBJDIR_DEBUG)/SystemModel/UT_SVF_SimulationProtocol.o: SystemModel/UT_SVF_SimulationProtocol.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_SVF_SimulationProtocol.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_SVF_SimulationProtocol.o
 
 $(OBJDIR_DEBUG)/SystemModel/UT_SystemModel.o: SystemModel/UT_SystemModel.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_SystemModel.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_SystemModel.o
@@ -203,6 +213,9 @@ $(OBJDIR_RELEASE)/UT_Helpers/SystemModelBuilder.o: UT_Helpers/SystemModelBuilder
 $(OBJDIR_RELEASE)/UT_Helpers/UT_SystemModelBuilder.o: UT_Helpers/UT_SystemModelBuilder.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c UT_Helpers/UT_SystemModelBuilder.cpp -o $(OBJDIR_RELEASE)/UT_Helpers/UT_SystemModelBuilder.o
 
+$(OBJDIR_RELEASE)/SystemModel/Fake_SVF_Simulator.o: SystemModel/Fake_SVF_Simulator.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/Fake_SVF_Simulator.cpp -o $(OBJDIR_RELEASE)/SystemModel/Fake_SVF_Simulator.o
+
 $(OBJDIR_RELEASE)/SystemModel/Spy_AccessInterfaceProtocols.o: SystemModel/Spy_AccessInterfaceProtocols.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/Spy_AccessInterfaceProtocols.cpp -o $(OBJDIR_RELEASE)/SystemModel/Spy_AccessInterfaceProtocols.o
 
@@ -232,6 +245,9 @@ $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelManager.o: SystemModel/UT_SystemMode
 
 $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelNode.o: SystemModel/UT_SystemModelNode.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_SystemModelNode.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelNode.o
+
+$(OBJDIR_RELEASE)/SystemModel/UT_SVF_SimulationProtocol.o: SystemModel/UT_SVF_SimulationProtocol.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_SVF_SimulationProtocol.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_SVF_SimulationProtocol.o
 
 $(OBJDIR_RELEASE)/SystemModel/UT_SystemModel.o: SystemModel/UT_SystemModel.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_SystemModel.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_SystemModel.o

@@ -58,6 +58,7 @@ OBJ_DEBUG = $(OBJDIR_DEBUG)/src/AccessInterface.o                  \
             $(OBJDIR_DEBUG)/src/PropagatePendingVisitor.o          \
             $(OBJDIR_DEBUG)/src/Register.o                         \
             $(OBJDIR_DEBUG)/src/SVF_Player.o                       \
+            $(OBJDIR_DEBUG)/src/SVF_SimulationProtocol.o           \
             $(OBJDIR_DEBUG)/src/SVFVector.o                        \
             $(OBJDIR_DEBUG)/src/SystemModel.o                      \
             $(OBJDIR_DEBUG)/src/SystemModelManager.o               \
@@ -84,6 +85,7 @@ OBJ_RELEASE = $(OBJDIR_RELEASE)/src/AccessInterface.o                  \
               $(OBJDIR_RELEASE)/src/PropagatePendingVisitor.o          \
               $(OBJDIR_RELEASE)/src/Register.o                         \
               $(OBJDIR_RELEASE)/src/SVF_Player.o                       \
+              $(OBJDIR_RELEASE)/src/SVF_SimulationProtocol.o           \
               $(OBJDIR_RELEASE)/src/SVFVector.o                        \
               $(OBJDIR_RELEASE)/src/SystemModel.o                      \
               $(OBJDIR_RELEASE)/src/SystemModelManager.o               \
@@ -156,6 +158,9 @@ $(OBJDIR_DEBUG)/src/Register.o: src/Register.cpp
 
 $(OBJDIR_DEBUG)/src/SVF_Player.o: src/SVF_Player.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/SVF_Player.cpp -o $(OBJDIR_DEBUG)/src/SVF_Player.o
+
+$(OBJDIR_DEBUG)/src/SVF_SimulationProtocol.o: src/SVF_SimulationProtocol.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/SVF_SimulationProtocol.cpp -o $(OBJDIR_DEBUG)/src/SVF_SimulationProtocol.o
 
 $(OBJDIR_DEBUG)/src/SVFVector.o: src/SVFVector.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/SVFVector.cpp -o $(OBJDIR_DEBUG)/src/SVFVector.o
@@ -247,6 +252,9 @@ $(OBJDIR_RELEASE)/src/Register.o: src/Register.cpp
 
 $(OBJDIR_RELEASE)/src/SVF_Player.o: src/SVF_Player.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/SVF_Player.cpp -o $(OBJDIR_RELEASE)/src/SVF_Player.o
+
+$(OBJDIR_RELEASE)/src/SVF_SimulationProtocol.o: src/SVF_SimulationProtocol.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/SVF_SimulationProtocol.cpp -o $(OBJDIR_RELEASE)/src/SVF_SimulationProtocol.o
 
 $(OBJDIR_RELEASE)/src/SVFVector.o: src/SVFVector.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/SVFVector.cpp -o $(OBJDIR_RELEASE)/src/SVFVector.o

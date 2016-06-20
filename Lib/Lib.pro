@@ -33,6 +33,7 @@ SOURCES +=  \
     src/PropagatePendingVisitor.cpp        \
     src/Register.cpp                       \
     src/SVF_Player.cpp                     \
+    src/SVF_SimulationProtocol.cpp         \
     src/SVFVector.cpp                      \
     src/SystemModel.cpp                    \
     src/SystemModelManager.cpp             \
@@ -67,6 +68,7 @@ HEADERS += \
     include/PropagatePendingVisitor.hpp         \
     include/Register.hpp                        \
     include/SVF_Player.hpp                      \
+    include/SVF_SimulationProtocol.hpp          \
     include/SVFVector.hpp                       \
     include/SystemModel.hpp                     \
     include/SystemModelManager.hpp              \

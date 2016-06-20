@@ -390,7 +390,7 @@ void UT_GmlPrinterVisitor::test_Visit_SelectionValues ()
                          "   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"Reg_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 6 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"Reg_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   edge [ source 0 target 1 label \"1\" ]\n"
-                         "   edge [ source 2 target 3 label \"1/[0b111111:S]\" ]\n"
+                         "   edge [ source 2 target 3 label \"1/[0b111111:S:A]\" ]\n"
                          "   edge [ source 7 target 12 label \"1\" ]\n"
                          "   edge [ source 7 target 13 label \"2\" ]\n"
                          "   edge [ source 7 target 14 label \"3\" ]\n"

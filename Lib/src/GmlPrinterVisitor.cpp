@@ -106,10 +106,17 @@ void GmlPrinterVisitor::AppendParentNode (string_view       shapeName,
       {
         ostringstream os;
         os << "/[" << selector->SelectionValue(childId).DataAsMixString(8, "", ":");
+
         if (selector->IsSelected(childId))
         {
           os << ":S";
         }
+
+        if (selector->IsActive(childId))
+        {
+          os << ":A";
+        }
+
         os << "]";
         auto note = os.str();
         PrintEdge(parentNode, *child, childId, "", note);

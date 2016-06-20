@@ -18,6 +18,9 @@
 #include "Spy_SVF_Protocol.hpp"
 #include "GmlPrinterVisitor.hpp"
 #include "BinaryVector_Traits.hpp"
+#include "DefaultBinaryPathSelector.hpp"
+
+#include <memory>
 
 using namespace mast;
 using namespace test;
@@ -67,6 +70,80 @@ std::shared_ptr<AccessInterface> Create_TestCase_1500 (SystemModel& sm, bool rep
 }
 //
 //  End of: Create_TestCase_1500
+//---------------------------------------------------------------------------
+
+
+//! Creates test case "MIB_Multichain_Pre"
+//!
+std::shared_ptr<AccessInterface> Create_TestCase_MIB_Multichain_Pre (SystemModel& sm, bool reportGml = false)
+{
+  SystemModelBuilder builder(sm);
+
+  auto tap = builder.Create_TestCase_MIB_Multichain_Pre("TAP", 4u);
+
+  auto regDyn_0  = sm.RegisterWithId(6u);
+  auto regDyn_1  = sm.RegisterWithId(7u);
+  auto regDyn_2  = sm.RegisterWithId(8u);
+  auto regDyn_3  = sm.RegisterWithId(9u);
+
+  regDyn_0->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x60));
+  regDyn_1->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x61));
+  regDyn_2->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x62));
+  regDyn_3->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x63));
+
+  regDyn_0->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x40));
+  regDyn_1->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x41));
+  regDyn_2->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x42));
+  regDyn_3->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x43));
+
+  if (reportGml)
+  {
+    GmlPrinterVisitor gmlPrinter("MIB_Multichain_Pre", GmlPrinterOptions::Std);
+    tap->Accept(gmlPrinter);
+    TS_ASSERT_EQUALS (gmlPrinter.Graph(), "");
+  }
+
+  return tap;
+}
+//
+//  End of: Create_TestCase_MIB_Multichain_Pre
+//---------------------------------------------------------------------------
+
+
+//! Creates test case "MIB_Multichain_Post"
+//!
+std::shared_ptr<AccessInterface> Create_TestCase_MIB_Multichain_Post (SystemModel& sm, bool reportGml = false)
+{
+  SystemModelBuilder builder(sm);
+
+  auto tap = builder.Create_TestCase_MIB_Multichain_Post("TAP", 4u);
+
+  auto regDyn_0  = sm.RegisterWithId(6u);
+  auto regDyn_1  = sm.RegisterWithId(7u);
+  auto regDyn_2  = sm.RegisterWithId(8u);
+  auto regDyn_3  = sm.RegisterWithId(9u);
+
+  regDyn_0->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x60));
+  regDyn_1->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x61));
+  regDyn_2->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x62));
+  regDyn_3->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x63));
+
+  regDyn_0->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x40));
+  regDyn_1->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x41));
+  regDyn_2->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x42));
+  regDyn_3->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x43));
+
+  if (reportGml)
+  {
+    GmlPrinterVisitor gmlPrinter("MIB_Multichain_Post", GmlPrinterOptions::Std);
+    tap->Accept(gmlPrinter);
+    TS_ASSERT_EQUALS (gmlPrinter.Graph(), "");
+  }
+
+  return tap;
+}
+//
+//  End of: Create_TestCase_MIB_Multichain_Post
 //---------------------------------------------------------------------------
 
 
@@ -262,26 +339,8 @@ void UT_SystemModelManager::test_DoDataCycles_1500 ()
     BinaryVector::CreateFromString("/x3636/b0/x0909_0909"), // 09 : DR
     BinaryVector::CreateFromString("/x3636/b1/x4040_4040"), // 10 : DR
     BinaryVector::CreateFromString("/x3636/b1:000"),        // 11 : DR
-//+    BinaryVector::CreateFromString("/xFF"),                 // 12 : IR
-//+    BinaryVector::CreateFromString("/b1"),                  // 13 : DR
-//+    BinaryVector::CreateFromString("/x01"),                 // 14 : IR
     BinaryVector::CreateFromString("/x3636/b0:000"),        // 15 : DR
     BinaryVector::CreateFromString("/xFF"),                 // 16 : IR
-
-//+    BinaryVector::CreateFromString("/b0000:0001"),                                                     // 00 : DR
-//+    BinaryVector::CreateFromString("/b0000:0101_0000:0101_10"),                                        // 01 : DR
-//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_0100"),                                      // 02 : DR
-//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_1110:0000_0110:0000_0110:0000_0110:0000_0"), // 03 : DR
-//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_0011"),                                      // 04 : DR
-//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_1101:1000_0101:1000_0101:1000_0101:1000_0"), // 05 : DR
-//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_0010"),                                      // 06 : DR
-//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_1000:0101_0000:0101_0000:0101_0000:0101_0"), // 07 : DR
-//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_0001"),                                      // 08 : DR
-//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_0000:0100_1000:0100_1000:0100_1000:0100_1"), // 09 : DR
-//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_1010:0000_0010:0000_0010:0000_0010:0000_0"), // 10 : DR
-//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_1000"),                                      // 11 : DR
-//+    BinaryVector::CreateFromString("/b0011:0110_0011:0110_0000"),                                      // 12 : DR
-//+    BinaryVector::CreateFromString("/b1111:1111"),                                                     // 13 : DR
   };
 
   TS_ASSERT_EQUALS (gotSutVectors, expected);
@@ -326,9 +385,6 @@ void UT_SystemModelManager::test_DoDataCycles_1500_SVF ()
      "SDR 49 TDI(006C6C09090909);\n",      // 09
      "SDR 49 TDI(006C6D40404040);\n",      // 10
      "SDR 20 TDI(036368);\n",              // 11
-//+     "SIR 8 TDI(FF);\n",                   // 12
-//+     "SDR 1 TDI(01);\n",                   // 13
-//+     "SIR 8 TDI(01);\n",                   // 14
      "SDR 20 TDI(036360);\n",              // 15
      "SIR 8 TDI(FF);\n",                   // 16
   };
@@ -337,9 +393,103 @@ void UT_SystemModelManager::test_DoDataCycles_1500_SVF ()
 }
 
 
+//! Checks SystemModelManager DoDataCycles when using "MIB_Multichain_Pre" testcase
+//!
+void UT_SystemModelManager::test_DoDataCycles_MIB_Multichain_Pre ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+
+  auto ai = Create_TestCase_MIB_Multichain_Pre(sm, false);
+
+  auto spy = make_shared<Spy_AccessInterfaceProtocols>();
+  ai->SetProtocol (spy);
+
+  SystemModelManager sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.DoDataCycles());
+
+  // ---------------- Verify
+  //
+  auto gotSutVectors = spy->ToSutVectors();
+
+  std::vector<mast::BinaryVector> expected
+  {
+    BinaryVector::CreateFromString("0x02"),        // 00 : IR
+    BinaryVector::CreateFromString("0x6060_6060"), // 01 : DR
+    BinaryVector::CreateFromString("0x01"),        // 02 : IR
+    BinaryVector::CreateFromString("0b11"),        // 03 : DR
+    BinaryVector::CreateFromString("0x02"),        // 04 : IR
+    BinaryVector::CreateFromString("0x6363_6363"), // 05 : DR
+    BinaryVector::CreateFromString("0x01"),        // 06 : IR
+    BinaryVector::CreateFromString("0b10"),        // 07 : DR
+    BinaryVector::CreateFromString("0x02"),        // 08 : IR
+    BinaryVector::CreateFromString("0x6262_6262"), // 09 : DR
+    BinaryVector::CreateFromString("0x01"),        // 10 : IR
+    BinaryVector::CreateFromString("0b01"),        // 11 : DR
+    BinaryVector::CreateFromString("0x02"),        // 12 : IR
+    BinaryVector::CreateFromString("0x6161_6161"), // 13 : DR
+    BinaryVector::CreateFromString("0xFF"),        // 14 : IR
+    BinaryVector::CreateFromString("0b1"),         // 15 : DR
+    BinaryVector::CreateFromString("0x01"),        // 16 : IR
+    BinaryVector::CreateFromString("0b00"),        // 17 : DR
+    BinaryVector::CreateFromString("0xFF"),        // 18 : IR
+  };
+
+  TS_ASSERT_EQUALS (gotSutVectors, expected);
+}
 
 
 
+//! Checks SystemModelManager DoDataCycles when using "MIB_Multichain_Post" testcase
+//!
+void UT_SystemModelManager::test_DoDataCycles_MIB_Multichain_Post ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+
+  auto ai = Create_TestCase_MIB_Multichain_Post(sm, false);
+
+  auto spy = make_shared<Spy_AccessInterfaceProtocols>();
+  ai->SetProtocol (spy);
+
+  SystemModelManager sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.DoDataCycles());
+
+  // ---------------- Verify
+  //
+  auto gotSutVectors = spy->ToSutVectors();
+
+  std::vector<mast::BinaryVector> expected
+  {
+    BinaryVector::CreateFromString("0x02"),        // 00 : IR
+    BinaryVector::CreateFromString("0b11"),        // 01 : DR
+    BinaryVector::CreateFromString("0x01"),        // 02 : IR
+    BinaryVector::CreateFromString("0x6363_6363"), // 03 : DR
+    BinaryVector::CreateFromString("0x02"),        // 04 : IR
+    BinaryVector::CreateFromString("0b10"),        // 05 : DR
+    BinaryVector::CreateFromString("0x01"),        // 06 : IR
+    BinaryVector::CreateFromString("0x6262_6262"), // 07 : DR
+    BinaryVector::CreateFromString("0x02"),        // 08 : IR
+    BinaryVector::CreateFromString("0b01"),        // 09 : DR
+    BinaryVector::CreateFromString("0x01"),        // 10 : IR
+    BinaryVector::CreateFromString("0x6161_6161"), // 11 : DR
+    BinaryVector::CreateFromString("0x02"),        // 12 : IR
+    BinaryVector::CreateFromString("0b00"),        // 13 : DR
+    BinaryVector::CreateFromString("0x01"),        // 14 : IR
+    BinaryVector::CreateFromString("0x6060_6060"), // 15 : DR
+    BinaryVector::CreateFromString("0xFF"),        // 16 : IR
+  };
+
+  TS_ASSERT_EQUALS (gotSutVectors, expected);
+}
 
 //===========================================================================
 // End of UT_SystemModelManager.cpp

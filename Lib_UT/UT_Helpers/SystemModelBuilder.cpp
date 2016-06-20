@@ -249,6 +249,68 @@ shared_ptr<AccessInterface> SystemModelBuilder::Create_TestCase_1687 (string_vie
 //---------------------------------------------------------------------------
 
 
+//! Creates a multi-chain MIB with control register placed before the mux (Linker)
+//!
+//! @note - There are multiple "dynamic" registers
+//!       - The control register is composed with multiple bits
+//!
+//! @param name         Name for top node
+//! @param chainsCount  Number of MIB mux derivations
+//!
+//! @return Top node of created sub-tree
+shared_ptr<AccessInterface> SystemModelBuilder::Create_TestCase_MIB_Multichain_Pre (string_view name, uint32_t chainsCount)
+{
+  auto tap         = m_model.CreateTap(name, 8u, 3u);
+
+  // ---------------- Append MIB with control register before mux
+  //
+  auto mibCtrl     = m_model.CreateRegister("MIB_ctrl", BinaryVector::CreateFromBinaryString("00"), tap);
+  auto mibSelector = make_shared<DefaultBinaryPathSelector>(mibCtrl, chainsCount);
+  auto mibMux      = m_model.CreateLinker("MIB_mux", mibSelector, tap);
+
+  // ---------------- Add wrapped cores (registers)
+  //
+  AppendRegisters(chainsCount, "dynamic_", BinaryVector(DYNAMIC_TDR_LEN, 0), mibMux);
+
+  return tap;
+}
+//
+//  End of: SystemModelBuilder::Create_TestCase_MIB_Multichain_Pre
+//---------------------------------------------------------------------------
+
+
+//! Creates a multi-chain MIB with control register placed before the mux (Linker)
+//!
+//! @note - There are multiple "dynamic" registers
+//!       - The control register is composed with multiple bits
+//!
+//! @param name         Name for top node
+//! @param chainsCount  Number of MIB mux derivations
+//!
+//! @return Top node of created sub-tree
+shared_ptr<AccessInterface> SystemModelBuilder::Create_TestCase_MIB_Multichain_Post (string_view name, uint32_t chainsCount)
+{
+  auto tap         = m_model.CreateTap(name, 8u, 3u);
+
+  // ---------------- Append MIB with control register before mux
+  //
+  auto mibCtrl     = m_model.CreateRegister("MIB_ctrl", BinaryVector::CreateFromBinaryString("00"), nullptr);
+  auto mibSelector = make_shared<DefaultBinaryPathSelector>(mibCtrl, chainsCount);
+  auto mibMux      = m_model.CreateLinker("MIB_mux", mibSelector, tap);
+
+  tap->AppendChild(mibCtrl);
+
+  // ---------------- Add wrapped cores (registers)
+  //
+  AppendRegisters(chainsCount, "dynamic_", BinaryVector(DYNAMIC_TDR_LEN, 0), mibMux);
+
+  return tap;
+}
+//
+//  End of: SystemModelBuilder::Create_TestCase_MIB_Multichain_Post
+//---------------------------------------------------------------------------
+
+
 //! Creates a 1687 structure with multiple insertion bits configuration
 //!
 //! @note - There are multiple "dynamic" registers

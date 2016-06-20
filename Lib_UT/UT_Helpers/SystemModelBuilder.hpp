@@ -91,10 +91,12 @@ class SystemModelBuilder final
   }
 
 
-  std::shared_ptr<mast::AccessInterface> Create_TestCase_AccessInterface (std::experimental::string_view name = "TAP");
-  std::shared_ptr<mast::AccessInterface> Create_TestCase_1687            (std::experimental::string_view name = "");
-  std::shared_ptr<mast::AccessInterface> Create_TestCase_MIB             (std::experimental::string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
-  std::shared_ptr<mast::AccessInterface> Create_TestCase_1500            (std::experimental::string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
+  std::shared_ptr<mast::AccessInterface> Create_TestCase_AccessInterface     (std::experimental::string_view name = "TAP");
+  std::shared_ptr<mast::AccessInterface> Create_TestCase_1687                (std::experimental::string_view name = "");
+  std::shared_ptr<mast::AccessInterface> Create_TestCase_MIB                 (std::experimental::string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
+  std::shared_ptr<mast::AccessInterface> Create_TestCase_MIB_Multichain_Pre  (std::experimental::string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
+  std::shared_ptr<mast::AccessInterface> Create_TestCase_MIB_Multichain_Post (std::experimental::string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
+  std::shared_ptr<mast::AccessInterface> Create_TestCase_1500                (std::experimental::string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
 
 
   std::shared_ptr<mast::AccessInterface> Create_Default_SUT  (std::experimental::string_view name);

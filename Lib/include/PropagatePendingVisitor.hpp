@@ -17,6 +17,7 @@
 
 #include "SystemModelVisitor.hpp"
 #include "Platform.hpp"
+#include <cstdint>
 
 namespace mast
 {
@@ -43,7 +44,7 @@ class DLL_EXPORT PropagatePendingVisitor final : public SystemModelVisitor
   // ---------------- Protected Methods
   //
   protected:
-  virtual bool HasChildPending (const ParentNode& parentNode);
+  virtual uint32_t ChildrenPendings (const ParentNode& parentNode);
 };
 //
 //  End of PropagatePendingVisitor class declaration

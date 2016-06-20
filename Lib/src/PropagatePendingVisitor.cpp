@@ -21,10 +21,8 @@ using namespace mast;
 //!
 void PropagatePendingVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 {
-  if (HasChildPending(accessInterface))
-  {
-    accessInterface.SetPending();
-  }
+  auto pendings = ChildrenPendings(accessInterface);
+  accessInterface.SetPendingsCount(pendings);
 }
 //
 //  End of: PropagatePendingVisitor::VisitAccessInterface
@@ -36,10 +34,8 @@ void PropagatePendingVisitor::VisitAccessInterface (AccessInterface& accessInter
 //!
 void PropagatePendingVisitor::VisitChain (Chain& chain)
 {
-  if (HasChildPending(chain))
-  {
-    chain.SetPending();
-  }
+  auto pendings = ChildrenPendings(chain);
+  chain.SetPendingsCount(pendings);
 }
 //
 //  End of: PropagatePendingVisitor::VisitChain
@@ -48,22 +44,23 @@ void PropagatePendingVisitor::VisitChain (Chain& chain)
 
 //! Visits direct children of a parent node, returning true if at least one is pending
 //!
-bool PropagatePendingVisitor::HasChildPending (const ParentNode& parentNode)
+uint32_t PropagatePendingVisitor::ChildrenPendings (const ParentNode& parentNode)
 {
-  auto isPending = false;
-  auto child     = parentNode.FirstChild();
+  uint32_t pendings = 0;
+  auto     child    = parentNode.FirstChild();
 
   while (child)
   {
     child->Accept(*this);
-    isPending |= child->IsPending();
+    pendings += child->PendingsCount();
 
     child = child->NextSibling();
   }
-  return isPending;
+
+  return pendings;
 }
 //
-//  End of: PropagatePendingVisitor::HasChildPending
+//  End of: PropagatePendingVisitor::ChildrenPendings
 //---------------------------------------------------------------------------
 
 
@@ -71,10 +68,8 @@ bool PropagatePendingVisitor::HasChildPending (const ParentNode& parentNode)
 //!
 void PropagatePendingVisitor::VisitLinker (Linker& linker)
 {
-  if (HasChildPending(linker))
-  {
-    linker.SetPending();
-  }
+  auto pendings = ChildrenPendings(linker);
+  linker.SetPendingsCount(pendings);
 }
 //
 //  End of: PropagatePendingVisitor::VisitLinker

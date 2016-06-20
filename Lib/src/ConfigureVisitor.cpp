@@ -22,11 +22,8 @@ using namespace mast;
 //!
 void ConfigureVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 {
-  accessInterface.ResetPending();
-  if (ConfigureChildren(accessInterface))
-  {
-    accessInterface.SetPending();
-  }
+  auto pendings = ConfigureChildren(accessInterface);
+  accessInterface.SetPendingsCount(pendings);
 }
 //
 //  End of: ConfigureVisitor::VisitAccessInterface
@@ -38,11 +35,8 @@ void ConfigureVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 //!
 void ConfigureVisitor::VisitChain (Chain& chain)
 {
-  chain.ResetPending();
-  if (ConfigureChildren(chain))
-  {
-    chain.SetPending();
-  }
+  auto pendings = ConfigureChildren(chain);
+  chain.SetPendingsCount(pendings);
 }
 //
 //  End of: ConfigureVisitor::VisitChain
@@ -56,38 +50,27 @@ void ConfigureVisitor::VisitChain (Chain& chain)
 //!
 //! @return true when at least one child is pending
 //!
-bool ConfigureVisitor::ConfigureChildren (const ParentNode& parentNode)
+uint32_t ConfigureVisitor::ConfigureChildren (const ParentNode& parentNode)
 {
-  auto isPending = false;
-  auto child     = parentNode.FirstChild();
-
+  auto child = parentNode.FirstChild();
   while (child)
   {
     child->Accept(*this);
-    isPending |= child->IsPending();
-
     child = child->NextSibling();
   }
 
-  if (!isPending)
+  // ---------------- Tally pendings after configuration of all children
+  //                 (a child may be changed while a sibling is configured)
+  //
+  uint32_t pendings = 0;
+  child = parentNode.FirstChild();
+  while (child)
   {
-    // ---------------- Check again pending state
-    //                 (a child may be changed while a sibling is configured)
-    //
-    child = parentNode.FirstChild();
-    while (child)
-    {
-      isPending = child->IsPending();
-      if (isPending)
-      {
-        break;
-      }
-
-      child = child->NextSibling();
-    }
+    pendings += child->PendingsCount();
+    child     = child->NextSibling();
   }
 
-  return isPending;
+  return pendings;
 }
 //
 //  End of: ConfigureVisitor::ConfigureChildren
@@ -110,7 +93,6 @@ void ConfigureVisitor::VisitLinker (Linker& linker)
   }
 
   uint32_t pathIdentifier = 1u;
-  auto     isPending      = false;
   auto     child          = linker.FirstChild();
 
   while (child)
@@ -118,7 +100,7 @@ void ConfigureVisitor::VisitLinker (Linker& linker)
     child->Accept(*this);
     if (child->IsPending())
     {
-      isPending = true;
+      linker.IncrementPendings(child->PendingsCount());
 
       if (m_configurationAlgorithm)
       {
@@ -132,11 +114,6 @@ void ConfigureVisitor::VisitLinker (Linker& linker)
 
     child = child->NextSibling();
     ++pathIdentifier;
-  }
-
-  if (isPending)
-  {
-    linker.SetPending();
   }
 
   if (m_configurationAlgorithm)

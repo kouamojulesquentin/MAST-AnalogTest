@@ -262,7 +262,7 @@ void UT_DefaultBinaryPathSelector::test_Select_Path_Zero ()
   // ---------------- Setup
   //
   auto bypassSequence = BinaryVector::CreateFromBinaryString("010");
-  auto reg            = make_shared<Register>("Reg", bypassSequence);
+  auto reg            = make_shared<Register>("Reg", bypassSequence, true);
   auto isInverted     = true;
   auto canSelectNone  = true;
   auto maxPath        = 5u;

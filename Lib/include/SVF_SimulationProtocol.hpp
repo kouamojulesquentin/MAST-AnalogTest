@@ -67,9 +67,9 @@ class DLL_EXPORT SVF_SimulationProtocol final : public SVF_Player
   // ---------------- Private  Fields
   //
   private:
-  std::string             m_toSutFilePath   = "./to_RTL/data_to_rtl.svf";     //!< File used to "transmit" SVF commands
-  std::string             m_fromSutFilePath = "./from_RTL/data_from_rtl.dat"; //!< File used to "receive" from SUT bitstream
-  std::ifstream::pos_type m_lastPos         = 0;                              //!< Position of last bitstream line "received" from SUT
+  std::string             m_toSutFilePath   = "to_RTL/data_to_rtl.svf";     //!< File used to "transmit" SVF commands
+  std::string             m_fromSutFilePath = "from_RTL/data_from_rtl.dat"; //!< File used to "receive" from SUT bitstream
+  std::ifstream::pos_type m_lastPos         = 0;                            //!< Position of last bitstream line "received" from SUT
 };
 //
 //  End of SVF_SimulationProtocol class declaration

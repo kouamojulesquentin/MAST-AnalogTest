@@ -47,8 +47,8 @@ void UT_SVF_SimulationProtocol::test_Constructor ()
 {
   // ---------------- Setup
   //
-  auto toSutPath = "./to_sut.svf";
-  auto fromSutPath = ".\\from_sut.dat";
+  auto toSutPath = "to_sut.svf";
+  auto fromSutPath = "from_sut.dat";
 
   // ---------------- Exercise & Verify
   //
@@ -62,8 +62,8 @@ void UT_SVF_SimulationProtocol::test_DoAction_Bad_ToSutPath ()
 {
   // ---------------- Setup
   //
-  auto toSutPath   = "./BAD/PATH/to_sut.svf";
-  auto fromSutPath = ".\\from_sut.dat";
+  auto toSutPath   = "BAD/PATH/to_sut.svf";
+  auto fromSutPath = "from_sut.dat";
   auto toSutVector = BinaryVector::CreateFromString("/x3636/b1/xC0C0_C0C0");
   auto sut         = SVF_SimulationProtocol(toSutPath, fromSutPath);
 
@@ -79,8 +79,8 @@ void UT_SVF_SimulationProtocol::test_DoAction_Bad_FromSutPath ()
 {
   // ---------------- Setup
   //
-  auto toSutPath   = "./to_sut.svf";
-  auto fromSutPath = "./BAD/PATH/from_sut.dat";
+  auto toSutPath   = "to_sut.svf";
+  auto fromSutPath = "BAD/PATH/from_sut.dat";
   auto toSutVector = BinaryVector::CreateFromString("/x3636/b1/xC0C0_C0C0");
   auto sut         = SVF_SimulationProtocol(toSutPath, fromSutPath);
 
@@ -97,8 +97,8 @@ void UT_SVF_SimulationProtocol::test_DoAction_Sync ()
 {
   // ---------------- DDT Setup
   //
-  auto toSutPath     = "./to_sut.svf";
-  auto fromSutPath   = ".\\from_sut.dat";
+  auto toSutPath     = "to_sut.svf";
+  auto fromSutPath   = "from_sut.dat";
   auto sut           = SVF_SimulationProtocol(toSutPath, fromSutPath);
 
   Fake_SVF_Simulator fakeSimulator(toSutPath, fromSutPath);
@@ -194,8 +194,8 @@ void UT_SVF_SimulationProtocol::test_DoAction_ASync ()
 {
   // ---------------- DDT Setup
   //
-  auto toSutPath   = "./to_sut.svf";
-  auto fromSutPath = ".\\from_sut.dat";
+  auto toSutPath   = "to_sut.svf";
+  auto fromSutPath = "from_sut.dat";
   auto sut         = SVF_SimulationProtocol(toSutPath, fromSutPath);
 
   Fake_SVF_Simulator fakeSimulator(toSutPath, fromSutPath);

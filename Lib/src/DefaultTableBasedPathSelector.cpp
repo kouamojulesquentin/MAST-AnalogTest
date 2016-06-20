@@ -108,7 +108,7 @@ void DefaultTableBasedPathSelector::CheckPathIdentifier (uint32_t pathIdentifier
 {
   if (pathIdentifier >= m_selectTable.size())
   {
-    ostringstream os; os << "pathIdentifier must be <= " << m_selectTable.size() << ", got: " << pathIdentifier;
+    ostringstream os; os << "pathIdentifier must be < " << m_selectTable.size() << ", got: " << pathIdentifier;
     THROW_OUT_OF_RANGE(os.str());
   }
 }

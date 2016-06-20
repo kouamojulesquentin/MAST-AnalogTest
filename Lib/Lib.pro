@@ -52,8 +52,6 @@ HEADERS += \
     include/Chain.hpp                           \
     include/ConfigurationAlgorithm.hpp          \
     include/ConfigureVisitor.hpp                \
-    include/DataCycleReadVisitor.hpp            \
-    include/DataCycleWriteVisitor.hpp           \
     include/DefaultBinaryPathSelector.hpp       \
     include/DefaultConfigurationAlgorithm.hpp   \
     include/DefaultTableBasedPathSelector.hpp   \

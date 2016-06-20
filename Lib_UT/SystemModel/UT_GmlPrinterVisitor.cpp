@@ -399,9 +399,9 @@ void UT_GmlPrinterVisitor::test_Visit_SelectionValues ()
                          "   edge [ source 4 target 9 label \"3\" ]\n"
                          "   edge [ source 4 target 10 label \"4\" ]\n"
                          "   edge [ source 4 target 11 label \"5\" ]\n"
-                         "   edge [ source 2 target 4 label \"2/[0b000001]\" ]\n"
-                         "   edge [ source 2 target 5 label \"3/[0b000010]\" ]\n"
-                         "   edge [ source 2 target 6 label \"4/[0b000011]\" ]\n"
+                         "   edge [ source 2 target 4 label \"2/[0b000001]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+                         "   edge [ source 2 target 5 label \"3/[0b000010]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+                         "   edge [ source 2 target 6 label \"4/[0b000011]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
                          "   edge [ source 0 target 2 label \"2\" ]\n"
                          "]"
                         );

@@ -107,19 +107,23 @@ void GmlPrinterVisitor::AppendParentNode (string_view       shapeName,
         ostringstream os;
         os << "/[" << selector->SelectionValue(childId).DataAsMixString(8, "", ":");
 
+        string_view edgeStyle = "dotted";
+
         if (selector->IsSelected(childId))
         {
           os << ":S";
+          edgeStyle = "dashed_dotted";
         }
 
         if (selector->IsActive(childId))
         {
           os << ":A";
+          edgeStyle = ""; // Use plain line for active derivation
         }
 
         os << "]";
         auto note = os.str();
-        PrintEdge(parentNode, *child, childId, "", note);
+        PrintEdge(parentNode, *child, childId, edgeStyle, note);
       }
       else
       {

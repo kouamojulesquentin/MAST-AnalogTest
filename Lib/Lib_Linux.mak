@@ -65,6 +65,7 @@ OBJ_DEBUG = \
             $(OBJDIR_DEBUG)/src/SVFVector.o                               \
             $(OBJDIR_DEBUG)/src/SystemModel.o                             \
             $(OBJDIR_DEBUG)/src/SystemModelManager.o                      \
+            $(OBJDIR_DEBUG)/src/SystemModelManagerMonitor.o               \
             $(OBJDIR_DEBUG)/src/SystemModelCheckerVisitor.o               \
             $(OBJDIR_DEBUG)/src/SystemModelCheckResult.o                  \
             $(OBJDIR_DEBUG)/src/SystemModelNode.o                         \
@@ -95,6 +96,7 @@ OBJ_RELEASE = \
               $(OBJDIR_RELEASE)/src/SVFVector.o                               \
               $(OBJDIR_RELEASE)/src/SystemModel.o                             \
               $(OBJDIR_RELEASE)/src/SystemModelManager.o                      \
+              $(OBJDIR_RELEASE)/src/SystemModelManagerMonitor.o               \
               $(OBJDIR_RELEASE)/src/SystemModelCheckerVisitor.o               \
               $(OBJDIR_RELEASE)/src/SystemModelCheckResult.o                  \
               $(OBJDIR_RELEASE)/src/SystemModelNode.o                         \
@@ -182,6 +184,9 @@ $(OBJDIR_DEBUG)/src/SystemModel.o: src/SystemModel.cpp
 
 $(OBJDIR_DEBUG)/src/SystemModelManager.o: src/SystemModelManager.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/SystemModelManager.cpp -o $(OBJDIR_DEBUG)/src/SystemModelManager.o
+
+$(OBJDIR_DEBUG)/src/SystemModelManagerMonitor.o: src/SystemModelManagerMonitor.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/SystemModelManagerMonitor.cpp -o $(OBJDIR_DEBUG)/src/SystemModelManagerMonitor.o
 
 $(OBJDIR_DEBUG)/src/SystemModelCheckerVisitor.o: src/SystemModelCheckerVisitor.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/SystemModelCheckerVisitor.cpp -o $(OBJDIR_DEBUG)/src/SystemModelCheckerVisitor.o
@@ -282,6 +287,9 @@ $(OBJDIR_RELEASE)/src/SystemModel.o: src/SystemModel.cpp
 
 $(OBJDIR_RELEASE)/src/SystemModelManager.o: src/SystemModelManager.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/SystemModelManager.cpp -o $(OBJDIR_RELEASE)/src/SystemModelManager.o
+
+$(OBJDIR_RELEASE)/src/SystemModelManagerMonitor.o: src/SystemModelManagerMonitor.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/SystemModelManagerMonitor.cpp -o $(OBJDIR_RELEASE)/src/SystemModelManagerMonitor.o
 
 $(OBJDIR_RELEASE)/src/SystemModelCheckerVisitor.o: src/SystemModelCheckerVisitor.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/SystemModelCheckerVisitor.cpp -o $(OBJDIR_RELEASE)/src/SystemModelCheckerVisitor.o

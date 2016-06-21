@@ -551,6 +551,12 @@ void UT_SystemModelManager::test_DoDataCycles_MIB_Multichain_Pre_Greedy ()
   auto configureAlgo = make_shared<ConfigureAlgorithm_LastOrDefault_Greedy>();
   SystemModelManager sut(sm, configureAlgo);
 
+//+  auto monitor       = make_shared<SystemModelManagerMonitor>();
+//+  monitor->MonitorAfterConfiguration(true);
+//+  monitor->MonitorBeforeConfiguration(true);
+//+  monitor->GmlBasePath("MIB_Multichain_Pre_Greedy");
+//+  SystemModelManager sut(sm, configureAlgo, monitor);
+
   // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.DoDataCycles());

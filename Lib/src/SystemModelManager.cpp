@@ -18,11 +18,13 @@
 #include "AccessInterfaceProtocol.hpp"
 #include "Chain.hpp"
 #include "Utility.hpp"
+#include "SystemModelManagerMonitor.hpp"
 
 using namespace mast;
 using std::shared_ptr;
 using std::dynamic_pointer_cast;
 
+#define MONITOR(fct) if (m_monitor) m_monitor->fct;
 
 //! Does a complete data cycles for SystemModel as long as there are pending nodes
 //!
@@ -30,13 +32,17 @@ using std::dynamic_pointer_cast;
 //!
 void SystemModelManager::DoDataCycles ()
 {
+  MONITOR(StartDataCycles());
   auto root        = m_sm.Root();
   auto doDataCycle = true;
 
   do
   {
+    MONITOR(StartDataCycle());
+    MONITOR(BeforeConfiguration(*root));
     root->Accept(m_configurator);
     root->Accept(m_propagator);
+    MONITOR(AfterConfiguration(*root));
 
     doDataCycle = root->IsPending();
 

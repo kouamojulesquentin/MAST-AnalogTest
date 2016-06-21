@@ -20,12 +20,12 @@
 #include "PropagatePendingVisitor.hpp"
 #include "ToSutVisitor.hpp"
 #include "FromSutUpdater.hpp"
+#include "SystemModelManagerMonitor.hpp"
 
 #include <memory>
 
 namespace mast
 {
-
 class AccessInterface;
 class SystemModel;
 
@@ -46,14 +46,17 @@ class DLL_EXPORT SystemModelManager final
   //! Associates a SystemModel to fresh SystemModelManager
   //!
   SystemModelManager(SystemModel& sm,
-                     std::shared_ptr<ConfigurationAlgorithm> configurationAlgorithm = std::make_shared<ConfigureAlgorithm_LastOrDefault>()
+                     std::shared_ptr<ConfigurationAlgorithm>    configurationAlgorithm = std::make_shared<ConfigureAlgorithm_LastOrDefault>(),
+                     std::shared_ptr<SystemModelManagerMonitor> monitor                = std::make_shared<SystemModelManagerMonitor>()
+//+                     std::shared_ptr<SystemModelManagerMonitor> monitor                = nullptr
                     )
-    : m_sm                     (sm)
-    , m_firstAccessInterface   (GetFirstAccessInterface(sm))
-    , m_configurator           (configurationAlgorithm)
-    , m_propagator             ()
-    , m_toSutVisitor           ()
-    , m_fromSutUpdater         (sm)
+    : m_sm                   (sm)
+    , m_firstAccessInterface (GetFirstAccessInterface(sm))
+    , m_configurator         (configurationAlgorithm)
+    , m_propagator           ()
+    , m_toSutVisitor         ()
+    , m_fromSutUpdater       (sm)
+    , m_monitor              (monitor)
   {  }
 
   //! Does a complete data cycles for SystemModel as long as there are pending nodes
@@ -76,12 +79,13 @@ class DLL_EXPORT SystemModelManager final
   // ---------------- Private  Fields
   //
   private:
-  SystemModel&                     m_sm;                   //!< The system model to manage
-  std::shared_ptr<AccessInterface> m_firstAccessInterface; //!< The first AccessInterface of the system
-  ConfigureVisitor                 m_configurator;         //!< In charge of configuration
-  PropagatePendingVisitor          m_propagator;           //!< In charge of propagating pending status bottom up
-  ToSutVisitor                     m_toSutVisitor;         //!< In charge of collecting bitstream to SUT
-  FromSutUpdater                   m_fromSutUpdater;       //!< In charge of updating SystemModel from bitstream from SUT
+  SystemModel&                               m_sm;                   //!< The system model to manage
+  std::shared_ptr<AccessInterface>           m_firstAccessInterface; //!< The first AccessInterface of the system
+  ConfigureVisitor                           m_configurator;         //!< In charge of configuration
+  PropagatePendingVisitor                    m_propagator;           //!< In charge of propagating pending status bottom up
+  ToSutVisitor                               m_toSutVisitor;         //!< In charge of collecting bitstream to SUT
+  FromSutUpdater                             m_fromSutUpdater;       //!< In charge of updating SystemModel from bitstream from SUT
+  std::shared_ptr<SystemModelManagerMonitor> m_monitor;              //!< Provides monitoring point
 };
 //
 //  End of SystemModelManager class declaration

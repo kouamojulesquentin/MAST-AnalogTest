@@ -116,6 +116,19 @@ void ConfigureVisitor::VisitLinker (Linker& linker)
     ++pathIdentifier;
   }
 
+  // ---------------- Count pendings again (because child may changes while configuring latter sibling)
+  //
+  linker.ResetPending();
+  child = linker.FirstChild();
+  while (child)
+  {
+    linker.IncrementPendings(child->PendingsCount());
+
+    child = child->NextSibling();
+  }
+
+  // ---------------- Take last decision about what to select
+  //
   if (m_configurationAlgorithm)
   {
     m_configurationAlgorithm->ResolvePendings(linker);

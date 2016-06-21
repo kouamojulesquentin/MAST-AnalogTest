@@ -135,6 +135,9 @@ std::shared_ptr<AccessInterface> Create_TestCase_MIB_Multichain_Post (SystemMode
 
   if (reportGml)
   {
+//+    auto linker = sm.LinkerWithId(5u);
+//+    linker->Select(3u);
+
     GmlPrinterVisitor gmlPrinter("MIB_Multichain_Post", GmlPrinterOptions::Std);
     tap->Accept(gmlPrinter);
     TS_ASSERT_EQUALS (gmlPrinter.Graph(), "");
@@ -432,11 +435,10 @@ void UT_SystemModelManager::test_DoDataCycles_MIB_Multichain_Pre ()
     BinaryVector::CreateFromString("0b01"),        // 11 : DR
     BinaryVector::CreateFromString("0x02"),        // 12 : IR
     BinaryVector::CreateFromString("0x6161_6161"), // 13 : DR
-    BinaryVector::CreateFromString("0xFF"),        // 14 : IR
-    BinaryVector::CreateFromString("0b1"),         // 15 : DR
-    BinaryVector::CreateFromString("0x01"),        // 16 : IR
-    BinaryVector::CreateFromString("0b00"),        // 17 : DR
-    BinaryVector::CreateFromString("0xFF"),        // 18 : IR
+    BinaryVector::CreateFromString("0x4141_4141"), // 14 : DR
+    BinaryVector::CreateFromString("0x01"),        // 15 : IR
+    BinaryVector::CreateFromString("0b00"),        // 16 : DR
+    BinaryVector::CreateFromString("0xFF"),        // 17 : IR
   };
 
   TS_ASSERT_EQUALS (gotSutVectors, expected);

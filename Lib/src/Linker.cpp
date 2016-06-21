@@ -89,6 +89,17 @@ bool Linker::IsSelected (uint32_t pathIdentifier) const
 }
 
 
+//! Returns true when the specified path is currently selected and active
+//!
+//! @param pathIdentifier   Path identifier in range [1..nb_path]
+//!
+bool Linker::IsSelectedAndActive (uint32_t pathIdentifier) const
+{
+  return m_pathSelector->IsSelectedAndActive(pathIdentifier);
+}
+
+
+
 //! Requests deactivation of the specified path
 //!
 //! @param pathIdentifier   Path identifier in range [1..nb_path]

@@ -13,7 +13,6 @@
 
 #include "ConfigureAlgorithm_LastOrDefault_Greedy.hpp"
 #include "Linker.hpp"
-#include "PathSelector.hpp"
 
 using namespace mast;
 using std::shared_ptr;
@@ -55,12 +54,11 @@ void ConfigureAlgorithm_LastOrDefault_Greedy::ResolvePendings (Linker& linker)
   }
   else if (linker.PendingsCount() == 1)
   {
-    auto selector  = linker.Selector();
-    auto pathCount = selector->SelectablePaths();
+    auto pathCount = linker.SelectablePaths();
 
     for (uint32_t pathId = 1 ; pathId <= pathCount ; ++pathId)
     {
-      if (selector->IsSelected(pathId) && selector->IsActive(pathId))
+      if (linker.IsSelectedAndActive(pathId))
       {
         linker.Select(0u);
         break;

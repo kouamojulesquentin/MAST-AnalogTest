@@ -44,6 +44,12 @@ class PathSelector
   //!
   virtual bool IsSelected (uint32_t pathIdentifier) const = 0;
 
+  //! Returns true when the specified path is already selected and active
+  //!
+  //! @param pathIdentifier   Path identifier in range [1..nb_path]
+  //!
+  virtual bool IsSelectedAndActive (uint32_t pathIdentifier) const = 0;
+
   //! Requests activation of the specified path
   //!
   //! @param pathIdentifier   Path identifier in range [1..nb_path]

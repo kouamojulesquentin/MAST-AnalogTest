@@ -48,10 +48,11 @@ class DLL_EXPORT DefaultTableBasedPathSelector  : public PathSelector
                                 TablesType                deselectTable,
                                 bool                      canSelectNone = false);
 
-  virtual bool IsActive   (uint32_t pathIdentifier) const override; //!< Returns true when the specified path is already selected
-  virtual bool IsSelected (uint32_t pathIdentifier) const override; //!< Returns true when the specified path is already selected
-  virtual void Select     (uint32_t pathIdentifier) override;       //!< Request activation of the specified path
-  virtual void Deselect   (uint32_t pathIdentifier) override;       //!< Request deactivation of the specified path
+  virtual bool IsActive            (uint32_t pathIdentifier) const override; //!< Returns true when the specified path is already active
+  virtual bool IsSelected          (uint32_t pathIdentifier) const override; //!< Returns true when the specified path is selected
+  virtual bool IsSelectedAndActive (uint32_t pathIdentifier) const override; //!< Returns true when the specified path is selected and active
+  virtual void Select              (uint32_t pathIdentifier) override;       //!< Request activation of the specified path
+  virtual void Deselect            (uint32_t pathIdentifier) override;       //!< Request deactivation of the specified path
 
   virtual std::shared_ptr<const Register> AssociatedRegister() const override { return m_muxRegister; }  //!< Returns associated Register
 

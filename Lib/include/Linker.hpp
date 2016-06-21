@@ -15,6 +15,7 @@
   #define LINKER_H__4E199FE8_B1BC_4778_4A89_2A5817AEECE__INCLUDED_
 
 #include "Chain.hpp"
+#include "PathSelector.hpp"
 #include <memory>
 #include <experimental/string_view>
 
@@ -31,7 +32,6 @@ enum class MibEncoding
   Binary_No_Idle,   //!< Binary encoding ensuring that at least one chain is selected
 };
 
-class PathSelector;
 class BinaryVector;
 
 //! Represents dynamically selectable chains of registers
@@ -44,23 +44,24 @@ class BinaryVector;
 //!
 class DLL_EXPORT Linker : public ParentNode
 {
-  public:
-
   // ---------------- Public  Methods
   //
   public:
-  ~Linker() = default;
+  virtual ~Linker() = default;
   Linker()  = delete;
   Linker(std::experimental::string_view name, std::shared_ptr<PathSelector> pathSelector);
 
-  bool IsActive   (uint32_t pathIdentifier) const ; //!< Returns true when the specified path is already selected
-  bool IsSelected (uint32_t pathIdentifier) const ; //!< Returns true when the specified path is currently pending to be selected
-  void Deselect   (uint32_t pathIdentifier);        //!< Requests deactivation of the specified path
-  void Select     (uint32_t pathIdentifier);        //!< Requests activation of the specified path
+  bool IsActive            (uint32_t pathIdentifier) const ; //!< Returns true when the specified path is already selected
+  bool IsSelected          (uint32_t pathIdentifier) const ; //!< Returns true when the specified path is currently pending to be selected
+  bool IsSelectedAndActive (uint32_t pathIdentifier) const;  //!< Returns true when the specified path is selected and active
+  void Deselect            (uint32_t pathIdentifier);        //!< Requests deactivation of the specified path
+  void Select              (uint32_t pathIdentifier);        //!< Requests activation of the specified path
 
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
 
   virtual std::experimental::string_view TypeName() const override { return "Linker"; } //!< Returns readable type name
+
+  uint32_t SelectablePaths() const { return m_pathSelector->SelectablePaths(); };   //!< Returns the maximum number of selectable paths (max value for IsActive, Select and Deselect)
 
   std::shared_ptr<PathSelector> Selector() const { return m_pathSelector; }
 
@@ -68,10 +69,6 @@ class DLL_EXPORT Linker : public ParentNode
   //
   protected:
   void CheckPathIdentifier(uint32_t pathIdentifier) const;
-
-  // ---------------- Private  Methods
-  //
-  private:
 
   // ---------------- Private  Fields
   //

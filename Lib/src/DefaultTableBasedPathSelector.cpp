@@ -183,6 +183,24 @@ bool DefaultTableBasedPathSelector::IsSelected (uint32_t pathIdentifier) const
 //---------------------------------------------------------------------------
 
 
+//! Returns true when the specified path is selected and active
+//!
+bool DefaultTableBasedPathSelector::IsSelectedAndActive (uint32_t pathIdentifier) const
+{
+  CheckPathIdentifier(pathIdentifier);
+
+  auto& lastToSut   = m_muxRegister->LastToSut();
+  auto& nextToSut   = m_muxRegister->NextToSut();
+  auto& selectValue = m_selectTable[pathIdentifier];
+
+  bool  isSelected  = nextToSut == selectValue;
+  bool  isActive    = lastToSut == selectValue;
+
+  return isSelected && isActive;
+}
+//
+//  End of: DefaultTableBasedPathSelector::IsSelectedAndActive
+//---------------------------------------------------------------------------
 
 //! Requests deactivation of the specified path
 //!

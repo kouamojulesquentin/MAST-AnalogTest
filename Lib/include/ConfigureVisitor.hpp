@@ -16,7 +16,7 @@
   #define CONFIGUREVISITOR_H__9C86FE0D_78AA_4852_8CA8_25CA6E34AC9__INCLUDED_
 
 #include "SystemModelVisitor.hpp"
-#include "DefaultConfigurationAlgorithm.hpp"
+#include "ConfigureAlgorithm_LastOrDefault.hpp"
 
 #include <memory>
 
@@ -31,7 +31,7 @@ class DLL_EXPORT ConfigureVisitor : public SystemModelVisitor
   //
   public:
   ~ConfigureVisitor() = default;
-  ConfigureVisitor(std::shared_ptr<ConfigurationAlgorithm> configurationAlgorithm = std::make_shared<DefaultConfigurationAlgorithm>())
+  ConfigureVisitor(std::shared_ptr<ConfigurationAlgorithm> configurationAlgorithm = std::make_shared<ConfigureAlgorithm_LastOrDefault>())
   : m_configurationAlgorithm (configurationAlgorithm)
   {
   }

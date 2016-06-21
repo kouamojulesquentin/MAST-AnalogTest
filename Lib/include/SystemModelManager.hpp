@@ -46,7 +46,7 @@ class DLL_EXPORT SystemModelManager final
   //! Associates a SystemModel to fresh SystemModelManager
   //!
   SystemModelManager(SystemModel& sm,
-                     std::shared_ptr<ConfigurationAlgorithm> configurationAlgorithm = std::make_shared<DefaultConfigurationAlgorithm>()
+                     std::shared_ptr<ConfigurationAlgorithm> configurationAlgorithm = std::make_shared<ConfigureAlgorithm_LastOrDefault>()
                     )
     : m_sm                     (sm)
     , m_firstAccessInterface   (GetFirstAccessInterface(sm))

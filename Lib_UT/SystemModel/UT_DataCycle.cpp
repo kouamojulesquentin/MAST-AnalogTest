@@ -97,7 +97,7 @@ void UT_DataCycle::test_SimpleDataCycle_Without_ConfAlgo ()
   auto root = sm.Root();
 
 
-  ConfigureVisitor configurator(nullptr); // Do not use DefaultConfigurationAlgorithm
+  ConfigureVisitor configurator(nullptr); // Do not use ConfigureAlgorithm_LastOrDefault
   ToSutVisitor     toSutVisitor;
   FromSutUpdater   fromSutUpdater(sm);
 
@@ -163,7 +163,7 @@ void UT_DataCycle::test_SimpleDataCycle_With_DefaultConfAlgo ()
   auto root = sm.Root();
 
 
-  ConfigureVisitor configurator; // DO USE DefaultConfigurationAlgorithm
+  ConfigureVisitor configurator; // DO USE ConfigureAlgorithm_LastOrDefault
   ToSutVisitor     toSutVisitor;
   FromSutUpdater   fromSutUpdater(sm);
 

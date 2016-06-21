@@ -22,7 +22,7 @@ SOURCES +=  \
     src/BinaryVector.cpp                   \
     src/Chain.cpp                          \
     src/ConfigureVisitor.cpp               \
-    src/DefaultConfigurationAlgorithm.cpp  \
+    src/ConfigureAlgorithm_LastOrDefault.cpp  \
     src/DefaultBinaryPathSelector.cpp      \
     src/DefaultTableBasedPathSelector.cpp  \
     src/FromSutUpdater.cpp                 \
@@ -53,7 +53,7 @@ HEADERS += \
     include/ConfigurationAlgorithm.hpp          \
     include/ConfigureVisitor.hpp                \
     include/DefaultBinaryPathSelector.hpp       \
-    include/DefaultConfigurationAlgorithm.hpp   \
+    include/ConfigureAlgorithm_LastOrDefault.hpp   \
     include/DefaultTableBasedPathSelector.hpp   \
     include/GmlPrinterVisitor.hpp               \
     include/FromSutUpdater.hpp                  \

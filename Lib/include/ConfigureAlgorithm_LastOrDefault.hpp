@@ -1,18 +1,18 @@
 //===========================================================================
-//                           DefaultConfigurationAlgorithm.hpp
+//                           ConfigureAlgorithm_LastOrDefault.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file DefaultConfigurationAlgorithm.hpp
+//! @file ConfigureAlgorithm_LastOrDefault.hpp
 //!
-//! Declares DefaultConfigurationAlgorithm class
+//! Declares ConfigureAlgorithm_LastOrDefault class
 //!
 //===========================================================================
 
-#ifndef DEFAULTCONFIGURATIONALGORITHM_H__EB531F2D_8842_4ECC_719A_71B6B792AF65__INCLUDED_
-  #define DEFAULTCONFIGURATIONALGORITHM_H__EB531F2D_8842_4ECC_719A_71B6B792AF65__INCLUDED_
+#ifndef CONFIGUREALGORITHM_LASTORDEFAULT_H__E633E366_59FF_447A_1283_B30BD9795B06__INCLUDED_
+  #define CONFIGUREALGORITHM_LASTORDEFAULT_H__E633E366_59FF_447A_1283_B30BD9795B06__INCLUDED_
 
 #include "ConfigurationAlgorithm.hpp"
 #include "Platform.hpp"
@@ -25,13 +25,13 @@ namespace mast
 //!       not already selected (that way pending paths will be streamed as fast as possible)
 //!
 //! @note This is appropriate when registers are not modified between data cycles
-class DLL_EXPORT DefaultConfigurationAlgorithm final : public ConfigurationAlgorithm
+class DLL_EXPORT ConfigureAlgorithm_LastOrDefault final : public ConfigurationAlgorithm
 {
   // ---------------- Public  Methods
   //
   public:
-  virtual ~DefaultConfigurationAlgorithm() = default;
-  DefaultConfigurationAlgorithm()  = default;
+  virtual ~ConfigureAlgorithm_LastOrDefault() = default;
+  ConfigureAlgorithm_LastOrDefault()  = default;
 
   //! Does what need to be done when ConfigureVisitor begins to process a new linker
   //!
@@ -52,7 +52,7 @@ class DLL_EXPORT DefaultConfigurationAlgorithm final : public ConfigurationAlgor
 
   //! Does what need to be done when all linker children have been processed
   //!
-  //! @note Must be called after linker pending state has been updated (this permit stateless algorithm) 
+  //! @note Must be called after linker pending state has been updated (this permit stateless algorithm)
   //! @note Post-condition: a selection choice must have done (by this method or by one call of ProcessPending for current linker)
   //!
   //! @param linker The linker currently configured
@@ -60,15 +60,12 @@ class DLL_EXPORT DefaultConfigurationAlgorithm final : public ConfigurationAlgor
   virtual void ResolvePendings(Linker& linker) override;
 };
 //
-//  End of DefaultConfigurationAlgorithm class declaration
+//  End of ConfigureAlgorithm_LastOrDefault class declaration
 //---------------------------------------------------------------------------
 } // End of namespace mast
 
 
-
-
-#endif  // not defined DEFAULTCONFIGURATIONALGORITHM_H__EB531F2D_8842_4ECC_719A_71B6B792AF65__INCLUDED_
-
+#endif  // not defined CONFIGUREALGORITHM_LASTORDEFAULT_H__E633E366_59FF_447A_1283_B30BD9795B06__INCLUDED_
 //===========================================================================
-// End of DefaultConfigurationAlgorithm.hpp
+// End of ConfigureAlgorithm_LastOrDefault.hpp
 //===========================================================================

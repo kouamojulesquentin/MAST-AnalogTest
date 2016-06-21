@@ -22,6 +22,7 @@ SOURCES +=  \
     src/BinaryVector.cpp                            \
     src/Chain.cpp                                   \
     src/ConfigureVisitor.cpp                        \
+    src/ConfigureAlgorithm_Last_Lazy.cpp            \
     src/ConfigureAlgorithm_LastOrDefault.cpp        \
     src/ConfigureAlgorithm_LastOrDefault_Greedy.cpp \
     src/DefaultBinaryPathSelector.cpp               \
@@ -54,6 +55,7 @@ HEADERS += \
     include/ConfigurationAlgorithm.hpp                  \
     include/ConfigureVisitor.hpp                        \
     include/DefaultBinaryPathSelector.hpp               \
+    include/ConfigureAlgorithm_Last_Lazy.hpp            \
     include/ConfigureAlgorithm_LastOrDefault.hpp        \
     include/ConfigureAlgorithm_LastOrDefault_Greedy.hpp \
     include/DefaultTableBasedPathSelector.hpp           \

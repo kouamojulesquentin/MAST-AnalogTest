@@ -48,6 +48,7 @@ OBJ_DEBUG = \
             $(OBJDIR_DEBUG)/src/BinaryVector.o                            \
             $(OBJDIR_DEBUG)/src/Chain.o                                   \
             $(OBJDIR_DEBUG)/src/DefaultBinaryPathSelector.o               \
+            $(OBJDIR_DEBUG)/src/ConfigureAlgorithm_Last_Lazy.o            \
             $(OBJDIR_DEBUG)/src/ConfigureAlgorithm_LastOrDefault.o        \
             $(OBJDIR_DEBUG)/src/ConfigureAlgorithm_LastOrDefault_Greedy.o \
             $(OBJDIR_DEBUG)/src/DefaultTableBasedPathSelector.o           \
@@ -77,6 +78,7 @@ OBJ_RELEASE = \
               $(OBJDIR_RELEASE)/src/BinaryVector.o                            \
               $(OBJDIR_RELEASE)/src/Chain.o                                   \
               $(OBJDIR_RELEASE)/src/DefaultBinaryPathSelector.o               \
+              $(OBJDIR_RELEASE)/src/ConfigureAlgorithm_Last_Lazy.o            \
               $(OBJDIR_RELEASE)/src/ConfigureAlgorithm_LastOrDefault.o        \
               $(OBJDIR_RELEASE)/src/ConfigureAlgorithm_LastOrDefault_Greedy.o \
               $(OBJDIR_RELEASE)/src/DefaultTableBasedPathSelector.o           \
@@ -129,6 +131,9 @@ $(OBJDIR_DEBUG)/src/Chain.o: src/Chain.cpp
 
 $(OBJDIR_DEBUG)/src/DefaultBinaryPathSelector.o: src/DefaultBinaryPathSelector.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/DefaultBinaryPathSelector.cpp -o $(OBJDIR_DEBUG)/src/DefaultBinaryPathSelector.o
+
+$(OBJDIR_DEBUG)/src/ConfigureAlgorithm_Last_Lazy.o: src/ConfigureAlgorithm_Last_Lazy.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/ConfigureAlgorithm_Last_Lazy.cpp -o $(OBJDIR_DEBUG)/src/ConfigureAlgorithm_Last_Lazy.o
 
 $(OBJDIR_DEBUG)/src/ConfigureAlgorithm_LastOrDefault.o: src/ConfigureAlgorithm_LastOrDefault.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/ConfigureAlgorithm_LastOrDefault.cpp -o $(OBJDIR_DEBUG)/src/ConfigureAlgorithm_LastOrDefault.o
@@ -226,6 +231,9 @@ $(OBJDIR_RELEASE)/src/Chain.o: src/Chain.cpp
 
 $(OBJDIR_RELEASE)/src/DefaultBinaryPathSelector.o: src/DefaultBinaryPathSelector.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/DefaultBinaryPathSelector.cpp -o $(OBJDIR_RELEASE)/src/DefaultBinaryPathSelector.o
+
+$(OBJDIR_RELEASE)/src/ConfigureAlgorithm_Last_Lazy.o: src/ConfigureAlgorithm_Last_Lazy.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/ConfigureAlgorithm_Last_Lazy.cpp -o $(OBJDIR_RELEASE)/src/ConfigureAlgorithm_Last_Lazy.o
 
 $(OBJDIR_RELEASE)/src/ConfigureAlgorithm_LastOrDefault.o: src/ConfigureAlgorithm_LastOrDefault.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/ConfigureAlgorithm_LastOrDefault.cpp -o $(OBJDIR_RELEASE)/src/ConfigureAlgorithm_LastOrDefault.o

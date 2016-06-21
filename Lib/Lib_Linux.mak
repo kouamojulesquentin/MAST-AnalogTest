@@ -42,58 +42,62 @@ OBJDIR_RELEASE  = ../obj/release
 DEP_RELEASE     =
 OUT_RELEASE     = ../bin/release/Lib.so
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/src/AccessInterface.o                  \
-            $(OBJDIR_DEBUG)/src/LoopbackAccessInterfaceProtocol.o  \
-            $(OBJDIR_DEBUG)/src/BinaryVector.o                     \
-            $(OBJDIR_DEBUG)/src/Chain.o                            \
-            $(OBJDIR_DEBUG)/src/DefaultBinaryPathSelector.o        \
-            $(OBJDIR_DEBUG)/src/ConfigureAlgorithm_LastOrDefault.o    \
-            $(OBJDIR_DEBUG)/src/DefaultTableBasedPathSelector.o    \
-            $(OBJDIR_DEBUG)/src/FromSutUpdater.o                   \
-            $(OBJDIR_DEBUG)/src/GmlPrinterVisitor.o                \
-            $(OBJDIR_DEBUG)/src/ConfigureVisitor.o                 \
-            $(OBJDIR_DEBUG)/src/Linker.o                           \
-            $(OBJDIR_DEBUG)/src/ParentNode.o                       \
-            $(OBJDIR_DEBUG)/src/PrettyPrinterVisitor.o             \
-            $(OBJDIR_DEBUG)/src/PropagatePendingVisitor.o          \
-            $(OBJDIR_DEBUG)/src/Register.o                         \
-            $(OBJDIR_DEBUG)/src/SVF_Player.o                       \
-            $(OBJDIR_DEBUG)/src/SVF_SimulationProtocol.o           \
-            $(OBJDIR_DEBUG)/src/SVFVector.o                        \
-            $(OBJDIR_DEBUG)/src/SystemModel.o                      \
-            $(OBJDIR_DEBUG)/src/SystemModelManager.o               \
-            $(OBJDIR_DEBUG)/src/SystemModelCheckerVisitor.o        \
-            $(OBJDIR_DEBUG)/src/SystemModelCheckResult.o           \
-            $(OBJDIR_DEBUG)/src/SystemModelNode.o                  \
-            $(OBJDIR_DEBUG)/src/SystemModelVisitor.o               \
-            $(OBJDIR_DEBUG)/src/ToSutVisitor.o                     \
+OBJ_DEBUG = \
+            $(OBJDIR_DEBUG)/src/AccessInterface.o                         \
+            $(OBJDIR_DEBUG)/src/LoopbackAccessInterfaceProtocol.o         \
+            $(OBJDIR_DEBUG)/src/BinaryVector.o                            \
+            $(OBJDIR_DEBUG)/src/Chain.o                                   \
+            $(OBJDIR_DEBUG)/src/DefaultBinaryPathSelector.o               \
+            $(OBJDIR_DEBUG)/src/ConfigureAlgorithm_LastOrDefault.o        \
+            $(OBJDIR_DEBUG)/src/ConfigureAlgorithm_LastOrDefault_Greedy.o \
+            $(OBJDIR_DEBUG)/src/DefaultTableBasedPathSelector.o           \
+            $(OBJDIR_DEBUG)/src/FromSutUpdater.o                          \
+            $(OBJDIR_DEBUG)/src/GmlPrinterVisitor.o                       \
+            $(OBJDIR_DEBUG)/src/ConfigureVisitor.o                        \
+            $(OBJDIR_DEBUG)/src/Linker.o                                  \
+            $(OBJDIR_DEBUG)/src/ParentNode.o                              \
+            $(OBJDIR_DEBUG)/src/PrettyPrinterVisitor.o                    \
+            $(OBJDIR_DEBUG)/src/PropagatePendingVisitor.o                 \
+            $(OBJDIR_DEBUG)/src/Register.o                                \
+            $(OBJDIR_DEBUG)/src/SVF_Player.o                              \
+            $(OBJDIR_DEBUG)/src/SVF_SimulationProtocol.o                  \
+            $(OBJDIR_DEBUG)/src/SVFVector.o                               \
+            $(OBJDIR_DEBUG)/src/SystemModel.o                             \
+            $(OBJDIR_DEBUG)/src/SystemModelManager.o                      \
+            $(OBJDIR_DEBUG)/src/SystemModelCheckerVisitor.o               \
+            $(OBJDIR_DEBUG)/src/SystemModelCheckResult.o                  \
+            $(OBJDIR_DEBUG)/src/SystemModelNode.o                         \
+            $(OBJDIR_DEBUG)/src/SystemModelVisitor.o                      \
+            $(OBJDIR_DEBUG)/src/ToSutVisitor.o                            \
             $(OBJDIR_DEBUG)/src/Utility.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/src/AccessInterface.o                  \
-              $(OBJDIR_RELEASE)/src/LoopbackAccessInterfaceProtocol.o  \
-              $(OBJDIR_RELEASE)/src/BinaryVector.o                     \
-              $(OBJDIR_RELEASE)/src/Chain.o                            \
-              $(OBJDIR_RELEASE)/src/DefaultBinaryPathSelector.o        \
-              $(OBJDIR_RELEASE)/src/ConfigureAlgorithm_LastOrDefault.o    \
-              $(OBJDIR_RELEASE)/src/DefaultTableBasedPathSelector.o    \
-              $(OBJDIR_RELEASE)/src/FromSutUpdater.o                   \
-              $(OBJDIR_RELEASE)/src/GmlPrinterVisitor.o                \
-              $(OBJDIR_RELEASE)/src/ConfigureVisitor.o                 \
-              $(OBJDIR_RELEASE)/src/Linker.o                           \
-              $(OBJDIR_RELEASE)/src/ParentNode.o                       \
-              $(OBJDIR_RELEASE)/src/PrettyPrinterVisitor.o             \
-              $(OBJDIR_RELEASE)/src/PropagatePendingVisitor.o          \
-              $(OBJDIR_RELEASE)/src/Register.o                         \
-              $(OBJDIR_RELEASE)/src/SVF_Player.o                       \
-              $(OBJDIR_RELEASE)/src/SVF_SimulationProtocol.o           \
-              $(OBJDIR_RELEASE)/src/SVFVector.o                        \
-              $(OBJDIR_RELEASE)/src/SystemModel.o                      \
-              $(OBJDIR_RELEASE)/src/SystemModelManager.o               \
-              $(OBJDIR_RELEASE)/src/SystemModelCheckerVisitor.o        \
-              $(OBJDIR_RELEASE)/src/SystemModelCheckResult.o           \
-              $(OBJDIR_RELEASE)/src/SystemModelNode.o                  \
-              $(OBJDIR_RELEASE)/src/SystemModelVisitor.o               \
-              $(OBJDIR_RELEASE)/src/ToSutVisitor.o                     \
+OBJ_RELEASE = \
+              $(OBJDIR_RELEASE)/src/AccessInterface.o                         \
+              $(OBJDIR_RELEASE)/src/LoopbackAccessInterfaceProtocol.o         \
+              $(OBJDIR_RELEASE)/src/BinaryVector.o                            \
+              $(OBJDIR_RELEASE)/src/Chain.o                                   \
+              $(OBJDIR_RELEASE)/src/DefaultBinaryPathSelector.o               \
+              $(OBJDIR_RELEASE)/src/ConfigureAlgorithm_LastOrDefault.o        \
+              $(OBJDIR_RELEASE)/src/ConfigureAlgorithm_LastOrDefault_Greedy.o \
+              $(OBJDIR_RELEASE)/src/DefaultTableBasedPathSelector.o           \
+              $(OBJDIR_RELEASE)/src/FromSutUpdater.o                          \
+              $(OBJDIR_RELEASE)/src/GmlPrinterVisitor.o                       \
+              $(OBJDIR_RELEASE)/src/ConfigureVisitor.o                        \
+              $(OBJDIR_RELEASE)/src/Linker.o                                  \
+              $(OBJDIR_RELEASE)/src/ParentNode.o                              \
+              $(OBJDIR_RELEASE)/src/PrettyPrinterVisitor.o                    \
+              $(OBJDIR_RELEASE)/src/PropagatePendingVisitor.o                 \
+              $(OBJDIR_RELEASE)/src/Register.o                                \
+              $(OBJDIR_RELEASE)/src/SVF_Player.o                              \
+              $(OBJDIR_RELEASE)/src/SVF_SimulationProtocol.o                  \
+              $(OBJDIR_RELEASE)/src/SVFVector.o                               \
+              $(OBJDIR_RELEASE)/src/SystemModel.o                             \
+              $(OBJDIR_RELEASE)/src/SystemModelManager.o                      \
+              $(OBJDIR_RELEASE)/src/SystemModelCheckerVisitor.o               \
+              $(OBJDIR_RELEASE)/src/SystemModelCheckResult.o                  \
+              $(OBJDIR_RELEASE)/src/SystemModelNode.o                         \
+              $(OBJDIR_RELEASE)/src/SystemModelVisitor.o                      \
+              $(OBJDIR_RELEASE)/src/ToSutVisitor.o                            \
               $(OBJDIR_RELEASE)/src/Utility.o
 
 all: debug release
@@ -128,6 +132,9 @@ $(OBJDIR_DEBUG)/src/DefaultBinaryPathSelector.o: src/DefaultBinaryPathSelector.c
 
 $(OBJDIR_DEBUG)/src/ConfigureAlgorithm_LastOrDefault.o: src/ConfigureAlgorithm_LastOrDefault.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/ConfigureAlgorithm_LastOrDefault.cpp -o $(OBJDIR_DEBUG)/src/ConfigureAlgorithm_LastOrDefault.o
+
+$(OBJDIR_DEBUG)/src/ConfigureAlgorithm_LastOrDefault_Greedy.o: src/ConfigureAlgorithm_LastOrDefault_Greedy.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/ConfigureAlgorithm_LastOrDefault_Greedy.cpp -o $(OBJDIR_DEBUG)/src/ConfigureAlgorithm_LastOrDefault_Greedy.o
 
 $(OBJDIR_DEBUG)/src/DefaultTableBasedPathSelector.o: src/DefaultTableBasedPathSelector.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/DefaultTableBasedPathSelector.cpp -o $(OBJDIR_DEBUG)/src/DefaultTableBasedPathSelector.o
@@ -222,6 +229,9 @@ $(OBJDIR_RELEASE)/src/DefaultBinaryPathSelector.o: src/DefaultBinaryPathSelector
 
 $(OBJDIR_RELEASE)/src/ConfigureAlgorithm_LastOrDefault.o: src/ConfigureAlgorithm_LastOrDefault.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/ConfigureAlgorithm_LastOrDefault.cpp -o $(OBJDIR_RELEASE)/src/ConfigureAlgorithm_LastOrDefault.o
+
+$(OBJDIR_RELEASE)/src/ConfigureAlgorithm_LastOrDefault_Greedy.o: src/ConfigureAlgorithm_LastOrDefault_Greedy.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/ConfigureAlgorithm_LastOrDefault_Greedy.cpp -o $(OBJDIR_RELEASE)/src/ConfigureAlgorithm_LastOrDefault_Greedy.o
 
 $(OBJDIR_RELEASE)/src/DefaultTableBasedPathSelector.o: src/DefaultTableBasedPathSelector.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/DefaultTableBasedPathSelector.cpp -o $(OBJDIR_RELEASE)/src/DefaultTableBasedPathSelector.o

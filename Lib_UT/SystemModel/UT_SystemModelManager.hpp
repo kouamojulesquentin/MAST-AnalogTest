@@ -40,8 +40,10 @@ class UT_SystemModelManager : public CxxTest::TestSuite
   void test_DoDataCycles_AccessInterface ();
   void test_DoDataCycles_1500 ();
   void test_DoDataCycles_1500_SVF ();
+  void test_DoDataCycles_1500_Greedy ();
 
   void test_DoDataCycles_MIB_Multichain_Pre ();
+  void test_DoDataCycles_MIB_Multichain_Pre_Greedy ();
   void test_DoDataCycles_MIB_Multichain_Post ();
 
   // ================ Other Methods ================

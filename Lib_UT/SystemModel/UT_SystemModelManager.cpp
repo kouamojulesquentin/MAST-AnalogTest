@@ -19,6 +19,7 @@
 #include "GmlPrinterVisitor.hpp"
 #include "BinaryVector_Traits.hpp"
 #include "DefaultBinaryPathSelector.hpp"
+#include "ConfigureAlgorithm_LastOrDefault_Greedy.hpp"
 
 #include <memory>
 
@@ -395,6 +396,50 @@ void UT_SystemModelManager::test_DoDataCycles_1500_SVF ()
   TS_ASSERT_EQUALS (gotSvfCommands, expected);
 }
 
+//! Checks SystemModelManager DoDataCycles when using "1500" testcase and greedy
+//! selection algorithm
+void UT_SystemModelManager::test_DoDataCycles_1500_Greedy ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  SystemModelBuilder builder(sm);
+
+  auto ai = Create_TestCase_1500(sm, false);
+
+  auto spy = make_shared<Spy_AccessInterfaceProtocols>();
+  ai->SetProtocol (spy);
+
+  auto configureAlgo = make_shared<ConfigureAlgorithm_LastOrDefault_Greedy>();
+  SystemModelManager sut(sm, configureAlgo);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.DoDataCycles());
+
+  // ---------------- Verify
+  //
+  auto gotSutVectors = spy->ToSutVectors();
+
+  std::vector<mast::BinaryVector> expected
+  {
+    BinaryVector::CreateFromString("/x01"),                 // 00 : IR
+    BinaryVector::CreateFromString("/x0505/b10"),           // 01 : DR
+    BinaryVector::CreateFromString("/x3636/b0:100"),        // 02 : DR
+    BinaryVector::CreateFromString("/x3636/b1/xC0C0_C0C0"), // 03 : DR
+    BinaryVector::CreateFromString("/x3636/b0:011"),        // 04 : DR
+    BinaryVector::CreateFromString("/x3636/b1/xB0B0_B0B0"), // 05 : DR
+    BinaryVector::CreateFromString("/x3636/b0:010"),        // 06 : DR
+    BinaryVector::CreateFromString("/x3636/b1/x0A0A_0A0A"), // 07 : DR
+    BinaryVector::CreateFromString("/x3636/b0:001"),        // 08 : DR
+    BinaryVector::CreateFromString("/x3636/b1/x0909_0909"), // 09 : DR
+    BinaryVector::CreateFromString("/x3636/b0:000"),        // 10 : DR
+    BinaryVector::CreateFromString("/xFF"),                 // 11 : IR
+  };
+
+  TS_ASSERT_EQUALS (gotSutVectors, expected);
+}
+
 
 //! Checks SystemModelManager DoDataCycles when using "MIB_Multichain_Pre" testcase
 //!
@@ -444,6 +489,55 @@ void UT_SystemModelManager::test_DoDataCycles_MIB_Multichain_Pre ()
   TS_ASSERT_EQUALS (gotSutVectors, expected);
 }
 
+
+//! Checks SystemModelManager DoDataCycles when using "MIB_Multichain_Pre" testcase
+//! with greedy selection algorithm
+//!
+void UT_SystemModelManager::test_DoDataCycles_MIB_Multichain_Pre_Greedy ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+
+  auto ai = Create_TestCase_MIB_Multichain_Pre(sm, false);
+
+  auto spy = make_shared<Spy_AccessInterfaceProtocols>();
+  ai->SetProtocol (spy);
+
+  auto configureAlgo = make_shared<ConfigureAlgorithm_LastOrDefault_Greedy>();
+  SystemModelManager sut(sm, configureAlgo);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.DoDataCycles());
+
+  // ---------------- Verify
+  //
+  auto gotSutVectors = spy->ToSutVectors();
+
+  std::vector<mast::BinaryVector> expected
+  {
+    BinaryVector::CreateFromString("0x02"),        // 00 : IR
+    BinaryVector::CreateFromString("0x6060_6060"), // 01 : DR
+    BinaryVector::CreateFromString("0x01"),        // 02 : IR
+    BinaryVector::CreateFromString("0b11"),        // 03 : DR
+    BinaryVector::CreateFromString("0x02"),        // 04 : IR
+    BinaryVector::CreateFromString("0x6363_6363"), // 05 : DR
+    BinaryVector::CreateFromString("0x01"),        // 06 : IR
+    BinaryVector::CreateFromString("0b10"),        // 07 : DR
+    BinaryVector::CreateFromString("0x02"),        // 08 : IR
+    BinaryVector::CreateFromString("0x6262_6262"), // 09 : DR
+    BinaryVector::CreateFromString("0x01"),        // 10 : IR
+    BinaryVector::CreateFromString("0b01"),        // 11 : DR
+    BinaryVector::CreateFromString("0x02"),        // 12 : IR
+    BinaryVector::CreateFromString("0x6161_6161"), // 13 : DR
+    BinaryVector::CreateFromString("0x01"),        // 14 : IR
+    BinaryVector::CreateFromString("0b00"),        // 15 : DR
+    BinaryVector::CreateFromString("0xFF"),        // 16 : IR
+  };
+
+  TS_ASSERT_EQUALS (gotSutVectors, expected);
+}
 
 
 //! Checks SystemModelManager DoDataCycles when using "MIB_Multichain_Post" testcase

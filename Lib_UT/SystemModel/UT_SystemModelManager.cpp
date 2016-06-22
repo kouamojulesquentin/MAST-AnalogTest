@@ -16,6 +16,7 @@
 #include "SystemModelBuilder.hpp"
 #include "Spy_AccessInterfaceProtocols.hpp"
 #include "Spy_SVF_Protocol.hpp"
+#include "Spy_I2C_Protocol.hpp"
 #include "GmlPrinterVisitor.hpp"
 #include "BinaryVector_Traits.hpp"
 #include "DefaultBinaryPathSelector.hpp"
@@ -29,6 +30,7 @@ using namespace test;
 using std::make_shared;
 using std::make_tuple;
 using std::string;
+using std::experimental::string_view;
 using std::vector;
 
 namespace
@@ -36,11 +38,11 @@ namespace
 
 //! Creates test case "1500", setting some register "next to sut" values
 //!
-std::shared_ptr<AccessInterface> Create_TestCase_1500 (SystemModel& sm, bool reportGml = false)
+std::shared_ptr<AccessInterface> Create_TestCase_1500 (SystemModel& sm, string_view name = "Tap", bool reportGml = false)
 {
   SystemModelBuilder builder(sm);
 
-  auto ai        = builder.Create_TestCase_1500("Tap", 4u);
+  auto ai        = builder.Create_TestCase_1500(name, 4u);
   auto ir        = sm.RegisterWithId(1u);
   auto bpy       = sm.RegisterWithId(3u);
   auto regStatic = sm.RegisterWithId(5u);
@@ -315,7 +317,7 @@ void UT_SystemModelManager::test_DoDataCycles_1500 ()
   SystemModel sm;
   SystemModelBuilder builder(sm);
 
-  auto ai = Create_TestCase_1500(sm, false);
+  auto ai = Create_TestCase_1500(sm, "Tap", false);
 
   auto spy = make_shared<Spy_AccessInterfaceProtocols>();
   ai->SetProtocol (spy);
@@ -361,7 +363,7 @@ void UT_SystemModelManager::test_DoDataCycles_1500_SVF ()
   SystemModel sm;
   SystemModelBuilder builder(sm);
 
-  auto ai        = Create_TestCase_1500(sm);
+  auto ai = Create_TestCase_1500(sm);
 
   auto spy = make_shared<Spy_SVF_Protocol>();
   ai->SetProtocol (spy);
@@ -397,6 +399,67 @@ void UT_SystemModelManager::test_DoDataCycles_1500_SVF ()
   TS_ASSERT_EQUALS (gotSvfCommands, expected);
 }
 
+
+//! Checks SystemModelManager DoDataCycles when using "1500" testcase and I2C protocol
+//!
+void UT_SystemModelManager::test_DoDataCycles_1500_I2C ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  SystemModelBuilder builder(sm);
+
+  auto ai        = Create_TestCase_1500(sm, "I2C");
+  auto addresses = { 0x00u, 0x41u, 0x42u };
+  auto spy       = make_shared<Spy_I2C_Protocol>(addresses, "S2R ");
+  ai->SetProtocol (spy);
+
+  SystemModelManager sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.DoDataCycles());
+
+  // ---------------- Verify
+  //
+  auto gotI2cCommands = spy->I2CCommands();
+
+  vector<string> expected
+  {
+     "S2R I2C_READ(0x41)\n"
+     "S2R I2C_WRITE(0x41, 0x01)\n",
+     "S2R I2C_READ(0x42)\n"
+     "S2R I2C_WRITE(0x42, 0x0505_/b10)\n",
+     "S2R I2C_READ(0x42)\n"
+     "S2R I2C_WRITE(0x42, 0x3636_4)\n",
+     "S2R I2C_READ(0x42)\n"
+     "S2R I2C_WRITE(0x42, 0x3636_E060:6060_/b0)\n",
+     "S2R I2C_READ(0x42)\n"
+     "S2R I2C_WRITE(0x42, 0x3636_3)\n",
+     "S2R I2C_READ(0x42)\n"
+     "S2R I2C_WRITE(0x42, 0x3636_D858:5858_/b0)\n",
+     "S2R I2C_READ(0x42)\n"
+     "S2R I2C_WRITE(0x42, 0x3636_2)\n",
+     "S2R I2C_READ(0x42)\n"
+     "S2R I2C_WRITE(0x42, 0x3636_8505:0505_/b0)\n",
+     "S2R I2C_READ(0x42)\n"
+     "S2R I2C_WRITE(0x42, 0x3636_1)\n",
+     "S2R I2C_READ(0x42)\n"
+     "S2R I2C_WRITE(0x42, 0x3636_0484:8484_/b1)\n",
+     "S2R I2C_READ(0x42)\n"
+     "S2R I2C_WRITE(0x42, 0x3636_A020:2020_/b0)\n",
+     "S2R I2C_READ(0x42)\n"
+     "S2R I2C_WRITE(0x42, 0x3636_8)\n",
+     "S2R I2C_READ(0x42)\n"
+     "S2R I2C_WRITE(0x42, 0x3636_0)\n",
+     "S2R I2C_READ(0x41)\n"
+     "S2R I2C_WRITE(0x41, 0xFF)\n"
+  };
+
+  TS_ASSERT_EQUALS (gotI2cCommands, expected);
+}
+
+
 //! Checks SystemModelManager DoDataCycles when using "1500" testcase and greedy
 //! selection algorithm
 void UT_SystemModelManager::test_DoDataCycles_1500_Greedy ()
@@ -406,7 +469,7 @@ void UT_SystemModelManager::test_DoDataCycles_1500_Greedy ()
   SystemModel sm;
   SystemModelBuilder builder(sm);
 
-  auto ai = Create_TestCase_1500(sm, false);
+  auto ai = Create_TestCase_1500(sm, "Tap", false);
 
   auto spy = make_shared<Spy_AccessInterfaceProtocols>();
   ai->SetProtocol (spy);
@@ -451,13 +514,19 @@ void UT_SystemModelManager::test_DoDataCycles_1500_Lazy ()
   SystemModel sm;
   SystemModelBuilder builder(sm);
 
-  auto ai = Create_TestCase_1500(sm, false);
+  auto ai = Create_TestCase_1500(sm, "Tap", false);
 
   auto spy = make_shared<Spy_AccessInterfaceProtocols>();
   ai->SetProtocol (spy);
 
   auto configureAlgo = make_shared<ConfigureAlgorithm_Last_Lazy>();
   SystemModelManager sut(sm, configureAlgo);
+
+//+  auto monitor       = make_shared<SystemModelManagerMonitor>();
+//+  monitor->MonitorAfterConfiguration(true);
+//+  monitor->MonitorBeforeConfiguration(true);
+//+  monitor->GmlBasePath("1500_Lazy");
+//+  SystemModelManager sut(sm, configureAlgo, monitor);
 
   // ---------------- Exercise
   //

@@ -55,6 +55,7 @@ OBJ_DEBUG = \
             $(OBJDIR_DEBUG)/src/FromSutUpdater.o                          \
             $(OBJDIR_DEBUG)/src/GmlPrinterVisitor.o                       \
             $(OBJDIR_DEBUG)/src/ConfigureVisitor.o                        \
+            $(OBJDIR_DEBUG)/src/I2C_Player.o                              \
             $(OBJDIR_DEBUG)/src/Linker.o                                  \
             $(OBJDIR_DEBUG)/src/ParentNode.o                              \
             $(OBJDIR_DEBUG)/src/PrettyPrinterVisitor.o                    \
@@ -86,6 +87,7 @@ OBJ_RELEASE = \
               $(OBJDIR_RELEASE)/src/FromSutUpdater.o                          \
               $(OBJDIR_RELEASE)/src/GmlPrinterVisitor.o                       \
               $(OBJDIR_RELEASE)/src/ConfigureVisitor.o                        \
+              $(OBJDIR_RELEASE)/src/I2C_Player.o                              \
               $(OBJDIR_RELEASE)/src/Linker.o                                  \
               $(OBJDIR_RELEASE)/src/ParentNode.o                              \
               $(OBJDIR_RELEASE)/src/PrettyPrinterVisitor.o                    \
@@ -154,6 +156,9 @@ $(OBJDIR_DEBUG)/src/GmlPrinterVisitor.o: src/GmlPrinterVisitor.cpp
 
 $(OBJDIR_DEBUG)/src/ConfigureVisitor.o: src/ConfigureVisitor.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/ConfigureVisitor.cpp -o $(OBJDIR_DEBUG)/src/ConfigureVisitor.o
+
+$(OBJDIR_DEBUG)/src/I2C_Player.o: src/I2C_Player.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/I2C_Player.cpp -o $(OBJDIR_DEBUG)/src/I2C_Player.o
 
 $(OBJDIR_DEBUG)/src/Linker.o: src/Linker.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/Linker.cpp -o $(OBJDIR_DEBUG)/src/Linker.o
@@ -257,6 +262,9 @@ $(OBJDIR_RELEASE)/src/GmlPrinterVisitor.o: src/GmlPrinterVisitor.cpp
 
 $(OBJDIR_RELEASE)/src/ConfigureVisitor.o: src/ConfigureVisitor.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/ConfigureVisitor.cpp -o $(OBJDIR_RELEASE)/src/ConfigureVisitor.o
+
+$(OBJDIR_RELEASE)/src/I2C_Player.o: src/I2C_Player.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/I2C_Player.cpp -o $(OBJDIR_RELEASE)/src/I2C_Player.o
 
 $(OBJDIR_RELEASE)/src/Linker.o: src/Linker.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/Linker.cpp -o $(OBJDIR_RELEASE)/src/Linker.o

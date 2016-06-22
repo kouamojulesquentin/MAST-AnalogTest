@@ -29,6 +29,7 @@ SOURCES +=  \
     src/DefaultTableBasedPathSelector.cpp           \
     src/FromSutUpdater.cpp                          \
     src/GmlPrinterVisitor.cpp                       \
+    src/I2C_Player.cpp                              \
     src/Linker.cpp                                  \
     src/ParentNode.cpp                              \
     src/PrettyPrinterVisitor.cpp                    \
@@ -62,6 +63,7 @@ HEADERS += \
     include/DefaultTableBasedPathSelector.hpp           \
     include/GmlPrinterVisitor.hpp                       \
     include/FromSutUpdater.hpp                          \
+    include/I2C_Player.hpp                              \
     include/Linker.hpp                                  \
     include/ParentNode.hpp                              \
     include/PathSelector.hpp                            \

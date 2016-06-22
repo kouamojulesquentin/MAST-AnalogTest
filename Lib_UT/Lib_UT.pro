@@ -27,6 +27,7 @@ SOURCES += \
     Generated/Runner.cpp                         \
     SystemModel/Fake_SVF_Simulator.cpp           \
     SystemModel/Spy_AccessInterfaceProtocols.cpp \
+    SystemModel/Spy_I2C_Protocol.cpp             \
     SystemModel/Spy_SVF_Protocol.cpp             \
     SystemModel/UT_ConfigureVisitor.cpp          \
     SystemModel/UT_DataCycle.cpp                 \
@@ -54,6 +55,7 @@ HEADERS += \
     CxxTest_Traits/SystemModelCheckResult_Traits.hpp \
     SystemModel/Fake_SVF_Simulator.hpp               \
     SystemModel/Spy_AccessInterfaceProtocols.hpp     \
+    SystemModel/Spy_I2C_Protocol.hpp                 \
     SystemModel/Spy_SVF_Protocol.hpp                 \
     SystemModel/UT_ConfigureVisitor.hpp              \
     SystemModel/UT_DataCycle.hpp                     \

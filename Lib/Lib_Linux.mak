@@ -53,6 +53,7 @@ OBJ_DEBUG = \
             $(OBJDIR_DEBUG)/src/ConfigureAlgorithm_LastOrDefault_Greedy.o \
             $(OBJDIR_DEBUG)/src/DefaultTableBasedPathSelector.o           \
             $(OBJDIR_DEBUG)/src/FromSutUpdater.o                          \
+            $(OBJDIR_DEBUG)/src/GenericAccessInterfaceProtocol.o          \
             $(OBJDIR_DEBUG)/src/GmlPrinterVisitor.o                       \
             $(OBJDIR_DEBUG)/src/ConfigureVisitor.o                        \
             $(OBJDIR_DEBUG)/src/I2C_Player.o                              \
@@ -85,6 +86,7 @@ OBJ_RELEASE = \
               $(OBJDIR_RELEASE)/src/ConfigureAlgorithm_LastOrDefault_Greedy.o \
               $(OBJDIR_RELEASE)/src/DefaultTableBasedPathSelector.o           \
               $(OBJDIR_RELEASE)/src/FromSutUpdater.o                          \
+              $(OBJDIR_RELEASE)/src/GenericAccessInterfaceProtocol.o          \
               $(OBJDIR_RELEASE)/src/GmlPrinterVisitor.o                       \
               $(OBJDIR_RELEASE)/src/ConfigureVisitor.o                        \
               $(OBJDIR_RELEASE)/src/I2C_Player.o                              \
@@ -150,6 +152,9 @@ $(OBJDIR_DEBUG)/src/DefaultTableBasedPathSelector.o: src/DefaultTableBasedPathSe
 
 $(OBJDIR_DEBUG)/src/FromSutUpdater.o: src/FromSutUpdater.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/FromSutUpdater.cpp -o $(OBJDIR_DEBUG)/src/FromSutUpdater.o
+
+$(OBJDIR_DEBUG)/src/GenericAccessInterfaceProtocol.o: src/GenericAccessInterfaceProtocol.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/GenericAccessInterfaceProtocol.cpp -o $(OBJDIR_DEBUG)/src/GenericAccessInterfaceProtocol.o
 
 $(OBJDIR_DEBUG)/src/GmlPrinterVisitor.o: src/GmlPrinterVisitor.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/GmlPrinterVisitor.cpp -o $(OBJDIR_DEBUG)/src/GmlPrinterVisitor.o
@@ -256,6 +261,9 @@ $(OBJDIR_RELEASE)/src/DefaultTableBasedPathSelector.o: src/DefaultTableBasedPath
 
 $(OBJDIR_RELEASE)/src/FromSutUpdater.o: src/FromSutUpdater.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/FromSutUpdater.cpp -o $(OBJDIR_RELEASE)/src/FromSutUpdater.o
+
+$(OBJDIR_RELEASE)/src/GenericAccessInterfaceProtocol.o: src/GenericAccessInterfaceProtocol.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/GenericAccessInterfaceProtocol.cpp -o $(OBJDIR_RELEASE)/src/GenericAccessInterfaceProtocol.o
 
 $(OBJDIR_RELEASE)/src/GmlPrinterVisitor.o: src/GmlPrinterVisitor.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/GmlPrinterVisitor.cpp -o $(OBJDIR_RELEASE)/src/GmlPrinterVisitor.o

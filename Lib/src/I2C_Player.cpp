@@ -31,6 +31,10 @@ I2C_Player::I2C_Player (initializer_list<uint32_t> addresses, string_view comman
   : m_commandPrefix (commandsPrefix)
   , m_addresses     (addresses)
 {
+  if (addresses.size() <= 2)
+  {
+    THROW_INVALID_ARGUMENT("I2C Addresses must have at least two entries");
+  }
 }
 //
 //  End of: I2C_Player::I2C_Player

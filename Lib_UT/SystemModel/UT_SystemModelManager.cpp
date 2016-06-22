@@ -14,6 +14,7 @@
 #include "UT_SystemModelManager.hpp"
 #include "SystemModelManager.hpp"
 #include "SystemModelBuilder.hpp"
+#include "GenericAccessInterfaceProtocol.hpp"
 #include "Spy_AccessInterfaceProtocols.hpp"
 #include "Spy_SVF_Protocol.hpp"
 #include "Spy_I2C_Protocol.hpp"
@@ -24,14 +25,23 @@
 #include "ConfigureAlgorithm_Last_Lazy.hpp"
 
 #include <memory>
+#include <vector>
+#include <string>
+#include <sstream>
 
-using namespace mast;
-using namespace test;
 using std::make_shared;
 using std::make_tuple;
 using std::string;
 using std::experimental::string_view;
+using std::ostringstream;
 using std::vector;
+
+using namespace std::string_literals;
+using namespace mast;
+using namespace test;
+
+using Primitive = GenericAccessInterfaceProtocol::Primitive;
+using Action    = GenericAccessInterfaceProtocol::Action;
 
 namespace
 {
@@ -153,6 +163,81 @@ std::shared_ptr<AccessInterface> Create_TestCase_MIB_Multichain_Post (SystemMode
 //  End of: Create_TestCase_MIB_Multichain_Post
 //---------------------------------------------------------------------------
 
+//! Creates a GenericAccessInterfaceProtocol suitable for following tests
+//!
+std::shared_ptr<GenericAccessInterfaceProtocol> CreateGenericAccessInterfaceProtocol (string& loggedActions)
+{
+  struct PrimitiveParam
+  {
+    PrimitiveParam(const BinaryVector& p_toSutData, BinaryVector& p_fromSutData)
+      : toSutData   (p_toSutData)
+      , fromSutData (p_fromSutData)
+    {  }
+
+    const BinaryVector& toSutData;
+          BinaryVector& fromSutData;
+  };
+
+  auto primitive_0  = [&](void*)
+  {
+    loggedActions += "S2R : RESET()\n"s ;
+  };
+
+  auto logPrimitive = [](uint32_t primitiveId, void* data)
+  {
+    const auto& param = *reinterpret_cast<PrimitiveParam*>(data);
+    param.fromSutData = param.toSutData;
+
+    ostringstream os;
+    os << "S2R : " << primitiveId << " " << param.toSutData.DataAsMixString() << "\n";
+    return os.str();
+  };
+
+  auto primitive_1  = [&loggedActions, logPrimitive](void* data)
+  {
+    loggedActions += logPrimitive(1u, data);
+  };
+
+  auto primitive_2  = [&loggedActions, logPrimitive](void* data)
+  {
+    loggedActions += logPrimitive(2u, data);
+  };
+
+  auto action_0 = [](const std::vector<Primitive>& primitives, void* data, const BinaryVector&)
+  {
+    primitives[0](data);
+    return BinaryVector();
+  };
+
+  auto derivationAction = [](const std::vector<Primitive>& primitives, uint32_t derivationId, void* /* data */, const BinaryVector& toSutData)
+  {
+    BinaryVector   fromSutData;
+    PrimitiveParam param(toSutData, fromSutData);
+
+    primitives[derivationId](&param);
+
+    return param.fromSutData;
+  };
+
+  auto action_1 = [derivationAction](const std::vector<Primitive>& primitives, void* data, const BinaryVector& toSutData)
+  {
+    return derivationAction(primitives, 1u, data, toSutData);
+  };
+
+  auto action_2 = [derivationAction](const std::vector<Primitive>& primitives, void* data, const BinaryVector& toSutData)
+  {
+    return derivationAction(primitives, 2u, data, toSutData);
+  };
+
+  vector<Primitive> primitives = {primitive_0, primitive_1, primitive_2};
+  vector<Action>    actions    = {action_0,    action_1,    action_2};
+
+  auto protocol = make_shared<GenericAccessInterfaceProtocol>(actions, primitives);
+  return protocol;
+}
+//
+//  End of: CreateSut
+//---------------------------------------------------------------------------
 
 } // End of unnamed namespace
 
@@ -315,10 +400,8 @@ void UT_SystemModelManager::test_DoDataCycles_1500 ()
   // ---------------- Setup
   //
   SystemModel sm;
-  SystemModelBuilder builder(sm);
 
-  auto ai = Create_TestCase_1500(sm, "Tap", false);
-
+  auto ai  = Create_TestCase_1500(sm, "Tap", false);
   auto spy = make_shared<Spy_AccessInterfaceProtocols>();
   ai->SetProtocol (spy);
 
@@ -361,10 +444,8 @@ void UT_SystemModelManager::test_DoDataCycles_1500_SVF ()
   // ---------------- Setup
   //
   SystemModel sm;
-  SystemModelBuilder builder(sm);
 
-  auto ai = Create_TestCase_1500(sm);
-
+  auto ai  = Create_TestCase_1500(sm);
   auto spy = make_shared<Spy_SVF_Protocol>();
   ai->SetProtocol (spy);
 
@@ -407,7 +488,6 @@ void UT_SystemModelManager::test_DoDataCycles_1500_I2C ()
   // ---------------- Setup
   //
   SystemModel sm;
-  SystemModelBuilder builder(sm);
 
   auto ai        = Create_TestCase_1500(sm, "I2C");
   auto addresses = { 0x00u, 0x41u, 0x42u };
@@ -460,6 +540,49 @@ void UT_SystemModelManager::test_DoDataCycles_1500_I2C ()
 }
 
 
+//! Checks SystemModelManager DoDataCycles when using "1500" testcase and Generic (table base) protocol
+//!
+void UT_SystemModelManager::test_DoDataCycles_1500_Generic ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  auto loggedActions = ""s;
+  auto protocol      = CreateGenericAccessInterfaceProtocol(loggedActions);
+  auto ai = Create_TestCase_1500(sm, "Generic");
+  ai->SetProtocol (protocol);
+
+  SystemModelManager sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.DoDataCycles());
+
+  // ---------------- Verify
+  //
+  string expected
+  {
+     "S2R : 1 0x01\n"
+     "S2R : 2 0x0505_/b10\n"
+     "S2R : 2 0x3636_4\n"
+     "S2R : 2 0x3636_E060:6060_/b0\n"
+     "S2R : 2 0x3636_3\n"
+     "S2R : 2 0x3636_D858:5858_/b0\n"
+     "S2R : 2 0x3636_2\n"
+     "S2R : 2 0x3636_8505:0505_/b0\n"
+     "S2R : 2 0x3636_1\n"
+     "S2R : 2 0x3636_0484:8484_/b1\n"
+     "S2R : 2 0x3636_A020:2020_/b0\n"
+     "S2R : 2 0x3636_8\n"
+     "S2R : 2 0x3636_0\n"
+     "S2R : 1 0xFF\n"
+  };
+
+  TS_ASSERT_EQUALS (loggedActions, expected);
+}
+
+
+
 //! Checks SystemModelManager DoDataCycles when using "1500" testcase and greedy
 //! selection algorithm
 void UT_SystemModelManager::test_DoDataCycles_1500_Greedy ()
@@ -467,7 +590,6 @@ void UT_SystemModelManager::test_DoDataCycles_1500_Greedy ()
   // ---------------- Setup
   //
   SystemModel sm;
-  SystemModelBuilder builder(sm);
 
   auto ai = Create_TestCase_1500(sm, "Tap", false);
 
@@ -512,7 +634,6 @@ void UT_SystemModelManager::test_DoDataCycles_1500_Lazy ()
   // ---------------- Setup
   //
   SystemModel sm;
-  SystemModelBuilder builder(sm);
 
   auto ai = Create_TestCase_1500(sm, "Tap", false);
 

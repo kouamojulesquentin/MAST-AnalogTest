@@ -28,6 +28,7 @@ SOURCES +=  \
     src/DefaultBinaryPathSelector.cpp               \
     src/DefaultTableBasedPathSelector.cpp           \
     src/FromSutUpdater.cpp                          \
+    src/GenericAccessInterfaceProtocol.cpp          \
     src/GmlPrinterVisitor.cpp                       \
     src/I2C_Player.cpp                              \
     src/Linker.cpp                                  \
@@ -61,6 +62,7 @@ HEADERS += \
     include/ConfigureAlgorithm_LastOrDefault.hpp        \
     include/ConfigureAlgorithm_LastOrDefault_Greedy.hpp \
     include/DefaultTableBasedPathSelector.hpp           \
+    include/GenericAccessInterfaceProtocol.hpp          \
     include/GmlPrinterVisitor.hpp                       \
     include/FromSutUpdater.hpp                          \
     include/I2C_Player.hpp                              \

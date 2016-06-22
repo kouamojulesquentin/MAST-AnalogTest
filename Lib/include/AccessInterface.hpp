@@ -45,35 +45,9 @@ class DLL_EXPORT AccessInterface : public ParentNode
   //!
   void  SetProtocol (std::shared_ptr<AccessInterfaceProtocol> protocol) { m_protocol = protocol; }
 
-
-  //! Primitives interface defining the Access Interface prototocol
-  //! @note The argument is a void* so it can be recast to the actual parameters
-  //!
-//+  using Primitive = std::function<int(void*)>; //!< Defines pre- and post- condition functors
-
-  //! Prototype of the commands used to access a derivation with as parameters:
-  //!  - The protocol table of available functions
-  //!  - The optional data the AI might requite
-  //!  - The total number of the derivations
-  //!  - The vector to push into the SUT (obtained from the current System Model)
-  //!  - The vector received from the SUT, which must be used to update the System Model
-  //!    after the command finishes
-  //!
-//+  using Command  = std::function<void(Primitive*, void*, int, BinaryVector*, BinaryVector*)>;
-//+  std::vector<Primitive>         m_primitives;                   //!< Primitives composing the protocol
-//+  std::vector<Command>           m_actions;                      //!< Provide Actions to access the derivations based on the set of primitives
-
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
 
   virtual std::experimental::string_view TypeName() const override { return "AccessInterface"; } //!< Returns readable type name
-
-  // ---------------- Protected Methods
-  //
-  protected:
-
-  // ---------------- Private  Methods
-  //
-  private:
 
   // ---------------- Private  Fields
   //

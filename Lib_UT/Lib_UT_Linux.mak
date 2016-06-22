@@ -43,55 +43,57 @@ DEP_RELEASE =
 OUT_RELEASE = ../bin/release/Lib_UT
 
 OBJ_DEBUG = \
-            $(OBJDIR_DEBUG)/Utility/UT_Utility.o                           \
-            $(OBJDIR_DEBUG)/Utility/UT_SVFVector.o                         \
-            $(OBJDIR_DEBUG)/Utility/UT_BinaryVector.o                      \
-            $(OBJDIR_DEBUG)/UT_Helpers/UT_SystemModelBuilder.o             \
-            $(OBJDIR_DEBUG)/UT_Helpers/SystemModelBuilder.o                \
-            $(OBJDIR_DEBUG)/SystemModel/Fake_SVF_Simulator.o               \
-            $(OBJDIR_DEBUG)/SystemModel/Spy_AccessInterfaceProtocols.o     \
-            $(OBJDIR_DEBUG)/SystemModel/Spy_I2C_Protocol.o                 \
-            $(OBJDIR_DEBUG)/SystemModel/Spy_SVF_Protocol.o                 \
-            $(OBJDIR_DEBUG)/SystemModel/UT_SVF_SimulationProtocol.o        \
-            $(OBJDIR_DEBUG)/SystemModel/UT_SystemModel.o                   \
-            $(OBJDIR_DEBUG)/SystemModel/UT_FromSutUpdater.o                \
-            $(OBJDIR_DEBUG)/SystemModel/UT_ToSutVisitor.o                  \
-            $(OBJDIR_DEBUG)/SystemModel/UT_DataCycle.o                     \
-            $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelCheckerVisitor.o     \
-            $(OBJDIR_DEBUG)/SystemModel/UT_Register.o                      \
-            $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelManager.o            \
-            $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelNode.o               \
-            $(OBJDIR_DEBUG)/SystemModel/UT_PrettyPrinterVisitor.o          \
-            $(OBJDIR_DEBUG)/SystemModel/UT_PropagatePendingVisitor.o       \
-            $(OBJDIR_DEBUG)/SystemModel/UT_GmlPrinterVisitor.o             \
-            $(OBJDIR_DEBUG)/SystemModel/UT_ConfigureVisitor.o              \
-            $(OBJDIR_DEBUG)/SystemModel/UT_DefaultBinaryPathSelector.o     \
-            $(OBJDIR_DEBUG)/Generated/Runner.o                             \
+            $(OBJDIR_DEBUG)/Utility/UT_Utility.o                            \
+            $(OBJDIR_DEBUG)/Utility/UT_SVFVector.o                          \
+            $(OBJDIR_DEBUG)/Utility/UT_BinaryVector.o                       \
+            $(OBJDIR_DEBUG)/UT_Helpers/UT_SystemModelBuilder.o              \
+            $(OBJDIR_DEBUG)/UT_Helpers/SystemModelBuilder.o                 \
+            $(OBJDIR_DEBUG)/SystemModel/Fake_SVF_Simulator.o                \
+            $(OBJDIR_DEBUG)/SystemModel/Spy_AccessInterfaceProtocols.o      \
+            $(OBJDIR_DEBUG)/SystemModel/Spy_I2C_Protocol.o                  \
+            $(OBJDIR_DEBUG)/SystemModel/Spy_SVF_Protocol.o                  \
+            $(OBJDIR_DEBUG)/SystemModel/UT_SVF_SimulationProtocol.o         \
+            $(OBJDIR_DEBUG)/SystemModel/UT_SystemModel.o                    \
+            $(OBJDIR_DEBUG)/SystemModel/UT_FromSutUpdater.o                 \
+            $(OBJDIR_DEBUG)/SystemModel/UT_ToSutVisitor.o                   \
+            $(OBJDIR_DEBUG)/SystemModel/UT_DataCycle.o                      \
+            $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelCheckerVisitor.o      \
+            $(OBJDIR_DEBUG)/SystemModel/UT_Register.o                       \
+            $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelManager.o             \
+            $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelNode.o                \
+            $(OBJDIR_DEBUG)/SystemModel/UT_PrettyPrinterVisitor.o           \
+            $(OBJDIR_DEBUG)/SystemModel/UT_PropagatePendingVisitor.o        \
+            $(OBJDIR_DEBUG)/SystemModel/UT_GenericAccessInterfaceProtocol.o \
+            $(OBJDIR_DEBUG)/SystemModel/UT_GmlPrinterVisitor.o              \
+            $(OBJDIR_DEBUG)/SystemModel/UT_ConfigureVisitor.o               \
+            $(OBJDIR_DEBUG)/SystemModel/UT_DefaultBinaryPathSelector.o      \
+            $(OBJDIR_DEBUG)/Generated/Runner.o                              \
 
 OBJ_RELEASE = \
-              $(OBJDIR_RELEASE)/Utility/UT_Utility.o                       \
-              $(OBJDIR_RELEASE)/Utility/UT_SVFVector.o                     \
-              $(OBJDIR_RELEASE)/Utility/UT_BinaryVector.o                  \
-              $(OBJDIR_RELEASE)/UT_Helpers/UT_SystemModelBuilder.o         \
-              $(OBJDIR_RELEASE)/UT_Helpers/SystemModelBuilder.o            \
-              $(OBJDIR_RELEASE)/SystemModel/Fake_SVF_Simulator.o           \
-              $(OBJDIR_RELEASE)/SystemModel/Spy_AccessInterfaceProtocols.o \
-              $(OBJDIR_RELEASE)/SystemModel/Spy_I2C_Protocol.o             \
-              $(OBJDIR_RELEASE)/SystemModel/Spy_SVF_Protocol.o             \
-              $(OBJDIR_RELEASE)/SystemModel/UT_SVF_SimulationProtocol.o    \
-              $(OBJDIR_RELEASE)/SystemModel/UT_SystemModel.o               \
-              $(OBJDIR_RELEASE)/SystemModel/UT_FromSutUpdater.o            \
-              $(OBJDIR_RELEASE)/SystemModel/UT_ToSutVisitor.o              \
-              $(OBJDIR_RELEASE)/SystemModel/UT_DataCycle.o                 \
-              $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelCheckerVisitor.o \
-              $(OBJDIR_RELEASE)/SystemModel/UT_Register.o                  \
-              $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelManager.o        \
-              $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelNode.o           \
-              $(OBJDIR_RELEASE)/SystemModel/UT_PrettyPrinterVisitor.o      \
-              $(OBJDIR_RELEASE)/SystemModel/UT_PropagatePendingVisitor.o   \
-              $(OBJDIR_RELEASE)/SystemModel/UT_GmlPrinterVisitor.o         \
-              $(OBJDIR_RELEASE)/SystemModel/UT_ConfigureVisitor.o          \
-              $(OBJDIR_RELEASE)/SystemModel/UT_DefaultBinaryPathSelector.o \
+              $(OBJDIR_RELEASE)/Utility/UT_Utility.o                            \
+              $(OBJDIR_RELEASE)/Utility/UT_SVFVector.o                          \
+              $(OBJDIR_RELEASE)/Utility/UT_BinaryVector.o                       \
+              $(OBJDIR_RELEASE)/UT_Helpers/UT_SystemModelBuilder.o              \
+              $(OBJDIR_RELEASE)/UT_Helpers/SystemModelBuilder.o                 \
+              $(OBJDIR_RELEASE)/SystemModel/Fake_SVF_Simulator.o                \
+              $(OBJDIR_RELEASE)/SystemModel/Spy_AccessInterfaceProtocols.o      \
+              $(OBJDIR_RELEASE)/SystemModel/Spy_I2C_Protocol.o                  \
+              $(OBJDIR_RELEASE)/SystemModel/Spy_SVF_Protocol.o                  \
+              $(OBJDIR_RELEASE)/SystemModel/UT_SVF_SimulationProtocol.o         \
+              $(OBJDIR_RELEASE)/SystemModel/UT_SystemModel.o                    \
+              $(OBJDIR_RELEASE)/SystemModel/UT_FromSutUpdater.o                 \
+              $(OBJDIR_RELEASE)/SystemModel/UT_ToSutVisitor.o                   \
+              $(OBJDIR_RELEASE)/SystemModel/UT_DataCycle.o                      \
+              $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelCheckerVisitor.o      \
+              $(OBJDIR_RELEASE)/SystemModel/UT_Register.o                       \
+              $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelManager.o             \
+              $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelNode.o                \
+              $(OBJDIR_RELEASE)/SystemModel/UT_PrettyPrinterVisitor.o           \
+              $(OBJDIR_RELEASE)/SystemModel/UT_PropagatePendingVisitor.o        \
+              $(OBJDIR_RELEASE)/SystemModel/UT_GenericAccessInterfaceProtocol.o \
+              $(OBJDIR_RELEASE)/SystemModel/UT_GmlPrinterVisitor.o              \
+              $(OBJDIR_RELEASE)/SystemModel/UT_ConfigureVisitor.o               \
+              $(OBJDIR_RELEASE)/SystemModel/UT_DefaultBinaryPathSelector.o      \
               $(OBJDIR_RELEASE)/Generated/Runner.o
 
 
@@ -136,6 +138,9 @@ $(OBJDIR_DEBUG)/SystemModel/Spy_SVF_Protocol.o: SystemModel/Spy_SVF_Protocol.cpp
 
 $(OBJDIR_DEBUG)/SystemModel/UT_DefaultBinaryPathSelector.o: SystemModel/UT_DefaultBinaryPathSelector.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_DefaultBinaryPathSelector.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_DefaultBinaryPathSelector.o
+
+$(OBJDIR_DEBUG)/SystemModel/UT_GenericAccessInterfaceProtocol.o: SystemModel/UT_GenericAccessInterfaceProtocol.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_GenericAccessInterfaceProtocol.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_GenericAccessInterfaceProtocol.o
 
 $(OBJDIR_DEBUG)/SystemModel/UT_GmlPrinterVisitor.o: SystemModel/UT_GmlPrinterVisitor.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_GmlPrinterVisitor.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_GmlPrinterVisitor.o
@@ -232,6 +237,9 @@ $(OBJDIR_RELEASE)/SystemModel/Spy_SVF_Protocol.o: SystemModel/Spy_SVF_Protocol.c
 
 $(OBJDIR_RELEASE)/SystemModel/UT_DefaultBinaryPathSelector.o: SystemModel/UT_DefaultBinaryPathSelector.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_DefaultBinaryPathSelector.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_DefaultBinaryPathSelector.o
+
+$(OBJDIR_RELEASE)/SystemModel/UT_GenericAccessInterfaceProtocol.o: SystemModel/UT_GenericAccessInterfaceProtocol.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_GenericAccessInterfaceProtocol.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_GenericAccessInterfaceProtocol.o
 
 $(OBJDIR_RELEASE)/SystemModel/UT_GmlPrinterVisitor.o: SystemModel/UT_GmlPrinterVisitor.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_GmlPrinterVisitor.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_GmlPrinterVisitor.o

@@ -68,10 +68,13 @@ class DLL_EXPORT SystemModelNode
   void SetPriority          (uint32_t priority)                          { m_priority        = priority;           } //!< Sets new priority (application defined semantic)
   void SetName              (std::experimental::string_view name)        { m_name            = MakeNodeName(name); } //!< Changes node name
 
+  void SetNextSibling (std::shared_ptr<SystemModelNode> nextSibling) { m_pNextSibling = nextSibling; };  //!< Replaces next sibling (caller is responsible to manage formely siblings)
+
   void SetPendingsCount  (uint32_t count) { m_pendingCount =  count; } //!< Sets number of pendings at given level (Must only be 0 or 1 for Registers)
   void IncrementPendings (uint32_t count) { m_pendingCount += count; } //!< Increment the number of pendings at given level (prefer SetPending for Registers)
   void SetPending        ()               { m_pendingCount =  1u; }    //!< Sets number of pendings to 1
   void ResetPending      ()               { m_pendingCount =  0;  }    //!< Resets the number of pendings
+
 
   static void ResetNodeIdentifier() { sm_nextIdentifier = 0; } //!< For debug purpose only, reset node identifier (e.g to be able to check construction order, or printers...)
 
@@ -93,6 +96,10 @@ class DLL_EXPORT SystemModelNode
   virtual ~SystemModelNode() = default;
   SystemModelNode()  = delete;
   SystemModelNode(std::experimental::string_view name);
+
+
+
+
 
   // ---------------- Private  Methods
   //

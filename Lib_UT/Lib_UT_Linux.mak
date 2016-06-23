@@ -61,6 +61,7 @@ OBJ_DEBUG = \
             $(OBJDIR_DEBUG)/SystemModel/UT_Register.o                       \
             $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelManager.o             \
             $(OBJDIR_DEBUG)/SystemModel/UT_SystemModelNode.o                \
+            $(OBJDIR_DEBUG)/SystemModel/UT_ParentNode.o                     \
             $(OBJDIR_DEBUG)/SystemModel/UT_PrettyPrinterVisitor.o           \
             $(OBJDIR_DEBUG)/SystemModel/UT_PropagatePendingVisitor.o        \
             $(OBJDIR_DEBUG)/SystemModel/UT_GenericAccessInterfaceProtocol.o \
@@ -88,6 +89,7 @@ OBJ_RELEASE = \
               $(OBJDIR_RELEASE)/SystemModel/UT_Register.o                       \
               $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelManager.o             \
               $(OBJDIR_RELEASE)/SystemModel/UT_SystemModelNode.o                \
+              $(OBJDIR_RELEASE)/SystemModel/UT_ParentNode.o                     \
               $(OBJDIR_RELEASE)/SystemModel/UT_PrettyPrinterVisitor.o           \
               $(OBJDIR_RELEASE)/SystemModel/UT_PropagatePendingVisitor.o        \
               $(OBJDIR_RELEASE)/SystemModel/UT_GenericAccessInterfaceProtocol.o \
@@ -147,6 +149,9 @@ $(OBJDIR_DEBUG)/SystemModel/UT_GmlPrinterVisitor.o: SystemModel/UT_GmlPrinterVis
 
 $(OBJDIR_DEBUG)/SystemModel/UT_ConfigureVisitor.o: SystemModel/UT_ConfigureVisitor.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_ConfigureVisitor.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_ConfigureVisitor.o
+
+$(OBJDIR_DEBUG)/SystemModel/UT_ParentNode.o: SystemModel/UT_ParentNode.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_ParentNode.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_ParentNode.o
 
 $(OBJDIR_DEBUG)/SystemModel/UT_PrettyPrinterVisitor.o: SystemModel/UT_PrettyPrinterVisitor.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_PrettyPrinterVisitor.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_PrettyPrinterVisitor.o
@@ -246,6 +251,9 @@ $(OBJDIR_RELEASE)/SystemModel/UT_GmlPrinterVisitor.o: SystemModel/UT_GmlPrinterV
 
 $(OBJDIR_RELEASE)/SystemModel/UT_ConfigureVisitor.o: SystemModel/UT_ConfigureVisitor.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_ConfigureVisitor.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_ConfigureVisitor.o
+
+$(OBJDIR_RELEASE)/SystemModel/UT_ParentNode.o: SystemModel/UT_ParentNode.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_ParentNode.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_ParentNode.o
 
 $(OBJDIR_RELEASE)/SystemModel/UT_PrettyPrinterVisitor.o: SystemModel/UT_PrettyPrinterVisitor.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_PrettyPrinterVisitor.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_PrettyPrinterVisitor.o

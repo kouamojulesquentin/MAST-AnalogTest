@@ -58,11 +58,11 @@ void UT_SystemModelNode::test_Constructor ()
 }
 
 
-//! Checks SystemModelNode::AppendSibling()
+//! Checks SystemModelNode::AppendSibling() first sibling
 //!
 //! @note As this is an abstract base class, it uses a Chain to have an instance
 //!
-void UT_SystemModelNode::test_AppendSibling ()
+void UT_SystemModelNode::test_AppendSibling_1 ()
 {
   // ---------------- Setup
   //
@@ -77,6 +77,63 @@ void UT_SystemModelNode::test_AppendSibling ()
   //
   TS_ASSERT_EQUALS (sut.NextSibling(), otherNode);
 }
+
+//! Checks SystemModelNode::AppendSibling() with a second node
+//!
+//! @note As this is an abstract base class, it uses a Chain to have an instance
+//!
+void UT_SystemModelNode::test_AppendSibling_2 ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = Chain("A Name");
+  auto node_1 = make_shared<Chain>("node 1");
+  auto node_2 = make_shared<Chain>("node 2");
+
+  sut.AppendSibling(node_1);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.AppendSibling(node_2));
+
+  // ---------------- Verify
+  //
+  auto sibling_1 = sut.NextSibling();
+  auto sibling_2 = sibling_1->NextSibling();
+
+  TS_ASSERT_EQUALS (sibling_1, node_1);
+  TS_ASSERT_EQUALS (sibling_2, node_2);
+}
+
+//! Checks SystemModelNode::SetSibling()
+//!
+//! @note As this is an abstract base class, it uses a Chain to have an instance
+//!
+void UT_SystemModelNode::test_SetSibling ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = Chain("A Name");
+  auto node_1 = make_shared<Chain>("node 1");
+  auto node_2 = make_shared<Chain>("node 2");
+  auto node_3 = make_shared<Chain>("node 3");
+
+  sut.AppendSibling(node_1);
+  sut.AppendSibling(node_2);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.SetNextSibling(node_3));
+
+  // ---------------- Verify
+  //
+  auto sibling_1 = sut.NextSibling();
+  auto sibling_2 = sibling_1->NextSibling();
+
+  TS_ASSERT_EQUALS (sibling_1, node_3);
+  TS_ASSERT_EQUALS (sibling_2, nullptr);
+}
+
 
 //! Checks SystemModelNode::SetPending()
 //!

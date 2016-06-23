@@ -29,12 +29,17 @@ class UT_SystemModelNode : public CxxTest::TestSuite
 
   void test_Constructor ();
 
-  void test_AppendSibling ();
+  void test_AppendSibling_1 ();
+  void test_AppendSibling_2 ();
+  void test_SetSibling ();
+
   void test_SetPending ();
   void test_ResetPending ();
+
   void test_SetPriority ();
   void test_SetName ();
   void test_SetApplicationData ();
+
   void test_SetConditioners ();
   void test_ResetConditioners ();
 };

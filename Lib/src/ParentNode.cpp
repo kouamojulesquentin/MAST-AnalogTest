@@ -168,6 +168,35 @@ void ParentNode::DisconnectSibling (shared_ptr<SystemModelNode> beforeNode, shar
 //---------------------------------------------------------------------------
 
 
+//! Tests whether a node is a direct child
+//!
+//! @param node The node to see if it is a direct child
+//!
+//! @return True if node is a direct child false otherwise
+//!
+bool ParentNode::HasDirectChild (std::shared_ptr<SystemModelNode> node) const
+{
+  CHECK_PARAMETER_NOT_NULL (node, "Invalid node: 'nullptr'");
+
+  auto currentChild = m_pFirstChild;
+
+  while (currentChild)
+  {
+    if (currentChild == node)
+    {
+      return true;
+    }
+
+    currentChild = currentChild->NextSibling();
+  }
+
+  return false;
+}
+//
+//  End of: ParentNode::HasDirectChild
+//---------------------------------------------------------------------------
+
+
 //===========================================================================
 // End of ParentNode.cpp
 //===========================================================================

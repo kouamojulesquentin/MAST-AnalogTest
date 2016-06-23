@@ -47,8 +47,16 @@ class UT_ParentNode : public CxxTest::TestSuite
   void test_DisconnectChild_2nd_OutOf_2 ();
   void test_DisconnectChild_2nd_OutOf_3 ();
   void test_DisconnectChild_NotAChild ();
-  void test_DisconnectChild_Nullptr ();
   void test_DisconnectChild_NoChild ();
+  void test_DisconnectChild_Nullptr ();
+
+  void test_HasDirectChild_1st_OutOf_1 ();
+  void test_HasDirectChild_1st_OutOf_2 ();
+  void test_HasDirectChild_2nd_OutOf_2 ();
+  void test_HasDirectChild_2nd_OutOf_3 ();
+  void test_HasDirectChild_NotAChild ();
+  void test_HasDirectChild_NoChild ();
+  void test_HasDirectChild_Nullptr ();
 
   void test_DisconnectAllChildren ();
   void test_DisconnectAllChildren_When_None ();

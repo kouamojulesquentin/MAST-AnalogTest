@@ -30,7 +30,7 @@ void UT_ParentNode::test_constructor ()
   //
   Chain sut("chain");
 
-  // ---------------- Verify (ParentNode part)
+  // ---------------- Verify
   //
   TS_ASSERT_EQUALS  (sut.DirectChildrenCount(), 0);
   TS_ASSERT_NULLPTR (sut.FirstChild());
@@ -53,7 +53,7 @@ void UT_ParentNode::test_AppendChild_1 ()
   //
   TS_ASSERT_THROWS_NOTHING (sut.AppendChild(node_1));
 
-  // ---------------- Verify (ParentNode part)
+  // ---------------- Verify
   //
   TS_ASSERT_EQUALS     (sut.DirectChildrenCount(), 1);
   TS_ASSERT_EQUALS_PTR (sut.FirstChild(),          node_1);
@@ -79,7 +79,7 @@ void UT_ParentNode::test_AppendChild_2 ()
   //
   TS_ASSERT_THROWS_NOTHING (sut.AppendChild(node_2));
 
-  // ---------------- Verify (ParentNode part)
+  // ---------------- Verify
   //
   TS_ASSERT_EQUALS     (sut.DirectChildrenCount(), 2);
   TS_ASSERT_EQUALS_PTR (sut.FirstChild(),          node_1);
@@ -104,7 +104,7 @@ void UT_ParentNode::test_DisconnectDerivation_1st_OutOf_1 ()
   //
   TS_ASSERT_THROWS_NOTHING (sut.DisconnectDerivation(1u));
 
-  // ---------------- Verify (ParentNode part)
+  // ---------------- Verify
   //
   TS_ASSERT_EQUALS  (sut.DirectChildrenCount(), 0);
   TS_ASSERT_NULLPTR (sut.FirstChild());
@@ -130,7 +130,7 @@ void UT_ParentNode::test_DisconnectDerivation_1st_OutOf_2 ()
   //
   TS_ASSERT_THROWS_NOTHING (sut.DisconnectDerivation(1u));
 
-  // ---------------- Verify (ParentNode part)
+  // ---------------- Verify
   //
   TS_ASSERT_EQUALS     (sut.DirectChildrenCount(), 1);
   TS_ASSERT_EQUALS_PTR (sut.FirstChild(),          node_2);
@@ -156,7 +156,7 @@ void UT_ParentNode::test_DisconnectDerivation_2nd_OutOf_2 ()
   //
   TS_ASSERT_THROWS_NOTHING (sut.DisconnectDerivation(2u));
 
-  // ---------------- Verify (ParentNode part)
+  // ---------------- Verify
   //
   TS_ASSERT_EQUALS     (sut.DirectChildrenCount(), 1);
   TS_ASSERT_EQUALS_PTR (sut.FirstChild(),          node_1);
@@ -185,7 +185,7 @@ void UT_ParentNode::test_DisconnectDerivation_2nd_OutOf_3 ()
   //
   TS_ASSERT_THROWS_NOTHING (sut.DisconnectDerivation(2u));
 
-  // ---------------- Verify (ParentNode part)
+  // ---------------- Verify
   //
   TS_ASSERT_EQUALS     (sut.DirectChildrenCount(), 2);
   TS_ASSERT_EQUALS_PTR (sut.FirstChild(),          node_1);
@@ -282,7 +282,7 @@ void UT_ParentNode::test_DisconnectChild_1st_OutOf_1 ()
   //
   TS_ASSERT_THROWS_NOTHING (sut.DisconnectChild(node_1));
 
-  // ---------------- Verify (ParentNode part)
+  // ---------------- Verify
   //
   TS_ASSERT_EQUALS  (sut.DirectChildrenCount(), 0);
   TS_ASSERT_NULLPTR (sut.FirstChild());
@@ -308,7 +308,7 @@ void UT_ParentNode::test_DisconnectChild_1st_OutOf_2 ()
   //
   TS_ASSERT_THROWS_NOTHING (sut.DisconnectChild(node_1));
 
-  // ---------------- Verify (ParentNode part)
+  // ---------------- Verify
   //
   TS_ASSERT_EQUALS     (sut.DirectChildrenCount(), 1);
   TS_ASSERT_EQUALS_PTR (sut.FirstChild(),          node_2);
@@ -334,7 +334,7 @@ void UT_ParentNode::test_DisconnectChild_2nd_OutOf_2 ()
   //
   TS_ASSERT_THROWS_NOTHING (sut.DisconnectChild(node_2));
 
-  // ---------------- Verify (ParentNode part)
+  // ---------------- Verify
   //
   TS_ASSERT_EQUALS     (sut.DirectChildrenCount(), 1);
   TS_ASSERT_EQUALS_PTR (sut.FirstChild(),          node_1);
@@ -363,7 +363,7 @@ void UT_ParentNode::test_DisconnectChild_2nd_OutOf_3 ()
   //
   TS_ASSERT_THROWS_NOTHING (sut.DisconnectChild(node_2));
 
-  // ---------------- Verify (ParentNode part)
+  // ---------------- Verify
   //
   TS_ASSERT_EQUALS     (sut.DirectChildrenCount(), 2);
   TS_ASSERT_EQUALS_PTR (sut.FirstChild(),          node_1);
@@ -393,6 +393,23 @@ void UT_ParentNode::test_DisconnectChild_NotAChild ()
 }
 
 
+
+//! Checks ParentNode::DisconnectChild() when there is no child nodes
+//!
+//! @note As this is an abstract base class, it uses a Chain to have an instance
+//!
+void UT_ParentNode::test_DisconnectChild_NoChild ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = Chain("chain");
+  auto node_1 = make_shared<Chain>("node 1");
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut.DisconnectChild(node_1), std::exception);
+}
+
 //! Checks ParentNode::DisconnectChild() when node is nullptr
 //!
 //! @note As this is an abstract base class, it uses a Chain to have an instance
@@ -413,21 +430,172 @@ void UT_ParentNode::test_DisconnectChild_Nullptr ()
   TS_ASSERT_THROWS (sut.DisconnectChild(nullptr), std::exception);
 }
 
-//! Checks ParentNode::DisconnectChild() when there is no child nodes
+
+//! Checks ParentNode::HasDirectChild() when first and only one
 //!
 //! @note As this is an abstract base class, it uses a Chain to have an instance
 //!
-void UT_ParentNode::test_DisconnectChild_NoChild ()
+void UT_ParentNode::test_HasDirectChild_1st_OutOf_1 ()
 {
   // ---------------- Setup
   //
   auto sut    = Chain("chain");
   auto node_1 = make_shared<Chain>("node 1");
 
+  sut.AppendChild(node_1);
+
+  // ---------------- Exercise
+  //
+  bool hasDirectChild = sut.HasDirectChild(node_1);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE (hasDirectChild);
+}
+
+
+//! Checks ParentNode::HasDirectChild() when first out of 2
+//!
+//! @note As this is an abstract base class, it uses a Chain to have an instance
+//!
+void UT_ParentNode::test_HasDirectChild_1st_OutOf_2 ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = Chain("chain");
+  auto node_1 = make_shared<Chain>("node 1");
+  auto node_2 = make_shared<Chain>("node 2");
+
+  sut.AppendChild(node_1);
+  sut.AppendChild(node_2);
+
+  // ---------------- Exercise
+  //
+  bool hasDirectChild = sut.HasDirectChild(node_1);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE (hasDirectChild);
+}
+
+
+//! Checks ParentNode::HasDirectChild() when 2nd out of 2
+//!
+//! @note As this is an abstract base class, it uses a Chain to have an instance
+//!
+void UT_ParentNode::test_HasDirectChild_2nd_OutOf_2 ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = Chain("chain");
+  auto node_1 = make_shared<Chain>("node 1");
+  auto node_2 = make_shared<Chain>("node 2");
+
+  sut.AppendChild(node_1);
+  sut.AppendChild(node_2);
+
+  // ---------------- Exercise
+  //
+  bool hasDirectChild = sut.HasDirectChild(node_2);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE (hasDirectChild);
+}
+
+
+//! Checks ParentNode::HasDirectChild() when 2nd out of 3
+//!
+//! @note As this is an abstract base class, it uses a Chain to have an instance
+//!
+void UT_ParentNode::test_HasDirectChild_2nd_OutOf_3 ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = Chain("chain");
+  auto node_1 = make_shared<Chain>("node 1");
+  auto node_2 = make_shared<Chain>("node 2");
+  auto node_3 = make_shared<Chain>("node 3");
+
+  sut.AppendChild(node_1);
+  sut.AppendChild(node_2);
+  sut.AppendChild(node_3);
+
+  // ---------------- Exercise
+  //
+  bool hasDirectChild = sut.HasDirectChild(node_2);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE (hasDirectChild);
+}
+
+
+//! Checks ParentNode::HasDirectChild() when node is not a child
+//!
+//! @note As this is an abstract base class, it uses a Chain to have an instance
+//!
+void UT_ParentNode::test_HasDirectChild_NotAChild ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = Chain("chain");
+  auto node_1 = make_shared<Chain>("node 1");
+  auto node_2 = make_shared<Chain>("node 2");
+  auto node_3 = make_shared<Chain>("node 3");
+
+  sut.AppendChild(node_1);
+  sut.AppendChild(node_2);
+
+  // ---------------- Exercise
+  //
+  bool hasDirectChild = sut.HasDirectChild(node_3);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE (hasDirectChild);
+}
+
+//! Checks ParentNode::HasDirectChild() when there is no child nodes
+//!
+//! @note As this is an abstract base class, it uses a Chain to have an instance
+//!
+void UT_ParentNode::test_HasDirectChild_NoChild ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = Chain("chain");
+  auto node_1 = make_shared<Chain>("node 1");
+
+  // ---------------- Exercise
+  //
+  bool hasDirectChild = sut.HasDirectChild(node_1);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE (hasDirectChild);
+}
+
+//! Checks ParentNode::HasDirectChild() when node is nullptr
+//!
+//! @note As this is an abstract base class, it uses a Chain to have an instance
+//!
+void UT_ParentNode::test_HasDirectChild_Nullptr ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = Chain("chain");
+  auto node_1 = make_shared<Chain>("node 1");
+  auto node_2 = make_shared<Chain>("node 2");
+
+  sut.AppendChild(node_1);
+  sut.AppendChild(node_2);
+
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (sut.DisconnectChild(node_1), std::exception);
+  TS_ASSERT_THROWS (sut.HasDirectChild(nullptr), std::exception);
 }
+
 
 
 
@@ -452,7 +620,7 @@ void UT_ParentNode::test_DisconnectAllChildren ()
   //
   auto firstChild = sut.DisconnectAllChildren();
 
-  // ---------------- Verify (ParentNode part)
+  // ---------------- Verify
   //
   TS_ASSERT_EQUALS     (sut.DirectChildrenCount(), 0);
   TS_ASSERT_NULLPTR    (sut.FirstChild());
@@ -474,7 +642,7 @@ void UT_ParentNode::test_DisconnectAllChildren_When_None ()
   //
   auto firstChild = sut.DisconnectAllChildren();
 
-  // ---------------- Verify (ParentNode part)
+  // ---------------- Verify
   //
   TS_ASSERT_EQUALS  (sut.DirectChildrenCount(), 0);
   TS_ASSERT_NULLPTR (sut.FirstChild());
@@ -505,7 +673,7 @@ void UT_ParentNode::test_SetChildAppender ()
   //
   TS_ASSERT_THROWS_NOTHING (sut.SetChildAppender(node_2));
 
-  // ---------------- Verify (ParentNode part)
+  // ---------------- Verify
   //
   TS_ASSERT_EQUALS_PTR (sut.ChildAppender(), node_2);
 

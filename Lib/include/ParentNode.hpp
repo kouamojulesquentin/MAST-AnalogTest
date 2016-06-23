@@ -26,14 +26,14 @@ class DLL_EXPORT ParentNode : public SystemModelNode
   //
   public:
 
-  //! Appends a new child node
-  //!
-  void AppendChild (std::shared_ptr<SystemModelNode> pChild);
+  void AppendChild    (std::shared_ptr<SystemModelNode> node);       //!< Appends a new child node
+  bool HasDirectChild (std::shared_ptr<SystemModelNode> node) const; //!< Returns true if node is a direct child
 
   uint32_t DirectChildrenCount() const;  //!< Returns current number of direct children
 
   std::shared_ptr<SystemModelNode> FirstChild()    const { return m_pFirstChild;            } //!< Returns first child or nullptr
   std::shared_ptr<ParentNode>      ChildAppender() const { return m_pOptionalChildAppender; }
+
 
   virtual void DisconnectChild(std::shared_ptr<SystemModelNode> child); //!< Disconnects specified child from its parent
 

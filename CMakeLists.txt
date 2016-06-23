@@ -68,7 +68,9 @@ if (${MAST_CXX_AUTOMATIC_HEADER_SEARCH})
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${Runner_UT_TMP_SOURCES})
     file(GLOB Runner_UT_TMP_SOURCES "Lib_UT/UT_Helpers/*.hpp")
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${Runner_UT_TMP_SOURCES})
+
 else()
+   #Manual add in order of execution
      set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${UT_RootPath}/Utility/UT_Utility.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/Utility/UT_BinaryVector.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/Utility/UT_SVFVector.hpp)

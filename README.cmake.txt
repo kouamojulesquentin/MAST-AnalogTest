@@ -11,6 +11,9 @@ Create a build directory, for instance cmake_build
 cd cmake_build
 
 Generate Makefiles: cmake ..
+It is also possible to define the build type:
+ cmake --DCMAKE_BUILD_TYPE=Debug ..
+ cmake --DCMAKE_BUILD_TYPE=Release ..
 
 Build: make
 

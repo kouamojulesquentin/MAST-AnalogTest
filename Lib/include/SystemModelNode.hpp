@@ -83,7 +83,7 @@ class DLL_EXPORT SystemModelNode
   void*                               ApplicationData() const { return m_applicationData; }               //!< Retrieve application specific data
   std::shared_ptr<mast::Conditioners> Conditioners()    const { return m_conditioners;    }               //!< Returns current condition checker
   NodeIdentifier                      Identifier()      const { return m_identifier;      }               //!< Returns node unique identifier
-  std::experimental::string_view      Name()            const { return m_name;            }               //!< Returns current node name
+  std::string                         Name()            const { return m_name;            }               //!< Returns current node name
   std::shared_ptr<SystemModelNode>    NextSibling()     const { return m_pNextSibling;    }               //!< Returns next sibling or nullptr
   uint32_t                            Priority()        const { return m_priority;        }               //!< Returns currently assigned priority
   bool                                HasConditioner()  const { return m_conditioners  ? true : false ;}  //!< Returns true if there is some condition to check

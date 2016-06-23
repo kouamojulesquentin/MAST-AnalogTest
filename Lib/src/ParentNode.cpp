@@ -84,6 +84,33 @@ shared_ptr<SystemModelNode> ParentNode::DisconnectAllChildren ()
 //---------------------------------------------------------------------------
 
 
+//! Disconnects a child node
+//!
+//! @param child  The child node to remove
+//!
+void ParentNode::DisconnectChild (shared_ptr<SystemModelNode> child)
+{
+  CHECK_PARAMETER_NOT_NULL (child,         "Cannot remove 'nullptr' child");
+  CHECK_VALUE_NOT_NULL     (m_pFirstChild, "Cannot disconnect a child when there is no child");
+
+  auto     currentChild    = m_pFirstChild;
+  auto     previousSibling = shared_ptr<SystemModelNode>();
+
+  while (currentChild != child)
+  {
+    previousSibling = currentChild;
+    currentChild    = currentChild->NextSibling();
+
+    CHECK_VALUE_NOT_NULL (currentChild, "Node '"s + child->Name() + "' is not a child of '" + Name() + "'");
+  }
+
+  DisconnectSibling(previousSibling, currentChild);
+}
+//
+//  End of: ParentNode::DisconnectChild
+//---------------------------------------------------------------------------
+
+
 //! Disconnects a derivation from the parent
 //!
 //! @param derivationId Identifies the derivation to disconnect
@@ -109,18 +136,7 @@ shared_ptr<SystemModelNode> ParentNode::DisconnectDerivation (uint32_t derivatio
     ++currentId;
   }
 
-  // ---------------- Splice previous sibling to next sibling
-  //                  Or change first child
-  //
-  auto nextSibling = currentChild->NextSibling();
-  if (previousSibling)
-  {
-    previousSibling->SetNextSibling(nextSibling);
-  }
-  else
-  {
-    m_pFirstChild = nextSibling;
-  }
+  DisconnectSibling(previousSibling, currentChild);
 
   return currentChild;
 }
@@ -128,6 +144,28 @@ shared_ptr<SystemModelNode> ParentNode::DisconnectDerivation (uint32_t derivatio
 //  End of: ParentNode::DisconnectDerivation
 //---------------------------------------------------------------------------
 
+
+
+//! Disconnects a node from a chain of siblings
+//!
+//! @param previous   Node before the node to disconnect (nullptr if sibling is first child)
+//! @param sibbling   The node to disconnect
+//!
+void ParentNode::DisconnectSibling (shared_ptr<SystemModelNode> beforeNode, shared_ptr<SystemModelNode> sibling)
+{
+  auto nextSibling = sibling->NextSibling();
+  if (beforeNode)
+  {
+    beforeNode->SetNextSibling(nextSibling);
+  }
+  else
+  {
+    m_pFirstChild = nextSibling;
+  }
+}
+//
+//  End of: ParentNode::DisconnectSibling
+//---------------------------------------------------------------------------
 
 
 //===========================================================================

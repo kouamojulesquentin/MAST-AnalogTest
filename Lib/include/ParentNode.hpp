@@ -35,6 +35,8 @@ class DLL_EXPORT ParentNode : public SystemModelNode
   std::shared_ptr<SystemModelNode> FirstChild()    const { return m_pFirstChild;            } //!< Returns first child or nullptr
   std::shared_ptr<ParentNode>      ChildAppender() const { return m_pOptionalChildAppender; }
 
+  virtual void DisconnectChild(std::shared_ptr<SystemModelNode> child); //!< Disconnects specified child from its parent
+
   virtual std::shared_ptr<SystemModelNode> DisconnectDerivation(uint32_t derivationId); //!< Disconnects a derivation from the parent
   virtual std::shared_ptr<SystemModelNode> DisconnectAllChildren();                     //!< Disconnects all direct children
 
@@ -47,6 +49,7 @@ class DLL_EXPORT ParentNode : public SystemModelNode
   ParentNode() = delete;
   ParentNode(std::experimental::string_view name) : SystemModelNode(name) {}
 
+  void DisconnectSibling(std::shared_ptr<SystemModelNode> beforeNode, std::shared_ptr<SystemModelNode> sibling);
 
   // ---------------- Private  Methods
   //

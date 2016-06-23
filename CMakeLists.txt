@@ -47,7 +47,7 @@ set (CXXTEST_TESTGEN_EXECUTABLE ${CXXTEST_PYTHON_TESTGEN_EXECUTABLE})
 set (CXXTEST_USE_PYTHON 1)
 find_package(CxxTest)
 
-set (CXXTEST_TESTGEN_INTERPRETER /usr/bin/python3)
+set (CXXTEST_TESTGEN_INTERPRETER python3)
 
 #if(CXXTEST_FOUND)
     set (UT_RootPath  "${CMAKE_CURRENT_SOURCE_DIR}/Lib_UT/")
@@ -58,26 +58,44 @@ set (CXXTEST_TESTGEN_INTERPRETER /usr/bin/python3)
 
     add_definitions(${Runner_UT_SOURCES}) 
 
-    set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${UT_RootPath}/Utility/UT_Utility.hpp)
+add_definitions(${MAST_CXX_AUTOMATIC_HEADER_SEARCH})
+set (MAST_CXX_AUTOMATIC_HEADER_SEARCH 0)
+MESSAGE("MAST_CXX_AUTOMATIC_HEADER_SEARCH : ${MAST_CXX_AUTOMATIC_HEADER_SEARCH}")
+
+if (${MAST_CXX_AUTOMATIC_HEADER_SEARCH})
+   file(GLOB Runner_UT_SOURCES "Lib_UT/Utility/*.hpp")
+    file(GLOB Runner_UT_TMP_SOURCES "Lib_UT/SystemModel/*.hpp")
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${Runner_UT_TMP_SOURCES})
+    file(GLOB Runner_UT_TMP_SOURCES "Lib_UT/UT_Helpers/*.hpp")
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${Runner_UT_TMP_SOURCES})
+else()
+     set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${UT_RootPath}/Utility/UT_Utility.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/Utility/UT_BinaryVector.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/Utility/UT_SVFVector.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_SystemModelNode.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_Register.hpp)
-    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_DefaultBinaryPathSelector.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}
+          ${UT_RootPath}/SystemModel/UT_DefaultBinaryPathSelector.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_SystemModel.hpp)
-    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_SystemModelCheckerVisitor.hpp)
-    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_PrettyPrinterVisitor.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES} 
+         ${UT_RootPath}/SystemModel/UT_SystemModelCheckerVisitor.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}
+          ${UT_RootPath}/SystemModel/UT_PrettyPrinterVisitor.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_GmlPrinterVisitor.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/UT_Helpers/UT_SystemModelBuilder.hpp)
-    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_PropagatePendingVisitor.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}
+          ${UT_RootPath}/SystemModel/UT_PropagatePendingVisitor.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_ConfigureVisitor.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_FromSutUpdater.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_ToSutVisitor.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_DataCycle.hpp )
-    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_GenericAccessInterfaceProtocol.hpp)
-    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_SVF_SimulationProtocol.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}
+          ${UT_RootPath}/SystemModel/UT_GenericAccessInterfaceProtocol.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}
+          ${UT_RootPath}/SystemModel/UT_SVF_SimulationProtocol.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_SystemModelManager.hpp)
-
+endif()
+ 
     file(GLOB Lib_UT_SOURCES "Lib_UT/Utility/*")
     file(GLOB Lib_UT_TMP_SOURCES "Lib_UT/SystemModel/*")
     set (Lib_UT_SOURCES ${Lib_UT_SOURCES} ${Lib_UT_TMP_SOURCES})

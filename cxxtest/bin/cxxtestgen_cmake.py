@@ -15,24 +15,12 @@ else:
 sys.path.append(".")
 
 import cxxtest
-print ("-----------------------------")
-for x in sys.argv:
-	print (x)
-print ("------------------------------")
 sys.argv.insert(2,"--have-eh")
 sys.argv.insert(3,"--have-std")
 sys.argv.insert(4,"--fog-parse")
 sys.argv.insert(5,"--root")
-print ("-----------------------------")
-for x in sys.argv:
-	print (x)
-print ("------------------------------")
 sys.argv.insert(8,"--template")
 sys.argv.insert(9,os.path.dirname(os.path.abspath(__file__))+"/../../Lib_UT/Runner.tpl")
-print ("-----------------------------")
-for x in sys.argv:
-	print (x)
-print ("------------------------------")
 cxxtest.main(sys.argv)
 print ("Done.")
 

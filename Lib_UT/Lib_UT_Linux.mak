@@ -153,6 +153,9 @@ $(OBJDIR_DEBUG)/SystemModel/UT_ConfigureVisitor.o: SystemModel/UT_ConfigureVisit
 $(OBJDIR_DEBUG)/SystemModel/UT_ParentNode.o: SystemModel/UT_ParentNode.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_ParentNode.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_ParentNode.o
 
+$(OBJDIR_DEBUG)/SystemModel/UT_PrettyPrinterVisitor.o: SystemModel/UT_PrettyPrinterVisitor.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_PrettyPrinterVisitor.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_PrettyPrinterVisitor.o
+
 $(OBJDIR_DEBUG)/SystemModel/UT_PropagatePendingVisitor.o: SystemModel/UT_PropagatePendingVisitor.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_PropagatePendingVisitor.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_PropagatePendingVisitor.o
 

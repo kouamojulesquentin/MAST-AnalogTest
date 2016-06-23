@@ -6,10 +6,16 @@ cmake_minimum_required(VERSION 3.5)
 
 project(mast)
 
-add_definitions(${EXTRA_COMPILER_FLAGS}) 
-set (EXTRA_COMPILER_FLAGS "-std=gnu++1y")
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_COMPILER_FLAGS}")
-set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${EXTRA_COMPILER_FLAGS}")
+
+add_definitions(${WARNINGS}) 
+set (WARNINGS -Wall -Wextra -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default)
+add_definitions(${CFLAGS}) 
+set (CFLAGS ${WARNINGS} -std=c++14 -fPIC)
+set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lpthread")
+
+add_compile_options(${CFLAGS})
+#set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CFLAGS}")
+#set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CFLAGS}")
  
 #Bring the headers, such as Student.h into the project
 include_directories(Lib/include/)
@@ -21,19 +27,64 @@ include_directories(Lib/public_include/)
 #However, the file(GLOB...) allows for wildcard additions:
 
 file(GLOB Lib_SOURCES "Lib/src/*")
-add_library(Lib OBJECT ${Lib_SOURCES})
+#add_library(Lib OBJECT ${Lib_SOURCES})
+add_library(Lib SHARED ${Lib_SOURCES})
 
 
-include_directories(cxxtest)
-include_directories(Lib_UT/SystemModel/)
-include_directories(Lib_UT/Utility/)
-include_directories(Lib_UT/CxxTest_Traits/)
-include_directories(Lib_UT/UT_Helpers/)
+add_definitions(${UT_WARNINGS}) 
+set (UT_WARNINGS ${WARNINGS})
 
-file(GLOB Lib_UT_SOURCES "Lib_UT/Utility/*")
-file(GLOB Lib_UT_SOURCES "Lib_UT/CxxTest_Traits/*")
-file(GLOB Lib_UT_SOURCES "Lib_UT/UT_Helpers/*")
-file(GLOB Lib_UT_SOURCES "Lib_UT/SystemModel/*")
+add_definitions(${UT_CFLAGS}) 
+set (UT_CFLAGS ${UT_WARNINGS} -fexceptions -std=c++14 -DCXXTEST_HAVE_EH -DCXXTEST_HAVE_STD -DCXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION)
 
-#add_library(Lib_UT OBJECT ${Lib_UT_SOURCES})
+add_compile_options(${UT_CFLAGS})
+
+#########################################
+
+set (CXXTEST_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cxxtest")
+set (CXXTEST_PYTHON_TESTGEN_EXECUTABLE "${CMAKE_CURRENT_SOURCE_DIR}/cxxtest/bin/cxxtestgen.py")
+find_package(CxxTest)
+set (CXXTEST_TESTGEN_INTERPRETER /usr/bin/python3)
+
+if(CXXTEST_FOUND)
+    set (UT_RootPath  "${CMAKE_CURRENT_SOURCE_DIR}/Lib_UT/")
+
+    include_directories(${CXXTEST_INCLUDE_DIR})
+    include_directories(${UT_RootPath}/CxxTest_Traits/)
+    include_directories(${UT_RootPath}/UT_Helpers/)
+
+    add_definitions(${Runner_UT_SOURCES}) 
+
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${UT_RootPath}/Utility/UT_Utility.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/Utility/UT_BinaryVector.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/Utility/UT_SVFVector.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_SystemModelNode.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_Register.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_DefaultBinaryPathSelector.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_SystemModel.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_SystemModelCheckerVisitor.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_PrettyPrinterVisitor.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_GmlPrinterVisitor.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/UT_Helpers/UT_SystemModelBuilder.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_PropagatePendingVisitor.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_ConfigureVisitor.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_FromSutUpdater.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_ToSutVisitor.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_DataCycle.hpp )
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_GenericAccessInterfaceProtocol.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_SVF_SimulationProtocol.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES}      ${UT_RootPath}/SystemModel/UT_SystemModelManager.hpp)
+
+    file(GLOB Lib_UT_SOURCES "Lib_UT/Utility/*")
+    file(GLOB Lib_UT_TMP_SOURCES "Lib_UT/SystemModel/*")
+    set (Lib_UT_SOURCES ${Lib_UT_SOURCES} ${Lib_UT_TMP_SOURCES})
+    file(GLOB Lib_UT_TMP_SOURCES "Lib_UT/UT_Helpers/*")
+    set (Lib_UT_SOURCES ${Lib_UT_SOURCES} ${Lib_UT_TMP_SOURCES})
+    
+    enable_testing()
+ 
+   CXXTEST_ADD_TEST(Lib_UT_Runner   	Runner.cpp  	${UT_RootPath}/Lib_UT.cbp ${Lib_UT_SOURCES} )
+   target_link_libraries(Lib_UT_Runner Lib)
+
+ endif()
 

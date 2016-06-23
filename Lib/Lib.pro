@@ -69,8 +69,6 @@ HEADERS += \
     include/Linker.hpp                                  \
     include/ParentNode.hpp                              \
     include/PathSelector.hpp                            \
-    include/PostConditionVisitor.hpp                    \
-    include/PreconditionVisitor.hpp                     \
     include/PrettyPrinterVisitor.hpp                    \
     include/PropagatePendingVisitor.hpp                 \
     include/Register.hpp                                \

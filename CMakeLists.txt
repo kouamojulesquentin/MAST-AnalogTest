@@ -1,5 +1,4 @@
 set (CMAKE_CXX_COMPILER "g++-4.9")
-set (CMAKE_C_COMPILER "gcc-4.9")
 
 cmake_minimum_required(VERSION 3.5)
 

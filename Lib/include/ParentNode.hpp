@@ -25,28 +25,18 @@ class DLL_EXPORT ParentNode : public SystemModelNode
   // ---------------- Public  Methods
   //
   public:
+
   //! Appends a new child node
-  //! @note It forms a singly linked list of children
-  void AppendChild (std::shared_ptr<SystemModelNode> pChild)
-  {
-    if (m_pOptionalChildAppender)
-    {
-      m_pOptionalChildAppender->AppendChild(pChild);
-    }
-    else if (m_pFirstChild)
-    {
-      m_pFirstChild->AppendSibling(pChild);
-    }
-    else
-    {
-      m_pFirstChild = pChild;
-    }
-  }
+  //!
+  void AppendChild (std::shared_ptr<SystemModelNode> pChild);
 
   uint32_t DirectChildrenCount() const;  //!< Returns current number of direct children
 
   std::shared_ptr<SystemModelNode> FirstChild()    const { return m_pFirstChild;            } //!< Returns first child or nullptr
   std::shared_ptr<ParentNode>      ChildAppender() const { return m_pOptionalChildAppender; }
+
+  virtual std::shared_ptr<SystemModelNode> DisconnectDerivation(uint32_t derivationId); //!< Disconnects a derivation from the parent
+  virtual std::shared_ptr<SystemModelNode> DisconnectAllChildren();                     //!< Disconnects all direct children
 
   void  SetChildAppender (std::shared_ptr<ParentNode> childAppender) { m_pOptionalChildAppender = childAppender; }
 

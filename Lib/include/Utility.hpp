@@ -19,6 +19,8 @@
 #include <string>
 #include <experimental/string_view>
 
+using namespace std::string_literals;
+
 //+#define __func__ nullptr // For compiler that does not support __func__
 
 namespace mast

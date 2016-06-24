@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       -= core gui
+QT -= core gui
 
 TARGET = Lib
 TEMPLATE = lib
@@ -14,7 +14,10 @@ CONFIG  += c++14
 QMAKE_CXXFLAGS += -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default
 QMAKE_CXXFLAGS += -fmax-errors=3
 
-INCLUDEPATH = include public_include
+INCLUDEPATH += include        \
+               public_include \
+               $$PWD/../Logger
+
 
 SOURCES +=  \
     src/AccessInterface.cpp                         \
@@ -104,10 +107,12 @@ win32 {
 #+else: CONFIG(release, debug|release): OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Lib/release)
 
 CONFIG(debug,   debug|release) {
-  OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Lib/debug)
-  DESTDIR     = $$clean_path($$PWD/../Build_Qt/bin/debug)
+  OBJECTS_DIR =   $$clean_path($$PWD/../Build_Qt/Lib/debug)
+  DESTDIR     =   $$clean_path($$PWD/../Build_Qt/bin/debug)
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/bin/debug) -lLogger
 }
 else: CONFIG(release, debug|release) {
-  OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Lib/release)
-  DESTDIR     = $$clean_path($$PWD/../Build_Qt/bin/release)
+  OBJECTS_DIR =   $$clean_path($$PWD/../Build_Qt/Lib/release)
+  DESTDIR     =   $$clean_path($$PWD/../Build_Qt/bin/release)
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/bin/release) -lLogger
 }

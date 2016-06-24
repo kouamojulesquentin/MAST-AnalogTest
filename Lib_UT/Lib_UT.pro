@@ -4,6 +4,7 @@ DEFINES += CXXTEST_HAVE_EH CXXTEST_HAVE_STD CXXTEST_PARTIAL_TEMPLATE_SPECIALIZAT
 CONFIG += console c++14
 CONFIG -= app_bundle
 CONFIG -= qt
+
 QMAKE_CXXFLAGS += -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default
 QMAKE_CXXFLAGS += -fmax-errors=3
 
@@ -12,8 +13,9 @@ QMAKE_CXXFLAGS += -fmax-errors=3
     error("Generated/Runner.cpp has not been generated")
 }
 
-INCLUDEPATH += $$PWD/../Lib/include \
-               $$PWD/../Lib/public_include \
+INCLUDEPATH += $$PWD/../Lib/include            \
+               $$PWD/../Lib/public_include     \
+               $$PWD/../Logger                 \
                $$PWD/../cxxtest CxxTest_Traits \
                UT_Helpers
 
@@ -85,12 +87,12 @@ HEADERS += \
 CONFIG(debug,   debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Lib_UT/debug)
   DESTDIR     = $$clean_path($$PWD/../Build_Qt/bin/debug)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/bin/debug)   -lLib
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/bin/debug)   -lLib -lLogger
 }
 else: CONFIG(release, debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Lib_UT/release)
   DESTDIR     = $$clean_path($$PWD/../Build_Qt/bin/release)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/bin/release) -lLib
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/bin/release) -lLib -lLogger
 }
 
 unix {

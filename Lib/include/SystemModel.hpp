@@ -97,16 +97,16 @@ class DLL_EXPORT SystemModel
   std::shared_ptr<Linker>          LinkerWithId          (NodeIdentifier identifier) const { return std::dynamic_pointer_cast<Linker>          (NodeWithId(identifier)); } //!< Returns Linker associated with a node identifier
   std::shared_ptr<Chain>           ChainWithId           (NodeIdentifier identifier) const { return std::dynamic_pointer_cast<Chain>           (NodeWithId(identifier)); } //!< Returns Chain associated with a node identifier
 
-  //! Releases the resources occupied by a node data structure recursively
+  //! Disconnects a node from those managed by SystemModel
+  //!
+  void DisconnectNodeFromModel(std::shared_ptr<SystemModelNode> node, std::shared_ptr<ParentNode> parentNode);
+
+
+  //! Removes a node from those managed by SystemModel without much check
   //!
   void RemoveNodeFromModel(std::shared_ptr<SystemModelNode> node);
-  //+ (JFC April/20/2016): How to report parent node that a node has been destroyed?
 
   uint32_t RegistersCount() const { return m_totalRegisters; }
-
-  // ---------------- Protected Methods
-  //
-  protected:
 
   // ---------------- Private  Methods
   //

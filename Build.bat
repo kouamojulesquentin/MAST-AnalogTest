@@ -20,10 +20,15 @@
 
 @if /i %chain% equ %Build_Qt% (
 
+@echo ===================== Building Logger =====================
+@echo.
+%make_exe% -j4 -C %Build_Qt%\Logger -f Makefile    %target%
+
 @echo ===================== Building Lib =====================
 @echo.
 %make_exe% -j4 -C %Build_Qt%\Lib -f Makefile    %target%
 
+@if errorlevel 0  (
 @echo.
 @echo ===================== Building Lib_UT Runner.cpp =====================
 @echo.
@@ -33,6 +38,8 @@
 @echo ===================== Building Lib_UT =====================
 @echo.
 %make_exe% -j4 -C %Build_Qt%\Lib_UT -f Makefile %target%
+)
+
 
 @goto CheckExe
 )

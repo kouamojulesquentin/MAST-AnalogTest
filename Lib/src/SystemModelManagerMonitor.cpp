@@ -14,6 +14,7 @@
 #include "SystemModelManagerMonitor.hpp"
 #include "ParentNode.hpp"
 #include "GmlPrinterVisitor.hpp"
+#include "g3log/g3log.hpp"
 
 #include <sstream>
 #include <fstream>
@@ -34,6 +35,7 @@ void SystemModelManagerMonitor::AfterConfiguration (ParentNode& root)
 {
   if (m_monitorAfterConfiguration)
   {
+    LOG(INFO) << "Configuration: End";
     ExportGml("After", root);
   }
 }
@@ -50,6 +52,7 @@ void SystemModelManagerMonitor::BeforeConfiguration (ParentNode& root)
 {
   if (m_monitorBeforeConfiguration)
   {
+    LOG(INFO) << "Configuration: Begin";
     ExportGml("Before", root);
   }
 }
@@ -112,6 +115,7 @@ string SystemModelManagerMonitor::MakeFilePath (string_view basePath, string_vie
 void SystemModelManagerMonitor::Reset ()
 {
   m_dataCyclesCount = 0;
+  LOG(INFO) << "Reseting data cycles counter";
 }
 //
 //  End of: SystemModelManagerMonitor::Reset
@@ -122,6 +126,7 @@ void SystemModelManagerMonitor::Reset ()
 void SystemModelManagerMonitor::StartDataCycle ()
 {
   ++m_dataCyclesCount;
+  LOG(INFO) << "Starting a data cycle: " << m_dataCyclesCount;
 }
 //
 //  End of: SystemModelManagerMonitor::StartDataCycles
@@ -130,6 +135,7 @@ void SystemModelManagerMonitor::StartDataCycle ()
 //! Monitor start of a series of new data cycles
 void SystemModelManagerMonitor::StartDataCycles ()
 {
+  LOG(INFO) << "Starting a series of data cycles";
 }
 //
 //  End of: SystemModelManagerMonitor::StartDataCycles

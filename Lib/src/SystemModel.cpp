@@ -292,33 +292,70 @@ void SystemModel::RegisterNode (std::shared_ptr<SystemModelNode> node)
 //---------------------------------------------------------------------------
 
 
-//! Releases the resources occupied by a node data structure recursively
+//! Disconnects a node from those managed by SystemModel
+//!
+//! @note Post-condition: the node cannot be retrieved from model by tree traversal of the SystemModel
+//!       but it is still managed by the SystemModel (its identifier is still valid)
+//!
+//! @param node         The node to disconnect
+//! @param parentNode   Starting point to search node direct parent (root if nullptr)
+//!
+void SystemModel::DisconnectNodeFromModel (shared_ptr<SystemModelNode> node, shared_ptr<ParentNode> parentNode)
+{
+  CHECK_PARAMETER_NOT_NULL(node, "Invalid nullptr");
+
+  if (node == m_root)
+  {
+    m_root = nullptr;
+  }
+  else
+  {
+    if (!parentNode)
+    {
+      parentNode = m_root;
+    }
+
+    if (!parentNode->HasDirectChild(node))
+    {
+//+      parentNode = parentNode->FindParentOfNode(node);
+    }
+
+    CHECK_VALUE_NOT_NULL(parentNode, "Cannot find parent of node '"s + node->Name() + "' to disconnect");
+
+    parentNode->DisconnectChild(node);
+  }
+}
+//
+//  End of: SystemModel::DisconnectNodeFromModel
+//---------------------------------------------------------------------------
+
+
+//! Removes node from those managed by SystemModel
+//!
+//! @param node The node to remove
+//!
+//! @note When removing the node, It should not have a parent nor siblings
+//!       Caller is responsible to maintain model tree consistency
+//!
+//! @note Post-condition: the node cannot be retrieved from model using its identifier
+//!
+//! @see ParentNode DisconnectXxx methods
 //!
 void SystemModel::RemoveNodeFromModel (shared_ptr<SystemModelNode> node)
 {
-  if (!node)
-  {
-    THROW_INVALID_ARGUMENT("Expecting not nullptr");
-  }
-
-  //! @todo [JFC]-[May/24/2016]: Find node parent to remove node from its children
-  //!                            - To void browsing tree structure each time, add method RemoveNodeFromParent giving it the parent node
-  //!                            - In that case, check the node is indeed of child of declared parent
-
-
-  auto asParentNode = dynamic_pointer_cast<ParentNode>(node);
-  if (asParentNode)
-  {
-    //! @todo [JFC]-[May/24/2016]: Recurse all children to remove them too
-    //!
-  }
+  CHECK_PARAMETER_NOT_NULL(node, "Invalid nullptr");
 
   auto id     = node->Identifier();
   auto offset = static_cast<TIdentifierMapping::size_type>(id);
 
   if (offset >= m_identifierMapping.size())
   {
-    THROW_LOGIC_ERROR("Cannot remove a node that is not managed by the SystemModel");
+    THROW_LOGIC_ERROR("Invalid node identifier: cannot remove a node that is not managed by the SystemModel");
+  }
+
+  if (m_identifierMapping[offset] != node)
+  {
+    THROW_LOGIC_ERROR("Cannot remove a node that is no more managed by the SystemModel");
   }
 
   m_identifierMapping[offset] = nullptr;
@@ -326,8 +363,6 @@ void SystemModel::RemoveNodeFromModel (shared_ptr<SystemModelNode> node)
 //
 //  End of: SystemModel::RemoveNodeFromModel
 //---------------------------------------------------------------------------
-
-
 
 //===========================================================================
 // End of SystemModel.cpp

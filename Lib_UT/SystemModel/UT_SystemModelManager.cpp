@@ -23,6 +23,7 @@
 #include "DefaultBinaryPathSelector.hpp"
 #include "ConfigureAlgorithm_LastOrDefault_Greedy.hpp"
 #include "ConfigureAlgorithm_Last_Lazy.hpp"
+#include "g3log/g3log.hpp"
 
 #include <memory>
 #include <vector>
@@ -746,10 +747,13 @@ void UT_SystemModelManager::test_DoDataCycles_MIB_Multichain_Pre_Greedy ()
 //+  monitor->MonitorBeforeConfiguration(true);
 //+  monitor->GmlBasePath("MIB_Multichain_Pre_Greedy");
 //+  SystemModelManager sut(sm, configureAlgo, monitor);
+//+  g3::logEnabled(true);
 
   // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.DoDataCycles());
+
+//+  g3::logEnabled(false);
 
   // ---------------- Verify
   //

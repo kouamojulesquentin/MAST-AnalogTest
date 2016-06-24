@@ -3,5 +3,6 @@ CONFIG  += ordered
 CONFIG  -= qml_debug
 
 SUBDIRS += \
-    Lib            \
+    Logger \
+    Lib    \
     Lib_UT

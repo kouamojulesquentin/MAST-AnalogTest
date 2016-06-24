@@ -1,33 +1,33 @@
 //===========================================================================
-//                           Platform.hpp
+//                           g3log_Export.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file Platform.hpp
+//! @file g3log_Export.hpp
 //!
-//! Defines platform dependant stuffs
+//! Defines DLL export stuffs for Windows build
 //===========================================================================
 
 
-#ifndef PLATFORM_H__31EE6B85_BB3D_4B14_E288_56C12101BFE0__INCLUDED_
-  #define PLATFORM_H__31EE6B85_BB3D_4B14_E288_56C12101BFE0__INCLUDED_
+#ifndef G3LOG_EXPORT_H__AAA05159_A646_48E1_6A2_15F84DF0BB5D__INCLUDED_
+  #define G3LOG_EXPORT_H__AAA05159_A646_48E1_6A2_15F84DF0BB5D__INCLUDED_
 
   #if defined(WINDOWS)
     #include <windows.h>
     #ifdef BUILD_DLL
-        #define DLL_EXPORT __declspec(dllexport)
+        #define G3LOG_DLL_EXPORT __declspec(dllexport)
     #else
-        #define DLL_EXPORT __declspec(dllimport)
+        #define G3LOG_DLL_EXPORT __declspec(dllimport)
     #endif
   #else
-      #define DLL_EXPORT
+      #define G3LOG_DLL_EXPORT
   #endif
 
-#endif  // not defined PLATFORM_H__31EE6B85_BB3D_4B14_E288_56C12101BFE0__INCLUDED_
+#endif  // not defined G3LOG_EXPORT_H__AAA05159_A646_48E1_6A2_15F84DF0BB5D__INCLUDED_
 //===========================================================================
-// End of Platform.hpp
+// End of g3log_Export.hpp
 //===========================================================================
 
 

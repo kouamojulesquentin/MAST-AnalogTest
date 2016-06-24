@@ -30,9 +30,15 @@ class UT_ParentNode : public CxxTest::TestSuite
 
   void test_constructor ();
 
+  // ---------------- Appending
+  //
   void test_AppendChild_1 ();
   void test_AppendChild_2 ();
 
+  void test_SetChildAppender ();
+
+  // ---------------- Disconnection
+  //
   void test_DisconnectDerivation_1st_OutOf_1 ();
   void test_DisconnectDerivation_1st_OutOf_2 ();
   void test_DisconnectDerivation_2nd_OutOf_2 ();
@@ -50,6 +56,11 @@ class UT_ParentNode : public CxxTest::TestSuite
   void test_DisconnectChild_NoChild ();
   void test_DisconnectChild_Nullptr ();
 
+  void test_DisconnectAllChildren ();
+  void test_DisconnectAllChildren_When_None ();
+
+  // ---------------- Parenthood
+  //
   void test_HasDirectChild_1st_OutOf_1 ();
   void test_HasDirectChild_1st_OutOf_2 ();
   void test_HasDirectChild_2nd_OutOf_2 ();
@@ -58,10 +69,14 @@ class UT_ParentNode : public CxxTest::TestSuite
   void test_HasDirectChild_NoChild ();
   void test_HasDirectChild_Nullptr ();
 
-  void test_DisconnectAllChildren ();
-  void test_DisconnectAllChildren_When_None ();
-
-  void test_SetChildAppender ();
+  void test_FindParentOfNode_NotAShared_ptr ();
+  void test_FindParentOfNode_DirectChild ();
+  void test_FindParentOfNode_Level_2_Child ();
+  void test_FindParentOfNode_Level_3_Child ();
+  void test_FindParentOfNode_Level_4_Child ();
+  void test_FindParentOfNode_NotAChild ();
+  void test_FindParentOfNode_NoChild ();
+  void test_FindParentOfNode_Nullptr ();
 
   // ================ Other Methods ================
 };

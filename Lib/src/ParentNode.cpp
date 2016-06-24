@@ -15,6 +15,7 @@
 #include "Utility.hpp"
 
 using std::shared_ptr;
+using std::dynamic_pointer_cast;
 using std::to_string;
 using namespace mast;
 
@@ -194,6 +195,66 @@ bool ParentNode::HasDirectChild (std::shared_ptr<SystemModelNode> node) const
 }
 //
 //  End of: ParentNode::HasDirectChild
+//---------------------------------------------------------------------------
+
+
+//! Searches down the hierarchy, the parent of specified node
+//!
+//! @note DO NOT CALL on instances not managed by a shared_ptr
+//!
+//! @param child  A node for which parent node is searched for.
+//!
+//! @return Parent node in case of success, nullptr otherwise
+//!
+shared_ptr<ParentNode> ParentNode::FindParentOfNode (shared_ptr<SystemModelNode> child)
+{
+  CHECK_PARAMETER_NOT_NULL (child, "Invalid node: 'nullptr'");
+
+  // ---------------- Check that this instance is managed by a shared_ptr
+  //
+  shared_ptr<ParentNode> currentParent;
+  try
+  {
+    currentParent = shared_from_this();
+  }
+  catch(std::exception&)
+  {
+    THROW_LOGIC_ERROR("FindParentOfNode CANNOT BE CALLED on instances not managed by a shared_ptr");
+  }
+
+  // ---------------- Search loop
+  //
+  shared_ptr<ParentNode> foundParent;
+
+  auto currentChild = currentParent->FirstChild();
+
+  while (currentChild)
+  {
+    if (currentChild == child)
+    {
+      foundParent = currentParent;
+      break;
+    }
+    currentChild = currentChild->NextSibling();
+  }
+
+  //! @todo [JFC]-[June/24/2016]: In FindParentOfNode(): Change implementation to do a real breadth first search
+  //! ==> Use a queue of parent nodes
+  currentChild = currentParent->FirstChild();
+  while (!foundParent && currentChild)
+  {
+    auto childAsParent = dynamic_pointer_cast<ParentNode>(currentChild);
+    if (childAsParent)
+    {
+      foundParent = childAsParent->FindParentOfNode(child);
+    }
+    currentChild = currentChild->NextSibling();
+  }
+
+  return foundParent;
+}
+//
+//  End of: ParentNode::FindParentOfNode
 //---------------------------------------------------------------------------
 
 

@@ -15,12 +15,13 @@
   #define PARENTNODE_H__EEDC0EF6_BF2B_4D20_6BBA_85F1386D5B97__INCLUDED_
 
 #include "SystemModelNode.hpp"
+#include <memory>
 
 namespace mast
 {
 //! Abstract class to represent nodes that can have children
 //!
-class DLL_EXPORT ParentNode : public SystemModelNode
+class DLL_EXPORT ParentNode : public SystemModelNode, public std::enable_shared_from_this<ParentNode>
 {
   // ---------------- Public  Methods
   //
@@ -33,6 +34,8 @@ class DLL_EXPORT ParentNode : public SystemModelNode
 
   std::shared_ptr<SystemModelNode> FirstChild()    const { return m_pFirstChild;            } //!< Returns first child or nullptr
   std::shared_ptr<ParentNode>      ChildAppender() const { return m_pOptionalChildAppender; }
+
+  std::shared_ptr<ParentNode>      FindParentOfNode(std::shared_ptr<SystemModelNode> child); //!< Searches down the hierarchy, the parent of specified node
 
 
   virtual void DisconnectChild(std::shared_ptr<SystemModelNode> child); //!< Disconnects specified child from its parent

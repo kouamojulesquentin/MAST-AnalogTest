@@ -13,6 +13,7 @@
 
 #include "UT_ParentNode.hpp"
 #include "Chain.hpp"
+#include "Register.hpp"
 #include <cxxtest/ValueTraits.h>
 
 using std::shared_ptr;
@@ -86,6 +87,41 @@ void UT_ParentNode::test_AppendChild_2 ()
   TS_ASSERT_EQUALS_PTR (node_1->NextSibling(),     node_2);
 }
 
+//! Checks ParentNode::SetChildAppender()
+//!
+//! @note As this is an abstract base class, it uses a Chain to have an instance
+//!
+void UT_ParentNode::test_SetChildAppender ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = Chain("chain");
+  auto node_1 = make_shared<Chain>("node 1");
+  auto node_2 = make_shared<Chain>("node 2");
+  auto node_3 = make_shared<Chain>("node 3");
+  auto node_4 = make_shared<Chain>("node 4");
+
+  sut.AppendChild(node_1);
+  sut.AppendChild(node_2);
+  sut.AppendChild(node_3);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.SetChildAppender(node_2));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS_PTR (sut.ChildAppender(), node_2);
+
+  sut.AppendChild(node_4);
+
+  TS_ASSERT_EQUALS     (sut.DirectChildrenCount(),     3);
+  TS_ASSERT_EQUALS     (node_2->DirectChildrenCount(), 1);
+  TS_ASSERT_EQUALS_PTR (node_2->FirstChild(),          node_4);
+  TS_ASSERT_EQUALS_PTR (node_1->NextSibling(),         node_2);
+  TS_ASSERT_EQUALS_PTR (node_2->NextSibling(),         node_3);
+  TS_ASSERT_NULLPTR    (node_3->NextSibling());
+}
 
 //! Checks ParentNode::DisconnectDerivation() when first and only one
 //!
@@ -430,6 +466,58 @@ void UT_ParentNode::test_DisconnectChild_Nullptr ()
   TS_ASSERT_THROWS (sut.DisconnectChild(nullptr), std::exception);
 }
 
+//! Checks ParentNode::DisconnectAllChildren()
+//!
+//! @note As this is an abstract base class, it uses a Chain to have an instance
+//!
+void UT_ParentNode::test_DisconnectAllChildren ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = Chain("chain");
+  auto node_1 = make_shared<Chain>("node 1");
+  auto node_2 = make_shared<Chain>("node 2");
+  auto node_3 = make_shared<Chain>("node 3");
+
+  sut.AppendChild(node_1);
+  sut.AppendChild(node_2);
+  sut.AppendChild(node_3);
+
+  // ---------------- Exercise
+  //
+  auto firstChild = sut.DisconnectAllChildren();
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS     (sut.DirectChildrenCount(), 0);
+  TS_ASSERT_NULLPTR    (sut.FirstChild());
+  TS_ASSERT_EQUALS_PTR (firstChild, node_1);
+}
+
+
+//! Checks ParentNode::DisconnectAllChildren() when there were none
+//!
+//! @note As this is an abstract base class, it uses a Chain to have an instance
+//!
+void UT_ParentNode::test_DisconnectAllChildren_When_None ()
+{
+  // ---------------- Setup
+  //
+  auto sut = Chain("chain");
+
+  // ---------------- Exercise
+  //
+  auto firstChild = sut.DisconnectAllChildren();
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS  (sut.DirectChildrenCount(), 0);
+  TS_ASSERT_NULLPTR (sut.FirstChild());
+  TS_ASSERT_NULLPTR (firstChild);
+}
+
+
+
 
 //! Checks ParentNode::HasDirectChild() when first and only one
 //!
@@ -597,95 +685,209 @@ void UT_ParentNode::test_HasDirectChild_Nullptr ()
 }
 
 
-
-
-//! Checks ParentNode::DisconnectAllChildren()
+//! Checks ParentNode::FindParentOfNode() when ParentNode is not manage by a shared_ptr
 //!
-//! @note As this is an abstract base class, it uses a Chain to have an instance
-//!
-void UT_ParentNode::test_DisconnectAllChildren ()
+void UT_ParentNode::test_FindParentOfNode_NotAShared_ptr ()
 {
   // ---------------- Setup
   //
   auto sut    = Chain("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
-  auto node_3 = make_shared<Chain>("node 3");
 
   sut.AppendChild(node_1);
-  sut.AppendChild(node_2);
-  sut.AppendChild(node_3);
+  node_1->AppendChild(node_2);
 
-  // ---------------- Exercise
+  // ---------------- Exercise & Verify
   //
-  auto firstChild = sut.DisconnectAllChildren();
-
-  // ---------------- Verify
-  //
-  TS_ASSERT_EQUALS     (sut.DirectChildrenCount(), 0);
-  TS_ASSERT_NULLPTR    (sut.FirstChild());
-  TS_ASSERT_EQUALS_PTR (firstChild, node_1);
+  TS_ASSERT_THROWS (sut.FindParentOfNode(node_2), std::exception);
 }
 
-
-//! Checks ParentNode::DisconnectAllChildren() when there were none
+//! Checks ParentNode::FindParentOfNode() when node is a direct child
 //!
-//! @note As this is an abstract base class, it uses a Chain to have an instance
-//!
-void UT_ParentNode::test_DisconnectAllChildren_When_None ()
+void UT_ParentNode::test_FindParentOfNode_DirectChild ()
 {
   // ---------------- Setup
   //
-  auto sut = Chain("chain");
-
-  // ---------------- Exercise
-  //
-  auto firstChild = sut.DisconnectAllChildren();
-
-  // ---------------- Verify
-  //
-  TS_ASSERT_EQUALS  (sut.DirectChildrenCount(), 0);
-  TS_ASSERT_NULLPTR (sut.FirstChild());
-  TS_ASSERT_NULLPTR (firstChild);
-}
-
-
-
-//! Checks ParentNode::SetChildAppender()
-//!
-//! @note As this is an abstract base class, it uses a Chain to have an instance
-//!
-void UT_ParentNode::test_SetChildAppender ()
-{
-  // ---------------- Setup
-  //
-  auto sut    = Chain("chain");
+  auto sut    = make_shared<Chain>("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
   auto node_3 = make_shared<Chain>("node 3");
   auto node_4 = make_shared<Chain>("node 4");
 
-  sut.AppendChild(node_1);
-  sut.AppendChild(node_2);
-  sut.AppendChild(node_3);
+  sut->AppendChild(node_1);
+  sut->AppendChild(node_2);
+  sut->AppendChild(node_3);
+  node_2->AppendChild(node_4);
 
   // ---------------- Exercise
   //
-  TS_ASSERT_THROWS_NOTHING (sut.SetChildAppender(node_2));
+  auto parent = sut->FindParentOfNode(node_2);
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS_PTR (sut.ChildAppender(), node_2);
-
-  sut.AppendChild(node_4);
-
-  TS_ASSERT_EQUALS     (sut.DirectChildrenCount(),     3);
-  TS_ASSERT_EQUALS     (node_2->DirectChildrenCount(), 1);
-  TS_ASSERT_EQUALS_PTR (node_2->FirstChild(),          node_4);
-  TS_ASSERT_EQUALS_PTR (node_1->NextSibling(),         node_2);
-  TS_ASSERT_EQUALS_PTR (node_2->NextSibling(),         node_3);
-  TS_ASSERT_NULLPTR    (node_3->NextSibling());
+  TS_ASSERT_EQUALS_PTR (parent, sut);
 }
+
+
+//! Checks ParentNode::FindParentOfNode() when node is a child of a direct child
+//!
+void UT_ParentNode::test_FindParentOfNode_Level_2_Child ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = make_shared<Chain>("chain");
+  auto node_1 = make_shared<Chain>("node 1");
+  auto node_2 = make_shared<Chain>("node 2");
+  auto node_3 = make_shared<Chain>("node 3");
+  auto node_4 = make_shared<Chain>("node 4");
+
+  sut->AppendChild(node_1);
+  sut->AppendChild(node_2);
+  sut->AppendChild(node_3);
+  node_2->AppendChild(node_4);
+
+  // ---------------- Exercise
+  //
+  auto parent = sut->FindParentOfNode(node_4);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS_PTR (parent, node_2);
+}
+
+
+//! Checks ParentNode::FindParentOfNode() when node is a child of child of child
+//!
+void UT_ParentNode::test_FindParentOfNode_Level_3_Child ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = make_shared<Chain>    ("chain");
+  auto node_1 = make_shared<Register> ("reg 1_1", BinaryVector());
+  auto node_2 = make_shared<Chain>    ("chain 1_2");
+  auto node_3 = make_shared<Chain>    ("chain 1_3");
+  auto node_4 = make_shared<Register> ("reg 2_1", BinaryVector());
+  auto node_5 = make_shared<Chain>    ("chain 2_2");
+
+  sut->AppendChild(node_1);
+  sut->AppendChild(node_2);
+  sut->AppendChild(node_3);
+  node_3->AppendChild(node_5);
+  node_5->AppendChild(node_4);
+
+  // ---------------- Exercise
+  //
+  auto parent = sut->FindParentOfNode(node_4);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS_PTR (parent, node_5);
+}
+
+
+//! Checks ParentNode::FindParentOfNode() when node is a child of child of child of child
+//!
+void UT_ParentNode::test_FindParentOfNode_Level_4_Child ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = make_shared<Chain>    ("chain");
+  auto node_1 = make_shared<Register> ("reg 1_1", BinaryVector());
+  auto node_2 = make_shared<Chain>    ("chain 1_2");
+  auto node_3 = make_shared<Chain>    ("chain 1_3");
+  auto node_4 = make_shared<Register> ("reg 2_1", BinaryVector());
+  auto node_5 = make_shared<Chain>    ("chain 2_2");
+  auto node_6 = make_shared<Register> ("reg 3_1", BinaryVector());
+  auto node_7 = make_shared<Register> ("reg 3_2", BinaryVector());
+  auto node_8 = make_shared<Chain>    ("chain 3_3");
+  auto node_9 = make_shared<Register> ("reg 4_1", BinaryVector());
+
+  sut->AppendChild(node_1);
+  sut->AppendChild(node_2);
+  sut->AppendChild(node_3);
+  node_3->AppendChild(node_4);
+  node_3->AppendChild(node_5);
+  node_5->AppendChild(node_6);
+  node_5->AppendChild(node_7);
+  node_5->AppendChild(node_8);
+  node_8->AppendChild(node_9);
+
+  // ---------------- Exercise
+  //
+  auto parent = sut->FindParentOfNode(node_9);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS_PTR (parent, node_8);
+}
+
+//! Checks ParentNode::FindParentOfNode() when node is not a (grand)child
+//!
+void UT_ParentNode::test_FindParentOfNode_NotAChild ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = make_shared<Chain>("chain");
+  auto node_1 = make_shared<Chain>("node 1");
+  auto node_2 = make_shared<Chain>("node 2");
+  auto node_3 = make_shared<Chain>("node 3");
+  auto node_4 = make_shared<Chain>("node 4");
+
+  sut->AppendChild(node_1);
+  sut->AppendChild(node_2);
+  node_2->AppendChild(node_3);
+
+  // ---------------- Exercise
+  //
+  auto parent = sut->FindParentOfNode(node_4);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_NULLPTR (parent);
+}
+
+//! Checks ParentNode::FindParentOfNode() when there is no child nodes
+//!
+void UT_ParentNode::test_FindParentOfNode_NoChild ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = make_shared<Chain>("chain");
+  auto node_1 = make_shared<Chain>("node 1");
+
+  // ---------------- Exercise
+  //
+  auto parent = sut->FindParentOfNode(node_1);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_NULLPTR (parent);
+}
+
+//! Checks ParentNode::FindParentOfNode() when node is nullptr
+//!
+void UT_ParentNode::test_FindParentOfNode_Nullptr ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = make_shared<Chain>("chain");
+  auto node_1 = make_shared<Chain>("node 1");
+  auto node_2 = make_shared<Chain>("node 2");
+  auto node_3 = make_shared<Chain>("node 3");
+
+  sut->AppendChild(node_1);
+  sut->AppendChild(node_2);
+  node_2->AppendChild(node_3);
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut->FindParentOfNode(nullptr), std::exception);
+}
+
+
+
+
 
 //===========================================================================
 // End of UT_ParentNode.cpp

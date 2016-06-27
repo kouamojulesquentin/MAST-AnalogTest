@@ -21,6 +21,9 @@ include_directories(Lib/include/)
 include_directories(Lib/public_include/)
 include_directories(Logger/)
 include_directories(Logger/g3log/)
+include_directories(Logger/Unix)
+include_directories(Logger/Windows)
+
 
 #Can manually add the sources using the set command as follows:
 #set(SOURCES src/mainapp.cpp src/Student.cpp)
@@ -31,7 +34,16 @@ file(GLOB Lib_SOURCES "Lib/src/*")
 #add_library(Lib OBJECT ${Lib_SOURCES})
 add_library(Lib SHARED ${Lib_SOURCES})
 
-file(GLOB Logger_SOURCES "Logger/*.cpp")
+file(GLOB Logger_SOURCES 			 "Logger/*.cpp")
+file(GLOB Logger_SOURCES_Linux "Logger/Unix/*.cpp")
+file(GLOB Logger_SOURCES_Win32 "Logger/Windows/*.cpp")
+
+if (WIN32)
+set (Logger_SOURCES ${Logger_SOURCES} ${Logger_SOURCES_Win32})
+else ()
+set (Logger_SOURCES ${Logger_SOURCES} ${Logger_SOURCES_Linux})
+endif ()
+
 add_library(Logger SHARED ${Logger_SOURCES})
 
 add_definitions(${UT_WARNINGS})

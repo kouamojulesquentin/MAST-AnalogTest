@@ -63,15 +63,15 @@ unix {
     INSTALLS += target
     SOURCES  += crashhandler_unix.cpp
 }
-
-win32 {
+else: win32 {
   DEFINES += WINDOWS BUILD_DLL
   LIBS    += -lDbghelp \
              -limagehlp
 
-  SOURCES +=
-  HEADERS +=
+  SOURCES += crashhandler_windows.cpp \
+             stacktrace_windows.cpp
 
+  HEADERS += g3log/stacktrace_windows.hpp
 }
 
 #+LIBS += -lkernel32

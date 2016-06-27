@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "g3log_Export.h"
-#include "g3log/loglevels.hpp"
-#include "g3log/crashhandler.hpp"
+#include "g3log_Export.hpp"
+#include "loglevels.hpp"
+#include "crashhandler.hpp"
 
 #include <string>
 #include <sstream>

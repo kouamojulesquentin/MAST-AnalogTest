@@ -11,8 +11,8 @@
   #define LOGFORMATTER_H__A59884F6_F5AA_430F_B992_37EA6E48C4__INCLUDED_
 
 
-#include "g3log_Export.h"
-#include "g3log/LogMessage.hpp"
+#include "g3log/g3log_Export.hpp"
+#include "g3log/logmessage.hpp"
 #include <string>
 #include <tuple>
 

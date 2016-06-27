@@ -11,12 +11,12 @@
  *
  * PUBLIC DOMAIN and Not copywrited. First published at KjellKod.cc
  * ********************************************* */
-#include "g3log/g3log.hpp"
-#include "g3log/sinkwrapper.hpp"
-#include "g3log/sinkhandle.hpp"
-#include "g3log/filesink.hpp"
-#include "g3log/logmessage.hpp"
-#include "g3log/std2_make_unique.hpp"
+#include "g3log.hpp"
+#include "sinkwrapper.hpp"
+#include "sinkhandle.hpp"
+#include "filesink.hpp"
+#include "logmessage.hpp"
+//+#include "std2_make_unique.hpp"
 
 #include <memory>
 #include <string>

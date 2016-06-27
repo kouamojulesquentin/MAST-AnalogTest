@@ -18,7 +18,7 @@
  * 5. Various Q&A at StackOverflow
  * ********************************************* */
 
-#include "g3log_Export.h"
+#include "g3log/g3log_Export.hpp"
 #include "g3log/g3log.hpp"
 #include "g3log/std2_make_unique.hpp"
 #include "g3log/logworker.hpp"

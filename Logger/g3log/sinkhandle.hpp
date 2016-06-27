@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "g3log/sink.hpp"
+#include "sink.hpp"
 
 #include <memory>
 #include <functional>

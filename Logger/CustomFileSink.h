@@ -19,7 +19,7 @@
 #include <chrono>
 #include <thread>
 
-#include "g3log_Export.h"
+#include "g3log/g3log_Export.hpp"
 #include "g3log/logmessage.hpp"
 #include "g3log/sinkhandle.hpp"
 #include "LogFormatter.h"

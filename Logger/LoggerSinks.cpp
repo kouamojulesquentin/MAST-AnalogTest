@@ -53,7 +53,7 @@ int UnitTestsLoggerSink::WaitTilLogCount (UnitTestsLoggerSink::TSinkHandle sinkH
   auto endTime   = startTime + std::chrono::milliseconds(50);
 
   int currentCount = 0;
-  while ((currentCount = sinkHandle->call(UnitTestsLoggerSink::GetCount).get()) < static_cast<int>(count))
+  while ((currentCount = sinkHandle->call(&UnitTestsLoggerSink::GetCount).get()) < static_cast<int>(count))
   {
     auto now = std::chrono::high_resolution_clock::now();
     if (now >= endTime)

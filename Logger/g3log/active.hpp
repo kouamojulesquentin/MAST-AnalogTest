@@ -23,8 +23,8 @@
 #include <functional>
 #include <memory>
 #include <iostream>
-#include "g3log/g3log_debug.hpp"
-#include "g3log/shared_queue.hpp"
+#include "g3log_debug.hpp"
+#include "shared_queue.hpp"
 
 namespace kjellkod {
    typedef std::function<void() > Callback;

@@ -11,7 +11,7 @@
   #define LOGGERSINKS_H__E0FCE333_42B1_4FD3_9EB5_6C18F858F45F__INCLUDED_
 
 
-#include "g3log_Export.h"
+#include "g3log/g3log_Export.hpp"
 #include "g3log/sinkhandle.hpp"
 #include "LogFormatter.h"
 #include <vector>

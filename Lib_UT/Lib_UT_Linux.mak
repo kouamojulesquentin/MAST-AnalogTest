@@ -12,7 +12,7 @@ AR = ar-4.9
 LD = g++-4.9
 WINDRES = windres
 
-INC = -I../cxxtest -I../Lib/include -I../Lib/public_include -ICxxTest_Traits -IUT_Helpers
+INC = -I../cxxtest -I../Lib/include -I../Lib/public_include -ICxxTest_Traits -IUT_Helpers -I../Logger -I../Logger/g3log
 WARNINGS = -Wall -Wextra -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default
 CFLAGS =  $(WARNINGS) -fexceptions -std=c++14 -DCXXTEST_HAVE_EH -DCXXTEST_HAVE_STD -DCXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION
 RESINC =
@@ -25,7 +25,7 @@ CFLAGS_DEBUG = $(CFLAGS) -g
 RESINC_DEBUG = $(RESINC)
 RCFLAGS_DEBUG = $(RCFLAGS)
 LIBDIR_DEBUG = $(LIBDIR)
-LIB_DEBUG = $(LIB) ../bin/debug/Lib.so
+LIB_DEBUG = $(LIB) ../bin/debug/Lib.so ../bin/debug/Logger.so
 LDFLAGS_DEBUG = $(LDFLAGS)
 OBJDIR_DEBUG = ../obj/debug
 DEP_DEBUG =
@@ -36,7 +36,7 @@ CFLAGS_RELEASE = $(CFLAGS) -O2
 RESINC_RELEASE = $(RESINC)
 RCFLAGS_RELEASE = $(RCFLAGS)
 LIBDIR_RELEASE = $(LIBDIR)
-LIB_RELEASE = $(LIB) ../bin/release/Lib.so
+LIB_RELEASE = $(LIB) ../bin/release/Lib.so ../bin/release/Logger.so
 LDFLAGS_RELEASE = $(LDFLAGS) -s
 OBJDIR_RELEASE = ../obj/release
 DEP_RELEASE =

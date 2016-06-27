@@ -12,7 +12,7 @@ AR = ar-4.9
 LD = g++-4.9
 WINDRES = windres
 
-INC = -Iinclude -Ipublic_include
+INC = -Iinclude -Ipublic_include -I../Logger -I../Logger/g3log
 WARNINGS = -Wall -Wextra -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default
 CFLAGS = $(WARNINGS) -std=c++14 -fPIC
 RESINC =

@@ -9,10 +9,10 @@
 #pragma once
 
 
-#include "g3log/sinkwrapper.hpp"
-#include "g3log/active.hpp"
-#include "g3log/future.hpp"
-#include "g3log/logmessage.hpp"
+#include "sinkwrapper.hpp"
+#include "active.hpp"
+#include "future.hpp"
+#include "logmessage.hpp"
 
 #include <memory>
 #include <functional>

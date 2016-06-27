@@ -26,9 +26,9 @@
 
 
 #include <future>
-#include "g3log/active.hpp"
-#include "g3log/moveoncopy.hpp"
-#include "g3log/stlpatch_future.hpp"
+#include "active.hpp"
+#include "moveoncopy.hpp"
+#include "stlpatch_future.hpp"
 
 namespace g3 {
    // Generic helper function to avoid repeating the steps for managing

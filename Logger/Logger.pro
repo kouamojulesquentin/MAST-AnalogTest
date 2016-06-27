@@ -26,7 +26,6 @@ SOURCES +=  \
     LogFormatter.cpp         \
     LoggerSinks.cpp          \
     CustomFileSink.cpp       \
-    crashhandler_windows.cpp \
     filesink.cpp             \
     g3log.cpp                \
     logcapture.cpp           \
@@ -39,12 +38,13 @@ HEADERS += \
     LogFormatter.h               \
     LoggerSinks.h                \
     CustomFileSink.h             \
-    g3log/active.hpp             \
     g3log/crashhandler.hpp       \
+    g3log/active.hpp             \
     g3log/filesink.hpp           \
     g3log/future.hpp             \
     g3log/g3log.hpp              \
     g3log/g3log_debug.hpp        \
+    g3log/g3log_export.hpp       \
     g3log/logcapture.hpp         \
     g3log/loglevels.hpp          \
     g3log/logmessage.hpp         \
@@ -61,17 +61,20 @@ HEADERS += \
 unix {
     target.path = /usr/lib
     INSTALLS += target
+    SOURCES  += crashhandler_unix.cpp
 }
 
 win32 {
   DEFINES += WINDOWS BUILD_DLL
-  LIBS    += -lDbghelp
-  SOURCES += stacktrace_windows.cpp
-  HEADERS += g3log/stacktrace_windows.hpp
+  LIBS    += -lDbghelp \
+             -limagehlp
+
+  SOURCES +=
+  HEADERS +=
+
 }
 
 #+LIBS += -lkernel32
-LIBS += -limagehlp
 #+CONFIG(debug,   debug|release): OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Logger/debug)
 #+else: CONFIG(release, debug|release): OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Logger/release)
 

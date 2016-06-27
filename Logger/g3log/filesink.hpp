@@ -10,7 +10,7 @@
 #include <string>
 #include <memory>
 
-#include "g3log/logmessage.hpp"
+#include "logmessage.hpp"
 namespace g3 {
 
    class FileSink {

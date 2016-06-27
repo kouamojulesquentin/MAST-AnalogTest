@@ -21,9 +21,10 @@
 
 #pragma once
 
-#include "g3log/logcapture.hpp"
-#include "g3log/loglevels.hpp"
-#include "g3log/logmessage.hpp"
+#include "logcapture.hpp"
+#include "loglevels.hpp"
+#include "logmessage.hpp"
+#include "g3log_Export.hpp"
 
 #include <string>
 #include <sstream>

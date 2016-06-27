@@ -12,15 +12,15 @@ AR = ar-4.9
 LD = g++-4.9
 WINDRES = windres
 
-INC = -Ig3log
-WARNINGS = -Wall -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default
+INC = 
+WARNINGS = -Wall -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-include-dirs -Wswitch-enum -Wswitch-default
 CFLAGS = $(WARNINGS) -std=c++14 -fPIC
 RESINC =
 LIBDIR =
 LIB = -lpthread
 LDFLAGS =
 
-INC_DEBUG     = $(INC)
+INC_DEBUG     = $(INC) 
 CFLAGS_DEBUG  = $(CFLAGS) -g -DBUILD_DLL
 RESINC_DEBUG  = $(RESINC)
 RCFLAGS_DEBUG = $(RCFLAGS)
@@ -43,10 +43,10 @@ DEP_RELEASE     =
 OUT_RELEASE     = ../bin/release/Logger.so
 
 OBJ_DEBUG = \
+            $(OBJDIR_DEBUG)/crashhandler_unix.o    \
             $(OBJDIR_DEBUG)/LogFormatter.o         \
             $(OBJDIR_DEBUG)/LoggerSinks.o          \
             $(OBJDIR_DEBUG)/CustomFileSink.o       \
-            $(OBJDIR_DEBUG)/crashhandler_windows.o \
             $(OBJDIR_DEBUG)/filesink.o             \
             $(OBJDIR_DEBUG)/g3log.o                \
             $(OBJDIR_DEBUG)/logcapture.o           \
@@ -56,10 +56,10 @@ OBJ_DEBUG = \
             $(OBJDIR_DEBUG)/time.o
 
 OBJ_RELEASE = \
+            $(OBJDIR_RELEASE)/crashhandler_unix.o    \
             $(OBJDIR_RELEASE)/LogFormatter.o         \
             $(OBJDIR_RELEASE)/LoggerSinks.o          \
             $(OBJDIR_RELEASE)/CustomFileSink.o       \
-            $(OBJDIR_RELEASE)/crashhandler_windows.o \
             $(OBJDIR_RELEASE)/filesink.o             \
             $(OBJDIR_RELEASE)/g3log.o                \
             $(OBJDIR_RELEASE)/logcapture.o           \
@@ -83,11 +83,12 @@ debug: before_debug out_debug after_debug
 out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 > $(LD) -shared $(LIBDIR_DEBUG) $(OBJ_DEBUG)  -o $(OUT_DEBUG) $(LDFLAGS_DEBUG) $(LIB_DEBUG)
 
-$(OBJDIR_DEBUG)/crashhandler_windows.o: crashhandler_windows.cpp
-> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c crashhandler_windows.cpp -o $(OBJDIR_DEBUG)/crashhandler_windows.o
+$(OBJDIR_DEBUG)/crashhandler_unix.o: crashhandler_unix.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c crashhandler_unix.cpp -o $(OBJDIR_DEBUG)/crashhandler_unix.o
 
 $(OBJDIR_DEBUG)/CustomFileSink.o: CustomFileSink.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c CustomFileSink.cpp -o $(OBJDIR_DEBUG)/CustomFileSink.o
+
 
 $(OBJDIR_DEBUG)/g3log.o: g3log.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c g3log.cpp -o $(OBJDIR_DEBUG)/g3log.o
@@ -133,8 +134,8 @@ release: before_release out_release after_release
 out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 > $(LD) -shared $(LIBDIR_RELEASE) $(OBJ_RELEASE)  -o $(OUT_RELEASE) $(LDFLAGS_RELEASE) $(LIB_RELEASE)
 
-$(OBJDIR_RELEASE)/crashhandler_windows.o: crashhandler_windows.cpp
-> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c crashhandler_windows.cpp -o $(OBJDIR_RELEASE)/crashhandler_windows.o
+$(OBJDIR_RELEASE)/crashhandler_unix.o: crashhandler_unix.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c crashhandler_unix.cpp -o $(OBJDIR_RELEASE)/crashhandler_unix.o
 
 $(OBJDIR_RELEASE)/CustomFileSink.o: CustomFileSink.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c CustomFileSink.cpp -o $(OBJDIR_RELEASE)/CustomFileSink.o

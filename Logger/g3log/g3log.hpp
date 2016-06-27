@@ -27,8 +27,6 @@
 #include "g3log_Export.hpp"
 
 #include <string>
-#include <sstream>
-#include <cstdarg>
 #include <functional>
 #if defined(QT_CORE_LIB)
 #include <QString>

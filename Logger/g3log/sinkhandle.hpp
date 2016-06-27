@@ -11,7 +11,6 @@
 #include "sink.hpp"
 
 #include <memory>
-#include <functional>
 #include <type_traits>
 
 namespace g3 {

@@ -8,7 +8,6 @@
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
  * ============================================================================*/
 #include <string>
-#include <csignal>
 #include "loglevels.hpp"
 
 

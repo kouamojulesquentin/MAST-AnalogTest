@@ -22,7 +22,6 @@
 #include <thread>
 #include <functional>
 #include <memory>
-#include <iostream>
 #include "g3log_debug.hpp"
 #include "shared_queue.hpp"
 

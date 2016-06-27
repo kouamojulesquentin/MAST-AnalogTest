@@ -19,10 +19,8 @@
 #include <dbghelp.h>
 #include <map>
 #include <memory>
-#include <atomic>
 #include <cassert>
 #include <vector>
-#include <cstdlib>
 #include <mutex>
 
 

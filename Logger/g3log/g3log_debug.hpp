@@ -16,6 +16,7 @@
   #define G3LOG_DEBUG_H__BA42ED87_51F3_4006_A99_54F6D1F77E6D__INCLUDED_
 
 #include <chrono>
+#include <iostream>
 
 #ifndef COUT_LOG_ENABLED
 #define COUT_LOG_ENABLED false

@@ -27,9 +27,7 @@
 #include "g3log/loglevels.hpp"
 
 
-#include <cstdio>    // vsnprintf
 #include <mutex>
-#include <csignal>
 #include <memory>
 #include <iostream>
 #include <thread>
@@ -147,8 +145,17 @@ namespace g3
     });
 
     std::lock_guard<std::mutex> lock(g_logging_init_mutex);
-    CHECK(!internal::isLoggingInitialized());
-    CHECK(bgworker != nullptr);
+
+    if (internal::isLoggingInitialized() || nullptr == bgworker)
+    {
+       std::ostringstream exitMsg;
+       exitMsg << __FILE__ "->" << __FUNCTION__ << ":" << __LINE__ << std::endl;
+       exitMsg << "\tFatal exit due to illegal initialization of g3::LogWorker\n";
+       exitMsg << "\t(due to multiple initializations? : " << std::boolalpha << internal::isLoggingInitialized();
+       exitMsg << ", due to nullptr == bgworker? : " << std::boolalpha << (nullptr == bgworker) << ")";
+       std::cerr << exitMsg.str() << std::endl;
+       std::exit(EXIT_FAILURE);
+    }
 
     // Save the first uninitialized message, if any
     std::call_once(g_save_first_unintialized_flag, [&bgworker] {

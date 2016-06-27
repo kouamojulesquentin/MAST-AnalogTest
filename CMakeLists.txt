@@ -123,7 +123,13 @@ endif()
     enable_testing()
 
    CXXTEST_ADD_TEST(Lib_UT_Runner   	Runner.cpp  	${Runner_UT_SOURCES} )
-   target_link_libraries(Lib_UT_Runner Lib_UT Lib Logger)
+
+if (WIN32)
+	target_link_libraries(Lib_UT_Runner Lib_UT Lib Logger)
+else ()
+	target_link_libraries(Lib_UT_Runner Lib_UT Lib Logger pthread)
+endif ()
+   
 
 # endif()
 

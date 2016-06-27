@@ -61,22 +61,18 @@ HEADERS += \
 unix {
     target.path = /usr/lib
     INSTALLS += target
-    SOURCES  += crashhandler_unix.cpp
+    SOURCES  += Unix/crashhandler_unix.cpp
 }
 else: win32 {
   DEFINES += WINDOWS BUILD_DLL
   LIBS    += -lDbghelp \
              -limagehlp
 
-  SOURCES += crashhandler_windows.cpp \
-             stacktrace_windows.cpp
+  SOURCES += Windows/crashhandler_windows.cpp \
+             Windows/stacktrace_windows.cpp
 
-  HEADERS += g3log/stacktrace_windows.hpp
+  HEADERS += Windows/stacktrace_windows.hpp
 }
-
-#+LIBS += -lkernel32
-#+CONFIG(debug,   debug|release): OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Logger/debug)
-#+else: CONFIG(release, debug|release): OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Logger/release)
 
 CONFIG(debug,   debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Logger/debug)

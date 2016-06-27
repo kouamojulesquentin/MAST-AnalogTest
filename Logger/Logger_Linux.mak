@@ -12,7 +12,7 @@ AR = ar-4.9
 LD = g++-4.9
 WINDRES = windres
 
-INC = 
+INC =
 WARNINGS = -Wall -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-include-dirs -Wswitch-enum -Wswitch-default
 CFLAGS = $(WARNINGS) -std=c++14 -fPIC
 RESINC =
@@ -20,7 +20,7 @@ LIBDIR =
 LIB = -lpthread
 LDFLAGS =
 
-INC_DEBUG     = $(INC) 
+INC_DEBUG     = $(INC)
 CFLAGS_DEBUG  = $(CFLAGS) -g -DBUILD_DLL
 RESINC_DEBUG  = $(RESINC)
 RCFLAGS_DEBUG = $(RCFLAGS)
@@ -83,8 +83,8 @@ debug: before_debug out_debug after_debug
 out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 > $(LD) -shared $(LIBDIR_DEBUG) $(OBJ_DEBUG)  -o $(OUT_DEBUG) $(LDFLAGS_DEBUG) $(LIB_DEBUG)
 
-$(OBJDIR_DEBUG)/crashhandler_unix.o: crashhandler_unix.cpp
-> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c crashhandler_unix.cpp -o $(OBJDIR_DEBUG)/crashhandler_unix.o
+$(OBJDIR_DEBUG)/crashhandler_unix.o: Unix/crashhandler_unix.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Unix/crashhandler_unix.cpp -o $(OBJDIR_DEBUG)/crashhandler_unix.o
 
 $(OBJDIR_DEBUG)/CustomFileSink.o: CustomFileSink.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c CustomFileSink.cpp -o $(OBJDIR_DEBUG)/CustomFileSink.o
@@ -134,8 +134,8 @@ release: before_release out_release after_release
 out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 > $(LD) -shared $(LIBDIR_RELEASE) $(OBJ_RELEASE)  -o $(OUT_RELEASE) $(LDFLAGS_RELEASE) $(LIB_RELEASE)
 
-$(OBJDIR_RELEASE)/crashhandler_unix.o: crashhandler_unix.cpp
-> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c crashhandler_unix.cpp -o $(OBJDIR_RELEASE)/crashhandler_unix.o
+$(OBJDIR_RELEASE)/crashhandler_unix.o: Unix/crashhandler_unix.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Unix/crashhandler_unix.cpp -o $(OBJDIR_RELEASE)/crashhandler_unix.o
 
 $(OBJDIR_RELEASE)/CustomFileSink.o: CustomFileSink.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c CustomFileSink.cpp -o $(OBJDIR_RELEASE)/CustomFileSink.o

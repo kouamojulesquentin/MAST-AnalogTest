@@ -15,8 +15,8 @@
 #include <sstream>
 #include <atomic>
 #include <process.h> // getpid
-#include "g3log/crashhandler.hpp"
-#include "g3log/stacktrace_windows.hpp"
+#include "crashhandler.hpp"
+#include "stacktrace_windows.hpp"
 #include "g3log/logcapture.hpp"
 
 #define getpid _getpid

@@ -12,7 +12,7 @@
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
  * ============================================================================*/
 
-#include "g3log/stacktrace_windows.hpp"
+#include "stacktrace_windows.hpp"
 #include "g3log/g3log.hpp"
 
 #include <windows.h>

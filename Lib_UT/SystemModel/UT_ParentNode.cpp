@@ -36,6 +36,7 @@ void UT_ParentNode::test_constructor ()
   TS_ASSERT_EQUALS  (sut.DirectChildrenCount(), 0);
   TS_ASSERT_NULLPTR (sut.FirstChild());
   TS_ASSERT_NULLPTR (sut.ChildAppender());
+  TS_ASSERT_FALSE   (sut.IgnoreForNodePath());
 }
 
 

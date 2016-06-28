@@ -32,8 +32,11 @@ class DLL_EXPORT ParentNode : public SystemModelNode, public std::enable_shared_
 
   uint32_t DirectChildrenCount() const;  //!< Returns current number of direct children
 
-  std::shared_ptr<SystemModelNode> FirstChild()    const { return m_pFirstChild;            } //!< Returns first child or nullptr
-  std::shared_ptr<ParentNode>      ChildAppender() const { return m_pOptionalChildAppender; }
+  bool                             IgnoreForNodePath() const { return m_ignoreForNodePath;      } //!< When true the node name is ignored when search a node by its path
+  std::shared_ptr<SystemModelNode> FirstChild()        const { return m_pFirstChild;            } //!< Returns first child or nullptr
+  std::shared_ptr<ParentNode>      ChildAppender()     const { return m_pOptionalChildAppender; }
+
+  void  IgnoreForNodePath (bool ignoreForNodePath) { m_ignoreForNodePath = ignoreForNodePath; } //!< Set whether the node must be ignored when search a node by its path
 
   std::shared_ptr<ParentNode>      FindParentOfNode(std::shared_ptr<SystemModelNode> child); //!< Searches down the hierarchy, the parent of specified node
 
@@ -45,6 +48,7 @@ class DLL_EXPORT ParentNode : public SystemModelNode, public std::enable_shared_
 
   void  SetChildAppender (std::shared_ptr<ParentNode> childAppender) { m_pOptionalChildAppender = childAppender; }
 
+
   // ---------------- Protected Methods
   //
   protected:
@@ -54,15 +58,12 @@ class DLL_EXPORT ParentNode : public SystemModelNode, public std::enable_shared_
 
   void DisconnectSibling(std::shared_ptr<SystemModelNode> beforeNode, std::shared_ptr<SystemModelNode> sibling);
 
-  // ---------------- Private  Methods
-  //
-  private:
-
   // ---------------- Private  Fields
   //
   private:
   std::shared_ptr<SystemModelNode> m_pFirstChild;
-  std::shared_ptr<ParentNode>      m_pOptionalChildAppender;  //!< To be used when "logical child" does not include "first child"
+  std::shared_ptr<ParentNode>      m_pOptionalChildAppender;    //!< To be used when "logical child" does not include "first child"
+  bool                             m_ignoreForNodePath = false; //!< When true the node name is ignored when search a node by its path
 };
 //
 //  End of ParentNode class declaration

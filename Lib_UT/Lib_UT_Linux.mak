@@ -66,6 +66,7 @@ OBJ_DEBUG = \
             $(OBJDIR_DEBUG)/SystemModel/UT_PropagatePendingVisitor.o        \
             $(OBJDIR_DEBUG)/SystemModel/UT_GenericAccessInterfaceProtocol.o \
             $(OBJDIR_DEBUG)/SystemModel/UT_GmlPrinterVisitor.o              \
+            $(OBJDIR_DEBUG)/SystemModel/UT_NodePathResolver.o               \
             $(OBJDIR_DEBUG)/SystemModel/UT_ConfigureVisitor.o               \
             $(OBJDIR_DEBUG)/SystemModel/UT_DefaultBinaryPathSelector.o      \
             $(OBJDIR_DEBUG)/Generated/Runner.o                              \
@@ -94,6 +95,7 @@ OBJ_RELEASE = \
               $(OBJDIR_RELEASE)/SystemModel/UT_PropagatePendingVisitor.o        \
               $(OBJDIR_RELEASE)/SystemModel/UT_GenericAccessInterfaceProtocol.o \
               $(OBJDIR_RELEASE)/SystemModel/UT_GmlPrinterVisitor.o              \
+              $(OBJDIR_RELEASE)/SystemModel/UT_NodePathResolver.o               \
               $(OBJDIR_RELEASE)/SystemModel/UT_ConfigureVisitor.o               \
               $(OBJDIR_RELEASE)/SystemModel/UT_DefaultBinaryPathSelector.o      \
               $(OBJDIR_RELEASE)/Generated/Runner.o
@@ -146,6 +148,9 @@ $(OBJDIR_DEBUG)/SystemModel/UT_GenericAccessInterfaceProtocol.o: SystemModel/UT_
 
 $(OBJDIR_DEBUG)/SystemModel/UT_GmlPrinterVisitor.o: SystemModel/UT_GmlPrinterVisitor.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_GmlPrinterVisitor.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_GmlPrinterVisitor.o
+
+$(OBJDIR_DEBUG)/SystemModel/UT_NodePathResolver.o: SystemModel/UT_NodePathResolver.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_NodePathResolver.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_NodePathResolver.o
 
 $(OBJDIR_DEBUG)/SystemModel/UT_ConfigureVisitor.o: SystemModel/UT_ConfigureVisitor.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c SystemModel/UT_ConfigureVisitor.cpp -o $(OBJDIR_DEBUG)/SystemModel/UT_ConfigureVisitor.o
@@ -248,6 +253,9 @@ $(OBJDIR_RELEASE)/SystemModel/UT_GenericAccessInterfaceProtocol.o: SystemModel/U
 
 $(OBJDIR_RELEASE)/SystemModel/UT_GmlPrinterVisitor.o: SystemModel/UT_GmlPrinterVisitor.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_GmlPrinterVisitor.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_GmlPrinterVisitor.o
+
+$(OBJDIR_RELEASE)/SystemModel/UT_NodePathResolver.o: SystemModel/UT_NodePathResolver.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_NodePathResolver.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_NodePathResolver.o
 
 $(OBJDIR_RELEASE)/SystemModel/UT_ConfigureVisitor.o: SystemModel/UT_ConfigureVisitor.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c SystemModel/UT_ConfigureVisitor.cpp -o $(OBJDIR_RELEASE)/SystemModel/UT_ConfigureVisitor.o

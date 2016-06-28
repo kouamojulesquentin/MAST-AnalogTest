@@ -21,6 +21,7 @@ Suites = \
       $(UT_RootPath)/SystemModel/UT_SystemModelNode.hpp                \
       $(UT_RootPath)/SystemModel/UT_Register.hpp                       \
       $(UT_RootPath)/SystemModel/UT_ParentNode.hpp                     \
+      $(UT_RootPath)/SystemModel/UT_NodePathResolver.hpp               \
       $(UT_RootPath)/SystemModel/UT_DefaultBinaryPathSelector.hpp      \
       $(UT_RootPath)/SystemModel/UT_SystemModel.hpp                    \
       $(UT_RootPath)/SystemModel/UT_SystemModelCheckerVisitor.hpp      \

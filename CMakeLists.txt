@@ -40,12 +40,6 @@ include_directories(Logger/g3log/)
 include_directories(Logger/Unix)
 include_directories(Logger/Windows)
 
-
-#Can manually add the sources using the set command as follows:
-#set(SOURCES src/mainapp.cpp src/Student.cpp)
-
-#However, the file(GLOB...) allows for wildcard additions:
-
 # LOGGER:
 file(GLOB Logger_SOURCES 			 "Logger/*.cpp")
 file(GLOB Logger_SOURCES_Linux "Logger/Unix/*.cpp")
@@ -63,7 +57,6 @@ if (WIN32)
 else ()
 	target_link_libraries(Logger pthread)
 endif ()
-
 
 # Lib:
 file(GLOB Lib_SOURCES "Lib/src/*")
@@ -120,6 +113,7 @@ else()
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${UT_RootPath}/Utility/UT_BinaryVector.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${UT_RootPath}/Utility/UT_SVFVector.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${UT_RootPath}/SystemModel/UT_SystemModelNode.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${UT_RootPath}/SystemModel/UT_NodePathResolver.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${UT_RootPath}/SystemModel/UT_Register.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${UT_RootPath}/SystemModel/UT_DefaultBinaryPathSelector.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${UT_RootPath}/SystemModel/UT_SystemModel.hpp)
@@ -154,7 +148,3 @@ if (WIN32)
 else ()
 	target_link_libraries(Lib_UT_Runner Lib_UT Lib Logger pthread)
 endif ()
-
-
-# endif()
-

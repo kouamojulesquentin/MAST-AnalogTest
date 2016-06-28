@@ -58,6 +58,7 @@ OBJ_DEBUG = \
             $(OBJDIR_DEBUG)/src/ConfigureVisitor.o                        \
             $(OBJDIR_DEBUG)/src/I2C_Player.o                              \
             $(OBJDIR_DEBUG)/src/Linker.o                                  \
+            $(OBJDIR_DEBUG)/src/NodePathResolver.o                        \
             $(OBJDIR_DEBUG)/src/ParentNode.o                              \
             $(OBJDIR_DEBUG)/src/PrettyPrinterVisitor.o                    \
             $(OBJDIR_DEBUG)/src/PropagatePendingVisitor.o                 \
@@ -91,6 +92,7 @@ OBJ_RELEASE = \
               $(OBJDIR_RELEASE)/src/ConfigureVisitor.o                        \
               $(OBJDIR_RELEASE)/src/I2C_Player.o                              \
               $(OBJDIR_RELEASE)/src/Linker.o                                  \
+              $(OBJDIR_RELEASE)/src/NodePathResolver.o                        \
               $(OBJDIR_RELEASE)/src/ParentNode.o                              \
               $(OBJDIR_RELEASE)/src/PrettyPrinterVisitor.o                    \
               $(OBJDIR_RELEASE)/src/PropagatePendingVisitor.o                 \
@@ -167,6 +169,9 @@ $(OBJDIR_DEBUG)/src/I2C_Player.o: src/I2C_Player.cpp
 
 $(OBJDIR_DEBUG)/src/Linker.o: src/Linker.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/Linker.cpp -o $(OBJDIR_DEBUG)/src/Linker.o
+
+$(OBJDIR_DEBUG)/src/NodePathResolver.o: src/NodePathResolver.cpp
+> $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/NodePathResolver.cpp -o $(OBJDIR_DEBUG)/src/NodePathResolver.o
 
 $(OBJDIR_DEBUG)/src/ParentNode.o: src/ParentNode.cpp
 > $(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/ParentNode.cpp -o $(OBJDIR_DEBUG)/src/ParentNode.o
@@ -276,6 +281,9 @@ $(OBJDIR_RELEASE)/src/I2C_Player.o: src/I2C_Player.cpp
 
 $(OBJDIR_RELEASE)/src/Linker.o: src/Linker.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/Linker.cpp -o $(OBJDIR_RELEASE)/src/Linker.o
+
+$(OBJDIR_RELEASE)/src/NodePathResolver.o: src/NodePathResolver.cpp
+> $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/NodePathResolver.cpp -o $(OBJDIR_RELEASE)/src/NodePathResolver.o
 
 $(OBJDIR_RELEASE)/src/ParentNode.o: src/ParentNode.cpp
 > $(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/ParentNode.cpp -o $(OBJDIR_RELEASE)/src/ParentNode.o

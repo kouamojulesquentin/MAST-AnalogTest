@@ -35,6 +35,7 @@ SOURCES +=  \
     src/GmlPrinterVisitor.cpp                       \
     src/I2C_Player.cpp                              \
     src/Linker.cpp                                  \
+    src/NodePathResolver.cpp                        \
     src/ParentNode.cpp                              \
     src/PrettyPrinterVisitor.cpp                    \
     src/PropagatePendingVisitor.cpp                 \
@@ -70,6 +71,7 @@ HEADERS += \
     include/FromSutUpdater.hpp                          \
     include/I2C_Player.hpp                              \
     include/Linker.hpp                                  \
+    include/NodePathResolver.hpp                        \
     include/ParentNode.hpp                              \
     include/PathSelector.hpp                            \
     include/PrettyPrinterVisitor.hpp                    \

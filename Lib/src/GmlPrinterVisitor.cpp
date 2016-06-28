@@ -73,15 +73,18 @@ GmlPrinterVisitor::GmlPrinterVisitor(std::experimental::string_view graphName, G
 
 //! Appends a parent node and its children to the GML graph
 //!
-//! @param type   Text representation of the node type
-//! @param node   The node for which a gml element is to be added
+//! @param shapeName        The shape to use
+//! @param backgroundColor  Background color
+//! @param notes            Optional node to add below the node name
+//! @param parentNode       Parent node to process
 //!
 void GmlPrinterVisitor::AppendParentNode (string_view       shapeName,
                                           string_view       backgroundColor,
                                           string_view       notes,
                                           const ParentNode& parentNode)
 {
-  AppendNode(shapeName, backgroundColor, notes, parentNode);
+  auto outlineStyle = parentNode.IgnoreForNodePath() ? "dashed" : "";
+  AppendNode(shapeName, outlineStyle, backgroundColor, notes, parentNode);
 
   auto linker   = dynamic_cast<const Linker*>(&parentNode);
   auto selector = m_showSelectionValues && linker ? linker->Selector() : nullptr;
@@ -149,7 +152,14 @@ void GmlPrinterVisitor::AppendParentNode (string_view       shapeName,
 
 //! Appends a node to the GML graph
 //!
+//! @param shapeName        The shape to use
+//! @param outlineStyle     Optional line type for shape (default when empty)
+//! @param backgroundColor  Background color
+//! @param notes            Optional node to add below the node name
+//! @param node             Node to process
+//!
 void GmlPrinterVisitor::AppendNode (string_view            shapeName,
+                                    string_view            outlineStyle,
                                     string_view            backgroundColor,
                                     string_view            notes,
                                     const SystemModelNode& node)
@@ -180,7 +190,7 @@ void GmlPrinterVisitor::AppendNode (string_view            shapeName,
     }
   }
   auto nodeWidth  = std::max(static_cast<size_t>(50u), (95u * labelCharWidth) / 10u);
-  auto nodeHeight = std::max(static_cast<size_t>(35u), 18u * linesCount);
+  auto nodeHeight = std::max(static_cast<size_t>(35u), 18u  * linesCount);
 
   if (shapeName != "rectangle"s)
   {
@@ -191,6 +201,10 @@ void GmlPrinterVisitor::AppendNode (string_view            shapeName,
   m_osGraph << " graphics [";
   m_osGraph << " type \"" << shapeName       << "\"";
   m_osGraph << " fill \"" << backgroundColor << "\"";
+  if (!outlineStyle.empty())
+  {
+    m_osGraph << " outlineStyle \"" << outlineStyle << "\"";
+  }
   m_osGraph << " w "  << nodeWidth;
   m_osGraph << " h "  << nodeHeight;
   m_osGraph << " ] ";
@@ -415,11 +429,11 @@ void GmlPrinterVisitor::VisitRegister (Register& reg)
       os << "Last from: " << regValue(reg.LastFromSut())     << std::endl;
       os << "Expected:  " << regValue(reg.ExpectedFromSut());
 
-      AppendNode(m_shape_Register, m_color_Register, os.str(), reg);
+      AppendNode(m_shape_Register, "", m_color_Register, os.str(), reg);
     }
     else
     {
-      AppendNode(m_shape_Register, m_color_Register, "", reg);
+      AppendNode(m_shape_Register, "", m_color_Register, "", reg);
     }
   }
 }

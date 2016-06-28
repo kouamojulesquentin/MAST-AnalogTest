@@ -101,6 +101,7 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
                         );
 
   void AppendNode       (std::experimental::string_view shapeName,
+                         std::experimental::string_view outlineStyle,
                          std::experimental::string_view backgroundColor,
                          std::experimental::string_view notes,
                          const SystemModelNode&         node

@@ -37,6 +37,40 @@ void UT_SystemModelBuilder::setUp ()
 }
 
 
+//! Checks SystemModelBuilder::Create_UnitTestCase_6_Levels()
+//!
+void UT_SystemModelBuilder::test_Create_UnitTestCase_6_Levels ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder builder(sm);
+
+  // ---------------- Exercise
+  //
+  auto tap = builder.Create_UnitTestCase_6_Levels();
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  TS_ASSERT_NOT_NULLPTR (tap);
+
+  // Check coherency
+  auto checkResult = sm.Check();
+
+  TS_ASSERT_FALSE  (checkResult.HasIssues());
+  if (checkResult.HasIssues())
+  {
+    TS_FAIL (checkResult.MakeReport());
+  }
+
+  // Export gml
+//+  GmlPrinterVisitor gmlPrinter("UnitTestCase_6_Levels", GmlPrinterOptions::Std);
+//+  tap->Accept(gmlPrinter);
+//+  TS_ASSERT_EQUALS (gmlPrinter.Graph(), "");
+}
+
 
 //! Checks SystemModelBuilder::Create_TestCase_AccessInterface()
 //!

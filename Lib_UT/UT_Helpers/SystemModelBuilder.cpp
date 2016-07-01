@@ -342,6 +342,56 @@ shared_ptr<AccessInterface> SystemModelBuilder::Create_TestCase_1500 (string_vie
 //---------------------------------------------------------------------------
 
 
+//! Creates a system model with 6 hierachical levels
+//!
+//! @note It is intended to be use in tests like:
+//!         - Locating nodes (from path, parent of child...)
+//!         - Disconnecting node
+//!         - Name checking
+//!         - ...
+//!         -
+shared_ptr<AccessInterface> SystemModelBuilder::Create_UnitTestCase_6_Levels ()
+{
+  auto tap    = m_model.CreateTap("Tap", 6u, 2u);
+  auto tapMux = m_model.LinkerWithId(2u);
+  tapMux->IgnoreForNodePath(true);
+
+  auto chain_0 = m_model.CreateChain("Chain_0", tap);
+
+  // ---------------- Level 1
+  //
+  m_model.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("0001_1"), chain_0);
+  auto chain_1_1 = m_model.CreateChain("Chain", chain_0);
+  auto chain_1_2 = m_model.CreateChain("Chain", chain_0);
+  m_model.CreateRegister("Reg_4", BinaryVector::CreateFromBinaryString("1000"), chain_0);
+  chain_1_1->IgnoreForNodePath(true);
+
+  // ---------------- Level 2
+  //
+  m_model.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("0010_1"),  chain_1_2);
+  m_model.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("0010_10"), chain_1_2);
+  auto chain_2_3 = m_model.CreateChain("Chain", chain_1_2);
+  auto chain_2_4 = m_model.CreateChain("Chain_2", chain_1_1);
+
+  m_model.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("0010"), chain_1_1);
+  m_model.CreateRegister("Reg_3", BinaryVector::CreateFromBinaryString("0011"), chain_1_1);
+
+  // ---------------- Level 3
+  //
+  m_model.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("1000"), chain_2_3);
+  m_model.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("1001"), chain_2_3);
+  m_model.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("0011_11"), chain_2_4);
+
+  // ---------------- Another unique in level two
+  //
+  m_model.CreateRegister("Reg_5", BinaryVector::CreateFromBinaryString("0010_101"), chain_1_2);
+
+  return tap;
+}
+//
+//  End of: SystemModelBuilder::Create_UnitTestCase_6_Levels
+//---------------------------------------------------------------------------
+
 
 //! Creates a MIB sub-tree
 //!

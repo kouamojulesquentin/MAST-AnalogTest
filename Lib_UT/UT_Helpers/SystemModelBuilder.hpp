@@ -98,6 +98,8 @@ class SystemModelBuilder final
   std::shared_ptr<mast::AccessInterface> Create_TestCase_MIB_Multichain_Post (std::experimental::string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
   std::shared_ptr<mast::AccessInterface> Create_TestCase_1500                (std::experimental::string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
 
+  std::shared_ptr<mast::AccessInterface> Create_UnitTestCase_6_Levels();
+
 
   std::shared_ptr<mast::AccessInterface> Create_Default_SUT  (std::experimental::string_view name);
   std::shared_ptr<mast::Chain>           Create_Default_SIB  (std::experimental::string_view name);

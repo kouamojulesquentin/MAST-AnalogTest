@@ -16,6 +16,7 @@
 #include "Chain.hpp"
 #include "SystemModel.hpp"
 #include "GmlPrinterVisitor.hpp"  // To get a visual representation of testcase
+#include "SystemModelBuilder.hpp"
 
 #include <memory>
 #include <tuple>
@@ -29,46 +30,17 @@ using std::make_tuple;
 using std::experimental::string_view;
 using namespace std::string_literals;
 using namespace mast;
+using namespace test;
 
 namespace
 {
-//! Creates a system model for testing NodePathResolver
+//! Creates a system model for testing node searching methods
 //!
 shared_ptr<ParentNode> CreateSystemModel (SystemModel& sm, bool reportGml = false)
 {
-  auto tap    = sm.CreateTap("Tap", 6u, 2u);
-  auto tapMux = sm.LinkerWithId(2u);
-  tapMux->IgnoreForNodePath(true);
+  SystemModelBuilder builder(sm);
 
-  auto chain_0 = sm.CreateChain("Chain_0", tap);
-
-  // ---------------- Level 1
-  //
-  sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("0001_1"), chain_0);
-  auto chain_1_1 = sm.CreateChain("Chain", chain_0);
-  auto chain_1_2 = sm.CreateChain("Chain", chain_0);
-  sm.CreateRegister("Reg_4", BinaryVector::CreateFromBinaryString("1000"), chain_0);
-  chain_1_1->IgnoreForNodePath(true);
-
-  // ---------------- Level 2
-  //
-  sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("0010_1"),  chain_1_2);
-  sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("0010_10"), chain_1_2);
-  auto chain_2_3 = sm.CreateChain("Chain", chain_1_2);
-  auto chain_2_4 = sm.CreateChain("Chain_2", chain_1_1);
-
-  sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("0010"), chain_1_1);
-  sm.CreateRegister("Reg_3", BinaryVector::CreateFromBinaryString("0011"), chain_1_1);
-
-  // ---------------- Level 3
-  //
-  sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("1000"), chain_2_3);
-  sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("1001"), chain_2_3);
-  sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("0011_11"), chain_2_4);
-
-  // ---------------- Another unique in level two
-  //
-  sm.CreateRegister("Reg_5", BinaryVector::CreateFromBinaryString("0010_101"), chain_1_2);
+  auto tap = builder.Create_UnitTestCase_6_Levels();
 
   if (reportGml)
   {
@@ -77,12 +49,12 @@ shared_ptr<ParentNode> CreateSystemModel (SystemModel& sm, bool reportGml = fals
     TS_ASSERT_EQUALS (gmlPrinter.Graph(), "");
   }
 
-  sm.Check();
   return tap;
 }
 //
 //  End of: CreateSystemModel
 //---------------------------------------------------------------------------
+
 } // End of unnamed namespace
 
 

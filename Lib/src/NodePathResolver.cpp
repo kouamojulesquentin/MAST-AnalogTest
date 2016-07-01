@@ -37,6 +37,38 @@ NodePathResolver::NodePathResolver(shared_ptr<ParentNode> referenceNode)
 //---------------------------------------------------------------------------
 
 
+//! Finds node with relative path from "prefix" or "reference" node
+//!
+//! @note Use a cache of already found path to speed up lookup of frequent path
+//!       It uses default std::map compare functor but could probably be optimized with
+//!       a functor that compare string in reverse order (paths deferentiation is often
+//!       located near their last characters)
+//!
+//! @param path Path of node relative to "prefix" node or "reference" node when there is no prefix
+//!
+//! @return Found node or nullptr
+//!
+shared_ptr<SystemModelNode> NodePathResolver::Resolve (string_view path)
+{
+  auto pos = m_cache.find(path.to_string());
+  if (pos != m_cache.end())
+  {
+    auto foundNode = pos->second;
+    return foundNode;
+  }
+
+  auto foundNode = m_prefixNode->FindNode(path);
+  if (foundNode)
+  {
+    m_cache[path.to_string()] = foundNode;
+  }
+
+  return foundNode;
+}
+//
+//  End of: NodePathResolver::Resolve
+//---------------------------------------------------------------------------
+
 //! Changes path prefix (relative to reference node)
 //!
 //! @note An empty prefix (or '.') will restore search path relative to reference node
@@ -45,6 +77,8 @@ NodePathResolver::NodePathResolver(shared_ptr<ParentNode> referenceNode)
 //!
 void NodePathResolver::SetPrefix (string prefix)
 {
+  m_cache.clear();
+
   if (prefix.empty() || (prefix == "."))
   {
     m_prefixNode = m_referenceNode;

@@ -42,6 +42,8 @@ class UT_NodePathResolver : public CxxTest::TestSuite
   void test_Resolve_Prefix_ValidPaths ();
   void test_Resolve_Prefix_NotValidPaths ();
 
+  void test_Resolve_FromCache ();
+
   // ================ Other Methods ================
 
   void setUp(); //!< Initializes test (called for each test)

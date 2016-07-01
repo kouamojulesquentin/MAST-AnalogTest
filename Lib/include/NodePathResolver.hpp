@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <string>
+#include <map>
 #include <experimental/string_view>
 
 namespace mast
@@ -42,7 +43,7 @@ class DLL_EXPORT NodePathResolver final
   //! @param path Path of node relative to "prefix" node or "reference" node when there is no prefix
   //!
   //! @return Found node or nullptr
-  std::shared_ptr<SystemModelNode> Resolve (std::experimental::string_view path) { return m_prefixNode->FindNode(path); }
+  std::shared_ptr<SystemModelNode> Resolve (std::experimental::string_view path);
 
   //! Returns current path prefix
   //!
@@ -55,8 +56,11 @@ class DLL_EXPORT NodePathResolver final
   // ---------------- Private  Fields
   //
   private:
+  using Cache_t = std::map<std::string, std::shared_ptr<SystemModelNode>>;
+
   std::shared_ptr<ParentNode> m_referenceNode; //!< Reference node for paths
   std::shared_ptr<ParentNode> m_prefixNode;    //!< Node associated with prefix (equals m_rootNode when prefix is empty)
+  Cache_t                     m_cache;
   std::string                 m_prefix;        //!< Path prefix (relative path from reference node)
 };
 //

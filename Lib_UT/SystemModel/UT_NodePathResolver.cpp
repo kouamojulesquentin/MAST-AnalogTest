@@ -376,6 +376,107 @@ void UT_NodePathResolver::test_Resolve_Prefix_NotValidPaths ()
   TS_DATA_DRIVEN_TEST(checker, data);
 }
 
+
+//! Checks NodePathResolver::Resolve() several time with same path
+//!
+void UT_NodePathResolver::test_Resolve_FromCache ()
+{
+  // ---------------- DDT Setup
+  //
+  SystemModel sm;
+  auto referenceNode = CreateSystemModel(sm);
+  auto sut           = NodePathResolver(referenceNode); // Same sut is used with all data to effectively check cache usage
+
+  auto checker = [&](const auto& data)
+  {
+    // ---------------- Setup
+    //
+
+    auto path       = std::get<0>(data);
+    auto expectedId = std::get<1>(data);
+
+    // ---------------- Exercise
+    //
+    auto node = sut.Resolve(path);
+
+    // ---------------- Verify
+    //
+    CxxTest::setAbortTestOnFail(true);
+
+    TS_ASSERT_NOT_NULLPTR (node);
+    TS_ASSERT_EQUALS      (node->Identifier(), expectedId);
+  };
+
+  auto data =
+  {
+    // ---------------- First access
+    //
+    make_tuple(".",                         0u),  // 00
+    make_tuple("Tap_IR",                    1u),  // 01
+    make_tuple("Tap_BPY",                   3u),  // 02
+    make_tuple("Chain_0",                   4u),  // 03
+    make_tuple("Chain_0.Reg_1",             5u),  // 04
+    make_tuple("Chain_0.Chain",             7u),  // 05
+    make_tuple("Chain_0.Reg_4",             8u),  // 06
+    make_tuple("Chain_0.Chain.Reg_1",       9u),  // 07
+    make_tuple("Chain_0.Chain.Reg_2",       10u), // 08
+    make_tuple("Chain_0.Chain.Chain",       11u), // 09
+    make_tuple("Chain_0.Chain_2",           12u), // 10
+    make_tuple("Chain_0.Reg_2",             13u), // 11
+    make_tuple("Chain_0.Reg_3",             14u), // 12
+    make_tuple("Chain_0.Chain.Chain.Reg_1", 15u), // 13
+    make_tuple("Chain_0.Chain.Chain.Reg_2", 16u), // 14
+    make_tuple("Chain_0.Chain_2.Reg_1",     17u), // 15
+    make_tuple("Chain_0.Chain.Reg_5",       18u), // 16
+
+    // ---------------- Second access
+    //
+    make_tuple(".",                         0u),  // 17
+    make_tuple("Tap_IR",                    1u),  // 18
+    make_tuple("Tap_BPY",                   3u),  // 19
+    make_tuple("Chain_0",                   4u),  // 20
+    make_tuple("Chain_0.Reg_1",             5u),  // 21
+    make_tuple("Chain_0.Chain",             7u),  // 22
+    make_tuple("Chain_0.Reg_4",             8u),  // 23
+    make_tuple("Chain_0.Chain.Reg_1",       9u),  // 24
+    make_tuple("Chain_0.Chain.Reg_2",       10u), // 25
+    make_tuple("Chain_0.Chain.Chain",       11u), // 26
+    make_tuple("Chain_0.Chain_2",           12u), // 27
+    make_tuple("Chain_0.Reg_2",             13u), // 28
+    make_tuple("Chain_0.Reg_3",             14u), // 29
+    make_tuple("Chain_0.Chain.Chain.Reg_1", 15u), // 30
+    make_tuple("Chain_0.Chain.Chain.Reg_2", 16u), // 31
+    make_tuple("Chain_0.Chain_2.Reg_1",     17u), // 32
+    make_tuple("Chain_0.Chain.Reg_5",       18u), // 33
+
+    // ---------------- Third access (out of order relative to previous data)
+    //
+    make_tuple("Tap_IR",                    1u),  // 34
+    make_tuple("Chain_0.Reg_4",             8u),  // 35
+    make_tuple("Chain_0.Reg_3",             14u), // 36
+    make_tuple("Chain_0.Reg_2",             13u), // 37
+    make_tuple("Chain_0.Chain_2",           12u), // 38
+    make_tuple("Chain_0.Reg_1",             5u),  // 39
+    make_tuple("Tap_BPY",                   3u),  // 40
+    make_tuple("Chain_0.Chain_2.Reg_1",     17u), // 41
+    make_tuple("Chain_0.Chain.Reg_2",       10u), // 42
+    make_tuple("Chain_0.Chain.Reg_5",       18u), // 43
+    make_tuple(".",                         0u),  // 44
+    make_tuple("Chain_0.Chain",             7u),  // 45
+    make_tuple("Chain_0.Chain.Chain.Reg_2", 16u), // 46
+    make_tuple("Chain_0.Chain.Chain.Reg_2", 16u), // 47
+    make_tuple("Chain_0.Chain.Chain.Reg_2", 16u), // 48
+    make_tuple("Chain_0.Chain.Chain.Reg_1", 15u), // 49
+    make_tuple("Chain_0.Chain.Reg_1",       9u),  // 50
+    make_tuple("Chain_0.Chain.Chain",       11u), // 51
+    make_tuple("Chain_0",                   4u),  // 52
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
 //===========================================================================
 // End of UT_NodePathResolver.cpp
 //===========================================================================

@@ -87,7 +87,11 @@ class DLL_EXPORT SystemModel
     return reg;
   }
 
-  std::shared_ptr<ParentNode > Root() const { return m_root; } //!< Returns root node
+  std::shared_ptr<ParentNode> Root() const { return m_root; }        //!< Returns root node
+
+  //! Replaces root node
+  //!
+  std::shared_ptr<ParentNode> ReplaceRoot(std::shared_ptr<ParentNode> newRoot, bool removeBeforeReplace);
 
   using NodeIdentifier = SystemModelNode::NodeIdentifier;
 
@@ -97,14 +101,15 @@ class DLL_EXPORT SystemModel
   std::shared_ptr<Linker>          LinkerWithId          (NodeIdentifier identifier) const { return std::dynamic_pointer_cast<Linker>          (NodeWithId(identifier)); } //!< Returns Linker associated with a node identifier
   std::shared_ptr<Chain>           ChainWithId           (NodeIdentifier identifier) const { return std::dynamic_pointer_cast<Chain>           (NodeWithId(identifier)); } //!< Returns Chain associated with a node identifier
 
-  //! Disconnects a node from those managed by SystemModel
+  //! Disconnects a node from SystemModel tree
   //!
-  void DisconnectNodeFromModel(std::shared_ptr<SystemModelNode> node, std::shared_ptr<ParentNode> parentNode);
+  void DisconnectNode(std::shared_ptr<SystemModelNode> node, std::shared_ptr<ParentNode> parentNode = nullptr);
 
 
-  //! Removes a node from those managed by SystemModel without much check
+  //! Removes a node from those managed by SystemModel (without much check)
   //!
   void RemoveNodeFromModel(std::shared_ptr<SystemModelNode> node);
+
 
   uint32_t RegistersCount() const { return m_totalRegisters; }
 

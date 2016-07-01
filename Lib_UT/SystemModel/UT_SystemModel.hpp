@@ -39,6 +39,13 @@ class UT_SystemModel : public CxxTest::TestSuite
   void test_CreateLinker_With_ParentNode ();
   void test_CreateTap ();
 
+  void test_DisconnectNode_Bottom ();
+  void test_DisconnectNode_Middle ();
+  void test_DisconnectNode_Top ();
+
+  void test_ReplaceRoot_NotRemoved ();
+  void test_ReplaceRoot_Removed ();
+  void test_ReplaceRoot_WithNullptr ();
 
   // ================ Other Methods ================
 

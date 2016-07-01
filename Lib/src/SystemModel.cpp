@@ -292,15 +292,16 @@ void SystemModel::RegisterNode (std::shared_ptr<SystemModelNode> node)
 //---------------------------------------------------------------------------
 
 
-//! Disconnects a node from those managed by SystemModel
+//! Disconnects a node from SystemModel tree
 //!
 //! @note Post-condition: the node cannot be retrieved from model by tree traversal of the SystemModel
 //!       but it is still managed by the SystemModel (its identifier is still valid)
+//!       It can then be latter reconnected somewhere else in the tree
 //!
 //! @param node         The node to disconnect
 //! @param parentNode   Starting point to search node direct parent (root if nullptr)
 //!
-void SystemModel::DisconnectNodeFromModel (shared_ptr<SystemModelNode> node, shared_ptr<ParentNode> parentNode)
+void SystemModel::DisconnectNode (shared_ptr<SystemModelNode> node, shared_ptr<ParentNode> parentNode)
 {
   CHECK_PARAMETER_NOT_NULL(node, "Invalid nullptr");
 
@@ -317,7 +318,7 @@ void SystemModel::DisconnectNodeFromModel (shared_ptr<SystemModelNode> node, sha
 
     if (!parentNode->HasDirectChild(node))
     {
-//+      parentNode = parentNode->FindParentOfNode(node);
+      parentNode = parentNode->FindParentOfNode(node);
     }
 
     CHECK_VALUE_NOT_NULL(parentNode, "Cannot find parent of node '"s + node->Name() + "' to disconnect");
@@ -326,7 +327,7 @@ void SystemModel::DisconnectNodeFromModel (shared_ptr<SystemModelNode> node, sha
   }
 }
 //
-//  End of: SystemModel::DisconnectNodeFromModel
+//  End of: SystemModel::DisconnectNode
 //---------------------------------------------------------------------------
 
 
@@ -343,7 +344,7 @@ void SystemModel::DisconnectNodeFromModel (shared_ptr<SystemModelNode> node, sha
 //!
 void SystemModel::RemoveNodeFromModel (shared_ptr<SystemModelNode> node)
 {
-  CHECK_PARAMETER_NOT_NULL(node, "Invalid nullptr");
+  CHECK_PARAMETER_NOT_NULL(node, "Cannot remove node nullptr");
 
   auto id     = node->Identifier();
   auto offset = static_cast<TIdentifierMapping::size_type>(id);
@@ -363,6 +364,34 @@ void SystemModel::RemoveNodeFromModel (shared_ptr<SystemModelNode> node)
 //
 //  End of: SystemModel::RemoveNodeFromModel
 //---------------------------------------------------------------------------
+
+
+
+//! Replaces root node
+//!
+//! @note Caller is responsible for keeping system model coherency
+//!
+//! @param newRoot              Parent node that will be new root node
+//! @param removeBeforeReplace  True if node is discarded from those managed by the SystemModel
+//!
+//! @return Old root node
+shared_ptr<ParentNode> SystemModel::ReplaceRoot (std::shared_ptr<ParentNode> newRoot, bool removeBeforeReplace)
+{
+  CHECK_PARAMETER_NOT_NULL(newRoot, "Cannot replace root node with nullptr");
+
+  auto oldRoot = m_root;
+  if (removeBeforeReplace)
+  {
+    RemoveNodeFromModel(m_root);
+  }
+
+  m_root = newRoot;
+  return oldRoot;
+}
+//
+//  End of: SystemModel::ReplaceRoot
+//---------------------------------------------------------------------------
+
 
 //===========================================================================
 // End of SystemModel.cpp

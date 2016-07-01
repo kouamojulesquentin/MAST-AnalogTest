@@ -15,6 +15,7 @@
 #include "SystemModel.hpp"
 #include "SystemModelNode.hpp"
 #include "DefaultBinaryPathSelector.hpp"
+#include "SystemModelBuilder.hpp"
 #include "BinaryVector_Traits.hpp"
 
 using std::string;
@@ -23,6 +24,7 @@ using std::shared_ptr;
 using std::make_shared;
 using std::dynamic_pointer_cast;
 using namespace mast;
+using namespace test;
 
 
 //! Initializes test (called for each test)
@@ -305,6 +307,140 @@ void UT_SystemModel::test_CreateTap ()
   linkerSecondChild = bypassAsRegister->NextSibling();
   TS_ASSERT_NOT_NULLPTR (linkerSecondChild);
   TS_ASSERT_EQUALS      (linkerSecondChild->Name(), "New reg");
+}
+
+//! Checks SystemModel::DisconnectNode() with a node down the hierarchy
+//!
+void UT_SystemModel::test_DisconnectNode_Bottom ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder builder(sm);
+
+  builder.Create_UnitTestCase_6_Levels();
+
+  auto chain = sm.ChainWithId(11u);
+  auto reg   = sm.RegisterWithId(16u);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sm.DisconnectNode(reg));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (chain->DirectChildrenCount(), 1u);
+  TS_ASSERT_FALSE  (chain->HasDirectChild(reg));
+}
+
+
+//! Checks SystemModel::DisconnectNode() with a node in the middle of the hierarchy
+//!
+void UT_SystemModel::test_DisconnectNode_Middle ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder builder(sm);
+
+  builder.Create_UnitTestCase_6_Levels();
+
+  auto chain_11 = sm.ChainWithId(11u);
+  auto chain_7  = sm.ChainWithId(7u);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sm.DisconnectNode(chain_11));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (chain_7->DirectChildrenCount(), 3u);
+  TS_ASSERT_FALSE  (chain_7->HasDirectChild(chain_11));
+}
+
+
+//! Checks SystemModel::DisconnectNode() with a node down the hierarchy
+//!
+void UT_SystemModel::test_DisconnectNode_Top ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder builder(sm);
+
+  auto tap = builder.Create_UnitTestCase_6_Levels();
+  auto mux = sm.LinkerWithId(2u);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sm.DisconnectNode(mux));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (tap->DirectChildrenCount(), 1u);
+  TS_ASSERT_FALSE  (tap->HasDirectChild(mux));
+}
+
+
+
+//! Checks SystemModel::ReplaceRoot() without removing it from SystemModel
+//!
+void UT_SystemModel::test_ReplaceRoot_NotRemoved ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+
+  auto tap    = sm.CreateTap("Tap", 6u, 3u);
+  auto newTap = sm.CreateAccessInterface("New Tap", nullptr);
+
+  // ---------------- Exercise
+  //
+  auto oldTap = sm.ReplaceRoot(newTap, false);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS_PTR (oldTap,    tap);
+  TS_ASSERT_EQUALS_PTR (sm.Root(), newTap);
+  TS_ASSERT_EQUALS_PTR (sm.NodeWithId(tap->Identifier()), tap);
+}
+
+
+//! Checks SystemModel::ReplaceRoot() removing it from SystemModel
+//!
+void UT_SystemModel::test_ReplaceRoot_Removed ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+
+  auto tap    = sm.CreateTap("Tap", 6u, 3u);
+  auto newTap = sm.CreateAccessInterface("New Tap", nullptr);
+
+  // ---------------- Exercise
+  //
+  auto oldTap = sm.ReplaceRoot(newTap, true);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS_PTR (oldTap,    tap);
+  TS_ASSERT_EQUALS_PTR (sm.Root(), newTap);
+  TS_ASSERT_THROWS     (sm.NodeWithId(tap->Identifier()), std::exception);
+}
+
+
+//! Checks SystemModel::ReplaceRoot() giving a nullptr
+//!
+void UT_SystemModel::test_ReplaceRoot_WithNullptr ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  auto tap = sm.CreateTap("Tap", 6u, 3u);
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sm.ReplaceRoot(nullptr, false), std::exception);
 }
 
 

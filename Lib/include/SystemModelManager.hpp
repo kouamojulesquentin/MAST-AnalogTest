@@ -20,9 +20,12 @@
 #include "PropagatePendingVisitor.hpp"
 #include "ToSutVisitor.hpp"
 #include "FromSutUpdater.hpp"
+#include "NodePathResolver.hpp"
 #include "SystemModelManagerMonitor.hpp"
 
 #include <memory>
+#include <functional>
+#include <thread>
 
 namespace mast
 {
@@ -40,15 +43,15 @@ class DLL_EXPORT SystemModelManager final
   // ---------------- Public  Methods
   //
   public:
-  ~SystemModelManager() = default;
-  SystemModelManager()  = delete;
+  ~SystemModelManager();
+  SystemModelManager() = delete;
 
   //! Associates a SystemModel to fresh SystemModelManager
   //!
   SystemModelManager(SystemModel& sm,
                      std::shared_ptr<ConfigurationAlgorithm>    configurationAlgorithm = std::make_shared<ConfigureAlgorithm_LastOrDefault>(),
-                     std::shared_ptr<SystemModelManagerMonitor> monitor                = std::make_shared<SystemModelManagerMonitor>()
-//+                     std::shared_ptr<SystemModelManagerMonitor> monitor                = nullptr
+//+                     std::shared_ptr<SystemModelManagerMonitor> monitor                = std::make_shared<SystemModelManagerMonitor>()
+                     std::shared_ptr<SystemModelManagerMonitor> monitor                = nullptr
                     )
     : m_sm                   (sm)
     , m_firstAccessInterface (GetFirstAccessInterface(sm))
@@ -57,6 +60,7 @@ class DLL_EXPORT SystemModelManager final
     , m_toSutVisitor         ()
     , m_fromSutUpdater       (sm)
     , m_monitor              (monitor)
+    , m_managerThreadId      (std::this_thread::get_id())
   {  }
 
   //! Does a complete data cycles for SystemModel as long as there are pending nodes
@@ -65,6 +69,16 @@ class DLL_EXPORT SystemModelManager final
   //!       retrieval and SystemModel updating
   //!
   void DoDataCycles();
+
+  using Application_t = std::function<void()>;
+
+  //! Creates an application thread
+  //!
+  void CreateApplicationThread(std::shared_ptr<ParentNode> applicationTopNode, Application_t functor);
+
+  //! Waits for all application thread to terminate
+  //!
+  void JoinAllApplicationThreads ();
 
   // ---------------- Protected Methods
   //
@@ -76,6 +90,21 @@ class DLL_EXPORT SystemModelManager final
   //
   private:
 
+  struct ApplicationData
+  {
+    ApplicationData(std::thread appThread, NodePathResolver pathResolver)
+      : m_thread       (std::move(appThread))
+      , m_pathResolver (pathResolver)
+    {
+    }
+
+    std::thread      m_thread;
+    NodePathResolver m_pathResolver;
+  };
+
+  using ApplicationDataMapper_t = std::map<std::thread::id, std::shared_ptr<ApplicationData>>;
+//+  using ApplicationDataMapper_t = std::map<std::thread::id, ApplicationData>;
+
   // ---------------- Private  Fields
   //
   private:
@@ -86,6 +115,8 @@ class DLL_EXPORT SystemModelManager final
   ToSutVisitor                               m_toSutVisitor;         //!< In charge of collecting bitstream to SUT
   FromSutUpdater                             m_fromSutUpdater;       //!< In charge of updating SystemModel from bitstream from SUT
   std::shared_ptr<SystemModelManagerMonitor> m_monitor;              //!< Provides monitoring point
+  const std::thread::id                      m_managerThreadId;      //!< Thread that created the manager
+  ApplicationDataMapper_t                    m_applicationsData;     //!< Associates a thread id with application data for that thread
 };
 //
 //  End of SystemModelManager class declaration

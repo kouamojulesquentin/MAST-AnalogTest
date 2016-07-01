@@ -22,9 +22,42 @@
 
 using namespace mast;
 using std::shared_ptr;
+using std::make_shared;
 using std::dynamic_pointer_cast;
 
 #define MONITOR(fct) if (m_monitor) m_monitor->fct;
+
+//! Joins application threads
+//!
+SystemModelManager::~SystemModelManager ()
+{
+  JoinAllApplicationThreads();
+}
+//
+//  End of: SystemModelManager::~SystemModelManager
+//---------------------------------------------------------------------------
+
+
+//! Creates an application thread
+//!
+//! @param applicationTopNode Top most node associated with the application
+//! @param functor            Function to call at thread creation
+//!
+void SystemModelManager::CreateApplicationThread (shared_ptr<ParentNode> applicationTopNode, Application_t functor)
+{
+  MONITOR(CreateApplication(*applicationTopNode));
+
+  auto appThread    = std::thread(functor);
+  auto pathResolver = NodePathResolver(applicationTopNode);
+  auto data         = make_shared<ApplicationData>(std::move(appThread), pathResolver);
+
+  m_applicationsData[appThread.get_id()] = data;
+}
+//
+//  End of: SystemModelManager::CreateApplicationThread
+//---------------------------------------------------------------------------
+
+
 
 //! Does a complete data cycles for SystemModel as long as there are pending nodes
 //!
@@ -115,6 +148,25 @@ shared_ptr<AccessInterface> SystemModelManager::GetFirstAccessInterface (const S
 //
 //  End of: SystemModelManager::GetFirstAccessInterface
 //---------------------------------------------------------------------------
+
+
+//! Waits for all application thread to terminate
+//!
+void SystemModelManager::JoinAllApplicationThreads ()
+{
+  for (const auto& item : m_applicationsData)
+  {
+    auto data = item.second;
+    if (data->m_thread.joinable())
+    {
+      data->m_thread.join();
+    }
+  }
+}
+//
+//  End of: SystemModelManager::JoinAllApplicationThreads
+//---------------------------------------------------------------------------
+
 
 
 //===========================================================================

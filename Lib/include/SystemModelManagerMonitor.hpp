@@ -33,11 +33,12 @@ class DLL_EXPORT SystemModelManagerMonitor
   virtual ~SystemModelManagerMonitor() = default;
   SystemModelManagerMonitor()  = default;
 
-  virtual void Reset();                                 //!< Resets data cyles counter
-  virtual void StartDataCycles();                       //!< Monitor start of new data cycles
-  virtual void StartDataCycle();                        //!< Monitor start of a new data cycle
-  virtual void BeforeConfiguration (ParentNode& root);  //!< Monitor state of SystemModel (from parentNode) before configuration
-  virtual void AfterConfiguration  (ParentNode& root);  //!< Monitor state of SystemModel (from parentNode) after configuration
+  virtual void Reset();                                         //!< Resets data cyles counter
+  virtual void CreateApplication   (const ParentNode& topNode); //!< Monitors creation of application thread
+  virtual void StartDataCycles();                               //!< Monitors start of new data cycles
+  virtual void StartDataCycle();                                //!< Monitors start of a new data cycle
+  virtual void BeforeConfiguration (ParentNode&       root);    //!< Monitors state of SystemModel (from parentNode) before configuration
+  virtual void AfterConfiguration  (ParentNode&       root);    //!< Monitors state of SystemModel (from parentNode) after configuration
 
   std::string GmlBasePath()                const { return m_gmlPrinterBasePath;         }
   bool        MonitorAfterConfiguration()  const { return m_monitorAfterConfiguration;  }
@@ -61,6 +62,7 @@ class DLL_EXPORT SystemModelManagerMonitor
   //
   private:
   uint32_t          m_dataCyclesCount            = 0;     //!< Number of data cycles since startup or last reset
+  bool              m_monitorAppThreadCreation   = true;  //!< True when requested to monitor application thread creation
   bool              m_monitorAfterConfiguration  = false; //!< True when requested to monitor SystemModel state after configuration
   bool              m_monitorBeforeConfiguration = false; //!< True when requested to monitor SystemModel state before configuration
   GmlPrinterVisitor m_gmlMonitor;                         //!< Visitor for building graph with SystemModel state

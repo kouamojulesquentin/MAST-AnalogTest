@@ -50,6 +50,9 @@ class UT_SystemModelManager : public CxxTest::TestSuite
   void test_DoDataCycles_MIB_Multichain_Pre_Lazy ();
   void test_DoDataCycles_MIB_Multichain_Post ();
 
+  void test_CreateApplicationThread ();
+//+  void test_CreateApplicationThread_Nullptr ();
+
   // ================ Other Methods ================
 
   void setUp(); //!< Initializes test (called for each test)

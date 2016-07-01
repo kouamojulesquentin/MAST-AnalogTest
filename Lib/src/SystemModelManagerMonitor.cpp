@@ -61,6 +61,21 @@ void SystemModelManagerMonitor::BeforeConfiguration (ParentNode& root)
 //---------------------------------------------------------------------------
 
 
+//! Monitors creation of application thread
+//!
+//! @param topNode Top most node associated with the application thread
+//!
+void SystemModelManagerMonitor::CreateApplication (const ParentNode& topNode)
+{
+  if (m_monitorAppThreadCreation)
+  {
+    LOG(INFO) << "Creating application thread with node : " << topNode.Name() << " (id: " << topNode.Identifier() << ")";
+  }
+}
+//
+//  End of: SystemModelManagerMonitor::BeforeConfiguration
+//---------------------------------------------------------------------------
+
 
 //! Creates a gml view of the SystemModel root node
 //!

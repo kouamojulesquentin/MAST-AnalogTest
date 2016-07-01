@@ -29,6 +29,8 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <atomic>
+#include <chrono>
 
 using std::make_shared;
 using std::make_tuple;
@@ -36,7 +38,7 @@ using std::string;
 using std::experimental::string_view;
 using std::ostringstream;
 using std::vector;
-
+using namespace std::chrono_literals;
 using namespace std::string_literals;
 using namespace mast;
 using namespace test;
@@ -76,9 +78,7 @@ std::shared_ptr<AccessInterface> Create_TestCase_1500 (SystemModel& sm, string_v
 
   if (reportGml)
   {
-    GmlPrinterVisitor gmlPrinter("Testcase_1500", GmlPrinterOptions::Std);
-    ai->Accept(gmlPrinter);
-    TS_ASSERT_EQUALS (gmlPrinter.Graph(), "");
+    TS_TRACE (GmlPrinterVisitor::Graph(ai, "Testcase_1500"));
   }
 
   return ai;
@@ -113,9 +113,7 @@ std::shared_ptr<AccessInterface> Create_TestCase_MIB_Multichain_Pre (SystemModel
 
   if (reportGml)
   {
-    GmlPrinterVisitor gmlPrinter("MIB_Multichain_Pre", GmlPrinterOptions::Std);
-    tap->Accept(gmlPrinter);
-    TS_ASSERT_EQUALS (gmlPrinter.Graph(), "");
+    TS_TRACE (GmlPrinterVisitor::Graph(tap, "MIB_Multichain_Pre"));
   }
 
   return tap;
@@ -150,12 +148,7 @@ std::shared_ptr<AccessInterface> Create_TestCase_MIB_Multichain_Post (SystemMode
 
   if (reportGml)
   {
-//+    auto linker = sm.LinkerWithId(5u);
-//+    linker->Select(3u);
-
-    GmlPrinterVisitor gmlPrinter("MIB_Multichain_Post", GmlPrinterOptions::Std);
-    tap->Accept(gmlPrinter);
-    TS_ASSERT_EQUALS (gmlPrinter.Graph(), "");
+    TS_TRACE (GmlPrinterVisitor::Graph(tap, "MIB_Multichain_Post"));
   }
 
   return tap;
@@ -292,7 +285,6 @@ void UT_SystemModelManager::test_Constructor_Root_is_AI ()
 
   auto root = builder.Create_TestCase_AccessInterface();
 
-
   // ---------------- Exercise & Verify
   //
   TS_ASSERT_THROWS_NOTHING (SystemModelManager sut(sm));
@@ -366,9 +358,7 @@ void UT_SystemModelManager::test_DoDataCycles_AccessInterface ()
   auto spy = make_shared<Spy_AccessInterfaceProtocols>();
   ai->SetProtocol (spy);
 
-//+  GmlPrinterVisitor gmlPrinter("Testcase_AccessInterface", GmlPrinterOptions::Std);
-//+  ai->Accept(gmlPrinter);
-//+  TS_ASSERT_EQUALS (gmlPrinter.Graph(), "");
+//+  TS_TRACE (GmlPrinterVisitor::Graph(ai, "Testcase_AccessInterface"));
 
   SystemModelManager sut(sm);
 
@@ -874,6 +864,66 @@ void UT_SystemModelManager::test_DoDataCycles_MIB_Multichain_Post ()
   };
 
   TS_ASSERT_EQUALS (gotSutVectors, expected);
+}
+
+
+//! Checks SystemModelManager::CreateApplicationThread() `...`
+//!
+void UT_SystemModelManager::test_CreateApplicationThread ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder builder(sm);
+
+  auto root = builder.Create_TestCase_MIB_Multichain_Pre();
+  auto mux  = sm.LinkerWithId(2u);
+  TS_ASSERT_NOT_NULLPTR (mux);
+
+//+  g3::logEnabled(true);
+//+  auto monitor = make_shared<SystemModelManagerMonitor>();
+//+  SystemModelManager sut(sm, nullptr, monitor);
+  SystemModelManager sut(sm);
+
+  // ---------------- Create a functor that tally value when not zero
+  //
+  std::atomic_uint value;
+  value = 0u;
+
+  uint32_t         sum   = 0;
+  auto appFunctor = [&value, &sum]()
+  {
+    while (true)
+    {
+      if (value != 0) // This is the "protocol" to say that there is a new value
+      {
+        sum  += value;
+        if (value >= 100u)
+        {
+          break;
+        }
+        value = 0;
+      }
+    }
+  };
+
+  // ---------------- Exercise
+  //  There is an artificial block scope too wait for sut destructor
+  {
+    TS_ASSERT_THROWS_NOTHING (sut.CreateApplicationThread(mux, appFunctor));
+
+    // ---------------- Verify
+    //
+    for (uint32_t ii = 1 ; ii <= 100u ; ++ii)
+    {
+      while (value != 0);
+      value = ii;
+    }
+    std::this_thread::sleep_for(1ms); // Just the time for the application thread to see the last value
+
+    TS_ASSERT_EQUALS (sum, 5050u);
+  }
+//+  g3::logEnabled(false);
 }
 
 //===========================================================================

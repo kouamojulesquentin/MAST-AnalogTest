@@ -39,10 +39,10 @@ class DLL_EXPORT NodePathResolver final
 
   //! Finds node with relative path from "prefix" or "reference" node
   //!
-  std::shared_ptr<SystemModelNode> Resolve(std::experimental::string_view path);
-
-  static std::shared_ptr<SystemModelNode> ResolveFromNode (std::experimental::string_view path, std::shared_ptr<ParentNode> referenceNode);
-
+  //! @param path Path of node relative to "prefix" node or "reference" node when there is no prefix
+  //!
+  //! @return Found node or nullptr
+  std::shared_ptr<SystemModelNode> Resolve (std::experimental::string_view path) { return m_prefixNode->FindNode(path); }
 
   //! Returns current path prefix
   //!
@@ -51,14 +51,6 @@ class DLL_EXPORT NodePathResolver final
   //! Changes path prefix
   //!
   void  SetPrefix (std::string prefix);
-
-  // ---------------- Protected Methods
-  //
-  protected:
-
-  // ---------------- Private  Methods
-  //
-  private:
 
   // ---------------- Private  Fields
   //

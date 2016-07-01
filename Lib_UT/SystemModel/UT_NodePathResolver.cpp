@@ -32,7 +32,6 @@ using namespace mast;
 
 namespace
 {
-
 //! Creates a system model for testing NodePathResolver
 //!
 shared_ptr<ParentNode> CreateSystemModel (SystemModel& sm, bool reportGml = false)
@@ -66,6 +65,10 @@ shared_ptr<ParentNode> CreateSystemModel (SystemModel& sm, bool reportGml = fals
   sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("1000"), chain_2_3);
   sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("1001"), chain_2_3);
   sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("0011_11"), chain_2_4);
+
+  // ---------------- Another unique in level two
+  //
+  sm.CreateRegister("Reg_5", BinaryVector::CreateFromBinaryString("0010_101"), chain_1_2);
 
   if (reportGml)
   {
@@ -194,6 +197,7 @@ void UT_NodePathResolver::test_Resolve_ValidPaths ()
     make_tuple("Chain_0.Chain.Chain.Reg_1", 15u), // 13
     make_tuple("Chain_0.Chain.Chain.Reg_2", 16u), // 14
     make_tuple("Chain_0.Chain_2.Reg_1",     17u), // 15
+    make_tuple("Chain_0.Chain.Reg_5",       18u), // 16
   };
 
   // ---------------- DDT Exercise
@@ -229,15 +233,16 @@ void UT_NodePathResolver::test_Resolve_NotValidPaths ()
   {
     "..",                  // 00
     "Tap_iR",              // 01
-    "Chain",               // 03
-    "Reg_1",               // 04
-    "Chain_2.Chain",       // 05
-    "Chain.Reg_3",         // 06
-    "Chain.Reg_1",         // 07
-    "Tap_DR_Mux.Chain_0",  // 08
-    "Tap_DR_Mux.tap_BPY",  // 09
-    "Chain_0/Chain.Chain", // 10
-    "Chain_0..Reg_1",      // 11
+    "Chain",               // 02
+    "Reg_1",               // 03
+    "Chain_2.Chain",       // 04
+    "Chain.Reg_3",         // 05
+    "Chain.Reg_1",         // 06
+    "Tap_DR_Mux.Chain_0",  // 07
+    "Tap_DR_Mux.tap_BPY",  // 08
+    "Chain_0/Chain.Chain", // 09
+    "Chain_0..Reg_1",      // 10
+    "Chain_0.Reg_5",       // 11
   };
 
   // ---------------- DDT Exercise

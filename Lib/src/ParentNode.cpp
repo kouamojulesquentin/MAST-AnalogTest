@@ -13,10 +13,13 @@
 
 #include "ParentNode.hpp"
 #include "Utility.hpp"
+#include <deque>
 
+using std::deque;
 using std::shared_ptr;
 using std::dynamic_pointer_cast;
 using std::to_string;
+using std::experimental::string_view;
 using namespace mast;
 
 
@@ -195,6 +198,126 @@ bool ParentNode::HasDirectChild (std::shared_ptr<SystemModelNode> node) const
 }
 //
 //  End of: ParentNode::HasDirectChild
+//---------------------------------------------------------------------------
+
+
+
+//! Finds node with relative path from a node
+//!
+//! @note For this method, no prefix is taken into account (search is done from referenceNode)
+//!
+//! @param path           Path of node relative to specified reference node
+//! @param referenceNode  Actual reference node
+//!
+//! @return Found node or nullptr
+shared_ptr<SystemModelNode> ParentNode::FindNode (string_view path)
+{
+  shared_ptr<SystemModelNode> foundNode;
+  auto                        notValidPath = false;
+
+  if (path == ".")
+  {
+    foundNode = shared_from_this();
+  }
+  else
+  {
+    deque<shared_ptr<ParentNode>> parentsToProcess;   // Use deque instead of queue to have access to clear method!
+
+    size_t startPos = 0;
+
+    // ---------------- Sub-path extraction function
+    //
+    auto extractNextChunk = [&startPos, path, &notValidPath]()
+    {
+      if (startPos >= path.length())
+      {
+        return string_view();
+      }
+
+      size_t dotPos = path.find('.', startPos);
+
+      // ---------------- Detect not valid multiple dots
+      //
+      if (dotPos == startPos)
+      {
+        notValidPath = true;
+        startPos     = path.length();
+        return string_view("<<< Not valid path ! >>>");
+      }
+
+      auto endPos = (dotPos == string_view::npos) ? path.length() : dotPos;
+      auto length = endPos - startPos;
+      auto chunk  = path.substr(startPos, length);
+
+      startPos = endPos + 1u;
+      return chunk;
+    };
+
+    // ---------------- Start init
+    //
+    auto currentPathChunk = extractNextChunk();
+    auto nextParent       = shared_from_this();
+
+    // ---------------- Search loop of parent nodes
+    //
+    while (!foundNode && nextParent && !notValidPath)
+    {
+      auto currentChild = nextParent->FirstChild();
+      while (currentChild && !notValidPath)
+      {
+        auto currentNodeAsParent = dynamic_pointer_cast<ParentNode>(currentChild);
+        auto ignored             = currentNodeAsParent && currentNodeAsParent->IgnoreForNodePath();
+
+        if (ignored)
+        {
+          parentsToProcess.push_back(currentNodeAsParent);
+        }
+        else if (currentChild->Name() == currentPathChunk)
+        {
+          currentPathChunk = extractNextChunk();
+
+          if (currentPathChunk.empty())
+          {
+            foundNode = currentChild;
+            break;
+          }
+
+          parentsToProcess.clear();     // Partial path found ==> ignore previously saved parent nodes
+
+          if (!currentNodeAsParent)     // Found non terminal path chunk on terminal node?
+          {
+            break;
+          }
+
+          currentChild = nullptr; // We have found node for current level (so we can ignore siblings)
+          parentsToProcess.push_back(currentNodeAsParent);  // Prepare for next parent node loop
+        }
+
+        if (currentChild)
+        {
+          currentChild = currentChild->NextSibling();
+        }
+      } // End of: siblings loop
+
+
+      if (parentsToProcess.empty())
+      {
+        break;
+      }
+
+      nextParent = parentsToProcess.front();
+      parentsToProcess.pop_front();
+    }
+  } // End of: parent nodes loop
+
+  if (notValidPath)
+  {
+    foundNode = nullptr;
+  }
+  return foundNode;
+}
+//
+//  End of: ParentNode::FindNode
 //---------------------------------------------------------------------------
 
 

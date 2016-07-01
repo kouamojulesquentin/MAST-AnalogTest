@@ -40,6 +40,8 @@ class DLL_EXPORT ParentNode : public SystemModelNode, public std::enable_shared_
 
   std::shared_ptr<ParentNode>      FindParentOfNode(std::shared_ptr<SystemModelNode> child); //!< Searches down the hierarchy, the parent of specified node
 
+  std::shared_ptr<SystemModelNode> FindNode (std::experimental::string_view path);  //!< Searches node matching specified path
+
 
   virtual void DisconnectChild(std::shared_ptr<SystemModelNode> child); //!< Disconnects specified child from its parent
 

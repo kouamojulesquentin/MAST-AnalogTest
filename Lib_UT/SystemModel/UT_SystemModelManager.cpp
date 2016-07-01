@@ -260,7 +260,6 @@ void UT_SystemModelManager::test_Constructor_EmptySystemModel ()
   //
   SystemModel sm;
 
-
   // ---------------- Exercise & Verify
   //
   TS_ASSERT_THROWS (SystemModelManager sut(sm), std::exception);
@@ -740,20 +739,20 @@ void UT_SystemModelManager::test_DoDataCycles_MIB_Multichain_Pre_Greedy ()
   ai->SetProtocol (spy);
 
   auto configureAlgo = make_shared<ConfigureAlgorithm_LastOrDefault_Greedy>();
-  SystemModelManager sut(sm, configureAlgo);
+//+  SystemModelManager sut(sm, configureAlgo);
 
-//+  auto monitor       = make_shared<SystemModelManagerMonitor>();
-//+  monitor->MonitorAfterConfiguration(true);
-//+  monitor->MonitorBeforeConfiguration(true);
-//+  monitor->GmlBasePath("MIB_Multichain_Pre_Greedy");
-//+  SystemModelManager sut(sm, configureAlgo, monitor);
-//+  g3::logEnabled(true);
+  auto monitor       = make_shared<SystemModelManagerMonitor>();
+  monitor->MonitorAfterConfiguration(true);
+  monitor->MonitorBeforeConfiguration(true);
+  monitor->GmlBasePath("MIB_Multichain_Pre_Greedy");
+  SystemModelManager sut(sm, configureAlgo, monitor);
+  g3::logEnabled(true);
 
   // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.DoDataCycles());
 
-//+  g3::logEnabled(false);
+  g3::logEnabled(false);
 
   // ---------------- Verify
   //

@@ -78,7 +78,13 @@ class UT_ParentNode : public CxxTest::TestSuite
   void test_FindParentOfNode_NoChild ();
   void test_FindParentOfNode_Nullptr ();
 
+  void test_FindNode ();
+  void test_FindNode_FromMiddle ();
+  void test_FindNode_NotValidPaths ();
+
   // ================ Other Methods ================
+
+  void setUp(); //!< Initializes test (called for each test)
 };
 //
 //  End of UT_ParentNode class declaration

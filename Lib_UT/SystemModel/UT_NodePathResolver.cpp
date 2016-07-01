@@ -44,9 +44,7 @@ shared_ptr<ParentNode> CreateSystemModel (SystemModel& sm, bool reportGml = fals
 
   if (reportGml)
   {
-    GmlPrinterVisitor gmlPrinter("NodePathResolver", GmlPrinterOptions::Std);
-    tap->Accept(gmlPrinter);
-    TS_ASSERT_EQUALS (gmlPrinter.Graph(), "");
+    TS_TRACE (GmlPrinterVisitor::Graph(tap, "NodePathResolver"));
   }
 
   return tap;

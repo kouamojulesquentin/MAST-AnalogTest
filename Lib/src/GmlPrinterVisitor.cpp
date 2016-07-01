@@ -17,6 +17,7 @@
 #include "PathSelector.hpp"
 
 #include <algorithm>
+using std::shared_ptr;
 using std::string;
 using std::experimental::string_view;
 using std::ostringstream;
@@ -346,6 +347,23 @@ string GmlPrinterVisitor::Graph ()
 //  End of: GmlPrinterVisitor::Graph
 //---------------------------------------------------------------------------
 
+
+//! Returns graph from a parent node
+//!
+//! @param topNode    Node from which graph is created
+//! @param graphName  Optional graph name
+//! @param options    Graph options
+//!
+string GmlPrinterVisitor::Graph (shared_ptr<ParentNode> topNode, string_view graphName, GmlPrinterOptions options)
+{
+  CHECK_PARAMETER_NOT_NULL(topNode, "Cannot create GML graph from nullptr");
+  GmlPrinterVisitor printer(graphName, options);
+  topNode->Accept(printer);
+  return printer.Graph();
+}
+//
+//  End of: GmlPrinterVisitor::Graph
+//---------------------------------------------------------------------------
 
 
 //! Appends AccessInterface node to GML graph

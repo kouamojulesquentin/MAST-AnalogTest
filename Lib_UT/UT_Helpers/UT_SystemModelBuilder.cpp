@@ -66,9 +66,7 @@ void UT_SystemModelBuilder::test_Create_UnitTestCase_6_Levels ()
   }
 
   // Export gml
-//+  GmlPrinterVisitor gmlPrinter("UnitTestCase_6_Levels", GmlPrinterOptions::Std);
-//+  tap->Accept(gmlPrinter);
-//+  TS_ASSERT_EQUALS (gmlPrinter.Graph(), "");
+//+  TS_TRACE (GmlPrinterVisitor::Graph(tap, "UnitTestCase_6_Levels"));
 }
 
 

@@ -867,7 +867,7 @@ void UT_SystemModelManager::test_DoDataCycles_MIB_Multichain_Post ()
 }
 
 
-//! Checks SystemModelManager::CreateApplicationThread() `...`
+//! Checks SystemModelManager::CreateApplicationThread()
 //!
 void UT_SystemModelManager::test_CreateApplicationThread ()
 {
@@ -924,6 +924,119 @@ void UT_SystemModelManager::test_CreateApplicationThread ()
     TS_ASSERT_EQUALS (sum, 5050u);
   }
 //+  g3::logEnabled(false);
+}
+
+
+//! Checks SystemModelManager::CreateApplicationThread() passing a nullptr for application top node
+//!
+void UT_SystemModelManager::test_CreateApplicationThread_Top_is_Nullptr ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder builder(sm);
+
+  auto root = builder.Create_TestCase_MIB_Multichain_Pre();
+
+  SystemModelManager sut(sm);
+
+  // ---------------- Create a do nothing functor
+  //
+  auto appFunctor = []() { };
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS (sut.CreateApplicationThread(nullptr, appFunctor), std::exception);
+}
+
+
+//! Checks SystemModelManager::iPrefix() using same thread as SystemModelManager
+//!
+void UT_SystemModelManager::test_iPrefix_Thread_is_SystemModelManager ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder builder(sm);
+
+  auto root = builder.Create_TestCase_MIB_Multichain_Pre();
+
+  auto prefix = "TAP_DR_Mux.MIB_mux";
+  SystemModelManager sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.iPrefix(prefix));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (sut.iPrefix(), prefix);
+}
+
+
+//! Checks SystemModelManager::iPrefix() using thread managed (known) by SystemModelManager
+//!
+void UT_SystemModelManager::test_iPrefix_Thread_is_Known ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder builder(sm);
+
+  auto root = builder.Create_TestCase_MIB_Multichain_Pre();
+  auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
+
+  SystemModelManager sut(sm);
+
+  auto   prefix = "MIB_mux";
+  string gotPrefix;
+
+  auto appFunctor = [prefix, &gotPrefix, &sut]()
+  {
+    // ---------------- Exercise (set & get)
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.iPrefix(prefix));
+    TS_ASSERT_THROWS_NOTHING (gotPrefix = sut.iPrefix());
+  };
+
+  sut.CreateApplicationThread(mux, appFunctor); // Include "Exercise" in created thread
+
+  // ---------------- Verify
+  //
+  sut.JoinAllApplicationThreads();  // Make sure application as done its action
+
+  CxxTest::setStringResultsOnNewLine(false);
+  TS_ASSERT_EQUALS (gotPrefix, prefix);
+}
+
+
+//! Checks SystemModelManager::iPrefix() using thread managed (known) by SystemModelManager
+//!
+void UT_SystemModelManager::test_iPrefix_Thread_is_Unknown ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder builder(sm);
+
+  auto root = builder.Create_TestCase_MIB_Multichain_Pre();
+  auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
+
+  SystemModelManager sut(sm);
+
+  auto   prefix = "MIB_mux";
+  string gotPrefix;
+
+  auto appFunctor = [prefix, &gotPrefix, &sut]()
+  {
+    // ---------------- Exercise & Verify (set & get)
+    //
+    TS_ASSERT_THROWS (sut.iPrefix(prefix),       std::exception);
+    TS_ASSERT_THROWS (gotPrefix = sut.iPrefix(), std::exception);
+  };
+
+  auto unkwnownThread = std::thread(appFunctor);
+  unkwnownThread.join();
 }
 
 //===========================================================================

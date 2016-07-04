@@ -51,7 +51,11 @@ class UT_SystemModelManager : public CxxTest::TestSuite
   void test_DoDataCycles_MIB_Multichain_Post ();
 
   void test_CreateApplicationThread ();
-//+  void test_CreateApplicationThread_Nullptr ();
+  void test_CreateApplicationThread_Top_is_Nullptr ();
+
+  void test_iPrefix_Thread_is_SystemModelManager ();
+  void test_iPrefix_Thread_is_Known ();
+  void test_iPrefix_Thread_is_Unknown ();
 
   // ================ Other Methods ================
 

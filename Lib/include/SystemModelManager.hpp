@@ -61,6 +61,7 @@ class DLL_EXPORT SystemModelManager final
     , m_fromSutUpdater       (sm)
     , m_monitor              (monitor)
     , m_managerThreadId      (std::this_thread::get_id())
+    , m_pathResolver         (sm.Root())
   {  }
 
   //! Does a complete data cycles for SystemModel as long as there are pending nodes
@@ -75,6 +76,15 @@ class DLL_EXPORT SystemModelManager final
   //! Creates an application thread
   //!
   void CreateApplicationThread(std::shared_ptr<ParentNode> applicationTopNode, Application_t functor);
+
+  //! Returns current path prefix for current thread
+  //!
+  std::string iPrefix() const;
+
+  //! Changes path prefix for calling thread
+  //!
+  void  iPrefix (std::string prefix);
+
 
   //! Waits for all application thread to terminate
   //!
@@ -105,6 +115,8 @@ class DLL_EXPORT SystemModelManager final
   using ApplicationDataMapper_t = std::map<std::thread::id, std::shared_ptr<ApplicationData>>;
 //+  using ApplicationDataMapper_t = std::map<std::thread::id, ApplicationData>;
 
+  std::shared_ptr<ApplicationData> ApplicationDataForCurrentThread() const;
+
   // ---------------- Private  Fields
   //
   private:
@@ -116,6 +128,7 @@ class DLL_EXPORT SystemModelManager final
   FromSutUpdater                             m_fromSutUpdater;       //!< In charge of updating SystemModel from bitstream from SUT
   std::shared_ptr<SystemModelManagerMonitor> m_monitor;              //!< Provides monitoring point
   const std::thread::id                      m_managerThreadId;      //!< Thread that created the manager
+  NodePathResolver                           m_pathResolver;         //!< Node path resolver for SystemModelManager thread
   ApplicationDataMapper_t                    m_applicationsData;     //!< Associates a thread id with application data for that thread
 };
 //

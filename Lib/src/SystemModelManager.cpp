@@ -24,6 +24,7 @@ using namespace mast;
 using std::shared_ptr;
 using std::make_shared;
 using std::dynamic_pointer_cast;
+using std::string;
 
 #define MONITOR(fct) if (m_monitor) m_monitor->fct;
 
@@ -38,6 +39,27 @@ SystemModelManager::~SystemModelManager ()
 //---------------------------------------------------------------------------
 
 
+//! Returns application data associated with caller thread
+//!
+shared_ptr<SystemModelManager::ApplicationData> SystemModelManager::ApplicationDataForCurrentThread () const
+{
+  auto threadId = std::this_thread::get_id();
+  auto pos      = m_applicationsData.find(threadId);
+
+  if (pos == m_applicationsData.cend())
+  {
+    THROW_LOGIC_ERROR("Calling thread is not managed by SystemModelManager");
+  }
+
+  auto data = pos->second;
+
+  return data;
+}
+//
+//  End of: SystemModelManager::ApplicationDataForCurrentThread
+//---------------------------------------------------------------------------
+
+
 //! Creates an application thread
 //!
 //! @param applicationTopNode Top most node associated with the application
@@ -45,13 +67,16 @@ SystemModelManager::~SystemModelManager ()
 //!
 void SystemModelManager::CreateApplicationThread (shared_ptr<ParentNode> applicationTopNode, Application_t functor)
 {
+  CHECK_PARAMETER_NOT_NULL(applicationTopNode, "Cannot create application thread with nullptr top node");
+
   MONITOR(CreateApplication(*applicationTopNode));
 
   auto appThread    = std::thread(functor);
+  auto appThreadId  = appThread.get_id();
   auto pathResolver = NodePathResolver(applicationTopNode);
   auto data         = make_shared<ApplicationData>(std::move(appThread), pathResolver);
 
-  m_applicationsData[appThread.get_id()] = data;
+  m_applicationsData[appThreadId] = data;
 }
 //
 //  End of: SystemModelManager::CreateApplicationThread
@@ -167,6 +192,42 @@ void SystemModelManager::JoinAllApplicationThreads ()
 //  End of: SystemModelManager::JoinAllApplicationThreads
 //---------------------------------------------------------------------------
 
+
+//! Returns current path prefix for current thread
+//!
+string SystemModelManager::iPrefix () const
+{
+  auto threadId = std::this_thread::get_id();
+
+  if (threadId == m_managerThreadId)
+  {
+    return m_pathResolver.Prefix();
+  }
+
+  RETHROW_LOGIC_ERROR(auto data = ApplicationDataForCurrentThread();
+                      return data->m_pathResolver.Prefix(), "iPrefix: Calling thread is not managed by SystemModelManager");
+}
+//
+//  End of: SystemModelManager::iPrefix
+//---------------------------------------------------------------------------
+
+
+//! Changes path prefix for calling thread
+//!
+void SystemModelManager::iPrefix (std::string prefix)
+{
+  auto threadId = std::this_thread::get_id();
+  if (threadId == m_managerThreadId)
+  {
+    return m_pathResolver.SetPrefix(std::move(prefix));
+  }
+
+  RETHROW_LOGIC_ERROR(auto data = ApplicationDataForCurrentThread();
+                      data->m_pathResolver.SetPrefix(std::move(prefix)), "iPrefix: Calling thread is not managed by SystemModelManager");
+}
+//
+//  End of: SystemModelManager::iPrefix
+//---------------------------------------------------------------------------
 
 
 //===========================================================================

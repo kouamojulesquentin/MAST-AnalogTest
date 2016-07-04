@@ -15,6 +15,7 @@
   #define UTILITY_H__AB0B55F8_1F3A_4D8D_893_CA234E5BFD9D__INCLUDED_
 
 #include "Platform.hpp"
+#include <exception>
 #include <stdexcept>
 #include <string>
 #include <experimental/string_view>
@@ -94,10 +95,27 @@ ScopeExit<F> MakeScopeExit (F f)
 //!
 #define THROW_IMPL(exc,msg)         throw exc(mast::Utility::MakeExceptionMessage(__FILE__, __func__, __LINE__, #exc, msg))
 
-#define THROW_RUNTIME_ERROR(msg)    THROW_IMPL(std::runtime_error,    msg)
 #define THROW_INVALID_ARGUMENT(msg) THROW_IMPL(std::invalid_argument, msg)
 #define THROW_LOGIC_ERROR(msg)      THROW_IMPL(std::logic_error,      msg)
 #define THROW_OUT_OF_RANGE(msg)     THROW_IMPL(std::out_of_range,     msg)
+#define THROW_RUNTIME_ERROR(msg)    THROW_IMPL(std::runtime_error,    msg)
+
+#define RETHROW_WITH_NESTED_IMPL(file, fct, line, action, exc_t, msg) \
+try             \
+{               \
+  action;       \
+}               \
+catch(exc_t&)   \
+{               \
+  std::throw_with_nested(exc_t(mast::Utility::MakeExceptionMessage(file, fct, line, #exc_t, msg))); \
+}
+
+#define RETHROW_WITH_NESTED(action, exc_t, msg) RETHROW_WITH_NESTED_IMPL(__FILE__, __func__, __LINE__, action, exc_t, msg)
+
+#define RETHROW_INVALID_ARGUMENT(action, msg) RETHROW_WITH_NESTED(action, std::invalid_argument, msg)
+#define RETHROW_LOGIC_ERROR(action, msg)      RETHROW_WITH_NESTED(action, std::logic_error,      msg)
+#define RETHROW_OUT_OF_RANGE(action, msg)     RETHROW_WITH_NESTED(action, std::out_of_range,     msg)
+#define RETHROW_RUNTIME_ERROR(action, msg)    RETHROW_WITH_NESTED(action, std::runtime_error,    msg)
 
 //! Checks that a pointer (parameter) is not nullptr, otherwise it throws an exception
 //!

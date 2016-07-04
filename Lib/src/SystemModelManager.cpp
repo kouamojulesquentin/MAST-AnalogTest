@@ -26,7 +26,9 @@ using std::make_shared;
 using std::dynamic_pointer_cast;
 using std::string;
 
-#define MONITOR(fct) if (m_monitor) m_monitor->fct;
+#define MONITOR(fct)                     if (m_monitor) m_monitor->fct;
+#define MONITOR_MESSAGE(msg)             if (m_monitor) m_monitor->LogUncondionally(msg);
+#define MONITOR_WITH_NODE(msg, node)     if (m_monitor) m_monitor->LogUncondionally(msg, node);
 
 //! Joins application threads
 //!
@@ -71,7 +73,21 @@ void SystemModelManager::CreateApplicationThread (shared_ptr<ParentNode> applica
 
   MONITOR(CreateApplication(*applicationTopNode));
 
-  auto appThread    = std::thread(functor);
+  auto wrapper = [this, applicationTopNode, functor]()
+  {
+    // ---------------- Wait for start "signal"
+    //
+    std::unique_lock<std::mutex> lk(m_appStartMutex);
+    m_appStartConditionVar.wait(lk, [this]{return m_appStarted;});
+
+    // ---------------- To actual application job
+    //
+    MONITOR_WITH_NODE("Application start with node: ", *applicationTopNode);
+    functor();
+    MONITOR_WITH_NODE("Application end with node: ", *applicationTopNode);
+  };
+
+  auto appThread    = std::thread(wrapper);
   auto appThreadId  = appThread.get_id();
   auto pathResolver = NodePathResolver(applicationTopNode);
   auto data         = make_shared<ApplicationData>(std::move(appThread), pathResolver);
@@ -179,12 +195,24 @@ shared_ptr<AccessInterface> SystemModelManager::GetFirstAccessInterface (const S
 //!
 void SystemModelManager::JoinAllApplicationThreads ()
 {
+  // ---------------- Make sure all application have been started
+  //                  (not waiting for start signal)
+  //
+  if (!m_appStarted)
+  {
+    StartCreatedApplicationThreads(); // Make sure none is still waiting to start
+  }
+
   for (const auto& item : m_applicationsData)
   {
-    auto data = item.second;
+    auto data    = item.second;
+    auto topNode = data->m_pathResolver.ReferenceNode();
+
     if (data->m_thread.joinable())
     {
+      MONITOR_WITH_NODE("Joining application thread associated with node: ", *topNode);
       data->m_thread.join();
+      MONITOR_WITH_NODE("Joined  application thread associated with node: ", *topNode);
     }
   }
 }
@@ -227,6 +255,29 @@ void SystemModelManager::iPrefix (std::string prefix)
 }
 //
 //  End of: SystemModelManager::iPrefix
+//---------------------------------------------------------------------------
+
+
+
+//! Starts all created application threads
+//!
+//! @note Application thread are configured to wait for a common start
+//!       This is done to wait for SystemModel complete creation before
+//!       any application try to use it
+//!
+void SystemModelManager::StartCreatedApplicationThreads ()
+{
+  {
+    std::lock_guard<std::mutex> lock(m_appStartMutex);
+    m_appStarted = true;
+
+    MONITOR_MESSAGE("Starting all created application threads");
+  }
+
+  m_appStartConditionVar.notify_all();
+}
+//
+//  End of: SystemModelManager::StartCreatedApplicationThreads
 //---------------------------------------------------------------------------
 
 

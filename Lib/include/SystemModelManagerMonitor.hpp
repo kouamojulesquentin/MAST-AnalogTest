@@ -33,6 +33,9 @@ class DLL_EXPORT SystemModelManagerMonitor
   virtual ~SystemModelManagerMonitor() = default;
   SystemModelManagerMonitor()  = default;
 
+  void LogUncondionally(std::experimental::string_view message);                              //!< Always log message
+  void LogUncondionally(std::experimental::string_view message, const SystemModelNode& node); //!< Always log message (in relation with a node)
+
   virtual void Reset();                                         //!< Resets data cyles counter
   virtual void CreateApplication   (const ParentNode& topNode); //!< Monitors creation of application thread
   virtual void StartDataCycles();                               //!< Monitors start of new data cycles
@@ -53,6 +56,8 @@ class DLL_EXPORT SystemModelManagerMonitor
   protected:
   std::string MakeFilePath (std::experimental::string_view basePath, std::experimental::string_view step);
   void        ExportGml    (std::experimental::string_view step, ParentNode& root);
+
+  static std::string NodeInfos    (const SystemModelNode& node);
 
   // ---------------- Private  Methods
   //

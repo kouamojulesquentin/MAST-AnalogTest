@@ -69,7 +69,7 @@ void SystemModelManagerMonitor::CreateApplication (const ParentNode& topNode)
 {
   if (m_monitorAppThreadCreation)
   {
-    LOG(INFO) << "Creating application thread with node : " << topNode.Name() << " (id: " << topNode.Identifier() << ")";
+    LOG(INFO) << "Creating application thread with node: " << topNode.Name() << " (id: " << topNode.Identifier() << ")";
   }
 }
 //
@@ -103,6 +103,32 @@ void SystemModelManagerMonitor::ExportGml (string_view step, ParentNode& root)
 //---------------------------------------------------------------------------
 
 
+//! Always log message
+//!
+//! @param message  A message to log
+//!
+void SystemModelManagerMonitor::LogUncondionally (string_view message)
+{
+  LOG(INFO) << message;
+}
+//
+//  End of: SystemModelManagerMonitor::LogUncondionally
+//---------------------------------------------------------------------------
+
+
+//! Always log message (in relation with a node)
+//!
+//! @param message  A message to log
+//!
+void SystemModelManagerMonitor::LogUncondionally (string_view message, const SystemModelNode& node)
+{
+  LOG(INFO) << message << NodeInfos(node);
+}
+//
+//  End of: SystemModelManagerMonitor::LogUncondionally
+//---------------------------------------------------------------------------
+
+
 
 //! Builds a path using a base, a step and data cycle counter
 //!
@@ -120,6 +146,17 @@ string SystemModelManagerMonitor::MakeFilePath (string_view basePath, string_vie
 }
 //
 //  End of: SystemModelManagerMonitor::MakeFilePath
+//---------------------------------------------------------------------------
+
+
+//! Returns general information for a node
+//!
+string SystemModelManagerMonitor::NodeInfos (const SystemModelNode& node)
+{
+  return node.Name() + " (id: " + std::to_string(node.Identifier()) + ")";
+}
+//
+//  End of: SystemModelManagerMonitor::NodeInfos
 //---------------------------------------------------------------------------
 
 

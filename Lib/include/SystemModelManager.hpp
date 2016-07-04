@@ -26,6 +26,8 @@
 #include <memory>
 #include <functional>
 #include <thread>
+#include <mutex>
+#include <condition_variable>
 
 namespace mast
 {
@@ -50,8 +52,8 @@ class DLL_EXPORT SystemModelManager final
   //!
   SystemModelManager(SystemModel& sm,
                      std::shared_ptr<ConfigurationAlgorithm>    configurationAlgorithm = std::make_shared<ConfigureAlgorithm_LastOrDefault>(),
-//+                     std::shared_ptr<SystemModelManagerMonitor> monitor                = std::make_shared<SystemModelManagerMonitor>()
-                     std::shared_ptr<SystemModelManagerMonitor> monitor                = nullptr
+                     std::shared_ptr<SystemModelManagerMonitor> monitor                = std::make_shared<SystemModelManagerMonitor>()
+//+                     std::shared_ptr<SystemModelManagerMonitor> monitor                = nullptr
                     )
     : m_sm                   (sm)
     , m_firstAccessInterface (GetFirstAccessInterface(sm))
@@ -77,6 +79,14 @@ class DLL_EXPORT SystemModelManager final
   //!
   void CreateApplicationThread(std::shared_ptr<ParentNode> applicationTopNode, Application_t functor);
 
+  //! Waits for all application thread to terminate
+  //!
+  void JoinAllApplicationThreads ();
+
+  //! Starts all created application threads
+  //!
+  void StartCreatedApplicationThreads ();
+
   //! Returns current path prefix for current thread
   //!
   std::string iPrefix() const;
@@ -86,9 +96,6 @@ class DLL_EXPORT SystemModelManager final
   void  iPrefix (std::string prefix);
 
 
-  //! Waits for all application thread to terminate
-  //!
-  void JoinAllApplicationThreads ();
 
   // ---------------- Protected Methods
   //
@@ -129,6 +136,9 @@ class DLL_EXPORT SystemModelManager final
   std::shared_ptr<SystemModelManagerMonitor> m_monitor;              //!< Provides monitoring point
   const std::thread::id                      m_managerThreadId;      //!< Thread that created the manager
   NodePathResolver                           m_pathResolver;         //!< Node path resolver for SystemModelManager thread
+  std::mutex                                 m_appStartMutex;        //!< Mutex to manage common start of application threads
+  std::condition_variable                    m_appStartConditionVar; //!< Variable to manage common start of application threads
+  bool                                       m_appStarted = false;   //!< True when application threads are requested to start effectively
   ApplicationDataMapper_t                    m_applicationsData;     //!< Associates a thread id with application data for that thread
 };
 //

@@ -29,6 +29,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <thread>
 #include <atomic>
 #include <chrono>
 
@@ -880,7 +881,7 @@ void UT_SystemModelManager::test_CreateApplicationThread ()
   auto mux  = sm.LinkerWithId(2u);
   TS_ASSERT_NOT_NULLPTR (mux);
 
-//+  g3::logEnabled(true);
+  g3::logEnabled(true);
 //+  auto monitor = make_shared<SystemModelManagerMonitor>();
 //+  SystemModelManager sut(sm, nullptr, monitor);
   SystemModelManager sut(sm);
@@ -890,7 +891,7 @@ void UT_SystemModelManager::test_CreateApplicationThread ()
   std::atomic_uint value;
   value = 0u;
 
-  uint32_t         sum   = 0;
+  uint32_t sum = 0;
   auto appFunctor = [&value, &sum]()
   {
     while (true)
@@ -914,7 +915,16 @@ void UT_SystemModelManager::test_CreateApplicationThread ()
 
     // ---------------- Verify
     //
-    for (uint32_t ii = 1 ; ii <= 100u ; ++ii)
+    value = 1u; // 1rst value
+    std::this_thread::sleep_for(1ms);
+    TS_ASSERT_EQUALS (sum,          0);  // Thread is not started ==> sum does not change
+    TS_ASSERT_EQUALS (value.load(), 1u); // Value is also not changed
+    sut.StartCreatedApplicationThreads();
+    std::this_thread::sleep_for(1ms);
+    TS_ASSERT_EQUALS (sum,          1u); // Thread is now started ==> sum has been updated
+    TS_ASSERT_EQUALS (value.load(), 0);  // Value has been reset
+
+    for (uint32_t ii = 2u ; ii <= 100u ; ++ii)
     {
       while (value != 0);
       value = ii;
@@ -923,7 +933,7 @@ void UT_SystemModelManager::test_CreateApplicationThread ()
 
     TS_ASSERT_EQUALS (sum, 5050u);
   }
-//+  g3::logEnabled(false);
+  g3::logEnabled(false);
 }
 
 
@@ -999,11 +1009,14 @@ void UT_SystemModelManager::test_iPrefix_Thread_is_Known ()
     TS_ASSERT_THROWS_NOTHING (gotPrefix = sut.iPrefix());
   };
 
+  g3::logEnabled(true);
   sut.CreateApplicationThread(mux, appFunctor); // Include "Exercise" in created thread
+  sut.StartCreatedApplicationThreads();
 
   // ---------------- Verify
   //
   sut.JoinAllApplicationThreads();  // Make sure application as done its action
+  g3::logEnabled(false);
 
   CxxTest::setStringResultsOnNewLine(false);
   TS_ASSERT_EQUALS (gotPrefix, prefix);

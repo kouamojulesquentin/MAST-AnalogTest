@@ -93,7 +93,8 @@ ScopeExit<F> MakeScopeExit (F f)
 
 //! Helper to format message and throw exception
 //!
-#define THROW_IMPL(exc,msg)         throw exc(mast::Utility::MakeExceptionMessage(__FILE__, __func__, __LINE__, #exc, msg))
+#define THROW_IMPL_(file, fct, line, exc, msg) throw exc(mast::Utility::MakeExceptionMessage(file, fct, line, #exc, msg))
+#define THROW_IMPL(exc,msg)                    THROW_IMPL_(__FILE__, __func__, __LINE__, exc, msg)
 
 #define THROW_INVALID_ARGUMENT(msg) THROW_IMPL(std::invalid_argument, msg)
 #define THROW_LOGIC_ERROR(msg)      THROW_IMPL(std::logic_error,      msg)

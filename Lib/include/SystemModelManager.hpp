@@ -95,7 +95,9 @@ class DLL_EXPORT SystemModelManager final
   //!
   void  iPrefix (std::string prefix);
 
-
+  //! Returns last Register value read from SUT
+  //!
+  BinaryVector iGet (std::experimental::string_view registerPath);
 
   // ---------------- Protected Methods
   //
@@ -123,6 +125,7 @@ class DLL_EXPORT SystemModelManager final
 //+  using ApplicationDataMapper_t = std::map<std::thread::id, ApplicationData>;
 
   std::shared_ptr<ApplicationData> ApplicationDataForCurrentThread() const;
+  const NodePathResolver&          PathResolver(const char* file, const char* fct, uint32_t line, std::experimental::string_view msg) const;
 
   // ---------------- Private  Fields
   //

@@ -25,10 +25,14 @@ using std::shared_ptr;
 using std::make_shared;
 using std::dynamic_pointer_cast;
 using std::string;
+using std::experimental::string_view;
 
 #define MONITOR(fct)                     if (m_monitor) m_monitor->fct;
 #define MONITOR_MESSAGE(msg)             if (m_monitor) m_monitor->LogUncondionally(msg);
 #define MONITOR_WITH_NODE(msg, node)     if (m_monitor) m_monitor->LogUncondionally(msg, node);
+
+#define PATH_RESOLVER(msg)                                        PathResolver(__FILE__, __func__, __LINE__, msg)
+#define MUTABLE_PATH_RESOLVER(msg)  const_cast<NodePathResolver&>(PathResolver(__FILE__, __func__, __LINE__, msg))
 
 //! Joins application threads
 //!
@@ -83,7 +87,18 @@ void SystemModelManager::CreateApplicationThread (shared_ptr<ParentNode> applica
     // ---------------- To actual application job
     //
     MONITOR_WITH_NODE("Application start with node: ", *applicationTopNode);
-    functor();
+    try
+    {
+      functor();
+    }
+    catch(std::exception& exc)  // Catch C++ standard exceptions
+    {
+      MONITOR_WITH_NODE("Uncaught exception '"s + exc.what() + "' from application with node: ", *applicationTopNode);
+    }
+    catch (...)
+    {
+      MONITOR_WITH_NODE("Uncaught unknown exception from application with node: ", *applicationTopNode);
+    }
     MONITOR_WITH_NODE("Application end with node: ", *applicationTopNode);
   };
 
@@ -221,19 +236,29 @@ void SystemModelManager::JoinAllApplicationThreads ()
 //---------------------------------------------------------------------------
 
 
+
+//! Returns last read value from specified register
+//!
+BinaryVector SystemModelManager::iGet (string_view registerPath)
+{
+  auto& pathResolver = PATH_RESOLVER("iGet: ");
+  auto reg           = pathResolver.ResolveAsRegister(registerPath);
+  auto readData      = reg->LastFromSut();
+
+  return readData;
+}
+//
+//  End of: SystemModelManager::iGet
+//---------------------------------------------------------------------------
+
+
+
 //! Returns current path prefix for current thread
 //!
 string SystemModelManager::iPrefix () const
 {
-  auto threadId = std::this_thread::get_id();
-
-  if (threadId == m_managerThreadId)
-  {
-    return m_pathResolver.Prefix();
-  }
-
-  RETHROW_LOGIC_ERROR(auto data = ApplicationDataForCurrentThread();
-                      return data->m_pathResolver.Prefix(), "iPrefix: Calling thread is not managed by SystemModelManager");
+  auto&  pathResolver = PATH_RESOLVER("iPrefix: ");
+  return pathResolver.Prefix();
 }
 //
 //  End of: SystemModelManager::iPrefix
@@ -244,19 +269,40 @@ string SystemModelManager::iPrefix () const
 //!
 void SystemModelManager::iPrefix (std::string prefix)
 {
-  auto threadId = std::this_thread::get_id();
-  if (threadId == m_managerThreadId)
-  {
-    return m_pathResolver.SetPrefix(std::move(prefix));
-  }
-
-  RETHROW_LOGIC_ERROR(auto data = ApplicationDataForCurrentThread();
-                      data->m_pathResolver.SetPrefix(std::move(prefix)), "iPrefix: Calling thread is not managed by SystemModelManager");
+  auto&  pathResolver = MUTABLE_PATH_RESOLVER("iPrefix: ");
+  pathResolver.SetPrefix(std::move(prefix));
 }
 //
 //  End of: SystemModelManager::iPrefix
 //---------------------------------------------------------------------------
 
+
+
+//! Returns path resolver associated with caller thread
+//!
+const NodePathResolver& SystemModelManager::PathResolver (const char* file, const char* fct, uint32_t line, string_view msg) const
+{
+  auto threadId = std::this_thread::get_id();
+
+  if (threadId == m_managerThreadId)
+  {
+    return m_pathResolver;
+  }
+
+  auto pos = m_applicationsData.find(threadId);
+
+  if (pos == m_applicationsData.cend())
+  {
+    THROW_IMPL_(file, fct, line, std::logic_error, msg.to_string() +  "Calling thread is not managed by SystemModelManager");
+  }
+
+  auto data = pos->second;
+
+  return data->m_pathResolver;
+}
+//
+//  End of: SystemModelManager::PathResolver
+//---------------------------------------------------------------------------
 
 
 //! Starts all created application threads

@@ -868,9 +868,9 @@ void UT_SystemModelManager::test_DoDataCycles_MIB_Multichain_Post ()
 }
 
 
-//! Checks SystemModelManager::CreateApplicationThread()
+//! Checks SystemModelManager::CreateApplicationThread() - Single application
 //!
-void UT_SystemModelManager::test_CreateApplicationThread ()
+void UT_SystemModelManager::test_CreateApplicationThread_1_App ()
 {
   // ---------------- Setup
   //
@@ -888,7 +888,7 @@ void UT_SystemModelManager::test_CreateApplicationThread ()
 
   // ---------------- Create a functor that tally value when not zero
   //
-  std::atomic_uint value;
+  std::atomic_uint value(0);
   value = 0u;
 
   uint32_t sum = 0;
@@ -932,6 +932,52 @@ void UT_SystemModelManager::test_CreateApplicationThread ()
     std::this_thread::sleep_for(1ms); // Just the time for the application thread to see the last value
 
     TS_ASSERT_EQUALS (sum, 5050u);
+  }
+  g3::logEnabled(false);
+}
+
+
+//! Checks SystemModelManager::CreateApplicationThread() - Two applications
+//!
+void UT_SystemModelManager::test_CreateApplicationThread_2_App ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder builder(sm);
+
+  auto root = builder.Create_TestCase_MIB_Multichain_Pre();
+  auto mux  = sm.LinkerWithId(2u);
+  TS_ASSERT_NOT_NULLPTR (mux);
+
+  g3::logEnabled(true);
+  SystemModelManager sut(sm);
+
+  // ---------------- Create a functor that tally value when not zero
+  //
+  std::atomic_uint valueApp_1(0);
+  std::atomic_uint valueApp_2(0);
+
+  auto app_1_Functor = [&valueApp_1]() { valueApp_1 = 13u; };
+  auto app_2_Functor = [&valueApp_2]() { valueApp_2 = 37u; };
+
+  // ---------------- Exercise
+  //  There is an artificial block scope too wait for sut destructor
+  {
+    TS_ASSERT_THROWS_NOTHING (sut.CreateApplicationThread(mux, app_1_Functor));
+    TS_ASSERT_THROWS_NOTHING (sut.CreateApplicationThread(mux, app_2_Functor));
+
+    // ---------------- Verify
+    //
+    std::this_thread::sleep_for(1ms); // To let threads to be started
+    TS_ASSERT_EQUALS (valueApp_1.load(), 0u);
+    TS_ASSERT_EQUALS (valueApp_2.load(), 0u);
+
+    sut.StartCreatedApplicationThreads(); // Do effectively start both application threads
+
+    std::this_thread::sleep_for(1ms); // Let application threads to their job
+    TS_ASSERT_EQUALS (valueApp_1.load(), 13u);
+    TS_ASSERT_EQUALS (valueApp_2.load(), 37u);
   }
   g3::logEnabled(false);
 }
@@ -1009,21 +1055,21 @@ void UT_SystemModelManager::test_iPrefix_Thread_is_Known ()
     TS_ASSERT_THROWS_NOTHING (gotPrefix = sut.iPrefix());
   };
 
-  g3::logEnabled(true);
+//+  g3::logEnabled(true);
   sut.CreateApplicationThread(mux, appFunctor); // Include "Exercise" in created thread
   sut.StartCreatedApplicationThreads();
 
   // ---------------- Verify
   //
   sut.JoinAllApplicationThreads();  // Make sure application as done its action
-  g3::logEnabled(false);
+//+  g3::logEnabled(false);
 
   CxxTest::setStringResultsOnNewLine(false);
   TS_ASSERT_EQUALS (gotPrefix, prefix);
 }
 
 
-//! Checks SystemModelManager::iPrefix() using thread managed (known) by SystemModelManager
+//! Checks SystemModelManager::iPrefix() using thread not managed (unknown) by SystemModelManager
 //!
 void UT_SystemModelManager::test_iPrefix_Thread_is_Unknown ()
 {
@@ -1051,6 +1097,114 @@ void UT_SystemModelManager::test_iPrefix_Thread_is_Unknown ()
   auto unkwnownThread = std::thread(appFunctor);
   unkwnownThread.join();
 }
+
+
+//! Checks SystemModelManager::iGet() using same thread as SystemModelManager
+//!
+void UT_SystemModelManager::test_iGet_Thread_is_SystemModelManager ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder builder(sm);
+
+  auto root = builder.Create_TestCase_MIB_Multichain_Pre();
+  auto reg  = sm.RegisterWithId(7u);
+  reg->SetFromSut(BinaryVector::CreateFromHexString("ABCD_0123"));
+
+  SystemModelManager sut(sm);
+  sut.iPrefix("TAP_DR_Mux.MIB_mux");
+
+  // ---------------- Exercise
+  //
+  auto lastFromSut = sut.iGet("dynamic_1");
+
+  // ---------------- Verify
+  //
+  auto expected = BinaryVector::CreateFromHexString("ABCD_0123");
+  TS_ASSERT_EQUALS (lastFromSut, expected);
+}
+
+
+//! Checks SystemModelManager::iGet() using thread managed (known) by SystemModelManager
+//!
+void UT_SystemModelManager::test_iGet_Thread_is_Known ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder builder(sm);
+
+  auto root = builder.Create_TestCase_MIB_Multichain_Pre();
+  auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
+  auto reg  = sm.RegisterWithId(7u);
+  reg->SetFromSut(BinaryVector::CreateFromHexString("ABCD_0123"));
+
+  SystemModelManager sut(sm);
+
+  // Thread functor
+  auto appFunctor = [&sut]()
+  {
+    // ---------------- Setup
+    //
+    sut.iPrefix("MIB_mux");
+
+    // ---------------- Exercise
+    //
+    auto lastFromSut = sut.iGet("dynamic_1");
+
+    // ---------------- Verify
+    //
+    CxxTest::setStringResultsOnNewLine(false);
+    auto expected = BinaryVector::CreateFromHexString("ABCD_0123");
+    TS_ASSERT_EQUALS (lastFromSut, expected);
+  };
+
+  g3::logEnabled(true);
+  sut.CreateApplicationThread(mux, appFunctor); // Include "Exercise" in created thread
+  sut.StartCreatedApplicationThreads();
+
+  // ---------------- Verify
+  //
+  sut.JoinAllApplicationThreads();  // Make sure application as done its action
+  g3::logEnabled(false);
+}
+
+
+//! Checks SystemModelManager::iGet() using thread not managed (unknown) by SystemModelManager
+//!
+void UT_SystemModelManager::test_iGet_Thread_is_Unknown ()
+{
+  // ---------------- Setup (cxxtest thread)
+  //
+  SystemModel        sm;
+  SystemModelBuilder builder(sm);
+
+  auto root = builder.Create_TestCase_MIB_Multichain_Pre();
+  auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
+  auto reg  = sm.RegisterWithId(7u);
+  reg->SetFromSut(BinaryVector::CreateFromHexString("ABCD_0123"));
+
+  SystemModelManager sut(sm);
+
+  // Thread functor
+  auto appFunctor = [&sut]()
+  {
+    // ---------------- Exercise & Verify (functor thread)
+    //
+    TS_ASSERT_THROWS (sut.iGet("MIB_mux.dynamic_1"), std::exception);
+  };
+
+  // Start thread
+  g3::logEnabled(true);
+  auto unkwnownThread = std::thread(appFunctor);
+  unkwnownThread.join();
+
+  // Wait end of thread
+  sut.JoinAllApplicationThreads();  // Make sure application as done its action
+  g3::logEnabled(false);
+}
+
 
 //===========================================================================
 // End of UT_SystemModelManager.cpp

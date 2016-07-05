@@ -13,13 +13,13 @@
 
 #include "NodePathResolver.hpp"
 #include "Utility.hpp"
-#include <deque>
+#include "Register.hpp"
 
 using std::shared_ptr;
 using std::dynamic_pointer_cast;
-using std::deque;
 using std::string;
 using std::experimental::string_view;
+using std::to_string;
 using namespace mast;
 
 //! Initializes the resolver with a reference node
@@ -48,7 +48,7 @@ NodePathResolver::NodePathResolver(shared_ptr<ParentNode> referenceNode)
 //!
 //! @return Found node or nullptr
 //!
-shared_ptr<SystemModelNode> NodePathResolver::Resolve (string_view path)
+shared_ptr<SystemModelNode> NodePathResolver::Resolve (string_view path) const
 {
   auto pos = m_cache.find(path.to_string());
   if (pos != m_cache.end())
@@ -68,6 +68,30 @@ shared_ptr<SystemModelNode> NodePathResolver::Resolve (string_view path)
 //
 //  End of: NodePathResolver::Resolve
 //---------------------------------------------------------------------------
+
+
+
+//! Finds Register with relative path from "prefix" or "reference" node
+//!
+//! @param path Path of Register relative to "prefix" node or "reference" node when there is no prefix
+//!
+//! @return    Found Register
+//! @exception std::invalid_argument when path do not denote a Register
+shared_ptr<Register> NodePathResolver::ResolveAsRegister (string_view registerPath) const
+{
+  auto node = Resolve(registerPath);
+  auto reg  = dynamic_pointer_cast<Register>(node);
+
+  if (!reg)
+  {
+    THROW_INVALID_ARGUMENT("Path: '"s + registerPath.to_string() + "' does not refer to a Register" );
+  }
+  return reg;
+}
+//
+//  End of: NodePathResolver::ResolveAsRegister
+//---------------------------------------------------------------------------
+
 
 //! Changes path prefix (relative to reference node)
 //!

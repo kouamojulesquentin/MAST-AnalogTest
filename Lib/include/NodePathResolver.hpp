@@ -24,6 +24,8 @@
 
 namespace mast
 {
+class Register;
+
 //! Associates paths with actual nodes
 //! @note Path are defined relative to a, fix, reference node
 //!       User can register at will a prefix that is a path relative to reference node
@@ -44,10 +46,12 @@ class DLL_EXPORT NodePathResolver final
 
   //! Finds node with relative path from "prefix" or "reference" node
   //!
-  //! @param path Path of node relative to "prefix" node or "reference" node when there is no prefix
+  std::shared_ptr<SystemModelNode> Resolve (std::experimental::string_view path) const;
+
+
+  //! Finds Register with relative path from "prefix" or "reference" node
   //!
-  //! @return Found node or nullptr
-  std::shared_ptr<SystemModelNode> Resolve (std::experimental::string_view path);
+  std::shared_ptr<Register> ResolveAsRegister (std::experimental::string_view registerPath) const;
 
   //! Returns current path prefix
   //!
@@ -64,7 +68,7 @@ class DLL_EXPORT NodePathResolver final
 
   std::shared_ptr<ParentNode> m_referenceNode; //!< Reference node for paths
   std::shared_ptr<ParentNode> m_prefixNode;    //!< Node associated with prefix (equals m_rootNode when prefix is empty)
-  Cache_t                     m_cache;
+  mutable Cache_t             m_cache;         //!< Cache to speed up resolving recurrent paths
   std::string                 m_prefix;        //!< Path prefix (relative path from reference node)
 };
 //

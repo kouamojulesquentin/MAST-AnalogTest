@@ -924,7 +924,7 @@ void UT_SystemModelManager::test_CreateApplicationThread_1_App ()
       while (value != 0);
       value = ii;
     }
-    std::this_thread::sleep_for(1ms); // Just the time for the application thread to see the last value
+    sut.JoinAllApplicationThreads();  // Make sure the application thread has seen the last value
 
     TS_ASSERT_EQUALS (sum, 5050u);
   }

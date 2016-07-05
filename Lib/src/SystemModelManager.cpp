@@ -20,12 +20,18 @@
 #include "Utility.hpp"
 #include "SystemModelManagerMonitor.hpp"
 
+
 using namespace mast;
 using std::shared_ptr;
 using std::make_shared;
 using std::dynamic_pointer_cast;
 using std::string;
 using std::experimental::string_view;
+using std::mutex;
+using std::shared_timed_mutex;
+using std::lock_guard;
+using std::unique_lock;
+using std::shared_lock;
 
 #define MONITOR(fct)                     if (m_monitor) m_monitor->fct;
 #define MONITOR_MESSAGE(msg)             if (m_monitor) m_monitor->LogUncondionally(msg);
@@ -49,6 +55,8 @@ SystemModelManager::~SystemModelManager ()
 //!
 shared_ptr<SystemModelManager::ApplicationData> SystemModelManager::ApplicationDataForCurrentThread () const
 {
+   shared_lock<shared_timed_mutex> lock(m_appDataMutex); // Shared lock is enough for read concurrency
+
   auto threadId = std::this_thread::get_id();
   auto pos      = m_applicationsData.find(threadId);
 
@@ -107,6 +115,7 @@ void SystemModelManager::CreateApplicationThread (shared_ptr<ParentNode> applica
   auto pathResolver = NodePathResolver(applicationTopNode);
   auto data         = make_shared<ApplicationData>(std::move(appThread), pathResolver);
 
+  unique_lock<shared_timed_mutex> lock(m_appDataMutex);
   m_applicationsData[appThreadId] = data;
 }
 //
@@ -218,6 +227,7 @@ void SystemModelManager::JoinAllApplicationThreads ()
     StartCreatedApplicationThreads(); // Make sure none is still waiting to start
   }
 
+  shared_lock<shared_timed_mutex> lock(m_appDataMutex); // Shared lock is enough for read concurrency
   for (const auto& item : m_applicationsData)
   {
     auto data    = item.second;
@@ -233,6 +243,30 @@ void SystemModelManager::JoinAllApplicationThreads ()
 }
 //
 //  End of: SystemModelManager::JoinAllApplicationThreads
+//---------------------------------------------------------------------------
+
+
+//! Executes queued operations
+//!
+void SystemModelManager::iApply ()
+{
+  auto threadId = std::this_thread::get_id();
+
+  if (threadId == m_managerThreadId)  // Single thread context?
+  {
+    DoDataCycles();
+  }
+  else
+  {
+    auto data = ApplicationDataForCurrentThread();
+
+
+  }
+
+
+}
+//
+//  End of: SystemModelManager::iApply
 //---------------------------------------------------------------------------
 
 
@@ -304,8 +338,9 @@ const NodePathResolver& SystemModelManager::PathResolver (const char* file, cons
     return m_pathResolver;
   }
 
-  auto pos = m_applicationsData.find(threadId);
+  shared_lock<shared_timed_mutex> lock(m_appDataMutex); // Shared lock is enough for read concurrency
 
+  auto pos = m_applicationsData.find(threadId);
   if (pos == m_applicationsData.cend())
   {
     THROW_IMPL_(file, fct, line, std::logic_error, msg.to_string() +  "Calling thread is not managed by SystemModelManager");

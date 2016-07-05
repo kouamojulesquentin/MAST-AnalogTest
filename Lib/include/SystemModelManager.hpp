@@ -27,6 +27,7 @@
 #include <functional>
 #include <thread>
 #include <mutex>
+#include <shared_mutex>
 #include <condition_variable>
 
 namespace mast
@@ -87,6 +88,10 @@ class DLL_EXPORT SystemModelManager final
   //!
   void StartCreatedApplicationThreads ();
 
+  //! Executes queued operations
+  //!
+  void iApply();
+
   //! Returns current path prefix for current thread
   //!
   std::string iPrefix() const;
@@ -122,8 +127,10 @@ class DLL_EXPORT SystemModelManager final
     {
     }
 
-    std::thread      m_thread;
-    NodePathResolver m_pathResolver;
+    std::thread             m_thread;               //!< Used to join application thread
+    std::condition_variable m_cv;                   //!< Wait mecanism (it is specific to application thread to avoid missing notification)
+    bool                    m_canProcessed = true;  //!< When true, application thread can return from iApply
+    NodePathResolver        m_pathResolver;         //!< One per application thread to point to different node, have different prefix and cache
   };
 
   using ApplicationDataMapper_t = std::map<std::thread::id, std::shared_ptr<ApplicationData>>;
@@ -147,6 +154,7 @@ class DLL_EXPORT SystemModelManager final
   std::condition_variable                    m_appStartConditionVar; //!< Variable to manage common start of application threads
   bool                                       m_appStarted = false;   //!< True when application threads are requested to start effectively
   ApplicationDataMapper_t                    m_applicationsData;     //!< Associates a thread id with application data for that thread
+  mutable std::shared_timed_mutex            m_appDataMutex;         //!< Mutex to manage concurrency of applications data (mutable to be used within const methods)
 };
 //
 //  End of SystemModelManager class declaration

@@ -783,8 +783,7 @@ void UT_SystemModelManager::test_DoDataCycles_MIB_Multichain_Pre_Lazy ()
   //
   SystemModel sm;
 
-  auto ai = Create_TestCase_MIB_Multichain_Pre(sm, false);
-
+  auto ai  = Create_TestCase_MIB_Multichain_Pre(sm, false);
   auto spy = make_shared<Spy_AccessInterfaceProtocols>();
   ai->SetProtocol (spy);
 
@@ -874,16 +873,12 @@ void UT_SystemModelManager::test_CreateApplicationThread_1_App ()
 {
   // ---------------- Setup
   //
-  SystemModel        sm;
-  SystemModelBuilder builder(sm);
-
-  auto root = builder.Create_TestCase_MIB_Multichain_Pre();
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
   auto mux  = sm.LinkerWithId(2u);
   TS_ASSERT_NOT_NULLPTR (mux);
 
-  g3::logEnabled(true);
-//+  auto monitor = make_shared<SystemModelManagerMonitor>();
-//+  SystemModelManager sut(sm, nullptr, monitor);
+//+  g3::logEnabled(true);
   SystemModelManager sut(sm);
 
   // ---------------- Create a functor that tally value when not zero
@@ -943,10 +938,8 @@ void UT_SystemModelManager::test_CreateApplicationThread_2_App ()
 {
   // ---------------- Setup
   //
-  SystemModel        sm;
-  SystemModelBuilder builder(sm);
-
-  auto root = builder.Create_TestCase_MIB_Multichain_Pre();
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
   auto mux  = sm.LinkerWithId(2u);
   TS_ASSERT_NOT_NULLPTR (mux);
 
@@ -974,8 +967,8 @@ void UT_SystemModelManager::test_CreateApplicationThread_2_App ()
     TS_ASSERT_EQUALS (valueApp_2.load(), 0u);
 
     sut.StartCreatedApplicationThreads(); // Do effectively start both application threads
+    sut.JoinAllApplicationThreads();      // Make sure application have done their job
 
-    std::this_thread::sleep_for(1ms); // Let application threads to their job
     TS_ASSERT_EQUALS (valueApp_1.load(), 13u);
     TS_ASSERT_EQUALS (valueApp_2.load(), 37u);
   }
@@ -989,10 +982,8 @@ void UT_SystemModelManager::test_CreateApplicationThread_Top_is_Nullptr ()
 {
   // ---------------- Setup
   //
-  SystemModel        sm;
-  SystemModelBuilder builder(sm);
-
-  auto root = builder.Create_TestCase_MIB_Multichain_Pre();
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
 
   SystemModelManager sut(sm);
 
@@ -1012,10 +1003,8 @@ void UT_SystemModelManager::test_iPrefix_Thread_is_SystemModelManager ()
 {
   // ---------------- Setup
   //
-  SystemModel        sm;
-  SystemModelBuilder builder(sm);
-
-  auto root = builder.Create_TestCase_MIB_Multichain_Pre();
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
 
   auto prefix = "TAP_DR_Mux.MIB_mux";
   SystemModelManager sut(sm);
@@ -1036,10 +1025,8 @@ void UT_SystemModelManager::test_iPrefix_Thread_is_Known ()
 {
   // ---------------- Setup
   //
-  SystemModel        sm;
-  SystemModelBuilder builder(sm);
-
-  auto root = builder.Create_TestCase_MIB_Multichain_Pre();
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
   auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
 
   SystemModelManager sut(sm);
@@ -1075,10 +1062,9 @@ void UT_SystemModelManager::test_iPrefix_Thread_is_Unknown ()
 {
   // ---------------- Setup
   //
-  SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
 
-  auto root = builder.Create_TestCase_MIB_Multichain_Pre();
   auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
 
   SystemModelManager sut(sm);
@@ -1105,10 +1091,9 @@ void UT_SystemModelManager::test_iGet_Thread_is_SystemModelManager ()
 {
   // ---------------- Setup
   //
-  SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
 
-  auto root = builder.Create_TestCase_MIB_Multichain_Pre();
   auto reg  = sm.RegisterWithId(7u);
   reg->SetFromSut(BinaryVector::CreateFromHexString("ABCD_0123"));
 
@@ -1132,10 +1117,9 @@ void UT_SystemModelManager::test_iGet_Thread_is_Known ()
 {
   // ---------------- Setup
   //
-  SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
 
-  auto root = builder.Create_TestCase_MIB_Multichain_Pre();
   auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
   auto reg  = sm.RegisterWithId(7u);
   reg->SetFromSut(BinaryVector::CreateFromHexString("ABCD_0123"));
@@ -1177,11 +1161,9 @@ void UT_SystemModelManager::test_iGet_Thread_is_Unknown ()
 {
   // ---------------- Setup (cxxtest thread)
   //
-  SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
 
-  auto root = builder.Create_TestCase_MIB_Multichain_Pre();
-  auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
   auto reg  = sm.RegisterWithId(7u);
   reg->SetFromSut(BinaryVector::CreateFromHexString("ABCD_0123"));
 
@@ -1204,6 +1186,104 @@ void UT_SystemModelManager::test_iGet_Thread_is_Unknown ()
   sut.JoinAllApplicationThreads();  // Make sure application as done its action
   g3::logEnabled(false);
 }
+
+
+//! Checks SystemModelManager::iWrite() using same thread as SystemModelManager
+//!
+void UT_SystemModelManager::test_iWrite_Thread_is_SystemModelManager ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto reg  = sm.RegisterWithId(7u);
+
+  SystemModelManager sut(sm);
+  sut.iPrefix("TAP_DR_Mux.MIB_mux");
+
+  auto nextToSut = BinaryVector::CreateFromHexString("ABCD_4567");
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.iWrite("dynamic_1", nextToSut));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (reg->NextToSut(), nextToSut);
+}
+
+
+//! Checks SystemModelManager::iWrite() using thread managed (known) by SystemModelManager
+//!
+void UT_SystemModelManager::test_iWrite_Thread_is_Known ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
+  auto reg  = sm.RegisterWithId(9u);
+
+  SystemModelManager sut(sm);
+
+  // Thread functor
+  auto appFunctor = [&sut]()
+  {
+    // ---------------- Setup
+    //
+    auto nextToSut = BinaryVector::CreateFromHexString("FADE_CAFE");
+    sut.iPrefix("MIB_mux");
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.iWrite("dynamic_3", nextToSut));
+  };
+
+  // ---------------- Setup (main thread)
+  //
+  g3::logEnabled(true);
+  sut.CreateApplicationThread(mux, appFunctor); // Include "Exercise" in created thread
+  sut.StartCreatedApplicationThreads();
+  sut.JoinAllApplicationThreads();  // Make sure application as done its action
+  g3::logEnabled(false);
+
+  // ---------------- Verify
+  //
+  auto expected = BinaryVector::CreateFromHexString("FADE_CAFE");
+  TS_ASSERT_EQUALS (reg->NextToSut(), expected);
+}
+
+
+//! Checks SystemModelManager::iWrite() using thread not managed (unknown) by SystemModelManager
+//!
+void UT_SystemModelManager::test_iWrite_Thread_is_Unknown ()
+{
+  // ---------------- Setup (main thread)
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  SystemModelManager sut(sm);
+
+  // Thread functor
+  auto appFunctor = [&sut]()
+  {
+    // ---------------- Setup
+    //
+    auto nextToSut = BinaryVector::CreateFromHexString("2BAD_CAFE");
+
+    // ---------------- Exercise & Verify (functor thread)
+    //
+    TS_ASSERT_THROWS (sut.iWrite("MIB_mux.dynamic_0", nextToSut), std::exception);
+  };
+
+  // Start thread
+  auto unkwnownThread = std::thread(appFunctor);
+  unkwnownThread.join();
+}
+
 
 
 //===========================================================================

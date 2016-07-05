@@ -99,6 +99,11 @@ class DLL_EXPORT SystemModelManager final
   //!
   BinaryVector iGet (std::experimental::string_view registerPath);
 
+  //! Sets next Register value to sent to SUT
+  //!
+  void iWrite (std::experimental::string_view registerPath, BinaryVector sequence);
+
+
   // ---------------- Protected Methods
   //
   protected:
@@ -122,7 +127,6 @@ class DLL_EXPORT SystemModelManager final
   };
 
   using ApplicationDataMapper_t = std::map<std::thread::id, std::shared_ptr<ApplicationData>>;
-//+  using ApplicationDataMapper_t = std::map<std::thread::id, ApplicationData>;
 
   std::shared_ptr<ApplicationData> ApplicationDataForCurrentThread() const;
   const NodePathResolver&          PathResolver(const char* file, const char* fct, uint32_t line, std::experimental::string_view msg) const;

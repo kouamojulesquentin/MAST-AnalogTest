@@ -278,6 +278,21 @@ void SystemModelManager::iPrefix (std::string prefix)
 
 
 
+//! Sets next Register value to sent to SUT
+//!
+void SystemModelManager::iWrite (string_view registerPath, BinaryVector sequence)
+{
+  auto& pathResolver = PATH_RESOLVER("iWrite: ");
+  auto reg           = pathResolver.ResolveAsRegister(registerPath);
+
+  reg->SetToSut(std::move(sequence));
+}
+//
+//  End of: SystemModelManager::iWrite
+//---------------------------------------------------------------------------
+
+
+
 //! Returns path resolver associated with caller thread
 //!
 const NodePathResolver& SystemModelManager::PathResolver (const char* file, const char* fct, uint32_t line, string_view msg) const

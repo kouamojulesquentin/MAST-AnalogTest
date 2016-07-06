@@ -66,6 +66,12 @@ class UT_SystemModelManager : public CxxTest::TestSuite
   void test_iWrite_Thread_is_Known ();
   void test_iWrite_Thread_is_Unknown ();
 
+  void test_iApply_Thread_is_SystemModelManager ();
+  void test_iApply_Thread_is_SystemModelManager_NoPending ();
+  void test_iApply_Thread_is_Known ();
+  void test_iApply_Thread_is_Known_NoPending ();
+  void test_iApply_Thread_is_Unknown ();
+
   // ================ Other Methods ================
 
   void setUp(); //!< Initializes test (called for each test)

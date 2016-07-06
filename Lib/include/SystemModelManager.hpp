@@ -24,6 +24,7 @@
 #include "SystemModelManagerMonitor.hpp"
 
 #include <memory>
+#include <set>
 #include <functional>
 #include <thread>
 #include <mutex>
@@ -62,9 +63,10 @@ class DLL_EXPORT SystemModelManager final
     , m_propagator           ()
     , m_toSutVisitor         ()
     , m_fromSutUpdater       (sm)
+    , m_pathResolver         (sm.Root())
     , m_monitor              (monitor)
     , m_managerThreadId      (std::this_thread::get_id())
-    , m_pathResolver         (sm.Root())
+    , m_constructionThreadId (std::this_thread::get_id())
   {  }
 
   //! Does a complete data cycles for SystemModel as long as there are pending nodes
@@ -87,6 +89,18 @@ class DLL_EXPORT SystemModelManager final
   //! Starts all created application threads
   //!
   void StartCreatedApplicationThreads ();
+
+  //! Starts periodical (or on iApply) loop of complete data cycles on calling thread
+  //!
+  void Start ();
+
+  //! Starts periodical (or on iApply) loop of complete data cycles on a new thread
+  //!
+  void StartInBackground ();
+
+  //! Stops data cycle loop
+  //!
+  void Stop ();
 
   //! Executes queued operations
   //!
@@ -119,42 +133,67 @@ class DLL_EXPORT SystemModelManager final
   //
   private:
 
+  using NodeIdentifier = SystemModelNode::NodeIdentifier;
+
   struct ApplicationData
   {
-    ApplicationData(std::thread appThread, NodePathResolver pathResolver)
-      : m_thread       (std::move(appThread))
-      , m_pathResolver (pathResolver)
+    ApplicationData(std::thread p_appThread, NodePathResolver p_pathResolver)
+      : appThread    (std::move(p_appThread))
+      , pathResolver (p_pathResolver)
     {
     }
 
-    std::thread             m_thread;               //!< Used to join application thread
-    std::condition_variable m_cv;                   //!< Wait mecanism (it is specific to application thread to avoid missing notification)
-    bool                    m_canProcessed = true;  //!< When true, application thread can return from iApply
-    NodePathResolver        m_pathResolver;         //!< One per application thread to point to different node, have different prefix and cache
+    std::thread              appThread;           //!< Used to join application thread
+    std::mutex               releaseMutex;        //!< Associated with condition variable to block/release pending threads (in iApply)
+    std::condition_variable  releaseCv;           //!< Wait mecanism (it is specific to application thread to avoid missing notification)
+    bool                     canProceed = true; //!< When true, application thread can return from iApply
+    NodePathResolver         pathResolver;        //!< One per application thread to point to different node, have different prefix and cache
+    std::set<NodeIdentifier> pendingRegistersIds; //!< Pending registers for application thread
   };
 
-  using ApplicationDataMapper_t = std::map<std::thread::id, std::shared_ptr<ApplicationData>>;
+  using ThreadToAppDataMapper_t = std::map<std::thread::id,     std::shared_ptr<ApplicationData>>;
+  using RegIdToAppDataMapper_t  = std::multimap<NodeIdentifier, std::shared_ptr<ApplicationData>>;
 
-  std::shared_ptr<ApplicationData> ApplicationDataForCurrentThread() const;
+  std::shared_ptr<ApplicationData> ApplicationDataForThreadId (std::thread::id threadId) const;
+  std::shared_ptr<ApplicationData> ThreadApplicationData() const { return ApplicationDataForThreadId(std::this_thread::get_id()); }
+
+
   const NodePathResolver&          PathResolver(const char* file, const char* fct, uint32_t line, std::experimental::string_view msg) const;
+
+  void LoopOnDataCycle ();
+  void DoDataCycles_Impl ();
+  void ReleaseServedThreads ();
+  void ReportServedRegisters (const std::vector<NodeIdentifier>& activeRegisters);
+  void WakeupDataCycles ();
 
   // ---------------- Private  Fields
   //
   private:
+  // Data cycle support
   SystemModel&                               m_sm;                   //!< The system model to manage
   std::shared_ptr<AccessInterface>           m_firstAccessInterface; //!< The first AccessInterface of the system
   ConfigureVisitor                           m_configurator;         //!< In charge of configuration
   PropagatePendingVisitor                    m_propagator;           //!< In charge of propagating pending status bottom up
   ToSutVisitor                               m_toSutVisitor;         //!< In charge of collecting bitstream to SUT
   FromSutUpdater                             m_fromSutUpdater;       //!< In charge of updating SystemModel from bitstream from SUT
-  std::shared_ptr<SystemModelManagerMonitor> m_monitor;              //!< Provides monitoring point
-  const std::thread::id                      m_managerThreadId;      //!< Thread that created the manager
   NodePathResolver                           m_pathResolver;         //!< Node path resolver for SystemModelManager thread
-  std::mutex                                 m_appStartMutex;        //!< Mutex to manage common start of application threads
-  std::condition_variable                    m_appStartConditionVar; //!< Variable to manage common start of application threads
-  bool                                       m_appStarted = false;   //!< True when application threads are requested to start effectively
-  ApplicationDataMapper_t                    m_applicationsData;     //!< Associates a thread id with application data for that thread
-  mutable std::shared_timed_mutex            m_appDataMutex;         //!< Mutex to manage concurrency of applications data (mutable to be used within const methods)
+  std::shared_ptr<SystemModelManagerMonitor> m_monitor;              //!< Provides monitoring point
+
+  // Multithreading support
+  std::thread                     m_managerThread;        //!< Background thread for data cycle loop
+  std::thread::id                 m_managerThreadId;      //!< Manager thread identifier (when constructed or when running data cycle loop in a background thread)
+  const std::thread::id           m_constructionThreadId; //!< Thread identifier when constructed
+  std::mutex                      m_appStartMutex;        //!< Associated to condition variable for common start of application threads
+  std::condition_variable         m_appStartConditionVar; //!< Variable to manage common start of application threads
+  bool                            m_appStarted = false;   //!< True when application threads are requested to start effectively
+  std::mutex                      m_loopMutex;            //!< Associated to condition variable to manage restart of data cycle loop
+  std::condition_variable         m_loopCV;               //!< Variable to manage restart of data cycle loop
+  bool                            m_runLoop    = false;   //!< True when data cycle loop is active
+  mutable std::shared_timed_mutex m_appDataMutex;         //!< Protects access to applications data (mutable to be used within const methods)
+  ThreadToAppDataMapper_t         m_threadToAppData;      //!< Associates a thread id with application data for that thread
+  RegIdToAppDataMapper_t          m_regIdToAppData;       //!< Associates a register id with application data for threadS that are pending on that register
+  mutable std::shared_timed_mutex m_pendingThreadMutex;   //!< Protects access to m_pendingThreads
+  std::set<std::thread::id>       m_pendingThreads;       //!< Identifies threads that must be paused in iApply
 };
 //
 //  End of SystemModelManager class declaration

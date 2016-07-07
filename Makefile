@@ -6,7 +6,7 @@ CMAKE_ARM_BUILD_DIR = cmake_arm
 
 CMAKE_DEBUG_BUILD_MAKEFILE =$(CMAKE_DEBUG_BUILD_DIR)/Makefile
 
-CMAKE_FLAGS=  -DCMAKE_CXX_COMPILER=g++-4.9
+CMAKE_FLAGS=  -DCMAKE_CXX_COMPILER=g++
 
 CMAKE_DEBUG_FLAGS=  -DCMAKE_BUILD_TYPE=Debug $(CMAKE_FLAGS)
 CMAKE_RELEASE_FLAGS=  -DCMAKE_BUILD_TYPE=Debug $(CMAKE_FLAGS)
@@ -14,6 +14,8 @@ CMAKE_RELEASE_FLAGS=  -DCMAKE_BUILD_TYPE=Debug $(CMAKE_FLAGS)
 CMAKE_ARM_FLAGS=  -D CMAKE_TOOLCHAIN_FILE=Toolchain-arm.cmake
 
 MAKE_FLAGS= -j4
+
+RUNNER=Lib_UT_Runner
 
 all: debug
 
@@ -30,6 +32,23 @@ ifeq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR))","")
 > cd $(CMAKE_RELEASE_BUILD_DIR) && cmake  $(CMAKE_RELEASE_FLAGS)  ..
 endif
 > cd $(CMAKE_RELEASE_BUILD_DIR) && make  $(MAKE_FLAGS)
+
+run_debug:
+ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(RUNNER))","")
+>  cd $(CMAKE_DEBUG_BUILD_DIR) && ./$(RUNNER) ;
+else
+>  @echo "		====No Debug build available ========"
+endif
+
+run_release:
+ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(RUNNER))","")
+>  cd $(CMAKE_RELEASE_BUILD_DIR) && ./$(RUNNER) ;
+else
+>  @echo "		====No Release build available ========"
+endif
+
+run_arm:
+>  @echo "		====No run defined for ARM build (needs qemu) ========"
 
 arm:
 ifeq ("$(wildcard $(CMAKE_ARM_BUILD_DIR))","")

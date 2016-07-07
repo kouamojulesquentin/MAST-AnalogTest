@@ -2,7 +2,7 @@
 ### include(CMakeForceCompiler)
 ### # Prefix detection only works with compiler id "GNU"
 ### # CMake will look for prefixed g++, cpp, ld, etc. automatically
-### CMAKE_FORCE_CXX_COMPILER(arm-none-eabi-g++ GNU)
+### CMAKE_FORCE_CXX_COMPILER( arm-linux-gnueabihf-g++ GNU)
 
 
 # this one is important
@@ -11,8 +11,8 @@ SET(CMAKE_SYSTEM_NAME Linux)
 SET(CMAKE_SYSTEM_VERSION 1)
 
 # specify the cross compiler
-SET(CMAKE_C_COMPILER   /usr/bin/arm-none-eabi-gcc)
-SET(CMAKE_CXX_COMPILER /usr/bin/arm-none-eabi-g++)
+SET(CMAKE_C_COMPILER   /usr/bin/arm-linux-gnueabihf-gcc)
+SET(CMAKE_CXX_COMPILER /usr/bin/arm-linux-gnueabihf-g++)
 
 # where is the target environment 
 SET(CMAKE_FIND_ROOT_PATH  /usr/bin/)
@@ -27,6 +27,6 @@ INCLUDE(CMakeForceCompiler)
 
 
 # specify the cross compiler
-CMAKE_FORCE_C_COMPILER(arm-none-eabi-gcc GNU)
-CMAKE_FORCE_CXX_COMPILER(arm-none-eabi-g++ GNU)
+CMAKE_FORCE_C_COMPILER(arm-linux-gnueabihf-gcc GNU)
+CMAKE_FORCE_CXX_COMPILER(arm-linux-gnueabihf-g++ GNU)
 

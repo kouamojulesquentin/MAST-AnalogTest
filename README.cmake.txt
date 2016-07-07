@@ -4,7 +4,9 @@ From projects root directory (where this file is):
  MAST uses C++ 2014, so gcc should be version 4.9 or higher.
  MAST uses Gnu Make with version >= 3.82
  The unitary test interface Needs "phyton3" and "phyton3-ply" module
-
+ NB: on newer Linux installation, a manual install of ply 3.8 might be needed 
+				http://www.dabeaz.com/ply/
+				
 [BUILD]
 Create a build directory, for instance cmake_build
 

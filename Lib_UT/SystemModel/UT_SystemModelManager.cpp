@@ -730,20 +730,20 @@ void UT_SystemModelManager::test_DoDataCycles_MIB_Multichain_Pre_Greedy ()
   ai->SetProtocol (spy);
 
   auto configureAlgo = make_shared<ConfigureAlgorithm_LastOrDefault_Greedy>();
-//+  SystemModelManager sut(sm, configureAlgo);
+  SystemModelManager sut(sm, configureAlgo);
 
-  auto monitor       = make_shared<SystemModelManagerMonitor>();
-  monitor->MonitorAfterConfiguration(true);
-  monitor->MonitorBeforeConfiguration(true);
-  monitor->GmlBasePath("MIB_Multichain_Pre_Greedy");
-  SystemModelManager sut(sm, configureAlgo, monitor);
-  g3::logEnabled(true);
+//+  auto monitor       = make_shared<SystemModelManagerMonitor>();
+//+  monitor->MonitorAfterConfiguration(true);
+//+  monitor->MonitorBeforeConfiguration(true);
+//+  monitor->GmlBasePath("MIB_Multichain_Pre_Greedy");
+//+  SystemModelManager sut(sm, configureAlgo, monitor);
+//+  g3::logEnabled(true);
 
   // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.DoDataCycles());
 
-  g3::logEnabled(false);
+//+  g3::logEnabled(false);
 
   // ---------------- Verify
   //
@@ -1226,33 +1226,36 @@ void UT_SystemModelManager::test_iWrite_Thread_is_Known ()
   auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
   auto reg  = sm.RegisterWithId(9u);
 
-  SystemModelManager sut(sm);
-
-  // Thread functor
-  auto appFunctor = [&sut]()
-  {
-    // ---------------- Setup
-    //
-    auto nextToSut = BinaryVector::CreateFromHexString("FADE_CAFE");
-    sut.iPrefix("MIB_mux");
-
-    // ---------------- Exercise
-    //
-    TS_ASSERT_THROWS_NOTHING (sut.iWrite("dynamic_3", nextToSut));
-  };
-
-  // ---------------- Setup (main thread)
-  //
   g3::logEnabled(true);
-  sut.CreateApplicationThread(mux, appFunctor); // Include "Exercise" in created thread
-  sut.StartCreatedApplicationThreads();
-  sut.JoinAllApplicationThreads();  // Make sure application as done its action
-  g3::logEnabled(false);
+  {
+    LOG_FUNCTION_SCOPE;
+    SystemModelManager sut(sm);
 
-  // ---------------- Verify
-  //
-  auto expected = BinaryVector::CreateFromHexString("FADE_CAFE");
-  TS_ASSERT_EQUALS (reg->NextToSut(), expected);
+    // Thread functor
+    auto appFunctor = [&sut]()
+    {
+      // ---------------- Setup
+      //
+      auto nextToSut = BinaryVector::CreateFromHexString("FADE_CAFE");
+      sut.iPrefix("MIB_mux");
+
+      // ---------------- Exercise
+      //
+      TS_ASSERT_THROWS_NOTHING (sut.iWrite("dynamic_3", nextToSut));
+    };
+
+    // ---------------- Setup (main thread)
+    //
+    sut.CreateApplicationThread(mux, appFunctor); // Include "Exercise" in created thread
+    sut.StartCreatedApplicationThreads();
+    sut.JoinAllApplicationThreads();  // Make sure application as done its action
+
+    // ---------------- Verify
+    //
+    auto expected = BinaryVector::CreateFromHexString("FADE_CAFE");
+    TS_ASSERT_EQUALS (reg->NextToSut(), expected);
+  }
+  g3::logEnabled(false);
 }
 
 
@@ -1331,6 +1334,7 @@ void UT_SystemModelManager::test_iApply_Thread_is_SystemModelManager_NoPending (
 }
 
 
+#define LOG_ENABLED_IN_SCOPE   g3::logEnabled(true); SCOPE_EXIT(g3::logEnabled(false))
 
 //! Checks SystemModelManager::iApply() using thread managed (known) by SystemModelManager
 //!
@@ -1344,6 +1348,8 @@ void UT_SystemModelManager::test_iApply_Thread_is_Known ()
   auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
   auto reg  = sm.RegisterWithId(9u);
 
+  LOG_ENABLED_IN_SCOPE;
+  LOG_FUNCTION_SCOPE;
   SystemModelManager sut(sm);
 
   // Thread functor
@@ -1362,16 +1368,115 @@ void UT_SystemModelManager::test_iApply_Thread_is_Known ()
 
   // ---------------- Setup (main thread)
   //
-  g3::logEnabled(true);
   sut.CreateApplicationThread(mux, appFunctor); // Include "Exercise" in created thread
-  sut.StartCreatedApplicationThreads();
   sut.StartInBackground();
+  sut.StartCreatedApplicationThreads();
   sut.JoinAllApplicationThreads();              // Make sure application as done its action
   sut.Stop();
-  g3::logEnabled(false);
 
   // ---------------- Verify
   //
+  auto expected = BinaryVector::CreateFromHexString("FADE_CAFE");
+  TS_ASSERT_EQUALS (reg->NextToSut(), reg->LastToSut());
+}
+
+
+//! Checks SystemModelManager::iApply() when SystemModelManager data cycle loop has not been started
+//!
+void UT_SystemModelManager::test_iApply_DataCycleLoop_NotStarted ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
+  auto reg  = sm.RegisterWithId(9u);
+
+  LOG_ENABLED_IN_SCOPE;
+  LOG_FUNCTION_SCOPE;
+  SystemModelManager sut(sm);
+
+  // Thread functor
+  auto appFunctor = [&sut]()
+  {
+    // ---------------- Setup
+    //
+    auto nextToSut = BinaryVector::CreateFromHexString("FADE_CAFE");
+    sut.iPrefix("MIB_mux");
+    sut.iWrite("dynamic_3", nextToSut);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.iApply());
+  };
+
+  // ---------------- Setup (main thread)
+  //
+  //                  No data cycle loop do not prevent to quit the application
+  //
+  sut.CreateApplicationThread(mux, appFunctor); // Include "Exercise" in created thread
+  sut.StartCreatedApplicationThreads();
+  sut.JoinAllApplicationThreads();              // Make sure application as done its action
+  sut.Stop();
+
+  // ---------------- Verify
+  //
+  auto expected = BinaryVector::CreateFromHexString("FADE_CAFE");
+  TS_ASSERT_DIFFERS (reg->NextToSut(), reg->LastToSut());   // As no data cycle took place new value has not been transfered to SUT
+}
+
+
+//! Checks SystemModelManager::Start() from another thread
+//!
+void UT_SystemModelManager::test_Start_from_Another_Thread ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
+  auto reg  = sm.RegisterWithId(9u);
+
+  LOG_ENABLED_IN_SCOPE;
+  LOG_FUNCTION_SCOPE;
+  SystemModelManager sut(sm);
+
+  // Thread functor
+  auto appFunctor = [&sut]()
+  {
+    TS_ASSERT_THROWS_NOTHING
+    (
+      auto nextToSut = BinaryVector::CreateFromHexString("FADE_CAFE");
+      sut.iPrefix("MIB_mux");
+      sut.iWrite("dynamic_3", nextToSut);
+      sut.iApply();
+    );
+  };
+
+  sut.CreateApplicationThread(mux, appFunctor);
+  std::atomic_bool started(false);
+
+  auto startFunctor = [&sut, & started]() { TS_ASSERT_THROWS_NOTHING (started = true; sut.Start()); };
+
+  // ---------------- Exercise
+  //
+  auto startThread = std::thread(startFunctor);
+
+  // ---------------- Verify
+  //
+  while (!started)  //!< Wait data cycle loop thread is effectively started
+  {
+    std::this_thread::sleep_for(100us);
+  }
+  sut.StartCreatedApplicationThreads();
+  sut.JoinAllApplicationThreads();              // Make sure application as done its action
+  sut.Stop();
+  if (startThread.joinable())
+  {
+    startThread.join();
+  }
   auto expected = BinaryVector::CreateFromHexString("FADE_CAFE");
   TS_ASSERT_EQUALS (reg->NextToSut(), reg->LastToSut());
 }
@@ -1389,6 +1494,8 @@ void UT_SystemModelManager::test_iApply_Thread_is_Known_NoPending ()
   auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
   auto reg  = sm.RegisterWithId(9u);
 
+  LOG_ENABLED_IN_SCOPE;
+  LOG_FUNCTION_SCOPE;
   SystemModelManager sut(sm);
 
   // Thread functor
@@ -1405,10 +1512,50 @@ void UT_SystemModelManager::test_iApply_Thread_is_Known_NoPending ()
 
   // ---------------- Setup (main thread)
   //
-  sut.CreateApplicationThread(mux, appFunctor); // Include "Exercise" in created thread
-  sut.StartCreatedApplicationThreads();
-  sut.JoinAllApplicationThreads();  // Make sure application as done its action
+  TS_ASSERT_THROWS_NOTHING
+  (
+    sut.CreateApplicationThread(mux, appFunctor); // Include "Exercise" in created thread
+    sut.StartInBackground();
+    sut.StartCreatedApplicationThreads();
+    sut.JoinAllApplicationThreads();              // Make sure application as done its action
+  );
 }
+
+
+//! Checks SystemModelManager::iApply() using thread managed (known) by SystemModelManager
+//!
+void UT_SystemModelManager::test_iApply_Thread_is_Known_NoPending_WrongStart ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
+  auto reg  = sm.RegisterWithId(9u);
+
+  LOG_ENABLED_IN_SCOPE;
+  LOG_FUNCTION_SCOPE;
+  SystemModelManager sut(sm);
+
+  // Thread functor
+  auto appFunctor = [&sut]()
+  {
+    // ---------------- Setup
+    //
+    auto nextToSut = BinaryVector::CreateFromHexString("FADE_CAFE");
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.iApply());
+  };
+
+  // ---------------- Setup (main thread)
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.CreateApplicationThread(mux, appFunctor)); // Include "Exercise" in created thread );
+  TS_ASSERT_THROWS (sut.Start(), std::exception);
+}
+
 
 
 

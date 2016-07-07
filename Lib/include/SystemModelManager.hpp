@@ -30,6 +30,7 @@
 #include <mutex>
 #include <shared_mutex>
 #include <condition_variable>
+#include <atomic>
 
 namespace mast
 {
@@ -56,18 +57,7 @@ class DLL_EXPORT SystemModelManager final
                      std::shared_ptr<ConfigurationAlgorithm>    configurationAlgorithm = std::make_shared<ConfigureAlgorithm_LastOrDefault>(),
                      std::shared_ptr<SystemModelManagerMonitor> monitor                = std::make_shared<SystemModelManagerMonitor>()
 //+                     std::shared_ptr<SystemModelManagerMonitor> monitor                = nullptr
-                    )
-    : m_sm                   (sm)
-    , m_firstAccessInterface (GetFirstAccessInterface(sm))
-    , m_configurator         (configurationAlgorithm)
-    , m_propagator           ()
-    , m_toSutVisitor         ()
-    , m_fromSutUpdater       (sm)
-    , m_pathResolver         (sm.Root())
-    , m_monitor              (monitor)
-    , m_managerThreadId      (std::this_thread::get_id())
-    , m_constructionThreadId (std::this_thread::get_id())
-  {  }
+                    );
 
   //! Does a complete data cycles for SystemModel as long as there are pending nodes
   //!
@@ -139,6 +129,7 @@ class DLL_EXPORT SystemModelManager final
   {
     ApplicationData(std::thread p_appThread, NodePathResolver p_pathResolver)
       : appThread    (std::move(p_appThread))
+      , canProceed   (false)
       , pathResolver (p_pathResolver)
     {
     }
@@ -146,7 +137,7 @@ class DLL_EXPORT SystemModelManager final
     std::thread              appThread;           //!< Used to join application thread
     std::mutex               releaseMutex;        //!< Associated with condition variable to block/release pending threads (in iApply)
     std::condition_variable  releaseCv;           //!< Wait mecanism (it is specific to application thread to avoid missing notification)
-    bool                     canProceed = true; //!< When true, application thread can return from iApply
+    std::atomic_bool         canProceed;          //!< When true, application thread can return from iApply
     NodePathResolver         pathResolver;        //!< One per application thread to point to different node, have different prefix and cache
     std::set<NodeIdentifier> pendingRegistersIds; //!< Pending registers for application thread
   };
@@ -183,17 +174,19 @@ class DLL_EXPORT SystemModelManager final
   std::thread                     m_managerThread;        //!< Background thread for data cycle loop
   std::thread::id                 m_managerThreadId;      //!< Manager thread identifier (when constructed or when running data cycle loop in a background thread)
   const std::thread::id           m_constructionThreadId; //!< Thread identifier when constructed
+  std::atomic_bool                m_threadStarted;        //!< To wait for application thread effectively started before returning to caller
   std::mutex                      m_appStartMutex;        //!< Associated to condition variable for common start of application threads
   std::condition_variable         m_appStartConditionVar; //!< Variable to manage common start of application threads
-  bool                            m_appStarted = false;   //!< True when application threads are requested to start effectively
+  std::atomic_bool                m_appStarted;           //!< True when application threads are requested to start effectively
+  std::recursive_mutex            m_dataMutex;            //!< Protects access to SystemModel and common data used to manage application threads
+  RegIdToAppDataMapper_t          m_regIdToAppData;       //!< Associates a register id with application data for threadS that are pending on that register
+  std::set<std::thread::id>       m_pendingThreads;       //!< Identifies threads that must be paused in iApply
+  std::atomic_bool                m_loopStarted;          //!< True when data cycle loop thread has been started effectively (waiting for iApply)
   std::mutex                      m_loopMutex;            //!< Associated to condition variable to manage restart of data cycle loop
   std::condition_variable         m_loopCV;               //!< Variable to manage restart of data cycle loop
-  bool                            m_runLoop    = false;   //!< True when data cycle loop is active
+  bool                            m_runLoop = false;      //!< True when data cycle loop is active
   mutable std::shared_timed_mutex m_appDataMutex;         //!< Protects access to applications data (mutable to be used within const methods)
   ThreadToAppDataMapper_t         m_threadToAppData;      //!< Associates a thread id with application data for that thread
-  RegIdToAppDataMapper_t          m_regIdToAppData;       //!< Associates a register id with application data for threadS that are pending on that register
-  mutable std::shared_timed_mutex m_pendingThreadMutex;   //!< Protects access to m_pendingThreads
-  std::set<std::thread::id>       m_pendingThreads;       //!< Identifies threads that must be paused in iApply
 };
 //
 //  End of SystemModelManager class declaration

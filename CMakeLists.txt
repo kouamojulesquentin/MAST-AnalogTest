@@ -4,8 +4,6 @@ if (WIN32)
 	endif()
   set (CMAKE_CXX_COMPILER "g++")
   set (CMAKE_C_COMPILER   "gcc")
-else()
-  set (CMAKE_CXX_COMPILER "g++-4.9")
 endif()
 
 cmake_minimum_required(VERSION 3.5)
@@ -132,7 +130,7 @@ else()
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${UT_RootPath}/SystemModel/UT_SystemModelManager.hpp)
 endif()
 
-	  CXXTEST_ADD_TEST(Lib_UT_Runner   	Runner.cpp  	${Runner_UT_SOURCES} )
+    CXXTEST_ADD_TEST(Lib_UT_Runner   	Runner.cpp  	${Runner_UT_SOURCES} )
 
     file(GLOB Lib_UT_SOURCES 			"Lib_UT/Utility/*")
     file(GLOB Lib_UT_TMP_SOURCES  "Lib_UT/SystemModel/*")

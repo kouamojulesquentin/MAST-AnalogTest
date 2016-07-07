@@ -25,6 +25,7 @@ using namespace mast;
 using std::shared_ptr;
 using std::make_shared;
 using std::dynamic_pointer_cast;
+using std::vector;
 using std::string;
 using std::experimental::string_view;
 using std::mutex;
@@ -45,32 +46,32 @@ using std::shared_lock;
 SystemModelManager::~SystemModelManager ()
 {
   JoinAllApplicationThreads();
+  Stop();
 }
 //
 //  End of: SystemModelManager::~SystemModelManager
 //---------------------------------------------------------------------------
 
 
-//! Returns application data associated with caller thread
+//! Returns application data associated with a thread
 //!
-shared_ptr<SystemModelManager::ApplicationData> SystemModelManager::ApplicationDataForCurrentThread () const
+//! @param threadId   Identifier of the thread
+//!
+shared_ptr<SystemModelManager::ApplicationData> SystemModelManager::ApplicationDataForThreadId (std::thread::id threadId) const
 {
-   shared_lock<shared_timed_mutex> lock(m_appDataMutex); // Shared lock is enough for read concurrency
+  shared_lock<shared_timed_mutex> lock(m_appDataMutex); // Shared lock is enough for read concurrency
 
-  auto threadId = std::this_thread::get_id();
-  auto pos      = m_applicationsData.find(threadId);
-
-  if (pos == m_applicationsData.cend())
+  auto pos = m_threadToAppData.find(threadId);
+  if (pos == m_threadToAppData.cend())
   {
-    THROW_LOGIC_ERROR("Calling thread is not managed by SystemModelManager");
+    THROW_LOGIC_ERROR("Thread is not managed by SystemModelManager");
   }
 
-  auto data = pos->second;
-
+  auto   data = pos->second;
   return data;
 }
 //
-//  End of: SystemModelManager::ApplicationDataForCurrentThread
+//  End of: SystemModelManager::ApplicationDataForThreadId
 //---------------------------------------------------------------------------
 
 
@@ -89,8 +90,8 @@ void SystemModelManager::CreateApplicationThread (shared_ptr<ParentNode> applica
   {
     // ---------------- Wait for start "signal"
     //
-    std::unique_lock<std::mutex> lk(m_appStartMutex);
-    m_appStartConditionVar.wait(lk, [this]{return m_appStarted;});
+    std::unique_lock<std::mutex> lock(m_appStartMutex);
+    m_appStartConditionVar.wait(lock, [this]{return m_appStarted;});
 
     // ---------------- To actual application job
     //
@@ -116,12 +117,11 @@ void SystemModelManager::CreateApplicationThread (shared_ptr<ParentNode> applica
   auto data         = make_shared<ApplicationData>(std::move(appThread), pathResolver);
 
   unique_lock<shared_timed_mutex> lock(m_appDataMutex);
-  m_applicationsData[appThreadId] = data;
+  m_threadToAppData[appThreadId] = data;
 }
 //
 //  End of: SystemModelManager::CreateApplicationThread
 //---------------------------------------------------------------------------
-
 
 
 //! Does a complete data cycles for SystemModel as long as there are pending nodes
@@ -129,6 +129,21 @@ void SystemModelManager::CreateApplicationThread (shared_ptr<ParentNode> applica
 //! @note It does the data cycle over each AccessInterface in the SystemModel
 //!
 void SystemModelManager::DoDataCycles ()
+{
+  if (std::this_thread::get_id() != m_managerThreadId)
+  {
+    THROW_RUNTIME_ERROR("DoDataCycles shall be called only on SystemModelManager thread");
+  }
+
+  DoDataCycles_Impl();
+}
+
+
+//! Does a complete data cycles for SystemModel as long as there are pending nodes
+//!
+//! @note It does the data cycle over each AccessInterface in the SystemModel
+//!
+void SystemModelManager::DoDataCycles_Impl ()
 {
   MONITOR(StartDataCycles());
   auto root        = m_sm.Root();
@@ -171,6 +186,10 @@ void SystemModelManager::DoDataCycles ()
               auto fromSutVector = protocol->DoAction(derivationId, nextDerivation->ApplicationData(), toSutVector);
 
               m_fromSutUpdater.UpdateRegisters(activeRegs, fromSutVector);
+              ReportServedRegisters(activeRegs);
+              ReleaseServedThreads();
+
+              //+ Release mutex and wait few ms !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             }
 
             nextDerivation = nextDerivation->NextSibling();
@@ -228,15 +247,15 @@ void SystemModelManager::JoinAllApplicationThreads ()
   }
 
   shared_lock<shared_timed_mutex> lock(m_appDataMutex); // Shared lock is enough for read concurrency
-  for (const auto& item : m_applicationsData)
+  for (const auto& item : m_threadToAppData)
   {
     auto data    = item.second;
-    auto topNode = data->m_pathResolver.ReferenceNode();
+    auto topNode = data->pathResolver.ReferenceNode();
 
-    if (data->m_thread.joinable())
+    if (data->appThread.joinable())
     {
       MONITOR_WITH_NODE("Joining application thread associated with node: ", *topNode);
-      data->m_thread.join();
+      data->appThread.join();
       MONITOR_WITH_NODE("Joined  application thread associated with node: ", *topNode);
     }
   }
@@ -248,6 +267,8 @@ void SystemModelManager::JoinAllApplicationThreads ()
 
 //! Executes queued operations
 //!
+//! @note If calling application thread has pending registers, it triggers a data cycles and wait for all its
+//! pending registers being served
 void SystemModelManager::iApply ()
 {
   auto threadId = std::this_thread::get_id();
@@ -258,12 +279,23 @@ void SystemModelManager::iApply ()
   }
   else
   {
-    auto data = ApplicationDataForCurrentThread();
+    auto appData = ThreadApplicationData();
+    {
+      unique_lock<shared_timed_mutex> lock(m_pendingThreadMutex);
+      m_pendingThreads.insert(threadId);               // Memorize that this is a pending thread
 
+      //! @todo [JFC]-[July/06/2016]: In iApply(): trigger data cycle before blocking
+      //!
 
+      appData->canProceed = false;
+      WakeupDataCycles();
+      if (appData->pendingRegistersIds.size() != 0)
+      {
+        std::unique_lock<std::mutex> lock(appData->releaseMutex);
+        appData->releaseCv.wait(lock, [appData]{ return appData->canProceed; });
+      }
+    }
   }
-
-
 }
 //
 //  End of: SystemModelManager::iApply
@@ -317,12 +349,63 @@ void SystemModelManager::iPrefix (std::string prefix)
 void SystemModelManager::iWrite (string_view registerPath, BinaryVector sequence)
 {
   auto& pathResolver = PATH_RESOLVER("iWrite: ");
-  auto reg           = pathResolver.ResolveAsRegister(registerPath);
+  auto  reg          = pathResolver.ResolveAsRegister(registerPath);
 
   reg->SetToSut(std::move(sequence));
+
+  // ---------------- Save the fact that application thread request an operation on that register
+  //
+  auto threadId = std::this_thread::get_id();
+  if (threadId != m_managerThreadId)
+  {
+    bool isPending = reg->NextToSut() != reg->LastToSut();
+    if (isPending)
+    {
+      // ---------------- Memorize that the register is associated with that thead
+      //
+      auto  data       = ThreadApplicationData();
+      auto& pendingIds = data->pendingRegistersIds;
+      auto  regId      = reg->Identifier();
+
+      bool alreadyRegistered = pendingIds.count(regId) == 0;
+      if (!alreadyRegistered)
+      {
+        pendingIds.insert(regId);
+
+        unique_lock<shared_timed_mutex> lock(m_pendingThreadMutex);
+        m_regIdToAppData.insert(make_pair(regId, data)); // Memorize that this register is pending for that thread
+      }
+    }
+  }
 }
 //
 //  End of: SystemModelManager::iWrite
+//---------------------------------------------------------------------------
+
+
+//! Runs data cyles when some application thread(s) are pending (in iApply)
+//!
+//! @note Returns when Stop is called
+void SystemModelManager::LoopOnDataCycle ()
+{
+    //+ (JFC July/06/2016): Start directly with data cycle to get SUT state ?
+  while (m_runLoop)
+  {
+    if (m_pendingThreads.size() != 0)
+    {
+      DoDataCycles_Impl();
+    }
+
+    // ---------------- Wait on new iApply or request to stop
+    //
+    std::unique_lock<std::mutex> lock(m_loopMutex);
+    m_loopCV.wait(lock, [this] { return !m_runLoop || (m_pendingThreads.size() != 0); });
+  }
+
+  MONITOR_MESSAGE("Exiting data cycle loop");
+}
+//
+//  End of: SystemModelManager::LoopOnDataCycle
 //---------------------------------------------------------------------------
 
 
@@ -340,18 +423,67 @@ const NodePathResolver& SystemModelManager::PathResolver (const char* file, cons
 
   shared_lock<shared_timed_mutex> lock(m_appDataMutex); // Shared lock is enough for read concurrency
 
-  auto pos = m_applicationsData.find(threadId);
-  if (pos == m_applicationsData.cend())
+  auto pos = m_threadToAppData.find(threadId);
+  if (pos == m_threadToAppData.cend())
   {
     THROW_IMPL_(file, fct, line, std::logic_error, msg.to_string() +  "Calling thread is not managed by SystemModelManager");
   }
 
   auto data = pos->second;
 
-  return data->m_pathResolver;
+  return data->pathResolver;
 }
 //
 //  End of: SystemModelManager::PathResolver
+//---------------------------------------------------------------------------
+
+
+//! Starts periodical (or on iApply) loop of complete data cycles on calling thread
+//!
+//! @note It only returns when StopDataCycleLoop is called, so it shall be called
+//!       from a thread differing from those used to create SystemModelManager.
+//!
+//! @see StartInBackground
+//!
+void SystemModelManager::Start ()
+{
+  if (std::this_thread::get_id() == m_managerThreadId)
+  {
+    THROW_RUNTIME_ERROR("StartDataCycleLoop shall be called only from thread different from SystemModelManager thread");
+  }
+
+  m_runLoop = true;
+  LoopOnDataCycle();
+}
+//
+//  End of Start
+//---------------------------------------------------------------------------
+
+
+//! Starts periodical (or on iApply) loop of complete data cycles on calling thread
+//!
+//! @note It only returns when StopDataCycleLoop is called, so it shall be called
+//!       from a thread differing from those used to create SystemModelManager.
+//!
+void SystemModelManager::StartInBackground ()
+{
+  if (m_managerThread.joinable())
+  {
+    THROW_RUNTIME_ERROR("There is already a background thread for data cycle loop");
+  }
+
+  m_runLoop = true;
+  auto threadFunctor = [this]()
+  {
+    LoopOnDataCycle();
+    MONITOR_MESSAGE("Exiting data cycle loop");
+  };
+
+  m_managerThread   = std::thread(threadFunctor);
+  m_managerThreadId = m_managerThread.get_id();
+}
+//
+//  End of StartInBackground
 //---------------------------------------------------------------------------
 
 
@@ -375,6 +507,109 @@ void SystemModelManager::StartCreatedApplicationThreads ()
 //
 //  End of: SystemModelManager::StartCreatedApplicationThreads
 //---------------------------------------------------------------------------
+
+
+
+//! Stops data cycle loop
+//!
+void SystemModelManager::Stop ()
+{
+  {
+    std::lock_guard<std::mutex> lock(m_loopMutex);
+    m_runLoop = false;
+
+    MONITOR_MESSAGE("Stopping datacycle loop");
+  }
+
+  m_loopCV.notify_one();
+
+  if (m_managerThread.joinable())
+  {
+    m_managerThread.join();
+  }
+  m_managerThreadId = m_constructionThreadId;
+}
+//
+//  End of: SystemModelManager::Stop
+//---------------------------------------------------------------------------
+
+
+
+//! Releases blocked application thread that have all their pending registers sent to SUT
+//!
+void SystemModelManager::ReleaseServedThreads ()
+{
+  for (const auto& threadId : m_pendingThreads)
+  {
+    auto appData = ApplicationDataForThreadId(threadId);
+
+    {
+      std::lock_guard<std::mutex> lock(appData->releaseMutex);
+      appData->canProceed = true;
+    }
+    appData->releaseCv.notify_one();
+  }
+}
+//
+//  End of: SystemModelManager::ReleaseServedThreads
+//---------------------------------------------------------------------------
+
+
+
+//! Clears "Pending registers" for updated (served) registers
+//!
+//! @param activeRegisters  SUT Registers that have been updated (during last AccessInterface action)
+//!
+void SystemModelManager::ReportServedRegisters (const vector<NodeIdentifier>& activeRegisters)
+{
+//+  unique_lock<shared_timed_mutex> lock(m_pendingThreadMutex);
+  //! @todo [JFC]-[July/06/2016]: In ReportServedRegisters(): Ensure exclusive access to m_regIdToAppData
+  //!
+
+
+  for (const auto& regId : activeRegisters)
+  {
+    // ---------------- Get all threads pending for that registers
+    //
+    auto range = m_regIdToAppData.equal_range(regId);
+
+    // ---------------- Report that the register has been update (served)
+    //
+    //                  (Normally, only a single thread should be pending for a register)
+    //
+    for (auto it = range.first ; it != range.second ; ++it)
+    {
+      auto threadData = it->second;
+
+      //! @todo [JFC]-[July/06/2016]: In ReportServedRegisters(): Ensure exclusive access to pendingRegistersIds
+      //!
+      threadData->pendingRegistersIds.erase(regId);
+    }
+
+    // ---------------- No more thread(s) pending for that register
+    //
+    m_regIdToAppData.erase(regId);
+  }
+}
+//
+//  End of: SystemModelManager::ReportServedRegisters
+//---------------------------------------------------------------------------
+
+
+//! Forces a new data cycle (if at least one thread is pending)
+//!
+void SystemModelManager::WakeupDataCycles ()
+{
+  {
+    std::lock_guard<std::mutex> lock(m_loopMutex);
+  }
+
+  m_loopCV.notify_one();
+}
+//
+//  End of: SystemModelManager::WakeupDataCycles
+//---------------------------------------------------------------------------
+
 
 
 //===========================================================================

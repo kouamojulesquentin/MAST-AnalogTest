@@ -1285,6 +1285,162 @@ void UT_SystemModelManager::test_iWrite_Thread_is_Unknown ()
 }
 
 
+//! Checks SystemModelManager::iApply() using same thread as SystemModelManager
+//!
+void UT_SystemModelManager::test_iApply_Thread_is_SystemModelManager ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto reg  = sm.RegisterWithId(7u);
+
+  SystemModelManager sut(sm);
+  sut.iPrefix("TAP_DR_Mux.MIB_mux");
+
+  auto nextToSut = BinaryVector::CreateFromHexString("ABCD_4567");
+  sut.iWrite("dynamic_1", nextToSut);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.iApply());
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (reg->NextToSut(), reg->LastToSut());
+}
+
+
+//! Checks SystemModelManager::iApply() using same thread as SystemModelManager and there is no pending registers
+//!
+void UT_SystemModelManager::test_iApply_Thread_is_SystemModelManager_NoPending ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto reg  = sm.RegisterWithId(7u);
+
+  SystemModelManager sut(sm);
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.iApply());
+}
+
+
+
+//! Checks SystemModelManager::iApply() using thread managed (known) by SystemModelManager
+//!
+void UT_SystemModelManager::test_iApply_Thread_is_Known ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
+  auto reg  = sm.RegisterWithId(9u);
+
+  SystemModelManager sut(sm);
+
+  // Thread functor
+  auto appFunctor = [&sut]()
+  {
+    // ---------------- Setup
+    //
+    auto nextToSut = BinaryVector::CreateFromHexString("FADE_CAFE");
+    sut.iPrefix("MIB_mux");
+    sut.iWrite("dynamic_3", nextToSut);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.iApply());
+  };
+
+  // ---------------- Setup (main thread)
+  //
+  g3::logEnabled(true);
+  sut.CreateApplicationThread(mux, appFunctor); // Include "Exercise" in created thread
+  sut.StartCreatedApplicationThreads();
+  sut.StartInBackground();
+  sut.JoinAllApplicationThreads();              // Make sure application as done its action
+  sut.Stop();
+  g3::logEnabled(false);
+
+  // ---------------- Verify
+  //
+  auto expected = BinaryVector::CreateFromHexString("FADE_CAFE");
+  TS_ASSERT_EQUALS (reg->NextToSut(), reg->LastToSut());
+}
+
+
+//! Checks SystemModelManager::iApply() using thread managed (known) by SystemModelManager
+//!
+void UT_SystemModelManager::test_iApply_Thread_is_Known_NoPending ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
+  auto reg  = sm.RegisterWithId(9u);
+
+  SystemModelManager sut(sm);
+
+  // Thread functor
+  auto appFunctor = [&sut]()
+  {
+    // ---------------- Setup
+    //
+    auto nextToSut = BinaryVector::CreateFromHexString("FADE_CAFE");
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.iApply());
+  };
+
+  // ---------------- Setup (main thread)
+  //
+  sut.CreateApplicationThread(mux, appFunctor); // Include "Exercise" in created thread
+  sut.StartCreatedApplicationThreads();
+  sut.JoinAllApplicationThreads();  // Make sure application as done its action
+}
+
+
+
+//! Checks SystemModelManager::iApply() using thread not managed (unknown) by SystemModelManager
+//!
+void UT_SystemModelManager::test_iApply_Thread_is_Unknown ()
+{
+  // ---------------- Setup (main thread)
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  SystemModelManager sut(sm);
+
+  // Thread functor
+  auto appFunctor = [&sut]()
+  {
+    // ---------------- Setup
+    //
+    auto nextToSut = BinaryVector::CreateFromHexString("2BAD_CAFE");
+
+    // ---------------- Exercise & Verify (functor thread)
+    //
+    TS_ASSERT_THROWS (sut.iApply(), std::exception);
+  };
+
+  // Start thread
+  auto unkwnownThread = std::thread(appFunctor);
+  unkwnownThread.join();
+}
+
+
 
 //===========================================================================
 // End of UT_SystemModelManager.cpp

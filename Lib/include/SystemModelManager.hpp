@@ -115,6 +115,22 @@ class DLL_EXPORT SystemModelManager final
   //!
   void iWrite (string_view registerPath, BinaryVector sequence);
 
+  //! Returns current maximum time between an iApply and the next data cycle
+  //!
+  std::chrono::milliseconds DataCycleLoopTimeout() const { return m_dataCycleLoopTimeout; }
+
+  //! Sets maximum time between an iApply and the next data cycle
+  //!
+  void DataCycleLoopTimeout (std::chrono::milliseconds dataCycleLoopTimeout) { m_dataCycleLoopTimeout = dataCycleLoopTimeout; }
+
+  //! Returns current sleep time between two SystemModel configurations (to let application threads to continue their job)
+  //!
+  std::chrono::microseconds SleepTimeBetweenConfigurations() const { return m_sleepTimeBetweenConfigurations; }
+
+  //! Sets sleep time between two SystemModel configurations (to let application threads to continue their job)
+  //!
+  void SleepTimeBetweenConfigurations (std::chrono::microseconds sleepTimeBetweenConfigurations) { m_sleepTimeBetweenConfigurations = sleepTimeBetweenConfigurations; }
+
 
   // ---------------- Protected Methods
   //
@@ -175,23 +191,28 @@ class DLL_EXPORT SystemModelManager final
   NodePathResolver                           m_pathResolver;         //!< Node path resolver for SystemModelManager thread
   std::shared_ptr<SystemModelManagerMonitor> m_monitor;              //!< Provides monitoring point
 
+
+
+
   // Multithreading support
-  std::thread                     m_managerThread;        //!< Background thread for data cycle loop
-  std::thread::id                 m_managerThreadId;      //!< Manager thread identifier (when constructed or when running data cycle loop in a background thread)
-  const std::thread::id           m_constructionThreadId; //!< Thread identifier when constructed
-  std::atomic_bool                m_threadStarted;        //!< To wait for application thread effectively started before returning to caller
-  std::mutex                      m_appStartMutex;        //!< Associated to condition variable for common start of application threads
-  std::condition_variable         m_appStartConditionVar; //!< Variable to manage common start of application threads
-  std::atomic_bool                m_appStarted;           //!< True when application threads are requested to start effectively
-  std::recursive_mutex            m_dataMutex;            //!< Protects access to SystemModel and common data used to manage application threads
-  RegIdToAppDataMapper_t          m_regIdToAppData;       //!< Associates a register id with application data for threadS that are pending on that register
-  std::set<std::thread::id>       m_pendingThreads;       //!< Identifies threads that must be paused in iApply
-  std::atomic_bool                m_loopStarted;          //!< True when data cycle loop thread has been started effectively (waiting for iApply)
-  std::mutex                      m_loopMutex;            //!< Associated to condition variable to manage restart of data cycle loop
-  std::condition_variable         m_loopCV;               //!< Variable to manage restart of data cycle loop
-  bool                            m_runLoop = false;      //!< True when data cycle loop is active
-  mutable std::shared_timed_mutex m_appDataMutex;         //!< Protects access to applications data (mutable to be used within const methods)
-  ThreadToAppDataMapper_t         m_threadToAppData;      //!< Associates a thread id with application data for that thread
+  std::thread                     m_managerThread;                  //!< Background thread for data cycle loop
+  std::thread::id                 m_managerThreadId;                //!< Manager thread identifier (when constructed or when running data cycle loop in a background thread)
+  const std::thread::id           m_constructionThreadId;           //!< Thread identifier when constructed
+  std::atomic_bool                m_threadStarted;                  //!< To wait for application thread effectively started before returning to caller
+  std::mutex                      m_appStartMutex;                  //!< Associated to condition variable for common start of application threads
+  std::condition_variable         m_appStartConditionVar;           //!< Variable to manage common start of application threads
+  std::atomic_bool                m_appStarted;                     //!< True when application threads are requested to start effectively
+  std::recursive_mutex            m_dataMutex;                      //!< Protects access to SystemModel and common data used to manage application threads
+  RegIdToAppDataMapper_t          m_regIdToAppData;                 //!< Associates a register id with application data for threadS that are pending on that register
+  std::set<std::thread::id>       m_pendingThreads;                 //!< Identifies threads that must be paused in iApply
+  std::atomic_bool                m_loopStarted;                    //!< True when data cycle loop thread has been started effectively (waiting for iApply)
+  std::mutex                      m_loopMutex;                      //!< Associated to condition variable to manage restart of data cycle loop
+  std::condition_variable         m_loopCV;                         //!< Variable to manage restart of data cycle loop
+  bool                            m_runLoop = false;                //!< True when data cycle loop is active
+  std::chrono::milliseconds       m_dataCycleLoopTimeout;           //!< Approximate max time before an iApply is seen by data cycle loop
+  std::chrono::microseconds       m_sleepTimeBetweenConfigurations; //!< Sleep duration between two configurations to let application thread to access registers
+  mutable std::shared_timed_mutex m_appDataMutex;                   //!< Protects access to applications data (mutable to be used within const methods)
+  ThreadToAppDataMapper_t         m_threadToAppData;                //!< Associates a thread id with application data for that thread
 };
 //
 //  End of SystemModelManager class declaration

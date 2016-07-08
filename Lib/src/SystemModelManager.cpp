@@ -63,19 +63,21 @@ SystemModelManager::~SystemModelManager ()
 SystemModelManager::SystemModelManager(SystemModel&                          sm,
                                        shared_ptr<ConfigurationAlgorithm>    configurationAlgorithm,
                                        shared_ptr<SystemModelManagerMonitor> monitor)
-  : m_sm                   (sm)
-  , m_firstAccessInterface (GetFirstAccessInterface(sm))
-  , m_configurator         (configurationAlgorithm)
-  , m_propagator           ()
-  , m_toSutVisitor         ()
-  , m_fromSutUpdater       (sm)
-  , m_pathResolver         (sm.Root())
-  , m_monitor              (monitor)
-  , m_managerThreadId      (std::this_thread::get_id())
-  , m_constructionThreadId (std::this_thread::get_id())
-  , m_threadStarted        (false)
-  , m_appStarted           (false)
-  , m_loopStarted          (false)
+  : m_sm                             (sm)
+  , m_firstAccessInterface           (GetFirstAccessInterface(sm))
+  , m_configurator                   (configurationAlgorithm)
+  , m_propagator                     ()
+  , m_toSutVisitor                   ()
+  , m_fromSutUpdater                 (sm)
+  , m_pathResolver                   (sm.Root())
+  , m_monitor                        (monitor)
+  , m_managerThreadId                (std::this_thread::get_id())
+  , m_constructionThreadId           (std::this_thread::get_id())
+  , m_threadStarted                  (false)
+  , m_appStarted                     (false)
+  , m_loopStarted                    (false)
+  , m_dataCycleLoopTimeout           (1s)
+  , m_sleepTimeBetweenConfigurations (100us)
 {
   MONITOR_MESSAGE("Constructed SystemModelManager");
 }
@@ -243,7 +245,7 @@ void SystemModelManager::DoDataCycles_Impl ()
       // ---------------- Release mutex and wait awhile for blocked (but not pending) threads can move forward
       //
       lock.unlock();
-      std::this_thread::sleep_for(1us);
+      std::this_thread::sleep_for(m_sleepTimeBetweenConfigurations);
     } // End of: if (doDataCycle)
   } while (doDataCycle);
 
@@ -484,8 +486,7 @@ void SystemModelManager::LoopOnDataCycle ()
     // ---------------- Wait on new iApply or request to stop
     //
     std::unique_lock<std::mutex> lock(m_loopMutex);
-    auto dataCycleLoopTimeout = 1s;
-    m_loopCV.wait_for(lock, dataCycleLoopTimeout, [this] { return !m_runLoop || (m_pendingThreads.size() != 0); });
+    m_loopCV.wait_for(lock, m_dataCycleLoopTimeout, [this] { return !m_runLoop || (m_pendingThreads.size() != 0); });
   }
 
   MONITOR_MESSAGE("Exiting data cycle loop");

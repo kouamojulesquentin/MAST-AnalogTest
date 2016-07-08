@@ -878,17 +878,18 @@ void UT_SystemModelManager::test_CreateApplicationThread_1_App ()
   auto mux  = sm.LinkerWithId(2u);
   TS_ASSERT_NOT_NULLPTR (mux);
 
-//+  g3::logEnabled(true);
   SystemModelManager sut(sm);
 
   // ---------------- Create a functor that tally value when not zero
   //
   std::atomic_uint value(0);
+  std::atomic_bool started(false);
   value = 0u;
 
   uint32_t sum = 0;
-  auto appFunctor = [&value, &sum]()
+  auto appFunctor = [&value, &sum, &started]()
   {
+    started = true;
     while (true)
     {
       if (value != 0) // This is the "protocol" to say that there is a new value
@@ -911,11 +912,11 @@ void UT_SystemModelManager::test_CreateApplicationThread_1_App ()
     // ---------------- Verify
     //
     value = 1u; // 1rst value
-    std::this_thread::sleep_for(1ms);
-    TS_ASSERT_EQUALS (sum,          0);  // Thread is not started ==> sum does not change
+    std::this_thread::sleep_for(2ms);    // Let the thread to be started by the system
+    TS_ASSERT_EQUALS (sum,          0);  // Thread is waiting for start signal ==> sum does not change
     TS_ASSERT_EQUALS (value.load(), 1u); // Value is also not changed
     sut.StartCreatedApplicationThreads();
-    std::this_thread::sleep_for(1ms);
+    while (!started){std::this_thread::sleep_for(10us);}  // Wait for start signal being seen by application thread function
     TS_ASSERT_EQUALS (sum,          1u); // Thread is now started ==> sum has been updated
     TS_ASSERT_EQUALS (value.load(), 0);  // Value has been reset
 
@@ -928,7 +929,6 @@ void UT_SystemModelManager::test_CreateApplicationThread_1_App ()
 
     TS_ASSERT_EQUALS (sum, 5050u);
   }
-  g3::logEnabled(false);
 }
 
 
@@ -1334,8 +1334,6 @@ void UT_SystemModelManager::test_iApply_Thread_is_SystemModelManager_NoPending (
 }
 
 
-#define LOG_ENABLED_IN_SCOPE   g3::logEnabled(true); SCOPE_EXIT(g3::logEnabled(false))
-
 //! Checks SystemModelManager::iApply() using thread managed (known) by SystemModelManager
 //!
 void UT_SystemModelManager::test_iApply_Thread_is_Known ()
@@ -1348,7 +1346,7 @@ void UT_SystemModelManager::test_iApply_Thread_is_Known ()
   auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
   auto reg  = sm.RegisterWithId(9u);
 
-  LOG_ENABLED_IN_SCOPE;
+  ENABLE_LOG_IN_SCOPE;
   LOG_FUNCTION_SCOPE;
   SystemModelManager sut(sm);
 
@@ -1393,7 +1391,7 @@ void UT_SystemModelManager::test_iApply_DataCycleLoop_NotStarted ()
   auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
   auto reg  = sm.RegisterWithId(9u);
 
-  LOG_ENABLED_IN_SCOPE;
+  ENABLE_LOG_IN_SCOPE;
   LOG_FUNCTION_SCOPE;
   SystemModelManager sut(sm);
 
@@ -1439,7 +1437,7 @@ void UT_SystemModelManager::test_Start_from_Another_Thread ()
   auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
   auto reg  = sm.RegisterWithId(9u);
 
-  LOG_ENABLED_IN_SCOPE;
+  ENABLE_LOG_IN_SCOPE;
   LOG_FUNCTION_SCOPE;
   SystemModelManager sut(sm);
 
@@ -1494,7 +1492,7 @@ void UT_SystemModelManager::test_iApply_Thread_is_Known_NoPending ()
   auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
   auto reg  = sm.RegisterWithId(9u);
 
-  LOG_ENABLED_IN_SCOPE;
+  ENABLE_LOG_IN_SCOPE;
   LOG_FUNCTION_SCOPE;
   SystemModelManager sut(sm);
 
@@ -1514,7 +1512,7 @@ void UT_SystemModelManager::test_iApply_Thread_is_Known_NoPending ()
   //
   TS_ASSERT_THROWS_NOTHING
   (
-    sut.CreateApplicationThread(mux, appFunctor); // Include "Exercise" in created thread
+    sut.CreateApplicationThread(mux, appFunctor, "test_iApply_Thread_is_Known_NoPending"); // Include "Exercise" in created thread
     sut.StartInBackground();
     sut.StartCreatedApplicationThreads();
     sut.JoinAllApplicationThreads();              // Make sure application as done its action
@@ -1534,7 +1532,7 @@ void UT_SystemModelManager::test_iApply_Thread_is_Known_NoPending_WrongStart ()
   auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
   auto reg  = sm.RegisterWithId(9u);
 
-  LOG_ENABLED_IN_SCOPE;
+  ENABLE_LOG_IN_SCOPE;
   LOG_FUNCTION_SCOPE;
   SystemModelManager sut(sm);
 

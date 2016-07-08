@@ -37,9 +37,9 @@ using std::shared_lock;
 using namespace mast;
 using namespace std::chrono_literals;
 
-#define MONITOR(fct)                     if (m_monitor) m_monitor->fct;
-#define MONITOR_MESSAGE(msg)             if (m_monitor) m_monitor->LogUncondionally(msg);
-#define MONITOR_WITH_NODE(msg, node)     if (m_monitor) m_monitor->LogUncondionally(msg, node);
+#define MONITOR(fct)                            if (m_monitor) m_monitor->fct;
+#define MONITOR_MESSAGE(msg)                    if (m_monitor) m_monitor->LogUncondionally(msg);
+#define MONITOR_WITH_NODE(msg, node, debugName) if (m_monitor) m_monitor->LogUncondionally(msg, node, debugName);
 
 #define PATH_RESOLVER(msg)                                        PathResolver(__FILE__, __func__, __LINE__, msg)
 #define MUTABLE_PATH_RESOLVER(msg)  const_cast<NodePathResolver&>(PathResolver(__FILE__, __func__, __LINE__, msg))
@@ -107,18 +107,18 @@ shared_ptr<SystemModelManager::ApplicationData> SystemModelManager::ApplicationD
 //! @param applicationTopNode Top most node associated with the application
 //! @param functor            Function to call at thread creation
 //!
-void SystemModelManager::CreateApplicationThread (shared_ptr<ParentNode> applicationTopNode, Application_t functor)
+void SystemModelManager::CreateApplicationThread (shared_ptr<ParentNode> applicationTopNode, Application_t functor, string_view debugName)
 {
   CHECK_PARAMETER_NOT_NULL(applicationTopNode, "Cannot create application thread with nullptr top node");
 
-  MONITOR(CreateApplication(*applicationTopNode));
+  MONITOR(CreateApplication(*applicationTopNode, debugName));
 
-  auto wrapper = [this, applicationTopNode, functor]()
+  auto wrapper = [this, applicationTopNode, functor](string_view debugName)
   {
     // ---------------- Report that the thread has effectively been started
     //
     m_threadStarted = true;
-    MONITOR_WITH_NODE("Application thread waiting for start signal with node: ", *applicationTopNode);
+    MONITOR_WITH_NODE("Application thread waiting for start signal", *applicationTopNode, debugName);
 
     // ---------------- Wait for start "signal"
     //
@@ -127,33 +127,33 @@ void SystemModelManager::CreateApplicationThread (shared_ptr<ParentNode> applica
 
     // ---------------- To actual application job
     //
-    MONITOR_WITH_NODE("Application start with node: ", *applicationTopNode);
+    MONITOR_WITH_NODE("Application start", *applicationTopNode, debugName);
     try
     {
       functor();
     }
     catch(std::exception& exc)  // Catch C++ standard exceptions
     {
-      MONITOR_WITH_NODE("Uncaught exception '"s + exc.what() + "' from application with node: ", *applicationTopNode);
+      MONITOR_WITH_NODE("Uncaught exception '"s + exc.what() + "' from application", *applicationTopNode, debugName);
     }
     catch (...)
     {
-      MONITOR_WITH_NODE("Uncaught unknown exception from application with node: ", *applicationTopNode);
+      MONITOR_WITH_NODE("Uncaught unknown exception from application", *applicationTopNode, debugName);
     }
-    MONITOR_WITH_NODE("Application end with node: ", *applicationTopNode);
+    MONITOR_WITH_NODE("Application ends", *applicationTopNode, debugName);
   };
 
   m_threadStarted   = false;    // This is to detect when the thread begins to run (waiting for start signal)
-  auto appThread    = std::thread(wrapper);
+  auto appThread    = std::thread(wrapper, debugName);
   auto appThreadId  = appThread.get_id();
   auto pathResolver = NodePathResolver(applicationTopNode);
-  auto data         = make_shared<ApplicationData>(std::move(appThread), pathResolver);
+  auto data         = make_shared<ApplicationData>(std::move(appThread), pathResolver, debugName);
 
   while (!m_threadStarted)
   {
     std::this_thread::sleep_for(100us);
   }
-  MONITOR_WITH_NODE("Application thread have reported to be running with node: ", *applicationTopNode);
+  MONITOR_WITH_NODE("Application thread have reported to be running", *applicationTopNode, debugName);
 
   m_threadStarted = false;
 
@@ -303,9 +303,9 @@ void SystemModelManager::JoinAllApplicationThreads ()
 
     if (data->appThread.joinable())
     {
-      MONITOR_WITH_NODE("Joining application thread associated with node: ", *topNode);
+      MONITOR_WITH_NODE("Joining application thread", *topNode, data->debugName);
       data->appThread.join();
-      MONITOR_WITH_NODE("Joined  application thread associated with node: ", *topNode);
+      MONITOR_WITH_NODE("Joined  application thread", *topNode, data->debugName);
     }
   }
   m_threadToAppData.clear();  // There is no more application thread, so the data are useless

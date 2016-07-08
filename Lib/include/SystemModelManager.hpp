@@ -23,6 +23,7 @@
 #include "NodePathResolver.hpp"
 #include "SystemModelManagerMonitor.hpp"
 
+#include <string>
 #include <memory>
 #include <set>
 #include <functional>
@@ -51,6 +52,8 @@ class DLL_EXPORT SystemModelManager final
   ~SystemModelManager();
   SystemModelManager() = delete;
 
+  using string_view = std::experimental::string_view;
+
   //! Associates a SystemModel to fresh SystemModelManager
   //!
   SystemModelManager(SystemModel& sm,
@@ -70,7 +73,7 @@ class DLL_EXPORT SystemModelManager final
 
   //! Creates an application thread
   //!
-  void CreateApplicationThread(std::shared_ptr<ParentNode> applicationTopNode, Application_t functor);
+  void CreateApplicationThread(std::shared_ptr<ParentNode> applicationTopNode, Application_t functor, string_view debugName = "");
 
   //! Waits for all application thread to terminate
   //!
@@ -106,11 +109,11 @@ class DLL_EXPORT SystemModelManager final
 
   //! Returns last Register value read from SUT
   //!
-  BinaryVector iGet (std::experimental::string_view registerPath);
+  BinaryVector iGet (string_view registerPath);
 
   //! Sets next Register value to sent to SUT
   //!
-  void iWrite (std::experimental::string_view registerPath, BinaryVector sequence);
+  void iWrite (string_view registerPath, BinaryVector sequence);
 
 
   // ---------------- Protected Methods
@@ -127,10 +130,11 @@ class DLL_EXPORT SystemModelManager final
 
   struct ApplicationData
   {
-    ApplicationData(std::thread p_appThread, NodePathResolver p_pathResolver)
+    ApplicationData(std::thread p_appThread, NodePathResolver p_pathResolver, string_view p_debugName)
       : appThread    (std::move(p_appThread))
       , canProceed   (false)
       , pathResolver (p_pathResolver)
+      , debugName    (p_debugName.to_string())
     {
     }
 
@@ -140,6 +144,7 @@ class DLL_EXPORT SystemModelManager final
     std::atomic_bool         canProceed;          //!< When true, application thread can return from iApply
     NodePathResolver         pathResolver;        //!< One per application thread to point to different node, have different prefix and cache
     std::set<NodeIdentifier> pendingRegistersIds; //!< Pending registers for application thread
+    std::string              debugName;           //!< Name associated to application thread to ease identification in debug
   };
 
   using ThreadToAppDataMapper_t = std::map<std::thread::id,     std::shared_ptr<ApplicationData>>;

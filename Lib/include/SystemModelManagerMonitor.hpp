@@ -33,15 +33,17 @@ class DLL_EXPORT SystemModelManagerMonitor
   virtual ~SystemModelManagerMonitor() = default;
   SystemModelManagerMonitor()  = default;
 
-  void LogUncondionally(std::experimental::string_view message);                              //!< Always log message
-  void LogUncondionally(std::experimental::string_view message, const SystemModelNode& node); //!< Always log message (in relation with a node)
+  using string_view = std::experimental::string_view;
 
-  virtual void Reset();                                         //!< Resets data cyles counter
-  virtual void CreateApplication   (const ParentNode& topNode); //!< Monitors creation of application thread
-  virtual void StartDataCycles();                               //!< Monitors start of new data cycles
-  virtual void StartDataCycle();                                //!< Monitors start of a new data cycle
-  virtual void BeforeConfiguration (ParentNode&       root);    //!< Monitors state of SystemModel (from parentNode) before configuration
-  virtual void AfterConfiguration  (ParentNode&       root);    //!< Monitors state of SystemModel (from parentNode) after configuration
+  void LogUncondionally(string_view message);                                                     //!< Always log message
+  void LogUncondionally(string_view message, const SystemModelNode& node, string_view debugName); //!< Always log message (in relation with a node)
+
+  virtual void Reset();                                                                //!< Resets data cyles counter
+  virtual void CreateApplication   (const ParentNode& topNode, string_view debugName); //!< Monitors creation of application thread
+  virtual void StartDataCycles();                                                      //!< Monitors start of new data cycles
+  virtual void StartDataCycle();                                                       //!< Monitors start of a new data cycle
+  virtual void BeforeConfiguration (ParentNode&       root);                           //!< Monitors state of SystemModel (from parentNode) before configuration
+  virtual void AfterConfiguration  (ParentNode&       root);                           //!< Monitors state of SystemModel (from parentNode) after configuration
 
   std::string GmlBasePath()                const { return m_gmlPrinterBasePath;         }
   bool        MonitorAfterConfiguration()  const { return m_monitorAfterConfiguration;  }
@@ -54,10 +56,13 @@ class DLL_EXPORT SystemModelManagerMonitor
   // ---------------- Protected Methods
   //
   protected:
-  std::string MakeFilePath (std::experimental::string_view basePath, std::experimental::string_view step);
-  void        ExportGml    (std::experimental::string_view step, ParentNode& root);
+  std::string MakeFilePath (string_view basePath, std::experimental::string_view step);
+  void        ExportGml    (string_view step, ParentNode& root);
 
   static std::string NodeInfos    (const SystemModelNode& node);
+
+  //! Wraps debug name within simple quotes
+  std::string WrapDebugName (string_view debugName) { return debugName.empty() ? "" : "'" + debugName.to_string() + "': "; }
 
   // ---------------- Private  Methods
   //

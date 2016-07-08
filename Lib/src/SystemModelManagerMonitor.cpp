@@ -65,11 +65,11 @@ void SystemModelManagerMonitor::BeforeConfiguration (ParentNode& root)
 //!
 //! @param topNode Top most node associated with the application thread
 //!
-void SystemModelManagerMonitor::CreateApplication (const ParentNode& topNode)
+void SystemModelManagerMonitor::CreateApplication (const ParentNode& topNode, string_view debugName)
 {
   if (m_monitorAppThreadCreation)
   {
-    LOG(INFO) << "Creating application thread with node: " << topNode.Name() << " (id: " << topNode.Identifier() << ")";
+    LOG(INFO) << WrapDebugName(debugName) << "Creating application thread" << NodeInfos(topNode);
   }
 }
 //
@@ -120,9 +120,9 @@ void SystemModelManagerMonitor::LogUncondionally (string_view message)
 //!
 //! @param message  A message to log
 //!
-void SystemModelManagerMonitor::LogUncondionally (string_view message, const SystemModelNode& node)
+void SystemModelManagerMonitor::LogUncondionally (string_view message, const SystemModelNode& node, string_view debugName)
 {
-  LOG(INFO) << message << NodeInfos(node);
+  LOG(INFO) << WrapDebugName(debugName) << message << NodeInfos(node);
 }
 //
 //  End of: SystemModelManagerMonitor::LogUncondionally
@@ -153,7 +153,7 @@ string SystemModelManagerMonitor::MakeFilePath (string_view basePath, string_vie
 //!
 string SystemModelManagerMonitor::NodeInfos (const SystemModelNode& node)
 {
-  return node.Name() + " (id: " + std::to_string(node.Identifier()) + ")";
+  return " (using top node '"s + node.Name() + "' [id: " + std::to_string(node.Identifier()) + "])";
 }
 //
 //  End of: SystemModelManagerMonitor::NodeInfos
@@ -192,6 +192,10 @@ void SystemModelManagerMonitor::StartDataCycles ()
 //
 //  End of: SystemModelManagerMonitor::StartDataCycles
 //---------------------------------------------------------------------------
+
+
+
+
 
 //===========================================================================
 // End of SystemModelManagerMonitor.cpp

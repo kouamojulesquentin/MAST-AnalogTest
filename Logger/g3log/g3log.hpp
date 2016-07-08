@@ -247,7 +247,18 @@ namespace g3
 #define INTERNAL_CONTRACT_MESSAGE(boolean_expression)  \
    LogCapture(__FILE__, __LINE__, __PRETTY_FUNCTION__, g3::internal::CONTRACT, boolean_expression)
 
+//! Helper to temporarily enable logs in current scope (@see ENABLE_LOG_IN_SCOPE)
+//!
+//! @note Log enabled state is restored once the scope where LogEnablerInScope is ended
+//! @note Can only be used once per scope but can be embedded in lower scope
+struct LogEnablerInScope
+{
+ LogEnablerInScope() : previousState(g3::logEnabled(true)) {}
+ ~LogEnablerInScope() { g3::logEnabled(previousState); }
+ bool previousState = false;
+};
 
+#define ENABLE_LOG_IN_SCOPE   LogEnablerInScope __var_to_restore_g3_log_enable_state_at_scope_exit
 
 // LOG(level) is the API for the stream log
 #define IF_CAN_LOG(level) if(g3::canLog(level))

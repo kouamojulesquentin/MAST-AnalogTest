@@ -125,11 +125,11 @@ class DLL_EXPORT SystemModelManager final
 
   //! Returns current sleep time between two SystemModel configurations (to let application threads to continue their job)
   //!
-  std::chrono::microseconds SleepTimeBetweenConfigurations() const { return m_sleepTimeBetweenConfigurations; }
+  std::chrono::milliseconds SleepTimeBetweenConfigurations() const { return m_sleepTimeBetweenConfigurations; }
 
   //! Sets sleep time between two SystemModel configurations (to let application threads to continue their job)
   //!
-  void SleepTimeBetweenConfigurations (std::chrono::microseconds sleepTimeBetweenConfigurations) { m_sleepTimeBetweenConfigurations = sleepTimeBetweenConfigurations; }
+  void SleepTimeBetweenConfigurations (std::chrono::milliseconds sleepTimeBetweenConfigurations) { m_sleepTimeBetweenConfigurations = sleepTimeBetweenConfigurations; }
 
 
   // ---------------- Protected Methods
@@ -210,7 +210,7 @@ class DLL_EXPORT SystemModelManager final
   std::condition_variable         m_loopCV;                         //!< Variable to manage restart of data cycle loop
   bool                            m_runLoop = false;                //!< True when data cycle loop is active
   std::chrono::milliseconds       m_dataCycleLoopTimeout;           //!< Approximate max time before an iApply is seen by data cycle loop
-  std::chrono::microseconds       m_sleepTimeBetweenConfigurations; //!< Sleep duration between two configurations to let application thread to access registers
+  std::chrono::milliseconds       m_sleepTimeBetweenConfigurations; //!< Sleep duration between two configurations to let application thread to access registers
   mutable std::shared_timed_mutex m_appDataMutex;                   //!< Protects access to applications data (mutable to be used within const methods)
   ThreadToAppDataMapper_t         m_threadToAppData;                //!< Associates a thread id with application data for that thread
 };

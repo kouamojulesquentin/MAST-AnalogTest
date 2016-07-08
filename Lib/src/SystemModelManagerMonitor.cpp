@@ -178,7 +178,7 @@ void SystemModelManagerMonitor::Reset ()
 void SystemModelManagerMonitor::StartDataCycle ()
 {
   ++m_dataCyclesCount;
-  LOG(INFO) << "Starting a data cycle: " << m_dataCyclesCount;
+  LOG(INFO) << "Starting data cycle: " << m_dataCyclesCount;
 }
 //
 //  End of: SystemModelManagerMonitor::StartDataCycles

@@ -77,7 +77,7 @@ SystemModelManager::SystemModelManager(SystemModel&                          sm,
   , m_appStarted                     (false)
   , m_loopStarted                    (false)
   , m_dataCycleLoopTimeout           (1s)
-  , m_sleepTimeBetweenConfigurations (100us)
+  , m_sleepTimeBetweenConfigurations (0ms)
 {
   MONITOR_MESSAGE("Constructed SystemModelManager");
 }
@@ -124,8 +124,16 @@ void SystemModelManager::CreateApplicationThread (shared_ptr<ParentNode> applica
 
     // ---------------- Wait for start "signal"
     //
+    auto predicate = [this]{ return m_appStarted.load(); };
+//+    while (!predicate())
+//+    {
+//+      std::unique_lock<std::mutex> lock(m_appStartMutex);
+//+      m_appStartConditionVar.wait_for(lock, 1ms, predicate);
+//+    }
+
     std::unique_lock<std::mutex> lock(m_appStartMutex);
-    m_appStartConditionVar.wait(lock, [this]{return m_appStarted.load();});
+    m_appStartConditionVar.wait(lock, predicate);
+    lock.unlock();
 
     // ---------------- To actual application job
     //

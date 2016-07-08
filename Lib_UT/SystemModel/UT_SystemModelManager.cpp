@@ -916,7 +916,7 @@ void UT_SystemModelManager::test_CreateApplicationThread_1_App ()
     TS_ASSERT_EQUALS (sum,          0);  // Thread is waiting for start signal ==> sum does not change
     TS_ASSERT_EQUALS (value.load(), 1u); // Value is also not changed
     sut.StartCreatedApplicationThreads();
-    while (!started){std::this_thread::sleep_for(10us);}  // Wait for start signal being seen by application thread function
+    while (!started){std::this_thread::sleep_for(1ms);}  // Wait for start signal being seen by application thread function
     TS_ASSERT_EQUALS (sum,          1u); // Thread is now started ==> sum has been updated
     TS_ASSERT_EQUALS (value.load(), 0);  // Value has been reset
 
@@ -1438,6 +1438,7 @@ void UT_SystemModelManager::test_iApply_Thread_is_Known_NoPending ()
   auto reg  = sm.RegisterWithId(9u);
 
 //+  ENABLE_LOG_IN_SCOPE;
+//+  LOG_FUNCTION_SCOPE;
   SystemModelManager sut(sm);
 
   // Thread functor
@@ -1482,18 +1483,16 @@ void UT_SystemModelManager::test_iApply_Thread_is_Known_NoPending_WrongStart ()
   // Thread functor
   auto appFunctor = [&sut]()
   {
-    // ---------------- Setup
-    //
     auto nextToSut = BinaryVector::CreateFromHexString("FADE_CAFE");
-
-    // ---------------- Exercise & Verify
-    //
     TS_ASSERT_THROWS_NOTHING (sut.iApply());
   };
 
   // ---------------- Setup (main thread)
   //
   TS_ASSERT_THROWS_NOTHING (sut.CreateApplicationThread(mux, appFunctor)); // Include "Exercise" in created thread );
+
+  // ---------------- Exercise & Verify
+  //
   TS_ASSERT_THROWS (sut.Start(), std::exception);
 }
 
@@ -1541,7 +1540,8 @@ void UT_SystemModelManager::test_iApply_4_Threads_Once_SameReg ()
   auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
   auto reg  = sm.RegisterWithId(9u);
 
-  //  ENABLE_LOG_IN_SCOPE;
+  ENABLE_LOG_IN_SCOPE;
+  LOG_FUNCTION_SCOPE;
   SystemModelManager sut(sm);
 
   // Thread functor
@@ -1590,7 +1590,8 @@ void UT_SystemModelManager::test_iApply_4_Threads_1_Write ()
   auto reg_2  = sm.RegisterWithId(8u);
   auto reg_3  = sm.RegisterWithId(9u);
 
-  //  ENABLE_LOG_IN_SCOPE;
+  ENABLE_LOG_IN_SCOPE;
+  LOG_FUNCTION_SCOPE;
   SystemModelManager sut(sm);
 
   // Thread functor
@@ -1646,7 +1647,8 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes ()
   auto reg_2  = sm.RegisterWithId(8u);
   auto reg_3  = sm.RegisterWithId(9u);
 
-  //  ENABLE_LOG_IN_SCOPE;
+  ENABLE_LOG_IN_SCOPE;
+  LOG_FUNCTION_SCOPE;
   SystemModelManager sut(sm);
 
   // Thread functor
@@ -1736,6 +1738,7 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes_TC_1500 ()
   auto reg_3  = sm.RegisterWithId(17u);
 
   ENABLE_LOG_IN_SCOPE;
+  LOG_FUNCTION_SCOPE;
   SystemModelManager sut(sm);
 
   // Thread functor
@@ -1822,7 +1825,8 @@ void UT_SystemModelManager::test_Start_from_Another_Thread ()
   auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
   auto reg  = sm.RegisterWithId(9u);
 
-  //  ENABLE_LOG_IN_SCOPE;
+  ENABLE_LOG_IN_SCOPE;
+  LOG_FUNCTION_SCOPE;
   SystemModelManager sut(sm);
 
   // Thread functor
@@ -1837,7 +1841,7 @@ void UT_SystemModelManager::test_Start_from_Another_Thread ()
     );
   };
 
-  sut.CreateApplicationThread(mux, appFunctor);
+  sut.CreateApplicationThread(mux, appFunctor, "test_Start_from_Another_Thread");
   std::atomic_bool started(false);
 
   auto startFunctor = [&sut, & started]() { TS_ASSERT_THROWS_NOTHING (started = true; sut.Start()); };

@@ -125,11 +125,6 @@ void SystemModelManager::CreateApplicationThread (shared_ptr<ParentNode> applica
     // ---------------- Wait for start "signal"
     //
     auto predicate = [this]{ return m_appStarted.load(); };
-//+    while (!predicate())
-//+    {
-//+      std::unique_lock<std::mutex> lock(m_appStartMutex);
-//+      m_appStartConditionVar.wait_for(lock, 1ms, predicate);
-//+    }
 
     std::unique_lock<std::mutex> lock(m_appStartMutex);
     m_appStartConditionVar.wait(lock, predicate);
@@ -345,13 +340,13 @@ void SystemModelManager::iApply ()
       //
       {
         unique_lock<recursive_mutex> lock(m_dataMutex);
+        appData->canProceed = false;      // Must be set to false before reporting as pending thread !
         m_pendingThreads.insert(threadId);
       }
 
-      appData->canProceed = false;
       WakeupDataCycles();
 
-//+      LOG(DEBUG) << "Will be blocked in iApply";
+      MONITOR_WITH_NODE("Will be blocked in iApply", *appData->pathResolver.ReferenceNode(), appData->debugName)
 
       // ---------------- Block the thread until data cycle loop release it (or is terminated)
       //                  As waking up of data cycle loop may occurs before wait
@@ -362,19 +357,20 @@ void SystemModelManager::iApply ()
 
       while (!predicate())
       {
-        if (timeout < maxTimeout)
+        if (timeout < maxTimeout) { timeout *= 2; }
+
         {
-          timeout *= 2;
+          std::unique_lock<std::mutex> lock(appData->releaseMutex);
+          appData->releaseCv.wait_for(lock, timeout, predicate);
         }
-        std::unique_lock<std::mutex> lock(appData->releaseMutex);
-        appData->releaseCv.wait_for(lock, timeout, predicate);
       }
 
       if (!m_runLoop)
       {
         MONITOR_MESSAGE("Application thread has been released from iApply because data cycle loop is not/no more running ");
       }
-//+      LOG(DEBUG) << "Released from iApply";
+
+      MONITOR_WITH_NODE("Released from iApply", *appData->pathResolver.ReferenceNode(), appData->debugName)
     }
   }
 }
@@ -435,9 +431,13 @@ void SystemModelManager::iWrite (string_view registerPath, BinaryVector sequence
   auto& pathResolver = PATH_RESOLVER("iWrite: ");
   auto  reg          = pathResolver.ResolveAsRegister(registerPath);
 
+  LOG(DEBUG) << "iWrite - Entering (may be blocked on mutex)";
+
   // ---------------- Protect access to SystemModel
   //
   unique_lock<recursive_mutex> lock(m_dataMutex);
+
+  LOG(DEBUG) << "iWrite - After mutex";
 
   reg->SetToSut(std::move(sequence));
 
@@ -464,6 +464,7 @@ void SystemModelManager::iWrite (string_view registerPath, BinaryVector sequence
       }
     }
   }
+  LOG(DEBUG) << "iWrite - Exiting";
 }
 //
 //  End of: SystemModelManager::iWrite
@@ -669,6 +670,7 @@ void SystemModelManager::ReleaseServedThreads ()
       ++it;
       m_pendingThreads.erase(toErasePos);
 
+      MONITOR_WITH_NODE("Will be released from iApply: ", *appData->pathResolver.ReferenceNode(), appData->debugName)
       appData->releaseCv.notify_one();
     }
     else

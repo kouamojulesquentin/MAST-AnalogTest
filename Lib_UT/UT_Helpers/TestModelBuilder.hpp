@@ -14,7 +14,7 @@
 #ifndef TESTMODELBUILDER_H__87ACB445_83CE_49DB_7EBB_7F14B3A1D5D0__INCLUDED_
   #define TESTMODELBUILDER_H__87ACB445_83CE_49DB_7EBB_7F14B3A1D5D0__INCLUDED_
 
-#include "SystemModel.hpp"
+#include "SystemModelBuilder.hpp"
 #include <memory>
 #include <experimental/string_view>
 using namespace std::string_literals;
@@ -55,40 +55,7 @@ class TestModelBuilder final
   public:
   ~TestModelBuilder() = default;
   TestModelBuilder()  = delete;
-  TestModelBuilder(mast::SystemModel& systemModel) : m_model(systemModel) {}
-
-  //! Specifies where the mux (Linker node) is placed relative to the register that drive it
-  //!
-  enum class MuxRegPlacement
-  {
-    Remote,    //!< The register placement is NOT related to the mux node
-    AfterMux,  //!< The register is placed after the mux
-    BeforeMux, //!< The register is placed before the mux
-  };
-
-  //! Appends several registers (with same length and initial content) to a parent
-  //!
-  void AppendRegisters (uint32_t                          count,
-                        const std::string&                baseName,
-                        const mast::BinaryVector&         bypass,
-                        std::shared_ptr<mast::ParentNode> parent);
-
-
-  std::shared_ptr<mast::Chain>           Create_MIB (std::experimental::string_view      name,
-                                                     std::shared_ptr<mast::PathSelector> selector,
-                                                     std::shared_ptr<mast::Register>     selectorRegister,
-                                                     MuxRegPlacement                     muxRegPlacement
-                                                     );
-
-  std::shared_ptr<mast::Chain>           Create_SIB (std::experimental::string_view      name,
-                                                     std::shared_ptr<mast::PathSelector> selector,
-                                                     std::shared_ptr<mast::Register>     selectorRegister,
-                                                     MuxRegPlacement                     muxRegPlacement
-                                                     )
-  {
-    return Create_MIB(name, selector, selectorRegister, muxRegPlacement);
-  }
-
+  TestModelBuilder(mast::SystemModel& systemModel) : m_model(systemModel), m_builder(systemModel) {}
 
   std::shared_ptr<mast::AccessInterface> Create_TestCase_AccessInterface     (std::experimental::string_view name = "TAP");
   std::shared_ptr<mast::AccessInterface> Create_TestCase_1687                (std::experimental::string_view name = "");
@@ -103,14 +70,15 @@ class TestModelBuilder final
   std::shared_ptr<mast::AccessInterface> Create_Default_SUT  (std::experimental::string_view name);
   std::shared_ptr<mast::Chain>           Create_Default_SIB  (std::experimental::string_view name);
   std::shared_ptr<mast::Chain>           Create_Default_MIB  (std::experimental::string_view name, uint32_t maxDerivations);
-  std::shared_ptr<mast::Chain>           Create_1500_Wrapper (std::experimental::string_view name, uint32_t maxDerivations);
 
   std::shared_ptr<mast::Chain>           Create_Simple_MIB   (std::experimental::string_view rootName = "Sut");
 
   // ---------------- Private  Fields
   //
   private:
-  mast::SystemModel& m_model;
+  mast::SystemModel&       m_model;   //!< Model to build on
+  mast::SystemModelBuilder m_builder; //!< "Official" SystemModel builder
+
 };
 //
 //  End of TestModelBuilder class declaration

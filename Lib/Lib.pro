@@ -44,6 +44,7 @@ SOURCES +=  \
     src/SVF_SimulationProtocol.cpp                  \
     src/SVFVector.cpp                               \
     src/SystemModel.cpp                             \
+    src/SystemModelBuilder.cpp                      \
     src/SystemModelManager.cpp                      \
     src/SystemModelManagerMonitor.cpp               \
     src/SystemModelCheckerVisitor.cpp               \
@@ -81,6 +82,7 @@ HEADERS += \
     include/SVF_SimulationProtocol.hpp                  \
     include/SVFVector.hpp                               \
     include/SystemModel.hpp                             \
+    include/SystemModelBuilder.hpp                      \
     include/SystemModelManager.hpp                      \
     include/SystemModelManagerMonitor.hpp               \
     include/SystemModelCheckerVisitor.hpp               \

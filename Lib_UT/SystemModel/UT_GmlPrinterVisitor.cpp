@@ -16,7 +16,7 @@
 #include "GmlPrinterVisitor.hpp"
 #include "SystemModelNodes.hpp"
 #include "DefaultBinaryPathSelector.hpp"
-#include "SystemModel.hpp"
+#include "SystemModelBuilder.hpp"
 #include "TestModelBuilder.hpp"
 
 #include <cxxtest/ValueTraits.h>
@@ -34,7 +34,7 @@ namespace
 //!
 std::shared_ptr<AccessInterface> Create_TestCase_Tap_With_Children (SystemModel& sm)
 {
-  TestModelBuilder buider(sm);
+  SystemModelBuilder buider(sm);
 
   string_view noName;
   uint32_t    irBitsCount   = 6u;

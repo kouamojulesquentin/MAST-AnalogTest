@@ -12,7 +12,6 @@
 //===========================================================================
 
 #include "TestModelBuilder.hpp"
-#include "SystemModel.hpp"
 #include "SystemModelNode.hpp"
 #include "DefaultBinaryPathSelector.hpp"
 #include "BinaryVector_Traits.hpp"
@@ -28,22 +27,6 @@ using namespace mast;
 using namespace test;
 
 
-//! Appends several registers (with same length and initial content) to a parent
-//!
-void TestModelBuilder::AppendRegisters (uint32_t               count,
-                                          const string&          baseName,
-                                          const BinaryVector&    bypass,
-                                          shared_ptr<ParentNode> parent)
-{
-  for (uint32_t ii = 0 ; ii < count ; ++ii)
-  {
-    auto regName = baseName + std::to_string(ii);
-    m_model.CreateRegister (regName, bypass, parent);
-  }
-}
-//
-//  End of: TestModelBuilder::AppendRegisters
-//---------------------------------------------------------------------------
 
 
 //! Creates a MIB with a default (binary) selector
@@ -59,7 +42,7 @@ std::shared_ptr<Chain> TestModelBuilder::Create_Default_MIB (string_view name, u
 
   // ---------------- Create the mib
   //
-  auto mib = Create_MIB(name, selector, selectorReg, MuxRegPlacement::BeforeMux);
+  auto mib = m_builder.Create_MIB(name, selector, selectorReg, MuxRegPlacement::BeforeMux);
 
   return mib;
 }
@@ -83,7 +66,9 @@ std::shared_ptr<Chain> TestModelBuilder::Create_Default_SIB (string_view name)
 
   // ---------------- Create the sib (a mib with only one possible derivation)
   //
-  auto sib = Create_MIB(sibName, selector, selectorReg, MuxRegPlacement::BeforeMux);
+  SystemModelBuilder m_builder(m_model);
+
+  auto sib = m_builder.Create_MIB(sibName, selector, selectorReg, MuxRegPlacement::BeforeMux);
 
   return sib;
 }
@@ -116,45 +101,6 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_Default_SUT (string_view na
 //  End of: TestModelBuilder::Create_Default_Sut
 //---------------------------------------------------------------------------
 
-
-
-//! Creates a "1500" style wrapper
-//!
-std::shared_ptr<Chain> TestModelBuilder::Create_1500_Wrapper (string_view name, uint32_t maxDerivations)
-{
-  // ---------------- Create wrapper
-  //
-  if (name.empty())
-  {
-    name = DEFAULT_1500_NAME;
-  }
-  auto wrapper = m_model.CreateChain (name);
-
-  // ---------------- SWIR
-  //
-  auto swirSelectorReg = m_model.CreateRegister ("SWIR"s + MIB_CTRL_EXT, BinaryVector::CreateFromBinaryString("0"), true);
-  auto swirSelector    = make_shared<DefaultBinaryPathSelector>(swirSelectorReg, 2);
-  auto swirMib         = Create_MIB("SWIR", swirSelector, swirSelectorReg, MuxRegPlacement::BeforeMux);
-  wrapper->AppendChild(swirMib);
-
-  // ---------------- WIR
-  //
-  auto totalDerivations = maxDerivations + 1u;   // +1 is to take into account bypass register (wirBypass)
-  auto wirSize          = DefaultBinaryPathSelector::RegWidthForPathCount(totalDerivations, false);
-  auto wirReg           = m_model.CreateRegister ("WIR_reg", BinaryVector(wirSize, 0), true);
-  auto wirSelector      = make_shared<DefaultBinaryPathSelector>(wirReg, totalDerivations);
-  auto wirMib           = Create_MIB("WIR", wirSelector, wirReg, MuxRegPlacement::Remote);
-  auto wirBypass        = m_model.CreateRegister ("WBY", BinaryVector(1, 0), wirMib);
-
-  swirMib->AppendChild(wirMib);
-  swirMib->AppendChild(wirReg);
-  wrapper->SetChildAppender(wirMib);
-
-  return wrapper;
-}
-//
-//  End of: TestModelBuilder::Create_1500_Wrapper
-//---------------------------------------------------------------------------
 
 //! Creates a simple 1149 tap node with two multiplexed registers
 //!
@@ -208,7 +154,7 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_MIB (string_view n
 
   // ---------------- Add registers
   //
-  AppendRegisters(registersCount, "dynamic_", BinaryVector(DYNAMIC_TDR_LEN, 0), tap);
+  m_builder.AppendRegisters(registersCount, "dynamic_", BinaryVector(DYNAMIC_TDR_LEN, 0), tap);
 
   return tap;
 }
@@ -270,7 +216,7 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_MIB_Multichain_Pre
 
   // ---------------- Add wrapped cores (registers)
   //
-  AppendRegisters(chainsCount, "dynamic_", BinaryVector(DYNAMIC_TDR_LEN, 0), mibMux);
+  m_builder.AppendRegisters(chainsCount, "dynamic_", BinaryVector(DYNAMIC_TDR_LEN, 0), mibMux);
 
   return tap;
 }
@@ -302,7 +248,7 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_MIB_Multichain_Pos
 
   // ---------------- Add wrapped cores (registers)
   //
-  AppendRegisters(chainsCount, "dynamic_", BinaryVector(DYNAMIC_TDR_LEN, 0), mibMux);
+  m_builder.AppendRegisters(chainsCount, "dynamic_", BinaryVector(DYNAMIC_TDR_LEN, 0), mibMux);
 
   return tap;
 }
@@ -328,12 +274,13 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_1500 (string_view 
 
   // ---------------- Append 1500 wrapper
   //
-  auto wrapper = Create_1500_Wrapper("", chainsCount);
+  SystemModelBuilder m_builder(m_model);
+  auto wrapper = m_builder.Create_1500_Wrapper("", chainsCount);
   tap->AppendChild(wrapper);
 
   // ---------------- Add 1500 wrapped cores (registers)
   //
-  AppendRegisters(chainsCount, "dynamic_", BinaryVector(DYNAMIC_TDR_LEN, 0), wrapper);
+  m_builder.AppendRegisters(chainsCount, "dynamic_", BinaryVector(DYNAMIC_TDR_LEN, 0), wrapper);
 
   return tap;
 }
@@ -390,59 +337,6 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_UnitTestCase_6_Levels ()
 }
 //
 //  End of: TestModelBuilder::Create_UnitTestCase_6_Levels
-//---------------------------------------------------------------------------
-
-
-//! Creates a MIB sub-tree
-//!
-//! @param name               Name associated with MIB top node
-//! @param selector           The selector that manage mux state
-//! @param selectorRegister   The selector register that will drive the mux
-//! @param muxRegPlacement       Whether mux is placed before or after the register that will drive it
-//!
-shared_ptr<Chain> TestModelBuilder::Create_MIB (string_view              name,
-                                                  shared_ptr<PathSelector> selector,
-                                                  shared_ptr<Register>     selectorRegister,
-                                                  MuxRegPlacement          muxRegPlacement
-                                                 )
-{
-  // ---------------- Create top node
-  //
-  if (name.empty())
-  {
-    name = DEFAULT_MIB_NAME;
-  }
-
-  auto mibName = string(name);
-  auto mib     = m_model.CreateChain(mibName);
-
-  // ---------------- Create linker
-  //
-  auto linker = m_model.CreateLinker(mibName + MIB_MUX_EXT, selector);
-
-  // ---------------- Append linker and optionally its selector register
-  //
-  if (muxRegPlacement == MuxRegPlacement::AfterMux)
-  {
-    mib->AppendChild(linker);
-    mib->AppendChild(selectorRegister);
-  }
-  else if (muxRegPlacement == MuxRegPlacement::BeforeMux)
-  {
-    mib->AppendChild(selectorRegister);
-    mib->AppendChild(linker);
-  }
-  else
-  {
-    mib->AppendChild(linker); // Remote control reg is already in the tree ==> append only the MUX
-  }
-
-  mib->SetChildAppender(linker);
-
-  return mib;
-}
-//
-//  End of: TestModelBuilder::Create_MIB
 //---------------------------------------------------------------------------
 
 

@@ -11,11 +11,12 @@ CMAKE_FLAGS=  -DCMAKE_CXX_COMPILER=g++
 CMAKE_DEBUG_FLAGS=  -DCMAKE_BUILD_TYPE=Debug $(CMAKE_FLAGS)
 CMAKE_RELEASE_FLAGS=  -DCMAKE_BUILD_TYPE=Debug $(CMAKE_FLAGS)
 
-CMAKE_ARM_FLAGS=  -D CMAKE_TOOLCHAIN_FILE=Toolchain-arm.cmake
+CMAKE_ARM_FLAGS= -D CMAKE_TOOLCHAIN_FILE=Toolchain-arm.cmake
 
 MAKE_FLAGS= -j4
 
 RUNNER=Lib_UT_Runner
+RUNNER_LIB=Lib_UT_Runner
 
 all: debug
 
@@ -34,15 +35,15 @@ endif
 > cd $(CMAKE_RELEASE_BUILD_DIR) && make  $(MAKE_FLAGS)
 
 run_debug:
-ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(RUNNER))","")
->  cd $(CMAKE_DEBUG_BUILD_DIR) && ./$(RUNNER) ;
+ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(RUNNER_LIB)/$(RUNNER))","")
+>  cd $(CMAKE_DEBUG_BUILD_DIR) && ./$(RUNNER_LIB)/$(RUNNER) ;
 else
 >  @echo "		====No Debug build available ========"
 endif
 
 run_release:
-ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(RUNNER))","")
->  cd $(CMAKE_RELEASE_BUILD_DIR) && ./$(RUNNER) ;
+ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(RUNNER_LIB)/$(RUNNER))","")
+>  cd $(CMAKE_RELEASE_BUILD_DIR) && ./$(RUNNER_LIB)/$(RUNNER) ;
 else
 >  @echo "		====No Release build available ========"
 endif

@@ -70,15 +70,12 @@ class UT_SystemModelManager : public CxxTest::TestSuite
   void test_iApply_Thread_is_SystemModelManager_NoPending ();
   void test_iApply_Thread_is_Known ();
   void test_iApply_Thread_is_Known_NoPending ();
-  void test_iApply_Thread_is_Known_NoPending_WrongStart ();
   void test_iApply_Thread_is_Unknown ();
   void test_iApply_DataCycleLoop_NotStarted ();
   void test_iApply_4_Threads_Once_SameReg ();
   void test_iApply_4_Threads_1_Write ();
   void test_iApply_4_Threads_N_Writes ();
   void test_iApply_4_Threads_N_Writes_TC_1500 ();
-
-  void test_Start_from_Another_Thread ();
 
   // ================ Other Methods ================
 

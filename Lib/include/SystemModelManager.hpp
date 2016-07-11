@@ -83,13 +83,9 @@ class DLL_EXPORT SystemModelManager final
   //!
   void StartCreatedApplicationThreads ();
 
-  //! Starts periodical (or on iApply) loop of complete data cycles on calling thread
-  //!
-  void Start ();
-
   //! Starts periodical (or on iApply) loop of complete data cycles on a new thread
   //!
-  void StartInBackground ();
+  void Start ();
 
   //! Stops data cycle loop
   //!

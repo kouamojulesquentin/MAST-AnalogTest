@@ -42,10 +42,12 @@ enum class MuxRegPlacement
 //!
 enum class SelectorKind
 {
-  Binary,
-  Binary_Inverted,
-  One_Hot,
-  N_Hot,
+  Binary,                        //!< Basic binary encoding where value '00' select path '0'
+  Binary_Inverted,               //!< Binary encoding where value 'FF' select path '0'
+  Binary_CanSelectNone,          //!< Binary encoding where value '00' select no path and "01" path '0'
+  Binary_Inverted_CanSelectNone, //!< Binary encoding where value 'FF' select no path and "FE" path '0'
+  One_Hot,                       //!< One hot encoding where value '000' select no path and "001" path '0'
+  N_Hot,                         //!< One hot encoding where value '000' select no path and "001" path '0'
 };
 
 

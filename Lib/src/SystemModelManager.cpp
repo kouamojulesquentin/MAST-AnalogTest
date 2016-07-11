@@ -534,38 +534,13 @@ const NodePathResolver& SystemModelManager::PathResolver (const char* file, cons
 //---------------------------------------------------------------------------
 
 
-//! Starts periodical (or on iApply) loop of complete data cycles on calling thread
+
+
+//! Starts, in a background thread, periodical (or on iApply) loop of complete data cycles
 //!
-//! @note It only returns when StopDataCycleLoop is called, so it shall be called
-//!       from a thread differing from those used to create SystemModelManager.
-//!
-//! @see StartInBackground
+//! @note It returns when the background thread is effectively running
 //!
 void SystemModelManager::Start ()
-{
-  if (std::this_thread::get_id() == m_managerThreadId)
-  {
-    THROW_RUNTIME_ERROR("Start shall be called only from a thread different from SystemModelManager thread ==> Use StartInBackground");
-  }
-
-  MONITOR_MESSAGE("Starting data cycle loop in caller thread");
-  m_runLoop = true;
-  LoopOnDataCycle();
-  MONITOR_MESSAGE("Ending data cycle loop (caller thread)");
-}
-//
-//  End of Start
-//---------------------------------------------------------------------------
-
-
-//! Starts periodical (or on iApply) loop of complete data cycles on calling thread
-//!
-//! @note It only returns when StopDataCycleLoop is called, so it shall be called
-//!       from a thread differing from those used to create SystemModelManager.
-//!
-//! @note When returning, background thread has effectively began to run
-//!
-void SystemModelManager::StartInBackground ()
 {
   if (m_managerThread.joinable())
   {
@@ -589,7 +564,7 @@ void SystemModelManager::StartInBackground ()
   }
 }
 //
-//  End of StartInBackground
+//  End of Start
 //---------------------------------------------------------------------------
 
 

@@ -27,7 +27,7 @@ Suites = \
       $(UT_RootPath)/SystemModel/UT_SystemModelCheckerVisitor.hpp      \
       $(UT_RootPath)/SystemModel/UT_PrettyPrinterVisitor.hpp           \
       $(UT_RootPath)/SystemModel/UT_GmlPrinterVisitor.hpp              \
-      $(UT_RootPath)/UT_Helpers/UT_SystemModelBuilder.hpp              \
+      $(UT_RootPath)/UT_Helpers/UT_TestModelBuilder.hpp                \
       $(UT_RootPath)/SystemModel/UT_PropagatePendingVisitor.hpp        \
       $(UT_RootPath)/SystemModel/UT_ConfigureVisitor.hpp               \
       $(UT_RootPath)/SystemModel/UT_FromSutUpdater.hpp                 \

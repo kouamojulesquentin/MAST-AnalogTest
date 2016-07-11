@@ -15,7 +15,7 @@
 #include "SystemModel.hpp"
 #include "SystemModelNode.hpp"
 #include "DefaultBinaryPathSelector.hpp"
-#include "SystemModelBuilder.hpp"
+#include "TestModelBuilder.hpp"
 #include "BinaryVector_Traits.hpp"
 
 using std::string;
@@ -316,7 +316,7 @@ void UT_SystemModel::test_DisconnectNode_Bottom ()
   // ---------------- Setup
   //
   SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   builder.Create_UnitTestCase_6_Levels();
 
@@ -341,7 +341,7 @@ void UT_SystemModel::test_DisconnectNode_Middle ()
   // ---------------- Setup
   //
   SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   builder.Create_UnitTestCase_6_Levels();
 
@@ -366,7 +366,7 @@ void UT_SystemModel::test_DisconnectNode_Top ()
   // ---------------- Setup
   //
   SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   auto tap = builder.Create_UnitTestCase_6_Levels();
   auto mux = sm.LinkerWithId(2u);

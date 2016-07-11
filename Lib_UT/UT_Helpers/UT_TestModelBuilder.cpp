@@ -1,18 +1,18 @@
 //===========================================================================
-//                           UT_SystemModelBuilder.cpp
+//                           UT_TestModelBuilder.cpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file UT_SystemModelBuilder.cpp
+//! @file UT_TestModelBuilder.cpp
 //!
-//! Implements test fixture for testing SystemModelBuilder
+//! Implements test fixture for testing TestModelBuilder
 //!
 //===========================================================================
 
-#include "UT_SystemModelBuilder.hpp"
-#include "SystemModelBuilder.hpp"
+#include "UT_TestModelBuilder.hpp"
+#include "TestModelBuilder.hpp"
 #include "SystemModelNodes.hpp"
 #include "GmlPrinterVisitor.hpp"
 #include "PrettyPrinterVisitor.hpp"
@@ -24,11 +24,11 @@
 using std::string;
 using std::experimental::string_view;
 
-using test::SystemModelBuilder;
+using test::TestModelBuilder;
 using namespace mast;
 
 //! Initializes test (called for each test)
-void UT_SystemModelBuilder::setUp ()
+void UT_TestModelBuilder::setUp ()
 {
   CxxTest::setStringResultsOnNewLine(true);
   CxxTest::setCharactersMapping(CxxTest::CharacterMapping::MAP_CHARS_MINIMAL);  // Keep quotes, HT, and new lines unescaped
@@ -37,14 +37,14 @@ void UT_SystemModelBuilder::setUp ()
 }
 
 
-//! Checks SystemModelBuilder::Create_UnitTestCase_6_Levels()
+//! Checks TestModelBuilder::Create_UnitTestCase_6_Levels()
 //!
-void UT_SystemModelBuilder::test_Create_UnitTestCase_6_Levels ()
+void UT_TestModelBuilder::test_Create_UnitTestCase_6_Levels ()
 {
   // ---------------- Setup
   //
   SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   // ---------------- Exercise
   //
@@ -70,14 +70,14 @@ void UT_SystemModelBuilder::test_Create_UnitTestCase_6_Levels ()
 }
 
 
-//! Checks SystemModelBuilder::Create_TestCase_AccessInterface()
+//! Checks TestModelBuilder::Create_TestCase_AccessInterface()
 //!
-void UT_SystemModelBuilder::test_Create_TestCase_AccessInterface ()
+void UT_TestModelBuilder::test_Create_TestCase_AccessInterface ()
 {
   // ---------------- Setup
   //
   SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   // ---------------- Exercise
   //
@@ -160,14 +160,14 @@ void UT_SystemModelBuilder::test_Create_TestCase_AccessInterface ()
 }
 
 
-//! Checks SystemModelBuilder::Create_TestCase_MIB()
+//! Checks TestModelBuilder::Create_TestCase_MIB()
 //!
-void UT_SystemModelBuilder::test_Create_TestCase_MIB_4_Chains ()
+void UT_TestModelBuilder::test_Create_TestCase_MIB_4_Chains ()
 {
   // ---------------- Setup
   //
   SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   // ---------------- Exercise
   //
@@ -316,14 +316,14 @@ void UT_SystemModelBuilder::test_Create_TestCase_MIB_4_Chains ()
 }
 
 
-//! Checks SystemModelBuilder::Create_TestCase_1687()
+//! Checks TestModelBuilder::Create_TestCase_1687()
 //!
-void UT_SystemModelBuilder::test_Create_TestCase_1687 ()
+void UT_TestModelBuilder::test_Create_TestCase_1687 ()
 {
   // ---------------- Setup
   //
   SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   // ---------------- Exercise
   //
@@ -441,14 +441,14 @@ void UT_SystemModelBuilder::test_Create_TestCase_1687 ()
   TS_ASSERT_EQUALS (gotPretty, expectedPretty);
 }
 
-//! Checks SystemModelBuilder::Create_TestCase_1500()
+//! Checks TestModelBuilder::Create_TestCase_1500()
 //!
-void UT_SystemModelBuilder::test_Create_TestCase_1500_3_Chains ()
+void UT_TestModelBuilder::test_Create_TestCase_1500_3_Chains ()
 {
   // ---------------- Setup
   //
   SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   // ---------------- Exercise
   //
@@ -623,5 +623,5 @@ void UT_SystemModelBuilder::test_Create_TestCase_1500_3_Chains ()
 
 
 //===========================================================================
-// End of UT_SystemModelBuilder.cpp
+// End of UT_TestModelBuilder.cpp
 //===========================================================================

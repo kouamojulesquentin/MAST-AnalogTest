@@ -14,7 +14,7 @@
 
 #include "UT_PropagatePendingVisitor.hpp"
 #include "PropagatePendingVisitor.hpp"
-#include "SystemModelBuilder.hpp"
+#include "TestModelBuilder.hpp"
 #include <cxxtest/ValueTraits.h>
 
 using namespace mast;
@@ -48,7 +48,7 @@ void UT_PropagatePendingVisitor::test_Visit_xxx ()
   // ---------------- Setup
   //
   SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   auto root = builder.Create_Simple_MIB();
 

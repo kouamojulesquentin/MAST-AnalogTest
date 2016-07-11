@@ -14,7 +14,7 @@
 
 #include "UT_ConfigureVisitor.hpp"
 #include "ConfigureVisitor.hpp"
-#include "SystemModelBuilder.hpp"
+#include "TestModelBuilder.hpp"
 
 #include <cxxtest/ValueTraits.h>
 
@@ -50,7 +50,7 @@ void UT_ConfigureVisitor::test_Accept_Testcase_1500_Nothing_Pending ()
   // ---------------- Setup
   //
   SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
   auto tap = builder.Create_TestCase_1500("TAP", 3u);
 
   ConfigureVisitor sut;
@@ -72,7 +72,7 @@ void UT_ConfigureVisitor::test_Accept_Testcase_1500_1_Pending ()
   // ---------------- Setup
   //
   SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   auto tap    = builder.Create_TestCase_1500("TAP", 3u);
   auto ir     = sm.RegisterWithId(1u);
@@ -115,7 +115,7 @@ void UT_ConfigureVisitor::test_Accept_Testcase_1500_2_Pending ()
   // ---------------- Setup
   //
   SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   auto tap    = builder.Create_TestCase_1500("TAP", 3u);
   auto reg_1  = sm.RegisterWithId(14u);
@@ -151,7 +151,7 @@ void UT_ConfigureVisitor::test_Accept_Testcase_AI_Pending_Reset ()
   // ---------------- Setup
   //
   SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   auto tap      = builder.Create_TestCase_AccessInterface("TAP");
   auto ir       = sm.RegisterWithId(1u);

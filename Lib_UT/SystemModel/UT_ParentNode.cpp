@@ -16,7 +16,7 @@
 #include "Register.hpp"
 #include "SystemModel.hpp"
 #include "GmlPrinterVisitor.hpp"  // To get a visual representation of testcase
-#include "SystemModelBuilder.hpp"
+#include "TestModelBuilder.hpp"
 #include <tuple>
 #include <cxxtest/ValueTraits.h>
 
@@ -33,7 +33,7 @@ namespace
 //!
 shared_ptr<ParentNode> CreateSystemModel (SystemModel& sm, bool reportGml = false)
 {
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   auto tap = builder.Create_UnitTestCase_6_Levels();
 

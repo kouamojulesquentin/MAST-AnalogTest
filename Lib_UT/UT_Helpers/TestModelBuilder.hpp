@@ -1,19 +1,18 @@
 //===========================================================================
-//                           SystemModelBuilder.hpp
+//                           TestModelBuilder.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file SystemModelBuilder.hpp
+//! @file TestModelBuilder.hpp
 //!
-//! Declares SystemModelBuilder class
+//! Declares TestModelBuilder class
 //!
 //===========================================================================
 
-
-#ifndef SYSTEMMODELBUILDER_H__90360FCD_A06E_4402_79BF_910CC9F73048__INCLUDED_
-  #define SYSTEMMODELBUILDER_H__90360FCD_A06E_4402_79BF_910CC9F73048__INCLUDED_
+#ifndef TESTMODELBUILDER_H__87ACB445_83CE_49DB_7EBB_7F14B3A1D5D0__INCLUDED_
+  #define TESTMODELBUILDER_H__87ACB445_83CE_49DB_7EBB_7F14B3A1D5D0__INCLUDED_
 
 #include "SystemModel.hpp"
 #include <memory>
@@ -49,14 +48,14 @@ constexpr char     SIB_MUX_EXT[]         = "_mux";
 //! Provides facilities to create SystemModel tree example
 //!
 //! @note This is mainly intended to be used in unit tests
-class SystemModelBuilder final
+class TestModelBuilder final
 {
   // ---------------- Public  Methods
   //
   public:
-  ~SystemModelBuilder() = default;
-  SystemModelBuilder()  = delete;
-  SystemModelBuilder(mast::SystemModel& systemModel) : m_model(systemModel) {}
+  ~TestModelBuilder() = default;
+  TestModelBuilder()  = delete;
+  TestModelBuilder(mast::SystemModel& systemModel) : m_model(systemModel) {}
 
   //! Specifies where the mux (Linker node) is placed relative to the register that drive it
   //!
@@ -114,15 +113,14 @@ class SystemModelBuilder final
   mast::SystemModel& m_model;
 };
 //
-//  End of SystemModelBuilder class declaration
+//  End of TestModelBuilder class declaration
 //---------------------------------------------------------------------------
 } // End of namespace mast
 
 
 
 
-#endif  // not defined SYSTEMMODELBUILDER_H__90360FCD_A06E_4402_79BF_910CC9F73048__INCLUDED_
-
+#endif  // not defined TESTMODELBUILDER_H__87ACB445_83CE_49DB_7EBB_7F14B3A1D5D0__INCLUDED_
 //===========================================================================
-// End of SystemModelBuilder.hpp
+// End of TestModelBuilder.hpp
 //===========================================================================

@@ -16,7 +16,7 @@
 #include "ToSutVisitor.hpp"
 #include "ConfigureVisitor.hpp"
 #include "FromSutUpdater.hpp"
-#include "SystemModelBuilder.hpp"
+#include "TestModelBuilder.hpp"
 #include "DefaultBinaryPathSelector.hpp"
 
 #include <cxxtest/ValueTraits.h>
@@ -32,7 +32,7 @@ namespace
 SystemModel CreateSystemModel_AccessInterface (uint8_t regValue)
 {
   SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
   auto tap    = builder.Create_TestCase_AccessInterface("TAP");
   auto reg    = sm.RegisterWithId(7u);
 
@@ -206,7 +206,7 @@ void UT_ToSutVisitor::test_Accept_Testcase_1500_Nothing_Pending ()
   // ---------------- Setup
   //
   SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   auto tap = builder.Create_TestCase_1500("TAP", 3u);
 
@@ -240,7 +240,7 @@ void UT_ToSutVisitor::test_Accept_Testcase_1500_BypassMode_IgnorePending ()
   // ---------------- Setup
   //
   SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
   auto tap = builder.Create_TestCase_1500("TAP", 3u);
 
   ToSutVisitor sut;

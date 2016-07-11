@@ -1,29 +1,29 @@
 //===========================================================================
-//                           UT_SystemModelBuilder.hpp
+//                           UT_TestModelBuilder.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file UT_SystemModelBuilder.hpp
+//! @file UT_TestModelBuilder.hpp
 //!
-//! Declares test fixture class for testing SystemModelBuilder
+//! Declares test fixture class for testing TestModelBuilder
 //!
 //===========================================================================
 
 
-#ifndef UT_SYSTEMMODELBUILDER_H__CEE2196B_B1C8_49A1_CC86_18C0A5DE84__INCLUDED_
-  #define UT_SYSTEMMODELBUILDER_H__CEE2196B_B1C8_49A1_CC86_18C0A5DE84__INCLUDED_
+#ifndef UT_TESTMODELBUILDER_H__59AFCE9C_983E_4989_D392_181352EF685D__INCLUDED_
+  #define UT_TESTMODELBUILDER_H__59AFCE9C_983E_4989_D392_181352EF685D__INCLUDED_
 
 #include <cxxtest/TestSuite.h>
 
-//! Unit tests for class SystemModelBuilder
+//! Unit tests for class TestModelBuilder
 //!
-class UT_SystemModelBuilder : public CxxTest::TestSuite
+class UT_TestModelBuilder : public CxxTest::TestSuite
 {
   public:
-   UT_SystemModelBuilder() = default;
-  ~UT_SystemModelBuilder() = default;
+   UT_TestModelBuilder() = default;
+  ~UT_TestModelBuilder() = default;
 
   // ================ Test Methods ================
 
@@ -38,11 +38,11 @@ class UT_SystemModelBuilder : public CxxTest::TestSuite
   void setUp(); //!< Initializes test (called for each test)
 };
 //
-//  End of UT_SystemModelBuilder class declaration
+//  End of UT_TestModelBuilder class declaration
 //---------------------------------------------------------------------------
 
 
-#endif  // not defined UT_SYSTEMMODELBUILDER_H__CEE2196B_B1C8_49A1_CC86_18C0A5DE84__INCLUDED_
+#endif  // not defined UT_TESTMODELBUILDER_H__59AFCE9C_983E_4989_D392_181352EF685D__INCLUDED_
 //===========================================================================
-// End of UT_SystemModelBuilder.hpp
+// End of UT_TestModelBuilder.hpp
 //===========================================================================

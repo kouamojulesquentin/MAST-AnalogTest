@@ -48,8 +48,8 @@ SOURCES += \
     SystemModel/UT_ToSutVisitor.cpp                   \
     SystemModel/UT_SystemModelManager.cpp             \
     SystemModel/UT_SystemModelNode.cpp                \
-    UT_Helpers/SystemModelBuilder.cpp                 \
-    UT_Helpers/UT_SystemModelBuilder.cpp              \
+    UT_Helpers/TestModelBuilder.cpp                   \
+    UT_Helpers/UT_TestModelBuilder.cpp                \
     Utility/UT_BinaryVector.cpp                       \
     Utility/UT_SVFVector.cpp                          \
     Utility/UT_Utility.cpp
@@ -79,8 +79,8 @@ HEADERS += \
     SystemModel/UT_ToSutVisitor.hpp                   \
     SystemModel/UT_SystemModelManager.hpp             \
     SystemModel/UT_SystemModelNode.hpp                \
-    UT_Helpers/SystemModelBuilder.hpp                 \
-    UT_Helpers/UT_SystemModelBuilder.hpp              \
+    UT_Helpers/TestModelBuilder.hpp                   \
+    UT_Helpers/UT_TestModelBuilder.hpp                \
     Utility/UT_BinaryVector.hpp                       \
     Utility/UT_SVFVector.hpp                          \
     Utility/UT_Utility.hpp

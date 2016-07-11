@@ -13,7 +13,7 @@
 
 #include "UT_SystemModelManager.hpp"
 #include "SystemModelManager.hpp"
-#include "SystemModelBuilder.hpp"
+#include "TestModelBuilder.hpp"
 #include "GenericAccessInterfaceProtocol.hpp"
 #include "Spy_AccessInterfaceProtocols.hpp"
 #include "Spy_SVF_Protocol.hpp"
@@ -54,7 +54,7 @@ namespace
 //!
 std::shared_ptr<AccessInterface> Create_TestCase_1500 (SystemModel& sm, string_view name = "Tap", bool reportGml = false)
 {
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   auto ai        = builder.Create_TestCase_1500(name, 4u);
   auto ir        = sm.RegisterWithId(1u);
@@ -93,7 +93,7 @@ std::shared_ptr<AccessInterface> Create_TestCase_1500 (SystemModel& sm, string_v
 //!
 std::shared_ptr<AccessInterface> Create_TestCase_MIB_Multichain_Pre (SystemModel& sm, bool reportGml = false)
 {
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   auto tap = builder.Create_TestCase_MIB_Multichain_Pre("TAP", 4u);
 
@@ -128,7 +128,7 @@ std::shared_ptr<AccessInterface> Create_TestCase_MIB_Multichain_Pre (SystemModel
 //!
 std::shared_ptr<AccessInterface> Create_TestCase_MIB_Multichain_Post (SystemModel& sm, bool reportGml = false)
 {
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   auto tap = builder.Create_TestCase_MIB_Multichain_Post("TAP", 4u);
 
@@ -266,7 +266,7 @@ void UT_SystemModelManager::test_Constructor_SystemModel_Without_AI ()
   // ---------------- Setup
   //
   SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   auto root = builder.Create_Simple_MIB();
 
@@ -282,7 +282,7 @@ void UT_SystemModelManager::test_Constructor_Root_is_AI ()
   // ---------------- Setup
   //
   SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   auto root = builder.Create_TestCase_AccessInterface();
 
@@ -300,7 +300,7 @@ void UT_SystemModelManager::test_Constructor_Root_is_Chain_1_AI ()
   //
   SystemModel sm;
   auto root = sm.CreateChain("root");
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   auto ai   = builder.Create_TestCase_AccessInterface();
 
@@ -320,7 +320,7 @@ void UT_SystemModelManager::test_Constructor_Root_is_Chain_3_AI ()
   //
   SystemModel sm;
   auto root = sm.CreateChain("root");
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   auto ai_1 = builder.Create_TestCase_AccessInterface();
   auto ai_2 = builder.Create_TestCase_AccessInterface();
@@ -343,7 +343,7 @@ void UT_SystemModelManager::test_DoDataCycles_AccessInterface ()
   // ---------------- Setup
   //
   SystemModel sm;
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   auto ai    = builder.Create_TestCase_AccessInterface();
   auto ir    = sm.RegisterWithId(1u);

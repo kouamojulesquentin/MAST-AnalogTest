@@ -13,7 +13,7 @@
 
 #include "UT_DataCycle.hpp"
 
-#include "SystemModelBuilder.hpp"
+#include "TestModelBuilder.hpp"
 #include "GmlPrinterVisitor.hpp"
 #include "ConfigureVisitor.hpp"
 #include "ToSutVisitor.hpp"
@@ -35,7 +35,7 @@ namespace
 SystemModel Create_SimpleMIB ()
 {
   SystemModel        sm;
-  SystemModelBuilder builder(sm);
+  TestModelBuilder builder(sm);
 
   auto root      = builder.Create_Simple_MIB();
   auto mib_Ctrl  = sm.RegisterWithId(3u);

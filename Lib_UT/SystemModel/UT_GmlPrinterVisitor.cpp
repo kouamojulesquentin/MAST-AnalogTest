@@ -17,7 +17,7 @@
 #include "SystemModelNodes.hpp"
 #include "DefaultBinaryPathSelector.hpp"
 #include "SystemModel.hpp"
-#include "SystemModelBuilder.hpp"
+#include "TestModelBuilder.hpp"
 
 #include <cxxtest/ValueTraits.h>
 using std::string;
@@ -34,7 +34,7 @@ namespace
 //!
 std::shared_ptr<AccessInterface> Create_TestCase_Tap_With_Children (SystemModel& sm)
 {
-  SystemModelBuilder buider(sm);
+  TestModelBuilder buider(sm);
 
   string_view noName;
   uint32_t    irBitsCount   = 6u;

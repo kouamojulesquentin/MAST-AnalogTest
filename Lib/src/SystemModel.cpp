@@ -186,7 +186,7 @@ shared_ptr<AccessInterface> SystemModel::CreateTap (string_view name,
   auto muxName    = noName ? DEFAULT_TAP_MUX_NAME     : string(name) + DEFAULT_TAP_MUX_EXT;
   auto muxBpyName = noName ? DEFAULT_TAP_MUX_BPY_NAME : string(name) + DEFAULT_TAP_MUX_BPY_EXT;
 
-  auto protocol        = make_shared<LoopbackAccessInterfaceProtocol>(); // This is the default for test, use must provide its own
+  auto protocol        = make_shared<LoopbackAccessInterfaceProtocol>(); //+ This is the default for test, user must provide its own
   auto accessInterface = CreateAccessInterface(rootName, protocol);
 
   // ---------------- Create IR

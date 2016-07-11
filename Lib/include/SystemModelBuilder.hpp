@@ -42,12 +42,9 @@ enum class MuxRegPlacement
 //!
 enum class SelectorKind
 {
-  Binary,                        //!< Basic binary encoding where value '00' select path '0'
-  Binary_Inverted,               //!< Binary encoding where value 'FF' select path '0'
-  Binary_CanSelectNone,          //!< Binary encoding where value '00' select no path and "01" path '0'
-  Binary_Inverted_CanSelectNone, //!< Binary encoding where value 'FF' select no path and "FE" path '0'
-  One_Hot,                       //!< One hot encoding where value '000' select no path and "001" path '0'
-  N_Hot,                         //!< One hot encoding where value '000' select no path and "001" path '0'
+  Binary,  //!< Basic binary encoding where value '00' select path '0'
+  One_Hot, //!< One hot encoding where value '000' select no path and "001" path '0'
+  N_Hot,   //!< One hot encoding where value '000' select no path, "001" path '0', "011" paths '1' and '0'
 };
 
 
@@ -62,6 +59,7 @@ class DLL_EXPORT SystemModelBuilder final
   SystemModelBuilder()  = delete;
   SystemModelBuilder(mast::SystemModel& systemModel) : m_model(systemModel) {}
 
+  using string_view = std::experimental::string_view;
 
   //! Appends several registers (with same length and initial content) to a parent
   //!
@@ -71,19 +69,35 @@ class DLL_EXPORT SystemModelBuilder final
                         std::shared_ptr<mast::ParentNode> parent);
 
 
+  //! Creates a path selector
+  //!
+  std::shared_ptr<mast::PathSelector> Create_PathSelector(SelectorKind              selectorKind,
+                                                          std::shared_ptr<Register> associatedRegister,
+                                                          uint32_t                  pathsCount,
+                                                          bool                      isInverted    = false,
+                                                          bool                      canSelectNone = false);
+
+  //! Creates a path selector, creating its associated register
+  //!
+  std::pair<std::shared_ptr<Register>, std::shared_ptr<mast::PathSelector>>
+  Create_PathSelector(SelectorKind selectorKind,
+                      string_view  registerName,
+                      uint32_t     pathsCount,
+                      bool         isInverted    = false,
+                      bool         canSelectNone = false);
+
+
+  //! Creates a MIB sub-tree
+  //!
   std::shared_ptr<mast::Chain> Create_MIB (std::experimental::string_view      name,
                                            std::shared_ptr<mast::PathSelector> selector,
                                            std::shared_ptr<mast::Register>     selectorRegister,
                                            MuxRegPlacement                     muxRegPlacement
                                           );
 
-  std::shared_ptr<mast::Chain> Create_MIB (std::experimental::string_view  name,
-                                           SelectorKind                    selectorKind,
-                                           std::shared_ptr<mast::Register> selectorRegister,
-                                           MuxRegPlacement                 muxRegPlacement
-                                  );
 
-
+  //! Creates a SIB sub-tree
+  //!
   std::shared_ptr<mast::Chain> Create_SIB (std::experimental::string_view      name,
                                            std::shared_ptr<mast::PathSelector> selector,
                                            std::shared_ptr<mast::Register>     selectorRegister,
@@ -93,17 +107,10 @@ class DLL_EXPORT SystemModelBuilder final
     return Create_MIB(name, selector, selectorRegister, muxRegPlacement);
   }
 
-  std::shared_ptr<mast::Chain> Create_SIB (std::experimental::string_view      name,
-                                           SelectorKind                        selectorKind,
-                                           std::shared_ptr<mast::Register>     selectorRegister,
-                                           MuxRegPlacement                     muxRegPlacement
-                                          )
-  {
-    return Create_MIB(name, selectorKind, selectorRegister, muxRegPlacement);
-  }
 
-
-  std::shared_ptr<mast::Chain>           Create_1500_Wrapper (std::experimental::string_view name, uint32_t maxDerivations);
+  //! Creates a "1500" style wrapper
+  //!
+  std::shared_ptr<mast::Chain > Create_1500_Wrapper (std::experimental::string_view name, uint32_t maxDerivations);
 
   // ---------------- Private  Fields
   //

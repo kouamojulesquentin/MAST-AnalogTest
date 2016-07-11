@@ -15,11 +15,14 @@
 #include "SystemModel.hpp"
 #include "SystemModelNode.hpp"
 #include "DefaultBinaryPathSelector.hpp"
+#include "Utility.hpp"
 
 using std::string;
 using std::experimental::string_view;
 using std::shared_ptr;
 using std::make_shared;
+using std::make_pair;
+using std::pair;
 using std::dynamic_pointer_cast;
 
 using namespace std::string_literals;
@@ -59,19 +62,21 @@ std::shared_ptr<Chain> SystemModelBuilder::Create_1500_Wrapper (string_view name
 
   // ---------------- SWIR
   //
-  auto swirSelectorReg = m_model.CreateRegister ("SWIR"s + MIB_CTRL_EXT, BinaryVector::CreateFromBinaryString("0"), true);
-  auto swirSelector    = make_shared<DefaultBinaryPathSelector>(swirSelectorReg, 2);
+  auto res             = Create_PathSelector(SelectorKind::Binary, "SWIR"s + MIB_CTRL_EXT, 2u);
+  auto swirSelectorReg = res.first;
+  auto swirSelector    = res.second;
   auto swirMib         = Create_MIB("SWIR", swirSelector, swirSelectorReg, MuxRegPlacement::BeforeMux);
   wrapper->AppendChild(swirMib);
 
   // ---------------- WIR
   //
   auto totalDerivations = maxDerivations + 1u;   // +1 is to take into account bypass register (wirBypass)
-  auto wirSize          = DefaultBinaryPathSelector::RegWidthForPathCount(totalDerivations, false);
-  auto wirReg           = m_model.CreateRegister ("WIR_reg", BinaryVector(wirSize, 0), true);
-  auto wirSelector      = make_shared<DefaultBinaryPathSelector>(wirReg, totalDerivations);
-  auto wirMib           = Create_MIB("WIR", wirSelector, wirReg, MuxRegPlacement::Remote);
-  auto wirBypass        = m_model.CreateRegister ("WBY", BinaryVector(1, 0), wirMib);
+
+       res         = Create_PathSelector(SelectorKind::Binary, "WIR_reg", totalDerivations);
+  auto wirReg      = res.first;
+  auto wirSelector = res.second;
+  auto wirMib      = Create_MIB("WIR", wirSelector, wirReg, MuxRegPlacement::Remote);
+  auto wirBypass   = m_model.CreateRegister ("WBY", BinaryVector(1, 0), wirMib);
 
   swirMib->AppendChild(wirMib);
   swirMib->AppendChild(wirReg);
@@ -134,6 +139,78 @@ shared_ptr<Chain> SystemModelBuilder::Create_MIB (string_view              name,
 }
 //
 //  End of: SystemModelBuilder::Create_MIB
+//---------------------------------------------------------------------------
+
+
+
+//! Creates a path selector
+//!
+//! @param selectorKind         Kind of selector (Binary, One_Hot, N_Hot)
+//! @param associatedRegister   Register that is used to drive the path multiplexer
+//! @param pathsCount           Number of managed paths (including, optional, bypass register)
+//! @param isInverted           When true the bits for selecting a path are inverted (relative to the path identifier number)
+//! @param canSelectNone        For Binary type selector, when true register value zero is reserved to select
+//!                             'no path' otherwise 0 is used to select first path (provided it is not inverted)
+//!
+//! @return Newly created path selector
+//!
+shared_ptr<mast::PathSelector> SystemModelBuilder::Create_PathSelector (SelectorKind selectorKind, shared_ptr<Register> associatedRegister, uint32_t pathsCount, bool isInverted, bool canSelectNone)
+{
+  CHECK_PARAMETER_NOT_NULL(associatedRegister, "Associated register is mandatory (or call the version that take the register name instead)");
+
+  switch (selectorKind)
+  {
+    case SelectorKind::Binary:
+      return make_shared<DefaultBinaryPathSelector>(associatedRegister, pathsCount, isInverted, canSelectNone);
+    case SelectorKind::One_Hot:
+      //! @todo [JFC]-[July/11/2016]: In Create_PathSelector(): Implement creation of One_Hot and N_Hot selectors
+      //!
+      return nullptr;
+      break;
+    case SelectorKind::N_Hot:
+      return nullptr;
+      break;
+    default:
+      THROW_INVALID_ARGUMENT("Can only support Binary, One_Hot and N_Hot type path selector");
+      break;
+  }
+}
+//
+//  End of: SystemModelBuilder::Create_PathSelector
+//---------------------------------------------------------------------------
+
+
+//! Creates a path selector, creating its associated register
+//!
+//! @param selectorKind         Kind of selector (Binary, One_Hot, N_Hot)
+//! @param registerName         Name of Register that is used to drive the path multiplexer
+//! @param pathsCount           Number of managed paths (including, optional, bypass register)
+//! @param isInverted           When true the bits for selecting a path are inverted (relative to the path identifier number)
+//! @param canSelectNone        For Binary type selector, when true register value zero is reserved to select
+//!                             'no path' otherwise 0 is used to select first path (provided it is not inverted)
+//!
+//! @return Newly created path selector and its associated register
+//!
+pair<shared_ptr<Register>, shared_ptr<PathSelector>> SystemModelBuilder::Create_PathSelector (SelectorKind selectorKind, string_view registerName, uint32_t pathsCount, bool isInverted, bool canSelectNone)
+{
+  // ---------------- Create associated register
+  //
+  auto regSize = (selectorKind == SelectorKind::Binary) ? DefaultBinaryPathSelector::RegWidthForPathCount(pathsCount, canSelectNone)
+                                                        : pathsCount;
+
+  auto holdValue = true;
+  auto associatedRegister = m_model.CreateRegister (registerName, BinaryVector(regSize, 0, SizeProperty::Fixed), holdValue);
+
+  // ---------------- Create selector
+  //
+  auto selector = Create_PathSelector(selectorKind, associatedRegister, pathsCount, isInverted, canSelectNone);
+
+  // ---------------- Return both
+  //
+  return make_pair(associatedRegister, selector);
+}
+//
+//  End of: SystemModelBuilder::Create_PathSelector
 //---------------------------------------------------------------------------
 
 

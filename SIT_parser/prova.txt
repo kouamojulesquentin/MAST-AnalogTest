@@ -1,0 +1,26 @@
+JTAG_TAP Disney SVF_loopback 16 [ "0xF_F","0b1" ,"0b2" ,"0b3" ,"0b4" ,"0b5" ,"0b6" ,"0b7" ]  7 
+   
+ { 
+ REGISTER Topolino Bypass: "0b12"
+    REGISTER Peppa  Bypass: "0b12"
+   LINKER Minni NO_iPrefix Default_Binary Peppa
+    { REGISTER Paperina Bypass: "0b12"
+       REGISTER Gaspare Bypass: "0b12"
+    }
+   CHAIN Paperone
+    { REGISTER Qui Bypass: "0b12"
+       REGISTER Quo Bypass: "0b12"
+       REGISTER Qua Bypass: "0b12"
+    }
+   SIB Gastone PRE HIGH
+    { REGISTER Brigitta Bypass: "0b12" 
+    }
+   MIB Archimede POST LOW 4 Default_Binary Peppa
+    { REGISTER Paperina Bypass: "0b12"
+       REGISTER Gaspare Bypass: "0b12"
+    }
+   WRAPPER_1500 Bassotti 2
+    { REGISTER Paperina Bypass: "0b12"
+       REGISTER Gaspare Bypass: "0b12"
+    }
+ }   

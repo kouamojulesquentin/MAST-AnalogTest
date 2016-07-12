@@ -36,9 +36,10 @@ std::shared_ptr<Chain> TestModelBuilder::Create_Default_MIB (string_view name, u
   // ---------------- Prepare default selector
   //
   auto selectorRegName = name.empty() ? string(DEFAULT_MIB_NAME) + MIB_CTRL_EXT : string(name) + MIB_CTRL_EXT;
-  auto selectorRegSize = DefaultBinaryPathSelector::RegWidthForPathCount(maxDerivations, false);
-  auto selectorReg     = m_model.CreateRegister (selectorRegName, BinaryVector(selectorRegSize, 0), true);
-  auto selector        = make_shared<DefaultBinaryPathSelector>(selectorReg, maxDerivations);
+
+  auto res         = m_builder.Create_PathSelector(SelectorKind::Binary, selectorRegName, maxDerivations);
+  auto selectorReg = res.first;
+  auto selector    = res.second;
 
   // ---------------- Create the mib
   //
@@ -60,9 +61,9 @@ std::shared_ptr<Chain> TestModelBuilder::Create_Default_SIB (string_view name)
   auto sibName = name.empty() ? string_view(DEFAULT_SIB_NAME) : name;
 
   auto selectorRegName = string(sibName) + SIB_CTRL_EXT;
-  auto selectorRegSize = DefaultBinaryPathSelector::RegWidthForPathCount(1u, true);
-  auto selectorReg     = m_model.CreateRegister (selectorRegName, BinaryVector(selectorRegSize, 0), true);
-  auto selector        = make_shared<DefaultBinaryPathSelector>(selectorReg, 1, false, true);
+  auto res             = m_builder.Create_PathSelector(SelectorKind::Binary, selectorRegName, 1u, false, true);
+  auto selectorReg     = res.first;
+  auto selector        = res.second;
 
   // ---------------- Create the sib (a mib with only one possible derivation)
   //
@@ -210,8 +211,11 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_MIB_Multichain_Pre
 
   // ---------------- Append MIB with control register before mux
   //
-  auto mibCtrl     = m_model.CreateRegister("MIB_ctrl", BinaryVector::CreateFromBinaryString("00"), tap);
-  auto mibSelector = make_shared<DefaultBinaryPathSelector>(mibCtrl, chainsCount);
+  auto res         = m_builder.Create_PathSelector(SelectorKind::Binary, "MIB_ctrl", chainsCount);
+  auto mibCtrl     = res.first;
+  auto mibSelector = res.second;
+
+  tap->AppendChild(mibCtrl);
   auto mibMux      = m_model.CreateLinker("MIB_mux", mibSelector, tap);
 
   // ---------------- Add wrapped cores (registers)
@@ -240,8 +244,9 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_MIB_Multichain_Pos
 
   // ---------------- Append MIB with control register before mux
   //
-  auto mibCtrl     = m_model.CreateRegister("MIB_ctrl", BinaryVector::CreateFromBinaryString("00"), nullptr);
-  auto mibSelector = make_shared<DefaultBinaryPathSelector>(mibCtrl, chainsCount);
+  auto res         = m_builder.Create_PathSelector(SelectorKind::Binary, "MIB_ctrl", chainsCount);
+  auto mibCtrl     = res.first;
+  auto mibSelector = res.second;
   auto mibMux      = m_model.CreateLinker("MIB_mux", mibSelector, tap);
 
   tap->AppendChild(mibCtrl);

@@ -3938,6 +3938,152 @@ void UT_BinaryVector::test_Operator_Tilde ()
 }
 
 
+//! Checks BinaryVector::SetBit()
+//!
+void UT_BinaryVector::test_SetBit ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits      = std::get<0>(data);
+    uint32_t    bitOffset    = std::get<1>(data);
+    string      expectedBits = std::get<2>(data);
+
+    auto sut = BinaryVector::CreateFromBinaryString(sutBits);
+
+    // ---------------- Exercise
+    //
+    sut.SetBit(bitOffset);
+
+    // ---------------- Verify
+    //
+    auto expected = BinaryVector::CreateFromBinaryString(expectedBits);
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,                               bitOffset, result
+    make_tuple("1",                                      0u,  "1"),                                      // 00
+    make_tuple("0",                                      0u,  "1"),                                      // 01
+    make_tuple("11",                                     1u,  "11"),                                     // 02
+    make_tuple("10",                                     1u,  "11"),                                     // 03
+    make_tuple("1001",                                   2u,  "1011"),                                   // 04
+    make_tuple("1011_0",                                 4u,  "1011_1"),                                 // 05
+    make_tuple("0110_0000",                              7u,  "0110_0001"),                              // 06
+    make_tuple("1110_0000:0",                            7u,  "1110_0001:0"),                            // 07
+    make_tuple("0000_0000:00",                           8u,  "0000_0000:10"),                           // 08
+    make_tuple("0000_0000:1100_1000:0000",               15u, "0000_0000:1100_1001:0000"),               // 09
+    make_tuple("0000_0000:1100_1000:0000_1",             16u, "0000_0000:1100_1000:1000_1"),             // 10
+    make_tuple("0000_0000:1100_1000:0000_0000:0000_000", 25u, "0000_0000:1100_1000:0000_0000:0100_000"), // 11
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::ClearBit()
+//!
+void UT_BinaryVector::test_ClearBit ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits      = std::get<0>(data);
+    uint32_t    bitOffset    = std::get<1>(data);
+    string      expectedBits = std::get<2>(data);
+
+    auto sut = BinaryVector::CreateFromBinaryString(sutBits);
+
+    // ---------------- Exercise
+    //
+    sut.ClearBit(bitOffset);
+
+    // ---------------- Verify
+    //
+    auto expected = BinaryVector::CreateFromBinaryString(expectedBits);
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,                               bitOffset, result
+    make_tuple("1",                                      0u,  "0"),                                      // 00
+    make_tuple("0",                                      0u,  "0"),                                      // 01
+    make_tuple("11",                                     1u,  "10"),                                     // 02
+    make_tuple("10",                                     1u,  "10"),                                     // 03
+    make_tuple("1111",                                   2u,  "1101"),                                   // 04
+    make_tuple("1011_1",                                 4u,  "1011_0"),                                 // 05
+    make_tuple("1111_1111",                              7u,  "1111_1110"),                              // 06
+    make_tuple("1111_1111:1",                            7u,  "1111_1110:1"),                            // 07
+    make_tuple("1111_1111:11",                           8u,  "1111_1111:01"),                           // 08
+    make_tuple("1111_1111:1111_1111:1111",               15u, "1111_1111:1111_1110:1111"),               // 09
+    make_tuple("1111_1111:1111_1111:1111_1",             16u, "1111_1111:1111_1111:0111_1"),             // 10
+    make_tuple("1111_1111:1111_1111:1111_1111:1111_111", 25u, "1111_1111:1111_1111:1111_1111:1011_111"), // 11
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::ToggleBit()
+//!
+void UT_BinaryVector::test_ToggleBit ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits      = std::get<0>(data);
+    uint32_t    bitOffset    = std::get<1>(data);
+    string      expectedBits = std::get<2>(data);
+
+    auto sut = BinaryVector::CreateFromBinaryString(sutBits);
+
+    // ---------------- Exercise
+    //
+    sut.ToggleBit(bitOffset);
+
+    // ---------------- Verify
+    //
+    auto expected = BinaryVector::CreateFromBinaryString(expectedBits);
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,                               bitOffset, result
+    make_tuple("1",                                      0u,  "0"),                                      // 00
+    make_tuple("0",                                      0u,  "1"),                                      // 01
+    make_tuple("11",                                     1u,  "10"),                                     // 02
+    make_tuple("10",                                     1u,  "11"),                                     // 03
+    make_tuple("1001",                                   2u,  "1011"),                                   // 04
+    make_tuple("1011_0",                                 4u,  "1011_1"),                                 // 05
+    make_tuple("0110_1111",                              7u,  "0110_1110"),                              // 06
+    make_tuple("1110_0000:0",                            7u,  "1110_0001:0"),                            // 07
+    make_tuple("0000_0000:00",                           8u,  "0000_0000:10"),                           // 08
+    make_tuple("0000_0000:1101_1111:1111",               15u, "0000_0000:1101_1110:1111"),               // 09
+    make_tuple("0000_0000:1101_1111:1111_1",             16u, "0000_0000:1101_1111:0111_1"),             // 10
+    make_tuple("0000_0000:1101_1111:1111_1111:1111_111", 25u, "0000_0000:1101_1111:1111_1111:1011_111"), // 11
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
 //! Checks BinaryVector::operator &=
 //!
 void UT_BinaryVector::test_Operator_Bitwise_And_Assignment ()

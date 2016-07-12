@@ -22,6 +22,7 @@ using std::array;
 using std::initializer_list;
 using std::ostringstream;
 using std::string;
+using std::to_string;
 using std::experimental::string_view;
 
 using namespace std::string_literals;
@@ -79,6 +80,20 @@ namespace
     "1110",  // 14
     "1111",  // 15
   };
+
+
+  static const std::array<uint8_t, 8> BIT_MASK_8 =
+  {
+    0b10000000,  // 00
+    0b01000000,  // 01
+    0b00100000,  // 02
+    0b00010000,  // 03
+    0b00001000,  // 04
+    0b00000100,  // 05
+    0b00000010,  // 06
+    0b00000001,  // 07
+  };
+
 
 
 } // End of unnamed namespace
@@ -368,6 +383,7 @@ BinaryVector& BinaryVector::AppendChunks (uint8_t numberOfBits, BitsAlignment al
 //  End of: BinaryVector::AppendChunks
 //---------------------------------------------------------------------------
 
+
 //! Clears all content
 //!
 //! @note Post-condition is that bits and bytes count are zeros
@@ -379,6 +395,24 @@ void BinaryVector::Clear ()
 }
 //
 //  End of: BinaryVector::Clear
+//---------------------------------------------------------------------------
+
+
+//! Clears specified bit (to zero)
+//!
+//! @param bitOffset Zero based bit offset (from left)
+//!
+void BinaryVector::ClearBit (uint32_t bitOffset)
+{
+  CHECK_PARAMETER_LT(bitOffset, m_usedBits, "Out of range bit id: "s + to_string(bitOffset));
+
+  auto byteOffset      = bitOffset / 8;
+  auto bitOffsetInByte = bitOffset % 8;
+
+  m_data[byteOffset] &= ~BIT_MASK_8[bitOffsetInByte];
+}
+//
+//  End of: BinaryVector::ClearBit
 //---------------------------------------------------------------------------
 
 
@@ -809,16 +843,6 @@ BinaryVector BinaryVector::operator+ (const BinaryVector& rhs) const
 
 
 
-//! Sets from 8 bits
-//!
-void BinaryVector::Set (uint8_t value)
-{
-  Clear();
-  Append(value);
-}
-//
-//  End of: BinaryVector::BinaryVector
-//---------------------------------------------------------------------------
 
 
 
@@ -1186,6 +1210,16 @@ void BinaryVector::MaskLastByte ()
 //  End of: BinaryVector::MaskLastByte
 //---------------------------------------------------------------------------
 
+//! Sets from 8 bits
+//!
+void BinaryVector::Set (uint8_t value)
+{
+  Clear();
+  Append(value);
+}
+//
+//  End of: BinaryVector::BinaryVector
+//---------------------------------------------------------------------------
 
 
 //! Sets from 16 bits
@@ -1226,6 +1260,28 @@ void BinaryVector::Set (uint64_t value)
 //---------------------------------------------------------------------------
 
 
+
+
+//! Sets specified bit (to one)
+//!
+//! @param bitOffset Zero based bit offset (from left)
+//!
+void BinaryVector::SetBit (uint32_t bitOffset)
+{
+  CHECK_PARAMETER_LT(bitOffset, m_usedBits, "Out of range bit id: "s + to_string(bitOffset));
+
+  auto byteOffset      = bitOffset / 8;
+  auto bitOffsetInByte = bitOffset % 8;
+
+  m_data[byteOffset] |= BIT_MASK_8[bitOffsetInByte];
+}
+//
+//  End of: BinaryVector::SetBit
+//---------------------------------------------------------------------------
+
+
+
+
 //! Returns a slice from BinaryVector
 //!
 //! @note   This call is not valid if it define a slice that exceed the actual
@@ -1243,14 +1299,8 @@ BinaryVector BinaryVector::Slice (uint32_t firstBitOffset, uint32_t bitsCount) c
   {
     // ---------------- Check parameters validity
     //
-    if (firstBitOffset >= m_usedBits)
-    {
-      THROW_INVALID_ARGUMENT("Slice first bit must be within bits range");
-    }
-    if ((firstBitOffset + bitsCount) > m_usedBits)
-    {
-      THROW_INVALID_ARGUMENT("Bits count must be such that slice is within bits range");
-    }
+    CHECK_PARAMETER_LT  (firstBitOffset,               m_usedBits, "Slice first bit must be within bits range");
+    CHECK_PARAMETER_LTE ((firstBitOffset + bitsCount), m_usedBits, "Bits count must be such that slice is within bits range");
 
     auto byteOffset           = firstBitOffset / 8;
     auto bitOffsetInFirstByte = firstBitOffset % 8;
@@ -1294,6 +1344,23 @@ BinaryVector BinaryVector::Slice (uint32_t firstBitOffset, uint32_t bitsCount) c
 //  End of: BinaryVector::Slice
 //---------------------------------------------------------------------------
 
+
+//! Toggle specified bit
+//!
+//! @param bitOffset Zero based bit offset (from left)
+//!
+void BinaryVector::ToggleBit (uint32_t bitOffset)
+{
+  CHECK_PARAMETER_LT(bitOffset, m_usedBits, "Out of range bit id: "s + to_string(bitOffset));
+
+  auto byteOffset      = bitOffset / 8;
+  auto bitOffsetInByte = bitOffset % 8;
+
+  m_data[byteOffset] ^= BIT_MASK_8[bitOffsetInByte];
+}
+//
+//  End of: BinaryVector::ToggleBit
+//---------------------------------------------------------------------------
 
 
 //! Toggles (flips) every bits of the vector

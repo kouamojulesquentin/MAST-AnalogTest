@@ -30,6 +30,7 @@ SOURCES +=  \
     src/ConfigureAlgorithm_LastOrDefault_Greedy.cpp \
     src/DefaultBinaryPathSelector.cpp               \
     src/DefaultTableBasedPathSelector.cpp           \
+    src/DefaultOneHotPathSelector.cpp               \
     src/FromSutUpdater.cpp                          \
     src/GenericAccessInterfaceProtocol.cpp          \
     src/GmlPrinterVisitor.cpp                       \
@@ -67,6 +68,7 @@ HEADERS += \
     include/ConfigureAlgorithm_LastOrDefault.hpp        \
     include/ConfigureAlgorithm_LastOrDefault_Greedy.hpp \
     include/DefaultTableBasedPathSelector.hpp           \
+    include/DefaultOneHotPathSelector.hpp               \
     include/GenericAccessInterfaceProtocol.hpp          \
     include/GmlPrinterVisitor.hpp                       \
     include/FromSutUpdater.hpp                          \

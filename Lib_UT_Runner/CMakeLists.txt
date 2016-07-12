@@ -49,6 +49,7 @@ else()
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${UT_RootPath}/SystemModel/UT_ParentNode.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${UT_RootPath}/SystemModel/UT_NodePathResolver.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${UT_RootPath}/SystemModel/UT_DefaultBinaryPathSelector.hpp)
+    set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${UT_RootPath}/SystemModel/UT_DefaultOneHotPathSelector.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${UT_RootPath}/SystemModel/UT_SystemModel.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${UT_RootPath}/SystemModel/UT_SystemModelCheckerVisitor.hpp)
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${UT_RootPath}/SystemModel/UT_PrettyPrinterVisitor.hpp)
@@ -77,5 +78,5 @@ if (WIN32)
 else ()
 	target_link_libraries(Lib_UT_Runner Lib_UT Lib Logger pthread)
 endif ()
-  
-  
+
+

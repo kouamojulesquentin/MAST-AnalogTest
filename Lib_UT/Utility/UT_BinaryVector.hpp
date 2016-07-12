@@ -155,6 +155,12 @@ class UT_BinaryVector : public CxxTest::TestSuite
   void test_ToggleBits_Using_HexString ();
   void test_Operator_Tilde ();
 
+  // ---------------- Single bit manipulation
+  //
+  void test_SetBit ();
+  void test_ClearBit ();
+  void test_ToggleBit ();
+
   // ---------------- Binary operators
   //
   void test_Operator_Bitwise_And_Assignment ();

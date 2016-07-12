@@ -123,6 +123,10 @@ class DLL_EXPORT BinaryVector final
   void          Set(uint32_t value); //!< Assigns 32 bits value the BinaryVector
   void          Set(uint64_t value); //!< Assigns 64 bits value the BinaryVector
 
+  void SetBit    (uint32_t bitOffset); //!< Sets specified bit (zero based)
+  void ClearBit  (uint32_t bitOffset); //!< Clears specified bit (zero based)
+  void ToggleBit (uint32_t bitOffset); //!< Toggles specified bit (zero based)
+
   void          FixSize(bool fixSize) { m_sizeProperty = fixSize ? SizeProperty::Fixed : SizeProperty::NotFixed; } //!< Sets whether the number of used bits cannot be changed
 
   bool           HasFixedSize() const { return m_sizeProperty != SizeProperty::NotFixed; } //!< Returns true if number of used bits cannot be changed
@@ -138,7 +142,6 @@ class DLL_EXPORT BinaryVector final
   //
   bool FixedSize() const { return m_sizeProperty == SizeProperty::Fixed; }
   void MaskLastByte ();
-
 
   // ---------------- Private  Fields
   //

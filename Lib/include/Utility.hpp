@@ -19,6 +19,7 @@
 #include <stdexcept>
 #include <string>
 #include <experimental/string_view>
+#include <type_traits>    // For enum item manipulation
 
 using namespace std::string_literals;
 
@@ -60,6 +61,30 @@ class DLL_EXPORT Utility final
 //  End of Utility class declaration
 //---------------------------------------------------------------------------
 
+
+//! Combination of flag type enum items (bitwise or)
+//!
+template<typename ENUM_T>
+constexpr ENUM_T operator | (ENUM_T X, ENUM_T Y)
+{
+  return static_cast<ENUM_T>(  static_cast<std::underlying_type_t<ENUM_T>>(X)
+                             | static_cast<std::underlying_type_t<ENUM_T>>(Y)
+                            );
+}
+
+//! Tests of flag type enum item
+//!
+template<typename ENUM_T>
+constexpr bool IsSet(ENUM_T value, ENUM_T flags)
+{
+  return (    static_cast<std::underlying_type_t<ENUM_T>>(value)
+            & static_cast<std::underlying_type_t<ENUM_T>>(flags)
+         ) == static_cast<std::underlying_type_t<ENUM_T>>(flags);
+}
+
+
+// ---------------- Define behaviour (functor call) at end of scope
+//
 template <typename F>
 struct ScopeExit
 {

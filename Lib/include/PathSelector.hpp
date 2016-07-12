@@ -20,6 +20,19 @@
 
 namespace mast
 {
+
+enum class SelectorProperty
+{
+  CanSelectNone = 0b0001,   //!< Tells whether one can select no path using path id 0 (mainly for binary encoding)
+  InvertedBits  = 0b0010,   //!< Tells whether a '0' select a derivation (low level activation in hardware)
+  ReverseOrder  = 0b0100,   //!< Tells whether bits order is reversed (e.g. in 1_Hot encoding last bit select first derivation)
+
+  Binary_Default  = 0b0000,        //!< Default property for binary based encoding
+  One_Hot_Default = CanSelectNone, //!< Default property for one hot based encoding
+  N_Hot_Default   = CanSelectNone, //!< Default property for N hot based encoding
+};
+
+
 class SystemModelVisitor;
 class Register;
 class BinaryVector;

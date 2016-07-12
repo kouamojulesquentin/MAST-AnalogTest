@@ -6,9 +6,9 @@ add_definitions(${UT_WARNINGS})
 set (UT_WARNINGS ${WARNINGS})
 
 add_definitions(${UT_CFLAGS})
-set (UT_CFLAGS ${UT_WARNINGS} -fexceptions -std=c++14 -DCXXTEST_HAVE_EH -DCXXTEST_HAVE_STD -DCXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION)
+set (UT_CFLAGS "${UT_WARNINGS} -fexceptions -std=c++14 -DCXXTEST_HAVE_EH -DCXXTEST_HAVE_STD -DCXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION")
 
-add_compile_options(${UT_CFLAGS})
+#add_compile_options(${UT_CFLAGS})
 
 #########################################
 
@@ -66,6 +66,9 @@ endif()
 
     CXXTEST_ADD_TEST(Lib_UT_Runner   	Runner.cpp  	${Runner_UT_SOURCES} )
 
+    set_target_properties(Lib_UT_Runner PROPERTIES
+ 	 COMPILE_FLAGS "${UT_CFLAGS}"
+	  )
     enable_testing()
 
 

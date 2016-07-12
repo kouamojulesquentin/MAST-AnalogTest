@@ -12,22 +12,20 @@ cmake_minimum_required(VERSION 3.5)
 project(mast)
 
 add_definitions(${WARNINGS})
-set (WARNINGS -Wall -Wextra -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default)
+set (WARNINGS "-Wall -Wextra -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default")
 add_definitions(${CFLAGS})
-set (CFLAGS ${WARNINGS} -std=c++14)
+set (CFLAGS "${WARNINGS} -std=c++14")
 
 if (WIN32)
-#+  set (CFLAGS ${CFLAGS} -DBUILD_DLL)
+#+  set (CFLAGS "${CFLAGS} -DBUILD_DLL")
   set (CFLAGS ${CFLAGS})
 else()
-  set (CFLAGS ${CFLAGS} -fPIC)
+  set (CFLAGS "${CFLAGS} -fPIC")
 endif()
 
 set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lpthread")
 
-add_compile_options(${CFLAGS})
-#set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CFLAGS}")
-#set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CFLAGS}")
+#add_compile_options(${CFLAGS})
 
 #Bring the headers, such as Student.h into the project
 include_directories(Lib/include/)
@@ -59,6 +57,11 @@ endif ()
 file(GLOB Lib_SOURCES "Lib/src/*")
 #add_library(Lib OBJECT ${Lib_SOURCES})
 add_library(Lib SHARED ${Lib_SOURCES})
+
+set_target_properties(Lib Logger PROPERTIES
+  COMPILE_FLAGS "${CFLAGS}"
+  )
+
 if (WIN32)
 	target_link_libraries(Lib Logger DbgHelp)
 else ()
@@ -67,3 +70,4 @@ endif ()
 
 add_subdirectory (Lib_UT)
 add_subdirectory (Lib_UT_Runner)
+add_subdirectory (SIT_parser)

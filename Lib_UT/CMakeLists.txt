@@ -6,16 +6,20 @@ add_definitions(${UT_WARNINGS})
 set (UT_WARNINGS ${WARNINGS})
 
 add_definitions(${UT_CFLAGS})
-set (UT_CFLAGS ${UT_WARNINGS} -fexceptions -std=c++14 -DCXXTEST_HAVE_EH -DCXXTEST_HAVE_STD -DCXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION)
+set (UT_CFLAGS "${UT_WARNINGS} -fexceptions -std=c++14 -DCXXTEST_HAVE_EH -DCXXTEST_HAVE_STD -DCXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION")
 
-add_compile_options(${UT_CFLAGS})
+#add_compile_options(${UT_CFLAGS})
 
     file(GLOB Lib_UT_SOURCES 	   "Utility/*")
     file(GLOB Lib_UT_TMP_SOURCES  "SystemModel/*")
     set (Lib_UT_SOURCES ${Lib_UT_SOURCES} ${Lib_UT_TMP_SOURCES})
     file(GLOB Lib_UT_TMP_SOURCES 	"UT_Helpers/*")
     set (Lib_UT_SOURCES ${Lib_UT_SOURCES} ${Lib_UT_TMP_SOURCES})
+
     add_library(Lib_UT SHARED ${Lib_UT_SOURCES})
+set_target_properties(Lib_UT PROPERTIES
+  COMPILE_FLAGS "${UT_CFLAGS}"
+  )
 
 #########################################
 

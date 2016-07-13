@@ -24,6 +24,7 @@ Suites = \
       $(UT_RootPath)/SystemModel/UT_NodePathResolver.hpp               \
       $(UT_RootPath)/SystemModel/UT_DefaultBinaryPathSelector.hpp      \
       $(UT_RootPath)/SystemModel/UT_DefaultOneHotPathSelector.hpp      \
+      $(UT_RootPath)/SystemModel/UT_DefaultNHotPathSelector.hpp        \
       $(UT_RootPath)/SystemModel/UT_SystemModel.hpp                    \
       $(UT_RootPath)/SystemModel/UT_SystemModelCheckerVisitor.hpp      \
       $(UT_RootPath)/SystemModel/UT_PrettyPrinterVisitor.hpp           \

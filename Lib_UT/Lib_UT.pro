@@ -34,6 +34,7 @@ SOURCES += \
     SystemModel/UT_ConfigureVisitor.cpp               \
     SystemModel/UT_DataCycle.cpp                      \
     SystemModel/UT_DefaultBinaryPathSelector.cpp      \
+    SystemModel/UT_DefaultNHotPathSelector.cpp        \
     SystemModel/UT_DefaultOneHotPathSelector.cpp      \
     SystemModel/UT_FromSutUpdater.cpp                 \
     SystemModel/UT_GenericAccessInterfaceProtocol.cpp \
@@ -66,6 +67,7 @@ HEADERS += \
     SystemModel/UT_ConfigureVisitor.hpp               \
     SystemModel/UT_DataCycle.hpp                      \
     SystemModel/UT_DefaultBinaryPathSelector.hpp      \
+    SystemModel/UT_DefaultNHotPathSelector.hpp        \
     SystemModel/UT_DefaultOneHotPathSelector.hpp      \
     SystemModel/UT_FromSutUpdater.hpp                 \
     SystemModel/UT_GenericAccessInterfaceProtocol.hpp \

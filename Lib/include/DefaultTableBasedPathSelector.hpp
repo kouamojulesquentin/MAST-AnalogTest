@@ -81,16 +81,9 @@ class DLL_EXPORT DefaultTableBasedPathSelector  : public PathSelector
 
   void CheckPathIdentifier (uint32_t pathIdentifier) const;
 
-
-
-  // ---------------- Private  Methods
+  // ---------------- Protected Fields
   //
-  private:
-
-  // ---------------- Private  Fields
-  //
-  private:
-
+  protected:
   uint32_t                  m_pathsCount;             //!< Number of managed paths
   std::shared_ptr<Register> m_muxRegister;            //!< Register that drives the paths multiplexer
   const TablesType          m_selectTable;            //!< Selection LUT

@@ -62,14 +62,16 @@ class DLL_EXPORT BinaryVector final
   BinaryVector(BinaryVector&& rhs) noexcept;    //!< Move constructor
   BinaryVector(BinaryVector&& rhs, SizeProperty sizeProperty) noexcept : BinaryVector(std::move(rhs)) { m_sizeProperty = sizeProperty; }    //!< Move constructor with fixed size
 
-  static BinaryVector CreateFromBinaryString (std::experimental::string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed);   //!< Creates a BinaryVector from text binary representation
-  static BinaryVector CreateFromHexString    (std::experimental::string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed);   //!< Creates a BinaryVector from text hexadecimal representation
-  static BinaryVector CreateFromString       (std::experimental::string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed);   //!< Creates a BinaryVector from mixed hexadecimal and binary representation
+  using string_view = std::experimental::string_view;
 
-  std::string DataAsBinaryString(std::experimental::string_view quadSeparator = "_",
-                                 std::experimental::string_view octoSeparator = ":",
-                                 uint32_t                       bytesPerLine  = 0,
-                                 std::experimental::string_view eolSeparator  = ","
+  static BinaryVector CreateFromBinaryString (string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed);   //!< Creates a BinaryVector from text binary representation
+  static BinaryVector CreateFromHexString    (string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed);   //!< Creates a BinaryVector from text hexadecimal representation
+  static BinaryVector CreateFromString       (string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed);   //!< Creates a BinaryVector from mixed hexadecimal and binary representation
+
+  std::string DataAsBinaryString(string_view quadSeparator = "_",
+                                 string_view octoSeparator = ":",
+                                 uint32_t    ssbytesPerLine  = 0,
+                                 string_view eolSeparator  = ","
                                 ) const; //!< Gets content as formatted binary string
 
   std::string DataAsHexString (std::experimental::string_view quadSeparator = "_",
@@ -95,10 +97,6 @@ class DLL_EXPORT BinaryVector final
   BinaryVector& operator&= (const BinaryVector& rhs); //!< Bitwise and assignment
   BinaryVector& operator|= (const BinaryVector& rhs); //!< Bitwise or assignment
   BinaryVector& operator^= (const BinaryVector& rhs); //!< Bitwise xor assignment
-
-  BinaryVector operator& (const BinaryVector& rhs) { auto result = *this; result &= rhs; return result; } //!< Bitwise and
-  BinaryVector operator| (const BinaryVector& rhs) { auto result = *this; result |= rhs; return result; } //!< Bitwise or
-  BinaryVector operator^ (const BinaryVector& rhs) { auto result = *this; result ^= rhs; return result; } //!< Bitwise xor
 
   // Logical operators
   bool operator==(const BinaryVector& rhs) const;                                 //!< Compares to other for equality (excepted fixed size property)
@@ -153,6 +151,33 @@ class DLL_EXPORT BinaryVector final
 //
 //  End of BinaryVector class declaration
 //---------------------------------------------------------------------------
+
+//! Bitwise 'and'
+//!
+inline BinaryVector operator& (const BinaryVector& lhs, const BinaryVector& rhs)
+{
+  auto result = lhs;
+  result &= rhs;
+  return result;
+}
+
+//! Bitwise 'or'
+//!
+inline BinaryVector operator| (const BinaryVector& lhs, const BinaryVector& rhs)
+{
+  auto result = lhs;
+  result |= rhs;
+  return result;
+}
+
+//! Bitwise 'xor'
+//!
+inline BinaryVector operator^ (const BinaryVector& lhs, const BinaryVector& rhs)
+{
+  auto result = lhs;
+  result ^= rhs;
+  return result;
+}
 
 
 //! Represents a slice within a BinaryVector

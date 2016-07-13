@@ -209,9 +209,12 @@ void DefaultTableBasedPathSelector::Deselect (uint32_t pathIdentifier)
 {
   CheckPathIdentifier(pathIdentifier);
 
-  m_muxRegister->SetToSut(m_deselectTable[pathIdentifier]);
-  m_muxRegister->SetBypass(m_deselectTable[pathIdentifier]);
-  m_muxRegister->SetPending();
+  const auto& selectValue = m_deselectTable[pathIdentifier];
+  if (m_muxRegister->NextToSut() != selectValue)
+  {
+    m_muxRegister->SetToSut(selectValue);
+    m_muxRegister->SetPending();
+  }
 }
 //
 //  End of: DefaultTableBasedPathSelector::Deselect
@@ -230,10 +233,6 @@ void DefaultTableBasedPathSelector::Select (uint32_t pathIdentifier)
   if (m_muxRegister->NextToSut() != selectValue)
   {
     m_muxRegister->SetToSut(selectValue);
-    if (m_muxRegister->HoldValue())
-    {
-      m_muxRegister->SetBypass(selectValue);  // Force bypass to same value as next to sut (to hold the value)
-    }
     m_muxRegister->SetPending();
   }
 }

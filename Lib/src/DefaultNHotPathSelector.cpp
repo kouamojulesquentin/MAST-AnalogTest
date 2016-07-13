@@ -12,6 +12,7 @@
 //===========================================================================
 
 #include "DefaultNHotPathSelector.hpp"
+#include "DefaultOneHotPathSelector.hpp"
 #include "Register.hpp"
 #include "Utility.hpp"
 
@@ -75,32 +76,7 @@ DefaultNHotPathSelector::TablesType DefaultNHotPathSelector::CreateSelectTable (
                                                                                 uint32_t         pathsCount,
                                                                                 SelectorProperty properties)
 {
-  CheckRegisterLength(registerLength, pathsCount);
-
-  TablesType table;
-
-  table.emplace_back(registerLength, 0, SizeProperty::FixedOnCopy); // Dummy entry for no selection and for path identifier starting from 1
-
-  bool     reverseOrder = IsSet(properties, SelectorProperty::ReverseOrder);
-  uint32_t selectionBit = reverseOrder ? registerLength - 1u : 0;
-
-  BinaryVector temp(registerLength);
-  for (uint32_t pathId = 1u ; pathId <= pathsCount ; ++pathId)
-  {
-    temp.SetBit(selectionBit);
-    table.emplace_back(temp, SizeProperty::FixedOnCopy);
-    temp.ClearBit(selectionBit);
-
-    selectionBit = reverseOrder ? selectionBit - 1u
-                                : selectionBit + 1u;
-  }
-
-  if (IsSet(properties, SelectorProperty::InvertedBits))
-  {
-    InvertTable(table);
-  }
-
-  return std::move(table);
+  return std::move(DefaultOneHotPathSelector::CreateSelectTable(registerLength, pathsCount, properties));
 }
 //
 //  End of: DefaultNHotPathSelector::CreateSelectTable

@@ -28,17 +28,15 @@ using namespace mast;
 //! Initializes selector for fast selection/deselection of a path
 //!
 //! @param associatedRegister   Register that is used to drive the path multiplexer
-//! @param pathsCount       Number of managed paths (including, optional, bypass register)
-//! @param isInverted       When true the bits for selecting a path are inverted (relative to the path identifier number)
-//! @param canSelectNone    When true zero is reserved to select 'no path' otherwise 0 is used to select first path
-//!                         (provided it is not inverted)
+//! @param pathsCount           Number of managed paths (including, optional, bypass register)
+//! @param properties           Properties of the selector (bit order can be reverse or it can use negative logic)
 //!
 DefaultOneHotPathSelector::DefaultOneHotPathSelector(shared_ptr<Register> associatedRegister, uint32_t pathsCount, SelectorProperty properties)
   : DefaultTableBasedPathSelector (associatedRegister,
                                    pathsCount,
                                    CreateSelectTable   (associatedRegister->BitsCount(), pathsCount, properties),
                                    CreateDeselectTable (associatedRegister->BitsCount(), pathsCount, properties),
-                                   true
+                                   IsSet(properties, SelectorProperty::CanSelectNone)
                                   )
 {
 }
@@ -83,7 +81,7 @@ DefaultOneHotPathSelector::TablesType DefaultOneHotPathSelector::CreateSelectTab
   table.emplace_back(registerLength, 0, SizeProperty::FixedOnCopy); // Dummy entry for no selection and for path identifier starting from 1
 
   bool     reverseOrder = IsSet(properties, SelectorProperty::ReverseOrder);
-  uint32_t selectionBit = reverseOrder ? 0 : registerLength - 1u;
+  uint32_t selectionBit = reverseOrder ? registerLength - 1u : 0;
 
   BinaryVector temp(registerLength);
   for (uint32_t pathId = 1u ; pathId <= pathsCount ; ++pathId)
@@ -92,8 +90,8 @@ DefaultOneHotPathSelector::TablesType DefaultOneHotPathSelector::CreateSelectTab
     table.emplace_back(temp, SizeProperty::FixedOnCopy);
     temp.ClearBit(selectionBit);
 
-    selectionBit = reverseOrder ? selectionBit + 1u
-                                : selectionBit - 1u;
+    selectionBit = reverseOrder ? selectionBit - 1u
+                                : selectionBit + 1u;
   }
 
   if (IsSet(properties, SelectorProperty::InvertedBits))
@@ -132,6 +130,24 @@ DefaultOneHotPathSelector::TablesType DefaultOneHotPathSelector::CreateDeselectT
 //  End of: DefaultOneHotPathSelector::CreateDeselectTable
 //---------------------------------------------------------------------------
 
+
+
+//! Request activation of the specified path
+//!
+//! @See DefaultTableBasedPathSelector::Select
+//!
+void DefaultOneHotPathSelector::Select (uint32_t pathIdentifier)
+{
+  if (!CanSelectNone() && (pathIdentifier == 0))
+  {
+    THROW_INVALID_ARGUMENT("Try to select no path, even though selector is configured to at least select one");
+  }
+
+  DefaultTableBasedPathSelector::Select(pathIdentifier);
+}
+//
+//  End of: DefaultOneHotPathSelector::Select
+//---------------------------------------------------------------------------
 
 //===========================================================================
 // End of DefaultOneHotPathSelector.cpp

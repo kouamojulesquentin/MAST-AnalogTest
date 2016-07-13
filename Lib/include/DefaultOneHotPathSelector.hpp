@@ -42,6 +42,8 @@ class DLL_EXPORT DefaultOneHotPathSelector : public DefaultTableBasedPathSelecto
                             uint32_t                  pathsCount,
                             SelectorProperty          properties = SelectorProperty::One_Hot_Default);
 
+  virtual void Select (uint32_t pathIdentifier) override; //!< Request activation of the specified path
+
   using TablesType = DefaultTableBasedPathSelector::TablesType;
 
   static TablesType CreateSelectTable   (uint32_t registerLength, uint32_t pathsCount, SelectorProperty properties);

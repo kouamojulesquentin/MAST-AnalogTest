@@ -138,13 +138,13 @@ void UT_DefaultOneHotPathSelector::test_Constructor_ReverseOrder ()
 {
   // ---------------- Setup
   //
-  auto bypassSequence = BinaryVector::CreateFromBinaryString("10111");
+  auto bypassSequence = BinaryVector::CreateFromBinaryString("00010");
   auto associatedNode = make_shared<Register>("Reg", bypassSequence);
 
   // ---------------- Exercise
   //
-  auto sut = DefaultOneHotPathSelector(associatedNode, 5u,    SelectorProperty::ReverseOrder
-                                                            | SelectorProperty::InvertedBits);
+  auto sut = DefaultOneHotPathSelector(associatedNode, 5u, SelectorProperty::CanSelectNone
+                                                         | SelectorProperty::ReverseOrder);
 
   // ---------------- Verify
   //
@@ -170,12 +170,14 @@ void UT_DefaultOneHotPathSelector::test_Constructor_InvertedReverseOrder ()
 {
   // ---------------- Setup
   //
-  auto bypassSequence = BinaryVector::CreateFromBinaryString("00010");
+  auto bypassSequence = BinaryVector::CreateFromBinaryString("10111");
   auto associatedNode = make_shared<Register>("Reg", bypassSequence);
 
   // ---------------- Exercise
   //
-  auto sut = DefaultOneHotPathSelector(associatedNode, 5u, SelectorProperty::ReverseOrder);
+  auto sut = DefaultOneHotPathSelector(associatedNode, 5u, SelectorProperty::CanSelectNone
+                                                         | SelectorProperty::ReverseOrder
+                                                         | SelectorProperty::InvertedBits);
 
   // ---------------- Verify
   //
@@ -332,8 +334,9 @@ void UT_DefaultOneHotPathSelector::test_Select_InvertedReverseOrder ()
     uint32_t pathsCount = 5u;
     auto sut            = DefaultOneHotPathSelector(associatedNode,
                                                     pathsCount,
-                                                      SelectorProperty::ReverseOrder
-                                                    | SelectorProperty::InvertedBits);
+                                                    SelectorProperty::CanSelectNone
+                                                  | SelectorProperty::ReverseOrder
+                                                  | SelectorProperty::InvertedBits);
 
     // ---------------- Exercise
     //
@@ -385,6 +388,21 @@ void UT_DefaultOneHotPathSelector::test_Select_Path_Zero ()
   TS_ASSERT_EQUALS (reg->NextToSut(), reg->BypassSequence());
 }
 
+
+//! Checks DefaultOneHotPathSelector::Select() of no path (deselect any) when configured to always select one
+//!
+void UT_DefaultOneHotPathSelector::test_Select_Path_Zero_when_CannotSelectNone ()
+{
+  // ---------------- Setup
+  //
+  auto     reg        = make_shared<Register>("Reg", BinaryVector::CreateFromBinaryString("10000"), true);
+  uint32_t pathsCount = 5u;
+  auto     sut        = DefaultOneHotPathSelector(reg, pathsCount, SelectorProperty::CannotSelectNone);
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut.Select(0u), std::exception);
+}
 
 //! Checks DefaultOneHotPathSelector::Select() when path identifier is out of range
 //!

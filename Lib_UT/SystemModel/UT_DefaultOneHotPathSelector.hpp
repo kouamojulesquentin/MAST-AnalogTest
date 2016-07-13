@@ -43,6 +43,7 @@ class UT_DefaultOneHotPathSelector : public CxxTest::TestSuite
   void test_Select_Inverted ();
   void test_Select_ReverseOrder ();
   void test_Select_InvertedReverseOrder ();
+  void test_Select_Path_Zero_when_CannotSelectNone ();
   void test_Select_Path_Zero ();
   void test_Select_OutOfRange ();
 

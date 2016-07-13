@@ -287,6 +287,30 @@ public:
 };
 
 
+template<typename T>
+class ValueTraits< CXXTEST_STD(initializer_list)<T> > : public StdTraitsBase
+{
+public:
+    ValueTraits(const CXXTEST_STD(initializer_list)<T> &items)
+    {
+        bool first = true;
+        *this << "initializer_list(";
+        for (const auto& item : items)
+        {
+          if (!first)
+          {
+            *this << ", ";
+          }
+          else
+          {
+            first = false;
+          }
+
+          *this << TS_AS_STRING(item);
+        }
+        *this << ")";
+    }
+};
 
 #endif
 

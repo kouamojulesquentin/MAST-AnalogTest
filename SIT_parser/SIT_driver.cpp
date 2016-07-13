@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include "SIT_driver.hpp"
+#include "SystemModelBuilder.hpp"
 
 SIT::SIT_Driver::~SIT_Driver()
 {
@@ -10,6 +11,11 @@ SIT::SIT_Driver::~SIT_Driver()
    scanner = nullptr;
    delete(parser);
    parser = nullptr;
+}
+
+SIT::SIT_Driver::SIT_Driver()
+: parsed_sut ( std::make_unique<mast::SystemModel>())
+{
 }
 
 void 

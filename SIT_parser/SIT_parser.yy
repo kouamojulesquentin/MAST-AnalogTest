@@ -21,6 +21,8 @@
 # endif
 
 #include "SIT_types.h"
+#include "SystemModelBuilder.hpp"
+using namespace mast;
 
 }
 
@@ -54,6 +56,13 @@ std::vector<std::string> JTAG_AI_target_table  =
 std::vector<std::string> Path_Selector_table  =
   {"Default_Binary","Default_Table_based"
   };
+
+/*enum node_type {}
+struct {
+       void *node_raw;
+       node_type  type;
+       }
+*/
   
 static int find_in_table(std::vector<std::string> table, std::string s)
 {
@@ -92,6 +101,8 @@ static int find_in_table(std::vector<std::string> table, std::string s)
 %type  <IR_coding_type> IR_coding_list
 %type  <IR_coding_type> IR_TABLE
 %type  <std::string> JTAG_target
+%type  <std::shared_ptr<mast::SystemModelNode>> root_node
+/*To append, cast to "dynamic_pointer_cast" vers ParentNode*/
 
 %token               END    0     "end of file"
 %token               UPPER
@@ -129,7 +140,7 @@ static int find_in_table(std::vector<std::string> table, std::string s)
 
 %%
 
-list_option: 
+root_node: 
    internal_node END 
     {std::cout << "Parsing OK, Root node is " << $1 << "  \n";}
    ;
@@ -205,7 +216,13 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
           	if ($2.is_transparent) std::cout << "(transparent)";
 		std::cout  << " Protocol : " << $3;
          	std::cout << ", children:  " << $4.name << " \n";
-  	  	$$ = $2.name;}
+  	  	$$ = $2.name;        
+		
+		auto node = driver.parsed_sut->CreateAccessInterface($2.name, nullptr);
+
+//  	  	$$ = node;        
+		
+		}
 	  }
  |  
  t_SIB node_name position active children_list

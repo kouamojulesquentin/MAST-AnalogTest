@@ -7,12 +7,16 @@
 
 #include "SIT_scanner.hpp"
 #include "SIT_parser.tab.hh"
+#include "SystemModelBuilder.hpp"
+
+using namespace mast;
+using std::shared_ptr;
 
 namespace SIT{
 
 class SIT_Driver{
 public:
-   SIT_Driver() = default;
+   SIT_Driver();
 
    virtual ~SIT_Driver();
    
@@ -34,6 +38,10 @@ public:
    void add_char();
 
    std::ostream& print(std::ostream &stream);
+
+   std::unique_ptr<mast::SystemModel> parsed_sut;
+   
+
 private:
 
    void parse_helper( std::istream &stream );

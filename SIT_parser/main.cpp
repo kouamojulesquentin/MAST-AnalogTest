@@ -3,6 +3,7 @@
 #include <cstring>
 
 #include "SIT_driver.hpp"
+#include "PrettyPrinterVisitor.hpp"
 
 int 
 main( const int argc, const char **argv )
@@ -11,6 +12,8 @@ main( const int argc, const char **argv )
    if( argc == 2 )
    {
       SIT::SIT_Driver driver;
+      std::unique_ptr<int> first (new int);
+      
       /** example for piping input from terminal, i.e., using cat **/ 
       if( std::strncmp( argv[ 1 ], "-o", 2 ) == 0 )
       {
@@ -30,11 +33,19 @@ main( const int argc, const char **argv )
          /** assume file, prod code, use stat to check **/
          driver.parse( argv[1] );
       }
+   
+   PrettyPrinterVisitor prettyPrinter;
+   driver.parsed_sut->Root()->Accept(prettyPrinter);
+   auto gotPretty      = prettyPrinter.PrettyPrint();
+   std::cout << gotPretty;
+   
    }
    else
    {
       /** exit with failure condition **/
       return ( EXIT_FAILURE );
    }
+   
+   
    return( EXIT_SUCCESS );
 }

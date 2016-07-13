@@ -58,6 +58,13 @@ class UT_PrettyPrinterVisitor : public CxxTest::TestSuite
   void test_VisitTap ();
   void test_VisitTap_With_SubNodes ();
 
+  // ---------------- PrettyPrint
+  //
+  void test_PrettyPrint ();
+  void test_PrettyPrint_Verbose ();
+  void test_PrettyPrint_AutoFormat ();
+  void test_PrettyPrint_Std ();
+
   // ---------------- Private  Methods
   //
   void setUp(); //!< Initializes test (called for each test)

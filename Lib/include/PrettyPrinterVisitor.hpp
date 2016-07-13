@@ -18,11 +18,23 @@
 #include "SystemModelVisitor.hpp"
 #include <string>
 #include <sstream>
+#include <memory>
 #include <experimental/string_view>
 
 namespace mast
 {
 class BinaryVector;
+
+//! Options of Pretty printer
+//!
+enum class PrettyPrinterOptions
+{
+  None       = 0,
+  Verbose    = 0b0001, //!< Maximum information is printed
+  AutoFormat = 0b0010, //!< To print Register values as hexadecimal string
+  Default    = None,
+  Std        = Verbose | AutoFormat,
+};
 
 //! System model visitors for creation of a text, readable, and hierarchical
 //! representation of the system mode tree
@@ -34,18 +46,23 @@ class DLL_EXPORT PrettyPrinterVisitor : public SystemModelVisitor
   public:
   virtual ~PrettyPrinterVisitor() = default;
   PrettyPrinterVisitor()  = default;
+  PrettyPrinterVisitor(PrettyPrinterOptions options);
 
   virtual void VisitAccessInterface (AccessInterface& accessInterface) override;
   virtual void VisitChain           (Chain&           chain)           override;
   virtual void VisitLinker          (Linker&          linker)          override;
   virtual void VisitRegister        (Register&        reg)             override;
 
-  std::string PrettyPrint()  const { return m_os.str();     } //!< Returns currently visited nodes representation
-  bool        IsVerbose()    const { return m_verbose;      } //!< Returns whether verbose mode is active
+  std::string PrettyPrint()   const { return m_os.str();      } //!< Returns currently visited nodes representation
+  bool        IsVerbose()     const { return m_verbose;       } //!< Returns whether verbose mode is active
   bool        UseAutoFormat() const { return m_useAutoFormat; } //!< Returns true if pretty printer is configured to print Register values as hexadecimal string
 
   void SetVerbose    (bool verbose)       { m_verbose       = verbose;       } //!< Changes verbosity mode
   void UseAutoFormat (bool useAutoFormat) { m_useAutoFormat = useAutoFormat; } //!< Sets whether pretty printer is configured to print Register values as hexadecimal string (except not complete nibbles that are displayed using binary format)
+
+  //! Returns textual model representation starting from a "top" node
+  //!
+  static std::string PrettyPrint(std::shared_ptr<ParentNode> topNode, PrettyPrinterOptions options = PrettyPrinterOptions::Default);
 
 
   // ---------------- Private  Methods

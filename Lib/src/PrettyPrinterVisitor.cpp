@@ -17,31 +17,24 @@
 #include "Utility.hpp"
 
 using std::string;
+using std::shared_ptr;
 
 using namespace mast;
 
 
-//! Pretty print childrens of a parent node
+
+//! Initializes with specified options
 //!
-void PrettyPrinterVisitor::PrintChildren (const ParentNode& parentNode)
+PrettyPrinterVisitor::PrettyPrinterVisitor (PrettyPrinterOptions options)
+  : m_useAutoFormat (IsSet(options, PrettyPrinterOptions::AutoFormat))
+  , m_verbose       (IsSet(options, PrettyPrinterOptions::Verbose))
 {
-  // ---------------- Do support exceptions
-  //
-  auto restoreDepth = [this, initialValue = m_depth]() { this->m_depth = initialValue; };
-  AT_SCOPE_EXIT(restoreDepth);
-
-  ++m_depth;
-
-  auto child = parentNode.FirstChild();
-  while (child)
-  {
-    child->Accept(*this);
-    child = child->NextSibling();
-  }
 }
 //
-//  End of: PrettyPrinterVisitor::PrintChildren
+//  End of: PrettyPrinterVisitor::PrettyPrinterVisitor
 //---------------------------------------------------------------------------
+
+
 
 
 //! Adds spaces to force next insertion point to be at target position relative
@@ -78,6 +71,46 @@ void PrettyPrinterVisitor::AlignOnNewLine (pos_type targetPos)
 //  End of: PrettyPrinterVisitor::AlignOnNewLine
 //---------------------------------------------------------------------------
 
+
+//! Returns textual model representation starting from a "top" node
+//!
+//! @param topNode    Node from which graph is created
+//! @param options    Printer options
+//!
+string PrettyPrinterVisitor::PrettyPrint (shared_ptr<ParentNode> topNode, PrettyPrinterOptions options)
+{
+  CHECK_PARAMETER_NOT_NULL(topNode, "Cannot 'pretty print' from nullptr");
+
+  PrettyPrinterVisitor printer(options);
+  topNode->Accept(printer);
+  return printer.PrettyPrint();
+}
+//
+//  End of: PrettyPrinterVisitor::PrettyPrint
+//---------------------------------------------------------------------------
+
+
+//! Pretty print childrens of a parent node
+//!
+void PrettyPrinterVisitor::PrintChildren (const ParentNode& parentNode)
+{
+  // ---------------- Do support exceptions
+  //
+  auto restoreDepth = [this, initialValue = m_depth]() { this->m_depth = initialValue; };
+  AT_SCOPE_EXIT(restoreDepth);
+
+  ++m_depth;
+
+  auto child = parentNode.FirstChild();
+  while (child)
+  {
+    child->Accept(*this);
+    child = child->NextSibling();
+  }
+}
+//
+//  End of: PrettyPrinterVisitor::PrintChildren
+//---------------------------------------------------------------------------
 
 
 //! Streams content of binary vector, prefixed with given name

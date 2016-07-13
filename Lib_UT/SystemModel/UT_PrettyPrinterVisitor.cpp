@@ -146,9 +146,7 @@ void UT_PrettyPrinterVisitor::test_VisitLinker ()
   auto chain  = make_shared<Chain>     ("Chain");
   auto muxReg = make_shared<Register>  ("Mux register name", BinaryVector::CreateFromBinaryString("000"));
   chain->AppendChild(muxReg);
-  auto isInverted     = false;
-  auto canSelectNone  = false;
-  auto pathSelector   = make_shared<DefaultBinaryPathSelector>(muxReg, 5, isInverted, canSelectNone);
+  auto pathSelector   = make_shared<DefaultBinaryPathSelector>(muxReg, 5u);
 
   auto linker = Linker("Linker name", pathSelector);
 
@@ -176,9 +174,7 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_Verbose ()
   auto chain  = make_shared<Chain>     ("Chain");
   auto muxReg = make_shared<Register>  ("Mux register name", BinaryVector::CreateFromBinaryString("000"));
   chain->AppendChild(muxReg);
-  auto isInverted     = false;
-  auto canSelectNone  = false;
-  auto pathSelector   = make_shared<DefaultBinaryPathSelector>(muxReg, 5, isInverted, canSelectNone);
+  auto pathSelector   = make_shared<DefaultBinaryPathSelector>(muxReg, 5u);
 
   auto linker = Linker("Linker name", pathSelector);
 

@@ -15,6 +15,7 @@
   #define SYSTEMMODELBUILDER_H__65823246_65BD_4D48_5EB4_23C860E85C36__INCLUDED_
 
 #include "SystemModel.hpp"
+#include "PathSelector.hpp"
 #include <memory>
 #include <experimental/string_view>
 using namespace std::string_literals;
@@ -74,17 +75,15 @@ class DLL_EXPORT SystemModelBuilder final
   std::shared_ptr<mast::PathSelector> Create_PathSelector(SelectorKind              selectorKind,
                                                           std::shared_ptr<Register> associatedRegister,
                                                           uint32_t                  pathsCount,
-                                                          bool                      isInverted    = false,
-                                                          bool                      canSelectNone = false);
+                                                          SelectorProperty          properties = SelectorProperty::Std);
 
   //! Creates a path selector, creating its associated register
   //!
   std::pair<std::shared_ptr<Register>, std::shared_ptr<mast::PathSelector>>
-  Create_PathSelector(SelectorKind selectorKind,
-                      string_view  registerName,
-                      uint32_t     pathsCount,
-                      bool         isInverted    = false,
-                      bool         canSelectNone = false);
+  Create_PathSelector(SelectorKind     selectorKind,
+                      string_view      registerName,
+                      uint32_t         pathsCount,
+                      SelectorProperty properties = SelectorProperty::Std);
 
 
   //! Creates a MIB sub-tree

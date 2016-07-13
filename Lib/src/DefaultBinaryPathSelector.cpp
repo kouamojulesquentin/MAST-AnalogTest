@@ -27,24 +27,21 @@ using namespace mast;
 //! Initializes selector for fast selection/deselection of a path
 //!
 //! @param associatedRegister   Register that is used to drive the path multiplexer
-//! @param pathsCount       Number of managed paths (including, optional, bypass register)
-//! @param isInverted       When true the bits for selecting a path are inverted (relative to the path identifier number)
-//! @param canSelectNone    When true zero is reserved to select 'no path' otherwise 0 is used to select first path
-//!                         (provided it is not inverted)
+//! @param pathsCount           Number of managed paths (including, optional, bypass register)
+//! @param properties           Properties of the selector (bit order can be reverse or it can use negative logic)
 //!
-DefaultBinaryPathSelector::DefaultBinaryPathSelector(shared_ptr<Register> associatedRegister, uint32_t pathsCount, bool isInverted, bool canSelectNone)
+DefaultBinaryPathSelector::DefaultBinaryPathSelector(shared_ptr<Register> associatedRegister, uint32_t pathsCount, SelectorProperty properties)
   : DefaultTableBasedPathSelector (associatedRegister,
                                    pathsCount,
-                                   CreateSelectTable   (associatedRegister->BitsCount(), pathsCount, isInverted, canSelectNone),
-                                   CreateDeselectTable (associatedRegister->BitsCount(), pathsCount, isInverted, canSelectNone),
-                                   canSelectNone
+                                   CreateSelectTable   (associatedRegister->BitsCount(), pathsCount, properties),
+                                   CreateDeselectTable (associatedRegister->BitsCount(), pathsCount, properties),
+                                   IsSet(properties, SelectorProperty::CanSelectNone)
                                   )
 {
 }
 //
 //  End of: DefaultBinaryPathSelector::DefaultBinaryPathSelector
 //---------------------------------------------------------------------------
-
 
 
 //! Checks that register length is enough to select all path count
@@ -82,8 +79,11 @@ void DefaultBinaryPathSelector::CheckRegisterLength (uint32_t registerLength, ui
 //! @param canSelectNone    When true zero is reserved to select 'no path' otherwise 0 is used to select first path
 //!                         (provided it is not inverted)
 //!
-DefaultBinaryPathSelector::TablesType DefaultBinaryPathSelector::CreateSelectTable (uint32_t registerLength, uint32_t pathsCount, bool isInverted, bool canSelectNone)
+DefaultBinaryPathSelector::TablesType DefaultBinaryPathSelector::CreateSelectTable (uint32_t registerLength, uint32_t pathsCount, SelectorProperty properties)
 {
+  auto isInverted    = IsSet(properties, SelectorProperty::InvertedBits);
+  auto canSelectNone = IsSet(properties, SelectorProperty::CanSelectNone);
+
   CheckRegisterLength(registerLength, pathsCount, canSelectNone);
 
   TablesType table;
@@ -117,8 +117,11 @@ DefaultBinaryPathSelector::TablesType DefaultBinaryPathSelector::CreateSelectTab
 //! Creates a table for deselection of a path
 //!
 //! @note A slot in select LUT is reserved for any paths deselection
-DefaultBinaryPathSelector::TablesType DefaultBinaryPathSelector::CreateDeselectTable (uint32_t registerLength, uint32_t pathsCount, bool isInverted, bool canSelectNone)
+DefaultBinaryPathSelector::TablesType DefaultBinaryPathSelector::CreateDeselectTable (uint32_t registerLength, uint32_t pathsCount, SelectorProperty properties)
 {
+  auto isInverted    = IsSet(properties, SelectorProperty::InvertedBits);
+  auto canSelectNone = IsSet(properties, SelectorProperty::CanSelectNone);
+
   CheckRegisterLength(registerLength, pathsCount, canSelectNone);
 
   TablesType table(pathsCount + 1, BinaryVector(registerLength, 0, SizeProperty::FixedOnCopy));

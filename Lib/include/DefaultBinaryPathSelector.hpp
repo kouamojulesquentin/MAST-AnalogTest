@@ -38,7 +38,7 @@ class DLL_EXPORT DefaultBinaryPathSelector : public DefaultTableBasedPathSelecto
   public:
   ~DefaultBinaryPathSelector() = default;
   DefaultBinaryPathSelector()  = delete;
-  DefaultBinaryPathSelector(std::shared_ptr<Register> associatedRegister, uint32_t pathsCount, bool isInverted = false, bool canSelectNone = false);
+  DefaultBinaryPathSelector(std::shared_ptr<Register> associatedRegister, uint32_t pathsCount, SelectorProperty properties = SelectorProperty::Binary_Default);
 
 
   //! Returns minimal bits count a register should have to drive a mux for number of path
@@ -47,8 +47,8 @@ class DLL_EXPORT DefaultBinaryPathSelector : public DefaultTableBasedPathSelecto
 
   using TablesType = DefaultTableBasedPathSelector::TablesType;
 
-  static TablesType CreateSelectTable   (uint32_t registerLength, uint32_t pathsCount, bool isInverted, bool canSelectNone);
-  static TablesType CreateDeselectTable (uint32_t registerLength, uint32_t pathsCount, bool isInverted, bool canSelectNone);
+  static TablesType CreateSelectTable   (uint32_t registerLength, uint32_t pathsCount, SelectorProperty properties);
+  static TablesType CreateDeselectTable (uint32_t registerLength, uint32_t pathsCount, SelectorProperty properties);
 
   // ---------------- Protected Methods
   //

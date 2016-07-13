@@ -15,6 +15,8 @@
 #include "SystemModel.hpp"
 #include "SystemModelNode.hpp"
 #include "DefaultBinaryPathSelector.hpp"
+#include "DefaultOneHotPathSelector.hpp"
+#include "DefaultNHotPathSelector.hpp"
 #include "Utility.hpp"
 
 using std::string;
@@ -148,28 +150,25 @@ shared_ptr<Chain> SystemModelBuilder::Create_MIB (string_view              name,
 //! @param selectorKind         Kind of selector (Binary, One_Hot, N_Hot)
 //! @param associatedRegister   Register that is used to drive the path multiplexer
 //! @param pathsCount           Number of managed paths (including, optional, bypass register)
-//! @param isInverted           When true the bits for selecting a path are inverted (relative to the path identifier number)
-//! @param canSelectNone        For Binary type selector, when true register value zero is reserved to select
-//!                             'no path' otherwise 0 is used to select first path (provided it is not inverted)
+//! @param properties           Properties of the selector (bit order can be reverse or it can use negative logic)
 //!
 //! @return Newly created path selector
 //!
-shared_ptr<mast::PathSelector> SystemModelBuilder::Create_PathSelector (SelectorKind selectorKind, shared_ptr<Register> associatedRegister, uint32_t pathsCount, bool isInverted, bool canSelectNone)
+shared_ptr<PathSelector> SystemModelBuilder::Create_PathSelector (SelectorKind         selectorKind,
+                                                                  shared_ptr<Register> associatedRegister,
+                                                                  uint32_t             pathsCount,
+                                                                  SelectorProperty     properties)
 {
   CHECK_PARAMETER_NOT_NULL(associatedRegister, "Associated register is mandatory (or call the version that take the register name instead)");
 
   switch (selectorKind)
   {
     case SelectorKind::Binary:
-      return make_shared<DefaultBinaryPathSelector>(associatedRegister, pathsCount, isInverted, canSelectNone);
+      return make_shared<DefaultBinaryPathSelector>(associatedRegister, pathsCount, properties);
     case SelectorKind::One_Hot:
-      //! @todo [JFC]-[July/11/2016]: In Create_PathSelector(): Implement creation of One_Hot and N_Hot selectors
-      //!
-      return nullptr;
-      break;
+      return make_shared<DefaultOneHotPathSelector>(associatedRegister, pathsCount, properties);
     case SelectorKind::N_Hot:
-      return nullptr;
-      break;
+      return make_shared<DefaultNHotPathSelector>(associatedRegister, pathsCount, properties);
     default:
       THROW_INVALID_ARGUMENT("Can only support Binary, One_Hot and N_Hot type path selector");
       break;
@@ -182,28 +181,32 @@ shared_ptr<mast::PathSelector> SystemModelBuilder::Create_PathSelector (Selector
 
 //! Creates a path selector, creating its associated register
 //!
-//! @param selectorKind         Kind of selector (Binary, One_Hot, N_Hot)
-//! @param registerName         Name of Register that is used to drive the path multiplexer
-//! @param pathsCount           Number of managed paths (including, optional, bypass register)
-//! @param isInverted           When true the bits for selecting a path are inverted (relative to the path identifier number)
-//! @param canSelectNone        For Binary type selector, when true register value zero is reserved to select
-//!                             'no path' otherwise 0 is used to select first path (provided it is not inverted)
+//! @param selectorKind   Kind of selector (Binary, One_Hot, N_Hot)
+//! @param registerName   Name of Register that is used to drive the path multiplexer
+//! @param pathsCount     Number of managed paths (including, optional, bypass register)
+//! @param properties     Properties of the selector (bit order can be reverse or it can use negative logic)
 //!
 //! @return Newly created path selector and its associated register
 //!
-pair<shared_ptr<Register>, shared_ptr<PathSelector>> SystemModelBuilder::Create_PathSelector (SelectorKind selectorKind, string_view registerName, uint32_t pathsCount, bool isInverted, bool canSelectNone)
+pair<shared_ptr<Register>, shared_ptr<PathSelector>> SystemModelBuilder::Create_PathSelector (SelectorKind     selectorKind,
+                                                                                              string_view      registerName,
+                                                                                              uint32_t         pathsCount,
+                                                                                              SelectorProperty properties)
 {
   // ---------------- Create associated register
   //
-  auto regSize = (selectorKind == SelectorKind::Binary) ? DefaultBinaryPathSelector::RegWidthForPathCount(pathsCount, canSelectNone)
-                                                        : pathsCount;
-
+  auto regSize = pathsCount;
+  if (selectorKind == SelectorKind::Binary)
+  {
+    auto canSelectNone = IsSet(properties, SelectorProperty::CanSelectNone);
+    regSize = DefaultBinaryPathSelector::RegWidthForPathCount(pathsCount, canSelectNone);
+  }
   auto holdValue = true;
   auto associatedRegister = m_model.CreateRegister (registerName, BinaryVector(regSize, 0, SizeProperty::Fixed), holdValue);
 
   // ---------------- Create selector
   //
-  auto selector = Create_PathSelector(selectorKind, associatedRegister, pathsCount, isInverted, canSelectNone);
+  auto selector = Create_PathSelector(selectorKind, associatedRegister, pathsCount, properties);
 
   // ---------------- Return both
   //

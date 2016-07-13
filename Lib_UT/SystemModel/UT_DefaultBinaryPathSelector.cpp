@@ -89,12 +89,10 @@ void UT_DefaultBinaryPathSelector::test_Constructor_CannotSelectNone ()
   //
   auto bypassSequence = BinaryVector::CreateFromBinaryString("000");
   auto associatedNode = make_shared<Register>("My register name", bypassSequence);
-  auto isInverted     = false;
-  auto canSelectNone  = false;
 
   // ---------------- Exercise
   //
-  auto sut = DefaultBinaryPathSelector(associatedNode, 5, isInverted, canSelectNone);
+  auto sut = DefaultBinaryPathSelector(associatedNode, 5, SelectorProperty::CannotSelectNone);
 
   // ---------------- Verify
   //
@@ -116,12 +114,10 @@ void UT_DefaultBinaryPathSelector::test_Constructor_CanSelectNone ()
   //
   auto bypassSequence = BinaryVector::CreateFromBinaryString("000");
   auto associatedNode = make_shared<Register>("My register name", bypassSequence);
-  auto isInverted     = false;
-  auto canSelectNone  = true;
 
   // ---------------- Exercise
   //
-  auto sut = DefaultBinaryPathSelector(associatedNode, 5, isInverted, canSelectNone);
+  auto sut = DefaultBinaryPathSelector(associatedNode, 5, SelectorProperty::CanSelectNone);
 
   // ---------------- Verify
   //
@@ -148,11 +144,9 @@ void UT_DefaultBinaryPathSelector::test_Select_CannotSelectNone ()
     //
     auto bypassSequence = BinaryVector::CreateFromBinaryString("100");
     auto associatedNode = make_shared<Register>("", bypassSequence);
-    auto isInverted     = false;
-    auto canSelectNone  = false;
     auto maxPath        = 5u;
 
-    auto sut = DefaultBinaryPathSelector(associatedNode, maxPath, isInverted, canSelectNone);
+    auto sut = DefaultBinaryPathSelector(associatedNode, maxPath, SelectorProperty::CannotSelectNone);
 
     // ---------------- Exercise
     //
@@ -189,11 +183,10 @@ void UT_DefaultBinaryPathSelector::test_Select_CanSelectNone ()
     //
     auto bypassSequence = BinaryVector::CreateFromBinaryString("010");
     auto associatedNode = make_shared<Register>("Reg", bypassSequence);
-    auto isInverted     = true;
-    auto canSelectNone  = true;
     auto maxPath        = 5u;
 
-    auto sut = DefaultBinaryPathSelector(associatedNode, maxPath, isInverted, canSelectNone);
+    auto sut = DefaultBinaryPathSelector(associatedNode, maxPath,  SelectorProperty::CanSelectNone
+                                                                 | SelectorProperty::InvertedBits);
 
     // ---------------- Exercise
     //
@@ -229,11 +222,10 @@ void UT_DefaultBinaryPathSelector::test_Select_CanSelectNoneInverted ()
     //
     auto bypassSequence = BinaryVector::CreateFromBinaryString("110");
     auto associatedNode = make_shared<Register>("My register name", bypassSequence);
-    auto isInverted     = true;
-    auto canSelectNone  = true;
     auto maxPath        = 5u;
 
-    auto sut = DefaultBinaryPathSelector(associatedNode, maxPath, isInverted, canSelectNone);
+    auto sut = DefaultBinaryPathSelector(associatedNode, maxPath, SelectorProperty::CanSelectNone
+                                                                 | SelectorProperty::InvertedBits);
 
     // ---------------- Exercise
     //
@@ -263,11 +255,9 @@ void UT_DefaultBinaryPathSelector::test_Select_Path_Zero ()
   //
   auto bypassSequence = BinaryVector::CreateFromBinaryString("010");
   auto reg            = make_shared<Register>("Reg", bypassSequence, true);
-  auto isInverted     = true;
-  auto canSelectNone  = true;
   auto maxPath        = 5u;
 
-  auto sut = DefaultBinaryPathSelector(reg, maxPath, isInverted, canSelectNone);
+  auto sut = DefaultBinaryPathSelector(reg, maxPath, SelectorProperty::CanSelectNone);
 
   // ---------------- Exercise
   //
@@ -299,11 +289,9 @@ void UT_DefaultBinaryPathSelector::test_Deselect ()
     //
     auto bypassSequence = BinaryVector::CreateFromBinaryString("010");
     auto associatedNode = make_shared<Register>("Reg", bypassSequence);
-    auto isInverted     = false;
-    auto canSelectNone  = true;
     auto maxPath        = 5u;
 
-    auto sut = DefaultBinaryPathSelector(associatedNode, maxPath, isInverted, canSelectNone);
+    auto sut = DefaultBinaryPathSelector(associatedNode, maxPath, SelectorProperty::CanSelectNone);
 
     // ---------------- Exercise
     //

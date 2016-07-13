@@ -197,7 +197,7 @@ shared_ptr<AccessInterface> SystemModel::CreateTap (string_view name,
   // ---------------- Create path selector
   //
   // Select table is by default binary except for no path and 1st that use the bypass sequence
-  auto selectTable = DefaultBinaryPathSelector::CreateSelectTable(irBitsCount, muxPathsCount, false, false);
+  auto selectTable = DefaultBinaryPathSelector::CreateSelectTable(irBitsCount, muxPathsCount, SelectorProperty::Binary_Default);
   selectTable[0] = irBypassSequence;  // Not used (path id zero)
   selectTable[1] = irBypassSequence;  // Bypass register
 

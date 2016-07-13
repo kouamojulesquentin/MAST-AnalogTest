@@ -61,7 +61,7 @@ std::shared_ptr<Chain> TestModelBuilder::Create_Default_SIB (string_view name)
   auto sibName = name.empty() ? string_view(DEFAULT_SIB_NAME) : name;
 
   auto selectorRegName = string(sibName) + SIB_CTRL_EXT;
-  auto res             = m_builder.Create_PathSelector(SelectorKind::Binary, selectorRegName, 1u, false, true);
+  auto res             = m_builder.Create_PathSelector(SelectorKind::Binary, selectorRegName, 1u, SelectorProperty::CanSelectNone);
   auto selectorReg     = res.first;
   auto selector        = res.second;
 

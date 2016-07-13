@@ -29,6 +29,7 @@ enum class SelectorProperty
   InvertedBits     = 0b0010, //!< Tells whether a '0' select a derivation (low level activation in hardware)
   ReverseOrder     = 0b0100, //!< Tells whether bits order is reversed (e.g. in 1_Hot encoding last bit select first derivation)
 
+  Std             = None,          //!< Default property for any type
   Binary_Default  = None,          //!< Default property for binary based encoding
   One_Hot_Default = CanSelectNone, //!< Default property for one hot based encoding
   N_Hot_Default   = CanSelectNone, //!< Default property for N hot based encoding

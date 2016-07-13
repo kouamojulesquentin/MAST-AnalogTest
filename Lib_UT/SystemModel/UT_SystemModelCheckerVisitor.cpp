@@ -560,9 +560,8 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_When_MaxPath_Zero ()
   SystemModel sm;
   auto tap          = sm.CreateTap("", 6u, 3u);
   auto reg_1        = sm.CreateRegister("reg_1", BinaryVector::CreateFromBinaryString("10"),  tap);
-  auto pathSelector = make_shared<DefaultBinaryPathSelector>(reg_1, 0u, false, false);
+  auto pathSelector = make_shared<DefaultBinaryPathSelector>(reg_1, 0u);
   auto linker       = sm.CreateLinker("linker", pathSelector, tap);
-//+  auto reg_2        = sm.CreateRegister("reg_2", BinaryVector::CreateFromBinaryString("10"),  linker);
 
   SystemModelCheckerVisitor sut(sm);
 

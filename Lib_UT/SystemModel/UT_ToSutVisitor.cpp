@@ -87,7 +87,7 @@ void UT_ToSutVisitor::test_Accept_Mib_Binary_CanSelectNone ()
   auto regStatic    = sm.CreateRegister ("static",    BinaryVector(STATIC_TDR_LEN),  root);
   auto mib          = sm.CreateChain    ("MIB",       root);
   auto reg_Ctrl     = sm.CreateRegister ("MIB_Ctrl",  BinaryVector(3U, 0u, SizeProperty::Fixed), true, mib);
-  auto pathSelector = make_shared<DefaultBinaryPathSelector>(reg_Ctrl, 4u, false, true);
+  auto pathSelector = make_shared<DefaultBinaryPathSelector>(reg_Ctrl, 4u, SelectorProperty::CanSelectNone);
   auto mux          = sm.CreateLinker   ("MIB_Mux",   pathSelector,                  mib);
   auto regDyn_0     = sm.CreateRegister ("dynamic_0", BinaryVector(DYNAMIC_TDR_LEN), mux);
   auto regDyn_1     = sm.CreateRegister ("dynamic_1", BinaryVector(DYNAMIC_TDR_LEN), mux);

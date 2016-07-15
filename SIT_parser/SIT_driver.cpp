@@ -4,6 +4,7 @@
 
 #include "SIT_driver.hpp"
 #include "SystemModelBuilder.hpp"
+using namespace mast;
 
 SIT::SIT_Driver::~SIT_Driver()
 {
@@ -51,6 +52,8 @@ SIT::SIT_Driver::parse_helper( std::istream &stream )
    delete(scanner);
    try
    {
+      SystemModelBuilder builder_obj(*parsed_sut);
+      builder = &builder_obj;
       scanner = new SIT::SIT_Scanner( &stream );
    }
    catch( std::bad_alloc &ba )

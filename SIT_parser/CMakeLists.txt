@@ -60,9 +60,16 @@ add_custom_command(
 
 include_directories(${CMAKE_BINARY_DIR}/SIT_parser/)
 
-add_executable (SIT_parser ${LEX_YACC_SRC_DIR}main.cpp ${LEX_YACC_SRC_DIR}SIT_driver.cpp ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc)
+add_library (SIT_parser ${LEX_YACC_SRC_DIR}SIT_driver.cpp ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc)
+
+add_executable (SIT_parser_demo ${LEX_YACC_SRC_DIR}main.cpp)
 
  set_target_properties(SIT_parser PROPERTIES
  	 COMPILE_FLAGS "${P_CFLAGS}"
 	  )
+ set_target_properties(SIT_parser_demo PROPERTIES
+ 	 COMPILE_FLAGS "${P_CFLAGS}"
+	  )
+
  target_link_libraries(SIT_parser Lib)
+ target_link_libraries(SIT_parser_demo SIT_parser Lib)

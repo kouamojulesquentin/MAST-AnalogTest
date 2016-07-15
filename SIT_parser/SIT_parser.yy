@@ -57,13 +57,6 @@ std::vector<std::string> Path_Selector_table  =
   {"Default_Binary","Default_Table_based"
   };
 
-/*enum node_type {}
-struct {
-       void *node_raw;
-       node_type  type;
-       }
-*/
-  
 static int find_in_table(std::vector<std::string> table, std::string s)
 {
 	unsigned int   l;
@@ -81,12 +74,8 @@ static int find_in_table(std::vector<std::string> table, std::string s)
 %define api.value.type variant
 %define parse.assert
 
-%type  <std::string> register_node
-%type  <std::string> node
 %type  <node_list_type> node_list
 %type  <node_list_type> children_list
-%type  <std::string> leaf_node
-%type  <std::string> internal_node
 %type  <std::uint8_t> is_transparent
 %type  <name_type> node_name
 %type  <std::uint8_t> hold
@@ -97,12 +86,17 @@ static int find_in_table(std::vector<std::string> table, std::string s)
 %type  <std::string> path_selector
 %type  <std::string> ctrl_node
 %type  <std::uint32_t> IR_size
+%type  <std::uint32_t> size
 %type  <std::uint32_t> n_DR_chains
 %type  <IR_coding_type> IR_coding_list
 %type  <IR_coding_type> IR_TABLE
 %type  <std::string> JTAG_target
+
 %type  <std::shared_ptr<mast::SystemModelNode>> root_node
-/*To append, cast to "dynamic_pointer_cast" vers ParentNode*/
+%type  <std::shared_ptr<mast::SystemModelNode>> register_node
+%type  <std::shared_ptr<mast::SystemModelNode>> leaf_node
+%type  <std::shared_ptr<mast::SystemModelNode>> internal_node
+%type  <std::shared_ptr<mast::SystemModelNode>> node
 
 %token               END    0     "end of file"
 %token               UPPER
@@ -142,7 +136,10 @@ static int find_in_table(std::vector<std::string> table, std::string s)
 
 root_node: 
    internal_node END 
-    {std::cout << "Parsing OK, Root node is " << $1 << "  \n";}
+    {
+    std::cout << "Parsing OK, Root node is " <<$1.get()->Name() << "  \n";
+    //driver.parsed_sut->ReplaceRoot($1,false);
+    }
    ;
 
 children_list:   
@@ -150,8 +147,12 @@ children_list:
   ;
 
 node_list:   
-    node node_list { $$.name = $1 + ' ' + $2.name; $$.n_nodes = $2.n_nodes+1; }	
-  |   node { $$.name = $1;$$.n_nodes = 1;}
+    node node_list { $$.name = $1.get()->Name() + ' ' + $2.name; $$.n_nodes = $2.n_nodes+1;
+                    auto tmp = $2.nodes;
+		    tmp.push_back($1);
+		    $$.nodes = tmp; 
+		    }	
+  |   node { $$.name = $1.get()->Name();$$.n_nodes = 1;$$.nodes.push_back($1);}
   ;
     
 node:  
@@ -180,7 +181,13 @@ t_CHAIN  node_name children_list {
                      if ($2.is_transparent) 
 		           std::cout << "(transparent)";
                      std::cout << ", " << $3.n_nodes << " children:  " << $3.name << " \n";
-  		     $$ = $2.name;}
+		     
+		     auto node = driver.parsed_sut->CreateChain($2.name);
+		//     for_each($3.nodes.begin(),$3.nodes.end(),node->AppendChild); 
+		     for (auto this_child : $3.nodes)
+		       node->AppendChild(this_child);
+ 	  	     $$ = node;
+  		     }
  |
 t_LINKER  node_name path_selector ctrl_node children_list {
 			int   l;
@@ -198,7 +205,12 @@ t_LINKER  node_name path_selector ctrl_node children_list {
 			std::cout <<  $3 <<"_PathSelector";
 			 std::cout <<" controlled by node "<<$4;
                      	std::cout << ", " << $5.n_nodes << " children:  " << $5.name << " \n";
-  		     	$$ = $2.name;}
+//		     auto node = driver.parsed_sut->CreateLinker ($5.name,   pathSelector, nullptr);
+ 		     auto node = driver.parsed_sut->CreateChain ($2.name);
+		     for (auto this_child : $5.nodes)
+		       node->AppendChild(this_child);
+ 	  	     $$ = node;
+  		      }
 		}
  |
 t_ACCESS_INTERFACE  node_name t_WORD children_list { 
@@ -216,11 +228,12 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
           	if ($2.is_transparent) std::cout << "(transparent)";
 		std::cout  << " Protocol : " << $3;
          	std::cout << ", children:  " << $4.name << " \n";
-  	  	$$ = $2.name;        
 		
 		auto node = driver.parsed_sut->CreateAccessInterface($2.name, nullptr);
+		for (auto this_child : $4.nodes)
+		   node->AppendChild(this_child);
 
-//  	  	$$ = node;        
+  	  	$$ = node;        
 		
 		}
 	  }
@@ -235,7 +248,12 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
         else
       {
   	std::cout << "Node type SIB, idf	 " << $2.name << " " << $3 <<" " << $4 <<"\n";
-  	$$ = $2.name;
+
+ 	auto node = driver.parsed_sut->CreateChain ($2.name,nullptr);
+	for (auto this_child : $5.nodes)
+	    node->AppendChild(this_child);
+
+ 	$$ = node;
        }
   }			
  |  
@@ -249,7 +267,10 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
         else
       {
   	std::cout << "Node type MIB, idf " << $2.name << " " << $3 <<" " << $4 << " Max derivations " << $5 << " " << $6 << "_PathSelctor ctrl_node " << $7 <<"\n";
-  	$$ = $2.name;
+        auto node = driver.parsed_sut->CreateChain ($2.name);
+	for (auto this_child : $8.nodes)
+	    node->AppendChild(this_child);
+  	$$ = node;
        }
   }			
  |  
@@ -263,7 +284,10 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
         else
       {
   	std::cout << "1500_Wrapper Macro, idf " << $2.name << " Max derivations " << $3 <<"\n";
-  	$$ = $2.name;
+        auto node = driver.parsed_sut->CreateChain ($2.name);
+	for (auto this_child : $4.nodes)
+	    node->AppendChild(this_child);
+  	$$ = node;
        }
   }			
  |  
@@ -292,7 +316,10 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
 	  else
 	{
 	 std::cout << "JTAG TAP Macro, idf " << $2.name << " IR size " << $4 <<" max DR chains " << $6 <<"\n";
-  	 $$ = $2.name;
+         auto node = driver.parsed_sut->CreateChain ($2.name);
+	 for (auto this_child : $7.nodes)
+	    node->AppendChild(this_child);
+  	 $$ = node;
 	 }
 	}
        }
@@ -342,12 +369,18 @@ active :
  t_LOW{ $$ = LOW;}
  ; 
  
-leaf_node: register_node { $$ = $1;}
+leaf_node: register_node {     $$=  $1;
+                           }
   ;
   
 register_node: 
-   t_REGISTER  node_name hold bypass { 
-  		     $$ = $2.name;}
+   t_REGISTER  node_name size hold bypass {
+                      auto node = driver.parsed_sut->CreateRegister ($2.name, BinaryVector(12, 0), nullptr); 
+  		     $$ = node;}
+
+size : 
+ t_DecimalLiteral { $$ = $1;}
+;
 
 hold: 
  t_HOLD_VALUE{  $$=1 ; }

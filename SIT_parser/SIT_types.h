@@ -3,6 +3,7 @@
  
 #include <string>
 #include <stdint.h>
+#include "SystemModelBuilder.hpp"
  
 
  typedef struct node_name_s
@@ -18,6 +19,7 @@ typedef struct node_list_type_s
   {
     std::uint32_t n_nodes;
     std::string name;
+    std::vector<std::shared_ptr<mast::SystemModelNode>> nodes;
   } node_list_type;
 
 typedef struct IR_coding_s

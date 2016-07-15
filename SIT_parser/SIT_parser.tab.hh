@@ -323,6 +323,10 @@ namespace SIT {
       char dummy5[sizeof(node_list_type)];
 
       // root_node
+      // node
+      // internal_node
+      // leaf_node
+      // register_node
       char dummy6[sizeof(std::shared_ptr<mast::SystemModelNode>)];
 
       // t_WORD
@@ -344,13 +348,9 @@ namespace SIT {
       // t_PRE
       // t_HIGH
       // t_LOW
-      // node
-      // internal_node
       // JTAG_target
       // path_selector
       // ctrl_node
-      // leaf_node
-      // register_node
       // bypass
       char dummy7[sizeof(std::string)];
 
@@ -358,6 +358,7 @@ namespace SIT {
       // IR_size
       // n_DR_chains
       // max_derivations
+      // size
       char dummy8[sizeof(std::uint32_t)];
 
       // is_transparent
@@ -859,8 +860,8 @@ namespace SIT {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 60,     ///< Last index in yytable_.
-      yynnts_ = 22,  ///< Number of nonterminal symbols.
+      yylast_ = 61,     ///< Last index in yytable_.
+      yynnts_ = 23,  ///< Number of nonterminal symbols.
       yyfinal_ = 18, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
@@ -876,7 +877,7 @@ namespace SIT {
 
 #line 5 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:377
 } // SIT
-#line 880 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.hh" // lalr1.cc:377
+#line 881 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.hh" // lalr1.cc:377
 
 
 

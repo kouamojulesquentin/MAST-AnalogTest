@@ -40,7 +40,7 @@ public:
    std::ostream& print(std::ostream &stream);
 
    std::unique_ptr<mast::SystemModel> parsed_sut;
-   
+   mast::SystemModelBuilder *builder;
 
 private:
 

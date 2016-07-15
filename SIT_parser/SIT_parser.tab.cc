@@ -78,13 +78,6 @@ std::vector<std::string> Path_Selector_table  =
   {"Default_Binary","Default_Table_based"
   };
 
-/*enum node_type {}
-struct {
-       void *node_raw;
-       node_type  type;
-       }
-*/
-  
 static int find_in_table(std::vector<std::string> table, std::string s)
 {
 	unsigned int   l;
@@ -98,7 +91,7 @@ static int find_in_table(std::vector<std::string> table, std::string s)
 }
    
 
-#line 102 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:413
+#line 95 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:413
 
 
 #ifndef YY_
@@ -184,7 +177,7 @@ static int find_in_table(std::vector<std::string> table, std::string s)
 
 #line 5 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:479
 namespace SIT {
-#line 188 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:479
+#line 181 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:479
 
   /// Build a parser object.
   SIT_Parser::SIT_Parser (SIT_Scanner  &scanner_yyarg, SIT_Driver  &driver_yyarg)
@@ -250,6 +243,10 @@ namespace SIT {
         break;
 
       case 33: // root_node
+      case 36: // node
+      case 39: // internal_node
+      case 50: // leaf_node
+      case 51: // register_node
         value.copy< std::shared_ptr<mast::SystemModelNode> > (other.value);
         break;
 
@@ -272,14 +269,10 @@ namespace SIT {
       case 25: // t_PRE
       case 26: // t_HIGH
       case 27: // t_LOW
-      case 36: // node
-      case 39: // internal_node
       case 40: // JTAG_target
       case 41: // path_selector
       case 42: // ctrl_node
-      case 50: // leaf_node
-      case 51: // register_node
-      case 53: // bypass
+      case 54: // bypass
         value.copy< std::string > (other.value);
         break;
 
@@ -287,11 +280,12 @@ namespace SIT {
       case 43: // IR_size
       case 44: // n_DR_chains
       case 47: // max_derivations
+      case 52: // size
         value.copy< std::uint32_t > (other.value);
         break;
 
       case 37: // is_transparent
-      case 52: // hold
+      case 53: // hold
         value.copy< std::uint8_t > (other.value);
         break;
 
@@ -335,6 +329,10 @@ namespace SIT {
         break;
 
       case 33: // root_node
+      case 36: // node
+      case 39: // internal_node
+      case 50: // leaf_node
+      case 51: // register_node
         value.copy< std::shared_ptr<mast::SystemModelNode> > (v);
         break;
 
@@ -357,14 +355,10 @@ namespace SIT {
       case 25: // t_PRE
       case 26: // t_HIGH
       case 27: // t_LOW
-      case 36: // node
-      case 39: // internal_node
       case 40: // JTAG_target
       case 41: // path_selector
       case 42: // ctrl_node
-      case 50: // leaf_node
-      case 51: // register_node
-      case 53: // bypass
+      case 54: // bypass
         value.copy< std::string > (v);
         break;
 
@@ -372,11 +366,12 @@ namespace SIT {
       case 43: // IR_size
       case 44: // n_DR_chains
       case 47: // max_derivations
+      case 52: // size
         value.copy< std::uint32_t > (v);
         break;
 
       case 37: // is_transparent
-      case 52: // hold
+      case 53: // hold
         value.copy< std::uint8_t > (v);
         break;
 
@@ -507,6 +502,10 @@ namespace SIT {
         break;
 
       case 33: // root_node
+      case 36: // node
+      case 39: // internal_node
+      case 50: // leaf_node
+      case 51: // register_node
         value.template destroy< std::shared_ptr<mast::SystemModelNode> > ();
         break;
 
@@ -529,14 +528,10 @@ namespace SIT {
       case 25: // t_PRE
       case 26: // t_HIGH
       case 27: // t_LOW
-      case 36: // node
-      case 39: // internal_node
       case 40: // JTAG_target
       case 41: // path_selector
       case 42: // ctrl_node
-      case 50: // leaf_node
-      case 51: // register_node
-      case 53: // bypass
+      case 54: // bypass
         value.template destroy< std::string > ();
         break;
 
@@ -544,11 +539,12 @@ namespace SIT {
       case 43: // IR_size
       case 44: // n_DR_chains
       case 47: // max_derivations
+      case 52: // size
         value.template destroy< std::uint32_t > ();
         break;
 
       case 37: // is_transparent
-      case 52: // hold
+      case 53: // hold
         value.template destroy< std::uint8_t > ();
         break;
 
@@ -598,6 +594,10 @@ namespace SIT {
         break;
 
       case 33: // root_node
+      case 36: // node
+      case 39: // internal_node
+      case 50: // leaf_node
+      case 51: // register_node
         value.move< std::shared_ptr<mast::SystemModelNode> > (s.value);
         break;
 
@@ -620,14 +620,10 @@ namespace SIT {
       case 25: // t_PRE
       case 26: // t_HIGH
       case 27: // t_LOW
-      case 36: // node
-      case 39: // internal_node
       case 40: // JTAG_target
       case 41: // path_selector
       case 42: // ctrl_node
-      case 50: // leaf_node
-      case 51: // register_node
-      case 53: // bypass
+      case 54: // bypass
         value.move< std::string > (s.value);
         break;
 
@@ -635,11 +631,12 @@ namespace SIT {
       case 43: // IR_size
       case 44: // n_DR_chains
       case 47: // max_derivations
+      case 52: // size
         value.move< std::uint32_t > (s.value);
         break;
 
       case 37: // is_transparent
-      case 52: // hold
+      case 53: // hold
         value.move< std::uint8_t > (s.value);
         break;
 
@@ -945,6 +942,10 @@ namespace SIT {
         break;
 
       case 33: // root_node
+      case 36: // node
+      case 39: // internal_node
+      case 50: // leaf_node
+      case 51: // register_node
         value.move< std::shared_ptr<mast::SystemModelNode> > (that.value);
         break;
 
@@ -967,14 +968,10 @@ namespace SIT {
       case 25: // t_PRE
       case 26: // t_HIGH
       case 27: // t_LOW
-      case 36: // node
-      case 39: // internal_node
       case 40: // JTAG_target
       case 41: // path_selector
       case 42: // ctrl_node
-      case 50: // leaf_node
-      case 51: // register_node
-      case 53: // bypass
+      case 54: // bypass
         value.move< std::string > (that.value);
         break;
 
@@ -982,11 +979,12 @@ namespace SIT {
       case 43: // IR_size
       case 44: // n_DR_chains
       case 47: // max_derivations
+      case 52: // size
         value.move< std::uint32_t > (that.value);
         break;
 
       case 37: // is_transparent
-      case 52: // hold
+      case 53: // hold
         value.move< std::uint8_t > (that.value);
         break;
 
@@ -1028,6 +1026,10 @@ namespace SIT {
         break;
 
       case 33: // root_node
+      case 36: // node
+      case 39: // internal_node
+      case 50: // leaf_node
+      case 51: // register_node
         value.copy< std::shared_ptr<mast::SystemModelNode> > (that.value);
         break;
 
@@ -1050,14 +1052,10 @@ namespace SIT {
       case 25: // t_PRE
       case 26: // t_HIGH
       case 27: // t_LOW
-      case 36: // node
-      case 39: // internal_node
       case 40: // JTAG_target
       case 41: // path_selector
       case 42: // ctrl_node
-      case 50: // leaf_node
-      case 51: // register_node
-      case 53: // bypass
+      case 54: // bypass
         value.copy< std::string > (that.value);
         break;
 
@@ -1065,11 +1063,12 @@ namespace SIT {
       case 43: // IR_size
       case 44: // n_DR_chains
       case 47: // max_derivations
+      case 52: // size
         value.copy< std::uint32_t > (that.value);
         break;
 
       case 37: // is_transparent
-      case 52: // hold
+      case 53: // hold
         value.copy< std::uint8_t > (that.value);
         break;
 
@@ -1323,6 +1322,10 @@ namespace SIT {
         break;
 
       case 33: // root_node
+      case 36: // node
+      case 39: // internal_node
+      case 50: // leaf_node
+      case 51: // register_node
         yylhs.value.build< std::shared_ptr<mast::SystemModelNode> > ();
         break;
 
@@ -1345,14 +1348,10 @@ namespace SIT {
       case 25: // t_PRE
       case 26: // t_HIGH
       case 27: // t_LOW
-      case 36: // node
-      case 39: // internal_node
       case 40: // JTAG_target
       case 41: // path_selector
       case 42: // ctrl_node
-      case 50: // leaf_node
-      case 51: // register_node
-      case 53: // bypass
+      case 54: // bypass
         yylhs.value.build< std::string > ();
         break;
 
@@ -1360,11 +1359,12 @@ namespace SIT {
       case 43: // IR_size
       case 44: // n_DR_chains
       case 47: // max_derivations
+      case 52: // size
         yylhs.value.build< std::uint32_t > ();
         break;
 
       case 37: // is_transparent
-      case 52: // hold
+      case 53: // hold
         yylhs.value.build< std::uint8_t > ();
         break;
 
@@ -1386,75 +1386,88 @@ namespace SIT {
           switch (yyn)
             {
   case 2:
-#line 145 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
-    {std::cout << "Parsing OK, Root node is " << yystack_[1].value.as< std::string > () << "  \n";}
-#line 1392 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 139 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+    {
+    std::cout << "Parsing OK, Root node is " <<yystack_[1].value.as< std::shared_ptr<mast::SystemModelNode> > ().get()->Name() << "  \n";
+    //driver.parsed_sut->ReplaceRoot($1,false);
+    }
+#line 1395 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 3:
-#line 149 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 146 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     { yylhs.value.as< node_list_type > () = yystack_[1].value.as< node_list_type > ();}
-#line 1398 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1401 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 4:
-#line 153 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
-    { yylhs.value.as< node_list_type > ().name = yystack_[1].value.as< std::string > () + ' ' + yystack_[0].value.as< node_list_type > ().name; yylhs.value.as< node_list_type > ().n_nodes = yystack_[0].value.as< node_list_type > ().n_nodes+1; }
-#line 1404 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 150 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+    { yylhs.value.as< node_list_type > ().name = yystack_[1].value.as< std::shared_ptr<mast::SystemModelNode> > ().get()->Name() + ' ' + yystack_[0].value.as< node_list_type > ().name; yylhs.value.as< node_list_type > ().n_nodes = yystack_[0].value.as< node_list_type > ().n_nodes+1;
+                    auto tmp = yystack_[0].value.as< node_list_type > ().nodes;
+		    tmp.push_back(yystack_[1].value.as< std::shared_ptr<mast::SystemModelNode> > ());
+		    yylhs.value.as< node_list_type > ().nodes = tmp; 
+		    }
+#line 1411 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 5:
-#line 154 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
-    { yylhs.value.as< node_list_type > ().name = yystack_[0].value.as< std::string > ();yylhs.value.as< node_list_type > ().n_nodes = 1;}
-#line 1410 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 155 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+    { yylhs.value.as< node_list_type > ().name = yystack_[0].value.as< std::shared_ptr<mast::SystemModelNode> > ().get()->Name();yylhs.value.as< node_list_type > ().n_nodes = 1;yylhs.value.as< node_list_type > ().nodes.push_back(yystack_[0].value.as< std::shared_ptr<mast::SystemModelNode> > ());}
+#line 1417 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 6:
-#line 158 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
-    { yylhs.value.as< std::string > () = yystack_[0].value.as< std::string > ();}
-#line 1416 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 159 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+    { yylhs.value.as< std::shared_ptr<mast::SystemModelNode> > () = yystack_[0].value.as< std::shared_ptr<mast::SystemModelNode> > ();}
+#line 1423 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 7:
-#line 160 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
-    { yylhs.value.as< std::string > () = yystack_[0].value.as< std::string > ();}
-#line 1422 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 161 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+    { yylhs.value.as< std::shared_ptr<mast::SystemModelNode> > () = yystack_[0].value.as< std::shared_ptr<mast::SystemModelNode> > ();}
+#line 1429 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 8:
-#line 164 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 165 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     {yylhs.value.as< std::uint8_t > () = 1;}
-#line 1428 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1435 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 9:
-#line 166 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 167 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     { yylhs.value.as< std::uint8_t > () = 0;}
-#line 1434 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1441 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 10:
-#line 170 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 171 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     { 
   		     yylhs.value.as< name_type > ().name = yystack_[1].value.as< std::string > ();
 		     yylhs.value.as< name_type > ().is_transparent = yystack_[0].value.as< std::uint8_t > ();
 		     }
-#line 1443 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1450 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 11:
-#line 178 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 179 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     { 
                      std::cout << "Node type CHAIN, idf " << yystack_[1].value.as< name_type > ().name ;
                      if (yystack_[1].value.as< name_type > ().is_transparent) 
 		           std::cout << "(transparent)";
                      std::cout << ", " << yystack_[0].value.as< node_list_type > ().n_nodes << " children:  " << yystack_[0].value.as< node_list_type > ().name << " \n";
-  		     yylhs.value.as< std::string > () = yystack_[1].value.as< name_type > ().name;}
-#line 1454 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+		     
+		     auto node = driver.parsed_sut->CreateChain(yystack_[1].value.as< name_type > ().name);
+		//     for_each($3.nodes.begin(),$3.nodes.end(),node->AppendChild); 
+		     for (auto this_child : yystack_[0].value.as< node_list_type > ().nodes)
+		       node->AppendChild(this_child);
+ 	  	     yylhs.value.as< std::shared_ptr<mast::SystemModelNode> > () = node;
+  		     }
+#line 1467 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 12:
-#line 185 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 192 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     {
 			int   l;
 			l = find_in_table(Path_Selector_table,yystack_[2].value.as< std::string > ());
@@ -1471,13 +1484,18 @@ namespace SIT {
 			std::cout <<  yystack_[2].value.as< std::string > () <<"_PathSelector";
 			 std::cout <<" controlled by node "<<yystack_[1].value.as< std::string > ();
                      	std::cout << ", " << yystack_[0].value.as< node_list_type > ().n_nodes << " children:  " << yystack_[0].value.as< node_list_type > ().name << " \n";
-  		     	yylhs.value.as< std::string > () = yystack_[3].value.as< name_type > ().name;}
+//		     auto node = driver.parsed_sut->CreateLinker ($5.name,   pathSelector, nullptr);
+ 		     auto node = driver.parsed_sut->CreateChain (yystack_[3].value.as< name_type > ().name);
+		     for (auto this_child : yystack_[0].value.as< node_list_type > ().nodes)
+		       node->AppendChild(this_child);
+ 	  	     yylhs.value.as< std::shared_ptr<mast::SystemModelNode> > () = node;
+  		      }
 		}
-#line 1477 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1495 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 13:
-#line 204 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 216 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     { 
 
 	int   l;
@@ -1493,19 +1511,20 @@ namespace SIT {
           	if (yystack_[2].value.as< name_type > ().is_transparent) std::cout << "(transparent)";
 		std::cout  << " Protocol : " << yystack_[1].value.as< std::string > ();
          	std::cout << ", children:  " << yystack_[0].value.as< node_list_type > ().name << " \n";
-  	  	yylhs.value.as< std::string > () = yystack_[2].value.as< name_type > ().name;        
 		
 		auto node = driver.parsed_sut->CreateAccessInterface(yystack_[2].value.as< name_type > ().name, nullptr);
+		for (auto this_child : yystack_[0].value.as< node_list_type > ().nodes)
+		   node->AppendChild(this_child);
 
-//  	  	$$ = node;        
+  	  	yylhs.value.as< std::shared_ptr<mast::SystemModelNode> > () = node;        
 		
 		}
 	  }
-#line 1505 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1524 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 14:
-#line 229 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 242 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     {
       if (yystack_[0].value.as< node_list_type > ().n_nodes!=1) 
 	 {
@@ -1515,14 +1534,19 @@ namespace SIT {
         else
       {
   	std::cout << "Node type SIB, idf	 " << yystack_[3].value.as< name_type > ().name << " " << yystack_[2].value.as< ctrl_position > () <<" " << yystack_[1].value.as< logic_polarity > () <<"\n";
-  	yylhs.value.as< std::string > () = yystack_[3].value.as< name_type > ().name;
+
+ 	auto node = driver.parsed_sut->CreateChain (yystack_[3].value.as< name_type > ().name,nullptr);
+	for (auto this_child : yystack_[0].value.as< node_list_type > ().nodes)
+	    node->AppendChild(this_child);
+
+ 	yylhs.value.as< std::shared_ptr<mast::SystemModelNode> > () = node;
        }
   }
-#line 1522 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1546 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 15:
-#line 243 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 261 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     {
       if (yystack_[0].value.as< node_list_type > ().n_nodes>yystack_[3].value.as< std::uint32_t > ()) 
 	 {
@@ -1532,14 +1556,17 @@ namespace SIT {
         else
       {
   	std::cout << "Node type MIB, idf " << yystack_[6].value.as< name_type > ().name << " " << yystack_[5].value.as< ctrl_position > () <<" " << yystack_[4].value.as< logic_polarity > () << " Max derivations " << yystack_[3].value.as< std::uint32_t > () << " " << yystack_[2].value.as< std::string > () << "_PathSelctor ctrl_node " << yystack_[1].value.as< std::string > () <<"\n";
-  	yylhs.value.as< std::string > () = yystack_[6].value.as< name_type > ().name;
+        auto node = driver.parsed_sut->CreateChain (yystack_[6].value.as< name_type > ().name);
+	for (auto this_child : yystack_[0].value.as< node_list_type > ().nodes)
+	    node->AppendChild(this_child);
+  	yylhs.value.as< std::shared_ptr<mast::SystemModelNode> > () = node;
        }
   }
-#line 1539 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1566 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 16:
-#line 257 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 278 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     {
       if (yystack_[0].value.as< node_list_type > ().n_nodes>yystack_[1].value.as< std::uint32_t > ()) 
 	 {
@@ -1549,14 +1576,17 @@ namespace SIT {
         else
       {
   	std::cout << "1500_Wrapper Macro, idf " << yystack_[2].value.as< name_type > ().name << " Max derivations " << yystack_[1].value.as< std::uint32_t > () <<"\n";
-  	yylhs.value.as< std::string > () = yystack_[2].value.as< name_type > ().name;
+        auto node = driver.parsed_sut->CreateChain (yystack_[2].value.as< name_type > ().name);
+	for (auto this_child : yystack_[0].value.as< node_list_type > ().nodes)
+	    node->AppendChild(this_child);
+  	yylhs.value.as< std::shared_ptr<mast::SystemModelNode> > () = node;
        }
   }
-#line 1556 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1586 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 17:
-#line 271 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 295 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     { if (yystack_[0].value.as< node_list_type > ().n_nodes>(yystack_[1].value.as< std::uint32_t > ()+1)) 
 	 {
 	  std::cerr << "JTAG TAP " << yystack_[5].value.as< name_type > ().name<< " has " << yystack_[0].value.as< node_list_type > ().n_nodes-1 << " DR derivations instead of maximum "<< yystack_[1].value.as< std::uint32_t > () <<"\n";
@@ -1581,127 +1611,138 @@ namespace SIT {
 	  else
 	{
 	 std::cout << "JTAG TAP Macro, idf " << yystack_[5].value.as< name_type > ().name << " IR size " << yystack_[3].value.as< std::uint32_t > () <<" max DR chains " << yystack_[1].value.as< std::uint32_t > () <<"\n";
-  	 yylhs.value.as< std::string > () = yystack_[5].value.as< name_type > ().name;
+         auto node = driver.parsed_sut->CreateChain (yystack_[5].value.as< name_type > ().name);
+	 for (auto this_child : yystack_[0].value.as< node_list_type > ().nodes)
+	    node->AppendChild(this_child);
+  	 yylhs.value.as< std::shared_ptr<mast::SystemModelNode> > () = node;
 	 }
 	}
        }
      }
-#line 1590 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1623 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 18:
-#line 303 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 330 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     { yylhs.value.as< std::string > () =yystack_[0].value.as< std::string > ();}
-#line 1596 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1629 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 19:
-#line 307 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 334 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     { yylhs.value.as< std::string > () =yystack_[0].value.as< std::string > ();}
-#line 1602 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1635 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 20:
-#line 310 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 337 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     { yylhs.value.as< std::string > () =yystack_[0].value.as< std::string > ();}
-#line 1608 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1641 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 21:
-#line 314 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 341 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     { yylhs.value.as< std::uint32_t > () = yystack_[0].value.as< std::uint32_t > ();}
-#line 1614 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1647 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 22:
-#line 317 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 344 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     { yylhs.value.as< std::uint32_t > () = yystack_[0].value.as< std::uint32_t > ();}
-#line 1620 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1653 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 23:
-#line 320 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 347 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     {yylhs.value.as< IR_coding_type > ()=yystack_[1].value.as< IR_coding_type > ();}
-#line 1626 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1659 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 24:
-#line 324 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 351 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     { yylhs.value.as< IR_coding_type > ().codeword = yystack_[0].value.as< std::string > ();yylhs.value.as< IR_coding_type > ().n_words = 1; }
-#line 1632 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1665 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 25:
-#line 326 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 353 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     {yylhs.value.as< IR_coding_type > ().codeword = yystack_[0].value.as< IR_coding_type > ().codeword + ' ' + yystack_[2].value.as< std::string > (); yylhs.value.as< IR_coding_type > ().n_words = (yystack_[0].value.as< IR_coding_type > ().n_words+1); }
-#line 1638 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1671 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 26:
-#line 331 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 358 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     { yylhs.value.as< std::uint32_t > () = yystack_[0].value.as< std::uint32_t > ();}
-#line 1644 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1677 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 27:
-#line 334 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 361 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     { yylhs.value.as< ctrl_position > () = AFTER;}
-#line 1650 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1683 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 28:
-#line 336 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 363 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     { yylhs.value.as< ctrl_position > () = BEFORE;}
-#line 1656 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1689 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 29:
-#line 340 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 367 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     { yylhs.value.as< logic_polarity > () = HIGH;}
-#line 1662 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+#line 1695 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
   case 30:
-#line 342 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+#line 369 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     { yylhs.value.as< logic_polarity > () = LOW;}
-#line 1668 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
-    break;
-
-  case 31:
-#line 345 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
-    { yylhs.value.as< std::string > () = yystack_[0].value.as< std::string > ();}
-#line 1674 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
-    break;
-
-  case 32:
-#line 349 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
-    { 
-  		     yylhs.value.as< std::string > () = yystack_[2].value.as< name_type > ().name;}
-#line 1681 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
-    break;
-
-  case 33:
-#line 353 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
-    {  yylhs.value.as< std::uint8_t > ()=1 ; }
-#line 1687 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
-    break;
-
-  case 34:
-#line 354 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
-    {  yylhs.value.as< std::uint8_t > ()=0 ; }
-#line 1693 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
-    break;
-
-  case 35:
-#line 359 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
-    {
-   yylhs.value.as< std::string > ()=yystack_[0].value.as< std::string > () ;
-  }
 #line 1701 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;
 
+  case 31:
+#line 372 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+    {     yylhs.value.as< std::shared_ptr<mast::SystemModelNode> > ()=  yystack_[0].value.as< std::shared_ptr<mast::SystemModelNode> > ();
+                           }
+#line 1708 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+    break;
 
-#line 1705 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+  case 32:
+#line 377 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+    {
+                      auto node = driver.parsed_sut->CreateRegister (yystack_[3].value.as< name_type > ().name, BinaryVector(12, 0), nullptr); 
+  		     yylhs.value.as< std::shared_ptr<mast::SystemModelNode> > () = node;}
+#line 1716 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+    break;
+
+  case 33:
+#line 382 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+    { yylhs.value.as< std::uint32_t > () = yystack_[0].value.as< std::uint32_t > ();}
+#line 1722 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+    break;
+
+  case 34:
+#line 386 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+    {  yylhs.value.as< std::uint8_t > ()=1 ; }
+#line 1728 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+    break;
+
+  case 35:
+#line 387 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+    {  yylhs.value.as< std::uint8_t > ()=0 ; }
+#line 1734 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+    break;
+
+  case 36:
+#line 392 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
+    {
+   yylhs.value.as< std::string > ()=yystack_[0].value.as< std::string > () ;
+  }
+#line 1742 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
+    break;
+
+
+#line 1746 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
             default:
               break;
             }
@@ -1879,9 +1920,9 @@ namespace SIT {
      -27,   -27,    13,   -27,   -27,    36,     0,   -27,   -27,   -22,
      -22,   -27,     0,   -27,    -9,    -2,    26,    13,   -27,   -27,
      -27,   -27,     0,   -27,   -27,   -27,     0,   -10,   -27,   -27,
-      16,    23,   -27,   -27,   -27,   -27,    25,    22,    19,   -27,
-      27,    36,    18,    24,   -27,     0,    43,   -27,     0,    22,
-     -27,   -27,    28,   -27,   -27,   -27
+      16,    17,   -27,   -27,   -27,   -27,    25,    20,    19,   -27,
+      28,    36,    18,    22,   -27,     0,   -27,    29,     0,    20,
+     -27,   -27,    45,   -27,   -27,   -27,    30,   -27
   };
 
   const unsigned char
@@ -1892,17 +1933,17 @@ namespace SIT {
        8,    10,     0,    11,    19,     0,     0,    27,    28,     0,
        0,    26,     0,    18,     0,     0,     0,     5,     6,     7,
       31,    20,     0,    13,    29,    30,     0,     0,    16,    21,
-       0,    34,     3,     4,    12,    14,     0,     0,     0,    33,
-       0,     0,    24,     0,    22,     0,     0,    32,     0,     0,
-      23,    17,     0,    15,    25,    35
+       0,     0,     3,     4,    12,    14,     0,     0,     0,    33,
+      35,     0,    24,     0,    22,     0,    34,     0,     0,     0,
+      23,    17,     0,    32,    15,    25,     0,    36
   };
 
   const signed char
   SIT_Parser::yypgoto_[] =
   {
-     -27,   -27,   -26,    17,   -27,   -27,     5,    52,   -27,    -1,
-      -5,   -27,   -27,   -27,   -12,    11,    44,    30,   -27,   -27,
-     -27,   -27
+     -27,   -27,   -26,    23,   -27,   -27,     5,    54,   -27,    -1,
+      -5,   -27,   -27,   -27,   -12,    11,    44,    31,   -27,   -27,
+     -27,   -27,   -27
   };
 
   const signed char
@@ -1910,7 +1951,7 @@ namespace SIT {
   {
       -1,     8,    23,    36,    37,    21,    11,    38,    34,    25,
       42,    50,    65,    58,    63,    32,    29,    46,    39,    40,
-      60,    67
+      60,    67,    73
   };
 
   const unsigned char
@@ -1920,9 +1961,9 @@ namespace SIT {
       15,    16,    17,    20,    18,    19,    54,    22,    31,    49,
       55,     1,    35,     2,     3,     4,     5,     6,     7,     1,
       24,     2,     3,     4,     5,     6,     7,    26,    33,    71,
-      51,    41,    73,    59,    52,    62,    57,    64,    66,    69,
-      72,    75,     9,    70,    53,    61,    68,    74,    56,    30,
-      47
+      51,    41,    74,    62,    52,    59,    57,    64,    66,    69,
+      72,    70,    76,    77,     9,    61,    68,    75,    56,    30,
+      53,    47
   };
 
   const unsigned char
@@ -1932,9 +1973,9 @@ namespace SIT {
        5,     6,     7,    19,     0,     0,    42,    17,    28,    28,
       46,     8,     9,    10,    11,    12,    13,    14,    15,     8,
        5,    10,    11,    12,    13,    14,    15,     5,     5,    65,
-      35,     5,    68,    20,    18,    23,    30,    28,    21,    31,
-       7,    23,     0,    29,    37,    56,    61,    69,    47,    15,
-      30
+      35,     5,    68,    23,    18,    28,    30,    28,    20,    31,
+      21,    29,     7,    23,     0,    56,    61,    69,    47,    15,
+      37,    30
   };
 
   const unsigned char
@@ -1945,9 +1986,9 @@ namespace SIT {
       19,    37,    17,    34,     5,    41,     5,    24,    25,    48,
       48,    28,    47,     5,    40,     9,    35,    36,    39,    50,
       51,     5,    42,    34,    26,    27,    49,    49,    34,    28,
-      43,    38,    18,    35,    34,    34,    47,    30,    45,    20,
-      52,    41,    23,    46,    28,    44,    21,    53,    42,    31,
-      29,    34,     7,    34,    46,    23
+      43,    38,    18,    35,    34,    34,    47,    30,    45,    28,
+      52,    41,    23,    46,    28,    44,    20,    53,    42,    31,
+      29,    34,    21,    54,    34,    46,     7,    23
   };
 
   const unsigned char
@@ -1956,7 +1997,7 @@ namespace SIT {
        0,    32,    33,    34,    35,    35,    36,    36,    37,    37,
       38,    39,    39,    39,    39,    39,    39,    39,    40,    41,
       42,    43,    44,    45,    46,    46,    47,    48,    48,    49,
-      49,    50,    51,    52,    52,    53
+      49,    50,    51,    52,    53,    53,    54
   };
 
   const unsigned char
@@ -1965,7 +2006,7 @@ namespace SIT {
        0,     2,     2,     3,     2,     1,     1,     1,     1,     0,
        2,     3,     5,     4,     5,     8,     4,     7,     1,     1,
        1,     1,     1,     3,     1,     3,     1,     1,     1,     1,
-       1,     1,     4,     1,     0,     3
+       1,     1,     5,     1,     1,     0,     3
   };
 
 
@@ -1986,17 +2027,17 @@ namespace SIT {
   "is_transparent", "node_name", "internal_node", "JTAG_target",
   "path_selector", "ctrl_node", "IR_size", "n_DR_chains", "IR_TABLE",
   "IR_coding_list", "max_derivations", "position", "active", "leaf_node",
-  "register_node", "hold", "bypass", YY_NULLPTR
+  "register_node", "size", "hold", "bypass", YY_NULLPTR
   };
 
 
   const unsigned short int
   SIT_Parser::yyrline_[] =
   {
-       0,   144,   144,   149,   153,   154,   158,   159,   164,   166,
-     169,   178,   185,   204,   228,   242,   256,   270,   302,   306,
-     309,   314,   317,   320,   324,   326,   331,   334,   336,   340,
-     342,   345,   349,   353,   354,   358
+       0,   138,   138,   146,   150,   155,   159,   160,   165,   167,
+     170,   179,   192,   216,   241,   260,   277,   294,   329,   333,
+     336,   341,   344,   347,   351,   353,   358,   361,   363,   367,
+     369,   372,   377,   382,   386,   387,   391
   };
 
   // Print the state stack on the debug stream.
@@ -2080,8 +2121,8 @@ namespace SIT {
 
 #line 5 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:1167
 } // SIT
-#line 2084 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:1167
-#line 364 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:1168
+#line 2125 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:1167
+#line 397 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:1168
 
 
 

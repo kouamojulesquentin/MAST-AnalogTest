@@ -12,8 +12,8 @@ main( const int argc, const char **argv )
    if( argc == 2 )
    {
       SIT::SIT_Driver driver;
-      std::unique_ptr<int> first (new int);
       
+      driver.parsed_sut = std::make_unique<mast::SystemModel>();
       /** example for piping input from terminal, i.e., using cat **/ 
       if( std::strncmp( argv[ 1 ], "-o", 2 ) == 0 )
       {

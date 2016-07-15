@@ -309,6 +309,89 @@ void UT_SystemModel::test_CreateTap ()
   TS_ASSERT_EQUALS      (linkerSecondChild->Name(), "New reg");
 }
 
+
+//! Checks SystemModel::CreateTap()
+//!
+void UT_SystemModel::test_CreateTap_NotAutoRoot ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sut(false);     // Auto root node is disabled
+  string_view noName;
+  uint32_t    irBitsCount   = 6u;
+  uint32_t    muxPathsCount = 5u;
+
+  // ---------------- Exercise
+  //
+  auto tapNode = sut.CreateTap(noName, irBitsCount, muxPathsCount);
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  TS_ASSERT_NOT_NULLPTR (tapNode);
+  TS_ASSERT_EQUALS      (tapNode->Name(),       DEFAULT_TAP_NAME);
+  TS_ASSERT_EQUALS      (tapNode->Identifier(), 0);
+  TS_ASSERT_EQUALS_PTR  (sut.NodeWithId(0),     tapNode);
+  TS_ASSERT_NULLPTR     (sut.Root());            // Still no root node managed by SystemModel
+
+  // IR
+  auto irNode = tapNode->FirstChild();
+  TS_ASSERT_NOT_NULLPTR (irNode);
+  TS_ASSERT_EQUALS      (irNode->Name(), DEFAULT_TAP_IR_NAME);
+
+  auto irAsRegister = dynamic_pointer_cast<Register>(irNode);
+  TS_ASSERT_NOT_NULLPTR (irAsRegister);
+  TS_ASSERT_EQUALS      (irAsRegister->BypassSequence(), BinaryVector::CreateFromBinaryString("1111_11"));
+
+  // DR MUX
+  auto muxNode = irNode->NextSibling();
+  TS_ASSERT_NOT_NULLPTR (muxNode);
+  auto muxAsLinker = dynamic_pointer_cast<Linker>(muxNode);
+  TS_ASSERT_NOT_NULLPTR (muxAsLinker);
+  TS_ASSERT_EQUALS      (muxAsLinker->Name(), DEFAULT_TAP_MUX_NAME);
+
+  // DR bypass
+  auto bypassNode = muxAsLinker->FirstChild();
+  TS_ASSERT_NOT_NULLPTR (bypassNode);
+  auto bypassAsRegister = dynamic_pointer_cast<Register>(bypassNode);
+  TS_ASSERT_NOT_NULLPTR (bypassAsRegister);
+  TS_ASSERT_EQUALS (bypassAsRegister->Name(), DEFAULT_TAP_MUX_BPY_NAME);
+
+  // Check appending nodes to tap
+  auto linkerSecondChild = bypassAsRegister->NextSibling();
+  TS_ASSERT_NULLPTR (linkerSecondChild);
+
+  auto newReg = sut.CreateRegister("New reg", BinaryVector::CreateFromBinaryString("1010"), tapNode);
+
+  linkerSecondChild = bypassAsRegister->NextSibling();
+  TS_ASSERT_NOT_NULLPTR (linkerSecondChild);
+  TS_ASSERT_EQUALS      (linkerSecondChild->Name(), "New reg");
+}
+
+
+//! Checks SystemModel::SetRoot()
+//!
+void UT_SystemModel::test_SetRoot ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sut(false); // No auto root node registration
+
+  auto chain = sut.CreateChain("Chain");
+
+  TS_ASSERT_NULLPTR (sut.Root());
+
+  // ---------------- Exercise
+  //
+  sut.SetRoot(chain);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS      (sut.Root(), chain);
+}
+
+
 //! Checks SystemModel::DisconnectNode() with a node down the hierarchy
 //!
 void UT_SystemModel::test_DisconnectNode_Bottom ()

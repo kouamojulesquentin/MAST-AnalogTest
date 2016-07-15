@@ -61,10 +61,11 @@ shared_ptr<AccessInterface> SystemModel::CreateAccessInterface (string_view name
 
   RegisterNode(node);
 
-  if (!m_root)
+  if (!m_root && m_autoRootNode)
   {
     m_root = node;
   }
+
 
   return node;
 }
@@ -83,12 +84,8 @@ shared_ptr<Chain> SystemModel::CreateChain (string_view name, shared_ptr<ParentN
 
   RegisterNode(node);
 
-  if (!m_root)
+  if (!m_root && m_autoRootNode)
   {
-    if (parentNode)
-    {
-      THROW_LOGIC_ERROR("Unexpected parent node when there in root node yet");
-    }
     m_root = node;
   }
 
@@ -109,11 +106,6 @@ shared_ptr<Chain> SystemModel::CreateChain (string_view name, shared_ptr<ParentN
 //!
 shared_ptr<Linker> SystemModel::CreateLinker (string_view name, shared_ptr<PathSelector> pathSelector, shared_ptr<ParentNode> parentNode)
 {
-  if (!m_root)
-  {
-    THROW_LOGIC_ERROR("There is no root node yet");
-  }
-
   auto node = make_shared<Linker> (name, pathSelector);
 
   if (parentNode)
@@ -135,11 +127,6 @@ shared_ptr<Register> SystemModel::CreateRegister (string_view            name,
                                                   BinaryVector           bypassSequence,
                                                   shared_ptr<ParentNode> parentNode)
 {
-  if (!m_root)
-  {
-    THROW_LOGIC_ERROR("There is no root node yet");
-  }
-
   auto node = make_shared<Register> (name, bypassSequence);
 
   if (parentNode)
@@ -284,7 +271,7 @@ void SystemModel::RegisterNode (std::shared_ptr<SystemModelNode> node)
   }
   else  // Out of order registration
   {
-    THROW_LOGIC_ERROR("Does not support out of order node registration");
+    THROW_LOGIC_ERROR("Some node(s) have been created without using SystemModel (which is not supported)");
   }
 }
 //
@@ -313,6 +300,7 @@ void SystemModel::DisconnectNode (shared_ptr<SystemModelNode> node, shared_ptr<P
   {
     if (!parentNode)
     {
+      CHECK_VALUE_NOT_NULL(m_root, "Cannot disconnect a node from 'no parent' when there is also no root node");
       parentNode = m_root;
     }
 
@@ -367,7 +355,7 @@ void SystemModel::RemoveNodeFromModel (shared_ptr<SystemModelNode> node)
 
 
 
-//! Replaces root node
+//! Replaces (or set first) root node
 //!
 //! @note Caller is responsible for keeping system model coherency
 //!
@@ -380,7 +368,7 @@ shared_ptr<ParentNode> SystemModel::ReplaceRoot (std::shared_ptr<ParentNode> new
   CHECK_PARAMETER_NOT_NULL(newRoot, "Cannot replace root node with nullptr");
 
   auto oldRoot = m_root;
-  if (removeBeforeReplace)
+  if (removeBeforeReplace && m_root)
   {
     RemoveNodeFromModel(m_root);
   }

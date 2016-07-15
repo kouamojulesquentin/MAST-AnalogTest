@@ -32,6 +32,9 @@ class DLL_EXPORT SystemModel
   public:
   ~SystemModel() = default;
   SystemModel()  = default;
+  //! Initializes the system model with automatic root node setting (or not) with first created AccessInterface or Chain
+  //!
+  SystemModel(bool autoRootNode) : m_autoRootNode(autoRootNode) {}
 
   friend class SystemModelCheckerVisitor;
 
@@ -87,11 +90,17 @@ class DLL_EXPORT SystemModel
     return reg;
   }
 
+  //! Sets root node
+  //!
+  void SetRoot(std::shared_ptr<ParentNode> newRoot) { ReplaceRoot(newRoot, true); };
+
   std::shared_ptr<ParentNode> Root() const { return m_root; }        //!< Returns root node
 
   //! Replaces root node
   //!
   std::shared_ptr<ParentNode> ReplaceRoot(std::shared_ptr<ParentNode> newRoot, bool removeBeforeReplace);
+
+
 
   using NodeIdentifier = SystemModelNode::NodeIdentifier;
 
@@ -126,10 +135,11 @@ class DLL_EXPORT SystemModel
   // ---------------- Private  Fields
   //
   private:
-  uint32_t                    m_totalRegisters        = 0; //!< Total number of registers in the model
-  uint32_t                    m_totalPendingRegisters = 0; //!< Number of registers currently "pending"
-  std::shared_ptr<ParentNode> m_root;                      //!< First (top) node of system model tree
-  TIdentifierMapping          m_identifierMapping;         //!< Maps a node identifier to a node instance
+  uint32_t                    m_totalRegisters        = 0;    //!< Total number of registers in the model
+  uint32_t                    m_totalPendingRegisters = 0;    //!< Number of registers currently "pending"
+  bool                        m_autoRootNode          = true; //!< When true (at construction) root node is set with first created AccessInterface or Chain nodes
+  std::shared_ptr<ParentNode> m_root;                         //!< First (top) node of system model tree
+  TIdentifierMapping          m_identifierMapping;            //!< Maps a node identifier to a node instance
 };
 //
 //  End of SystemModel class declaration

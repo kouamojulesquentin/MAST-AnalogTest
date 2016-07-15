@@ -25,15 +25,20 @@ namespace mast
 {
 class BinaryVector;
 
+
 //! Options of Pretty printer
 //!
 enum class PrettyPrinterOptions
 {
-  None       = 0,
-  Verbose    = 0b0001, //!< Maximum information is printed
-  AutoFormat = 0b0010, //!< To print Register values as hexadecimal string
-  Default    = None,
-  Std        = Verbose | AutoFormat,
+  None               = 0,
+  Verbose            = 0b0001, //!< Maximum information is printed
+  DisplayValueAuto   = 0b0010, //!< To show Register values as binary when small, hexa when large and end of large string as binary when cannot form a plain nibble
+  ShowSelectionState = 0b0100,
+  ShowSelectionValue = 0b1000,
+
+  Default           = None,
+  Std               = Verbose | DisplayValueAuto,
+  All               = Verbose | DisplayValueAuto | ShowSelectionState | ShowSelectionValue,
 };
 
 //! System model visitors for creation of a text, readable, and hierarchical

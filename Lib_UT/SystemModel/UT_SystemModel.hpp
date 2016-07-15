@@ -37,9 +37,8 @@ class UT_SystemModel : public CxxTest::TestSuite
   void test_CreateChain_With_ParentNode ();
   void test_CreateLinker_Without_ParentNode ();
   void test_CreateLinker_With_ParentNode ();
-  void test_CreateTap ();
-  void test_CreateTap_NotAutoRoot ();
 
+  void test_NotAutoRoot ();
   void test_SetRoot ();
 
   void test_DisconnectNode_Bottom ();

@@ -47,8 +47,13 @@ class DLL_EXPORT DefaultBinaryPathSelector : public DefaultTableBasedPathSelecto
 
   using TablesType = DefaultTableBasedPathSelector::TablesType;
 
-  static TablesType CreateSelectTable   (uint32_t registerLength, uint32_t pathsCount, SelectorProperty properties);
-  static TablesType CreateDeselectTable (uint32_t registerLength, uint32_t pathsCount, SelectorProperty properties);
+  //! Returns the associated register expected initial value for a path count and selector properties
+  //!
+  static BinaryVector AssociatedRegisterInitialValue(uint32_t pathsCount, SelectorProperty properties);
+
+
+  static TablesType   CreateSelectTable                       (uint32_t   registerLength,  uint32_t pathsCount, SelectorProperty properties);
+  static TablesType   CreateDeselectTable                     (uint32_t   registerLength,  uint32_t pathsCount, SelectorProperty properties);
 
   // ---------------- Protected Methods
   //

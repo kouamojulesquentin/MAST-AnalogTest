@@ -14,6 +14,7 @@
 #include "UT_PrettyPrinterVisitor.hpp"
 #include "PrettyPrinterVisitor.hpp"
 #include "SystemModelNodes.hpp"
+#include "TestModelBuilder.hpp"
 #include "DefaultBinaryPathSelector.hpp"
 #include "SystemModel.hpp"
 
@@ -24,6 +25,7 @@ using std::experimental::string_view;
 using std::make_shared;
 
 using namespace mast;
+using namespace test;
 
 //! Initializes tests (called for each test)
 //!
@@ -507,7 +509,7 @@ void UT_PrettyPrinterVisitor::test_VisitAccessInterface_with_Child ()
 
 //! Checks PrettyPrinterVisitor::VisitAccessInterface() when printing Registers in hex format
 //!
-void UT_PrettyPrinterVisitor::test_VisitAccessInterface_Hex_Format ()
+void UT_PrettyPrinterVisitor::test_VisitAccessInterface_AutoFormat ()
 {
   // ---------------- Setup
   //
@@ -531,8 +533,7 @@ void UT_PrettyPrinterVisitor::test_VisitAccessInterface_Hex_Format ()
   chain->AppendChild(reg_2);
   chain->AppendChild(reg_3);
 
-  PrettyPrinterVisitor sut;
-  sut.UseAutoFormat(true);
+  PrettyPrinterVisitor sut(PrettyPrinterOptions::DisplayValueAuto);
 
   // ---------------- Exercise
   //
@@ -564,10 +565,12 @@ void UT_PrettyPrinterVisitor::test_VisitTap ()
   // ---------------- Setup
   //
   SystemModel sm;
+  TestModelBuilder builder(sm);
+
   string_view noName;
   uint32_t    irBitsCount   = 6u;
   uint32_t    muxPathsCount = 5u;
-  auto        tap           = sm.CreateTap(noName, irBitsCount, muxPathsCount);
+  auto        tap           = builder.Create_JTAG_TAP(noName, irBitsCount, muxPathsCount);
 
   PrettyPrinterVisitor sut;
 
@@ -595,10 +598,12 @@ void UT_PrettyPrinterVisitor::test_VisitTap_With_SubNodes ()
   // ---------------- Setup
   //
   SystemModel sm;
+  TestModelBuilder builder(sm);
+
   string_view noName;
   uint32_t    irBitsCount   = 6u;
   uint32_t    muxPathsCount = 5u;
-  auto        tap           = sm.CreateTap(noName, irBitsCount, muxPathsCount);
+  auto        tap           = builder.Create_JTAG_TAP(noName, irBitsCount, muxPathsCount);
 
   auto chain = sm.CreateChain("Chain name", tap);
   auto reg_1 = sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("1010_01"), tap);
@@ -633,7 +638,9 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap      ("", 5u, 2u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP ("", 5u, 2u);
   auto chain = sm.CreateChain    ("Chain name", tap);
   auto reg_1 = sm.CreateRegister ("Reg_1", BinaryVector::CreateFromBinaryString("1010_01"), tap);
   auto reg_2 = sm.CreateRegister ("Reg_2", BinaryVector::CreateFromBinaryString("1010_10"), tap);
@@ -664,7 +671,9 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_Verbose ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap      ("", 5u, 2u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP ("", 5u, 2u);
   auto chain = sm.CreateChain    ("Chain name", tap);
   auto reg_1 = sm.CreateRegister ("Reg_1", BinaryVector::CreateFromBinaryString("1010_01"), tap);
   auto reg_2 = sm.CreateRegister ("Reg_2", BinaryVector::CreateFromBinaryString("1010_10"), tap);
@@ -708,21 +717,23 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_Verbose ()
 }
 
 
-//! Checks PrettyPrinterVisitor::PrettyPrint() with AutoFormat option
+//! Checks PrettyPrinterVisitor::PrettyPrint() with DisplayValueAuto option
 //!
 void UT_PrettyPrinterVisitor::test_PrettyPrint_AutoFormat ()
 {
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap      ("", 5u, 2u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP ("", 5u, 2u);
   auto chain = sm.CreateChain    ("Chain name", tap);
   auto reg_1 = sm.CreateRegister ("Reg_1", BinaryVector::CreateFromBinaryString("1010_0110:110"), tap);
   auto reg_2 = sm.CreateRegister ("Reg_2", BinaryVector::CreateFromBinaryString("1010_10"),       tap);
 
   // ---------------- Exercise
   //
-  auto got = PrettyPrinterVisitor::PrettyPrint(tap, PrettyPrinterOptions::AutoFormat);
+  auto got = PrettyPrinterVisitor::PrettyPrint(tap, PrettyPrinterOptions::DisplayValueAuto);
 
   // ---------------- Verify
   //
@@ -746,7 +757,9 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_Std ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap      ("", 5u, 2u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP ("", 5u, 2u);
   auto chain = sm.CreateChain    ("Chain name", tap);
   auto reg_1 = sm.CreateRegister ("Reg_1", BinaryVector::CreateFromBinaryString("1010_0110:110"), tap);
   auto reg_2 = sm.CreateRegister ("Reg_2", BinaryVector::CreateFromBinaryString("1010_10"),       tap);
@@ -788,6 +801,63 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_Std ()
                         );
   TS_ASSERT_EQUALS (got, expected);
 }
+
+
+//! Checks PrettyPrinterVisitor::PrettyPrint() with all options
+//!
+void UT_PrettyPrinterVisitor::test_PrettyPrint_AllOptions ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto tap    = builder.Create_JTAG_TAP ("", 5u, 2u);
+  auto linker = sm.LinkerWithId(2u);
+  auto chain  = sm.CreateChain    ("Chain name", tap);
+  auto reg_1  = sm.CreateRegister ("Reg_1", BinaryVector::CreateFromBinaryString("1010_0110:110"), tap);
+  auto reg_2  = sm.CreateRegister ("Reg_2", BinaryVector::CreateFromBinaryString("1010_10"),       tap);
+
+  linker->IgnoreForNodePath(true);
+
+  // ---------------- Exercise
+  //
+  auto got = PrettyPrinterVisitor::PrettyPrint(tap, PrettyPrinterOptions::All);
+
+  // ---------------- Verify
+  //
+  auto expected = string("[Access_I](0)  \"1149_1_TAP\", pending: false, has_conditioner: false, priority: 0\n"
+                         " [Register](1)  \"TAP_IR\", length: 5, Hold value: true, bypass:            0b1111_1\n"
+                         "                                                     , next_to_sut:       0b1111_1\n"
+                         "                                                     , last_to_sut:       0b1111_1\n"
+                         "                                                     , last_from_sut:     0b1111_1\n"
+                         "                                                     , expected_from_sut: 0b1111_1\n"
+                         "                                                     , pending: false, has_conditioner: false, priority: 0\n"
+                         " [Linker](2)    \"TAP_DR_Mux\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
+                         "  :Selector:(1)  \"TAP_IR\"\n"
+                         "  [Register](3)  \"TAP_BPY\", length: 1, bypass:            0b1\n"
+                         "                                     , next_to_sut:       0b1\n"
+                         "                                     , last_to_sut:       0b1\n"
+                         "                                     , last_from_sut:     0b1\n"
+                         "                                     , expected_from_sut: 0b1\n"
+                         "                                     , pending: false, has_conditioner: false, priority: 0\n"
+                         "  [Chain](4)     \"Chain name\", pending: false, has_conditioner: false, priority: 0\n"
+                         "  [Register](5)  \"Reg_1\", length: 11, bypass:            0xA6/b110\n"
+                         "                                    , next_to_sut:       0xA6/b110\n"
+                         "                                    , last_to_sut:       0xA6/b110\n"
+                         "                                    , last_from_sut:     0xA6/b110\n"
+                         "                                    , expected_from_sut: 0xA6/b110\n"
+                         "                                    , pending: false, has_conditioner: false, priority: 0\n"
+                         "  [Register](6)  \"Reg_2\", length: 6, bypass:            0b1010_10\n"
+                         "                                   , next_to_sut:       0b1010_10\n"
+                         "                                   , last_to_sut:       0b1010_10\n"
+                         "                                   , last_from_sut:     0b1010_10\n"
+                         "                                   , expected_from_sut: 0b1010_10\n"
+                         "                                   , pending: false, has_conditioner: false, priority: 0"
+                        );
+  TS_ASSERT_EQUALS (got, expected);
+}
+
 
 
 //===========================================================================

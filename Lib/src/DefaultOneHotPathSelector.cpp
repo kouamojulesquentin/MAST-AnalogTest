@@ -45,6 +45,31 @@ DefaultOneHotPathSelector::DefaultOneHotPathSelector(shared_ptr<Register> associ
 //---------------------------------------------------------------------------
 
 
+//! Returns the associated register expected initial value for a path count and selector properties
+//!
+//! @param pathsCount   Number of managed paths (including, optional, bypass register)
+//! @param properties   Properties of the selector (bit order can be reverse or it can use negative logic)
+//!
+BinaryVector DefaultOneHotPathSelector::AssociatedRegisterInitialValue (uint32_t pathsCount, SelectorProperty properties)
+{
+  auto canSelectNone = IsSet(properties, SelectorProperty::CanSelectNone);
+  auto invertedBits  = IsSet(properties, SelectorProperty::InvertedBits);
+  auto reverseOrder  = IsSet(properties, SelectorProperty::ReverseOrder);
+  auto value         = invertedBits ? BinaryVector(pathsCount, 0xFF, SizeProperty::Fixed)
+                                    : BinaryVector(pathsCount, 0x00, SizeProperty::Fixed);
+  if (!canSelectNone)
+  {
+    uint32_t bitOffset = reverseOrder ? pathsCount - 1 : 0u;
+
+    invertedBits ? value.ClearBit(bitOffset)
+                 : value.SetBit(bitOffset);
+  }
+  return value;
+}
+//
+//  End of: DefaultOneHotPathSelector::AssociatedRegisterInitialValue
+//---------------------------------------------------------------------------
+
 
 //! Checks that register length is enough to select all paths count
 //!

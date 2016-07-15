@@ -57,12 +57,6 @@ class DLL_EXPORT SystemModel
   std::shared_ptr<AccessInterface> CreateAccessInterface (std::experimental::string_view           name,
                                                           std::shared_ptr<AccessInterfaceProtocol> protocol);
 
-  //! Creates a new Tap sub-tree
-  //!
-  std::shared_ptr<AccessInterface> CreateTap             (std::experimental::string_view           name,
-                                                          uint32_t                                 irBitsCount,
-                                                          uint32_t                                 muxPathsCount);
-
   // ---------------- Creates a new Chain node
   //
   std::shared_ptr<Chain>    CreateChain    (std::experimental::string_view name,

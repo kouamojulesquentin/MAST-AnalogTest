@@ -90,6 +90,76 @@ std::shared_ptr<Chain> SystemModelBuilder::Create_1500_Wrapper (string_view name
 //  End of: SystemModelBuilder::Create_1500_Wrapper
 //---------------------------------------------------------------------------
 
+//! Creates a new Tap node
+//!
+//!  @param name            Name given to the tap
+//!  @param irBitsCount     IR number of bits (at least one)
+//!  @param muxPathsCount   DR number of path (at least two)
+//!
+//!  ______________________________
+//! |                              |
+//! |     (ACCESS_I:Tap)           |
+//! |      /      \                |
+//! |     /       _\__________     |
+//! | [REG:Ir]  /Linker:Dr_Mux\    |
+//! |           ---------------    |
+//! |             /                |
+//! |        [REG:Bypass]          |
+//! |                              |
+//!  ------------------------------
+//!
+shared_ptr<AccessInterface> SystemModelBuilder::Create_JTAG_TAP (string_view                         name,
+                                                                 uint32_t                            irBitsCount,
+                                                                 uint32_t                            muxPathsCount,
+                                                                 shared_ptr<AccessInterfaceProtocol> protocol)
+{
+  CHECK_PARAMETER_NOT_ZERO (irBitsCount, "irBitsCount must be != 0");
+  CHECK_PARAMETER_GT       (muxPathsCount, 1, "muxPathsCount must be > 1");
+
+  auto noName     = name.empty();
+  auto rootName   = noName ? DEFAULT_TAP_NAME         : name;
+  auto irName     = noName ? DEFAULT_TAP_IR_NAME      : string(name) + DEFAULT_TAP_IR_EXT;
+  auto muxName    = noName ? DEFAULT_TAP_MUX_NAME     : string(name) + DEFAULT_TAP_MUX_EXT;
+  auto muxBpyName = noName ? DEFAULT_TAP_MUX_BPY_NAME : string(name) + DEFAULT_TAP_MUX_BPY_EXT;
+
+  auto accessInterface = m_model.CreateAccessInterface(rootName, protocol);
+
+  // ---------------- Create IR
+  //
+  auto irBypassSequence = BinaryVector(irBitsCount, 0xFF);
+  auto ir               = m_model.CreateRegister(irName, irBypassSequence, true, accessInterface);
+
+  // ---------------- Create path selector
+  //
+  // Select table is by default binary except for no path and 1st that use the bypass sequence
+  auto selectTable = DefaultBinaryPathSelector::CreateSelectTable(irBitsCount, muxPathsCount, SelectorProperty::Binary_Default);
+  selectTable[0] = irBypassSequence;  // Not used (path id zero)
+  selectTable[1] = irBypassSequence;  // Bypass register
+
+  // Deselect table is by default all bypass sequence
+  auto deselectTable = DefaultTableBasedPathSelector::TablesType(muxPathsCount + 1u, irBypassSequence);
+
+  auto pathSelector = make_shared<DefaultTableBasedPathSelector>(ir, muxPathsCount, selectTable, deselectTable);
+
+  // ---------------- Create Linker
+  //
+  auto linker       = m_model.CreateLinker(muxName, pathSelector, accessInterface);
+
+  // ---------------- Create bypass register
+  //
+  auto bypassBypassSequence = BinaryVector(1, 0xFF);
+  auto bypassRegister       = m_model.CreateRegister(muxBpyName, bypassBypassSequence, linker);
+
+  // ---------------- Set AccessInterface to forward append to the linker
+  //
+  accessInterface->SetChildAppender(linker);
+
+  return accessInterface;
+}
+//
+//  End of: SystemModelBuilder::Create_JTAG_TAP
+//---------------------------------------------------------------------------
+
 
 //! Creates a MIB sub-tree
 //!
@@ -195,14 +265,24 @@ pair<shared_ptr<Register>, shared_ptr<PathSelector>> SystemModelBuilder::Create_
 {
   // ---------------- Create associated register
   //
-  auto regSize = pathsCount;
-  if (selectorKind == SelectorKind::Binary)
+  BinaryVector registerInitialValue;
+  switch (selectorKind)
   {
-    auto canSelectNone = IsSet(properties, SelectorProperty::CanSelectNone);
-    regSize = DefaultBinaryPathSelector::RegWidthForPathCount(pathsCount, canSelectNone);
+    case SelectorKind::Binary:
+      registerInitialValue = DefaultBinaryPathSelector::AssociatedRegisterInitialValue(pathsCount, properties);
+      break;
+    case SelectorKind::One_Hot:
+      registerInitialValue = DefaultOneHotPathSelector::AssociatedRegisterInitialValue(pathsCount, properties);
+      break;
+    case SelectorKind::N_Hot:
+      registerInitialValue = DefaultNHotPathSelector::AssociatedRegisterInitialValue(pathsCount, properties);
+      break;
+    default:
+      THROW_INVALID_ARGUMENT("Can only support Binary, One_Hot and N_Hot type path selector");
+      break;
   }
   auto holdValue = true;
-  auto associatedRegister = m_model.CreateRegister (registerName, BinaryVector(regSize, 0, SizeProperty::Fixed), holdValue);
+  auto associatedRegister = m_model.CreateRegister (registerName, registerInitialValue, holdValue);
 
   // ---------------- Create selector
   //
@@ -215,6 +295,7 @@ pair<shared_ptr<Register>, shared_ptr<PathSelector>> SystemModelBuilder::Create_
 //
 //  End of: SystemModelBuilder::Create_PathSelector
 //---------------------------------------------------------------------------
+
 
 
 //===========================================================================

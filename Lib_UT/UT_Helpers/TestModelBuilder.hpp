@@ -57,21 +57,34 @@ class TestModelBuilder final
   TestModelBuilder()  = delete;
   TestModelBuilder(mast::SystemModel& systemModel) : m_model(systemModel), m_builder(systemModel) {}
 
-  std::shared_ptr<mast::AccessInterface> Create_TestCase_AccessInterface     (std::experimental::string_view name = "TAP");
-  std::shared_ptr<mast::AccessInterface> Create_TestCase_1687                (std::experimental::string_view name = "");
-  std::shared_ptr<mast::AccessInterface> Create_TestCase_MIB                 (std::experimental::string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
-  std::shared_ptr<mast::AccessInterface> Create_TestCase_MIB_Multichain_Pre  (std::experimental::string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
-  std::shared_ptr<mast::AccessInterface> Create_TestCase_MIB_Multichain_Post (std::experimental::string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
-  std::shared_ptr<mast::AccessInterface> Create_TestCase_1500                (std::experimental::string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
+  using string_view = std::experimental::string_view;
+
+  //! Appends several registers (with same length and initial content) to a parent
+  //!
+  void AppendRegisters (uint32_t                          count,
+                        const std::string&                baseName,
+                        const mast::BinaryVector&         bypass,
+                        std::shared_ptr<mast::ParentNode> parent)
+  {
+    m_builder.AppendRegisters(count, baseName, bypass, parent);
+  }
+
+  std::shared_ptr<mast::AccessInterface> Create_TestCase_AccessInterface     (string_view name = "TAP");
+  std::shared_ptr<mast::AccessInterface> Create_TestCase_1687                (string_view name = "");
+  std::shared_ptr<mast::AccessInterface> Create_TestCase_MIB                 (string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
+  std::shared_ptr<mast::AccessInterface> Create_TestCase_MIB_Multichain_Pre  (string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
+  std::shared_ptr<mast::AccessInterface> Create_TestCase_MIB_Multichain_Post (string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
+  std::shared_ptr<mast::AccessInterface> Create_TestCase_1500                (string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
 
   std::shared_ptr<mast::AccessInterface> Create_UnitTestCase_6_Levels();
 
-
-  std::shared_ptr<mast::AccessInterface> Create_Default_SUT  (std::experimental::string_view name);
-  std::shared_ptr<mast::Chain>           Create_Default_SIB  (std::experimental::string_view name);
-  std::shared_ptr<mast::Chain>           Create_Default_MIB  (std::experimental::string_view name, uint32_t maxDerivations);
-
-  std::shared_ptr<mast::Chain>           Create_Simple_MIB   (std::experimental::string_view rootName = "Sut");
+  //! Creates a new Tap sub-tree
+  //!
+  std::shared_ptr<mast::AccessInterface> Create_JTAG_TAP    (string_view name, uint32_t irBitsCount, uint32_t muxPathsCount);
+  std::shared_ptr<mast::AccessInterface> Create_Default_SUT (string_view name);
+  std::shared_ptr<mast::Chain>           Create_Default_SIB (string_view name);
+  std::shared_ptr<mast::Chain>           Create_Default_MIB (string_view name,  uint32_t maxDerivations);
+  std::shared_ptr<mast::Chain>           Create_Simple_MIB  (string_view rootName = "Sut");
 
   // ---------------- Private  Fields
   //

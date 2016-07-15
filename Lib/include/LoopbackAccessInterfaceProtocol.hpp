@@ -15,6 +15,7 @@
   #define LOOPBACKACCESSINTERFACEPROTOCOL_H__7EA95A6E_19D8_4B68_B28A_6C501BCEC0FA__INCLUDED_
 
 #include "AccessInterfaceProtocol.hpp"
+#include "Utility.hpp"
 
 namespace mast
 {
@@ -22,7 +23,7 @@ namespace mast
 //!
 //! @note This is mainly provided for tests purposes
 //!
-class LoopbackAccessInterfaceProtocol : public AccessInterfaceProtocol
+class DLL_EXPORT LoopbackAccessInterfaceProtocol : public AccessInterfaceProtocol
 {
   // ---------------- Public  Methods
   //

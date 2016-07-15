@@ -14,6 +14,8 @@
 #include "TestModelBuilder.hpp"
 #include "SystemModelNode.hpp"
 #include "DefaultBinaryPathSelector.hpp"
+#include "LoopbackAccessInterfaceProtocol.hpp"
+
 #include "BinaryVector_Traits.hpp"
 
 using std::string;
@@ -85,7 +87,7 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_Default_SUT (string_view na
 {
   // ---------------- Create tap
   //
-  auto tap = m_model.CreateTap (name, DEFAULT_IR_LEN, DEFAULT_TDR_LEN);
+  auto tap = Create_JTAG_TAP (name, DEFAULT_IR_LEN, DEFAULT_TDR_LEN);
 
   // ---------------- Append "SUT"
   //
@@ -103,6 +105,35 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_Default_SUT (string_view na
 //---------------------------------------------------------------------------
 
 
+//! Creates a new Tap node
+//!
+//!  @param name            Name given to the tap
+//!  @param irBitsCount     IR number of bits (at least one)
+//!  @param muxPathsCount   DR number of path (at least two)
+//!
+//!  ______________________________
+//! |                              |
+//! |     (ACCESS_I:Tap)           |
+//! |      /      \                |
+//! |     /       _\__________     |
+//! | [REG:Ir]  /Linker:Dr_Mux\    |
+//! |           ---------------    |
+//! |             /                |
+//! |        [REG:Bypass]          |
+//! |                              |
+//!  ------------------------------
+//!
+shared_ptr<AccessInterface> TestModelBuilder::Create_JTAG_TAP (string_view name, uint32_t irBitsCount, uint32_t muxPathsCount)
+{
+  auto protocol = make_shared<LoopbackAccessInterfaceProtocol > ();
+
+  return m_builder.Create_JTAG_TAP(name, irBitsCount, muxPathsCount, protocol);
+}
+//
+//  End of: TestModelBuilder::Create_JTAG_TAP
+//---------------------------------------------------------------------------
+
+
 //! Creates a simple 1149 tap node with two multiplexed registers
 //!
 //! @note - There are multiple "dynamic" registers
@@ -116,7 +147,7 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_AccessInterface (s
 {
   uint32_t muxDrPathCount = 3u;
 
-  auto tap     = m_model.CreateTap      (name,       DEFAULT_IR_LEN, muxDrPathCount);
+  auto tap     = Create_JTAG_TAP    (name,       DEFAULT_IR_LEN, muxDrPathCount);
 
   auto chain_1 = m_model.CreateChain    ("sut_1",    tap);
   auto reg_1   = m_model.CreateRegister ("static_1", BinaryVector(STATIC_TDR_LEN, 0), chain_1);
@@ -207,7 +238,7 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_1687 (string_view 
 //! @return Top node of created sub-tree
 shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_MIB_Multichain_Pre (string_view name, uint32_t chainsCount)
 {
-  auto tap         = m_model.CreateTap(name, 8u, 3u);
+  auto tap         = Create_JTAG_TAP(name, 8u, 3u);
 
   // ---------------- Append MIB with control register before mux
   //
@@ -240,7 +271,7 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_MIB_Multichain_Pre
 //! @return Top node of created sub-tree
 shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_MIB_Multichain_Post (string_view name, uint32_t chainsCount)
 {
-  auto tap         = m_model.CreateTap(name, 8u, 3u);
+  auto tap         = Create_JTAG_TAP(name, 8u, 3u);
 
   // ---------------- Append MIB with control register before mux
   //
@@ -304,7 +335,7 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_1500 (string_view 
 //!         -
 shared_ptr<AccessInterface> TestModelBuilder::Create_UnitTestCase_6_Levels ()
 {
-  auto tap    = m_model.CreateTap("Tap", 6u, 2u);
+  auto tap    = Create_JTAG_TAP("Tap", 6u, 2u);
   auto tapMux = m_model.LinkerWithId(2u);
   tapMux->IgnoreForNodePath(true);
 

@@ -54,6 +54,10 @@ class PathSelector
   //!
   virtual bool IsActive (uint32_t pathIdentifier) const = 0;
 
+  //! Returns the number of paths that are currently active
+  //!
+  virtual uint32_t ActiveCount() const = 0;
+
   //! Returns true when the specified path is already selected
   //!
   //! @param pathIdentifier   Path identifier in range [1..nb_path]

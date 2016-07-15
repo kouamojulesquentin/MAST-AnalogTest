@@ -59,7 +59,7 @@ class DLL_EXPORT DefaultTableBasedPathSelector  : public PathSelector
   virtual uint32_t SelectablePaths() const override { return m_pathsCount; };   //!< Returns the maximum number of selectable paths (max value for IsActive, Select and Deselect)
   virtual bool     CanSelectNone()   const override { return m_canSelectNone; }   //!< Returns true if selector can select nothing (passthrough mode), false otherwise
 
-  uint32_t ActiveCount() const;    //!< Returns the number of paths that are currently active
+  virtual uint32_t ActiveCount() const override;    //!< Returns the number of paths that are currently active
 
   virtual void Accept   (SystemModelVisitor& visitor) override;   //!< Forwards call to any embedded Register
 

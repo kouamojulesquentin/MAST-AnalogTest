@@ -35,30 +35,14 @@ include_directories(Logger/g3log/)
 include_directories(Logger/Unix)
 include_directories(Logger/Windows)
 
-# LOGGER:
-file(GLOB Logger_SOURCES 			 "Logger/*.cpp")
-file(GLOB Logger_SOURCES_Linux "Logger/Unix/*.cpp")
-file(GLOB Logger_SOURCES_Win32 "Logger/Windows/*.cpp")
-
-if (WIN32)
-	set (Logger_SOURCES ${Logger_SOURCES} ${Logger_SOURCES_Win32})
-else ()
-	set (Logger_SOURCES ${Logger_SOURCES} ${Logger_SOURCES_Linux})
-endif ()
-
-add_library(Logger SHARED ${Logger_SOURCES})
-if (WIN32)
-	target_link_libraries(Logger DbgHelp)
-else ()
-	target_link_libraries(Logger pthread)
-endif ()
+add_subdirectory (Logger)
 
 # Lib:
 file(GLOB Lib_SOURCES "Lib/src/*")
 #add_library(Lib OBJECT ${Lib_SOURCES})
 add_library(Lib SHARED ${Lib_SOURCES})
 
-set_target_properties(Lib Logger PROPERTIES
+set_target_properties(Lib  PROPERTIES
   COMPILE_FLAGS "${CFLAGS}"
   )
 

@@ -14,12 +14,14 @@
 #include "UT_FromSutUpdater.hpp"
 #include "FromSutUpdater.hpp"
 #include "SystemModel.hpp"
+#include "TestModelBuilder.hpp"
 #include "BinaryVector_Traits.hpp"
 
 #include <vector>
 
 using std::vector;
 using namespace mast;
+using namespace test;
 
 //! Initializes test (called for each test)
 void UT_FromSutUpdater::setUp ()
@@ -52,7 +54,9 @@ void UT_FromSutUpdater::test_UpdateRegisters_0 ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap      = sm.CreateTap("", 8u, 2u);
+  TestModelBuilder builder(sm);
+
+  auto tap      = builder.Create_JTAG_TAP("", 8u, 2u);
   auto reg      = sm.CreateRegister("Reg", BinaryVector::CreateFromBinaryString("1100"), tap);
   auto newValue = BinaryVector(0);
 
@@ -77,7 +81,9 @@ void UT_FromSutUpdater::test_UpdateRegisters_1 ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap      = sm.CreateTap("", 8u, 2u);
+  TestModelBuilder builder(sm);
+
+  auto tap      = builder.Create_JTAG_TAP("", 8u, 2u);
   auto reg      = sm.CreateRegister("Reg", BinaryVector::CreateFromBinaryString("1100"), tap);
   auto newValue = BinaryVector::CreateFromBinaryString("0011");
 
@@ -107,7 +113,9 @@ void UT_FromSutUpdater::test_UpdateRegisters_2 ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap("", 8u, 2u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("", 8u, 2u);
   auto reg_1 = sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("0100_1"),  tap);
   auto reg_2 = sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("1000_10"), tap);
 
@@ -145,7 +153,9 @@ void UT_FromSutUpdater::test_UpdateRegisters_3 ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap("", 8u, 2u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("", 8u, 2u);
   auto reg_1 = sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("0100_1"),  tap);
   auto reg_2 = sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("1000_10"), tap);
   auto reg_3 = sm.CreateRegister("Reg_3", BinaryVector::CreateFromBinaryString("1110_110"), tap);
@@ -183,7 +193,9 @@ void UT_FromSutUpdater::test_UpdateRegisters_Vector_TooSmall ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap("", 8u, 2u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("", 8u, 2u);
   auto reg_1 = sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("0100_1"),  tap);
   auto reg_2 = sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("1000_10"), tap);
 
@@ -210,7 +222,9 @@ void UT_FromSutUpdater::test_UpdateRegisters_Vector_TooLarge ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap("", 8u, 2u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("", 8u, 2u);
   auto reg_1 = sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("0100_1"),  tap);
   auto reg_2 = sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("1000_10"), tap);
 
@@ -237,7 +251,9 @@ void UT_FromSutUpdater::test_UpdateRegisters_Vector_WrongOrder ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap("", 8u, 2u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("", 8u, 2u);
   auto reg_1 = sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("0100_1"),   tap);
   auto reg_2 = sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("1000_10"),  tap);
   auto reg_3 = sm.CreateRegister("Reg_3", BinaryVector::CreateFromBinaryString("1110_110"), tap);

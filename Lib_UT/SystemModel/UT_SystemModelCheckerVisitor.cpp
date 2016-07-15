@@ -15,11 +15,13 @@
 #include "UT_SystemModelCheckerVisitor.hpp"
 #include "SystemModelCheckerVisitor.hpp"
 #include "DefaultBinaryPathSelector.hpp"
+#include "TestModelBuilder.hpp"
 #include "SystemModelCheckResult_Traits.hpp"
 
 using std::string;
 using std::make_shared;
 using namespace mast;
+using namespace test;
 
 
 //! Initializes test (called for each test)
@@ -54,7 +56,9 @@ void UT_SystemModelCheckerVisitor::test_Constructor_From_ModelWithTap ()
   // ---------------- Setup
   //
   SystemModel sm;
-  sm.CreateTap("", 6u, 4u);
+  TestModelBuilder builder(sm);
+
+  builder.Create_JTAG_TAP("", 6u, 4u);
 
   // ---------------- Exercise & Verify
   //
@@ -98,7 +102,9 @@ void UT_SystemModelCheckerVisitor::test_CheckIdentifiers_With_ModelWithTap ()
   // ---------------- Setup
   //
   SystemModel sm;
-  sm.CreateTap("", 6u, 4u);
+  TestModelBuilder builder(sm);
+
+  builder.Create_JTAG_TAP("", 6u, 4u);
 
   SystemModelCheckerVisitor sut(sm);
 
@@ -121,7 +127,9 @@ void UT_SystemModelCheckerVisitor::test_CheckIdentifiers_With_UnusedIdentifier (
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap("", 6u, 4u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("", 6u, 4u);
   auto reg_1 = sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("1100_111"), tap);
   auto reg_2 = sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("111"),      tap);
 
@@ -183,7 +191,9 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_With_ModelWithTap ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap = sm.CreateTap("", 6u, 4u);
+  TestModelBuilder builder(sm);
+
+  auto tap = builder.Create_JTAG_TAP("", 6u, 4u);
   sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("1100_1"),   tap);
   sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("1100_10"),  tap);
   sm.CreateRegister("Reg_3", BinaryVector::CreateFromBinaryString("1100_111"), tap);
@@ -209,7 +219,9 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_ParentWithoutChild ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap("", 6u, 4u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("", 6u, 4u);
   auto chain = sm.CreateChain("Chain_1", tap);
 
   sm.CreateRegister("Reg_3", BinaryVector::CreateFromBinaryString("1100_1"),   tap);
@@ -242,7 +254,9 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_UnmanagedNode ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap("", 6u, 4u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("", 6u, 4u);
   auto chain = sm.CreateChain("Chain_1", tap);
   sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("1100_1"),   tap);
   sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("1100_10"),  tap);
@@ -278,7 +292,9 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_UnreachableNode ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap("", 6u, 4u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("", 6u, 4u);
   auto chain = sm.CreateChain("Chain_1", tap);
   auto reg_1 = sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("1100_101"));  // Is not appended in the tree structure
   auto reg_2 = sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("1100_0010"), chain);
@@ -313,7 +329,9 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_NodeAppendedTwice ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap("", 6u, 4u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("", 6u, 4u);
   auto chain = sm.CreateChain("Chain_1", tap);
   auto reg_1 = sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("1100_101"),  tap);
   auto reg_2 = sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("1100_0010"), chain);
@@ -348,7 +366,9 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_NodeAppendedTwice_SameParent_1
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap("", 6u, 4u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("", 6u, 4u);
   auto chain = sm.CreateChain("Chain_1", tap);
   auto reg_1 = sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("1100_101"),  chain);
   auto reg_2 = sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("1100_0010"), chain);
@@ -385,7 +405,9 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_NodeAppendedTwice_SameParent_2
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap("", 6u, 4u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("", 6u, 4u);
   auto chain = sm.CreateChain("Chain_1", tap);
   auto reg_1 = sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("1100_101"),  chain);
   auto reg_2 = sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("1100_0010"), chain);
@@ -422,7 +444,9 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_NodeAppended_ToSelf_Last ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap("", 6u, 2u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("", 6u, 2u);
   auto chain = sm.CreateChain("Chain_1", tap);
   auto reg_1 = sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("1"),  chain);
   auto reg_2 = sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("10"), chain);
@@ -456,7 +480,9 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_NodeAppended_ToSelf_Middle ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap("", 6u, 2u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("", 6u, 2u);
   auto chain = sm.CreateChain("Chain_1", tap);
   auto reg_1 = sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("1"),  chain);
   chain->AppendChild(chain);
@@ -492,7 +518,9 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_When_Linker_Less_Children ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap = sm.CreateTap("", 6u, 4u);
+  TestModelBuilder builder(sm);
+
+  auto tap = builder.Create_JTAG_TAP("", 6u, 4u);
   sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("110"),  tap);
   sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("1100"), tap);
 
@@ -524,7 +552,9 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_When_Linker_More_Children ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap = sm.CreateTap("", 6u, 4u);
+  TestModelBuilder builder(sm);
+
+  auto tap = builder.Create_JTAG_TAP("", 6u, 4u);
   sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("1"),   tap);
   sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("10"),  tap);
   sm.CreateRegister("Reg_3", BinaryVector::CreateFromBinaryString("111"), tap);
@@ -558,7 +588,9 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_When_MaxPath_Zero ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap          = sm.CreateTap("", 6u, 3u);
+  TestModelBuilder builder(sm);
+
+  auto tap          = builder.Create_JTAG_TAP("", 6u, 3u);
   auto reg_1        = sm.CreateRegister("reg_1", BinaryVector::CreateFromBinaryString("10"),  tap);
   auto pathSelector = make_shared<DefaultBinaryPathSelector>(reg_1, 0u);
   auto linker       = sm.CreateLinker("linker", pathSelector, tap);

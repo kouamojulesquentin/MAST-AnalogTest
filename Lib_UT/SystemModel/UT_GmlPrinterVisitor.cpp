@@ -34,12 +34,12 @@ namespace
 //!
 std::shared_ptr<AccessInterface> Create_TestCase_Tap_With_Children (SystemModel& sm)
 {
-  SystemModelBuilder buider(sm);
+  TestModelBuilder builder(sm);
 
   string_view noName;
   uint32_t    irBitsCount   = 6u;
   uint32_t    muxPathsCount = 5u;
-  auto        tap           = sm.CreateTap(noName, irBitsCount, muxPathsCount);
+  auto        tap           = builder.Create_JTAG_TAP(noName, irBitsCount, muxPathsCount);
 
   auto chain_1 = sm.CreateChain("Chain_1", tap);
 
@@ -48,8 +48,8 @@ std::shared_ptr<AccessInterface> Create_TestCase_Tap_With_Children (SystemModel&
 
   auto chain_2 = sm.CreateChain("Chain_2", chain_1);
 
-  buider.AppendRegisters(4, "Reg_a_", BinaryVector(5,  0xff), chain_1);
-  buider.AppendRegisters(3, "Reg_b_", BinaryVector(15, 0x03), chain_2);
+  builder.AppendRegisters(4, "Reg_a_", BinaryVector(5,  0xff), chain_1);
+  builder.AppendRegisters(3, "Reg_b_", BinaryVector(15, 0x03), chain_2);
 
   return tap;
 }
@@ -207,11 +207,12 @@ void UT_GmlPrinterVisitor::test_VisitTap ()
 {
   // ---------------- Setup
   //
-  SystemModel sm;
-  string_view noName;
-  uint32_t    irBitsCount   = 6u;
-  uint32_t    muxPathsCount = 5u;
-  auto        tap           = sm.CreateTap(noName, irBitsCount, muxPathsCount);
+  SystemModel      sm;
+  TestModelBuilder builder(sm);
+  string_view      noName;
+  uint32_t         irBitsCount   = 6u;
+  uint32_t         muxPathsCount = 5u;
+  auto             tap           = builder.Create_JTAG_TAP(noName, irBitsCount, muxPathsCount);
 
   GmlPrinterVisitor sut("", GmlPrinterOptions::ShowSelectorWithEdge);
 

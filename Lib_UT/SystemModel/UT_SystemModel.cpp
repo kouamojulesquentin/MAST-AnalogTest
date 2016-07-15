@@ -246,84 +246,18 @@ void UT_SystemModel::test_CreateLinker_With_ParentNode ()
 }
 
 
-//! Checks SystemModel::CreateTap()
+//! Checks SystemModel "No auto root registration mode"
 //!
-void UT_SystemModel::test_CreateTap ()
+void UT_SystemModel::test_NotAutoRoot ()
 {
   // ---------------- Setup
   //
-  SystemModel sut;
-  string_view noName;
-  uint32_t    irBitsCount   = 6u;
-  uint32_t    muxPathsCount = 5u;
+  SystemModel      sut(false);     // Auto root node is disabled
+  TestModelBuilder builder(sut);
 
   // ---------------- Exercise
   //
-  auto tapNode = sut.CreateTap(noName, irBitsCount, muxPathsCount);
-
-  // ---------------- Verify
-  //
-  CxxTest::setAbortTestOnFail(true);
-
-  TS_ASSERT_NOT_NULLPTR (tapNode);
-  TS_ASSERT_EQUALS      (tapNode->Name(), DEFAULT_TAP_NAME);
-
-  auto id = tapNode->Identifier();
-
-  TS_ASSERT_EQUALS      (id, 0);
-  TS_ASSERT_NOT_NULLPTR (sut.Root());
-  TS_ASSERT_NOT_NULLPTR (sut.NodeWithId(id));
-  TS_ASSERT_EQUALS_PTR  (sut.Root(), sut.NodeWithId(id));
-
-  // IR
-  auto irNode = tapNode->FirstChild();
-  TS_ASSERT_NOT_NULLPTR (irNode);
-  TS_ASSERT_EQUALS      (irNode->Name(), DEFAULT_TAP_IR_NAME);
-
-  auto irAsRegister = dynamic_pointer_cast<Register>(irNode);
-  TS_ASSERT_NOT_NULLPTR (irAsRegister);
-  TS_ASSERT_EQUALS      (irAsRegister->BypassSequence(), BinaryVector::CreateFromBinaryString("1111_11"));
-
-  // DR MUX
-  auto muxNode = irNode->NextSibling();
-  TS_ASSERT_NOT_NULLPTR (muxNode);
-  auto muxAsLinker = dynamic_pointer_cast<Linker>(muxNode);
-  TS_ASSERT_NOT_NULLPTR (muxAsLinker);
-  TS_ASSERT_EQUALS      (muxAsLinker->Name(), DEFAULT_TAP_MUX_NAME);
-
-  // DR bypass
-  auto bypassNode = muxAsLinker->FirstChild();
-  TS_ASSERT_NOT_NULLPTR (bypassNode);
-  auto bypassAsRegister = dynamic_pointer_cast<Register>(bypassNode);
-  TS_ASSERT_NOT_NULLPTR (bypassAsRegister);
-  TS_ASSERT_EQUALS (bypassAsRegister->Name(), DEFAULT_TAP_MUX_BPY_NAME);
-
-  // Check appending nodes to tap
-  auto linkerSecondChild = bypassAsRegister->NextSibling();
-  TS_ASSERT_NULLPTR (linkerSecondChild);
-
-  auto newReg = sut.CreateRegister("New reg", BinaryVector::CreateFromBinaryString("1010"), tapNode);
-
-  linkerSecondChild = bypassAsRegister->NextSibling();
-  TS_ASSERT_NOT_NULLPTR (linkerSecondChild);
-  TS_ASSERT_EQUALS      (linkerSecondChild->Name(), "New reg");
-}
-
-
-//! Checks SystemModel::CreateTap()
-//!
-void UT_SystemModel::test_CreateTap_NotAutoRoot ()
-{
-  // ---------------- Setup
-  //
-  SystemModel sut(false);     // Auto root node is disabled
-  string_view noName;
-  uint32_t    irBitsCount   = 6u;
-  uint32_t    muxPathsCount = 5u;
-
-  // ---------------- Exercise
-  //
-  auto tapNode = sut.CreateTap(noName, irBitsCount, muxPathsCount);
+  auto tapNode = builder.Create_JTAG_TAP("", 6u, 5u);   // Indirectly use sut in "No auto root registration mode"
 
   // ---------------- Verify
   //
@@ -473,8 +407,9 @@ void UT_SystemModel::test_ReplaceRoot_NotRemoved ()
   // ---------------- Setup
   //
   SystemModel sm;
+  TestModelBuilder builder(sm);
 
-  auto tap    = sm.CreateTap("Tap", 6u, 3u);
+  auto tap    = builder.Create_JTAG_TAP("Tap", 6u, 3u);
   auto newTap = sm.CreateAccessInterface("New Tap", nullptr);
 
   // ---------------- Exercise
@@ -496,8 +431,9 @@ void UT_SystemModel::test_ReplaceRoot_Removed ()
   // ---------------- Setup
   //
   SystemModel sm;
+  TestModelBuilder builder(sm);
 
-  auto tap    = sm.CreateTap("Tap", 6u, 3u);
+  auto tap    = builder.Create_JTAG_TAP("Tap", 6u, 3u);
   auto newTap = sm.CreateAccessInterface("New Tap", nullptr);
 
   // ---------------- Exercise
@@ -519,7 +455,9 @@ void UT_SystemModel::test_ReplaceRoot_WithNullptr ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap = sm.CreateTap("Tap", 6u, 3u);
+  TestModelBuilder builder(sm);
+
+  auto tap = builder.Create_JTAG_TAP("Tap", 6u, 3u);
 
   // ---------------- Exercise & Verify
   //

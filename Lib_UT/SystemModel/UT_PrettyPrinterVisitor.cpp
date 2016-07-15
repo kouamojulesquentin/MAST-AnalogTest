@@ -14,6 +14,7 @@
 #include "UT_PrettyPrinterVisitor.hpp"
 #include "PrettyPrinterVisitor.hpp"
 #include "SystemModelNodes.hpp"
+#include "TestModelBuilder.hpp"
 #include "DefaultBinaryPathSelector.hpp"
 #include "SystemModel.hpp"
 
@@ -24,6 +25,7 @@ using std::experimental::string_view;
 using std::make_shared;
 
 using namespace mast;
+using namespace test;
 
 //! Initializes tests (called for each test)
 //!
@@ -564,10 +566,12 @@ void UT_PrettyPrinterVisitor::test_VisitTap ()
   // ---------------- Setup
   //
   SystemModel sm;
+  TestModelBuilder builder(sm);
+
   string_view noName;
   uint32_t    irBitsCount   = 6u;
   uint32_t    muxPathsCount = 5u;
-  auto        tap           = sm.CreateTap(noName, irBitsCount, muxPathsCount);
+  auto        tap           = builder.Create_JTAG_TAP(noName, irBitsCount, muxPathsCount);
 
   PrettyPrinterVisitor sut;
 
@@ -595,10 +599,12 @@ void UT_PrettyPrinterVisitor::test_VisitTap_With_SubNodes ()
   // ---------------- Setup
   //
   SystemModel sm;
+  TestModelBuilder builder(sm);
+
   string_view noName;
   uint32_t    irBitsCount   = 6u;
   uint32_t    muxPathsCount = 5u;
-  auto        tap           = sm.CreateTap(noName, irBitsCount, muxPathsCount);
+  auto        tap           = builder.Create_JTAG_TAP(noName, irBitsCount, muxPathsCount);
 
   auto chain = sm.CreateChain("Chain name", tap);
   auto reg_1 = sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("1010_01"), tap);
@@ -633,7 +639,9 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap      ("", 5u, 2u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP ("", 5u, 2u);
   auto chain = sm.CreateChain    ("Chain name", tap);
   auto reg_1 = sm.CreateRegister ("Reg_1", BinaryVector::CreateFromBinaryString("1010_01"), tap);
   auto reg_2 = sm.CreateRegister ("Reg_2", BinaryVector::CreateFromBinaryString("1010_10"), tap);
@@ -664,7 +672,9 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_Verbose ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap      ("", 5u, 2u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP ("", 5u, 2u);
   auto chain = sm.CreateChain    ("Chain name", tap);
   auto reg_1 = sm.CreateRegister ("Reg_1", BinaryVector::CreateFromBinaryString("1010_01"), tap);
   auto reg_2 = sm.CreateRegister ("Reg_2", BinaryVector::CreateFromBinaryString("1010_10"), tap);
@@ -715,7 +725,9 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_AutoFormat ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap      ("", 5u, 2u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP ("", 5u, 2u);
   auto chain = sm.CreateChain    ("Chain name", tap);
   auto reg_1 = sm.CreateRegister ("Reg_1", BinaryVector::CreateFromBinaryString("1010_0110:110"), tap);
   auto reg_2 = sm.CreateRegister ("Reg_2", BinaryVector::CreateFromBinaryString("1010_10"),       tap);
@@ -746,7 +758,9 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_Std ()
   // ---------------- Setup
   //
   SystemModel sm;
-  auto tap   = sm.CreateTap      ("", 5u, 2u);
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP ("", 5u, 2u);
   auto chain = sm.CreateChain    ("Chain name", tap);
   auto reg_1 = sm.CreateRegister ("Reg_1", BinaryVector::CreateFromBinaryString("1010_0110:110"), tap);
   auto reg_2 = sm.CreateRegister ("Reg_2", BinaryVector::CreateFromBinaryString("1010_10"),       tap);

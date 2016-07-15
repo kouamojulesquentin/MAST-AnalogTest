@@ -26,7 +26,7 @@ using namespace mast;
 //! Initializes with specified options
 //!
 PrettyPrinterVisitor::PrettyPrinterVisitor (PrettyPrinterOptions options)
-  : m_useAutoFormat (IsSet(options, PrettyPrinterOptions::AutoFormat))
+  : m_useAutoFormat (IsSet(options, PrettyPrinterOptions::DisplayValueAuto))
   , m_verbose       (IsSet(options, PrettyPrinterOptions::Verbose))
 {
 }
@@ -101,6 +101,11 @@ void PrettyPrinterVisitor::PrintChildren (const ParentNode& parentNode)
 
   ++m_depth;
 
+  //! @todo [JFC]-[July/15/2016]: For linker, set before printing its child:
+  //!                               - Its selector
+  //!                               - Derivation ID
+  //!                             Reset Selector when them when not Linker
+
   auto child = parentNode.FirstChild();
   while (child)
   {
@@ -149,6 +154,9 @@ void PrettyPrinterVisitor::StreamNodeCommon (const SystemModelNode& node)
     m_os << ", has_conditioner: " << node.HasConditioner();
     m_os << ", priority: "        << node.Priority();
   }
+
+  //! @todo [JFC]-[July/15/2016]: Add support for ShowSelectionState and ShowSelectionValue
+  //!
 }
 //
 //  End of: PrettyPrinterVisitor::StreamNodeCommon
@@ -201,6 +209,12 @@ void PrettyPrinterVisitor::StreamParentNode (std::experimental::string_view type
 
   if (m_verbose)
   {
+    if (parentNode.IgnoreForNodePath())
+    {
+      m_os.setf(std::ios_base::boolalpha);
+      m_os << ", ignore_in_path: true";
+    }
+
     StreamNodeCommon(parentNode);
   }
   PrintChildren(parentNode);
@@ -237,6 +251,11 @@ void PrettyPrinterVisitor::VisitLinker (Linker& linker)
 
   if (m_verbose)
   {
+    if (linker.IgnoreForNodePath())
+    {
+      m_os << ", ignore_in_path: true";
+    }
+
     StreamNodeCommon(linker);
   }
 
@@ -274,6 +293,7 @@ void PrettyPrinterVisitor::VisitRegister (Register& reg)
     StreamNodeHeader("Register", reg);
 
     m_os << ", length: " << reg.BypassSequence().BitsCount();
+
     if (reg.HoldValue())
     {
       m_os << ", Hold value: true";

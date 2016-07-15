@@ -54,7 +54,7 @@ class UT_PrettyPrinterVisitor : public CxxTest::TestSuite
   void test_VisitLinker_with_Child ();
   void test_VisitLinker_with_Child_Verbose ();
   void test_VisitAccessInterface_with_Child ();
-  void test_VisitAccessInterface_Hex_Format ();
+  void test_VisitAccessInterface_AutoFormat ();
   void test_VisitTap ();
   void test_VisitTap_With_SubNodes ();
 
@@ -64,6 +64,7 @@ class UT_PrettyPrinterVisitor : public CxxTest::TestSuite
   void test_PrettyPrint_Verbose ();
   void test_PrettyPrint_AutoFormat ();
   void test_PrettyPrint_Std ();
+  void test_PrettyPrint_AllOptions ();
 
   // ---------------- Private  Methods
   //

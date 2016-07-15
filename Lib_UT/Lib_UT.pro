@@ -46,6 +46,7 @@ SOURCES += \
     SystemModel/UT_Register.cpp                       \
     SystemModel/UT_SVF_SimulationProtocol.cpp         \
     SystemModel/UT_SystemModel.cpp                    \
+    SystemModel/UT_SystemModelBuilder.cpp             \
     SystemModel/UT_SystemModelCheckerVisitor.cpp      \
     SystemModel/UT_ToSutVisitor.cpp                   \
     SystemModel/UT_SystemModelManager.cpp             \
@@ -79,6 +80,7 @@ HEADERS += \
     SystemModel/UT_Register.hpp                       \
     SystemModel/UT_SVF_SimulationProtocol.hpp         \
     SystemModel/UT_SystemModel.hpp                    \
+    SystemModel/UT_SystemModelBuilder.hpp             \
     SystemModel/UT_SystemModelCheckerVisitor.hpp      \
     SystemModel/UT_ToSutVisitor.hpp                   \
     SystemModel/UT_SystemModelManager.hpp             \

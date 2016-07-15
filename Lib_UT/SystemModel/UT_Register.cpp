@@ -35,7 +35,10 @@ void UT_Register::test_Constructor ()
 
   // ---------------- Verify
   //
+  TS_ASSERT_EQUALS (sut.TypeName(), "Register");
+  TS_ASSERT_FALSE  (sut.HoldValue());
   TS_ASSERT_FALSE  (sut.MustCheckExpected());
+  TS_ASSERT_EQUALS (sut.Mismatches(),      0U);
   TS_ASSERT_EQUALS (sut.BitsCount(),       9U);
   TS_ASSERT_EQUALS (sut.BypassSequence(),  bypassSequence);
   TS_ASSERT_EQUALS (sut.NextToSut(),       bypassSequence);

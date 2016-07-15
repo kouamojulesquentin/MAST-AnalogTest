@@ -47,6 +47,20 @@ DefaultNHotPathSelector::DefaultNHotPathSelector(shared_ptr<Register> associated
 //---------------------------------------------------------------------------
 
 
+//! Returns the associated register expected initial value for a path count and selector properties
+//!
+//! @param pathsCount   Number of managed paths (including, optional, bypass register)
+//! @param properties   Properties of the selector (bit order can be reverse or it can use negative logic)
+//!
+BinaryVector DefaultNHotPathSelector::AssociatedRegisterInitialValue (uint32_t pathsCount, SelectorProperty properties)
+{
+  return DefaultOneHotPathSelector::AssociatedRegisterInitialValue(pathsCount, properties);
+}
+//
+//  End of: DefaultNHotPathSelector::AssociatedRegisterInitialValue
+//---------------------------------------------------------------------------
+
+
 
 //! Checks that register length is enough to select all paths count
 //!

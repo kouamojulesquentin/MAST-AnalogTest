@@ -44,6 +44,26 @@ DefaultBinaryPathSelector::DefaultBinaryPathSelector(shared_ptr<Register> associ
 //---------------------------------------------------------------------------
 
 
+
+//! Returns the associated register expected initial value for a path count and selector properties
+//!
+//! @param pathsCount   Number of managed paths (including, optional, bypass register)
+//! @param properties   Properties of the selector (bit order can be reverse or it can use negative logic)
+//!
+BinaryVector DefaultBinaryPathSelector::AssociatedRegisterInitialValue (uint32_t pathsCount, SelectorProperty properties)
+{
+  auto canSelectNone = IsSet(properties, SelectorProperty::CanSelectNone);
+  auto regSize       = DefaultBinaryPathSelector::RegWidthForPathCount(pathsCount, canSelectNone);
+  auto value         = BinaryVector(regSize, 0, SizeProperty::Fixed);
+
+  return value;
+}
+//
+//  End of: DefaultBinaryPathSelector::AssociatedRegisterInitialValue
+//---------------------------------------------------------------------------
+
+
+
 //! Checks that register length is enough to select all path count
 //!
 void DefaultBinaryPathSelector::CheckRegisterLength (uint32_t registerLength, uint32_t pathsCount, bool canSelectNone)

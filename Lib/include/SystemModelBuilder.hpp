@@ -70,6 +70,13 @@ class DLL_EXPORT SystemModelBuilder final
                         std::shared_ptr<mast::ParentNode> parent);
 
 
+  //! Creates a JTAG TAP
+  //!
+  std::shared_ptr<AccessInterface> Create_JTAG_TAP (string_view                              name,
+                                                    uint32_t                                 irBitsCount,
+                                                    uint32_t                                 muxPathsCount,
+                                                    std::shared_ptr<AccessInterfaceProtocol> protocol);
+
   //! Creates a path selector
   //!
   std::shared_ptr<mast::PathSelector> Create_PathSelector(SelectorKind              selectorKind,
@@ -88,7 +95,7 @@ class DLL_EXPORT SystemModelBuilder final
 
   //! Creates a MIB sub-tree
   //!
-  std::shared_ptr<mast::Chain> Create_MIB (std::experimental::string_view      name,
+  std::shared_ptr<mast::Chain> Create_MIB (string_view                         name,
                                            std::shared_ptr<mast::PathSelector> selector,
                                            std::shared_ptr<mast::Register>     selectorRegister,
                                            MuxRegPlacement                     muxRegPlacement
@@ -97,7 +104,7 @@ class DLL_EXPORT SystemModelBuilder final
 
   //! Creates a SIB sub-tree
   //!
-  std::shared_ptr<mast::Chain> Create_SIB (std::experimental::string_view      name,
+  std::shared_ptr<mast::Chain> Create_SIB (string_view                         name,
                                            std::shared_ptr<mast::PathSelector> selector,
                                            std::shared_ptr<mast::Register>     selectorRegister,
                                            MuxRegPlacement                     muxRegPlacement
@@ -109,7 +116,7 @@ class DLL_EXPORT SystemModelBuilder final
 
   //! Creates a "1500" style wrapper
   //!
-  std::shared_ptr<mast::Chain > Create_1500_Wrapper (std::experimental::string_view name, uint32_t maxDerivations);
+  std::shared_ptr<mast::Chain> Create_1500_Wrapper (string_view name, uint32_t maxDerivations);
 
   // ---------------- Private  Fields
   //

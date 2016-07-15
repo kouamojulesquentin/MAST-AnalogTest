@@ -1389,7 +1389,7 @@ namespace SIT {
 #line 139 "/home/michele/mast-devel/SIT_parser/SIT_parser.yy" // lalr1.cc:859
     {
     std::cout << "Parsing OK, Root node is " <<yystack_[1].value.as< std::shared_ptr<mast::SystemModelNode> > ().get()->Name() << "  \n";
-    //driver.parsed_sut->ReplaceRoot($1,false);
+    driver.parsed_sut->ReplaceRoot(std::dynamic_pointer_cast<ParentNode>(yystack_[1].value.as< std::shared_ptr<mast::SystemModelNode> > ()),false);
     }
 #line 1395 "/home/michele/mast-devel/SIT_parser/SIT_parser.tab.cc" // lalr1.cc:859
     break;

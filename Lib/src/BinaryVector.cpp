@@ -871,7 +871,7 @@ BinaryVector BinaryVector::operator+ (const BinaryVector& rhs) const
 //! @param bits   Sequence of characters representing content of BinaryVector to create
 //!               Characters in ",':_- \t/\" are ignored (can be used to ease display of string)
 //!               An exception is thrown if there is any character different from
-//!               set "01,':_- \t"
+//!               set "01,':_- \t\n"
 //!               '0b' is ignored at start of string. An exception is thrown everywhere else
 //!               '/b', '/B', '\b', '\B' constructions are ignored anywhere
 //!
@@ -882,6 +882,18 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
 
   uint8_t nextByte = 0;
   auto    bitCount = 0;
+
+  // ---------------- Skip leading blank chars
+  //
+  auto bitId  = size_t(0);
+  while (   (bits[bitId] == '\n')
+         || (bits[bitId] == '\t')
+         || (bits[bitId] == ' ')
+        )
+  {
+    ++bitId;
+  }
+  bits.remove_prefix(bitId);
 
   // ---------------- Tolerate strings beginning with "0b"
   //
@@ -921,6 +933,7 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
       case ',':
       case '\'':
       case '\t':
+      case '\n':
       case ' ':
       case '\0':
       case '/':
@@ -934,7 +947,7 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
         }
         break;
       default:
-        THROW_INVALID_ARGUMENT("CreateFromBinaryString only support characters in '01,\':_-\\x20\\t'");
+        THROW_INVALID_ARGUMENT("CreateFromBinaryString only support characters in '01,\':_-\\x20\\t\\n'");
         break;
     }
     previousChar = nextChar;
@@ -964,7 +977,7 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
 //! @param bits   Sequence of characters representing content of BinaryVector to create
 //!               Characters in ",':_- \t/\" are ignored (can be used to ease display of string)
 //!               An exception is thrown if there is any character different from
-//!               set "0123456789abcdefABCDEF,':_- \t/\"
+//!               set "0123456789abcdefABCDEF,':_- \t\n/\"
 //!               '0x' is ignored at start of string. An exception is thrown everywhere else
 //!               '/x', '/X', '\x', '\X' constructions are ignored anywhere
 //!
@@ -976,6 +989,18 @@ BinaryVector BinaryVector::CreateFromHexString (string_view bits, SizeProperty s
 
   uint8_t nextByte = 0;
   auto    bitCount = 0;
+
+  // ---------------- Skip leading blank chars
+  //
+  auto bitId  = size_t(0);
+  while (   (bits[bitId] == '\n')
+         || (bits[bitId] == '\t')
+         || (bits[bitId] == ' ')
+        )
+  {
+    ++bitId;
+  }
+  bits.remove_prefix(bitId);
 
   // ---------------- Tolerate strings beginning with "0x"
   //
@@ -1023,6 +1048,7 @@ BinaryVector BinaryVector::CreateFromHexString (string_view bits, SizeProperty s
       case ',':
       case '\'':
       case '\t':
+      case '\n':
       case ' ':
       case '\0':
       case '/':
@@ -1041,7 +1067,7 @@ BinaryVector BinaryVector::CreateFromHexString (string_view bits, SizeProperty s
         }
         break;
       default:
-        THROW_INVALID_ARGUMENT("CreateFromBinaryString only support characters in '01,\':_-\\x20\\t/\\'");
+        THROW_INVALID_ARGUMENT("CreateFromBinaryString only support characters in '01,\':_-\\x20\\t\\n/\\'");
     }
 
     if (hasValue)
@@ -1123,14 +1149,25 @@ BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty size
     THROW_INVALID_ARGUMENT("Cannot interpret one, non space, character");
   }
 
-  auto format = StringFormat::Undefined;
-  bool firstCharOk = (bits[0] == '0') || (bits[0] == '/') || (bits[0] == '\\');
+  // ---------------- Skip leading blank chars
+  //
+  auto bitId  = size_t(0);
+  while (   (bits[bitId] == '\n')
+         || (bits[bitId] == '\t')
+         || (bits[bitId] == ' ')
+        )
+  {
+    ++bitId;
+  }
 
-  if      (firstCharOk && ((bits[1] == 'x') || (bits[1] == 'X')))
+  auto format = StringFormat::Undefined;
+  auto firstCharOk = (bits[bitId] == '0') || (bits[bitId] == '/') || (bits[bitId] == '\\');
+  ++bitId;
+  if      (firstCharOk && ((bits[bitId] == 'x') || (bits[bitId] == 'X')))
   {
     format = StringFormat::Hexadecimal;
   }
-  else if (firstCharOk && ((bits[1] == 'b') || (bits[1] == 'B')))
+  else if (firstCharOk && ((bits[bitId] == 'b') || (bits[bitId] == 'B')))
   {
     format = StringFormat::Binary;
   }
@@ -1187,7 +1224,7 @@ BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty size
   BinaryVector result;
   BinaryVector chunkVector;
 
-  bits.remove_prefix(2);  // Remove one of: '0x', '/x', '\x', '0b', '/b' and '\b'
+  bits.remove_prefix(bitId + 1);  // Remove leading blank chars and one of: '0x', '/x', '\x', '0b', '/b' and '\b'
   while (!bits.empty())
   {
     auto bitsChunk = getNextChunk();

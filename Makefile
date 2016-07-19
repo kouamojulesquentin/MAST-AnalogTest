@@ -28,7 +28,7 @@ RUN   = ./
 
 BIN_DIR           = Bin
 LIB_UT_EXE_NAME   = Lib_UT
-PARSER_EXE_NAME   = SIT_parser_demo.exe
+PARSER_EXE_NAME   = SIT_parser_demo
 LIB_UT_EXE_PATH   = $(BIN_DIR)/$(LIB_UT_EXE_NAME)
 PARSER_EXE_PATH   = $(PARSER_EXE_NAME)
 PARSER_INPUT_FILE = ../../SIT_parser/prova.txt

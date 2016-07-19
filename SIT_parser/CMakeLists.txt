@@ -6,11 +6,14 @@ set (P_WARNINGS "-Wall -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-de
 add_definitions(${P_CFLAGS})
 set (P_CFLAGS "${P_WARNINGS} -std=c++14")
 
+add_definitions(${Flex_Switches})
 if (WIN32)
 #+  set (P_CFLAGS ${P_CFLAGS} -DBUILD_DLL)
   set (P_CFLAGS ${P_CFLAGS})
+	set (Flex_Switches -v -L --wincompat)
 else()
   set (P_CFLAGS "${P_CFLAGS} -fPIC")
+	set (Flex_Switches -v -L)
 endif()
 
 
@@ -20,7 +23,7 @@ set (LEX_YACC_SRC_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/")
 ADD_CUSTOM_TARGET(SIT_Lexer_class echo "Creating SIT_lexer")
 add_custom_command(
   OUTPUT ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc
-  COMMAND flex -v -L --wincompat --outfile=${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc ${LEX_YACC_SRC_DIR}SIT_lexer.l
+  COMMAND flex ${Flex_Switches}  --outfile=${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc ${LEX_YACC_SRC_DIR}SIT_lexer.l
   DEPENDS SIT_lexer.l
 )
 

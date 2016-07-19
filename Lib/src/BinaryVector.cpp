@@ -257,11 +257,14 @@ BinaryVector& BinaryVector::Append (uint16_t value, uint8_t numberOfBits, BitsAl
   CHECK_FIXED_SIZE;
   CHECK_AT_LEAST_1_BIT(numberOfBits);
 
-  //! @todo [JFC]-[April/25/2016]: Use Boost.Endian to manage properly endianness
-  //!
-
-  uint8_t byte_1 = (value >>  8) & 0xff;
-  uint8_t byte_2 = (value >>  0) & 0xff;
+  auto asBytes = reinterpret_cast<uint8_t*>(&value);
+  #if __BYTE_ORDER == __LITTLE_ENDIAN
+    uint8_t byte_1 = asBytes[1];
+    uint8_t byte_2 = asBytes[0];
+  #else
+    uint8_t byte_1 = asBytes[0];
+    uint8_t byte_2 = asBytes[1];
+  #endif
 
   auto chunksList = {byte_1, byte_2};
   return AppendChunks(numberOfBits, alignment, chunksList);
@@ -283,12 +286,18 @@ BinaryVector& BinaryVector::Append (uint32_t value, uint8_t numberOfBits, BitsAl
   CHECK_FIXED_SIZE;
   CHECK_AT_LEAST_1_BIT(numberOfBits);
 
-  //! @todo [JFC]-[April/25/2016]: Use Boost.Endian to manage properly endianness
-  //!
-  uint8_t byte_1 = (value >> 24) & 0xff;
-  uint8_t byte_2 = (value >> 16) & 0xff;
-  uint8_t byte_3 = (value >>  8) & 0xff;
-  uint8_t byte_4 = (value >>  0) & 0xff;
+  auto asBytes = reinterpret_cast<uint8_t*>(&value);
+  #if __BYTE_ORDER == __LITTLE_ENDIAN
+    uint8_t byte_1 = asBytes[3];
+    uint8_t byte_2 = asBytes[2];
+    uint8_t byte_3 = asBytes[1];
+    uint8_t byte_4 = asBytes[0];
+  #else
+    uint8_t byte_1 = asBytes[0];
+    uint8_t byte_2 = asBytes[1];
+    uint8_t byte_3 = asBytes[2];
+    uint8_t byte_4 = asBytes[3];
+  #endif
 
   auto chunksList = {byte_1, byte_2, byte_3, byte_4};
   return AppendChunks(numberOfBits, alignment, chunksList);
@@ -309,17 +318,26 @@ BinaryVector& BinaryVector::Append (uint64_t value, uint8_t numberOfBits, BitsAl
   CHECK_FIXED_SIZE;
   CHECK_AT_LEAST_1_BIT(numberOfBits);
 
-  //! @todo [JFC]-[April/25/2016]: Use Boost.Endian to manage properly endianness
-  //!
-
-  uint8_t byte_1 = (value >> 56) & 0xff;
-  uint8_t byte_2 = (value >> 48) & 0xff;
-  uint8_t byte_3 = (value >> 40) & 0xff;
-  uint8_t byte_4 = (value >> 32) & 0xff;
-  uint8_t byte_5 = (value >> 24) & 0xff;
-  uint8_t byte_6 = (value >> 16) & 0xff;
-  uint8_t byte_7 = (value >>  8) & 0xff;
-  uint8_t byte_8 = (value >>  0) & 0xff;
+  auto asBytes = reinterpret_cast<uint8_t*>(&value);
+  #if __BYTE_ORDER == __LITTLE_ENDIAN
+    uint8_t byte_1 = asBytes[7];
+    uint8_t byte_2 = asBytes[6];
+    uint8_t byte_3 = asBytes[5];
+    uint8_t byte_4 = asBytes[4];
+    uint8_t byte_5 = asBytes[3];
+    uint8_t byte_6 = asBytes[2];
+    uint8_t byte_7 = asBytes[1];
+    uint8_t byte_8 = asBytes[0];
+  #else
+    uint8_t byte_1 = asBytes[0];
+    uint8_t byte_2 = asBytes[1];
+    uint8_t byte_3 = asBytes[2];
+    uint8_t byte_4 = asBytes[3];
+    uint8_t byte_5 = asBytes[4];
+    uint8_t byte_6 = asBytes[5];
+    uint8_t byte_7 = asBytes[6];
+    uint8_t byte_8 = asBytes[7];
+  #endif
 
   auto chunksList = {byte_1, byte_2, byte_3, byte_4, byte_5, byte_6, byte_7, byte_8};
 

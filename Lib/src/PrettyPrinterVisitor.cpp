@@ -26,8 +26,10 @@ using namespace mast;
 //! Initializes with specified options
 //!
 PrettyPrinterVisitor::PrettyPrinterVisitor (PrettyPrinterOptions options)
-  : m_useAutoFormat (IsSet(options, PrettyPrinterOptions::DisplayValueAuto))
-  , m_verbose       (IsSet(options, PrettyPrinterOptions::Verbose))
+  : m_useAutoFormat      (IsSet(options, PrettyPrinterOptions::DisplayValueAuto))
+  , m_verbose            (IsSet(options, PrettyPrinterOptions::Verbose))
+  , m_showSelectionState (IsSet(options, PrettyPrinterOptions::ShowSelectionState))
+  , m_showSelectionValue (IsSet(options, PrettyPrinterOptions::ShowSelectionValue))
 {
 }
 //
@@ -101,17 +103,23 @@ void PrettyPrinterVisitor::PrintChildren (const ParentNode& parentNode)
 
   ++m_depth;
 
-  //! @todo [JFC]-[July/15/2016]: For linker, set before printing its child:
-  //!                               - Its selector
-  //!                               - Derivation ID
-  //!                             Reset Selector when them when not Linker
+  auto pLinker  = dynamic_cast<const Linker*>(&parentNode);
+  auto selector = pLinker ? pLinker->Selector() : nullptr;
+  auto childId  = uint32_t(1u);
 
   auto child = parentNode.FirstChild();
   while (child)
   {
+    m_selector = selector;
+    m_childId  = childId;
+
     child->Accept(*this);
     child = child->NextSibling();
+
+    ++childId;
   }
+  m_selector = nullptr;
+  m_childId  = 0;
 }
 //
 //  End of: PrettyPrinterVisitor::PrintChildren
@@ -154,9 +162,6 @@ void PrettyPrinterVisitor::StreamNodeCommon (const SystemModelNode& node)
     m_os << ", has_conditioner: " << node.HasConditioner();
     m_os << ", priority: "        << node.Priority();
   }
-
-  //! @todo [JFC]-[July/15/2016]: Add support for ShowSelectionState and ShowSelectionValue
-  //!
 }
 //
 //  End of: PrettyPrinterVisitor::StreamNodeCommon
@@ -190,8 +195,24 @@ void PrettyPrinterVisitor::StreamNodeHeader(std::experimental::string_view type,
 
   m_os << '(' << node.Identifier() << ") ";
 
+
   AlignRelativeTo(m_startPos, 15u + m_depth);
   m_os << '"' << node.Name()       << '"';
+
+  // ---------------- Display selection/active state(s)
+  //
+  if (m_selector && (m_showSelectionState || m_showSelectionValue))
+  {
+    bool isSelected    = m_selector->IsSelected(m_childId);
+    bool isActive      = m_selector->IsActive(m_childId);
+    bool showSomething = m_showSelectionValue || isActive || isSelected;
+
+    if (showSomething)                      m_os << ", ", AlignRelativeTo(m_startPos, 30u + m_depth);
+    if (m_showSelectionValue)               m_os << ":" << m_selector->SelectionValue(m_childId).DataAsMixString(8, "", ":");
+    if (m_showSelectionState && isSelected) m_os << ":S";
+    if (m_showSelectionState && isActive)   m_os << ":A";
+    if (showSomething)                      m_os << ":";
+  }
 
   m_first = false;
 }

@@ -64,6 +64,8 @@ class UT_PrettyPrinterVisitor : public CxxTest::TestSuite
   void test_PrettyPrint_Verbose ();
   void test_PrettyPrint_AutoFormat ();
   void test_PrettyPrint_Std ();
+  void test_PrettyPrint_SelectionValue ();
+  void test_PrettyPrint_SelectionState ();
   void test_PrettyPrint_AllOptions ();
 
   // ---------------- Private  Methods

@@ -22,7 +22,7 @@ So, when modifying an header, it is recommended to clean the project(s) - unless
 
 To clean the projects, run "Build clean"
 
-[Qt Build]
+[Build-Qt]
 
 For debug and release configurations: Add custom build step using make with parameters: -C  %{CurrentProject:Path}/Lib_UT -f Runner.mak
 Place it before project make or even as first step (before Qmake is run)
@@ -37,3 +37,6 @@ Release version: "UT_Run release" or "UT_Run_Release" or "UT_Run_Release_Verbose
 All tests results are then saved into Lib_UT\UT_Results\UT_Result.txt
 The verbose version will report all individual assertions actual values (even when successful)
 
+[Build-CMake]
+  - Has been validated with Flex 2.5.37 and Bison 3.0
+  - FLEX_DIR environment variable must point to where flex is intalled (to get access to FlexLexer.h)

@@ -1,14 +1,4 @@
-if (WIN32)
-	if (NOT ${CMAKE_GENERATOR} MATCHES "MinGW Makefiles")
-		message("\n>>>>>>>>>>>>>>> Syntax should be: cmake -G \"MinGW Makefiles\" <<<<<<<<<<<<<<<\n\n")
-	endif()
-  set (CMAKE_CXX_COMPILER "g++")
-  set (CMAKE_C_COMPILER   "gcc")
-endif()
-
 cmake_minimum_required(VERSION 3.5)
-
-  
 project(SIT_parser)
 
 add_definitions(${P_WARNINGS})
@@ -24,52 +14,48 @@ else()
 endif()
 
 
-#add_compile_options(${P_CFLAGS})
-
-
-# SIT_scanner:
-
 set (LEX_YACC_SRC_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/")
 
-# Create target for the parser
- ADD_CUSTOM_TARGET(SIT_Parser echo "Creating SIT_parser")
-
 # Create custom command for flex/lex (note the outputs)
+ADD_CUSTOM_TARGET(SIT_Lexer echo "Creating SIT_lexer")
 add_custom_command(
   OUTPUT ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc
-  COMMAND flex --outfile=${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc ${LEX_YACC_SRC_DIR}SIT_lexer.l
+  COMMAND flex -v -L --wincompat --outfile=${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc ${LEX_YACC_SRC_DIR}SIT_lexer.l
   DEPENDS SIT_lexer.l
 )
 
+# Create target for the parser
+ADD_CUSTOM_TARGET(SIT_Parser echo "Creating SIT_parser")
 add_custom_command(
   OUTPUT ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_parser.tab.hh
-  COMMAND bison -d -v ${LEX_YACC_SRC_DIR}SIT_parser.yy -o ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc
+  COMMAND bison -d -v -l ${LEX_YACC_SRC_DIR}SIT_parser.yy -o ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc
   DEPENDS SIT_parser.yy
 )
 
 # Add parser.c to the list of sources
- SET(SIT_parser_SRCS ${SIT_parser_SRC} ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc)
+#+SET(SIT_parser_SRCS ${SIT_parser_SRC} ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc)
 
 # Since parser.c does not exists yet when cmake is run mark
 # it as generated
- SET_SOURCE_FILES_PROPERTIES(${LEX_YACC_SRC_DIR}SIT_parser.tab.cc GENERATED)
- SET_SOURCE_FILES_PROPERTIES(${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc GENERATED)
+SET_SOURCE_FILES_PROPERTIES(${LEX_YACC_SRC_DIR}SIT_parser.tab.cc GENERATED)
+SET_SOURCE_FILES_PROPERTIES(${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc 	 GENERATED)
 
 # Include binary directory to include lexer.c in parser.c
- INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/)
-
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/)
 include_directories(${CMAKE_BINARY_DIR}/SIT_parser/)
+include_directories(../Lib/include/)
+include_directories(../Lib/public_include/)
+include_directories(../Logger/)
+include_directories(../Logger/g3log/)
+if (WIN32)
+  include_directories($ENV{FLEX_DIR})
+endif()
 
-add_library (SIT_parser ${LEX_YACC_SRC_DIR}SIT_driver.cpp ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc)
+add_library 		(SIT_parser 			${LEX_YACC_SRC_DIR}SIT_driver.cpp ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc)
+add_executable 	(SIT_parser_demo 	${LEX_YACC_SRC_DIR}main.cpp)
 
-add_executable (SIT_parser_demo ${LEX_YACC_SRC_DIR}main.cpp)
+set_target_properties(SIT_parser 			PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+set_target_properties(SIT_parser_demo PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
- set_target_properties(SIT_parser PROPERTIES
- 	 COMPILE_FLAGS "${P_CFLAGS}"
-	  )
- set_target_properties(SIT_parser_demo PROPERTIES
- 	 COMPILE_FLAGS "${P_CFLAGS}"
-	  )
-
- target_link_libraries(SIT_parser Lib)
- target_link_libraries(SIT_parser_demo SIT_parser Lib)
+target_link_libraries(SIT_parser Lib)
+target_link_libraries(SIT_parser_demo SIT_parser Lib)

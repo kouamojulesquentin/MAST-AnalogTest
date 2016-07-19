@@ -1,5 +1,10 @@
 project(mast_logger)
 
+include_directories(./)
+include_directories(g3log/)
+include_directories(Unix/)
+include_directories(Windows/)
+
 # LOGGER:
 file(GLOB Logger_SOURCES 	"*.cpp")
 file(GLOB Logger_SOURCES_Linux "Unix/*.cpp")

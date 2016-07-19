@@ -8,32 +8,43 @@ set (UT_WARNINGS ${WARNINGS})
 add_definitions(${UT_CFLAGS})
 set (UT_CFLAGS "${UT_WARNINGS} -fexceptions -std=c++14 -DCXXTEST_HAVE_EH -DCXXTEST_HAVE_STD -DCXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION")
 
-#add_compile_options(${UT_CFLAGS})
-
-    file(GLOB Lib_UT_SOURCES 	   "Utility/*")
-    file(GLOB Lib_UT_TMP_SOURCES  "SystemModel/*")
-    set (Lib_UT_SOURCES ${Lib_UT_SOURCES} ${Lib_UT_TMP_SOURCES})
-    file(GLOB Lib_UT_TMP_SOURCES 	"UT_Helpers/*")
-    set (Lib_UT_SOURCES ${Lib_UT_SOURCES} ${Lib_UT_TMP_SOURCES})
-
-    add_library(Lib_UT SHARED ${Lib_UT_SOURCES})
-set_target_properties(Lib_UT PROPERTIES
-  COMPILE_FLAGS "${UT_CFLAGS}"
-  )
-
-#########################################
-
-set (CXXTEST_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../cxxtest")
-set (CXXTEST_PYTHON_TESTGEN_EXECUTABLE "${CMAKE_CURRENT_SOURCE_DIR}/../cxxtest/bin/cxxtestgen_cmake.py")
-set (CXXTEST_TESTGEN_EXECUTABLE ${CXXTEST_PYTHON_TESTGEN_EXECUTABLE})
-set (CXXTEST_USE_PYTHON 1)
-find_package(CxxTest)
-
-set (CXXTEST_TESTGEN_INTERPRETER python3)
 
 #if(CXXTEST_FOUND)
-set (UT_RootPath  "${CMAKE_CURRENT_SOURCE_DIR}/")
+set (UT_RootPath  					"${CMAKE_CURRENT_SOURCE_DIR}/")
+set (CXXTEST_INCLUDE_DIR 		"${CMAKE_CURRENT_SOURCE_DIR}/../cxxtest")
+
 
 include_directories(${CXXTEST_INCLUDE_DIR})
-include_directories(${UT_RootPath}//CxxTest_Traits/)
+include_directories(${UT_RootPath}/CxxTest_Traits)
 include_directories(${UT_RootPath}/UT_Helpers/)
+include_directories(../Lib/include/)
+include_directories(../Lib/public_include/)
+include_directories(../Logger/)
+include_directories(../Logger/g3log/)
+
+ADD_CUSTOM_TARGET(Runner echo "Building Lib_UT runner")
+add_custom_command (OUTPUT 		${UT_RootPath}/Generated/Runner.cpp
+										DEPENDS 	${UT_RootPath}/Runner.mak
+										COMMAND 	make -C ${UT_RootPath} -f Runner.mak
+										)
+
+#add_compile_options(${UT_CFLAGS})
+
+file(GLOB Lib_UT_UTILITY      "Utility/*")
+file(GLOB Lib_UT_SYSTEM_MODEL "SystemModel/*")
+file(GLOB Lib_UT_HELPERS      "UT_Helpers/*")
+file(GLOB Lib_UT_GENERATED 		"Generated/Runner.cpp")
+
+set (Lib_UT_SOURCES ${Lib_UT_UTILITY} ${Lib_UT_SYSTEM_MODEL} ${Lib_UT_HELPERS} ${Lib_UT_GENERATED})
+
+set_source_files_properties(${Lib_UT_GENERATED} GENERATED)
+
+add_executable (Lib_UT ${Lib_UT_SOURCES})
+set_target_properties(Lib_UT PROPERTIES COMPILE_FLAGS "${UT_CFLAGS}" )
+
+if (WIN32)
+	target_link_libraries(Lib_UT Lib Logger DbgHelp )
+else ()
+	target_link_libraries(Lib_UT Lib Logger pthread)
+endif ()
+

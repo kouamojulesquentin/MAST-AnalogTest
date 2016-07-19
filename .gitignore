@@ -49,3 +49,6 @@
 /Temp.cpp
 /Test.py
 /Build_CMake
+/Doxygen_Doc
+/cmake_debug
+/cmake_release

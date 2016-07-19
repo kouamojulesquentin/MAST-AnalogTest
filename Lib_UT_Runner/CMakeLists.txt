@@ -67,18 +67,16 @@ else()
     set (Runner_UT_SOURCES ${Runner_UT_SOURCES} ${UT_RootPath}/SystemModel/UT_SystemModelManager.hpp)
 endif()
 
-    CXXTEST_ADD_TEST(Lib_UT_Runner   	Runner.cpp  	${Runner_UT_SOURCES} )
+    CXXTEST_ADD_TEST(Lib_UT_Runner   	${UT_RootPath}/Generated/Runner.cpp  	${Runner_UT_SOURCES} )
 
-    set_target_properties(Lib_UT_Runner PROPERTIES
- 	 COMPILE_FLAGS "${UT_CFLAGS}"
-	  )
-    enable_testing()
+#+    set_target_properties(Lib_UT_Runner PROPERTIES COMPILE_FLAGS "${UT_CFLAGS}")
+#+    enable_testing()
 
 
-if (WIN32)
-	target_link_libraries(Lib_UT_Runner Lib_UT Lib Logger DbgHelp )
-else ()
-	target_link_libraries(Lib_UT_Runner Lib_UT Lib Logger pthread)
-endif ()
+#+if (WIN32)
+#+	target_link_libraries(Lib_UT_Runner Lib_UT Lib Logger DbgHelp )
+#+else ()
+#+	target_link_libraries(Lib_UT_Runner Lib_UT Lib Logger pthread)
+#+endif ()
 
-
+#+add_custom_target (Runner_Main, make -f Runner.mak)

@@ -138,7 +138,7 @@ root_node:
    internal_node END 
     {
     std::cout << "Parsing OK, Root node is " <<$1.get()->Name() << "  \n";
-    //driver.parsed_sut->ReplaceRoot($1,false);
+    driver.parsed_sut->ReplaceRoot(std::dynamic_pointer_cast<ParentNode>($1),false);
     }
    ;
 

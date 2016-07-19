@@ -7,18 +7,10 @@ include_directories(../Logger/g3log/)
 
 file(GLOB Lib_SOURCES "src/*")
 add_library						(Lib SHARED ${Lib_SOURCES})
-set_target_properties	(Lib PROPERTIES COMPILE_FLAGS "${CFLAGS}" RUNTIME_OUTPUT_DIRECTOR "Bin")
+set_target_properties	(Lib PROPERTIES COMPILE_FLAGS "${CFLAGS}")
 
 if (WIN32)
 	target_link_libraries(Lib Logger DbgHelp)
 else ()
 	target_link_libraries(Lib Logger pthread)
 endif ()
-
-
-
-
-#+install(TARGETS Lib
-#+        RUNTIME DESTINATION bin
-#+        LIBRARY DESTINATION bin
-#+			)

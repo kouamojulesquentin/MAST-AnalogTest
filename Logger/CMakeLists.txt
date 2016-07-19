@@ -5,8 +5,12 @@ include_directories(g3log/)
 include_directories(Unix/)
 include_directories(Windows/)
 
-# LOGGER:
-file(GLOB Logger_SOURCES 	"*.cpp")
+add_definitions(${LOGGER_WARNINGS})
+set (LOGGER_WARNINGS "-Wall -Wextra -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-include-dirs -Wswitch-enum -Wswitch-default")
+add_definitions(${LOGGER_CFLAGS})
+set (LOGGER_CFLAGS "${LOGGER_WARNINGS} -std=c++14")
+
+file(GLOB Logger_SOURCES       "*.cpp")
 file(GLOB Logger_SOURCES_Linux "Unix/*.cpp")
 file(GLOB Logger_SOURCES_Win32 "Windows/*.cpp")
 
@@ -23,6 +27,4 @@ else ()
 	target_link_libraries(Logger pthread)
 endif ()
 
-set_target_properties(Logger PROPERTIES
-  COMPILE_FLAGS "${CFLAGS}"
-  )
+set_target_properties(Logger PROPERTIES COMPILE_FLAGS "${LOGGER_CFLAGS}" )

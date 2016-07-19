@@ -22,11 +22,6 @@ include_directories(../Lib/public_include/)
 include_directories(../Logger/)
 include_directories(../Logger/g3log/)
 
-ADD_CUSTOM_TARGET(Runner echo "Building Lib_UT runner")
-add_custom_command (OUTPUT 		${UT_RootPath}/Generated/Runner.cpp
-										DEPENDS 	${UT_RootPath}/Runner.mak
-										COMMAND 	make -C ${UT_RootPath} -f Runner.mak
-										)
 
 #add_compile_options(${UT_CFLAGS})
 
@@ -36,6 +31,13 @@ file(GLOB Lib_UT_HELPERS      "UT_Helpers/*")
 file(GLOB Lib_UT_GENERATED 		"Generated/Runner.cpp")
 
 set (Lib_UT_SOURCES ${Lib_UT_UTILITY} ${Lib_UT_SYSTEM_MODEL} ${Lib_UT_HELPERS} ${Lib_UT_GENERATED})
+
+ADD_CUSTOM_TARGET(Runner echo "Building Lib_UT runner")
+file(GLOB Lib_UT_HEADER      "./*/UT_*.hpp")
+add_custom_command (OUTPUT 		${UT_RootPath}/Generated/Runner.cpp
+										DEPENDS 	${UT_RootPath}/Runner.mak ${Lib_UT_HEADER}
+										COMMAND 	make -C ${UT_RootPath} -f Runner.mak
+										)
 
 set_source_files_properties(${Lib_UT_GENERATED} GENERATED)
 

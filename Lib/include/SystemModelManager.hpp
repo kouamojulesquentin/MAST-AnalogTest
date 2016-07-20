@@ -77,7 +77,7 @@ class DLL_EXPORT SystemModelManager final
 
   //! Waits for all application thread to terminate
   //!
-  void JoinAllApplicationThreads ();
+  void WaitForApplicationsEnd ();
 
   //! Starts all created application threads
   //!
@@ -106,6 +106,10 @@ class DLL_EXPORT SystemModelManager final
   //! Returns last Register value read from SUT
   //!
   BinaryVector iGet (string_view registerPath);
+
+  //! Queues data to be read from SUT
+  //!
+  void iRead (string_view registerPath, BinaryVector expectedValue);
 
   //! Sets next Register value to sent to SUT
   //!
@@ -170,6 +174,7 @@ class DLL_EXPORT SystemModelManager final
 
   void LoopOnDataCycle ();
   void DoDataCycles_Impl ();
+  void RegisterPendingThread (std::shared_ptr<Register> reg);
   void ReleaseServedThreads ();
   void ReportServedRegisters (const std::vector<NodeIdentifier>& activeRegisters);
   void WakeupDataCycles ();

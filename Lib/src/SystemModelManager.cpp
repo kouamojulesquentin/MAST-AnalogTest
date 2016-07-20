@@ -50,7 +50,7 @@ SystemModelManager::~SystemModelManager ()
 {
   MONITOR_MESSAGE("Destructing SystemModelManager (begin)");
   Stop();                         // Stopping data cycle loop also release thread blocked in iApply
-  JoinAllApplicationThreads();
+  WaitForApplicationsEnd();
   MONITOR_MESSAGE("Destructing SystemModelManager (end)");
 }
 //
@@ -288,36 +288,6 @@ shared_ptr<AccessInterface> SystemModelManager::GetFirstAccessInterface (const S
 //---------------------------------------------------------------------------
 
 
-//! Waits for all application thread to terminate
-//!
-void SystemModelManager::JoinAllApplicationThreads ()
-{
-  // ---------------- Make sure all application have been started
-  //                  (not waiting for start signal)
-  //
-  if (!m_appStarted)
-  {
-    StartCreatedApplicationThreads(); // Make sure none is still waiting to start
-  }
-
-  shared_lock<shared_timed_mutex> lock(m_appDataMutex); // Shared lock is enough for read concurrency
-  for (const auto& item : m_threadToAppData)
-  {
-    auto data    = item.second;
-    auto topNode = data->pathResolver.ReferenceNode();
-
-    if (data->appThread.joinable())
-    {
-      MONITOR_WITH_NODE("Joining application thread", *topNode, data->debugName);
-      data->appThread.join();
-      MONITOR_WITH_NODE("Joined  application thread", *topNode, data->debugName);
-    }
-  }
-  m_threadToAppData.clear();  // There is no more application thread, so the data are useless
-}
-//
-//  End of: SystemModelManager::JoinAllApplicationThreads
-//---------------------------------------------------------------------------
 
 
 //! Executes queued operations
@@ -423,6 +393,34 @@ void SystemModelManager::iPrefix (std::string prefix)
 //---------------------------------------------------------------------------
 
 
+//! Sets next Register value to sent to SUT
+//!
+//! @param registerPath     Register path (relative to the last iPrefix or node associated with application thread)
+//! @param expectedValue    Value expected to be read from SUT (to trigger automatic check)
+//!
+void SystemModelManager::iRead (string_view registerPath, BinaryVector expectedValue)
+{
+  auto& pathResolver = PATH_RESOLVER("iRead: ");
+  auto  reg          = pathResolver.ResolveAsRegister(registerPath);
+
+  LOG(DEBUG) << "iRead - Entering (may be blocked on mutex)";
+
+  // ---------------- Protect access to SystemModel
+  //
+  unique_lock<recursive_mutex> lock(m_dataMutex);
+
+  LOG(DEBUG) << "iRead - After mutex";
+
+  reg->SetExpectedFromSut(std::move(expectedValue));
+  reg->SetCheckExpected(true);
+
+  RegisterPendingThread(reg);
+  LOG(DEBUG) << "iRead - Exiting";
+}
+//
+//  End of: SystemModelManager::iRead
+//---------------------------------------------------------------------------
+
 
 //! Sets next Register value to sent to SUT
 //!
@@ -449,19 +447,7 @@ void SystemModelManager::iWrite (string_view registerPath, BinaryVector sequence
     bool isPending = reg->NextToSut() != reg->LastToSut();
     if (isPending)
     {
-      // ---------------- Memorize that the register is associated with that thead
-      //
-      auto  data       = ThreadApplicationData();
-      auto& pendingIds = data->pendingRegistersIds;
-      auto  regId      = reg->Identifier();
-
-      bool alreadyRegistered = pendingIds.count(regId) == 0;
-      if (!alreadyRegistered)
-      {
-        pendingIds.insert(regId);
-
-        m_regIdToAppData.insert(make_pair(regId, data)); // Memorize that this register is pending for that thread
-      }
+      RegisterPendingThread(reg);
     }
   }
   LOG(DEBUG) << "iWrite - Exiting";
@@ -597,6 +583,9 @@ void SystemModelManager::StartCreatedApplicationThreads ()
 //! Stops data cycle loop
 //!
 //! @note When returning, the background thread is effectively terminated
+//! @note This should be used precautionaly as it may stop cycles before all data are shifted to SUT
+//!
+//! @see WaitForApplicationsEnd
 void SystemModelManager::Stop ()
 {
   {
@@ -660,6 +649,32 @@ void SystemModelManager::ReleaseServedThreads ()
 
 
 
+//! Saves the fact that application thread request an operation on a register
+//!
+//! @note Only applies in multi-thread context
+//!
+void SystemModelManager::RegisterPendingThread (shared_ptr<Register> reg)
+{
+  auto threadId = std::this_thread::get_id();
+  if (threadId != m_managerThreadId)
+  {
+    auto  data       = ThreadApplicationData();
+    auto& pendingIds = data->pendingRegistersIds;
+    auto  regId      = reg->Identifier();
+
+    bool alreadyRegistered = pendingIds.count(regId) == 0;
+    if (!alreadyRegistered)
+    {
+      pendingIds.insert(regId);
+      m_regIdToAppData.insert(make_pair(regId, data));
+    }
+  }
+}
+//
+//  End of: SystemModelManager::RegisterPendingThread
+//---------------------------------------------------------------------------
+
+
 //! Clears "Pending registers" for updated (served) registers
 //!
 //! @param activeRegisters  SUT Registers that have been updated (during last AccessInterface action)
@@ -692,6 +707,39 @@ void SystemModelManager::ReportServedRegisters (const vector<NodeIdentifier>& ac
 }
 //
 //  End of: SystemModelManager::ReportServedRegisters
+//---------------------------------------------------------------------------
+
+
+
+//! Waits for all application thread to terminate
+//!
+void SystemModelManager::WaitForApplicationsEnd ()
+{
+  // ---------------- Make sure all application have been started
+  //                  (not waiting for start signal)
+  //
+  if (!m_appStarted)
+  {
+    StartCreatedApplicationThreads(); // Make sure none is still waiting to start
+  }
+
+  shared_lock<shared_timed_mutex> lock(m_appDataMutex); // Shared lock is enough for read concurrency
+  for (const auto& item : m_threadToAppData)
+  {
+    auto data    = item.second;
+    auto topNode = data->pathResolver.ReferenceNode();
+
+    if (data->appThread.joinable())
+    {
+      MONITOR_WITH_NODE("Joining application thread", *topNode, data->debugName);
+      data->appThread.join();
+      MONITOR_WITH_NODE("Joined  application thread", *topNode, data->debugName);
+    }
+  }
+  m_threadToAppData.clear();  // There is no more application thread, so the data are useless
+}
+//
+//  End of: SystemModelManager::WaitForApplicationsEnd
 //---------------------------------------------------------------------------
 
 

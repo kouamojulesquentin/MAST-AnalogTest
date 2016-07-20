@@ -925,7 +925,7 @@ void UT_SystemModelManager::test_CreateApplicationThread_1_App ()
       while (value != 0);
       value = ii;
     }
-    sut.JoinAllApplicationThreads();  // Make sure the application thread has seen the last value
+    sut.WaitForApplicationsEnd();  // Make sure the application thread has seen the last value
 
     TS_ASSERT_EQUALS (sum, 5050u);
   }
@@ -967,7 +967,7 @@ void UT_SystemModelManager::test_CreateApplicationThread_2_App ()
     TS_ASSERT_EQUALS (valueApp_2.load(), 0u);
 
     sut.StartCreatedApplicationThreads(); // Do effectively start both application threads
-    sut.JoinAllApplicationThreads();      // Make sure application have done their job
+    sut.WaitForApplicationsEnd();      // Make sure application have done their job
 
     TS_ASSERT_EQUALS (valueApp_1.load(), 13u);
     TS_ASSERT_EQUALS (valueApp_2.load(), 37u);
@@ -1048,7 +1048,7 @@ void UT_SystemModelManager::test_iPrefix_Thread_is_Known ()
 
   // ---------------- Verify
   //
-  sut.JoinAllApplicationThreads();  // Make sure application has done its action
+  sut.WaitForApplicationsEnd();  // Make sure application has done its action
 //+  g3::logEnabled(false);
 
   CxxTest::setStringResultsOnNewLine(false);
@@ -1150,7 +1150,7 @@ void UT_SystemModelManager::test_iGet_Thread_is_Known ()
 
   // ---------------- Verify
   //
-  sut.JoinAllApplicationThreads();  // Make sure application has done its action
+  sut.WaitForApplicationsEnd();  // Make sure application has done its action
   g3::logEnabled(false);
 }
 
@@ -1183,7 +1183,7 @@ void UT_SystemModelManager::test_iGet_Thread_is_Unknown ()
   unkwnownThread.join();
 
   // Wait end of thread
-  sut.JoinAllApplicationThreads();  // Make sure application has done its action
+  sut.WaitForApplicationsEnd();  // Make sure application has done its action
   g3::logEnabled(false);
 }
 
@@ -1248,7 +1248,7 @@ void UT_SystemModelManager::test_iWrite_Thread_is_Known ()
     //
     sut.CreateApplicationThread(mux, appFunctor); // Include "Exercise" in created thread
     sut.StartCreatedApplicationThreads();
-    sut.JoinAllApplicationThreads();  // Make sure application has done its action
+    sut.WaitForApplicationsEnd();  // Make sure application has done its action
 
     // ---------------- Verify
     //
@@ -1368,7 +1368,7 @@ void UT_SystemModelManager::test_iApply_Thread_is_Known ()
   sut.CreateApplicationThread(mux, appFunctor); // Include "Exercise" in created thread
   sut.Start();
   sut.StartCreatedApplicationThreads();
-  sut.JoinAllApplicationThreads();              // Make sure application has done its action
+  sut.WaitForApplicationsEnd();              // Make sure application has done its action
   sut.Stop();
 
   // ---------------- Verify
@@ -1413,7 +1413,7 @@ void UT_SystemModelManager::test_iApply_DataCycleLoop_NotStarted ()
   //
   sut.CreateApplicationThread(mux, appFunctor); // Include "Exercise" in created thread
   sut.StartCreatedApplicationThreads();
-  sut.JoinAllApplicationThreads();              // Make sure application has done its action
+  sut.WaitForApplicationsEnd();              // Make sure application has done its action
   sut.Stop();
 
   // ---------------- Verify
@@ -1460,7 +1460,7 @@ void UT_SystemModelManager::test_iApply_Thread_is_Known_NoPending ()
     sut.CreateApplicationThread(mux, appFunctor, "test_iApply_Thread_is_Known_NoPending"); // Include "Exercise" in created thread
     sut.Start();
     sut.StartCreatedApplicationThreads();
-    sut.JoinAllApplicationThreads();              // Make sure application has done its action
+    sut.WaitForApplicationsEnd();              // Make sure application has done its action
   );
 }
 
@@ -1531,7 +1531,7 @@ void UT_SystemModelManager::test_iApply_4_Threads_Once_SameReg ()
   sut.CreateApplicationThread(mux, appFunctor, "App_4");
   sut.Start();
   sut.StartCreatedApplicationThreads();
-  sut.JoinAllApplicationThreads();              // Make sure application has done its action
+  sut.WaitForApplicationsEnd();              // Make sure application has done its action
   sut.Stop();
 
   // ---------------- Verify
@@ -1556,12 +1556,17 @@ void UT_SystemModelManager::test_iApply_4_Threads_1_Write ()
   auto reg_2  = sm.RegisterWithId(8u);
   auto reg_3  = sm.RegisterWithId(9u);
 
+  auto gotVector_0 = BinaryVector();
+  auto gotVector_1 = BinaryVector();
+  auto gotVector_2 = BinaryVector();
+  auto gotVector_3 = BinaryVector();
+
   ENABLE_LOG_IN_SCOPE;
   LOG_FUNCTION_SCOPE;
   SystemModelManager sut(sm);
 
   // Thread functor
-  auto appFunctor = [&sut](string_view regName, string_view regValue)
+  auto appFunctor = [&sut](string_view regName, string_view regValue, BinaryVector& gotVector)
   {
     auto nextToSut = BinaryVector::CreateFromHexString(regValue);
 
@@ -1570,18 +1575,21 @@ void UT_SystemModelManager::test_iApply_4_Threads_1_Write ()
       sut.iPrefix("MIB_mux");
       sut.iWrite(regName, nextToSut);
       sut.iApply();
+      sut.iRead(regName, nextToSut);
+      sut.iApply();
+      gotVector = sut.iGet(regName);
     );
   };
 
   // ---------------- Setup (main thread)
   //
-  sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_0", "CAFE_8760"); }, "App_0");
-  sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_1", "CAFE_8761"); }, "App_1");
-  sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_2", "CAFE_8762"); }, "App_2");
-  sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_3", "CAFE_8763"); }, "App_3");
+  sut.CreateApplicationThread(mux, [appFunctor, &gotVector_0]() { appFunctor("dynamic_0", "CAFE_8760", gotVector_0); }, "App_0");
+  sut.CreateApplicationThread(mux, [appFunctor, &gotVector_1]() { appFunctor("dynamic_1", "CAFE_8761", gotVector_1); }, "App_1");
+  sut.CreateApplicationThread(mux, [appFunctor, &gotVector_2]() { appFunctor("dynamic_2", "CAFE_8762", gotVector_2); }, "App_2");
+  sut.CreateApplicationThread(mux, [appFunctor, &gotVector_3]() { appFunctor("dynamic_3", "CAFE_8763", gotVector_3); }, "App_3");
   sut.Start();
   sut.StartCreatedApplicationThreads();
-  sut.JoinAllApplicationThreads();              // Make sure applications have done their action
+  sut.WaitForApplicationsEnd(); // Make sure applications have done their action
   sut.Stop();
 
   // ---------------- Verify
@@ -1595,6 +1603,12 @@ void UT_SystemModelManager::test_iApply_4_Threads_1_Write ()
   TS_ASSERT_EQUALS (reg_1->NextToSut(), BinaryVector::CreateFromHexString("CAFE_8761"));
   TS_ASSERT_EQUALS (reg_2->NextToSut(), BinaryVector::CreateFromHexString("CAFE_8762"));
   TS_ASSERT_EQUALS (reg_3->NextToSut(), BinaryVector::CreateFromHexString("CAFE_8763"));
+
+//+  TS_ASSERT_EQUALS (gotVector_0, BinaryVector::CreateFromHexString("CAFE_8760"));
+//+  TS_ASSERT_EQUALS (gotVector_1, BinaryVector::CreateFromHexString("CAFE_8761"));
+//+  TS_ASSERT_EQUALS (gotVector_2, BinaryVector::CreateFromHexString("CAFE_8762"));
+//+  TS_ASSERT_EQUALS (gotVector_3, BinaryVector::CreateFromHexString("CAFE_8763"));
+  TS_WARN ("Complete tests using iRead ==> Need 'PendingReads' to be fully implemented");
 }
 
 
@@ -1661,7 +1675,7 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes ()
   sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_3", 0x00035003u); }, "App_3");
   sut.Start();
   sut.StartCreatedApplicationThreads();
-  sut.JoinAllApplicationThreads();              // Make sure applications have done their action
+  sut.WaitForApplicationsEnd();              // Make sure applications have done their action
   sut.Stop();
 
   // ---------------- Verify
@@ -1751,7 +1765,7 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes_TC_1500 ()
   sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_3", 0x00035003u); }, "TC_1500_App_3");
   sut.Start();
   sut.StartCreatedApplicationThreads();
-  sut.JoinAllApplicationThreads();              // Make sure applications have done their action
+  sut.WaitForApplicationsEnd();              // Make sure applications have done their action
   sut.Stop();
 
   // ---------------- Verify

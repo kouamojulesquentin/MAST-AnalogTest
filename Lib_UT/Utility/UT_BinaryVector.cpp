@@ -32,6 +32,11 @@ using std::experimental::string_view;
 
 using namespace mast;
 
+//! Initializes test (called for each test)
+void UT_BinaryVector::setUp ()
+{
+  CxxTest::setDisplayUnsignedAsHex(true);
+}
 
 //! Checks BinaryVector defaut constructor
 //!
@@ -3282,6 +3287,304 @@ void UT_BinaryVector::test_Append_Other_When_FixedSize ()
   TS_ASSERT_THROWS (sut.Append(other), std::exception);
 }
 
+
+//! Checks Get when sut is empty and adding 8 bits from uint8_t
+//!
+void UT_BinaryVector::test_Get_uint_8_When_Empty ()
+{
+  // ---------------- Setup
+  //
+  uint8_t     value;
+  BinaryVector sut;
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut.Get(value), std::exception);
+}
+
+//! Checks Get when sut is empty and adding 16 bits from uint16_t
+//!
+void UT_BinaryVector::test_Get_uint_16_When_Empty ()
+{
+  // ---------------- Setup
+  //
+  uint16_t     value;
+  BinaryVector sut;
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut.Get(value), std::exception);
+}
+
+
+//! Checks Get when sut is empty and adding 32 bits from uint32_t
+//!
+void UT_BinaryVector::test_Get_uint_32_When_Empty ()
+{
+  // ---------------- Setup
+  //
+  uint32_t     value;
+  BinaryVector sut;
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut.Get(value), std::exception);
+}
+
+
+//! Checks Get when sut is empty and adding 64 bits from uint64_t
+//!
+void UT_BinaryVector::test_Get_uint_64_When_Empty ()
+{
+  // ---------------- Setup
+  //
+  uint64_t     value;
+  BinaryVector sut;
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut.Get(value), std::exception);
+}
+
+
+
+//! Checks BinaryVector::Get() when BinaryVector is not empty
+//!
+void UT_BinaryVector::test_Get_uint_8_When_NotEmpty ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto    vectorValue   = std::get<0>(data);
+    uint8_t expectedValue = std::get<1>(data);
+    uint8_t gotValue      = 0xBA;
+
+    auto sut  = BinaryVector::CreateFromBinaryString(vectorValue);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Get(gotValue));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (gotValue, expectedValue);
+  };
+
+  auto data =
+  {
+    make_tuple("0",            uint8_t(0x00)), // 00
+    make_tuple("1",            uint8_t(0x01)), // 01
+    make_tuple("10",           uint8_t(0x02)), // 02
+    make_tuple("101",          uint8_t(0x05)), // 03
+    make_tuple("1011",         uint8_t(0x0B)), // 04
+    make_tuple("1:0011",       uint8_t(0x13)), // 05
+    make_tuple("10:0100",      uint8_t(0x24)), // 06
+    make_tuple("101:1011",     uint8_t(0x5B)), // 07
+    make_tuple("1010:0110",    uint8_t(0xA6)), // 08
+    make_tuple("1_1001:0111",  uint8_t(0x97)), // 09
+    make_tuple("01_1011:1000", uint8_t(0xB8)), // 10
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks BinaryVector::Get() when BinaryVector is not empty
+//!
+void UT_BinaryVector::test_Get_uint_16_When_NotEmpty ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto    vectorValue   = std::get<0>(data);
+    uint16_t expectedValue = std::get<1>(data);
+    uint16_t gotValue      = 0xBA;
+
+    auto sut  = BinaryVector::CreateFromBinaryString(vectorValue);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Get(gotValue));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (gotValue, expectedValue);
+  };
+
+  auto data =
+  {
+    make_tuple("0",                     uint16_t(0x0000)), // 00
+    make_tuple("1",                     uint16_t(0x0001)), // 01
+    make_tuple("10",                    uint16_t(0x0002)), // 02
+    make_tuple("101",                   uint16_t(0x0005)), // 03
+    make_tuple("1011",                  uint16_t(0x000B)), // 04
+    make_tuple("1:0011",                uint16_t(0x0013)), // 05
+    make_tuple("10:0100",               uint16_t(0x0024)), // 06
+    make_tuple("101:1011",              uint16_t(0x005B)), // 07
+    make_tuple("1010:0110",             uint16_t(0x00A6)), // 08
+    make_tuple("1_1001:0111",           uint16_t(0x0197)), // 09
+    make_tuple("01_1011:1000",          uint16_t(0x01B8)), // 10
+    make_tuple("101_1011:1000",         uint16_t(0x05B8)), // 11
+    make_tuple("1101_1011:1000",        uint16_t(0x0DB8)), // 12
+    make_tuple("1:0101_1011:1000",      uint16_t(0x15B8)), // 13
+    make_tuple("10:0001_1011:1000",     uint16_t(0x21B8)), // 14
+    make_tuple("101:0001_1011:1000",    uint16_t(0x51B8)), // 15
+    make_tuple("1011:0001_1011:1000",   uint16_t(0xB1B8)), // 16
+    make_tuple("1_1001:0001_1011:1000", uint16_t(0x91B8)), // 17
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks BinaryVector::Get() when BinaryVector is not empty
+//!
+void UT_BinaryVector::test_Get_uint_32_When_NotEmpty ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto     vectorValue   = std::get<0>(data);
+    uint32_t expectedValue = std::get<1>(data);
+    uint32_t gotValue      = 0xBAD;
+
+    auto sut  = BinaryVector::CreateFromBinaryString(vectorValue);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Get(gotValue));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (gotValue, expectedValue);
+  };
+
+  auto data =
+  {
+    make_tuple("0",                                         uint32_t(0x00000000)), // 00
+    make_tuple("1",                                         uint32_t(0x00000001)), // 01
+    make_tuple("10",                                        uint32_t(0x00000002)), // 02
+    make_tuple("101",                                       uint32_t(0x00000005)), // 03
+    make_tuple("1011",                                      uint32_t(0x0000000B)), // 04
+    make_tuple("1:0011",                                    uint32_t(0x00000013)), // 05
+    make_tuple("10:0100",                                   uint32_t(0x00000024)), // 06
+    make_tuple("101:1011",                                  uint32_t(0x0000005B)), // 07
+    make_tuple("1010:0110",                                 uint32_t(0x000000A6)), // 08
+    make_tuple("1_1001:0111",                               uint32_t(0x00000197)), // 09
+    make_tuple("01_1011:1000",                              uint32_t(0x000001B8)), // 10
+    make_tuple("101_1011:1000",                             uint32_t(0x000005B8)), // 11
+    make_tuple("1101_1011:1000",                            uint32_t(0x00000DB8)), // 12
+    make_tuple("1:0101_1011:1000",                          uint32_t(0x000015B8)), // 13
+    make_tuple("10:0001_1011:1000",                         uint32_t(0x000021B8)), // 14
+    make_tuple("101:0001_1011:1000",                        uint32_t(0x000051B8)), // 15
+    make_tuple("1011:0001_1011:1000",                       uint32_t(0x0000B1B8)), // 16
+    make_tuple("1_1001:0001_1011:1000",                     uint32_t(0x000191B8)), // 17
+    make_tuple("10_1001:0001_1011:1000",                    uint32_t(0x000291B8)), // 18
+    make_tuple("1110_1001:0001_1011:1000",                  uint32_t(0x000E91B8)), // 19
+    make_tuple("1:0110|1001:0001_1011:1000",                uint32_t(0x001691B8)), // 20
+    make_tuple("10:0110|1001:0001_1011:1000",               uint32_t(0x002691B8)), // 21
+    make_tuple("11_1100:0111|1001:0001_1011:1000",          uint32_t(0x03C791B8)), // 22
+    make_tuple("1011_1100:0111|1001:0001_1011:1000",        uint32_t(0x0BC791B8)), // 23
+    make_tuple("1:0011_1100:0111|1001:0001_1011:1000",      uint32_t(0x13C791B8)), // 24
+    make_tuple("10:0011_1100:0111|1001:0001_1011:1000",     uint32_t(0x23C791B8)), // 25
+    make_tuple("1010:0011_1100:0111|1001:0001_1011:1000",   uint32_t(0xA3C791B8)), // 26
+    make_tuple("1_1001:0011_1100:0110|1001:0001_1011:1000", uint32_t(0x93C691B8)), // 27
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks BinaryVector::Get() when BinaryVector is not empty
+//!
+void UT_BinaryVector::test_Get_uint_64_When_NotEmpty ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto     vectorValue   = std::get<0>(data);
+    uint64_t expectedValue = std::get<1>(data);
+    uint64_t gotValue      = 0xBAD;
+
+    auto sut  = BinaryVector::CreateFromBinaryString(vectorValue);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Get(gotValue));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (gotValue, expectedValue);
+  };
+
+  auto data =
+  {
+    make_tuple("0",                                                                                    uint64_t(0x0000000000000000)), // 00
+    make_tuple("1",                                                                                    uint64_t(0x0000000000000001)), // 01
+    make_tuple("10",                                                                                   uint64_t(0x0000000000000002)), // 02
+    make_tuple("101",                                                                                  uint64_t(0x0000000000000005)), // 03
+    make_tuple("1011",                                                                                 uint64_t(0x000000000000000B)), // 04
+    make_tuple("1:0011",                                                                               uint64_t(0x0000000000000013)), // 05
+    make_tuple("10:0100",                                                                              uint64_t(0x0000000000000024)), // 06
+    make_tuple("101:1011",                                                                             uint64_t(0x000000000000005B)), // 07
+    make_tuple("1010:0110",                                                                            uint64_t(0x00000000000000A6)), // 08
+    make_tuple("1_1001:0111",                                                                          uint64_t(0x0000000000000197)), // 09
+    make_tuple("01_1011:1000",                                                                         uint64_t(0x00000000000001B8)), // 10
+    make_tuple("101_1011:1000",                                                                        uint64_t(0x00000000000005B8)), // 11
+    make_tuple("1101_1011:1000",                                                                       uint64_t(0x0000000000000DB8)), // 12
+    make_tuple("1:0101_1011:1000",                                                                     uint64_t(0x00000000000015B8)), // 13
+    make_tuple("10:0001_1011:1000",                                                                    uint64_t(0x00000000000021B8)), // 14
+    make_tuple("101:0001_1011:1000",                                                                   uint64_t(0x00000000000051B8)), // 15
+    make_tuple("1011:0001_1011:1000",                                                                  uint64_t(0x000000000000B1B8)), // 16
+    make_tuple("1_1001:0001_1011:1000",                                                                uint64_t(0x00000000000191B8)), // 17
+    make_tuple("10_1001:0001_1011:1000",                                                               uint64_t(0x00000000000291B8)), // 18
+    make_tuple("1110_1001:0001_1011:1000",                                                             uint64_t(0x00000000000E91B8)), // 19
+    make_tuple("1:0110|1001:0001_1011:1000",                                                           uint64_t(0x00000000001691B8)), // 20
+    make_tuple("10:0110|1001:0001_1011:1000",                                                          uint64_t(0x00000000002691B8)), // 21
+    make_tuple("110:0110|1001:0001_1011:1000",                                                         uint64_t(0x00000000006691B8)), // 22
+    make_tuple("0110:0110|1001:0001_1011:1000",                                                        uint64_t(0x00000000006691B8)), // 23
+    make_tuple("11_1100:0111|1001:0001_1011:1000",                                                     uint64_t(0x0000000003C791B8)), // 24
+    make_tuple("1011_1100:0111|1001:0001_1011:1000",                                                   uint64_t(0x000000000BC791B8)), // 25
+    make_tuple("1:0011_1100:0111|1001:0001_1011:1000",                                                 uint64_t(0x0000000013C791B8)), // 26
+    make_tuple("10:0011_1100:0111|1001:0001_1011:1000",                                                uint64_t(0x0000000023C791B8)), // 27
+    make_tuple("1010:0011_1100:0111|1001:0001_1011:1000",                                              uint64_t(0x00000000A3C791B8)), // 28
+    make_tuple("1|1001:0011_1100:0110|1001:0001_1011:1000",                                            uint64_t(0x0000000193C691B8)), // 29
+    make_tuple("11||1001:0011_1100:0110|1001:0001_1011:1000",                                          uint64_t(0x0000000393C691B8)), // 30
+    make_tuple("1:1111||1001:0011_1100:0110|1001:0001_1011:1000",                                      uint64_t(0x0000001F93C691B8)), // 31
+    make_tuple("1001:1111||1001:0011_1100:0110|1001:0001_1011:1000",                                   uint64_t(0x0000009F93C691B8)), // 32
+    make_tuple("110_1001:1111||1001:0011_1100:0110|1001:0001_1011:1000",                               uint64_t(0x0000069F93C691B8)), // 33
+    make_tuple("10:1110_1001:1111||1001:0011_1100:0110|1001:0001_1011:1000",                           uint64_t(0x00002E9F93C691B8)), // 34
+    make_tuple("1|0110:1110_1001:1111||1001:0011_1100:0110|1001:0001_1011:1000",                       uint64_t(0x00016E9F93C691B8)), // 35
+    make_tuple("1011|0110:1110_1001:1111||1001:0011_1100:0110|1001:0001_1011:1000",                    uint64_t(0x000B6E9F93C691B8)), // 36
+    make_tuple("010:1011|0110:1110_1001:1111||1001:0011_1100:0110|1001:0001_1011:1000",                uint64_t(0x002B6E9F93C691B8)), // 37
+    make_tuple("01_1010:1011|0110:1110_1001:1111||1001:0011_1100:0110|1001:0001_1011:1000",            uint64_t(0x01AB6E9F93C691B8)), // 38
+    make_tuple("1:0101_1010:1011|0110:1110_1001:1111||1001:0011_1100:0110|1001:0001_1011:1000",        uint64_t(0x15AB6E9F93C691B8)), // 39
+    make_tuple("1101:0101_1010:1011|0110:1110_1001:1111||1001:0011_1100:0110|1001:0001_1011:1000",     uint64_t(0xD5AB6E9F93C691B8)), // 40
+    make_tuple("1|||1101:0101_1010:1011|0110:1110_1001:1111||1001:0011_1100:0110|1001:0001_1011:1000", uint64_t(0xD5AB6E9F93C691B8)), // 41
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
 
 
 //! Checks BinaryVector::Operator<< when the sut is still empty

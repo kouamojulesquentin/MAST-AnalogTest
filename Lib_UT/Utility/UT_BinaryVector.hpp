@@ -118,6 +118,18 @@ class UT_BinaryVector : public CxxTest::TestSuite
   void test_Append_Other_When_NotEmpty ();
   void test_Append_Other_When_FixedSize ();
 
+  // ---------------- Get
+  //
+  void test_Get_uint_8_When_Empty ();
+  void test_Get_uint_16_When_Empty ();
+  void test_Get_uint_32_When_Empty ();
+  void test_Get_uint_64_When_Empty ();
+
+  void test_Get_uint_8_When_NotEmpty ();
+  void test_Get_uint_16_When_NotEmpty ();
+  void test_Get_uint_32_When_NotEmpty ();
+  void test_Get_uint_64_When_NotEmpty ();
+
   // ---------------- operator<<
   //
   void test_Operator_Shift_When_Empty ();
@@ -181,6 +193,10 @@ class UT_BinaryVector : public CxxTest::TestSuite
   //
   void test_Slice ();
   void test_Slice_When_Exceeding_Capacity ();
+
+  // ---------------- Other methods
+  //
+  void setUp(); //!< Initializes test (called for each test)
 };
 //
 //  End of UT_BinaryVector class declaration

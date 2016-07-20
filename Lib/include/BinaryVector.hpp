@@ -68,11 +68,18 @@ class DLL_EXPORT BinaryVector final
   static BinaryVector CreateFromHexString    (string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed);   //!< Creates a BinaryVector from text hexadecimal representation
   static BinaryVector CreateFromString       (string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed);   //!< Creates a BinaryVector from mixed hexadecimal and binary representation
 
+
   std::string DataAsBinaryString(string_view quadSeparator = "_",
                                  string_view octoSeparator = ":",
                                  uint32_t    ssbytesPerLine  = 0,
                                  string_view eolSeparator  = ","
                                 ) const; //!< Gets content as formatted binary string
+
+//+  std::string DataAsDecimalString(string_view quadSeparator  = "_",
+//+                                  string_view octoSeparator  = ":",
+//+                                  uint32_t    ssbytesPerLine = 0,
+//+                                  string_view eolSeparator   = ","
+//+                                ) const; //!< Gets content as formatted decimal string
 
   std::string DataAsHexString (std::experimental::string_view quadSeparator = "_",
                                std::experimental::string_view octoSeparator = ":",
@@ -115,7 +122,13 @@ class DLL_EXPORT BinaryVector final
 
   BinaryVector& AppendChunks (uint8_t numberOfBits, BitsAlignment alignment, std::initializer_list<uint8_t> chunks); // Appends from a list of uint8_t ordered from msb to lsb
 
-  void          Clear();             //!< Clears all content
+  void          Clear();              //!< Clears all content
+
+  void          Get(uint8_t&  value) const; //!< Reads  8 bits value from BinaryVector
+  void          Get(uint16_t& value) const; //!< Reads 16 bits value from BinaryVector
+  void          Get(uint32_t& value) const; //!< Reads 32 bits value from BinaryVector
+  void          Get(uint64_t& value) const; //!< Reads 64 bits value from BinaryVector
+
   void          Set(uint8_t  value); //!< Assigns  8 bits value the BinaryVector
   void          Set(uint16_t value); //!< Assigns 16 bits value the BinaryVector
   void          Set(uint32_t value); //!< Assigns 32 bits value the BinaryVector
@@ -125,7 +138,7 @@ class DLL_EXPORT BinaryVector final
   void ClearBit  (uint32_t bitOffset); //!< Clears specified bit (zero based)
   void ToggleBit (uint32_t bitOffset); //!< Toggles specified bit (zero based)
 
-  void          FixSize(bool fixSize) { m_sizeProperty = fixSize ? SizeProperty::Fixed : SizeProperty::NotFixed; } //!< Sets whether the number of used bits cannot be changed
+  void           FixSize(bool fixSize) { m_sizeProperty = fixSize ? SizeProperty::Fixed : SizeProperty::NotFixed; } //!< Sets whether the number of used bits cannot be changed
 
   bool           HasFixedSize() const { return m_sizeProperty != SizeProperty::NotFixed; } //!< Returns true if number of used bits cannot be changed
   bool           IsEmpty()      const { return m_data.empty();}                            //!< Returns true when there is no bit in the BinaryVector, false otherwise
@@ -140,6 +153,16 @@ class DLL_EXPORT BinaryVector final
   //
   bool FixedSize() const { return m_sizeProperty == SizeProperty::Fixed; }
   void MaskLastByte ();
+  uint8_t MergeToByte (uint32_t lsbOffset, uint8_t lsbBitsCount) const;
+  uint8_t LastByteBitsCount() const
+  {
+    if (m_usedBits == 0) return 0;
+
+    auto bitsCount = m_usedBits % 8u;
+    if (bitsCount == 0) bitsCount = 8u;
+
+    return bitsCount;
+  }
 
   // ---------------- Private  Fields
   //

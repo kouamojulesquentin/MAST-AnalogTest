@@ -29,6 +29,7 @@ using namespace std::string_literals;
 using namespace mast;
 
 #define CHECK_SAME_SIZE(other)                if (other.m_usedBits != m_usedBits)         THROW_LOGIC_ERROR("BinaryVectors must have same size")
+#define CHECK_NOT_EMPTY                       if (IsEmpty())                              THROW_LOGIC_ERROR("BinaryVector must not be empty")
 #define CHECK_FIXED_SIZE                      if (FixedSize())                            THROW_LOGIC_ERROR("BinaryVector size has been fixed")
 #define CHECK_FIXED_SIZE_ASSIGNMENT(newSize)  if (FixedSize() && (newSize != m_usedBits)) THROW_LOGIC_ERROR("BinaryVector size has been fixed")
 #define CHECK_AT_LEAST_1_BIT(numBits)         if (numBits == 0)                           THROW_INVALID_ARGUMENT("Number of bits to append must be != 0")
@@ -50,6 +51,22 @@ namespace
     0b11111111, // 8 bits
   };
 
+  //! Defines a mask to least most significant bits of a uint8_t
+  //!
+  constexpr uint8_t RIGHT_BITS_MASK_8[] =
+  {
+    0b00000000, // 0 bits
+    0b00000001, // 1 bits
+    0b00000011, // 2 bits
+    0b00000111, // 3 bits
+    0b00001111, // 4 bits
+    0b00011111, // 5 bits
+    0b00111111, // 6 bits
+    0b01111111, // 7 bits
+    0b11111111, // 8 bits
+  };
+
+
   //! Defines a mask to keep most significant bits of a nibble
   //!
   constexpr uint8_t LEFT_BITS_MASK_4[] =
@@ -59,6 +76,18 @@ namespace
     0b1100, // 2 bits
     0b1110, // 3 bits
     0b1111, // 4 bits
+  };
+
+  static const std::array<uint8_t, 8> BIT_MASK_8 =
+  {
+    0b10000000,  // 00
+    0b01000000,  // 01
+    0b00100000,  // 02
+    0b00010000,  // 03
+    0b00001000,  // 04
+    0b00000100,  // 05
+    0b00000010,  // 06
+    0b00000001,  // 07
   };
 
   static const std::array<string_view, 16> BINARY_NIBBLES =
@@ -82,17 +111,6 @@ namespace
   };
 
 
-  static const std::array<uint8_t, 8> BIT_MASK_8 =
-  {
-    0b10000000,  // 00
-    0b01000000,  // 01
-    0b00100000,  // 02
-    0b00010000,  // 03
-    0b00001000,  // 04
-    0b00000100,  // 05
-    0b00000010,  // 06
-    0b00000001,  // 07
-  };
 
 
 
@@ -869,7 +887,7 @@ BinaryVector BinaryVector::operator+ (const BinaryVector& rhs) const
 //! @note Firstly intended for test purposes, but can be used for anything else
 //!
 //! @param bits   Sequence of characters representing content of BinaryVector to create
-//!               Characters in ",':_- \t/\" are ignored (can be used to ease display of string)
+//!               Characters in ",':_- \t/\|" are ignored (can be used to ease display of string)
 //!               An exception is thrown if there is any character different from
 //!               set "01,':_- \t\n"
 //!               '0b' is ignored at start of string. An exception is thrown everywhere else
@@ -930,6 +948,7 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
       case '-':
       case '_':
       case ':':
+      case '|':
       case ',':
       case '\'':
       case '\t':
@@ -947,7 +966,7 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
         }
         break;
       default:
-        THROW_INVALID_ARGUMENT("CreateFromBinaryString only support characters in '01,\':_-\\x20\\t\\n'");
+        THROW_INVALID_ARGUMENT("CreateFromBinaryString only support characters in '01,\':|_-\\x20\\t\\n'");
         break;
     }
     previousChar = nextChar;
@@ -1045,6 +1064,7 @@ BinaryVector BinaryVector::CreateFromHexString (string_view bits, SizeProperty s
       case '-':
       case '_':
       case ':':
+      case '|':
       case ',':
       case '\'':
       case '\t':
@@ -1067,7 +1087,7 @@ BinaryVector BinaryVector::CreateFromHexString (string_view bits, SizeProperty s
         }
         break;
       default:
-        THROW_INVALID_ARGUMENT("CreateFromBinaryString only support characters in '01,\':_-\\x20\\t\\n/\\'");
+        THROW_INVALID_ARGUMENT("CreateFromBinaryString only support characters in '01,\':|_-\\x20\\t\\n/\\'");
     }
 
     if (hasValue)
@@ -1250,6 +1270,151 @@ BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty size
 //---------------------------------------------------------------------------
 
 
+//! Reads 8 bits value from BinaryVector
+//!
+//! @note This is an invalid operation when the BinaryVector is empty
+//! @note If the BinaryVector has less than 8 bits, then a padding will be appled on value most significants bits
+//! @note If the BinaryVector has more than 8 bits, then the value will take only the least significants bits
+//!
+//! @param value  Variable to update with current value
+//!
+void BinaryVector::Get (uint8_t&  value) const
+{
+  CHECK_NOT_EMPTY;
+
+  uint8_t  lastByteBits   = LastByteBitsCount();
+  uint32_t lastByteOffset = m_data.size() - 1u;
+
+  value = (m_usedBits > 0) ? MergeToByte(lastByteOffset, lastByteBits) : 0;
+}
+//
+//  End of: BinaryVector::Get
+//---------------------------------------------------------------------------
+
+
+
+
+//! Reads 16 bits value from BinaryVector
+//!
+//! @note This is an invalid operation when the BinaryVector is empty
+//! @note If the BinaryVector has less than 16 bits, then a padding will be appled on value most significants bits
+//! @note If the BinaryVector has more than 16 bits, then the value will take only the least significants bits
+//!
+//! @param value  Variable to update with current value
+//!
+void BinaryVector::Get (uint16_t&  value) const
+{
+  CHECK_NOT_EMPTY;
+
+  uint8_t  lastByteBits   = LastByteBitsCount();
+  uint32_t lastByteOffset = m_data.size() - 1u;
+
+  uint8_t value_0 =  (m_usedBits > 0)  ? MergeToByte(lastByteOffset,      lastByteBits) : 0;  // LSB
+  uint8_t value_1 =  (m_usedBits > 8)  ? MergeToByte(lastByteOffset - 1u, lastByteBits) : 0;  // MSB
+
+  auto asBytes = reinterpret_cast<uint8_t*>(&value);
+  #if __BYTE_ORDER == __LITTLE_ENDIAN
+    asBytes[0] = value_0;
+    asBytes[1] = value_1;
+  #else
+    asBytes[0] = value_1;
+    asBytes[1] = value_0;
+  #endif
+}
+//
+//  End of: BinaryVector::Get
+//---------------------------------------------------------------------------
+
+
+//! Reads 32 bits value from BinaryVector
+//!
+//! @note This is an invalid operation when the BinaryVector is empty
+//! @note If the BinaryVector has less than 32 bits, then a padding will be appled on value most significants bits
+//! @note If the BinaryVector has more than 32 bits, then the value will take only the least significants bits
+//!
+//! @param value  Variable to update with current value
+//!
+void BinaryVector::Get (uint32_t&  value) const
+{
+  CHECK_NOT_EMPTY;
+
+  uint8_t  lastByteBits   = LastByteBitsCount();
+  uint32_t lastByteOffset = m_data.size() - 1u;
+
+  uint8_t value_0 =  (m_usedBits > 0)  ? MergeToByte(lastByteOffset,      lastByteBits) : 0;  // LSB
+  uint8_t value_1 =  (m_usedBits > 8)  ? MergeToByte(lastByteOffset - 1u, lastByteBits) : 0;
+  uint8_t value_2 =  (m_usedBits > 16) ? MergeToByte(lastByteOffset - 2u, lastByteBits) : 0;
+  uint8_t value_3 =  (m_usedBits > 24) ? MergeToByte(lastByteOffset - 3u, lastByteBits) : 0;  // MSB
+
+  auto asBytes = reinterpret_cast<uint8_t*>(&value);
+  #if __BYTE_ORDER == __LITTLE_ENDIAN
+    asBytes[0] = value_0;
+    asBytes[1] = value_1;
+    asBytes[2] = value_2;
+    asBytes[3] = value_3;
+  #else
+    asBytes[0] = value_3;
+    asBytes[1] = value_2;
+    asBytes[2] = value_1;
+    asBytes[3] = value_0;
+  #endif
+}
+//
+//  End of: BinaryVector::Get
+//---------------------------------------------------------------------------
+
+
+//! Reads 64 bits value from BinaryVector
+//!
+//! @note This is an invalid operation when the BinaryVector is empty
+//! @note If the BinaryVector has less than 64 bits, then a padding will be appled on value most significants bits
+//! @note If the BinaryVector has more than 64 bits, then the value will take only the least significants bits
+//!
+//! @param value  Variable to update with current value
+//!
+void BinaryVector::Get (uint64_t&  value) const
+{
+  CHECK_NOT_EMPTY;
+
+  uint8_t  lastByteBits   = LastByteBitsCount();
+  uint32_t lastByteOffset = m_data.size() - 1u;
+
+  uint8_t value_0 =  (m_usedBits > 0)  ? MergeToByte(lastByteOffset,      lastByteBits) : 0;  // LSB
+  uint8_t value_1 =  (m_usedBits > 8)  ? MergeToByte(lastByteOffset - 1u, lastByteBits) : 0;
+  uint8_t value_2 =  (m_usedBits > 16) ? MergeToByte(lastByteOffset - 2u, lastByteBits) : 0;
+  uint8_t value_3 =  (m_usedBits > 24) ? MergeToByte(lastByteOffset - 3u, lastByteBits) : 0;
+  uint8_t value_4 =  (m_usedBits > 32) ? MergeToByte(lastByteOffset - 4u, lastByteBits) : 0;
+  uint8_t value_5 =  (m_usedBits > 40) ? MergeToByte(lastByteOffset - 5u, lastByteBits) : 0;
+  uint8_t value_6 =  (m_usedBits > 48) ? MergeToByte(lastByteOffset - 6u, lastByteBits) : 0;
+  uint8_t value_7 =  (m_usedBits > 56) ? MergeToByte(lastByteOffset - 7u, lastByteBits) : 0; // MSB
+
+  // ---------------- Combine all bytes dealing with endianness
+  //
+  auto asBytes = reinterpret_cast<uint8_t*>(&value);
+  #if __BYTE_ORDER == __LITTLE_ENDIAN
+    asBytes[0] = value_0;
+    asBytes[1] = value_1;
+    asBytes[2] = value_2;
+    asBytes[3] = value_3;
+    asBytes[4] = value_4;
+    asBytes[5] = value_5;
+    asBytes[6] = value_6;
+    asBytes[7] = value_7;
+  #else
+    asBytes[0] = value_7;
+    asBytes[1] = value_6;
+    asBytes[2] = value_5;
+    asBytes[3] = value_4;
+    asBytes[4] = value_3;
+    asBytes[5] = value_2;
+    asBytes[6] = value_1;
+    asBytes[7] = value_0;
+  #endif
+}
+//
+//  End of: BinaryVector::Get
+//---------------------------------------------------------------------------
+
 
 //! Masks last byte to be sure that unused bits are always set to zero
 //!
@@ -1264,6 +1429,33 @@ void BinaryVector::MaskLastByte ()
 //
 //  End of: BinaryVector::MaskLastByte
 //---------------------------------------------------------------------------
+
+
+//! Merges bits from two bytes
+//!
+//! @param lsbOffset      Rightmost byte to merge
+//! @param lsbBitsCount   Number of bits to take form rightmost byte
+//!
+uint8_t BinaryVector::MergeToByte (uint32_t lsbOffset, uint8_t lsbBitsCount) const
+{
+  const uint8_t secondToLastByteBits = 8u - lsbBitsCount;
+
+  uint8_t value_L = m_data[lsbOffset] >> secondToLastByteBits;
+
+  if (lsbOffset == 0)
+  {
+    return value_L;
+  }
+
+  auto value_H = m_data[lsbOffset - 1u] << lsbBitsCount;
+  auto value   = value_H | value_L;
+
+  return value;
+}
+//
+//  End of: BinaryVector::MergeToByte
+//---------------------------------------------------------------------------
+
 
 //! Sets from 8 bits
 //!

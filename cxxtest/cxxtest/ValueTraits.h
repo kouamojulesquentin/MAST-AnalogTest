@@ -438,18 +438,7 @@ class ValueTraits<signed _CXXTEST_LONGLONG>
     typedef _CXXTEST_LONGLONG T;
     char _asString[2 + 3 * sizeof(T)];
 public:
-    ValueTraits(T t)
-    {
-      if (displayUnsignedAsHex())
-      {
-        char* pDst = copyString(_asString, "0x");
-        numberToString<T>(t, pDst, 16);
-      }
-      else
-      {
-        numberToString<T>(t, _asString);
-      }
-    }
+    ValueTraits(T t) { numberToString<T>(t, _asString); }
    ~ValueTraits() {}
     const char* asString(void) const { return _asString; }
 };
@@ -463,7 +452,18 @@ class ValueTraits<unsigned _CXXTEST_LONGLONG>
     typedef unsigned _CXXTEST_LONGLONG T;
     char _asString[3 + 3 * sizeof(T)];
 public:
-    ValueTraits(T t) { numberToString<T>(t, _asString); }
+    ValueTraits(T t)
+    {
+      if (displayUnsignedAsHex())
+      {
+        char* pDst = copyString(_asString, "0x");
+        numberToString<T>(t, pDst, 16);
+      }
+      else
+      {
+        numberToString<T>(t, _asString);
+      }
+    }
     ~ValueTraits() {}
     const char* asString(void) const { return _asString; }
 };

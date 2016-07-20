@@ -71,7 +71,18 @@ namespace CxxTest
       typedef unsigned long long T;
       char _asString[80];   // Must support binary display of 64 bits
   public:
-      ValueTraits(T t) { numberToString<T>(t, _asString); }
+      ValueTraits(T t)
+      {
+        if (displayUnsignedAsHex())
+        {
+          char* pDst = copyString(_asString, "0x");
+          numberToString<T>(t, pDst, 16);
+        }
+        else
+        {
+          numberToString<T>(t, _asString);
+        }
+      }
       ~ValueTraits() {}
       const char* asString(void) const { return _asString; }
   };

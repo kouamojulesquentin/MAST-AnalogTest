@@ -17,6 +17,7 @@ namespace CxxTest
 
 static CharacterMapping currentCharacterMapping = MAP_CHARS_FULL;
 static bool             stringResultsOnNewLines = false;
+static bool             displayUnsignedAsHexs   = false;
 
 //! Returns current character mapping
 CharacterMapping charactersMapping ()
@@ -55,6 +56,21 @@ bool setStringResultsOnNewLine(bool newState)
   stringResultsOnNewLines = newState;
   return previousState;
 }
+
+
+//!< Returns true when a requested to display unsigned int value as hex string (instead of decimal)
+//!<
+bool displayUnsignedAsHex() { return displayUnsignedAsHexs; }
+
+//!< Sets whether requesting to display unsigned int value as hex string (instead of decimal)
+//!<
+bool setDisplayUnsignedAsHex(bool newState)
+{
+  bool previousState = displayUnsignedAsHexs;
+  displayUnsignedAsHexs = newState;
+  return previousState;
+}
+
 
 //
 // Non-inline functions from ValueTraits.h

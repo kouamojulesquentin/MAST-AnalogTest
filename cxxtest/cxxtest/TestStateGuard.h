@@ -32,6 +32,7 @@ class TestStateGuard
     bool             _abortDataDrivenTestsOnFailure;
     CharacterMapping _characterMapping;
     bool             _stringResultsOnNewLine;
+    bool             _displayUnsignedAsHex;
 
 public:
     TestStateGuard()
@@ -40,6 +41,7 @@ public:
       , _abortDataDrivenTestsOnFailure (abortDataDrivenTestsOnFailure())
       , _characterMapping              (charactersMapping())
       , _stringResultsOnNewLine        (stringResultsOnNewLine())
+      , _displayUnsignedAsHex          (displayUnsignedAsHex())
     {}
 
     virtual ~TestStateGuard()
@@ -48,7 +50,8 @@ public:
         setAbortTestOnFail               (_abortTestOnFail);
         setAbortDataDrivenTestsOnFailure (_abortDataDrivenTestsOnFailure);
         setCharactersMapping             (_characterMapping);
-        setStringResultsOnNewLine        (_stringResultsOnNewLine) ;
+        setStringResultsOnNewLine        (_stringResultsOnNewLine);
+        setDisplayUnsignedAsHex          (_displayUnsignedAsHex);
     }
 };
 } // End of namespace CxxTest

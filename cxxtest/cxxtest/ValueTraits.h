@@ -60,6 +60,8 @@ CharacterMapping setCharactersMapping(CharacterMapping newMapping);   //!< Chang
 CharacterMapping setDefaultCharactersMapping();                       //!< Restores default characters mapping mode
 bool             stringResultsOnNewLine();                            //!< Returns true when a new line is used (instead of quote) when displaying string results (either got and expected)
 bool             setStringResultsOnNewLine(bool newState);            //!< Tells whether a new line is used (instead of quote) when displaying string results
+bool             displayUnsignedAsHex();                              //!< Returns true when a requested to display unsigned int value as hex string (instead of decimal)
+bool             setDisplayUnsignedAsHex(bool newState);              //!< Sets whether requesting to display unsigned int value as hex string (instead of decimal)
 
 // Char representation of a digit
 //
@@ -436,7 +438,18 @@ class ValueTraits<signed _CXXTEST_LONGLONG>
     typedef _CXXTEST_LONGLONG T;
     char _asString[2 + 3 * sizeof(T)];
 public:
-    ValueTraits(T t) { numberToString<T>(t, _asString); }
+    ValueTraits(T t)
+    {
+      if (displayUnsignedAsHex())
+      {
+        char* pDst = copyString(_asString, "0x");
+        numberToString<T>(t, pDst, 16);
+      }
+      else
+      {
+        numberToString<T>(t, _asString);
+      }
+    }
    ~ValueTraits() {}
     const char* asString(void) const { return _asString; }
 };
@@ -448,7 +461,7 @@ CXXTEST_TEMPLATE_INSTANTIATION
 class ValueTraits<unsigned _CXXTEST_LONGLONG>
 {
     typedef unsigned _CXXTEST_LONGLONG T;
-    char _asString[1 + 3 * sizeof(T)];
+    char _asString[3 + 3 * sizeof(T)];
 public:
     ValueTraits(T t) { numberToString<T>(t, _asString); }
     ~ValueTraits() {}
@@ -479,9 +492,20 @@ CXXTEST_TEMPLATE_INSTANTIATION
 class ValueTraits<unsigned long int>
 {
     typedef unsigned long int T;
-    char _asString[1 + 3 * sizeof(T)];
+    char _asString[3 + 3 * sizeof(T)];
 public:
-    ValueTraits(T t) { numberToString<T>(t, _asString); }
+    ValueTraits(T t)
+    {
+      if (displayUnsignedAsHex())
+      {
+        char* pDst = copyString(_asString, "0x");
+        numberToString<T>(t, pDst, 16);
+      }
+      else
+      {
+        numberToString<T>(t, _asString);
+      }
+    }
     ~ValueTraits() {}
     const char* asString(void) const { return _asString; }
 };

@@ -1457,6 +1457,82 @@ uint8_t BinaryVector::MergeToByte (uint32_t lsbOffset, uint8_t lsbBitsCount) con
 //---------------------------------------------------------------------------
 
 
+//! Appends 0 or 1 bit N times
+//!
+//! @param bitIsOne   When true '1' otherwise '0' are appended to the vector
+//! @param count      Number of '0' or '1' to append
+//!
+BinaryVector& BinaryVector::AppendBits (bool bitIsOne, uint32_t count)
+{
+  uint8_t value = bitIsOne ? 0xFF : 0;
+  auto    bytesCount = count / 8u;
+
+  if (bytesCount != 0)
+  {
+    m_data.insert(m_data.cend(), bytesCount, value);
+
+    auto addedBits = 8u * bytesCount;
+    m_usedBits    += addedBits;
+    count         -= addedBits;
+  }
+
+  if (count != 0)
+  {
+    Append(value, count);
+  }
+
+  return *this;
+}
+//
+//  End of: BinaryVector::AppendBits
+//---------------------------------------------------------------------------
+
+
+
+//! Sets from 8 bits
+//!
+void BinaryVector::Set (int8_t value)
+{
+  Set<int8_t, uint8_t>(value);
+}
+//
+//  End of: BinaryVector::Set
+//---------------------------------------------------------------------------
+
+
+//! Sets from 16 bits
+//!
+void BinaryVector::Set (int16_t value)
+{
+  Set<int16_t, uint16_t>(value);
+}
+//
+//  End of: BinaryVector::Set
+//---------------------------------------------------------------------------
+
+
+//! Sets from 32 bits
+//!
+void BinaryVector::Set (int32_t value)
+{
+  Set<int32_t, uint32_t>(value);
+}
+//
+//  End of: BinaryVector::Set
+//---------------------------------------------------------------------------
+
+
+//! Sets from 64 bits
+//!
+void BinaryVector::Set (int64_t value)
+{
+  Set<int64_t, uint64_t>(value);
+}
+//
+//  End of: BinaryVector::Set
+//---------------------------------------------------------------------------
+
+
 //! Sets from 8 bits
 //!
 void BinaryVector::Set (uint8_t value)
@@ -1465,7 +1541,7 @@ void BinaryVector::Set (uint8_t value)
   Append(value);
 }
 //
-//  End of: BinaryVector::BinaryVector
+//  End of: BinaryVector::Set
 //---------------------------------------------------------------------------
 
 
@@ -1478,7 +1554,7 @@ void BinaryVector::Set (uint16_t value)
   Append(value);
 }
 //
-//  End of: BinaryVector::BinaryVector
+//  End of: BinaryVector::Set
 //---------------------------------------------------------------------------
 
 //! Sets from 32 bits
@@ -1490,7 +1566,7 @@ void BinaryVector::Set (uint32_t value)
   Append(value);
 }
 //
-//  End of: BinaryVector::BinaryVector
+//  End of: BinaryVector::Set
 //---------------------------------------------------------------------------
 
 

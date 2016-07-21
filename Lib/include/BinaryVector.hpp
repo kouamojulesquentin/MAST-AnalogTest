@@ -120,6 +120,8 @@ class DLL_EXPORT BinaryVector final
   BinaryVector& Append(uint32_t value, uint8_t numberOfBits = 32, BitsAlignment alignment = BitsAlignment::Right); //!< Appends 32 bits value the BinaryVector
   BinaryVector& Append(uint64_t value, uint8_t numberOfBits = 64, BitsAlignment alignment = BitsAlignment::Right); //!< Appends 64 bits value the BinaryVector
 
+  BinaryVector& AppendBits (bool bitIsOne, uint32_t count); //!< Appends 0 or 1 bit N times
+
   BinaryVector& AppendChunks (uint8_t numberOfBits, BitsAlignment alignment, std::initializer_list<uint8_t> chunks); // Appends from a list of uint8_t ordered from msb to lsb
 
   void          Clear();              //!< Clears all content
@@ -129,10 +131,15 @@ class DLL_EXPORT BinaryVector final
   void          Get(uint32_t& value) const; //!< Reads 32 bits value from BinaryVector
   void          Get(uint64_t& value) const; //!< Reads 64 bits value from BinaryVector
 
-  void          Set(uint8_t  value); //!< Assigns  8 bits value the BinaryVector
-  void          Set(uint16_t value); //!< Assigns 16 bits value the BinaryVector
-  void          Set(uint32_t value); //!< Assigns 32 bits value the BinaryVector
-  void          Set(uint64_t value); //!< Assigns 64 bits value the BinaryVector
+  void          Set(uint8_t  value); //!< Assigns unsigned  8 bits value the BinaryVector
+  void          Set(uint16_t value); //!< Assigns unsigned 16 bits value the BinaryVector
+  void          Set(uint32_t value); //!< Assigns unsigned 32 bits value the BinaryVector
+  void          Set(uint64_t value); //!< Assigns unsigned 64 bits value the BinaryVector
+
+  void          Set(int8_t  value); //!< Assigns signed  8 bits value the BinaryVector
+  void          Set(int16_t value); //!< Assigns signed 16 bits value the BinaryVector
+  void          Set(int32_t value); //!< Assigns signed 32 bits value the BinaryVector
+  void          Set(int64_t value); //!< Assigns signed 64 bits value the BinaryVector
 
   void SetBit    (uint32_t bitOffset); //!< Sets specified bit (zero based)
   void ClearBit  (uint32_t bitOffset); //!< Clears specified bit (zero based)
@@ -163,6 +170,41 @@ class DLL_EXPORT BinaryVector final
 
     return bitsCount;
   }
+
+
+  //! Sets from N bits
+  //!
+  template<typename T, typename UT>
+  void Set (T value)
+  {
+    auto constexpr valueBitsCount   = uint32_t(8u * sizeof(value));
+    auto           initialBitsCount = m_usedBits;
+
+    Clear();
+
+    if (!FixedSize() || (initialBitsCount == 0))
+    {
+      Append(static_cast<UT>(value));
+    }
+    else
+    {
+      m_sizeProperty = SizeProperty::NotFixed;
+
+      auto bitsCountToAppend = initialBitsCount;
+
+      if (initialBitsCount > valueBitsCount)
+      {
+        auto msbCount = initialBitsCount - valueBitsCount;
+
+        AppendBits(value < 0, msbCount);
+        bitsCountToAppend = valueBitsCount;
+      }
+
+      Append(static_cast<UT>(value), bitsCountToAppend);
+      m_sizeProperty = SizeProperty::Fixed;
+    }
+  }
+
 
   // ---------------- Private  Fields
   //

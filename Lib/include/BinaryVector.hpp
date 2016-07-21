@@ -126,10 +126,15 @@ class DLL_EXPORT BinaryVector final
 
   void          Clear();              //!< Clears all content
 
-  void          Get(uint8_t&  value) const; //!< Reads  8 bits value from BinaryVector
-  void          Get(uint16_t& value) const; //!< Reads 16 bits value from BinaryVector
-  void          Get(uint32_t& value) const; //!< Reads 32 bits value from BinaryVector
-  void          Get(uint64_t& value) const; //!< Reads 64 bits value from BinaryVector
+  void          Get(uint8_t&  value) const; //!< Reads unsigned  8 bits value from BinaryVector
+  void          Get(uint16_t& value) const; //!< Reads unsigned 16 bits value from BinaryVector
+  void          Get(uint32_t& value) const; //!< Reads unsigned 32 bits value from BinaryVector
+  void          Get(uint64_t& value) const; //!< Reads unsigned 64 bits value from BinaryVector
+
+  void          Get(int8_t&  value) const; //!< Reads signed  8 bits value from BinaryVector
+  void          Get(int16_t& value) const; //!< Reads signed 16 bits value from BinaryVector
+  void          Get(int32_t& value) const; //!< Reads signed 32 bits value from BinaryVector
+  void          Get(int64_t& value) const; //!< Reads signed 64 bits value from BinaryVector
 
   void          Set(uint8_t  value); //!< Assigns unsigned  8 bits value the BinaryVector
   void          Set(uint16_t value); //!< Assigns unsigned 16 bits value the BinaryVector
@@ -160,7 +165,9 @@ class DLL_EXPORT BinaryVector final
   //
   bool FixedSize() const { return m_sizeProperty == SizeProperty::Fixed; }
   void MaskLastByte ();
-  uint8_t MergeToByte (uint32_t lsbOffset, uint8_t lsbBitsCount) const;
+  uint8_t MergeToByte (uint32_t lsbOffset, uint8_t lsbBitsCount, bool asSigned = false) const;
+  bool    IsNegative() const { return (m_data[0] & 0x80) != 0; }
+
   uint8_t LastByteBitsCount() const
   {
     if (m_usedBits == 0) return 0;

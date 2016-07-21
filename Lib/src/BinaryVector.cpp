@@ -109,11 +109,6 @@ namespace
     "1110",  // 14
     "1111",  // 15
   };
-
-
-
-
-
 } // End of unnamed namespace
 
 //! Initializes with constant value for all bits
@@ -1346,6 +1341,8 @@ void BinaryVector::Get (uint32_t&  value) const
   uint8_t value_2 =  (m_usedBits > 16) ? MergeToByte(lastByteOffset - 2u, lastByteBits) : 0;
   uint8_t value_3 =  (m_usedBits > 24) ? MergeToByte(lastByteOffset - 3u, lastByteBits) : 0;  // MSB
 
+  // ---------------- Combine all bytes dealing with endianness
+  //
   auto asBytes = reinterpret_cast<uint8_t*>(&value);
   #if __BYTE_ORDER == __LITTLE_ENDIAN
     asBytes[0] = value_0;
@@ -1416,6 +1413,154 @@ void BinaryVector::Get (uint64_t&  value) const
 //---------------------------------------------------------------------------
 
 
+//! Reads 8 signed bits value from BinaryVector
+//!
+//! @note This is an invalid operation when the BinaryVector is empty
+//! @note If the BinaryVector has less than 8 bits, then a padding will be appled on value most significants bits (with sign extension)
+//! @note If the BinaryVector has more than 8 bits, then the value will take only the least significants bits (truncation occurs)
+//!
+//! @param value  Variable to update with current value
+//!
+void BinaryVector::Get (int8_t&  value) const
+{
+  CHECK_NOT_EMPTY;
+
+  uint8_t  lastByteBits   = LastByteBitsCount();
+  uint32_t lastByteOffset = m_data.size() - 1u;
+
+  value = MergeToByte(lastByteOffset, lastByteBits, true);
+}
+//
+//  End of: BinaryVector::Get
+//---------------------------------------------------------------------------
+
+
+//! Reads 16 signed bits value from BinaryVector
+//!
+//! @note This is an invalid operation when the BinaryVector is empty
+//! @note If the BinaryVector has less than 8 bits, then a padding will be appled on value most significants bits (with sign extension)
+//! @note If the BinaryVector has more than 8 bits, then the value will take only the least significants bits (truncation occurs)
+//!
+//! @param value  Variable to update with current value
+//!
+void BinaryVector::Get (int16_t&  value) const
+{
+  CHECK_NOT_EMPTY;
+
+  uint8_t  lastByteBits   = LastByteBitsCount();
+  uint32_t lastByteOffset = m_data.size() - 1u;
+  uint8_t  fillBits       = IsNegative() ? 0xFF : 0x00;
+
+  uint8_t value_0 =  (m_usedBits > 0)  ? MergeToByte(lastByteOffset,      lastByteBits, true) : fillBits;  // LSB
+  uint8_t value_1 =  (m_usedBits > 8)  ? MergeToByte(lastByteOffset - 1u, lastByteBits, true) : fillBits;  // MSB
+
+  auto asBytes = reinterpret_cast<uint8_t*>(&value);
+  #if __BYTE_ORDER == __LITTLE_ENDIAN
+    asBytes[0] = value_0;
+    asBytes[1] = value_1;
+  #else
+    asBytes[0] = value_1;
+    asBytes[1] = value_0;
+  #endif
+}
+//
+//  End of: BinaryVector::Get
+//---------------------------------------------------------------------------
+
+
+//! Reads 32 signed bits value from BinaryVector
+//!
+//! @note This is an invalid operation when the BinaryVector is empty
+//! @note If the BinaryVector has less than 8 bits, then a padding will be appled on value most significants bits (with sign extension)
+//! @note If the BinaryVector has more than 8 bits, then the value will take only the least significants bits (truncation occurs)
+//!
+//! @param value  Variable to update with current value
+//!
+void BinaryVector::Get (int32_t&  value) const
+{
+  CHECK_NOT_EMPTY;
+
+  uint8_t  lastByteBits   = LastByteBitsCount();
+  uint32_t lastByteOffset = m_data.size() - 1u;
+  uint8_t  fillBits       = IsNegative() ? 0xFF : 0x00;
+
+  uint8_t value_0 = (m_usedBits > 0)  ? MergeToByte(lastByteOffset,       lastByteBits, true) : fillBits; // LSB
+  uint8_t value_1 = (m_usedBits > 8)  ? MergeToByte(lastByteOffset  - 1u, lastByteBits, true) : fillBits;
+  uint8_t value_2 = (m_usedBits > 16) ? MergeToByte(lastByteOffset  - 2u, lastByteBits, true) : fillBits;
+  uint8_t value_3 = (m_usedBits > 24) ? MergeToByte(lastByteOffset  - 3u, lastByteBits, true) : fillBits; // MSB
+
+  // ---------------- Combine all bytes dealing with endianness
+  //
+  auto asBytes = reinterpret_cast<uint8_t*>(&value);
+  #if __BYTE_ORDER == __LITTLE_ENDIAN
+    asBytes[0] = value_0;
+    asBytes[1] = value_1;
+    asBytes[2] = value_2;
+    asBytes[3] = value_3;
+  #else
+    asBytes[0] = value_3;
+    asBytes[1] = value_2;
+    asBytes[2] = value_1;
+    asBytes[3] = value_0;
+  #endif
+}
+//
+//  End of: BinaryVector::Get
+//---------------------------------------------------------------------------
+
+
+//! Reads 64 signed bits value from BinaryVector
+//!
+//! @note This is an invalid operation when the BinaryVector is empty
+//! @note If the BinaryVector has less than 8 bits, then a padding will be appled on value most significants bits (with sign extension)
+//! @note If the BinaryVector has more than 8 bits, then the value will take only the least significants bits (truncation occurs)
+//!
+//! @param value  Variable to update with current value
+//!
+void BinaryVector::Get (int64_t&  value) const
+{
+  CHECK_NOT_EMPTY;
+
+  uint8_t  lastByteBits   = LastByteBitsCount();
+  uint64_t lastByteOffset = m_data.size() - 1u;
+  uint8_t  fillBits       = IsNegative() ? 0xFF : 0x00;
+
+  uint8_t value_0 = (m_usedBits > 0)  ? MergeToByte(lastByteOffset,      lastByteBits, true) : fillBits; // LSB
+  uint8_t value_1 = (m_usedBits > 8)  ? MergeToByte(lastByteOffset - 1u, lastByteBits, true) : fillBits;
+  uint8_t value_2 = (m_usedBits > 16) ? MergeToByte(lastByteOffset - 2u, lastByteBits, true) : fillBits;
+  uint8_t value_3 = (m_usedBits > 24) ? MergeToByte(lastByteOffset - 3u, lastByteBits, true) : fillBits; // MSB
+  uint8_t value_4 = (m_usedBits > 32) ? MergeToByte(lastByteOffset - 4u, lastByteBits, true) : fillBits; // LSB
+  uint8_t value_5 = (m_usedBits > 40) ? MergeToByte(lastByteOffset - 5u, lastByteBits, true) : fillBits;
+  uint8_t value_6 = (m_usedBits > 48) ? MergeToByte(lastByteOffset - 6u, lastByteBits, true) : fillBits;
+  uint8_t value_7 = (m_usedBits > 56) ? MergeToByte(lastByteOffset - 7u, lastByteBits, true) : fillBits; // MSB
+
+  // ---------------- Combine all bytes dealing with endianness
+  //
+  auto asBytes = reinterpret_cast<uint8_t*>(&value);
+  #if __BYTE_ORDER == __LITTLE_ENDIAN
+    asBytes[0] = value_0;
+    asBytes[1] = value_1;
+    asBytes[2] = value_2;
+    asBytes[3] = value_3;
+    asBytes[4] = value_4;
+    asBytes[5] = value_5;
+    asBytes[6] = value_6;
+    asBytes[7] = value_7;
+  #else
+    asBytes[0] = value_7;
+    asBytes[1] = value_6;
+    asBytes[2] = value_5;
+    asBytes[3] = value_4;
+    asBytes[4] = value_3;
+    asBytes[5] = value_2;
+    asBytes[6] = value_1;
+    asBytes[7] = value_0;
+  #endif
+}
+//
+//  End of: BinaryVector::Get
+//---------------------------------------------------------------------------
+
 //! Masks last byte to be sure that unused bits are always set to zero
 //!
 void BinaryVector::MaskLastByte ()
@@ -1431,12 +1576,13 @@ void BinaryVector::MaskLastByte ()
 //---------------------------------------------------------------------------
 
 
-//! Merges bits from two bytes
+//! Merges bits from two bytes viewed as signed
 //!
 //! @param lsbOffset      Rightmost byte to merge
 //! @param lsbBitsCount   Number of bits to take form rightmost byte
+//! @param asSigned       When true underlying value is considered signed
 //!
-uint8_t BinaryVector::MergeToByte (uint32_t lsbOffset, uint8_t lsbBitsCount) const
+uint8_t BinaryVector::MergeToByte (uint32_t lsbOffset, uint8_t lsbBitsCount, bool asSigned) const
 {
   const uint8_t secondToLastByteBits = 8u - lsbBitsCount;
 
@@ -1444,6 +1590,10 @@ uint8_t BinaryVector::MergeToByte (uint32_t lsbOffset, uint8_t lsbBitsCount) con
 
   if (lsbOffset == 0)
   {
+    if (asSigned && IsNegative())
+    {
+      value_L |= LEFT_BITS_MASK_8[secondToLastByteBits];
+    }
     return value_L;
   }
 

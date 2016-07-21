@@ -147,6 +147,16 @@ class UT_BinaryVector : public CxxTest::TestSuite
   void test_Get_uint_32_When_NotEmpty ();
   void test_Get_uint_64_When_NotEmpty ();
 
+  void test_Get_int_8_When_Empty ();
+  void test_Get_int_16_When_Empty ();
+  void test_Get_int_32_When_Empty ();
+  void test_Get_int_64_When_Empty ();
+
+  void test_Get_int_8_When_NotEmpty ();
+  void test_Get_int_16_When_NotEmpty ();
+  void test_Get_int_32_When_NotEmpty ();
+  void test_Get_int_64_When_NotEmpty ();
+
   // ---------------- operator<<
   //
   void test_Operator_Shift_When_Empty ();

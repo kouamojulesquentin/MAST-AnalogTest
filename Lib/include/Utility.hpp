@@ -83,6 +83,41 @@ constexpr bool IsSet(ENUM_T value, ENUM_T flags)
 }
 
 
+//! Helper class to set a value for current scope and restore it at scope exit
+//!
+template <typename T>
+struct SetForScope
+{
+  SetForScope() = delete;
+  SetForScope(const SetForScope&) = default;
+  SetForScope& operator=(const SetForScope&) = default;
+
+  SetForScope (T& v, T nv)
+    : vr(v), ov(v)
+  {
+    vr = nv;
+  }
+
+  ~SetForScope ()
+  {
+    vr = ov;
+  }
+  T& vr;
+  T  ov;
+};
+
+//! Helper function to create a SetForScope instance
+//!
+template <typename T>
+SetForScope<T> MakeSetForScope (T& v, T nv)
+{
+  return SetForScope<T>(v, nv);
+}
+#define SET_FOR_SCOPE(var, varValue) \
+    auto STRING_JOIN2(set_in_scope, __LINE__) = MakeSetForScope(var, varValue)
+
+
+
 // ---------------- Define behaviour (functor call) at end of scope
 //
 template <typename F>

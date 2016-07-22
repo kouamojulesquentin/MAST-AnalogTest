@@ -67,7 +67,7 @@ class DLL_EXPORT Register : public SystemModelNode
 
   //! Sets the bits sequence to send during the next iApply cycle
   //!
-  void SetToSut           (BinaryVector sequence)
+  void SetToSut (BinaryVector&& sequence)
   {
     if (m_holdValue)
     {
@@ -76,13 +76,27 @@ class DLL_EXPORT Register : public SystemModelNode
     m_nextToSut = std::move(sequence);
   }
 
+  //! Sets the bits sequence to send during the next iApply cycle
+  //!
+  void SetToSut (const BinaryVector& sequence)
+  {
+    if (m_holdValue)
+    {
+      m_bypass = sequence;
+    }
+    m_nextToSut = sequence;
+  }
+
+  //! Returns last sequence received from SUT as integral value
+  //!
+  void LastFromSut (BinaryVector& value) const { value = m_lastFromSut; }
 
   //! Returns last sequence received from SUT as integral value
   //!
   template<typename T> void LastFromSut (T& value) const
   {
     static_assert(std::is_integral<T>::value, "LastFromSut requires integral types");
-    m_lastToSut.Get(value);
+    m_lastFromSut.Get(value);
   }
 
   //! Sets expected sequence (when updating from SUT) from integral value
@@ -97,7 +111,7 @@ class DLL_EXPORT Register : public SystemModelNode
   //!
   template <typename T> void SetToSut (T newValue)
   {
-    static_assert(std::is_integral <T>::value, "SetToSut requires BinaryVector or integral types");
+    static_assert(std::is_integral<T>::value, "SetToSut requires BinaryVector or integral types");
     m_nextToSut.Set(newValue);
 
     if (m_holdValue)

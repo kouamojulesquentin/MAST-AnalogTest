@@ -22,7 +22,31 @@ using std::tuple;
 using std::make_tuple;
 
 using namespace mast;
+namespace
+{
+template<typename T, typename U> void Check_LastFromSut(U data)
+{
+  // ---------------- Setup
+  //
+  const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+  const auto expected = std::get<1>(data);
 
+  Register sut("Reg", initial, true);
+  sut.SetToSut(0u);
+  sut.SetExpectedFromSut(0u);
+  sut.SetBypass(BinaryVector(initial.BitsCount()));
+
+  T gotValue;
+
+  // ---------------- Exercise
+  //
+  sut.LastFromSut(gotValue);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (gotValue, expected);
+}
+} // End of unnamed namespace
 
 //! Checks Register:: constructor
 //!
@@ -893,7 +917,6 @@ void UT_Register::test_SetExpectedFromSut_int64 ()
 
 
 
-
 //! Checks Register::SetToSut() with a proper value from uint8_t
 //!
 void UT_Register::test_LastFromSut_uint8 ()
@@ -902,21 +925,7 @@ void UT_Register::test_LastFromSut_uint8 ()
   //
   auto checker = [](const auto& data)
   {
-    // ---------------- Setup
-    //
-    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
-    const auto expected = std::get<1>(data);
-
-    Register sut("Reg", initial, true);
-    uint8_t gotValue;
-
-    // ---------------- Exercise
-    //
-    sut.LastFromSut(gotValue);
-
-    // ---------------- Verify
-    //
-    TS_ASSERT_EQUALS (gotValue, expected);
+    Check_LastFromSut<uint8_t>(data);
   };
 
   auto data =
@@ -939,21 +948,7 @@ void UT_Register::test_LastFromSut_uint16 ()
   //
   auto checker = [](const auto& data)
   {
-    // ---------------- Setup
-    //
-    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
-    const auto expected = std::get<1>(data);
-
-    Register sut("Reg", initial, true);
-    uint16_t gotValue;
-
-    // ---------------- Exercise
-    //
-    sut.LastFromSut(gotValue);
-
-    // ---------------- Verify
-    //
-    TS_ASSERT_EQUALS (gotValue, expected);
+    Check_LastFromSut<uint16_t>(data);
   };
 
   auto data =
@@ -977,21 +972,7 @@ void UT_Register::test_LastFromSut_uint32 ()
   //
   auto checker = [](const auto& data)
   {
-    // ---------------- Setup
-    //
-    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
-    const auto expected = std::get<1>(data);
-
-    Register sut("Reg", initial, true);
-    uint32_t gotValue;
-
-    // ---------------- Exercise
-    //
-    sut.LastFromSut(gotValue);
-
-    // ---------------- Verify
-    //
-    TS_ASSERT_EQUALS (gotValue, expected);
+    Check_LastFromSut<uint32_t>(data);
   };
 
   auto data =
@@ -1014,21 +995,7 @@ void UT_Register::test_LastFromSut_uint64 ()
   //
   auto checker = [](const auto& data)
   {
-    // ---------------- Setup
-    //
-    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
-    const auto expected = std::get<1>(data);
-
-    Register sut("Reg", initial, true);
-    uint64_t gotValue;
-
-    // ---------------- Exercise
-    //
-    sut.LastFromSut(gotValue);
-
-    // ---------------- Verify
-    //
-    TS_ASSERT_EQUALS (gotValue, expected);
+    Check_LastFromSut<uint64_t>(data);
   };
 
   auto data =
@@ -1054,21 +1021,7 @@ void UT_Register::test_LastFromSut_int8 ()
   //
   auto checker = [](const auto& data)
   {
-    // ---------------- Setup
-    //
-    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
-    const auto expected = std::get<1>(data);
-
-    Register sut("Reg", initial, true);
-    int8_t gotValue;
-
-    // ---------------- Exercise
-    //
-    sut.LastFromSut(gotValue);
-
-    // ---------------- Verify
-    //
-    TS_ASSERT_EQUALS (gotValue, expected);
+    Check_LastFromSut<int8_t>(data);
   };
 
   auto data =
@@ -1092,21 +1045,7 @@ void UT_Register::test_LastFromSut_int16 ()
   //
   auto checker = [](const auto& data)
   {
-    // ---------------- Setup
-    //
-    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
-    const auto expected = std::get<1>(data);
-
-    Register sut("Reg", initial, true);
-    int16_t gotValue;
-
-    // ---------------- Exercise
-    //
-    sut.LastFromSut(gotValue);
-
-    // ---------------- Verify
-    //
-    TS_ASSERT_EQUALS (gotValue, expected);
+    Check_LastFromSut<int16_t>(data);
   };
 
   auto data =
@@ -1131,21 +1070,7 @@ void UT_Register::test_LastFromSut_int32 ()
   //
   auto checker = [](const auto& data)
   {
-    // ---------------- Setup
-    //
-    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
-    const auto expected = std::get<1>(data);
-
-    Register sut("Reg", initial, true);
-    int32_t gotValue;
-
-    // ---------------- Exercise
-    //
-    sut.LastFromSut(gotValue);
-
-    // ---------------- Verify
-    //
-    TS_ASSERT_EQUALS (gotValue, expected);
+    Check_LastFromSut<int32_t>(data);
   };
 
   auto data =
@@ -1169,21 +1094,7 @@ void UT_Register::test_LastFromSut_int64 ()
   //
   auto checker = [](const auto& data)
   {
-    // ---------------- Setup
-    //
-    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
-    const auto expected = std::get<1>(data);
-
-    Register sut("Reg", initial, true);
-    int64_t gotValue;
-
-    // ---------------- Exercise
-    //
-    sut.LastFromSut(gotValue);
-
-    // ---------------- Verify
-    //
-    TS_ASSERT_EQUALS (gotValue, expected);
+    Check_LastFromSut<int64_t>(data);
   };
 
   auto data =

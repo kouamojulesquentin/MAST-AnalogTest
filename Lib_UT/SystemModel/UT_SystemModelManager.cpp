@@ -234,6 +234,59 @@ std::shared_ptr<GenericAccessInterfaceProtocol> CreateGenericAccessInterfaceProt
 //  End of: CreateSut
 //---------------------------------------------------------------------------
 
+//! Checks SystemModelManager::iWrite() using same thread as SystemModelManager
+//!
+template<typename T> void Check_iWrite_SingleThread (T value, string_view expected)
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto reg  = sm.RegisterWithId(7u);
+
+  SystemModelManager sut(sm);
+  sut.iPrefix("TAP_DR_Mux.MIB_mux");
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.iWrite("dynamic_1", value));
+
+  // ---------------- Verify
+  //
+  auto expectedNextToSut = BinaryVector::CreateFromHexString(expected);
+
+  TS_ASSERT_EQUALS (reg->NextToSut(), expectedNextToSut);
+}
+//
+//  End of: Check_iWrite_SingleThread
+//---------------------------------------------------------------------------
+
+
+//! Checks SystemModelManager::iGet() using same thread as SystemModelManager
+//!
+template<typename T> void Check_iGet_SingleThread (string_view initialValue, T expected)
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto reg  = sm.RegisterWithId(7u);
+  reg->SetFromSut(BinaryVector::CreateFromHexString(initialValue));
+
+  SystemModelManager sut(sm);
+  sut.iPrefix("TAP_DR_Mux.MIB_mux");
+  T lastFromSut;
+
+  // ---------------- Exercise
+  //
+  sut.iGet("dynamic_1", lastFromSut);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (lastFromSut, expected);
+}
 } // End of unnamed namespace
 
 //! Initializes test (called for each test)
@@ -1085,31 +1138,18 @@ void UT_SystemModelManager::test_iPrefix_Thread_is_Unknown ()
 }
 
 
+
 //! Checks SystemModelManager::iGet() using same thread as SystemModelManager
 //!
-void UT_SystemModelManager::test_iGet_Thread_is_SystemModelManager ()
-{
-  // ---------------- Setup
-  //
-  SystemModel sm;
-  Create_TestCase_MIB_Multichain_Pre(sm);
-
-  auto reg  = sm.RegisterWithId(7u);
-  reg->SetFromSut(BinaryVector::CreateFromHexString("ABCD_0123"));
-
-  SystemModelManager sut(sm);
-  sut.iPrefix("TAP_DR_Mux.MIB_mux");
-
-  // ---------------- Exercise
-  //
-  auto lastFromSut = sut.iGet("dynamic_1");
-
-  // ---------------- Verify
-  //
-  auto expected = BinaryVector::CreateFromHexString("ABCD_0123");
-  TS_ASSERT_EQUALS (lastFromSut, expected);
-}
-
+void UT_SystemModelManager::test_iGet_Thread_SingleThread_BinaryVector () { Check_iGet_SingleThread("ABCD_4567", BinaryVector::CreateFromHexString("ABCD_4567")); }
+void UT_SystemModelManager::test_iGet_Thread_SingleThread_uint8        () { Check_iGet_SingleThread("0000_007B", uint8_t(123));          }
+void UT_SystemModelManager::test_iGet_Thread_SingleThread_uint16       () { Check_iGet_SingleThread("0000_3039", uint16_t(12345));       }
+void UT_SystemModelManager::test_iGet_Thread_SingleThread_uint32       () { Check_iGet_SingleThread("0012_D687", uint32_t(1234567L));    }
+void UT_SystemModelManager::test_iGet_Thread_SingleThread_uint64       () { Check_iGet_SingleThread("075B_CD15", uint64_t(123456789LL)); }
+void UT_SystemModelManager::test_iGet_Thread_SingleThread_int8         () { Check_iGet_SingleThread("FFFF_FF85", int8_t(-123));          }
+void UT_SystemModelManager::test_iGet_Thread_SingleThread_int16        () { Check_iGet_SingleThread("FFFF_CFC7", int16_t(-12345));       }
+void UT_SystemModelManager::test_iGet_Thread_SingleThread_int32        () { Check_iGet_SingleThread("FFED_2979", int32_t(-1234567L));    }
+void UT_SystemModelManager::test_iGet_Thread_SingleThread_int64        () { Check_iGet_SingleThread("F8A4_32EB", int64_t(-123456789LL)); }
 
 //! Checks SystemModelManager::iGet() using thread managed (known) by SystemModelManager
 //!
@@ -1190,28 +1230,16 @@ void UT_SystemModelManager::test_iGet_Thread_is_Unknown ()
 
 //! Checks SystemModelManager::iWrite() using same thread as SystemModelManager
 //!
-void UT_SystemModelManager::test_iWrite_Thread_is_SystemModelManager ()
-{
-  // ---------------- Setup
-  //
-  SystemModel sm;
-  Create_TestCase_MIB_Multichain_Pre(sm);
+void UT_SystemModelManager::test_iWrite_Thread_SingleThread_BinaryVector () { Check_iWrite_SingleThread(BinaryVector::CreateFromHexString("ABCD_4567"), "ABCD_4567"); }
+void UT_SystemModelManager::test_iWrite_Thread_SingleThread_uint8        () { Check_iWrite_SingleThread(uint8_t(123),          "0000_007B"); }
+void UT_SystemModelManager::test_iWrite_Thread_SingleThread_uint16       () { Check_iWrite_SingleThread(uint16_t(12345),       "0000_3039"); }
+void UT_SystemModelManager::test_iWrite_Thread_SingleThread_uint32       () { Check_iWrite_SingleThread(uint32_t(1234567L),    "0012_D687"); }
+void UT_SystemModelManager::test_iWrite_Thread_SingleThread_uint64       () { Check_iWrite_SingleThread(uint64_t(123456789LL), "075B_CD15"); }
+void UT_SystemModelManager::test_iWrite_Thread_SingleThread_int8         () { Check_iWrite_SingleThread(int8_t(-123),          "FFFF_FF85"); }
+void UT_SystemModelManager::test_iWrite_Thread_SingleThread_int16        () { Check_iWrite_SingleThread(int16_t(-12345),       "FFFF_CFC7"); }
+void UT_SystemModelManager::test_iWrite_Thread_SingleThread_int32        () { Check_iWrite_SingleThread(int32_t(-1234567L),    "FFED_2979"); }
+void UT_SystemModelManager::test_iWrite_Thread_SingleThread_int64        () { Check_iWrite_SingleThread(int64_t(-123456789LL), "F8A4_32EB"); }
 
-  auto reg  = sm.RegisterWithId(7u);
-
-  SystemModelManager sut(sm);
-  sut.iPrefix("TAP_DR_Mux.MIB_mux");
-
-  auto nextToSut = BinaryVector::CreateFromHexString("ABCD_4567");
-
-  // ---------------- Exercise
-  //
-  TS_ASSERT_THROWS_NOTHING (sut.iWrite("dynamic_1", nextToSut));
-
-  // ---------------- Verify
-  //
-  TS_ASSERT_EQUALS (reg->NextToSut(), nextToSut);
-}
 
 
 //! Checks SystemModelManager::iWrite() using thread managed (known) by SystemModelManager

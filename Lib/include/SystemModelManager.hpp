@@ -105,7 +105,21 @@ class DLL_EXPORT SystemModelManager final
 
   //! Returns last Register value read from SUT
   //!
-  BinaryVector iGet (string_view registerPath);
+  void         iGet (string_view registerPath, uint8_t&      readData);
+  void         iGet (string_view registerPath, uint16_t&     readData);
+  void         iGet (string_view registerPath, uint32_t&     readData);
+  void         iGet (string_view registerPath, uint64_t&     readData);
+  void         iGet (string_view registerPath, int8_t&       readData);
+  void         iGet (string_view registerPath, int16_t&      readData);
+  void         iGet (string_view registerPath, int32_t&      readData);
+  void         iGet (string_view registerPath, int64_t&      readData);
+  void         iGet (string_view registerPath, BinaryVector& readData);
+  BinaryVector iGet (string_view registerPath)
+  {
+    BinaryVector readData;
+    iGet(registerPath, readData);
+    return std::move(readData);
+  }
 
   //! Queues data to be read from SUT
   //!
@@ -113,7 +127,15 @@ class DLL_EXPORT SystemModelManager final
 
   //! Sets next Register value to sent to SUT
   //!
-  void iWrite (string_view registerPath, BinaryVector sequence);
+  void iWrite (string_view registerPath, BinaryVector value);
+  void iWrite (string_view registerPath, uint8_t      value);
+  void iWrite (string_view registerPath, uint16_t     value);
+  void iWrite (string_view registerPath, uint32_t     value);
+  void iWrite (string_view registerPath, uint64_t     value);
+  void iWrite (string_view registerPath, int8_t       value);
+  void iWrite (string_view registerPath, int16_t      value);
+  void iWrite (string_view registerPath, int32_t      value);
+  void iWrite (string_view registerPath, int64_t      value);
 
   //! Returns current maximum time between an iApply and the next data cycle
   //!
@@ -143,6 +165,9 @@ class DLL_EXPORT SystemModelManager final
   private:
 
   using NodeIdentifier = SystemModelNode::NodeIdentifier;
+
+  template<typename T> void iGet_impl   (string_view registerPath, T& readData);
+  template<typename T> void iWrite_impl (string_view registerPath, T  value);
 
   struct ApplicationData
   {

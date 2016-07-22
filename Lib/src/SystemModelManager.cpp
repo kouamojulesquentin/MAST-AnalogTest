@@ -21,6 +21,7 @@
 #include "SystemModelManagerMonitor.hpp"
 #include "g3log/g3log.hpp"
 
+#include <utility>
 using std::shared_ptr;
 using std::make_shared;
 using std::dynamic_pointer_cast;
@@ -352,21 +353,29 @@ void SystemModelManager::iApply ()
 
 //! Returns last read value from specified register
 //!
-BinaryVector SystemModelManager::iGet (string_view registerPath)
+template<typename T>
+void SystemModelManager::iGet_impl (string_view registerPath, T& readData)
 {
   auto& pathResolver = PATH_RESOLVER("iGet: ");
   auto reg           = pathResolver.ResolveAsRegister(registerPath);
 
   unique_lock<recursive_mutex> lock(m_dataMutex); // We must protect for the register been updated just when we read it
 
-  auto readData = reg->LastFromSut();
-
-  return readData;
+  reg->LastFromSut(readData);
 }
 //
 //  End of: SystemModelManager::iGet
 //---------------------------------------------------------------------------
 
+void SystemModelManager::iGet (string_view registerPath, BinaryVector& readData) { iGet_impl(registerPath, readData); }
+void SystemModelManager::iGet (string_view registerPath, uint8_t&      readData) { iGet_impl(registerPath, readData); }
+void SystemModelManager::iGet (string_view registerPath, uint16_t&     readData) { iGet_impl(registerPath, readData); }
+void SystemModelManager::iGet (string_view registerPath, uint32_t&     readData) { iGet_impl(registerPath, readData); }
+void SystemModelManager::iGet (string_view registerPath, uint64_t&     readData) { iGet_impl(registerPath, readData); }
+void SystemModelManager::iGet (string_view registerPath, int8_t&       readData) { iGet_impl(registerPath, readData); }
+void SystemModelManager::iGet (string_view registerPath, int16_t&      readData) { iGet_impl(registerPath, readData); }
+void SystemModelManager::iGet (string_view registerPath, int32_t&      readData) { iGet_impl(registerPath, readData); }
+void SystemModelManager::iGet (string_view registerPath, int64_t&      readData) { iGet_impl(registerPath, readData); }
 
 
 //! Returns current path prefix for current thread
@@ -424,7 +433,8 @@ void SystemModelManager::iRead (string_view registerPath, BinaryVector expectedV
 
 //! Sets next Register value to sent to SUT
 //!
-void SystemModelManager::iWrite (string_view registerPath, BinaryVector sequence)
+template<typename T>
+void SystemModelManager::iWrite_impl (string_view registerPath, T value)
 {
   auto& pathResolver = PATH_RESOLVER("iWrite: ");
   auto  reg          = pathResolver.ResolveAsRegister(registerPath);
@@ -437,7 +447,7 @@ void SystemModelManager::iWrite (string_view registerPath, BinaryVector sequence
 
   LOG(DEBUG) << "iWrite - After mutex";
 
-  reg->SetToSut(std::move(sequence));
+  reg->SetToSut(std::move(value));
 
   // ---------------- Save the fact that application thread request an operation on that register
   //
@@ -453,9 +463,22 @@ void SystemModelManager::iWrite (string_view registerPath, BinaryVector sequence
   LOG(DEBUG) << "iWrite - Exiting";
 }
 //
-//  End of: SystemModelManager::iWrite
+//  End of: SystemModelManager::iWrite_impl
 //---------------------------------------------------------------------------
 
+
+//! Sets next Register value to sent to SUT
+//!
+void SystemModelManager::iWrite (string_view registerPath, BinaryVector value) { iWrite_impl(registerPath, std::move(value)); }
+
+void SystemModelManager::iWrite (string_view registerPath, uint8_t  value) { iWrite_impl(registerPath, value); }
+void SystemModelManager::iWrite (string_view registerPath, uint16_t value) { iWrite_impl(registerPath, value); }
+void SystemModelManager::iWrite (string_view registerPath, uint32_t value) { iWrite_impl(registerPath, value); }
+void SystemModelManager::iWrite (string_view registerPath, uint64_t value) { iWrite_impl(registerPath, value); }
+void SystemModelManager::iWrite (string_view registerPath, int8_t   value) { iWrite_impl(registerPath, value); }
+void SystemModelManager::iWrite (string_view registerPath, int16_t  value) { iWrite_impl(registerPath, value); }
+void SystemModelManager::iWrite (string_view registerPath, int32_t  value) { iWrite_impl(registerPath, value); }
+void SystemModelManager::iWrite (string_view registerPath, int64_t  value) { iWrite_impl(registerPath, value); }
 
 //! Runs data cyles when some application thread(s) are pending (in iApply)
 //!

@@ -163,10 +163,14 @@ class DLL_EXPORT BinaryVector final
 
   // ---------------- Private  Methods
   //
-  bool FixedSize() const { return m_sizeProperty == SizeProperty::Fixed; }
   void MaskLastByte ();
-  uint8_t MergeToByte (uint32_t lsbOffset, uint8_t lsbBitsCount, bool asSigned = false) const;
-  bool    IsNegative() const { return (m_data[0] & 0x80) != 0; }
+  uint8_t                   MergeToByte (uint32_t lsbOffset, uint8_t lsbBitsCount, bool asSigned = false) const;
+  template<typename T> void SetUnsigned (T value);
+  template<typename T> void SetSigned   (T value);
+
+  bool FixedSize()  const { return m_sizeProperty == SizeProperty::Fixed; }
+  bool IsNegative() const { return (m_data[0] & 0x80) != 0; }
+
 
   uint8_t LastByteBitsCount() const
   {
@@ -178,39 +182,6 @@ class DLL_EXPORT BinaryVector final
     return bitsCount;
   }
 
-
-  //! Sets from N bits
-  //!
-  template<typename T, typename UT>
-  void Set (T value)
-  {
-    auto constexpr valueBitsCount   = uint32_t(8u * sizeof(value));
-    auto           initialBitsCount = m_usedBits;
-
-    Clear();
-
-    if (!FixedSize() || (initialBitsCount == 0))
-    {
-      Append(static_cast<UT>(value));
-    }
-    else
-    {
-      m_sizeProperty = SizeProperty::NotFixed;
-
-      auto bitsCountToAppend = initialBitsCount;
-
-      if (initialBitsCount > valueBitsCount)
-      {
-        auto msbCount = initialBitsCount - valueBitsCount;
-
-        AppendBits(value < 0, msbCount);
-        bitsCountToAppend = valueBitsCount;
-      }
-
-      Append(static_cast<UT>(value), bitsCountToAppend);
-      m_sizeProperty = SizeProperty::Fixed;
-    }
-  }
 
 
   // ---------------- Private  Fields

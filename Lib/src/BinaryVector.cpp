@@ -78,7 +78,7 @@ namespace
     0b1111, // 4 bits
   };
 
-  static const std::array<uint8_t, 8> BIT_MASK_8 =
+  constexpr std::array<uint8_t, 8> BIT_MASK_8 =
   {
     0b10000000,  // 00
     0b01000000,  // 01
@@ -1637,13 +1637,82 @@ BinaryVector& BinaryVector::AppendBits (bool bitIsOne, uint32_t count)
 //  End of: BinaryVector::AppendBits
 //---------------------------------------------------------------------------
 
+//! Sets from N signed bits
+//!
+template<typename T>
+void BinaryVector::SetSigned (T value)
+{
+  static_assert(std::is_signed<T>::value, "Must only be called for signed value as it includes sign bit extension");
+  auto constexpr valueBitsCount   = uint32_t(8u * sizeof(value));
+  auto           initialBitsCount = m_usedBits;
+
+  Clear();
+
+  if (!FixedSize() || (initialBitsCount == 0))
+  {
+    Append(static_cast<std::make_unsigned_t<T>>(value));
+  }
+  else
+  {
+    m_sizeProperty = SizeProperty::NotFixed;
+
+    auto bitsCountToAppend = initialBitsCount;
+
+    if (initialBitsCount > valueBitsCount)
+    {
+      auto msbCount = initialBitsCount - valueBitsCount;
+
+      AppendBits(value < 0, msbCount);
+      bitsCountToAppend = valueBitsCount;
+    }
+
+    Append(static_cast<std::make_unsigned_t<T>>(value), bitsCountToAppend);
+    m_sizeProperty = SizeProperty::Fixed;
+  }
+}
+
+
+//! Sets from N unsigned bits
+//!
+template<typename T>
+void BinaryVector::SetUnsigned (T value)
+{
+  static_assert(std::is_unsigned<T>::value, "Must only be called for unsigned value as it DOES NOT includes sign bit extension");
+
+  auto constexpr valueBitsCount   = uint32_t(8u * sizeof(value));
+  auto           initialBitsCount = m_usedBits;
+
+  Clear();
+
+  if (!FixedSize() || (initialBitsCount == 0))
+  {
+    Append(value);
+  }
+  else
+  {
+    m_sizeProperty = SizeProperty::NotFixed;
+
+    auto bitsCountToAppend = initialBitsCount;
+
+    if (initialBitsCount > valueBitsCount)
+    {
+      auto msbCount = initialBitsCount - valueBitsCount;
+
+      AppendBits(false, msbCount);
+      bitsCountToAppend = valueBitsCount;
+    }
+
+    Append(value, bitsCountToAppend);
+    m_sizeProperty = SizeProperty::Fixed;
+  }
+}
 
 
 //! Sets from 8 bits
 //!
 void BinaryVector::Set (int8_t value)
 {
-  Set<int8_t, uint8_t>(value);
+  SetSigned(value);
 }
 //
 //  End of: BinaryVector::Set
@@ -1654,7 +1723,7 @@ void BinaryVector::Set (int8_t value)
 //!
 void BinaryVector::Set (int16_t value)
 {
-  Set<int16_t, uint16_t>(value);
+  SetSigned(value);
 }
 //
 //  End of: BinaryVector::Set
@@ -1665,7 +1734,7 @@ void BinaryVector::Set (int16_t value)
 //!
 void BinaryVector::Set (int32_t value)
 {
-  Set<int32_t, uint32_t>(value);
+  SetSigned(value);
 }
 //
 //  End of: BinaryVector::Set
@@ -1676,7 +1745,7 @@ void BinaryVector::Set (int32_t value)
 //!
 void BinaryVector::Set (int64_t value)
 {
-  Set<int64_t, uint64_t>(value);
+  SetSigned(value);
 }
 //
 //  End of: BinaryVector::Set
@@ -1687,8 +1756,7 @@ void BinaryVector::Set (int64_t value)
 //!
 void BinaryVector::Set (uint8_t value)
 {
-  Clear();
-  Append(value);
+  SetUnsigned(value);
 }
 //
 //  End of: BinaryVector::Set
@@ -1699,9 +1767,7 @@ void BinaryVector::Set (uint8_t value)
 //!
 void BinaryVector::Set (uint16_t value)
 {
-  CHECK_FIXED_SIZE_ASSIGNMENT(8u * sizeof(value));
-  Clear();
-  Append(value);
+  SetUnsigned(value);
 }
 //
 //  End of: BinaryVector::Set
@@ -1711,9 +1777,7 @@ void BinaryVector::Set (uint16_t value)
 //!
 void BinaryVector::Set (uint32_t value)
 {
-  CHECK_FIXED_SIZE_ASSIGNMENT(8u * sizeof(value));
-  Clear();
-  Append(value);
+  SetUnsigned(value);
 }
 //
 //  End of: BinaryVector::Set
@@ -1724,9 +1788,7 @@ void BinaryVector::Set (uint32_t value)
 //!
 void BinaryVector::Set (uint64_t value)
 {
-  CHECK_FIXED_SIZE_ASSIGNMENT(8u * sizeof(value));
-  Clear();
-  Append(value);
+  SetUnsigned(value);
 }
 //
 //  End of: BinaryVector::Set

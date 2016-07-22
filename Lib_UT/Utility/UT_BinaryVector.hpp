@@ -120,6 +120,21 @@ class UT_BinaryVector : public CxxTest::TestSuite
 
   // ---------------- Set
   //
+  void test_Set_uint_8_When_Empty ();
+  void test_Set_uint_16_When_Empty ();
+  void test_Set_uint_32_When_Empty ();
+  void test_Set_uint_64_When_Empty ();
+
+  void test_Set_uint_8_When_NotEmpty_Not_Fixed ();
+  void test_Set_uint_16_When_NotEmpty_Not_Fixed ();
+  void test_Set_uint_32_When_NotEmpty_Not_Fixed ();
+  void test_Set_uint_64_When_NotEmpty_Not_Fixed ();
+
+  void test_Set_uint_8_When_NotEmpty_Fixed ();
+  void test_Set_uint_16_When_NotEmpty_Fixed ();
+  void test_Set_uint_32_When_NotEmpty_Fixed ();
+  void test_Set_uint_64_When_NotEmpty_Fixed ();
+
   void test_Set_int_8_When_Empty ();
   void test_Set_int_16_When_Empty ();
   void test_Set_int_32_When_Empty ();

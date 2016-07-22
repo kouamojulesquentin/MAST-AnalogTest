@@ -77,6 +77,34 @@ class DLL_EXPORT Register : public SystemModelNode
   }
 
 
+  //! Returns last sequence received from SUT as integral value
+  //!
+  template<typename T> void LastFromSut (T& value) const
+  {
+    static_assert(std::is_integral<T>::value, "LastFromSut requires integral types");
+    m_lastToSut.Get(value);
+  }
+
+  //! Sets expected sequence (when updating from SUT) from integral value
+  //!
+  template<typename T> void SetExpectedFromSut (T newValue)
+  {
+    static_assert(std::is_integral<T>::value, "SetExpectedFromSut requires BinaryVector or integral types");
+    m_expectedFromSut.Set(newValue);
+  }
+
+  //! Sets the bits sequence to send during the next iApply cycle from integral value
+  //!
+  template <typename T> void SetToSut (T newValue)
+  {
+    static_assert(std::is_integral <T>::value, "SetToSut requires BinaryVector or integral types");
+    m_nextToSut.Set(newValue);
+
+    if (m_holdValue)
+    {
+      m_bypass.Set(newValue);
+    }
+  }
 
 
   void SetCheckExpected   (bool checkExpected) { m_mustCheckExpected  = checkExpected; } //!< Sets whether data updated from SUT must be check agains expected data

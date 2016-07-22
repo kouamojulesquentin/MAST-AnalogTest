@@ -16,6 +16,11 @@
 #include "Register.hpp"
 #include "BinaryVector_Traits.hpp"
 
+#include <tuple>
+
+using std::tuple;
+using std::make_tuple;
+
 using namespace mast;
 
 
@@ -137,6 +142,8 @@ void UT_Register::test_SetToSut_DifferentSize ()
   //
   TS_ASSERT_THROWS (sut.SetToSut(newValue), std::exception);
 }
+
+
 
 //! Checks Register::SetExpectedFromSut() with a proper value
 //!
@@ -262,6 +269,936 @@ void UT_Register::test_UpdateLastToSut ()
   //
   TS_ASSERT_EQUALS (sut.LastToSut(), newValue);
 }
+
+
+//! Checks Register::SetToSut() with a proper value from uint8_t
+//!
+void UT_Register::test_SetToSut_uint8 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto newValue = std::get<1>(data);
+    const auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    Register sut("Reg", initial, true);
+
+    // ---------------- Exercise
+    //
+    sut.SetToSut(newValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.NextToSut(), expected);
+    TS_ASSERT_EQUALS (sut.LastToSut(), initial);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0000",    uint8_t(5u),  "0:0101"),
+    make_tuple("0:0000",    uint8_t(25u), "1:1001"),
+    make_tuple("0000:0000", uint8_t(25u), "0001:1001"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Register::SetToSut() with a proper value from uint16_t
+//!
+void UT_Register::test_SetToSut_uint16 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto newValue = std::get<1>(data);
+    const auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    Register sut("Reg", initial, true);
+
+    // ---------------- Exercise
+    //
+    sut.SetToSut(newValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.NextToSut(), expected);
+    TS_ASSERT_EQUALS (sut.LastToSut(), initial);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0000",                uint16_t(5u),         "0:0101"),
+    make_tuple("1|1111:1111_1111:1111", uint16_t(25u),        "0|0000:0000_0001:1001"),
+    make_tuple("0000:0000_0000:0000",   uint16_t(UINT16_MAX), "1111:1111_1111:1111"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Register::SetToSut() with a proper value from uint32_t
+//!
+void UT_Register::test_SetToSut_uint32 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto newValue = std::get<1>(data);
+    const auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    Register sut("Reg", initial, true);
+
+    // ---------------- Exercise
+    //
+    sut.SetToSut(newValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.NextToSut(), expected);
+    TS_ASSERT_EQUALS (sut.LastToSut(), initial);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0000",    uint32_t(5u),  "0:0101"),
+    make_tuple("0:0000",    uint32_t(25u), "1:1001"),
+    make_tuple("111||1111:1111_1111:1111|111:1111_1111:1111", uint32_t(123456789u), "000||0000:1110_1011:0111|100:1101_0001:0101"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Register::SetToSut() with a proper value from uint64_t
+//!
+void UT_Register::test_SetToSut_uint64 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto newValue = std::get<1>(data);
+    const auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    Register sut("Reg", initial, true);
+
+    // ---------------- Exercise
+    //
+    sut.SetToSut(newValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.NextToSut(), expected);
+    TS_ASSERT_EQUALS (sut.LastToSut(), initial);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0000",                                                      uint64_t(5u),                "0:0101"),
+    make_tuple("0:0000",                                                      uint64_t(25u),               "1:1001"),
+    make_tuple("0000:0000",                                                   uint64_t(25u),               "0001:1001"),
+    make_tuple("1111:1111_1111:1111|1111:1111_1111:1111-1111:1111_1111:1111", uint64_t(33012345678933ULL), "0001:1110:0000:0110|0100:1001_0010:0011-0010:1100_0101:0101"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Register::SetToSut() with a proper value from int8_t
+//!
+void UT_Register::test_SetToSut_int8 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto newValue = std::get<1>(data);
+    const auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    Register sut("Reg", initial, true);
+
+    // ---------------- Exercise
+    //
+    sut.SetToSut(newValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.NextToSut(), expected);
+    TS_ASSERT_EQUALS (sut.LastToSut(), initial);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0000",    int8_t(5),   "0:0101"),
+    make_tuple("0:0000",    int8_t(25),  "1:1001"),
+    make_tuple("0000:0000", int8_t(-25), "1110:0111"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Register::SetToSut() with a proper value from int16_t
+//!
+void UT_Register::test_SetToSut_int16 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto newValue = std::get<1>(data);
+    const auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    Register sut("Reg", initial, true);
+
+    // ---------------- Exercise
+    //
+    sut.SetToSut(newValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.NextToSut(), expected);
+    TS_ASSERT_EQUALS (sut.LastToSut(), initial);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0000",                int16_t(5),         "0:0101"),
+    make_tuple("1|1111:1111_1111:1111", int16_t(-25),       "1|1111:1111_1110:0111"),
+    make_tuple("0000:0000_0000:0000",   int16_t(INT16_MIN), "1000:0000_0000:0000"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Register::SetToSut() with a proper value from int32_t
+//!
+void UT_Register::test_SetToSut_int32 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto newValue = std::get<1>(data);
+    const auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    Register sut("Reg", initial, true);
+
+    // ---------------- Exercise
+    //
+    sut.SetToSut(newValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.NextToSut(), expected);
+    TS_ASSERT_EQUALS (sut.LastToSut(), initial);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0000",                                       int32_t(5L),          "0:0101"),
+    make_tuple("00:0000",                                      int32_t(-25L),        "10:0111"),
+    make_tuple("111||1111:1111_1111:1111|1111:1111_1111:1111", int32_t(-123456789L), "111||1111:1000_1010:0100|0011:0010_1110:1011"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Register::SetToSut() with a proper value from int64_t
+//!
+void UT_Register::test_SetToSut_int64 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto newValue = std::get<1>(data);
+    const auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    Register sut("Reg", initial, true);
+
+    // ---------------- Exercise
+    //
+    sut.SetToSut(newValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.NextToSut(), expected);
+    TS_ASSERT_EQUALS (sut.LastToSut(), initial);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0000",                                                      int64_t(5LL),               "0:0101"),
+    make_tuple("000:0000",                                                    int64_t(-25LL),             "110:0111"),
+    make_tuple("1111:1111_1111:1111|1111:1111_1111:1111-1111:1111_1111:1111", int64_t(-33012345678933LL), "1110:0001_1111:1001|1011:0110_1101:1100-1101:0011_1010:1011"),
+
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Register::SetExpectedFromSut() with a proper value from uint8_t
+//!
+void UT_Register::test_SetExpectedFromSut_uint8 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto newValue = std::get<1>(data);
+    const auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    Register sut("Reg", initial, true);
+
+    // ---------------- Exercise
+    //
+    sut.SetExpectedFromSut(newValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.ExpectedFromSut(), expected);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0000",    uint8_t(5u),  "0:0101"),
+    make_tuple("0:0000",    uint8_t(25u), "1:1001"),
+    make_tuple("0000:0000", uint8_t(25u), "0001:1001"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Register::SetExpectedFromSut() with a proper value from uint16_t
+//!
+void UT_Register::test_SetExpectedFromSut_uint16 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto newValue = std::get<1>(data);
+    const auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    Register sut("Reg", initial, true);
+
+    // ---------------- Exercise
+    //
+    sut.SetExpectedFromSut(newValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.ExpectedFromSut(), expected);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0000",                uint16_t(5u),         "0:0101"),
+    make_tuple("1|1111:1111_1111:1111", uint16_t(25u),        "0|0000:0000_0001:1001"),
+    make_tuple("0000:0000_0000:0000",   uint16_t(UINT16_MAX), "1111:1111_1111:1111"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Register::SetExpectedFromSut() with a proper value from uint32_t
+//!
+void UT_Register::test_SetExpectedFromSut_uint32 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto newValue = std::get<1>(data);
+    const auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    Register sut("Reg", initial, true);
+
+    // ---------------- Exercise
+    //
+    sut.SetExpectedFromSut(newValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.ExpectedFromSut(), expected);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0000",    uint32_t(5u),  "0:0101"),
+    make_tuple("0:0000",    uint32_t(25u), "1:1001"),
+    make_tuple("111||1111:1111_1111:1111|111:1111_1111:1111", uint32_t(123456789u), "000||0000:1110_1011:0111|100:1101_0001:0101"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Register::SetExpectedFromSut() with a proper value from uint64_t
+//!
+void UT_Register::test_SetExpectedFromSut_uint64 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto newValue = std::get<1>(data);
+    const auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    Register sut("Reg", initial, true);
+
+    // ---------------- Exercise
+    //
+    sut.SetExpectedFromSut(newValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.ExpectedFromSut(), expected);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0000",                                                      uint64_t(5u),                "0:0101"),
+    make_tuple("0:0000",                                                      uint64_t(25u),               "1:1001"),
+    make_tuple("0000:0000",                                                   uint64_t(25u),               "0001:1001"),
+    make_tuple("1111:1111_1111:1111|1111:1111_1111:1111-1111:1111_1111:1111", uint64_t(33012345678933ULL), "0001:1110:0000:0110|0100:1001_0010:0011-0010:1100_0101:0101"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Register::SetExpectedFromSut() with a proper value from int8_t
+//!
+void UT_Register::test_SetExpectedFromSut_int8 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto newValue = std::get<1>(data);
+    const auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    Register sut("Reg", initial, true);
+
+    // ---------------- Exercise
+    //
+    sut.SetExpectedFromSut(newValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.ExpectedFromSut(), expected);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0000",    int8_t(5),   "0:0101"),
+    make_tuple("0:0000",    int8_t(25),  "1:1001"),
+    make_tuple("0000:0000", int8_t(-25), "1110:0111"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Register::SetExpectedFromSut() with a proper value from int16_t
+//!
+void UT_Register::test_SetExpectedFromSut_int16 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto newValue = std::get<1>(data);
+    const auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    Register sut("Reg", initial, true);
+
+    // ---------------- Exercise
+    //
+    sut.SetExpectedFromSut(newValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.ExpectedFromSut(), expected);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0000",                int16_t(5),         "0:0101"),
+    make_tuple("1|1111:1111_1111:1111", int16_t(-25),       "1|1111:1111_1110:0111"),
+    make_tuple("0000:0000_0000:0000",   int16_t(INT16_MIN), "1000:0000_0000:0000"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Register::SetExpectedFromSut() with a proper value from int32_t
+//!
+void UT_Register::test_SetExpectedFromSut_int32 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto newValue = std::get<1>(data);
+    const auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    Register sut("Reg", initial, true);
+
+    // ---------------- Exercise
+    //
+    sut.SetExpectedFromSut(newValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.ExpectedFromSut(), expected);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0000",                                       int32_t(5L),          "0:0101"),
+    make_tuple("00:0000",                                      int32_t(-25L),        "10:0111"),
+    make_tuple("111||1111:1111_1111:1111|1111:1111_1111:1111", int32_t(-123456789L), "111||1111:1000_1010:0100|0011:0010_1110:1011"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Register::SetExpectedFromSut() with a proper value from int64_t
+//!
+void UT_Register::test_SetExpectedFromSut_int64 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto newValue = std::get<1>(data);
+    const auto expected = BinaryVector::CreateFromBinaryString(std::get<2>(data));
+
+    Register sut("Reg", initial, true);
+
+    // ---------------- Exercise
+    //
+    sut.SetExpectedFromSut(newValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.ExpectedFromSut(), expected);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0000",                                                      int64_t(5LL),               "0:0101"),
+    make_tuple("000:0000",                                                    int64_t(-25LL),             "110:0111"),
+    make_tuple("1111:1111_1111:1111|1111:1111_1111:1111-1111:1111_1111:1111", int64_t(-33012345678933LL), "1110:0001_1111:1001|1011:0110_1101:1100-1101:0011_1010:1011"),
+
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+
+
+
+//! Checks Register::SetToSut() with a proper value from uint8_t
+//!
+void UT_Register::test_LastFromSut_uint8 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto expected = std::get<1>(data);
+
+    Register sut("Reg", initial, true);
+    uint8_t gotValue;
+
+    // ---------------- Exercise
+    //
+    sut.LastFromSut(gotValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (gotValue, expected);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0101",        uint8_t(5)),
+    make_tuple("000|0111:1011", uint8_t(123)),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Register::SetToSut() with a proper value from uint16_t
+//!
+void UT_Register::test_LastFromSut_uint16 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto expected = std::get<1>(data);
+
+    Register sut("Reg", initial, true);
+    uint16_t gotValue;
+
+    // ---------------- Exercise
+    //
+    sut.LastFromSut(gotValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (gotValue, expected);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0101",                   uint16_t(5)),
+    make_tuple("000|0011:0000_0011:1001", uint16_t(12345)),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+
+//! Checks Register::SetToSut() with a proper value from uint32_t
+//!
+void UT_Register::test_LastFromSut_uint32 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto expected = std::get<1>(data);
+
+    Register sut("Reg", initial, true);
+    uint32_t gotValue;
+
+    // ---------------- Exercise
+    //
+    sut.LastFromSut(gotValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (gotValue, expected);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0101",                                uint32_t(5L)),
+    make_tuple("00:0111_0101:1011|1100:1101_0001:0101", uint32_t(123456789L)),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Register::SetToSut() with a proper value from uint64_t
+//!
+void UT_Register::test_LastFromSut_uint64 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto expected = std::get<1>(data);
+
+    Register sut("Reg", initial, true);
+    uint64_t gotValue;
+
+    // ---------------- Exercise
+    //
+    sut.LastFromSut(gotValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (gotValue, expected);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0101",                                                      uint64_t(5ULL)),
+    make_tuple("0001:1110:0000:0110|0100:1001_0010:0011-0010:1100_0101:0101", uint64_t(33012345678933ULL)),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+
+
+
+//! Checks Register::SetToSut() with a proper value from int8_t
+//!
+void UT_Register::test_LastFromSut_int8 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto expected = std::get<1>(data);
+
+    Register sut("Reg", initial, true);
+    int8_t gotValue;
+
+    // ---------------- Exercise
+    //
+    sut.LastFromSut(gotValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (gotValue, expected);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0101",        int8_t(5)),
+    make_tuple("110:0111",      int8_t(-25)),
+    make_tuple("111|1000:0101", int8_t(-123)),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Register::SetToSut() with a proper value from int16_t
+//!
+void UT_Register::test_LastFromSut_int16 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto expected = std::get<1>(data);
+
+    Register sut("Reg", initial, true);
+    int16_t gotValue;
+
+    // ---------------- Exercise
+    //
+    sut.LastFromSut(gotValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (gotValue, expected);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0101",                   int16_t(5)),
+    make_tuple("110:0111",                 int16_t(-25)),
+    make_tuple("111||1100:1111_1100:0111", int16_t(-12345)),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+
+//! Checks Register::SetToSut() with a proper value from int32_t
+//!
+void UT_Register::test_LastFromSut_int32 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto expected = std::get<1>(data);
+
+    Register sut("Reg", initial, true);
+    int32_t gotValue;
+
+    // ---------------- Exercise
+    //
+    sut.LastFromSut(gotValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (gotValue, expected);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0101",                                       int32_t(5L)),
+    make_tuple("110:0111",                                     int32_t(-25L)),
+    make_tuple("111||1111:1000_1010:0100|0011:0010_1110:1011", int32_t(-123456789L)),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Register::SetToSut() with a proper value from int64_t
+//!
+void UT_Register::test_LastFromSut_int64 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto initial  = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    const auto expected = std::get<1>(data);
+
+    Register sut("Reg", initial, true);
+    int64_t gotValue;
+
+    // ---------------- Exercise
+    //
+    sut.LastFromSut(gotValue);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (gotValue, expected);
+  };
+
+  auto data =
+  {
+    make_tuple("0:0101",                                                      int64_t(5LL)),
+    make_tuple("110:0111",                                                    int64_t(-25LL)),
+    make_tuple("1110:0001_1111:1001|1011:0110_1101:1100-1101:0011_1010:1011", int64_t(-33012345678933LL)),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
 
 //! Checks Register::ResetMismatches()
 //!

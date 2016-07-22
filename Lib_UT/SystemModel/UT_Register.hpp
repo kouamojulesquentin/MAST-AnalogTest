@@ -41,6 +41,7 @@ class UT_Register : public CxxTest::TestSuite
   void test_SetToSut ();
   void test_SetToSut_DifferentSize ();
 
+
   void test_SetExpectedFromSut ();
   void test_SetExpectedFromSut_DifferentSize ();
 
@@ -51,6 +52,37 @@ class UT_Register : public CxxTest::TestSuite
   void test_UpdateLastToSut ();
 
   void test_HoldValue ();
+
+  // ---------------- Other setters
+  //
+  void test_SetToSut_uint8 ();
+  void test_SetToSut_uint16 ();
+  void test_SetToSut_uint32 ();
+  void test_SetToSut_uint64 ();
+  void test_SetToSut_int8 ();
+  void test_SetToSut_int16 ();
+  void test_SetToSut_int32 ();
+  void test_SetToSut_int64 ();
+
+  void test_SetExpectedFromSut_uint8 ();
+  void test_SetExpectedFromSut_uint16 ();
+  void test_SetExpectedFromSut_uint32 ();
+  void test_SetExpectedFromSut_uint64 ();
+  void test_SetExpectedFromSut_int8 ();
+  void test_SetExpectedFromSut_int16 ();
+  void test_SetExpectedFromSut_int32 ();
+  void test_SetExpectedFromSut_int64 ();
+
+  // ---------------- Other getters
+  //
+  void test_LastFromSut_uint8 ();
+  void test_LastFromSut_uint16 ();
+  void test_LastFromSut_uint32 ();
+  void test_LastFromSut_uint64 ();
+  void test_LastFromSut_int8 ();
+  void test_LastFromSut_int16 ();
+  void test_LastFromSut_int32 ();
+  void test_LastFromSut_int64 ();
 
   // ---------------- Mismatches
   //

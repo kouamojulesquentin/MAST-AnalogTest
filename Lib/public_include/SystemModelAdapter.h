@@ -7,16 +7,50 @@
 //
 //! @file SystemModelAdapter.h
 //!
-//! Declares C language API to system model (mainly to construct the system
-//! model tree)
+//! Declares 'C' language API to system model
 //===========================================================================
 
 
 #ifndef SYSTEMMODELADAPTER_H__A6DC6C83_7B2F_4CC8_7DAA_31AA4CDB849D__INCLUDED_
   #define SYSTEMMODELADAPTER_H__A6DC6C83_7B2F_4CC8_7DAA_31AA4CDB849D__INCLUDED_
 
+#include "Platform.hpp"
+
+#include <stdint.h>
 extern "C"
 {
+  enum ErrorCode_t
+  {
+    Ok               = 0,
+    InvalidArgument  = 0xFFFFFFF9,
+    LogicError       = 0xFFFFFFFA,
+    OutOfRange       = 0xFFFFFFFB,
+    RuntimeError     = 0xFFFFFFFC,
+    StdException     = 0xFFFFFFFD,
+    UndefinedFailure = 0xFFFFFFFE,
+    Failure          = 0xFFFFFFFF,
+  };
+  typedef enum ErrorCode_t ErrorCode;
+
+  //! Returns error message from last command
+  //!
+  //! @return Pointer to the message string (only valid till no other command is issued)
+  DLL_EXPORT const char* ErrorMessage();
+
+  //! Clears last error message
+  //!
+  DLL_EXPORT void ClearErrorMessage();
+
+  //! Sets error message
+  //!
+  //! @note This is normally used only by library internals
+  DLL_EXPORT void SetErrorMessage(const char* message);
+
+  //!< Starts up mast library, building model using specified file
+  //!<
+  //!< @note  This is to be used when there is no specific code to
+  //!<        build initialize the model and an associated manager
+  DLL_EXPORT ErrorCode InitializeMast      (const char* modelFilePath);
 }
 
 #endif  // not defined SYSTEMMODELADAPTER_H__A6DC6C83_7B2F_4CC8_7DAA_31AA4CDB849D__INCLUDED_

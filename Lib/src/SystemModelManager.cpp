@@ -402,7 +402,7 @@ void SystemModelManager::iPrefix (std::string prefix)
 //---------------------------------------------------------------------------
 
 
-//! Sets next Register value to sent to SUT
+//! Queues a request to (re-)read register value from SUT giving an expected value.
 //!
 //! @param registerPath     Register path (relative to the last iPrefix or node associated with application thread)
 //! @param expectedValue    Value expected to be read from SUT (to trigger automatic check)

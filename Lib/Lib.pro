@@ -39,6 +39,7 @@ SOURCES +=  \
     src/Linker.cpp                                  \
     src/NodePathResolver.cpp                        \
     src/ParentNode.cpp                              \
+    src/PDL_Adapter.cpp                             \
     src/PrettyPrinterVisitor.cpp                    \
     src/PropagatePendingVisitor.cpp                 \
     src/Register.cpp                                \
@@ -46,6 +47,7 @@ SOURCES +=  \
     src/SVF_SimulationProtocol.cpp                  \
     src/SVFVector.cpp                               \
     src/SystemModel.cpp                             \
+    src/SystemModelAdapter.cpp                      \
     src/SystemModelBuilder.cpp                      \
     src/SystemModelManager.cpp                      \
     src/SystemModelManagerMonitor.cpp               \
@@ -86,6 +88,7 @@ HEADERS += \
     include/SVF_SimulationProtocol.hpp                  \
     include/SVFVector.hpp                               \
     include/SystemModel.hpp                             \
+    include/SystemModelAdapter.h                        \
     include/SystemModelBuilder.hpp                      \
     include/SystemModelManager.hpp                      \
     include/SystemModelManagerMonitor.hpp               \
@@ -96,7 +99,7 @@ HEADERS += \
     include/SystemModelVisitor.hpp                      \
     include/ToSutVisitor.hpp                            \
     include/Utility.hpp                                 \
-    public_include/PDLAdapter.h                         \
+    public_include/PDL_Adapter.h                        \
     public_include/Platform.hpp                         \
     public_include/SystemModelAdapter.h
 

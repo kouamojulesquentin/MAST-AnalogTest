@@ -225,7 +225,7 @@ T CheckValueIsNotNullptr(const char* file, const char* function, int line, T val
 {
   if (value == 0)
   {
-    throw std::logic_error(mast::Utility::MakeExceptionMessage(file, function, line, "std::logic_error", msg));
+    throw std::runtime_error(mast::Utility::MakeExceptionMessage(file, function, line, "std::runtime_error", msg));
   }
   return value;
 }

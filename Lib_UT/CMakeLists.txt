@@ -25,12 +25,13 @@ include_directories(../Logger/g3log/)
 
 #add_compile_options(${UT_CFLAGS})
 
+file(GLOB Lib_UT_C_API        "C_API/*")
 file(GLOB Lib_UT_UTILITY      "Utility/*")
 file(GLOB Lib_UT_SYSTEM_MODEL "SystemModel/*")
 file(GLOB Lib_UT_HELPERS      "UT_Helpers/*")
 file(GLOB Lib_UT_GENERATED 		"Generated/Runner.cpp")
 
-set (Lib_UT_SOURCES ${Lib_UT_UTILITY} ${Lib_UT_SYSTEM_MODEL} ${Lib_UT_HELPERS} ${Lib_UT_GENERATED})
+set (Lib_UT_SOURCES ${Lib_UT_C_API} ${Lib_UT_UTILITY} ${Lib_UT_SYSTEM_MODEL} ${Lib_UT_HELPERS} ${Lib_UT_GENERATED})
 
 ADD_CUSTOM_TARGET(Runner echo "Building Lib_UT runner")
 file(GLOB Lib_UT_HEADER      "./*/UT_*.hpp")

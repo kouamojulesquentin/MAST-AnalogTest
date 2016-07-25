@@ -891,6 +891,7 @@ BinaryVector BinaryVector::operator+ (const BinaryVector& rhs) const
 //! @return A new BinaryVector initialized as defined by bits text
 BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_view bits, SizeProperty sizeProperty)
 {
+  CHECK_PARAMETER_NOT_NULL(bits.data(), "BinaryVector cannot be created from nullptr");
   BinaryVector result;
 
   uint8_t nextByte = 0;
@@ -899,9 +900,11 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
   // ---------------- Skip leading blank chars
   //
   auto bitId  = size_t(0);
-  while (   (bits[bitId] == '\n')
-         || (bits[bitId] == '\t')
-         || (bits[bitId] == ' ')
+  while (   (bitId < bits.length())
+         && (   (bits[bitId] == '\n')
+             || (bits[bitId] == '\t')
+             || (bits[bitId] == ' ')
+            )
         )
   {
     ++bitId;
@@ -999,6 +1002,7 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
 //!
 BinaryVector BinaryVector::CreateFromHexString (string_view bits, SizeProperty sizeProperty)
 {
+  CHECK_PARAMETER_NOT_NULL(bits.data(), "BinaryVector cannot be created from nullptr");
   BinaryVector result;
 
   uint8_t nextByte = 0;
@@ -1139,6 +1143,8 @@ BinaryVector BinaryVector::CreateFromHexString (string_view bits, SizeProperty s
 //!
 BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty sizeProperty)
 {
+  CHECK_PARAMETER_NOT_NULL(bits.data(), "BinaryVector cannot be created from nullptr");
+
   //! Defines how a string is formatted to represent BinaryVector content
   //!
   enum class StringFormat
@@ -1167,9 +1173,11 @@ BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty size
   // ---------------- Skip leading blank chars
   //
   auto bitId  = size_t(0);
-  while (   (bits[bitId] == '\n')
-         || (bits[bitId] == '\t')
-         || (bits[bitId] == ' ')
+  while (   (bitId < bits.length())
+         && (   (bits[bitId] == '\n')
+             || (bits[bitId] == '\t')
+             || (bits[bitId] == ' ')
+            )
         )
   {
     ++bitId;

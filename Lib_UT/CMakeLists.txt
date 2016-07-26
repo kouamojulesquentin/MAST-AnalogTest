@@ -13,6 +13,12 @@ set (UT_CFLAGS "${UT_WARNINGS} -fexceptions -std=c++14 -DCXXTEST_HAVE_EH -DCXXTE
 set (UT_RootPath  					"${CMAKE_CURRENT_SOURCE_DIR}/")
 set (CXXTEST_INCLUDE_DIR 		"${CMAKE_CURRENT_SOURCE_DIR}/../cxxtest")
 
+ADD_CUSTOM_TARGET(Runner echo "Building Lib_UT runner")
+file(GLOB Lib_UT_HEADER      "./*/UT_*.hpp")
+add_custom_command (OUTPUT 		${UT_RootPath}/Generated/Runner.cpp
+										DEPENDS 	${UT_RootPath}/Runner.mak ${Lib_UT_HEADER}
+										COMMAND 	make -C ${UT_RootPath} -f Runner.mak
+										)
 
 include_directories(${CXXTEST_INCLUDE_DIR})
 include_directories(${UT_RootPath}/CxxTest_Traits)
@@ -29,16 +35,11 @@ file(GLOB Lib_UT_C_API        "C_API/*")
 file(GLOB Lib_UT_UTILITY      "Utility/*")
 file(GLOB Lib_UT_SYSTEM_MODEL "SystemModel/*")
 file(GLOB Lib_UT_HELPERS      "UT_Helpers/*")
-file(GLOB Lib_UT_GENERATED 		"Generated/Runner.cpp")
+set(Lib_UT_GENERATED 		"Generated/Runner.cpp")
 
 set (Lib_UT_SOURCES ${Lib_UT_C_API} ${Lib_UT_UTILITY} ${Lib_UT_SYSTEM_MODEL} ${Lib_UT_HELPERS} ${Lib_UT_GENERATED})
 
-ADD_CUSTOM_TARGET(Runner echo "Building Lib_UT runner")
-file(GLOB Lib_UT_HEADER      "./*/UT_*.hpp")
-add_custom_command (OUTPUT 		${UT_RootPath}/Generated/Runner.cpp
-										DEPENDS 	${UT_RootPath}/Runner.mak ${Lib_UT_HEADER}
-										COMMAND 	make -C ${UT_RootPath} -f Runner.mak
-										)
+
 
 set_source_files_properties(${Lib_UT_GENERATED} GENERATED)
 

@@ -1,8 +1,18 @@
 cmake_minimum_required(VERSION 3.5)
 project(SIT_parser)
 
+find_package(FLEX)
+find_package(BISON)
+if ( NOT FLEX_FOUND)
+ message( FATAL_ERROR "Flex not found")
+endif() 
+
+if (NOT BISON_FOUND)
+ message( FATAL_ERROR "Bison not found")
+endif() 
+
 add_definitions(${P_WARNINGS})
-set (P_WARNINGS "-Wall -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs")
+set (P_WARNINGS "-Wall -Wno-sign-compare -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs")
 add_definitions(${P_CFLAGS})
 set (P_CFLAGS "${P_WARNINGS} -std=c++14")
 

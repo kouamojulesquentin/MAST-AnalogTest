@@ -13,11 +13,14 @@
 
 #include "UT_Utility.hpp"
 #include "Utility.hpp"
+
 #include <tuple>
+#include <experimental/string_view>
 #include <cxxtest/ValueTraits.h>
 
 using std::tuple;
 using std::make_tuple;
+using std::experimental::string_view;
 using mast::Utility;
 
 
@@ -76,6 +79,55 @@ void UT_Utility::test_MinimalBitsForValue ()
     make_tuple(2147483648U, 32U), // 27
     make_tuple(2147483649U, 32U), // 28
     make_tuple(4294967295U, 32U), // 29
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+
+//! Checks Utility::TrimLeft(StringView)
+//!
+void UT_Utility::test_StringView_Utility_TrimLeft ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto sut      = string_view(std::get<0>(data));
+    auto expected = string_view(std::get<1>(data));
+
+    // ---------------- Exercise
+    //
+    Utility::TrimLeft(sut);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto data =
+  {
+    make_tuple("",          ""),          // 00
+    make_tuple(" ",         ""),          // 01
+    make_tuple("  ",        ""),          // 02
+    make_tuple("\t",        ""),          // 03
+    make_tuple("\t\t",      ""),          // 04
+    make_tuple("\t \t",     ""),          // 05
+    make_tuple("a  ",       "a  "),       // 06
+    make_tuple(" a ",       "a "),        // 07
+    make_tuple("  a ",      "a "),        // 08
+    make_tuple("\tab ",     "ab "),       // 09
+    make_tuple("\t ab ",    "ab "),       // 10
+    make_tuple(" \tab ",    "ab "),       // 11
+    make_tuple(" \t ab ",   "ab "),       // 12
+    make_tuple("?  Hello ", "?  Hello "), // 13
+
+    make_tuple(static_cast<const char*>(nullptr), static_cast<const char*>(nullptr)), // 14
   };
 
   // ---------------- DDT Exercise

@@ -27,7 +27,11 @@ class UT_Utility : public CxxTest::TestSuite
   ~UT_Utility() = default;
 
   // ================ Test Methods ================
+
   void test_MinimalBitsForValue ();
+
+  void test_StringView_Utility_TrimLeft ();
+
 
 };
 //

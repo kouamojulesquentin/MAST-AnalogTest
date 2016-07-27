@@ -58,8 +58,8 @@ class DLL_EXPORT SystemModelManager final
   //!
   SystemModelManager(SystemModel& sm,
                      std::shared_ptr<ConfigurationAlgorithm>    configurationAlgorithm = std::make_shared<ConfigureAlgorithm_LastOrDefault>(),
-                     std::shared_ptr<SystemModelManagerMonitor> monitor                = std::make_shared<SystemModelManagerMonitor>()
-//+                     std::shared_ptr<SystemModelManagerMonitor> monitor                = nullptr
+//+                     std::shared_ptr<SystemModelManagerMonitor> monitor                = std::make_shared<SystemModelManagerMonitor>()
+                     std::shared_ptr<SystemModelManagerMonitor> monitor                = nullptr
                     );
 
   //! Does a complete data cycles for SystemModel as long as there are pending nodes
@@ -171,15 +171,32 @@ class DLL_EXPORT SystemModelManager final
 
   struct ApplicationData
   {
-    ApplicationData(std::thread p_appThread, NodePathResolver p_pathResolver, string_view p_debugName)
+    enum class State
+    {
+      NotInitialized,
+      Initialized,
+      WrapperThreadStarted,
+      ApplicationThreadStarted,
+      WriteRequest,
+      ReadRequest,
+      InApply,
+      Running,
+      Terminated,
+      TerminatedWithException,
+    };
+
+    ApplicationData(std::thread p_appThread, std::shared_ptr<State> p_currentState, NodePathResolver p_pathResolver, string_view p_debugName)
       : appThread    (std::move(p_appThread))
+      , currentState (p_currentState)
       , canProceed   (false)
       , pathResolver (p_pathResolver)
       , debugName    (p_debugName.to_string())
     {
     }
 
+
     std::thread              appThread;           //!< Used to join application thread
+    std::shared_ptr<State>   currentState;        //!< This is for debug purpose only
     std::mutex               releaseMutex;        //!< Associated with condition variable to block/release pending threads (in iApply)
     std::condition_variable  releaseCv;           //!< Wait mecanism (it is specific to application thread to avoid missing notification)
     std::atomic_bool         canProceed;          //!< When true, application thread can return from iApply

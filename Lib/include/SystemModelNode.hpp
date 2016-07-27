@@ -70,10 +70,10 @@ class DLL_EXPORT SystemModelNode
 
   void SetNextSibling (std::shared_ptr<SystemModelNode> nextSibling) { m_pNextSibling = nextSibling; };  //!< Replaces next sibling (caller is responsible to manage formely siblings)
 
-  void SetPendingsCount  (uint32_t count) { m_pendingCount =  count; } //!< Sets number of pendings at given level (Must only be 0 or 1 for Registers)
-  void IncrementPendings (uint32_t count) { m_pendingCount += count; } //!< Increment the number of pendings at given level (prefer SetPending for Registers)
-  void SetPending        ()               { m_pendingCount =  1u; }    //!< Sets number of pendings to 1
-  void ResetPending      ()               { m_pendingCount =  0;  }    //!< Resets the number of pendings
+  void SetPendingCount  (uint32_t count)  { m_pendingCount =  count; } //!< Sets number of pending at given level (Must only be 0 or 1 for Registers)
+  void IncrementPendings (uint32_t count) { m_pendingCount += count; } //!< Increment the number of pending at given level (prefer SetPending for Registers)
+  void SetPending        ()               { m_pendingCount =  1u; }    //!< Sets number of pending to 1
+  virtual void ResetPending      ()       { m_pendingCount =  0;  }    //!< Resets the number of pending
 
 
   static void ResetNodeIdentifier() { sm_nextIdentifier = 0; } //!< For debug purpose only, reset node identifier (e.g to be able to check construction order, or printers...)
@@ -87,8 +87,8 @@ class DLL_EXPORT SystemModelNode
   std::shared_ptr<SystemModelNode>    NextSibling()     const { return m_pNextSibling;    }               //!< Returns next sibling or nullptr
   uint32_t                            Priority()        const { return m_priority;        }               //!< Returns currently assigned priority
   bool                                HasConditioner()  const { return m_conditioners  ? true : false ;}  //!< Returns true if there is some condition to check
-  uint32_t                            PendingsCount()   const { return m_pendingCount; }                  //!< Returns number of pendings registers down the hierachy
-  bool                                IsPending()       const { return m_pendingCount != 0;    }          //!< Returns true if at least one node in the hierarchy is pending (need an update cycle)
+  virtual uint32_t                    PendingCount()   const { return m_pendingCount; }                  //!< Returns number of pending registers down the hierarchy
+  virtual bool                        IsPending()       const { return m_pendingCount  != 0;    }         //!< Returns true if at least one node in the hierarchy is pending (need an update cycle)
 
   // ---------------- Protected Methods
   //

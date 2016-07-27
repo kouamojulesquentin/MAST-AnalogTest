@@ -52,7 +52,7 @@ void ConfigureAlgorithm_LastOrDefault_Greedy::ResolvePendings (Linker& linker)
   {
     linker.Select(0u);
   }
-  else if (linker.PendingsCount() == 1)
+  else if (linker.PendingCount() == 1)
   {
     auto pathCount = linker.SelectablePaths();
 

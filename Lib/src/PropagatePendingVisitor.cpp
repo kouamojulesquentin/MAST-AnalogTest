@@ -21,8 +21,8 @@ using namespace mast;
 //!
 void PropagatePendingVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 {
-  auto pendings = ChildrenPendings(accessInterface);
-  accessInterface.SetPendingsCount(pendings);
+  auto pendingCount = ChildrenPendings(accessInterface);
+  accessInterface.SetPendingCount(pendingCount);
 }
 //
 //  End of: PropagatePendingVisitor::VisitAccessInterface
@@ -34,8 +34,8 @@ void PropagatePendingVisitor::VisitAccessInterface (AccessInterface& accessInter
 //!
 void PropagatePendingVisitor::VisitChain (Chain& chain)
 {
-  auto pendings = ChildrenPendings(chain);
-  chain.SetPendingsCount(pendings);
+  auto pendingCount = ChildrenPendings(chain);
+  chain.SetPendingCount(pendingCount);
 }
 //
 //  End of: PropagatePendingVisitor::VisitChain
@@ -46,18 +46,18 @@ void PropagatePendingVisitor::VisitChain (Chain& chain)
 //!
 uint32_t PropagatePendingVisitor::ChildrenPendings (const ParentNode& parentNode)
 {
-  uint32_t pendings = 0;
+  uint32_t pendingCount = 0;
   auto     child    = parentNode.FirstChild();
 
   while (child)
   {
     child->Accept(*this);
-    pendings += child->PendingsCount();
+    pendingCount += child->PendingCount();
 
     child = child->NextSibling();
   }
 
-  return pendings;
+  return pendingCount;
 }
 //
 //  End of: PropagatePendingVisitor::ChildrenPendings
@@ -68,8 +68,8 @@ uint32_t PropagatePendingVisitor::ChildrenPendings (const ParentNode& parentNode
 //!
 void PropagatePendingVisitor::VisitLinker (Linker& linker)
 {
-  auto pendings = ChildrenPendings(linker);
-  linker.SetPendingsCount(pendings);
+  auto pendingCount = ChildrenPendings(linker);
+  linker.SetPendingCount(pendingCount);
 }
 //
 //  End of: PropagatePendingVisitor::VisitLinker

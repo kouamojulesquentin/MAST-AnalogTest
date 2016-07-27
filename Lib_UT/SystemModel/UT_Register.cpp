@@ -64,16 +64,133 @@ void UT_Register::test_Constructor ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS (sut.TypeName(), "Register");
+  TS_ASSERT_EQUALS (sut.TypeName(),        "Register");
   TS_ASSERT_FALSE  (sut.HoldValue());
   TS_ASSERT_FALSE  (sut.MustCheckExpected());
   TS_ASSERT_EQUALS (sut.Mismatches(),      0U);
   TS_ASSERT_EQUALS (sut.BitsCount(),       9U);
+  TS_ASSERT_EQUALS (sut.PendingCount(),    0U);
+  TS_ASSERT_FALSE  (sut.IsPendingForRead());
+  TS_ASSERT_FALSE  (sut.IsPending());
   TS_ASSERT_EQUALS (sut.BypassSequence(),  bypassSequence);
   TS_ASSERT_EQUALS (sut.NextToSut(),       bypassSequence);
   TS_ASSERT_EQUALS (sut.LastToSut(),       bypassSequence);
   TS_ASSERT_EQUALS (sut.ExpectedFromSut(), bypassSequence);
   TS_ASSERT_EQUALS (sut.LastFromSut(),     bypassSequence);
+}
+
+
+//! Checks Register::SetPendingForWrite
+//!
+void UT_Register::test_SetPendingForWrite ()
+{
+  // ---------------- Setup
+  //
+  auto bypassSequence = BinaryVector::CreateFromBinaryString("1111_1111:0");
+
+  Register sut("", bypassSequence);
+
+  // ---------------- Exercise
+  //
+  sut.SetPendingForWrite(true);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE   (sut.IsPending());
+  TS_ASSERT_FALSE  (sut.IsPendingForRead());
+  TS_ASSERT_EQUALS (sut.PendingCount(), 1U);
+}
+
+
+//! Checks Register::ResetPendingWrite
+//!
+void UT_Register::test_ResetPendingWrite ()
+{
+  // ---------------- Setup
+  //
+  auto bypassSequence = BinaryVector::CreateFromBinaryString("1111_1111:0");
+
+  Register sut("", bypassSequence);
+
+  sut.SetPendingForWrite(true);
+
+  // ---------------- Exercise
+  //
+  sut.ResetPendingWrite();
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE (sut.IsPending());
+  TS_ASSERT_FALSE  (sut.IsPendingForRead());
+  TS_ASSERT_EQUALS (sut.PendingCount(), 0U);
+}
+
+
+//! Checks Register::SetPendingForWrite
+//!
+void UT_Register::test_SetPendingForRead ()
+{
+  // ---------------- Setup
+  //
+  auto bypassSequence = BinaryVector::CreateFromBinaryString("1111_1111:0");
+
+  Register sut("", bypassSequence);
+
+  // ---------------- Exercise
+  //
+  sut.SetPendingForRead(true);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE   (sut.IsPending());
+  TS_ASSERT_TRUE   (sut.IsPendingForRead());
+  TS_ASSERT_EQUALS (sut.PendingCount(), 1U);
+}
+
+//! Checks Register when it is both pending for read and for write
+//!
+void UT_Register::test_SetBothPending ()
+{
+  // ---------------- Setup
+  //
+  auto bypassSequence = BinaryVector::CreateFromBinaryString("1111_1111:0");
+
+  Register sut("", bypassSequence);
+
+  // ---------------- Exercise
+  //
+  sut.SetPendingForRead();
+  sut.SetPendingForWrite();
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE   (sut.IsPending());
+  TS_ASSERT_TRUE   (sut.IsPendingForRead());
+  TS_ASSERT_EQUALS (sut.PendingCount(), 1U);
+}
+
+//! Checks Register::ResetPending
+//!
+void UT_Register::test_ResetPending ()
+{
+  // ---------------- Setup
+  //
+  auto bypassSequence = BinaryVector::CreateFromBinaryString("1111_1111:0");
+
+  Register sut("", bypassSequence);
+
+  sut.SetPendingForRead(true);
+  sut.SetPendingForWrite(true);
+
+  // ---------------- Exercise
+  //
+  sut.ResetPending();
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE  (sut.IsPending());
+  TS_ASSERT_FALSE  (sut.IsPendingForRead());
+  TS_ASSERT_EQUALS (sut.PendingCount(), 0U);
 }
 
 

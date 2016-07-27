@@ -47,6 +47,43 @@ void Register::Accept (SystemModelVisitor& visitor)
 }
 
 
+
+//! Returns true if register is pending for read or for write
+//!
+bool Register::IsPending () const
+{
+  return m_pendingRead || SystemModelNode::IsPending();
+}
+//
+//  End of: Register::IsPending
+//---------------------------------------------------------------------------
+
+
+//! Returns number of pending registers down the hierarchy
+//!
+uint32_t Register::PendingCount () const
+{
+  return (m_pendingRead || SystemModelNode::IsPending()) ? 1u : 0;
+}
+//
+//  End of: Register::PendingCount
+//---------------------------------------------------------------------------
+
+
+
+//! Resets the number of pending
+//!
+void Register::ResetPending ()
+{
+  m_pendingRead = false;
+  SystemModelNode::ResetPending();
+}
+//
+//  End of: Register::ResetPending
+//---------------------------------------------------------------------------
+
+
+
 //! Sets last sequence of bits that have been shifted from SUT
 //!
 //! @param sequence   Sequence received from SUT during last scan

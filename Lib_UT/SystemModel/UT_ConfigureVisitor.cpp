@@ -144,6 +144,60 @@ void UT_ConfigureVisitor::test_Accept_Testcase_1500_2_Pending ()
   TS_ASSERT_FALSE (linker->IsActive(4u));
 }
 
+
+
+//! Checks ConfigureVisitor::Accept_Testcase_1500() when a (single) register is pending for read
+//!
+void UT_ConfigureVisitor::test_Accept_Testcase_1500_1_PendingRead ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  TestModelBuilder builder(sm);
+
+  auto tap     = builder.Create_TestCase_1500("TAP", 3u);
+  auto ir      = sm.RegisterWithId(1u);
+  auto swir    = sm.RegisterWithId(7u);
+  auto wir     = sm.RegisterWithId(10u);
+  auto swirMux = sm.LinkerWithId(9u);
+  auto reg_1   = sm.RegisterWithId(14u);
+  auto reg_2   = sm.RegisterWithId(15u);
+  auto reg_3   = sm.RegisterWithId(16u);
+  auto wirMux  = sm.LinkerWithId(12u);
+
+  reg_2->SetPendingForRead();
+  ConfigureVisitor sut;
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (tap->Accept(sut));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE  (tap->IsPending());
+  TS_ASSERT_TRUE  (ir->IsPending());
+  TS_ASSERT_TRUE  (swir->IsPending());
+  TS_ASSERT_TRUE  (wir->IsPending());
+  TS_ASSERT_TRUE  (swirMux->IsPending());
+  TS_ASSERT_FALSE (reg_1->IsPending());
+  TS_ASSERT_TRUE  (reg_2->IsPending());
+  TS_ASSERT_FALSE (reg_3->IsPending());
+
+  TS_ASSERT_EQUALS (tap->PendingCount(),     4u);
+  TS_ASSERT_EQUALS (swirMux->PendingCount(), 2u);
+  TS_ASSERT_EQUALS (wirMux->PendingCount(),  1u);
+
+  TS_ASSERT_FALSE (wirMux->IsSelected(1u));
+  TS_ASSERT_FALSE (wirMux->IsSelected(2u));
+  TS_ASSERT_TRUE  (wirMux->IsSelected(3u));
+  TS_ASSERT_FALSE (wirMux->IsSelected(4u));
+
+  TS_ASSERT_TRUE  (wirMux->IsActive(1u));
+  TS_ASSERT_FALSE (wirMux->IsActive(2u));
+  TS_ASSERT_FALSE (wirMux->IsActive(3u));
+  TS_ASSERT_FALSE (wirMux->IsActive(4u));
+}
+
 //! Checks ConfigureVisitor::Accept with Testcase_1500() reset pending flags when no more register are pending
 //!
 void UT_ConfigureVisitor::test_Accept_Testcase_AI_Pending_Reset ()

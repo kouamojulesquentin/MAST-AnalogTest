@@ -22,8 +22,8 @@ using namespace mast;
 //!
 void ConfigureVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 {
-  auto pendings = ConfigureChildren(accessInterface);
-  accessInterface.SetPendingsCount(pendings);
+  auto pendingCount = ConfigureChildren(accessInterface);
+  accessInterface.SetPendingCount(pendingCount);
 }
 //
 //  End of: ConfigureVisitor::VisitAccessInterface
@@ -35,8 +35,8 @@ void ConfigureVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 //!
 void ConfigureVisitor::VisitChain (Chain& chain)
 {
-  auto pendings = ConfigureChildren(chain);
-  chain.SetPendingsCount(pendings);
+  auto pendingCount = ConfigureChildren(chain);
+  chain.SetPendingCount(pendingCount);
 }
 //
 //  End of: ConfigureVisitor::VisitChain
@@ -62,15 +62,15 @@ uint32_t ConfigureVisitor::ConfigureChildren (const ParentNode& parentNode)
   // ---------------- Tally pendings after configuration of all children
   //                 (a child may be changed while a sibling is configured)
   //
-  uint32_t pendings = 0;
+  uint32_t pendingCount = 0;
   child = parentNode.FirstChild();
   while (child)
   {
-    pendings += child->PendingsCount();
-    child     = child->NextSibling();
+    pendingCount += child->PendingCount();
+    child         = child->NextSibling();
   }
 
-  return pendings;
+  return pendingCount;
 }
 //
 //  End of: ConfigureVisitor::ConfigureChildren
@@ -100,7 +100,7 @@ void ConfigureVisitor::VisitLinker (Linker& linker)
     child->Accept(*this);
     if (child->IsPending())
     {
-      linker.IncrementPendings(child->PendingsCount());
+      linker.IncrementPendings(child->PendingCount());
 
       if (m_configurationAlgorithm)
       {
@@ -122,7 +122,7 @@ void ConfigureVisitor::VisitLinker (Linker& linker)
   child = linker.FirstChild();
   while (child)
   {
-    linker.IncrementPendings(child->PendingsCount());
+    linker.IncrementPendings(child->PendingCount());
 
     child = child->NextSibling();
   }
@@ -148,12 +148,7 @@ void ConfigureVisitor::VisitLinker (Linker& linker)
 //!
 void ConfigureVisitor::VisitRegister (Register& reg)
 {
-  reg.ResetPending();
-  auto isPending = reg.NextToSut() != reg.LastToSut();
-  if (isPending)
-  {
-    reg.SetPending();
-  }
+  reg.SetPendingForWrite(reg.NextToSut() != reg.LastToSut());
 }
 //
 //  End of: ConfigureVisitor::VisitRegister

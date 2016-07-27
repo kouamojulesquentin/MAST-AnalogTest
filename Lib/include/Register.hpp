@@ -57,13 +57,20 @@ class DLL_EXPORT Register : public SystemModelNode
   bool                HoldValue()         const { return m_holdValue;          } //!< Returns true when bypass value is maintained equal to nextToSut (The value will not be changed while the register is selected)
   bool                MustCheckExpected() const { return m_mustCheckExpected;  } //!< Returns true when received data must be checked against expected data
   uint32_t            Mismatches()        const { return m_mismatches;         } //!< Returns current mismatch count
+  bool                IsPendingForRead()  const { return m_pendingRead;        } //!< Returns true when there is a pending request to read the Register from SUT
+  virtual bool        IsPending()         const override;                        //!< Returns true if register is pending for read or for write
+  virtual uint32_t    PendingCount()      const override;                        //!< Returns number of pending registers down the hierarchy
 
   // ---------------- Setters
   //
-  void SetFromSut         (BinaryVector sequence);                                                       //!< Sets last sequence of bits that have been shifted from SUT
-  void SetExpectedFromSut (BinaryVector sequence)  { m_expectedFromSut = std::move(sequence); }          //!< Sets expected sequence (when updating from SUT)
-  void SetBypass          (BinaryVector sequence)  { m_bypass          = std::move(sequence); }          //!< Sets sequence to shift into the sut when no iApply cycle has been defined on the register
-  void SetHoldValue       (bool         holdValue) { m_holdValue       = holdValue;           }          //!< Set whether bypass value is maintain equal to nextToSut
+  void         SetFromSut         (BinaryVector sequence);                                                                              //!< Sets last sequence of bits that have been shifted from SUT
+  void         SetExpectedFromSut (BinaryVector sequence)               { m_expectedFromSut = std::move(sequence); }                    //!< Sets expected sequence (when updating from SUT)
+  void         SetBypass          (BinaryVector sequence)               { m_bypass          = std::move(sequence); }                    //!< Sets sequence to shift into the sut when no iApply cycle has been defined on the register
+  void         SetHoldValue       (bool         holdValue       = true) { m_holdValue       = holdValue;           }                    //!< Set whether bypass value is maintain equal to nextToSut
+  void         SetPendingForRead  (bool         pendingForRead  = true) { m_pendingRead     = pendingForRead;    }                      //!< Set whether there is a pending request or not for read value from SUT
+  void         SetPendingForWrite (bool         pendingForWrite = true) { SystemModelNode::SetPendingCount(pendingForWrite ? 1u : 0); } //!< Sets pending requests for updating SUT (write operation)
+  void         ResetPendingWrite  ()                                    { SystemModelNode::ResetPending(); }                            //!< Resets any pending requests for updating SUT (write operation)
+  virtual void ResetPending       () override;                                                                                          //!< Resets read and write pending
 
   //! Sets the bits sequence to send during the next iApply cycle
   //!
@@ -120,7 +127,6 @@ class DLL_EXPORT Register : public SystemModelNode
     }
   }
 
-
   void SetCheckExpected   (bool checkExpected) { m_mustCheckExpected  = checkExpected; } //!< Sets whether data updated from SUT must be check agains expected data
   void ResetMismatches    ()                   { m_mismatches = 0; }                     //!< Clears the mismatch count
 
@@ -129,7 +135,7 @@ class DLL_EXPORT Register : public SystemModelNode
   // ---------------- Private  Fields
   //
   private:
-//+  bool         m_pendingSelect     = false; //!< True when the tdr value has been changed following a selection action
+  bool         m_pendingRead       = false; //!< True when there is a pending request to read register value from SUT
   bool         m_holdValue         = false; //!< When true, force bypass value to be equal to nextToSut (The value will not be changed while the register is selected)
   bool         m_mustCheckExpected = false; //!< When true, it triggers a check of received vs expected data during the following shift from sut
   uint32_t     m_mismatches        = 0;     //!< Number of mismatches following IEEE 1687 rules

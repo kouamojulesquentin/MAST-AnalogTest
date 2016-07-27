@@ -4,7 +4,8 @@
 
 @if "%Build%"=="" goto Syntax
 
-@set Path=C:\MinGW\bin;%Path%
+@set originalPath=%path%
+@REM @set Path=C:\MinGW\bin;%Path%
 @set DestFile=Lib_UT\UT_Results\UT_Result.txt
 
 @if not defined chain  (set chain=Build_Qt)
@@ -33,6 +34,7 @@ set  targetDir=".\bin\%Build%"
 
 @set Build=
 @set Options=
+@REM @set Path=%originalPath%
 @popd
 @echo.
 @echo Results have been saved into: "%DestFile%"

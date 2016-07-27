@@ -32,6 +32,15 @@ class UT_Register : public CxxTest::TestSuite
   //
   void test_Constructor ();
 
+  // ---------------- Pending
+  //
+  void test_SetPendingForWrite ();
+  void test_ResetPendingWrite ();
+  void test_SetPendingForRead ();
+  void test_SetBothPending ();
+  void test_ResetPending ();
+
+
   // ---------------- BinaryVector setters
   //
   void test_SetBypass ();

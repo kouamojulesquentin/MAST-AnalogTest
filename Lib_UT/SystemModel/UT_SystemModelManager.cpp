@@ -790,13 +790,11 @@ void UT_SystemModelManager::test_DoDataCycles_MIB_Multichain_Pre_Greedy ()
 //+  monitor->MonitorBeforeConfiguration(true);
 //+  monitor->GmlBasePath("MIB_Multichain_Pre_Greedy");
 //+  SystemModelManager sut(sm, configureAlgo, monitor);
-//+  g3::logEnabled(true);
+//+   ENABLE_LOG_IN_SCOPE;
 
   // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.DoDataCycles());
-
-//+  g3::logEnabled(false);
 
   // ---------------- Verify
   //
@@ -996,7 +994,7 @@ void UT_SystemModelManager::test_CreateApplicationThread_2_App ()
   auto mux  = sm.LinkerWithId(2u);
   TS_ASSERT_NOT_NULLPTR (mux);
 
-  g3::logEnabled(true);
+  ENABLE_LOG_IN_SCOPE;
   SystemModelManager sut(sm);
 
   // ---------------- Create a functor that tally value when not zero
@@ -1025,7 +1023,6 @@ void UT_SystemModelManager::test_CreateApplicationThread_2_App ()
     TS_ASSERT_EQUALS (valueApp_1.load(), 13u);
     TS_ASSERT_EQUALS (valueApp_2.load(), 37u);
   }
-  g3::logEnabled(false);
 }
 
 
@@ -1095,14 +1092,13 @@ void UT_SystemModelManager::test_iPrefix_Thread_is_Known ()
     TS_ASSERT_THROWS_NOTHING (gotPrefix = sut.iPrefix());
   };
 
-//+  g3::logEnabled(true);
+//+   ENABLE_LOG_IN_SCOPE;
   sut.CreateApplicationThread(mux, appFunctor); // Include "Exercise" in created thread
   sut.StartCreatedApplicationThreads();
 
   // ---------------- Verify
   //
   sut.WaitForApplicationsEnd();  // Make sure application has done its action
-//+  g3::logEnabled(false);
 
   CxxTest::setStringResultsOnNewLine(false);
   TS_ASSERT_EQUALS (gotPrefix, prefix);
@@ -1184,14 +1180,13 @@ void UT_SystemModelManager::test_iGet_Thread_is_Known ()
     TS_ASSERT_EQUALS (lastFromSut, expected);
   };
 
-  g3::logEnabled(true);
+//+   ENABLE_LOG_IN_SCOPE;
   sut.CreateApplicationThread(mux, appFunctor); // Include "Exercise" in created thread
   sut.StartCreatedApplicationThreads();
 
   // ---------------- Verify
   //
   sut.WaitForApplicationsEnd();  // Make sure application has done its action
-  g3::logEnabled(false);
 }
 
 
@@ -1218,13 +1213,12 @@ void UT_SystemModelManager::test_iGet_Thread_is_Unknown ()
   };
 
   // Start thread
-  g3::logEnabled(true);
+//+   ENABLE_LOG_IN_SCOPE;
   auto unkwnownThread = std::thread(appFunctor);
   unkwnownThread.join();
 
   // Wait end of thread
   sut.WaitForApplicationsEnd();  // Make sure application has done its action
-  g3::logEnabled(false);
 }
 
 
@@ -1254,9 +1248,8 @@ void UT_SystemModelManager::test_iWrite_Thread_is_Known ()
   auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
   auto reg  = sm.RegisterWithId(9u);
 
-  g3::logEnabled(true);
+//+   ENABLE_LOG_IN_SCOPE;
   {
-    //  ENABLE_LOG_IN_SCOPE;
     SystemModelManager sut(sm);
 
     // Thread functor
@@ -1283,7 +1276,6 @@ void UT_SystemModelManager::test_iWrite_Thread_is_Known ()
     auto expected = BinaryVector::CreateFromHexString("FADE_CAFE");
     TS_ASSERT_EQUALS (reg->NextToSut(), expected);
   }
-  g3::logEnabled(false);
 }
 
 
@@ -1534,7 +1526,7 @@ void UT_SystemModelManager::test_iApply_4_Threads_Once_SameReg ()
   auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
   auto reg  = sm.RegisterWithId(9u);
 
-  ENABLE_LOG_IN_SCOPE;
+//+  ENABLE_LOG_IN_SCOPE;
   LOG_FUNCTION_SCOPE;
   SystemModelManager sut(sm);
 
@@ -1579,17 +1571,17 @@ void UT_SystemModelManager::test_iApply_4_Threads_1_Write ()
   Create_TestCase_MIB_Multichain_Pre(sm);
 
   auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
-  auto reg_0  = sm.RegisterWithId(6u);
-  auto reg_1  = sm.RegisterWithId(7u);
-  auto reg_2  = sm.RegisterWithId(8u);
-  auto reg_3  = sm.RegisterWithId(9u);
+  auto reg_0  = sm.RegisterWithId(6u); reg_0->SetHoldValue(true); // Hold is to maintain the same value (nextToSut becoume also bypass)
+  auto reg_1  = sm.RegisterWithId(7u); reg_1->SetHoldValue(true);
+  auto reg_2  = sm.RegisterWithId(8u); reg_2->SetHoldValue(true);
+  auto reg_3  = sm.RegisterWithId(9u); reg_3->SetHoldValue(true);
 
   auto gotVector_0 = BinaryVector();
   auto gotVector_1 = BinaryVector();
   auto gotVector_2 = BinaryVector();
   auto gotVector_3 = BinaryVector();
 
-  ENABLE_LOG_IN_SCOPE;
+//+  ENABLE_LOG_IN_SCOPE;
   LOG_FUNCTION_SCOPE;
   SystemModelManager sut(sm);
 
@@ -1632,11 +1624,11 @@ void UT_SystemModelManager::test_iApply_4_Threads_1_Write ()
   TS_ASSERT_EQUALS (reg_2->NextToSut(), BinaryVector::CreateFromHexString("CAFE_8762"));
   TS_ASSERT_EQUALS (reg_3->NextToSut(), BinaryVector::CreateFromHexString("CAFE_8763"));
 
-//+  TS_ASSERT_EQUALS (gotVector_0, BinaryVector::CreateFromHexString("CAFE_8760"));
-//+  TS_ASSERT_EQUALS (gotVector_1, BinaryVector::CreateFromHexString("CAFE_8761"));
-//+  TS_ASSERT_EQUALS (gotVector_2, BinaryVector::CreateFromHexString("CAFE_8762"));
-//+  TS_ASSERT_EQUALS (gotVector_3, BinaryVector::CreateFromHexString("CAFE_8763"));
-  TS_WARN ("Complete tests using iRead ==> Need 'PendingReads' to be fully implemented");
+  TS_ASSERT_EQUALS (gotVector_0, BinaryVector::CreateFromHexString("CAFE_8760"));
+  TS_ASSERT_EQUALS (gotVector_1, BinaryVector::CreateFromHexString("CAFE_8761"));
+  TS_ASSERT_EQUALS (gotVector_2, BinaryVector::CreateFromHexString("CAFE_8762"));
+  TS_ASSERT_EQUALS (gotVector_3, BinaryVector::CreateFromHexString("CAFE_8763"));
+
 }
 
 
@@ -1649,13 +1641,13 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes ()
   SystemModel sm;
   Create_TestCase_MIB_Multichain_Pre(sm);
 
-  auto mux    = sm.LinkerWithId(2u);   // This is Tap mux
-  auto reg_0  = sm.RegisterWithId(6u);
-  auto reg_1  = sm.RegisterWithId(7u);
-  auto reg_2  = sm.RegisterWithId(8u);
-  auto reg_3  = sm.RegisterWithId(9u);
+  auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
+  auto reg_0  = sm.RegisterWithId(6u); reg_0->SetHoldValue(true); // Hold is to maintain the same value (nextToSut becoume also bypass)
+  auto reg_1  = sm.RegisterWithId(7u); reg_1->SetHoldValue(true);
+  auto reg_2  = sm.RegisterWithId(8u); reg_2->SetHoldValue(true);
+  auto reg_3  = sm.RegisterWithId(9u); reg_3->SetHoldValue(true);
 
-  ENABLE_LOG_IN_SCOPE;
+//+  ENABLE_LOG_IN_SCOPE;
   LOG_FUNCTION_SCOPE;
   SystemModelManager sut(sm);
 
@@ -1664,6 +1656,7 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes ()
   {
     auto nextToSut    = BinaryVector(32u);
     auto currentValue = initialValue;
+//+    auto gotValue     = BinaryVector(32u);
 
     TS_ASSERT_THROWS_NOTHING
     (
@@ -1685,12 +1678,20 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes ()
 
         sut.iApply();
 
-        // ---------------- Make is "think" after iApply
+        // ---------------- Make it "think" after iApply
         //
         if ((ii % 57) == 0)
         {
           std::this_thread::sleep_for(7ms);
         }
+
+        sut.iRead(regName, nextToSut);
+        sut.iApply();
+//+        gotValue = sut.iGet(regName);
+//+        if (gotValue != nextToSut)
+//+        {
+//+          ++gotMismatches;
+//+        }
       }
     );
   };
@@ -1717,15 +1718,20 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes ()
 
   // Terminal value
   //
-  auto expected_0 = BinaryVector(32); expected_0.Set(0x00005080u);
-  auto expected_1 = BinaryVector(32); expected_1.Set(0x00015081u);
-  auto expected_2 = BinaryVector(32); expected_2.Set(0x00025082u);
-  auto expected_3 = BinaryVector(32); expected_3.Set(0x00035083u);
+  auto expected_0 = BinaryVector(32u); expected_0.Set(0x00005080u);
+  auto expected_1 = BinaryVector(32u); expected_1.Set(0x00015081u);
+  auto expected_2 = BinaryVector(32u); expected_2.Set(0x00025082u);
+  auto expected_3 = BinaryVector(32u); expected_3.Set(0x00035083u);
 
   TS_ASSERT_EQUALS (reg_0->NextToSut(), expected_0);
   TS_ASSERT_EQUALS (reg_1->NextToSut(), expected_1);
   TS_ASSERT_EQUALS (reg_2->NextToSut(), expected_2);
   TS_ASSERT_EQUALS (reg_3->NextToSut(), expected_3);
+
+  TS_ASSERT_EQUALS (reg_0->Mismatches(), 0);
+  TS_ASSERT_EQUALS (reg_1->Mismatches(), 0);
+  TS_ASSERT_EQUALS (reg_2->Mismatches(), 0);
+  TS_ASSERT_EQUALS (reg_3->Mismatches(), 0);
 }
 
 //! Checks SystemModelManager::iApply() with 4 application threads accessing multiple times
@@ -1745,7 +1751,7 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes_TC_1500 ()
   auto reg_2  = sm.RegisterWithId(16u);
   auto reg_3  = sm.RegisterWithId(17u);
 
-  ENABLE_LOG_IN_SCOPE;
+//+  ENABLE_LOG_IN_SCOPE;
   LOG_FUNCTION_SCOPE;
   SystemModelManager sut(sm);
 

@@ -24,13 +24,14 @@ using namespace mast;
 //!
 //! @note All registers are initialized like the bypass sequence
 Register::Register (string_view name, mast::BinaryVector bypassSequence, bool holdValue)
-  : SystemModelNode   (name)
-  , m_holdValue       (holdValue)
-  , m_nextToSut       (bypassSequence, SizeProperty::Fixed)
-  , m_lastToSut       (bypassSequence, SizeProperty::Fixed)
-  , m_lastFromSut     (bypassSequence, SizeProperty::Fixed)
-  , m_expectedFromSut (bypassSequence, SizeProperty::Fixed)
-  , m_bypass          (std::move(bypassSequence), SizeProperty::Fixed)
+  : SystemModelNode      (name)
+  , m_holdValue          (holdValue)
+  , m_nextToSut          (bypassSequence,            SizeProperty::Fixed)
+  , m_lastToSut          (bypassSequence,            SizeProperty::Fixed)
+  , m_lastFromSut        (bypassSequence,            SizeProperty::Fixed)
+  , m_lastReadFromSut (bypassSequence.BitsCount())
+  , m_expectedFromSut    (bypassSequence,            SizeProperty::Fixed)
+  , m_bypass             (std::move(bypassSequence), SizeProperty::Fixed)
 {
 }
 //
@@ -90,12 +91,21 @@ void Register::ResetPending ()
 //!
 void Register::SetFromSut (BinaryVector sequence)
 {
-  m_lastFromSut = std::move(sequence);
-
-  if (m_mustCheckExpected && (m_lastFromSut != m_expectedFromSut))
+  if (m_pendingRead)
   {
-    ++m_mismatches;
+    m_lastReadFromSut = sequence;
   }
+
+  if (m_mustCheckExpected)
+  {
+    //! @todo [JFC]-[July/28/2016]: Apply the don't care mask to sequence
+
+    if (sequence != m_expectedFromSut)
+    {
+      ++m_mismatches;
+    }
+  }
+  m_lastFromSut = std::move(sequence);
 }
 //
 //  End of: Register::SetFromSut

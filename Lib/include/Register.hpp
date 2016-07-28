@@ -39,19 +39,13 @@ class DLL_EXPORT Register : public SystemModelNode
 
   virtual std::experimental::string_view TypeName() const override { return "Register"; } //!< Returns readable type name
 
-  //!< Checks that last received sequence equals expected one
-  //!<
-  //!< @note  It increments internal mismatch count in case of failure
-  //!<
-  //!< @return  true when received sequence equals expected one, false otherwise
-//+  bool CheckAgainstExpected();
-
   // ---------------- Getters
   //
   uint32_t            BitsCount()         const { return m_bypass.BitsCount(); } //!< Returns Register numbers of bits
   const BinaryVector& BypassSequence()    const { return m_bypass;             } //!< Returns bypass sequence
   const BinaryVector& ExpectedFromSut()   const { return m_expectedFromSut;    } //!< Returns expected sequence
   const BinaryVector& LastFromSut()       const { return m_lastFromSut;        } //!< Returns last sequence received from SUT
+  const BinaryVector& LastReadFromSut()   const { return m_lastReadFromSut;    } //!< Returns last sequence received from SUT when it was in pending read state
   const BinaryVector& NextToSut()         const { return m_nextToSut;          } //!< Returns next sequence to send to SUT
   const BinaryVector& LastToSut()         const { return m_lastToSut;          } //!< Returns last sequence effectively sent to SUT
   bool                HoldValue()         const { return m_holdValue;          } //!< Returns true when bypass value is maintained equal to nextToSut (The value will not be changed while the register is selected)
@@ -106,6 +100,19 @@ class DLL_EXPORT Register : public SystemModelNode
     m_lastFromSut.Get(value);
   }
 
+  //! Returns last sequence received from SUT when it was in pending read state - with output reference
+  //!
+  void LastReadFromSut (BinaryVector& value) const { value = m_lastReadFromSut; }
+
+  //! Returns last sequence received from SUT when it was in pending read state - as integral value
+  //!
+  template<typename T> void LastReadFromSut (T& value) const
+  {
+    static_assert(std::is_integral<T>::value, "LastReadFromSut requires integral types");
+    m_lastReadFromSut.Get(value);
+  }
+
+
   //! Sets expected sequence (when updating from SUT) from integral value
   //!
   template<typename T> void SetExpectedFromSut (T newValue)
@@ -142,6 +149,7 @@ class DLL_EXPORT Register : public SystemModelNode
   BinaryVector m_nextToSut;                 //!< Sequence of bits that should be shifted into SUT (during the next iApply cycle)
   BinaryVector m_lastToSut;                 //!< Last sent sequence of bits: It stores the status of the SUT (SIBs, etc...) after an apply cycle
   BinaryVector m_lastFromSut;               //!< Last sequence of bits that have been shifted from SUT
+  BinaryVector m_lastReadFromSut;           //!< Last sequence of bits that have been shifted from SUT when pending read is true
   BinaryVector m_expectedFromSut;           //!< Sequence of expected bits when scanning from SUT
   BinaryVector m_bypass;                    //!< Sequence to shift into the sut when no iApply cycle has been defined on the register
 };

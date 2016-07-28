@@ -385,7 +385,7 @@ void SystemModelManager::iGet_impl (string_view registerPath, T& readData)
 
   unique_lock<recursive_mutex> lock(m_dataMutex); // We must protect for the register been updated just when we read it
 
-  reg->LastFromSut(readData);
+  reg->LastReadFromSut(readData);
 }
 //
 //  End of: SystemModelManager::iGet

@@ -56,6 +56,7 @@ class UT_Register : public CxxTest::TestSuite
 
   void test_SetFromSut_DifferingFromExpected_WithoutCheck ();
   void test_SetFromSut_DifferingFromExpected_WithCheck ();
+  void test_SetFromSut_DifferingFromExpected_WithPendingRead ();
   void test_SetFromSut_DifferentSize ();
 
   void test_UpdateLastToSut ();

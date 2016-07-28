@@ -77,6 +77,25 @@ void UT_Register::test_Constructor ()
   TS_ASSERT_EQUALS (sut.LastToSut(),       bypassSequence);
   TS_ASSERT_EQUALS (sut.ExpectedFromSut(), bypassSequence);
   TS_ASSERT_EQUALS (sut.LastFromSut(),     bypassSequence);
+  TS_ASSERT_EQUALS (sut.LastReadFromSut(), BinaryVector(9u));
+
+  uint8_t  last_uint8  = 0x55;  sut.LastReadFromSut(last_uint8);
+  uint16_t last_uint16 = 0x55;  sut.LastReadFromSut(last_uint16);
+  uint32_t last_uint32 = 0x55;  sut.LastReadFromSut(last_uint32);
+  uint64_t last_uint64 = 0x55;  sut.LastReadFromSut(last_uint64);
+  int8_t   last_int8   = 0x55;  sut.LastReadFromSut(last_int8);
+  int16_t  last_int16  = 0x55;  sut.LastReadFromSut(last_int16);
+  int32_t  last_int32  = 0x55;  sut.LastReadFromSut(last_int32);
+  int64_t  last_int64  = 0x55;  sut.LastReadFromSut(last_int64);
+
+  TS_ASSERT_EQUALS (last_uint8,  0U);
+  TS_ASSERT_EQUALS (last_uint16, 0U);
+  TS_ASSERT_EQUALS (last_uint32, 0UL);
+  TS_ASSERT_EQUALS (last_uint64, 0ULL);
+  TS_ASSERT_EQUALS (last_int8,   0);
+  TS_ASSERT_EQUALS (last_int16,  0);
+  TS_ASSERT_EQUALS (last_int32,  0L);
+  TS_ASSERT_EQUALS (last_int64,  0LL);
 }
 
 
@@ -342,8 +361,9 @@ void UT_Register::test_SetFromSut_DifferingFromExpected_WithoutCheck ()
   // ---------------- Verify
   //
   TS_ASSERT_FALSE  (sut.MustCheckExpected());
-  TS_ASSERT_EQUALS (sut.LastFromSut(), newValue);
-  TS_ASSERT_EQUALS (sut.Mismatches(), 0);
+  TS_ASSERT_EQUALS (sut.LastFromSut(),     newValue);
+  TS_ASSERT_EQUALS (sut.LastReadFromSut(), BinaryVector(initial.BitsCount()));
+  TS_ASSERT_EQUALS (sut.Mismatches(),      0);
 }
 
 //! Checks Register::SetFromSut() with a value different from expected one and check enabled
@@ -367,9 +387,54 @@ void UT_Register::test_SetFromSut_DifferingFromExpected_WithCheck ()
   // ---------------- Verify
   //
   TS_ASSERT_TRUE   (sut.MustCheckExpected());
-  TS_ASSERT_EQUALS (sut.LastFromSut(), newValue);
+  TS_ASSERT_EQUALS (sut.LastFromSut(),     newValue);
+  TS_ASSERT_EQUALS (sut.LastReadFromSut(), BinaryVector(initial.BitsCount()));
   TS_ASSERT_EQUALS (sut.Mismatches(), 1);
 }
+
+
+//! Checks Register::SetFromSut() while in pending read
+//!
+void UT_Register::test_SetFromSut_DifferingFromExpected_WithPendingRead ()
+{
+  // ---------------- Setup
+  //
+  const auto initial  = BinaryVector::CreateFromBinaryString("1111_1111");
+  const auto newValue = BinaryVector::CreateFromBinaryString("0010_0110");
+
+  Register sut("Reg", initial);
+  sut.SetPendingForRead(true);
+
+  // ---------------- Exercise
+  //
+  sut.SetFromSut(newValue);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (sut.LastFromSut(),     newValue);
+  TS_ASSERT_EQUALS (sut.LastReadFromSut(), newValue);
+  TS_ASSERT_EQUALS (sut.Mismatches(),      0);
+
+  uint8_t  last_uint8  = 0x55U;   sut.LastReadFromSut(last_uint8);
+  uint16_t last_uint16 = 0x55U;   sut.LastReadFromSut(last_uint16);
+  uint32_t last_uint32 = 0x55UL;  sut.LastReadFromSut(last_uint32);
+  uint64_t last_uint64 = 0x55ULL; sut.LastReadFromSut(last_uint64);
+  int8_t   last_int8   = 0x55;    sut.LastReadFromSut(last_int8);
+  int16_t  last_int16  = 0x55;    sut.LastReadFromSut(last_int16);
+  int32_t  last_int32  = 0x55L;   sut.LastReadFromSut(last_int32);
+  int64_t  last_int64  = 0x55LL;  sut.LastReadFromSut(last_int64);
+
+  CxxTest::setDisplayUnsignedAsHex(true);
+  TS_ASSERT_EQUALS (last_uint8,  0x26U);
+  TS_ASSERT_EQUALS (last_uint16, 0x26U);
+  TS_ASSERT_EQUALS (last_uint32, 0x26UL);
+  TS_ASSERT_EQUALS (last_uint64, 0x26ULL);
+  TS_ASSERT_EQUALS (last_int8,   0x26);
+  TS_ASSERT_EQUALS (last_int16,  0x26);
+  TS_ASSERT_EQUALS (last_int32,  0x26L);
+  TS_ASSERT_EQUALS (last_int64,  0x26LL);
+}
+
 
 
 //! Checks Register::SetFromSut() with a value of different size

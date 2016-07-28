@@ -273,6 +273,7 @@ template<typename T> void Check_iGet_SingleThread (string_view initialValue, T e
   Create_TestCase_MIB_Multichain_Pre(sm);
 
   auto reg  = sm.RegisterWithId(7u);
+  reg->SetPendingForRead();
   reg->SetFromSut(BinaryVector::CreateFromHexString(initialValue));
 
   SystemModelManager sut(sm);
@@ -1158,6 +1159,7 @@ void UT_SystemModelManager::test_iGet_Thread_is_Known ()
 
   auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
   auto reg  = sm.RegisterWithId(7u);
+  reg->SetPendingForRead();
   reg->SetFromSut(BinaryVector::CreateFromHexString("ABCD_0123"));
 
   SystemModelManager sut(sm);

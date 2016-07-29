@@ -136,15 +136,18 @@ class DLL_EXPORT BinaryVector final
   void          Get(int32_t& value) const; //!< Reads signed 32 bits value from BinaryVector
   void          Get(int64_t& value) const; //!< Reads signed 64 bits value from BinaryVector
 
-  void          Set(uint8_t  value); //!< Assigns unsigned  8 bits value the BinaryVector
-  void          Set(uint16_t value); //!< Assigns unsigned 16 bits value the BinaryVector
-  void          Set(uint32_t value); //!< Assigns unsigned 32 bits value the BinaryVector
-  void          Set(uint64_t value); //!< Assigns unsigned 64 bits value the BinaryVector
+  void          Set(const BinaryVector& value) { *this = value; };             //!< Assigns from another BinaryVector
+  void          Set(BinaryVector&&      value) { *this = std::move(value); };  //!< Assigns from another BinaryVector (with move)
 
-  void          Set(int8_t  value); //!< Assigns signed  8 bits value the BinaryVector
-  void          Set(int16_t value); //!< Assigns signed 16 bits value the BinaryVector
-  void          Set(int32_t value); //!< Assigns signed 32 bits value the BinaryVector
-  void          Set(int64_t value); //!< Assigns signed 64 bits value the BinaryVector
+  void          Set(uint8_t  value); //!< Assigns unsigned  8 bits value to the BinaryVector
+  void          Set(uint16_t value); //!< Assigns unsigned 16 bits value to the BinaryVector
+  void          Set(uint32_t value); //!< Assigns unsigned 32 bits value to the BinaryVector
+  void          Set(uint64_t value); //!< Assigns unsigned 64 bits value to the BinaryVector
+
+  void          Set(int8_t  value); //!< Assigns signed  8 bits value to the BinaryVector
+  void          Set(int16_t value); //!< Assigns signed 16 bits value to the BinaryVector
+  void          Set(int32_t value); //!< Assigns signed 32 bits value to the BinaryVector
+  void          Set(int64_t value); //!< Assigns signed 64 bits value to the BinaryVector
 
   void SetBit    (uint32_t bitOffset); //!< Sets specified bit (zero based)
   void ClearBit  (uint32_t bitOffset); //!< Clears specified bit (zero based)

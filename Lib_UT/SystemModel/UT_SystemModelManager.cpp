@@ -1632,7 +1632,6 @@ void UT_SystemModelManager::test_iApply_4_Threads_1_Write ()
   TS_ASSERT_EQUALS (gotVector_1, BinaryVector::CreateFromHexString("CAFE_8761"));
   TS_ASSERT_EQUALS (gotVector_2, BinaryVector::CreateFromHexString("CAFE_8762"));
   TS_ASSERT_EQUALS (gotVector_3, BinaryVector::CreateFromHexString("CAFE_8763"));
-
 }
 
 
@@ -1660,10 +1659,10 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes ()
   {
     auto nextToSut    = BinaryVector(32u);
     auto currentValue = initialValue;
-//+    auto gotValue     = BinaryVector(32u);
+    auto gotValue     = BinaryVector(32u);
 
-    TS_ASSERT_THROWS_NOTHING
-    (
+    try
+    {
       sut.iPrefix("MIB_mux");
 
       for (int ii = 0 ; ii <= 128 ; ++ii)
@@ -1674,11 +1673,19 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes ()
 
         // ---------------- Stupid double write without iApply...
         //
-        if ((ii % 83) == 0) { ++ii; nextToSut.Set(currentValue++); sut.iWrite(regName, nextToSut); }
+        if ((ii % 83) == 0)
+        {
+          ++ii;
+          nextToSut.Set(currentValue++);
+          sut.iWrite(regName, nextToSut);
+        }
 
         //! Make it "dream" between iWrite and iApply
         //!
-        if ((ii % 37) == 0) { std::this_thread::sleep_for(3ms); }
+        if ((ii % 37) == 0)
+        {
+          std::this_thread::sleep_for(1ms);
+        }
 
         sut.iApply();
 
@@ -1686,13 +1693,22 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes ()
         //
         if ((ii % 57) == 0)
         {
-          std::this_thread::sleep_for(7ms);
+          std::this_thread::sleep_for(3ms);
         }
 
         sut.iRead(regName, nextToSut);
         sut.iApply();
+        sut.iGet(regName, gotValue);
       }
-    );
+    }
+    catch(std::exception& exc)  // Catch C++ standard exceptions
+    {
+      TS_FAIL (exc.what());
+    }
+    catch (...)
+    {
+      TS_FAIL ("Caught unknown exception");
+    }
   };
 
   // ---------------- Setup (main thread)
@@ -1776,7 +1792,7 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes_TC_1500 ()
 
         //! Make it "dream" between iWrite and iApply
         //!
-        if ((ii % 37) == 0) { std::this_thread::sleep_for(3ms); }
+        if ((ii % 37) == 0) { std::this_thread::sleep_for(1ms); }
 
         sut.iApply();
 
@@ -1784,7 +1800,7 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes_TC_1500 ()
         //
         if ((ii % 57) == 0)
         {
-          std::this_thread::sleep_for(7ms);
+          std::this_thread::sleep_for(3ms);
         }
       }
     );

@@ -48,6 +48,7 @@ void FromSutUpdater::UpdateRegisters (const std::vector<NodeIdentifier>& activeR
     reg->SetFromSut(slice);
     reg->UpdateLastToSut();
     reg->ResetPending();
+    reg->SetCheckExpected(false);
 
     offset += bitsCount;
   }

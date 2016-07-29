@@ -327,7 +327,6 @@ void SystemModelManager::iApply ()
   { // ---------------- Protect access to SystemModel
     unique_lock<recursive_mutex> lock(m_dataMutex);
 
-
     // ---------------- Process queued writes
     //
     for (const auto& request : appData->queuedWrites)
@@ -347,21 +346,27 @@ void SystemModelManager::iApply ()
       }
     }
     appData->queuedWrites.clear();
+
+    // ---------------- Process queued refreshs
+    //
+  //+  for (const auto& request : appData->queuedRefreshes)
+  //+  {
+  //+  }
+  //+  appData->queuedRefreshes.clear();
+
+    // ---------------- Process queued reads
+    //
+    for (const auto& request : appData->queuedReads)
+    {
+      auto reg = m_sm.RegisterWithId(request.regId);
+      reg->SetExpectedFromSut(std::move(request.value));
+      reg->SetCheckExpected(true);
+      reg->SetPendingForRead(true);
+
+      RegisterPendingThread(reg);
+    }
+    appData->queuedReads.clear();
   }
-
-  // ---------------- Process queued refreshs
-  //
-//+  for (const auto& request : appData->queuedRefreshes)
-//+  {
-//+  }
-//+  appData->queuedRefreshes.clear();
-
-  // ---------------- Process queued reads
-  //
-//+  for (const auto& request : appData->queuedReads)
-//+  {
-//+  }
-//+  appData->queuedReads.clear();
 
   if (threadId == m_managerThreadId)  // Single thread context?
   {
@@ -369,14 +374,14 @@ void SystemModelManager::iApply ()
   }
   else
   {
-    for (const auto& regId : appData->pendingRegistersIds)
-    {
-      auto reg = m_sm.RegisterWithId(regId);
-      if (reg->IsPendingForRead())
-      {
-        reg->SetCheckExpected(true);
-      }
-    }
+//+    for (const auto& regId : appData->pendingRegistersIds)
+//+    {
+//+      auto reg = m_sm.RegisterWithId(regId);
+//+      if (reg->IsPendingForRead())
+//+      {
+//+        reg->SetCheckExpected(true);
+//+      }
+//+    }
 
     {
       // ---------------- Report that this thread is pending
@@ -483,29 +488,18 @@ void SystemModelManager::iPrefix (std::string prefix)
 //!
 void SystemModelManager::iRead (string_view registerPath, BinaryVector expectedValue)
 {
+  LOG(DEBUG) << "iRead - Entering";
+
   auto& pathResolver = PATH_RESOLVER("iRead: ");
   auto  reg          = pathResolver.ResolveAsRegister(registerPath);
 
-  LOG(DEBUG) << "iRead - Entering (may be blocked on mutex)";
 
-  if (std::this_thread::get_id() != m_managerThreadId)
-  {
-    auto  appData          = ThreadApplicationData();
-    *appData->currentState = ApplicationData::State::ReadRequest;
-  }
+  auto appData = ThreadApplicationData();
+  appData->queuedReads.emplace_back(SystemModelManager::QueuedRequest(reg->Identifier(), std::move(expectedValue)));
 
-  // ---------------- Protect access to SystemModel
-  //
-  unique_lock<recursive_mutex> lock(m_dataMutex);
+  *appData->currentState = ApplicationData::State::ReadRequest;
 
-  LOG(DEBUG) << "iRead - After mutex";
-
-  reg->SetExpectedFromSut(std::move(expectedValue));
-//+  reg->SetCheckExpected(true);
-  reg->SetPendingForRead(true);
-
-  RegisterPendingThread(reg);
-  LOG(DEBUG) << "iRead - Exiting";
+  LOG(DEBUG) << "iRead - Leaving";
 }
 //
 //  End of: SystemModelManager::iRead
@@ -517,20 +511,21 @@ void SystemModelManager::iRead (string_view registerPath, BinaryVector expectedV
 template<typename T>
 void SystemModelManager::iWrite_impl (string_view registerPath, T value)
 {
+  LOG(DEBUG) << "iWrite - Entering";
+
   auto& pathResolver = PATH_RESOLVER("iWrite: ");
   auto  reg          = pathResolver.ResolveAsRegister(registerPath);
 
-  LOG(DEBUG) << "iWrite - Entering";
 
   auto asBinaryVector = BinaryVector(reg->BitsCount(), 0u, SizeProperty::Fixed);
   asBinaryVector.Set(std::move(value));
 
   auto appData = ThreadApplicationData();
-  appData->queuedWrites.push_back(SystemModelManager::QueuedRequest(reg->Identifier(), std::move(asBinaryVector)));
+  appData->queuedWrites.emplace_back(SystemModelManager::QueuedRequest(reg->Identifier(), std::move(asBinaryVector)));
 
   *appData->currentState = ApplicationData::State::WriteRequest;
 
-  LOG(DEBUG) << "iWrite - Exiting";
+  LOG(DEBUG) << "iWrite - Leaving";
 }
 //
 //  End of: SystemModelManager::iWrite_impl
@@ -785,13 +780,12 @@ void SystemModelManager::ReportServedRegisters (const vector<NodeIdentifier>& ac
     // ---------------- Check must be done once after read
     //
     auto reg = m_sm.RegisterWithId(regId);
-    reg->SetCheckExpected(false);
 
     // ---------------- Get all threads pending for that registers
     //
     auto range = m_regIdToAppData.equal_range(regId);
 
-    // ---------------- Report that the register has been update (served)
+    // ---------------- Report that the register has been updated (served)
     //
     //                  (Normally, only a single thread should be pending for a register)
     //

@@ -1139,15 +1139,15 @@ void UT_SystemModelManager::test_iPrefix_Thread_is_Unknown ()
 
 //! Checks SystemModelManager::iGet() using same thread as SystemModelManager
 //!
-void UT_SystemModelManager::test_iGet_Thread_SingleThread_BinaryVector () { Check_iGet_SingleThread("ABCD_4567", BinaryVector::CreateFromHexString("ABCD_4567")); }
-void UT_SystemModelManager::test_iGet_Thread_SingleThread_uint8        () { Check_iGet_SingleThread("0000_007B", uint8_t(123));          }
-void UT_SystemModelManager::test_iGet_Thread_SingleThread_uint16       () { Check_iGet_SingleThread("0000_3039", uint16_t(12345));       }
-void UT_SystemModelManager::test_iGet_Thread_SingleThread_uint32       () { Check_iGet_SingleThread("0012_D687", uint32_t(1234567L));    }
-void UT_SystemModelManager::test_iGet_Thread_SingleThread_uint64       () { Check_iGet_SingleThread("075B_CD15", uint64_t(123456789LL)); }
-void UT_SystemModelManager::test_iGet_Thread_SingleThread_int8         () { Check_iGet_SingleThread("FFFF_FF85", int8_t(-123));          }
-void UT_SystemModelManager::test_iGet_Thread_SingleThread_int16        () { Check_iGet_SingleThread("FFFF_CFC7", int16_t(-12345));       }
-void UT_SystemModelManager::test_iGet_Thread_SingleThread_int32        () { Check_iGet_SingleThread("FFED_2979", int32_t(-1234567L));    }
-void UT_SystemModelManager::test_iGet_Thread_SingleThread_int64        () { Check_iGet_SingleThread("F8A4_32EB", int64_t(-123456789LL)); }
+void UT_SystemModelManager::test_iGet_SingleThread_BinaryVector () { Check_iGet_SingleThread("ABCD_4567", BinaryVector::CreateFromHexString("ABCD_4567")); }
+void UT_SystemModelManager::test_iGet_SingleThread_uint8        () { Check_iGet_SingleThread("0000_007B", uint8_t(123));          }
+void UT_SystemModelManager::test_iGet_SingleThread_uint16       () { Check_iGet_SingleThread("0000_3039", uint16_t(12345));       }
+void UT_SystemModelManager::test_iGet_SingleThread_uint32       () { Check_iGet_SingleThread("0012_D687", uint32_t(1234567L));    }
+void UT_SystemModelManager::test_iGet_SingleThread_uint64       () { Check_iGet_SingleThread("075B_CD15", uint64_t(123456789LL)); }
+void UT_SystemModelManager::test_iGet_SingleThread_int8         () { Check_iGet_SingleThread("FFFF_FF85", int8_t(-123));          }
+void UT_SystemModelManager::test_iGet_SingleThread_int16        () { Check_iGet_SingleThread("FFFF_CFC7", int16_t(-12345));       }
+void UT_SystemModelManager::test_iGet_SingleThread_int32        () { Check_iGet_SingleThread("FFED_2979", int32_t(-1234567L));    }
+void UT_SystemModelManager::test_iGet_SingleThread_int64        () { Check_iGet_SingleThread("F8A4_32EB", int64_t(-123456789LL)); }
 
 //! Checks SystemModelManager::iGet() using thread managed (known) by SystemModelManager
 //!
@@ -1839,7 +1839,202 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes_TC_1500 ()
   TS_ASSERT_EQUALS (reg_3->NextToSut(), expected_3);
 }
 
+//! Checks SystemModelManager::iRefresh() with 4 application threads accessing multiple times their own register
+//!
+//! @note It just check that application and manager threads are not blocked
+void UT_SystemModelManager::test_iRefresh ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
 
+  auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
+
+  SystemModelManager sut(sm);
+
+  // Thread functor
+  auto appFunctor = [&sut](string_view regName)
+  {
+    try
+    {
+      sut.iPrefix("MIB_mux");
+
+      for (int ii = 0 ; ii <= 128 ; ++ii)
+      {
+        sut.iRefresh(regName);
+
+        // ---------------- "Stupid" double refresh without iApply...
+        //
+        if ((ii % 83) == 0)
+        {
+          sut.iRefresh(regName);
+        }
+
+        //! Make it "dream" between iWrite and iApply
+        //!
+        if ((ii % 37) == 0)
+        {
+          std::this_thread::sleep_for(1ms);
+        }
+
+        sut.iApply();
+
+        // ---------------- Make it "think" for some time
+        //
+        if ((ii % 57) == 0)
+        {
+          std::this_thread::sleep_for(3ms);
+        }
+      }
+    }
+    catch(std::exception& exc)  // Catch C++ standard exceptions
+    {
+      TS_FAIL (exc.what());
+    }
+    catch (...)
+    {
+      TS_FAIL ("Caught unknown exception");
+    }
+  };
+
+  // ---------------- Setup (main thread)
+  //
+  sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_0"); }, "App_0");
+  sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_1"); }, "App_1");
+  sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_2"); }, "App_2");
+  sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_3"); }, "App_3");
+  sut.Start();
+  sut.StartCreatedApplicationThreads();
+  sut.WaitForApplicationsEnd();              // Make sure applications have done their action
+  sut.Stop();
+
+  // ---------------- Verify
+  //
+  auto reg_0  = sm.RegisterWithId(6u);
+  auto reg_1  = sm.RegisterWithId(7u);
+  auto reg_2  = sm.RegisterWithId(8u);
+  auto reg_3  = sm.RegisterWithId(9u);
+
+  TS_ASSERT_FALSE (reg_0->IsPending());
+  TS_ASSERT_FALSE (reg_1->IsPending());
+  TS_ASSERT_FALSE (reg_2->IsPending());
+  TS_ASSERT_FALSE (reg_3->IsPending());
+}
+
+
+//! Checks SystemModelManager::iRefresh() with 4 application threads accessing multiple times their each register
+//!
+//! @note It just check that application and manager threads are not blocked
+void UT_SystemModelManager::test_iRefresh_4_RegPerApp ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
+
+  SystemModelManager sut(sm);
+
+  // Thread functor
+  auto appFunctor = [&sut]()
+  {
+    try
+    {
+      sut.iPrefix("MIB_mux");
+
+      for (int ii = 0 ; ii <= 18 ; ++ii)
+      {
+        sut.iRefresh("dynamic_0");
+        sut.iRefresh("dynamic_1");
+        sut.iRefresh("dynamic_2");
+        sut.iRefresh("dynamic_3");
+
+        sut.iApply();
+      }
+    }
+    catch(std::exception& exc)  // Catch C++ standard exceptions
+    {
+      TS_FAIL (exc.what());
+    }
+    catch (...)
+    {
+      TS_FAIL ("Caught unknown exception");
+    }
+  };
+
+  // ---------------- Setup (main thread)
+  //
+  sut.CreateApplicationThread(mux, appFunctor, "App_0");
+  sut.CreateApplicationThread(mux, appFunctor, "App_1");
+  sut.CreateApplicationThread(mux, appFunctor, "App_2");
+  sut.CreateApplicationThread(mux, appFunctor, "App_3");
+  sut.Start();
+  sut.StartCreatedApplicationThreads();
+  sut.WaitForApplicationsEnd();              // Make sure applications have done their action
+  sut.Stop();
+
+  // ---------------- Verify
+  //
+  auto reg_0  = sm.RegisterWithId(6u);
+  auto reg_1  = sm.RegisterWithId(7u);
+  auto reg_2  = sm.RegisterWithId(8u);
+  auto reg_3  = sm.RegisterWithId(9u);
+
+  TS_ASSERT_FALSE (reg_0->IsPending());
+  TS_ASSERT_FALSE (reg_1->IsPending());
+  TS_ASSERT_FALSE (reg_2->IsPending());
+  TS_ASSERT_FALSE (reg_3->IsPending());
+}
+
+
+
+//! Checks SystemModelManager::iGetRefresh() with 4 application threads accessing multiple times their own register
+//!
+//! @note It just check that application and manager threads are not blocked
+void UT_SystemModelManager::test_iGetRefresh ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
+  auto reg_0  = sm.RegisterWithId(6u); reg_0->SetHoldValue(true); // Hold is to maintain the same value (nextToSut becoume also bypass)
+  auto reg_1  = sm.RegisterWithId(7u); reg_1->SetHoldValue(true);
+  auto reg_2  = sm.RegisterWithId(8u); reg_2->SetHoldValue(true);
+  auto reg_3  = sm.RegisterWithId(9u); reg_3->SetHoldValue(true);
+
+  SystemModelManager sut(sm);
+
+  // Thread functor
+  auto appFunctor = [&sut](string_view regName)
+  {
+    TS_ASSERT_THROWS_NOTHING
+    (
+      sut.iPrefix("MIB_mux");
+
+      uint32_t gotData;
+
+      for (int ii = 0 ; ii < 30 ; ++ii)
+      {
+        sut.iGetRefresh(regName, gotData);
+      }
+    );
+  };
+
+  // ---------------- Setup (main thread)
+  //
+  sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_0"); }, "App_0");
+  sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_1"); }, "App_1");
+  sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_2"); }, "App_2");
+  sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_3"); }, "App_3");
+  sut.Start();
+  sut.StartCreatedApplicationThreads();
+  sut.WaitForApplicationsEnd();              // Make sure applications have done their action
+  sut.Stop();
+}
 
 //===========================================================================
 // End of UT_SystemModelManager.cpp

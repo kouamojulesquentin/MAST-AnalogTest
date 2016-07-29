@@ -317,112 +317,60 @@ shared_ptr<AccessInterface> SystemModelManager::GetFirstAccessInterface (const S
 //!
 void SystemModelManager::iApply ()
 {
-  LOG(DEBUG) << "iApply";
 
   auto appData           = ThreadApplicationData();
   *appData->currentState = ApplicationData::State::InApply;
 
+  ProcessQueuedRequests(appData);
+
   auto threadId = std::this_thread::get_id();
-
-  { // ---------------- Protect access to SystemModel
-    unique_lock<recursive_mutex> lock(m_dataMutex);
-
-    // ---------------- Process queued writes
-    //
-    for (const auto& request : appData->queuedWrites)
-    {
-      auto reg = m_sm.RegisterWithId(request.regId);
-      reg->SetToSut(std::move(request.value));
-
-      // ---------------- Save the fact that application thread request an operation on that register
-      //
-      if (threadId != m_managerThreadId)
-      {
-        bool pendingWrite = reg->NextToSut() != reg->LastToSut();
-        if (pendingWrite)
-        {
-          RegisterPendingThread(reg);
-        }
-      }
-    }
-    appData->queuedWrites.clear();
-
-    // ---------------- Process queued refreshs
-    //
-  //+  for (const auto& request : appData->queuedRefreshes)
-  //+  {
-  //+  }
-  //+  appData->queuedRefreshes.clear();
-
-    // ---------------- Process queued reads
-    //
-    for (const auto& request : appData->queuedReads)
-    {
-      auto reg = m_sm.RegisterWithId(request.regId);
-      reg->SetExpectedFromSut(std::move(request.value));
-      reg->SetCheckExpected(true);
-      reg->SetPendingForRead(true);
-
-      RegisterPendingThread(reg);
-    }
-    appData->queuedReads.clear();
-  }
-
   if (threadId == m_managerThreadId)  // Single thread context?
   {
     DoDataCycles();
   }
   else
   {
-//+    for (const auto& regId : appData->pendingRegistersIds)
-//+    {
-//+      auto reg = m_sm.RegisterWithId(regId);
-//+      if (reg->IsPendingForRead())
-//+      {
-//+        reg->SetCheckExpected(true);
-//+      }
-//+    }
-
+    // ---------------- Report that this thread is pending
+    //
     {
-      // ---------------- Report that this thread is pending
-      //
-      {
-        unique_lock<recursive_mutex> lock(m_dataMutex);
-        appData->canProceed = false;      // Must be set to false before reporting as pending thread !
-        m_pendingThreads.insert(threadId);
-      }
-
-      WakeupDataCycles();
-
-      MONITOR_WITH_NODE("Will be blocked in iApply", *appData->pathResolver.ReferenceNode(), appData->debugName)
-
-      // ---------------- Block the thread until data cycle loop release it (or is terminated)
-      //                  As waking up of data cycle loop may occurs before wait
-      //                  we use a timeout to check again if we can proceed (this is to compensate for potential notification loss)
-      auto predicate = [appData, this]{ return appData->canProceed.load() || !m_runLoop; };
-      auto timeout    = 500us;
-      auto maxTimeout = 100ms;
-
-      while (!predicate())
-      {
-        if (timeout < maxTimeout) { timeout *= 2; }
-
-        {
-          std::unique_lock<std::mutex> lock(appData->releaseMutex);
-          appData->releaseCv.wait_for(lock, timeout, predicate);
-        }
-      }
-
-      if (!m_runLoop)
-      {
-        MONITOR_MESSAGE("Application thread has been released from iApply because data cycle loop is not/no more running ");
-      }
-
-      MONITOR_WITH_NODE("Released from iApply", *appData->pathResolver.ReferenceNode(), appData->debugName)
+      unique_lock<recursive_mutex> lock(m_dataMutex);
+      appData->canProceed = false;      // Must be set to false before reporting as pending thread !
+      m_pendingThreads.insert(threadId);
     }
 
-    *appData->currentState = ApplicationData::State::Running;
+    WakeupDataCycles();
+
+    MONITOR_WITH_NODE("Will be blocked in iApply", *appData->pathResolver.ReferenceNode(), appData->debugName)
+
+    // ---------------- Block the thread until data cycle loop release it (or is terminated)
+    //                  As waking up of data cycle loop may occurs before wait
+    //                  we use a timeout to check again if we can proceed (this is to compensate for potential notification loss)
+    auto predicate = [appData, this]{ return appData->canProceed.load() || !m_runLoop; };
+    auto timeout    = 500us;
+    auto maxTimeout = 100ms;
+
+    while (!predicate())
+    {
+      if (timeout < maxTimeout) { timeout *= 2; }
+
+      {
+        std::unique_lock<std::mutex> lock(appData->releaseMutex);
+        appData->releaseCv.wait_for(lock, timeout, predicate);
+      }
+    }
+
+    if (!m_runLoop)
+    {
+      MONITOR_MESSAGE("iApply - Application thread has been released because data cycle loop is not/no more running ");
+    }
+    else
+    {
+      MONITOR_WITH_NODE("iApply - Released ", *appData->pathResolver.ReferenceNode(), appData->debugName)
+    }
   }
+
+  *appData->currentState = ApplicationData::State::Running;
+  LOG(DEBUG) << "iApply - Leaving";
 }
 //
 //  End of: SystemModelManager::iApply
@@ -455,6 +403,31 @@ void SystemModelManager::iGet (string_view registerPath, int8_t&       readData)
 void SystemModelManager::iGet (string_view registerPath, int16_t&      readData) { iGet_impl(registerPath, readData); }
 void SystemModelManager::iGet (string_view registerPath, int32_t&      readData) { iGet_impl(registerPath, readData); }
 void SystemModelManager::iGet (string_view registerPath, int64_t&      readData) { iGet_impl(registerPath, readData); }
+
+
+//! Queues data to be read from SUT without checking the value
+//!
+template<typename T>
+void SystemModelManager::iGetRefresh_impl (string_view registerPath, T& readData)
+{
+  iRefresh(registerPath);
+  iApply();
+  iGet_impl(registerPath, readData);
+}
+//
+//  End of: SystemModelManager::iGetRefresh
+//---------------------------------------------------------------------------
+
+
+void SystemModelManager::iGetRefresh (string_view registerPath, BinaryVector& readData) { iGetRefresh_impl(registerPath, readData); }
+void SystemModelManager::iGetRefresh (string_view registerPath, uint8_t&      readData) { iGetRefresh_impl(registerPath, readData); }
+void SystemModelManager::iGetRefresh (string_view registerPath, uint16_t&     readData) { iGetRefresh_impl(registerPath, readData); }
+void SystemModelManager::iGetRefresh (string_view registerPath, uint32_t&     readData) { iGetRefresh_impl(registerPath, readData); }
+void SystemModelManager::iGetRefresh (string_view registerPath, uint64_t&     readData) { iGetRefresh_impl(registerPath, readData); }
+void SystemModelManager::iGetRefresh (string_view registerPath, int8_t&       readData) { iGetRefresh_impl(registerPath, readData); }
+void SystemModelManager::iGetRefresh (string_view registerPath, int16_t&      readData) { iGetRefresh_impl(registerPath, readData); }
+void SystemModelManager::iGetRefresh (string_view registerPath, int32_t&      readData) { iGetRefresh_impl(registerPath, readData); }
+void SystemModelManager::iGetRefresh (string_view registerPath, int64_t&      readData) { iGetRefresh_impl(registerPath, readData); }
 
 
 //! Returns current path prefix for current thread
@@ -503,6 +476,29 @@ void SystemModelManager::iRead (string_view registerPath, BinaryVector expectedV
 }
 //
 //  End of: SystemModelManager::iRead
+//---------------------------------------------------------------------------
+
+
+//! Queues a request to (re-)read register value from SUT
+//!
+//! @param registerPath     Register path (relative to the last iPrefix or node associated with application thread)
+//!
+void SystemModelManager::iRefresh (string_view registerPath)
+{
+  LOG(DEBUG) << "iRefresh - Entering";
+
+  auto& pathResolver = PATH_RESOLVER("iRefresh: ");
+  auto  reg          = pathResolver.ResolveAsRegister(registerPath);
+
+  auto appData = ThreadApplicationData();
+  appData->queuedRefreshes.emplace_back(SystemModelManager::QueuedRequest(reg->Identifier()));
+
+  *appData->currentState = ApplicationData::State::RefreshRequest;
+
+  LOG(DEBUG) << "iRefresh - Leaving";
+}
+//
+//  End of: SystemModelManager::iRefresh
 //---------------------------------------------------------------------------
 
 
@@ -609,6 +605,58 @@ const NodePathResolver& SystemModelManager::PathResolver (const char* file, cons
 //  End of: SystemModelManager::PathResolver
 //---------------------------------------------------------------------------
 
+
+
+//! Processes queued iWrite, iRead and iRefresh requests
+//!
+//! @note Must be called only by iApply
+//!
+void SystemModelManager::ProcessQueuedRequests (shared_ptr<ApplicationData> appData)
+{
+  unique_lock<recursive_mutex> lock(m_dataMutex);
+
+  // ---------------- Process queued writes
+  //
+  for (const auto& request : appData->queuedWrites)
+  {
+    auto reg = m_sm.RegisterWithId(request.regId);
+    reg->SetToSut(std::move(request.value));
+
+    bool pendingWrite = reg->NextToSut() != reg->LastToSut();
+    if (pendingWrite)
+    {
+      RegisterPendingThread(reg);
+    }
+  }
+  appData->queuedWrites.clear();
+
+  // ---------------- Process queued refreshes
+  //
+  for (const auto& request : appData->queuedRefreshes)
+  {
+    auto reg = m_sm.RegisterWithId(request.regId);
+    reg->SetPendingForRead(true);
+
+    RegisterPendingThread(reg);
+  }
+  appData->queuedRefreshes.clear();
+
+  // ---------------- Process queued reads
+  //
+  for (const auto& request : appData->queuedReads)
+  {
+    auto reg = m_sm.RegisterWithId(request.regId);
+    reg->SetExpectedFromSut(std::move(request.value));
+    reg->SetCheckExpected(true);
+    reg->SetPendingForRead(true);
+
+    RegisterPendingThread(reg);
+  }
+  appData->queuedReads.clear();
+}
+//
+//  End of: SystemModelManager::ProcessQueuedRequests
+//---------------------------------------------------------------------------
 
 
 

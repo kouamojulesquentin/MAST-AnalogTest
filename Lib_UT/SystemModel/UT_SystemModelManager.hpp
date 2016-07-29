@@ -60,15 +60,15 @@ class UT_SystemModelManager : public CxxTest::TestSuite
 
   // ---------------- iGet
   //
-  void test_iGet_Thread_SingleThread_BinaryVector ();
-  void test_iGet_Thread_SingleThread_uint8 ();
-  void test_iGet_Thread_SingleThread_uint16 ();
-  void test_iGet_Thread_SingleThread_uint32 ();
-  void test_iGet_Thread_SingleThread_uint64 ();
-  void test_iGet_Thread_SingleThread_int8 ();
-  void test_iGet_Thread_SingleThread_int16 ();
-  void test_iGet_Thread_SingleThread_int32 ();
-  void test_iGet_Thread_SingleThread_int64 ();
+  void test_iGet_SingleThread_BinaryVector ();
+  void test_iGet_SingleThread_uint8 ();
+  void test_iGet_SingleThread_uint16 ();
+  void test_iGet_SingleThread_uint32 ();
+  void test_iGet_SingleThread_uint64 ();
+  void test_iGet_SingleThread_int8 ();
+  void test_iGet_SingleThread_int16 ();
+  void test_iGet_SingleThread_int32 ();
+  void test_iGet_SingleThread_int64 ();
   void test_iGet_Thread_is_Known ();
   void test_iGet_Thread_is_Unknown ();
 
@@ -99,6 +99,13 @@ class UT_SystemModelManager : public CxxTest::TestSuite
   void test_iApply_4_Threads_1_Write ();
   void test_iApply_4_Threads_N_Writes ();
   void test_iApply_4_Threads_N_Writes_TC_1500 ();
+
+  // ---------------- iRefresh
+  //
+  void test_iRefresh ();
+  void test_iRefresh_4_RegPerApp ();
+  void test_iGetRefresh ();
+
 
   // ================ Other Methods ================
 

@@ -127,6 +127,28 @@ class DLL_EXPORT SystemModelManager final
   //!
   void iRead (string_view registerPath, BinaryVector expectedValue);
 
+  //! Queues data to be read from SUT without checking the value
+  //!
+  void iRefresh (string_view registerPath);
+
+  //! Request data to be read from SUT and wait till we can return it
+  //!
+  void         iGetRefresh (string_view registerPath, uint8_t&      readData);
+  void         iGetRefresh (string_view registerPath, uint16_t&     readData);
+  void         iGetRefresh (string_view registerPath, uint32_t&     readData);
+  void         iGetRefresh (string_view registerPath, uint64_t&     readData);
+  void         iGetRefresh (string_view registerPath, int8_t&       readData);
+  void         iGetRefresh (string_view registerPath, int16_t&      readData);
+  void         iGetRefresh (string_view registerPath, int32_t&      readData);
+  void         iGetRefresh (string_view registerPath, int64_t&      readData);
+  void         iGetRefresh (string_view registerPath, BinaryVector& readData);
+  BinaryVector iGetRefresh (string_view registerPath)
+  {
+    BinaryVector readData;
+    iGetRefresh(registerPath, readData);
+    return std::move(readData);
+  }
+
   //! Sets next Register value to sent to SUT
   //!
   void iWrite (string_view registerPath, BinaryVector value);
@@ -168,12 +190,13 @@ class DLL_EXPORT SystemModelManager final
 
   using NodeIdentifier = SystemModelNode::NodeIdentifier;
 
-  template<typename T> void iGet_impl   (string_view registerPath, T& readData);
-  template<typename T> void iWrite_impl (string_view registerPath, T  value);
+  template<typename T> void iGet_impl        (string_view registerPath, T& readData);
+  template<typename T> void iGetRefresh_impl (string_view registerPath, T& readData);
+  template<typename T> void iWrite_impl      (string_view registerPath, T  value);
 
   struct QueuedRequest
   {
-    QueuedRequest(NodeIdentifier p_id, BinaryVector p_value, BinaryVector p_mask = BinaryVector())
+    QueuedRequest(NodeIdentifier p_id, BinaryVector p_value = BinaryVector(), BinaryVector p_mask = BinaryVector())
       : regId (p_id), value (p_value), mask (p_mask)
     {}
 
@@ -192,6 +215,7 @@ class DLL_EXPORT SystemModelManager final
       ApplicationThreadStarted,
       WriteRequest,
       ReadRequest,
+      RefreshRequest,
       InApply,
       Running,
       Terminated,
@@ -231,6 +255,7 @@ class DLL_EXPORT SystemModelManager final
 
   const NodePathResolver&          PathResolver(const char* file, const char* fct, uint32_t line, std::experimental::string_view msg) const;
 
+  void ProcessQueuedRequests (std::shared_ptr<ApplicationData> appData);
   void LoopOnDataCycle ();
   void DoDataCycles_Impl ();
   void RegisterPendingThread (std::shared_ptr<Register> reg);

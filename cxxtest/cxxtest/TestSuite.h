@@ -45,6 +45,8 @@ class SkipTest {};
 void doAbortTest();
 #   define TS_ABORT() CxxTest::doAbortTest()
 
+#define TS_NAME  CxxTest::tracker().test().testName() //!< Gets test method name (no class nor namespace scope)
+
 class StringMerger
 {
   enum { BUFFER_SIZE = 500 };

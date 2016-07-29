@@ -430,6 +430,32 @@ void SystemModelManager::iGetRefresh (string_view registerPath, int32_t&      re
 void SystemModelManager::iGetRefresh (string_view registerPath, int64_t&      readData) { iGetRefresh_impl(registerPath, readData); }
 
 
+//! Returns the number of expected read failure for a single Register
+//!
+//! @param registerPath Path to the register
+//! @param clearCounter When true, the mismatch counter is reset
+//!
+uint32_t SystemModelManager::iGetStatus (string_view registerPath, bool clearCounter)
+{
+  auto& pathResolver = PATH_RESOLVER("iGetStatus: ");
+  auto  reg          = pathResolver.ResolveAsRegister(registerPath);
+
+  unique_lock<recursive_mutex> lock(m_dataMutex); // We must protect for the register been updated just when we read it
+
+  auto count = reg->Mismatches();
+  if (clearCounter)
+  {
+    reg->ResetMismatches();
+  }
+
+  return count;
+}
+//
+//  End of: SystemModelManager::iGetStatus
+//---------------------------------------------------------------------------
+
+
+
 //! Returns current path prefix for current thread
 //!
 string SystemModelManager::iPrefix () const

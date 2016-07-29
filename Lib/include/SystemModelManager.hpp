@@ -149,6 +149,8 @@ class DLL_EXPORT SystemModelManager final
     return std::move(readData);
   }
 
+  uint32_t iGetStatus(string_view registerPath, bool clearCounter = false);
+
   //! Sets next Register value to sent to SUT
   //!
   void iWrite (string_view registerPath, BinaryVector value);

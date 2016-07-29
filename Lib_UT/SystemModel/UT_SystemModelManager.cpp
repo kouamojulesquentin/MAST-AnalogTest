@@ -47,6 +47,15 @@ using namespace test;
 using Primitive = GenericAccessInterfaceProtocol::Primitive;
 using Action    = GenericAccessInterfaceProtocol::Action;
 
+#define LOG_TEST_DURATION
+
+namespace
+{
+  #ifdef LOG_TEST_DURATION
+  std::chrono::time_point<std::chrono::steady_clock> g_testStartTime;
+  #endif  // not define LOG_TEST_DURATION
+} // End of unnamed namespace
+
 namespace
 {
 
@@ -291,15 +300,29 @@ template<typename T> void Check_iGet_SingleThread (string_view initialValue, T e
 }
 } // End of unnamed namespace
 
+
 //! Initializes test (called for each test)
 void UT_SystemModelManager::setUp ()
 {
   CxxTest::setStringResultsOnNewLine(true);
   CxxTest::setCharactersMapping(CxxTest::CharacterMapping::MAP_CHARS_MINIMAL);  // Keep quotes, HT, and new lines unescaped
 
+  #if defined(LOG_TEST_DURATION)
+  g_testStartTime = std::chrono::steady_clock::now();
+  #endif
+
   SystemModelNode::ResetNodeIdentifier();
 }
 
+//! Cleanups test (called for each test)
+void UT_SystemModelManager::tearDown ()
+{
+  #if defined(LOG_TEST_DURATION)
+  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - g_testStartTime).count();
+  ENABLE_LOG_IN_SCOPE;
+  LOG(INFO) << std::setw(3) << duration << " ms for: UT_SystemModelManager::" << TS_NAME;
+  #endif
+}
 
 //! Checks SystemModelManager constructor when there are no node in system model
 //!
@@ -965,11 +988,10 @@ void UT_SystemModelManager::test_CreateApplicationThread_1_App ()
     // ---------------- Verify
     //
     value = 1u; // 1rst value
-    std::this_thread::sleep_for(2ms);    // Let the thread to be started by the system
     TS_ASSERT_EQUALS (sum,          0);  // Thread is waiting for start signal ==> sum does not change
     TS_ASSERT_EQUALS (value.load(), 1u); // Value is also not changed
     sut.StartCreatedApplicationThreads();
-    while (!started){std::this_thread::sleep_for(1ms);}  // Wait for start signal being seen by application thread function
+    while (!started){std::this_thread::sleep_for(0ms);}  // Wait for start signal being seen by application thread function
     TS_ASSERT_EQUALS (sum,          1u); // Thread is now started ==> sum has been updated
     TS_ASSERT_EQUALS (value.load(), 0);  // Value has been reset
 
@@ -1665,7 +1687,7 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes ()
     {
       sut.iPrefix("MIB_mux");
 
-      for (int ii = 0 ; ii <= 128 ; ++ii)
+      for (int ii = 0 ; ii <= 48 ; ++ii)
       {
         nextToSut.Set(currentValue++);
         LOG(INFO) << "Writing to " << regName << ": 0x" << std::hex << currentValue;
@@ -1673,7 +1695,7 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes ()
 
         // ---------------- Stupid double write without iApply...
         //
-        if ((ii % 83) == 0)
+        if (ii == 47)
         {
           ++ii;
           nextToSut.Set(currentValue++);
@@ -1682,7 +1704,7 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes ()
 
         //! Make it "dream" between iWrite and iApply
         //!
-        if ((ii % 37) == 0)
+        if (ii == 37)
         {
           std::this_thread::sleep_for(1ms);
         }
@@ -1691,9 +1713,9 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes ()
 
         // ---------------- Make it "think" after iApply
         //
-        if ((ii % 57) == 0)
+        if (ii == 33)
         {
-          std::this_thread::sleep_for(3ms);
+          std::this_thread::sleep_for(2ms);
         }
 
         sut.iRead(regName, nextToSut);
@@ -1733,10 +1755,10 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes ()
 
   // Terminal value
   //
-  auto expected_0 = BinaryVector(32u); expected_0.Set(0x00005080u);
-  auto expected_1 = BinaryVector(32u); expected_1.Set(0x00015081u);
-  auto expected_2 = BinaryVector(32u); expected_2.Set(0x00025082u);
-  auto expected_3 = BinaryVector(32u); expected_3.Set(0x00035083u);
+  auto expected_0 = BinaryVector(32u); expected_0.Set(0x00005030u);
+  auto expected_1 = BinaryVector(32u); expected_1.Set(0x00015031u);
+  auto expected_2 = BinaryVector(32u); expected_2.Set(0x00025032u);
+  auto expected_3 = BinaryVector(32u); expected_3.Set(0x00035033u);
 
   TS_ASSERT_EQUALS (reg_0->NextToSut(), expected_0);
   TS_ASSERT_EQUALS (reg_1->NextToSut(), expected_1);
@@ -1780,7 +1802,7 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes_TC_1500 ()
     (
       sut.iPrefix(".");
 
-      for (int ii = 0 ; ii <= 128 ; ++ii)
+      for (int ii = 0 ; ii <= 48 ; ++ii)
       {
         nextToSut.Set(currentValue++);
         LOG(INFO) << "Writing to " << regName << ": 0x" << std::hex << currentValue;
@@ -1788,19 +1810,19 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes_TC_1500 ()
 
         // ---------------- Stupid double write without iApply...
         //
-        if ((ii % 83) == 0) { ++ii; nextToSut.Set(currentValue++); sut.iWrite(regName, nextToSut); }
+        if (ii == 37) { ++ii; nextToSut.Set(currentValue++); sut.iWrite(regName, nextToSut); }
 
         //! Make it "dream" between iWrite and iApply
         //!
-        if ((ii % 37) == 0) { std::this_thread::sleep_for(1ms); }
+        if (ii == 27) { std::this_thread::sleep_for(1ms); }
 
         sut.iApply();
 
         // ---------------- Make is "think" after iApply
         //
-        if ((ii % 57) == 0)
+        if (ii == 17)
         {
-          std::this_thread::sleep_for(3ms);
+          std::this_thread::sleep_for(2ms);
         }
       }
     );
@@ -1828,10 +1850,10 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes_TC_1500 ()
 
   // Terminal value
   //
-  auto expected_0 = BinaryVector(32); expected_0.Set(0x00005080u);
-  auto expected_1 = BinaryVector(32); expected_1.Set(0x00015081u);
-  auto expected_2 = BinaryVector(32); expected_2.Set(0x00025082u);
-  auto expected_3 = BinaryVector(32); expected_3.Set(0x00035083u);
+  auto expected_0 = BinaryVector(32); expected_0.Set(0x00005030u);
+  auto expected_1 = BinaryVector(32); expected_1.Set(0x00015031u);
+  auto expected_2 = BinaryVector(32); expected_2.Set(0x00025032u);
+  auto expected_3 = BinaryVector(32); expected_3.Set(0x00035033u);
 
   TS_ASSERT_EQUALS (reg_0->NextToSut(), expected_0);
   TS_ASSERT_EQUALS (reg_1->NextToSut(), expected_1);
@@ -1839,7 +1861,7 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes_TC_1500 ()
   TS_ASSERT_EQUALS (reg_3->NextToSut(), expected_3);
 }
 
-//! Checks SystemModelManager::iRefresh() with 4 application threads accessing multiple times their own register
+//! Checks SystemModelManager::iRefresh() with 3 application threads accessing multiple times their own register
 //!
 //! @note It just check that application and manager threads are not blocked
 void UT_SystemModelManager::test_iRefresh ()
@@ -1860,20 +1882,20 @@ void UT_SystemModelManager::test_iRefresh ()
     {
       sut.iPrefix("MIB_mux");
 
-      for (int ii = 0 ; ii <= 128 ; ++ii)
+      for (int ii = 0 ; ii <= 7 ; ++ii)
       {
         sut.iRefresh(regName);
 
         // ---------------- "Stupid" double refresh without iApply...
         //
-        if ((ii % 83) == 0)
+        if ((ii % 3) == 0)
         {
           sut.iRefresh(regName);
         }
 
         //! Make it "dream" between iWrite and iApply
         //!
-        if ((ii % 37) == 0)
+        if ((ii % 5) == 0)
         {
           std::this_thread::sleep_for(1ms);
         }
@@ -1882,9 +1904,9 @@ void UT_SystemModelManager::test_iRefresh ()
 
         // ---------------- Make it "think" for some time
         //
-        if ((ii % 57) == 0)
+        if ((ii % 6) == 0)
         {
-          std::this_thread::sleep_for(3ms);
+          std::this_thread::sleep_for(2ms);
         }
       }
     }
@@ -1903,7 +1925,6 @@ void UT_SystemModelManager::test_iRefresh ()
   sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_0"); }, "App_0");
   sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_1"); }, "App_1");
   sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_2"); }, "App_2");
-  sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_3"); }, "App_3");
   sut.Start();
   sut.StartCreatedApplicationThreads();
   sut.WaitForApplicationsEnd();              // Make sure applications have done their action
@@ -1923,7 +1944,7 @@ void UT_SystemModelManager::test_iRefresh ()
 }
 
 
-//! Checks SystemModelManager::iRefresh() with 4 application threads accessing multiple times their each register
+//! Checks SystemModelManager::iRefresh() with 3 application threads accessing multiple times four registers
 //!
 //! @note It just check that application and manager threads are not blocked
 void UT_SystemModelManager::test_iRefresh_4_RegPerApp ()
@@ -1944,7 +1965,7 @@ void UT_SystemModelManager::test_iRefresh_4_RegPerApp ()
     {
       sut.iPrefix("MIB_mux");
 
-      for (int ii = 0 ; ii <= 18 ; ++ii)
+      for (int ii = 0 ; ii <= 9 ; ++ii)
       {
         sut.iRefresh("dynamic_0");
         sut.iRefresh("dynamic_1");
@@ -1969,7 +1990,6 @@ void UT_SystemModelManager::test_iRefresh_4_RegPerApp ()
   sut.CreateApplicationThread(mux, appFunctor, "App_0");
   sut.CreateApplicationThread(mux, appFunctor, "App_1");
   sut.CreateApplicationThread(mux, appFunctor, "App_2");
-  sut.CreateApplicationThread(mux, appFunctor, "App_3");
   sut.Start();
   sut.StartCreatedApplicationThreads();
   sut.WaitForApplicationsEnd();              // Make sure applications have done their action
@@ -2017,7 +2037,7 @@ void UT_SystemModelManager::test_iGetRefresh ()
 
       uint32_t gotData;
 
-      for (int ii = 0 ; ii < 30 ; ++ii)
+      for (int ii = 0 ; ii < 8 ; ++ii)
       {
         sut.iGetRefresh(regName, gotData);
       }
@@ -2028,10 +2048,136 @@ void UT_SystemModelManager::test_iGetRefresh ()
   //
   sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_0"); }, "App_0");
   sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_1"); }, "App_1");
-  sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_2"); }, "App_2");
-  sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_3"); }, "App_3");
   sut.Start();
   sut.StartCreatedApplicationThreads();
+  sut.WaitForApplicationsEnd();              // Make sure applications have done their action
+  sut.Stop();
+}
+
+
+//! Checks SystemModelManager::iGetStatus() without requesting to reset the counter
+//!
+//! @note It just check that application and manager threads are not blocked
+void UT_SystemModelManager::test_iGetStatus_Register_WithoutClear ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto reg  = sm.RegisterWithId(8u);
+  reg->SetCheckExpected(true);
+  reg->SetExpectedFromSut (BinaryVector::CreateFromHexString("FADE_6666"));
+  reg->SetFromSut         (BinaryVector::CreateFromHexString("FADE_5555"));
+  reg->SetFromSut         (BinaryVector::CreateFromHexString("FADE_4444"));
+
+  TS_ASSERT_EQUALS (reg->Mismatches(), 2u);
+
+  SystemModelManager sut(sm);
+
+  TS_ASSERT_THROWS_NOTHING (sut.iPrefix("TAP_DR_Mux.MIB_mux"));
+
+  // ---------------- Exercise
+  //
+  auto count_1 = sut.iGetStatus("dynamic_2");
+  auto count_2 = sut.iGetStatus("dynamic_2");
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (count_1, 2u);
+  TS_ASSERT_EQUALS (count_1, count_2);
+}
+
+
+//! Checks SystemModelManager::iGetStatus() without requesting to reset the counter
+//!
+//! @note It just check that application and manager threads are not blocked
+void UT_SystemModelManager::test_iGetStatus_Register_WithClear ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto reg  = sm.RegisterWithId(8u);
+  reg->SetCheckExpected(true);
+  reg->SetExpectedFromSut (BinaryVector::CreateFromHexString("FADE_6666"));
+  reg->SetFromSut         (BinaryVector::CreateFromHexString("FADE_5555"));
+  reg->SetFromSut         (BinaryVector::CreateFromHexString("FADE_4444"));
+
+  TS_ASSERT_EQUALS (reg->Mismatches(), 2u);
+
+  SystemModelManager sut(sm);
+
+  TS_ASSERT_THROWS_NOTHING (sut.iPrefix("TAP_DR_Mux.MIB_mux"));
+
+  // ---------------- Exercise
+  //
+  auto count_1 = sut.iGetStatus("dynamic_2", true);
+  auto count_2 = sut.iGetStatus("dynamic_2", true);
+  auto count_3 = sut.iGetStatus("dynamic_2", true);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (count_1, 2u);
+  TS_ASSERT_EQUALS (count_2, 0u);
+  TS_ASSERT_EQUALS (count_3, 0u);
+}
+
+//! Checks SystemModelManager::iGetStatus() for single register when one thread cause mismatches and a second one get the status
+//!
+//! @note It just check that application and manager threads are not blocked
+void UT_SystemModelManager::test_iGetStatus_Register_Multithread ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto mux = sm.LinkerWithId(2u);   // This is Tap mux
+
+  SystemModelManager sut(sm);
+
+  auto causeMismatchesFunctor = [&sut]()
+  {
+    TS_ASSERT_THROWS_NOTHING
+    (
+      auto expected = BinaryVector::CreateFromHexString("FADE_6666");
+
+      for (int ii = 0 ; ii < 5 ; ++ii)
+      {
+        sut.iWrite ("MIB_mux.dynamic_3", ii);
+        sut.iRead  ("MIB_mux.dynamic_3", expected);
+        sut.iApply();
+      }
+    );
+  };
+
+  auto getStatusFunctor = [&sut]()
+  {
+    TS_ASSERT_THROWS_NOTHING
+    (
+      // ---------------- Exercise
+      //
+      while (sut.iGetStatus("MIB_mux.dynamic_3") < 5u)
+      {
+        std::this_thread::sleep_for(2ms);
+      }
+    );
+  };
+
+
+  // ---------------- Setup (main thread)
+  //
+  sut.CreateApplicationThread(mux, getStatusFunctor,       "App_getStatus");
+  sut.CreateApplicationThread(mux, causeMismatchesFunctor, "App_causeMismatches");
+  sut.Start();
+  sut.StartCreatedApplicationThreads();
+
+  // ---------------- Verify
+  //
+  // Proper termination means successful test
+  //
   sut.WaitForApplicationsEnd();              // Make sure applications have done their action
   sut.Stop();
 }

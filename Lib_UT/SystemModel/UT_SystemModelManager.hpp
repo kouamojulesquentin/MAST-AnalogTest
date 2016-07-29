@@ -106,10 +106,16 @@ class UT_SystemModelManager : public CxxTest::TestSuite
   void test_iRefresh_4_RegPerApp ();
   void test_iGetRefresh ();
 
+  // ---------------- iGetStatus
+  //
+  void test_iGetStatus_Register_WithoutClear ();
+  void test_iGetStatus_Register_WithClear ();
+  void test_iGetStatus_Register_Multithread ();
 
   // ================ Other Methods ================
 
-  void setUp(); //!< Initializes test (called for each test)
+  void setUp();    //!< Initializes test (called for each test)
+  void tearDown(); //!< Cleanups test (called for each test)
 };
 //
 //  End of UT_SystemModelManager class declaration

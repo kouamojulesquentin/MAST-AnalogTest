@@ -254,6 +254,7 @@ template<typename T> void Check_iWrite_SingleThread (T value, string_view expect
 
   // ---------------- Verify
   //
+  TS_ASSERT_THROWS_NOTHING (sut.iApply());
   auto expectedNextToSut = BinaryVector::CreateFromHexString(expected);
 
   TS_ASSERT_EQUALS (reg->NextToSut(), expectedNextToSut);
@@ -1226,15 +1227,15 @@ void UT_SystemModelManager::test_iGet_Thread_is_Unknown ()
 
 //! Checks SystemModelManager::iWrite() using same thread as SystemModelManager
 //!
-void UT_SystemModelManager::test_iWrite_Thread_SingleThread_BinaryVector () { Check_iWrite_SingleThread(BinaryVector::CreateFromHexString("ABCD_4567"), "ABCD_4567"); }
-void UT_SystemModelManager::test_iWrite_Thread_SingleThread_uint8        () { Check_iWrite_SingleThread(uint8_t(123),          "0000_007B"); }
-void UT_SystemModelManager::test_iWrite_Thread_SingleThread_uint16       () { Check_iWrite_SingleThread(uint16_t(12345),       "0000_3039"); }
-void UT_SystemModelManager::test_iWrite_Thread_SingleThread_uint32       () { Check_iWrite_SingleThread(uint32_t(1234567L),    "0012_D687"); }
-void UT_SystemModelManager::test_iWrite_Thread_SingleThread_uint64       () { Check_iWrite_SingleThread(uint64_t(123456789LL), "075B_CD15"); }
-void UT_SystemModelManager::test_iWrite_Thread_SingleThread_int8         () { Check_iWrite_SingleThread(int8_t(-123),          "FFFF_FF85"); }
-void UT_SystemModelManager::test_iWrite_Thread_SingleThread_int16        () { Check_iWrite_SingleThread(int16_t(-12345),       "FFFF_CFC7"); }
-void UT_SystemModelManager::test_iWrite_Thread_SingleThread_int32        () { Check_iWrite_SingleThread(int32_t(-1234567L),    "FFED_2979"); }
-void UT_SystemModelManager::test_iWrite_Thread_SingleThread_int64        () { Check_iWrite_SingleThread(int64_t(-123456789LL), "F8A4_32EB"); }
+void UT_SystemModelManager::test_iWrite_SingleThread_BinaryVector () { Check_iWrite_SingleThread(BinaryVector::CreateFromHexString("ABCD_4567"), "ABCD_4567"); }
+void UT_SystemModelManager::test_iWrite_SingleThread_uint8        () { Check_iWrite_SingleThread(uint8_t(123),          "0000_007B"); }
+void UT_SystemModelManager::test_iWrite_SingleThread_uint16       () { Check_iWrite_SingleThread(uint16_t(12345),       "0000_3039"); }
+void UT_SystemModelManager::test_iWrite_SingleThread_uint32       () { Check_iWrite_SingleThread(uint32_t(1234567L),    "0012_D687"); }
+void UT_SystemModelManager::test_iWrite_SingleThread_uint64       () { Check_iWrite_SingleThread(uint64_t(123456789LL), "075B_CD15"); }
+void UT_SystemModelManager::test_iWrite_SingleThread_int8         () { Check_iWrite_SingleThread(int8_t(-123),          "FFFF_FF85"); }
+void UT_SystemModelManager::test_iWrite_SingleThread_int16        () { Check_iWrite_SingleThread(int16_t(-12345),       "FFFF_CFC7"); }
+void UT_SystemModelManager::test_iWrite_SingleThread_int32        () { Check_iWrite_SingleThread(int32_t(-1234567L),    "FFED_2979"); }
+void UT_SystemModelManager::test_iWrite_SingleThread_int64        () { Check_iWrite_SingleThread(int64_t(-123456789LL), "F8A4_32EB"); }
 
 
 
@@ -1265,6 +1266,7 @@ void UT_SystemModelManager::test_iWrite_Thread_is_Known ()
       // ---------------- Exercise
       //
       TS_ASSERT_THROWS_NOTHING (sut.iWrite("dynamic_3", nextToSut));
+      TS_ASSERT_THROWS_NOTHING (sut.iApply());
     };
 
     // ---------------- Setup (main thread)
@@ -1689,11 +1691,6 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes ()
 
         sut.iRead(regName, nextToSut);
         sut.iApply();
-//+        gotValue = sut.iGet(regName);
-//+        if (gotValue != nextToSut)
-//+        {
-//+          ++gotMismatches;
-//+        }
       }
     );
   };

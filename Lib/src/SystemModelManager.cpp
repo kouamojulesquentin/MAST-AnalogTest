@@ -80,6 +80,10 @@ SystemModelManager::SystemModelManager(SystemModel&                          sm,
   , m_dataCycleLoopTimeout           (1s)
   , m_sleepTimeBetweenConfigurations (0ms)
 {
+  auto appState       = make_shared<ApplicationData::State>(ApplicationData::State::ApplicationThreadStarted);
+  auto pathResolver   = NodePathResolver(sm.Root());
+  m_mainThreadAppData = make_shared<ApplicationData>(std::thread(), appState, pathResolver, "Manager");
+
   MONITOR_MESSAGE("Constructed SystemModelManager");
 }
 
@@ -94,7 +98,12 @@ shared_ptr<SystemModelManager::ApplicationData> SystemModelManager::ApplicationD
   auto pos = m_threadToAppData.find(threadId);
   if (pos == m_threadToAppData.cend())
   {
-    THROW_LOGIC_ERROR("Thread is not managed by SystemModelManager");
+    if (threadId != m_managerThreadId)
+    {
+      THROW_LOGIC_ERROR("Thread is not managed by SystemModelManager");
+    }
+
+
   }
 
   auto   data = pos->second;
@@ -308,7 +317,51 @@ shared_ptr<AccessInterface> SystemModelManager::GetFirstAccessInterface (const S
 //!
 void SystemModelManager::iApply ()
 {
+  LOG(DEBUG) << "iApply";
+
+  auto appData           = ThreadApplicationData();
+  *appData->currentState = ApplicationData::State::InApply;
+
   auto threadId = std::this_thread::get_id();
+
+  { // ---------------- Protect access to SystemModel
+    unique_lock<recursive_mutex> lock(m_dataMutex);
+
+
+    // ---------------- Process queued writes
+    //
+    for (const auto& request : appData->queuedWrites)
+    {
+      auto reg = m_sm.RegisterWithId(request.regId);
+      reg->SetToSut(std::move(request.value));
+
+      // ---------------- Save the fact that application thread request an operation on that register
+      //
+      if (threadId != m_managerThreadId)
+      {
+        bool pendingWrite = reg->NextToSut() != reg->LastToSut();
+        if (pendingWrite)
+        {
+          RegisterPendingThread(reg);
+        }
+      }
+    }
+    appData->queuedWrites.clear();
+  }
+
+  // ---------------- Process queued refreshs
+  //
+//+  for (const auto& request : appData->queuedRefreshes)
+//+  {
+//+  }
+//+  appData->queuedRefreshes.clear();
+
+  // ---------------- Process queued reads
+  //
+//+  for (const auto& request : appData->queuedReads)
+//+  {
+//+  }
+//+  appData->queuedReads.clear();
 
   if (threadId == m_managerThreadId)  // Single thread context?
   {
@@ -316,9 +369,6 @@ void SystemModelManager::iApply ()
   }
   else
   {
-    auto appData           = ThreadApplicationData();
-    *appData->currentState = ApplicationData::State::InApply;
-
     for (const auto& regId : appData->pendingRegistersIds)
     {
       auto reg = m_sm.RegisterWithId(regId);
@@ -470,33 +520,15 @@ void SystemModelManager::iWrite_impl (string_view registerPath, T value)
   auto& pathResolver = PATH_RESOLVER("iWrite: ");
   auto  reg          = pathResolver.ResolveAsRegister(registerPath);
 
-  LOG(DEBUG) << "iWrite - Entering (may be blocked on mutex)";
+  LOG(DEBUG) << "iWrite - Entering";
 
-  if (std::this_thread::get_id() != m_managerThreadId)
-  {
-    auto  appData          = ThreadApplicationData();
-    *appData->currentState = ApplicationData::State::WriteRequest;
-  }
+  auto asBinaryVector = BinaryVector(reg->BitsCount(), 0u, SizeProperty::Fixed);
+  asBinaryVector.Set(std::move(value));
 
-  // ---------------- Protect access to SystemModel
-  //
-  unique_lock<recursive_mutex> lock(m_dataMutex);
+  auto appData = ThreadApplicationData();
+  appData->queuedWrites.push_back(SystemModelManager::QueuedRequest(reg->Identifier(), std::move(asBinaryVector)));
 
-  LOG(DEBUG) << "iWrite - After mutex";
-
-  reg->SetToSut(std::move(value));
-
-  // ---------------- Save the fact that application thread request an operation on that register
-  //
-  auto threadId = std::this_thread::get_id();
-  if (threadId != m_managerThreadId)
-  {
-    bool isPending = reg->NextToSut() != reg->LastToSut();
-    if (isPending)
-    {
-      RegisterPendingThread(reg);
-    }
-  }
+  *appData->currentState = ApplicationData::State::WriteRequest;
 
   LOG(DEBUG) << "iWrite - Exiting";
 }
@@ -806,7 +838,7 @@ void SystemModelManager::WaitForApplicationsEnd ()
       MONITOR_WITH_NODE("Joined  application thread", *topNode, data->debugName);
     }
   }
-  m_threadToAppData.clear();  // There is no more application thread, so the data are useless
+  m_threadToAppData.clear();  // There is no more application threads, so the data are useless
 }
 //
 //  End of: SystemModelManager::WaitForApplicationsEnd

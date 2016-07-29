@@ -74,15 +74,15 @@ class UT_SystemModelManager : public CxxTest::TestSuite
 
   // ---------------- iWrite
   //
-  void test_iWrite_Thread_SingleThread_BinaryVector ();
-  void test_iWrite_Thread_SingleThread_uint8 ();
-  void test_iWrite_Thread_SingleThread_uint16 ();
-  void test_iWrite_Thread_SingleThread_uint32 ();
-  void test_iWrite_Thread_SingleThread_uint64 ();
-  void test_iWrite_Thread_SingleThread_int8 ();
-  void test_iWrite_Thread_SingleThread_int16 ();
-  void test_iWrite_Thread_SingleThread_int32 ();
-  void test_iWrite_Thread_SingleThread_int64 ();
+  void test_iWrite_SingleThread_BinaryVector ();
+  void test_iWrite_SingleThread_uint8 ();
+  void test_iWrite_SingleThread_uint16 ();
+  void test_iWrite_SingleThread_uint32 ();
+  void test_iWrite_SingleThread_uint64 ();
+  void test_iWrite_SingleThread_int8 ();
+  void test_iWrite_SingleThread_int16 ();
+  void test_iWrite_SingleThread_int32 ();
+  void test_iWrite_SingleThread_int64 ();
 
   void test_iWrite_Thread_is_Known ();
   void test_iWrite_Thread_is_Unknown ();

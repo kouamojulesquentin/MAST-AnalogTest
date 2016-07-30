@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "SIT_driver.hpp"
+#include "SIT_reader.hpp"
 #include "PrettyPrinterVisitor.hpp"
 
 int 
@@ -11,7 +11,7 @@ main( const int argc, const char **argv )
    /** check for the right # of arguments **/
    if( argc == 2 )
    {
-      SIT::SIT_Driver driver;
+      SIT::SIT_Reader driver;
       
       driver.parsed_sut = std::make_unique<mast::SystemModel>();
       /** example for piping input from terminal, i.e., using cat **/ 

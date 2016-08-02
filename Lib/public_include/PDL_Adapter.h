@@ -46,9 +46,12 @@ extern "C"
   DLL_EXPORT ErrorCode iGet_int32_t  (const char* registerPath, int32_t*  readData); //!< Returns last Register value read from SUT as int32_t
   DLL_EXPORT ErrorCode iGet_int64_t  (const char* registerPath, int64_t*  readData); //!< Returns last Register value read from SUT as int64_t
 
+  // ---------------- iGetMiscompares
+  //
+  DLL_EXPORT ErrorCode iGetMiscompares (const char* registerPath, char* buffer, size_t* bufferLength, StringType stringType); //!< Returns XOR of the last value read from SUT and the expected value
 
-  //! Requests data to be read from SUT and wait till it can be return
-  //!
+  // ---------------- iGetRefresh
+  //
   DLL_EXPORT ErrorCode iGetRefresh_String   (const char* registerPath, char*     readDataBuffer, size_t* readDataBufferLength, StringType stringType); //!< Requests register value to be read from SUT and wait till it can be return (as string)
   DLL_EXPORT ErrorCode iGetRefresh_uint8_t  (const char* registerPath, uint8_t*  readData); //!< Requests register value to be read from SUT and wait till it can be return as uint8_t
   DLL_EXPORT ErrorCode iGetRefresh_uint16_t (const char* registerPath, uint16_t* readData); //!< Requests register value to be read from SUT and wait till it can be return as uint16_t
@@ -58,6 +61,10 @@ extern "C"
   DLL_EXPORT ErrorCode iGetRefresh_int16_t  (const char* registerPath, int16_t*  readData); //!< Requests register value to be read from SUT and wait till it can be return as int16_t
   DLL_EXPORT ErrorCode iGetRefresh_int32_t  (const char* registerPath, int32_t*  readData); //!< Requests register value to be read from SUT and wait till it can be return as int32_t
   DLL_EXPORT ErrorCode iGetRefresh_int64_t  (const char* registerPath, int64_t*  readData); //!< Requests register value to be read from SUT and wait till it can be return as int64_t
+
+  // ---------------- iGetStatus
+  //
+  DLL_EXPORT ErrorCode iGetRegisterStatus  (const char* registerPath, uint32_t* failureCount, bool clearCounter); //!< Returns the number of expected read failure for a single Register
 
   // ---------------- iPrefix
   //

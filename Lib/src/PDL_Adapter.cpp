@@ -59,7 +59,6 @@ void CopyBinaryVectorToCstr (const BinaryVector& binVector, char* readDataBuffer
       break;
   }
 
-
   // ---------------- Copy result
   //
   auto actualCount = std::min(*readDataBufferLength, asString.length() + 1u);
@@ -190,6 +189,32 @@ ErrorCode iGet_int32_t  (const char* registerPath, int32_t*  readData) { return 
 ErrorCode iGet_int64_t  (const char* registerPath, int64_t*  readData) { return iGet_impl(registerPath, readData); }
 
 
+
+//! Returns XOR of the last value read from SUT and the expected value
+//!
+//! @note May contain x-values (for don't care)
+//!
+ErrorCode iGetMiscompares (const char* registerPath, char* buffer, size_t* bufferLength, StringType stringType)
+{
+  auto retCode = ErrorCode::Ok;
+
+  //! @todo [JFC]-[August/02/2016]: In iGetMiscompares(): add support for don't care
+  //!
+  TRY_CATCH_ALL(retCode,
+                CHECK_PARAMETER_NOT_NULL(registerPath,     "Register path must be not nullptr");
+                CHECK_PARAMETER_NOT_NULL(buffer,           "Pointer tp data buffer must be not nullptr");
+                CHECK_PARAMETER_NOT_NULL(bufferLength,     "Pointer to result length must be not nullptr");
+                CHECK_PARAMETER_GT      (*bufferLength, 1, "Buffer length must be > 1");    // At least 1 bit + null terminator
+
+                auto manager   = GetAndCheckManager();
+                auto gotVector = manager->iGetMiscompares(registerPath);
+                CopyBinaryVectorToCstr(gotVector, buffer, bufferLength, stringType);
+               );
+
+  return retCode;
+}
+
+
 //! Requests register value to be read from SUT and wait till it can be return (as string)
 //!
 ErrorCode iGetRefresh_String (const char* registerPath, char* readDataBuffer, size_t* readDataBufferLength, StringType stringType)
@@ -218,6 +243,27 @@ ErrorCode iGetRefresh_int8_t   (const char* registerPath, int8_t*   readData) { 
 ErrorCode iGetRefresh_int16_t  (const char* registerPath, int16_t*  readData) { return iGetRefresh_impl(registerPath, readData); }
 ErrorCode iGetRefresh_int32_t  (const char* registerPath, int32_t*  readData) { return iGetRefresh_impl(registerPath, readData); }
 ErrorCode iGetRefresh_int64_t  (const char* registerPath, int64_t*  readData) { return iGetRefresh_impl(registerPath, readData); }
+
+
+
+//! Returns the number of expected read failure for a single Register
+//!
+//! @param [in]  registerPath   Path to the register
+//! @param [out] failureCount   Pointer to return the number of failures
+//! @param [in]  clearCounter   When true, the mismatch counter is reset
+//!
+DLL_EXPORT ErrorCode iGetRegisterStatus (const char* registerPath, uint32_t* failureCount, bool clearCounter)
+{
+  auto retCode = ErrorCode::Ok;
+
+  TRY_CATCH_ALL(retCode,
+                CHECK_PARAMETER_NOT_NULL(registerPath, "Register path must be not nullptr");
+                auto manager = GetAndCheckManager();
+                *failureCount = manager->iGetStatus(registerPath, clearCounter);
+               );
+
+  return retCode;
+}
 
 
 //! Changes path prefix

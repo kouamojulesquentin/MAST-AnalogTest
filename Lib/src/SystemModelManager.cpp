@@ -483,26 +483,42 @@ void SystemModelManager::iPrefix (std::string prefix)
 //! Queues a request to (re-)read register value from SUT giving an expected value.
 //!
 //! @param registerPath     Register path (relative to the last iPrefix or node associated with application thread)
-//! @param expectedValue    Value expected to be read from SUT (to trigger automatic check)
+//! @param expectedValue    Value expected to be read from SUT (may contain don't care bits)
 //!
-void SystemModelManager::iRead (string_view registerPath, BinaryVector expectedValue)
+template<typename T>
+void SystemModelManager::iRead_impl (string_view registerPath, T value)
 {
   LOG(DEBUG) << "iRead - Entering";
 
+  //! @todo [JFC]-[August/02/2016]: In iRead_impl(): Add support for don't care
+  //!
   auto& pathResolver = PATH_RESOLVER("iRead: ");
   auto  reg          = pathResolver.ResolveAsRegister(registerPath);
 
+  auto asBinaryVector = BinaryVector(reg->BitsCount(), 0u, SizeProperty::Fixed);
+  asBinaryVector.Set(std::move(value));
 
   auto appData = ThreadApplicationData();
-  appData->queuedReads.emplace_back(SystemModelManager::QueuedRequest(reg->Identifier(), std::move(expectedValue)));
+  appData->queuedReads.emplace_back(SystemModelManager::QueuedRequest(reg->Identifier(), std::move(asBinaryVector)));
 
   *appData->currentState = ApplicationData::State::ReadRequest;
 
   LOG(DEBUG) << "iRead - Leaving";
 }
 //
-//  End of: SystemModelManager::iRead
+//  End of: SystemModelManager::iRead_impl
 //---------------------------------------------------------------------------
+
+
+void SystemModelManager::iRead (string_view registerPath, BinaryVector expectedValue) { iRead_impl(registerPath, std::move(expectedValue)); }
+void SystemModelManager::iRead (string_view registerPath, uint8_t      expectedValue) { iRead_impl(registerPath, expectedValue);            }
+void SystemModelManager::iRead (string_view registerPath, uint16_t     expectedValue) { iRead_impl(registerPath, expectedValue);            }
+void SystemModelManager::iRead (string_view registerPath, uint32_t     expectedValue) { iRead_impl(registerPath, expectedValue);            }
+void SystemModelManager::iRead (string_view registerPath, uint64_t     expectedValue) { iRead_impl(registerPath, expectedValue);            }
+void SystemModelManager::iRead (string_view registerPath, int8_t       expectedValue) { iRead_impl(registerPath, expectedValue);            }
+void SystemModelManager::iRead (string_view registerPath, int16_t      expectedValue) { iRead_impl(registerPath, expectedValue);            }
+void SystemModelManager::iRead (string_view registerPath, int32_t      expectedValue) { iRead_impl(registerPath, expectedValue);            }
+void SystemModelManager::iRead (string_view registerPath, int64_t      expectedValue) { iRead_impl(registerPath, expectedValue);            }
 
 
 //! Queues a request to (re-)read register value from SUT

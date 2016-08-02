@@ -12,6 +12,8 @@
 
 #include "PDL_Adapter.h"
 #include "SystemModelManager.hpp"
+#include "Startup.hpp"
+#include "C_API_Commons.hpp"
 #include "Utility.hpp"
 
 #include <memory>
@@ -23,34 +25,11 @@ using std::string;
 using namespace std::string_literals;
 using namespace mast;
 
-#define CATCH_ALL(retCode)\
-catch(std::invalid_argument& exc) { retCode = ErrorCode::InvalidArgument;  SetErrorMessage(exc.what()); }\
-catch(std::out_of_range&     exc) { retCode = ErrorCode::OutOfRange;       SetErrorMessage(exc.what()); }\
-catch(std::logic_error&      exc) { retCode = ErrorCode::LogicError;       SetErrorMessage(exc.what()); }\
-catch(std::runtime_error&    exc) { retCode = ErrorCode::RuntimeError;     SetErrorMessage(exc.what()); }\
-catch(std::exception&        exc) { retCode = ErrorCode::StdException;     SetErrorMessage(exc.what()); }\
-catch(...)                        { retCode = ErrorCode::UndefinedFailure; SetErrorMessage("Got non C++ std exception"); }
-
-#define TRY_CATCH_ALL(retCode, block)\
-try\
-{\
-  ClearErrorMessage();\
-  block;\
-}\
-CATCH_ALL(retCode)
-
 namespace
 {
-  shared_ptr<SystemModelManager> GetManager()
-  {
-    shared_ptr<SystemModelManager> manager;
-
-    return manager;
-  }
-
   inline auto GetAndCheckManager()
   {
-    auto manager = GetManager();
+    auto manager = Startup::GetManager();
     CHECK_VALUE_NOT_NULL(manager, "Mast library has not been properly initialized");\
     return manager;
   }

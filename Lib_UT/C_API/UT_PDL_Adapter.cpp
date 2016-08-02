@@ -15,6 +15,7 @@
 #include "PDL_Adapter.h"
 #include "BinaryVector.hpp"
 
+//+#include "SystemModelAdapter.hpp"
 #include "C_API_Traits.hpp"
 #include <algorithm>
 #include <experimental/string_view>
@@ -108,6 +109,8 @@ namespace
   {
     // ---------------- Setup
     //
+    InitializeMast(nullptr);
+
 //+    SystemModel sm;
 //+    Create_TestCase_MIB_Multichain_Pre(sm);
 

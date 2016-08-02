@@ -12,7 +12,10 @@
 
 #include "SystemModelAdapter.h"
 #include "SystemModelManager.hpp"
+#include "C_API_Commons.hpp"
+#include "Startup.hpp"
 #include "Utility.hpp"
+//+#include "SIT_driver.hpp"
 
 #include <memory>
 #include <string>
@@ -27,6 +30,7 @@ using namespace mast;
 namespace
 {
   thread_local string thread_error_message;
+
 
 } // End of unnamed namespace
 
@@ -55,6 +59,135 @@ const char* ErrorMessage ()
 {
   return thread_error_message.c_str();
 }
+
+
+//! Registers applications functions with their associated node to the System Model Manager
+//!
+ErrorCode CreateApplications (ApplicationAssociation* pAssociations, uint32_t count)
+{
+  auto retCode = ErrorCode::Ok;
+
+  try
+  {
+    ClearErrorMessage();
+
+    auto sm      = mast::Startup::GetSystemModel();
+    auto manager = mast::Startup::GetManager();
+
+    for (uint32_t ii = 0 ; ii < count ; ++ii)
+    {
+      const auto& nextAssociation = pAssociations[count];
+
+      CHECK_VALUE_NOT_NULL(nextAssociation.function,    "Invalid nullptr for application function");
+      CHECK_VALUE_NOT_NULL(nextAssociation.topNodePath, "Invalid nullptr for application top node path");
+
+      auto foundNode = sm->Root()->FindNode(nextAssociation.topNodePath);
+      auto topNode   = std::dynamic_pointer_cast<ParentNode>(foundNode);
+
+      manager->CreateApplicationThread(topNode, nextAssociation.function, nextAssociation.debugName);
+    }
+  }
+  CATCH_ALL(retCode)
+
+  return retCode;
+}
+//
+//  End of: CreateApplications
+//---------------------------------------------------------------------------
+
+
+
+//! Starts up mast library, building model using specified file
+//!
+//! @note This function is not thread safe: It must be call by only one thread prior to any usage of mast library
+//!       This function must be called only after main has been call by the runtime system
+//!
+ErrorCode InitializeMast (const char* /* modelFilePath */)
+{
+  auto retCode = ErrorCode::Ok;
+
+  TRY_CATCH_ALL(retCode,
+
+//+    if (modelFilePath != nullptr)
+//+    {
+//+      SIT_Driver parser;
+//+      parser.parse(modelFilePath);
+
+//+      auto sm = parser.parsed_sut;
+//+      mast::Startup::SetSystemModel(sm);
+//+    }
+
+/* unused */ mast::Startup::GetSystemModel();
+/* unused */ mast::Startup::GetManager();
+
+  );
+
+  return retCode;
+}
+//
+//  End of: InitializeMast
+//---------------------------------------------------------------------------
+
+
+//! Runs Mast til applications terminates
+//!
+ErrorCode RunMast (const char* modelFilePath, ApplicationAssociation* pAssociations, uint32_t count)
+{
+  auto retCode = ErrorCode::Ok;
+
+  try
+  {
+    retCode = InitializeMast(modelFilePath);
+    if (retCode != ErrorCode::Ok) return retCode;
+    retCode = CreateApplications(pAssociations, count);
+    if (retCode != ErrorCode::Ok) return retCode;
+    retCode = Start();
+    if (retCode != ErrorCode::Ok) return retCode;
+    retCode = WaitForApplicationsEnd();
+  }
+  CATCH_ALL(retCode)
+
+  return retCode;
+}
+//
+//  End of: RunMast
+//---------------------------------------------------------------------------
+
+
+//! Starts System Model Manager
+//!
+ErrorCode Start ()
+{
+  auto retCode = ErrorCode::Ok;
+
+  TRY_CATCH_ALL(retCode,
+    auto manager = mast::Startup::GetManager();
+    manager->Start();
+  );
+
+  return retCode;
+}
+//
+//  End of: Start
+//---------------------------------------------------------------------------
+
+
+//! Waits (blocks) until all application thread terminates (on their own or by a mechanism unknown to mast manager)
+//!
+ErrorCode WaitForApplicationsEnd ()
+{
+  auto retCode = ErrorCode::Ok;
+
+  TRY_CATCH_ALL(retCode,
+    auto manager = mast::Startup::GetManager();
+    manager->WaitForApplicationsEnd();
+  );
+
+  return retCode;
+}
+//
+//  End of: Start
+//---------------------------------------------------------------------------
 
 
 //===========================================================================

@@ -46,6 +46,7 @@ SOURCES +=  \
     src/SVF_Player.cpp                              \
     src/SVF_SimulationProtocol.cpp                  \
     src/SVFVector.cpp                               \
+    src/Startup.cpp                                 \
     src/SystemModel.cpp                             \
     src/SystemModelAdapter.cpp                      \
     src/SystemModelBuilder.cpp                      \
@@ -63,6 +64,7 @@ HEADERS += \
     include/AccessInterfaceProtocol.hpp                 \
     include/LoopbackAccessInterfaceProtocol.hpp         \
     include/BinaryVector.hpp                            \
+    include/C_API_Commons.hpp                           \
     include/Chain.hpp                                   \
     include/ConfigurationAlgorithm.hpp                  \
     include/ConfigureVisitor.hpp                        \
@@ -87,6 +89,7 @@ HEADERS += \
     include/SVF_Player.hpp                              \
     include/SVF_SimulationProtocol.hpp                  \
     include/SVFVector.hpp                               \
+    include/Startup.hpp                                 \
     include/SystemModel.hpp                             \
     include/SystemModelAdapter.h                        \
     include/SystemModelBuilder.hpp                      \

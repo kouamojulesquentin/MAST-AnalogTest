@@ -60,6 +60,21 @@ bool Register::IsPending () const
 //---------------------------------------------------------------------------
 
 
+//! Returns XOR of the last value read from SUT and the expected value
+//!
+//! @note May contain x-values (for don't care)
+//!
+BinaryVector Register::LastCompareResult () const
+{
+  auto result = m_lastReadFromSut ^ m_expectedFromSut;
+
+  return std::move(result);
+}
+//
+//  End of: Register::LastCompareResult
+//---------------------------------------------------------------------------
+
+
 //! Returns number of pending registers down the hierarchy
 //!
 uint32_t Register::PendingCount () const

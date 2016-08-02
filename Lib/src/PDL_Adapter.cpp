@@ -18,6 +18,8 @@
 
 #include <memory>
 #include <string>
+#include <cstring>
+#include <algorithm>
 
 using std::shared_ptr;
 using std::string;
@@ -27,6 +29,56 @@ using namespace mast;
 
 namespace
 {
+
+//! Copies binary vector bits as a C-Style string
+//!
+//! @param binVector                        A BinaryVector to "export" to C-Style string
+//! @param readDataBuffer                   A buffer to build the C-Style string
+//! @param [in, out] readDataBufferLength   As input, point to input buffer length, as output this is same as strlen() for the return string
+//!
+void CopyBinaryVectorToCstr (const BinaryVector& binVector, char* readDataBuffer, size_t* readDataBufferLength, StringType stringType)
+{
+  // ---------------- Convert BinaryVector to string
+  //
+  string asString;
+
+  switch (stringType)
+  {
+    case StringType::Binary:
+      asString = binVector.DataAsBinaryString("", "", 0, "");
+      break;
+    case StringType::Hex:
+      asString = binVector.DataAsHexString("", "", 0, "");
+      break;
+    case StringType::Decimal:
+//+      asString = binVector.DataAsDecimalString("", "", 0, "");
+      THROW_INVALID_ARGUMENT("StringType::Decimal is not yet supported !!!");
+      break;
+    default:
+      THROW_INVALID_ARGUMENT("stringType must be Binary, Hex or Decimal"s + std::to_string(static_cast<std::underlying_type_t<StringType>>(stringType)));
+      break;
+  }
+
+
+  // ---------------- Copy result
+  //
+  auto actualCount = std::min(*readDataBufferLength, asString.length() + 1u);
+  std::strncpy(readDataBuffer, asString.c_str(), actualCount);
+
+  // ---------------- Make sure it is null terminated
+  //
+  if (actualCount == *readDataBufferLength)
+  {
+    readDataBuffer[actualCount - 1u] = '\0';
+  }
+
+  *readDataBufferLength = actualCount - 1u; // Length does not count null terminating character
+}
+//
+//  End of: CopyBinaryVectorToCstr
+//---------------------------------------------------------------------------
+
+
   inline auto GetAndCheckManager()
   {
     auto manager = Startup::GetManager();
@@ -43,6 +95,34 @@ namespace
                   CHECK_PARAMETER_NOT_NULL(readData,     "Pointer to read data must be not nullptr");
                   auto manager = GetAndCheckManager();
                   manager->iGet(registerPath, *readData);
+                 );
+
+    return retCode;
+  }
+
+  template<typename T> ErrorCode iGetRefresh_impl(const char* registerPath, T* readData)
+  {
+    auto retCode = ErrorCode::Ok;
+
+    TRY_CATCH_ALL(retCode,
+                  CHECK_PARAMETER_NOT_NULL(registerPath, "Register path must be not nullptr");
+                  CHECK_PARAMETER_NOT_NULL(readData,     "Pointer to read data must be not nullptr");
+                  auto manager = GetAndCheckManager();
+                  manager->iGetRefresh(registerPath, *readData);
+                 );
+
+    return retCode;
+  }
+
+
+  template<typename T> ErrorCode iRead_impl(const char* registerPath, T expectedValue)
+  {
+    auto retCode = ErrorCode::Ok;
+
+    TRY_CATCH_ALL(retCode,
+                  CHECK_PARAMETER_NOT_NULL(registerPath, "Register path must be not nullptr");
+                  auto manager = GetAndCheckManager();
+                  manager->iRead(registerPath, std::move(expectedValue));
                  );
 
     return retCode;
@@ -79,6 +159,27 @@ DLL_EXPORT ErrorCode iApply ()
   return retCode;
 }
 
+
+//! Returns last Register value read from SUT as string
+//!
+ErrorCode iGet_String (const char* registerPath, char* readDataBuffer, size_t* readDataBufferLength, StringType stringType)
+{
+  auto retCode = ErrorCode::Ok;
+
+  TRY_CATCH_ALL(retCode,
+                CHECK_PARAMETER_NOT_NULL(registerPath,             "Register path must be not nullptr");
+                CHECK_PARAMETER_NOT_NULL(readDataBuffer,           "Pointer to read data must be not nullptr");
+                CHECK_PARAMETER_NOT_NULL(readDataBufferLength,     "Pointer to read data length");
+                CHECK_PARAMETER_GT      (*readDataBufferLength, 1, "Buffer length must be > 1");    // At least 1 bit + null terminator
+
+                auto manager   = GetAndCheckManager();
+                auto gotVector = manager->iGet(registerPath);
+                CopyBinaryVectorToCstr(gotVector, readDataBuffer, readDataBufferLength, stringType);
+               );
+
+  return retCode;
+}
+
 ErrorCode iGet_uint8_t  (const char* registerPath, uint8_t*  readData) { return iGet_impl(registerPath, readData); }
 ErrorCode iGet_uint16_t (const char* registerPath, uint16_t* readData) { return iGet_impl(registerPath, readData); }
 ErrorCode iGet_uint32_t (const char* registerPath, uint32_t* readData) { return iGet_impl(registerPath, readData); }
@@ -88,6 +189,35 @@ ErrorCode iGet_int16_t  (const char* registerPath, int16_t*  readData) { return 
 ErrorCode iGet_int32_t  (const char* registerPath, int32_t*  readData) { return iGet_impl(registerPath, readData); }
 ErrorCode iGet_int64_t  (const char* registerPath, int64_t*  readData) { return iGet_impl(registerPath, readData); }
 
+
+//! Requests register value to be read from SUT and wait till it can be return (as string)
+//!
+ErrorCode iGetRefresh_String (const char* registerPath, char* readDataBuffer, size_t* readDataBufferLength, StringType stringType)
+{
+  auto retCode = ErrorCode::Ok;
+
+  TRY_CATCH_ALL(retCode,
+                CHECK_PARAMETER_NOT_NULL(registerPath,             "Register path must be not nullptr");
+                CHECK_PARAMETER_NOT_NULL(readDataBuffer,           "Pointer to read data must be not nullptr");
+                CHECK_PARAMETER_NOT_NULL(readDataBufferLength,     "Pointer to read data length");
+                CHECK_PARAMETER_GT      (*readDataBufferLength, 1, "Buffer length must be > 1");    // At least 1 bit + null terminator
+
+                auto manager   = GetAndCheckManager();
+                auto gotVector = manager->iGetRefresh(registerPath);
+                CopyBinaryVectorToCstr(gotVector, readDataBuffer, readDataBufferLength, stringType);
+               );
+
+  return retCode;
+}
+
+ErrorCode iGetRefresh_uint8_t  (const char* registerPath, uint8_t*  readData) { return iGetRefresh_impl(registerPath, readData); }
+ErrorCode iGetRefresh_uint16_t (const char* registerPath, uint16_t* readData) { return iGetRefresh_impl(registerPath, readData); }
+ErrorCode iGetRefresh_uint32_t (const char* registerPath, uint32_t* readData) { return iGetRefresh_impl(registerPath, readData); }
+ErrorCode iGetRefresh_uint64_t (const char* registerPath, uint64_t* readData) { return iGetRefresh_impl(registerPath, readData); }
+ErrorCode iGetRefresh_int8_t   (const char* registerPath, int8_t*   readData) { return iGetRefresh_impl(registerPath, readData); }
+ErrorCode iGetRefresh_int16_t  (const char* registerPath, int16_t*  readData) { return iGetRefresh_impl(registerPath, readData); }
+ErrorCode iGetRefresh_int32_t  (const char* registerPath, int32_t*  readData) { return iGetRefresh_impl(registerPath, readData); }
+ErrorCode iGetRefresh_int64_t  (const char* registerPath, int64_t*  readData) { return iGetRefresh_impl(registerPath, readData); }
 
 
 //! Changes path prefix
@@ -100,6 +230,45 @@ DLL_EXPORT ErrorCode iPrefix (const char* registerPath)
                 CHECK_PARAMETER_NOT_NULL(registerPath, "Register path must be not nullptr");
                 auto manager = GetAndCheckManager();
                 manager->iPrefix(registerPath);
+               );
+
+  return retCode;
+}
+
+ErrorCode iRead_BinaryVector (const char* registerPath, const char*  value)
+{
+  auto retCode = ErrorCode::Ok;
+
+  //! @todo [JFC]-[August/02/2016]: In iRead_BinaryVector(): Add support for don't care
+  //!
+  TRY_CATCH_ALL(retCode,
+                CHECK_PARAMETER_NOT_NULL(registerPath, "Register path must be not nullptr");
+                retCode = iRead_impl(registerPath, BinaryVector::CreateFromBinaryString(value))
+               );
+
+  return retCode;
+}
+
+ErrorCode iRead_uint8_t  (const char* registerPath, uint8_t  expectedValue) { return iRead_impl(registerPath, expectedValue); }
+ErrorCode iRead_uint16_t (const char* registerPath, uint16_t expectedValue) { return iRead_impl(registerPath, expectedValue); }
+ErrorCode iRead_uint32_t (const char* registerPath, uint32_t expectedValue) { return iRead_impl(registerPath, expectedValue); }
+ErrorCode iRead_uint64_t (const char* registerPath, uint64_t expectedValue) { return iRead_impl(registerPath, expectedValue); }
+ErrorCode iRead_int8_t   (const char* registerPath, int8_t   expectedValue) { return iRead_impl(registerPath, expectedValue); }
+ErrorCode iRead_int16_t  (const char* registerPath, int16_t  expectedValue) { return iRead_impl(registerPath, expectedValue); }
+ErrorCode iRead_int32_t  (const char* registerPath, int32_t  expectedValue) { return iRead_impl(registerPath, expectedValue); }
+ErrorCode iRead_int64_t  (const char* registerPath, int64_t  expectedValue) { return iRead_impl(registerPath, expectedValue); }
+
+
+//! Changes path prefix
+//!
+DLL_EXPORT ErrorCode iRefresh (const char* registerPath)
+{
+  auto retCode = ErrorCode::Ok;
+
+  TRY_CATCH_ALL(retCode,
+                CHECK_PARAMETER_NOT_NULL(registerPath, "Register path must not be nullptr");
+                auto manager = GetAndCheckManager();
+                manager->iRefresh(registerPath);
                );
 
   return retCode;

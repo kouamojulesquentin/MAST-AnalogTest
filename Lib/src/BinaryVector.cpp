@@ -452,16 +452,18 @@ void BinaryVector::ClearBit (uint32_t bitOffset)
 //!
 //! @note An example of formatting is: 0001_1111:0011_0100:0101_010
 //!
-//! @param octoSeparator    Characters to insert every 8 bits
+//! @param octoSeparator  Characters to insert every 8 bits
 //! @param quadSeparator  Characters to insert every 4 bits
-//! @param bytesPerLine     Number of bytes (sequence of 8 bits) to write per line.
-//!                         When zero, all is on the "same line"
-//! @param eolSeparator     Characters to insert just before new lines (when bytesPerLine != 0)
+//! @param bytesPerLine   Number of bytes (sequence of 8 bits) to write per line.
+//!                       When zero, all is on the "same line"
+//! @param eolSeparator   Characters to insert just before new lines (when bytesPerLine != 0)
+//! @param prefixWith0b   When true, "0b" will be prepended to the resulting string
 //!
 string BinaryVector::DataAsBinaryString (string_view quadSeparator,
                                          string_view octoSeparator,
                                          uint32_t    bytesPerLine,
-                                         string_view eolSeparator
+                                         string_view eolSeparator,
+                                         bool        prefixWith0b
                                         ) const
 {
 
@@ -503,6 +505,11 @@ string BinaryVector::DataAsBinaryString (string_view quadSeparator,
     }
   };
 
+  if (prefixWith0b)
+  {
+    os << "0b";
+  }
+
   auto bitsCount = m_usedBits;
 
   for (auto byte : m_data)
@@ -538,16 +545,18 @@ string BinaryVector::DataAsBinaryString (string_view quadSeparator,
 //! @note An example of formatting is: FACE_DEAD:BEEF_0123:CAFE_4 (where last '4' may mean '0b0100' or '0b010' or '0b01')
 //! @note For precise display of last bits, please use DataAsMixString (or DataAsBinaryString)
 //!
-//! @param octoSeparator    Characters to insert every 32 bits
-//! @param quadSeparator  Characters to insert every 16 bits
+//! @param octoSeparator   Characters to insert every 32 bits
+//! @param quadSeparator   Characters to insert every 16 bits
 //! @param bytesPerLine    Number of bytes (sequence of 8 bits) to write per line.
 //!                        When zero, all is on the "same line"
 //! @param eolSeparator    Characters to insert just before new lines character (when bytesPerLine != 0)
+//! @param prefixWith0x    When true, "0x" will be prepended to the resulting string
 //!
 string BinaryVector::DataAsHexString (string_view quadSeparator,
                                       string_view octoSeparator,
                                       uint32_t    bytesPerLine,
-                                      string_view eolSeparator
+                                      string_view eolSeparator,
+                                      bool        prefixWith0x
                                      ) const
 {
   // ---------------- Associate 4 bits value with its hexadecimal representation
@@ -602,6 +611,11 @@ string BinaryVector::DataAsHexString (string_view quadSeparator,
     ++nibblesCount;
     os << nibble;
   };
+
+  if (prefixWith0x)
+  {
+    os << "0x";
+  }
 
 
   auto bitsCount = m_usedBits;
@@ -659,10 +673,10 @@ string BinaryVector::DataAsMixString (uint32_t    hexStyleThreshold,
 
   if (m_usedBits < hexStyleThreshold)
   {
-    return "0b"s + DataAsBinaryString(quadSeparator, octaSeparator, bytesPerLine, eolSeparator);
+    return DataAsBinaryString(quadSeparator, octaSeparator, bytesPerLine, eolSeparator, true);
   }
 
-  auto smartString       = "0x"s + DataAsHexString(quadSeparator, octaSeparator, bytesPerLine, eolSeparator);
+  auto smartString       = DataAsHexString(quadSeparator, octaSeparator, bytesPerLine, eolSeparator, true);
   auto lastByteBitsCount = m_usedBits % 8;
   auto lastQuadBitsCount = m_usedBits % 4;
 

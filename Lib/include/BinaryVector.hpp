@@ -71,20 +71,22 @@ class DLL_EXPORT BinaryVector final
 
   std::string DataAsBinaryString(string_view quadSeparator = "_",
                                  string_view octoSeparator = ":",
-                                 uint32_t    ssbytesPerLine  = 0,
-                                 string_view eolSeparator  = ","
+                                 uint32_t    bytesPerLine  = 0,
+                                 string_view eolSeparator  = ",",
+                                 bool        prefixWith0b  = false
                                 ) const; //!< Gets content as formatted binary string
 
 //+  std::string DataAsDecimalString(string_view quadSeparator  = "_",
 //+                                  string_view octoSeparator  = ":",
-//+                                  uint32_t    ssbytesPerLine = 0,
+//+                                  uint32_t    bytesPerLine = 0,
 //+                                  string_view eolSeparator   = ","
 //+                                ) const; //!< Gets content as formatted decimal string
 
   std::string DataAsHexString (std::experimental::string_view quadSeparator = "_",
                                std::experimental::string_view octoSeparator = ":",
                                uint32_t                       bytesPerLine  = 0,
-                               std::experimental::string_view eolSeparator  = ","
+                               std::experimental::string_view eolSeparator  = ",",
+                               bool                           prefixWith0x  = false
                               ) const;         //!< Gets content as formatted hexadecimal string
 
   std::string DataAsMixString (uint32_t                       hexStyleThreshold = 8,

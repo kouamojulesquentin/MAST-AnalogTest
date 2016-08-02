@@ -51,11 +51,39 @@ namespace CxxTest
       {
         os << std::endl;
       }
-      os << instance.DataAsBinaryString(":", "_", 80, ",");
+
+      switch (DisplayFormat())
+      {
+        case Format::Bin:
+          os << instance.DataAsBinaryString(":", "_", 80, ",");
+          break;
+        case Format::Hex:
+          os << instance.DataAsHexString(":", "_", 80, ",");
+          break;
+        case Format::Auto:
+        default:
+          os << instance.DataAsMixString(16u, ":", "_", 80, ",");
+          break;
+      }
       os << string(")");
       return os.str();
     }
     std::string m_asString;
+
+    enum class Format
+    {
+      Bin,
+      Hex,
+      Auto,
+    };
+
+    static void DisplayFormat (Format displayFormat) { DisplayFormat() = displayFormat; }
+
+    static Format& DisplayFormat()
+    {
+      static Format instance = Format::Auto;
+      return instance;
+    }
   };
 } // End of namespace CxxTest
 

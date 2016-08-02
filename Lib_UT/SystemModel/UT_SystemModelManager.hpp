@@ -112,6 +112,11 @@ class UT_SystemModelManager : public CxxTest::TestSuite
   void test_iGetStatus_Register_WithClear ();
   void test_iGetStatus_Register_Multithread ();
 
+  // ---------------- iGetMiscompares
+  //
+  void test_iGetMiscompares ();
+  void test_iGetMiscompares_Multithread ();
+
   // ================ Other Methods ================
 
   void setUp();    //!< Initializes test (called for each test)

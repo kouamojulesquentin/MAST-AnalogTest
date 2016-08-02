@@ -123,6 +123,10 @@ class DLL_EXPORT SystemModelManager final
     return std::move(readData);
   }
 
+  //! Returns XOR of the last value read from SUT and the expected value
+  //!
+  BinaryVector iGetMiscompares (string_view registerPath);
+
   //! Queues data to be read from SUT
   //!
   void iRead (string_view registerPath, BinaryVector expectedValue);

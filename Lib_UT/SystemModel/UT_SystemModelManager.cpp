@@ -2153,15 +2153,22 @@ void UT_SystemModelManager::test_iGetStatus_Register_Multithread ()
     );
   };
 
-  auto getStatusFunctor = [&sut]()
+  auto reachedTimeout   = false;
+  auto getStatusFunctor = [&sut, &reachedTimeout]()
   {
+    auto timeout = std::chrono::steady_clock::now() + 10ms;
     TS_ASSERT_THROWS_NOTHING
     (
       // ---------------- Exercise
       //
       while (sut.iGetStatus("MIB_mux.dynamic_3") < 5u)
       {
-        std::this_thread::sleep_for(2ms);
+        if (std::chrono::steady_clock::now() > timeout)
+        {
+          reachedTimeout = true;
+          break;
+        }
+        std::this_thread::yield();
       }
     );
   };
@@ -2180,6 +2187,109 @@ void UT_SystemModelManager::test_iGetStatus_Register_Multithread ()
   //
   sut.WaitForApplicationsEnd();              // Make sure applications have done their action
   sut.Stop();
+  TS_ASSERT_FALSE (reachedTimeout);
+}
+
+
+//! Checks SystemModelManager::iGetMiscompares() in single thread context
+//!
+void UT_SystemModelManager::test_iGetMiscompares ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto reg  = sm.RegisterWithId(8u);
+  reg->SetCheckExpected(true);
+  reg->SetPendingForRead(true);
+  reg->SetExpectedFromSut (BinaryVector::CreateFromHexString("FADE_6666"));
+  reg->SetFromSut         (BinaryVector::CreateFromHexString("FADE_5555"));
+
+  SystemModelManager sut(sm);
+
+  TS_ASSERT_THROWS_NOTHING (sut.iPrefix("TAP_DR_Mux.MIB_mux"));
+
+  // ---------------- Exercise
+  //
+  auto compareResult = sut.iGetMiscompares("dynamic_2");
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (compareResult, BinaryVector::CreateFromHexString("0000_3333"));
+}
+
+//! Checks SystemModelManager::iGetMiscompares() in multi-thread context
+//!
+void UT_SystemModelManager::test_iGetMiscompares_Multithread ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto mux = sm.LinkerWithId(2u);   // This is Tap mux
+
+  SystemModelManager sut(sm);
+
+  auto causeMismatchesFunctor = [&sut]()
+  {
+    TS_ASSERT_THROWS_NOTHING
+    (
+      for (int ii = 1 ; ii < 7 ; ++ii)
+      {
+        sut.iWrite ("MIB_mux.dynamic_3", ii);
+        sut.iRead  ("MIB_mux.dynamic_3", 0xA007u);
+        sut.iApply();
+      }
+    );
+  };
+
+  auto reachedTimeout = false;
+
+  auto getMiscomparesFunctor = [&sut, &reachedTimeout]()
+  {
+    auto timeout = std::chrono::steady_clock::now() + 10ms;
+    TS_ASSERT_THROWS_NOTHING
+    (
+      auto expectedLastMiscompare = BinaryVector::CreateFromHexString("0000_A001");   // Last written value is 6
+
+      // ---------------- Exercise
+      //
+      do
+      {
+        auto compareResult = sut.iGetMiscompares("MIB_mux.dynamic_3");
+
+        if (compareResult == expectedLastMiscompare)
+        {
+          break;
+        }
+
+        if (std::chrono::steady_clock::now() > timeout)
+        {
+          reachedTimeout = true;
+          break;
+        }
+        std::this_thread::sleep_for(1ms);
+      } while (true);
+    );
+  };
+
+
+  // ---------------- Setup (main thread)
+  //
+  sut.CreateApplicationThread(mux, getMiscomparesFunctor,  "App_getMiscomparesFunctor");
+  sut.CreateApplicationThread(mux, causeMismatchesFunctor, "App_causeMismatches");
+  sut.Start();
+  sut.StartCreatedApplicationThreads();
+
+  // ---------------- Verify
+  //
+  // Proper termination means successful test
+  //
+  sut.WaitForApplicationsEnd();              // Make sure applications have done their actions
+  sut.Stop();
+  TS_ASSERT_FALSE (reachedTimeout);
 }
 
 //===========================================================================

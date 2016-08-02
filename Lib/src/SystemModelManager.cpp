@@ -391,7 +391,7 @@ void SystemModelManager::iGet_impl (string_view registerPath, T& readData)
   reg->LastReadFromSut(readData);
 }
 //
-//  End of: SystemModelManager::iGet
+//  End of: SystemModelManager::iGet_impl
 //---------------------------------------------------------------------------
 
 void SystemModelManager::iGet (string_view registerPath, BinaryVector& readData) { iGet_impl(registerPath, readData); }
@@ -403,6 +403,25 @@ void SystemModelManager::iGet (string_view registerPath, int8_t&       readData)
 void SystemModelManager::iGet (string_view registerPath, int16_t&      readData) { iGet_impl(registerPath, readData); }
 void SystemModelManager::iGet (string_view registerPath, int32_t&      readData) { iGet_impl(registerPath, readData); }
 void SystemModelManager::iGet (string_view registerPath, int64_t&      readData) { iGet_impl(registerPath, readData); }
+
+
+
+//! Returns XOR of the last value read from SUT and the expected value
+//!
+//! @note May contain x-values (for don't care)
+//!
+BinaryVector SystemModelManager::iGetMiscompares (string_view registerPath)
+{
+  auto& pathResolver = PATH_RESOLVER("iGetMiscompares: ");
+  auto reg           = pathResolver.ResolveAsRegister(registerPath);
+
+  unique_lock<recursive_mutex> lock(m_dataMutex); // We must protect for the register been updated just when we read it
+
+  return reg->LastCompareResult();
+}
+//
+//  End of: SystemModelManager::iGetMiscompares
+//---------------------------------------------------------------------------
 
 
 //! Queues data to be read from SUT without checking the value

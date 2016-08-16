@@ -18,6 +18,9 @@
 #include "SystemModelAdapter.h"
 #include "Platform.hpp"
 
+#include <stddef.h>
+#include <stdint.h>
+
 extern "C"
 {
   //! Defines string representation of register values

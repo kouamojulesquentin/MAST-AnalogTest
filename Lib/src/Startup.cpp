@@ -27,7 +27,30 @@ std::shared_ptr<SystemModelManager> Startup::sm_manager;
 
 
 
-//! Returns SystemModelManager singleton
+//! Gets rid of common SystemModel
+//!
+void Startup::ForgetSystemModel ()
+{
+  sm_systemModel.reset();
+}
+//
+//  End of: Startup::ForgetSystemModel
+//---------------------------------------------------------------------------
+
+
+//! Gets rid of common SystemModelManager
+//!
+void Startup::ForgetManager ()
+{
+  sm_manager.reset();
+}
+//
+//  End of: Startup::ForgetManager
+//---------------------------------------------------------------------------
+
+
+
+//! Returns shared SystemModelManager
 //!
 shared_ptr<SystemModelManager> Startup::GetManager ()
 {
@@ -43,7 +66,7 @@ shared_ptr<SystemModelManager> Startup::GetManager ()
 
 
 
-//! Returns systemModel singleton
+//! Returns shared SystemModel
 //!
 shared_ptr<SystemModel> Startup::GetSystemModel ()
 {

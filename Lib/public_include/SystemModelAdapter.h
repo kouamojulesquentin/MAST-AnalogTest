@@ -52,6 +52,12 @@ extern "C"
   //!<        build initialize the model and an associated manager
   DLL_EXPORT ErrorCode InitializeMast(const char* modelFilePath);
 
+  //!< Cleans up Mast library
+  //!<
+  //!< @note  To start using Mast (e.g. with a new model), one must call InitializeMast again
+  //!<
+  DLL_EXPORT ErrorCode CleanupMast();
+
   //! Starts System Model Manager
   //!
   DLL_EXPORT ErrorCode Start();

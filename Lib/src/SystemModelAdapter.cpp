@@ -35,6 +35,26 @@ namespace
 } // End of unnamed namespace
 
 
+//!< Cleans up Mast library
+//!<
+//!< @note  To start using Mast (e.g. with a new model), one must call InitializeMast again
+//!<
+ErrorCode CleanupMast ()
+{
+  auto retCode = ErrorCode::Ok;
+
+  TRY_CATCH_ALL(retCode,
+                mast::Startup::ForgetSystemModel();
+                mast::Startup::ForgetManager();
+               );
+
+  return retCode;
+}
+//
+//  End of: CleanupMast
+//---------------------------------------------------------------------------
+
+
 //! Clears last error message
 //!
 void ClearErrorMessage()

@@ -35,8 +35,11 @@ class DLL_EXPORT Startup final
   ~Startup() = delete;
   Startup()  = delete;
 
-  static std::shared_ptr<SystemModel>        GetSystemModel();
-  static std::shared_ptr<SystemModelManager> GetManager();
+  static std::shared_ptr<SystemModel>        GetSystemModel(); //!< Returns shared SystemModel
+  static std::shared_ptr<SystemModelManager> GetManager();     //!< Returns shared SystemModelManager
+
+  static void ForgetSystemModel(); //!< Gets rid of common SystemModel singleton
+  static void ForgetManager();     //!< Gets rid of common SystemModelManager singleton
 
   // ---------------- Private  Methods
   //

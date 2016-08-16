@@ -42,8 +42,7 @@ Suites = \
       $(UT_RootPath)/C_API/UT_PDL_Adapter.hpp
 
 
-ProjectFile  = $(RootPath)/Lib_UT.cbp \
-               $(RootPath)/Lib_UT.pro
+ProjectFile  = $(RootPath)/Lib_UT.pro
 
 #+Generator   = ..\..\CxxTest\bin\cxxtestgen.py
 Generator    = $(RootPath)/../cxxtest/bin/cxxtestgen.py

@@ -1,3 +1,3 @@
 @cls
-@Call UT_Run_InLoop Debug
+@Call UT_Run_InLoop Release
 @popd

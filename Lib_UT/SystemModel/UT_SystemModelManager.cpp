@@ -992,8 +992,6 @@ void UT_SystemModelManager::test_CreateApplicationThread_1_App ()
     TS_ASSERT_EQUALS (value.load(), 1u); // Value is also not changed
     sut.StartCreatedApplicationThreads();
     while (!started){std::this_thread::sleep_for(0ms);}  // Wait for start signal being seen by application thread function
-    TS_ASSERT_EQUALS (sum,          1u); // Thread is now started ==> sum has been updated
-    TS_ASSERT_EQUALS (value.load(), 0);  // Value has been reset
 
     for (uint32_t ii = 2u ; ii <= 100u ; ++ii)
     {

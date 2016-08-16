@@ -35,7 +35,6 @@ namespace test
 
   // ---------------- Private  Methods
   //
-  void setUp(); //!< Initializes test (called for each test)
  };
 //
 //  End of UT_reader_wrapper class declaration

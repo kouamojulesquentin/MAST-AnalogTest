@@ -28,6 +28,9 @@ include_directories(../Lib/public_include/)
 include_directories(../Logger/)
 include_directories(../Logger/g3log/)
 include_directories(../SIT_parser/)
+if (WIN32)
+  include_directories($ENV{FLEX_DIR})
+endif()
 
 
 #add_compile_options(${UT_CFLAGS})
@@ -46,7 +49,7 @@ add_executable (SIT_Reader_UT ${SIT_Reader_UT_SOURCES})
 set_target_properties(SIT_Reader_UT PROPERTIES COMPILE_FLAGS "${UT_CFLAGS}" )
 
 if (WIN32)
-	target_link_libraries(SIT_Reader_UT  Lib Logger SIT_Reader_Lib DbgHelp )
+	target_link_libraries(SIT_Reader_UT  Lib Logger  SIT_Reader_Lib DbgHelp)
 else ()
 	target_link_libraries(SIT_Reader_UT  Lib Logger  SIT_Reader_Lib pthread)
 endif ()

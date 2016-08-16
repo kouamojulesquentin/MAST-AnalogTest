@@ -2,11 +2,11 @@
 #include <fstream>
 #include <cassert>
 
-#include "SIT_driver.hpp"
+#include "SIT_reader.hpp"
 #include "SystemModelBuilder.hpp"
 using namespace mast;
 
-SIT::SIT_Driver::~SIT_Driver()
+SIT::SIT_Reader::~SIT_Reader()
 {
    delete(scanner);
    scanner = nullptr;
@@ -14,13 +14,13 @@ SIT::SIT_Driver::~SIT_Driver()
    parser = nullptr;
 }
 
-SIT::SIT_Driver::SIT_Driver()
+SIT::SIT_Reader::SIT_Reader()
 : parsed_sut ( std::make_unique<mast::SystemModel>())
 {
 }
 
-void 
-SIT::SIT_Driver::parse( const char * const filename )
+bool
+SIT::SIT_Reader::parse( const char * const filename )
 {
    assert( filename != nullptr );
    std::ifstream in_file( filename );
@@ -29,24 +29,24 @@ SIT::SIT_Driver::parse( const char * const filename )
        exit( EXIT_FAILURE );
    }
    parse_helper( in_file );
-   return;
+   return true;
 }
 
-void
-SIT::SIT_Driver::parse( std::istream &stream )
+bool
+SIT::SIT_Reader::parse( std::istream &stream )
 {
    if( ! stream.good()  && stream.eof() )
    {
-       return;
+       return false;
    }
    //else
    parse_helper( stream ); 
-   return;
+   return true;
 }
 
 
 void 
-SIT::SIT_Driver::parse_helper( std::istream &stream )
+SIT::SIT_Reader::parse_helper( std::istream &stream )
 {
    
    delete(scanner);
@@ -84,7 +84,7 @@ SIT::SIT_Driver::parse_helper( std::istream &stream )
 }
 
 void 
-SIT::SIT_Driver::add_upper()
+SIT::SIT_Reader::add_upper()
 { 
    uppercase++; 
    chars++; 
@@ -92,7 +92,7 @@ SIT::SIT_Driver::add_upper()
 }
 
 void 
-SIT::SIT_Driver::add_lower()
+SIT::SIT_Reader::add_lower()
 { 
    lowercase++; 
    chars++; 
@@ -100,7 +100,7 @@ SIT::SIT_Driver::add_lower()
 }
 
 void 
-SIT::SIT_Driver::add_word( const std::string &word )
+SIT::SIT_Reader::add_word( const std::string &word )
 {
    words++; 
    chars += word.length();
@@ -117,21 +117,21 @@ SIT::SIT_Driver::add_word( const std::string &word )
 }
 
 void 
-SIT::SIT_Driver::add_newline()
+SIT::SIT_Reader::add_newline()
 { 
    lines++; 
    chars++; 
 }
 
 void 
-SIT::SIT_Driver::add_char()
+SIT::SIT_Reader::add_char()
 { 
    chars++; 
 }
 
 
 std::ostream& 
-SIT::SIT_Driver::print( std::ostream &stream )
+SIT::SIT_Reader::print( std::ostream &stream )
 {
    stream << red  << "Results: " << norm << "\n";
    stream << blue << "Uppercase: " << norm << uppercase << "\n";

@@ -7,7 +7,7 @@
 
 %code requires{
    namespace SIT {
-      class SIT_Driver;
+      class SIT_Reader;
       class SIT_Scanner;
    }
 
@@ -27,7 +27,7 @@ using namespace mast;
 }
 
 %parse-param { SIT_Scanner  &scanner  }
-%parse-param { SIT_Driver  &driver  }
+%parse-param { SIT_Reader  &driver  }
 
 %code{
    #include <iostream>
@@ -35,7 +35,7 @@ using namespace mast;
    #include <fstream>
    
    /* include for all driver functions */
-   #include "SIT_driver.hpp"
+   #include "SIT_reader.hpp"
    #include "SIT_types.h"
 
 #undef yylex
@@ -135,7 +135,7 @@ static int find_in_table(std::vector<std::string> table, std::string s)
 %%
 
 root_node: 
-   internal_node END 
+   node END 
     {
     std::cout << "Parsing OK, Root node is " <<$1.get()->Name() << "  \n";
     driver.parsed_sut->ReplaceRoot(std::dynamic_pointer_cast<ParentNode>($1),false);
@@ -183,7 +183,6 @@ t_CHAIN  node_name children_list {
                      std::cout << ", " << $3.n_nodes << " children:  " << $3.name << " \n";
 		     
 		     auto node = driver.parsed_sut->CreateChain($2.name);
-		//     for_each($3.nodes.begin(),$3.nodes.end(),node->AppendChild); 
 		     for (auto this_child : $3.nodes)
 		       node->AppendChild(this_child);
  	  	     $$ = node;

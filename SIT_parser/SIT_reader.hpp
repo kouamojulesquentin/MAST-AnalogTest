@@ -14,22 +14,22 @@ using std::shared_ptr;
 
 namespace SIT{
 
-class SIT_Driver{
+class SIT_Reader{
 public:
-   SIT_Driver();
+   SIT_Reader();
 
-   virtual ~SIT_Driver();
+   virtual ~SIT_Reader();
    
    /** 
     * parse - parse from a file
     * @param filename - valid string with input file
     */
-   void parse( const char * const filename );
+   bool parse( const char * const filename );
    /** 
     * parse - parse from a c++ input stream
     * @param is - std::istream&, valid input stream
     */
-   void parse( std::istream &iss );
+   bool parse( std::istream &iss );
 
    void add_upper();
    void add_lower();

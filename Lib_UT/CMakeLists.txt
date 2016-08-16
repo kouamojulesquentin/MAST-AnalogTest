@@ -43,6 +43,7 @@ set (Lib_UT_SOURCES ${Lib_UT_C_API} ${Lib_UT_UTILITY} ${Lib_UT_SYSTEM_MODEL} ${L
 
 set_source_files_properties(${Lib_UT_GENERATED} GENERATED)
 
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "../Bin")
 add_executable (Lib_UT ${Lib_UT_SOURCES})
 set_target_properties(Lib_UT PROPERTIES COMPILE_FLAGS "${UT_CFLAGS}" )
 

@@ -64,11 +64,11 @@ if (WIN32)
   include_directories($ENV{FLEX_DIR})
 endif()
 
-add_library 		(SIT_Parser_Lib 	${LEX_YACC_SRC_DIR}SIT_driver.cpp ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc)
-add_executable 	(SIT_parser_demo 	${LEX_YACC_SRC_DIR}main.cpp)
+add_library (SIT_Reader_Lib SHARED	${LEX_YACC_SRC_DIR}SIT_reader.cpp ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc)
+add_executable 	(SIT_reader_demo 	${LEX_YACC_SRC_DIR}main.cpp)
 
-set_target_properties(SIT_Parser_Lib 	PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
-set_target_properties(SIT_parser_demo PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+set_target_properties(SIT_Reader_Lib 	PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+set_target_properties(SIT_reader_demo PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
-target_link_libraries(SIT_Parser_Lib Lib)
-target_link_libraries(SIT_parser_demo SIT_Parser_Lib Lib)
+target_link_libraries(SIT_Reader_Lib Lib)
+target_link_libraries(SIT_reader_demo SIT_Reader_Lib Lib)

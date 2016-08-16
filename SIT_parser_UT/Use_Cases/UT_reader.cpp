@@ -30,13 +30,13 @@ void UT_reader::setUp ()
 {
   CxxTest::setStringResultsOnNewLine(true);
   CxxTest::setCharactersMapping(CxxTest::CharacterMapping::MAP_CHARS_MINIMAL);  // Keep quotes, HT, and new lines unescaped
-
+ /*Faire un reset des identifiants, regarder les UT du SystemModel*/
 }
 
 
 //! Checks GmlPrinterVisitor constructor
 //!
-void UT_reader::test_chain ()
+void UT_reader::test_reader ()
 {
   // ---------------- Exercise
   //
@@ -53,15 +53,16 @@ void UT_reader::test_chain ()
   
     auto input_SITs =
      {
-      "REGISTER Gaspare 12 Bypass: \"0b12\"",
-      "REGISTER Gaspare 12 Bypass: \"0b1\"",
+      "REGISTER Gaspare 12 Bypass: \"0b12\"\n",
+      "REGISTER Gaspare 12 Bypass: \"0b1\"\n",
      };
  
     auto expected_PrettyPrinters =
      {
-      "REGISTER Gaspare 12 Bypass: \"0b12\"",
-      "REGISTER Gaspare 12 Bypass: \"0b1\"",
+      "",
+      "",
      };
+     /*vore example des tuple pour lecture plus facile: input+expected meme ligne*/
      
   // ---------------- DDT Exercise
   //

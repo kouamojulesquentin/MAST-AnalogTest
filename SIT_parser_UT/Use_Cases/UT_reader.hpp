@@ -28,7 +28,7 @@ class UT_reader : public CxxTest::TestSuite
 
   // ---------------- Constructor
   //
-  void test_chain ();
+  void test_reader ();
 
   // ---------------- Private  Methods
   //

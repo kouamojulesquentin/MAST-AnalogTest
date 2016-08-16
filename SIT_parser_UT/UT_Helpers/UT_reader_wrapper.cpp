@@ -25,13 +25,6 @@ using std::experimental::string_view;
 
 using namespace test;
 
-//! Initializes tests (called for each test)
-//!
-void UT_reader_wrapper::setUp ()
-{
-
-}
-
 
 string UT_reader_wrapper::run_parser_for_UT(string input_SIT)
 {
@@ -51,11 +44,14 @@ string UT_reader_wrapper::run_parser_for_UT(string input_SIT)
 
   driver.parse(stream);
 
+   /*Regarder les appels de PrettyPrinter sans "accept"
+   prettyPrinter::xxxquelque chosexxx qui retourne le string*/
    PrettyPrinterVisitor prettyPrinter;
    driver.parsed_sut->Root()->Accept(prettyPrinter);
-   auto actual_PrettyPrinter      = prettyPrinter.PrettyPrint();
+   auto actual_PrettyPrint      = prettyPrinter.PrettyPrint();
 
-  return actual_PrettyPrinter;
+   
+  return actual_PrettyPrint;
 }
 
 

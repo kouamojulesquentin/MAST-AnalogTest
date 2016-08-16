@@ -80,6 +80,7 @@ SIT::SIT_Reader::parse_helper( std::istream &stream )
    {
       std::cerr << "Parse failed!!\n";
    }
+   delete(builder);
    return;
 }
 

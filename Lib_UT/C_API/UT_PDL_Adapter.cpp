@@ -371,7 +371,7 @@ void UT_PDL_Adapter::test_iGet_String_Nullptr_ReadData ()
   InitializeMast(nullptr);
 
   auto retCode            = ErrorCode::Ok;
-  auto readDataBufferSize = 0u;
+  auto readDataBufferSize = size_t(0u);
 
   // ---------------- Exercise
   //

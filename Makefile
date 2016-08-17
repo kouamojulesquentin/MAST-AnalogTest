@@ -15,23 +15,27 @@ RM    = rmdir /S /Q
 MKDIR = mkdir
 RUN   =
 
-BIN_DIR           = Bin
-LIB_UT_EXE_NAME   = Lib_UT.exe
-PARSER_EXE_NAME   = SIT_reader_demo.exe
-LIB_UT_EXE_PATH   = $(BIN_DIR)\$(LIB_UT_EXE_NAME)
-PARSER_EXE_PATH   = $(PARSER_EXE_NAME)
-PARSER_INPUT_FILE = ..\..\SIT_parser\prova.txt
+BIN_DIR            = Bin
+LIB_UT_EXE_NAME    = Lib_UT.exe
+TESTCASES_EXE_NAME = TestCasesApp.exe
+PARSER_EXE_NAME    = SIT_reader_demo.exe
+LIB_UT_EXE_PATH    = $(BIN_DIR)\$(LIB_UT_EXE_NAME)
+TESTCASES_EXE_PATH = $(BIN_DIR)\$(TESTCASES_EXE_NAME)
+PARSER_EXE_PATH    = $(PARSER_EXE_NAME)
+PARSER_INPUT_FILE  = ..\..\SIT_parser\prova.txt
 else
 MKDIR = mkdir -p
 RM    = rm -rf
 RUN   = ./
 
-BIN_DIR           = Bin
-LIB_UT_EXE_NAME   = Lib_UT
-PARSER_EXE_NAME   = SIT_reader_demo
-LIB_UT_EXE_PATH   = $(BIN_DIR)/$(LIB_UT_EXE_NAME)
-PARSER_EXE_PATH   = $(PARSER_EXE_NAME)
-PARSER_INPUT_FILE = ../../SIT_parser/prova.txt
+BIN_DIR            = Bin
+LIB_UT_EXE_NAME    = Lib_UT
+PARSER_EXE_NAME    = SIT_reader_demo
+PARSER_EXE_NAME    = TestCasesApp.exe
+LIB_UT_EXE_PATH    = $(BIN_DIR)/$(LIB_UT_EXE_NAME)
+TESTCASES_EXE_PATH = $(BIN_DIR)/$(TESTCASES_EXE_NAME)
+PARSER_EXE_PATH    = $(PARSER_EXE_NAME)
+PARSER_INPUT_FILE  = ../../SIT_parser/prova.txt
 endif
 
 CMAKE_DEBUG_FLAGS=    -DCMAKE_BUILD_TYPE=Debug   $(CMAKE_FLAGS)
@@ -62,32 +66,47 @@ run_debug:
 ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(LIB_UT_EXE_NAME))","")
 >  cd $(CMAKE_DEBUG_BUILD_DIR) && $(RUN)$(LIB_UT_EXE_PATH)
 else
->  @echo "    ====No Debug Lib UT available ========"
+>  @echo "    ==== No Debug Lib UT available ========"
 endif
 
 run_release:
 ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(LIB_UT_EXE_NAME))","")
 >  cd $(CMAKE_RELEASE_BUILD_DIR) && $(RUN)$(LIB_UT_EXE_PATH)
 else
->  @echo "    ====No Release Lib UT available ========"
+>  @echo "    ==== No Release Lib UT available ========"
 endif
 
 run_parser_debug:
 ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(PARSER_EXE_NAME))","")
 >  cd $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR) && $(RUN)$(PARSER_EXE_PATH)    $(PARSER_INPUT_FILE)
 else
->  @echo "    ====No Debug parser available ========"
+>  @echo "    ==== No Debug parser available ========"
 endif
 
 run_parser_release:
 ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(PARSER_EXE_NAME))","")
 >  cd $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR) && $(RUN)$(PARSER_EXE_PATH)    $(PARSER_INPUT_FILE)
 else
->  @echo "    ====No Release parser available ========"
+>  @echo "    ==== No Release parser available ========"
 endif
 
+run_testcases_debug:
+ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(TESTCASES_EXE_NAME))","")
+>  cd $(CMAKE_DEBUG_BUILD_DIR) && $(RUN)$(TESTCASES_EXE_PATH)
+else
+>  @echo "    ==== No Debug testcases available ========"
+endif
+
+run_testcases_release:
+ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(TESTCASES_EXE_NAME))","")
+>  cd $(CMAKE_RELEASE_BUILD_DIR) && $(RUN)$(TESTCASES_EXE_PATH)
+else
+>  @echo "    ==== No Release testcases available ========"
+endif
+
+
 run_arm:
->  @echo "		====No run defined for ARM build (needs qemu) ========"
+>  @echo "    ==== No run defined for ARM build (needs qemu) ========"
 
 arm:
 ifeq ("$(wildcard $(CMAKE_ARM_BUILD_DIR))","")

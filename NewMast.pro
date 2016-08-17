@@ -5,4 +5,5 @@ CONFIG  -= qml_debug
 SUBDIRS += \
     Logger \
     Lib    \
-    Lib_UT
+    Lib_UT \
+    TestCasesApp

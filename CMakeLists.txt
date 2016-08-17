@@ -35,4 +35,5 @@ add_subdirectory (Lib 	)
 add_subdirectory (Lib_UT)
 add_subdirectory (SIT_reader)
 add_subdirectory (SIT_reader_UT)
+add_subdirectory (TestCasesApp)
 

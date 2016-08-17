@@ -54,3 +54,5 @@
 /cmake_release
 /SIT_parser/SIT_parser.output
 /CanLoop.txt
+/SIT_parser_UT/Generated
+/Doxyfile.cfg

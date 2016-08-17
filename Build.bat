@@ -7,23 +7,27 @@
 @if not defined target (set target=debug)
 
 @set Build_Qt=Build_Qt
-@if /i %chain% equ %Build_Qt% (set targetFile=".\Build_Qt\bin\%target%\Lib_UT.exe") else (set targetFile=".\bin\%target%\Lib_UT.exe")
+@set UT_targetFile=".\Build_Qt\bin\%target%\Lib_UT.exe"
+@set TCA_targetFile=".\Build_Qt\bin\%target%\TestCasesApp.exe"
 
-@echo ======= Chain: %chain%, Target File: %targetFile%
+@echo.
+@echo ======= Chain: %chain%, Target File: %UT_targetFile%
 @echo.
 @REM goto :EOF
 
-@if exist %targetFile% del %targetFile%
+@if exist %UT_targetFile%  del %UT_targetFile%
+@if exist %TCA_targetFile% del %TCA_targetFile%
+
 @if not exist Lib_UT\Generated mkdir Lib_UT\Generated
 
 @set make_exe="c:\mingw-w64\Gcc-4.9.3\mingw32\bin\make.exe"
 
-@if /i %chain% equ %Build_Qt% (
-
+@echo.
 @echo ===================== Building Logger =====================
 @echo.
 %make_exe% -j4 -C %Build_Qt%\Logger -f Makefile    %target%
 
+@echo.
 @echo ===================== Building Lib =====================
 @echo.
 %make_exe% -j4 -C %Build_Qt%\Lib -f Makefile    %target%
@@ -38,35 +42,16 @@
 @echo ===================== Building Lib_UT =====================
 @echo.
 %make_exe% -j4 -C %Build_Qt%\Lib_UT -f Makefile %target%
+
+@echo.
+@echo ===================== Building TestCasesApp =====================
+@echo.
+%make_exe% -j4 -C %Build_Qt%\TestCasesApp -f Makefile    %target%
 )
-
-
-@goto CheckExe
-)
-else (
-
-@echo ===================== Building Lib =====================
-%make_exe% -j4 -C Lib -f Lib_Windows.mak    %target%
-
-@echo.
-@echo ===================== Building Lib_UT Runner.cpp =====================
-@echo.
-%make_exe% -C Lib_UT -f Runner.mak
-
-@echo.
-@echo ===================== Building Lib_UT =====================
-@echo.
-%make_exe% -j4 -C Lib_UT -f Lib_UT_Windows.mak %target%
-)
-
-
-@REM pushd Lib
-@REM g++.exe -shared -Wl,--output-def=..\bin\Debug\libLib.def -Wl,--out-implib=..\bin\Debug\libLib.a -Wl,--dll  ..\obj\Debug\src\AccessInterface.o ..\obj\Debug\src\BinaryVector.o ..\obj\Debug\src\Chain.o ..\obj\Debug\src\DefaultBinaryPathSelector.o ..\obj\Debug\src\GmlPrinterVisitor.o ..\obj\Debug\src\Linker.o ..\obj\Debug\src\ParentNode.o ..\obj\Debug\src\PrettyPrinterVisitor.o ..\obj\Debug\src\Register.o ..\obj\Debug\src\SVFVector.o ..\obj\Debug\src\SystemModel.o ..\obj\Debug\src\SystemModelNode.o ..\obj\Debug\src\Tap.o ..\obj\Debug\src\Utility.o  -o ..\bin\Debug\Lib.dll  -luser32
-@REM g++.exe -shared -Wl, --output-def=..\bin\Debug\libLib.def -Wl, --out-implib=..\bin\Debug\libLib.a -Wl, --dll  ..\obj\Debug\src\AccessInterface.o ..\obj\Debug\src\BinaryVector.o ..\obj\Debug\src\Chain.o ..\obj\Debug\src\DefaultBinaryPathSelector.o ..\obj\Debug\src\GmlPrinterVisitor.o ..\obj\Debug\src\Linker.o ..\obj\Debug\src\ParentNode.o ..\obj\Debug\src\PrettyPrinterVisitor.o ..\obj\Debug\src\Register.o ..\obj\Debug\src\SVFVector.o ..\obj\Debug\src\SystemModel.o ..\obj\Debug\src\SystemModelNode.o ..\obj\Debug\src\Tap.o ..\obj\Debug\src\Utility.o  -o ..\bin\Debug\Lib.dll  -luser32
-@REM popd
 
 :CheckExe
 @echo.
 @echo.
-@if not exist %targetFile% echo =============== Error: Failed to generate unit test executable =====================
+@if not exist %UT_targetFile%  echo =============== Error: Failed to generate Mast Lib unit test executable =====================
+@if not exist %TCA_targetFile% echo =============== Error: Failed to generate TestCasesApp executable =====================
 @echo.

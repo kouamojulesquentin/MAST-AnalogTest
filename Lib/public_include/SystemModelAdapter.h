@@ -22,6 +22,7 @@ extern "C"
   enum ErrorCode_t
   {
     Ok               = 0,
+    InvalidModel     = 0xFFFFFFF8,
     InvalidArgument  = 0xFFFFFFF9,
     LogicError       = 0xFFFFFFFA,
     OutOfRange       = 0xFFFFFFFB,
@@ -41,7 +42,7 @@ extern "C"
     const char*      debugName;
   };
 
-  //! Runs Mast til applications terminates
+  //! Runs Mast till applications terminates
   //!
   DLL_EXPORT ErrorCode RunMast(const char* modelFilePath, ApplicationAssociation* pAssociations, uint32_t count);
 

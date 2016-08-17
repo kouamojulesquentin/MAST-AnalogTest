@@ -25,6 +25,7 @@
 //!
 CXXTEST_ENUM_TRAITS(ErrorCode_t,
                     CXXTEST_ENUM_MEMBER(Ok)
+                    CXXTEST_ENUM_MEMBER(InvalidModel)
                     CXXTEST_ENUM_MEMBER(InvalidArgument)
                     CXXTEST_ENUM_MEMBER(LogicError)
                     CXXTEST_ENUM_MEMBER(OutOfRange)

@@ -47,7 +47,9 @@ class DLL_EXPORT SystemModelCheckResult final
     return !operator==(rhs);
   }
 
-  bool HasIssues() const { return (warningsCount != 0) || (errorsCount != 0); }
+  bool HasIssues()   const { return (warningsCount != 0)  || (errorsCount != 0); }
+  bool HasWarnings() const { return (warningsCount != 0); }
+  bool HasErrors()   const { return (errorsCount   != 0); }
 
   std::string MakeReport() const; //!< Returns a string representing the check result
 

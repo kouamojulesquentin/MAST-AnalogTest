@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.5)
 project(TestCasesApp)
 
 add_definitions(${P_WARNINGS})
-set (P_WARNINGS "-Wall -Wno-sign-compare -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs")
+set (P_WARNINGS "-Wall -Wno-sign-compare -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-include-dirs")
 add_definitions(${P_CFLAGS})
 set (P_CFLAGS "${P_WARNINGS} -std=c++14")
 

@@ -191,6 +191,13 @@ class DLL_EXPORT SystemModelManager final
   //!
   void SleepTimeBetweenConfigurations (std::chrono::milliseconds sleepTimeBetweenConfigurations) { m_sleepTimeBetweenConfigurations = sleepTimeBetweenConfigurations; }
 
+  //! Returns instance that monitor manager main actions
+  //!
+  std::shared_ptr<SystemModelManagerMonitor>  Monitor() const { return m_monitor; }
+
+  //! Sets instance that monitor manager main actions
+  //!
+  void  Monitor (std::shared_ptr<SystemModelManagerMonitor> monitor) { m_monitor = monitor; }
 
   // ---------------- Protected Methods
   //
@@ -277,6 +284,8 @@ class DLL_EXPORT SystemModelManager final
   void ReleaseServedThreads ();
   void ReportServedRegisters (const std::vector<NodeIdentifier>& activeRegisters);
   void WakeupDataCycles ();
+
+
 
   // ---------------- Private  Fields
   //

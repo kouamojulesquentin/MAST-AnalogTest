@@ -79,7 +79,7 @@ void PrettyPrinterVisitor::AlignOnNewLine (pos_type targetPos)
 //! @param topNode    Node from which graph is created
 //! @param options    Printer options
 //!
-string PrettyPrinterVisitor::PrettyPrint (shared_ptr<ParentNode> topNode, PrettyPrinterOptions options)
+string PrettyPrinterVisitor::PrettyPrint (shared_ptr<SystemModelNode> topNode, PrettyPrinterOptions options)
 {
   CHECK_PARAMETER_NOT_NULL(topNode, "Cannot 'pretty print' from nullptr");
 

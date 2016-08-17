@@ -354,7 +354,7 @@ string GmlPrinterVisitor::Graph ()
 //! @param graphName  Optional graph name
 //! @param options    Graph options
 //!
-string GmlPrinterVisitor::Graph (shared_ptr<ParentNode> topNode, string_view graphName, GmlPrinterOptions options)
+string GmlPrinterVisitor::Graph (shared_ptr<SystemModelNode> topNode, string_view graphName, GmlPrinterOptions options)
 {
   CHECK_PARAMETER_NOT_NULL(topNode, "Cannot create GML graph from nullptr");
   GmlPrinterVisitor printer(graphName, options);

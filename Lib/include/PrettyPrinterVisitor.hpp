@@ -67,7 +67,7 @@ class DLL_EXPORT PrettyPrinterVisitor : public SystemModelVisitor
 
   //! Returns textual model representation starting from a "top" node
   //!
-  static std::string PrettyPrint(std::shared_ptr<ParentNode> topNode, PrettyPrinterOptions options = PrettyPrinterOptions::Default);
+  static std::string PrettyPrint(std::shared_ptr<SystemModelNode> topNode, PrettyPrinterOptions options = PrettyPrinterOptions::Default);
 
 
   // ---------------- Private  Methods

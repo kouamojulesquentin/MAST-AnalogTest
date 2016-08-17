@@ -85,9 +85,9 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
   void DisplayRegisterValue (bool displayRegisterValue) { m_displayRegisterValue = displayRegisterValue; } //!< Sets whether registers value are displayed (below the name)
   void DisplayValueAuto     (bool displayValueAuto)     { m_displayRegValueAuto  = displayValueAuto;     } //!< Sets whether registers values are displayed as hexadecimal string if large enough and not complete nibble as binary
 
-  //! Returns graph from a parent node
+  //! Returns graph from a node (usually a ParentNode)
   //!
-  static std::string Graph(std::shared_ptr<ParentNode> topNode, std::experimental::string_view graphName = "", GmlPrinterOptions options = GmlPrinterOptions::Std);
+  static std::string Graph(std::shared_ptr<SystemModelNode> topNode, std::experimental::string_view graphName = "", GmlPrinterOptions options = GmlPrinterOptions::Std);
 
   // ---------------- Private  Methods
   //

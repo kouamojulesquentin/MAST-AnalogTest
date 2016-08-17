@@ -51,16 +51,15 @@ void UT_reader::test_reader ()
     TS_ASSERT_EQUALS (actual_PrettyPrinter, expected_PrettyPrinter);
   }; 
   
+
     auto input_SITs =
      {
-      "REGISTER Gaspare 12 Bypass: \"0b12\"\n",
-      "REGISTER Gaspare 12 Bypass: \"0b1\"\n",
+      "REGISTER test_register 12 Bypass: \"0b12\"\n",
      };
  
     auto expected_PrettyPrinters =
      {
-      "",
-      "",
+            "[Register](0)  \"test_register\", length: 12, bypass: 0000_0000:0000",
      };
      /*vore example des tuple pour lecture plus facile: input+expected meme ligne*/
      

@@ -11,9 +11,9 @@ main( const int argc, const char **argv )
    /** check for the right # of arguments **/
    if( argc == 2 )
    {
-      SIT::SIT_Reader driver;
+      auto  sm = std::make_shared<mast::SystemModel>();
+      SIT::SIT_Reader driver(sm);
       
-      driver.parsed_sut = std::make_unique<mast::SystemModel>();
       /** example for piping input from terminal, i.e., using cat **/ 
       if( std::strncmp( argv[ 1 ], "-o", 2 ) == 0 )
       {
@@ -34,10 +34,13 @@ main( const int argc, const char **argv )
          driver.parse( argv[1] );
       }
    
+   std::cout << "Parsing finished\n";
+
+   
    PrettyPrinterVisitor prettyPrinter;
-   driver.parsed_sut->Root()->Accept(prettyPrinter);
+   driver.parsed_sut->Accept(prettyPrinter);
    auto gotPretty      = prettyPrinter.PrettyPrint();
-   std::cout << gotPretty;
+   std::cout << gotPretty << "\n";
    
    }
    else

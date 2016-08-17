@@ -16,7 +16,7 @@ namespace SIT{
 
 class SIT_Reader{
 public:
-   SIT_Reader();
+   SIT_Reader( std::shared_ptr<mast::SystemModel> sm);
 
    virtual ~SIT_Reader();
    
@@ -39,7 +39,8 @@ public:
 
    std::ostream& print(std::ostream &stream);
 
-   std::unique_ptr<mast::SystemModel> parsed_sut;
+   std::shared_ptr<mast::SystemModel> main_sm;
+   std::shared_ptr<mast::SystemModelNode> parsed_sut;
    mast::SystemModelBuilder *builder;
 
 private:

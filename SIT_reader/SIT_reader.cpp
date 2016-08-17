@@ -14,9 +14,10 @@ SIT::SIT_Reader::~SIT_Reader()
    parser = nullptr;
 }
 
-SIT::SIT_Reader::SIT_Reader()
-: parsed_sut ( std::make_unique<mast::SystemModel>())
+SIT::SIT_Reader::SIT_Reader( std::shared_ptr<mast::SystemModel> sm)
 {
+ main_sm = sm;
+ parsed_sut = nullptr;
 }
 
 bool
@@ -52,7 +53,7 @@ SIT::SIT_Reader::parse_helper( std::istream &stream )
    delete(scanner);
    try
    {
-      SystemModelBuilder builder_obj(*parsed_sut);
+      SystemModelBuilder builder_obj(*main_sm);
       builder = &builder_obj;
       scanner = new SIT::SIT_Scanner( &stream );
    }
@@ -80,7 +81,6 @@ SIT::SIT_Reader::parse_helper( std::istream &stream )
    {
       std::cerr << "Parse failed!!\n";
    }
-   delete(builder);
    return;
 }
 

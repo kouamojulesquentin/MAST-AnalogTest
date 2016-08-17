@@ -34,20 +34,21 @@ string UT_reader_wrapper::run_parser_for_UT(string input_SIT)
 
   // ---------------- Verify
   //
-      SIT::SIT_Reader driver;
-      driver.parsed_sut = std::make_unique<mast::SystemModel>();
+      auto  sm = std::make_shared<mast::SystemModel>();
+      SIT::SIT_Reader driver(sm);
 
    std::stringstream stream;
   
  
      stream << input_SIT ;
 
-  driver.parse(stream);
+   driver.parse(stream);
 
    /*Regarder les appels de PrettyPrinter sans "accept"
    prettyPrinter::xxxquelque chosexxx qui retourne le string*/
    PrettyPrinterVisitor prettyPrinter;
-   driver.parsed_sut->Root()->Accept(prettyPrinter);
+
+   driver.parsed_sut->Accept(prettyPrinter);
    auto actual_PrettyPrint      = prettyPrinter.PrettyPrint();
 
    

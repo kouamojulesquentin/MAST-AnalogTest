@@ -34,7 +34,7 @@ int main( int argc, char *argv[] )
 
     // ---------------- Start UT framework
     //
-    CxxTest::RealWorldDescription::_worldName = "Mast_SIT_parser";
+    CxxTest::RealWorldDescription::_worldName = "Mast_SIT_reader";
 
     CxxTest::ErrorPrinter tmp;
 

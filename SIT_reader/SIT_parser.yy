@@ -137,8 +137,8 @@ static int find_in_table(std::vector<std::string> table, std::string s)
 root_node: 
    node END 
     {
-    std::cout << "Parsing OK, Root node is " <<$1.get()->Name() << "  \n";
-    driver.parsed_sut->ReplaceRoot(std::dynamic_pointer_cast<ParentNode>($1),false);
+    std::cout << "Parsing OK, Root node is " <<$1->Name() << "  \n";
+    driver.parsed_sut=$1;
     }
    ;
 
@@ -147,12 +147,12 @@ children_list:
   ;
 
 node_list:   
-    node node_list { $$.name = $1.get()->Name() + ' ' + $2.name; $$.n_nodes = $2.n_nodes+1;
+    node node_list { $$.name = $1->Name() + ' ' + $2.name; $$.n_nodes = $2.n_nodes+1;
                     auto tmp = $2.nodes;
 		    tmp.push_back($1);
 		    $$.nodes = tmp; 
 		    }	
-  |   node { $$.name = $1.get()->Name();$$.n_nodes = 1;$$.nodes.push_back($1);}
+  |   node { $$.name = $1->Name();$$.n_nodes = 1;$$.nodes.push_back($1);}
   ;
     
 node:  
@@ -182,7 +182,7 @@ t_CHAIN  node_name children_list {
 		           std::cout << "(transparent)";
                      std::cout << ", " << $3.n_nodes << " children:  " << $3.name << " \n";
 		     
-		     auto node = driver.parsed_sut->CreateChain($2.name);
+		     auto node = driver.main_sm->CreateChain($2.name);
 		     for (auto this_child : $3.nodes)
 		       node->AppendChild(this_child);
  	  	     $$ = node;
@@ -204,8 +204,8 @@ t_LINKER  node_name path_selector ctrl_node children_list {
 			std::cout <<  $3 <<"_PathSelector";
 			 std::cout <<" controlled by node "<<$4;
                      	std::cout << ", " << $5.n_nodes << " children:  " << $5.name << " \n";
-//		     auto node = driver.parsed_sut->CreateLinker ($5.name,   pathSelector, nullptr);
- 		     auto node = driver.parsed_sut->CreateChain ($2.name);
+//		     auto node = driver.main_sm->CreateLinker ($5.name,   pathSelector, nullptr);
+ 		     auto node = driver.main_sm->CreateChain ($2.name);
 		     for (auto this_child : $5.nodes)
 		       node->AppendChild(this_child);
  	  	     $$ = node;
@@ -228,7 +228,7 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
 		std::cout  << " Protocol : " << $3;
          	std::cout << ", children:  " << $4.name << " \n";
 		
-		auto node = driver.parsed_sut->CreateAccessInterface($2.name, nullptr);
+		auto node = driver.main_sm->CreateAccessInterface($2.name, nullptr);
 		for (auto this_child : $4.nodes)
 		   node->AppendChild(this_child);
 
@@ -248,7 +248,7 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
       {
   	std::cout << "Node type SIB, idf	 " << $2.name << " " << $3 <<" " << $4 <<"\n";
 
- 	auto node = driver.parsed_sut->CreateChain ($2.name,nullptr);
+ 	auto node = driver.main_sm->CreateChain ($2.name,nullptr);
 	for (auto this_child : $5.nodes)
 	    node->AppendChild(this_child);
 
@@ -266,7 +266,7 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
         else
       {
   	std::cout << "Node type MIB, idf " << $2.name << " " << $3 <<" " << $4 << " Max derivations " << $5 << " " << $6 << "_PathSelctor ctrl_node " << $7 <<"\n";
-        auto node = driver.parsed_sut->CreateChain ($2.name);
+        auto node = driver.main_sm->CreateChain ($2.name);
 	for (auto this_child : $8.nodes)
 	    node->AppendChild(this_child);
   	$$ = node;
@@ -283,7 +283,7 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
         else
       {
   	std::cout << "1500_Wrapper Macro, idf " << $2.name << " Max derivations " << $3 <<"\n";
-        auto node = driver.parsed_sut->CreateChain ($2.name);
+        auto node = driver.main_sm->CreateChain ($2.name);
 	for (auto this_child : $4.nodes)
 	    node->AppendChild(this_child);
   	$$ = node;
@@ -315,7 +315,7 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
 	  else
 	{
 	 std::cout << "JTAG TAP Macro, idf " << $2.name << " IR size " << $4 <<" max DR chains " << $6 <<"\n";
-         auto node = driver.parsed_sut->CreateChain ($2.name);
+         auto node = driver.main_sm->CreateChain ($2.name);
 	 for (auto this_child : $7.nodes)
 	    node->AppendChild(this_child);
   	 $$ = node;
@@ -374,7 +374,7 @@ leaf_node: register_node {     $$=  $1;
   
 register_node: 
    t_REGISTER  node_name size hold bypass {
-                      auto node = driver.parsed_sut->CreateRegister ($2.name, BinaryVector(12, 0), nullptr); 
+                      auto node = driver.main_sm->CreateRegister ($2.name, BinaryVector(12, 0), nullptr); 
   		     $$ = node;}
 
 size : 

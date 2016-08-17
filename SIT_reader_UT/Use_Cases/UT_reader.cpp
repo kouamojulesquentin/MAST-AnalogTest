@@ -15,11 +15,14 @@
 #include <experimental/string_view>
 #include <cxxtest/ValueTraits.h>
 #include <iostream>
+#include <tuple>
 #include "SIT_reader.hpp"
 #include "PrettyPrinterVisitor.hpp"
 #include "UT_reader.hpp"
 #include "UT_reader_wrapper.hpp"
 
+using std::tuple;
+using std::make_tuple;
 using std::string;
 using std::experimental::string_view;
 using test::UT_reader_wrapper;
@@ -42,8 +45,11 @@ void UT_reader::test_reader ()
   //
 
   //
-  auto checker = [](string input_SIT, string expected_PrettyPrinter)
+  auto checker = [](auto data)
   {
+    auto input_SIT = std::get<0>(data);
+    auto expected_PrettyPrinter = std::get<1>(data);
+    
     // ---------------- Exercise & Verify
     //
       UT_reader_wrapper reader;
@@ -51,21 +57,15 @@ void UT_reader::test_reader ()
     TS_ASSERT_EQUALS (actual_PrettyPrinter, expected_PrettyPrinter);
   }; 
   
+  auto data =
+  {
+   make_tuple( "REGISTER test_register 12 Bypass: \"0b1001:0110:1100\"\n",   "[Register](0)  \"test_register\", length: 12, bypass: 1001_0110:1100"), 
+  };
 
-    auto input_SITs =
-     {
-      "REGISTER test_register 12 Bypass: \"0b1001:0110:1100\"\n",
-     };
- 
-    auto expected_PrettyPrinters =
-     {
-            "[Register](0)  \"test_register\", length: 12, bypass: 1001_0110:1100",
-     };
-     /*vore example des tuple pour lecture plus facile: input+expected meme ligne*/
      
   // ---------------- DDT Exercise
   //
-  TS_DATA_DRIVEN_TEST (checker, input_SITs, expected_PrettyPrinters);
+  TS_DATA_DRIVEN_TEST (checker, data);
 
 }
 

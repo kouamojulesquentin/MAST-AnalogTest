@@ -49,6 +49,30 @@ void ParentNode::AppendChild (std::shared_ptr<SystemModelNode> pChild)
 //---------------------------------------------------------------------------
 
 
+
+//! Returns ParentNode that will effectively append childs in place of this ParentNode
+//!
+shared_ptr<ParentNode> ParentNode::DeepestChildAppender () const
+{
+  auto appender = m_pOptionalChildAppender;
+
+  while (appender)
+  {
+    auto nextAppender = appender->m_pOptionalChildAppender;
+    if (!nextAppender)
+    {
+      break;
+    }
+    appender = nextAppender;
+  }
+  return appender;
+}
+//
+//  End of: ParentNode::DeepestChildAppender
+//---------------------------------------------------------------------------
+
+
+
 //! Returns current number of children
 //!
 //! @note It is intended for test or checking purpose (It is O(N) time complexity)

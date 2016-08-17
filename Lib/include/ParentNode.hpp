@@ -32,9 +32,10 @@ class DLL_EXPORT ParentNode : public SystemModelNode, public std::enable_shared_
 
   uint32_t DirectChildrenCount() const;  //!< Returns current number of direct children
 
-  bool                             IgnoreForNodePath() const { return m_ignoreForNodePath;      } //!< When true the node name is ignored when search a node by its path
-  std::shared_ptr<SystemModelNode> FirstChild()        const { return m_pFirstChild;            } //!< Returns first child or nullptr
-  std::shared_ptr<ParentNode>      ChildAppender()     const { return m_pOptionalChildAppender; }
+  bool                             IgnoreForNodePath()    const { return m_ignoreForNodePath;      } //!< When true the node name is ignored when search a node by its path
+  std::shared_ptr<SystemModelNode> FirstChild()           const { return m_pFirstChild;            } //!< Returns first child or nullptr
+  std::shared_ptr<ParentNode>      ChildAppender()        const { return m_pOptionalChildAppender; }
+  std::shared_ptr<ParentNode>      DeepestChildAppender() const;                                     //!< Returns ParentNode that will effectively append childs in place of this ParentNode
 
   void  IgnoreForNodePath (bool ignoreForNodePath) { m_ignoreForNodePath = ignoreForNodePath; } //!< Set whether the node must be ignored when search a node by its path
 

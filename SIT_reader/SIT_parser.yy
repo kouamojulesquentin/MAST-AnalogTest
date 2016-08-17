@@ -68,6 +68,16 @@ static int find_in_table(std::vector<std::string> table, std::string s)
  if (l>= table.size())	return -1;
  else return l;
 }
+
+inline std::string remove_quotes(std::string s)
+{
+ // Remove all double-quote characters
+  s.erase(
+    remove( s.begin(), s.end(), '\"' ),
+    s.end()
+    );
+ return s;
+}
    
 }
 
@@ -373,8 +383,8 @@ leaf_node: register_node {     $$=  $1;
   ;
   
 register_node: 
-   t_REGISTER  node_name size hold bypass {
-                      auto node = driver.main_sm->CreateRegister ($2.name, BinaryVector(12, 0), nullptr); 
+   t_REGISTER  node_name size hold bypass { 
+                      auto node = driver.main_sm->CreateRegister ($2.name,  BinaryVector::CreateFromBinaryString(remove_quotes($5)), nullptr); 
   		     $$ = node;}
 
 size : 

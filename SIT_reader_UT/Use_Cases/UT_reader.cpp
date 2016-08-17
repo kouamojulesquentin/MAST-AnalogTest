@@ -54,12 +54,12 @@ void UT_reader::test_reader ()
 
     auto input_SITs =
      {
-      "REGISTER test_register 12 Bypass: \"0b12\"\n",
+      "REGISTER test_register 12 Bypass: \"0b1001:0110:1100\"\n",
      };
  
     auto expected_PrettyPrinters =
      {
-            "[Register](0)  \"test_register\", length: 12, bypass: 0000_0000:0000",
+            "[Register](0)  \"test_register\", length: 12, bypass: 1001_0110:1100",
      };
      /*vore example des tuple pour lecture plus facile: input+expected meme ligne*/
      

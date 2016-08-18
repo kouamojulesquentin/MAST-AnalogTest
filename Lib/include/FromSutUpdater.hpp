@@ -42,7 +42,7 @@ class DLL_EXPORT FromSutUpdater final
 
   // ---------------- Private  Fields
   //
-  SystemModel m_sm; //!< System model (to get nodes from identifier)
+  SystemModel& m_sm; //!< System model (to get nodes from identifier)
 };
 //
 //  End of FromSutUpdater class declaration

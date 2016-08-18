@@ -46,6 +46,7 @@ SOURCES +=  \
     src/SVF_Player.cpp                              \
     src/SVF_SimulationProtocol.cpp                  \
     src/SVFVector.cpp                               \
+    src/Session.cpp                                 \
     src/Startup.cpp                                 \
     src/SystemModel.cpp                             \
     src/SystemModelAdapter.cpp                      \
@@ -89,6 +90,7 @@ HEADERS += \
     include/SVF_Player.hpp                              \
     include/SVF_SimulationProtocol.hpp                  \
     include/SVFVector.hpp                               \
+    include/Session.hpp                                 \
     include/Startup.hpp                                 \
     include/SystemModel.hpp                             \
     include/SystemModelAdapter.h                        \

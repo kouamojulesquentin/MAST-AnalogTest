@@ -11,7 +11,7 @@
 //===========================================================================
 
 #include "SystemModelAdapter.h"
-#include "Startup.hpp"
+#include "Session.hpp"
 #include "SystemModelBuilder.hpp"
 #include "LoopbackAccessInterfaceProtocol.hpp"
 #include "GmlPrinterVisitor.hpp"
@@ -28,16 +28,44 @@
 #include <memory>
 #include <fstream>
 #include <sstream>
+#include <string>
 
 using std::shared_ptr;
 using std::make_shared;
 using std::make_unique;
 using std::dynamic_pointer_cast;
+using std::string;
 using std::cout;
 using std::ofstream;
 using std::ostringstream;
 
 using namespace mast;
+
+
+
+//! Check SystemModel coherency
+//!
+ErrorCode CheckResult (shared_ptr<SystemModel> sm)
+{
+  auto retCode = ErrorCode::Ok;
+
+  auto checkResult = sm->Check();
+
+  if (checkResult.HasIssues())
+  {
+    cout << "!!!!!! Invalid model !!!!!!" << std::endl;
+    cout << checkResult.MakeReport();
+
+    if (checkResult.HasErrors())
+    {
+      retCode = ErrorCode::InvalidModel;
+    }
+  }
+  return retCode;
+}
+//
+//  End of: CheckResult
+//---------------------------------------------------------------------------
 
 
 
@@ -75,14 +103,20 @@ int main (int /* argc */, char */* argv */[])
 {
   std::cout << "Test case 1500 Wrapper" << std::endl;
 
-//+  auto errorCode = RunMast(filePath, pAssociations, )
+//+  auto errorCode = RunMast(filePath, associations)
 
   auto retCode = ErrorCode::Ok;
   try
   {
     auto logworker = InitializeLogger();
 
-    auto sm               = mast::Startup::GetSystemModel();
+    {
+      Session junk(std::make_shared<SystemModelManagerMonitor>());
+    }
+
+    auto session          = Session (std::make_shared<SystemModelManagerMonitor>());
+    auto sm               = session.sm;
+    auto manager          = session.manager;
     auto builder          = SystemModelBuilder(*sm);
     auto protocol         = make_shared<LoopbackAccessInterfaceProtocol> ();
     auto accessInterface  = builder.Create_JTAG_TAP("Tap", 8u, 2u, protocol);
@@ -94,20 +128,11 @@ int main (int /* argc */, char */* argv */[])
 
     sm->SetRoot(accessInterface);
 
-    auto printGraph  = true;
+    auto printGraph  = false;
 
-    auto checkResult = sm->Check();
-
-    if (checkResult.HasIssues())
+    retCode = CheckResult(sm);
+    if (retCode != ErrorCode::Ok)
     {
-      cout << "!!!!!! Invalid model !!!!!!" << std::endl;
-      cout << checkResult.MakeReport();
-
-      if (checkResult.HasErrors())
-      {
-        retCode = ErrorCode::InvalidModel;
-        return static_cast<int>(retCode);
-      }
       printGraph = true;
     }
 
@@ -117,54 +142,49 @@ int main (int /* argc */, char */* argv */[])
       os << GmlPrinterVisitor::Graph(accessInterface);
     }
 
-    if (retCode == ErrorCode::Ok)
+    if (retCode != ErrorCode::Ok)
     {
-      auto manager = mast::Startup::GetManager();
-      auto monitor = std::make_shared<SystemModelManagerMonitor>();
-      manager->Monitor(monitor);
-      manager->Start();
-
-      auto pdlApp = [manager](uint16_t loopCount, uint16_t initialValue)
-      {
-        while (loopCount)
-        {
-          manager->iWrite("dynamic_0", initialValue);
-          manager->iApply();
-
-          ++initialValue;
-          --loopCount;
-        }
-      };
-
-
-//+      auto node         = dynamic_pointer_cast<ParentNode>(wrapper->FindNode("SWIR."));
-      auto appNode         = wrapper->DeepestChildAppender();
-
-      auto initialValue = uint16_t(0x1000);
-      auto loopCount    = uint16_t(10);
-      for (uint32_t ii = 0 ; ii < derivationsCount ; ++ii)
-      {
-        ostringstream os;
-        os << "App_" << ii;
-        auto appName      = os.str();
-        auto appWrapper   = [pdlApp, loopCount, initialValue]() { pdlApp(loopCount, initialValue); };
-        manager->CreateApplicationThread(appNode, appWrapper, appName);
-
-        initialValue += 0x1000;
-      }
-
-      manager->StartCreatedApplicationThreads();
-      manager->WaitForApplicationsEnd();
-      manager->Stop();
-
-//+      manager.reset();
-    //! @todo [JFC]-[August/17/2016]: In main(): Create then used a MAST session that initialize/cleanup mast
-    //!
-      mast::Startup::ForgetManager();
-      mast::Startup::ForgetSystemModel();
-
-      std::cout << "Test case run successfully" << std::endl;
+      return static_cast<int>(retCode);
     }
+
+    manager->Start();
+
+    auto pdlApp = [manager](uint16_t loopCount, string registerPath, uint16_t initialValue)
+    {
+      while (loopCount)
+      {
+        manager->iWrite(registerPath, initialValue);
+        manager->iApply();
+
+        ++initialValue;
+        --loopCount;
+      }
+    };
+
+    auto appNode      = wrapper->DeepestChildAppender();
+    auto initialValue = uint16_t(0x1000);
+    auto loopCount    = uint16_t(10);
+    for (uint32_t ii = 0 ; ii < derivationsCount ; ++ii)
+    {
+      ostringstream os_app;
+      os_app << "App_" << ii;
+      auto appName      = os_app.str();
+
+      ostringstream os_reg;
+      os_reg << "dynamic_" << ii;
+      auto registerPath = os_reg.str();
+
+      auto appWrapper   = [pdlApp, loopCount, registerPath, initialValue]() { pdlApp(loopCount, registerPath, initialValue); };
+      manager->CreateApplicationThread(appNode, appWrapper, appName);
+
+      initialValue += 0x1000;
+    }
+
+    manager->StartCreatedApplicationThreads();
+    manager->WaitForApplicationsEnd();
+    manager->Stop();
+
+    std::cout << "Test case run successfully" << std::endl;
   }
   catch(std::invalid_argument& exc) { retCode = ErrorCode::InvalidArgument;  std::cout << exc.what(); }
   catch(std::out_of_range&     exc) { retCode = ErrorCode::OutOfRange;       std::cout << exc.what(); }

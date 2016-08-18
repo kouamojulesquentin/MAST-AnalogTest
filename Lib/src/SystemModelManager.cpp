@@ -38,9 +38,11 @@ using std::shared_lock;
 using namespace mast;
 using namespace std::chrono_literals;
 
-#define MONITOR(fct)                            if (m_monitor) m_monitor->fct;
-#define MONITOR_MESSAGE(msg)                    if (m_monitor) m_monitor->LogUncondionally(msg);
-#define MONITOR_WITH_NODE(msg, node, debugName) if (m_monitor) m_monitor->LogUncondionally(msg, node, debugName);
+#define MONITOR(fct)                            if (m_monitor) m_monitor->fct
+#define MONITOR_MESSAGE(msg)                    if (m_monitor) m_monitor->LogUncondionally(msg)
+#define MONITOR_WITH_NODE(msg, node, debugName) if (m_monitor) m_monitor->LogUncondionally(msg, node, debugName)
+#define MONITOR_APP(msg, appData)               if (m_monitor) m_monitor->LogUncondionally(msg, *appData->pathResolver.ReferenceNode(), appData->debugName)
+
 
 #define PATH_RESOLVER(msg)                                        PathResolver(__FILE__, __func__, __LINE__, msg)
 #define MUTABLE_PATH_RESOLVER(msg)  const_cast<NodePathResolver&>(PathResolver(__FILE__, __func__, __LINE__, msg))
@@ -65,7 +67,7 @@ SystemModelManager::SystemModelManager(SystemModel&                          sm,
                                        shared_ptr<ConfigurationAlgorithm>    configurationAlgorithm,
                                        shared_ptr<SystemModelManagerMonitor> monitor)
   : m_sm                             (sm)
-  , m_firstAccessInterface           (GetFirstAccessInterface(sm))
+  , m_firstAccessInterface           ()
   , m_configurator                   (configurationAlgorithm)
   , m_propagator                     ()
   , m_toSutVisitor                   ()
@@ -102,8 +104,6 @@ shared_ptr<SystemModelManager::ApplicationData> SystemModelManager::ApplicationD
     {
       THROW_LOGIC_ERROR("Thread is not managed by SystemModelManager");
     }
-
-
   }
 
   auto   data = pos->second;
@@ -176,7 +176,7 @@ void SystemModelManager::CreateApplicationThread (shared_ptr<ParentNode> applica
     std::this_thread::sleep_for(100us);
   }
   *data->currentState = ApplicationData::State::WrapperThreadStarted;
-  MONITOR_WITH_NODE("Application thread have reported to be running", *applicationTopNode, debugName);
+  MONITOR_APP("Application thread have reported to be running", data);
 
   m_threadStarted = false;
 
@@ -197,6 +197,11 @@ void SystemModelManager::DoDataCycles ()
   if (std::this_thread::get_id() != m_managerThreadId)
   {
     THROW_RUNTIME_ERROR("DoDataCycles shall be called only on SystemModelManager thread");
+  }
+
+  if (!m_firstAccessInterface)
+  {
+    m_firstAccessInterface = GetFirstAccessInterface(m_sm);
   }
 
   DoDataCycles_Impl();
@@ -317,7 +322,6 @@ shared_ptr<AccessInterface> SystemModelManager::GetFirstAccessInterface (const S
 //!
 void SystemModelManager::iApply ()
 {
-
   auto appData           = ThreadApplicationData();
   *appData->currentState = ApplicationData::State::InApply;
 
@@ -340,7 +344,7 @@ void SystemModelManager::iApply ()
 
     WakeupDataCycles();
 
-    MONITOR_WITH_NODE("Will be blocked in iApply", *appData->pathResolver.ReferenceNode(), appData->debugName)
+    MONITOR_APP("iApply - May be blocked (if data cycle update application data)", appData);
 
     // ---------------- Block the thread until data cycle loop release it (or is terminated)
     //                  As waking up of data cycle loop may occurs before wait
@@ -361,16 +365,16 @@ void SystemModelManager::iApply ()
 
     if (!m_runLoop)
     {
-      MONITOR_MESSAGE("iApply - Application thread has been released because data cycle loop is not/no more running ");
+      MONITOR_APP("iApply - Application thread has been released because data cycle loop is not/no more running ", appData);
     }
     else
     {
-      MONITOR_WITH_NODE("iApply - Released ", *appData->pathResolver.ReferenceNode(), appData->debugName)
+      MONITOR_APP("iApply - Released ", appData);
     }
   }
 
   *appData->currentState = ApplicationData::State::Running;
-  LOG(DEBUG) << "iApply - Leaving";
+  MONITOR_APP("iApply - Leaving", appData);
 }
 //
 //  End of: SystemModelManager::iApply
@@ -477,7 +481,7 @@ uint32_t SystemModelManager::iGetStatus (string_view registerPath, bool clearCou
 
 //! Returns current path prefix for current thread
 //!
-string SystemModelManager::iPrefix () const
+string SystemModelManager::iPrefix ()
 {
   auto&  pathResolver = PATH_RESOLVER("iPrefix: ");
   return pathResolver.Prefix();
@@ -507,8 +511,6 @@ void SystemModelManager::iPrefix (std::string prefix)
 template<typename T>
 void SystemModelManager::iRead_impl (string_view registerPath, T value)
 {
-  LOG(DEBUG) << "iRead - Entering";
-
   //! @todo [JFC]-[August/02/2016]: In iRead_impl(): Add support for don't care
   //!
   auto& pathResolver = PATH_RESOLVER("iRead: ");
@@ -518,11 +520,12 @@ void SystemModelManager::iRead_impl (string_view registerPath, T value)
   asBinaryVector.Set(std::move(value));
 
   auto appData = ThreadApplicationData();
+  MONITOR_APP("iRead - Queuing request", appData);
   appData->queuedReads.emplace_back(SystemModelManager::QueuedRequest(reg->Identifier(), std::move(asBinaryVector)));
 
   *appData->currentState = ApplicationData::State::ReadRequest;
 
-  LOG(DEBUG) << "iRead - Leaving";
+  MONITOR_APP("iRead - Leaving", appData);
 }
 //
 //  End of: SystemModelManager::iRead_impl
@@ -546,17 +549,16 @@ void SystemModelManager::iRead (string_view registerPath, int64_t      expectedV
 //!
 void SystemModelManager::iRefresh (string_view registerPath)
 {
-  LOG(DEBUG) << "iRefresh - Entering";
-
   auto& pathResolver = PATH_RESOLVER("iRefresh: ");
   auto  reg          = pathResolver.ResolveAsRegister(registerPath);
 
   auto appData = ThreadApplicationData();
+  MONITOR_APP("iRefresh - Queuing request", appData);
   appData->queuedRefreshes.emplace_back(SystemModelManager::QueuedRequest(reg->Identifier()));
 
   *appData->currentState = ApplicationData::State::RefreshRequest;
 
-  LOG(DEBUG) << "iRefresh - Leaving";
+  MONITOR_APP("iRefresh - Leaving", appData);
 }
 //
 //  End of: SystemModelManager::iRefresh
@@ -568,21 +570,20 @@ void SystemModelManager::iRefresh (string_view registerPath)
 template<typename T>
 void SystemModelManager::iWrite_impl (string_view registerPath, T value)
 {
-  LOG(DEBUG) << "iWrite - Entering";
-
-  auto& pathResolver = PATH_RESOLVER("iWrite: ");
-  auto  reg          = pathResolver.ResolveAsRegister(registerPath);
-
-
+  auto& pathResolver  = PATH_RESOLVER("iWrite: ");
+  auto  reg           = pathResolver.ResolveAsRegister(registerPath);
   auto asBinaryVector = BinaryVector(reg->BitsCount(), 0u, SizeProperty::Fixed);
   asBinaryVector.Set(std::move(value));
 
   auto appData = ThreadApplicationData();
+
+  MONITOR_APP("iWrite - Queuing request", appData);
+
   appData->queuedWrites.emplace_back(SystemModelManager::QueuedRequest(reg->Identifier(), std::move(asBinaryVector)));
 
   *appData->currentState = ApplicationData::State::WriteRequest;
 
-  LOG(DEBUG) << "iWrite - Leaving";
+  MONITOR_APP("iWrite - Leaving", appData);
 }
 //
 //  End of: SystemModelManager::iWrite_impl
@@ -641,12 +642,16 @@ void SystemModelManager::LoopOnDataCycle ()
 
 //! Returns path resolver associated with caller thread
 //!
-const NodePathResolver& SystemModelManager::PathResolver (const char* file, const char* fct, uint32_t line, string_view msg) const
+const NodePathResolver& SystemModelManager::PathResolver (const char* file, const char* fct, uint32_t line, string_view msg)
 {
   auto threadId = std::this_thread::get_id();
 
   if (threadId == m_managerThreadId)
   {
+    if (!m_pathResolver.ReferenceNode())
+    {
+      m_pathResolver.ReferenceNode(m_sm.Root());
+    }
     return m_pathResolver;
   }
 
@@ -730,6 +735,11 @@ void SystemModelManager::Start ()
   if (m_managerThread.joinable())
   {
     THROW_RUNTIME_ERROR("There is already a background thread for data cycle loop");
+  }
+
+  if (!m_firstAccessInterface)
+  {
+    m_firstAccessInterface = GetFirstAccessInterface(m_sm);
   }
 
   MONITOR_MESSAGE("Starting data cycle loop background thread");
@@ -833,7 +843,7 @@ void SystemModelManager::ReleaseServedThreads ()
       ++it;
       m_pendingThreads.erase(toErasePos);
 
-      MONITOR_WITH_NODE("Will be released from iApply: ", *appData->pathResolver.ReferenceNode(), appData->debugName)
+      MONITOR_APP("Will be released from iApply: ", appData);
       appData->releaseCv.notify_one();
     }
     else
@@ -936,9 +946,9 @@ void SystemModelManager::WaitForApplicationsEnd ()
 
     if (data->appThread.joinable())
     {
-      MONITOR_WITH_NODE("Joining application thread", *topNode, data->debugName);
+      MONITOR_APP("Joining application thread", data);
       data->appThread.join();
-      MONITOR_WITH_NODE("Joined  application thread", *topNode, data->debugName);
+      MONITOR_APP("Joined  application thread", data);
     }
   }
   m_threadToAppData.clear();  // There is no more application threads, so the data are useless

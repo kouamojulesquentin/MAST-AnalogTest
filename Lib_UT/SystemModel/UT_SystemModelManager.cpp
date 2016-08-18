@@ -334,7 +334,7 @@ void UT_SystemModelManager::test_Constructor_EmptySystemModel ()
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (SystemModelManager sut(sm), std::exception);
+  TS_ASSERT_THROWS_NOTHING (SystemModelManager sut(sm));
 }
 
 //! Checks SystemModelManager constructor when there are no node in system model
@@ -343,14 +343,14 @@ void UT_SystemModelManager::test_Constructor_SystemModel_Without_AI ()
 {
   // ---------------- Setup
   //
-  SystemModel        sm;
+  SystemModel      sm;
   TestModelBuilder builder(sm);
 
   auto root = builder.Create_Simple_MIB();
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (SystemModelManager sut(sm), std::exception);
+  TS_ASSERT_THROWS_NOTHING (SystemModelManager sut(sm));
 }
 
 //! Checks SystemModelManager constructor when root is an AccessInterface
@@ -411,6 +411,24 @@ void UT_SystemModelManager::test_Constructor_Root_is_Chain_3_AI ()
   // ---------------- Exercise & Verify
   //
   TS_ASSERT_THROWS_NOTHING (SystemModelManager sut(sm));
+}
+
+
+//! Checks SystemModelManager::Start when there is AccessInterface in system model
+//!
+void UT_SystemModelManager::test_Start_SystemModel_Without_AI ()
+{
+  // ---------------- Setup
+  //
+  SystemModel      sm;
+  TestModelBuilder builder(sm);
+
+  auto root = builder.Create_Simple_MIB();
+  SystemModelManager sut(sm);
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut.Start(), std::exception);
 }
 
 

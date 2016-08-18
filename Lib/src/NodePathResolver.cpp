@@ -24,16 +24,28 @@ using namespace mast;
 
 //! Initializes the resolver with a reference node
 //!
-//! @param referenceNode  A node that will be reference for resolving path (must be not nullptr)
+//! @param referenceNode  A node that will be reference for resolving path (if nullptr, ReferenceNode() setter must be called before any call to Resolve)
 //!
 NodePathResolver::NodePathResolver(shared_ptr<ParentNode> referenceNode)
   : m_referenceNode (referenceNode)
   , m_prefixNode    (referenceNode)
 {
-  CHECK_PARAMETER_NOT_NULL(referenceNode, "NodePathResolver must be constructed with a valid reference node");
 }
 //
 //  End of NodePathResolver
+//---------------------------------------------------------------------------
+
+
+//! Sets reference node to search from
+//!
+void NodePathResolver::ReferenceNode (std::shared_ptr<ParentNode> referenceNode)
+{
+  m_referenceNode = referenceNode;
+  m_prefixNode    = referenceNode;
+  m_prefix.clear();
+}
+//
+//  End of: NodePathResolver::ReferenceNode
 //---------------------------------------------------------------------------
 
 
@@ -56,6 +68,8 @@ shared_ptr<SystemModelNode> NodePathResolver::Resolve (string_view path) const
     auto foundNode = pos->second;
     return foundNode;
   }
+
+  CHECK_VALUE_NOT_NULL(m_prefixNode, "Resolver has not been initialized with a reference node");
 
   auto foundNode = m_prefixNode->FindNode(path);
   if (foundNode)
@@ -110,6 +124,7 @@ void NodePathResolver::SetPrefix (string prefix)
   }
   else
   {
+    CHECK_VALUE_NOT_NULL(m_referenceNode, "Reference node must be set before calling SetPrefix");
     auto prefixNode = m_referenceNode->FindNode(prefix);
 
     CHECK_VALUE_NOT_NULL(prefixNode, "Prefix: '"s + prefix + "' is not valid (cannot find matching node)");

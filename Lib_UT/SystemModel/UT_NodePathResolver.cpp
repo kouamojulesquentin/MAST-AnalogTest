@@ -115,7 +115,7 @@ void UT_NodePathResolver::test_constructor_nullptr ()
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (auto sut = NodePathResolver(nullptrReferenceNode), std::exception);
+  TS_ASSERT_THROWS_NOTHING (auto sut = NodePathResolver(nullptrReferenceNode));
 }
 
 

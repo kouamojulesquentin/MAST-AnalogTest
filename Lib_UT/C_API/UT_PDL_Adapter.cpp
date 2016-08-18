@@ -246,17 +246,18 @@ namespace
     // ---------------- Exercise
     //
     TS_ASSERT_THROWS_NOTHING (retCode = fct("TAP_DR_Mux.MIB_mux.dynamic_1", value));
-    TS_ASSERT_THROWS_NOTHING (retCode = iApply());      // iWrite does nothing visible without iApply
 
     // ---------------- Verify
     //
-    auto expectedNextToSut = BinaryVector::CreateFromHexString(expected);
-    auto errorMsg          = ErrorMessage();
+    TS_ASSERT_EQUALS         (retCode, ErrorCode::Ok);
+    TS_ASSERT_THROWS_NOTHING (retCode  = iApply()); // iWrite does nothing visible without iApply
+    TS_ASSERT_EQUALS         (retCode, ErrorCode::Ok);
 
-    TS_ASSERT_EQUALS (retCode,  ErrorCode::Ok);
+    auto errorMsg = ErrorMessage();
     TS_ASSERT_EQUALS (errorMsg, "");
 
-    auto reg = Startup::GetSystemModel()->RegisterWithId(7u);
+    auto reg               = Startup::GetSystemModel()->RegisterWithId(7u);
+    auto expectedNextToSut = BinaryVector::CreateFromHexString(expected);
     TS_ASSERT_EQUALS (reg->NextToSut(), expectedNextToSut);
   }
   //

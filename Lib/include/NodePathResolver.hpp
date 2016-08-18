@@ -44,6 +44,10 @@ class DLL_EXPORT NodePathResolver final
   //!
   std::shared_ptr<ParentNode> ReferenceNode() const { return m_referenceNode; }
 
+  //! Sets reference node to search from
+  //!
+  void  ReferenceNode (std::shared_ptr<ParentNode> referenceNode);
+
   //! Finds node with relative path from "prefix" or "reference" node
   //!
   std::shared_ptr<SystemModelNode> Resolve (std::experimental::string_view path) const;

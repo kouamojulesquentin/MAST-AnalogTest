@@ -35,6 +35,10 @@ class UT_SystemModelManager : public CxxTest::TestSuite
   void test_Constructor_Root_is_Chain_1_AI ();
   void test_Constructor_Root_is_Chain_3_AI ();
 
+  // ---------------- Constructor
+  //
+  void test_Start_SystemModel_Without_AI ();
+
   // ---------------- DoDataCycles
   //
   void test_DoDataCycles_AccessInterface ();

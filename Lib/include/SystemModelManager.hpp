@@ -99,7 +99,7 @@ class DLL_EXPORT SystemModelManager final
 
   //! Returns current path prefix for current thread
   //!
-  std::string iPrefix() const;
+  std::string iPrefix();
 
   //! Changes path prefix for calling thread
   //!
@@ -275,7 +275,7 @@ class DLL_EXPORT SystemModelManager final
   std::shared_ptr<ApplicationData> ThreadApplicationData() const { return ApplicationDataForThreadId(std::this_thread::get_id()); }
 
 
-  const NodePathResolver&          PathResolver(const char* file, const char* fct, uint32_t line, std::experimental::string_view msg) const;
+  const NodePathResolver& PathResolver(const char* file, const char* fct, uint32_t line, std::experimental::string_view msg);
 
   void ProcessQueuedRequests (std::shared_ptr<ApplicationData> appData);
   void LoopOnDataCycle ();

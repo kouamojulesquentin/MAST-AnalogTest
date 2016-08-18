@@ -55,4 +55,5 @@
 /SIT_parser/SIT_parser.output
 /CanLoop.txt
 /SIT_parser_UT/Generated
-/Doxyfile.cfg
+/SIT_reader/SIT_parser.output
+/SIT_reader_UT/Generated/Runner.cpp

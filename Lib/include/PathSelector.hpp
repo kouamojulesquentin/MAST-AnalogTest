@@ -17,6 +17,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <experimental/string_view>
 
 namespace mast
 {
@@ -42,11 +43,15 @@ class BinaryVector;
 
 //! Extension point interface used by Linker to manage paths selection
 //!
+//! @note It is actual an abstract base class that provide SelectorProperty getter
+//!
 class PathSelector
 {
   // ---------------- Public  Methods
   //
   public:
+
+  PathSelector(SelectorProperty properties) : m_properties(properties) {}
 
   //! Returns true when the specified path is already selected
   //!
@@ -91,10 +96,6 @@ class PathSelector
   //!
   virtual uint32_t SelectablePaths() const = 0;
 
-  //! Returns true if selector can select nothing (passthrough mode), false otherwise
-  //!
-  virtual bool CanSelectNone() const = 0;
-
   //! Returns associated Register or nullptr when there is none
   //!
   virtual std::shared_ptr<const Register> AssociatedRegister() const = 0;
@@ -107,10 +108,31 @@ class PathSelector
   //!
   virtual const BinaryVector& SelectionValue (uint32_t pathIdentifier) const = 0;
 
+  //! Returns readable type of selector (binary, One_Hot, N_Hot...)
+  //!
+  virtual std::experimental::string_view KindName() const = 0;
+
+  //! Returns selector main properties
+  //!
+  SelectorProperty Properties() const { return m_properties; }
+
+  //! Returns true if selector can select nothing (passthrough mode), false otherwise
+  //!
+  bool CanSelectNone() const
+  {
+    return (    static_cast<std::underlying_type_t<SelectorProperty>>(m_properties)
+              & static_cast<std::underlying_type_t<SelectorProperty>>(SelectorProperty::CanSelectNone)
+           ) == static_cast<std::underlying_type_t<SelectorProperty>>(SelectorProperty::CanSelectNone);
+  }
+
   // ---------------- Protected Methods
   //
   virtual ~PathSelector() = default;
   PathSelector()  = default;
+
+  // ---------------- Private  Fields
+  //
+  const SelectorProperty m_properties = SelectorProperty::None;       //!< Defines selector properies
 };
 //
 //  End of PathSelector class declaration

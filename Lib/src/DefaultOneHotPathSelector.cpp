@@ -36,7 +36,7 @@ DefaultOneHotPathSelector::DefaultOneHotPathSelector(shared_ptr<Register> associ
                                    pathsCount,
                                    CreateSelectTable   (associatedRegister->BitsCount(), pathsCount, properties),
                                    CreateDeselectTable (associatedRegister->BitsCount(), pathsCount, properties),
-                                   IsSet(properties, SelectorProperty::CanSelectNone)
+                                   properties
                                   )
 {
 }

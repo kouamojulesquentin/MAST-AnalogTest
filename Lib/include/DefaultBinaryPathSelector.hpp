@@ -55,6 +55,8 @@ class DLL_EXPORT DefaultBinaryPathSelector : public DefaultTableBasedPathSelecto
   static TablesType   CreateSelectTable                       (uint32_t   registerLength,  uint32_t pathsCount, SelectorProperty properties);
   static TablesType   CreateDeselectTable                     (uint32_t   registerLength,  uint32_t pathsCount, SelectorProperty properties);
 
+  virtual std::experimental::string_view KindName() const override { return "Binary"; }; //!< Returns readable type of selector
+
   // ---------------- Protected Methods
   //
   protected:

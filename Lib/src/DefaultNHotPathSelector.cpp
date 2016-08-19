@@ -37,7 +37,7 @@ DefaultNHotPathSelector::DefaultNHotPathSelector(shared_ptr<Register> associated
                                    pathsCount,
                                    CreateSelectTable   (associatedRegister->BitsCount(), pathsCount, properties),
                                    CreateDeselectTable (associatedRegister->BitsCount(), pathsCount, properties),
-                                   IsSet(properties, SelectorProperty::CanSelectNone)
+                                   properties
                                   )
   , m_invertedBits (IsSet(properties, SelectorProperty::InvertedBits))
 {

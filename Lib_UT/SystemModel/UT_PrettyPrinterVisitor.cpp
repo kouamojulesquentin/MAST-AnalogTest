@@ -909,7 +909,7 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_AllOptions ()
                          "                                                     , expected_from_sut: 0b1111_1\n"
                          "                                                     , pending: false, has_conditioner: false, priority: 0\n"
                          " [Linker](2)    \"TAP_DR_Mux\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
-                         "  :Selector:(1)  \"TAP_IR\"\n"
+                         "  :Selector:(1)  \"TAP_IR\", kind: Table_Based, can_select_none: false, inverted_bits: false, reversed_order: false\n"
                          "  [Register](3)  \"TAP_BPY\",     :0b11111:S:A:, length: 1, bypass:            0b1\n"
                          "                                                        , next_to_sut:       0b1\n"
                          "                                                        , last_to_sut:       0b1\n"

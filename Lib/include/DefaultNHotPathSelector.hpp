@@ -57,6 +57,8 @@ class DLL_EXPORT DefaultNHotPathSelector : public DefaultTableBasedPathSelector
   static TablesType CreateSelectTable   (uint32_t registerLength, uint32_t pathsCount, SelectorProperty properties);
   static TablesType CreateDeselectTable (uint32_t registerLength, uint32_t pathsCount, SelectorProperty properties);
 
+  virtual std::experimental::string_view KindName() const override { return "N_Hot"; }; //!< Returns readable type of selector
+
   // ---------------- Protected Methods
   //
   protected:

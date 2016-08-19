@@ -26,10 +26,11 @@ using namespace mast;
 //! Initializes with specified options
 //!
 PrettyPrinterVisitor::PrettyPrinterVisitor (PrettyPrinterOptions options)
-  : m_useAutoFormat      (IsSet(options, PrettyPrinterOptions::DisplayValueAuto))
-  , m_verbose            (IsSet(options, PrettyPrinterOptions::Verbose))
-  , m_showSelectionState (IsSet(options, PrettyPrinterOptions::ShowSelectionState))
-  , m_showSelectionValue (IsSet(options, PrettyPrinterOptions::ShowSelectionValue))
+  : m_useAutoFormat       (IsSet(options, PrettyPrinterOptions::DisplayValueAuto))
+  , m_verbose             (IsSet(options, PrettyPrinterOptions::Verbose))
+  , m_showSelectionState  (IsSet(options, PrettyPrinterOptions::ShowSelectionState))
+  , m_showSelectionValue  (IsSet(options, PrettyPrinterOptions::ShowSelectionValue))
+  , m_showSelectorOptions (IsSet(options, PrettyPrinterOptions::ShowSelectorOptions))
 {
 }
 //
@@ -199,16 +200,25 @@ void PrettyPrinterVisitor::StreamNodeHeader(std::experimental::string_view type,
   AlignRelativeTo(m_startPos, 15u + m_depth);
   m_os << '"' << node.Name()       << '"';
 
+  if (m_selector && m_processingSelector && m_showSelectorOptions)
+  {
+    m_os << ", kind: "            << m_selector->KindName();
+    m_os << ", can_select_none: " << IsSet(m_selector->Properties(), SelectorProperty::CanSelectNone);
+    m_os << ", inverted_bits: "   << IsSet(m_selector->Properties(), SelectorProperty::InvertedBits);
+    m_os << ", reversed_order: "  << IsSet(m_selector->Properties(), SelectorProperty::ReverseOrder);
+  }
+
   // ---------------- Display selection/active state(s)
   //
-  if (m_selector && (m_showSelectionState || m_showSelectionValue))
+  if (m_selector && !m_processingSelector && (m_showSelectionState || m_showSelectionValue))
   {
-    bool isSelected    = m_selector->IsSelected(m_childId);
-    bool isActive      = m_selector->IsActive(m_childId);
-    bool showSomething = m_showSelectionValue || isActive || isSelected;
+    bool isSelected         = m_selector->IsSelected(m_childId);
+    bool isActive           = m_selector->IsActive(m_childId);
+    bool showSelectionValue = m_showSelectionValue && !dynamic_cast<const Linker*>(&node);
+    bool showSomething      = showSelectionValue || isActive || isSelected;
 
     if (showSomething)                      m_os << ", ", AlignRelativeTo(m_startPos, 30u + m_depth);
-    if (m_showSelectionValue)               m_os << ":" << m_selector->SelectionValue(m_childId).DataAsMixString(8, "", ":");
+    if (showSelectionValue)                 m_os << ":" << m_selector->SelectionValue(m_childId).DataAsMixString(8, "", ":");
     if (m_showSelectionState && isSelected) m_os << ":S";
     if (m_showSelectionState && isActive)   m_os << ":A";
     if (showSomething)                      m_os << ":";
@@ -268,6 +278,7 @@ void PrettyPrinterVisitor::VisitChain (Chain& chain)
 //! @note Supposes that path selector associated with linker will be made of SystemModelNode too
 void PrettyPrinterVisitor::VisitLinker (Linker& linker)
 {
+  m_selector = linker.Selector();
   StreamNodeHeader("Linker", linker);
 
   if (m_verbose)
@@ -294,6 +305,7 @@ void PrettyPrinterVisitor::VisitLinker (Linker& linker)
     m_processingSelector = true;
 
     auto selector = linker.Selector();
+
     selector->Accept(*this);
   }
 

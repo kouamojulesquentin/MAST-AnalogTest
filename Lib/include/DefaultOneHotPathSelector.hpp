@@ -53,6 +53,8 @@ class DLL_EXPORT DefaultOneHotPathSelector : public DefaultTableBasedPathSelecto
   static TablesType CreateSelectTable   (uint32_t registerLength, uint32_t pathsCount, SelectorProperty properties);
   static TablesType CreateDeselectTable (uint32_t registerLength, uint32_t pathsCount, SelectorProperty properties);
 
+  virtual std::experimental::string_view KindName() const override { return "One_Hot"; }; //!< Returns readable type of selector
+
   // ---------------- Protected Methods
   //
   protected:

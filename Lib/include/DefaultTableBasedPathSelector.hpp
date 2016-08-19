@@ -30,7 +30,7 @@ class Register;
 //!
 //! @note Path identifier are defined in range [1..nb_path]
 //!
-class DLL_EXPORT DefaultTableBasedPathSelector  : public PathSelector
+class DLL_EXPORT DefaultTableBasedPathSelector : public PathSelector
 {
   // ---------------- Public  Methods
   //
@@ -46,7 +46,7 @@ class DLL_EXPORT DefaultTableBasedPathSelector  : public PathSelector
                                 uint32_t                  pathsCount,
                                 TablesType                selectTable,
                                 TablesType                deselectTable,
-                                bool                      canSelectNone = false);
+                                SelectorProperty          properties = SelectorProperty::None);
 
   virtual bool IsActive            (uint32_t pathIdentifier) const override; //!< Returns true when the specified path is already active
   virtual bool IsSelected          (uint32_t pathIdentifier) const override; //!< Returns true when the specified path is selected
@@ -57,7 +57,6 @@ class DLL_EXPORT DefaultTableBasedPathSelector  : public PathSelector
   virtual std::shared_ptr<const Register> AssociatedRegister() const override { return m_muxRegister; }  //!< Returns associated Register
 
   virtual uint32_t SelectablePaths() const override { return m_pathsCount; };   //!< Returns the maximum number of selectable paths (max value for IsActive, Select and Deselect)
-  virtual bool     CanSelectNone()   const override { return m_canSelectNone; }   //!< Returns true if selector can select nothing (passthrough mode), false otherwise
 
   virtual uint32_t ActiveCount() const override;    //!< Returns the number of paths that are currently active
 
@@ -74,6 +73,7 @@ class DLL_EXPORT DefaultTableBasedPathSelector  : public PathSelector
   static TablesType& InvertTable (TablesType& table);  //!< Inverts table bits
   static TablesType& FixTable    (TablesType& table);  //!< Makes table entry fix (cannot modify size)
 
+  virtual std::experimental::string_view KindName() const override { return "Table_Based"; }; //!< Returns readable type of selector
 
   // ---------------- Protected Methods
   //
@@ -88,7 +88,6 @@ class DLL_EXPORT DefaultTableBasedPathSelector  : public PathSelector
   std::shared_ptr<Register> m_muxRegister;            //!< Register that drives the paths multiplexer
   const TablesType          m_selectTable;            //!< Selection LUT
   const TablesType          m_deselectTable;          //!< Deselection LUT
-  const bool                m_canSelectNone = false;  //!< When true zero is reserved to select 'no path' otherwise 0 is used to select first path
 };
 //
 //  End of DefaultTableBasedPathSelector class declaration

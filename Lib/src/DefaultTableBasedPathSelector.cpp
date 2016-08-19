@@ -38,12 +38,12 @@ DefaultTableBasedPathSelector::DefaultTableBasedPathSelector (shared_ptr<Registe
                                                               uint32_t             pathsCount,
                                                               TablesType           selectTable,
                                                               TablesType           deselectTable,
-                                                              bool                 canSelectNone)
-  : m_pathsCount    (pathsCount)
+                                                              SelectorProperty     properties)
+  : PathSelector    (properties)
+  , m_pathsCount    (pathsCount)
   , m_muxRegister   (CHECK_PARAMETER_NOT_NULL (associatedRegister, "associatedRegister must be a valid Register"))
   , m_selectTable   (FixTable(selectTable))
   , m_deselectTable (FixTable(deselectTable))
-  , m_canSelectNone (canSelectNone)
 {
   if (m_selectTable.size() != m_deselectTable.size())
   {

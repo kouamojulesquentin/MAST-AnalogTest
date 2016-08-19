@@ -30,6 +30,7 @@ CXXTEST_ENUM_TRAITS(ErrorCode_t,
                     CXXTEST_ENUM_MEMBER(LogicError)
                     CXXTEST_ENUM_MEMBER(OutOfRange)
                     CXXTEST_ENUM_MEMBER(RuntimeError)
+                    CXXTEST_ENUM_MEMBER(RegexException)
                     CXXTEST_ENUM_MEMBER(StdException)
                     CXXTEST_ENUM_MEMBER(UndefinedFailure)
                     CXXTEST_ENUM_MEMBER(Failure)

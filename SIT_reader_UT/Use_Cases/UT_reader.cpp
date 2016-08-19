@@ -27,25 +27,32 @@ using std::string;
 using std::experimental::string_view;
 using test::UT_reader_wrapper;
  
+UT_reader::UT_reader()
+{ 
+ sm = std::make_shared<mast::SystemModel>();
+}
+
 //! Initializes tests (called for each test)
 //!
 void UT_reader::setUp ()
 {
   CxxTest::setStringResultsOnNewLine(true);
   CxxTest::setCharactersMapping(CxxTest::CharacterMapping::MAP_CHARS_MINIMAL);  // Keep quotes, HT, and new lines unescaped
- /*Faire un reset des identifiants, regarder les UT du SystemModel*/
+ /*Faire un reset des identifiants, regarder les UT du SystemModel*/  
+ SystemModelNode::ResetNodeIdentifier();
+ sm = std::make_shared<mast::SystemModel>();
+ 
 }
 
 
-//! Checks GmlPrinterVisitor constructor
-//!
-void UT_reader::test_reader ()
+/*Test construction of register nodes from Simplified ICL Tree input*/
+void UT_reader::test_register ()
 {
   // ---------------- Exercise
   //
 
   //
-  auto checker = [](auto data)
+  auto checker = [&](auto data)
   {
     auto input_SIT = std::get<0>(data);
     auto expected_PrettyPrinter = std::get<1>(data);
@@ -53,13 +60,16 @@ void UT_reader::test_reader ()
     // ---------------- Exercise & Verify
     //
       UT_reader_wrapper reader;
-    auto actual_PrettyPrinter=reader.run_parser_for_UT(input_SIT);
+    auto actual_PrettyPrinter=reader.run_parser_for_UT(input_SIT,sm);
     TS_ASSERT_EQUALS (actual_PrettyPrinter, expected_PrettyPrinter);
   }; 
   
   auto data =
-  {
-   make_tuple( "REGISTER test_register 12 Bypass: \"0b1001:0110:1100\"\n",   "[Register](0)  \"test_register\", length: 12, bypass: 1001_0110:1100"), 
+  { /*Basic constructor, different sizes and bypass values*/
+   make_tuple( "REGISTER test_register 12 Bypass: \"0b1001:0110:1100\"\n",  "[Register](0)  \"test_register\", length: 12, bypass: 1001_0110:1100"), 
+   make_tuple( "REGISTER test_register 11 Bypass: \"0b001:0110:1100\"\n",   "[Register](0)  \"test_register\", length: 11, bypass: 0010_1101:100"), 
+   /*Hold value*/
+   make_tuple( "REGISTER test_register 12 Hold_value Bypass: \"0b1001:0110:1100\"\n",  "[Register](0)  \"test_register\", length: 12, Hold value: true, bypass: 1001_0110:1100"), 
   };
 
      
@@ -70,6 +80,63 @@ void UT_reader::test_reader ()
 }
 
 
+/*Test construction of chain nodes from Simplified ICL Tree input*/
+void UT_reader::test_chain ()
+{
+  // ---------------- Exercise
+  //
+
+  //
+  auto checker = [&](auto data)
+  {
+    auto input_SIT = std::get<0>(data);
+    auto expected_PrettyPrinter = std::get<1>(data);
+    
+    // ---------------- Exercise & Verify
+    //
+      UT_reader_wrapper reader;
+    auto actual_PrettyPrinter=reader.run_parser_for_UT(input_SIT,sm);
+    TS_ASSERT_EQUALS (actual_PrettyPrinter, expected_PrettyPrinter);
+  }; 
+  
+  auto data =
+  { /*Chain with one register*/
+   make_tuple( "CHAIN test_chain\n { REGISTER test_register 12 Bypass: \"0b1001:0110:1100\"\n}",  
+   "[Chain](1)     \"test_chain\"\n [Register](0)  \"test_register\", length: 12, bypass: 1001_0110:1100"),
+    /*Chain with two registers*/ 
+    make_tuple(    "CHAIN test_chain\
+    { REGISTER test_register_1 12 Bypass: \"0b1001:0110:1100\"\
+      REGISTER test_register_2 12 Bypass: \"0b1001:0110:1100\"\
+    }",
+"[Chain](2)     \"test_chain\"\n\
+ [Register](0)  \"test_register_1\", length: 12, bypass: 1001_0110:1100\n\
+ [Register](1)  \"test_register_2\", length: 12, bypass: 1001_0110:1100"
+),
+    /*Nested Chains*/ 
+    make_tuple(    " CHAIN test_chain_1\
+  { CHAIN test_chain_2\
+   { CHAIN test_chain_3\
+    { CHAIN test_chain_4\
+     { CHAIN test_chain_5\
+      { REGISTER test_register_1 12 Bypass: \"0b1001:0110:1100\"\
+      REGISTER test_register_2 12 Bypass: \"0b1001:0110:1100\"\
+     }}}}}",
+"[Chain](6)     \"test_chain_1\"\n\
+ [Chain](5)     \"test_chain_2\"\n\
+  [Chain](4)     \"test_chain_3\"\n\
+   [Chain](3)     \"test_chain_4\"\n\
+    [Chain](2)     \"test_chain_5\"\n\
+     [Register](0)  \"test_register_1\", length: 12, bypass: 1001_0110:1100\n\
+     [Register](1)  \"test_register_2\", length: 12, bypass: 1001_0110:1100"),
+
+  };
+
+     
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+
+}
 
 //===========================================================================
 // End of UT_reader.cpp

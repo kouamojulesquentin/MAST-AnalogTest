@@ -44,6 +44,7 @@ static keywords_type keywords_table []=
    ,{"PRE"			,token::t_PRE} /*10*/
    ,{"HIGH"			,token::t_HIGH}
    ,{"LOW"			,token::t_LOW} 
+   ,{"REVERSE"			,token::t_REVERSE} 
    ,{"MIB"			,token::t_MIB} 
    ,{"WRAPPER_1500"		,token::t_1500_WRAPPER} 
    ,{"JTAG_TAP"			,token::t_JTAG_TAP} 

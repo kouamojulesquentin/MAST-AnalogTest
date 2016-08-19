@@ -21,7 +21,10 @@
 # endif
 
 #include "SIT_types.h"
+#include "DefaultNHotPathSelector.hpp"
 #include "SystemModelBuilder.hpp"
+using std::pair;
+
 using namespace mast;
 
 }
@@ -54,8 +57,12 @@ std::vector<std::string> JTAG_AI_target_table  =
   };
 
 std::vector<std::string> Path_Selector_table  =
-  {"Default_Binary","Default_Table_based"
-  };
+  {"Binary","One_Hot","N_Hot","Binary_noidle","One_Hot_noidle","N_Hot_noidle"};
+enum Path_Selector_t {Binary,One_Hot,N_Hot,Binary_noidle,One_Hot_noidle,N_Hot_noidle};
+
+std::vector<SelectorProperty> Path_Selector_prop_t { 
+ SelectorProperty::Binary_Default  ,SelectorProperty::One_Hot_Default,SelectorProperty::N_Hot_Default,
+ SelectorProperty::CannotSelectNone,SelectorProperty::CannotSelectNone,SelectorProperty::CannotSelectNone,};
 
 static int find_in_table(std::vector<std::string> table, std::string s)
 {
@@ -90,8 +97,10 @@ inline std::string remove_quotes(std::string s)
 %type  <name_type> node_name
 %type  <std::uint8_t> hold
 %type  <std::string> bypass
-%type  <ctrl_position> position
-%type  <logic_polarity> active
+%type  <mast::MuxRegPlacement> position
+
+%type  <mast::SelectorProperty> active
+%type  <mast::SelectorProperty> reverse
 %type  <std::uint32_t> max_derivations
 %type  <std::string> path_selector
 %type  <std::string> ctrl_node
@@ -136,6 +145,7 @@ inline std::string remove_quotes(std::string s)
 %token  <std::string> t_PRE
 %token  <std::string> t_HIGH
 %token  <std::string> t_LOW
+%token  <std::string> t_REVERSE
 %token  <std::uint32_t>  t_DecimalLiteral
 %token  t_RightBracket
 %token  t_LeftBracket
@@ -147,7 +157,6 @@ inline std::string remove_quotes(std::string s)
 root_node: 
    node END 
     {
-    std::cout << "Parsing OK, Root node is " <<$1->Name() << "  \n";
     driver.parsed_sut=$1;
     }
    ;
@@ -159,7 +168,7 @@ children_list:
 node_list:   
     node node_list { $$.name = $1->Name() + ' ' + $2.name; $$.n_nodes = $2.n_nodes+1;
                     auto tmp = $2.nodes;
-		    tmp.push_back($1);
+		    tmp.insert(tmp.begin(),$1);
 		    $$.nodes = tmp; 
 		    }	
   |   node { $$.name = $1->Name();$$.n_nodes = 1;$$.nodes.push_back($1);}
@@ -187,10 +196,8 @@ node_name :  t_WORD is_transparent
 internal_node: 
 
 t_CHAIN  node_name children_list { 
-                     std::cout << "Node type CHAIN, idf " << $2.name ;
                      if ($2.is_transparent) 
 		           std::cout << "(transparent)";
-                     std::cout << ", " << $3.n_nodes << " children:  " << $3.name << " \n";
 		     
 		     auto node = driver.main_sm->CreateChain($2.name);
 		     for (auto this_child : $3.nodes)
@@ -256,7 +263,7 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
 	 }
         else
       {
-  	std::cout << "Node type SIB, idf	 " << $2.name << " " << $3 <<" " << $4 <<"\n";
+  	std::cout << "Node type SIB, idf	 " << $2.name << "\n";
 
  	auto node = driver.main_sm->CreateChain ($2.name,nullptr);
 	for (auto this_child : $5.nodes)
@@ -266,17 +273,45 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
        }
   }			
  |  
- t_MIB node_name position active max_derivations path_selector ctrl_node children_list
+ t_MIB node_name position active reverse max_derivations path_selector children_list
   {
-      if ($8.n_nodes>$5) 
+      if ($8.n_nodes>$6) 
 	 {
-	  std::cerr << "MIB " << $2.name<< " has " << $8.n_nodes << " derivations instead of maximum "<< $5 <<"\n";
+	  std::cerr << "MIB " << $2.name<< " has " << $8.n_nodes << " derivations instead of maximum "<< $6 <<"\n";
 	  YYERROR; 
 	 }
         else
       {
-  	std::cout << "Node type MIB, idf " << $2.name << " " << $3 <<" " << $4 << " Max derivations " << $5 << " " << $6 << "_PathSelctor ctrl_node " << $7 <<"\n";
-        auto node = driver.main_sm->CreateChain ($2.name);
+      int   l;
+	l = find_in_table(Path_Selector_table,$7);
+	if (l==-1) 
+	 {
+	 std::cerr << "node " << $2.name<< " \""<< $7 << "\"" << ": Unkown MIB Path Selector \n";
+	 YYERROR; 
+	 }
+        auto selectorRegName = $2.name + MIB_CTRL_EXT;
+	SelectorProperty sel_properties = $4 | $5| Path_Selector_prop_t[l];
+
+        pair<shared_ptr<Register>, shared_ptr<PathSelector>> res; /*cannot use auto inside a switch*/
+ 	switch(l)
+	 { 
+	  case Binary : 
+	  case Binary_noidle : 
+	      res =  driver.builder->Create_PathSelector(SelectorKind::Binary, selectorRegName, $6,sel_properties);
+	     break;
+	  case One_Hot : 
+	  case One_Hot_noidle : 
+ 	      res  = driver.builder->Create_PathSelector(SelectorKind::One_Hot, selectorRegName, $6,sel_properties);
+	      break;
+	  case N_Hot : 
+	  case N_Hot_noidle : 
+ 	      res  = driver.builder->Create_PathSelector(SelectorKind::N_Hot, selectorRegName, $6,sel_properties);
+	      break;
+	 }
+   	auto selectorReg = res.first;
+  	auto selector    = res.second;
+        auto node = driver.builder->Create_MIB($2.name, selector, selectorReg, $3);
+
 	for (auto this_child : $8.nodes)
 	    node->AppendChild(this_child);
   	$$ = node;
@@ -344,6 +379,8 @@ path_selector: t_WORD
    ;
 ctrl_node: t_WORD
    { $$ =$1;}
+   |
+   { $$ = "";}
    ;
 
 IR_size : 
@@ -367,15 +404,21 @@ max_derivations :
  t_DecimalLiteral { $$ = $1;}
 ;
 position :
- t_POST { $$ = AFTER;}
+ t_POST { $$ = MuxRegPlacement::AfterMux;}
  |
- t_PRE{ $$ = BEFORE;}
+ t_PRE{ $$ = MuxRegPlacement::BeforeMux;}
  ; 
 
 active :
- t_HIGH { $$ = HIGH;}
+ t_HIGH { $$ = SelectorProperty::None;}
  |
- t_LOW{ $$ = LOW;}
+ t_LOW{ $$ =  SelectorProperty::InvertedBits;}
+ ; 
+
+reverse :
+ t_REVERSE {$$ = SelectorProperty::ReverseOrder;}
+ |
+ {  $$ = SelectorProperty::None; }
  ; 
  
 leaf_node: register_node {     $$=  $1;
@@ -384,7 +427,8 @@ leaf_node: register_node {     $$=  $1;
   
 register_node: 
    t_REGISTER  node_name size hold bypass { 
-                      auto node = driver.main_sm->CreateRegister ($2.name,  BinaryVector::CreateFromBinaryString(remove_quotes($5)), nullptr); 
+                      auto node = driver.main_sm->CreateRegister ($2.name,  BinaryVector::CreateFromBinaryString(remove_quotes($5)), nullptr);
+		      if ($4==1) node->SetHoldValue(true); 
   		     $$ = node;}
 
 size : 

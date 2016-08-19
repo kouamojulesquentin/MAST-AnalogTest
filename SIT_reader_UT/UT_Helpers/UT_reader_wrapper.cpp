@@ -19,6 +19,7 @@
 #include "PrettyPrinterVisitor.hpp"
 #include "UT_reader_wrapper.hpp"
 #include "PrettyPrinterVisitor.hpp"
+#include "../Use_Cases/UT_reader.hpp"
 
 using std::string;
 using std::experimental::string_view;
@@ -26,7 +27,7 @@ using std::experimental::string_view;
 using namespace test;
 
 
-string UT_reader_wrapper::run_parser_for_UT(string input_SIT)
+string UT_reader_wrapper::run_parser_for_UT(string input_SIT, std::shared_ptr<mast::SystemModel> sm)
 {
   // ---------------- Exercise
   //
@@ -34,7 +35,6 @@ string UT_reader_wrapper::run_parser_for_UT(string input_SIT)
 
   // ---------------- Verify
   //
-      auto  sm = std::make_shared<mast::SystemModel>();
       SIT::SIT_Reader driver(sm);
 
    std::stringstream stream;

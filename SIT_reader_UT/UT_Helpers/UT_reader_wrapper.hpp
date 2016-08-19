@@ -31,7 +31,7 @@ namespace test
 
   // ---------------- Constructor
   //
-  string run_parser_for_UT(string input_SIT);
+  string run_parser_for_UT(string input_SIT, std::shared_ptr<mast::SystemModel> sm);
 
   // ---------------- Private  Methods
   //

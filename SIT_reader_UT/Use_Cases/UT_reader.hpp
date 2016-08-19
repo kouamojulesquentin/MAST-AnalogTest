@@ -17,22 +17,28 @@
 
 #include <cxxtest/TestSuite.h>
 
+#include "SystemModelBuilder.hpp"
+using namespace mast;
+
 //! Dummy Unit tests
 //!
 //!
 class UT_reader : public CxxTest::TestSuite
 {
   public:
-   UT_reader() = default;
+   UT_reader();
   ~UT_reader() = default;
 
   // ---------------- Constructor
   //
-  void test_reader ();
+  void test_register ();
+  void test_chain ();
 
   // ---------------- Private  Methods
   //
   void setUp(); //!< Initializes test (called for each test)
+
+  std::shared_ptr<mast::SystemModel> sm;
 };
 //
 //  End of UT_reader class declaration

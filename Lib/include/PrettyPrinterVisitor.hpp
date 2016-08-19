@@ -35,11 +35,11 @@ enum class PrettyPrinterOptions
   DisplayValueAuto    = 0b00010, //!< To show Register values as binary when small, hexa when large and end of large string as binary when cannot form a plain nibble
   ShowSelectionState  = 0b00100,
   ShowSelectionValue  = 0b01000,
-  ShowSelectorOptions = 0b10000,
+  ShowSelectorProperties = 0b10000,
 
   Default           = None,
   Std               = Verbose | DisplayValueAuto,
-  All               = Verbose | DisplayValueAuto | ShowSelectionState | ShowSelectionValue | ShowSelectorOptions,
+  All               = Verbose | DisplayValueAuto | ShowSelectionState | ShowSelectionValue | ShowSelectorProperties,
 };
 
 //! System model visitors for creation of a text, readable, and hierarchical
@@ -94,18 +94,18 @@ class DLL_EXPORT PrettyPrinterVisitor : public SystemModelVisitor
   // ---------------- Private  Fields
   //
   private:
-  uint32_t                      m_depth               = 0u;    //!< Current nodes tree depth
-  std::shared_ptr<PathSelector> m_selector;                    //!< This is used to tell when a child of a linker is selected/active
-  uint32_t                      m_childId             = 0u;    //!< When m_selector is valid, it tells what derivation id is currently beeing "Pretty Printed"
-  std::ostringstream            m_os;                          //!< Stream to build up a representation of visited system model nodes
-  bool                          m_processingSelector  = false; //!< When true, we are visiting a path selector (while visiting a linker)
-  pos_type                      m_startPos            = 0;     //!< Position, in stream, of first character of current line
-  bool                          m_useAutoFormat       = false; //!< When true, register values are displayed as hexadecimal string if large enough and not complete nibble as binary
-  bool                          m_verbose             = false; //!< When true, more information are printed
-  bool                          m_showSelectionState  = false; //!< When true, selected/active linker node are reported as so
-  bool                          m_showSelectionValue  = false; //!< When true, for all linker children nodes, their selection state is reported
-  bool                          m_showSelectorOptions = false; //!< When true, selector options are reported
-  bool                          m_first               = true;  //!< True when nothing as been streamed yet (useful to add first new line)
+  uint32_t                      m_depth                  = 0u;    //!< Current nodes tree depth
+  std::shared_ptr<PathSelector> m_selector;                       //!< This is used to tell when a child of a linker is selected/active
+  uint32_t                      m_childId                = 0u;    //!< When m_selector is valid, it tells what derivation id is currently beeing "Pretty Printed"
+  std::ostringstream            m_os;                             //!< Stream to build up a representation of visited system model nodes
+  bool                          m_processingSelector     = false; //!< When true, we are visiting a path selector (while visiting a linker)
+  pos_type                      m_startPos               = 0;     //!< Position, in stream, of first character of current line
+  bool                          m_useAutoFormat          = false; //!< When true, register values are displayed as hexadecimal string if large enough and not complete nibble as binary
+  bool                          m_verbose                = false; //!< When true, more information are printed
+  bool                          m_showSelectionState     = false; //!< When true, selected/active linker node are reported as so
+  bool                          m_showSelectionValue     = false; //!< When true, for all linker children nodes, their selection state is reported
+  bool                          m_showSelectorProperties = false; //!< When true, selector options are reported
+  bool                          m_first                  = true;  //!< True when nothing as been streamed yet (useful to add first new line)
 };
 //
 //  End of PrettyPrinterVisitor class declaration

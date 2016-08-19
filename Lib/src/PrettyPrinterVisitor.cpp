@@ -26,11 +26,11 @@ using namespace mast;
 //! Initializes with specified options
 //!
 PrettyPrinterVisitor::PrettyPrinterVisitor (PrettyPrinterOptions options)
-  : m_useAutoFormat       (IsSet(options, PrettyPrinterOptions::DisplayValueAuto))
-  , m_verbose             (IsSet(options, PrettyPrinterOptions::Verbose))
-  , m_showSelectionState  (IsSet(options, PrettyPrinterOptions::ShowSelectionState))
-  , m_showSelectionValue  (IsSet(options, PrettyPrinterOptions::ShowSelectionValue))
-  , m_showSelectorOptions (IsSet(options, PrettyPrinterOptions::ShowSelectorOptions))
+  : m_useAutoFormat          (IsSet(options, PrettyPrinterOptions::DisplayValueAuto))
+  , m_verbose                (IsSet(options, PrettyPrinterOptions::Verbose))
+  , m_showSelectionState     (IsSet(options, PrettyPrinterOptions::ShowSelectionState))
+  , m_showSelectionValue     (IsSet(options, PrettyPrinterOptions::ShowSelectionValue))
+  , m_showSelectorProperties (IsSet(options, PrettyPrinterOptions::ShowSelectorProperties))
 {
 }
 //
@@ -200,7 +200,7 @@ void PrettyPrinterVisitor::StreamNodeHeader(std::experimental::string_view type,
   AlignRelativeTo(m_startPos, 15u + m_depth);
   m_os << '"' << node.Name()       << '"';
 
-  if (m_selector && m_processingSelector && m_showSelectorOptions)
+  if (m_showSelectorProperties && m_selector && m_processingSelector)
   {
     m_os << ", kind: "            << m_selector->KindName();
     m_os << ", can_select_none: " << IsSet(m_selector->Properties(), SelectorProperty::CanSelectNone);

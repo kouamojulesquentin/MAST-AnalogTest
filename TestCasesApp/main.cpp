@@ -22,22 +22,26 @@
 #include "LogFormatter.h"
 #include "LoggerSinks.h"
 #include "CustomFileSink.h"
+#include "Options.hpp"
 
-#include <iostream>
 #include <stdexcept>
 #include <memory>
-#include <fstream>
-#include <sstream>
 #include <string>
+#include <experimental/string_view>
+#include <iostream>
+#include <fstream>
+#include <regex>
 
 using std::shared_ptr;
 using std::make_shared;
 using std::make_unique;
 using std::dynamic_pointer_cast;
 using std::string;
-using std::cout;
+using std::experimental::string_view;
 using std::ofstream;
 using std::ostringstream;
+using std::cout;
+using std::cerr;
 
 using namespace mast;
 
@@ -97,22 +101,21 @@ std::unique_ptr<g3::LogWorker> InitializeLogger ()
 //---------------------------------------------------------------------------
 
 
+
+
 //! Runs a testcase depending on actual arguments
 //!
-int main (int /* argc */, char */* argv */[])
+int main (int argc, char* argv [])
 {
-  std::cout << "Test case 1500 Wrapper" << std::endl;
-
 //+  auto errorCode = RunMast(filePath, associations)
 
   auto retCode = ErrorCode::Ok;
   try
   {
-    auto logworker = InitializeLogger();
+    auto logworker  = InitializeLogger();
 
-    {
-      Session junk(std::make_shared<SystemModelManagerMonitor>());
-    }
+    auto options = Options::ParseArguments(argc, argv);
+    cout << options.ToDebugString("Retained options: \n", "   ");
 
     auto session          = Session (std::make_shared<SystemModelManagerMonitor>());
     auto sm               = session.sm;
@@ -128,15 +131,13 @@ int main (int /* argc */, char */* argv */[])
 
     sm->SetRoot(accessInterface);
 
-    auto printGraph  = false;
-
     retCode = CheckResult(sm);
     if (retCode != ErrorCode::Ok)
     {
-      printGraph = true;
+      options.printGraph = true;
     }
 
-    if (printGraph)
+    if (options.printGraph)
     {
       ofstream os("Testcase_1500.gml");
       os << GmlPrinterVisitor::Graph(accessInterface);
@@ -163,7 +164,7 @@ int main (int /* argc */, char */* argv */[])
 
     auto appNode      = wrapper->DeepestChildAppender();
     auto initialValue = uint16_t(0x1000);
-    auto loopCount    = uint16_t(10);
+    auto loopCount    = options.loopCount;
     for (uint32_t ii = 0 ; ii < derivationsCount ; ++ii)
     {
       ostringstream os_app;
@@ -189,6 +190,7 @@ int main (int /* argc */, char */* argv */[])
   catch(std::invalid_argument& exc) { retCode = ErrorCode::InvalidArgument;  std::cout << exc.what(); }
   catch(std::out_of_range&     exc) { retCode = ErrorCode::OutOfRange;       std::cout << exc.what(); }
   catch(std::logic_error&      exc) { retCode = ErrorCode::LogicError;       std::cout << exc.what(); }
+  catch(std::regex_error&      exc) { retCode = ErrorCode::RegexException;   std::cout << exc.what(); }
   catch(std::runtime_error&    exc) { retCode = ErrorCode::RuntimeError;     std::cout << exc.what(); }
   catch(std::exception&        exc) { retCode = ErrorCode::StdException;     std::cout << exc.what(); }
   catch(...)                        { retCode = ErrorCode::UndefinedFailure; std::cout << "Got non C++ std exception"; }

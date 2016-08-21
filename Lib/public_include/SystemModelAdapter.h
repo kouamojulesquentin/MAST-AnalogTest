@@ -22,11 +22,12 @@ extern "C"
   enum ErrorCode_t
   {
     Ok               = 0,
-    InvalidModel     = 0xFFFFFFF8,
-    InvalidArgument  = 0xFFFFFFF9,
-    LogicError       = 0xFFFFFFFA,
-    OutOfRange       = 0xFFFFFFFB,
-    RuntimeError     = 0xFFFFFFFC,
+    InvalidModel     = 0xFFFFFFF7,
+    InvalidArgument  = 0xFFFFFFF8,
+    LogicError       = 0xFFFFFFF9,
+    OutOfRange       = 0xFFFFFFFA,
+    RuntimeError     = 0xFFFFFFFB,
+    RegexException   = 0xFFFFFFFC,
     StdException     = 0xFFFFFFFD,
     UndefinedFailure = 0xFFFFFFFE,
     Failure          = 0xFFFFFFFF,

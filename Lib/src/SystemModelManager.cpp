@@ -119,7 +119,7 @@ shared_ptr<SystemModelManager::ApplicationData> SystemModelManager::ApplicationD
 //! @param applicationTopNode Top most node associated with the application
 //! @param functor            Function to call at thread creation
 //!
-void SystemModelManager::CreateApplicationThread (shared_ptr<ParentNode> applicationTopNode, Application_t functor, string_view debugName)
+void SystemModelManager::CreateApplicationThread (shared_ptr<ParentNode> applicationTopNode, Application_t functor, string debugName)
 {
   CHECK_PARAMETER_NOT_NULL(applicationTopNode, "Cannot create application thread with nullptr top node");
 
@@ -365,11 +365,11 @@ void SystemModelManager::iApply ()
 
     if (!m_runLoop)
     {
-      MONITOR_APP("iApply - Application thread has been released because data cycle loop is not/no more running ", appData);
+      MONITOR_APP("iApply - Application thread has been released because data cycle loop is not/no more running", appData);
     }
     else
     {
-      MONITOR_APP("iApply - Released ", appData);
+      MONITOR_APP("iApply - Released", appData);
     }
   }
 
@@ -843,7 +843,7 @@ void SystemModelManager::ReleaseServedThreads ()
       ++it;
       m_pendingThreads.erase(toErasePos);
 
-      MONITOR_APP("Will be released from iApply: ", appData);
+      MONITOR_APP("iApply - Notified from data cycle internal", appData);
       appData->releaseCv.notify_one();
     }
     else

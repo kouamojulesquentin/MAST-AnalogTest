@@ -15,8 +15,8 @@
 @echo.
 @REM goto :EOF
 
-@if exist %UT_targetFile%  del %UT_targetFile%
-@if exist %TCA_targetFile% del %TCA_targetFile%
+@REM @if exist %UT_targetFile%  del %UT_targetFile%
+@REM @if exist %TCA_targetFile% del %TCA_targetFile%
 
 @if not exist Lib_UT\Generated mkdir Lib_UT\Generated
 

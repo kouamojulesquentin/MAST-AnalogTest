@@ -75,7 +75,7 @@ class DLL_EXPORT SystemModelManager final
 
   //! Creates an application thread
   //!
-  void CreateApplicationThread(std::shared_ptr<ParentNode> applicationTopNode, Application_t functor, string_view debugName = "");
+  void CreateApplicationThread(std::shared_ptr<ParentNode> applicationTopNode, Application_t functor, std::string debugName = "");
 
   //! Waits for all application thread to terminate
   //!

@@ -18,10 +18,12 @@ DEPENDPATH += $$PWD/../Lib/include \
 
 
 SOURCES += \
-    main.cpp
+    main.cpp \
+    Options.cpp
 
 
-#+HEADERS += \
+HEADERS += \
+    Options.hpp
 
 
 CONFIG(debug,   debug|release) {

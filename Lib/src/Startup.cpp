@@ -56,7 +56,8 @@ shared_ptr<SystemModelManager> Startup::GetManager ()
 {
   if (!sm_manager)
   {
-    sm_manager = make_shared<mast::SystemModelManager>(*GetSystemModel());
+    auto sm    = GetSystemModel();
+    sm_manager = make_shared<mast::SystemModelManager>(*sm);
   }
   return sm_manager;
 }

@@ -37,7 +37,7 @@ main( const int argc, const char **argv )
    std::cout << "Parsing finished\n";
 
    
-   PrettyPrinterVisitor prettyPrinter;
+   PrettyPrinterVisitor prettyPrinter(PrettyPrinterOptions::ShowSelectorProperties);
 //   prettyPrinter.SetVerbose(true);
    driver.parsed_sut->Accept(prettyPrinter);
    auto gotPretty      = prettyPrinter.PrettyPrint();

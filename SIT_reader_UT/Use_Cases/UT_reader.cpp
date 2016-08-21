@@ -138,6 +138,517 @@ void UT_reader::test_chain ()
 
 }
 
+/*Test construction of MIB macro from Simplified ICL Tree input*/
+void UT_reader::test_MIB ()
+{
+  // ---------------- Exercise
+  //
+
+  //
+  auto checker = [&](auto data)
+  {
+    auto input_SIT = std::get<0>(data);
+    auto expected_PrettyPrinter = std::get<1>(data);
+    
+    // ---------------- Exercise & Verify
+    //
+      UT_reader_wrapper reader;
+    auto actual_PrettyPrinter=reader.run_parser_for_UT(input_SIT,sm);
+    TS_ASSERT_EQUALS (actual_PrettyPrinter, expected_PrettyPrinter);
+  }; 
+  
+  auto data =
+  { /*Exhaustive test of all possible macro parameter combinations*/
+make_tuple( "MIB test_MIB POST HIGH 4 Binary \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00"),
+make_tuple( "MIB test_MIB POST LOW 4 Binary \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 1, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00"),
+make_tuple( "MIB test_MIB PRE LOW 4 Binary \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 1, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB PRE HIGH 4 Binary \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB PRE HIGH REVERSE 4 Binary \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 0, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB PRE LOW REVERSE 4 Binary \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 1, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB POST LOW REVERSE 4 Binary \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 1, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00"),
+make_tuple( "MIB test_MIB POST HIGH REVERSE 4 Binary \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 0, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00"),
+make_tuple( "MIB test_MIB POST HIGH 4 N_Hot \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 1, inverted_bits: 0, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0000"),
+make_tuple( "MIB test_MIB POST LOW 4 N_Hot \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 1, inverted_bits: 1, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1111"),
+make_tuple( "MIB test_MIB PRE LOW 4 N_Hot \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1111\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 1, inverted_bits: 1, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB PRE HIGH 4 N_Hot \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0000\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 1, inverted_bits: 0, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB PRE HIGH REVERSE 4 N_Hot \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0000\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 1, inverted_bits: 0, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB PRE LOW REVERSE 4 N_Hot \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1111\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 1, inverted_bits: 1, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB POST LOW REVERSE 4 N_Hot \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 1, inverted_bits: 1, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1111"),
+make_tuple( "MIB test_MIB POST HIGH REVERSE 4 N_Hot \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 1, inverted_bits: 0, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0000"),
+make_tuple( "MIB test_MIB POST HIGH 4 One_Hot \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 1, inverted_bits: 0, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0000"),
+make_tuple( "MIB test_MIB POST LOW 4 One_Hot \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 1, inverted_bits: 1, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1111"),
+make_tuple( "MIB test_MIB PRE LOW 4 One_Hot \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1111\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 1, inverted_bits: 1, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB PRE HIGH 4 One_Hot \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0000\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 1, inverted_bits: 0, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB PRE HIGH REVERSE 4 One_Hot \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0000\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 1, inverted_bits: 0, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB PRE LOW REVERSE 4 One_Hot \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1111\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 1, inverted_bits: 1, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB POST LOW REVERSE 4 One_Hot \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 1, inverted_bits: 1, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1111"),
+make_tuple( "MIB test_MIB POST HIGH REVERSE 4 One_Hot \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 1, inverted_bits: 0, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0000"),
+make_tuple( "MIB test_MIB POST HIGH 4 Binary_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00"),
+make_tuple( "MIB test_MIB POST LOW 4 Binary_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 1, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00"),
+make_tuple( "MIB test_MIB PRE LOW 4 Binary_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 1, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB PRE HIGH 4 Binary_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB PRE HIGH REVERSE 4 Binary_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 0, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB PRE LOW REVERSE 4 Binary_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 1, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB POST LOW REVERSE 4 Binary_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 1, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00"),
+make_tuple( "MIB test_MIB POST HIGH REVERSE 4 Binary_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 0, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00"),
+make_tuple( "MIB test_MIB POST HIGH 4 One_Hot_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1000"),
+make_tuple( "MIB test_MIB POST LOW 4 One_Hot_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 0, inverted_bits: 1, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0111"),
+make_tuple( "MIB test_MIB PRE LOW 4 One_Hot_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0111\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 0, inverted_bits: 1, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB PRE HIGH 4 One_Hot_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1000\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB PRE HIGH REVERSE 4 One_Hot_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0001\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 0, inverted_bits: 0, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB PRE LOW REVERSE 4 One_Hot_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1110\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 0, inverted_bits: 1, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB POST LOW REVERSE 4 One_Hot_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 0, inverted_bits: 1, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1110"),
+make_tuple( "MIB test_MIB POST HIGH REVERSE 4 One_Hot_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 0, inverted_bits: 0, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0001"),
+make_tuple( "MIB test_MIB POST HIGH 4 N_Hot_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1000"),
+make_tuple( "MIB test_MIB POST LOW 4 N_Hot_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 0, inverted_bits: 1, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0111"),
+make_tuple( "MIB test_MIB PRE LOW 4 N_Hot_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0111\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 0, inverted_bits: 1, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB PRE HIGH 4 N_Hot_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1000\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB PRE HIGH REVERSE 4 N_Hot_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0001\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 0, inverted_bits: 0, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB PRE LOW REVERSE 4 N_Hot_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1110\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 0, inverted_bits: 1, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100"),
+make_tuple( "MIB test_MIB POST LOW REVERSE 4 N_Hot_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 0, inverted_bits: 1, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1110"),
+make_tuple( "MIB test_MIB POST HIGH REVERSE 4 N_Hot_noidle \
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"[Chain](3)     \"test_MIB\"\n\
+ [Linker](4)    \"test_MIB_mux\"\n\
+  :Selector:(2)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 0, inverted_bits: 0, reversed_order: 1\n\
+  [Register](0)  \"test_reg_1\", length: 4, bypass: 1001\n\
+  [Register](1)  \"test_reg_2\", length: 4, bypass: 1100\n\
+ [Register](2)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0001"),
+
+  };
+
+     
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+
+}
+
 //===========================================================================
 // End of UT_reader.cpp
 //===========================================================================

@@ -46,7 +46,8 @@ string UT_reader_wrapper::run_parser_for_UT(string input_SIT, std::shared_ptr<ma
 
    /*Regarder les appels de PrettyPrinter sans "accept"
    prettyPrinter::xxxquelque chosexxx qui retourne le string*/
-   PrettyPrinterVisitor prettyPrinter;
+   PrettyPrinterVisitor 
+           prettyPrinter(PrettyPrinterOptions::ShowSelectorProperties);
 
    driver.parsed_sut->Accept(prettyPrinter);
    auto actual_PrettyPrint      = prettyPrinter.PrettyPrint();

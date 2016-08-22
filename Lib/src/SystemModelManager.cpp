@@ -747,7 +747,29 @@ void SystemModelManager::Start ()
   auto threadFunctor = [this]()
   {
     MONITOR_MESSAGE("Starting background thread");
-    LoopOnDataCycle();
+
+    try
+    {
+      LoopOnDataCycle();
+    }
+    catch(std::exception& exc)  // Catch C++ standard exceptions
+    {
+      LOG(ERROR_LVL) << "Uncaught exception '"s + exc.what();
+      {
+        std::lock_guard<std::mutex> lock(m_loopMutex);
+        m_runLoop = false;
+      }
+      m_loopCV.notify_one();
+    }
+    catch (...)
+    {
+      LOG(ERROR_LVL) << "Uncaught unknown exception from application";
+      {
+        std::lock_guard<std::mutex> lock(m_loopMutex);
+        m_runLoop = false;
+      }
+      m_loopCV.notify_one();
+    }
     MONITOR_MESSAGE("Exiting background thread");
   };
 

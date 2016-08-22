@@ -47,6 +47,8 @@ using namespace mast;
 #define N_AIs 6
 #define MAX_AI_NAME 30
 
+extern int nlines;
+
 std::vector<std::string> AI_protocol_table  =
   {"JTAG_SVF_loopback","JTAG_SVF_simulation","JTAG_SVF_openOCD",
   "I2C_loopback","I2C_simulation","I2C_api"
@@ -453,5 +455,7 @@ bypass:
 void 
 SIT::SIT_Parser::error( const location_type &l, const std::string &err_message )
 {
-   std::cerr << "Error: " << err_message << " at " << l << "\n";
+//   std::cerr << "Error: " << err_message << " at " << l << "\n";
+   std::cerr << "Error: " << err_message << " at line " << nlines << "\n";
+   driver.parsed_sut=nullptr;
 }

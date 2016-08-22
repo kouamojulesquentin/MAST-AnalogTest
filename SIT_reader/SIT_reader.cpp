@@ -27,10 +27,9 @@ SIT::SIT_Reader::parse( const char * const filename )
    std::ifstream in_file( filename );
    if( ! in_file.good() )
    {
-       exit( EXIT_FAILURE );
+      return false;
    }
-   parse_helper( in_file );
-   return true;
+   return parse_helper( in_file );
 }
 
 bool
@@ -41,12 +40,12 @@ SIT::SIT_Reader::parse( std::istream &stream )
        return false;
    }
    //else
-   parse_helper( stream ); 
-   return true;
+   return parse_helper( stream );
+    
 }
 
 
-void 
+bool 
 SIT::SIT_Reader::parse_helper( std::istream &stream )
 {
    
@@ -61,7 +60,7 @@ SIT::SIT_Reader::parse_helper( std::istream &stream )
    {
       std::cerr << "Failed to allocate scanner: (" <<
          ba.what() << "), exiting!!\n";
-      exit( EXIT_FAILURE );
+      return false;
    }
    
    delete(parser); 
@@ -74,71 +73,28 @@ SIT::SIT_Reader::parse_helper( std::istream &stream )
    {
       std::cerr << "Failed to allocate parser: (" << 
          ba.what() << "), exiting!!\n";
-      exit( EXIT_FAILURE );
+      return false;
    }
    const int accept( 0 );
    if( parser->parse() != accept )
    {
       std::cerr << "Parse failed!!\n";
+      return false;
    }
-   return;
-}
-
-void 
-SIT::SIT_Reader::add_upper()
-{ 
-   uppercase++; 
-   chars++; 
-   words++; 
-}
-
-void 
-SIT::SIT_Reader::add_lower()
-{ 
-   lowercase++; 
-   chars++; 
-   words++; 
-}
-
-void 
-SIT::SIT_Reader::add_word( const std::string &word )
-{
-   words++; 
-   chars += word.length();
-   for(const char &c : word ){
-      if( islower( c ) )
-      { 
-         lowercase++; 
-      }
-      else if ( isupper( c ) ) 
-      { 
-         uppercase++; 
-      }
-   }
+   return true;
 }
 
 void 
 SIT::SIT_Reader::add_newline()
 { 
-   lines++; 
-   chars++; 
+   line++; 
+   column=0; 
 }
 
 void 
-SIT::SIT_Reader::add_char()
+SIT::SIT_Reader::add_column()
 { 
-   chars++; 
+   column++; 
 }
 
 
-std::ostream& 
-SIT::SIT_Reader::print( std::ostream &stream )
-{
-   stream << red  << "Results: " << norm << "\n";
-   stream << blue << "Uppercase: " << norm << uppercase << "\n";
-   stream << blue << "Lowercase: " << norm << lowercase << "\n";
-   stream << blue << "Lines: " << norm << lines << "\n";
-   stream << blue << "Words: " << norm << words << "\n";
-   stream << blue << "Characters: " << norm << chars << "\n";
-   return(stream);
-}

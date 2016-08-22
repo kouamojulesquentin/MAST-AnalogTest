@@ -36,7 +36,12 @@ main( const int argc, const char **argv )
    
    std::cout << "Parsing finished\n";
 
-   
+   if (driver.parsed_sut==nullptr)
+     {
+      /** exit with failure condition **/
+      return ( EXIT_FAILURE );
+     }
+      
    PrettyPrinterVisitor prettyPrinter(PrettyPrinterOptions::ShowSelectorProperties);
 //   prettyPrinter.SetVerbose(true);
    driver.parsed_sut->Accept(prettyPrinter);

@@ -31,13 +31,9 @@ public:
     */
    bool parse( std::istream &iss );
 
-   void add_upper();
-   void add_lower();
-   void add_word( const std::string &word );
    void add_newline();
-   void add_char();
+   void add_column();
 
-   std::ostream& print(std::ostream &stream);
 
    std::shared_ptr<mast::SystemModel> main_sm;
    std::shared_ptr<mast::SystemModelNode> parsed_sut;
@@ -45,13 +41,10 @@ public:
 
 private:
 
-   void parse_helper( std::istream &stream );
+   bool parse_helper( std::istream &stream );
 
-   std::size_t  chars      = 0;
-   std::size_t  words      = 0;
-   std::size_t  lines      = 0;
-   std::size_t  uppercase  = 0;
-   std::size_t  lowercase  = 0;
+   std::size_t  column      = 0;
+   std::size_t  line      = 0;
    SIT::SIT_Parser  *parser  = nullptr;
    SIT::SIT_Scanner *scanner = nullptr;
    

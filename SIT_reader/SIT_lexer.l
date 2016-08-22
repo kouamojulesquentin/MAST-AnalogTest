@@ -71,6 +71,8 @@ static int find_keyword(char *s)
   else return(pt->kval);
 }
 
+int nlines = 1;
+
 %}
 upper_case_letter 	  [A-Z]
 digit 			  [0-9]
@@ -134,7 +136,6 @@ BV_value		({extended_digit}|{BV_base_specifier})
 		}
 {base_specifier}({extended_digit}(_?{extended_digit}))*  {
               yylval->build< std::string >( yytext );
-	      std::cout << "Found Based integer\n";
 	       return( token::t_BASED_INTEGER );
             }
 \"({extended_letter_or_digit})*\" {
@@ -153,7 +154,7 @@ BV_value		({extended_digit}|{BV_base_specifier})
 	 }
 
 \n          {
-               loc->lines();
+              nlines++;
             }
 
 \[	{ return( token::t_LeftBracket);}

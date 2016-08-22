@@ -42,8 +42,10 @@ string UT_reader_wrapper::run_parser_for_UT(string input_SIT, std::shared_ptr<ma
  
      stream << input_SIT ;
 
-   driver.parse(stream);
+   auto result = driver.parse(stream);
 
+   if (result == false) return "PARSING ERROR";
+   
    /*Regarder les appels de PrettyPrinter sans "accept"
    prettyPrinter::xxxquelque chosexxx qui retourne le string*/
    PrettyPrinterVisitor 

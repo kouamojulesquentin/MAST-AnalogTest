@@ -29,12 +29,19 @@ class UT_SystemModelBuilder : public CxxTest::TestSuite
   // ================ Test Methods ================
 
   void test_Create_JTAG_TAP ();
+
+  // ---------------- Create_PathSelector
+  //
   void test_Create_PathSelector_Binary ();
   void test_Create_PathSelector_OneHot_CannotSelectNone ();
   void test_Create_PathSelector_OneHot_CanSelectNone ();
   void test_Create_PathSelector_NHot_CannotSelectNone ();
   void test_Create_PathSelector_NHot_CanSelectNone ();
 
+  // ---------------- Create_MIB
+  //
+  void test_Create_MIB_1_Derivation ();
+  void test_Create_MIB_4_Derivations ();
 
   // ================ Other Methods ================
 

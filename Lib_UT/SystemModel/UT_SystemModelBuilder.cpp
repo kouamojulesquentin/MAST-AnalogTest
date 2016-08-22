@@ -19,15 +19,20 @@
 #include "DefaultBinaryPathSelector.hpp"
 #include "DefaultOneHotPathSelector.hpp"
 #include "DefaultNHotPathSelector.hpp"
+#include "GmlPrinterVisitor.hpp"
+#include "PrettyPrinterVisitor.hpp"
 
 #include "BinaryVector_Traits.hpp"
+#include "SystemModelCheckResult_Traits.hpp"
 
 #include <memory>
 #include <experimental/string_view>
+#include <string>
 
 using std::shared_ptr;
 using std::make_shared;
 using std::dynamic_pointer_cast;
+using std::string;
 using std::experimental::string_view;
 
 using namespace mast;
@@ -36,8 +41,8 @@ using namespace mast;
 //! Initializes test (called for each test)
 void UT_SystemModelBuilder::setUp ()
 {
-//+  CxxTest::setStringResultsOnNewLine(true);
-//+  CxxTest::setCharactersMapping(CxxTest::CharacterMapping::MAP_CHARS_MINIMAL);  // Keep quotes, HT, and new lines unescaped
+  CxxTest::setStringResultsOnNewLine(true);
+  CxxTest::setCharactersMapping(CxxTest::CharacterMapping::MAP_CHARS_MINIMAL);  // Keep quotes, HT, and new lines unescaped
 
   SystemModelNode::ResetNodeIdentifier();
 }
@@ -315,6 +320,148 @@ void UT_SystemModelBuilder::test_Create_PathSelector_NHot_CanSelectNone ()
   TS_ASSERT_NOT_NULLPTR (asNHotSelector);
 }
 
+
+//! Checks TestModelBuilder::Create_MIB() with 1 Derivation
+//!
+void UT_SystemModelBuilder::test_Create_MIB_1_Derivation ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder builder(sm);
+
+  auto res         = builder.Create_PathSelector(SelectorKind::Binary, "Reg_name", 1u, SelectorProperty::CanSelectNone);
+  auto selectorReg = res.first;
+  auto selector    = res.second;
+
+  // ---------------- Exercise
+  //
+  auto mib         = builder.Create_MIB("MIB_name", selector, selectorReg, MuxRegPlacement::AfterMux);
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+  TS_ASSERT_NOT_NULLPTR (mib);
+  CxxTest::setAbortTestOnFail(false);
+
+  // With SystemModel checker
+  auto result = sm.Check();
+  TS_ASSERT_FALSE (result.HasErrors());
+
+  // Check with GmlPrinterVisitor
+
+  auto gotGraph = GmlPrinterVisitor::Graph(sm.Root());
+  auto expected = string(
+                         "graph\n"
+                         "[\n"
+                         "   hierarchic 1 directed 1\n"
+                         "   node [ id 1 graphics [ type \"ellipse\" fill \"#FFCC20\" w 116 h 43 ] LabelGraphics [ text \"(1)\n"
+                         "MIB_name\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" w 154 h 44 ] LabelGraphics [ text \"(2)\n"
+                         "MIB_name_mux\n"
+                         ":0:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 0 graphics [ type \"rectangle\" fill \"#59FF20\" w 152 h 144 ] LabelGraphics [ text \"(0)\n"
+                         "Reg_name\n"
+                         "Width: 1\n"
+                         "Hold value: true\n"
+                         "Bypass:    0b0\n"
+                         "Next to:   0b0\n"
+                         "Last to:   0b0\n"
+                         "Last from: 0b0\n"
+                         "Expected:  0b0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   edge [ source 1 target 2 label \"1\" ]\n"
+                         "   edge [ source 1 target 0 label \"2\" ]\n"
+                         "]"
+                        );
+  TS_ASSERT_EQUALS (gotGraph, expected);
+
+  // With "Pretty" printer
+
+  auto gotPretty      = PrettyPrinterVisitor::PrettyPrint(sm.Root(), PrettyPrinterOptions::All);
+  auto expectedPretty = string(
+                               "[Chain](1)     \"MIB_name\", pending: false, has_conditioner: false, priority: 0\n"
+                               " [Linker](2)    \"MIB_name_mux\", pending: false, has_conditioner: false, priority: 0\n"
+                               "  :Selector:(0)  \"Reg_name\", kind: Binary, can_select_none: true, inverted_bits: false, reversed_order: false\n"
+                               " [Register](0)  \"Reg_name\", length: 1, Hold value: true, bypass:            0b0\n"
+                               "                                                       , next_to_sut:       0b0\n"
+                               "                                                       , last_to_sut:       0b0\n"
+                               "                                                       , last_from_sut:     0b0\n"
+                               "                                                       , expected_from_sut: 0b0\n"
+                               "                                                       , pending: false, has_conditioner: false, priority: 0"
+                              );
+  TS_ASSERT_EQUALS (gotPretty, expectedPretty);
+}
+
+
+//! Checks TestModelBuilder::Create_MIB() with 4 chains
+//!
+void UT_SystemModelBuilder::test_Create_MIB_4_Derivations ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder builder(sm);
+
+  auto res         = builder.Create_PathSelector(SelectorKind::Binary, "Reg_name", 4u);
+  auto selectorReg = res.first;
+  auto selector    = res.second;
+
+  // ---------------- Exercise
+  //
+  auto mib         = builder.Create_MIB("MIB_name", selector, selectorReg, MuxRegPlacement::BeforeMux);
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+  TS_ASSERT_NOT_NULLPTR (mib);
+  CxxTest::setAbortTestOnFail(false);
+
+  // With SystemModel checker
+  auto result = sm.Check();
+  TS_ASSERT_FALSE (result.HasErrors());
+
+  // Check with GmlPrinterVisitor
+
+  auto gotGraph = GmlPrinterVisitor::Graph(sm.Root());
+  auto expected = string(
+                         "graph\n"
+                         "[\n"
+                         "   hierarchic 1 directed 1\n"
+                         "   node [ id 1 graphics [ type \"ellipse\" fill \"#FFCC20\" w 116 h 43 ] LabelGraphics [ text \"(1)\n"
+                         "MIB_name\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 0 graphics [ type \"rectangle\" fill \"#59FF20\" w 152 h 144 ] LabelGraphics [ text \"(0)\n"
+                         "Reg_name\n"
+                         "Width: 2\n"
+                         "Hold value: true\n"
+                         "Bypass:    0b00\n"
+                         "Next to:   0b00\n"
+                         "Last to:   0b00\n"
+                         "Last from: 0b00\n"
+                         "Expected:  0b00\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" w 154 h 44 ] LabelGraphics [ text \"(2)\n"
+                         "MIB_name_mux\n"
+                         ":0:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   edge [ source 1 target 0 label \"1\" ]\n"
+                         "   edge [ source 1 target 2 label \"2\" ]\n"
+                         "]"
+                        );
+  TS_ASSERT_EQUALS (gotGraph, expected);
+
+  // With "Pretty" printer
+
+  auto gotPretty      = PrettyPrinterVisitor::PrettyPrint(sm.Root(), PrettyPrinterOptions::All);
+  auto expectedPretty = string("[Chain](1)     \"MIB_name\", pending: false, has_conditioner: false, priority: 0\n"
+                               " [Register](0)  \"Reg_name\", length: 2, Hold value: true, bypass:            0b00\n"
+                               "                                                       , next_to_sut:       0b00\n"
+                               "                                                       , last_to_sut:       0b00\n"
+                               "                                                       , last_from_sut:     0b00\n"
+                               "                                                       , expected_from_sut: 0b00\n"
+                               "                                                       , pending: false, has_conditioner: false, priority: 0\n"
+                               " [Linker](2)    \"MIB_name_mux\", pending: false, has_conditioner: false, priority: 0\n"
+                               "  :Selector:(0)  \"Reg_name\", kind: Binary, can_select_none: false, inverted_bits: false, reversed_order: false"
+                              );
+  TS_ASSERT_EQUALS (gotPretty, expectedPretty);
+}
 
 //===========================================================================
 // End of UT_SystemModelBuilder.cpp

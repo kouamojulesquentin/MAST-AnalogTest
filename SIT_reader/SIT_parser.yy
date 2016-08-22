@@ -23,6 +23,14 @@
 #include "SIT_types.h"
 #include "DefaultNHotPathSelector.hpp"
 #include "SystemModelBuilder.hpp"
+#include "AccessInterfaceProtocol.hpp"
+#include "LoopbackAccessInterfaceProtocol.hpp"
+#include "GenericAccessInterfaceProtocol.hpp"
+#include "SVF_SimulationProtocol.hpp"
+
+using std::shared_ptr;
+using std::make_shared;
+using std::dynamic_pointer_cast;
 using std::pair;
 
 using namespace mast;
@@ -54,9 +62,10 @@ std::vector<std::string> AI_protocol_table  =
   "I2C_loopback","I2C_simulation","I2C_api"
   };
 
-std::vector<std::string> JTAG_AI_target_table  =
-  {"SVF_loopback","SVF_simulation","SVF_openOCD"
+std::vector<std::string> JTAG_AI_protocol_table  =
+  {"Loopback","SVF_simulation","SVF_openOCD"
   };
+enum JTAG_AI_protocol_t {Loopback,SVF_simulation,SVF_openOCD};
 
 std::vector<std::string> Path_Selector_table  =
   {"Binary","One_Hot","N_Hot","Binary_noidle","One_Hot_noidle","N_Hot_noidle"};
@@ -111,7 +120,7 @@ inline std::string remove_quotes(std::string s)
 %type  <std::uint32_t> n_DR_chains
 %type  <IR_coding_type> IR_coding_list
 %type  <IR_coding_type> IR_TABLE
-%type  <std::string> JTAG_target
+%type  <std::string> JTAG_protocol
 
 %type  <std::shared_ptr<mast::SystemModelNode>> root_node
 %type  <std::shared_ptr<mast::SystemModelNode>> register_node
@@ -266,7 +275,6 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
         else
       {
  	auto node =  driver.builder->Create_SIB($2.name,$4,$3);
- 	//auto node = driver.main_sm->CreateChain ($2.name,nullptr);
 	for (auto this_child : $5.nodes)
 	    node->AppendChild(this_child);
 
@@ -336,7 +344,7 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
        }
   }			
  |  
-  t_JTAG_TAP node_name JTAG_target IR_size IR_TABLE n_DR_chains children_list
+  t_JTAG_TAP node_name JTAG_protocol IR_size IR_TABLE n_DR_chains children_list
       { if ($7.n_nodes>($6+1)) 
 	 {
 	  std::cerr << "JTAG TAP " << $2.name<< " has " << $7.n_nodes-1 << " DR derivations instead of maximum "<< $6 <<"\n";
@@ -344,7 +352,7 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
 	 }
         else
       {
-       if ($5.n_words <($7.n_nodes+1))
+       if (($5.n_words>0) && ($5.n_words <($7.n_nodes+1)))
          {
 	  std::cerr << "JTAG TAP " << $2.name<< " has only " << $5.n_words << " IR codings for " << $7.n_nodes << " DR derivations + BPY\n";
 	  YYERROR; 
@@ -352,16 +360,27 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
        else 
   	{
 	int   l;
-	l = find_in_table(JTAG_AI_target_table,$3);
+	l = find_in_table(JTAG_AI_protocol_table,$3);
   	if (l==-1) 
 	  {
-	  std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unkown JTAG Target \n";
+	  std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unkown JTAG protocol \n";
 	  YYERROR; 
 	  }
 	  else
 	{
-	 std::cout << "JTAG TAP Macro, idf " << $2.name << " IR size " << $4 <<" max DR chains " << $6 <<"\n";
-         auto node = driver.main_sm->CreateChain ($2.name);
+          std::shared_ptr<AccessInterfaceProtocol> protocol;
+	  switch(l)
+	  {
+	  case Loopback :
+	   protocol = make_shared<LoopbackAccessInterfaceProtocol > ();
+	  case SVF_simulation :
+	   protocol = make_shared<SVF_SimulationProtocol > ();
+	  case SVF_openOCD :
+	   protocol = make_shared<SVF_SimulationProtocol> ();
+	  break;
+
+	  }
+	 auto node = driver.builder->Create_JTAG_TAP($2.name,$4,$6,protocol);
 	 for (auto this_child : $7.nodes)
 	    node->AppendChild(this_child);
   	 $$ = node;
@@ -371,8 +390,9 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
      }
   ; 
 
-JTAG_target: t_WORD
-   { $$ =$1;}
+JTAG_protocol: t_WORD
+   { std::cout << "TAP protocol\n";
+    $$ =$1;}
    ;
 
 path_selector: t_WORD
@@ -385,13 +405,14 @@ ctrl_node: t_WORD
    ;
 
 IR_size : 
- t_DecimalLiteral { $$ = $1;}
+ t_DecimalLiteral { std::cout << "IR_size\n"; $$ = $1;}
 ;
 n_DR_chains : 
- t_DecimalLiteral { $$ = $1;}
+ t_DecimalLiteral { std::cout << "n_DR_chains\n";  $$ = $1;}
 ;
 IR_TABLE: 
  t_LeftBracket IR_coding_list t_RightBracket  {$$=$2;}
+ |  {$$.n_words = 0;}
  ;
 
 IR_coding_list:

@@ -23,7 +23,7 @@ using token = SIT::SIT_Parser::token;
 
 
 #define KEYWORD_MAXSIZE 	20
-#define N_KEYWORDS 		15
+#define N_KEYWORDS 		16
 
 typedef struct {
         char name[KEYWORD_MAXSIZE];
@@ -67,7 +67,11 @@ static int find_keyword(char *s)
      break;
      }
    }
-  if (pt==NULL) return(-1);
+  if (pt==NULL) 
+   {
+//    std::cerr << "Unregnized Token "<< s <<" \n";
+    return(-1);
+   }
   else return(pt->kval);
 }
 

@@ -189,6 +189,100 @@ void UT_Utility::test_StringView_Utility_TrimLeft ()
 }
 
 
+//! Checks Utility::TrimRight(StringView)
+//!
+void UT_Utility::test_StringView_Utility_TrimRight ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto sut      = string_view(std::get<0>(data));
+    auto expected = string_view(std::get<1>(data));
+
+    // ---------------- Exercise
+    //
+    Utility::TrimRight(sut);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto data =
+  {
+    make_tuple("",          ""),         // 00
+    make_tuple(" ",         ""),         // 01
+    make_tuple("  ",        ""),         // 02
+    make_tuple("\t",        ""),         // 03
+    make_tuple("\t\t",      ""),         // 04
+    make_tuple("\t \t",     ""),         // 05
+    make_tuple("a  ",       "a"),        // 06
+    make_tuple(" a ",       " a"),       // 07
+    make_tuple("  a ",      "  a"),      // 08
+    make_tuple("\tab ",     "\tab"),     // 09
+    make_tuple("\t ab ",    "\t ab"),    // 10
+    make_tuple(" \tab ",    " \tab"),    // 11
+    make_tuple(" \t ab ",   " \t ab"),   // 12
+    make_tuple("?  Hello ", "?  Hello"), // 13
+
+    make_tuple(static_cast<const char*>(nullptr), static_cast<const char*>(nullptr)), // 14
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Utility::TrimRight(StringView)
+//!
+void UT_Utility::test_StringView_Utility_TrimBoth ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto sut      = string_view(std::get<0>(data));
+    auto expected = string_view(std::get<1>(data));
+
+    // ---------------- Exercise
+    //
+    Utility::TrimBoth(sut);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto data =
+  {
+    make_tuple("",         ""),      // 00
+    make_tuple(" ",        ""),      // 01
+    make_tuple("  ",       ""),      // 02
+    make_tuple("\t",       ""),      // 03
+    make_tuple("\t\t",     ""),      // 04
+    make_tuple("\t \t",    ""),      // 05
+    make_tuple("a  ",      "a"),     // 06
+    make_tuple(" a ",      "a"),     // 07
+    make_tuple("  a ",     "a"),     // 08
+    make_tuple("\tab ",    "ab"),    // 09
+    make_tuple("\t ab ",   "ab"),    // 10
+    make_tuple(" \tab ",   "ab"),    // 11
+    make_tuple(" \t ab ",  "ab"),    // 12
+    make_tuple("  Hello ", "Hello"), // 13
+
+    make_tuple(static_cast<const char*>(nullptr), static_cast<const char*>(nullptr)), // 14
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
 
 //===========================================================================
 // End of UT_Utility.cpp

@@ -161,6 +161,27 @@ void Utility::TrimLeft (string_view& text)
 //---------------------------------------------------------------------------
 
 
+//! Trims trailing space characters (including \t)
+//!
+//! @param text A string_view to trim
+//!
+void Utility::TrimRight (string_view& text)
+{
+  if (!text.empty())
+  {
+    if ((text.back() == ' ') || (text.back() == '\t'))
+    {
+      auto startPos  = text.find_last_not_of(" \t");
+      auto trimCount = (startPos == text.npos) ? text.length() : text.length() - ++startPos;
+      text.remove_suffix(trimCount);
+    }
+  }
+}
+//
+//  End of: Utility::TrimLeft
+//---------------------------------------------------------------------------
+
+
 
 //===========================================================================
 // End of Utility.cpp

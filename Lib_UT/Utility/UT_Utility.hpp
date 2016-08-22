@@ -32,6 +32,8 @@ class UT_Utility : public CxxTest::TestSuite
 
   void test_StringView_Utility_Split ();
   void test_StringView_Utility_TrimLeft ();
+  void test_StringView_Utility_TrimRight ();
+  void test_StringView_Utility_TrimBoth ();
 
 
 };

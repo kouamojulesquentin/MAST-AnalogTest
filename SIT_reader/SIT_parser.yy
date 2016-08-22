@@ -391,8 +391,7 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
   ; 
 
 JTAG_protocol: t_WORD
-   { std::cout << "TAP protocol\n";
-    $$ =$1;}
+   {$$ =$1;}
    ;
 
 path_selector: t_WORD
@@ -405,10 +404,10 @@ ctrl_node: t_WORD
    ;
 
 IR_size : 
- t_DecimalLiteral { std::cout << "IR_size\n"; $$ = $1;}
+ t_DecimalLiteral { $$ = $1;}
 ;
 n_DR_chains : 
- t_DecimalLiteral { std::cout << "n_DR_chains\n";  $$ = $1;}
+ t_DecimalLiteral { $$ = $1;}
 ;
 IR_TABLE: 
  t_LeftBracket IR_coding_list t_RightBracket  {$$=$2;}

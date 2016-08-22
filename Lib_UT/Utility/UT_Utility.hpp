@@ -30,6 +30,7 @@ class UT_Utility : public CxxTest::TestSuite
 
   void test_MinimalBitsForValue ();
 
+  void test_StringView_Utility_Split ();
   void test_StringView_Utility_TrimLeft ();
 
 

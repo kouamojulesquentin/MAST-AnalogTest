@@ -16,9 +16,11 @@
 #include <string>
 #include <sstream>
 #include <array>
+#include <vector>
 
 using std::string;
 using std::experimental::string_view;
+using std::vector;
 
 using namespace mast;
 
@@ -93,6 +95,47 @@ uint32_t Utility::MinimalBitsForValue (uint32_t value)
 }
 //
 //  End of: Utility::MinimalBitsForValue
+//---------------------------------------------------------------------------
+
+
+//! Splits a string_view into bunch of string_view
+//!
+//! @note No trimming is done
+//!
+//! @param text         Text to spli
+//! @param separator    Chunk separator (may be several character width)
+//!
+//! @return A list of string_view (tokens) without the separators
+vector<string_view> Utility::Split (string_view text, string_view separator)
+{
+  vector<string_view> views;
+
+  if (!text.empty())
+  {
+    if (separator.empty())
+    {
+      views.emplace_back(text);
+    }
+    else
+    {
+      string_view::size_type startPos = 0;
+      string_view::size_type endPos   = 0;
+
+      while ((endPos = text.find(separator, startPos)) != std::string::npos)
+      {
+        auto count = endPos - startPos;                    // Count ignore separator
+        views.emplace_back(text.substr(startPos, count));
+        startPos = endPos + separator.length();            // Prepare skiping of separator
+      }
+
+      views.emplace_back(text.substr(startPos));  // Last chunk
+    }
+  }
+
+  return views;
+}
+//
+//  End of: Utility::Split
 //---------------------------------------------------------------------------
 
 

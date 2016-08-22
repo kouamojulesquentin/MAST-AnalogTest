@@ -13,7 +13,9 @@
 
 #include "UT_Utility.hpp"
 #include "Utility.hpp"
+#include <initializer_list>
 
+#include <vector>
 #include <tuple>
 #include <experimental/string_view>
 #include <cxxtest/ValueTraits.h>
@@ -21,6 +23,8 @@
 using std::tuple;
 using std::make_tuple;
 using std::experimental::string_view;
+using std::initializer_list;
+using std::vector;
 using mast::Utility;
 
 
@@ -86,6 +90,55 @@ void UT_Utility::test_MinimalBitsForValue ()
   TS_DATA_DRIVEN_TEST(checker, data);
 }
 
+
+//! Checks Utility::Split(StringView, StringView)
+//!
+void UT_Utility::test_StringView_Utility_Split ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto sut       = std::get<0>(data);
+    auto separator = std::get<1>(data);
+    auto expected  = std::get<2>(data);
+
+    // ---------------- Exercise
+    //
+    auto result = Utility::Split(sut, separator);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (result, expected);
+  };
+
+  using data_t = tuple<string_view, string_view, vector<string_view>>;
+  auto  data =
+  {
+    data_t("",                          "",   {}),                                                // 00
+    data_t(" ",                         "",   {" "}),                                             // 01
+    data_t("  ",                        " ",  {"",      "",          ""}),                        // 02
+    data_t("\t",                        ",",  {"\t"}),                                            // 03
+    data_t("\t\t",                      "\t", {"",      "",          ""}),                        // 04
+    data_t("\t \t",                     "\t", {"",      " ",         ""}),                        // 05
+    data_t("a  ",                       ",",  {"a  "}),                                           // 06
+    data_t(" a ",                       ",",  {" a "}),                                           // 07
+    data_t("a,b",                       ",",  {"a",     "b"}),                                    // 08
+    data_t("a,b, ",                     ",",  {"a",     "b",         " "}),                       // 09
+    data_t("Hello::world",              "::", {"Hello", "world"}),                                // 10
+    data_t("a nice and strange usage ", "a",  {"",      " nice ",    "nd str", "nge us", "ge "}), // 11
+    data_t(" foo / bar / bore ",        "/",  {" foo ", " bar ",     " bore "}),                  // 12
+    data_t("foo/bar/bore",              "/",  {"foo",   "bar",       "bore"}),                    // 13
+    data_t("?  Hello  ?",               "?",  {"",      "  Hello  ", ""}),                        // 14
+    data_t(static_cast<const char*>(nullptr), static_cast<const char*>(nullptr), {}),             // 15
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
 
 
 //! Checks Utility::TrimLeft(StringView)

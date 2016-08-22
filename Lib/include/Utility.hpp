@@ -17,6 +17,7 @@
 #include "Platform.hpp"
 #include <exception>
 #include <stdexcept>
+#include <vector>
 #include <string>
 #include <experimental/string_view>
 #include <type_traits>    // For enum item manipulation
@@ -48,6 +49,11 @@ class DLL_EXPORT Utility final
   //! Trims leading space characters (including \t)
   //!
   static void TrimLeft(std::experimental::string_view& text);
+
+  //! Splits a string_view into bunch of string_view
+  //!
+  static std::vector<std::experimental::string_view> Split(std::experimental::string_view text, std::experimental::string_view separator);
+
 
   //! Formats message for (std) exception
   //!

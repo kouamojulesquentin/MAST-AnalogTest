@@ -2172,7 +2172,7 @@ void UT_SystemModelManager::test_iGetStatus_Register_Multithread ()
   auto reachedTimeout   = false;
   auto getStatusFunctor = [&sut, &reachedTimeout]()
   {
-    auto timeout = std::chrono::steady_clock::now() + 10ms;
+    auto timeout = std::chrono::steady_clock::now() + 100ms;
     TS_ASSERT_THROWS_NOTHING
     (
       // ---------------- Exercise

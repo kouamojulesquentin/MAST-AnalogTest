@@ -14,6 +14,7 @@
 #include "Session.hpp"
 #include "SystemModelBuilder.hpp"
 #include "LoopbackAccessInterfaceProtocol.hpp"
+#include "SVF_SimulationProtocol.hpp"
 #include "GmlPrinterVisitor.hpp"
 #include "PrettyPrinterVisitor.hpp"
 #include "SystemModelManager.hpp"
@@ -45,8 +46,8 @@ using std::cerr;
 
 using namespace mast;
 
-
-
+namespace
+{
 //! Check SystemModel coherency
 //!
 ErrorCode CheckResult (shared_ptr<SystemModel> sm)
@@ -70,6 +71,62 @@ ErrorCode CheckResult (shared_ptr<SystemModel> sm)
 //
 //  End of: CheckResult
 //---------------------------------------------------------------------------
+
+
+
+//! Creates a AccessInterfaceProtocol corresponding with protocol option
+//!
+//! @param protocol         Protocol kind
+//! @param protocolOptions  Options needed to specific protocol
+//!
+//! @return An AccessInterfaceProtocol
+shared_ptr<AccessInterfaceProtocol> GetProtocol (Options::Protocol protocol, const string& protocolOptions)
+{
+  auto aiProtocol = shared_ptr<AccessInterfaceProtocol>();
+
+  switch (protocol)
+  {
+    case Options::Protocol::NotSpecified:
+      LOG(DEBUG) << "No specific protocol";
+      break;
+    case Options::Protocol::LoopBack:
+      aiProtocol = make_shared<LoopbackAccessInterfaceProtocol> ();
+      break;
+    case Options::Protocol::SVF_Emulation:
+      THROW_LOGIC_ERROR("Not yet implemented");
+      break;
+    case Options::Protocol::SVF_Simulation:
+    {
+      auto paths = Utility::Split(protocolOptions, ",");
+      if (paths.size() != 2)
+      {
+        THROW_LOGIC_ERROR("Expecting 2 files paths for SVF_Simulation protocol");
+      }
+      auto toSutFilePath   = paths[0]; Utility::TrimBoth(toSutFilePath);
+      auto fromSutFilePath = paths[1]; Utility::TrimBoth(fromSutFilePath);
+      aiProtocol = make_shared<SVF_SimulationProtocol> (toSutFilePath, fromSutFilePath);
+      break;
+    }
+    case Options::Protocol::I2C_Emulation:
+    THROW_LOGIC_ERROR("Not yet implemented");
+      break;
+    case Options::Protocol::OpenOCD:
+    THROW_LOGIC_ERROR("Not yet implemented");
+      break;
+    case Options::Protocol::Generic:
+    THROW_LOGIC_ERROR("Not yet implemented");
+      break;
+    default:
+      THROW_INVALID_ARGUMENT("Unsupported aiProtocol");
+      break;
+  }
+
+  return aiProtocol;
+}
+//
+//  End of: GetProtocol
+//---------------------------------------------------------------------------
+
 
 
 
@@ -101,6 +158,8 @@ std::unique_ptr<g3::LogWorker> InitializeLogger ()
 //---------------------------------------------------------------------------
 
 
+} // End of unnamed namespace
+
 
 
 //! Runs a testcase depending on actual arguments
@@ -121,7 +180,7 @@ int main (int argc, char* argv [])
     auto sm               = session.sm;
     auto manager          = session.manager;
     auto builder          = SystemModelBuilder(*sm);
-    auto protocol         = make_shared<LoopbackAccessInterfaceProtocol> ();
+    auto protocol         = GetProtocol(options.protocol, options.protocolOptions);
     auto accessInterface  = builder.Create_JTAG_TAP("Tap", 8u, 2u, protocol);
     auto derivationsCount = uint32_t(4u);
     auto wrapper          = builder.Create_1500_Wrapper("1500", derivationsCount);

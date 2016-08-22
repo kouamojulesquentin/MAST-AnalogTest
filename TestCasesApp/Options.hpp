@@ -27,13 +27,24 @@ class Options
 {
   // ---------------- Public Enum
   //
+  public:
+
+  //! Defines which kind of AccessInterfaceProtocol to use
+  //!
   enum class Protocol
   {
-    LoopBack,
+    NotSpecified,
+    LoopBack,       //!< Data from SUT are exactly the same as data to SUT
+    SVF_Emulation,  //!< Data to SUT are written to file and data from SUT readen from file (SVF formatted )
+    SVF_Simulation, //!< Data to SUT are written to file that is read from simulator and data from SUT readen from file that is written by simulator (SVF formatted)
+    I2C_Emulation,  //!< Data to SUT are written to file and data from SUT readen from file (Textual I2C commands)
+    OpenOCD,        //!< Protocol is based upon OpenOCD
+    Generic,        //!< Table based protocol is used (need specific options)
   };
 
   enum class Testcase
   {
+    NotSpecified,
     SIT_File,
     Wrapper_1500,
   };
@@ -57,8 +68,8 @@ class Options
   protected:
 
   static std::string ReplaceFilePathExtension (std::string filePath, const std::string& replacement);
-  static Protocol    ParseProtocol(string_view protocolOption);
-  static Testcase    ParseTestcase(string_view testcaseOption);
+  static Protocol    ParseProtocol(const std::string& protocolOption);
+  static Testcase    ParseTestcase(const std::string& testcaseOption);
 
   // ---------------- Private  Methods
   //
@@ -72,7 +83,8 @@ class Options
   uint32_t    loopCount     = 5u;
   Testcase    testcase      = Testcase::Wrapper_1500;
   std::string sitFile;
-  Protocol    protocol      = Protocol::LoopBack;
+  Protocol    protocol      = Protocol::NotSpecified;
+  std::string protocolOptions;
 };
 //
 //  End of Options class declaration

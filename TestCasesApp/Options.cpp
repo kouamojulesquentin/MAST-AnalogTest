@@ -48,7 +48,8 @@ using std::make_tuple;
 //!                 |  Brocade
 //!
 //! options: [protocol] [loop_count] [print_graph]
-//! protocol:         -p loopback | SVF_Simu[lation] | SVF_Emu[lation]
+//! protocol:         -p loopback | SVF_Simu[lation] | SVF_Emu[lation]  [protocol_options]
+//! protocol_options: -po protocol specific string of options
 //! loop_count:       -lc value
 //! print_graph:      -pg
 //!
@@ -97,6 +98,11 @@ Options Options::ParseArguments (int argc, char* argv [])
            [&options, &getNextItem](int& ii, string& item)
            {
              options.protocol = ParseProtocol(getNextItem(ii, item));
+           }),
+    data_t("Protocol options", "-po|--protocol_options",
+           [&options, &getNextItem](int& ii, string& item)
+           {
+             options.protocolOptions = getNextItem(ii, item);
            }),
     data_t("Loop count", "-lc|--loop_count",
            [&options, &getNextItem](int& ii, string& item)
@@ -178,9 +184,35 @@ Options Options::ParseArguments (int argc, char* argv [])
 
 //! Parses protocol option provided by user to a Protocol enum
 //!
-Options::Protocol Options::ParseProtocol (string_view protocolOption)
+//! @note Supported protocol options are: loopback | SVF_Simu[lation] | SVF_Emu[lation]
+Options::Protocol Options::ParseProtocol (const string& protocolOption)
 {
-  Protocol protocol = Protocol::LoopBack;
+  Protocol protocol = Protocol::NotSpecified;
+
+  if      (regex_search(protocolOption, regex("^loopback$", regex::icase)))
+  {
+    protocol = Options::Protocol::LoopBack;
+  }
+  else if (regex_search(protocolOption, regex("^I2C_Emu(lation)?$", regex::icase)))
+  {
+    protocol = Options::Protocol::I2C_Emulation;
+  }
+  else if (regex_search(protocolOption, regex("^SVF_Emu(lation)?$", regex::icase)))
+  {
+    protocol = Options::Protocol::SVF_Emulation;
+  }
+  else if (regex_search(protocolOption, regex("^SVF_Simu(lation)?$", regex::icase)))
+  {
+    protocol = Options::Protocol::SVF_Simulation;
+  }
+  else if (regex_search(protocolOption, regex("^OpenOCD$", regex::icase)))
+  {
+    protocol = Options::Protocol::OpenOCD;
+  }
+  else if (regex_search(protocolOption, regex("^Generic$", regex::icase)))
+  {
+    protocol = Options::Protocol::Generic;
+  }
 
   return protocol;
 }
@@ -191,9 +223,14 @@ Options::Protocol Options::ParseProtocol (string_view protocolOption)
 
 //! Parses test case option provided by user to a Testcase enum
 //!
-Options::Testcase Options::ParseTestcase (string_view testcaseOption)
+Options::Testcase Options::ParseTestcase (const string& testcaseOption)
 {
   Testcase testcase = Testcase::Wrapper_1500;
+
+  if (regex_search(testcaseOption, regex("1500", regex::icase)))
+  {
+    testcase = Options::Testcase::Wrapper_1500;
+  }
 
   return testcase;
 }
@@ -216,6 +253,9 @@ string Options::ToDebugString (string_view header, string_view linePrefix) const
   os << linePrefix << "Test case:   ";
   switch (testcase)
   {
+    case Testcase::NotSpecified:
+      os << "Not_specified";
+      break;
     case Testcase::SIT_File:
       os << "SIT File \"" << sitFile << "\"";
       break;
@@ -231,13 +271,32 @@ string Options::ToDebugString (string_view header, string_view linePrefix) const
   os << linePrefix << "Protocol:    ";
   switch (protocol)
   {
+    case Protocol::NotSpecified:
+      os << "Not_specified";
+      break;
     case Protocol::LoopBack:
       os << "LoopBack";
+      break;
+    case Protocol::SVF_Emulation:
+      os << "SVF_Emulation";
+      break;
+    case Protocol::SVF_Simulation:
+      os << "SVF_Simulation";
+      break;
+    case Protocol::I2C_Emulation:
+      os << "I2C_Emulation";
+      break;
+    case Protocol::OpenOCD:
+      os << "OpenOCD";
+      break;
+    case Protocol::Generic:
+      os << "Generic";
       break;
     default:
       os << "???";
       break;
   }
+  os << ", Options: \"" << protocolOptions << "\"";
   os << std::endl;
 
   auto asString = os.str();

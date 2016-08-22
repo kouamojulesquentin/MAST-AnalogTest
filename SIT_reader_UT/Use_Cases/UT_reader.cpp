@@ -649,6 +649,67 @@ make_tuple( "MIB test_MIB POST HIGH REVERSE 4 N_Hot_noidle \
 
 }
 
+/*Test SIB macro from Simplified ICL Tree input*/
+void UT_reader::test_SIB ()
+{
+  // ---------------- Exercise
+  //
+
+  //
+  auto checker = [&](auto data)
+  {
+    auto input_SIT = std::get<0>(data);
+    auto expected_PrettyPrinter = std::get<1>(data);
+    
+    // ---------------- Exercise & Verify
+    //
+      UT_reader_wrapper reader;
+    auto actual_PrettyPrinter=reader.run_parser_for_UT(input_SIT,sm);
+    TS_ASSERT_EQUALS (actual_PrettyPrinter, expected_PrettyPrinter);
+  }; 
+  
+  auto data =
+  { /*Exhaustive test of all possible macro parameter combinations*/
+   make_tuple( "SIB test_SIB POST HIGH\
+    {REGISTER test_reg 4 Bypass: \"0b1001\"}\n",
+
+"[Chain](2)     \"test_SIB\"\n\
+ [Linker](3)    \"test_SIB_mux\"\n\
+  :Selector:(1)  \"test_SIB_ctrl\", kind: Binary, can_select_none: 1, inverted_bits: 0, reversed_order: 0\n\
+  [Register](0)  \"test_reg\", length: 4, bypass: 1001\n\
+ [Register](1)  \"test_SIB_ctrl\", length: 1, Hold value: true, bypass: 0"),
+   make_tuple( "SIB test_SIB POST LOW\
+    {REGISTER test_reg 4 Bypass: \"0b1001\"}\n",
+
+"[Chain](2)     \"test_SIB\"\n\
+ [Linker](3)    \"test_SIB_mux\"\n\
+  :Selector:(1)  \"test_SIB_ctrl\", kind: Binary, can_select_none: 1, inverted_bits: 1, reversed_order: 0\n\
+  [Register](0)  \"test_reg\", length: 4, bypass: 1001\n\
+ [Register](1)  \"test_SIB_ctrl\", length: 1, Hold value: true, bypass: 0"),
+   make_tuple( "SIB test_SIB PRE HIGH\
+    {REGISTER test_reg 4 Bypass: \"0b1001\"}\n",
+"[Chain](2)     \"test_SIB\"\n\
+ [Register](1)  \"test_SIB_ctrl\", length: 1, Hold value: true, bypass: 0\n\
+ [Linker](3)    \"test_SIB_mux\"\n\
+  :Selector:(1)  \"test_SIB_ctrl\", kind: Binary, can_select_none: 1, inverted_bits: 0, reversed_order: 0\n\
+  [Register](0)  \"test_reg\", length: 4, bypass: 1001"),
+   make_tuple( "SIB test_SIB PRE LOW\
+    {REGISTER test_reg 4 Bypass: \"0b1001\"}\n",
+"[Chain](2)     \"test_SIB\"\n\
+ [Register](1)  \"test_SIB_ctrl\", length: 1, Hold value: true, bypass: 0\n\
+ [Linker](3)    \"test_SIB_mux\"\n\
+  :Selector:(1)  \"test_SIB_ctrl\", kind: Binary, can_select_none: 1, inverted_bits: 1, reversed_order: 0\n\
+  [Register](0)  \"test_reg\", length: 4, bypass: 1001"),
+
+  };
+
+     
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+
+}
+
 //===========================================================================
 // End of UT_reader.cpp
 //===========================================================================

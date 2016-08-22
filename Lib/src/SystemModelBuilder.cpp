@@ -214,6 +214,29 @@ shared_ptr<Chain> SystemModelBuilder::Create_MIB (string_view              name,
 //---------------------------------------------------------------------------
 
 
+//! Creates a SIB sub-tree: a 1-node MIB using a SefaultBinary Selector
+//!
+//! @param name               Name associated with SIB top node
+//! @param sel_properties    Properties of the SIB: only InvertedBits is taken into account
+//! @param muxRegPlacement       Whether mux is placed before or after the register that will drive it
+//!
+shared_ptr<Chain> SystemModelBuilder::Create_SIB (string_view              name,
+                                           SelectorProperty sel_properties,
+                                                  MuxRegPlacement          muxRegPlacement
+                                                 )
+  {
+  auto SIB_properties= sel_properties | SelectorProperty::CanSelectNone;
+  auto selectorRegName = string(name)+ MIB_CTRL_EXT;
+ auto res=      Create_PathSelector(SelectorKind::Binary, selectorRegName, 1,SIB_properties);
+  auto selectorReg = res.first;
+  auto selector    = res.second;
+ 
+   return Create_MIB(name, selector, selectorReg,muxRegPlacement );
+  }
+//
+//  End of: SystemModelBuilder::Create_SIB
+//---------------------------------------------------------------------------
+
 
 //! Creates a path selector
 //!

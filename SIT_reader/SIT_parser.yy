@@ -265,9 +265,8 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
 	 }
         else
       {
-  	std::cout << "Node type SIB, idf	 " << $2.name << "\n";
-
- 	auto node = driver.main_sm->CreateChain ($2.name,nullptr);
+ 	auto node =  driver.builder->Create_SIB($2.name,$4,$3);
+ 	//auto node = driver.main_sm->CreateChain ($2.name,nullptr);
 	for (auto this_child : $5.nodes)
 	    node->AppendChild(this_child);
 

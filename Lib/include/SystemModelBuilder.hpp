@@ -105,13 +105,9 @@ class DLL_EXPORT SystemModelBuilder final
   //! Creates a SIB sub-tree
   //!
   std::shared_ptr<mast::Chain> Create_SIB (string_view                         name,
-                                           std::shared_ptr<mast::PathSelector> selector,
-                                           std::shared_ptr<mast::Register>     selectorRegister,
+                                           SelectorProperty sel_properties,
                                            MuxRegPlacement                     muxRegPlacement
-                                          )
-  {
-    return Create_MIB(name, selector, selectorRegister, muxRegPlacement);
-  }
+                                          );
 
 
   //! Creates a "1500" style wrapper

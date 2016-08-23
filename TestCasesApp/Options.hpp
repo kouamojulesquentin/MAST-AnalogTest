@@ -81,7 +81,7 @@ class Options
   bool        printGraph    = false;
   std::string graphFilePath = "Testcase.gml"; //!< This is default file name when not requested explicitly by user
   uint32_t    loopCount     = 5u;
-  Testcase    testcase      = Testcase::Wrapper_1500;
+  Testcase    testcase      = Testcase::NotSpecified;
   std::string testcaseOptions;
   Protocol    protocol      = Protocol::NotSpecified;
   std::string protocolOptions;

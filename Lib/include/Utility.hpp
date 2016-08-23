@@ -38,6 +38,10 @@ class DLL_EXPORT Utility final
   ~Utility() = delete;
   Utility()  = delete;
 
+  //! Tests if a file exists
+  //!
+  static bool FileExists (std::experimental::string_view filePath);
+
   //! Returns the minimal number of bits to encode a binary value
   //!
   static uint32_t MinimalBitsForValue(uint32_t value);
@@ -247,12 +251,15 @@ T CheckValueIsNotNullptr(const char* file, const char* function, int line, T val
 
 #define CHECK_PARAMETER_NOT_NULL(ptr, msg) CheckParameterIsNotNullptr (__FILE__, __func__, __LINE__, ptr, msg)
 #define CHECK_PARAMETER_NOT_ZERO(val, msg) CheckParameterIsNotZero    (__FILE__, __func__, __LINE__, val, msg)
+
 #define CHECK_PARAMETER_GT(val,  minVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val),(val >  minVal), msg)
 #define CHECK_PARAMETER_GTE(val, minVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val),(val >= minVal), msg)
 #define CHECK_PARAMETER_LT(val,  maxVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val),(val <  maxVal), msg)
 #define CHECK_PARAMETER_LTE(val, maxVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val),(val <= maxVal), msg)
 
-#define CHECK_VALUE_NOT_NULL(ptr, msg) CheckValueIsNotNullptr (__FILE__, __func__, __LINE__, ptr, msg)
+#define CHECK_VALUE_NOT_NULL(ptr, msg)  CheckValueIsNotNullptr (__FILE__, __func__, __LINE__, ptr, msg)
+#define CHECK_TRUE(expr, msg)            if (!expr)  throw std::runtime_error(mast::Utility::MakeExceptionMessage(__FILE__, __func__, __LINE__, "std::runtime_error", msg))
+#define CHECK_FILE_EXISTS(filePath) CHECK_TRUE(mast::Utility::FileExists(filePath), "File: '"s + filePath + "' does not exist (or cannot be opened)" )
 
 #endif  // not defined UTILITY_H__AB0B55F8_1F3A_4D8D_893_CA234E5BFD9D__INCLUDED_
 

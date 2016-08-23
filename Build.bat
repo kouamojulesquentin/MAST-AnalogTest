@@ -44,6 +44,11 @@
 %make_exe% -j4 -C %Build_Qt%\Lib_UT -f Makefile %target%
 
 @echo.
+@echo ===================== Building SIT_Reader =====================
+@echo.
+%make_exe% -j4 -C %Build_Qt%\SIT_reader -f Makefile    %target%
+
+@echo.
 @echo ===================== Building TestCasesApp =====================
 @echo.
 %make_exe% -j4 -C %Build_Qt%\TestCasesApp -f Makefile    %target%

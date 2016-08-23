@@ -141,7 +141,7 @@ Options Options::ParseArguments (int argc, char* argv [])
       auto parsed = false;
       for (const auto& data : parsingData)
       {
-        auto switchRegex = regex("^"s + string(std::get<1>(data)) + "$"s, regex::icase);
+        auto switchRegex = regex("^("s + string(std::get<1>(data)) + ")$"s, regex::icase);
         if (regex_search(item, switchRegex))
         {
           std::get<2>(data)(ii, item);
@@ -183,34 +183,32 @@ Options Options::ParseArguments (int argc, char* argv [])
 
 //! Parses protocol option provided by user to a Protocol enum
 //!
-//! @note Supported protocol options are: loopback | SVF_Simu[lation] | SVF_Emu[lation]
+//! @note Supported protocol options are:
+//!     loopback
+//!   | SVF_Simu[lation]
+//!   | SVF_Emu[lation]
+//!   | OpenOCD
+//!
 Options::Protocol Options::ParseProtocol (const string& protocolOption)
 {
-  Protocol protocol = Protocol::NotSpecified;
+  constexpr auto parsingData =
+  {
+    make_tuple(Options::Protocol::LoopBack,       "Loopback"),
+    make_tuple(Options::Protocol::OpenOCD,        "OpenOCD"),
+    make_tuple(Options::Protocol::SVF_Emulation,  "SVF_Emu(lation)?"),
+    make_tuple(Options::Protocol::SVF_Simulation, "SVF_Simu(lation)?"),
+    make_tuple(Options::Protocol::I2C_Emulation,  "I2C_Emu(lation)?"),
+    make_tuple(Options::Protocol::Generic,        "Generic"),
+  };
 
-  if      (regex_search(protocolOption, regex("^loopback$", regex::icase)))
+  Protocol protocol = Protocol::NotSpecified;
+  for (const auto& data : parsingData)
   {
-    protocol = Options::Protocol::LoopBack;
-  }
-  else if (regex_search(protocolOption, regex("^I2C_Emu(lation)?$", regex::icase)))
-  {
-    protocol = Options::Protocol::I2C_Emulation;
-  }
-  else if (regex_search(protocolOption, regex("^SVF_Emu(lation)?$", regex::icase)))
-  {
-    protocol = Options::Protocol::SVF_Emulation;
-  }
-  else if (regex_search(protocolOption, regex("^SVF_Simu(lation)?$", regex::icase)))
-  {
-    protocol = Options::Protocol::SVF_Simulation;
-  }
-  else if (regex_search(protocolOption, regex("^OpenOCD$", regex::icase)))
-  {
-    protocol = Options::Protocol::OpenOCD;
-  }
-  else if (regex_search(protocolOption, regex("^Generic$", regex::icase)))
-  {
-    protocol = Options::Protocol::Generic;
+    if (regex_search(protocolOption, regex("^("s + std::get<1>(data) + ")$", regex::icase)))
+    {
+      protocol = std::get<0>(data);
+      break;
+    }
   }
 
   return protocol;
@@ -224,11 +222,20 @@ Options::Protocol Options::ParseProtocol (const string& protocolOption)
 //!
 Options::Testcase Options::ParseTestcase (const string& testcaseOption)
 {
-  Testcase testcase = Testcase::Wrapper_1500;
-
-  if (regex_search(testcaseOption, regex("1500", regex::icase)))
+  constexpr auto parsingData =
   {
-    testcase = Options::Testcase::Wrapper_1500;
+    make_tuple(Options::Testcase::SIT_File,     "SIT_File"),
+    make_tuple(Options::Testcase::Wrapper_1500, "1500"),
+  };
+
+  Testcase testcase = Testcase::NotSpecified;
+  for (const auto& data : parsingData)
+  {
+    if (regex_search(testcaseOption, regex("^("s + std::get<1>(data) + ")$", regex::icase)))
+    {
+      testcase = std::get<0>(data);
+      break;
+    }
   }
 
   return testcase;
@@ -245,7 +252,12 @@ string Options::ToDebugString (string_view header, string_view linePrefix) const
   ostringstream os;
 
   os << header;
-  os << linePrefix << "Print graph: " << std::boolalpha << printGraph << std::endl;
+  os << linePrefix << "Print graph: " << std::boolalpha << printGraph;
+  if (!graphFilePath.empty())
+  {
+    os << ", File: " << graphFilePath;
+  }
+  os << std::endl;
   os << linePrefix << "Loop count:  " << loopCount      << std::endl;
 
   os << linePrefix << "Test case:   ";
@@ -255,7 +267,7 @@ string Options::ToDebugString (string_view header, string_view linePrefix) const
       os << "Not_specified";
       break;
     case Testcase::SIT_File:
-      os << "SIT File \"" << testcaseOptions << "\"";
+      os << "SIT File";
       break;
     case Testcase::Wrapper_1500:
       os << "1500 wrapper";

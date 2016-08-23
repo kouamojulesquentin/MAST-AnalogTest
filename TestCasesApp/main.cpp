@@ -11,6 +11,7 @@
 //===========================================================================
 
 #include "Session.hpp"
+#include "Startup.hpp"
 #include "SystemModelAdapter.h"
 #include "SystemModelBuilder.hpp"
 #include "SystemModelManager.hpp"
@@ -23,6 +24,7 @@
 #include "LogFormatter.h"
 #include "LoggerSinks.h"
 #include "CustomFileSink.h"
+#include "SIT_reader.hpp"
 #include "Options.hpp"
 
 #include <stdexcept>
@@ -41,6 +43,7 @@ using std::dynamic_pointer_cast;
 using std::vector;
 using std::string;
 using std::experimental::string_view;
+using std::ifstream;
 using std::ofstream;
 using std::ostringstream;
 using std::cout;
@@ -91,6 +94,51 @@ ErrorCode CheckResult (shared_ptr<SystemModel> sm)
 //---------------------------------------------------------------------------
 
 
+
+//! Creates applications and associate them with some register path
+//!
+vector<ApplicationDescriptor> CreateDefaultAppDescriptors (const string& appTopNodePath, uint16_t appCount, string_view registerNamePrefix, uint16_t loopCount )
+{
+  auto pdlApp = [](uint16_t loopCount, string registerPath, uint16_t initialValue)
+  {
+    auto manager = Startup::GetManager();
+    while (loopCount)
+    {
+      manager->iWrite(registerPath, initialValue);
+      manager->iApply();
+
+      ++initialValue;
+      --loopCount;
+    }
+  };
+
+  vector<ApplicationDescriptor> associations;
+
+  auto initialValue = uint16_t(0x1000);
+  for (uint16_t ii = 0 ; ii < appCount ; ++ii)
+  {
+    ostringstream os_app;
+    os_app << "App_" << ii;
+    auto appName      = os_app.str();
+
+    ostringstream os_reg;
+    os_reg << registerNamePrefix << ii;
+    auto registerPath = os_reg.str();
+
+    auto appWrapper   = [pdlApp, loopCount, registerPath, initialValue]() { pdlApp(loopCount, registerPath, initialValue); };
+
+    initialValue += 0x1000;
+
+    associations.emplace_back(appWrapper, appTopNodePath, appName);
+  }
+
+  return associations;
+}
+//
+//  End of: CreateDefaultAppDescriptors
+//---------------------------------------------------------------------------
+
+
 //! Builds SystemModel with optional AccessInterfaceProtocol for specified testcase.
 //! @param sm               Current system model
 //! @param protocol         Optional protocol (supersede one that may be defined by the testcase)
@@ -99,12 +147,12 @@ ErrorCode CheckResult (shared_ptr<SystemModel> sm)
 //!
 //! @return Application function and their association with a ParentNode within the SystemModel
 vector<ApplicationDescriptor> CreateTestcase (shared_ptr<SystemModel>             sm,
-                                              shared_ptr<SystemModelManager>      manager,
                                               shared_ptr<AccessInterfaceProtocol> protocol,
                                               Options::Testcase                   testcase,
                                               const string&                       testcaseOptions)
 {
   vector<ApplicationDescriptor> associations;
+  auto filePath = testcaseOptions;  // By default, testcaseOptions may contains a file path
 
   switch (testcase)
   {
@@ -113,7 +161,23 @@ vector<ApplicationDescriptor> CreateTestcase (shared_ptr<SystemModel>           
       break;
     case Options::Testcase::SIT_File:
     {
-      auto file = testcaseOptions;
+      CHECK_FILE_EXISTS(filePath);
+      auto reader   = SIT::SIT_Reader(sm);
+      reader.parse(filePath.c_str());
+      auto topNode  = dynamic_pointer_cast<ParentNode>(reader.parsed_sut);
+
+      sm->ReplaceRoot(topNode, false);
+      if (protocol)
+      {
+        auto ai = dynamic_pointer_cast<AccessInterface>(sm->Root());
+        if (ai)
+        {
+          ai->SetProtocol(protocol);
+        }
+      }
+      auto topPath   = "TAP_DR_Mux.W_1500.SWIR.SWIR_mux.WIR.WIR_mux";
+      auto loopCount = 10u;
+      associations   = CreateDefaultAppDescriptors(topPath, 4u, "reg_", loopCount);
       break;
     }
     case Options::Testcase::Wrapper_1500:
@@ -126,45 +190,14 @@ vector<ApplicationDescriptor> CreateTestcase (shared_ptr<SystemModel>           
       auto wrapper          = builder.Create_1500_Wrapper("1500", derivationsCount);
 
       accessInterface->AppendChild(wrapper);
-      builder.AppendRegisters(4u, "dynamic_", BinaryVector::CreateFromHexString("ABCD"), wrapper);
+      auto registerNamePrefix = "dynamic_";
+      builder.AppendRegisters(4u, registerNamePrefix, BinaryVector::CreateFromHexString("ABCD"), wrapper);
 
       sm->SetRoot(accessInterface);
 
-
-      auto pdlApp = [manager](uint16_t loopCount, string registerPath, uint16_t initialValue)
-      {
-        while (loopCount)
-        {
-          manager->iWrite(registerPath, initialValue);
-          manager->iApply();
-
-          ++initialValue;
-          --loopCount;
-        }
-      };
-
-  //+    auto appNode      = wrapper->DeepestChildAppender();
-      auto topPath      = "Tap_DR_Mux.1500.SWIR.SWIR_mux.WIR.WIR_mux";
-      auto initialValue = uint16_t(0x1000);
-//+      auto loopCount    = options.loopCount;
-      auto loopCount    = 10;
-
-      for (uint32_t ii = 0 ; ii < derivationsCount ; ++ii)
-      {
-        ostringstream os_app;
-        os_app << "App_" << ii;
-        auto appName      = os_app.str();
-
-        ostringstream os_reg;
-        os_reg << "dynamic_" << ii;
-        auto registerPath = os_reg.str();
-
-        auto appWrapper   = [pdlApp, loopCount, registerPath, initialValue]() { pdlApp(loopCount, registerPath, initialValue); };
-
-        initialValue += 0x1000;
-
-        associations.emplace_back(appWrapper, topPath, appName);
-      }
+      auto topPath   = "Tap_DR_Mux.1500.SWIR.SWIR_mux.WIR.WIR_mux";
+      auto loopCount = 10u;
+      associations   = CreateDefaultAppDescriptors(topPath, 4u, registerNamePrefix, loopCount);
       break;
     }
     default:
@@ -177,6 +210,8 @@ vector<ApplicationDescriptor> CreateTestcase (shared_ptr<SystemModel>           
 //
 //  End of: CreateTestcase
 //---------------------------------------------------------------------------
+
+
 
 
 
@@ -272,8 +307,6 @@ std::unique_ptr<g3::LogWorker> InitializeLogger ()
 //!
 int main (int argc, char* argv [])
 {
-//+  auto errorCode = RunMast(filePath, associations)
-
   auto retCode = ErrorCode::Ok;
   try
   {
@@ -286,7 +319,7 @@ int main (int argc, char* argv [])
     auto sm               = session.sm;
     auto manager          = session.manager;
     auto protocol         = GetProtocol(options.protocol, options.protocolOptions);
-    auto descriptors      = CreateTestcase(sm, manager, protocol, options.testcase, options.testcaseOptions);
+    auto descriptors      = CreateTestcase(sm, protocol, options.testcase, options.testcaseOptions);
 
     retCode = CheckResult(sm);
     if (retCode != ErrorCode::Ok)
@@ -296,7 +329,7 @@ int main (int argc, char* argv [])
 
     if (options.printGraph)
     {
-      ofstream os("Testcase_1500.gml");
+      ofstream os(options.graphFilePath);
       os << GmlPrinterVisitor::Graph(sm->Root());
     }
 

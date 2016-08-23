@@ -22,10 +22,10 @@ typedef struct node_list_type_s
     std::vector<std::shared_ptr<mast::SystemModelNode>> nodes;
   } node_list_type;
 
-typedef struct IR_coding_s
+typedef struct coding_s
   {
     std::uint32_t n_words;
-    std::string codeword; 
-  } IR_coding_type;
+    std::vector<uint32_t> codevalue; 
+  } Coding_type;
 
 #endif

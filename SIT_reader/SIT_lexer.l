@@ -85,7 +85,7 @@ space_character 	  [ \t]
 format_effector		  [\t\v\r\l\f]
 end_of_line		  \n
 lower_case_letter 	  [a-z]
-other_special_character   [\!\$\@\?\[\\\]\^\`\{\}\~]
+other_special_character   [\!\$\@\?\\\^\`\{\}\~]
 
 graphic_character	  ({basic_graphic_character}|{lower_case_letter}|{other_special_character})
 basic_graphic_character	  ({upper_case_letter}|{digit}|{special_character}|{space_character})

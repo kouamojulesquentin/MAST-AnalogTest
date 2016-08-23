@@ -27,6 +27,7 @@
 #include "LoopbackAccessInterfaceProtocol.hpp"
 #include "GenericAccessInterfaceProtocol.hpp"
 #include "SVF_SimulationProtocol.hpp"
+#include "I2C_Player.hpp"
 
 using std::shared_ptr;
 using std::make_shared;
@@ -55,12 +56,15 @@ using namespace mast;
 #define N_AIs 6
 #define MAX_AI_NAME 30
 
+#define DEFAULT_I2C_PREFIX "S2R"
+
 extern int nlines;
 
 std::vector<std::string> AI_protocol_table  =
-  {"JTAG_SVF_loopback","JTAG_SVF_simulation","JTAG_SVF_openOCD",
-  "I2C_loopback","I2C_simulation","I2C_api"
+  {"JTAG_Loopback","JTAG_SVF_simulation","JTAG_SVF_openOCD",
+  "I2C_Player"
   };
+enum AI_protocol_t {JTAG_Loopback,JTAG_SVF_simulation,JTAG_SVF_openOCD, I2C_Player};
 
 std::vector<std::string> JTAG_AI_protocol_table  =
   {"Loopback","SVF_simulation","SVF_openOCD"
@@ -96,7 +100,16 @@ inline std::string remove_quotes(std::string s)
     );
  return s;
 }
-   
+
+inline std::uint32_t extract_number(std::string s)
+{
+  char *end;
+  auto tmp = remove_quotes(s);
+  auto res = std::strtoul (tmp.c_str(), &end,0);
+  auto result = res;
+  return  result;
+}  
+
 }
 
 %define api.value.type variant
@@ -118,8 +131,9 @@ inline std::string remove_quotes(std::string s)
 %type  <std::uint32_t> IR_size
 %type  <std::uint32_t> size
 %type  <std::uint32_t> n_DR_chains
-%type  <IR_coding_type> IR_coding_list
-%type  <IR_coding_type> IR_TABLE
+%type  <Coding_type> Coding_list
+%type  <Coding_type> IR_TABLE
+%type  <Coding_type> AI_TABLE
 %type  <std::string> JTAG_protocol
 
 %type  <std::shared_ptr<mast::SystemModelNode>> root_node
@@ -239,31 +253,6 @@ t_LINKER  node_name path_selector ctrl_node children_list {
  	  	     $$ = node;
   		      }
 		}
- |
-t_ACCESS_INTERFACE  node_name t_WORD children_list { 
-
-	int   l;
-	l = find_in_table(AI_protocol_table,$3);
-  	if (l==-1) 
-	  {
-	  std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unkown AccessInterface Protocol \n";
-	  YYERROR; 
-	  }
-	  else
-	  {
-          	std::cout << "Node type ACCESS_INTERFACE , idf " << $2.name;
-          	if ($2.is_transparent) std::cout << "(transparent)";
-		std::cout  << " Protocol : " << $3;
-         	std::cout << ", children:  " << $4.name << " \n";
-		
-		auto node = driver.main_sm->CreateAccessInterface($2.name, nullptr);
-		for (auto this_child : $4.nodes)
-		   node->AppendChild(this_child);
-
-  	  	$$ = node;        
-		
-		}
-	  }
  |  
  t_SIB node_name position active children_list
   {
@@ -342,6 +331,50 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
   	$$ = node;
        }
   }			
+ |
+t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE children_list { 
+
+	int   l;
+	l = find_in_table(AI_protocol_table,$3);
+  	if (l==-1) 
+	  {
+	  std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unkown AccessInterface Protocol \n";
+	  YYERROR; 
+	  }
+	  else
+	  {
+		
+          std::shared_ptr<AccessInterfaceProtocol> protocol;
+	  switch(l)
+	  {
+	  case JTAG_Loopback :
+	   protocol = make_shared<LoopbackAccessInterfaceProtocol > ();
+	  case JTAG_SVF_simulation :
+	   protocol = make_shared<SVF_SimulationProtocol > ();
+	  case JTAG_SVF_openOCD :
+	   protocol = make_shared<SVF_SimulationProtocol> ();
+	  break;
+	  case AI_protocol_t::I2C_Player :
+	   if ($4.n_words==0)
+	    {
+	    std::cerr << "Error, " << AI_protocol_table[l] <<" needs an address table\n";
+	    YYERROR;
+	    }
+//	    protocol = make_shared<I2C_Player> ($4.codevalue, DEFAULT_I2C_PREFIX);
+	   protocol = make_shared<LoopbackAccessInterfaceProtocol > ();
+
+	  break;
+
+	  }
+
+		auto node = driver.main_sm->CreateAccessInterface($2.name, protocol);
+		for (auto this_child : $5.nodes)
+		   node->AppendChild(this_child);
+
+  	  	$$ = node;        
+		
+		}
+	  }
  |  
   t_JTAG_TAP node_name JTAG_protocol IR_size IR_TABLE n_DR_chains children_list
       { if ($7.n_nodes>($6+1)) 
@@ -372,8 +405,10 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
 	  {
 	  case Loopback :
 	   protocol = make_shared<LoopbackAccessInterfaceProtocol > ();
+	  break;
 	  case SVF_simulation :
 	   protocol = make_shared<SVF_SimulationProtocol > ();
+	  break;
 	  case SVF_openOCD :
 	   protocol = make_shared<SVF_SimulationProtocol> ();
 	  break;
@@ -409,16 +444,30 @@ n_DR_chains :
  t_DecimalLiteral { $$ = $1;}
 ;
 IR_TABLE: 
- t_LeftBracket IR_coding_list t_RightBracket  {$$=$2;}
+ t_LeftBracket Coding_list t_RightBracket  {$$=$2;}
  |  {$$.n_words = 0;}
  ;
 
-IR_coding_list:
- t_QUOTED_STRING { $$.codeword = $1;$$.n_words = 1; }
- |
- t_QUOTED_STRING t_Comma  IR_coding_list {$$.codeword = $3.codeword + ' ' + $1; $$.n_words = ($3.n_words+1); }	
-;
+AI_TABLE: 
+t_LeftBracket Coding_list t_RightBracket  {$$=$2;}
+ |  {$$.n_words = 0;}
+ ;
 
+Coding_list:
+ t_QUOTED_STRING 
+    { 
+       $$.codevalue.push_back(extract_number($1)); 
+    $$.n_words = 1; 
+    }
+ |
+ t_QUOTED_STRING t_Comma  Coding_list 
+  {
+   $$.n_words = ($3.n_words+1); 
+   auto tmp = $3.codevalue;
+   tmp.insert(tmp.begin(),extract_number($1));
+   $$.codevalue = tmp;
+   }	
+;
 
 max_derivations : 
  t_DecimalLiteral { $$ = $1;}

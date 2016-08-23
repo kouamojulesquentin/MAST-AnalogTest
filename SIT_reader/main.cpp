@@ -47,7 +47,8 @@ main( const int argc, const char **argv )
    driver.parsed_sut->Accept(prettyPrinter);
    auto gotPretty      = prettyPrinter.PrettyPrint();
    std::cout << gotPretty << "\n";
-   
+   auto result= sm->Check();
+   std::cout << "Model Check returns " << result.MakeReport();
    }
    else
    {

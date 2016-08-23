@@ -27,7 +27,7 @@ using std::experimental::string_view;
 using namespace test;
 
 
-string UT_reader_wrapper::run_parser_for_UT(string input_SIT, std::shared_ptr<mast::SystemModel> sm)
+pair<string,std::shared_ptr<mast::SystemModelNode>> UT_reader_wrapper::run_parser_for_UT(string input_SIT, std::shared_ptr<mast::SystemModel> sm)
 {
   // ---------------- Exercise
   //
@@ -42,9 +42,14 @@ string UT_reader_wrapper::run_parser_for_UT(string input_SIT, std::shared_ptr<ma
  
      stream << input_SIT ;
 
-   auto result = driver.parse(stream);
+   auto parse_result = driver.parse(stream);
 
-   if (result == false) return "PARSING ERROR";
+   pair<string,std::shared_ptr<mast::SystemModelNode>> result;
+
+   if (parse_result == false) {
+      result.first = "PARSING ERROR";
+      return result;
+      }
    
    /*Regarder les appels de PrettyPrinter sans "accept"
    prettyPrinter::xxxquelque chosexxx qui retourne le string*/
@@ -54,8 +59,10 @@ string UT_reader_wrapper::run_parser_for_UT(string input_SIT, std::shared_ptr<ma
    driver.parsed_sut->Accept(prettyPrinter);
    auto actual_PrettyPrint      = prettyPrinter.PrettyPrint();
 
-   
-  return actual_PrettyPrint;
+  result.first =actual_PrettyPrint ;
+  result.second = driver.parsed_sut ;
+ 
+  return result;
 }
 
 

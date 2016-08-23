@@ -32,6 +32,14 @@ UT_reader::UT_reader()
  sm = std::make_shared<mast::SystemModel>();
 }
 
+string expectedReport = "Errors   (0):\n"
+                        "Warnings (0):\n"
+                        "Infos    (0):\n";
+string expectedMIBReport = "Errors   (0):\n"
+			   "Warnings (1):\n"
+			   "  - Linker 'test_MIB_mux' (id: 4) has only 2 children, even though it can select 4 paths\n"
+                        "Infos    (0):\n";
+
 //! Initializes tests (called for each test)
 //!
 void UT_reader::setUp ()
@@ -60,9 +68,10 @@ void UT_reader::test_register ()
     // ---------------- Exercise & Verify
     //
       UT_reader_wrapper reader;
-    auto actual_PrettyPrinter=reader.run_parser_for_UT(input_SIT,sm);
+    auto result=reader.run_parser_for_UT(input_SIT,sm);
+    auto actual_PrettyPrinter=result.first;
     TS_ASSERT_EQUALS (actual_PrettyPrinter, expected_PrettyPrinter);
-  }; 
+    }; 
   
   auto data =
   { /*Basic constructor, different sizes and bypass values*/
@@ -95,8 +104,16 @@ void UT_reader::test_chain ()
     // ---------------- Exercise & Verify
     //
       UT_reader_wrapper reader;
-    auto actual_PrettyPrinter=reader.run_parser_for_UT(input_SIT,sm);
+    auto result=reader.run_parser_for_UT(input_SIT,sm);
+    auto actual_PrettyPrinter=result.first;
     TS_ASSERT_EQUALS (actual_PrettyPrinter, expected_PrettyPrinter);
+
+   auto parent = dynamic_pointer_cast<ParentNode> (result.second);
+   sm->ReplaceRoot(parent,false);
+   auto check_result = sm->Check();
+
+    auto   report         = check_result.MakeReport();
+  TS_ASSERT_EQUALS (report, expectedReport);
   }; 
   
   auto data =
@@ -153,8 +170,16 @@ void UT_reader::test_MIB ()
     // ---------------- Exercise & Verify
     //
       UT_reader_wrapper reader;
-    auto actual_PrettyPrinter=reader.run_parser_for_UT(input_SIT,sm);
+    auto result=reader.run_parser_for_UT(input_SIT,sm);
+    auto actual_PrettyPrinter=result.first;
     TS_ASSERT_EQUALS (actual_PrettyPrinter, expected_PrettyPrinter);
+
+   auto parent = dynamic_pointer_cast<ParentNode> (result.second);
+   sm->ReplaceRoot(parent,false);
+   auto check_result = sm->Check();
+
+    auto   report         = check_result.MakeReport();
+  TS_ASSERT_EQUALS (report, expectedMIBReport);
   }; 
   
   auto data =
@@ -664,8 +689,16 @@ void UT_reader::test_SIB ()
     // ---------------- Exercise & Verify
     //
       UT_reader_wrapper reader;
-    auto actual_PrettyPrinter=reader.run_parser_for_UT(input_SIT,sm);
+    auto result=reader.run_parser_for_UT(input_SIT,sm);
+    auto actual_PrettyPrinter=result.first;
     TS_ASSERT_EQUALS (actual_PrettyPrinter, expected_PrettyPrinter);
+
+   auto parent = dynamic_pointer_cast<ParentNode> (result.second);
+   sm->ReplaceRoot(parent,false);
+   auto check_result = sm->Check();
+
+    auto   report         = check_result.MakeReport();
+  TS_ASSERT_EQUALS (report, expectedReport);
   }; 
   
   auto data =
@@ -725,8 +758,16 @@ void UT_reader::test_JTAG_TAP ()
     // ---------------- Exercise & Verify
     //
       UT_reader_wrapper reader;
-    auto actual_PrettyPrinter=reader.run_parser_for_UT(input_SIT,sm);
+    auto result=reader.run_parser_for_UT(input_SIT,sm);
+    auto actual_PrettyPrinter=result.first;
     TS_ASSERT_EQUALS (actual_PrettyPrinter, expected_PrettyPrinter);
+
+   auto parent = dynamic_pointer_cast<ParentNode> (result.second);
+   sm->ReplaceRoot(parent,false);
+   auto check_result = sm->Check();
+
+    auto   report         = check_result.MakeReport();
+  TS_ASSERT_EQUALS (report, expectedReport);
   }; 
   
   auto data =
@@ -788,8 +829,16 @@ void UT_reader::test_1500 ()
     // ---------------- Exercise & Verify
     //
       UT_reader_wrapper reader;
-    auto actual_PrettyPrinter=reader.run_parser_for_UT(input_SIT,sm);
+    auto result=reader.run_parser_for_UT(input_SIT,sm);
+    auto actual_PrettyPrinter=result.first;
     TS_ASSERT_EQUALS (actual_PrettyPrinter, expected_PrettyPrinter);
+
+   auto parent = dynamic_pointer_cast<ParentNode> (result.second);
+   sm->ReplaceRoot(parent,false);
+   auto check_result = sm->Check();
+
+    auto   report         = check_result.MakeReport();
+  TS_ASSERT_EQUALS (report, expectedReport);
   }; 
   
   auto data =

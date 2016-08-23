@@ -741,6 +741,28 @@ void UT_reader::test_JTAG_TAP ()
   :Selector:(2)  \"my_tap_IR\", kind: Table_Based, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
   [Register](4)  \"my_tap_BPY\", length: 1, bypass: 1\n\
   [Register](0)  \"test_reg\", length: 4, bypass: 1100"),
+   make_tuple( "JTAG_TAP my_tap SVF_simulation 4 2\
+  {\
+     REGISTER test_reg 4 Bypass: \"0b1100\"\
+   }\n",
+"[Access_I](1)  \"my_tap\"\n\
+ [Register](2)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n\
+ [Linker](3)    \"my_tap_DR_Mux\"\n\
+  :Selector:(2)  \"my_tap_IR\", kind: Table_Based, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
+  [Register](4)  \"my_tap_BPY\", length: 1, bypass: 1\n\
+  [Register](0)  \"test_reg\", length: 4, bypass: 1100"),
+   make_tuple( "JTAG_TAP my_tap SVF_openOCD 4 2\
+  {\
+     REGISTER test_reg 4 Bypass: \"0b1100\"\
+   }\n",
+"[Access_I](1)  \"my_tap\"\n\
+ [Register](2)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n\
+ [Linker](3)    \"my_tap_DR_Mux\"\n\
+  :Selector:(2)  \"my_tap_IR\", kind: Table_Based, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
+  [Register](4)  \"my_tap_BPY\", length: 1, bypass: 1\n\
+  [Register](0)  \"test_reg\", length: 4, bypass: 1100"),
+ 
+ 
  
    };
 
@@ -751,6 +773,52 @@ void UT_reader::test_JTAG_TAP ()
 
 }
 
+/*Test 1500 Wrapper macro from Simplified ICL Tree input*/
+void UT_reader::test_1500 ()
+{
+  // ---------------- Exercise
+  //
+
+  //
+  auto checker = [&](auto data)
+  {
+    auto input_SIT = std::get<0>(data);
+    auto expected_PrettyPrinter = std::get<1>(data);
+    
+    // ---------------- Exercise & Verify
+    //
+      UT_reader_wrapper reader;
+    auto actual_PrettyPrinter=reader.run_parser_for_UT(input_SIT,sm);
+    TS_ASSERT_EQUALS (actual_PrettyPrinter, expected_PrettyPrinter);
+  }; 
+  
+  auto data =
+  { 
+   make_tuple( "WRAPPER_1500 test_wrapper 2\
+ { REGISTER test_register_1 12 Bypass: \"0b1001:0110:1100\"\
+   REGISTER test_register_2 12 Bypass: \"0b1001:0110:1100\"}\n",
+"[Chain](2)     \"test_wrapper\"\n\
+ [Chain](4)     \"SWIR\"\n\
+  [Register](3)  \"SWIR_ctrl\", length: 1, Hold value: true, bypass: 0\n\
+  [Linker](5)    \"SWIR_mux\"\n\
+   :Selector:(3)  \"SWIR_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
+   [Chain](7)     \"WIR\"\n\
+    [Linker](8)    \"WIR_mux\"\n\
+     :Selector:(6)  \"WIR_reg\", kind: Binary, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
+     [Register](9)  \"WBY\", length: 1, bypass: 0\n\
+     [Register](0)  \"test_register_1\", length: 12, bypass: 1001_0110:1100\n\
+     [Register](1)  \"test_register_2\", length: 12, bypass: 1001_0110:1100\n\
+   [Register](6)  \"WIR_reg\", length: 2, Hold value: true, bypass: 00"),
+ 
+ 
+   };
+
+     
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+
+}
 //===========================================================================
 // End of UT_reader.cpp
 //===========================================================================

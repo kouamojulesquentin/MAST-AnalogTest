@@ -336,8 +336,7 @@ t_ACCESS_INTERFACE  node_name t_WORD children_list {
 	 }
         else
       {
-  	std::cout << "1500_Wrapper Macro, idf " << $2.name << " Max derivations " << $3 <<"\n";
-        auto node = driver.main_sm->CreateChain ($2.name);
+        auto node = driver.builder->Create_1500_Wrapper ($2.name,$3);
 	for (auto this_child : $4.nodes)
 	    node->AppendChild(this_child);
   	$$ = node;

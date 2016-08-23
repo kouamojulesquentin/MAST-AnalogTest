@@ -83,16 +83,15 @@ Options Options::ParseArguments (int argc, char* argv [])
   using data_t = tuple<string_view, string_view, std::function<void(int& ii, string& item)>>;
   auto parsingData =
   {
-    data_t("SIT file", "-sf|--sit_file",
-           [&options, &getNextItem](int& ii, string& item)
-           {
-             options.testcase = Testcase::SIT_File;
-             options.sitFile  = getNextItem(ii, item);
-           }),
     data_t("Test case", "-tc|--test_case",
            [&options, &getNextItem](int& ii, string& item)
            {
              options.testcase = ParseTestcase(getNextItem(ii, item));
+           }),
+    data_t("Test case options", "-tco|--test_case_options",
+           [&options, &getNextItem](int& ii, string& item)
+           {
+             options.testcaseOptions = getNextItem(ii, item);
            }),
     data_t("Protocol", "-p|--protocol",
            [&options, &getNextItem](int& ii, string& item)
@@ -247,7 +246,6 @@ string Options::ToDebugString (string_view header, string_view linePrefix) const
 
   os << header;
   os << linePrefix << "Print graph: " << std::boolalpha << printGraph << std::endl;
-  os << linePrefix << "Graph file:  " << graphFilePath  << std::endl;
   os << linePrefix << "Loop count:  " << loopCount      << std::endl;
 
   os << linePrefix << "Test case:   ";
@@ -257,7 +255,7 @@ string Options::ToDebugString (string_view header, string_view linePrefix) const
       os << "Not_specified";
       break;
     case Testcase::SIT_File:
-      os << "SIT File \"" << sitFile << "\"";
+      os << "SIT File \"" << testcaseOptions << "\"";
       break;
     case Testcase::Wrapper_1500:
       os << "1500 wrapper";
@@ -266,6 +264,7 @@ string Options::ToDebugString (string_view header, string_view linePrefix) const
       os << "???";
       break;
   }
+  os << ", Options: \"" << testcaseOptions << "\"";
   os << std::endl;
 
   os << linePrefix << "Protocol:    ";

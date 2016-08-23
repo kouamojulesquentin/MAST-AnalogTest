@@ -10,14 +10,14 @@
 //! Defines main for testcases application
 //===========================================================================
 
-#include "SystemModelAdapter.h"
 #include "Session.hpp"
+#include "SystemModelAdapter.h"
 #include "SystemModelBuilder.hpp"
+#include "SystemModelManager.hpp"
 #include "LoopbackAccessInterfaceProtocol.hpp"
 #include "SVF_SimulationProtocol.hpp"
 #include "GmlPrinterVisitor.hpp"
 #include "PrettyPrinterVisitor.hpp"
-#include "SystemModelManager.hpp"
 #include "g3log/g3log.hpp"
 #include "g3log/logworker.hpp"
 #include "LogFormatter.h"
@@ -26,6 +26,7 @@
 #include "Options.hpp"
 
 #include <stdexcept>
+#include <vector>
 #include <memory>
 #include <string>
 #include <experimental/string_view>
@@ -37,6 +38,7 @@ using std::shared_ptr;
 using std::make_shared;
 using std::make_unique;
 using std::dynamic_pointer_cast;
+using std::vector;
 using std::string;
 using std::experimental::string_view;
 using std::ofstream;
@@ -48,6 +50,22 @@ using namespace mast;
 
 namespace
 {
+struct ApplicationDescriptor
+{
+  using Application_t = std::function<void()>;
+
+  Application_t function;
+  std::string   topNodePath;
+  std::string   debugName;
+
+  ApplicationDescriptor(Application_t p_function, std::string p_topNodePath, std::string p_debugName = "")
+    : function    (p_function)
+    , topNodePath (std::move(p_topNodePath))
+    , debugName   (std::move(p_debugName))
+  {}
+};
+
+
 //! Check SystemModel coherency
 //!
 ErrorCode CheckResult (shared_ptr<SystemModel> sm)
@@ -70,6 +88,94 @@ ErrorCode CheckResult (shared_ptr<SystemModel> sm)
 }
 //
 //  End of: CheckResult
+//---------------------------------------------------------------------------
+
+
+//! Builds SystemModel with optional AccessInterfaceProtocol for specified testcase.
+//! @param sm               Current system model
+//! @param protocol         Optional protocol (supersede one that may be defined by the testcase)
+//! @param testcase         Tescase kind
+//! @param testcaseOptions  Options for test case (depends on tescase kind)
+//!
+//! @return Application function and their association with a ParentNode within the SystemModel
+vector<ApplicationDescriptor> CreateTestcase (shared_ptr<SystemModel>             sm,
+                                              shared_ptr<SystemModelManager>      manager,
+                                              shared_ptr<AccessInterfaceProtocol> protocol,
+                                              Options::Testcase                   testcase,
+                                              const string&                       testcaseOptions)
+{
+  vector<ApplicationDescriptor> associations;
+
+  switch (testcase)
+  {
+    case Options::Testcase::NotSpecified:
+      cerr << "A testcase must be specified !!!" ;
+      break;
+    case Options::Testcase::SIT_File:
+    {
+      auto file = testcaseOptions;
+      break;
+    }
+    case Options::Testcase::Wrapper_1500:
+    {
+      //! @todo [JFC]-[August/22/2016]: In CreateTestcase(): Use function provided by testcase file
+      //!
+      auto builder          = SystemModelBuilder(*sm);
+      auto accessInterface  = builder.Create_JTAG_TAP("Tap", 8u, 2u, protocol);
+      auto derivationsCount = uint32_t(4u);
+      auto wrapper          = builder.Create_1500_Wrapper("1500", derivationsCount);
+
+      accessInterface->AppendChild(wrapper);
+      builder.AppendRegisters(4u, "dynamic_", BinaryVector::CreateFromHexString("ABCD"), wrapper);
+
+      sm->SetRoot(accessInterface);
+
+
+      auto pdlApp = [manager](uint16_t loopCount, string registerPath, uint16_t initialValue)
+      {
+        while (loopCount)
+        {
+          manager->iWrite(registerPath, initialValue);
+          manager->iApply();
+
+          ++initialValue;
+          --loopCount;
+        }
+      };
+
+  //+    auto appNode      = wrapper->DeepestChildAppender();
+      auto topPath      = "Tap_DR_Mux.1500.SWIR.SWIR_mux.WIR.WIR_mux";
+      auto initialValue = uint16_t(0x1000);
+//+      auto loopCount    = options.loopCount;
+      auto loopCount    = 10;
+
+      for (uint32_t ii = 0 ; ii < derivationsCount ; ++ii)
+      {
+        ostringstream os_app;
+        os_app << "App_" << ii;
+        auto appName      = os_app.str();
+
+        ostringstream os_reg;
+        os_reg << "dynamic_" << ii;
+        auto registerPath = os_reg.str();
+
+        auto appWrapper   = [pdlApp, loopCount, registerPath, initialValue]() { pdlApp(loopCount, registerPath, initialValue); };
+
+        initialValue += 0x1000;
+
+        associations.emplace_back(appWrapper, topPath, appName);
+      }
+      break;
+    }
+    default:
+      break;
+  }
+
+
+  return associations;
+}
+//
+//  End of: CreateTestcase
 //---------------------------------------------------------------------------
 
 
@@ -179,16 +285,8 @@ int main (int argc, char* argv [])
     auto session          = Session (std::make_shared<SystemModelManagerMonitor>());
     auto sm               = session.sm;
     auto manager          = session.manager;
-    auto builder          = SystemModelBuilder(*sm);
     auto protocol         = GetProtocol(options.protocol, options.protocolOptions);
-    auto accessInterface  = builder.Create_JTAG_TAP("Tap", 8u, 2u, protocol);
-    auto derivationsCount = uint32_t(4u);
-    auto wrapper          = builder.Create_1500_Wrapper("1500", derivationsCount);
-
-    accessInterface->AppendChild(wrapper);
-    builder.AppendRegisters(4u, "dynamic_", BinaryVector::CreateFromHexString("ABCD"), wrapper);
-
-    sm->SetRoot(accessInterface);
+    auto descriptors      = CreateTestcase(sm, manager, protocol, options.testcase, options.testcaseOptions);
 
     retCode = CheckResult(sm);
     if (retCode != ErrorCode::Ok)
@@ -199,7 +297,7 @@ int main (int argc, char* argv [])
     if (options.printGraph)
     {
       ofstream os("Testcase_1500.gml");
-      os << GmlPrinterVisitor::Graph(accessInterface);
+      os << GmlPrinterVisitor::Graph(sm->Root());
     }
 
     if (retCode != ErrorCode::Ok)
@@ -207,44 +305,21 @@ int main (int argc, char* argv [])
       return static_cast<int>(retCode);
     }
 
-    manager->Start();
+//+    RunMast(testcase);
 
-    auto pdlApp = [manager](uint16_t loopCount, string registerPath, uint16_t initialValue)
+    for (const auto& descriptor : descriptors)
     {
-      while (loopCount)
-      {
-        manager->iWrite(registerPath, initialValue);
-        manager->iApply();
+      auto appNode = dynamic_pointer_cast<ParentNode>(sm->Root()->FindNode(descriptor.topNodePath));
 
-        ++initialValue;
-        --loopCount;
-      }
-    };
-
-    auto appNode      = wrapper->DeepestChildAppender();
-    auto initialValue = uint16_t(0x1000);
-    auto loopCount    = options.loopCount;
-    for (uint32_t ii = 0 ; ii < derivationsCount ; ++ii)
-    {
-      ostringstream os_app;
-      os_app << "App_" << ii;
-      auto appName      = os_app.str();
-
-      ostringstream os_reg;
-      os_reg << "dynamic_" << ii;
-      auto registerPath = os_reg.str();
-
-      auto appWrapper   = [pdlApp, loopCount, registerPath, initialValue]() { pdlApp(loopCount, registerPath, initialValue); };
-      manager->CreateApplicationThread(appNode, appWrapper, appName);
-
-      initialValue += 0x1000;
+      manager->CreateApplicationThread(appNode, descriptor.function, descriptor.debugName);
     }
 
+    manager->Start();
     manager->StartCreatedApplicationThreads();
     manager->WaitForApplicationsEnd();
     manager->Stop();
 
-    std::cout << "Test case run successfully" << std::endl;
+    std::cout << "End of test case (see log file in case of errors)" << std::endl;
   }
   catch(std::invalid_argument& exc) { retCode = ErrorCode::InvalidArgument;  std::cout << exc.what(); }
   catch(std::out_of_range&     exc) { retCode = ErrorCode::OutOfRange;       std::cout << exc.what(); }

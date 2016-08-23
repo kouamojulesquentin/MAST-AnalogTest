@@ -8,7 +8,9 @@
 @pushd %targetDir%
 @if not exist %AppFileName% goto No_exe
 @REM @cls && %AppFileName% -sf "c:\models\1500_wrapper.sit"  --print_graph -p SVF_Simu -lc 10
-@cls && %AppFileName% -tc 1500  --print_graph -p SVF_Simu -lc 7
+@REM @cls && %AppFileName% -tc 1500  --print_graph -p loopback -lc 7
+@cls && %AppFileName% -tc 1500  --print_graph -lc 7 -p loopback
+@REM @cls && %AppFileName% -tc 1500  --print_graph -p SVF_Simu --protocol_options "to_sut.svf, from_sut.dat" -lc 7
 @popd
 @goto :EOF
 

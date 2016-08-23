@@ -15,14 +15,34 @@
 
 #include <string>
 #include <sstream>
+#include <fstream>
 #include <array>
 #include <vector>
 
 using std::string;
 using std::experimental::string_view;
 using std::vector;
+using std::ifstream;
 
 using namespace mast;
+
+
+
+//! Tests if a file exists
+//!
+//! @param filePath File path
+//!
+//! @return true when file can be opened, false otherwise
+bool Utility::FileExists (string_view filePath)
+{
+  ifstream ifs;
+  ifs.open(filePath.data());
+  return ifs.is_open();
+}
+//
+//  End of: Utility::FileExists
+//---------------------------------------------------------------------------
+
 
 //! Formats message for (std) exception
 //!

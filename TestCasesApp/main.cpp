@@ -17,6 +17,7 @@
 #include "SystemModelManager.hpp"
 #include "LoopbackAccessInterfaceProtocol.hpp"
 #include "SVF_SimulationProtocol.hpp"
+#include "OpenOCDProtocol.hpp"
 #include "GmlPrinterVisitor.hpp"
 #include "PrettyPrinterVisitor.hpp"
 #include "g3log/g3log.hpp"
@@ -291,11 +292,14 @@ shared_ptr<AccessInterfaceProtocol> GetProtocol (Options::Protocol protocol, con
       aiProtocol = make_shared<SVF_SimulationProtocol> (toSutFilePath, fromSutFilePath);
       break;
     }
-    case Options::Protocol::I2C_Emulation:
-    THROW_LOGIC_ERROR("Not yet implemented");
-      break;
     case Options::Protocol::OpenOCD:
-    THROW_LOGIC_ERROR("Not yet implemented");
+    {
+      auto configFilePath = protocolOptions;
+      aiProtocol = make_shared<OpenOCDProtocol> (configFilePath);
+      break;
+    }
+    case Options::Protocol::I2C_Emulation:
+      THROW_LOGIC_ERROR("Not yet implemented");
       break;
     case Options::Protocol::Generic:
     THROW_LOGIC_ERROR("Not yet implemented");

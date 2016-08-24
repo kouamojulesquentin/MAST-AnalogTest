@@ -76,6 +76,8 @@ class UT_BinaryVector : public CxxTest::TestSuite
   void test_Constructor_Move ();
   void test_Constructor_Move_FixedSize ();
   void test_Constructor_Move_FixedSizeOnCopy ();
+  void test_Constructor_FromRawDataVector ();
+  void test_Constructor_FromRawDataVector_Moved ();
 
   // ---------------- Append
   //

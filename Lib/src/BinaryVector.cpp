@@ -157,6 +157,59 @@ BinaryVector::BinaryVector (mast::BinaryVector&& rhs) noexcept
 //---------------------------------------------------------------------------
 
 
+//! Constructs from raw data
+//!
+//! @note Raw data must be formatted as:
+//!         - MSB comes first (data[0])
+//!         - For last byte, bits are left aligned (on most significant bits)
+//!
+//! @note If data does not contained exactly the number of bytes for specified bits count,
+//!       the content is either truncated or extended with zeros
+//!
+//! @param data           Raw data (formated as expected)
+//! @param bitsCount      Number of effectively used bits
+//! @param sizeProperty   Size property
+//!
+BinaryVector::BinaryVector (const std::vector<uint8_t>& data, uint32_t bitsCount, SizeProperty sizeProperty)
+  : m_data         (data)
+  , m_usedBits     (bitsCount)
+  , m_sizeProperty (sizeProperty)
+{
+  auto expectedSize = (bitsCount + 7u) / 8u;
+  m_data.resize(expectedSize);
+  MaskLastByte();
+}
+//
+//  End of: BinaryVector::BinaryVector
+//---------------------------------------------------------------------------
+
+
+//! Constructs from "moveable" raw data
+//!
+//! @note Raw data must be formatted as:
+//!         - MSB comes first (data[0])
+//!         - For last byte, bits are left aligned (on most significant bits)
+//!
+//! @note If data does not contained exactly the number of bytes for specified bits count,
+//!       the content is either truncated or extended with zeros
+//!
+//! @param data           Raw data (formated as expected)
+//! @param bitsCount      Number of effectively used bits
+//! @param sizeProperty   Size property
+//!
+BinaryVector::BinaryVector (std::vector<uint8_t>&& data, uint32_t bitsCount, SizeProperty sizeProperty)
+  : m_data         (std::move(data))
+  , m_usedBits     (bitsCount)
+  , m_sizeProperty (sizeProperty)
+{
+  auto expectedSize = (bitsCount + 7u) / 8u;
+  m_data.resize(expectedSize);
+  MaskLastByte();
+}
+//
+//  End of: BinaryVector::BinaryVector
+//---------------------------------------------------------------------------
+
 
 //! Appends another scan vector
 //!

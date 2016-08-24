@@ -1508,7 +1508,114 @@ void UT_BinaryVector::test_Constructor_Move ()
   TS_DATA_DRIVEN_TEST (checker, data);
 }
 
-//! Checks Append when sut is empty and adding 8 bits from uint8_t
+
+//! Checks BinaryVector constructor from raw data (std::vector)
+//!
+//! @note Suppose that operator== is working properly
+void UT_BinaryVector::test_Constructor_FromRawDataVector ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto rawData   = vector<uint8_t>{std::get<0>(data)};
+    auto bitsCount = std::get<1>(data);
+    auto expected  = BinaryVector::CreateFromString(std::get<2>(data));
+
+    // ---------------- Exercise
+    //
+    BinaryVector sut(rawData, bitsCount);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  using data_t = tuple<initializer_list<uint8_t>, uint32_t, string_view>;
+  auto  data =
+  {
+    data_t({},                 0,     "0b"),                  // 00
+    data_t({},                 1,     "0b0"),                 // 01
+    data_t({},                 13,    "0b0000_0000:0000_0" ), // 02
+    data_t({0b10000000},       1,     "0b1"),                 // 03
+    data_t({0b01000000},       2,     "0b01"),                // 04
+    data_t({0b01000000},       3,     "0b010"),               // 05
+    data_t({0b01001000},       13,    "0b0100_1000:0000_0"),  // 06
+    data_t({0x5A, 0x6B},       13,    "0x5A/b0110_1"),        // 07
+    data_t({0x5A, 0x6B},       16,    "0x5A_6B"),             // 08
+    data_t({0x5A, 0x6B},       17,    "0x5A_6B/b0"),          // 09
+    data_t({0x5A, 0x6B, 0xAF}, 13,    "0x5A/b0110_1"),        // 10
+    data_t({0x5A, 0x6B, 0xAF}, 16,    "0x5A_6B"),             // 11
+    data_t({0x5A, 0x6B, 0xAF}, 17,    "0x5A_6B/b1"),          // 12
+    data_t({0x5A, 0x6B, 0xAF}, 23,    "0x5A_6B/b1010111"),    // 13
+    data_t({0x5A, 0x6B, 0xAF}, 24,    "0x5A_6B_AF"),          // 14
+    data_t({0x5A, 0x6B, 0xAF}, 25,    "0x5A_6B_AF/b0"),       // 15
+    data_t({0x5A, 0x6B, 0xAF}, 32,    "0x5A_6B_AF_00"),       // 16
+    data_t({0x5A, 0x6B, 0xAF}, 33,    "0x5A_6B_AF_00/b0"),    // 17
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector constructor from raw data (std::vector)
+//!
+//! @note Suppose that operator== is working properly
+void UT_BinaryVector::test_Constructor_FromRawDataVector_Moved ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto rawData   = vector<uint8_t>{std::get<0>(data)};
+    auto bitsCount = std::get<1>(data);
+    auto expected  = BinaryVector::CreateFromString(std::get<2>(data));
+
+    // ---------------- Exercise
+    //
+    BinaryVector sut(std::move(rawData), bitsCount);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  using data_t = tuple<initializer_list<uint8_t>, uint32_t, string_view>;
+  auto  data =
+  {
+    data_t({},                 0,     "0b"),                  // 00
+    data_t({},                 1,     "0b0"),                 // 01
+    data_t({},                 13,    "0b0000_0000:0000_0" ), // 02
+    data_t({0b10000000},       1,     "0b1"),                 // 03
+    data_t({0b01000000},       2,     "0b01"),                // 04
+    data_t({0b01000000},       3,     "0b010"),               // 05
+    data_t({0b01001000},       13,    "0b0100_1000:0000_0"),  // 06
+    data_t({0x5A, 0x6B},       13,    "0x5A/b0110_1"),        // 07
+    data_t({0x5A, 0x6B},       16,    "0x5A_6B"),             // 08
+    data_t({0x5A, 0x6B},       17,    "0x5A_6B/b0"),          // 09
+    data_t({0x5A, 0x6B, 0xAF}, 13,    "0x5A/b0110_1"),        // 10
+    data_t({0x5A, 0x6B, 0xAF}, 16,    "0x5A_6B"),             // 11
+    data_t({0x5A, 0x6B, 0xAF}, 17,    "0x5A_6B/b1"),          // 12
+    data_t({0x5A, 0x6B, 0xAF}, 23,    "0x5A_6B/b1010111"),    // 13
+    data_t({0x5A, 0x6B, 0xAF}, 24,    "0x5A_6B_AF"),          // 14
+    data_t({0x5A, 0x6B, 0xAF}, 25,    "0x5A_6B_AF/b0"),       // 15
+    data_t({0x5A, 0x6B, 0xAF}, 32,    "0x5A_6B_AF_00"),       // 16
+    data_t({0x5A, 0x6B, 0xAF}, 33,    "0x5A_6B_AF_00/b0"),    // 17
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks Append when sut is empty and adding 8 bits from  int8_t
 //!
 void UT_BinaryVector::test_Append_8_bits_When_Empty ()
 {

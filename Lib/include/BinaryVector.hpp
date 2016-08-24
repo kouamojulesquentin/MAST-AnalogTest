@@ -61,6 +61,8 @@ class DLL_EXPORT BinaryVector final
 
   BinaryVector(BinaryVector&& rhs) noexcept;    //!< Move constructor
   BinaryVector(BinaryVector&& rhs, SizeProperty sizeProperty) noexcept : BinaryVector(std::move(rhs)) { m_sizeProperty = sizeProperty; }    //!< Move constructor with fixed size
+  BinaryVector(const std::vector<uint8_t>& data, uint32_t bitsCount, SizeProperty sizeProperty = SizeProperty::NotFixed); //!< Constructs from raw data
+  BinaryVector(std::vector<uint8_t>&& data,      uint32_t bitsCount, SizeProperty sizeProperty = SizeProperty::NotFixed); //!< Constructs from raw data
 
   using string_view = std::experimental::string_view;
 
@@ -192,7 +194,7 @@ class DLL_EXPORT BinaryVector final
   // ---------------- Private  Fields
   //
   private:
-  std::vector<uint8_t> m_data;                                  //!< Bytes formatted bit stream
+  std::vector<uint8_t> m_data;                                  //!< Bytes formatted bit stream MSB first and last byte bits are left aligned (on msb)
   uint32_t             m_usedBits     = 0;                      //!< Number of effective bits (last byte may be not all used)
   SizeProperty         m_sizeProperty = SizeProperty::NotFixed; //!< When true, the number of used bits cannot be changed (once constructed)
 };

@@ -4,8 +4,9 @@ TEMPLATE = lib
 CONFIG += c++14
 CONFIG -= app_bundle
 CONFIG -= qt
+CONFIG += warn_off
 
-QMAKE_CXXFLAGS += -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-include-dirs -Wswitch-enum -Wswitch-default
+QMAKE_CXXFLAGS += -Wnarrowing -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-include-dirs -Wswitch-enum
 QMAKE_CXXFLAGS += -fmax-errors=3
 
 

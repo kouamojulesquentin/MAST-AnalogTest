@@ -29,6 +29,7 @@
 
 #include <stdexcept>
 #include <vector>
+#include <tuple>
 #include <memory>
 #include <string>
 #include <experimental/string_view>
@@ -41,8 +42,11 @@ using std::make_shared;
 using std::make_unique;
 using std::dynamic_pointer_cast;
 using std::vector;
+using std::tuple;
+using std::make_tuple;
 using std::string;
 using std::experimental::string_view;
+using std::regex;
 using std::ifstream;
 using std::ofstream;
 using std::ostringstream;
@@ -151,9 +155,50 @@ vector<ApplicationDescriptor> CreateTestcase (shared_ptr<SystemModel>           
                                               Options::Testcase                   testcase,
                                               const string&                       testcaseOptions)
 {
-  vector<ApplicationDescriptor> associations;
-  auto filePath = testcaseOptions;  // By default, testcaseOptions may contains a file path
+  string_view filePath  = testcaseOptions;  // By default, testcaseOptions may contains a file path
+  uint32_t    loopCount = 10u;
 
+  // ---------------- Define switches and associated processing to update Options
+  //
+  using it_t   = vector<string_view>::const_iterator;
+  using data_t = tuple<string_view, std::function<void(it_t&, const it_t&, string_view)>>;
+  auto parsingData =
+  {
+    data_t("-f",
+           [&filePath](it_t& it, const it_t& ite, string_view)
+           {
+             if (it != ite) filePath = *it++;
+           }),
+    data_t("-lc|--loop_count",
+           [&loopCount](it_t& it, const it_t& ite, string_view)
+           {
+             if (it != ite) loopCount = std::stoul((*it++).data());
+           }),
+  };
+
+  // ---------------- Parse specific options
+  //
+  auto parts = Utility::Split(testcaseOptions, " ");
+  auto ite   = parts.cend();
+  auto it    = parts.cbegin();
+  while (it != ite)
+  {
+    auto item = *it++;
+    for (const auto& data : parsingData)
+    {
+      auto expr        = std::get<0>(data);
+      auto switchRegex = regex(expr.cbegin(), expr.cend(), regex::icase);
+      if (regex_match(item.cbegin(), item.cend(), switchRegex))
+      {
+        std::get<1>(data)(it, ite, item);
+        break;
+      }
+    }
+  }
+
+  Utility::TrimBoth(filePath);
+
+  vector<ApplicationDescriptor> associations;
   switch (testcase)
   {
     case Options::Testcase::NotSpecified:
@@ -163,7 +208,7 @@ vector<ApplicationDescriptor> CreateTestcase (shared_ptr<SystemModel>           
     {
       CHECK_FILE_EXISTS(filePath);
       auto reader   = SIT::SIT_Reader(sm);
-      reader.parse(filePath.c_str());
+      reader.parse(filePath.data());
       auto topNode  = dynamic_pointer_cast<ParentNode>(reader.parsed_sut);
 
       sm->ReplaceRoot(topNode, false);
@@ -176,7 +221,6 @@ vector<ApplicationDescriptor> CreateTestcase (shared_ptr<SystemModel>           
         }
       }
       auto topPath   = "TAP_DR_Mux.W_1500.SWIR.SWIR_mux.WIR.WIR_mux";
-      auto loopCount = 10u;
       associations   = CreateDefaultAppDescriptors(topPath, 4u, "reg_", loopCount);
       break;
     }
@@ -196,7 +240,6 @@ vector<ApplicationDescriptor> CreateTestcase (shared_ptr<SystemModel>           
       sm->SetRoot(accessInterface);
 
       auto topPath   = "Tap_DR_Mux.1500.SWIR.SWIR_mux.WIR.WIR_mux";
-      auto loopCount = 10u;
       associations   = CreateDefaultAppDescriptors(topPath, 4u, registerNamePrefix, loopCount);
       break;
     }

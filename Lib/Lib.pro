@@ -38,6 +38,7 @@ SOURCES +=  \
     src/I2C_Player.cpp                              \
     src/Linker.cpp                                  \
     src/NodePathResolver.cpp                        \
+    src/OpenOCDProtocol.cpp                         \
     src/ParentNode.cpp                              \
     src/PDL_Adapter.cpp                             \
     src/PrettyPrinterVisitor.cpp                    \
@@ -82,6 +83,7 @@ HEADERS += \
     include/I2C_Player.hpp                              \
     include/Linker.hpp                                  \
     include/NodePathResolver.hpp                        \
+    include/OpenOCDProtocol.hpp                         \
     include/ParentNode.hpp                              \
     include/PathSelector.hpp                            \
     include/PrettyPrinterVisitor.hpp                    \

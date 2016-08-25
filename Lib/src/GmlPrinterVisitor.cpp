@@ -38,33 +38,18 @@ const std::experimental::string_view GmlPrinterVisitor::m_color_Register        
 
 const std::experimental::string_view GmlPrinterVisitor::m_fontName              = "Lucida Console";
 
-
-inline GmlPrinterOptions& operator |= (GmlPrinterOptions& X, GmlPrinterOptions Y)
-{
-  X = X | Y;
-  return X;
-}
-
-inline bool IsEnumFlagSet(GmlPrinterOptions options, GmlPrinterOptions flag)
-{
-  auto rawOption = static_cast<std::underlying_type_t<GmlPrinterOptions>>(options);
-  auto rawFlag   = static_cast<std::underlying_type_t<GmlPrinterOptions>>(flag);
-
-  return (rawOption & rawFlag) == rawFlag;
-}
-
 //! Initializes with given options
 //!
 GmlPrinterVisitor::GmlPrinterVisitor(std::experimental::string_view graphName, GmlPrinterOptions options)
   : m_graphName (graphName)
+  , m_displayIdentifier    (IsSet(options, GmlPrinterOptions::DisplayIdentifiers))
+  , m_displayRegisterValue (IsSet(options, GmlPrinterOptions::DisplayRegisterValue))
+  , m_displayRegValueAuto  (IsSet(options, GmlPrinterOptions::DisplayValueAuto))
+  , m_showProtocol         (IsSet(options, GmlPrinterOptions::ShowProtocol))
+  , m_showSelectorWithEdge (IsSet(options, GmlPrinterOptions::ShowSelectorWithEdge))
+  , m_showSelectionValues  (IsSet(options, GmlPrinterOptions::ShowSelectionValues))
 {
   CreateRoot();
-  m_displayIdentifier    = IsEnumFlagSet(options, GmlPrinterOptions::DisplayIdentifiers);
-  m_displayRegisterValue = IsEnumFlagSet(options, GmlPrinterOptions::DisplayRegisterValue);
-  m_displayRegValueAuto  = IsEnumFlagSet(options, GmlPrinterOptions::DisplayValueAuto);
-  m_showProtocol         = IsEnumFlagSet(options, GmlPrinterOptions::ShowProtocol);
-  m_showSelectorWithEdge = IsEnumFlagSet(options, GmlPrinterOptions::ShowSelectorWithEdge);
-  m_showSelectionValues  = IsEnumFlagSet(options, GmlPrinterOptions::ShowSelectionValues);
 }
 //
 //  End of: GmlPrinterVisitor::GmlPrinterVisitor

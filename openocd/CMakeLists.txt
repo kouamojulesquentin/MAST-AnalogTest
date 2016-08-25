@@ -24,13 +24,15 @@ ExternalProject_Add(OpenOCD
    BUILD_COMMAND make
    INSTALL_COMMAND make install
    )
-
+   
 find_path(LIBUSB_INCLUDE_DIR
   NAMES libusb.h
-  PATH_SUFFIXES "include" "libusb" "libusb-1.0")
+  PATH_SUFFIXES "include" "libusb" "libusb-1.0")  
+     
 find_library(LIBUSB_LIBRARY
-  NAMES usb
-  PATH_SUFFIXES "lib" "lib32" "lib64")
+  NAMES usb usb-1.0 
+  PATH_SUFFIXES "lib" "lib32" "lib64" )
+  
 
 set(whole_libraries)
 set(whole_lib_files)

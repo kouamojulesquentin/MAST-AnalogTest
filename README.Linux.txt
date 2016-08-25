@@ -5,6 +5,13 @@
  NB: on newer Linux installation, a manual install of ply 3.8 might be needed
 				http://www.dabeaz.com/ply/
 
+OpenOCD need Lib to be installed (sudo apt-get install libusb-1.0-0-dev)
+To build OpenOCD, the following tools are required:
+	- Automake
+	- Autoconf
+	- m4
+	- perl
+
 
 [Build-Qt]
 

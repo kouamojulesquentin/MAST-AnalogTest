@@ -181,16 +181,22 @@ void GmlPrinterVisitor::AppendNode (string_view            shapeName,
   if (displayNotes)
   {
     ++linesCount;
-    size_t startPos = 0;
-    size_t foundPos = 0;
+    size_t startPos  = 0;
+    size_t foundPos  = 0;
+    size_t noteWidth = 0;
+
     while ((foundPos = notes.find('\n', startPos)) != string_view::npos)
     {
       ++linesCount;
-      auto noteWidth = foundPos - startPos;
-      labelCharWidth = std::max(labelCharWidth, noteWidth);
-
+      noteWidth = std::max(noteWidth, foundPos - startPos);
       startPos = ++foundPos;
     }
+
+    if (noteWidth == 0)
+    {
+      noteWidth = notes.length();
+    }
+    labelCharWidth = std::max(labelCharWidth, noteWidth);
   }
   auto nodeWidth  = std::max(static_cast<size_t>(50u), (95u * labelCharWidth) / 10u);
   auto nodeHeight = std::max(static_cast<size_t>(35u), 18u  * linesCount);

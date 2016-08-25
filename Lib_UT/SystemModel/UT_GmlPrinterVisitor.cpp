@@ -318,7 +318,7 @@ void UT_GmlPrinterVisitor::test_VisitTap_ShowProtocol ()
   auto expected = string("graph\n"
                          "[\n"
                          "   hierarchic 1 directed 1\n"
-                         "   node [ id 0 graphics [ type \"octagon\" fill \"#10FFFF\" w 135 h 44 ] LabelGraphics [ text \"1149_1_TAP\nProtocol: Loopback\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 0 graphics [ type \"octagon\" fill \"#10FFFF\" w 211 h 44 ] LabelGraphics [ text \"1149_1_TAP\nProtocol: Loopback\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 1 graphics [ type \"rectangle\" fill \"#59FF20\" w 57 h 35 ] LabelGraphics [ text \"TAP_IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" w 135 h 43 ] LabelGraphics [ text \"TAP_DR_Mux\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"TAP_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"

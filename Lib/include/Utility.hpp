@@ -84,10 +84,15 @@ class DLL_EXPORT Utility final
 //! @return A string with the concatenation
 inline std::string operator+(const std::string& lhs, std::experimental::string_view rhs) { return std::string (lhs).append(rhs.cbegin(), rhs.cend()); }
 
+//! Appends a string_view to a string
+//!
+//! @return Left hand side string appended with right hand side string_view
+inline std::string& operator+=(std::string& lhs, std::experimental::string_view rhs) { return lhs.append(rhs.cbegin(), rhs.cend()); }
+
 //! Concatenates a string_view and a string
 //!
 //! @return A string with the concatenation
-inline std::string operator+(std::experimental::string_view a, const std::string& b) { return std::string(a.cbegin(), a.cend()).append(b); }
+inline std::string operator+(std::experimental::string_view lhs, const std::string& rhs) { return std::string(lhs.cbegin(), lhs.cend()).append(rhs); }
 
 //! Combination of flag type enum items (bitwise or)
 //!

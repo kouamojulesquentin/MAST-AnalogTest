@@ -377,7 +377,7 @@ int main (int argc, char* argv [])
     if (options.printGraph)
     {
       ofstream os(options.graphFilePath);
-      os << GmlPrinterVisitor::Graph(sm->Root());
+      os << GmlPrinterVisitor::Graph(sm->Root(), "", GmlPrinterOptions::Std | GmlPrinterOptions::ShowProtocol);
     }
 
     if (retCode != ErrorCode::Ok)

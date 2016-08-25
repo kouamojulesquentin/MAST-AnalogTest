@@ -36,6 +36,10 @@ class Spy_AccessInterfaceProtocols final : public mast::AccessInterfaceProtocol
 
   const std::vector<mast::BinaryVector>& ToSutVectors() const { return m_toSutVectors; }
 
+  //! Returns readable type of protocol
+  //!
+  virtual std::experimental::string_view KindName() const override { return "Loopback_Spy"; }
+
   // ---------------- Private  Fields
   //
   private:

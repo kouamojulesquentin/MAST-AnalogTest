@@ -297,6 +297,63 @@ void UT_GmlPrinterVisitor::test_VisitTap_With_SubNodes ()
 }
 
 
+//! Checks GmlPrinterVisitor::Visit_xxx() with a tap with added sub-nodes
+//!
+void UT_GmlPrinterVisitor::test_VisitTap_ShowProtocol ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  auto tap = Create_TestCase_Tap_With_Children(sm);
+
+  GmlPrinterVisitor sut("", GmlPrinterOptions::ShowSelectorWithEdge | GmlPrinterOptions::ShowProtocol);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (tap->Accept(sut)); // Will indirectly call Visit for several types of nodes
+
+  // ---------------- Verify
+  //
+  auto got      = sut.Graph();
+  auto expected = string("graph\n"
+                         "[\n"
+                         "   hierarchic 1 directed 1\n"
+                         "   node [ id 0 graphics [ type \"octagon\" fill \"#10FFFF\" w 135 h 44 ] LabelGraphics [ text \"1149_1_TAP\nProtocol: Loopback\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 1 graphics [ type \"rectangle\" fill \"#59FF20\" w 57 h 35 ] LabelGraphics [ text \"TAP_IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" w 135 h 43 ] LabelGraphics [ text \"TAP_DR_Mux\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"TAP_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 4 graphics [ type \"ellipse\" fill \"#FFCC20\" w 106 h 43 ] LabelGraphics [ text \"Chain_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 7 graphics [ type \"ellipse\" fill \"#FFCC20\" w 106 h 43 ] LabelGraphics [ text \"Chain_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 12 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"Reg_b_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 13 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"Reg_b_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 14 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"Reg_b_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 8 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"Reg_a_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 9 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"Reg_a_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 10 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"Reg_a_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 11 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"Reg_a_3\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"Reg_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 6 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"Reg_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   edge [ source 0 target 1 label \"1\" ]\n"
+                         "   edge [ source 2 target 3 label \"1\" ]\n"
+                         "   edge [ source 7 target 12 label \"1\" ]\n"
+                         "   edge [ source 7 target 13 label \"2\" ]\n"
+                         "   edge [ source 7 target 14 label \"3\" ]\n"
+                         "   edge [ source 4 target 7 label \"1\" ]\n"
+                         "   edge [ source 4 target 8 label \"2\" ]\n"
+                         "   edge [ source 4 target 9 label \"3\" ]\n"
+                         "   edge [ source 4 target 10 label \"4\" ]\n"
+                         "   edge [ source 4 target 11 label \"5\" ]\n"
+                         "   edge [ source 2 target 4 label \"2\" ]\n"
+                         "   edge [ source 2 target 5 label \"3\" ]\n"
+                         "   edge [ source 2 target 6 label \"4\" ]\n"
+                         "   edge [ source 2 target 1 graphics [ width 1 style \"dashed\" targetArrow \"standard\" ] ]\n"
+                         "   edge [ source 0 target 2 label \"2\" ]\n"
+                         "]"
+                        );
+  TS_ASSERT_EQUALS (got, expected);
+}
+
+
 //! Checks GmlPrinterVisitor::Visit_xxx() when does not use edge between Linker and Selector Register
 //!
 void UT_GmlPrinterVisitor::test_Visit_NoEdgeForSelector ()

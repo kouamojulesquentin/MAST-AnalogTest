@@ -36,6 +36,10 @@ class Spy_SVF_Protocol final : public mast::SVF_Player
 
   const std::vector<std::string>& SVFCommands() const { return m_commands; }
 
+  //! Returns readable type of protocol
+  //!
+  virtual std::experimental::string_view KindName() const override { return "SVF_Spy"; }
+
   // ---------------- Private  Fields
   //
   private:

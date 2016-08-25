@@ -36,6 +36,7 @@ class UT_GmlPrinterVisitor : public CxxTest::TestSuite
   void test_Visit_After_Graph ();
   void test_VisitTap ();
   void test_VisitTap_With_SubNodes ();
+  void test_VisitTap_ShowProtocol ();
 
   // ---------------- Options
   //

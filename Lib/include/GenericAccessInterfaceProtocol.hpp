@@ -65,9 +65,9 @@ class DLL_EXPORT GenericAccessInterfaceProtocol : public AccessInterfaceProtocol
   //! @return Bits stream retrieved from SUT
   virtual BinaryVector DoAction(uint32_t derivationId, void* interfaceData, const BinaryVector& toSutData) override;
 
-  // ---------------- Protected Methods
-  //
-  protected:
+  //! Returns readable type of protocol
+  //!
+  virtual std::experimental::string_view KindName() const override { return "Generic"; }
 
   // ---------------- Private  Fields
   //

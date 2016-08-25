@@ -40,17 +40,9 @@ class DLL_EXPORT LoopbackAccessInterfaceProtocol : public AccessInterfaceProtoco
   //! @return Bits stream retrieved from SUT
   virtual BinaryVector DoAction(uint32_t derivationId, void* interfaceData, const BinaryVector& toSutData) override;
 
-  // ---------------- Protected Methods
-  //
-  protected:
-
-  // ---------------- Private  Methods
-  //
-  private:
-
-  // ---------------- Private  Fields
-  //
-  private:
+  //! Returns readable type of protocol
+  //!
+  virtual std::experimental::string_view KindName() const override { return "Loopback"; }
 };
 //
 //  End of LoopbackAccessInterfaceProtocol class declaration

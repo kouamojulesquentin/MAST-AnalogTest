@@ -16,6 +16,7 @@
   #define ACCESSINTERFACEPROTOCOL_H__B0FE4245_A913_4634_F1BD_725570BFDC80__INCLUDED_
 
 #include "BinaryVector.hpp"
+#include <experimental/string_view>
 
 namespace mast
 {
@@ -35,6 +36,10 @@ class AccessInterfaceProtocol
   //!
   //! @return Bits stream retrieved from SUT
   virtual BinaryVector DoAction(uint32_t derivationId, void* interfaceData, const BinaryVector& toSutData) = 0;
+
+  //! Returns readable type of protocol (I2C, SVF_Simu, OpenOCD, SPI...)
+  //!
+  virtual std::experimental::string_view KindName() const = 0;
 
   // ---------------- Protected Methods
   //

@@ -109,7 +109,10 @@ void SystemModelManagerMonitor::ExportGml (string_view step, ParentNode& root)
 //!
 void SystemModelManagerMonitor::LogUncondionally (string_view message)
 {
-  LOG(INFO) << message;
+  if (!message.empty())
+  {
+    LOG(INFO) << message;
+  }
 }
 //
 //  End of: SystemModelManagerMonitor::LogUncondionally
@@ -122,7 +125,10 @@ void SystemModelManagerMonitor::LogUncondionally (string_view message)
 //!
 void SystemModelManagerMonitor::LogUncondionally (string_view message, const SystemModelNode& node, string_view debugName)
 {
-  LOG(INFO) << WrapDebugName(debugName) << message << NodeInfos(node);
+  if (!message.empty())
+  {
+    LOG(INFO) << WrapDebugName(debugName) << message << NodeInfos(node);
+  }
 }
 //
 //  End of: SystemModelManagerMonitor::LogUncondionally

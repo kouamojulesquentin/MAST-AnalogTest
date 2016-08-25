@@ -15,6 +15,7 @@
 #include "SystemModelNodes.hpp"
 #include "Utility.hpp"
 #include "PathSelector.hpp"
+#include "AccessInterfaceProtocol.hpp"
 
 #include <algorithm>
 using std::shared_ptr;
@@ -61,6 +62,7 @@ GmlPrinterVisitor::GmlPrinterVisitor(std::experimental::string_view graphName, G
   m_displayIdentifier    = IsEnumFlagSet(options, GmlPrinterOptions::DisplayIdentifiers);
   m_displayRegisterValue = IsEnumFlagSet(options, GmlPrinterOptions::DisplayRegisterValue);
   m_displayRegValueAuto  = IsEnumFlagSet(options, GmlPrinterOptions::DisplayValueAuto);
+  m_showProtocol         = IsEnumFlagSet(options, GmlPrinterOptions::ShowProtocol);
   m_showSelectorWithEdge = IsEnumFlagSet(options, GmlPrinterOptions::ShowSelectorWithEdge);
   m_showSelectionValues  = IsEnumFlagSet(options, GmlPrinterOptions::ShowSelectionValues);
 }
@@ -370,7 +372,15 @@ string GmlPrinterVisitor::Graph (shared_ptr<SystemModelNode> topNode, string_vie
 //!
 void GmlPrinterVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 {
-  AppendParentNode(m_shape_AccessInterface, m_color_AccessInterface, "", accessInterface);
+  auto protocol = accessInterface.Protocol();
+  auto note     = string();
+  if (m_showProtocol)
+  {
+    note = "Protocol: ";
+    note += protocol ? protocol->KindName() : "Not set";
+  }
+
+  AppendParentNode(m_shape_AccessInterface, m_color_AccessInterface, note, accessInterface);
 }
 
 //! Appends Chain node to GML graph

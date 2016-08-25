@@ -39,6 +39,10 @@ class Spy_I2C_Protocol final : public mast::I2C_Player
 
   const std::vector<std::string>& I2CCommands() const { return m_commands; }
 
+  //! Returns readable type of protocol
+  //!
+  virtual std::experimental::string_view KindName() const override { return "I2C_Spy"; }
+
   // ---------------- Private  Fields
   //
   private:

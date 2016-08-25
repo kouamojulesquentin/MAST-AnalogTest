@@ -49,6 +49,10 @@ class DLL_EXPORT SVF_SimulationProtocol final : public SVF_Player
   //!
   virtual BinaryVector DoAction(uint32_t derivationId, void* interfaceData, const BinaryVector& toSutData) override;
 
+  //! Returns readable type of protocol
+  //!
+  virtual std::experimental::string_view KindName() const override { return "SVF_Simulation"; }
+
   // ---------------- Protected Methods
   //
   protected:

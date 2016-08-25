@@ -14,10 +14,12 @@
 #include "PrettyPrinterVisitor.hpp"
 #include "SystemModelNodes.hpp"
 #include "PathSelector.hpp"
+#include "AccessInterfaceProtocol.hpp"
 #include "Utility.hpp"
 
 using std::string;
 using std::shared_ptr;
+using std::experimental::string_view;
 
 using namespace mast;
 
@@ -28,6 +30,7 @@ using namespace mast;
 PrettyPrinterVisitor::PrettyPrinterVisitor (PrettyPrinterOptions options)
   : m_useAutoFormat          (IsSet(options, PrettyPrinterOptions::DisplayValueAuto))
   , m_verbose                (IsSet(options, PrettyPrinterOptions::Verbose))
+  , m_showProtocol           (IsSet(options, PrettyPrinterOptions::ShowProtocol))
   , m_showSelectionState     (IsSet(options, PrettyPrinterOptions::ShowSelectionState))
   , m_showSelectionValue     (IsSet(options, PrettyPrinterOptions::ShowSelectionValue))
   , m_showSelectorProperties (IsSet(options, PrettyPrinterOptions::ShowSelectorProperties))
@@ -174,8 +177,9 @@ void PrettyPrinterVisitor::StreamNodeCommon (const SystemModelNode& node)
 //!
 //! @param type   Text representation of the node type
 //! @param node   The node for which header is to be streamed
+//! @param notes  Optional note to add after node name
 //!
-void PrettyPrinterVisitor::StreamNodeHeader(std::experimental::string_view type, const SystemModelNode& node)
+void PrettyPrinterVisitor::StreamNodeHeader(string_view type, const SystemModelNode& node, string_view notes)
 {
   if (!m_first)
   {
@@ -199,6 +203,11 @@ void PrettyPrinterVisitor::StreamNodeHeader(std::experimental::string_view type,
 
   AlignRelativeTo(m_startPos, 15u + m_depth);
   m_os << '"' << node.Name()       << '"';
+
+  if (!notes.empty())
+  {
+    m_os << ", " << notes;
+  }
 
   if (m_showSelectorProperties && m_selector && m_processingSelector)
   {
@@ -233,10 +242,11 @@ void PrettyPrinterVisitor::StreamNodeHeader(std::experimental::string_view type,
 //!
 //! @param type   Text representation of the node type
 //! @param node   The node for which header is to be streamed
+//! @param notes  Optional note to add after node name
 //!
-void PrettyPrinterVisitor::StreamParentNode (std::experimental::string_view type, const ParentNode& parentNode)
+void PrettyPrinterVisitor::StreamParentNode (std::experimental::string_view type, const ParentNode& parentNode, string_view notes)
 {
-  StreamNodeHeader(type, parentNode);
+  StreamNodeHeader(type, parentNode, notes);
 
   if (m_verbose)
   {
@@ -261,7 +271,16 @@ void PrettyPrinterVisitor::StreamParentNode (std::experimental::string_view type
 //!
 void PrettyPrinterVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 {
-  StreamParentNode("Access_I", accessInterface);
+  string note;
+
+  if (m_verbose || m_showProtocol)
+  {
+    auto protocol = accessInterface.Protocol();
+    note = "Protocol: ";
+    note += protocol ? protocol->KindName() : "Not set";
+  }
+
+  StreamParentNode("Access_I", accessInterface, note);
 }
 
 //! Appends content of Chain node in text representation and visits

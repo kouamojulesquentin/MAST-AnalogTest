@@ -90,7 +90,29 @@ void UT_PrettyPrinterVisitor::test_VisitAccessInterface_Verbose ()
   // ---------------- Verify
   //
   auto got      = sut.PrettyPrint();
-  auto expected = string("[Access_I](0)  \"Access interface name\", pending: false, has_conditioner: false, priority: 0");
+  auto expected = string("[Access_I](0)  \"Access interface name\", Protocol: Not set, pending: false, has_conditioner: false, priority: 0");
+  TS_ASSERT_EQUALS (got, expected);
+}
+
+
+//! Checks PrettyPrinterVisitor::VisitAccessInterface() with ShowProtocol option
+//!
+void UT_PrettyPrinterVisitor::test_VisitAccessInterface_ShowProtocol ()
+{
+  // ---------------- Setup
+  //
+  AccessInterface accessInterface("Access interface name", nullptr);
+
+  PrettyPrinterVisitor sut(PrettyPrinterOptions::ShowProtocol);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.VisitAccessInterface(accessInterface));
+
+  // ---------------- Verify
+  //
+  auto got      = sut.PrettyPrint();
+  auto expected = string("[Access_I](0)  \"Access interface name\", Protocol: Not set");
   TS_ASSERT_EQUALS (got, expected);
 }
 
@@ -684,7 +706,7 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_Verbose ()
 
   // ---------------- Verify
   //
-  auto expected = string("[Access_I](0)  \"1149_1_TAP\", pending: false, has_conditioner: false, priority: 0\n"
+  auto expected = string("[Access_I](0)  \"1149_1_TAP\", Protocol: Loopback, pending: false, has_conditioner: false, priority: 0\n"
                          " [Register](1)  \"TAP_IR\", length: 5, Hold value: true, bypass:            1111_1\n"
                          "                                                     , next_to_sut:       1111_1\n"
                          "                                                     , last_to_sut:       1111_1\n"
@@ -770,7 +792,7 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_Std ()
 
   // ---------------- Verify
   //
-  auto expected = string("[Access_I](0)  \"1149_1_TAP\", pending: false, has_conditioner: false, priority: 0\n"
+  auto expected = string("[Access_I](0)  \"1149_1_TAP\", Protocol: Loopback, pending: false, has_conditioner: false, priority: 0\n"
                          " [Register](1)  \"TAP_IR\", length: 5, Hold value: true, bypass:            0b1111_1\n"
                          "                                                     , next_to_sut:       0b1111_1\n"
                          "                                                     , last_to_sut:       0b1111_1\n"
@@ -901,7 +923,7 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_AllOptions ()
   // ---------------- Verify
   //
   auto expected = string(
-                         "[Access_I](0)  \"1149_1_TAP\", pending: false, has_conditioner: false, priority: 0\n"
+                         "[Access_I](0)  \"1149_1_TAP\", Protocol: Loopback, pending: false, has_conditioner: false, priority: 0\n"
                          " [Register](1)  \"TAP_IR\", length: 5, Hold value: true, bypass:            0b1111_1\n"
                          "                                                     , next_to_sut:       0b1111_1\n"
                          "                                                     , last_to_sut:       0b1111_1\n"

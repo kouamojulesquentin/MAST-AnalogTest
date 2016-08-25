@@ -30,16 +30,17 @@ class PathSelector;
 //!
 enum class PrettyPrinterOptions
 {
-  None                = 0,
-  Verbose             = 0b00001, //!< Show all Register values
-  DisplayValueAuto    = 0b00010, //!< To show Register values as binary when small, hexa when large and end of large string as binary when cannot form a plain nibble
-  ShowSelectionState  = 0b00100,
-  ShowSelectionValue  = 0b01000,
-  ShowSelectorProperties = 0b10000,
+  None                   = 0,
+  Verbose                = 1 << 0,  //!< Show all Register values
+  DisplayValueAuto       = 1 << 1,  //!< To show Register values as binary when small, hexa when large and end of large string as binary when cannot form a plain nibble
+  ShowProtocol           = 1 << 2,  //!< To show Linker selector associated register with an edge between the Linker and the Register
+  ShowSelectionState     = 1 << 3,
+  ShowSelectionValue     = 1 << 4,
+  ShowSelectorProperties = 1 << 5,
 
   Default           = None,
   Std               = Verbose | DisplayValueAuto,
-  All               = Verbose | DisplayValueAuto | ShowSelectionState | ShowSelectionValue | ShowSelectorProperties,
+  All               = Verbose | DisplayValueAuto | ShowProtocol | ShowSelectionState | ShowSelectionValue | ShowSelectorProperties,
 };
 
 //! System model visitors for creation of a text, readable, and hierarchical
@@ -88,8 +89,8 @@ class DLL_EXPORT PrettyPrinterVisitor : public SystemModelVisitor
 
   void StreamBinaryVector (std::experimental::string_view name, const BinaryVector&    bits);
   void StreamNodeCommon   (const SystemModelNode&         node);
-  void StreamNodeHeader   (std::experimental::string_view type, const SystemModelNode& node);
-  void StreamParentNode   (std::experimental::string_view type, const ParentNode&      parentNode);
+  void StreamNodeHeader   (std::experimental::string_view type, const SystemModelNode& node,       std::experimental::string_view notes = "");
+  void StreamParentNode   (std::experimental::string_view type, const ParentNode&      parentNode, std::experimental::string_view notes = "");
 
   // ---------------- Private  Fields
   //
@@ -102,6 +103,7 @@ class DLL_EXPORT PrettyPrinterVisitor : public SystemModelVisitor
   pos_type                      m_startPos               = 0;     //!< Position, in stream, of first character of current line
   bool                          m_useAutoFormat          = false; //!< When true, register values are displayed as hexadecimal string if large enough and not complete nibble as binary
   bool                          m_verbose                = false; //!< When true, more information are printed
+  bool                          m_showProtocol           = false; //!< When true, protocol kind is displayed for AccessInterface
   bool                          m_showSelectionState     = false; //!< When true, selected/active linker node are reported as so
   bool                          m_showSelectionValue     = false; //!< When true, for all linker children nodes, their selection state is reported
   bool                          m_showSelectorProperties = false; //!< When true, selector options are reported

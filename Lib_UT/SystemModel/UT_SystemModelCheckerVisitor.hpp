@@ -57,6 +57,8 @@ class UT_SystemModelCheckerVisitor : public CxxTest::TestSuite
 
   void test_CheckTree_When_MaxPath_Zero ();
 
+  void test_CheckTree_NoProtocol ();
+
   // ================ Other Methods ================
 
   void setUp(); //!< Initializes test (called for each test)

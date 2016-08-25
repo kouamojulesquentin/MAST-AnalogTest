@@ -235,6 +235,7 @@ void SystemModelCheckerVisitor::CheckTree ()
   m_collectedNodeInfo.clear();      // Allow multiple call to CheckTree
   m_collectedNodeInfo.resize(m_identifierMapping.size());
 
+  m_root->Accept(*this);            // Process parent node specifically
   CheckParentNode(m_root);
 
   // ---------------- Check that each node is reachable (no dangling node)
@@ -348,10 +349,14 @@ ostringstream& SystemModelCheckerVisitor::Stream (ostringstream& os, string_view
 
 //! Checks consistency specific to AccessInterface nodes
 //!
-void SystemModelCheckerVisitor::VisitAccessInterface (AccessInterface& )
+void SystemModelCheckerVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 {
-  //! @todo [JFC]-[May/24/2016]: Implement SystemModelCheckerVisitor::VisitAccessInterface()
-  //!
+  auto protocol = accessInterface.Protocol();
+
+  if (!protocol)
+  {
+    ReportWarning(accessInterface, " has no associated AccessInterfaceProtocol");
+  }
 }
 //
 //  End of: SystemModelCheckerVisitor::VisitAccessInterface

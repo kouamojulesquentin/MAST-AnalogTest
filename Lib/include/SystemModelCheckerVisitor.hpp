@@ -108,14 +108,14 @@ class DLL_EXPORT SystemModelCheckerVisitor final : public SystemModelVisitor
   using TCollectedNodeInfo = std::vector<CollectedNodeInfo>;
   TCollectedNodeInfo                m_collectedNodeInfo; //!< Collects nodes info when scanning tree structure
 
-  std::shared_ptr<const ParentNode> m_root;              //!< First (top) node of system model tree
-  TIdentifierMapping                m_identifierMapping; //!< Maps a node identifier to a node instance
-  std::ostringstream                m_infos;             //!< Collects info messages
-  std::ostringstream                m_warnings;          //!< Collects warning messages
-  std::ostringstream                m_errors;            //!< Collects error messages
-  uint32_t                          m_infosCount    = 0; //!< Total number of collected info messages
-  uint32_t                          m_warningsCount = 0; //!< Total number of collected warnings messages
-  uint32_t                          m_errorsCount   = 0; //!< Total number of collected errors messages
+  std::shared_ptr<ParentNode> m_root;              //!< First (top) node of system model tree
+  TIdentifierMapping          m_identifierMapping; //!< Maps a node identifier to a node instance
+  std::ostringstream          m_infos;             //!< Collects info messages
+  std::ostringstream          m_warnings;          //!< Collects warning messages
+  std::ostringstream          m_errors;            //!< Collects error messages
+  uint32_t                    m_infosCount    = 0; //!< Total number of collected info messages
+  uint32_t                    m_warningsCount = 0; //!< Total number of collected warnings messages
+  uint32_t                    m_errorsCount   = 0; //!< Total number of collected errors messages
 };
 //
 //  End of SystemModelCheckerVisitor class declaration

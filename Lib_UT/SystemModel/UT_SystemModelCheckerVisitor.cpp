@@ -18,8 +18,10 @@
 #include "TestModelBuilder.hpp"
 #include "SystemModelCheckResult_Traits.hpp"
 
+
 using std::string;
 using std::make_shared;
+using std::dynamic_pointer_cast;
 using namespace mast;
 using namespace test;
 
@@ -616,6 +618,38 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_When_MaxPath_Zero ()
   TS_ASSERT_EQUALS (report, expectedReport);
 }
 
+//! Checks SystemModelCheckerVisitor::CheckTree() when an access interface has no associated AccessInterfaceProtocol
+//!
+void UT_SystemModelCheckerVisitor::test_CheckTree_NoProtocol ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto tap = builder.Create_JTAG_TAP("", 6u, 2u);
+  auto reg = sm.CreateRegister("reg", BinaryVector::CreateFromBinaryString("10"),  tap);
+  auto ai  = dynamic_pointer_cast<AccessInterface>(tap);
+  TS_ASSERT_NOT_NULLPTR (ai);
+  ai->SetProtocol(nullptr);        // This remove any protocol associated with the AccessInterface
+
+  SystemModelCheckerVisitor sut(sm);
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.CheckTree());
+
+  // ---------------- Verify
+  //
+  auto result = sut.MakeCheckResult();
+
+  TS_ASSERT_TRUE    (result.HasWarnings());
+  TS_ASSERT_FALSE   (result.HasErrors());
+  TS_ASSERT_EQUALS  (result.infosCount, 0u);
+  TS_ASSERT_EQUALS  (result.warningsCount, 1u);
+  TS_ASSERT_DIFFERS (result.warnings,      "");
+  TS_ASSERT_DIFFERS (result.MakeReport(),  "");
+}
 
 //===========================================================================
 // End of UT_SystemModelCheckerVisitor.cpp

@@ -43,7 +43,9 @@ int gdb_put_packet(struct connection *connection, char *buffer, int len);
 
 static inline struct target *get_target_from_connection(struct connection *connection)
 {
-	struct gdb_service *gdb_service = connection->service->priv;
+
+    // update - Niels Grataloup <niels.grataloup@imag.fr> cast has been added to be -fpermissive compliant.
+	struct gdb_service *gdb_service = (struct gdb_service *)connection->service->priv;
 	return gdb_service->target;
 }
 

@@ -295,7 +295,7 @@ shared_ptr<AccessInterfaceProtocol> GetProtocol (Options::Protocol protocol, con
     case Options::Protocol::OpenOCD:
     {
       auto configFilePath = protocolOptions;
-      aiProtocol = make_shared<OpenOCDProtocol> (configFilePath);
+      aiProtocol = make_shared<OpenOCDProtocol> (configFilePath); // TODO passer la longueur IR (int)
       break;
     }
     case Options::Protocol::I2C_Emulation:

@@ -19,6 +19,32 @@
 #include <string>
 #include <experimental/string_view>
 
+extern "C" {
+    #include <openocd/config.h>    
+    #include <jtag/driver.h>
+    #include <jtag/jtag.h>
+    #include <transport/transport.h>
+    #include <helper/ioutil.h>
+    #include <helper/util.h>
+    #include <helper/configuration.h>
+    #include <flash/nor/core.h>
+    #include <flash/nand/core.h>
+    #include <pld/pld.h>
+    #include <flash/mflash.h>
+
+    #include <server/server.h>
+    #include <server/gdb_server.h>
+}
+#include "Utility.hpp"
+
+static const char openocd_startup_tcl[] = {
+#include "startup_tcl.inc"
+0 /* Terminate with zero */
+};
+
+extern "C" struct command_context *setup_command_handler(Jim_Interp *interp);
+
+
 namespace mast
 {
 //! Implement AccessInterfaceProtocol by sending SVF commands to file and receiving
@@ -30,7 +56,7 @@ class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
   // ---------------- Public  Methods
   //
   public:
-  virtual ~OpenOCDProtocol() = default;
+  ~OpenOCDProtocol();
   OpenOCDProtocol()          = delete;
   OpenOCDProtocol(std::experimental::string_view configFilePath);
 
@@ -55,6 +81,44 @@ class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
   // ---------------- Private  Methods
   //
   private:
+    //static int openocd_register_commands(struct command_context *cmd_ctx);
+    //void setup_command_handler(Jim_Interp *interp);
+    struct command_context *cmd_ctx;
+
+   /* static const struct command_registration openocd_command_handlers[] = {
+	    {
+		    .name = "version",
+		    .jim_handler = jim_version_command,
+		    .mode = COMMAND_ANY,
+		    .help = "show program version",
+	    },
+	    {
+		    .name = "noinit",
+		    .handler = &handle_noinit_command,
+		    .mode = COMMAND_CONFIG,
+		    .help = "Prevent 'init' from being called at startup.",
+		    .usage = ""
+	    },
+	    {
+		    .name = "init",
+		    .handler = &handle_init_command,
+		    .mode = COMMAND_ANY,
+		    .help = "Initializes configured targets and servers.  "
+			    "Changes command mode from CONFIG to EXEC.  "
+			    "Unless 'noinit' is called, this command is "
+			    "called automatically at the end of startup.",
+		    .usage = ""
+	    },
+	    {
+		    .name = "add_script_search_dir",
+		    .handler = &handle_add_script_search_dir_command,
+		    .mode = COMMAND_ANY,
+		    .help = "dir to search for config files and scripts",
+		    .usage = "<directory>"
+	    },
+	    { .name = NULL, .chain = NULL }
+    };*/
+    
 
   // ---------------- Private  Fields
   //

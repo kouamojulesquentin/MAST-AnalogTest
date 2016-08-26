@@ -13,9 +13,11 @@
 
 #include "SystemModelCheckerVisitor.hpp"
 #include "PathSelector.hpp"
+#include "AccessInterfaceProtocol.hpp"
 
 using namespace mast;
 using std::string;
+using std::to_string;
 using std::experimental::string_view;
 using std::shared_ptr;
 using std::dynamic_pointer_cast;
@@ -51,6 +53,7 @@ void SystemModelCheckerVisitor::CheckAccessInterface ()
 
   if (rootAsAI)
   {
+    CheckNumberOfDerivations(rootAsAI);
 //+    CheckNoAccessInterfaceBellow(rootAsAI);
   }
   else if (rootAsChain)
@@ -63,6 +66,7 @@ void SystemModelCheckerVisitor::CheckAccessInterface ()
       if (childAsAi)
       {
         ++aiCount;
+        CheckNumberOfDerivations(childAsAi);
 //+        CheckNoAccessInterfaceBellow(childAsAi);
       }
       else
@@ -199,6 +203,43 @@ bool SystemModelCheckerVisitor::CheckChildNode (shared_ptr<const ParentNode> par
 }
 //
 //  End of: SystemModelCheckerVisitor::CheckChildNode
+//---------------------------------------------------------------------------
+
+
+//! Checks the an interface has no more derivation than is supported by its protocol
+//!
+//! @note Does no check when there is no protocol (this is checked everywhere)
+//!
+void SystemModelCheckerVisitor::CheckNumberOfDerivations (shared_ptr<AccessInterface> accessInterface)
+{
+  auto protocol = accessInterface->Protocol();
+
+  if (protocol)
+  {
+    auto maxDerivations = protocol->MaxSupportedDerivations();
+    auto childrenCount  = accessInterface->DirectChildrenCount();
+
+    if (childrenCount >= maxDerivations) // Max derivations includes pseudo derivation reserved to do "Reset" action
+    {
+      auto message =   " has two much children ("                + to_string(childrenCount)
+                     + ") ; its protocol supports a maximum of " + to_string(maxDerivations)
+                     + " derivations (including one 'pseudo derivation' reserved for reset action)";
+      ReportError(*accessInterface, message);
+    }
+    else if (maxDerivations > (childrenCount + 1u))
+    {
+      auto diff = maxDerivations - childrenCount;
+      if (diff < 100u)  // Do not report for virtually unlimited maxDerivations
+      {
+        ReportInfo(*accessInterface,   " has only "                                                + to_string(childrenCount)
+                                     + " children even though its protocol supports a maximum of " + to_string(maxDerivations)
+                                     + " derivations (including one 'pseudo derivation' reserved for reset action)");
+      }
+    }
+  }
+}
+//
+//  End of: SystemModelCheckerVisitor::CheckNumberOfDerivations
 //---------------------------------------------------------------------------
 
 
@@ -358,6 +399,20 @@ void SystemModelCheckerVisitor::ReportError (const SystemModelNode& node, string
   Stream(os, node) << message;
 
   ReportError(os.str());
+}
+//
+//  End of: SystemModelCheckerVisitor::ReportError
+//---------------------------------------------------------------------------
+
+
+//! Reports an info for a node
+//!
+void SystemModelCheckerVisitor::ReportInfo (const SystemModelNode& node, string_view message)
+{
+  ostringstream os;
+  Stream(os, node) << message;
+
+  ReportInfo(os.str());
 }
 //
 //  End of: SystemModelCheckerVisitor::ReportError

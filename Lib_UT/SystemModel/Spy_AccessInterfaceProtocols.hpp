@@ -42,7 +42,7 @@ class Spy_AccessInterfaceProtocols final : public mast::AccessInterfaceProtocol
   //!
   //! @return The number of supported derivation (including pseudo derivation 0 for reset)
   //!
-  virtual uint32_t MaxSupportedDerivations() const override { return UINT32_MAX; }
+  virtual uint32_t MaxSupportedDerivations() const override { return 10u; }  // 10 is just used to be able to report that an AccessInterface as fewer derivation than is supported by its interface
 
   //! Returns readable type of protocol
   //!

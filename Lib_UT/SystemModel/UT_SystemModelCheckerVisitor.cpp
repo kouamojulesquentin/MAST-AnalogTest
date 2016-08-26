@@ -15,6 +15,8 @@
 #include "UT_SystemModelCheckerVisitor.hpp"
 #include "SystemModelCheckerVisitor.hpp"
 #include "DefaultBinaryPathSelector.hpp"
+#include "SVF_SimulationProtocol.hpp"
+#include "Spy_AccessInterfaceProtocols.hpp"
 #include "TestModelBuilder.hpp"
 #include "GmlPrinterVisitor.hpp"
 #include "SystemModelCheckResult_Traits.hpp"
@@ -752,7 +754,6 @@ void UT_SystemModelCheckerVisitor::test_Check_When_RootIsChainWithoutAccessInter
 
   // ---------------- Verify
   //
-  TS_ASSERT_TRUE   (result.HasErrors());
   TS_ASSERT_FALSE  (result.HasWarnings());
   TS_ASSERT_EQUALS (result.errorsCount, 3u); // 1 for no AccessInterface + 2 for regs that are not AccessInterface
 }
@@ -807,10 +808,6 @@ void UT_SystemModelCheckerVisitor::test_Check_When_RootIsChainWithMixKindChildre
 
 //+  tap_1->AppendChild(tap_2);
 
-//+  //+ (begin JFC August/26/2016): for debug purpose
-//+  //+ TS_ASSERT_EQUALS (GmlPrinterVisitor::Graph(sm.Root()), "");
-//+  //+ (end   JFC August/26/2016):
-
 
 //+  // ---------------- Exercise
 //+  //
@@ -823,6 +820,63 @@ void UT_SystemModelCheckerVisitor::test_Check_When_RootIsChainWithMixKindChildre
 //+}
 
 
+//! Checks SystemModelCheckerVisitor::CheckTree() when root is and AccessInterface but has 1 too much derivation
+//!
+void UT_SystemModelCheckerVisitor::test_Check_When_AccessInterface_has_MoreDerivations ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  SystemModelBuilder builder(sm);
+
+  auto protocol = make_shared<SVF_SimulationProtocol>();
+  auto tap      = builder.Create_JTAG_TAP("1500", 8u, 3u, protocol);
+  auto reg_1    = sm.CreateRegister("reg_1", BinaryVector::CreateFromBinaryString("01"), tap);
+  auto reg_2    = sm.CreateRegister("reg_2", BinaryVector::CreateFromBinaryString("10"), tap);
+  tap->SetChildAppender(nullptr);
+  auto reg_3    = sm.CreateRegister("reg_3", BinaryVector::CreateFromBinaryString("11"), tap);
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelCheckerVisitor::Check(sm);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE  (result.HasWarnings());
+  TS_ASSERT_EQUALS (result.errorsCount,  1u);
+}
+
+
+//! Checks SystemModelCheckerVisitor::CheckTree() when root is and AccessInterface but has fewer
+//! derivations than supported by its derivation
+//!
+void UT_SystemModelCheckerVisitor::test_Check_When_AccessInterface_has_LessDerivations ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  SystemModelBuilder builder(sm);
+
+  auto protocol = make_shared<Spy_AccessInterfaceProtocols>();
+  auto tap      = builder.Create_JTAG_TAP("1500", 8u, 3u, protocol);
+  auto reg_1    = sm.CreateRegister("reg_1", BinaryVector::CreateFromBinaryString("01"), tap);
+  auto reg_2    = sm.CreateRegister("reg_2", BinaryVector::CreateFromBinaryString("10"), tap);
+
+  //+ (begin JFC August/26/2016): for debug purpose
+//+   TS_ASSERT_EQUALS (GmlPrinterVisitor::Graph(sm.Root()), "", GmlPrinterOptions::All);
+  //+ (end   JFC August/26/2016):
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelCheckerVisitor::Check(sm);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE  (result.HasWarnings());
+  TS_ASSERT_FALSE  (result.HasErrors());
+  TS_ASSERT_EQUALS (result.infosCount,  1u);
+  TS_ASSERT_EQUALS (result.MakeReport(), "");
+}
 
 
 //! Checks SystemModelCheckerVisitor::CheckTree() when an access interface has no associated AccessInterfaceProtocol

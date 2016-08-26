@@ -64,6 +64,9 @@ class UT_SystemModelCheckerVisitor : public CxxTest::TestSuite
   void test_Check_When_RootIsChainWithMixKindChildren ();
 //+  void test_Check_When_RootIsAccessInterface_and_AnotherBellow ();
 
+  void test_Check_When_AccessInterface_has_MoreDerivations ();
+  void test_Check_When_AccessInterface_has_LessDerivations ();
+
   void test_CheckTree_NoProtocol ();
 
   // ================ Other Methods ================

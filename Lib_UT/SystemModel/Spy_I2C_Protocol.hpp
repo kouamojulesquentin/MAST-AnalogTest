@@ -37,6 +37,14 @@ class Spy_I2C_Protocol final : public mast::I2C_Player
   //!
   virtual mast::BinaryVector DoAction(uint32_t derivationId, void* interfaceData, const mast::BinaryVector& toSutData) override;
 
+  //! Gets the number of derivations supported by the specific protocol
+  //!
+  //! @note Derivation id 0 is reserved for reset operation, so protocol must support a least two derivations
+  //!
+  //! @return The number of supported derivation (including pseudo derivation 0 for reset)
+  //!
+  virtual uint32_t MaxSupportedDerivations() const override { return 2u; }
+
   const std::vector<std::string>& I2CCommands() const { return m_commands; }
 
   //! Returns readable type of protocol

@@ -32,6 +32,11 @@ string SVF_Player::CreateSVFCommand (uint32_t derivationId, const BinaryVector& 
 
   switch (derivationId)
   {
+    case 0u:
+      THROW_INVALID_ARGUMENT("Reset operation is not yet implemented");
+      //! @todo [JFC]-[August/26/2016]: In DoAction(): Do a reset operation for derivationId 0
+      //!
+      break;
     case 1u:
       commandType = "SIR";
       break;
@@ -39,7 +44,7 @@ string SVF_Player::CreateSVFCommand (uint32_t derivationId, const BinaryVector& 
       commandType = "SDR";
       break;
     default:
-      THROW_INVALID_ARGUMENT("DerivationId must be '1' (for SIR), or '2' (for SDR)");
+      THROW_INVALID_ARGUMENT("DerivationId must be '0' (for Reset), '1' (for SIR) or '2' (for SDR)");
       break;
   }
 

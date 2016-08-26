@@ -38,6 +38,13 @@ class DLL_EXPORT I2C_Player : public AccessInterfaceProtocol
   I2C_Player(std::initializer_list<uint32_t> addresses, std::experimental::string_view commandsPrefix = "");
   I2C_Player(std::vector<uint32_t>           addresses, std::experimental::string_view commandsPrefix = "");
 
+  //! Gets the number of derivations supported by the specific protocol
+  //!
+  //! @note Derivation id 0 is reserved for reset operation, so protocol must support a least two derivations
+  //!
+  //! @return The number of supported derivation (including pseudo derivation 0 for reset)
+  //!
+  virtual uint32_t MaxSupportedDerivations() const override { return m_addresses.size(); }
 
   std::string CommandsPrefix() const { return m_commandPrefix; }  //!< Returns current commands prefix
 

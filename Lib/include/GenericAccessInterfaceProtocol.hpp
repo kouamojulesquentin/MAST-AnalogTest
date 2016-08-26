@@ -53,6 +53,14 @@ class DLL_EXPORT GenericAccessInterfaceProtocol : public AccessInterfaceProtocol
   //!
   using Action  = std::function<BinaryVector(const std::vector<Primitive>&, void*, const BinaryVector&)>;
 
+  //! Gets the number of derivations supported by the specific protocol
+  //!
+  //! @note Derivation id 0 is reserved for reset operation, so protocol must support a least two derivations
+  //!
+  //! @return The number of supported derivation (including pseudo derivation 0 for reset)
+  //!
+  virtual uint32_t MaxSupportedDerivations() const override { return m_actions.size(); }
+
   GenericAccessInterfaceProtocol(std::initializer_list<Action> actions, std::initializer_list<Primitive> primitives);
   GenericAccessInterfaceProtocol(std::vector<Action>           actions, std::vector<Primitive>           primitives);
 

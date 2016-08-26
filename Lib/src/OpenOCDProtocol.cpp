@@ -21,20 +21,28 @@ using std::experimental::string_view;
 
 //! Initializes OpenOCD "engine"
 //!
-OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, int iIrLength)
+//! @param configFilePath path of the configuration file for the adapter (USB dongle, FTDI...)
+//! @param designName name of the SystemModel.
+//! @param iIrLength size of the IR register within the system.
+OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, string_view designName, int iIrLength)
 {
 
-   this->cmd_ctx = setup_command_handler(NULL);
+    // setup_command_handler registers all handlers used by all different blocs from OpenOCD,
+    // such as callbacks for JTAG, Flash, drivers, and so on. 
+    this->cmd_ctx = setup_command_handler(NULL);
 
     command_context_mode(this->cmd_ctx, COMMAND_CONFIG);
 
     command_set_output_handler(this->cmd_ctx, configuration_output_handler, NULL);
 
+    // configuration files are parsed through JimTcl.
+    // command_run_line() can process interface and TAP description scripts, indicate the required debug_level...
+    // This is why "script " prior string is required.
     string_view adapter_config_string = "script " + configFilePath;
 
     int ret = command_run_line(cmd_ctx, (char*)adapter_config_string.data());
 
-	CheckParameterCondition<int>("OpenOCDProtocol.cpp", "OpenOCDProtocol", 35, ret, (ret != ERROR_COMMAND_CLOSE_CONNECTION), "[OpenOCD] Could not parse the adapter configuration file.");
+	CheckParameterCondition<int>("OpenOCDProtocol.cpp", "OpenOCDProtocol", 35, ret, (ret != ERROR_COMMAND_CLOSE_CONNECTION), "[OpenOCD] Command requesting the parsing of the configuration file is unsupported.");
 
 	CheckParameterCondition<int>("OpenOCDProtocol.cpp", "OpenOCDProtocol", 37, ret, (ret == ERROR_OK), "[OpenOCD] Error while parsing the adapter configuration file.");
 
@@ -44,20 +52,27 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, int iIrLength)
     ret = ioutil_init(this->cmd_ctx);
 	CheckParameterCondition<int>("OpenOCDProtocol.cpp", "OpenOCDProtocol", 43, ret, (ret == ERROR_OK), "[OpenOCD] ioutil_init has failed.");
 
+    // Initialising the adapter.
     adapter_init(this->cmd_ctx);
 
+    // Now we build the corresponding System Description
     struct jtag_tap *m_tap = NULL;
 
     m_tap = (struct jtag_tap*)calloc(1, sizeof(*m_tap));
 
     CheckValueIsNotNullptr<struct jtag_tap*>("OpenOCDProtocol.cpp", "OpenOCDProtocol", 51, m_tap, "[OpenOCD] Making the TAP returns NULL.");
 
-    m_tap->chip = strdup("zybo");
+    m_tap->chip = strdup(designName.data());
 
+    // We want OpenOCD working in "boudary scan mode"
     m_tap->tapname = strdup("bs");
 
-    m_tap->dotted_name = strdup("zybo.bs");
+    string_view s_dotted_name = designName + ".bs";
 
+    // As a chip may have multiple TAPs, OpenOCD describes each TAP by a dotted name: chip.tapname
+    m_tap->dotted_name = strdup(s_dotted_name.data());
+
+    // For boundary scans, OpenOCD only needs the size of the IR register.
     m_tap->ir_length = iIrLength;
 
     m_tap->enabled = true;
@@ -78,6 +93,7 @@ OpenOCDProtocol::~OpenOCDProtocol()
 {
     struct jtag_tap *m_tap = jtag_all_taps();
 
+    // We need to destruct all TAPs.
     while(m_tap != NULL) {
         struct jtag_tap *m_tap_n = m_tap->next_tap;
         jtag_tap_free(m_tap);

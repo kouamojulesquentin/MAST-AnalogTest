@@ -295,7 +295,7 @@ shared_ptr<AccessInterfaceProtocol> GetProtocol (Options::Protocol protocol, con
     case Options::Protocol::OpenOCD:
     {
       auto configFilePath = protocolOptions;
-      aiProtocol = make_shared<OpenOCDProtocol> (configFilePath, 8); // @todo passer la longueur IR (int) - NG
+      aiProtocol = make_shared<OpenOCDProtocol> (configFilePath, "zybo", 8); // @todo passer la longueur IR (int) - NG
       break;
     }
     case Options::Protocol::I2C_Emulation:

@@ -58,7 +58,8 @@ class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
   public:
   ~OpenOCDProtocol();
   OpenOCDProtocol()          = delete;
-  OpenOCDProtocol(std::experimental::string_view configFilePath, int iIrLength);
+  OpenOCDProtocol(std::experimental::string_view configFilePath,
+                    std::experimental::string_view designName, int iIrLength);
 
   //! Does any action required to transfer scan data to and from SUT
   //!

@@ -21,7 +21,7 @@ using std::experimental::string_view;
 
 //! Initializes OpenOCD "engine"
 //!
-OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath)
+OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, int iIrLength)
 {
 
    this->cmd_ctx = setup_command_handler(NULL);
@@ -30,7 +30,9 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath)
 
     command_set_output_handler(this->cmd_ctx, configuration_output_handler, NULL);
 
-    int ret = command_run_line(cmd_ctx, "script /home/gratalou/forge/mast_dvl/mast-devel/openocd/openocd-ft2232.cfg");
+    string_view adapter_config_string = "script " + configFilePath;
+
+    int ret = command_run_line(cmd_ctx, (char*)adapter_config_string.data());
 
 	CheckParameterCondition<int>("OpenOCDProtocol.cpp", "OpenOCDProtocol", 35, ret, (ret != ERROR_COMMAND_CLOSE_CONNECTION), "[OpenOCD] Could not parse the adapter configuration file.");
 
@@ -48,8 +50,7 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath)
 
     m_tap = (struct jtag_tap*)calloc(1, sizeof(*m_tap));
 
-    if(m_tap == NULL)
-        THROW_INVALID_ARGUMENT("[OpenOCD] Making the TAP returns NULL.");
+    CheckValueIsNotNullptr<struct jtag_tap*>("OpenOCDProtocol.cpp", "OpenOCDProtocol", 51, m_tap, "[OpenOCD] Making the TAP returns NULL.");
 
     m_tap->chip = strdup("zybo");
 
@@ -57,7 +58,7 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath)
 
     m_tap->dotted_name = strdup("zybo.bs");
 
-    m_tap->ir_length = 8;
+    m_tap->ir_length = iIrLength;
 
     m_tap->enabled = true;
 

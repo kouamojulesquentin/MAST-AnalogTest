@@ -58,7 +58,7 @@ class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
   public:
   ~OpenOCDProtocol();
   OpenOCDProtocol()          = delete;
-  OpenOCDProtocol(std::experimental::string_view configFilePath);
+  OpenOCDProtocol(std::experimental::string_view configFilePath, int iIrLength);
 
   //! Does any action required to transfer scan data to and from SUT
   //!
@@ -81,43 +81,7 @@ class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
   // ---------------- Private  Methods
   //
   private:
-    //static int openocd_register_commands(struct command_context *cmd_ctx);
-    //void setup_command_handler(Jim_Interp *interp);
     struct command_context *cmd_ctx;
-
-   /* static const struct command_registration openocd_command_handlers[] = {
-	    {
-		    .name = "version",
-		    .jim_handler = jim_version_command,
-		    .mode = COMMAND_ANY,
-		    .help = "show program version",
-	    },
-	    {
-		    .name = "noinit",
-		    .handler = &handle_noinit_command,
-		    .mode = COMMAND_CONFIG,
-		    .help = "Prevent 'init' from being called at startup.",
-		    .usage = ""
-	    },
-	    {
-		    .name = "init",
-		    .handler = &handle_init_command,
-		    .mode = COMMAND_ANY,
-		    .help = "Initializes configured targets and servers.  "
-			    "Changes command mode from CONFIG to EXEC.  "
-			    "Unless 'noinit' is called, this command is "
-			    "called automatically at the end of startup.",
-		    .usage = ""
-	    },
-	    {
-		    .name = "add_script_search_dir",
-		    .handler = &handle_add_script_search_dir_command,
-		    .mode = COMMAND_ANY,
-		    .help = "dir to search for config files and scripts",
-		    .usage = "<directory>"
-	    },
-	    { .name = NULL, .chain = NULL }
-    };*/
     
 
   // ---------------- Private  Fields

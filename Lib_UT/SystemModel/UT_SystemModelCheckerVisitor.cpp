@@ -16,6 +16,7 @@
 #include "SystemModelCheckerVisitor.hpp"
 #include "DefaultBinaryPathSelector.hpp"
 #include "TestModelBuilder.hpp"
+#include "GmlPrinterVisitor.hpp"
 #include "SystemModelCheckResult_Traits.hpp"
 
 
@@ -78,7 +79,7 @@ void UT_SystemModelCheckerVisitor::test_CheckIdentifiers_With_EmptyModel ()
 
   SystemModelCheckerVisitor sut(sm);
 
-  // ---------------- Exercise & Verify
+  // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.CheckIdentifiers());
 
@@ -110,7 +111,7 @@ void UT_SystemModelCheckerVisitor::test_CheckIdentifiers_With_ModelWithTap ()
 
   SystemModelCheckerVisitor sut(sm);
 
-  // ---------------- Exercise & Verify
+  // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.CheckIdentifiers());
 
@@ -138,7 +139,7 @@ void UT_SystemModelCheckerVisitor::test_CheckIdentifiers_With_UnusedIdentifier (
   sm.RemoveNodeFromModel(reg_1);
   SystemModelCheckerVisitor sut(sm);
 
-  // ---------------- Exercise & Verify
+  // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.CheckIdentifiers());
 
@@ -168,7 +169,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_With_EmptyModel ()
 
   SystemModelCheckerVisitor sut(sm);
 
-  // ---------------- Exercise & Verify
+  // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.CheckTree());
 
@@ -202,7 +203,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_With_ModelWithTap ()
 
   SystemModelCheckerVisitor sut(sm);
 
-  // ---------------- Exercise & Verify
+  // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.CheckTree());
 
@@ -231,7 +232,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_ParentWithoutChild ()
 
   SystemModelCheckerVisitor sut(sm);
 
-  // ---------------- Exercise & Verify
+  // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.CheckTree());
 
@@ -268,7 +269,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_UnmanagedNode ()
 
   SystemModelCheckerVisitor sut(sm);
 
-  // ---------------- Exercise & Verify
+  // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.CheckTree());
 
@@ -305,7 +306,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_UnreachableNode ()
 
   SystemModelCheckerVisitor sut(sm);
 
-  // ---------------- Exercise & Verify
+  // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.CheckTree());
 
@@ -343,7 +344,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_NodeAppendedTwice ()
 
   SystemModelCheckerVisitor sut(sm);
 
-  // ---------------- Exercise & Verify
+  // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.CheckTree());
 
@@ -381,7 +382,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_NodeAppendedTwice_SameParent_1
 
   SystemModelCheckerVisitor sut(sm);
 
-  // ---------------- Exercise & Verify
+  // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.CheckTree());
 
@@ -420,7 +421,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_NodeAppendedTwice_SameParent_2
 
   SystemModelCheckerVisitor sut(sm);
 
-  // ---------------- Exercise & Verify
+  // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.CheckTree());
 
@@ -456,7 +457,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_NodeAppended_ToSelf_Last ()
 
   SystemModelCheckerVisitor sut(sm);
 
-  // ---------------- Exercise & Verify
+  // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.CheckTree());
 
@@ -492,7 +493,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_NodeAppended_ToSelf_Middle ()
 
   SystemModelCheckerVisitor sut(sm);
 
-  // ---------------- Exercise & Verify
+  // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.CheckTree());
 
@@ -528,7 +529,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_When_Linker_Less_Children ()
 
   SystemModelCheckerVisitor sut(sm);
 
-  // ---------------- Exercise & Verify
+  // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.CheckTree());
 
@@ -564,7 +565,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_When_Linker_More_Children ()
 
   SystemModelCheckerVisitor sut(sm);
 
-  // ---------------- Exercise & Verify
+  // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.CheckTree());
 
@@ -599,7 +600,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_When_MaxPath_Zero ()
 
   SystemModelCheckerVisitor sut(sm);
 
-  // ---------------- Exercise & Verify
+  // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.CheckTree());
 
@@ -618,6 +619,212 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_When_MaxPath_Zero ()
   TS_ASSERT_EQUALS (report, expectedReport);
 }
 
+
+//! Checks SystemModelCheckerVisitor::CheckTree() when there is no AccessInterface
+//!
+void UT_SystemModelCheckerVisitor::test_Check_When_NoAccessInterface ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  SystemModelBuilder builder(sm);
+
+  auto wrapper = builder.Create_1500_Wrapper("1500", 2u);
+  auto reg_1   = sm.CreateRegister("reg_1", BinaryVector::CreateFromBinaryString("01"),  wrapper);
+  auto reg_2   = sm.CreateRegister("reg_2", BinaryVector::CreateFromBinaryString("10"),  wrapper);
+
+  SystemModelCheckerVisitor sut(sm);
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelCheckerVisitor::Check(sm);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE    (result.HasErrors());
+  TS_ASSERT_FALSE   (result.HasWarnings());
+  TS_ASSERT_EQUALS  (result.infosCount,   0u);
+  TS_ASSERT_EQUALS  (result.errorsCount,  2u);  // 2 for No AccessInterface + for child not an AccessInterface
+  TS_ASSERT_DIFFERS (result.errors,       "");
+  TS_ASSERT_DIFFERS (result.MakeReport(), "");
+}
+
+
+//! Checks SystemModelCheckerVisitor::CheckTree() when root is and AccessInterface
+//!
+void UT_SystemModelCheckerVisitor::test_Check_When_RootIsAccessInterface ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("1500", 8u, 3u);
+  auto reg_1 = sm.CreateRegister("reg_1", BinaryVector::CreateFromBinaryString("01"), tap);
+  auto reg_2 = sm.CreateRegister("reg_2", BinaryVector::CreateFromBinaryString("10"), tap);
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelCheckerVisitor::Check(sm);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE (result.HasErrors());
+  TS_ASSERT_FALSE (result.HasWarnings());
+}
+
+
+//! Checks SystemModelCheckerVisitor::CheckTree() when root is a Chain with single AccessInterface
+//!
+void UT_SystemModelCheckerVisitor::test_Check_When_RootIsChainWithAccessInterface ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto root  = sm.CreateChain("root");
+  auto tap   = builder.Create_JTAG_TAP("1500", 8u, 3u);
+  auto reg_1 = sm.CreateRegister("reg_1", BinaryVector::CreateFromBinaryString("01"), tap);
+  auto reg_2 = sm.CreateRegister("reg_2", BinaryVector::CreateFromBinaryString("10"), tap);
+
+  root->AppendChild(tap);
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelCheckerVisitor::Check(sm);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE (result.HasErrors());
+  TS_ASSERT_FALSE (result.HasWarnings());
+}
+
+
+//! Checks SystemModelCheckerVisitor::CheckTree() when root is a Chain with several AccessInterface
+//!
+void UT_SystemModelCheckerVisitor::test_Check_When_RootIsChainWithAccessInterfaces ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto root  = sm.CreateChain("root");
+  auto tap_1 = builder.Create_JTAG_TAP("1500_1", 8u, 2u);
+  auto tap_2 = builder.Create_JTAG_TAP("1500_2", 8u, 2u);
+  auto tap_3 = builder.Create_JTAG_TAP("1500_3", 8u, 2u);
+  auto reg_1 = sm.CreateRegister("reg_1", BinaryVector::CreateFromBinaryString("01"), tap_1);
+  auto reg_2 = sm.CreateRegister("reg_2", BinaryVector::CreateFromBinaryString("10"), tap_2);
+  auto reg_3 = sm.CreateRegister("reg_2", BinaryVector::CreateFromBinaryString("11"), tap_3);
+
+  root->AppendChild(tap_1);
+  root->AppendChild(tap_2);
+  root->AppendChild(tap_3);
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelCheckerVisitor::Check(sm);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE (result.HasErrors());
+  TS_ASSERT_FALSE (result.HasWarnings());
+}
+
+
+//! Checks SystemModelCheckerVisitor::CheckTree() when root is a Chain without AccessInterface
+//!
+void UT_SystemModelCheckerVisitor::test_Check_When_RootIsChainWithoutAccessInterface ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto root  = sm.CreateChain("root");
+  auto reg_1 = sm.CreateRegister("reg_1", BinaryVector::CreateFromBinaryString("01"), root);
+  auto reg_2 = sm.CreateRegister("reg_2", BinaryVector::CreateFromBinaryString("10"), root);
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelCheckerVisitor::Check(sm);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE   (result.HasErrors());
+  TS_ASSERT_FALSE  (result.HasWarnings());
+  TS_ASSERT_EQUALS (result.errorsCount, 3u); // 1 for no AccessInterface + 2 for regs that are not AccessInterface
+}
+
+
+//! Checks SystemModelCheckerVisitor::CheckTree() when root is a Chain with AccessInterface and a register
+//!
+void UT_SystemModelCheckerVisitor::test_Check_When_RootIsChainWithMixKindChildren ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto root  = sm.CreateChain("root");
+  auto tap_1 = builder.Create_JTAG_TAP("1500_1", 8u, 2u);
+  auto tap_2 = builder.Create_JTAG_TAP("1500_2", 8u, 2u);
+  auto reg_1 = sm.CreateRegister("reg_1", BinaryVector::CreateFromBinaryString("01"), tap_1);
+  auto reg_2 = sm.CreateRegister("reg_2", BinaryVector::CreateFromBinaryString("10"), tap_2);
+  auto reg_3 = sm.CreateRegister("reg_3", BinaryVector::CreateFromBinaryString("11"), root);
+
+  root->AppendChild(tap_1);
+  root->AppendChild(tap_2);
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelCheckerVisitor::Check(sm);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE   (result.HasErrors());
+  TS_ASSERT_FALSE  (result.HasWarnings());
+  TS_ASSERT_EQUALS (result.errorsCount, 1u); // 1 for child not an AccessInterface
+}
+
+
+//! Checks SystemModelCheckerVisitor::CheckTree() when root is an AccessInterface and there is anoter one bellow
+//!
+//+void UT_SystemModelCheckerVisitor::test_Check_When_RootIsAccessInterface_and_AnotherBellow ()
+//+{
+//+  // ---------------- Setup
+//+  //
+//+  SystemModel sm;
+//+  TestModelBuilder builder(sm);
+
+//+  auto tap_1 = builder.Create_JTAG_TAP("1500_1", 8u, 4u);
+//+  auto reg_1 = sm.CreateRegister("reg_1", BinaryVector::CreateFromBinaryString("01"), tap_1);
+//+  auto reg_2 = sm.CreateRegister("reg_2", BinaryVector::CreateFromBinaryString("10"), tap_1);
+//+  auto tap_2 = builder.Create_JTAG_TAP("1500_2", 8u, 3u);
+//+  auto reg_3 = sm.CreateRegister("reg_3", BinaryVector::CreateFromBinaryString("011"), tap_2);
+//+  auto reg_4 = sm.CreateRegister("reg_4", BinaryVector::CreateFromBinaryString("100"), tap_2);
+
+//+  tap_1->AppendChild(tap_2);
+
+//+  //+ (begin JFC August/26/2016): for debug purpose
+//+  //+ TS_ASSERT_EQUALS (GmlPrinterVisitor::Graph(sm.Root()), "");
+//+  //+ (end   JFC August/26/2016):
+
+
+//+  // ---------------- Exercise
+//+  //
+//+  auto result = SystemModelCheckerVisitor::Check(sm);
+
+//+  // ---------------- Verify
+//+  //
+//+  TS_ASSERT_FALSE (result.HasWarnings());
+//+  TS_ASSERT_EQUALS (result.MakeReport(), "");
+//+}
+
+
+
+
 //! Checks SystemModelCheckerVisitor::CheckTree() when an access interface has no associated AccessInterfaceProtocol
 //!
 void UT_SystemModelCheckerVisitor::test_CheckTree_NoProtocol ()
@@ -635,7 +842,7 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_NoProtocol ()
 
   SystemModelCheckerVisitor sut(sm);
 
-  // ---------------- Exercise & Verify
+  // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (sut.CheckTree());
 

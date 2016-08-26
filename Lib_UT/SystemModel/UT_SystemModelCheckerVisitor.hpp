@@ -54,8 +54,15 @@ class UT_SystemModelCheckerVisitor : public CxxTest::TestSuite
 
   void test_CheckTree_When_Linker_Less_Children ();
   void test_CheckTree_When_Linker_More_Children ();
-
   void test_CheckTree_When_MaxPath_Zero ();
+
+  void test_Check_When_NoAccessInterface ();
+  void test_Check_When_RootIsAccessInterface ();
+  void test_Check_When_RootIsChainWithAccessInterface ();
+  void test_Check_When_RootIsChainWithAccessInterfaces ();
+  void test_Check_When_RootIsChainWithoutAccessInterface ();
+  void test_Check_When_RootIsChainWithMixKindChildren ();
+//+  void test_Check_When_RootIsAccessInterface_and_AnotherBellow ();
 
   void test_CheckTree_NoProtocol ();
 

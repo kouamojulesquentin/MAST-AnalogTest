@@ -346,10 +346,10 @@ void UT_SystemModelBuilder::test_Create_MIB_1_Derivation ()
 
   // With SystemModel checker
   auto result = sm.Check();
-  TS_ASSERT_FALSE (result.HasErrors());
+  TS_ASSERT_EQUALS (result.errorsCount,   3u);  // 3 for missing AccessInterface + 2 chidren not AccessInterface
+  TS_ASSERT_EQUALS (result.warningsCount, 1u);  // 1 for linker with no child
 
   // Check with GmlPrinterVisitor
-
   auto gotGraph = GmlPrinterVisitor::Graph(sm.Root());
   auto expected = string(
                          "graph\n"
@@ -418,10 +418,10 @@ void UT_SystemModelBuilder::test_Create_MIB_4_Derivations ()
 
   // With SystemModel checker
   auto result = sm.Check();
-  TS_ASSERT_FALSE (result.HasErrors());
+  TS_ASSERT_EQUALS (result.errorsCount,   3u);  // 3 for missing AccessInterface + 2 chidren not AccessInterface
+  TS_ASSERT_EQUALS (result.warningsCount, 1u);  // 1 for linker with no child
 
   // Check with GmlPrinterVisitor
-
   auto gotGraph = GmlPrinterVisitor::Graph(sm.Root());
   auto expected = string(
                          "graph\n"

@@ -51,6 +51,12 @@ class DLL_EXPORT SystemModelCheckerVisitor final : public SystemModelVisitor
   //!
   //! @see CheckIdentifiers and CheckTree
   //!
+  static SystemModelCheckResult Check(const SystemModel& model) { return SystemModelCheckerVisitor(model).Check(); };
+
+  //! Checks SystemModel consistency
+  //!
+  //! @see CheckIdentifiers and CheckTree
+  //!
   SystemModelCheckResult Check();
 
   //! Checks consistency of identifiers:
@@ -80,19 +86,22 @@ class DLL_EXPORT SystemModelCheckerVisitor final : public SystemModelVisitor
   // ---------------- Private  Methods
   //
   private:
+  using string_view = std::experimental::string_view;
+
+  void CheckAccessInterface ();
   void CheckParentNode (std::shared_ptr<const ParentNode> parent);
   bool CheckChildNode  (std::shared_ptr<const ParentNode> parent, std::shared_ptr<const SystemModelNode> child);
 
   void Report (std::experimental::string_view  message, uint32_t& counter, std::ostringstream& os);
 
-  void ReportInfo    (std::experimental::string_view message) { Report(message, m_infosCount,    m_infos);    }
-  void ReportWarning (std::experimental::string_view message) { Report(message, m_warningsCount, m_warnings); }
-  void ReportError   (std::experimental::string_view message) { Report(message, m_errorsCount,   m_errors);   }
+  void ReportInfo    (string_view message) { Report(message, m_infosCount,    m_infos);    }
+  void ReportWarning (string_view message) { Report(message, m_warningsCount, m_warnings); }
+  void ReportError   (string_view message) { Report(message, m_errorsCount,   m_errors);   }
 
-  void ReportWarning (const SystemModelNode& node, std::experimental::string_view message);
-  void ReportError   (const SystemModelNode& node, std::experimental::string_view message);
+  void ReportWarning (const SystemModelNode& node, string_view message);
+  void ReportError   (const SystemModelNode& node, string_view message);
 
-  static std::ostringstream& Stream(std::ostringstream& os, std::experimental::string_view header, const SystemModelNode& node);
+  static std::ostringstream& Stream(std::ostringstream& os, string_view header, const SystemModelNode& node);
   static std::ostringstream& Stream(std::ostringstream& os, const SystemModelNode& node) { return Stream(os, "", node); }
 
   // ---------------- Private  Fields
@@ -106,8 +115,8 @@ class DLL_EXPORT SystemModelCheckerVisitor final : public SystemModelVisitor
   };
 
   using TCollectedNodeInfo = std::vector<CollectedNodeInfo>;
-  TCollectedNodeInfo                m_collectedNodeInfo; //!< Collects nodes info when scanning tree structure
 
+  TCollectedNodeInfo          m_collectedNodeInfo; //!< Collects nodes info when scanning tree structure
   std::shared_ptr<ParentNode> m_root;              //!< First (top) node of system model tree
   TIdentifierMapping          m_identifierMapping; //!< Maps a node identifier to a node instance
   std::ostringstream          m_infos;             //!< Collects info messages
@@ -121,8 +130,6 @@ class DLL_EXPORT SystemModelCheckerVisitor final : public SystemModelVisitor
 //  End of SystemModelCheckerVisitor class declaration
 //---------------------------------------------------------------------------
 } // End of namespace mast
-
-
 
 
 #endif  // not defined SYSTEMMODELCHECKERVISITOR_H__51E1518C_6330_4646_7A6_B51ECBAB1C6A__INCLUDED_

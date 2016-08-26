@@ -41,6 +41,52 @@ SystemModelCheckResult SystemModelCheckerVisitor::Check ()
 //---------------------------------------------------------------------------
 
 
+//! Checks that root is an AccessInterface or a Chain with only AccessInterface
+//! and there is no more AccessInterface below the hierarchy
+//!
+void SystemModelCheckerVisitor::CheckAccessInterface ()
+{
+  auto rootAsAI    = dynamic_pointer_cast<AccessInterface > (m_root);
+  auto rootAsChain = dynamic_pointer_cast<Chain>(m_root);
+
+  if (rootAsAI)
+  {
+//+    CheckNoAccessInterfaceBellow(rootAsAI);
+  }
+  else if (rootAsChain)
+  {
+    auto aiCount = 0u;
+    auto child = rootAsChain->FirstChild();
+    while (child)
+    {
+      auto childAsAi = dynamic_pointer_cast<AccessInterface>(child);
+      if (childAsAi)
+      {
+        ++aiCount;
+//+        CheckNoAccessInterfaceBellow(childAsAi);
+      }
+      else
+      {
+        ReportError(*child, ", children of Chain root node is not an AccessInterface");
+      }
+      child = child->NextSibling();
+    }
+
+    if (aiCount == 0)
+    {
+      ReportError(*rootAsChain, " has no AccessInterface child");
+    }
+  }
+  else
+  {
+    ReportError(*m_root, " is neither an AccessInterface nor a Chain");
+  }
+}
+//
+//  End of: SystemModelCheckerVisitor::CheckAccessInterface
+//---------------------------------------------------------------------------
+
+
 
 //! Checks consistency of identifiers mapping:
 //!
@@ -236,6 +282,10 @@ void SystemModelCheckerVisitor::CheckTree ()
   m_collectedNodeInfo.resize(m_identifierMapping.size());
 
   m_root->Accept(*this);            // Process parent node specifically
+
+  // ---------------- AccessInterface check
+  //
+  CheckAccessInterface();
   CheckParentNode(m_root);
 
   // ---------------- Check that each node is reachable (no dangling node)

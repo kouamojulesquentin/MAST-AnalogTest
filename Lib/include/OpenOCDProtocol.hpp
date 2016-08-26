@@ -16,34 +16,9 @@
   #define OPENOCDPROTOCOL_H__1670F41A_CA14_4C39_E89B_D855CFF1A020__INCLUDED_
 
 #include "AccessInterfaceProtocol.hpp"
-#include <string>
 #include <experimental/string_view>
 
-extern "C" {
-    #include <openocd/config.h>    
-    #include <jtag/driver.h>
-    #include <jtag/jtag.h>
-    #include <transport/transport.h>
-    #include <helper/ioutil.h>
-    #include <helper/util.h>
-    #include <helper/configuration.h>
-    #include <flash/nor/core.h>
-    #include <flash/nand/core.h>
-    #include <pld/pld.h>
-    #include <flash/mflash.h>
-
-    #include <server/server.h>
-    #include <server/gdb_server.h>
-}
-#include "Utility.hpp"
-
-static const char openocd_startup_tcl[] = {
-#include "startup_tcl.inc"
-0 /* Terminate with zero */
-};
-
-extern "C" struct command_context *setup_command_handler(Jim_Interp *interp);
-
+struct command_context;
 
 namespace mast
 {
@@ -57,9 +32,8 @@ class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
   //
   public:
   ~OpenOCDProtocol();
-  OpenOCDProtocol()          = delete;
-  OpenOCDProtocol(std::experimental::string_view configFilePath,
-                    std::experimental::string_view designName, int iIrLength);
+  OpenOCDProtocol() = delete;
+  OpenOCDProtocol(std::experimental::string_view configFilePath, std::experimental::string_view designName, int iIrLength);
 
   //! Does any action required to transfer scan data to and from SUT
   //!
@@ -75,18 +49,11 @@ class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
   //!
   virtual std::experimental::string_view KindName() const override { return "OpenOCD"; }
 
-  // ---------------- Protected Methods
-  //
-  protected:
-
-  // ---------------- Private  Methods
-  //
-  private:
-    struct command_context *cmd_ctx;
-    
 
   // ---------------- Private  Fields
   //
+  private:
+  command_context* m_cmd_ctx;
 };
 //
 //  End of OpenOCDProtocol class declaration

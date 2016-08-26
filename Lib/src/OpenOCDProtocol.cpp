@@ -84,7 +84,7 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, string_view design
 
   adapter_init(this->m_cmd_ctx);
 
-  auto tap = static_cast<jtag_tap*>(calloc(1, sizeof(*tap));
+  auto tap = static_cast<jtag_tap*>(calloc(1, sizeof(jtag_tap)));
 
   CHECK_VALUE_NOT_NULL(tap, "[OpenOCD] Making the TAP returns NULL.");
 
@@ -124,8 +124,8 @@ OpenOCDProtocol::~OpenOCDProtocol()
     tap = tap_n;
   }
 
-  unregister_all_commands(cmd_ctx, nullptr);
-  command_done(cmd_ctx);
+  unregister_all_commands(m_cmd_ctx, nullptr);
+  command_done(m_cmd_ctx);
   adapter_quit();
   #endif  // not define _WIN32
 }

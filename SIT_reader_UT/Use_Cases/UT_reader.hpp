@@ -16,20 +16,22 @@
   #define UT_reader_H__INCLUDED_
 
 #include <cxxtest/TestSuite.h>
+#include <memory>
 
-#include "SystemModelBuilder.hpp"
-using namespace mast;
+namespace mast
+{
+  class SystemModel;
+} // End of namespace mast
 
-//! Dummy Unit tests
-//!
+//! Unit tests for class SystemModelBuilder SIT_Reader
 //!
 class UT_reader : public CxxTest::TestSuite
 {
   public:
-   UT_reader();
+   UT_reader() = default;
   ~UT_reader() = default;
 
-  // ---------------- Constructor
+  // ---------------- Tests
   //
   void test_register ();
   void test_chain ();

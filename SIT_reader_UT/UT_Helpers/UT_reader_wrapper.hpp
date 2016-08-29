@@ -16,26 +16,20 @@
   #define UT_reader_wrapper_H__INCLUDED_
 
 #include <string>
-using std::string;
+#include <utility>
 
-namespace test 
+namespace test
 {
-//! reader Unit tests
+//! Helpers to test SIT_reader
 //!
-//!
- class UT_reader_wrapper final
- {
+class UT_reader_wrapper final
+{
   public:
    UT_reader_wrapper() = default;
   ~UT_reader_wrapper() = default;
 
-  // ---------------- Constructor
-  //
-  pair<string,std::shared_ptr<mast::SystemModelNode>> run_parser_for_UT(string input_SIT, std::shared_ptr<mast::SystemModel> sm);
-
-  // ---------------- Private  Methods
-  //
- };
+  static std::pair<std::string, std::shared_ptr<mast::SystemModelNode>> run_parser_for_UT(const std::string& input_SIT, std::shared_ptr<mast::SystemModel> sm);
+};
 //
 //  End of UT_reader_wrapper class declaration
 //---------------------------------------------------------------------------

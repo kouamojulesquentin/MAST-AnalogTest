@@ -11,7 +11,6 @@
 //!
 //===========================================================================
 
-
 #include <experimental/string_view>
 #include <iostream>
 #include <sstream>
@@ -23,46 +22,27 @@
 
 using std::string;
 using std::experimental::string_view;
+using std::pair;
+using std::make_pair;
 
 using namespace test;
+using namespace mast;
 
 
-pair<string,std::shared_ptr<mast::SystemModelNode>> UT_reader_wrapper::run_parser_for_UT(string input_SIT, std::shared_ptr<mast::SystemModel> sm)
+pair<string, std::shared_ptr<mast::SystemModelNode>> UT_reader_wrapper::run_parser_for_UT(const string& input_SIT, std::shared_ptr<mast::SystemModel> sm)
 {
-  // ---------------- Exercise
-  //
-//  GmlPrinterVisitor sut;
+  std::stringstream stream(input_SIT);
+  SIT::SIT_Reader driver(sm);
 
-  // ---------------- Verify
-  //
-      SIT::SIT_Reader driver(sm);
+  auto parse_result = driver.parse(stream);
 
-   std::stringstream stream;
-  
- 
-     stream << input_SIT ;
+  if (parse_result == false) {
+    return make_pair("PARSING ERROR", shared_ptr<SystemModelNode>(nullptr));
+  }
 
-   auto parse_result = driver.parse(stream);
+  auto actual_PrettyPrint = PrettyPrinterVisitor::PrettyPrint(driver.parsed_sut, PrettyPrinterOptions::ShowSelectorProperties);
 
-   pair<string,std::shared_ptr<mast::SystemModelNode>> result;
-
-   if (parse_result == false) {
-      result.first = "PARSING ERROR";
-      return result;
-      }
-   
-   /*Regarder les appels de PrettyPrinter sans "accept"
-   prettyPrinter::xxxquelque chosexxx qui retourne le string*/
-   PrettyPrinterVisitor 
-           prettyPrinter(PrettyPrinterOptions::ShowSelectorProperties);
-
-   driver.parsed_sut->Accept(prettyPrinter);
-   auto actual_PrettyPrint      = prettyPrinter.PrettyPrint();
-
-  result.first =actual_PrettyPrint ;
-  result.second = driver.parsed_sut ;
- 
-  return result;
+  return make_pair(actual_PrettyPrint, driver.parsed_sut);
 }
 
 

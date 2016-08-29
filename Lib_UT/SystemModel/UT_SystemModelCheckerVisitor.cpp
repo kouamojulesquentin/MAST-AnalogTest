@@ -1089,6 +1089,87 @@ void UT_SystemModelCheckerVisitor::test_Check_SameNames_Mix_Regs_and_Ignored_2 (
 }
 
 
+//! Checks SystemModelCheckerVisitor::Check() when a register has no valid name (cannot be identified by path)
+//!
+void UT_SystemModelCheckerVisitor::test_Check_NoName_Reg ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("Tap", 8u, 4u);
+  auto reg_1 = sm.CreateRegister("reg_1", BinaryVector::CreateFromBinaryString("01"), tap);
+  auto reg_2 = sm.CreateRegister("reg_2", BinaryVector::CreateFromBinaryString("10"), tap);
+  auto reg_3 = sm.CreateRegister("",      BinaryVector::CreateFromBinaryString("11"), tap);
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelCheckerVisitor::Check(sm);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (result.infosCount,    1u);  // This is just an info because this is not mandatory to be identified by path
+  TS_ASSERT_EQUALS (result.warningsCount, 0u);
+  TS_ASSERT_EQUALS (result.errorsCount,   0u);
+}
+
+
+//! Checks SystemModelCheckerVisitor::Check() when a ParentNode has no valid name and not ignored for node paths (cannot be identified by path)
+//!
+void UT_SystemModelCheckerVisitor::test_Check_NoName_Parent ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("Tap", 8u, 4u);
+  auto reg_1 = sm.CreateRegister("Foo", BinaryVector::CreateFromBinaryString("01"), tap);
+  auto reg_2 = sm.CreateRegister("Bar", BinaryVector::CreateFromBinaryString("01"), tap);
+  auto chain = sm.CreateChain("",    tap);
+  auto reg_3 = sm.CreateRegister("Bar", BinaryVector::CreateFromBinaryString("11"), chain);
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelCheckerVisitor::Check(sm);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (result.infosCount,    0u);
+  TS_ASSERT_EQUALS (result.warningsCount, 1u);
+  TS_ASSERT_EQUALS (result.errorsCount,   0u);
+//+  TS_ASSERT_EQUALS (result.MakeReport(), "");
+}
+
+
+//! Checks SystemModelCheckerVisitor::Check() when a ParentNode has no valid name but ignored for node paths (cannot be identified by path)
+//!
+void UT_SystemModelCheckerVisitor::test_Check_NoName_Ignored ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("Tap", 8u, 4u);
+  auto reg_1 = sm.CreateRegister("Foo", BinaryVector::CreateFromBinaryString("01"), tap);
+  auto reg_2 = sm.CreateRegister("Bar", BinaryVector::CreateFromBinaryString("01"), tap);
+  auto chain = sm.CreateChain("",    tap);  chain->IgnoreForNodePath(true);
+  auto reg_3 = sm.CreateRegister("Bar", BinaryVector::CreateFromBinaryString("11"), chain);
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelCheckerVisitor::Check(sm);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (result.infosCount,    0u);
+  TS_ASSERT_EQUALS (result.warningsCount, 0u);
+  TS_ASSERT_EQUALS (result.errorsCount,   0u);
+}
+
+
 //! Checks SystemModelCheckerVisitor::CheckTree() when an access interface has no associated AccessInterfaceProtocol
 //!
 void UT_SystemModelCheckerVisitor::test_Check_NoProtocol ()

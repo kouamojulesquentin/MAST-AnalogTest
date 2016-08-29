@@ -77,6 +77,10 @@ class UT_SystemModelCheckerVisitor : public CxxTest::TestSuite
   void test_Check_SameNames_Mix_Regs_and_Ignored_1 ();
   void test_Check_SameNames_Mix_Regs_and_Ignored_2 ();
 
+  void test_Check_NoName_Reg ();
+  void test_Check_NoName_Parent ();
+  void test_Check_NoName_Ignored ();
+
   void test_Check_NoProtocol ();
 
   // ================ Other Methods ================

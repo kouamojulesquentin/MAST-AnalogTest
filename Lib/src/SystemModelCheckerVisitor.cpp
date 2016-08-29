@@ -304,6 +304,12 @@ void SystemModelCheckerVisitor::CheckParentNode (shared_ptr<const ParentNode> pa
 
 //! Checks name of a child node relative to its previous sibling(s)
 //!
+//! @note It checks for no name and duplicate names
+//!       - For no name, it is acceptable unless for parent nodes that are not declared to be ignored for node paths.
+//!         Otherwise, it is just an info
+//!       - For duplicates, it is acceptable for parent nodes that are declared to be ignored for node paths.
+//!         Otherwise it is a warning or info
+//!
 //! @param [in]      child        Child node to check
 //! @param [in, out] childNames   Set names of already processed children that are not ignored path
 //! @param [in, out] ignoredNames Set names of already processed children that are ignored for paths
@@ -311,19 +317,31 @@ void SystemModelCheckerVisitor::CheckParentNode (shared_ptr<const ParentNode> pa
 void SystemModelCheckerVisitor::CheckSiblingName (shared_ptr<SystemModelNode> child, set<string_view>& childNames, set<string_view>& ignoredNames)
 {
   auto asParentNode = dynamic_pointer_cast<const ParentNode>(child);
+  auto name         = child->Name();
+  auto noName       = name.empty() || (name == "unnamed");
+  auto ignored      = asParentNode && asParentNode->IgnoreForNodePath();
 
-  auto name                 = child->Name();
-  auto ignored              = asParentNode && asParentNode->IgnoreForNodePath();
-  auto sameNameAsIgnored    = ignoredNames.count(name) != 0;
-  auto sameNameAsNotIgnored = childNames.count(name)   != 0;
+  if (noName)
+  {
+    auto isParent = asParentNode != nullptr;
 
-       if (sameNameAsNotIgnored && !ignored) ReportError (*child, " Has same name as a previous sibling");
-  else if (sameNameAsNotIgnored && ignored)  ReportInfo  (*child, " Has same name as a previous sibling (it is ignored for node paths)");
-  else if (sameNameAsIgnored    && !ignored) ReportInfo  (*child, " Has same name as a previous sibling (that is ignored for node paths)");
-  else if (sameNameAsIgnored    && ignored)  ReportInfo  (*child, " Has same name as previous sibling (both are ignored for node paths)");
+    if      (!isParent) ReportInfo    (*child, " Has no valid name");
+    else if (!ignored)  ReportWarning (*child, " Has no valid name, even though it is parent node not ignored for node paths");
 
-  ignored ? ignoredNames.emplace(name)
-          : childNames.emplace(name);
+  }
+  else
+  {
+    auto sameNameAsIgnored    = ignoredNames.count(name) != 0;
+    auto sameNameAsNotIgnored = childNames.count(name)   != 0;
+
+         if (sameNameAsNotIgnored && !ignored) ReportError (*child, " Has same name as a previous sibling");
+    else if (sameNameAsNotIgnored && ignored)  ReportInfo  (*child, " Has same name as a previous sibling (it is ignored for node paths)");
+    else if (sameNameAsIgnored    && !ignored) ReportInfo  (*child, " Has same name as a previous sibling (that is ignored for node paths)");
+    else if (sameNameAsIgnored    && ignored)  ReportInfo  (*child, " Has same name as previous sibling (both are ignored for node paths)");
+
+    ignored ? ignoredNames.emplace(name)
+            : childNames.emplace(name);
+  }
 }
 //
 //  End of: SystemModelCheckerVisitor::CheckSiblingName

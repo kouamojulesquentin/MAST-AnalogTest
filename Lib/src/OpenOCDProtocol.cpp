@@ -114,6 +114,9 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, string_view design
 OpenOCDProtocol::~OpenOCDProtocol()
 {
   #ifndef _WIN32
+  
+  // Here we put the tap in RESET state (i.e. like if TRST were pulsed.)
+  jtag_add_statemove(TAP_RESET);
   auto tap = jtag_all_taps();
 
   // We need to destruct all TAPs.

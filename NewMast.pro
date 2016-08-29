@@ -3,8 +3,9 @@ CONFIG  += ordered
 CONFIG  -= qml_debug
 
 SUBDIRS += \
-    Logger     \
-    Lib        \
-    Lib_UT     \
-    SIT_reader \
+    Logger        \
+    Lib           \
+    Lib_UT        \
+    SIT_reader    \
+    SIT_reader_UT \
     TestCasesApp

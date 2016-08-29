@@ -18,23 +18,6 @@
 #include <string>
 
 #ifndef _WIN32
-extern "C"
-{
-    #include <openocd/config.h>
-    #include <jtag/driver.h>
-    #include <jtag/jtag.h>
-    #include <transport/transport.h>
-    #include <helper/ioutil.h>
-    #include <helper/util.h>
-    #include <helper/configuration.h>
-    #include <flash/nor/core.h>
-    #include <flash/nand/core.h>
-    #include <pld/pld.h>
-    #include <flash/mflash.h>
-
-    #include <server/server.h>
-    #include <server/gdb_server.h>
-}
 
 static const char openocd_startup_tcl[] = {
 #include "startup_tcl.inc"
@@ -102,7 +85,22 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, string_view design
   tap->enabled   = true;
 
   jtag_tap_init(tap);
-  jtag_add_reset(0, 0);
+
+  // OpenOCD has an 'internal' variable (i.e. static) indicating if hardware TRST is supported by
+  // the adapter and the target.
+  this->m_supported_resets = jtag_get_reset_config();
+
+  
+  // Some adapters and JTAG TAP do not provide a TRST pin. If the m_supported_resets attribute has the
+  // RESET_HAS_TRST flag positive, we do it by hardware, otherwise we pass by the state machine.
+  if(this->m_supported_resets & RESET_HAS_TRST)
+    jtag_add_reset(1, 0);
+  else
+    jtag_add_reset(0, 0);
+
+  ret = jtag_execute_queue();
+
+  CHECK_TRUE(ret == ERROR_OK, "[OpenOCD] jtag_execute_queue has failed.");
 }
 #endif  // not define _WIN32
 //
@@ -115,8 +113,18 @@ OpenOCDProtocol::~OpenOCDProtocol()
 {
   #ifndef _WIN32
   
-  // Here we put the tap in RESET state (i.e. like if TRST were pulsed.)
-  jtag_add_statemove(TAP_RESET);
+  // Here we put the tap in RESET state
+  if(this->m_supported_resets & RESET_HAS_TRST)
+    jtag_add_reset(1, 0);           // Hardware reset is supported, TRST is enabled for one TCK cycle.
+  else
+    jtag_add_statemove(TAP_RESET);  // At least one of the toolchain components does not provide a TRST pin.
+                                    // Using FSM instead.
+
+  int ret = jtag_execute_queue();
+
+  CHECK_TRUE(ret == ERROR_OK, "[OpenOCD] jtag_execute_queue has failed.");
+
+
   auto tap = jtag_all_taps();
 
   // We need to destruct all TAPs.
@@ -164,9 +172,13 @@ BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfac
   switch (derivationId)
   {
     case 0u:
-      THROW_INVALID_ARGUMENT("Reset operation is not yet implemented");
-      //! @todo [JFC]-[August/26/2016]: In DoAction(): Do a reset operation for derivationId 0
-      //!
+      // Some adapters and JTAG TAP do not provide a TRST pin. If the m_supported_resets attribute has the
+      // RESET_HAS_TRST flag positive, we do it by hardware, otherwise we pass by the state machine.
+      if(this->m_supported_resets & RESET_HAS_TRST)
+        jtag_add_reset(1, 0);           // TRST is enabled for one TCK cycle.
+      else
+        jtag_add_statemove(TAP_RESET);  // One of the toolchain components does not provide a TRST pin.
+                                        // Using FSM instead.
       break;
     case 1u:
       jtag_add_plain_ir_scan(bitsCount, toSutData.Data(), fromSutDataBuffer.data(), TAP_IDLE);
@@ -188,7 +200,7 @@ BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfac
 }
 #endif
 //
-//  End of: Spy_AccessInterfaceProtocols::DoAction
+//  End of: OpenOCDProtocol::DoAction
 //---------------------------------------------------------------------------
 
 //===========================================================================

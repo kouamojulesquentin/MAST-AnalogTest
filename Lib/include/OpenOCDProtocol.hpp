@@ -83,9 +83,10 @@ class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
   //
   private:
   #ifndef _WIN32
-  command_context* m_cmd_ctx;
+  command_context* m_cmd_ctx;  //!< OpenOCD structure containing the whole context of the current OpenOCD session configuration.
 
-  enum reset_types m_supported_resets;
+  enum reset_types m_supported_resets; //!< Contains which kind of physical reset (TRST / SRST) is supported by the toolchain (adapter + TAP). JTAG TAP only requires TRST.
+
   #endif  // not define _WIN32
 };
 //

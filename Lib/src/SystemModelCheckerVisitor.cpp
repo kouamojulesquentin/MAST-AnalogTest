@@ -22,6 +22,7 @@ using std::experimental::string_view;
 using std::shared_ptr;
 using std::dynamic_pointer_cast;
 using std::vector;
+using std::set;
 using std::ostringstream;
 
 
@@ -259,6 +260,9 @@ void SystemModelCheckerVisitor::CheckParentNode (shared_ptr<const ParentNode> pa
   }
   else
   {
+    set<string_view> childNames;
+    set<string_view> ignoredNames;
+
     while (nextChild)
     {
       if (nextChild == parent)
@@ -275,6 +279,8 @@ void SystemModelCheckerVisitor::CheckParentNode (shared_ptr<const ParentNode> pa
         }
         else
         {
+          CheckSiblingName(nextChild, childNames, ignoredNames);
+
           nextChild->Accept(*this);   // Do check specific to node type
 
           // ---------------- Recurse when child is also a parent
@@ -293,6 +299,34 @@ void SystemModelCheckerVisitor::CheckParentNode (shared_ptr<const ParentNode> pa
 }
 //
 //  End of: SystemModelCheckerVisitor::CheckParentNode
+//---------------------------------------------------------------------------
+
+
+//! Checks name of a child node relative to its previous sibling(s)
+//!
+//! @param [in]      child        Child node to check
+//! @param [in, out] childNames   Set names of already processed children that are not ignored path
+//! @param [in, out] ignoredNames Set names of already processed children that are ignored for paths
+//!
+void SystemModelCheckerVisitor::CheckSiblingName (shared_ptr<SystemModelNode> child, set<string_view>& childNames, set<string_view>& ignoredNames)
+{
+  auto asParentNode = dynamic_pointer_cast<const ParentNode>(child);
+
+  auto name                 = child->Name();
+  auto ignored              = asParentNode && asParentNode->IgnoreForNodePath();
+  auto sameNameAsIgnored    = ignoredNames.count(name) != 0;
+  auto sameNameAsNotIgnored = childNames.count(name)   != 0;
+
+       if (sameNameAsNotIgnored && !ignored) ReportError (*child, " Has same name as a previous sibling");
+  else if (sameNameAsNotIgnored && ignored)  ReportInfo  (*child, " Has same name as a previous sibling (it is ignored for node paths)");
+  else if (sameNameAsIgnored    && !ignored) ReportInfo  (*child, " Has same name as a previous sibling (that is ignored for node paths)");
+  else if (sameNameAsIgnored    && ignored)  ReportInfo  (*child, " Has same name as previous sibling (both are ignored for node paths)");
+
+  ignored ? ignoredNames.emplace(name)
+          : childNames.emplace(name);
+}
+//
+//  End of: SystemModelCheckerVisitor::CheckSiblingName
 //---------------------------------------------------------------------------
 
 

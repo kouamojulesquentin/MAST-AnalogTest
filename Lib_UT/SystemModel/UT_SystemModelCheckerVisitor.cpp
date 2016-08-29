@@ -830,7 +830,7 @@ void UT_SystemModelCheckerVisitor::test_Check_When_AccessInterface_has_MoreDeriv
   SystemModelBuilder builder(sm);
 
   auto protocol = make_shared<SVF_SimulationProtocol>();
-  auto tap      = builder.Create_JTAG_TAP("1500", 8u, 3u, protocol);
+  auto tap      = builder.Create_JTAG_TAP("Tap", 8u, 3u, protocol);
   auto reg_1    = sm.CreateRegister("reg_1", BinaryVector::CreateFromBinaryString("01"), tap);
   auto reg_2    = sm.CreateRegister("reg_2", BinaryVector::CreateFromBinaryString("10"), tap);
   tap->SetChildAppender(nullptr);
@@ -858,7 +858,7 @@ void UT_SystemModelCheckerVisitor::test_Check_When_AccessInterface_has_LessDeriv
   SystemModelBuilder builder(sm);
 
   auto protocol = make_shared<Spy_AccessInterfaceProtocols>();
-  auto tap      = builder.Create_JTAG_TAP("1500", 8u, 3u, protocol);
+  auto tap      = builder.Create_JTAG_TAP("Tap", 8u, 3u, protocol);
   auto reg_1    = sm.CreateRegister("reg_1", BinaryVector::CreateFromBinaryString("01"), tap);
   auto reg_2    = sm.CreateRegister("reg_2", BinaryVector::CreateFromBinaryString("10"), tap);
 
@@ -875,13 +875,223 @@ void UT_SystemModelCheckerVisitor::test_Check_When_AccessInterface_has_LessDeriv
   TS_ASSERT_FALSE  (result.HasWarnings());
   TS_ASSERT_FALSE  (result.HasErrors());
   TS_ASSERT_EQUALS (result.infosCount,  1u);
-  TS_ASSERT_EQUALS (result.MakeReport(), "");
+//+  TS_ASSERT_EQUALS (result.MakeReport(), "");
+}
+
+
+//! Checks SystemModelCheckerVisitor::Check() when two Register share the same name
+//!
+void UT_SystemModelCheckerVisitor::test_Check_SameNames_Only_Regs ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("Tap", 8u, 4u);
+  auto reg_1 = sm.CreateRegister("reg",   BinaryVector::CreateFromBinaryString("01"), tap);
+  auto reg_2 = sm.CreateRegister("reg_2", BinaryVector::CreateFromBinaryString("10"), tap);
+  auto reg_3 = sm.CreateRegister("reg",   BinaryVector::CreateFromBinaryString("11"), tap);
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelCheckerVisitor::Check(sm);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (result.infosCount,    0u);
+  TS_ASSERT_EQUALS (result.warningsCount, 0u);
+  TS_ASSERT_EQUALS (result.errorsCount,   1u);
+//+  TS_ASSERT_EQUALS (result.MakeReport(), "");
+}
+
+
+//! Checks SystemModelCheckerVisitor::Check() when two ParentNode share the same name
+//!
+void UT_SystemModelCheckerVisitor::test_Check_SameNames_Only_Parents ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("Tap", 8u, 4u);
+  auto chain_1 = sm.CreateChain("chain",   tap);
+  auto chain_2 = sm.CreateChain("chain_2", tap);
+  auto chain_3 = sm.CreateChain("chain",   tap);
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelCheckerVisitor::Check(sm);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (result.infosCount,    0u);
+  TS_ASSERT_EQUALS (result.warningsCount, 3u);  // For no child in chain
+  TS_ASSERT_EQUALS (result.errorsCount,   1u);  // For same name
+}
+
+
+//! Checks SystemModelCheckerVisitor::Check() when one ParentNode and a Register share the same name
+//!
+void UT_SystemModelCheckerVisitor::test_Check_SameNames_Mix_Regs_and_Parents ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto tap     = builder.Create_JTAG_TAP("Tap", 8u, 4u);
+  auto reg     = sm.CreateRegister("Foo", BinaryVector::CreateFromBinaryString("01"), tap);
+  auto chain_1 = sm.CreateChain(   "Bar", tap);
+  auto chain_2 = sm.CreateChain(   "Foo", tap);
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelCheckerVisitor::Check(sm);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (result.infosCount,    0u);
+  TS_ASSERT_EQUALS (result.warningsCount, 2u);  // For no child in chains
+  TS_ASSERT_EQUALS (result.errorsCount,   1u);  // For same name
+}
+
+
+//! Checks SystemModelCheckerVisitor::Check() when two ParentNode share the same name but are ignored
+//!
+void UT_SystemModelCheckerVisitor::test_Check_SameNames_Only_Ignored ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("Tap", 8u, 4u);
+  auto chain_1 = sm.CreateChain("chain",   tap); chain_1->IgnoreForNodePath(true);
+  auto chain_2 = sm.CreateChain("chain_2", tap); chain_2->IgnoreForNodePath(true);
+  auto chain_3 = sm.CreateChain("chain",   tap); chain_3->IgnoreForNodePath(true);
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelCheckerVisitor::Check(sm);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (result.infosCount,    1u);  // For same name but ignored
+  TS_ASSERT_EQUALS (result.warningsCount, 3u);  // For no child in chain
+  TS_ASSERT_EQUALS (result.errorsCount,   0u);
+}
+
+
+//! Checks SystemModelCheckerVisitor::Check() when two ParentNode share the same name and 1st one is ignored
+//!
+void UT_SystemModelCheckerVisitor::test_Check_SameNames_Some_Ignored_1 ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("Tap", 8u, 4u);
+  auto chain_1 = sm.CreateChain("chain",   tap); chain_1->IgnoreForNodePath(true);
+  auto chain_2 = sm.CreateChain("chain_2", tap);
+  auto chain_3 = sm.CreateChain("chain",   tap);
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelCheckerVisitor::Check(sm);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (result.infosCount,    1u);  // For same name but ignored
+  TS_ASSERT_EQUALS (result.warningsCount, 3u);  // For no child in chain
+  TS_ASSERT_EQUALS (result.errorsCount,   0u);
+}
+
+
+//! Checks SystemModelCheckerVisitor::Check() when two ParentNode share the same name and 2nd one is ignored
+//!
+void UT_SystemModelCheckerVisitor::test_Check_SameNames_Some_Ignored_2 ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("Tap", 8u, 4u);
+  auto chain_1 = sm.CreateChain("chain",   tap);
+  auto chain_2 = sm.CreateChain("chain_2", tap);
+  auto chain_3 = sm.CreateChain("chain",   tap); chain_3->IgnoreForNodePath(true);
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelCheckerVisitor::Check(sm);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (result.infosCount,    1u);  // For same name but ignored
+  TS_ASSERT_EQUALS (result.warningsCount, 3u);  // For no child in chain
+  TS_ASSERT_EQUALS (result.errorsCount,   0u);
+}
+
+
+//! Checks SystemModelCheckerVisitor::Check() when a Register has same name as a following ParentNode that is ignored for node paths
+//!
+void UT_SystemModelCheckerVisitor::test_Check_SameNames_Mix_Regs_and_Ignored_1 ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("Tap", 8u, 4u);
+  auto reg     = sm.CreateRegister("Foo", BinaryVector::CreateFromBinaryString("01"), tap);
+  auto chain_1 = sm.CreateChain("Bar", tap);
+  auto chain_2 = sm.CreateChain("Foo", tap); chain_2->IgnoreForNodePath(true);
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelCheckerVisitor::Check(sm);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (result.infosCount,    1u);  // For same name but ignored
+  TS_ASSERT_EQUALS (result.warningsCount, 2u);  // For no child in chains
+  TS_ASSERT_EQUALS (result.errorsCount,   0u);
+}
+
+
+//! Checks SystemModelCheckerVisitor::Check() when a Register has same name as a previous ParentNode that is ignored for node paths
+//!
+void UT_SystemModelCheckerVisitor::test_Check_SameNames_Mix_Regs_and_Ignored_2 ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto tap   = builder.Create_JTAG_TAP("Tap", 8u, 4u);
+  auto chain_1 = sm.CreateChain("Foo", tap); chain_1->IgnoreForNodePath(true);
+  auto chain_2 = sm.CreateChain("Bar", tap);
+  auto reg     = sm.CreateRegister("Foo", BinaryVector::CreateFromBinaryString("01"), tap);
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelCheckerVisitor::Check(sm);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (result.infosCount,    1u);  // For same name but ignored
+  TS_ASSERT_EQUALS (result.warningsCount, 2u);  // For no child in chain
+  TS_ASSERT_EQUALS (result.errorsCount,   0u);
+//+  TS_ASSERT_EQUALS (result.MakeReport(), "");
 }
 
 
 //! Checks SystemModelCheckerVisitor::CheckTree() when an access interface has no associated AccessInterfaceProtocol
 //!
-void UT_SystemModelCheckerVisitor::test_CheckTree_NoProtocol ()
+void UT_SystemModelCheckerVisitor::test_Check_NoProtocol ()
 {
   // ---------------- Setup
   //
@@ -894,16 +1104,12 @@ void UT_SystemModelCheckerVisitor::test_CheckTree_NoProtocol ()
   TS_ASSERT_NOT_NULLPTR (ai);
   ai->SetProtocol(nullptr);        // This remove any protocol associated with the AccessInterface
 
-  SystemModelCheckerVisitor sut(sm);
-
   // ---------------- Exercise
   //
-  TS_ASSERT_THROWS_NOTHING (sut.CheckTree());
+  auto result = SystemModelCheckerVisitor::Check(sm);
 
   // ---------------- Verify
   //
-  auto result = sut.MakeCheckResult();
-
   TS_ASSERT_TRUE    (result.HasWarnings());
   TS_ASSERT_FALSE   (result.HasErrors());
   TS_ASSERT_EQUALS  (result.infosCount, 0u);

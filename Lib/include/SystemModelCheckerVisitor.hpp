@@ -22,6 +22,7 @@
 #include <memory>
 #include <vector>
 #include <sstream>
+#include <set>
 
 namespace mast
 {
@@ -92,6 +93,7 @@ class DLL_EXPORT SystemModelCheckerVisitor final : public SystemModelVisitor
   void CheckParentNode          (std::shared_ptr<const ParentNode> parent);
   bool CheckChildNode           (std::shared_ptr<const ParentNode> parent, std::shared_ptr<const SystemModelNode> child);
   void CheckNumberOfDerivations (std::shared_ptr<AccessInterface>  accessInterface);
+  void CheckSiblingName         (std::shared_ptr<SystemModelNode>, std::set<string_view>& childNames, std::set<string_view>& ignoredNames);
 
   void Report (std::experimental::string_view  message, uint32_t& counter, std::ostringstream& os);
 

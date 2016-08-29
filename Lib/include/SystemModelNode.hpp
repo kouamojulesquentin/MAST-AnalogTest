@@ -48,13 +48,11 @@ class DLL_EXPORT SystemModelNode
   //
   public:
 
-  using NodeIdentifier   = uint32_t;                              //!< Uniquely identifies a node
-//+  using ConditionFunctor = std::function<bool(SystemModelNode*)>; //!< Defines pre- and post- condition functors
+  using NodeIdentifier = uint32_t; //!< Uniquely identifies a node
 
+  virtual void Accept (SystemModelVisitor& visitor) = 0; //!< Visited part of the Visitor pattern
 
-  virtual void Accept        (SystemModelVisitor& visitor) = 0;   //!< Visited part of the Visitor pattern
-
-  virtual std::experimental::string_view TypeName() const = 0;          //!< Returns readable type name
+  virtual std::experimental::string_view TypeName() const = 0; //!< Returns readable type name
 
   // ---------------- Setters
   //
@@ -83,11 +81,11 @@ class DLL_EXPORT SystemModelNode
   void*                               ApplicationData() const { return m_applicationData; }               //!< Retrieve application specific data
   std::shared_ptr<mast::Conditioners> Conditioners()    const { return m_conditioners;    }               //!< Returns current condition checker
   NodeIdentifier                      Identifier()      const { return m_identifier;      }               //!< Returns node unique identifier
-  std::string                         Name()            const { return m_name;            }               //!< Returns current node name
+  const std::string&                  Name()            const { return m_name;            }               //!< Returns current node name
   std::shared_ptr<SystemModelNode>    NextSibling()     const { return m_pNextSibling;    }               //!< Returns next sibling or nullptr
   uint32_t                            Priority()        const { return m_priority;        }               //!< Returns currently assigned priority
   bool                                HasConditioner()  const { return m_conditioners  ? true : false ;}  //!< Returns true if there is some condition to check
-  virtual uint32_t                    PendingCount()   const { return m_pendingCount; }                  //!< Returns number of pending registers down the hierarchy
+  virtual uint32_t                    PendingCount()    const { return m_pendingCount; }                  //!< Returns number of pending registers down the hierarchy
   virtual bool                        IsPending()       const { return m_pendingCount  != 0;    }         //!< Returns true if at least one node in the hierarchy is pending (need an update cycle)
 
   // ---------------- Protected Methods
@@ -96,10 +94,6 @@ class DLL_EXPORT SystemModelNode
   virtual ~SystemModelNode() = default;
   SystemModelNode()  = delete;
   SystemModelNode(std::experimental::string_view name);
-
-
-
-
 
   // ---------------- Private  Methods
   //

@@ -73,9 +73,9 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, string_view design
 
   tap->chip = strdup(designName.data());
 
-  // We want OpenOCD working in "boudary scan mode"
-  tap->tapname       = strdup("bs");
-  auto s_dotted_name = designName + ".bs"s;
+  // We want OpenOCD working in "single TAP mode"
+  tap->tapname       = strdup("tap");
+  auto s_dotted_name = designName + ".tap"s;
 
   // As a chip may have multiple TAPs, OpenOCD describes each TAP by a dotted name: chip.tapname
   tap->dotted_name = strdup(s_dotted_name.data());

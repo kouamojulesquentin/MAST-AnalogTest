@@ -26,7 +26,6 @@ using std::set;
 using std::ostringstream;
 
 
-
 //! Checks SystemModel consistency
 //!
 //! @see CheckIdentifiers and CheckTree
@@ -401,105 +400,6 @@ void SystemModelCheckerVisitor::CheckTree ()
 }
 //
 //  End of: SystemModelCheckerVisitor::CheckTree
-//---------------------------------------------------------------------------
-
-
-
-//! Builds up a SystemModelCheckResult from currently selected issues
-//!
-SystemModelCheckResult SystemModelCheckerVisitor::MakeCheckResult ()
-{
-  SystemModelCheckResult result;
-
-  result.errors        = m_errors.str();
-  result.warnings      = m_warnings.str();
-  result.infos         = m_infos.str();
-
-  result.errorsCount   = m_errorsCount;
-  result.warningsCount = m_warningsCount;
-  result.infosCount    = m_infosCount;
-
-  return result;
-}
-//
-//  End of: SystemModelCheckerVisitor::MakeCheckResult
-//---------------------------------------------------------------------------
-
-
-//! Reports an error, warning or info
-//!
-void SystemModelCheckerVisitor::Report (string_view message, uint32_t& counter, ostringstream& os)
-{
-  if (counter != 0)
-  {
-    os << std::endl;
-  }
-
-  os << "  - " << message;
-  ++counter;
-}
-//
-//  End of: SystemModelCheckerVisitor::ReportError
-//---------------------------------------------------------------------------
-
-
-//! Reports an error for a node
-//!
-void SystemModelCheckerVisitor::ReportError (const SystemModelNode& node, string_view message)
-{
-  ostringstream os;
-  Stream(os, node) << message;
-
-  ReportError(os.str());
-}
-//
-//  End of: SystemModelCheckerVisitor::ReportError
-//---------------------------------------------------------------------------
-
-
-//! Reports an info for a node
-//!
-void SystemModelCheckerVisitor::ReportInfo (const SystemModelNode& node, string_view message)
-{
-  ostringstream os;
-  Stream(os, node) << message;
-
-  ReportInfo(os.str());
-}
-//
-//  End of: SystemModelCheckerVisitor::ReportError
-//---------------------------------------------------------------------------
-
-
-//! Reports a warning for a node
-//!
-void SystemModelCheckerVisitor::ReportWarning (const SystemModelNode& node, string_view message)
-{
-  ostringstream os;
-  Stream(os, node) << message;
-
-  ReportWarning(os.str());
-}
-//
-//  End of: SystemModelCheckerVisitor::ReportWarning
-//---------------------------------------------------------------------------
-
-
-
-//! Helper that streams into os, an header, node name and identifier
-//!
-ostringstream& SystemModelCheckerVisitor::Stream (ostringstream& os, string_view header, const SystemModelNode& node)
-{
-  if (!header.empty())
-  {
-    os << header << " ";
-  }
-
-  os << node.TypeName() << " '" << node.Name() << "' (id: " << node.Identifier() << ")";
-  return os;
-}
-//
-//  End of: SystemModelCheckerVisitor::Stream
 //---------------------------------------------------------------------------
 
 

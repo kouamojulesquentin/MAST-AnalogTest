@@ -24,6 +24,7 @@ SOURCES +=  \
     src/LoopbackAccessInterfaceProtocol.cpp         \
     src/BinaryVector.cpp                            \
     src/Chain.cpp                                   \
+    src/Checker.cpp                                 \
     src/ConfigureVisitor.cpp                        \
     src/ConfigureAlgorithm_Last_Lazy.cpp            \
     src/ConfigureAlgorithm_LastOrDefault.cpp        \
@@ -68,6 +69,7 @@ HEADERS += \
     include/BinaryVector.hpp                            \
     include/C_API_Commons.hpp                           \
     include/Chain.hpp                                   \
+    include/Checker.hpp                                 \
     include/ConfigurationAlgorithm.hpp                  \
     include/ConfigureVisitor.hpp                        \
     include/DefaultBinaryPathSelector.hpp               \

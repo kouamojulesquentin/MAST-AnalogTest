@@ -18,10 +18,10 @@
 #include "SystemModelCheckResult.hpp"
 #include "SystemModelVisitor.hpp"
 #include "SystemModel.hpp"
+#include "Checker.hpp"
 
 #include <memory>
 #include <vector>
-#include <sstream>
 #include <set>
 
 namespace mast
@@ -30,7 +30,7 @@ namespace mast
 //!
 //! @note This is intended to be used by SystemModel::Check()
 //!
-class DLL_EXPORT SystemModelCheckerVisitor final : public SystemModelVisitor
+class DLL_EXPORT SystemModelCheckerVisitor final : public Checker, public SystemModelVisitor
 {
   // ---------------- Public  Methods
   //
@@ -58,7 +58,7 @@ class DLL_EXPORT SystemModelCheckerVisitor final : public SystemModelVisitor
   //!
   //! @see CheckIdentifiers and CheckTree
   //!
-  SystemModelCheckResult Check();
+  virtual SystemModelCheckResult Check();
 
   //! Checks consistency of identifiers:
   //!
@@ -80,10 +80,6 @@ class DLL_EXPORT SystemModelCheckerVisitor final : public SystemModelVisitor
   //!
   void CheckTree ();
 
-  //! Builds up a SystemModelCheckResult from currently selected issues
-  //!
-  SystemModelCheckResult  MakeCheckResult();
-
   // ---------------- Private  Methods
   //
   private:
@@ -94,19 +90,6 @@ class DLL_EXPORT SystemModelCheckerVisitor final : public SystemModelVisitor
   bool CheckChildNode           (std::shared_ptr<const ParentNode> parent, std::shared_ptr<const SystemModelNode> child);
   void CheckNumberOfDerivations (std::shared_ptr<AccessInterface>  accessInterface);
   void CheckSiblingName         (std::shared_ptr<SystemModelNode>, std::set<string_view>& childNames, std::set<string_view>& ignoredNames);
-
-  void Report (std::experimental::string_view  message, uint32_t& counter, std::ostringstream& os);
-
-  void ReportInfo    (string_view message) { Report(message, m_infosCount,    m_infos);    }
-  void ReportWarning (string_view message) { Report(message, m_warningsCount, m_warnings); }
-  void ReportError   (string_view message) { Report(message, m_errorsCount,   m_errors);   }
-
-  void ReportInfo    (const SystemModelNode& node, string_view message);
-  void ReportWarning (const SystemModelNode& node, string_view message);
-  void ReportError   (const SystemModelNode& node, string_view message);
-
-  static std::ostringstream& Stream(std::ostringstream& os, string_view header, const SystemModelNode& node);
-  static std::ostringstream& Stream(std::ostringstream& os, const SystemModelNode& node) { return Stream(os, "", node); }
 
   // ---------------- Private  Fields
   //
@@ -123,12 +106,6 @@ class DLL_EXPORT SystemModelCheckerVisitor final : public SystemModelVisitor
   TCollectedNodeInfo          m_collectedNodeInfo; //!< Collects nodes info when scanning tree structure
   std::shared_ptr<ParentNode> m_root;              //!< First (top) node of system model tree
   TIdentifierMapping          m_identifierMapping; //!< Maps a node identifier to a node instance
-  std::ostringstream          m_infos;             //!< Collects info messages
-  std::ostringstream          m_warnings;          //!< Collects warning messages
-  std::ostringstream          m_errors;            //!< Collects error messages
-  uint32_t                    m_infosCount    = 0; //!< Total number of collected info messages
-  uint32_t                    m_warningsCount = 0; //!< Total number of collected warnings messages
-  uint32_t                    m_errorsCount   = 0; //!< Total number of collected errors messages
 };
 //
 //  End of SystemModelCheckerVisitor class declaration

@@ -318,8 +318,8 @@ void UT_NamesChecker::test_Check_NoName_Ignored ()
   auto tap   = builder.Create_JTAG_TAP("Tap", 8u, 4u);
   auto reg_1 = sm.CreateRegister("Foo", BinaryVector::CreateFromBinaryString("01"), tap);
   auto reg_2 = sm.CreateRegister("Bar", BinaryVector::CreateFromBinaryString("01"), tap);
-  auto chain = sm.CreateChain("",    tap);  chain->IgnoreForNodePath(true);
-  auto reg_3 = sm.CreateRegister("Bar", BinaryVector::CreateFromBinaryString("11"), chain);
+  auto chain = sm.CreateChain   ("",    tap);  chain->IgnoreForNodePath(true);
+  auto reg_3 = sm.CreateRegister("Bit", BinaryVector::CreateFromBinaryString("11"), chain);
 
   // ---------------- Exercise
   //
@@ -330,8 +330,129 @@ void UT_NamesChecker::test_Check_NoName_Ignored ()
   TS_ASSERT_EQUALS (result.infosCount,    0u);
   TS_ASSERT_EQUALS (result.warningsCount, 0u);
   TS_ASSERT_EQUALS (result.errorsCount,   0u);
+//+  TS_ASSERT_EQUALS (result.MakeReport(), "");
 }
 
+
+//! Checks NamesChecker::Check() when one Register downward the hierarchy has same name as another Register
+//!
+void UT_NamesChecker::test_Check_SamePath_Downward_2_Regs ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto tap     = builder.Create_JTAG_TAP("Tap", 8u, 4u);
+
+  auto reg_1   = sm.CreateRegister ("Foo",  BinaryVector::CreateFromBinaryString("01"), tap);
+  auto chain_1 = sm.CreateChain    ("Bar",  tap);  chain_1->IgnoreForNodePath(true);
+  auto chain_2 = sm.CreateChain    ("Food", tap);
+  auto reg_2   = sm.CreateRegister ("Foo",  BinaryVector::CreateFromBinaryString("10"), chain_1);
+
+  // ---------------- Exercise
+  //
+  auto result = NamesChecker::Check(tap);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (result.infosCount,    0u);
+  TS_ASSERT_EQUALS (result.warningsCount, 0u);
+  TS_ASSERT_EQUALS (result.errorsCount,   1u);
+//+  TS_ASSERT_EQUALS (result.MakeReport(), "");
+}
+
+
+//! Checks NamesChecker::Check() when 2 Registers downward the hierarchy has same name as another Register
+//!
+void UT_NamesChecker::test_Check_SamePath_Downward_3_Regs ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto tap     = builder.Create_JTAG_TAP("Tap", 8u, 4u);
+
+  auto reg_1   = sm.CreateRegister ("Foo",  BinaryVector::CreateFromBinaryString("01"), tap);
+  auto chain_1 = sm.CreateChain    ("Bar",  tap);      chain_1->IgnoreForNodePath(true);
+  auto chain_2 = sm.CreateChain    ("Bat",  chain_1);  chain_2->IgnoreForNodePath(true);
+  auto chain_3 = sm.CreateChain    ("Bit",  tap);
+  auto reg_2   = sm.CreateRegister ("Foo",  BinaryVector::CreateFromBinaryString("10"), chain_1);
+  auto reg_3   = sm.CreateRegister ("Foo",  BinaryVector::CreateFromBinaryString("11"), chain_2);
+
+  // ---------------- Exercise
+  //
+  auto result = NamesChecker::Check(tap);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (result.infosCount,    0u);
+  TS_ASSERT_EQUALS (result.warningsCount, 0u);
+  TS_ASSERT_EQUALS (result.errorsCount,   2u);
+//+  TS_ASSERT_EQUALS (result.MakeReport(), "");
+}
+
+
+//! Checks NamesChecker::Check() when one Register on a side hierarchy has same name as another Register
+//!
+void UT_NamesChecker::test_Check_SamePath_Sideward_2_Regs ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto tap     = builder.Create_JTAG_TAP("Tap", 8u, 4u);
+
+  auto chain_1 = sm.CreateChain    ("Bar",  tap); chain_1->IgnoreForNodePath(true);
+  auto chain_2 = sm.CreateChain    ("Food", tap); chain_2->IgnoreForNodePath(true);
+  auto reg_1   = sm.CreateRegister ("Foo",  BinaryVector::CreateFromBinaryString("01"), chain_1);
+  auto reg_2   = sm.CreateRegister ("Foo",  BinaryVector::CreateFromBinaryString("10"), chain_2);
+
+  // ---------------- Exercise
+  //
+  auto result = NamesChecker::Check(tap);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (result.infosCount,    0u);
+  TS_ASSERT_EQUALS (result.warningsCount, 0u);
+  TS_ASSERT_EQUALS (result.errorsCount,   1u);
+}
+
+
+//! Checks NamesChecker::Check() when one Register on a side hierarchy has same name as another Register
+//!
+void UT_NamesChecker::test_Check_SamePath_Sideward_3_Regs ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto tap     = builder.Create_JTAG_TAP("Tap", 8u, 4u);
+
+  auto chain_1 = sm.CreateChain    ("Bar",      tap); chain_1->IgnoreForNodePath(true);
+  auto chain_2 = sm.CreateChain    ("Mood",     tap);
+  auto chain_3 = sm.CreateChain    ("VAT",      tap); chain_3->IgnoreForNodePath(true);
+  auto chain_4 = sm.CreateChain    ("Mood",     chain_1);
+  auto reg_1   = sm.CreateRegister ("Foo",      BinaryVector::CreateFromBinaryString("001"), chain_1);
+  auto reg_2   = sm.CreateRegister ("Foo",      BinaryVector::CreateFromBinaryString("010"), chain_2);
+  auto reg_3   = sm.CreateRegister ("Mood.Foo", BinaryVector::CreateFromBinaryString("011"), chain_3);
+  auto reg_4   = sm.CreateRegister ("Foo",      BinaryVector::CreateFromBinaryString("100"), chain_4);
+
+  // ---------------- Exercise
+  //
+  auto result = NamesChecker::Check(tap);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (result.infosCount,    0u);
+  TS_ASSERT_EQUALS (result.warningsCount, 0u);
+  TS_ASSERT_EQUALS (result.errorsCount,   2u);
+//+  TS_ASSERT_EQUALS (result.MakeReport(), "");
+}
 
 
 //===========================================================================

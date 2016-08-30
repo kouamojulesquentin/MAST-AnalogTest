@@ -59,6 +59,10 @@ class DLL_EXPORT Checker
   static std::ostringstream& Stream(std::ostringstream& os, string_view header, const SystemModelNode& node);
   static std::ostringstream& Stream(std::ostringstream& os, const SystemModelNode& node) { return Stream(os, "", node); }
 
+  uint32_t InfosCount()   const { return m_infosCount;    }
+  uint32_t WarningCount() const { return m_warningsCount; }
+  uint32_t ErrorsCount()  const { return m_errorsCount;   }
+
   // ---------------- Private  Fields
   //
   std::ostringstream m_infos;             //!< Collects info messages

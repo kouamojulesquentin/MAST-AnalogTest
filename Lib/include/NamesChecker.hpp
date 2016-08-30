@@ -16,9 +16,11 @@
 
 #include "ParentNode.hpp"
 #include "Checker.hpp"
+#include <unordered_map>
 
 #include <memory>
 #include <set>
+#include <vector>
 
 namespace mast
 {
@@ -48,14 +50,26 @@ class DLL_EXPORT NamesChecker final : public Checker
   private:
   using string_view = std::experimental::string_view;
 
-  void CheckParentNode  (std::shared_ptr<const ParentNode> parent);
-  void CheckSiblingName (std::shared_ptr<const SystemModelNode>, std::set<string_view>& childNames, std::set<string_view>& ignoredNames);
+  bool CheckSiblingName (std::shared_ptr<const SystemModelNode> child,
+                         std::set<string_view>&                 childNames,
+                         std::set<string_view>&                 ignoredNames);
+
+  void CheckParentNode    (const ParentNode* parent);
+  void PopParentPath      (const ParentNode* parent);
+  void PushParentPath     (const ParentNode* parent);
+  void ClearPaths         ();
+  void RebuildLogicalPath ();
 
   // ---------------- Private  Fields
   //
-  private :
-  std::shared_ptr<ParentNode>      m_root;           //!< First (top) node of system model tree
-  std::set<const SystemModelNode*> m_processedNodes; //!< Helper to detect loop within the SystemModel
+  private:
+  using PathsMap_t = std::unordered_multimap<std::string, const SystemModelNode*>;
+
+  std::shared_ptr<ParentNode>      m_root;               //!< First (top) node of system model tree
+  std::set<const SystemModelNode*> m_processedNodes;     //!< Helper to detect loop within the SystemModel
+  std::vector<const ParentNode*>   m_currentPathNodes;   //!< ParentNode that represent current path
+  std::string                      m_currentLogicalPath; //!< Accrued path to current ParentNode (dot separated)
+  PathsMap_t                       m_leafPaths;          //!< Saves logical path of tree leaves (Registers)
 };
 //
 //  End of NamesChecker class declaration

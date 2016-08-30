@@ -14,6 +14,7 @@
 #include "NamesChecker.hpp"
 #include "PathSelector.hpp"
 #include "AccessInterfaceProtocol.hpp"
+#include "Utility.hpp"
 
 using namespace mast;
 using std::string;
@@ -38,7 +39,8 @@ SystemModelCheckResult NamesChecker::Check ()
   }
   else
   {
-    CheckParentNode(m_root);
+    ClearPaths();
+    CheckParentNode(m_root.get());
   }
 
   auto result = MakeCheckResult();
@@ -52,8 +54,13 @@ SystemModelCheckResult NamesChecker::Check ()
 
 //! Checks name consistency of a parent node and sub-nodes
 //!
-void NamesChecker::CheckParentNode (shared_ptr<const ParentNode> parent)
+void NamesChecker::CheckParentNode (const ParentNode* parent)
 {
+  CHECK_PARAMETER_NOT_NULL(parent, "Expect to be pass valid pointer");
+
+  PushParentPath(parent);
+  auto popAtExit = MakeScopeExit([=]() { PopParentPath(parent); });
+
   auto nextChild = parent->FirstChild();
 
   if (!nextChild)
@@ -74,14 +81,36 @@ void NamesChecker::CheckParentNode (shared_ptr<const ParentNode> parent)
 
   while (nextChild)
   {
-    CheckSiblingName(nextChild, childNames, ignoredNames);
+    auto hasReportedAnError = CheckSiblingName(nextChild, childNames, ignoredNames);
 
     // ---------------- Recurse when child is also a parent
     //
     auto asParentNode = dynamic_pointer_cast<const ParentNode>(nextChild);
     if (asParentNode)
     {
-      CheckParentNode(asParentNode);
+      CheckParentNode(asParentNode.get());
+    }
+    else
+    {
+      auto leafPath = m_currentLogicalPath + nextChild->Name();
+
+      if (!hasReportedAnError)
+      {
+        auto samePathCount = m_leafPaths.count(leafPath);
+
+        if      (samePathCount == 1)
+        {
+          auto otherLeaf = m_leafPaths.find(leafPath)->second;
+
+          ReportError(*nextChild, " Has same logical path \"" + leafPath + "\" than Register with id: " + to_string(otherLeaf->Identifier()));
+        }
+        else if (samePathCount != 0)
+        {
+          ReportError(*nextChild, " Has same logical path \""s + leafPath + "\" than " + to_string(samePathCount) + " other Registers");
+        }
+      }
+
+      m_leafPaths.emplace(std::move(leafPath), nextChild.get());
     }
 
     nextChild = nextChild->NextSibling();
@@ -104,8 +133,11 @@ void NamesChecker::CheckParentNode (shared_ptr<const ParentNode> parent)
 //! @param [in, out] childNames   Set names of already processed children that are not ignored path
 //! @param [in, out] ignoredNames Set names of already processed children that are ignored for paths
 //!
-void NamesChecker::CheckSiblingName (shared_ptr<const SystemModelNode> child, set<string_view>& childNames, set<string_view>& ignoredNames)
+//! @return true When an error has been reported, false otherwise
+bool NamesChecker::CheckSiblingName (shared_ptr<const SystemModelNode> child, set<string_view>& childNames, set<string_view>& ignoredNames)
 {
+  auto initialErrorCount = ErrorsCount();
+
   auto asParentNode = dynamic_pointer_cast<const ParentNode>(child);
   auto name         = child->Name();
   auto noName       = name.empty() || (name == "unnamed");
@@ -117,7 +149,6 @@ void NamesChecker::CheckSiblingName (shared_ptr<const SystemModelNode> child, se
 
     if      (!isParent) ReportInfo    (*child, " Has no valid name");
     else if (!ignored)  ReportWarning (*child, " Has no valid name, even though it is parent node not ignored for node paths");
-
   }
   else
   {
@@ -132,10 +163,74 @@ void NamesChecker::CheckSiblingName (shared_ptr<const SystemModelNode> child, se
     ignored ? ignoredNames.emplace(name)
             : childNames.emplace(name);
   }
+
+  return ErrorsCount() != initialErrorCount;
 }
 //
 //  End of: NamesChecker::CheckSiblingName
 //---------------------------------------------------------------------------
+
+
+//! Clears paths related members
+//!
+void NamesChecker::ClearPaths ()
+{
+  m_currentPathNodes.clear();
+  m_currentLogicalPath.clear();
+  m_leafPaths.clear();
+}
+//
+//  End of: NamesChecker::ClearPaths
+//---------------------------------------------------------------------------
+
+
+//! Removes parent node from path (if it is not ignored for path)
+//!
+void NamesChecker::PopParentPath (const ParentNode* parent)
+{
+  CHECK_PARAMETER_NOT_NULL(parent, "Should get only not nullptr");
+  if (!parent->IgnoreForNodePath())
+  {
+    m_currentPathNodes.pop_back();
+    RebuildLogicalPath();
+  }
+}
+//
+//  End of: NamesChecker::UpdateCurrentPath
+//---------------------------------------------------------------------------
+
+
+//! Append parent node to path (if it is not ignored for path)
+//!
+void NamesChecker::PushParentPath (const ParentNode* parent)
+{
+  CHECK_PARAMETER_NOT_NULL(parent, "Should get only not nullptr");
+  if (!parent->IgnoreForNodePath())
+  {
+    m_currentPathNodes.push_back(parent);
+    RebuildLogicalPath();
+  }
+}
+//
+//  End of: NamesChecker::UpdateCurrentPath
+//---------------------------------------------------------------------------
+
+
+//! Rebuilds current path name from, not ignored, ParentNode in path
+//!
+void NamesChecker::RebuildLogicalPath ()
+{
+  m_currentLogicalPath.clear();
+  for (auto parent : m_currentPathNodes)
+  {
+    CHECK_VALUE_NOT_NULL(parent, "See PushParentPath why it saved nullptr");
+    m_currentLogicalPath.append(parent->Name()).append(".");
+  }
+}
+//
+//  End of: NamesChecker::RebuildLogicalPath
+//---------------------------------------------------------------------------
+
 
 
 //===========================================================================

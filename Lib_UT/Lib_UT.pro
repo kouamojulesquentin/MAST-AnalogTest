@@ -40,6 +40,7 @@ SOURCES += \
     SystemModel/UT_FromSutUpdater.cpp                 \
     SystemModel/UT_GenericAccessInterfaceProtocol.cpp \
     SystemModel/UT_GmlPrinterVisitor.cpp              \
+    SystemModel/UT_NamesChecker.cpp                   \
     SystemModel/UT_NodePathResolver.cpp               \
     SystemModel/UT_ParentNode.cpp                     \
     SystemModel/UT_PrettyPrinterVisitor.cpp           \
@@ -75,6 +76,7 @@ HEADERS += \
     SystemModel/UT_FromSutUpdater.hpp                 \
     SystemModel/UT_GenericAccessInterfaceProtocol.hpp \
     SystemModel/UT_GmlPrinterVisitor.hpp              \
+    SystemModel/UT_NamesChecker.hpp                   \
     SystemModel/UT_NodePathResolver.hpp               \
     SystemModel/UT_ParentNode.hpp                     \
     SystemModel/UT_PrettyPrinterVisitor.hpp           \

@@ -67,19 +67,7 @@ class UT_SystemModelCheckerVisitor : public CxxTest::TestSuite
   void test_Check_When_AccessInterface_has_MoreDerivations ();
   void test_Check_When_AccessInterface_has_LessDerivations ();
 
-  void test_Check_SameNames_Only_Regs ();
-  void test_Check_SameNames_Only_Parents ();
-  void test_Check_SameNames_Mix_Regs_and_Parents ();
-
-  void test_Check_SameNames_Only_Ignored ();
-  void test_Check_SameNames_Some_Ignored_1 ();
-  void test_Check_SameNames_Some_Ignored_2 ();
-  void test_Check_SameNames_Mix_Regs_and_Ignored_1 ();
-  void test_Check_SameNames_Mix_Regs_and_Ignored_2 ();
-
-  void test_Check_NoName_Reg ();
-  void test_Check_NoName_Parent ();
-  void test_Check_NoName_Ignored ();
+  void test_Check_SameNames (); // Other name issues are tested by UT_NamesChecker
 
   void test_Check_NoProtocol ();
 

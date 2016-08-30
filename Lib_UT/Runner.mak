@@ -27,6 +27,7 @@ Suites = \
       $(UT_RootPath)/SystemModel/UT_DefaultNHotPathSelector.hpp        \
       $(UT_RootPath)/SystemModel/UT_SystemModel.hpp                    \
       $(UT_RootPath)/SystemModel/UT_SystemModelBuilder.hpp             \
+      $(UT_RootPath)/SystemModel/UT_NamesChecker.hpp                   \
       $(UT_RootPath)/SystemModel/UT_SystemModelCheckerVisitor.hpp      \
       $(UT_RootPath)/SystemModel/UT_PrettyPrinterVisitor.hpp           \
       $(UT_RootPath)/SystemModel/UT_GmlPrinterVisitor.hpp              \

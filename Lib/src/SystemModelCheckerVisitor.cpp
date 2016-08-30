@@ -14,6 +14,7 @@
 #include "SystemModelCheckerVisitor.hpp"
 #include "PathSelector.hpp"
 #include "AccessInterfaceProtocol.hpp"
+#include "NamesChecker.hpp"
 
 using namespace mast;
 using std::string;
@@ -35,7 +36,10 @@ SystemModelCheckResult SystemModelCheckerVisitor::Check ()
   CheckIdentifiers();
   CheckTree();
 
-  auto result = MakeCheckResult();
+  auto nameCheckerResult = NamesChecker::Check(m_root);
+  auto result            = MakeCheckResult();
+
+  result.Merge(nameCheckerResult);
   return result;
 }
 //
@@ -246,8 +250,9 @@ void SystemModelCheckerVisitor::CheckNumberOfDerivations (shared_ptr<AccessInter
 
 //! Checks consistency of a parent node
 //!
-//! @note It checks that:
+//! @note It checks that
 //!   - Each parent node has at least one child otherwise a warning is issued
+//! @note Names are checked elsewhere
 //!
 void SystemModelCheckerVisitor::CheckParentNode (shared_ptr<const ParentNode> parent)
 {
@@ -259,9 +264,6 @@ void SystemModelCheckerVisitor::CheckParentNode (shared_ptr<const ParentNode> pa
   }
   else
   {
-    set<string_view> childNames;
-    set<string_view> ignoredNames;
-
     while (nextChild)
     {
       if (nextChild == parent)
@@ -278,8 +280,6 @@ void SystemModelCheckerVisitor::CheckParentNode (shared_ptr<const ParentNode> pa
         }
         else
         {
-          CheckSiblingName(nextChild, childNames, ignoredNames);
-
           nextChild->Accept(*this);   // Do check specific to node type
 
           // ---------------- Recurse when child is also a parent

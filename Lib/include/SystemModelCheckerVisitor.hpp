@@ -58,7 +58,7 @@ class DLL_EXPORT SystemModelCheckerVisitor final : public Checker, public System
   //!
   //! @see CheckIdentifiers and CheckTree
   //!
-  virtual SystemModelCheckResult Check();
+  virtual SystemModelCheckResult Check() override;
 
   //! Checks consistency of identifiers:
   //!

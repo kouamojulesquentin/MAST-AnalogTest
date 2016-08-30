@@ -38,6 +38,7 @@ SOURCES +=  \
     src/GmlPrinterVisitor.cpp                       \
     src/I2C_Player.cpp                              \
     src/Linker.cpp                                  \
+    src/NamesChecker.cpp                            \
     src/NodePathResolver.cpp                        \
     src/OpenOCDProtocol.cpp                         \
     src/ParentNode.cpp                              \
@@ -84,6 +85,7 @@ HEADERS += \
     include/FromSutUpdater.hpp                          \
     include/I2C_Player.hpp                              \
     include/Linker.hpp                                  \
+    include/NamesChecker.hpp                            \
     include/NodePathResolver.hpp                        \
     include/OpenOCDProtocol.hpp                         \
     include/ParentNode.hpp                              \

@@ -32,6 +32,12 @@ class DLL_EXPORT SystemModelCheckResult final
   ~SystemModelCheckResult() = default;
   SystemModelCheckResult()  = default;
 
+  //! Merges other results into this
+  //!
+  void Merge(const SystemModelCheckResult& other);
+
+  //! Returns true when it equals to another SystemModelCheckResult
+  //!
   bool operator==(const SystemModelCheckResult& rhs) const
   {
     return    (infosCount    == rhs.infosCount)
@@ -42,6 +48,8 @@ class DLL_EXPORT SystemModelCheckResult final
            && (errors        == rhs.errors);
   }
 
+  //! Returns true when it differs from another SystemModelCheckResult
+  //!
   bool operator!=(const SystemModelCheckResult& rhs) const
   {
     return !operator==(rhs);

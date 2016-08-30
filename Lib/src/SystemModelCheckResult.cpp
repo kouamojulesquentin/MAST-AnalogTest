@@ -42,6 +42,24 @@ string SystemModelCheckResult::MakeReport() const
 }
 
 
+//! Merges other results into this
+//!
+void SystemModelCheckResult::Merge (const SystemModelCheckResult& other)
+{
+  infosCount    += other.infosCount;
+  warningsCount += other.warningsCount;
+  errorsCount   += other.errorsCount;
+
+  if (!other.infos.empty())    infos.append    ("\n").append(other.infos);
+  if (!other.warnings.empty()) warnings.append ("\n").append(other.warnings);
+  if (!other.errors.empty())   errors.append   ("\n").append(other.errors);
+}
+//
+//  End of: SystemModelCheckResult::Merge
+//---------------------------------------------------------------------------
+
+
+
 //===========================================================================
 // End of SystemModelCheckResult.cpp
 //===========================================================================

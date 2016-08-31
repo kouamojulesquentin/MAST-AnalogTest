@@ -57,3 +57,4 @@
 /SIT_parser_UT/Generated
 /SIT_reader/SIT_parser.output
 /SIT_reader_UT/Generated/Runner.cpp
+/openocd/*.Plo

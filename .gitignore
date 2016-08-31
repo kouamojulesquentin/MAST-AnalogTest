@@ -60,3 +60,4 @@
 /openocd/*.Plo
 /openocd/openocd/config.log
 /openocd/openocd/config.status
+/openocd/openocd/Makefile

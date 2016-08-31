@@ -59,3 +59,4 @@
 /SIT_reader_UT/Generated/Runner.cpp
 /openocd/*.Plo
 /openocd/openocd/config.log
+/openocd/openocd/config.status

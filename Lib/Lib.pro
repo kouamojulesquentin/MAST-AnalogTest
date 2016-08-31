@@ -36,6 +36,7 @@ SOURCES +=  \
     src/FromSutUpdater.cpp                          \
     src/GenericAccessInterfaceProtocol.cpp          \
     src/GmlPrinterVisitor.cpp                       \
+    src/I2C_EmulationProtocol.cpp                   \
     src/I2C_Player.cpp                              \
     src/Linker.cpp                                  \
     src/NamesChecker.cpp                            \
@@ -47,6 +48,7 @@ SOURCES +=  \
     src/PropagatePendingVisitor.cpp                 \
     src/Register.cpp                                \
     src/SVF_Player.cpp                              \
+    src/SVF_EmulationProtocol.cpp                   \
     src/SVF_SimulationProtocol.cpp                  \
     src/SVFVector.cpp                               \
     src/Session.cpp                                 \
@@ -83,6 +85,7 @@ HEADERS += \
     include/GenericAccessInterfaceProtocol.hpp          \
     include/GmlPrinterVisitor.hpp                       \
     include/FromSutUpdater.hpp                          \
+    include/I2C_EmulationProtocol.hpp                   \
     include/I2C_Player.hpp                              \
     include/Linker.hpp                                  \
     include/NamesChecker.hpp                            \
@@ -94,6 +97,7 @@ HEADERS += \
     include/PropagatePendingVisitor.hpp                 \
     include/Register.hpp                                \
     include/SVF_Player.hpp                              \
+    include/SVF_EmulationProtocol.hpp                   \
     include/SVF_SimulationProtocol.hpp                  \
     include/SVFVector.hpp                               \
     include/Session.hpp                                 \

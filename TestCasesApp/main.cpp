@@ -17,6 +17,8 @@
 #include "SystemModelManager.hpp"
 #include "LoopbackAccessInterfaceProtocol.hpp"
 #include "SVF_SimulationProtocol.hpp"
+#include "SVF_EmulationProtocol.hpp"
+#include "I2C_EmulationProtocol.hpp"
 #include "OpenOCDProtocol.hpp"
 #include "GmlPrinterVisitor.hpp"
 #include "PrettyPrinterVisitor.hpp"
@@ -31,6 +33,7 @@
 #include <stdexcept>
 #include <vector>
 #include <tuple>
+#include <initializer_list>
 #include <memory>
 #include <string>
 #include <experimental/string_view>
@@ -45,6 +48,7 @@ using std::dynamic_pointer_cast;
 using std::vector;
 using std::tuple;
 using std::make_tuple;
+using std::initializer_list;
 using std::string;
 using std::experimental::string_view;
 using std::regex;
@@ -278,7 +282,7 @@ shared_ptr<AccessInterfaceProtocol> GetProtocol (Options::Protocol protocol, con
       aiProtocol = make_shared<LoopbackAccessInterfaceProtocol> ();
       break;
     case Options::Protocol::SVF_Emulation:
-      THROW_LOGIC_ERROR("Not yet implemented");
+      aiProtocol = make_shared<SVF_EmulationProtocol> ();
       break;
     case Options::Protocol::SVF_Simulation:
     {
@@ -299,8 +303,16 @@ shared_ptr<AccessInterfaceProtocol> GetProtocol (Options::Protocol protocol, con
       break;
     }
     case Options::Protocol::I2C_Emulation:
-      THROW_LOGIC_ERROR("Not yet implemented");
+    {
+//+      vector<uint32_t>  addresses;
+//+      string            commandsPrefix;
+
+      initializer_list<uint32_t> addresses      = { 0x00, 0x01, 0x02 };
+      string_view                commandsPrefix = "";
+
+      aiProtocol = make_shared<I2C_EmulationProtocol> (addresses, commandsPrefix);
       break;
+    }
     case Options::Protocol::Generic:
     THROW_LOGIC_ERROR("Not yet implemented");
       break;

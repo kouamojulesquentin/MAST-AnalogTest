@@ -43,7 +43,7 @@ I2C_Player::I2C_Player (initializer_list<uint32_t> addresses, string_view comman
 
 //! Constructor from vector
 //!
-//! @param addresses        Array of I2C addresses for managed derivations (value at offset 0 is reserved)
+//! @param addresses        Array of I2C addresses for managed derivations (value at offset 0 is reserved for reset)
 //! @param commandsPrefix   Optional text that will be prepended to actual I2C command
 //!
 I2C_Player::I2C_Player (vector<uint32_t> addresses, string_view commandsPrefix)

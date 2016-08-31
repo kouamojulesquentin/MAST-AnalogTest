@@ -15,7 +15,8 @@
 #include "C_API_Commons.hpp"
 #include "Startup.hpp"
 #include "Utility.hpp"
-//+#include "SIT_driver.hpp"
+#include "Session.hpp"
+//+#include "SIT_reader.hpp"
 
 #include <memory>
 #include <string>
@@ -130,10 +131,10 @@ ErrorCode InitializeMast (const char* /* modelFilePath */)
 
 //+    if (modelFilePath != nullptr)
 //+    {
-//+      SIT_Driver parser;
-//+      parser.parse(modelFilePath);
+//+      SIT_Reader reader;
+//+      reader.parse(modelFilePath);
 
-//+      auto sm = parser.parsed_sut;
+//+      auto sm = reader.parsed_sut;
 //+      mast::Startup::SetSystemModel(sm);
 //+    }
 
@@ -157,12 +158,17 @@ ErrorCode RunMast (const char* modelFilePath, ApplicationAssociation* pAssociati
 
   try
   {
+    Session session;
+
     retCode = InitializeMast(modelFilePath);
     if (retCode != ErrorCode::Ok) return retCode;
+
     retCode = CreateApplications(pAssociations, count);
     if (retCode != ErrorCode::Ok) return retCode;
+
     retCode = Start();
     if (retCode != ErrorCode::Ok) return retCode;
+
     retCode = WaitForApplicationsEnd();
   }
   CATCH_ALL(retCode)

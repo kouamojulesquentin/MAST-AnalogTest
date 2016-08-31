@@ -26,7 +26,8 @@
 static inline void interface_jtag_add_scan_check_alloc(struct scan_field *field)
 {
 	unsigned num_bytes = DIV_ROUND_UP(field->num_bits, 8);
-	field->in_value = cmd_queue_alloc(num_bytes);
+    // Niels Grataloup <niels.grataloup@imag.fr>  -- Cast has been added to ensure -fpermissive option compliance.
+	field->in_value = (uint8_t *)cmd_queue_alloc(num_bytes);
 }
 
 void interface_jtag_add_callback(jtag_callback1_t f, jtag_callback_data_t data0);

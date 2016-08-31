@@ -40,7 +40,8 @@ Suites = \
       $(UT_RootPath)/SystemModel/UT_GenericAccessInterfaceProtocol.hpp \
       $(UT_RootPath)/SystemModel/UT_SVF_SimulationProtocol.hpp         \
       $(UT_RootPath)/SystemModel/UT_SystemModelManager.hpp             \
-      $(UT_RootPath)/C_API/UT_PDL_Adapter.hpp
+      $(UT_RootPath)/C_API/UT_PDL_Adapter.hpp                          \
+      $(UT_RootPath)/C_API/UT_PDL_Adapter_CPP.hpp
 
 
 ProjectFile  = $(RootPath)/Lib_UT.pro

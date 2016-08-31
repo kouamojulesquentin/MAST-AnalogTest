@@ -44,6 +44,7 @@ SOURCES +=  \
     src/OpenOCDProtocol.cpp                         \
     src/ParentNode.cpp                              \
     src/PDL_Adapter.cpp                             \
+    src/PDL_Adapter_CPP.cpp                         \
     src/PrettyPrinterVisitor.cpp                    \
     src/PropagatePendingVisitor.cpp                 \
     src/Register.cpp                                \
@@ -115,6 +116,7 @@ HEADERS += \
     include/ToSutVisitor.hpp                            \
     include/Utility.hpp                                 \
     public_include/PDL_Adapter.h                        \
+    public_include/PDL_Adapter_CPP.h                    \
     public_include/Platform.hpp                         \
     public_include/SystemModelAdapter.h
 

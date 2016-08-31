@@ -263,8 +263,10 @@ T CheckValueIsNotNullptr(const char* file, const char* function, int line, T val
 }
 
 
-#define CHECK_PARAMETER_NOT_NULL(ptr, msg) CheckParameterIsNotNullptr (__FILE__, __func__, __LINE__, ptr, msg)
-#define CHECK_PARAMETER_NOT_ZERO(val, msg) CheckParameterIsNotZero    (__FILE__, __func__, __LINE__, val, msg)
+#define CHECK_PARAMETER_NOT_NULL(ptr, msg)    CheckParameterIsNotNullptr (__FILE__, __func__, __LINE__, ptr, msg)
+#define CHECK_PARAMETER_NOT_ZERO(val, msg)    CheckParameterIsNotZero    (__FILE__, __func__, __LINE__, val, msg)
+
+#define CHECK_PARAMETER_NOT_EMPTY(val, msg)   CheckParameterCondition  (__FILE__, __func__, __LINE__, (val), !(val).empty(), msg)
 
 #define CHECK_PARAMETER_GT(val,  minVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val),(val >  minVal), msg)
 #define CHECK_PARAMETER_GTE(val, minVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val),(val >= minVal), msg)

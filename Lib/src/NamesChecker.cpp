@@ -138,10 +138,10 @@ bool NamesChecker::CheckSiblingName (shared_ptr<const SystemModelNode> child, se
 {
   auto initialErrorCount = ErrorsCount();
 
-  auto asParentNode = dynamic_pointer_cast<const ParentNode>(child);
-  auto name         = child->Name();
-  auto noName       = name.empty() || (name == "unnamed");
-  auto ignored      = asParentNode && asParentNode->IgnoreForNodePath();
+  auto        asParentNode = dynamic_pointer_cast<const ParentNode>(child);
+  const auto& name         = child->Name();
+  auto        noName       = name.empty() || (name == "unnamed");
+  auto        ignored      = asParentNode && asParentNode->IgnoreForNodePath();
 
   if (noName)
   {

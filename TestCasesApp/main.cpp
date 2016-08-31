@@ -304,9 +304,6 @@ shared_ptr<AccessInterfaceProtocol> GetProtocol (Options::Protocol protocol, con
     }
     case Options::Protocol::I2C_Emulation:
     {
-//+      vector<uint32_t>  addresses;
-//+      string            commandsPrefix;
-
       initializer_list<uint32_t> addresses      = { 0x00, 0x01, 0x02 };
       string_view                commandsPrefix = "";
 
@@ -358,6 +355,28 @@ std::unique_ptr<g3::LogWorker> InitializeLogger ()
 //---------------------------------------------------------------------------
 
 
+//! Runs mast using application descriptors
+//!
+void RunMast (const vector<ApplicationDescriptor>& descriptors)
+{
+  auto sm      = Startup::GetSystemModel();
+  auto manager = Startup::GetManager();
+
+  for (const auto& descriptor : descriptors)
+  {
+    auto appNode = dynamic_pointer_cast<ParentNode>(sm->Root()->FindNode(descriptor.topNodePath));
+
+    manager->CreateApplicationThread(appNode, descriptor.function, descriptor.debugName);
+  }
+
+  manager->Start();
+  manager->StartCreatedApplicationThreads();
+  manager->WaitForApplicationsEnd();
+  manager->Stop();
+}
+//
+//  End of: RunMast
+//---------------------------------------------------------------------------
 } // End of unnamed namespace
 
 
@@ -369,16 +388,15 @@ int main (int argc, char* argv [])
   auto retCode = ErrorCode::Ok;
   try
   {
-    auto logworker  = InitializeLogger();
+    auto logworker = InitializeLogger();
 
     auto options = Options::ParseArguments(argc, argv);
     cout << options.ToDebugString("Retained options: \n", "   ");
 
-    auto session          = Session (std::make_shared<SystemModelManagerMonitor>());
-    auto sm               = session.sm;
-    auto manager          = session.manager;
-    auto protocol         = GetProtocol(options.protocol, options.protocolOptions);
-    auto descriptors      = CreateTestcase(sm, protocol, options.testcase, options.testcaseOptions);
+    auto session     = Session (std::make_shared<SystemModelManagerMonitor>());
+    auto sm          = session.sm;
+    auto protocol    = GetProtocol(options.protocol, options.protocolOptions);
+    auto descriptors = CreateTestcase(sm, protocol, options.testcase, options.testcaseOptions);
 
     retCode = CheckResult(sm);
     if (retCode != ErrorCode::Ok)
@@ -397,19 +415,7 @@ int main (int argc, char* argv [])
       return static_cast<int>(retCode);
     }
 
-//+    RunMast(testcase);
-
-    for (const auto& descriptor : descriptors)
-    {
-      auto appNode = dynamic_pointer_cast<ParentNode>(sm->Root()->FindNode(descriptor.topNodePath));
-
-      manager->CreateApplicationThread(appNode, descriptor.function, descriptor.debugName);
-    }
-
-    manager->Start();
-    manager->StartCreatedApplicationThreads();
-    manager->WaitForApplicationsEnd();
-    manager->Stop();
+    RunMast(descriptors);
 
     std::cout << "End of test case (see log file in case of errors)" << std::endl;
   }
@@ -419,7 +425,7 @@ int main (int argc, char* argv [])
   catch(std::regex_error&      exc) { retCode = ErrorCode::RegexException;   std::cout << exc.what(); }
   catch(std::runtime_error&    exc) { retCode = ErrorCode::RuntimeError;     std::cout << exc.what(); }
   catch(std::exception&        exc) { retCode = ErrorCode::StdException;     std::cout << exc.what(); }
-  catch(...)                        { retCode = ErrorCode::UndefinedFailure; std::cout << "Got non C++ std exception"; }
+  catch(...)                        { retCode = ErrorCode::UndefinedFailure; std::cout << "Got non std::exception"; }
 
   return static_cast<int>(retCode);
 }

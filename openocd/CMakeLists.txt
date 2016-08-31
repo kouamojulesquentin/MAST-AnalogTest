@@ -170,8 +170,28 @@ add_library(openocd SHARED dummy.c) #dev_openocd.c)
 
 #LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/openocd/src)
 #target_include_directories(dev_openocd_app ${LIBUSB_INCLUDE_DIR})
-target_link_libraries(openocd
+IF(${LIBUSB1_FOUND})
+
+    IF(${LIBUSB0_FOUND})
+        target_link_libraries(openocd
 ${whole_lib_files} ${LIBUSB1_LIBRARY} ${LIBUSB0_LIBRARY} ${CMAKE_CURRENT_SOURCE_DIR}/openocd/jimtcl/libjim.a)
+    ELSE(${LIBUSB0_FOUND})
+        target_link_libraries(openocd
+${whole_lib_files} ${LIBUSB1_LIBRARY} ${CMAKE_CURRENT_SOURCE_DIR}/openocd/jimtcl/libjim.a)
+    ENDIF(${LIBUSB0_FOUND})
+
+ELSE(${LIBUSB1_FOUND})
+
+    IF(${LIBUSB0_FOUND})
+        target_link_libraries(openocd
+${whole_lib_files} ${LIBUSB0_LIBRARY} ${CMAKE_CURRENT_SOURCE_DIR}/openocd/jimtcl/libjim.a)
+    ELSE(${LIBUSB0_FOUND})
+        target_link_libraries(openocd
+${whole_lib_files} ${CMAKE_CURRENT_SOURCE_DIR}/openocd/jimtcl/libjim.a)
+    ENDIF(${LIBUSB0_FOUND})
+
+
+ENDIF(${LIBUSB1_FOUND})
 #target_link_libraries(dev_openocd_app openocd)
 
 add_dependencies(openocd OpenOCD)

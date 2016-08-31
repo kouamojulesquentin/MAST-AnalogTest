@@ -36,7 +36,7 @@ BIN_DIR             = Bin
 LIB_UT_EXE_NAME     = Lib_UT
 TESTCASES_EXE_NAME  = TestCasesApp
 SIT_READER_EXE_NAME = SIT_reader_demo
-SIT_UT_EXE_NAME     = SIT_Reader_UT.exe
+SIT_UT_EXE_NAME     = SIT_Reader_UT
 
 LIB_UT_EXE_PATH       = $(BIN_DIR)/$(LIB_UT_EXE_NAME)
 SIT_UT_EXE_PATH       = $(BIN_DIR)/$(SIT_UT_EXE_NAME)

@@ -64,5 +64,5 @@ if (WIN32)
 	target_link_libraries(TestCasesApp Lib Logger SIT_Reader_Lib DbgHelp )
 else ()
     # $LIBUSB_CFLAGS, ldl and libjim.a args are required by OpenOCD.
-	target_link_libraries(TestCasesApp Lib Logger SIT_Reader_Lib pthread openocd ${LIBUSB_CFLAGS} -ldl ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/openocd/jimtcl/libjim.a)
+	target_link_libraries(TestCasesApp Lib Logger SIT_Reader_Lib pthread openocd ${LIBUSB_CFLAGS} -ldl ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/openocd/jimtcl/libjim.a dl)
 endif ()

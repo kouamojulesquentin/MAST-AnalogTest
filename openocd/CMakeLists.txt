@@ -162,7 +162,7 @@ ENDIF(${LIBUSB1_FOUND})
 #add_executable (dev_openocd_app dev_openocd.c)
 
 # -ldl is needed by JimTcl, -lusb-1.0 is needed for FTDI drivers, and -lm for <math.h>.
-set(CMAKE_C_FLAGS "-std=c99 -D_GNU_SOURCE -lm -ldl ${LIBUSB_CFLAGS}")
+set(CMAKE_C_FLAGS "-std=c99 -D_GNU_SOURCE -lm ${LIBUSB_CFLAGS}")
 
 #set_property(TARGET dev_openocd_app PROPERTY C_STANDARD 99) # TODO: plus joli mais ne fonctionne pas WTF?
 
@@ -174,20 +174,20 @@ IF(${LIBUSB1_FOUND})
 
     IF(${LIBUSB0_FOUND})
         target_link_libraries(openocd
-${whole_lib_files} ${LIBUSB1_LIBRARY} ${LIBUSB0_LIBRARY} ${CMAKE_CURRENT_SOURCE_DIR}/openocd/jimtcl/libjim.a)
+${whole_lib_files} ${LIBUSB1_LIBRARY} ${LIBUSB0_LIBRARY} ${CMAKE_CURRENT_SOURCE_DIR}/openocd/jimtcl/libjim.a dl)
     ELSE(${LIBUSB0_FOUND})
         target_link_libraries(openocd
-${whole_lib_files} ${LIBUSB1_LIBRARY} ${CMAKE_CURRENT_SOURCE_DIR}/openocd/jimtcl/libjim.a)
+${whole_lib_files} ${LIBUSB1_LIBRARY} ${CMAKE_CURRENT_SOURCE_DIR}/openocd/jimtcl/libjim.a dl)
     ENDIF(${LIBUSB0_FOUND})
 
 ELSE(${LIBUSB1_FOUND})
 
     IF(${LIBUSB0_FOUND})
         target_link_libraries(openocd
-${whole_lib_files} ${LIBUSB0_LIBRARY} ${CMAKE_CURRENT_SOURCE_DIR}/openocd/jimtcl/libjim.a)
+${whole_lib_files} ${LIBUSB0_LIBRARY} ${CMAKE_CURRENT_SOURCE_DIR}/openocd/jimtcl/libjim.a dl)
     ELSE(${LIBUSB0_FOUND})
         target_link_libraries(openocd
-${whole_lib_files} ${CMAKE_CURRENT_SOURCE_DIR}/openocd/jimtcl/libjim.a)
+${whole_lib_files} ${CMAKE_CURRENT_SOURCE_DIR}/openocd/jimtcl/libjim.a dl)
     ENDIF(${LIBUSB0_FOUND})
 
 

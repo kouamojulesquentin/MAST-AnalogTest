@@ -16,9 +16,7 @@ jtag/drivers/versaloon/libocdjtagdrivers_la-versaloon.o
 jtag/drivers/usb_blaster/usb_blaster.o
 jtag/drivers/usb_blaster/ublast2_access_libusb.o
 jtag/drivers/libocdjtagdrivers_la-driver.o
-jtag/drivers/libocdjtagdrivers_la-libusb1_common.o
 jtag/drivers/libocdjtagdrivers_la-ti_icdi_usb.o
-jtag/drivers/libocdjtagdrivers_la-usb_common.o
 jtag/drivers/libocdjtagdrivers_la-ftdi.o
 jtag/drivers/libocdjtagdrivers_la-mpsse.o
 jtag/drivers/libocdjtagdrivers_la-usbprog.o

@@ -531,7 +531,7 @@ configure:12467: $? = 0
 configure:12484: result: none required
 configure:12492: checking for library containing dlopen
 configure:12523: gcc -std=gnu99 -o conftest -fPIC   conftest.c  >&5
-/tmp/cc8mqTjA.o: In function `main':
+/tmp/ccvwlYO1.o: In function `main':
 conftest.c:(.text+0xa): undefined reference to `dlopen'
 collect2: error: ld returned 1 exit status
 configure:12523: $? = 1

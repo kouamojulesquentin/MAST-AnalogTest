@@ -194,6 +194,7 @@ ${whole_lib_files} ${CMAKE_CURRENT_SOURCE_DIR}/openocd/jimtcl/libjim.a dl)
 ENDIF(${LIBUSB1_FOUND})
 #target_link_libraries(dev_openocd_app openocd)
 
+SET_SOURCE_FILES_PROPERTIES( ${CMAKE_CURRENT_SOURCE_DIR}/openocd/config.h GENERATED)
 #set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/openocd/config.h OBJECT_DEPENDS OpenOCD)
-add_dependencies(openocd OpenOCD ${CMAKE_CURRENT_SOURCE_DIR}/openocd/config.h)
+#add_dependencies(openocd OpenOCD ${CMAKE_CURRENT_SOURCE_DIR}/openocd/config.h)
 #add_dependencies(dev_openocd_app openocd)

@@ -61,3 +61,5 @@
 /openocd/openocd/config.log
 /openocd/openocd/config.status
 /openocd/openocd/Makefile
+/openocd/openocd/*/Makefile
+/openocd/openocd/config.h

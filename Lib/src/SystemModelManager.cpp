@@ -121,7 +121,7 @@ shared_ptr<SystemModelManager::ApplicationData> SystemModelManager::ApplicationD
 //!
 void SystemModelManager::CreateApplicationThread (shared_ptr<ParentNode> applicationTopNode, Application_t functor, string debugName)
 {
-  CHECK_PARAMETER_NOT_NULL(applicationTopNode, "Cannot create application thread with nullptr top node");
+  CHECK_PARAMETER_NOT_NULL(applicationTopNode, "Cannot create application thread with nullptr reference node (you may have to check node path)");
 
   MONITOR(CreateApplication(*applicationTopNode, debugName));
 

@@ -225,8 +225,8 @@ vector<ApplicationDescriptor> CreateTestcase (shared_ptr<SystemModel>           
           ai->SetProtocol(protocol);
         }
       }
-      auto topPath   = "TAP_DR_Mux.W_1500.SWIR.SWIR_mux.WIR.WIR_mux";
-      associations   = CreateDefaultAppDescriptors(topPath, 4u, "reg_", loopCount);
+      auto topPath   = "TAP_DR_Mux";
+      associations   = CreateDefaultAppDescriptors(topPath, 2u, "reg_", loopCount);
       break;
     }
     case Options::Testcase::Wrapper_1500:
@@ -365,6 +365,7 @@ void RunMast (const vector<ApplicationDescriptor>& descriptors)
   for (const auto& descriptor : descriptors)
   {
     auto appNode = dynamic_pointer_cast<ParentNode>(sm->Root()->FindNode(descriptor.topNodePath));
+    CHECK_VALUE_NOT_NULL(appNode, "Cannot find a node using path: "s + descriptor.topNodePath);
 
     manager->CreateApplicationThread(appNode, descriptor.function, descriptor.debugName);
   }

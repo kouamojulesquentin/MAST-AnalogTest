@@ -62,4 +62,4 @@
 /openocd/openocd/config.status
 /openocd/openocd/Makefile
 /openocd/openocd/*/Makefile
-/openocd/openocd/config.h
+/openocd/openocd/src/.deps/main.Po

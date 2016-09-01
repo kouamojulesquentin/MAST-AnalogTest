@@ -29,6 +29,8 @@
 #include "CustomFileSink.h"
 #include "SIT_reader.hpp"
 #include "Options.hpp"
+#include "ApplicationDescriptor.hpp"
+#include "Zybo.hpp"
 
 #include <stdexcept>
 #include <vector>
@@ -59,25 +61,10 @@ using std::cout;
 using std::cerr;
 
 using namespace mast;
+using namespace test;
 
 namespace
 {
-struct ApplicationDescriptor
-{
-  using Application_t = std::function<void()>;
-
-  Application_t function;
-  std::string   topNodePath;
-  std::string   debugName;
-
-  ApplicationDescriptor(Application_t p_function, std::string p_topNodePath, std::string p_debugName = "")
-    : function    (p_function)
-    , topNodePath (std::move(p_topNodePath))
-    , debugName   (std::move(p_debugName))
-  {}
-};
-
-
 //! Check SystemModel coherency
 //!
 ErrorCode CheckResult (shared_ptr<SystemModel> sm)
@@ -161,6 +148,7 @@ vector<ApplicationDescriptor> CreateTestcase (shared_ptr<SystemModel>           
                                               const string&                       testcaseOptions)
 {
   string_view filePath  = testcaseOptions;  // By default, testcaseOptions may contains a file path
+  string_view name      = "default";        // This is testcase "sub-name"
   uint32_t    loopCount = 10u;
 
   // ---------------- Define switches and associated processing to update Options
@@ -178,6 +166,11 @@ vector<ApplicationDescriptor> CreateTestcase (shared_ptr<SystemModel>           
            [&loopCount](it_t& it, const it_t& ite, string_view)
            {
              if (it != ite) loopCount = std::stoul((*it++).data());
+           }),
+    data_t("-n|--name",
+           [&name](it_t& it, const it_t& ite, string_view)
+           {
+             if (it != ite) name = *it++;
            }),
   };
 
@@ -225,8 +218,15 @@ vector<ApplicationDescriptor> CreateTestcase (shared_ptr<SystemModel>           
           ai->SetProtocol(protocol);
         }
       }
-      auto topPath   = "TAP_DR_Mux";
-      associations   = CreateDefaultAppDescriptors(topPath, 2u, "reg_", loopCount);
+      if (name == "zybo")
+      {
+        associations = test::Zybo_CreateApplicationsDescriptor();
+      }
+      else
+      {
+        auto topPath   = "Tap_DR_Mux.1500.SWIR.SWIR_mux.WIR.WIR_mux";
+        associations   = CreateDefaultAppDescriptors(topPath, 4u, "reg_", loopCount);
+      }
       break;
     }
     case Options::Testcase::Wrapper_1500:

@@ -14,7 +14,7 @@
 @REM @cls && %AppFileName% -tc SIT_File -tco "-lc 7 -f ..\..\..\TestCasesApp\SIT_Testcases\1500_Wrapper_4xRegs_12xBits.sit" --print_graph_file Parsed.gml -p OpenOCD -po "ocd.conf"
 @REM @cls && %AppFileName% -tc SIT_File -tco "-lc 7 -f ..\..\..\TestCasesApp\SIT_Testcases\1500_Wrapper_4xRegs_12xBits.sit" -p SVF_Emu
 @REM @cls && %AppFileName% -tc SIT_File -tco "-lc 7 -f ..\..\..\TestCasesApp\SIT_Testcases\1500_Wrapper_4xRegs_12xBits.sit" -p I2C_Emu
-@cls && %AppFileName% -pg -tc SIT_File -tco "-lc 7 -f ..\..\..\TestCasesApp\SIT_Testcases\Zybo-1xReg_11bits.sit" -p I2C_Emu
+@cls && %AppFileName% -pg -tc SIT_File -tco "--name zybo -f ..\..\..\TestCasesApp\SIT_Testcases\Zybo-1xReg_11bits.sit" -p I2C_Emu
 @REM @cls && %AppFileName% -tc SIT_File -tco "-lc 7" --print_graph_file Parsed.gml -p loopback
 
 @REM @cls && %AppFileName% -tc 1500  --print_graph -p SVF_Simu --protocol_options "to_sut.svf, from_sut.dat" -lc 7

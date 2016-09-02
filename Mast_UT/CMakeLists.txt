@@ -14,9 +14,9 @@ set (UT_RootPath  					"${CMAKE_CURRENT_SOURCE_DIR}/")
 set (CXXTEST_INCLUDE_DIR 		"${CMAKE_CURRENT_SOURCE_DIR}/../cxxtest")
 
 ADD_CUSTOM_TARGET(Runner echo "Building Mast_UT runner")
-file(GLOB Lib_UT_HEADER      "./*/UT_*.hpp")
+file(GLOB Mast_UT_HEADER      "./*/UT_*.hpp")
 add_custom_command (OUTPUT 		${UT_RootPath}/Generated/Runner.cpp
-										DEPENDS 	${UT_RootPath}/Runner.mak ${Lib_UT_HEADER}
+										DEPENDS 	${UT_RootPath}/Runner.mak ${Mast_UT_HEADER}
 										COMMAND 	make -C ${UT_RootPath} -f Runner.mak
 										)
 
@@ -31,20 +31,20 @@ include_directories(../Logger/g3log/)
 
 #add_compile_options(${UT_CFLAGS})
 
-file(GLOB Lib_UT_C_API        "C_API/*")
-file(GLOB Lib_UT_UTILITY      "Utility/*")
-file(GLOB Lib_UT_SYSTEM_MODEL "SystemModel/*")
-file(GLOB Lib_UT_HELPERS      "UT_Helpers/*")
-set(Lib_UT_GENERATED 		"Generated/Runner.cpp")
+file(GLOB Mast_UT_C_API        "C_API/*")
+file(GLOB Mast_UT_UTILITY      "Utility/*")
+file(GLOB Mast_UT_SYSTEM_MODEL "SystemModel/*")
+file(GLOB Mast_UT_HELPERS      "UT_Helpers/*")
+set(Mast_UT_GENERATED 		"Generated/Runner.cpp")
 
-set (Lib_UT_SOURCES ${Lib_UT_C_API} ${Lib_UT_UTILITY} ${Lib_UT_SYSTEM_MODEL} ${Lib_UT_HELPERS} ${Lib_UT_GENERATED})
+set (Mast_UT_SOURCES ${Mast_UT_C_API} ${Mast_UT_UTILITY} ${Mast_UT_SYSTEM_MODEL} ${Mast_UT_HELPERS} ${Mast_UT_GENERATED})
 
 
 
-set_source_files_properties(${Lib_UT_GENERATED} GENERATED)
+set_source_files_properties(${Mast_UT_GENERATED} GENERATED)
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "../Bin")
-add_executable 				(Mast_UT ${Lib_UT_SOURCES})
+add_executable 				(Mast_UT ${Mast_UT_SOURCES})
 set_target_properties	(Mast_UT PROPERTIES COMPILE_FLAGS "${UT_CFLAGS}" )
 
 if (WIN32)

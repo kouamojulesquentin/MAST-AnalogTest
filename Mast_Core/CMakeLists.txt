@@ -7,9 +7,13 @@ include_directories(../Logger/g3log/)
 
 set(LIBUSB_CFLAGS "")
 if (NOT WIN32)
-  include_directories(../openocd/)
-  include_directories(../openocd/openocd/src/)
-  include_directories(../openocd/openocd/jimtcl/)
+  # OpenOCD has C header files but using gcc with -std=c++14 args creates warnings
+  # (like if C99 was not enabled).
+  # by calling these third-party software headers with the SYSTEM attribute in the
+  # include_directories() function, we skip these warnings.
+  include_directories(SYSTEM ../openocd/)
+  include_directories(SYSTEM ../openocd/openocd/src/)
+  include_directories(SYSTEM ../openocd/openocd/jimtcl/)
 
   # Trying to find libusb0
   find_path(LIBUSB0_INCLUDE_DIR

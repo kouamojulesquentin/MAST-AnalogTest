@@ -2,17 +2,15 @@
 #include <fstream>
 #include <cassert>
 
-#include "SIT_reader.hpp"
 #include "SystemModelBuilder.hpp"
+#include "SIT_reader.hpp"
+#include "SIT_parser.tab.hh"
+#include "SIT_scanner.hpp"
+
+using std::experimental::string_view;
+
 using namespace mast;
 
-SIT::SIT_Reader::~SIT_Reader()
-{
-   delete(scanner);
-   scanner = nullptr;
-   delete(parser);
-   parser = nullptr;
-}
 
 SIT::SIT_Reader::SIT_Reader( std::shared_ptr<mast::SystemModel> sm)
 {
@@ -21,10 +19,11 @@ SIT::SIT_Reader::SIT_Reader( std::shared_ptr<mast::SystemModel> sm)
 }
 
 bool
-SIT::SIT_Reader::parse( const char * const filename )
+SIT::SIT_Reader::parse( string_view filename )
 {
-   assert( filename != nullptr );
-   std::ifstream in_file( filename );
+   assert( filename.data() != nullptr );
+
+   std::ifstream in_file( filename.data() );
    if( ! in_file.good() )
    {
       return false;
@@ -41,20 +40,16 @@ SIT::SIT_Reader::parse( std::istream &stream )
    }
    //else
    return parse_helper( stream );
-    
 }
 
 
-bool 
+bool
 SIT::SIT_Reader::parse_helper( std::istream &stream )
 {
-   
-   delete(scanner);
    try
    {
-      SystemModelBuilder builder_obj(*main_sm);
-      builder = &builder_obj;
-      scanner = new SIT::SIT_Scanner( &stream );
+      builder = make_shared<mast::SystemModelBuilder>(*main_sm);
+      scanner = make_shared<SIT_Scanner>(&stream);
    }
    catch( std::bad_alloc &ba )
    {
@@ -62,20 +57,19 @@ SIT::SIT_Reader::parse_helper( std::istream &stream )
          ba.what() << "), exiting!!\n";
       return false;
    }
-   
-   delete(parser); 
+
    try
    {
-      parser = new SIT::SIT_Parser( (*scanner) /* scanner */, 
-                                  (*this) /* driver */ );
+      parser = make_shared<SIT_Parser>(*scanner /* scanner */, *this /* driver */);
    }
    catch( std::bad_alloc &ba )
    {
-      std::cerr << "Failed to allocate parser: (" << 
+      std::cerr << "Failed to allocate parser: (" <<
          ba.what() << "), exiting!!\n";
       return false;
    }
-   const int accept( 0 );
+
+   constexpr int accept = 0;
    if( parser->parse() != accept )
    {
       std::cerr << "Parse failed!!\n";
@@ -84,17 +78,17 @@ SIT::SIT_Reader::parse_helper( std::istream &stream )
    return true;
 }
 
-void 
+void
 SIT::SIT_Reader::add_newline()
-{ 
-   line++; 
-   column=0; 
+{
+   ++line;
+   column=0;
 }
 
-void 
+void
 SIT::SIT_Reader::add_column()
-{ 
-   column++; 
+{
+   ++column;
 }
 
 

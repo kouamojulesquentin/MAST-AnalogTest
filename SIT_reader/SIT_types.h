@@ -1,10 +1,16 @@
 #ifndef SIT_TYPES_H
 #define SIT_TYPES_H
- 
+
 #include <string>
+#include <vector>
+#include <memory>
 #include <stdint.h>
-#include "SystemModelBuilder.hpp"
- 
+
+namespace mast
+{
+  class SystemModelNode;
+} // End of namespace mast
+
 
  typedef struct node_name_s
   {
@@ -25,7 +31,7 @@ typedef struct node_list_type_s
 typedef struct coding_s
   {
     std::uint32_t n_words;
-    std::vector<uint32_t> codevalue; 
+    std::vector<uint32_t> codevalue;
   } Coding_type;
 
 #endif

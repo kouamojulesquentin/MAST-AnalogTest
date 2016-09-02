@@ -14,14 +14,12 @@ QMAKE_CXXFLAGS += -fmax-errors=3
 }
 
 INCLUDEPATH += $$PWD/../Mast_Core/include        \
-               $$PWD/../Mast_Core/public_include \
                $$PWD/../SIT_reader               \
                $$PWD/../Logger                   \
                $$PWD/../cxxtest                  \
                UT_Helpers
 
 DEPENDPATH +=  $$PWD/../Mast_Core/include        \
-               $$PWD/../Mast_Core/public_include \
                $$PWD/../SIT_reader               \
                $$PWD/../Logger                   \
                $$PWD/../cxxtest                  \

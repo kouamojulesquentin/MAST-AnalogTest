@@ -1,11 +1,15 @@
 #include <iostream>
 #include <cstdlib>
 #include <cstring>
+#include <memory>
 
 #include "SIT_reader.hpp"
+#include "SystemModel.hpp"
 #include "PrettyPrinterVisitor.hpp"
 
-int 
+using namespace mast;
+
+int
 main( const int argc, const char **argv )
 {
    /** check for the right # of arguments **/
@@ -13,8 +17,8 @@ main( const int argc, const char **argv )
    {
       auto  sm = std::make_shared<mast::SystemModel>();
       SIT::SIT_Reader driver(sm);
-      
-      /** example for piping input from terminal, i.e., using cat **/ 
+
+      /** example for piping input from terminal, i.e., using cat **/
       if( std::strncmp( argv[ 1 ], "-o", 2 ) == 0 )
       {
          driver.parse( std::cin );
@@ -33,7 +37,7 @@ main( const int argc, const char **argv )
          /** assume file, prod code, use stat to check **/
          driver.parse( argv[1] );
       }
-   
+
    std::cout << "Parsing finished\n";
 
    if (driver.parsed_sut==nullptr)
@@ -41,7 +45,7 @@ main( const int argc, const char **argv )
       /** exit with failure condition **/
       return ( EXIT_FAILURE );
      }
-      
+
    PrettyPrinterVisitor prettyPrinter(PrettyPrinterOptions::ShowSelectorProperties);
 //   prettyPrinter.SetVerbose(true);
    driver.parsed_sut->Accept(prettyPrinter);
@@ -55,7 +59,7 @@ main( const int argc, const char **argv )
       /** exit with failure condition **/
       return ( EXIT_FAILURE );
    }
-   
-   
+
+
    return( EXIT_SUCCESS );
 }

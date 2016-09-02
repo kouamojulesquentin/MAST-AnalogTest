@@ -12,10 +12,6 @@
 //===========================================================================
 
 
-#include <experimental/string_view>
-#include <cxxtest/ValueTraits.h>
-#include <iostream>
-#include <tuple>
 #include "SIT_reader.hpp"
 #include "PrettyPrinterVisitor.hpp"
 #include "SystemModelBuilder.hpp"
@@ -23,10 +19,18 @@
 #include "UT_reader.hpp"
 #include "UT_reader_wrapper.hpp"
 
+#include <cxxtest/ValueTraits.h>
+#include <experimental/string_view>
+#include <iostream>
+#include <tuple>
+#include <memory>
+
 using std::tuple;
 using std::make_tuple;
 using std::string;
 using std::experimental::string_view;
+using std::shared_ptr;
+using std::make_shared;
 using test::UT_reader_wrapper;
 
 using namespace mast;

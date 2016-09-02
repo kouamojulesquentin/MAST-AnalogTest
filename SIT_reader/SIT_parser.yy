@@ -1,7 +1,7 @@
 %skeleton "lalr1.cc"
 %require  "3.0"
-%debug 
-%defines 
+%debug
+%defines
 %define api.namespace {SIT}
 %define parser_class_name {SIT_Parser}
 
@@ -45,9 +45,10 @@ using namespace mast;
    #include <iostream>
    #include <cstdlib>
    #include <fstream>
-   
+
    /* include for all driver functions */
-   #include "SIT_reader.hpp"
+   #include "SIT_Reader.hpp"
+   #include "SIT_scanner.hpp"
    #include "SIT_types.h"
 
 #undef yylex
@@ -75,7 +76,7 @@ std::vector<std::string> Path_Selector_table  =
   {"Binary","One_Hot","N_Hot","Binary_noidle","One_Hot_noidle","N_Hot_noidle"};
 enum Path_Selector_t {Binary,One_Hot,N_Hot,Binary_noidle,One_Hot_noidle,N_Hot_noidle};
 
-std::vector<SelectorProperty> Path_Selector_prop_t { 
+std::vector<SelectorProperty> Path_Selector_prop_t {
  SelectorProperty::Binary_Default  ,SelectorProperty::One_Hot_Default,SelectorProperty::N_Hot_Default,
  SelectorProperty::CannotSelectNone,SelectorProperty::CannotSelectNone,SelectorProperty::CannotSelectNone,};
 
@@ -83,7 +84,7 @@ static int find_in_table(std::vector<std::string> table, std::string s)
 {
 	unsigned int   l;
  	for (l=0;l<table.size();l++)
-   	if ((table)[l]==s) 
+   	if ((table)[l]==s)
      		{
      		break;
      	    }
@@ -108,7 +109,7 @@ inline std::uint32_t extract_number(std::string s)
   auto res = std::strtoul (tmp.c_str(), &end,0);
   auto result = res;
   return  result;
-}  
+}
 
 }
 
@@ -179,27 +180,27 @@ inline std::uint32_t extract_number(std::string s)
 
 %%
 
-root_node: 
-   node END 
+root_node:
+   node END
     {
     driver.parsed_sut=$1;
     }
    ;
 
-children_list:   
-  t_START_HIERARCHY node_list  t_END_HIERARCHY{ $$ = $2;}	
+children_list:
+  t_START_HIERARCHY node_list  t_END_HIERARCHY{ $$ = $2;}
   ;
 
-node_list:   
+node_list:
     node node_list { $$.name = $1->Name() + ' ' + $2.name; $$.n_nodes = $2.n_nodes+1;
                     auto tmp = $2.nodes;
 		    tmp.insert(tmp.begin(),$1);
-		    $$.nodes = tmp; 
-		    }	
+		    $$.nodes = tmp;
+		    }
   |   node { $$.name = $1->Name();$$.n_nodes = 1;$$.nodes.push_back($1);}
   ;
-    
-node:  
+
+node:
    internal_node { $$ = $1;}
   | leaf_node
   		    { $$ = $1;}
@@ -211,19 +212,19 @@ is_transparent:
   { $$ = 0;}
 ;
 
-node_name :  t_WORD is_transparent 
-     			{ 
+node_name :  t_WORD is_transparent
+     			{
   		     $$.name = $1;
 		     $$.is_transparent = $2;
 		     }
      ;
 
-internal_node: 
+internal_node:
 
-t_CHAIN  node_name children_list { 
-                     if ($2.is_transparent) 
+t_CHAIN  node_name children_list {
+                     if ($2.is_transparent)
 		           std::cout << "(transparent)";
-		     
+
 		     auto node = driver.main_sm->CreateChain($2.name);
 		     for (auto this_child : $3.nodes)
 		       node->AppendChild(this_child);
@@ -233,15 +234,15 @@ t_CHAIN  node_name children_list {
 t_LINKER  node_name path_selector ctrl_node children_list {
 			int   l;
 			l = find_in_table(Path_Selector_table,$3);
-			if (l==-1) 
+			if (l==-1)
 			 {
 	  		std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unkown Linker Path Selector \n";
-	  		YYERROR; 
+	  		YYERROR;
 	  		}
 	  	       else
-	  	    	{ 
+	  	    	{
                      	std::cout << "Node type LINKER, idf " << $2.name ;
-                     	if ($2.is_transparent) 
+                     	if ($2.is_transparent)
 		           std::cout << "(transparent) ";
 			std::cout <<  $3 <<"_PathSelector";
 			 std::cout <<" controlled by node "<<$4;
@@ -253,13 +254,13 @@ t_LINKER  node_name path_selector ctrl_node children_list {
  	  	     $$ = node;
   		      }
 		}
- |  
+ |
  t_SIB node_name position active children_list
   {
-      if ($5.n_nodes!=1) 
+      if ($5.n_nodes!=1)
 	 {
 	  std::cerr << "SIB " << $2.name<< " has " << $5.n_nodes << " derivations instead of 1\n";
-	  YYERROR; 
+	  YYERROR;
 	 }
         else
       {
@@ -269,40 +270,40 @@ t_LINKER  node_name path_selector ctrl_node children_list {
 
  	$$ = node;
        }
-  }			
- |  
+  }
+ |
  t_MIB node_name position active reverse max_derivations path_selector children_list
   {
-      if ($8.n_nodes>$6) 
+      if ($8.n_nodes>$6)
 	 {
 	  std::cerr << "MIB " << $2.name<< " has " << $8.n_nodes << " derivations instead of maximum "<< $6 <<"\n";
-	  YYERROR; 
+	  YYERROR;
 	 }
         else
       {
       int   l;
 	l = find_in_table(Path_Selector_table,$7);
-	if (l==-1) 
+	if (l==-1)
 	 {
 	 std::cerr << "node " << $2.name<< " \""<< $7 << "\"" << ": Unkown MIB Path Selector \n";
-	 YYERROR; 
+	 YYERROR;
 	 }
         auto selectorRegName = $2.name + MIB_CTRL_EXT;
 	SelectorProperty sel_properties = $4 | $5| Path_Selector_prop_t[l];
 
         pair<shared_ptr<Register>, shared_ptr<PathSelector>> res; /*cannot use auto inside a switch*/
  	switch(l)
-	 { 
-	  case Binary : 
-	  case Binary_noidle : 
+	 {
+	  case Binary :
+	  case Binary_noidle :
 	      res =  driver.builder->Create_PathSelector(SelectorKind::Binary, selectorRegName, $6,sel_properties);
 	     break;
-	  case One_Hot : 
-	  case One_Hot_noidle : 
+	  case One_Hot :
+	  case One_Hot_noidle :
  	      res  = driver.builder->Create_PathSelector(SelectorKind::One_Hot, selectorRegName, $6,sel_properties);
 	      break;
-	  case N_Hot : 
-	  case N_Hot_noidle : 
+	  case N_Hot :
+	  case N_Hot_noidle :
  	      res  = driver.builder->Create_PathSelector(SelectorKind::N_Hot, selectorRegName, $6,sel_properties);
 	      break;
 	 }
@@ -314,14 +315,14 @@ t_LINKER  node_name path_selector ctrl_node children_list {
 	    node->AppendChild(this_child);
   	$$ = node;
        }
-  }			
- |  
+  }
+ |
  t_1500_WRAPPER node_name max_derivations children_list
   {
-      if ($4.n_nodes>$3) 
+      if ($4.n_nodes>$3)
 	 {
 	  std::cerr << "1500 Wrapper " << $2.name<< " has " << $4.n_nodes << " derivations instead of maximum "<< $3 <<"\n";
-	  YYERROR; 
+	  YYERROR;
 	 }
         else
       {
@@ -330,20 +331,20 @@ t_LINKER  node_name path_selector ctrl_node children_list {
 	    node->AppendChild(this_child);
   	$$ = node;
        }
-  }			
+  }
  |
-t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE children_list { 
+t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE children_list {
 
 	int   l;
 	l = find_in_table(AI_protocol_table,$3);
-  	if (l==-1) 
+  	if (l==-1)
 	  {
 	  std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unkown AccessInterface Protocol \n";
-	  YYERROR; 
+	  YYERROR;
 	  }
 	  else
 	  {
-		
+
           std::shared_ptr<AccessInterfaceProtocol> protocol;
 	  switch(l)
 	  {
@@ -371,32 +372,32 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE children_list {
 		for (auto this_child : $5.nodes)
 		   node->AppendChild(this_child);
 
-  	  	$$ = node;        
-		
+  	  	$$ = node;
+
 		}
 	  }
- |  
+ |
   t_JTAG_TAP node_name JTAG_protocol IR_size IR_TABLE n_DR_chains children_list
-      { if ($7.n_nodes>($6+1)) 
+      { if ($7.n_nodes>($6+1))
 	 {
 	  std::cerr << "JTAG TAP " << $2.name<< " has " << $7.n_nodes-1 << " DR derivations instead of maximum "<< $6 <<"\n";
-	  YYERROR; 
+	  YYERROR;
 	 }
         else
       {
        if (($5.n_words>0) && ($5.n_words <($7.n_nodes+1)))
          {
 	  std::cerr << "JTAG TAP " << $2.name<< " has only " << $5.n_words << " IR codings for " << $7.n_nodes << " DR derivations + BPY\n";
-	  YYERROR; 
+	  YYERROR;
 	 }
-       else 
+       else
   	{
 	int   l;
 	l = find_in_table(JTAG_AI_protocol_table,$3);
-  	if (l==-1) 
+  	if (l==-1)
 	  {
 	  std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unkown JTAG protocol \n";
-	  YYERROR; 
+	  YYERROR;
 	  }
 	  else
 	{
@@ -422,7 +423,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE children_list {
 	}
        }
      }
-  ; 
+  ;
 
 JTAG_protocol: t_WORD
    {$$ =$1;}
@@ -437,89 +438,89 @@ ctrl_node: t_WORD
    { $$ = "";}
    ;
 
-IR_size : 
+IR_size :
  t_DecimalLiteral { $$ = $1;}
 ;
-n_DR_chains : 
+n_DR_chains :
  t_DecimalLiteral { $$ = $1;}
 ;
-IR_TABLE: 
+IR_TABLE:
  t_LeftBracket Coding_list t_RightBracket  {$$=$2;}
  |  {$$.n_words = 0;}
  ;
 
-AI_TABLE: 
+AI_TABLE:
 t_LeftBracket Coding_list t_RightBracket  {$$=$2;}
  |  {$$.n_words = 0;}
  ;
 
 Coding_list:
- t_QUOTED_STRING 
-    { 
-       $$.codevalue.push_back(extract_number($1)); 
-    $$.n_words = 1; 
+ t_QUOTED_STRING
+    {
+       $$.codevalue.push_back(extract_number($1));
+    $$.n_words = 1;
     }
  |
- t_QUOTED_STRING t_Comma  Coding_list 
+ t_QUOTED_STRING t_Comma  Coding_list
   {
-   $$.n_words = ($3.n_words+1); 
+   $$.n_words = ($3.n_words+1);
    auto tmp = $3.codevalue;
    tmp.insert(tmp.begin(),extract_number($1));
    $$.codevalue = tmp;
-   }	
+   }
 ;
 
-max_derivations : 
+max_derivations :
  t_DecimalLiteral { $$ = $1;}
 ;
 position :
  t_POST { $$ = MuxRegPlacement::AfterMux;}
  |
  t_PRE{ $$ = MuxRegPlacement::BeforeMux;}
- ; 
+ ;
 
 active :
  t_HIGH { $$ = SelectorProperty::None;}
  |
  t_LOW{ $$ =  SelectorProperty::InvertedBits;}
- ; 
+ ;
 
 reverse :
  t_REVERSE {$$ = SelectorProperty::ReverseOrder;}
  |
  {  $$ = SelectorProperty::None; }
- ; 
- 
+ ;
+
 leaf_node: register_node {     $$=  $1;
                            }
   ;
-  
-register_node: 
-   t_REGISTER  node_name size hold bypass { 
+
+register_node:
+   t_REGISTER  node_name size hold bypass {
                       auto node = driver.main_sm->CreateRegister ($2.name,  BinaryVector::CreateFromBinaryString(remove_quotes($5)), nullptr);
-		      if ($4==1) node->SetHoldValue(true); 
+		      if ($4==1) node->SetHoldValue(true);
   		     $$ = node;}
 
-size : 
+size :
  t_DecimalLiteral { $$ = $1;}
 ;
 
-hold: 
+hold:
  t_HOLD_VALUE{  $$=1 ; }
  |{  $$=0 ; }
  ;
 
-bypass: 
+bypass:
  t_BYPASS t_SEMICOLON t_QUOTED_STRING
   {
    $$=$3 ;
   }
   ;
- 
+
 %%
 
 
-void 
+void
 SIT::SIT_Parser::error( const location_type &l, const std::string &err_message )
 {
 //   std::cerr << "Error: " << err_message << " at " << l << "\n";

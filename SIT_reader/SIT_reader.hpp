@@ -2,55 +2,61 @@
 #define __SITDRIVER_HPP__ 1
 
 #include <string>
+#include <experimental/string_view>
 #include <cstddef>
 #include <istream>
+#include <memory>
 
-#include "SIT_scanner.hpp"
-#include "SIT_parser.tab.hh"
-#include "SystemModelBuilder.hpp"
 
-using namespace mast;
-using std::shared_ptr;
+namespace mast
+{
+  class SystemModelBuilder;
+  class SystemModel;
+  class SystemModelNode;
+} // End of namespace mast
 
-namespace SIT{
+namespace SIT
+{
+class SIT_Parser;
+class SIT_Scanner;
 
-class SIT_Reader{
+class SIT_Reader
+{
 public:
+   virtual ~SIT_Reader() = default;
+   SIT_Reader() = delete;
    SIT_Reader( std::shared_ptr<mast::SystemModel> sm);
 
-   virtual ~SIT_Reader();
-   
-   /** 
+
+   /**
     * parse - parse from a file
     * @param filename - valid string with input file
     */
-   bool parse( const char * const filename );
-   /** 
+   bool parse(std::experimental::string_view filename);
+
+   /**
     * parse - parse from a c++ input stream
     * @param is - std::istream&, valid input stream
     */
    bool parse( std::istream &iss );
 
-   void add_newline();
-   void add_column();
-
-
-   std::shared_ptr<mast::SystemModel> main_sm;
    std::shared_ptr<mast::SystemModelNode> parsed_sut;
-   mast::SystemModelBuilder *builder;
+
+private:  // Part used by SIT_Parser
+  friend class SIT_Parser;
+  std::shared_ptr<mast::SystemModel>        main_sm;
+  std::shared_ptr<mast::SystemModelBuilder> builder;
 
 private:
 
+   void add_newline();
+   void add_column();
    bool parse_helper( std::istream &stream );
 
-   std::size_t  column      = 0;
-   std::size_t  line      = 0;
-   SIT::SIT_Parser  *parser  = nullptr;
-   SIT::SIT_Scanner *scanner = nullptr;
-   
-   const std::string red   = "\033[1;31m";
-   const std::string blue  = "\033[1;36m";
-   const std::string norm  = "\033[0m";
+   std::size_t                  column = 0;
+   std::size_t                  line   = 0;
+   std::shared_ptr<SIT_Parser>  parser;
+   std::shared_ptr<SIT_Scanner> scanner;
 };
 
 } /* end namespace SIT */

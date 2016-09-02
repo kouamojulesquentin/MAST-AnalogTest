@@ -12,7 +12,7 @@ namespace SIT{
 
 class SIT_Scanner : public yyFlexLexer{
 public:
-   
+
    SIT_Scanner(std::istream *in) : yyFlexLexer(in)
    {
       loc = new SIT::SIT_Parser::location_type();
@@ -25,17 +25,17 @@ public:
    using FlexLexer::yylex;
 
    virtual
-   int yylex( SIT::SIT_Parser::semantic_type * const lval, 
-              SIT::SIT_Parser::location_type *location );
+   int yylex( SIT_Parser::semantic_type * const lval,
+              SIT_Parser::location_type *location );
    // YY_DECL defined in SIT_lexer.l
    // Method body created by flex in SIT_lexer.yy.cc
 
 
 private:
    /* yyval ptr */
-   SIT::SIT_Parser::semantic_type *yylval = nullptr;
+   SIT_Parser::semantic_type *yylval = nullptr;
    /* location ptr */
-   SIT::SIT_Parser::location_type *loc    = nullptr;
+   SIT_Parser::location_type *loc    = nullptr;
 };
 
 } /* end namespace SIT */

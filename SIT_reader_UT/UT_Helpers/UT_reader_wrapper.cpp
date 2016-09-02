@@ -24,6 +24,7 @@ using std::string;
 using std::experimental::string_view;
 using std::pair;
 using std::make_pair;
+using std::shared_ptr;
 
 using namespace test;
 using namespace mast;

@@ -13,18 +13,18 @@ QMAKE_CXXFLAGS += -fmax-errors=3
     error("Generated/Runner.cpp has not been generated")
 }
 
-INCLUDEPATH += $$PWD/../Lib/include        \
-               $$PWD/../Lib/public_include \
-               $$PWD/../SIT_reader         \
-               $$PWD/../Logger             \
-               $$PWD/../cxxtest            \
+INCLUDEPATH += $$PWD/../Mast_Core/include        \
+               $$PWD/../Mast_Core/public_include \
+               $$PWD/../SIT_reader               \
+               $$PWD/../Logger                   \
+               $$PWD/../cxxtest                  \
                UT_Helpers
 
-DEPENDPATH +=  $$PWD/../Lib/include        \
-               $$PWD/../Lib/public_include \
-               $$PWD/../SIT_reader         \
-               $$PWD/../Logger             \
-               $$PWD/../cxxtest            \
+DEPENDPATH +=  $$PWD/../Mast_Core/include        \
+               $$PWD/../Mast_Core/public_include \
+               $$PWD/../SIT_reader               \
+               $$PWD/../Logger                   \
+               $$PWD/../cxxtest                  \
                UT_Helpers
 
 win32 {
@@ -45,13 +45,13 @@ HEADERS += \
 
 CONFIG(debug,   debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/SIT_reader_UT/debug)
-  DESTDIR     = $$clean_path($$PWD/../Build_Qt/bin/debug)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/bin/debug)   -lLib -lLogger -lSIT_reader_Lib
+  DESTDIR     = $$clean_path($$PWD/../Build_Qt/Bin/debug)
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/debug)   -lMast_Core -lLogger -lSIT_reader_Lib
 }
 else: CONFIG(release, debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/SIT_reader_UT/release)
-  DESTDIR     = $$clean_path($$PWD/../Build_Qt/bin/release)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/bin/release) -lLib -lLogger -lSIT_reader_Lib
+  DESTDIR     = $$clean_path($$PWD/../Build_Qt/Bin/release)
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/release) -lMast_Core -lLogger -lSIT_reader_Lib
 }
 
 unix {

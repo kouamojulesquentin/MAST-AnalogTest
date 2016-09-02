@@ -9,8 +9,8 @@ add_definitions(${P_CFLAGS})
 set (P_CFLAGS "${P_WARNINGS} -std=c++14")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
-include_directories(../Lib/include/)
-include_directories(../Lib/public_include/)
+include_directories(../Mast_Core/include/)
+include_directories(../Mast_Core/public_include/)
 include_directories(../Logger/)
 include_directories(../Logger/g3log/)
 include_directories(../SIT_reader/)
@@ -24,8 +24,8 @@ if (NOT WIN32)
   # Trying to find libusb0
   find_path(LIBUSB0_INCLUDE_DIR
     NAMES usb.h
-    PATH_SUFFIXES "include" "libusb")  
-         
+    PATH_SUFFIXES "include" "libusb")
+
   find_library(LIBUSB0_LIBRARY
     NAMES usb
     PATH_SUFFIXES "lib" "lib32" "lib64" )
@@ -33,10 +33,10 @@ if (NOT WIN32)
   # Trying to find libusb1
   find_path(LIBUSB1_INCLUDE_DIR
     NAMES libusb.h
-    PATH_SUFFIXES "include" "libusb-1.0")  
-         
+    PATH_SUFFIXES "include" "libusb-1.0")
+
   find_library(LIBUSB1_LIBRARY
-    NAMES usb-1.0 
+    NAMES usb-1.0
     PATH_SUFFIXES "lib" "lib32" "lib64" )
 
   if(LIBUSB1_INCLUDE_DIR AND LIBUSB1_LIBRARY)
@@ -61,8 +61,8 @@ add_executable 				(TestCasesApp ${APP_SOURCES})
 set_target_properties	(TestCasesApp PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
 if (WIN32)
-	target_link_libraries(TestCasesApp Lib Logger SIT_Reader_Lib DbgHelp )
+	target_link_libraries(TestCasesApp Mast_Core Logger SIT_Reader_Lib DbgHelp )
 else ()
     # $LIBUSB_CFLAGS, ldl and libjim.a args are required by OpenOCD.
-	target_link_libraries(TestCasesApp Lib Logger SIT_Reader_Lib pthread openocd ${LIBUSB_CFLAGS} -ldl ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/openocd/jimtcl/libjim.a dl)
+	target_link_libraries(TestCasesApp Mast_Core Logger SIT_Reader_Lib pthread openocd ${LIBUSB_CFLAGS} -ldl ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/openocd/jimtcl/libjim.a dl)
 endif ()

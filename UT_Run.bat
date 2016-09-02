@@ -6,7 +6,7 @@
 
 @set originalPath=%path%
 @REM @set Path=C:\MinGW\bin;%Path%
-@set DestFile=Lib_UT\UT_Results\UT_Result.txt
+@set DestFile=Mast_UT\UT_Results\UT_Result.txt
 
 @if not defined chain  (set chain=Build_Qt)
 @REM @if not defined chain  (set chain=Build_CB)
@@ -23,13 +23,13 @@ set  targetDir=".\bin\%Build%"
 @echo ===== Target dir: %targetDir%
 @pushd %targetDir%
 
-@if not exist Lib_UT.exe goto No_exe
+@if not exist Mast_UT.exe goto No_exe
 @REM @echo Dir: %cd%
 @REM @dir
 
 
-@if     "%Options%"=="--display_success"  Lib_UT.exe %Options% >      %DestFileFromExe%
-@if not "%Options%"=="--display_success"  Lib_UT.exe %Options% | mtee %DestFileFromExe%
+@if     "%Options%"=="--display_success"  Mast_UT.exe %Options% >      %DestFileFromExe%
+@if not "%Options%"=="--display_success"  Mast_UT.exe %Options% | mtee %DestFileFromExe%
 
 
 @set Build=
@@ -42,7 +42,7 @@ set  targetDir=".\bin\%Build%"
 @goto :EOF
 :No_exe
 @echo.
-@echo. ---- file %CD%\Lib_UT.exe does not exist! ----
+@echo. ---- file %CD%\Mast_UT.exe does not exist! ----
 @echo.
 @goto :EOF
 :Syntax

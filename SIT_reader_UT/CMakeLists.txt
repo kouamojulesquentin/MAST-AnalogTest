@@ -1,6 +1,6 @@
-# LIB Unit tests:
+# SIT_Reader:
 
-project (mast_UT)
+project (SIT_reader_UT)
 
 add_definitions(${UT_WARNINGS})
 set (UT_WARNINGS ${WARNINGS})
@@ -23,8 +23,8 @@ add_custom_command (OUTPUT 		${UT_RootPath}/Generated/Runner.cpp
 include_directories(${CXXTEST_INCLUDE_DIR})
 include_directories(${UT_RootPath}/../Lib_UT/CxxTest_Traits)
 include_directories(${UT_RootPath}/UT_Helpers/)
-include_directories(../Lib/include/)
-include_directories(../Lib/public_include/)
+include_directories(../Mast_Core/include/)
+include_directories(../Mast_Core/public_include/)
 include_directories(../Logger/)
 include_directories(../Logger/g3log/)
 include_directories(../SIT_reader/)
@@ -49,8 +49,8 @@ add_executable (SIT_Reader_UT ${SIT_Reader_UT_SOURCES})
 set_target_properties(SIT_Reader_UT PROPERTIES COMPILE_FLAGS "${UT_CFLAGS}" )
 
 if (WIN32)
-	target_link_libraries(SIT_Reader_UT  Lib Logger  SIT_Reader_Lib DbgHelp)
+	target_link_libraries(SIT_Reader_UT  Mast_Core Logger  SIT_Reader_Lib DbgHelp)
 else ()
-	target_link_libraries(SIT_Reader_UT  Lib Logger  SIT_Reader_Lib pthread)
+	target_link_libraries(SIT_Reader_UT  Mast_Core Logger  SIT_Reader_Lib pthread)
 endif ()
 

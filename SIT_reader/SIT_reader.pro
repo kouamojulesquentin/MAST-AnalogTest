@@ -18,12 +18,12 @@ QMAKE_CXXFLAGS += -fmax-errors=3
     error("Parser has not been generated")
 }
 
-INCLUDEPATH += $$PWD/../Lib/include            \
-               $$PWD/../Lib/public_include     \
+INCLUDEPATH += $$PWD/../Mast_Core/include            \
+               $$PWD/../Mast_Core/public_include     \
                $$PWD/../Logger
 
-DEPENDPATH += $$PWD/../Lib/include        \
-              $$PWD/../Lib/public_include \
+DEPENDPATH += $$PWD/../Mast_Core/include        \
+              $$PWD/../Mast_Core/public_include \
               $$PWD/../Logger
 
 win32 {
@@ -47,13 +47,13 @@ HEADERS += \
 
 CONFIG(debug,   debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/SIT_reader/debug)
-  DESTDIR     = $$clean_path($$PWD/../Build_Qt/bin/debug)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/bin/debug)   -lLib -lLogger
+  DESTDIR     = $$clean_path($$PWD/../Build_Qt/Bin/debug)
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/debug)   -lMast_Core -lLogger
 }
 else: CONFIG(release, debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/SIT_reader/release)
-  DESTDIR     = $$clean_path($$PWD/../Build_Qt/bin/release)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/bin/release) -lLib -lLogger
+  DESTDIR     = $$clean_path($$PWD/../Build_Qt/Bin/release)
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/release) -lMast_Core -lLogger
 }
 
 unix {

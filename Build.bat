@@ -7,7 +7,7 @@
 @if not defined target (set target=debug)
 
 @set Build_Qt=Build_Qt
-@set UT_targetFile=".\Build_Qt\bin\%target%\Lib_UT.exe"
+@set UT_targetFile=".\Build_Qt\bin\%target%\Mast_UT.exe"
 @set TCA_targetFile=".\Build_Qt\bin\%target%\TestCasesApp.exe"
 
 @echo.
@@ -18,7 +18,7 @@
 @REM @if exist %UT_targetFile%  del %UT_targetFile%
 @REM @if exist %TCA_targetFile% del %TCA_targetFile%
 
-@if not exist Lib_UT\Generated mkdir Lib_UT\Generated
+@if not exist Mast_UT\Generated mkdir Mast_UT\Generated
 
 @set make_exe="c:\mingw-w64\Gcc-4.9.3\mingw32\bin\make.exe"
 
@@ -28,20 +28,20 @@
 %make_exe% -j4 -C %Build_Qt%\Logger -f Makefile    %target%
 
 @echo.
-@echo ===================== Building Lib =====================
+@echo ===================== Building Mast_Core =====================
 @echo.
-%make_exe% -j4 -C %Build_Qt%\Lib -f Makefile    %target%
+%make_exe% -j4 -C %Build_Qt%\Mast_Core -f Makefile    %target%
 
 @if errorlevel 0  (
 @echo.
-@echo ===================== Building Lib_UT Runner.cpp =====================
+@echo ===================== Building Mast_UT Runner.cpp =====================
 @echo.
-%make_exe% -C Lib_UT -f Runner.mak
+%make_exe% -C Mast_UT -f Runner.mak
 
 @echo.
-@echo ===================== Building Lib_UT =====================
+@echo ===================== Building Mast_UT =====================
 @echo.
-%make_exe% -j4 -C %Build_Qt%\Lib_UT -f Makefile %target%
+%make_exe% -j4 -C %Build_Qt%\Mast_UT -f Makefile %target%
 
 @echo.
 @echo ===================== Building SIT_Reader =====================
@@ -62,6 +62,6 @@
 :CheckExe
 @echo.
 @echo.
-@if not exist %UT_targetFile%  echo =============== Error: Failed to generate Mast Lib unit test executable =====================
+@if not exist %UT_targetFile%  echo =============== Error: Failed to generate Mast_UT executable =====================
 @if not exist %TCA_targetFile% echo =============== Error: Failed to generate TestCasesApp executable =====================
 @echo.

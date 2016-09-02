@@ -63,3 +63,4 @@
 /openocd/openocd/Makefile
 /openocd/openocd/*/Makefile
 /openocd/openocd/src/.deps/main.Po
+/Mast_UT/Generated/Runner.cpp

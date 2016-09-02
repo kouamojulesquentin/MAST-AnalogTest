@@ -6,7 +6,7 @@
 
 QT -= core gui
 
-TARGET = Lib
+TARGET   = Mast_Core
 TEMPLATE = lib
 
 DEFINES += LIB_LIBRARY
@@ -134,16 +134,13 @@ win32 {
 }
 
 
-#+CONFIG(debug,   debug|release): OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Lib/debug)
-#+else: CONFIG(release, debug|release): OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Lib/release)
-
 CONFIG(debug,   debug|release) {
-  OBJECTS_DIR =   $$clean_path($$PWD/../Build_Qt/Lib/debug)
-  DESTDIR     =   $$clean_path($$PWD/../Build_Qt/bin/debug)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/bin/debug) -lLogger
+  OBJECTS_DIR =   $$clean_path($$PWD/../Build_Qt/Mast_Core/debug)
+  DESTDIR     =   $$clean_path($$PWD/../Build_Qt/Bin/debug)
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/debug) -lLogger
 }
 else: CONFIG(release, debug|release) {
-  OBJECTS_DIR =   $$clean_path($$PWD/../Build_Qt/Lib/release)
-  DESTDIR     =   $$clean_path($$PWD/../Build_Qt/bin/release)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/bin/release) -lLogger
+  OBJECTS_DIR =   $$clean_path($$PWD/../Build_Qt/Mast_Core/release)
+  DESTDIR     =   $$clean_path($$PWD/../Build_Qt/Bin/release)
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/release) -lLogger
 }

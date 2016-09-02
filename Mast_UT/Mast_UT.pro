@@ -13,15 +13,15 @@ QMAKE_CXXFLAGS += -fmax-errors=3
     error("Generated/Runner.cpp has not been generated")
 }
 
-INCLUDEPATH += $$PWD/../Lib/include            \
-               $$PWD/../Lib/public_include     \
-               $$PWD/../Logger                 \
-               $$PWD/../cxxtest CxxTest_Traits \
+INCLUDEPATH += $$PWD/../Mast_Core/include        \
+               $$PWD/../Mast_Core/public_include \
+               $$PWD/../Logger                   \
+               $$PWD/../cxxtest CxxTest_Traits   \
                UT_Helpers
 
-DEPENDPATH += $$PWD/../Lib/include \
-              $$PWD/../Lib/public_include \
-              $$PWD/../cxxtest CxxTest_Traits \
+DEPENDPATH += $$PWD/../Mast_Core/include        \
+              $$PWD/../Mast_Core/public_include \
+              $$PWD/../cxxtest CxxTest_Traits   \
               UT_Helpers
 
 
@@ -99,14 +99,14 @@ HEADERS += \
 
 
 CONFIG(debug,   debug|release) {
-  OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Lib_UT/debug)
-  DESTDIR     = $$clean_path($$PWD/../Build_Qt/bin/debug)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/bin/debug)   -lLib -lLogger
+  OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Mast_UT/debug)
+  DESTDIR     = $$clean_path($$PWD/../Build_Qt/Bin/debug)
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/debug)   -lMast_Core -lLogger
 }
 else: CONFIG(release, debug|release) {
-  OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Lib_UT/release)
-  DESTDIR     = $$clean_path($$PWD/../Build_Qt/bin/release)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/bin/release) -lLib -lLogger
+  OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Mast_UT/release)
+  DESTDIR     = $$clean_path($$PWD/../Build_Qt/Bin/release)
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/release) -lMast_Core -lLogger
 }
 
 unix {

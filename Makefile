@@ -16,12 +16,12 @@ MKDIR = mkdir
 RUN   =
 
 BIN_DIR             = Bin
-LIB_UT_EXE_NAME     = Lib_UT.exe
+MAST_UT_EXE_NAME    = Mast_UT.exe
 SIT_UT_EXE_NAME     = SIT_Reader_UT.exe
 SIT_READER_EXE_NAME = SIT_reader_demo.exe
 TESTCASES_EXE_NAME  = TestCasesApp.exe
 
-LIB_UT_EXE_PATH       = $(BIN_DIR)\$(LIB_UT_EXE_NAME)
+MAST_UT_EXE_PATH      = $(BIN_DIR)\$(MAST_UT_EXE_NAME)
 SIT_UT_EXE_PATH       = $(BIN_DIR)\$(SIT_UT_EXE_NAME)
 SIT_READER_EXE_PATH   = $(SIT_READER_EXE_NAME)
 SIT_READER_INPUT_FILE = ..\..\SIT_reader\prova.txt
@@ -33,12 +33,12 @@ RM    = rm -rf
 RUN   = ./
 
 BIN_DIR             = Bin
-LIB_UT_EXE_NAME     = Lib_UT
+MAST_UT_EXE_NAME    = Mast_UT
 TESTCASES_EXE_NAME  = TestCasesApp
 SIT_READER_EXE_NAME = SIT_reader_demo
 SIT_UT_EXE_NAME     = SIT_Reader_UT
 
-LIB_UT_EXE_PATH       = $(BIN_DIR)/$(LIB_UT_EXE_NAME)
+MAST_UT_EXE_PATH      = $(BIN_DIR)/$(MAST_UT_EXE_NAME)
 SIT_UT_EXE_PATH       = $(BIN_DIR)/$(SIT_UT_EXE_NAME)
 SIT_READER_EXE_PATH   = $(SIT_READER_EXE_NAME)
 SIT_READER_INPUT_FILE = ../../SIT_reader/prova.txt
@@ -70,15 +70,15 @@ endif
 > cd $(CMAKE_RELEASE_BUILD_DIR) && make  $(MAKE_FLAGS)
 
 run_debug:
-ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(LIB_UT_EXE_NAME))","")
->  cd $(CMAKE_DEBUG_BUILD_DIR) && $(RUN)$(LIB_UT_EXE_PATH)
+ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(MAST_UT_EXE_NAME))","")
+>  cd $(CMAKE_DEBUG_BUILD_DIR) && $(RUN)$(MAST_UT_EXE_PATH)
 else
 >  @echo "    ==== No Debug Lib UT available ========"
 endif
 
 run_release:
-ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(LIB_UT_EXE_NAME))","")
->  cd $(CMAKE_RELEASE_BUILD_DIR) && $(RUN)$(LIB_UT_EXE_PATH)
+ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(MAST_UT_EXE_NAME))","")
+>  cd $(CMAKE_RELEASE_BUILD_DIR) && $(RUN)$(MAST_UT_EXE_PATH)
 else
 >  @echo "    ==== No Release Lib UT available ========"
 endif

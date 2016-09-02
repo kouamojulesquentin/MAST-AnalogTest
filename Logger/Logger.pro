@@ -76,9 +76,9 @@ else: win32 {
 
 CONFIG(debug,   debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Logger/debug)
-  DESTDIR     = $$clean_path($$PWD/../Build_Qt/bin/debug)
+  DESTDIR     = $$clean_path($$PWD/../Build_Qt/Bin/debug)
 }
 else: CONFIG(release, debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Logger/release)
-  DESTDIR     = $$clean_path($$PWD/../Build_Qt/bin/release)
+  DESTDIR     = $$clean_path($$PWD/../Build_Qt/Bin/release)
 }

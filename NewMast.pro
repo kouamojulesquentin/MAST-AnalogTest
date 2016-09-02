@@ -4,8 +4,8 @@ CONFIG  -= qml_debug
 
 SUBDIRS += \
     Logger        \
-    Lib           \
-    Lib_UT        \
+    Mast_Core     \
+    Mast_UT       \
     SIT_reader    \
     SIT_reader_UT \
     TestCasesApp

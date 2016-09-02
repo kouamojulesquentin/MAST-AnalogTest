@@ -71,9 +71,9 @@ STRING(REGEX REPLACE "\n" ";" file_content "${file_content}")
 
 FOREACH(lib_file IN LISTS file_content)
     # CMake returns the End of File as an empty line. Here we discard it to avoid useless warning messages.
-    IF(NOT (lib_file STREQUAL "")
+    IF(NOT (lib_file STREQUAL ""))
 	    list(APPEND whole_lib_files "${openocd_src_dir}/${lib_file}")
-    ENDIF(NOT (lib_file STREQUAL "")
+    ENDIF(NOT (lib_file STREQUAL ""))
 ENDFOREACH(lib_file)
 
 # LIBUSB-RELATED DEPENDENCIES:

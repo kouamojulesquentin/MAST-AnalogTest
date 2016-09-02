@@ -47,7 +47,7 @@ using namespace mast;
    #include <fstream>
 
    /* include for all driver functions */
-   #include "SIT_Reader.hpp"
+   #include "SIT_reader.hpp"
    #include "SIT_scanner.hpp"
    #include "SIT_types.h"
 

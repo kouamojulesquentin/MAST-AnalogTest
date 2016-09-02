@@ -57,7 +57,6 @@ SET_SOURCE_FILES_PROPERTIES(${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc 	 GENERATED)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
 include_directories(../Mast_Core/include/)
-include_directories(../Mast_Core/public_include/)
 include_directories(../Logger/)
 include_directories(../Logger/g3log/)
 if (WIN32)

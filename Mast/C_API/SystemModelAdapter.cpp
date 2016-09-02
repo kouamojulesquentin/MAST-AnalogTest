@@ -16,7 +16,7 @@
 #include "Startup.hpp"
 #include "Utility.hpp"
 #include "Session.hpp"
-//+#include "SIT_reader.hpp"
+#include "SIT_reader.hpp"
 
 #include <memory>
 #include <string>
@@ -25,12 +25,35 @@ using std::shared_ptr;
 using std::string;
 
 using namespace std::string_literals;
+using std::experimental::string_view;
+using std::dynamic_pointer_cast;
 using namespace mast;
 
 
 namespace
 {
-  thread_local string thread_error_message;
+thread_local string thread_error_message;
+
+
+//! Loads model from "SIT" file and set it as root of SystemModel
+//!
+void LoadSystemModel (string_view filePath)
+{
+  CHECK_PARAMETER_NOT_EMPTY(filePath, "Expect valid file path");
+  CHECK_FILE_EXISTS(filePath);
+
+  auto sm     = Startup::GetSystemModel();
+  auto reader = SIT::SIT_Reader(sm);
+
+  reader.parse(filePath);
+
+  auto topNode = dynamic_pointer_cast<ParentNode>(reader.parsed_sut);
+
+  sm->ReplaceRoot(topNode, false);
+}
+//
+//  End of: LoadSystemModel
+//---------------------------------------------------------------------------
 
 
 } // End of unnamed namespace
@@ -123,24 +146,20 @@ ErrorCode CreateApplications (ApplicationAssociation* pAssociations, uint32_t co
 //! @note This function is not thread safe: It must be call by only one thread prior to any usage of mast library
 //!       This function must be called only after main has been call by the runtime system
 //!
-ErrorCode InitializeMast (const char* /* modelFilePath */)
+ErrorCode InitializeMast (const char* modelFilePath)
 {
   auto retCode = ErrorCode::Ok;
 
   TRY_CATCH_ALL(retCode,
 
-//+    if (modelFilePath != nullptr)
-//+    {
-//+      SIT_Reader reader;
-//+      reader.parse(modelFilePath);
+    // Those 2 lines do the initialization
+    /* unused */ Startup::GetSystemModel();
+    /* unused */ Startup::GetManager();
 
-//+      auto sm = reader.parsed_sut;
-//+      mast::Startup::SetSystemModel(sm);
-//+    }
-
-/* unused */ mast::Startup::GetSystemModel();
-/* unused */ mast::Startup::GetManager();
-
+    if (modelFilePath != nullptr)
+    {
+      LoadSystemModel(modelFilePath);
+    }
   );
 
   return retCode;
@@ -160,8 +179,8 @@ ErrorCode RunMast (const char* modelFilePath, ApplicationAssociation* pAssociati
   {
     Session session;
 
-    retCode = InitializeMast(modelFilePath);
-    if (retCode != ErrorCode::Ok) return retCode;
+    CHECK_PARAMETER_NOT_NULL(modelFilePath, "Cannot run Mast without a valid path for system model (SIT file)");
+    CHECK_FILE_EXISTS(modelFilePath);
 
     retCode = CreateApplications(pAssociations, count);
     if (retCode != ErrorCode::Ok) return retCode;

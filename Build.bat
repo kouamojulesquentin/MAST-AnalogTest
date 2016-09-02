@@ -33,6 +33,11 @@
 %make_exe% -j4 -C %Build_Qt%\Mast_Core -f Makefile    %target%
 
 @echo.
+@echo ===================== Building SIT_Reader =====================
+@echo.
+%make_exe% -j4 -C %Build_Qt%\SIT_reader -f Makefile    %target%
+
+@echo.
 @echo ===================== Building Mast =====================
 @echo.
 %make_exe% -j4 -C %Build_Qt%\Mast -f Makefile    %target%
@@ -48,10 +53,6 @@
 @echo.
 %make_exe% -j4 -C %Build_Qt%\Mast_UT -f Makefile %target%
 
-@echo.
-@echo ===================== Building SIT_Reader =====================
-@echo.
-%make_exe% -j4 -C %Build_Qt%\SIT_reader -f Makefile    %target%
 
 @echo.
 @echo ===================== Building SIT_Reader_UT =====================

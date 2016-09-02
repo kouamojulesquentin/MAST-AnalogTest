@@ -1,10 +1,11 @@
 project(mast)
 
-include_directories(../CPP_API/)
-include_directories(../C_API/)
+include_directories(CPP_API/)
+include_directories(C_API/)
 include_directories(../Mast_Core/include/)
 include_directories(../Logger/)
 include_directories(../Logger/g3log/)
+include_directories(../SIT_reader/)
 
 set (CFLAGS "${CFLAGS}")
 
@@ -17,7 +18,7 @@ add_library						(Mast SHARED 	${Mast_SOURCES})
 set_target_properties	(Mast PROPERTIES COMPILE_FLAGS "${CFLAGS}")
 
 if (WIN32)
-	target_link_libraries(Mast Mast_Core Logger DbgHelp)
+	target_link_libraries(Mast SIT_Reader_Lib Mast_Core Logger DbgHelp)
 else ()
-	target_link_libraries(Mast Mast_Core Logger pthread openocd ${LIBUSB_CFLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/openocd/jimtcl/libjim.a dl)
+	target_link_libraries(Mast SIT_reader_Lib Mast_Core Logger pthread openocd ${LIBUSB_CFLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/openocd/jimtcl/libjim.a dl)
 endif ()

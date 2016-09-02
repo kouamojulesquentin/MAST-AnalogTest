@@ -16,11 +16,13 @@ QMAKE_CXXFLAGS += -fmax-errors=3
 
 INCLUDEPATH += C_API                      \
                CPP_API                    \
+               $$PWD/../SIT_reader        \
                $$PWD/../Mast_Core/include \
                $$PWD/../Logger
 
 DEPENDPATH  += C_API                      \
                CPP_API                    \
+               $$PWD/../SIT_reader        \
                $$PWD/../Mast_Core/include \
                $$PWD/../Logger
 
@@ -45,10 +47,10 @@ unix {
 CONFIG(debug,   debug|release) {
   OBJECTS_DIR =   $$clean_path($$PWD/../Build_Qt/Mast/debug)
   DESTDIR     =   $$clean_path($$PWD/../Build_Qt/Bin/debug)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/debug) -lLogger -lMast_Core
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/debug) -lSIT_reader_Lib -lLogger -lMast_Core
 }
 else: CONFIG(release, debug|release) {
   OBJECTS_DIR =   $$clean_path($$PWD/../Build_Qt/Mast/release)
   DESTDIR     =   $$clean_path($$PWD/../Build_Qt/Bin/release)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/release) -lLogger -lMast_Core
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/release) -lSIT_reader_Lib -lLogger -lMast_Core
 }

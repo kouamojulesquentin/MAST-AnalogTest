@@ -1,13 +1,6 @@
 #ifndef _LINUX_LIST_H
 #define _LINUX_LIST_H
 
-/**
-* This file has been modified by Niels Grataloup <niels.grataloup@imag.fr>
-* Some functions are using arguments called "new" in the original version, which is illegal
-* in the case these headers are called by a C++ compiler. Such a case may appear when OpenOCD
-* is used as a third-party library.
-*/
-
 /* begin local changes */
 #include <helper/types.h>
 
@@ -54,46 +47,46 @@ static inline void INIT_LIST_HEAD(struct list_head *list)
  * the prev/next entries already!
  */
 #ifndef CONFIG_DEBUG_LIST
-static inline void __list_add(struct list_head *new_e,
+static inline void __list_add(struct list_head *e_new,
 	struct list_head *prev,
 	struct list_head *next)
 {
-	next->prev = new_e;
-	new_e->next = next;
-	new_e->prev = prev;
-	prev->next = new_e;
+	next->prev = e_new;
+	e_new->next = next;
+	e_new->prev = prev;
+	prev->next = e_new;
 }
 #else
-extern void __list_add(struct list_head *new_e,
+extern void __list_add(struct list_head *e_new,
 		       struct list_head *prev,
 		       struct list_head *next);
 #endif
 
 /**
  * list_add - add a new entry
- * @new: new entry to be added
+ * @e_new: new entry to be added
  * @head: list head to add it after
  *
  * Insert a new entry after the specified head.
  * This is good for implementing stacks.
  */
-static inline void list_add(struct list_head *new_e, struct list_head *head)
+static inline void list_add(struct list_head *e_new, struct list_head *head)
 {
-	__list_add(new_e, head, head->next);
+	__list_add(e_new, head, head->next);
 }
 
 
 /**
  * list_add_tail - add a new entry
- * @new: new entry to be added
+ * @e_new: new entry to be added
  * @head: list head to add it before
  *
  * Insert a new entry before the specified head.
  * This is useful for implementing queues.
  */
-static inline void list_add_tail(struct list_head *new_e, struct list_head *head)
+static inline void list_add_tail(struct list_head *e_new, struct list_head *head)
 {
-	__list_add(new_e, head->prev, head);
+	__list_add(e_new, head->prev, head);
 }
 
 /*
@@ -135,23 +128,23 @@ extern void list_del(struct list_head *entry);
 /**
  * list_replace - replace old entry by new one
  * @old : the element to be replaced
- * @new : the new element to insert
+ * @e_new : the new element to insert
  *
  * If @old was empty, it will be overwritten.
  */
 static inline void list_replace(struct list_head *old,
-	struct list_head *new_e)
+	struct list_head *e_new)
 {
-	new_e->next = old->next;
-	new_e->next->prev = new_e;
-	new_e->prev = old->prev;
-	new_e->prev->next = new_e;
+	e_new->next = old->next;
+	e_new->next->prev = e_new;
+	e_new->prev = old->prev;
+	e_new->prev->next = e_new;
 }
 
 static inline void list_replace_init(struct list_head *old,
-	struct list_head *new_e)
+	struct list_head *e_new)
 {
-	list_replace(old, new_e);
+	list_replace(old, e_new);
 	INIT_LIST_HEAD(old);
 }
 
@@ -253,13 +246,13 @@ static inline int list_is_singular(const struct list_head *head)
 static inline void __list_cut_position(struct list_head *list,
 	struct list_head *head, struct list_head *entry)
 {
-	struct list_head *new_first = entry->next;
+	struct list_head *e_new_first = entry->next;
 	list->next = head->next;
 	list->next->prev = list;
 	list->prev = entry;
 	entry->next = list;
-	head->next = new_first;
-	new_first->prev = head;
+	head->next = e_new_first;
+	e_new_first->prev = head;
 }
 
 /**
@@ -673,11 +666,11 @@ static inline void hlist_add_fake(struct hlist_node *n)
  * reference of the first entry if it exists.
  */
 static inline void hlist_move_list(struct hlist_head *old,
-	struct hlist_head *new_e)
+	struct hlist_head *e_new)
 {
-	new_e->first = old->first;
-	if (new_e->first)
-		new_e->first->pprev = &new_e->first;
+	e_new->first = old->first;
+	if (e_new->first)
+		e_new->first->pprev = &e_new->first;
 	old->first = NULL;
 }
 

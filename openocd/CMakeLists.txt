@@ -71,9 +71,11 @@ STRING(REGEX REPLACE "\n" ";" file_content "${file_content}")
 
 FOREACH(lib_file IN LISTS file_content)
     # CMake returns the End of File as an empty line. Here we discard it to avoid useless warning messages.
-    IF(NOT (lib_file STREQUAL ""))
+    IF(NOT ${lib_file} STREQUAL "")
 	    list(APPEND whole_lib_files "${openocd_src_dir}/${lib_file}")
-    ENDIF(NOT (lib_file STREQUAL ""))
+        message(STATUS "processing ${lib_file}")
+    ENDIF(NOT ${lib_file} STREQUAL "")
+    message(STATUS "processing ${lib_file}")
 ENDFOREACH(lib_file)
 
 # LIBUSB-RELATED DEPENDENCIES:
@@ -197,6 +199,7 @@ ENDIF(${LIBUSB1_FOUND})
 #target_link_libraries(dev_openocd_app openocd)
 
 SET_SOURCE_FILES_PROPERTIES( ${CMAKE_CURRENT_SOURCE_DIR}/openocd/config.h GENERATED)
+#add_dependencies(openocd OpenOCD)
 #set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/openocd/config.h OBJECT_DEPENDS OpenOCD)
 #add_dependencies(openocd OpenOCD ${CMAKE_CURRENT_SOURCE_DIR}/openocd/config.h)
 #add_dependencies(dev_openocd_app openocd)

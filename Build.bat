@@ -32,6 +32,11 @@
 @echo.
 %make_exe% -j4 -C %Build_Qt%\Mast_Core -f Makefile    %target%
 
+@echo.
+@echo ===================== Building Mast =====================
+@echo.
+%make_exe% -j4 -C %Build_Qt%\Mast -f Makefile    %target%
+
 @if errorlevel 0  (
 @echo.
 @echo ===================== Building Mast_UT Runner.cpp =====================

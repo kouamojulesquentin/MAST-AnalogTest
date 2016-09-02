@@ -1,7 +1,6 @@
-project(mast_lib)
+project(Mast_Core)
 
 include_directories(include/)
-include_directories(public_include/)
 include_directories(../Logger/)
 include_directories(../Logger/g3log/)
 
@@ -48,8 +47,8 @@ else()
 endif()
 
 
-file(GLOB Lib_SOURCES "src/*")
-add_library						(Mast_Core SHARED ${Lib_SOURCES})
+file(GLOB Mast_Core_SOURCES "src/*")
+add_library						(Mast_Core SHARED ${Mast_Core_SOURCES})
 set_target_properties	(Mast_Core PROPERTIES COMPILE_FLAGS "${CFLAGS}")
 
 if (WIN32)

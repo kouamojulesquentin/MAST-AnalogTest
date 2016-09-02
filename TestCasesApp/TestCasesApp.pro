@@ -8,14 +8,16 @@ QMAKE_CXXFLAGS += -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmis
 QMAKE_CXXFLAGS += -fmax-errors=3
 
 
-INCLUDEPATH += $$PWD/../Mast_Core/include        \
-               $$PWD/../Mast_Core/public_include \
-               $$PWD/../Logger                   \
+INCLUDEPATH += $$PWD/../Mast_Core/include \
+               $$PWD/../Mast/CPP_API      \
+               $$PWD/../Mast/C_API        \
+               $$PWD/../Logger            \
                $$PWD/../SIT_reader
 
-DEPENDPATH += $$PWD/../Mast_Core/include        \
-              $$PWD/../Mast_Core/public_include \
-              $$PWD/../Logger                   \
+DEPENDPATH += $$PWD/../Mast_Core/include \
+              $$PWD/../Mast/CPP_API      \
+              $$PWD/../Mast/C_API        \
+              $$PWD/../Logger            \
               $$PWD/../SIT_reader
 
 win32 {
@@ -36,12 +38,12 @@ HEADERS +=      \
 CONFIG(debug,   debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/TestCasesApp/debug)
   DESTDIR     = $$clean_path($$PWD/../Build_Qt/Bin/debug)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/debug)   -lMast_Core -lLogger -lSIT_Reader_Lib
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/debug)   -lMast -lMast_Core -lLogger -lSIT_Reader_Lib
 }
 else: CONFIG(release, debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/TestCasesApp/release)
   DESTDIR     = $$clean_path($$PWD/../Build_Qt/Bin/release)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/release) -lMast_Core -lLogger -lSIT_Reader_Lib
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/release) -lMast -lMast_Core -lLogger -lSIT_Reader_Lib
 }
 
 unix {

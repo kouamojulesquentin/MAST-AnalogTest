@@ -14,13 +14,15 @@ QMAKE_CXXFLAGS += -fmax-errors=3
 }
 
 INCLUDEPATH += $$PWD/../Mast_Core/include        \
-               $$PWD/../Mast_Core/public_include \
+               $$PWD/../Mast/CPP_API             \
+               $$PWD/../Mast/C_API               \
                $$PWD/../Logger                   \
                $$PWD/../cxxtest CxxTest_Traits   \
                UT_Helpers
 
 DEPENDPATH += $$PWD/../Mast_Core/include        \
-              $$PWD/../Mast_Core/public_include \
+              $$PWD/../Mast/CPP_API             \
+              $$PWD/../Mast/C_API               \
               $$PWD/../cxxtest CxxTest_Traits   \
               UT_Helpers
 
@@ -101,12 +103,12 @@ HEADERS += \
 CONFIG(debug,   debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Mast_UT/debug)
   DESTDIR     = $$clean_path($$PWD/../Build_Qt/Bin/debug)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/debug)   -lMast_Core -lLogger
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/debug)   -lMast -lMast_Core -lLogger
 }
 else: CONFIG(release, debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Mast_UT/release)
   DESTDIR     = $$clean_path($$PWD/../Build_Qt/Bin/release)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/release) -lMast_Core -lLogger
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/release) -lMast -lMast_Core -lLogger
 }
 
 unix {

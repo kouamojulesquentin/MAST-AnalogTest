@@ -15,7 +15,9 @@ QMAKE_CXXFLAGS += -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmis
 QMAKE_CXXFLAGS += -fmax-errors=3
 
 INCLUDEPATH += include        \
-               public_include \
+               $$PWD/../Logger
+
+DEPENDPATH += include        \
                $$PWD/../Logger
 
 
@@ -43,8 +45,6 @@ SOURCES +=  \
     src/NodePathResolver.cpp                        \
     src/OpenOCDProtocol.cpp                         \
     src/ParentNode.cpp                              \
-    src/PDL_Adapter.cpp                             \
-    src/PDL_Adapter_CPP.cpp                         \
     src/PrettyPrinterVisitor.cpp                    \
     src/PropagatePendingVisitor.cpp                 \
     src/Register.cpp                                \
@@ -55,7 +55,6 @@ SOURCES +=  \
     src/Session.cpp                                 \
     src/Startup.cpp                                 \
     src/SystemModel.cpp                             \
-    src/SystemModelAdapter.cpp                      \
     src/SystemModelBuilder.cpp                      \
     src/SystemModelManager.cpp                      \
     src/SystemModelManagerMonitor.cpp               \
@@ -71,7 +70,6 @@ HEADERS += \
     include/AccessInterfaceProtocol.hpp                 \
     include/LoopbackAccessInterfaceProtocol.hpp         \
     include/BinaryVector.hpp                            \
-    include/C_API_Commons.hpp                           \
     include/Chain.hpp                                   \
     include/Checker.hpp                                 \
     include/ConfigurationAlgorithm.hpp                  \
@@ -104,7 +102,6 @@ HEADERS += \
     include/Session.hpp                                 \
     include/Startup.hpp                                 \
     include/SystemModel.hpp                             \
-    include/SystemModelAdapter.h                        \
     include/SystemModelBuilder.hpp                      \
     include/SystemModelManager.hpp                      \
     include/SystemModelManagerMonitor.hpp               \
@@ -115,10 +112,7 @@ HEADERS += \
     include/SystemModelVisitor.hpp                      \
     include/ToSutVisitor.hpp                            \
     include/Utility.hpp                                 \
-    public_include/PDL_Adapter.h                        \
-    public_include/PDL_Adapter_CPP.h                    \
-    public_include/Platform.hpp                         \
-    public_include/SystemModelAdapter.h
+    include/Platform.hpp
 
 unix {
     target.path = /usr/lib

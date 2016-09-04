@@ -13,17 +13,19 @@ if (HAVE_STDINT_H)
   add_definitions(-DHAVE_STDINT)
 endif()
 
+set(OPENOCD_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/openocd_build)
+
 # Configure, build and install OpenOCD from its source code through its own configure and makefile scripts.
 # During ./configure, OpenOCD binaries are installed into the openocd/build dir. -fPIC CFLAGS option enables the exportation of some driver functions into a .so file.
 ExternalProject_Add(OpenOCD
    DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
    UPDATE_COMMAND ""
    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/openocd
-   BUILD_IN_SOURCE 1
-   CONFIGURE_COMMAND ./configure --prefix=${CMAKE_CURRENT_SOURCE_DIR}/openocd/build CFLAGS=-fPIC
+   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/openocd/configure --prefix=${OPENOCD_BUILD_DIR}/openocd/build CFLAGS=-fPIC
    BUILD_COMMAND make
    INSTALL_COMMAND make install
    )
+set(OPENOCD_GENERATED_DIR  ${CMAKE_CURRENT_BINARY_DIR}/OpenOCD-prefix/src/OpenOCD-build/)
    
 # Trying to find libusb0
 find_path(LIBUSB0_INCLUDE_DIR
@@ -72,11 +74,12 @@ STRING(REGEX REPLACE "\n" ";" file_content "${file_content}")
 FOREACH(lib_file IN LISTS file_content)
     # CMake returns the End of File as an empty line. Here we discard it to avoid useless warning messages.
     IF(NOT ${lib_file} STREQUAL "")
-	    list(APPEND whole_lib_files "${openocd_src_dir}/${lib_file}")
+	    list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/${lib_file}")
        # message(STATUS "processing ${lib_file}")
     ENDIF(NOT ${lib_file} STREQUAL "")
-   # message(STATUS "processing ${lib_file}")
+    #message(STATUS "processing ${lib_file}")
 ENDFOREACH(lib_file)
+
 
 # LIBUSB-RELATED DEPENDENCIES:
 # Some adapter drivers are generated according to the locally installed versions of libusb.
@@ -86,70 +89,76 @@ ENDFOREACH(lib_file)
 
 # Some .o files are generated only if >libusb 1.0.0 is installed.
 if(${LIBUSB1_FOUND})
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/libocdjtagdrivers_la-libusb1_common.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/libocdjtagdrivers_la-libusb1_common.o")
 
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/libocdjtagdrivers_la-ftdi.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/libocdjtagdrivers_la-mpsse.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/hla/hla_transport.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/hla/hla_tcl.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/hla/hla_interface.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/hla/hla_layout.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/libocdjtagdrivers_la-stlink_usb.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/libocdjtagdrivers_la-ti_icdi_usb.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/libocdjtagdrivers_la-ulink.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/usb_blaster/usb_blaster.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/usb_blaster/ublast2_access_libusb.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/versaloon/usbtoxxx/libocdjtagdrivers_la-usbtogpio.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/versaloon/usbtoxxx/libocdjtagdrivers_la-usbtojtagraw.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/versaloon/usbtoxxx/libocdjtagdrivers_la-usbtoswd.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/versaloon/usbtoxxx/libocdjtagdrivers_la-usbtopwr.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/versaloon/usbtoxxx/libocdjtagdrivers_la-usbtoxxx.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/versaloon/libocdjtagdrivers_la-versaloon.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/libocdjtagdrivers_la-vsllink.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/libocdjtagdrivers_la-ftdi.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/libocdjtagdrivers_la-mpsse.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/hla/hla_transport.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/hla/hla_tcl.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/hla/hla_interface.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/hla/hla_layout.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/libocdjtagdrivers_la-stlink_usb.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/libocdjtagdrivers_la-ti_icdi_usb.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/libocdjtagdrivers_la-ulink.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/usb_blaster/usb_blaster.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/usb_blaster/ublast2_access_libusb.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/versaloon/usbtoxxx/libocdjtagdrivers_la-usbtogpio.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/versaloon/usbtoxxx/libocdjtagdrivers_la-usbtojtagraw.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/versaloon/usbtoxxx/libocdjtagdrivers_la-usbtoswd.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/versaloon/usbtoxxx/libocdjtagdrivers_la-usbtopwr.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/versaloon/usbtoxxx/libocdjtagdrivers_la-usbtoxxx.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/versaloon/libocdjtagdrivers_la-versaloon.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/libocdjtagdrivers_la-vsllink.o")
 
     # Common drivers with libusb0 and libusb1
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/aice/aice_transport.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/aice/aice_interface.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/aice/aice_port.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/aice/aice_usb.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/aice/aice_pipe.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/libocdjtagdrivers_la-jlink.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/libocdjtagdrivers_la-osbdm.o")
-   list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/libocdjtagdrivers_la-opendous.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/aice/aice_transport.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/aice/aice_interface.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/aice/aice_port.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/aice/aice_usb.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/aice/aice_pipe.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/libocdjtagdrivers_la-jlink.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/libocdjtagdrivers_la-osbdm.o")
+   list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/libocdjtagdrivers_la-opendous.o")
 
 endif(${LIBUSB1_FOUND})
 
 # Sometimes libusb0 may already be installed. Hence, OpenOCD configuration script will automatically 
 # build libusb0 specific .o file. Here we add them when needed.
 IF(${LIBUSB0_FOUND})
-    list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/libocdjtagdrivers_la-usb_common.o")
-    list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/libocdjtagdrivers_la-rlink.o")
-    list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/libocdjtagdrivers_la-rlink_speed_table.o")
-    list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/libocdjtagdrivers_la-arm-jtag-ew.o")
-    list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/libocdjtagdrivers_la-usbprog.o")
+    list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/libocdjtagdrivers_la-usb_common.o")
+    list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/libocdjtagdrivers_la-rlink.o")
+    list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/libocdjtagdrivers_la-rlink_speed_table.o")
+    list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/libocdjtagdrivers_la-arm-jtag-ew.o")
+    list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/libocdjtagdrivers_la-usbprog.o")
 
     if(NOT ${LIBUSB1_FOUND})
-       list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/libocdjtagdrivers_la-libusb0_common.o")
+       list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/libocdjtagdrivers_la-libusb0_common.o")
     # Common drivers with libusb0 and libusb1
-       list(APPEND whole_lib_files "${openocd_src_dir}/jtag/aice/aice_transport.o")
-       list(APPEND whole_lib_files "${openocd_src_dir}/jtag/aice/aice_interface.o")
-       list(APPEND whole_lib_files "${openocd_src_dir}/jtag/aice/aice_port.o")
-       list(APPEND whole_lib_files "${openocd_src_dir}/jtag/aice/aice_usb.o")
-       list(APPEND whole_lib_files "${openocd_src_dir}/jtag/aice/aice_pipe.o")
-       list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/libocdjtagdrivers_la-jlink.o")
-       list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/libocdjtagdrivers_la-osbdm.o")
-       list(APPEND whole_lib_files "${openocd_src_dir}/jtag/drivers/libocdjtagdrivers_la-opendous.o")
+       list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/aice/aice_transport.o")
+       list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/aice/aice_interface.o")
+       list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/aice/aice_port.o")
+       list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/aice/aice_usb.o")
+       list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/aice/aice_pipe.o")
+       list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/libocdjtagdrivers_la-jlink.o")
+       list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/libocdjtagdrivers_la-osbdm.o")
+       list(APPEND whole_lib_files "${OPENOCD_GENERATED_DIR}/jtag/drivers/libocdjtagdrivers_la-opendous.o")
     endif(NOT ${LIBUSB1_FOUND})
 endif(${LIBUSB0_FOUND})
 
 set_source_files_properties(${whole_lib_files}
                             PROPERTIES GENERATED TRUE)
 
+
+
 include_directories(openocd/src)
 
 include_directories(openocd)
-
 include_directories(openocd/jimtcl)
+
+include_directories(${OPENOCD_GENERATED_DIR}/jimtcl)
+
+include_directories(${OPENOCD_GENERATED_DIR})
+include_directories(${OPENOCD_GENERATED_DIR}/src)
 
 IF(${LIBUSB0_FOUND})
     include_directories(${LIBUSB0_INCLUDE_DIR})
@@ -174,32 +183,30 @@ add_library(openocd SHARED dummy.c) #dev_openocd.c)
 
 #LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/openocd/src)
 #target_include_directories(dev_openocd_app ${LIBUSB_INCLUDE_DIR})
+
 IF(${LIBUSB1_FOUND})
 
     IF(${LIBUSB0_FOUND})
         target_link_libraries(openocd
-${whole_lib_files} ${LIBUSB1_LIBRARY} ${LIBUSB0_LIBRARY} ${CMAKE_CURRENT_SOURCE_DIR}/openocd/jimtcl/libjim.a dl)
+${whole_lib_files} ${LIBUSB1_LIBRARY} ${LIBUSB0_LIBRARY} ${OPENOCD_GENERATED_DIR}/jimtcl/libjim.a dl)
     ELSE(${LIBUSB0_FOUND})
         target_link_libraries(openocd
-${whole_lib_files} ${LIBUSB1_LIBRARY} ${CMAKE_CURRENT_SOURCE_DIR}/openocd/jimtcl/libjim.a dl)
+${whole_lib_files} ${LIBUSB1_LIBRARY} ${OPENOCD_GENERATED_DIR}/jimtcl/libjim.a dl)
     ENDIF(${LIBUSB0_FOUND})
 
 ELSE(${LIBUSB1_FOUND})
 
     IF(${LIBUSB0_FOUND})
         target_link_libraries(openocd
-${whole_lib_files} ${LIBUSB0_LIBRARY} ${CMAKE_CURRENT_SOURCE_DIR}/openocd/jimtcl/libjim.a dl)
+${whole_lib_files} ${LIBUSB0_LIBRARY} ${OPENOCD_GENERATED_DIR}/jimtcl/libjim.a dl)
     ELSE(${LIBUSB0_FOUND})
         target_link_libraries(openocd
-${whole_lib_files} ${CMAKE_CURRENT_SOURCE_DIR}/openocd/jimtcl/libjim.a dl)
+${whole_lib_files} ${OPENOCD_GENERATED_DIR}/jimtcl/libjim.a dl)
     ENDIF(${LIBUSB0_FOUND})
 
 
 ENDIF(${LIBUSB1_FOUND})
 #target_link_libraries(dev_openocd_app openocd)
 
-SET_SOURCE_FILES_PROPERTIES( ${CMAKE_CURRENT_SOURCE_DIR}/openocd/config.h GENERATED)
+SET_SOURCE_FILES_PROPERTIES( ${OPENOCD_GENERATED_DIR}/config.h GENERATED)
 add_dependencies(openocd OpenOCD)
-#set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/openocd/config.h OBJECT_DEPENDS OpenOCD)
-#add_dependencies(openocd OpenOCD ${CMAKE_CURRENT_SOURCE_DIR}/openocd/config.h)
-#add_dependencies(dev_openocd_app openocd)

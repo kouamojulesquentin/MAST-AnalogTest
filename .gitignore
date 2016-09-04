@@ -62,5 +62,11 @@
 /openocd/openocd/config.status
 /openocd/openocd/Makefile
 /openocd/openocd/*/Makefile
-/openocd/openocd/src/.deps/main.Po
+/openocd/openocd/src/.deps/main.Po        
+/openocd/openocd/doc/openocd.info
+/openocd/openocd/doc/openocd.info-1
+/openocd/openocd/doc/openocd.info-2
+/openocd/openocd/doc/stamp-vti
+/openocd/openocd/doc/version.texi
+
 /Mast_UT/Generated/Runner.cpp

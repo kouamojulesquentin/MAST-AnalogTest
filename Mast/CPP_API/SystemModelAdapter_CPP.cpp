@@ -10,7 +10,7 @@
 //! Implements 'CPP' language API to system model
 //===========================================================================
 
-#include "SystemModelAdapter_CPP.h"
+#include "SystemModelAdapter_CPP.hpp"
 #include "SystemModelManager.hpp"
 #include "Commons_C.hpp"
 #include "Startup.hpp"

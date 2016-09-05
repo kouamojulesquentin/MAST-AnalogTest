@@ -118,6 +118,43 @@ uint32_t Utility::MinimalBitsForValue (uint32_t value)
 //---------------------------------------------------------------------------
 
 
+//! Surrounds some, not empty, text with single quotes and a space after the closing quote
+//!
+//! @param text   Text to surround with quotes and space
+//!
+//! @return When not empty text parameter surrounded with single quotes and space,
+//!         empty string otherwise
+string Utility::IfNotEmpty_SingleQuoteAndSuffixWithSpace (string_view text)
+{
+  string result;
+
+  if (!text.empty())
+  {
+    result.append("'").append(text.cbegin(), text.cend()).append("' ");
+  }
+  return result;
+}
+//
+//  End of: Utility::IfNotEmpty_SingleQuoteAndSuffixWithSpace
+//---------------------------------------------------------------------------
+
+
+//! Surrounds some text with single quotes
+//!
+//! @param text   Text to surround with quotes
+//!
+//! @return Text surrounded with single quotes
+//!
+string Utility::SingleQuote (string_view text)
+{
+  string result;
+  result.append("'").append(text.cbegin(), text.cend()).append("'");
+  return result;
+}
+//
+//  End of: Utility::IfNotEmpty_SingleQuoteAndSuffixWithSpace
+//---------------------------------------------------------------------------
+
 //! Splits a string_view into bunch of string_view
 //!
 //! @note No trimming is done

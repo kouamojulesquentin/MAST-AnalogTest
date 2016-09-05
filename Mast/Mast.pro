@@ -28,14 +28,17 @@ DEPENDPATH  += C_API                      \
 
 
 SOURCES += \
-           CPP_API/PDL_Adapter_CPP.cpp  \
-           C_API/PDL_Adapter.cpp        \
+           CPP_API/PDL_Adapter_CPP.cpp        \
+           CPP_API/SystemModelAdapter_CPP.cpp \
+           C_API/PDL_Adapter.cpp              \
            C_API/SystemModelAdapter_C.cpp
 
 HEADERS += \
-    CPP_API/PDL_Adapter_CPP.h  \
-    C_API/Commons_C.hpp    \
-    C_API/PDL_Adapter.h        \
+    CPP_API/PDL_Adapter_CPP.hpp        \
+    CPP_API/SystemModelAdapter_CPP.hpp \
+    C_API/Commons_C.hpp                \
+    C_API/ErrorCode_C.h                \
+    C_API/PDL_Adapter.h                \
     C_API/SystemModelAdapter_C.h
 
 unix {

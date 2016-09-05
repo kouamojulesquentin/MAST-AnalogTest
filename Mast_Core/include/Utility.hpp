@@ -62,6 +62,14 @@ class DLL_EXPORT Utility final
   //!
   static void TrimRight(std::experimental::string_view& text);
 
+  //! Surrounds some not empty text with single quotes and a space after the closing quote
+  //!
+  static std::string IfNotEmpty_SingleQuoteAndSuffixWithSpace (std::experimental::string_view text);
+
+  //! Surrounds some text with single quotes
+  //!
+  static std::string SingleQuote (std::experimental::string_view text);
+
   //! Splits a string_view into bunch of string_view
   //!
   static std::vector<std::experimental::string_view> Split(std::experimental::string_view text, std::experimental::string_view separator);

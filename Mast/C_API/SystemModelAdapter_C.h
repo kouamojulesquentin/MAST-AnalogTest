@@ -14,25 +14,11 @@
   #define SYSTEMMODELADAPTER_C_H__1D5A30E_BBA2_4C6D_B7B4_5077996B2B04__INCLUDED_
 
 #include "Platform.hpp"
+#include "ErrorCode_C.h"
 
 #include <stdint.h>
 extern "C"
 {
-  enum ErrorCode_t
-  {
-    Ok               = 0,
-    InvalidModel     = 0xFFFFFFF7,
-    InvalidArgument  = 0xFFFFFFF8,
-    LogicError       = 0xFFFFFFF9,
-    OutOfRange       = 0xFFFFFFFA,
-    RuntimeError     = 0xFFFFFFFB,
-    RegexException   = 0xFFFFFFFC,
-    StdException     = 0xFFFFFFFD,
-    UndefinedFailure = 0xFFFFFFFE,
-    Failure          = 0xFFFFFFFF,
-  };
-  typedef enum ErrorCode_t ErrorCode;
-
   typedef void(*PDLApplication_t)();
 
   struct ApplicationAssociation

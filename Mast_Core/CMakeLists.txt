@@ -10,9 +10,9 @@ if (NOT WIN32)
   # (like if C99 was not enabled).
   # by calling these third-party software headers with the SYSTEM attribute in the
   # include_directories() function, we skip these warnings.
-  include_directories(SYSTEM ../openocd/)
-  include_directories(SYSTEM ../openocd/openocd/src/)
-  include_directories(SYSTEM ../openocd/openocd/jimtcl/)
+  include_directories(SYSTEM ../openocd/include/)
+  include_directories(SYSTEM ../openocd/include/src/)
+  include_directories(SYSTEM ../openocd/include/jimtcl/)
 
   # Trying to find libusb0
   find_path(LIBUSB0_INCLUDE_DIR
@@ -58,5 +58,5 @@ set_target_properties	(Mast_Core PROPERTIES COMPILE_FLAGS "${CFLAGS}")
 if (WIN32)
 	target_link_libraries(Mast_Core Logger DbgHelp)
 else ()
-	target_link_libraries(Mast_Core Logger pthread openocd ${LIBUSB_CFLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/openocd/jimtcl/libjim.a dl)
+	target_link_libraries(Mast_Core Logger pthread ${LIBUSB_CFLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/bin/libopenocd.so dl) #${CMAKE_CURRENT_SOURCE_DIR}/../openocd/openocd/jimtcl/libjim.a dl)
 endif ()

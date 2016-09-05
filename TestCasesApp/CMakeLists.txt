@@ -18,9 +18,9 @@ include_directories(../SIT_reader/)
 
 set(LIBUSB_CFLAGS "")
 if (NOT WIN32)
-  include_directories(../openocd/)
-  include_directories(../openocd/openocd/src/)
-  include_directories(../openocd/openocd/jimtcl/)
+  include_directories(SYSTEM ../openocd/include/)
+  include_directories(SYSTEM ../openocd/include/src/)
+  include_directories(SYSTEM ../openocd/include/jimtcl/)
 
   # Trying to find libusb0
   find_path(LIBUSB0_INCLUDE_DIR
@@ -65,5 +65,5 @@ if (WIN32)
 	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
 else ()
     # $LIBUSB_CFLAGS, ldl and libjim.a args are required by OpenOCD.
-	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib pthread openocd ${LIBUSB_CFLAGS} -ldl ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/openocd/jimtcl/libjim.a dl)
+	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib pthread ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/bin/libopenocd.so dl)
 endif ()

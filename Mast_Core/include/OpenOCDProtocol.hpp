@@ -21,7 +21,7 @@
 #ifndef _WIN32
 extern "C"
 {
-    #include <openocd/config.h>
+    #include <config.h>
     #include <jtag/driver.h>
     #include <jtag/jtag.h>
     #include <transport/transport.h>

@@ -1,17 +1,17 @@
 //===========================================================================
-//                           SystemModelAdapter_CPP.h
+//                           SystemModelAdapter_CPP.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file SystemModelAdapter_CPP.h
+//! @file SystemModelAdapter_CPP.hpp
 //!
 //! Declares 'CPP' language API to system model
 //===========================================================================
 
-#ifndef SYSTEMMODELADAPTER_CPP_H__C34A0543_25E_40B0_64AB_80AA19C3259__INCLUDED_
-  #define SYSTEMMODELADAPTER_CPP_H__C34A0543_25E_40B0_64AB_80AA19C3259__INCLUDED_
+#ifndef SYSTEMMODELADAPTER_CPP_H__D20B38D9_1D62_4C8A_59AE_115AEF979C69__INCLUDED_
+  #define SYSTEMMODELADAPTER_CPP_H__D20B38D9_1D62_4C8A_59AE_115AEF979C69__INCLUDED_
 
 #include "Platform.hpp"
 #include <string>
@@ -76,9 +76,10 @@ namespace mast
   DLL_EXPORT void WaitForApplicationsEnd();
 }
 
-#endif  // not defined SYSTEMMODELADAPTER_CPP_H__C34A0543_25E_40B0_64AB_80AA19C3259__INCLUDED_
+
+#endif  // not defined SYSTEMMODELADAPTER_CPP_H__D20B38D9_1D62_4C8A_59AE_115AEF979C69__INCLUDED_
 //===========================================================================
-// End of SystemModelAdapter_CPP.h
+// End of SystemModelAdapter_CPP.hpp
 //===========================================================================
 
 

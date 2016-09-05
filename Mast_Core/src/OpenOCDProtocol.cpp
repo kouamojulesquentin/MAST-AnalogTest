@@ -13,6 +13,7 @@
 
 #include "OpenOCDProtocol.hpp"
 #include "Utility.hpp"
+#include "g3log/g3log.hpp"
 
 #include <vector>
 #include <string>
@@ -90,7 +91,7 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, string_view design
   // the adapter and the target.
   this->m_supported_resets = jtag_get_reset_config();
 
-  
+
   // Some adapters and JTAG TAP do not provide a TRST pin. If the m_supported_resets attribute has the
   // RESET_HAS_TRST flag positive, we do it by hardware, otherwise we pass by the state machine.
   if(this->m_supported_resets & RESET_HAS_TRST)
@@ -112,7 +113,7 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, string_view design
 OpenOCDProtocol::~OpenOCDProtocol()
 {
   #ifndef _WIN32
-  
+
   // Here we put the tap in RESET state
   if(this->m_supported_resets & RESET_HAS_TRST)
     jtag_add_reset(1, 0);           // Hardware reset is supported, TRST is enabled for one TCK cycle.
@@ -154,8 +155,23 @@ OpenOCDProtocol::~OpenOCDProtocol()
 //! @return Bitstream retrieved from SUT
 //!
 #if defined(_WIN32)
-BinaryVector OpenOCDProtocol::DoAction (uint32_t /* derivationId */, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
+  switch (derivationId)
+  {
+    case 0u:
+      LOG(INFO) << "OpenOCD_RST_Simu(" << toSutData.DataAsMixString() << ")";
+      break;
+    case 1u:
+      LOG(INFO) << "OpenOCD_IR_Simu(" << toSutData.DataAsMixString() << ")";
+      break;
+    case 2u:
+      LOG(INFO) << "OpenOCD_DR_Simu(" << toSutData.DataAsMixString() << ")";
+      break;
+    default:
+      THROW_INVALID_ARGUMENT("DerivationId must be '0' (for Reset), '1' (for IR) or '2' (for DR)");
+      break;
+  }
   return toSutData; // Just do a loopback
 }
 #else
@@ -172,6 +188,7 @@ BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfac
   switch (derivationId)
   {
     case 0u:
+      LOG(INFO) << "OpenOCD_RST_Simu(" << toSutData.DataAsMixString() << ")";
       // Some adapters and JTAG TAP do not provide a TRST pin. If the m_supported_resets attribute has the
       // RESET_HAS_TRST flag positive, we do it by hardware, otherwise we pass by the state machine.
       if(this->m_supported_resets & RESET_HAS_TRST)
@@ -181,9 +198,11 @@ BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfac
                                         // Using FSM instead.
       break;
     case 1u:
+      LOG(INFO) << "OpenOCD_IR(" << toSutData.DataAsMixString() << ")";
       jtag_add_plain_ir_scan(bitsCount, toSutData.Data(), fromSutDataBuffer.data(), TAP_IDLE);
       break;
     case 2u:
+      LOG(INFO) << "OpenOCD_DR_Simu(" << toSutData.DataAsMixString() << ")";
       jtag_add_plain_dr_scan(bitsCount, toSutData.Data(), fromSutDataBuffer.data(), TAP_IDLE);
       break;
     default:

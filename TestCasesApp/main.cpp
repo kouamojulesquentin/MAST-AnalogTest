@@ -12,7 +12,7 @@
 
 #include "Session.hpp"
 #include "Startup.hpp"
-#include "SystemModelAdapter.h"
+#include "SystemModelAdapter_C.h"
 #include "SystemModelBuilder.hpp"
 #include "SystemModelManager.hpp"
 #include "LoopbackAccessInterfaceProtocol.hpp"

@@ -1,18 +1,18 @@
 //===========================================================================
-//                           SystemModelAdapter.cpp
+//                           SystemModelAdapter_C.cpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file SystemModelAdapter.cpp
+//! @file SystemModelAdapter_C.cpp
 //!
 //! Implements 'C' language API to system model
 //===========================================================================
 
-#include "SystemModelAdapter.h"
+#include "SystemModelAdapter_C.h"
 #include "SystemModelManager.hpp"
-#include "C_API_Commons.hpp"
+#include "Commons_C.hpp"
 #include "Startup.hpp"
 #include "Utility.hpp"
 #include "Session.hpp"
@@ -236,5 +236,5 @@ ErrorCode WaitForApplicationsEnd ()
 
 
 //===========================================================================
-// End of SystemModelAdapter.cpp
+// End of SystemModelAdapter_C.cpp
 //===========================================================================

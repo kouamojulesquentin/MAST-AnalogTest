@@ -1,22 +1,19 @@
 //===========================================================================
-//                           C_API_Commons.hpp
+//                           Commons_C.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file C_API_Commons.hpp
+//! @file Commons_C.hpp
 //!
 //! Declares commonalities to implement 'C' API
 //!
 //===========================================================================
 
 
-#ifndef C_API_COMMONS_H__E0B3788E_4855_41D3_C1BA_D6E49F3B5EE__INCLUDED_
-  #define C_API_COMMONS_H__E0B3788E_4855_41D3_C1BA_D6E49F3B5EE__INCLUDED_
-
-
-
+#ifndef COMMONS_C_H__3F71BC5D_1592_40FA_F9AB_AD1EB9ACEE39__INCLUDED_
+  #define COMMONS_C_H__3F71BC5D_1592_40FA_F9AB_AD1EB9ACEE39__INCLUDED_
 #define CATCH_ALL(retCode)\
 catch(std::invalid_argument& exc) { retCode = ErrorCode::InvalidArgument;  SetErrorMessage(exc.what()); }\
 catch(std::out_of_range&     exc) { retCode = ErrorCode::OutOfRange;       SetErrorMessage(exc.what()); }\
@@ -34,9 +31,9 @@ try\
 CATCH_ALL(retCode)
 
 
-#endif  // not defined C_API_COMMONS_H__E0B3788E_4855_41D3_C1BA_D6E49F3B5EE__INCLUDED_
+#endif  // not defined COMMONS_C_H__3F71BC5D_1592_40FA_F9AB_AD1EB9ACEE39__INCLUDED_
 //===========================================================================
-// End of C_API_Commons.hpp
+// End of Commons_C.hpp
 //===========================================================================
 
 

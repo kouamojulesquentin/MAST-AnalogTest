@@ -19,7 +19,7 @@
 #include "TestModelBuilder.hpp"
 #include "GmlPrinterVisitor.hpp"
 
-//+#include "SystemModelAdapter.hpp"
+//+#include "SystemModelAdapter_C.hpp"
 #include "C_API_Traits.hpp"
 #include "BinaryVector_Traits.hpp"
 

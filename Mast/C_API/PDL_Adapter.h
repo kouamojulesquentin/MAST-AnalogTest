@@ -15,7 +15,7 @@
 #ifndef PDL_ADAPTER_H__91DB123F_F997_4574_50B6_54BF85F6D69A__INCLUDED_
   #define PDL_ADAPTER_H__91DB123F_F997_4574_50B6_54BF85F6D69A__INCLUDED_
 
-#include "SystemModelAdapter.h"
+#include "SystemModelAdapter_C.h"
 #include "Platform.hpp"
 
 #include <stddef.h>

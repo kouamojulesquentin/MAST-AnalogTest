@@ -19,7 +19,7 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
-#include "SystemModelAdapter.h"
+#include "SystemModelAdapter_C.h"
 
 //! Enables CxxTest to display enums using their names (instead of their integer values)
 //!

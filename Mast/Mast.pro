@@ -30,13 +30,13 @@ DEPENDPATH  += C_API                      \
 SOURCES += \
            CPP_API/PDL_Adapter_CPP.cpp  \
            C_API/PDL_Adapter.cpp        \
-           C_API/SystemModelAdapter.cpp
+           C_API/SystemModelAdapter_C.cpp
 
 HEADERS += \
     CPP_API/PDL_Adapter_CPP.h  \
-    C_API/C_API_Commons.hpp    \
+    C_API/Commons_C.hpp    \
     C_API/PDL_Adapter.h        \
-    C_API/SystemModelAdapter.h
+    C_API/SystemModelAdapter_C.h
 
 unix {
     target.path = /usr/lib

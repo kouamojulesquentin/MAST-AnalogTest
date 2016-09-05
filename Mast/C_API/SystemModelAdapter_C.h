@@ -1,18 +1,17 @@
 //===========================================================================
-//                           SystemModelAdapter.h
+//                           SystemModelAdapter_C.h
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file SystemModelAdapter.h
+//! @file SystemModelAdapter_C.h
 //!
 //! Declares 'C' language API to system model
 //===========================================================================
 
-
-#ifndef SYSTEMMODELADAPTER_H__A6DC6C83_7B2F_4CC8_7DAA_31AA4CDB849D__INCLUDED_
-  #define SYSTEMMODELADAPTER_H__A6DC6C83_7B2F_4CC8_7DAA_31AA4CDB849D__INCLUDED_
+#ifndef SYSTEMMODELADAPTER_C_H__1D5A30E_BBA2_4C6D_B7B4_5077996B2B04__INCLUDED_
+  #define SYSTEMMODELADAPTER_C_H__1D5A30E_BBA2_4C6D_B7B4_5077996B2B04__INCLUDED_
 
 #include "Platform.hpp"
 
@@ -88,9 +87,10 @@ extern "C"
   DLL_EXPORT void SetErrorMessage(const char* message);
 }
 
-#endif  // not defined SYSTEMMODELADAPTER_H__A6DC6C83_7B2F_4CC8_7DAA_31AA4CDB849D__INCLUDED_
+
+#endif  // not defined SYSTEMMODELADAPTER_C_H__1D5A30E_BBA2_4C6D_B7B4_5077996B2B04__INCLUDED_
 //===========================================================================
-// End of SystemModelAdapter.h
+// End of SystemModelAdapter_C.h
 //===========================================================================
 
 

@@ -11,6 +11,7 @@
 //===========================================================================
 
 #include "SystemModelAdapter_CPP.hpp"
+#include "ApplicationAssociation_CPP.hpp"
 #include "SystemModelManager.hpp"
 #include "Commons_C.hpp"
 #include "Startup.hpp"

@@ -34,11 +34,12 @@ SOURCES += \
            C_API/SystemModelAdapter_C.cpp
 
 HEADERS += \
-    CPP_API/PDL_Adapter_CPP.hpp        \
-    CPP_API/SystemModelAdapter_CPP.hpp \
-    C_API/Commons_C.hpp                \
-    C_API/ErrorCode_C.h                \
-    C_API/PDL_Adapter_C.h              \
+    CPP_API/ApplicationAssociation_CPP.hpp \
+    CPP_API/PDL_Adapter_CPP.hpp            \
+    CPP_API/SystemModelAdapter_CPP.hpp     \
+    C_API/Commons_C.hpp                    \
+    C_API/ErrorCode_C.h                    \
+    C_API/PDL_Adapter_C.h                  \
     C_API/SystemModelAdapter_C.h
 
 unix {

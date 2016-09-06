@@ -15,13 +15,16 @@
 #ifndef ZYBO_H__9398CFAE_487B_47F1_5B82_379918C2340C__INCLUDED_
   #define ZYBO_H__9398CFAE_487B_47F1_5B82_379918C2340C__INCLUDED_
 
-#include "ApplicationDescriptor.hpp"
 #include <vector>
+
+namespace mast
+{
+  struct ApplicationAssociation;
+}
 
 namespace test
 {
-  std::vector<ApplicationDescriptor> Zybo_CreateApplicationsDescriptor();
-
+  std::vector<mast::ApplicationAssociation> Zybo_CreateApplicationsDescriptor();
 } // End of namespace mast
 
 #endif  // not defined ZYBO_H__9398CFAE_487B_47F1_5B82_379918C2340C__INCLUDED_

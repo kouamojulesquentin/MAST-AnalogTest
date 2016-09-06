@@ -12,7 +12,7 @@
 //===========================================================================
 
 #include "Startup.hpp"
-#include "ApplicationDescriptor.hpp"
+#include "ApplicationAssociation_CPP.hpp"
 #include "PDL_Adapter_CPP.hpp"
 //+#include "g3log/g3log.hpp"
 #include "Zybo.hpp"
@@ -28,7 +28,7 @@ using namespace mast;
 //!
 //! @note Adapt this function as necessary
 //!       It must nevertheless be compliant with SystemModel (possibly with 'SIT' file)
-vector<test::ApplicationDescriptor> test::Zybo_CreateApplicationsDescriptor ()
+vector<ApplicationAssociation> test::Zybo_CreateApplicationsDescriptor ()
 {
   auto app = []()
   {
@@ -46,7 +46,7 @@ vector<test::ApplicationDescriptor> test::Zybo_CreateApplicationsDescriptor ()
     }
   };
 
-  vector<test::ApplicationDescriptor> associations;
+  vector<ApplicationAssociation> associations;
 
   associations.emplace_back(app, "TAP_DR_Mux", "Zybo");
 

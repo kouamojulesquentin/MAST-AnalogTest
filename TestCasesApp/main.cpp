@@ -13,6 +13,7 @@
 #include "Session.hpp"
 #include "Startup.hpp"
 //+#include "SystemModelAdapter_CPP.h"
+#include "ApplicationAssociation_CPP.hpp"
 #include "ErrorCode_C.h"
 #include "SystemModelBuilder.hpp"
 #include "SystemModelManager.hpp"
@@ -30,7 +31,6 @@
 #include "CustomFileSink.h"
 #include "SIT_reader.hpp"
 #include "Options.hpp"
-#include "ApplicationDescriptor.hpp"
 #include "Zybo.hpp"
 
 #include <stdexcept>
@@ -94,7 +94,7 @@ ErrorCode CheckResult (shared_ptr<SystemModel> sm)
 
 //! Creates applications and associate them with some register path
 //!
-vector<ApplicationDescriptor> CreateDefaultAppDescriptors (const string& appTopNodePath, uint16_t appCount, string_view registerNamePrefix, uint16_t loopCount )
+vector<ApplicationAssociation> CreateDefaultAppDescriptors (const string& appTopNodePath, uint16_t appCount, string_view registerNamePrefix, uint16_t loopCount )
 {
   auto pdlApp = [](uint16_t loopCount, string registerPath, uint16_t initialValue)
   {
@@ -109,7 +109,7 @@ vector<ApplicationDescriptor> CreateDefaultAppDescriptors (const string& appTopN
     }
   };
 
-  vector<ApplicationDescriptor> associations;
+  vector<ApplicationAssociation> associations;
 
   auto initialValue = uint16_t(0x1000);
   for (uint16_t ii = 0 ; ii < appCount ; ++ii)
@@ -143,7 +143,7 @@ vector<ApplicationDescriptor> CreateDefaultAppDescriptors (const string& appTopN
 //! @param testcaseOptions  Options for test case (depends on tescase kind)
 //!
 //! @return Application function and their association with a ParentNode within the SystemModel
-vector<ApplicationDescriptor> CreateTestcase (shared_ptr<SystemModel>             sm,
+vector<ApplicationAssociation> CreateTestcase (shared_ptr<SystemModel>             sm,
                                               shared_ptr<AccessInterfaceProtocol> protocol,
                                               Options::Testcase                   testcase,
                                               const string&                       testcaseOptions)
@@ -197,7 +197,7 @@ vector<ApplicationDescriptor> CreateTestcase (shared_ptr<SystemModel>           
 
   Utility::TrimBoth(filePath);
 
-  vector<ApplicationDescriptor> associations;
+  vector<ApplicationAssociation> associations;
   switch (testcase)
   {
     case Options::Testcase::NotSpecified:
@@ -358,7 +358,7 @@ std::unique_ptr<g3::LogWorker> InitializeLogger ()
 
 //! Runs mast using application descriptors
 //!
-void RunMast (const vector<ApplicationDescriptor>& descriptors)
+void RunMast (const vector<ApplicationAssociation>& descriptors)
 {
   auto sm      = Startup::GetSystemModel();
   auto manager = Startup::GetManager();

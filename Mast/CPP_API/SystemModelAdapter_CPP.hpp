@@ -14,32 +14,15 @@
   #define SYSTEMMODELADAPTER_CPP_H__D20B38D9_1D62_4C8A_59AE_115AEF979C69__INCLUDED_
 
 #include "Platform.hpp"
+//+#include "ApplicationAssociation_CPP.hpp"
 #include <string>
 #include <vector>
 #include <experimental/string_view>
-#include <functional>
 
 namespace mast
 {
-  //! Associates functions (applications) with some node path and optionally a (debug) name
-  //!
-  struct ApplicationAssociation final
-  {
-    using Application_t = std::function<void()>;
+  class ApplicationAssociation;
 
-    Application_t function;
-    std::string   topNodePath;
-    std::string   debugName;
-
-    ApplicationAssociation(Application_t p_function, std::string p_topNodePath, std::string p_debugName = "")
-      : function    (p_function)
-      , topNodePath (std::move(p_topNodePath))
-      , debugName   (std::move(p_debugName))
-    {}
-  };
-  //
-  //  End of ApplicationAssociation struct declaration
-  //---------------------------------------------------------------------------
 
 
   //! Runs Mast till applications terminates

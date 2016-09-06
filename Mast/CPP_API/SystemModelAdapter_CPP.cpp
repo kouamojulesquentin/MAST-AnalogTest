@@ -43,7 +43,7 @@ inline auto GetAndCheckManager()
 //!
 void LoadSystemModel (string_view filePath)
 {
-  CHECK_PARAMETER_NOT_EMPTY(filePath, "Expect valid file path");
+  CHECK_PARAMETER_NOT_EMPTY(filePath, "Cannot create system model without a valid path for its description (SIT file)");
   CHECK_FILE_EXISTS(filePath);
 
   auto sm     = Startup::GetSystemModel();
@@ -79,6 +79,8 @@ void mast::CleanupMast ()
 
 
 //! Registers applications functions with their associated node to the System Model Manager
+//!
+//! @param appAssociations  Associate some application function with a node in the system model
 //!
 void mast::CreateApplications (const vector<ApplicationAssociation>& appAssociations)
 {
@@ -124,20 +126,36 @@ void mast::InitializeMast (string_view modelFilePath)
 
 //! Runs Mast til applications terminates
 //!
+//! @param appAssociations  Associate some application function with a node in the system model
+//!
+//! @note Mast must have been initialized and system model been created beforehand
+//!
+void mast::RunMast (const vector<ApplicationAssociation>& appAssociations)
+{
+  CreateApplications(appAssociations);
+
+  auto manager = mast::Startup::GetManager();
+  manager->Start();
+  manager->StartCreatedApplicationThreads();
+  manager->WaitForApplicationsEnd();
+  manager->Stop();
+}
+//
+//  End of: mast::RunMast
+//---------------------------------------------------------------------------
+
+
+//! Creates a system model from configuration file, then runs Mast till applications terminates
+//!
 void mast::RunMast (string_view modelFilePath, const vector<ApplicationAssociation>& appAssociations)
 {
   CHECK_PARAMETER_NOT_EMPTY(modelFilePath, "Cannot run Mast without a valid path for system model (SIT file)");
   CHECK_FILE_EXISTS(modelFilePath);
 
   Session session;
-  auto manager = mast::Startup::GetManager();
 
-  CreateApplications(appAssociations);
-
-  manager->Start();
-  manager->StartCreatedApplicationThreads();
-  manager->WaitForApplicationsEnd();
-  manager->Stop();
+  LoadSystemModel(modelFilePath);
+  RunMast(appAssociations);
 }
 //
 //  End of: mast::RunMast

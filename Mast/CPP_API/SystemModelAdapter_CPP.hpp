@@ -25,20 +25,25 @@ namespace mast
 
 
 
-  //! Runs Mast till applications terminates
+  //! Creates a system model from configuration file, then runs Mast till applications terminates
   //!
   DLL_EXPORT void RunMast(std::experimental::string_view modelFilePath, const std::vector<ApplicationAssociation>& appAssociations);
 
-  //!< Starts up mast library, building model using specified file
-  //!<
-  //!< @note  This is to be used when there is no specific code to
-  //!<        build initialize the model and an associated manager
+  //! Runs Mast till applications terminates
+  //!
+  //! @note Mast must have been initialized and system model been created beforehand
+  DLL_EXPORT void RunMast(const std::vector<ApplicationAssociation>& appAssociations);
+
+  //! Starts up mast library, building model using specified file
+  //!
+  //! @note  This is to be used when there is no specific code to
+  //!        build initialize the model and an associated manager
   DLL_EXPORT void InitializeMast(std::experimental::string_view modelFilePath);
 
-  //!< Cleans up Mast library
-  //!<
-  //!< @note  To start using Mast (e.g. with a new model), one must call InitializeMast again
-  //!<
+  //! Cleans up Mast library
+  //!
+  //! @note  To start using Mast (e.g. with a new model), one must call InitializeMast again
+  //!
   DLL_EXPORT void CleanupMast();
 
   //! Starts System Model Manager
@@ -54,7 +59,7 @@ namespace mast
   //!
   DLL_EXPORT void CreateApplications(const std::vector<ApplicationAssociation>& appAssociations);
 
-  //! Waits (blocks) until all application thread terminates (on their own or by a mechanism unknown to mast manager)
+  //! Waits (blocks) until all application thread terminate (on their own or by a mechanism unknown to mast manager)
   //!
   DLL_EXPORT void WaitForApplicationsEnd();
 }

@@ -12,8 +12,8 @@
 
 #include "Session.hpp"
 #include "Startup.hpp"
-//+#include "SystemModelAdapter_CPP.h"
 #include "ApplicationAssociation_CPP.hpp"
+#include "SystemModelAdapter_CPP.hpp"
 #include "ErrorCode_C.h"
 #include "SystemModelBuilder.hpp"
 #include "SystemModelManager.hpp"
@@ -68,10 +68,10 @@ namespace
 {
 //! Check SystemModel coherency
 //!
-ErrorCode CheckResult (shared_ptr<SystemModel> sm)
+ErrorCode CheckSystemModel ()
 {
-  auto retCode = ErrorCode::Ok;
-
+  auto retCode     = ErrorCode::Ok;
+  auto sm          = Startup::GetSystemModel();
   auto checkResult = sm->Check();
 
   if (checkResult.HasIssues())
@@ -87,7 +87,7 @@ ErrorCode CheckResult (shared_ptr<SystemModel> sm)
   return retCode;
 }
 //
-//  End of: CheckResult
+//  End of: CheckSystemModel
 //---------------------------------------------------------------------------
 
 
@@ -137,16 +137,14 @@ vector<ApplicationAssociation> CreateDefaultAppDescriptors (const string& appTop
 
 
 //! Builds SystemModel with optional AccessInterfaceProtocol for specified testcase.
-//! @param sm               Current system model
 //! @param protocol         Optional protocol (supersede one that may be defined by the testcase)
 //! @param testcase         Tescase kind
 //! @param testcaseOptions  Options for test case (depends on tescase kind)
 //!
 //! @return Application function and their association with a ParentNode within the SystemModel
-vector<ApplicationAssociation> CreateTestcase (shared_ptr<SystemModel>             sm,
-                                              shared_ptr<AccessInterfaceProtocol> protocol,
-                                              Options::Testcase                   testcase,
-                                              const string&                       testcaseOptions)
+vector<ApplicationAssociation> CreateTestcase (shared_ptr<AccessInterfaceProtocol> protocol,
+                                               Options::Testcase                   testcase,
+                                               const string&                       testcaseOptions)
 {
   string_view filePath  = testcaseOptions;  // By default, testcaseOptions may contains a file path
   string_view name      = "default";        // This is testcase "sub-name"
@@ -197,6 +195,8 @@ vector<ApplicationAssociation> CreateTestcase (shared_ptr<SystemModel>          
 
   Utility::TrimBoth(filePath);
 
+  auto sm = Startup::GetSystemModel();
+
   vector<ApplicationAssociation> associations;
   switch (testcase)
   {
@@ -205,12 +205,8 @@ vector<ApplicationAssociation> CreateTestcase (shared_ptr<SystemModel>          
       break;
     case Options::Testcase::SIT_File:
     {
-      CHECK_FILE_EXISTS(filePath);
-      auto reader   = SIT::SIT_Reader(sm);
-      reader.parse(filePath.data());
-      auto topNode  = dynamic_pointer_cast<ParentNode>(reader.parsed_sut);
+      InitializeMast(filePath);
 
-      sm->ReplaceRoot(topNode, false);
       if (protocol)
       {
         auto ai = dynamic_pointer_cast<AccessInterface>(sm->Root());
@@ -219,6 +215,7 @@ vector<ApplicationAssociation> CreateTestcase (shared_ptr<SystemModel>          
           ai->SetProtocol(protocol);
         }
       }
+
       if (name == "zybo")
       {
         associations = test::Zybo_CreateApplicationsDescriptor();
@@ -252,7 +249,6 @@ vector<ApplicationAssociation> CreateTestcase (shared_ptr<SystemModel>          
     default:
       break;
   }
-
 
   return associations;
 }
@@ -354,31 +350,6 @@ std::unique_ptr<g3::LogWorker> InitializeLogger ()
 //
 //  End of: InitializeLogger
 //---------------------------------------------------------------------------
-
-
-//! Runs mast using application descriptors
-//!
-void RunMast (const vector<ApplicationAssociation>& descriptors)
-{
-  auto sm      = Startup::GetSystemModel();
-  auto manager = Startup::GetManager();
-
-  for (const auto& descriptor : descriptors)
-  {
-    auto appNode = dynamic_pointer_cast<ParentNode>(sm->Root()->FindNode(descriptor.topNodePath));
-    CHECK_VALUE_NOT_NULL(appNode, "Cannot find a node using path: "s + descriptor.topNodePath);
-
-    manager->CreateApplicationThread(appNode, descriptor.function, descriptor.debugName);
-  }
-
-  manager->Start();
-  manager->StartCreatedApplicationThreads();
-  manager->WaitForApplicationsEnd();
-  manager->Stop();
-}
-//
-//  End of: RunMast
-//---------------------------------------------------------------------------
 } // End of unnamed namespace
 
 
@@ -395,12 +366,11 @@ int main (int argc, char* argv [])
     auto options = Options::ParseArguments(argc, argv);
     cout << options.ToDebugString("Retained options: \n", "   ");
 
-    auto session     = Session (std::make_shared<SystemModelManagerMonitor>());
-    auto sm          = session.sm;
-    auto protocol    = GetProtocol(options.protocol, options.protocolOptions);
-    auto descriptors = CreateTestcase(sm, protocol, options.testcase, options.testcaseOptions);
+    auto session        = Session (std::make_shared<SystemModelManagerMonitor>());
+    auto protocol       = GetProtocol(options.protocol, options.protocolOptions);
+    auto appAssociation = CreateTestcase(protocol, options.testcase, options.testcaseOptions);
 
-    retCode = CheckResult(sm);
+    retCode = CheckSystemModel();
     if (retCode != ErrorCode::Ok)
     {
       options.printGraph = true;
@@ -409,7 +379,7 @@ int main (int argc, char* argv [])
     if (options.printGraph)
     {
       ofstream os(options.graphFilePath);
-      os << GmlPrinterVisitor::Graph(sm->Root(), "", GmlPrinterOptions::Std | GmlPrinterOptions::ShowProtocol);
+      os << GmlPrinterVisitor::Graph(session.sm->Root(), "", GmlPrinterOptions::Std | GmlPrinterOptions::ShowProtocol);
     }
 
     if (retCode != ErrorCode::Ok)
@@ -417,7 +387,7 @@ int main (int argc, char* argv [])
       return static_cast<int>(retCode);
     }
 
-    RunMast(descriptors);
+    RunMast(appAssociation);
 
     std::cout << "End of test case (see log file in case of errors)" << std::endl;
   }

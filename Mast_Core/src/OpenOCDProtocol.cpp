@@ -11,14 +11,33 @@
 //!
 //===========================================================================
 
-#include "OpenOCDProtocol.hpp"
 #include "Utility.hpp"
 #include "g3log/g3log.hpp"
+#include "OpenOCDProtocol.hpp"
 
 #include <vector>
 #include <string>
 
 #if defined(USE_OPEN_OCD)
+
+extern "C"
+{
+    #include <config.h>
+    #include <jtag/driver.h>
+    #include <jtag/jtag.h>
+    #include <transport/transport.h>
+    #include <helper/ioutil.h>
+    #include <helper/util.h>
+    #include <helper/configuration.h>
+    #include <flash/nor/core.h>
+    #include <flash/nand/core.h>
+    #include <pld/pld.h>
+    #include <flash/mflash.h>
+
+    #include <server/server.h>
+    #include <server/gdb_server.h>
+}
+
 
 static const char openocd_startup_tcl[] = {
 #include "startup_tcl.inc"
@@ -87,14 +106,10 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, string_view design
 
   jtag_tap_init(tap);
 
-  // OpenOCD has an 'internal' variable (i.e. static) indicating if hardware TRST is supported by
-  // the adapter and the target.
-  this->m_supported_resets = jtag_get_reset_config();
+  m_supportTrst = jtag_get_reset_config() & RESET_HAS_TRST;
 
 
-  // Some adapters and JTAG TAP do not provide a TRST pin. If the m_supported_resets attribute has the
-  // RESET_HAS_TRST flag positive, we do it by hardware, otherwise we pass by the state machine.
-  if(this->m_supported_resets & RESET_HAS_TRST)
+  if(m_supportTrst)         // Some adapters and JTAG TAP do not provide a TRST pin.
     jtag_add_reset(1, 0);
   else
     jtag_add_reset(0, 0);
@@ -115,7 +130,7 @@ OpenOCDProtocol::~OpenOCDProtocol()
   #if defined(USE_OPEN_OCD)
 
   // Here we put the tap in RESET state
-  if(this->m_supported_resets & RESET_HAS_TRST)
+  if(m_supportTrst)
     jtag_add_reset(1, 0);           // Hardware reset is supported, TRST is enabled for one TCK cycle.
   else
     jtag_add_statemove(TAP_RESET);  // At least one of the toolchain components does not provide a TRST pin.
@@ -189,9 +204,8 @@ BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfac
   {
     case 0u:
       LOG(INFO) << "OpenOCD_RST(" << toSutData.DataAsMixString() << ")";
-      // Some adapters and JTAG TAP do not provide a TRST pin. If the m_supported_resets attribute has the
-      // RESET_HAS_TRST flag positive, we do it by hardware, otherwise we pass by the state machine.
-      if(this->m_supported_resets & RESET_HAS_TRST)
+
+      if(m_supportTrst)
         jtag_add_reset(1, 0);           // TRST is enabled for one TCK cycle.
       else
         jtag_add_statemove(TAP_RESET);  // One of the toolchain components does not provide a TRST pin.

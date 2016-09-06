@@ -18,27 +18,6 @@
 #include "AccessInterfaceProtocol.hpp"
 #include <experimental/string_view>
 
-#if defined(USE_OPEN_OCD)
-extern "C"
-{
-    #include <config.h>
-    #include <jtag/driver.h>
-    #include <jtag/jtag.h>
-    #include <transport/transport.h>
-    #include <helper/ioutil.h>
-    #include <helper/util.h>
-    #include <helper/configuration.h>
-    #include <flash/nor/core.h>
-    #include <flash/nand/core.h>
-    #include <pld/pld.h>
-    #include <flash/mflash.h>
-
-    #include <server/server.h>
-    #include <server/gdb_server.h>
-}
-
-#endif
-
 struct command_context;
 
 namespace mast
@@ -83,11 +62,13 @@ class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
   //
   private:
   #if defined(USE_OPEN_OCD)
-  command_context* m_cmd_ctx;  //!< OpenOCD structure containing the whole context of the current OpenOCD session configuration.
+  command_context* m_cmd_ctx;          //!< OpenOCD structure containing the whole context of the current OpenOCD session configuration.
 
-  enum reset_types m_supported_resets; //!< Contains which kind of physical reset (TRST / SRST) is supported by the toolchain (adapter + TAP). JTAG TAP only requires TRST.
+  //! Some adapters and JTAG TAP do not provide a TRST pin.
+  //! If jtag_get_reset_config() attribute has the RESET_HAS_TRST flag set, we do it by hardware, otherwise we pass by the state machine.
+  bool             m_supportTrst = false;
 
-  #endif  // not define _WIN32
+  #endif
 };
 //
 //  End of OpenOCDProtocol class declaration

@@ -71,10 +71,10 @@ class TestModelBuilder final
 
   std::shared_ptr<mast::AccessInterface> Create_TestCase_AccessInterface     (string_view name = "TAP");
   std::shared_ptr<mast::AccessInterface> Create_TestCase_1687                (string_view name = "");
-  std::shared_ptr<mast::AccessInterface> Create_TestCase_MIB                 (string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
-  std::shared_ptr<mast::AccessInterface> Create_TestCase_MIB_Multichain_Pre  (string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
-  std::shared_ptr<mast::AccessInterface> Create_TestCase_MIB_Multichain_Post (string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
-  std::shared_ptr<mast::AccessInterface> Create_TestCase_1500                (string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES);
+  std::shared_ptr<mast::AccessInterface> Create_TestCase_MIB                 (string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES, uint32_t regsBitsCount = DYNAMIC_TDR_LEN);
+  std::shared_ptr<mast::AccessInterface> Create_TestCase_MIB_Multichain_Pre  (string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES, uint32_t regsBitsCount = DYNAMIC_TDR_LEN);
+  std::shared_ptr<mast::AccessInterface> Create_TestCase_MIB_Multichain_Post (string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES, uint32_t regsBitsCount = DYNAMIC_TDR_LEN);
+  std::shared_ptr<mast::AccessInterface> Create_TestCase_1500                (string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES, uint32_t regsBitsCount = DYNAMIC_TDR_LEN);
 
   std::shared_ptr<mast::AccessInterface> Create_UnitTestCase_6_Levels();
 

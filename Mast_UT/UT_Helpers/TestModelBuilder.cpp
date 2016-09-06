@@ -168,11 +168,14 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_AccessInterface (s
 //!       - The control register is composed with multiple bits
 //!
 //! @param name           Name for top node
-//! @param registersCount Number of MIB mux derivations
+//! @param regsCount      Number of MIB mux derivations
+//! @param regsBitsCount  Number of bits of each registers
 //!
 //! @return Top node of created sub-tree
 //!
-shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_MIB (string_view name, uint32_t registersCount)
+shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_MIB (string_view name,
+                                                                   uint32_t    regsCount,
+                                                                   uint32_t    regsBitsCount)
 {
   // ---------------- Create SUT
   //
@@ -180,13 +183,13 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_MIB (string_view n
 
   // ---------------- Append MIB
   //
-  auto mib = Create_Default_MIB("", registersCount);
+  auto mib = Create_Default_MIB("", regsCount);
   tap->AppendChild(mib);
   tap->SetChildAppender(mib);
 
   // ---------------- Add registers
   //
-  m_builder.AppendRegisters(registersCount, "dynamic_", BinaryVector(DYNAMIC_TDR_LEN, 0), tap);
+  m_builder.AppendRegisters(regsCount, "dynamic_", BinaryVector(regsBitsCount, 0), tap);
 
   return tap;
 }
@@ -232,17 +235,20 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_1687 (string_view 
 //! @note - There are multiple "dynamic" registers
 //!       - The control register is composed with multiple bits
 //!
-//! @param name         Name for top node
-//! @param chainsCount  Number of MIB mux derivations
+//! @param name           Name for top node
+//! @param regsCount      Number of MIB mux derivations
+//! @param regsBitsCount  Number of bits of each registers
 //!
 //! @return Top node of created sub-tree
-shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_MIB_Multichain_Pre (string_view name, uint32_t chainsCount)
+shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_MIB_Multichain_Pre (string_view name,
+                                                                                  uint32_t    regsCount,
+                                                                                  uint32_t    regsBitsCount)
 {
   auto tap         = Create_JTAG_TAP(name, 8u, 3u);
 
   // ---------------- Append MIB with control register before mux
   //
-  auto res         = m_builder.Create_PathSelector(SelectorKind::Binary, "MIB_ctrl", chainsCount);
+  auto res         = m_builder.Create_PathSelector(SelectorKind::Binary, "MIB_ctrl", regsCount);
   auto mibCtrl     = res.first;
   auto mibSelector = res.second;
 
@@ -251,7 +257,7 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_MIB_Multichain_Pre
 
   // ---------------- Add wrapped cores (registers)
   //
-  m_builder.AppendRegisters(chainsCount, "dynamic_", BinaryVector(DYNAMIC_TDR_LEN, 0), mibMux);
+  m_builder.AppendRegisters(regsCount, "dynamic_", BinaryVector(regsBitsCount, 0), mibMux);
 
   return tap;
 }
@@ -265,17 +271,20 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_MIB_Multichain_Pre
 //! @note - There are multiple "dynamic" registers
 //!       - The control register is composed with multiple bits
 //!
-//! @param name         Name for top node
-//! @param chainsCount  Number of MIB mux derivations
+//! @param name           Name for top node
+//! @param regsCount      Number of MIB mux derivations
+//! @param regsBitsCount  Number of bits of each registers
 //!
 //! @return Top node of created sub-tree
-shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_MIB_Multichain_Post (string_view name, uint32_t chainsCount)
+shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_MIB_Multichain_Post (string_view name,
+                                                                                   uint32_t    regsCount,
+                                                                                   uint32_t    regsBitsCount)
 {
   auto tap         = Create_JTAG_TAP(name, 8u, 3u);
 
   // ---------------- Append MIB with control register before mux
   //
-  auto res         = m_builder.Create_PathSelector(SelectorKind::Binary, "MIB_ctrl", chainsCount);
+  auto res         = m_builder.Create_PathSelector(SelectorKind::Binary, "MIB_ctrl", regsCount);
   auto mibCtrl     = res.first;
   auto mibSelector = res.second;
   auto mibMux      = m_model.CreateLinker("MIB_mux", mibSelector, tap);
@@ -284,7 +293,7 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_MIB_Multichain_Pos
 
   // ---------------- Add wrapped cores (registers)
   //
-  m_builder.AppendRegisters(chainsCount, "dynamic_", BinaryVector(DYNAMIC_TDR_LEN, 0), mibMux);
+  m_builder.AppendRegisters(regsCount, "dynamic_", BinaryVector(regsBitsCount, 0), mibMux);
 
   return tap;
 }
@@ -298,11 +307,14 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_MIB_Multichain_Pos
 //! @note - There are multiple "dynamic" registers
 //!       - The control register is composed with multiple bits
 //!
-//! @param name         Name for top node
-//! @param chainsCount  Number of mux derivations (excluding bypass register)
+//! @param name           Name for top node
+//! @param regsCount      Number of mux derivations (excluding bypass register)
+//! @param regsBitsCount  Number of bits of each registers
 //!
 //! @return Top node of created sub-tree
-shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_1500 (string_view name, uint32_t chainsCount)
+shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_1500 (string_view name,
+                                                                    uint32_t    regsCount,
+                                                                    uint32_t    regsBitsCount)
 {
   // ---------------- Create SUT
   //
@@ -311,12 +323,12 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_1500 (string_view 
   // ---------------- Append 1500 wrapper
   //
   SystemModelBuilder m_builder(m_model);
-  auto wrapper = m_builder.Create_1500_Wrapper("", chainsCount);
+  auto wrapper = m_builder.Create_1500_Wrapper("", regsCount);
   tap->AppendChild(wrapper);
 
   // ---------------- Add 1500 wrapped cores (registers)
   //
-  m_builder.AppendRegisters(chainsCount, "dynamic_", BinaryVector(DYNAMIC_TDR_LEN, 0), wrapper);
+  m_builder.AppendRegisters(regsCount, "dynamic_", BinaryVector(regsBitsCount, 0), wrapper);
 
   return tap;
 }

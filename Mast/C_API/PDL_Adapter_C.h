@@ -1,19 +1,18 @@
 //===========================================================================
-//                           PDL_Adapter.h
+//                           PDL_Adapter_C.h
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file PDL_Adapter.h
+//! @file PDL_Adapter_C.h
 //!
 //! Declares C language API to PDL
 //!
 //===========================================================================
 
-
-#ifndef PDL_ADAPTER_H__91DB123F_F997_4574_50B6_54BF85F6D69A__INCLUDED_
-  #define PDL_ADAPTER_H__91DB123F_F997_4574_50B6_54BF85F6D69A__INCLUDED_
+#ifndef PDL_ADAPTER_C_H__71981A37_3B9D_480F_F88B_CD06588A949E__INCLUDED_
+  #define PDL_ADAPTER_C_H__71981A37_3B9D_480F_F88B_CD06588A949E__INCLUDED_
 
 #include "SystemModelAdapter_C.h"
 #include "Platform.hpp"
@@ -102,9 +101,10 @@ extern "C"
   DLL_EXPORT ErrorCode iWrite_int64_t      (const char* registerPath, int64_t     value); //!< Requires write to register from int64_t
 }
 
-#endif  // not defined PDL_ADAPTER_H__91DB123F_F997_4574_50B6_54BF85F6D69A__INCLUDED_
+
+#endif  // not defined PDL_ADAPTER_C_H__71981A37_3B9D_480F_F88B_CD06588A949E__INCLUDED_
 //===========================================================================
-// End of PDL_Adapter.h
+// End of PDL_Adapter_C.h
 //===========================================================================
 
 

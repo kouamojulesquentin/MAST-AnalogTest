@@ -1,16 +1,16 @@
 //===========================================================================
-//                           PDL_Adapter.cpp
+//                           PDL_Adapter_C.cpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file PDL_Adapter.cpp
+//! @file PDL_Adapter_C.cpp
 //!
 //! Implements 'C' language API to system model
 //===========================================================================
 
-#include "PDL_Adapter.h"
+#include "PDL_Adapter_C.h"
 #include "SystemModelManager.hpp"
 #include "Startup.hpp"
 #include "Commons_C.hpp"
@@ -345,5 +345,5 @@ ErrorCode iWrite_int32_t  (const char* registerPath, int32_t  value)  { return i
 ErrorCode iWrite_int64_t  (const char* registerPath, int64_t  value)  { return iWrite_impl(registerPath, value); }
 
 //===========================================================================
-// End of PDL_Adapter.cpp
+// End of PDL_Adapter_C.cpp
 //===========================================================================

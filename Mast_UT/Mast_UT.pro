@@ -29,8 +29,8 @@ DEPENDPATH += $$PWD/../Mast_Core/include        \
 
 SOURCES += \
     Generated/Runner.cpp                              \
-    C_API/UT_PDL_Adapter.cpp                          \
-    C_API/UT_PDL_Adapter_CPP.cpp                      \
+    API_C/UT_PDL_Adapter_C.cpp                        \
+    API_CPP/UT_PDL_Adapter_CPP.cpp                    \
     SystemModel/Fake_SVF_Simulator.cpp                \
     SystemModel/Spy_AccessInterfaceProtocols.cpp      \
     SystemModel/Spy_I2C_Protocol.cpp                  \
@@ -66,8 +66,8 @@ SOURCES += \
 HEADERS += \
     CxxTest_Traits/BinaryVector_Traits.hpp            \
     CxxTest_Traits/SystemModelCheckResult_Traits.hpp  \
-    C_API/UT_PDL_Adapter.hpp                          \
-    C_API/UT_PDL_Adapter_CPP.hpp                      \
+    API_C/UT_PDL_Adapter_C.hpp                        \
+    API_CPP/UT_PDL_Adapter_CPP.hpp                    \
     SystemModel/Fake_SVF_Simulator.hpp                \
     SystemModel/Spy_AccessInterfaceProtocols.hpp      \
     SystemModel/Spy_I2C_Protocol.hpp                  \

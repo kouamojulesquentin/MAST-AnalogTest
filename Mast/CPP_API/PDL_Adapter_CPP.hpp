@@ -5,7 +5,7 @@
 //
 // Project : Mast
 //
-//! @file PDL_Adapter.h
+//! @file PDL_Adapter_CPP.h
 //!
 //! Declares C++ language API to PDL
 //!
@@ -130,7 +130,7 @@ namespace mast
 #endif  // not defined PDL_ADAPTER_CPP_H__287AC6DE_2B0_4C1D_90A1_4BF822B1DC85__INCLUDED_
 
 //===========================================================================
-// End of PDL_Adapter.h
+// End of PDL_Adapter_CPP.h
 //===========================================================================
 
 

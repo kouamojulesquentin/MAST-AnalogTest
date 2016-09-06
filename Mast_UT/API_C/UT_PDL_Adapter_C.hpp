@@ -1,29 +1,28 @@
 //===========================================================================
-//                           UT_PDL_Adapter.hpp
+//                           UT_PDL_Adapter_C.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file UT_PDL_Adapter.hpp
+//! @file UT_PDL_Adapter_C.hpp
 //!
-//! Declares test fixture class for testing PDL_Adapter
+//! Declares test fixture class for testing PDL_Adapter_C
 //!
 //===========================================================================
 
-
-#ifndef UT_PDL_ADAPTER_H__11A19994_E0B3_4769_CA81_D3C9D6D8DE5C__INCLUDED_
-  #define UT_PDL_ADAPTER_H__11A19994_E0B3_4769_CA81_D3C9D6D8DE5C__INCLUDED_
+#ifndef UT_PDL_ADAPTER_C_H__5BB4DECD_614B_4F3F_B39A_BB15F4612574__INCLUDED_
+  #define UT_PDL_ADAPTER_C_H__5BB4DECD_614B_4F3F_B39A_BB15F4612574__INCLUDED_
 
 #include <cxxtest/TestSuite.h>
 
-//! Unit tests for "C" API PDL_Adapter functions
+//! Unit tests for "C" API PDL_Adapter_C functions
 //!
-class UT_PDL_Adapter : public CxxTest::TestSuite
+class UT_PDL_Adapter_C : public CxxTest::TestSuite
 {
   public:
-   UT_PDL_Adapter() = default;
-  ~UT_PDL_Adapter() = default;
+   UT_PDL_Adapter_C() = default;
+  ~UT_PDL_Adapter_C() = default;
 
   // ================ Test Methods ================
 
@@ -103,11 +102,11 @@ class UT_PDL_Adapter : public CxxTest::TestSuite
   void setUp(); //!< Initializes test (called for each test)
 };
 //
-//  End of UT_PDL_Adapter class declaration
+//  End of UT_PDL_Adapter_C class declaration
 //---------------------------------------------------------------------------
 
 
-#endif  // not defined UT_PDL_ADAPTER_H__11A19994_E0B3_4769_CA81_D3C9D6D8DE5C__INCLUDED_
+#endif  // not defined UT_PDL_ADAPTER_C_H__5BB4DECD_614B_4F3F_B39A_BB15F4612574__INCLUDED_
 //===========================================================================
-// End of UT_PDL_Adapter.hpp
+// End of UT_PDL_Adapter_C.hpp
 //===========================================================================

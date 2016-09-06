@@ -32,15 +32,14 @@ include_directories(../Logger/g3log/)
 
 #add_compile_options(${UT_CFLAGS})
 
-file(GLOB Mast_UT_C_API        "C_API/*")
+file(GLOB Mast_UT_C_API        "API_C/*")
+file(GLOB Mast_UT_CPP_API      "API_CPP/*")
 file(GLOB Mast_UT_UTILITY      "Utility/*")
 file(GLOB Mast_UT_SYSTEM_MODEL "SystemModel/*")
 file(GLOB Mast_UT_HELPERS      "UT_Helpers/*")
 set(Mast_UT_GENERATED 				 "Generated/Runner.cpp")
 
-set (Mast_UT_SOURCES ${Mast_UT_C_API} ${Mast_UT_UTILITY} ${Mast_UT_SYSTEM_MODEL} ${Mast_UT_HELPERS} ${Mast_UT_GENERATED})
-
-
+set (Mast_UT_SOURCES ${Mast_UT_C_API} ${Mast_UT_CPP_API} ${Mast_UT_UTILITY} ${Mast_UT_SYSTEM_MODEL} ${Mast_UT_HELPERS} ${Mast_UT_GENERATED})
 
 set_source_files_properties(${Mast_UT_GENERATED} GENERATED)
 

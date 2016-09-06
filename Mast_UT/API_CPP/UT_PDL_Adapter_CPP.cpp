@@ -486,8 +486,8 @@ void UT_PDL_Adapter_CPP::test_iGetRefresh_String ()
 
   auto data =
   {
-    make_tuple(0x8171615141312111ULL, StringType::Hex,    "8171615141312111"),
-    make_tuple(0x8171615141312111ULL, StringType::Binary, "1000000101110001011000010101000101000001001100010010000100010001"),
+    make_tuple(uint64_t(0x8171615141312111ULL), StringType::Hex,    "8171615141312111"),
+    make_tuple(uint64_t(0x8171615141312111ULL), StringType::Binary, "1000000101110001011000010101000101000001001100010010000100010001"),
     //! @todo [JFC]-[September/06/2016]: In test_iGetRefresh_String(): Add checking of decimal mode (when available)
     //!
   };
@@ -531,8 +531,8 @@ void UT_PDL_Adapter_CPP::test_iGetRefresh_String_Sugar ()
 
   auto data =
   {
-    make_tuple(0x8171615141312111ULL, StringType::Hex,    "8171615141312111"),
-    make_tuple(0x8171615141312111ULL, StringType::Binary, "1000000101110001011000010101000101000001001100010010000100010001"),
+    make_tuple(uint64_t(0x8171615141312111ULL), StringType::Hex,    "8171615141312111"),
+    make_tuple(uint64_t(0x8171615141312111ULL), StringType::Binary, "1000000101110001011000010101000101000001001100010010000100010001"),
     //! @todo [JFC]-[September/06/2016]: In test_iGetRefresh_String_Sugar(): Add checking of decimal mode (when available)
     //!
   };

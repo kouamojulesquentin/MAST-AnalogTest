@@ -61,6 +61,7 @@ using namespace mast;
 #define DEFAULT_I2C_PREFIX "S2R"
 
 extern int nlines;
+extern SIT::SIT_Parser::location_type *my_location;
 
 std::vector<std::string> AI_protocol_table  =
   {"JTAG_Loopback","JTAG_SVF_simulation","JTAG_SVF_openOCD",
@@ -236,7 +237,8 @@ t_LINKER  node_name path_selector ctrl_node children_list {
 			l = find_in_table(Path_Selector_table,$3);
 			if (l==-1)
 			 {
-	  		std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unkown Linker Path Selector \n";
+   			std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
+			std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unkown Linker Path Selector \n";
 	  		YYERROR;
 	  		}
 	  	       else
@@ -259,6 +261,7 @@ t_LINKER  node_name path_selector ctrl_node children_list {
   {
       if ($5.n_nodes!=1)
 	 {
+	  std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
 	  std::cerr << "SIB " << $2.name<< " has " << $5.n_nodes << " derivations instead of 1\n";
 	  YYERROR;
 	 }
@@ -276,6 +279,7 @@ t_LINKER  node_name path_selector ctrl_node children_list {
   {
       if ($8.n_nodes>$6)
 	 {
+	  std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
 	  std::cerr << "MIB " << $2.name<< " has " << $8.n_nodes << " derivations instead of maximum "<< $6 <<"\n";
 	  YYERROR;
 	 }
@@ -285,6 +289,7 @@ t_LINKER  node_name path_selector ctrl_node children_list {
 	l = find_in_table(Path_Selector_table,$7);
 	if (l==-1)
 	 {
+	 std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
 	 std::cerr << "node " << $2.name<< " \""<< $7 << "\"" << ": Unkown MIB Path Selector \n";
 	 YYERROR;
 	 }
@@ -321,6 +326,7 @@ t_LINKER  node_name path_selector ctrl_node children_list {
   {
       if ($4.n_nodes>$3)
 	 {
+	  std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
 	  std::cerr << "1500 Wrapper " << $2.name<< " has " << $4.n_nodes << " derivations instead of maximum "<< $3 <<"\n";
 	  YYERROR;
 	 }
@@ -339,6 +345,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE children_list {
 	l = find_in_table(AI_protocol_table,$3);
   	if (l==-1)
 	  {
+	  std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
 	  std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unkown AccessInterface Protocol \n";
 	  YYERROR;
 	  }
@@ -358,6 +365,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE children_list {
 	  case AI_protocol_t::I2C_Player :
 	   if ($4.n_words==0)
 	    {
+	    std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
 	    std::cerr << "Error, " << AI_protocol_table[l] <<" needs an address table\n";
 	    YYERROR;
 	    }
@@ -380,6 +388,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE children_list {
   t_JTAG_TAP node_name JTAG_protocol IR_size IR_TABLE n_DR_chains children_list
       { if ($7.n_nodes>($6+1))
 	 {
+	  std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
 	  std::cerr << "JTAG TAP " << $2.name<< " has " << $7.n_nodes-1 << " DR derivations instead of maximum "<< $6 <<"\n";
 	  YYERROR;
 	 }
@@ -387,6 +396,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE children_list {
       {
        if (($5.n_words>0) && ($5.n_words <($7.n_nodes+1)))
          {
+	  std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
 	  std::cerr << "JTAG TAP " << $2.name<< " has only " << $5.n_words << " IR codings for " << $7.n_nodes << " DR derivations + BPY\n";
 	  YYERROR;
 	 }
@@ -396,6 +406,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE children_list {
 	l = find_in_table(JTAG_AI_protocol_table,$3);
   	if (l==-1)
 	  {
+	  std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
 	  std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unkown JTAG protocol \n";
 	  YYERROR;
 	  }
@@ -497,7 +508,14 @@ leaf_node: register_node {     $$=  $1;
 
 register_node:
    t_REGISTER  node_name size hold bypass {
-                      auto node = driver.main_sm->CreateRegister ($2.name,  BinaryVector::CreateFromBinaryString(remove_quotes($5)), nullptr);
+                      auto bin_value = BinaryVector::CreateFromBinaryString(remove_quotes($5));
+		      if (bin_value.BitsCount() != $3)
+		        {
+	  		std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
+			std::cerr << "Node " << $2.name<< " size "<< $3 << " does not match Bypass value bit count " << bin_value.BitsCount() << "\n";
+	  		YYERROR;
+			}
+		      auto node = driver.main_sm->CreateRegister ($2.name, bin_value , nullptr);
 		      /*TODO: save return value and check if binaryVector.size == size is correct
 		       and raise error if not*/
 		      if ($4==1) node->SetHoldValue(true);
@@ -520,12 +538,11 @@ bypass:
   ;
 
 %%
-extern SIT::SIT_Parser::location_type *my_location;
 
 void
 SIT::SIT_Parser::error( const location_type &l, const std::string &err_message )
 {
-   std::cerr << "Error: " << err_message << " at line " << my_location->begin.line << ", columns " << my_location->begin.column ;
-   std::cerr << " - " << my_location->end.column <<"\n";
+   std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
+   std::cerr << err_message << "\n";
    driver.parsed_sut=nullptr;
 }

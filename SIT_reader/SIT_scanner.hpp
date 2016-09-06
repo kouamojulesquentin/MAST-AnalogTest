@@ -16,6 +16,7 @@ public:
    SIT_Scanner(std::istream *in) : yyFlexLexer(in)
    {
       loc = new SIT::SIT_Parser::location_type();
+      loc ->initialize();
    };
    virtual ~SIT_Scanner() {
       delete loc;

@@ -20,8 +20,13 @@ using token = SIT::SIT_Parser::token;
 
 /* update location on matching */
 #define YY_USER_ACTION loc->step(); loc->columns(yyleng);
+/* handle locations */
+/*int yycolumn = 1;
 
-
+#define YY_USER_ACTION yylloc.first_line = yyloc.last_line = yylineno; \
+    yylloc.first_column = yycolumn; yylloc.last_column = yycolumn+yyleng-1; \
+    yycolumn += yyleng;
+*/
 #define KEYWORD_MAXSIZE 	20
 #define N_KEYWORDS 		16
 
@@ -76,6 +81,7 @@ static int find_keyword(char *s)
 }
 
 int nlines = 1;
+SIT::SIT_Parser::location_type *my_location;
 
 %}
 upper_case_letter 	  [A-Z]
@@ -116,6 +122,7 @@ BV_value		({extended_digit}|{BV_base_specifier})
 %%
 %{          /** Code executed at the beginning of yylex **/
             yylval = lval;
+	    my_location = loc;
 %}
 
 {integer}			{
@@ -159,6 +166,7 @@ BV_value		({extended_digit}|{BV_base_specifier})
 
 \n          {
               nlines++;
+	      loc->lines();
             }
 
 \[	{ return( token::t_LeftBracket);}

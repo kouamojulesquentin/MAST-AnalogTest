@@ -1,6 +1,7 @@
 %skeleton "lalr1.cc"
 %require  "3.0"
 %debug
+%locations
 %defines
 %define api.namespace {SIT}
 %define parser_class_name {SIT_Parser}
@@ -176,7 +177,6 @@ inline std::uint32_t extract_number(std::string s)
 %token  t_RightBracket
 %token  t_LeftBracket
 %token  t_Comma
-%locations
 
 %%
 
@@ -498,6 +498,8 @@ leaf_node: register_node {     $$=  $1;
 register_node:
    t_REGISTER  node_name size hold bypass {
                       auto node = driver.main_sm->CreateRegister ($2.name,  BinaryVector::CreateFromBinaryString(remove_quotes($5)), nullptr);
+		      /*TODO: save return value and check if binaryVector.size == size is correct
+		       and raise error if not*/
 		      if ($4==1) node->SetHoldValue(true);
   		     $$ = node;}
 
@@ -518,12 +520,12 @@ bypass:
   ;
 
 %%
-
+extern SIT::SIT_Parser::location_type *my_location;
 
 void
 SIT::SIT_Parser::error( const location_type &l, const std::string &err_message )
 {
-//   std::cerr << "Error: " << err_message << " at " << l << "\n";
-   std::cerr << "Error: " << err_message << " at line " << nlines << "\n";
+   std::cerr << "Error: " << err_message << " at line " << my_location->begin.line << ", columns " << my_location->begin.column ;
+   std::cerr << " - " << my_location->end.column <<"\n";
    driver.parsed_sut=nullptr;
 }

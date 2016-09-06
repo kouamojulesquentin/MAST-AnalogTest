@@ -20,13 +20,16 @@
 #include "TestModelBuilder.hpp"
 #include "GmlPrinterVisitor.hpp"
 
-//+#include "SystemModelAdapter_C.hpp"
 #include "BinaryVector_Traits.hpp"
+#include "CPP_API_Traits.hpp"
 
 #include <algorithm>
 #include <string>
 #include <experimental/string_view>
+#include <tuple>
 
+using std::tuple;
+using std::make_tuple;
 using std::string;
 using std::experimental::string_view;
 
@@ -39,33 +42,33 @@ namespace
 //!
 //! @note Mast library must be initialized prior to calling this functin
 //!
-void Create_TestCase_MIB_Multichain_Pre (bool reportGml = false)
+void Create_TestCase_MIB_Multichain_Pre (bool reportGml = false, uint32_t regsBitsCount = DYNAMIC_TDR_LEN)
 {
   auto sm = Startup::GetSystemModel();
 
   TestModelBuilder builder(*sm);
 
-  auto tap = builder.Create_TestCase_MIB_Multichain_Pre("TAP", 4u);
+  auto tap = builder.Create_TestCase_MIB_Multichain_Pre("TAP", 4u, regsBitsCount);
 
   auto regDyn_0  = sm->RegisterWithId(6u);
   auto regDyn_1  = sm->RegisterWithId(7u);
   auto regDyn_2  = sm->RegisterWithId(8u);
   auto regDyn_3  = sm->RegisterWithId(9u);
 
-  regDyn_0->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x60));
-  regDyn_1->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x61));
-  regDyn_2->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x62));
-  regDyn_3->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x63));
+  regDyn_0->SetToSut   (BinaryVector(regsBitsCount, 0x60));
+  regDyn_1->SetToSut   (BinaryVector(regsBitsCount, 0x61));
+  regDyn_2->SetToSut   (BinaryVector(regsBitsCount, 0x62));
+  regDyn_3->SetToSut   (BinaryVector(regsBitsCount, 0x63));
 
-  regDyn_0->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x40));
-  regDyn_1->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x41));
-  regDyn_2->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x42));
-  regDyn_3->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x43));
+  regDyn_0->SetBypass  (BinaryVector(regsBitsCount, 0x40));
+  regDyn_1->SetBypass  (BinaryVector(regsBitsCount, 0x41));
+  regDyn_2->SetBypass  (BinaryVector(regsBitsCount, 0x42));
+  regDyn_3->SetBypass  (BinaryVector(regsBitsCount, 0x43));
 
-  regDyn_0->SetPendingForRead(); regDyn_0->SetFromSut  (BinaryVector(DYNAMIC_TDR_LEN, 0x50));
-  regDyn_1->SetPendingForRead(); regDyn_1->SetFromSut  (BinaryVector(DYNAMIC_TDR_LEN, 0x51));
-  regDyn_2->SetPendingForRead(); regDyn_2->SetFromSut  (BinaryVector(DYNAMIC_TDR_LEN, 0x52));
-  regDyn_3->SetPendingForRead(); regDyn_3->SetFromSut  (BinaryVector(DYNAMIC_TDR_LEN, 0x53));
+  regDyn_0->SetPendingForRead(); regDyn_0->SetFromSut  (BinaryVector(regsBitsCount, 0x50));
+  regDyn_1->SetPendingForRead(); regDyn_1->SetFromSut  (BinaryVector(regsBitsCount, 0x51));
+  regDyn_2->SetPendingForRead(); regDyn_2->SetFromSut  (BinaryVector(regsBitsCount, 0x52));
+  regDyn_3->SetPendingForRead(); regDyn_3->SetFromSut  (BinaryVector(regsBitsCount, 0x53));
 
   if (reportGml)
   {
@@ -128,6 +131,56 @@ template<typename T> void Check_iGet (T expectedData)
 }
 
 
+//! Checks SystemModelManager::iGetRefresh()
+//!
+template<typename T> void Check_iGetRefresh (T value)
+{
+  // ---------------- Setup
+  //
+  Session session;
+  Create_TestCase_MIB_Multichain_Pre(false, 64u);
+
+  auto regName = "dynamic_1";
+  iPrefix("TAP_DR_Mux.MIB_mux");
+  iWrite(regName, value);
+  iApply();
+
+  T readData;
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (iGetRefresh(regName, readData));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (readData, value);
+}
+
+//! Checks SystemModelManager::iGetRefresh()
+//!
+template<typename T> void Check_iGetRefresh (T value, StringType stringType, string_view expected)
+{
+  // ---------------- Setup
+  //
+  Session session;
+  Create_TestCase_MIB_Multichain_Pre(false, 64u);
+
+  auto regName = "dynamic_1";
+  iPrefix("TAP_DR_Mux.MIB_mux");
+  iWrite(regName, value);
+  iApply();
+
+  string readData;
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (iGetRefresh(regName, readData, stringType));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (readData, expected);
+}
+
 //! Checks SystemModelManager::iWrite_xxx() using same thread as SystemModelManager
 //!
 template<typename T> void Check_iWrite_NotInitialized ()
@@ -177,7 +230,7 @@ void UT_PDL_Adapter_CPP::setUp ()
 {
   CxxTest::setStringResultsOnNewLine(true);
   CxxTest::setCharactersMapping(CxxTest::CharacterMapping::MAP_CHARS_MINIMAL);  // Keep quotes, HT, and new lines unescaped
-
+  CxxTest::setDisplayUnsignedAsHex(true);
   SystemModelNode::ResetNodeIdentifier();
 }
 
@@ -234,46 +287,6 @@ void UT_PDL_Adapter_CPP::test_iGet_String_Empty_Path ()
 }
 
 
-//! Checks PDL_Adapter_CPP::iGet_String() in hexadecimal format
-//!
-void UT_PDL_Adapter_CPP::test_iGet_String_Hex ()
-{
-  // ---------------- Setup
-  //
-  Session session;
-  Create_TestCase_MIB_Multichain_Pre();
-
-  string readData;
-
-  // ---------------- Exercise
-  //
-  TS_ASSERT_THROWS_NOTHING (iGet("TAP_DR_Mux.MIB_mux.dynamic_1", readData, StringType::Hex));
-
-  // ---------------- Verify
-  //
-  TS_ASSERT_EQUALS (readData, "51515151");
-}
-
-
-//! Checks PDL_Adapter_CPP::iGet_String() in binary format
-//!
-void UT_PDL_Adapter_CPP::test_iGet_String_Bin ()
-{
-  Session session;
-  Create_TestCase_MIB_Multichain_Pre();
-
-  string readData;
-
-  // ---------------- Exercise
-  //
-  TS_ASSERT_THROWS_NOTHING (iGet("TAP_DR_Mux.MIB_mux.dynamic_1", readData, StringType::Binary));
-
-  // ---------------- Verify
-  //
-  TS_ASSERT_EQUALS (readData, "01010001010100010101000101010001");
-}
-
-
 void UT_PDL_Adapter_CPP::test_iGet_uint8  () { Check_iGet<uint8_t>  (0x51);       }
 void UT_PDL_Adapter_CPP::test_iGet_uint16 () { Check_iGet<uint16_t> (0x5151);     }
 void UT_PDL_Adapter_CPP::test_iGet_uint32 () { Check_iGet<uint32_t> (0x51515151); }
@@ -283,6 +296,99 @@ void UT_PDL_Adapter_CPP::test_iGet_int16  () { Check_iGet<int16_t>  (0x5151);   
 void UT_PDL_Adapter_CPP::test_iGet_int32  () { Check_iGet<int32_t>  (0x51515151); }
 void UT_PDL_Adapter_CPP::test_iGet_int64  () { Check_iGet<int64_t>  (0x51515151); }
 
+//! Checks the syntactically more pleasant way to use iGet (for integral types)
+//!
+void UT_PDL_Adapter_CPP::test_iGet_Sugar ()
+{
+  // ---------------- Setup
+  //
+  Session session;
+  Create_TestCase_MIB_Multichain_Pre(false, 64u);
+
+  // ---------------- Exercise
+  //
+  auto readData = iGet<uint32_t>("TAP_DR_Mux.MIB_mux.dynamic_1");
+
+  // ---------------- Verify
+  //
+  auto expected = uint32_t(0x51515151);
+  TS_ASSERT_EQUALS (readData, expected);
+}
+
+
+
+void UT_PDL_Adapter_CPP::test_iGet_String ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto stringType = std::get<0>(data);
+    auto expected   = std::get<1>(data);
+
+    Session session;
+    Create_TestCase_MIB_Multichain_Pre();
+
+    string readData;
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (iGet("TAP_DR_Mux.MIB_mux.dynamic_1", readData, stringType));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (readData, expected);
+  };
+
+  auto data =
+  {
+    make_tuple(StringType::Hex,    "51515151"),
+    make_tuple(StringType::Binary, "01010001010100010101000101010001"),
+    //! @todo [JFC]-[September/06/2016]: In test_iGet_String(): Add checking of decimal mode (when available)
+    //!
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+void UT_PDL_Adapter_CPP::test_iGet_String_Sugar ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto stringType = std::get<0>(data);
+    auto expected   = std::get<1>(data);
+
+    Session session;
+    Create_TestCase_MIB_Multichain_Pre();
+
+    // ---------------- Exercise
+    //
+    auto readData = iGet("TAP_DR_Mux.MIB_mux.dynamic_1", stringType);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (readData, expected);
+  };
+
+  auto data =
+  {
+    make_tuple(StringType::Hex,    "51515151"),
+    make_tuple(StringType::Binary, "01010001010100010101000101010001"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
 
 //! Checks PDL_Adapter_CPP::iWrite() when MAST library has not been initialized yet
 //!
@@ -312,6 +418,129 @@ void UT_PDL_Adapter_CPP::test_iWrite_int64  () { Check_iWrite_SingleThread<int64
 
 
 //+void UT_PDL_Adapter_CPP::test_iWrite_BinaryVector_InvalidValue () { Check_iWrite_SingleThread<const char*>(iWrite_BinaryVector, "ABCD_4567",           "ABCD_4567"); }
+
+void UT_PDL_Adapter_CPP::test_iGetRefresh_uint8      () { Check_iGetRefresh<uint8_t>  (0x51);                  }
+void UT_PDL_Adapter_CPP::test_iGetRefresh_uint16     () { Check_iGetRefresh<uint16_t> (0x5141);                }
+void UT_PDL_Adapter_CPP::test_iGetRefresh_uint32     () { Check_iGetRefresh<uint32_t> (0x51413121UL);          }
+void UT_PDL_Adapter_CPP::test_iGetRefresh_uint64     () { Check_iGetRefresh<uint64_t> (0x0171615141312111ULL); }
+void UT_PDL_Adapter_CPP::test_iGetRefresh_int8       () { Check_iGetRefresh<int8_t>   (0x51);                  }
+void UT_PDL_Adapter_CPP::test_iGetRefresh_int16      () { Check_iGetRefresh<int16_t>  (0x5141);                }
+void UT_PDL_Adapter_CPP::test_iGetRefresh_int32      () { Check_iGetRefresh<int32_t>  (0x51413121UL);          }
+void UT_PDL_Adapter_CPP::test_iGetRefresh_int64      () { Check_iGetRefresh<int64_t>  (0x8171615141312111ULL); }
+
+//! Checks the syntactically more pleasant way to use iGetRefresh (for integral types)
+//!
+void UT_PDL_Adapter_CPP::test_iGetRefresh_Sugar ()
+{
+  // ---------------- Setup
+  //
+  Session session;
+  Create_TestCase_MIB_Multichain_Pre(false, 64u);
+
+  auto value   = uint32_t(0x51413121UL);
+  auto regName = "dynamic_1";
+
+  iPrefix("TAP_DR_Mux.MIB_mux");
+  iWrite(regName, value);
+  iApply();
+
+  // ---------------- Exercise
+  //
+  auto readData = iGetRefresh<uint32_t>(regName);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (readData, value);
+}
+
+void UT_PDL_Adapter_CPP::test_iGetRefresh_String ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto value      = std::get<0>(data);
+    auto stringType = std::get<1>(data);
+    auto expected   = std::get<2>(data);
+
+    Session session;
+    Create_TestCase_MIB_Multichain_Pre(false, 64u);
+
+    auto regName = "dynamic_1";
+    iPrefix("TAP_DR_Mux.MIB_mux");
+    iWrite(regName, value);
+    iApply();
+
+    string readData;
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (iGetRefresh(regName, readData, stringType));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (readData, expected);
+  };
+
+  auto data =
+  {
+    make_tuple(0x8171615141312111ULL, StringType::Hex,    "8171615141312111"),
+    make_tuple(0x8171615141312111ULL, StringType::Binary, "1000000101110001011000010101000101000001001100010010000100010001"),
+    //! @todo [JFC]-[September/06/2016]: In test_iGetRefresh_String(): Add checking of decimal mode (when available)
+    //!
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks the syntactically more pleasant way to use iGetRefresh (for string)
+//!
+void UT_PDL_Adapter_CPP::test_iGetRefresh_String_Sugar ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto value      = std::get<0>(data);
+    auto stringType = std::get<1>(data);
+    auto expected   = std::get<2>(data);
+
+    Session session;
+    Create_TestCase_MIB_Multichain_Pre(false, 64u);
+
+    auto regName = "dynamic_1";
+    iPrefix("TAP_DR_Mux.MIB_mux");
+    iWrite(regName, value);
+    iApply();
+
+    // ---------------- Exercise
+    //
+    auto readData = iGetRefresh(regName, stringType);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (readData, expected);
+  };
+
+  auto data =
+  {
+    make_tuple(0x8171615141312111ULL, StringType::Hex,    "8171615141312111"),
+    make_tuple(0x8171615141312111ULL, StringType::Binary, "1000000101110001011000010101000101000001001100010010000100010001"),
+    //! @todo [JFC]-[September/06/2016]: In test_iGetRefresh_String_Sugar(): Add checking of decimal mode (when available)
+    //!
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
 
 //===========================================================================
 // End of UT_PDL_Adapter_CPP.cpp

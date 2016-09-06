@@ -66,6 +66,8 @@ SOURCES += \
 HEADERS += \
     CxxTest_Traits/BinaryVector_Traits.hpp            \
     CxxTest_Traits/SystemModelCheckResult_Traits.hpp  \
+    CxxTest_Traits/CPP_API_Traits.hpp                 \
+    CxxTest_Traits/C_API_Traits.hpp                   \
     API_C/UT_PDL_Adapter_C.hpp                        \
     API_CPP/UT_PDL_Adapter_CPP.hpp                    \
     SystemModel/Fake_SVF_Simulator.hpp                \

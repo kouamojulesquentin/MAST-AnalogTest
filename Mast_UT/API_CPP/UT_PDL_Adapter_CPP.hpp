@@ -52,8 +52,6 @@ class UT_PDL_Adapter_CPP : public CxxTest::TestSuite
   void test_iGet_int64_Empty_Path ();
   void test_iGet_String_Empty_Path ();
 
-  void test_iGet_String_Hex ();
-  void test_iGet_String_Bin ();
   void test_iGet_uint8 ();
   void test_iGet_uint16 ();
   void test_iGet_uint32 ();
@@ -62,6 +60,9 @@ class UT_PDL_Adapter_CPP : public CxxTest::TestSuite
   void test_iGet_int16 ();
   void test_iGet_int32 ();
   void test_iGet_int64 ();
+  void test_iGet_Sugar ();
+  void test_iGet_String ();
+  void test_iGet_String_Sugar ();
 
   // ---------------- iWrite_xx
   //
@@ -86,6 +87,20 @@ class UT_PDL_Adapter_CPP : public CxxTest::TestSuite
   void test_iWrite_int16 ();
   void test_iWrite_int32 ();
   void test_iWrite_int64 ();
+
+  // ---------------- iGetRefresh
+  //
+  void test_iGetRefresh_uint8 ();
+  void test_iGetRefresh_uint16 ();
+  void test_iGetRefresh_uint32 ();
+  void test_iGetRefresh_uint64 ();
+  void test_iGetRefresh_int8 ();
+  void test_iGetRefresh_int16 ();
+  void test_iGetRefresh_int32 ();
+  void test_iGetRefresh_int64 ();
+  void test_iGetRefresh_Sugar ();
+  void test_iGetRefresh_String ();
+  void test_iGetRefresh_String_Sugar ();
 
   // ================ Other Methods ================
 

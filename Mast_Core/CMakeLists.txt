@@ -5,7 +5,13 @@ include_directories(../Logger/)
 include_directories(../Logger/g3log/)
 
 set(LIBUSB_CFLAGS "")
-if (NOT WIN32)
+
+message("Mast_Core.CMake: USE_OPEN_OCD: ${USE_OPEN_OCD}")
+
+
+if (${USE_OPEN_OCD})
+	set (CFLAGS "${CFLAGS} -DUSE_OPEN_OCD")
+
   # OpenOCD has C header files but using gcc with -std=c++14 args creates warnings
   # (like if C99 was not enabled).
   # by calling these third-party software headers with the SYSTEM attribute in the
@@ -42,11 +48,11 @@ if (NOT WIN32)
 
   endif(LIBUSB1_INCLUDE_DIR AND LIBUSB1_LIBRARY)
 
-endif()
+endif() # if (${USE_OPEN_OCD})
 
 if (WIN32)
   set (CFLAGS "${CFLAGS} -D__LITTLE_ENDIAN=1 -D__BIG_ENDIAN=2 -D__BYTE_ORDER=1")
-else()
+elseif(${USE_OPEN_OCD})
   set (CFLAGS "${CFLAGS} -lusb-1.0")
 endif()
 
@@ -57,6 +63,8 @@ set_target_properties	(Mast_Core PROPERTIES COMPILE_FLAGS "${CFLAGS}")
 
 if (WIN32)
 	target_link_libraries(Mast_Core Logger DbgHelp)
-else ()
+elseif(${USE_OPEN_OCD})
 	target_link_libraries(Mast_Core Logger pthread ${LIBUSB_CFLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/bin/libopenocd.so dl) #${CMAKE_CURRENT_SOURCE_DIR}/../openocd/openocd/jimtcl/libjim.a dl)
+else ()
+	target_link_libraries(Mast_Core Logger pthread)
 endif ()

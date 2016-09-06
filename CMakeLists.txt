@@ -8,6 +8,7 @@ if (WIN32)
   set (CMAKE_C_COMPILER   "gcc")
 endif()
 
+message("NewMast.CMake:   USE_OPEN_OCD: ${USE_OPEN_OCD}")
 
 
 project(mast)
@@ -18,7 +19,6 @@ add_definitions(${CFLAGS})
 set (CFLAGS "${WARNINGS} -std=c++14")
 
 if (WIN32)
-#+  set (CFLAGS "${CFLAGS} -DBUILD_DLL")
   set (CFLAGS ${CFLAGS})
 else()
   set (CFLAGS "${CFLAGS} -fPIC")

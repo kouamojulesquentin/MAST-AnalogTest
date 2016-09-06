@@ -10,6 +10,7 @@ CMAKE_FLAGS=  -DCMAKE_CXX_COMPILER=g++
 
 ifeq ($(OS), Windows_NT)
 $(info ==> Building for Windows)
+USE_OPEN_OCD = OFF
 CMAKE_FLAGS+= -G "MinGW Makefiles"
 RM    = rmdir /S /Q
 MKDIR = mkdir
@@ -28,6 +29,7 @@ SIT_READER_INPUT_FILE = ..\..\SIT_reader\prova.txt
 TESTCASES_EXE_PATH    = $(BIN_DIR)\$(TESTCASES_EXE_NAME)
 
 else
+USE_OPEN_OCD = ON
 MKDIR = mkdir -p
 RM    = rm -rf
 RUN   = ./
@@ -45,8 +47,10 @@ SIT_READER_INPUT_FILE = ../../SIT_reader/prova.txt
 TESTCASES_EXE_PATH    = $(BIN_DIR)/$(TESTCASES_EXE_NAME)
 endif
 
-CMAKE_DEBUG_FLAGS=    -DCMAKE_BUILD_TYPE=Debug   $(CMAKE_FLAGS)
-CMAKE_RELEASE_FLAGS=  -DCMAKE_BUILD_TYPE=Release $(CMAKE_FLAGS)
+$(info ==> Makefile: Use Open OCD: $(USE_OPEN_OCD))
+
+CMAKE_DEBUG_FLAGS=    -DCMAKE_BUILD_TYPE=Debug   $(CMAKE_FLAGS) -DUSE_OPEN_OCD:BOOL=$(USE_OPEN_OCD)
+CMAKE_RELEASE_FLAGS=  -DCMAKE_BUILD_TYPE=Release $(CMAKE_FLAGS) -DUSE_OPEN_OCD:BOOL=$(USE_OPEN_OCD)
 
 
 CMAKE_ARM_FLAGS= -D CMAKE_TOOLCHAIN_FILE=Toolchain-arm.cmake
@@ -88,6 +92,7 @@ ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(SIT_UT_EXE_NAME))","")
 >  cd $(CMAKE_DEBUG_BUILD_DIR) && $(RUN)$(SIT_UT_EXE_PATH)
 else
 >  @echo "    ==== No Debug Sit UT available ========"
+>  @echo "    ==== $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(SIT_UT_EXE_NAME)
 endif
 
 run_sit_ut_release:
@@ -95,6 +100,7 @@ ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(SIT_UT_EXE_NAME))",""
 >  cd $(CMAKE_RELEASE_BUILD_DIR) && $(RUN)$(SIT_UT_EXE_PATH)
 else
 >  @echo "    ==== No Release Sit UT available ========"
+>  @echo "    ==== Expecting: $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(SIT_UT_EXE_NAME) ========"
 endif
 
 run_sit_reader_debug:

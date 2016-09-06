@@ -18,7 +18,7 @@
 #include <vector>
 #include <string>
 
-#ifndef _WIN32
+#if defined(USE_OPEN_OCD)
 
 static const char openocd_startup_tcl[] = {
 #include "startup_tcl.inc"
@@ -26,7 +26,7 @@ static const char openocd_startup_tcl[] = {
 };
 
 extern "C" struct command_context *setup_command_handler(Jim_Interp *interp);
-#endif  // not define _WIN32
+#endif
 
 
 
@@ -37,7 +37,7 @@ using std::experimental::string_view;
 
 //! Initializes OpenOCD "engine"
 //!
-#ifdef _WIN32
+#if not defined(USE_OPEN_OCD)
 OpenOCDProtocol::OpenOCDProtocol (string_view /* configFilePath */, string_view /* designName */, int /* iIrLength */)
 {
 }
@@ -103,7 +103,7 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, string_view design
 
   CHECK_TRUE(ret == ERROR_OK, "[OpenOCD] jtag_execute_queue has failed.");
 }
-#endif  // not define _WIN32
+#endif
 //
 //  End of: OpenOCDProtocol::OpenOCDProtocol
 //---------------------------------------------------------------------------
@@ -112,7 +112,7 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, string_view design
 //!
 OpenOCDProtocol::~OpenOCDProtocol()
 {
-  #ifndef _WIN32
+  #if defined(USE_OPEN_OCD)
 
   // Here we put the tap in RESET state
   if(this->m_supported_resets & RESET_HAS_TRST)
@@ -139,7 +139,7 @@ OpenOCDProtocol::~OpenOCDProtocol()
   unregister_all_commands(m_cmd_ctx, nullptr);
   command_done(m_cmd_ctx);
   adapter_quit();
-  #endif  // not define _WIN32
+  #endif
 }
 //
 //  End of: OpenOCDProtocol::~OpenOCDProtocol
@@ -154,7 +154,7 @@ OpenOCDProtocol::~OpenOCDProtocol()
 //!
 //! @return Bitstream retrieved from SUT
 //!
-#if defined(_WIN32)
+#if not defined(USE_OPEN_OCD)
 BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   switch (derivationId)

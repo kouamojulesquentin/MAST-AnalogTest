@@ -18,7 +18,7 @@
 #include "AccessInterfaceProtocol.hpp"
 #include <experimental/string_view>
 
-#ifndef _WIN32
+#if defined(USE_OPEN_OCD)
 extern "C"
 {
     #include <config.h>
@@ -37,7 +37,7 @@ extern "C"
     #include <server/gdb_server.h>
 }
 
-#endif // not define _WIN32
+#endif
 
 struct command_context;
 
@@ -82,7 +82,7 @@ class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
   // ---------------- Private  Fields
   //
   private:
-  #ifndef _WIN32
+  #if defined(USE_OPEN_OCD)
   command_context* m_cmd_ctx;  //!< OpenOCD structure containing the whole context of the current OpenOCD session configuration.
 
   enum reset_types m_supported_resets; //!< Contains which kind of physical reset (TRST / SRST) is supported by the toolchain (adapter + TAP). JTAG TAP only requires TRST.

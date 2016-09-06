@@ -22,6 +22,6 @@ Build: make
 Clean make clean
 
 [TESTS]
-Standard CMAKE test: run make test
-Custom MAST test: ./Lib_UT_Runner
+Standard CMAKE test: make run_debug or make run_release
+Custom MAST test: ./Mast_UT
 

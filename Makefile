@@ -47,7 +47,6 @@ SIT_READER_INPUT_FILE = ../../SIT_reader/prova.txt
 TESTCASES_EXE_PATH    = $(BIN_DIR)/$(TESTCASES_EXE_NAME)
 endif
 
-$(info ==> Makefile: Use Open OCD: $(USE_OPEN_OCD))
 
 CMAKE_DEBUG_FLAGS=    -DCMAKE_BUILD_TYPE=Debug   $(CMAKE_FLAGS) -DUSE_OPEN_OCD:BOOL=$(USE_OPEN_OCD)
 CMAKE_RELEASE_FLAGS=  -DCMAKE_BUILD_TYPE=Release $(CMAKE_FLAGS) -DUSE_OPEN_OCD:BOOL=$(USE_OPEN_OCD)
@@ -61,6 +60,7 @@ all: debug
 
 debug:
 ifeq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR))","")
+> $(info ==> Makefile: Use Open OCD: $(USE_OPEN_OCD))
 > $(MKDIR) $(CMAKE_DEBUG_BUILD_DIR)
 > cd       $(CMAKE_DEBUG_BUILD_DIR) && cmake $(CMAKE_DEBUG_FLAGS) ..
 endif
@@ -68,6 +68,7 @@ endif
 
 release:
 ifeq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR))","")
+> $(info ==> Makefile: Use Open OCD: $(USE_OPEN_OCD))
 > $(MKDIR) $(CMAKE_RELEASE_BUILD_DIR)
 > cd $(CMAKE_RELEASE_BUILD_DIR) && cmake  $(CMAKE_RELEASE_FLAGS)  ..
 endif

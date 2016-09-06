@@ -28,12 +28,18 @@ Place it before project make or even as first step (before Qmake is run)
     Clean (shallow): "make clean"     (cleans all debug and release obj, lib and exe)
     Clean (deep):    "make distclean" (cleans all build directories)
 
+  To disable build using OpenOCD
+    make disclean
+    then:
+    Debug:           "make debug   USE_OPEN_OCD=OFF"
+    Release:         "make release USE_OPEN_OCD=OFF"
+
   Running Lib Unit tests:
     Debug:      "make run_debug"
     Release:    "make run_release"
     for ARM: "Lib_UT_Runner" must be executed on a ARM target (ex: QEMU)
 
   Running SIT Parser Unit tests:
-    Debug:      "make run_parser_debug"
-    Release:    "make run_parser_release"
+    Debug:      "make run_sit_ut_debug"
+    Release:    "make run_sit_ut_release"
 

@@ -62,7 +62,7 @@ void ToSutVisitor::VisitLinker (Linker& linker)
 //!
 void ToSutVisitor::VisitRegister (Register& reg)
 {
-  if (m_ignorePendingState || reg.IsPending())
+  if (m_ignorePendingState || reg.IsPendingForWrite())
   {
     m_toSutVector.Append(reg.NextToSut());
   }

@@ -70,6 +70,11 @@ void Create_TestCase_MIB_Multichain_Pre (bool reportGml = false, uint32_t regsBi
   regDyn_2->SetPendingForRead(); regDyn_2->SetFromSut  (BinaryVector(regsBitsCount, 0x52));
   regDyn_3->SetPendingForRead(); regDyn_3->SetFromSut  (BinaryVector(regsBitsCount, 0x53));
 
+  regDyn_0->SetHoldValue(false);
+  regDyn_1->SetHoldValue(false);
+  regDyn_2->SetHoldValue(false);
+  regDyn_3->SetHoldValue(false);
+
   if (reportGml)
   {
     TS_TRACE (GmlPrinterVisitor::Graph(tap, "MIB_Multichain_Pre"));
@@ -133,7 +138,10 @@ template<typename T> void Check_iGet (T expectedData)
 
 //! Checks SystemModelManager::iGetRefresh()
 //!
-template<typename T> void Check_iGetRefresh (T value)
+//! @param writtenValue   Value that is written in an iWrite prior to iGetRefresh
+//! @param expected       Value of bypass register expected to be gotten from iGetRefresh
+//!
+template<typename T> void Check_iGetRefresh (T writtenValue, T expected)
 {
   // ---------------- Setup
   //
@@ -142,18 +150,16 @@ template<typename T> void Check_iGetRefresh (T value)
 
   auto regName = "dynamic_1";
   iPrefix("TAP_DR_Mux.MIB_mux");
-  iWrite(regName, value);
+  iWrite(regName, writtenValue);
   iApply();
-
-  T readData;
 
   // ---------------- Exercise
   //
-  TS_ASSERT_THROWS_NOTHING (iGetRefresh(regName, readData));
+  auto readData = iGetRefresh<T>(regName);  // Get bypass value (because register is not configured to hold its value)
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS (readData, value);
+  TS_ASSERT_EQUALS (readData, expected);
 }
 
 //! Checks SystemModelManager::iGetRefresh()
@@ -419,14 +425,14 @@ void UT_PDL_Adapter_CPP::test_iWrite_int64  () { Check_iWrite_SingleThread<int64
 
 //+void UT_PDL_Adapter_CPP::test_iWrite_BinaryVector_InvalidValue () { Check_iWrite_SingleThread<const char*>(iWrite_BinaryVector, "ABCD_4567",           "ABCD_4567"); }
 
-void UT_PDL_Adapter_CPP::test_iGetRefresh_uint8      () { Check_iGetRefresh<uint8_t>  (0x51);                  }
-void UT_PDL_Adapter_CPP::test_iGetRefresh_uint16     () { Check_iGetRefresh<uint16_t> (0x5141);                }
-void UT_PDL_Adapter_CPP::test_iGetRefresh_uint32     () { Check_iGetRefresh<uint32_t> (0x51413121UL);          }
-void UT_PDL_Adapter_CPP::test_iGetRefresh_uint64     () { Check_iGetRefresh<uint64_t> (0x0171615141312111ULL); }
-void UT_PDL_Adapter_CPP::test_iGetRefresh_int8       () { Check_iGetRefresh<int8_t>   (0x51);                  }
-void UT_PDL_Adapter_CPP::test_iGetRefresh_int16      () { Check_iGetRefresh<int16_t>  (0x5141);                }
-void UT_PDL_Adapter_CPP::test_iGetRefresh_int32      () { Check_iGetRefresh<int32_t>  (0x51413121UL);          }
-void UT_PDL_Adapter_CPP::test_iGetRefresh_int64      () { Check_iGetRefresh<int64_t>  (0x8171615141312111ULL); }
+void UT_PDL_Adapter_CPP::test_iGetRefresh_uint8  () { Check_iGetRefresh<uint8_t>  (0x51,                  0x41); }
+void UT_PDL_Adapter_CPP::test_iGetRefresh_uint16 () { Check_iGetRefresh<uint16_t> (0x5141,                0x4141); }
+void UT_PDL_Adapter_CPP::test_iGetRefresh_uint32 () { Check_iGetRefresh<uint32_t> (0x51413121UL,          0x41414141); }
+void UT_PDL_Adapter_CPP::test_iGetRefresh_uint64 () { Check_iGetRefresh<uint64_t> (0x0171615141312111ULL, 0x4141414141414141); }
+void UT_PDL_Adapter_CPP::test_iGetRefresh_int8   () { Check_iGetRefresh<int8_t>   (0x51,                  0x41); }
+void UT_PDL_Adapter_CPP::test_iGetRefresh_int16  () { Check_iGetRefresh<int16_t>  (0x5141,                0x4141); }
+void UT_PDL_Adapter_CPP::test_iGetRefresh_int32  () { Check_iGetRefresh<int32_t>  (0x51413121UL,          0x41414141); }
+void UT_PDL_Adapter_CPP::test_iGetRefresh_int64  () { Check_iGetRefresh<int64_t>  (0x8171615141312111ULL, 0x4141414141414141); }
 
 //! Checks the syntactically more pleasant way to use iGetRefresh (for integral types)
 //!
@@ -450,7 +456,7 @@ void UT_PDL_Adapter_CPP::test_iGetRefresh_Sugar ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS (readData, value);
+  TS_ASSERT_EQUALS (readData, 0x41414141);  // The loopback protocol implies to get bypass value
 }
 
 void UT_PDL_Adapter_CPP::test_iGetRefresh_String ()
@@ -486,8 +492,8 @@ void UT_PDL_Adapter_CPP::test_iGetRefresh_String ()
 
   auto data =
   {
-    make_tuple(uint64_t(0x8171615141312111ULL), StringType::Hex,    "0x8171615141312111"),
-    make_tuple(uint64_t(0x8171615141312111ULL), StringType::Binary, "0b1000000101110001011000010101000101000001001100010010000100010001"),
+    make_tuple(uint64_t(0xCAFE), StringType::Hex,    "0x4141414141414141"),  // iGetRefresh get bypass value
+    make_tuple(uint64_t(0xFADE), StringType::Binary, "0b0100000101000001010000010100000101000001010000010100000101000001"),
     //! @todo [JFC]-[September/06/2016]: In test_iGetRefresh_String(): Add checking of decimal mode (when available)
     //!
   };
@@ -531,8 +537,8 @@ void UT_PDL_Adapter_CPP::test_iGetRefresh_String_Sugar ()
 
   auto data =
   {
-    make_tuple(uint64_t(0x8171615141312111ULL), StringType::Hex,    "0x8171615141312111"),
-    make_tuple(uint64_t(0x8171615141312111ULL), StringType::Binary, "0b1000000101110001011000010101000101000001001100010010000100010001"),
+    make_tuple(uint64_t(0x8171615141312111ULL), StringType::Hex,    "0x4141414141414141"),
+    make_tuple(uint64_t(0x8171615141312111ULL), StringType::Binary, "0b0100000101000001010000010100000101000001010000010100000101000001"),
     //! @todo [JFC]-[September/06/2016]: In test_iGetRefresh_String_Sugar(): Add checking of decimal mode (when available)
     //!
   };
@@ -559,8 +565,6 @@ void UT_PDL_Adapter_CPP::test_iGetMiscompares_Expecting_Zero ()
   iWrite (regPath, fromSut);        // Loopback (default protocol) will force FromSut to be updated with that value
   iApply();
 
-//+  TS_TRACE (GmlPrinterVisitor::Graph(session.sm->Root(), "MIB_Multichain_Pre"));
-
   string xorResult;
 
   // ---------------- Exercise
@@ -573,7 +577,7 @@ void UT_PDL_Adapter_CPP::test_iGetMiscompares_Expecting_Zero ()
 }
 
 
-//! Checks iGetMiscompares expecting zero but got not zero
+//! Checks iGetMiscompares expecting a value and got another one
 //!
 void UT_PDL_Adapter_CPP::test_iGetMiscompares ()
 {
@@ -594,15 +598,7 @@ void UT_PDL_Adapter_CPP::test_iGetMiscompares ()
     iWrite (regPath, "0xFADE5555"); // Loopback (default protocol) will force FromSut to be updated
     iApply();
 
-    // Hack to force a value from SUT
-    auto reg  = session.sm->RegisterWithId(8u);
-    reg->SetFromSut (BinaryVector::CreateFromHexString("FADE_5555"));
-
-    //! @todo [JFC]-[September/07/2016]: In test_iGetMiscompares(): Add SystemModel::GetNodeWithPath(), SystemModel::RegisterWithPath()...
-    //!                                  and use it instead of using register id
     string xorResult;
-
-//+    TS_TRACE (GmlPrinterVisitor::Graph(session.sm->Root(), "MIB_Multichain_Pre"));
 
     // ---------------- Exercise
     //
@@ -622,6 +618,132 @@ void UT_PDL_Adapter_CPP::test_iGetMiscompares ()
   // ---------------- DDT Exercise
   //
   TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks iGetMiscompares, easier to use version, expecting a value and got another one
+//!
+void UT_PDL_Adapter_CPP::test_iGetMiscompares_Sugar ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto stringType = std::get<0>(data);
+    auto expected   = std::get<1>(data);
+
+    Session session;
+    Create_TestCase_MIB_Multichain_Pre();
+
+    auto regPath = "TAP_DR_Mux.MIB_mux.dynamic_2";
+    iRead  (regPath, "0xFADE6666");
+    iWrite (regPath, "0xFADE5555"); // Loopback (default protocol) will force FromSut to be updated
+    iApply();
+
+    // ---------------- Exercise
+    //
+    auto xorResult = iGetMiscompares(regPath, stringType);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (xorResult, expected);
+  };
+
+  auto data =
+  {
+    make_tuple(StringType::Hex,    "0x00003333"),
+    make_tuple(StringType::Binary, "0b00000000000000000011001100110011"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+//! Checks iGetRegisterStatus requesting to reset the mismatched count
+//!
+void UT_PDL_Adapter_CPP::test_iGetRegisterStatus_with_Reset ()
+{
+  // ---------------- Setup
+  //
+  Session session;
+  Create_TestCase_MIB_Multichain_Pre();
+
+  auto regPath = "TAP_DR_Mux.MIB_mux.dynamic_2";
+
+  iRead  (regPath, "0x00000000");  // Expect a value different of what we will get
+  iWrite (regPath, "0xFADE5555");  // Loopback (default protocol) will force FromSut to be updated with that value
+  iApply();
+
+  // ---------------- Exercise
+  //
+  auto status = iGetRegisterStatus(regPath, true);
+
+  // ---------------- Verify
+  //
+  auto newStatus = iGetRegisterStatus(regPath, false);
+
+  TS_ASSERT_EQUALS (status,    1u);
+  TS_ASSERT_EQUALS (newStatus, 0u);
+}
+
+
+//! Checks iGetRegisterStatus without requesting to reset the mismatched count
+//!
+void UT_PDL_Adapter_CPP::test_iGetRegisterStatus_without_Reset ()
+{
+  // ---------------- Setup
+  //
+  Session session;
+  Create_TestCase_MIB_Multichain_Pre();
+
+  auto regPath = "TAP_DR_Mux.MIB_mux.dynamic_2";
+
+  iRead  (regPath, "0x00000000");  // Expect a value different of what we will get
+  iWrite (regPath, "0xFADE5555");  // Loopback (default protocol) will force FromSut to be updated with that value
+  iApply();
+
+  // ---------------- Exercise
+  //
+  auto status = iGetRegisterStatus(regPath, false);
+
+  // ---------------- Verify
+  //
+  auto newStatus = iGetRegisterStatus(regPath, false);
+
+  TS_ASSERT_EQUALS (status,    1u);
+  TS_ASSERT_EQUALS (newStatus, 1u);
+}
+
+
+//! Checks iRefresh
+//!
+void UT_PDL_Adapter_CPP::test_iRefresh ()
+{
+  // ---------------- Setup
+  //
+  Session session;
+  Create_TestCase_MIB_Multichain_Pre();
+
+  auto regPath = "TAP_DR_Mux.MIB_mux.dynamic_2";
+
+  iWrite (regPath, "0xFADE5555");  // Loopback (default protocol) will force FromSut to be updated with that value
+  iApply();
+
+  auto readCheck = iGet<uint32_t>(regPath);
+  TS_ASSERT_EQUALS (readCheck, 0xFADE5555);
+
+  // ---------------- Exercise
+  //
+  iRefresh(regPath);
+
+  // ---------------- Verify
+  //
+  iApply();                                   // Queued refresh must be applied to be effective
+  auto readValue = iGet<uint32_t>(regPath);
+  TS_ASSERT_EQUALS (readValue, 0x42424242u);  // Bypass value has been read because of Loopback protocol
 }
 
 

@@ -106,7 +106,17 @@ class UT_PDL_Adapter_CPP : public CxxTest::TestSuite
   //
   void test_iGetMiscompares_Expecting_Zero ();
   void test_iGetMiscompares ();
-//+  void test_iGetMiscompares_Sugar ();
+  void test_iGetMiscompares_Sugar ();
+
+  // ---------------- iGetRegisterStatus
+  //
+  void test_iGetRegisterStatus_with_Reset ();
+  void test_iGetRegisterStatus_without_Reset ();
+
+  // ---------------- iRefresh
+  //
+  void test_iRefresh ();
+
 
   // ================ Other Methods ================
 

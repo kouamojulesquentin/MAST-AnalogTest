@@ -52,6 +52,7 @@ class DLL_EXPORT Register : public SystemModelNode
   bool                MustCheckExpected() const { return m_mustCheckExpected;  } //!< Returns true when received data must be checked against expected data
   uint32_t            Mismatches()        const { return m_mismatches;         } //!< Returns current mismatch count
   bool                IsPendingForRead()  const { return m_pendingRead;        } //!< Returns true when there is a pending request to read the Register from SUT
+  bool                IsPendingForWrite() const { return SystemModelNode::IsPending(); } //!< Returns true when there is a pending request to write to SUT
   BinaryVector        LastCompareResult() const;                                 //!< Returns XOR of the value last read from SUT and the expected value. May contain x-values (for don't care).
   virtual bool        IsPending()         const override;                        //!< Returns true if register is pending for read or for write
   virtual uint32_t    PendingCount()      const override;                        //!< Returns number of pending registers down the hierarchy

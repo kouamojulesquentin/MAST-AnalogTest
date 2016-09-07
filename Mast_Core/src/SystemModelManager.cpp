@@ -384,6 +384,7 @@ void SystemModelManager::iApply ()
 
 //! Returns last read value from specified register
 //!
+//! @note This read value is not dependent on an expected value (@see iRead operation)
 template<typename T>
 void SystemModelManager::iGet_impl (string_view registerPath, T& readData)
 {
@@ -392,7 +393,7 @@ void SystemModelManager::iGet_impl (string_view registerPath, T& readData)
 
   unique_lock<recursive_mutex> lock(m_dataMutex); // We must protect for the register been updated just when we read it
 
-  reg->LastReadFromSut(readData);
+  reg->LastFromSut(readData);
 }
 //
 //  End of: SystemModelManager::iGet_impl
@@ -506,22 +507,22 @@ void SystemModelManager::iPrefix (std::string prefix)
 //! Queues a request to (re-)read register value from SUT giving an expected value.
 //!
 //! @param registerPath     Register path (relative to the last iPrefix or node associated with application thread)
-//! @param expectedValue    Value expected to be read from SUT (may contain don't care bits)
+//! @param expectedValue    Value expected to be read from SUT (may contain don't care bits if specified as string)
 //!
 template<typename T>
-void SystemModelManager::iRead_impl (string_view registerPath, T value)
+void SystemModelManager::iRead_impl (string_view registerPath, T expectedValue)
 {
   //! @todo [JFC]-[August/02/2016]: In iRead_impl(): Add support for don't care
   //!
   auto& pathResolver = PATH_RESOLVER("iRead: ");
   auto  reg          = pathResolver.ResolveAsRegister(registerPath);
 
-  auto asBinaryVector = BinaryVector(reg->BitsCount(), 0u, SizeProperty::Fixed);
-  asBinaryVector.Set(std::move(value));
+  auto expectedAsBV  = BinaryVector(reg->BitsCount(), 0u, SizeProperty::Fixed);
+  expectedAsBV.Set(std::move(expectedValue));
 
   auto appData = ThreadApplicationData();
   MONITOR_APP("iRead - Queuing request", appData);
-  appData->queuedReads.emplace_back(SystemModelManager::QueuedRequest(reg->Identifier(), std::move(asBinaryVector)));
+  appData->queuedReads.emplace_back(SystemModelManager::QueuedRequest(reg->Identifier(), std::move(expectedAsBV)));
 
   *appData->currentState = ApplicationData::State::ReadRequest;
 

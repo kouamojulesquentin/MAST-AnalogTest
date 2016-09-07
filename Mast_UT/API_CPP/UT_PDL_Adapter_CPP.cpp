@@ -227,6 +227,37 @@ template<typename T> void Check_iWrite_SingleThread (T value, string_view expect
 //  End of: Check_iWrite_SingleThread
 //---------------------------------------------------------------------------
 
+//! Checks SystemModelManager::iRead()
+//!
+//! @param iReadValue         The value passed to iRead
+//! @param iWriteValue        The value passed to iWrite
+//! @param expectedMismatch   Expected mismatch (checked with 40 bits register)
+//!
+template<typename T> void Check_iRead (T iReadValue, T iWriteValue, string_view expectedMismatch)
+{
+  // ---------------- Setup
+  //
+  Session session;
+  Create_TestCase_MIB_Multichain_Pre(false, 40u);
+
+  auto regPath = "TAP_DR_Mux.MIB_mux.dynamic_2";
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (iRead(regPath, iReadValue));
+
+  // ---------------- Verify
+  //
+  iWrite (regPath, iWriteValue); // Loopback (default protocol) will force FromSut to be updated
+  iApply();
+
+  auto xorResult = iGetMiscompares    (regPath, StringType::Hex);
+  auto status    = iGetRegisterStatus (regPath, false);
+
+  TS_ASSERT_EQUALS (status,    1u);
+  TS_ASSERT_EQUALS (xorResult, expectedMismatch);   // 40 bits reg
+}
+
 } // End of unnamed namespace
 
 
@@ -745,8 +776,41 @@ void UT_PDL_Adapter_CPP::test_iRefresh ()
   auto readValue = iGet<uint32_t>(regPath);
   TS_ASSERT_EQUALS (readValue, 0x42424242u);  // Bypass value has been read because of Loopback protocol
 }
+                                                                  //  (iReadVal, iWriteVal, expectedMismatch)
+// ---------------- Check iRead operation
+//
+void UT_PDL_Adapter_CPP::test_iRead_uint8  () { Check_iRead<uint8_t>  (0xF0,        0xAC,        "0x000000005C"); }
+void UT_PDL_Adapter_CPP::test_iRead_uint16 () { Check_iRead<uint16_t> (0x0FF0,      0xACDE,      "0x000000A32E"); }
+void UT_PDL_Adapter_CPP::test_iRead_uint32 () { Check_iRead<uint32_t> (0xFF00FF00,  0x89ABCDEF,  "0x0076AB32EF"); }
+void UT_PDL_Adapter_CPP::test_iRead_uint64 () { Check_iRead<uint64_t> (0xCFF00FF00, 0xD89ABCDEF, "0x0176AB32EF"); }
+void UT_PDL_Adapter_CPP::test_iRead_int8   () { Check_iRead<int8_t>   (0x70,        0x6C,        "0x000000001C"); }
+void UT_PDL_Adapter_CPP::test_iRead_int16  () { Check_iRead<int16_t>  (0x0FF0,      0x3CDE,      "0x000000332E"); }
+void UT_PDL_Adapter_CPP::test_iRead_int32  () { Check_iRead<int32_t>  (0x2F00FF00,  0x49ABCDEF,  "0x0066AB32EF"); }
+void UT_PDL_Adapter_CPP::test_iRead_int64  () { Check_iRead<int64_t>  (0xCFF00FF00, 0xD89ABCDEF, "0x0176AB32EF"); }
+void UT_PDL_Adapter_CPP::test_iRead_String ()
+{
+  // ---------------- Setup
+  //
+  Session session;
+  Create_TestCase_MIB_Multichain_Pre(false, 40u);
 
+  auto regPath = "TAP_DR_Mux.MIB_mux.dynamic_2";
 
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (iRead(regPath, "0x0CFF00FF00"));
+
+  // ---------------- Verify
+  //
+  iWrite (regPath, 0xD89ABCDEF); // Loopback (default protocol) will force FromSut to be updated
+  iApply();
+
+  auto xorResult = iGetMiscompares    (regPath, StringType::Hex);
+  auto status    = iGetRegisterStatus (regPath, false);
+
+  TS_ASSERT_EQUALS (status,    1u);
+  TS_ASSERT_EQUALS (xorResult, "0x0176AB32EF");   // 40 bits reg
+}
 
 //===========================================================================
 // End of UT_PDL_Adapter_CPP.cpp

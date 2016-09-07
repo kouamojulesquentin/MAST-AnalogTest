@@ -117,6 +117,17 @@ class UT_PDL_Adapter_CPP : public CxxTest::TestSuite
   //
   void test_iRefresh ();
 
+  // ---------------- iRead
+  //
+  void test_iRead_uint8 ();
+  void test_iRead_uint16 ();
+  void test_iRead_uint32 ();
+  void test_iRead_uint64 ();
+  void test_iRead_int8 ();
+  void test_iRead_int16 ();
+  void test_iRead_int32 ();
+  void test_iRead_int64 ();
+  void test_iRead_String ();
 
   // ================ Other Methods ================
 

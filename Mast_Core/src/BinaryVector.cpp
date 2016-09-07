@@ -30,8 +30,8 @@ using namespace mast;
 
 #define CHECK_SAME_SIZE(other)                if (other.m_usedBits != m_usedBits)         THROW_LOGIC_ERROR("BinaryVectors must have same size")
 #define CHECK_NOT_EMPTY                       if (IsEmpty())                              THROW_LOGIC_ERROR("BinaryVector must not be empty")
-#define CHECK_FIXED_SIZE                      if (FixedSize())                            THROW_LOGIC_ERROR("BinaryVector size has been fixed")
-#define CHECK_FIXED_SIZE_ASSIGNMENT(newSize)  if (FixedSize() && (newSize != m_usedBits)) THROW_LOGIC_ERROR("BinaryVector size has been fixed")
+#define CHECK_FIXED_SIZE                      if (FixedSize())                            THROW_LOGIC_ERROR("BinaryVector size has been fixed to " + to_string(m_usedBits) + " bit(s)")
+#define CHECK_FIXED_SIZE_ASSIGNMENT(newSize)  if (FixedSize() && (newSize != m_usedBits)) THROW_LOGIC_ERROR("BinaryVector size has been fixed to " + to_string(m_usedBits) + " bit(s); Cannot assign " + to_string(newSize) + " bit(s)")
 #define CHECK_AT_LEAST_1_BIT(numBits)         if (numBits == 0)                           THROW_INVALID_ARGUMENT("Number of bits to append must be != 0")
 
 namespace

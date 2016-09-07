@@ -46,8 +46,9 @@ main( const int argc, const char **argv )
       return ( EXIT_FAILURE );
      }
 
-   PrettyPrinterVisitor prettyPrinter(PrettyPrinterOptions::ShowSelectorProperties);
-//   prettyPrinter.SetVerbose(true);
+//   PrettyPrinterVisitor prettyPrinter(PrettyPrinterOptions::ShowSelectorProperties);
+   PrettyPrinterVisitor prettyPrinter(PrettyPrinterOptions::ShowNodeIsIgnored);
+
    driver.parsed_sut->Accept(prettyPrinter);
    auto gotPretty      = prettyPrinter.PrettyPrint();
    std::cout << gotPretty << "\n";

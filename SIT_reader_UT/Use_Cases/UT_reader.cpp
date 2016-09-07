@@ -178,6 +178,16 @@ void UT_reader::test_chain ()
      [Register](0)  \"test_register_1\", length: 12, bypass: 1001_0110:1100\n\
      [Register](1)  \"test_register_2\", length: 12, bypass: 1001_0110:1100"),
 
+    /*Chain with two registers, name not in path*/
+    make_tuple(    "CHAIN test_chain NOT_IN_PATH\
+    { REGISTER test_register_1 12 Bypass: \"0b1001:0110:1100\"\
+      REGISTER test_register_2 12 Bypass: \"0b1001:0110:1100\"\
+    }",
+"[Chain](2)     \"test_chain\", ignore_in_path: true\n\
+ [Register](0)  \"test_register_1\", length: 12, bypass: 1001_0110:1100\n\
+ [Register](1)  \"test_register_2\", length: 12, bypass: 1001_0110:1100"
+),
+
   };
 
   // ---------------- DDT Exercise

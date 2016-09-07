@@ -37,9 +37,11 @@ enum class PrettyPrinterOptions
   ShowSelectionState     = 1 << 3,
   ShowSelectionValue     = 1 << 4,
   ShowSelectorProperties = 1 << 5,
+  ShowNodeIsIgnored      = 1 << 6,
 
   Default           = None,
   Std               = Verbose | DisplayValueAuto,
+  Parser_debug      = ShowSelectorProperties | ShowNodeIsIgnored ,
   All               = Verbose | DisplayValueAuto | ShowProtocol | ShowSelectionState | ShowSelectionValue | ShowSelectorProperties,
 };
 
@@ -107,6 +109,7 @@ class DLL_EXPORT PrettyPrinterVisitor : public SystemModelVisitor
   bool                          m_showSelectionState     = false; //!< When true, selected/active linker node are reported as so
   bool                          m_showSelectionValue     = false; //!< When true, for all linker children nodes, their selection state is reported
   bool                          m_showSelectorProperties = false; //!< When true, selector options are reported
+  bool                          m_ShowNodeIsIgnored      = false; //!< When true, it is reported if node name is ignored in path composition
   bool                          m_first                  = true;  //!< True when nothing as been streamed yet (useful to add first new line)
 };
 //

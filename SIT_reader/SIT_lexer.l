@@ -41,7 +41,7 @@ static keywords_type keywords_table []=
    ,{"REGISTER"			,token::t_REGISTER}
    ,{"LINKER"			,token::t_LINKER}
    ,{"ACCESS_INTERFACE"		,token::t_ACCESS_INTERFACE}
-   ,{"NO_iPrefix"		,token::t_TRANSPARENT}
+   ,{"NOT_IN_PATH"		,token::t_TRANSPARENT}
    ,{"Hold_value"		,token::t_HOLD_VALUE}
    ,{"Bypass"			,token::t_BYPASS}
    ,{"SIB"			,token::t_SIB}

@@ -223,10 +223,9 @@ node_name :  t_WORD is_transparent
 internal_node:
 
 t_CHAIN  node_name children_list {
-                     if ($2.is_transparent)
-		           std::cout << "(transparent)";
-
 		     auto node = driver.main_sm->CreateChain($2.name);
+                     if ($2.is_transparent)
+		           node->IgnoreForNodePath(true);
 		     for (auto this_child : $3.nodes)
 		       node->AppendChild(this_child);
  	  	     $$ = node;

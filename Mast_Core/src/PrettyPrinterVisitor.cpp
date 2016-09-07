@@ -34,6 +34,7 @@ PrettyPrinterVisitor::PrettyPrinterVisitor (PrettyPrinterOptions options)
   , m_showSelectionState     (IsSet(options, PrettyPrinterOptions::ShowSelectionState))
   , m_showSelectionValue     (IsSet(options, PrettyPrinterOptions::ShowSelectionValue))
   , m_showSelectorProperties (IsSet(options, PrettyPrinterOptions::ShowSelectorProperties))
+  , m_ShowNodeIsIgnored      (IsSet(options, PrettyPrinterOptions::ShowNodeIsIgnored))
 {
 }
 //
@@ -204,6 +205,7 @@ void PrettyPrinterVisitor::StreamNodeHeader(string_view type, const SystemModelN
   AlignRelativeTo(m_startPos, 15u + m_depth);
   m_os << '"' << node.Name()       << '"';
 
+  
   if (!notes.empty())
   {
     m_os << ", " << notes;
@@ -248,7 +250,7 @@ void PrettyPrinterVisitor::StreamParentNode (std::experimental::string_view type
 {
   StreamNodeHeader(type, parentNode, notes);
 
-  if (m_verbose)
+  if (m_verbose || m_ShowNodeIsIgnored)
   {
     if (parentNode.IgnoreForNodePath())
     {

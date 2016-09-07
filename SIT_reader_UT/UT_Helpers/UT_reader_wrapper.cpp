@@ -41,7 +41,7 @@ pair<string, std::shared_ptr<mast::SystemModelNode>> UT_reader_wrapper::run_pars
     return make_pair("PARSING ERROR", shared_ptr<SystemModelNode>(nullptr));
   }
 
-  auto actual_PrettyPrint = PrettyPrinterVisitor::PrettyPrint(driver.parsed_sut, PrettyPrinterOptions::ShowSelectorProperties);
+  auto actual_PrettyPrint = PrettyPrinterVisitor::PrettyPrint(driver.parsed_sut, PrettyPrinterOptions::Parser_debug);
 
   return make_pair(actual_PrettyPrint, driver.parsed_sut);
 }

@@ -47,10 +47,10 @@ string BinaryVectorAsString (const BinaryVector& binVector, StringType stringTyp
   switch (stringType)
   {
     case StringType::Binary:
-      asString = binVector.DataAsBinaryString("", "", 0, "");
+      asString = binVector.DataAsBinaryString("", "", 0, "", true);
       break;
     case StringType::Hex:
-      asString = binVector.DataAsHexString("", "", 0, "");
+      asString = binVector.DataAsHexString("", "", 0, "", true);
       break;
     case StringType::Decimal:
 //+      asString = binVector.DataAsDecimalString("", "", 0, "");

@@ -102,6 +102,12 @@ class UT_PDL_Adapter_CPP : public CxxTest::TestSuite
   void test_iGetRefresh_String ();
   void test_iGetRefresh_String_Sugar ();
 
+  // ---------------- iGetMiscompares
+  //
+  void test_iGetMiscompares_Expecting_Zero ();
+  void test_iGetMiscompares ();
+//+  void test_iGetMiscompares_Sugar ();
+
   // ================ Other Methods ================
 
   void setUp(); //!< Initializes test (called for each test)

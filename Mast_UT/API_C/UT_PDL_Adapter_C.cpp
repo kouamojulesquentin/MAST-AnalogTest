@@ -416,8 +416,8 @@ void UT_PDL_Adapter_C::test_iGet_String_Hex ()
 
   TS_ASSERT_EQUALS (retCode,               ErrorCode::Ok);
   TS_ASSERT_EQUALS (errorMsg,              "");
-  TS_ASSERT_EQUALS (readDataBufferSize,    8u);
-  TS_ASSERT_EQUALS (readDataBuffer.data(), "51515151");
+  TS_ASSERT_EQUALS (readDataBufferSize,    10u);
+  TS_ASSERT_EQUALS (readDataBuffer.data(), "0x51515151");
 }
 
 
@@ -444,8 +444,8 @@ void UT_PDL_Adapter_C::test_iGet_String_Bin ()
 
   TS_ASSERT_EQUALS (retCode,               ErrorCode::Ok);
   TS_ASSERT_EQUALS (errorMsg,              "");
-  TS_ASSERT_EQUALS (readDataBufferSize,    32u);
-  TS_ASSERT_EQUALS (readDataBuffer.data(), "01010001010100010101000101010001");
+  TS_ASSERT_EQUALS (readDataBufferSize,    34u);
+  TS_ASSERT_EQUALS (readDataBuffer.data(), "0b01010001010100010101000101010001");
 }
 
 

@@ -40,7 +40,7 @@ namespace
 {
 //! Creates a test case for testing 'C' interface
 //!
-//! @note Mast library must be initialized prior to calling this functin
+//! @note Mast library must be initialized prior to calling this function
 //!
 void Create_TestCase_MIB_Multichain_Pre (bool reportGml = false, uint32_t regsBitsCount = DYNAMIC_TDR_LEN)
 {
@@ -344,8 +344,8 @@ void UT_PDL_Adapter_CPP::test_iGet_String ()
 
   auto data =
   {
-    make_tuple(StringType::Hex,    "51515151"),
-    make_tuple(StringType::Binary, "01010001010100010101000101010001"),
+    make_tuple(StringType::Hex,    "0x51515151"),
+    make_tuple(StringType::Binary, "0b01010001010100010101000101010001"),
     //! @todo [JFC]-[September/06/2016]: In test_iGet_String(): Add checking of decimal mode (when available)
     //!
   };
@@ -381,8 +381,8 @@ void UT_PDL_Adapter_CPP::test_iGet_String_Sugar ()
 
   auto data =
   {
-    make_tuple(StringType::Hex,    "51515151"),
-    make_tuple(StringType::Binary, "01010001010100010101000101010001"),
+    make_tuple(StringType::Hex,    "0x51515151"),
+    make_tuple(StringType::Binary, "0b01010001010100010101000101010001"),
   };
 
   // ---------------- DDT Exercise
@@ -486,8 +486,8 @@ void UT_PDL_Adapter_CPP::test_iGetRefresh_String ()
 
   auto data =
   {
-    make_tuple(uint64_t(0x8171615141312111ULL), StringType::Hex,    "8171615141312111"),
-    make_tuple(uint64_t(0x8171615141312111ULL), StringType::Binary, "1000000101110001011000010101000101000001001100010010000100010001"),
+    make_tuple(uint64_t(0x8171615141312111ULL), StringType::Hex,    "0x8171615141312111"),
+    make_tuple(uint64_t(0x8171615141312111ULL), StringType::Binary, "0b1000000101110001011000010101000101000001001100010010000100010001"),
     //! @todo [JFC]-[September/06/2016]: In test_iGetRefresh_String(): Add checking of decimal mode (when available)
     //!
   };
@@ -531,8 +531,8 @@ void UT_PDL_Adapter_CPP::test_iGetRefresh_String_Sugar ()
 
   auto data =
   {
-    make_tuple(uint64_t(0x8171615141312111ULL), StringType::Hex,    "8171615141312111"),
-    make_tuple(uint64_t(0x8171615141312111ULL), StringType::Binary, "1000000101110001011000010101000101000001001100010010000100010001"),
+    make_tuple(uint64_t(0x8171615141312111ULL), StringType::Hex,    "0x8171615141312111"),
+    make_tuple(uint64_t(0x8171615141312111ULL), StringType::Binary, "0b1000000101110001011000010101000101000001001100010010000100010001"),
     //! @todo [JFC]-[September/06/2016]: In test_iGetRefresh_String_Sugar(): Add checking of decimal mode (when available)
     //!
   };
@@ -541,6 +541,90 @@ void UT_PDL_Adapter_CPP::test_iGetRefresh_String_Sugar ()
   //
   TS_DATA_DRIVEN_TEST(checker, data);
 }
+
+
+//! Checks iGetMiscompares expecting zero but got not zero
+//!
+void UT_PDL_Adapter_CPP::test_iGetMiscompares_Expecting_Zero ()
+{
+  // ---------------- Setup
+  //
+  Session session;
+  Create_TestCase_MIB_Multichain_Pre();
+
+  auto regPath = "TAP_DR_Mux.MIB_mux.dynamic_2";
+  auto fromSut = "0xFADE5555";
+
+  iRead  (regPath, "0x00000000");
+  iWrite (regPath, fromSut);        // Loopback (default protocol) will force FromSut to be updated with that value
+  iApply();
+
+//+  TS_TRACE (GmlPrinterVisitor::Graph(session.sm->Root(), "MIB_Multichain_Pre"));
+
+  string xorResult;
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (iGetMiscompares(regPath, xorResult, StringType::Hex));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (xorResult, fromSut);
+}
+
+
+//! Checks iGetMiscompares expecting zero but got not zero
+//!
+void UT_PDL_Adapter_CPP::test_iGetMiscompares ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto stringType = std::get<0>(data);
+    auto expected   = std::get<1>(data);
+
+    Session session;
+    Create_TestCase_MIB_Multichain_Pre();
+
+    auto regPath = "TAP_DR_Mux.MIB_mux.dynamic_2";
+    iRead  (regPath, "0xFADE6666");
+    iWrite (regPath, "0xFADE5555"); // Loopback (default protocol) will force FromSut to be updated
+    iApply();
+
+    // Hack to force a value from SUT
+    auto reg  = session.sm->RegisterWithId(8u);
+    reg->SetFromSut (BinaryVector::CreateFromHexString("FADE_5555"));
+
+    //! @todo [JFC]-[September/07/2016]: In test_iGetMiscompares(): Add SystemModel::GetNodeWithPath(), SystemModel::RegisterWithPath()...
+    //!                                  and use it instead of using register id
+    string xorResult;
+
+//+    TS_TRACE (GmlPrinterVisitor::Graph(session.sm->Root(), "MIB_Multichain_Pre"));
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (iGetMiscompares(regPath, xorResult, stringType));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (xorResult, expected);
+  };
+
+  auto data =
+  {
+    make_tuple(StringType::Hex,    "0x00003333"),
+    make_tuple(StringType::Binary, "0b00000000000000000011001100110011"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
 
 //===========================================================================
 // End of UT_PDL_Adapter_CPP.cpp

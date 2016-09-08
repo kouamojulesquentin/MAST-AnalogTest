@@ -133,6 +133,41 @@ std::shared_ptr<AccessInterface> Create_TestCase_MIB_Multichain_Pre (SystemModel
 //---------------------------------------------------------------------------
 
 
+//! Creates test case for iPrefix related test using "MIB_Multichain_Pre" type model
+//!
+std::shared_ptr<AccessInterface> Create_TestCase_ForIPrefix (SystemModel& sm, bool reportGml = false)
+{
+  SystemModelBuilder builder(sm);
+  TestModelBuilder   testBuilder(sm);
+
+  auto tap         = testBuilder.Create_JTAG_TAP("Tap", 8u, 3u);
+
+  // ---------------- Append MIB with control register before mux
+  //
+  auto chainsCount = uint32_t(4u);
+  auto res         = builder.Create_PathSelector(SelectorKind::Binary, "MIB_ctrl", chainsCount);
+  auto mibCtrl     = res.first;
+  auto mibSelector = res.second;
+
+  tap->AppendChild(mibCtrl);
+  auto mibMux      = sm.CreateLinker("MIB_mux", mibSelector, tap);
+
+  // ---------------- Add wrapped cores (registers)
+  //
+  testBuilder.AppendChains(chainsCount, "Chain_", mibMux);
+
+  if (reportGml)
+  {
+    TS_TRACE (GmlPrinterVisitor::Graph(tap, "Testcase_iPrefix"));
+  }
+
+  return tap;
+}
+//
+//  End of: Create_TestCase_MIB_Multichain_Pre
+//---------------------------------------------------------------------------
+
+
 //! Creates test case "MIB_Multichain_Post"
 //!
 std::shared_ptr<AccessInterface> Create_TestCase_MIB_Multichain_Post (SystemModel& sm, bool reportGml = false)
@@ -255,7 +290,6 @@ template<typename T> void Check_iWrite_SingleThread (T value, string_view expect
   auto reg  = sm.RegisterWithId(7u);
 
   SystemModelManager sut(sm);
-  sut.iPrefix("TAP_DR_Mux.MIB_mux");
 
   // ---------------- Exercise
   //
@@ -287,7 +321,6 @@ template<typename T> void Check_iGet_SingleThread (string_view initialValue, T e
   reg->SetFromSut(BinaryVector::CreateFromHexString(initialValue));
 
   SystemModelManager sut(sm);
-  sut.iPrefix("TAP_DR_Mux.MIB_mux");
   T lastFromSut;
 
   // ---------------- Exercise
@@ -1094,9 +1127,9 @@ void UT_SystemModelManager::test_iPrefix_Thread_is_SystemModelManager ()
   // ---------------- Setup
   //
   SystemModel sm;
-  Create_TestCase_MIB_Multichain_Pre(sm);
+  Create_TestCase_ForIPrefix(sm);
 
-  auto prefix = "TAP_DR_Mux.MIB_mux";
+  auto prefix = "Chain_1";
   SystemModelManager sut(sm);
 
   // ---------------- Exercise
@@ -1116,12 +1149,12 @@ void UT_SystemModelManager::test_iPrefix_Thread_is_Known ()
   // ---------------- Setup
   //
   SystemModel sm;
-  Create_TestCase_MIB_Multichain_Pre(sm);
+  Create_TestCase_ForIPrefix(sm);
   auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
 
   SystemModelManager sut(sm);
 
-  auto   prefix = "MIB_mux";
+  auto   prefix = "Chain_2";
   string gotPrefix;
 
   auto appFunctor = [prefix, &gotPrefix, &sut]()
@@ -1206,10 +1239,6 @@ void UT_SystemModelManager::test_iGet_Thread_is_Known ()
   // Thread functor
   auto appFunctor = [&sut]()
   {
-    // ---------------- Setup
-    //
-    sut.iPrefix("MIB_mux");
-
     // ---------------- Exercise
     //
     auto lastFromSut = sut.iGet("dynamic_1");
@@ -1299,7 +1328,6 @@ void UT_SystemModelManager::test_iWrite_Thread_is_Known ()
       // ---------------- Setup
       //
       auto nextToSut = BinaryVector::CreateFromHexString("FADE_CAFE");
-      sut.iPrefix("MIB_mux");
 
       // ---------------- Exercise
       //
@@ -1362,7 +1390,6 @@ void UT_SystemModelManager::test_iApply_Thread_is_SystemModelManager ()
   auto reg  = sm.RegisterWithId(7u);
 
   SystemModelManager sut(sm);
-  sut.iPrefix("TAP_DR_Mux.MIB_mux");
 
   auto nextToSut = BinaryVector::CreateFromHexString("ABCD_4567");
   sut.iWrite("dynamic_1", nextToSut);
@@ -1417,7 +1444,6 @@ void UT_SystemModelManager::test_iApply_Thread_is_Known ()
     // ---------------- Setup
     //
     auto nextToSut = BinaryVector::CreateFromHexString("FADE_CAFE");
-    sut.iPrefix("MIB_mux");
     sut.iWrite("dynamic_3", nextToSut);
 
     // ---------------- Exercise
@@ -1461,7 +1487,6 @@ void UT_SystemModelManager::test_iApply_DataCycleLoop_NotStarted ()
     // ---------------- Setup
     //
     auto nextToSut = BinaryVector::CreateFromHexString("FADE_CAFE");
-    sut.iPrefix("MIB_mux");
     sut.iWrite("dynamic_3", nextToSut);
 
     // ---------------- Exercise
@@ -1579,7 +1604,6 @@ void UT_SystemModelManager::test_iApply_4_Threads_Once_SameReg ()
 
     TS_ASSERT_THROWS_NOTHING
     (
-      sut.iPrefix("MIB_mux");
       sut.iWrite("dynamic_3", nextToSut);
       sut.iApply();
     );
@@ -1634,7 +1658,6 @@ void UT_SystemModelManager::test_iApply_4_Threads_1_Write ()
 
     TS_ASSERT_THROWS_NOTHING
     (
-      sut.iPrefix("MIB_mux");
       sut.iWrite(regName, nextToSut);
       sut.iApply();
       sut.iRead(regName, nextToSut);
@@ -1701,8 +1724,6 @@ void UT_SystemModelManager::test_iApply_4_Threads_N_Writes ()
 
     try
     {
-      sut.iPrefix("MIB_mux");
-
       for (int ii = 0 ; ii <= 48 ; ++ii)
       {
         nextToSut.Set(currentValue++);
@@ -1896,8 +1917,6 @@ void UT_SystemModelManager::test_iRefresh ()
   {
     try
     {
-      sut.iPrefix("MIB_mux");
-
       for (int ii = 0 ; ii <= 7 ; ++ii)
       {
         sut.iRefresh(regName);
@@ -1979,8 +1998,6 @@ void UT_SystemModelManager::test_iRefresh_4_RegPerApp ()
   {
     try
     {
-      sut.iPrefix("MIB_mux");
-
       for (int ii = 0 ; ii <= 9 ; ++ii)
       {
         sut.iRefresh("dynamic_0");
@@ -2049,8 +2066,6 @@ void UT_SystemModelManager::test_iGetRefresh ()
   {
     TS_ASSERT_THROWS_NOTHING
     (
-      sut.iPrefix("MIB_mux");
-
       uint32_t gotData;
 
       for (int ii = 0 ; ii < 8 ; ++ii)
@@ -2091,8 +2106,6 @@ void UT_SystemModelManager::test_iGetStatus_Register_WithoutClear ()
 
   SystemModelManager sut(sm);
 
-  TS_ASSERT_THROWS_NOTHING (sut.iPrefix("TAP_DR_Mux.MIB_mux"));
-
   // ---------------- Exercise
   //
   auto count_1 = sut.iGetStatus("dynamic_2");
@@ -2124,8 +2137,6 @@ void UT_SystemModelManager::test_iGetStatus_Register_WithClear ()
   TS_ASSERT_EQUALS (reg->Mismatches(), 2u);
 
   SystemModelManager sut(sm);
-
-  TS_ASSERT_THROWS_NOTHING (sut.iPrefix("TAP_DR_Mux.MIB_mux"));
 
   // ---------------- Exercise
   //
@@ -2162,8 +2173,8 @@ void UT_SystemModelManager::test_iGetStatus_Register_Multithread ()
 
       for (int ii = 0 ; ii < 5 ; ++ii)
       {
-        sut.iWrite ("MIB_mux.dynamic_3", ii);
-        sut.iRead  ("MIB_mux.dynamic_3", expected);
+        sut.iWrite ("dynamic_3", ii);
+        sut.iRead  ("dynamic_3", expected);
         sut.iApply();
       }
     );
@@ -2177,7 +2188,7 @@ void UT_SystemModelManager::test_iGetStatus_Register_Multithread ()
     (
       // ---------------- Exercise
       //
-      while (sut.iGetStatus("MIB_mux.dynamic_3") < 5u)
+      while (sut.iGetStatus("dynamic_3") < 5u)
       {
         if (std::chrono::steady_clock::now() > timeout)
         {
@@ -2224,8 +2235,6 @@ void UT_SystemModelManager::test_iGetMiscompares ()
 
   SystemModelManager sut(sm);
 
-  TS_ASSERT_THROWS_NOTHING (sut.iPrefix("TAP_DR_Mux.MIB_mux"));
-
   // ---------------- Exercise
   //
   auto compareResult = sut.iGetMiscompares("dynamic_2");
@@ -2254,8 +2263,8 @@ void UT_SystemModelManager::test_iGetMiscompares_Multithread ()
     (
       for (int ii = 1 ; ii < 7 ; ++ii)
       {
-        sut.iWrite ("MIB_mux.dynamic_3", ii);
-        sut.iRead  ("MIB_mux.dynamic_3", 0xA007u);
+        sut.iWrite ("dynamic_3", ii);
+        sut.iRead  ("dynamic_3", 0xA007u);
         sut.iApply();
       }
     );
@@ -2274,7 +2283,7 @@ void UT_SystemModelManager::test_iGetMiscompares_Multithread ()
       //
       do
       {
-        auto compareResult = sut.iGetMiscompares("MIB_mux.dynamic_3");
+        auto compareResult = sut.iGetMiscompares("dynamic_3");
 
         if (compareResult == expectedLastMiscompare)
         {

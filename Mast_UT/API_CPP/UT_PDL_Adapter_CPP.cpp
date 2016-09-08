@@ -128,7 +128,7 @@ template<typename T> void Check_iGet (T expectedData)
 
   // ---------------- Exercise
   //
-  TS_ASSERT_THROWS_NOTHING (iGet("TAP_DR_Mux.MIB_mux.dynamic_1", readData));
+  TS_ASSERT_THROWS_NOTHING (iGet("dynamic_1", readData));
 
   // ---------------- Verify
   //
@@ -149,7 +149,7 @@ template<typename T> void Check_iGetRefresh (T writtenValue, T expected)
   Create_TestCase_MIB_Multichain_Pre(false, 64u);
 
   auto regName = "dynamic_1";
-  iPrefix("TAP_DR_Mux.MIB_mux");
+  iPrefix(".");
   iWrite(regName, writtenValue);
   iApply();
 
@@ -172,7 +172,6 @@ template<typename T> void Check_iGetRefresh (T value, StringType stringType, str
   Create_TestCase_MIB_Multichain_Pre(false, 64u);
 
   auto regName = "dynamic_1";
-  iPrefix("TAP_DR_Mux.MIB_mux");
   iWrite(regName, value);
   iApply();
 
@@ -213,7 +212,7 @@ template<typename T> void Check_iWrite_SingleThread (T value, string_view expect
 
   // ---------------- Exercise
   //
-  TS_ASSERT_THROWS_NOTHING (iWrite("TAP_DR_Mux.MIB_mux.dynamic_1", value));
+  TS_ASSERT_THROWS_NOTHING (iWrite("dynamic_1", value));
 
   // ---------------- Verify
   //
@@ -240,7 +239,7 @@ template<typename T> void Check_iRead (T iReadValue, T iWriteValue, string_view 
   Session session;
   Create_TestCase_MIB_Multichain_Pre(false, 40u);
 
-  auto regPath = "TAP_DR_Mux.MIB_mux.dynamic_2";
+  auto regPath = "dynamic_2";
 
   // ---------------- Exercise
   //
@@ -344,7 +343,7 @@ void UT_PDL_Adapter_CPP::test_iGet_Sugar ()
 
   // ---------------- Exercise
   //
-  auto readData = iGet<uint32_t>("TAP_DR_Mux.MIB_mux.dynamic_1");
+  auto readData = iGet<uint32_t>("dynamic_1");
 
   // ---------------- Verify
   //
@@ -372,7 +371,7 @@ void UT_PDL_Adapter_CPP::test_iGet_String ()
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS_NOTHING (iGet("TAP_DR_Mux.MIB_mux.dynamic_1", readData, stringType));
+    TS_ASSERT_THROWS_NOTHING (iGet("dynamic_1", readData, stringType));
 
     // ---------------- Verify
     //
@@ -409,7 +408,7 @@ void UT_PDL_Adapter_CPP::test_iGet_String_Sugar ()
 
     // ---------------- Exercise
     //
-    auto readData = iGet("TAP_DR_Mux.MIB_mux.dynamic_1", stringType);
+    auto readData = iGet("dynamic_1", stringType);
 
     // ---------------- Verify
     //
@@ -477,7 +476,6 @@ void UT_PDL_Adapter_CPP::test_iGetRefresh_Sugar ()
   auto value   = uint32_t(0x51413121UL);
   auto regName = "dynamic_1";
 
-  iPrefix("TAP_DR_Mux.MIB_mux");
   iWrite(regName, value);
   iApply();
 
@@ -506,7 +504,6 @@ void UT_PDL_Adapter_CPP::test_iGetRefresh_String ()
     Create_TestCase_MIB_Multichain_Pre(false, 64u);
 
     auto regName = "dynamic_1";
-    iPrefix("TAP_DR_Mux.MIB_mux");
     iWrite(regName, value);
     iApply();
 
@@ -553,7 +550,6 @@ void UT_PDL_Adapter_CPP::test_iGetRefresh_String_Sugar ()
     Create_TestCase_MIB_Multichain_Pre(false, 64u);
 
     auto regName = "dynamic_1";
-    iPrefix("TAP_DR_Mux.MIB_mux");
     iWrite(regName, value);
     iApply();
 
@@ -589,7 +585,7 @@ void UT_PDL_Adapter_CPP::test_iGetMiscompares_Expecting_Zero ()
   Session session;
   Create_TestCase_MIB_Multichain_Pre();
 
-  auto regPath = "TAP_DR_Mux.MIB_mux.dynamic_2";
+  auto regPath = "dynamic_2";
   auto fromSut = "0xFADE5555";
 
   iRead  (regPath, "0x00000000");
@@ -624,7 +620,7 @@ void UT_PDL_Adapter_CPP::test_iGetMiscompares ()
     Session session;
     Create_TestCase_MIB_Multichain_Pre();
 
-    auto regPath = "TAP_DR_Mux.MIB_mux.dynamic_2";
+    auto regPath = "dynamic_2";
     iRead  (regPath, "0xFADE6666");
     iWrite (regPath, "0xFADE5555"); // Loopback (default protocol) will force FromSut to be updated
     iApply();
@@ -668,7 +664,7 @@ void UT_PDL_Adapter_CPP::test_iGetMiscompares_Sugar ()
     Session session;
     Create_TestCase_MIB_Multichain_Pre();
 
-    auto regPath = "TAP_DR_Mux.MIB_mux.dynamic_2";
+    auto regPath = "dynamic_2";
     iRead  (regPath, "0xFADE6666");
     iWrite (regPath, "0xFADE5555"); // Loopback (default protocol) will force FromSut to be updated
     iApply();
@@ -702,7 +698,7 @@ void UT_PDL_Adapter_CPP::test_iGetRegisterStatus_with_Reset ()
   Session session;
   Create_TestCase_MIB_Multichain_Pre();
 
-  auto regPath = "TAP_DR_Mux.MIB_mux.dynamic_2";
+  auto regPath = "dynamic_2";
 
   iRead  (regPath, "0x00000000");  // Expect a value different of what we will get
   iWrite (regPath, "0xFADE5555");  // Loopback (default protocol) will force FromSut to be updated with that value
@@ -730,7 +726,7 @@ void UT_PDL_Adapter_CPP::test_iGetRegisterStatus_without_Reset ()
   Session session;
   Create_TestCase_MIB_Multichain_Pre();
 
-  auto regPath = "TAP_DR_Mux.MIB_mux.dynamic_2";
+  auto regPath = "dynamic_2";
 
   iRead  (regPath, "0x00000000");  // Expect a value different of what we will get
   iWrite (regPath, "0xFADE5555");  // Loopback (default protocol) will force FromSut to be updated with that value
@@ -758,7 +754,7 @@ void UT_PDL_Adapter_CPP::test_iRefresh ()
   Session session;
   Create_TestCase_MIB_Multichain_Pre();
 
-  auto regPath = "TAP_DR_Mux.MIB_mux.dynamic_2";
+  auto regPath = "dynamic_2";
 
   iWrite (regPath, "0xFADE5555");  // Loopback (default protocol) will force FromSut to be updated with that value
   iApply();
@@ -794,7 +790,7 @@ void UT_PDL_Adapter_CPP::test_iRead_String ()
   Session session;
   Create_TestCase_MIB_Multichain_Pre(false, 40u);
 
-  auto regPath = "TAP_DR_Mux.MIB_mux.dynamic_2";
+  auto regPath = "dynamic_2";
 
   // ---------------- Exercise
   //

@@ -48,7 +48,7 @@ vector<ApplicationAssociation> test::Zybo_CreateApplicationsDescriptor ()
 
   vector<ApplicationAssociation> associations;
 
-  associations.emplace_back(app, "TAP_DR_Mux", "Zybo");
+  associations.emplace_back(app, ".", "Zybo");
 
   return associations;
 }

@@ -52,6 +52,7 @@ void LoadSystemModel (string_view filePath)
   reader.parse(filePath);
 
   auto topNode = dynamic_pointer_cast<ParentNode>(reader.parsed_sut);
+  CHECK_VALUE_NOT_NULL(topNode, "Failed to parse file: " + filePath);
 
   sm->ReplaceRoot(topNode, false);
 }

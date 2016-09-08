@@ -33,10 +33,9 @@ Linker::Linker (string_view name, shared_ptr<PathSelector> pathSelector)
   : ParentNode     (name)
   , m_pathSelector (pathSelector)
 {
-  if (!pathSelector)
-  {
-    THROW_INVALID_ARGUMENT("A valid pathSelector is mandatory");
-  }
+  CHECK_PARAMETER_NOT_NULL(pathSelector, "A valid pathSelector is mandatory to construct a Linker");
+
+  IgnoreForNodePath(true);    // This is the default for linkers
 }
 //
 //  End of: Linker::Linker

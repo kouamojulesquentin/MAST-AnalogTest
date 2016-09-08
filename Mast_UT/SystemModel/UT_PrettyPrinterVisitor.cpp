@@ -212,7 +212,7 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_Verbose ()
   // ---------------- Verify
   //
   auto got      = sut.PrettyPrint();
-  auto expected = string("[Linker](2)    \"Linker name\", pending: false, has_conditioner: false, priority: 0\n"
+  auto expected = string("[Linker](2)    \"Linker name\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
                          " :Selector:(1)  \"Mux register name\""
                         );
   TS_ASSERT_EQUALS (got, expected);
@@ -458,7 +458,7 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_with_Child_Verbose ()
   // ---------------- Verify
   //
   auto got      = sut.PrettyPrint();
-  auto expected = string("[Linker](7)    \"Link\", pending: false, has_conditioner: false, priority: 0\n"
+  auto expected = string("[Linker](7)    \"Link\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
                          " :Selector:(6)  \"Sel_1\"\n"
                          " [Register](4)  \"R_A\", length: 15, bypass:            1110_1110:1111_101\n"
                          "                                 , next_to_sut:       1110_1110:1111_101\n"
@@ -713,7 +713,7 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_Verbose ()
                          "                                                     , last_from_sut:     1111_1\n"
                          "                                                     , expected_from_sut: 1111_1\n"
                          "                                                     , pending: false, has_conditioner: false, priority: 0\n"
-                         " [Linker](2)    \"TAP_DR_Mux\", pending: false, has_conditioner: false, priority: 0\n"
+                         " [Linker](2)    \"TAP_DR_Mux\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
                          "  :Selector:(1)  \"TAP_IR\"\n"
                          "  [Register](3)  \"TAP_BPY\", length: 1, bypass:            1\n"
                          "                                     , next_to_sut:       1\n"
@@ -799,7 +799,7 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_Std ()
                          "                                                     , last_from_sut:     0b1111_1\n"
                          "                                                     , expected_from_sut: 0b1111_1\n"
                          "                                                     , pending: false, has_conditioner: false, priority: 0\n"
-                         " [Linker](2)    \"TAP_DR_Mux\", pending: false, has_conditioner: false, priority: 0\n"
+                         " [Linker](2)    \"TAP_DR_Mux\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
                          "  :Selector:(1)  \"TAP_IR\"\n"
                          "  [Register](3)  \"TAP_BPY\", length: 1, bypass:            0b1\n"
                          "                                     , next_to_sut:       0b1\n"

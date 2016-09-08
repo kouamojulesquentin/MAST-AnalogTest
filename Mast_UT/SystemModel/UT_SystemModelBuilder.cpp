@@ -357,7 +357,7 @@ void UT_SystemModelBuilder::test_Create_MIB_1_Derivation ()
                          "   hierarchic 1 directed 1\n"
                          "   node [ id 1 graphics [ type \"ellipse\" fill \"#FFCC20\" w 116 h 43 ] LabelGraphics [ text \"(1)\n"
                          "MIB_name\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                         "   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" w 154 h 44 ] LabelGraphics [ text \"(2)\n"
+                         "   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" outlineStyle \"dashed\" w 154 h 44 ] LabelGraphics [ text \"(2)\n"
                          "MIB_name_mux\n"
                          ":0:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 0 graphics [ type \"rectangle\" fill \"#59FF20\" w 152 h 144 ] LabelGraphics [ text \"(0)\n"
@@ -380,7 +380,7 @@ void UT_SystemModelBuilder::test_Create_MIB_1_Derivation ()
   auto gotPretty      = PrettyPrinterVisitor::PrettyPrint(sm.Root(), PrettyPrinterOptions::All);
   auto expectedPretty = string(
                                "[Chain](1)     \"MIB_name\", pending: false, has_conditioner: false, priority: 0\n"
-                               " [Linker](2)    \"MIB_name_mux\", pending: false, has_conditioner: false, priority: 0\n"
+                               " [Linker](2)    \"MIB_name_mux\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
                                "  :Selector:(0)  \"Reg_name\", kind: Binary, can_select_none: true, inverted_bits: false, reversed_order: false\n"
                                " [Register](0)  \"Reg_name\", length: 1, Hold value: true, bypass:            0b0\n"
                                "                                                       , next_to_sut:       0b0\n"
@@ -438,7 +438,7 @@ void UT_SystemModelBuilder::test_Create_MIB_4_Derivations ()
                          "Last to:   0b00\n"
                          "Last from: 0b00\n"
                          "Expected:  0b00\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                         "   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" w 154 h 44 ] LabelGraphics [ text \"(2)\n"
+                         "   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" outlineStyle \"dashed\" w 154 h 44 ] LabelGraphics [ text \"(2)\n"
                          "MIB_name_mux\n"
                          ":0:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   edge [ source 1 target 0 label \"1\" ]\n"
@@ -457,7 +457,7 @@ void UT_SystemModelBuilder::test_Create_MIB_4_Derivations ()
                                "                                                       , last_from_sut:     0b00\n"
                                "                                                       , expected_from_sut: 0b00\n"
                                "                                                       , pending: false, has_conditioner: false, priority: 0\n"
-                               " [Linker](2)    \"MIB_name_mux\", pending: false, has_conditioner: false, priority: 0\n"
+                               " [Linker](2)    \"MIB_name_mux\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
                                "  :Selector:(0)  \"Reg_name\", kind: Binary, can_select_none: false, inverted_bits: false, reversed_order: false"
                               );
   TS_ASSERT_EQUALS (gotPretty, expectedPretty);

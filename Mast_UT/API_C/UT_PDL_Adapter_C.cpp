@@ -169,7 +169,7 @@ namespace
     // ---------------- Exercise
     //
     T readData;
-    TS_ASSERT_THROWS_NOTHING (retCode = fct("TAP_DR_Mux.MIB_mux.dynamic_1", &readData));
+    TS_ASSERT_THROWS_NOTHING (retCode = fct("dynamic_1", &readData));
 
     // ---------------- Verify
     //
@@ -243,7 +243,7 @@ namespace
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS_NOTHING (retCode = fct("TAP_DR_Mux.MIB_mux.dynamic_1", value));
+    TS_ASSERT_THROWS_NOTHING (retCode = fct("dynamic_1", value));
 
     // ---------------- Verify
     //
@@ -408,7 +408,7 @@ void UT_PDL_Adapter_C::test_iGet_String_Hex ()
 
   // ---------------- Exercise
   //
-  TS_ASSERT_THROWS_NOTHING (retCode = iGet_String("TAP_DR_Mux.MIB_mux.dynamic_1", readDataBuffer.data(), &readDataBufferSize, Hex));
+  TS_ASSERT_THROWS_NOTHING (retCode = iGet_String("dynamic_1", readDataBuffer.data(), &readDataBufferSize, Hex));
 
   // ---------------- Verify
   //
@@ -436,7 +436,7 @@ void UT_PDL_Adapter_C::test_iGet_String_Bin ()
 
   // ---------------- Exercise
   //
-  TS_ASSERT_THROWS_NOTHING (retCode = iGet_String("TAP_DR_Mux.MIB_mux.dynamic_1", readDataBuffer.data(), &readDataBufferSize, Binary));
+  TS_ASSERT_THROWS_NOTHING (retCode = iGet_String("dynamic_1", readDataBuffer.data(), &readDataBufferSize, Binary));
 
   // ---------------- Verify
   //

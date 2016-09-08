@@ -30,6 +30,23 @@ using namespace test;
 
 
 
+//! Appends several chains (with same name prefix) to a parent
+//!
+void TestModelBuilder::AppendChains (uint32_t                     count,
+                                     const string&                baseName,
+                                     shared_ptr<mast::ParentNode> parent)
+{
+  for (uint32_t ii = 0 ; ii < count ; ++ii)
+  {
+    auto name = baseName + std::to_string(ii);
+    m_model.CreateChain (name, parent);
+  }
+}
+//
+//  End of: TestModelBuilder::AppendChains
+//---------------------------------------------------------------------------
+
+
 
 //! Creates a MIB with a default (binary) selector
 //!

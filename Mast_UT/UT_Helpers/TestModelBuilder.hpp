@@ -59,6 +59,12 @@ class TestModelBuilder final
 
   using string_view = std::experimental::string_view;
 
+  //! Appends several chains (with same name prefix) to a parent
+  //!
+  void AppendChains (uint32_t                          count,
+                     const std::string&                baseName,
+                     std::shared_ptr<mast::ParentNode> parent);
+
   //! Appends several registers (with same length and initial content) to a parent
   //!
   void AppendRegisters (uint32_t                          count,

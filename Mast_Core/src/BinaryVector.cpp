@@ -759,12 +759,10 @@ BinaryVector& BinaryVector::operator= (const BinaryVector& rhs)
 {
   CHECK_FIXED_SIZE_ASSIGNMENT(rhs.m_usedBits);
 
-  if (this != &rhs)
-  {
-    m_data         = rhs.m_data;
-    m_usedBits     = rhs.m_usedBits;
-    m_sizeProperty = rhs.m_sizeProperty == SizeProperty::FixedOnCopy ? SizeProperty::FixedOnCopy : m_sizeProperty;
-  }
+  m_data         = rhs.m_data;
+  m_usedBits     = rhs.m_usedBits;
+  m_sizeProperty = rhs.m_sizeProperty == SizeProperty::FixedOnCopy ? SizeProperty::FixedOnCopy : m_sizeProperty;
+
   return *this;
 }
 //
@@ -778,14 +776,14 @@ BinaryVector& BinaryVector::operator= (const BinaryVector& rhs)
 //!
 BinaryVector& BinaryVector::operator= (BinaryVector&& rhs)
 {
-  CHECK_FIXED_SIZE_ASSIGNMENT(rhs.m_usedBits);
-
   if (this != &rhs)
   {
+    CHECK_FIXED_SIZE_ASSIGNMENT(rhs.m_usedBits);
     m_data         = std::move(rhs.m_data);
     m_usedBits     = rhs.m_usedBits;
     m_sizeProperty = rhs.m_sizeProperty == SizeProperty::FixedOnCopy ? SizeProperty::FixedOnCopy : m_sizeProperty;
   }
+
   return *this;
 }
 //

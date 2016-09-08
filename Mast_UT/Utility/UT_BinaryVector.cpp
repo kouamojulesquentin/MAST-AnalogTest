@@ -5626,6 +5626,27 @@ void UT_BinaryVector::test_CopyAssignmentOperator_From_FixedSizeOnCopy ()
 }
 
 
+//! Checks copy assigment operator when copying onto itself
+//!
+void UT_BinaryVector::test_CopyAssignmentOperator_to_Self ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector sut   (3, 0x45);
+  BinaryVector other (3, 0x45);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut = sut);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (sut, sut);
+  TS_ASSERT_EQUALS (sut, other);
+}
+
+
+
 //! Checks assigment operator
 //!
 void UT_BinaryVector::test_MoveAssignmentOperator ()
@@ -5727,6 +5748,24 @@ void UT_BinaryVector::test_MoveAssignmentOperator_From_FixedSizeOnCopy ()
   TS_ASSERT_TRUE (other.IsEmpty());
 }
 
+//! Checks move assigment operator when moving from itself
+//!
+void UT_BinaryVector::test_MoveAssignmentOperator_to_self ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector sut   (3, 0x21);
+  BinaryVector other (3, 0x21);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut = std::move(sut));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (sut, sut);
+  TS_ASSERT_EQUALS (sut, other);
+}
 
 
 //! Checks BinaryVector::ToggleBits()

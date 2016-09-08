@@ -213,7 +213,7 @@ BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfac
       break;
     case 1u:
       LOG(INFO) << "OpenOCD_IR(" << toSutData.DataAsMixString() << ")";
-      jtag_add_plain_ir_scan(bitsCount, toSutData.Data(), fromSutDataBuffer.data(), TAP_IDLE);
+      jtag_add_plain_ir_scan(bitsCount, toSutData.DataLeftAligned(), fromSutDataBuffer.data(), TAP_IDLE);
       break;
     case 2u:
       LOG(INFO) << "OpenOCD_DR(" << toSutData.DataAsMixString() << ")";

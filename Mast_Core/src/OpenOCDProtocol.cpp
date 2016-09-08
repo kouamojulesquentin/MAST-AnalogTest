@@ -217,7 +217,7 @@ BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfac
       break;
     case 2u:
       LOG(INFO) << "OpenOCD_DR(" << toSutData.DataAsMixString() << ")";
-      jtag_add_plain_dr_scan(bitsCount, toSutData.Data(), fromSutDataBuffer.data(), TAP_IDLE);
+      jtag_add_plain_dr_scan(bitsCount, toSutData.DataLeftAligned(), fromSutDataBuffer.data(), TAP_IDLE);
       break;
     default:
       THROW_INVALID_ARGUMENT("DerivationId must be '0' (for Reset), '1' (for SIR) or '2' (for SDR)");

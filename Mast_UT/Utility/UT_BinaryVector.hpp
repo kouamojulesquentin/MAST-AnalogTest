@@ -240,6 +240,10 @@ class UT_BinaryVector : public CxxTest::TestSuite
   void test_Slice ();
   void test_Slice_When_Exceeding_Capacity ();
 
+  // ---------------- DataRightAligned
+  //
+  void test_DataRightAligned ();
+
   // ---------------- Other methods
   //
   void setUp(); //!< Initializes test (called for each test)

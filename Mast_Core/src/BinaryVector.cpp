@@ -19,6 +19,7 @@
 
 
 using std::array;
+using std::vector;
 using std::initializer_list;
 using std::ostringstream;
 using std::string;
@@ -150,7 +151,8 @@ BinaryVector::BinaryVector (mast::BinaryVector&& rhs) noexcept
   , m_usedBits     (rhs.m_usedBits)
   , m_sizeProperty (rhs.m_sizeProperty == SizeProperty::FixedOnCopy ? SizeProperty::FixedOnCopy : SizeProperty::NotFixed)
 {
-  rhs.m_usedBits = 0;
+  rhs.m_usedBits     = 0;
+  rhs.m_sizeProperty = SizeProperty::NotFixed;
 }
 //
 //  End of: BinaryVector::BinaryVector
@@ -217,8 +219,8 @@ BinaryVector& BinaryVector::Append (const BinaryVector& rhs)
 {
   CHECK_FIXED_SIZE;
 
-  uint32_t       bitsToAppend = rhs.BitsCount();
-  const uint8_t* pRhsData     = rhs.Data();
+  uint32_t       bitsToAppend = rhs.m_usedBits;
+  const uint8_t* pRhsData     = rhs.m_data.data();
 
   while (bitsToAppend >= 8)
   {
@@ -750,6 +752,77 @@ string BinaryVector::DataAsMixString (uint32_t    hexStyleThreshold,
 //---------------------------------------------------------------------------
 
 
+//! Returns data right aligned in a new buffer
+//!
+//! @note Internal representation is left aligned.
+//!       For example for a 23 bits BinaryVector with value 0x654321 (0b110_0101_0100_0011_0010_0001)
+//!       Will be in memory (with increased address)
+//!       Left aligned:   [CA][86][42]  (0b11001010:10000110:01000010)
+//!       Right aligned:  [65][43][21]  (0b01100101:01000011:00100001)
+//!
+//! @note To be cache friendly data are processed in increased address order
+vector<uint8_t> BinaryVector::DataRightAligned () const
+{
+  vector<uint8_t> rightAligned;
+
+  auto binVectorLsbBits = m_usedBits % 8; // This is the number of meaningful bits on last byte in BinaryVector representation (left aligned)
+
+  if (binVectorLsbBits == 0) // Deal with fast case
+  {
+    rightAligned = m_data;
+  }
+  else     // Deal with case, right aligned bytes are stranded on two bytes of left aligned version
+  {
+    rightAligned.reserve(m_data.size());
+
+    auto pBegin = m_data.cbegin();
+    auto pEnd   = m_data.cend();
+    auto pByte  = pBegin;
+
+    uint8_t  bufferShiftCount   = 8u - binVectorLsbBits;  // This is the number of meaningful bits on first byte in right aligned result
+    uint32_t remainingBitsCount = m_usedBits;
+    uint8_t  byte = 0;
+
+    // ---------------- Process first bits (on first byte)
+    //
+    byte   = *pByte;
+    byte >>= bufferShiftCount;
+    byte  &= RIGHT_BITS_MASK_8[binVectorLsbBits];
+
+    rightAligned.push_back(byte);
+
+    // ---------------- Process other bytes
+    //
+    remainingBitsCount -= binVectorLsbBits;
+    while ((remainingBitsCount != 0) && (pByte < pEnd))
+    {
+      uint8_t msb = *pByte++;   // msb for result is on lsb of "left" byte of binary BinaryVector
+      uint8_t lsb = *pByte;     // lsb for result is on msb of "right" byte of binary BinaryVector
+
+      // ---------------- Merge bytes
+      //
+      // e.g. : [xxxmmmmm][lllyyyyy] ==> [mmmmmlll]
+      //           msb        lsb           byte
+      //
+      msb <<= binVectorLsbBits;
+      lsb >>= bufferShiftCount;
+      msb &= LEFT_BITS_MASK_8[bufferShiftCount];
+      lsb &= RIGHT_BITS_MASK_8[binVectorLsbBits];
+
+      uint8_t byte = msb | lsb;
+      rightAligned.push_back(byte);
+
+      remainingBitsCount -= 8;
+    }
+  }
+
+  return rightAligned;
+}
+//
+//  End of: BinaryVector::DataRightAligned
+//---------------------------------------------------------------------------
+
+
 
 //! Copy assignment
 //!
@@ -782,6 +855,9 @@ BinaryVector& BinaryVector::operator= (BinaryVector&& rhs)
     m_data         = std::move(rhs.m_data);
     m_usedBits     = rhs.m_usedBits;
     m_sizeProperty = rhs.m_sizeProperty == SizeProperty::FixedOnCopy ? SizeProperty::FixedOnCopy : m_sizeProperty;
+
+    rhs.m_usedBits     = 0;
+    rhs.m_sizeProperty = SizeProperty::NotFixed;
   }
 
   return *this;
@@ -807,7 +883,6 @@ bool BinaryVector::operator== (const BinaryVector& rhs) const
   {
     return true;
   }
-
 
   auto bitsOnLastByte = m_usedBits % 8;
   auto areEqual       = true;

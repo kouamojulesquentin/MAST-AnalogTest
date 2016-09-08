@@ -72,11 +72,6 @@ SVFVector::SVFVector (std::experimental::string_view svfString, uint32_t bitsCou
 //---------------------------------------------------------------------------
 
 
-
-
-
-
-
 //! Constructs from BinaryVector
 //!
 //! @note Take into account that all bits in a BinaryVector are left aligned
@@ -94,7 +89,7 @@ SVFVector::SVFVector (const BinaryVector& binaryVector)
 
     auto binVectorLsbBits = bitsCount % 8;
 
-    auto pBegin = binaryVector.Data();
+    auto pBegin = binaryVector.DataLeftAligned();
     auto pEnd   = pBegin + binaryVector.BytesCount();
     auto pByte  = pBegin;
 

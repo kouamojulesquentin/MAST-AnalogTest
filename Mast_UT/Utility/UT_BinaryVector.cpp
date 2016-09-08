@@ -52,7 +52,7 @@ void UT_BinaryVector::test_Constructor_Default ()
   TS_ASSERT_EQUALS  (sut.BytesCount(), 0);
   TS_ASSERT_TRUE    (sut.IsEmpty());
   TS_ASSERT_FALSE   (sut.HasFixedSize());
-  TS_ASSERT_NULLPTR (sut.Data());
+  TS_ASSERT_NULLPTR (sut.DataLeftAligned());
 }
 
 
@@ -74,7 +74,7 @@ void UT_BinaryVector::test_Constructor_Copy_When_SrcIsEmpty ()
   TS_ASSERT_EQUALS  (sut.BytesCount(), 0);
   TS_ASSERT_TRUE    (sut.IsEmpty());
   TS_ASSERT_FALSE   (sut.HasFixedSize());
-  TS_ASSERT_NULLPTR (sut.Data());
+  TS_ASSERT_NULLPTR (sut.DataLeftAligned());
 }
 
 //! Checks BinaryVector move constructor when the source BinaryVector is empty
@@ -95,7 +95,7 @@ void UT_BinaryVector::test_Constructor_Move_When_SrcIsEmpty ()
   TS_ASSERT_EQUALS  (sut.BytesCount(), 0);
   TS_ASSERT_TRUE    (sut.IsEmpty());
   TS_ASSERT_FALSE   (sut.HasFixedSize());
-  TS_ASSERT_NULLPTR (sut.Data());
+  TS_ASSERT_NULLPTR (sut.DataLeftAligned());
 }
 
 
@@ -127,7 +127,7 @@ void UT_BinaryVector::test_CreateFromBinaryString ()
 
     if (expectedBytesCount != 0u)
     {
-      const uint8_t* pData = sut.Data();
+      const uint8_t* pData = sut.DataLeftAligned();
 
       TS_ASSERT_GREATER_THAN_EQUALS (expectedContent.size(), expectedBytesCount);
 
@@ -283,8 +283,8 @@ void UT_BinaryVector::test_CreateFromHexString ()
 
     if (expectedBytesCount != 0u)
     {
-      const uint8_t* pSutData      = sut.Data();
-      const uint8_t* pExpectedData = expectedBinaryVector.Data();
+      const uint8_t* pSutData      = sut.DataLeftAligned();
+      const uint8_t* pExpectedData = expectedBinaryVector.DataLeftAligned();
 
       CxxTest::setAbortTestOnFail(true);
       TS_ASSERT_NOT_NULLPTR (pSutData);
@@ -441,8 +441,8 @@ void UT_BinaryVector::test_CreateFromString ()
 
     if (expectedBytesCount != 0u)
     {
-      const uint8_t* pSutData      = sut.Data();
-      const uint8_t* pExpectedData = expectedBinaryVector.Data();
+      const uint8_t* pSutData      = sut.DataLeftAligned();
+      const uint8_t* pExpectedData = expectedBinaryVector.DataLeftAligned();
 
       CxxTest::setAbortTestOnFail(true);
       TS_ASSERT_NOT_NULLPTR (pSutData);
@@ -1634,7 +1634,7 @@ void UT_BinaryVector::test_Append_8_bits_When_Empty ()
   TS_ASSERT_EQUALS      (sut.BytesCount(), 1);
 
   CxxTest::setAbortTestOnFail(true);
-  const uint8_t*         pData = sut.Data();
+  const uint8_t*         pData = sut.DataLeftAligned();
 
   TS_ASSERT_NOT_NULLPTR (pData);
   TS_ASSERT_EQUALS      (pData[0], 0xA5);
@@ -1659,7 +1659,7 @@ void UT_BinaryVector::test_Append_16_bits_When_Empty ()
   TS_ASSERT_EQUALS      (sut.BytesCount(), 2);
 
   CxxTest::setAbortTestOnFail(true);
-  const uint8_t*        pData = sut.Data();
+  const uint8_t*        pData = sut.DataLeftAligned();
 
   TS_ASSERT_NOT_NULLPTR (pData);
   TS_ASSERT_EQUALS      (pData[0], 0xFA);
@@ -1686,7 +1686,7 @@ void UT_BinaryVector::test_Append_32_bits_When_Empty ()
   TS_ASSERT_EQUALS      (sut.BytesCount(), 4);
 
   CxxTest::setAbortTestOnFail(true);
-  const uint8_t*        pData = sut.Data();
+  const uint8_t*        pData = sut.DataLeftAligned();
 
   TS_ASSERT_NOT_NULLPTR (pData);
   TS_ASSERT_EQUALS      (pData[0], 0xFA);
@@ -1715,7 +1715,7 @@ void UT_BinaryVector::test_Append_64_bits_When_Empty ()
   TS_ASSERT_EQUALS      (sut.BytesCount(), 8);
 
   CxxTest::setAbortTestOnFail(true);
-  const uint8_t*        pData = sut.Data();
+  const uint8_t*        pData = sut.DataLeftAligned();
 
   TS_ASSERT_NOT_NULLPTR (pData);
   TS_ASSERT_EQUALS      (pData[0], 0xFA);
@@ -1762,7 +1762,7 @@ void UT_BinaryVector::test_Append_8_bits_When_NotEmpty ()
       TS_ASSERT_EQUALS      (sut.BitsCount(),   expectedBitsCount);
       TS_ASSERT_EQUALS      (sut.BytesCount(), expectedBytesCount);
 
-      const uint8_t* pData = sut.Data();
+      const uint8_t* pData = sut.DataLeftAligned();
 
       TS_ASSERT_GREATER_THAN_EQUALS (expectedContent.size(), expectedBytesCount);
       TS_ASSERT_NOT_NULLPTR (pData);
@@ -1820,7 +1820,7 @@ void UT_BinaryVector::test_Append_16_bits_When_NotEmpty ()
       TS_ASSERT_EQUALS (sut.BitsCount(),   expectedBitsCount);
       TS_ASSERT_EQUALS (sut.BytesCount(), expectedBytesCount);
 
-      const uint8_t* pData = sut.Data();
+      const uint8_t* pData = sut.DataLeftAligned();
 
       TS_ASSERT_GREATER_THAN_EQUALS (expectedContent.size(), expectedBytesCount);
       TS_ASSERT_NOT_NULLPTR (pData);
@@ -1886,7 +1886,7 @@ void UT_BinaryVector::test_Append_32_bits_When_NotEmpty ()
       TS_ASSERT_EQUALS (sut.BitsCount(),   expectedBitsCount);
       TS_ASSERT_EQUALS (sut.BytesCount(), expectedBytesCount);
 
-      const uint8_t* pData = sut.Data();
+      const uint8_t* pData = sut.DataLeftAligned();
 
       TS_ASSERT_GREATER_THAN_EQUALS (expectedContent.size(), expectedBytesCount);
       TS_ASSERT_NOT_NULLPTR (pData);
@@ -1950,7 +1950,7 @@ void UT_BinaryVector::test_Append_64_bits_When_NotEmpty ()
       TS_ASSERT_EQUALS (sut.BitsCount(),   expectedBitsCount);
       TS_ASSERT_EQUALS (sut.BytesCount(), expectedBytesCount);
 
-      const uint8_t* pData = sut.Data();
+      const uint8_t* pData = sut.DataLeftAligned();
 
       TS_ASSERT_GREATER_THAN_EQUALS (expectedContent.size(), expectedBytesCount);
       TS_ASSERT_NOT_NULLPTR (pData);
@@ -2067,7 +2067,7 @@ void UT_BinaryVector::test_Append_1_to_8_bits_When_Empty_Right_Aligned ()
     TS_ASSERT_EQUALS (sut.BitsCount(),   expectedBitsCount);
     TS_ASSERT_EQUALS (sut.BytesCount(), expectedBytesCount);
 
-    const uint8_t* pData = sut.Data();
+    const uint8_t* pData = sut.DataLeftAligned();
 
     TS_ASSERT_GREATER_THAN_EQUALS (expectedContent.size(), expectedBytesCount);
     CxxTest::setAbortTestOnFail(true);
@@ -2142,7 +2142,7 @@ void UT_BinaryVector::test_Append_1_to_8_bits_When_Empty_Left_Aligned ()
     TS_ASSERT_EQUALS (sut.BitsCount(),  expectedBitsCount);
     TS_ASSERT_EQUALS (sut.BytesCount(), expectedBytesCount);
 
-    const uint8_t* pData = sut.Data();
+    const uint8_t* pData = sut.DataLeftAligned();
 
     TS_ASSERT_GREATER_THAN_EQUALS (expectedContent.size(), expectedBytesCount);
     CxxTest::setAbortTestOnFail(true);
@@ -2222,7 +2222,7 @@ void UT_BinaryVector::test_Append_1_to_8_bits_When_NotEmpty_Right_Aligned ()
     TS_ASSERT_EQUALS (sut.BitsCount(),  expectedBitsCount);
     TS_ASSERT_EQUALS (sut.BytesCount(), expectedBytesCount);
 
-    const uint8_t* pData = sut.Data();
+    const uint8_t* pData = sut.DataLeftAligned();
 
     TS_ASSERT_GREATER_THAN_EQUALS (expectedContent.size(), expectedBytesCount);
     CxxTest::setAbortTestOnFail(true);
@@ -2306,7 +2306,7 @@ void UT_BinaryVector::test_Append_1_to_8_bits_When_NotEmpty_Left_Aligned ()
     TS_ASSERT_EQUALS (sut.BitsCount(),  expectedBitsCount);
     TS_ASSERT_EQUALS (sut.BytesCount(), expectedBytesCount);
 
-    const uint8_t* pData = sut.Data();
+    const uint8_t* pData = sut.DataLeftAligned();
 
     TS_ASSERT_GREATER_THAN_EQUALS (expectedContent.size(), expectedBytesCount);
     CxxTest::setAbortTestOnFail(true);
@@ -6678,6 +6678,71 @@ void UT_BinaryVector::test_Slice_When_Exceeding_Capacity ()
   test_PrettyPrinter();
 }
 
+
+//! Checks BinaryVector::DataRightAligned() `...`
+//!
+void UT_BinaryVector::test_DataRightAligned ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto sut      = BinaryVector::CreateFromString(std::get<0>(data));
+    auto expected = vector<uint8_t>(std::get<1>(data));
+
+    // ---------------- Exercise
+    //
+    auto rightAligned = sut.DataRightAligned();
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (rightAligned, expected);
+  };
+
+  using data_t = tuple<string_view, initializer_list<uint8_t>> ;
+  auto data =
+  {
+    data_t("",                                  {}),                       // 00
+    data_t("0xA5",                              {0xA5}),                   // 01
+    data_t("0xA5B6",                            {0xA5, 0xB6}),             // 02
+    data_t("0xA5B6C",                           {0x0A, 0x5B, 0x6C}),       // 03
+    data_t("0b0",                               {0x00}),                   // 04
+    data_t("0b1",                               {0x01}),                   // 05
+    data_t("0b10",                              {0x02}),                   // 06
+    data_t("0b11",                              {0x03}),                   // 07
+    data_t("0b100",                             {0x04}),                   // 08
+    data_t("0b101",                             {0x05}),                   // 09
+    data_t("0b110",                             {0x06}),                   // 10
+    data_t("0b111",                             {0x07}),                   // 11
+    data_t("0b1110",                            {0x0E}),                   // 12
+    data_t("0b1_0110",                          {0x16}),                   // 13
+    data_t("0b10_0110",                         {0x26}),                   // 14
+    data_t("0b100_0110",                        {0x46}),                   // 15
+    data_t("0b0_1001_0110",                     {0x00, 0x96}),             // 16
+    data_t("0b11_1010_0110",                    {0x03, 0xA6}),             // 17
+    data_t("0b111_1010_0110",                   {0x07, 0xA6}),             // 18
+    data_t("0b0_0111_1010_0110",                {0x07, 0xA6}),             // 19
+    data_t("0b01_0111_1010_0110",               {0x17, 0xA6}),             // 20
+    data_t("0b10_0111_1010_0110",               {0x27, 0xA6}),             // 21
+    data_t("0b110_0111_1010_0110",              {0x67, 0xA6}),             // 22
+    data_t("0b0_1010_0111_1010_0110",           {0x00, 0xA7, 0xA6}),       // 23
+    data_t("0b10:1010_0111:1010_0110",          {0x02, 0xA7, 0xA6}),       // 24
+    data_t("0b110:1010_0111:1010_0110",         {0x06, 0xA7, 0xA6}),       // 25
+    data_t("0b1110:1010_0111:1010_0110",        {0x0E, 0xA7, 0xA6}),       // 26
+    data_t("0b1_1110:1010_0111:1010_0110",      {0x1E, 0xA7, 0xA6}),       // 27
+    data_t("0b11_0110:1011_0111:1010_0110",     {0x36, 0xB7, 0xA6}),       // 28
+    data_t("0b101_0110:1011_0111:1010_0110",    {0x56, 0xB7, 0xA6}),       // 29
+    data_t("0b1101_0110:1011_0111:1010_0110",   {0xD6, 0xB7, 0xA6}),       // 30
+    data_t("0b110_0101:0100_0011:0010_0001",    {0x65, 0x43, 0x21}),       // 31
+    data_t("0b1:1101_0110:1011_0111:1010_0110", {0x01, 0xD6, 0xB7, 0xA6}), // 32
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
 
 //===========================================================================
 // End of UT_BinaryVector.cpp

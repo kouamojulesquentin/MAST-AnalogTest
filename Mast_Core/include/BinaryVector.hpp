@@ -23,10 +23,6 @@
 namespace mast
 {
 
-class SVFVector;
-class BinaryVectorRef;
-
-
 //! Tells how, non complete, data have their useful bits aligned
 //!
 enum class BitsAlignment
@@ -159,11 +155,12 @@ class DLL_EXPORT BinaryVector final
 
   void           FixSize(bool fixSize) { m_sizeProperty = fixSize ? SizeProperty::Fixed : SizeProperty::NotFixed; } //!< Sets whether the number of used bits cannot be changed
 
-  bool           HasFixedSize() const { return m_sizeProperty != SizeProperty::NotFixed; } //!< Returns true if number of used bits cannot be changed
-  bool           IsEmpty()      const { return m_data.empty();}                            //!< Returns true when there is no bit in the BinaryVector, false otherwise
-  uint32_t       BitsCount()    const { return m_usedBits;    }                            //!< Returns total number of valid bits in the BinaryVector
-  uint32_t       BytesCount()   const { return m_data.size(); }                            //!< Returns total number of valid bits in the BinaryVector
-  const uint8_t* Data()         const { return m_data.data(); }                            //!< Returns pointer on raw bits stream data (only valid as long as content is not modified)
+  bool                 HasFixedSize()     const { return m_sizeProperty != SizeProperty::NotFixed; } //!< Returns true if number of used bits cannot be changed
+  bool                 IsEmpty()          const { return m_data.empty();}                            //!< Returns true when there is no bit in the BinaryVector, false otherwise
+  uint32_t             BitsCount()        const { return m_usedBits;    }                            //!< Returns total number of valid bits in the BinaryVector
+  uint32_t             BytesCount()       const { return m_data.size(); }                            //!< Returns total number of valid bits in the BinaryVector
+  const uint8_t*       DataLeftAligned()  const { return m_data.data(); }                            //!< Returns pointer on raw bits stream data (only valid as long as content is not modified)
+  std::vector<uint8_t> DataRightAligned() const;                                                     //!< Returns data right aligned in a new buffer
 
   BinaryVector    Slice    (uint32_t firstBitOffset, uint32_t bitsCount) const; //!< Returns a slice from BinaryVector
 //+  BinaryVector_View Slice_View (uint32_t firstBitOffset, uint32_t bitsCount) const; //!< Returns a reference to a slice from BinaryVector
@@ -228,38 +225,6 @@ inline BinaryVector operator^ (const BinaryVector& lhs, const BinaryVector& rhs)
   result ^= rhs;
   return result;
 }
-
-
-//! Represents a slice within a BinaryVector
-//!
-class BinaryVectorRef final
-{
-  // ---------------- Public  Methods
-  //
-  public:
-  ~BinaryVectorRef() = default;
-  BinaryVectorRef()  = delete;
-  BinaryVectorRef(const BinaryVector& binaryVector, uint32_t firstBit, uint32_t lastBit)
-    : m_binaryVector (binaryVector)
-    , m_firstBit     (firstBit)
-    , m_lastBit      (lastBit)
-  {}
-
-  friend BinaryVector;
-
-  // ---------------- Private  Fields
-  //
-  private:
-  const BinaryVector& m_binaryVector;
-  const uint32_t      m_firstBit = 0;
-  const uint32_t      m_lastBit  = 0;
-};
-//
-//  End of BinaryVectorRef class declaration
-//---------------------------------------------------------------------------
-
-
-
 
 } // End of namespace mast
 

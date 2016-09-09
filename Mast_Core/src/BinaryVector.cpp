@@ -507,15 +507,17 @@ void BinaryVector::ClearBit (uint32_t bitOffset)
 //!
 //! @note Firstly intended for test purposes, but can be used for anything else
 //!
-//! @param bits   Sequence of characters representing content of BinaryVector to create
-//!               Characters in ",':_- \t/\|" are ignored (can be used to ease display of string)
-//!               An exception is thrown if there is any character different from
-//!               set "01,':_- \t\n"
-//!               '0b' is ignored at start of string. An exception is thrown everywhere else
-//!               '/b', '/B', '\b', '\B' constructions are ignored anywhere
+//! @param bits         Sequence of characters representing content of BinaryVector to create
+//!                     Characters in ",':_- \t/\|" are ignored (can be used to ease display of string)
+//!                     An exception is thrown if there is any character different from
+//!                     set "01,':_- \t\n"
+//!                     '0b' is ignored at start of string. An exception is thrown everywhere else
+//!                     '/b', '/B', '\b', '\B' constructions are ignored anywhere
+//! @param sizeProperty Size property
+//! @param dontCare     Tells how to handle "dont't care" special characters 'x' and 'X'
 //!
 //! @return A new BinaryVector initialized as defined by bits text
-BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_view bits, SizeProperty sizeProperty)
+BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_view bits, SizeProperty sizeProperty, DontCare dontCare)
 {
   CHECK_PARAMETER_NOT_NULL(bits.data(), "BinaryVector cannot be created from nullptr");
   BinaryVector result;
@@ -547,28 +549,52 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
     bits.remove_prefix(2);
   }
 
+  auto appendBit = [&](uint8_t bit)   // Helper to append one bit (zero or one)
+  {
+    nextByte <<= 1;
+    nextByte |= bit;
+
+    if (++bitCount == 8)
+    {
+      result.m_data.push_back(nextByte);
+      result.m_usedBits += 8;
+
+      nextByte = 0;
+      bitCount = 0;
+    }
+  };
+
   string_view::value_type previousChar = '\0'; // To detect construction like '\b' and '/b' that are tolerated
   for (const auto& nextChar : bits)
   {
     switch (nextChar)
     {
       case '0':
+        appendBit(0);
+        break;
       case '1':
-        nextByte <<= 1;
-        if (nextChar == '1')
+        appendBit(1);
+        break;
+      case 'x':
+      case 'X':
+      {
+        switch (dontCare)
         {
-          nextByte |= 1;
-        }
-
-        if (++bitCount == 8)
-        {
-          result.m_data.push_back(nextByte);
-          result.m_usedBits += 8;
-
-          nextByte = 0;
-          bitCount = 0;
+          case DontCare::IsError:
+            THROW_INVALID_ARGUMENT("CreateFromBinaryString found unexpected \"don't care character\"");
+            break;
+          case DontCare::IsZero:
+            appendBit(0);
+            break;
+          case DontCare::IsOne:
+            appendBit(1);
+            break;
+          default:
+            CHECK_TRUE(false, "Unexpected 'dontCare' value");
+            break;
         }
         break;
+      }
       case '-':
       case '_':
       case ':':
@@ -617,16 +643,18 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
 //!
 //! @note Firstly intended for test purposes, but can be used for anything else
 //!
-//! @param bits   Sequence of characters representing content of BinaryVector to create
-//!               Characters in ",':_- \t/\" are ignored (can be used to ease display of string)
-//!               An exception is thrown if there is any character different from
-//!               set "0123456789abcdefABCDEF,':_- \t\n/\"
-//!               '0x' is ignored at start of string. An exception is thrown everywhere else
-//!               '/x', '/X', '\x', '\X' constructions are ignored anywhere
+//! @param bits         Sequence of characters representing content of BinaryVector to create
+//!                     Characters in ",':_- \t/\" are ignored (can be used to ease display of string)
+//!                     An exception is thrown if there is any character different from
+//!                     set "0123456789abcdefABCDEF,':_- \t\n/\"
+//!                     '0x' is ignored at start of string. An exception is thrown everywhere else
+//!                     '/x', '/X', '\x', '\X' constructions are ignored anywhere
+//! @param sizeProperty Size property
+//! @param dontCare     Tells how to handle "dont't care" special characters 'x' and 'X'
 //!
 //! @return A new BinaryVector initialized as defined by bits text
 //!
-BinaryVector BinaryVector::CreateFromHexString (string_view bits, SizeProperty sizeProperty)
+BinaryVector BinaryVector::CreateFromHexString (string_view bits, SizeProperty sizeProperty, DontCare dontCare)
 {
   CHECK_PARAMETER_NOT_NULL(bits.data(), "BinaryVector cannot be created from nullptr");
   BinaryVector result;
@@ -708,11 +736,18 @@ BinaryVector BinaryVector::CreateFromHexString (string_view bits, SizeProperty s
         }
         else
         {
-          THROW_INVALID_ARGUMENT("CreateFromBinaryString support only constructions: '\\x' and '/x'");
+          switch (dontCare)
+          {
+            case DontCare::IsError: THROW_INVALID_ARGUMENT("CreateFromHexString found unexpected \"don't care character\"");
+            case DontCare::IsZero: value = 0x0; break;
+            case DontCare::IsOne:  value = 0xF; break;
+            default: CHECK_TRUE(false, "Unexpected 'dontCare' value"); break;
+          }
+          break;
         }
         break;
       default:
-        THROW_INVALID_ARGUMENT("CreateFromBinaryString only support characters in '01,\':|_-\\x20\\t\\n/\\'");
+        THROW_INVALID_ARGUMENT("CreateFromHexString only support characters in '01,\':|_-\\x20\\t\\n/\\'");
     }
 
     if (hasValue)
@@ -757,17 +792,19 @@ BinaryVector BinaryVector::CreateFromHexString (string_view bits, SizeProperty s
 //!
 //! @note Firstly intended for test purposes, but can be used for anything else
 //!
-//! @param bits   Sequence of characters representing content of BinaryVector to create
-//!               Characters in ",':_- \t/\" are ignored (can be used to ease display of string)
-//!               An exception is thrown if there is any character different from
-//!               set "0123456789abcdefABCDEF,':_- \t/\"
-//!               '0x' is ignored at start of string. An exception is thrown everywhere else
-//!               '/x', '/X', '\x', '\X' constructions are interpreted as: What follow is hexadecimal
-//!               '/b', '/B', '\b', '\B' constructions are interpreted as: What follow is binary
+//! @param bits         Sequence of characters representing content of BinaryVector to create
+//!                     Characters in ",':_- \t/\" are ignored (can be used to ease display of string)
+//!                     An exception is thrown if there is any character different from
+//!                     set "0123456789abcdefABCDEF,':_- \t/\"
+//!                     '0x' is ignored at start of string. An exception is thrown everywhere else
+//!                     '/x', '/X', '\x', '\X' constructions are interpreted as: What follow is hexadecimal
+//!                     '/b', '/B', '\b', '\B' constructions are interpreted as: What follow is binary
+//! @param sizeProperty Size property
+//! @param dontCare     Tells how to handle "dont't care" special characters 'x' and 'X'
 //!
 //! @return A new BinaryVector initialized as defined by bits text
 //!
-BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty sizeProperty)
+BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty sizeProperty, DontCare dontCare)
 {
   CHECK_PARAMETER_NOT_NULL(bits.data(), "BinaryVector cannot be created from nullptr");
 
@@ -880,12 +917,12 @@ BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty size
 
     if (format == StringFormat::Binary)
     {
-      chunkVector = BinaryVector::CreateFromBinaryString(bitsChunk);
+      chunkVector = BinaryVector::CreateFromBinaryString(bitsChunk, SizeProperty::NotFixed, dontCare);
       format      = StringFormat::Hexadecimal;
     }
     else
     {
-      chunkVector = BinaryVector::CreateFromHexString(bitsChunk);
+      chunkVector = BinaryVector::CreateFromHexString(bitsChunk, SizeProperty::NotFixed, dontCare);
       format      = StringFormat::Binary;
     }
     result.Append(chunkVector);
@@ -895,7 +932,7 @@ BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty size
   return result;
 }
 //
-//  End of: BinaryVector::CreateFromBinaryString
+//  End of: BinaryVector::CreateFromString
 //---------------------------------------------------------------------------
 
 

@@ -38,10 +38,18 @@ class UT_BinaryVector : public CxxTest::TestSuite
   //
   void test_CreateFromBinaryString ();
   void test_CreateFromBinaryString_InvalidChars ();
+  void test_CreateFromBinaryString_DontCare_as_Zero ();
+  void test_CreateFromBinaryString_DontCare_as_One ();
+
   void test_CreateFromHexString ();
   void test_CreateFromHexString_InvalidChars ();
+  void test_CreateFromHexString_DontCare_as_Zero ();
+  void test_CreateFromHexString_DontCare_as_One ();
+
   void test_CreateFromString ();
   void test_CreateFromString_InvalidChars ();
+  void test_CreateFromString_DontCare_as_Zero ();
+  void test_CreateFromString_DontCare_as_One ();
 
   // ---------------- DataAsBinaryString
   //

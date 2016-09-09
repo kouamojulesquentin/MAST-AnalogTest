@@ -257,6 +257,93 @@ void UT_BinaryVector::test_CreateFromBinaryString_InvalidChars ()
 }
 
 
+//! Checks BinaryVector::CreateFromBinaryString() replacing don't care characters 'x' and 'X' with zeros
+//!
+void UT_BinaryVector::test_CreateFromBinaryString_DontCare_as_Zero ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto input             = std::get<0>(data);
+    auto expectedBitsCount = std::get<1>(data);
+    auto expectedBytes     = vector<uint8_t>(std::get<2>(data));
+
+    // ---------------- Exercise
+    //
+    auto sut = BinaryVector::CreateFromBinaryString(input, SizeProperty::NotFixed, DontCare::IsZero);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS    (sut.BitsCount(),       expectedBitsCount);
+    TS_ASSERT_SAME_DATA (sut.DataLeftAligned(), expectedBytes.data(), expectedBytes.size());
+  };
+
+  using data_t = tuple<string_view, uint32_t, initializer_list<uint8_t>>;
+
+  initializer_list<data_t> data =  // Input, bits count, bytes
+  {
+    data_t("x1",              2,  {0b01000000}),             // 00
+    data_t("1x",              2,  {0b10000000}),             // 01
+    data_t("1x11",            4,  {0b10110000}),             // 02
+    data_t("11100x001",       9,  {0b11100000, 0b10000000}), // 03
+    data_t("011Xx101",        8,  {0b01100101}),             // 04
+    data_t("10011xxx  xX01",  12, {0b10011000, 0b00010000}), // 05
+    data_t("10001011, 10111", 13, {0b10001011, 0b10111000}), // 06
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+
+//! Checks BinaryVector::CreateFromBinaryString() replacing don't care characters 'x' and 'X' with ones
+//!
+void UT_BinaryVector::test_CreateFromBinaryString_DontCare_as_One ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto input             = std::get<0>(data);
+    auto expectedBitsCount = std::get<1>(data);
+    auto expectedBytes     = vector<uint8_t>(std::get<2>(data));
+
+    // ---------------- Exercise
+    //
+    auto sut = BinaryVector::CreateFromBinaryString(input, SizeProperty::NotFixed, DontCare::IsOne);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS    (sut.BitsCount(),       expectedBitsCount);
+    TS_ASSERT_SAME_DATA (sut.DataLeftAligned(), expectedBytes.data(), expectedBytes.size());
+  };
+
+  using data_t = tuple<string_view, uint32_t, initializer_list<uint8_t>>;
+
+  initializer_list<data_t> data =  // Input, bits count, bytes
+  {
+    data_t("x1",              2,  {0b11000000}),             // 00
+    data_t("x0",              2,  {0b10000000}),             // 01
+    data_t("0x",              2,  {0b01000000}),             // 02
+    data_t("1x11",            4,  {0b11110000}),             // 03
+    data_t("11100x001",       9,  {0b11100100, 0b10000000}), // 04
+    data_t("011Xx101",        8,  {0b01111101}),             // 05
+    data_t("10011xXx  xx01",  12, {0b10011111, 0b11010000}), // 06
+    data_t("10x01011, 10111", 13, {0b10101011, 0b10111000}), // 07
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
 //! Checks BinaryVector::CreateFromHexString()
 //!
 //! @note Suppose that CreateFromBinaryString is working properly
@@ -410,6 +497,97 @@ void UT_BinaryVector::test_CreateFromHexString_InvalidChars ()
 }
 
 
+//! Checks BinaryVector::CreateFromHexString() replacing don't care characters 'x' and 'X' with zeros
+//!
+void UT_BinaryVector::test_CreateFromHexString_DontCare_as_Zero ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto input             = std::get<0>(data);
+    auto expectedBitsCount = std::get<1>(data);
+    auto expectedBytes     = vector<uint8_t>(std::get<2>(data));
+
+    // ---------------- Exercise
+    //
+    auto sut = BinaryVector::CreateFromHexString(input, SizeProperty::NotFixed, DontCare::IsZero);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS    (sut.BitsCount(),       expectedBitsCount);
+    TS_ASSERT_SAME_DATA (sut.DataLeftAligned(), expectedBytes.data(), expectedBytes.size());
+  };
+
+  using data_t = tuple<string_view, uint32_t, initializer_list<uint8_t>>;
+
+  initializer_list<data_t> data =  // Input, bits count, bytes
+  {
+    data_t("5",      4,  {0x50}),             // 00
+    data_t("x",      4,  {0x00}),             // 01
+    data_t("x1",     8,  {0x01}),             // 02
+    data_t("2x",     8,  {0x20}),             // 03
+    data_t("3x4",    12, {0x30, 0x40}),       // 04
+    data_t("34x5",   16, {0x34, 0x05}),       // 05
+    data_t("345X",   16, {0x34, 0x50}),       // 06
+    data_t("3x4x5",  20, {0x30, 0x40, 0x50}), // 07
+    data_t("34xx56", 24, {0x34, 0x00, 0x56}), // 08
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::CreateFromHexString() replacing don't care characters 'x' and 'X' with zeros
+//!
+void UT_BinaryVector::test_CreateFromHexString_DontCare_as_One ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto input             = std::get<0>(data);
+    auto expectedBitsCount = std::get<1>(data);
+    auto expectedBytes     = vector<uint8_t>(std::get<2>(data));
+
+    // ---------------- Exercise
+    //
+    auto sut = BinaryVector::CreateFromHexString(input, SizeProperty::NotFixed, DontCare::IsOne);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS    (sut.BitsCount(),       expectedBitsCount);
+    TS_ASSERT_SAME_DATA (sut.DataLeftAligned(), expectedBytes.data(), expectedBytes.size());
+  };
+
+  using data_t = tuple<string_view, uint32_t, initializer_list<uint8_t>>;
+
+  initializer_list<data_t> data =  // Input, bits count, bytes
+  {
+    data_t("5",      4,  {0x50}),             // 00
+    data_t("x",      4,  {0xF0}),             // 01
+    data_t("x1",     8,  {0xF1}),             // 02
+    data_t("2X",     8,  {0x2F}),             // 03
+    data_t("3x4",    12, {0x3F, 0x40}),       // 04
+    data_t("34x5",   16, {0x34, 0xF5}),       // 05
+    data_t("345X",   16, {0x34, 0x5F}),       // 06
+    data_t("3x4x5",  20, {0x3F, 0x4F, 0x50}), // 07
+    data_t("34xx56", 24, {0x34, 0xFF, 0x56}), // 08
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+
 //! Checks BinaryVector::CreateFromString()
 //!
 //! @note Suppose that CreateFromString is working properly
@@ -502,7 +680,7 @@ void UT_BinaryVector::test_CreateFromString_InvalidChars ()
   {
     // ---------------- Exercise & Verify
     //
-    TS_ASSERT_THROWS (BinaryVector::CreateFromString(bits), std::exception);
+    TS_ASSERT_THROWS (BinaryVector::CreateFromString(bits, SizeProperty::NotFixed, DontCare::IsError), std::exception);
   };
 
   auto inputs =
@@ -528,6 +706,116 @@ void UT_BinaryVector::test_CreateFromString_InvalidChars ()
   // ---------------- DDT Exercise
   //
   TS_DATA_DRIVEN_TEST (checker, inputs);
+}
+
+
+//! Checks BinaryVector::CreateFromString() replacing don't care characters 'x' and 'X' with zeros
+//!
+void UT_BinaryVector::test_CreateFromString_DontCare_as_Zero ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto input             = std::get<0>(data);
+    auto expectedBitsCount = std::get<1>(data);
+    auto expectedBytes     = vector<uint8_t>(std::get<2>(data));
+
+    // ---------------- Exercise
+    //
+    auto sut = BinaryVector::CreateFromString(input, SizeProperty::NotFixed, DontCare::IsZero);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS    (sut.BitsCount(),       expectedBitsCount);
+    TS_ASSERT_SAME_DATA (sut.DataLeftAligned(), expectedBytes.data(), expectedBytes.size());
+  };
+
+  using data_t = tuple<string_view, uint32_t, initializer_list<uint8_t>>;
+
+  initializer_list<data_t> data =  // Input, bits count, bytes
+  {
+    data_t("0x5",               4,  {0x50}),                          // 00
+    data_t("0xx",               4,  {0x00}),                          // 01
+    data_t("0xx1",              8,  {0x01}),                          // 02
+    data_t("0x2x",              8,  {0x20}),                          // 03
+    data_t("0x3x4",             12, {0x30, 0x40}),                    // 04
+    data_t("0x34x5",            16, {0x34, 0x05}),                    // 05
+    data_t("0x345X",            16, {0x34, 0x50}),                    // 06
+    data_t("0x3x4x5",           20, {0x30, 0x40, 0x50}),              // 07
+    data_t("0x34xx56",          24, {0x34, 0x00, 0x56}),              // 08
+    data_t("0bx1",              2,  {0b01000000}),                    // 09
+    data_t("0b1x",              2,  {0b10000000}),                    // 10
+    data_t("0b1x11",            4,  {0b10110000}),                    // 11
+    data_t("0b11100x001",       9,  {0b11100000, 0b10000000}),        // 12
+    data_t("0b011Xx101",        8,  {0b01100101}),                    // 13
+    data_t("0b10011xxx  xX01",  12, {0b10011000, 0b00010000}),        // 14
+    data_t("0b10001011, 10111", 13, {0b10001011, 0b10111000}),        // 15
+    data_t("0x34x5/b11x",       19, {0x34, 0x05, 0b11000000}),        // 16
+    data_t("0b1x10/x12x345",    28, {0b10100001, 0x20, 0x34, 0x50 }), // 17
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::CreateFromString() replacing don't care characters 'x' and 'X' with ones
+//!
+void UT_BinaryVector::test_CreateFromString_DontCare_as_One ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto input             = std::get<0>(data);
+    auto expectedBitsCount = std::get<1>(data);
+    auto expectedBytes     = vector<uint8_t>(std::get<2>(data));
+
+    // ---------------- Exercise
+    //
+    auto sut = BinaryVector::CreateFromString(input, SizeProperty::NotFixed, DontCare::IsOne);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS    (sut.BitsCount(),       expectedBitsCount);
+    TS_ASSERT_SAME_DATA (sut.DataLeftAligned(), expectedBytes.data(), expectedBytes.size());
+  };
+
+  using data_t = tuple<string_view, uint32_t, initializer_list<uint8_t>>;
+
+  initializer_list<data_t> data =  // Input, bits count, bytes
+  {
+    data_t("0x5",              4,  {0x50}),                                            // 00
+    data_t("0xx",              4,  {0xF0}),                                            // 01
+    data_t("0xx1",             8,  {0xF1}),                                            // 02
+    data_t("0x2x",             8,  {0x2F}),                                            // 03
+    data_t("0x3x4",            12, {0x3F, 0x40}),                                      // 04
+    data_t("0x34x5",           16, {0x34, 0xF5}),                                      // 05
+    data_t("0x345X",           16, {0x34, 0x5F}),                                      // 06
+    data_t("0x3x4x5",          20, {0x3F, 0x4F, 0x50}),                                // 07
+    data_t("0x34xx56",         24, {0x34, 0xFF, 0x56}),                                // 08
+    data_t("0bx1",             2,  {0b11000000}),                                      // 09
+    data_t("0b1x",             2,  {0b11000000}),                                      // 10
+    data_t("0b1x11",           4,  {0b11110000}),                                      // 11
+    data_t("0b11100x001",      9,  {0b11100100, 0b10000000}),                          // 12
+    data_t("0b011Xx101",       8,  {0b01111101}),                                      // 13
+    data_t("0b10011xxx:xX01",  12, {0b10011111, 0b11010000}),                          // 14
+    data_t("0bX1001011:10111", 13, {0b11001011, 0b10111000}),                          // 15
+    data_t("0x34x5/b10x",      19, {0x34, 0xF5, 0b10100000}),                          // 16
+    data_t("0b1x10/x12x345",   28, {0b11100001, 0x2F, 0x34, 0x50 }),                   // 17
+    data_t("0B1x10/x12x345",   28, {0b11100001, 0x2F, 0x34, 0x50 }),                   // 18
+    data_t("0b1Xx10/X12x345",  29, {0b11110000, 0b10010111, 0b10011010, 0b00101000 }), // 19
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
 }
 
 

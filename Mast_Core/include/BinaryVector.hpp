@@ -40,6 +40,15 @@ enum class SizeProperty
   FixedOnCopy, //!< Same as Fixed, except the property is copied (and moved)
 };
 
+//! Tells how don't care is supported
+//!
+enum class DontCare
+{
+  IsError, //!< Don't care is not supported, so 'x' or 'X' outside format specifier is an error
+  IsZero,  //!< 'x' or 'X' outside format specifier are replaced with zeros
+  IsOne,   //!< 'x' or 'X' outside format specifier are replaced with ones
+};
+
 //! Contains bitstream vector in compact binary format
 //!
 class DLL_EXPORT BinaryVector final
@@ -62,9 +71,9 @@ class DLL_EXPORT BinaryVector final
 
   using string_view = std::experimental::string_view;
 
-  static BinaryVector CreateFromBinaryString (string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed);   //!< Creates a BinaryVector from text binary representation
-  static BinaryVector CreateFromHexString    (string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed);   //!< Creates a BinaryVector from text hexadecimal representation
-  static BinaryVector CreateFromString       (string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed);   //!< Creates a BinaryVector from mixed hexadecimal and binary representation
+  static BinaryVector CreateFromBinaryString (string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed, DontCare dontCare = DontCare::IsError);   //!< Creates a BinaryVector from text binary representation
+  static BinaryVector CreateFromHexString    (string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed, DontCare dontCare = DontCare::IsError);   //!< Creates a BinaryVector from text hexadecimal representation
+  static BinaryVector CreateFromString       (string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed, DontCare dontCare = DontCare::IsError);   //!< Creates a BinaryVector from mixed hexadecimal and binary representation
 
   //! Creates a BinaryVector from a buffer with right aligned data (first byte is partially used and last one if fully used)
   //!

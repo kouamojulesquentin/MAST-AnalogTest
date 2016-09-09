@@ -18,7 +18,7 @@
 #include <vector>
 #include <string>
 
-#if defined(USE_OPEN_OCD)
+#ifndef _WIN32
 
 extern "C"
 {
@@ -56,7 +56,7 @@ using std::experimental::string_view;
 
 //! Initializes OpenOCD "engine"
 //!
-#if not defined(USE_OPEN_OCD)
+#ifdef _WIN32
 OpenOCDProtocol::OpenOCDProtocol (string_view /* configFilePath */, string_view /* designName */, int /* iIrLength */)
 {
 }
@@ -127,7 +127,7 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, string_view design
 //!
 OpenOCDProtocol::~OpenOCDProtocol()
 {
-  #if defined(USE_OPEN_OCD)
+  #ifndef _WIN32
 
   // Here we put the tap in RESET state
   if(m_supportTrst)
@@ -169,7 +169,7 @@ OpenOCDProtocol::~OpenOCDProtocol()
 //!
 //! @return Bitstream retrieved from SUT
 //!
-#if not defined(USE_OPEN_OCD)
+#ifdef _WIN32
 BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   switch (derivationId)
@@ -212,12 +212,20 @@ BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfac
                                         // Using FSM instead.
       break;
     case 1u:
-      LOG(INFO) << "OpenOCD_IR(" << toSutData.DataAsMixString() << ")";
-      jtag_add_plain_ir_scan(bitsCount, toSutData.DataLeftAligned(), fromSutDataBuffer.data(), TAP_IDLE);
+      {
+        vector<uint8_t> v_openocd_ir = toSutData.DataRightAligned();
+        reverse(v_openocd_ir.begin(), v_openocd_ir.end());
+        LOG(INFO) << "OpenOCD_IR(" << toSutData.DataAsMixString() << ")";
+        jtag_add_plain_ir_scan(bitsCount, v_openocd_ir.data(), fromSutDataBuffer.data(), TAP_IDLE);
+      }
       break;
     case 2u:
-      LOG(INFO) << "OpenOCD_DR(" << toSutData.DataAsMixString() << ")";
-      jtag_add_plain_dr_scan(bitsCount, toSutData.DataLeftAligned(), fromSutDataBuffer.data(), TAP_IDLE);
+      {
+        vector<uint8_t> v_openocd_dr = toSutData.DataRightAligned();
+        reverse(v_openocd_dr.begin(), v_openocd_dr.end());
+        LOG(INFO) << "OpenOCD_DR(" << toSutData.DataAsMixString() << ")";
+        jtag_add_plain_dr_scan(bitsCount, v_openocd_dr.data(), fromSutDataBuffer.data(), TAP_IDLE);
+      }
       break;
     default:
       THROW_INVALID_ARGUMENT("DerivationId must be '0' (for Reset), '1' (for SIR) or '2' (for SDR)");
@@ -228,7 +236,11 @@ BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfac
 
   CHECK_TRUE(ir == ERROR_OK, "[OpenOCD] jtag_execute_queue has failed.");
 
-  auto   fromSutData = BinaryVector(fromSutDataBuffer, bitsCount);
+  vector<uint8_t> v_openocd_out = fromSutDataBuffer;
+  reverse(v_openocd_out.begin(), v_openocd_out.end());
+
+  auto   fromSutData = BinaryVector::CreateFromRightAlignedBuffer(v_openocd_out, bitsCount);
+
   return fromSutData;
 }
 #endif

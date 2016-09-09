@@ -61,7 +61,7 @@ class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
   // ---------------- Private  Fields
   //
   private:
-  #if defined(USE_OPEN_OCD)
+  #ifndef _WIN32
   command_context* m_cmd_ctx;          //!< OpenOCD structure containing the whole context of the current OpenOCD session configuration.
 
   //! Some adapters and JTAG TAP do not provide a TRST pin.

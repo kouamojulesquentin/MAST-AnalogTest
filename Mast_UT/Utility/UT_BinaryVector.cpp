@@ -6679,7 +6679,7 @@ void UT_BinaryVector::test_Slice_When_Exceeding_Capacity ()
 }
 
 
-//! Checks BinaryVector::DataRightAligned() `...`
+//! Checks BinaryVector::DataRightAligned()
 //!
 void UT_BinaryVector::test_DataRightAligned ()
 {
@@ -6743,6 +6743,126 @@ void UT_BinaryVector::test_DataRightAligned ()
   //
   TS_DATA_DRIVEN_TEST(checker, data);
 }
+
+
+//! Checks BinaryVector::CreateFromRightAlignedBuffer()
+//!
+void UT_BinaryVector::test_CreateFromRightAlignedBuffer ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto buffer   = vector<uint8_t>(std::get<0>(data));
+    auto expected = BinaryVector::CreateFromString(std::get<1>(data));
+
+    // ---------------- Exercise
+    //
+    auto rightAligned = BinaryVector::CreateFromRightAlignedBuffer(buffer, expected.BitsCount());
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (rightAligned, expected);
+  };
+
+  using data_t = tuple<initializer_list<uint8_t>, string_view> ;
+  initializer_list<data_t> data =
+  {
+    data_t({0x00},                      "0b"),                                // 00
+    data_t({0xA5},                      "0xA5"),                              // 01
+    data_t({0xA5,  0xB6},               "0xA5B6"),                            // 02
+    data_t({0x0A,  0x5B,  0x6C},        "0xA5B6C"),                           // 03
+    data_t({0x00},                      "0b0"),                               // 04
+    data_t({0x01},                      "0b1"),                               // 05
+    data_t({0x01},                      "0b01"),                              // 06
+    data_t({0x02},                      "0b10"),                              // 07
+    data_t({0x03},                      "0b11"),                              // 08
+    data_t({0x04},                      "0b100"),                             // 09
+    data_t({0x05},                      "0b101"),                             // 10
+    data_t({0x06},                      "0b110"),                             // 11
+    data_t({0x07},                      "0b111"),                             // 12
+    data_t({0x0E},                      "0b1110"),                            // 13
+    data_t({0x16},                      "0b1_0110"),                          // 14
+    data_t({0x26},                      "0b10_0110"),                         // 15
+    data_t({0x46},                      "0b100_0110"),                        // 16
+    data_t({0x00,  0x96},               "0b0_1001_0110"),                     // 17
+    data_t({0x03,  0xA6},               "0b11_1010_0110"),                    // 18
+    data_t({0x07,  0xA6},               "0b111_1010_0110"),                   // 19
+    data_t({0x07,  0xA6},               "0b0_0111_1010_0110"),                // 20
+    data_t({0x17,  0xA6},               "0b01_0111_1010_0110"),               // 21
+    data_t({0x27,  0xA6},               "0b10_0111_1010_0110"),               // 22
+    data_t({0x67,  0xA6},               "0b110_0111_1010_0110"),              // 23
+    data_t({0x00,  0xA7,  0xA6},        "0b0_1010_0111_1010_0110"),           // 24
+    data_t({0x02,  0xA7,  0xA6},        "0b10:1010_0111:1010_0110"),          // 25
+    data_t({0x06,  0xA7,  0xA6},        "0b110:1010_0111:1010_0110"),         // 26
+    data_t({0x0E,  0xA7,  0xA6},        "0b1110:1010_0111:1010_0110"),        // 27
+    data_t({0x1E,  0xA7,  0xA6},        "0b1_1110:1010_0111:1010_0110"),      // 28
+    data_t({0x36,  0xB7,  0xA6},        "0b11_0110:1011_0111:1010_0110"),     // 29
+    data_t({0x65,  0x43,  0x21},        "0b110_0101:0100_0011:0010_0001"),    // 30
+    data_t({0x56,  0xB7,  0xA6},        "0b101_0110:1011_0111:1010_0110"),    // 31
+    data_t({0xD6,  0xB7,  0xA6},        "0b1101_0110:1011_0111:1010_0110"),   // 32
+    data_t({0x01,  0xD6,  0xB7,  0xA6}, "0b1:1101_0110:1011_0111:1010_0110"), // 33
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks BinaryVector::CreateFromRightAlignedBuffer() using moveable source buffer
+//!
+void UT_BinaryVector::test_CreateFromRightAlignedBuffer_Moved ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto buffer   = vector<uint8_t>(std::get<0>(data));
+    auto expected = BinaryVector::CreateFromString(std::get<1>(data));
+
+    // ---------------- Exercise
+    //
+    auto rightAligned = BinaryVector::CreateFromRightAlignedBuffer(std::move(buffer), expected.BitsCount());
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (rightAligned, expected);
+  };
+
+  using data_t = tuple<initializer_list<uint8_t>, string_view> ;
+  initializer_list<data_t> data =
+  {
+    data_t({0x00},                      "0b"),                                // 00
+    data_t({0xA5},                      "0xA5"),                              // 01
+    data_t({0xA5,  0xB6},               "0xA5B6"),                            // 02
+    data_t({0x0A,  0x5B,  0x6C},        "0xA5B6C"),                           // 03
+    data_t({0x00},                      "0b0"),                               // 04
+    data_t({0x01},                      "0b1"),                               // 05
+    data_t({0x03},                      "0b11"),                              // 06
+    data_t({0x06},                      "0b110"),                             // 07
+    data_t({0x0E},                      "0b1110"),                            // 08
+    data_t({0x26},                      "0b10_0110"),                         // 09
+    data_t({0x00,  0x96},               "0b0_1001_0110"),                     // 10
+    data_t({0x07,  0xA6},               "0b111_1010_0110"),                   // 11
+    data_t({0x17,  0xA6},               "0b01_0111_1010_0110"),               // 12
+    data_t({0x67,  0xA6},               "0b110_0111_1010_0110"),              // 13
+    data_t({0x06,  0xA7,  0xA6},        "0b110:1010_0111:1010_0110"),         // 14
+    data_t({0x36,  0xB7,  0xA6},        "0b11_0110:1011_0111:1010_0110"),     // 15
+    data_t({0x56,  0xB7,  0xA6},        "0b101_0110:1011_0111:1010_0110"),    // 16
+    data_t({0x01,  0xD6,  0xB7,  0xA6}, "0b1:1101_0110:1011_0111:1010_0110"), // 17
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
 
 //===========================================================================
 // End of UT_BinaryVector.cpp

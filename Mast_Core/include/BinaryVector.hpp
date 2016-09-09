@@ -66,6 +66,15 @@ class DLL_EXPORT BinaryVector final
   static BinaryVector CreateFromHexString    (string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed);   //!< Creates a BinaryVector from text hexadecimal representation
   static BinaryVector CreateFromString       (string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed);   //!< Creates a BinaryVector from mixed hexadecimal and binary representation
 
+  //! Creates a BinaryVector from a buffer with right aligned data (first byte is partially used and last one if fully used)
+  //!
+  static BinaryVector CreateFromRightAlignedBuffer (const std::vector<uint8_t>& buffer, uint32_t bitsCount, SizeProperty sizeProperty = SizeProperty::NotFixed);
+
+
+  //! Creates a BinaryVector from a "moveable" buffer with right aligned data (first byte is partially used and last one if fully used)
+  //!
+  static BinaryVector CreateFromRightAlignedBuffer (std::vector<uint8_t>&& buffer, uint32_t bitsCount, SizeProperty sizeProperty = SizeProperty::NotFixed);
+
 
   std::string DataAsBinaryString(string_view quadSeparator = "_",
                                  string_view octoSeparator = ":",
@@ -175,17 +184,24 @@ class DLL_EXPORT BinaryVector final
   bool FixedSize()  const { return m_sizeProperty == SizeProperty::Fixed; }
   bool IsNegative() const { return (m_data[0] & 0x80) != 0; }
 
+  //! Computes the minimal number of bytes to hold a number of bits
+  //!
+  static uint32_t BytesCountFromBitsCount(uint32_t bitsCount) { return (bitsCount + 7) / 8; }
 
-  uint8_t LastByteBitsCount() const
+  static void ShiftBufferLeft(const uint8_t* pSource, uint8_t* pDest, uint32_t bytesCount, uint8_t leftShiftCount);
+  static void ShiftBufferLeft(const std::vector<uint8_t>& sourceBuffer, std::vector<uint8_t>& destBuffer, uint32_t bitsCount);
+
+  static uint8_t  LastByteBitsCount(uint32_t usedBits)
   {
-    if (m_usedBits == 0) return 0;
+    if (usedBits == 0) return 0;
 
-    auto bitsCount = m_usedBits % 8u;
+    auto bitsCount = usedBits % 8u;
     if (bitsCount == 0) bitsCount = 8u;
 
     return bitsCount;
   }
 
+  uint8_t LastByteBitsCount() const { return LastByteBitsCount(m_usedBits); }
 
 
   // ---------------- Private  Fields
@@ -198,6 +214,7 @@ class DLL_EXPORT BinaryVector final
 //
 //  End of BinaryVector class declaration
 //---------------------------------------------------------------------------
+
 
 //! Bitwise 'and'
 //!

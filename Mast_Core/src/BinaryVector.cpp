@@ -16,6 +16,7 @@
 #include <sstream>
 #include <array>
 #include <algorithm>
+#include <cstring>
 
 
 using std::array;
@@ -502,521 +503,6 @@ void BinaryVector::ClearBit (uint32_t bitOffset)
 //---------------------------------------------------------------------------
 
 
-
-//! Gets content as formatted binary string
-//!
-//! @note An example of formatting is: 0001_1111:0011_0100:0101_010
-//!
-//! @param octoSeparator  Characters to insert every 8 bits
-//! @param quadSeparator  Characters to insert every 4 bits
-//! @param bytesPerLine   Number of bytes (sequence of 8 bits) to write per line.
-//!                       When zero, all is on the "same line"
-//! @param eolSeparator   Characters to insert just before new lines (when bytesPerLine != 0)
-//! @param prefixWith0b   When true, "0b" will be prepended to the resulting string
-//!
-string BinaryVector::DataAsBinaryString (string_view quadSeparator,
-                                         string_view octoSeparator,
-                                         uint32_t    bytesPerLine,
-                                         string_view eolSeparator,
-                                         bool        prefixWith0b
-                                        ) const
-{
-
-  ostringstream os;
-  uint32_t      nibblesCount = 0;
-  uint32_t      bytesCount   = 0;
-
-  auto appendNibble = [&](string_view nibble)
-  {
-    if (nibblesCount == 1)
-    {
-      os << quadSeparator;
-    }
-    else if (nibblesCount == 2)
-    {
-      nibblesCount = 0;
-      ++bytesCount;
-      if (bytesCount == bytesPerLine)
-      {
-        os << eolSeparator << std::endl;
-      }
-      else
-      {
-        os << octoSeparator;
-      }
-    }
-
-    ++nibblesCount;
-    os << nibble;
-  };
-
-  auto appendBits = [&](uint8_t bitsOnLsb, uint32_t bitsCount)
-  {
-    if (bitsCount != 0)
-    {
-      auto nibble = BINARY_NIBBLES[bitsOnLsb];       // Get string representation with padded zero on the right
-      nibble = string_view(nibble.data(), bitsCount);
-      appendNibble(nibble);
-    }
-  };
-
-  if (prefixWith0b)
-  {
-    os << "0b";
-  }
-
-  auto bitsCount = m_usedBits;
-
-  for (auto byte : m_data)
-  {
-    if (bitsCount >= 8)
-    {
-      appendNibble(BINARY_NIBBLES[byte >> 4]);
-      appendNibble(BINARY_NIBBLES[byte &  0x0F]);
-      bitsCount -= 8;
-    }
-    else if (bitsCount >= 4)
-    {
-      appendNibble(BINARY_NIBBLES[byte >> 4]);
-      bitsCount -= 4;
-      appendBits(byte & 0x0F, bitsCount);
-    }
-    else
-    {
-      byte = (byte >> 4) & 0x0F; // Put bits on LSB
-      appendBits(byte, bitsCount);
-    }
-  }
-
-  return os.str();
-}
-//
-//  End of: BinaryVector::DataAsBinaryString
-//---------------------------------------------------------------------------
-
-
-//! Gets content as formatted hexadecimal string (as saved internally - bits are appended from left to right)
-//!
-//! @note An example of formatting is: FACE_DEAD:BEEF_0123:CAFE_4 (where last '4' may mean '0b0100' or '0b010' or '0b01')
-//! @note For precise display of last bits, please use DataAsMixString (or DataAsBinaryString)
-//!
-//! @param octoSeparator   Characters to insert every 32 bits
-//! @param quadSeparator   Characters to insert every 16 bits
-//! @param bytesPerLine    Number of bytes (sequence of 8 bits) to write per line.
-//!                        When zero, all is on the "same line"
-//! @param eolSeparator    Characters to insert just before new lines character (when bytesPerLine != 0)
-//! @param prefixWith0x    When true, "0x" will be prepended to the resulting string
-//!
-string BinaryVector::DataAsHexString (string_view quadSeparator,
-                                      string_view octoSeparator,
-                                      uint32_t    bytesPerLine,
-                                      string_view eolSeparator,
-                                      bool        prefixWith0x
-                                     ) const
-{
-  // ---------------- Associate 4 bits value with its hexadecimal representation
-  //
-  static const std::array<string_view, 16> nibbles =
-  {
-    "0",  // 00
-    "1",  // 01
-    "2",  // 02
-    "3",  // 03
-    "4",  // 04
-    "5",  // 05
-    "6",  // 06
-    "7",  // 07
-    "8",  // 08
-    "9",  // 09
-    "A",  // 10
-    "B",  // 11
-    "C",  // 12
-    "D",  // 13
-    "E",  // 14
-    "F",  // 15
-  };
-
-  ostringstream os;
-  uint32_t      nibblesCount = 0;
-  uint32_t      bytesCount   = 0;
-
-  auto appendNibble = [&](string_view nibble)
-  {
-    if ((nibblesCount != 0) && ((nibblesCount % 2) == 0))
-    {
-      ++bytesCount;
-      if (bytesCount == bytesPerLine)
-      {
-        nibblesCount = 0;
-        bytesCount   = 0;
-
-        os << eolSeparator << std::endl;
-      }
-      else if (nibblesCount == 4)
-      {
-        os << quadSeparator;
-      }
-      else if (nibblesCount == 8)
-      {
-        nibblesCount = 0;
-        os << octoSeparator;
-      }
-    }
-
-    ++nibblesCount;
-    os << nibble;
-  };
-
-  if (prefixWith0x)
-  {
-    os << "0x";
-  }
-
-
-  auto bitsCount = m_usedBits;
-
-  for (auto byte : m_data)
-  {
-    if (bitsCount >= 8)
-    {
-      appendNibble(nibbles[byte >> 4]);
-      appendNibble(nibbles[byte &  0x0F]);
-      bitsCount -= 8;
-    }
-    else if (bitsCount > 4)
-    {
-      appendNibble(nibbles[byte >> 4]);
-      bitsCount -= 4;
-      appendNibble(nibbles[byte & LEFT_BITS_MASK_4[bitsCount]]);
-    }
-    else
-    {
-      byte >>= 4;         // Put bits on least significant nibble
-      appendNibble(nibbles[byte & LEFT_BITS_MASK_4[bitsCount]]);
-    }
-  }
-
-  return os.str();
-}
-//
-//  End of: BinaryVector::DataAsHexString
-//---------------------------------------------------------------------------
-
-
-//! Gets content as formatted hexadecimal or/and binary string
-//!
-//!
-//! @note An example of formatting is: 0xFACE_DEAD:BEEF_0123:CAFE_/b01
-//!
-//! @param hexStyleThreshold  The number of bits that makes the result starting as hex string (preference is to be >= 8)
-//! @param octaSeparator      Characters to insert every 8 digits
-//! @param quadSeparator      Characters to insert every 4 digits
-//! @param bytesPerLine       Number of bytes (sequence of 8 bits) to write per line.
-//!                           When zero, all is on the "same line"
-//! @param eolSeparator       Characters to insert just before new lines character (when bytesPerLine != 0)
-//!
-string BinaryVector::DataAsMixString (uint32_t    hexStyleThreshold,
-                                      string_view quadSeparator,
-                                      string_view octaSeparator,
-                                      uint32_t    bytesPerLine,
-                                      string_view eolSeparator) const
-{
-  if (m_usedBits == 0)
-  {
-    return "";
-  }
-
-  if (m_usedBits < hexStyleThreshold)
-  {
-    return DataAsBinaryString(quadSeparator, octaSeparator, bytesPerLine, eolSeparator, true);
-  }
-
-  auto smartString       = DataAsHexString(quadSeparator, octaSeparator, bytesPerLine, eolSeparator, true);
-  auto lastByteBitsCount = m_usedBits % 8;
-  auto lastQuadBitsCount = m_usedBits % 4;
-
-  if (lastQuadBitsCount != 0)
-  {
-    // ---------------- Replace last digit with its binary equivalent
-    //
-    auto shiftCount = (lastByteBitsCount < 4) ? 8u - lastQuadBitsCount    // For cases last bits are on msb
-                                              : 4u - lastQuadBitsCount;   // For cases last bits are on lsb
-    auto byte       = (m_data.back() >> shiftCount) & 0x0F;
-    auto lastBits   = BINARY_NIBBLES[byte].substr(4u - lastQuadBitsCount, lastQuadBitsCount);
-    smartString     = smartString.substr(0, smartString.length() - 1) + "/b"s + string(lastBits);
-  }
-  return smartString;
-}
-//
-//  End of: BinaryVector::DataAsMixString
-//---------------------------------------------------------------------------
-
-
-//! Returns data right aligned in a new buffer
-//!
-//! @note Internal representation is left aligned.
-//!       For example for a 23 bits BinaryVector with value 0x654321 (0b110_0101_0100_0011_0010_0001)
-//!       Will be in memory (with increased address)
-//!       Left aligned:   [CA][86][42]  (0b11001010:10000110:01000010)
-//!       Right aligned:  [65][43][21]  (0b01100101:01000011:00100001)
-//!
-//! @note To be cache friendly data are processed in increased address order
-vector<uint8_t> BinaryVector::DataRightAligned () const
-{
-  vector<uint8_t> rightAligned;
-
-  auto binVectorLsbBits = m_usedBits % 8; // This is the number of meaningful bits on last byte in BinaryVector representation (left aligned)
-
-  if (binVectorLsbBits == 0) // Deal with fast case
-  {
-    rightAligned = m_data;
-  }
-  else     // Deal with case, right aligned bytes are stranded on two bytes of left aligned version
-  {
-    rightAligned.reserve(m_data.size());
-
-    auto pBegin = m_data.cbegin();
-    auto pEnd   = m_data.cend();
-    auto pByte  = pBegin;
-
-    uint8_t  bufferShiftCount   = 8u - binVectorLsbBits;  // This is the number of meaningful bits on first byte in right aligned result
-    uint32_t remainingBitsCount = m_usedBits;
-    uint8_t  byte = 0;
-
-    // ---------------- Process first bits (on first byte)
-    //
-    byte   = *pByte;
-    byte >>= bufferShiftCount;
-    byte  &= RIGHT_BITS_MASK_8[binVectorLsbBits];
-
-    rightAligned.push_back(byte);
-
-    // ---------------- Process other bytes
-    //
-    remainingBitsCount -= binVectorLsbBits;
-    while ((remainingBitsCount != 0) && (pByte < pEnd))
-    {
-      uint8_t msb = *pByte++;   // msb for result is on lsb of "left" byte of binary BinaryVector
-      uint8_t lsb = *pByte;     // lsb for result is on msb of "right" byte of binary BinaryVector
-
-      // ---------------- Merge bytes
-      //
-      // e.g. : [xxxmmmmm][lllyyyyy] ==> [mmmmmlll]
-      //           msb        lsb           byte
-      //
-      msb <<= binVectorLsbBits;
-      lsb >>= bufferShiftCount;
-      msb &= LEFT_BITS_MASK_8[bufferShiftCount];
-      lsb &= RIGHT_BITS_MASK_8[binVectorLsbBits];
-
-      uint8_t byte = msb | lsb;
-      rightAligned.push_back(byte);
-
-      remainingBitsCount -= 8;
-    }
-  }
-
-  return rightAligned;
-}
-//
-//  End of: BinaryVector::DataRightAligned
-//---------------------------------------------------------------------------
-
-
-
-//! Copy assignment
-//!
-//! @note Does not change the fixed size property
-//!
-BinaryVector& BinaryVector::operator= (const BinaryVector& rhs)
-{
-  CHECK_FIXED_SIZE_ASSIGNMENT(rhs.m_usedBits);
-
-  m_data         = rhs.m_data;
-  m_usedBits     = rhs.m_usedBits;
-  m_sizeProperty = rhs.m_sizeProperty == SizeProperty::FixedOnCopy ? SizeProperty::FixedOnCopy : m_sizeProperty;
-
-  return *this;
-}
-//
-//  End of: BinaryVector::BinaryVector
-//---------------------------------------------------------------------------
-
-
-//! Move assignment
-//!
-//! @note Does not change the fixed size property
-//!
-BinaryVector& BinaryVector::operator= (BinaryVector&& rhs)
-{
-  if (this != &rhs)
-  {
-    CHECK_FIXED_SIZE_ASSIGNMENT(rhs.m_usedBits);
-    m_data         = std::move(rhs.m_data);
-    m_usedBits     = rhs.m_usedBits;
-    m_sizeProperty = rhs.m_sizeProperty == SizeProperty::FixedOnCopy ? SizeProperty::FixedOnCopy : m_sizeProperty;
-
-    rhs.m_usedBits     = 0;
-    rhs.m_sizeProperty = SizeProperty::NotFixed;
-  }
-
-  return *this;
-}
-//
-//  End of: BinaryVector::BinaryVector
-//---------------------------------------------------------------------------
-
-
-
-//! Returns true when *this is equal to another BinaryVector
-//!
-//! @note Fixed size property is not compare (only the value)
-//!
-bool BinaryVector::operator== (const BinaryVector& rhs) const
-{
-  if (m_usedBits != rhs.m_usedBits)
-  {
-    return false;
-  }
-
-  if (m_usedBits == 0)
-  {
-    return true;
-  }
-
-  auto bitsOnLastByte = m_usedBits % 8;
-  auto areEqual       = true;
-
-  if (bitsOnLastByte == 0)
-  {
-    areEqual = m_data == rhs.m_data;
-  }
-  else
-  {
-    if (m_data.size() > 1)
-    {
-      areEqual = std::equal(m_data.cbegin(), m_data.cend() - 1, rhs.m_data.cbegin(), rhs.m_data.cend() - 1);
-    }
-
-    if (areEqual)
-    {
-      auto left  = m_data.back()     & LEFT_BITS_MASK_8[bitsOnLastByte];
-      auto right = rhs.m_data.back() & LEFT_BITS_MASK_8[bitsOnLastByte];
-
-      areEqual = left == right;
-    }
-  }
-
-  return areEqual;
-}
-//
-//  End of: BinaryVector::operator==
-//---------------------------------------------------------------------------
-
-
-
-//! Returns another BinaryVector with every bits toggles
-//!
-BinaryVector BinaryVector::operator~ () const
-{
-  BinaryVector toggled(*this);
-
-  toggled.ToggleBits();
-  return toggled;
-}
-//
-//  End of: BinaryVector::operator~
-//---------------------------------------------------------------------------
-
-
-//! Bitwise and with another vector
-//!
-BinaryVector& BinaryVector::operator&= (const BinaryVector& rhs)
-{
-  CHECK_SAME_SIZE(rhs);
-
-  auto left  = m_data.begin();
-  auto right = rhs.m_data.cbegin();
-
-  while (left != m_data.end())
-  {
-    *left++ &= *right++;
-  }
-
-  MaskLastByte();
-
-  return *this;
-}
-//
-//  End of: BinaryVector::operator&=
-//---------------------------------------------------------------------------
-
-
-//! Bitwise or with another vector
-//!
-BinaryVector& BinaryVector::operator|= (const BinaryVector& rhs)
-{
-  CHECK_SAME_SIZE(rhs);
-
-  auto left  = m_data.begin();
-  auto right = rhs.m_data.cbegin();
-
-  while (left != m_data.end())
-  {
-    *left++ |= *right++;
-  }
-
-  MaskLastByte();
-
-  return *this;
-}
-//
-//  End of: BinaryVector::operator&=
-//---------------------------------------------------------------------------
-
-
-//! Bitwise xor with another vector
-//!
-BinaryVector& BinaryVector::operator^= (const BinaryVector& rhs)
-{
-  CHECK_SAME_SIZE(rhs);
-
-  auto left  = m_data.begin();
-  auto right = rhs.m_data.cbegin();
-
-  while (left != m_data.end())
-  {
-    *left++ ^= *right++;
-  }
-
-  MaskLastByte();
-
-  return *this;
-}
-//
-//  End of: BinaryVector::operator&=
-//---------------------------------------------------------------------------
-
-
-//! Concatenate two scan vectors
-//!
-BinaryVector BinaryVector::operator+ (const BinaryVector& rhs) const
-{
-  BinaryVector result(*this);
-
-  result.Append(rhs);
-
-  return result;
-}
-//
-//  End of: BinaryVector::operator~
-//---------------------------------------------------------------------------
-
-
-
-
-
-
 //! Creates a BinaryVector from text binary representation
 //!
 //! @note Firstly intended for test purposes, but can be used for anything else
@@ -1410,6 +896,554 @@ BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty size
 }
 //
 //  End of: BinaryVector::CreateFromBinaryString
+//---------------------------------------------------------------------------
+
+
+
+
+
+//! Creates a BinaryVector from a "moveable" buffer with right aligned data (first byte is partially used and last one if fully used)
+//!
+//! @param buffer       Source buffer (with right aligned data)
+//! @param bitsCount    Number of meaningful bits in source buffer
+//! @param sizeProperty Size property
+//!
+BinaryVector BinaryVector::CreateFromRightAlignedBuffer (vector<uint8_t>&& buffer, uint32_t bitsCount, SizeProperty sizeProperty)
+{
+  ShiftBufferLeft(buffer, buffer, bitsCount);
+
+  BinaryVector binaryVector(std::move(buffer), bitsCount, sizeProperty);
+  return binaryVector;
+}
+//
+//  End of: BinaryVector::CreateFromRightAlignedBuffer
+//---------------------------------------------------------------------------
+
+
+//! Creates a BinaryVector from a buffer with right aligned data (first byte is partially used and last one if fully used)
+//!
+//! @param buffer       Source buffer (with right aligned data)
+//! @param bitsCount    Number of meaningful bits in source buffer
+//! @param sizeProperty Size property
+//!
+BinaryVector BinaryVector::CreateFromRightAlignedBuffer (const vector<uint8_t>& buffer, uint32_t bitsCount, SizeProperty sizeProperty)
+{
+  vector<uint8_t> newBuffer(buffer.size());
+
+  ShiftBufferLeft(buffer, newBuffer, bitsCount);
+
+  BinaryVector binaryVector(std::move(newBuffer), bitsCount, sizeProperty);
+  return binaryVector;
+}
+
+
+//! Gets content as formatted binary string
+//!
+//! @note An example of formatting is: 0001_1111:0011_0100:0101_010
+//!
+//! @param octoSeparator  Characters to insert every 8 bits
+//! @param quadSeparator  Characters to insert every 4 bits
+//! @param bytesPerLine   Number of bytes (sequence of 8 bits) to write per line.
+//!                       When zero, all is on the "same line"
+//! @param eolSeparator   Characters to insert just before new lines (when bytesPerLine != 0)
+//! @param prefixWith0b   When true, "0b" will be prepended to the resulting string
+//!
+string BinaryVector::DataAsBinaryString (string_view quadSeparator,
+                                         string_view octoSeparator,
+                                         uint32_t    bytesPerLine,
+                                         string_view eolSeparator,
+                                         bool        prefixWith0b
+                                        ) const
+{
+
+  ostringstream os;
+  uint32_t      nibblesCount = 0;
+  uint32_t      bytesCount   = 0;
+
+  auto appendNibble = [&](string_view nibble)
+  {
+    if (nibblesCount == 1)
+    {
+      os << quadSeparator;
+    }
+    else if (nibblesCount == 2)
+    {
+      nibblesCount = 0;
+      ++bytesCount;
+      if (bytesCount == bytesPerLine)
+      {
+        os << eolSeparator << std::endl;
+      }
+      else
+      {
+        os << octoSeparator;
+      }
+    }
+
+    ++nibblesCount;
+    os << nibble;
+  };
+
+  auto appendBits = [&](uint8_t bitsOnLsb, uint32_t bitsCount)
+  {
+    if (bitsCount != 0)
+    {
+      auto nibble = BINARY_NIBBLES[bitsOnLsb];       // Get string representation with padded zero on the right
+      nibble = string_view(nibble.data(), bitsCount);
+      appendNibble(nibble);
+    }
+  };
+
+  if (prefixWith0b)
+  {
+    os << "0b";
+  }
+
+  auto bitsCount = m_usedBits;
+
+  for (auto byte : m_data)
+  {
+    if (bitsCount >= 8)
+    {
+      appendNibble(BINARY_NIBBLES[byte >> 4]);
+      appendNibble(BINARY_NIBBLES[byte &  0x0F]);
+      bitsCount -= 8;
+    }
+    else if (bitsCount >= 4)
+    {
+      appendNibble(BINARY_NIBBLES[byte >> 4]);
+      bitsCount -= 4;
+      appendBits(byte & 0x0F, bitsCount);
+    }
+    else
+    {
+      byte = (byte >> 4) & 0x0F; // Put bits on LSB
+      appendBits(byte, bitsCount);
+    }
+  }
+
+  return os.str();
+}
+//
+//  End of: BinaryVector::DataAsBinaryString
+//---------------------------------------------------------------------------
+
+
+//! Gets content as formatted hexadecimal string (as saved internally - bits are appended from left to right)
+//!
+//! @note An example of formatting is: FACE_DEAD:BEEF_0123:CAFE_4 (where last '4' may mean '0b0100' or '0b010' or '0b01')
+//! @note For precise display of last bits, please use DataAsMixString (or DataAsBinaryString)
+//!
+//! @param octoSeparator   Characters to insert every 32 bits
+//! @param quadSeparator   Characters to insert every 16 bits
+//! @param bytesPerLine    Number of bytes (sequence of 8 bits) to write per line.
+//!                        When zero, all is on the "same line"
+//! @param eolSeparator    Characters to insert just before new lines character (when bytesPerLine != 0)
+//! @param prefixWith0x    When true, "0x" will be prepended to the resulting string
+//!
+string BinaryVector::DataAsHexString (string_view quadSeparator,
+                                      string_view octoSeparator,
+                                      uint32_t    bytesPerLine,
+                                      string_view eolSeparator,
+                                      bool        prefixWith0x
+                                     ) const
+{
+  // ---------------- Associate 4 bits value with its hexadecimal representation
+  //
+  static const std::array<string_view, 16> nibbles =
+  {
+    "0",  // 00
+    "1",  // 01
+    "2",  // 02
+    "3",  // 03
+    "4",  // 04
+    "5",  // 05
+    "6",  // 06
+    "7",  // 07
+    "8",  // 08
+    "9",  // 09
+    "A",  // 10
+    "B",  // 11
+    "C",  // 12
+    "D",  // 13
+    "E",  // 14
+    "F",  // 15
+  };
+
+  ostringstream os;
+  uint32_t      nibblesCount = 0;
+  uint32_t      bytesCount   = 0;
+
+  auto appendNibble = [&](string_view nibble)
+  {
+    if ((nibblesCount != 0) && ((nibblesCount % 2) == 0))
+    {
+      ++bytesCount;
+      if (bytesCount == bytesPerLine)
+      {
+        nibblesCount = 0;
+        bytesCount   = 0;
+
+        os << eolSeparator << std::endl;
+      }
+      else if (nibblesCount == 4)
+      {
+        os << quadSeparator;
+      }
+      else if (nibblesCount == 8)
+      {
+        nibblesCount = 0;
+        os << octoSeparator;
+      }
+    }
+
+    ++nibblesCount;
+    os << nibble;
+  };
+
+  if (prefixWith0x)
+  {
+    os << "0x";
+  }
+
+
+  auto bitsCount = m_usedBits;
+
+  for (auto byte : m_data)
+  {
+    if (bitsCount >= 8)
+    {
+      appendNibble(nibbles[byte >> 4]);
+      appendNibble(nibbles[byte &  0x0F]);
+      bitsCount -= 8;
+    }
+    else if (bitsCount > 4)
+    {
+      appendNibble(nibbles[byte >> 4]);
+      bitsCount -= 4;
+      appendNibble(nibbles[byte & LEFT_BITS_MASK_4[bitsCount]]);
+    }
+    else
+    {
+      byte >>= 4;         // Put bits on least significant nibble
+      appendNibble(nibbles[byte & LEFT_BITS_MASK_4[bitsCount]]);
+    }
+  }
+
+  return os.str();
+}
+//
+//  End of: BinaryVector::DataAsHexString
+//---------------------------------------------------------------------------
+
+
+//! Gets content as formatted hexadecimal or/and binary string
+//!
+//!
+//! @note An example of formatting is: 0xFACE_DEAD:BEEF_0123:CAFE_/b01
+//!
+//! @param hexStyleThreshold  The number of bits that makes the result starting as hex string (preference is to be >= 8)
+//! @param octaSeparator      Characters to insert every 8 digits
+//! @param quadSeparator      Characters to insert every 4 digits
+//! @param bytesPerLine       Number of bytes (sequence of 8 bits) to write per line.
+//!                           When zero, all is on the "same line"
+//! @param eolSeparator       Characters to insert just before new lines character (when bytesPerLine != 0)
+//!
+string BinaryVector::DataAsMixString (uint32_t    hexStyleThreshold,
+                                      string_view quadSeparator,
+                                      string_view octaSeparator,
+                                      uint32_t    bytesPerLine,
+                                      string_view eolSeparator) const
+{
+  if (m_usedBits == 0)
+  {
+    return "";
+  }
+
+  if (m_usedBits < hexStyleThreshold)
+  {
+    return DataAsBinaryString(quadSeparator, octaSeparator, bytesPerLine, eolSeparator, true);
+  }
+
+  auto smartString       = DataAsHexString(quadSeparator, octaSeparator, bytesPerLine, eolSeparator, true);
+  auto lastByteBitsCount = m_usedBits % 8;
+  auto lastQuadBitsCount = m_usedBits % 4;
+
+  if (lastQuadBitsCount != 0)
+  {
+    // ---------------- Replace last digit with its binary equivalent
+    //
+    auto shiftCount = (lastByteBitsCount < 4) ? 8u - lastQuadBitsCount    // For cases last bits are on msb
+                                              : 4u - lastQuadBitsCount;   // For cases last bits are on lsb
+    auto byte       = (m_data.back() >> shiftCount) & 0x0F;
+    auto lastBits   = BINARY_NIBBLES[byte].substr(4u - lastQuadBitsCount, lastQuadBitsCount);
+    smartString     = smartString.substr(0, smartString.length() - 1) + "/b"s + string(lastBits);
+  }
+  return smartString;
+}
+//
+//  End of: BinaryVector::DataAsMixString
+//---------------------------------------------------------------------------
+
+
+//! Returns data right aligned in a new buffer
+//!
+//! @note Internal representation is left aligned.
+//!       For example for a 23 bits BinaryVector with value 0x654321 (0b110_0101_0100_0011_0010_0001)
+//!       Will be in memory (with increased address)
+//!       Left aligned:   [CA][86][42]  (0b11001010:10000110:01000010)
+//!       Right aligned:  [65][43][21]  (0b01100101:01000011:00100001)
+//!
+//! @note To be cache friendly data are processed in increased address order
+vector<uint8_t> BinaryVector::DataRightAligned () const
+{
+  vector<uint8_t> rightAligned;
+
+  auto binVectorLsbBits = LastByteBitsCount(); // This is the number of meaningful bits on last byte in BinaryVector representation (left aligned)
+
+  if (binVectorLsbBits == 0) // Deal with fast case
+  {
+    rightAligned = m_data;
+  }
+  else     // Deal with case, right aligned bytes are stranded on two bytes of left aligned version
+  {
+    rightAligned.reserve(m_data.size());
+
+    auto pBegin = m_data.cbegin();
+    auto pEnd   = m_data.cend();
+    auto pByte  = pBegin;
+
+    uint8_t  bufferShiftCount   = 8u - binVectorLsbBits;  // This is the number of meaningful bits on first byte in right aligned result
+    uint32_t remainingBitsCount = m_usedBits;
+    uint8_t  byte = 0;
+
+    // ---------------- Process first bits (on first byte)
+    //
+    byte   = *pByte;
+    byte >>= bufferShiftCount;
+    byte  &= RIGHT_BITS_MASK_8[binVectorLsbBits];
+
+    rightAligned.push_back(byte);
+
+    // ---------------- Process other bytes
+    //
+    remainingBitsCount -= binVectorLsbBits;
+    while ((remainingBitsCount != 0) && (pByte < pEnd))
+    {
+      uint8_t msb = *pByte++;   // msb for result is on lsb of "left" byte of binary BinaryVector
+      uint8_t lsb = *pByte;     // lsb for result is on msb of "right" byte of binary BinaryVector
+
+      // ---------------- Merge bytes
+      //
+      // e.g. : [xxxmmmmm][lllyyyyy] ==> [mmmmmlll]
+      //           msb        lsb           byte
+      //
+      msb <<= binVectorLsbBits;
+      lsb >>= bufferShiftCount;
+      msb &= LEFT_BITS_MASK_8[bufferShiftCount];
+      lsb &= RIGHT_BITS_MASK_8[binVectorLsbBits];
+
+      uint8_t byte = msb | lsb;
+      rightAligned.push_back(byte);
+
+      remainingBitsCount -= 8;
+    }
+  }
+
+  return rightAligned;
+}
+//
+//  End of: BinaryVector::DataRightAligned
+//---------------------------------------------------------------------------
+
+
+
+//! Copy assignment
+//!
+//! @note Does not change the fixed size property
+//!
+BinaryVector& BinaryVector::operator= (const BinaryVector& rhs)
+{
+  CHECK_FIXED_SIZE_ASSIGNMENT(rhs.m_usedBits);
+
+  m_data         = rhs.m_data;
+  m_usedBits     = rhs.m_usedBits;
+  m_sizeProperty = rhs.m_sizeProperty == SizeProperty::FixedOnCopy ? SizeProperty::FixedOnCopy : m_sizeProperty;
+
+  return *this;
+}
+//
+//  End of: BinaryVector::BinaryVector
+//---------------------------------------------------------------------------
+
+
+//! Move assignment
+//!
+//! @note Does not change the fixed size property
+//!
+BinaryVector& BinaryVector::operator= (BinaryVector&& rhs)
+{
+  if (this != &rhs)
+  {
+    CHECK_FIXED_SIZE_ASSIGNMENT(rhs.m_usedBits);
+    m_data         = std::move(rhs.m_data);
+    m_usedBits     = rhs.m_usedBits;
+    m_sizeProperty = rhs.m_sizeProperty == SizeProperty::FixedOnCopy ? SizeProperty::FixedOnCopy : m_sizeProperty;
+
+    rhs.m_usedBits     = 0;
+    rhs.m_sizeProperty = SizeProperty::NotFixed;
+  }
+
+  return *this;
+}
+//
+//  End of: BinaryVector::BinaryVector
+//---------------------------------------------------------------------------
+
+
+
+//! Returns true when *this is equal to another BinaryVector
+//!
+//! @note Fixed size property is not compare (only the value)
+//!
+bool BinaryVector::operator== (const BinaryVector& rhs) const
+{
+  if (m_usedBits != rhs.m_usedBits)
+  {
+    return false;
+  }
+
+  if (m_usedBits == 0)
+  {
+    return true;
+  }
+
+  auto bitsOnLastByte = m_usedBits % 8;
+  auto areEqual       = true;
+
+  if (bitsOnLastByte == 0)
+  {
+    areEqual = m_data == rhs.m_data;
+  }
+  else
+  {
+    if (m_data.size() > 1)
+    {
+      areEqual = std::equal(m_data.cbegin(), m_data.cend() - 1, rhs.m_data.cbegin(), rhs.m_data.cend() - 1);
+    }
+
+    if (areEqual)
+    {
+      auto left  = m_data.back()     & LEFT_BITS_MASK_8[bitsOnLastByte];
+      auto right = rhs.m_data.back() & LEFT_BITS_MASK_8[bitsOnLastByte];
+
+      areEqual = left == right;
+    }
+  }
+
+  return areEqual;
+}
+//
+//  End of: BinaryVector::operator==
+//---------------------------------------------------------------------------
+
+
+
+//! Returns another BinaryVector with every bits toggles
+//!
+BinaryVector BinaryVector::operator~ () const
+{
+  BinaryVector toggled(*this);
+
+  toggled.ToggleBits();
+  return toggled;
+}
+//
+//  End of: BinaryVector::operator~
+//---------------------------------------------------------------------------
+
+
+//! Bitwise and with another vector
+//!
+BinaryVector& BinaryVector::operator&= (const BinaryVector& rhs)
+{
+  CHECK_SAME_SIZE(rhs);
+
+  auto left  = m_data.begin();
+  auto right = rhs.m_data.cbegin();
+
+  while (left != m_data.end())
+  {
+    *left++ &= *right++;
+  }
+
+  MaskLastByte();
+
+  return *this;
+}
+//
+//  End of: BinaryVector::operator&=
+//---------------------------------------------------------------------------
+
+
+//! Bitwise or with another vector
+//!
+BinaryVector& BinaryVector::operator|= (const BinaryVector& rhs)
+{
+  CHECK_SAME_SIZE(rhs);
+
+  auto left  = m_data.begin();
+  auto right = rhs.m_data.cbegin();
+
+  while (left != m_data.end())
+  {
+    *left++ |= *right++;
+  }
+
+  MaskLastByte();
+
+  return *this;
+}
+//
+//  End of: BinaryVector::operator&=
+//---------------------------------------------------------------------------
+
+
+//! Bitwise xor with another vector
+//!
+BinaryVector& BinaryVector::operator^= (const BinaryVector& rhs)
+{
+  CHECK_SAME_SIZE(rhs);
+
+  auto left  = m_data.begin();
+  auto right = rhs.m_data.cbegin();
+
+  while (left != m_data.end())
+  {
+    *left++ ^= *right++;
+  }
+
+  MaskLastByte();
+
+  return *this;
+}
+//
+//  End of: BinaryVector::operator&=
+//---------------------------------------------------------------------------
+
+
+//! Concatenate two scan vectors
+//!
+BinaryVector BinaryVector::operator+ (const BinaryVector& rhs) const
+{
+  BinaryVector result(*this);
+
+  result.Append(rhs);
+
+  return result;
+}
+//
+//  End of: BinaryVector::operator~
 //---------------------------------------------------------------------------
 
 
@@ -1963,6 +1997,104 @@ void BinaryVector::SetBit (uint32_t bitOffset)
 //---------------------------------------------------------------------------
 
 
+
+//! Shifts bits left in array
+//!
+//! @note Example for a shift count of 3 (where bits are represented by digits, x by not used and 0 bits forced to zero)
+//!   Source buffer:      [12345678_12345678_1234xxx]
+//!   Destination buffer: [45678123_45678123_4xxx000]
+//!
+//! @param pSource        Source pointer
+//! @param pDest          Destination pointer (can be same as source or at lower address)
+//! @param bytesCount     Number of bytes to process
+//! @param leftShiftCount Bits shift count in range [0, 7]
+//!
+void BinaryVector::ShiftBufferLeft (const uint8_t* pSource, uint8_t* pDest, uint32_t bytesCount, uint8_t leftShiftCount)
+{
+  CHECK_PARAMETER_LTE(leftShiftCount, 7, "Shift count (" + to_string(leftShiftCount)+ ") is expected to be in range [0, 7]");
+  CHECK_PARAMETER_NOT_NULL(pSource, "Invalid source buffer");
+  CHECK_PARAMETER_NOT_NULL(pDest,   "Invalid destination buffer");
+
+  if (bytesCount == 0)
+  {
+    return;
+  }
+
+  if (leftShiftCount == 0)
+  {
+    std::memcpy(pDest, pSource, bytesCount);
+  }
+  else
+  {
+    auto     pByte           = pSource;
+    uint32_t bitsCount       = (bytesCount * 8u) - leftShiftCount; // This is to ease detection of end of loop
+    uint8_t  rightShiftCount = 8u - leftShiftCount;                // This is to align msb of next source byte to be lsb for destination byte
+
+    while (bitsCount != 0)
+    {
+      uint8_t msb = *pByte++ << leftShiftCount;
+
+      if (bitsCount <= rightShiftCount)
+      {
+        *pDest    = msb;
+        bitsCount = 0;
+      }
+      else
+      {
+        uint8_t lsb = *pByte >> rightShiftCount;
+
+        // ---------------- Merge bytes
+        //
+        // e.g. : [xxxmmmmm][lllyyyyy] ==> [mmmmmlll]
+        //           msb        lsb           byte
+        //
+        uint8_t byte = msb | lsb;
+        *pDest++ = byte;
+        bitsCount -= 8u;
+      }
+    }
+  }
+}
+//
+//  End of: BinaryVector::ShiftBufferLeft
+//---------------------------------------------------------------------------
+
+
+//! Copies one buffer to another, shifting data to transform a right aligned arrangement of data to a left aligned one
+//!
+//! @param sourceBuffer Source buffer (with right aligned data)
+//! @param sourceBuffer Destination buffer (with left aligned data)
+//! @param bitsCount    Number of meaningful bits in source buffer
+//!
+void BinaryVector::ShiftBufferLeft (const vector<uint8_t>& sourceBuffer, vector<uint8_t>& destBuffer, uint32_t bitsCount)
+{
+  if (bitsCount == 0)
+  {
+    return;
+  }
+
+  auto bytesCount = BytesCountFromBitsCount(bitsCount);   // This is the minimal buffer size
+
+  CHECK_PARAMETER_GTE(sourceBuffer.size(), bytesCount, "Source buffer must be large enough to hold " + to_string(bitsCount) + " bit(s)");
+
+  if (destBuffer.size() < bytesCount)
+  {
+    destBuffer.resize(bytesCount) ;
+  }
+
+  auto firstByteOffset = sourceBuffer.size() - bytesCount;
+  auto pSource         = sourceBuffer.data() + firstByteOffset;
+  auto pDest           = destBuffer.data();
+  auto leftShiftCount  = 8u - LastByteBitsCount(bitsCount);
+
+  ShiftBufferLeft(pSource, pDest, bytesCount, leftShiftCount);
+
+  destBuffer.resize(bytesCount);    // Can drop, now useless, end of buffer
+  destBuffer.shrink_to_fit();
+}
+//
+//  End of: BinaryVector::CreateFromRightAlignedBuffer
+//---------------------------------------------------------------------------
 
 
 //! Returns a slice from BinaryVector

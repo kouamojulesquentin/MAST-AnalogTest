@@ -244,6 +244,11 @@ class UT_BinaryVector : public CxxTest::TestSuite
   //
   void test_DataRightAligned ();
 
+  // ---------------- CreateFromRightAlignedBuffer
+  //
+  void test_CreateFromRightAlignedBuffer ();
+  void test_CreateFromRightAlignedBuffer_Moved ();
+
   // ---------------- Other methods
   //
   void setUp(); //!< Initializes test (called for each test)

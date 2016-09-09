@@ -18,7 +18,7 @@
 #include <vector>
 #include <string>
 
-#ifndef _WIN32
+#ifdef USE_OPEN_OCD
 
 extern "C"
 {
@@ -56,7 +56,7 @@ using std::experimental::string_view;
 
 //! Initializes OpenOCD "engine"
 //!
-#ifdef _WIN32
+#ifndef USE_OPEN_OCD
 OpenOCDProtocol::OpenOCDProtocol (string_view /* configFilePath */, string_view /* designName */, int /* iIrLength */)
 {
 }
@@ -127,7 +127,7 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, string_view design
 //!
 OpenOCDProtocol::~OpenOCDProtocol()
 {
-  #ifndef _WIN32
+  #ifdef USE_OPEN_OCD
 
   // Here we put the tap in RESET state
   if(m_supportTrst)
@@ -169,7 +169,7 @@ OpenOCDProtocol::~OpenOCDProtocol()
 //!
 //! @return Bitstream retrieved from SUT
 //!
-#ifdef _WIN32
+#ifndef USE_OPEN_OCD
 BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   switch (derivationId)

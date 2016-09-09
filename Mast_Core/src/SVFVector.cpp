@@ -127,8 +127,8 @@ SVFVector::SVFVector (const BinaryVector& binaryVector)
         //
         msb <<= binVectorLsbBits;
         lsb >>= binVectorMsbBits;
-        msb &= LEFT_BITS_MASK_8[binVectorMsbBits];
-        lsb &= RIGHT_BITS_MASK_8[binVectorMsbBits];
+        msb &= LEFT_BITS_MASK_8  [binVectorMsbBits];
+        lsb &= RIGHT_BITS_MASK_8 [binVectorLsbBits];
 
         unsigned int byte = msb | lsb;
         os << std::setw(2) << static_cast<int>(byte);

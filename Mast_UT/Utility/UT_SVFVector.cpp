@@ -68,48 +68,59 @@ void UT_SVFVector::test_Constructor_FromString ()
   };
 
 
-  auto data =
-  {           // input, bitsCount, expected bitsCount, expected data
-    make_tuple(0,  "",        0,  ""),       // 00
-    make_tuple(1,  "0",       1,  "00"),     // 01
-    make_tuple(1,  "01",      1,  "01"),     // 02
-    make_tuple(2,  "2",       2,  "02"),     // 03
-    make_tuple(3,  "05",      3,  "05"),     // 04
-    make_tuple(4,  "0",       4,  "00"),     // 05
-    make_tuple(4,  "1",       4,  "01"),     // 06
-    make_tuple(4,  "002",     4,  "02"),     // 07
-    make_tuple(4,  "3",       4,  "03"),     // 08
-    make_tuple(4,  "4",       4,  "04"),     // 09
-    make_tuple(4,  "5",       4,  "05"),     // 10
-    make_tuple(4,  "6",       4,  "06"),     // 11
-    make_tuple(4,  "7",       4,  "07"),     // 12
-    make_tuple(4,  "8",       4,  "08"),     // 13
-    make_tuple(4,  "9",       4,  "09"),     // 14
-    make_tuple(4,  "a",       4,  "0A"),     // 15
-    make_tuple(4,  "b",       4,  "0B"),     // 16
-    make_tuple(4,  "c",       4,  "0C"),     // 17
-    make_tuple(4,  "d",       4,  "0D"),     // 18
-    make_tuple(4,  "e",       4,  "0E"),     // 19
-    make_tuple(4,  "f",       4,  "0F"),     // 20
-    make_tuple(5,  "17",      5,  "17"),     // 21
-    make_tuple(6,  "02B",     6,  "2B"),     // 22
-    make_tuple(7,  "75",      7,  "75"),     // 23
-    make_tuple(8,  "00",      8,  "00"),     // 24
-    make_tuple(8,  "01",      8,  "01"),     // 25
-    make_tuple(8,  "002",     8,  "02"),     // 26
-    make_tuple(8,  "04",      8,  "04"),     // 27
-    make_tuple(8,  "08",      8,  "08"),     // 28
-    make_tuple(8,  "10",      8,  "10"),     // 29
-    make_tuple(8,  "20",      8,  "20"),     // 30
-    make_tuple(8,  "40",      8,  "40"),     // 31
-    make_tuple(8,  "80",      8,  "80"),     // 32
-    make_tuple(8,  "A5",      8,  "A5"),     // 33
-    make_tuple(8,  "5A",      8,  "5A"),     // 34
-    make_tuple(9,  "1BD",     9,  "01BD"),   // 35
-    make_tuple(11, "06F5",    11, "06F5"),   // 36
-    make_tuple(16, "030E",    16, "030E"),   // 37
-    make_tuple(17, "0061CDE", 17, "061CDE"), // 38
-    make_tuple(20, "5E123",   20, "05E123"), // 39
+  auto data = // bitsCount, input, expected bitsCount, expected data
+  {
+    make_tuple(0,  "",         0,  ""),         // 00
+    make_tuple(1,  "0",        1,  "00"),       // 01
+    make_tuple(1,  "01",       1,  "01"),       // 02
+    make_tuple(2,  "2",        2,  "02"),       // 03
+    make_tuple(3,  "05",       3,  "05"),       // 04
+    make_tuple(4,  "0",        4,  "00"),       // 05
+    make_tuple(4,  "1",        4,  "01"),       // 06
+    make_tuple(4,  "002",      4,  "02"),       // 07
+    make_tuple(4,  "3",        4,  "03"),       // 08
+    make_tuple(4,  "4",        4,  "04"),       // 09
+    make_tuple(4,  "5",        4,  "05"),       // 10
+    make_tuple(4,  "6",        4,  "06"),       // 11
+    make_tuple(4,  "7",        4,  "07"),       // 12
+    make_tuple(4,  "8",        4,  "08"),       // 13
+    make_tuple(4,  "9",        4,  "09"),       // 14
+    make_tuple(4,  "a",        4,  "0A"),       // 15
+    make_tuple(4,  "b",        4,  "0B"),       // 16
+    make_tuple(4,  "c",        4,  "0C"),       // 17
+    make_tuple(4,  "d",        4,  "0D"),       // 18
+    make_tuple(4,  "e",        4,  "0E"),       // 19
+    make_tuple(4,  "f",        4,  "0F"),       // 20
+    make_tuple(5,  "17",       5,  "17"),       // 21
+    make_tuple(6,  "02B",      6,  "2B"),       // 22
+    make_tuple(7,  "75",       7,  "75"),       // 23
+    make_tuple(8,  "00",       8,  "00"),       // 24
+    make_tuple(8,  "01",       8,  "01"),       // 25
+    make_tuple(8,  "002",      8,  "02"),       // 26
+    make_tuple(8,  "04",       8,  "04"),       // 27
+    make_tuple(8,  "08",       8,  "08"),       // 28
+    make_tuple(8,  "10",       8,  "10"),       // 29
+    make_tuple(8,  "20",       8,  "20"),       // 30
+    make_tuple(8,  "40",       8,  "40"),       // 31
+    make_tuple(8,  "80",       8,  "80"),       // 32
+    make_tuple(8,  "A5",       8,  "A5"),       // 33
+    make_tuple(8,  "5A",       8,  "5A"),       // 34
+    make_tuple(9,  "1BD",      9,  "01BD"),     // 35
+    make_tuple(11, "06F5",     11, "06F5"),     // 36
+    make_tuple(16, "030E",     16, "030E"),     // 37
+    make_tuple(17, "0061CDE",  17, "061CDE"),   // 38
+    make_tuple(18, "2F7DE",    18, "02F7DE"),   // 39
+    make_tuple(19, "5F7DE",    19, "05F7DE"),   // 40
+    make_tuple(20, "9E123",    20, "09E123"),   // 41
+    make_tuple(21, "19E123",   21, "19E123"),   // 42
+    make_tuple(22, "29E123",   22, "29E123"),   // 43
+    make_tuple(23, "59E123",   23, "59E123"),   // 44
+    make_tuple(24, "36B7A6",   24, "36B7A6"),   // 45
+    make_tuple(25, "136B7A6",  25, "0136B7A6"), // 46
+    make_tuple(26, "3DEF7DE",  26, "03DEF7DE"), // 47
+    make_tuple(27, "6789ABC",  27, "06789ABC"), // 48
+    make_tuple(28, "9876543",  28, "09876543"), // 49
+    make_tuple(29, "19876543", 29, "19876543"), // 50
   };
 
   // ---------------- DDT Exercise
@@ -286,9 +297,13 @@ void UT_SVFVector::test_Constructor_FromBinary ()
     make_tuple("0101_1010",                8,  "5A"),     // 34
     make_tuple("1101_1110:1",              9,  "01BD"),   // 35
     make_tuple("1101_1110:101",            11, "06F5"),   // 36
-    make_tuple("0000_1110:0000_0011",      16, "0E03"),   // 37
-    make_tuple("0000_1110:0000_0011:0",    17, "001C06"), // 38
-    make_tuple("0000_1110:0000_0011:0101", 20, "00E035"), // 39
+    make_tuple("1001_1110:1101",           12, "09ED"),   // 37
+    make_tuple("1001_1110:1101_1",         13, "13DB"),   // 38
+    make_tuple("1001_1110:1101_10",        14, "27B6"),   // 39
+    make_tuple("1001_1110:1101_101",       15, "4F6D"),   // 40
+    make_tuple("0000_1110:0000_0011",      16, "0E03"),   // 41
+    make_tuple("0000_1110:0000_0011:0",    17, "001C06"), // 42
+    make_tuple("0000_1110:0000_0011:0101", 20, "00E035"), // 43
 
     make_tuple("1010_1000:1001_0110:0111_0100:0101_0010:0011_0000:0001", 44, "0A8967452301"), // 40
   };

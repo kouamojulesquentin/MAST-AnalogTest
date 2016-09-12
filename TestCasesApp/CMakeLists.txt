@@ -20,6 +20,7 @@ if (${USE_OPEN_OCD})
   set (P_CFLAGS "${P_CFLAGS} -DUSE_OPEN_OCD")
 
   set(LIBUSB_CFLAGS "")
+  set(HIDAPI_CFLAGS "")
 
   include_directories(SYSTEM ../openocd/include/)
   include_directories(SYSTEM ../openocd/include/src/)
@@ -52,6 +53,19 @@ if (${USE_OPEN_OCD})
       endif(LIBUSB0_INCLUDE_DIR AND LIBUSB0_LIBRARY)
 
   endif(LIBUSB1_INCLUDE_DIR AND LIBUSB1_LIBRARY)
+
+  # Trying to find HIDAPI
+  find_library(HIDAPI_LIBRARY
+	  NAMES hidapi hidapi-libusb)
+
+  find_path(HIDAPI_INCLUDE_DIR
+	  NAMES hidapi.h
+	  PATH_SUFFIXES "hidapi")
+
+  if(HIDAPI_INCLUDE_DIR AND HIDAPI_LIBRARY)
+      set(HIDAPI_FOUND true)
+      set(HIDAPI_CFLAGS "--Ihidapi/hidapi")
+  endif(HIDAPI_INCLUDE_DIR AND HIDAPI_LIBRARY)
 endif()
 
 if (WIN32)

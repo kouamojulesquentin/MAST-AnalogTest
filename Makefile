@@ -12,9 +12,14 @@ ifeq ($(OS), Windows_NT)
 $(info ==> Building for Windows)
 USE_OPEN_OCD = OFF
 CMAKE_FLAGS+= -G "MinGW Makefiles"
-RM    = rmdir /S /Q
-MKDIR = mkdir
-RUN   =
+
+IF_EXIST = if exist
+
+RM     = del /Q
+RM_DIR = rmdir /S /Q
+MKDIR  = mkdir
+SEP    = "\"
+RUN    =
 
 BIN_DIR             = Bin
 MAST_UT_EXE_NAME    = Mast_UT.exe
@@ -31,7 +36,9 @@ TESTCASES_EXE_PATH    = $(BIN_DIR)\$(TESTCASES_EXE_NAME)
 else
 USE_OPEN_OCD = ON
 MKDIR = mkdir -p
-RM    = rm -rf
+RM     = rm -f
+RM_DIR = rm -rf
+SEP   = /
 RUN   = ./
 
 BIN_DIR             = Bin
@@ -152,6 +159,8 @@ ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/Makefile)","")
 endif
 
 distclean:
-> $(RM) $(CMAKE_RELEASE_BUILD_DIR)
-> $(RM) $(CMAKE_DEBUG_BUILD_DIR)
-> $(RM) $(CMAKE_ARM_BUILD_DIR)
+> $(IF_EXIST) Mast_UT$(SEP)Generated$(SEP)Runner.cpp       $(RM)     Mast_UT$(SEP)Generated$(SEP)Runner.cpp
+> $(IF_EXIST) SIT_reader_UT$(SEP)Generated$(SEP)Runner.cpp $(RM)     SIT_reader_UT$(SEP)Generated$(SEP)Runner.cpp
+> $(IF_EXIST) $(CMAKE_RELEASE_BUILD_DIR)                   $(RM_DIR) $(CMAKE_RELEASE_BUILD_DIR)
+> $(IF_EXIST) $(CMAKE_DEBUG_BUILD_DIR)                     $(RM_DIR) $(CMAKE_DEBUG_BUILD_DIR)
+> $(IF_EXIST) $(CMAKE_ARM_BUILD_DIR)                       $(RM_DIR) $(CMAKE_ARM_BUILD_DIR)

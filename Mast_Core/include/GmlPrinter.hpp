@@ -29,23 +29,16 @@ namespace mast
 enum class GmlPrinterOptions
 {
   Default              = 0,
-  DisplayIdentifiers   = 0b000001,  //!< To display node identifier
-  DisplayRegisterValue = 0b000010,  //!< To show Register values
-  DisplayValueAuto     = 0b000100,  //!< To show Register values as binary when small, hexa when large and end of large string as binary when cannot form a plain nibble
-  ShowProtocol         = 0b001000, //!< To show Linker selector associated register with an edge between the Linker and the Register
-  ShowSelectorWithEdge = 0b010000,  //!< To show Linker selector associated register with an edge between the Linker and the Register
-  ShowSelectionValues  = 0b100000,  //!< To show Selector Register value along edge between linker and derivations
+  DisplayIdentifiers   = 1 << 0, //!< To display node identifier
+  DisplayRegisterValue = 1 << 1, //!< To show Register values
+  DisplayValueAuto     = 1 << 2, //!< To show Register values as binary when small, hexa when large and end of large string as binary when cannot form a plain nibble
+  ShowProtocol         = 1 << 3, //!< To show Linker selector associated register with an edge between the Linker and the Register
+  ShowSelectorWithEdge = 1 << 4, //!< To show Linker selector associated register with an edge between the Linker and the Register
+  ShowSelectionValues  = 1 << 5, //!< To show Selector Register value along edge between linker and derivations
+
   Std                  = DisplayIdentifiers | DisplayRegisterValue | DisplayValueAuto | ShowSelectionValues,
   All                  = Std | ShowProtocol | ShowSelectionValues,
 };
-
-#include <type_traits>
-constexpr GmlPrinterOptions operator | (GmlPrinterOptions X, GmlPrinterOptions Y)
-{
-  return static_cast<GmlPrinterOptions>(  static_cast<std::underlying_type_t<GmlPrinterOptions>>(X)
-                                        | static_cast<std::underlying_type_t<GmlPrinterOptions>>(Y)
-                                       );
-}
 
 //! System model visitors for creation of a GML formated representation of the
 //! system mode tree
@@ -86,6 +79,10 @@ class DLL_EXPORT GmlPrinter : public SystemModelVisitor
   void DisplayIdentifier    (bool displayIdentifier)    { m_displayIdentifier    = displayIdentifier;    } //!< Sets whether node identifier are displayed or not
   void DisplayRegisterValue (bool displayRegisterValue) { m_displayRegisterValue = displayRegisterValue; } //!< Sets whether registers value are displayed (below the name)
   void DisplayValueAuto     (bool displayValueAuto)     { m_displayRegValueAuto  = displayValueAuto;     } //!< Sets whether registers values are displayed as hexadecimal string if large enough and not complete nibble as binary
+
+  //! Returns graph from a node (usually a ParentNode)
+  //!
+  static std::string Graph(SystemModelNode& topNode, std::experimental::string_view graphName = "", GmlPrinterOptions options = GmlPrinterOptions::Std);
 
   //! Returns graph from a node (usually a ParentNode)
   //!

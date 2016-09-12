@@ -341,6 +341,25 @@ string GmlPrinter::Graph ()
 //---------------------------------------------------------------------------
 
 
+
+
+//! Returns graph from a parent node
+//!
+//! @param topNode    Node from which graph is created
+//! @param graphName  Optional graph name
+//! @param options    Graph options
+//!
+string GmlPrinter::Graph (SystemModelNode& topNode, string_view graphName, GmlPrinterOptions options)
+{
+  GmlPrinter printer(graphName, options);
+  topNode.Accept(printer);
+  return printer.Graph();
+}
+//
+//  End of: GmlPrinter::Graph
+//---------------------------------------------------------------------------
+
+
 //! Returns graph from a parent node
 //!
 //! @param topNode    Node from which graph is created
@@ -350,9 +369,7 @@ string GmlPrinter::Graph ()
 string GmlPrinter::Graph (shared_ptr<SystemModelNode> topNode, string_view graphName, GmlPrinterOptions options)
 {
   CHECK_PARAMETER_NOT_NULL(topNode, "Cannot create GML graph from nullptr");
-  GmlPrinter printer(graphName, options);
-  topNode->Accept(printer);
-  return printer.Graph();
+  return Graph(*topNode, graphName, options);
 }
 //
 //  End of: GmlPrinter::Graph

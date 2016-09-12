@@ -29,6 +29,7 @@ set_property(GLOBAL PROPERTY CXX_STANDARD_REQUIRED ON)
 
 set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lpthread")
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "../Bin")
+set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "../Lib")
 
 add_subdirectory (Logger)
 add_subdirectory (Mast_Core)
@@ -37,4 +38,5 @@ add_subdirectory (Mast)
 add_subdirectory (Mast_UT)
 add_subdirectory (SIT_reader_UT)
 add_subdirectory (TestCasesApp)
+add_subdirectory (License)
 

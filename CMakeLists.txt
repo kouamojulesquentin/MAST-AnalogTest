@@ -38,5 +38,7 @@ add_subdirectory (Mast)
 add_subdirectory (Mast_UT)
 add_subdirectory (SIT_reader_UT)
 add_subdirectory (TestCasesApp)
+if (NOT WIN32)
 add_subdirectory (License)
+endif()
 

@@ -19,7 +19,7 @@
 #include "DefaultBinaryPathSelector.hpp"
 #include "DefaultOneHotPathSelector.hpp"
 #include "DefaultNHotPathSelector.hpp"
-#include "GmlPrinterVisitor.hpp"
+#include "GmlPrinter.hpp"
 #include "PrettyPrinterVisitor.hpp"
 
 #include "BinaryVector_Traits.hpp"
@@ -349,8 +349,8 @@ void UT_SystemModelBuilder::test_Create_MIB_1_Derivation ()
   TS_ASSERT_EQUALS (result.errorsCount,   3u);  // 3 for missing AccessInterface + 2 chidren not AccessInterface
   TS_ASSERT_EQUALS (result.warningsCount, 1u);  // 1 for linker with no child
 
-  // Check with GmlPrinterVisitor
-  auto gotGraph = GmlPrinterVisitor::Graph(sm.Root());
+  // Check with GmlPrinter
+  auto gotGraph = GmlPrinter::Graph(sm.Root());
   auto expected = string(
                          "graph\n"
                          "[\n"
@@ -421,8 +421,8 @@ void UT_SystemModelBuilder::test_Create_MIB_4_Derivations ()
   TS_ASSERT_EQUALS (result.errorsCount,   3u);  // 3 for missing AccessInterface + 2 chidren not AccessInterface
   TS_ASSERT_EQUALS (result.warningsCount, 1u);  // 1 for linker with no child
 
-  // Check with GmlPrinterVisitor
-  auto gotGraph = GmlPrinterVisitor::Graph(sm.Root());
+  // Check with GmlPrinter
+  auto gotGraph = GmlPrinter::Graph(sm.Root());
   auto expected = string(
                          "graph\n"
                          "[\n"

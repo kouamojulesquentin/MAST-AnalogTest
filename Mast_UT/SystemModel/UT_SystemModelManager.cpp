@@ -18,7 +18,7 @@
 #include "Spy_AccessInterfaceProtocols.hpp"
 #include "Spy_SVF_Protocol.hpp"
 #include "Spy_I2C_Protocol.hpp"
-#include "GmlPrinterVisitor.hpp"
+#include "GmlPrinter.hpp"
 #include "BinaryVector_Traits.hpp"
 #include "DefaultBinaryPathSelector.hpp"
 #include "ConfigureAlgorithm_LastOrDefault_Greedy.hpp"
@@ -88,7 +88,7 @@ std::shared_ptr<AccessInterface> Create_TestCase_1500 (SystemModel& sm, string_v
 
   if (reportGml)
   {
-    TS_TRACE (GmlPrinterVisitor::Graph(ai, "Testcase_1500"));
+    TS_TRACE (GmlPrinter::Graph(ai, "Testcase_1500"));
   }
 
   return ai;
@@ -123,7 +123,7 @@ std::shared_ptr<AccessInterface> Create_TestCase_MIB_Multichain_Pre (SystemModel
 
   if (reportGml)
   {
-    TS_TRACE (GmlPrinterVisitor::Graph(tap, "MIB_Multichain_Pre"));
+    TS_TRACE (GmlPrinter::Graph(tap, "MIB_Multichain_Pre"));
   }
 
   return tap;
@@ -158,7 +158,7 @@ std::shared_ptr<AccessInterface> Create_TestCase_ForIPrefix (SystemModel& sm, bo
 
   if (reportGml)
   {
-    TS_TRACE (GmlPrinterVisitor::Graph(tap, "Testcase_iPrefix"));
+    TS_TRACE (GmlPrinter::Graph(tap, "Testcase_iPrefix"));
   }
 
   return tap;
@@ -193,7 +193,7 @@ std::shared_ptr<AccessInterface> Create_TestCase_MIB_Multichain_Post (SystemMode
 
   if (reportGml)
   {
-    TS_TRACE (GmlPrinterVisitor::Graph(tap, "MIB_Multichain_Post"));
+    TS_TRACE (GmlPrinter::Graph(tap, "MIB_Multichain_Post"));
   }
 
   return tap;
@@ -488,7 +488,7 @@ void UT_SystemModelManager::test_DoDataCycles_AccessInterface ()
   auto spy = make_shared<Spy_AccessInterfaceProtocols>();
   ai->SetProtocol (spy);
 
-//+  TS_TRACE (GmlPrinterVisitor::Graph(ai, "Testcase_AccessInterface"));
+//+  TS_TRACE (GmlPrinter::Graph(ai, "Testcase_AccessInterface"));
 
   SystemModelManager sut(sm);
 

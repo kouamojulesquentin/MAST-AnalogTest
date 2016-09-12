@@ -15,7 +15,7 @@
 #include "Chain.hpp"
 #include "Register.hpp"
 #include "SystemModel.hpp"
-#include "GmlPrinterVisitor.hpp"  // To get a visual representation of testcase
+#include "GmlPrinter.hpp"  // To get a visual representation of testcase
 #include "TestModelBuilder.hpp"
 #include <tuple>
 #include <cxxtest/ValueTraits.h>
@@ -39,7 +39,7 @@ shared_ptr<ParentNode> CreateSystemModel (SystemModel& sm, bool reportGml = fals
 
   if (reportGml)
   {
-    TS_TRACE (GmlPrinterVisitor::Graph(tap, "UT_ParentNode"));
+    TS_TRACE (GmlPrinter::Graph(tap, "UT_ParentNode"));
   }
 
   return tap;

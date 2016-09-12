@@ -15,7 +15,7 @@
 #ifndef SYSTEMMODELMANAGERMONITOR_H__831655E4_CE44_4DFD_F886_30ECFC1CC3FC__INCLUDED_
   #define SYSTEMMODELMANAGERMONITOR_H__831655E4_CE44_4DFD_F886_30ECFC1CC3FC__INCLUDED_
 
-#include "GmlPrinterVisitor.hpp"
+#include "GmlPrinter.hpp"
 #include "Platform.hpp"
 #include <string>
 
@@ -75,7 +75,7 @@ class DLL_EXPORT SystemModelManagerMonitor
   bool              m_monitorAppThreadCreation   = true;  //!< True when requested to monitor application thread creation
   bool              m_monitorAfterConfiguration  = false; //!< True when requested to monitor SystemModel state after configuration
   bool              m_monitorBeforeConfiguration = false; //!< True when requested to monitor SystemModel state before configuration
-  GmlPrinterVisitor m_gmlMonitor;                         //!< Visitor for building graph with SystemModel state
+  GmlPrinter m_gmlMonitor;                         //!< Visitor for building graph with SystemModel state
   std::string       m_gmlPrinterBasePath;                 //!< Base path use when exporting graph representing system model
 };
 //

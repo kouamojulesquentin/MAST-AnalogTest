@@ -18,7 +18,7 @@
 #include "Session.hpp"
 #include "SystemModel.hpp"
 #include "TestModelBuilder.hpp"
-#include "GmlPrinterVisitor.hpp"
+#include "GmlPrinter.hpp"
 
 #include "BinaryVector_Traits.hpp"
 #include "CPP_API_Traits.hpp"
@@ -77,7 +77,7 @@ void Create_TestCase_MIB_Multichain_Pre (bool reportGml = false, uint32_t regsBi
 
   if (reportGml)
   {
-    TS_TRACE (GmlPrinterVisitor::Graph(tap, "MIB_Multichain_Pre"));
+    TS_TRACE (GmlPrinter::Graph(tap, "MIB_Multichain_Pre"));
   }
 }
 //

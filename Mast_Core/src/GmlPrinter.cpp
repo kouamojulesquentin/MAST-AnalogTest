@@ -1,17 +1,17 @@
 //===========================================================================
-//                           GmlPrinterVisitor.cpp
+//                           GmlPrinter.cpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file GmlPrinterVisitor.cpp
+//! @file GmlPrinter.cpp
 //!
-//! Implements class GmlPrinterVisitor
+//! Implements class GmlPrinter
 //!
 //===========================================================================
 
-#include "GmlPrinterVisitor.hpp"
+#include "GmlPrinter.hpp"
 #include "SystemModelNodes.hpp"
 #include "Utility.hpp"
 #include "PathSelector.hpp"
@@ -26,21 +26,21 @@ using namespace std::string_literals;
 using namespace mast;
 
 
-const std::experimental::string_view GmlPrinterVisitor::m_shape_AccessInterface = "octagon";
-const std::experimental::string_view GmlPrinterVisitor::m_shape_Linker          = "trapezoid";
-const std::experimental::string_view GmlPrinterVisitor::m_shape_Chain           = "ellipse";
-const std::experimental::string_view GmlPrinterVisitor::m_shape_Register        = "rectangle";
+const std::experimental::string_view GmlPrinter::m_shape_AccessInterface = "octagon";
+const std::experimental::string_view GmlPrinter::m_shape_Linker          = "trapezoid";
+const std::experimental::string_view GmlPrinter::m_shape_Chain           = "ellipse";
+const std::experimental::string_view GmlPrinter::m_shape_Register        = "rectangle";
 
-const std::experimental::string_view GmlPrinterVisitor::m_color_AccessInterface = "#10FFFF";
-const std::experimental::string_view GmlPrinterVisitor::m_color_Linker          = "#FF3060";
-const std::experimental::string_view GmlPrinterVisitor::m_color_Chain           = "#FFCC20";
-const std::experimental::string_view GmlPrinterVisitor::m_color_Register        = "#59FF20";
+const std::experimental::string_view GmlPrinter::m_color_AccessInterface = "#10FFFF";
+const std::experimental::string_view GmlPrinter::m_color_Linker          = "#FF3060";
+const std::experimental::string_view GmlPrinter::m_color_Chain           = "#FFCC20";
+const std::experimental::string_view GmlPrinter::m_color_Register        = "#59FF20";
 
-const std::experimental::string_view GmlPrinterVisitor::m_fontName              = "Lucida Console";
+const std::experimental::string_view GmlPrinter::m_fontName              = "Lucida Console";
 
 //! Initializes with given options
 //!
-GmlPrinterVisitor::GmlPrinterVisitor(std::experimental::string_view graphName, GmlPrinterOptions options)
+GmlPrinter::GmlPrinter(std::experimental::string_view graphName, GmlPrinterOptions options)
   : m_graphName (graphName)
   , m_displayIdentifier    (IsSet(options, GmlPrinterOptions::DisplayIdentifiers))
   , m_displayRegisterValue (IsSet(options, GmlPrinterOptions::DisplayRegisterValue))
@@ -52,7 +52,7 @@ GmlPrinterVisitor::GmlPrinterVisitor(std::experimental::string_view graphName, G
   CreateRoot();
 }
 //
-//  End of: GmlPrinterVisitor::GmlPrinterVisitor
+//  End of: GmlPrinter::GmlPrinter
 //---------------------------------------------------------------------------
 
 
@@ -66,7 +66,7 @@ GmlPrinterVisitor::GmlPrinterVisitor(std::experimental::string_view graphName, G
 //! @param notes            Optional node to add below the node name
 //! @param parentNode       Parent node to process
 //!
-void GmlPrinterVisitor::AppendParentNode (string_view       shapeName,
+void GmlPrinter::AppendParentNode (string_view       shapeName,
                                           string_view       backgroundColor,
                                           string_view       notes,
                                           const ParentNode& parentNode)
@@ -133,7 +133,7 @@ void GmlPrinterVisitor::AppendParentNode (string_view       shapeName,
   }
 }
 //
-//  End of: GmlPrinterVisitor::AppendParentNode
+//  End of: GmlPrinter::AppendParentNode
 //---------------------------------------------------------------------------
 
 
@@ -146,7 +146,7 @@ void GmlPrinterVisitor::AppendParentNode (string_view       shapeName,
 //! @param notes            Optional node to add below the node name
 //! @param node             Node to process
 //!
-void GmlPrinterVisitor::AppendNode (string_view            shapeName,
+void GmlPrinter::AppendNode (string_view            shapeName,
                                     string_view            outlineStyle,
                                     string_view            backgroundColor,
                                     string_view            notes,
@@ -228,7 +228,7 @@ void GmlPrinterVisitor::AppendNode (string_view            shapeName,
   m_osGraph << " ]" << std::endl;
 }
 //
-//  End of: GmlPrinterVisitor::AppendNode
+//  End of: GmlPrinter::AppendNode
 //---------------------------------------------------------------------------
 
 
@@ -237,7 +237,7 @@ void GmlPrinterVisitor::AppendNode (string_view            shapeName,
 //! @param parentNode   A parent node
 //! @param childNode    A child of the parent node
 //!
-void GmlPrinterVisitor::PrintEdge (const ParentNode&      parentNode,
+void GmlPrinter::PrintEdge (const ParentNode&      parentNode,
                                    const SystemModelNode& childNode,
                                    uint32_t               childId,
                                    string_view            style,
@@ -269,13 +269,13 @@ void GmlPrinterVisitor::PrintEdge (const ParentNode&      parentNode,
   m_osEdges << " ]" << std::endl;
 }
 //
-//  End of: GmlPrinterVisitor::PrintEdge
+//  End of: GmlPrinter::PrintEdge
 //---------------------------------------------------------------------------
 
 
 //! Closes root node
 //!
-void GmlPrinterVisitor::CloseRoot ()
+void GmlPrinter::CloseRoot ()
 {
   if (m_depth != 0)
   {
@@ -286,13 +286,13 @@ void GmlPrinterVisitor::CloseRoot ()
   m_osGraph << "]";
 }
 //
-//  End of: GmlPrinterVisitor::CloseRoot
+//  End of: GmlPrinter::CloseRoot
 //---------------------------------------------------------------------------
 
 
 //! Creates root node
 //!
-void GmlPrinterVisitor::CreateRoot ()
+void GmlPrinter::CreateRoot ()
 {
   if (m_depth != 0)
   {
@@ -310,14 +310,14 @@ void GmlPrinterVisitor::CreateRoot ()
   m_osGraph << std::endl;
 }
 //
-//  End of: GmlPrinterVisitor::CloseRoot
+//  End of: GmlPrinter::CloseRoot
 //---------------------------------------------------------------------------
 
 
 
 //! Returns currently visited nodes representation and edges
 //!
-string GmlPrinterVisitor::Graph ()
+string GmlPrinter::Graph ()
 {
   string graph;
 
@@ -337,7 +337,7 @@ string GmlPrinterVisitor::Graph ()
   return graph;
 }
 //
-//  End of: GmlPrinterVisitor::Graph
+//  End of: GmlPrinter::Graph
 //---------------------------------------------------------------------------
 
 
@@ -347,21 +347,21 @@ string GmlPrinterVisitor::Graph ()
 //! @param graphName  Optional graph name
 //! @param options    Graph options
 //!
-string GmlPrinterVisitor::Graph (shared_ptr<SystemModelNode> topNode, string_view graphName, GmlPrinterOptions options)
+string GmlPrinter::Graph (shared_ptr<SystemModelNode> topNode, string_view graphName, GmlPrinterOptions options)
 {
   CHECK_PARAMETER_NOT_NULL(topNode, "Cannot create GML graph from nullptr");
-  GmlPrinterVisitor printer(graphName, options);
+  GmlPrinter printer(graphName, options);
   topNode->Accept(printer);
   return printer.Graph();
 }
 //
-//  End of: GmlPrinterVisitor::Graph
+//  End of: GmlPrinter::Graph
 //---------------------------------------------------------------------------
 
 
 //! Appends AccessInterface node to GML graph
 //!
-void GmlPrinterVisitor::VisitAccessInterface (AccessInterface& accessInterface)
+void GmlPrinter::VisitAccessInterface (AccessInterface& accessInterface)
 {
   auto protocol = accessInterface.Protocol();
   auto note     = string();
@@ -376,7 +376,7 @@ void GmlPrinterVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 
 //! Appends Chain node to GML graph
 //!
-void GmlPrinterVisitor::VisitChain (Chain& chain)
+void GmlPrinter::VisitChain (Chain& chain)
 {
   AppendParentNode(m_shape_Chain, m_color_Chain, "", chain);
 }
@@ -384,7 +384,7 @@ void GmlPrinterVisitor::VisitChain (Chain& chain)
 //! Appends Linker node to GML graph
 //!
 //! @note Supposes that path selector associated with linker will be made of SystemModelNode too
-void GmlPrinterVisitor::VisitLinker (Linker& linker)
+void GmlPrinter::VisitLinker (Linker& linker)
 {
   string notes;
 
@@ -415,7 +415,7 @@ void GmlPrinterVisitor::VisitLinker (Linker& linker)
 
  //! Appends Register node to GML graph
 //!
-void GmlPrinterVisitor::VisitRegister (Register& reg)
+void GmlPrinter::VisitRegister (Register& reg)
 {
   // ---------------- Deal with path selector associated with Linker nodes
   //
@@ -458,5 +458,5 @@ void GmlPrinterVisitor::VisitRegister (Register& reg)
 }
 
 //===========================================================================
-// End of GmlPrinterVisitor.cpp
+// End of GmlPrinter.cpp
 //===========================================================================

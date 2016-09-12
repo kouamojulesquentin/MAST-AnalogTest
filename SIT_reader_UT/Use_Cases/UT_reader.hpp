@@ -5,9 +5,9 @@
 //
 // Project : Mast
 //
-//! @file UT_GmlPrinterVisitor.hpp
+//! @file UT_reader.hpp
 //!
-//! Declares test fixture class for testing GmlPrinterVisitor
+//! Declares test fixture class for testing SIT_Reader
 //!
 //===========================================================================
 
@@ -23,7 +23,7 @@ namespace mast
   class SystemModel;
 } // End of namespace mast
 
-//! Unit tests for class SystemModelBuilder SIT_Reader
+//! Unit tests for class SIT_Reader
 //!
 class UT_reader : public CxxTest::TestSuite
 {
@@ -50,8 +50,7 @@ class UT_reader : public CxxTest::TestSuite
 //  End of UT_reader class declaration
 //---------------------------------------------------------------------------
 
-
-#endif  // not defined UT_GMLPRINTERVISITOR_H_INCLUDED_
+#endif
 //===========================================================================
 // End of UT_reader.hpp
 //===========================================================================

@@ -1,19 +1,19 @@
 //===========================================================================
-//                           GmlPrinterVisitor.hpp
+//                           GmlPrinter.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file GmlPrinterVisitor.hpp
+//! @file GmlPrinter.hpp
 //!
-//! Declares class GmlPrinterVisitor
+//! Declares class GmlPrinter
 //!
 //===========================================================================
 
 
-#ifndef GMLPRINTERVISITOR_H__2DA805E1_7CD4_4D2D_2AB8_5A6B17EEEB3D__INCLUDED_
-  #define GMLPRINTERVISITOR_H__2DA805E1_7CD4_4D2D_2AB8_5A6B17EEEB3D__INCLUDED_
+#ifndef GMLPRINTER_H__C3248668_6D34_4480_B5A2_38F17955B4CE__INCLUDED_
+  #define GMLPRINTER_H__C3248668_6D34_4480_B5A2_38F17955B4CE__INCLUDED_
 
 #include "SystemModelVisitor.hpp"
 #include "SystemModelNode.hpp"
@@ -50,17 +50,17 @@ constexpr GmlPrinterOptions operator | (GmlPrinterOptions X, GmlPrinterOptions Y
 //! System model visitors for creation of a GML formated representation of the
 //! system mode tree
 //!
-class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
+class DLL_EXPORT GmlPrinter : public SystemModelVisitor
 {
   // ---------------- Public  Methods
   //
   public:
-  ~GmlPrinterVisitor() = default;
-  GmlPrinterVisitor()
-    : GmlPrinterVisitor("", GmlPrinterOptions::Default)
+  ~GmlPrinter() = default;
+  GmlPrinter()
+    : GmlPrinter("", GmlPrinterOptions::Default)
   {}
 
-  GmlPrinterVisitor(std::experimental::string_view graphName, bool displayIdentifiers = false, bool displayRegisterValue = false, bool displayValueAuto = false)
+  GmlPrinter(std::experimental::string_view graphName, bool displayIdentifiers = false, bool displayRegisterValue = false, bool displayValueAuto = false)
     : m_graphName            (graphName)
     , m_displayIdentifier    (displayIdentifiers)
     , m_displayRegisterValue (displayRegisterValue)
@@ -69,7 +69,7 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
     CreateRoot();
   }
 
-  GmlPrinterVisitor(std::experimental::string_view graphName, GmlPrinterOptions options = GmlPrinterOptions::Default);
+  GmlPrinter(std::experimental::string_view graphName, GmlPrinterOptions options = GmlPrinterOptions::Default);
 
   virtual void VisitAccessInterface (AccessInterface& accessInterface) override;
   virtual void VisitChain           (Chain&           chain)           override;
@@ -142,15 +142,13 @@ class DLL_EXPORT GmlPrinterVisitor : public SystemModelVisitor
   static const std::experimental::string_view m_fontName;
 };
 //
-//  End of GmlPrinterVisitor class declaration
+//  End of GmlPrinter class declaration
 //---------------------------------------------------------------------------
 } // End of namespace mast
 
 
 
-
-#endif  // not defined GMLPRINTERVISITOR_H__2DA805E1_7CD4_4D2D_2AB8_5A6B17EEEB3D__INCLUDED_
-
+#endif  // not defined GMLPRINTER_H__C3248668_6D34_4480_B5A2_38F17955B4CE__INCLUDED_
 //===========================================================================
-// End of GmlPrinterVisitor.hpp
+// End of GmlPrinter.hpp
 //===========================================================================

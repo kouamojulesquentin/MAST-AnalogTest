@@ -17,7 +17,7 @@
 #include "Startup.hpp"
 #include "SystemModel.hpp"
 #include "TestModelBuilder.hpp"
-#include "GmlPrinterVisitor.hpp"
+#include "GmlPrinter.hpp"
 
 #include "C_API_Traits.hpp"
 #include "BinaryVector_Traits.hpp"
@@ -66,7 +66,7 @@ namespace
 
     if (reportGml)
     {
-      TS_TRACE (GmlPrinterVisitor::Graph(tap, "MIB_Multichain_Pre"));
+      TS_TRACE (GmlPrinter::Graph(tap, "MIB_Multichain_Pre"));
     }
   }
   //

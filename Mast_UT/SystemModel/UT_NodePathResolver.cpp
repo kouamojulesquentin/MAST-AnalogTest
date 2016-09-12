@@ -15,7 +15,7 @@
 #include "NodePathResolver.hpp"
 #include "Chain.hpp"
 #include "SystemModel.hpp"
-#include "GmlPrinterVisitor.hpp"  // To get a visual representation of testcase
+#include "GmlPrinter.hpp"  // To get a visual representation of testcase
 #include "TestModelBuilder.hpp"
 
 #include <memory>
@@ -44,7 +44,7 @@ shared_ptr<ParentNode> CreateSystemModel (SystemModel& sm, bool reportGml = fals
 
   if (reportGml)
   {
-    TS_TRACE (GmlPrinterVisitor::Graph(tap, "NodePathResolver"));
+    TS_TRACE (GmlPrinter::Graph(tap, "NodePathResolver"));
   }
 
   return tap;

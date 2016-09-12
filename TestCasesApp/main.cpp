@@ -22,7 +22,7 @@
 #include "SVF_EmulationProtocol.hpp"
 #include "I2C_EmulationProtocol.hpp"
 #include "OpenOCDProtocol.hpp"
-#include "GmlPrinterVisitor.hpp"
+#include "GmlPrinter.hpp"
 #include "PrettyPrinterVisitor.hpp"
 #include "g3log/g3log.hpp"
 #include "g3log/logworker.hpp"
@@ -379,7 +379,7 @@ int main (int argc, char* argv [])
     if (options.printGraph)
     {
       ofstream os(options.graphFilePath);
-      os << GmlPrinterVisitor::Graph(session.sm->Root(), "", GmlPrinterOptions::Std | GmlPrinterOptions::ShowProtocol);
+      os << GmlPrinter::Graph(session.sm->Root(), "", GmlPrinterOptions::Std | GmlPrinterOptions::ShowProtocol);
     }
 
     if (retCode != ErrorCode::Ok)

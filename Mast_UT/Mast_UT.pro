@@ -42,7 +42,7 @@ SOURCES += \
     SystemModel/UT_DefaultOneHotPathSelector.cpp      \
     SystemModel/UT_FromSutUpdater.cpp                 \
     SystemModel/UT_GenericAccessInterfaceProtocol.cpp \
-    SystemModel/UT_GmlPrinterVisitor.cpp              \
+    SystemModel/UT_GmlPrinter.cpp                     \
     SystemModel/UT_NamesChecker.cpp                   \
     SystemModel/UT_NodePathResolver.cpp               \
     SystemModel/UT_ParentNode.cpp                     \
@@ -81,7 +81,7 @@ HEADERS += \
     SystemModel/UT_DefaultOneHotPathSelector.hpp      \
     SystemModel/UT_FromSutUpdater.hpp                 \
     SystemModel/UT_GenericAccessInterfaceProtocol.hpp \
-    SystemModel/UT_GmlPrinterVisitor.hpp              \
+    SystemModel/UT_GmlPrinter.hpp                     \
     SystemModel/UT_NamesChecker.hpp                   \
     SystemModel/UT_NodePathResolver.hpp               \
     SystemModel/UT_ParentNode.hpp                     \

@@ -37,7 +37,7 @@ SOURCES +=  \
     src/DefaultNHotPathSelector.cpp                 \
     src/FromSutUpdater.cpp                          \
     src/GenericAccessInterfaceProtocol.cpp          \
-    src/GmlPrinterVisitor.cpp                       \
+    src/GmlPrinter.cpp                              \
     src/I2C_EmulationProtocol.cpp                   \
     src/I2C_Player.cpp                              \
     src/Linker.cpp                                  \
@@ -82,7 +82,7 @@ HEADERS += \
     include/DefaultOneHotPathSelector.hpp               \
     include/DefaultNHotPathSelector.hpp                 \
     include/GenericAccessInterfaceProtocol.hpp          \
-    include/GmlPrinterVisitor.hpp                       \
+    include/GmlPrinter.hpp                              \
     include/FromSutUpdater.hpp                          \
     include/I2C_EmulationProtocol.hpp                   \
     include/I2C_Player.hpp                              \

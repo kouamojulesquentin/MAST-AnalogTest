@@ -16,7 +16,7 @@
 #include "NamesChecker.hpp"
 
 #include "TestModelBuilder.hpp"
-#include "GmlPrinterVisitor.hpp"
+#include "GmlPrinter.hpp"
 #include "SystemModelCheckResult_Traits.hpp"
 
 #include <cxxtest/ValueTraits.h>

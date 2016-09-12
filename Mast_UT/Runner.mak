@@ -30,7 +30,7 @@ Suites = \
       $(UT_RootPath)/SystemModel/UT_NamesChecker.hpp                   \
       $(UT_RootPath)/SystemModel/UT_SystemModelCheckerVisitor.hpp      \
       $(UT_RootPath)/SystemModel/UT_PrettyPrinterVisitor.hpp           \
-      $(UT_RootPath)/SystemModel/UT_GmlPrinterVisitor.hpp              \
+      $(UT_RootPath)/SystemModel/UT_GmlPrinter.hpp                     \
       $(UT_RootPath)/UT_Helpers/UT_TestModelBuilder.hpp                \
       $(UT_RootPath)/SystemModel/UT_PropagatePendingVisitor.hpp        \
       $(UT_RootPath)/SystemModel/UT_ConfigureVisitor.hpp               \

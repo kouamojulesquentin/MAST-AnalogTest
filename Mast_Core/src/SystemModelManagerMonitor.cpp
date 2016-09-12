@@ -13,7 +13,7 @@
 
 #include "SystemModelManagerMonitor.hpp"
 #include "ParentNode.hpp"
-#include "GmlPrinterVisitor.hpp"
+#include "GmlPrinter.hpp"
 #include "g3log/g3log.hpp"
 
 #include <sstream>
@@ -85,7 +85,7 @@ void SystemModelManagerMonitor::ExportGml (string_view step, ParentNode& root)
   {
     // ---------------- Make graph
     //
-    GmlPrinterVisitor printer("", GmlPrinterOptions::Std);
+    GmlPrinter printer("", GmlPrinterOptions::Std);
 
     root.Accept(printer);
     auto graph = printer.Graph();

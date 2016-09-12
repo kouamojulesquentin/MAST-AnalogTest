@@ -1,13 +1,13 @@
 //===========================================================================
-//                           UT_GmlPrinterVisitor.cpp
+//                           UT_GmlPrinter.cpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file UT_GmlPrinterVisitor.cpp
+//! @file UT_GmlPrinter.cpp
 //!
-//! Implements test fixture for testing GmlPrinterVisitor
+//! Implements test fixture for testing GmlPrinter
 //!
 //===========================================================================
 

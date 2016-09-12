@@ -18,7 +18,7 @@
 #include "SVF_SimulationProtocol.hpp"
 #include "Spy_AccessInterfaceProtocols.hpp"
 #include "TestModelBuilder.hpp"
-#include "GmlPrinterVisitor.hpp"
+#include "GmlPrinter.hpp"
 #include "SystemModelCheckResult_Traits.hpp"
 
 
@@ -863,7 +863,7 @@ void UT_SystemModelCheckerVisitor::test_Check_When_AccessInterface_has_LessDeriv
   auto reg_2    = sm.CreateRegister("reg_2", BinaryVector::CreateFromBinaryString("10"), tap);
 
   //+ (begin JFC August/26/2016): for debug purpose
-//+   TS_ASSERT_EQUALS (GmlPrinterVisitor::Graph(sm.Root()), "", GmlPrinterOptions::All);
+//+   TS_ASSERT_EQUALS (GmlPrinter::Graph(sm.Root()), "", GmlPrinterOptions::All);
   //+ (end   JFC August/26/2016):
 
   // ---------------- Exercise

@@ -1,19 +1,19 @@
 //===========================================================================
-//                           UT_GmlPrinterVisitor.cpp
+//                           UT_GmlPrinter.cpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file UT_GmlPrinterVisitor.cpp
+//! @file UT_GmlPrinter.cpp
 //!
-//! Implements test fixture for testing GmlPrinterVisitor
+//! Implements test fixture for testing GmlPrinter
 //!
 //===========================================================================
 
 
-#include "UT_GmlPrinterVisitor.hpp"
-#include "GmlPrinterVisitor.hpp"
+#include "UT_GmlPrinter.hpp"
+#include "GmlPrinter.hpp"
 #include "SystemModelNodes.hpp"
 #include "DefaultBinaryPathSelector.hpp"
 #include "SystemModelBuilder.hpp"
@@ -63,7 +63,7 @@ std::shared_ptr<AccessInterface> Create_TestCase_Tap_With_Children (SystemModel&
 
 //! Initializes tests (called for each test)
 //!
-void UT_GmlPrinterVisitor::setUp ()
+void UT_GmlPrinter::setUp ()
 {
   CxxTest::setStringResultsOnNewLine(true);
   CxxTest::setCharactersMapping(CxxTest::CharacterMapping::MAP_CHARS_MINIMAL);  // Keep quotes, HT, and new lines unescaped
@@ -72,13 +72,13 @@ void UT_GmlPrinterVisitor::setUp ()
 }
 
 
-//! Checks GmlPrinterVisitor constructor
+//! Checks GmlPrinter constructor
 //!
-void UT_GmlPrinterVisitor::test_Constructor ()
+void UT_GmlPrinter::test_Constructor ()
 {
   // ---------------- Exercise
   //
-  GmlPrinterVisitor sut;
+  GmlPrinter sut;
 
   // ---------------- Verify
   //
@@ -93,9 +93,9 @@ void UT_GmlPrinterVisitor::test_Constructor ()
 
 
 
-//! Checks GmlPrinterVisitor::VisitAccessInterface() when there are several child beneath
+//! Checks GmlPrinter::VisitAccessInterface() when there are several child beneath
 //!
-void UT_GmlPrinterVisitor::test_VisitAccessInterface_with_Child ()
+void UT_GmlPrinter::test_VisitAccessInterface_with_Child ()
 {
   // ---------------- Setup
   //
@@ -121,7 +121,7 @@ void UT_GmlPrinterVisitor::test_VisitAccessInterface_with_Child ()
   linker->AppendChild(reg_a);
   linker->AppendChild(reg_b);
 
-  GmlPrinterVisitor sut("", GmlPrinterOptions::ShowSelectorWithEdge);
+  GmlPrinter sut("", GmlPrinterOptions::ShowSelectorWithEdge);
 
   // ---------------- Exercise
   //
@@ -157,9 +157,9 @@ void UT_GmlPrinterVisitor::test_VisitAccessInterface_with_Child ()
   TS_ASSERT_EQUALS (gotGraph, expected);
 }
 
-//! Checks GmlPrinterVisitor::VisitAccessInterface() when there are several child beneath
+//! Checks GmlPrinter::VisitAccessInterface() when there are several child beneath
 //!
-void UT_GmlPrinterVisitor::test_Visit_After_Graph ()
+void UT_GmlPrinter::test_Visit_After_Graph ()
 {
   // ---------------- Setup
   //
@@ -174,7 +174,7 @@ void UT_GmlPrinterVisitor::test_Visit_After_Graph ()
 
   accessInterface->AppendChild(chain);
 
-  GmlPrinterVisitor sut;
+  GmlPrinter sut;
   sut.Graph();   // Should return valid empty graph
 
   // ---------------- Exercise
@@ -201,9 +201,9 @@ void UT_GmlPrinterVisitor::test_Visit_After_Graph ()
 }
 
 
-//! Checks GmlPrinterVisitor::Visit_xxx() with a tap
+//! Checks GmlPrinter::Visit_xxx() with a tap
 //!
-void UT_GmlPrinterVisitor::test_VisitTap ()
+void UT_GmlPrinter::test_VisitTap ()
 {
   // ---------------- Setup
   //
@@ -214,7 +214,7 @@ void UT_GmlPrinterVisitor::test_VisitTap ()
   uint32_t         muxPathsCount = 5u;
   auto             tap           = builder.Create_JTAG_TAP(noName, irBitsCount, muxPathsCount);
 
-  GmlPrinterVisitor sut("", GmlPrinterOptions::ShowSelectorWithEdge);
+  GmlPrinter sut("", GmlPrinterOptions::ShowSelectorWithEdge);
 
   // ---------------- Exercise
   //
@@ -240,16 +240,16 @@ void UT_GmlPrinterVisitor::test_VisitTap ()
 }
 
 
-//! Checks GmlPrinterVisitor::Visit_xxx() with a tap with added sub-nodes
+//! Checks GmlPrinter::Visit_xxx() with a tap with added sub-nodes
 //!
-void UT_GmlPrinterVisitor::test_VisitTap_With_SubNodes ()
+void UT_GmlPrinter::test_VisitTap_With_SubNodes ()
 {
   // ---------------- Setup
   //
   SystemModel sm;
   auto tap = Create_TestCase_Tap_With_Children(sm);
 
-  GmlPrinterVisitor sut("", GmlPrinterOptions::ShowSelectorWithEdge);
+  GmlPrinter sut("", GmlPrinterOptions::ShowSelectorWithEdge);
 
   // ---------------- Exercise
   //
@@ -297,16 +297,16 @@ void UT_GmlPrinterVisitor::test_VisitTap_With_SubNodes ()
 }
 
 
-//! Checks GmlPrinterVisitor::Visit_xxx() with a tap with added sub-nodes
+//! Checks GmlPrinter::Visit_xxx() with a tap with added sub-nodes
 //!
-void UT_GmlPrinterVisitor::test_VisitTap_ShowProtocol ()
+void UT_GmlPrinter::test_VisitTap_ShowProtocol ()
 {
   // ---------------- Setup
   //
   SystemModel sm;
   auto tap = Create_TestCase_Tap_With_Children(sm);
 
-  GmlPrinterVisitor sut("", GmlPrinterOptions::ShowSelectorWithEdge | GmlPrinterOptions::ShowProtocol);
+  GmlPrinter sut("", GmlPrinterOptions::ShowSelectorWithEdge | GmlPrinterOptions::ShowProtocol);
 
   // ---------------- Exercise
   //
@@ -354,16 +354,16 @@ void UT_GmlPrinterVisitor::test_VisitTap_ShowProtocol ()
 }
 
 
-//! Checks GmlPrinterVisitor::Visit_xxx() when does not use edge between Linker and Selector Register
+//! Checks GmlPrinter::Visit_xxx() when does not use edge between Linker and Selector Register
 //!
-void UT_GmlPrinterVisitor::test_Visit_NoEdgeForSelector ()
+void UT_GmlPrinter::test_Visit_NoEdgeForSelector ()
 {
   // ---------------- Setup
   //
   SystemModel sm;
   auto tap = Create_TestCase_Tap_With_Children(sm);
 
-  GmlPrinterVisitor sut;
+  GmlPrinter sut;
 
   // ---------------- Exercise
   //
@@ -410,16 +410,16 @@ void UT_GmlPrinterVisitor::test_Visit_NoEdgeForSelector ()
 }
 
 
-//! Checks GmlPrinterVisitor::Visit_xxx() when requesting selection values for Linker derivations
+//! Checks GmlPrinter::Visit_xxx() when requesting selection values for Linker derivations
 //!
-void UT_GmlPrinterVisitor::test_Visit_SelectionValues ()
+void UT_GmlPrinter::test_Visit_SelectionValues ()
 {
   // ---------------- Setup
   //
   SystemModel sm;
   auto tap = Create_TestCase_Tap_With_Children(sm);
 
-  GmlPrinterVisitor sut("", GmlPrinterOptions::ShowSelectionValues);
+  GmlPrinter sut("", GmlPrinterOptions::ShowSelectionValues);
 
   // ---------------- Exercise
   //
@@ -466,16 +466,16 @@ void UT_GmlPrinterVisitor::test_Visit_SelectionValues ()
   TS_ASSERT_EQUALS (got, expected);
 }
 
-//! Checks GmlPrinterVisitor::Visit_xxx() when DisplayIdentifier is true
+//! Checks GmlPrinter::Visit_xxx() when DisplayIdentifier is true
 //!
-void UT_GmlPrinterVisitor::test_Visit_With_DisplayIdentifier_true ()
+void UT_GmlPrinter::test_Visit_With_DisplayIdentifier_true ()
 {
   // ---------------- Setup
   //
   SystemModel sm;
   auto tap = Create_TestCase_Tap_With_Children(sm);
 
-  GmlPrinterVisitor sut("", GmlPrinterOptions::ShowSelectorWithEdge);
+  GmlPrinter sut("", GmlPrinterOptions::ShowSelectorWithEdge);
   sut.DisplayIdentifier(true);
 
   // ---------------- Exercise
@@ -539,16 +539,16 @@ void UT_GmlPrinterVisitor::test_Visit_With_DisplayIdentifier_true ()
 }
 
 
-//! Checks GmlPrinterVisitor::Visit_xxx() when DisplayIdentifier and DisplayRegisterValue are true
+//! Checks GmlPrinter::Visit_xxx() when DisplayIdentifier and DisplayRegisterValue are true
 //!
-void UT_GmlPrinterVisitor::test_Visit_With_DisplayIdentifierAndRegister_true ()
+void UT_GmlPrinter::test_Visit_With_DisplayIdentifierAndRegister_true ()
 {
   // ---------------- Setup
   //
   SystemModel sm;
   auto tap = Create_TestCase_Tap_With_Children(sm);
 
-  GmlPrinterVisitor sut("",   GmlPrinterOptions::ShowSelectorWithEdge
+  GmlPrinter sut("",   GmlPrinterOptions::ShowSelectorWithEdge
                             | GmlPrinterOptions::DisplayIdentifiers
                             | GmlPrinterOptions::DisplayRegisterValue
                        );
@@ -681,5 +681,5 @@ void UT_GmlPrinterVisitor::test_Visit_With_DisplayIdentifierAndRegister_true ()
 }
 
 //===========================================================================
-// End of UT_GmlPrinterVisitor.cpp
+// End of UT_GmlPrinter.cpp
 //===========================================================================

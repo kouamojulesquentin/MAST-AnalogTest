@@ -14,7 +14,7 @@
 #include "UT_DataCycle.hpp"
 
 #include "TestModelBuilder.hpp"
-#include "GmlPrinterVisitor.hpp"
+#include "GmlPrinter.hpp"
 #include "ConfigureVisitor.hpp"
 #include "ToSutVisitor.hpp"
 #include "FromSutUpdater.hpp"
@@ -65,7 +65,7 @@ SystemModel Create_SimpleMIB ()
   regDyn_2->SetPending();
   regDyn_3->SetPending();
 
-//+  GmlPrinterVisitor gmlPrinter("Simple MIB", true, true, true);
+//+  GmlPrinter gmlPrinter("Simple MIB", true, true, true);
 //+  root->Accept(gmlPrinter);
 //+  TS_ASSERT_EQUALS (gmlPrinter.Graph(), "");
 

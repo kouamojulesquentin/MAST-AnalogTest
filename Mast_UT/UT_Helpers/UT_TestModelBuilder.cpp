@@ -14,7 +14,7 @@
 #include "UT_TestModelBuilder.hpp"
 #include "TestModelBuilder.hpp"
 #include "SystemModelNodes.hpp"
-#include "GmlPrinterVisitor.hpp"
+#include "GmlPrinter.hpp"
 #include "PrettyPrinterVisitor.hpp"
 
 #include "SystemModelCheckResult_Traits.hpp"
@@ -66,7 +66,7 @@ void UT_TestModelBuilder::test_Create_UnitTestCase_6_Levels ()
   }
 
   // Export gml
-//+  TS_TRACE (GmlPrinterVisitor::Graph(tap, "UnitTestCase_6_Levels"));
+//+  TS_TRACE (GmlPrinter::Graph(tap, "UnitTestCase_6_Levels"));
 }
 
 
@@ -93,8 +93,8 @@ void UT_TestModelBuilder::test_Create_TestCase_AccessInterface ()
   auto result = sm.Check();
   TS_ASSERT_EQUALS (result, SystemModelCheckResult::None);
 
-  // Check with GmlPrinterVisitor
-  GmlPrinterVisitor printer("", GmlPrinterOptions::ShowSelectorWithEdge);
+  // Check with GmlPrinter
+  GmlPrinter printer("", GmlPrinterOptions::ShowSelectorWithEdge);
   printer.DisplayIdentifier(true);
   printer.DisplayRegisterValue(true);
   printer.DisplayValueAuto(true);
@@ -183,10 +183,10 @@ void UT_TestModelBuilder::test_Create_TestCase_MIB_4_Chains ()
   auto result = sm.Check();
   TS_ASSERT_EQUALS (result, SystemModelCheckResult::None);
 
-  // Check with GmlPrinterVisitor
+  // Check with GmlPrinter
 
   // With GML printer
-  GmlPrinterVisitor printer("", GmlPrinterOptions::ShowSelectorWithEdge);
+  GmlPrinter printer("", GmlPrinterOptions::ShowSelectorWithEdge);
   printer.DisplayIdentifier(true);
   printer.DisplayRegisterValue(true);
   printer.DisplayValueAuto(true);
@@ -339,10 +339,10 @@ void UT_TestModelBuilder::test_Create_TestCase_1687 ()
   auto result = sm.Check();
   TS_ASSERT_EQUALS (result, SystemModelCheckResult::None);
 
-  // Check with GmlPrinterVisitor
+  // Check with GmlPrinter
 
   // With GML printer
-  GmlPrinterVisitor printer("", GmlPrinterOptions::ShowSelectorWithEdge);
+  GmlPrinter printer("", GmlPrinterOptions::ShowSelectorWithEdge);
   printer.DisplayIdentifier(true);
   printer.DisplayRegisterValue(true);
   printer.DisplayValueAuto(true);
@@ -464,10 +464,10 @@ void UT_TestModelBuilder::test_Create_TestCase_1500_3_Chains ()
   auto result = sm.Check();
   TS_ASSERT_EQUALS (result, SystemModelCheckResult::None);
 
-  // Check with GmlPrinterVisitor
+  // Check with GmlPrinter
 
   // With GML printer
-  GmlPrinterVisitor printer("", GmlPrinterOptions::ShowSelectorWithEdge);
+  GmlPrinter printer("", GmlPrinterOptions::ShowSelectorWithEdge);
   printer.DisplayIdentifier(true);
   printer.DisplayRegisterValue(true);
   printer.DisplayValueAuto(true);

@@ -1,30 +1,30 @@
 //===========================================================================
-//                           UT_GmlPrinterVisitor.hpp
+//                           UT_GmlPrinter.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file UT_GmlPrinterVisitor.hpp
+//! @file UT_GmlPrinter.hpp
 //!
-//! Declares test fixture class for testing GmlPrinterVisitor
+//! Declares test fixture class for testing GmlPrinter
 //!
 //===========================================================================
 
 
-#ifndef UT_GMLPRINTERVISITOR_H__EE13EE8E_BF72_4155_E7B9_E5465FA829B9__INCLUDED_
-  #define UT_GMLPRINTERVISITOR_H__EE13EE8E_BF72_4155_E7B9_E5465FA829B9__INCLUDED_
+#ifndef UT_GMLPRINTER_H__F9300B2B_ED20_45DF_8683_469A2DB684E7__INCLUDED_
+  #define UT_GMLPRINTER_H__F9300B2B_ED20_45DF_8683_469A2DB684E7__INCLUDED_
 
 #include <cxxtest/TestSuite.h>
 
-//! Unit tests for class GmlPrinterVisitor
+//! Unit tests for class GmlPrinter
 //!
 //!
-class UT_GmlPrinterVisitor : public CxxTest::TestSuite
+class UT_GmlPrinter : public CxxTest::TestSuite
 {
   public:
-   UT_GmlPrinterVisitor() = default;
-  ~UT_GmlPrinterVisitor() = default;
+   UT_GmlPrinter() = default;
+  ~UT_GmlPrinter() = default;
 
   // ---------------- Constructor
   //
@@ -50,11 +50,11 @@ class UT_GmlPrinterVisitor : public CxxTest::TestSuite
   void setUp(); //!< Initializes test (called for each test)
 };
 //
-//  End of UT_GmlPrinterVisitor class declaration
+//  End of UT_GmlPrinter class declaration
 //---------------------------------------------------------------------------
 
 
-#endif  // not defined UT_GMLPRINTERVISITOR_H__EE13EE8E_BF72_4155_E7B9_E5465FA829B9__INCLUDED_
+#endif  // not defined UT_GMLPRINTER_H__F9300B2B_ED20_45DF_8683_469A2DB684E7__INCLUDED_
 //===========================================================================
-// End of UT_GmlPrinterVisitor.hpp
+// End of UT_GmlPrinter.hpp
 //===========================================================================

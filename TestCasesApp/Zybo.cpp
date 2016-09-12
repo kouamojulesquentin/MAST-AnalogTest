@@ -33,7 +33,7 @@ vector<ApplicationAssociation> test::Zybo_CreateApplicationsDescriptor ()
   auto app = []()
   {
     auto     registerPath = "reg_0";
-    auto     loopCount    = 10u;
+    auto     loopCount    = 891u;
     uint16_t initialValue = 1u;
 
     while (loopCount)

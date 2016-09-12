@@ -1,4 +1,4 @@
-JTAG_TAP TAP Loopback 8 2
+JTAG_TAP TAP Loopback 11 2
 {
-    REGISTER reg_0 11 Bypass: "0b001:0110:1100"
+    REGISTER reg_0 16 Bypass: "0b:00100001:0110:1100"
 }

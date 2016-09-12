@@ -100,26 +100,33 @@ std::shared_ptr<AccessInterface> Create_TestCase_1500 (SystemModel& sm, string_v
 
 //! Creates test case "MIB_Multichain_Pre"
 //!
-std::shared_ptr<AccessInterface> Create_TestCase_MIB_Multichain_Pre (SystemModel& sm, bool reportGml = false)
+std::shared_ptr<AccessInterface> Create_TestCase_MIB_Multichain_Pre (SystemModel& sm,
+                                                                     bool         reportGml     = false,
+                                                                     uint32_t     regsBitsCount = DYNAMIC_TDR_LEN)
 {
   TestModelBuilder builder(sm);
 
-  auto tap = builder.Create_TestCase_MIB_Multichain_Pre("TAP", 4u);
+  auto tap = builder.Create_TestCase_MIB_Multichain_Pre("TAP", 4u, regsBitsCount);
 
   auto regDyn_0  = sm.RegisterWithId(6u);
   auto regDyn_1  = sm.RegisterWithId(7u);
   auto regDyn_2  = sm.RegisterWithId(8u);
   auto regDyn_3  = sm.RegisterWithId(9u);
 
-  regDyn_0->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x60));
-  regDyn_1->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x61));
-  regDyn_2->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x62));
-  regDyn_3->SetToSut   (BinaryVector(DYNAMIC_TDR_LEN, 0x63));
+  regDyn_0->SetToSut   (BinaryVector(regsBitsCount, 0x60));
+  regDyn_1->SetToSut   (BinaryVector(regsBitsCount, 0x61));
+  regDyn_2->SetToSut   (BinaryVector(regsBitsCount, 0x62));
+  regDyn_3->SetToSut   (BinaryVector(regsBitsCount, 0x63));
 
-  regDyn_0->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x40));
-  regDyn_1->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x41));
-  regDyn_2->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x42));
-  regDyn_3->SetBypass  (BinaryVector(DYNAMIC_TDR_LEN, 0x43));
+  regDyn_0->SetBypass  (BinaryVector(regsBitsCount, 0x40));
+  regDyn_1->SetBypass  (BinaryVector(regsBitsCount, 0x41));
+  regDyn_2->SetBypass  (BinaryVector(regsBitsCount, 0x42));
+  regDyn_3->SetBypass  (BinaryVector(regsBitsCount, 0x43));
+
+  regDyn_0->SetPendingForRead(); regDyn_0->SetFromSut  (BinaryVector(regsBitsCount, 0x50));
+  regDyn_1->SetPendingForRead(); regDyn_1->SetFromSut  (BinaryVector(regsBitsCount, 0x51));
+  regDyn_2->SetPendingForRead(); regDyn_2->SetFromSut  (BinaryVector(regsBitsCount, 0x52));
+  regDyn_3->SetPendingForRead(); regDyn_3->SetFromSut  (BinaryVector(regsBitsCount, 0x53));
 
   if (reportGml)
   {
@@ -331,6 +338,85 @@ template<typename T> void Check_iGet_SingleThread (string_view initialValue, T e
   //
   TS_ASSERT_EQUALS (lastFromSut, expected);
 }
+
+
+//! Checks SystemModelManager::iRead()
+//!
+//! @param iReadValue         The value passed to iRead
+//! @param iWriteValue        The value passed to iWrite
+//! @param expectedMismatch   Expected mismatch (checked with 40 bits register)
+//!
+template<typename T> void Check_iRead_SingleThread (T iReadValue, T iWriteValue, string_view expectedMismatch)
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm, false, 40u);
+  SystemModelManager sut(sm);
+
+  auto regPath = "dynamic_2";
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.iRead(regPath, iReadValue));
+
+  // ---------------- Verify
+  //
+  sut.iWrite (regPath, iWriteValue); // Loopback (default protocol) will force FromSut to be updated
+  sut.iApply();
+
+  auto xorResult         = sut.iGetMiscompares (regPath);
+  auto status            = sut.iGetStatus      (regPath, false);
+  auto expectedXorResult = BinaryVector::CreateFromHexString(expectedMismatch);
+
+  TS_ASSERT_EQUALS (status,    1u);
+  TS_ASSERT_EQUALS (xorResult, expectedXorResult);   // 40 bits reg
+}
+
+//! Checks SystemModelManager::iGetRefresh() with 4 application threads accessing multiple times their own register
+//!
+//! @note It just check that application and manager threads are not blocked
+template<typename T> void Check_iGetRefresh ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
+  auto reg_0  = sm.RegisterWithId(6u); reg_0->SetHoldValue(true); // Hold is to maintain the same value (nextToSut become also bypass)
+  auto reg_1  = sm.RegisterWithId(7u); reg_1->SetHoldValue(true);
+  auto reg_2  = sm.RegisterWithId(8u); reg_2->SetHoldValue(true);
+  auto reg_3  = sm.RegisterWithId(9u); reg_3->SetHoldValue(true);
+
+  SystemModelManager sut(sm);
+
+  // Thread functor
+  auto appFunctor = [&sut](string_view regName)
+  {
+    TS_ASSERT_THROWS_NOTHING
+    (
+      T gotData;
+
+      for (int ii = 0 ; ii < 8 ; ++ii)
+      {
+        sut.iGetRefresh(regName, gotData);
+      }
+    );
+  };
+
+  // ---------------- Setup (main thread)
+  //
+  sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_0"); }, "App_0");
+  sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_1"); }, "App_1");
+  sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_2"); }, "App_2");
+  sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_3"); }, "App_3");
+  sut.Start();
+  sut.StartCreatedApplicationThreads();
+  sut.WaitForApplicationsEnd();              // Make sure applications have done their action
+  sut.Stop();
+}
+
 } // End of unnamed namespace
 
 
@@ -2043,47 +2129,17 @@ void UT_SystemModelManager::test_iRefresh_4_RegPerApp ()
 
 
 
-//! Checks SystemModelManager::iGetRefresh() with 4 application threads accessing multiple times their own register
-//!
-//! @note It just check that application and manager threads are not blocked
-void UT_SystemModelManager::test_iGetRefresh ()
-{
-  // ---------------- Setup
-  //
-  SystemModel sm;
-  Create_TestCase_MIB_Multichain_Pre(sm);
-
-  auto mux  = sm.LinkerWithId(2u);   // This is Tap mux
-  auto reg_0  = sm.RegisterWithId(6u); reg_0->SetHoldValue(true); // Hold is to maintain the same value (nextToSut becoume also bypass)
-  auto reg_1  = sm.RegisterWithId(7u); reg_1->SetHoldValue(true);
-  auto reg_2  = sm.RegisterWithId(8u); reg_2->SetHoldValue(true);
-  auto reg_3  = sm.RegisterWithId(9u); reg_3->SetHoldValue(true);
-
-  SystemModelManager sut(sm);
-
-  // Thread functor
-  auto appFunctor = [&sut](string_view regName)
-  {
-    TS_ASSERT_THROWS_NOTHING
-    (
-      uint32_t gotData;
-
-      for (int ii = 0 ; ii < 8 ; ++ii)
-      {
-        sut.iGetRefresh(regName, gotData);
-      }
-    );
-  };
-
-  // ---------------- Setup (main thread)
-  //
-  sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_0"); }, "App_0");
-  sut.CreateApplicationThread(mux, [appFunctor]() { appFunctor("dynamic_1"); }, "App_1");
-  sut.Start();
-  sut.StartCreatedApplicationThreads();
-  sut.WaitForApplicationsEnd();              // Make sure applications have done their action
-  sut.Stop();
-}
+// Checks SystemModelManager::iGetRefresh() with 4 application threads accessing multiple times their own register
+//
+void UT_SystemModelManager::test_iGetRefresh_uint8        () { Check_iGetRefresh<uint8_t>();      }
+void UT_SystemModelManager::test_iGetRefresh_uint16       () { Check_iGetRefresh<uint16_t>();     }
+void UT_SystemModelManager::test_iGetRefresh_uint32       () { Check_iGetRefresh<uint32_t>();     }
+void UT_SystemModelManager::test_iGetRefresh_uint64       () { Check_iGetRefresh<uint64_t>();     }
+void UT_SystemModelManager::test_iGetRefresh_int8         () { Check_iGetRefresh<int8_t>();       }
+void UT_SystemModelManager::test_iGetRefresh_int16        () { Check_iGetRefresh<int16_t>();      }
+void UT_SystemModelManager::test_iGetRefresh_int32        () { Check_iGetRefresh<int32_t>();      }
+void UT_SystemModelManager::test_iGetRefresh_int64        () { Check_iGetRefresh<int64_t>();      }
+void UT_SystemModelManager::test_iGetRefresh_BinaryVector () { Check_iGetRefresh<BinaryVector>(); }
 
 
 //! Checks SystemModelManager::iGetStatus() without requesting to reset the counter
@@ -2316,6 +2372,20 @@ void UT_SystemModelManager::test_iGetMiscompares_Multithread ()
   sut.Stop();
   TS_ASSERT_FALSE (reachedTimeout);
 }
+
+//! Checks SystemModelManager::iRead() using same thread as SystemModelManager
+//!                                                                           // iReadValue, iWriteValue, expectedMismatch
+void UT_SystemModelManager::test_iRead_uint8        () { Check_iRead_SingleThread<uint8_t>  (0xF0,        0xAC,        "000000005C"); }
+void UT_SystemModelManager::test_iRead_uint16       () { Check_iRead_SingleThread<uint16_t> (0x0FF0,      0xACDE,      "000000A32E"); }
+void UT_SystemModelManager::test_iRead_uint32       () { Check_iRead_SingleThread<uint32_t> (0xFF00FF00,  0x89ABCDEF,  "0076AB32EF"); }
+void UT_SystemModelManager::test_iRead_uint64       () { Check_iRead_SingleThread<uint64_t> (0xCFF00FF00, 0xD89ABCDEF, "0176AB32EF"); }
+void UT_SystemModelManager::test_iRead_int8         () { Check_iRead_SingleThread<int8_t>   (0x70,        0x6C,        "000000001C"); }
+void UT_SystemModelManager::test_iRead_int16        () { Check_iRead_SingleThread<int16_t>  (0x0FF0,      0x3CDE,      "000000332E"); }
+void UT_SystemModelManager::test_iRead_int32        () { Check_iRead_SingleThread<int32_t>  (0x2F00FF00,  0x49ABCDEF,  "0066AB32EF"); }
+void UT_SystemModelManager::test_iRead_int64        () { Check_iRead_SingleThread<int64_t>  (0xCFF00FF00, 0xD89ABCDEF, "0176AB32EF"); }
+void UT_SystemModelManager::test_iRead_BinaryVector () { Check_iRead_SingleThread(BinaryVector::CreateFromHexString("0CFF00FF00"),
+                                                                                  BinaryVector::CreateFromHexString("0D89ABCDEF"),
+                                                                                                                    "0176AB32EF"); }
 
 //===========================================================================
 // End of UT_SystemModelManager.cpp

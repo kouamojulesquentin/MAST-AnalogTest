@@ -108,7 +108,16 @@ class UT_SystemModelManager : public CxxTest::TestSuite
   //
   void test_iRefresh ();
   void test_iRefresh_4_RegPerApp ();
-  void test_iGetRefresh ();
+
+  void test_iGetRefresh_uint8 ();
+  void test_iGetRefresh_uint16 ();
+  void test_iGetRefresh_uint32 ();
+  void test_iGetRefresh_uint64 ();
+  void test_iGetRefresh_int8 ();
+  void test_iGetRefresh_int16 ();
+  void test_iGetRefresh_int32 ();
+  void test_iGetRefresh_int64 ();
+  void test_iGetRefresh_BinaryVector ();
 
   // ---------------- iGetStatus
   //
@@ -120,6 +129,18 @@ class UT_SystemModelManager : public CxxTest::TestSuite
   //
   void test_iGetMiscompares ();
   void test_iGetMiscompares_Multithread ();
+
+  // ---------------- iRead
+  //
+  void test_iRead_uint8 ();
+  void test_iRead_uint16 ();
+  void test_iRead_uint32 ();
+  void test_iRead_uint64 ();
+  void test_iRead_int8 ();
+  void test_iRead_int16 ();
+  void test_iRead_int32 ();
+  void test_iRead_int64 ();
+  void test_iRead_BinaryVector ();
 
   // ================ Other Methods ================
 

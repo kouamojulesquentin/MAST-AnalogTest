@@ -23,6 +23,20 @@ namespace mast
 {
 class ParentNode;
 
+//! Options for SystemModelManagerMonitor
+//!
+enum class ManagerMonitorOptions
+{
+  Default             = 0,
+  AppThreadCreation   = 1 << 0, //!< Monitor application thread creation
+  BeforeConfiguration = 1 << 1, //!< Monitor SystemModel state before configuration
+  AfterConfiguration  = 1 << 2, //!< Monitor SystemModel state after configuration
+  ExportGml           = 1 << 3, //!< Tells whether GML graph is exported (before/after  configuration)
+
+  Std                 = AppThreadCreation,
+  All                 = Std | BeforeConfiguration | AfterConfiguration,
+};
+
 //! Provides monitoring of SystemModelManager behavior and SystemModel state
 //!
 class DLL_EXPORT SystemModelManagerMonitor
@@ -32,6 +46,15 @@ class DLL_EXPORT SystemModelManagerMonitor
   public:
   virtual ~SystemModelManagerMonitor() = default;
   SystemModelManagerMonitor()  = default;
+
+  //! Returns current monitoring options
+  //!
+  ManagerMonitorOptions  Options() const { return m_options; }
+
+  //! Sets monitoring options
+  //!
+  void  Options (ManagerMonitorOptions options) { m_options = options; }
+
 
   using string_view = std::experimental::string_view;
 
@@ -45,13 +68,10 @@ class DLL_EXPORT SystemModelManagerMonitor
   virtual void BeforeConfiguration (ParentNode&       root);                           //!< Monitors state of SystemModel (from parentNode) before configuration
   virtual void AfterConfiguration  (ParentNode&       root);                           //!< Monitors state of SystemModel (from parentNode) after configuration
 
-  std::string GmlBasePath()                const { return m_gmlPrinterBasePath;         }
-  bool        MonitorAfterConfiguration()  const { return m_monitorAfterConfiguration;  }
-  bool        MonitorBeforeConfiguration() const { return m_monitorBeforeConfiguration; }
+  std::string GmlBasePath() const { return m_gmlPrinterBasePath; }
 
-  void GmlBasePath                (std::string gmlBasePath)                { m_gmlPrinterBasePath         = gmlBasePath;                }
-  void MonitorAfterConfiguration  (bool        monitorAfterConfiguration)  { m_monitorAfterConfiguration  = monitorAfterConfiguration;  }
-  void MonitorBeforeConfiguration (bool        monitorBeforeConfiguration) { m_monitorBeforeConfiguration = monitorBeforeConfiguration; }
+  void GmlBasePath (std::string gmlBasePath) { m_gmlPrinterBasePath = gmlBasePath; }
+
 
   // ---------------- Protected Methods
   //
@@ -64,19 +84,12 @@ class DLL_EXPORT SystemModelManagerMonitor
   //! Wraps debug name within simple quotes
   std::string WrapDebugName (string_view debugName) { return debugName.empty() ? "" : "'" + debugName.to_string() + "': "; }
 
-  // ---------------- Private  Methods
-  //
-  private:
-
   // ---------------- Private  Fields
   //
   private:
-  uint32_t          m_dataCyclesCount            = 0;     //!< Number of data cycles since startup or last reset
-  bool              m_monitorAppThreadCreation   = true;  //!< True when requested to monitor application thread creation
-  bool              m_monitorAfterConfiguration  = false; //!< True when requested to monitor SystemModel state after configuration
-  bool              m_monitorBeforeConfiguration = false; //!< True when requested to monitor SystemModel state before configuration
-  GmlPrinter m_gmlMonitor;                         //!< Visitor for building graph with SystemModel state
-  std::string       m_gmlPrinterBasePath;                 //!< Base path use when exporting graph representing system model
+  uint32_t              m_dataCyclesCount = 0; //!< Number of data cycles since startup or last reset
+  std::string           m_gmlPrinterBasePath;  //!< Base path use when exporting graph representing system model
+  ManagerMonitorOptions m_options         = ManagerMonitorOptions::Std;
 };
 //
 //  End of SystemModelManagerMonitor class declaration

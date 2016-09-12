@@ -14,6 +14,7 @@
 #include "SystemModelManagerMonitor.hpp"
 #include "ParentNode.hpp"
 #include "GmlPrinter.hpp"
+#include "Utility.hpp"
 #include "g3log/g3log.hpp"
 
 #include <sstream>
@@ -33,7 +34,7 @@ using namespace mast;
 //!
 void SystemModelManagerMonitor::AfterConfiguration (ParentNode& root)
 {
-  if (m_monitorAfterConfiguration)
+  if (IsSet(m_options, ManagerMonitorOptions::AfterConfiguration))
   {
     LOG(INFO) << "Configuration: End";
     ExportGml("After", root);
@@ -50,7 +51,7 @@ void SystemModelManagerMonitor::AfterConfiguration (ParentNode& root)
 //!
 void SystemModelManagerMonitor::BeforeConfiguration (ParentNode& root)
 {
-  if (m_monitorBeforeConfiguration)
+  if (IsSet(m_options, ManagerMonitorOptions::BeforeConfiguration))
   {
     LOG(INFO) << "Configuration: Begin";
     ExportGml("Before", root);
@@ -67,7 +68,7 @@ void SystemModelManagerMonitor::BeforeConfiguration (ParentNode& root)
 //!
 void SystemModelManagerMonitor::CreateApplication (const ParentNode& topNode, string_view debugName)
 {
-  if (m_monitorAppThreadCreation)
+  if (IsSet(m_options, ManagerMonitorOptions::AppThreadCreation))
   {
     LOG(INFO) << WrapDebugName(debugName) << "Creating application thread" << NodeInfos(topNode);
   }
@@ -81,14 +82,13 @@ void SystemModelManagerMonitor::CreateApplication (const ParentNode& topNode, st
 //!
 void SystemModelManagerMonitor::ExportGml (string_view step, ParentNode& root)
 {
-  if (!m_gmlPrinterBasePath.empty())
+  if (  !m_gmlPrinterBasePath.empty()
+      && IsSet(m_options, ManagerMonitorOptions::ExportGml)
+     )
   {
     // ---------------- Make graph
     //
-    GmlPrinter printer("", GmlPrinterOptions::Std);
-
-    root.Accept(printer);
-    auto graph = printer.Graph();
+    auto graph = GmlPrinter::Graph(root, "Mast");
 
     // ---------------- Save graph to file
     //

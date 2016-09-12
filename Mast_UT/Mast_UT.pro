@@ -46,13 +46,13 @@ SOURCES += \
     SystemModel/UT_NamesChecker.cpp                   \
     SystemModel/UT_NodePathResolver.cpp               \
     SystemModel/UT_ParentNode.cpp                     \
-    SystemModel/UT_PrettyPrinter.cpp           \
+    SystemModel/UT_PrettyPrinter.cpp                  \
     SystemModel/UT_PropagatePendingVisitor.cpp        \
     SystemModel/UT_Register.cpp                       \
     SystemModel/UT_SVF_SimulationProtocol.cpp         \
     SystemModel/UT_SystemModel.cpp                    \
     SystemModel/UT_SystemModelBuilder.cpp             \
-    SystemModel/UT_SystemModelCheckerVisitor.cpp      \
+    SystemModel/UT_SystemModelChecker.cpp             \
     SystemModel/UT_ToSutVisitor.cpp                   \
     SystemModel/UT_SystemModelManager.cpp             \
     SystemModel/UT_SystemModelNode.cpp                \
@@ -85,13 +85,13 @@ HEADERS += \
     SystemModel/UT_NamesChecker.hpp                   \
     SystemModel/UT_NodePathResolver.hpp               \
     SystemModel/UT_ParentNode.hpp                     \
-    SystemModel/UT_PrettyPrinter.hpp           \
+    SystemModel/UT_PrettyPrinter.hpp                  \
     SystemModel/UT_PropagatePendingVisitor.hpp        \
     SystemModel/UT_Register.hpp                       \
     SystemModel/UT_SVF_SimulationProtocol.hpp         \
     SystemModel/UT_SystemModel.hpp                    \
     SystemModel/UT_SystemModelBuilder.hpp             \
-    SystemModel/UT_SystemModelCheckerVisitor.hpp      \
+    SystemModel/UT_SystemModelChecker.hpp             \
     SystemModel/UT_ToSutVisitor.hpp                   \
     SystemModel/UT_SystemModelManager.hpp             \
     SystemModel/UT_SystemModelNode.hpp                \

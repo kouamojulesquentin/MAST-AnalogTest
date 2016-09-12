@@ -45,7 +45,7 @@ SOURCES +=  \
     src/NodePathResolver.cpp                        \
     src/OpenOCDProtocol.cpp                         \
     src/ParentNode.cpp                              \
-    src/PrettyPrinter.cpp                    \
+    src/PrettyPrinter.cpp                           \
     src/PropagatePendingVisitor.cpp                 \
     src/Register.cpp                                \
     src/SVF_Player.cpp                              \
@@ -58,7 +58,7 @@ SOURCES +=  \
     src/SystemModelBuilder.cpp                      \
     src/SystemModelManager.cpp                      \
     src/SystemModelManagerMonitor.cpp               \
-    src/SystemModelCheckerVisitor.cpp               \
+    src/SystemModelChecker.cpp                      \
     src/SystemModelCheckResult.cpp                  \
     src/SystemModelVisitor.cpp                      \
     src/ToSutVisitor.cpp                            \
@@ -92,7 +92,7 @@ HEADERS += \
     include/OpenOCDProtocol.hpp                         \
     include/ParentNode.hpp                              \
     include/PathSelector.hpp                            \
-    include/PrettyPrinter.hpp                    \
+    include/PrettyPrinter.hpp                           \
     include/PropagatePendingVisitor.hpp                 \
     include/Register.hpp                                \
     include/SVF_Player.hpp                              \
@@ -105,7 +105,7 @@ HEADERS += \
     include/SystemModelBuilder.hpp                      \
     include/SystemModelManager.hpp                      \
     include/SystemModelManagerMonitor.hpp               \
-    include/SystemModelCheckerVisitor.hpp               \
+    include/SystemModelChecker.hpp                      \
     include/SystemModelCheckResult.hpp                  \
     include/SystemModelNode.hpp                         \
     include/SystemModelNodes.hpp                        \

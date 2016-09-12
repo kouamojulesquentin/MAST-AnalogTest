@@ -1,17 +1,17 @@
 //===========================================================================
-//                           SystemModelCheckerVisitor.cpp
+//                           SystemModelChecker.cpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file SystemModelCheckerVisitor.cpp
+//! @file SystemModelChecker.cpp
 //!
-//! Implements class SystemModelCheckerVisitor
+//! Implements class SystemModelChecker
 //!
 //===========================================================================
 
-#include "SystemModelCheckerVisitor.hpp"
+#include "SystemModelChecker.hpp"
 #include "PathSelector.hpp"
 #include "AccessInterfaceProtocol.hpp"
 #include "NamesChecker.hpp"
@@ -31,7 +31,7 @@ using std::ostringstream;
 //!
 //! @see CheckIdentifiers and CheckTree
 //!
-SystemModelCheckResult SystemModelCheckerVisitor::Check ()
+SystemModelCheckResult SystemModelChecker::Check ()
 {
   CheckIdentifiers();
   CheckTree();
@@ -43,14 +43,14 @@ SystemModelCheckResult SystemModelCheckerVisitor::Check ()
   return result;
 }
 //
-//  End of: SystemModelCheckerVisitor::Check
+//  End of: SystemModelChecker::Check
 //---------------------------------------------------------------------------
 
 
 //! Checks that root is an AccessInterface or a Chain with only AccessInterface
 //! and there is no more AccessInterface below the hierarchy
 //!
-void SystemModelCheckerVisitor::CheckAccessInterface ()
+void SystemModelChecker::CheckAccessInterface ()
 {
   auto rootAsAI    = dynamic_pointer_cast<AccessInterface > (m_root);
   auto rootAsChain = dynamic_pointer_cast<Chain>(m_root);
@@ -91,7 +91,7 @@ void SystemModelCheckerVisitor::CheckAccessInterface ()
   }
 }
 //
-//  End of: SystemModelCheckerVisitor::CheckAccessInterface
+//  End of: SystemModelChecker::CheckAccessInterface
 //---------------------------------------------------------------------------
 
 
@@ -101,7 +101,7 @@ void SystemModelCheckerVisitor::CheckAccessInterface ()
 //! @note - Each used identifier must refere to a node that has the very same identifier
 //!       - Unused identifiers are collected as "info"
 //!
-void SystemModelCheckerVisitor::CheckIdentifiers ()
+void SystemModelChecker::CheckIdentifiers ()
 {
   auto idCount = m_identifierMapping.size();
 
@@ -126,7 +126,7 @@ void SystemModelCheckerVisitor::CheckIdentifiers ()
   }
 }
 //
-//  End of: SystemModelCheckerVisitor::CheckIdentifiers
+//  End of: SystemModelChecker::CheckIdentifiers
 //---------------------------------------------------------------------------
 
 
@@ -139,7 +139,7 @@ void SystemModelCheckerVisitor::CheckIdentifiers ()
 //!
 //! @return true when this is the first time this child node has been checked.
 //!
-bool SystemModelCheckerVisitor::CheckChildNode (shared_ptr<const ParentNode> parent, shared_ptr<const SystemModelNode> child)
+bool SystemModelChecker::CheckChildNode (shared_ptr<const ParentNode> parent, shared_ptr<const SystemModelNode> child)
 {
   auto checkedOnce = true;
 
@@ -206,7 +206,7 @@ bool SystemModelCheckerVisitor::CheckChildNode (shared_ptr<const ParentNode> par
   return checkedOnce;
 }
 //
-//  End of: SystemModelCheckerVisitor::CheckChildNode
+//  End of: SystemModelChecker::CheckChildNode
 //---------------------------------------------------------------------------
 
 
@@ -214,7 +214,7 @@ bool SystemModelCheckerVisitor::CheckChildNode (shared_ptr<const ParentNode> par
 //!
 //! @note Does no check when there is no protocol (this is checked everywhere)
 //!
-void SystemModelCheckerVisitor::CheckNumberOfDerivations (shared_ptr<AccessInterface> accessInterface)
+void SystemModelChecker::CheckNumberOfDerivations (shared_ptr<AccessInterface> accessInterface)
 {
   auto protocol = accessInterface->Protocol();
 
@@ -243,7 +243,7 @@ void SystemModelCheckerVisitor::CheckNumberOfDerivations (shared_ptr<AccessInter
   }
 }
 //
-//  End of: SystemModelCheckerVisitor::CheckNumberOfDerivations
+//  End of: SystemModelChecker::CheckNumberOfDerivations
 //---------------------------------------------------------------------------
 
 
@@ -254,7 +254,7 @@ void SystemModelCheckerVisitor::CheckNumberOfDerivations (shared_ptr<AccessInter
 //!   - Each parent node has at least one child otherwise a warning is issued
 //! @note Names are checked elsewhere
 //!
-void SystemModelCheckerVisitor::CheckParentNode (shared_ptr<const ParentNode> parent)
+void SystemModelChecker::CheckParentNode (shared_ptr<const ParentNode> parent)
 {
   auto nextChild = parent->FirstChild();
 
@@ -297,7 +297,7 @@ void SystemModelCheckerVisitor::CheckParentNode (shared_ptr<const ParentNode> pa
   }
 }
 //
-//  End of: SystemModelCheckerVisitor::CheckParentNode
+//  End of: SystemModelChecker::CheckParentNode
 //---------------------------------------------------------------------------
 
 
@@ -313,7 +313,7 @@ void SystemModelCheckerVisitor::CheckParentNode (shared_ptr<const ParentNode> pa
 //! @param [in, out] childNames   Set names of already processed children that are not ignored path
 //! @param [in, out] ignoredNames Set names of already processed children that are ignored for paths
 //!
-void SystemModelCheckerVisitor::CheckSiblingName (shared_ptr<SystemModelNode> child, set<string_view>& childNames, set<string_view>& ignoredNames)
+void SystemModelChecker::CheckSiblingName (shared_ptr<SystemModelNode> child, set<string_view>& childNames, set<string_view>& ignoredNames)
 {
   auto asParentNode = dynamic_pointer_cast<const ParentNode>(child);
   auto name         = child->Name();
@@ -343,7 +343,7 @@ void SystemModelCheckerVisitor::CheckSiblingName (shared_ptr<SystemModelNode> ch
   }
 }
 //
-//  End of: SystemModelCheckerVisitor::CheckSiblingName
+//  End of: SystemModelChecker::CheckSiblingName
 //---------------------------------------------------------------------------
 
 
@@ -357,7 +357,7 @@ void SystemModelCheckerVisitor::CheckSiblingName (shared_ptr<SystemModelNode> ch
 //!   - Each linker has a number of chidren that matches its selector or an warning is issued when there are to few
 //!     children and an error when there are too much
 //!
-void SystemModelCheckerVisitor::CheckTree ()
+void SystemModelChecker::CheckTree ()
 {
   if (!m_root)
   {
@@ -399,14 +399,14 @@ void SystemModelCheckerVisitor::CheckTree ()
   }
 }
 //
-//  End of: SystemModelCheckerVisitor::CheckTree
+//  End of: SystemModelChecker::CheckTree
 //---------------------------------------------------------------------------
 
 
 
 //! Checks consistency specific to AccessInterface nodes
 //!
-void SystemModelCheckerVisitor::VisitAccessInterface (AccessInterface& accessInterface)
+void SystemModelChecker::VisitAccessInterface (AccessInterface& accessInterface)
 {
   auto protocol = accessInterface.Protocol();
 
@@ -416,18 +416,18 @@ void SystemModelCheckerVisitor::VisitAccessInterface (AccessInterface& accessInt
   }
 }
 //
-//  End of: SystemModelCheckerVisitor::VisitAccessInterface
+//  End of: SystemModelChecker::VisitAccessInterface
 //---------------------------------------------------------------------------
 
 
 //! Checks consistency specific to Chain nodes
 //!
-void SystemModelCheckerVisitor::VisitChain (Chain& )
+void SystemModelChecker::VisitChain (Chain& )
 {
   // Nothing to do yet
 }
 //
-//  End of: SystemModelCheckerVisitor::VisitChain
+//  End of: SystemModelChecker::VisitChain
 //---------------------------------------------------------------------------
 
 
@@ -438,9 +438,9 @@ void SystemModelCheckerVisitor::VisitChain (Chain& )
 //!   - Each linker has a number of children that matches its selector or an warning is issued when there are to few
 //!     children and an error when there are too much
 //!
-void SystemModelCheckerVisitor::VisitLinker (Linker& linker)
+void SystemModelChecker::VisitLinker (Linker& linker)
 {
-  //! @todo [JFC]-[May/24/2016]: Implement SystemModelCheckerVisitor::VisitLinker()
+  //! @todo [JFC]-[May/24/2016]: Implement SystemModelChecker::VisitLinker()
 
   auto childrenCount = linker.DirectChildrenCount();
   auto pathSelector  = linker.Selector();
@@ -486,21 +486,21 @@ void SystemModelCheckerVisitor::VisitLinker (Linker& linker)
   }
 }
 //
-//  End of: SystemModelCheckerVisitor::VisitLinker
+//  End of: SystemModelChecker::VisitLinker
 //---------------------------------------------------------------------------
 
 
 //! Checks consistency specific to Register nodes
 //!
-void SystemModelCheckerVisitor::VisitRegister (Register& )
+void SystemModelChecker::VisitRegister (Register& )
 {
   // Nothing to do yet
 }
 //
-//  End of: SystemModelCheckerVisitor::VisitRegister
+//  End of: SystemModelChecker::VisitRegister
 //---------------------------------------------------------------------------
 
 
 //===========================================================================
-// End of SystemModelCheckerVisitor.cpp
+// End of SystemModelChecker.cpp
 //===========================================================================

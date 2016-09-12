@@ -17,7 +17,7 @@
 #include "DefaultTableBasedPathSelector.hpp"
 #include "DefaultBinaryPathSelector.hpp"
 #include "LoopbackAccessInterfaceProtocol.hpp"
-#include "SystemModelCheckerVisitor.hpp"
+#include "SystemModelChecker.hpp"
 #include <string>
 
 using namespace mast;
@@ -41,7 +41,7 @@ using std::experimental::string_view;
 //!
 SystemModelCheckResult SystemModel::Check () const
 {
-  SystemModelCheckerVisitor checker(*this);
+  SystemModelChecker checker(*this);
 
   auto result = checker.Check();
 

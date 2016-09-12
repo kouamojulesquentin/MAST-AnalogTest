@@ -36,7 +36,7 @@ class DLL_EXPORT SystemModel
   //!
   SystemModel(bool autoRootNode) : m_autoRootNode(autoRootNode) {}
 
-  friend class SystemModelCheckerVisitor;
+  friend class SystemModelChecker;
 
   //! Checks model coherence
   //!

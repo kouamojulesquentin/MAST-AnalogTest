@@ -1,30 +1,30 @@
 //===========================================================================
-//                           UT_SystemModelCheckerVisitor.hpp
+//                           UT_SystemModelChecker.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file UT_SystemModelCheckerVisitor.hpp
+//! @file UT_SystemModelChecker.hpp
 //!
-//! Declares test fixture class for testing SystemModelCheckerVisitor
+//! Declares test fixture class for testing SystemModelChecker
 //!
 //===========================================================================
 
 
-#ifndef UT_SYSTEMMODELCHECKERVISITOR_H__7B7782B0_5B71_4ED4_F38E_2389907371B__INCLUDED_
-  #define UT_SYSTEMMODELCHECKERVISITOR_H__7B7782B0_5B71_4ED4_F38E_2389907371B__INCLUDED_
+#ifndef UT_SYSTEMMODELCHECKER_H__5E4CB3CA_F334_4F38_F895_BB812595F3BC__INCLUDED_
+  #define UT_SYSTEMMODELCHECKER_H__5E4CB3CA_F334_4F38_F895_BB812595F3BC__INCLUDED_
 
 #include <cxxtest/TestSuite.h>
 
-//! Unit tests for class SystemModelCheckerVisitor
+//! Unit tests for class SystemModelChecker
 //!
 //!
-class UT_SystemModelCheckerVisitor : public CxxTest::TestSuite
+class UT_SystemModelChecker : public CxxTest::TestSuite
 {
   public:
-   UT_SystemModelCheckerVisitor() = default;
-  ~UT_SystemModelCheckerVisitor() = default;
+   UT_SystemModelChecker() = default;
+  ~UT_SystemModelChecker() = default;
 
   // ================ Test Methods ================
 
@@ -76,11 +76,11 @@ class UT_SystemModelCheckerVisitor : public CxxTest::TestSuite
   void setUp(); //!< Initializes test (called for each test)
 };
 //
-//  End of UT_SystemModelCheckerVisitor class declaration
+//  End of UT_SystemModelChecker class declaration
 //---------------------------------------------------------------------------
 
 
-#endif  // not defined UT_SYSTEMMODELCHECKERVISITOR_H__7B7782B0_5B71_4ED4_F38E_2389907371B__INCLUDED_
+#endif  // not defined UT_SYSTEMMODELCHECKER_H__5E4CB3CA_F334_4F38_F895_BB812595F3BC__INCLUDED_
 //===========================================================================
-// End of UT_SystemModelCheckerVisitor.hpp
+// End of UT_SystemModelChecker.hpp
 //===========================================================================

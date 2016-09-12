@@ -1,19 +1,19 @@
 //===========================================================================
-//                           SystemModelCheckerVisitor.hpp
+//                           SystemModelChecker.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file SystemModelCheckerVisitor.hpp
+//! @file SystemModelChecker.hpp
 //!
-//! Declares SystemModelCheckerVisitor class
+//! Declares SystemModelChecker class
 //!
 //===========================================================================
 
 
-#ifndef SYSTEMMODELCHECKERVISITOR_H__51E1518C_6330_4646_7A6_B51ECBAB1C6A__INCLUDED_
-  #define SYSTEMMODELCHECKERVISITOR_H__51E1518C_6330_4646_7A6_B51ECBAB1C6A__INCLUDED_
+#ifndef SYSTEMMODELCHECKER_H__BB1485FA_44D5_40BA_E5A8_C23F1A1BCC6__INCLUDED_
+  #define SYSTEMMODELCHECKER_H__BB1485FA_44D5_40BA_E5A8_C23F1A1BCC6__INCLUDED_
 
 #include "SystemModelCheckResult.hpp"
 #include "SystemModelVisitor.hpp"
@@ -30,14 +30,14 @@ namespace mast
 //!
 //! @note This is intended to be used by SystemModel::Check()
 //!
-class DLL_EXPORT SystemModelCheckerVisitor final : public Checker, public SystemModelVisitor
+class DLL_EXPORT SystemModelChecker final : public Checker, public SystemModelVisitor
 {
   // ---------------- Public  Methods
   //
   public:
-  ~SystemModelCheckerVisitor() = default;
-  SystemModelCheckerVisitor()  = delete;
-  SystemModelCheckerVisitor(const SystemModel& model)
+  ~SystemModelChecker() = default;
+  SystemModelChecker()  = delete;
+  SystemModelChecker(const SystemModel& model)
     : m_root              (model.Root())
     , m_identifierMapping (model.IdentifierMapping())
   {}
@@ -52,7 +52,7 @@ class DLL_EXPORT SystemModelCheckerVisitor final : public Checker, public System
   //!
   //! @see CheckIdentifiers and CheckTree
   //!
-  static SystemModelCheckResult Check(const SystemModel& model) { return SystemModelCheckerVisitor(model).Check(); };
+  static SystemModelCheckResult Check(const SystemModel& model) { return SystemModelChecker(model).Check(); };
 
   //! Checks SystemModel consistency
   //!
@@ -108,13 +108,13 @@ class DLL_EXPORT SystemModelCheckerVisitor final : public Checker, public System
   TIdentifierMapping          m_identifierMapping; //!< Maps a node identifier to a node instance
 };
 //
-//  End of SystemModelCheckerVisitor class declaration
+//  End of SystemModelChecker class declaration
 //---------------------------------------------------------------------------
 } // End of namespace mast
 
 
-#endif  // not defined SYSTEMMODELCHECKERVISITOR_H__51E1518C_6330_4646_7A6_B51ECBAB1C6A__INCLUDED_
+#endif  // not defined SYSTEMMODELCHECKER_H__BB1485FA_44D5_40BA_E5A8_C23F1A1BCC6__INCLUDED_
 
 //===========================================================================
-// End of SystemModelCheckerVisitor.hpp
+// End of SystemModelChecker.hpp
 //===========================================================================

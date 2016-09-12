@@ -1,17 +1,17 @@
 //===========================================================================
-//                           PrettyPrinterVisitor.cpp
+//                           PrettyPrinter.cpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file PrettyPrinterVisitor.cpp
+//! @file PrettyPrinter.cpp
 //!
-//! Implements class PrettyPrinterVisitor
+//! Implements class PrettyPrinter
 //!
 //===========================================================================
 
-#include "PrettyPrinterVisitor.hpp"
+#include "PrettyPrinter.hpp"
 #include "SystemModelNodes.hpp"
 #include "PathSelector.hpp"
 #include "AccessInterfaceProtocol.hpp"
@@ -27,7 +27,7 @@ using namespace mast;
 
 //! Initializes with specified options
 //!
-PrettyPrinterVisitor::PrettyPrinterVisitor (PrettyPrinterOptions options)
+PrettyPrinter::PrettyPrinter (PrettyPrinterOptions options)
   : m_useAutoFormat          (IsSet(options, PrettyPrinterOptions::DisplayValueAuto))
   , m_verbose                (IsSet(options, PrettyPrinterOptions::Verbose))
   , m_showProtocol           (IsSet(options, PrettyPrinterOptions::ShowProtocol))
@@ -38,7 +38,7 @@ PrettyPrinterVisitor::PrettyPrinterVisitor (PrettyPrinterOptions options)
 {
 }
 //
-//  End of: PrettyPrinterVisitor::PrettyPrinterVisitor
+//  End of: PrettyPrinter::PrettyPrinter
 //---------------------------------------------------------------------------
 
 
@@ -50,7 +50,7 @@ PrettyPrinterVisitor::PrettyPrinterVisitor (PrettyPrinterOptions options)
 //! @param refPos       Reference position
 //! @param targetPos    Target position relative to refPos
 //!
-void PrettyPrinterVisitor::AlignRelativeTo (pos_type refPos, pos_type targetPos)
+void PrettyPrinter::AlignRelativeTo (pos_type refPos, pos_type targetPos)
 {
   auto curPos      = m_os.tellp();
   auto startLength = curPos - refPos;
@@ -61,7 +61,7 @@ void PrettyPrinterVisitor::AlignRelativeTo (pos_type refPos, pos_type targetPos)
   }
 }
 //
-//  End of: PrettyPrinterVisitor::AlignRelativeTo
+//  End of: PrettyPrinter::AlignRelativeTo
 //---------------------------------------------------------------------------
 
 
@@ -69,13 +69,13 @@ void PrettyPrinterVisitor::AlignRelativeTo (pos_type refPos, pos_type targetPos)
 //!
 //! @param targetPos  Position set after adding a new line
 //!
-void PrettyPrinterVisitor::AlignOnNewLine (pos_type targetPos)
+void PrettyPrinter::AlignOnNewLine (pos_type targetPos)
 {
   m_os << std::endl;
   m_os << string(targetPos, ' ');
 }
 //
-//  End of: PrettyPrinterVisitor::AlignOnNewLine
+//  End of: PrettyPrinter::AlignOnNewLine
 //---------------------------------------------------------------------------
 
 
@@ -84,22 +84,22 @@ void PrettyPrinterVisitor::AlignOnNewLine (pos_type targetPos)
 //! @param topNode    Node from which graph is created
 //! @param options    Printer options
 //!
-string PrettyPrinterVisitor::PrettyPrint (shared_ptr<SystemModelNode> topNode, PrettyPrinterOptions options)
+string PrettyPrinter::PrettyPrint (shared_ptr<SystemModelNode> topNode, PrettyPrinterOptions options)
 {
   CHECK_PARAMETER_NOT_NULL(topNode, "Cannot 'pretty print' from nullptr");
 
-  PrettyPrinterVisitor printer(options);
+  PrettyPrinter printer(options);
   topNode->Accept(printer);
   return printer.PrettyPrint();
 }
 //
-//  End of: PrettyPrinterVisitor::PrettyPrint
+//  End of: PrettyPrinter::PrettyPrint
 //---------------------------------------------------------------------------
 
 
 //! Pretty print childrens of a parent node
 //!
-void PrettyPrinterVisitor::PrintChildren (const ParentNode& parentNode)
+void PrettyPrinter::PrintChildren (const ParentNode& parentNode)
 {
   // ---------------- Do support exceptions
   //
@@ -127,7 +127,7 @@ void PrettyPrinterVisitor::PrintChildren (const ParentNode& parentNode)
   m_childId  = 0;
 }
 //
-//  End of: PrettyPrinterVisitor::PrintChildren
+//  End of: PrettyPrinter::PrintChildren
 //---------------------------------------------------------------------------
 
 
@@ -136,7 +136,7 @@ void PrettyPrinterVisitor::PrintChildren (const ParentNode& parentNode)
 //! @param bits  Binary vector to print
 //! @param name  Name given to the binary vector (can be empty)
 //!
-void PrettyPrinterVisitor::StreamBinaryVector (std::experimental::string_view name, const BinaryVector& bits)
+void PrettyPrinter::StreamBinaryVector (std::experimental::string_view name, const BinaryVector& bits)
 {
   m_os << ", " << name;
 
@@ -150,7 +150,7 @@ void PrettyPrinterVisitor::StreamBinaryVector (std::experimental::string_view na
   }
 }
 //
-//  End of: PrettyPrinterVisitor::StreamBinaryVector
+//  End of: PrettyPrinter::StreamBinaryVector
 //---------------------------------------------------------------------------
 
 
@@ -158,7 +158,7 @@ void PrettyPrinterVisitor::StreamBinaryVector (std::experimental::string_view na
 //!
 //! @param node   The node for which header is to be streamed
 //!
-void PrettyPrinterVisitor::StreamNodeCommon (const SystemModelNode& node)
+void PrettyPrinter::StreamNodeCommon (const SystemModelNode& node)
 {
   if (m_verbose)
   {
@@ -169,7 +169,7 @@ void PrettyPrinterVisitor::StreamNodeCommon (const SystemModelNode& node)
   }
 }
 //
-//  End of: PrettyPrinterVisitor::StreamNodeCommon
+//  End of: PrettyPrinter::StreamNodeCommon
 //---------------------------------------------------------------------------
 
 
@@ -180,7 +180,7 @@ void PrettyPrinterVisitor::StreamNodeCommon (const SystemModelNode& node)
 //! @param node   The node for which header is to be streamed
 //! @param notes  Optional note to add after node name
 //!
-void PrettyPrinterVisitor::StreamNodeHeader(string_view type, const SystemModelNode& node, string_view notes)
+void PrettyPrinter::StreamNodeHeader(string_view type, const SystemModelNode& node, string_view notes)
 {
   if (!m_first)
   {
@@ -205,7 +205,7 @@ void PrettyPrinterVisitor::StreamNodeHeader(string_view type, const SystemModelN
   AlignRelativeTo(m_startPos, 15u + m_depth);
   m_os << '"' << node.Name()       << '"';
 
-  
+
   if (!notes.empty())
   {
     m_os << ", " << notes;
@@ -246,7 +246,7 @@ void PrettyPrinterVisitor::StreamNodeHeader(string_view type, const SystemModelN
 //! @param node   The node for which header is to be streamed
 //! @param notes  Optional note to add after node name
 //!
-void PrettyPrinterVisitor::StreamParentNode (std::experimental::string_view type, const ParentNode& parentNode, string_view notes)
+void PrettyPrinter::StreamParentNode (std::experimental::string_view type, const ParentNode& parentNode, string_view notes)
 {
   StreamNodeHeader(type, parentNode, notes);
 
@@ -263,7 +263,7 @@ void PrettyPrinterVisitor::StreamParentNode (std::experimental::string_view type
   PrintChildren(parentNode);
 }
 //
-//  End of: PrettyPrinterVisitor::StreamParentNode
+//  End of: PrettyPrinter::StreamParentNode
 //---------------------------------------------------------------------------
 
 
@@ -271,7 +271,7 @@ void PrettyPrinterVisitor::StreamParentNode (std::experimental::string_view type
 //! Appends content of AccessInterface node in text representation and visits
 //! sub-nodes
 //!
-void PrettyPrinterVisitor::VisitAccessInterface (AccessInterface& accessInterface)
+void PrettyPrinter::VisitAccessInterface (AccessInterface& accessInterface)
 {
   string note;
 
@@ -288,7 +288,7 @@ void PrettyPrinterVisitor::VisitAccessInterface (AccessInterface& accessInterfac
 //! Appends content of Chain node in text representation and visits
 //! sub-nodes
 //!
-void PrettyPrinterVisitor::VisitChain (Chain& chain)
+void PrettyPrinter::VisitChain (Chain& chain)
 {
   StreamParentNode("Chain", chain);
 }
@@ -297,7 +297,7 @@ void PrettyPrinterVisitor::VisitChain (Chain& chain)
 //! sub-nodes
 //!
 //! @note Supposes that path selector associated with linker will be made of SystemModelNode too
-void PrettyPrinterVisitor::VisitLinker (Linker& linker)
+void PrettyPrinter::VisitLinker (Linker& linker)
 {
   m_selector = linker.Selector();
   StreamNodeHeader("Linker", linker);
@@ -336,7 +336,7 @@ void PrettyPrinterVisitor::VisitLinker (Linker& linker)
 //! Appends content of Register node in text representation and visits
 //! sub-nodes
 //!
-void PrettyPrinterVisitor::VisitRegister (Register& reg)
+void PrettyPrinter::VisitRegister (Register& reg)
 {
   if (m_processingSelector)
   {
@@ -372,5 +372,5 @@ void PrettyPrinterVisitor::VisitRegister (Register& reg)
 }
 
 //===========================================================================
-// End of PrettyPrinterVisitor.cpp
+// End of PrettyPrinter.cpp
 //===========================================================================

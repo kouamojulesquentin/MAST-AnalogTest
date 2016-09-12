@@ -15,9 +15,9 @@
 #include <iostream>
 #include <sstream>
 #include "SIT_reader.hpp"
-#include "PrettyPrinterVisitor.hpp"
+#include "PrettyPrinter.hpp"
 #include "UT_reader_wrapper.hpp"
-#include "PrettyPrinterVisitor.hpp"
+#include "PrettyPrinter.hpp"
 #include "../Use_Cases/UT_reader.hpp"
 
 using std::string;
@@ -41,7 +41,7 @@ pair<string, std::shared_ptr<mast::SystemModelNode>> UT_reader_wrapper::run_pars
     return make_pair("PARSING ERROR", shared_ptr<SystemModelNode>(nullptr));
   }
 
-  auto actual_PrettyPrint = PrettyPrinterVisitor::PrettyPrint(driver.parsed_sut, PrettyPrinterOptions::Parser_debug);
+  auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(driver.parsed_sut, PrettyPrinterOptions::Parser_debug);
 
   return make_pair(actual_PrettyPrint, driver.parsed_sut);
 }

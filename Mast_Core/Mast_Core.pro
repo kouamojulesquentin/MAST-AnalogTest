@@ -45,7 +45,7 @@ SOURCES +=  \
     src/NodePathResolver.cpp                        \
     src/OpenOCDProtocol.cpp                         \
     src/ParentNode.cpp                              \
-    src/PrettyPrinterVisitor.cpp                    \
+    src/PrettyPrinter.cpp                    \
     src/PropagatePendingVisitor.cpp                 \
     src/Register.cpp                                \
     src/SVF_Player.cpp                              \
@@ -92,7 +92,7 @@ HEADERS += \
     include/OpenOCDProtocol.hpp                         \
     include/ParentNode.hpp                              \
     include/PathSelector.hpp                            \
-    include/PrettyPrinterVisitor.hpp                    \
+    include/PrettyPrinter.hpp                    \
     include/PropagatePendingVisitor.hpp                 \
     include/Register.hpp                                \
     include/SVF_Player.hpp                              \

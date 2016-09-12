@@ -5,7 +5,7 @@
 
 #include "SIT_reader.hpp"
 #include "SystemModel.hpp"
-#include "PrettyPrinterVisitor.hpp"
+#include "PrettyPrinter.hpp"
 
 using namespace mast;
 
@@ -46,8 +46,8 @@ main( const int argc, const char **argv )
       return ( EXIT_FAILURE );
      }
 
-//   PrettyPrinterVisitor prettyPrinter(PrettyPrinterOptions::ShowSelectorProperties);
-   PrettyPrinterVisitor prettyPrinter(PrettyPrinterOptions::ShowNodeIsIgnored);
+//   PrettyPrinter prettyPrinter(PrettyPrinterOptions::ShowSelectorProperties);
+   PrettyPrinter prettyPrinter(PrettyPrinterOptions::ShowNodeIsIgnored);
 
    driver.parsed_sut->Accept(prettyPrinter);
    auto gotPretty      = prettyPrinter.PrettyPrint();

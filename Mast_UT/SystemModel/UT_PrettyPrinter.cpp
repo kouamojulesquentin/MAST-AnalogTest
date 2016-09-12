@@ -1,18 +1,18 @@
 //===========================================================================
-//                           UT_PrettyPrinterVisitor.cpp
+//                           UT_PrettyPrinter.cpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file UT_PrettyPrinterVisitor.cpp
+//! @file UT_PrettyPrinter.cpp
 //!
-//! Implements test fixture for testing PrettyPrinterVisitor
+//! Implements test fixture for testing PrettyPrinter
 //!
 //===========================================================================
 
-#include "UT_PrettyPrinterVisitor.hpp"
-#include "PrettyPrinterVisitor.hpp"
+#include "UT_PrettyPrinter.hpp"
+#include "PrettyPrinter.hpp"
 #include "SystemModelNodes.hpp"
 #include "TestModelBuilder.hpp"
 #include "DefaultBinaryPathSelector.hpp"
@@ -29,7 +29,7 @@ using namespace test;
 
 //! Initializes tests (called for each test)
 //!
-void UT_PrettyPrinterVisitor::setUp ()
+void UT_PrettyPrinter::setUp ()
 {
   CxxTest::setStringResultsOnNewLine(true);
   CxxTest::setCharactersMapping(CxxTest::CharacterMapping::MAP_CHARS_MINIMAL);  // Keep quotes, HT, and new lines unescaped
@@ -38,28 +38,28 @@ void UT_PrettyPrinterVisitor::setUp ()
 }
 
 
-//! Checks PrettyPrinterVisitor constructor
+//! Checks PrettyPrinter constructor
 //!
-void UT_PrettyPrinterVisitor::test_Constructor ()
+void UT_PrettyPrinter::test_Constructor ()
 {
   // ---------------- Exercise
   //
-  PrettyPrinterVisitor sut;
+  PrettyPrinter sut;
 
   // ---------------- Verify
   //
   TS_ASSERT_EQUALS (sut.PrettyPrint(), "");
 }
 
-//! Checks PrettyPrinterVisitor::VisitAccessInterface()
+//! Checks PrettyPrinter::VisitAccessInterface()
 //!
-void UT_PrettyPrinterVisitor::test_VisitAccessInterface ()
+void UT_PrettyPrinter::test_VisitAccessInterface ()
 {
   // ---------------- Setup
   //
   AccessInterface accessInterface("Access interface name", nullptr);
 
-  PrettyPrinterVisitor sut;
+  PrettyPrinter sut;
 
   // ---------------- Exercise
   //
@@ -72,15 +72,15 @@ void UT_PrettyPrinterVisitor::test_VisitAccessInterface ()
   TS_ASSERT_EQUALS (got, expected);
 }
 
-//! Checks PrettyPrinterVisitor::VisitAccessInterface() with verbose mode
+//! Checks PrettyPrinter::VisitAccessInterface() with verbose mode
 //!
-void UT_PrettyPrinterVisitor::test_VisitAccessInterface_Verbose ()
+void UT_PrettyPrinter::test_VisitAccessInterface_Verbose ()
 {
   // ---------------- Setup
   //
   AccessInterface accessInterface("Access interface name", nullptr);
 
-  PrettyPrinterVisitor sut;
+  PrettyPrinter sut;
   sut.SetVerbose(true);
 
   // ---------------- Exercise
@@ -95,15 +95,15 @@ void UT_PrettyPrinterVisitor::test_VisitAccessInterface_Verbose ()
 }
 
 
-//! Checks PrettyPrinterVisitor::VisitAccessInterface() with ShowProtocol option
+//! Checks PrettyPrinter::VisitAccessInterface() with ShowProtocol option
 //!
-void UT_PrettyPrinterVisitor::test_VisitAccessInterface_ShowProtocol ()
+void UT_PrettyPrinter::test_VisitAccessInterface_ShowProtocol ()
 {
   // ---------------- Setup
   //
   AccessInterface accessInterface("Access interface name", nullptr);
 
-  PrettyPrinterVisitor sut(PrettyPrinterOptions::ShowProtocol);
+  PrettyPrinter sut(PrettyPrinterOptions::ShowProtocol);
 
   // ---------------- Exercise
   //
@@ -117,15 +117,15 @@ void UT_PrettyPrinterVisitor::test_VisitAccessInterface_ShowProtocol ()
 }
 
 
-//! Checks PrettyPrinterVisitor::VisitChain()
+//! Checks PrettyPrinter::VisitChain()
 //!
-void UT_PrettyPrinterVisitor::test_VisitChain ()
+void UT_PrettyPrinter::test_VisitChain ()
 {
   // ---------------- Setup
   //
   Chain chain("Chain name");
 
-  PrettyPrinterVisitor sut;
+  PrettyPrinter sut;
 
   // ---------------- Exercise
   //
@@ -139,15 +139,15 @@ void UT_PrettyPrinterVisitor::test_VisitChain ()
 }
 
 
-//! Checks PrettyPrinterVisitor::VisitChain() with verbose mode
+//! Checks PrettyPrinter::VisitChain() with verbose mode
 //!
-void UT_PrettyPrinterVisitor::test_VisitChain_Verbose ()
+void UT_PrettyPrinter::test_VisitChain_Verbose ()
 {
   // ---------------- Setup
   //
   Chain chain("Chain name");
 
-  PrettyPrinterVisitor sut;
+  PrettyPrinter sut;
   sut.SetVerbose(true);
 
   // ---------------- Exercise
@@ -161,9 +161,9 @@ void UT_PrettyPrinterVisitor::test_VisitChain_Verbose ()
   TS_ASSERT_EQUALS (got, expected);
 }
 
-//! Checks PrettyPrinterVisitor::VisitLinker()
+//! Checks PrettyPrinter::VisitLinker()
 //!
-void UT_PrettyPrinterVisitor::test_VisitLinker ()
+void UT_PrettyPrinter::test_VisitLinker ()
 {
   // ---------------- Setup
   //
@@ -174,7 +174,7 @@ void UT_PrettyPrinterVisitor::test_VisitLinker ()
 
   auto linker = Linker("Linker name", pathSelector);
 
-  PrettyPrinterVisitor sut;
+  PrettyPrinter sut;
 
   // ---------------- Exercise
   //
@@ -189,9 +189,9 @@ void UT_PrettyPrinterVisitor::test_VisitLinker ()
 }
 
 
-//! Checks PrettyPrinterVisitor::VisitLinker() with verbose mode
+//! Checks PrettyPrinter::VisitLinker() with verbose mode
 //!
-void UT_PrettyPrinterVisitor::test_VisitLinker_Verbose ()
+void UT_PrettyPrinter::test_VisitLinker_Verbose ()
 {
   // ---------------- Setup
   //
@@ -202,7 +202,7 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_Verbose ()
 
   auto linker = Linker("Linker name", pathSelector);
 
-  PrettyPrinterVisitor sut;
+  PrettyPrinter sut;
   sut.SetVerbose(true);
 
   // ---------------- Exercise
@@ -219,16 +219,16 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_Verbose ()
 }
 
 
-//! Checks PrettyPrinterVisitor::VisitRegister()
+//! Checks PrettyPrinter::VisitRegister()
 //!
-void UT_PrettyPrinterVisitor::test_VisitRegister ()
+void UT_PrettyPrinter::test_VisitRegister ()
 {
   // ---------------- Setup
   //
 
   Register reg("A register name", BinaryVector::CreateFromBinaryString("1111_1111:0"));
 
-  PrettyPrinterVisitor sut;
+  PrettyPrinter sut;
 
   // ---------------- Exercise
   //
@@ -242,15 +242,15 @@ void UT_PrettyPrinterVisitor::test_VisitRegister ()
 }
 
 
-//! Checks PrettyPrinterVisitor::VisitRegister() with verbose mode
+//! Checks PrettyPrinter::VisitRegister() with verbose mode
 //!
-void UT_PrettyPrinterVisitor::test_VisitRegister_Verbose ()
+void UT_PrettyPrinter::test_VisitRegister_Verbose ()
 {
   // ---------------- Setup
   //
   Register reg("A register name", BinaryVector::CreateFromBinaryString("1111_1111:0"));
 
-  PrettyPrinterVisitor sut;
+  PrettyPrinter sut;
   sut.SetVerbose(true);
 
   // ---------------- Exercise
@@ -271,10 +271,10 @@ void UT_PrettyPrinterVisitor::test_VisitRegister_Verbose ()
 }
 
 
-//! Checks PrettyPrinterVisitor::VisitChain() when there one register
+//! Checks PrettyPrinter::VisitChain() when there one register
 //! managed by the chain
 //!
-void UT_PrettyPrinterVisitor::test_VisitChain_with_Register ()
+void UT_PrettyPrinter::test_VisitChain_with_Register ()
 {
   // ---------------- Setup
   //
@@ -282,7 +282,7 @@ void UT_PrettyPrinterVisitor::test_VisitChain_with_Register ()
   auto reg   = make_shared<Register>  ("Reg_1", BinaryVector::CreateFromBinaryString("1010_11"));
   chain->AppendChild(reg);
 
-  PrettyPrinterVisitor sut;
+  PrettyPrinter sut;
 
   // ---------------- Exercise
   //
@@ -297,10 +297,10 @@ void UT_PrettyPrinterVisitor::test_VisitChain_with_Register ()
   TS_ASSERT_EQUALS (got, expected);
 }
 
-//! Checks PrettyPrinterVisitor::VisitChain() when there are registers
+//! Checks PrettyPrinter::VisitChain() when there are registers
 //! managed by the chain
 //!
-void UT_PrettyPrinterVisitor::test_VisitChain_with_Registers ()
+void UT_PrettyPrinter::test_VisitChain_with_Registers ()
 {
   // ---------------- Setup
   //
@@ -310,7 +310,7 @@ void UT_PrettyPrinterVisitor::test_VisitChain_with_Registers ()
   chain->AppendChild(reg_1);
   chain->AppendChild(reg_2);
 
-  PrettyPrinterVisitor sut;
+  PrettyPrinter sut;
 
   // ---------------- Exercise
   //
@@ -327,10 +327,10 @@ void UT_PrettyPrinterVisitor::test_VisitChain_with_Registers ()
 }
 
 
-//! Checks PrettyPrinterVisitor::VisitChain() when there are several registers
+//! Checks PrettyPrinter::VisitChain() when there are several registers
 //! managed by the chain and verbose mode set
 //!
-void UT_PrettyPrinterVisitor::test_VisitChain_with_Registers_Verbose ()
+void UT_PrettyPrinter::test_VisitChain_with_Registers_Verbose ()
 {
   // ---------------- Setup
   //
@@ -343,7 +343,7 @@ void UT_PrettyPrinterVisitor::test_VisitChain_with_Registers_Verbose ()
   chain->AppendChild(reg_2);
   chain->AppendChild(reg_3);
 
-  PrettyPrinterVisitor sut;
+  PrettyPrinter sut;
   sut.SetVerbose(true);
 
   // ---------------- Exercise
@@ -376,9 +376,9 @@ void UT_PrettyPrinterVisitor::test_VisitChain_with_Registers_Verbose ()
   TS_ASSERT_EQUALS (got, expected);
 }
 
-//! Checks PrettyPrinterVisitor::VisitLinker() when there are several child beneath
+//! Checks PrettyPrinter::VisitLinker() when there are several child beneath
 //!
-void UT_PrettyPrinterVisitor::test_VisitLinker_with_Child ()
+void UT_PrettyPrinter::test_VisitLinker_with_Child ()
 {
   // ---------------- Setup
   //
@@ -401,7 +401,7 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_with_Child ()
   linker->AppendChild(reg_a);
   linker->AppendChild(reg_b);
 
-  PrettyPrinterVisitor sut;
+  PrettyPrinter sut;
 
   // ---------------- Exercise
   //
@@ -424,9 +424,9 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_with_Child ()
 }
 
 
-//! Checks PrettyPrinterVisitor::VisitLinker() when there are several child beneath
+//! Checks PrettyPrinter::VisitLinker() when there are several child beneath
 //! and verbose mode
-void UT_PrettyPrinterVisitor::test_VisitLinker_with_Child_Verbose ()
+void UT_PrettyPrinter::test_VisitLinker_with_Child_Verbose ()
 {
   // ---------------- Setup
   //
@@ -448,7 +448,7 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_with_Child_Verbose ()
   linker->AppendChild(reg_a);
   linker->AppendChild(reg_b);
 
-  PrettyPrinterVisitor sut;
+  PrettyPrinter sut;
   sut.SetVerbose(true);
 
   // ---------------- Exercise
@@ -476,9 +476,9 @@ void UT_PrettyPrinterVisitor::test_VisitLinker_with_Child_Verbose ()
   TS_ASSERT_EQUALS (got, expected);
 }
 
-//! Checks PrettyPrinterVisitor::VisitAccessInterface() when there are several child beneath
+//! Checks PrettyPrinter::VisitAccessInterface() when there are several child beneath
 //!
-void UT_PrettyPrinterVisitor::test_VisitAccessInterface_with_Child ()
+void UT_PrettyPrinter::test_VisitAccessInterface_with_Child ()
 {
   // ---------------- Setup
   //
@@ -505,7 +505,7 @@ void UT_PrettyPrinterVisitor::test_VisitAccessInterface_with_Child ()
   linker->AppendChild(reg_b);
 
 
-  PrettyPrinterVisitor sut;
+  PrettyPrinter sut;
 
   // ---------------- Exercise
   //
@@ -529,9 +529,9 @@ void UT_PrettyPrinterVisitor::test_VisitAccessInterface_with_Child ()
 }
 
 
-//! Checks PrettyPrinterVisitor::VisitAccessInterface() when printing Registers in hex format
+//! Checks PrettyPrinter::VisitAccessInterface() when printing Registers in hex format
 //!
-void UT_PrettyPrinterVisitor::test_VisitAccessInterface_AutoFormat ()
+void UT_PrettyPrinter::test_VisitAccessInterface_AutoFormat ()
 {
   // ---------------- Setup
   //
@@ -555,7 +555,7 @@ void UT_PrettyPrinterVisitor::test_VisitAccessInterface_AutoFormat ()
   chain->AppendChild(reg_2);
   chain->AppendChild(reg_3);
 
-  PrettyPrinterVisitor sut(PrettyPrinterOptions::DisplayValueAuto);
+  PrettyPrinter sut(PrettyPrinterOptions::DisplayValueAuto);
 
   // ---------------- Exercise
   //
@@ -580,9 +580,9 @@ void UT_PrettyPrinterVisitor::test_VisitAccessInterface_AutoFormat ()
 }
 
 
-//! Checks PrettyPrinterVisitor::Visit_xxx() with a tap
+//! Checks PrettyPrinter::Visit_xxx() with a tap
 //!
-void UT_PrettyPrinterVisitor::test_VisitTap ()
+void UT_PrettyPrinter::test_VisitTap ()
 {
   // ---------------- Setup
   //
@@ -594,7 +594,7 @@ void UT_PrettyPrinterVisitor::test_VisitTap ()
   uint32_t    muxPathsCount = 5u;
   auto        tap           = builder.Create_JTAG_TAP(noName, irBitsCount, muxPathsCount);
 
-  PrettyPrinterVisitor sut;
+  PrettyPrinter sut;
 
   // ---------------- Exercise
   //
@@ -613,9 +613,9 @@ void UT_PrettyPrinterVisitor::test_VisitTap ()
 }
 
 
-//! Checks PrettyPrinterVisitor::Visit_xxx() with a tap with added sub-nodes
+//! Checks PrettyPrinter::Visit_xxx() with a tap with added sub-nodes
 //!
-void UT_PrettyPrinterVisitor::test_VisitTap_With_SubNodes ()
+void UT_PrettyPrinter::test_VisitTap_With_SubNodes ()
 {
   // ---------------- Setup
   //
@@ -631,7 +631,7 @@ void UT_PrettyPrinterVisitor::test_VisitTap_With_SubNodes ()
   auto reg_1 = sm.CreateRegister("Reg_1", BinaryVector::CreateFromBinaryString("1010_01"), tap);
   auto reg_2 = sm.CreateRegister("Reg_2", BinaryVector::CreateFromBinaryString("1010_10"), tap);
 
-  PrettyPrinterVisitor sut;
+  PrettyPrinter sut;
 
   // ---------------- Exercise
   //
@@ -653,9 +653,9 @@ void UT_PrettyPrinterVisitor::test_VisitTap_With_SubNodes ()
 }
 
 
-//! Checks PrettyPrinterVisitor::PrettyPrint() with default options
+//! Checks PrettyPrinter::PrettyPrint() with default options
 //!
-void UT_PrettyPrinterVisitor::test_PrettyPrint ()
+void UT_PrettyPrinter::test_PrettyPrint ()
 {
   // ---------------- Setup
   //
@@ -669,7 +669,7 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint ()
 
   // ---------------- Exercise
   //
-  auto got = PrettyPrinterVisitor::PrettyPrint(tap);
+  auto got = PrettyPrinter::PrettyPrint(tap);
 
   // ---------------- Verify
   //
@@ -686,9 +686,9 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint ()
 }
 
 
-//! Checks PrettyPrinterVisitor::PrettyPrint() with verbose option
+//! Checks PrettyPrinter::PrettyPrint() with verbose option
 //!
-void UT_PrettyPrinterVisitor::test_PrettyPrint_Verbose ()
+void UT_PrettyPrinter::test_PrettyPrint_Verbose ()
 {
   // ---------------- Setup
   //
@@ -702,7 +702,7 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_Verbose ()
 
   // ---------------- Exercise
   //
-  auto got = PrettyPrinterVisitor::PrettyPrint(tap, PrettyPrinterOptions::Verbose);
+  auto got = PrettyPrinter::PrettyPrint(tap, PrettyPrinterOptions::Verbose);
 
   // ---------------- Verify
   //
@@ -739,9 +739,9 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_Verbose ()
 }
 
 
-//! Checks PrettyPrinterVisitor::PrettyPrint() with DisplayValueAuto option
+//! Checks PrettyPrinter::PrettyPrint() with DisplayValueAuto option
 //!
-void UT_PrettyPrinterVisitor::test_PrettyPrint_AutoFormat ()
+void UT_PrettyPrinter::test_PrettyPrint_AutoFormat ()
 {
   // ---------------- Setup
   //
@@ -755,7 +755,7 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_AutoFormat ()
 
   // ---------------- Exercise
   //
-  auto got = PrettyPrinterVisitor::PrettyPrint(tap, PrettyPrinterOptions::DisplayValueAuto);
+  auto got = PrettyPrinter::PrettyPrint(tap, PrettyPrinterOptions::DisplayValueAuto);
 
   // ---------------- Verify
   //
@@ -772,9 +772,9 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_AutoFormat ()
 }
 
 
-//! Checks PrettyPrinterVisitor::PrettyPrint() with Std option
+//! Checks PrettyPrinter::PrettyPrint() with Std option
 //!
-void UT_PrettyPrinterVisitor::test_PrettyPrint_Std ()
+void UT_PrettyPrinter::test_PrettyPrint_Std ()
 {
   // ---------------- Setup
   //
@@ -788,7 +788,7 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_Std ()
 
   // ---------------- Exercise
   //
-  auto got = PrettyPrinterVisitor::PrettyPrint(tap, PrettyPrinterOptions::Std);
+  auto got = PrettyPrinter::PrettyPrint(tap, PrettyPrinterOptions::Std);
 
   // ---------------- Verify
   //
@@ -825,9 +825,9 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_Std ()
 }
 
 
-//! Checks PrettyPrinterVisitor::PrettyPrint() with "Show Selection Value" option
+//! Checks PrettyPrinter::PrettyPrint() with "Show Selection Value" option
 //!
-void UT_PrettyPrinterVisitor::test_PrettyPrint_SelectionValue ()
+void UT_PrettyPrinter::test_PrettyPrint_SelectionValue ()
 {
   // ---------------- Setup
   //
@@ -844,7 +844,7 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_SelectionValue ()
 
   // ---------------- Exercise
   //
-  auto got = PrettyPrinterVisitor::PrettyPrint(tap, PrettyPrinterOptions::ShowSelectionValue);
+  auto got = PrettyPrinter::PrettyPrint(tap, PrettyPrinterOptions::ShowSelectionValue);
 
   // ---------------- Verify
   //
@@ -862,9 +862,9 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_SelectionValue ()
 }
 
 
-//! Checks PrettyPrinterVisitor::PrettyPrint() with "Show Selection State" option
+//! Checks PrettyPrinter::PrettyPrint() with "Show Selection State" option
 //!
-void UT_PrettyPrinterVisitor::test_PrettyPrint_SelectionState ()
+void UT_PrettyPrinter::test_PrettyPrint_SelectionState ()
 {
   // ---------------- Setup
   //
@@ -881,7 +881,7 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_SelectionState ()
 
   // ---------------- Exercise
   //
-  auto got = PrettyPrinterVisitor::PrettyPrint(tap, PrettyPrinterOptions::ShowSelectionState);
+  auto got = PrettyPrinter::PrettyPrint(tap, PrettyPrinterOptions::ShowSelectionState);
 
   // ---------------- Verify
   //
@@ -899,9 +899,9 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_SelectionState ()
 }
 
 
-//! Checks PrettyPrinterVisitor::PrettyPrint() with all options
+//! Checks PrettyPrinter::PrettyPrint() with all options
 //!
-void UT_PrettyPrinterVisitor::test_PrettyPrint_AllOptions ()
+void UT_PrettyPrinter::test_PrettyPrint_AllOptions ()
 {
   // ---------------- Setup
   //
@@ -918,7 +918,7 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_AllOptions ()
 
   // ---------------- Exercise
   //
-  auto got = PrettyPrinterVisitor::PrettyPrint(tap, PrettyPrinterOptions::All);
+  auto got = PrettyPrinter::PrettyPrint(tap, PrettyPrinterOptions::All);
 
   // ---------------- Verify
   //
@@ -956,5 +956,5 @@ void UT_PrettyPrinterVisitor::test_PrettyPrint_AllOptions ()
 }
 
 //===========================================================================
-// End of UT_PrettyPrinterVisitor.cpp
+// End of UT_PrettyPrinter.cpp
 //===========================================================================

@@ -1,19 +1,18 @@
 //===========================================================================
-//                           PrettyPrinterVisitor.hpp
+//                           PrettyPrinter.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file PrettyPrinterVisitor.hpp
+//! @file PrettyPrinter.hpp
 //!
-//! Declares PrettyPrinterVisitor class
+//! Declares PrettyPrinter class
 //!
 //===========================================================================
 
-
-#ifndef PRETTYPRINTERVISITOR_H__DF84532_49ED_4EAF_9A8D_7D71C57AA2E6__INCLUDED_
-  #define PRETTYPRINTERVISITOR_H__DF84532_49ED_4EAF_9A8D_7D71C57AA2E6__INCLUDED_
+#ifndef PRETTYPRINTER_H__4F4E33D0_FA7_4FAA_86BE_FFC320DECD62__INCLUDED_
+  #define PRETTYPRINTER_H__4F4E33D0_FA7_4FAA_86BE_FFC320DECD62__INCLUDED_
 
 #include "SystemModelVisitor.hpp"
 #include <string>
@@ -48,14 +47,14 @@ enum class PrettyPrinterOptions
 //! System model visitors for creation of a text, readable, and hierarchical
 //! representation of the system mode tree
 //!
-class DLL_EXPORT PrettyPrinterVisitor : public SystemModelVisitor
+class DLL_EXPORT PrettyPrinter : public SystemModelVisitor
 {
   // ---------------- Public  Methods
   //
   public:
-  virtual ~PrettyPrinterVisitor() = default;
-  PrettyPrinterVisitor()  = default;
-  PrettyPrinterVisitor(PrettyPrinterOptions options);
+  virtual ~PrettyPrinter() = default;
+  PrettyPrinter()  = default;
+  PrettyPrinter(PrettyPrinterOptions options);
 
   virtual void VisitAccessInterface (AccessInterface& accessInterface) override;
   virtual void VisitChain           (Chain&           chain)           override;
@@ -113,15 +112,12 @@ class DLL_EXPORT PrettyPrinterVisitor : public SystemModelVisitor
   bool                          m_first                  = true;  //!< True when nothing as been streamed yet (useful to add first new line)
 };
 //
-//  End of PrettyPrinterVisitor class declaration
+//  End of PrettyPrinter class declaration
 //---------------------------------------------------------------------------
 } // End of namespace mast
 
 
-
-
-#endif  // not defined PRETTYPRINTERVISITOR_H__DF84532_49ED_4EAF_9A8D_7D71C57AA2E6__INCLUDED_
-
+#endif  // not defined PRETTYPRINTER_H__4F4E33D0_FA7_4FAA_86BE_FFC320DECD62__INCLUDED_
 //===========================================================================
-// End of PrettyPrinterVisitor.hpp
+// End of PrettyPrinter.hpp
 //===========================================================================

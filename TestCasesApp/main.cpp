@@ -23,7 +23,7 @@
 #include "I2C_EmulationProtocol.hpp"
 #include "OpenOCDProtocol.hpp"
 #include "GmlPrinter.hpp"
-#include "PrettyPrinterVisitor.hpp"
+#include "PrettyPrinter.hpp"
 #include "g3log/g3log.hpp"
 #include "g3log/logworker.hpp"
 #include "LogFormatter.h"

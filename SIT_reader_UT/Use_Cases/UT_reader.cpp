@@ -13,7 +13,7 @@
 
 
 #include "SIT_reader.hpp"
-#include "PrettyPrinterVisitor.hpp"
+#include "PrettyPrinter.hpp"
 #include "SystemModelBuilder.hpp"
 #include "LoopbackAccessInterfaceProtocol.hpp"
 #include "UT_reader.hpp"

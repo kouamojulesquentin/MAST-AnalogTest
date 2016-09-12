@@ -20,7 +20,7 @@
 #include "DefaultOneHotPathSelector.hpp"
 #include "DefaultNHotPathSelector.hpp"
 #include "GmlPrinter.hpp"
-#include "PrettyPrinterVisitor.hpp"
+#include "PrettyPrinter.hpp"
 
 #include "BinaryVector_Traits.hpp"
 #include "SystemModelCheckResult_Traits.hpp"
@@ -377,7 +377,7 @@ void UT_SystemModelBuilder::test_Create_MIB_1_Derivation ()
 
   // With "Pretty" printer
 
-  auto gotPretty      = PrettyPrinterVisitor::PrettyPrint(sm.Root(), PrettyPrinterOptions::All);
+  auto gotPretty      = PrettyPrinter::PrettyPrint(sm.Root(), PrettyPrinterOptions::All);
   auto expectedPretty = string(
                                "[Chain](1)     \"MIB_name\", pending: false, has_conditioner: false, priority: 0\n"
                                " [Linker](2)    \"MIB_name_mux\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
@@ -449,7 +449,7 @@ void UT_SystemModelBuilder::test_Create_MIB_4_Derivations ()
 
   // With "Pretty" printer
 
-  auto gotPretty      = PrettyPrinterVisitor::PrettyPrint(sm.Root(), PrettyPrinterOptions::All);
+  auto gotPretty      = PrettyPrinter::PrettyPrint(sm.Root(), PrettyPrinterOptions::All);
   auto expectedPretty = string("[Chain](1)     \"MIB_name\", pending: false, has_conditioner: false, priority: 0\n"
                                " [Register](0)  \"Reg_name\", length: 2, Hold value: true, bypass:            0b00\n"
                                "                                                       , next_to_sut:       0b00\n"

@@ -15,7 +15,7 @@
 #include "TestModelBuilder.hpp"
 #include "SystemModelNodes.hpp"
 #include "GmlPrinter.hpp"
-#include "PrettyPrinterVisitor.hpp"
+#include "PrettyPrinter.hpp"
 
 #include "SystemModelCheckResult_Traits.hpp"
 
@@ -292,7 +292,7 @@ void UT_TestModelBuilder::test_Create_TestCase_MIB_4_Chains ()
   TS_ASSERT_EQUALS (gotGraph, expected);
 
   // With "Pretty" printer
-  PrettyPrinterVisitor prettyPrinter;
+  PrettyPrinter prettyPrinter;
   tap->Accept(prettyPrinter);
 
   auto gotPretty      = prettyPrinter.PrettyPrint();
@@ -421,7 +421,7 @@ void UT_TestModelBuilder::test_Create_TestCase_1687 ()
   TS_ASSERT_EQUALS (gotGraph, expected);
 
   // With "Pretty" printer
-  PrettyPrinterVisitor prettyPrinter;
+  PrettyPrinter prettyPrinter;
   tap->Accept(prettyPrinter);
 
   auto gotPretty      = prettyPrinter.PrettyPrint();
@@ -593,7 +593,7 @@ void UT_TestModelBuilder::test_Create_TestCase_1500_3_Chains ()
   TS_ASSERT_EQUALS (gotGraph, expected);
 
   // With "Pretty" printer
-  PrettyPrinterVisitor prettyPrinter;
+  PrettyPrinter prettyPrinter;
   tap->Accept(prettyPrinter);
 
   auto gotPretty      = prettyPrinter.PrettyPrint();

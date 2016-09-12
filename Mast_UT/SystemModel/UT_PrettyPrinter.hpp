@@ -1,29 +1,28 @@
 //===========================================================================
-//                           UT_PrettyPrinterVisitor.hpp
+//                           UT_PrettyPrinter.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file UT_PrettyPrinterVisitor.hpp
+//! @file UT_PrettyPrinter.hpp
 //!
-//! Declares test fixture class for testing PrettyPrinterVisitor
+//! Declares test fixture class for testing PrettyPrinter
 //!
 //===========================================================================
 
-
-#ifndef UT_PRETTYPRINTERVISITOR_H__81EABFFB_2B16_465D_E396_1C6C22642AB8__INCLUDED_
-  #define UT_PRETTYPRINTERVISITOR_H__81EABFFB_2B16_465D_E396_1C6C22642AB8__INCLUDED_
+#ifndef UT_PRETTYPRINTER_H__1B3FB709_2AA6_4CA6_8281_45577186605__INCLUDED_
+  #define UT_PRETTYPRINTER_H__1B3FB709_2AA6_4CA6_8281_45577186605__INCLUDED_
 
 #include <cxxtest/TestSuite.h>
 
-//! Unit tests for class PrettyPrinterVisitor
+//! Unit tests for class PrettyPrinter
 //!
-class UT_PrettyPrinterVisitor : public CxxTest::TestSuite
+class UT_PrettyPrinter : public CxxTest::TestSuite
 {
   public:
-   UT_PrettyPrinterVisitor() = default;
-  ~UT_PrettyPrinterVisitor() = default;
+   UT_PrettyPrinter() = default;
+  ~UT_PrettyPrinter() = default;
 
 
   // ================ Test Methods ================
@@ -74,11 +73,11 @@ class UT_PrettyPrinterVisitor : public CxxTest::TestSuite
   void setUp(); //!< Initializes test (called for each test)
 };
 //
-//  End of UT_PrettyPrinterVisitor class declaration
+//  End of UT_PrettyPrinter class declaration
 //---------------------------------------------------------------------------
 
 
-#endif  // not defined UT_PRETTYPRINTERVISITOR_H__81EABFFB_2B16_465D_E396_1C6C22642AB8__INCLUDED_
+#endif  // not defined UT_PRETTYPRINTER_H__1B3FB709_2AA6_4CA6_8281_45577186605__INCLUDED_
 //===========================================================================
-// End of UT_PrettyPrinterVisitor.hpp
+// End of UT_PrettyPrinter.hpp
 //===========================================================================

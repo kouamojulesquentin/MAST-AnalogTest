@@ -159,8 +159,17 @@ ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/Makefile)","")
 endif
 
 distclean:
+ifeq ($(OS), Windows_NT)
 > $(IF_EXIST) Mast_UT$(SEP)Generated$(SEP)Runner.cpp       $(RM)     Mast_UT$(SEP)Generated$(SEP)Runner.cpp
 > $(IF_EXIST) SIT_reader_UT$(SEP)Generated$(SEP)Runner.cpp $(RM)     SIT_reader_UT$(SEP)Generated$(SEP)Runner.cpp
 > $(IF_EXIST) $(CMAKE_RELEASE_BUILD_DIR)                   $(RM_DIR) $(CMAKE_RELEASE_BUILD_DIR)
 > $(IF_EXIST) $(CMAKE_DEBUG_BUILD_DIR)                     $(RM_DIR) $(CMAKE_DEBUG_BUILD_DIR)
 > $(IF_EXIST) $(CMAKE_ARM_BUILD_DIR)                       $(RM_DIR) $(CMAKE_ARM_BUILD_DIR)
+else
+> $(RM)     Mast_UT$(SEP)Generated$(SEP)Runner.cpp
+> $(RM)     SIT_reader_UT$(SEP)Generated$(SEP)Runner.cpp
+> $(RM_DIR) $(CMAKE_RELEASE_BUILD_DIR)
+> $(RM_DIR) $(CMAKE_DEBUG_BUILD_DIR)
+> $(RM_DIR) $(CMAKE_ARM_BUILD_DIR)
+endif
+

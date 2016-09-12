@@ -16,8 +16,11 @@ include_directories(../Logger/)
 include_directories(../Logger/g3log/)
 include_directories(../SIT_reader/)
 
-set(LIBUSB_CFLAGS "")
-if (NOT WIN32)
+if (${USE_OPEN_OCD})
+  set (P_CFLAGS "${P_CFLAGS} -DUSE_OPEN_OCD")
+
+  set(LIBUSB_CFLAGS "")
+
   include_directories(SYSTEM ../openocd/include/)
   include_directories(SYSTEM ../openocd/include/src/)
   include_directories(SYSTEM ../openocd/include/jimtcl/)

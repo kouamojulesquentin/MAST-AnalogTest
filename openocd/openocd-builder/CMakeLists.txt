@@ -49,6 +49,7 @@ find_library(LIBUSB1_LIBRARY
   PATH_SUFFIXES "lib" "lib32" "lib64" )
 
 set(LIBUSB_CFLAGS "")
+set(HIDAPI_CFLAGS "")
 
 if(LIBUSB1_INCLUDE_DIR AND LIBUSB1_LIBRARY)
     set(LIBUSB1_FOUND true)
@@ -61,6 +62,19 @@ if(LIBUSB0_INCLUDE_DIR AND LIBUSB0_LIBRARY)
         set(LIBUSB_CFLAGS "-lusb")
     endif(NOT ${LIBUSB1_FOUND})
 endif(LIBUSB0_INCLUDE_DIR AND LIBUSB0_LIBRARY)
+
+# Trying to find HIDAPI
+find_library(HIDAPI_LIBRARY
+	NAMES hidapi hidapi-libusb)
+
+find_path(HIDAPI_INCLUDE_DIR
+	NAMES hidapi.h
+	PATH_SUFFIXES "hidapi")
+
+if(HIDAPI_INCLUDE_DIR AND HIDAPI_LIBRARY)
+    set(HIDAPI_FOUND true)
+    set(HIDAPI_CFLAGS "--Ihidapi/hidapi")
+endif(HIDAPI_INCLUDE_DIR AND HIDAPI_LIBRARY)
   
 
 set(whole_libraries)
@@ -147,6 +161,10 @@ IF(${LIBUSB0_FOUND})
        list(APPEND whole_lib_files "${OPENOCD_GENERATED_O_DIR}/jtag/drivers/libocdjtagdrivers_la-opendous.o")
     endif(NOT ${LIBUSB1_FOUND})
 endif(${LIBUSB0_FOUND})
+
+if(${HIDAPI_FOUND})
+    list(APPEND whole_lib_files "${OPENOCD_GENERATED_O_DIR}/jtag/drivers/libocdjtagdrivers_la-cmsis_dap_usb.o")
+endif()
 
 set_source_files_properties(${whole_lib_files}
                             PROPERTIES GENERATED TRUE)

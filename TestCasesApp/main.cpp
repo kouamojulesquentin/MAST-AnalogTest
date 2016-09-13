@@ -22,6 +22,7 @@
 #include "SVF_EmulationProtocol.hpp"
 #include "I2C_EmulationProtocol.hpp"
 #include "OpenOCDProtocol.hpp"
+#include "SPI_Protocol.hpp"
 #include "GmlPrinter.hpp"
 #include "PrettyPrinter.hpp"
 #include "g3log/g3log.hpp"

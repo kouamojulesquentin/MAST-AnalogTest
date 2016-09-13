@@ -9,6 +9,7 @@ if (WIN32)
 endif()
 
 message("NewMast.CMake:   USE_OPEN_OCD: ${USE_OPEN_OCD}")
+message("NewMast.CMake:   USE_LIBFTDISPI: ${USE_LIBFTDISPI}")
 
 
 project(mast)
@@ -32,6 +33,9 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "../Bin")
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "../Lib")
 
 add_subdirectory (Logger)
+if(${USE_LIBFTDISPI})
+	add_subdirectory (libftdispi)
+endif()
 add_subdirectory (Mast_Core)
 add_subdirectory (SIT_reader)
 add_subdirectory (Mast)

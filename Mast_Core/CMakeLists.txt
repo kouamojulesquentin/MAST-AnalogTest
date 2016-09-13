@@ -6,8 +6,10 @@ include_directories(../Logger/g3log/)
 
 set(LIBUSB_CFLAGS "")
 set(HIDAPI_CFLAGS "")
+set(LIBFTDISPI_CFLAGS "")
 
 message("Mast_Core.CMake: USE_OPEN_OCD: ${USE_OPEN_OCD}")
+message("Mast_Core.CMake: USE_LIBFTDISPI: ${USE_LIBFTDISPI}")
 
 
 if (${USE_OPEN_OCD})
@@ -64,6 +66,12 @@ if (${USE_OPEN_OCD})
 
 endif() # if (${USE_OPEN_OCD})
 
+if (${USE_LIBFTDISPI})
+	set (CFLAGS "${CFLAGS} -DUSE_LIBFTDISPI")
+	set	(LIBFTDISPI_CFLAGS "libftdispi")
+	include_directories(SYSTEM ../libftdispi/include/)
+endif() # if (${USE_LIBFTDISPI})
+
 if (WIN32)
   set (CFLAGS "${CFLAGS} -D__LITTLE_ENDIAN=1 -D__BIG_ENDIAN=2 -D__BYTE_ORDER=1")
 elseif(${USE_OPEN_OCD})
@@ -78,7 +86,7 @@ set_target_properties	(Mast_Core PROPERTIES COMPILE_FLAGS "${CFLAGS}")
 if (WIN32)
 	target_link_libraries(Mast_Core Logger DbgHelp)
 elseif(${USE_OPEN_OCD})
-	target_link_libraries(Mast_Core Logger pthread ${LIBUSB_CFLAGS} ${HIDAPI_CFLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/lib/libopenocd.so dl) #${CMAKE_CURRENT_SOURCE_DIR}/../openocd/openocd/jimtcl/libjim.a dl)
+	target_link_libraries(Mast_Core Logger pthread ${LIBFTDISPI_CFLAGS} ${LIBUSB_CFLAGS} ${HIDAPI_CFLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/lib/libopenocd.so dl) #${CMAKE_CURRENT_SOURCE_DIR}/../openocd/openocd/jimtcl/libjim.a dl)
 else ()
 	target_link_libraries(Mast_Core Logger pthread)
 endif ()

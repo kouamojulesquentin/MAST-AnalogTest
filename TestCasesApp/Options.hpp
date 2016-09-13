@@ -39,6 +39,7 @@ class Options
     SVF_Simulation, //!< Data to SUT are written to file that is read from simulator and data from SUT readen from file that is written by simulator (SVF formatted)
     I2C_Emulation,  //!< Data to SUT are written to file and data from SUT readen from file (Textual I2C commands)
     OpenOCD,        //!< Protocol is based upon OpenOCD
+		SPI,
     Generic,        //!< Table based protocol is used (need specific options)
   };
 

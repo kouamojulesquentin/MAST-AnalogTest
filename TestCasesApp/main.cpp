@@ -299,6 +299,14 @@ shared_ptr<AccessInterfaceProtocol> GetProtocol (Options::Protocol protocol, con
       aiProtocol = make_shared<OpenOCDProtocol> (configFilePath, "zybo", 11); // @todo passer la longueur IR (int) - NG
       break;
     }
+		case Options::Protocol::SPI:
+		{
+			initializer_list<uint32_t> readCommands		=	{	0x00, 0x01 };
+			initializer_list<uint32_t> writeCommands	=	{ 0x00, 0x02 };
+			string_view                commandsPrefix = "";
+			aiProtocol = make_shared<SPI_Protocol>(readCommands, writeCommands, commandsPrefix);
+			break;
+		}
     case Options::Protocol::I2C_Emulation:
     {
       initializer_list<uint32_t> addresses      = { 0x00, 0x01, 0x02 };

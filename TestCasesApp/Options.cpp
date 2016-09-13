@@ -195,6 +195,7 @@ Options::Protocol Options::ParseProtocol (const string& protocolOption)
   {
     make_tuple(Options::Protocol::LoopBack,       "Loopback"),
     make_tuple(Options::Protocol::OpenOCD,        "OpenOCD"),
+    make_tuple(Options::Protocol::SPI,	  				"SPI"),
     make_tuple(Options::Protocol::SVF_Emulation,  "SVF_Emu(lation)?"),
     make_tuple(Options::Protocol::SVF_Simulation, "SVF_Simu(lation)?"),
     make_tuple(Options::Protocol::I2C_Emulation,  "I2C_Emu(lation)?"),
@@ -299,6 +300,9 @@ string Options::ToDebugString (string_view header, string_view linePrefix) const
       break;
     case Protocol::OpenOCD:
       os << "OpenOCD";
+      break;
+		case Protocol::SPI:
+      os << "SPI";
       break;
     case Protocol::Generic:
       os << "Generic";

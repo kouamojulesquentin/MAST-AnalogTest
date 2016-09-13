@@ -68,6 +68,11 @@ class DLL_EXPORT PrettyPrinter : public SystemModelVisitor
   void SetVerbose    (bool verbose)       { m_verbose       = verbose;       } //!< Changes verbosity mode
   void UseAutoFormat (bool useAutoFormat) { m_useAutoFormat = useAutoFormat; } //!< Sets whether pretty printer is configured to print Register values as hexadecimal string (except not complete nibbles that are displayed using binary format)
 
+
+  //! Returns textual model representation starting from a "top" node
+  //!
+  static std::string PrettyPrint(SystemModelNode& topNode, PrettyPrinterOptions options = PrettyPrinterOptions::Default);
+
   //! Returns textual model representation starting from a "top" node
   //!
   static std::string PrettyPrint(std::shared_ptr<SystemModelNode> topNode, PrettyPrinterOptions options = PrettyPrinterOptions::Default);

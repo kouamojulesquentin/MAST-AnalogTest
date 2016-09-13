@@ -84,18 +84,31 @@ void PrettyPrinter::AlignOnNewLine (pos_type targetPos)
 //! @param topNode    Node from which graph is created
 //! @param options    Printer options
 //!
-string PrettyPrinter::PrettyPrint (shared_ptr<SystemModelNode> topNode, PrettyPrinterOptions options)
+string PrettyPrinter::PrettyPrint (SystemModelNode& topNode, PrettyPrinterOptions options)
 {
-  CHECK_PARAMETER_NOT_NULL(topNode, "Cannot 'pretty print' from nullptr");
-
   PrettyPrinter printer(options);
-  topNode->Accept(printer);
+  topNode.Accept(printer);
   return printer.PrettyPrint();
 }
 //
 //  End of: PrettyPrinter::PrettyPrint
 //---------------------------------------------------------------------------
 
+
+//! Returns textual model representation starting from a "top" node
+//!
+//! @param topNode    Node from which graph is created
+//! @param options    Printer options
+//!
+string PrettyPrinter::PrettyPrint (shared_ptr<SystemModelNode> topNode, PrettyPrinterOptions options)
+{
+  CHECK_PARAMETER_NOT_NULL(topNode, "Cannot 'pretty print' from nullptr");
+
+  return PrettyPrint(*topNode, options);
+}
+//
+//  End of: PrettyPrinter::PrettyPrint
+//---------------------------------------------------------------------------
 
 //! Pretty print childrens of a parent node
 //!

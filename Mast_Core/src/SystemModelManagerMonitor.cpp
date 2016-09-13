@@ -14,6 +14,7 @@
 #include "SystemModelManagerMonitor.hpp"
 #include "ParentNode.hpp"
 #include "GmlPrinter.hpp"
+#include "PrettyPrinter.hpp"
 #include "Utility.hpp"
 #include "g3log/g3log.hpp"
 
@@ -82,7 +83,7 @@ void SystemModelManagerMonitor::CreateApplication (const ParentNode& topNode, st
 //!
 void SystemModelManagerMonitor::ExportGml (string_view step, ParentNode& root)
 {
-  if (  !m_gmlPrinterBasePath.empty()
+  if (  !m_exportBasePath.empty()
       && IsSet(m_options, ManagerMonitorOptions::ExportGml)
      )
   {
@@ -92,10 +93,29 @@ void SystemModelManagerMonitor::ExportGml (string_view step, ParentNode& root)
 
     // ---------------- Save graph to file
     //
-    auto path = MakeFilePath(m_gmlPrinterBasePath, step);
-    ofstream os(path);
-    os << graph;
-    os.flush();
+    SaveToFile(graph, m_exportBasePath, "gml", step);
+  }
+}
+//
+//  End of: SystemModelManagerMonitor::ExportGml
+//---------------------------------------------------------------------------
+
+
+//! Creates a textual representation of SystemModel, starting from root node
+//!
+void SystemModelManagerMonitor::ExportPrettyPrint (string_view step, ParentNode& root)
+{
+  if (  !m_exportBasePath.empty()
+      && IsSet(m_options, ManagerMonitorOptions::ExportPrettyPrint)
+     )
+  {
+    // ---------------- Make graph
+    //
+    auto prettyPrint = PrettyPrinter::PrettyPrint(root);
+
+    // ---------------- Save graph to file
+    //
+    SaveToFile(prettyPrint, m_exportBasePath, "txt", step);
   }
 }
 //
@@ -138,7 +158,7 @@ void SystemModelManagerMonitor::LogUncondionally (string_view message, const Sys
 
 //! Builds a path using a base, a step and data cycle counter
 //!
-string SystemModelManagerMonitor::MakeFilePath (string_view basePath, string_view step)
+string SystemModelManagerMonitor::MakeFilePath (string_view basePath, string_view extension, string_view step) const
 {
   if (basePath.empty())
   {
@@ -146,7 +166,7 @@ string SystemModelManagerMonitor::MakeFilePath (string_view basePath, string_vie
   }
 
   ostringstream os;
-  os << basePath << "_" << step << "_"<< m_dataCyclesCount << ".gml";
+  os << basePath << "_" << step << "_"<< m_dataCyclesCount << "." << extension;
 
   return os.str();
 }
@@ -178,6 +198,28 @@ void SystemModelManagerMonitor::Reset ()
 //
 //  End of: SystemModelManagerMonitor::Reset
 //---------------------------------------------------------------------------
+
+
+
+//! Saves some text associated with a step in SystemModelManager
+//!
+//! @param text       Text to save
+//! @param basePath   Destination file base path (include base file name)
+//! @param extension  File extension
+//! @param step       Represent SystemModelManager step (with only characters authorized for paths)
+//!
+void SystemModelManagerMonitor::SaveToFile (string_view text, string_view basePath, string_view extension, string_view step) const
+{
+  auto path = MakeFilePath(basePath, extension, step);
+
+  ofstream os(path);
+  os << text;
+  os.flush();
+}
+//
+//  End of: SystemModelManagerMonitor::SaveToFile
+//---------------------------------------------------------------------------
+
 
 
 //! Monitor start of a new data cycle

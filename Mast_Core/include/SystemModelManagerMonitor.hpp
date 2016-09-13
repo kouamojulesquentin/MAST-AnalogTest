@@ -32,6 +32,7 @@ enum class ManagerMonitorOptions
   BeforeConfiguration = 1 << 1, //!< Monitor SystemModel state before configuration
   AfterConfiguration  = 1 << 2, //!< Monitor SystemModel state after configuration
   ExportGml           = 1 << 3, //!< Tells whether GML graph is exported (before/after  configuration)
+  ExportPrettyPrint   = 1 << 4, //!< Tells whether a "Pretty Print" is exported (before/after  configuration)
 
   Std                 = AppThreadCreation,
   All                 = Std | BeforeConfiguration | AfterConfiguration,
@@ -68,16 +69,18 @@ class DLL_EXPORT SystemModelManagerMonitor
   virtual void BeforeConfiguration (ParentNode&       root);                           //!< Monitors state of SystemModel (from parentNode) before configuration
   virtual void AfterConfiguration  (ParentNode&       root);                           //!< Monitors state of SystemModel (from parentNode) after configuration
 
-  std::string GmlBasePath() const { return m_gmlPrinterBasePath; }
+  std::string ExportBasePath() const { return m_exportBasePath; }
 
-  void GmlBasePath (std::string gmlBasePath) { m_gmlPrinterBasePath = gmlBasePath; }
+  void ExportBasePath (std::string exportBasePath) { m_exportBasePath = exportBasePath; }
 
 
   // ---------------- Protected Methods
   //
   protected:
-  std::string MakeFilePath (string_view basePath, std::experimental::string_view step);
-  void        ExportGml    (string_view step, ParentNode& root);
+  void        SaveToFile        (string_view text,     string_view basePath,  string_view extension, string_view step) const;
+  std::string MakeFilePath      (string_view basePath, string_view extension, string_view step) const;
+  void        ExportGml         (string_view step,     ParentNode& root);
+  void        ExportPrettyPrint (string_view step,     ParentNode& root);
 
   static std::string NodeInfos    (const SystemModelNode& node);
 
@@ -88,7 +91,7 @@ class DLL_EXPORT SystemModelManagerMonitor
   //
   private:
   uint32_t              m_dataCyclesCount = 0; //!< Number of data cycles since startup or last reset
-  std::string           m_gmlPrinterBasePath;  //!< Base path use when exporting graph representing system model
+  std::string           m_exportBasePath;      //!< Base path use when exporting graph representing system model
   ManagerMonitorOptions m_options         = ManagerMonitorOptions::Std;
 };
 //

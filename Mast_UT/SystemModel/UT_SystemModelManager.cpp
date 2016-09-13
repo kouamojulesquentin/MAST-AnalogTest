@@ -852,7 +852,7 @@ void UT_SystemModelManager::test_DoDataCycles_1500_Lazy ()
 //+  auto monitor       = make_shared<SystemModelManagerMonitor>();
 //+  monitor->MonitorAfterConfiguration(true);
 //+  monitor->MonitorBeforeConfiguration(true);
-//+  monitor->GmlBasePath("1500_Lazy");
+//+  monitor->ExportBasePath("1500_Lazy");
 //+  SystemModelManager sut(sm, configureAlgo, monitor);
 
   // ---------------- Exercise
@@ -950,7 +950,7 @@ void UT_SystemModelManager::test_DoDataCycles_MIB_Multichain_Pre_Greedy ()
 //+  auto monitor       = make_shared<SystemModelManagerMonitor>();
 //+  monitor->MonitorAfterConfiguration(true);
 //+  monitor->MonitorBeforeConfiguration(true);
-//+  monitor->GmlBasePath("MIB_Multichain_Pre_Greedy");
+//+  monitor->ExportBasePath("MIB_Multichain_Pre_Greedy");
 //+  SystemModelManager sut(sm, configureAlgo, monitor);
 //+   ENABLE_LOG_IN_SCOPE;
 

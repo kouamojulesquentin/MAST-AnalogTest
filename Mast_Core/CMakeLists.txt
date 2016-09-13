@@ -88,5 +88,5 @@ if (WIN32)
 elseif(${USE_OPEN_OCD})
 	target_link_libraries(Mast_Core Logger pthread ${LIBFTDISPI_CFLAGS} ${LIBUSB_CFLAGS} ${HIDAPI_CFLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/lib/libopenocd.so dl) #${CMAKE_CURRENT_SOURCE_DIR}/../openocd/openocd/jimtcl/libjim.a dl)
 else ()
-	target_link_libraries(Mast_Core Logger pthread)
+	target_link_libraries(Mast_Core Logger pthread ${LIBFTDISPI_CFLAGS}) # TODO call LIBFTDICLAGS here too.
 endif ()

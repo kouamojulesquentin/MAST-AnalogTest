@@ -80,6 +80,8 @@ set_target_properties	(TestCasesApp PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
 if (WIN32)
 	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
+elseif( NOT ${USE_OPEN_OCD})
+	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib pthread dl)
 else ()
     # $LIBUSB_CFLAGS, ldl and libjim.a args are required by OpenOCD.
 	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib pthread ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/lib/libopenocd.so dl)

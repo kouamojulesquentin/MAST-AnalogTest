@@ -19,6 +19,8 @@ set_target_properties	(Mast PROPERTIES COMPILE_FLAGS "${CFLAGS}")
 
 if (WIN32)
 	target_link_libraries(Mast SIT_Reader_Lib Mast_Core Logger DbgHelp)
+elseif( NOT ${USE_OPEN_OCD})
+  target_link_libraries(Mast SIT_Reader_Lib Mast_Core Logger pthread  dl)
 else ()
   target_link_libraries(Mast SIT_Reader_Lib Mast_Core Logger pthread ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/lib/libopenocd.so ${LIBUSB_CFLAGS} dl)
 endif ()

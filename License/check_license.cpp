@@ -65,6 +65,10 @@ bool get_mac_address(unsigned char *mac_address)
  return success;
 }
 #else
+bool get_mac_address(unsigned char *mac_address)
+{
+ return true;
+}
 #endif
 
 bool check_license();

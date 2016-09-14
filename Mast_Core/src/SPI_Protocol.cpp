@@ -131,31 +131,30 @@ BinaryVector SPI_Protocol::DoAction (uint32_t derivationId, void* /* interfaceDa
 #else
 BinaryVector SPI_Protocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
-  auto command 				= CreateSPICommand(derivationId, toSutData);
-
-	auto m_readCommand 	= GetReadCommand(derivationId);
-  auto m_writeCommand = GetWriteCommand(derivationId);
+	auto readCommand 	= GetReadCommand(derivationId);
+  auto writeCommand = GetWriteCommand(derivationId);
 
   auto bitsCount	 		= toSutData.BitsCount();
   auto bytesCount 		= toSutData.BytesCount();
-	auto spiBufferRead 	= vector<uint8_t>(toSutData.BytesCount()+1);
-	auto spiBufferWrite	= vector<uint8_t>(toSutData.BytesCount()+1);
+	auto spiBufferLength = bytesCount+1u;									 // +1 byte is needed to host command.
+	auto spiBufferRead 	= vector<uint8_t>(bytesCount+1u);
+	auto spiBufferWrite	= vector<uint8_t>();
 
   auto toSutDataBuffer		=	toSutData.DataRightAligned();
 	//auto fromSutDataBuffer	= vector<uint8_t>(toSutData.BytesCount());
 
-  spiBufferRead[0] 		= m_readCommand;
+  spiBufferRead[0] 		= readCommand;
 
-  spiBufferWrite[0] 	= m_writeCommand;
+  spiBufferWrite[0] 	= writeCommand;
 
-  spiBufferWrite.insert(spiBufferRead.end(), toSutDataBuffer.begin(), toSutDataBuffer.end());
+  spiBufferWrite.insert(spiBufferWrite.end(), toSutDataBuffer.begin(), toSutDataBuffer.end());
 
-  ftdispi_read(m_ftdispi_ctx, spiBufferRead.data(), bytesCount+1, 0);
-  ftdispi_write(m_ftdispi_ctx, spiBufferWrite.data(), bytesCount+1, 0);
+  ftdispi_read(m_ftdispi_ctx, spiBufferRead.data(), spiBufferLength, 0);
+  ftdispi_write(m_ftdispi_ctx, spiBufferWrite.data(), spiBufferLength, 0);
   
 	vector<uint8_t> fromSutDataBuffer(&spiBufferRead[1], &spiBufferRead[bytesCount]);
 
-  auto fromSutData = BinaryVector::CreateFromRightAlignedBuffer(fromSutDataBuffer, bitsCount);
+  auto fromSutData = BinaryVector::CreateFromRightAlignedBuffer(std::move(fromSutDataBuffer), bitsCount);
 
   return fromSutData;
 }

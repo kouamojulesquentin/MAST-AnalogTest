@@ -190,6 +190,11 @@ void ParentNode::DisconnectSibling (shared_ptr<SystemModelNode> beforeNode, shar
   {
     m_pFirstChild = nextSibling;
   }
+
+  if (sibling == m_pOptionalChildAppender)
+  {
+    m_pOptionalChildAppender = nullptr;
+  }
 }
 //
 //  End of: ParentNode::DisconnectSibling

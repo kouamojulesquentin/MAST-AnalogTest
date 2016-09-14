@@ -30,7 +30,8 @@ class DLL_EXPORT ParentNode : public SystemModelNode, public std::enable_shared_
   void AppendChild    (std::shared_ptr<SystemModelNode> node);       //!< Appends a new child node
   bool HasDirectChild (std::shared_ptr<SystemModelNode> node) const; //!< Returns true if node is a direct child
 
-  uint32_t DirectChildrenCount() const;  //!< Returns current number of direct children
+  uint32_t DirectChildrenCount() const;                                     //!< Returns current number of direct children
+  bool     HasChildren()         const { return m_pFirstChild != nullptr; } //!< Returns true if has at leas one child
 
   bool                             IgnoreForNodePath()    const { return m_ignoreForNodePath;      } //!< When true the node name is ignored when search a node by its path
   std::shared_ptr<SystemModelNode> FirstChild()           const { return m_pFirstChild;            } //!< Returns first child or nullptr
@@ -71,6 +72,25 @@ class DLL_EXPORT ParentNode : public SystemModelNode, public std::enable_shared_
 //
 //  End of ParentNode class declaration
 //---------------------------------------------------------------------------
+
+
+//! Returns true if parent direct children are all of specified type.
+//! @return true when there is no child or all are of required type, false otherwise
+template<typename T> bool HasOnlyChilrenOfType(std::shared_ptr<const ParentNode> parent)
+{
+  auto child = parent->FirstChild();
+
+  while (child)
+  {
+    auto childAsRequestedType = std::dynamic_pointer_cast<T>(child);
+    if (!childAsRequestedType)
+    {
+      return false;
+    }
+    child = child->NextSibling();
+  }
+  return true;
+}
 } // End of namespace mast
 
 

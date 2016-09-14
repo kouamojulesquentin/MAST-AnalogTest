@@ -48,12 +48,14 @@ SOURCES +=  \
     src/PrettyPrinter.cpp                           \
     src/PropagatePendingVisitor.cpp                 \
     src/Register.cpp                                \
+    src/Session.cpp                                 \
+    src/SPI_Player.cpp                              \
+    src/SPI_Protocol.cpp                            \
+    src/Startup.cpp                                 \
     src/SVF_Player.cpp                              \
     src/SVF_EmulationProtocol.cpp                   \
     src/SVF_SimulationProtocol.cpp                  \
     src/SVFVector.cpp                               \
-    src/Session.cpp                                 \
-    src/Startup.cpp                                 \
     src/SystemModel.cpp                             \
     src/SystemModelBuilder.cpp                      \
     src/SystemModelManager.cpp                      \
@@ -61,8 +63,8 @@ SOURCES +=  \
     src/SystemModelChecker.cpp                      \
     src/SystemModelCheckResult.cpp                  \
     src/SystemModelVisitor.cpp                      \
-    src/ToSutVisitor.cpp                            \
     src/SystemModelNode.cpp                         \
+    src/ToSutVisitor.cpp                            \
     src/Utility.cpp
 
 HEADERS += \
@@ -95,6 +97,8 @@ HEADERS += \
     include/PrettyPrinter.hpp                           \
     include/PropagatePendingVisitor.hpp                 \
     include/Register.hpp                                \
+    include/SPI_Player.hpp                              \
+    include/SPI_Protocol.hpp                            \
     include/SVF_Player.hpp                              \
     include/SVF_EmulationProtocol.hpp                   \
     include/SVF_SimulationProtocol.hpp                  \

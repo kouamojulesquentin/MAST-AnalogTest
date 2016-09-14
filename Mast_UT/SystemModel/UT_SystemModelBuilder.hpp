@@ -43,6 +43,14 @@ class UT_SystemModelBuilder : public CxxTest::TestSuite
   void test_Create_MIB_1_Derivation ();
   void test_Create_MIB_4_Derivations ();
 
+  // ---------------- DaisyChain_JTAG_TAPS
+  //
+  void test_DaisyChain_JTAG_TAPS ();
+  void test_DaisyChain_JTAG_TAPS_NoName ();
+  void test_DaisyChain_JTAG_TAPS_Append ();
+  void test_DaisyChain_JTAG_TAPS_3rdTap ();
+  void test_DaisyChain_JTAG_TAPS_4xTap ();
+
   // ================ Other Methods ================
 
   void setUp(); //!< Initializes test (called for each test)

@@ -16,7 +16,9 @@
 
 #include "SystemModel.hpp"
 #include "PathSelector.hpp"
+
 #include <memory>
+#include <initializer_list>
 #include <experimental/string_view>
 using namespace std::string_literals;
 
@@ -69,6 +71,12 @@ class DLL_EXPORT SystemModelBuilder final
                         const mast::BinaryVector&         bypass,
                         std::shared_ptr<mast::ParentNode> parent);
 
+  //! Appends several registers (with same length and initial content) to a parent
+  //!
+  void AppendRegisters (uint32_t                  count,
+                        const std::string&        baseName,
+                        const mast::BinaryVector& bypass,
+                        string_view               parentPath);
 
   //! Creates a JTAG TAP
   //!
@@ -113,6 +121,14 @@ class DLL_EXPORT SystemModelBuilder final
   //! Creates a "1500" style wrapper
   //!
   std::shared_ptr<mast::Chain> Create_1500_Wrapper (string_view name, uint32_t maxDerivations);
+
+  //! Chains (merges) a 1149.1 AccessInterface into another 1149.1 AccessInterface.
+  //!
+  void DaisyChain_JTAG_TAPS(std::shared_ptr<AccessInterface> tap1, std::shared_ptr<AccessInterface> tap2);
+
+  //! Chains (merges) a bunch of 1149.1 AccessInterfaces
+  //!
+  void DaisyChain_JTAG_TAPS(std::initializer_list<std::shared_ptr<AccessInterface>> taps);
 
   // ---------------- Private  Fields
   //

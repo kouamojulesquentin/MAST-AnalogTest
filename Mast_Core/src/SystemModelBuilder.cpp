@@ -17,6 +17,7 @@
 #include "DefaultBinaryPathSelector.hpp"
 #include "DefaultOneHotPathSelector.hpp"
 #include "DefaultNHotPathSelector.hpp"
+#include "AccessInterfaceProtocol.hpp"
 #include "Utility.hpp"
 
 using std::string;
@@ -26,9 +27,100 @@ using std::make_shared;
 using std::make_pair;
 using std::pair;
 using std::dynamic_pointer_cast;
+using std::initializer_list;
 
 using namespace std::string_literals;
 using namespace mast;
+
+namespace
+{
+//! Defines how an AccessInterface looks like
+//!
+enum class AccessInterfaceAssessment
+{
+  Undefined,        //!< The kind of AccessInterface has not been recognized
+  JTAG_TAP,         //!< The AccessInterface has been recognized as a JTAG TAP
+  Chained_JTAG_TAP, //!< The AccessInterface has been recognized as an already chain of JTAG TAPs
+};
+
+
+//! Tries to assess the kind of an AccessInterface
+//!
+//! @note Only recognizes JTAG TAP and chained JTAG TAP
+//!
+AccessInterfaceAssessment AssessAccessInterfaceType (shared_ptr<AccessInterface> ai)
+{
+  auto type = AccessInterfaceAssessment::Undefined;
+
+  auto firstChild  = ai->FirstChild();
+  auto secondChild = firstChild->NextSibling();
+
+  auto firstChildAsChain = dynamic_pointer_cast<Chain>(firstChild);
+
+  // ---------------- Already a chain of JTAG TAPs ?
+  //
+  if (firstChildAsChain)
+  {
+    // ---------------- Check that second child is also a chain
+    //
+    auto secondChildAsChain = dynamic_pointer_cast<Chain>(secondChild);
+    if (!secondChildAsChain)
+    {
+      return AccessInterfaceAssessment::Undefined;
+    }
+
+    // ---------------- Check that there is only 2 chains
+    //
+    if (secondChildAsChain->NextSibling())
+    {
+      return AccessInterfaceAssessment::Undefined;
+    }
+
+    // ---------------- Check that first chain has only IRs
+    //
+    auto hasOnlyIRs = firstChildAsChain->HasChildren() && HasOnlyChilrenOfType<Register>(firstChildAsChain);
+    if (!hasOnlyIRs)
+    {
+      return AccessInterfaceAssessment::Undefined;
+    }
+
+    // ---------------- Check that second chain has only muxes (Linkers)
+    //
+    auto hasOnlyMuxes = secondChildAsChain->HasChildren() && HasOnlyChilrenOfType<Linker>(secondChildAsChain);
+    if (!hasOnlyMuxes)
+    {
+      return AccessInterfaceAssessment::Undefined;
+    }
+    type = AccessInterfaceAssessment::Chained_JTAG_TAP;
+  }
+  else  // Only a JTAG TAP
+  {
+    // ---------------- Check that first child is only a single IR
+    //
+    auto firstChildAsRegister = dynamic_pointer_cast<Register>(firstChild);
+    if (!firstChildAsRegister)
+    {
+      return AccessInterfaceAssessment::Undefined;
+    }
+
+    // ---------------- Check that second child is only a single mux (Linker)
+    //
+    auto secondChildAsLinker = dynamic_pointer_cast<Linker>(secondChild);
+    if (!secondChildAsLinker || secondChildAsLinker->NextSibling())
+    {
+      return AccessInterfaceAssessment::Undefined;
+    }
+    type = AccessInterfaceAssessment::JTAG_TAP;
+  }
+
+  return type;
+}
+//
+//  End of: AssessAccessInterfaceType
+//---------------------------------------------------------------------------
+
+
+} // End of unnamed namespace
 
 
 //! Appends several registers (with same length and initial content) to a parent
@@ -43,6 +135,23 @@ void SystemModelBuilder::AppendRegisters (uint32_t               count,
     auto regName = baseName + std::to_string(ii);
     m_model.CreateRegister (regName, bypass, parent);
   }
+}
+//
+//  End of: SystemModelBuilder::AppendRegisters
+//---------------------------------------------------------------------------
+
+
+//! Appends several registers (with same length and initial content) to a parent
+//!
+void SystemModelBuilder::AppendRegisters (uint32_t            count,
+                                          const string&       baseName,
+                                          const BinaryVector& bypass,
+                                          string_view         parentPath)
+{
+  auto parentNode = dynamic_pointer_cast<ParentNode>(m_model.Root()->FindNode(parentPath));;
+  CHECK_VALUE_NOT_NULL(parentNode, "Cannot find parent node with path: " + parentPath);
+
+  AppendRegisters(count, baseName, bypass, parentNode);
 }
 //
 //  End of: SystemModelBuilder::AppendRegisters
@@ -230,7 +339,7 @@ shared_ptr<Chain> SystemModelBuilder::Create_SIB (string_view              name,
  auto res=      Create_PathSelector(SelectorKind::Binary, selectorRegName, 1,SIB_properties);
   auto selectorReg = res.first;
   auto selector    = res.second;
- 
+
    return Create_MIB(name, selector, selectorReg,muxRegPlacement );
   }
 //
@@ -317,6 +426,135 @@ pair<shared_ptr<Register>, shared_ptr<PathSelector>> SystemModelBuilder::Create_
 }
 //
 //  End of: SystemModelBuilder::Create_PathSelector
+//---------------------------------------------------------------------------
+
+
+
+//! Chains (merges) a 1149.1 AccessInterface into another 1149.1 AccessInterface.
+//!
+//! @note - If first tap is already a daisy chain, second tap is daisy chained after last already chained tap
+//!       - Paths relative to first tap must include 1st tap name ; if none is provided, "TAP1" is provided)
+//!       - Paths relative to second tap must include 2nd tap name ; if none is provided, "TAPx" is provided (where is
+//!         reflect the position of the tap in the chain of taps)
+//!
+//! @param tap1 First tap
+//! @param tap2 Second tap
+//!
+void SystemModelBuilder::DaisyChain_JTAG_TAPS (shared_ptr<AccessInterface> tap1, shared_ptr<AccessInterface> tap2)
+{
+  CHECK_PARAMETER_NOT_NULL(tap1, "Cannot chain tap with nullptr");
+  CHECK_PARAMETER_NOT_NULL(tap2, "Cannot chain tap from nullptr");
+
+  // ---------------- Check/manage protocols
+  //
+  auto protocol1 = tap1->Protocol();
+  auto protocol2 = tap2->Protocol();
+  if (protocol1 && protocol2)
+  {
+    CHECK_TRUE(protocol1->KindName() == protocol2->KindName(), "To daisy chain two AccessInterface, they must have same type of protocol");
+  }
+  else if (!protocol1)
+  {
+    tap1->SetProtocol(protocol2);
+  }
+
+
+
+  auto aiType1 = AssessAccessInterfaceType(tap1);
+  auto aiType2 = AssessAccessInterfaceType(tap2);
+
+  CHECK_TRUE(   (aiType1 == AccessInterfaceAssessment::JTAG_TAP)
+             || (aiType1 == AccessInterfaceAssessment::Chained_JTAG_TAP) , "First AccessInterface must be a JTAG TAP or a chain of JTAG TAP");
+
+
+  CHECK_TRUE(aiType2 == AccessInterfaceAssessment::JTAG_TAP, "First AccessInterface must be a JTAG TAP");
+
+  auto renameNodes = [](shared_ptr<AccessInterface> tap, shared_ptr<Register> ir, shared_ptr<Linker> drMux, uint32_t tapOrder)
+  {
+    auto setTapName =     tap->Name().empty()
+                      || (tap->Name() == "TAP")
+                      || (tap->Name() == "1149_1_TAP");
+
+    auto tapName = setTapName ? "TAP"s + std::to_string(tapOrder) : tap->Name();
+
+    tap->SetName("Chained_TAP");
+
+    ir    ->SetName(tapName + ".IR");
+    drMux ->SetName(tapName);
+  };
+
+  // ---------------- Prepare daisy chain
+  //
+  if (aiType1 == AccessInterfaceAssessment::JTAG_TAP)
+  {
+    auto mux = dynamic_pointer_cast<Linker>   (tap1->DisconnectDerivation(2u));;
+    auto ir  = dynamic_pointer_cast<Register> (tap1->DisconnectDerivation(1u));;
+
+    auto irChain  = m_model.CreateChain("IR_DaisyChain",     tap1);
+    auto muxChain = m_model.CreateChain("DR_Mux_DaisyChain", tap1);
+
+    irChain->AppendChild(ir);
+    muxChain->AppendChild(mux);
+    tap1->SetChildAppender(mux); // Restore child appender (reset when having disconnected the mux)
+
+    // ---------------- Adjust paths management
+    //
+    irChain->IgnoreForNodePath(true);
+    muxChain->IgnoreForNodePath(true);
+    mux->IgnoreForNodePath(false);
+
+    renameNodes(tap1, ir, mux, 1u);
+  }
+
+  // ---------------- Chain second tap
+  //
+  auto mux = dynamic_pointer_cast<Linker>   (tap2->DisconnectDerivation(2u));;
+  auto ir  = dynamic_pointer_cast<Register> (tap2->DisconnectDerivation(1u));;
+
+  auto irChain  = dynamic_pointer_cast<Chain>(tap1->FirstChild());
+  CHECK_VALUE_NOT_NULL(irChain, "Houps tap1 is not already a chain of JTAG TAP");
+
+  auto muxChain = dynamic_pointer_cast<Chain>(irChain->NextSibling());
+  CHECK_VALUE_NOT_NULL(muxChain, "Houps tap1 is not already a chain of JTAG TAP");
+
+  irChain->AppendChild(ir);
+  muxChain->AppendChild(mux);
+
+  // ---------------- Adjust names for paths
+  //
+  mux->IgnoreForNodePath(false);
+  auto tapsCount = irChain->DirectChildrenCount();
+  renameNodes(tap2, ir, mux, tapsCount);
+
+  // ---------------- Get rid of second tap
+  //
+  m_model.RemoveNodeFromModel(tap2);
+}
+//
+//  End of: SystemModelBuilder::DaisyChain_JTAG_TAPS
+//---------------------------------------------------------------------------
+
+
+
+//! Chains a bunch of 1149.1 AccessInterfaces
+//!
+//! @param taps The taps to chain
+//!
+void SystemModelBuilder::DaisyChain_JTAG_TAPS (initializer_list<std::shared_ptr<AccessInterface>> taps)
+{
+  CHECK_PARAMETER_GTE(taps.size(), 2u, "Cannot chain a single AccessInterface");
+
+  auto first = taps.begin();
+  auto next  = first + 1u;
+
+  while (next != taps.end())
+  {
+    DaisyChain_JTAG_TAPS(*first, *next);
+    ++next;
+  }
+}
+//
+//  End of: SystemModelBuilder::DaisyChain_JTAG_TAPS
 //---------------------------------------------------------------------------
 
 

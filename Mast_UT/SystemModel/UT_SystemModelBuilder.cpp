@@ -19,8 +19,10 @@
 #include "DefaultBinaryPathSelector.hpp"
 #include "DefaultOneHotPathSelector.hpp"
 #include "DefaultNHotPathSelector.hpp"
+#include "SystemModelChecker.hpp"
 #include "GmlPrinter.hpp"
 #include "PrettyPrinter.hpp"
+#include "Utility.hpp"
 
 #include "BinaryVector_Traits.hpp"
 #include "SystemModelCheckResult_Traits.hpp"
@@ -462,6 +464,380 @@ void UT_SystemModelBuilder::test_Create_MIB_4_Derivations ()
                               );
   TS_ASSERT_EQUALS (gotPretty, expectedPretty);
 }
+
+
+//! Checks SystemModel::DaisyChain_JTAG_TAPS()
+//!
+void UT_SystemModelBuilder::test_DaisyChain_JTAG_TAPS ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder sut(sm);
+
+  auto tap1 = sut.Create_JTAG_TAP("TAP1", 6u, 4u, make_shared<LoopbackAccessInterfaceProtocol>());
+  auto tap2 = sut.Create_JTAG_TAP("TAP2", 5u, 3u, make_shared<LoopbackAccessInterfaceProtocol>());
+
+  sut.AppendRegisters(3u, "reg_", BinaryVector::CreateFromString("0xFDE"), tap1);
+  sut.AppendRegisters(2u, "reg_", BinaryVector::CreateFromString("0xAB"),  tap2);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.DaisyChain_JTAG_TAPS(tap1, tap2));
+
+  // ---------------- Verify
+  //
+  // Model coherency
+  auto result = SystemModelChecker::Check(sm);
+  TS_ASSERT_FALSE (result.HasIssues());
+//+  TS_TRACE (result.MakeReport());
+
+  auto graph         = GmlPrinter::Graph(sm.Root(), "", GmlPrinterOptions::DisplayIdentifiers | GmlPrinterOptions::ShowProtocol);
+  auto expectedGraph = "graph\n"
+                       "[\n"
+                       "   hierarchic 1 directed 1\n"
+                       "   node [ id 0 graphics [ type \"octagon\" fill \"#10FFFF\" w 211 h 44 ] LabelGraphics [ text \"(0)\n"
+                       "Chained_TAP\n"
+                       "Protocol: Loopback\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 13 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 163 h 43 ] LabelGraphics [ text \"(13)\n"
+                       "IR_DaisyChain\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 1 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(1)\n"
+                       "TAP1.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(5)\n"
+                       "TAP2.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 14 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 201 h 43 ] LabelGraphics [ text \"(14)\n"
+                       "DR_Mux_DaisyChain\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(2)\n"
+                       "TAP1\n"
+                       ":1:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 76 h 35 ] LabelGraphics [ text \"(3)\n"
+                       "TAP1_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 8 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(8)\n"
+                       "reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 9 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(9)\n"
+                       "reg_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 10 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(10)\n"
+                       "reg_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 6 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(6)\n"
+                       "TAP2\n"
+                       ":5:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 7 graphics [ type \"rectangle\" fill \"#59FF20\" w 76 h 35 ] LabelGraphics [ text \"(7)\n"
+                       "TAP2_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 11 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(11)\n"
+                       "reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 12 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(12)\n"
+                       "reg_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   edge [ source 13 target 1 label \"1\" ]\n"
+                       "   edge [ source 13 target 5 label \"2\" ]\n"
+                       "   edge [ source 0 target 13 label \"1\" ]\n"
+                       "   edge [ source 2 target 3 label \"1\" ]\n"
+                       "   edge [ source 2 target 8 label \"2\" ]\n"
+                       "   edge [ source 2 target 9 label \"3\" ]\n"
+                       "   edge [ source 2 target 10 label \"4\" ]\n"
+                       "   edge [ source 14 target 2 label \"1\" ]\n"
+                       "   edge [ source 6 target 7 label \"1\" ]\n"
+                       "   edge [ source 6 target 11 label \"2\" ]\n"
+                       "   edge [ source 6 target 12 label \"3\" ]\n"
+                       "   edge [ source 14 target 6 label \"2\" ]\n"
+                       "   edge [ source 0 target 14 label \"2\" ]\n"
+                       "]"s;
+
+  TS_ASSERT_EQUALS (graph, expectedGraph);
+}
+
+//! Checks SystemModel::DaisyChain_JTAG_TAPS() when taps have no name
+//!
+void UT_SystemModelBuilder::test_DaisyChain_JTAG_TAPS_NoName ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder sut(sm);
+
+  auto tap1 = sut.Create_JTAG_TAP("", 6u, 4u, make_shared<LoopbackAccessInterfaceProtocol>());
+  auto tap2 = sut.Create_JTAG_TAP("", 5u, 3u, make_shared<LoopbackAccessInterfaceProtocol>());
+
+  sut.AppendRegisters(3u, "reg_", BinaryVector::CreateFromString("0xFDE"), tap1);
+  sut.AppendRegisters(2u, "reg_", BinaryVector::CreateFromString("0xAB"),  tap2);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.DaisyChain_JTAG_TAPS(tap1, tap2));
+
+  // ---------------- Verify
+  //
+  // IRs
+  auto ir1     = sm.RegisterWithId(1u);
+  auto ir2     = sm.RegisterWithId(5u);
+  auto ir1Name = ir1->Name();
+  auto ir2Name = ir2->Name();
+  TS_ASSERT_DIFFERS (ir1Name, ir2Name);
+
+  // Linkers
+  auto mux1     = sm.LinkerWithId(2u);
+  auto mux2     = sm.LinkerWithId(6u);
+  auto mux1Name = mux1->Name();
+  auto mux2Name = mux2->Name();
+  TS_ASSERT_DIFFERS (mux1Name, mux2Name);
+
+  // Model coherency
+  auto result = SystemModelChecker::Check(sm);
+  TS_ASSERT_FALSE (result.HasIssues());
+}
+
+
+//! Checks SystemModel::DaisyChain_JTAG_TAPS() that still allow to append properly after having been chained
+//!
+void UT_SystemModelBuilder::test_DaisyChain_JTAG_TAPS_Append ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder sut(sm);
+
+  auto tap1 = sut.Create_JTAG_TAP("TAP", 6u, 4u, make_shared<LoopbackAccessInterfaceProtocol>());
+  auto tap2 = sut.Create_JTAG_TAP("TAP", 5u, 3u, make_shared<LoopbackAccessInterfaceProtocol>());
+
+  sut.AppendRegisters(1u, "reg_", BinaryVector::CreateFromString("0xAA"), tap1);
+  sut.AppendRegisters(1u, "reg_", BinaryVector::CreateFromString("0xB1"), tap2);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.DaisyChain_JTAG_TAPS(tap1, tap2));
+
+  // ---------------- Verify
+  //
+  sut.AppendRegisters(2u, "reg_A", BinaryVector::CreateFromString("0xAA2"), "TAP1");
+  sut.AppendRegisters(1u, "reg_B", BinaryVector::CreateFromString("0xBB2"), "TAP2");
+
+  // Model coherency
+  auto result = SystemModelChecker::Check(sm);
+  TS_ASSERT_FALSE (result.HasIssues());
+//+  TS_TRACE (result.MakeReport());
+//+  TS_TRACE (GmlPrinter::Graph(sm.Root()));
+}
+
+
+//! Checks SystemModel::DaisyChain_JTAG_TAPS() when first AccessInterface is already a Daisy Chain
+//!
+void UT_SystemModelBuilder::test_DaisyChain_JTAG_TAPS_3rdTap ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder sut(sm);
+
+  auto tap1 = sut.Create_JTAG_TAP("TAP_A", 6u, 4u, make_shared<LoopbackAccessInterfaceProtocol>());
+  auto tap2 = sut.Create_JTAG_TAP("TAP_B", 5u, 3u, make_shared<LoopbackAccessInterfaceProtocol>());
+  auto tap3 = sut.Create_JTAG_TAP("TAP_C", 3u, 2u, make_shared<LoopbackAccessInterfaceProtocol>());
+
+  sut.AppendRegisters(3u, "reg_", BinaryVector::CreateFromString("0x1"),   tap1);
+  sut.AppendRegisters(2u, "reg_", BinaryVector::CreateFromString("0x22"),  tap2);
+  sut.AppendRegisters(1u, "reg_", BinaryVector::CreateFromString("0x333"), tap3);
+
+  TS_ASSERT_THROWS_NOTHING (sut.DaisyChain_JTAG_TAPS(tap1, tap2));
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.DaisyChain_JTAG_TAPS(tap1, tap3));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  // Model coherency
+  auto result = SystemModelChecker::Check(sm);
+  TS_ASSERT_FALSE (result.HasIssues());
+
+  auto graph         = GmlPrinter::Graph(sm.Root(), "", GmlPrinterOptions::DisplayIdentifiers | GmlPrinterOptions::ShowProtocol);
+  auto expectedGraph =
+                      "graph\n"
+                      "[\n"
+                      "   hierarchic 1 directed 1\n"
+                      "   node [ id 0 graphics [ type \"octagon\" fill \"#10FFFF\" w 211 h 44 ] LabelGraphics [ text \"(0)\n"
+                      "Chained_TAP\n"
+                      "Protocol: Loopback\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                      "   node [ id 18 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 163 h 43 ] LabelGraphics [ text \"(18)\n"
+                      "IR_DaisyChain\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                      "   node [ id 1 graphics [ type \"rectangle\" fill \"#59FF20\" w 76 h 35 ] LabelGraphics [ text \"(1)\n"
+                      "TAP_A.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                      "   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 76 h 35 ] LabelGraphics [ text \"(5)\n"
+                      "TAP_B.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                      "   node [ id 9 graphics [ type \"rectangle\" fill \"#59FF20\" w 76 h 35 ] LabelGraphics [ text \"(9)\n"
+                      "TAP_C.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                      "   node [ id 19 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 201 h 43 ] LabelGraphics [ text \"(19)\n"
+                      "DR_Mux_DaisyChain\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                      "   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(2)\n"
+                      "TAP_A\n"
+                      ":1:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                      "   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 85 h 35 ] LabelGraphics [ text \"(3)\n"
+                      "TAP_A_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                      "   node [ id 12 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(12)\n"
+                      "reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                      "   node [ id 13 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(13)\n"
+                      "reg_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                      "   node [ id 14 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(14)\n"
+                      "reg_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                      "   node [ id 6 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(6)\n"
+                      "TAP_B\n"
+                      ":5:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                      "   node [ id 7 graphics [ type \"rectangle\" fill \"#59FF20\" w 85 h 35 ] LabelGraphics [ text \"(7)\n"
+                      "TAP_B_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                      "   node [ id 15 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(15)\n"
+                      "reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                      "   node [ id 16 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(16)\n"
+                      "reg_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                      "   node [ id 10 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(10)\n"
+                      "TAP_C\n"
+                      ":9:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                      "   node [ id 11 graphics [ type \"rectangle\" fill \"#59FF20\" w 85 h 35 ] LabelGraphics [ text \"(11)\n"
+                      "TAP_C_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                      "   node [ id 17 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(17)\n"
+                      "reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                      "   edge [ source 18 target 1 label \"1\" ]\n"
+                      "   edge [ source 18 target 5 label \"2\" ]\n"
+                      "   edge [ source 18 target 9 label \"3\" ]\n"
+                      "   edge [ source 0 target 18 label \"1\" ]\n"
+                      "   edge [ source 2 target 3 label \"1\" ]\n"
+                      "   edge [ source 2 target 12 label \"2\" ]\n"
+                      "   edge [ source 2 target 13 label \"3\" ]\n"
+                      "   edge [ source 2 target 14 label \"4\" ]\n"
+                      "   edge [ source 19 target 2 label \"1\" ]\n"
+                      "   edge [ source 6 target 7 label \"1\" ]\n"
+                      "   edge [ source 6 target 15 label \"2\" ]\n"
+                      "   edge [ source 6 target 16 label \"3\" ]\n"
+                      "   edge [ source 19 target 6 label \"2\" ]\n"
+                      "   edge [ source 10 target 11 label \"1\" ]\n"
+                      "   edge [ source 10 target 17 label \"2\" ]\n"
+                      "   edge [ source 19 target 10 label \"3\" ]\n"
+                      "   edge [ source 0 target 19 label \"2\" ]\n"
+                      "]"s;
+
+  TS_ASSERT_EQUALS (graph, expectedGraph);
+}
+
+
+//! Checks SystemModel::DaisyChain_JTAG_TAPS() with 4 taps
+//!
+void UT_SystemModelBuilder::test_DaisyChain_JTAG_TAPS_4xTap ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder sut(sm);
+
+  auto tap1 = sut.Create_JTAG_TAP("TAP_A", 7u, 5u, make_shared<LoopbackAccessInterfaceProtocol>());
+  auto tap2 = sut.Create_JTAG_TAP("TAP_B", 6u, 4u, make_shared<LoopbackAccessInterfaceProtocol>());
+  auto tap3 = sut.Create_JTAG_TAP("TAP_C", 5u, 3u, make_shared<LoopbackAccessInterfaceProtocol>());
+  auto tap4 = sut.Create_JTAG_TAP("TAP_D", 4u, 2u, make_shared<LoopbackAccessInterfaceProtocol>());
+
+  sut.AppendRegisters(4u, "reg_", BinaryVector::CreateFromString("0x1"),    tap1);
+  sut.AppendRegisters(3u, "reg_", BinaryVector::CreateFromString("0x22"),   tap2);
+  sut.AppendRegisters(2u, "reg_", BinaryVector::CreateFromString("0x33"),   tap3);
+  sut.AppendRegisters(1u, "reg_", BinaryVector::CreateFromString("0x4444"), tap4);
+
+  auto taps = {tap1, tap2, tap3, tap4};
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.DaisyChain_JTAG_TAPS(taps));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  // Model coherency
+  auto result = SystemModelChecker::Check(sm);
+  TS_ASSERT_FALSE (result.HasIssues());
+
+  auto graph         = GmlPrinter::Graph(sm.Root(), "", GmlPrinterOptions::DisplayIdentifiers | GmlPrinterOptions::ShowProtocol);
+  auto expectedGraph = "graph\n"
+                       "[\n"
+                       "   hierarchic 1 directed 1\n"
+                       "   node [ id 0 graphics [ type \"octagon\" fill \"#10FFFF\" w 211 h 44 ] LabelGraphics [ text \"(0)\n"
+                       "Chained_TAP\n"
+                       "Protocol: Loopback\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 26 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 163 h 43 ] LabelGraphics [ text \"(26)\n"
+                       "IR_DaisyChain\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 1 graphics [ type \"rectangle\" fill \"#59FF20\" w 76 h 35 ] LabelGraphics [ text \"(1)\n"
+                       "TAP_A.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 76 h 35 ] LabelGraphics [ text \"(5)\n"
+                       "TAP_B.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 9 graphics [ type \"rectangle\" fill \"#59FF20\" w 76 h 35 ] LabelGraphics [ text \"(9)\n"
+                       "TAP_C.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 13 graphics [ type \"rectangle\" fill \"#59FF20\" w 76 h 35 ] LabelGraphics [ text \"(13)\n"
+                       "TAP_D.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 27 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 201 h 43 ] LabelGraphics [ text \"(27)\n"
+                       "DR_Mux_DaisyChain\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(2)\n"
+                       "TAP_A\n"
+                       ":1:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 85 h 35 ] LabelGraphics [ text \"(3)\n"
+                       "TAP_A_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 16 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(16)\n"
+                       "reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 17 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(17)\n"
+                       "reg_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 18 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(18)\n"
+                       "reg_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 19 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(19)\n"
+                       "reg_3\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 6 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(6)\n"
+                       "TAP_B\n"
+                       ":5:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 7 graphics [ type \"rectangle\" fill \"#59FF20\" w 85 h 35 ] LabelGraphics [ text \"(7)\n"
+                       "TAP_B_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 20 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(20)\n"
+                       "reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 21 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(21)\n"
+                       "reg_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 22 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(22)\n"
+                       "reg_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 10 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(10)\n"
+                       "TAP_C\n"
+                       ":9:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 11 graphics [ type \"rectangle\" fill \"#59FF20\" w 85 h 35 ] LabelGraphics [ text \"(11)\n"
+                       "TAP_C_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 23 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(23)\n"
+                       "reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 24 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(24)\n"
+                       "reg_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 14 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(14)\n"
+                       "TAP_D\n"
+                       ":13:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 15 graphics [ type \"rectangle\" fill \"#59FF20\" w 85 h 35 ] LabelGraphics [ text \"(15)\n"
+                       "TAP_D_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 25 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(25)\n"
+                       "reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   edge [ source 26 target 1 label \"1\" ]\n"
+                       "   edge [ source 26 target 5 label \"2\" ]\n"
+                       "   edge [ source 26 target 9 label \"3\" ]\n"
+                       "   edge [ source 26 target 13 label \"4\" ]\n"
+                       "   edge [ source 0 target 26 label \"1\" ]\n"
+                       "   edge [ source 2 target 3 label \"1\" ]\n"
+                       "   edge [ source 2 target 16 label \"2\" ]\n"
+                       "   edge [ source 2 target 17 label \"3\" ]\n"
+                       "   edge [ source 2 target 18 label \"4\" ]\n"
+                       "   edge [ source 2 target 19 label \"5\" ]\n"
+                       "   edge [ source 27 target 2 label \"1\" ]\n"
+                       "   edge [ source 6 target 7 label \"1\" ]\n"
+                       "   edge [ source 6 target 20 label \"2\" ]\n"
+                       "   edge [ source 6 target 21 label \"3\" ]\n"
+                       "   edge [ source 6 target 22 label \"4\" ]\n"
+                       "   edge [ source 27 target 6 label \"2\" ]\n"
+                       "   edge [ source 10 target 11 label \"1\" ]\n"
+                       "   edge [ source 10 target 23 label \"2\" ]\n"
+                       "   edge [ source 10 target 24 label \"3\" ]\n"
+                       "   edge [ source 27 target 10 label \"3\" ]\n"
+                       "   edge [ source 14 target 15 label \"1\" ]\n"
+                       "   edge [ source 14 target 25 label \"2\" ]\n"
+                       "   edge [ source 27 target 14 label \"4\" ]\n"
+                       "   edge [ source 0 target 27 label \"2\" ]\n"
+                       "]"s;
+
+  TS_ASSERT_EQUALS (graph, expectedGraph);
+}
+
 
 //===========================================================================
 // End of UT_SystemModelBuilder.cpp

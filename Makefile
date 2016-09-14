@@ -57,7 +57,7 @@ endif
 BUILD_UT = ON
 
 CMAKE_DEBUG_FLAGS=    -DCMAKE_BUILD_TYPE=Debug   $(CMAKE_FLAGS) -DUSE_OPEN_OCD:BOOL=$(USE_OPEN_OCD) -DBUILD_UT:BOOL=$(BUILD_UT)
-CMAKE_RELEASE_FLAGS=  -DCMAKE_BUILD_TYPE=Release $(CMAKE_FLAGS) -DUSE_OPEN_OCD:BOOL=$(USE_OPEN_OCD)
+CMAKE_RELEASE_FLAGS=  -DCMAKE_BUILD_TYPE=Release $(CMAKE_FLAGS) -DUSE_OPEN_OCD:BOOL=$(USE_OPEN_OCD) -DBUILD_UT:BOOL=$(BUILD_UT)
 
 
 CMAKE_ARM_FLAGS= -D CMAKE_TOOLCHAIN_FILE=Toolchain-arm.cmake -DUSE_OPEN_OCD:BOOL=OFF
@@ -68,18 +68,20 @@ all: debug
 
 debug:
 ifeq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR))","")
-> $(info ==> Makefile: Use Open OCD: $(USE_OPEN_OCD))
 > $(MKDIR) $(CMAKE_DEBUG_BUILD_DIR)
 > cd       $(CMAKE_DEBUG_BUILD_DIR) && cmake $(CMAKE_DEBUG_FLAGS) ..
 endif
+> $(info ==> Makefile: Use Open OCD: $(USE_OPEN_OCD))
+> $(info ==> Makefile: Build UT:     $(BUILD_UT))
 > cd $(CMAKE_DEBUG_BUILD_DIR) && make $(MAKE_FLAGS)
 
 release:
 ifeq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR))","")
-> $(info ==> Makefile: Use Open OCD: $(USE_OPEN_OCD))
 > $(MKDIR) $(CMAKE_RELEASE_BUILD_DIR)
 > cd $(CMAKE_RELEASE_BUILD_DIR) && cmake  $(CMAKE_RELEASE_FLAGS)  ..
 endif
+> $(info ==> Makefile: Use Open OCD: $(USE_OPEN_OCD))
+> $(info ==> Makefile: Build UT:     $(BUILD_UT))
 > cd $(CMAKE_RELEASE_BUILD_DIR) && make  $(MAKE_FLAGS)
 
 run_debug:

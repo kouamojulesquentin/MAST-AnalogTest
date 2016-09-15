@@ -138,7 +138,7 @@ inline std::uint32_t extract_number(std::string s)
 %type  <Coding_type> IR_TABLE
 %type  <Coding_type> AI_TABLE
 %type  <std::string> JTAG_protocol
-
+%type  <std::string> PDL_declaration
 %type  <std::shared_ptr<mast::SystemModelNode>> root_node
 %type  <std::shared_ptr<mast::SystemModelNode>> register_node
 %type  <std::shared_ptr<mast::SystemModelNode>> leaf_node
@@ -222,13 +222,23 @@ node_name :  t_WORD is_transparent
 		     }
      ;
 
-parent_node_with_children: parent_node children_list
+parent_node_with_children: parent_node PDL_declaration children_list
  {
   auto asParentNode = dynamic_pointer_cast<ParentNode>($1);
-   for (auto this_child : $2.nodes)
+   for (auto this_child : $3.nodes)
        asParentNode->AppendChild(this_child);
      $$ = $1;
+  if (!$2.empty())
+   {
+    std::cout<< "Function " << $2 <<" is associated with node " << $1->Name() <<"\n";
+   }   
  }
+
+PDL_declaration:
+ t_PDL t_WORD { $$ = $2;}
+ |
+  {  $$ = "";}
+;
 
 parent_node:
 
@@ -388,7 +398,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE  {
 	  break;
 
 	  }
-	 auto node = driver.builder->Create_JTAG_TAP($2.name,$4,$6,protocol);
+	 auto node = driver.builder->Create_JTAG_TAP($2.name,$4,$6+1,protocol);
   	 $$ = node;
 	 }
 	}

@@ -40,7 +40,7 @@ class DLL_EXPORT Session
   public:
   virtual ~Session();
 
-  Session();
+  Session(bool enableLog = false);
   Session(std::shared_ptr<SystemModelManagerMonitor> monitor);
 
   // ---------------- Public  Fields

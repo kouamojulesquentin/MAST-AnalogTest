@@ -107,7 +107,7 @@ const char* ErrorMessage ()
 
 //! Registers applications functions with their associated node to the System Model Manager
 //!
-ErrorCode CreateApplications (ApplicationAssociation* pAssociations, uint32_t count)
+ErrorCode CreateApplications (AppFunctionAndNodePath* pAssociations, uint32_t count)
 {
   auto retCode = ErrorCode::Ok;
 
@@ -171,7 +171,7 @@ ErrorCode InitializeMast (const char* modelFilePath)
 
 //! Runs Mast til applications terminates
 //!
-ErrorCode RunMast (const char* modelFilePath, ApplicationAssociation* pAssociations, uint32_t count)
+ErrorCode RunMast (const char* modelFilePath, AppFunctionAndNodePath* pAssociations, uint32_t count)
 {
   auto retCode = ErrorCode::Ok;
 

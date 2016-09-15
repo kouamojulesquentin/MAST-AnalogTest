@@ -25,6 +25,7 @@ Session::~Session ()
   Startup::ForgetSystemModel();
   Startup::ForgetManager();
   SystemModelNode::ResetNodeIdentifier();
+  Startup::StopLogger();
 }
 //
 //  End of: Session::~Session
@@ -33,8 +34,11 @@ Session::~Session ()
 
 //! Gets pointers to SystemModel and SystemModelManager
 //!
-Session::Session ()
-  : sm      (Startup::GetSystemModel())
+//! @param enableLog  When true, log facility is initialized and enabled, otherwise it is not started
+//!
+Session::Session (bool enableLog)
+  : logger  (enableLog ? Startup::GetLogger() : nullptr)
+  , sm      (Startup::GetSystemModel())
   , manager (Startup::GetManager())
 {
 }
@@ -46,7 +50,7 @@ Session::Session ()
 //! Gets pointers to SystemModel and SystemModelManager and set monitor for SystemModelManager
 //!
 Session::Session (shared_ptr<SystemModelManagerMonitor> monitor)
-  : Session()
+  : Session(true)
 {
   manager->Monitor(monitor);
 }

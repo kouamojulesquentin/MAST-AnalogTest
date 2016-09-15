@@ -18,6 +18,11 @@
 #include "Platform.hpp"
 #include <memory>
 
+namespace g3
+{
+  class LogWorker;
+}
+
 namespace mast
 {
 class SystemModel;
@@ -28,7 +33,6 @@ class SystemModelManager;
 //!
 class DLL_EXPORT Startup final
 {
-
   // ---------------- Public  Methods
   //
   public:
@@ -37,19 +41,19 @@ class DLL_EXPORT Startup final
 
   static std::shared_ptr<SystemModel>        GetSystemModel(); //!< Returns shared SystemModel
   static std::shared_ptr<SystemModelManager> GetManager();     //!< Returns shared SystemModelManager
+  static std::shared_ptr<g3::LogWorker>      GetLogger();      //!< Returns shared logger
+  static void                                StartLogger();    //!< Initializes logger facility
+  static void                                StopLogger();     //!< Stop logger facility
 
   static void ForgetSystemModel(); //!< Gets rid of common SystemModel singleton
   static void ForgetManager();     //!< Gets rid of common SystemModelManager singleton
-
-  // ---------------- Private  Methods
-  //
-  private:
 
   // ---------------- Private  Fields
   //
   private:
   static std::shared_ptr<SystemModel>        sm_systemModel;
   static std::shared_ptr<SystemModelManager> sm_manager;
+  static std::shared_ptr<g3::LogWorker>      sm_logger;
 };
 //
 //  End of Startup class declaration

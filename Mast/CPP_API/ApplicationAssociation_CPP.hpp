@@ -20,20 +20,20 @@
 
 namespace mast
 {
-  //! Associates functions (applications) with some node path and optionally a (debug) name
+  //! Associates application functions (algorithm) with some node path and optionally an application name
   //!
   struct ApplicationAssociation final
   {
     using Application_t = std::function<void()>;
 
-    Application_t function;
+    Application_t appFunction;
     std::string   topNodePath;
-    std::string   debugName;
+    std::string   appName;
 
-    ApplicationAssociation(Application_t p_function, std::string p_topNodePath, std::string p_debugName = "")
-      : function    (p_function)
+    ApplicationAssociation(Application_t p_appFunction, std::string p_topNodePath, std::string p_appName = "")
+      : appFunction (p_appFunction)
       , topNodePath (std::move(p_topNodePath))
-      , debugName   (std::move(p_debugName))
+      , appName     (std::move(p_appName))
     {}
   };
   //

@@ -18,10 +18,14 @@
 #include "Utility.hpp"
 #include "Session.hpp"
 #include "SIT_reader.hpp"
+#include "Utility.hpp"
+#include "g3log/g3log.hpp"
 
 #include <memory>
+#include <fstream>
 
 using std::shared_ptr;
+using std::make_shared;
 using std::vector;
 using std::string;
 using std::experimental::string_view;
@@ -64,6 +68,40 @@ void LoadSystemModel (string_view filePath)
 } // End of unnamed namespace
 
 
+//! Check SystemModel coherency, logging check result and throwing runtime exception in case of error
+//!
+void mast::CheckSystemModel ()
+{
+  auto sm          = Startup::GetSystemModel();
+  auto checkResult = sm->Check();
+
+  if (!checkResult.HasIssues())
+  {
+    if (checkResult.infosCount == 0)
+    {
+      LOG(DEBUG) << "System model is correct";
+    }
+    else
+    {
+      LOG(DEBUG) << "System model infos: " << checkResult.infos;
+    }
+  }
+  else
+  {
+    LOG(DEBUG) << checkResult.MakeReport();
+
+    if (checkResult.HasErrors())
+    {
+      PrintModelGraph();
+      THROW_RUNTIME_ERROR("checkResult.MakeReport()");
+    }
+  }
+}
+//
+//  End of: CheckSystemModel
+//---------------------------------------------------------------------------
+
+
 //!< Cleans up Mast library
 //!<
 //!< @note  To start using Mast again (e.g. with a new model), one must call InitializeMast again
@@ -95,10 +133,10 @@ void mast::CreateApplications (const vector<ApplicationAssociation>& appAssociat
     auto foundNode = sm->Root()->FindNode(nextAssociation.topNodePath);
     auto topNode   = std::dynamic_pointer_cast<ParentNode>(foundNode);
 
-    CHECK_VALUE_NOT_NULL(topNode,   "Cannot create application "                     + Utility::IfNotEmpty_SingleQuoteAndSuffixWithSpace(nextAssociation.debugName)
+    CHECK_VALUE_NOT_NULL(topNode,   "Cannot create application "                     + Utility::IfNotEmpty_SingleQuoteAndSuffixWithSpace(nextAssociation.appName)
                                   + "because cannot find an actual node with path: " + Utility::SingleQuote(nextAssociation.topNodePath));
 
-    manager->CreateApplicationThread(topNode, nextAssociation.function, nextAssociation.debugName);
+    manager->CreateApplicationThread(topNode, nextAssociation.appFunction, nextAssociation.appName);
   }
 }
 //
@@ -125,17 +163,53 @@ void mast::InitializeMast (string_view modelFilePath)
 //---------------------------------------------------------------------------
 
 
+//! Exports GML formated graph of system model
+//!
+//! @param filePath   Gml file path
+//!
+void mast::PrintModelGraph (const string& filePath)
+{
+  std::ofstream os(filePath);
+  auto          sm = Startup::GetSystemModel();
+
+  os << GmlPrinter::Graph(sm->Root(), "", GmlPrinterOptions::Std | GmlPrinterOptions::ShowProtocol);
+}
+//
+//  End of: mast::PrintModelGraph
+//---------------------------------------------------------------------------
+
+
+
+
 //! Runs Mast til applications terminates
 //!
 //! @param appAssociations  Associate some application function with a node in the system model
 //!
 //! @note Mast must have been initialized and system model been created beforehand
 //!
-void mast::RunMast (const vector<ApplicationAssociation>& appAssociations)
+void mast::RunMast (const vector<ApplicationAssociation>& appAssociations, RunMastOptions options)
 {
   CreateApplications(appAssociations);
 
+  if (IsSet(options, RunMastOptions::CheckModel))
+  {
+    CheckSystemModel();
+  }
+
+  if (IsSet(options, RunMastOptions::PrintModelGraph))
+  {
+    PrintModelGraph();
+  }
+
   auto manager = mast::Startup::GetManager();
+
+  if (    IsSet(options, RunMastOptions::LogManagerActivity)
+      && !manager->Monitor()
+     )
+  {
+    manager->Monitor(make_shared<SystemModelManagerMonitor>());
+  }
+
   manager->Start();
   manager->StartCreatedApplicationThreads();
   manager->WaitForApplicationsEnd();
@@ -148,7 +222,7 @@ void mast::RunMast (const vector<ApplicationAssociation>& appAssociations)
 
 //! Creates a system model from configuration file, then runs Mast till applications terminates
 //!
-void mast::RunMast (string_view modelFilePath, const vector<ApplicationAssociation>& appAssociations)
+void mast::RunMast (string_view modelFilePath, const vector<ApplicationAssociation>& appAssociations, RunMastOptions options)
 {
   CHECK_PARAMETER_NOT_EMPTY(modelFilePath, "Cannot run Mast without a valid path for system model (SIT file)");
   CHECK_FILE_EXISTS(modelFilePath);
@@ -156,7 +230,7 @@ void mast::RunMast (string_view modelFilePath, const vector<ApplicationAssociati
   Session session;
 
   LoadSystemModel(modelFilePath);
-  RunMast(appAssociations);
+  RunMast(appAssociations, options);
 }
 //
 //  End of: mast::RunMast

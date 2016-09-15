@@ -26,11 +26,11 @@
 #include "GmlPrinter.hpp"
 #include "PrettyPrinter.hpp"
 #include "g3log/g3log.hpp"
-#include "g3log/logworker.hpp"
-#include "LogFormatter.h"
-#include "LoggerSinks.h"
-#include "CustomFileSink.h"
-#include "SIT_reader.hpp"
+//+#include "g3log/logworker.hpp"
+//+#include "LogFormatter.h"
+//+#include "LoggerSinks.h"
+//+#include "CustomFileSink.h"
+//+#include "SIT_reader.hpp"
 #include "Options.hpp"
 #include "Zybo.hpp"
 
@@ -67,31 +67,6 @@ using namespace test;
 
 namespace
 {
-//! Check SystemModel coherency
-//!
-ErrorCode CheckSystemModel ()
-{
-  auto retCode     = ErrorCode::Ok;
-  auto sm          = Startup::GetSystemModel();
-  auto checkResult = sm->Check();
-
-  if (checkResult.HasIssues())
-  {
-    cout << "!!!!!! Invalid model !!!!!!" << std::endl;
-    cout << checkResult.MakeReport();
-
-    if (checkResult.HasErrors())
-    {
-      retCode = ErrorCode::InvalidModel;
-    }
-  }
-  return retCode;
-}
-//
-//  End of: CheckSystemModel
-//---------------------------------------------------------------------------
-
-
 
 //! Creates applications and associate them with some register path
 //!
@@ -223,7 +198,7 @@ vector<ApplicationAssociation> CreateTestcase (shared_ptr<AccessInterfaceProtoco
       }
       else
       {
-        auto topPath   = "Tap_DR_Mux.1500.SWIR.SWIR_mux.WIR.WIR_mux";
+        auto topPath   = "W_1500.SWIR.WIR";
         associations   = CreateDefaultAppDescriptors(topPath, 4u, "reg_", loopCount);
       }
       break;
@@ -243,7 +218,7 @@ vector<ApplicationAssociation> CreateTestcase (shared_ptr<AccessInterfaceProtoco
 
       sm->SetRoot(accessInterface);
 
-      auto topPath   = "Tap_DR_Mux.1500.SWIR.SWIR_mux.WIR.WIR_mux";
+      auto topPath   = "1500.SWIR.WIR";
       associations   = CreateDefaultAppDescriptors(topPath, 4u, registerNamePrefix, loopCount);
       break;
     }
@@ -317,7 +292,7 @@ shared_ptr<AccessInterfaceProtocol> GetProtocol (Options::Protocol protocol, con
       break;
     }
     case Options::Protocol::Generic:
-    THROW_LOGIC_ERROR("Not yet implemented");
+      THROW_LOGIC_ERROR("Not yet implemented");
       break;
     default:
       THROW_INVALID_ARGUMENT("Unsupported aiProtocol");
@@ -330,35 +305,6 @@ shared_ptr<AccessInterfaceProtocol> GetProtocol (Options::Protocol protocol, con
 //  End of: GetProtocol
 //---------------------------------------------------------------------------
 
-
-
-
-//! Initializes logger facility
-//!
-std::unique_ptr<g3::LogWorker> InitializeLogger ()
-{
-  auto logworker    = g3::LogWorker::createLogWorker();
-  auto logFormatter = g3::LogFormatter();
-
-  logFormatter.ShowDate(false);
-  logFormatter.ShowTime(true);
-  logFormatter.ShowFileName(false);
-  logFormatter.ShowFunctionName(true);
-  logFormatter.ShowLineNumber(true);
-
-  auto customSink = std::make_unique<g3::CustomFileSink>("Log.txt", g3::CustomFileSink::FlushMode::AutoBackground, logFormatter);
-  customSink->Clear();
-
-  logworker->addSink(std::move(customSink), &g3::CustomFileSink::ReceiveLogUnformattedMessage);
-
-  g3::initializeLogging(logworker.get());
-  g3::logEnabled(true);
-
-  return logworker;
-}
-//
-//  End of: InitializeLogger
-//---------------------------------------------------------------------------
 } // End of unnamed namespace
 
 
@@ -368,35 +314,24 @@ std::unique_ptr<g3::LogWorker> InitializeLogger ()
 int main (int argc, char* argv [])
 {
   auto retCode = ErrorCode::Ok;
+  auto session = Session (std::make_shared<SystemModelManagerMonitor>());
+
   try
   {
-    auto logworker = InitializeLogger();
-
     auto options = Options::ParseArguments(argc, argv);
     cout << options.ToDebugString("Retained options: \n", "   ");
 
-    auto session        = Session (std::make_shared<SystemModelManagerMonitor>());
     auto protocol       = GetProtocol(options.protocol, options.protocolOptions);
     auto appAssociation = CreateTestcase(protocol, options.testcase, options.testcaseOptions);
 
-    retCode = CheckSystemModel();
-    if (retCode != ErrorCode::Ok)
-    {
-      options.printGraph = true;
-    }
+    auto runMastOptions = RunMastOptions::LogManagerActivity | RunMastOptions::CheckModel;
 
     if (options.printGraph)
     {
-      ofstream os(options.graphFilePath);
-      os << GmlPrinter::Graph(session.sm->Root(), "", GmlPrinterOptions::Std | GmlPrinterOptions::ShowProtocol);
+      PrintModelGraph(options.graphFilePath);
     }
 
-    if (retCode != ErrorCode::Ok)
-    {
-      return static_cast<int>(retCode);
-    }
-
-    RunMast(appAssociation);
+    RunMast(appAssociation, runMastOptions);
 
     std::cout << "End of test case (see log file in case of errors)" << std::endl;
   }

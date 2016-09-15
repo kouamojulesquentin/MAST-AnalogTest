@@ -18,6 +18,11 @@
 #include "Platform.hpp"
 #include <memory>
 
+namespace g3
+{
+  class LogWorker;
+}
+
 namespace mast
 {
 class SystemModelManagerMonitor;
@@ -41,6 +46,7 @@ class DLL_EXPORT Session
   // ---------------- Public  Fields
   //
   public:
+  std::shared_ptr<g3::LogWorker>      logger;
   std::shared_ptr<SystemModel>        sm;
   std::shared_ptr<SystemModelManager> manager;
 };

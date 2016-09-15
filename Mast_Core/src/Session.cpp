@@ -25,6 +25,7 @@ Session::~Session ()
   Startup::ForgetSystemModel();
   Startup::ForgetManager();
   SystemModelNode::ResetNodeIdentifier();
+  Startup::StopLogger();
 }
 //
 //  End of: Session::~Session
@@ -34,7 +35,8 @@ Session::~Session ()
 //! Gets pointers to SystemModel and SystemModelManager
 //!
 Session::Session ()
-  : sm      (Startup::GetSystemModel())
+  : logger  (Startup::GetLogger())
+  , sm      (Startup::GetSystemModel())
   , manager (Startup::GetManager())
 {
 }

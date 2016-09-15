@@ -19,12 +19,12 @@
 
 namespace mast
 {
-  struct ApplicationAssociation;
+  struct AppFunctionAndNodePath;
 }
 
 namespace test
 {
-  std::vector<mast::ApplicationAssociation> Zybo_CreateApplicationsDescriptor();
+  std::vector<mast::AppFunctionAndNodePath> Zybo_CreateApplicationsDescriptor();
 } // End of namespace mast
 
 #endif  // not defined ZYBO_H__9398CFAE_487B_47F1_5B82_379918C2340C__INCLUDED_

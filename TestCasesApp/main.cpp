@@ -12,7 +12,7 @@
 
 #include "Session.hpp"
 #include "Startup.hpp"
-#include "ApplicationAssociation_CPP.hpp"
+#include "AppFunctionAndNodePath_CPP.hpp"
 #include "SystemModelAdapter_CPP.hpp"
 #include "ErrorCode_C.h"
 #include "SystemModelBuilder.hpp"
@@ -70,7 +70,7 @@ namespace
 
 //! Creates applications and associate them with some register path
 //!
-vector<ApplicationAssociation> CreateDefaultAppDescriptors (const string& appTopNodePath, uint16_t appCount, string_view registerNamePrefix, uint16_t loopCount )
+vector<AppFunctionAndNodePath> CreateDefaultAppDescriptors (const string& appTopNodePath, uint16_t appCount, string_view registerNamePrefix, uint16_t loopCount )
 {
   auto pdlApp = [](uint16_t loopCount, string registerPath, uint16_t initialValue)
   {
@@ -85,7 +85,7 @@ vector<ApplicationAssociation> CreateDefaultAppDescriptors (const string& appTop
     }
   };
 
-  vector<ApplicationAssociation> associations;
+  vector<AppFunctionAndNodePath> associations;
 
   auto initialValue = uint16_t(0x1000);
   for (uint16_t ii = 0 ; ii < appCount ; ++ii)
@@ -118,7 +118,7 @@ vector<ApplicationAssociation> CreateDefaultAppDescriptors (const string& appTop
 //! @param testcaseOptions  Options for test case (depends on tescase kind)
 //!
 //! @return Application function and their association with a ParentNode within the SystemModel
-vector<ApplicationAssociation> CreateTestcase (shared_ptr<AccessInterfaceProtocol> protocol,
+vector<AppFunctionAndNodePath> CreateTestcase (shared_ptr<AccessInterfaceProtocol> protocol,
                                                Options::Testcase                   testcase,
                                                const string&                       testcaseOptions)
 {
@@ -173,7 +173,7 @@ vector<ApplicationAssociation> CreateTestcase (shared_ptr<AccessInterfaceProtoco
 
   auto sm = Startup::GetSystemModel();
 
-  vector<ApplicationAssociation> associations;
+  vector<AppFunctionAndNodePath> associations;
   switch (testcase)
   {
     case Options::Testcase::NotSpecified:

@@ -21,7 +21,7 @@ extern "C"
 {
   typedef void(*PDLApplication_t)();
 
-  struct ApplicationAssociation
+  struct AppFunctionAndNodePath
   {
     PDLApplication_t function;
     const char*      topNodePath;
@@ -30,7 +30,7 @@ extern "C"
 
   //! Runs Mast till applications terminates
   //!
-  DLL_EXPORT ErrorCode RunMast(const char* modelFilePath, ApplicationAssociation* pAssociations, uint32_t count);
+  DLL_EXPORT ErrorCode RunMast(const char* modelFilePath, AppFunctionAndNodePath* pAssociations, uint32_t count);
 
 
   //!< Starts up mast library, building model using specified file
@@ -51,7 +51,7 @@ extern "C"
 
   //! Registers applications functions with their associated node to the System Model Manager
   //!
-  DLL_EXPORT ErrorCode CreateApplications(ApplicationAssociation* pAssociations, uint32_t count);
+  DLL_EXPORT ErrorCode CreateApplications(AppFunctionAndNodePath* pAssociations, uint32_t count);
 
 
   //! Waits (blocks) until all application thread terminates (on their own or by a mechanism unknown to mast manager)

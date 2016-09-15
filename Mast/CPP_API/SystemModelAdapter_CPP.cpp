@@ -11,7 +11,7 @@
 //===========================================================================
 
 #include "SystemModelAdapter_CPP.hpp"
-#include "ApplicationAssociation_CPP.hpp"
+#include "AppFunctionAndNodePath_CPP.hpp"
 #include "SystemModelManager.hpp"
 #include "Commons_C.hpp"
 #include "Startup.hpp"
@@ -121,7 +121,7 @@ void mast::CleanupMast ()
 //!
 //! @param appAssociations  Associate some application function with a node in the system model
 //!
-void mast::CreateApplications (const vector<ApplicationAssociation>& appAssociations)
+void mast::CreateApplications (const vector<AppFunctionAndNodePath>& appAssociations)
 {
   auto sm      = mast::Startup::GetSystemModel();
   auto manager = mast::Startup::GetManager();
@@ -187,7 +187,7 @@ void mast::PrintModelGraph (const string& filePath)
 //!
 //! @note Mast must have been initialized and system model been created beforehand
 //!
-void mast::RunMast (const vector<ApplicationAssociation>& appAssociations, RunMastOptions options)
+void mast::RunMast (const vector<AppFunctionAndNodePath>& appAssociations, RunMastOptions options)
 {
   CreateApplications(appAssociations);
 
@@ -222,7 +222,7 @@ void mast::RunMast (const vector<ApplicationAssociation>& appAssociations, RunMa
 
 //! Creates a system model from configuration file, then runs Mast till applications terminates
 //!
-void mast::RunMast (string_view modelFilePath, const vector<ApplicationAssociation>& appAssociations, RunMastOptions options)
+void mast::RunMast (string_view modelFilePath, const vector<AppFunctionAndNodePath>& appAssociations, RunMastOptions options)
 {
   CHECK_PARAMETER_NOT_EMPTY(modelFilePath, "Cannot run Mast without a valid path for system model (SIT file)");
   CHECK_FILE_EXISTS(modelFilePath);

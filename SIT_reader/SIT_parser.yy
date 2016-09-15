@@ -142,8 +142,9 @@ inline std::uint32_t extract_number(std::string s)
 %type  <std::shared_ptr<mast::SystemModelNode>> root_node
 %type  <std::shared_ptr<mast::SystemModelNode>> register_node
 %type  <std::shared_ptr<mast::SystemModelNode>> leaf_node
-%type  <std::shared_ptr<mast::SystemModelNode>> internal_node
+%type  <std::shared_ptr<mast::SystemModelNode>> parent_node
 %type  <std::shared_ptr<mast::SystemModelNode>> node
+%type  <std::shared_ptr<mast::SystemModelNode>> parent_node_with_children
 
 %token               END    0     "end of file"
 %token               UPPER
@@ -160,6 +161,7 @@ inline std::uint32_t extract_number(std::string s)
 %token  <std::string> t_MIB
 %token  <std::string> t_1500_WRAPPER
 %token  <std::string> t_JTAG_TAP
+%token  <std::string> t_PDL
 
 %token  <std::string> t_BASED_INTEGER
 %token		t_START_HIERARCHY
@@ -202,7 +204,7 @@ node_list:
   ;
 
 node:
-   internal_node { $$ = $1;}
+   parent_node_with_children { $$ = $1;}
   | leaf_node
   		    { $$ = $1;}
   ;
@@ -220,18 +222,24 @@ node_name :  t_WORD is_transparent
 		     }
      ;
 
-internal_node:
+parent_node_with_children: parent_node children_list
+ {
+  auto asParentNode = dynamic_pointer_cast<ParentNode>($1);
+   for (auto this_child : $2.nodes)
+       asParentNode->AppendChild(this_child);
+     $$ = $1;
+ }
 
-t_CHAIN  node_name children_list {
+parent_node:
+
+t_CHAIN  node_name  {
 		     auto node = driver.main_sm->CreateChain($2.name);
                      if ($2.is_transparent)
 		           node->IgnoreForNodePath(true);
-		     for (auto this_child : $3.nodes)
-		       node->AppendChild(this_child);
  	  	     $$ = node;
   		     }
  |
-t_LINKER  node_name path_selector ctrl_node children_list {
+t_LINKER  node_name path_selector ctrl_node {
 			int   l;
 			l = find_in_table(Path_Selector_table,$3);
 			if (l==-1)
@@ -247,42 +255,23 @@ t_LINKER  node_name path_selector ctrl_node children_list {
 		           std::cout << "(transparent) ";
 			std::cout <<  $3 <<"_PathSelector";
 			 std::cout <<" controlled by node "<<$4;
-                     	std::cout << ", " << $5.n_nodes << " children:  " << $5.name << " \n";
 //		     auto node = driver.main_sm->CreateLinker ($5.name,   pathSelector, nullptr);
  		     auto node = driver.main_sm->CreateChain ($2.name);
-		     for (auto this_child : $5.nodes)
-		       node->AppendChild(this_child);
  	  	     $$ = node;
   		      }
 		}
  |
- t_SIB node_name position active children_list
+ t_SIB node_name position active 
   {
-      if ($5.n_nodes!=1)
-	 {
-	  std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-	  std::cerr << "SIB " << $2.name<< " has " << $5.n_nodes << " derivations instead of 1\n";
-	  YYERROR;
-	 }
-        else
       {
  	auto node =  driver.builder->Create_SIB($2.name,$4,$3);
-	for (auto this_child : $5.nodes)
-	    node->AppendChild(this_child);
 
  	$$ = node;
        }
   }
  |
- t_MIB node_name position active reverse max_derivations path_selector children_list
+ t_MIB node_name position active reverse max_derivations path_selector
   {
-      if ($8.n_nodes>$6)
-	 {
-	  std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-	  std::cerr << "MIB " << $2.name<< " has " << $8.n_nodes << " derivations instead of maximum "<< $6 <<"\n";
-	  YYERROR;
-	 }
-        else
       {
       int   l;
 	l = find_in_table(Path_Selector_table,$7);
@@ -315,30 +304,19 @@ t_LINKER  node_name path_selector ctrl_node children_list {
   	auto selector    = res.second;
         auto node = driver.builder->Create_MIB($2.name, selector, selectorReg, $3);
 
-	for (auto this_child : $8.nodes)
-	    node->AppendChild(this_child);
   	$$ = node;
        }
   }
  |
- t_1500_WRAPPER node_name max_derivations children_list
+ t_1500_WRAPPER node_name max_derivations 
   {
-      if ($4.n_nodes>$3)
-	 {
-	  std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-	  std::cerr << "1500 Wrapper " << $2.name<< " has " << $4.n_nodes << " derivations instead of maximum "<< $3 <<"\n";
-	  YYERROR;
-	 }
-        else
       {
         auto node = driver.builder->Create_1500_Wrapper ($2.name,$3);
-	for (auto this_child : $4.nodes)
-	    node->AppendChild(this_child);
   	$$ = node;
        }
   }
  |
-t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE children_list {
+t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE  {
 
 	int   l;
 	l = find_in_table(AI_protocol_table,$3);
@@ -376,30 +354,15 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE children_list {
 	  }
 
 		auto node = driver.main_sm->CreateAccessInterface($2.name, protocol);
-		for (auto this_child : $5.nodes)
-		   node->AppendChild(this_child);
 
   	  	$$ = node;
 
 		}
 	  }
  |
-  t_JTAG_TAP node_name JTAG_protocol IR_size IR_TABLE n_DR_chains children_list
-      { if ($7.n_nodes>($6+1))
-	 {
-	  std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-	  std::cerr << "JTAG TAP " << $2.name<< " has " << $7.n_nodes-1 << " DR derivations instead of maximum "<< $6 <<"\n";
-	  YYERROR;
-	 }
-        else
+  t_JTAG_TAP node_name JTAG_protocol IR_size IR_TABLE n_DR_chains 
+      { 
       {
-       if (($5.n_words>0) && ($5.n_words <($7.n_nodes+1)))
-         {
-	  std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-	  std::cerr << "JTAG TAP " << $2.name<< " has only " << $5.n_words << " IR codings for " << $7.n_nodes << " DR derivations + BPY\n";
-	  YYERROR;
-	 }
-       else
   	{
 	int   l;
 	l = find_in_table(JTAG_AI_protocol_table,$3);
@@ -426,8 +389,6 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE children_list {
 
 	  }
 	 auto node = driver.builder->Create_JTAG_TAP($2.name,$4,$6,protocol);
-	 for (auto this_child : $7.nodes)
-	    node->AppendChild(this_child);
   	 $$ = node;
 	 }
 	}

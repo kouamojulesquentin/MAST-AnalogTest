@@ -28,7 +28,7 @@ using token = SIT::SIT_Parser::token;
     yycolumn += yyleng;
 */
 #define KEYWORD_MAXSIZE 	20
-#define N_KEYWORDS 		16
+#define N_KEYWORDS 		17
 
 typedef struct {
         char name[KEYWORD_MAXSIZE];
@@ -53,6 +53,7 @@ static keywords_type keywords_table []=
    ,{"MIB"			,token::t_MIB} 
    ,{"WRAPPER_1500"		,token::t_1500_WRAPPER} 
    ,{"JTAG_TAP"			,token::t_JTAG_TAP} 
+   ,{"PDL"			,token::t_PDL} 
 
   };
 

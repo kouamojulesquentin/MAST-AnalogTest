@@ -44,7 +44,7 @@ SPI_Protocol::SPI_Protocol(std::initializer_list<uint32_t> chipSelectCommands, s
 	fprintf(stderr, "ftdi_init failed\n");
   }
 
-  int ret = ftdi_usb_open(m_ftdi_ctx, 0x0403, 0x6011);
+  int ret = ftdi_usb_open(m_ftdi_ctx, 0x0403, 0x6010);
 
   if (ret < 0 && ret != -5) {
 	fprintf(stderr, "OPEN: %s\n", ftdi_get_error_string(m_ftdi_ctx));

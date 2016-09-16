@@ -278,8 +278,8 @@ shared_ptr<AccessInterfaceProtocol> GetProtocol (Options::Protocol protocol, con
 		case Options::Protocol::SPI:
 		{
 			initializer_list<uint32_t> csCommands			=	{ 0x00, 0x00 };
-			initializer_list<uint32_t> readCommands		=	{	0x10, 0x01 };
-			initializer_list<uint32_t> writeCommands	=	{ 0x10, 0x02 };
+			initializer_list<uint32_t> readCommands		=	{	0x10, 0x80 };
+			initializer_list<uint32_t> writeCommands	=	{ 0x10, 0x00 };
 			string_view                commandsPrefix = "";
 			aiProtocol = make_shared<SPI_Protocol>(csCommands, readCommands, writeCommands, commandsPrefix);
 			break;

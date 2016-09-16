@@ -478,7 +478,7 @@ leaf_node: register_node {     $$=  $1;
 
 register_node:
    t_REGISTER  node_name size hold bypass {
-                      auto bin_value = BinaryVector::CreateFromBinaryString(remove_quotes($5));
+                      auto bin_value = BinaryVector::CreateFromString(remove_quotes($5));
 		      if (bin_value.BitsCount() != $3)
 		        {
 	  		std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;

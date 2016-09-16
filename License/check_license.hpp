@@ -13,11 +13,12 @@
 
 #ifndef H_MAST_CHECK_LICENSE
 #define H_MAST_CHECK_LICENSE
+using std::pair;
 
 //! returns TRUE if license check succeeds, FALSE otherwise
 //! license file is supposed to be on current directory
 //! if environment variable MAST_LICENSE_PATH is not set
 //!
-bool check_license();
+pair<bool,LicenseOptions> check_license();
 
 #endif

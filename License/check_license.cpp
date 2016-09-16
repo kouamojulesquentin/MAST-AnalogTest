@@ -18,6 +18,7 @@
 #include <iostream>
 #include  <cstdlib>
 using namespace std;
+using std::pair;
 
 #include "mast_license.hpp"
 #include "aes.hpp"
@@ -71,9 +72,9 @@ bool get_mac_address(unsigned char *mac_address)
 }
 #endif
 
-bool check_license();
+pair<bool,LicenseOptions> check_license();
 
-bool check_license()
+pair<bool,LicenseOptions> check_license()
 {
     unsigned char mac_address[6];
     bool success = false;
@@ -81,8 +82,13 @@ bool check_license()
     unsigned char buf[32];
     char name_with_path[200]={""};
     char *lpath;
-
+    pair<bool,LicenseOptions> retvalue;
+    
     mast_license_type *mast_license;
+
+    retvalue.first = false;
+    retvalue.second = LicenseOptions::None;
+
    memset( buf, 0, 32 );
     aes_set_key( &ctx, MAST_master_key, 256 );
    
@@ -99,7 +105,7 @@ bool check_license()
  if (!file.good())
   {
    std::cerr << "Could not find MAST license file " << name_with_path << "\n";
-   return false;
+   return retvalue;
   }
     file.seekg (0, ios::beg);
     file.read ((char *)buf, 32);
@@ -120,7 +126,7 @@ mast_license = (mast_license_type *)buf;
       else 	
         {
 	std::cout << "Error: MAC Addresses not in license file\n";
-	return false;
+	return retvalue;
 	}
 
       std::time_t now = std::time(NULL);
@@ -152,13 +158,16 @@ mast_license = (mast_license_type *)buf;
       }
 
     }
- return success;
+  retvalue.first = success;
+  
+ return retvalue;
 }
 
 #ifdef TEST_LICENSE
 int main()
 {
- if (check_license()==true)
+ auto res = check_license();
+ if (res.first==true)
        std::cout << "MAST license check OK\n";
  else
        std::cout << "MAST license check FAILES\n";

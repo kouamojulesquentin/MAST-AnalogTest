@@ -35,8 +35,8 @@ using namespace std::string_literals;
 
 //! Constructor from initializer_list
 //!
-SPI_Protocol::SPI_Protocol(std::initializer_list<uint32_t> readCommands, std::initializer_list<uint32_t> writeCommands, std::experimental::string_view commandsPrefix)
-  : SPI_Player(readCommands, writeCommands, commandsPrefix)
+SPI_Protocol::SPI_Protocol(std::initializer_list<uint32_t> chipSelectCommands, std::initializer_list<uint32_t> readCommands, std::initializer_list<uint32_t> writeCommands, std::experimental::string_view commandsPrefix)
+  : SPI_Player(chipSelectCommands, readCommands, writeCommands, commandsPrefix)
 {
 	#ifdef USE_LIBFTDISPI
   m_ftdi_ctx = static_cast<ftdi_context*>(malloc(sizeof(*m_ftdi_ctx)));
@@ -70,8 +70,8 @@ SPI_Protocol::SPI_Protocol(std::initializer_list<uint32_t> readCommands, std::in
 //! @param addresses        Array of SPI addresses for managed derivations (value at offset 0 is reserved for reset)
 //! @param commandsPrefix   Optional text that will be prepended to actual SPI command
 //!
-SPI_Protocol::SPI_Protocol (std::vector<uint32_t>           readCommands, std::vector<uint32_t>           writeCommands, std::experimental::string_view commandsPrefix)
-  : SPI_Player(readCommands, writeCommands, commandsPrefix)
+SPI_Protocol::SPI_Protocol (std::vector<uint32_t>           chipSelectCommands, std::vector<uint32_t>           readCommands, std::vector<uint32_t>           writeCommands, std::experimental::string_view commandsPrefix)
+  : SPI_Player(chipSelectCommands, readCommands, writeCommands, commandsPrefix)
 {
 	#ifdef USE_LIBFTDISPI
   m_ftdi_ctx = static_cast<ftdi_context*>(malloc(sizeof(*m_ftdi_ctx)));
@@ -131,6 +131,7 @@ BinaryVector SPI_Protocol::DoAction (uint32_t derivationId, void* /* interfaceDa
 #else
 BinaryVector SPI_Protocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
+	auto chipSelectCommand = GetChipSelectCommand(derivationId);
 	auto readCommand 	= GetReadCommand(derivationId);
   auto writeCommand = GetWriteCommand(derivationId);
 
@@ -149,8 +150,8 @@ BinaryVector SPI_Protocol::DoAction (uint32_t derivationId, void* /* interfaceDa
 
   spiBufferWrite.insert(spiBufferWrite.end(), toSutDataBuffer.begin(), toSutDataBuffer.end());
 
-  ftdispi_read(m_ftdispi_ctx, spiBufferRead.data(), spiBufferLength, 0);
-  ftdispi_write(m_ftdispi_ctx, spiBufferWrite.data(), spiBufferLength, 0);
+  ftdispi_read(m_ftdispi_ctx, spiBufferRead.data(), spiBufferLength, chipSelectCommand);
+  ftdispi_write(m_ftdispi_ctx, spiBufferWrite.data(), spiBufferLength, chipSelectCommand);
   
 	vector<uint8_t> fromSutDataBuffer(&spiBufferRead[1], &spiBufferRead[bytesCount]);
 

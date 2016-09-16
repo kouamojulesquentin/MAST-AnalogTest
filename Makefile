@@ -21,17 +21,19 @@ MKDIR  = mkdir
 SEP    = "\"
 RUN    =
 
-BIN_DIR             = Bin
-MAST_UT_EXE_NAME    = Mast_UT.exe
-SIT_UT_EXE_NAME     = SIT_Reader_UT.exe
-SIT_READER_EXE_NAME = SIT_reader_demo.exe
-TESTCASES_EXE_NAME  = TestCasesApp.exe
+BIN_DIR              = Bin
+MAST_UT_EXE_NAME     = Mast_UT.exe
+CPP_EXAMPLE_EXE_NAME = MastExample_CPP.exe
+SIT_UT_EXE_NAME      = SIT_Reader_UT.exe
+SIT_READER_EXE_NAME  = SIT_reader_demo.exe
+TESTCASES_EXE_NAME   = TestCasesApp.exe
 
 MAST_UT_EXE_PATH      = $(BIN_DIR)\$(MAST_UT_EXE_NAME)
 SIT_UT_EXE_PATH       = $(BIN_DIR)\$(SIT_UT_EXE_NAME)
 SIT_READER_EXE_PATH   = $(SIT_READER_EXE_NAME)
 SIT_READER_INPUT_FILE = ..\..\SIT_reader\prova.txt
 TESTCASES_EXE_PATH    = $(BIN_DIR)\$(TESTCASES_EXE_NAME)
+CPP_EXAMPLE_EXE_PATH  = $(BIN_DIR)\$(CPP_EXAMPLE_EXE_NAME)
 
 else
 USE_OPEN_OCD = ON
@@ -41,17 +43,19 @@ RM_DIR = rm -rf
 SEP   = /
 RUN   = ./
 
-BIN_DIR             = Bin
-MAST_UT_EXE_NAME    = Mast_UT
-TESTCASES_EXE_NAME  = TestCasesApp
-SIT_READER_EXE_NAME = SIT_reader_demo
-SIT_UT_EXE_NAME     = SIT_Reader_UT
+BIN_DIR              = Bin
+MAST_UT_EXE_NAME     = Mast_UT
+TESTCASES_EXE_NAME   = TestCasesApp
+CPP_EXAMPLE_EXE_NAME = MastExample_CPP
+SIT_READER_EXE_NAME  = SIT_reader_demo
+SIT_UT_EXE_NAME      = SIT_Reader_UT
 
 MAST_UT_EXE_PATH      = $(BIN_DIR)/$(MAST_UT_EXE_NAME)
 SIT_UT_EXE_PATH       = $(BIN_DIR)/$(SIT_UT_EXE_NAME)
 SIT_READER_EXE_PATH   = $(SIT_READER_EXE_NAME)
 SIT_READER_INPUT_FILE = ../../SIT_reader/prova.txt
 TESTCASES_EXE_PATH    = $(BIN_DIR)/$(TESTCASES_EXE_NAME)
+CPP_EXAMPLE_EXE_PATH  = $(BIN_DIR)/$(CPP_EXAMPLE_EXE_NAME)
 endif
 
 BUILD_UT = ON
@@ -141,6 +145,21 @@ ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(TESTCASES_EXE_NAME))"
 else
 >  @echo "    ==== No Release testcases available ========"
 endif
+
+run_cpp_example_debug:
+ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(CPP_EXAMPLE_EXE_NAME))","")
+>  cd $(CMAKE_DEBUG_BUILD_DIR) && $(RUN)$(CPP_EXAMPLE_EXE_PATH)
+else
+>  @echo "    ==== No Debug cpp_example available ========"
+endif
+
+run_cpp_example_release:
+ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(CPP_EXAMPLE_EXE_NAME))","")
+>  cd $(CMAKE_RELEASE_BUILD_DIR) && $(RUN)$(CPP_EXAMPLE_EXE_PATH)
+else
+>  @echo "    ==== No Release cpp_example available ========"
+endif
+
 
 
 run_arm:

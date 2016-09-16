@@ -21,6 +21,7 @@
 namespace mast
 {
   class AppFunctionAndNodePath;
+  class AppFunctionAndName;
 
   //! Flags for running mast
   //!
@@ -58,6 +59,11 @@ namespace mast
   //!
   void PrintModelGraph(const std::string& filePath = "MastModel.gml");
 
+  //! Creates a system model from configuration file, then runs Mast till applications terminates
+  //!
+  DLL_EXPORT void RunMast(std::experimental::string_view         modelFilePath,
+                          const std::vector<AppFunctionAndName>& appFunctionsAndNames,
+                          RunMastOptions                         options = RunMastOptions::None);
 
 
   //! Creates a system model from configuration file, then runs Mast till applications terminates
@@ -69,7 +75,7 @@ namespace mast
   //! Runs Mast till applications terminates
   //!
   //! @note Mast must have been initialized and system model been created beforehand
-  DLL_EXPORT void RunMast(const std::vector<AppFunctionAndNodePath>& appAssociations, RunMastOptions options = RunMastOptions::None);
+  DLL_EXPORT void RunMast(const std::vector<AppFunctionAndNodePath>& appFunctionsAndPaths, RunMastOptions options = RunMastOptions::None);
 
   //! Starts up mast library, building model using specified file
   //!
@@ -94,7 +100,7 @@ namespace mast
 
   //! Registers applications functions with their associated node to the System Model Manager
   //!
-  DLL_EXPORT void CreateApplications(const std::vector<AppFunctionAndNodePath>& appAssociations);
+  DLL_EXPORT void CreateApplications(const std::vector<AppFunctionAndNodePath>& appFunctionsAndPaths);
 
   //! Waits (blocks) until all application thread terminate (on their own or by a mechanism unknown to mast manager)
   //!

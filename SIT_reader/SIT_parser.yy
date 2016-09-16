@@ -231,7 +231,7 @@ parent_node_with_children: parent_node PDL_declaration children_list
   if (!$2.empty())
    {
     std::cout<< "Function " << $2 <<" is associated with node " << $1->Name() <<"\n";
-   }   
+   }
  }
 
 PDL_declaration:
@@ -255,7 +255,7 @@ t_LINKER  node_name path_selector ctrl_node {
 			if (l==-1)
 			 {
    			std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-			std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unkown Linker Path Selector \n";
+      std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unknown Linker Path Selector \n";
 	  		YYERROR;
 	  		}
 	  	       else
@@ -271,7 +271,7 @@ t_LINKER  node_name path_selector ctrl_node {
   		      }
 		}
  |
- t_SIB node_name position active 
+ t_SIB node_name position active
   {
       {
  	auto node =  driver.builder->Create_SIB($2.name,$4,$3);
@@ -288,7 +288,7 @@ t_LINKER  node_name path_selector ctrl_node {
 	if (l==-1)
 	 {
 	 std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-	 std::cerr << "node " << $2.name<< " \""<< $7 << "\"" << ": Unkown MIB Path Selector \n";
+   std::cerr << "node " << $2.name<< " \""<< $7 << "\"" << ": Unknown MIB Path Selector \n";
 	 YYERROR;
 	 }
         auto selectorRegName = $2.name + MIB_CTRL_EXT;
@@ -318,7 +318,7 @@ t_LINKER  node_name path_selector ctrl_node {
        }
   }
  |
- t_1500_WRAPPER node_name max_derivations 
+ t_1500_WRAPPER node_name max_derivations
   {
       {
         auto node = driver.builder->Create_1500_Wrapper ($2.name,$3);
@@ -333,7 +333,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE  {
   	if (l==-1)
 	  {
 	  std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-	  std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unkown AccessInterface Protocol \n";
+    std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unknown AccessInterface Protocol \n";
 	  YYERROR;
 	  }
 	  else
@@ -370,8 +370,8 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE  {
 		}
 	  }
  |
-  t_JTAG_TAP node_name JTAG_protocol IR_size IR_TABLE n_DR_chains 
-      { 
+  t_JTAG_TAP node_name JTAG_protocol IR_size IR_TABLE n_DR_chains
+      {
       {
   	{
 	int   l;
@@ -379,7 +379,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE  {
   	if (l==-1)
 	  {
 	  std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-	  std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unkown JTAG protocol \n";
+    std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unknown JTAG protocol \n";
 	  YYERROR;
 	  }
 	  else

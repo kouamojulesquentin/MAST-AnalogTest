@@ -9,4 +9,5 @@ SUBDIRS += \
     Mast          \
     Mast_UT       \
     SIT_reader_UT \
-    TestCasesApp
+    TestCasesApp  \
+    MastExample_CPP

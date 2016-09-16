@@ -1,7 +1,10 @@
 #ifndef __SITDRIVER_HPP__
 #define __SITDRIVER_HPP__ 1
 
+#include "AppFunctionNameAndNode.hpp"
+
 #include <string>
+#include <vector>
 #include <experimental/string_view>
 #include <cstddef>
 #include <istream>
@@ -13,7 +16,7 @@ namespace mast
   class SystemModelBuilder;
   class SystemModel;
   class SystemModelNode;
-} // End of namespace mast
+}
 
 namespace SIT
 {
@@ -40,7 +43,8 @@ public:
     */
    bool parse( std::istream &iss );
 
-   std::shared_ptr<mast::SystemModelNode> parsed_sut;
+   std::shared_ptr<mast::SystemModelNode>    parsed_sut;    //!< SystemModel tree build from SIT file
+   std::vector<mast::AppFunctionNameAndNode> namesAndNodes; //!< Associations of algorithms name a node
 
 private:  // Part used by SIT_Parser
   friend class SIT_Parser;

@@ -34,6 +34,7 @@ SOURCES += \
            C_API/SystemModelAdapter_C.cpp
 
 HEADERS += \
+    CPP_API/AppFunctionAndName_CPP.hpp     \
     CPP_API/AppFunctionAndNodePath_CPP.hpp \
     CPP_API/PDL_Adapter_CPP.hpp            \
     CPP_API/SystemModelAdapter_CPP.hpp     \

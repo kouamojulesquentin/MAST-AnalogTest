@@ -27,15 +27,15 @@ class ParentNode;
 //!
 enum class ManagerMonitorOptions
 {
-  Default             = 0,
+  Min                 = 0,
   AppThreadCreation   = 1 << 0, //!< Monitor application thread creation
   BeforeConfiguration = 1 << 1, //!< Monitor SystemModel state before configuration
   AfterConfiguration  = 1 << 2, //!< Monitor SystemModel state after configuration
   ExportGml           = 1 << 3, //!< Tells whether GML graph is exported (before/after  configuration)
   ExportPrettyPrint   = 1 << 4, //!< Tells whether a "Pretty Print" is exported (before/after  configuration)
 
-  Std                 = AppThreadCreation,
-  All                 = Std | BeforeConfiguration | AfterConfiguration,
+  Std                 = AppThreadCreation | BeforeConfiguration | AfterConfiguration,
+  All                 = Std | ExportGml | ExportPrettyPrint,
 };
 
 //! Provides monitoring of SystemModelManager behavior and SystemModel state

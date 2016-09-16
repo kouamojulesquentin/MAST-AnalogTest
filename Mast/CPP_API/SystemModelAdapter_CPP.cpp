@@ -12,6 +12,9 @@
 
 #include "SystemModelAdapter_CPP.hpp"
 #include "AppFunctionAndNodePath_CPP.hpp"
+#include "AppFunctionAndName_CPP.hpp"
+#include "AppFunctionAndNode.hpp"
+#include "AppFunctionNameAndNode.hpp"
 #include "SystemModelManager.hpp"
 #include "Commons_C.hpp"
 #include "Startup.hpp"
@@ -23,6 +26,7 @@
 
 #include <memory>
 #include <fstream>
+#include <algorithm>
 
 using std::shared_ptr;
 using std::make_shared;
@@ -34,18 +38,109 @@ using namespace std::string_literals;
 using namespace mast;
 
 
-namespace
+namespace CPP_API_IMPL
 {
-inline auto GetAndCheckManager()
+  vector<AppFunctionNameAndNode>        LoadSystemModel      (string_view                           filePath);
+  vector<AppFunctionAndNode>            GetFunctionsAndNodes (const vector<AppFunctionAndNodePath>& functionsAndPaths);
+  void                                  CreateApplications   (const vector<AppFunctionAndNode>&     functionsAndNodes);
+  void                                  RunMast              (const vector<AppFunctionAndNode>&     functionsAndNodes, RunMastOptions options);
+  vector<AppFunctionAndNode>            GetFunctionsAndNodes (const vector<AppFunctionAndName>&     appFunctionsAndNames,
+                                                              const vector<AppFunctionNameAndNode>& appFunctionNameAndNodes);
+
+  inline auto GetAndCheckManager()
+  {
+    auto manager = Startup::GetManager();
+    CHECK_VALUE_NOT_NULL(manager, "Mast library has not been properly initialized");\
+    return manager;
+  }
+} // End of CPP_API_IMPL namespace
+
+//! Registers applications functions with their associated node to the System Model Manager
+//!
+//! @param functionsAndNodes  List of application function with their associated node
+//!
+void CPP_API_IMPL::CreateApplications (const vector<AppFunctionAndNode>& functionsAndNodes)
 {
-  auto manager = Startup::GetManager();
-  CHECK_VALUE_NOT_NULL(manager, "Mast library has not been properly initialized");\
-  return manager;
+  auto sm      = mast::Startup::GetSystemModel();
+  auto manager = mast::Startup::GetManager();
+
+  for (const auto& functionAndNode : functionsAndNodes)
+  {
+    CHECK_VALUE_NOT_NULL(functionAndNode.node, "Cannot create application " + Utility::IfNotEmpty_SingleQuoteAndSuffixWithSpace(functionAndNode.appName));
+
+    manager->CreateApplicationThread(functionAndNode.node, functionAndNode.appFunction, functionAndNode.appName);
+  }
 }
+//
+//  End of: mast::CreateApplications
+//---------------------------------------------------------------------------
+
+
+//! Registers applications functions with their associated node to the System Model Manager
+//!
+//! @param functionsAndPaths  Associate some application function with a node in the system model
+//!
+vector<AppFunctionAndNode> CPP_API_IMPL::GetFunctionsAndNodes (const vector<AppFunctionAndNodePath>& functionsAndPaths)
+{
+  auto functionAndNodes = vector<AppFunctionAndNode>();
+  auto rootNode         = mast::Startup::GetSystemModel()->Root();
+
+  CHECK_VALUE_NOT_NULL(rootNode, "Internal error: SystemModel must be constructed before calling GetFunctionsAndNodes");
+
+  for (const auto& nextAssociation : functionsAndPaths)
+  {
+    CHECK_PARAMETER_NOT_EMPTY(nextAssociation.topNodePath, "An empty node path is not valid to associate an application");
+
+    auto foundNode = rootNode->FindNode(nextAssociation.topNodePath);
+    auto topNode   = std::dynamic_pointer_cast<ParentNode>(foundNode);
+
+    CHECK_VALUE_NOT_NULL(topNode,   "Cannot create application "                     + Utility::IfNotEmpty_SingleQuoteAndSuffixWithSpace(nextAssociation.appName)
+                                  + "because cannot find an actual node with path: " + Utility::SingleQuote(nextAssociation.topNodePath));
+
+    functionAndNodes.emplace_back(nextAssociation.appFunction, topNode, nextAssociation.appName);
+  }
+  return functionAndNodes;
+}
+//
+//  End of: GetFunctionsAndNodes
+//---------------------------------------------------------------------------
+
+
+//! Associates a function and an node from association from function and a name an association from a name to a node
+//!
+//! @param appFunctionsAndNames     List associations of function and their name
+//! @param appFunctionNameAndNodes  List associations of function name and a node
+//!
+vector<AppFunctionAndNode> CPP_API_IMPL::GetFunctionsAndNodes (const vector<AppFunctionAndName>&     appFunctionsAndNames,
+                                                               const vector<AppFunctionNameAndNode>& appFunctionNameAndNodes)
+{
+  auto functionAndNodes = vector<AppFunctionAndNode>();
+
+  for (const auto& functionNameAndNode : appFunctionNameAndNodes)
+  {
+    CHECK_PARAMETER_NOT_EMPTY (functionNameAndNode.appName, "Application function name cannot be empty");
+    CHECK_PARAMETER_NOT_NULL  (functionNameAndNode.node,    "Application cannot be associated to 'no node'");
+
+    auto it    = std::find_if(appFunctionsAndNames.begin(),
+                              appFunctionsAndNames.end(),
+                              [=](const AppFunctionAndName& item) { return item.appName == functionNameAndNode.appName; });
+
+    if (it != appFunctionsAndNames.cend())
+    {
+      functionAndNodes.emplace_back(it->appFunction, functionNameAndNode.node);
+    }
+  }
+
+  return functionAndNodes;
+}
+//
+//  End of: GetFunctionsAndNodes
+//---------------------------------------------------------------------------
+
 
 //! Loads model from "SIT" file and set it as root of SystemModel
 //!
-void LoadSystemModel (string_view filePath)
+vector<AppFunctionNameAndNode> CPP_API_IMPL::LoadSystemModel (string_view filePath)
 {
   CHECK_PARAMETER_NOT_EMPTY(filePath, "Cannot create system model without a valid path for its description (SIT file)");
   CHECK_FILE_EXISTS(filePath);
@@ -57,15 +152,55 @@ void LoadSystemModel (string_view filePath)
 
   auto topNode = dynamic_pointer_cast<ParentNode>(reader.parsed_sut);
   CHECK_VALUE_NOT_NULL(topNode, "Failed to parse file: " + filePath);
-
   sm->ReplaceRoot(topNode, false);
+
+  auto namesAndNodes = reader.namesAndNodes;
+
+  return namesAndNodes;
 }
 //
 //  End of: LoadSystemModel
 //---------------------------------------------------------------------------
 
+//! Runs Mast til applications terminates
+//!
+//! @param appAssociations  Associate some application function with a node in the system model
+//!
+//! @note Mast must have been initialized and system model been created beforehand
+//!
+void CPP_API_IMPL::RunMast (const vector<AppFunctionAndNode>& functionsAndNodes, RunMastOptions options)
+{
+  CreateApplications(functionsAndNodes);
 
-} // End of unnamed namespace
+  if (IsSet(options, RunMastOptions::CheckModel))
+  {
+    CheckSystemModel();
+  }
+
+  if (IsSet(options, RunMastOptions::PrintModelGraph))
+  {
+    PrintModelGraph();
+  }
+
+  auto manager = mast::Startup::GetManager();
+
+  if (    IsSet(options, RunMastOptions::LogManagerActivity)
+      && !manager->Monitor()
+     )
+  {
+    auto monitor = make_shared<SystemModelManagerMonitor>();
+    monitor->Options(ManagerMonitorOptions::All);
+    manager->Monitor(monitor);
+  }
+
+  manager->Start();
+  manager->StartCreatedApplicationThreads();
+  manager->WaitForApplicationsEnd();
+  manager->Stop();
+}
+//
+//  End of: mast::RunMast
+//---------------------------------------------------------------------------
 
 
 //! Check SystemModel coherency, logging check result and throwing runtime exception in case of error
@@ -117,33 +252,20 @@ void mast::CleanupMast ()
 
 
 
+
+
 //! Registers applications functions with their associated node to the System Model Manager
 //!
-//! @param appAssociations  Associate some application function with a node in the system model
+//! @param appFunctionsAndPaths  Associate some application functions with a node identified by its path in the system model
 //!
-void mast::CreateApplications (const vector<AppFunctionAndNodePath>& appAssociations)
+void mast::CreateApplications (const vector<AppFunctionAndNodePath>& appFunctionsAndPaths)
 {
-  auto sm      = mast::Startup::GetSystemModel();
-  auto manager = mast::Startup::GetManager();
-
-  for (const auto& nextAssociation : appAssociations)
-  {
-    CHECK_PARAMETER_NOT_EMPTY(nextAssociation.topNodePath, "An empty node path is not valid to associate an application");
-
-    auto foundNode = sm->Root()->FindNode(nextAssociation.topNodePath);
-    auto topNode   = std::dynamic_pointer_cast<ParentNode>(foundNode);
-
-    CHECK_VALUE_NOT_NULL(topNode,   "Cannot create application "                     + Utility::IfNotEmpty_SingleQuoteAndSuffixWithSpace(nextAssociation.appName)
-                                  + "because cannot find an actual node with path: " + Utility::SingleQuote(nextAssociation.topNodePath));
-
-    manager->CreateApplicationThread(topNode, nextAssociation.appFunction, nextAssociation.appName);
-  }
+  auto functionsAndNodes = CPP_API_IMPL::GetFunctionsAndNodes(appFunctionsAndPaths);
+  CPP_API_IMPL::CreateApplications(functionsAndNodes);
 }
 //
 //  End of: mast::CreateApplications
 //---------------------------------------------------------------------------
-
-
 
 //! Starts up mast library, building model using specified file
 //!
@@ -156,7 +278,7 @@ void mast::InitializeMast (string_view modelFilePath)
   /* unused */ Startup::GetSystemModel();
   /* unused */ Startup::GetManager();
 
-  LoadSystemModel(modelFilePath);
+  CPP_API_IMPL::LoadSystemModel(modelFilePath);
 }
 //
 //  End of: mast::InitializeMast
@@ -179,41 +301,18 @@ void mast::PrintModelGraph (const string& filePath)
 //---------------------------------------------------------------------------
 
 
-
-
-//! Runs Mast til applications terminates
+//! Creates a system model from configuration file, then runs Mast till applications terminates
 //!
-//! @param appAssociations  Associate some application function with a node in the system model
-//!
-//! @note Mast must have been initialized and system model been created beforehand
-//!
-void mast::RunMast (const vector<AppFunctionAndNodePath>& appAssociations, RunMastOptions options)
+void mast::RunMast (string_view modelFilePath, const vector<AppFunctionAndNodePath>& appFunctionsAndPaths, RunMastOptions options)
 {
-  CreateApplications(appAssociations);
+  CHECK_PARAMETER_NOT_EMPTY(modelFilePath, "Cannot run Mast without a valid path for system model (SIT file)");
+  CHECK_FILE_EXISTS(modelFilePath);
 
-  if (IsSet(options, RunMastOptions::CheckModel))
-  {
-    CheckSystemModel();
-  }
+  Session session;
 
-  if (IsSet(options, RunMastOptions::PrintModelGraph))
-  {
-    PrintModelGraph();
-  }
-
-  auto manager = mast::Startup::GetManager();
-
-  if (    IsSet(options, RunMastOptions::LogManagerActivity)
-      && !manager->Monitor()
-     )
-  {
-    manager->Monitor(make_shared<SystemModelManagerMonitor>());
-  }
-
-  manager->Start();
-  manager->StartCreatedApplicationThreads();
-  manager->WaitForApplicationsEnd();
-  manager->Stop();
+  CPP_API_IMPL::LoadSystemModel(modelFilePath);
+  auto functionsAndNodes = CPP_API_IMPL::GetFunctionsAndNodes(appFunctionsAndPaths);
+  CPP_API_IMPL::RunMast(functionsAndNodes, options);
 }
 //
 //  End of: mast::RunMast
@@ -222,15 +321,37 @@ void mast::RunMast (const vector<AppFunctionAndNodePath>& appAssociations, RunMa
 
 //! Creates a system model from configuration file, then runs Mast till applications terminates
 //!
-void mast::RunMast (string_view modelFilePath, const vector<AppFunctionAndNodePath>& appAssociations, RunMastOptions options)
+void mast::RunMast (string_view modelFilePath, const vector<AppFunctionAndName>& appFunctionsAndNames, RunMastOptions options)
 {
   CHECK_PARAMETER_NOT_EMPTY(modelFilePath, "Cannot run Mast without a valid path for system model (SIT file)");
   CHECK_FILE_EXISTS(modelFilePath);
 
-  Session session;
+  auto initializeLogger = IsSet(options, RunMastOptions::LogManagerActivity);
+  Session session(initializeLogger);
 
-  LoadSystemModel(modelFilePath);
-  RunMast(appAssociations, options);
+  auto namesAndNodes     = CPP_API_IMPL::LoadSystemModel(modelFilePath);
+  auto functionsAndNodes = CPP_API_IMPL::GetFunctionsAndNodes(appFunctionsAndNames, namesAndNodes);
+
+  CPP_API_IMPL::RunMast(functionsAndNodes, options);
+}
+//
+//  End of: mast::RunMast
+//---------------------------------------------------------------------------
+
+
+//! Runs Mast till applications terminates
+//!
+//! @param appFunctionsAndPaths Associations of application function and node path
+//! @param options
+//!
+//! @note Mast must have been initialized and system model been created beforehand
+//!
+void mast::RunMast (const vector<AppFunctionAndNodePath>& appFunctionsAndPaths, RunMastOptions options)
+{
+  CHECK_PARAMETER_NOT_NULL(mast::Startup::GetSystemModel()->Root(), "System model must have been constructed before running Mast");
+
+  auto functionsAndNodes = CPP_API_IMPL::GetFunctionsAndNodes(appFunctionsAndPaths);
+  CPP_API_IMPL::RunMast(functionsAndNodes, options);
 }
 //
 //  End of: mast::RunMast
@@ -241,7 +362,7 @@ void mast::RunMast (string_view modelFilePath, const vector<AppFunctionAndNodePa
 //!
 void mast::Start ()
 {
-  auto manager = GetAndCheckManager();
+  auto manager = CPP_API_IMPL::GetAndCheckManager();
   manager->Start();
 }
 //
@@ -253,7 +374,7 @@ void mast::Start ()
 //!
 void mast::Stop ()
 {
-  auto manager = GetAndCheckManager();
+  auto manager = CPP_API_IMPL::GetAndCheckManager();
   manager->Stop();
 }
 //
@@ -265,7 +386,7 @@ void mast::Stop ()
 //!
 void mast::WaitForApplicationsEnd ()
 {
-  auto manager = GetAndCheckManager();
+  auto manager = CPP_API_IMPL::GetAndCheckManager();
   manager->WaitForApplicationsEnd();
 }
 //

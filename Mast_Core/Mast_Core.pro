@@ -70,6 +70,7 @@ SOURCES +=  \
 HEADERS += \
     include/AccessInterface.hpp                         \
     include/AccessInterfaceProtocol.hpp                 \
+    include/AppFunctionAndNode.hpp                      \
     include/LoopbackAccessInterfaceProtocol.hpp         \
     include/BinaryVector.hpp                            \
     include/Chain.hpp                                   \

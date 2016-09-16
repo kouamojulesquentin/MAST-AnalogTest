@@ -63,6 +63,12 @@
 @echo ===================== Building TestCasesApp =====================
 @echo.
 %make_exe% -j4 -C %Build_Qt%\TestCasesApp -f Makefile  %target%
+
+@echo.
+@echo ===================== Building MastExample_CPP =====================
+@echo.
+%make_exe% -j4 -C %Build_Qt%\MastExample_CPP -f Makefile  %target%
+
 )
 
 :CheckExe

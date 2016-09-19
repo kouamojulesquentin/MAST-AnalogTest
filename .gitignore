@@ -45,7 +45,6 @@
 /Temp.cpp
 /Test.py
 /Build_CMake
-/Doxygen_Doc
 /cmake_debug
 /cmake_release
 /SIT_parser/SIT_parser.output
@@ -58,3 +57,6 @@
 /openocd/openocd-builder/openocd/*
 /openocd/openocd-builder/build/*
 /Mast_UT/Generated/Runner.cpp
+/Doxygen_Doc/html/index.html
+/Doxygen_Doc/html
+/Doxygen_Doc/index.html.lnk

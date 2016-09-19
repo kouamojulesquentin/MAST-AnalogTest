@@ -232,7 +232,7 @@ parent_node_with_children: parent_node PDL_declaration children_list
   if (!$2.empty())
    {
     std::cout<< "Function " << $2 <<" is associated with node " << $1->Name() <<"\n";
-    AppFunctionNameAndNode($2,asParentNode,my_location->begin.line);
+    driver.namesAndNodes.push_back(AppFunctionNameAndNode($2,asParentNode,my_location->begin.line));
    }
  }
 

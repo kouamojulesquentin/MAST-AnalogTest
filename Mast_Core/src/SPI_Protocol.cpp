@@ -35,7 +35,7 @@ using namespace std::string_literals;
 
 //! Constructor from initializer_list
 //!
-SPI_Protocol::SPI_Protocol(std::initializer_list<uint32_t> chipSelectCommands, std::initializer_list<uint32_t> readCommands, std::initializer_list<uint32_t> writeCommands, std::experimental::string_view commandsPrefix)
+SPI_Protocol::SPI_Protocol(std::initializer_list<uint32_t> chipSelectCommands, std::initializer_list<uint32_t> readCommands, std::initializer_list<uint32_t> writeCommands, std::experimental::string_view commandsPrefix, uint16_t usbDeviceID)
   : SPI_Player(chipSelectCommands, readCommands, writeCommands, commandsPrefix)
 {
 	#ifdef USE_LIBFTDISPI
@@ -44,7 +44,7 @@ SPI_Protocol::SPI_Protocol(std::initializer_list<uint32_t> chipSelectCommands, s
 	fprintf(stderr, "ftdi_init failed\n");
   }
 
-  int ret = ftdi_usb_open(m_ftdi_ctx, 0x0403, 0x6010);
+  int ret = ftdi_usb_open(m_ftdi_ctx, 0x0403, usbDeviceID);
 
   if (ret < 0 && ret != -5) {
 	fprintf(stderr, "OPEN: %s\n", ftdi_get_error_string(m_ftdi_ctx));
@@ -70,7 +70,7 @@ SPI_Protocol::SPI_Protocol(std::initializer_list<uint32_t> chipSelectCommands, s
 //! @param addresses        Array of SPI addresses for managed derivations (value at offset 0 is reserved for reset)
 //! @param commandsPrefix   Optional text that will be prepended to actual SPI command
 //!
-SPI_Protocol::SPI_Protocol (std::vector<uint32_t>           chipSelectCommands, std::vector<uint32_t>           readCommands, std::vector<uint32_t>           writeCommands, std::experimental::string_view commandsPrefix)
+SPI_Protocol::SPI_Protocol (std::vector<uint32_t>           chipSelectCommands, std::vector<uint32_t>           readCommands, std::vector<uint32_t>           writeCommands, std::experimental::string_view commandsPrefix, uint16_t usbDeviceID)
   : SPI_Player(chipSelectCommands, readCommands, writeCommands, commandsPrefix)
 {
 	#ifdef USE_LIBFTDISPI
@@ -79,7 +79,7 @@ SPI_Protocol::SPI_Protocol (std::vector<uint32_t>           chipSelectCommands, 
 	fprintf(stderr, "ftdi_init failed\n");
   }
 
-  int ret = ftdi_usb_open(m_ftdi_ctx, 0x0403, 0x6011);
+  int ret = ftdi_usb_open(m_ftdi_ctx, 0x0403, usbDeviceID);
 
   if (ret < 0 && ret != -5) {
 	fprintf(stderr, "OPEN: %s\n", ftdi_get_error_string(m_ftdi_ctx));

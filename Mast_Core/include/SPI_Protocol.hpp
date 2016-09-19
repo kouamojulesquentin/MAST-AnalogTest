@@ -35,8 +35,8 @@ class DLL_EXPORT SPI_Protocol final : public SPI_Player
   public:
   ~SPI_Protocol();
   SPI_Protocol() = delete;
-  SPI_Protocol(std::initializer_list<uint32_t> chipSelectCommands, std::initializer_list<uint32_t> readCommands, std::initializer_list<uint32_t> writeCommands, std::experimental::string_view commandsPrefix = "");
-  SPI_Protocol(std::vector<uint32_t>           chipSelectCommands, std::vector<uint32_t>           readCommands, std::vector<uint32_t>           writeCommands, std::experimental::string_view commandsPrefix = "");
+  SPI_Protocol(std::initializer_list<uint32_t> chipSelectCommands, std::initializer_list<uint32_t> readCommands, std::initializer_list<uint32_t> writeCommands, std::experimental::string_view commandsPrefix = "", uint16_t usbDeviceID=0x6010u);
+  SPI_Protocol(std::vector<uint32_t>           chipSelectCommands, std::vector<uint32_t>           readCommands, std::vector<uint32_t>           writeCommands, std::experimental::string_view commandsPrefix = "", uint16_t usbDeviceID=0x6010u);
 
   //! Does any action required to transfer scan data to and from SUT
   //!

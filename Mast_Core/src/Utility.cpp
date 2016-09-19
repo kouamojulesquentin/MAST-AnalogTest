@@ -49,9 +49,9 @@ bool Utility::FileExists (string_view filePath)
 //! @note It can also be used for non std::exception derived class
 //! @note Format example:
 //!   std::invalid_argument: Number of append bits cannot exceed number of bits of value.
-//!   In File:     C:\Users\Jean-Francois\Documents\Tima\NewMast\Lib\src\BinaryVector.cpp
+//!   In File:     C:\\Users\\Jean-Francois\\Documents\\Tima\\NewMast\\Lib\\src\\BinaryVector.cpp
 //!   In Function:
-//!   At Line:     87'
+//!   At Line:     87
 //!
 string Utility::MakeExceptionMessage(const char*                    file,
                                      const char*                    function,
@@ -197,7 +197,7 @@ vector<string_view> Utility::Split (string_view text, string_view separator)
 
 
 
-//! Trims leading space characters (including \t)
+//! Trims leading space characters (including \\t)
 //!
 //! @param text A string_view to trim
 //!
@@ -218,7 +218,7 @@ void Utility::TrimLeft (string_view& text)
 //---------------------------------------------------------------------------
 
 
-//! Trims trailing space characters (including \t)
+//! Trims trailing space characters (including \\t)
 //!
 //! @param text A string_view to trim
 //!

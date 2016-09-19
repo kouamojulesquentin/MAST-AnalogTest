@@ -57,8 +57,7 @@ void ToSutVisitor::VisitLinker (Linker& linker)
 
 //! Appends Register value to send to SUT while saving the fact that it was active
 //!
-//! @note Should be only used (indirectly called) for active (currently selected) Registers
-//!       =================================================================================
+//! @note __Should be only used (indirectly called) for active (currently selected) Registers__
 //!
 void ToSutVisitor::VisitRegister (Register& reg)
 {

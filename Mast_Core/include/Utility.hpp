@@ -50,15 +50,15 @@ class DLL_EXPORT Utility final
   //!
   static uint32_t BytesCountFromBitsCount(uint32_t bitsCount) { return (bitsCount + 7) / 8; }
 
-  //! Trims both leading and trailing space characters (including \t)
+  //! Trims both leading and trailing space characters (including \\t)
   //!
   static void TrimBoth(std::experimental::string_view& text) { TrimLeft(text); TrimRight(text); }
 
-  //! Trims leading space characters (including \t)
+  //! Trims leading space characters (including \\t)
   //!
   static void TrimLeft(std::experimental::string_view& text);
 
-  //! Trims trailing space characters (including \t)
+  //! Trims trailing space characters (including \\t)
   //!
   static void TrimRight(std::experimental::string_view& text);
 

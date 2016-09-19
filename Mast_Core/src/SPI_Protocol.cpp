@@ -35,10 +35,14 @@ using namespace std::string_literals;
 
 //! Constructor from initializer_list
 //!
-SPI_Protocol::SPI_Protocol(std::initializer_list<uint32_t> chipSelectCommands, std::initializer_list<uint32_t> readCommands, std::initializer_list<uint32_t> writeCommands, std::experimental::string_view commandsPrefix, uint16_t usbDeviceID)
+#ifdef USE_LIBFTDISPI
+SPI_Protocol::SPI_Protocol(initializer_list<uint32_t> chipSelectCommands,
+                           initializer_list<uint32_t> readCommands,
+                           initializer_list<uint32_t> writeCommands,
+                           experimental::string_view  commandsPrefix,
+                           uint16_t                   usbDeviceID)
   : SPI_Player(chipSelectCommands, readCommands, writeCommands, commandsPrefix)
 {
-	#ifdef USE_LIBFTDISPI
   m_ftdi_ctx = static_cast<ftdi_context*>(malloc(sizeof(*m_ftdi_ctx)));
   if (ftdi_init(m_ftdi_ctx) < 0) {
 	fprintf(stderr, "ftdi_init failed\n");
@@ -56,10 +60,17 @@ SPI_Protocol::SPI_Protocol(std::initializer_list<uint32_t> chipSelectCommands, s
 	ftdispi_setmode(m_ftdispi_ctx, 1, 0, 0, 0, 0, 0); // CPOL and CPHA are both set to zero.
 	ftdispi_setclock(m_ftdispi_ctx, 200000);					 // Here we request a 200kHz bus speed
 	ftdispi_setloopback(m_ftdispi_ctx, 0);
-
-	#endif
-
 }
+#else
+SPI_Protocol::SPI_Protocol(initializer_list<uint32_t> chipSelectCommands,
+                           initializer_list<uint32_t> readCommands,
+                           initializer_list<uint32_t> writeCommands,
+                           string_view                commandsPrefix,
+                           uint16_t                   /* usbDeviceID */)
+  : SPI_Player(chipSelectCommands, readCommands, writeCommands, commandsPrefix)
+{
+}
+#endif
 //
 //  End of: SPI_Protocol::SPI_Protocol
 //---------------------------------------------------------------------------
@@ -70,10 +81,17 @@ SPI_Protocol::SPI_Protocol(std::initializer_list<uint32_t> chipSelectCommands, s
 //! @param addresses        Array of SPI addresses for managed derivations (value at offset 0 is reserved for reset)
 //! @param commandsPrefix   Optional text that will be prepended to actual SPI command
 //!
-SPI_Protocol::SPI_Protocol (std::vector<uint32_t>           chipSelectCommands, std::vector<uint32_t>           readCommands, std::vector<uint32_t>           writeCommands, std::experimental::string_view commandsPrefix, uint16_t usbDeviceID)
-  : SPI_Player(chipSelectCommands, readCommands, writeCommands, commandsPrefix)
+#ifdef USE_LIBFTDISPI
+SPI_Protocol::SPI_Protocol (vector<uint32_t> chipSelectCommands,
+                            vector<uint32_t> readCommands,
+                            vector<uint32_t> writeCommands,
+                            string_view      commandsPrefix,
+                            uint16_t         usbDeviceID)
+  : SPI_Player(std::move(chipSelectCommands),
+               std::move(readCommands),
+               std::move(writeCommands),
+               commandsPrefix)
 {
-	#ifdef USE_LIBFTDISPI
   m_ftdi_ctx = static_cast<ftdi_context*>(malloc(sizeof(*m_ftdi_ctx)));
   if (ftdi_init(m_ftdi_ctx) < 0) {
 	fprintf(stderr, "ftdi_init failed\n");
@@ -91,9 +109,20 @@ SPI_Protocol::SPI_Protocol (std::vector<uint32_t>           chipSelectCommands, 
 	ftdispi_setmode(m_ftdispi_ctx, 1, 0, 0, 0, 0, 0); // CPOL and CPHA are both set to zero.
 	ftdispi_setclock(m_ftdispi_ctx, 200000);					 // Here we request a 200kHz bus speed
 	ftdispi_setloopback(m_ftdispi_ctx, 0);
-
-	#endif
 }
+#else
+SPI_Protocol::SPI_Protocol (vector<uint32_t> chipSelectCommands,
+                            vector<uint32_t> readCommands,
+                            vector<uint32_t> writeCommands,
+                            string_view      commandsPrefix,
+                            uint16_t         /* usbDeviceID */)
+  : SPI_Player(std::move(chipSelectCommands),
+               std::move(readCommands),
+               std::move(writeCommands),
+               commandsPrefix)
+{
+}
+#endif
 //
 //  End of: SPI_Protocol::SPI_Protocol
 //---------------------------------------------------------------------------
@@ -107,10 +136,10 @@ SPI_Protocol::~SPI_Protocol()
 	#endif
 }
 
-#ifndef USE_LIBFTDISPI
 
 //! Loopbacks "to SUT data" logging SPI command(s) that would have been issued if libFTDIspi was installed.
 //!
+#ifndef USE_LIBFTDISPI
 BinaryVector SPI_Protocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
 	auto command = CreateSPICommand(derivationId, toSutData);
@@ -152,7 +181,7 @@ BinaryVector SPI_Protocol::DoAction (uint32_t derivationId, void* /* interfaceDa
 
   ftdispi_read(m_ftdispi_ctx, spiBufferRead.data(), spiBufferLength, chipSelectCommand);
   ftdispi_write(m_ftdispi_ctx, spiBufferWrite.data(), spiBufferLength, chipSelectCommand);
-  
+
 	vector<uint8_t> fromSutDataBuffer(&spiBufferRead[1], &spiBufferRead[bytesCount]);
 
   auto fromSutData = BinaryVector::CreateFromRightAlignedBuffer(std::move(fromSutDataBuffer), bitsCount);

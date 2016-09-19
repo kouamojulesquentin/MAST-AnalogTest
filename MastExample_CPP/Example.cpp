@@ -33,6 +33,8 @@ namespace
   //!
   void Algo_Increment ()
   {
+    iPrefix("SWIR.WIR");
+
     auto     registerPath = "reg_0";
     auto     loopCount    = 20u;
     uint16_t initialValue = 1u;
@@ -54,6 +56,8 @@ namespace
   //!
   void Algo_Decrement ()
   {
+    iPrefix("SWIR.WIR");
+
     auto     registerPath = "reg_1";
     auto     loopCount    = 20u;
     uint16_t value = 60u;
@@ -81,8 +85,8 @@ vector<AppFunctionAndNodePath> GetAlgorithmsAndNodePaths (int /* argc */, char* 
 {
   vector<AppFunctionAndNodePath> associations
   {
-    {Algo_Increment, "W_1500.SWIR.WIR", "Inc"},
-    {Algo_Decrement, "W_1500.SWIR.WIR", "Dec"},
+    {Algo_Increment, "W_1500", "Inc"},
+    {Algo_Decrement, "W_1500", "Dec"},
   };
 
   return associations;
@@ -103,8 +107,8 @@ vector<mast::AppFunctionAndName> GetAlgorithmsNames (int /* argc */, char* /* ar
 {
   vector<AppFunctionAndName> names
   {
-//+    {Algo_Increment, "Incr"},
-//+    {Algo_Decrement, "Decr"},
+    {Algo_Increment, "Incr"},
+    {Algo_Decrement, "Decr"},
   };
 
   return names;

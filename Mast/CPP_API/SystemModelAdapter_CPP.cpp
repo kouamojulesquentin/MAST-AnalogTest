@@ -127,7 +127,7 @@ vector<AppFunctionAndNode> CPP_API_IMPL::GetFunctionsAndNodes (const vector<AppF
 
     if (it != appFunctionsAndNames.cend())
     {
-      functionAndNodes.emplace_back(it->appFunction, functionNameAndNode.node);
+      functionAndNodes.emplace_back(it->appFunction, functionNameAndNode.node, functionNameAndNode.appName);
     }
   }
 

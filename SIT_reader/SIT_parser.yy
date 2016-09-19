@@ -29,6 +29,7 @@
 #include "GenericAccessInterfaceProtocol.hpp"
 #include "SVF_SimulationProtocol.hpp"
 #include "I2C_Player.hpp"
+#include "AppFunctionNameAndNode.hpp"
 
 using std::shared_ptr;
 using std::make_shared;
@@ -231,6 +232,7 @@ parent_node_with_children: parent_node PDL_declaration children_list
   if (!$2.empty())
    {
     std::cout<< "Function " << $2 <<" is associated with node " << $1->Name() <<"\n";
+    AppFunctionNameAndNode($2,asParentNode,my_location->begin.line);
    }
  }
 

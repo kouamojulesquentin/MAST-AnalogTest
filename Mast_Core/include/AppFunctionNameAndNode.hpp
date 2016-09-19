@@ -28,10 +28,12 @@ namespace mast
   {
     std::string                 appName;
     std::shared_ptr<ParentNode> node;
-
-    AppFunctionNameAndNode(std::string p_appName, std::shared_ptr<ParentNode> p_node)
+    int 			SIT_line;
+    
+    AppFunctionNameAndNode(std::string p_appName, std::shared_ptr<ParentNode> p_node, int p_SIT_line)
       : appName (std::move(p_appName))
       , node    (p_node)
+      , SIT_line (p_SIT_line)
     {}
   };
   //

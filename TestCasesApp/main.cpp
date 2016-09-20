@@ -203,6 +203,19 @@ vector<AppFunctionAndNodePath> CreateTestcase (shared_ptr<AccessInterfaceProtoco
       }
       break;
     }
+		case Options::Testcase::ZyboSPI:
+		{
+			auto builder					 = SystemModelBuilder(*sm);
+			auto accessInterface	 = sm->CreateAccessInterface("SPI", protocol);
+		  auto regBypassSequence = BinaryVector(8, 0xFF);
+			auto regSpi	= sm->CreateRegister("reg_0", regBypassSequence, accessInterface);
+			sm->SetRoot(accessInterface);
+
+			auto topPath   = "Zybo";
+      associations   = CreateDefaultAppDescriptors(".", 1u, "reg_", loopCount);
+			break;
+		}
+
     case Options::Testcase::Wrapper_1500:
     {
       //! @todo [JFC]-[August/22/2016]: In CreateTestcase(): Use function provided by testcase file

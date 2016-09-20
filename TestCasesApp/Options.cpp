@@ -226,6 +226,7 @@ Options::Testcase Options::ParseTestcase (const string& testcaseOption)
   constexpr auto parsingData =
   {
     make_tuple(Options::Testcase::SIT_File,     "SIT_File"),
+		make_tuple(Options::Testcase::ZyboSPI,	    "ZyboSPI"),
     make_tuple(Options::Testcase::Wrapper_1500, "1500"),
   };
 
@@ -267,6 +268,9 @@ string Options::ToDebugString (string_view header, string_view linePrefix) const
     case Testcase::NotSpecified:
       os << "Not_specified";
       break;
+		case Testcase::ZyboSPI:
+			os << "Zybo SPI";
+			break;
     case Testcase::SIT_File:
       os << "SIT File";
       break;

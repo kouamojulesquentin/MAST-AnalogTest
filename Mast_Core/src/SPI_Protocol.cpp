@@ -173,9 +173,9 @@ BinaryVector SPI_Protocol::DoAction (uint32_t derivationId, void* /* interfaceDa
   auto toSutDataBuffer		=	toSutData.DataRightAligned();
 	//auto fromSutDataBuffer	= vector<uint8_t>(toSutData.BytesCount());
 
-  spiBufferRead[0] 		= readCommand;
+  spiBufferRead.insert(spiBufferRead.begin(), readCommand);
 
-  spiBufferWrite[0] 	= writeCommand;
+  spiBufferWrite.insert(spiBufferWrite.begin(), writeCommand);
 
   spiBufferWrite.insert(spiBufferWrite.end(), toSutDataBuffer.begin(), toSutDataBuffer.end());
 

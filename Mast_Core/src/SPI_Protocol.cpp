@@ -39,7 +39,7 @@ using namespace std::string_literals;
 SPI_Protocol::SPI_Protocol(initializer_list<uint32_t> chipSelectCommands,
                            initializer_list<uint32_t> readCommands,
                            initializer_list<uint32_t> writeCommands,
-                           experimental::string_view  commandsPrefix,
+                           string_view  commandsPrefix,
                            uint16_t                   usbDeviceID)
   : SPI_Player(chipSelectCommands, readCommands, writeCommands, commandsPrefix)
 {

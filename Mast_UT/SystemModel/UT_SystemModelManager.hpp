@@ -123,7 +123,10 @@ class UT_SystemModelManager : public CxxTest::TestSuite
   //
   void test_iGetStatus_Register_WithoutClear ();
   void test_iGetStatus_Register_WithClear ();
+  void test_iGetStatus_Root_WithoutClear ();
+  void test_iGetStatus_Root_WithClear ();
   void test_iGetStatus_Register_Multithread ();
+  void test_iGetStatus_Root_Multithread ();
 
   // ---------------- iGetMiscompares
   //

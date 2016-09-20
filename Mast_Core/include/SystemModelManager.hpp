@@ -161,7 +161,18 @@ class DLL_EXPORT SystemModelManager final
     return std::move(readData);
   }
 
-  uint32_t iGetStatus(string_view registerPath, bool clearCounter = false);
+  //! Returns the number of expected read failure for SystemModel sub-tree
+  //!
+  uint32_t iGetStatus (std::shared_ptr<SystemModelNode> node, bool clearCounter);
+
+
+  //! Returns the number of expected read failure for the complete system model
+  //!
+  uint32_t iGetStatus(bool clearCounter);
+
+  //! Returns the number of expected read failures from SystemModel sub-tree
+  //!
+  uint32_t iGetStatus(string_view nodePath, bool clearCounter);
 
   //! Sets next Register value to sent to SUT
   //!
@@ -208,6 +219,7 @@ class DLL_EXPORT SystemModelManager final
   // ---------------- Private  Methods
   //
   private:
+  template<typename T> uint32_t iGetStatus (T you_should_call_iStatus_with_path_and_clear_counter_parameters); //!< Non implemented version to avoid implicit conversion from char* to bool
 
   using NodeIdentifier = SystemModelNode::NodeIdentifier;
 

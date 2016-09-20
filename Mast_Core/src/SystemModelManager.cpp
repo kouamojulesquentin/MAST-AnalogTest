@@ -19,6 +19,7 @@
 #include "Chain.hpp"
 #include "Utility.hpp"
 #include "SystemModelManagerMonitor.hpp"
+#include "MismatchesCollector.hpp"
 #include "g3log/g3log.hpp"
 
 #include <utility>
@@ -454,25 +455,59 @@ void SystemModelManager::iGetRefresh (string_view registerPath, int32_t&      re
 void SystemModelManager::iGetRefresh (string_view registerPath, int64_t&      readData) { iGetRefresh_impl(registerPath, readData); }
 
 
-//! Returns the number of expected read failure for a single Register
+//! Returns the number of expected read failure for SystemModel sub-tree
 //!
-//! @param registerPath Path to the register
 //! @param clearCounter When true, the mismatch counter is reset
 //!
-uint32_t SystemModelManager::iGetStatus (string_view registerPath, bool clearCounter)
+//! @return The total count of mismatches within the system model
+//!
+uint32_t SystemModelManager::iGetStatus (shared_ptr<SystemModelNode> node, bool clearCounter)
 {
-  auto& pathResolver = PATH_RESOLVER("iGetStatus: ");
-  auto  reg          = pathResolver.ResolveAsRegister(registerPath);
+  CHECK_PARAMETER_NOT_NULL(node, "Cannot get status from undefined node");
 
-  unique_lock<recursive_mutex> lock(m_dataMutex); // We must protect for the register been updated just when we read it
-
-  auto count = reg->Mismatches();
-  if (clearCounter)
+  auto mismatchesCollector = MismatchesCollector(clearCounter);
   {
-    reg->ResetMismatches();
+    unique_lock<recursive_mutex> lock(m_dataMutex); // We must protect for the register been updated just when we read it
+    node->Accept(mismatchesCollector);
   }
 
-  return count;
+  return mismatchesCollector.MismatchesCount();
+}
+//
+//  End of: SystemModelManager::iGetStatus
+//---------------------------------------------------------------------------
+
+
+//! Returns the number of expected read failures from SystemModel sub-tree
+//!
+//! @note sub-tree can be a single Register or complete SystemModel (node path = ".")
+//!
+//! @param nodePath     Path to top node of sub-tree
+//! @param clearCounter When true, the mismatch counters are reset
+//!
+//! @return The total count of mismatches for the sub-tree
+//!
+uint32_t SystemModelManager::iGetStatus (string_view nodePath, bool clearCounter)
+{
+  auto& pathResolver = PATH_RESOLVER("iGetStatus: ");
+  auto  node         = pathResolver.Resolve(nodePath);
+
+  return iGetStatus(node, clearCounter);
+}
+//
+//  End of: SystemModelManager::iGetStatus
+//---------------------------------------------------------------------------
+
+
+//! Returns the number of expected read failure for the complete system model
+//!
+//! @param clearCounter When true, the mismatch counter is reset
+//!
+//! @return The total count of mismatches within the system model
+//!
+uint32_t SystemModelManager::iGetStatus (bool clearCounter)
+{
+  return iGetStatus(m_sm.Root(), clearCounter);
 }
 //
 //  End of: SystemModelManager::iGetStatus

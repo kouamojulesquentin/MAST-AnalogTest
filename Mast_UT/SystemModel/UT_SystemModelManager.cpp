@@ -2144,7 +2144,6 @@ void UT_SystemModelManager::test_iGetRefresh_BinaryVector () { Check_iGetRefresh
 
 //! Checks SystemModelManager::iGetStatus() without requesting to reset the counter
 //!
-//! @note It just check that application and manager threads are not blocked
 void UT_SystemModelManager::test_iGetStatus_Register_WithoutClear ()
 {
   // ---------------- Setup
@@ -2164,8 +2163,8 @@ void UT_SystemModelManager::test_iGetStatus_Register_WithoutClear ()
 
   // ---------------- Exercise
   //
-  auto count_1 = sut.iGetStatus("dynamic_2");
-  auto count_2 = sut.iGetStatus("dynamic_2");
+  auto count_1 = sut.iGetStatus("dynamic_2", false);
+  auto count_2 = sut.iGetStatus("dynamic_2", false);
 
   // ---------------- Verify
   //
@@ -2176,7 +2175,6 @@ void UT_SystemModelManager::test_iGetStatus_Register_WithoutClear ()
 
 //! Checks SystemModelManager::iGetStatus() without requesting to reset the counter
 //!
-//! @note It just check that application and manager threads are not blocked
 void UT_SystemModelManager::test_iGetStatus_Register_WithClear ()
 {
   // ---------------- Setup
@@ -2207,9 +2205,91 @@ void UT_SystemModelManager::test_iGetStatus_Register_WithClear ()
   TS_ASSERT_EQUALS (count_3, 0u);
 }
 
+
+//! Checks SystemModelManager::iGetStatus() from root node without requesting to reset the counters
+//!
+void UT_SystemModelManager::test_iGetStatus_Root_WithoutClear ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto reg_1  = sm.RegisterWithId(6u);
+  reg_1->SetCheckExpected(true);
+  reg_1->SetExpectedFromSut (BinaryVector::CreateFromHexString("CAFE_1111"));
+  reg_1->SetFromSut         (BinaryVector::CreateFromHexString("CAFE_2222"));
+  reg_1->SetFromSut         (BinaryVector::CreateFromHexString("CAFE_3333"));
+  reg_1->SetFromSut         (BinaryVector::CreateFromHexString("CAFE_4444"));
+
+
+  auto reg_2  = sm.RegisterWithId(8u);
+  reg_2->SetCheckExpected(true);
+  reg_2->SetExpectedFromSut (BinaryVector::CreateFromHexString("FADE_6666"));
+  reg_2->SetFromSut         (BinaryVector::CreateFromHexString("FADE_5555"));
+  reg_2->SetFromSut         (BinaryVector::CreateFromHexString("FADE_4444"));
+
+  TS_ASSERT_EQUALS (reg_1->Mismatches(), 3u);
+  TS_ASSERT_EQUALS (reg_2->Mismatches(), 2u);
+
+  SystemModelManager sut(sm);
+
+  // ---------------- Exercise
+  //
+  auto count_1 = sut.iGetStatus(false);
+  auto count_2 = sut.iGetStatus(false);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (count_1, 5u);
+  TS_ASSERT_EQUALS (count_1, count_2);
+}
+
+
+//! Checks SystemModelManager::iGetStatus() from root node requesting to reset the counters
+//!
+void UT_SystemModelManager::test_iGetStatus_Root_WithClear ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto reg_1  = sm.RegisterWithId(6u);
+  reg_1->SetCheckExpected(true);
+  reg_1->SetExpectedFromSut (BinaryVector::CreateFromHexString("CAFE_1111"));
+  reg_1->SetFromSut         (BinaryVector::CreateFromHexString("CAFE_2222"));
+  reg_1->SetFromSut         (BinaryVector::CreateFromHexString("CAFE_3333"));
+  reg_1->SetFromSut         (BinaryVector::CreateFromHexString("CAFE_4444"));
+
+
+  auto reg_2  = sm.RegisterWithId(8u);
+  reg_2->SetCheckExpected(true);
+  reg_2->SetExpectedFromSut (BinaryVector::CreateFromHexString("FADE_6666"));
+  reg_2->SetFromSut         (BinaryVector::CreateFromHexString("FADE_5555"));
+  reg_2->SetFromSut         (BinaryVector::CreateFromHexString("FADE_4444"));
+
+  TS_ASSERT_EQUALS (reg_1->Mismatches(), 3u);
+  TS_ASSERT_EQUALS (reg_2->Mismatches(), 2u);
+
+  SystemModelManager sut(sm);
+
+  // ---------------- Exercise
+  //
+  auto count_1 = sut.iGetStatus(true);
+  auto count_2 = sut.iGetStatus(true);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (count_1, 5u);
+  TS_ASSERT_EQUALS (count_2, 0u);
+}
+
+
+
 //! Checks SystemModelManager::iGetStatus() for single register when one thread cause mismatches and a second one get the status
 //!
-//! @note It just check that application and manager threads are not blocked
+//! @note It also check that application and manager threads are not blocked
 void UT_SystemModelManager::test_iGetStatus_Register_Multithread ()
 {
   // ---------------- Setup
@@ -2244,7 +2324,7 @@ void UT_SystemModelManager::test_iGetStatus_Register_Multithread ()
     (
       // ---------------- Exercise
       //
-      while (sut.iGetStatus("dynamic_3") < 5u)
+      while (sut.iGetStatus("dynamic_3", false) < 5u)
       {
         if (std::chrono::steady_clock::now() > timeout)
         {
@@ -2273,6 +2353,75 @@ void UT_SystemModelManager::test_iGetStatus_Register_Multithread ()
   TS_ASSERT_FALSE (reachedTimeout);
 }
 
+
+
+//! Checks SystemModelManager::iGetStatus() for all SystemModel when one thread cause mismatches and a second one get the status
+//!
+//! @note It also check that application and manager threads are not blocked
+void UT_SystemModelManager::test_iGetStatus_Root_Multithread ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto mux = sm.LinkerWithId(2u);   // This is Tap mux
+
+  SystemModelManager sut(sm);
+
+  auto causeMismatchesFunctor = [&sut]()
+  {
+    TS_ASSERT_THROWS_NOTHING
+    (
+      for (int ii = 0 ; ii < 5 ; ++ii)
+      {
+        sut.iWrite ("dynamic_3", ii);
+        sut.iApply();
+        std::this_thread::yield();
+      }
+    );
+  };
+
+  auto reachedTimeout   = false;
+  auto getStatusFunctor = [&sut, &reachedTimeout]()
+  {
+    auto expected = BinaryVector::CreateFromHexString("FADE_6666");
+
+    auto timeout = std::chrono::steady_clock::now() + 100ms;
+    TS_ASSERT_THROWS_NOTHING
+    (
+      // ---------------- Exercise
+      //
+      do
+      {
+        if (std::chrono::steady_clock::now() > timeout)
+        {
+          reachedTimeout = true;
+          break;
+        }
+        sut.iRead  ("dynamic_3", expected);  // Set the expected value
+        sut.iApply();
+        std::this_thread::yield();
+      } while (sut.iGetStatus(false) < 5u);
+    );
+  };
+
+
+  // ---------------- Setup (main thread)
+  //
+  sut.CreateApplicationThread(mux, getStatusFunctor,       "App_getStatus");
+  sut.CreateApplicationThread(mux, causeMismatchesFunctor, "App_causeMismatches");
+  sut.Start();
+  sut.StartCreatedApplicationThreads();
+
+  // ---------------- Verify
+  //
+  // Proper termination means successful test
+  //
+  sut.WaitForApplicationsEnd();              // Make sure applications have done their action
+  sut.Stop();
+  TS_ASSERT_FALSE (reachedTimeout);
+}
 
 //! Checks SystemModelManager::iGetMiscompares() in single thread context
 //!

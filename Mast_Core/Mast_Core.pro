@@ -41,6 +41,7 @@ SOURCES +=  \
     src/I2C_EmulationProtocol.cpp                   \
     src/I2C_Player.cpp                              \
     src/Linker.cpp                                  \
+    src/MismatchesCollector.cpp                     \
     src/NamesChecker.cpp                            \
     src/NodePathResolver.cpp                        \
     src/OpenOCDProtocol.cpp                         \
@@ -90,6 +91,7 @@ HEADERS += \
     include/I2C_EmulationProtocol.hpp                   \
     include/I2C_Player.hpp                              \
     include/Linker.hpp                                  \
+    include/MismatchesCollector.hpp                     \
     include/NamesChecker.hpp                            \
     include/NodePathResolver.hpp                        \
     include/OpenOCDProtocol.hpp                         \

@@ -108,10 +108,13 @@ class UT_PDL_Adapter_CPP : public CxxTest::TestSuite
   void test_iGetMiscompares ();
   void test_iGetMiscompares_Sugar ();
 
-  // ---------------- iGetRegisterStatus
+  // ---------------- iGetStatus_Register
   //
-  void test_iGetRegisterStatus_with_Reset ();
-  void test_iGetRegisterStatus_without_Reset ();
+  void test_iGetStatus_Register_with_Reset ();
+  void test_iGetStatus_Register_without_Reset ();
+  void test_iGetStatus_Node_with_Reset ();
+  void test_iGetStatus_Root_with_Reset ();
+  void test_iGetStatus_Root_without_Reset ();
 
   // ---------------- iRefresh
   //

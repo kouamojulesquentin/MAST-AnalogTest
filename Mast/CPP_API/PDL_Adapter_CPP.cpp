@@ -28,7 +28,8 @@ using string_view = std::experimental::string_view;
 using namespace std::string_literals;
 using namespace mast;
 
-#define CHECK_REGISTER_PATH(registerPath)  CHECK_PARAMETER_NOT_EMPTY(registerPath, "Register path must be not empty")
+#define CHECK_REGISTER_PATH(registerPath) CHECK_PARAMETER_NOT_EMPTY(registerPath, "Register path must be not empty")
+#define CHECK_NODE_PATH(nodePath)         CHECK_PARAMETER_NOT_EMPTY(nodePath,     "Node path must be not empty")
 
 namespace
 {
@@ -177,12 +178,19 @@ string mast::iGetRefresh (string_view registerPath, StringType stringType)
 void mast::iGetRefresh (string_view registerPath, std::string& readData, StringType stringType) { readData = mast::iGetRefresh(registerPath, stringType); }
 
 
-uint32_t mast::iGetRegisterStatus (string_view registerPath, bool clearCounter)
+uint32_t mast::iGetStatus (string_view nodePath, bool clearCounter)
 {
-  CHECK_REGISTER_PATH(registerPath);
+  CHECK_NODE_PATH(nodePath);
 
   auto   manager = GetAndCheckManager();
-  return manager->iGetStatus(registerPath, clearCounter);
+  return manager->iGetStatus(nodePath, clearCounter);
+}
+
+
+uint32_t mast::iGetStatus (bool clearCounter)
+{
+  auto   manager = GetAndCheckManager();
+  return manager->iGetStatus(clearCounter);
 }
 
 

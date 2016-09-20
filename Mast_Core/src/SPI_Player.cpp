@@ -47,9 +47,9 @@ SPI_Player::SPI_Player(std::initializer_list<uint32_t> chipSelectCommands, std::
 
 SPI_Player::SPI_Player(std::vector<uint32_t> chipSelectCommands, std::vector<uint32_t> readCommands, std::vector<uint32_t>           writeCommands, std::experimental::string_view commandsPrefix)
   : m_commandPrefix 			(commandsPrefix)
-	, m_chipSelectCommands 	(std::move(chipSelectCommands))
-  , m_readCommands  			(std::move(readCommands))
-  , m_writeCommands 			(std::move(writeCommands))
+  , m_chipSelectCommands 	(chipSelectCommands)
+  , m_readCommands  			(readCommands)
+  , m_writeCommands 			(writeCommands)
 {
   if ((chipSelectCommands.size() < 2)
 			|| (readCommands.size() < 2)

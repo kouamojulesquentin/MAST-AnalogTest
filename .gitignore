@@ -63,4 +63,6 @@
 /vhdl/transcript
 /vhdl/MAST_write.so
 /vhdl/MAST_write.o
+/vhdl/data_to_rtl.svf
+/vhdl/data_from_rtl.dat
 

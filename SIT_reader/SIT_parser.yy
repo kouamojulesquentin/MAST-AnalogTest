@@ -148,7 +148,7 @@ inline std::uint32_t extract_number(std::string s)
 %type  <std::shared_ptr<mast::SystemModelNode>> parent_node_with_children
 %type  <std::vector<std::string>> function_list
 %type  <std::vector<std::string>> PDL_declaration
-
+%type  <std::uint32_t> AI_identifier
 %token               END    0     "end of file"
 %token               UPPER
 %token               LOWER
@@ -344,7 +344,7 @@ t_LINKER  node_name path_selector ctrl_node {
        }
   }
  |
-t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE  {
+t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
 
 	int   l;
 	l = find_in_table(AI_protocol_table,$3);
@@ -368,13 +368,13 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE  {
 	   protocol = make_shared<SVF_SimulationProtocol> ();
 	  break;
 	  case AI_protocol_t::SPI_FTDI :
-	   if ($4.n_words==0)
+	   if ($5.n_words==0)
 	    {
 	    std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
 	    std::cerr << "Error, " << AI_protocol_table[l] <<" needs an address table\n";
 	    YYERROR;
 	    }
-	    if (($4.n_words%3)!=0)
+	    if (($5.n_words%3)!=0)
 	     {
 	      std::cerr << "Error, " << AI_protocol_table[l] <<" requires 3 addresses for each slave\n";
 	     }
@@ -382,12 +382,13 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE  {
 	   auto chipselectCommands = std::vector<uint32_t>();
 	   auto readCommands = std::vector<uint32_t>();           
 	   auto writeCommands = std::vector<uint32_t>();           
+//           string_view       commandsPrefix = "";
           
-	  for ( auto i=0 ; i<$4.codevalue.size();i+=3)
+	  for ( auto i=0 ; i<$5.codevalue.size();i+=3)
 	     {
-	     chipselectCommands.push_back($4.codevalue[i]);
-	     readCommands.push_back($4.codevalue[i+1]);
-	     writeCommands.push_back($4.codevalue[i+2]);
+	     chipselectCommands.push_back($5.codevalue[i]);
+	     readCommands.push_back($5.codevalue[i+1]);
+	     writeCommands.push_back($5.codevalue[i+2]);
 	     }
 
 	   std::cout << "chipselectCommands (size " << chipselectCommands.size() << ") ";
@@ -403,7 +404,10 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE  {
 	    std::cout <<   iter << " ";
 	    std::cout << "\n" ;
 	    
-	   protocol = make_shared<SPI_Protocol > (std::move(chipselectCommands),readCommands,writeCommands);
+	   if ($4==0)
+	     protocol = make_shared<SPI_Protocol > (chipselectCommands,readCommands,writeCommands,"");
+	   else  
+	     protocol = make_shared<SPI_Protocol > (chipselectCommands,readCommands,writeCommands,"",(std::uint16_t) $4);
 
 	  break;
 
@@ -481,6 +485,15 @@ t_LeftBracket Coding_list t_RightBracket  {$$=$2;}
  |  {$$.n_words = 0;}
  ;
 
+AI_identifier:
+ t_QUOTED_STRING
+    {
+       $$ = extract_number($1);
+    }
+ |
+ { $$=0;
+ }
+ 
 Coding_list:
  t_QUOTED_STRING
     {

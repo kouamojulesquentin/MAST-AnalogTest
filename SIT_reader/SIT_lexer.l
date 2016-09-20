@@ -172,6 +172,9 @@ BV_value		({extended_digit}|{BV_base_specifier})
 
 \[	{ return( token::t_LeftBracket);}
 \]	{ return( token::t_RightBracket);}
+
+\(	{ return( token::t_LeftParenthesis);}
+\)	{ return( token::t_RightParenthesis);}
 \,	{ return( token::t_Comma);}
 
 .           {

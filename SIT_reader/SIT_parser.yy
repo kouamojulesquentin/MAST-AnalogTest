@@ -29,6 +29,7 @@
 #include "GenericAccessInterfaceProtocol.hpp"
 #include "SVF_SimulationProtocol.hpp"
 #include "I2C_Player.hpp"
+#include "SPI_Protocol.hpp"
 #include "AppFunctionNameAndNode.hpp"
 
 using std::shared_ptr;
@@ -66,9 +67,9 @@ extern SIT::SIT_Parser::location_type *my_location;
 
 std::vector<std::string> AI_protocol_table  =
   {"JTAG_Loopback","JTAG_SVF_simulation","JTAG_SVF_openOCD",
-  "I2C_Player"
+  "SPI_FTDI"
   };
-enum AI_protocol_t {JTAG_Loopback,JTAG_SVF_simulation,JTAG_SVF_openOCD, I2C_Player};
+enum AI_protocol_t {JTAG_Loopback,JTAG_SVF_simulation,JTAG_SVF_openOCD, SPI_FTDI};
 
 std::vector<std::string> JTAG_AI_protocol_table  =
   {"Loopback","SVF_simulation","SVF_openOCD"
@@ -182,7 +183,8 @@ inline std::uint32_t extract_number(std::string s)
 %token  t_RightBracket
 %token  t_LeftBracket
 %token  t_Comma
-
+%token  t_RightParenthesis
+%token  t_LeftParenthesis
 %%
 
 root_node:
@@ -365,15 +367,43 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_TABLE  {
 	  case JTAG_SVF_openOCD :
 	   protocol = make_shared<SVF_SimulationProtocol> ();
 	  break;
-	  case AI_protocol_t::I2C_Player :
+	  case AI_protocol_t::SPI_FTDI :
 	   if ($4.n_words==0)
 	    {
 	    std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
 	    std::cerr << "Error, " << AI_protocol_table[l] <<" needs an address table\n";
 	    YYERROR;
 	    }
-//	    protocol = make_shared<I2C_Player> ($4.codevalue, DEFAULT_I2C_PREFIX);
-	   protocol = make_shared<LoopbackAccessInterfaceProtocol > ();
+	    if (($4.n_words%3)!=0)
+	     {
+	      std::cerr << "Error, " << AI_protocol_table[l] <<" requires 3 addresses for each slave\n";
+	     }
+	   std::cout << "Generating " << AI_protocol_table[l] <<" Access Interface\n";
+	   auto chipselectCommands = std::vector<uint32_t>();
+	   auto readCommands = std::vector<uint32_t>();           
+	   auto writeCommands = std::vector<uint32_t>();           
+          
+	  for ( auto i=0 ; i<$4.codevalue.size();i+=3)
+	     {
+	     chipselectCommands.push_back($4.codevalue[i]);
+	     readCommands.push_back($4.codevalue[i+1]);
+	     writeCommands.push_back($4.codevalue[i+2]);
+	     }
+
+	   std::cout << "chipselectCommands (size " << chipselectCommands.size() << ") ";
+	   for (auto iter :chipselectCommands  )
+	    std::cout <<   iter << " ";
+	    std::cout << "\n" ;
+	   std::cout << "readCommands (size " << readCommands.size() << ") ";
+	   for (auto iter :readCommands  )
+	    std::cout <<   iter << " ";
+	    std::cout << "\n" ;
+	   std::cout << "writeCommands (size " << writeCommands.size() << ") ";
+	   for (auto iter :writeCommands  )
+	    std::cout <<   iter << " ";
+	    std::cout << "\n" ;
+	    
+	   protocol = make_shared<SPI_Protocol > (std::move(chipselectCommands),readCommands,writeCommands);
 
 	  break;
 
@@ -458,11 +488,53 @@ Coding_list:
     $$.n_words = 1;
     }
  |
+ t_QUOTED_STRING t_RightParenthesis
+    { /* ')' at far right*/
+       $$.codevalue.push_back(extract_number($1));
+    $$.n_words = 1;
+    }
+ |
+t_LeftParenthesis t_QUOTED_STRING t_RightParenthesis
+    { /* '(' and ')' at far right*/
+       $$.codevalue.push_back(extract_number($2));
+    $$.n_words = 1;
+    }
+ |
+t_LeftParenthesis t_QUOTED_STRING 
+    { /* '(' at far right*/
+       $$.codevalue.push_back(extract_number($2));
+    $$.n_words = 1;
+    }
+ |
  t_QUOTED_STRING t_Comma  Coding_list
   {
    $$.n_words = ($3.n_words+1);
    auto tmp = $3.codevalue;
    tmp.insert(tmp.begin(),extract_number($1));
+   $$.codevalue = tmp;
+   }
+ |
+ t_LeftParenthesis t_QUOTED_STRING t_Comma  Coding_list
+  { /* '('  at beginning+middle of list*/
+   $$.n_words = ($4.n_words+1);
+   auto tmp = $4.codevalue;
+   tmp.insert(tmp.begin(),extract_number($2));
+   $$.codevalue = tmp;
+   }
+ |
+ t_QUOTED_STRING t_RightParenthesis t_Comma  Coding_list
+  { /* ')' at beginning+ middle of the list*/
+   $$.n_words = ($4.n_words+1);
+   auto tmp = $4.codevalue;
+   tmp.insert(tmp.begin(),extract_number($1));
+   $$.codevalue = tmp;
+   }
+ |
+  t_LeftParenthesis t_QUOTED_STRING t_RightParenthesis t_Comma  Coding_list
+  { /* '(' and ')' at beginning+ middle of the list*/
+   $$.n_words = ($5.n_words+1);
+   auto tmp = $5.codevalue;
+   tmp.insert(tmp.begin(),extract_number($2));
    $$.codevalue = tmp;
    }
 ;

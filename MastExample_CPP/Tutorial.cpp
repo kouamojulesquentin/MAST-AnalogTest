@@ -14,6 +14,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 
 using std::vector;
@@ -33,19 +34,26 @@ namespace
   //!
   void Algo_Increment ()
   {
-    iPrefix("SWIR.WIR");
 
-    auto     registerPath = "reg_0";
-    auto     loopCount    = 20u;
+    auto     registerPath = "reg";
+    auto     loopCount    = 5u;
+    auto     i    = 0u;
     uint16_t initialValue = 1u;
+    uint16_t curValue;
 
-    while (loopCount--)
+    std::cout << "Running " << loopCount << " iWrites on register " <<registerPath << "\n";
+    while (i++<loopCount)
     {
       iWrite(registerPath, initialValue);
+ //     iGet(registerPath,curValue);
+      curValue=iGet<uint16_t>(registerPath);
+     std::cout << "\n Cycle "<< i << ": Wrote " << initialValue ;
+     std::cout << "\n       "<< i << ": Read " << curValue ;
       iApply();
 
       ++initialValue;
     }
+     std::cout << "\n" ;
   }
   //
   //  End of: Algo_Increment
@@ -56,9 +64,7 @@ namespace
   //!
   void Algo_Decrement ()
   {
-    iPrefix("SWIR.WIR");
-
-    auto     registerPath = "reg_1";
+    auto     registerPath = "reg";
     auto     loopCount    = 20u;
     uint16_t value = 60u;
 
@@ -85,8 +91,8 @@ vector<AppFunctionAndNodePath> GetAlgorithmsAndNodePaths (int /* argc */, char* 
 {
   vector<AppFunctionAndNodePath> associations
   {
-    {Algo_Increment, "W_1500", "Inc"},
-    {Algo_Decrement, "W_1500", "Dec"},
+    {Algo_Increment, "", "Inc"},
+    {Algo_Decrement, "", "Dec"},
   };
 
   return associations;

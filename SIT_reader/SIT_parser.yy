@@ -28,6 +28,7 @@
 #include "LoopbackAccessInterfaceProtocol.hpp"
 #include "GenericAccessInterfaceProtocol.hpp"
 #include "SVF_SimulationProtocol.hpp"
+#include "SVF_EmulationProtocol.hpp"
 #include "I2C_Player.hpp"
 #include "SPI_Protocol.hpp"
 #include "AppFunctionNameAndNode.hpp"
@@ -66,15 +67,15 @@ extern int nlines;
 extern SIT::SIT_Parser::location_type *my_location;
 
 std::vector<std::string> AI_protocol_table  =
-  {"JTAG_Loopback","JTAG_SVF_simulation","JTAG_SVF_openOCD",
+  {"JTAG_Loopback","JTAG_SVF_simulation","JTAG_SVF_openOCD","JTAG_SVF_Emulation",
   "SPI_FTDI"
   };
-enum AI_protocol_t {JTAG_Loopback,JTAG_SVF_simulation,JTAG_SVF_openOCD, SPI_FTDI};
+enum AI_protocol_t {JTAG_Loopback,JTAG_SVF_simulation,JTAG_SVF_openOCD, JTAG_SVF_Emulation, SPI_FTDI};
 
 std::vector<std::string> JTAG_AI_protocol_table  =
-  {"Loopback","SVF_simulation","SVF_openOCD"
+  {"Loopback","SVF_simulation","SVF_openOCD","SVF_Emulation"
   };
-enum JTAG_AI_protocol_t {Loopback,SVF_simulation,SVF_openOCD};
+enum JTAG_AI_protocol_t {Loopback,SVF_simulation,SVF_openOCD,SVF_Emulation};
 
 std::vector<std::string> Path_Selector_table  =
   {"Binary","One_Hot","N_Hot","Binary_noidle","One_Hot_noidle","N_Hot_noidle"};
@@ -367,7 +368,11 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
 	  case JTAG_SVF_openOCD :
 	   protocol = make_shared<SVF_SimulationProtocol> ();
 	  break;
+	  case JTAG_SVF_Emulation :
+	   protocol = make_shared<SVF_EmulationProtocol> ();
+	  break;
 	  case AI_protocol_t::SPI_FTDI :
+	   {
 	   if ($5.n_words==0)
 	    {
 	    std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
@@ -382,7 +387,6 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
 	   auto chipselectCommands = std::vector<uint32_t>();
 	   auto readCommands = std::vector<uint32_t>();           
 	   auto writeCommands = std::vector<uint32_t>();           
-//           string_view       commandsPrefix = "";
           
 	  for ( auto i=0 ; i<$5.codevalue.size();i+=3)
 	     {
@@ -409,7 +413,8 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
 	   else  
 	     protocol = make_shared<SPI_Protocol > (chipselectCommands,readCommands,writeCommands,"",(std::uint16_t) $4);
 
-	  break;
+	   break;
+	   }
 
 	  }
 
@@ -442,6 +447,9 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
 	  break;
 	  case SVF_simulation :
 	   protocol = make_shared<SVF_SimulationProtocol > ();
+	  break;
+	  case SVF_Emulation :
+	   protocol = make_shared<SVF_EmulationProtocol > ();
 	  break;
 	  case SVF_openOCD :
 	   protocol = make_shared<SVF_SimulationProtocol> ();

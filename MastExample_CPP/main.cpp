@@ -66,7 +66,7 @@ int main (int argc, char* argv [])
         throw std::runtime_error("Cannot run Mast without any algorithm to start");
       }
     }
-    std::cout << "Mast example done";
+    std::cout << "Mast example done\n";
   }
   catch(std::invalid_argument& exc) { retCode = -1; std::cout << exc.what(); }
   catch(std::out_of_range&     exc) { retCode = -1; std::cout << exc.what(); }

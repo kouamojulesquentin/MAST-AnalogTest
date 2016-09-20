@@ -139,13 +139,14 @@ inline std::uint32_t extract_number(std::string s)
 %type  <Coding_type> IR_TABLE
 %type  <Coding_type> AI_TABLE
 %type  <std::string> JTAG_protocol
-%type  <std::string> PDL_declaration
 %type  <std::shared_ptr<mast::SystemModelNode>> root_node
 %type  <std::shared_ptr<mast::SystemModelNode>> register_node
 %type  <std::shared_ptr<mast::SystemModelNode>> leaf_node
 %type  <std::shared_ptr<mast::SystemModelNode>> parent_node
 %type  <std::shared_ptr<mast::SystemModelNode>> node
 %type  <std::shared_ptr<mast::SystemModelNode>> parent_node_with_children
+%type  <std::vector<std::string>> function_list
+%type  <std::vector<std::string>> PDL_declaration
 
 %token               END    0     "end of file"
 %token               UPPER
@@ -163,7 +164,7 @@ inline std::uint32_t extract_number(std::string s)
 %token  <std::string> t_1500_WRAPPER
 %token  <std::string> t_JTAG_TAP
 %token  <std::string> t_PDL
-
+ 
 %token  <std::string> t_BASED_INTEGER
 %token		t_START_HIERARCHY
 %token		t_END_HIERARCHY
@@ -231,19 +232,32 @@ parent_node_with_children: parent_node PDL_declaration children_list
      $$ = $1;
   if (!$2.empty())
    {
-    std::cout<< "Function " << $2 <<" is associated with node " << $1->Name() <<"\n";
-    driver.namesAndNodes.push_back(AppFunctionNameAndNode($2,asParentNode,my_location->begin.line));
+    for (auto this_function : $2)
+      driver.namesAndNodes.push_back(AppFunctionNameAndNode(this_function,asParentNode,my_location->begin.line));
    }
  }
 
 PDL_declaration:
- t_PDL t_WORD { $$ = $2;}
+ t_PDL function_list { $$ = $2;}
  |
-  {  $$ = "";}
+  {  $$ = std::vector<std::string>();}
 ;
 
-parent_node:
+function_list:
+ t_WORD
+    {
+    $$.push_back($1);
+    }
+ |
+ t_WORD t_Comma  function_list
+  {
+   $$ = $3;
+   $$.push_back($1);
+   }
+;
 
+
+parent_node:
 t_CHAIN  node_name  {
 		     auto node = driver.main_sm->CreateChain($2.name);
                      if ($2.is_transparent)

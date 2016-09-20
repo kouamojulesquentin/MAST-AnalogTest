@@ -47,6 +47,7 @@ class Options
   {
     NotSpecified,
     SIT_File,
+		ZyboSPI,
     Wrapper_1500,
   };
 

@@ -68,6 +68,10 @@ if (${USE_OPEN_OCD})
   endif(HIDAPI_INCLUDE_DIR AND HIDAPI_LIBRARY)
 endif()
 
+if (${USE_LIBFTDISPI})
+  set (P_CFLAGS "${P_CFLAGS} -DUSE_LIBFTDISPI")
+endif()
+
 if (WIN32)
   include_directories($ENV{FLEX_DIR})
 endif()

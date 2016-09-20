@@ -4,6 +4,7 @@
  The unitary test interface Needs "phyton3" and "phyton3-ply" module
  NB: on newer Linux installation, a manual install of ply 3.8 might be needed
 				http://www.dabeaz.com/ply/
+ MAST uses Flex and Bison
 
 OpenOCD need Lib to be installed (sudo apt-get install libusb-1.0-0-dev)
 To build OpenOCD, the following tools are required:

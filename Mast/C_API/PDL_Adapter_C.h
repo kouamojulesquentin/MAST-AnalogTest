@@ -66,7 +66,8 @@ extern "C"
 
   // ---------------- iGetStatus
   //
-  DLL_EXPORT ErrorCode iGetRegisterStatus  (const char* registerPath, uint32_t* failureCount, bool clearCounter); //!< Returns the number of expected read failure for a single Register
+  DLL_EXPORT ErrorCode iGetNodeStatus  (const char* nodePath, uint32_t* failureCount, bool clearCounter); //!< Returns the number of expected read failure for a single node sub-tree (or just Register)
+  DLL_EXPORT ErrorCode iGetStatus      (uint32_t* failureCount, bool clearCounter); //!< Returns the number of expected read failure for all SystemModel tree (from root)
 
   // ---------------- iPrefix
   //

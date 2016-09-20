@@ -92,7 +92,8 @@ namespace mast
 
   // ---------------- iGetStatus
   //
-  DLL_EXPORT uint32_t iGetRegisterStatus  (std::experimental::string_view registerPath, bool clearCounter); //!< Returns the number of expected read failure for a single Register
+  DLL_EXPORT uint32_t iGetStatus  (std::experimental::string_view nodePath, bool clearCounter); //!< Returns the number of expected read failure for a sub-tree (starting at application top node)
+  DLL_EXPORT uint32_t iGetStatus  (bool clearCounter); //!< Returns the number of expected read failure for the complete SUT
 
   // ---------------- iPrefix
   //

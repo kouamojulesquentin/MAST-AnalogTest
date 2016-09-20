@@ -251,7 +251,7 @@ template<typename T> void Check_iRead (T iReadValue, T iWriteValue, string_view 
   iApply();
 
   auto xorResult = iGetMiscompares    (regPath, StringType::Hex);
-  auto status    = iGetRegisterStatus (regPath, false);
+  auto status    = iGetStatus (regPath, false);
 
   TS_ASSERT_EQUALS (status,    1u);
   TS_ASSERT_EQUALS (xorResult, expectedMismatch);   // 40 bits reg
@@ -689,9 +689,9 @@ void UT_PDL_Adapter_CPP::test_iGetMiscompares_Sugar ()
   TS_DATA_DRIVEN_TEST(checker, data);
 }
 
-//! Checks iGetRegisterStatus requesting to reset the mismatched count
+//! Checks iGetStatus on a Register node requesting to reset the mismatched count
 //!
-void UT_PDL_Adapter_CPP::test_iGetRegisterStatus_with_Reset ()
+void UT_PDL_Adapter_CPP::test_iGetStatus_Register_with_Reset ()
 {
   // ---------------- Setup
   //
@@ -706,20 +706,20 @@ void UT_PDL_Adapter_CPP::test_iGetRegisterStatus_with_Reset ()
 
   // ---------------- Exercise
   //
-  auto status = iGetRegisterStatus(regPath, true);
+  auto status = iGetStatus(regPath, true);
 
   // ---------------- Verify
   //
-  auto newStatus = iGetRegisterStatus(regPath, false);
+  auto newStatus = iGetStatus(regPath, false);
 
   TS_ASSERT_EQUALS (status,    1u);
   TS_ASSERT_EQUALS (newStatus, 0u);
 }
 
 
-//! Checks iGetRegisterStatus without requesting to reset the mismatched count
+//! Checks iGetStatus a Register node without requesting to reset the mismatched count
 //!
-void UT_PDL_Adapter_CPP::test_iGetRegisterStatus_without_Reset ()
+void UT_PDL_Adapter_CPP::test_iGetStatus_Register_without_Reset ()
 {
   // ---------------- Setup
   //
@@ -734,16 +734,112 @@ void UT_PDL_Adapter_CPP::test_iGetRegisterStatus_without_Reset ()
 
   // ---------------- Exercise
   //
-  auto status = iGetRegisterStatus(regPath, false);
+  auto status = iGetStatus(regPath, false);
 
   // ---------------- Verify
   //
-  auto newStatus = iGetRegisterStatus(regPath, false);
+  auto newStatus = iGetStatus(regPath, false);
 
   TS_ASSERT_EQUALS (status,    1u);
   TS_ASSERT_EQUALS (newStatus, 1u);
 }
 
+//! Checks iGetStatus on a application top node
+//!
+void UT_PDL_Adapter_CPP::test_iGetStatus_Node_with_Reset ()
+{
+  // ---------------- Setup
+  //
+  Session session;
+  Create_TestCase_MIB_Multichain_Pre();
+
+  auto regPath = "dynamic_2";
+
+  iRead  (regPath, "0x00000000");  // Expect a value different of what we will get
+  iWrite (regPath, "0xFADE5555");  // Loopback (default protocol) will force FromSut to be updated with that value
+  iApply();
+
+  // ---------------- Exercise
+  //
+  auto status = iGetStatus(".", true);
+
+  // ---------------- Verify
+  //
+  auto newStatus = iGetStatus(".", false);
+
+  TS_ASSERT_EQUALS (status,    1u);
+  TS_ASSERT_EQUALS (newStatus, 0u);
+}
+
+
+
+//! Checks iGetStatus on root node requesting to reset the mismatched count
+//!
+void UT_PDL_Adapter_CPP::test_iGetStatus_Root_with_Reset ()
+{
+  // ---------------- Setup
+  //
+  Session session;
+  Create_TestCase_MIB_Multichain_Pre();
+
+  auto regPath_1 = "dynamic_1";
+  auto regPath_2 = "dynamic_2";
+
+  iRead  (regPath_1, "0xFEDCBA98");
+  iRead  (regPath_2, "0x76543210");
+  iApply();
+  iWrite (regPath_1, "0xFADE5555");  // Loopback (default protocol) will force FromSut to be updated with that value
+  iWrite (regPath_2, "0x0BADCAFE");  // Loopback (default protocol) will force FromSut to be updated with that value
+  iRead  (regPath_2, "0x76543210");
+  iWrite (regPath_2, "0x0BADDEAF");  // Loopback (default protocol) will force FromSut to be updated with that value
+  iApply();
+
+  // ---------------- Exercise
+  //
+  auto status = iGetStatus(true);
+
+  // ---------------- Verify
+  //
+  auto newStatus = iGetStatus(false);
+
+  TS_ASSERT_EQUALS (status,    3u);
+  TS_ASSERT_EQUALS (newStatus, 0u);
+}
+
+
+//! Checks iGetStatus on root node without requesting to reset the mismatched count
+//!
+void UT_PDL_Adapter_CPP::test_iGetStatus_Root_without_Reset ()
+{
+  // ---------------- Setup
+  //
+  Session session;
+  Create_TestCase_MIB_Multichain_Pre();
+
+  auto regPath_1 = "dynamic_1";
+  auto regPath_2 = "dynamic_2";
+
+  iRead  (regPath_1, "0xFEDCBA98");
+  iRead  (regPath_2, "0x76543210");
+  iApply();
+  iWrite (regPath_1, "0xFADE5555");  // Loopback (default protocol) will force FromSut to be updated with that value
+  iWrite (regPath_2, "0x0BADCAFE");  // Loopback (default protocol) will force FromSut to be updated with that value
+  iApply();
+  iRead  (regPath_2, "0x0BADDEED");
+  iWrite (regPath_2, "0x0BADDEAF");  // Loopback (default protocol) will force FromSut to be updated with that value
+  iApply();
+
+  // ---------------- Exercise
+  //
+  auto status = iGetStatus(false);
+
+  // ---------------- Verify
+  //
+  auto newStatus = iGetStatus(false);
+
+  TS_ASSERT_EQUALS (status,    3u);
+  TS_ASSERT_EQUALS (newStatus, 3u);
+}
 
 //! Checks iRefresh
 //!
@@ -802,7 +898,7 @@ void UT_PDL_Adapter_CPP::test_iRead_String ()
   iApply();
 
   auto xorResult = iGetMiscompares    (regPath, StringType::Hex);
-  auto status    = iGetRegisterStatus (regPath, false);
+  auto status    = iGetStatus (regPath, false);
 
   TS_ASSERT_EQUALS (status,    1u);
   TS_ASSERT_EQUALS (xorResult, "0x0176AB32EF");   // 40 bits reg

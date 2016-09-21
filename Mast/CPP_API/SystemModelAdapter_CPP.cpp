@@ -174,7 +174,6 @@ vector<AppFunctionNameAndNode> CPP_API_IMPL::LoadSystemModel (string_view filePa
 //!
 void CPP_API_IMPL::RunMast (const vector<AppFunctionAndNode>& functionsAndNodes, RunMastOptions options)
 {
-  CreateApplications(functionsAndNodes);
 
   if (IsSet(options, RunMastOptions::CheckModel))
   {
@@ -193,9 +192,11 @@ void CPP_API_IMPL::RunMast (const vector<AppFunctionAndNode>& functionsAndNodes,
      )
   {
     auto monitor = make_shared<SystemModelManagerMonitor>();
-//+    monitor->Options(ManagerMonitorOptions::All);
+    monitor->Options(ManagerMonitorOptions::Std);
     manager->Monitor(monitor);
   }
+
+  CreateApplications(functionsAndNodes);
 
   manager->Start();
   manager->StartCreatedApplicationThreads();

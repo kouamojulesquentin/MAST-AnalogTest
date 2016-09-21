@@ -29,6 +29,8 @@ using std::experimental::string_view;
 using namespace std::string_literals;
 using namespace mast;
 
+
+
 //! Monitor state of SystemModel (from parentNode) after configuration
 //!
 //! @param root SystemModel root node
@@ -127,15 +129,15 @@ void SystemModelManagerMonitor::ExportPrettyPrint (string_view step, ParentNode&
 //!
 //! @param message  A message to log
 //!
-void SystemModelManagerMonitor::LogUncondionally (string_view message)
+void SystemModelManagerMonitor::LogDebug (string_view message)
 {
-  if (!message.empty())
+  if (!message.empty() && IsSet(m_options, ManagerMonitorOptions::InternalDebug))
   {
-    LOG(INFO) << message;
+    LOG(DEBUG) << message;
   }
 }
 //
-//  End of: SystemModelManagerMonitor::LogUncondionally
+//  End of: SystemModelManagerMonitor::LogDebug
 //---------------------------------------------------------------------------
 
 
@@ -143,15 +145,15 @@ void SystemModelManagerMonitor::LogUncondionally (string_view message)
 //!
 //! @param message  A message to log
 //!
-void SystemModelManagerMonitor::LogUncondionally (string_view message, const SystemModelNode& node, string_view debugName)
+void SystemModelManagerMonitor::LogDebug (string_view message, const SystemModelNode& node, string_view debugName)
 {
-  if (!message.empty())
+  if (!message.empty() && IsSet(m_options, ManagerMonitorOptions::InternalDebug))
   {
-    LOG(INFO) << WrapDebugName(debugName) << message << NodeInfos(node);
+    LOG(DEBUG) << WrapDebugName(debugName) << message << NodeInfos(node);
   }
 }
 //
-//  End of: SystemModelManagerMonitor::LogUncondionally
+//  End of: SystemModelManagerMonitor::LogDebug
 //---------------------------------------------------------------------------
 
 
@@ -193,7 +195,10 @@ string SystemModelManagerMonitor::NodeInfos (const SystemModelNode& node)
 void SystemModelManagerMonitor::Reset ()
 {
   m_dataCyclesCount = 0;
-  LOG(INFO) << "Reseting data cycles counter";
+  if (IsSet(m_options, ManagerMonitorOptions::DataCycles))
+  {
+    LOG(INFO) << "Reseting data cycles counter";
+  }
 }
 //
 //  End of: SystemModelManagerMonitor::Reset
@@ -226,7 +231,10 @@ void SystemModelManagerMonitor::SaveToFile (string_view text, string_view basePa
 void SystemModelManagerMonitor::StartDataCycle ()
 {
   ++m_dataCyclesCount;
-  LOG(INFO) << "Starting data cycle: " << m_dataCyclesCount;
+  if (IsSet(m_options, ManagerMonitorOptions::DataCycles))
+  {
+    LOG(INFO) << "Starting data cycle: " << m_dataCyclesCount;
+  }
 }
 //
 //  End of: SystemModelManagerMonitor::StartDataCycles
@@ -235,7 +243,10 @@ void SystemModelManagerMonitor::StartDataCycle ()
 //! Monitor start of a series of new data cycles
 void SystemModelManagerMonitor::StartDataCycles ()
 {
-  LOG(INFO) << "Starting a series of data cycles";
+  if (IsSet(m_options, ManagerMonitorOptions::DataCycles))
+  {
+    LOG(INFO) << "Starting a series of data cycles";
+  }
 }
 //
 //  End of: SystemModelManagerMonitor::StartDataCycles

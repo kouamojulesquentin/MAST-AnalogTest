@@ -40,9 +40,9 @@ using namespace mast;
 using namespace std::chrono_literals;
 
 #define MONITOR(fct)                            if (m_monitor) m_monitor->fct
-#define MONITOR_MESSAGE(msg)                    if (m_monitor) m_monitor->LogUncondionally(msg)
-#define MONITOR_WITH_NODE(msg, node, debugName) if (m_monitor) m_monitor->LogUncondionally(msg, node, debugName)
-#define MONITOR_APP(msg, appData)               if (m_monitor) m_monitor->LogUncondionally(msg, *appData->pathResolver.ReferenceNode(), appData->debugName)
+#define MONITOR_MESSAGE(msg)                    if (m_monitor) m_monitor->LogDebug(msg)
+#define MONITOR_WITH_NODE(msg, node, debugName) if (m_monitor) m_monitor->LogDebug(msg, node, debugName)
+#define MONITOR_APP(msg, appData)               if (m_monitor) m_monitor->LogDebug(msg, *appData->pathResolver.ReferenceNode(), appData->debugName)
 
 
 #define PATH_RESOLVER(msg)                                        PathResolver(__FILE__, __func__, __LINE__, msg)

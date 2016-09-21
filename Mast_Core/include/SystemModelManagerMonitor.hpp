@@ -29,13 +29,17 @@ enum class ManagerMonitorOptions
 {
   Min                 = 0,
   AppThreadCreation   = 1 << 0, //!< Monitor application thread creation
-  BeforeConfiguration = 1 << 1, //!< Monitor SystemModel state before configuration
-  AfterConfiguration  = 1 << 2, //!< Monitor SystemModel state after configuration
-  ExportGml           = 1 << 3, //!< Tells whether GML graph is exported (before/after  configuration)
-  ExportPrettyPrint   = 1 << 4, //!< Tells whether a "Pretty Print" is exported (before/after  configuration)
+  ExportGml           = 1 << 1, //!< Tells whether GML graph is exported (before/after  configuration)
+  ExportPrettyPrint   = 1 << 2, //!< Tells whether a "Pretty Print" is exported (before/after  configuration)
+  DataCycles          = 1 << 3, //!< Monitor data cycle main events
+  BeforeConfiguration = 1 << 4, //!< Monitor SystemModel state before configuration
+  AfterConfiguration  = 1 << 5, //!< Monitor SystemModel state after configuration
+  InternalDebug       = 1 << 6, //!< This are message for internal manager debug (it is normally of no use for applications)
 
-  Std                 = AppThreadCreation | BeforeConfiguration | AfterConfiguration,
-  All                 = Std | ExportGml | ExportPrettyPrint,
+  Std                 = AppThreadCreation,
+  Std_Debug           = Std | InternalDebug,
+  All                 = Std | BeforeConfiguration | AfterConfiguration | ExportGml | ExportPrettyPrint,
+  All_Debug           = All | InternalDebug,
 };
 
 //! Provides monitoring of SystemModelManager behavior and SystemModel state
@@ -59,8 +63,8 @@ class DLL_EXPORT SystemModelManagerMonitor
 
   using string_view = std::experimental::string_view;
 
-  void LogUncondionally(string_view message);                                                     //!< Always log message
-  void LogUncondionally(string_view message, const SystemModelNode& node, string_view debugName); //!< Always log message (in relation with a node)
+  void LogDebug(string_view message);                                                     //!< Always log message
+  void LogDebug(string_view message, const SystemModelNode& node, string_view debugName); //!< Always log message (in relation with a node)
 
   virtual void Reset();                                                                //!< Resets data cyles counter
   virtual void CreateApplication   (const ParentNode& topNode, string_view debugName); //!< Monitors creation of application thread
@@ -69,9 +73,10 @@ class DLL_EXPORT SystemModelManagerMonitor
   virtual void BeforeConfiguration (ParentNode&       root);                           //!< Monitors state of SystemModel (from parentNode) before configuration
   virtual void AfterConfiguration  (ParentNode&       root);                           //!< Monitors state of SystemModel (from parentNode) after configuration
 
-  std::string ExportBasePath() const { return m_exportBasePath; }
 
-  void ExportBasePath (std::string exportBasePath) { m_exportBasePath = exportBasePath; }
+  std::string ExportBasePath() const { return m_exportBasePath; } //!< Returns the file path (without extension) for export files (extension depends on export type)
+
+  void ExportBasePath (std::string exportBasePath) { m_exportBasePath = exportBasePath; } //!< Set file path (without extension) for export files (extension depends on export type)
 
 
   // ---------------- Protected Methods
@@ -92,7 +97,8 @@ class DLL_EXPORT SystemModelManagerMonitor
   private:
   uint32_t              m_dataCyclesCount = 0; //!< Number of data cycles since startup or last reset
   std::string           m_exportBasePath;      //!< Base path use when exporting graph representing system model
-  ManagerMonitorOptions m_options         = ManagerMonitorOptions::Std;
+//+  ManagerMonitorOptions m_options         = ManagerMonitorOptions::Std;
+  ManagerMonitorOptions m_options         = ManagerMonitorOptions::Std_Debug;
 };
 //
 //  End of SystemModelManagerMonitor class declaration

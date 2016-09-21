@@ -211,8 +211,8 @@ vector<AppFunctionAndNodePath> CreateTestcase (shared_ptr<AccessInterfaceProtoco
 			auto regSpi	= sm->CreateRegister("reg_0", regBypassSequence, accessInterface);
 			sm->SetRoot(accessInterface);
 
-			auto topPath   = "Zybo";
-      associations   = CreateDefaultAppDescriptors(".", 1u, "reg_", loopCount);
+			associations = test::Zybo_CreateApplicationsDescriptor();
+      // associations   = CreateDefaultAppDescriptors(".", 1u, "reg_", loopCount);
 			break;
 		}
 

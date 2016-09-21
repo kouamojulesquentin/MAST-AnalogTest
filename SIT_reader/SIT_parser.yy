@@ -34,10 +34,13 @@
 #include "AppFunctionNameAndNode.hpp"
 #include "OpenOCDProtocol.hpp"
 
+#include <experimental/string_view>
+
 using std::shared_ptr;
 using std::make_shared;
 using std::dynamic_pointer_cast;
 using std::pair;
+using std::experimental::string_view;
 
 using namespace mast;
 
@@ -170,7 +173,7 @@ inline std::uint32_t extract_number(std::string s)
 %token  <std::string> t_1500_WRAPPER
 %token  <std::string> t_JTAG_TAP
 %token  <std::string> t_PDL
- 
+
 %token  <std::string> t_BASED_INTEGER
 %token		t_START_HIERARCHY
 %token		t_END_HIERARCHY
@@ -361,74 +364,71 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
 	  }
 	  else
 	  {
+      std::shared_ptr<AccessInterfaceProtocol> protocol;
+      switch(l)
+      {
+        case JTAG_Loopback :
+         protocol = make_shared<LoopbackAccessInterfaceProtocol > ();
+        case JTAG_SVF_simulation :
+         protocol = make_shared<SVF_SimulationProtocol > ();
+        case JTAG_SVF_openOCD :
+         protocol = make_shared<SVF_SimulationProtocol> ();
+        break;
+        case JTAG_SVF_Emulation :
+         protocol = make_shared<SVF_EmulationProtocol> ();
+        break;
+        case AI_protocol_t::SPI_FTDI :
+        {
+          if ($5.n_words==0)
+          {
+            std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
+            std::cerr << "Error, " << AI_protocol_table[l] <<" needs an address table\n";
+            YYERROR;
+          }
+          if (($5.n_words%3)!=0)
+          {
+            std::cerr << "Error, " << AI_protocol_table[l] <<" requires 3 addresses for each slave\n";
+          }
 
-          std::shared_ptr<AccessInterfaceProtocol> protocol;
-	  switch(l)
-	  {
-	  case JTAG_Loopback :
-	   protocol = make_shared<LoopbackAccessInterfaceProtocol > ();
-	  case JTAG_SVF_simulation :
-	   protocol = make_shared<SVF_SimulationProtocol > ();
-	  case JTAG_SVF_openOCD :
-	   protocol = make_shared<SVF_SimulationProtocol> ();
-	  break;
-	  case JTAG_SVF_Emulation :
-	   protocol = make_shared<SVF_EmulationProtocol> ();
-	  break;
-	  case AI_protocol_t::SPI_FTDI :
-	   {
-	   if ($5.n_words==0)
-	    {
-	    std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-	    std::cerr << "Error, " << AI_protocol_table[l] <<" needs an address table\n";
-	    YYERROR;
-	    }
-	    if (($5.n_words%3)!=0)
-	     {
-	      std::cerr << "Error, " << AI_protocol_table[l] <<" requires 3 addresses for each slave\n";
-	     }
-	   std::cout << "Generating " << AI_protocol_table[l] <<" Access Interface\n";
-	   auto chipselectCommands = std::vector<uint32_t>();
-	   auto readCommands = std::vector<uint32_t>();           
-	   auto writeCommands = std::vector<uint32_t>();           
-          
-	  for ( auto i=0 ; i<$5.codevalue.size();i+=3)
-	     {
-	     chipselectCommands.push_back($5.codevalue[i]);
-	     readCommands.push_back($5.codevalue[i+1]);
-	     writeCommands.push_back($5.codevalue[i+2]);
-	     }
+          std::cout << "Generating " << AI_protocol_table[l] <<" Access Interface\n";
 
-	   std::cout << "chipselectCommands (size " << chipselectCommands.size() << ") ";
-	   for (auto iter :chipselectCommands  )
-	    std::cout <<   iter << " ";
-	    std::cout << "\n" ;
-	   std::cout << "readCommands (size " << readCommands.size() << ") ";
-	   for (auto iter :readCommands  )
-	    std::cout <<   iter << " ";
-	    std::cout << "\n" ;
-	   std::cout << "writeCommands (size " << writeCommands.size() << ") ";
-	   for (auto iter :writeCommands  )
-	    std::cout <<   iter << " ";
-	    std::cout << "\n" ;
-	    
-	   if (!$4.empty())
-	     protocol = make_shared<SPI_Protocol > (chipselectCommands,readCommands,writeCommands,"");
-	   else  
-	     {
-	    auto usbDeviceID = extract_number($4);
-	     protocol = make_shared<SPI_Protocol > (chipselectCommands,readCommands,writeCommands,"",(std::uint16_t) usbDeviceID);
-	     }
+          auto chipselectCommands = std::vector<uint32_t>();
+          auto readCommands       = std::vector<uint32_t>();
+          auto writeCommands      = std::vector<uint32_t>();
 
-	   break;
-	   }
+          for ( auto i = 0 ; i < $5.codevalue.size(); i += 3)
+          {
+            chipselectCommands.push_back($5.codevalue[i]);
+            readCommands.push_back($5.codevalue[i+1]);
+            writeCommands.push_back($5.codevalue[i+2]);
+          }
 
-	  }
 
-		auto node = driver.main_sm->CreateAccessInterface($2.name, protocol);
+          auto displayContent = [](string_view name, const std::vector<uint32_t>& container)
+          {
+            std::cout << name << " (size " << std::noshowbase << container.size() << ") ";
+            for (auto item : container)
+            {
+              std::cout << "0x" << std::hex << item << " ";
+            }
+            std::cout << std::endl;
+          };
 
-  	  	$$ = node;
+          displayContent("chipselectCommands", chipselectCommands);
+          displayContent("readCommands",       readCommands);
+          displayContent("writeCommands",      writeCommands);
 
+          if ($4==0)
+            protocol = make_shared<SPI_Protocol > (std::move(chipselectCommands), std::move(readCommands), std::move(writeCommands));
+          else
+            protocol = make_shared<SPI_Protocol > (std::move(chipselectCommands), std::move(readCommands), std::move(writeCommands), "", static_cast<std::uint16_t>($4));
+
+          break;
+        } // End of: case AI_protocol_t::SPI_FTDI :
+      } // End of: switch(l)
+
+      auto node = driver.main_sm->CreateAccessInterface($2.name, protocol);
+      $$ = node;
 		}
 	  }
  |
@@ -525,7 +525,7 @@ AI_identifier:
  |
  { $$="";
  }
- 
+
 Coding_list:
  t_QUOTED_STRING
     {
@@ -545,7 +545,7 @@ t_LeftParenthesis t_QUOTED_STRING t_RightParenthesis
     $$.n_words = 1;
     }
  |
-t_LeftParenthesis t_QUOTED_STRING 
+t_LeftParenthesis t_QUOTED_STRING
     { /* '(' at far right*/
        $$.codevalue.push_back(extract_number($2));
     $$.n_words = 1;

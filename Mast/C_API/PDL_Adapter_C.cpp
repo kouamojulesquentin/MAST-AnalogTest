@@ -246,20 +246,40 @@ ErrorCode iGetRefresh_int64_t  (const char* registerPath, int64_t*  readData) { 
 
 
 
-//! Returns the number of expected read failure for a single Register
+//! Returns the number of expected read failure for a node sub-tree
 //!
-//! @param [in]  registerPath   Path to the register
+//! @note node sub-tree can be as simple as a Register
+//!
+//! @param [in]  nodePath       Path to the node
 //! @param [out] failureCount   Pointer to return the number of failures
 //! @param [in]  clearCounter   When true, the mismatch counter is reset
 //!
-DLL_EXPORT ErrorCode iGetRegisterStatus (const char* registerPath, uint32_t* failureCount, bool clearCounter)
+DLL_EXPORT ErrorCode iGetNodeStatus (const char* nodePath, uint32_t* failureCount, bool clearCounter)
 {
   auto retCode = ErrorCode::Ok;
 
   TRY_CATCH_ALL(retCode,
-                CHECK_PARAMETER_NOT_NULL(registerPath, "Register path must be not nullptr");
+                CHECK_PARAMETER_NOT_NULL(nodePath, "Node path must be not nullptr");
                 auto manager = GetAndCheckManager();
-                *failureCount = manager->iGetStatus(registerPath, clearCounter);
+                *failureCount = manager->iGetStatus(nodePath, clearCounter);
+               );
+
+  return retCode;
+}
+
+
+//! Returns the number of expected read failure for all SystemModel tree (from root)
+//!
+//! @param [out] failureCount   Pointer to return the number of failures
+//! @param [in]  clearCounter   When true, the mismatch counter is reset
+//!
+DLL_EXPORT ErrorCode iGetStatus (uint32_t* failureCount, bool clearCounter)
+{
+  auto retCode = ErrorCode::Ok;
+
+  TRY_CATCH_ALL(retCode,
+                auto manager = GetAndCheckManager();
+                *failureCount = manager->iGetStatus(clearCounter);
                );
 
   return retCode;

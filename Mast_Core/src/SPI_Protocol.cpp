@@ -17,6 +17,7 @@
 #include "Utility.hpp"
 #include <thread>
 #include <chrono>
+#include <iostream>
 
 #ifdef USE_LIBFTDISPI
 	#include <ftdispi.h>
@@ -32,54 +33,15 @@ using namespace mast;
 using namespace std::string_literals;
 
 
-
-//! Constructor from initializer_list
+//! Initializes ftdi spi library
 //!
-#ifdef USE_LIBFTDISPI
-SPI_Protocol::SPI_Protocol(initializer_list<uint32_t> chipSelectCommands,
-                           initializer_list<uint32_t> readCommands,
-                           initializer_list<uint32_t> writeCommands,
-                           string_view  commandsPrefix,
-                           uint16_t                   usbDeviceID)
-  : SPI_Player(chipSelectCommands, readCommands, writeCommands, commandsPrefix)
-{
-  m_ftdi_ctx = static_cast<ftdi_context*>(malloc(sizeof(*m_ftdi_ctx)));
-  if (ftdi_init(m_ftdi_ctx) < 0) {
-	fprintf(stderr, "ftdi_init failed\n");
-  }
-
-  int ret = ftdi_usb_open(m_ftdi_ctx, 0x0403, usbDeviceID);
-
-  if (ret < 0 && ret != -5) {
-	fprintf(stderr, "OPEN: %s\n", ftdi_get_error_string(m_ftdi_ctx));
-		exit(-1);
-	}
-
-  m_ftdispi_ctx = static_cast<ftdispi_context*>(malloc(sizeof(*m_ftdispi_ctx)));
-	ftdispi_open(m_ftdispi_ctx, m_ftdi_ctx, INTERFACE_A);
-	ftdispi_setmode(m_ftdispi_ctx, 1, 0, 0, 0, 0, 0); // CPOL and CPHA are both set to zero.
-	ftdispi_setclock(m_ftdispi_ctx, 200000);					 // Here we request a 200kHz bus speed
-	ftdispi_setloopback(m_ftdispi_ctx, 0);
-}
-#else
-SPI_Protocol::SPI_Protocol(initializer_list<uint32_t> chipSelectCommands,
-                           initializer_list<uint32_t> readCommands,
-                           initializer_list<uint32_t> writeCommands,
-                           string_view                commandsPrefix,
-                           uint16_t                   /* usbDeviceID */)
-  : SPI_Player(chipSelectCommands, readCommands, writeCommands, commandsPrefix)
-{
-}
-#endif
-//
-//  End of: SPI_Protocol::SPI_Protocol
-//---------------------------------------------------------------------------
-
-
-//! Constructor from vector
+//! @note AccessInterface derivations ids start from 1 (0 is reserved for reset command)
 //!
-//! @param addresses        Array of SPI addresses for managed derivations (value at offset 0 is reserved for reset)
-//! @param commandsPrefix   Optional text that will be prepended to actual SPI command
+//! @param chipSelectCommands   SPI chip select addresses for each derivation id
+//! @param readCommands         SPI read addresses for each derivation id
+//! @param writeCommands        SPI write addresses for each derivation id
+//! @param commandsPrefix       Optional text that will be prepended to actual SPI command
+//! @param usbDeviceID          Optional (machine specific) USB device identifier
 //!
 #ifdef USE_LIBFTDISPI
 SPI_Protocol::SPI_Protocol (vector<uint32_t> chipSelectCommands,
@@ -180,9 +142,10 @@ BinaryVector SPI_Protocol::DoAction (uint32_t derivationId, void* /* interfaceDa
   spiBufferWrite.insert(spiBufferWrite.end(), toSutDataBuffer.begin(), toSutDataBuffer.end());
 
   ftdispi_read(m_ftdispi_ctx, spiBufferRead.data(), spiBufferLength, chipSelectCommand);
+	LOG(INFO) << "SPI_WRITE(" << toSutData.DataAsMixString() << ")";
   ftdispi_write(m_ftdispi_ctx, spiBufferWrite.data(), spiBufferLength, chipSelectCommand);
 
-	vector<uint8_t> fromSutDataBuffer(&spiBufferRead[1], &spiBufferRead[bytesCount]);
+	vector<uint8_t> fromSutDataBuffer(spiBufferRead.begin()+1, spiBufferRead.end());
 
   auto fromSutData = BinaryVector::CreateFromRightAlignedBuffer(std::move(fromSutDataBuffer), bitsCount);
 

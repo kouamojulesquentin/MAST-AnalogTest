@@ -13,6 +13,7 @@
 
 #include "SystemModelManagerMonitor.hpp"
 #include "ParentNode.hpp"
+#include "BinaryVector.hpp"
 #include "GmlPrinter.hpp"
 #include "PrettyPrinter.hpp"
 #include "Utility.hpp"
@@ -73,7 +74,7 @@ void SystemModelManagerMonitor::CreateApplication (const ParentNode& topNode, st
 {
   if (IsSet(m_options, ManagerMonitorOptions::AppThreadCreation))
   {
-    LOG(INFO) << WrapDebugName(debugName) << "Creating application thread" << NodeInfos(topNode);
+    LOG(INFO) << WrapDebugName(debugName) << "Creating application thread" << NodeInfos(topNode, true);
   }
 }
 //
@@ -125,7 +126,7 @@ void SystemModelManagerMonitor::ExportPrettyPrint (string_view step, ParentNode&
 //---------------------------------------------------------------------------
 
 
-//! Always log message
+//! Logs a debug message
 //!
 //! @param message  A message to log
 //!
@@ -141,9 +142,11 @@ void SystemModelManagerMonitor::LogDebug (string_view message)
 //---------------------------------------------------------------------------
 
 
-//! Always log message (in relation with a node)
+//! Logs a debug message (in relation with a node)
 //!
-//! @param message  A message to log
+//! @param message    A message to log
+//! @param node       The node related to the message
+//! @param debugName  Application debug name
 //!
 void SystemModelManagerMonitor::LogDebug (string_view message, const SystemModelNode& node, string_view debugName)
 {
@@ -179,15 +182,85 @@ string SystemModelManagerMonitor::MakeFilePath (string_view basePath, string_vie
 
 //! Returns general information for a node
 //!
-string SystemModelManagerMonitor::NodeInfos (const SystemModelNode& node)
+string SystemModelManagerMonitor::NodeInfos (const SystemModelNode& node, bool ignoreVerboseMode) const
 {
-  return " (using top node '"s + node.Name() + "' [id: " + std::to_string(node.Identifier()) + "])";
+  string infos;
+
+  if (ignoreVerboseMode || IsSet(m_options, ManagerMonitorOptions::Verbose))
+  {
+    infos.append(" (app top node: '").append(node.Name()).append("'");
+
+    if (IsSet(m_options, ManagerMonitorOptions::InternalDebug))
+    {
+      infos.append(" [id: ").append(std::to_string(node.Identifier())).append("])");
+    }
+
+    infos.append(")");
+  }
+
+  return infos;
 }
 //
 //  End of: SystemModelManagerMonitor::NodeInfos
 //---------------------------------------------------------------------------
 
 
+//! Returns formatted node path message (when not empty)
+//!
+string SystemModelManagerMonitor::NodePath (string_view nodePath) const
+{
+  if (nodePath.empty())
+  {
+    return "";
+  }
+  return " on node '" + nodePath + "'";
+}
+//
+//  End of: SystemModelManagerMonitor::NodePath
+//---------------------------------------------------------------------------
+
+//! Logs a PDL command
+//!
+//! @param message    A PDL command message
+//! @param nodePath   Path relative to application top node (or prefix) for which the PDL command is issued
+//! @param node       Application associated top node
+//! @param debugName  Application debug name
+//!
+void SystemModelManagerMonitor::PDLCommand (string_view message, string_view nodePath, const ParentNode& node, string_view debugName)
+{
+  if (!message.empty() && IsSet(m_options, ManagerMonitorOptions::PDLCommands))
+  {
+    LOG(INFO) << WrapDebugName(debugName) << message
+              << NodePath(nodePath)
+              << NodeInfos(node);
+  }
+}
+//
+//  End of: SystemModelManagerMonitor::LogDebug
+//---------------------------------------------------------------------------
+
+
+//! Logs a PDL command with associated BinaryVector value
+//!
+//! @param message    A PDL command message
+//! @param nodePath   Path relative to application top node (or prefix) for which the PDL command is issued
+//! @param value      The PDL command value
+//! @param node       Application associated top node
+//! @param debugName  Application debug name
+//!
+void SystemModelManagerMonitor::PDLCommand (string_view message, string_view nodePath, const BinaryVector& value, const ParentNode& node, string_view debugName)
+{
+  if (!message.empty() && IsSet(m_options, ManagerMonitorOptions::PDLCommands))
+  {
+    LOG(INFO) << WrapDebugName(debugName) << message
+              << NodePath(nodePath)
+              << " with value: " << value.DataAsMixString()
+              << NodeInfos(node);
+  }
+}
+//
+//  End of: SystemModelManagerMonitor::LogDebug
+//---------------------------------------------------------------------------
 
 
 //! Resets data cyles counter

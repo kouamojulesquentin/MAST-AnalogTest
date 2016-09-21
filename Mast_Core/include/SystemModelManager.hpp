@@ -60,7 +60,6 @@ class DLL_EXPORT SystemModelManager final
   //!
   SystemModelManager(SystemModel& sm,
                      std::shared_ptr<ConfigurationAlgorithm>    configurationAlgorithm = std::make_shared<ConfigureAlgorithm_LastOrDefault>(),
-//+                     std::shared_ptr<SystemModelManagerMonitor> monitor                = std::make_shared<SystemModelManagerMonitor>()
                      std::shared_ptr<SystemModelManagerMonitor> monitor                = nullptr
                     );
 

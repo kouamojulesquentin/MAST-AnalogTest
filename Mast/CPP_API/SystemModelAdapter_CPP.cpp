@@ -129,6 +129,10 @@ vector<AppFunctionAndNode> CPP_API_IMPL::GetFunctionsAndNodes (const vector<AppF
     {
       functionAndNodes.emplace_back(it->appFunction, functionNameAndNode.node, functionNameAndNode.appName);
     }
+    else
+    {
+      LOG(WARNING) << "Found no registered function for name: '" << functionNameAndNode.appName << "' (be aware that the association is case sensitive)";
+    }
   }
 
   return functionAndNodes;

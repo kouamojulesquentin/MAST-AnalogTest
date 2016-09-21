@@ -74,10 +74,10 @@ extern SIT::SIT_Parser::location_type *my_location;
 #define OPENOCD_DEFAULT_CONFIG "openocd-ft2232.cfg"
 
 std::vector<std::string> AI_protocol_table  =
-  {"JTAG_Loopback","JTAG_SVF_simulation","JTAG_SVF_openOCD","JTAG_SVF_Emulation",
+  {"JTAG_Loopback","JTAG_SVF_simulation","JTAG_SVF_Emulation",
   "SPI_FTDI"
   };
-enum AI_protocol_t {JTAG_Loopback,JTAG_SVF_simulation,JTAG_SVF_openOCD, JTAG_SVF_Emulation, SPI_FTDI};
+enum AI_protocol_t {JTAG_Loopback,JTAG_SVF_simulation,JTAG_SVF_Emulation, SPI_FTDI};
 
 std::vector<std::string> JTAG_AI_protocol_table  =
   {"Loopback","SVF_simulation","SVF_openOCD","SVF_Emulation"
@@ -123,7 +123,23 @@ inline std::uint32_t extract_number(std::string s)
   return  result;
 }
 
+
+
+inline auto make_openOCD_protocol(std::string designName,std::uint32_t IR_size)
+{          char config_with_path[200]={""};
+          char *lpath;	  
+   	lpath = std::getenv("MAST_CONFIGURATION_PATH");
+   	if (lpath != nullptr)
+     	{
+    	 strcpy(config_with_path,lpath);
+    	 strcat( config_with_path,"/");
+    	 }
+   	strcat( config_with_path,OPENOCD_DEFAULT_CONFIG);
+   
+   return make_shared<OpenOCDProtocol> (config_with_path, designName, IR_size);
 }
+
+} /*end of %code section*/
 
 %define api.value.type variant
 %define parse.assert
@@ -371,9 +387,6 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
          protocol = make_shared<LoopbackAccessInterfaceProtocol > ();
         case JTAG_SVF_simulation :
          protocol = make_shared<SVF_SimulationProtocol > ();
-        case JTAG_SVF_openOCD :
-         protocol = make_shared<SVF_SimulationProtocol> ();
-        break;
         case JTAG_SVF_Emulation :
          protocol = make_shared<SVF_EmulationProtocol> ();
         break;
@@ -468,18 +481,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
 	     std::cerr<<"Error, OpenOCD protocol requires providing a Design Name before IR Size\n";
 	     YYERROR;
 	    }
-          char config_with_path[200]={""};
-          char *lpath;	  
-   	lpath = std::getenv("MAST_CONFIGURATION_PATH");
-   	if (lpath != nullptr)
-     	{
-    	 strcpy(config_with_path,lpath);
-    	 strcat( config_with_path,"/");
-    	 }
-   	strcat( config_with_path,OPENOCD_DEFAULT_CONFIG);
-   
-	   protocol = make_shared<OpenOCDProtocol> (config_with_path, $4, $5);
-	     std::cout<<"Created OpenOCD protocol\n";
+	   protocol=make_openOCD_protocol( $4, $5);
 	  break;
            }
 	  }

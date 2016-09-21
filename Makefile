@@ -71,12 +71,17 @@ MAKE_FLAGS= -j4
 
 OPENOCD_INSTALL_DIR=./openocd/
 
-all: debug 
+all: debug
 
-debug: openocd_debug
+ifeq ("$(USE_OPEN_OCD)","ON")
+debug:   openocd_debug
 release: openocd_release
+else
+debug:   debug_cmake
+release: release_cmake
+endif
 
-debug_cmake: 
+debug_cmake:
 ifeq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR))","")
 > $(MKDIR) $(CMAKE_DEBUG_BUILD_DIR)
 > cd       $(CMAKE_DEBUG_BUILD_DIR) && cmake $(CMAKE_DEBUG_FLAGS) ..
@@ -85,7 +90,7 @@ endif
 > $(info ==> Makefile: Build UT:     $(BUILD_UT))
 > cd $(CMAKE_DEBUG_BUILD_DIR) && make $(MAKE_FLAGS)
 
-release_cmake:  
+release_cmake:
 ifeq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR))","")
 > $(MKDIR) $(CMAKE_RELEASE_BUILD_DIR)
 > cd $(CMAKE_RELEASE_BUILD_DIR) && cmake  $(CMAKE_RELEASE_FLAGS)  ..
@@ -166,14 +171,14 @@ else
 >  @echo "    ==== No Release cpp_example available ========"
 endif
 
-openocd_debug: debug_cmake $(OPENOCD_INSTALL_DIR)/lib/libopenocd.so $(OPENOCD_INSTALL_DIR)/openocd-ft2232.cfg
 ifeq ("$(USE_OPEN_OCD)","ON")
+openocd_debug: debug_cmake $(OPENOCD_INSTALL_DIR)/lib/libopenocd.so $(OPENOCD_INSTALL_DIR)/openocd-ft2232.cfg
 > cp -f $(OPENOCD_INSTALL_DIR)/lib/libopenocd.so $(CMAKE_DEBUG_BUILD_DIR)/$(LIB_DIR)/
 > cp -f $(OPENOCD_INSTALL_DIR)/openocd-ft2232.cfg $(CMAKE_DEBUG_BUILD_DIR)/$(LIB_DIR)/
 endif
 
-openocd_release: release_cmake $(OPENOCD_INSTALL_DIR)/lib/libopenocd.so $(OPENOCD_INSTALL_DIR)/openocd-ft2232.cfg
 ifeq ("$(USE_OPEN_OCD)","ON")
+openocd_release: release_cmake $(OPENOCD_INSTALL_DIR)/lib/libopenocd.so $(OPENOCD_INSTALL_DIR)/openocd-ft2232.cfg
 > cp -f $(OPENOCD_INSTALL_DIR)/lib/libopenocd.so $(CMAKE_RELEASE_BUILD_DIR)/$(LIB_DIR)/
 > cp -f $(OPENOCD_INSTALL_DIR)/openocd-ft2232.cfg $(CMAKE_RELEASE_BUILD_DIR)/$(LIB_DIR)/
 endif

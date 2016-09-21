@@ -126,17 +126,13 @@ inline std::uint32_t extract_number(std::string s)
 
 
 inline auto make_openOCD_protocol(std::string designName,std::uint32_t IR_size)
-{          char config_with_path[200]={""};
-          char *lpath;	  
-   	lpath = std::getenv("MAST_CONFIGURATION_PATH");
-   	if (lpath != nullptr)
-     	{
-    	 strcpy(config_with_path,lpath);
-    	 strcat( config_with_path,"/");
-    	 }
-   	strcat( config_with_path,OPENOCD_DEFAULT_CONFIG);
+{
+   auto path = std::string(std::getenv("MAST_CONFIGURATION_PATH"));
+   if (path.back()!='/')
+	   path.push_back('/');
+    path.append(OPENOCD_DEFAULT_CONFIG);   
    
-   return make_shared<OpenOCDProtocol> (config_with_path, designName, IR_size);
+   return make_shared<OpenOCDProtocol> (path, designName, IR_size);
 }
 
 } /*end of %code section*/

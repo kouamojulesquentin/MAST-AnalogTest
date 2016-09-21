@@ -25,6 +25,12 @@ using std::pair;
 
 bool get_mac_address(unsigned char *mac_address);
 
+#ifdef _WIN32
+ #define DIR_SEPARATOR '\\'
+#else
+ #define DIR_SEPARATOR '/'
+#endif
+
 #ifndef _WIN32
 #include <sys/ioctl.h>
 #include <net/if.h> 
@@ -80,8 +86,6 @@ pair<bool,LicenseOptions> check_license()
     bool success = false;
     aes_context ctx;
     unsigned char buf[32];
-    char name_with_path[200]={""};
-    char *lpath;
     pair<bool,LicenseOptions> retvalue;
     
     mast_license_type *mast_license;
@@ -92,19 +96,16 @@ pair<bool,LicenseOptions> check_license()
    memset( buf, 0, 32 );
     aes_set_key( &ctx, MAST_master_key, 256 );
    
-   lpath = std::getenv("MAST_LICENSE_PATH");
-   if (lpath != nullptr)
-     {
-     strcpy(name_with_path,lpath);
-     strcat( name_with_path,"/");
-     }
-   strcat( name_with_path,LICENSE_FILE);
+   auto path = std::string(std::getenv("MAST_LICENSE_PATH"));
+   if (path.back()!=DIR_SEPARATOR)
+	   path.push_back(DIR_SEPARATOR);
+    path.append(LICENSE_FILE);   
 
-    ifstream file (name_with_path, ios::binary);
+    ifstream file (path, ios::binary);
 
  if (!file.good())
   {
-   std::cerr << "Could not find MAST license file " << name_with_path << "\n";
+   std::cerr << "Could not find MAST license file " << path << "\n";
    return retvalue;
   }
     file.seekg (0, ios::beg);

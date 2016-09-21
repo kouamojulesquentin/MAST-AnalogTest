@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <memory>
+#include <stdexcept>
 
 #include "SIT_reader.hpp"
 #include "SystemModel.hpp"
@@ -9,58 +10,75 @@
 
 using namespace mast;
 
-int
-main( const int argc, const char **argv )
+
+namespace
 {
-   /** check for the right # of arguments **/
-   if( argc == 2 )
-   {
-      auto  sm = std::make_shared<mast::SystemModel>();
+  //! Displays syntax on console
+  void DisplaySyntax()
+  {
+    std::cout << "  Use -o for pipe from std::cin\n";
+    std::cout << "  Just give a filename to parse from a file\n";
+    std::cout << "  Use -h to get this menu\n";
+  }
+} // End of unnamed namespace
+
+
+int main (const int argc, const char** argv)
+{
+  int retCode = EXIT_SUCCESS;
+
+  try
+  {
+    /** check for the right # of arguments **/
+    if (argc == 2)
+    {
+      auto sm = std::make_shared <mast::SystemModel>();
       SIT::SIT_Reader driver(sm);
 
-      /** example for piping input from terminal, i.e., using cat **/
-      if( std::strncmp( argv[ 1 ], "-o", 2 ) == 0 )
+      if (std::strncmp(argv[1], "-h", 2) == 0)  /** simple help menu **/
       {
-         driver.parse( std::cin );
-      }
-      /** simple help menu **/
-      else if( std::strncmp( argv[ 1 ], "-h", 2 ) == 0 )
-      {
-         std::cout << "use -o for pipe to std::cin\n";
-         std::cout << "just give a filename to count from a file\n";
-         std::cout << "use -h to get this menu\n";
-         return( EXIT_SUCCESS );
-      }
-      /** example reading input from a file **/
-      else
-      {
-         /** assume file, prod code, use stat to check **/
-         driver.parse( argv[1] );
+        DisplaySyntax();
+        return (EXIT_SUCCESS);
       }
 
-   std::cout << "Parsing finished\n";
+      auto sourceDescription = "";
+      if (std::strncmp(argv[1], "-o", 2) == 0) /** example for piping input from terminal, i.e., using cat **/
+      {
+        sourceDescription = "cin";
+        driver.parse(std::cin);
+      }
+      else  /** example reading input from a file **/
+      {
+        sourceDescription = argv[1];
+        driver.parse(argv[1]);  /** example reading input from a file **/
+      }
 
-   if (driver.parsed_sut==nullptr)
-     {
-      /** exit with failure condition **/
-      return ( EXIT_FAILURE );
-     }
+      std::cout << "Parsing finished\n";
 
-//   PrettyPrinter prettyPrinter(PrettyPrinterOptions::ShowSelectorProperties);
-   PrettyPrinter prettyPrinter(PrettyPrinterOptions::ShowNodeIsIgnored);
+      if (driver.parsed_sut == nullptr)
+      {
+        std::cerr << "Failed to parse from: " << sourceDescription;
+        return (EXIT_FAILURE);
+      }
 
-   driver.parsed_sut->Accept(prettyPrinter);
-   auto gotPretty      = prettyPrinter.PrettyPrint();
-   std::cout << gotPretty << "\n";
-   auto result= sm->Check();
-   std::cout << "Model Check returns " << result.MakeReport();
-   }
-   else
-   {
-      /** exit with failure condition **/
-      return ( EXIT_FAILURE );
-   }
+      auto gotPretty = PrettyPrinter::PrettyPrint(driver.parsed_sut, PrettyPrinterOptions::ShowNodeIsIgnored); // PrettyPrinterOptions::ShowSelectorProperties
+      std::cout << gotPretty << "\n";
+      auto result = sm->Check();
+      std::cout << "Model Check returns " << result.MakeReport();
+    }
+    else
+    {
+      std::cerr << std::endl << "Missing command line parameter!" << std::endl;
+      DisplaySyntax();
+      return (EXIT_FAILURE);
+    }
+  }
+  catch(std::invalid_argument& exc) { retCode = EXIT_FAILURE; std::cout << exc.what(); }
+  catch(std::out_of_range&     exc) { retCode = EXIT_FAILURE; std::cout << exc.what(); }
+  catch(std::logic_error&      exc) { retCode = EXIT_FAILURE; std::cout << exc.what(); }
+  catch(std::runtime_error&    exc) { retCode = EXIT_FAILURE; std::cout << exc.what(); }
+  catch(std::exception&        exc) { retCode = EXIT_FAILURE; std::cout << exc.what(); }
+  catch(...)                        { retCode = EXIT_FAILURE; std::cout << "Got non std::exception"; }
 
-
-   return( EXIT_SUCCESS );
+  return (retCode);
 }

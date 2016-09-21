@@ -44,6 +44,10 @@ using namespace std::chrono_literals;
 #define MONITOR_WITH_NODE(msg, node, debugName) if (m_monitor) m_monitor->LogDebug(msg, node, debugName)
 #define MONITOR_APP(msg, appData)               if (m_monitor) m_monitor->LogDebug(msg, *appData->pathResolver.ReferenceNode(), appData->debugName)
 
+#define MONITOR_PDL(msg, appData)                        if (m_monitor) m_monitor->PDLCommand(msg, "",          *appData->pathResolver.ReferenceNode(), appData->debugName)
+#define MONITOR_PDL_EX(msg, path, appData)               if (m_monitor) m_monitor->PDLCommand(msg, path,        *appData->pathResolver.ReferenceNode(), appData->debugName)
+#define MONITOR_PDL_AND_VALUE(msg, path, value, appData) if (m_monitor) m_monitor->PDLCommand(msg, path, value, *appData->pathResolver.ReferenceNode(), appData->debugName)
+
 
 #define PATH_RESOLVER(msg)                                        PathResolver(__FILE__, __func__, __LINE__, msg)
 #define MUTABLE_PATH_RESOLVER(msg)  const_cast<NodePathResolver&>(PathResolver(__FILE__, __func__, __LINE__, msg))
@@ -326,6 +330,8 @@ void SystemModelManager::iApply ()
   auto appData           = ThreadApplicationData();
   *appData->currentState = ApplicationData::State::InApply;
 
+  MONITOR_PDL("iApply - Processing queued requests", appData);
+
   ProcessQueuedRequests(appData);
 
   auto threadId = std::this_thread::get_id();
@@ -392,9 +398,13 @@ void SystemModelManager::iGet_impl (string_view registerPath, T& readData)
   auto& pathResolver = PATH_RESOLVER("iGet: ");
   auto reg           = pathResolver.ResolveAsRegister(registerPath);
 
-  unique_lock<recursive_mutex> lock(m_dataMutex); // We must protect for the register been updated just when we read it
+  {
+    unique_lock<recursive_mutex> lock(m_dataMutex); // We must protect for the register been updated just when we read it
 
-  reg->LastFromSut(readData);
+    reg->LastFromSut(readData);
+  }
+
+  MONITOR_PDL_EX("iGet ", registerPath, ThreadApplicationData());
 }
 //
 //  End of: SystemModelManager::iGet_impl
@@ -492,6 +502,8 @@ uint32_t SystemModelManager::iGetStatus (string_view nodePath, bool clearCounter
   auto& pathResolver = PATH_RESOLVER("iGetStatus: ");
   auto  node         = pathResolver.Resolve(nodePath);
 
+  MONITOR_PDL_EX("iGetStatus ", nodePath, ThreadApplicationData());
+
   return iGetStatus(node, clearCounter);
 }
 //
@@ -531,6 +543,8 @@ string SystemModelManager::iPrefix ()
 //!
 void SystemModelManager::iPrefix (std::string prefix)
 {
+  MONITOR_PDL_EX("iPrefix ", prefix, ThreadApplicationData());
+
   auto&  pathResolver = MUTABLE_PATH_RESOLVER("iPrefix: ");
   pathResolver.SetPrefix(std::move(prefix));
 }
@@ -556,7 +570,9 @@ void SystemModelManager::iRead_impl (string_view registerPath, T expectedValue)
   expectedAsBV.Set(std::move(expectedValue));
 
   auto appData = ThreadApplicationData();
-  MONITOR_APP("iRead - Queuing request", appData);
+
+  MONITOR_PDL_AND_VALUE("iRead - Queuing request", registerPath, expectedAsBV, appData);
+
   appData->queuedReads.emplace_back(SystemModelManager::QueuedRequest(reg->Identifier(), std::move(expectedAsBV)));
 
   *appData->currentState = ApplicationData::State::ReadRequest;
@@ -589,7 +605,7 @@ void SystemModelManager::iRefresh (string_view registerPath)
   auto  reg          = pathResolver.ResolveAsRegister(registerPath);
 
   auto appData = ThreadApplicationData();
-  MONITOR_APP("iRefresh - Queuing request", appData);
+  MONITOR_PDL_EX("iRefresh - Queued request", registerPath, appData);
   appData->queuedRefreshes.emplace_back(SystemModelManager::QueuedRequest(reg->Identifier()));
 
   *appData->currentState = ApplicationData::State::RefreshRequest;
@@ -613,8 +629,7 @@ void SystemModelManager::iWrite_impl (string_view registerPath, T value)
 
   auto appData = ThreadApplicationData();
 
-  MONITOR_APP("iWrite - Queuing request", appData);
-
+  MONITOR_PDL_AND_VALUE("iWrite - Queuing request", registerPath, asBinaryVector, appData);
   appData->queuedWrites.emplace_back(SystemModelManager::QueuedRequest(reg->Identifier(), std::move(asBinaryVector)));
 
   *appData->currentState = ApplicationData::State::WriteRequest;

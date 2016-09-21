@@ -15,6 +15,7 @@
 #include "Startup.hpp"
 #include "SystemModel.hpp"
 #include "SystemModelManager.hpp"
+#include "SystemModelManagerMonitor.hpp"
 #include "g3log/g3log.hpp"
 #include "g3log/logworker.hpp"
 #include "CustomFileSink.h"
@@ -42,7 +43,7 @@ std::unique_ptr<g3::LogWorker> InitializeLogger ()
   logFormatter.ShowTime(true);
   logFormatter.ShowFileName(false);
   logFormatter.ShowFunctionName(true);
-  logFormatter.ShowLineNumber(true);
+  logFormatter.ShowLineNumber(false);
 
   auto customSink = std::make_unique<g3::CustomFileSink>("Log.txt", g3::CustomFileSink::FlushMode::AutoBackground, logFormatter);
   customSink->Clear();
@@ -104,7 +105,10 @@ shared_ptr<SystemModelManager> Startup::GetManager ()
   if (!sm_manager)
   {
     auto sm    = GetSystemModel();
-    sm_manager = make_shared<mast::SystemModelManager>(*sm);
+
+    auto defaultConfigAlgo = make_shared<ConfigureAlgorithm_LastOrDefault>();
+    auto monitor           = make_shared<SystemModelManagerMonitor>(ManagerMonitorOptions::Std);
+    sm_manager             = make_shared<mast::SystemModelManager>(*sm, defaultConfigAlgo, monitor);
   }
   return sm_manager;
 }

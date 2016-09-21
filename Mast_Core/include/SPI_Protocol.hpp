@@ -20,8 +20,8 @@
 #include <string>
 #include <experimental/string_view>
 
-struct ftdi_context; 
-struct ftdispi_context; 
+struct ftdi_context;
+struct ftdispi_context;
 
 namespace mast
 {
@@ -35,8 +35,11 @@ class DLL_EXPORT SPI_Protocol final : public SPI_Player
   public:
   ~SPI_Protocol();
   SPI_Protocol() = delete;
-  SPI_Protocol(std::initializer_list<uint32_t> chipSelectCommands, std::initializer_list<uint32_t> readCommands, std::initializer_list<uint32_t> writeCommands, std::experimental::string_view commandsPrefix = "", uint16_t usbDeviceID=0x6010u);
-  SPI_Protocol(std::vector<uint32_t>           chipSelectCommands, std::vector<uint32_t>           readCommands, std::vector<uint32_t>           writeCommands, std::experimental::string_view commandsPrefix = "", uint16_t usbDeviceID=0x6010u);
+  SPI_Protocol(std::vector<uint32_t>          chipSelectCommands,
+               std::vector<uint32_t>          readCommands,
+               std::vector<uint32_t>          writeCommands,
+               std::experimental::string_view commandsPrefix = "",
+               uint16_t                       usbDeviceID    = 0x6010u);
 
   //! Does any action required to transfer scan data to and from SUT
   //!
@@ -53,12 +56,10 @@ class DLL_EXPORT SPI_Protocol final : public SPI_Player
   virtual std::experimental::string_view KindName() const override { return "SPI_"; }
 
   protected:
-	#ifdef USE_LIBFTDISPI
-
-  struct ftdi_context *m_ftdi_ctx = nullptr;
-  struct ftdispi_context *m_ftdispi_ctx = nullptr;
-
-	#endif
+  #ifdef  USE_LIBFTDISPI
+  ftdi_context*    m_ftdi_ctx    = nullptr;
+  ftdispi_context* m_ftdispi_ctx = nullptr;
+  #endif
 };
 //
 //  End of SPI_Protocol class declaration

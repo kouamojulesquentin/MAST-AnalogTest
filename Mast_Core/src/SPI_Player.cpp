@@ -25,38 +25,21 @@ using std::initializer_list;
 using namespace mast;
 using namespace std::string_literals;
 
-//! Constructor from initializer_list
+
+//! Saves address values that will further be used to build SPI commands
 //!
-SPI_Player::SPI_Player(std::initializer_list<uint32_t> chipSelectCommands, std::initializer_list<uint32_t> readCommands, std::initializer_list<uint32_t> writeCommands, std::experimental::string_view commandsPrefix)
+SPI_Player::SPI_Player(vector<uint32_t> chipSelectCommands,
+                       vector<uint32_t> readCommands,
+                       vector<uint32_t> writeCommands,
+                       string_view      commandsPrefix)
   : m_commandPrefix 			(commandsPrefix)
-	, m_chipSelectCommands 	(chipSelectCommands)
-  , m_readCommands  			(readCommands)
-  , m_writeCommands 			(writeCommands)
+  , m_chipSelectCommands  (std::move(chipSelectCommands))
+  , m_readCommands        (std::move(readCommands))
+  , m_writeCommands       (std::move(writeCommands))
 {
-  if ((chipSelectCommands.size() < 2)
-			|| (readCommands.size() < 2)
-      || (writeCommands.size() < 2))
-  {
-    THROW_INVALID_ARGUMENT("Chip select, Read and write SPI commands must have at least two entries each");
-  }
-}
-//
-//  End of: SPI_Player::SPI_Player
-//---------------------------------------------------------------------------
-
-
-SPI_Player::SPI_Player(std::vector<uint32_t> chipSelectCommands, std::vector<uint32_t> readCommands, std::vector<uint32_t>           writeCommands, std::experimental::string_view commandsPrefix)
-  : m_commandPrefix 			(commandsPrefix)
-  , m_chipSelectCommands 	(chipSelectCommands)
-  , m_readCommands  			(readCommands)
-  , m_writeCommands 			(writeCommands)
-{
-  if ((chipSelectCommands.size() < 2)
-			|| (readCommands.size() < 2)
-      || (writeCommands.size() < 2))
-  {
-    THROW_INVALID_ARGUMENT("Chip select, Read and write SPI commands must have at least two entries each");
-  }
+  CHECK_PARAMETER_GTE(m_chipSelectCommands.size(), 2, "Chips select commands must have at least two elements");
+  CHECK_PARAMETER_GTE(m_readCommands.size(),       2, "Read commands must have at least two elements");
+  CHECK_PARAMETER_GTE(m_chipSelectCommands.size(), 2, "Write commands must have at least two elements");
 }
 //
 //  End of: SPI_Player::SPI_Player
@@ -72,7 +55,6 @@ SPI_Player::SPI_Player(std::vector<uint32_t> chipSelectCommands, std::vector<uin
 string SPI_Player::CreateSPICommand (uint32_t derivationId, const BinaryVector& toSutData)
 {
   ostringstream os;
-  string_view commandType;
 
   if (derivationId == 0)
   {
@@ -80,11 +62,11 @@ string SPI_Player::CreateSPICommand (uint32_t derivationId, const BinaryVector& 
   }
   else
   {
-		auto chipSelectCommand = GetChipSelectCommand(derivationId);
-    auto readCommand = GetReadCommand(derivationId);
-    auto writeCommand = GetWriteCommand(derivationId);
+    auto chipSelectCommand = GetChipSelectCommand(derivationId);
+    auto readCommand       = GetReadCommand(derivationId);
+    auto writeCommand      = GetWriteCommand(derivationId);
 
-    os << m_commandPrefix << "SPI_READ(0x"  << std::hex << readCommand << ", " << std::hex << chipSelectCommand << ")\n";
+    os << m_commandPrefix << "SPI_READ(0x"  << std::hex << readCommand  << ", " << std::hex << chipSelectCommand << ")\n";
     os << m_commandPrefix << "SPI_WRITE(0x" << std::hex << writeCommand << ", " << toSutData.DataAsMixString() << ", " << std::hex << chipSelectCommand << ")\n";
   }
 

@@ -17,6 +17,7 @@
 #include "Utility.hpp"
 #include <thread>
 #include <chrono>
+#include <iostream>
 
 #ifdef USE_LIBFTDISPI
 	#include <ftdispi.h>
@@ -180,9 +181,10 @@ BinaryVector SPI_Protocol::DoAction (uint32_t derivationId, void* /* interfaceDa
   spiBufferWrite.insert(spiBufferWrite.end(), toSutDataBuffer.begin(), toSutDataBuffer.end());
 
   ftdispi_read(m_ftdispi_ctx, spiBufferRead.data(), spiBufferLength, chipSelectCommand);
+	LOG(INFO) << "SPI_WRITE(" << toSutData.DataAsMixString() << ")";
   ftdispi_write(m_ftdispi_ctx, spiBufferWrite.data(), spiBufferLength, chipSelectCommand);
 
-	vector<uint8_t> fromSutDataBuffer(&spiBufferRead[1], &spiBufferRead[bytesCount]);
+	vector<uint8_t> fromSutDataBuffer(spiBufferRead.begin()+1, spiBufferRead.end());
 
   auto fromSutData = BinaryVector::CreateFromRightAlignedBuffer(std::move(fromSutDataBuffer), bitsCount);
 

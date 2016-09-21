@@ -418,10 +418,13 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
           displayContent("readCommands",       readCommands);
           displayContent("writeCommands",      writeCommands);
 
-          if ($4==0)
+	   if (!$4.empty())
             protocol = make_shared<SPI_Protocol > (std::move(chipselectCommands), std::move(readCommands), std::move(writeCommands));
           else
-            protocol = make_shared<SPI_Protocol > (std::move(chipselectCommands), std::move(readCommands), std::move(writeCommands), "", static_cast<std::uint16_t>($4));
+            {
+    	    auto usbDeviceID = extract_number($4);
+		protocol = make_shared<SPI_Protocol > (std::move(chipselectCommands), std::move(readCommands), std::move(writeCommands), "", static_cast<std::uint16_t>(usbDeviceID));
+		}
 
           break;
         } // End of: case AI_protocol_t::SPI_FTDI :

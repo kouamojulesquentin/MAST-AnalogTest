@@ -7,6 +7,7 @@ CMAKE_ARM_BUILD_DIR     = cmake_arm
 #+CMAKE_DEBUG_BUILD_MAKEFILE =$(CMAKE_DEBUG_BUILD_DIR)/Makefile
 
 CMAKE_FLAGS=  -DCMAKE_CXX_COMPILER=g++
+LIB_DIR              = Lib
 
 ifeq ($(OS), Windows_NT)
 $(info ==> Building for Windows)
@@ -68,9 +69,11 @@ CMAKE_ARM_FLAGS= -D CMAKE_TOOLCHAIN_FILE=Toolchain-arm.cmake -DUSE_OPEN_OCD:BOOL
 
 MAKE_FLAGS= -j4
 
-all: debug
+OPENOCD_INSTALL_DIR=./openocd/
 
-debug:
+all: debug 
+
+debug: openocd_debug
 ifeq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR))","")
 > $(MKDIR) $(CMAKE_DEBUG_BUILD_DIR)
 > cd       $(CMAKE_DEBUG_BUILD_DIR) && cmake $(CMAKE_DEBUG_FLAGS) ..
@@ -79,7 +82,7 @@ endif
 > $(info ==> Makefile: Build UT:     $(BUILD_UT))
 > cd $(CMAKE_DEBUG_BUILD_DIR) && make $(MAKE_FLAGS)
 
-release:
+release:  openocd_release
 ifeq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR))","")
 > $(MKDIR) $(CMAKE_RELEASE_BUILD_DIR)
 > cd $(CMAKE_RELEASE_BUILD_DIR) && cmake  $(CMAKE_RELEASE_FLAGS)  ..
@@ -160,7 +163,17 @@ else
 >  @echo "    ==== No Release cpp_example available ========"
 endif
 
+openocd_debug: $(OPENOCD_INSTALL_DIR)/lib/libopenocd.so $(OPENOCD_INSTALL_DIR)/openocd-ft2232.cfg
+ifeq ("$(USE_OPEN_OCD)","ON")
+> cp -f $(OPENOCD_INSTALL_DIR)/lib/libopenocd.so $(CMAKE_DEBUG_BUILD_DIR)/$(LIB_DIR)/
+> cp -f $(OPENOCD_INSTALL_DIR)/openocd-ft2232.cfg $(CMAKE_DEBUG_BUILD_DIR)/$(LIB_DIR)/
+endif
 
+openocd_release: $(OPENOCD_INSTALL_DIR)/lib/libopenocd.so $(OPENOCD_INSTALL_DIR)/openocd-ft2232.cfg
+ifeq ("$(USE_OPEN_OCD)","ON")
+> cp -f $(OPENOCD_INSTALL_DIR)/lib/libopenocd.so $(CMAKE_RELEASE_BUILD_DIR)/$(LIB_DIR)/
+> cp -f $(OPENOCD_INSTALL_DIR)/openocd-ft2232.cfg $(CMAKE_RELEASE_BUILD_DIR)/$(LIB_DIR)/
+endif
 
 run_arm:
 >  @echo "    ==== No run defined for ARM build (needs qemu) ========"

@@ -32,6 +32,7 @@
 #include "I2C_Player.hpp"
 #include "SPI_Protocol.hpp"
 #include "AppFunctionNameAndNode.hpp"
+#include "OpenOCDProtocol.hpp"
 
 using std::shared_ptr;
 using std::make_shared;
@@ -49,6 +50,7 @@ using namespace mast;
    #include <iostream>
    #include <cstdlib>
    #include <fstream>
+   #include <string.h>
 
    /* include for all driver functions */
    #include "SIT_reader.hpp"
@@ -65,6 +67,8 @@ using namespace mast;
 
 extern int nlines;
 extern SIT::SIT_Parser::location_type *my_location;
+
+#define OPENOCD_DEFAULT_CONFIG "openocd-ft2232.cfg"
 
 std::vector<std::string> AI_protocol_table  =
   {"JTAG_Loopback","JTAG_SVF_simulation","JTAG_SVF_openOCD","JTAG_SVF_Emulation",
@@ -149,7 +153,7 @@ inline std::uint32_t extract_number(std::string s)
 %type  <std::shared_ptr<mast::SystemModelNode>> parent_node_with_children
 %type  <std::vector<std::string>> function_list
 %type  <std::vector<std::string>> PDL_declaration
-%type  <std::uint32_t> AI_identifier
+%type  <std::string> AI_identifier
 %token               END    0     "end of file"
 %token               UPPER
 %token               LOWER
@@ -408,10 +412,13 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
 	    std::cout <<   iter << " ";
 	    std::cout << "\n" ;
 	    
-	   if ($4==0)
+	   if (!$4.empty())
 	     protocol = make_shared<SPI_Protocol > (chipselectCommands,readCommands,writeCommands,"");
 	   else  
-	     protocol = make_shared<SPI_Protocol > (chipselectCommands,readCommands,writeCommands,"",(std::uint16_t) $4);
+	     {
+	    auto usbDeviceID = extract_number($4);
+	     protocol = make_shared<SPI_Protocol > (chipselectCommands,readCommands,writeCommands,"",(std::uint16_t) usbDeviceID);
+	     }
 
 	   break;
 	   }
@@ -425,7 +432,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
 		}
 	  }
  |
-  t_JTAG_TAP node_name JTAG_protocol IR_size IR_TABLE n_DR_chains
+  t_JTAG_TAP node_name JTAG_protocol AI_identifier IR_size IR_TABLE n_DR_chains 
       {
       {
   	{
@@ -452,11 +459,28 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
 	   protocol = make_shared<SVF_EmulationProtocol > ();
 	  break;
 	  case SVF_openOCD :
-	   protocol = make_shared<SVF_SimulationProtocol> ();
+	   {
+	   if ($4.empty())
+	    {
+	     std::cerr<<"Error, OpenOCD protocol requires providing a Design Name before IR Size\n";
+	     YYERROR;
+	    }
+          char config_with_path[200]={""};
+          char *lpath;	  
+   	lpath = std::getenv("MAST_CONFIGURATION_PATH");
+   	if (lpath != nullptr)
+     	{
+    	 strcpy(config_with_path,lpath);
+    	 strcat( config_with_path,"/");
+    	 }
+   	strcat( config_with_path,OPENOCD_DEFAULT_CONFIG);
+   
+	   protocol = make_shared<OpenOCDProtocol> (config_with_path, $4, $5);
+	     std::cout<<"Created OpenOCD protocol\n";
 	  break;
-
+           }
 	  }
-	 auto node = driver.builder->Create_JTAG_TAP($2.name,$4,$6+1,protocol);
+	 auto node = driver.builder->Create_JTAG_TAP($2.name,$5,$7+1,protocol);
   	 $$ = node;
 	 }
 	}
@@ -496,10 +520,10 @@ t_LeftBracket Coding_list t_RightBracket  {$$=$2;}
 AI_identifier:
  t_QUOTED_STRING
     {
-       $$ = extract_number($1);
+       $$ = $1;
     }
  |
- { $$=0;
+ { $$="";
  }
  
 Coding_list:

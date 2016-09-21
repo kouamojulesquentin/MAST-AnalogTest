@@ -72,7 +72,12 @@ extern int nlines;
 extern SIT::SIT_Parser::location_type *my_location;
 
 #define OPENOCD_DEFAULT_CONFIG "openocd-ft2232.cfg"
-
+#ifdef _WIN32
+ #define DIR_SEPARATOR '\\'
+#else
+ #define DIR_SEPARATOR '/'
+#endif
+ 
 std::vector<std::string> AI_protocol_table  =
   {"JTAG_Loopback","JTAG_SVF_simulation","JTAG_SVF_Emulation",
   "SPI_FTDI"
@@ -128,10 +133,9 @@ inline std::uint32_t extract_number(std::string s)
 inline auto make_openOCD_protocol(std::string designName,std::uint32_t IR_size)
 {
    auto path = std::string(std::getenv("MAST_CONFIGURATION_PATH"));
-   if (path.back()!='/')
-	   path.push_back('/');
+   if (path.back()!=DIR_SEPARATOR)
+	   path.push_back(DIR_SEPARATOR);
     path.append(OPENOCD_DEFAULT_CONFIG);   
-   
    return make_shared<OpenOCDProtocol> (path, designName, IR_size);
 }
 

@@ -193,7 +193,7 @@ void CPP_API_IMPL::RunMast (const vector<AppFunctionAndNode>& functionsAndNodes,
      )
   {
     auto monitor = make_shared<SystemModelManagerMonitor>();
-    monitor->Options(ManagerMonitorOptions::All);
+//+    monitor->Options(ManagerMonitorOptions::All);
     manager->Monitor(monitor);
   }
 
@@ -218,16 +218,16 @@ void mast::CheckSystemModel ()
   {
     if (checkResult.infosCount == 0)
     {
-      LOG(DEBUG) << "System model is correct";
+      LOG(INFO) << "System model is correct";
     }
     else
     {
-      LOG(DEBUG) << "System model infos: " << checkResult.infos;
+      LOG(INFO) << "System model infos: " << checkResult.infos;
     }
   }
   else
   {
-    LOG(DEBUG) << checkResult.MakeReport();
+    LOG(WARNING) << checkResult.MakeReport();
 
     if (checkResult.HasErrors())
     {

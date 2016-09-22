@@ -207,8 +207,10 @@ std::shared_ptr<Chain> SystemModelBuilder::Create_1500_Wrapper (string_view name
 //!  @param muxPathsCount     DR number of path (at least two)
 //! 
 //!
-shared_ptr<mast::PathSelector> SystemModelBuilder::Create_bynary_DR_MUX_path_selector (shared_ptr<Register>        ir,                            
-                                                           uint32_t                            muxPathsCount)
+shared_ptr<mast::PathSelector> SystemModelBuilder::Create_bynary_DR_MUX_path_selector (
+			shared_ptr<Register>        ir,                            
+                        uint32_t                    muxPathsCount,
+			std::vector<uint32_t>	coding)
 {
   CHECK_PARAMETER_GT       (muxPathsCount, 1, "muxPathsCount must be > 1");
 
@@ -222,7 +224,7 @@ shared_ptr<mast::PathSelector> SystemModelBuilder::Create_bynary_DR_MUX_path_sel
   auto selectTable = DefaultBinaryPathSelector::CreateSelectTable(irBitsCount, muxPathsCount, SelectorProperty::Binary_Default);
   selectTable[0] = irBypassSequence;  // Not used (path id zero)
   selectTable[1] = irBypassSequence;  // Bypass register
-
+  coding.push_back(0); //dummy operation to avoid warning
   // Deselect table is by default all bypass sequence
   auto deselectTable = DefaultTableBasedPathSelector::TablesType(muxPathsCount + 1u, irBypassSequence);
 
@@ -276,7 +278,7 @@ shared_ptr<AccessInterface> SystemModelBuilder::Create_JTAG_TAP (string_view    
   auto irBypassSequence = BinaryVector(irBitsCount, 0xFF);
   auto ir               = m_model.CreateRegister(irName, irBypassSequence, true, accessInterface);
 
-  auto pathSelector =  Create_bynary_DR_MUX_path_selector (ir,muxPathsCount);
+  auto pathSelector =  Create_bynary_DR_MUX_path_selector (ir,muxPathsCount,std::vector<uint32_t>());
 
   // ---------------- Create Linker
   //

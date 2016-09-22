@@ -82,7 +82,8 @@ class DLL_EXPORT SystemModelBuilder final
   //!
   std::shared_ptr<mast::PathSelector> Create_bynary_DR_MUX_path_selector (
                                                     std::shared_ptr<Register>        ir, 
-						    uint32_t                            muxPathsCount);
+						    uint32_t                            muxPathsCount,
+						    std::vector<uint32_t>	coding);
 
   //! Creates a JTAG TAP
   //!

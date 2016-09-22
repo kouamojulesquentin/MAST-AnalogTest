@@ -989,8 +989,207 @@ void UT_BinaryVector::test_DataAsBinaryString_Without_Separators ()
 }
 
 
+//! Checks BinaryVector::CompareEqualTo with empty mask when they are equal
+//!
+void UT_BinaryVector::test_CompareEqualTo_With_EmptyMask_Equal ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto sut       = BinaryVector::CreateFromString(data);
+    auto rhs       = BinaryVector::CreateFromString(data);
+    auto emptyMask = BinaryVector();
+
+    // ---------------- Exercise
+    //
+    bool areEqual = sut.CompareEqualTo(rhs, emptyMask);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_TRUE (areEqual);
+  };
+
+  auto data =
+  {
+    "0b",              // 00
+    "0b0",             // 01
+    "0b1",             // 02
+    "0b01",            // 03
+    "0b10",            // 04
+    "0b1011",          // 05
+    "0b0110_0101",     // 06
+    "0b1110_0000:1",   // 07
+    "0b1110_0010:10",  // 08
+    "0xE29EA/b1",      // 09
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
 
 
+//! Checks BinaryVector::CompareEqualTo with empty mask when they are not equal
+//!
+void UT_BinaryVector::test_CompareEqualTo_With_EmptyMask_NotEqual ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto sut       = BinaryVector::CreateFromString(std::get<0>(data));
+    auto rhs       = BinaryVector::CreateFromString(std::get<1>(data));
+    auto emptyMask = BinaryVector();
+
+    // ---------------- Exercise
+    //
+    bool areEqual = sut.CompareEqualTo(rhs, emptyMask);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_FALSE (areEqual);
+  };
+
+  auto data =
+  {
+    make_tuple("0b",             "0b0"),            // 00
+    make_tuple("0b0",            "0b1"),            // 01
+    make_tuple("0b1",            "0b11"),           // 02
+    make_tuple("0b01",           "0b001"),          // 03
+    make_tuple("0b10",           "0b"),             // 04
+    make_tuple("0b1011",         "0b1010"),         // 05
+    make_tuple("0b0110_0101",    "0b0110_010"),     // 06
+    make_tuple("0b1110_0000:1",  "0b1110_0000:0"),  // 07
+    make_tuple("0b1110_0010:10", "0b1110_0110:10"), // 08
+    make_tuple("0xE29EA/b1",     "0xE29EA/b0"),     // 09
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::CompareEqualTo with non empty mask when they are equal
+//!
+void UT_BinaryVector::test_CompareEqualTo_With_Mask_Equal ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto sut       = BinaryVector::CreateFromString(std::get<0>(data));
+    auto rhs       = BinaryVector::CreateFromString(std::get<1>(data));
+    auto emptyMask = BinaryVector::CreateFromString(std::get<2>(data));
+
+    // ---------------- Exercise
+    //
+    bool areEqual = sut.CompareEqualTo(rhs, emptyMask);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_TRUE (areEqual);
+  };
+
+  auto data =
+  {
+    make_tuple("0b0",         "0b0",         "0b0"),         // 00
+    make_tuple("0b1",         "0b0",         "0b0"),         // 01
+    make_tuple("0b0",         "0b0",         "0b1"),         // 02
+    make_tuple("0b01",        "0b01",        "0b11"),        // 03
+    make_tuple("0b10",        "0b11",        "0b10"),        // 04
+    make_tuple("0b1011",      "0b1000",      "0b1100"),      // 05
+    make_tuple("0xFADE/b110", "0xFADE/b110", "0xFFFF/b111"), // 06
+    make_tuple("0xFADE/b110", "0xF55E/b110", "0xF00F/b111"), // 07
+    make_tuple("0xFADE/b110", "0xFADE/b000", "0xFFFF/b000"), // 08
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::CompareEqualTo with non empty mask when they are NOT equal
+//!
+void UT_BinaryVector::test_CompareEqualTo_With_Mask_NotEqual ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto sut       = BinaryVector::CreateFromString(std::get<0>(data));
+    auto rhs       = BinaryVector::CreateFromString(std::get<1>(data));
+    auto emptyMask = BinaryVector::CreateFromString(std::get<2>(data));
+
+    // ---------------- Exercise
+    //
+    bool areEqual = sut.CompareEqualTo(rhs, emptyMask);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_FALSE (areEqual);
+  };
+
+  auto data = //  lhs         rhs               mask
+  {
+    make_tuple("0b0",         "0b1",          "0b1"),          // 00
+    make_tuple("0b1",         "0b0",          "0b1"),          // 01
+    make_tuple("0b01",        "0b11",         "0b11"),         // 02
+    make_tuple("0b10",        "0b01",         "0b10"),         // 03
+    make_tuple("0b1011",      "0b0001",       "0b1101"),       // 04
+    make_tuple("0b0110_0101", "0b0111_0111",  "0b1111_0000"),  // 05
+    make_tuple("0xFADE/b110", "0xFADE/b010",  "0xFFFF/b111"),  // 06
+    make_tuple("0xFADE/b110", "0xFADE/b010",  "0xF00F/b111"),  // 07
+    make_tuple("0xFADE/b110", "0xFADE/b01",   "0xFFFF/b111"),  // 08
+    make_tuple("0xFADE/b110", "0xFADE/b0111", "0xFFFF/b1111"), // 09
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::CompareEqualTo with non empty mask when the mask has not the proper size
+//!
+void UT_BinaryVector::test_CompareEqualTo_With_Mask_BadSize ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto sut       = BinaryVector::CreateFromString(std::get<0>(data));
+    auto rhs       = BinaryVector::CreateFromString(std::get<1>(data));
+    auto emptyMask = BinaryVector::CreateFromString(std::get<2>(data));
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (sut.CompareEqualTo(rhs, emptyMask), std::exception);
+  };
+
+  auto data = //  lhs         rhs            mask
+  {
+    make_tuple("0b0",         "0b1",         "0b000"),      // 00
+    make_tuple("0b1",         "0b0",         "0b11"),       // 01
+    make_tuple("0xFADE/b110", "0xFADE/b010", "0xFFFF/b11"), // 02
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
 
 //! Checks BinaryVector::operator== when comparing with same instance
 //!

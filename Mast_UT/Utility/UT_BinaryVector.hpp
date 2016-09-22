@@ -63,6 +63,14 @@ class UT_BinaryVector : public CxxTest::TestSuite
   void test_DataAsMixString_Without_NewLine ();
   void test_DataAsMixString_With_NewLine ();
 
+  // ---------------- CompareEqualTo
+  //
+  void test_CompareEqualTo_With_EmptyMask_Equal ();
+  void test_CompareEqualTo_With_EmptyMask_NotEqual ();
+  void test_CompareEqualTo_With_Mask_Equal ();
+  void test_CompareEqualTo_With_Mask_NotEqual ();
+  void test_CompareEqualTo_With_Mask_BadSize ();
+
   // ---------------- Operator==
   //
   void test_operator_eq_With_Self ();

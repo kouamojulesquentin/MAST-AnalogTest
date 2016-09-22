@@ -124,8 +124,8 @@ class DLL_EXPORT BinaryVector final
   BinaryVector& operator^= (const BinaryVector& rhs); //!< Bitwise xor assignment
 
   // Logical operators
-  bool operator==(const BinaryVector& rhs) const;                                 //!< Compares to other for equality (excepted fixed size property)
-  bool operator!=(const BinaryVector& rhs) const { return !operator==(rhs); };    //!< Compares to other for inequality
+  bool operator==(const BinaryVector& rhs) const { return  CompareEqualTo(rhs); } //!< Compares to other for equality (excepted fixed size property)
+  bool operator!=(const BinaryVector& rhs) const { return !CompareEqualTo(rhs); } //!< Compares to other for inequality
 
   // Append operator and methods
   BinaryVector& operator<< (const BinaryVector& rhs) { return this->Append(rhs); }; //!< Appends another BinaryVector
@@ -153,6 +153,18 @@ class DLL_EXPORT BinaryVector final
   void          Get(int16_t& value) const; //!< Reads signed 16 bits value from BinaryVector
   void          Get(int32_t& value) const; //!< Reads signed 32 bits value from BinaryVector
   void          Get(int64_t& value) const; //!< Reads signed 64 bits value from BinaryVector
+
+  //! Reads value from BinaryVector with specified type
+  //!
+  template<typename T> T Get() const
+  {
+    T value;
+    Get(value);
+    return value;
+  }
+
+  bool CompareEqualTo(const BinaryVector& rhs) const;                                   //!< Compares to other for equality (excepted fixed size property)
+  bool CompareEqualTo(const BinaryVector& rhs, const BinaryVector& dontCareMask) const; //!< Compares to other for equality taking account a don't care mask
 
   void          Set(const BinaryVector& value) { *this = value; };             //!< Assigns from another BinaryVector
   void          Set(BinaryVector&&      value) { *this = std::move(value); };  //!< Assigns from another BinaryVector (with move)

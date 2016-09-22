@@ -503,6 +503,119 @@ void BinaryVector::ClearBit (uint32_t bitOffset)
 //---------------------------------------------------------------------------
 
 
+//! Returns true when *this is equal to another BinaryVector
+//!
+//! @note Fixed size property is not compared (only the value)
+//!
+bool BinaryVector::CompareEqualTo (const BinaryVector& rhs) const
+{
+  if (m_usedBits != rhs.m_usedBits)
+  {
+    return false;
+  }
+
+  if (m_usedBits == 0)
+  {
+    return true;
+  }
+
+  auto bitsOnLastByte = m_usedBits % 8;
+  auto areEqual       = true;
+
+  if (bitsOnLastByte == 0)
+  {
+    areEqual = m_data == rhs.m_data;
+  }
+  else
+  {
+    if (m_data.size() > 1)
+    {
+      areEqual = std::equal(m_data.cbegin(), m_data.cend() - 1, rhs.m_data.cbegin(), rhs.m_data.cend() - 1);
+    }
+
+    if (areEqual)
+    {
+      auto left  = m_data.back()     & LEFT_BITS_MASK_8[bitsOnLastByte];
+      auto right = rhs.m_data.back() & LEFT_BITS_MASK_8[bitsOnLastByte];
+
+      areEqual = left == right;
+    }
+  }
+
+  return areEqual;
+}
+//
+//  End of: BinaryVector::CompareEqualTo
+//---------------------------------------------------------------------------
+
+
+
+//! Returns true when *this is equal to another BinaryVector taking account a don't care mask
+//!
+//! @note fall back to standard CompareEqualTo when the mask is empty (to simplify usage)
+//! @note Fixed size property is not compared (only the value)
+//!
+//! @internal
+//! @note Note used bits are supposed to be forced to zero!
+//! @note It is optimized for cases both vectors are most often equal (at least the first bytes)
+//! @endinternal
+//!
+//! @param rhs            A BinaryVector to compare to
+//! @param dontCareMask   A mask for bits to compare (1s) and ignore (0s)
+//!
+//! @return true When all __cared-for bits__ are equal, false otherwise
+//!
+bool BinaryVector::CompareEqualTo (const BinaryVector& rhs, const BinaryVector& dontCareMask) const
+{
+  if (dontCareMask.IsEmpty())
+  {
+    return CompareEqualTo(rhs);
+  }
+
+  if (m_usedBits != rhs.m_usedBits)
+  {
+    return false;
+  }
+
+  if (m_usedBits == 0)
+  {
+    return true;
+  }
+
+  CHECK_SAME_SIZE(dontCareMask);
+
+
+  auto pLhs    = m_data.cbegin();
+  auto pLhsEnd = m_data.cend();
+  auto pRhs    = rhs.m_data.cbegin();
+  auto pMask   = dontCareMask.m_data.cbegin();
+
+  while (pLhs != pLhsEnd)
+  {
+    auto lhsByte = *pLhs++;
+    auto rhsByte = *pRhs++;
+
+    if (lhsByte != rhsByte)
+    {
+      auto mask          = *pMask;
+      auto compareResult = (lhsByte ^ rhsByte) & mask;
+
+      if (compareResult != 0)
+      {
+        return false;
+      }
+    }
+
+    ++pMask;
+  }
+
+  return true;
+}
+//
+//  End of: BinaryVector::CompareEqualTo
+//---------------------------------------------------------------------------
+
+
 //! Creates a BinaryVector from text binary representation
 //!
 //! @note Firstly intended for test purposes, but can be used for anything else
@@ -1339,50 +1452,6 @@ BinaryVector& BinaryVector::operator= (BinaryVector&& rhs)
 
 
 
-//! Returns true when *this is equal to another BinaryVector
-//!
-//! @note Fixed size property is not compare (only the value)
-//!
-bool BinaryVector::operator== (const BinaryVector& rhs) const
-{
-  if (m_usedBits != rhs.m_usedBits)
-  {
-    return false;
-  }
-
-  if (m_usedBits == 0)
-  {
-    return true;
-  }
-
-  auto bitsOnLastByte = m_usedBits % 8;
-  auto areEqual       = true;
-
-  if (bitsOnLastByte == 0)
-  {
-    areEqual = m_data == rhs.m_data;
-  }
-  else
-  {
-    if (m_data.size() > 1)
-    {
-      areEqual = std::equal(m_data.cbegin(), m_data.cend() - 1, rhs.m_data.cbegin(), rhs.m_data.cend() - 1);
-    }
-
-    if (areEqual)
-    {
-      auto left  = m_data.back()     & LEFT_BITS_MASK_8[bitsOnLastByte];
-      auto right = rhs.m_data.back() & LEFT_BITS_MASK_8[bitsOnLastByte];
-
-      areEqual = left == right;
-    }
-  }
-
-  return areEqual;
-}
-//
-//  End of: BinaryVector::operator==
-//---------------------------------------------------------------------------
 
 
 

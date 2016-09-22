@@ -267,7 +267,8 @@ PDL_declaration:
  t_PDL function_list { 
            pair <std::vector<std::string>,std::uint32_t> ret;
 	   ret.first = $2;
-	   ret.second =my_location->begin.line;
+//	   ret.second =my_location->begin.line;
+   ret.second =nlines;
 	   $$ = ret;
 	   }
  |

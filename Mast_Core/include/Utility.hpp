@@ -276,10 +276,12 @@ T CheckValueIsNotNullptr(const char* file, const char* function, int line, T val
 
 #define CHECK_PARAMETER_NOT_EMPTY(val, msg)   CheckParameterCondition  (__FILE__, __func__, __LINE__, (val), !(val).empty(), msg)
 
-#define CHECK_PARAMETER_GT(val,  minVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val),(val >  minVal), msg)
-#define CHECK_PARAMETER_GTE(val, minVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val),(val >= minVal), msg)
-#define CHECK_PARAMETER_LT(val,  maxVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val),(val <  maxVal), msg)
-#define CHECK_PARAMETER_LTE(val, maxVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val),(val <= maxVal), msg)
+#define CHECK_PARAMETER_EQ(val,  refVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (val == refVal), msg)
+#define CHECK_PARAMETER_NEQ(val, refVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (val != refVal), msg)
+#define CHECK_PARAMETER_GT(val,  minVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (val >  minVal), msg)
+#define CHECK_PARAMETER_GTE(val, minVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (val >= minVal), msg)
+#define CHECK_PARAMETER_LT(val,  maxVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (val <  maxVal), msg)
+#define CHECK_PARAMETER_LTE(val, maxVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (val <= maxVal), msg)
 
 #define CHECK_VALUE_NOT_NULL(ptr, msg)  CheckValueIsNotNullptr (__FILE__, __func__, __LINE__, ptr, msg)
 #define CHECK_TRUE(expr, msg)            if (!(expr))  throw std::runtime_error(mast::Utility::MakeExceptionMessage(__FILE__, __func__, __LINE__, "std::runtime_error", msg))

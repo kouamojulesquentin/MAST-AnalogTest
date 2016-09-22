@@ -90,11 +90,11 @@ class DLL_EXPORT SystemModelBuilder final
                                                     uint32_t                                 muxPathsCount,
                                                     std::shared_ptr<AccessInterfaceProtocol> protocol);
 
+template <_DR_MUX_path_selector DR_MUX_path_selector>
 std::shared_ptr<AccessInterface> Create_JTAG_TAP_generic (string_view                         name,
                                                                  uint32_t                            irBitsCount,
                                                                  uint32_t                            muxPathsCount,
-                                                                 std::shared_ptr<AccessInterfaceProtocol> protocol,
-								 _DR_MUX_path_selector *DR_MUX_path_selector);
+                                                                 std::shared_ptr<AccessInterfaceProtocol> protocol);
 
   //! Creates a path selector
   //!

@@ -269,19 +269,17 @@ shared_ptr<AccessInterface> SystemModelBuilder::Create_JTAG_TAP (string_view    
                                                                  shared_ptr<AccessInterfaceProtocol> protocol)
 {
 
- return Create_JTAG_TAP_generic(name,irBitsCount,muxPathsCount,protocol,
- 				&(Create_bynary_DR_MUX_path_selector));
+ return Create_JTAG_TAP_generic<Create_bynary_DR_MUX_path_selector>(name,irBitsCount,muxPathsCount,protocol);
 }
 //
 //  End of: SystemModelBuilder::Create_JTAG_TAP
 //---------------------------------------------------------------------------
 
-
+template <_DR_MUX_path_selector DR_MUX_path_selector>
 shared_ptr<AccessInterface> SystemModelBuilder::Create_JTAG_TAP_generic (string_view                         name,
                                                                  uint32_t                            irBitsCount,
                                                                  uint32_t                            muxPathsCount,
-                                                                 shared_ptr<AccessInterfaceProtocol> protocol,
-								 _DR_MUX_path_selector *DR_MUX_path_selector)
+                                                                 shared_ptr<AccessInterfaceProtocol> protocol)
 {
   CHECK_PARAMETER_NOT_ZERO (irBitsCount, "irBitsCount must be != 0");
   CHECK_PARAMETER_GT       (muxPathsCount, 1, "muxPathsCount must be > 1");

@@ -131,7 +131,9 @@ vector<AppFunctionAndNode> CPP_API_IMPL::GetFunctionsAndNodes (const vector<AppF
     }
     else
     {
-      LOG(WARNING) << "Found no registered function for name: '" << functionNameAndNode.appName << "' (be aware that the association is case sensitive)";
+      LOG(WARNING) << "Found no registered function for name: '" << functionNameAndNode.appName
+                   << "' found in SIT file at line: "            << functionNameAndNode.SIT_line
+                   << " (be aware that the association is case sensitive)";
     }
   }
 

@@ -844,6 +844,16 @@ void UT_reader::test_JTAG_TAP ()
   :Selector:(1)  \"my_tap_IR\", kind: Table_Based, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
   [Register](3)  \"my_tap_BPY\", length: 1, bypass: 1\n\
   [Register](4)  \"test_reg\", length: 4, bypass: 1100"),
+   make_tuple( "JTAG_TAP my_tap SVF_simulation 4 [ \"0xF\" , \"0x2\" ] 1\
+  {\
+     REGISTER test_reg 4 Bypass: \"0b1100\"\
+   }\n",
+"[Access_I](0)  \"my_tap\"\n\
+ [Register](1)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n\
+ [Linker](2)    \"my_tap_DR_Mux\"\n\
+  :Selector:(1)  \"my_tap_IR\", kind: Table_Based, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
+  [Register](3)  \"my_tap_BPY\", length: 1, bypass: 1\n\
+  [Register](4)  \"test_reg\", length: 4, bypass: 1100"),
 /*   make_tuple( "JTAG_TAP my_tap SVF_openOCD 4 1\
   {\
      REGISTER test_reg 4 Bypass: \"0b1100\"\

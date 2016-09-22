@@ -32,7 +32,7 @@ using std::initializer_list;
 using namespace std::string_literals;
 using namespace mast;
 
-//! Creates a bynary linker for the DR_MUX of a JTAG_TAP
+//! Creates a binary linker for the DR_MUX of a JTAG_TAP
 //!
 shared_ptr<mast::PathSelector> Create_bynary_DR_MUX_path_selector (
 			shared_ptr<Register>        ir,                            
@@ -42,6 +42,7 @@ shared_ptr<mast::PathSelector> Create_bynary_DR_MUX_path_selector (
 //!
 //!  @param ir       IR Register
 //!  @param muxPathsCount     DR number of path (at least two)
+//!  @param coding     		vector of coding values UNUSED, kept for template compatibility
 //! 
 //!
 shared_ptr<mast::PathSelector> Create_bynary_DR_MUX_path_selector (
@@ -75,6 +76,49 @@ shared_ptr<mast::PathSelector> Create_bynary_DR_MUX_path_selector (
 //  End of: Create_bynary_DR_MUX_path_selector
 //---------------------------------------------------------------------------
 
+//! Creates a binary linker for the DR_MUX of a JTAG_TAP
+//!
+shared_ptr<mast::PathSelector> Create_table_based_DR_MUX_path_selector (
+			shared_ptr<Register>        ir,                            
+                        uint32_t                    muxPathsCount,
+			std::vector<uint32_t>	coding);
+//! Creates a binary path selector for a TAP
+//!
+//!  @param ir       		IR Register
+//!  @param muxPathsCount     DR number of path (at least two)
+//!  @param coding     		vector of coding values comprising bypass
+//! 
+//!
+shared_ptr<mast::PathSelector> Create_table_based_DR_MUX_path_selector (
+			shared_ptr<Register>        ir,                            
+                        uint32_t                    muxPathsCount,
+			std::vector<uint32_t>	coding)
+{
+  CHECK_PARAMETER_GT       (muxPathsCount, 1, "muxPathsCount must be > 1");
+
+  // ---------------- Create IR
+  //
+  auto irBypassSequence = ir->BypassSequence();
+  auto irBitsCount = ir->BypassSequence().BitsCount();
+  // ---------------- Create path selector
+  //
+  // Select table is by default binary except for no path and 1st that use the bypass sequence
+  auto selectTable = DefaultBinaryPathSelector::CreateSelectTable(irBitsCount, muxPathsCount, SelectorProperty::Binary_Default);
+  selectTable[0] = irBypassSequence;  // Not used (path id zero)
+  selectTable[1] = irBypassSequence;  // Bypass register
+  coding.push_back(0); //dummy operation to avoid warning
+  // Deselect table is by default all bypass sequence
+  auto deselectTable = DefaultTableBasedPathSelector::TablesType(muxPathsCount + 1u, irBypassSequence);
+
+  auto pathSelector = make_shared<DefaultTableBasedPathSelector>(ir, muxPathsCount, selectTable, deselectTable);
+
+
+
+  return pathSelector;
+}
+//
+//  End of: Create_table_based_DR_MUX_path_selector
+//---------------------------------------------------------------------------
 
 namespace
 {
@@ -245,7 +289,7 @@ std::shared_ptr<Chain> SystemModelBuilder::Create_1500_Wrapper (string_view name
 
 
 
-//! Creates a new Tap node
+//! Creates a new Tap node using implicit binary coding
 //!
 //!  @param name            Name given to the tap
 //!  @param irBitsCount     IR number of bits (at least one)
@@ -269,17 +313,50 @@ shared_ptr<AccessInterface> SystemModelBuilder::Create_JTAG_TAP (string_view    
                                                                  shared_ptr<AccessInterfaceProtocol> protocol)
 {
 
- return Create_JTAG_TAP_generic<Create_bynary_DR_MUX_path_selector>(name,irBitsCount,muxPathsCount,protocol);
+ return Create_JTAG_TAP_generic<Create_bynary_DR_MUX_path_selector>(name,irBitsCount,muxPathsCount,protocol,std::vector<uint32_t>());
 }
 //
 //  End of: SystemModelBuilder::Create_JTAG_TAP
 //---------------------------------------------------------------------------
 
+//! Creates a new Tap node using provided coding
+//!
+//!  @param name            Name given to the tap
+//!  @param irBitsCount     IR number of bits (at least one)
+//!  @param muxPathsCount   DR number of path (at least two)
+//!
+//!  ______________________________
+//! |                              |
+//! |     (ACCESS_I:Tap)           |
+//! |      /      \                |
+//! |     /       _\__________     |
+//! | [REG:Ir]  /Linker:Dr_Mux\    |
+//! |           ---------------    |
+//! |             /                |
+//! |        [REG:Bypass]          |
+//! |                              |
+//!  ------------------------------
+//!
+shared_ptr<AccessInterface> SystemModelBuilder::Create_JTAG_TAP (string_view                         name,
+                                                                 uint32_t                            irBitsCount,
+                                                                 uint32_t                            muxPathsCount,
+                                                                 shared_ptr<AccessInterfaceProtocol> protocol,
+								 std::vector<uint32_t>	coding)
+{
+
+ return Create_JTAG_TAP_generic<Create_table_based_DR_MUX_path_selector>(name,irBitsCount,muxPathsCount,protocol,coding);
+}
+//
+//  End of: SystemModelBuilder::Create_JTAG_TAP
+//---------------------------------------------------------------------------
+
+
 template <_DR_MUX_path_selector DR_MUX_path_selector>
 shared_ptr<AccessInterface> SystemModelBuilder::Create_JTAG_TAP_generic (string_view                         name,
                                                                  uint32_t                            irBitsCount,
                                                                  uint32_t                            muxPathsCount,
-                                                                 shared_ptr<AccessInterfaceProtocol> protocol)
+                                                                 shared_ptr<AccessInterfaceProtocol> protocol,
+								 std::vector<uint32_t>	coding)
 {
   CHECK_PARAMETER_NOT_ZERO (irBitsCount, "irBitsCount must be != 0");
   CHECK_PARAMETER_GT       (muxPathsCount, 1, "muxPathsCount must be > 1");
@@ -297,7 +374,7 @@ shared_ptr<AccessInterface> SystemModelBuilder::Create_JTAG_TAP_generic (string_
   auto irBypassSequence = BinaryVector(irBitsCount, 0xFF);
   auto ir               = m_model.CreateRegister(irName, irBypassSequence, true, accessInterface);
 
-  std::shared_ptr<mast::PathSelector>  pathSelector =  DR_MUX_path_selector (ir,muxPathsCount,std::vector<uint32_t>());
+  std::shared_ptr<mast::PathSelector>  pathSelector =  DR_MUX_path_selector (ir,muxPathsCount,coding);
 
   // ---------------- Create Linker
   //

@@ -497,8 +497,22 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
 	  break;
            }
 	  }
-	 auto node = driver.builder->Create_JTAG_TAP($2.name,$5,$7+1,protocol);
-  	 $$ = node;
+	  if ($6.n_words==0)
+	   {
+	   auto node = driver.builder->Create_JTAG_TAP($2.name,$5,$7+1,protocol);
+  	   $$ = node;
+	   }
+	  else
+	   {
+	     if ($6.n_words!=($7+1))
+	      {
+	      std::cerr<<"Error Coding must be provided for bypass register and each chain\n";
+	     YYERROR;
+	      }
+	   auto node = driver.builder->Create_JTAG_TAP($2.name,$5,$7+1,protocol,$6.codevalue);
+  	   $$ = node;
+	      
+	   } 
 	 }
 	}
        }

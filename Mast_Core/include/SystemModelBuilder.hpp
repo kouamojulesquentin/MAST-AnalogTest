@@ -83,18 +83,26 @@ class DLL_EXPORT SystemModelBuilder final
                         string_view               parentPath);
 
 
-  //! Creates a JTAG TAP
+  //! Creates a JTAG TAP using implicit binary coding
   //!
   std::shared_ptr<AccessInterface> Create_JTAG_TAP (string_view                              name,
                                                     uint32_t                                 irBitsCount,
                                                     uint32_t                                 muxPathsCount,
                                                     std::shared_ptr<AccessInterfaceProtocol> protocol);
+  //! Creates a JTAG TAP using provided coding
+  //!
+  std::shared_ptr<AccessInterface> Create_JTAG_TAP (string_view                              name,
+                                                    uint32_t                                 irBitsCount,
+                                                    uint32_t                                 muxPathsCount,
+                                                    std::shared_ptr<AccessInterfaceProtocol> protocol,
+						    std::vector<uint32_t>	coding);
 
 template <_DR_MUX_path_selector DR_MUX_path_selector>
 std::shared_ptr<AccessInterface> Create_JTAG_TAP_generic (string_view                         name,
                                                                  uint32_t                            irBitsCount,
                                                                  uint32_t                            muxPathsCount,
-                                                                 std::shared_ptr<AccessInterfaceProtocol> protocol);
+                                                                 std::shared_ptr<AccessInterfaceProtocol> protocol,
+								 std::vector<uint32_t>	coding);
 
   //! Creates a path selector
   //!

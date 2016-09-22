@@ -39,10 +39,10 @@ using std::shared_lock;
 using namespace mast;
 using namespace std::chrono_literals;
 
-#define MONITOR(fct)                            if (m_monitor) m_monitor->fct
-#define MONITOR_MESSAGE(msg)                    if (m_monitor) m_monitor->LogDebug(msg)
-#define MONITOR_WITH_NODE(msg, node, debugName) if (m_monitor) m_monitor->LogDebug(msg, node, debugName)
-#define MONITOR_APP(msg, appData)               if (m_monitor) m_monitor->LogDebug(msg, *appData->pathResolver.ReferenceNode(), appData->debugName)
+#define MONITOR(fct)                                 if (m_monitor) m_monitor->fct
+#define MONITOR_DEBUG_MANAGER(msg)                   if (m_monitor) m_monitor->LogDebug(msg)
+#define MONITOR_DEBUG_APP_LIFE(msg, node, debugName) if (m_monitor) m_monitor->LogDebug(msg, node, debugName)
+#define MONITOR_DEBUG_APP(msg, appData)              if (m_monitor) m_monitor->LogDebug(msg, *appData->pathResolver.ReferenceNode(), appData->debugName)
 
 #define MONITOR_PDL(msg, appData)                        if (m_monitor) m_monitor->PDLCommand(msg, "",          *appData->pathResolver.ReferenceNode(), appData->debugName)
 #define MONITOR_PDL_EX(msg, path, appData)               if (m_monitor) m_monitor->PDLCommand(msg, path,        *appData->pathResolver.ReferenceNode(), appData->debugName)
@@ -56,10 +56,10 @@ using namespace std::chrono_literals;
 //!
 SystemModelManager::~SystemModelManager ()
 {
-  MONITOR_MESSAGE("Destructing SystemModelManager (begin)");
+  MONITOR_DEBUG_MANAGER("Destructing SystemModelManager (begin)");
   Stop();                         // Stopping data cycle loop also release thread blocked in iApply
   WaitForApplicationsEnd();
-  MONITOR_MESSAGE("Destructing SystemModelManager (end)");
+  MONITOR_DEBUG_MANAGER("Destructing SystemModelManager (end)");
 }
 //
 //  End of: SystemModelManager::~SystemModelManager
@@ -91,7 +91,7 @@ SystemModelManager::SystemModelManager(SystemModel&                          sm,
   auto pathResolver   = NodePathResolver(sm.Root());
   m_mainThreadAppData = make_shared<ApplicationData>(std::thread(), appState, pathResolver, "Manager");
 
-  MONITOR_MESSAGE("Constructed SystemModelManager");
+  MONITOR_DEBUG_MANAGER("Constructed SystemModelManager");
 }
 
 //! Returns application data associated with a thread
@@ -135,7 +135,7 @@ void SystemModelManager::CreateApplicationThread (shared_ptr<ParentNode> applica
     // ---------------- Report that the thread has effectively been started
     //
     m_threadStarted = true;
-    MONITOR_WITH_NODE("Application thread waiting for start signal", *applicationTopNode, debugName);
+    MONITOR_DEBUG_APP_LIFE("Application thread waiting for start signal", *applicationTopNode, debugName);
 
     // ---------------- Wait for start "signal"
     //
@@ -149,7 +149,7 @@ void SystemModelManager::CreateApplicationThread (shared_ptr<ParentNode> applica
 
     // ---------------- To actual application job
     //
-    MONITOR_WITH_NODE("Application start", *applicationTopNode, debugName);
+    MONITOR_DEBUG_APP_LIFE("Application start", *applicationTopNode, debugName);
     try
     {
       functor();
@@ -158,14 +158,14 @@ void SystemModelManager::CreateApplicationThread (shared_ptr<ParentNode> applica
     catch(std::exception& exc)  // Catch C++ standard exceptions
     {
       *applicationState = ApplicationData::State::TerminatedWithException;
-      MONITOR_WITH_NODE("Uncaught exception '"s + exc.what() + "' from application", *applicationTopNode, debugName);
+      MONITOR_DEBUG_APP_LIFE("Uncaught exception '"s + exc.what() + "' from application", *applicationTopNode, debugName);
     }
     catch (...)
     {
       *applicationState = ApplicationData::State::TerminatedWithException;
-      MONITOR_WITH_NODE("Uncaught unknown exception from application", *applicationTopNode, debugName);
+      MONITOR_DEBUG_APP_LIFE("Uncaught unknown exception from application", *applicationTopNode, debugName);
     }
-    MONITOR_WITH_NODE("Application ends", *applicationTopNode, debugName);
+    MONITOR_DEBUG_APP_LIFE("Application ends", *applicationTopNode, debugName);
   };
 
   m_threadStarted   = false;    // This is to detect when the thread begins to run (waiting for start signal)
@@ -181,7 +181,7 @@ void SystemModelManager::CreateApplicationThread (shared_ptr<ParentNode> applica
     std::this_thread::sleep_for(100us);
   }
   *data->currentState = ApplicationData::State::WrapperThreadStarted;
-  MONITOR_APP("Application thread have reported to be running", data);
+  MONITOR_DEBUG_APP("Application thread have reported to be running", data);
 
   m_threadStarted = false;
 
@@ -351,7 +351,7 @@ void SystemModelManager::iApply ()
 
     WakeupDataCycles();
 
-    MONITOR_APP("iApply - May be blocked (if data cycle update application data)", appData);
+    MONITOR_DEBUG_APP("iApply - May be blocked (if data cycle update application data)", appData);
 
     // ---------------- Block the thread until data cycle loop release it (or is terminated)
     //                  As waking up of data cycle loop may occurs before wait
@@ -372,16 +372,16 @@ void SystemModelManager::iApply ()
 
     if (!m_runLoop)
     {
-      MONITOR_APP("iApply - Application thread has been released because data cycle loop is not/no more running", appData);
+      MONITOR_DEBUG_APP("iApply - Application thread has been released because data cycle loop is not/no more running", appData);
     }
     else
     {
-      MONITOR_APP("iApply - Released", appData);
+      MONITOR_DEBUG_APP("iApply - Released", appData);
     }
   }
 
   *appData->currentState = ApplicationData::State::Running;
-  MONITOR_APP("iApply - Leaving", appData);
+  MONITOR_DEBUG_APP("iApply - Leaving", appData);
 }
 //
 //  End of: SystemModelManager::iApply
@@ -404,7 +404,7 @@ void SystemModelManager::iGet_impl (string_view registerPath, T& readData)
     reg->LastFromSut(readData);
   }
 
-  MONITOR_PDL_EX("iGet ", registerPath, ThreadApplicationData());
+  MONITOR_PDL_EX("iGet", registerPath, ThreadApplicationData());
 }
 //
 //  End of: SystemModelManager::iGet_impl
@@ -431,6 +431,8 @@ BinaryVector SystemModelManager::iGetMiscompares (string_view registerPath)
   auto& pathResolver = PATH_RESOLVER("iGetMiscompares: ");
   auto reg           = pathResolver.ResolveAsRegister(registerPath);
 
+  MONITOR_PDL_EX("iGetMiscompares", registerPath, ThreadApplicationData());
+
   unique_lock<recursive_mutex> lock(m_dataMutex); // We must protect for the register been updated just when we read it
 
   return reg->LastCompareResult();
@@ -445,6 +447,7 @@ BinaryVector SystemModelManager::iGetMiscompares (string_view registerPath)
 template<typename T>
 void SystemModelManager::iGetRefresh_impl (string_view registerPath, T& readData)
 {
+  MONITOR_PDL_EX("iGetRefresh", registerPath, ThreadApplicationData());
   iRefresh(registerPath);
   iApply();
   iGet_impl(registerPath, readData);
@@ -502,7 +505,7 @@ uint32_t SystemModelManager::iGetStatus (string_view nodePath, bool clearCounter
   auto& pathResolver = PATH_RESOLVER("iGetStatus: ");
   auto  node         = pathResolver.Resolve(nodePath);
 
-  MONITOR_PDL_EX("iGetStatus ", nodePath, ThreadApplicationData());
+  MONITOR_PDL_EX("iGetStatus", nodePath, ThreadApplicationData());
 
   return iGetStatus(node, clearCounter);
 }
@@ -519,6 +522,8 @@ uint32_t SystemModelManager::iGetStatus (string_view nodePath, bool clearCounter
 //!
 uint32_t SystemModelManager::iGetStatus (bool clearCounter)
 {
+  MONITOR_PDL_EX("iGetStatus", "SUT Root", ThreadApplicationData());
+
   return iGetStatus(m_sm.Root(), clearCounter);
 }
 //
@@ -577,7 +582,7 @@ void SystemModelManager::iRead_impl (string_view registerPath, T expectedValue)
 
   *appData->currentState = ApplicationData::State::ReadRequest;
 
-  MONITOR_APP("iRead - Leaving", appData);
+  MONITOR_DEBUG_APP("iRead - Leaving", appData);
 }
 //
 //  End of: SystemModelManager::iRead_impl
@@ -605,12 +610,13 @@ void SystemModelManager::iRefresh (string_view registerPath)
   auto  reg          = pathResolver.ResolveAsRegister(registerPath);
 
   auto appData = ThreadApplicationData();
-  MONITOR_PDL_EX("iRefresh - Queued request", registerPath, appData);
+  MONITOR_PDL_EX("iRefresh - Queuing request", registerPath, appData);
+
   appData->queuedRefreshes.emplace_back(SystemModelManager::QueuedRequest(reg->Identifier()));
 
   *appData->currentState = ApplicationData::State::RefreshRequest;
 
-  MONITOR_APP("iRefresh - Leaving", appData);
+  MONITOR_DEBUG_APP("iRefresh - Leaving", appData);
 }
 //
 //  End of: SystemModelManager::iRefresh
@@ -634,7 +640,7 @@ void SystemModelManager::iWrite_impl (string_view registerPath, T value)
 
   *appData->currentState = ApplicationData::State::WriteRequest;
 
-  MONITOR_APP("iWrite - Leaving", appData);
+  MONITOR_DEBUG_APP("iWrite - Leaving", appData);
 }
 //
 //  End of: SystemModelManager::iWrite_impl
@@ -660,7 +666,7 @@ void SystemModelManager::iWrite (string_view registerPath, int64_t  value) { iWr
 void SystemModelManager::LoopOnDataCycle ()
 {
     //+ (JFC July/06/2016): Start directly with data cycle to get SUT state ?
-  MONITOR_MESSAGE("Entering data cycle loop");
+  MONITOR_DEBUG_MANAGER("Entering data cycle loop");
   m_loopStarted = true; // Report that the thread has effectively been started
   while (m_runLoop)
   {
@@ -683,7 +689,7 @@ void SystemModelManager::LoopOnDataCycle ()
     }
   }
 
-  MONITOR_MESSAGE("Exiting data cycle loop");
+  MONITOR_DEBUG_MANAGER("Exiting data cycle loop");
 }
 //
 //  End of: SystemModelManager::LoopOnDataCycle
@@ -793,11 +799,11 @@ void SystemModelManager::Start ()
     m_firstAccessInterface = GetFirstAccessInterface(m_sm);
   }
 
-  MONITOR_MESSAGE("Starting data cycle loop background thread");
+  MONITOR_DEBUG_MANAGER("Starting data cycle loop background thread");
   m_runLoop = true;
   auto threadFunctor = [this]()
   {
-    MONITOR_MESSAGE("Starting background thread");
+    MONITOR_DEBUG_MANAGER("Starting background thread");
 
     try
     {
@@ -821,7 +827,7 @@ void SystemModelManager::Start ()
       }
       m_loopCV.notify_one();
     }
-    MONITOR_MESSAGE("Exiting background thread");
+    MONITOR_DEBUG_MANAGER("Exiting background thread");
   };
 
   m_managerThread   = std::thread(threadFunctor);
@@ -850,11 +856,11 @@ void SystemModelManager::StartCreatedApplicationThreads ()
     std::lock_guard<std::mutex> lock(m_appStartMutex);
     m_appStarted = true;
 
-    MONITOR_MESSAGE("Notifying application threads to start");
+    MONITOR_DEBUG_MANAGER("Notifying application threads to start");
   }
 
   m_appStartConditionVar.notify_all();
-  MONITOR_MESSAGE("Application threads have been notified to start");
+  MONITOR_DEBUG_MANAGER("Application threads have been notified to start");
 }
 //
 //  End of: SystemModelManager::StartCreatedApplicationThreads
@@ -874,7 +880,7 @@ void SystemModelManager::Stop ()
     std::lock_guard<std::mutex> lock(m_loopMutex);
     m_runLoop = false;
 
-    MONITOR_MESSAGE("Stopping data cycle loop");
+    MONITOR_DEBUG_MANAGER("Stopping data cycle loop");
   }
   m_loopCV.notify_one();
 
@@ -884,7 +890,7 @@ void SystemModelManager::Stop ()
   }
 
   m_managerThreadId = m_constructionThreadId;
-  MONITOR_MESSAGE("Data cycle loop stopped");
+  MONITOR_DEBUG_MANAGER("Data cycle loop stopped");
 }
 //
 //  End of: SystemModelManager::Stop
@@ -916,7 +922,7 @@ void SystemModelManager::ReleaseServedThreads ()
       ++it;
       m_pendingThreads.erase(toErasePos);
 
-      MONITOR_APP("iApply - Notified from data cycle internal", appData);
+      MONITOR_DEBUG_APP("iApply - Notified from data cycle internal", appData);
       appData->releaseCv.notify_one();
     }
     else
@@ -1019,9 +1025,9 @@ void SystemModelManager::WaitForApplicationsEnd ()
 
     if (data->appThread.joinable())
     {
-      MONITOR_APP("Joining application thread", data);
+      MONITOR_DEBUG_APP("Joining application thread", data);
       data->appThread.join();
-      MONITOR_APP("Joined  application thread", data);
+      MONITOR_DEBUG_APP("Joined  application thread", data);
     }
   }
   m_threadToAppData.clear();  // There is no more application threads, so the data are useless

@@ -29,7 +29,7 @@ std::vector<mast::AppFunctionAndNodePath> GetAlgorithmsAndNodePaths (int argc, c
 
 namespace
 {
-  //! This algorithm increment "reg_0" 60 times
+  //! This algorithm increment "reg_0"
   //!
   void Algo_Increment ()
   {
@@ -52,15 +52,15 @@ namespace
   //---------------------------------------------------------------------------
 
 
-  //! This algorithm decrement "reg_1" 60 times
+  //! This algorithm decrement "reg_1"
   //!
   void Algo_Decrement ()
   {
     iPrefix("SWIR.WIR");
 
     auto     registerPath = "reg_1";
-    auto     loopCount    = 20u;
-    uint16_t value = 60u;
+    auto     loopCount    = 60u;
+    uint16_t value        = 0xCAFEu;
 
     while (loopCount--)
     {
@@ -73,6 +73,54 @@ namespace
   //
   //  End of: Algo_Increment
   //---------------------------------------------------------------------------
+
+
+
+  //! This algorithm copy value from "reg_0"  to "reg_2"
+  //!
+  void Algo_Copy ()
+  {
+    iPrefix("SWIR.WIR");
+
+    auto fromPath  = "reg_0";
+    auto toPath    = "reg_2";
+    auto loopCount = 20u;
+
+    while (loopCount--)
+    {
+      auto gotValue = iGetRefresh<uint32_t>(fromPath);
+
+      iWrite(toPath, gotValue);
+      iApply();
+    }
+  }
+  //
+  //  End of: Algo_Copy
+  //---------------------------------------------------------------------------
+
+
+  //! This algorithm Shifting value from "reg_2"  to "reg_3"
+  //!
+  void Algo_Shift ()
+  {
+    iPrefix("SWIR.WIR");
+
+    auto fromPath  = "reg_2";
+    auto toPath    = "reg_3";
+    auto loopCount = 20u;
+
+    while (loopCount--)
+    {
+      auto gotValue = iGetRefresh<uint32_t>(fromPath);
+      gotValue <<= 1u;
+      iWrite(toPath, gotValue);
+      iApply();
+    }
+  }
+  //
+  //  End of: Algo_Shift
+  //---------------------------------------------------------------------------
+
 } // End of unnamed namespace
 
 
@@ -87,6 +135,8 @@ vector<AppFunctionAndNodePath> GetAlgorithmsAndNodePaths (int /* argc */, char* 
   {
     {Algo_Increment, "W_1500", "Inc"},
     {Algo_Decrement, "W_1500", "Dec"},
+    {Algo_Copy,      "W_1500", "Copy"},
+    {Algo_Shift,     "W_1500", "Shift"},
   };
 
   return associations;
@@ -109,6 +159,8 @@ vector<mast::AppFunctionAndName> GetAlgorithmsNames (int /* argc */, char* /* ar
   {
     {Algo_Increment, "Incr"},
     {Algo_Decrement, "Decr"},
+    {Algo_Copy,      "Copy"},
+    {Algo_Shift,     "Shift"},
   };
 
   return names;

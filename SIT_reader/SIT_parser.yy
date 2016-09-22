@@ -171,7 +171,7 @@ inline auto make_openOCD_protocol(std::string designName,std::uint32_t IR_size)
 %type  <std::shared_ptr<mast::SystemModelNode>> node
 %type  <std::shared_ptr<mast::SystemModelNode>> parent_node_with_children
 %type  <std::vector<std::string>> function_list
-%type  <std::vector<std::string>> PDL_declaration
+%type  <std::pair <std::vector<std::string>,std::uint32_t>> PDL_declaration
 %type  <std::string> AI_identifier
 %token               END    0     "end of file"
 %token               UPPER
@@ -256,17 +256,27 @@ parent_node_with_children: parent_node PDL_declaration children_list
    for (auto this_child : $3.nodes)
        asParentNode->AppendChild(this_child);
      $$ = $1;
-  if (!$2.empty())
+  if (!$2.first.empty())
    {
-    for (auto this_function : $2)
-      driver.namesAndNodes.push_back(AppFunctionNameAndNode(this_function,asParentNode,my_location->begin.line));
+    for (auto this_function : $2.first)
+      driver.namesAndNodes.push_back(AppFunctionNameAndNode(this_function,asParentNode,$2.second));
    }
  }
 
 PDL_declaration:
- t_PDL function_list { $$ = $2;}
+ t_PDL function_list { 
+           pair <std::vector<std::string>,std::uint32_t> ret;
+	   ret.first = $2;
+	   ret.second =my_location->begin.line;
+	   $$ = ret;
+	   }
  |
-  {  $$ = std::vector<std::string>();}
+  {  
+   std::pair <std::vector<std::string>,std::uint32_t> ret;
+   ret.first = std::vector<std::string>();
+   ret.second =my_location->begin.line;
+  $$ = ret;
+  }
 ;
 
 function_list:

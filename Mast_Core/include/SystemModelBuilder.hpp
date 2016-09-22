@@ -78,6 +78,12 @@ class DLL_EXPORT SystemModelBuilder final
                         const mast::BinaryVector& bypass,
                         string_view               parentPath);
 
+  //! Creates a bynary linker for the DR_MUX of a JTAG_TAP
+  //!
+  std::shared_ptr<mast::PathSelector> Create_bynary_DR_MUX_path_selector (
+                                                    std::shared_ptr<Register>        ir, 
+						    uint32_t                            muxPathsCount);
+
   //! Creates a JTAG TAP
   //!
   std::shared_ptr<AccessInterface> Create_JTAG_TAP (string_view                              name,

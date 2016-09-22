@@ -199,6 +199,44 @@ std::shared_ptr<Chain> SystemModelBuilder::Create_1500_Wrapper (string_view name
 //  End of: SystemModelBuilder::Create_1500_Wrapper
 //---------------------------------------------------------------------------
 
+
+
+//! Creates a binary path selector for a TAP
+//!
+//!  @param ir       IR Register
+//!  @param muxPathsCount     DR number of path (at least two)
+//! 
+//!
+shared_ptr<mast::PathSelector> SystemModelBuilder::Create_bynary_DR_MUX_path_selector (shared_ptr<Register>        ir,                            
+                                                           uint32_t                            muxPathsCount)
+{
+  CHECK_PARAMETER_GT       (muxPathsCount, 1, "muxPathsCount must be > 1");
+
+  // ---------------- Create IR
+  //
+  auto irBypassSequence = ir->BypassSequence();
+  auto irBitsCount = ir->BypassSequence().BitsCount();
+  // ---------------- Create path selector
+  //
+  // Select table is by default binary except for no path and 1st that use the bypass sequence
+  auto selectTable = DefaultBinaryPathSelector::CreateSelectTable(irBitsCount, muxPathsCount, SelectorProperty::Binary_Default);
+  selectTable[0] = irBypassSequence;  // Not used (path id zero)
+  selectTable[1] = irBypassSequence;  // Bypass register
+
+  // Deselect table is by default all bypass sequence
+  auto deselectTable = DefaultTableBasedPathSelector::TablesType(muxPathsCount + 1u, irBypassSequence);
+
+  auto pathSelector = make_shared<DefaultTableBasedPathSelector>(ir, muxPathsCount, selectTable, deselectTable);
+
+
+
+  return pathSelector;
+}
+//
+//  End of: SystemModelBuilder::Create_bynary_DR_MUX_path_selector
+//---------------------------------------------------------------------------
+
+
 //! Creates a new Tap node
 //!
 //!  @param name            Name given to the tap
@@ -238,17 +276,7 @@ shared_ptr<AccessInterface> SystemModelBuilder::Create_JTAG_TAP (string_view    
   auto irBypassSequence = BinaryVector(irBitsCount, 0xFF);
   auto ir               = m_model.CreateRegister(irName, irBypassSequence, true, accessInterface);
 
-  // ---------------- Create path selector
-  //
-  // Select table is by default binary except for no path and 1st that use the bypass sequence
-  auto selectTable = DefaultBinaryPathSelector::CreateSelectTable(irBitsCount, muxPathsCount, SelectorProperty::Binary_Default);
-  selectTable[0] = irBypassSequence;  // Not used (path id zero)
-  selectTable[1] = irBypassSequence;  // Bypass register
-
-  // Deselect table is by default all bypass sequence
-  auto deselectTable = DefaultTableBasedPathSelector::TablesType(muxPathsCount + 1u, irBypassSequence);
-
-  auto pathSelector = make_shared<DefaultTableBasedPathSelector>(ir, muxPathsCount, selectTable, deselectTable);
+  auto pathSelector =  Create_bynary_DR_MUX_path_selector (ir,muxPathsCount);
 
   // ---------------- Create Linker
   //

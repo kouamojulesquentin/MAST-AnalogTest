@@ -48,6 +48,7 @@ class DLL_EXPORT Register : public SystemModelNode
   const BinaryVector& LastReadFromSut()   const { return m_lastReadFromSut;    } //!< Returns last sequence received from SUT when it was in pending read state
   const BinaryVector& NextToSut()         const { return m_nextToSut;          } //!< Returns next sequence to send to SUT
   const BinaryVector& LastToSut()         const { return m_lastToSut;          } //!< Returns last sequence effectively sent to SUT
+  const BinaryVector& DontCareMask()      const { return m_dontCareMask;       } //!< Returns the don't care mask (1 for care, 0 for don't care)
   bool                HoldValue()         const { return m_holdValue;          } //!< Returns true when bypass value is maintained equal to nextToSut (The value will not be changed while the register is selected)
   bool                MustCheckExpected() const { return m_mustCheckExpected;  } //!< Returns true when received data must be checked against expected data
   uint32_t            Mismatches()        const { return m_mismatches;         } //!< Returns current mismatch count
@@ -59,14 +60,18 @@ class DLL_EXPORT Register : public SystemModelNode
 
   // ---------------- Setters
   //
-  void         SetFromSut         (BinaryVector sequence);                                                                              //!< Sets last sequence of bits that have been shifted from SUT
-  void         SetExpectedFromSut (BinaryVector sequence)               { m_expectedFromSut = std::move(sequence); }                    //!< Sets expected sequence (when updating from SUT)
-  void         SetBypass          (BinaryVector sequence)               { m_bypass          = std::move(sequence); }                    //!< Sets sequence to shift into the sut when no iApply cycle has been defined on the register
-  void         SetHoldValue       (bool         holdValue       = true) { m_holdValue       = holdValue;           }                    //!< Set whether bypass value is maintain equal to nextToSut
-  void         SetPendingForRead  (bool         pendingForRead  = true) { m_pendingRead     = pendingForRead;    }                      //!< Set whether there is a pending request or not for read value from SUT
-  void         SetPendingForWrite (bool         pendingForWrite = true) { SystemModelNode::SetPendingCount(pendingForWrite ? 1u : 0); } //!< Sets pending requests for updating SUT (write operation)
-  void         ResetPendingWrite  ()                                    { SystemModelNode::ResetPending(); }                            //!< Resets any pending requests for updating SUT (write operation)
-  virtual void ResetPending       () override;                                                                                          //!< Resets read and write pending
+  void SetFromSut         (BinaryVector sequence);                                             //!< Sets last sequence of bits that have been shifted from SUT
+  void SetBypass          (BinaryVector sequence) { m_bypass          = std::move(sequence); } //!< Sets sequence to shift into the sut when no iApply cycle has been defined on the register
+  void SetExpectedFromSut (BinaryVector sequence) { m_expectedFromSut = std::move(sequence); } //!< Sets expected sequence (when updating from SUT)
+  void SetExpectedFromSut (BinaryVector sequence, BinaryVector dontCareMask);                  //!< Sets expected sequence and don't care mask (when updating from SUT)
+
+
+  void SetHoldValue       (bool holdValue       = true) { m_holdValue   = holdValue;      }                             //!< Set whether bypass value is maintain equal to nextToSut
+  void SetPendingForRead  (bool pendingForRead  = true) { m_pendingRead = pendingForRead; }                             //!< Set whether there is a pending request or not for read value from SUT
+  void SetPendingForWrite (bool pendingForWrite = true) { SystemModelNode::SetPendingCount(pendingForWrite ? 1u : 0); } //!< Sets pending requests for updating SUT (write operation)
+
+  void         ResetPendingWrite () { SystemModelNode::ResetPending(); } //!< Resets any pending requests for updating SUT (write operation)
+  virtual void ResetPending () override;                                 //!< Resets read and write pending
 
   //! Sets the bits sequence to send during the next iApply cycle
   //!
@@ -114,6 +119,14 @@ class DLL_EXPORT Register : public SystemModelNode
     m_lastReadFromSut.Get(value);
   }
 
+  //! Returns last sequence received from SUT when it was in pending read state - as integral value
+  //!
+  template<typename T> T LastReadFromSut () const
+  {
+    static_assert(std::is_integral<T>::value, "LastReadFromSut requires integral types");
+    return m_lastReadFromSut.Get<T>();
+  }
+
 
   //! Sets expected sequence (when updating from SUT) from integral value
   //!
@@ -122,6 +135,20 @@ class DLL_EXPORT Register : public SystemModelNode
     static_assert(std::is_integral<T>::value, "SetExpectedFromSut requires BinaryVector or integral types");
     m_expectedFromSut.Set(newValue);
   }
+
+  //! Sets expected sequence (when updating from SUT) and don't care mask from integral value
+  //!
+  template<typename T> void SetExpectedFromSut (T newValue, T dontCareMask)
+  {
+    static_assert(std::is_integral<T>::value, "SetExpectedFromSut requires BinaryVector or integral types");
+    m_expectedFromSut.Set(newValue);
+    if (m_dontCareMask.IsEmpty())
+    {
+      m_dontCareMask = BinaryVector(m_expectedFromSut.BitsCount(), 0, SizeProperty::Fixed);
+    }
+    m_dontCareMask.Set(dontCareMask);
+  }
+
 
   //! Sets the bits sequence to send during the next iApply cycle from integral value
   //!
@@ -154,6 +181,7 @@ class DLL_EXPORT Register : public SystemModelNode
   BinaryVector m_lastReadFromSut;           //!< Last sequence of bits that have been shifted from SUT when pending read is true
   BinaryVector m_expectedFromSut;           //!< Sequence of expected bits when scanning from SUT
   BinaryVector m_bypass;                    //!< Sequence to shift into the sut when no iApply cycle has been defined on the register
+  BinaryVector m_dontCareMask;              //!< When not empty, each one bit represent a bit to compare and each zero bit represent a bit we don't care
 };
 //
 //  End of Register class declaration

@@ -53,10 +53,14 @@ class UT_Register : public CxxTest::TestSuite
 
   void test_SetExpectedFromSut ();
   void test_SetExpectedFromSut_DifferentSize ();
+  void test_SetExpectedFromSut_DontCare ();
+  void test_SetExpectedFromSut_DontCare_DifferentSize ();
 
-  void test_SetFromSut_DifferingFromExpected_WithoutCheck ();
-  void test_SetFromSut_DifferingFromExpected_WithCheck ();
-  void test_SetFromSut_DifferingFromExpected_WithPendingRead ();
+  void test_SetFromSut_Differing_WithoutCheck ();
+  void test_SetFromSut_Differing_WithCheck ();
+  void test_SetFromSut_Differing_DontCare_Mismatch ();
+  void test_SetFromSut_Differing_DontCare_NoMismatch ();
+  void test_SetFromSut_Differing_WithPendingRead ();
   void test_SetFromSut_DifferentSize ();
 
   void test_UpdateLastToSut ();
@@ -82,6 +86,15 @@ class UT_Register : public CxxTest::TestSuite
   void test_SetExpectedFromSut_int16 ();
   void test_SetExpectedFromSut_int32 ();
   void test_SetExpectedFromSut_int64 ();
+
+  void test_SetExpectedFromSut_DontCare_uint8 ();
+  void test_SetExpectedFromSut_DontCare_uint16 ();
+  void test_SetExpectedFromSut_DontCare_uint32 ();
+  void test_SetExpectedFromSut_DontCare_uint64 ();
+  void test_SetExpectedFromSut_DontCare_int8 ();
+  void test_SetExpectedFromSut_DontCare_int16 ();
+  void test_SetExpectedFromSut_DontCare_int32 ();
+  void test_SetExpectedFromSut_DontCare_int64 ();
 
   // ---------------- Other getters
   //

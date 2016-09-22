@@ -24,14 +24,14 @@ using namespace mast;
 //!
 //! @note All registers are initialized like the bypass sequence
 Register::Register (string_view name, mast::BinaryVector bypassSequence, bool holdValue)
-  : SystemModelNode      (name)
-  , m_holdValue          (holdValue)
-  , m_nextToSut          (bypassSequence,            SizeProperty::Fixed)
-  , m_lastToSut          (bypassSequence,            SizeProperty::Fixed)
-  , m_lastFromSut        (bypassSequence,            SizeProperty::Fixed)
+  : SystemModelNode   (name)
+  , m_holdValue       (holdValue)
+  , m_nextToSut       (bypassSequence,            SizeProperty::Fixed)
+  , m_lastToSut       (bypassSequence,            SizeProperty::Fixed)
+  , m_lastFromSut     (bypassSequence,            SizeProperty::Fixed)
   , m_lastReadFromSut (bypassSequence.BitsCount())
-  , m_expectedFromSut    (bypassSequence,            SizeProperty::Fixed)
-  , m_bypass             (std::move(bypassSequence), SizeProperty::Fixed)
+  , m_expectedFromSut (bypassSequence,            SizeProperty::Fixed)
+  , m_bypass          (std::move(bypassSequence), SizeProperty::Fixed)
 {
 }
 //
@@ -68,7 +68,11 @@ BinaryVector Register::LastCompareResult () const
 {
   auto result = m_lastReadFromSut ^ m_expectedFromSut;
 
-  return std::move(result);
+  if (!m_dontCareMask.IsEmpty())
+  {
+    result &= m_dontCareMask;
+  }
+  return result;
 }
 //
 //  End of: Register::LastCompareResult
@@ -98,6 +102,22 @@ void Register::ResetPending ()
 //  End of: Register::ResetPending
 //---------------------------------------------------------------------------
 
+//! Sets expected sequence and don't care mask (when updating from SUT)
+//!
+//! @param sequence     New expected value to read from SUT
+//! @param dontCareMask Don't care mask (relative to expected value)
+//!
+void Register::SetExpectedFromSut (BinaryVector sequence, BinaryVector dontCareMask)
+{
+  CHECK_PARAMETER_EQ(dontCareMask.BitsCount(), sequence.BitsCount(), "Don't care mask must have same size as Register");
+
+  if (m_dontCareMask.IsEmpty())
+  {
+    m_dontCareMask = BinaryVector(m_expectedFromSut.BitsCount(), 0, SizeProperty::Fixed);
+  }
+  m_expectedFromSut = std::move(sequence);
+  m_dontCareMask    = std::move(dontCareMask);
+}
 
 
 //! Sets last sequence of bits that have been shifted from SUT
@@ -111,14 +131,9 @@ void Register::SetFromSut (BinaryVector sequence)
     m_lastReadFromSut = sequence;
   }
 
-  if (m_mustCheckExpected)
+  if (m_mustCheckExpected && !sequence.CompareEqualTo(m_expectedFromSut, m_dontCareMask))
   {
-    //! @todo [JFC]-[July/28/2016]: Apply the don't care mask to sequence
-
-    if (sequence != m_expectedFromSut)
-    {
-      ++m_mismatches;
-    }
+    ++m_mismatches;
   }
   m_lastFromSut = std::move(sequence);
 }

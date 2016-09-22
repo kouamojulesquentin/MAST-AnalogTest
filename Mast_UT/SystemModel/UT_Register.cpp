@@ -46,6 +46,28 @@ template<typename T, typename U> void Check_LastFromSut(U data)
   //
   TS_ASSERT_EQUALS (gotValue, expected);
 }
+
+//! Checks Register::SetExpectedFromSut() with integral type and don't care mask
+//!
+template<typename T>
+void Check_SetExpectedFromSut_DontCare (T expected, T mask)
+{
+  static_assert(std::is_integral<T>::value, "");
+
+  // ---------------- Setup
+  //
+  Register sut("Reg", BinaryVector::CreateFromString("0xF0A5B6C7D8E9"), true);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.SetExpectedFromSut(expected, mask));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (sut.ExpectedFromSut().Get<T>(), expected);
+  TS_ASSERT_EQUALS (sut.DontCareMask().Get<T>(),    mask);
+}
+
 } // End of unnamed namespace
 
 //! Checks Register:: constructor
@@ -98,6 +120,8 @@ void UT_Register::test_Constructor ()
   TS_ASSERT_EQUALS (last_int32,  0L);
   TS_ASSERT_EQUALS (last_int64,  0LL);
 }
+
+
 
 
 //! Checks Register::SetPendingForWrite
@@ -343,9 +367,51 @@ void UT_Register::test_SetExpectedFromSut_DifferentSize ()
   TS_ASSERT_THROWS (sut.SetExpectedFromSut(newValue), std::exception);
 }
 
+
+//! Checks Register::SetExpectedFromSut() with a proper value
+//!
+void UT_Register::test_SetExpectedFromSut_DontCare ()
+{
+  // ---------------- Setup
+  //
+  const auto initial         = BinaryVector::CreateFromBinaryString("1111_1111:0");
+  const auto expectedFromSut = BinaryVector::CreateFromBinaryString("0000_0101:0");
+  const auto dontCareMask    = BinaryVector::CreateFromBinaryString("1000_0111:1");
+
+  Register sut("Reg", initial);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.SetExpectedFromSut(expectedFromSut, dontCareMask));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (sut.ExpectedFromSut(), expectedFromSut);
+  TS_ASSERT_EQUALS (sut.DontCareMask(),    dontCareMask);
+}
+
+
+//! Checks Register::SetExpectedFromSut() with a don't care maske of improper size
+//!
+void UT_Register::test_SetExpectedFromSut_DontCare_DifferentSize ()
+{
+  // ---------------- Setup
+  //
+  const auto initial         = BinaryVector::CreateFromBinaryString("1111_1111:0");
+  const auto expectedFromSut = BinaryVector::CreateFromBinaryString("0000_0101:0");
+  const auto dontCareMask    = BinaryVector::CreateFromBinaryString("1000_0111");
+
+  Register sut("Reg", initial);
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut.SetExpectedFromSut(expectedFromSut, dontCareMask), std::exception);
+}
+
+
 //! Checks Register::SetFromSut() with a value different from expected one and check disabled
 //!
-void UT_Register::test_SetFromSut_DifferingFromExpected_WithoutCheck ()
+void UT_Register::test_SetFromSut_Differing_WithoutCheck ()
 {
   // ---------------- Setup
   //
@@ -369,9 +435,10 @@ void UT_Register::test_SetFromSut_DifferingFromExpected_WithoutCheck ()
   TS_ASSERT_EQUALS (sut.LastCompareResult(), expected);   // Check was not activated (so LastCompareResult has not been updated)
 }
 
+
 //! Checks Register::SetFromSut() with a value different from expected one and check enabled
 //!
-void UT_Register::test_SetFromSut_DifferingFromExpected_WithCheck ()
+void UT_Register::test_SetFromSut_Differing_WithCheck ()
 {
   // ---------------- Setup
   //
@@ -390,17 +457,82 @@ void UT_Register::test_SetFromSut_DifferingFromExpected_WithCheck ()
 
   // ---------------- Verify
   //
+  auto expectedCompareResult = BinaryVector::CreateFromBinaryString("0000_0000:1");
+
   TS_ASSERT_TRUE   (sut.MustCheckExpected());
   TS_ASSERT_EQUALS (sut.LastFromSut(),       newValue);
   TS_ASSERT_EQUALS (sut.LastReadFromSut(),   newValue);
   TS_ASSERT_EQUALS (sut.Mismatches(),        1);
-  TS_ASSERT_EQUALS (sut.LastCompareResult(), BinaryVector::CreateFromBinaryString("0000_0000:1"));
+  TS_ASSERT_EQUALS (sut.LastCompareResult(), expectedCompareResult);
 }
 
 
+//! Checks Register::SetFromSut() with a value different from expected, check enabled and there is a mismatch
+//!
+void UT_Register::test_SetFromSut_Differing_DontCare_Mismatch ()
+{
+  // ---------------- Setup
+  //
+  const auto initial  = BinaryVector::CreateFromBinaryString("1111_1111:0");
+  const auto newValue = BinaryVector::CreateFromBinaryString("1110_0111:0");
+  const auto expected = BinaryVector::CreateFromBinaryString("1010_1000:1");
+  const auto dontcare = BinaryVector::CreateFromBinaryString("1011_1100:1");
+
+  Register sut("Reg", initial);
+  sut.SetExpectedFromSut(expected, dontcare);
+  sut.SetPendingForRead(true);
+  sut.SetCheckExpected(true);
+
+  // ---------------- Exercise
+  //
+  sut.SetFromSut(newValue);
+
+  // ---------------- Verify
+  //
+  auto expectedCompareResult = BinaryVector::CreateFromBinaryString("0000_1100:1");
+
+  TS_ASSERT_TRUE   (sut.MustCheckExpected());
+  TS_ASSERT_EQUALS (sut.LastFromSut(),       newValue);
+  TS_ASSERT_EQUALS (sut.LastReadFromSut(),   newValue);
+  TS_ASSERT_EQUALS (sut.Mismatches(),        1);
+  TS_ASSERT_EQUALS (sut.LastCompareResult(), expectedCompareResult);
+}
+
+
+//! Checks Register::SetFromSut() with a value different from expected, check enabled and there is a no mismatch due to don't care
+//!
+void UT_Register::test_SetFromSut_Differing_DontCare_NoMismatch ()
+{
+  // ---------------- Setup
+  //
+  const auto initial  = BinaryVector::CreateFromBinaryString("1111_1111:0");
+  const auto newValue = BinaryVector::CreateFromBinaryString("1010_1011:1");
+  const auto expected = BinaryVector::CreateFromBinaryString("1010_1000:0");
+  const auto dontcare = BinaryVector::CreateFromBinaryString("1111_1100:0");
+
+  Register sut("Reg", initial);
+  sut.SetExpectedFromSut(expected, dontcare);
+  sut.SetPendingForRead(true);
+  sut.SetCheckExpected(true);
+
+  // ---------------- Exercise
+  //
+  sut.SetFromSut(newValue);
+
+  // ---------------- Verify
+  //
+  auto expectedCompareResult = BinaryVector::CreateFromBinaryString("0000_0000:0");
+
+  TS_ASSERT_TRUE   (sut.MustCheckExpected());
+  TS_ASSERT_EQUALS (sut.LastFromSut(),       newValue);
+  TS_ASSERT_EQUALS (sut.LastReadFromSut(),   newValue);
+  TS_ASSERT_EQUALS (sut.Mismatches(),        0);
+  TS_ASSERT_EQUALS (sut.LastCompareResult(), expectedCompareResult);
+}
+
 //! Checks Register::SetFromSut() while in pending read
 //!
-void UT_Register::test_SetFromSut_DifferingFromExpected_WithPendingRead ()
+void UT_Register::test_SetFromSut_Differing_WithPendingRead ()
 {
   // ---------------- Setup
   //
@@ -1104,6 +1236,14 @@ void UT_Register::test_SetExpectedFromSut_int64 ()
 }
 
 
+void UT_Register::test_SetExpectedFromSut_DontCare_uint8  () { Check_SetExpectedFromSut_DontCare<uint8_t>  (uint8_t  (0xFA),       uint8_t  (0xFE)       ); }
+void UT_Register::test_SetExpectedFromSut_DontCare_uint16 () { Check_SetExpectedFromSut_DontCare<uint16_t> (uint16_t (0xFA12),     uint16_t (0xFEAA)     ); }
+void UT_Register::test_SetExpectedFromSut_DontCare_uint32 () { Check_SetExpectedFromSut_DontCare<uint32_t> (uint32_t (0xFA1234),   uint32_t (0xFEAA55)   ); }
+void UT_Register::test_SetExpectedFromSut_DontCare_uint64 () { Check_SetExpectedFromSut_DontCare<uint64_t> (uint64_t (0xFA123456), uint64_t (0xFEAA5566) ); }
+void UT_Register::test_SetExpectedFromSut_DontCare_int8   () { Check_SetExpectedFromSut_DontCare<int8_t>   (int8_t   (0xFA),       int8_t   (0xFE)       ); }
+void UT_Register::test_SetExpectedFromSut_DontCare_int16  () { Check_SetExpectedFromSut_DontCare<int16_t>  (int16_t  (0xFA12),     int16_t  (0xFEAA)     ); }
+void UT_Register::test_SetExpectedFromSut_DontCare_int32  () { Check_SetExpectedFromSut_DontCare<int32_t>  (int32_t  (0xFA1234),   int32_t  (0xFEAA55)   ); }
+void UT_Register::test_SetExpectedFromSut_DontCare_int64  () { Check_SetExpectedFromSut_DontCare<int64_t>  (int64_t  (0xFA123456), int64_t  (0xFEAA5566) ); }
 
 
 //! Checks Register::SetToSut() with a proper value from uint8_t

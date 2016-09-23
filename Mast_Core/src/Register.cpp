@@ -107,7 +107,7 @@ void Register::ResetPending ()
 //!
 //! @param sequence     New expected value to read from SUT
 //! @param dontCareMask Don't care mask (relative to expected value).
-//!                     It is is empty, then all bits will be cared-of
+//!                     If it is empty, then all bits will be cared-of
 //!
 //! @warning dontCareMask must be either empty or have same size as Register
 //!

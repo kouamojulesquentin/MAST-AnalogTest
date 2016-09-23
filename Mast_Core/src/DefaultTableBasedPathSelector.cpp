@@ -24,6 +24,16 @@ using std::shared_ptr;
 
 using namespace mast;
 
+  std::experimental::string_view DefaultTableBasedPathSelector::DebugSelectorInfo() const 
+  
+  { 
+    auto message=std::string("Selection Table: ");
+    for (auto iter : m_selectTable);
+      
+  return message;
+  } //!< Returns debug information about selector
+
+
 //! Initializes selector for fast selection/deselection of a path
 //!
 //! @param associatedRegister   Register that is used to drive the path multiplexer
@@ -258,8 +268,6 @@ const BinaryVector& DefaultTableBasedPathSelector::SelectionValue (uint32_t path
 //
 //  End of: DefaultTableBasedPathSelector::SelectionValue
 //---------------------------------------------------------------------------
-
-
 
 //===========================================================================
 // End of DefaultTableBasedPathSelector.cpp

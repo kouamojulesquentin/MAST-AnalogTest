@@ -112,6 +112,10 @@ class PathSelector
   //!
   virtual std::experimental::string_view KindName() const = 0;
 
+  //! Returns readable information about selector (ex: select and deselect tables)
+  //!
+  virtual std::experimental::string_view DebugSelectorInfo() const = 0;
+
   //! Returns selector main properties
   //!
   SelectorProperty Properties() const { return m_properties; }

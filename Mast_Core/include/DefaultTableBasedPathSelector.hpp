@@ -75,6 +75,9 @@ class DLL_EXPORT DefaultTableBasedPathSelector : public PathSelector
 
   virtual std::experimental::string_view KindName() const override { return "Table_Based"; }; //!< Returns readable type of selector
 
+  virtual std::experimental::string_view DebugSelectorInfo() const override ;
+  //!< Returns debug information about selector
+
   // ---------------- Protected Methods
   //
   protected:

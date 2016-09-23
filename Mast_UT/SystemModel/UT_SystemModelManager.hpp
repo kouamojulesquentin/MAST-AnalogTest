@@ -145,6 +145,16 @@ class UT_SystemModelManager : public CxxTest::TestSuite
   void test_iRead_int64 ();
   void test_iRead_BinaryVector ();
 
+  void test_iRead_DontCare_uint8 ();
+  void test_iRead_DontCare_uint16 ();
+  void test_iRead_DontCare_uint32 ();
+  void test_iRead_DontCare_uint64 ();
+  void test_iRead_DontCare_int8 ();
+  void test_iRead_DontCare_int16 ();
+  void test_iRead_DontCare_int32 ();
+  void test_iRead_DontCare_int64 ();
+  void test_iRead_DontCare_BinaryVector ();
+
   // ================ Other Methods ================
 
   void setUp();    //!< Initializes test (called for each test)

@@ -102,13 +102,24 @@ void Register::ResetPending ()
 //  End of: Register::ResetPending
 //---------------------------------------------------------------------------
 
+
 //! Sets expected sequence and don't care mask (when updating from SUT)
 //!
 //! @param sequence     New expected value to read from SUT
-//! @param dontCareMask Don't care mask (relative to expected value)
+//! @param dontCareMask Don't care mask (relative to expected value).
+//!                     It is is empty, then all bits will be cared-of
+//!
+//! @warning dontCareMask must be either empty or have same size as Register
 //!
 void Register::SetExpectedFromSut (BinaryVector sequence, BinaryVector dontCareMask)
 {
+  if (dontCareMask.IsEmpty())
+  {
+    m_dontCareMask.Clear();
+    SetExpectedFromSut(sequence);
+    return;
+  }
+
   CHECK_PARAMETER_EQ(dontCareMask.BitsCount(), sequence.BitsCount(), "Don't care mask must have same size as Register");
 
   if (m_dontCareMask.IsEmpty())

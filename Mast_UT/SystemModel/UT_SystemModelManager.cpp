@@ -373,6 +373,45 @@ template<typename T> void Check_iRead_SingleThread (T iReadValue, T iWriteValue,
   TS_ASSERT_EQUALS (xorResult, expectedXorResult);   // 40 bits reg
 }
 
+
+//! Checks SystemModelManager::iRead() with a don't care value in case there is a mismatch
+//!
+//! @param iReadExpectedValue The expected value passed to iRead
+//! @param iReadDontCareValue The don't care value passed to iRead
+//! @param iWriteValue        The value passed to iWrite
+//! @param expectedMismatch   Expected mismatch (checked with 40 bits register)
+//!
+template<typename T> void Check_iRead_DontCare_SingleThread (T           iReadExpectedValue,
+                                                             T           iReadDontCareValue,
+                                                             T           iWriteValue,
+                                                             string_view expectedMismatch)
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm, false, 40u);
+  SystemModelManager sut(sm);
+
+  auto regPath = "dynamic_2";
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.iRead(regPath, iReadExpectedValue, iReadDontCareValue));
+
+  // ---------------- Verify
+  //
+  sut.iWrite (regPath, iWriteValue); // Loopback (default protocol) will force FromSut to be updated
+  sut.iApply();
+
+  auto xorResult         = sut.iGetMiscompares (regPath);
+  auto status            = sut.iGetStatus      (regPath, false);
+  auto expectedXorResult = BinaryVector::CreateFromHexString(expectedMismatch);
+
+  TS_ASSERT_EQUALS (status,    1u);
+  TS_ASSERT_EQUALS (xorResult, expectedXorResult);   // 40 bits reg
+}
+
+
 //! Checks SystemModelManager::iGetRefresh() with 4 application threads accessing multiple times their own register
 //!
 //! @note It just check that application and manager threads are not blocked
@@ -2535,6 +2574,23 @@ void UT_SystemModelManager::test_iRead_int64        () { Check_iRead_SingleThrea
 void UT_SystemModelManager::test_iRead_BinaryVector () { Check_iRead_SingleThread(BinaryVector::CreateFromHexString("0CFF00FF00"),
                                                                                   BinaryVector::CreateFromHexString("0D89ABCDEF"),
                                                                                                                     "0176AB32EF"); }
+
+
+//! Checks SystemModelManager::iRead() when there is a don't care value - using same thread as SystemModelManager
+//!                                                                                                 // iRead-ExpectedValue, iRead-DontCare, iWrite-Value, expectedMismatch
+//!
+void UT_SystemModelManager::test_iRead_DontCare_uint8        () { Check_iRead_DontCare_SingleThread<uint8_t>  (0xF0,        0xF3,        0xAC,        "0000000050"); }
+void UT_SystemModelManager::test_iRead_DontCare_uint16       () { Check_iRead_DontCare_SingleThread<uint16_t> (0x0FF0,      0x0FFF,      0xACDE,      "000000032E"); }
+void UT_SystemModelManager::test_iRead_DontCare_uint32       () { Check_iRead_DontCare_SingleThread<uint32_t> (0xFF00FF00,  0xFF00FF00,  0x89ABCDEF,  "0076003200"); }
+void UT_SystemModelManager::test_iRead_DontCare_uint64       () { Check_iRead_DontCare_SingleThread<uint64_t> (0xCFF00FF00, 0xFFF00FF00, 0xD89ABCDEF, "0176003200"); }
+void UT_SystemModelManager::test_iRead_DontCare_int8         () { Check_iRead_DontCare_SingleThread<int8_t>   (0x70,        0x70,        0x6C,        "0000000010"); }
+void UT_SystemModelManager::test_iRead_DontCare_int16        () { Check_iRead_DontCare_SingleThread<int16_t>  (0x4280,      0x7F80,      0x3CDE,      "0000007E00"); }
+void UT_SystemModelManager::test_iRead_DontCare_int32        () { Check_iRead_DontCare_SingleThread<int32_t>  (0x12345678,  0x3F00FF00,  0x98765432,  "000A000200"); }
+void UT_SystemModelManager::test_iRead_DontCare_int64        () { Check_iRead_DontCare_SingleThread<int64_t>  (0x123456789, 0xCFF00FF00, 0x987654321, "08A4002400"); }
+void UT_SystemModelManager::test_iRead_DontCare_BinaryVector () { Check_iRead_DontCare_SingleThread(BinaryVector::CreateFromHexString("0CAD005A00"),
+                                                                                                    BinaryVector::CreateFromHexString("0FFF00FF00"),
+                                                                                                    BinaryVector::CreateFromHexString("0D89ABCDEF"),
+                                                                                                                                      "0124009700"); }
 
 //===========================================================================
 // End of UT_SystemModelManager.cpp

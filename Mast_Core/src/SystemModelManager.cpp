@@ -566,8 +566,6 @@ void SystemModelManager::iPrefix (std::string prefix)
 template<typename T>
 void SystemModelManager::iRead_impl (string_view registerPath, T expectedValue)
 {
-  //! @todo [JFC]-[August/02/2016]: In iRead_impl(): Add support for don't care
-  //!
   auto& pathResolver = PATH_RESOLVER("iRead: ");
   auto  reg          = pathResolver.ResolveAsRegister(registerPath);
 
@@ -589,6 +587,41 @@ void SystemModelManager::iRead_impl (string_view registerPath, T expectedValue)
 //---------------------------------------------------------------------------
 
 
+//! Queues a request to (re-)read register value from SUT giving an expected value.
+//!
+//! @param registerPath     Register path (relative to the last iPrefix or node associated with application thread)
+//! @param expectedValue    Value expected to be read from SUT (may contain don't care bits if specified as string)
+//! @param dontCareMask     Mask with 1s for cared-for bits and 0s for don't care bits
+//!
+template<typename T>
+void SystemModelManager::iRead_impl (string_view registerPath, T expectedValue, T dontCareMask)
+{
+  auto& pathResolver = PATH_RESOLVER("iRead: ");
+  auto  reg          = pathResolver.ResolveAsRegister(registerPath);
+
+  auto expectedAsBV  = BinaryVector(reg->BitsCount(), 0u, SizeProperty::Fixed);
+  auto dontCareAsBV  = BinaryVector(reg->BitsCount(), 0u, SizeProperty::Fixed);
+  expectedAsBV.Set(std::move(expectedValue));
+  dontCareAsBV.Set(std::move(dontCareMask));
+
+  auto appData = ThreadApplicationData();
+
+  MONITOR_PDL_AND_VALUE("iRead with don't care - Queuing request", registerPath, expectedAsBV, appData);
+
+
+  appData->queuedReads.emplace_back(SystemModelManager::QueuedRequest(reg->Identifier(),
+                                                                      std::move(expectedAsBV),
+                                                                      std::move(dontCareAsBV)));
+
+  *appData->currentState = ApplicationData::State::ReadRequest;
+
+  MONITOR_DEBUG_APP("iRead - Leaving", appData);
+}
+//
+//  End of: SystemModelManager::iRead_impl
+//---------------------------------------------------------------------------
+
+
 void SystemModelManager::iRead (string_view registerPath, BinaryVector expectedValue) { iRead_impl(registerPath, std::move(expectedValue)); }
 void SystemModelManager::iRead (string_view registerPath, uint8_t      expectedValue) { iRead_impl(registerPath, expectedValue);            }
 void SystemModelManager::iRead (string_view registerPath, uint16_t     expectedValue) { iRead_impl(registerPath, expectedValue);            }
@@ -599,6 +632,15 @@ void SystemModelManager::iRead (string_view registerPath, int16_t      expectedV
 void SystemModelManager::iRead (string_view registerPath, int32_t      expectedValue) { iRead_impl(registerPath, expectedValue);            }
 void SystemModelManager::iRead (string_view registerPath, int64_t      expectedValue) { iRead_impl(registerPath, expectedValue);            }
 
+void SystemModelManager::iRead (string_view registerPath, BinaryVector expectedValue, BinaryVector dontCareMask) { iRead_impl(registerPath, std::move(expectedValue), std::move(dontCareMask)); }
+void SystemModelManager::iRead (string_view registerPath, uint8_t      expectedValue, uint8_t      dontCareMask) { iRead_impl(registerPath, expectedValue,            dontCareMask);            }
+void SystemModelManager::iRead (string_view registerPath, uint16_t     expectedValue, uint16_t     dontCareMask) { iRead_impl(registerPath, expectedValue,            dontCareMask);            }
+void SystemModelManager::iRead (string_view registerPath, uint32_t     expectedValue, uint32_t     dontCareMask) { iRead_impl(registerPath, expectedValue,            dontCareMask);            }
+void SystemModelManager::iRead (string_view registerPath, uint64_t     expectedValue, uint64_t     dontCareMask) { iRead_impl(registerPath, expectedValue,            dontCareMask);            }
+void SystemModelManager::iRead (string_view registerPath, int8_t       expectedValue, int8_t       dontCareMask) { iRead_impl(registerPath, expectedValue,            dontCareMask);            }
+void SystemModelManager::iRead (string_view registerPath, int16_t      expectedValue, int16_t      dontCareMask) { iRead_impl(registerPath, expectedValue,            dontCareMask);            }
+void SystemModelManager::iRead (string_view registerPath, int32_t      expectedValue, int32_t      dontCareMask) { iRead_impl(registerPath, expectedValue,            dontCareMask);            }
+void SystemModelManager::iRead (string_view registerPath, int64_t      expectedValue, int64_t      dontCareMask) { iRead_impl(registerPath, expectedValue,            dontCareMask);            }
 
 //! Queues a request to (re-)read register value from SUT
 //!
@@ -769,7 +811,7 @@ void SystemModelManager::ProcessQueuedRequests (shared_ptr<ApplicationData> appD
   for (const auto& request : appData->queuedReads)
   {
     auto reg = m_sm.RegisterWithId(request.regId);
-    reg->SetExpectedFromSut(std::move(request.value));
+    reg->SetExpectedFromSut(std::move(request.value), std::move(request.mask));
     reg->SetCheckExpected(true);
     reg->SetPendingForRead(true);
 

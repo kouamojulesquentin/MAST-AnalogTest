@@ -138,6 +138,17 @@ class DLL_EXPORT SystemModelManager final
   void iRead (string_view registerPath, int32_t      expectedValue);
   void iRead (string_view registerPath, int64_t      expectedValue);
 
+
+  void iRead (string_view registerPath, BinaryVector expectedValue, BinaryVector dontCareMask);
+  void iRead (string_view registerPath, uint8_t      expectedValue, uint8_t      dontCareMask);
+  void iRead (string_view registerPath, uint16_t     expectedValue, uint16_t     dontCareMask);
+  void iRead (string_view registerPath, uint32_t     expectedValue, uint32_t     dontCareMask);
+  void iRead (string_view registerPath, uint64_t     expectedValue, uint64_t     dontCareMask);
+  void iRead (string_view registerPath, int8_t       expectedValue, int8_t       dontCareMask);
+  void iRead (string_view registerPath, int16_t      expectedValue, int16_t      dontCareMask);
+  void iRead (string_view registerPath, int32_t      expectedValue, int32_t      dontCareMask);
+  void iRead (string_view registerPath, int64_t      expectedValue, int64_t      dontCareMask);
+
   //! Queues data to be read from SUT without checking the value
   //!
   void iRefresh (string_view registerPath);
@@ -225,6 +236,7 @@ class DLL_EXPORT SystemModelManager final
   template<typename T> void iGet_impl        (string_view registerPath, T& readData);
   template<typename T> void iGetRefresh_impl (string_view registerPath, T& readData);
   template<typename T> void iRead_impl       (string_view registerPath, T  expectedValue);
+  template<typename T> void iRead_impl       (string_view registerPath, T  expectedValue, T dontCareMask);
   template<typename T> void iWrite_impl      (string_view registerPath, T  value);
 
   struct QueuedRequest

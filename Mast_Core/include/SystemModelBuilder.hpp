@@ -50,11 +50,6 @@ enum class SelectorKind
   N_Hot,   //!< One hot encoding where value '000' select no path, "001" path '0', "011" paths '1' and '0'
 };
 
-typedef std::shared_ptr<mast::PathSelector> _DR_MUX_path_selector (
-			std::shared_ptr<Register>    ,                            
-                        uint32_t                ,
-			std::vector<uint32_t>	);
-
 //! Provides facilities to create SystemModel sub-trees
 //!
 class DLL_EXPORT SystemModelBuilder final
@@ -95,14 +90,8 @@ class DLL_EXPORT SystemModelBuilder final
                                                     uint32_t                                 irBitsCount,
                                                     uint32_t                                 muxPathsCount,
                                                     std::shared_ptr<AccessInterfaceProtocol> protocol,
-						    std::vector<uint32_t>	coding);
+						    std::vector<mast::BinaryVector>	IR_coding);
 
-template <_DR_MUX_path_selector DR_MUX_path_selector>
-std::shared_ptr<AccessInterface> Create_JTAG_TAP_generic (string_view                         name,
-                                                                 uint32_t                            irBitsCount,
-                                                                 uint32_t                            muxPathsCount,
-                                                                 std::shared_ptr<AccessInterfaceProtocol> protocol,
-								 std::vector<uint32_t>	coding);
 
   //! Creates a path selector
   //!

@@ -164,8 +164,9 @@ inline std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(std::string desig
 %type  <std::uint32_t> IR_size
 %type  <std::uint32_t> size
 %type  <std::uint32_t> n_DR_chains
-%type  <std::vector<uint32_t>> Coding_list
-%type  <std::vector<uint32_t>> IR_TABLE
+%type  <std::vector<uint32_t>> AI_Coding_list
+%type  <std::vector<mast::BinaryVector>> IR_Coding_list
+%type  <std::vector<mast::BinaryVector>> IR_TABLE
 %type  <std::vector<uint32_t>> AI_TABLE
 %type  <std::string> JTAG_protocol
 %type  <std::shared_ptr<mast::SystemModelNode>> root_node
@@ -548,12 +549,12 @@ n_DR_chains :
  t_DecimalLiteral { $$ = $1;}
 ;
 IR_TABLE:
- t_LeftBracket Coding_list t_RightBracket  {$$=$2;}
- |  {$$ = std::vector<uint32_t>();}
+ t_LeftBracket IR_Coding_list t_RightBracket  {$$=$2;}
+ |  {$$ = std::vector<mast::BinaryVector>();}
  ;
 
 AI_TABLE:
-t_LeftBracket Coding_list t_RightBracket  {$$=$2;}
+t_LeftBracket AI_Coding_list t_RightBracket  {$$=$2;}
  |  {$$ = std::vector<uint32_t>();}
  ;
 
@@ -566,16 +567,30 @@ AI_identifier:
  { $$="";
  }
 
-Coding_list:
+AI_Coding_list:
  t_QUOTED_STRING
     {
        $$.push_back(extract_number($1));
     }
  |
- t_QUOTED_STRING t_Comma  Coding_list
+ t_QUOTED_STRING t_Comma  AI_Coding_list
   {
    auto tmp = $3;
    tmp.insert(tmp.begin(),extract_number($1));
+   $$ = tmp;
+   }
+;
+
+IR_Coding_list:
+ t_QUOTED_STRING
+    {
+       $$.push_back(BinaryVector::CreateFromString(remove_quotes($1)));
+    }
+ |
+ t_QUOTED_STRING t_Comma  IR_Coding_list
+  {
+   auto tmp = $3;
+   tmp.insert(tmp.begin(),BinaryVector::CreateFromString(remove_quotes($1)));
    $$ = tmp;
    }
 ;

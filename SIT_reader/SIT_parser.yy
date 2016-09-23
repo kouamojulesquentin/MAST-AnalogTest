@@ -572,46 +572,10 @@ Coding_list:
        $$.push_back(extract_number($1));
     }
  |
- t_QUOTED_STRING t_RightParenthesis
-    { /* ')' at far right*/
-       $$.push_back(extract_number($1));
-    }
- |
-t_LeftParenthesis t_QUOTED_STRING t_RightParenthesis
-    { /* '(' and ')' at far right*/
-       $$.push_back(extract_number($2));
-    }
- |
-t_LeftParenthesis t_QUOTED_STRING
-    { /* '(' at far right*/
-       $$.push_back(extract_number($2));
-    }
- |
  t_QUOTED_STRING t_Comma  Coding_list
   {
    auto tmp = $3;
    tmp.insert(tmp.begin(),extract_number($1));
-   $$ = tmp;
-   }
- |
- t_LeftParenthesis t_QUOTED_STRING t_Comma  Coding_list
-  { /* '('  at beginning+middle of list*/
-   auto tmp = $4;
-   tmp.insert(tmp.begin(),extract_number($2));
-   $$ = tmp;
-   }
- |
- t_QUOTED_STRING t_RightParenthesis t_Comma  Coding_list
-  { /* ')' at beginning+ middle of the list*/
-   auto tmp = $4;
-   tmp.insert(tmp.begin(),extract_number($1));
-   $$ = tmp;
-   }
- |
-  t_LeftParenthesis t_QUOTED_STRING t_RightParenthesis t_Comma  Coding_list
-  { /* '(' and ')' at beginning+ middle of the list*/
-   auto tmp = $5;
-   tmp.insert(tmp.begin(),extract_number($2));
    $$ = tmp;
    }
 ;

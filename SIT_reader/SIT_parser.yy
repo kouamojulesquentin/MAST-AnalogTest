@@ -130,12 +130,16 @@ inline std::uint32_t extract_number(std::string s)
 
 
 
-inline auto make_openOCD_protocol(std::string designName,std::uint32_t IR_size)
+inline std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(std::string designName,std::uint32_t IR_size)
 {
    auto path = std::string(std::getenv("MAST_CONFIGURATION_PATH"));
    if (path.back()!=DIR_SEPARATOR)
 	   path.push_back(DIR_SEPARATOR);
-    path.append(OPENOCD_DEFAULT_CONFIG);   
+    path.append(OPENOCD_DEFAULT_CONFIG);
+    std::fstream f;
+    f.open(path);
+    if (!f.good())
+     return nullptr;
    return make_shared<OpenOCDProtocol> (path, designName, IR_size);
 }
 
@@ -160,9 +164,9 @@ inline auto make_openOCD_protocol(std::string designName,std::uint32_t IR_size)
 %type  <std::uint32_t> IR_size
 %type  <std::uint32_t> size
 %type  <std::uint32_t> n_DR_chains
-%type  <Coding_type> Coding_list
-%type  <Coding_type> IR_TABLE
-%type  <Coding_type> AI_TABLE
+%type  <std::vector<uint32_t>> Coding_list
+%type  <std::vector<uint32_t>> IR_TABLE
+%type  <std::vector<uint32_t>> AI_TABLE
 %type  <std::string> JTAG_protocol
 %type  <std::shared_ptr<mast::SystemModelNode>> root_node
 %type  <std::shared_ptr<mast::SystemModelNode>> register_node
@@ -404,13 +408,13 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
         break;
         case AI_protocol_t::SPI_FTDI :
         {
-          if ($5.n_words==0)
+          if ($5.size()==0)
           {
             std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
             std::cerr << "Error, " << AI_protocol_table[l] <<" needs an address table\n";
             YYERROR;
           }
-          if (($5.n_words%3)!=0)
+          if (($5.size()%3)!=0)
           {
             std::cerr << "Error, " << AI_protocol_table[l] <<" requires 3 addresses for each slave\n";
           }
@@ -421,11 +425,11 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
           auto readCommands       = std::vector<uint32_t>();
           auto writeCommands      = std::vector<uint32_t>();
 
-          for ( auto i = 0 ; i < $5.codevalue.size(); i += 3)
+          for ( auto i = 0 ; i < $5.size(); i += 3)
           {
-            chipselectCommands.push_back($5.codevalue[i]);
-            readCommands.push_back($5.codevalue[i+1]);
-            writeCommands.push_back($5.codevalue[i+2]);
+            chipselectCommands.push_back($5[i]);
+            readCommands.push_back($5[i+1]);
+            writeCommands.push_back($5[i+2]);
           }
 
 
@@ -494,22 +498,27 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
 	     YYERROR;
 	    }
 	   protocol=make_openOCD_protocol( $4, $5);
+	   if (protocol==nullptr)
+	    {
+	    std::cerr<<"Error while opening OpenOCD configuration file\n";
+	    YYERROR;
+	    }
 	  break;
            }
 	  }
-	  if ($6.n_words==0)
+	  if ($6.size()==0)
 	   {
 	   auto node = driver.builder->Create_JTAG_TAP($2.name,$5,$7+1,protocol);
   	   $$ = node;
 	   }
 	  else
 	   {
-	     if ($6.n_words!=($7+1))
+	     if ($6.size()!=($7+1))
 	      {
 	      std::cerr<<"Error Coding must be provided for bypass register and each chain\n";
 	     YYERROR;
 	      }
-	   auto node = driver.builder->Create_JTAG_TAP($2.name,$5,$7+1,protocol,$6.codevalue);
+	   auto node = driver.builder->Create_JTAG_TAP($2.name,$5,$7+1,protocol,$6);
   	   $$ = node;
 	      
 	   } 
@@ -540,12 +549,12 @@ n_DR_chains :
 ;
 IR_TABLE:
  t_LeftBracket Coding_list t_RightBracket  {$$=$2;}
- |  {$$.n_words = 0;}
+ |  {$$ = std::vector<uint32_t>();}
  ;
 
 AI_TABLE:
 t_LeftBracket Coding_list t_RightBracket  {$$=$2;}
- |  {$$.n_words = 0;}
+ |  {$$ = std::vector<uint32_t>();}
  ;
 
 AI_identifier:
@@ -560,58 +569,50 @@ AI_identifier:
 Coding_list:
  t_QUOTED_STRING
     {
-       $$.codevalue.push_back(extract_number($1));
-    $$.n_words = 1;
+       $$.push_back(extract_number($1));
     }
  |
  t_QUOTED_STRING t_RightParenthesis
     { /* ')' at far right*/
-       $$.codevalue.push_back(extract_number($1));
-    $$.n_words = 1;
+       $$.push_back(extract_number($1));
     }
  |
 t_LeftParenthesis t_QUOTED_STRING t_RightParenthesis
     { /* '(' and ')' at far right*/
-       $$.codevalue.push_back(extract_number($2));
-    $$.n_words = 1;
+       $$.push_back(extract_number($2));
     }
  |
 t_LeftParenthesis t_QUOTED_STRING
     { /* '(' at far right*/
-       $$.codevalue.push_back(extract_number($2));
-    $$.n_words = 1;
+       $$.push_back(extract_number($2));
     }
  |
  t_QUOTED_STRING t_Comma  Coding_list
   {
-   $$.n_words = ($3.n_words+1);
-   auto tmp = $3.codevalue;
+   auto tmp = $3;
    tmp.insert(tmp.begin(),extract_number($1));
-   $$.codevalue = tmp;
+   $$ = tmp;
    }
  |
  t_LeftParenthesis t_QUOTED_STRING t_Comma  Coding_list
   { /* '('  at beginning+middle of list*/
-   $$.n_words = ($4.n_words+1);
-   auto tmp = $4.codevalue;
+   auto tmp = $4;
    tmp.insert(tmp.begin(),extract_number($2));
-   $$.codevalue = tmp;
+   $$ = tmp;
    }
  |
  t_QUOTED_STRING t_RightParenthesis t_Comma  Coding_list
   { /* ')' at beginning+ middle of the list*/
-   $$.n_words = ($4.n_words+1);
-   auto tmp = $4.codevalue;
+   auto tmp = $4;
    tmp.insert(tmp.begin(),extract_number($1));
-   $$.codevalue = tmp;
+   $$ = tmp;
    }
  |
   t_LeftParenthesis t_QUOTED_STRING t_RightParenthesis t_Comma  Coding_list
   { /* '(' and ')' at beginning+ middle of the list*/
-   $$.n_words = ($5.n_words+1);
-   auto tmp = $5.codevalue;
+   auto tmp = $5;
    tmp.insert(tmp.begin(),extract_number($2));
-   $$.codevalue = tmp;
+   $$ = tmp;
    }
 ;
 

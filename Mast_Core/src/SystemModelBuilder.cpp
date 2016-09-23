@@ -32,12 +32,8 @@ using std::initializer_list;
 using namespace std::string_literals;
 using namespace mast;
 
-//! Creates a binary linker for the DR_MUX of a JTAG_TAP
-//!
-shared_ptr<mast::PathSelector> Create_bynary_DR_MUX_path_selector (
-			shared_ptr<Register>        ir,                            
-                        uint32_t                    muxPathsCount,
-			std::vector<uint32_t>	coding);
+namespace
+{
 //! Creates a binary path selector for a TAP
 //!
 //!  @param ir       IR Register
@@ -76,12 +72,6 @@ shared_ptr<mast::PathSelector> Create_bynary_DR_MUX_path_selector (
 //  End of: Create_bynary_DR_MUX_path_selector
 //---------------------------------------------------------------------------
 
-//! Creates a binary linker for the DR_MUX of a JTAG_TAP
-//!
-shared_ptr<mast::PathSelector> Create_table_based_DR_MUX_path_selector (
-			shared_ptr<Register>        ir,                            
-                        uint32_t                    muxPathsCount,
-			std::vector<uint32_t>	coding);
 //! Creates a binary path selector for a TAP
 //!
 //!  @param ir       		IR Register
@@ -119,6 +109,7 @@ shared_ptr<mast::PathSelector> Create_table_based_DR_MUX_path_selector (
 //
 //  End of: Create_table_based_DR_MUX_path_selector
 //---------------------------------------------------------------------------
+}
 
 namespace
 {

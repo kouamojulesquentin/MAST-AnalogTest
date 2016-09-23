@@ -40,7 +40,7 @@ enum class PrettyPrinterOptions
 
   Default           = None,
   Std               = Verbose | DisplayValueAuto,
-  Parser_debug      = ShowSelectorProperties | ShowNodeIsIgnored ,
+  Parser_debug      = ShowSelectorProperties | ShowNodeIsIgnored | ShowProtocol,
   All               = Verbose | DisplayValueAuto | ShowProtocol | ShowSelectionState | ShowSelectionValue | ShowSelectorProperties,
 };
 

@@ -79,15 +79,15 @@ extern SIT::SIT_Parser::location_type *my_location;
 #endif
  
 std::vector<std::string> AI_protocol_table  =
-  {"JTAG_Loopback","JTAG_SVF_simulation","JTAG_SVF_Emulation",
+  {"JTAG_Loopback","JTAG_SVF_Simulation","JTAG_SVF_Emulation",
   "SPI_FTDI"
   };
-enum AI_protocol_t {JTAG_Loopback,JTAG_SVF_simulation,JTAG_SVF_Emulation, SPI_FTDI};
+enum AI_protocol_t {JTAG_Loopback,JTAG_SVF_Simulation,JTAG_SVF_Emulation, SPI_FTDI};
 
 std::vector<std::string> JTAG_AI_protocol_table  =
-  {"Loopback","SVF_simulation","SVF_openOCD","SVF_Emulation"
+  {"Loopback","SVF_Simulation","SVF_openOCD","SVF_Emulation"
   };
-enum JTAG_AI_protocol_t {Loopback,SVF_simulation,SVF_openOCD,SVF_Emulation};
+enum JTAG_AI_protocol_t {Loopback,SVF_Simulation,SVF_openOCD,SVF_Emulation};
 
 std::vector<std::string> Path_Selector_table  =
   {"Binary","One_Hot","N_Hot","Binary_noidle","One_Hot_noidle","N_Hot_noidle"};
@@ -401,12 +401,20 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
       switch(l)
       {
         case JTAG_Loopback :
-         protocol = make_shared<LoopbackAccessInterfaceProtocol > ();
-        case JTAG_SVF_simulation :
-         protocol = make_shared<SVF_SimulationProtocol > ();
+         {
+	 protocol = make_shared<LoopbackAccessInterfaceProtocol > ();
+	 break;
+	 }
+        case JTAG_SVF_Simulation :
+         {
+	 protocol = make_shared<SVF_SimulationProtocol > ();
+	 break;
+	 }
         case JTAG_SVF_Emulation :
-         protocol = make_shared<SVF_EmulationProtocol> ();
-        break;
+         {
+	 protocol = make_shared<SVF_EmulationProtocol> ();
+	 break;
+	 }
         case AI_protocol_t::SPI_FTDI :
         {
           if ($5.size()==0)
@@ -485,9 +493,11 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
 	  case Loopback :
 	   protocol = make_shared<LoopbackAccessInterfaceProtocol > ();
 	  break;
-	  case SVF_simulation :
+	  case SVF_Simulation :
+	   {
 	   protocol = make_shared<SVF_SimulationProtocol > ();
 	  break;
+	  }
 	  case SVF_Emulation :
 	   protocol = make_shared<SVF_EmulationProtocol > ();
 	  break;

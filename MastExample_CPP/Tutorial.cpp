@@ -30,7 +30,7 @@ std::vector<mast::AppFunctionAndNodePath> GetAlgorithmsAndNodePaths (int argc, c
 
 namespace
 {
-  //! This algorithm increment "reg_0" 60 times
+  //! This algorithm increment "reg" 60 times
   //!
   void Algo_Increment ()
   {

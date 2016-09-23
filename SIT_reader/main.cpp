@@ -61,7 +61,7 @@ int main (const int argc, const char** argv)
         return (EXIT_FAILURE);
       }
 
-      auto gotPretty = PrettyPrinter::PrettyPrint(driver.parsed_sut, PrettyPrinterOptions::ShowNodeIsIgnored); // PrettyPrinterOptions::ShowSelectorProperties
+      auto gotPretty = PrettyPrinter::PrettyPrint(driver.parsed_sut, PrettyPrinterOptions::Parser_debug); 
       std::cout << gotPretty << "\n";
       auto result = sm->Check();
       std::cout << "Model Check returns " << result.MakeReport();

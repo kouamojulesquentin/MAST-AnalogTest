@@ -18,6 +18,7 @@
 #include "SystemModel.hpp"
 #include "TestModelBuilder.hpp"
 #include "GmlPrinter.hpp"
+#include "g3log/g3log.hpp"
 
 #include "C_API_Traits.hpp"
 #include "BinaryVector_Traits.hpp"
@@ -235,6 +236,8 @@ namespace
   {
     // ---------------- Setup
     //
+    ENABLE_LOG_IN_SCOPE;
+    LOG(DEBUG) << "Before InitializeMast";
     InitializeMast(nullptr);
 
     Create_TestCase_MIB_Multichain_Pre();
@@ -267,12 +270,22 @@ namespace
 //! Initializes test (called for each test)
 void UT_PDL_Adapter_C::setUp ()
 {
+  ENABLE_LOG_IN_SCOPE;
   CxxTest::setStringResultsOnNewLine(true);
   CxxTest::setCharactersMapping(CxxTest::CharacterMapping::MAP_CHARS_MINIMAL);  // Keep quotes, HT, and new lines unescaped
 
-  CleanupMast();
   SystemModelNode::ResetNodeIdentifier();
 }
+
+
+//! Cleanups test (called for each test)
+//!
+void UT_PDL_Adapter_C::tearDown ()
+{
+  ENABLE_LOG_IN_SCOPE;
+  CleanupMast();
+}
+
 
 //! Checks SystemModelManager::iPrefix() when Mast library is not initialized
 //!
@@ -295,8 +308,8 @@ void UT_PDL_Adapter_C::test_iPrefix_NotInitialized ()
 }
 
 
-//! Checks PDL_Adapter::iGet_String() when MAST library has not been initialized yet
-//!
+// ---------------- Checks PDL_Adapter::iGet_String() when MAST library has not been initialized yet
+//
 void UT_PDL_Adapter_C::test_iGet_String_NotInitialized ()
 {
   // ---------------- Setup
@@ -327,8 +340,8 @@ void UT_PDL_Adapter_C::test_iGet_int32_NotInitialized        () { Check_iGet_Not
 void UT_PDL_Adapter_C::test_iGet_int64_NotInitialized        () { Check_iGet_NotInitialized<int64_t>(iGet_int64_t);          }
 
 
-//! Checks PDL_Adapter::iGet_String() when register path is nullptr
-//!
+// ---------------- Checks PDL_Adapter::iGet_String() when register path is nullptr
+//
 void UT_PDL_Adapter_C::test_iGet_String_Nullptr_Path ()
 {
   // ---------------- Setup
@@ -361,8 +374,8 @@ void UT_PDL_Adapter_C::test_iGet_int32_Nullptr_Path        () { Check_iGet_Nullp
 void UT_PDL_Adapter_C::test_iGet_int64_Nullptr_Path        () { Check_iGet_Nullptr_Path<int64_t>(iGet_int64_t);          }
 
 
-//! Checks PDL_Adapter::iGet_String() when register path is nullptr
-//!
+// ---------------- Checks PDL_Adapter::iGet_String() when register path is nullptr
+//
 void UT_PDL_Adapter_C::test_iGet_String_Nullptr_ReadData ()
 {
   // ---------------- Setup
@@ -393,8 +406,8 @@ void UT_PDL_Adapter_C::test_iGet_int16_Nullptr_ReadData        () { Check_iGet_N
 void UT_PDL_Adapter_C::test_iGet_int32_Nullptr_ReadData        () { Check_iGet_Nullptr_ReadData<int32_t>(iGet_int32_t);          }
 void UT_PDL_Adapter_C::test_iGet_int64_Nullptr_ReadData        () { Check_iGet_Nullptr_ReadData<int64_t>(iGet_int64_t);          }
 
-//! Checks PDL_Adapter::iGet_String() in hexadecimal format
-//!
+// ---------------- Checks PDL_Adapter::iGet_String() in hexadecimal format
+//
 void UT_PDL_Adapter_C::test_iGet_String_Hex ()
 {
   // ---------------- Setup
@@ -485,8 +498,8 @@ void UT_PDL_Adapter_C::test_iWrite_int16        () { Check_iWrite_SingleThread<i
 void UT_PDL_Adapter_C::test_iWrite_int32        () { Check_iWrite_SingleThread<int32_t>(iWrite_int32_t,   int32_t(-1234567L),    "FFED_2979"); }
 void UT_PDL_Adapter_C::test_iWrite_int64        () { Check_iWrite_SingleThread<int64_t>(iWrite_int64_t,   int64_t(-123456789LL), "F8A4_32EB"); }
 
-
 //+void UT_PDL_Adapter_C::test_iWrite_BinaryVector_InvalidValue () { Check_iWrite_SingleThread<const char*>(iWrite_BinaryVector, "ABCD_4567",           "ABCD_4567"); }
+
 
 //===========================================================================
 // End of UT_PDL_Adapter_C.cpp

@@ -17,6 +17,7 @@
 #include "Utility.hpp"
 #include "Session.hpp"
 #include "SIT_reader.hpp"
+#include "g3log/g3log.hpp"
 
 #include <memory>
 #include <string>
@@ -68,8 +69,9 @@ ErrorCode CleanupMast ()
   auto retCode = ErrorCode::Ok;
 
   TRY_CATCH_ALL(retCode,
-                mast::Startup::ForgetSystemModel();
+                LOG(INFO) << "Cleaning MAST Core library";
                 mast::Startup::ForgetManager();
+                mast::Startup::ForgetSystemModel();
                );
 
   return retCode;

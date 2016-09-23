@@ -250,6 +250,7 @@ void mast::CheckSystemModel ()
 //!<
 void mast::CleanupMast ()
 {
+  LOG(INFO) << "Cleaning MAST Core library";
   mast::Startup::ForgetManager();
   mast::Startup::ForgetSystemModel();
 }

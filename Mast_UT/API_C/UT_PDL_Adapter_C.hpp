@@ -85,8 +85,6 @@ class UT_PDL_Adapter_C : public CxxTest::TestSuite
   void test_iWrite_int32_NotInitialized ();
   void test_iWrite_int64_NotInitialized ();
 
-//+  void test_iWrite_BinaryVector_InvalidValue ();
-
   void test_iWrite_BinaryVector ();
   void test_iWrite_uint8 ();
   void test_iWrite_uint16 ();
@@ -97,9 +95,13 @@ class UT_PDL_Adapter_C : public CxxTest::TestSuite
   void test_iWrite_int32 ();
   void test_iWrite_int64 ();
 
+//+  void test_iWrite_BinaryVector_InvalidValue ();
+
+
   // ================ Other Methods ================
 
-  void setUp(); //!< Initializes test (called for each test)
+  void setUp();    //!< Initializes test (called for each test)
+  void tearDown(); //!< Cleanups test (called for each test)
 };
 //
 //  End of UT_PDL_Adapter_C class declaration

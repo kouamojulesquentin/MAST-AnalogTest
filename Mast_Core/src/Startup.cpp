@@ -26,9 +26,9 @@ using std::make_shared;
 
 using namespace mast;
 
+shared_ptr<g3::LogWorker>      Startup::sm_logger;
 shared_ptr<SystemModel>        Startup::sm_systemModel;
 shared_ptr<SystemModelManager> Startup::sm_manager;
-shared_ptr<g3::LogWorker>      Startup::sm_logger;
 
 namespace
 {
@@ -52,7 +52,7 @@ std::unique_ptr<g3::LogWorker> InitializeLogger ()
 
   g3::initializeLogging(logworker.get());
   g3::logEnabled(true);
-
+  LOG(DEBUG) << "Logger started";
   return logworker;
 }
 //
@@ -64,6 +64,7 @@ std::unique_ptr<g3::LogWorker> InitializeLogger ()
 //!
 void Startup::ForgetSystemModel ()
 {
+  LOG(DEBUG) << "Get rid of SystemModel";
   sm_systemModel.reset();
 }
 //
@@ -75,7 +76,13 @@ void Startup::ForgetSystemModel ()
 //!
 void Startup::ForgetManager ()
 {
-  sm_manager.reset();
+  if (sm_manager)
+  {
+    LOG(DEBUG) << "Stopping and getting rid of manager";
+    sm_manager->Stop();
+    sm_manager->Monitor(nullptr);
+    sm_manager.reset();
+  }
 }
 //
 //  End of: Startup::ForgetManager
@@ -104,8 +111,9 @@ shared_ptr<SystemModelManager> Startup::GetManager ()
 {
   if (!sm_manager)
   {
-    auto sm    = GetSystemModel();
+    auto sm = GetSystemModel();
 
+    LOG(INFO) << "Creating SystemModelManager";
     auto defaultConfigAlgo = make_shared<ConfigureAlgorithm_LastOrDefault>();
     auto monitor           = make_shared<SystemModelManagerMonitor>(ManagerMonitorOptions::Std);
     sm_manager             = make_shared<mast::SystemModelManager>(*sm, defaultConfigAlgo, monitor);
@@ -124,6 +132,7 @@ shared_ptr<SystemModel> Startup::GetSystemModel ()
 {
   if (!sm_systemModel)
   {
+    LOG(INFO) << "Creating new SystemModel";
     sm_systemModel = make_shared<mast::SystemModel>();
   }
 
@@ -154,6 +163,7 @@ void Startup::StopLogger ()
 {
   if (sm_logger)
   {
+    LOG(INFO) << "Stopping logger";
     g3::logEnabled(false);
     sm_logger.reset();
   }

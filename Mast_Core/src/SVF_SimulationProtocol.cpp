@@ -82,6 +82,21 @@ BinaryVector SVF_SimulationProtocol::FetchDataFromSut ()
   //
   auto startTime = std::chrono::steady_clock::now();
   auto refTime   = startTime;
+
+  // ---------------- Waiting time checker
+  //
+  auto checkWaitTime = [&refTime](auto message)
+  {
+    auto now     = std::chrono::steady_clock::now();
+    auto elapsed = now - refTime;
+    if (elapsed >= 5s)
+    {
+      refTime  = now;
+
+      LOG(INFO) << message;
+    }
+  };
+
   while (!Utility::FileExists(m_fromSutFilePath))
   {
     auto now     = std::chrono::steady_clock::now();
@@ -92,12 +107,8 @@ BinaryVector SVF_SimulationProtocol::FetchDataFromSut ()
       THROW_RUNTIME_ERROR("File does not exist: " + m_fromSutFilePath);
     }
 
-    elapsed = now - refTime;
-    if (elapsed >= 1s)
-    {
-      refTime = now;
-      LOG(INFO) << "Waiting for file: " << m_fromSutFilePath;
-    }
+    checkWaitTime("Waiting for file: " + m_fromSutFilePath);
+
     std::this_thread::sleep_for(m_fromSutWait);
   }
 
@@ -122,7 +133,9 @@ BinaryVector SVF_SimulationProtocol::FetchDataFromSut ()
     if (ifs.eof())
     {
       ifs.close();
-      std::this_thread::sleep_for(std::chrono::milliseconds(0));
+
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
       ifs.open(m_fromSutFilePath);
       ifs.seekg(m_lastPos);
     }
@@ -134,8 +147,11 @@ BinaryVector SVF_SimulationProtocol::FetchDataFromSut ()
         keepOnReading = false;
         break;
       }
+
       fromSutBitstream += nextChar;
     }
+
+    checkWaitTime("Waiting for data from SUT... ");
   } while (keepOnReading);
 
   // ---------------- Create binary from read line

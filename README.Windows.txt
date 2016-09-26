@@ -1,10 +1,13 @@
 [SETUP]
   MAST uses C++ 2014, so gcc should be version 4.9 or higher.
-  MAST uses Gnu Make with version >= 3.82
+  Install mingw-w64:              http://mingw-w64.org/doku.php
+  Gnu Make with version >= 3.82
+  CMake version >= 3.5
   MAST "SIT" Parser uses Flex and Bison (validated with Flex 2.5.37 and Bison 3.0)
   FLEX_DIR environment variable must point to where flex is intalled (to get access to FlexLexer.h)
   The unitary test interface Needs "phyton3" and "phyton3-ply" module
-
+  Qt build has been tested with Qt 5.5 and QtCreator 3.6.1 but should be compatible with more recent versions
+  Note that QtCreator has the ability to use CMake files (but seems to have a lesser level of support than for native .pro files)
 
 [Build-Qt]
 

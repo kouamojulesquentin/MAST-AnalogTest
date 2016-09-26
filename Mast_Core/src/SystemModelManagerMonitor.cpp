@@ -299,6 +299,18 @@ void SystemModelManagerMonitor::SaveToFile (string_view text, string_view basePa
 //---------------------------------------------------------------------------
 
 
+//! Monitor start of SystemModelManager background thread
+void SystemModelManagerMonitor::StartBackgroundThread ()
+{
+  if (IsSet(m_options, ManagerMonitorOptions::DataCycles))
+  {
+    LOG(INFO) << "Started SystemModelManager data cycles loop background thread";
+  }
+}
+//
+//  End of: SystemModelManagerMonitor::StartDataCycles
+//---------------------------------------------------------------------------
+
 
 //! Monitor start of a new data cycle
 void SystemModelManagerMonitor::StartDataCycle ()

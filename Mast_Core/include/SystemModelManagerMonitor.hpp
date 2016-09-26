@@ -81,6 +81,7 @@ class DLL_EXPORT SystemModelManagerMonitor
   //!
   virtual void PDLCommand (string_view message, string_view nodePath, const BinaryVector& value, const ParentNode& topNode, string_view debugName);
 
+  virtual void StartBackgroundThread();                                                                     //!< Monitors start of SystemModelManager background thread
   virtual void StartDataCycles();                                                                           //!< Monitors start of new data cycles
   virtual void StartDataCycle();                                                                            //!< Monitors start of a new data cycle
   virtual void BeforeConfiguration (ParentNode&       root);                                                //!< Monitors state of SystemModel (from parentNode) before configuration

@@ -845,7 +845,7 @@ void SystemModelManager::Start ()
   m_runLoop = true;
   auto threadFunctor = [this]()
   {
-    MONITOR_DEBUG_MANAGER("Starting background thread");
+    MONITOR(StartBackgroundThread());
 
     try
     {
@@ -853,7 +853,7 @@ void SystemModelManager::Start ()
     }
     catch(std::exception& exc)  // Catch C++ standard exceptions
     {
-      LOG(ERROR_LVL) << "Uncaught exception '"s + exc.what();
+      LOG(ERROR_LVL) << "SystemModelManager background thread caught " << exc.what();
       {
         std::lock_guard<std::mutex> lock(m_loopMutex);
         m_runLoop = false;
@@ -862,14 +862,14 @@ void SystemModelManager::Start ()
     }
     catch (...)
     {
-      LOG(ERROR_LVL) << "Uncaught unknown exception from application";
+      LOG(ERROR_LVL) << "Unknown exception caught by SystemModelManager background thread";
       {
         std::lock_guard<std::mutex> lock(m_loopMutex);
         m_runLoop = false;
       }
       m_loopCV.notify_one();
     }
-    MONITOR_DEBUG_MANAGER("Exiting background thread");
+    LOG(WARNING) << "Exiting SystemModelManager background thread";
   };
 
   m_managerThread   = std::thread(threadFunctor);

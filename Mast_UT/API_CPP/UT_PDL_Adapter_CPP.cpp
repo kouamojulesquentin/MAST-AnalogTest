@@ -257,6 +257,43 @@ template<typename T> void Check_iRead (T iReadValue, T iWriteValue, string_view 
   TS_ASSERT_EQUALS (xorResult, expectedMismatch);   // 40 bits reg
 }
 
+
+//! Checks SystemModelManager::iRead() with don't care mask in case there is a mismatch
+//!
+//! @param iReadExpectedValue The expected value passed to iRead
+//! @param iReadDontCareValue The don't care value passed to iRead
+//! @param iWriteValue        The value passed to iWrite
+//! @param expectedMismatch   Expected mismatch (checked with 40 bits register)
+//!
+template<typename T> void Check_iRead_DontCare (T           iReadExpectedValue,
+                                                T           iReadDontCareValue,
+                                                T           iWriteValue,
+                                                string_view expectedMismatch)
+{
+  // ---------------- Setup
+  //
+  Session session;
+  Create_TestCase_MIB_Multichain_Pre(false, 40u);
+
+  auto regPath = "dynamic_2";
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (iRead(regPath, iReadExpectedValue, iReadDontCareValue));
+
+  // ---------------- Verify
+  //
+  iWrite (regPath, iWriteValue); // Loopback (default protocol) will force FromSut to be updated
+  iApply();
+
+  auto xorResult = iGetMiscompares    (regPath, StringType::Hex);
+  auto status    = iGetStatus (regPath, false);
+
+  TS_ASSERT_EQUALS (status,    1u);
+  TS_ASSERT_EQUALS (xorResult, expectedMismatch);   // 40 bits reg
+}
+
+
 } // End of unnamed namespace
 
 
@@ -879,6 +916,19 @@ void UT_PDL_Adapter_CPP::test_iRead_int8   () { Check_iRead<int8_t>   (0x70,    
 void UT_PDL_Adapter_CPP::test_iRead_int16  () { Check_iRead<int16_t>  (0x0FF0,      0x3CDE,      "0x000000332E"); }
 void UT_PDL_Adapter_CPP::test_iRead_int32  () { Check_iRead<int32_t>  (0x2F00FF00,  0x49ABCDEF,  "0x0066AB32EF"); }
 void UT_PDL_Adapter_CPP::test_iRead_int64  () { Check_iRead<int64_t>  (0xCFF00FF00, 0xD89ABCDEF, "0x0176AB32EF"); }
+
+//! Checks SystemModelManager::iRead() when there is a don't care value - using same thread as SystemModelManager
+//!                                                                                // iRead-ExpectedValue, iRead-DontCare, iWrite-Value, expectedMismatch
+//!
+void UT_PDL_Adapter_CPP::test_iRead_DontCare_uint8  () { Check_iRead_DontCare<uint8_t>  (0xF0,        0xF3,        0xAC,        "0x0000000050"); }
+void UT_PDL_Adapter_CPP::test_iRead_DontCare_uint16 () { Check_iRead_DontCare<uint16_t> (0x0FF0,      0x0FFF,      0xACDE,      "0x000000032E"); }
+void UT_PDL_Adapter_CPP::test_iRead_DontCare_uint32 () { Check_iRead_DontCare<uint32_t> (0xFF00FF00,  0xFF00FF00,  0x89ABCDEF,  "0x0076003200"); }
+void UT_PDL_Adapter_CPP::test_iRead_DontCare_uint64 () { Check_iRead_DontCare<uint64_t> (0xCFF00FF00, 0xFFF00FF00, 0xD89ABCDEF, "0x0176003200"); }
+void UT_PDL_Adapter_CPP::test_iRead_DontCare_int8   () { Check_iRead_DontCare<int8_t>   (0x70,        0x70,        0x6C,        "0x0000000010"); }
+void UT_PDL_Adapter_CPP::test_iRead_DontCare_int16  () { Check_iRead_DontCare<int16_t>  (0x4280,      0x7F80,      0x3CDE,      "0x0000007E00"); }
+void UT_PDL_Adapter_CPP::test_iRead_DontCare_int32  () { Check_iRead_DontCare<int32_t>  (0x12345678,  0x3F00FF00,  0x98765432,  "0x000A000200"); }
+void UT_PDL_Adapter_CPP::test_iRead_DontCare_int64  () { Check_iRead_DontCare<int64_t>  (0x123456789, 0xCFF00FF00, 0x987654321, "0x08A4002400"); }
+
 void UT_PDL_Adapter_CPP::test_iRead_String ()
 {
   // ---------------- Setup

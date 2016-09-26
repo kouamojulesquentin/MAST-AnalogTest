@@ -100,6 +100,15 @@ template<typename T> void iRead_impl(string_view registerPath, T expectedValue)
   manager->iRead(registerPath, std::move(expectedValue));
 }
 
+template<typename T> void iRead_impl(string_view registerPath, T expectedValue, T dontCareMask)
+{
+  CHECK_REGISTER_PATH(registerPath);
+
+  auto manager = GetAndCheckManager();
+  manager->iRead(registerPath, std::move(expectedValue), std::move(dontCareMask));
+}
+
+
 
 template<typename T> void iWrite_impl(string_view registerPath, T value)
 {
@@ -205,14 +214,24 @@ void mast::iPrefix (string_view registerPath)
 }
 
 
-void mast::iRead (string_view registerPath, uint8_t     expectedValue) { return iRead_impl(registerPath, expectedValue); }
-void mast::iRead (string_view registerPath, uint16_t    expectedValue) { return iRead_impl(registerPath, expectedValue); }
-void mast::iRead (string_view registerPath, uint32_t    expectedValue) { return iRead_impl(registerPath, expectedValue); }
-void mast::iRead (string_view registerPath, uint64_t    expectedValue) { return iRead_impl(registerPath, expectedValue); }
-void mast::iRead (string_view registerPath, int8_t      expectedValue) { return iRead_impl(registerPath, expectedValue); }
-void mast::iRead (string_view registerPath, int16_t     expectedValue) { return iRead_impl(registerPath, expectedValue); }
-void mast::iRead (string_view registerPath, int32_t     expectedValue) { return iRead_impl(registerPath, expectedValue); }
-void mast::iRead (string_view registerPath, int64_t     expectedValue) { return iRead_impl(registerPath, expectedValue); }
+void mast::iRead (string_view registerPath, uint8_t  expectedValue) { return iRead_impl(registerPath, expectedValue); }
+void mast::iRead (string_view registerPath, uint16_t expectedValue) { return iRead_impl(registerPath, expectedValue); }
+void mast::iRead (string_view registerPath, uint32_t expectedValue) { return iRead_impl(registerPath, expectedValue); }
+void mast::iRead (string_view registerPath, uint64_t expectedValue) { return iRead_impl(registerPath, expectedValue); }
+void mast::iRead (string_view registerPath, int8_t   expectedValue) { return iRead_impl(registerPath, expectedValue); }
+void mast::iRead (string_view registerPath, int16_t  expectedValue) { return iRead_impl(registerPath, expectedValue); }
+void mast::iRead (string_view registerPath, int32_t  expectedValue) { return iRead_impl(registerPath, expectedValue); }
+void mast::iRead (string_view registerPath, int64_t  expectedValue) { return iRead_impl(registerPath, expectedValue); }
+
+void mast::iRead (string_view registerPath, uint8_t  expectedValue, uint8_t  dontCareMask) { return iRead_impl(registerPath, expectedValue, dontCareMask); }
+void mast::iRead (string_view registerPath, uint16_t expectedValue, uint16_t dontCareMask) { return iRead_impl(registerPath, expectedValue, dontCareMask); }
+void mast::iRead (string_view registerPath, uint32_t expectedValue, uint32_t dontCareMask) { return iRead_impl(registerPath, expectedValue, dontCareMask); }
+void mast::iRead (string_view registerPath, uint64_t expectedValue, uint64_t dontCareMask) { return iRead_impl(registerPath, expectedValue, dontCareMask); }
+void mast::iRead (string_view registerPath, int8_t   expectedValue, int8_t   dontCareMask) { return iRead_impl(registerPath, expectedValue, dontCareMask); }
+void mast::iRead (string_view registerPath, int16_t  expectedValue, int16_t  dontCareMask) { return iRead_impl(registerPath, expectedValue, dontCareMask); }
+void mast::iRead (string_view registerPath, int32_t  expectedValue, int32_t  dontCareMask) { return iRead_impl(registerPath, expectedValue, dontCareMask); }
+void mast::iRead (string_view registerPath, int64_t  expectedValue, int64_t  dontCareMask) { return iRead_impl(registerPath, expectedValue, dontCareMask); }
+
 void mast::iRead (string_view registerPath, string_view expectedValue) { return iRead_impl(registerPath, BinaryVector::CreateFromString(expectedValue)); }
 
 

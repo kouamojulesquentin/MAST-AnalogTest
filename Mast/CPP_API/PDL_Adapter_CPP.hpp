@@ -101,14 +101,23 @@ namespace mast
 
   // ---------------- iRead
   //
-  DLL_EXPORT void iRead (std::experimental::string_view registerPath, uint8_t     expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected uint8_t value
-  DLL_EXPORT void iRead (std::experimental::string_view registerPath, uint16_t    expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected uint16_t value
-  DLL_EXPORT void iRead (std::experimental::string_view registerPath, uint32_t    expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected uint32_t value
-  DLL_EXPORT void iRead (std::experimental::string_view registerPath, uint64_t    expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected uint64_t value
-  DLL_EXPORT void iRead (std::experimental::string_view registerPath, int8_t      expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected int8_t value
-  DLL_EXPORT void iRead (std::experimental::string_view registerPath, int16_t     expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected int16_t value
-  DLL_EXPORT void iRead (std::experimental::string_view registerPath, int32_t     expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected int32_t value
-  DLL_EXPORT void iRead (std::experimental::string_view registerPath, int64_t     expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected int64_t value
+  DLL_EXPORT void iRead (std::experimental::string_view registerPath, uint8_t  expectedValue);                        //!< Queues a request to (re-)read register value from SUT giving an expected uint8_t value
+  DLL_EXPORT void iRead (std::experimental::string_view registerPath, uint16_t expectedValue);                        //!< Queues a request to (re-)read register value from SUT giving an expected uint16_t value
+  DLL_EXPORT void iRead (std::experimental::string_view registerPath, uint32_t expectedValue);                        //!< Queues a request to (re-)read register value from SUT giving an expected uint32_t value
+  DLL_EXPORT void iRead (std::experimental::string_view registerPath, uint64_t expectedValue);                        //!< Queues a request to (re-)read register value from SUT giving an expected uint64_t value
+  DLL_EXPORT void iRead (std::experimental::string_view registerPath, int8_t   expectedValue);                        //!< Queues a request to (re-)read register value from SUT giving an expected int8_t value
+  DLL_EXPORT void iRead (std::experimental::string_view registerPath, int16_t  expectedValue);                        //!< Queues a request to (re-)read register value from SUT giving an expected int16_t value
+  DLL_EXPORT void iRead (std::experimental::string_view registerPath, int32_t  expectedValue);                        //!< Queues a request to (re-)read register value from SUT giving an expected int32_t value
+  DLL_EXPORT void iRead (std::experimental::string_view registerPath, int64_t  expectedValue);                        //!< Queues a request to (re-)read register value from SUT giving an expected int64_t value
+  DLL_EXPORT void iRead (std::experimental::string_view registerPath, uint8_t  expectedValue, uint8_t  dontCareMask); //!< Queues a request to (re-)read register value from SUT giving an expected uint8_t value and don't care mask
+  DLL_EXPORT void iRead (std::experimental::string_view registerPath, uint16_t expectedValue, uint16_t dontCareMask); //!< Queues a request to (re-)read register value from SUT giving an expected uint16_t value and don't care mask
+  DLL_EXPORT void iRead (std::experimental::string_view registerPath, uint32_t expectedValue, uint32_t dontCareMask); //!< Queues a request to (re-)read register value from SUT giving an expected uint32_t value and don't care mask
+  DLL_EXPORT void iRead (std::experimental::string_view registerPath, uint64_t expectedValue, uint64_t dontCareMask); //!< Queues a request to (re-)read register value from SUT giving an expected uint64_t value and don't care mask
+  DLL_EXPORT void iRead (std::experimental::string_view registerPath, int8_t   expectedValue, int8_t   dontCareMask); //!< Queues a request to (re-)read register value from SUT giving an expected int8_t value and don't care mask
+  DLL_EXPORT void iRead (std::experimental::string_view registerPath, int16_t  expectedValue, int16_t  dontCareMask); //!< Queues a request to (re-)read register value from SUT giving an expected int16_t value and don't care mask
+  DLL_EXPORT void iRead (std::experimental::string_view registerPath, int32_t  expectedValue, int32_t  dontCareMask); //!< Queues a request to (re-)read register value from SUT giving an expected int32_t value and don't care mask
+  DLL_EXPORT void iRead (std::experimental::string_view registerPath, int64_t  expectedValue, int64_t  dontCareMask); //!< Queues a request to (re-)read register value from SUT giving an expected int64_t value and don't care mask
+
   DLL_EXPORT void iRead (std::experimental::string_view registerPath, std::experimental::string_view expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected binary string value
 
   // ---------------- iRefresh

@@ -236,7 +236,7 @@ namespace
   {
     // ---------------- Setup
     //
-    ENABLE_LOG_IN_SCOPE;
+//+    ENABLE_LOG_IN_SCOPE;
     LOG(DEBUG) << "Before InitializeMast";
     InitializeMast(nullptr);
 
@@ -270,7 +270,7 @@ namespace
 //! Initializes test (called for each test)
 void UT_PDL_Adapter_C::setUp ()
 {
-  ENABLE_LOG_IN_SCOPE;
+//+  ENABLE_LOG_IN_SCOPE;
   CxxTest::setStringResultsOnNewLine(true);
   CxxTest::setCharactersMapping(CxxTest::CharacterMapping::MAP_CHARS_MINIMAL);  // Keep quotes, HT, and new lines unescaped
 
@@ -282,7 +282,7 @@ void UT_PDL_Adapter_C::setUp ()
 //!
 void UT_PDL_Adapter_C::tearDown ()
 {
-  ENABLE_LOG_IN_SCOPE;
+//+  ENABLE_LOG_IN_SCOPE;
   CleanupMast();
 }
 

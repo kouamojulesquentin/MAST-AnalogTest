@@ -20,6 +20,7 @@
 
 using std::make_tuple;
 using namespace std::string_literals;
+using namespace std::chrono_literals;
 using namespace mast;
 using namespace test;
 
@@ -83,6 +84,9 @@ void UT_SVF_SimulationProtocol::test_DoAction_Bad_FromSutPath ()
   auto fromSutPath = "BAD/PATH/from_sut.dat";
   auto toSutVector = BinaryVector::CreateFromString("/x3636/b1/xC0C0_C0C0");
   auto sut         = SVF_SimulationProtocol(toSutPath, fromSutPath);
+
+  sut.FromSutDataWait(1ms);     // This is required to get rapidly an exception
+  sut.FromSutDataTimeout(2ms);  // This is required to get rapidly an exception
 
   // ---------------- Exercise & Verify
   //

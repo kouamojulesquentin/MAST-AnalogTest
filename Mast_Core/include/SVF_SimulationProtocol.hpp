@@ -18,6 +18,7 @@
 #include "SVF_Player.hpp"
 #include <fstream>
 #include <string>
+#include <chrono>
 #include <experimental/string_view>
 
 namespace mast
@@ -61,6 +62,23 @@ class DLL_EXPORT SVF_SimulationProtocol final : public SVF_Player
   //!
   virtual std::experimental::string_view KindName() const override { return "SVF_Simulation"; }
 
+  //! Sets maximum time to wait for data from SUT
+  //!
+  void FromSutDataTimeout (std::chrono::milliseconds fromSutTimeout) { m_fromSutTimeout = fromSutTimeout; }
+
+  //! Returns maximum time to wait for data from SUT
+  //!
+  std::chrono::milliseconds FromSutDataTimeout() const { return m_fromSutTimeout; }
+
+  //! Sets duration between two attempts to get data from SUT
+  //!
+  void FromSutDataWait (std::chrono::milliseconds fromSutWait) { m_fromSutWait = fromSutWait; }
+
+  //! Returns duration between two attempts to get data from SUT
+  //!
+  std::chrono::milliseconds FromSutDataWait() const { return m_fromSutWait; }
+
+
   // ---------------- Protected Methods
   //
   protected:
@@ -72,16 +90,14 @@ class DLL_EXPORT SVF_SimulationProtocol final : public SVF_Player
   //!
   virtual BinaryVector FetchDataFromSut();
 
-  // ---------------- Private  Methods
-  //
-  private:
-
   // ---------------- Private  Fields
   //
   private:
-  std::string             m_toSutFilePath   = "to_RTL/data_to_rtl.svf";     //!< File used to "transmit" SVF commands
-  std::string             m_fromSutFilePath = "from_RTL/data_from_rtl.dat"; //!< File used to "receive" from SUT bitstream
-  std::ifstream::pos_type m_lastPos         = 0;                            //!< Position of last bitstream line "received" from SUT
+  std::string               m_toSutFilePath   = "to_RTL/data_to_rtl.svf";      //!< File used to "transmit" SVF commands
+  std::string               m_fromSutFilePath = "from_RTL/data_from_rtl.dat";  //!< File used to "receive" from SUT bitstream
+  std::ifstream::pos_type   m_lastPos         = 0;                             //!< Position of last bitstream line "received" from SUT
+  std::chrono::milliseconds m_fromSutTimeout  = std::chrono::seconds(60);      //!< Timeout waiting for "from SUT data" (before an exception is thrown)
+  std::chrono::milliseconds m_fromSutWait     = std::chrono::milliseconds(50); //!< Duration between two attempts to get data from SUT
 };
 //
 //  End of SVF_SimulationProtocol class declaration

@@ -13,6 +13,7 @@
 
 #include "SVF_SimulationProtocol.hpp"
 #include "Utility.hpp"
+#include "g3log/g3log.hpp"
 #include <thread>
 #include <chrono>
 
@@ -20,8 +21,9 @@ using std::experimental::string_view;
 using std::string;
 using std::ofstream;
 using std::ifstream;
-using namespace mast;
+using namespace std::chrono_literals;
 using namespace std::string_literals;
+using namespace mast;
 
 
 //! Spies content of parameter toSutData and return it unchanged
@@ -48,6 +50,30 @@ BinaryVector SVF_SimulationProtocol::FetchDataFromSut ()
   //
   string   fromSutBitstream;
   auto     keepOnReading = true;
+
+  // ---------------- Wait for file to exists
+  //
+  auto startTime = std::chrono::steady_clock::now();
+  auto refTime   = startTime;
+  while (!Utility::FileExists(m_fromSutFilePath))
+  {
+    auto now     = std::chrono::steady_clock::now();
+    auto elapsed = now - startTime;
+
+    if (elapsed >= m_fromSutTimeout)
+    {
+      THROW_RUNTIME_ERROR("File does not exist: " + m_fromSutFilePath);
+    }
+
+    elapsed = now - refTime;
+    if (elapsed >= 1s)
+    {
+      refTime = now;
+      LOG(INFO) << "Waiting for file: " << m_fromSutFilePath;
+    }
+    std::this_thread::sleep_for(m_fromSutWait);
+  }
+
   ifstream ifs(m_fromSutFilePath);
 
   if (!ifs.is_open())

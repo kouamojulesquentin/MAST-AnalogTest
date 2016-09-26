@@ -76,14 +76,24 @@ extern "C"
   // ---------------- iRead
   //
   DLL_EXPORT ErrorCode iRead_BinaryVector (const char* registerPath, const char* expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected binary string value
-  DLL_EXPORT ErrorCode iRead_uint8_t      (const char* registerPath, uint8_t     expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected uint8_t value
-  DLL_EXPORT ErrorCode iRead_uint16_t     (const char* registerPath, uint16_t    expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected uint16_t value
-  DLL_EXPORT ErrorCode iRead_uint32_t     (const char* registerPath, uint32_t    expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected uint32_t value
-  DLL_EXPORT ErrorCode iRead_uint64_t     (const char* registerPath, uint64_t    expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected uint64_t value
-  DLL_EXPORT ErrorCode iRead_int8_t       (const char* registerPath, int8_t      expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected int8_t value
-  DLL_EXPORT ErrorCode iRead_int16_t      (const char* registerPath, int16_t     expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected int16_t value
-  DLL_EXPORT ErrorCode iRead_int32_t      (const char* registerPath, int32_t     expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected int32_t value
-  DLL_EXPORT ErrorCode iRead_int64_t      (const char* registerPath, int64_t     expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected int64_t value
+
+  DLL_EXPORT ErrorCode iRead_uint8_t  (const char* registerPath, uint8_t  expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected uint8_t value
+  DLL_EXPORT ErrorCode iRead_uint16_t (const char* registerPath, uint16_t expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected uint16_t value
+  DLL_EXPORT ErrorCode iRead_uint32_t (const char* registerPath, uint32_t expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected uint32_t value
+  DLL_EXPORT ErrorCode iRead_uint64_t (const char* registerPath, uint64_t expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected uint64_t value
+  DLL_EXPORT ErrorCode iRead_int8_t   (const char* registerPath, int8_t   expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected int8_t value
+  DLL_EXPORT ErrorCode iRead_int16_t  (const char* registerPath, int16_t  expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected int16_t value
+  DLL_EXPORT ErrorCode iRead_int32_t  (const char* registerPath, int32_t  expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected int32_t value
+  DLL_EXPORT ErrorCode iRead_int64_t  (const char* registerPath, int64_t  expectedValue); //!< Queues a request to (re-)read register value from SUT giving an expected int64_t value
+
+  DLL_EXPORT ErrorCode iRead_with_DontCare_uint8_t  (const char* registerPath, uint8_t  expectedValue, uint8_t  dontCareMask); //!< Queues a request to (re-)read register value from SUT giving an expected uint8_t value and don't care mask
+  DLL_EXPORT ErrorCode iRead_with_DontCare_uint16_t (const char* registerPath, uint16_t expectedValue, uint16_t dontCareMask); //!< Queues a request to (re-)read register value from SUT giving an expected uint16_t value and don't care mask
+  DLL_EXPORT ErrorCode iRead_with_DontCare_uint32_t (const char* registerPath, uint32_t expectedValue, uint32_t dontCareMask); //!< Queues a request to (re-)read register value from SUT giving an expected uint32_t value and don't care mask
+  DLL_EXPORT ErrorCode iRead_with_DontCare_uint64_t (const char* registerPath, uint64_t expectedValue, uint64_t dontCareMask); //!< Queues a request to (re-)read register value from SUT giving an expected uint64_t value and don't care mask
+  DLL_EXPORT ErrorCode iRead_with_DontCare_int8_t   (const char* registerPath, int8_t   expectedValue, int8_t   dontCareMask); //!< Queues a request to (re-)read register value from SUT giving an expected int8_t value and don't care mask
+  DLL_EXPORT ErrorCode iRead_with_DontCare_int16_t  (const char* registerPath, int16_t  expectedValue, int16_t  dontCareMask); //!< Queues a request to (re-)read register value from SUT giving an expected int16_t value and don't care mask
+  DLL_EXPORT ErrorCode iRead_with_DontCare_int32_t  (const char* registerPath, int32_t  expectedValue, int32_t  dontCareMask); //!< Queues a request to (re-)read register value from SUT giving an expected int32_t value and don't care mask
+  DLL_EXPORT ErrorCode iRead_with_DontCare_int64_t  (const char* registerPath, int64_t  expectedValue, int64_t  dontCareMask); //!< Queues a request to (re-)read register value from SUT giving an expected int64_t value and don't care mask
 
   // ---------------- iRefresh
   //

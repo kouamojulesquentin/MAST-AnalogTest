@@ -127,6 +127,20 @@ void CopyBinaryVectorToCstr (const BinaryVector& binVector, char* readDataBuffer
     return retCode;
   }
 
+  template<typename T> ErrorCode iRead_impl(const char* registerPath, T expectedValue, T dontCareMask)
+  {
+    auto retCode = ErrorCode::Ok;
+
+    TRY_CATCH_ALL(retCode,
+                  CHECK_PARAMETER_NOT_NULL(registerPath, "Register path must be not nullptr");
+                  auto manager = GetAndCheckManager();
+                  manager->iRead(registerPath, std::move(expectedValue), std::move(dontCareMask));
+                 );
+
+    return retCode;
+  }
+
+
 
   template<typename T> ErrorCode iWrite_impl(const char* registerPath, T value)
   {
@@ -324,6 +338,14 @@ ErrorCode iRead_int16_t  (const char* registerPath, int16_t  expectedValue) { re
 ErrorCode iRead_int32_t  (const char* registerPath, int32_t  expectedValue) { return iRead_impl(registerPath, expectedValue); }
 ErrorCode iRead_int64_t  (const char* registerPath, int64_t  expectedValue) { return iRead_impl(registerPath, expectedValue); }
 
+ErrorCode iRead_with_DontCare_uint8_t  (const char* registerPath, uint8_t  expectedValue, uint8_t  dontCareMask) { return iRead_impl(registerPath, expectedValue, dontCareMask); }
+ErrorCode iRead_with_DontCare_uint16_t (const char* registerPath, uint16_t expectedValue, uint16_t dontCareMask) { return iRead_impl(registerPath, expectedValue, dontCareMask); }
+ErrorCode iRead_with_DontCare_uint32_t (const char* registerPath, uint32_t expectedValue, uint32_t dontCareMask) { return iRead_impl(registerPath, expectedValue, dontCareMask); }
+ErrorCode iRead_with_DontCare_uint64_t (const char* registerPath, uint64_t expectedValue, uint64_t dontCareMask) { return iRead_impl(registerPath, expectedValue, dontCareMask); }
+ErrorCode iRead_with_DontCare_int8_t   (const char* registerPath, int8_t   expectedValue, int8_t   dontCareMask) { return iRead_impl(registerPath, expectedValue, dontCareMask); }
+ErrorCode iRead_with_DontCare_int16_t  (const char* registerPath, int16_t  expectedValue, int16_t  dontCareMask) { return iRead_impl(registerPath, expectedValue, dontCareMask); }
+ErrorCode iRead_with_DontCare_int32_t  (const char* registerPath, int32_t  expectedValue, int32_t  dontCareMask) { return iRead_impl(registerPath, expectedValue, dontCareMask); }
+ErrorCode iRead_with_DontCare_int64_t  (const char* registerPath, int64_t  expectedValue, int64_t  dontCareMask) { return iRead_impl(registerPath, expectedValue, dontCareMask); }
 
 //! Changes path prefix
 //!

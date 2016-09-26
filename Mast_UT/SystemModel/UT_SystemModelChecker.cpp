@@ -829,7 +829,7 @@ void UT_SystemModelChecker::test_Check_When_AccessInterface_has_MoreDerivations 
   SystemModel sm;
   SystemModelBuilder builder(sm);
 
-  auto protocol = make_shared<SVF_SimulationProtocol>();
+  auto protocol = make_shared<SVF_SimulationProtocol>("ToSut.svf", "FromSut.svf");
   auto tap      = builder.Create_JTAG_TAP("Tap", 8u, 3u, protocol);
   auto reg_1    = sm.CreateRegister("reg_1", BinaryVector::CreateFromBinaryString("01"), tap);
   auto reg_2    = sm.CreateRegister("reg_2", BinaryVector::CreateFromBinaryString("10"), tap);

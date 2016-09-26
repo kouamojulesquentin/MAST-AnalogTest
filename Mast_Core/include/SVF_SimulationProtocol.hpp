@@ -33,11 +33,16 @@ class DLL_EXPORT SVF_SimulationProtocol final : public SVF_Player
   //
   public:
   virtual ~SVF_SimulationProtocol() = default;
-  SVF_SimulationProtocol() = default;
+  SVF_SimulationProtocol()
+  {
+    CleanUpFiles();
+  }
+
   SVF_SimulationProtocol(std::experimental::string_view toSutFilePath, std::experimental::string_view fromSutFilePath)
     : m_toSutFilePath   (toSutFilePath)
     , m_fromSutFilePath (fromSutFilePath)
   {
+    CleanUpFiles();
   }
 
   //! Does any action required to transfer scan data to and from SUT
@@ -82,6 +87,11 @@ class DLL_EXPORT SVF_SimulationProtocol final : public SVF_Player
   // ---------------- Protected Methods
   //
   protected:
+
+  //! Deletes content of exchange files
+  //!
+  void CleanUpFiles ();
+
   //! Sends SVF command to SUT
   //!
   virtual void SendCommand(std::experimental::string_view command);

@@ -28,11 +28,10 @@ class UT_SVF_SimulationProtocol : public CxxTest::TestSuite
 
   // ================ Test Methods ================
 
-  void test_DefaultConstructor ();
   void test_Constructor ();
+  void test_Constructor_Bad_ToSutPath ();
+  void test_Constructor_Bad_FromSutPath ();
 
-  void test_DoAction_Bad_ToSutPath ();
-  void test_DoAction_Bad_FromSutPath ();
   void test_DoAction_Sync ();
   void test_DoAction_ASync ();
 

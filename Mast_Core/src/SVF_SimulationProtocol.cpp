@@ -41,6 +41,33 @@ BinaryVector SVF_SimulationProtocol::DoAction (uint32_t derivationId, void* /* i
 //---------------------------------------------------------------------------
 
 
+//! Deletes content of exchange files
+//!
+void SVF_SimulationProtocol::CleanUpFiles ()
+{
+  // ---------------- Output file
+  //
+  ofstream ofs(m_toSutFilePath, std::ios_base::trunc);
+
+  if (!ofs.is_open())
+  {
+    THROW_RUNTIME_ERROR("Cannot open output file: " + m_toSutFilePath);
+  }
+
+  // ---------------- input file
+  //
+  ofstream ifs(m_fromSutFilePath, std::ios_base::trunc);
+
+  if (!ifs.is_open())
+  {
+    THROW_RUNTIME_ERROR("Cannot open input file: " + m_fromSutFilePath);
+  }
+}
+//
+//  End of: SVF_SimulationProtocol::CleanUpFiles
+//---------------------------------------------------------------------------
+
+
 
 //! Retrieves bitstrem data from SUT
 //!

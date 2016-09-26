@@ -32,16 +32,6 @@ void UT_SVF_SimulationProtocol::setUp ()
 {
 }
 
-//! Checks SVF_SimulationProtocol default constructor
-//!
-void UT_SVF_SimulationProtocol::test_DefaultConstructor ()
-{
-  // ---------------- Exercise & Verify
-  //
-  TS_ASSERT_THROWS_NOTHING (SVF_SimulationProtocol sut);
-}
-
-
 //! Checks SVF_SimulationProtocol constructor with files path
 //!
 void UT_SVF_SimulationProtocol::test_Constructor ()
@@ -57,40 +47,38 @@ void UT_SVF_SimulationProtocol::test_Constructor ()
 }
 
 
-//! Checks SVF_SimulationProtocol::DoAction when cannot open "To SUT path"
+//! Checks SVF_SimulationProtocol constructor when cannot open "To SUT path"
 //!
-void UT_SVF_SimulationProtocol::test_DoAction_Bad_ToSutPath ()
+void UT_SVF_SimulationProtocol::test_Constructor_Bad_ToSutPath ()
 {
   // ---------------- Setup
   //
   auto toSutPath   = "BAD/PATH/to_sut.svf";
   auto fromSutPath = "from_sut.dat";
   auto toSutVector = BinaryVector::CreateFromString("/x3636/b1/xC0C0_C0C0");
-  auto sut         = SVF_SimulationProtocol(toSutPath, fromSutPath);
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (sut.DoAction(1, nullptr, toSutVector), std::exception);
+  TS_ASSERT_THROWS (SVF_SimulationProtocol(toSutPath, fromSutPath), std::exception);
 }
 
 
-//! Checks SVF_SimulationProtocol::DoAction when cannot open "From SUT path"
+//! Checks SVF_SimulationProtocol constructor DoAction when cannot open "From SUT path"
 //!
-void UT_SVF_SimulationProtocol::test_DoAction_Bad_FromSutPath ()
+void UT_SVF_SimulationProtocol::test_Constructor_Bad_FromSutPath ()
 {
   // ---------------- Setup
   //
   auto toSutPath   = "to_sut.svf";
   auto fromSutPath = "BAD/PATH/from_sut.dat";
   auto toSutVector = BinaryVector::CreateFromString("/x3636/b1/xC0C0_C0C0");
-  auto sut         = SVF_SimulationProtocol(toSutPath, fromSutPath);
 
-  sut.FromSutDataWait(1ms);     // This is required to get rapidly an exception
-  sut.FromSutDataTimeout(2ms);  // This is required to get rapidly an exception
+//+  sut.FromSutDataWait(1ms);     // This is required to get rapidly an exception
+//+  sut.FromSutDataTimeout(2ms);  // This is required to get rapidly an exception
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (sut.DoAction(1, nullptr, toSutVector), std::exception);
+  TS_ASSERT_THROWS (SVF_SimulationProtocol(toSutPath, fromSutPath), std::exception);
 }
 
 

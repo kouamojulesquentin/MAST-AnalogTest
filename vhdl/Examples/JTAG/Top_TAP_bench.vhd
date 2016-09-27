@@ -104,6 +104,18 @@ signal UE_delay, next_UE_delay   : std_logic_vector(0 to MAX_LEVELS);
 signal SEL_int,next_SEL_int  : std_logic_vector(0 to MAX_LEVELS);
 signal UE_int, next_UE_int   : std_logic_vector(0 to MAX_LEVELS);
 
+component tutorial_1_testcase 
+ port  ( clk   : in  std_logic;
+     rst  : in  std_logic;
+     TDI   : in  std_logic;
+     TDO   : out std_logic;
+     mode  : in  std_logic;
+     SH_en : in  std_logic;
+     CA_en : in  std_logic;
+     UP_en : in  std_logic;
+     Sel   : in  std_logic
+   );
+end component;
 
 component P1687_testcase 
  port  ( clk   : in  std_logic;
@@ -241,6 +253,22 @@ DR_loopback: if target_SUT = LOOPBACK generate
  chain_loop: for n in 1 to MAX_DR_CHAINS generate
     from_DR(n) <= to_scan_chain;
   end generate;
+end generate;
+
+
+SUT_TUTORIAL_1: if target_SUT = TUTORIAL_1 generate
+
+SUT : tutorial_1_testcase  port map 
+   ( clk   => TCK,
+     rst   => reset_chains,
+     TDI   => to_scan_chain,
+     TDO   => from_DR(1),
+     mode  => '1',
+     SH_en => ShiftDR,
+     CA_en => CaptureDR,
+     UP_en => UpdateDR,
+     Sel   => select_DR_chain(1)
+   );
 end generate;
 
 

@@ -82,7 +82,7 @@ void write_string (
     if (outfile ==NULL)
      {
       mti_PrintFormatted("WARNING: target non initialized\n");
-      outfile = fopen("pippo.dat","w+");
+      outfile = fopen("from_RTL.dat","w+");
      }
     string_val = get_string(vhdl_array);
     mti_PrintFormatted("Writing string \"%s\" to file\n",string_val);
@@ -107,7 +107,7 @@ void write_log_line (
     if  ((n_log > n_log_files) && (log_files[n_log] ==NULL))
      {
       mti_PrintFormatted("WARNING: log file %d non initialized\n",n_log);
-      outfile = fopen("pippo.dat","w+");
+      outfile = fopen("from_RTL.dat","w+");
      }
     string_val = get_string(vhdl_array);
     mti_PrintFormatted("Writing string \"%s\" to log %d\n",string_val,n_log);

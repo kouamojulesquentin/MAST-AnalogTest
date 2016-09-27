@@ -24,9 +24,9 @@ package Master_TAP_package is
 
   component Master_TAP
     generic ( input_SVF_dir : string := "./inputs/";
-              input_SVF_file : string := "data_to_shift.txt";
+              input_SVF_file : string := "data_to_shift.svf";
              output_SVF_dir : string := "./outputs/";
-             output_SVF_file : string := "data_from_SUT.txt");
+             output_SVF_file : string := "data_from_SUT.dat");
     port (
        	  TDI		: out std_logic;
 			  TCK    : out std_logic;
@@ -49,9 +49,9 @@ use work.MAST_config.all;
 
 Entity Master_TAP is
     generic ( input_SVF_dir : string := "./inputs/";
-              input_SVF_file : string := "data_to_shift.txt";
+              input_SVF_file : string := "data_to_shift.svf";
              output_SVF_dir : string := "./outputs/";
-             output_SVF_file : string := "data_from_SUT.txt");
+             output_SVF_file : string := "data_from_SUT.dat");
     port ( TDI		: out std_logic;
 			  TCK : out std_logic;
 			  TMS    : out std_logic;
@@ -380,12 +380,13 @@ log_seq: process (Resetn, Clk)
 
 data_logger: process(log_status,toggle) is
  file log_file : TEXT open WRITE_MODE is output_SVF_dir&output_SVF_file;
- variable out_line, display : LINE;
+ variable display : LINE;
  variable i : integer;
  variable shift_state : tap_states;
  variable cur_bit : integer;
  variable first_execution : integer:=0;
- begin
+ variable output_vector_p : string_p;
+  begin
  if (first_execution=0) then
    init_target(output_SVF_dir&output_SVF_file);
    first_execution := 1;
@@ -398,21 +399,24 @@ data_logger: process(log_status,toggle) is
 	cur_bit := 1;
 	 --Format line start
 	 shift_state := old_state;
-	 --write(out_line,print_state(shift_state)&": ");
-         write(out_line,chr(TDO));
-         write_string(str(TDO));
+	 output_vector_p := new string(1 to next_vector_length);
+	 for i in 1 to next_vector_length loop
+	     output_vector_p(i) := 'X'; end loop;
+	 --Writing first bit
+	output_vector_p(next_vector_length):=chr(TDO);
   else
      next_log_status <= idle;
    end if;  
   when active =>
    if (old_state = Shift_IR) or (old_state = Shift_DR) then
+	if (next_vector_length-cur_bit>0) then
+	 output_vector_p(next_vector_length-cur_bit):=chr(TDO);
+	end if;
 	cur_bit := cur_bit+1;
-        write(out_line,chr(TDO));
-        write_string(str(TDO));
       next_log_status <= active;
      else
+        write_string(output_vector_p(1 to next_vector_length));
 	flush_string;
-        writeline(output,out_line);
         cur_bit := 0;
         next_log_status <= idle;
      end if;

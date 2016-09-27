@@ -18,4 +18,5 @@ vcom AI_for_simulation/AI_JTAG_SVF.vhd
 vcom Examples/JTAG/slave_tap.vhd  
 vcom Examples/JTAG/P1687_testcase.vhd 
 vcom Examples/JTAG/AMS_testcase.vhd 
+vcom Examples/JTAG/tutorial_1.vhd  
 vcom Examples/JTAG/Top_TAP_bench.vhd 

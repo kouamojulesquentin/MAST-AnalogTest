@@ -110,6 +110,11 @@ class UT_Register : public CxxTest::TestSuite
   // ---------------- Mismatches
   //
   void test_ResetMismatches ();
+
+  // ---------------- Reset
+  //
+  void test_Reset ();
+  void test_Reset_NoValue ();
 };
 //
 //  End of UT_Register class declaration

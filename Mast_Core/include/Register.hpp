@@ -31,6 +31,7 @@ class DLL_EXPORT Register : public SystemModelNode
   ~Register() = default;
   Register()  = delete;
   Register(std::experimental::string_view name, mast::BinaryVector bypassSequence, bool holdValue = false);
+  Register(std::experimental::string_view name, mast::BinaryVector bypassSequence, mast::BinaryVector resetSequence, bool holdValue = false);
   friend SystemModel;
 
   // ---------------- Miscellaneous
@@ -163,6 +164,8 @@ class DLL_EXPORT Register : public SystemModelNode
     }
   }
 
+  void Reset(); //!< When the reset sequence is not empty, resets internal state
+
   void SetCheckExpected   (bool checkExpected) { m_mustCheckExpected  = checkExpected; } //!< Sets whether data updated from SUT must be check agains expected data
   void ResetMismatches    ()                   { m_mismatches = 0; }                     //!< Clears the mismatch count
 
@@ -182,6 +185,7 @@ class DLL_EXPORT Register : public SystemModelNode
   BinaryVector m_expectedFromSut;           //!< Sequence of expected bits when scanning from SUT
   BinaryVector m_bypass;                    //!< Sequence to shift into the sut when no iApply cycle has been defined on the register
   BinaryVector m_dontCareMask;              //!< When not empty, each one bit represent a bit to compare and each zero bit represent a bit we don't care
+  BinaryVector m_resetValue;                //!< When not empty, it is the value used to reflect the register value after a iReset command
 };
 //
 //  End of Register class declaration

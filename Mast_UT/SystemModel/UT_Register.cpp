@@ -616,6 +616,30 @@ void UT_Register::test_UpdateLastToSut ()
 }
 
 
+//! Checks when Register::HoldValue() is true, "bypass sequence" is updated whenever "next to sut" is
+//!
+void UT_Register::test_HoldValue ()
+{
+  // ---------------- Setup
+  //
+  const auto initial  = BinaryVector::CreateFromBinaryString("1111_1111:0");
+
+  Register sut("Reg", initial);
+
+  // ---------------- Exercise
+  //
+  sut.SetHoldValue(true);
+
+  // ---------------- Verify
+  //
+  const auto newValue = BinaryVector::CreateFromBinaryString("1110_0111:0");
+
+  sut.SetToSut(newValue);
+
+  TS_ASSERT_EQUALS (sut.NextToSut(),      newValue);
+  TS_ASSERT_EQUALS (sut.BypassSequence(), newValue);
+}
+
 //! Checks Register::SetToSut() with a proper value from uint8_t
 //!
 void UT_Register::test_SetToSut_uint8 ()
@@ -1466,30 +1490,94 @@ void UT_Register::test_ResetMismatches ()
 }
 
 
-
-//! Checks when Register::HoldValue() is true, "bypass sequence" is updated whenever "next to sut" is
+//! Checks Register::Reset() when there is a reset value
 //!
-void UT_Register::test_HoldValue ()
+void UT_Register::test_Reset ()
 {
   // ---------------- Setup
   //
-  const auto initial  = BinaryVector::CreateFromBinaryString("1111_1111:0");
+  const auto initial  = BinaryVector::CreateFromString("0x123456");
+  const auto reset    = BinaryVector::CreateFromString("0xAA55AA");
+  const auto newValue = BinaryVector::CreateFromString("0x789ABC");
+  const auto expected = BinaryVector::CreateFromString("0x789ABC");
+  const auto dontcare = BinaryVector::CreateFromString("0xF0F0FF");
 
-  Register sut("Reg", initial);
+  Register sut("Reg", initial, reset, true);
+  sut.SetExpectedFromSut(expected, dontcare);
+  sut.SetCheckExpected(true);
+  sut.SetPendingForRead(true);
+  sut.SetFromSut(newValue);
 
   // ---------------- Exercise
   //
-  sut.SetHoldValue(true);
+  sut.Reset();
 
   // ---------------- Verify
   //
-  const auto newValue = BinaryVector::CreateFromBinaryString("1110_0111:0");
-
-  sut.SetToSut(newValue);
-
-  TS_ASSERT_EQUALS (sut.NextToSut(),      newValue);
-  TS_ASSERT_EQUALS (sut.BypassSequence(), newValue);
+  TS_ASSERT_EQUALS (sut.TypeName(),          "Register");
+  TS_ASSERT_EQUALS (sut.BitsCount(),         24U);
+  TS_ASSERT_EQUALS (sut.Mismatches(),        0U);
+  TS_ASSERT_EQUALS (sut.PendingCount(),      0U);
+  TS_ASSERT_FALSE  (sut.IsPendingForRead());
+  TS_ASSERT_FALSE  (sut.IsPending());
+  TS_ASSERT_TRUE   (sut.HoldValue());
+  TS_ASSERT_FALSE  (sut.MustCheckExpected());
+  TS_ASSERT_EQUALS (sut.BypassSequence(),    reset);
+  TS_ASSERT_EQUALS (sut.NextToSut(),         reset);
+  TS_ASSERT_EQUALS (sut.LastToSut(),         reset);
+  TS_ASSERT_EQUALS (sut.ExpectedFromSut(),   expected);
+  TS_ASSERT_EQUALS (sut.LastFromSut(),       newValue);
+  TS_ASSERT_EQUALS (sut.LastReadFromSut(),   newValue);
+  TS_ASSERT_EQUALS (sut.LastCompareResult(), BinaryVector::CreateFromString("0x000000"));
 }
+
+
+//! Checks Register::Reset() when there is a no reset value
+//!
+void UT_Register::test_Reset_NoValue ()
+{
+  // ---------------- Setup
+  //
+  const auto initial  = BinaryVector::CreateFromString("0x123456");
+  const auto newValue = BinaryVector::CreateFromString("0x789ABC");
+  const auto gotValue = BinaryVector::CreateFromString("0x55AA66");
+  const auto expected = BinaryVector::CreateFromString("0x789ABF");
+  const auto dontcare = BinaryVector::CreateFromString("0xF0F0FF");
+
+  Register sut("Reg", initial, true);
+  sut.SetExpectedFromSut(expected, dontcare);
+  sut.SetCheckExpected(true);
+  sut.SetPendingForRead(true);
+  sut.SetToSut  (newValue);
+  sut.SetFromSut(gotValue);
+
+  // ---------------- Exercise
+  //
+  sut.Reset();
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (sut.TypeName(),          "Register");
+  TS_ASSERT_EQUALS (sut.BitsCount(),         24U);
+  TS_ASSERT_EQUALS (sut.Mismatches(),        1U);
+  TS_ASSERT_EQUALS (sut.PendingCount(),      1U);
+  TS_ASSERT_TRUE   (sut.IsPendingForRead());
+  TS_ASSERT_TRUE   (sut.IsPending());
+  TS_ASSERT_TRUE   (sut.HoldValue());
+  TS_ASSERT_TRUE   (sut.MustCheckExpected());
+  TS_ASSERT_EQUALS (sut.BypassSequence(),    newValue);
+  TS_ASSERT_EQUALS (sut.NextToSut(),         newValue);
+  TS_ASSERT_EQUALS (sut.LastToSut(),         initial);
+  TS_ASSERT_EQUALS (sut.ExpectedFromSut(),   expected);
+  TS_ASSERT_EQUALS (sut.LastFromSut(),       gotValue);
+  TS_ASSERT_EQUALS (sut.LastReadFromSut(),   gotValue);
+  TS_ASSERT_EQUALS (sut.LastCompareResult(), BinaryVector::CreateFromString("0x2030D9"));
+}
+
+
+
+
+
 
 //===========================================================================
 // End of UT_Register.cpp

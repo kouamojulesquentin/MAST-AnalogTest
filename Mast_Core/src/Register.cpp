@@ -20,10 +20,16 @@ using std::experimental::string_view;
 using namespace mast;
 
 
-//! Initializes a new Register
+//! Initializes a new Register (with a reset value)
 //!
-//! @note All registers are initialized like the bypass sequence
-Register::Register (string_view name, mast::BinaryVector bypassSequence, bool holdValue)
+//! @param name             Register name (to be identified using a path)
+//! @param bypassSequence   Sequence of bits that define initial and bypass value
+//! @param resetSequence    Sequence of bits that define the reset state
+//! @param holdValue        When true, register value from iWrite command is maintained (by setting the bypass with the same value)
+//!
+//! @note All internal BinaryVector are initialized like the bypass sequence
+//!
+Register::Register (string_view name, mast::BinaryVector bypassSequence, mast::BinaryVector resetSequence, bool holdValue)
   : SystemModelNode   (name)
   , m_holdValue       (holdValue)
   , m_nextToSut       (bypassSequence,            SizeProperty::Fixed)
@@ -32,6 +38,28 @@ Register::Register (string_view name, mast::BinaryVector bypassSequence, bool ho
   , m_lastReadFromSut (bypassSequence.BitsCount())
   , m_expectedFromSut (bypassSequence,            SizeProperty::Fixed)
   , m_bypass          (std::move(bypassSequence), SizeProperty::Fixed)
+  , m_resetValue      (std::move(resetSequence))
+{
+  if (!m_resetValue.IsEmpty())
+  {
+    CHECK_PARAMETER_EQ(m_resetValue.BitsCount(), m_bypass.BitsCount(), "Reset sequence must have same number of bits as bypass sequence");
+    m_resetValue.FixSize(true);
+  }
+}
+//
+//  End of: Register::Register
+//---------------------------------------------------------------------------
+
+//! Initializes a new Register
+//!
+//! @param name             Register name (to be identified using a path)
+//! @param bypassSequence   Sequence of bits that define initial and bypass value
+//! @param holdValue        When true, register value from iWrite command is maintained (by setting the bypass with the same value)
+//!
+//! @note All registers are initialized like the bypass sequence
+//!
+Register::Register (string_view name, mast::BinaryVector bypassSequence, bool holdValue)
+  : Register   (name, bypassSequence, BinaryVector(), holdValue)
 {
 }
 //
@@ -87,6 +115,36 @@ uint32_t Register::PendingCount () const
 }
 //
 //  End of: Register::PendingCount
+//---------------------------------------------------------------------------
+
+
+//! When the reset sequence is not empty, resets internal state
+//!
+//! @warning Does nothing when reset sequence is empty
+//!
+void Register::Reset ()
+{
+  if (m_resetValue.IsEmpty())
+  {
+    return;
+  }
+
+  ResetPending();
+
+  m_mismatches        = 0;
+  m_mustCheckExpected = false;
+  m_dontCareMask.Clear();
+
+//+  m_expectedFromSut = m_resetValue;
+//+  m_lastFromSut     = m_resetValue;
+//+  m_lastReadFromSut = m_resetValue;
+
+  m_bypass          = m_resetValue;
+  m_nextToSut       = m_resetValue;
+  m_lastToSut       = m_resetValue;
+}
+//
+//  End of: Register::Reset
 //---------------------------------------------------------------------------
 
 

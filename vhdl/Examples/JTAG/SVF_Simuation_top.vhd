@@ -4,7 +4,7 @@
 --
 -- Create Date:   11:40:57 11/02/2015
 -- Design Name:   
--- Module Name:   ./vhd/Master_TAPFSM_Bench.vhd
+-- Module Name:   ./vhd/SVF_Simuation_top.vhd
 -- Project Name:  MAST_JTAG
 -- Target Device:  
 -- Tool versions:  
@@ -25,7 +25,7 @@ USE ieee.numeric_std.ALL;
 use STD.textio.all;
 
 library work;
-use work.master_TAP_package.all;
+use work.AI_JTAG_SVF_package.all;
 use work.slave_TAP_package.all;
 use work.JTAG_package.all;
 use work.MAST_config.all;
@@ -35,10 +35,10 @@ use work.exchange_registers.all;
 -- arithmetic functions with Signed or Unsigned values
 --USE ieee.numeric_std.ALL;
  
-ENTITY Top_TAP_bench IS
-END Top_TAP_bench;
+ENTITY SVF_Simuation_top IS
+END SVF_Simuation_top;
  
-ARCHITECTURE behavior OF Top_TAP_bench IS 
+ARCHITECTURE behavior OF SVF_Simuation_top IS 
  
     -- Component Declaration for the Unit Under Test (UUT)
  
@@ -157,7 +157,7 @@ BEGIN
  
   Resetn <= '0', '1' after 100 ns;
  
-  main_tap: master_TAP 
+  main_tap: AI_JTAG_SVF 
     generic map (input_SVF_dir => "./"
                  ,input_SVF_file => "data_to_rtl.svf" 
 		 ,output_SVF_dir => "./"

@@ -20,9 +20,9 @@ use work.txt_util.all;
 use work.MAST_write.all;
 use work.MAST_config.all;
 
-package Master_TAP_package is
+package AI_JTAG_SVF_package is
 
-  component Master_TAP
+  component AI_JTAG_SVF
     generic ( input_SVF_dir : string := "./inputs/";
               input_SVF_file : string := "data_to_shift.svf";
              output_SVF_dir : string := "./outputs/";
@@ -35,7 +35,7 @@ package Master_TAP_package is
 			  TDO		: in std_logic
 	   );       
   end component;
-end Master_TAP_package;
+end AI_JTAG_SVF_package;
 
 library IEEE;
 use IEEE.std_logic_1164.all;
@@ -47,7 +47,7 @@ use work.txt_util.all;
 use work.MAST_write.all;
 use work.MAST_config.all;
 
-Entity Master_TAP is
+Entity AI_JTAG_SVF is
     generic ( input_SVF_dir : string := "./inputs/";
               input_SVF_file : string := "data_to_shift.svf";
              output_SVF_dir : string := "./outputs/";
@@ -58,9 +58,9 @@ Entity Master_TAP is
            TRSTN  : out std_logic;
 			  TDO		: in std_logic
 	   );       
-end Master_TAP;
+end AI_JTAG_SVF;
 
-Architecture behavior of Master_TAP is
+Architecture behavior of AI_JTAG_SVF is
 
   signal current_state: extended_tap_states;  
   signal next_state: extended_tap_states;

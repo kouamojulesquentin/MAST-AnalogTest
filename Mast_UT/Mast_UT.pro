@@ -31,10 +31,6 @@ SOURCES += \
     Generated/Runner.cpp                              \
     API_C/UT_PDL_Adapter_C.cpp                        \
     API_CPP/UT_PDL_Adapter_CPP.cpp                    \
-    SystemModel/Fake_SVF_Simulator.cpp                \
-    SystemModel/Spy_AccessInterfaceProtocols.cpp      \
-    SystemModel/Spy_I2C_Protocol.cpp                  \
-    SystemModel/Spy_SVF_Protocol.cpp                  \
     SystemModel/UT_ConfigureVisitor.cpp               \
     SystemModel/UT_DataCycle.cpp                      \
     SystemModel/UT_DefaultBinaryPathSelector.cpp      \
@@ -56,6 +52,10 @@ SOURCES += \
     SystemModel/UT_ToSutVisitor.cpp                   \
     SystemModel/UT_SystemModelManager.cpp             \
     SystemModel/UT_SystemModelNode.cpp                \
+    UT_Helpers/Fake_SVF_Simulator.cpp                 \
+    UT_Helpers/Spy_AccessInterfaceProtocols.cpp       \
+    UT_Helpers/Spy_I2C_Protocol.cpp                   \
+    UT_Helpers/Spy_SVF_Protocol.cpp                   \
     UT_Helpers/TestModelBuilder.cpp                   \
     UT_Helpers/UT_TestModelBuilder.cpp                \
     Utility/UT_BinaryVector.cpp                       \
@@ -70,10 +70,6 @@ HEADERS += \
     CxxTest_Traits/C_API_Traits.hpp                   \
     API_C/UT_PDL_Adapter_C.hpp                        \
     API_CPP/UT_PDL_Adapter_CPP.hpp                    \
-    SystemModel/Fake_SVF_Simulator.hpp                \
-    SystemModel/Spy_AccessInterfaceProtocols.hpp      \
-    SystemModel/Spy_I2C_Protocol.hpp                  \
-    SystemModel/Spy_SVF_Protocol.hpp                  \
     SystemModel/UT_ConfigureVisitor.hpp               \
     SystemModel/UT_DataCycle.hpp                      \
     SystemModel/UT_DefaultBinaryPathSelector.hpp      \
@@ -95,6 +91,10 @@ HEADERS += \
     SystemModel/UT_ToSutVisitor.hpp                   \
     SystemModel/UT_SystemModelManager.hpp             \
     SystemModel/UT_SystemModelNode.hpp                \
+    UT_Helpers/Fake_SVF_Simulator.hpp                 \
+    UT_Helpers/Spy_AccessInterfaceProtocols.hpp       \
+    UT_Helpers/Spy_I2C_Protocol.hpp                   \
+    UT_Helpers/Spy_SVF_Protocol.hpp                   \
     UT_Helpers/TestModelBuilder.hpp                   \
     UT_Helpers/UT_TestModelBuilder.hpp                \
     Utility/UT_BinaryVector.hpp                       \

@@ -363,6 +363,28 @@ DLL_EXPORT ErrorCode iRefresh (const char* registerPath)
 }
 
 
+
+//! Forces the ResetPort to be asserted on the target module and reset SystemModel accordingly
+//!
+//! @param doSynchronousReset When true, reset will be done by issuing a synchronous reset sequence
+//!
+ErrorCode iReset (bool doSynchronousReset)
+{
+  auto retCode = ErrorCode::Ok;
+
+  TRY_CATCH_ALL(retCode,
+                auto manager = GetAndCheckManager();
+                manager->iReset(doSynchronousReset);
+               );
+
+  return retCode;
+}
+//
+//  End of: iReset
+//---------------------------------------------------------------------------
+
+
+
 //! Requires write to register from binary string
 //!
 ErrorCode iWrite_BinaryVector (const char* registerPath, const char*  value)

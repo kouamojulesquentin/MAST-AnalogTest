@@ -99,6 +99,10 @@ extern "C"
   //
   DLL_EXPORT ErrorCode iRefresh (const char* registerPath); //!< Queues a request to (re-)read register value from SUT
 
+  //! Forces the ResetPort to be asserted on the target module and reset SystemModel accordingly
+  //!
+  DLL_EXPORT ErrorCode iReset(bool doSynchronousReset);
+
   // ---------------- iWrite
   //
   DLL_EXPORT ErrorCode iWrite_BinaryVector (const char* registerPath, const char* value); //!< Requires write to register from binary string

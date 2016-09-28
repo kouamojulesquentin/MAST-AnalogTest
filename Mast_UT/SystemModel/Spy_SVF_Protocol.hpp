@@ -17,6 +17,7 @@
 
 #include "SVF_Player.hpp"
 #include "BinaryVector.hpp"
+#include <string>
 
 namespace test
 {
@@ -47,6 +48,16 @@ class Spy_SVF_Protocol final : public mast::SVF_Player
   //! Returns readable type of protocol
   //!
   virtual std::experimental::string_view KindName() const override { return "SVF_Spy"; }
+
+  //! Forces the ResetPort to be asserted on the target module
+  //!
+  virtual void DoReset(bool doSynchronousReset) override;
+
+  // ---------------- Private  Methods
+  //
+  //! Saves SVF commands
+  //!
+  void SaveCommands(std::experimental::string_view commands);
 
   // ---------------- Private  Fields
   //

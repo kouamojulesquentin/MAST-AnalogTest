@@ -175,7 +175,7 @@ BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfac
   switch (derivationId)
   {
     case 0u:
-      LOG(INFO) << "OpenOCD_RST_LB(" << toSutData.DataAsMixString() << ")";
+      LOG(INFO) << "OpenOCD_RST_LB";
       break;
     case 1u:
       LOG(INFO) << "OpenOCD_IR_LB(" << toSutData.DataAsMixString() << ")";
@@ -203,13 +203,7 @@ BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfac
   switch (derivationId)
   {
     case 0u:
-      LOG(INFO) << "OpenOCD_RST(" << toSutData.DataAsMixString() << ")";
-
-      if(m_supportTrst)
-        jtag_add_reset(1, 0);           // TRST is enabled for one TCK cycle.
-      else
-        jtag_add_statemove(TAP_RESET);  // One of the toolchain components does not provide a TRST pin.
-                                        // Using FSM instead.
+      DoReset();
       break;
     case 1u:
       {
@@ -247,6 +241,27 @@ BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfac
 //
 //  End of: OpenOCDProtocol::DoAction
 //---------------------------------------------------------------------------
+
+
+//! Forces the ResetPort to be asserted on the target module
+//!
+//! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence
+//!
+void OpenOCDProtocol::DoReset(bool doSynchronousReset)
+{
+  LOG(INFO) << "OpenOCD_RST sync = " << std::boolalpha << doSynchronousReset;
+
+  #ifdef USE_OPEN_OCD
+  if(m_supportTrst && !doSynchronousReset)
+  {
+    jtag_add_reset(1, 0);           // TRST is enabled for one TCK cycle.
+  }
+  else
+  {
+    jtag_add_statemove(TAP_RESET);  // One of the toolchain components does not provide a TRST pin ==> Use FSM instead.
+  }
+  #endif
+}
 
 //===========================================================================
 // End of OpenOCDProtocol.cpp

@@ -83,6 +83,11 @@ class DLL_EXPORT SVF_SimulationProtocol final : public SVF_Player
   //!
   std::chrono::milliseconds FromSutDataWait() const { return m_fromSutWait; }
 
+  //! Forces the ResetPort to be asserted on the target module
+  //!
+  //! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence
+  //!
+  virtual void DoReset(bool doSynchronousReset) override;
 
   // ---------------- Protected Methods
   //

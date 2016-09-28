@@ -51,10 +51,15 @@ class Spy_I2C_Protocol final : public mast::I2C_Player
   //!
   virtual std::experimental::string_view KindName() const override { return "I2C_Spy"; }
 
+  //! Forces the ResetPort to be asserted on the target module
+  //!
+  virtual void DoReset(bool doSynchronousReset) override;
+
   // ---------------- Private  Fields
   //
   private:
   std::vector<std::string> m_commands; //!< Collected I2C commands issued from vectors "send" to SUT by SystemModelManager
+  uint32_t                 m_resetCount = 0;
 };
 //
 //  End of Spy_I2C_Protocol class declaration

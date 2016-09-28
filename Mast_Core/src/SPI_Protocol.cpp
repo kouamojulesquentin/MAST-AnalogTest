@@ -122,24 +122,22 @@ BinaryVector SPI_Protocol::DoAction (uint32_t derivationId, void* /* interfaceDa
 #else
 BinaryVector SPI_Protocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
-	auto chipSelectCommand = GetChipSelectCommand(derivationId);
-	auto readCommand 	= GetReadCommand(derivationId);
-  auto writeCommand = GetWriteCommand(derivationId);
+  auto chipSelectCommand = GetChipSelectCommand(derivationId);
+  auto readCommand       = GetReadCommand(derivationId);
+  auto writeCommand      = GetWriteCommand(derivationId);
 
-  auto bitsCount	 		= toSutData.BitsCount();
-  auto bytesCount 		= toSutData.BytesCount();
-	auto spiBufferLength = bytesCount+1u;									 // +1 byte is needed to host command.
-	auto spiBufferRead 	= vector<uint8_t>(bytesCount+1u);
-	auto spiBufferWrite	= vector<uint8_t>();
+  auto bitsCount       = toSutData.BitsCount();
+  auto bytesCount      = toSutData.BytesCount();
+  auto spiBufferLength = bytesCount+1u;                  // +1 byte is needed to host command.
+  auto spiBufferRead   = vector<uint8_t>(bytesCount+1u);
+  auto spiBufferWrite  = vector<uint8_t>();
 
   auto toSutDataBuffer		=	toSutData.DataRightAligned();
 	//auto fromSutDataBuffer	= vector<uint8_t>(toSutData.BytesCount());
 
-  spiBufferRead.insert(spiBufferRead.begin(), readCommand);
-
-  spiBufferWrite.insert(spiBufferWrite.begin(), writeCommand);
-
-  spiBufferWrite.insert(spiBufferWrite.end(), toSutDataBuffer.begin(), toSutDataBuffer.end());
+  spiBufferRead.insert  (spiBufferRead.begin(),  readCommand);
+  spiBufferWrite.insert (spiBufferWrite.begin(), writeCommand);
+  spiBufferWrite.insert (spiBufferWrite.end(),   toSutDataBuffer.begin(), toSutDataBuffer.end());
 
   ftdispi_read(m_ftdispi_ctx, spiBufferRead.data(), spiBufferLength, chipSelectCommand);
 	LOG(INFO) << "SPI_WRITE(" << toSutData.DataAsMixString() << ")";
@@ -153,8 +151,22 @@ BinaryVector SPI_Protocol::DoAction (uint32_t derivationId, void* /* interfaceDa
 }
 #endif
 //
-//  End of: Spy_AccessInterfaceProtocols::DoAction
+//  End of: SPI_Protocol::DoAction
 //---------------------------------------------------------------------------
+
+
+//! Forces the ResetPort to be asserted on the target module
+//!
+//! @param doSynchronousReset   Is ignored
+//!
+void SPI_Protocol::DoReset(bool /* doSynchronousReset */)
+{
+  #ifndef USE_LIBFTDISPI
+  LOG(INFO) << "SPI_RESET()";
+  #else
+  LOG(WARNING) << "SPI_RESET() ==> Not Yet Implemented";
+  #endif
+}
 
 
 //===========================================================================

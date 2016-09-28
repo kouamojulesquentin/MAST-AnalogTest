@@ -33,14 +33,26 @@ class DLL_EXPORT SVF_Player : public AccessInterfaceProtocol
   ~SVF_Player() = default;
   SVF_Player()  = default;
 
+  //! Returns true when TRST JTAG port is supported
+  //!
+  bool  SupportTRST() const { return m_supportTRST; }
 
-  // ---------------- Protected Methods
-  //
-  protected:
+  //! Sets whether TRST JTAG port is supported
+  //!
+  void  SupportTRST (bool supportTRST) { m_supportTRST = supportTRST; }
+
 
   //! Creates an SVF command associated to derivation identifier and BinaryVector to send to SUT
   //!
-  std::string CreateSVFCommand(uint32_t derivationId, const BinaryVector& toSutData);
+  std::string CreateSVFCommand(uint32_t derivationId, const BinaryVector& toSutData) const;
+
+  //! Creates an SVF reset command
+  //!
+  std::string CreateResetSVFCommand (bool doSynchronousReset) const ;
+
+  // ---------------- Private  Fields
+  //
+  bool m_supportTRST = false; //!< When true, TRST instruction is used for reset unless synchronous reset is requested
 };
 //
 //  End of SVF_Player class declaration

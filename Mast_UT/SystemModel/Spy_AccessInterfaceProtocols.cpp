@@ -29,6 +29,18 @@ BinaryVector Spy_AccessInterfaceProtocols::DoAction (uint32_t /* derivationId */
 
 
 
+//! Tally number of call to Reset
+//!
+void Spy_AccessInterfaceProtocols::DoReset (bool /* doSynchronousReset */)
+{
+  ++m_resetCount;
+}
+//
+//  End of: Spy_AccessInterfaceProtocols::Reset
+//---------------------------------------------------------------------------
+
+
+
 
 //===========================================================================
 // End of Spy_AccessInterfaceProtocols.cpp

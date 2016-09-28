@@ -17,14 +17,20 @@
 
 #include "BinaryVector_Traits.hpp"
 #include <tuple>
+#include <experimental/string_view>
 
 using std::make_tuple;
+using std::experimental::string_view;
 using namespace std::string_literals;
 using namespace std::chrono_literals;
 using namespace mast;
 using namespace test;
 
-
+namespace
+{
+  constexpr char TO_SUT_PATH[]   = "TO_SUT_PATH";
+  constexpr char FROM_SUT_PATH[] = "FROM_SUT_PATH";
+} // End of unnamed namespace
 
 
 //! Initializes test (called for each test)
@@ -38,8 +44,8 @@ void UT_SVF_SimulationProtocol::test_Constructor ()
 {
   // ---------------- Setup
   //
-  auto toSutPath = "to_sut.svf";
-  auto fromSutPath = "from_sut.dat";
+  auto toSutPath = "TO_SUT_PATH";
+  auto fromSutPath = "FROM_SUT_PATH";
 
   // ---------------- Exercise & Verify
   //
@@ -53,8 +59,8 @@ void UT_SVF_SimulationProtocol::test_Constructor_Bad_ToSutPath ()
 {
   // ---------------- Setup
   //
-  auto toSutPath   = "BAD/PATH/to_sut.svf";
-  auto fromSutPath = "from_sut.dat";
+  auto toSutPath   = "BAD/PATH/TO_SUT_PATH";
+  auto fromSutPath = "FROM_SUT_PATH";
   auto toSutVector = BinaryVector::CreateFromString("/x3636/b1/xC0C0_C0C0");
 
   // ---------------- Exercise & Verify
@@ -69,8 +75,8 @@ void UT_SVF_SimulationProtocol::test_Constructor_Bad_FromSutPath ()
 {
   // ---------------- Setup
   //
-  auto toSutPath   = "to_sut.svf";
-  auto fromSutPath = "BAD/PATH/from_sut.dat";
+  auto toSutPath   = "TO_SUT_PATH";
+  auto fromSutPath = "BAD/PATH/FROM_SUT_PATH";
   auto toSutVector = BinaryVector::CreateFromString("/x3636/b1/xC0C0_C0C0");
 
 //+  sut.FromSutDataWait(1ms);     // This is required to get rapidly an exception
@@ -89,8 +95,8 @@ void UT_SVF_SimulationProtocol::test_DoAction_Sync ()
 {
   // ---------------- DDT Setup
   //
-  auto toSutPath     = "to_sut.svf";
-  auto fromSutPath   = "from_sut.dat";
+  auto toSutPath     = "TO_SUT_PATH";
+  auto fromSutPath   = "FROM_SUT_PATH";
   auto sut           = SVF_SimulationProtocol(toSutPath, fromSutPath);
 
   Fake_SVF_Simulator fakeSimulator(toSutPath, fromSutPath);
@@ -186,8 +192,8 @@ void UT_SVF_SimulationProtocol::test_DoAction_ASync ()
 {
   // ---------------- DDT Setup
   //
-  auto toSutPath   = "to_sut.svf";
-  auto fromSutPath = "from_sut.dat";
+  auto toSutPath   = "TO_SUT_PATH";
+  auto fromSutPath = "FROM_SUT_PATH";
   auto sut         = SVF_SimulationProtocol(toSutPath, fromSutPath);
 
   Fake_SVF_Simulator fakeSimulator(toSutPath, fromSutPath);
@@ -275,6 +281,62 @@ void UT_SVF_SimulationProtocol::test_DoAction_ASync ()
     "11111111\n";                                         // 13
 
   TS_ASSERT_FILE_CONTENT (fromSutPath, expectedFromSutFileContent);
+}
+
+
+//! Checks SVF_SimulationProtocol::Reset
+//!
+void UT_SVF_SimulationProtocol::test_DoReset ()
+{
+  // ---------------- DDT Setup
+  //
+  auto sut = SVF_SimulationProtocol(TO_SUT_PATH, FROM_SUT_PATH);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.DoReset(false));
+
+  auto expectedToSutFileContent = "STATE RESET;\n";
+
+  TS_ASSERT_FILE_CONTENT (TO_SUT_PATH, expectedToSutFileContent);
+}
+
+
+//! Checks SVF_SimulationProtocol::Reset when protocol support TRST
+//!
+void UT_SVF_SimulationProtocol::test_DoReset_SupportTRST ()
+{
+  // ---------------- DDT Setup
+  //
+  auto sut = SVF_SimulationProtocol(TO_SUT_PATH, FROM_SUT_PATH);
+  sut.SupportTRST(true);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.DoReset(false));
+
+  auto expectedToSutFileContent = "TRST ON;\nTRST OFF;\n";
+
+  TS_ASSERT_FILE_CONTENT (TO_SUT_PATH, expectedToSutFileContent);
+}
+
+
+//! Checks SVF_SimulationProtocol::Reset when protocol support TRST but a 'sync' mode reset is requested
+//!
+void UT_SVF_SimulationProtocol::test_DoReset_Sync ()
+{
+  // ---------------- DDT Setup
+  //
+  auto sut = SVF_SimulationProtocol(TO_SUT_PATH, FROM_SUT_PATH);
+  sut.SupportTRST(true);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.DoReset(true));
+
+  auto expectedToSutFileContent = "STATE RESET;\n";
+
+  TS_ASSERT_FILE_CONTENT (TO_SUT_PATH, expectedToSutFileContent);
 }
 
 //===========================================================================

@@ -48,10 +48,15 @@ class Spy_AccessInterfaceProtocols final : public mast::AccessInterfaceProtocol
   //!
   virtual std::experimental::string_view KindName() const override { return "Loopback_Spy"; }
 
+  //! Forces the ResetPort to be asserted on the target module
+  //!
+  virtual void DoReset(bool doSynchronousReset) override;
+
   // ---------------- Private  Fields
   //
   private:
   std::vector<mast::BinaryVector> m_toSutVectors; //!< Collected vectors "send" to SUT by SystemModelManager
+  uint32_t                        m_resetCount = 0;
 };
 //
 //  End of Spy_AccessInterfaceProtocols class declaration

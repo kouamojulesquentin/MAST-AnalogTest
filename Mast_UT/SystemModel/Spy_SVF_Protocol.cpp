@@ -12,7 +12,9 @@
 //===========================================================================
 
 #include "Spy_SVF_Protocol.hpp"
+#include "Utility.hpp"
 
+using std::experimental::string_view;
 using namespace mast;
 using namespace test;
 
@@ -22,13 +24,48 @@ using namespace test;
 BinaryVector Spy_SVF_Protocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   auto command = CreateSVFCommand(derivationId, toSutData);
-  m_commands.emplace_back(command);
+
+  SaveCommands(command);
+
   return toSutData;
 }
 //
 //  End of: Spy_SVF_Protocol::DoAction
 //---------------------------------------------------------------------------
 
+
+//! Saves SVF commands
+//!
+//! @param commands New line separated commands
+//!
+void Spy_SVF_Protocol::SaveCommands (string_view commands)
+{
+  auto splitCommands = Utility::Split(commands, "\n");
+
+  for (auto command : splitCommands)
+  {
+    if (!command.empty())
+    {
+      m_commands.emplace_back(command);
+    }
+  }
+}
+//
+//  End of: Spy_SVF_Protocol::SaveCommands
+//---------------------------------------------------------------------------
+
+
+//! Spies Reset command
+//!
+void Spy_SVF_Protocol::DoReset (bool doSynchronousReset)
+{
+  auto commands = CreateResetSVFCommand(doSynchronousReset);
+
+  SaveCommands(commands);
+}
+//
+//  End of: Spy_AccessInterfaceProtocols::Reset
+//---------------------------------------------------------------------------
 
 
 

@@ -55,6 +55,12 @@ class DLL_EXPORT SPI_Protocol final : public SPI_Player
   //!
   virtual std::experimental::string_view KindName() const override { return "SPI_"; }
 
+  //! Forces the ResetPort to be asserted on the target module
+  //!
+  //! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence
+  //!
+  virtual void DoReset(bool doSynchronousReset) override;
+
   protected:
   #ifdef  USE_LIBFTDISPI
   ftdi_context*    m_ftdi_ctx    = nullptr;

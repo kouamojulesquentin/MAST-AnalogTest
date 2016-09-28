@@ -48,6 +48,10 @@ class DLL_EXPORT I2C_EmulationProtocol final : public I2C_Player
   //! Returns readable type of protocol
   //!
   virtual std::experimental::string_view KindName() const override { return "I2C_Emulation"; }
+
+  //! Forces the ResetPort to be asserted on the target module
+  //!
+  virtual void DoReset(bool doSynchronousReset) override;
 };
 //
 //  End of I2C_EmulationProtocol class declaration

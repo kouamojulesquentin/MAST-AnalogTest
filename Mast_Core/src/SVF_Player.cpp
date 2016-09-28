@@ -26,17 +26,14 @@ using std::ostringstream;
 
 //! Creates an SVF command associated to derivation identifier and BinaryVector to send to SUT
 //!
-string SVF_Player::CreateSVFCommand (uint32_t derivationId, const BinaryVector& toSutData)
+string SVF_Player::CreateSVFCommand (uint32_t derivationId, const BinaryVector& toSutData) const
 {
   string_view commandType;
 
   switch (derivationId)
   {
     case 0u:
-      THROW_INVALID_ARGUMENT("Reset operation is not yet implemented");
-      //! @todo [JFC]-[August/26/2016]: In DoAction(): Do a reset operation for derivationId 0
-      //!
-      break;
+      return CreateResetSVFCommand(false);
     case 1u:
       commandType = "SIR";
       break;
@@ -60,6 +57,30 @@ string SVF_Player::CreateSVFCommand (uint32_t derivationId, const BinaryVector& 
 //---------------------------------------------------------------------------
 
 
+//! Creates an SVF reset command
+//!
+//! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence
+//!
+string SVF_Player::CreateResetSVFCommand (bool doSynchronousReset) const
+{
+  ostringstream os;
+
+  if (SupportTRST() && !doSynchronousReset)
+  {
+    os << "TRST ON;\nTRST OFF;\n";
+  }
+  else
+  {
+    os << "STATE RESET;\n";
+  }
+
+  auto svfCommand = os.str();
+
+  return svfCommand;
+}
+//
+//  End of: SVF_Player::CreateSVFCommand
+//---------------------------------------------------------------------------
 
 
 //===========================================================================

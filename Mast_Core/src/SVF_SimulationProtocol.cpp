@@ -186,6 +186,14 @@ void SVF_SimulationProtocol::SendCommand (string_view command)
 //---------------------------------------------------------------------------
 
 
+//! Forces the ResetPort to be asserted on the target module
+//!
+//! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence
+//!
+void SVF_SimulationProtocol::DoReset(bool doSynchronousReset)
+{
+  SendCommand(CreateResetSVFCommand(doSynchronousReset));
+}
 
 
 //===========================================================================

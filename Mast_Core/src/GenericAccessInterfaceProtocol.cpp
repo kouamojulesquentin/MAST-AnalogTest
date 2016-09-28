@@ -93,6 +93,17 @@ BinaryVector GenericAccessInterfaceProtocol::DoAction (uint32_t derivationId, vo
 
 
 
+//! Forces the ResetPort to be asserted on the target module
+//!
+//! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence
+//!
+void GenericAccessInterfaceProtocol::DoReset(bool doSynchronousReset)
+{
+  auto& primitive = m_primitives[0];
+  primitive(static_cast<void*>(&doSynchronousReset));
+}
+
+
 //===========================================================================
 // End of GenericAccessInterfaceProtocol.cpp
 //===========================================================================

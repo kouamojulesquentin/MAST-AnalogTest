@@ -54,6 +54,17 @@ class DLL_EXPORT SVF_EmulationProtocol final : public SVF_Player
   //! Returns readable type of protocol
   //!
   virtual std::experimental::string_view KindName() const override { return "SVF_Emulation"; }
+
+  //! Forces the ResetPort to be asserted on the target module
+  //!
+  virtual void DoReset(bool doSynchronousReset) override;
+
+  // ---------------- Protected Methods
+  //
+
+  //! Logs SVF commands
+  //!
+  void LogCommands(std::experimental::string_view commands);
 };
 //
 //  End of SVF_EmulationProtocol class declaration

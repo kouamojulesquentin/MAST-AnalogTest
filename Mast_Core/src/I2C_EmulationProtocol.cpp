@@ -49,9 +49,6 @@ I2C_EmulationProtocol::I2C_EmulationProtocol (vector<uint32_t> addresses, string
   : I2C_Player(addresses, commandsPrefix)
 {
 }
-//
-//  End of: I2C_EmulationProtocol::I2C_EmulationProtocol
-//---------------------------------------------------------------------------
 
 
 //! Loopbacks "to SUT data" logging I2C command(s) that would be issued if it was really an operating protocol
@@ -73,10 +70,16 @@ BinaryVector I2C_EmulationProtocol::DoAction (uint32_t derivationId, void* /* in
 
   return toSutData;
 }
-//
-//  End of: Spy_AccessInterfaceProtocols::DoAction
-//---------------------------------------------------------------------------
 
+
+//! Forces the ResetPort to be asserted on the target module
+//!
+//! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence
+//!
+void I2C_EmulationProtocol::DoReset(bool doSynchronousReset)
+{
+  LOG(INFO) << "I2C_RESET(" << std::boolalpha << doSynchronousReset << ")";
+}
 
 //===========================================================================
 // End of I2C_EmulationProtocol.cpp

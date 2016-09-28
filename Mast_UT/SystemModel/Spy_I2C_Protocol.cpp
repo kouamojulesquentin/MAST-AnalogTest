@@ -30,6 +30,15 @@ BinaryVector Spy_I2C_Protocol::DoAction (uint32_t derivationId, void* /* interfa
 //---------------------------------------------------------------------------
 
 
+//! Tally number of call to Reset
+//!
+void Spy_I2C_Protocol::DoReset (bool /* doSynchronousReset */)
+{
+  ++m_resetCount;
+}
+//
+//  End of: Spy_AccessInterfaceProtocols::Reset
+//---------------------------------------------------------------------------
 
 
 //===========================================================================

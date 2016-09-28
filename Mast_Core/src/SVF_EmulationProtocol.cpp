@@ -40,10 +40,35 @@ BinaryVector SVF_EmulationProtocol::DoAction (uint32_t derivationId, void* /* in
 
   return toSutData;
 }
+
+
+//! Logs SVF commands
+//!
+//! @param commands New line separated commands
+//!
+void SVF_EmulationProtocol::LogCommands (string_view commands)
+{
+  auto splitCommands = Utility::Split(commands, "\n");
+
+  for (auto command : splitCommands)
+  {
+    LOG(INFO) << command;
+  }
+}
 //
-//  End of: Spy_AccessInterfaceProtocols::DoAction
+//  End of: SVF_EmulationProtocol::LogCommand
 //---------------------------------------------------------------------------
 
+
+
+//! Forces the ResetPort to be asserted on the target module
+//!
+//! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence
+//!
+void SVF_EmulationProtocol::DoReset(bool doSynchronousReset)
+{
+  LogCommands(CreateResetSVFCommand(doSynchronousReset));
+}
 
 //===========================================================================
 // End of SVF_EmulationProtocol.cpp

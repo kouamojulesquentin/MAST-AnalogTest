@@ -77,6 +77,13 @@ class DLL_EXPORT GenericAccessInterfaceProtocol : public AccessInterfaceProtocol
   //!
   virtual std::experimental::string_view KindName() const override { return "Generic"; }
 
+
+  //! Forces the ResetPort to be asserted on the target module
+  //!
+  //! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence
+  //!
+  virtual void DoReset(bool doSynchronousReset) override;
+
   // ---------------- Private  Fields
   //
   std::vector<Action>    m_actions;    //!< Provide Actions to access the derivations based on the set of primitives

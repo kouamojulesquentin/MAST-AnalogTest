@@ -35,6 +35,9 @@ class UT_SVF_SimulationProtocol : public CxxTest::TestSuite
   void test_DoAction_Sync ();
   void test_DoAction_ASync ();
 
+  void test_DoReset ();
+  void test_DoReset_SupportTRST ();
+  void test_DoReset_Sync ();
 
   // ================ Other Methods ================
 

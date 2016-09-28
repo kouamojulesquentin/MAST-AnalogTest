@@ -12,6 +12,7 @@
 //===========================================================================
 
 #include "LoopbackAccessInterfaceProtocol.hpp"
+#include "g3log/g3log.hpp"
 
 using namespace mast;
 
@@ -34,6 +35,14 @@ BinaryVector LoopbackAccessInterfaceProtocol::DoAction (uint32_t /* derivationId
 //---------------------------------------------------------------------------
 
 
+//! Forces the ResetPort to be asserted on the target module
+//!
+//! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence
+//!
+void LoopbackAccessInterfaceProtocol::DoReset(bool /* doSynchronousReset */)
+{
+  LOG(INFO) << "Reseting " << KindName() << " interface";
+}
 
 
 //===========================================================================

@@ -50,6 +50,12 @@ class AccessInterfaceProtocol
   //!
   virtual std::experimental::string_view KindName() const = 0;
 
+  //! Forces the ResetPort to be asserted on the target module
+  //!
+  //! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence
+  //!
+  virtual void DoReset(bool doSynchronousReset) = 0;
+
   // ---------------- Protected Methods
   //
   protected:

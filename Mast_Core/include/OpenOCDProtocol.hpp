@@ -57,6 +57,11 @@ class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
   //!
   virtual std::experimental::string_view KindName() const override { return "OpenOCD"; }
 
+  //! Forces the ResetPort to be asserted on the target module
+  //!
+  //! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence
+  //!
+  virtual void DoReset(bool doSynchronousReset) override;
 
   // ---------------- Private  Fields
   //

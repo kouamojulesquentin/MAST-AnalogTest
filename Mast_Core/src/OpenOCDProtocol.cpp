@@ -203,7 +203,7 @@ BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfac
   switch (derivationId)
   {
     case 0u:
-      DoReset();
+      DoReset(false);
       break;
     case 1u:
       {

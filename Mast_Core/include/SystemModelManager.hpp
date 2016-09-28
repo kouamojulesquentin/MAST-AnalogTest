@@ -184,6 +184,11 @@ class DLL_EXPORT SystemModelManager final
   //!
   uint32_t iGetStatus(string_view nodePath, bool clearCounter);
 
+  //! Forces the ResetPort to be asserted on the target module and reset SystemModel accordingly
+  //!
+  void iReset(bool doSynchronousReset = false);
+
+
   //! Sets next Register value to sent to SUT
   //!
   void iWrite (string_view registerPath, BinaryVector value);

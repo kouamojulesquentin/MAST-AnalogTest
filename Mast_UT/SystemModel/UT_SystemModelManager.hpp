@@ -155,6 +155,14 @@ class UT_SystemModelManager : public CxxTest::TestSuite
   void test_iRead_DontCare_int64 ();
   void test_iRead_DontCare_BinaryVector ();
 
+  // ---------------- iReset
+  //
+  void test_iReset_Main_Thread ();
+  void test_iReset_Main_Thread_SupportTRST ();
+  void test_iReset_Main_Thread_Sync ();
+  void test_iReset_App_Thread_Root ();
+  void test_iReset_App_Thread_NotRoot ();
+
   // ================ Other Methods ================
 
   void setUp();    //!< Initializes test (called for each test)

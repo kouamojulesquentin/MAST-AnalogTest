@@ -706,20 +706,20 @@ void UT_SystemModelManager::test_DoDataCycles_1500_SVF ()
 
   vector<string> expected
   {
-     "SIR 8 TDI(01);\n",                   // 00
-     "SDR 18 TDI(001416);\n",              // 01
-     "SDR 20 TDI(036364);\n",              // 02
-     "SDR 49 TDI(006C6DC0C0C0C0);\n",      // 03
-     "SDR 20 TDI(036363);\n",              // 04
-     "SDR 49 TDI(006C6DB0B0B0B0);\n",      // 05
-     "SDR 20 TDI(036362);\n",              // 06
-     "SDR 49 TDI(006C6D0A0A0A0A);\n",      // 07
-     "SDR 20 TDI(036361);\n",              // 08
-     "SDR 49 TDI(006C6C09090909);\n",      // 09
-     "SDR 49 TDI(006C6D40404040);\n",      // 10
-     "SDR 20 TDI(036368);\n",              // 11
-     "SDR 20 TDI(036360);\n",              // 15
-     "SIR 8 TDI(FF);\n",                   // 16
+     "SIR 8 TDI(01);",                   // 00
+     "SDR 18 TDI(001416);",              // 01
+     "SDR 20 TDI(036364);",              // 02
+     "SDR 49 TDI(006C6DC0C0C0C0);",      // 03
+     "SDR 20 TDI(036363);",              // 04
+     "SDR 49 TDI(006C6DB0B0B0B0);",      // 05
+     "SDR 20 TDI(036362);",              // 06
+     "SDR 49 TDI(006C6D0A0A0A0A);",      // 07
+     "SDR 20 TDI(036361);",              // 08
+     "SDR 49 TDI(006C6C09090909);",      // 09
+     "SDR 49 TDI(006C6D40404040);",      // 10
+     "SDR 20 TDI(036368);",              // 11
+     "SDR 20 TDI(036360);",              // 12
+     "SIR 8 TDI(FF);",                   // 13
   };
 
   TS_ASSERT_EQUALS (gotSvfCommands, expected);
@@ -2590,7 +2590,179 @@ void UT_SystemModelManager::test_iRead_DontCare_int64        () { Check_iRead_Do
 void UT_SystemModelManager::test_iRead_DontCare_BinaryVector () { Check_iRead_DontCare_SingleThread(BinaryVector::CreateFromHexString("0CAD005A00"),
                                                                                                     BinaryVector::CreateFromHexString("0FFF00FF00"),
                                                                                                     BinaryVector::CreateFromHexString("0D89ABCDEF"),
-                                                                                                                                      "0124009700"); }
+                                                                                                    "0124009700");
+                                                                }
+
+//! Checks SystemModelManager::iReset when called from main thread
+//!
+void UT_SystemModelManager::test_iReset_Main_Thread ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+
+  auto ai  = Create_TestCase_1500(sm);
+  auto spy = make_shared<Spy_SVF_Protocol>();
+  spy->SupportTRST(false); // Cannot use TRST signal instead of RESET command
+  ai->SetProtocol (spy);
+
+  SystemModelManager sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.iReset());
+
+  // ---------------- Verify
+  //
+  auto gotSvfCommands = spy->SVFCommands();
+
+  vector<string> expected
+  {
+    "STATE RESET;",
+  };
+
+  TS_ASSERT_EQUALS (gotSvfCommands, expected);
+}
+
+//! Checks SystemModelManager::iReset when called from main thread and support TRST
+//!
+void UT_SystemModelManager::test_iReset_Main_Thread_SupportTRST ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+
+  auto ai  = Create_TestCase_1500(sm);
+  auto spy = make_shared<Spy_SVF_Protocol>();
+  spy->SupportTRST(true); // Direct to use TRST signal instead of RESET command
+  ai->SetProtocol (spy);
+
+  SystemModelManager sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.iReset());
+
+  // ---------------- Verify
+  //
+  auto gotSvfCommands = spy->SVFCommands();
+
+  vector<string> expected
+  {
+     "TRST ON;",
+     "TRST OFF;",
+  };
+
+  TS_ASSERT_EQUALS (gotSvfCommands, expected);
+}
+
+//! Checks SystemModelManager::iReset when called from main thread and required synchronous reset
+//!
+void UT_SystemModelManager::test_iReset_Main_Thread_Sync ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+
+  auto ai  = Create_TestCase_1500(sm);
+  auto spy = make_shared<Spy_SVF_Protocol>();
+  spy->SupportTRST(true); // Direct to use TRST signal instead of RESET command, unless 'sync' mode is requested
+  ai->SetProtocol (spy);
+
+  SystemModelManager sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.iReset(true));
+
+  // ---------------- Verify
+  //
+  auto gotSvfCommands = spy->SVFCommands();
+
+  vector<string> expected
+  {
+     "STATE RESET;",
+  };
+
+  TS_ASSERT_EQUALS (gotSvfCommands, expected);
+}
+
+//! Checks SystemModelManager::iReset when called from an application thread associated with root node
+//!
+void UT_SystemModelManager::test_iReset_App_Thread_Root ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+
+  auto ai  = Create_TestCase_1500(sm);
+  auto spy = make_shared<Spy_SVF_Protocol>();
+  spy->SupportTRST(true); // Direct to use TRST signal instead of RESET command
+  ai->SetProtocol (spy);
+
+  SystemModelManager sut(sm);
+
+  // Thread functor
+  auto appFunctor = [&sut]()
+  {
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.iReset());
+  };
+
+  sut.CreateApplicationThread(ai, appFunctor); // Include "Exercise" in created thread
+  sut.StartCreatedApplicationThreads();
+
+  // ---------------- Verify
+  //
+  sut.WaitForApplicationsEnd();  // Make sure application has done its action
+  auto gotSvfCommands = spy->SVFCommands();
+
+  vector<string> expected
+  {
+     "TRST ON;",
+     "TRST OFF;",
+  };
+
+  TS_ASSERT_EQUALS (gotSvfCommands, expected);
+}
+
+
+//! Checks SystemModelManager::iReset when called from an application thread is not associated with root node
+//!
+void UT_SystemModelManager::test_iReset_App_Thread_NotRoot ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+
+  auto ai  = Create_TestCase_1500(sm);
+  auto mux = sm.LinkerWithId(12u);
+  auto spy = make_shared<Spy_SVF_Protocol>();
+  spy->SupportTRST(true);
+  ai->SetProtocol (spy);
+
+  SystemModelManager sut(sm);
+
+  // Thread functor
+  auto appFunctor = [&sut]()
+  {
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.iReset());
+  };
+
+  ENABLE_LOG_IN_SCOPE;
+  sut.CreateApplicationThread(mux, appFunctor); // Application is not associated with root node
+  sut.StartCreatedApplicationThreads();
+
+  // ---------------- Verify
+  //
+  sut.WaitForApplicationsEnd();  // Make sure application has done its action
+  auto gotSvfCommands = spy->SVFCommands();
+
+  TS_ASSERT_TRUE (gotSvfCommands.empty());
+}
 
 //===========================================================================
 // End of UT_SystemModelManager.cpp

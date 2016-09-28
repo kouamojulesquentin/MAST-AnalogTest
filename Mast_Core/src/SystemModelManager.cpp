@@ -20,6 +20,7 @@
 #include "Utility.hpp"
 #include "SystemModelManagerMonitor.hpp"
 #include "MismatchesCollector.hpp"
+#include "SystemModelReseter.hpp"
 #include "g3log/g3log.hpp"
 
 #include <utility>
@@ -662,6 +663,36 @@ void SystemModelManager::iRefresh (string_view registerPath)
 }
 //
 //  End of: SystemModelManager::iRefresh
+//---------------------------------------------------------------------------
+
+
+//! Forces the ResetPort to be asserted on the target module and reset SystemModel accordingly
+//!
+//! @param doSynchronousReset When true, reset will be done by issuing a synchronous reset sequence
+//!
+void SystemModelManager::iReset (bool doSynchronousReset)
+{
+  auto rootNode = m_sm.Root();
+
+  if (std::this_thread::get_id() != m_constructionThreadId)
+  {
+    auto appData = ThreadApplicationData();
+    auto refNode = appData->pathResolver.ReferenceNode();
+    CHECK_VALUE_NOT_NULL(refNode, "Application thread should always be associated with some 'top' node");
+
+    if (refNode != rootNode)
+    {
+      LOG(ERROR_LVL) << "iReset cannot be called by application not associated with SystemModel root node";
+      return;
+    }
+  }
+
+  SystemModelReseter reseter(doSynchronousReset);
+
+  rootNode->Accept(reseter);
+}
+//
+//  End of: SystemModelManager::iReset
 //---------------------------------------------------------------------------
 
 

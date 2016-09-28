@@ -63,8 +63,9 @@ SOURCES +=  \
     src/SystemModelManagerMonitor.cpp               \
     src/SystemModelChecker.cpp                      \
     src/SystemModelCheckResult.cpp                  \
-    src/SystemModelVisitor.cpp                      \
     src/SystemModelNode.cpp                         \
+    src/SystemModelReseter.cpp                      \
+    src/SystemModelVisitor.cpp                      \
     src/ToSutVisitor.cpp                            \
     src/Utility.cpp
 
@@ -116,6 +117,7 @@ HEADERS += \
     include/SystemModelCheckResult.hpp                  \
     include/SystemModelNode.hpp                         \
     include/SystemModelNodes.hpp                        \
+    include/SystemModelReseter.hpp                      \
     include/SystemModelVisitor.hpp                      \
     include/ToSutVisitor.hpp                            \
     include/Utility.hpp                                 \

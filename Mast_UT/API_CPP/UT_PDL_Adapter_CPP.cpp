@@ -19,6 +19,7 @@
 #include "SystemModel.hpp"
 #include "TestModelBuilder.hpp"
 #include "GmlPrinter.hpp"
+#include "Spy_SVF_Protocol.hpp"
 
 #include "BinaryVector_Traits.hpp"
 #include "CPP_API_Traits.hpp"
@@ -27,9 +28,14 @@
 #include <string>
 #include <experimental/string_view>
 #include <tuple>
+#include <memory>
+#include <vector>
 
+using std::vector;
 using std::tuple;
 using std::make_tuple;
+using std::shared_ptr;
+using std::make_shared;
 using std::string;
 using std::experimental::string_view;
 
@@ -42,7 +48,7 @@ namespace
 //!
 //! @note Mast library must be initialized prior to calling this function
 //!
-void Create_TestCase_MIB_Multichain_Pre (bool reportGml = false, uint32_t regsBitsCount = DYNAMIC_TDR_LEN)
+shared_ptr<AccessInterface> Create_TestCase_MIB_Multichain_Pre (bool reportGml = false, uint32_t regsBitsCount = DYNAMIC_TDR_LEN)
 {
   auto sm = Startup::GetSystemModel();
 
@@ -79,6 +85,8 @@ void Create_TestCase_MIB_Multichain_Pre (bool reportGml = false, uint32_t regsBi
   {
     TS_TRACE (GmlPrinter::Graph(tap, "MIB_Multichain_Pre"));
   }
+
+  return tap;
 }
 //
 //  End of: Create_TestCase_MIB_Multichain_Pre
@@ -953,6 +961,89 @@ void UT_PDL_Adapter_CPP::test_iRead_String ()
   TS_ASSERT_EQUALS (status,    1u);
   TS_ASSERT_EQUALS (xorResult, "0x0176AB32EF");   // 40 bits reg
 }
+
+
+void UT_PDL_Adapter_CPP::test_iReset ()
+{
+  // ---------------- Setup
+  //
+  Session session;
+  auto tap = Create_TestCase_MIB_Multichain_Pre();
+  auto spy = make_shared<Spy_SVF_Protocol>();
+  spy->SupportTRST (false);
+  tap->SetProtocol (spy);
+
+  // ---------------- Exercise
+  //
+  iReset(false);
+
+  // ---------------- Verify
+  //
+  auto gotSvfCommands = spy->SVFCommands();
+
+  vector<string> expected
+  {
+     "STATE RESET;",
+  };
+
+  TS_ASSERT_EQUALS (gotSvfCommands, expected);
+}
+
+
+void UT_PDL_Adapter_CPP::test_iReset_SupportTRST ()
+{
+  // ---------------- Setup
+  //
+  Session session;
+  auto tap = Create_TestCase_MIB_Multichain_Pre();
+  auto spy = make_shared<Spy_SVF_Protocol>();
+  spy->SupportTRST (true);
+  tap->SetProtocol (spy);
+
+  // ---------------- Exercise
+  //
+  iReset(false);
+
+  // ---------------- Verify
+  //
+  auto gotSvfCommands = spy->SVFCommands();
+
+  vector<string> expected
+  {
+     "TRST ON;",
+     "TRST OFF;",
+  };
+
+  TS_ASSERT_EQUALS (gotSvfCommands, expected);
+}
+
+
+void UT_PDL_Adapter_CPP::test_iReset_Sync ()
+{
+  // ---------------- Setup
+  //
+  Session session;
+  auto tap = Create_TestCase_MIB_Multichain_Pre();
+  auto spy = make_shared<Spy_SVF_Protocol>();
+  spy->SupportTRST (true);
+  tap->SetProtocol (spy);
+
+  // ---------------- Exercise
+  //
+  iReset(true);
+
+  // ---------------- Verify
+  //
+  auto gotSvfCommands = spy->SVFCommands();
+
+  vector<string> expected
+  {
+    "STATE RESET;",
+  };
+
+  TS_ASSERT_EQUALS (gotSvfCommands, expected);
+}
+
 
 //===========================================================================
 // End of UT_PDL_Adapter_CPP.cpp

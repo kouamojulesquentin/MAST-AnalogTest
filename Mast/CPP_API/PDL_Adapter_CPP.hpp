@@ -124,6 +124,10 @@ namespace mast
   //
   DLL_EXPORT void iRefresh (std::experimental::string_view registerPath); //!< Queues a request to (re-)read register value from SUT
 
+  //! Forces the ResetPort to be asserted on the target module and reset SystemModel accordingly
+  //!
+  DLL_EXPORT void iReset(bool doSynchronousReset = false);
+
   // ---------------- iWrite
   //
   DLL_EXPORT void iWrite (std::experimental::string_view registerPath, uint8_t     value); //!< Queues write request to register from uint8_t

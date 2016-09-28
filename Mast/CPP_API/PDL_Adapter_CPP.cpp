@@ -245,6 +245,24 @@ void mast::iRefresh (string_view registerPath)
   manager->iRefresh(registerPath);
 }
 
+
+
+//! Forces the ResetPort to be asserted on the target module and reset SystemModel accordingly
+//!
+//! @param doSynchronousReset When true, reset will be done by issuing a synchronous reset sequence
+//!
+void mast::iReset (bool doSynchronousReset)
+{
+  auto manager = GetAndCheckManager();
+  manager->iReset(doSynchronousReset);
+}
+//
+//  End of: mast::iReset
+//---------------------------------------------------------------------------
+
+
+
+
 void mast::iWrite (string_view registerPath, uint8_t     value) { iWrite_impl(registerPath, value); }
 void mast::iWrite (string_view registerPath, uint16_t    value) { iWrite_impl(registerPath, value); }
 void mast::iWrite (string_view registerPath, uint32_t    value) { iWrite_impl(registerPath, value); }

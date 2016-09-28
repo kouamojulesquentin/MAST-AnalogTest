@@ -141,6 +141,10 @@ class UT_PDL_Adapter_CPP : public CxxTest::TestSuite
   void test_iRead_DontCare_int32 ();
   void test_iRead_DontCare_int64 ();
 
+  void test_iReset ();
+  void test_iReset_SupportTRST ();
+  void test_iReset_Sync ();
+
   // ================ Other Methods ================
 
   void setUp(); //!< Initializes test (called for each test)

@@ -55,7 +55,8 @@ class DLL_EXPORT SystemModel
   //! Creates a new AccessInterface node
   //!
   std::shared_ptr<AccessInterface> CreateAccessInterface (std::experimental::string_view           name,
-                                                          std::shared_ptr<AccessInterfaceProtocol> protocol);
+                                                          std::shared_ptr<AccessInterfaceProtocol> protocol,
+                                                          std::shared_ptr<ParentNode>              parentNode = nullptr);
 
   // ---------------- Creates a new Chain node
   //
@@ -88,13 +89,13 @@ class DLL_EXPORT SystemModel
   //!
   void SetRoot(std::shared_ptr<ParentNode> newRoot) { ReplaceRoot(newRoot, true); };
 
-  std::shared_ptr<ParentNode> Root() const { return m_root; }        //!< Returns root node
+  //! Returns root node
+  //!
+  std::shared_ptr<ParentNode> Root() const { return m_root; }
 
   //! Replaces root node
   //!
   std::shared_ptr<ParentNode> ReplaceRoot(std::shared_ptr<ParentNode> newRoot, bool removeBeforeReplace);
-
-
 
   using NodeIdentifier = SystemModelNode::NodeIdentifier;
 

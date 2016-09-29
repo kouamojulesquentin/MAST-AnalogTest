@@ -54,18 +54,34 @@ SystemModelCheckResult SystemModel::Check () const
 
 //! Creates a new AccessInterface node
 //!
-//! @note An is the root node if it is the first node to be created
-shared_ptr<AccessInterface> SystemModel::CreateAccessInterface (string_view name, shared_ptr<AccessInterfaceProtocol> protocol)
+//! @param name       Name for the AccessInterface (can be empty)
+//! @param protocol   Protocol associated to AccessInterface (if nullptr, it
+//!                   must be set before starting SystemModelManager, or prior to
+//!                   calling "macro" builders)
+//! @param parentNode If not nullptr, the newly created AccessInterface will be appended
+//!                   as a child to this ParentNode
+//!
+//! @note If no parent node is provided and there is no root yet and auto root mode is active,
+//!       created node will become the root node
+//!
+//! @return Newly created AccessInterface
+//!
+shared_ptr<AccessInterface> SystemModel::CreateAccessInterface (string_view                         name,
+                                                                shared_ptr<AccessInterfaceProtocol> protocol,
+                                                                shared_ptr<ParentNode>              parentNode)
 {
-  auto node = make_shared<AccessInterface > (name, protocol);
+  auto node = make_shared<AccessInterface> (name, protocol);
 
   RegisterNode(node);
 
-  if (!m_root && m_autoRootNode)
+  if (!parentNode && !m_root && m_autoRootNode)
   {
     m_root = node;
   }
-
+  else if (parentNode)
+  {
+    parentNode->AppendChild(node);
+  }
 
   return node;
 }

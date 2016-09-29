@@ -270,6 +270,8 @@ T CheckValueIsNotNullptr(const char* file, const char* function, int line, T val
   return value;
 }
 
+template<typename T>
+bool InRange(const T& val, const T& minVal, const T& maxVal) { return (val >= minVal) && (val <= maxVal); }
 
 #define CHECK_PARAMETER_NOT_NULL(ptr, msg)    CheckParameterIsNotNullptr (__FILE__, __func__, __LINE__, ptr, msg)
 #define CHECK_PARAMETER_NOT_ZERO(val, msg)    CheckParameterIsNotZero    (__FILE__, __func__, __LINE__, val, msg)
@@ -282,6 +284,7 @@ T CheckValueIsNotNullptr(const char* file, const char* function, int line, T val
 #define CHECK_PARAMETER_GTE(val, minVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (val >= minVal), msg)
 #define CHECK_PARAMETER_LT(val,  maxVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (val <  maxVal), msg)
 #define CHECK_PARAMETER_LTE(val, maxVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (val <= maxVal), msg)
+#define CHECK_PARAMETER_RANGE(val, minVal, maxVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), InRange((val), (minVal), (maxVal)), msg)
 
 #define CHECK_VALUE_NOT_NULL(ptr, msg)  CheckValueIsNotNullptr (__FILE__, __func__, __LINE__, ptr, msg)
 #define CHECK_TRUE(expr, msg)            if (!(expr))  throw std::runtime_error(mast::Utility::MakeExceptionMessage(__FILE__, __func__, __LINE__, "std::runtime_error", msg))

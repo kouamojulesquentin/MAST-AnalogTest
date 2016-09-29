@@ -16,7 +16,7 @@ vcom common/txt_util.vhd
 vcom common/exchange_registers.vhd
 vcom AI_for_simulation/AI_JTAG_SVF.vhd 
 vcom Examples/JTAG/slave_tap.vhd  
-vcom Examples/JTAG/P1687_testcase.vhd 
 vcom Examples/JTAG/AMS_testcase.vhd 
 vcom Examples/JTAG/tutorial_1.vhd  
+vcom Examples/JTAG/SIB_tutorial.vhd 
 vcom Examples/JTAG/SVF_Simuation_top.vhd 

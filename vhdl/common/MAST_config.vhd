@@ -13,7 +13,7 @@ package MAST_config is
  constant MAX_REGISTERS : integer := 20;
  constant MAX_LEVELS : integer := 10;
   
-  type target_SUT_type is (LOOPBACK,TUTORIAL_1,IEEE1687,AMS);
+  type target_SUT_type is (LOOPBACK,TUTORIAL_1,SIB_TUTORIAL,AMS);
 
   constant target_SUT :target_SUT_type :=TUTORIAL_1;
 --  constant target_SUT :target_SUT_type :=LOOPBACK;

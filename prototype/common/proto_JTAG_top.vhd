@@ -4,7 +4,7 @@
 --
 -- Create Date:   11:40:57 11/02/2015
 -- Design Name:   
--- Module Name:   ./vhd/SVF_Simuation_top.vhd
+-- Module Name:   proto_top.vhd
 -- Project Name:  MAST_JTAG
 -- Target Device:  
 -- Tool versions:  
@@ -22,41 +22,37 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
-use STD.textio.all;
 
 library work;
-use work.AI_JTAG_SVF_package.all;
-use work.slave_TAP_package.all;
+use work.slave_TAP_synth_package.all;
 use work.JTAG_package.all;
 use work.MAST_config.all;
-use work.MAST_write.all;
-use work.exchange_registers.all;
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
 --USE ieee.numeric_std.ALL;
+ Library  UNISIM;
+use  UNISIM.vcomponents.all;
+
+ENTITY proto_top IS
+ port (
+        	  TDI		: in std_logic;
+			  TCK    : in std_logic;
+			  TMS    : in std_logic;
+           TRSTN  : in std_logic;
+			  TDO	: out	 std_logic;
+			    GPIO_DIP_SW : in std_logic_vector(8 downto 1);
+				 
+			    GPIO_LED : out std_logic_vector(7 downto 0)
+);
+
+END proto_top;
  
-ENTITY SVF_Simuation_top IS
-END SVF_Simuation_top;
- 
-ARCHITECTURE behavior OF SVF_Simuation_top IS 
+ARCHITECTURE behavior OF proto_top IS 
  
     -- Component Declaration for the Unit Under Test (UUT)
  
    
 
-   --Inputs
-   signal Resetn : std_logic := '0';
-   signal Clk : std_logic := '0';
-
-   -- Clock period definitions
-   constant Clk_period : time := 10 ns;
-
-
-signal       	  TDI		: std_logic;
-signal			  TCK    : std_logic;
-signal			  TMS    : std_logic;
-signal           TRSTN  : std_logic;
-signal			  TDO		: std_logic;
 	
 signal reset_chains : std_logic;
 signal           IS_SHIFTING: std_logic;
@@ -95,16 +91,12 @@ signal toRST  : std_logic_vector(1 to MAX_LEVELS);
 --------------------------
  --signal for PO capture
 
-signal static_out : std_logic_vector(63 downto 0);
-signal static_in : std_logic_vector(63 downto 0);
-signal dynamic_out : std_logic_vector(127 downto 0);
-
 signal SEL_delay,next_SEL_delay  : std_logic_vector(0 to MAX_LEVELS);
 signal UE_delay, next_UE_delay   : std_logic_vector(0 to MAX_LEVELS);
 signal SEL_int,next_SEL_int  : std_logic_vector(0 to MAX_LEVELS);
 signal UE_int, next_UE_int   : std_logic_vector(0 to MAX_LEVELS);
 
-component tutorial_1_testcase 
+component tutorial_1_synth 
  port  ( clk   : in  std_logic;
      rst  : in  std_logic;
      TDI   : in  std_logic;
@@ -113,70 +105,35 @@ component tutorial_1_testcase
      SH_en : in  std_logic;
      CA_en : in  std_logic;
      UP_en : in  std_logic;
-     Sel   : in  std_logic
+     Sel   : in  std_logic;
+     static_out : out std_logic_vector(11 downto 0);
+     static_in : in std_logic_vector(11 downto 0)
    );
 end component;
 
-component SIB_tutorial_testcase
- port  ( clk   : in  std_logic;
-     rst  : in  std_logic;
-     TDI   : in  std_logic;
-     TDO   : out std_logic;
-     mode  : in  std_logic;
-     SH_en : in  std_logic;
-     CA_en : in  std_logic;
-     UP_en : in  std_logic;
-     Sel   : in  std_logic
-   );
-end component;
 
-component AMS_testcase 
- port  ( clk   : in  std_logic;
-     rst  : in  std_logic;
-     TDI   : in  std_logic;
-     TDO   : out std_logic;
-     mode  : in  std_logic;
-     SH_en : in  std_logic;
-     CA_en : in  std_logic;
-     UP_en : in  std_logic;
-     Sel   : in  std_logic
-   );
-end component;
+signal     static_out : std_logic_vector(11 downto 0);
+signal     static_in : std_logic_vector(11 downto 0);
+
+
+
+signal int_tck: std_logic;
 
 BEGIN
- 
-
-   -- Clock process definitions
-   Clk_process :process
-   begin
-		Clk <= '0';
-		wait for Clk_period/2;
-		Clk <= '1';
-		wait for Clk_period/2;
-   end process;
- 
-  Resetn <= '0', '1' after 100 ns;
- 
-  main_tap: AI_JTAG_SVF 
-    generic map (input_SVF_dir => "./"
-                 ,input_SVF_file => "data_to_rtl.svf" 
-		 ,output_SVF_dir => "./"
-                 ,output_SVF_file => "data_from_rtl.dat" 
-              )
-    port map (
-       	  TDI => TDI,
-			  TCK => TCK,
-			  TMS => TMS,
-           TRSTN => TRSTN,
-			  TDO => TDO
-	   );   
 
 
+tckbuf: IBUFG
+generic  map  (
+IOSTANDARD  =>  "DEFAULT")
+port  map  (
+O  =>  int_TCK,  --  Clock  buffer  output
+I  =>  TCK    --  Clock  buffer  input  (connect  directly  to  top-level  port) 
+);
 
- slave_TAP_0 : slave_TAP 
+ slave_TAP_0 : slave_TAP_synth 
     port  map ( 
 	        --TAP Signalq
-			  TCK => TCK,
+			  TCK => int_TCK,
            TMS  => TMS,
            TRSTN  => TRSTN,
            TDI => TDI, --NB!
@@ -201,7 +158,7 @@ BEGIN
 	   );       
 IR_reg : bs_register_nocapture generic map (size => IR_SIZE)
  port map
-   ( clk   => TCK, --ClockIR,
+   ( clk   => int_TCK, --ClockIR,
      rst   => reset_chains, 
      TDI   => to_scan_chain,
      TDO   => from_IR,
@@ -212,7 +169,7 @@ IR_reg : bs_register_nocapture generic map (size => IR_SIZE)
      );
 
 BYP_reg : bs_cell port map
-    ( clk  => TCK, --ClockDR,
+    ( clk  => int_TCK, --ClockDR,
      rst   => reset_chains,
      TDI   => to_scan_chain,
      TDO   => from_BYP,
@@ -258,8 +215,8 @@ end generate;
 
 SUT_TUTORIAL_1: if target_SUT = TUTORIAL_1 generate
 
-SUT : tutorial_1_testcase  port map 
-   ( clk   => TCK,
+SUT : tutorial_1_synth  port map 
+   ( clk   => int_TCK,
      rst   => reset_chains,
      TDI   => to_scan_chain,
      TDO   => from_DR(1),
@@ -267,41 +224,15 @@ SUT : tutorial_1_testcase  port map
      SH_en => ShiftDR,
      CA_en => CaptureDR,
      UP_en => UpdateDR,
-     Sel   => select_DR_chain(1)
+     Sel   => select_DR_chain(1),
+     static_out => static_out,
+     static_in => static_in
    );
+	
+	static_in(7 downto 0) <=   GPIO_DIP_SW;
+
+			    GPIO_LED <= static_out(7 downto 0);
 end generate;
 
-
-SUT_IEE1687: if target_SUT = SIB_tutorial generate
-
-SUT : SIB_tutorial_testcase  port map 
-   ( clk   => TCK,
-     rst   => reset_chains,
-     TDI   => to_scan_chain,
-     TDO   => from_DR(1),
-     mode  => '1',
-     SH_en => ShiftDR,
-     CA_en => CaptureDR,
-     UP_en => UpdateDR,
-     Sel   => select_DR_chain(1)
-   );
-
-end generate;
-
-SUT_AMS: if target_SUT = AMS generate
-
-SUT : AMS_testcase  port map 
-   ( clk   => TCK,
-     rst   => reset_chains,
-     TDI   => to_scan_chain,
-     TDO   => from_DR(1),
-     mode  => '1',
-     SH_en => ShiftDR,
-     CA_en => CaptureDR,
-     UP_en => UpdateDR,
-     Sel   => select_DR_chain(1)
-   );
-
-end generate;
 
 END;

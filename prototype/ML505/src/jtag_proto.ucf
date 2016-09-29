@@ -1,0 +1,23 @@
+NET  GPIO_DIP_SW<1>         LOC="U25";   # Bank 15, Vcco=1.8V, DCI using 49.9 ohm resistors
+NET  GPIO_DIP_SW<2>         LOC="AG27";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors
+NET  GPIO_DIP_SW<3>         LOC="AF25";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors
+NET  GPIO_DIP_SW<4>         LOC="AF26";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors
+NET  GPIO_DIP_SW<5>         LOC="AE27";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors
+NET  GPIO_DIP_SW<6>         LOC="AE26";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors
+NET  GPIO_DIP_SW<7>         LOC="AC25";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors
+NET  GPIO_DIP_SW<8>         LOC="AC24";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors
+NET  GPIO_LED<0>           LOC="H18";   # Bank 3, Vcco=2.5V, No DCI
+NET  GPIO_LED<1>           LOC="L18";   # Bank 3, Vcco=2.5V, No DCI
+NET  GPIO_LED<2>           LOC="G15";   # Bank 3, Vcco=2.5V, No DCI
+NET  GPIO_LED<3>           LOC="AD26";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors
+NET  GPIO_LED<4>           LOC="G16";   # Bank 3, Vcco=2.5V, No DCI
+NET  GPIO_LED<5>           LOC="AD25";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors
+NET  GPIO_LED<6>           LOC="AD24";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors
+NET  GPIO_LED<7>           LOC="AE24";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors
+
+NET  TRSTN              LOC="AM33";  # Bank 13, Vcco=2.5V or 3.3V user selectable by J20
+NET  TCK              LOC="AJ34";  # Bank 13, Vcco=2.5V or 3.3V user selectable by J20
+NET  TMS              LOC="AM32";  # Bank 13, Vcco=2.5V or 3.3V user selectable by J20
+NET  TDI              LOC="AN34";  # Bank 13, Vcco=2.5V or 3.3V user selectable by J20
+NET  TDO              LOC="AN33";  # Bank 13, Vcco=2.5V or 3.3V user selectable by J20
+NET "TCK" CLOCK_DEDICATED_ROUTE = FALSE;

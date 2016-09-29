@@ -270,8 +270,8 @@ T CheckValueIsNotNullptr(const char* file, const char* function, int line, T val
   return value;
 }
 
-template<typename T>
-bool InRange(const T& val, const T& minVal, const T& maxVal) { return (val >= minVal) && (val <= maxVal); }
+template<typename T, typename U, typename V>
+bool InRange(const T& val, const U& minVal, const V& maxVal) { return (val >= minVal) && (val <= maxVal); }
 
 #define CHECK_PARAMETER_NOT_NULL(ptr, msg)    CheckParameterIsNotNullptr (__FILE__, __func__, __LINE__, ptr, msg)
 #define CHECK_PARAMETER_NOT_ZERO(val, msg)    CheckParameterIsNotZero    (__FILE__, __func__, __LINE__, val, msg)

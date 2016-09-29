@@ -20,6 +20,8 @@
 #include "DefaultOneHotPathSelector.hpp"
 #include "DefaultNHotPathSelector.hpp"
 #include "SystemModelChecker.hpp"
+#include "I2C_EmulationProtocol.hpp"
+#include "SVF_EmulationProtocol.hpp"
 #include "GmlPrinter.hpp"
 #include "PrettyPrinter.hpp"
 #include "Utility.hpp"
@@ -30,12 +32,14 @@
 #include <memory>
 #include <experimental/string_view>
 #include <string>
+#include <initializer_list>
 
 using std::shared_ptr;
 using std::make_shared;
 using std::dynamic_pointer_cast;
 using std::string;
 using std::experimental::string_view;
+using std::initializer_list;
 
 using namespace mast;
 
@@ -834,6 +838,95 @@ void UT_SystemModelBuilder::test_DaisyChain_JTAG_TAPS_4xTap ()
                        "   edge [ source 27 target 14 label \"4\" ]\n"
                        "   edge [ source 0 target 27 label \"2\" ]\n"
                        "]"s;
+
+  TS_ASSERT_EQUALS (graph, expectedGraph);
+}
+
+
+//! Checks SystemModel::Create_Brocade when there is just one tap
+//!
+void UT_SystemModelBuilder::test_Create_Brocade_1xTAP ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder sut(sm);
+  auto I2C_Adresses   = initializer_list<uint32_t>{ 0x30u, 0x31u };
+  auto masterProtocol = make_shared<I2C_EmulationProtocol>(I2C_Adresses);
+  auto slaveProtocol  = make_shared<SVF_EmulationProtocol>();
+
+  auto tap1 = sut.Create_JTAG_TAP("TAP1", 6u, 4u, make_shared<LoopbackAccessInterfaceProtocol>());
+
+  sut.AppendRegisters(3u, "reg_", BinaryVector::CreateFromString("0xFDE"), tap1);
+
+  shared_ptr<Chain> brocadeChain;
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (brocadeChain = sut.Create_Brocade(masterProtocol, slaveProtocol, { tap1 }));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  TS_ASSERT_NOT_NULLPTR (brocadeChain);
+
+  // Model coherency
+  auto result = SystemModelChecker::Check(sm);
+  TS_ASSERT_FALSE (result.HasIssues());
+//+  TS_TRACE (result.MakeReport());
+
+  auto graph         = GmlPrinter::Graph(sm.Root(), "", GmlPrinterOptions::DisplayIdentifiers | GmlPrinterOptions::ShowProtocol);
+  auto expectedGraph = "graph\n"
+                       "[\n"
+                       "   hierarchic 1 directed 1\n"
+                       "   node [ id 7 graphics [ type \"ellipse\" fill \"#FFCC20\" w 106 h 43 ] LabelGraphics [ text \"(7)\n"
+                       "Brocade\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 8 graphics [ type \"octagon\" fill \"#10FFFF\" w 258 h 44 ] LabelGraphics [ text \"(8)\n"
+                       "Master_AI\n"
+                       "Protocol: I2C_Emulation\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 10 graphics [ type \"rectangle\" fill \"#59FF20\" w 114 h 35 ] LabelGraphics [ text \"(10)\n"
+                       "Brocade_CTRL\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 9 graphics [ type \"octagon\" fill \"#10FFFF\" w 258 h 44 ] LabelGraphics [ text \"(9)\n"
+                       "Slave_AI\n"
+                       "Protocol: SVF_Emulation\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 11 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 90 h 43 ] LabelGraphics [ text \"(11)\n"
+                       "IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 13 graphics [ type \"trapezoid\" fill \"#FF3060\" outlineStyle \"dashed\" w 97 h 44 ] LabelGraphics [ text \"(13)\n"
+                       "IR_Mux\n"
+                       ":10:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 1 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(1)\n"
+                       "TAP1.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 12 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 90 h 43 ] LabelGraphics [ text \"(12)\n"
+                       "DR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 14 graphics [ type \"trapezoid\" fill \"#FF3060\" outlineStyle \"dashed\" w 97 h 44 ] LabelGraphics [ text \"(14)\n"
+                       "DR_Mux\n"
+                       ":10:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(2)\n"
+                       "TAP1\n"
+                       ":1:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 76 h 35 ] LabelGraphics [ text \"(3)\n"
+                       "TAP1_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 4 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(4)\n"
+                       "reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(5)\n"
+                       "reg_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   node [ id 6 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(6)\n"
+                       "reg_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                       "   edge [ source 8 target 10 label \"1\" ]\n"
+                       "   edge [ source 7 target 8 label \"1\" ]\n"
+                       "   edge [ source 13 target 1 label \"1\" ]\n"
+                       "   edge [ source 11 target 13 label \"1\" ]\n"
+                       "   edge [ source 9 target 11 label \"1\" ]\n"
+                       "   edge [ source 2 target 3 label \"1\" ]\n"
+                       "   edge [ source 2 target 4 label \"2\" ]\n"
+                       "   edge [ source 2 target 5 label \"3\" ]\n"
+                       "   edge [ source 2 target 6 label \"4\" ]\n"
+                       "   edge [ source 14 target 2 label \"1\" ]\n"
+                       "   edge [ source 12 target 14 label \"1\" ]\n"
+                       "   edge [ source 9 target 12 label \"2\" ]\n"
+                       "   edge [ source 7 target 9 label \"2\" ]\n"
+                       "]";
 
   TS_ASSERT_EQUALS (graph, expectedGraph);
 }

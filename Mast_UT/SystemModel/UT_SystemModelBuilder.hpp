@@ -51,6 +51,13 @@ class UT_SystemModelBuilder : public CxxTest::TestSuite
   void test_DaisyChain_JTAG_TAPS_3rdTap ();
   void test_DaisyChain_JTAG_TAPS_4xTap ();
 
+  // ---------------- Create_Brocade
+  //
+  void test_Create_Brocade_1xTAP ();
+//+  void test_Create_Brocade_2xTAPs ();
+//+  void test_Create_Brocade_4xTAPs ();
+//+  void test_Create_Brocade_5xTAPs ();
+
   // ================ Other Methods ================
 
   void setUp(); //!< Initializes test (called for each test)

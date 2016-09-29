@@ -90,7 +90,7 @@ class DLL_EXPORT SystemModelBuilder final
                                                     uint32_t                                 irBitsCount,
                                                     uint32_t                                 muxPathsCount,
                                                     std::shared_ptr<AccessInterfaceProtocol> protocol,
-						    std::vector<mast::BinaryVector>	IR_coding);
+                                                    std::vector<BinaryVector>                IR_coding);
 
 
   //! Creates a path selector
@@ -137,6 +137,12 @@ class DLL_EXPORT SystemModelBuilder final
   //! Chains (merges) a bunch of 1149.1 AccessInterfaces
   //!
   void DaisyChain_JTAG_TAPS(std::initializer_list<std::shared_ptr<AccessInterface>> taps);
+
+  //! Moves up to 4 TAPs under a "Master" TAP that provides dynamic selection of the "Slave" TAPs
+  //!
+  std::shared_ptr<Chain> Create_Brocade(std::shared_ptr<AccessInterfaceProtocol>                masterProtocol,
+                                        std::shared_ptr<AccessInterfaceProtocol>                slaveProtocol,
+                                        std::initializer_list<std::shared_ptr<AccessInterface>> taps);
 
   // ---------------- Private  Fields
   //

@@ -200,6 +200,90 @@ std::shared_ptr<Chain> SystemModelBuilder::Create_1500_Wrapper (string_view name
 //---------------------------------------------------------------------------
 
 
+//! Moves up to 4 TAPs under a "Master" TAP that provides dynamic selection of the "Slave" TAPs
+//!
+//! @param masterProtocol An access interface protocol for the "Master" TAP
+//! @param slaveProtocol  An access interface protocol for the "Slave" TAP
+//! @param taps           "Slave" TAPs
+//!
+shared_ptr<Chain> SystemModelBuilder::Create_Brocade (shared_ptr<AccessInterfaceProtocol>           masterProtocol,
+                                                      shared_ptr<AccessInterfaceProtocol>           slaveProtocol,
+                                                      initializer_list<shared_ptr<AccessInterface>> taps)
+{
+  // ---------------- Check parameters
+  //
+  CHECK_PARAMETER_NOT_NULL(masterProtocol, "Expect a valid AccessInterfaceProtocol for the 'Master' AccessInterface");
+  CHECK_PARAMETER_NOT_NULL(slaveProtocol,  "Expect a valid AccessInterfaceProtocol for the 'Slave' AccessInterface");
+  CHECK_PARAMETER_RANGE(taps.size(), 1u, 4u, "Brocade support only from 1 to 4 'slave' TAPs");
+  for (auto tap : taps)
+  {
+    auto aiType = AssessAccessInterfaceType(tap);
+    CHECK_TRUE(aiType == AccessInterfaceAssessment::JTAG_TAP, "Cannot handle none JTAG TAP slaves");
+  }
+
+  // ---------------- Prepare Brocade mux
+  //
+  auto brocadeChain  = m_model.CreateChain("Brocade");
+  auto masterAi      = m_model.CreateAccessInterface("Master_AI", masterProtocol, brocadeChain);
+  auto slaveAi       = m_model.CreateAccessInterface("Slave_AI",  slaveProtocol,  brocadeChain);
+  auto masterCtrlReg = m_model.CreateRegister("Brocade_CTRL", BinaryVector(8u), masterAi);
+  auto irChain       = m_model.CreateChain  ("IR",     slaveAi);
+  auto drChain       = m_model.CreateChain  ("DR",     slaveAi);
+  auto selector      = Create_PathSelector  (SelectorKind::N_Hot, masterCtrlReg, taps.size(), SelectorProperty::N_Hot_Default);
+  auto irLinker      = m_model.CreateLinker ("IR_Mux", selector, irChain);
+  auto drLinker      = m_model.CreateLinker ("DR_Mux", selector, drChain);
+
+  irChain->IgnoreForNodePath(true);
+  irChain->SetChildAppender(irLinker);
+
+  drChain->IgnoreForNodePath(true);
+  drChain->SetChildAppender(drLinker);
+
+  // ---------------- Connect slave TAPs
+  //
+  auto renameNodes = [](shared_ptr<AccessInterface> tap, shared_ptr<Register> ir, shared_ptr<Linker> drMux, uint32_t tapOrder)
+  {
+    auto setTapName =     tap->Name().empty()
+                      || (tap->Name() == "TAP")
+                      || (tap->Name() == "1149_1_TAP");
+
+    auto tapName = setTapName ? "TAP"s + std::to_string(tapOrder) : tap->Name();
+
+    ir    ->SetName(tapName + ".IR");
+    drMux ->SetName(tapName);
+  };
+
+  uint32_t tapNum = 1u;
+  for (auto tap : taps)
+  {
+    // ---------------- Diconnect pieces from AccessInterface
+    //
+    auto mux = dynamic_pointer_cast<Linker>   (tap->DisconnectDerivation(2u));
+    auto ir  = dynamic_pointer_cast<Register> (tap->DisconnectDerivation(1u));
+
+    // ---------------- Reconnect to Brocade muxes
+    //
+    irLinker->AppendChild(ir);
+    drLinker->AppendChild(mux);
+
+    // ---------------- Adjust names for paths
+    //
+    mux->IgnoreForNodePath(false);
+    renameNodes(tap, ir, mux, tapNum++);
+
+    // ---------------- Get rid of AccessInterface
+    //
+    m_model.RemoveNodeFromModel(tap);
+  }
+
+  m_model.ReplaceRoot(brocadeChain, false);
+  return brocadeChain;
+}
+//
+//  End of: SystemModelBuilder::Create_Brocade
+//---------------------------------------------------------------------------
+
+
 
 //! Creates a new Tap node using implicit binary coding
 //!
@@ -272,7 +356,7 @@ shared_ptr<AccessInterface> SystemModelBuilder::Create_JTAG_TAP (string_view    
   std::vector<BinaryVector> selectTable;
   if (IR_coding.empty())
    {
-  // Select table is by default binary except for no path and 1st that use the bypass sequence 
+  // Select table is by default binary except for no path and 1st that use the bypass sequence
    selectTable = DefaultBinaryPathSelector::CreateSelectTable(irBitsCount, muxPathsCount, SelectorProperty::Binary_Default);
    irBypassSequence = BinaryVector(irBitsCount, 0xFF);
   selectTable[0] = irBypassSequence;  // Not used (path id zero)
@@ -291,7 +375,7 @@ shared_ptr<AccessInterface> SystemModelBuilder::Create_JTAG_TAP (string_view    
   // ---------------- Create path selector
 
   //
-   
+
   // Deselect table is by default all bypass sequence
   auto deselectTable = DefaultTableBasedPathSelector::TablesType(muxPathsCount + 1u, irBypassSequence);
 
@@ -505,8 +589,6 @@ void SystemModelBuilder::DaisyChain_JTAG_TAPS (shared_ptr<AccessInterface> tap1,
     tap1->SetProtocol(protocol2);
   }
 
-
-
   auto aiType1 = AssessAccessInterfaceType(tap1);
   auto aiType2 = AssessAccessInterfaceType(tap2);
 
@@ -555,8 +637,8 @@ void SystemModelBuilder::DaisyChain_JTAG_TAPS (shared_ptr<AccessInterface> tap1,
 
   // ---------------- Chain second tap
   //
-  auto mux = dynamic_pointer_cast<Linker>   (tap2->DisconnectDerivation(2u));;
-  auto ir  = dynamic_pointer_cast<Register> (tap2->DisconnectDerivation(1u));;
+  auto mux = dynamic_pointer_cast<Linker>   (tap2->DisconnectDerivation(2u));
+  auto ir  = dynamic_pointer_cast<Register> (tap2->DisconnectDerivation(1u));
 
   auto irChain  = dynamic_pointer_cast<Chain>(tap1->FirstChild());
   CHECK_VALUE_NOT_NULL(irChain, "Houps tap1 is not already a chain of JTAG TAP");

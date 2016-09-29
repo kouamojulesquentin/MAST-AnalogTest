@@ -1,5 +1,7 @@
 @page Acronyms
 
+These are acronyms related to JTAG and test:
+
   - ATE   Automatic Test Equipment
   - ATPG  Automatic Test Pattern Generator
   - BSDL  Boundary Scan Description Language

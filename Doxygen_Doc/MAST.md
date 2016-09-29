@@ -1,4 +1,4 @@
-@section MAST ""
+@page MAST
 MAST project provides simplified 'C' or 'C++' API to use MAST with PDL like syntax.
 
 @note Simple API implies it does not have the full-fledged capabilities of @ref MAST_Core.

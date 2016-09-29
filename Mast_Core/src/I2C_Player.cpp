@@ -25,21 +25,6 @@ using std::initializer_list;
 using namespace mast;
 using namespace std::string_literals;
 
-//! Constructor from initializer_list
-//!
-I2C_Player::I2C_Player (initializer_list<uint32_t> addresses, string_view commandsPrefix)
-  : m_commandPrefix (commandsPrefix)
-  , m_addresses     (addresses)
-{
-  if (addresses.size() <= 2)
-  {
-    THROW_INVALID_ARGUMENT("I2C Addresses must have at least two entries");
-  }
-}
-//
-//  End of: I2C_Player::I2C_Player
-//---------------------------------------------------------------------------
-
 
 //! Constructor from vector
 //!
@@ -50,10 +35,7 @@ I2C_Player::I2C_Player (vector<uint32_t> addresses, string_view commandsPrefix)
   : m_commandPrefix (commandsPrefix)
   , m_addresses     (std::move(addresses))
 {
-  if (addresses.size() <= 2)
-  {
-    THROW_INVALID_ARGUMENT("I2C Addresses must have at least two entries");
-  }
+  CHECK_PARAMETER_GTE(m_addresses.size(), 2u, "I2C Addresses must have at least two entries");
 }
 //
 //  End of: I2C_Player::I2C_Player

@@ -35,7 +35,6 @@ class DLL_EXPORT I2C_Player : public AccessInterfaceProtocol
   virtual ~I2C_Player() = default;
   I2C_Player() = delete;
 
-  I2C_Player(std::initializer_list<uint32_t> addresses, std::experimental::string_view commandsPrefix = "");
   I2C_Player(std::vector<uint32_t>           addresses, std::experimental::string_view commandsPrefix = "");
 
   //! Gets the number of derivations supported by the specific protocol

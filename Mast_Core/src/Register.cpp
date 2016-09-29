@@ -124,24 +124,25 @@ uint32_t Register::PendingCount () const
 //!
 void Register::Reset ()
 {
-  if (m_resetValue.IsEmpty())
-  {
-    return;
-  }
-
   ResetPending();
 
   m_mismatches        = 0;
   m_mustCheckExpected = false;
   m_dontCareMask.Clear();
 
+  if (m_resetValue.IsEmpty())
+  {
+    return;
+  }
+
+
 //+  m_expectedFromSut = m_resetValue;
 //+  m_lastFromSut     = m_resetValue;
 //+  m_lastReadFromSut = m_resetValue;
+//+  m_lastToSut       = m_resetValue;
 
-  m_bypass          = m_resetValue;
-  m_nextToSut       = m_resetValue;
-  m_lastToSut       = m_resetValue;
+  m_bypass    = m_resetValue;
+  m_nextToSut = m_resetValue;
 }
 //
 //  End of: Register::Reset

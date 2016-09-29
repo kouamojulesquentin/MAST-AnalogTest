@@ -1524,7 +1524,7 @@ void UT_Register::test_Reset ()
   TS_ASSERT_FALSE  (sut.MustCheckExpected());
   TS_ASSERT_EQUALS (sut.BypassSequence(),    reset);
   TS_ASSERT_EQUALS (sut.NextToSut(),         reset);
-  TS_ASSERT_EQUALS (sut.LastToSut(),         reset);
+  TS_ASSERT_EQUALS (sut.LastToSut(),         initial);
   TS_ASSERT_EQUALS (sut.ExpectedFromSut(),   expected);
   TS_ASSERT_EQUALS (sut.LastFromSut(),       newValue);
   TS_ASSERT_EQUALS (sut.LastReadFromSut(),   newValue);
@@ -1559,19 +1559,19 @@ void UT_Register::test_Reset_NoValue ()
   //
   TS_ASSERT_EQUALS (sut.TypeName(),          "Register");
   TS_ASSERT_EQUALS (sut.BitsCount(),         24U);
-  TS_ASSERT_EQUALS (sut.Mismatches(),        1U);
-  TS_ASSERT_EQUALS (sut.PendingCount(),      1U);
-  TS_ASSERT_TRUE   (sut.IsPendingForRead());
-  TS_ASSERT_TRUE   (sut.IsPending());
   TS_ASSERT_TRUE   (sut.HoldValue());
-  TS_ASSERT_TRUE   (sut.MustCheckExpected());
+  TS_ASSERT_EQUALS (sut.Mismatches(),        0U);
+  TS_ASSERT_EQUALS (sut.PendingCount(),      0U);
+  TS_ASSERT_FALSE  (sut.IsPendingForRead());
+  TS_ASSERT_FALSE  (sut.IsPending());
+  TS_ASSERT_FALSE  (sut.MustCheckExpected());
   TS_ASSERT_EQUALS (sut.BypassSequence(),    newValue);
   TS_ASSERT_EQUALS (sut.NextToSut(),         newValue);
   TS_ASSERT_EQUALS (sut.LastToSut(),         initial);
   TS_ASSERT_EQUALS (sut.ExpectedFromSut(),   expected);
   TS_ASSERT_EQUALS (sut.LastFromSut(),       gotValue);
   TS_ASSERT_EQUALS (sut.LastReadFromSut(),   gotValue);
-  TS_ASSERT_EQUALS (sut.LastCompareResult(), BinaryVector::CreateFromString("0x2030D9"));
+  TS_ASSERT_EQUALS (sut.LastCompareResult(), BinaryVector::CreateFromString("0x2D30D9"));
 }
 
 

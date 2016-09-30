@@ -43,10 +43,10 @@ HEADERS += \
     C_API/PDL_Adapter_C.h                  \
     C_API/SystemModelAdapter_C.h
 
-unix {
-    target.path = /usr/lib
-    INSTALLS += target
-}
+#unix {
+#    target.path = /usr/lib
+#    INSTALLS += target
+#}
 
 
 CONFIG(debug,   debug|release) {

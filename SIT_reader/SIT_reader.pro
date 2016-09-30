@@ -1,4 +1,4 @@
-TARGET   = SIT_Reader_Lib
+TARGET   = SIT_reader_Lib
 TEMPLATE = lib
 
 CONFIG += c++14
@@ -42,6 +42,7 @@ HEADERS += \
     location.hh \
     position.hh \
     position.hh \
+    SIT_reader.hpp \
     stack.hh
 
 

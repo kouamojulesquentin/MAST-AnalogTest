@@ -105,12 +105,12 @@ HEADERS += \
 CONFIG(debug,   debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Mast_UT/debug)
   DESTDIR     = $$clean_path($$PWD/../Build_Qt/Bin/debug)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/debug)   -lMast -lMast_Core -lLogger
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/debug)   -lMast -lMast_Core -lLogger -lSIT_reader_Lib
 }
 else: CONFIG(release, debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Mast_UT/release)
   DESTDIR     = $$clean_path($$PWD/../Build_Qt/Bin/release)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/release) -lMast -lMast_Core -lLogger
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/release) -lMast -lMast_Core -lLogger -lSIT_reader_Lib
 }
 
 unix {

@@ -32,13 +32,13 @@ win32 {
 
 SOURCES += \
     Generated/Runner.cpp    \
-    Use_Cases/UT_Reader.cpp \
-    UT_Helpers/UT_Reader_wrapper.cpp
+    Use_Cases/UT_reader.cpp \
+    UT_Helpers/UT_reader_wrapper.cpp
 
 
 HEADERS += \
-    Use_Cases/UT_Reader.hpp \
-    UT_Helpers/UT_Reader_wrapper.hpp
+    Use_Cases/UT_reader.hpp \
+    UT_Helpers/UT_reader_wrapper.hpp
 
 
 CONFIG(debug,   debug|release) {
@@ -49,7 +49,7 @@ CONFIG(debug,   debug|release) {
 else: CONFIG(release, debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/SIT_reader_UT/release)
   DESTDIR     = $$clean_path($$PWD/../Build_Qt/Bin/release)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/release) -lMast_Core -lLogger -lSIT_reader_Lib
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/release) -lMast_Core -lLogger -lSIT_rader_Lib
 }
 
 unix {

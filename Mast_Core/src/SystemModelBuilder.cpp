@@ -18,6 +18,7 @@
 #include "DefaultOneHotPathSelector.hpp"
 #include "DefaultNHotPathSelector.hpp"
 #include "AccessInterfaceProtocol.hpp"
+#include "BrocadeSelector.hpp"
 #include "Utility.hpp"
 
 using std::string;
@@ -200,7 +201,7 @@ std::shared_ptr<Chain> SystemModelBuilder::Create_1500_Wrapper (string_view name
 //---------------------------------------------------------------------------
 
 
-//! Moves up to 4 TAPs under a "Master" TAP that provides dynamic selection of the "Slave" TAPs
+//! Moves up to 5 TAPs under a "Master" TAP that provides dynamic selection of the "Slave" TAPs
 //!
 //! @param masterProtocol An access interface protocol for the "Master" TAP
 //! @param slaveProtocol  An access interface protocol for the "Slave" TAP
@@ -214,7 +215,7 @@ shared_ptr<Chain> SystemModelBuilder::Create_Brocade (shared_ptr<AccessInterface
   //
   CHECK_PARAMETER_NOT_NULL(masterProtocol, "Expect a valid AccessInterfaceProtocol for the 'Master' AccessInterface");
   CHECK_PARAMETER_NOT_NULL(slaveProtocol,  "Expect a valid AccessInterfaceProtocol for the 'Slave' AccessInterface");
-  CHECK_PARAMETER_RANGE(taps.size(), 1u, 4u, "Brocade support only from 1 to 4 'slave' TAPs");
+  CHECK_PARAMETER_RANGE(taps.size(), 1u, 5u, "Brocade support only from 1 to 5 'slave' TAPs");
   for (auto tap : taps)
   {
     auto aiType = AssessAccessInterfaceType(tap);
@@ -229,10 +230,12 @@ shared_ptr<Chain> SystemModelBuilder::Create_Brocade (shared_ptr<AccessInterface
   auto masterCtrlReg = m_model.CreateRegister("Brocade_CTRL", BinaryVector(8u), masterAi);
   auto irChain       = m_model.CreateChain  ("IR",     slaveAi);
   auto drChain       = m_model.CreateChain  ("DR",     slaveAi);
-  auto selector      = Create_PathSelector  (SelectorKind::N_Hot, masterCtrlReg, taps.size(), SelectorProperty::N_Hot_Default);
+  auto selector      = make_shared<BrocadeSelector>(masterCtrlReg, taps.size());
   auto irLinker      = m_model.CreateLinker ("IR_Mux", selector, irChain);
   auto drLinker      = m_model.CreateLinker ("DR_Mux", selector, drChain);
 
+  masterAi->IgnoreForNodePath(true);
+  slaveAi->IgnoreForNodePath(true);
   irChain->IgnoreForNodePath(true);
   irChain->SetChildAppender(irLinker);
 
@@ -245,8 +248,11 @@ shared_ptr<Chain> SystemModelBuilder::Create_Brocade (shared_ptr<AccessInterface
   {
     auto setTapName =     tap->Name().empty()
                       || (tap->Name() == "TAP")
+                      || (tap->Name() == "Tap")
+                      || (tap->Name() == "tap")
                       || (tap->Name() == "1149_1_TAP");
-
+    //! @todo [JFC]-[September/30/2016]: In Create_Brocade(): Compare case insensitive ==> Need utility
+    //!
     auto tapName = setTapName ? "TAP"s + std::to_string(tapOrder) : tap->Name();
 
     ir    ->SetName(tapName + ".IR");

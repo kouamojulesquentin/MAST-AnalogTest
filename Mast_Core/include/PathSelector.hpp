@@ -34,6 +34,7 @@ enum class SelectorProperty
   Binary_Default  = None,          //!< Default property for binary based encoding
   One_Hot_Default = CanSelectNone, //!< Default property for one hot based encoding
   N_Hot_Default   = CanSelectNone, //!< Default property for N hot based encoding
+  Brocade_Default = CanSelectNone, //!< Default property for Brocade compatible encoding
 };
 
 

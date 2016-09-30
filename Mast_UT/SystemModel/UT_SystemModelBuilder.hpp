@@ -55,8 +55,8 @@ class UT_SystemModelBuilder : public CxxTest::TestSuite
   //
   void test_Create_Brocade_1xTAP ();
 //+  void test_Create_Brocade_2xTAPs ();
-//+  void test_Create_Brocade_4xTAPs ();
-//+  void test_Create_Brocade_5xTAPs ();
+  void test_Create_Brocade_5xTAPs ();
+//+  void test_Create_Brocade_6xTAPs ();
 
   // ================ Other Methods ================
 

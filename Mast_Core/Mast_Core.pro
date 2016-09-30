@@ -25,6 +25,7 @@ SOURCES +=  \
     src/AccessInterface.cpp                         \
     src/LoopbackAccessInterfaceProtocol.cpp         \
     src/BinaryVector.cpp                            \
+    src/BrocadeSelector.cpp                         \
     src/Chain.cpp                                   \
     src/Checker.cpp                                 \
     src/ConfigureVisitor.cpp                        \
@@ -75,6 +76,7 @@ HEADERS += \
     include/AppFunctionAndNode.hpp                      \
     include/LoopbackAccessInterfaceProtocol.hpp         \
     include/BinaryVector.hpp                            \
+    include/BrocadeSelector.hpp                         \
     include/Chain.hpp                                   \
     include/Checker.hpp                                 \
     include/ConfigurationAlgorithm.hpp                  \

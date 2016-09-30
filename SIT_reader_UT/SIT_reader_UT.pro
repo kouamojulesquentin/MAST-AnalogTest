@@ -49,7 +49,7 @@ CONFIG(debug,   debug|release) {
 else: CONFIG(release, debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/SIT_reader_UT/release)
   DESTDIR     = $$clean_path($$PWD/../Build_Qt/Bin/release)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/release) -lMast_Core -lLogger -lSIT_rader_Lib
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/release) -lMast_Core -lLogger -lSIT_reader_Lib
 }
 
 unix {

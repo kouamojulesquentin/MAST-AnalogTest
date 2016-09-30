@@ -149,7 +149,7 @@ public:
 template <>
 class ValueTraits<char*>
 {
-    enum { BUFFER_SIZE = 1000 };
+    enum { BUFFER_SIZE = 2000 };        // Found that 1000 was not always enough
     char m_valueAsString[BUFFER_SIZE];
 
     void fillBuffer(const char* pText)
@@ -160,12 +160,15 @@ class ValueTraits<char*>
       }
       else
       {
-        char*       pFreePos = m_valueAsString;
+
         const char* bound    = stringResultsOnNewLine() ? "\n" : "\"";
 
-        pFreePos = copyStringN(pFreePos, bound, BUFFER_SIZE);
-        pFreePos = copyStringN(pFreePos, pText, BUFFER_SIZE);
-        pFreePos = copyStringN(pFreePos, bound, BUFFER_SIZE);
+        const char* pEndBuf  = m_valueAsString + BUFFER_SIZE;
+        char*       pFreePos = m_valueAsString;
+
+        pFreePos = copyStringN(pFreePos, bound, pEndBuf - pFreePos);
+        pFreePos = copyStringN(pFreePos, pText, pEndBuf - pFreePos);
+        pFreePos = copyStringN(pFreePos, bound, pEndBuf - pFreePos);
       }
     }
 

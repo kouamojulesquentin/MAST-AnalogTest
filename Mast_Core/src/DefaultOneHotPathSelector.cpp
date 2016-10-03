@@ -92,8 +92,9 @@ void DefaultOneHotPathSelector::CheckRegisterLength (uint32_t registerLength, ui
 //!
 //! @note A slot in select LUT is reserved for no path selection
 //!
-//! @param pathsCount   Number of managed paths
-//! @param isInverted   When true the bits for selecting a path are inverted (relative to the path identifier number)
+//! @param registerLength Number of bits of associated register
+//! @param pathsCount     Number of managed paths (including, optional, bypass register)
+//! @param properties     Properties of the selector (bit order can be reverse or it can use negative logic)
 //!
 DefaultOneHotPathSelector::TablesType DefaultOneHotPathSelector::CreateSelectTable (uint32_t         registerLength,
                                                                                     uint32_t         pathsCount,
@@ -135,6 +136,10 @@ DefaultOneHotPathSelector::TablesType DefaultOneHotPathSelector::CreateSelectTab
 //! Creates a table for deselection of a path
 //!
 //! @note A slot in select LUT is reserved for any paths deselection
+//!
+//! @param registerLength Number of bits of associated register
+//! @param pathsCount     Number of managed paths (including, optional, bypass register)
+//! @param properties     Properties of the selector (bit order can be reverse or it can use negative logic)
 //!
 DefaultOneHotPathSelector::TablesType DefaultOneHotPathSelector::CreateDeselectTable (uint32_t         registerLength,
                                                                                       uint32_t         pathsCount,

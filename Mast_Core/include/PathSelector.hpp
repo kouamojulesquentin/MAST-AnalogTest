@@ -48,6 +48,8 @@ class BinaryVector;
 //!
 class PathSelector
 {
+  friend class Linker;
+
   // ---------------- Public  Methods
   //
   public:
@@ -75,19 +77,6 @@ class PathSelector
   //! @param pathIdentifier   Path identifier in range [1..nb_path]
   //!
   virtual bool IsSelectedAndActive (uint32_t pathIdentifier) const = 0;
-
-  //! Requests activation of the specified path
-  //!
-  //! @param pathIdentifier   Path identifier in range [1..nb_path]
-  //!
-  virtual void Select   (uint32_t pathIdentifier) = 0;
-
-  //! Request deactivation of the specified path
-  //!
-  //! @param pathIdentifier   Path identifier in range [1..nb_path]
-  //!
-  virtual void Deselect (uint32_t pathIdentifier) = 0;
-
 
   //! Forwards call to any embedded SystemModelNode (or do nothing)
   //!
@@ -134,6 +123,23 @@ class PathSelector
   //
   virtual ~PathSelector() = default;
   PathSelector()  = default;
+
+  //! Requests activation of the specified path
+  //!
+  //! @note Expected to be called only by Linker
+  //!
+  //! @param pathIdentifier   Path identifier in range [1..nb_path]
+  //!
+  virtual void Select   (uint32_t pathIdentifier) = 0;
+
+  //! Request deactivation of the specified path
+  //!
+  //! @note Expected to be called only by Linker
+  //!
+  //! @param pathIdentifier   Path identifier in range [1..nb_path]
+  //!
+  virtual void Deselect (uint32_t pathIdentifier) = 0;
+
 
   // ---------------- Private  Fields
   //

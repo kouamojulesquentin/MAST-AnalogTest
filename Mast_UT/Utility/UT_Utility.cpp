@@ -119,10 +119,10 @@ void UT_Utility::test_StringView_Utility_Split ()
   {
     data_t("",                          "",   {}),                                                // 00
     data_t(" ",                         "",   {" "}),                                             // 01
-    data_t("  ",                        " ",  {"",      "",          ""}),                        // 02
+    data_t("  ",                        " ",  {"",      ""}),                                     // 02
     data_t("\t",                        ",",  {"\t"}),                                            // 03
-    data_t("\t\t",                      "\t", {"",      "",          ""}),                        // 04
-    data_t("\t \t",                     "\t", {"",      " ",         ""}),                        // 05
+    data_t("\t\t",                      "\t", {"",      ""}),                                     // 04
+    data_t("\t \t",                     "\t", {"",      " "}),                                    // 05
     data_t("a  ",                       ",",  {"a  "}),                                           // 06
     data_t(" a ",                       ",",  {" a "}),                                           // 07
     data_t("a,b",                       ",",  {"a",     "b"}),                                    // 08
@@ -131,7 +131,7 @@ void UT_Utility::test_StringView_Utility_Split ()
     data_t("a nice and strange usage ", "a",  {"",      " nice ",    "nd str", "nge us", "ge "}), // 11
     data_t(" foo / bar / bore ",        "/",  {" foo ", " bar ",     " bore "}),                  // 12
     data_t("foo/bar/bore",              "/",  {"foo",   "bar",       "bore"}),                    // 13
-    data_t("?  Hello  ?",               "?",  {"",      "  Hello  ", ""}),                        // 14
+    data_t("?  Hello  ?",               "?",  {"",      "  Hello  "}),                            // 14
     data_t(static_cast<const char*>(nullptr), static_cast<const char*>(nullptr), {}),             // 15
   };
 

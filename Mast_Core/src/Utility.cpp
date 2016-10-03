@@ -185,7 +185,10 @@ vector<string_view> Utility::Split (string_view text, string_view separator)
         startPos = endPos + separator.length();            // Prepare skiping of separator
       }
 
-      views.emplace_back(text.substr(startPos));  // Last chunk
+      if (startPos < text.length())
+      {
+        views.emplace_back(text.substr(startPos));  // Last chunk
+      }
     }
   }
 

@@ -15,6 +15,8 @@
 #include "SystemModelManager.hpp"
 #include "TestModelBuilder.hpp"
 #include "GenericAccessInterfaceProtocol.hpp"
+#include "LoopbackAccessInterfaceProtocol.hpp"
+#include "SpiedProtocolsCommands.hpp"
 #include "Spy_AccessInterfaceProtocols.hpp"
 #include "Spy_SVF_Protocol.hpp"
 #include "Spy_I2C_Protocol.hpp"
@@ -33,12 +35,14 @@
 #include <atomic>
 #include <chrono>
 
+using std::shared_ptr;
 using std::make_shared;
 using std::make_tuple;
 using std::string;
 using std::experimental::string_view;
 using std::ostringstream;
 using std::vector;
+
 using namespace std::chrono_literals;
 using namespace std::string_literals;
 using namespace mast;
@@ -66,8 +70,6 @@ std::shared_ptr<AccessInterface> Create_TestCase_1500 (SystemModel& sm, string_v
   TestModelBuilder builder(sm);
 
   auto ai        = builder.Create_TestCase_1500(name, 4u);
-  auto ir        = sm.RegisterWithId(1u);
-  auto bpy       = sm.RegisterWithId(3u);
   auto regStatic = sm.RegisterWithId(5u);
   auto regDyn_0  = sm.RegisterWithId(14u);
   auto regDyn_1  = sm.RegisterWithId(15u);
@@ -207,6 +209,65 @@ std::shared_ptr<AccessInterface> Create_TestCase_MIB_Multichain_Post (SystemMode
 }
 //
 //  End of: Create_TestCase_MIB_Multichain_Post
+//---------------------------------------------------------------------------
+
+
+//! Creates test case "Brocade"
+//!
+std::shared_ptr<Chain> Create_TestCase_Brocade (SystemModel&                        sm,
+                                                shared_ptr<AccessInterfaceProtocol> masterProtocol,
+                                                shared_ptr<AccessInterfaceProtocol> slaveProtocol,
+                                                bool                                reportGml = false)
+{
+  SystemModelBuilder builder(sm);
+
+  auto tap1 = builder.Create_JTAG_TAP("Zybo", 6u, 2u, make_shared<LoopbackAccessInterfaceProtocol>());
+  auto tap2 = builder.Create_JTAG_TAP("Tap",  6u, 3u, make_shared<LoopbackAccessInterfaceProtocol>());
+  auto tap3 = builder.Create_JTAG_TAP("TAP3", 6u, 4u, make_shared<LoopbackAccessInterfaceProtocol>());
+  auto tap4 = builder.Create_JTAG_TAP("",     6u, 2u, make_shared<LoopbackAccessInterfaceProtocol>());
+
+  builder.AppendRegisters(1u, "reg_", BinaryVector::CreateFromString("0x123"), tap1);
+  builder.AppendRegisters(2u, "R_",   BinaryVector::CreateFromString("0x45"),  tap2);
+  builder.AppendRegisters(3u, "reg_", BinaryVector::CreateFromString("0x678"), tap3);
+  builder.AppendRegisters(1u, "reg_", BinaryVector::CreateFromString("0x9A"),  tap4);
+
+  auto taps = { tap1, tap2, tap3, tap4 };
+  auto root = builder.Create_Brocade(masterProtocol, slaveProtocol, taps);
+
+
+  auto reg_16 = sm.RegisterWithId(16u);  // tap1
+  auto reg_17 = sm.RegisterWithId(17u);  // tap2
+  auto reg_18 = sm.RegisterWithId(18u);  // tap2
+  auto reg_19 = sm.RegisterWithId(19u);  // tap3
+  auto reg_20 = sm.RegisterWithId(20u);  // tap3
+  auto reg_21 = sm.RegisterWithId(21u);  // tap3
+  auto reg_22 = sm.RegisterWithId(22u);  // tap4
+
+  reg_16->SetToSut (BinaryVector::CreateFromString("0x040")); // tap1
+  reg_17->SetToSut (BinaryVector::CreateFromString("0x90"));  // tap2
+  reg_18->SetToSut (BinaryVector::CreateFromString("0x91"));  // tap2
+  reg_19->SetToSut (BinaryVector::CreateFromString("0x671")); // tap3
+  reg_20->SetToSut (BinaryVector::CreateFromString("0x672")); // tap3
+  reg_21->SetToSut (BinaryVector::CreateFromString("0x673")); // tap3
+  reg_22->SetToSut (BinaryVector::CreateFromString("0x9B"));  // tap4
+
+  reg_16->SetBypass (BinaryVector::CreateFromString("0x111")); // tap1
+  reg_17->SetBypass (BinaryVector::CreateFromString("0x22"));  // tap2
+  reg_18->SetBypass (BinaryVector::CreateFromString("0x23"));  // tap2
+  reg_19->SetBypass (BinaryVector::CreateFromString("0x331")); // tap3
+  reg_20->SetBypass (BinaryVector::CreateFromString("0x332")); // tap3
+  reg_21->SetBypass (BinaryVector::CreateFromString("0x333")); // tap3
+  reg_22->SetBypass (BinaryVector::CreateFromString("0xAA"));  // tap4
+
+  if (reportGml)
+  {
+    TS_TRACE (GmlPrinter::Graph(root, "MIB_Multichain_Post"));
+  }
+
+  return root;
+}
+//
+//  End of: Create_TestCase_Brocade
 //---------------------------------------------------------------------------
 
 //! Creates a GenericAccessInterfaceProtocol suitable for following tests
@@ -751,38 +812,41 @@ void UT_SystemModelManager::test_DoDataCycles_1500_I2C ()
 
   vector<string> expected
   {
-     "S2R I2C_READ(0x41)\n"
-     "S2R I2C_WRITE(0x41, 0x01)\n",
-     "S2R I2C_READ(0x42)\n"
-     "S2R I2C_WRITE(0x42, 0x0505_/b10)\n",
-     "S2R I2C_READ(0x42)\n"
-     "S2R I2C_WRITE(0x42, 0x3636_4)\n",
-     "S2R I2C_READ(0x42)\n"
-     "S2R I2C_WRITE(0x42, 0x3636_E060:6060_/b0)\n",
-     "S2R I2C_READ(0x42)\n"
-     "S2R I2C_WRITE(0x42, 0x3636_3)\n",
-     "S2R I2C_READ(0x42)\n"
-     "S2R I2C_WRITE(0x42, 0x3636_D858:5858_/b0)\n",
-     "S2R I2C_READ(0x42)\n"
-     "S2R I2C_WRITE(0x42, 0x3636_2)\n",
-     "S2R I2C_READ(0x42)\n"
-     "S2R I2C_WRITE(0x42, 0x3636_8505:0505_/b0)\n",
-     "S2R I2C_READ(0x42)\n"
-     "S2R I2C_WRITE(0x42, 0x3636_1)\n",
-     "S2R I2C_READ(0x42)\n"
-     "S2R I2C_WRITE(0x42, 0x3636_0484:8484_/b1)\n",
-     "S2R I2C_READ(0x42)\n"
-     "S2R I2C_WRITE(0x42, 0x3636_A020:2020_/b0)\n",
-     "S2R I2C_READ(0x42)\n"
-     "S2R I2C_WRITE(0x42, 0x3636_8)\n",
-     "S2R I2C_READ(0x42)\n"
-     "S2R I2C_WRITE(0x42, 0x3636_0)\n",
-     "S2R I2C_READ(0x41)\n"
-     "S2R I2C_WRITE(0x41, 0xFF)\n"
+    "S2R I2C_READ(0x41)",
+    "S2R I2C_WRITE(0x41, 0x01)",
+    "S2R I2C_READ(0x42)",
+    "S2R I2C_WRITE(0x42, 0x0505_/b10)",
+    "S2R I2C_READ(0x42)",
+    "S2R I2C_WRITE(0x42, 0x3636_4)",
+    "S2R I2C_READ(0x42)",
+    "S2R I2C_WRITE(0x42, 0x3636_E060:6060_/b0)",
+    "S2R I2C_READ(0x42)",
+    "S2R I2C_WRITE(0x42, 0x3636_3)",
+    "S2R I2C_READ(0x42)",
+    "S2R I2C_WRITE(0x42, 0x3636_D858:5858_/b0)",
+    "S2R I2C_READ(0x42)",
+    "S2R I2C_WRITE(0x42, 0x3636_2)",
+    "S2R I2C_READ(0x42)",
+    "S2R I2C_WRITE(0x42, 0x3636_8505:0505_/b0)",
+    "S2R I2C_READ(0x42)",
+    "S2R I2C_WRITE(0x42, 0x3636_1)",
+    "S2R I2C_READ(0x42)",
+    "S2R I2C_WRITE(0x42, 0x3636_0484:8484_/b1)",
+    "S2R I2C_READ(0x42)",
+    "S2R I2C_WRITE(0x42, 0x3636_A020:2020_/b0)",
+    "S2R I2C_READ(0x42)",
+    "S2R I2C_WRITE(0x42, 0x3636_8)",
+    "S2R I2C_READ(0x42)",
+    "S2R I2C_WRITE(0x42, 0x3636_0)",
+    "S2R I2C_READ(0x41)",
+    "S2R I2C_WRITE(0x41, 0xFF)"
   };
 
   TS_ASSERT_EQUALS (gotI2cCommands, expected);
 }
+
+
+
 
 
 //! Checks SystemModelManager DoDataCycles when using "1500" testcase and Generic (table base) protocol
@@ -1116,6 +1180,68 @@ void UT_SystemModelManager::test_DoDataCycles_MIB_Multichain_Post ()
   };
 
   TS_ASSERT_EQUALS (gotSutVectors, expected);
+}
+
+
+//! Checks SystemModelManager DoDataCycles when using "Brocade" testcase
+//!
+void UT_SystemModelManager::test_DoDataCycles_Brocade ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+
+  auto spiedCommands = make_shared<SpiedProtocolsCommands>();
+
+  auto addresses = { 0x00u, 0x41u, 0x42u };
+  auto i2cSpy    = make_shared<Spy_I2C_Protocol>(spiedCommands, addresses, "S2R ");
+  auto svfSpy    = make_shared<Spy_SVF_Protocol>(spiedCommands);
+
+  auto root = Create_TestCase_Brocade(sm, i2cSpy, svfSpy);
+
+  SystemModelManager sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.DoDataCycles());
+
+  // ---------------- Verify
+  //
+  const auto& gotCommands = spiedCommands->Commands();
+
+  vector<string> expected
+  {
+    "S2R I2C_READ(0x41)",
+    "S2R I2C_WRITE(0x41, 0xF0)",
+    "SIR 24 TDI(0420C1);",
+    "SDR 40 TDI(040916739B);",
+    "S2R I2C_READ(0x41)",
+    "S2R I2C_WRITE(0x41, 0x00)",
+    "SIR 0 TDI();",
+    "SDR 0 TDI();",
+    "S2R I2C_READ(0x41)",
+    "S2R I2C_WRITE(0x41, 0xF0)",
+    "SIR 24 TDI(FC10BF);",
+    "SDR 22 TDI(320CE5);",
+    "S2R I2C_READ(0x41)",
+    "S2R I2C_WRITE(0x41, 0x00)",
+    "SIR 0 TDI();",
+    "SDR 0 TDI();",
+    "S2R I2C_READ(0x41)",
+    "S2R I2C_WRITE(0x41, 0x60)",
+    "SIR 12 TDI(0FC1);",
+    "SDR 13 TDI(1671);",
+    "S2R I2C_READ(0x41)",
+    "S2R I2C_WRITE(0x41, 0x00)",
+    "SIR 0 TDI();",
+    "S2R I2C_READ(0x41)",
+    "S2R I2C_WRITE(0x41, 0x20)",
+    "SIR 6 TDI(3F);",
+    "S2R I2C_READ(0x41)",
+    "S2R I2C_WRITE(0x41, 0x00)",
+  };
+
+  TS_ASSERT_EQUALS (gotCommands, expected);
 }
 
 

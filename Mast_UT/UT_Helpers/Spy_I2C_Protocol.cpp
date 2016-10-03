@@ -12,6 +12,13 @@
 //===========================================================================
 
 #include "Spy_I2C_Protocol.hpp"
+#include "Utility.hpp"
+
+#include <string>
+#include <experimental/string_view>
+
+using std::string;
+using std::experimental::string_view;
 
 using namespace mast;
 using namespace test;
@@ -21,13 +28,35 @@ using namespace test;
 //!
 BinaryVector Spy_I2C_Protocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
-  auto command = CreateI2CCommand(derivationId, toSutData);
-  m_commands.emplace_back(command);
+  auto commands = CreateI2CCommand(derivationId, toSutData);
+  SaveCommands(commands);
   return toSutData;
 }
 //
 //  End of: Spy_I2C_Protocol::DoAction
 //---------------------------------------------------------------------------
+
+
+//! Saves I2C commands
+//!
+//! @param commands New line separated commands
+//!
+void Spy_I2C_Protocol::SaveCommands (string_view commands)
+{
+  auto splitCommands = Utility::Split(commands, "\n");
+
+  for (auto command : splitCommands)
+  {
+    if (!command.empty())
+    {
+      m_spiedCommands->SaveCommand(string(command));
+    }
+  }
+}
+//
+//  End of: Spy_I2C_Protocol::SaveCommands
+//---------------------------------------------------------------------------
+
 
 
 //! Tally number of call to Reset

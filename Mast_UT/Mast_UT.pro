@@ -92,6 +92,7 @@ HEADERS += \
     SystemModel/UT_SystemModelManager.hpp             \
     SystemModel/UT_SystemModelNode.hpp                \
     UT_Helpers/Fake_SVF_Simulator.hpp                 \
+    UT_Helpers/SpiedProtocolsCommands.hpp             \
     UT_Helpers/Spy_AccessInterfaceProtocols.hpp       \
     UT_Helpers/Spy_I2C_Protocol.hpp                   \
     UT_Helpers/Spy_SVF_Protocol.hpp                   \

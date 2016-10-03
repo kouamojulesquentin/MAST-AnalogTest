@@ -15,6 +15,7 @@
 #include "Utility.hpp"
 
 using std::experimental::string_view;
+using std::string;
 using namespace mast;
 using namespace test;
 
@@ -46,7 +47,7 @@ void Spy_SVF_Protocol::SaveCommands (string_view commands)
   {
     if (!command.empty())
     {
-      m_commands.emplace_back(command);
+      m_spiedCommands->SaveCommand(string(command));
     }
   }
 }

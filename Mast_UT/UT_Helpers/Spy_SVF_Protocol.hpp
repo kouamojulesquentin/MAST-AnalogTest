@@ -16,7 +16,10 @@
   #define SPY_SVF_PROTOCOL_H__7720E2EF_FEE3_4D05_C4B6_A5E4CB999B6__INCLUDED_
 
 #include "SVF_Player.hpp"
+#include "SpiedProtocolsCommands.hpp"
 #include "BinaryVector.hpp"
+
+#include <memory>
 #include <string>
 
 namespace test
@@ -29,13 +32,16 @@ class Spy_SVF_Protocol final : public mast::SVF_Player
   //
   public:
   virtual ~Spy_SVF_Protocol() = default;
-  Spy_SVF_Protocol()  = default;
+  Spy_SVF_Protocol(std::shared_ptr<SpiedProtocolsCommands> spiedCommands)
+    : m_spiedCommands(spiedCommands) {}
+  Spy_SVF_Protocol()
+    : m_spiedCommands(std::make_shared<SpiedProtocolsCommands>()) {}
 
   //! Spies content how binary vector to SUT is transformed to SVF command while returning the BinaryVector unchanged
   //!
   virtual mast::BinaryVector DoAction(uint32_t derivationId, void* interfaceData, const mast::BinaryVector& toSutData) override;
 
-  const std::vector<std::string>& SVFCommands() const { return m_commands; }
+  const std::vector<std::string>& SVFCommands() const { return m_spiedCommands->Commands(); }
 
   //! Gets the number of derivations supported by the specific protocol
   //!
@@ -62,7 +68,7 @@ class Spy_SVF_Protocol final : public mast::SVF_Player
   // ---------------- Private  Fields
   //
   private:
-  std::vector<std::string> m_commands; //!< Collected SVF commands issued from vectors "send" to SUT by SystemModelManager
+  std::shared_ptr<SpiedProtocolsCommands> m_spiedCommands; //!< Collected SVF commands issued from vectors "send" to SUT by SystemModelManager
 };
 //
 //  End of Spy_SVF_Protocol class declaration

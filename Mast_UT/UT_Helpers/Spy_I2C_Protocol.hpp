@@ -16,7 +16,10 @@
   #define SPY_I2C_PROTOCOL_H__D5A21174_691E_49F5_4CB1_629C102E6DB9__INCLUDED_
 
 #include "I2C_Player.hpp"
+#include "SpiedProtocolsCommands.hpp"
 #include "BinaryVector.hpp"
+
+#include <memory>
 
 namespace test
 {
@@ -29,8 +32,16 @@ class Spy_I2C_Protocol final : public mast::I2C_Player
   public:
   virtual ~Spy_I2C_Protocol() = default;
   Spy_I2C_Protocol() = delete;
-  Spy_I2C_Protocol(std::initializer_list<uint32_t> addresses, std::experimental::string_view commandsPrefix = "")
-    : I2C_Player(addresses, commandsPrefix)
+  Spy_I2C_Protocol(std::shared_ptr<SpiedProtocolsCommands> spiedCommands,
+                   std::initializer_list<uint32_t>         addresses,
+                   std::experimental::string_view          commandsPrefix = "")
+    : I2C_Player      (addresses, commandsPrefix)
+    , m_spiedCommands (spiedCommands)
+  {  }
+
+  Spy_I2C_Protocol(std::initializer_list<uint32_t> addresses,
+                   std::experimental::string_view  commandsPrefix = "")
+    : Spy_I2C_Protocol(std::make_shared<SpiedProtocolsCommands>(), addresses, commandsPrefix)
   {  }
 
   //! Spies content how binary vector to SUT is transformed to I2C command while returning the BinaryVector unchanged
@@ -45,7 +56,7 @@ class Spy_I2C_Protocol final : public mast::I2C_Player
   //!
   virtual uint32_t MaxSupportedDerivations() const override { return 2u; }
 
-  const std::vector<std::string>& I2CCommands() const { return m_commands; }
+  const std::vector<std::string>& I2CCommands() const { return m_spiedCommands->Commands(); }
 
   //! Returns readable type of protocol
   //!
@@ -55,11 +66,18 @@ class Spy_I2C_Protocol final : public mast::I2C_Player
   //!
   virtual void DoReset(bool doSynchronousReset) override;
 
+  // ---------------- Private  Methods
+  //
+
+  //! Saves SVF commands
+  //!
+  void SaveCommands(std::experimental::string_view commands);
+
   // ---------------- Private  Fields
   //
   private:
-  std::vector<std::string> m_commands; //!< Collected I2C commands issued from vectors "send" to SUT by SystemModelManager
-  uint32_t                 m_resetCount = 0;
+  std::shared_ptr<SpiedProtocolsCommands> m_spiedCommands; //!< Collected I2C commands issued from vectors "send" to SUT by SystemModelManager
+  uint32_t                                m_resetCount = 0;
 };
 //
 //  End of Spy_I2C_Protocol class declaration

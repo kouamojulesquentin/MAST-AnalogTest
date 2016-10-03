@@ -951,7 +951,7 @@ void UT_SystemModelBuilder::test_Create_Brocade_5xTAPs ()
   auto tap5 = sut.Create_JTAG_TAP("TAP",  6u, 3u, make_shared<LoopbackAccessInterfaceProtocol>());
 
   sut.AppendRegisters(1u, "reg_", BinaryVector::CreateFromString("0xFDE"), tap1);
-  sut.AppendRegisters(2u, "R_", BinaryVector::CreateFromString("0xFDE"), tap2);
+  sut.AppendRegisters(2u, "R_",   BinaryVector::CreateFromString("0xFDE"), tap2);
   sut.AppendRegisters(3u, "reg_", BinaryVector::CreateFromString("0xFDE"), tap3);
   sut.AppendRegisters(1u, "reg_", BinaryVector::CreateFromString("0xFDE"), tap4);
   sut.AppendRegisters(2u, "reg_", BinaryVector::CreateFromString("0xFDE"), tap5);

@@ -187,6 +187,10 @@ void BrocadeSelector::Select (uint32_t pathIdentifier)
 
   if (pathIdentifier == 0)
   {
+    if (m_muxRegister->IsPending())  // Do not discard the selection for IR
+    {
+      return;
+    }
     toSut = selectMask;
   }
   else

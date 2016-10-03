@@ -227,7 +227,7 @@ shared_ptr<Chain> SystemModelBuilder::Create_Brocade (shared_ptr<AccessInterface
   auto brocadeChain  = m_model.CreateChain("Brocade");
   auto masterAi      = m_model.CreateAccessInterface("Master_AI", masterProtocol, brocadeChain);
   auto slaveAi       = m_model.CreateAccessInterface("Slave_AI",  slaveProtocol,  brocadeChain);
-  auto masterCtrlReg = m_model.CreateRegister("Brocade_CTRL", BinaryVector(8u), masterAi);
+  auto masterCtrlReg = m_model.CreateRegister("Brocade_CTRL", BinaryVector(8u), true, masterAi);
   auto irChain       = m_model.CreateChain  ("IR",     slaveAi);
   auto drChain       = m_model.CreateChain  ("DR",     slaveAi);
   auto selector      = make_shared<BrocadeSelector>(masterCtrlReg, taps.size());

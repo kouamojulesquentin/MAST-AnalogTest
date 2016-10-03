@@ -260,13 +260,16 @@ void SystemModelManager::DoDataCycles_Impl ()
               nextDerivation->Accept(m_toSutVisitor);
 
               const auto& toSutVector = m_toSutVisitor.ToSutVector();
-              const auto& activeRegs  = m_toSutVisitor.ActiveRegistersIdentifiers();
+              if (!toSutVector.IsEmpty())   // This can be empty when actual SUT state prevent from serving pending Registers
+              {
+                const auto& activeRegs  = m_toSutVisitor.ActiveRegistersIdentifiers();
 
-              auto fromSutVector = protocol->DoAction(derivationId, nextDerivation->ApplicationData(), toSutVector);
+                auto fromSutVector = protocol->DoAction(derivationId, nextDerivation->ApplicationData(), toSutVector);
 
-              m_fromSutUpdater.UpdateRegisters(activeRegs, fromSutVector);
-              ReportServedRegisters(activeRegs);
-              ReleaseServedThreads();
+                m_fromSutUpdater.UpdateRegisters(activeRegs, fromSutVector);
+                ReportServedRegisters(activeRegs);
+                ReleaseServedThreads();
+              }
             }
 
             nextDerivation = nextDerivation->NextSibling();

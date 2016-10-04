@@ -621,9 +621,9 @@ bool BinaryVector::CompareEqualTo (const BinaryVector& rhs, const BinaryVector& 
 //! @note Firstly intended for test purposes, but can be used for anything else
 //!
 //! @param bits         Sequence of characters representing content of BinaryVector to create
-//!                     Characters in ",':_- \t/\|" are ignored (can be used to ease display of string)
+//!                     Characters in \",':_- \\t/\|\" are ignored (can be used to ease display of string)
 //!                     An exception is thrown if there is any character different from
-//!                     set "01,':_- \t\n"
+//!                     set \"01,':_- \\t\\n\"
 //!                     '0b' is ignored at start of string. An exception is thrown everywhere else
 //!                     '/b', '/B', '\b', '\B' constructions are ignored anywhere
 //! @param sizeProperty Size property
@@ -757,9 +757,9 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
 //! @note Firstly intended for test purposes, but can be used for anything else
 //!
 //! @param bits         Sequence of characters representing content of BinaryVector to create
-//!                     Characters in ",':_- \t/\" are ignored (can be used to ease display of string)
+//!                     Characters in \",':_- \t/\" are ignored (can be used to ease display of string)
 //!                     An exception is thrown if there is any character different from
-//!                     set "0123456789abcdefABCDEF,':_- \t\n/\"
+//!                     set \"0123456789abcdefABCDEF,':_- \\t\\n/\"
 //!                     '0x' is ignored at start of string. An exception is thrown everywhere else
 //!                     '/x', '/X', '\x', '\X' constructions are ignored anywhere
 //! @param sizeProperty Size property
@@ -906,12 +906,12 @@ BinaryVector BinaryVector::CreateFromHexString (string_view bits, SizeProperty s
 //! @note Firstly intended for test purposes, but can be used for anything else
 //!
 //! @param bits         Sequence of characters representing content of BinaryVector to create
-//!                     Characters in ",':_- \t/\" are ignored (can be used to ease display of string)
+//!                     Characters in \",':_- \t/\" are ignored (can be used to ease display of string)
 //!                     An exception is thrown if there is any character different from
-//!                     set "0123456789abcdefABCDEF,':_- \t/\"
+//!                     set \"0123456789abcdefABCDEF,':_- \t/\"
 //!                     '0x' is ignored at start of string. An exception is thrown everywhere else
-//!                     '/x', '/X', '\x', '\X' constructions are interpreted as: What follow is hexadecimal
-//!                     '/b', '/B', '\b', '\B' constructions are interpreted as: What follow is binary
+//!                     '/x', '/X', '\\x', '\\X' constructions are interpreted as: What follow is hexadecimal
+//!                     '/b', '/B', '\\b', '\\B' constructions are interpreted as: What follow is binary
 //! @param sizeProperty Size property
 //! @param dontCare     Tells how to handle "dont't care" special characters 'x' and 'X'
 //!
@@ -1293,8 +1293,8 @@ string BinaryVector::DataAsHexString (string_view quadSeparator,
 //! @note An example of formatting is: 0xFACE_DEAD:BEEF_0123:CAFE_/b01
 //!
 //! @param hexStyleThreshold  The number of bits that makes the result starting as hex string (preference is to be >= 8)
-//! @param octaSeparator      Characters to insert every 8 digits
 //! @param quadSeparator      Characters to insert every 4 digits
+//! @param octaSeparator      Characters to insert every 8 digits
 //! @param bytesPerLine       Number of bytes (sequence of 8 bits) to write per line.
 //!                           When zero, all is on the "same line"
 //! @param eolSeparator       Characters to insert just before new lines character (when bytesPerLine != 0)

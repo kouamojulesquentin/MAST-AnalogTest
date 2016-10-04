@@ -57,8 +57,9 @@ BrocadeSelector::BrocadeSelector(shared_ptr<Register> associatedRegister, uint32
 //!
 //! @note A slot in select LUT is reserved for no path selection
 //!
-//! @param properties   Specifies whether bits are reversed. By default first TAP is controled by
-//!                     associated Register least significant bit
+//! @param pathsCount  Number of effective paths to handle (to size the table)
+//! @param properties  Specifies whether bits are reversed. By default first TAP is controled by
+//!                    associated Register least significant bit
 //!
 BrocadeSelector::TablesType BrocadeSelector::CreateSelectTable (uint32_t pathsCount, SelectorProperty properties)
 {
@@ -76,6 +77,10 @@ BrocadeSelector::TablesType BrocadeSelector::CreateSelectTable (uint32_t pathsCo
 //! Creates a table for deselection of a path
 //!
 //! @note A slot in select LUT is reserved for any paths deselection
+//!
+//! @param pathsCount  Number of effective paths to handle (to size the table)
+//! @param properties  Specifies whether bits are reversed. By default first TAP is controled by
+//!                    associated Register least significant bit
 //!
 BrocadeSelector::TablesType BrocadeSelector::CreateDeselectTable (uint32_t pathsCount, SelectorProperty properties)
 {

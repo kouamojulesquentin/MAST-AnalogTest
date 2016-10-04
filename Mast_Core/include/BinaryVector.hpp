@@ -107,7 +107,7 @@ class DLL_EXPORT BinaryVector final
 
   std::string DataAsMixString (uint32_t                       hexStyleThreshold = 8,
                                std::experimental::string_view quadSeparator     = "_",
-                               std::experimental::string_view octoSeparator     = ":",
+                               std::experimental::string_view octaSeparator     = ":",
                                uint32_t                       bytesPerLine      = 0,
                                std::experimental::string_view eolSeparator      = ","
                               ) const;         //!< Gets content as mix of hex and binary digits (size dependent)
@@ -140,7 +140,7 @@ class DLL_EXPORT BinaryVector final
 
   BinaryVector& AppendBits (bool bitIsOne, uint32_t count); //!< Appends 0 or 1 bit N times
 
-  BinaryVector& AppendChunks (uint8_t numberOfBits, BitsAlignment alignment, std::initializer_list<uint8_t> chunks); // Appends from a list of uint8_t ordered from msb to lsb
+  BinaryVector& AppendChunks (uint8_t numberOfBits, BitsAlignment alignment, std::initializer_list<uint8_t> chunksList); // Appends from a list of uint8_t ordered from msb to lsb
 
   void          Clear();              //!< Clears all content
 

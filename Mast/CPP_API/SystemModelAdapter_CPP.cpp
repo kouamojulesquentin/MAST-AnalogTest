@@ -170,7 +170,8 @@ vector<AppFunctionNameAndNode> CPP_API_IMPL::LoadSystemModel (string_view filePa
 
 //! Runs Mast til applications terminates
 //!
-//! @param appAssociations  Associate some application function with a node in the system model
+//! @param functionsAndNodes  Associate some application function with a node in the system model
+//! @param options            Options for running MAST
 //!
 //! @note Mast must have been initialized and system model been created beforehand
 //!

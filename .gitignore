@@ -76,3 +76,4 @@
 /Doxygen_Doc/C_API/*.lnk
 /Doxygen_Doc/FULL_API/*.lnk
 /Doxygen_Doc/MastDev/*.lnk
+/Doxygen_Doc/MastDev/html

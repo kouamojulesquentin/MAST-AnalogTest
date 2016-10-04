@@ -35,9 +35,8 @@ namespace
 {
 //! Copies binary vector bits as a C-Style string
 //!
-//! @param binVector                        A BinaryVector to "export" to C-Style string
-//! @param readDataBuffer                   A buffer to build the C-Style string
-//! @param [in, out] readDataBufferLength   As input, point to input buffer length, as output this is same as strlen() for the return string
+//! @param binVector  A BinaryVector to "export" to C-Style string
+//! @param StringType Base of representation (Hex, Binary or Decimal)
 //!
 string BinaryVectorAsString (const BinaryVector& binVector, StringType stringType)
 {

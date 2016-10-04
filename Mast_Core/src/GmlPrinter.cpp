@@ -50,6 +50,7 @@ GmlPrinter::GmlPrinter(std::experimental::string_view graphName, GmlPrinterOptio
   , m_showProtocol           (IsSet(options, GmlPrinterOptions::ShowProtocol))
   , m_showSelectorWithEdge   (IsSet(options, GmlPrinterOptions::ShowSelectorWithEdge))
   , m_showSelectorProperties (IsSet(options, GmlPrinterOptions::ShowSelectorProperties))
+  , m_showSelectorTables     (IsSet(options, GmlPrinterOptions::ShowSelectorTables))
   , m_showSelectionValues    (IsSet(options, GmlPrinterOptions::ShowSelectionValues))
 {
   CreateRoot();
@@ -80,7 +81,7 @@ void GmlPrinter::AppendParentNode (string_view       shapeName,
   auto linker   = dynamic_cast<const Linker*>(&parentNode);
   auto selector = linker ? linker->Selector() : nullptr;
 
-  if (selector && m_showSelectorProperties)
+  if (selector && (m_showSelectorProperties || m_showSelectorTables))
   {
     AppendSelector(*linker, *selector);
   }
@@ -272,14 +273,7 @@ void GmlPrinter::AppendSelector (const Linker& linker, const PathSelector& selec
 {
   if (m_processedSelectors.count(&selector) == 0)
   {
-    ostringstream os;
-
-    os << "Kind: "            << selector.KindName() << std::endl;
-    os << "Can_select_none: " << std::boolalpha << IsSet(selector.Properties(), SelectorProperty::CanSelectNone) << std::endl;
-    os << "Reversed_order:  " << std::boolalpha << IsSet(selector.Properties(), SelectorProperty::ReverseOrder)  << std::endl;
-    os << "Inverted_bits:   " << std::boolalpha << IsSet(selector.Properties(), SelectorProperty::InvertedBits);
-
-    auto notes    = os.str();
+    auto notes    = selector.DebugSelectorInfo(!m_showSelectorTables);
     auto nodeName = "Selector " + FormattedAssociateRegisterId(linker);
 
     SET_FOR_SCOPE(m_displayIdentifier, false);

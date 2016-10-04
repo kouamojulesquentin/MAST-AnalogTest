@@ -43,6 +43,7 @@ class UT_GmlPrinter : public CxxTest::TestSuite
   void test_Visit_NoEdgeForSelector ();
   void test_Visit_SelectionValues ();
   void test_Visit_SelectorProperties ();
+  void test_Visit_SelectorTables ();
   void test_Visit_With_DisplayIdentifier_true ();
   void test_Visit_With_DisplayIdentifierAndRegister_true ();
 

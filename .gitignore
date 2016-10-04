@@ -69,3 +69,10 @@
 /vhdl/work/*
 /prototype/ML505/ISE/*
 !/prototype/ML505/ISE/JTAG_proto.xise
+/Doxygen_Doc/CPP_API/html
+/Doxygen_Doc/C_API/html
+/Doxygen_Doc/FULL_API/html
+/Doxygen_Doc/CPP_API/*.lnk
+/Doxygen_Doc/C_API/*.lnk
+/Doxygen_Doc/FULL_API/*.lnk
+/Doxygen_Doc/MastDev/*.lnk

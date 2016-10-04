@@ -5,6 +5,10 @@
  NB: on newer Linux installation, a manual install of ply 3.8 might be needed
 				http://www.dabeaz.com/ply/
  MAST uses Flex and Bison
+ To generate Doxygen documentation, doxygen and graphviz must be installed
+  - apt-get install doxygen
+  - apt-get install graphviz
+
 
 OpenOCD need Lib to be installed (sudo apt-get install libusb-1.0-0-dev)
 To build OpenOCD, the following tools are required:
@@ -30,6 +34,7 @@ Place it before project make or even as first step (before Qmake is run)
     For ARM:         "make arm"
     Clean (shallow): "make clean"     (cleans all debug and release obj, lib and exe)
     Clean (deep):    "make distclean" (cleans all build directories)
+    Doxygen docs:    "make docs"
 
   To disable build using OpenOCD
     make disclean
@@ -45,4 +50,14 @@ Place it before project make or even as first step (before Qmake is run)
   Running SIT Parser Unit tests:
     Debug:      "make run_sit_ut_debug"
     Release:    "make run_sit_ut_release"
+
+  Compiled object files are in generated to: .\cmake_debug     and .\cmake_release
+  Target dll files are generated to:         .\cmake_debug\Lib and .\cmake_release\Lib
+  Target executable files are generated to:  .\cmake_debug\Bin and .\cmake_release\Bin
+  Doxygen docs are generated into:
+    - Doxygen_Doc\MastDev,
+    - Doxygen_Doc\Full_API,
+    - Doxygen_Doc\CPP_API
+    - Doxygen_Doc\C_API
+  Their entry point is index.html in the respective directories
 

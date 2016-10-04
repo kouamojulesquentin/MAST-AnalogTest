@@ -7,7 +7,7 @@ CMAKE_ARM_BUILD_DIR     = cmake_arm
 #+CMAKE_DEBUG_BUILD_MAKEFILE =$(CMAKE_DEBUG_BUILD_DIR)/Makefile
 
 CMAKE_FLAGS=  -DCMAKE_CXX_COMPILER=g++
-LIB_DIR              = Lib
+LIB_DIR    = Lib
 
 ifeq ($(OS), Windows_NT)
 $(info ==> Building for Windows)
@@ -38,11 +38,11 @@ CPP_EXAMPLE_EXE_PATH  = $(BIN_DIR)\$(CPP_EXAMPLE_EXE_NAME)
 
 else
 USE_OPEN_OCD = ON
-MKDIR = mkdir -p
+MKDIR  = mkdir -p
 RM     = rm -f
 RM_DIR = rm -rf
-SEP   = /
-RUN   = ./
+SEP    = /
+RUN    = ./
 
 BIN_DIR              = Bin
 MAST_UT_EXE_NAME     = Mast_UT
@@ -200,6 +200,20 @@ endif
 ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/Makefile)","")
 > cd $(CMAKE_RELEASE_BUILD_DIR) &&  make clean;
 endif
+
+docs:
+ifeq ($(OS), Windows_NT)
+> $(IF_EXIST) Doxygen_Doc$(SEP)MastDev$(SEP)html  $(RM_DIR) Doxygen_Doc$(SEP)MastDev$(SEP)html
+> $(IF_EXIST) Doxygen_Doc$(SEP)FULL_API$(SEP)html $(RM_DIR) Doxygen_Doc$(SEP)FULL_API$(SEP)html
+> $(IF_EXIST) Doxygen_Doc$(SEP)CPP_API$(SEP)html  $(RM_DIR) Doxygen_Doc$(SEP)CPP_API$(SEP)html
+> $(IF_EXIST) Doxygen_Doc$(SEP)C_API$(SEP)html    $(RM_DIR) Doxygen_Doc$(SEP)C_API$(SEP)html
+else
+> $(RM_DIR)   Doxygen_Doc$(SEP)html
+endif
+> doxygen Doxyfile_MastDev.cfg
+> doxygen Doxyfile_FULL_API.cfg
+> doxygen Doxyfile_CPP_API.cfg
+> doxygen Doxyfile_C_API.cfg
 
 distclean:
 ifeq ($(OS), Windows_NT)

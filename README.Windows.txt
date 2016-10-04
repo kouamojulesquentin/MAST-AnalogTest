@@ -6,6 +6,8 @@
   MAST "SIT" Parser uses Flex and Bison (validated with Flex 2.5.37 and Bison 3.0)
   FLEX_DIR environment variable must point to where flex is intalled (to get access to FlexLexer.h)
   The unitary test interface Needs "phyton3" and "phyton3-ply" module
+  To generate Doxygen documentation, doxygen and graphviz must be installed and dot.exe added to PATH environment variable
+
   Qt build has been tested with Qt 5.5 and QtCreator 3.6.1 but should be compatible with more recent versions
   Note that QtCreator has the ability to use CMake files (but seems to have a lesser level of support than for native .pro files)
 
@@ -40,6 +42,7 @@ Note that 'QMake' environment variable should point to qmake application (someth
     For ARM:         "make arm"
     Clean (shallow): "make clean"     (cleans all debug and release obj, lib and exe)
     Clean (deep):    "make distclean" (cleans all build directories)
+    Doxygen docs:    "make docs"
 
   Running Lib Unit tests:
     Debug:      "make run_debug"
@@ -49,5 +52,12 @@ Note that 'QMake' environment variable should point to qmake application (someth
     Debug:      "make run_parser_debug"
     Release:    "make run_parser_release"
 
-  Compiled object files are in generated to .\cmake_debug and .\cmake_release
-  Target dll and executable files are generated to .\cmake_debug\Bin and .\cmake_release\Bin
+  Compiled object files are in generated to:        .\cmake_debug     and .\cmake_release
+  Target dll and executable files are generated to: .\cmake_debug\Bin and .\cmake_release\Bin
+  Doxygen docs are generated into:
+    - Doxygen_Doc\MastDev,
+    - Doxygen_Doc\Full_API,
+    - Doxygen_Doc\CPP_API
+    - Doxygen_Doc\C_API
+  Their entry point is index.html in the respective directories
+

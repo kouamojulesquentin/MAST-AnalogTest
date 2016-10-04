@@ -30,24 +30,27 @@ const std::experimental::string_view GmlPrinter::m_shape_AccessInterface = "octa
 const std::experimental::string_view GmlPrinter::m_shape_Linker          = "trapezoid";
 const std::experimental::string_view GmlPrinter::m_shape_Chain           = "ellipse";
 const std::experimental::string_view GmlPrinter::m_shape_Register        = "rectangle";
+const std::experimental::string_view GmlPrinter::m_shape_Selector        = "rectangle";
 
 const std::experimental::string_view GmlPrinter::m_color_AccessInterface = "#10FFFF";
 const std::experimental::string_view GmlPrinter::m_color_Linker          = "#FF3060";
 const std::experimental::string_view GmlPrinter::m_color_Chain           = "#FFCC20";
 const std::experimental::string_view GmlPrinter::m_color_Register        = "#59FF20";
+const std::experimental::string_view GmlPrinter::m_color_Selector        = "#E8E8E8";
 
 const std::experimental::string_view GmlPrinter::m_fontName              = "Lucida Console";
 
 //! Initializes with given options
 //!
 GmlPrinter::GmlPrinter(std::experimental::string_view graphName, GmlPrinterOptions options)
-  : m_graphName (graphName)
-  , m_displayIdentifier    (IsSet(options, GmlPrinterOptions::DisplayIdentifiers))
-  , m_displayRegisterValue (IsSet(options, GmlPrinterOptions::DisplayRegisterValue))
-  , m_displayRegValueAuto  (IsSet(options, GmlPrinterOptions::DisplayValueAuto))
-  , m_showProtocol         (IsSet(options, GmlPrinterOptions::ShowProtocol))
-  , m_showSelectorWithEdge (IsSet(options, GmlPrinterOptions::ShowSelectorWithEdge))
-  , m_showSelectionValues  (IsSet(options, GmlPrinterOptions::ShowSelectionValues))
+  : m_graphName              (graphName)
+  , m_displayIdentifier      (IsSet(options, GmlPrinterOptions::DisplayIdentifiers))
+  , m_displayRegisterValue   (IsSet(options, GmlPrinterOptions::DisplayRegisterValue))
+  , m_displayRegValueAuto    (IsSet(options, GmlPrinterOptions::DisplayValueAuto))
+  , m_showProtocol           (IsSet(options, GmlPrinterOptions::ShowProtocol))
+  , m_showSelectorWithEdge   (IsSet(options, GmlPrinterOptions::ShowSelectorWithEdge))
+  , m_showSelectorProperties (IsSet(options, GmlPrinterOptions::ShowSelectorProperties))
+  , m_showSelectionValues    (IsSet(options, GmlPrinterOptions::ShowSelectionValues))
 {
   CreateRoot();
 }
@@ -67,15 +70,20 @@ GmlPrinter::GmlPrinter(std::experimental::string_view graphName, GmlPrinterOptio
 //! @param parentNode       Parent node to process
 //!
 void GmlPrinter::AppendParentNode (string_view       shapeName,
-                                          string_view       backgroundColor,
-                                          string_view       notes,
-                                          const ParentNode& parentNode)
+                                   string_view       backgroundColor,
+                                   string_view       notes,
+                                   const ParentNode& parentNode)
 {
   auto outlineStyle = parentNode.IgnoreForNodePath() ? "dashed" : "";
   AppendNode(shapeName, outlineStyle, backgroundColor, notes, parentNode);
 
   auto linker   = dynamic_cast<const Linker*>(&parentNode);
-  auto selector = m_showSelectionValues && linker ? linker->Selector() : nullptr;
+  auto selector = linker ? linker->Selector() : nullptr;
+
+  if (selector && m_showSelectorProperties)
+  {
+    AppendSelector(*linker, *selector);
+  }
 
   // ---------------- Print children
   //
@@ -93,7 +101,7 @@ void GmlPrinter::AppendParentNode (string_view       shapeName,
     {
       child->Accept(*this);
 
-      if (selector)
+      if (selector && m_showSelectionValues)
       {
         ostringstream os;
         os << "/[" << selector->SelectionValue(childId).DataAsMixString(8, "", ":");
@@ -137,30 +145,31 @@ void GmlPrinter::AppendParentNode (string_view       shapeName,
 //---------------------------------------------------------------------------
 
 
-
 //! Appends a node to the GML graph
 //!
+//! @param nodeIdentifier   Unique identifier for graph node
+//! @param nodeNam          Node name (first text line of graph node)
 //! @param shapeName        The shape to use
 //! @param outlineStyle     Optional line type for shape (default when empty)
 //! @param backgroundColor  Background color
 //! @param notes            Optional node to add below the node name
-//! @param node             Node to process
 //!
-void GmlPrinter::AppendNode (string_view            shapeName,
-                                    string_view            outlineStyle,
-                                    string_view            backgroundColor,
-                                    string_view            notes,
-                                    const SystemModelNode& node)
+void GmlPrinter::AppendNode (uint32_t    nodeIdentifier,
+                             string_view nodeName,
+                             string_view shapeName,
+                             string_view outlineStyle,
+                             string_view backgroundColor,
+                             string_view notes)
 {
-  m_osGraph << "   node [ id " << node.Identifier();
+  m_osGraph << "   node [ id " << nodeIdentifier;
 
-  auto displayName  = !node.Name().empty();
+  auto displayName  = !nodeName.empty();
   auto displayNotes = !notes.empty();
   auto displayLabel = displayName || m_displayIdentifier || displayNotes;
 
   // ---------------- Compute height and width for the graphic
   //
-  size_t labelCharWidth = node.Name().length();
+  size_t labelCharWidth = nodeName.length();
   size_t linesCount     = 1;
 
   if (displayNotes)
@@ -209,12 +218,12 @@ void GmlPrinter::AppendNode (string_view            shapeName,
 
     if (m_displayIdentifier)
     {
-      m_osGraph << "(" << node.Identifier() << ")\n";
+      m_osGraph << "(" << nodeIdentifier << ")\n";
     }
 
     if (displayName)
     {
-      m_osGraph << node.Name();
+      m_osGraph << nodeName;
     }
 
     if (displayNotes)
@@ -232,24 +241,83 @@ void GmlPrinter::AppendNode (string_view            shapeName,
 //---------------------------------------------------------------------------
 
 
-//! Appends an edge between two nodes to the GML graph
+//! Appends a node to the GML graph
 //!
-//! @param parentNode   A parent node
-//! @param childNode    A child of the parent node
+//! @param shapeName        The shape to use
+//! @param outlineStyle     Optional line type for shape (default when empty)
+//! @param backgroundColor  Background color
+//! @param notes            Optional node to add below the node name
+//! @param node             Node to process
 //!
-void GmlPrinter::PrintEdge (const ParentNode&      parentNode,
-                                   const SystemModelNode& childNode,
-                                   uint32_t               childId,
-                                   string_view            style,
-                                   string_view            note)
+void GmlPrinter::AppendNode (string_view            shapeName,
+                             string_view            outlineStyle,
+                             string_view            backgroundColor,
+                             string_view            notes,
+                             const SystemModelNode& node)
+{
+  AppendNode(node.Identifier(), node.Name(), shapeName, outlineStyle, backgroundColor, notes);
+}
+//
+//  End of: GmlPrinter::AppendNode
+//---------------------------------------------------------------------------
+
+
+
+//! Appends path selector associated with a Linker
+//!
+//! @param linker     Linker associated with the PathSelector
+//! @param selector   PathSelector associated with the Linker
+//!
+void GmlPrinter::AppendSelector (const Linker& linker, const PathSelector& selector)
+{
+  if (m_processedSelectors.count(&selector) == 0)
+  {
+    ostringstream os;
+
+    os << "Kind: "            << selector.KindName() << std::endl;
+    os << "Can_select_none: " << std::boolalpha << IsSet(selector.Properties(), SelectorProperty::CanSelectNone) << std::endl;
+    os << "Reversed_order:  " << std::boolalpha << IsSet(selector.Properties(), SelectorProperty::ReverseOrder)  << std::endl;
+    os << "Inverted_bits:   " << std::boolalpha << IsSet(selector.Properties(), SelectorProperty::InvertedBits);
+
+    auto notes    = os.str();
+    auto nodeName = "Selector " + FormattedAssociateRegisterId(linker);
+
+    SET_FOR_SCOPE(m_displayIdentifier, false);
+    AppendNode(m_selectorNodeId, nodeName, m_shape_Selector, "", m_color_Selector, notes);
+
+    m_processedSelectors[&selector] = m_selectorNodeId--;
+  }
+
+  auto selectorNodeId = m_processedSelectors[&selector];
+  PrintEdge(selectorNodeId, linker.Identifier(), 0, "dotted", "selector");
+}
+//
+//  End of: GmlPrinter::AppendSelector
+//---------------------------------------------------------------------------
+
+
+
+//! Appends an edge between two nodes of the GML graph
+//!
+//! @param sourceId   Identifier of source node
+//! @param targetId   Identifier of target node
+//! @param edgeId     When != 0, this will be used as edge label
+//! @param style      Edge style
+//! @param note       Edge optional notes
+//!
+void GmlPrinter::PrintEdge (uint32_t    sourceId,
+                            uint32_t    targetId,
+                            uint32_t    edgeId,
+                            string_view style,
+                            string_view note)
 {
   m_osEdges << "   edge ["
-            << " source "  << parentNode.Identifier()
-            << " target "  << childNode.Identifier();
+            << " source "  << sourceId
+            << " target "  << targetId;
 
-  if (childId != 0)
+  if (edgeId != 0)
   {
-    m_osEdges << " label \"" << childId;
+    m_osEdges << " label \"" << edgeId;
     if (!note.empty())
     {
       m_osEdges << note;
@@ -271,6 +339,29 @@ void GmlPrinter::PrintEdge (const ParentNode&      parentNode,
 //
 //  End of: GmlPrinter::PrintEdge
 //---------------------------------------------------------------------------
+
+
+//! Appends an edge between two nodes to the GML graph
+//!
+//! @param parentNode A parent node
+//! @param childNode  A child of the parent node
+//! @param edgeId     When != 0, this will be used as edge label
+//! @param style      Edge style
+//! @param note       Edge optional notes
+//!
+void GmlPrinter::PrintEdge (const ParentNode&      parentNode,
+                            const SystemModelNode& childNode,
+                            uint32_t               edgeId,
+                            string_view            style,
+                            string_view            note)
+{
+  PrintEdge(parentNode.Identifier(), childNode.Identifier(), edgeId, style, note);
+}
+//
+//  End of: GmlPrinter::PrintEdge
+//---------------------------------------------------------------------------
+
+
 
 
 //! Closes root node
@@ -313,6 +404,29 @@ void GmlPrinter::CreateRoot ()
 //  End of: GmlPrinter::CloseRoot
 //---------------------------------------------------------------------------
 
+
+
+//! Returns formatted reference to Linker PathSelector associated register
+//!
+//! @param linker A Linker
+//!
+//! @return Associated register identifier surrounded with colons
+string GmlPrinter::FormattedAssociateRegisterId (const Linker& linker)
+{
+  auto selector           = linker.Selector();
+  auto associatedRegister = selector->AssociatedRegister();
+  if (!associatedRegister)
+  {
+    return "";
+  }
+
+  ostringstream os;
+  os << ":" << associatedRegister->Identifier() << ":";
+  return os.str();
+}
+//
+//  End of: GmlPrinter::FormattedAssociateRegisterId
+//---------------------------------------------------------------------------
 
 
 //! Returns currently visited nodes representation and edges
@@ -407,14 +521,7 @@ void GmlPrinter::VisitLinker (Linker& linker)
 
   if (!m_showSelectorWithEdge)
   {
-    auto selector           = linker.Selector();
-    auto associatedRegister = selector->AssociatedRegister();
-    if (associatedRegister)
-    {
-      ostringstream os;
-      os << ":" << associatedRegister->Identifier() << ":";
-      notes = os.str();
-    }
+    notes = FormattedAssociateRegisterId(linker);
   }
 
   AppendParentNode(m_shape_Linker, m_color_Linker, notes, linker);
@@ -424,9 +531,9 @@ void GmlPrinter::VisitLinker (Linker& linker)
   auto selector = linker.Selector();
   if (selector)
   {
-    m_linker = &linker;
+    m_linker   = &linker;
     selector->Accept(*this);
-    m_linker = nullptr;
+    m_linker   = nullptr;
   }
 }
 
@@ -442,6 +549,7 @@ void GmlPrinter::VisitRegister (Register& reg)
     {
       PrintEdge(*m_linker, reg, 0, "dashed");
     }
+
     m_linker = nullptr;   // Only first SystemModelNode is connected to the linker
   }
   else

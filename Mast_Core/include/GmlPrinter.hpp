@@ -17,24 +17,30 @@
 
 #include "SystemModelVisitor.hpp"
 #include "SystemModelNode.hpp"
+
+#include <memory>
 #include <string>
+#include <map>
 #include <sstream>
 #include <experimental/string_view>
 
 namespace mast
 {
+class PathSelector;
+class Linker;
 
 //! Options of Gml graph constructions
 //!
 enum class GmlPrinterOptions
 {
-  Default              = 0,
-  DisplayIdentifiers   = 1 << 0, //!< To display node identifier
-  DisplayRegisterValue = 1 << 1, //!< To show Register values
-  DisplayValueAuto     = 1 << 2, //!< To show Register values as binary when small, hexa when large and end of large string as binary when cannot form a plain nibble
-  ShowProtocol         = 1 << 3, //!< To show Linker selector associated register with an edge between the Linker and the Register
-  ShowSelectorWithEdge = 1 << 4, //!< To show Linker selector associated register with an edge between the Linker and the Register
-  ShowSelectionValues  = 1 << 5, //!< To show Selector Register value along edge between linker and derivations
+  Default                = 0,
+  DisplayIdentifiers     = 1 << 0, //!< To display node identifier
+  DisplayRegisterValue   = 1 << 1, //!< To show Register values
+  DisplayValueAuto       = 1 << 2, //!< To show Register values as binary when small, hexa when large and end of large string as binary when cannot form a plain nibble
+  ShowProtocol           = 1 << 3, //!< To show Linker selector associated register with an edge between the Linker and the Register
+  ShowSelectorWithEdge   = 1 << 4, //!< To show Linker selector associated register with an edge between the Linker and the Register
+  ShowSelectorProperties = 1 << 5, //!< To show kind of selector
+  ShowSelectionValues    = 1 << 6, //!< To show Selector Register value along edge between linker and derivations
 
   Std                  = DisplayIdentifiers | DisplayRegisterValue | DisplayValueAuto | ShowSelectionValues,
   All                  = Std | ShowProtocol | ShowSelectionValues,
@@ -53,16 +59,9 @@ class DLL_EXPORT GmlPrinter : public SystemModelVisitor
     : GmlPrinter("", GmlPrinterOptions::Default)
   {}
 
-  GmlPrinter(std::experimental::string_view graphName, bool displayIdentifiers = false, bool displayRegisterValue = false, bool displayValueAuto = false)
-    : m_graphName            (graphName)
-    , m_displayIdentifier    (displayIdentifiers)
-    , m_displayRegisterValue (displayRegisterValue)
-    , m_displayRegValueAuto  (displayValueAuto)
-  {
-    CreateRoot();
-  }
+  using string_view = std::experimental::string_view;
 
-  GmlPrinter(std::experimental::string_view graphName, GmlPrinterOptions options = GmlPrinterOptions::Default);
+  GmlPrinter(string_view graphName, GmlPrinterOptions options = GmlPrinterOptions::Default);
 
   virtual void VisitAccessInterface (AccessInterface& accessInterface) override;
   virtual void VisitChain           (Chain&           chain)           override;
@@ -95,48 +94,77 @@ class DLL_EXPORT GmlPrinter : public SystemModelVisitor
   void CreateRoot();
   void CloseRoot();
 
-  void AppendParentNode (std::experimental::string_view shapeName,
-                         std::experimental::string_view backgroundColor,
-                         std::experimental::string_view notes,
-                         const ParentNode&              parentNode
+  void AppendParentNode (string_view       shapeName,
+                         string_view       backgroundColor,
+                         string_view       notes,
+                         const ParentNode& parentNode
                         );
 
-  void AppendNode       (std::experimental::string_view shapeName,
-                         std::experimental::string_view outlineStyle,
-                         std::experimental::string_view backgroundColor,
-                         std::experimental::string_view notes,
-                         const SystemModelNode&         node
+  void AppendNode       (uint32_t    nodeIdentifier,
+                         string_view nodeName,
+                         string_view shapeName,
+                         string_view outlineStyle,
+                         string_view backgroundColor,
+                         string_view notes);
+
+  void AppendNode       (string_view            shapeName,
+                         string_view            outlineStyle,
+                         string_view            backgroundColor,
+                         string_view            notes,
+                         const SystemModelNode& node
                          );
 
-  void PrintEdge        (const ParentNode& parentNode, const SystemModelNode& childNode, uint32_t childId, std::experimental::string_view style = "", std::experimental::string_view note = "");
+  void AppendSelector (const Linker& linker, const PathSelector& selector);
+
+  void PrintEdge (uint32_t    sourceId,
+                  uint32_t    targetId,
+                  uint32_t    edgeId,
+                  string_view style = "",
+                  string_view note  = "");
+
+  void PrintEdge (const ParentNode&      parentNode,
+                  const SystemModelNode& childNode,
+                  uint32_t               edgeId,
+                  string_view            style = "",
+                  string_view            note  = "");
+
+  std::string FormattedAssociateRegisterId (const Linker& linker);
 
   // ---------------- Private  Fields
   //
   private:
-  std::string        m_graphName;                      //!< Name associated to the all graph
-  uint32_t           m_depth                = 0u;      //!< Current nodes tree depth
-  bool               m_visited              = false;   //!< Becomes true when a tree traversal has been completely done
-  bool               m_displayIdentifier    = false;   //!< When true, node identifiers are displayed along with their name
-  bool               m_displayRegisterValue = false;   //!< When true, register values are displayed (below its name)
-  bool               m_displayRegValueAuto  = false;   //!< When true, register values are displayed as hexadecimal string if large enough and not complete nibble as binary
-  bool               m_showProtocol         = false;   //!< When true, protocol kind is displayed in AccessInterface box
-  bool               m_showSelectorWithEdge = false;   //!< When true an edge is drawn from Linkers and Registers used by the selector
-  bool               m_showSelectionValues  = false;   //!< When true the value to select a Linker derivation is displayed along side of derivation id (label of the edge)
-  const Linker*      m_linker               = nullptr; //!< When not nullptr, we are visiting a path selector (while visiting a linker)
-  std::ostringstream m_osGraph;                        //!< Stream to build up a representation of visited system model nodes
-  std::ostringstream m_osEdges;                        //!< Stream to build up links between nodes
+  using SelectorMapper_t = std::map<const PathSelector*, uint32_t>; //!< To remenber already processed PathSelector (when shared between several muxes)
 
-  static const std::experimental::string_view m_shape_AccessInterface;
-  static const std::experimental::string_view m_shape_Linker;
-  static const std::experimental::string_view m_shape_Chain;
-  static const std::experimental::string_view m_shape_Register;
+  std::string        m_graphName;                          //!< Name associated to the all graph
+  uint32_t           m_depth                  = 0u;        //!< Current nodes tree depth
+  bool               m_visited                = false;     //!< Becomes true when a tree traversal has been completely done
+  bool               m_displayIdentifier      = false;     //!< When true, node identifiers are displayed along with their name
+  bool               m_displayRegisterValue   = false;     //!< When true, register values are displayed (below its name)
+  bool               m_displayRegValueAuto    = false;     //!< When true, register values are displayed as hexadecimal string if large enough and not complete nibble as binary
+  bool               m_showProtocol           = false;     //!< When true, protocol kind is displayed in AccessInterface box
+  bool               m_showSelectorWithEdge   = false;     //!< When true an edge is drawn from Linkers and Registers used by the selector
+  bool               m_showSelectorProperties = false;     //!< When true, selector properties are displayed along with the control register
+  bool               m_showSelectionValues    = false;     //!< When true the value to select a Linker derivation is displayed along side of derivation id (label of the edge)
+  const Linker*      m_linker                 = nullptr;   //!< When not nullptr, we are visiting a path selector (while visiting a linker)
+  std::ostringstream m_osGraph;                            //!< Stream to build up a representation of visited system model nodes
+  std::ostringstream m_osEdges;                            //!< Stream to build up links between nodes
+  uint32_t           m_selectorNodeId         = INT32_MAX; //!< Node identifier when displaying selector properties (UINT32_MAX is not supported by yEd)
+  SelectorMapper_t   m_processedSelectors;                 //!< To "recycle" graph node representing already processed PathSelector
 
-  static const std::experimental::string_view m_color_AccessInterface;
-  static const std::experimental::string_view m_color_Linker;
-  static const std::experimental::string_view m_color_Chain;
-  static const std::experimental::string_view m_color_Register;
 
-  static const std::experimental::string_view m_fontName;
+  static const string_view m_shape_AccessInterface;
+  static const string_view m_shape_Linker;
+  static const string_view m_shape_Chain;
+  static const string_view m_shape_Register;
+  static const string_view m_shape_Selector;
+
+  static const string_view m_color_AccessInterface;
+  static const string_view m_color_Linker;
+  static const string_view m_color_Chain;
+  static const string_view m_color_Register;
+  static const string_view m_color_Selector;
+
+  static const string_view m_fontName;
 };
 //
 //  End of GmlPrinter class declaration

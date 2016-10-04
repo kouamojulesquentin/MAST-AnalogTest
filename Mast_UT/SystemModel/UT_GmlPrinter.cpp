@@ -466,6 +466,87 @@ void UT_GmlPrinter::test_Visit_SelectionValues ()
   TS_ASSERT_EQUALS (got, expected);
 }
 
+
+//! Checks GmlPrinter::Visit_xxx() when requesting selection values for Linker derivations
+//!
+void UT_GmlPrinter::test_Visit_SelectorProperties ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  auto tap = Create_TestCase_Tap_With_Children(sm);
+
+  GmlPrinter sut("",   GmlPrinterOptions::DisplayIdentifiers
+                     | GmlPrinterOptions::ShowSelectionValues
+                     | GmlPrinterOptions::ShowSelectorProperties);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (tap->Accept(sut)); // Will indirectly call Visit for several types of nodes
+
+  // ---------------- Verify
+  //
+  auto got      = sut.Graph();
+  auto expected = string("graph\n"
+                         "[\n"
+                         "   hierarchic 1 directed 1\n"
+                         "   node [ id 0 graphics [ type \"octagon\" fill \"#10FFFF\" w 135 h 43 ] LabelGraphics [ text \"(0)\n"
+                         "1149_1_TAP\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 1 graphics [ type \"rectangle\" fill \"#59FF20\" w 57 h 35 ] LabelGraphics [ text \"(1)\n"
+                         "TAP_IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" outlineStyle \"dashed\" w 135 h 44 ] LabelGraphics [ text \"(2)\n"
+                         "TAP_DR_Mux\n"
+                         ":1:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 2147483647 graphics [ type \"rectangle\" fill \"#E8E8E8\" w 209 h 90 ] LabelGraphics [ text \"Selector :1:\n"
+                         "Kind: Table_Based\n"
+                         "Can_select_none: false\n"
+                         "Reversed_order:  false\n"
+                         "Inverted_bits:   false\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(3)\n"
+                         "TAP_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 4 graphics [ type \"ellipse\" fill \"#FFCC20\" w 106 h 43 ] LabelGraphics [ text \"(4)\n"
+                         "Chain_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 7 graphics [ type \"ellipse\" fill \"#FFCC20\" w 106 h 43 ] LabelGraphics [ text \"(7)\n"
+                         "Chain_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 12 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(12)\n"
+                         "Reg_b_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 13 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(13)\n"
+                         "Reg_b_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 14 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(14)\n"
+                         "Reg_b_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 8 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(8)\n"
+                         "Reg_a_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 9 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(9)\n"
+                         "Reg_a_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 10 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(10)\n"
+                         "Reg_a_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 11 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(11)\n"
+                         "Reg_a_3\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(5)\n"
+                         "Reg_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   node [ id 6 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(6)\n"
+                         "Reg_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+                         "   edge [ source 0 target 1 label \"1\" ]\n"
+                         "   edge [ source 2147483647 target 2 graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+                         "   edge [ source 2 target 3 label \"1/[0b111111:S:A]\" ]\n"
+                         "   edge [ source 7 target 12 label \"1\" ]\n"
+                         "   edge [ source 7 target 13 label \"2\" ]\n"
+                         "   edge [ source 7 target 14 label \"3\" ]\n"
+                         "   edge [ source 4 target 7 label \"1\" ]\n"
+                         "   edge [ source 4 target 8 label \"2\" ]\n"
+                         "   edge [ source 4 target 9 label \"3\" ]\n"
+                         "   edge [ source 4 target 10 label \"4\" ]\n"
+                         "   edge [ source 4 target 11 label \"5\" ]\n"
+                         "   edge [ source 2 target 4 label \"2/[0b000001]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+                         "   edge [ source 2 target 5 label \"3/[0b000010]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+                         "   edge [ source 2 target 6 label \"4/[0b000011]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+                         "   edge [ source 0 target 2 label \"2\" ]\n"
+                         "]"
+                        );
+  TS_ASSERT_EQUALS (got, expected);
+}
+
+
 //! Checks GmlPrinter::Visit_xxx() when DisplayIdentifier is true
 //!
 void UT_GmlPrinter::test_Visit_With_DisplayIdentifier_true ()

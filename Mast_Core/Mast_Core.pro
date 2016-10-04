@@ -46,6 +46,7 @@ SOURCES +=  \
     src/NamesChecker.cpp                            \
     src/NodePathResolver.cpp                        \
     src/OpenOCDProtocol.cpp                         \
+    src/PathSelector.cpp                            \
     src/ParentNode.cpp                              \
     src/PrettyPrinter.cpp                           \
     src/PropagatePendingVisitor.cpp                 \

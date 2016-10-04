@@ -20,18 +20,50 @@
 #include <sstream>
 
 using std::ostringstream;
+using std::string;
+using std::experimental::string_view;
 using std::shared_ptr;
 
 using namespace mast;
 
-  std::experimental::string_view DefaultTableBasedPathSelector::DebugSelectorInfo() const 
-  
-  { 
-    auto message=std::string("Selection Table: ");
-    for (auto iter : m_selectTable);
-      
-  return message;
-  } //!< Returns debug information about selector
+//! Returns readable information about selector (ex: select and deselect tables)
+//!
+//! @param onlyProperties When true, only properties are return, otherwise content
+//!                       of select/deselect tables are return as well
+//!
+string DefaultTableBasedPathSelector::DebugSelectorInfo (bool onlyProperties) const
+{
+  auto debugInfo = PathSelector::DebugSelectorInfo(onlyProperties);
+
+  ostringstream os;
+
+  if (!onlyProperties)
+  {
+    auto streamTable = [](string_view title, auto& os, auto& table)
+    {
+      os << std::endl << std::endl;
+      os << title;
+
+      uint32_t pathID = 0;
+      for (const auto& bv : table)
+      {
+        os << std::endl;
+        os << "[" << pathID++ << "] " << bv.DataAsMixString();
+      }
+    };
+
+    streamTable("Selection Table:",   os, m_selectTable);
+    streamTable("Deselection Table:", os, m_deselectTable);
+
+    debugInfo.append(os.str());
+  }
+
+  return debugInfo;
+}
+//
+//  End of: DefaultTableBasedPathSelector::DebugSelectorInfo
+//---------------------------------------------------------------------------
+
 
 
 //! Initializes selector for fast selection/deselection of a path

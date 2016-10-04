@@ -45,7 +45,7 @@ class BinaryVector;
 
 //! Extension point interface used by Linker to manage paths selection
 //!
-//! @note It is actual an abstract base class that provide SelectorProperty getter
+//! @note It is actually an abstract base class that provide SelectorProperty getter
 //!
 class PathSelector
 {
@@ -105,7 +105,7 @@ class PathSelector
 
   //! Returns readable information about selector (ex: select and deselect tables)
   //!
-  virtual std::experimental::string_view DebugSelectorInfo() const = 0;
+  virtual std::string DebugSelectorInfo(bool onlyProperties) const = 0;
 
   //! Returns selector main properties
   //!

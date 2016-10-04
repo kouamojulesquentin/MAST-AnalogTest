@@ -20,6 +20,7 @@
 
 #include <vector>
 #include <memory>
+#include <experimental/string_view>
 
 namespace mast
 {
@@ -73,10 +74,13 @@ class DLL_EXPORT DefaultTableBasedPathSelector : public PathSelector
   static TablesType& InvertTable (TablesType& table);  //!< Inverts table bits
   static TablesType& FixTable    (TablesType& table);  //!< Makes table entry fix (cannot modify size)
 
-  virtual std::experimental::string_view KindName() const override { return "Table_Based"; }; //!< Returns readable type of selector
+  //! Returns readable type of selector
+  //!
+  virtual std::experimental::string_view KindName() const override { return "Table_Based"; };
 
-  virtual std::experimental::string_view DebugSelectorInfo() const override ;
-  //!< Returns debug information about selector
+  //! Returns debug information about selector
+  //!
+  virtual std::string DebugSelectorInfo(bool onlyProperties) const override;
 
   // ---------------- Protected Methods
   //

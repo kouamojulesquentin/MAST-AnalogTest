@@ -1,0 +1,69 @@
+-----------------------------------------------------------------------
+The idea behind the ML505 MAST prototype is to demonstrate the capability of MAST to deal with:
+- multi-thread test algorithms,
+- on-the-shelf algorithms with very small modifications,
+- and multiple protocols.
+
+This prototype provides two applications on a Virtex-5 FPGA, using only a JTAG TAP and a SPI unit.
+The first application is a JTAG controlled VU-meter, using the on-board ADC and LCD, for audio acquisition and display.
+The FFT is performed thanks to the KissFFT algorithm (https://sourceforge.net/projects/kissfft/), executed by MAST.
+
+|-----------|															|
+|						|-------|JTAG adapter|----------[JTAG TAP]------[Data register 1]----------[LCD DISPLAY IP]
+|		MAST		|															|							|---[Data register 2]----------[ADC ACQUISITION IP]
+|-----------|															|
+
+Host computer																								Xilinx ML505 board
+
+The second application is a simple data register accessible through the SPI interface, which content is directly handled by MAST.
+The data register is directly connected to the GPIO LEDs to show how MAST manages SPI.
+
+-------------------------------
+1) Pre-requirements:
+The following tools are needed if you wish to synthetise the project by yourself:
+- Xilinx ISE 14.6 minimum
+- Xilinx Impact if you wish to use an USB programmer unit
+- XDK if you wish to flash the board through the CompactFlash unit.
+
+------------
+
+2) Connecting the adapters and the audio source:
+
+The ML505 MAST prototype uses the J6 pin array as pinout to connect JTAG and SPI interfaces.
+
+JTAG pinout:
+ _________
+|J6 | JTAG|
+-----------
+|28 | TCLK|
+|30 | TDI |
+|32 | TDO |
+|34 | TMS |
+|36 | TRST|
+-----------
+
+SPI pinout:
+ _________
+|J6 | SPI |
+-----------
+|58 | SCK |
+|60 | MOSI|
+|62 | MISO|
+|64 | SS_N|
+-----------
+
+------------
+
+3) Launching the project:
+- In the prototype/ML505/ISE directory, launch the ml505_lcd.xise file with ise (with Linux 'ise ml505_lcd.xise &')
+- In the 'Hierarchy' window (upper-left area of the window), ensure the 'jtag_lcd_top' design is selected.
+- In the 'Processes' window, click twice on 'Synthetize', then on 'Implement Design', and then on 'Generate Programming File' (few minutes may be required between two actions).
+
+- If you wish to use the USB Programmer Unit, please refer to the Xilinx Impact Documentation. You will find the "jtag_lcd_top.bit" bitfile into the prototype/ML505/ISE directory.
+
+- If you wish to prepare an ACE file to put on the Compact Flash, please follow the next directions:
+- 1/ change your current path to the prototype/ML505/ISE directory.
+- 2/ execute "xmd -tcl ./genace.tcl -jprog -hw jtag_lcd_top.bit -board ml505 -ace <name_of_the_output_file>.ace"
+- 3/ connect the provided CompactFlash card to the computer, and replace on of the existing .ace file in one of subdirectories of ML505/
+- 4/ set back the CompactFlash into its dedicated slot. Switch on the ML505 and select the program you replaced the ace file.
+

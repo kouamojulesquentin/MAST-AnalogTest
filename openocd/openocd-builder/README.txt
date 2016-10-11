@@ -41,6 +41,17 @@ A: If you have already built OpenOCD for MAST, please check the build/OpenOCD-pr
 
 --
 
+Q: The connection with my adapter/JTAG TAP/SPI slave does not work. How to check if the problem comes from the adapter?
+
+A: You can run directly openocd by executing the build/openocd_build/openocd/build/bin/openocd binary with the following options
+-f <adapter_configuration_file> -f <sut_description_file_for_openocd> -c "init; <list of commands>"
+
+The SUT description file for OpenOCD can be design according to the guidelines given on http://openocd.org/doc/html/Config-File-Guidelines.html .
+
+In boundary scan mode, commands can be found on http://openocd.org/doc/html/Boundary-Scan-Commands.html . You can add commands as many as you want, at the moment they are separated by a semicolon (';').
+
+--
+
 Q: Why there is an external CMake script doing exactly the same job than the standard OpenOCD installation commands?
    Why I should not just install OpenOCD on my computer?
 

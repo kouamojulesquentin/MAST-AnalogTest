@@ -48,7 +48,7 @@ A: You can run directly openocd by executing the build/openocd_build/openocd/bui
 
 The SUT description file for OpenOCD can be design according to the guidelines given on http://openocd.org/doc/html/Config-File-Guidelines.html .
 
-In boundary scan mode, commands can be found on http://openocd.org/doc/html/Boundary-Scan-Commands.html . You can add commands as many as you want, at the moment they are separated by a semicolon (';').
+In boundary scan mode, commands can be found on http://openocd.org/doc/html/Boundary-Scan-Commands.html . You can add as many commands as you want, at the moment they are separated by a semicolon (';').
 
 --
 

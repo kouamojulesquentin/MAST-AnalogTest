@@ -9,11 +9,14 @@ The first application is a JTAG controlled VU-meter, using the on-board ADC and 
 The FFT is performed thanks to the KissFFT algorithm (https://sourceforge.net/projects/kissfft/), executed by MAST.
 
 |-----------|															|
-|						|-------|JTAG adapter|----------[JTAG TAP]------[Data register 1]----------[LCD DISPLAY IP]
-|		MAST		|															|							|---[Data register 2]----------[ADC ACQUISITION IP]
+|						|-------|JTAG adapter|----------[JTAG TAP]------[Data register 1]--(write)--[LCD DISPLAY IP]
+|		MAST		|															|							|---[Data register 2]--(read)---[ADC ACQUISITION IP]
 |-----------|															|
-
-Host computer																								Xilinx ML505 board
+			|																		|
+			|																		|
+	(KissFFT)																|
+																					|
+Host computer															|									Xilinx ML505 board
 
 The second application is a simple data register accessible through the SPI interface, which content is directly handled by MAST.
 The data register is directly connected to the GPIO LEDs to show how MAST manages SPI.
@@ -29,12 +32,14 @@ The following tools are needed if you wish to synthetise the project by yourself
 
 2) Connecting the adapters and the audio source:
 
-The ML505 MAST prototype uses the J6 pin array as pinout to connect JTAG and SPI interfaces.
+The ML505 MAST prototype uses the J6 pin array as pinout to connect the JTAG and SPI interfaces.
+
+Adapters must be connected according to the pinouts given in the tables below. VOLTAGES MUST NOT EXCEED 3.3V and ground pins must be connected to the left part of the GND-identified pin array.
 
 JTAG pinout:
  _________
 |J6 | JTAG|
------------
+|---------|
 |28 | TCLK|
 |30 | TDI |
 |32 | TDO |
@@ -45,7 +50,7 @@ JTAG pinout:
 SPI pinout:
  _________
 |J6 | SPI |
------------
+|---------|
 |58 | SCK |
 |60 | MOSI|
 |62 | MISO|
@@ -64,6 +69,8 @@ SPI pinout:
 - If you wish to prepare an ACE file to put on the Compact Flash, please follow the next directions:
 - 1/ change your current path to the prototype/ML505/ISE directory.
 - 2/ execute "xmd -tcl ./genace.tcl -jprog -hw jtag_lcd_top.bit -board ml505 -ace <name_of_the_output_file>.ace"
-- 3/ connect the provided CompactFlash card to the computer, and replace on of the existing .ace file in one of subdirectories of ML505/
-- 4/ set back the CompactFlash into its dedicated slot. Switch on the ML505 and select the program you replaced the ace file.
+- 3/ connect the provided CompactFlash card to the computer. In the ML50X directory of the CompactFlash, replace one of the existing .ace file in one of subdirectories with the one just generated.
+- 4/ set back the CompactFlash into its dedicated slot abord the ML505. Switch on the ML505 and select the program you replaced the ace file.
+
+- Setup is complete when the embedded LCD display shows "MAST ML505 demo - A JTAG VU-meter".
 

@@ -1,0 +1,6 @@
+JTAG_TAP TAP Loopback 11 2
+  PDL kissfft
+  {
+    REGISTER reg_lcd 16 Bypass: "0b0010:0001:0110:1100"
+		REGISTER reg_adc 16 Bypass: "0b0010:0001:0110:1100"
+  }

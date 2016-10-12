@@ -15,6 +15,9 @@ include_directories(../Logger/)
 include_directories(../Logger/g3log/)
 include_directories(../SIT_reader/)
 
+include_directories(kissfft/)
+include_directories(kissfft/tools)
+
 
 if (WIN32)
   include_directories($ENV{FLEX_DIR})
@@ -27,10 +30,25 @@ set_target_properties	(MastExample_CPP PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
 add_executable 		(Tutorial main.cpp Tutorial.cpp)
 set_target_properties	(Tutorial PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+
+add_library(kiss_fft SHARED
+  # main FFT implementation
+  kissfft/kiss_fft.c
+  # from the tools/ directory
+  kissfft/tools/kfc.c 
+  kissfft/tools/kiss_fftnd.c 
+  kissfft/tools/kiss_fftndr.c 
+  kissfft/tools/kiss_fftr.c
+  )
+
+add_executable 				(ML505 main.cpp ml505_demo.cpp)
+set_target_properties	(ML505 PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 if (WIN32)
 	target_link_libraries(MastExample_CPP Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
 	target_link_libraries(Tutorial Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
+	target_link_libraries(ML505 Mast Mast_Core Logger SIT_Reader_Lib DbgHelp kiss_fft)
 else ()
 	target_link_libraries(MastExample_CPP Mast Mast_Core Logger SIT_Reader_Lib pthread dl)
 	target_link_libraries(Tutorial Mast Mast_Core Logger SIT_Reader_Lib pthread dl)
+	target_link_libraries(ML505 Mast Mast_Core Logger SIT_Reader_Lib pthread dl kiss_fft)
 endif ()

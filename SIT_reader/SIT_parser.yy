@@ -136,12 +136,14 @@ inline std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(std::string desig
 {
   char *path_tmp;
   std::string path;
+   string_view configfile_view;
+   string_view designName_view;
    
    path_tmp = std::getenv("MAST_CONFIGURATION_PATH");
 
    if (path_tmp == NULL)
     {
-     std::cout << "MAST_CONFIGURATION_PATH environment variable not found, using ./" << OPENOCD_DEFAULT_PATH << "./ instead \n";
+     std::cout << "MAST_CONFIGURATION_PATH environment variable not found, using ./" << OPENOCD_DEFAULT_PATH << " instead \n";
     path = std::string("./");
     path.append(OPENOCD_DEFAULT_PATH);
     }
@@ -157,7 +159,9 @@ inline std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(std::string desig
     if (!f.good())
      return nullptr;
    std::cerr << "Creating OpenOCD protocol, designName :" <<  designName <<"path "<< path << "\n";
-   return make_shared<OpenOCDProtocol> (path, designName, IR_size);
+   configfile_view = path;
+   designName_view =designName ;
+   return make_shared<OpenOCDProtocol> (configfile_view, designName_view, IR_size);
 }
 
 } /*end of %code section*/

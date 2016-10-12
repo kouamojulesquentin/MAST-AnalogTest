@@ -71,7 +71,7 @@ namespace
 		std::cout << "We suppose ADC has transmitted the following 16-bit word: " << (int) adcSampledValues << std::endl;
     while (i++<loopCount)
     {
-			//iGetRefresh(adcRegisterPath, adcSampledValues);
+			iGetRefresh(adcRegisterPath, adcSampledValues);
 
 			adcRightChannelValue =  static_cast<kiss_fft_scalar>(adcSampledValues&0x00FF);
 
@@ -88,14 +88,14 @@ namespace
 			kiss_fftr(kissCfg, adcLeftChannelSamples, fftOutputLeftChannel);
 			kiss_fftr(kissCfg, adcRightChannelSamples, fftOutputRightChannel);
 			
-			lcdCalculatedAmplitudes = static_cast<uint16_t>(fftOutputLeftChannel[0].r);
+			lcdCalculatedAmplitudes = static_cast<uint16_t>(fftOutputLeftChannel[0].r/255);
 			lcdCalculatedAmplitudes<<=8;
-			lcdCalculatedAmplitudes += static_cast<uint16_t>(fftOutputRightChannel[0].r);
+			lcdCalculatedAmplitudes += static_cast<uint16_t>(fftOutputRightChannel[0].r/255);
 			
       iWrite(lcdRegisterPath, lcdCalculatedAmplitudes);
  //     iGet(registerPath,curValue);
      std::cout << "\n Cycle "<< i << ": Sampled " << (int)adcLeftChannelSamples[254] << ":" << (int)adcRightChannelSamples[254];
-     std::cout << "\n       "<< i << ": Estimated amplitude " << (int)fftOutputLeftChannel[0].r << ":" << (int)fftOutputRightChannel[0].r << std::endl;
+     std::cout << "\n       "<< i << ": Estimated amplitude " << (int)fftOutputLeftChannel[0].r/255 << ":" << (int)fftOutputRightChannel[0].r/255 << std::endl;
       iApply();
 
       ++initialValue;

@@ -1,4 +1,4 @@
-JTAG_TAP TAP Loopback 11 2
+JTAG_TAP TAP openOCD ml505 11 2
   PDL kissfft
   {
     REGISTER reg_lcd 16 Bypass: "0b0010:0001:0110:1100"

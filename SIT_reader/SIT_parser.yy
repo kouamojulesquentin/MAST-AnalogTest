@@ -77,6 +77,8 @@ extern SIT::SIT_Parser::location_type *my_location;
 #else
  #define DIR_SEPARATOR '/'
 #endif
+
+#define OPENOCD_DEFAULT_PATH "openocd"
  
 std::vector<std::string> AI_protocol_table  =
   {"JTAG_Loopback","JTAG_SVF_Simulation","JTAG_SVF_Emulation",
@@ -132,7 +134,21 @@ inline std::uint32_t extract_number(std::string s)
 
 inline std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(std::string designName,std::uint32_t IR_size)
 {
-   auto path = std::string(std::getenv("MAST_CONFIGURATION_PATH"));
+  char *path_tmp;
+  std::string path;
+   
+   path_tmp = std::getenv("MAST_CONFIGURATION_PATH");
+
+   if (path_tmp == NULL)
+    {
+     std::cout << "MAST_CONFIGURATION_PATH environment variable not found, using ./" << OPENOCD_DEFAULT_PATH << "./ instead \n";
+    path = std::string("./");
+    path.append(OPENOCD_DEFAULT_PATH);
+    }
+    else
+     path = std::string(path_tmp);
+    
+    
    if (path.back()!=DIR_SEPARATOR)
 	   path.push_back(DIR_SEPARATOR);
     path.append(OPENOCD_DEFAULT_CONFIG);
@@ -140,6 +156,7 @@ inline std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(std::string desig
     f.open(path);
     if (!f.good())
      return nullptr;
+   std::cerr << "Creating OpenOCD protocol, designName :" <<  designName <<"path "<< path << "\n";
    return make_shared<OpenOCDProtocol> (path, designName, IR_size);
 }
 
@@ -569,7 +586,7 @@ t_LeftBracket AI_Coding_list t_RightBracket  {$$=$2;}
  ;
 
 AI_identifier:
- t_QUOTED_STRING
+ t_WORD
     {
        $$ = $1;
     }

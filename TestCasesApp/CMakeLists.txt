@@ -16,6 +16,9 @@ include_directories(../Logger/)
 include_directories(../Logger/g3log/)
 include_directories(../SIT_reader/)
 
+include_directories(kissfft/)
+include_directories(kissfft/tools)
+
 if (${USE_OPEN_OCD})
   set (P_CFLAGS "${P_CFLAGS} -DUSE_OPEN_OCD")
 
@@ -74,6 +77,9 @@ endif()
 
 if (WIN32)
   include_directories($ENV{FLEX_DIR})
+
+# KissFFT on Windows, make sure that the symbols get exported - https://github.com/extemporelang/kiss_fft/blob/master/CMakeLists.txt
+	target_sources(kiss_fft PRIVATE kiss_fft.def)
 endif()
 
 file(GLOB APP_SOURCES "*")
@@ -83,10 +89,10 @@ add_executable 				(TestCasesApp ${APP_SOURCES})
 set_target_properties	(TestCasesApp PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
 if (WIN32)
-	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
+	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib DbgHelp kiss_fft)
 elseif( NOT ${USE_OPEN_OCD})
 	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib pthread dl)
 else ()
     # $LIBUSB_CFLAGS, ldl and libjim.a args are required by OpenOCD.
-	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib pthread ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/lib/libopenocd.so dl)
+	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib pthread ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/lib/libopenocd.so dl kiss_fft)
 endif ()

@@ -33,6 +33,7 @@
 //+#include "SIT_reader.hpp"
 #include "Options.hpp"
 #include "Zybo.hpp"
+#include "ml505_demo.hpp"
 
 #include <stdexcept>
 #include <vector>
@@ -196,6 +197,10 @@ vector<AppFunctionAndNodePath> CreateTestcase (shared_ptr<AccessInterfaceProtoco
       {
         associations = test::Zybo_CreateApplicationsDescriptor();
       }
+			else if(name == "ml505")
+			{
+				associations = test::ml505_CreateApplicationsDescriptor();
+			}
       else
       {
         auto topPath   = "W_1500.SWIR.WIR";

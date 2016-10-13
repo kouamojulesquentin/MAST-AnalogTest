@@ -54,6 +54,8 @@ SPI_Protocol::SPI_Protocol (vector<uint32_t> chipSelectCommands,
                std::move(writeCommands),
                commandsPrefix)
 {
+
+	// Here we initialize libftdi-related structures (used later by libftdispi)
   m_ftdi_ctx = static_cast<ftdi_context*>(malloc(sizeof(*m_ftdi_ctx)));
   if (ftdi_init(m_ftdi_ctx) < 0) {
 	fprintf(stderr, "ftdi_init failed\n");
@@ -66,8 +68,9 @@ SPI_Protocol::SPI_Protocol (vector<uint32_t> chipSelectCommands,
 		exit(-1);
 	}
 
+	// Now we initialize libftdispi configuration structures
   m_ftdispi_ctx = static_cast<ftdispi_context*>(malloc(sizeof(*m_ftdispi_ctx)));
-	ftdispi_open(m_ftdispi_ctx, m_ftdi_ctx, INTERFACE_A);
+	ftdispi_open(m_ftdispi_ctx, m_ftdi_ctx, INTERFACE_A);		// We use previously generated libftdi config structure, and say we want to use it on INTERFACE_A.
 	ftdispi_setmode(m_ftdispi_ctx, 1, 0, 0, 0, 0, 0); // CPOL and CPHA are both set to zero.
 	ftdispi_setclock(m_ftdispi_ctx, 200000);					 // Here we request a 200kHz bus speed
 	ftdispi_setloopback(m_ftdispi_ctx, 0);
@@ -122,6 +125,7 @@ BinaryVector SPI_Protocol::DoAction (uint32_t derivationId, void* /* interfaceDa
 #else
 BinaryVector SPI_Protocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
+	// Getting chip-select, and read and write commands for the given derivationId.
   auto chipSelectCommand = GetChipSelectCommand(derivationId);
   auto readCommand       = GetReadCommand(derivationId);
   auto writeCommand      = GetWriteCommand(derivationId);
@@ -135,15 +139,15 @@ BinaryVector SPI_Protocol::DoAction (uint32_t derivationId, void* /* interfaceDa
   auto toSutDataBuffer		=	toSutData.DataRightAligned();
 	//auto fromSutDataBuffer	= vector<uint8_t>(toSutData.BytesCount());
 
-  spiBufferRead.insert  (spiBufferRead.begin(),  readCommand);
-  spiBufferWrite.insert (spiBufferWrite.begin(), writeCommand);
+  spiBufferRead.insert  (spiBufferRead.begin(),  readCommand);		// Adding the read command at the beginning of the read packet.
+  spiBufferWrite.insert (spiBufferWrite.begin(), writeCommand);		// Adding the write command at the beginning of the read packet.
   spiBufferWrite.insert (spiBufferWrite.end(),   toSutDataBuffer.begin(), toSutDataBuffer.end());
 
-  ftdispi_read(m_ftdispi_ctx, spiBufferRead.data(), spiBufferLength, chipSelectCommand);
+  ftdispi_read(m_ftdispi_ctx, spiBufferRead.data(), spiBufferLength, chipSelectCommand);		// Read request with libftdispi
 	LOG(INFO) << "SPI_WRITE(" << toSutData.DataAsMixString() << ")";
-  ftdispi_write(m_ftdispi_ctx, spiBufferWrite.data(), spiBufferLength, chipSelectCommand);
+  ftdispi_write(m_ftdispi_ctx, spiBufferWrite.data(), spiBufferLength, chipSelectCommand);  // Write request with libftdispi
 
-	vector<uint8_t> fromSutDataBuffer(spiBufferRead.begin()+1, spiBufferRead.end());
+	vector<uint8_t> fromSutDataBuffer(spiBufferRead.begin()+1, spiBufferRead.end());					// Removing the first byte: dummy value due to the SPI command
 
   auto fromSutData = BinaryVector::CreateFromRightAlignedBuffer(std::move(fromSutDataBuffer), bitsCount);
 

@@ -106,7 +106,7 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, string_view design
 
   jtag_tap_init(tap);
 
-  m_supportTrst = jtag_get_reset_config() & RESET_HAS_TRST;
+  m_supportTrst = jtag_get_reset_config() & RESET_HAS_TRST;		// We check if the current JTAG adapter provides a TRST pin.
 
 
   if(m_supportTrst)         // Some adapters and JTAG TAP do not provide a TRST pin.
@@ -207,15 +207,15 @@ BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfac
       break;
     case 1u:
       {
-        vector<uint8_t> v_openocd_ir = toSutData.DataRightAligned();
-        reverse(v_openocd_ir.begin(), v_openocd_ir.end());
+        vector<uint8_t> v_openocd_ir = toSutData.DataRightAligned();			// OpenOCD requires data to be structured with the LSB first, MSB last. Here we have each byte with LSb on the right, MSb on the left.
+        reverse(v_openocd_ir.begin(), v_openocd_ir.end());								// Now we reverse the order, as the LSB is the last one of the vector.
         LOG(INFO) << "OpenOCD_IR(" << toSutData.DataAsMixString() << ")";
-        jtag_add_plain_ir_scan(bitsCount, v_openocd_ir.data(), fromSutDataBuffer.data(), TAP_IDLE);
+        jtag_add_plain_ir_scan(bitsCount, v_openocd_ir.data(), fromSutDataBuffer.data(), TAP_IDLE);		// Adding irscan to the scheduler.
       }
       break;
     case 2u:
       {
-        vector<uint8_t> v_openocd_dr = toSutData.DataRightAligned();
+        vector<uint8_t> v_openocd_dr = toSutData.DataRightAligned();		// See case 1u.
         reverse(v_openocd_dr.begin(), v_openocd_dr.end());
         LOG(INFO) << "OpenOCD_DR(" << toSutData.DataAsMixString() << ")";
         jtag_add_plain_dr_scan(bitsCount, v_openocd_dr.data(), fromSutDataBuffer.data(), TAP_IDLE);
@@ -226,11 +226,11 @@ BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfac
       break;
   }
 
-  auto ir = jtag_execute_queue();
+  auto ir = jtag_execute_queue();				// Executing tasks queued in the scheduler.
 
   CHECK_TRUE(ir == ERROR_OK, "[OpenOCD] jtag_execute_queue has failed.");
 
-  vector<uint8_t> v_openocd_out = fromSutDataBuffer;
+  vector<uint8_t> v_openocd_out = fromSutDataBuffer;				// Inverse of what is done in 1u and 2u derivationId. We set incoming data in the MAST-supported format.
   reverse(v_openocd_out.begin(), v_openocd_out.end());
 
   auto   fromSutData = BinaryVector::CreateFromRightAlignedBuffer(v_openocd_out, bitsCount);

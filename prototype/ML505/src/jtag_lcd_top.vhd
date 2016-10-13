@@ -379,7 +379,7 @@ spi_unit : new_spi_slave
       );
 
 ------------------------------------ LED area
-LED_out <= dc97_left_channel; -- s_spi_reg_val; --s_jtag_update(15 downto 8); --jtag_update_q; 
+LED_out <= s_spi_reg_val;
 --LED_out(3) <= '0';
 
 

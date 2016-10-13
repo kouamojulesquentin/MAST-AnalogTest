@@ -61,12 +61,13 @@ architecture Structural of LCDDriver4Bit is
 	constant last_LCD_char_2nd_line : integer := last_char_2nd_line - out_of_LCD_chars; 
 
 	type CHAR_RAM_TYPE is array(0 to last_char_2nd_line) of std_logic_vector(7 downto 0);
-	signal charRAM				: CHAR_RAM_TYPE := (	0=>x"4D", 1=>x"2E", 2=>x"50", 3=>x"6F", 4=>x"72", 5=>x"74",
-									6=>x"6F", 7=>x"6C", 8=>x"61", 9=>x"6E",  
-									20=>x"57",21=>x"69", 22=>x"69", 23=>x"FE",  --Wii
-									24=>x"63", 25=>x"6F", 26=>x"6E",27=>x"74", 28=>x"72", 
-									29=>x"6F",30=>x"6C", 31=>x"6C", 32=>x"65",
-									33=>x"72",--Controller
+	signal charRAM				: CHAR_RAM_TYPE := (	0=>x"4D", 1=>x"41", 2=>x"53", 3=>x"54", 4=>x"FE", 5=>x"4D",
+									6=>x"4C", 7=>x"35", 8=>x"30", 9=>x"35",  
+									10=>x"FE",11=>x"64", 12=>x"65", 13=>x"6d",  --Wii
+									14=>x"6f",
+									20=>x"41", 21=>x"FE",22=>x"4A", 23=>x"54", 24=>x"41", 25=>x"47", 26=>x"FE", 27=>x"56", 28=>x"55",
+									29=>x"2D",30=>x"6D", 31=>x"65", 32=>x"74",
+									33=>x"65", 34=>x"72",--Controller
 --									20=>x"4D", 21=>x"61", 22=>x"79", 23=>x"FE", 24=>x"FE", --MAY
 --									25=>x"32", 26=>x"30", 27=>x"31", 28=>x"31", --2011
 									others=>x"A0");
@@ -126,12 +127,13 @@ CharRAMWrite : process(clk)
 begin
 	if (clk'event and clk='1') then
 	  if (resetn = '0') then
-	    charRAM <=( 0=>x"4D", 1=>x"2E", 2=>x"50", 3=>x"6F", 4=>x"72", 5=>x"74",
-		        6=>x"6F", 7=>x"6C", 8=>x"61", 9=>x"6E",  
-		        20=>x"57",21=>x"69", 22=>x"69", 23=>x"FE",  --Wii
-		        24=>x"63", 25=>x"6F", 26=>x"6E",27=>x"74", 28=>x"72", 
-		        29=>x"6F",30=>x"6C", 31=>x"6C", 32=>x"75",
-			33=>x"72",
+	    charRAM <=( 0=>x"4D", 1=>x"41", 2=>x"53", 3=>x"54", 4=>x"FE", 5=>x"4D",
+									6=>x"4C", 7=>x"35", 8=>x"30", 9=>x"35",  
+									10=>x"FE",11=>x"64", 12=>x"65", 13=>x"6d",  --Wii
+									14=>x"6f",
+									20=>x"41", 21=>x"FE",22=>x"4A", 23=>x"54", 24=>x"41", 25=>x"47", 26=>x"FE", 27=>x"56", 28=>x"55",
+									29=>x"2D",30=>x"6D", 31=>x"65", 32=>x"74",
+									33=>x"65", 34=>x"72",
 			others=>x"A0");
 
 	  elsif (wEn='1') then

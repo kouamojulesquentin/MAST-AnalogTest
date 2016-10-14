@@ -36,7 +36,6 @@ int main (int argc, char* argv [])
 
   try
   {
-  //  auto session     = Session(true);  // True enable logging
     auto session = Session (std::make_shared<SystemModelManagerMonitor>());
     auto sitFilePath = GetSitModelFilePath (argc, argv);
 

@@ -1,0 +1,4 @@
+ACCESS_INTERFACE my_AI SPI_FTDI [ ( "0x0" ,  "0x90" ,"0x80" ), ( "0x1" , "0x2" ,"0x3" )]
+{
+  REGISTER reg_data 8 Bypass: "0b0001:0110:1100"
+}

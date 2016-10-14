@@ -43,12 +43,18 @@ add_library(kiss_fft SHARED
 
 add_executable 				(ML505 main.cpp ml505_demo.cpp)
 set_target_properties	(ML505 PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+
+add_executable 				(ML505SPI main.cpp ml505_spi.cpp)
+set_target_properties	(ML505SPI PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+
 if (WIN32)
 	target_link_libraries(MastExample_CPP Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
 	target_link_libraries(Tutorial Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
 	target_link_libraries(ML505 Mast Mast_Core Logger SIT_Reader_Lib DbgHelp kiss_fft)
+	target_link_libraries(ML505SPI Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
 else ()
 	target_link_libraries(MastExample_CPP Mast Mast_Core Logger SIT_Reader_Lib pthread dl)
 	target_link_libraries(Tutorial Mast Mast_Core Logger SIT_Reader_Lib pthread dl)
 	target_link_libraries(ML505 Mast Mast_Core Logger SIT_Reader_Lib pthread dl kiss_fft)
+	target_link_libraries(ML505SPI Mast Mast_Core Logger SIT_Reader_Lib pthread dl)
 endif ()

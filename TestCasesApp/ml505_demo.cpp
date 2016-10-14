@@ -26,7 +26,7 @@ using std::string;
 using namespace mast;
 
 
-//! Returns descriptions for applications running with the ML505 board
+//! Returns descriptions for the JTAG VU-meter (DFT) application running with the ML505 board
 //!
 //! @note Adapt this function as necessary
 //!       It must nevertheless be compliant with SystemModel (possibly with 'SIT' file)
@@ -37,9 +37,10 @@ vector<AppFunctionAndNodePath> test::ml505_CreateApplicationsDescriptor ()
     auto     lcdRegisterPath = "reg_lcd";
 		auto     adcRegisterPath = "reg_adc";
     auto     loopCount    = 2048u;
+		auto		 fft_nb_bins	=	255;
     auto     i    = 0u;
     uint16_t initialValue = 1u;
-    uint16_t adcSampledValues = 32u;
+    uint16_t adcSampledValues = 32u;		// 0x20 is a dummy value.
 		uint16_t lcdCalculatedAmplitudes;
 
 		kiss_fftr_cfg kissCfg = nullptr;
@@ -47,24 +48,28 @@ vector<AppFunctionAndNodePath> test::ml505_CreateApplicationsDescriptor ()
 		kiss_fft_scalar adcLeftChannelValue = 1.0f;
 		kiss_fft_scalar adcRightChannelValue = 1.0f;
 
-		kiss_fft_scalar adcLeftChannelSamples[255];
-		kiss_fft_scalar adcRightChannelSamples[255];
+		kiss_fft_scalar adcLeftChannelSamples[fft_nb_bins];
+		kiss_fft_scalar adcRightChannelSamples[fft_nb_bins];
 
-		kiss_fft_cpx fftOutputLeftChannel[255];
-		kiss_fft_cpx fftOutputRightChannel[255];
+		kiss_fft_cpx fftOutputLeftChannel[fft_nb_bins];
+		kiss_fft_cpx fftOutputRightChannel[fft_nb_bins];
+
+		kiss_fft_scalar fftOutputAmplitudesLeft, fftOutputAmplitudesRight;
+
+		kiss_fft_scalar fftOutputMaxAmplitudesLeft, fftOutputMaxAmplitudesRight;
 
 
-		kissCfg = kiss_fftr_alloc(254, 0, 0, 0);
+		kissCfg = kiss_fftr_alloc(fft_nb_bins-1, 0, 0, 0);
 
 		//CHECK_VALUE_NOT_NULL(kissCfg, "[KissFFT] KissFFT configuration returns null.");
 
-		for(int i=0; i< 255; i++) {
-				adcLeftChannelSamples[i] = 0.0f;
-				adcRightChannelSamples[i] = 0.0f;
+		for(int k=0; k < fft_nb_bins; k++) {
+				adcLeftChannelSamples[k] = 0.0f;
+				adcRightChannelSamples[k] = 0.0f;
 			}
 
     std::cout << "Running " << loopCount << " KissFFT on registers " <<lcdRegisterPath << "; " << adcRegisterPath << "\n";
-		std::cout << "We suppose ADC has transmitted the following 16-bit word: " << (int) adcSampledValues << std::endl;
+
     while (i++<loopCount)
     {
 			iGetRefresh(adcRegisterPath, adcSampledValues);
@@ -73,25 +78,59 @@ vector<AppFunctionAndNodePath> test::ml505_CreateApplicationsDescriptor ()
 
 			adcLeftChannelValue =  static_cast<kiss_fft_scalar>((adcSampledValues>>8)&0x00FF);
 
-			for(int i=0; i< 254; i++) {
-				adcLeftChannelSamples[i] = adcLeftChannelSamples[i+1];
-				adcRightChannelSamples[i] = adcRightChannelSamples[i+1];
+			for(int k=0; k< fft_nb_bins-1; k++) {
+				adcLeftChannelSamples[k] = adcLeftChannelSamples[k+1];
+				adcRightChannelSamples[k] = adcRightChannelSamples[k+1];
 			}
 
-			adcLeftChannelSamples[254] = adcLeftChannelValue;
-			adcRightChannelSamples[254] = adcRightChannelValue;
+			adcLeftChannelSamples[fft_nb_bins-1] = adcLeftChannelValue;
+			adcRightChannelSamples[fft_nb_bins-1] = adcRightChannelValue;
 
 			kiss_fftr(kissCfg, adcLeftChannelSamples, fftOutputLeftChannel);
 			kiss_fftr(kissCfg, adcRightChannelSamples, fftOutputRightChannel);
+
+			fftOutputMaxAmplitudesLeft = 0.0f;
+			fftOutputMaxAmplitudesRight = 0.0f;
+
+			for(int k=0; k<(fft_nb_bins/2); k++) { // Frequency domain runs from 0 to NB_BINS/2 because we use only real components.
+
+				// Estimating the amplitude of each bin
+				fftOutputAmplitudesLeft
+						= static_cast<kiss_fft_scalar>(
+											sqrt((fftOutputLeftChannel[k].r/fft_nb_bins*fftOutputLeftChannel[k].r/fft_nb_bins)
+											+(fftOutputLeftChannel[k].i/fft_nb_bins*fftOutputLeftChannel[k].i/fft_nb_bins))
+											);
+
+				// The VU-meter only displays the bin which amplitude is maximum at this time step
+				if(fftOutputAmplitudesLeft > fftOutputMaxAmplitudesLeft)
+					fftOutputMaxAmplitudesLeft = fftOutputAmplitudesLeft;
+
+				// Repeating above operations for the right audio channel.
+				fftOutputAmplitudesRight
+						= static_cast<kiss_fft_scalar>(
+											sqrt((fftOutputRightChannel[k].r/fft_nb_bins*fftOutputRightChannel[k].r/fft_nb_bins)
+											+(fftOutputRightChannel[k].i/fft_nb_bins*fftOutputRightChannel[k].i/fft_nb_bins))
+											);
+
+				if(fftOutputAmplitudesRight > fftOutputMaxAmplitudesRight)
+					fftOutputMaxAmplitudesRight = fftOutputAmplitudesRight;
+			}
+
 			
-			lcdCalculatedAmplitudes = static_cast<uint16_t>(fftOutputLeftChannel[0].r/255);
+			// 16-bit output word for both audio channels:
+			// MSB contains the left channel amplitude, LSB the right one.
+			lcdCalculatedAmplitudes = static_cast<uint16_t>(fftOutputMaxAmplitudesLeft);
 			lcdCalculatedAmplitudes<<=8;
-			lcdCalculatedAmplitudes += static_cast<uint16_t>(fftOutputRightChannel[0].r/255);
+			lcdCalculatedAmplitudes += static_cast<uint16_t>(fftOutputMaxAmplitudesRight);
 			
       iWrite(lcdRegisterPath, lcdCalculatedAmplitudes);
- //     iGet(registerPath,curValue);
-     std::cout << "\n Cycle "<< i << ": Sampled " << (int)adcLeftChannelSamples[254] << ":" << (int)adcRightChannelSamples[254];
-     std::cout << "\n       "<< i << ": Estimated amplitude " << (int)fftOutputLeftChannel[0].r/255 << ":" << (int)fftOutputRightChannel[0].r/255 << std::endl;
+
+     std::cout << "\n Cycle "<< i << ": Sampled " << (int)adcLeftChannelSamples[fft_nb_bins-1]
+						<< ":" << (int)adcRightChannelSamples[fft_nb_bins-1];
+
+     std::cout << "\n       "<< i << ": Estimated amplitude " << (int)fftOutputMaxAmplitudesLeft
+						<< ":" << (int)fftOutputMaxAmplitudesRight << std::endl;
+
       iApply();
 
       ++initialValue;

@@ -33,6 +33,7 @@
 #include "SPI_Protocol.hpp"
 #include "AppFunctionNameAndNode.hpp"
 #include "OpenOCDProtocol.hpp"
+#include "Utility.hpp"
 
 #include <experimental/string_view>
 
@@ -155,9 +156,7 @@ inline std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(std::string desig
 	   path.push_back(DIR_SEPARATOR);
     path.append(OPENOCD_DEFAULT_CONFIG);
     std::fstream f;
-    f.open(path);
-    if (!f.good())
-     return nullptr;
+    CHECK_FILE_EXISTS(path);
    std::cerr << "Creating OpenOCD protocol, designName :" <<  designName <<"path "<< path << "\n";
    configfile_view = path;
    designName_view =designName ;

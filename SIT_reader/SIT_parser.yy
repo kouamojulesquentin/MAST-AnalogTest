@@ -155,12 +155,14 @@ inline std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(std::string desig
    if (path.back()!=DIR_SEPARATOR)
 	   path.push_back(DIR_SEPARATOR);
     path.append(OPENOCD_DEFAULT_CONFIG);
-    std::fstream f;
+
     CHECK_FILE_EXISTS(path);
    std::cerr << "Creating OpenOCD protocol, designName :" <<  designName <<"path "<< path << "\n";
    configfile_view = path;
    designName_view =designName ;
-   return make_shared<OpenOCDProtocol> (configfile_view, designName_view, IR_size);
+   
+   auto protocol = make_shared<OpenOCDProtocol> (configfile_view, designName_view, IR_size);
+   return protocol;
 }
 
 } /*end of %code section*/

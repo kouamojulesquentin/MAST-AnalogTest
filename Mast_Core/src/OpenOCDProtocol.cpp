@@ -85,7 +85,8 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, string_view design
   ret = ioutil_init(this->m_cmd_ctx);
   CHECK_TRUE(ret == ERROR_OK, "[OpenOCD] ioutil_init has failed.");
 
-  adapter_init(this->m_cmd_ctx);
+  ret = adapter_init(this->m_cmd_ctx);
+	CHECK_TRUE(ret == ERROR_OK, "[OpenOCD] adapter_init has failed.");
 
   auto tap = static_cast<jtag_tap*>(calloc(1, sizeof(jtag_tap)));
 

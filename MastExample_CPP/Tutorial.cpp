@@ -30,7 +30,7 @@ std::vector<mast::AppFunctionAndNodePath> GetAlgorithmsAndNodePaths (int argc, c
 
 namespace
 {
-  //! This algorithm increment "reg" 60 times
+  //! This algorithm increment "reg" 
   //!
   void Algo_Increment ()
   {
@@ -91,8 +91,8 @@ vector<AppFunctionAndNodePath> GetAlgorithmsAndNodePaths (int /* argc */, char* 
 {
   vector<AppFunctionAndNodePath> associations
   {
-    {Algo_Increment, "", "Inc"},
-    {Algo_Decrement, "", "Dec"},
+    {Algo_Increment, "", "Incr"},
+    {Algo_Decrement, "", "Decr"},
   };
 
   return associations;

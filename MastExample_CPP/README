@@ -1,0 +1,28 @@
+-------------------------------------------------------------------
+
+ML505 demo board PDL examples:
+
+We currently provide two different binaries, ML505 and ML505SPI, each handling a PDL for one different protocol (respectively JTAG and SPI).
+
+Each binary may be launched for example, with the following command: ./ML505 <path_to_ml505_jtag_sit_file> .
+
+------- Using the JTAG interface with the ML505 demo board:
+
+The ML505 provides a JTAG interface with a 11-bit instruction register, and two 16-bit data register. These latter have respectively the following IR address: 0x01 and 0x02.
+
+Data register 0x01 contains the amplitude on a 0->255 dynamic of each channel (8-bit MSb are left channel, while 8-bit LSb are right channel) that the VU-meter must display.
+
+Data register 0x02 contains the ADC latest sampled value. Data is set on 16-bit in the same way than in data register 0x01.
+
+To execute the dedicated PDLs with the ML505 JTAG slave, please use the following command: ./ML505 <path_to_ml505_jtag_sit_file>/SIT/ml505_demo.sit
+
+------- Using the SPI interface with the ML505 demo board:
+
+The ML505 MAST prototype contains a SPI-slave with an 8-bit data register, connected to the front LEDs of the board.
+
+Each SPI packet is at least 2-bytes long, with the first byte containing a read/write command.
+
+SPI master can read the content of the data register with the 0x90 command. Writing requires the master to send the 0x80 command.
+
+To execute the dedicated PDLs with the SPI protocol, please enter the following command:
+./ML505 <path_to_ml505_jtag_sit_file>/SIT/ml505_spi.sit

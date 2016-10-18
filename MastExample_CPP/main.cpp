@@ -36,13 +36,15 @@ int main (int argc, char* argv [])
 
   try
   {
-    auto session = Session (std::make_shared<SystemModelManagerMonitor>());
+    auto session = Session (false);
     auto sitFilePath = GetSitModelFilePath (argc, argv);
 
     if (sitFilePath.empty())
     {
       throw std::runtime_error("A valid SIT file path must be provided !");
     }
+
+    InitializeMast(sitFilePath);
 
     auto algoAndNames = GetAlgorithmsNames  (argc, argv);
 
@@ -61,7 +63,7 @@ int main (int argc, char* argv [])
       if (!algoAndPath.empty())
       {
         std::cout << "Have " << std::to_string(algoAndPath.size()) << " algorithm(s) associated to node paths" << std::endl;
-        RunMast(sitFilePath, algoAndPath, options);
+       RunMast(algoAndPath, options);
       }
       else
       {

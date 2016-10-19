@@ -44,7 +44,7 @@ int main (int argc, char* argv [])
       throw std::runtime_error("A valid SIT file path must be provided !");
     }
 
-    InitializeMast(sitFilePath);
+//    InitializeMast(sitFilePath);
 
     auto algoAndNames = GetAlgorithmsNames  (argc, argv);
 
@@ -63,7 +63,7 @@ int main (int argc, char* argv [])
       if (!algoAndPath.empty())
       {
         std::cout << "Have " << std::to_string(algoAndPath.size()) << " algorithm(s) associated to node paths" << std::endl;
-       RunMast(algoAndPath, options);
+       RunMast(sitFilePath,algoAndPath, options);
       }
       else
       {

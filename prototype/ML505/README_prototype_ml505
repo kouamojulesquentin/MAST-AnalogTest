@@ -40,23 +40,23 @@ JTAG pinout:
  _________
 |J6 | JTAG|
 |---------|
-|28 | TCLK|
-|30 | TDI |
-|32 | TDO |
-|34 | TMS |
-|36 | TRST|
+|28 | TCLK| --> Adbus0
+|30 | TDI | --> Adbus1
+|32 | TDO | --> Adbus2
+|34 | TMS | --> Adbus3
+|36 | TRST| --> Adbus4
 -----------
 
 SPI pinout:
  _________
 |J6 | SPI |
 |---------|
-|58 | SCK |
-|60 | MOSI|
-|62 | MISO|
-|64 | SS_N|
+|58 | SCK | --> Adbus0
+|60 | MOSI| --> Adbus1
+|62 | MISO| --> Adbus2
+|64 | SS_N| --> Adbus3 -->can be configured with libftdispi on GPI Adbus 4 to 7
 -----------
-
+	
 ------------
 
 3) Launching the project:

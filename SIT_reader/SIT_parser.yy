@@ -691,4 +691,6 @@ SIT::SIT_Parser::error( const location_type &l, const std::string &err_message )
    std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
    std::cerr << err_message << "\n";
    driver.parsed_sut=nullptr;
+  THROW_RUNTIME_ERROR("Parse error");
+ 
 }

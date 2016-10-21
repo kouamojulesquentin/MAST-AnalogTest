@@ -31,6 +31,7 @@
 #include "SVF_EmulationProtocol.hpp"
 #include "I2C_Player.hpp"
 #include "SPI_Protocol.hpp"
+#include "STIL_EmulationProtocol.hpp"
 #include "AppFunctionNameAndNode.hpp"
 #include "OpenOCDProtocol.hpp"
 #include "Utility.hpp"
@@ -83,9 +84,9 @@ extern SIT::SIT_Parser::location_type *my_location;
  
 std::vector<std::string> AI_protocol_table  =
   {"JTAG_Loopback","JTAG_SVF_Simulation","JTAG_SVF_Emulation",
-  "SPI_FTDI"
+  "SPI_FTDI", "STIL_Emulation"
   };
-enum AI_protocol_t {JTAG_Loopback,JTAG_SVF_Simulation,JTAG_SVF_Emulation, SPI_FTDI};
+enum AI_protocol_t {JTAG_Loopback,JTAG_SVF_Simulation,JTAG_SVF_Emulation, SPI_FTDI,STIL_Emulation};
 
 std::vector<std::string> JTAG_AI_protocol_table  =
   {"Loopback","SVF_Simulation","SVF_openOCD","SVF_Emulation"
@@ -162,6 +163,9 @@ inline std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(std::string desig
    designName_view =designName ;
    
    auto protocol = make_shared<OpenOCDProtocol> (configfile_view, designName_view, IR_size);
+   if (protocol->is_initialized()==false)
+    return nullptr;
+   else  
    return protocol;
 }
 
@@ -186,6 +190,7 @@ inline std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(std::string desig
 %type  <std::uint32_t> IR_size
 %type  <std::uint32_t> size
 %type  <std::uint32_t> n_DR_chains
+%type  <std::uint32_t> n_chains
 %type  <std::vector<uint32_t>> AI_Coding_list
 %type  <std::vector<mast::BinaryVector>> IR_Coding_list
 %type  <std::vector<mast::BinaryVector>> IR_TABLE
@@ -407,7 +412,7 @@ t_LINKER  node_name path_selector ctrl_node {
        }
   }
  |
-t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
+t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains {
 
 	int   l;
 	l = find_in_table(AI_protocol_table,$3);
@@ -435,6 +440,11 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
         case JTAG_SVF_Emulation :
          {
 	 protocol = make_shared<SVF_EmulationProtocol> ();
+	 break;
+	 }
+        case STIL_Emulation :
+         {
+	 protocol = make_shared<STIL_EmulationProtocol> ($6);
 	 break;
 	 }
         case AI_protocol_t::SPI_FTDI :
@@ -533,7 +543,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
 	   protocol=make_openOCD_protocol( $4, $5);
 	   if (protocol==nullptr)
 	    {
-	    std::cerr<<"Error while opening OpenOCD configuration file\n";
+	    std::cerr<<"Error while setting up OpenOCD interface\n";
 	    YYERROR;
 	    }
 	  break;
@@ -580,6 +590,15 @@ IR_size :
 n_DR_chains :
  t_DecimalLiteral { $$ = $1;}
 ;
+
+
+n_chains :
+ {$$ = 0;}
+ | 
+ t_DecimalLiteral { $$ = $1;}
+;
+
+
 IR_TABLE:
  t_LeftBracket IR_Coding_list t_RightBracket  {$$=$2;}
  |  {$$ = std::vector<mast::BinaryVector>();}

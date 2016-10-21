@@ -329,7 +329,7 @@ void mast::RunMast (string_view modelFilePath, const vector<AppFunctionAndNodePa
 
 
 //! Creates a system model from configuration file, then runs Mast till applications terminates
-//!
+//! Warning, openOCD may cause a segfault
 void mast::RunMast (string_view modelFilePath, const vector<AppFunctionAndName>& appFunctionsAndNames, RunMastOptions options)
 {
   CHECK_PARAMETER_NOT_EMPTY(modelFilePath, "Cannot run Mast without a valid path for system model (SIT file)");
@@ -338,7 +338,7 @@ void mast::RunMast (string_view modelFilePath, const vector<AppFunctionAndName>&
   auto initializeLogger = IsSet(options, RunMastOptions::LogManagerActivity);
   Session session(initializeLogger);
 
-  auto namesAndNodes     = CPP_API_IMPL::LoadSystemModel(modelFilePath);
+  auto namesAndNodes     = CPP_API_IMPL::LoadSystemModel(modelFilePath); 
   auto functionsAndNodes = CPP_API_IMPL::GetFunctionsAndNodes(appFunctionsAndNames, namesAndNodes);
 
   CPP_API_IMPL::RunMast(functionsAndNodes, options);

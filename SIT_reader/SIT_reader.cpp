@@ -16,6 +16,7 @@ SIT::SIT_Reader::SIT_Reader( std::shared_ptr<mast::SystemModel> sm)
 {
  main_sm = sm;
  parsed_sut = nullptr;
+ builder = make_shared<mast::SystemModelBuilder>(*main_sm);
 }
 
 bool
@@ -48,7 +49,6 @@ SIT::SIT_Reader::parse_helper( std::istream &stream )
 {
    try
    {
-      builder = make_shared<mast::SystemModelBuilder>(*main_sm);
       scanner = make_shared<SIT_Scanner>(&stream);
    }
    catch( std::bad_alloc &ba )

@@ -63,6 +63,7 @@ OpenOCDProtocol::OpenOCDProtocol (string_view /* configFilePath */, string_view 
 #else
 OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, string_view designName, int iIrLength)
 {
+  m_openOCD_initialized = false;
   // setup_command_handler registers all handlers used by all different blocs from OpenOCD,
   // such as callbacks for JTAG, Flash, drivers, and so on.
   m_cmd_ctx = setup_command_handler(nullptr);
@@ -118,6 +119,8 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, string_view design
   ret = jtag_execute_queue();
 
   CHECK_TRUE(ret == ERROR_OK, "[OpenOCD] jtag_execute_queue has failed.");
+  
+  m_openOCD_initialized = true;
 }
 #endif
 //
@@ -128,8 +131,12 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, string_view design
 //!
 OpenOCDProtocol::~OpenOCDProtocol()
 {
+
   #ifdef USE_OPEN_OCD
 
+  if (!m_openOCD_initialized) //There was an error during construction
+    return;
+    
   // Here we put the tap in RESET state
   if(m_supportTrst)
     jtag_add_reset(1, 0);           // Hardware reset is supported, TRST is enabled for one TCK cycle.
@@ -139,7 +146,8 @@ OpenOCDProtocol::~OpenOCDProtocol()
 
   int ret = jtag_execute_queue();
 
-  CHECK_TRUE(ret == ERROR_OK, "[OpenOCD] jtag_execute_queue has failed.");
+  if (ret == ERROR_OK)
+    return;
 
 
   auto tap = jtag_all_taps();
@@ -263,6 +271,11 @@ void OpenOCDProtocol::DoReset(bool doSynchronousReset)
   }
   #endif
 }
+
+bool OpenOCDProtocol::is_initialized()
+ {
+  return m_openOCD_initialized;
+ }
 
 //===========================================================================
 // End of OpenOCDProtocol.cpp

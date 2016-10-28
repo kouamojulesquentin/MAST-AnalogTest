@@ -444,7 +444,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains {
 	 }
         case STIL_Emulation :
          {
-	 protocol = make_shared<STIL_EmulationProtocol> ($6);
+	 protocol = make_shared<STIL_EmulationProtocol> ($6+1); //one derivation for reset
 	 break;
 	 }
         case AI_protocol_t::SPI_FTDI :

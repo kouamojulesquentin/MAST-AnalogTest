@@ -1,0 +1,66 @@
+# Constraint file for the MAST ML505 JTAG and SPI units demonstrator.
+# Rev 1.0 - 06/10/2016 - NG
+
+# Clock signals from oscillators
+NET "clk" LOC = "AH15"   ;
+NET  clk_27mhz       LOC="AG18";  # Bank 4, Vcco=3.3V, No DCI
+	
+# JTAG pinout
+NET "jtagTCK" CLOCK_DEDICATED_ROUTE=FALSE;
+
+NET "jtagTCK" TNM_NET = "jtag_clk_timing";
+TIMESPEC TS_jtag_clk_timing = PERIOD "jtag_clk_timing" 10 kHz;
+OFFSET = IN 25 us VALID 50 us BEFORE "jtagTCK" RISING;
+
+NET  "jtagTCK"        LOC="AD32" ;   # pin J6-28 - Clock capable pin.
+NET  "jtagTDI"        LOC="Y34" ;   # pin J6-30
+NET  "jtagTDO"        LOC="Y32" ;   # pin J6-32
+NET  "jtagTMS"        LOC="W32" ;   # pin J6-34
+NET  "jtagRST"        LOC="AH34" ;   # pin J6-36
+
+
+# SPI slave pinout
+NET "spi_sclk"        LOC="AJ34" ;  # pin J6-58 - Clock capable pin
+NET "spi_mosi"        LOC="AM32" ;  # pin J6-60
+NET "spi_miso"        LOC="AN34" ;  # pin J6-62
+NET "spi_ssn"         LOC="AN33" ;  # pin J6-64
+
+NET "spi_sclk" CLOCK_DEDICATED_ROUTE=FALSE;
+
+# AD1981B ADC-to-FPGA pinout
+NET  ac97_bitclk      LOC="AF18";  # Bank 4, Vcco=3.3V, No DCI    
+NET  ac97_sdata_i     LOC="AE18";  # Bank 4, Vcco=3.3V, No DCI    
+NET  ac97_sdata_o     LOC="AG16";  # Bank 4, Vcco=3.3V, No DCI    
+NET  ac97_sync        LOC="AF19";  # Bank 4, Vcco=3.3V, No DCI
+NET  ac97_reset       LOC="AG17";  # Bank 4, Vcco=3.3V, No DCI
+
+# LCD display pinout				
+NET  "lcdData<0>"     LOC="T9"  ;    # Bank 12, Vcco=3.3V, DCI using 49.9 ohm resistors
+NET  "lcdData<1>"     LOC="G7"  ;    # Bank 12, Vcco=3.3V, DCI using 49.9 ohm resistors
+NET  "lcdData<2>"     LOC="G6"  ;    # Bank 12, Vcco=3.3V, DCI using 49.9 ohm resistors
+NET  "lcdData<3>"     LOC="T11" ;   # Bank 12, Vcco=3.3V, DCI using 49.9 ohm resistors
+NET  "lcdE"           LOC="AC9" ;   # Bank 22, Vcco=3.3V, DCI using 49.9 ohm resistors      
+NET  "lcdRS"          LOC="J17" ;   # Bank 3, Vcco=2.5V, No DCI      
+NET  "lcdRW"          LOC="AC10" ;   # Bank 22, Vcco=3.3V, DCI using 49.9 ohm resistors      
+
+# RESET and General Purposes I/Os (switches...)
+NET  "resetn"               LOC="U25";   # Bank 15, Vcco=1.8V, DCI using 49.9 ohm resistors
+
+NET "resetn" CLOCK_DEDICATED_ROUTE=FALSE;
+
+NET  "switches<1>"    LOC="AG27";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors
+NET  "switches<2>"    LOC="AF25";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors
+NET  "switches<3>"    LOC="AF26";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors
+NET  "switches<4>"    LOC="AE27";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors
+NET  "switches<5>"    LOC="AE26";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors
+NET  "switches<6>"    LOC="AC25";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors
+#NET  "switches<7>"    LOC="AC24";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors
+
+NET  "LED_out<0>"     LOC="H18";   # Bank 3, Vcco=2.5V, No DCI
+NET  "LED_out<1>"     LOC="L18";   # Bank 3, Vcco=2.5V, No DCI
+NET  "LED_out<2>"     LOC="G15";   # Bank 3, Vcco=2.5V, No DCI
+NET  "LED_out<3>"     LOC="AD26";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors
+NET  "LED_out<4>"     LOC="G16";   # Bank 3, Vcco=2.5V, No DCI
+NET  "LED_out<5>"     LOC="AD25";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors
+NET  "LED_out<6>"     LOC="AD24";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors
+NET  "LED_out<7>"     LOC="AE24";  # Bank 21, Vcco=1.8V, DCI using 49.9 ohm resistors

@@ -218,6 +218,7 @@ void mast::CheckSystemModel ()
   auto sm          = Startup::GetSystemModel();
   auto checkResult = sm->Check();
 
+  return;
   if (!checkResult.HasIssues())
   {
     if (checkResult.infosCount == 0)

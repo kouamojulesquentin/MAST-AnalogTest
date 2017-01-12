@@ -29,7 +29,9 @@
 #include "GenericAccessInterfaceProtocol.hpp"
 #include "SVF_SimulationProtocol.hpp"
 #include "SVF_EmulationProtocol.hpp"
+#include "OfflineProtocol.hpp"
 #include "I2C_Player.hpp"
+#include "I2C_EmulationProtocol.hpp"
 #include "SPI_Protocol.hpp"
 #include "STIL_EmulationProtocol.hpp"
 #include "AppFunctionNameAndNode.hpp"
@@ -84,9 +86,10 @@ extern SIT::SIT_Parser::location_type *my_location;
  
 std::vector<std::string> AI_protocol_table  =
   {"JTAG_Loopback","JTAG_SVF_Simulation","JTAG_SVF_Emulation",
-  "SPI_FTDI", "STIL_Emulation"
+  "SPI_FTDI", "STIL_Emulation","I2C_Emulation",
+  "Offline"
   };
-enum AI_protocol_t {JTAG_Loopback,JTAG_SVF_Simulation,JTAG_SVF_Emulation, SPI_FTDI,STIL_Emulation};
+enum AI_protocol_t {JTAG_Loopback,JTAG_SVF_Simulation,JTAG_SVF_Emulation, SPI_FTDI,STIL_Emulation,I2C_Emulation,Offline};
 
 std::vector<std::string> JTAG_AI_protocol_table  =
   {"Loopback","SVF_Simulation","SVF_openOCD","SVF_Emulation"
@@ -498,6 +501,34 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains {
 
           break;
         } // End of: case AI_protocol_t::SPI_FTDI :
+        case I2C_Emulation :
+         {
+          if ($5.size()==0)
+          {
+            std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
+            std::cerr << "Error, " << AI_protocol_table[l] <<" needs an address table\n";
+            YYERROR;
+          }
+          if (($5.size())!=$6)
+          {
+            std::cerr << "Error, " << AI_protocol_table[l] <<" requires 1 address for each register chain\n";
+          }
+          std::cout << "Generating " << AI_protocol_table[l] <<" Access Interface\n";
+
+          auto I2C_addresses       = std::vector<uint32_t>();
+
+          for ( auto i = 0 ; i < $5.size(); i ++)
+          {
+            I2C_addresses.push_back($5[i]);
+          }
+	 protocol = make_shared<I2C_EmulationProtocol> (I2C_addresses);
+	 break;
+	 }
+        case Offline :
+         {
+	 protocol = make_shared<OfflineProtocol > ();
+	 break;
+	 }
       } // End of: switch(l)
 
       auto node = driver.main_sm->CreateAccessInterface($2.name, protocol);

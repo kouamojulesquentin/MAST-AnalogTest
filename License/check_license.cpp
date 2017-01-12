@@ -171,7 +171,7 @@ int main()
  if (res.first==true)
        std::cout << "MAST license check OK\n";
  else
-       std::cout << "MAST license check FAILES\n";
+       std::cout << "MAST license check FAILS\n";
  
  return 0;
 }

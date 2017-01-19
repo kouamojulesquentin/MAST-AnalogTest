@@ -82,6 +82,11 @@ namespace mast
   //! @note  This is to be used when there is no specific code to
   //!        build initialize the model and an associated manager
   DLL_EXPORT void InitializeMast(std::experimental::string_view modelFilePath);
+  //! Starts up mast library,without  building the model
+  //!
+  //! @note  This is to be used when there is no specific code to
+  //!        build initialize the model and an associated manager
+  DLL_EXPORT void InitializeMast();
 
   //! Cleans up Mast library
   //!

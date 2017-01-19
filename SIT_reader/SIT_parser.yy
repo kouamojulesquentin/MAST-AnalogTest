@@ -38,7 +38,14 @@
 #include "OpenOCDProtocol.hpp"
 #include "Utility.hpp"
 
+#define INTEL_EXPERIMENT
+#ifdef INTEL_EXPERIMENT
+#include "Intel_EmulationProtocol.hpp"
+#endif
+
 #include <experimental/string_view>
+
+
 
 using std::shared_ptr;
 using std::make_shared;
@@ -87,9 +94,9 @@ extern SIT::SIT_Parser::location_type *my_location;
 std::vector<std::string> AI_protocol_table  =
   {"JTAG_Loopback","JTAG_SVF_Simulation","JTAG_SVF_Emulation",
   "SPI_FTDI", "STIL_Emulation","I2C_Emulation",
-  "Offline"
+  "Offline","Intel_Packet"
   };
-enum AI_protocol_t {JTAG_Loopback,JTAG_SVF_Simulation,JTAG_SVF_Emulation, SPI_FTDI,STIL_Emulation,I2C_Emulation,Offline};
+enum AI_protocol_t {JTAG_Loopback,JTAG_SVF_Simulation,JTAG_SVF_Emulation, SPI_FTDI,STIL_Emulation,I2C_Emulation,Offline,Intel_Packet};
 
 std::vector<std::string> JTAG_AI_protocol_table  =
   {"Loopback","SVF_Simulation","SVF_openOCD","SVF_Emulation"
@@ -512,6 +519,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains {
           if (($5.size())!=$6)
           {
             std::cerr << "Error, " << AI_protocol_table[l] <<" requires 1 address for each register chain\n";
+            YYERROR;
           }
           std::cout << "Generating " << AI_protocol_table[l] <<" Access Interface\n";
 
@@ -527,6 +535,21 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains {
         case Offline :
          {
 	 protocol = make_shared<OfflineProtocol > ();
+	 break;
+	 }
+        case Intel_Packet :
+         {
+          if (($5.size())!=$6)
+          {
+            std::cerr << "Error, " << AI_protocol_table[l] <<" requires 1 address for each register chain\n";
+            YYERROR;
+          }
+          auto Region_addresses       = std::vector<uint32_t>();
+          for ( auto i = 0 ; i < $5.size(); i ++)
+          {
+            Region_addresses.push_back($5[i]);
+          }
+	 protocol = make_shared<Intel_EmulationProtocol > (Region_addresses);
 	 break;
 	 }
       } // End of: switch(l)

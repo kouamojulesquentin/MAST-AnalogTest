@@ -44,7 +44,9 @@ int main (int argc, char* argv [])
       throw std::runtime_error("A valid SIT file path must be provided !");
     }
 
-    InitializeMast(sitFilePath);
+ //runMast alread initializes SM: risk of double construction!
+//    InitializeMast(sitFilePath);
+    InitializeMast();
 
     auto algoAndNames = GetAlgorithmsNames  (argc, argv);
 
@@ -55,7 +57,7 @@ int main (int argc, char* argv [])
     if (!algoAndNames.empty())
     {
       std::cout << "Have " << std::to_string(algoAndNames.size()) << " algorithm(s) identified by their names" << std::endl;
-      RunMast(sitFilePath, algoAndNames, options);
+   RunMast(sitFilePath, algoAndNames, options);
     }
     else
     {

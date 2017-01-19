@@ -48,3 +48,5 @@ endif()
  add_subdirectory (Mast_UT)
  add_subdirectory (SIT_reader_UT)
 #endif()
+
+ add_subdirectory (Intel)

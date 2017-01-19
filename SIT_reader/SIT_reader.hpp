@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <istream>
 #include <memory>
+#include <iostream>
 
 
 namespace mast

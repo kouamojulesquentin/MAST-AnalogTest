@@ -78,9 +78,6 @@ endif()
 
 if (WIN32)
   include_directories($ENV{FLEX_DIR})
-
-# KissFFT on Windows, make sure that the symbols get exported - https://github.com/extemporelang/kiss_fft/blob/master/CMakeLists.txt
-	target_sources(kiss_fft PRIVATE kiss_fft.def)
 endif()
 
 file(GLOB APP_SOURCES "*")
@@ -90,6 +87,8 @@ add_executable 				(TestCasesApp ${APP_SOURCES})
 set_target_properties	(TestCasesApp PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
 if (WIN32)
+  # KissFFT on Windows, make sure that the symbols get exported - https://github.com/extemporelang/kiss_fft/blob/master/CMakeLists.txt
+#+  target_sources(TestCasesApp PRIVATE kiss_fft.def)
 	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib DbgHelp kiss_fft)
 elseif( NOT ${USE_OPEN_OCD})
 	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib pthread dl kiss_fft)

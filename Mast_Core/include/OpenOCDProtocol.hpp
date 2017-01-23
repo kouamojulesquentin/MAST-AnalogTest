@@ -64,17 +64,15 @@ class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
   virtual void DoReset(bool doSynchronousReset) override;
 
   // ---------------- Private  Fields
-  //
+  // Those variable MUST always be part of OpenOCDProtocol instance to avoid be seen with different size
+  // (causing hard to find bugs)
   private:
-  #ifdef USE_OPEN_OCD
-  command_context* m_cmd_ctx;          //!< OpenOCD structure containing the whole context of the current OpenOCD session configuration.
+  command_context* m_cmd_ctx = nullptr;          //!< OpenOCD structure containing the whole context of the current OpenOCD session configuration.
 
   //! Some adapters and JTAG TAP do not provide a TRST pin.
   //! If jtag_get_reset_config() attribute has the RESET_HAS_TRST flag set, we do it by hardware, otherwise we pass by the state machine.
   bool             m_supportTrst = false;
-
-  #endif
-};
+ };
 //
 //  End of OpenOCDProtocol class declaration
 //---------------------------------------------------------------------------

@@ -79,8 +79,6 @@ class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
   bool             m_supportTrst = false;
 
   bool             m_openOCD_initialized = false; //!< To avoid some destructor processing when not initialized properly !
-
-  #endif
 };
 //
 //  End of OpenOCDProtocol class declaration

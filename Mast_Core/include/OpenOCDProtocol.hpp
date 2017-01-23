@@ -35,6 +35,10 @@ class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
   OpenOCDProtocol() = delete;
   OpenOCDProtocol(std::experimental::string_view configFilePath, std::experimental::string_view designName, int iIrLength);
 
+  //! Return TRUE if initialization finished correctly
+  //!
+  bool is_initialized();
+
   //! Does any action required to transfer scan data to and from SUT
   //!
   //! @param derivationId   Identifies the derivation to act for (zero based)
@@ -63,6 +67,7 @@ class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
   //!
   virtual void DoReset(bool doSynchronousReset) override;
 
+  
   // ---------------- Private  Fields
   // Those variable MUST always be part of OpenOCDProtocol instance to avoid be seen with different size
   // (causing hard to find bugs)
@@ -72,7 +77,11 @@ class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
   //! Some adapters and JTAG TAP do not provide a TRST pin.
   //! If jtag_get_reset_config() attribute has the RESET_HAS_TRST flag set, we do it by hardware, otherwise we pass by the state machine.
   bool             m_supportTrst = false;
- };
+
+  bool             m_openOCD_initialized = false; //!< To avoid some destructor processing when not initialized properly !
+
+  #endif
+};
 //
 //  End of OpenOCDProtocol class declaration
 //---------------------------------------------------------------------------

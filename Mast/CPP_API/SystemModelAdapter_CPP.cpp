@@ -152,6 +152,7 @@ vector<AppFunctionNameAndNode> CPP_API_IMPL::LoadSystemModel (string_view filePa
   CHECK_FILE_EXISTS(filePath);
 
   auto sm     = Startup::GetSystemModel();
+  
   auto reader = SIT::SIT_Reader(sm);
 
   reader.parse(filePath);
@@ -218,6 +219,7 @@ void mast::CheckSystemModel ()
   auto sm          = Startup::GetSystemModel();
   auto checkResult = sm->Check();
 
+  return;
   if (!checkResult.HasIssues())
   {
     if (checkResult.infosCount == 0)
@@ -292,6 +294,21 @@ void mast::InitializeMast (string_view modelFilePath)
 //
 //  End of: mast::InitializeMast
 //---------------------------------------------------------------------------
+//! Starts up mast library, without building the model
+//!
+//! @note This function is not thread safe: It must be call by only one thread prior to any usage of mast library
+//!       This function must be called only after main has been call by the runtime system
+//!
+void mast::InitializeMast ()
+{
+  // Those 2 lines do the initialization
+  /* unused */ Startup::GetSystemModel();
+  /* unused */ Startup::GetManager();
+
+}
+//
+//  End of: mast::InitializeMast
+//---------------------------------------------------------------------------
 
 
 //! Exports GML formated graph of system model
@@ -318,7 +335,6 @@ void mast::RunMast (string_view modelFilePath, const vector<AppFunctionAndNodePa
   CHECK_FILE_EXISTS(modelFilePath);
 
   Session session;
-
   CPP_API_IMPL::LoadSystemModel(modelFilePath);
   auto functionsAndNodes = CPP_API_IMPL::GetFunctionsAndNodes(appFunctionsAndPaths);
   CPP_API_IMPL::RunMast(functionsAndNodes, options);
@@ -329,7 +345,7 @@ void mast::RunMast (string_view modelFilePath, const vector<AppFunctionAndNodePa
 
 
 //! Creates a system model from configuration file, then runs Mast till applications terminates
-//!
+//! Warning, openOCD may cause a segfault
 void mast::RunMast (string_view modelFilePath, const vector<AppFunctionAndName>& appFunctionsAndNames, RunMastOptions options)
 {
   CHECK_PARAMETER_NOT_EMPTY(modelFilePath, "Cannot run Mast without a valid path for system model (SIT file)");
@@ -338,7 +354,7 @@ void mast::RunMast (string_view modelFilePath, const vector<AppFunctionAndName>&
   auto initializeLogger = IsSet(options, RunMastOptions::LogManagerActivity);
   Session session(initializeLogger);
 
-  auto namesAndNodes     = CPP_API_IMPL::LoadSystemModel(modelFilePath);
+  auto namesAndNodes     = CPP_API_IMPL::LoadSystemModel(modelFilePath); 
   auto functionsAndNodes = CPP_API_IMPL::GetFunctionsAndNodes(appFunctionsAndNames, namesAndNodes);
 
   CPP_API_IMPL::RunMast(functionsAndNodes, options);

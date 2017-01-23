@@ -60,7 +60,18 @@ SPI_Protocol::SPI_Protocol (vector<uint32_t> chipSelectCommands,
   if (ftdi_init(m_ftdi_ctx) < 0) {
 	fprintf(stderr, "ftdi_init failed\n");
   }
-
+  
+  /*Trying to open channel B, reverting to ANY if error*/
+  if (ftdi_set_interface(m_ftdi_ctx,INTERFACE_B)>0)
+    {
+     fprintf(stdout, "ftdi open on Channel B\n");
+    }
+    else
+     {
+     ftdi_set_interface(m_ftdi_ctx,INTERFACE_ANY);
+     fprintf(stdout, "ftdi open on Channel A\n");
+     }
+  
   int ret = ftdi_usb_open(m_ftdi_ctx, 0x0403, usbDeviceID);
 
   if (ret < 0 && ret != -5) {

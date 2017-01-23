@@ -29,13 +29,23 @@
 #include "GenericAccessInterfaceProtocol.hpp"
 #include "SVF_SimulationProtocol.hpp"
 #include "SVF_EmulationProtocol.hpp"
+#include "OfflineProtocol.hpp"
 #include "I2C_Player.hpp"
+#include "I2C_EmulationProtocol.hpp"
 #include "SPI_Protocol.hpp"
+#include "STIL_EmulationProtocol.hpp"
 #include "AppFunctionNameAndNode.hpp"
 #include "OpenOCDProtocol.hpp"
 #include "Utility.hpp"
 
+#define INTEL_EXPERIMENT
+#ifdef INTEL_EXPERIMENT
+#include "Intel_EmulationProtocol.hpp"
+#endif
+
 #include <experimental/string_view>
+
+
 
 using std::shared_ptr;
 using std::make_shared;
@@ -83,9 +93,10 @@ extern SIT::SIT_Parser::location_type *my_location;
  
 std::vector<std::string> AI_protocol_table  =
   {"JTAG_Loopback","JTAG_SVF_Simulation","JTAG_SVF_Emulation",
-  "SPI_FTDI"
+  "SPI_FTDI", "STIL_Emulation","I2C_Emulation",
+  "Offline","Intel_Packet"
   };
-enum AI_protocol_t {JTAG_Loopback,JTAG_SVF_Simulation,JTAG_SVF_Emulation, SPI_FTDI};
+enum AI_protocol_t {JTAG_Loopback,JTAG_SVF_Simulation,JTAG_SVF_Emulation, SPI_FTDI,STIL_Emulation,I2C_Emulation,Offline,Intel_Packet};
 
 std::vector<std::string> JTAG_AI_protocol_table  =
   {"Loopback","SVF_Simulation","SVF_openOCD","SVF_Emulation"
@@ -155,12 +166,17 @@ inline std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(std::string desig
    if (path.back()!=DIR_SEPARATOR)
 	   path.push_back(DIR_SEPARATOR);
     path.append(OPENOCD_DEFAULT_CONFIG);
-    std::fstream f;
+
     CHECK_FILE_EXISTS(path);
    std::cerr << "Creating OpenOCD protocol, designName :" <<  designName <<"path "<< path << "\n";
    configfile_view = path;
    designName_view =designName ;
-   return make_shared<OpenOCDProtocol> (configfile_view, designName_view, IR_size);
+   
+   auto protocol = make_shared<OpenOCDProtocol> (configfile_view, designName_view, IR_size);
+   if (protocol->is_initialized()==false)
+    return nullptr;
+   else  
+   return protocol;
 }
 
 } /*end of %code section*/
@@ -184,6 +200,7 @@ inline std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(std::string desig
 %type  <std::uint32_t> IR_size
 %type  <std::uint32_t> size
 %type  <std::uint32_t> n_DR_chains
+%type  <std::uint32_t> n_chains
 %type  <std::vector<uint32_t>> AI_Coding_list
 %type  <std::vector<mast::BinaryVector>> IR_Coding_list
 %type  <std::vector<mast::BinaryVector>> IR_TABLE
@@ -405,7 +422,7 @@ t_LINKER  node_name path_selector ctrl_node {
        }
   }
  |
-t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
+t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains {
 
 	int   l;
 	l = find_in_table(AI_protocol_table,$3);
@@ -433,6 +450,11 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
         case JTAG_SVF_Emulation :
          {
 	 protocol = make_shared<SVF_EmulationProtocol> ();
+	 break;
+	 }
+        case STIL_Emulation :
+         {
+	 protocol = make_shared<STIL_EmulationProtocol> ($6+1); //one derivation for reset
 	 break;
 	 }
         case AI_protocol_t::SPI_FTDI :
@@ -486,6 +508,50 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
 
           break;
         } // End of: case AI_protocol_t::SPI_FTDI :
+        case I2C_Emulation :
+         {
+          if ($5.size()==0)
+          {
+            std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
+            std::cerr << "Error, " << AI_protocol_table[l] <<" needs an address table\n";
+            YYERROR;
+          }
+          if (($5.size())!=$6)
+          {
+            std::cerr << "Error, " << AI_protocol_table[l] <<" requires 1 address for each register chain\n";
+            YYERROR;
+          }
+          std::cout << "Generating " << AI_protocol_table[l] <<" Access Interface\n";
+
+          auto I2C_addresses       = std::vector<uint32_t>();
+
+          for ( auto i = 0 ; i < $5.size(); i ++)
+          {
+            I2C_addresses.push_back($5[i]);
+          }
+	 protocol = make_shared<I2C_EmulationProtocol> (I2C_addresses);
+	 break;
+	 }
+        case Offline :
+         {
+	 protocol = make_shared<OfflineProtocol > ();
+	 break;
+	 }
+        case Intel_Packet :
+         {
+          if (($5.size())!=$6)
+          {
+            std::cerr << "Error, " << AI_protocol_table[l] <<" requires 1 address for each register chain\n";
+            YYERROR;
+          }
+          auto Region_addresses       = std::vector<uint32_t>();
+          for ( auto i = 0 ; i < $5.size(); i ++)
+          {
+            Region_addresses.push_back($5[i]);
+          }
+	 protocol = make_shared<Intel_EmulationProtocol > (Region_addresses);
+	 break;
+	 }
       } // End of: switch(l)
 
       auto node = driver.main_sm->CreateAccessInterface($2.name, protocol);
@@ -531,7 +597,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE  {
 	   protocol=make_openOCD_protocol( $4, $5);
 	   if (protocol==nullptr)
 	    {
-	    std::cerr<<"Error while opening OpenOCD configuration file\n";
+	    std::cerr<<"Error while setting up OpenOCD interface\n";
 	    YYERROR;
 	    }
 	  break;
@@ -578,6 +644,15 @@ IR_size :
 n_DR_chains :
  t_DecimalLiteral { $$ = $1;}
 ;
+
+
+n_chains :
+ {$$ = 0;}
+ | 
+ t_DecimalLiteral { $$ = $1;}
+;
+
+
 IR_TABLE:
  t_LeftBracket IR_Coding_list t_RightBracket  {$$=$2;}
  |  {$$ = std::vector<mast::BinaryVector>();}
@@ -689,4 +764,6 @@ SIT::SIT_Parser::error( const location_type &l, const std::string &err_message )
    std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
    std::cerr << err_message << "\n";
    driver.parsed_sut=nullptr;
+  THROW_RUNTIME_ERROR("Parse error");
+ 
 }

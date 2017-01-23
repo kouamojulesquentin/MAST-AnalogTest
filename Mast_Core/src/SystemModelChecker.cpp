@@ -225,7 +225,7 @@ void SystemModelChecker::CheckNumberOfDerivations (shared_ptr<AccessInterface> a
 
     if (childrenCount >= maxDerivations) // Max derivations includes pseudo derivation reserved to do "Reset" action
     {
-      auto message =   " has two much children ("                + to_string(childrenCount)
+      auto message =   " has too many children ("                + to_string(childrenCount)
                      + ") ; its protocol supports a maximum of " + to_string(maxDerivations)
                      + " derivations (including one 'pseudo derivation' reserved for reset action)";
       ReportError(*accessInterface, message);

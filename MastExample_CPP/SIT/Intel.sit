@@ -1,0 +1,9 @@
+ACCESS_INTERFACE Intel_Exp Intel_Packet [ "0x10"] 1
+{
+ CHAIN First_Region
+  PDL Incr,decr
+  {
+    REGISTER regHI 16 Hold_value Bypass: "0x1122"
+    REGISTER regLO 16 Hold_value Bypass: "0x3344"
+  }
+}

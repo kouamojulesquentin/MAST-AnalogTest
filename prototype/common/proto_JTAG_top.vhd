@@ -229,9 +229,10 @@ SUT : tutorial_1_synth  port map
      static_in => static_in
    );
 	
-	static_in(7 downto 0) <=   GPIO_DIP_SW;
+static_in(7 downto 0) <=   GPIO_DIP_SW;
+GPIO_LED <= static_out(7 downto 0);
 
-			    GPIO_LED <= static_out(7 downto 0);
+
 end generate;
 
 

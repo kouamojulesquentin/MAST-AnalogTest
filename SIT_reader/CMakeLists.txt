@@ -59,6 +59,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
 include_directories(../Mast_Core/include/)
 include_directories(../Logger/)
 include_directories(../Logger/g3log/)
+
+include_directories(../Intel/src/)
+
 if (WIN32)
   include_directories($ENV{FLEX_DIR})
 endif()
@@ -69,5 +72,5 @@ add_executable 	(SIT_reader_demo 	${LEX_YACC_SRC_DIR}main.cpp)
 set_target_properties(SIT_Reader_Lib 	PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 set_target_properties(SIT_reader_demo PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
-target_link_libraries(SIT_Reader_Lib Mast_Core)
-target_link_libraries(SIT_reader_demo SIT_Reader_Lib Mast_Core)
+target_link_libraries(SIT_Reader_Lib Mast_Core Intel_Exp)
+target_link_libraries(SIT_reader_demo SIT_Reader_Lib Mast_Core Intel_Exp)

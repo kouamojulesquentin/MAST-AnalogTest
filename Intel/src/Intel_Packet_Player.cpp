@@ -203,9 +203,7 @@ BinaryVector Intel_Packet_Player::Send_Intel_Packet_Stream (uint32_t derivationI
      /*manually handle conversion  from network ordering (big endian)*/
        
        for (auto cur_byte : *nw_order_data)
-          {
 	  from_SUT.Append(cur_byte);
-	  }
 	
 
      /*release stream id*/

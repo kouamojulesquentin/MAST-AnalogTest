@@ -18,6 +18,7 @@ void send_packet(ClientSocket& ring_input,
       test_packet.opcode = opcode;
      test_packet.data = data;
 
+     std::cout<< "Sent test_packet Id 0x"<<std::hex<<test_packet.id.to_ulong()<< " Opdcode 0x"<<std::hex<<test_packet.opcode.to_ulong() << " Data 0x" <<std::hex<<test_packet.data.to_ulong() << "\n";
 
 	  ring_input << test_packet;
    sleep(0.3);

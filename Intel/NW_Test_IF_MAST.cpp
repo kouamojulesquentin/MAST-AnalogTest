@@ -44,7 +44,7 @@ int run_TEST_IF_start ( int ring_start_port )
     {
     while (fread(&packet,sizeof(ring_packet),1,C_to_ring_file)==0);
 
-     std::cout<< "Read packet Id 0x"<<std::hex<<packet.id.to_ulong()<< " Opdcode 0x"<<std::hex<<packet.opcode.to_ulong() << " Data 0x" <<std::hex<<packet.data.to_ulong() << "\n";
+     std::cout<< "Sent packet Id 0x"<<std::hex<<packet.id.to_ulong()<< " Opdcode 0x"<<std::hex<<packet.opcode.to_ulong() << " Data 0x" <<std::hex<<packet.data.to_ulong() << "\n";
 
      send_packet(ring_input,packet.opcode,packet.id,packet.data);
      }

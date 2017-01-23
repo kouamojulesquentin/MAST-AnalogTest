@@ -16,6 +16,10 @@ include_directories(../Logger/g3log/)
 add_library	(Intel_Exp STATIC ${Intel_SOURCES})
 set_target_properties	(Intel_Exp PROPERTIES COMPILE_FLAGS "${CFLAGS}")
 
+if (NOT WIN32)
+
+#This emulation backend is based on Linux Sockets 
+
 add_executable (NW_Region NW_Region.cpp)
 add_executable (NW_Test_IF NW_Test_IF.cpp)
 add_executable (NW_Test_IF_end NW_Test_IF_end.cpp)
@@ -30,3 +34,4 @@ target_link_libraries (NW_Test_IF Intel_Exp)
 target_link_libraries (NW_Test_IF_end Intel_Exp)
 
 target_link_libraries (NW_Test_IF_MAST Intel_Exp)
+endif()

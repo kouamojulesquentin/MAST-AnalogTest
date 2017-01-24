@@ -9,6 +9,11 @@
   - apt-get install doxygen
   - apt-get install graphviz
 
+ Some parts need to intall:
+  - apt-get install libftdi-dev
+  - apt-get install libpng++-dev
+  - apt-get install zlibc
+  -
 
 OpenOCD need Lib to be installed (sudo apt-get install libusb-1.0-0-dev)
 To build OpenOCD, the following tools are required:
@@ -37,7 +42,7 @@ Place it before project make or even as first step (before Qmake is run)
     Doxygen docs:    "make docs"
 
   To disable build using OpenOCD
-    make disclean
+    make distclean
     then:
     Debug:           "make debug   USE_OPEN_OCD=OFF"
     Release:         "make release USE_OPEN_OCD=OFF"

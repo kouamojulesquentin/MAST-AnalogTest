@@ -11,6 +11,9 @@ if (NOT BISON_FOUND)
  message( FATAL_ERROR "Bison not found")
 endif()
 
+message("SIT_Reader.CMake: USE_OPEN_OCD:     ${USE_OPEN_OCD}")
+message("SIT_Reader.CMake: INTEL_EXPERIMENT: ${INTEL_EXPERIMENT}")
+
 add_definitions(${P_WARNINGS})
 set (P_WARNINGS "-Wall -Wno-sign-compare -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs")
 add_definitions(${P_CFLAGS})
@@ -20,10 +23,10 @@ add_definitions(${Flex_Switches})
 if (WIN32)
 #+  set (P_CFLAGS ${P_CFLAGS} -DBUILD_DLL)
   set (P_CFLAGS ${P_CFLAGS})
-	set (Flex_Switches -v -L --wincompat)
+  set (Flex_Switches -v -L --wincompat)
 else()
   set (P_CFLAGS "${P_CFLAGS} -fPIC")
-	set (Flex_Switches -v -L)
+  set (Flex_Switches -v -L)
 endif()
 
 # Set defines depending of what is enabled/disabled
@@ -59,7 +62,7 @@ add_custom_command(
 
 # Since parser.c does not exists yet when cmake is run, mark it as generated
 SET_SOURCE_FILES_PROPERTIES(${LEX_YACC_SRC_DIR}SIT_parser.tab.cc GENERATED)
-SET_SOURCE_FILES_PROPERTIES(${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc 	 GENERATED)
+SET_SOURCE_FILES_PROPERTIES(${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc   GENERATED)
 
 # Include binary directory to include lexer.c in parser.c
 #+include_directories(${CMAKE_BINARY_DIR}/SIT_parser/)
@@ -70,6 +73,7 @@ include_directories(../Logger/)
 include_directories(../Logger/g3log/)
 
 if (${INTEL_EXPERIMENT})
+#+  message("Cmake.Sit_Reader: Using INTEL_EXPERIMENT")
   include_directories(../Intel/src/)
 endif()
 
@@ -77,10 +81,10 @@ if (WIN32)
   include_directories($ENV{FLEX_DIR})
 endif()
 
-add_library 		(SIT_Reader_Lib SHARED	${LEX_YACC_SRC_DIR}SIT_reader.cpp ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc)
-add_executable 	(SIT_reader_demo 				${LEX_YACC_SRC_DIR}main.cpp)
+add_library     (SIT_Reader_Lib SHARED  ${LEX_YACC_SRC_DIR}SIT_reader.cpp ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc)
+add_executable  (SIT_reader_demo        ${LEX_YACC_SRC_DIR}main.cpp)
 
-set_target_properties(SIT_Reader_Lib 	PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+set_target_properties(SIT_Reader_Lib  PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 set_target_properties(SIT_reader_demo PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
 if (${INTEL_EXPERIMENT})
@@ -90,4 +94,3 @@ else()
   target_link_libraries(                SIT_Reader_Lib Mast_Core)
   target_link_libraries(SIT_reader_demo SIT_Reader_Lib Mast_Core)
 endif()
-

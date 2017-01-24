@@ -45,6 +45,7 @@ SOURCES += \
     SystemModel/UT_PrettyPrinter.cpp                  \
     SystemModel/UT_PropagatePendingVisitor.cpp        \
     SystemModel/UT_Register.cpp                       \
+    SystemModel/UT_STIL_EmulationProtocol.cpp         \
     SystemModel/UT_SVF_SimulationProtocol.cpp         \
     SystemModel/UT_SystemModel.cpp                    \
     SystemModel/UT_SystemModelBuilder.cpp             \
@@ -55,6 +56,7 @@ SOURCES += \
     UT_Helpers/Fake_SVF_Simulator.cpp                 \
     UT_Helpers/Spy_AccessInterfaceProtocols.cpp       \
     UT_Helpers/Spy_I2C_Protocol.cpp                   \
+    UT_Helpers/Spy_STIL_Protocol.cpp                  \
     UT_Helpers/Spy_SVF_Protocol.cpp                   \
     UT_Helpers/TestModelBuilder.cpp                   \
     UT_Helpers/UT_TestModelBuilder.cpp                \
@@ -84,6 +86,7 @@ HEADERS += \
     SystemModel/UT_PrettyPrinter.hpp                  \
     SystemModel/UT_PropagatePendingVisitor.hpp        \
     SystemModel/UT_Register.hpp                       \
+    SystemModel/UT_STIL_EmulationProtocol.hpp         \
     SystemModel/UT_SVF_SimulationProtocol.hpp         \
     SystemModel/UT_SystemModel.hpp                    \
     SystemModel/UT_SystemModelBuilder.hpp             \
@@ -95,6 +98,7 @@ HEADERS += \
     UT_Helpers/SpiedProtocolsCommands.hpp             \
     UT_Helpers/Spy_AccessInterfaceProtocols.hpp       \
     UT_Helpers/Spy_I2C_Protocol.hpp                   \
+    UT_Helpers/Spy_STIL_Protocol.hpp                  \
     UT_Helpers/Spy_SVF_Protocol.hpp                   \
     UT_Helpers/TestModelBuilder.hpp                   \
     UT_Helpers/UT_TestModelBuilder.hpp                \

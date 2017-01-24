@@ -24,15 +24,23 @@ win32 {
   INCLUDEPATH +=  "$$(FLEX_DIR)"
 }
 
-SOURCES +=      \
-    main.cpp    \
-    Options.cpp \
+SOURCES +=         \
+    main.cpp       \
+    Options.cpp    \
     Zybo.cpp
 
 
-HEADERS +=      \
-    Options.hpp \
+HEADERS +=         \
+    Options.hpp    \
     Zybo.hpp
+
+unix {
+  SOURCES +=         \
+      ml505_demo.cpp
+
+  HEADERS +=         \
+      ml505_demo.hpp
+}
 
 
 CONFIG(debug,   debug|release) {

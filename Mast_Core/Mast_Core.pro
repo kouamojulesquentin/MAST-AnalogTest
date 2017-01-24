@@ -45,6 +45,7 @@ SOURCES +=  \
     src/MismatchesCollector.cpp                     \
     src/NamesChecker.cpp                            \
     src/NodePathResolver.cpp                        \
+    src/OfflineProtocol.cpp                         \
     src/OpenOCDProtocol.cpp                         \
     src/PathSelector.cpp                            \
     src/ParentNode.cpp                              \
@@ -55,6 +56,8 @@ SOURCES +=  \
     src/SPI_Player.cpp                              \
     src/SPI_Protocol.cpp                            \
     src/Startup.cpp                                 \
+    src/STIL_Player.cpp                             \
+    src/STIL_EmulationProtocol.cpp                  \
     src/SVF_Player.cpp                              \
     src/SVF_EmulationProtocol.cpp                   \
     src/SVF_SimulationProtocol.cpp                  \
@@ -98,6 +101,7 @@ HEADERS += \
     include/MismatchesCollector.hpp                     \
     include/NamesChecker.hpp                            \
     include/NodePathResolver.hpp                        \
+    include/OfflineProtocol.hpp                         \
     include/OpenOCDProtocol.hpp                         \
     include/ParentNode.hpp                              \
     include/PathSelector.hpp                            \
@@ -106,6 +110,8 @@ HEADERS += \
     include/Register.hpp                                \
     include/SPI_Player.hpp                              \
     include/SPI_Protocol.hpp                            \
+    include/STIL_Player.hpp                             \
+    include/STIL_EmulationProtocol.hpp                  \
     include/SVF_Player.hpp                              \
     include/SVF_EmulationProtocol.hpp                   \
     include/SVF_SimulationProtocol.hpp                  \

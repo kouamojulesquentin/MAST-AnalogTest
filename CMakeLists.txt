@@ -8,8 +8,9 @@ if (WIN32)
   set (CMAKE_C_COMPILER   "gcc")
 endif()
 
-message("NewMast.CMake:   USE_OPEN_OCD: ${USE_OPEN_OCD}")
-message("NewMast.CMake:   USE_LIBFTDISPI: ${USE_LIBFTDISPI}")
+message("NewMast.CMake:   USE_OPEN_OCD:     ${USE_OPEN_OCD}")
+message("NewMast.CMake:   USE_LIBFTDISPI:   ${USE_LIBFTDISPI}")
+message("NewMast.CMake:   INTEL_EXPERIMENT: ${INTEL_EXPERIMENT}")
 
 
 project(mast)
@@ -33,9 +34,6 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "../Bin")
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "../Lib")
 
 add_subdirectory (Logger)
-if(${USE_LIBFTDISPI})
-	add_subdirectory (libftdispi)
-endif()
 add_subdirectory (Mast_Core)
 add_subdirectory (SIT_reader)
 add_subdirectory (Mast)
@@ -49,4 +47,10 @@ endif()
  add_subdirectory (SIT_reader_UT)
 #endif()
 
- add_subdirectory (Intel)
+if(${USE_LIBFTDISPI})
+	add_subdirectory (libftdispi)
+endif()
+
+if(${INTEL_EXPERIMENT})
+	add_subdirectory (Intel)
+endif()

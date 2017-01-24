@@ -3,12 +3,13 @@
 cmake_minimum_required(VERSION 3.5)
 project(TestCasesApp)
 
+message("TestCasesApp.CMake:   INTEL_EXPERIMENT: ${INTEL_EXPERIMENT}")
+
 add_definitions(${P_WARNINGS})
 set (P_WARNINGS "-Wall -Wno-sign-compare -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-include-dirs")
 add_definitions(${P_CFLAGS})
 set (P_CFLAGS "${P_WARNINGS} -std=c++14")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
 include_directories(../Mast_Core/include/)
 include_directories(../Mast/CPP_API/)
 include_directories(../Mast/C_API/)
@@ -16,9 +17,16 @@ include_directories(../Logger/)
 include_directories(../Logger/g3log/)
 include_directories(../SIT_reader/)
 
-include_directories(../MastExample_CPP/)
-include_directories(../MastExample_CPP/kissfft/)
-include_directories(../MastExample_CPP/kissfft/tools/)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
+
+if (WIN32)
+  message("\n>>>>>>>>>>>>>>> TestCasesApp.CMake:   kissfft not used on Windows !!!\n")
+#+	target_sources(TestCasesApp, PRIVATE, main.cpp Options.cpp Zybo.cpp)
+else()
+  include_directories(../MastExample_CPP/)
+  include_directories(../MastExample_CPP/kissfft/)
+  include_directories(../MastExample_CPP/kissfft/tools/)
+endif()
 
 if (${USE_OPEN_OCD})
   set (P_CFLAGS "${P_CFLAGS} -DUSE_OPEN_OCD")
@@ -78,18 +86,18 @@ endif()
 
 if (WIN32)
   include_directories($ENV{FLEX_DIR})
+  set (APP_SOURCES "main.cpp" "Options.cpp" "Zybo.cpp")
+else()
+  set (P_CFLAGS "${P_CFLAGS} -DUSE_KISS_FFT")
+  file(GLOB APP_SOURCES "*")
 endif()
-
-file(GLOB APP_SOURCES "*")
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "../Bin")
 add_executable 				(TestCasesApp ${APP_SOURCES})
 set_target_properties	(TestCasesApp PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
 if (WIN32)
-  # KissFFT on Windows, make sure that the symbols get exported - https://github.com/extemporelang/kiss_fft/blob/master/CMakeLists.txt
-#+  target_sources(TestCasesApp PRIVATE kiss_fft.def)
-	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib DbgHelp kiss_fft)
+	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib DbgHelp)
 elseif( NOT ${USE_OPEN_OCD})
 	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib pthread dl kiss_fft)
 else ()

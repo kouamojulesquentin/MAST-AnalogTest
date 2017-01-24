@@ -26,6 +26,15 @@ else()
 	set (Flex_Switches -v -L)
 endif()
 
+# Set defines depending of what is enabled/disabled
+#
+if (${USE_OPEN_OCD})
+  set (CFLAGS "${CFLAGS} -DUSE_OPEN_OCD")
+endif()
+
+if (${INTEL_EXPERIMENT})
+  set (CFLAGS "${CFLAGS} -DINTEL_EXPERIMENT")
+endif()
 
 set (LEX_YACC_SRC_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/")
 
@@ -60,17 +69,25 @@ include_directories(../Mast_Core/include/)
 include_directories(../Logger/)
 include_directories(../Logger/g3log/)
 
-include_directories(../Intel/src/)
+if (${INTEL_EXPERIMENT})
+  include_directories(../Intel/src/)
+endif()
 
 if (WIN32)
   include_directories($ENV{FLEX_DIR})
 endif()
 
-add_library (SIT_Reader_Lib SHARED	${LEX_YACC_SRC_DIR}SIT_reader.cpp ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc)
-add_executable 	(SIT_reader_demo 	${LEX_YACC_SRC_DIR}main.cpp)
+add_library 		(SIT_Reader_Lib SHARED	${LEX_YACC_SRC_DIR}SIT_reader.cpp ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc)
+add_executable 	(SIT_reader_demo 				${LEX_YACC_SRC_DIR}main.cpp)
 
 set_target_properties(SIT_Reader_Lib 	PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 set_target_properties(SIT_reader_demo PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
-target_link_libraries(SIT_Reader_Lib Mast_Core Intel_Exp)
-target_link_libraries(SIT_reader_demo SIT_Reader_Lib Mast_Core Intel_Exp)
+if (${INTEL_EXPERIMENT})
+  target_link_libraries(                SIT_Reader_Lib Mast_Core Intel_Exp)
+  target_link_libraries(SIT_reader_demo SIT_Reader_Lib Mast_Core Intel_Exp)
+else()
+  target_link_libraries(                SIT_Reader_Lib Mast_Core)
+  target_link_libraries(SIT_reader_demo SIT_Reader_Lib Mast_Core)
+endif()
+

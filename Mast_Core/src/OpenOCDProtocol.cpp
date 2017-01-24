@@ -58,6 +58,7 @@ using std::experimental::string_view;
 //!
 #ifndef USE_OPEN_OCD
 OpenOCDProtocol::OpenOCDProtocol (string_view /* configFilePath */, string_view /* designName */, int /* iIrLength */)
+  : m_openOCD_initialized (true)
 {
 }
 #else
@@ -119,7 +120,7 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, string_view design
   ret = jtag_execute_queue();
 
   CHECK_TRUE(ret == ERROR_OK, "[OpenOCD] jtag_execute_queue has failed.");
-  
+
   m_openOCD_initialized = true;
 }
 #endif
@@ -134,9 +135,12 @@ OpenOCDProtocol::~OpenOCDProtocol()
 
   #ifdef USE_OPEN_OCD
 
-  if (!m_openOCD_initialized) //There was an error during construction
+  if (!m_openOCD_initialized) // There was an error during construction
+  {
+    LOG(WARNING) << "As there was an error during construction, we do nothing in destructor";
     return;
-    
+  }
+
   // Here we put the tap in RESET state
   if(m_supportTrst)
     jtag_add_reset(1, 0);           // Hardware reset is supported, TRST is enabled for one TCK cycle.
@@ -147,12 +151,15 @@ OpenOCDProtocol::~OpenOCDProtocol()
   int ret = jtag_execute_queue();
 
   if (ret == ERROR_OK)
+  {
+    LOG(WARNING) << "Got failure return code from jtag_execute_queue";
     return;
-
+  }
 
   auto tap = jtag_all_taps();
 
-  // We need to destruct all TAPs.
+  // ---------------- Destruct all TAPs.
+  //
   while(tap)
   {
     auto tap_n = tap->next_tap;
@@ -215,21 +222,21 @@ BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfac
       DoReset(false);
       break;
     case 1u:
-      {
-        vector<uint8_t> v_openocd_ir = toSutData.DataRightAligned();			// OpenOCD requires data to be structured with the LSB first, MSB last. Here we have each byte with LSb on the right, MSb on the left.
-        reverse(v_openocd_ir.begin(), v_openocd_ir.end());								// Now we reverse the order, as the LSB is the last one of the vector.
-        LOG(INFO) << "OpenOCD_IR(" << toSutData.DataAsMixString() << ")";
-        jtag_add_plain_ir_scan(bitsCount, v_openocd_ir.data(), fromSutDataBuffer.data(), TAP_IDLE);		// Adding irscan to the scheduler.
-      }
+    {
+      vector<uint8_t> v_openocd_ir = toSutData.DataRightAligned();      // OpenOCD requires data to be structured with the LSB first, MSB last. Here we have each byte with LSb on the right, MSb on the left.
+      reverse(v_openocd_ir.begin(), v_openocd_ir.end());                // Now we reverse the order, as the LSB is the last one of the vector.
+      LOG(INFO) << "OpenOCD_IR(" << toSutData.DataAsMixString() << ")";
+      jtag_add_plain_ir_scan(bitsCount, v_openocd_ir.data(), fromSutDataBuffer.data(), TAP_IDLE);   // Adding irscan to the scheduler.
       break;
+    }
     case 2u:
-      {
-        vector<uint8_t> v_openocd_dr = toSutData.DataRightAligned();		// See case 1u.
-        reverse(v_openocd_dr.begin(), v_openocd_dr.end());
-        LOG(INFO) << "OpenOCD_DR(" << toSutData.DataAsMixString() << ")";
-        jtag_add_plain_dr_scan(bitsCount, v_openocd_dr.data(), fromSutDataBuffer.data(), TAP_IDLE);
-      }
+    {
+      vector<uint8_t> v_openocd_dr = toSutData.DataRightAligned();    // See case 1u.
+      reverse(v_openocd_dr.begin(), v_openocd_dr.end());
+      LOG(INFO) << "OpenOCD_DR(" << toSutData.DataAsMixString() << ")";
+      jtag_add_plain_dr_scan(bitsCount, v_openocd_dr.data(), fromSutDataBuffer.data(), TAP_IDLE);
       break;
+    }
     default:
       THROW_INVALID_ARGUMENT("DerivationId must be '0' (for Reset), '1' (for SIR) or '2' (for SDR)");
       break;
@@ -272,10 +279,6 @@ void OpenOCDProtocol::DoReset(bool doSynchronousReset)
   #endif
 }
 
-bool OpenOCDProtocol::is_initialized()
- {
-  return m_openOCD_initialized;
- }
 
 //===========================================================================
 // End of OpenOCDProtocol.cpp

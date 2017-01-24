@@ -35,9 +35,9 @@ class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
   OpenOCDProtocol() = delete;
   OpenOCDProtocol(std::experimental::string_view configFilePath, std::experimental::string_view designName, int iIrLength);
 
-  //! Return TRUE if initialization finished correctly
+  //! Returns whether it has been completly (properly) initialized
   //!
-  bool is_initialized();
+  bool is_initialized() const { return m_openOCD_initialized; }
 
   //! Does any action required to transfer scan data to and from SUT
   //!
@@ -67,7 +67,8 @@ class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
   //!
   virtual void DoReset(bool doSynchronousReset) override;
 
-  
+
+
   // ---------------- Private  Fields
   // Those variable MUST always be part of OpenOCDProtocol instance to avoid be seen with different size
   // (causing hard to find bugs)

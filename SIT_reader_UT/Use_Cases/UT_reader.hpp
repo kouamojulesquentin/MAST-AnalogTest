@@ -39,6 +39,7 @@ class UT_reader : public CxxTest::TestSuite
   void test_SIB ();
   void test_JTAG_TAP ();
   void test_1500 ();
+  void test_LINKER ();
 
   // ---------------- Private  Methods
   //

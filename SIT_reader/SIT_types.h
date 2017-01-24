@@ -28,4 +28,13 @@ typedef struct node_list_type_s
     std::vector<std::shared_ptr<mast::SystemModelNode>> nodes;
   } node_list_type;
 
+ typedef struct linker_information_s
+  {
+   std::shared_ptr<mast::SystemModelNode> linker_node;
+   uint32_t column;
+   uint32_t line;
+   uint32_t derivations;
+   std::string selector_name;
+  } linker_information;
+
 #endif

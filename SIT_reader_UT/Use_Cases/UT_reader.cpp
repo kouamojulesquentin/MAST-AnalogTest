@@ -938,6 +938,96 @@ void UT_reader::test_1500 ()
   //
   TS_DATA_DRIVEN_TEST (checker, data);
 }
+
+
+/*Test construction of LINKERs macro from Simplified ICL Tree input*/
+void UT_reader::test_LINKER ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [&](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto input_SIT            = std::get<0> (data);
+    auto expected_PrettyPrint = std::get<1> (data);
+    auto expected_errMSG = std::get<2> (data);
+    auto errorsCount = std::get<3> (data);
+    /*Redirectign std:cerr to collect error message*/
+    std::ostringstream oss;
+    std::streambuf* p_cerr_streambuf = std::cerr.rdbuf();
+    std::cerr.rdbuf(oss.rdbuf());
+
+    // ---------------- Exercise
+    //
+    auto parseResult = UT_reader_wrapper::run_parser_for_UT(input_SIT, sm);
+
+    // ---------------- Verify
+    //
+    // With PrettyPrint
+    auto actual_PrettyPrint = parseResult.first;
+    TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
+    // With Checker
+    PrependWithTap(sm, parseResult.second);   // This is to avoid warnings about missing AccessInterface
+    auto checkResult = sm->Check();
+
+    TS_ASSERT_EQUALS (checkResult.warningsCount, 1u); // 1 for "Linker 'test_xxx' (id: x) has only 2 children, even though it can select 4 paths"
+    TS_ASSERT_EQUALS (checkResult.errorsCount,   errorsCount);
+    TS_ASSERT_EQUALS (checkResult.infosCount,    0u);
+    //+ (begin JFC August/29/2016): for debug purpose
+//+    TS_ASSERT_EQUALS (checkResult.MakeReport(), "");
+    //+ (end   JFC August/29/2016):
+  
+
+    // test your oss content...
+    if (oss.str().length() != strlen(expected_errMSG))
+      {
+      TS_FAIL("Error, received error message :\n"+oss.str()+"\n!= :\n" 
+      		+expected_errMSG);
+      }
+    
+    if (strlen(expected_errMSG)>0)
+      TS_ASSERT_EQUALS(oss.str(),expected_errMSG);
+    
+   std::cerr.rdbuf(p_cerr_streambuf); // restore
+  };
+
+  auto data =
+  { /*Error: selector register not defined*/
+make_tuple( "LINKER test_LINKER Binary 4\
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"PARSING ERROR",
+  "Line 1:27-28: Must specify a control node for path selector\nParse failed!!\n",
+  0u),
+   /*Error: selector register does not exist*/
+make_tuple( "LINKER test_LINKER Binary selector_reg 4\
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+"PARSING ERROR",
+  "Error, Selector register selector_reg required by linker test_LINKER at line 1:40 does not exist\nParse failed!!\n",
+  3u),
+   /*correct syntax */ 
+make_tuple( "LINKER test_LINKER Binary test_reg_1 4\
+    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+     REGISTER test_reg_2 4 Bypass: \"0b1100\"\
+    }",
+  "[Chain](0)     \"test_LINKER\"\n\
+ [Register](1)  \"test_reg_1\", length: 4, bypass: 1001\n\
+ [Register](2)  \"test_reg_2\", length: 4, bypass: 1100",
+  "",
+  0u),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
 //===========================================================================
 // End of UT_reader.cpp
 //===========================================================================

@@ -46,6 +46,7 @@
 #include <experimental/string_view>
 
 
+#include <map>
 
 using std::shared_ptr;
 using std::make_shared;
@@ -110,6 +111,7 @@ enum Path_Selector_t {Binary,One_Hot,N_Hot,Binary_noidle,One_Hot_noidle,N_Hot_no
 std::vector<SelectorProperty> Path_Selector_prop_t {
  SelectorProperty::Binary_Default  ,SelectorProperty::One_Hot_Default,SelectorProperty::N_Hot_Default,
  SelectorProperty::CannotSelectNone,SelectorProperty::CannotSelectNone,SelectorProperty::CannotSelectNone,};
+ 
 
 static int find_in_table(std::vector<std::string> table, std::string s)
 {
@@ -143,15 +145,13 @@ inline std::uint32_t extract_number(std::string s)
 }
 
 
-
-inline std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(std::string designName,std::uint32_t IR_size)
+namespace 
 {
-  char *path_tmp;
+std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(const std::string& designName,std::uint32_t IR_size)
+{
   std::string path;
-   string_view configfile_view;
-   string_view designName_view;
    
-   path_tmp = std::getenv("MAST_CONFIGURATION_PATH");
+   auto path_tmp = std::getenv("MAST_CONFIGURATION_PATH");
 
    if (path_tmp == NULL)
     {
@@ -169,16 +169,24 @@ inline std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(std::string desig
 
     CHECK_FILE_EXISTS(path);
    std::cerr << "Creating OpenOCD protocol, designName :" <<  designName <<"path "<< path << "\n";
-   configfile_view = path;
-   designName_view =designName ;
    
-   auto protocol = make_shared<OpenOCDProtocol> (configfile_view, designName_view, IR_size);
+   auto protocol = make_shared<OpenOCDProtocol> (path, designName, IR_size);
    if (protocol->is_initialized()==false)
     return nullptr;
    else  
    return protocol;
 }
+/*void clear_linker_information() 
+{
+std::map<std::string,  std::shared_ptr<mast::SystemModelNode>> empty_registers;
+std::queue<linker_information> empty_linkers;
 
+std::swap(driver.declared_registers,empty_registers);
+std::swap( unresolved_linkers,empty_linkers);
+
+}*/
+
+}
 } /*end of %code section*/
 
 %define api.value.type variant
@@ -254,8 +262,45 @@ inline std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(std::string desig
 %%
 
 root_node:
-   node END
+  node END
     {
+     /*resolve evetual Linkers*/
+     linker_information this_linker;
+     while (!driver.unresolved_linkers.empty())
+      {
+      this_linker =  driver.unresolved_linkers.front();
+      /*remove resolved linker*/
+      auto selector_reg= driver.declared_registers.find(this_linker.selector_name);
+      if (selector_reg==driver.declared_registers.end())
+       {
+       std::cerr << "Error, Selector register " << this_linker.selector_name << " required by linker " <<  this_linker.linker_node->Name() << " at line " << this_linker.line <<":"<<this_linker.column << " does not exist\n" ;
+	YYERROR;
+       }
+             int   l;
+	l = find_in_table(Path_Selector_table,this_linker.selector_name);
+	SelectorProperty sel_properties = Path_Selector_prop_t[l];
+
+        pair<shared_ptr<Register>, shared_ptr<PathSelector>> res; /*cannot use auto inside a switch*/
+ 	switch(l)
+	 {
+	  case Binary :
+	  case Binary_noidle :
+	      res =  driver.builder->Create_PathSelector(SelectorKind::Binary, this_linker.selector_name, this_linker.derivations,sel_properties);
+	     break;
+	  case One_Hot :
+	  case One_Hot_noidle :
+ 	      res  = driver.builder->Create_PathSelector(SelectorKind::One_Hot, this_linker.selector_name, this_linker.derivations,sel_properties);
+	      break;
+	  case N_Hot :
+	  case N_Hot_noidle :
+ 	      res  = driver.builder->Create_PathSelector(SelectorKind::N_Hot, this_linker.selector_name, this_linker.derivations,sel_properties);
+	      break;
+	 }
+   	auto selectorReg = res.first;
+  	auto selector    = res.second;
+
+      driver.unresolved_linkers.pop();
+      }
     driver.parsed_sut=$1;
     }
    ;
@@ -345,26 +390,39 @@ t_CHAIN  node_name  {
  	  	     $$ = node;
   		     }
  |
-t_LINKER  node_name path_selector ctrl_node {
+t_LINKER  node_name path_selector ctrl_node max_derivations{
 			int   l;
 			l = find_in_table(Path_Selector_table,$3);
 			if (l==-1)
 			 {
-   			std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-      std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unknown Linker Path Selector \n";
+   			std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" 
+					<< my_location->end.column << ": " ;
+      			std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unknown Linker Path Selector \n";
 	  		YYERROR;
 	  		}
-	  	       else
-	  	    	{
+			if ($4=="")
+			 {
+   			std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" 
+					<< my_location->end.column << ": " ;
+			std::cerr <<"Must specify a control node for path selector\n";
+			YYERROR;
+			 }
                      	std::cout << "Node type LINKER, idf " << $2.name ;
                      	if ($2.is_transparent)
 		           std::cout << "(transparent) ";
 			std::cout <<  $3 <<"_PathSelector";
-			 std::cout <<" controlled by node "<<$4;
-//		     auto node = driver.main_sm->CreateLinker ($5.name,   pathSelector, nullptr);
+			std::cout <<" controlled by node "<<$4;
  		     auto node = driver.main_sm->CreateChain ($2.name);
+		     
+  	             linker_information this_linker;
+		     this_linker.linker_node =node; 
+		     this_linker.column = my_location->begin.column;
+		     this_linker.line = my_location->begin.line;
+		     this_linker.selector_name=$4;
+		     this_linker.derivations=$5;
+		     driver.unresolved_linkers.push(this_linker);
+  
  	  	     $$ = node;
-  		      }
 		}
  |
  t_SIB node_name position active
@@ -738,6 +796,9 @@ register_node:
 		      /*TODO: save return value and check if binaryVector.size == size is correct
 		       and raise error if not*/
 		      if ($4==1) node->SetHoldValue(true);
+		     driver.declared_registers.insert ( std::pair<std::string, std::shared_ptr<mast::SystemModelNode>> 
+		     			($2.name,node) );
+   
   		     $$ = node;}
 
 size :

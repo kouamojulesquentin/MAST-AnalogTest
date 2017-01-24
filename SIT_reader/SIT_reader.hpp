@@ -10,7 +10,9 @@
 #include <istream>
 #include <memory>
 #include <iostream>
-
+#include <map>
+#include <queue>
+#include "SIT_types.h"
 
 namespace mast
 {
@@ -46,6 +48,9 @@ public:
 
    std::shared_ptr<mast::SystemModelNode>    parsed_sut;    //!< SystemModel tree build from SIT file
    std::vector<mast::AppFunctionNameAndNode> namesAndNodes; //!< Associations of algorithms name a node
+
+   std::map<std::string,  std::shared_ptr<mast::SystemModelNode>> declared_registers;
+   std::queue<linker_information> unresolved_linkers;
 
 private:  // Part used by SIT_Parser
   friend class SIT_Parser;

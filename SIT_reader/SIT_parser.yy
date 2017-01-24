@@ -22,6 +22,29 @@
 # endif
 
 #include "SIT_types.h"
+#include "BinaryVector.hpp"
+#include "SystemModelBuilder.hpp"
+#include "SystemModelNode.hpp"
+#include "PathSelector.hpp"
+}
+
+%parse-param { SIT_Scanner  &scanner  }
+%parse-param { SIT_Reader  &driver  }
+
+%code{
+/* include for all driver functions */
+#include "SIT_reader.hpp"
+#include "SIT_scanner.hpp"
+#include "SIT_types.h"
+
+#include <iostream>
+#include <cstdlib>
+#include <fstream>
+#include <string.h>
+#include <experimental/string_view>
+
+// ---------------- What is needed for parser to build the SystemModel
+//
 #include "DefaultNHotPathSelector.hpp"
 #include "SystemModelBuilder.hpp"
 #include "AccessInterfaceProtocol.hpp"
@@ -42,33 +65,13 @@
 #include "Intel_EmulationProtocol.hpp"
 #endif
 
-#include <experimental/string_view>
-
-
-
 using std::shared_ptr;
 using std::make_shared;
 using std::dynamic_pointer_cast;
 using std::pair;
 using std::experimental::string_view;
-
 using namespace mast;
 
-}
-
-%parse-param { SIT_Scanner  &scanner  }
-%parse-param { SIT_Reader  &driver  }
-
-%code{
-   #include <iostream>
-   #include <cstdlib>
-   #include <fstream>
-   #include <string.h>
-
-   /* include for all driver functions */
-   #include "SIT_reader.hpp"
-   #include "SIT_scanner.hpp"
-   #include "SIT_types.h"
 
 #undef yylex
 #define yylex scanner.yylex

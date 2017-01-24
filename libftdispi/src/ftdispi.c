@@ -255,7 +255,7 @@ __dll int ftdispi_write_read(struct ftdispi_context *fsc,
 			   fsc->fc);
 		for (n = 0; n < rcount;) {
 			FTDI_CHECK(r =
-				   ftdi_read_data(&fsc->fc, rbuf + n,
+           ftdi_read_data(&fsc->fc, (unsigned char*)rbuf + n,
 						  rcount - n), "RD", fsc->fc);
 			n += r;
 		}

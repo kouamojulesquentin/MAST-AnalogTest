@@ -46,8 +46,9 @@ BinaryVector Intel_EmulationProtocol::DoAction (uint32_t derivationId, void* /* 
 //!
 //! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence
 //!
-void Intel_EmulationProtocol::DoReset(bool doSynchronousReset)
+void Intel_EmulationProtocol::DoReset(bool /* doSynchronousReset */)
 {
+  LOG(INFO) << "DoReset does nothing";
 }
 
 //===========================================================================

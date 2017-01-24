@@ -24,9 +24,9 @@ else()
   add_executable (NW_Test_IF_end  NW_Test_IF_end.cpp)
   add_executable (NW_Test_IF_MAST NW_Test_IF_MAST.cpp)
 
-  set_target_properties (NW_Region      PROPERTIES COMPILE_FLAGS "${CFLAGS}")
-  set_target_properties (NW_Test_IF     PROPERTIES COMPILE_FLAGS "${CFLAGS}")
-  set_target_properties (NW_Test_IF_end PROPERTIES COMPILE_FLAGS "${CFLAGS}")
+  set_target_properties (NW_Region      PROPERTIES COMPILE_FLAGS "${CFLAGS} -std=c++14")
+  set_target_properties (NW_Test_IF     PROPERTIES COMPILE_FLAGS "${CFLAGS} -std=c++14")
+  set_target_properties (NW_Test_IF_end PROPERTIES COMPILE_FLAGS "${CFLAGS} -std=c++14")
 
 
   target_link_libraries (NW_Region       Mast Mast_Core Logger SIT_Reader_Lib Intel_Exp pthread dl )

@@ -5,6 +5,7 @@ if (WIN32)
 #+  set (CFLAGS "${CFLAGS} -D__LITTLE_ENDIAN=1 -D__BIG_ENDIAN=2 -D__BYTE_ORDER=1")
 #+  target_link_libraries(libftdispi)
 else()
+  set (CFLAGS "${CFLAGS} -std=c++14")
   include_directories(include/)
 
   find_path(FTDI_INCLUDE_DIR

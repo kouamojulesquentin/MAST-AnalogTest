@@ -40,12 +40,12 @@ using std::ostringstream;
 void outgoing_packet_client(blocking_queue<ring_packet>& outgoing_packets);
 void incoming_packet_server(blocking_queue<ring_packet>& incoming_packet_queue);
 
-Intel_Packet_Player::Intel_Packet_Player(std::vector<uint32_t> Region_addresses) 
+Intel_Packet_Player::Intel_Packet_Player(std::vector<uint32_t> Region_addresses)
  {
  auto n_chains = Region_addresses.size();
  m_n_chains = Region_addresses.size();
  std::bitset<ID_WIDTH> available_id=0x1;
- 
+
   outgoing_packets = new blocking_queue<ring_packet>(20);
   incoming_packet_queue = new  blocking_queue<ring_packet> (20);
 
@@ -62,19 +62,19 @@ Intel_Packet_Player::Intel_Packet_Player(std::vector<uint32_t> Region_addresses)
  /*Create emulation backend Interface*/
 
   in_server=std::thread (incoming_packet_server,std::ref(*incoming_packet_queue));
- 
+
  out_client=std::thread (outgoing_packet_client,std::ref(*outgoing_packets));
 
   out_client.detach();
   in_server.detach();
-  
-  
+
+
  /*end of emulation backend*/
 }
 
  Intel_Packet_Player::~Intel_Packet_Player()
   {}
- 
+
 void Intel_Packet_Player::send_packet(std::bitset<2> opcode, std::bitset<ID_WIDTH> id, std::bitset<DATA_WIDTH> data) const
  {
        ring_packet test_packet;
@@ -88,14 +88,14 @@ void Intel_Packet_Player::send_packet(std::bitset<2> opcode, std::bitset<ID_WIDT
 
 ring_packet Intel_Packet_Player::receive_packet() const
  {
-    
+
     auto packet = incoming_packet_queue->take();
     return packet;
  }
 
 void outgoing_packet_client(blocking_queue<ring_packet>& outgoing_packets)
- {      
- 
+ {
+
   ofstream  to_ring_file ("packets_to_ring.bin", ios::out | ios::binary);
 
   try
@@ -107,29 +107,29 @@ void outgoing_packet_client(blocking_queue<ring_packet>& outgoing_packets)
     auto packet = outgoing_packets.take(); //get first packet
      to_ring_file.write((char*)&packet,sizeof(ring_packet));
      to_ring_file.flush();
-     
+
      }
    }
-   }  
+   }
   catch ( SocketException& e )
     {
       std::cout << "Outgoing client exception was caught:" << e.description() << "\n";
     }
- } 
+ }
 
- 
+
 void incoming_packet_server(blocking_queue<ring_packet>& incoming_packet_queue)
- {      
+ {
 
   /*Open file in W mode to empty it*/
   ofstream  from_ring_file ("packets_from_ring.bin", ios::out | ios::binary);
   from_ring_file.close();
-  
+
   FILE *C_from_ring_file;
   C_from_ring_file=fopen("packets_from_ring.bin","rb");
     try
     {
- 
+
       while(true)
       {
       ring_packet packet;
@@ -142,74 +142,76 @@ void incoming_packet_server(blocking_queue<ring_packet>& incoming_packet_queue)
     {
       std::cout << "Incoming server Exception was caught:" << e.description() << "\nExiting.\n";
     }
-   
- } 
+
+ }
 
 //! Creates an Intel_Packet command associated to derivation identifier and BinaryVector to send to SUT
 //!
 BinaryVector Intel_Packet_Player::Send_Intel_Packet_Stream (uint32_t derivationId, const BinaryVector& toSutData) const
 {
-
   BinaryVector from_SUT;
-  BinaryVector  slice;
-  int offset = 0u;
-  uint8_t packet_data;
-  std::vector<uint8_t> packets_to_send;
-  int sent_packets=0;
-  ring_packet packet;
 
-  if (derivationId == 0) 
-      {
-      return from_SUT;
-      }
+  if (derivationId == 0)
+  {
+    return from_SUT;
+  }
+
   if (derivationId > m_n_chains)
-      THROW_INVALID_ARGUMENT("DerivationId must be comprised between '0' (for Reset) and the total number of chains");
+    THROW_INVALID_ARGUMENT("DerivationId must be comprised between '0' (for Reset) and the total number of chains");
 
- std::bitset<ID_WIDTH> stream_id =  region_id[derivationId];
- std::bitset<ADDR_WIDTH> Phy_Addr=  region_addr[derivationId];
-     /*Assign target region a stream id */
-     send_packet(SELECT,stream_id,FIRST_REGION_ADDR);
-     receive_packet(); //SELECT packet comes back identical from ring 
+  std::bitset <ID_WIDTH>   stream_id = region_id[derivationId];
+//+  std::bitset <ADDR_WIDTH> Phy_Addr = region_addr[derivationId];
+  /*Assign target region a stream id */
+  send_packet(SELECT, stream_id, FIRST_REGION_ADDR);
+  receive_packet(); //SELECT packet comes back identical from ring
 
-     /*Select SCANCTL*/
-     send_packet(CONTROL,stream_id,0x10);
-     receive_packet(); //CONTROL packet comes back from ring with previous CONTROL value 
-     	/*Enable scan on region*/
-     send_packet(DATA,stream_id,0x03);
-     receive_packet(); //DATA packet comes back from ring with previous SCANCTL value
+  /*Select SCANCTL*/
+  send_packet(CONTROL, stream_id, 0x10);
+  receive_packet(); //CONTROL packet comes back from ring with previous CONTROL value
+  /*Enable scan on region*/
+  send_packet(DATA, stream_id, 0x03);
+  receive_packet(); //DATA packet comes back from ring with previous SCANCTL value
 
-     /*Select SCANDATA */
-     send_packet(CONTROL,stream_id,0x11);
-     receive_packet(); //CONTROL packet comes back from ring with previous CONTROL value (here: SCANCTL, 0x10);
+  /*Select SCANDATA */
+  send_packet(CONTROL, stream_id, 0x11);
+  receive_packet(); //CONTROL packet comes back from ring with previous CONTROL value (here: SCANCTL, 0x10);
 
-     /*Send Data: manually handle covnersion to network ordering (big endian)*/
-     offset = toSutData.BitsCount()-DATA_WIDTH;
-     auto nw_order_data= new std::vector<uint8_t>();
-     while(offset >=0)
-        {
-	slice = toSutData.Slice(offset,DATA_WIDTH);
-	slice.Get(packet_data);
+//+  std::vector <uint8_t> packets_to_send;
 
-	offset-=DATA_WIDTH;
-        send_packet(DATA,stream_id,packet_data);
-	sent_packets++;
+  /*Send Data: manually handle covnersion to network ordering (big endian)*/
+  unsigned int          offset = toSutData.BitsCount() - DATA_WIDTH;
+  std::vector <uint8_t> nw_order_data;
+  int                   sent_packets = 0;
+  BinaryVector          slice;
+  ring_packet           packet;
+
+  while (offset != 0)
+  {
+    uint8_t packet_data;
+
+    slice = toSutData.Slice(offset, DATA_WIDTH);
+    slice.Get(packet_data);
+
+    offset -= DATA_WIDTH;
+    send_packet(DATA, stream_id, packet_data);
+    sent_packets++;
+
     /*Retrieve data from received packets*/
-       packet=receive_packet();
-       packet_data=static_cast<uint8_t>(packet.data.to_ulong());
-       nw_order_data->insert(nw_order_data->begin(),packet_data);
-       }
+    packet = receive_packet();
+    packet_data = static_cast <uint8_t>(packet.data.to_ulong());
+    nw_order_data.insert(nw_order_data.begin(), packet_data);
+  }
 
 
-     /*manually handle conversion  from network ordering (big endian)*/
-       
-       for (auto cur_byte : *nw_order_data)
-	  from_SUT.Append(cur_byte);
-	
+  /*manually handle conversion  from network ordering (big endian)*/
 
-     /*release stream id*/
-     send_packet(SELECT,0x0,FIRST_REGION_ADDR);
-     receive_packet(); //SELECT packet comes back identical from ring 
+  for (auto cur_byte : nw_order_data)
+    from_SUT.Append(cur_byte);
 
+
+  /*release stream id*/
+  send_packet(SELECT, 0x0, FIRST_REGION_ADDR);
+  receive_packet(); //SELECT packet comes back identical from ring
 
   return from_SUT;
 }
@@ -222,10 +224,9 @@ BinaryVector Intel_Packet_Player::Send_Intel_Packet_Stream (uint32_t derivationI
 //!
 //! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence
 //!
-void Intel_Packet_Player::CreateResetIntel_PacketCommand (bool doSynchronousReset) const
+void Intel_Packet_Player::CreateResetIntel_PacketCommand (bool /* doSynchronousReset */) const
 {
-
-  return ;
+  LOG(INFO) << "CreateResetIntel_PacketCommand does nothing!";
 }
 //
 //  End of: Intel_Packet_Player::CreateIntel_PacketCommand

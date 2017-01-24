@@ -161,29 +161,27 @@ int Socket::recv ( std::string& s ) const
 
 
 
-int Socket::recv ( ring_packet& s ) const
+int Socket::recv (ring_packet& s) const
 {
-  char buf [ MAXRECV + 1 ];
+  char buf[MAXRECV + 1];
 
-   memset ( buf, 0, MAXRECV + 1 );
-  ring_packet *tmp;
+  memset(buf, 0, MAXRECV + 1);
+  int status = ::recv(m_sock, buf, MAXRECV, 0);
 
-  int status = ::recv ( m_sock, buf, MAXRECV, 0 );
-
-  if ( status == -1 )
-    {
-      std::cout << "status == -1   errno == " << errno << "  in Socket::recv\n";
-      return 0;
-    }
-  else if ( status == 0 )
-    {
-      return 0;
-    }
+  if (status == -1)
+  {
+    std::cout << "status == -1   errno == " << errno << "  in Socket::recv\n";
+    return 0;
+  }
+  else if (status == 0)
+  {
+    return 0;
+  }
   else
-    { 
-     s = *( ring_packet *)buf;
-      return status;
-    }
+  {
+    s = *(ring_packet*) buf;
+    return status;
+  }
 }
 
 

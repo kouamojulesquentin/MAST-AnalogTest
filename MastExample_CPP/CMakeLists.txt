@@ -42,15 +42,16 @@ else ()
   find_package(PNG REQUIRED)
   include_directories(${PNG_INCLUDE_DIR})
 
-  add_library(kiss_fft SHARED
-    # main FFT implementation
-    kissfft/kiss_fft.c
-    # from the tools/ directory
-    kissfft/tools/kfc.c
-    kissfft/tools/kiss_fftnd.c
-    kissfft/tools/kiss_fftndr.c
-    kissfft/tools/kiss_fftr.c
-    )
+  set(KissFFT_Files # main FFT implementation
+                    kissfft/kiss_fft.c
+                    # from the tools/ directory
+                    kissfft/tools/kfc.c
+                    kissfft/tools/kiss_fftnd.c
+                    kissfft/tools/kiss_fftndr.c
+                    kissfft/tools/kiss_fftr.c
+  )
+  set_source_files_properties (${KissFFT_Files} PROPERTIES COMPILE_FLAGS "-Wall" )
+  add_library(kiss_fft SHARED ${KissFFT_Files})
 
   add_executable        (Intel main.cpp   Intel.cpp)
   set_target_properties (Intel PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )

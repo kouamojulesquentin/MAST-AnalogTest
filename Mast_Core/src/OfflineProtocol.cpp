@@ -31,7 +31,7 @@ using namespace mast;
 
 //! Spies content of parameter toSutData and return it unchanged
 //!
-BinaryVector OfflineProtocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector OfflineProtocol::DoAction (uint32_t /* derivationId */, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   auto command = toSutData.DataAsBinaryString ();
   SendCommand(command);
@@ -189,9 +189,9 @@ void OfflineProtocol::SendCommand (string_view command)
 //!
 //! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence
 //!
-void OfflineProtocol::DoReset(bool doSynchronousReset)
+void OfflineProtocol::DoReset(bool /* doSynchronousReset */)
 {
-  return;
+  LOG(INFO) << "DoReset does nothing!";
 }
 
 

@@ -41,7 +41,6 @@ SOURCES += \
 HEADERS += \
     location.hh \
     position.hh \
-    position.hh \
     SIT_reader.hpp \
     stack.hh
 

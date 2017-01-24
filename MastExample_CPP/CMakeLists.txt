@@ -15,59 +15,59 @@ include_directories(../Logger/)
 include_directories(../Logger/g3log/)
 include_directories(../SIT_reader/)
 
-include_directories(kissfft/)
-include_directories(kissfft/tools)
-
-
 if (WIN32)
   include_directories($ENV{FLEX_DIR})
 endif()
 
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "../Bin")
+
 add_executable 				(MastExample_CPP main.cpp Example.cpp)
 set_target_properties	(MastExample_CPP PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
-add_executable 		(Tutorial main.cpp Tutorial.cpp)
-set_target_properties	(Tutorial PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
-
-add_executable 		(Intel main.cpp Intel.cpp)
-set_target_properties	(Intel PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
-
-find_package(PNG REQUIRED)
-include_directories(${PNG_INCLUDE_DIR})
-
-add_executable 		(ETS17 main.cpp ETS17.cpp)
-set_target_properties	(ETS17 PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
-
-add_library(kiss_fft SHARED
-  # main FFT implementation
-  kissfft/kiss_fft.c
-  # from the tools/ directory
-  kissfft/tools/kfc.c 
-  kissfft/tools/kiss_fftnd.c 
-  kissfft/tools/kiss_fftndr.c 
-  kissfft/tools/kiss_fftr.c
-  )
-
-add_executable 				(ML505 main.cpp ml505_demo.cpp)
-set_target_properties	(ML505 PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
-
-add_executable 				(ML505SPI main.cpp ml505_spi.cpp)
-set_target_properties	(ML505SPI PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+add_executable        (Tutorial main.cpp   Tutorial.cpp)
+set_target_properties (Tutorial PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
 
-if (WIN32)
-	target_link_libraries(MastExample_CPP Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
-	target_link_libraries(Tutorial Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
-	target_link_libraries(Intel Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
-	target_link_libraries(ML505 Mast Mast_Core Logger SIT_Reader_Lib DbgHelp kiss_fft)
-	target_link_libraries(ML505SPI Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
+if (WIN32) # Package png not installed on Windows ==> Cannot use kiss_fft (as is)
+  target_link_libraries(MastExample_CPP Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
+  target_link_libraries(Tutorial        Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
+#+	target_link_libraries(Intel Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
+#+	target_link_libraries(ML505 Mast Mast_Core Logger SIT_Reader_Lib DbgHelp kiss_fft)
+#+	target_link_libraries(ML505SPI Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
 else ()
-	target_link_libraries(MastExample_CPP Mast Mast_Core Logger SIT_Reader_Lib pthread dl)
-	target_link_libraries(Tutorial Mast Mast_Core Logger SIT_Reader_Lib pthread dl)
-	target_link_libraries(Intel Mast Mast_Core Logger SIT_Reader_Lib pthread dl)
-	target_link_libraries(ML505 Mast Mast_Core Logger SIT_Reader_Lib pthread dl kiss_fft)
-	target_link_libraries(ML505SPI Mast Mast_Core Logger SIT_Reader_Lib pthread dl)
-	target_link_libraries(ETS17 Mast Mast_Core Logger SIT_Reader_Lib pthread dl kiss_fft ${PNG_LIBRARY})
+  include_directories(kissfft/)
+  include_directories(kissfft/tools)
+
+  find_package(PNG REQUIRED)
+  include_directories(${PNG_INCLUDE_DIR})
+
+  add_library(kiss_fft SHARED
+    # main FFT implementation
+    kissfft/kiss_fft.c
+    # from the tools/ directory
+    kissfft/tools/kfc.c
+    kissfft/tools/kiss_fftnd.c
+    kissfft/tools/kiss_fftndr.c
+    kissfft/tools/kiss_fftr.c
+    )
+
+  add_executable        (Intel main.cpp   Intel.cpp)
+  set_target_properties (Intel PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+
+  add_executable        (ML505 main.cpp ml505_demo.cpp)
+  set_target_properties (ML505 PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+
+  add_executable        (ML505SPI main.cpp ml505_spi.cpp)
+  set_target_properties (ML505SPI PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+
+  add_executable        (ETS17 main.cpp   ETS17.cpp)
+  set_target_properties (ETS17 PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+
+  target_link_libraries(MastExample_CPP Mast Mast_Core Logger SIT_Reader_Lib pthread dl)
+  target_link_libraries(Tutorial        Mast Mast_Core Logger SIT_Reader_Lib pthread dl)
+  target_link_libraries(Intel           Mast Mast_Core Logger SIT_Reader_Lib pthread dl)
+  target_link_libraries(ML505           Mast Mast_Core Logger SIT_Reader_Lib pthread dl kiss_fft)
+  target_link_libraries(ML505SPI        Mast Mast_Core Logger SIT_Reader_Lib pthread dl)
+  target_link_libraries(ETS17           Mast Mast_Core Logger SIT_Reader_Lib pthread dl kiss_fft ${PNG_LIBRARY})
 endif ()

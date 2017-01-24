@@ -19,7 +19,7 @@ using std::shared_ptr;
 
 
 
-//! Does what is necessary for a pending linker child
+//! Selects a child if not already active
 //!
 //! @param linker         The linker currently configured
 //! @param pathIdentifier Pending child path identifier
@@ -27,10 +27,16 @@ using std::shared_ptr;
 //!
 void ConfigureAlgorithm_LastOrDefault::ProcessPending (Linker& linker, uint32_t pathIdentifier, shared_ptr<SystemModelNode> /* child */)
 {
-  if (!linker.IsActive(pathIdentifier))
+  if (!linker.IsActive(pathIdentifier)) // Do not take risk to overwrite another selection
   {
     linker.Select(pathIdentifier);
   }
+//+ (begin JFC October/03/2016): for debug purpose
+//+  else
+//+  {
+//+    linker.Select(pathIdentifier);
+//+  }
+//+ (end   JFC October/03/2016):
 }
 //
 //  End of: ConfigureAlgorithm_LastOrDefault::ProcessPending
@@ -40,8 +46,7 @@ void ConfigureAlgorithm_LastOrDefault::ProcessPending (Linker& linker, uint32_t 
 
 //! Selects path 0 when linker is not pending, otherwise does nothing
 //!
-//! @note Must be called after linker pending state has been updated (this permit stateless algorithm)
-//! @note Post-condition: a selection choice must have done (by this method or by one call of ProcessPending for current linker)
+//! @note Must be called after linker pending state has been updated (this permit stateless algorithm)//! @note Post-condition: a selection choice must have done (by this method or by one call of ProcessPending for current linker)
 //!
 //! @param linker The linker currently configured
 //!

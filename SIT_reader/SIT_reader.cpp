@@ -1,6 +1,7 @@
 #include <cctype>
 #include <fstream>
 #include <cassert>
+#include <memory>
 
 #include "SystemModelBuilder.hpp"
 #include "SIT_reader.hpp"
@@ -9,6 +10,7 @@
 
 using std::experimental::string_view;
 
+using std::make_shared;
 using namespace mast;
 
 

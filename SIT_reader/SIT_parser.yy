@@ -22,6 +22,29 @@
 # endif
 
 #include "SIT_types.h"
+#include "BinaryVector.hpp"
+#include "SystemModelBuilder.hpp"
+#include "SystemModelNode.hpp"
+#include "PathSelector.hpp"
+}
+
+%parse-param { SIT_Scanner  &scanner  }
+%parse-param { SIT_Reader  &driver  }
+
+%code{
+/* include for all driver functions */
+#include "SIT_reader.hpp"
+#include "SIT_scanner.hpp"
+#include "SIT_types.h"
+
+#include <iostream>
+#include <cstdlib>
+#include <fstream>
+#include <string.h>
+#include <experimental/string_view>
+
+// ---------------- What is needed for parser to build the SystemModel
+//
 #include "DefaultNHotPathSelector.hpp"
 #include "SystemModelBuilder.hpp"
 #include "AccessInterfaceProtocol.hpp"
@@ -38,7 +61,6 @@
 #include "OpenOCDProtocol.hpp"
 #include "Utility.hpp"
 
-#define INTEL_EXPERIMENT
 #ifdef INTEL_EXPERIMENT
 #include "Intel_EmulationProtocol.hpp"
 #endif
@@ -53,24 +75,8 @@ using std::make_shared;
 using std::dynamic_pointer_cast;
 using std::pair;
 using std::experimental::string_view;
-
 using namespace mast;
 
-}
-
-%parse-param { SIT_Scanner  &scanner  }
-%parse-param { SIT_Reader  &driver  }
-
-%code{
-   #include <iostream>
-   #include <cstdlib>
-   #include <fstream>
-   #include <string.h>
-
-   /* include for all driver functions */
-   #include "SIT_reader.hpp"
-   #include "SIT_scanner.hpp"
-   #include "SIT_types.h"
 
 #undef yylex
 #define yylex scanner.yylex
@@ -91,7 +97,7 @@ extern SIT::SIT_Parser::location_type *my_location;
 #endif
 
 #define OPENOCD_DEFAULT_PATH "openocd"
- 
+
 std::vector<std::string> AI_protocol_table  =
   {"JTAG_Loopback","JTAG_SVF_Simulation","JTAG_SVF_Emulation",
   "SPI_FTDI", "STIL_Emulation","I2C_Emulation",
@@ -161,8 +167,8 @@ std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(const std::string& desig
     }
     else
      path = std::string(path_tmp);
-    
-    
+
+
    if (path.back()!=DIR_SEPARATOR)
 	   path.push_back(DIR_SEPARATOR);
     path.append(OPENOCD_DEFAULT_CONFIG);
@@ -173,7 +179,7 @@ std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(const std::string& desig
    auto protocol = make_shared<OpenOCDProtocol> (path, designName, IR_size);
    if (protocol->is_initialized()==false)
     return nullptr;
-   else  
+   else
    return protocol;
 }
 /*void clear_linker_information() 
@@ -351,7 +357,7 @@ parent_node_with_children: parent_node PDL_declaration children_list
  }
 
 PDL_declaration:
- t_PDL function_list { 
+ t_PDL function_list {
            pair <std::vector<std::string>,std::uint32_t> ret;
 	   ret.first = $2;
 //	   ret.second =my_location->begin.line;
@@ -359,7 +365,7 @@ PDL_declaration:
 	   $$ = ret;
 	   }
  |
-  {  
+  {
    std::pair <std::vector<std::string>,std::uint32_t> ret;
    ret.first = std::vector<std::string>();
 //   ret.second =my_location->begin.line;
@@ -597,17 +603,21 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains {
 	 }
         case Intel_Packet :
          {
-          if (($5.size())!=$6)
-          {
-            std::cerr << "Error, " << AI_protocol_table[l] <<" requires 1 address for each register chain\n";
-            YYERROR;
-          }
-          auto Region_addresses       = std::vector<uint32_t>();
-          for ( auto i = 0 ; i < $5.size(); i ++)
-          {
-            Region_addresses.push_back($5[i]);
-          }
-	 protocol = make_shared<Intel_EmulationProtocol > (Region_addresses);
+          #ifdef INTEL_EXPERIMENT
+            if (($5.size())!=$6)
+            {
+              std::cerr << "Error, " << AI_protocol_table[l] <<" requires 1 address for each register chain\n";
+              YYERROR;
+            }
+            auto Region_addresses       = std::vector<uint32_t>();
+            for ( auto i = 0 ; i < $5.size(); i ++)
+            {
+              Region_addresses.push_back($5[i]);
+            }
+            protocol = make_shared<Intel_EmulationProtocol > (Region_addresses);
+          #else
+           std::cerr << "Error, Intel_EmulationProtocol has not been built";
+          #endif
 	 break;
 	 }
       } // End of: switch(l)
@@ -617,7 +627,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains {
 		}
 	  }
  |
-  t_JTAG_TAP node_name JTAG_protocol AI_identifier IR_size IR_TABLE n_DR_chains 
+  t_JTAG_TAP node_name JTAG_protocol AI_identifier IR_size IR_TABLE n_DR_chains
       {
       {
   	{
@@ -675,8 +685,8 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains {
 	      }
 	   auto node = driver.builder->Create_JTAG_TAP($2.name,$5,$7+1,protocol,$6);
   	   $$ = node;
-	      
-	   } 
+
+	   }
 	 }
 	}
        }
@@ -706,7 +716,7 @@ n_DR_chains :
 
 n_chains :
  {$$ = 0;}
- | 
+ |
  t_DecimalLiteral { $$ = $1;}
 ;
 
@@ -826,5 +836,5 @@ SIT::SIT_Parser::error( const location_type &l, const std::string &err_message )
    std::cerr << err_message << "\n";
    driver.parsed_sut=nullptr;
   THROW_RUNTIME_ERROR("Parse error");
- 
+
 }

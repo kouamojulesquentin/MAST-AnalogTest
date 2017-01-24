@@ -26,14 +26,13 @@
 #include "GmlPrinter.hpp"
 #include "PrettyPrinter.hpp"
 #include "g3log/g3log.hpp"
-//+#include "g3log/logworker.hpp"
-//+#include "LogFormatter.h"
-//+#include "LoggerSinks.h"
-//+#include "CustomFileSink.h"
-//+#include "SIT_reader.hpp"
 #include "Options.hpp"
 #include "Zybo.hpp"
-#include "ml505_demo.hpp"
+
+#if defined(USE_KISS_FFT)
+  #include "ml505_demo.hpp"
+#endif
+
 
 #include <stdexcept>
 #include <vector>
@@ -199,8 +198,12 @@ vector<AppFunctionAndNodePath> CreateTestcase (shared_ptr<AccessInterfaceProtoco
       }
 			else if(name == "ml505")
 			{
-				associations = test::ml505_CreateApplicationsDescriptor();
-			}
+        #if defined(USE_KISS_FFT)
+        associations = test::ml505_CreateApplicationsDescriptor();
+        #else
+        LOG(ERROR_LVL) << "Cannot target ml505 because application has not been build with Kiss FFT !!!";
+        #endif
+      }
       else
       {
         auto topPath   = "W_1500.SWIR.WIR";

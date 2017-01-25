@@ -50,8 +50,8 @@ else ()
                     kissfft/tools/kiss_fftndr.c
                     kissfft/tools/kiss_fftr.c
   )
-  set_source_files_properties (${KissFFT_Files} PROPERTIES COMPILE_FLAGS "-Wall" )
-  add_library(kiss_fft SHARED ${KissFFT_Files})
+  add_library           (kiss_fft SHARED     ${KissFFT_Files})
+  set_target_properties (kiss_fft PROPERTIES COMPILE_FLAGS "-Wall" )
 
   add_executable        (Intel main.cpp   Intel.cpp)
   set_target_properties (Intel PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )

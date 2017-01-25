@@ -5,7 +5,6 @@ if (WIN32)
 #+  set (CFLAGS "${CFLAGS} -D__LITTLE_ENDIAN=1 -D__BIG_ENDIAN=2 -D__BYTE_ORDER=1")
 #+  target_link_libraries(libftdispi)
 else()
-  set (CFLAGS "${CFLAGS} -std=c++14")
   include_directories(include/)
 
   find_path(FTDI_INCLUDE_DIR
@@ -22,7 +21,7 @@ else()
 
   file(GLOB libftdispi_SOURCES "src/*")
   add_library           (libftdispi SHARED ${libftdispi_SOURCES})
-  set_target_properties (libftdispi PROPERTIES COMPILE_FLAGS "${CFLAGS}")
+  set_target_properties (libftdispi PROPERTIES COMPILE_FLAGS "-Wall")
 
   target_link_libraries(libftdispi ftdi)
 endif()

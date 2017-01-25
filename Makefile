@@ -63,12 +63,12 @@ TESTCASES_EXE_PATH    = $(BIN_DIR)/$(TESTCASES_EXE_NAME)
 CPP_EXAMPLE_EXE_PATH  = $(BIN_DIR)/$(CPP_EXAMPLE_EXE_NAME)
 endif
 
-BUILD_UT = ON
+#+BUILD_UT = ON
 
 CPP_DEFINES  = -DUSE_OPEN_OCD:BOOL=$(USE_OPEN_OCD)
 CPP_DEFINES += -DUSE_LIBFTDISPI:BOOL=$(USE_LIBFTDISPI)
 CPP_DEFINES += -DINTEL_EXPERIMENT:BOOL=$(INTEL_EXPERIMENT)
-CPP_DEFINES += -DBUILD_UT:BOOL=$(BUILD_UT)
+#+CPP_DEFINES += -DBUILD_UT:BOOL=$(BUILD_UT)
 
 CMAKE_DEBUG_FLAGS=    -DCMAKE_BUILD_TYPE=Debug   $(CMAKE_FLAGS) $(CPP_DEFINES)
 CMAKE_RELEASE_FLAGS=  -DCMAKE_BUILD_TYPE=Release $(CMAKE_FLAGS) $(CPP_DEFINES)
@@ -100,7 +100,7 @@ ifeq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR))","")
 > cd       $(CMAKE_DEBUG_BUILD_DIR) && cmake $(CMAKE_DEBUG_FLAGS) ..
 endif
 > $(info ==> Makefile: Use Open OCD: $(USE_OPEN_OCD))
-> $(info ==> Makefile: Build UT:     $(BUILD_UT))
+#+> $(info ==> Makefile: Build UT:     $(BUILD_UT))
 > cd $(CMAKE_DEBUG_BUILD_DIR) && make $(MAKE_FLAGS)
 
 release_cmake:
@@ -109,7 +109,7 @@ ifeq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR))","")
 > cd $(CMAKE_RELEASE_BUILD_DIR) && cmake  $(CMAKE_RELEASE_FLAGS)  ..
 endif
 > $(info ==> Makefile: Use Open OCD: $(USE_OPEN_OCD))
-> $(info ==> Makefile: Build UT:     $(BUILD_UT))
+#+> $(info ==> Makefile: Build UT:     $(BUILD_UT))
 > cd $(CMAKE_RELEASE_BUILD_DIR) && make  $(MAKE_FLAGS)
 
 run_debug:

@@ -6,6 +6,7 @@
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <array>
 
 #include "DFT_Ring_NW.h"
 
@@ -163,10 +164,10 @@ int Socket::recv ( std::string& s ) const
 
 int Socket::recv (ring_packet& s) const
 {
-  char buf[MAXRECV + 1];
+  std::array<char, MAXRECV + 1> buf;
 
-  memset(buf, 0, MAXRECV + 1);
-  int status = ::recv(m_sock, buf, MAXRECV, 0);
+  memset(buf.data(), 0, MAXRECV + 1);
+  int status = ::recv(m_sock, buf.data(), MAXRECV, 0);
 
   if (status == -1)
   {
@@ -179,7 +180,7 @@ int Socket::recv (ring_packet& s) const
   }
   else
   {
-    s = *(ring_packet*) buf;
+    s = *reinterpret_cast<ring_packet*>(buf.data());
     return status;
   }
 }

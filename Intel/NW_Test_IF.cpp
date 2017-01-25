@@ -67,13 +67,13 @@ int main (int /* argc */, char ** /* argv */)
   std :: string run_enpoint = "xterm -e ./NW_Test_IF_end ";
   run_enpoint.append(SSTR(LAST_PORT)+" "+SSTR(SERVER_ADDR));
   run_enpoint.append("&");
-  system (run_enpoint.c_str ());
+  int retCode = system (run_enpoint.c_str());
   sleep(1);
   std::cout << run_region <<"\n";
-  system (run_region.c_str ());
+  retCode = system (run_region.c_str());
   sleep(1);
 
   run_TEST_IF_start (FIRST_PORT );
-
-  return 0;
+  retCode = 0;
+  return retCode;
 }

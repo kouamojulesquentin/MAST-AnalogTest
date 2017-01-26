@@ -17,6 +17,7 @@ using namespace std::literals::chrono_literals;
 using g3::LoggerSink;
 using g3::UnitTestsLoggerSink;
 using g3::CoutLoggerSink;
+using g3::ErrorsOnCerrLoggerSink;
 
 std::weak_ptr<g3::SinkHandle<g3::UnitTestsLoggerSink>> g3::UnitTestsLoggerSink::sm_sinkHandle;
 
@@ -66,7 +67,7 @@ int UnitTestsLoggerSink::WaitTilLogCount (UnitTestsLoggerSink::TSinkHandle sinkH
   return currentCount;
 }
 
-//! Collects (or not) a log message
+//! Streams log message to std::cout
 //!
 void CoutLoggerSink::ReceiveLogMessage(g3::LogMessageMover&& logMessage)
 {
@@ -75,6 +76,17 @@ void CoutLoggerSink::ReceiveLogMessage(g3::LogMessageMover&& logMessage)
     std::cout << Formatter().FormatAsStdString(std::move(logMessage)) << std::endl;
   }
 }
+
+//! Collects (or not) a log message
+//!
+void ErrorsOnCerrLoggerSink::ReceiveLogMessage(g3::LogMessageMover&& logMessage)
+{
+  if (IsEnabled() && (logMessage.get()._level == ERROR_LVL))
+  {
+    std::cerr << Formatter().FormatAsStdString(std::move(logMessage)) << std::endl;
+  }
+}
+
 
 
 //===========================================================================

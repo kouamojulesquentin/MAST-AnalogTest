@@ -19,6 +19,7 @@
 #include "g3log/g3log.hpp"
 #include "g3log/logworker.hpp"
 #include "CustomFileSink.h"
+#include "LoggerSinks.h"
 
 
 using std::shared_ptr;
@@ -45,10 +46,17 @@ std::unique_ptr<g3::LogWorker> InitializeLogger ()
   logFormatter.ShowFunctionName(true);
   logFormatter.ShowLineNumber(false);
 
+  // ---------------- Sink for logging to file
+  //
   auto customSink = std::make_unique<g3::CustomFileSink>("Log.txt", g3::CustomFileSink::FlushMode::AutoBackground, logFormatter);
   customSink->Clear();
 
   logworker->addSink(std::move(customSink), &g3::CustomFileSink::ReceiveLogUnformattedMessage);
+
+  // ---------------- Sink for logging errors to std::cerr
+  //
+  auto cerrSink = std::make_unique<g3::ErrorsOnCerrLoggerSink>();
+  logworker->addSink(std::move(cerrSink), &g3::ErrorsOnCerrLoggerSink::ReceiveLogMessage);
 
   g3::initializeLogging(logworker.get());
   g3::logEnabled(true);

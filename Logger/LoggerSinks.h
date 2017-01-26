@@ -78,7 +78,7 @@ namespace g3
     static int         WaitTilLogCount(UnitTestsLoggerSink::TSinkHandle sinkHandle, int count);
   };
 
-  //! Saves each log message into a string list (to be easily checked by unit tests dedicated to logs)
+  //! Streams all log messages to std::cout
   //!
   class G3LOG_DLL_EXPORT CoutLoggerSink final : public LoggerSink
   {
@@ -91,6 +91,22 @@ namespace g3
 
     void ReceiveLogMessage(g3::LogMessageMover&& logMessage) override;
   };
+
+
+  //! Streams ERROR only log messages to std::cerr
+  //!
+  class G3LOG_DLL_EXPORT ErrorsOnCerrLoggerSink final : public LoggerSink
+  {
+    public:
+
+    virtual ~ErrorsOnCerrLoggerSink() = default;
+             ErrorsOnCerrLoggerSink()             : ErrorsOnCerrLoggerSink(true) {}
+             ErrorsOnCerrLoggerSink(bool enabled) : LoggerSink(enabled) {}
+             ErrorsOnCerrLoggerSink(const g3::LogFormatter& formatter, bool enabled = true) : LoggerSink(formatter, enabled) {}
+
+    void ReceiveLogMessage(g3::LogMessageMover&& logMessage) override;
+  };
+
 
 
   //! Discards (does nothing with) log messages

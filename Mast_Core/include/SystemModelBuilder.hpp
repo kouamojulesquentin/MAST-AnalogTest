@@ -48,6 +48,7 @@ enum class SelectorKind
   Binary,  //!< Basic binary encoding where value '00' select path '0'
   One_Hot, //!< One hot encoding where value '000' select no path and "001" path '0'
   N_Hot,   //!< One hot encoding where value '000' select no path, "001" path '0', "011" paths '1' and '0'
+  Unresolved,
 };
 
 //! Provides facilities to create SystemModel sub-trees

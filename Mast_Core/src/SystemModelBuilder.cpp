@@ -17,6 +17,7 @@
 #include "DefaultBinaryPathSelector.hpp"
 #include "DefaultOneHotPathSelector.hpp"
 #include "DefaultNHotPathSelector.hpp"
+#include "UnresolvedPathSelector.hpp"
 #include "AccessInterfaceProtocol.hpp"
 #include "BrocadeSelector.hpp"
 #include "Utility.hpp"
@@ -486,7 +487,7 @@ shared_ptr<Chain> SystemModelBuilder::Create_SIB (string_view              name,
 
 //! Creates a path selector
 //!
-//! @param selectorKind         Kind of selector (Binary, One_Hot, N_Hot)
+//! @param selectorKind         Kind of selector (Binary, One_Hot, N_Hot,Unresolved)
 //! @param associatedRegister   Register that is used to drive the path multiplexer
 //! @param pathsCount           Number of managed paths (including, optional, bypass register)
 //! @param properties           Properties of the selector (bit order can be reverse or it can use negative logic)
@@ -508,6 +509,8 @@ shared_ptr<PathSelector> SystemModelBuilder::Create_PathSelector (SelectorKind  
       return make_shared<DefaultOneHotPathSelector>(associatedRegister, pathsCount, properties);
     case SelectorKind::N_Hot:
       return make_shared<DefaultNHotPathSelector>(associatedRegister, pathsCount, properties);
+    case SelectorKind::Unresolved:
+      return make_shared<UnresolvedPathSelector>();
     default:
       THROW_INVALID_ARGUMENT("Can only support Binary, One_Hot and N_Hot type path selector");
       break;
@@ -545,6 +548,9 @@ pair<shared_ptr<Register>, shared_ptr<PathSelector>> SystemModelBuilder::Create_
       break;
     case SelectorKind::N_Hot:
       registerInitialValue = DefaultNHotPathSelector::AssociatedRegisterInitialValue(pathsCount, properties);
+      break;
+    case SelectorKind::Unresolved:
+      registerInitialValue = UnresolvedPathSelector::AssociatedRegisterInitialValue(pathsCount, properties);
       break;
     default:
       THROW_INVALID_ARGUMENT("Can only support Binary, One_Hot and N_Hot type path selector");

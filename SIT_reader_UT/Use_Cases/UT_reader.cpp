@@ -1011,7 +1011,7 @@ make_tuple( "LINKER test_LINKER Binary selector_reg 4\
   "Error, Selector register selector_reg required by linker test_LINKER at line 1:40 does not exist\nParse failed!!\n",
   3u),
    /*correct syntax */ 
-make_tuple( "LINKER test_LINKER Binary test_reg_1 4\
+make_tuple( "LINKER test_LINKER One_Hot test_reg_1 4\
     {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
     }",

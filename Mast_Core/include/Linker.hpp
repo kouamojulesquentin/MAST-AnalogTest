@@ -65,6 +65,8 @@ class DLL_EXPORT Linker : public ParentNode
 
   std::shared_ptr<PathSelector> Selector() const { return m_pathSelector; }
 
+  void ReplacePathSelector  (const std::shared_ptr<PathSelector>& new_pathSelector) {m_pathSelector=new_pathSelector;};   //!< Replaces current path selector
+
   // ---------------- Protected Methods
   //
   protected:

@@ -39,7 +39,7 @@
 
 #include <iostream>
 #include <cstdlib>
-#include <fstream>
+#include <fstream> 
 #include <string.h>
 #include <experimental/string_view>
 
@@ -60,6 +60,7 @@
 #include "AppFunctionNameAndNode.hpp"
 #include "OpenOCDProtocol.hpp"
 #include "Utility.hpp"
+#include "UnresolvedPathSelector.hpp"
 
 #ifdef INTEL_EXPERIMENT
 #include "Intel_EmulationProtocol.hpp"
@@ -182,15 +183,63 @@ std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(const std::string& desig
    else
    return protocol;
 }
-/*void clear_linker_information() 
-{
-std::map<std::string,  std::shared_ptr<mast::SystemModelNode>> empty_registers;
-std::queue<linker_information> empty_linkers;
 
-std::swap(driver.declared_registers,empty_registers);
-std::swap( unresolved_linkers,empty_linkers);
+class SIT_Reader;
 
-}*/
+std::pair<shared_ptr<Register>, shared_ptr<PathSelector>> make_PathSelector 
+           (
+	  std::shared_ptr<mast::SystemModelBuilder> builder, 
+	  int SelectorType,
+      	  const SelectorProperty& sel_properties,
+	  const std::string& selectorRegName,
+	  const std::uint32_t&  max_derivations
+	   )
+  {
+     pair<shared_ptr<Register>, shared_ptr<PathSelector>> res; /*cannot use auto inside a switch*/
+ 	switch(SelectorType)
+	 {
+	  case Binary :
+	  case Binary_noidle :
+	      res =  builder->Create_PathSelector(SelectorKind::Binary, selectorRegName, max_derivations,sel_properties);
+	     break;
+	  case One_Hot :
+	  case One_Hot_noidle :
+ 	      res  = builder->Create_PathSelector(SelectorKind::One_Hot, selectorRegName, max_derivations,sel_properties);
+	      break;
+	  case N_Hot :
+	  case N_Hot_noidle :
+ 	      res  = builder->Create_PathSelector(SelectorKind::N_Hot, selectorRegName, max_derivations,sel_properties);
+	      break;
+	 }
+  return res;	 
+ }
+std::shared_ptr<PathSelector> make_PathSelector 
+           (
+	  std::shared_ptr<mast::SystemModelBuilder> builder, 
+	  int SelectorType,
+      	  const SelectorProperty& sel_properties,
+	  std::shared_ptr< Register > selectorReg,
+	  const std::uint32_t&  max_derivations
+	   )
+  {
+     shared_ptr<PathSelector> res; /*cannot use auto inside a switch*/
+ 	switch(SelectorType)
+	 {
+	  case Binary :
+	  case Binary_noidle :
+	      res =  builder->Create_PathSelector(SelectorKind::Binary, selectorReg, max_derivations,sel_properties);
+	     break;
+	  case One_Hot :
+	  case One_Hot_noidle :
+ 	      res  = builder->Create_PathSelector(SelectorKind::One_Hot, selectorReg, max_derivations,sel_properties);
+	      break;
+	  case N_Hot :
+	  case N_Hot_noidle :
+ 	      res  = builder->Create_PathSelector(SelectorKind::N_Hot, selectorReg, max_derivations,sel_properties);
+	      break;
+	 }
+  return res;	 
+ }
 
 }
 } /*end of %code section*/
@@ -276,35 +325,25 @@ root_node:
       {
       this_linker =  driver.unresolved_linkers.front();
       /*remove resolved linker*/
-      auto selector_reg= driver.declared_registers.find(this_linker.selector_name);
-      if (selector_reg==driver.declared_registers.end())
+      auto selector_info= driver.declared_registers.find(this_linker.selector_name);
+      if (selector_info==driver.declared_registers.end())
        {
        std::cerr << "Error, Selector register " << this_linker.selector_name << " required by linker " <<  this_linker.linker_node->Name() << " at line " << this_linker.line <<":"<<this_linker.column << " does not exist\n" ;
 	YYERROR;
        }
-             int   l;
+       int   l;
 	l = find_in_table(Path_Selector_table,this_linker.selector_name);
 	SelectorProperty sel_properties = Path_Selector_prop_t[l];
-
-        pair<shared_ptr<Register>, shared_ptr<PathSelector>> res; /*cannot use auto inside a switch*/
- 	switch(l)
-	 {
-	  case Binary :
-	  case Binary_noidle :
-	      res =  driver.builder->Create_PathSelector(SelectorKind::Binary, this_linker.selector_name, this_linker.derivations,sel_properties);
-	     break;
-	  case One_Hot :
-	  case One_Hot_noidle :
- 	      res  = driver.builder->Create_PathSelector(SelectorKind::One_Hot, this_linker.selector_name, this_linker.derivations,sel_properties);
-	      break;
-	  case N_Hot :
-	  case N_Hot_noidle :
- 	      res  = driver.builder->Create_PathSelector(SelectorKind::N_Hot, this_linker.selector_name, this_linker.derivations,sel_properties);
-	      break;
-	 }
-   	auto selectorReg = res.first;
-  	auto selector    = res.second;
-
+        auto selector = make_PathSelector (
+	  driver.builder, 
+	  l,
+      	  sel_properties,
+	  dynamic_pointer_cast<Register>(selector_info->second),
+	  this_linker.derivations
+	   );
+	
+	auto linker_node = dynamic_pointer_cast<Linker>(this_linker.linker_node);
+        linker_node->ReplacePathSelector(selector);
       driver.unresolved_linkers.pop();
       }
     driver.parsed_sut=$1;
@@ -418,7 +457,9 @@ t_LINKER  node_name path_selector ctrl_node max_derivations{
 		           std::cout << "(transparent) ";
 			std::cout <<  $3 <<"_PathSelector";
 			std::cout <<" controlled by node "<<$4;
- 		     auto node = driver.main_sm->CreateChain ($2.name);
+	             auto  pathSelector = make_shared<UnresolvedPathSelector>();
+                     auto node = driver.main_sm->CreateLinker ($2.name, pathSelector);
+
 		     
   	             linker_information this_linker;
 		     this_linker.linker_node =node; 
@@ -454,22 +495,15 @@ t_LINKER  node_name path_selector ctrl_node max_derivations{
         auto selectorRegName = $2.name + MIB_CTRL_EXT;
 	SelectorProperty sel_properties = $4 | $5| Path_Selector_prop_t[l];
 
-        pair<shared_ptr<Register>, shared_ptr<PathSelector>> res; /*cannot use auto inside a switch*/
- 	switch(l)
-	 {
-	  case Binary :
-	  case Binary_noidle :
-	      res =  driver.builder->Create_PathSelector(SelectorKind::Binary, selectorRegName, $6,sel_properties);
-	     break;
-	  case One_Hot :
-	  case One_Hot_noidle :
- 	      res  = driver.builder->Create_PathSelector(SelectorKind::One_Hot, selectorRegName, $6,sel_properties);
-	      break;
-	  case N_Hot :
-	  case N_Hot_noidle :
- 	      res  = driver.builder->Create_PathSelector(SelectorKind::N_Hot, selectorRegName, $6,sel_properties);
-	      break;
-	 }
+        auto res = make_PathSelector 
+           (
+	  driver.builder, 
+	  l,
+      	  sel_properties,
+	  selectorRegName,
+	 $6
+	   );
+
    	auto selectorReg = res.first;
   	auto selector    = res.second;
         auto node = driver.builder->Create_MIB($2.name, selector, selectorReg, $3);

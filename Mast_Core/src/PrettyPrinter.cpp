@@ -339,8 +339,16 @@ void PrettyPrinter::VisitLinker (Linker& linker)
     m_processingSelector = true;
 
     auto selector = linker.Selector();
+    if (selector)
+    {
+      selector->Accept(*this);
+    }
+    else
+    {
+      m_os << ", HAS NO SELECTOR !!!";
+    }
 
-    selector->Accept(*this);
+
   }
 
   PrintChildren(linker);

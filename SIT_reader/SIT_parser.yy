@@ -39,7 +39,7 @@
 
 #include <iostream>
 #include <cstdlib>
-#include <fstream> 
+#include <fstream>
 #include <string.h>
 #include <experimental/string_view>
 
@@ -65,16 +65,18 @@
 #ifdef INTEL_EXPERIMENT
 #include "Intel_EmulationProtocol.hpp"
 #endif
-
+#include "g3log/g3log.hpp"
 #include <experimental/string_view>
 
 
 #include <map>
 
+using std::vector;
 using std::shared_ptr;
 using std::make_shared;
 using std::dynamic_pointer_cast;
 using std::pair;
+using std::string;
 using std::experimental::string_view;
 using namespace mast;
 
@@ -111,27 +113,21 @@ std::vector<std::string> JTAG_AI_protocol_table  =
   };
 enum JTAG_AI_protocol_t {Loopback,SVF_Simulation,SVF_openOCD,SVF_Emulation};
 
-std::vector<std::string> Path_Selector_table  =
-  {"Binary","One_Hot","N_Hot","Binary_noidle","One_Hot_noidle","N_Hot_noidle"};
-enum Path_Selector_t {Binary,One_Hot,N_Hot,Binary_noidle,One_Hot_noidle,N_Hot_noidle};
+enum class PathSelectorKind {Binary, One_Hot, N_Hot, Binary_noidle, One_Hot_noidle, N_Hot_noidle};
+const vector<PathSelectorKind> PathSelectorKinds {PathSelectorKind::Binary,
+                                                  PathSelectorKind::One_Hot,
+                                                  PathSelectorKind::N_Hot,
+                                                  PathSelectorKind::Binary_noidle,
+                                                  PathSelectorKind::One_Hot_noidle,
+                                                  PathSelectorKind::N_Hot_noidle};
+const vector<string> Path_Selector_table  = {"Binary", "One_Hot", "N_Hot", "Binary_noidle", "One_Hot_noidle", "N_Hot_noidle"};
 
-std::vector<SelectorProperty> Path_Selector_prop_t {
- SelectorProperty::Binary_Default  ,SelectorProperty::One_Hot_Default,SelectorProperty::N_Hot_Default,
- SelectorProperty::CannotSelectNone,SelectorProperty::CannotSelectNone,SelectorProperty::CannotSelectNone,};
- 
-
-static int find_in_table(std::vector<std::string> table, std::string s)
-{
-	unsigned int   l;
- 	for (l=0;l<table.size();l++)
-   	if ((table)[l]==s)
-     		{
-     		break;
-     	    }
- if (l>= table.size())	return -1;
- else return l;
-}
-
+const std::vector<SelectorProperty> Path_Selector_prop_t {SelectorProperty::Binary_Default,
+                                                          SelectorProperty::One_Hot_Default,
+                                                          SelectorProperty::N_Hot_Default,
+                                                          SelectorProperty::CannotSelectNone,
+                                                          SelectorProperty::CannotSelectNone,
+                                                          SelectorProperty::CannotSelectNone};
 inline std::string remove_quotes(std::string s)
 {
  // Remove all double-quote characters
@@ -152,12 +148,24 @@ inline std::uint32_t extract_number(std::string s)
 }
 
 
-namespace 
+namespace
 {
+int index_in_table(const std::vector<std::string>& table, const std::string& s)
+{
+  auto pos = std::find(table.cbegin(), table.cend(), s);
+  if (pos == table.cend())
+  {
+    return -1;
+  }
+
+  auto index = pos - table.cbegin();
+  return static_cast<int>(index);
+}
+
 std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(const std::string& designName,std::uint32_t IR_size)
 {
   std::string path;
-   
+
    auto path_tmp = std::getenv("MAST_CONFIGURATION_PATH");
 
    if (path_tmp == NULL)
@@ -176,7 +184,7 @@ std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(const std::string& desig
 
     CHECK_FILE_EXISTS(path);
    std::cerr << "Creating OpenOCD protocol, designName :" <<  designName <<"path "<< path << "\n";
-   
+
    auto protocol = make_shared<OpenOCDProtocol> (path, designName, IR_size);
    if (protocol->is_initialized()==false)
     return nullptr;
@@ -184,61 +192,60 @@ std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(const std::string& desig
    return protocol;
 }
 
-class SIT_Reader;
-
-std::pair<shared_ptr<Register>, shared_ptr<PathSelector>> make_PathSelector 
+std::pair<shared_ptr<Register>, shared_ptr<PathSelector>> make_PathSelector
            (
-	  std::shared_ptr<mast::SystemModelBuilder> builder, 
-	  int SelectorType,
-      	  const SelectorProperty& sel_properties,
-	  const std::string& selectorRegName,
-	  const std::uint32_t&  max_derivations
-	   )
+           std::shared_ptr<mast::SystemModelBuilder> builder,
+           PathSelectorKind                          SelectorType,
+           const SelectorProperty&                   sel_properties,
+           const std::string&                        selectorRegName,
+           std::uint32_t                             max_derivations
+           )
   {
      pair<shared_ptr<Register>, shared_ptr<PathSelector>> res; /*cannot use auto inside a switch*/
- 	switch(SelectorType)
-	 {
-	  case Binary :
-	  case Binary_noidle :
-	      res =  builder->Create_PathSelector(SelectorKind::Binary, selectorRegName, max_derivations,sel_properties);
-	     break;
-	  case One_Hot :
-	  case One_Hot_noidle :
- 	      res  = builder->Create_PathSelector(SelectorKind::One_Hot, selectorRegName, max_derivations,sel_properties);
-	      break;
-	  case N_Hot :
-	  case N_Hot_noidle :
- 	      res  = builder->Create_PathSelector(SelectorKind::N_Hot, selectorRegName, max_derivations,sel_properties);
-	      break;
-	 }
-  return res;	 
+     switch(SelectorType)
+     {
+      case PathSelectorKind::Binary :
+      case PathSelectorKind::Binary_noidle :
+          res =  builder->Create_PathSelector(SelectorKind::Binary, selectorRegName, max_derivations, sel_properties);
+         break;
+      case PathSelectorKind::One_Hot :
+      case PathSelectorKind::One_Hot_noidle :
+          res  = builder->Create_PathSelector(SelectorKind::One_Hot, selectorRegName, max_derivations, sel_properties);
+          break;
+      case PathSelectorKind::N_Hot :
+      case PathSelectorKind::N_Hot_noidle :
+          res  = builder->Create_PathSelector(SelectorKind::N_Hot, selectorRegName, max_derivations, sel_properties);
+          break;
+     }
+     return res;
  }
-std::shared_ptr<PathSelector> make_PathSelector 
+
+std::shared_ptr<PathSelector> make_PathSelector
            (
-	  std::shared_ptr<mast::SystemModelBuilder> builder, 
-	  int SelectorType,
-      	  const SelectorProperty& sel_properties,
-	  std::shared_ptr< Register > selectorReg,
-	  const std::uint32_t&  max_derivations
+            std::shared_ptr<mast::SystemModelBuilder> builder,
+            PathSelectorKind                          SelectorType,
+            const SelectorProperty&                   sel_properties,
+            std::shared_ptr<Register>                 selectorReg,
+            std::uint32_t                             max_derivations
 	   )
   {
      shared_ptr<PathSelector> res; /*cannot use auto inside a switch*/
  	switch(SelectorType)
 	 {
-	  case Binary :
-	  case Binary_noidle :
+    case PathSelectorKind::Binary :
+    case PathSelectorKind::Binary_noidle :
 	      res =  builder->Create_PathSelector(SelectorKind::Binary, selectorReg, max_derivations,sel_properties);
 	     break;
-	  case One_Hot :
-	  case One_Hot_noidle :
+    case PathSelectorKind::One_Hot :
+    case PathSelectorKind::One_Hot_noidle :
  	      res  = builder->Create_PathSelector(SelectorKind::One_Hot, selectorReg, max_derivations,sel_properties);
 	      break;
-	  case N_Hot :
-	  case N_Hot_noidle :
+    case PathSelectorKind::N_Hot :
+    case PathSelectorKind::N_Hot_noidle :
  	      res  = builder->Create_PathSelector(SelectorKind::N_Hot, selectorReg, max_derivations,sel_properties);
 	      break;
 	 }
-  return res;	 
+  return res;
  }
 
 }
@@ -318,36 +325,34 @@ std::shared_ptr<PathSelector> make_PathSelector
 
 root_node:
   node END
+  {
+    /*resolve evetual Linkers*/
+    while (!driver.unresolved_linkers.empty())
     {
-     /*resolve evetual Linkers*/
-     linker_information this_linker;
-     while (!driver.unresolved_linkers.empty())
-      {
-      this_linker =  driver.unresolved_linkers.front();
-      /*remove resolved linker*/
+      const auto& this_linker = driver.unresolved_linkers.front();
+
+      // remove resolved linker
       auto selector_info= driver.declared_registers.find(this_linker.selector_name);
       if (selector_info==driver.declared_registers.end())
-       {
-       std::cerr << "Error, Selector register " << this_linker.selector_name << " required by linker " <<  this_linker.linker_node->Name() << " at line " << this_linker.line <<":"<<this_linker.column << " does not exist\n" ;
-	YYERROR;
-       }
-       int   l;
-	l = find_in_table(Path_Selector_table,this_linker.selector_name);
-	SelectorProperty sel_properties = Path_Selector_prop_t[l];
-        auto selector = make_PathSelector (
-	  driver.builder, 
-	  l,
-      	  sel_properties,
-	  dynamic_pointer_cast<Register>(selector_info->second),
-	  this_linker.derivations
-	   );
-	
-	auto linker_node = dynamic_pointer_cast<Linker>(this_linker.linker_node);
-        linker_node->ReplacePathSelector(selector);
-      driver.unresolved_linkers.pop();
+      {
+        std::cerr << "Error, Selector register " << this_linker.selector_name << " required by linker " <<  this_linker.linker_node->Name() << " at line " << this_linker.line <<":"<<this_linker.column << " does not exist\n" ;
+        YYERROR;
       }
-    driver.parsed_sut=$1;
+
+      auto properties   = Path_Selector_prop_t[this_linker.selector_kind_index];
+      auto selectorKind = PathSelectorKinds[this_linker.selector_kind_index];
+      auto selector = make_PathSelector (driver.builder,
+                                         selectorKind,
+                                         properties,
+                                         dynamic_pointer_cast<Register>(selector_info->second),
+                                         this_linker.derivations);
+
+      auto linker_node = dynamic_pointer_cast<Linker>(this_linker.linker_node);
+      linker_node->ReplacePathSelector(selector);
+      driver.unresolved_linkers.pop();
     }
+    driver.parsed_sut=$1;
+  }
    ;
 
 children_list:
@@ -436,40 +441,42 @@ t_CHAIN  node_name  {
   		     }
  |
 t_LINKER  node_name path_selector ctrl_node max_derivations{
-			int   l;
-			l = find_in_table(Path_Selector_table,$3);
-			if (l==-1)
-			 {
-   			std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" 
+      int selectorKindIndex = index_in_table(Path_Selector_table, $3);
+      if (selectorKindIndex == -1)
+      {
+   			std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-"
 					<< my_location->end.column << ": " ;
       			std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unknown Linker Path Selector \n";
 	  		YYERROR;
-	  		}
-			if ($4=="")
-			 {
-   			std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" 
-					<< my_location->end.column << ": " ;
-			std::cerr <<"Must specify a control node for path selector\n";
-			YYERROR;
-			 }
-                     	std::cout << "Node type LINKER, idf " << $2.name ;
-                     	if ($2.is_transparent)
-		           std::cout << "(transparent) ";
-			std::cout <<  $3 <<"_PathSelector";
-			std::cout <<" controlled by node "<<$4;
-	             auto  pathSelector = make_shared<UnresolvedPathSelector>();
-                     auto node = driver.main_sm->CreateLinker ($2.name, pathSelector);
+      }
 
-		     
-  	             linker_information this_linker;
-		     this_linker.linker_node =node; 
-		     this_linker.column = my_location->begin.column;
-		     this_linker.line = my_location->begin.line;
-		     this_linker.selector_name=$4;
-		     this_linker.derivations=$5;
-		     driver.unresolved_linkers.push(this_linker);
-  
- 	  	     $$ = node;
+      if ($4 == "")
+      {
+        std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-";
+        std::cerr << my_location->end.column << ": " ;
+        std::cerr << "Must specify a control node for path selector\n";
+        YYERROR;
+      }
+
+      std::cout << "Node type LINKER, idf " << $2.name << " ";
+      if ($2.is_transparent)
+        std::cout << "(transparent) ";
+      std::cout << $3 << "_PathSelector";
+      std::cout << " controlled by node " << $4;
+
+      auto pathSelector = make_shared<UnresolvedPathSelector>();
+      auto node = driver.main_sm->CreateLinker ($2.name, pathSelector);
+
+      linker_information linkerInfo;
+      linkerInfo.linker_node         = node;
+      linkerInfo.column              = my_location->begin.column;
+      linkerInfo.line                = my_location->begin.line;
+      linkerInfo.selector_kind_index = selectorKindIndex;
+      linkerInfo.selector_name       = $4;
+      linkerInfo.derivations         = $5;
+      driver.unresolved_linkers.push(linkerInfo);
+
+      $$ = node;
 		}
  |
  t_SIB node_name position active
@@ -484,29 +491,27 @@ t_LINKER  node_name path_selector ctrl_node max_derivations{
  t_MIB node_name position active reverse max_derivations path_selector
   {
       {
-      int   l;
-	l = find_in_table(Path_Selector_table,$7);
-	if (l==-1)
+  int index = index_in_table(Path_Selector_table,$7);
+  if (index==-1)
 	 {
 	 std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
    std::cerr << "node " << $2.name<< " \""<< $7 << "\"" << ": Unknown MIB Path Selector \n";
 	 YYERROR;
 	 }
-        auto selectorRegName = $2.name + MIB_CTRL_EXT;
-	SelectorProperty sel_properties = $4 | $5| Path_Selector_prop_t[l];
 
-        auto res = make_PathSelector 
-           (
-	  driver.builder, 
-	  l,
-      	  sel_properties,
-	  selectorRegName,
-	 $6
-	   );
+   auto selectorRegName = $2.name + MIB_CTRL_EXT;
+   SelectorProperty sel_properties = $4 | $5| Path_Selector_prop_t[index];
 
-   	auto selectorReg = res.first;
-  	auto selector    = res.second;
-        auto node = driver.builder->Create_MIB($2.name, selector, selectorReg, $3);
+   auto selectorKind = PathSelectorKinds[index];
+   auto res = make_PathSelector(driver.builder,
+                                selectorKind,
+                                sel_properties,
+                                selectorRegName,
+                                $6);
+
+    auto selectorReg = res.first;
+    auto selector    = res.second;
+    auto node        = driver.builder->Create_MIB($2.name, selector, selectorReg, $3);
 
   	$$ = node;
        }
@@ -522,8 +527,7 @@ t_LINKER  node_name path_selector ctrl_node max_derivations{
  |
 t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains {
 
-	int   l;
-	l = find_in_table(AI_protocol_table,$3);
+  int l = index_in_table(AI_protocol_table,$3);
   	if (l==-1)
 	  {
 	  std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
@@ -665,8 +669,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains {
       {
       {
   	{
-	int   l;
-	l = find_in_table(JTAG_AI_protocol_table,$3);
+    int l = index_in_table(JTAG_AI_protocol_table,$3);
   	if (l==-1)
 	  {
 	  std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
@@ -675,7 +678,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains {
 	  }
 	  else
 	{
-          std::shared_ptr<AccessInterfaceProtocol> protocol;
+    std::shared_ptr<AccessInterfaceProtocol> protocol;
 	  switch(l)
 	  {
 	  case Loopback :
@@ -840,9 +843,9 @@ register_node:
 		      /*TODO: save return value and check if binaryVector.size == size is correct
 		       and raise error if not*/
 		      if ($4==1) node->SetHoldValue(true);
-		     driver.declared_registers.insert ( std::pair<std::string, std::shared_ptr<mast::SystemModelNode>> 
+		     driver.declared_registers.insert ( std::pair<std::string, std::shared_ptr<mast::SystemModelNode>>
 		     			($2.name,node) );
-   
+
   		     $$ = node;}
 
 size :

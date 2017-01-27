@@ -17,6 +17,7 @@ INCLUDEPATH += $$PWD/../Mast_Core/include        \
                $$PWD/../SIT_reader               \
                $$PWD/../Logger                   \
                $$PWD/../cxxtest                  \
+               CxxTest_Traits                    \
                UT_Helpers
 
 DEPENDPATH +=  $$PWD/../Mast_Core/include        \

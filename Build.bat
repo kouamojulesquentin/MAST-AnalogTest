@@ -53,6 +53,11 @@
 @echo.
 %make_exe% -j4 -C %Build_Qt%\Mast_UT -f Makefile %target%
 
+@echo.
+@echo ===================== Building SIT_Reader_UT Runner.cpp =====================
+@echo.
+%make_exe% -C SIT_reader_UT -f Runner.mak
+
 
 @echo.
 @echo ===================== Building SIT_Reader_UT =====================

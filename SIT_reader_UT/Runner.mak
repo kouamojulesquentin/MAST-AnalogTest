@@ -17,6 +17,7 @@ UT_RootPath  = $(RootPath)
 Suites = \
       $(UT_RootPath)/Use_Cases/UT_reader.hpp
 
+ProjectFile  = $(RootPath)/SIT_reader_UT.pro
 
 #+Generator   = ..\..\CxxTest\bin\cxxtestgen.py
 Generator    = $(RootPath)/../cxxtest/bin/cxxtestgen.py
@@ -73,7 +74,7 @@ $(info )
 # DO NOT FORGET to define CXXTEST_HAVE_EH and CXXTEST_HAVE_STD to compile UT Files
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-$(RunnerFile): $(Suites) $(TemplateFile)
+$(RunnerFile): $(Suites) $(ProjectFile) $(TemplateFile)
 > $(python) "$(Generator)" --error-printer --have-eh --have-std --fog-parse --root -o $(RunnerFile) --template $(TemplateFile) $(Suites)
 
 clean:

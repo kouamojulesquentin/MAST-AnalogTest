@@ -69,6 +69,7 @@
 #include <experimental/string_view>
 
 
+
 #include <map>
 
 using std::vector;
@@ -78,6 +79,7 @@ using std::dynamic_pointer_cast;
 using std::pair;
 using std::string;
 using std::experimental::string_view;
+using namespace std::experimental::literals::string_view_literals;
 using namespace mast;
 
 
@@ -170,7 +172,7 @@ std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(const std::string& desig
 
    if (path_tmp == NULL)
     {
-     std::cout << "MAST_CONFIGURATION_PATH environment variable not found, using ./" << OPENOCD_DEFAULT_PATH << " instead \n";
+     LOG(INFO) << "MAST_CONFIGURATION_PATH environment variable not found, using ./" << OPENOCD_DEFAULT_PATH << " instead";
     path = std::string("./");
     path.append(OPENOCD_DEFAULT_PATH);
     }
@@ -458,11 +460,13 @@ t_LINKER  node_name path_selector ctrl_node max_derivations{
         YYERROR;
       }
 
-      std::cout << "Node type LINKER, idf " << $2.name << " ";
+      std::ostringstream os;
+      os << "Node type LINKER, idf " << $2.name << " ";
       if ($2.is_transparent)
-        std::cout << "(transparent) ";
-      std::cout << $3 << "_PathSelector";
-      std::cout << " controlled by node " << $4;
+        os << "(transparent) ";
+      os << $3 << "_PathSelector";
+      os << " controlled by node " << $4;
+      LOG(DEBUG) << os;
 
       auto pathSelector = make_shared<UnresolvedPathSelector>();
       auto node = driver.main_sm->CreateLinker ($2.name, pathSelector);
@@ -572,7 +576,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains {
             std::cerr << "Error, " << AI_protocol_table[l] <<" requires 3 addresses for each slave\n";
           }
 
-          std::cout << "Generating " << AI_protocol_table[l] <<" Access Interface\n";
+          LOG(DEBUG) << "Generating " << AI_protocol_table[l] << " Access Interface";
 
           auto chipselectCommands = std::vector<uint32_t>();
           auto readCommands       = std::vector<uint32_t>();
@@ -588,12 +592,11 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains {
 
           auto displayContent = [](string_view name, const std::vector<uint32_t>& container)
           {
-            std::cout << name << " (size " << std::noshowbase << container.size() << ") ";
+            LOG(DEBUG) << name << " (size " << std::noshowbase << container.size() << ") ";
             for (auto item : container)
             {
-              std::cout << "0x" << std::hex << item << " ";
+              LOG(DEBUG) << "0x" << std::hex << item << " ";
             }
-            std::cout << std::endl;
           };
 
           displayContent("chipselectCommands", chipselectCommands);
@@ -623,7 +626,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains {
             std::cerr << "Error, " << AI_protocol_table[l] <<" requires 1 address for each register chain\n";
             YYERROR;
           }
-          std::cout << "Generating " << AI_protocol_table[l] <<" Access Interface\n";
+          LOG(DEBUG) << "Generating " << AI_protocol_table[l] << " Access Interface";
 
           auto I2C_addresses       = std::vector<uint32_t>();
 
@@ -869,9 +872,16 @@ bypass:
 void
 SIT::SIT_Parser::error( const location_type &l, const std::string &err_message )
 {
-   std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-   std::cerr << err_message << "\n";
-   driver.parsed_sut=nullptr;
-  THROW_RUNTIME_ERROR("Parse error");
+  std::ostringstream os;
 
+  os << "Line " << my_location->begin.line
+     << ":"     << my_location->begin.column
+     << "-"     << my_location->end.column
+     << ": "    << err_message << "\n";
+
+  std::cerr << os.str();
+  driver.parsed_sut = nullptr;
+
+  auto exceptionMessage = "SIT parsing error: "s + os.str();
+  THROW_RUNTIME_ERROR(exceptionMessage);
 }

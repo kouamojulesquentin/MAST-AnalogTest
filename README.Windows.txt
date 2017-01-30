@@ -4,8 +4,11 @@
   Gnu Make with version >= 3.82
   CMake version >= 3.5
   MAST "SIT" Parser uses Flex and Bison (validated with Flex 2.5.37 and Bison 3.0)
+    - It seems that Linux version (Flex 2.6.0 and Bison 3.0.4) works better (specially for error reporting)
+    - NOTICE: It is recommended to patch Windows installation data sub-dir with equivalent files from Linux installation !!!
+    -
   FLEX_DIR environment variable must point to where flex is intalled (to get access to FlexLexer.h)
-  The unitary test interface Needs "phyton3" and "phyton3-ply" module
+  The unitary test interface Needs "python3" and "python3-ply" module
   To generate Doxygen documentation, doxygen and graphviz must be installed and dot.exe added to PATH environment variable
 
   Qt build has been tested with Qt 5.5 and QtCreator 3.6.1 but should be compatible with more recent versions

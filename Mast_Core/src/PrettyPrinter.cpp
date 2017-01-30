@@ -345,7 +345,7 @@ void PrettyPrinter::VisitLinker (Linker& linker)
     }
     else
     {
-      m_os << ", HAS NO SELECTOR !!!";
+      m_os << ", ERROR: LINKER HAS NO SELECTOR !!!";
     }
 
 

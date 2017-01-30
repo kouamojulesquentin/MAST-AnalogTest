@@ -33,7 +33,8 @@ class UT_reader : public CxxTest::TestSuite
 
   // ---------------- Tests
   //
-  void test_register ();
+  void test_register_Success ();
+  void test_register_Error ();
   void test_chain ();
   void test_MIB ();
   void test_SIB ();

@@ -37,6 +37,10 @@ using test::UT_reader_wrapper;
 
 using namespace mast;
 
+#define REDIRECT_CERR(OSS_VAR) \
+std::ostringstream OSS_VAR;    \
+AT_SCOPE_EXIT([prevRdBuf = std::cerr.rdbuf(errorSink.rdbuf())]() { std::cerr.rdbuf(prevRdBuf); })
+
 namespace
 {
 
@@ -73,9 +77,9 @@ void UT_reader::setUp ()
 }
 
 
-// Test construction of register nodes from Simplified ICL Tree input
+// Test construction of register nodes from Simplified ICL Tree input when the input is correct
 //
-void UT_reader::test_register ()
+void UT_reader::test_register_Success ()
 {
   // ---------------- DDT Setup
   //
@@ -86,12 +90,17 @@ void UT_reader::test_register ()
     auto input_SIT            = std::get<0> (data);
     auto expected_PrettyPrint = std::get<1> (data);
 
+    REDIRECT_CERR(errorSink);
+
     // ---------------- Exercise
     //
     auto parseResult = UT_reader_wrapper::run_parser_for_UT(input_SIT, sm);
 
     // ---------------- Verify
     //
+    const auto gotErrorMessage = errorSink.str();
+    TS_ASSERT_TRUE (gotErrorMessage.empty());
+
     // With PrettyPrinter
     auto actual_PrettyPrint = parseResult.first;
     TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
@@ -117,6 +126,58 @@ void UT_reader::test_register ()
   //
   TS_DATA_DRIVEN_TEST (checker, data);
 }
+
+
+// Test construction of register nodes from Simplified ICL Tree input when the input is NOT correct
+//
+void UT_reader::test_register_Error ()
+{
+//+  #if not defined(WIN32)
+  // ---------------- DDT Setup
+  //
+  auto checker = [&](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto input_SIT       = std::get<0> (data);
+    auto expected_errMSG = std::get<1> (data);
+
+    REDIRECT_CERR(errorSink);
+
+    // ---------------- Exercise
+    //
+    auto parseResult = UT_reader_wrapper::run_parser_for_UT(input_SIT, sm);
+
+    // ---------------- Verify
+    //
+    const auto gotErrorMessage = errorSink.str();
+    TS_ASSERT_EQUALS  (gotErrorMessage, expected_errMSG);
+
+    auto systemModelNode = parseResult.second;
+    TS_ASSERT_NULLPTR(systemModelNode);
+  };
+
+  auto data =  // Sit input, expected PrettyPrint, expected error message, checker error count
+  {
+    // 00: Wrong Bypass length
+    make_tuple("REGISTER test_register 8 Bypass: \"0b1001:011\"\n",
+               "Line 1:34-46: Node test_register size 8 does not match Bypass value bit count 7\nParse failed!!\n"),
+
+    // 01: Missing register name
+    make_tuple("REGISTER test_register 5 Bypass: \"0b001:0110:1100\"\n",
+               "Line 1:34-51: Node test_register size 5 does not match Bypass value bit count 11\nParse failed!!\n"),
+
+    // 02: Missing register length
+    make_tuple("REGISTER test_register Bypass: \"0b001\"\n",
+               "Line 1:24-30: syntax error\nParse failed!!\n"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+//+  #endif
+}
+
 
 
 // Test construction of chain nodes from Simplified ICL Tree input
@@ -955,10 +1016,7 @@ void UT_reader::test_LINKER_Success ()
     auto input_SIT            = std::get<0>(data);
     auto expected_PrettyPrint = std::get<1>(data);
 
-    // ---------------- Redirect std:cerr to collect error message
-    //
-    std::ostringstream errorSink;
-    AT_SCOPE_EXIT([prevRdBuf = std::cerr.rdbuf(errorSink.rdbuf())]() { std::cerr.rdbuf(prevRdBuf); });
+    REDIRECT_CERR(errorSink);
 
     // ---------------- Exercise
     //
@@ -1021,15 +1079,10 @@ void UT_reader::test_LINKER_Error ()
   {
     // ---------------- Setup
     //
-    auto input_SIT            = std::get<0> (data);
-    auto expected_PrettyPrint = std::get<1> (data);
-    auto expected_errMSG      = std::get<2> (data);
-    auto errorsCount          = std::get<3> (data);
+    auto input_SIT       = std::get<0> (data);
+    auto expected_errMSG = std::get<1> (data);
 
-    // ---------------- Redirect std:cerr to collect error message
-    //
-    std::ostringstream errorSink;
-    AT_SCOPE_EXIT([prevRdBuf = std::cerr.rdbuf(errorSink.rdbuf())]() { std::cerr.rdbuf(prevRdBuf); });
+    REDIRECT_CERR(errorSink);
 
     // ---------------- Exercise
     //
@@ -1037,23 +1090,11 @@ void UT_reader::test_LINKER_Error ()
 
     // ---------------- Verify
     //
-    // With PrettyPrint
-    auto actual_PrettyPrint = parseResult.first;
-    TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
-
-    // With Checker
-    PrependWithTap(sm, parseResult.second);   // This is to avoid warnings about missing AccessInterface
-    auto checkResult = sm->Check();
-
-    TS_ASSERT_EQUALS (checkResult.warningsCount, 1u); // 1 for "Linker 'test_xxx' (id: x) has only 2 children, even though it can select 4 paths"
-    TS_ASSERT_EQUALS (checkResult.errorsCount,   errorsCount);
-    TS_ASSERT_EQUALS (checkResult.infosCount,    0u);
-    //+ (begin JFC August/29/2016): for debug purpose
-//+    TS_ASSERT_EQUALS (checkResult.MakeReport(), "");
-    //+ (end   JFC August/29/2016):
-
     const auto gotErrorMessage = errorSink.str();
-    TS_ASSERT_EQUALS (gotErrorMessage, expected_errMSG);
+    TS_ASSERT_EQUALS  (gotErrorMessage, expected_errMSG);
+
+    auto systemModelNode = parseResult.second;
+    TS_ASSERT_NULLPTR(systemModelNode);
   };
 
   auto data =
@@ -1063,9 +1104,7 @@ void UT_reader::test_LINKER_Error ()
                "{REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
                "REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
                "}"s,
-               "PARSING ERROR"s,
-               "Line 1:27-28: Must specify a control node for path selector\nParse failed!!\n"s,
-               0u),
+               "Line 1:27-28: Must specify a control node for path selector\nParse failed!!\n"s),
 
     // 01 ==> Error: selector register does not exist
     make_tuple("LINKER test_LINKER Binary selector_reg 4\n"
@@ -1073,10 +1112,8 @@ void UT_reader::test_LINKER_Error ()
                "  REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
                "  REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
                "}"s,
-               "PARSING ERROR"s,
                "Error, Selector register selector_reg required by linker test_LINKER at line 1:40 does not exist\n"
-               "Parse failed!!\n"s,
-               3u),
+               "Parse failed!!\n"s),
   };
 
   // ---------------- DDT Exercise

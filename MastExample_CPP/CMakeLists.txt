@@ -22,15 +22,18 @@ endif()
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "../Bin")
 
-add_executable 				(MastExample_CPP main.cpp Example.cpp)
+add_executable        (MastExample_CPP main.cpp)
 set_target_properties	(MastExample_CPP PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
-add_executable        (Tutorial main.cpp   Tutorial.cpp)
+add_executable        (Tutorial main.cpp   DefaultMastMain.cpp Tutorial.cpp)
 set_target_properties (Tutorial PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
+add_library           (Example_CPP SHARED     DefaultMastMain.cpp Example.cpp)
+set_target_properties (Example_CPP PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
 if (WIN32) # Package png not installed on Windows ==> Cannot use kiss_fft (as is)
-  target_link_libraries(MastExample_CPP Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
+  target_link_libraries(Example_CPP Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
+  target_link_libraries(MastExample_CPP Example_CPP Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
   target_link_libraries(Tutorial        Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
 #+	target_link_libraries(Intel Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
 #+	target_link_libraries(ML505 Mast Mast_Core Logger SIT_Reader_Lib DbgHelp kiss_fft)
@@ -53,19 +56,20 @@ else ()
   add_library           (kiss_fft SHARED     ${KissFFT_Files})
   set_target_properties (kiss_fft PROPERTIES COMPILE_FLAGS "-Wall" )
 
-  add_executable        (Intel main.cpp   Intel.cpp)
+  add_executable        (Intel main.cpp   DefaultMastMain.cpp Intel.cpp)
   set_target_properties (Intel PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
-  add_executable        (ML505 main.cpp ml505_demo.cpp)
+  add_executable        (ML505 main.cpp    DefaultMastMain.cpp ml505_demo.cpp)
   set_target_properties (ML505 PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
-  add_executable        (ML505SPI main.cpp ml505_spi.cpp)
+  add_executable        (ML505SPI main.cpp DefaultMastMain.cpp ml505_spi.cpp)
   set_target_properties (ML505SPI PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
-  add_executable        (ETS17 main.cpp   ETS17.cpp)
+  add_executable        (ETS17 main.cpp    DefaultMastMain.cpp ETS17.cpp)
   set_target_properties (ETS17 PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
-  target_link_libraries(MastExample_CPP Mast Mast_Core Logger SIT_Reader_Lib pthread dl)
+  target_link_libraries(Example_CPP Mast Mast_Core Logger SIT_Reader_Lib pthread dl)
+  target_link_libraries(MastExample_CPP Example_CPP Mast Mast_Core Logger SIT_Reader_Lib pthread dl)
   target_link_libraries(Tutorial        Mast Mast_Core Logger SIT_Reader_Lib pthread dl)
   target_link_libraries(Intel           Mast Mast_Core Logger SIT_Reader_Lib pthread dl)
   target_link_libraries(ML505           Mast Mast_Core Logger SIT_Reader_Lib pthread dl kiss_fft)

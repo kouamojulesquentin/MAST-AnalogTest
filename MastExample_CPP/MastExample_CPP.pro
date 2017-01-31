@@ -24,8 +24,9 @@ win32 {
   INCLUDEPATH +=  "$$(FLEX_DIR)"
 }
 
-SOURCES +=      \
-    main.cpp    \
+SOURCES +=              \
+    main.cpp            \
+    DefaultMastMain.cpp \
     Example.cpp
 
 

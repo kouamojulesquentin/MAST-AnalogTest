@@ -466,7 +466,7 @@ t_LINKER  node_name path_selector ctrl_node max_derivations{
         os << "(transparent) ";
       os << $3 << "_PathSelector";
       os << " controlled by node " << $4;
-      LOG(DEBUG) << os;
+      LOG(DEBUG) << os.str();
 
       auto pathSelector = make_shared<UnresolvedPathSelector>();
       auto node = driver.main_sm->CreateLinker ($2.name, pathSelector);

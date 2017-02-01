@@ -108,7 +108,7 @@ void UT_reader::test_register_Success ()
 
     // ---------------- Verify
     //
-     std::this_thread::sleep_for(1ms); // To get messages from logger (running in another thread)
+    std::this_thread::sleep_for(5ms); // To get messages from logger (running in another thread)
 
     const auto gotErrorMessage = errorSink.str();
     TS_ASSERT_TRUE (gotErrorMessage.empty());
@@ -127,11 +127,13 @@ void UT_reader::test_register_Success ()
   };
 
   auto data =
-  { /*Basic constructor, different sizes and bypass values*/
-   make_tuple( "REGISTER test_register 12 Bypass: \"0b1001:0110:1100\"\n",  "[Register](0)  \"test_register\", length: 12, bypass: 1001_0110:1100"),
-   make_tuple( "REGISTER test_register 11 Bypass: \"0b001:0110:1100\"\n",   "[Register](0)  \"test_register\", length: 11, bypass: 0010_1101:100"),
-   /*Hold value*/
-   make_tuple( "REGISTER test_register 12 Hold_value Bypass: \"0b1001:0110:1100\"\n",  "[Register](0)  \"test_register\", length: 12, Hold value: true, bypass: 1001_0110:1100"),
+  {
+    /*Basic constructor, different sizes and bypass values*/
+    make_tuple( "REGISTER test_register 12 Bypass: \"0b1001:0110:1100\"\n",  "[Register](0)  \"test_register\", length: 12, bypass: 1001_0110:1100"),
+    make_tuple( "REGISTER test_register 11 Bypass: \"0b001:0110:1100\"\n",   "[Register](0)  \"test_register\", length: 11, bypass: 0010_1101:100"),
+
+    /*Hold value*/
+    make_tuple( "REGISTER test_register 12 Hold_value Bypass: \"0b1001:0110:1100\"\n",  "[Register](0)  \"test_register\", length: 12, Hold value: true, bypass: 1001_0110:1100"),
   };
 
   // ---------------- DDT Exercise
@@ -144,7 +146,6 @@ void UT_reader::test_register_Success ()
 //
 void UT_reader::test_register_Error ()
 {
-//+  #if not defined(WIN32)
   // ---------------- DDT Setup
   //
   auto checker = [&](auto data)
@@ -153,7 +154,6 @@ void UT_reader::test_register_Error ()
     //
     auto input_SIT       = std::get<0> (data);
     auto expected_errMSG = std::get<1> (data);
-
     REDIRECT_CERR(errorSink);
 
     // ---------------- Exercise
@@ -162,7 +162,7 @@ void UT_reader::test_register_Error ()
 
     // ---------------- Verify
     //
-    std::this_thread::sleep_for(1ms); // To get messages from logger (running in another thread)
+    std::this_thread::sleep_for(10ms); // To get messages from logger (running in another thread)
 
     const auto gotErrorMessage = errorSink.str();
     TS_ASSERT_EQUALS  (gotErrorMessage, expected_errMSG);
@@ -189,7 +189,6 @@ void UT_reader::test_register_Error ()
   // ---------------- DDT Exercise
   //
   TS_DATA_DRIVEN_TEST (checker, data);
-//+  #endif
 }
 
 
@@ -227,8 +226,8 @@ void UT_reader::test_chain ()
 
   auto data =
   { /*Chain with one register*/
-   make_tuple( "CHAIN test_chain\n { REGISTER test_register 12 Bypass: \"0b1001:0110:1100\"\n}",
-   "[Chain](0)     \"test_chain\"\n [Register](1)  \"test_register\", length: 12, bypass: 1001_0110:1100"),
+    make_tuple("CHAIN test_chain\n { REGISTER test_register 12 Bypass: \"0b1001:0110:1100\"\n}",
+               "[Chain](0)     \"test_chain\"\n [Register](1)  \"test_register\", length: 12, bypass: 1001_0110:1100"),
     /*Chain with two registers*/
     make_tuple(    "CHAIN test_chain\
     { REGISTER test_register_1 12 Bypass: \"0b1001:0110:1100\"\
@@ -1046,7 +1045,7 @@ void UT_reader::test_LINKER_Success ()
     PrependWithTap(sm, parseResult.second);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
 
-    std::this_thread::sleep_for(1ms); // To get messages from logger (running in another thread)
+    std::this_thread::sleep_for(5ms); // To get messages from logger (running in another thread)
 
     const auto gotErrorMessage = errorSink.str();
     TS_ASSERT_TRUE (gotErrorMessage.empty());
@@ -1106,7 +1105,7 @@ void UT_reader::test_LINKER_Error ()
 
     // ---------------- Verify
     //
-    std::this_thread::sleep_for(1ms); // To get messages from logger (running in another thread)
+    std::this_thread::sleep_for(10ms); // To get messages from logger (running in another thread)
 
     const auto gotErrorMessage = errorSink.str();
     TS_ASSERT_EQUALS  (gotErrorMessage, expected_errMSG);

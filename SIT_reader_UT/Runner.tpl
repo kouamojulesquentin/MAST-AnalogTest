@@ -13,6 +13,13 @@ int main( int argc, char *argv[] )
     //
     auto logworker  = g3::LogWorker::createLogWorker();
 
+    // ---------------- Sink for logging errors to std::cerr
+    //
+    auto cerrSink       = std::make_unique<g3::ErrorsOnCerrLoggerSink>(true, g3::LogFormatterUsage::Ignore);
+    auto cerrSinkHandle = logworker->addSink(std::move(cerrSink), &g3::ErrorsOnCerrLoggerSink::ReceiveLogMessage);
+
+    // ---------------- Sink for capturing all messages in memory
+    //
     g3::UnitTestsLoggerSink::TSinkHandle sinkHandle = logworker->addSink(std::make_unique<g3::UnitTestsLoggerSink>(false), &g3::UnitTestsLoggerSink::ReceiveLogMessage);
     g3::UnitTestsLoggerSink::SetSinkHandle(sinkHandle);    // This is to allow g3log unit tests to have an access point to log at the end of the chain
 
@@ -23,15 +30,12 @@ int main( int argc, char *argv[] )
     logFormatter.ShowFunctionName(false);
     logFormatter.ShowLineNumber(false);
 
+
     auto customSink = std::make_unique<g3::CustomFileSink>("Log.txt", g3::CustomFileSink::FlushMode::AutoBackground, logFormatter);
     customSink->Clear();
 
     auto customSinkHandle = logworker->addSink(std::move(customSink), &g3::CustomFileSink::ReceiveLogUnformattedMessage);
 
-    // ---------------- Sink for logging errors to std::cerr
-    //
-    auto cerrSink       = std::make_unique<g3::ErrorsOnCerrLoggerSink>(true, g3::LogFormatterUsage::Ignore);
-    auto cerrSinkHandle = logworker->addSink(std::move(cerrSink), &g3::ErrorsOnCerrLoggerSink::ReceiveLogMessage);
 
     g3::initializeLogging(logworker.get());
     LOG(INFO) << "Start of Unit tests";

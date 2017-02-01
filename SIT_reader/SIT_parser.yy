@@ -103,17 +103,40 @@ extern SIT::SIT_Parser::location_type *my_location;
 
 #define OPENOCD_DEFAULT_PATH "openocd"
 
-std::vector<std::string> AI_protocol_table  =
-  {"JTAG_Loopback","JTAG_SVF_Simulation","JTAG_SVF_Emulation",
-  "SPI_FTDI", "STIL_Emulation","I2C_Emulation",
-  "Offline","Intel_Packet"
-  };
-enum AI_protocol_t {JTAG_Loopback,JTAG_SVF_Simulation,JTAG_SVF_Emulation, SPI_FTDI,STIL_Emulation,I2C_Emulation,Offline,Intel_Packet};
+std::vector <std::string>AI_protocol_table =
+{
+  "JTAG_Loopback",
+  "JTAG_SVF_Simulation",
+  "JTAG_SVF_Emulation",
+  "SPI_FTDI",
+  "STIL_Emulation",
+  "I2C_Emulation",
+  "Offline",
+  "Intel_Packet"
+};
+enum AI_protocol_t
+{
+  JTAG_Loopback,
+  JTAG_SVF_Simulation,
+  JTAG_SVF_Emulation,
+  SPI_FTDI,
+  STIL_Emulation,
+  I2C_Emulation,
+  Offline,
+  Intel_Packet
+};
 
-std::vector<std::string> JTAG_AI_protocol_table  =
-  {"Loopback","SVF_Simulation","SVF_openOCD","SVF_Emulation"
-  };
-enum JTAG_AI_protocol_t {Loopback,SVF_Simulation,SVF_openOCD,SVF_Emulation};
+std::vector <std::string>JTAG_AI_protocol_table =
+{
+  "Loopback", "SVF_Simulation", "SVF_openOCD", "SVF_Emulation"
+};
+enum JTAG_AI_protocol_t
+{
+  Loopback,
+  SVF_Simulation,
+  SVF_openOCD,
+  SVF_Emulation
+};
 
 enum class PathSelectorKind {Binary, One_Hot, N_Hot, Binary_noidle, One_Hot_noidle, N_Hot_noidle};
 const vector<PathSelectorKind> PathSelectorKinds {PathSelectorKind::Binary,
@@ -164,91 +187,95 @@ int index_in_table(const std::vector<std::string>& table, const std::string& s)
   return static_cast<int>(index);
 }
 
-std::shared_ptr<OpenOCDProtocol>  make_openOCD_protocol(const std::string& designName,std::uint32_t IR_size)
+std::shared_ptr <OpenOCDProtocol>make_openOCD_protocol (const std::string& designName, std::uint32_t IR_size)
 {
   std::string path;
 
-   auto path_tmp = std::getenv("MAST_CONFIGURATION_PATH");
+  auto path_tmp = std::getenv("MAST_CONFIGURATION_PATH");
 
-   if (path_tmp == NULL)
-    {
-     LOG(INFO) << "MAST_CONFIGURATION_PATH environment variable not found, using ./" << OPENOCD_DEFAULT_PATH << " instead";
+  if (path_tmp == NULL)
+  {
+    LOG(INFO) << "MAST_CONFIGURATION_PATH environment variable not found, using ./"
+              << OPENOCD_DEFAULT_PATH << " instead";
     path = std::string("./");
     path.append(OPENOCD_DEFAULT_PATH);
-    }
-    else
-     path = std::string(path_tmp);
+  }
+  else
+  {
+    path = std::string(path_tmp);
+  }
 
+  if (path.back() != DIR_SEPARATOR)
+  {
+    path.push_back(DIR_SEPARATOR);
+  }
+  path.append(OPENOCD_DEFAULT_CONFIG);
 
-   if (path.back()!=DIR_SEPARATOR)
-	   path.push_back(DIR_SEPARATOR);
-    path.append(OPENOCD_DEFAULT_CONFIG);
+  CHECK_FILE_EXISTS(path);
+  std::cerr << "Creating OpenOCD protocol, designName :" << designName << "path " << path << "\n";
 
-    CHECK_FILE_EXISTS(path);
-   std::cerr << "Creating OpenOCD protocol, designName :" <<  designName <<"path "<< path << "\n";
+  auto protocol = make_shared <OpenOCDProtocol>(path, designName, IR_size);
 
-   auto protocol = make_shared<OpenOCDProtocol> (path, designName, IR_size);
-   if (protocol->is_initialized()==false)
+  if (protocol->is_initialized() == false)
     return nullptr;
-   else
-   return protocol;
+  else
+    return protocol;
 }
 
 std::pair<shared_ptr<Register>, shared_ptr<PathSelector>> make_PathSelector
-           (
-           std::shared_ptr<mast::SystemModelBuilder> builder,
-           PathSelectorKind                          SelectorType,
-           const SelectorProperty&                   sel_properties,
-           const std::string&                        selectorRegName,
-           std::uint32_t                             max_derivations
-           )
-  {
-     pair<shared_ptr<Register>, shared_ptr<PathSelector>> res; /*cannot use auto inside a switch*/
-     switch(SelectorType)
-     {
-      case PathSelectorKind::Binary :
-      case PathSelectorKind::Binary_noidle :
-          res =  builder->Create_PathSelector(SelectorKind::Binary, selectorRegName, max_derivations, sel_properties);
-         break;
-      case PathSelectorKind::One_Hot :
-      case PathSelectorKind::One_Hot_noidle :
-          res  = builder->Create_PathSelector(SelectorKind::One_Hot, selectorRegName, max_derivations, sel_properties);
-          break;
-      case PathSelectorKind::N_Hot :
-      case PathSelectorKind::N_Hot_noidle :
-          res  = builder->Create_PathSelector(SelectorKind::N_Hot, selectorRegName, max_derivations, sel_properties);
-          break;
-     }
-     return res;
- }
+             (
+             std::shared_ptr<mast::SystemModelBuilder> builder,
+             PathSelectorKind                          SelectorType,
+             const SelectorProperty&                   sel_properties,
+             const std::string&                        selectorRegName,
+             std::uint32_t                             max_derivations
+             )
+{
+  pair < shared_ptr <Register>, shared_ptr < PathSelector >> res; /*cannot use auto inside a switch*/
 
-std::shared_ptr<PathSelector> make_PathSelector
-           (
-            std::shared_ptr<mast::SystemModelBuilder> builder,
-            PathSelectorKind                          SelectorType,
-            const SelectorProperty&                   sel_properties,
-            std::shared_ptr<Register>                 selectorReg,
-            std::uint32_t                             max_derivations
-	   )
+  switch (SelectorType)
   {
-     shared_ptr<PathSelector> res; /*cannot use auto inside a switch*/
- 	switch(SelectorType)
-	 {
     case PathSelectorKind::Binary :
     case PathSelectorKind::Binary_noidle :
-	      res =  builder->Create_PathSelector(SelectorKind::Binary, selectorReg, max_derivations,sel_properties);
-	     break;
+      res = builder->Create_PathSelector(SelectorKind::Binary, selectorRegName, max_derivations, sel_properties);
+      break;
     case PathSelectorKind::One_Hot :
     case PathSelectorKind::One_Hot_noidle :
- 	      res  = builder->Create_PathSelector(SelectorKind::One_Hot, selectorReg, max_derivations,sel_properties);
-	      break;
+      res = builder->Create_PathSelector(SelectorKind::One_Hot, selectorRegName, max_derivations, sel_properties);
+      break;
     case PathSelectorKind::N_Hot :
     case PathSelectorKind::N_Hot_noidle :
- 	      res  = builder->Create_PathSelector(SelectorKind::N_Hot, selectorReg, max_derivations,sel_properties);
-	      break;
-	 }
+      res = builder->Create_PathSelector(SelectorKind::N_Hot, selectorRegName, max_derivations, sel_properties);
+      break;
+  }
   return res;
- }
+}
+
+std::shared_ptr <PathSelector>make_PathSelector (std::shared_ptr         <mast::SystemModelBuilder>builder,
+                                                 PathSelectorKind        SelectorType,
+                                                 const SelectorProperty& sel_properties,
+                                                 std::shared_ptr         <Register>selectorReg,
+                                                 std::uint32_t           max_derivations)
+{
+  shared_ptr <PathSelector>res; /*cannot use auto inside a switch*/
+
+  switch (SelectorType)
+  {
+    case PathSelectorKind::Binary :
+    case PathSelectorKind::Binary_noidle :
+      res = builder->Create_PathSelector(SelectorKind::Binary, selectorReg, max_derivations, sel_properties);
+      break;
+    case PathSelectorKind::One_Hot :
+    case PathSelectorKind::One_Hot_noidle :
+      res = builder->Create_PathSelector(SelectorKind::One_Hot, selectorReg, max_derivations, sel_properties);
+      break;
+    case PathSelectorKind::N_Hot :
+    case PathSelectorKind::N_Hot_noidle :
+      res = builder->Create_PathSelector(SelectorKind::N_Hot, selectorReg, max_derivations, sel_properties);
+      break;
+  }
+  return res;
+}
 
 }
 } /*end of %code section*/
@@ -363,9 +390,9 @@ children_list:
 
 node_list:
     node node_list { $$.name = $1->Name() + ' ' + $2.name; $$.n_nodes = $2.n_nodes+1;
-                    auto tmp = $2.nodes;
-		    tmp.insert(tmp.begin(),$1);
-		    $$.nodes = tmp;
+                     auto tmp = $2.nodes;
+                     tmp.insert(tmp.begin(),$1);
+                     $$.nodes = tmp;
 		    }
   |   node { $$.name = $1->Name();$$.n_nodes = 1;$$.nodes.push_back($1);}
   ;
@@ -384,40 +411,43 @@ is_transparent:
 
 node_name :  t_WORD is_transparent
      			{
-  		     $$.name = $1;
-		     $$.is_transparent = $2;
-		     }
+            $$.name = $1;
+            $$.is_transparent = $2;
+          }
      ;
 
 parent_node_with_children: parent_node PDL_declaration children_list
- {
-  auto asParentNode = dynamic_pointer_cast<ParentNode>($1);
-   for (auto this_child : $3.nodes)
-       asParentNode->AppendChild(this_child);
-     $$ = $1;
+{
+  auto asParentNode = dynamic_pointer_cast <ParentNode>($1);
+
+  for (auto this_child : $3.nodes)
+  {
+    asParentNode->AppendChild(this_child);
+  }
+  $$ = $1;
+
   if (!$2.first.empty())
-   {
+  {
     for (auto this_function : $2.first)
-      driver.namesAndNodes.push_back(AppFunctionNameAndNode(this_function,asParentNode,$2.second));
-   }
- }
+      driver.namesAndNodes.push_back(AppFunctionNameAndNode(this_function, asParentNode, $2.second));
+  }
+}
 
 PDL_declaration:
- t_PDL function_list {
-           pair <std::vector<std::string>,std::uint32_t> ret;
-	   ret.first = $2;
-//	   ret.second =my_location->begin.line;
+ t_PDL function_list
+ {
+   pair <std::vector<std::string>,std::uint32_t> ret;
+   ret.first = $2;
    ret.second =nlines;
-	   $$ = ret;
-	   }
+   $$ = ret;
+ }
  |
-  {
+ {
    std::pair <std::vector<std::string>,std::uint32_t> ret;
    ret.first = std::vector<std::string>();
-//   ret.second =my_location->begin.line;
    ret.second =nlines;
-  $$ = ret;
-  }
+   $$ = ret;
+ }
 ;
 
 function_list:
@@ -435,53 +465,55 @@ function_list:
 
 
 parent_node:
-t_CHAIN  node_name  {
+t_CHAIN  node_name
+{
 		     auto node = driver.main_sm->CreateChain($2.name);
-                     if ($2.is_transparent)
+         if ($2.is_transparent)
 		           node->IgnoreForNodePath(true);
- 	  	     $$ = node;
-  		     }
+         $$ = node;
+}
  |
-t_LINKER  node_name path_selector ctrl_node max_derivations{
-      int selectorKindIndex = index_in_table(Path_Selector_table, $3);
-      if (selectorKindIndex == -1)
-      {
-   			std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-"
-					<< my_location->end.column << ": " ;
-      			std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unknown Linker Path Selector \n";
-	  		YYERROR;
-      }
+t_LINKER  node_name path_selector ctrl_node max_derivations
+{
+  int selectorKindIndex = index_in_table(Path_Selector_table, $3);
+  if (selectorKindIndex == -1)
+  {
+    std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-"
+      << my_location->end.column << ": " ;
+        std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unknown Linker Path Selector \n";
+    YYERROR;
+  }
 
-      if ($4 == "")
-      {
-        std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-";
-        std::cerr << my_location->end.column << ": " ;
-        std::cerr << "Must specify a control node for path selector\n";
-        YYERROR;
-      }
+  if ($4 == "")
+  {
+    std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-";
+    std::cerr << my_location->end.column << ": " ;
+    std::cerr << "Must specify a control node for path selector\n";
+    YYERROR;
+  }
 
-      std::ostringstream os;
-      os << "Node type LINKER, idf " << $2.name << " ";
-      if ($2.is_transparent)
-        os << "(transparent) ";
-      os << $3 << "_PathSelector";
-      os << " controlled by node " << $4;
-      LOG(DEBUG) << os.str();
+  std::ostringstream os;
+  os << "Node type LINKER, idf " << $2.name << " ";
+  if ($2.is_transparent)
+    os << "(transparent) ";
+  os << $3 << "_PathSelector";
+  os << " controlled by node " << $4;
+  LOG(DEBUG) << os.str();
 
-      auto pathSelector = make_shared<UnresolvedPathSelector>();
-      auto node = driver.main_sm->CreateLinker ($2.name, pathSelector);
+  auto pathSelector = make_shared<UnresolvedPathSelector>();
+  auto node = driver.main_sm->CreateLinker ($2.name, pathSelector);
 
-      linker_information linkerInfo;
-      linkerInfo.linker_node         = node;
-      linkerInfo.column              = my_location->begin.column;
-      linkerInfo.line                = my_location->begin.line;
-      linkerInfo.selector_kind_index = selectorKindIndex;
-      linkerInfo.selector_name       = $4;
-      linkerInfo.derivations         = $5;
-      driver.unresolved_linkers.push(linkerInfo);
+  linker_information linkerInfo;
+  linkerInfo.linker_node         = node;
+  linkerInfo.column              = my_location->begin.column;
+  linkerInfo.line                = my_location->begin.line;
+  linkerInfo.selector_kind_index = selectorKindIndex;
+  linkerInfo.selector_name       = $4;
+  linkerInfo.derivations         = $5;
+  driver.unresolved_linkers.push(linkerInfo);
 
-      $$ = node;
-		}
+  $$ = node;
+}
  |
  t_SIB node_name position active
   {
@@ -494,20 +526,20 @@ t_LINKER  node_name path_selector ctrl_node max_derivations{
  |
  t_MIB node_name position active reverse max_derivations path_selector
   {
-      {
-  int index = index_in_table(Path_Selector_table,$7);
-  if (index==-1)
-	 {
-	 std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-   std::cerr << "node " << $2.name<< " \""<< $7 << "\"" << ": Unknown MIB Path Selector \n";
-	 YYERROR;
-	 }
+  {
+    int index = index_in_table(Path_Selector_table,$7);
+    if (index==-1)
+    {
+      std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
+      std::cerr << "node " << $2.name<< " \""<< $7 << "\"" << ": Unknown MIB Path Selector \n";
+      YYERROR;
+    }
 
-   auto selectorRegName = $2.name + MIB_CTRL_EXT;
-   SelectorProperty sel_properties = $4 | $5| Path_Selector_prop_t[index];
+    auto selectorRegName = $2.name + MIB_CTRL_EXT;
+    SelectorProperty sel_properties = $4 | $5| Path_Selector_prop_t[index];
 
-   auto selectorKind = PathSelectorKinds[index];
-   auto res = make_PathSelector(driver.builder,
+    auto selectorKind = PathSelectorKinds[index];
+    auto res = make_PathSelector(driver.builder,
                                 selectorKind,
                                 sel_properties,
                                 selectorRegName,
@@ -517,221 +549,220 @@ t_LINKER  node_name path_selector ctrl_node max_derivations{
     auto selector    = res.second;
     auto node        = driver.builder->Create_MIB($2.name, selector, selectorReg, $3);
 
-  	$$ = node;
-       }
+    $$ = node;
+  }
   }
  |
  t_1500_WRAPPER node_name max_derivations
   {
       {
         auto node = driver.builder->Create_1500_Wrapper ($2.name,$3);
-  	$$ = node;
+        $$ = node;
        }
   }
  |
-t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains {
-
+t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains
+{
   int l = index_in_table(AI_protocol_table,$3);
-  	if (l==-1)
-	  {
-	  std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
+  if (l==-1)
+  {
+    std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
     std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unknown AccessInterface Protocol \n";
-	  YYERROR;
-	  }
-	  else
-	  {
-      std::shared_ptr<AccessInterfaceProtocol> protocol;
-      switch(l)
+    YYERROR;
+  }
+  else
+  {
+    std::shared_ptr<AccessInterfaceProtocol> protocol;
+    switch(l)
+    {
+      case JTAG_Loopback :
       {
-        case JTAG_Loopback :
-         {
-	 protocol = make_shared<LoopbackAccessInterfaceProtocol > ();
-	 break;
-	 }
-        case JTAG_SVF_Simulation :
-         {
-	 protocol = make_shared<SVF_SimulationProtocol > ();
-	 break;
-	 }
-        case JTAG_SVF_Emulation :
-         {
-	 protocol = make_shared<SVF_EmulationProtocol> ();
-	 break;
-	 }
-        case STIL_Emulation :
-         {
-	 protocol = make_shared<STIL_EmulationProtocol> ($6+1); //one derivation for reset
-	 break;
-	 }
-        case AI_protocol_t::SPI_FTDI :
+        protocol = make_shared<LoopbackAccessInterfaceProtocol > ();
+        break;
+      }
+      case JTAG_SVF_Simulation :
+      {
+        protocol = make_shared<SVF_SimulationProtocol > ();
+        break;
+      }
+      case JTAG_SVF_Emulation :
+      {
+        protocol = make_shared<SVF_EmulationProtocol> ();
+        break;
+      }
+      case STIL_Emulation :
+      {
+        protocol = make_shared<STIL_EmulationProtocol> ($6+1); //one derivation for reset
+        break;
+      }
+      case AI_protocol_t::SPI_FTDI :
+      {
+        if ($5.size()==0)
         {
-          if ($5.size()==0)
+          std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
+          std::cerr << "Error, " << AI_protocol_table[l] <<" needs an address table\n";
+          YYERROR;
+        }
+        if (($5.size()%3)!=0)
+        {
+          std::cerr << "Error, " << AI_protocol_table[l] <<" requires 3 addresses for each slave\n";
+        }
+
+        LOG(DEBUG) << "Generating " << AI_protocol_table[l] << " Access Interface";
+
+        auto chipselectCommands = std::vector<uint32_t>();
+        auto readCommands       = std::vector<uint32_t>();
+        auto writeCommands      = std::vector<uint32_t>();
+
+        for ( auto i = 0 ; i < $5.size(); i += 3)
+        {
+          chipselectCommands.push_back($5[i]);
+          readCommands.push_back($5[i+1]);
+          writeCommands.push_back($5[i+2]);
+        }
+
+
+        auto displayContent = [](string_view name, const std::vector<uint32_t>& container)
+        {
+          LOG(DEBUG) << name << " (size " << std::noshowbase << container.size() << ") ";
+          for (auto item : container)
           {
-            std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-            std::cerr << "Error, " << AI_protocol_table[l] <<" needs an address table\n";
-            YYERROR;
+            LOG(DEBUG) << "0x" << std::hex << item << " ";
           }
-          if (($5.size()%3)!=0)
-          {
-            std::cerr << "Error, " << AI_protocol_table[l] <<" requires 3 addresses for each slave\n";
-          }
+        };
 
-          LOG(DEBUG) << "Generating " << AI_protocol_table[l] << " Access Interface";
+        displayContent("chipselectCommands", chipselectCommands);
+        displayContent("readCommands",       readCommands);
+        displayContent("writeCommands",      writeCommands);
 
-          auto chipselectCommands = std::vector<uint32_t>();
-          auto readCommands       = std::vector<uint32_t>();
-          auto writeCommands      = std::vector<uint32_t>();
+        if (!$4.empty())
+          protocol = make_shared<SPI_Protocol > (std::move(chipselectCommands), std::move(readCommands), std::move(writeCommands));
+        else
+        {
+          auto usbDeviceID = extract_number($4);
+          protocol = make_shared<SPI_Protocol > (std::move(chipselectCommands), std::move(readCommands), std::move(writeCommands), "", static_cast<std::uint16_t>(usbDeviceID));
+        }
+        break;
+      } // End of: case AI_protocol_t::SPI_FTDI :
+      case I2C_Emulation :
+      {
+        if ($5.size()==0)
+        {
+          std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
+          std::cerr << "Error, " << AI_protocol_table[l] <<" needs an address table\n";
+          YYERROR;
+        }
+        if (($5.size())!=$6)
+        {
+          std::cerr << "Error, " << AI_protocol_table[l] <<" requires 1 address for each register chain\n";
+          YYERROR;
+        }
+        LOG(DEBUG) << "Generating " << AI_protocol_table[l] << " Access Interface";
 
-          for ( auto i = 0 ; i < $5.size(); i += 3)
-          {
-            chipselectCommands.push_back($5[i]);
-            readCommands.push_back($5[i+1]);
-            writeCommands.push_back($5[i+2]);
-          }
+        auto I2C_addresses       = std::vector<uint32_t>();
 
-
-          auto displayContent = [](string_view name, const std::vector<uint32_t>& container)
-          {
-            LOG(DEBUG) << name << " (size " << std::noshowbase << container.size() << ") ";
-            for (auto item : container)
-            {
-              LOG(DEBUG) << "0x" << std::hex << item << " ";
-            }
-          };
-
-          displayContent("chipselectCommands", chipselectCommands);
-          displayContent("readCommands",       readCommands);
-          displayContent("writeCommands",      writeCommands);
-
-	   if (!$4.empty())
-            protocol = make_shared<SPI_Protocol > (std::move(chipselectCommands), std::move(readCommands), std::move(writeCommands));
-          else
-            {
-    	    auto usbDeviceID = extract_number($4);
-		protocol = make_shared<SPI_Protocol > (std::move(chipselectCommands), std::move(readCommands), std::move(writeCommands), "", static_cast<std::uint16_t>(usbDeviceID));
-		}
-
-          break;
-        } // End of: case AI_protocol_t::SPI_FTDI :
-        case I2C_Emulation :
-         {
-          if ($5.size()==0)
-          {
-            std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-            std::cerr << "Error, " << AI_protocol_table[l] <<" needs an address table\n";
-            YYERROR;
-          }
+        for ( auto i = 0 ; i < $5.size(); i ++)
+        {
+          I2C_addresses.push_back($5[i]);
+        }
+        protocol = make_shared<I2C_EmulationProtocol> (I2C_addresses);
+        break;
+      }
+      case Offline :
+      {
+        protocol = make_shared<OfflineProtocol > ();
+        break;
+      }
+      case Intel_Packet :
+      {
+        #ifdef INTEL_EXPERIMENT
           if (($5.size())!=$6)
           {
             std::cerr << "Error, " << AI_protocol_table[l] <<" requires 1 address for each register chain\n";
             YYERROR;
           }
-          LOG(DEBUG) << "Generating " << AI_protocol_table[l] << " Access Interface";
-
-          auto I2C_addresses       = std::vector<uint32_t>();
-
+          auto Region_addresses = std::vector<uint32_t>();
           for ( auto i = 0 ; i < $5.size(); i ++)
           {
-            I2C_addresses.push_back($5[i]);
+            Region_addresses.push_back($5[i]);
           }
-	 protocol = make_shared<I2C_EmulationProtocol> (I2C_addresses);
-	 break;
-	 }
-        case Offline :
-         {
-	 protocol = make_shared<OfflineProtocol > ();
-	 break;
-	 }
-        case Intel_Packet :
-         {
-          #ifdef INTEL_EXPERIMENT
-            if (($5.size())!=$6)
-            {
-              std::cerr << "Error, " << AI_protocol_table[l] <<" requires 1 address for each register chain\n";
-              YYERROR;
-            }
-            auto Region_addresses       = std::vector<uint32_t>();
-            for ( auto i = 0 ; i < $5.size(); i ++)
-            {
-              Region_addresses.push_back($5[i]);
-            }
-            protocol = make_shared<Intel_EmulationProtocol > (Region_addresses);
-          #else
-           std::cerr << "Error, Intel_EmulationProtocol has not been built";
-          #endif
-	 break;
-	 }
-      } // End of: switch(l)
+          protocol = make_shared<Intel_EmulationProtocol > (Region_addresses);
+        #else
+         std::cerr << "Error, Intel_EmulationProtocol has not been built";
+        #endif
+        break;
+      }
+    } // End of: switch(l)
 
-      auto node = driver.main_sm->CreateAccessInterface($2.name, protocol);
-      $$ = node;
-		}
-	  }
+    auto node = driver.main_sm->CreateAccessInterface($2.name, protocol);
+    $$ = node;
+  }
+}
  |
   t_JTAG_TAP node_name JTAG_protocol AI_identifier IR_size IR_TABLE n_DR_chains
-      {
-      {
+{
+  {
   	{
     int l = index_in_table(JTAG_AI_protocol_table,$3);
-  	if (l==-1)
-	  {
-	  std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-    std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unknown JTAG protocol \n";
-	  YYERROR;
-	  }
-	  else
-	{
-    std::shared_ptr<AccessInterfaceProtocol> protocol;
-	  switch(l)
-	  {
-	  case Loopback :
-	   protocol = make_shared<LoopbackAccessInterfaceProtocol > ();
-	  break;
-	  case SVF_Simulation :
-	   {
-	   protocol = make_shared<SVF_SimulationProtocol > ();
-	  break;
-	  }
-	  case SVF_Emulation :
-	   protocol = make_shared<SVF_EmulationProtocol > ();
-	  break;
-	  case SVF_openOCD :
-	   {
-	   if ($4.empty())
-	    {
-	     std::cerr<<"Error, OpenOCD protocol requires providing a Design Name before IR Size\n";
-	     YYERROR;
-	    }
-	   protocol=make_openOCD_protocol( $4, $5);
-	   if (protocol==nullptr)
-	    {
-	    std::cerr<<"Error while setting up OpenOCD interface\n";
-	    YYERROR;
-	    }
-	  break;
-           }
-	  }
-	  if ($6.size()==0)
-	   {
-	   auto node = driver.builder->Create_JTAG_TAP($2.name,$5,$7+1,protocol);
-  	   $$ = node;
-	   }
-	  else
-	   {
-	     if ($6.size()!=($7+1))
-	      {
-	      std::cerr<<"Error Coding must be provided for bypass register and each chain\n";
-	     YYERROR;
-	      }
-	   auto node = driver.builder->Create_JTAG_TAP($2.name,$5,$7+1,protocol,$6);
-  	   $$ = node;
+    if (l==-1)
+    {
+      std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
+      std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unknown JTAG protocol \n";
+      YYERROR;
+    }
+    else
+    {
+      std::shared_ptr<AccessInterfaceProtocol> protocol;
+      switch(l)
+      {
+        case Loopback :
+          protocol = make_shared<LoopbackAccessInterfaceProtocol > ();
+          break;
+        case SVF_Simulation :
+        {
+          protocol = make_shared<SVF_SimulationProtocol > ();
+          break;
+        }
+        case SVF_Emulation :
+          protocol = make_shared<SVF_EmulationProtocol > ();
+          break;
+        case SVF_openOCD :
+        {
+          if ($4.empty())
+          {
+            std::cerr<<"Error, OpenOCD protocol requires providing a Design Name before IR Size\n";
+            YYERROR;
+          }
+          protocol=make_openOCD_protocol( $4, $5);
+          if (protocol==nullptr)
+          {
+            std::cerr<<"Error while setting up OpenOCD interface\n";
+            YYERROR;
+          }
+          break;
+        }
+      }
 
-	   }
-	 }
-	}
-       }
-     }
-  ;
+      if ($6.size()==0)
+      {
+        auto node = driver.builder->Create_JTAG_TAP($2.name,$5,$7+1,protocol);
+        $$ = node;
+      }
+      else
+      {
+        if ($6.size()!=($7+1))
+        {
+          std::cerr<<"Error Coding must be provided for bypass register and each chain\n";
+          YYERROR;
+        }
+        auto node = driver.builder->Create_JTAG_TAP($2.name,$5,$7+1,protocol,$6);
+        $$ = node;
+      }
+    }
+    }
+  }
+}
+;
 
 JTAG_protocol: t_WORD
    {$$ =$1;}
@@ -834,22 +865,27 @@ leaf_node: register_node {     $$=  $1;
   ;
 
 register_node:
-   t_REGISTER  node_name size hold bypass {
-                      auto bin_value = BinaryVector::CreateFromString(remove_quotes($5));
-		      if (bin_value.BitsCount() != $3)
-		        {
-	  		std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-			std::cerr << "Node " << $2.name<< " size "<< $3 << " does not match Bypass value bit count " << bin_value.BitsCount() << "\n";
-	  		YYERROR;
-			}
-		      auto node = driver.main_sm->CreateRegister ($2.name, bin_value , nullptr);
-		      /*TODO: save return value and check if binaryVector.size == size is correct
-		       and raise error if not*/
-		      if ($4==1) node->SetHoldValue(true);
-		     driver.declared_registers.insert ( std::pair<std::string, std::shared_ptr<mast::SystemModelNode>>
-		     			($2.name,node) );
+   t_REGISTER  node_name size hold bypass
+   {
+     auto bin_value = BinaryVector::CreateFromString(remove_quotes($5));
+     if (bin_value.BitsCount() != $3)
+     {
+       std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
+       std::cerr << "Node " << $2.name<< " size "<< $3 << " does not match Bypass value bit count " << bin_value.BitsCount() << "\n";
+       YYERROR;
+     }
 
-  		     $$ = node;}
+     auto node = driver.main_sm->CreateRegister ($2.name, bin_value , nullptr);
+     /*TODO: save return value and check if binaryVector.size == size is correct
+     and raise error if not*/
+     if ($4==1)
+     {
+       node->SetHoldValue(true);
+     }
+     driver.declared_registers.insert (std::pair<std::string, std::shared_ptr<mast::SystemModelNode>>($2.name,node) );
+
+     $$ = node;
+    }
 
 size :
  t_DecimalLiteral { $$ = $1;}
@@ -869,8 +905,7 @@ bypass:
 
 %%
 
-void
-SIT::SIT_Parser::error( const location_type &l, const std::string &err_message )
+void SIT::SIT_Parser::error( const location_type &l, const std::string &err_message )
 {
   std::ostringstream os;
 

@@ -39,7 +39,14 @@ void UnitTestsLoggerSink::ReceiveLogMessage(g3::LogMessageMover&& logMessage)
 {
   if (IsEnabled())
   {
-    m_logs.emplace_back(Formatter().FormatAsStdString(std::move(logMessage)));;
+    if (UseFormatter())
+    {
+      m_logs.emplace_back(Formatter().FormatAsStdString(std::move(logMessage)));
+    }
+    else
+    {
+      m_logs.emplace_back(logMessage.get().message());
+    }
   }
 }
 
@@ -81,7 +88,7 @@ void CoutLoggerSink::ReceiveLogMessage(g3::LogMessageMover&& logMessage)
     {
       std::cout << logMessage.get().message() << std::endl;
     }
-//+    std::cout.flush();
+    std::cout.flush();
   }
 }
 
@@ -99,7 +106,7 @@ void ErrorsOnCerrLoggerSink::ReceiveLogMessage(g3::LogMessageMover&& logMessage)
     {
       std::cerr << logMessage.get().message() << std::endl;
     }
-//+    std::cerr.flush();
+    std::cerr.flush();
   }
 }
 

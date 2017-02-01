@@ -65,7 +65,7 @@ namespace g3
   //!
   class G3LOG_DLL_EXPORT UnitTestsLoggerSink final : public LoggerSink
   {
-    std::vector<std::string>                                               m_logs;           //!< Saved log message
+    std::vector<std::string>                                  m_logs;           //!< Saved log message
     static std::weak_ptr<g3::SinkHandle<UnitTestsLoggerSink>> sm_sinkHandle;    //!< Must not keep an handle when the sink is no more used
 
     public:

@@ -17,6 +17,7 @@
 #include "SystemModelBuilder.hpp"
 #include "Utility.hpp"
 #include "LoopbackAccessInterfaceProtocol.hpp"
+#include "g3log/g3log.hpp"
 #include "UT_reader.hpp"
 #include "UT_reader_wrapper.hpp"
 
@@ -30,6 +31,7 @@ using std::tuple;
 using std::make_tuple;
 using std::string;
 using std::experimental::string_view;
+using namespace std::chrono_literals;
 using namespace std::experimental::literals::string_view_literals;
 using std::shared_ptr;
 using std::make_shared;
@@ -74,7 +76,15 @@ void UT_reader::setUp ()
   SystemModelNode::ResetNodeIdentifier();
 
   sm = std::make_shared<mast::SystemModel> ();
+  m_loggerInitialState = g3::logEnabled(true);
 }
+
+//! Cleanups test (called for each test)
+void UT_reader::tearDown ()
+{
+  g3::logEnabled(m_loggerInitialState);
+}
+
 
 
 // Test construction of register nodes from Simplified ICL Tree input when the input is correct
@@ -98,6 +108,8 @@ void UT_reader::test_register_Success ()
 
     // ---------------- Verify
     //
+     std::this_thread::sleep_for(1ms); // To get messages from logger (running in another thread)
+
     const auto gotErrorMessage = errorSink.str();
     TS_ASSERT_TRUE (gotErrorMessage.empty());
 
@@ -150,6 +162,8 @@ void UT_reader::test_register_Error ()
 
     // ---------------- Verify
     //
+    std::this_thread::sleep_for(1ms); // To get messages from logger (running in another thread)
+
     const auto gotErrorMessage = errorSink.str();
     TS_ASSERT_EQUALS  (gotErrorMessage, expected_errMSG);
 
@@ -1032,6 +1046,8 @@ void UT_reader::test_LINKER_Success ()
     PrependWithTap(sm, parseResult.second);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
 
+    std::this_thread::sleep_for(1ms); // To get messages from logger (running in another thread)
+
     const auto gotErrorMessage = errorSink.str();
     TS_ASSERT_TRUE (gotErrorMessage.empty());
 
@@ -1090,6 +1106,8 @@ void UT_reader::test_LINKER_Error ()
 
     // ---------------- Verify
     //
+    std::this_thread::sleep_for(1ms); // To get messages from logger (running in another thread)
+
     const auto gotErrorMessage = errorSink.str();
     TS_ASSERT_EQUALS  (gotErrorMessage, expected_errMSG);
 

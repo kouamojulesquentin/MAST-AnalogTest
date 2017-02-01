@@ -97,7 +97,7 @@ SIT::SIT_Reader::parse_helper( std::istream &stream )
     LOG(ERROR_LVL) << "Got unknown type of exception";
   }
 
-  std::cerr << "Parse failed!!\n";
+  LOG(ERROR_LVL) << "Parse failed!!";
   return false;
 }
 

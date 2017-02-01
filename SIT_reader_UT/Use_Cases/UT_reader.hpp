@@ -43,11 +43,14 @@ class UT_reader : public CxxTest::TestSuite
   void test_LINKER_Success ();
   void test_LINKER_Error ();
 
-  // ---------------- Private  Methods
+  // ---------------- Other methods
   //
-  void setUp(); //!< Initializes test (called for each test)
+  void setUp();    //!< Initializes test (called for each test)
+  void tearDown(); //!< Cleanups test (called for each test)
 
+  private:
   std::shared_ptr<mast::SystemModel> sm;
+  bool m_loggerInitialState = false;      //!< To enable logger for each test
 };
 //
 //  End of UT_reader class declaration

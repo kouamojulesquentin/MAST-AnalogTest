@@ -212,7 +212,7 @@ std::shared_ptr <OpenOCDProtocol>make_openOCD_protocol (const std::string& desig
   path.append(OPENOCD_DEFAULT_CONFIG);
 
   CHECK_FILE_EXISTS(path);
-  std::cerr << "Creating OpenOCD protocol, designName :" << designName << "path " << path << "\n";
+  LOG(ERROR_LVL) << "Creating OpenOCD protocol, designName :" << designName << "path " << path;
 
   auto protocol = make_shared <OpenOCDProtocol>(path, designName, IR_size);
 
@@ -364,7 +364,7 @@ root_node:
       auto selector_info= driver.declared_registers.find(this_linker.selector_name);
       if (selector_info==driver.declared_registers.end())
       {
-        std::cerr << "Error, Selector register " << this_linker.selector_name << " required by linker " <<  this_linker.linker_node->Name() << " at line " << this_linker.line <<":"<<this_linker.column << " does not exist\n" ;
+        LOG(ERROR_LVL) << "Error, Selector register " << this_linker.selector_name << " required by linker " <<  this_linker.linker_node->Name() << " at line " << this_linker.line <<":"<<this_linker.column << " does not exist" ;
         YYERROR;
       }
 
@@ -478,17 +478,17 @@ t_LINKER  node_name path_selector ctrl_node max_derivations
   int selectorKindIndex = index_in_table(Path_Selector_table, $3);
   if (selectorKindIndex == -1)
   {
-    std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-"
-      << my_location->end.column << ": " ;
-        std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unknown Linker Path Selector \n";
+    LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-"
+                   << my_location->end.column << ": "
+                   << "node " << $2.name<< " \""<< $3 << "\"" << ": Unknown Linker Path Selector";
     YYERROR;
   }
 
   if ($4 == "")
   {
-    std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-";
-    std::cerr << my_location->end.column << ": " ;
-    std::cerr << "Must specify a control node for path selector\n";
+    LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-"
+                   << my_location->end.column << ": "
+                   << "Must specify a control node for path selector";
     YYERROR;
   }
 
@@ -530,8 +530,8 @@ t_LINKER  node_name path_selector ctrl_node max_derivations
     int index = index_in_table(Path_Selector_table,$7);
     if (index==-1)
     {
-      std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-      std::cerr << "node " << $2.name<< " \""<< $7 << "\"" << ": Unknown MIB Path Selector \n";
+      LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": "
+                     << "node " << $2.name << " \"" << $7 << "\"" << ": Unknown MIB Path Selector";
       YYERROR;
     }
 
@@ -566,8 +566,8 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains
   int l = index_in_table(AI_protocol_table,$3);
   if (l==-1)
   {
-    std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-    std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unknown AccessInterface Protocol \n";
+    LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": "
+                   << "node " << $2.name<< " \""<< $3 << "\"" << ": Unknown AccessInterface Protocol";
     YYERROR;
   }
   else
@@ -599,13 +599,13 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains
       {
         if ($5.size()==0)
         {
-          std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-          std::cerr << "Error, " << AI_protocol_table[l] <<" needs an address table\n";
+          LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": "
+                         << "Error, " << AI_protocol_table[l]  << " needs an address table";
           YYERROR;
         }
         if (($5.size()%3)!=0)
         {
-          std::cerr << "Error, " << AI_protocol_table[l] <<" requires 3 addresses for each slave\n";
+          LOG(ERROR_LVL) << "Error, " << AI_protocol_table[l] <<" requires 3 addresses for each slave";
         }
 
         LOG(DEBUG) << "Generating " << AI_protocol_table[l] << " Access Interface";
@@ -648,13 +648,13 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains
       {
         if ($5.size()==0)
         {
-          std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-          std::cerr << "Error, " << AI_protocol_table[l] <<" needs an address table\n";
+          LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": "
+                         << "Error, " << AI_protocol_table[l] <<" needs an address table";
           YYERROR;
         }
         if (($5.size())!=$6)
         {
-          std::cerr << "Error, " << AI_protocol_table[l] <<" requires 1 address for each register chain\n";
+          LOG(ERROR_LVL) << "Error, " << AI_protocol_table[l] << " requires 1 address for each register chain";
           YYERROR;
         }
         LOG(DEBUG) << "Generating " << AI_protocol_table[l] << " Access Interface";
@@ -678,7 +678,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains
         #ifdef INTEL_EXPERIMENT
           if (($5.size())!=$6)
           {
-            std::cerr << "Error, " << AI_protocol_table[l] <<" requires 1 address for each register chain\n";
+            LOG(ERROR_LVL) << "Error, " << AI_protocol_table[l] << " requires 1 address for each register chain";
             YYERROR;
           }
           auto Region_addresses = std::vector<uint32_t>();
@@ -688,7 +688,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains
           }
           protocol = make_shared<Intel_EmulationProtocol > (Region_addresses);
         #else
-         std::cerr << "Error, Intel_EmulationProtocol has not been built";
+         LOG(ERROR_LVL) << "Error, Intel_EmulationProtocol has not been built";
         #endif
         break;
       }
@@ -706,8 +706,8 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains
     int l = index_in_table(JTAG_AI_protocol_table,$3);
     if (l==-1)
     {
-      std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-      std::cerr << "node " << $2.name<< " \""<< $3 << "\"" << ": Unknown JTAG protocol \n";
+      LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": "
+                     << "node " << $2.name << " \"" << $3 << "\"" << ": Unknown JTAG protocol";
       YYERROR;
     }
     else
@@ -730,13 +730,13 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains
         {
           if ($4.empty())
           {
-            std::cerr<<"Error, OpenOCD protocol requires providing a Design Name before IR Size\n";
+            LOG(ERROR_LVL) << "Error, OpenOCD protocol requires providing a Design Name before IR Size";
             YYERROR;
           }
           protocol=make_openOCD_protocol( $4, $5);
           if (protocol==nullptr)
           {
-            std::cerr<<"Error while setting up OpenOCD interface\n";
+            LOG(ERROR_LVL) << "Error while setting up OpenOCD interface";
             YYERROR;
           }
           break;
@@ -752,7 +752,7 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains
       {
         if ($6.size()!=($7+1))
         {
-          std::cerr<<"Error Coding must be provided for bypass register and each chain\n";
+          LOG(ERROR_LVL) << "Error Coding must be provided for bypass register and each chain";
           YYERROR;
         }
         auto node = driver.builder->Create_JTAG_TAP($2.name,$5,$7+1,protocol,$6);
@@ -870,8 +870,8 @@ register_node:
      auto bin_value = BinaryVector::CreateFromString(remove_quotes($5));
      if (bin_value.BitsCount() != $3)
      {
-       std::cerr << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": " ;
-       std::cerr << "Node " << $2.name<< " size "<< $3 << " does not match Bypass value bit count " << bin_value.BitsCount() << "\n";
+       LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": "
+                      << "Node " << $2.name << " size " << $3 << " does not match Bypass value bit count " << bin_value.BitsCount();
        YYERROR;
      }
 
@@ -912,9 +912,9 @@ void SIT::SIT_Parser::error( const location_type &l, const std::string &err_mess
   os << "Line " << my_location->begin.line
      << ":"     << my_location->begin.column
      << "-"     << my_location->end.column
-     << ": "    << err_message << "\n";
+     << ": "    << err_message;
 
-  std::cerr << os.str();
+  LOG(ERROR_LVL) << os.str();
   driver.parsed_sut = nullptr;
 
   auto exceptionMessage = "SIT parsing error: "s + os.str();

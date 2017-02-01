@@ -28,6 +28,11 @@ int main( int argc, char *argv[] )
 
     auto customSinkHandle = logworker->addSink(std::move(customSink), &g3::CustomFileSink::ReceiveLogUnformattedMessage);
 
+    // ---------------- Sink for logging errors to std::cerr
+    //
+    auto cerrSink       = std::make_unique<g3::ErrorsOnCerrLoggerSink>(true, g3::LogFormatterUsage::Ignore);
+    auto cerrSinkHandle = logworker->addSink(std::move(cerrSink), &g3::ErrorsOnCerrLoggerSink::ReceiveLogMessage);
+
     g3::initializeLogging(logworker.get());
     LOG(INFO) << "Start of Unit tests";
     g3::logEnabled(false);

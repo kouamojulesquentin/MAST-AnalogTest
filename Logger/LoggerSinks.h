@@ -23,16 +23,31 @@ namespace g3
   //!
   class G3LOG_DLL_EXPORT LoggerSink
   {
-    g3::LogFormatter m_formatter;
-    bool             m_enabled = true; //!< To enable/disable message for this logger sink only
+    g3::LogFormatter  m_formatter;
+    LogFormatterUsage m_formatterUsage = LogFormatterUsage::Use; //!< Tells whether the formater should be used or not
+    bool              m_enabled        = true;                   //!< To enable/disable message for this logger sink only
 
     // ---------------- Public  Methods
     //
     public:
     virtual ~LoggerSink() = default;
     LoggerSink()          = default;
-    LoggerSink(bool enabled)                                           : m_enabled(enabled) {}
-    LoggerSink(const g3::LogFormatter& formatter, bool enabled = true) : m_formatter(formatter), m_enabled(enabled) {}
+    LoggerSink(bool enabled, LogFormatterUsage formatterUsage = LogFormatterUsage::Use)
+      : m_formatterUsage (formatterUsage)
+      , m_enabled        (enabled)
+    {}
+    LoggerSink(const g3::LogFormatter& formatter,
+               bool                    enabled        = true,
+               LogFormatterUsage       formatterUsage = LogFormatterUsage::Use)
+      : m_formatter      (formatter)
+      , m_formatterUsage (formatterUsage)
+      , m_enabled        (enabled)
+    {}
+
+
+    bool  UseFormatter() const             { return m_formatterUsage == LogFormatterUsage::Use; }
+    void  UseFormatter (bool useFormatter) { m_formatterUsage = useFormatter ? LogFormatterUsage::Use : LogFormatterUsage::Ignore; }
+
 
     bool Enabled(bool enabled);
     bool IsEnabled() const { return m_enabled; }
@@ -85,9 +100,13 @@ namespace g3
     public:
 
     virtual ~CoutLoggerSink() = default;
-             CoutLoggerSink()             : CoutLoggerSink(true) {}
+             CoutLoggerSink() = default;
              CoutLoggerSink(bool enabled) : LoggerSink(enabled) {}
-             CoutLoggerSink(const g3::LogFormatter& formatter, bool enabled = true) : LoggerSink(formatter, enabled) {}
+             CoutLoggerSink(const g3::LogFormatter& formatter,
+                            bool                    enabled        = true,
+                            LogFormatterUsage       formatterUsage = LogFormatterUsage::Use)
+              : LoggerSink(formatter, enabled, formatterUsage)
+             {}
 
     void ReceiveLogMessage(g3::LogMessageMover&& logMessage) override;
   };
@@ -100,9 +119,15 @@ namespace g3
     public:
 
     virtual ~ErrorsOnCerrLoggerSink() = default;
-             ErrorsOnCerrLoggerSink()             : ErrorsOnCerrLoggerSink(true) {}
-             ErrorsOnCerrLoggerSink(bool enabled) : LoggerSink(enabled) {}
-             ErrorsOnCerrLoggerSink(const g3::LogFormatter& formatter, bool enabled = true) : LoggerSink(formatter, enabled) {}
+             ErrorsOnCerrLoggerSink() = default;
+             ErrorsOnCerrLoggerSink(bool enabled, LogFormatterUsage formatterUsage = LogFormatterUsage::Use)
+              : LoggerSink(enabled, formatterUsage)
+             {}
+             ErrorsOnCerrLoggerSink(const g3::LogFormatter& formatter,
+                                    bool                    enabled        = true,
+                                    LogFormatterUsage       formatterUsage = LogFormatterUsage::Use)
+              : LoggerSink(formatter, enabled, formatterUsage)
+             {}
 
     void ReceiveLogMessage(g3::LogMessageMover&& logMessage) override;
   };

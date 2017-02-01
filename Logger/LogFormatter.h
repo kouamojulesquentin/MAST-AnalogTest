@@ -18,6 +18,16 @@
 
 namespace g3
 {
+  //! Tells whether log formatter is to be used or not
+  //!
+  //! @note It is intended to be used dynamically and independently by logger sinks
+  //!
+  enum class LogFormatterUsage
+  {
+    Use,    //!< Do format messages
+    Ignore, //!< Do not format messages
+  };
+
   //! Formats messages from g3log library
   //!
   class G3LOG_DLL_EXPORT LogFormatter final

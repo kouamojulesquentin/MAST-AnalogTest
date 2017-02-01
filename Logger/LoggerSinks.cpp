@@ -73,17 +73,33 @@ void CoutLoggerSink::ReceiveLogMessage(g3::LogMessageMover&& logMessage)
 {
   if (IsEnabled())
   {
-    std::cout << Formatter().FormatAsStdString(std::move(logMessage)) << std::endl;
+    if (UseFormatter())
+    {
+      std::cout << Formatter().FormatAsStdString(std::move(logMessage)) << std::endl;
+    }
+    else
+    {
+      std::cout << logMessage.get().message() << std::endl;
+    }
+//+    std::cout.flush();
   }
 }
 
-//! Collects (or not) a log message
+//! Streams log message to std::cerr if it has ERROR level
 //!
 void ErrorsOnCerrLoggerSink::ReceiveLogMessage(g3::LogMessageMover&& logMessage)
 {
   if (IsEnabled() && (logMessage.get()._level == ERROR_LVL))
   {
-    std::cerr << Formatter().FormatAsStdString(std::move(logMessage)) << std::endl;
+    if (UseFormatter())
+    {
+      std::cerr << Formatter().FormatAsStdString(std::move(logMessage)) << std::endl;
+    }
+    else
+    {
+      std::cerr << logMessage.get().message() << std::endl;
+    }
+//+    std::cerr.flush();
   }
 }
 

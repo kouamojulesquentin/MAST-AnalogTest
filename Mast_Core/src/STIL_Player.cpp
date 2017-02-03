@@ -32,7 +32,11 @@ STIL_Player::STIL_Player (const std::string& nbDerivations)
 {
   try
   {
-    m_nbDerivations = static_cast<uint32_t>(std::stoul(nbDerivations, nullptr, 0));
+    auto number = std::stoull(string(nbDerivations), nullptr, 0);
+
+    CHECK_PARAMETER_LTE(number, UINT32_MAX, nbDerivations + ", is out of range for a 32 bit number");
+
+    m_nbDerivations = static_cast<uint32_t>(number);
   }
   catch(std::out_of_range& exc)     // Conversion to number is not possible ==> it must be the prefix
   {

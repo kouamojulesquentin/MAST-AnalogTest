@@ -32,7 +32,19 @@ class DLL_EXPORT STIL_Player : public AccessInterfaceProtocol
   public:
   ~STIL_Player() = default;
   STIL_Player() = delete;
-  STIL_Player(uint32_t n_chains) {m_n_chains = n_chains;}
+  STIL_Player(uint32_t nbDerivations) { m_nbDerivations = nbDerivations; }
+
+  //! Initializes a with number of derivations defined by a string
+  //!
+  STIL_Player(const std::string& nbDerivations);
+
+  //! Gets the number of derivations supported by the specific protocol
+  //!
+  //! @note Derivation id 0 is reserved for reset operation, so protocol must support a least two derivations
+  //!
+  //! @return The number of supported derivation (including pseudo derivation 0 for reset)
+  //!
+  virtual uint32_t MaxSupportedDerivations() const override { return m_nbDerivations; }
 
   //! Returns true when TRST JTAG port is supported
   //!
@@ -54,8 +66,9 @@ class DLL_EXPORT STIL_Player : public AccessInterfaceProtocol
 
   // ---------------- Private  Fields
   //
-  bool m_supportTRST = false; //!< When true, TRST instruction is used for reset unless synchronous reset is requested
-  uint32_t m_n_chains = 0; //!< When true, TRST instruction is used for reset unless synchronous reset is requested
+  private:
+  bool     m_supportTRST   = false; //!< When true, TRST instruction is used for reset unless synchronous reset is requested
+  uint32_t m_nbDerivations = 0;     //!< Number of derivations
 };
 //
 //  End of STIL_Player class declaration

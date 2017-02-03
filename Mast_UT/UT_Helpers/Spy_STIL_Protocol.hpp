@@ -43,14 +43,6 @@ class Spy_STIL_Protocol final : public mast::STIL_Player
 
   const std::vector<std::string>& STILCommands() const { return m_spiedCommands->Commands(); }
 
-  //! Gets the number of derivations supported by the specific protocol
-  //!
-  //! @note Derivation id 0 is reserved for reset operation, so protocol must support a least two derivations
-  //!
-  //! @return The number of supported derivation (including pseudo derivation 0 for reset)
-  //!
-  virtual uint32_t MaxSupportedDerivations() const override { return m_n_chains;}
-
   //! Returns readable type of protocol
   //!
   virtual std::experimental::string_view KindName() const override { return "STIL_Spy"; }

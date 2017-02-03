@@ -34,6 +34,10 @@ class DLL_EXPORT STIL_EmulationProtocol final : public STIL_Player
   STIL_EmulationProtocol() = delete;
   STIL_EmulationProtocol(uint32_t n_chains);
 
+  //! Initializes a with number of derivations defined by a string
+  //!
+  STIL_EmulationProtocol(const std::string& nbChains);
+
   //! Does any action required to transfer scan data to and from SUT
   //!
   //! @param derivationId   Identifies the derivation to act for (zero based)
@@ -44,13 +48,6 @@ class DLL_EXPORT STIL_EmulationProtocol final : public STIL_Player
   //!
   virtual BinaryVector DoAction(uint32_t derivationId, void* interfaceData, const BinaryVector& toSutData) override;
 
-  //! Gets the number of derivations supported by the specific protocol
-  //!
-  //! @note Derivation id 0 is reserved for reset operation, so protocol must support a least two derivations
-  //!
-  //! @return The number of supported derivation (including pseudo derivation 0 for reset)
-  //!
-  virtual uint32_t MaxSupportedDerivations() const override { return m_n_chains; }
 
   //! Returns readable type of protocol
   //!

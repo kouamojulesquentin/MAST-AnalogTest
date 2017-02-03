@@ -100,8 +100,12 @@ class DLL_EXPORT OfflineProtocol final : public AccessInterfaceProtocol
   // ---------------- Private  Fields
   //
   private:
-  std::string               m_toSutFilePath   = "/dev/null";      //!< File used to "transmit" SVF commands
-  std::string               m_fromSutFilePath = "input.dat";      //!< File used to "receive" from SUT bitstream
+  #if defined(_WIN32)
+  std::string               m_toSutFilePath   = "NULL";                        //!< File used to "transmit" SVF commands
+  #else
+  std::string               m_toSutFilePath   = "/dev/null";                   //!< File used to "transmit" SVF commands
+  #endif
+  std::string               m_fromSutFilePath = "input.dat";                   //!< File used to "receive" from SUT bitstream
   std::ifstream::pos_type   m_lastPos         = 0;                             //!< Position of last bitstream line "received" from SUT
   std::chrono::milliseconds m_fromSutTimeout  = std::chrono::seconds(60);      //!< Timeout waiting for "from SUT data" (before an exception is thrown)
   std::chrono::milliseconds m_fromSutWait     = std::chrono::milliseconds(50); //!< Duration between two attempts to get data from SUT

@@ -59,7 +59,7 @@ void OfflineProtocol::CleanUpFiles ()
 
   // ---------------- input file
   //
-  ofstream ifs(m_fromSutFilePath, std::ios_base::in);
+  ofstream ifs(m_fromSutFilePath, std::ios_base::trunc);
 
   if (!ifs.is_open())
   {

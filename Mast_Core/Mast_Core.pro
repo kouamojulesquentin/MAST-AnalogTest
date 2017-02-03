@@ -23,6 +23,7 @@ DEPENDPATH += include        \
 
 SOURCES +=  \
     src/AccessInterface.cpp                         \
+    src/AccessInterfaceProtocolFactories.cpp        \
     src/LoopbackAccessInterfaceProtocol.cpp         \
     src/BinaryVector.cpp                            \
     src/BrocadeSelector.cpp                         \
@@ -77,6 +78,7 @@ SOURCES +=  \
 HEADERS += \
     include/AccessInterface.hpp                         \
     include/AccessInterfaceProtocol.hpp                 \
+    include/AccessInterfaceProtocolFactories.hpp        \
     include/AppFunctionAndNode.hpp                      \
     include/LoopbackAccessInterfaceProtocol.hpp         \
     include/BinaryVector.hpp                            \

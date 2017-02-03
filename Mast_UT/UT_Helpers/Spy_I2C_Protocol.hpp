@@ -34,15 +34,23 @@ class Spy_I2C_Protocol final : public mast::I2C_Player
   Spy_I2C_Protocol() = delete;
   Spy_I2C_Protocol(std::shared_ptr<SpiedProtocolsCommands> spiedCommands,
                    std::initializer_list<uint32_t>         addresses,
-                   std::experimental::string_view          commandsPrefix = "")
-    : I2C_Player      (addresses, commandsPrefix)
+                   std::string                             commandsPrefix = "")
+    : I2C_Player      (addresses, std::move(commandsPrefix))
     , m_spiedCommands (spiedCommands)
   {  }
 
   Spy_I2C_Protocol(std::initializer_list<uint32_t> addresses,
-                   std::experimental::string_view  commandsPrefix = "")
-    : Spy_I2C_Protocol(std::make_shared<SpiedProtocolsCommands>(), addresses, commandsPrefix)
+                   std::string                     commandsPrefix = "")
+    : Spy_I2C_Protocol(std::make_shared<SpiedProtocolsCommands>(), addresses, std::move(commandsPrefix))
   {  }
+
+  //! Initializes with addresses and optional prefix defined by a string
+  //!
+  Spy_I2C_Protocol(const std::string& parameters)
+    : I2C_Player      (parameters)
+    , m_spiedCommands (std::make_shared<SpiedProtocolsCommands>())
+  {
+  }
 
   //! Spies content how binary vector to SUT is transformed to I2C command while returning the BinaryVector unchanged
   //!

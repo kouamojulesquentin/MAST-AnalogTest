@@ -308,7 +308,7 @@ shared_ptr<AccessInterfaceProtocol> GetProtocol (Options::Protocol protocol, con
     case Options::Protocol::I2C_Emulation:
     {
       initializer_list<uint32_t> addresses      = { 0x00, 0x01, 0x02 };
-      string_view                commandsPrefix = "";
+      auto                       commandsPrefix = ""s;
 
       aiProtocol = make_shared<I2C_EmulationProtocol> (addresses, commandsPrefix);
       break;

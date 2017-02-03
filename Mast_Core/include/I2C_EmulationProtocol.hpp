@@ -32,8 +32,12 @@ class DLL_EXPORT I2C_EmulationProtocol final : public I2C_Player
   public:
   virtual ~I2C_EmulationProtocol() = default;
   I2C_EmulationProtocol() = delete;
-  I2C_EmulationProtocol(std::initializer_list<uint32_t> addresses, std::experimental::string_view commandsPrefix = "");
-  I2C_EmulationProtocol(std::vector<uint32_t>           addresses, std::experimental::string_view commandsPrefix = "");
+  I2C_EmulationProtocol(std::initializer_list<uint32_t> addresses, std::string commandsPrefix = "");
+  I2C_EmulationProtocol(std::vector<uint32_t>           addresses, std::string commandsPrefix = "");
+
+  //! Initializes with addresses and optional prefix defined by a string
+  //!
+  I2C_EmulationProtocol(const std::string& parameters);
 
   //! Does any action required to transfer scan data to and from SUT
   //!

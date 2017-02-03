@@ -35,7 +35,11 @@ class DLL_EXPORT I2C_Player : public AccessInterfaceProtocol
   virtual ~I2C_Player() = default;
   I2C_Player() = delete;
 
-  I2C_Player(std::vector<uint32_t>           addresses, std::experimental::string_view commandsPrefix = "");
+  I2C_Player(std::vector<uint32_t> addresses, std::string commandsPrefix = "");
+
+  //! Initializes with addresses and optional prefix defined by a string
+  //!
+  I2C_Player(const std::string& parameters);
 
   //! Gets the number of derivations supported by the specific protocol
   //!
@@ -45,9 +49,17 @@ class DLL_EXPORT I2C_Player : public AccessInterfaceProtocol
   //!
   virtual uint32_t MaxSupportedDerivations() const override { return m_addresses.size(); }
 
-  std::string CommandsPrefix() const { return m_commandPrefix; }  //!< Returns current commands prefix
+  //! Returns current commands prefix
+  //!
+  const std::string& CommandsPrefix() const { return m_commandPrefix; }
 
-  void  CommandsPrefix (std::string commandsPrefix) { m_commandPrefix = commandsPrefix; } //!< Changes current commands prefix (must include spaces when necessary)
+  //! Changes current commands prefix (must include spaces when necessary)
+  //!
+  void  CommandsPrefix (std::experimental::string_view commandsPrefix)
+  {
+    m_commandPrefix.clear();
+    m_commandPrefix.append(commandsPrefix.cbegin(), commandsPrefix.cend());
+  }
 
   // ---------------- Protected Methods
   //

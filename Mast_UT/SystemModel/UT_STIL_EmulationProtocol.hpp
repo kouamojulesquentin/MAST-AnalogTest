@@ -37,7 +37,6 @@ class UT_STIL_EmulationProtocol : public CxxTest::TestSuite
 
   // ================ Other Methods ================
 
-  void setUp(); //!< Initializes test (called for each test)
 };
 //
 //  End of UT_STIL_EmulationProtocol class declaration

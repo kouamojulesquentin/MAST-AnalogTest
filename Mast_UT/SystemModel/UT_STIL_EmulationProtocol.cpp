@@ -32,11 +32,6 @@ using namespace mast;
 using namespace test;
 
 
-//! Initializes test (called for each test)
-void UT_STIL_EmulationProtocol::setUp ()
-{
-}
-
 //! Checks STIL_EmulationProtocol constructor given max derivation as an integer
 //!
 void UT_STIL_EmulationProtocol::test_Constructor_Integer ()
@@ -116,27 +111,27 @@ void UT_STIL_EmulationProtocol::test_Constructor_String_Error ()
 {
   // ---------------- DDT Setup
   //
-  auto checker = [](const auto& data)
+  auto checker = [](string_view data)
   {
     // ---------------- Setup
     //
-    auto maxDerivations = string(std::get<0>(data));
+    string maxSupportedDerivations(data);
 
     // ---------------- Exercise & Verify
     //
-    TS_ASSERT_THROWS (auto sut = STIL_EmulationProtocol(maxDerivations), std::exception);
+    TS_ASSERT_THROWS (auto sut = STIL_EmulationProtocol(maxSupportedDerivations), std::exception);
   };
 
   auto data =
   {
-//+    make_tuple(""sv),            // 0: No number at all
-    make_tuple("   "sv),         // 1: No number at all
-    make_tuple("Five"sv),        // 2: Not a number
-    make_tuple("NaN"sv),         // 3: Not a number
-    make_tuple(":10"sv),         // 4: Start with not number character
-    make_tuple("O17"sv),         // 5: 'O' instead of zero
-    make_tuple("x17"sv),         // 6: Missing leading zero
-    make_tuple("0xFFFFFFFF0"sv), // 7: Too big number
+    ""sv,            // 0: No number at all
+    "   "sv,         // 1: No number at all
+    "Five"sv,        // 2: Not a number
+    "NaN"sv,         // 3: Not a number
+    ":10"sv,         // 4: Start with not number character
+    "O17"sv,         // 5: 'O' instead of zero
+    "x17"sv,         // 6: Missing leading zero
+    "0xFFFFFFFF0"sv, // 7: Too big number
   };
 
   // ---------------- DDT Exercise
@@ -184,17 +179,19 @@ void UT_STIL_EmulationProtocol::test_DoAction ()
 
     sut.resetCommands();
 
-  auto fromSutVector = sut.DoAction(n_chain,nullptr,toSutVector);
-  TS_ASSERT_EQUALS (toSutVector,fromSutVector); //It is a loopback
+    auto fromSutVector = sut.DoAction(n_chain,nullptr,toSutVector);
+    TS_ASSERT_EQUALS (toSutVector,fromSutVector); //It is a loopback
 
-  auto gotSTILCommands=sut.STILCommands();
-  TS_ASSERT_EQUALS (gotSTILCommands, expected);
+    auto gotSTILCommands=sut.STILCommands();
+    TS_ASSERT_EQUALS (gotSTILCommands, expected);
   };
 
-  auto data = {
-  make_tuple(1,"/b01",vector<std::string> ({"V{ CHAIN = 001010-T}","V{ CHAIN = 0011001T}", "V{ CHAIN = 0011000T}", "V{ CHAIN = 001001-T}",})),
-  make_tuple(2,"/b01",vector<std::string> ({"V{ CHAIN = 010010-T}","V{ CHAIN = 0101001T}", "V{ CHAIN = 0101000T}", "V{ CHAIN = 010001-T}",})),
- };
+  auto data =
+  {
+    make_tuple(1,"/b01",vector<std::string> ({"V{ CHAIN = 001010-T}","V{ CHAIN = 0011001T}", "V{ CHAIN = 0011000T}", "V{ CHAIN = 001001-T}",})),
+    make_tuple(2,"/b01",vector<std::string> ({"V{ CHAIN = 010010-T}","V{ CHAIN = 0101001T}", "V{ CHAIN = 0101000T}", "V{ CHAIN = 010001-T}",})),
+  };
+
   // ---------------;- DDT Exercise
   //
   TS_DATA_DRIVEN_TEST (checker, data);

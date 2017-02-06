@@ -48,6 +48,7 @@
 #include "DefaultNHotPathSelector.hpp"
 #include "SystemModelBuilder.hpp"
 #include "AccessInterfaceProtocol.hpp"
+#include "AccessInterfaceProtocolFactories.hpp"
 #include "LoopbackAccessInterfaceProtocol.hpp"
 #include "GenericAccessInterfaceProtocol.hpp"
 #include "SVF_SimulationProtocol.hpp"
@@ -89,6 +90,9 @@ using namespace mast;
 #define N_AIs 6
 #define MAX_AI_NAME 30
 
+#define THROW_PARSER_ERROR(msg) THROW_IMPL(ParserException, msg)
+
+
 #define DEFAULT_I2C_PREFIX "S2R"
 
 extern int nlines;
@@ -103,7 +107,7 @@ extern SIT::SIT_Parser::location_type *my_location;
 
 #define OPENOCD_DEFAULT_PATH "openocd"
 
-std::vector <std::string>AI_protocol_table =
+std::vector<std::string> AI_protocol_table =
 {
   "JTAG_Loopback",
   "JTAG_SVF_Simulation",
@@ -126,7 +130,7 @@ enum AI_protocol_t
   Intel_Packet
 };
 
-std::vector <std::string>JTAG_AI_protocol_table =
+std::vector<std::string> JTAG_AI_protocol_table =
 {
   "Loopback", "SVF_Simulation", "SVF_openOCD", "SVF_Emulation"
 };
@@ -187,7 +191,9 @@ int index_in_table(const std::vector<std::string>& table, const std::string& s)
   return static_cast<int>(index);
 }
 
-std::shared_ptr <OpenOCDProtocol>make_openOCD_protocol (const std::string& designName, std::uint32_t IR_size)
+//! @todo [JFC]-[February/06/2017]: Move that code into OpenOCDProtocol constructor from string parameters
+//!
+std::shared_ptr<OpenOCDProtocol> make_openOCD_protocol (const std::string& designName, std::uint32_t IR_size)
 {
   std::string path;
 
@@ -276,44 +282,49 @@ std::shared_ptr <PathSelector>make_PathSelector (std::shared_ptr         <mast::
   }
   return res;
 }
+} // End of: unnamed namespace
 
-}
+
 } /*end of %code section*/
 
 %define api.value.type variant
 %define parse.assert
 
-%type  <node_list_type> node_list
-%type  <node_list_type> children_list
-%type  <std::uint8_t> is_transparent
-%type  <name_type> node_name
-%type  <std::uint8_t> hold
-%type  <std::string> bypass
-%type  <mast::MuxRegPlacement> position
+%type <node_list_type>        node_list
+%type <node_list_type>        children_list
+%type <std::uint8_t>          is_transparent
+%type <name_type>             node_name
+%type <std::uint8_t>          hold
+%type <std::string>           bypass
+%type <mast::MuxRegPlacement> position
 
-%type  <mast::SelectorProperty> active
-%type  <mast::SelectorProperty> reverse
-%type  <std::uint32_t> max_derivations
-%type  <std::string> path_selector
-%type  <std::string> ctrl_node
-%type  <std::uint32_t> IR_size
-%type  <std::uint32_t> size
-%type  <std::uint32_t> n_DR_chains
-%type  <std::uint32_t> n_chains
-%type  <std::vector<uint32_t>> AI_Coding_list
-%type  <std::vector<mast::BinaryVector>> IR_Coding_list
-%type  <std::vector<mast::BinaryVector>> IR_TABLE
-%type  <std::vector<uint32_t>> AI_TABLE
-%type  <std::string> JTAG_protocol
-%type  <std::shared_ptr<mast::SystemModelNode>> root_node
-%type  <std::shared_ptr<mast::SystemModelNode>> register_node
-%type  <std::shared_ptr<mast::SystemModelNode>> leaf_node
-%type  <std::shared_ptr<mast::SystemModelNode>> parent_node
-%type  <std::shared_ptr<mast::SystemModelNode>> node
-%type  <std::shared_ptr<mast::SystemModelNode>> parent_node_with_children
-%type  <std::vector<std::string>> function_list
-%type  <std::pair <std::vector<std::string>,std::uint32_t>> PDL_declaration
-%type  <std::string> AI_identifier
+
+%type <mast::SelectorProperty>          active
+%type <mast::SelectorProperty>          reverse
+%type <std::uint32_t>                   max_derivations
+%type <std::string>                     path_selector
+%type <std::string>                     ctrl_node
+%type <std::uint32_t>                   IR_size
+%type <std::uint32_t>                   size
+%type <std::uint32_t>                   n_DR_chains
+%type <std::uint32_t>                   n_chains
+%type <std::vector<uint32_t>>           AI_Coding_list
+%type <std::vector<mast::BinaryVector>> IR_Coding_list
+%type <std::vector<mast::BinaryVector>> IR_TABLE
+%type <std::vector<uint32_t>>           AI_TABLE
+%type <std::string>                     JTAG_protocol
+%type <std::string>                     AI_identifier
+%type <std::string>                     AI_protocol_parameters
+
+%type <std::shared_ptr<mast::SystemModelNode>> root_node
+%type <std::shared_ptr<mast::SystemModelNode>> register_node
+%type <std::shared_ptr<mast::SystemModelNode>> leaf_node
+%type <std::shared_ptr<mast::SystemModelNode>> parent_node
+%type <std::shared_ptr<mast::SystemModelNode>> node
+%type <std::shared_ptr<mast::SystemModelNode>> parent_node_with_children
+%type <std::vector<std::string>>               function_list
+%type <std::pair<std::vector<std::string>, std::uint32_t>>  PDL_declaration
+
 %token               END    0     "end of file"
 %token               UPPER
 %token               LOWER
@@ -699,66 +710,58 @@ t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains
   }
 }
  |
-  t_JTAG_TAP node_name JTAG_protocol AI_identifier IR_size IR_TABLE n_DR_chains
+  // $1      $2        $3            $4                     $5      $6       $7
+  t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_chains
 {
   {
   	{
-    int l = index_in_table(JTAG_AI_protocol_table,$3);
-    if (l==-1)
-    {
-      LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": "
-                     << "node " << $2.name << " \"" << $3 << "\"" << ": Unknown JTAG protocol";
-      YYERROR;
-    }
-    else
-    {
-      std::shared_ptr<AccessInterfaceProtocol> protocol;
-      switch(l)
-      {
-        case Loopback :
-          protocol = make_shared<LoopbackAccessInterfaceProtocol > ();
-          break;
-        case SVF_Simulation :
-        {
-          protocol = make_shared<SVF_SimulationProtocol > ();
-          break;
-        }
-        case SVF_Emulation :
-          protocol = make_shared<SVF_EmulationProtocol > ();
-          break;
-        case SVF_openOCD :
-        {
-          if ($4.empty())
-          {
-            LOG(ERROR_LVL) << "Error, OpenOCD protocol requires providing a Design Name before IR Size";
-            YYERROR;
-          }
-          protocol=make_openOCD_protocol( $4, $5);
-          if (protocol==nullptr)
-          {
-            LOG(ERROR_LVL) << "Error while setting up OpenOCD interface";
-            YYERROR;
-          }
-          break;
-        }
-      }
+      const auto& nodeName           = $2.name;
+      const auto& protocolName       = $3;
+      const auto& protocolParameters = $4;
+      const auto  irSize             = $5;
+      const auto& irTable            = $6;
+      const auto  nbDRChains         = $7;
+      const auto  nbDerivations      = nbDRChains + 1u;
 
-      if ($6.size()==0)
+      string      factoryName("JTAG_");
+      factoryName.append(protocolName);
+
+      try
       {
-        auto node = driver.builder->Create_JTAG_TAP($2.name,$5,$7+1,protocol);
-        $$ = node;
-      }
-      else
-      {
-        if ($6.size()!=($7+1))
+        auto& factories = AccessInterfaceProtocolFactories::Instance();
+        auto  protocol  = factories.CreateProtocol(factoryName, protocolParameters);
+
+        if (!protocol)
         {
-          LOG(ERROR_LVL) << "Error Coding must be provided for bypass register and each chain";
+          LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": "
+                         << "node " << nodeName << " Cannot create protocol: \"" << protocolName << "\"";
           YYERROR;
         }
-        auto node = driver.builder->Create_JTAG_TAP($2.name,$5,$7+1,protocol,$6);
-        $$ = node;
+        else
+        {
+          if (irTable.empty())
+          {
+            auto node = driver.builder->Create_JTAG_TAP(nodeName, irSize, nbDerivations, protocol);
+            $$ = node;
+          }
+          else
+          {
+            if (irTable.size() != nbDerivations)
+            {
+              LOG(ERROR_LVL) << "Error Coding must be provided for bypass register and each chain";
+              YYERROR;
+            }
+            auto node = driver.builder->Create_JTAG_TAP(nodeName, irSize, nbDerivations, protocol, irTable);
+            $$ = node;
+          }
+        }
       }
-    }
+      catch(std::invalid_argument exc)  // Catch C++ standard exceptions
+      {
+        LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": "
+                       << "node " << nodeName << " Cannot create protocol: \"" << protocolName << "\"; " << exc.what();
+        YYERROR;
+      }
     }
   }
 }
@@ -810,6 +813,18 @@ AI_identifier:
  |
  { $$="";
  }
+;
+
+AI_protocol_parameters:
+ t_WORD
+ {
+   $$ = $1;
+ }
+ |
+ {
+   $$="";
+ }
+;
 
 AI_Coding_list:
  t_QUOTED_STRING
@@ -918,5 +933,5 @@ void SIT::SIT_Parser::error( const location_type &l, const std::string &err_mess
   driver.parsed_sut = nullptr;
 
   auto exceptionMessage = "SIT parsing error: "s + os.str();
-  THROW_RUNTIME_ERROR(exceptionMessage);
+  THROW_PARSER_ERROR(exceptionMessage);
 }

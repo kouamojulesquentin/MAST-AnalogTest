@@ -87,10 +87,12 @@ SIT::SIT_Reader::parse_helper( std::istream &stream )
       return true;
     }
   }
-  catch(std::exception& exc)  // Catch C++ standard exceptions (do nothing because it is the normal way error are reported)
+  catch(ParserException& exc) // Do nothing because it is the normal way parser error are reported
   {
-//+    std::cerr << "Got exception while parsing: " << exc.what();
-//+    LOG(ERROR_LVL) << "Got exception while parsing: " << exc.what();
+  }
+  catch(std::exception& exc)  // Catch C++ standard exceptions
+  {
+    LOG(ERROR_LVL) << "Got unexpected std::exception while parsing: " << exc.what();
   }
   catch (...)
   {

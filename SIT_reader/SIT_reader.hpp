@@ -26,6 +26,21 @@ namespace SIT
 class SIT_Parser;
 class SIT_Scanner;
 
+//! Exception thrown internally by SIT_Parser
+//!
+//! @note Should not yet been used externally
+class ParserException : public std::runtime_error
+{
+  public:
+  ParserException(const std::string& what_arg)
+   : std::runtime_error(what_arg)
+  { }
+
+  ParserException(const char* what_arg)
+   : std::runtime_error(what_arg)
+  { }
+};
+
 class SIT_Reader
 {
 public:

@@ -867,8 +867,9 @@ void UT_reader::test_SIB ()
   TS_DATA_DRIVEN_TEST (checker, data);
 }
 
-/*Test JTAG macro from Simplified ICL Tree input*/
-void UT_reader::test_JTAG_TAP ()
+//! Test JTAG macro from Simplified ICL Tree input - In cases with success
+//!
+void UT_reader::test_JTAG_TAP_Success ()
 {
   // ---------------- DDT Setup
   //
@@ -879,6 +880,8 @@ void UT_reader::test_JTAG_TAP ()
     auto input_SIT            = std::get<0> (data);
     auto expected_PrettyPrint = std::get<1> (data);
 
+    REDIRECT_CERR(errorSink);
+
     // ---------------- Exercise
     //
     auto parseResult = UT_reader_wrapper::run_parser_for_UT(input_SIT, sm);
@@ -888,6 +891,11 @@ void UT_reader::test_JTAG_TAP ()
     // With PrettyPrint
     auto actual_PrettyPrint = parseResult.first;
     TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
+    // Error messages
+    std::this_thread::sleep_for(5ms); // To get messages from logger (running in another thread)
+    const auto gotErrorMessage = errorSink.str();
+    TS_ASSERT_EQUALS (gotErrorMessage, "");
 
     // With Checker
     auto checkResult = sm->Check();
@@ -900,56 +908,96 @@ void UT_reader::test_JTAG_TAP ()
 
   auto data =
   {
-   make_tuple( "JTAG_TAP my_tap Loopback 4 1\
-  {\
-     REGISTER test_reg 4 Bypass: \"0b1100\"\
-   }\n",
-"[Access_I](0)  \"my_tap\", Protocol: Loopback\n\
- [Register](1)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n\
- [Linker](2)    \"my_tap_DR_Mux\"\n\
-  :Selector:(1)  \"my_tap_IR\", kind: Table_Based, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
-  [Register](3)  \"my_tap_BPY\", length: 1, bypass: 1\n\
-  [Register](4)  \"test_reg\", length: 4, bypass: 1100"),
-   make_tuple( "JTAG_TAP my_tap SVF_Simulation 4 1\
-  {\
-     REGISTER test_reg 4 Bypass: \"0b1100\"\
-   }\n",
-"[Access_I](0)  \"my_tap\", Protocol: SVF_Simulation\n\
- [Register](1)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n\
- [Linker](2)    \"my_tap_DR_Mux\"\n\
-  :Selector:(1)  \"my_tap_IR\", kind: Table_Based, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
-  [Register](3)  \"my_tap_BPY\", length: 1, bypass: 1\n\
-  [Register](4)  \"test_reg\", length: 4, bypass: 1100"),
-   make_tuple( "JTAG_TAP my_tap SVF_Emulation 4 1\
-  {\
-     REGISTER test_reg 4 Bypass: \"0b1100\"\
-   }\n",
-"[Access_I](0)  \"my_tap\", Protocol: SVF_Emulation\n\
- [Register](1)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n\
- [Linker](2)    \"my_tap_DR_Mux\"\n\
-  :Selector:(1)  \"my_tap_IR\", kind: Table_Based, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
-  [Register](3)  \"my_tap_BPY\", length: 1, bypass: 1\n\
-  [Register](4)  \"test_reg\", length: 4, bypass: 1100"),
-   make_tuple( "JTAG_TAP my_tap SVF_Simulation 4 [ \"0xF\" , \"0x2\" ] 1\
-  {\
-     REGISTER test_reg 4 Bypass: \"0b1100\"\
-   }\n",
-"[Access_I](0)  \"my_tap\", Protocol: SVF_Simulation\n\
- [Register](1)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n\
- [Linker](2)    \"my_tap_DR_Mux\"\n\
-  :Selector:(1)  \"my_tap_IR\", kind: Table_Based, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
-  [Register](3)  \"my_tap_BPY\", length: 1, bypass: 1\n\
-  [Register](4)  \"test_reg\", length: 4, bypass: 1100"),
-/*   make_tuple( "JTAG_TAP my_tap SVF_openOCD 4 1\
-  {\
-     REGISTER test_reg 4 Bypass: \"0b1100\"\
-   }\n",
-"[Access_I](0)  \"my_tap\"\n\
- [Register](1)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n\
- [Linker](2)    \"my_tap_DR_Mux\"\n\
-  :Selector:(1)  \"my_tap_IR\", kind: Table_Based, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
-  [Register](3)  \"my_tap_BPY\", length: 1, bypass: 1\n\
-  [Register](4)  \"test_reg\", length: 4, bypass: 1100"),*/
+    // 00: Loopback
+    make_tuple("JTAG_TAP my_tap Loopback 4 1\n"
+               "{"
+               "  REGISTER test_reg 4 Bypass: \"0b1100\"\n"
+               "}\n",
+               "[Access_I](0)  \"my_tap\", Protocol: Loopback\n"
+               " [Register](1)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n"
+               " [Linker](2)    \"my_tap_DR_Mux\"\n"
+               "  :Selector:(1)  \"my_tap_IR\", kind: Table_Based, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n"
+               "  [Register](3)  \"my_tap_BPY\", length: 1, bypass: 1\n"
+               "  [Register](4)  \"test_reg\", length: 4, bypass: 1100"),
+
+    // 01: SVF Simulation
+    make_tuple("JTAG_TAP my_tap SVF_Simulation 4 1\n"
+               "{\n"
+               "  REGISTER test_reg 4 Bypass: \"0b1100\"\n"
+               "}\n",
+               "[Access_I](0)  \"my_tap\", Protocol: SVF_Simulation\n"
+               " [Register](1)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n"
+               " [Linker](2)    \"my_tap_DR_Mux\"\n"
+               "  :Selector:(1)  \"my_tap_IR\", kind: Table_Based, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n"
+               "  [Register](3)  \"my_tap_BPY\", length: 1, bypass: 1\n"
+               "  [Register](4)  \"test_reg\", length: 4, bypass: 1100"),
+
+    // 02: SVF Simulation
+    make_tuple("JTAG_TAP my_tap SVF_Simulation 4 [ \"0xF\" , \"0x2\" ] 1"    // Ignored array
+               "{"
+               " REGISTER test_reg 4 Bypass: \"0b1100\""
+               "}\n",
+               "[Access_I](0)  \"my_tap\", Protocol: SVF_Simulation\n"
+               " [Register](1)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n"
+               " [Linker](2)    \"my_tap_DR_Mux\"\n"
+               "  :Selector:(1)  \"my_tap_IR\", kind: Table_Based, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n"
+               "  [Register](3)  \"my_tap_BPY\", length: 1, bypass: 1\n"
+               "  [Register](4)  \"test_reg\", length: 4, bypass: 1100"),
+
+    // 03: SVF Emulation
+    make_tuple("JTAG_TAP my_tap SVF_Emulation 4 1"
+               "{"
+               " REGISTER test_reg 4 Bypass: \"0b1100\""
+               "}\n",
+               "[Access_I](0)  \"my_tap\", Protocol: SVF_Emulation\n"
+               " [Register](1)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n"
+               " [Linker](2)    \"my_tap_DR_Mux\"\n"
+               "  :Selector:(1)  \"my_tap_IR\", kind: Table_Based, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n"
+               "  [Register](3)  \"my_tap_BPY\", length: 1, bypass: 1\n"
+               "  [Register](4)  \"test_reg\", length: 4, bypass: 1100"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Test JTAG macro from Simplified ICL Tree input - In cases with failure
+//!
+void UT_reader::test_JTAG_TAP_Failure ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [&](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto input_SIT         = std::get<0> (data);
+    auto expected_ErrorMsg = std::get<1> (data);
+
+    REDIRECT_CERR(errorSink);
+
+    // ---------------- Exercise
+    //
+    auto parseResult = UT_reader_wrapper::run_parser_for_UT(input_SIT, sm);
+
+    // ---------------- Verify
+    //
+    std::this_thread::sleep_for(5ms); // To get messages from logger (running in another thread)
+    const auto gotErrorMessage = errorSink.str();
+    TS_ASSERT_EQUALS (gotErrorMessage.find(expected_ErrorMsg), 0);
+  };
+
+  auto data =
+  {
+    // 00: SVF OpenOCD
+    make_tuple("JTAG_TAP my_tap SVF_openOCD 4 1"
+               "{"
+               "  REGISTER test_reg 4 Bypass: \"0b1100\""
+               "}\n",
+               "Line 1:31-32: node my_tap Cannot create protocol: \"SVF_openOCD\"; std::invalid_argument: There is no factory registered with name: JTAG_SVF_openOCD."
+               ),
   };
 
   // ---------------- DDT Exercise
@@ -1048,7 +1096,7 @@ void UT_reader::test_LINKER_Success ()
     std::this_thread::sleep_for(5ms); // To get messages from logger (running in another thread)
 
     const auto gotErrorMessage = errorSink.str();
-    TS_ASSERT_TRUE (gotErrorMessage.empty());
+    TS_ASSERT_EQUALS (gotErrorMessage, "");
 
     TS_ASSERT_EQUALS (checkResult.warningsCount, 0u);
     TS_ASSERT_EQUALS (checkResult.errorsCount,   0u);

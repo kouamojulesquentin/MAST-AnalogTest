@@ -32,6 +32,8 @@
 using std::tuple;
 using std::make_tuple;
 using std::shared_ptr;
+using std::make_shared;
+using std::string;
 
 using namespace mast;
 
@@ -154,6 +156,150 @@ void UT_AccessInterfaceProtocolFactories::test_CreateProtocol_Error ()
   // ---------------- DDT Exercise
   //
   TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks AccessInterfaceProtocolFactories::Clear()
+//!
+void UT_AccessInterfaceProtocolFactories::test_Clear ()
+{
+  // ---------------- Setup
+  //
+  auto& sut = AccessInterfaceProtocolFactories::Instance();
+
+  // ---------------- Exercise
+  //
+  sut.Clear();
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (sut.RegisteredFactoriesCount(), 0u);
+}
+
+
+//! Checks AccessInterfaceProtocolFactories::InitializeWithDefaults() when there are none before
+//!
+void UT_AccessInterfaceProtocolFactories::test_InitializeWithDefaults ()
+{
+  // ---------------- Setup
+  //
+  auto& sut = AccessInterfaceProtocolFactories::Instance();
+  sut.Clear();  // Remove default factories added at construction
+
+  // ---------------- Exercise
+  //
+  sut.InitializeWithDefaults();
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_GREATER_THAN_EQUALS (sut.RegisteredFactoriesCount(), 6u);
+}
+
+
+
+//! Checks AccessInterfaceProtocolFactories::AddFactory() when adding a new one on top of default one
+//!
+void UT_AccessInterfaceProtocolFactories::test_AddFactory_NewOne_when_Defaults ()
+{
+  // ---------------- Setup
+  //
+  auto& sut         = AccessInterfaceProtocolFactories::Instance();
+  auto  nbFactories = sut.RegisteredFactoriesCount();
+
+  auto  newFactory  = [](const string& nbDerivations) { return make_shared<STIL_EmulationProtocol>(nbDerivations); };
+
+  // ---------------- Exercise
+  //
+  sut.AddFactory("Foo", newFactory);
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto newNbFactories = sut.RegisteredFactoriesCount();
+  TS_ASSERT_EQUALS (newNbFactories, nbFactories + 1u);
+
+  auto protocol = sut.CreateProtocol("Foo", "12");
+  TS_ASSERT_NOT_NULLPTR (protocol);
+
+  const auto&       actualProtocolType = typeid(*protocol);
+  TS_ASSERT_EQUALS (actualProtocolType,  typeid(STIL_EmulationProtocol));
+
+  auto asSTILL_EmulationProtocol = std::dynamic_pointer_cast<STIL_EmulationProtocol>(protocol);
+  TS_ASSERT_NOT_NULLPTR (asSTILL_EmulationProtocol);
+
+  TS_ASSERT_EQUALS (asSTILL_EmulationProtocol->MaxSupportedDerivations(), 12u);
+}
+
+
+//! Checks AccessInterfaceProtocolFactories::AddFactory() when adding a new one when none are registeres
+//!
+void UT_AccessInterfaceProtocolFactories::test_AddFactory_NewOne_when_None ()
+{
+  // ---------------- Setup
+  //
+  auto& sut         = AccessInterfaceProtocolFactories::Instance();
+  auto  newFactory  = [](const string& nbDerivations) { return make_shared<STIL_EmulationProtocol>(nbDerivations); };
+
+  sut.Clear();
+
+  // ---------------- Exercise
+  //
+  sut.AddFactory("Foo", newFactory);
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto newNbFactories = sut.RegisteredFactoriesCount();
+  TS_ASSERT_EQUALS (newNbFactories, 1u);
+
+  auto protocol = sut.CreateProtocol("Foo", "13");
+  TS_ASSERT_NOT_NULLPTR (protocol);
+
+  const auto&       actualProtocolType = typeid(*protocol);
+  TS_ASSERT_EQUALS (actualProtocolType,  typeid(STIL_EmulationProtocol));
+
+  auto asSTILL_EmulationProtocol = std::dynamic_pointer_cast<STIL_EmulationProtocol>(protocol);
+  TS_ASSERT_NOT_NULLPTR (asSTILL_EmulationProtocol);
+
+  TS_ASSERT_EQUALS (asSTILL_EmulationProtocol->MaxSupportedDerivations(), 13u);
+}
+
+//! Checks AccessInterfaceProtocolFactories::AddFactory() when replacing a default one
+//!
+void UT_AccessInterfaceProtocolFactories::test_AddFactory_Replace_Default ()
+{
+  // ---------------- Setup
+  //
+  auto& sut = AccessInterfaceProtocolFactories::Instance();
+  sut.Clear();  // Remove default factories added at construction
+  sut.InitializeWithDefaults();
+
+  auto  nbFactories = sut.RegisteredFactoriesCount();
+  auto  newFactory  = [](const string& nbDerivations) { return make_shared<STIL_EmulationProtocol>(nbDerivations); };
+
+  // ---------------- Exercise
+  //
+  sut.AddFactory("STIL_Emulation", newFactory);
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto newNbFactories = sut.RegisteredFactoriesCount();
+  TS_ASSERT_EQUALS (newNbFactories, nbFactories);
+
+  auto protocol = sut.CreateProtocol("STIL_Emulation", "14");
+  TS_ASSERT_NOT_NULLPTR (protocol);
+
+  const auto&       actualProtocolType = typeid(*protocol);
+  TS_ASSERT_EQUALS (actualProtocolType,  typeid(STIL_EmulationProtocol));
+
+  auto asSTILL_EmulationProtocol = std::dynamic_pointer_cast<STIL_EmulationProtocol>(protocol);
+  TS_ASSERT_NOT_NULLPTR (asSTILL_EmulationProtocol);
+
+  TS_ASSERT_EQUALS (asSTILL_EmulationProtocol->MaxSupportedDerivations(), 14u);
 }
 
 //===========================================================================

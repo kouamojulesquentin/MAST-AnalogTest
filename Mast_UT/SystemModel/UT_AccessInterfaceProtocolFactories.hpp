@@ -34,10 +34,13 @@ class UT_AccessInterfaceProtocolFactories : public CxxTest::TestSuite
 
   // ---------------- Protocols Management
   //
-  //+ Clear
-  //+ InitializeWithDefaults
-  //+ AddFactory_New
-  //+ AddFactory_Replace
+  void test_Clear ();
+  void test_InitializeWithDefaults ();
+
+
+  void test_AddFactory_NewOne_when_Defaults ();
+  void test_AddFactory_NewOne_when_None ();
+  void test_AddFactory_Replace_Default ();
 
   // ================ Other Methods ================
 

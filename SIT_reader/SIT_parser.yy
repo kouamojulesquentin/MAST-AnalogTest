@@ -37,40 +37,21 @@
 #include "SIT_scanner.hpp"
 #include "SIT_types.h"
 
+// ---------------- What is needed for parser to build the SystemModel
+//
+#include "DefaultNHotPathSelector.hpp"
+#include "SystemModelBuilder.hpp"
+#include "AccessInterfaceProtocolFactories.hpp"
+#include "AppFunctionNameAndNode.hpp"
+#include "Utility.hpp"
+#include "UnresolvedPathSelector.hpp"
+#include "g3log/g3log.hpp"
+
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
 #include <string.h>
 #include <experimental/string_view>
-
-// ---------------- What is needed for parser to build the SystemModel
-//
-#include "DefaultNHotPathSelector.hpp"
-#include "SystemModelBuilder.hpp"
-#include "AccessInterfaceProtocol.hpp"
-#include "AccessInterfaceProtocolFactories.hpp"
-#include "LoopbackAccessInterfaceProtocol.hpp"
-#include "GenericAccessInterfaceProtocol.hpp"
-#include "SVF_SimulationProtocol.hpp"
-#include "SVF_EmulationProtocol.hpp"
-#include "OfflineProtocol.hpp"
-#include "I2C_Player.hpp"
-#include "I2C_EmulationProtocol.hpp"
-#include "SPI_Protocol.hpp"
-#include "STIL_EmulationProtocol.hpp"
-#include "AppFunctionNameAndNode.hpp"
-#include "OpenOCDProtocol.hpp"
-#include "Utility.hpp"
-#include "UnresolvedPathSelector.hpp"
-
-#ifdef INTEL_EXPERIMENT
-#include "Intel_EmulationProtocol.hpp"
-#endif
-#include "g3log/g3log.hpp"
-#include <experimental/string_view>
-
-
-
 #include <map>
 
 using std::vector;
@@ -80,6 +61,7 @@ using std::dynamic_pointer_cast;
 using std::pair;
 using std::string;
 using std::experimental::string_view;
+
 using namespace std::experimental::literals::string_view_literals;
 using namespace mast;
 
@@ -87,60 +69,11 @@ using namespace mast;
 #undef yylex
 #define yylex scanner.yylex
 
-#define N_AIs 6
-#define MAX_AI_NAME 30
-
 #define THROW_PARSER_ERROR(msg) THROW_IMPL(ParserException, msg)
-
-
-#define DEFAULT_I2C_PREFIX "S2R"
 
 extern int nlines;
 extern SIT::SIT_Parser::location_type *my_location;
 
-#define OPENOCD_DEFAULT_CONFIG "openocd-ft2232.cfg"
-#ifdef _WIN32
- #define DIR_SEPARATOR '\\'
-#else
- #define DIR_SEPARATOR '/'
-#endif
-
-#define OPENOCD_DEFAULT_PATH "openocd"
-
-std::vector<std::string> AI_protocol_table =
-{
-  "JTAG_Loopback",
-  "JTAG_SVF_Simulation",
-  "JTAG_SVF_Emulation",
-  "SPI_FTDI",
-  "STIL_Emulation",
-  "I2C_Emulation",
-  "Offline",
-  "Intel_Packet"
-};
-enum AI_protocol_t
-{
-  JTAG_Loopback,
-  JTAG_SVF_Simulation,
-  JTAG_SVF_Emulation,
-  SPI_FTDI,
-  STIL_Emulation,
-  I2C_Emulation,
-  Offline,
-  Intel_Packet
-};
-
-std::vector<std::string> JTAG_AI_protocol_table =
-{
-  "Loopback", "SVF_Simulation", "SVF_openOCD", "SVF_Emulation"
-};
-enum JTAG_AI_protocol_t
-{
-  Loopback,
-  SVF_Simulation,
-  SVF_openOCD,
-  SVF_Emulation
-};
 
 enum class PathSelectorKind {Binary, One_Hot, N_Hot, Binary_noidle, One_Hot_noidle, N_Hot_noidle};
 const vector<PathSelectorKind> PathSelectorKinds {PathSelectorKind::Binary,
@@ -167,16 +100,6 @@ inline std::string remove_quotes(std::string s)
  return s;
 }
 
-inline std::uint32_t extract_number(std::string s)
-{
-  char *end;
-  auto tmp = remove_quotes(s);
-  auto res = std::strtoul (tmp.c_str(), &end,0);
-  auto result = res;
-  return  result;
-}
-
-
 namespace
 {
 int index_in_table(const std::vector<std::string>& table, const std::string& s)
@@ -191,42 +114,6 @@ int index_in_table(const std::vector<std::string>& table, const std::string& s)
   return static_cast<int>(index);
 }
 
-//! @todo [JFC]-[February/06/2017]: Move that code into OpenOCDProtocol constructor from string parameters
-//!
-std::shared_ptr<OpenOCDProtocol> make_openOCD_protocol (const std::string& designName, std::uint32_t IR_size)
-{
-  std::string path;
-
-  auto path_tmp = std::getenv("MAST_CONFIGURATION_PATH");
-
-  if (path_tmp == NULL)
-  {
-    LOG(INFO) << "MAST_CONFIGURATION_PATH environment variable not found, using ./"
-              << OPENOCD_DEFAULT_PATH << " instead";
-    path = std::string("./");
-    path.append(OPENOCD_DEFAULT_PATH);
-  }
-  else
-  {
-    path = std::string(path_tmp);
-  }
-
-  if (path.back() != DIR_SEPARATOR)
-  {
-    path.push_back(DIR_SEPARATOR);
-  }
-  path.append(OPENOCD_DEFAULT_CONFIG);
-
-  CHECK_FILE_EXISTS(path);
-  LOG(ERROR_LVL) << "Creating OpenOCD protocol, designName :" << designName << "path " << path;
-
-  auto protocol = make_shared <OpenOCDProtocol>(path, designName, IR_size);
-
-  if (protocol->is_initialized() == false)
-    return nullptr;
-  else
-    return protocol;
-}
 
 std::pair<shared_ptr<Register>, shared_ptr<PathSelector>> make_PathSelector
              (
@@ -307,11 +194,8 @@ std::shared_ptr <PathSelector>make_PathSelector (std::shared_ptr         <mast::
 %type <std::uint32_t>                   IR_size
 %type <std::uint32_t>                   size
 %type <std::uint32_t>                   n_DR_chains
-%type <std::uint32_t>                   n_chains
-%type <std::vector<uint32_t>>           AI_Coding_list
 %type <std::vector<mast::BinaryVector>> IR_Coding_list
 %type <std::vector<mast::BinaryVector>> IR_TABLE
-%type <std::vector<uint32_t>>           AI_TABLE
 %type <std::string>                     JTAG_protocol
 %type <std::string>                     AI_identifier
 %type <std::string>                     AI_protocol_parameters
@@ -325,44 +209,44 @@ std::shared_ptr <PathSelector>make_PathSelector (std::shared_ptr         <mast::
 %type <std::vector<std::string>>               function_list
 %type <std::pair<std::vector<std::string>, std::uint32_t>>  PDL_declaration
 
-%token               END    0     "end of file"
-%token               UPPER
-%token               LOWER
-%token <std::string> t_WORD
-%token               CHAR
-%token               t_SEMICOLON
+%token END 0 "end of file"
+%token UPPER
+%token LOWER
+%token CHAR
+%token t_SEMICOLON
+%token t_START_HIERARCHY
+%token t_END_HIERARCHY
+%token t_RightBracket
+%token t_LeftBracket
+%token t_Comma
+%token t_RightParenthesis
+%token t_LeftParenthesis
 
-%token  <std::string> t_CHAIN
-%token  <std::string> t_REGISTER
-%token  <std::string> t_LINKER
-%token  <std::string> t_ACCESS_INTERFACE
-%token  <std::string> t_SIB
-%token  <std::string> t_MIB
-%token  <std::string> t_1500_WRAPPER
-%token  <std::string> t_JTAG_TAP
-%token  <std::string> t_PDL
+%token <std::string>   t_WORD
+%token <std::string>   t_CHAIN
+%token <std::string>   t_REGISTER
+%token <std::string>   t_LINKER
+%token <std::string>   t_ACCESS_INTERFACE
+%token <std::string>   t_SIB
+%token <std::string>   t_MIB
+%token <std::string>   t_1500_WRAPPER
+%token <std::string>   t_JTAG_TAP
+%token <std::string>   t_PDL
+%token <std::string>   t_BASED_INTEGER
+%token <std::string>   t_TRANSPARENT
+%token <std::string>   t_HOLD_VALUE
+%token <std::string>   t_BYPASS
+%token <std::string>   t_BINARY_VECTOR
+%token <std::string>   t_QUOTED_STRING
+%token <std::string>   t_POST
+%token <std::string>   t_PRE
+%token <std::string>   t_HIGH
+%token <std::string>   t_LOW
+%token <std::string>   t_REVERSE
+%token <std::uint32_t> t_DecimalLiteral
 
-%token  <std::string> t_BASED_INTEGER
-%token		t_START_HIERARCHY
-%token		t_END_HIERARCHY
-%token 	<std::string>	t_TRANSPARENT
-%token 	<std::string>	t_HOLD_VALUE
-%token 	<std::string>	t_BYPASS
-%token 	<std::string>	t_BINARY_VECTOR
-%token 	<std::string>	t_QUOTED_STRING
-%token  <std::string> t_POST
-%token  <std::string> t_PRE
-%token  <std::string> t_HIGH
-%token  <std::string> t_LOW
-%token  <std::string> t_REVERSE
-%token  <std::uint32_t>  t_DecimalLiteral
-%token  t_RightBracket
-%token  t_LeftBracket
-%token  t_Comma
-%token  t_RightParenthesis
-%token  t_LeftParenthesis
+
 %%
-
 root_node:
   node END
   {
@@ -404,14 +288,14 @@ node_list:
                      auto tmp = $2.nodes;
                      tmp.insert(tmp.begin(),$1);
                      $$.nodes = tmp;
-		    }
+        }
   |   node { $$.name = $1->Name();$$.n_nodes = 1;$$.nodes.push_back($1);}
   ;
 
 node:
    parent_node_with_children { $$ = $1;}
   | leaf_node
-  		    { $$ = $1;}
+          { $$ = $1;}
   ;
 
 is_transparent:
@@ -421,7 +305,7 @@ is_transparent:
 ;
 
 node_name :  t_WORD is_transparent
-     			{
+          {
             $$.name = $1;
             $$.is_transparent = $2;
           }
@@ -478,9 +362,9 @@ function_list:
 parent_node:
 t_CHAIN  node_name
 {
-		     auto node = driver.main_sm->CreateChain($2.name);
+         auto node = driver.main_sm->CreateChain($2.name);
          if ($2.is_transparent)
-		           node->IgnoreForNodePath(true);
+               node->IgnoreForNodePath(true);
          $$ = node;
 }
  |
@@ -529,9 +413,9 @@ t_LINKER  node_name path_selector ctrl_node max_derivations
  t_SIB node_name position active
   {
       {
- 	auto node =  driver.builder->Create_SIB($2.name,$4,$3);
+  auto node =  driver.builder->Create_SIB($2.name,$4,$3);
 
- 	$$ = node;
+  $$ = node;
        }
   }
  |
@@ -571,198 +455,87 @@ t_LINKER  node_name path_selector ctrl_node max_derivations
         $$ = node;
        }
   }
- |
-t_ACCESS_INTERFACE  node_name t_WORD AI_identifier AI_TABLE n_chains
+|
+t_ACCESS_INTERFACE  node_name AI_identifier AI_protocol_parameters
 {
-  int l = index_in_table(AI_protocol_table,$3);
-  if (l==-1)
-  {
-    LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": "
-                   << "node " << $2.name<< " \""<< $3 << "\"" << ": Unknown AccessInterface Protocol";
-    YYERROR;
-  }
-  else
-  {
-    std::shared_ptr<AccessInterfaceProtocol> protocol;
-    switch(l)
+    const auto& nodeName           = $2.name;
+    const auto& protocolName       = $3;
+    const auto& protocolParameters = $4;
+
+    try
     {
-      case JTAG_Loopback :
-      {
-        protocol = make_shared<LoopbackAccessInterfaceProtocol > ();
-        break;
-      }
-      case JTAG_SVF_Simulation :
-      {
-        protocol = make_shared<SVF_SimulationProtocol > ();
-        break;
-      }
-      case JTAG_SVF_Emulation :
-      {
-        protocol = make_shared<SVF_EmulationProtocol> ();
-        break;
-      }
-      case STIL_Emulation :
-      {
-        protocol = make_shared<STIL_EmulationProtocol> ($6+1); //one derivation for reset
-        break;
-      }
-      case AI_protocol_t::SPI_FTDI :
-      {
-        if ($5.size()==0)
-        {
-          LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": "
-                         << "Error, " << AI_protocol_table[l]  << " needs an address table";
-          YYERROR;
-        }
-        if (($5.size()%3)!=0)
-        {
-          LOG(ERROR_LVL) << "Error, " << AI_protocol_table[l] <<" requires 3 addresses for each slave";
-        }
+      auto& factories = AccessInterfaceProtocolFactories::Instance();
+      auto  protocol  = factories.CreateProtocol(protocolName, protocolParameters);
 
-        LOG(DEBUG) << "Generating " << AI_protocol_table[l] << " Access Interface";
-
-        auto chipselectCommands = std::vector<uint32_t>();
-        auto readCommands       = std::vector<uint32_t>();
-        auto writeCommands      = std::vector<uint32_t>();
-
-        for ( auto i = 0 ; i < $5.size(); i += 3)
-        {
-          chipselectCommands.push_back($5[i]);
-          readCommands.push_back($5[i+1]);
-          writeCommands.push_back($5[i+2]);
-        }
-
-
-        auto displayContent = [](string_view name, const std::vector<uint32_t>& container)
-        {
-          LOG(DEBUG) << name << " (size " << std::noshowbase << container.size() << ") ";
-          for (auto item : container)
-          {
-            LOG(DEBUG) << "0x" << std::hex << item << " ";
-          }
-        };
-
-        displayContent("chipselectCommands", chipselectCommands);
-        displayContent("readCommands",       readCommands);
-        displayContent("writeCommands",      writeCommands);
-
-        if (!$4.empty())
-          protocol = make_shared<SPI_Protocol > (std::move(chipselectCommands), std::move(readCommands), std::move(writeCommands));
-        else
-        {
-          auto usbDeviceID = extract_number($4);
-          protocol = make_shared<SPI_Protocol > (std::move(chipselectCommands), std::move(readCommands), std::move(writeCommands), "", static_cast<std::uint16_t>(usbDeviceID));
-        }
-        break;
-      } // End of: case AI_protocol_t::SPI_FTDI :
-      case I2C_Emulation :
-      {
-        if ($5.size()==0)
-        {
-          LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": "
-                         << "Error, " << AI_protocol_table[l] <<" needs an address table";
-          YYERROR;
-        }
-        if (($5.size())!=$6)
-        {
-          LOG(ERROR_LVL) << "Error, " << AI_protocol_table[l] << " requires 1 address for each register chain";
-          YYERROR;
-        }
-        LOG(DEBUG) << "Generating " << AI_protocol_table[l] << " Access Interface";
-
-        auto I2C_addresses       = std::vector<uint32_t>();
-
-        for ( auto i = 0 ; i < $5.size(); i ++)
-        {
-          I2C_addresses.push_back($5[i]);
-        }
-        protocol = make_shared<I2C_EmulationProtocol> (I2C_addresses);
-        break;
-      }
-      case Offline :
-      {
-        protocol = make_shared<OfflineProtocol > ();
-        break;
-      }
-      case Intel_Packet :
-      {
-        #ifdef INTEL_EXPERIMENT
-          if (($5.size())!=$6)
-          {
-            LOG(ERROR_LVL) << "Error, " << AI_protocol_table[l] << " requires 1 address for each register chain";
-            YYERROR;
-          }
-          auto Region_addresses = std::vector<uint32_t>();
-          for ( auto i = 0 ; i < $5.size(); i ++)
-          {
-            Region_addresses.push_back($5[i]);
-          }
-          protocol = make_shared<Intel_EmulationProtocol > (Region_addresses);
-        #else
-         LOG(ERROR_LVL) << "Error, Intel_EmulationProtocol has not been built";
-        #endif
-        break;
-      }
-    } // End of: switch(l)
-
-    auto node = driver.main_sm->CreateAccessInterface($2.name, protocol);
-    $$ = node;
-  }
-}
- |
-  // $1      $2        $3            $4                     $5      $6       $7
-  t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_chains
-{
-  {
-  	{
-      const auto& nodeName           = $2.name;
-      const auto& protocolName       = $3;
-      const auto& protocolParameters = $4;
-      const auto  irSize             = $5;
-      const auto& irTable            = $6;
-      const auto  nbDRChains         = $7;
-      const auto  nbDerivations      = nbDRChains + 1u;
-
-      string      factoryName("JTAG_");
-      factoryName.append(protocolName);
-
-      try
-      {
-        auto& factories = AccessInterfaceProtocolFactories::Instance();
-        auto  protocol  = factories.CreateProtocol(factoryName, protocolParameters);
-
-        if (!protocol)
-        {
-          LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": "
-                         << "node " << nodeName << " Cannot create protocol: \"" << protocolName << "\"";
-          YYERROR;
-        }
-        else
-        {
-          if (irTable.empty())
-          {
-            auto node = driver.builder->Create_JTAG_TAP(nodeName, irSize, nbDerivations, protocol);
-            $$ = node;
-          }
-          else
-          {
-            if (irTable.size() != nbDerivations)
-            {
-              LOG(ERROR_LVL) << "Error Coding must be provided for bypass register and each chain";
-              YYERROR;
-            }
-            auto node = driver.builder->Create_JTAG_TAP(nodeName, irSize, nbDerivations, protocol, irTable);
-            $$ = node;
-          }
-        }
-      }
-      catch(std::invalid_argument exc)  // Catch C++ standard exceptions
+      if (!protocol)
       {
         LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": "
-                       << "node " << nodeName << " Cannot create protocol: \"" << protocolName << "\"; " << exc.what();
+                       << "node " << nodeName << " Cannot create protocol: \"" << protocolName << "\"";
         YYERROR;
       }
+      else
+      {
+        auto node = driver.main_sm->CreateAccessInterface(nodeName, protocol);
+        $$ = node;
+      }
     }
+    catch(std::invalid_argument exc)  // Catch C++ standard exceptions
+    {
+      LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": "
+                     << "node " << nodeName << " Cannot create protocol: \"" << protocolName << "\"; " << exc.what();
+      YYERROR;
+    }
+}
+|
+// $1      $2        $3            $4                     $5      $6       $7
+t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_chains
+{
+  const auto& nodeName           = $2.name;
+  const auto& protocolName       = $3;
+  const auto& protocolParameters = $4;
+  const auto  irSize             = $5;
+  const auto& irTable            = $6;
+  const auto  nbDRChains         = $7;
+  const auto  nbDerivations      = nbDRChains + 1u;
+
+  string      factoryName("JTAG_");
+  factoryName.append(protocolName);
+
+  try
+  {
+    auto& factories = AccessInterfaceProtocolFactories::Instance();
+    auto  protocol  = factories.CreateProtocol(factoryName, protocolParameters);
+
+    if (!protocol)
+    {
+      LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": "
+                     << "node " << nodeName << " Cannot create protocol: \"" << protocolName << "\"";
+      YYERROR;
+    }
+    else
+    {
+      if (irTable.empty())
+      {
+        auto node = driver.builder->Create_JTAG_TAP(nodeName, irSize, nbDerivations, protocol);
+        $$ = node;
+      }
+      else
+      {
+        if (irTable.size() != nbDerivations)
+        {
+          LOG(ERROR_LVL) << "Error Coding must be provided for bypass register and each chain";
+          YYERROR;
+        }
+        auto node = driver.builder->Create_JTAG_TAP(nodeName, irSize, nbDerivations, protocol, irTable);
+        $$ = node;
+      }
+    }
+  }
+  catch(std::invalid_argument exc)  // Catch C++ standard exceptions
+  {
+    LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": "
+                   << "node " << nodeName << " Cannot create protocol: \"" << protocolName << "\"; " << exc.what();
+    YYERROR;
   }
 }
 ;
@@ -783,14 +556,8 @@ ctrl_node: t_WORD
 IR_size :
  t_DecimalLiteral { $$ = $1;}
 ;
+
 n_DR_chains :
- t_DecimalLiteral { $$ = $1;}
-;
-
-
-n_chains :
- {$$ = 0;}
- |
  t_DecimalLiteral { $$ = $1;}
 ;
 
@@ -800,58 +567,35 @@ IR_TABLE:
  |  {$$ = std::vector<mast::BinaryVector>();}
  ;
 
-AI_TABLE:
-t_LeftBracket AI_Coding_list t_RightBracket  {$$=$2;}
- |  {$$ = std::vector<uint32_t>();}
- ;
-
 AI_identifier:
- t_WORD
-    {
-       $$ = $1;
-    }
- |
- { $$="";
- }
+  t_WORD
+  {
+     $$ = $1;
+  }
 ;
 
 AI_protocol_parameters:
- t_WORD
+ t_QUOTED_STRING
  {
-   $$ = $1;
+   $$ = remove_quotes($1);
  }
- |
+|
  {
    $$="";
  }
 ;
 
-AI_Coding_list:
- t_QUOTED_STRING
-    {
-       $$.push_back(extract_number($1));
-    }
- |
- t_QUOTED_STRING t_Comma  AI_Coding_list
-  {
-   auto tmp = $3;
-   tmp.insert(tmp.begin(),extract_number($1));
-   $$ = tmp;
-   }
-;
-
 IR_Coding_list:
- t_QUOTED_STRING
-    {
-       $$.push_back(BinaryVector::CreateFromString(remove_quotes($1)));
-    }
- |
- t_QUOTED_STRING t_Comma  IR_Coding_list
+  t_QUOTED_STRING
   {
-   auto tmp = $3;
-   tmp.insert(tmp.begin(),BinaryVector::CreateFromString(remove_quotes($1)));
-   $$ = tmp;
-   }
+     $$.push_back(BinaryVector::CreateFromString(remove_quotes($1)));
+  }
+| t_QUOTED_STRING t_Comma  IR_Coding_list
+  {
+    auto tmp = $3;
+    tmp.insert(tmp.begin(), BinaryVector::CreateFromString(remove_quotes($1)));
+    $$ = tmp;
+  }
 ;
 
 max_derivations :

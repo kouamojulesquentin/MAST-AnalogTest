@@ -1,4 +1,4 @@
-ACCESS_INTERFACE Naked_chains STIL_Emulation 2
+ACCESS_INTERFACE Naked_chains STIL_Emulation "2"
   PDL Incr
   {
     REGISTER reg 12 Bypass: "0b0001:0110:1100"

@@ -1073,7 +1073,7 @@ void UT_reader::test_ACCES_INTERFACE_Success ()
                " [Register](2)  \"r2\", length: 2, bypass: 11"),
 
     // 04: STIL_Emulation
-    make_tuple("ACCESS_INTERFACE my_tap  STIL_Emulation 2 \n"
+    make_tuple("ACCESS_INTERFACE my_tap  STIL_Emulation \"3\" \n"
                "{\n"
                "   REGISTER r1 1 Bypass: \"0b1\"\n"
                "   REGISTER r2 2 Bypass: \"0b11\"\n"
@@ -1083,7 +1083,7 @@ void UT_reader::test_ACCES_INTERFACE_Success ()
                " [Register](2)  \"r2\", length: 2, bypass: 11"),
 
     // 05: I2C_Emulation
-    make_tuple("ACCESS_INTERFACE my_tap  I2C_Emulation [\"0x40\", \"0x41\", \"0x42\"] 3 \n"
+    make_tuple("ACCESS_INTERFACE my_tap  I2C_Emulation \"0x40, 0x41, 0x42, [I2C]\" \n"
                "{\n"
                "   REGISTER r1 1 Bypass: \"0b1\"\n"
                "   REGISTER r2 2 Bypass: \"0b11\"\n"
@@ -1092,10 +1092,70 @@ void UT_reader::test_ACCES_INTERFACE_Success ()
                " [Register](1)  \"r1\", length: 1, bypass: 1\n"
                " [Register](2)  \"r2\", length: 2, bypass: 11"),
 
+    // 06: Any letter in parameters
+    make_tuple("ACCESS_INTERFACE letters I2C_Emulation \"0x40, 0x41, 0x42, abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ\" \n"
+               "{\n"
+               "   REGISTER r1 1 Bypass: \"0b1\"\n"
+               "   REGISTER r2 2 Bypass: \"0b11\"\n"
+               "}\n",
+               "[Access_I](0)  \"letters\", Protocol: I2C_Emulation\n"
+               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
+               " [Register](2)  \"r2\", length: 2, bypass: 11"),
+
+    // 07: Any digits in parameters
+    make_tuple("ACCESS_INTERFACE digits I2C_Emulation \"0x40, 0x41, 0x42, _0123456789 \" \n"
+               "{\n"
+               "   REGISTER r1 1 Bypass: \"0b1\"\n"
+               "   REGISTER r2 2 Bypass: \"0b11\"\n"
+               "}\n",
+               "[Access_I](0)  \"digits\", Protocol: I2C_Emulation\n"
+               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
+               " [Register](2)  \"r2\", length: 2, bypass: 11"),
+
+    // 08: Any brackets characters in parameters
+    make_tuple("ACCESS_INTERFACE brackets  I2C_Emulation \"0x40, 0x41, 0x42, ([<()>])\" \n"
+               "{\n"
+               "   REGISTER r1 1 Bypass: \"0b1\"\n"
+               "   REGISTER r2 2 Bypass: \"0b11\"\n"
+               "}\n",
+               "[Access_I](0)  \"brackets\", Protocol: I2C_Emulation\n"
+               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
+               " [Register](2)  \"r2\", length: 2, bypass: 11"),
+
+    // 09: Any punctuation characters in parameters
+    make_tuple("ACCESS_INTERFACE punctuation  I2C_Emulation \"0x40, 0x41, 0x42, ?!.:; \" \n"
+               "{\n"
+               "   REGISTER r1 1 Bypass: \"0b1\"\n"
+               "   REGISTER r2 2 Bypass: \"0b11\"\n"
+               "}\n",
+               "[Access_I](0)  \"punctuation\", Protocol: I2C_Emulation\n"
+               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
+               " [Register](2)  \"r2\", length: 2, bypass: 11"),
+
+    // 10: Any operators characters in parameters
+    make_tuple("ACCESS_INTERFACE operators  I2C_Emulation \"0x40, 0x41, 0x42, /*-+~%\" \n"
+               "{\n"
+               "   REGISTER r1 1 Bypass: \"0b1\"\n"
+               "   REGISTER r2 2 Bypass: \"0b11\"\n"
+               "}\n",
+               "[Access_I](0)  \"operators\", Protocol: I2C_Emulation\n"
+               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
+               " [Register](2)  \"r2\", length: 2, bypass: 11"),
+
+    // 11: Any special characters in parameters
+    make_tuple("ACCESS_INTERFACE special  I2C_Emulation \"0x40, 0x41, 0x42, $=@'_|& \" \n"
+               "{\n"
+               "   REGISTER r1 1 Bypass: \"0b1\"\n"
+               "   REGISTER r2 2 Bypass: \"0b11\"\n"
+               "}\n",
+               "[Access_I](0)  \"special\", Protocol: I2C_Emulation\n"
+               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
+               " [Register](2)  \"r2\", length: 2, bypass: 11"),
+
 
     #ifdef INTEL_EXPERIMENT
-    // 06: Intel_Packet
-    make_tuple("ACCESS_INTERFACE tap  Intel_Packet [\"0x41\",\"0x42\"] 2 \n"
+    // 12: Intel_Packet
+    make_tuple("ACCESS_INTERFACE tap  Intel_Packet \"0x41, 0x42\" \n"
                "{\n"
                "   REGISTER r1 1 Bypass: \"0b1\"\n"
                "   REGISTER r2 2 Bypass: \"0b11\"\n"
@@ -1144,11 +1204,13 @@ void UT_reader::test_ACCES_INTERFACE_Failure ()
 
     TS_ASSERT_FALSE (gotErrorMessage.empty()); // Make sure there is an error message
 
-    //+ (begin JFC February/07/2017): for debug purpose
-//+    TS_ASSERT_EQUALS (gotErrorMessage, expected_ErrorMsg);
-    //+ (end   JFC February/07/2017):
 
     auto containsExpected = gotErrorMessage.find(expected_ErrorMsg) != string::npos;
+
+    //+ (begin JFC February/07/2017): for debug purpose
+    if (!containsExpected) { TS_FAIL (gotErrorMessage); }
+    //+ (end   JFC February/07/2017):
+
     TS_ASSERT_TRUE (containsExpected);
   };
 
@@ -1156,19 +1218,19 @@ void UT_reader::test_ACCES_INTERFACE_Failure ()
   auto data =
   {
     // 00: Empty integer array
-    make_tuple("ACCESS_INTERFACE my_tap JTAG_Loopback []\n"
+    make_tuple("ACCESS_INTERFACE Useless_Square_Brackets JTAG_Loopback []\n"
                "{\n"
                "  REGISTER test_reg 4 Bypass: \"0b1100\"\n"
                "}\n",
-               "Line 1:40-41: syntax error"),
+               "Line 1:56-57: syntax error"),
 
     // 01: Unregistered protocol type
-    make_tuple("ACCESS_INTERFACE my_tap MyProtocol\n"
+    make_tuple("ACCESS_INTERFACE Unregistered_Protocol MyProtocol\n"
                "{\n"
                "  REGISTER reg_1 3 Bypass: \"0b101\"\n"
                "  REGISTER reg_2 5 Bypass: \"0b11001\"\n"
                "}\n",
-               "Line 2:1-2: node my_tap \"MyProtocol\": Unknown AccessInterface Protocol"),
+               "Line 2:1-2: node Unregistered_Protocol Cannot create protocol: \"MyProtocol\"; std::invalid_argument: There is no factory registered with name: MyProtocol."),
 
     // 02: No AccessInterface name (same as no protocol)
     make_tuple("ACCESS_INTERFACE Offline  \n"
@@ -1178,37 +1240,13 @@ void UT_reader::test_ACCES_INTERFACE_Failure ()
                "}\n",
                "Line 2:1-2: syntax error"),
 
-    // 03: Missing number of derivations
-    make_tuple("ACCESS_INTERFACE my_tap  I2C_Emulation [\"0x40\", \"0x41\", \"0x42\"]  \n"
+    // 03: Not enough addresses
+    make_tuple("ACCESS_INTERFACE Not_enough_Adresses I2C_Emulation \"0x40, (i2c)\"  \n"
                "{\n"
                "   REGISTER r1 1 Bypass: \"0b1\"\n"
                "   REGISTER r2 2 Bypass: \"0b11\"\n"
                "}\n",
-               "Error, I2C_Emulation requires 1 address for each register chain"),
-
-    // 04: Number of derivations not consistent with the number of addresses
-    make_tuple("ACCESS_INTERFACE my_tap  I2C_Emulation [\"0x40\", \"0x41\", \"0x42\"] 33 \n"
-               "{\n"
-               "   REGISTER r1 1 Bypass: \"0b1\"\n"
-               "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               "}\n",
-               "Error, I2C_Emulation requires 1 address for each register chain"),
-
-    // 05: Missing addresses array
-    make_tuple("ACCESS_INTERFACE my_tap  I2C_Emulation [\"0x40\", \"0x41\", \"0x42\"] 33 \n"
-               "{\n"
-               "   REGISTER r1 1 Bypass: \"0b1\"\n"
-               "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               "}\n",
-               "Error, I2C_Emulation requires 1 address for each register chain"),
-
-    // 06: SPI FTDI cannot open (wrong addresses)
-    make_tuple("ACCESS_INTERFACE my_tap  SPI_FTDI [(\"0x41\",\"0x42\",\"0x0\"), (\"0x1\", \"0x2\", \"0x3\"), (\"0x4\",\"0x5\",\"0x6\")] \n"
-               "{\n"
-               "   REGISTER r1 1 Bypass: \"0b1\"\n"
-               "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               "}\n",
-               "std::runtime_error: OPEN: usb_find_busses() failed"),
+               "Line 1:52-65: node Not_enough_Adresses Cannot create protocol: \"I2C_Emulation\"; std::invalid_argument: I2C Addresses must have at least two entries."),
   };
 
   // ---------------- DDT Exercise

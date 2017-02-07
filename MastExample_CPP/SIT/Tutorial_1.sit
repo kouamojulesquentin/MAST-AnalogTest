@@ -1,4 +1,4 @@
-JTAG_TAP TAP SVF_Simulation 8 1
+JTAG_TAP TAP SVF_Simulation
   PDL Incr
   {
     REGISTER reg 12 Bypass: "0xABC"

@@ -1,4 +1,4 @@
-ACCESS_INTERFACE Intel_Exp Intel_Packet [ "0x10"] 1
+ACCESS_INTERFACE Intel_Exp Intel_Packet "0x10, 1"
 {
  CHAIN First_Region
   PDL Incr,decr

@@ -53,7 +53,7 @@ class DLL_EXPORT SPI_Protocol final : public SPI_Player
 
   //! Returns readable type of protocol
   //!
-  virtual std::experimental::string_view KindName() const override { return "SPI_"; }
+  virtual std::experimental::string_view KindName() const override { return "SPI_FTDI"; }
 
   //! Forces the ResetPort to be asserted on the target module
   //!

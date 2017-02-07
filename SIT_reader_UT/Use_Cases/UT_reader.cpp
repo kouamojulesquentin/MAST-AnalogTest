@@ -120,10 +120,7 @@ void UT_reader::test_register_Success ()
     // With Checker
     PrependWithTap(sm, parseResult.second);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
-
-    TS_ASSERT_EQUALS (checkResult.warningsCount, 0u);
-    TS_ASSERT_EQUALS (checkResult.errorsCount,   0u);
-    TS_ASSERT_EQUALS (checkResult.infosCount,    0u);
+    TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
   };
 
   auto data =
@@ -218,10 +215,7 @@ void UT_reader::test_chain ()
     // With Checker
     PrependWithTap(sm, parseResult.second);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
-
-    TS_ASSERT_EQUALS (checkResult.warningsCount, 0u);
-    TS_ASSERT_EQUALS (checkResult.errorsCount,   0u);
-    TS_ASSERT_EQUALS (checkResult.infosCount,    0u);
+    TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
   };
 
   auto data =
@@ -296,13 +290,14 @@ void UT_reader::test_MIB ()
     // With Checker
     PrependWithTap(sm, parseResult.second);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
-
     TS_ASSERT_EQUALS (checkResult.warningsCount, 1u); // 1 for "Linker 'test_xxx' (id: x) has only 2 children, even though it can select 4 paths"
     TS_ASSERT_EQUALS (checkResult.errorsCount,   0u);
     TS_ASSERT_EQUALS (checkResult.infosCount,    0u);
-    //+ (begin JFC August/29/2016): for debug purpose
-//+    TS_ASSERT_EQUALS (checkResult.MakeReport(), "");
-    //+ (end   JFC August/29/2016):
+
+    if (checkResult.errorsCount != 0)
+    {
+      TS_ASSERT_EQUALS (checkResult.MakeReport(), "");
+    }
   };
 
   auto data =
@@ -821,10 +816,7 @@ void UT_reader::test_SIB ()
     // With Checker
     PrependWithTap(sm, parseResult.second);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
-
-    TS_ASSERT_EQUALS (checkResult.warningsCount, 0u);
-    TS_ASSERT_EQUALS (checkResult.errorsCount,   0u);
-    TS_ASSERT_EQUALS (checkResult.infosCount,    0u);
+    TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
   };
 
   auto data =
@@ -888,21 +880,18 @@ void UT_reader::test_JTAG_TAP_Success ()
 
     // ---------------- Verify
     //
-    // With PrettyPrint
-    auto actual_PrettyPrint = parseResult.first;
-    TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
-
     // Error messages
     std::this_thread::sleep_for(5ms); // To get messages from logger (running in another thread)
     const auto gotErrorMessage = errorSink.str();
     TS_ASSERT_EQUALS (gotErrorMessage, "");
 
+    // With PrettyPrint
+    auto actual_PrettyPrint = parseResult.first;
+    TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
     // With Checker
     auto checkResult = sm->Check();
-
-    TS_ASSERT_EQUALS (checkResult.warningsCount, 0u);
-    TS_ASSERT_EQUALS (checkResult.errorsCount,   0u);
-    TS_ASSERT_EQUALS (checkResult.infosCount,    0u);
+    TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
   };
 
 
@@ -1005,6 +994,230 @@ void UT_reader::test_JTAG_TAP_Failure ()
   TS_DATA_DRIVEN_TEST (checker, data);
 }
 
+//! Test ACCES_INTERFACE from Simplified ICL Tree input - In cases with success
+//!
+void UT_reader::test_ACCES_INTERFACE_Success ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [&](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto input_SIT            = std::get<0> (data);
+    auto expected_PrettyPrint = std::get<1> (data);
+
+    REDIRECT_CERR(errorSink);
+
+    // ---------------- Exercise
+    //
+    auto parseResult = UT_reader_wrapper::run_parser_for_UT(input_SIT, sm);
+
+    // ---------------- Verify
+    //
+    CxxTest::setAbortTestOnFail(true);
+
+    // Error messages
+    std::this_thread::sleep_for(5ms); // To get messages from logger (running in another thread)
+    const auto gotErrorMessage = errorSink.str();
+    TS_ASSERT_EQUALS (gotErrorMessage, "");
+
+    // With PrettyPrint
+    auto actual_PrettyPrint = parseResult.first;
+    TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
+    // With Checker
+    auto checkResult = sm->Check();
+    TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
+  };
+
+
+  auto data =
+  {
+    // 00: Loopback
+    make_tuple("ACCESS_INTERFACE my_tap JTAG_Loopback\n"
+               "{\n"
+               "  REGISTER test_reg 4 Bypass: \"0b1100\"\n"
+               "}\n",
+               "[Access_I](0)  \"my_tap\", Protocol: Loopback\n"
+               " [Register](1)  \"test_reg\", length: 4, bypass: 1100"),
+
+    // 01: SVF Simulation
+    make_tuple("ACCESS_INTERFACE my_tap JTAG_SVF_Simulation\n"
+               "{\n"
+               "  REGISTER reg_1 3 Bypass: \"0b101\"\n"
+               "  REGISTER reg_2 5 Bypass: \"0b11001\"\n"
+               "}\n",
+               "[Access_I](0)  \"my_tap\", Protocol: SVF_Simulation\n"
+               " [Register](1)  \"reg_1\", length: 3, bypass: 101\n"
+               " [Register](2)  \"reg_2\", length: 5, bypass: 1100_1"),
+
+    // 02: SVF Emulation
+    make_tuple("ACCESS_INTERFACE my_tap  JTAG_SVF_Emulation \n"
+               "{\n"
+               "   REGISTER r1 1 Bypass: \"0b1\"\n"
+               "   REGISTER r2 2 Bypass: \"0b11\"\n"
+               "}\n",
+               "[Access_I](0)  \"my_tap\", Protocol: SVF_Emulation\n"
+               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
+               " [Register](2)  \"r2\", length: 2, bypass: 11"),
+
+    // 03: Offline
+    make_tuple("ACCESS_INTERFACE my_tap  Offline  \n"
+               "{\n"
+               "   REGISTER r1 1 Bypass: \"0b1\"\n"
+               "   REGISTER r2 2 Bypass: \"0b11\"\n"
+               "}\n",
+               "[Access_I](0)  \"my_tap\", Protocol: Offline\n"
+               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
+               " [Register](2)  \"r2\", length: 2, bypass: 11"),
+
+    // 04: STIL_Emulation
+    make_tuple("ACCESS_INTERFACE my_tap  STIL_Emulation 2 \n"
+               "{\n"
+               "   REGISTER r1 1 Bypass: \"0b1\"\n"
+               "   REGISTER r2 2 Bypass: \"0b11\"\n"
+               "}\n",
+               "[Access_I](0)  \"my_tap\", Protocol: STIL_Emulation\n"
+               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
+               " [Register](2)  \"r2\", length: 2, bypass: 11"),
+
+    // 05: I2C_Emulation
+    make_tuple("ACCESS_INTERFACE my_tap  I2C_Emulation [\"0x40\", \"0x41\", \"0x42\"] 3 \n"
+               "{\n"
+               "   REGISTER r1 1 Bypass: \"0b1\"\n"
+               "   REGISTER r2 2 Bypass: \"0b11\"\n"
+               "}\n",
+               "[Access_I](0)  \"my_tap\", Protocol: I2C_Emulation\n"
+               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
+               " [Register](2)  \"r2\", length: 2, bypass: 11"),
+
+    // 06: SPI FTDI
+    make_tuple("ACCESS_INTERFACE my_tap  SPI_FTDI [(\"0x41\",\"0x42\",\"0x0\"), (\"0x1\", \"0x2\", \"0x3\"), (\"0x4\",\"0x5\",\"0x6\")] \n"
+               "{\n"
+               "   REGISTER r1 1 Bypass: \"0b1\"\n"
+               "   REGISTER r2 2 Bypass: \"0b11\"\n"
+               "}\n",
+               "[Access_I](0)  \"my_tap\", Protocol: SPI_FTDI\n"
+               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
+               " [Register](2)  \"r2\", length: 2, bypass: 11"),
+
+    #ifdef INTEL_EXPERIMENT
+    // 07: Intel_Packet
+    make_tuple("ACCESS_INTERFACE tap  Intel_Packet [\"0x41\",\"0x42\"] 2 \n"
+               "{\n"
+               "   REGISTER r1 1 Bypass: \"0b1\"\n"
+               "   REGISTER r2 2 Bypass: \"0b11\"\n"
+               "}\n",
+               "[Access_I](0)  \"tap\", Protocol: Intel_Packet\n"
+               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
+               " [Register](2)  \"r2\", length: 2, bypass: 11"),
+    #endif
+  };
+
+  #ifndef INTEL_EXPERIMENT
+//+  TS_WARN ("No tests for Intel_Packet protocol");
+  #endif
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Test ACCES_INTERFACE from Simplified ICL Tree input - In cases with parsing failure
+//!
+void UT_reader::test_ACCES_INTERFACE_Failure ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [&](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto input_SIT         = std::get<0> (data);
+    auto expected_ErrorMsg = std::get<1> (data);
+
+    REDIRECT_CERR(errorSink);
+
+    // ---------------- Exercise
+    //
+    auto parseResult = UT_reader_wrapper::run_parser_for_UT(input_SIT, sm);
+
+    // ---------------- Verify
+    //
+    CxxTest::setAbortTestOnFail(true);
+
+    std::this_thread::sleep_for(5ms);         // To get messages from logger (running in another thread)
+    const auto gotErrorMessage = errorSink.str();
+
+    TS_ASSERT_FALSE (gotErrorMessage.empty()); // Make sure there is an error message
+
+    //+ (begin JFC February/07/2017): for debug purpose
+//+    TS_ASSERT_EQUALS (gotErrorMessage, expected_ErrorMsg);
+    //+ (end   JFC February/07/2017):
+
+    auto containsExpected = gotErrorMessage.find(expected_ErrorMsg) != string::npos;
+    TS_ASSERT_TRUE (containsExpected);
+  };
+
+
+  auto data =
+  {
+    // 00: Empty integer array
+    make_tuple("ACCESS_INTERFACE my_tap JTAG_Loopback []\n"
+               "{\n"
+               "  REGISTER test_reg 4 Bypass: \"0b1100\"\n"
+               "}\n",
+               "Line 1:40-41: syntax error"),
+
+    // 01: Unregistered protocol type
+    make_tuple("ACCESS_INTERFACE my_tap MyProtocol\n"
+               "{\n"
+               "  REGISTER reg_1 3 Bypass: \"0b101\"\n"
+               "  REGISTER reg_2 5 Bypass: \"0b11001\"\n"
+               "}\n",
+               "Line 2:1-2: node my_tap \"MyProtocol\": Unknown AccessInterface Protocol"),
+
+    // 02: No AccessInterface name (same as no protocol)
+    make_tuple("ACCESS_INTERFACE Offline  \n"
+               "{\n"
+               "   REGISTER r1 1 Bypass: \"0b1\"\n"
+               "   REGISTER r2 2 Bypass: \"0b11\"\n"
+               "}\n",
+               "Line 2:1-2: syntax error"),
+
+    // 03: Missing number of derivations
+    make_tuple("ACCESS_INTERFACE my_tap  I2C_Emulation [\"0x40\", \"0x41\", \"0x42\"]  \n"
+               "{\n"
+               "   REGISTER r1 1 Bypass: \"0b1\"\n"
+               "   REGISTER r2 2 Bypass: \"0b11\"\n"
+               "}\n",
+               "Error, I2C_Emulation requires 1 address for each register chain"),
+
+    // 04: Number of derivations not consistent with the number of addresses
+    make_tuple("ACCESS_INTERFACE my_tap  I2C_Emulation [\"0x40\", \"0x41\", \"0x42\"] 33 \n"
+               "{\n"
+               "   REGISTER r1 1 Bypass: \"0b1\"\n"
+               "   REGISTER r2 2 Bypass: \"0b11\"\n"
+               "}\n",
+               "Error, I2C_Emulation requires 1 address for each register chain"),
+
+    // 05: Missing addresses array
+    make_tuple("ACCESS_INTERFACE my_tap  I2C_Emulation [\"0x40\", \"0x41\", \"0x42\"] 33 \n"
+               "{\n"
+               "   REGISTER r1 1 Bypass: \"0b1\"\n"
+               "   REGISTER r2 2 Bypass: \"0b11\"\n"
+               "}\n",
+               "Error, I2C_Emulation requires 1 address for each register chain"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
 /*Test 1500 Wrapper macro from Simplified ICL Tree input*/
 void UT_reader::test_1500 ()
 {
@@ -1028,13 +1241,7 @@ void UT_reader::test_1500 ()
     // With Checker
     PrependWithTap(sm, parseResult.second);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
-
-    TS_ASSERT_EQUALS (checkResult.warningsCount, 0u);
-    TS_ASSERT_EQUALS (checkResult.errorsCount,   0u);
-    TS_ASSERT_EQUALS (checkResult.infosCount,    0u);
-    //+ (begin JFC August/29/2016): for debug purpose
-  //+    TS_ASSERT_EQUALS (checkResult.MakeReport(), "");
-    //+ (end   JFC August/29/2016):
+    TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
   };
 
   auto data =
@@ -1085,6 +1292,13 @@ void UT_reader::test_LINKER_Success ()
 
     // ---------------- Verify
     //
+    CxxTest::setAbortTestOnFail(true);
+
+    // Error messages
+    std::this_thread::sleep_for(5ms); // To get messages from logger (running in another thread)
+    const auto gotErrorMessage = errorSink.str();
+    TS_ASSERT_EQUALS (gotErrorMessage, "");
+
     // With PrettyPrint
     auto actual_PrettyPrint = parseResult.first;
     TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
@@ -1092,20 +1306,8 @@ void UT_reader::test_LINKER_Success ()
     // With Checker
     PrependWithTap(sm, parseResult.second);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
+    TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
 
-    std::this_thread::sleep_for(5ms); // To get messages from logger (running in another thread)
-
-    const auto gotErrorMessage = errorSink.str();
-    TS_ASSERT_EQUALS (gotErrorMessage, "");
-
-    TS_ASSERT_EQUALS (checkResult.warningsCount, 0u);
-    TS_ASSERT_EQUALS (checkResult.errorsCount,   0u);
-    TS_ASSERT_EQUALS (checkResult.infosCount,    0u);
-
-    if (checkResult.HasIssues())
-    {
-      TS_ASSERT_EQUALS (checkResult.MakeReport(), "");
-    }
   };
 
   auto data =

@@ -21,6 +21,9 @@
 
 #ifdef USE_LIBFTDISPI
   #include <ftdispi.h>
+#else // Defines the struct to allow unique_ptr destructor to know their size
+  struct ftdi_context {};
+  struct ftdispi_context {};
 #endif
 
 using std::experimental::string_view;

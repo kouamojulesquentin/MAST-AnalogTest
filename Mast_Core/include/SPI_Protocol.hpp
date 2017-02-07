@@ -42,6 +42,10 @@ class DLL_EXPORT SPI_Protocol final : public SPI_Player
                std::experimental::string_view commandsPrefix = "",
                uint16_t                       usbDeviceID    = 0x6010u);
 
+  SPI_Protocol(SPI_Protocol&&) = delete;
+  SPI_Protocol(const SPI_Protocol&) = delete;
+  SPI_Protocol& operator=(const SPI_Protocol&) = delete;
+
   //! Does any action required to transfer scan data to and from SUT
   //!
   //! @param derivationId   Identifies the derivation to act for (zero based)

@@ -25,6 +25,7 @@ using std::initializer_list;
 
 using namespace mast;
 using namespace std::string_literals;
+using namespace std::experimental::literals::string_view_literals;
 
 
 //! Constructor from vector
@@ -58,7 +59,7 @@ I2C_Player::I2C_Player (const std::string& parameters)
 {
   auto parts = Utility::Split(parameters, ",");
 
-  CHECK_PARAMETER_GTE(parts.size(), 2u, "Parameters must defined at least two I2C Addresses");
+  CHECK_PARAMETER_GTE(parts.size(), 2u, "Parameters must defined at least two I2C Addresses, got: \""sv + parameters + "\""sv);
 
   auto afterAddressIndex = 0u;  // This is to be able to know if there is a valid command prefix
 

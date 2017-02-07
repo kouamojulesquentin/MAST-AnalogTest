@@ -35,6 +35,9 @@ class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
   OpenOCDProtocol() = delete;
   OpenOCDProtocol(std::experimental::string_view configFilePath, std::experimental::string_view designName, int iIrLength);
 
+  //! Constructs a OpenOCDProtocol using string encoded parameters
+  OpenOCDProtocol (const std::string& parameters);
+
   //! Returns whether it has been completly (properly) initialized
   //!
   bool is_initialized() const { return m_openOCD_initialized; }
@@ -67,7 +70,10 @@ class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
   //!
   virtual void DoReset(bool doSynchronousReset) override;
 
-
+  // ---------------- Private  Methods
+  //
+  private:
+  void Initialize (std::experimental::string_view configFilePath, std::experimental::string_view designName, int iIrLength);
 
   // ---------------- Private  Fields
   // Those variable MUST always be part of OpenOCDProtocol instance to avoid be seen with different size

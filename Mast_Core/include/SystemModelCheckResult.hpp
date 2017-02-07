@@ -59,7 +59,9 @@ class DLL_EXPORT SystemModelCheckResult final
   bool HasWarnings() const { return (warningsCount != 0); }
   bool HasErrors()   const { return (errorsCount   != 0); }
 
-  std::string MakeReport() const; //!< Returns a string representing the check result
+  std::string MakeReport()        const; //!< Returns a string representing the check result
+  std::string IssuesReport()      const; //!< Returns a string representing the check result only when there are issues
+  std::string InformativeReport() const; //!< Returns a string representing the check result only when there is something to report
 
   static const SystemModelCheckResult None; //!< Instance to compare for no error (very useful in unit tests along with traits to show the issues)
 

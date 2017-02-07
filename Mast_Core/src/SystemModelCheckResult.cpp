@@ -21,6 +21,48 @@ using namespace mast;
 
 const SystemModelCheckResult SystemModelCheckResult::None;  // This is to compare with something that represent no errors
 
+
+//! Returns a string representing the check result only when there is something to report
+//!
+//! @note This is useful for unit test for comparing with empty string
+string SystemModelCheckResult::InformativeReport () const
+{
+  if (   (infosCount    != 0)
+      || (warningsCount != 0)
+      || (errorsCount   != 0)
+     )
+  {
+    return MakeReport();
+  }
+
+  return string();
+}
+//
+//  End of: SystemModelCheckResult::InformativeReport
+//---------------------------------------------------------------------------
+
+
+
+//! Returns a string representing the check result only when there are issues
+//!
+//! @note This is useful for unit test for comparing with empty string
+string SystemModelCheckResult::IssuesReport () const
+{
+  if (HasIssues())
+  {
+    return MakeReport();
+  }
+
+  return string();
+}
+//
+//  End of: SystemModelCheckResult::IssuesReport
+//---------------------------------------------------------------------------
+
+
+
+//! Returns a string representing the check result
+//!
 string SystemModelCheckResult::MakeReport() const
 {
   ostringstream os;
@@ -40,6 +82,8 @@ string SystemModelCheckResult::MakeReport() const
 
   return os.str();
 }
+
+
 
 
 //! Merges other results into this

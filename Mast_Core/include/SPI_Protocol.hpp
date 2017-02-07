@@ -18,6 +18,7 @@
 #include "SPI_Player.hpp"
 #include <fstream>
 #include <string>
+#include <memory>
 #include <experimental/string_view>
 
 struct ftdi_context;
@@ -62,10 +63,8 @@ class DLL_EXPORT SPI_Protocol final : public SPI_Player
   virtual void DoReset(bool doSynchronousReset) override;
 
   protected:
-  #ifdef  USE_LIBFTDISPI
-  ftdi_context*    m_ftdi_ctx    = nullptr;
-  ftdispi_context* m_ftdispi_ctx = nullptr;
-  #endif
+  std::unique_ptr<ftdi_context>    m_ftdi_ctx;
+  std::unique_ptr<ftdispi_context> m_ftdispi_ctx;
 };
 //
 //  End of SPI_Protocol class declaration

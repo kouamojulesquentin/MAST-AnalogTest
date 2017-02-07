@@ -1092,18 +1092,9 @@ void UT_reader::test_ACCES_INTERFACE_Success ()
                " [Register](1)  \"r1\", length: 1, bypass: 1\n"
                " [Register](2)  \"r2\", length: 2, bypass: 11"),
 
-    // 06: SPI FTDI
-    make_tuple("ACCESS_INTERFACE my_tap  SPI_FTDI [(\"0x41\",\"0x42\",\"0x0\"), (\"0x1\", \"0x2\", \"0x3\"), (\"0x4\",\"0x5\",\"0x6\")] \n"
-               "{\n"
-               "   REGISTER r1 1 Bypass: \"0b1\"\n"
-               "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               "}\n",
-               "[Access_I](0)  \"my_tap\", Protocol: SPI_FTDI\n"
-               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
-               " [Register](2)  \"r2\", length: 2, bypass: 11"),
 
     #ifdef INTEL_EXPERIMENT
-    // 07: Intel_Packet
+    // 06: Intel_Packet
     make_tuple("ACCESS_INTERFACE tap  Intel_Packet [\"0x41\",\"0x42\"] 2 \n"
                "{\n"
                "   REGISTER r1 1 Bypass: \"0b1\"\n"
@@ -1210,6 +1201,14 @@ void UT_reader::test_ACCES_INTERFACE_Failure ()
                "   REGISTER r2 2 Bypass: \"0b11\"\n"
                "}\n",
                "Error, I2C_Emulation requires 1 address for each register chain"),
+
+    // 06: SPI FTDI cannot open (wrong addresses)
+    make_tuple("ACCESS_INTERFACE my_tap  SPI_FTDI [(\"0x41\",\"0x42\",\"0x0\"), (\"0x1\", \"0x2\", \"0x3\"), (\"0x4\",\"0x5\",\"0x6\")] \n"
+               "{\n"
+               "   REGISTER r1 1 Bypass: \"0b1\"\n"
+               "   REGISTER r2 2 Bypass: \"0b11\"\n"
+               "}\n",
+               "std::runtime_error: OPEN: usb_find_busses() failed"),
   };
 
   // ---------------- DDT Exercise

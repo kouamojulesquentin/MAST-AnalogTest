@@ -7,6 +7,8 @@ From projects root directory (where this file is):
  NB: on newer Linux installation, a manual install of ply 3.8 might be needed
 				http://www.dabeaz.com/ply/
  On Windows, FLEX_DIR environment variable must point to where flex is intalled (to get access to FlexLexer.h)
+ XmlRpc related features are only available on Linux (see README.Linux.txt)
+
 [BUILD]
 Create a build directory, for instance cmake_build
 

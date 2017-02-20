@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 
+message("")
+message("================================================================================")
 if (WIN32)
 	if (NOT ${CMAKE_GENERATOR} MATCHES "MinGW Makefiles")
 		message("\n>>>>>>>>>>>>>>> Syntax should be: cmake -G \"MinGW Makefiles\" <<<<<<<<<<<<<<<\n\n")
@@ -8,10 +10,7 @@ if (WIN32)
   set (CMAKE_C_COMPILER   "gcc")
 endif()
 
-message("NewMast.CMake:   USE_OPEN_OCD:     ${USE_OPEN_OCD}")
-message("NewMast.CMake:   USE_LIBFTDISPI:   ${USE_LIBFTDISPI}")
-message("NewMast.CMake:   INTEL_EXPERIMENT: ${INTEL_EXPERIMENT}")
-
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/External_Libs/CMake ${CMAKE_MODULE_PATH})
 
 project(mast)
 
@@ -29,14 +28,39 @@ endif()
 set_property(GLOBAL PROPERTY CXX_STANDARD 14)
 set_property(GLOBAL PROPERTY CXX_STANDARD_REQUIRED ON)
 
-set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lpthread")
-set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "../Bin")
-set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "../Lib")
+set (CMAKE_EXE_LINKER_FLAGS         "${CMAKE_EXE_LINKER_FLAGS} -lpthread")
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Bin")
+set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Lib")
+
+message(STATUS "")
+message(STATUS "Mast: USE_OPEN_OCD:       ${USE_OPEN_OCD}")
+message(STATUS "Mast: USE_LIBFTDISPI:     ${USE_LIBFTDISPI}")
+message(STATUS "Mast: USE_XML_RPC:        ${USE_XML_RPC}")
+message(STATUS "Mast: INTEL_EXPERIMENT:   ${INTEL_EXPERIMENT}")
+message(STATUS "")
+message(STATUS "Mast: CMAKE_MODULE_PATH:              ${CMAKE_MODULE_PATH}")
+message(STATUS "Mast: CMAKE_RUNTIME_OUTPUT_DIRECTORY: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+message(STATUS "Mast: CMAKE_LIBRARY_OUTPUT_DIRECTORY: ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+
+if (USE_XML_RPC)
+  set(USE_EXTERNAL_LIBS ON)
+  set(XmlRpcInstall ${CMAKE_CURRENT_LIST_DIR}/External_Libs/xmlrpc-c/build)
+  message(STATUS "Mast: XmlRpcInstall:                  ${XmlRpcInstall}")
+endif()
+
+message("================================================================================")
+message("")
 
 add_subdirectory (Logger)
 add_subdirectory (Mast_Core)
 add_subdirectory (SIT_reader)
 add_subdirectory (Mast)
+
+if (USE_EXTERNAL_LIBS)
+#+  add_subdirectory(External_Libs)
+  add_subdirectory(Optional_Libs)
+endif()
+
 add_subdirectory (TestCasesApp)
 add_subdirectory (MastExample_CPP)
 if (NOT WIN32)
@@ -52,3 +76,4 @@ endif()
 if(${INTEL_EXPERIMENT})
 	add_subdirectory (Intel)
 endif()
+

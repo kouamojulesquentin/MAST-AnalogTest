@@ -23,6 +23,15 @@ To build OpenOCD, the following tools are required:
 	- perl
 
 
+Xml RPC may be needed for optional features.
+  - It is included in the build environment as dual parts
+    - xmlrpc-c library (in External_Libs directory)
+      - Build of xmlrpc-c must be done (normally once) before building Mast parts
+        - cd External_Libs/xmlrpc-c
+        - ./build.sh
+        - That should be all
+    - MastXmlRpc Mast libraries related to XmlRpc (in Optional_Libs directory)
+
 [Build-Qt]
 
 For debug and release configurations: Add custom build step using make with parameters: -C  %{CurrentProject:Path}/Lib_UT -f Runner.mak

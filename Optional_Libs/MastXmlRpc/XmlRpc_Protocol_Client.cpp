@@ -23,6 +23,7 @@ using std::string;
 using std::vector;
 
 using mast::XmlRpc_Protocol_Client;
+using mast::Remote_Protocol_Client;
 
 
 //! `Releases ...`
@@ -54,24 +55,30 @@ XmlRpc_Protocol_Client::XmlRpc_Protocol_Client (const std::string& parameters)
 //! Sends scan vector to System Under Test
 //!
 //! @param commandName  Command name (SIR, SDR, RST...)
+//! @param bitsCount    Number of valid bits in scan vector
 //! @param scanVector   Binary data to send to SUT (default is right aligned)
 //!
-//! @return Error code (0 means no error)
-int XmlRpc_Protocol_Client::SendScanVector (const std::string& commandName, const std::vector<unsigned char>& scanVector)
+//! @return from SUT scan vector
+vector<unsigned char> XmlRpc_Protocol_Client::SendScanVector (const std::string& commandName, uint32_t bitsCount, const vector<unsigned char>& toSutScanVector)
 {
   const string methodName("XmlRpc_Protocol_Server.SendScanVector");
 
   xmlrpc_c::paramList params;
-  params.add(xmlrpc_c::value_bytestring(scanVector));
+
+  params.add(xmlrpc_c::value_string     (commandName));
+  params.add(xmlrpc_c::value_int        (bitsCount));
+  params.add(xmlrpc_c::value_bytestring (toSutScanVector));
 
   xmlrpc_c::value        result;
   xmlrpc_c::clientSimple client;
 
   client.call(ServerUrl(), methodName, params, &result);
 
-  xmlrpc_c::value_int retCode = xmlrpc_c::value_int(result);
+  xmlrpc_c::value_bytestring asBytesString = xmlrpc_c::value_bytestring(result);
 
-  return retCode;
+  vector<unsigned char> fromSutScanVector = asBytesString.cvalue();
+
+  return fromSutScanVector;
 }
 //
 //  End of: XmlRpc_Protocol_Client::SendScanVector

@@ -47,9 +47,10 @@ Remote_Protocol_Proxy::Remote_Protocol_Proxy (unique_ptr<Remote_Protocol_Client>
 //---------------------------------------------------------------------------
 
 
-//! Constructs from string parameters defining actual Remote_Protocol_Client
+//! Constructs from string parameters defining actual Remote_Protocol_Client and parameters
 //!
 //! @note Parameters are formatted like this:
+//!       access_interface_protocol_factory_name [, parameter [, parameter]]
 //!
 //! @param parameters Parameters defining actual Remote_Protocol_Client,
 //!                   associated commands and optional kindName
@@ -57,6 +58,9 @@ Remote_Protocol_Proxy::Remote_Protocol_Proxy (unique_ptr<Remote_Protocol_Client>
 Remote_Protocol_Proxy::Remote_Protocol_Proxy (const string& parameters)
 {
   CHECK_TRUE(false, "Not Yet Implemented");
+
+  //! @todo [JFC]-[February/22/2017]: Complete AccessInterfaceProtocolFactories to support, by default, construction of Remote_Protocol_Proxy
+  //!                                 ==> Need a Remote_Protocol_Client_Factory !!!
 
 
   CHECK_PARAMETER_NOT_NULL(m_remoteProtocol.get(), "Could not create a valid Remote_Protocol_Client");
@@ -66,17 +70,17 @@ Remote_Protocol_Proxy::Remote_Protocol_Proxy (const string& parameters)
 
 //! Loopbacks "to SUT data" logging SVF command(s) that would be issued if it was really an operating protocol
 //!
-BinaryVector Remote_Protocol_Proxy::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector Remote_Protocol_Proxy::DoAction (uint32_t derivationId, void* interfaceData, const BinaryVector& toSutData)
 {
-//+  auto command = CreateSVFCommand(derivationId, toSutData);
+  CHECK_PARAMETER_NULL (interfaceData, "Interface data is not supported by remote protocols (there is no sharing of address space)");
+  CHECK_PARAMETER_LTE  (derivationId, m_commands.size(), "Derivation id must not be greater than supported commands");
 
-//+  while (command.back() == '\n')
-//+  {
-//+    command.pop_back();
-//+  }
-//+  LOG(INFO) << command;
+  auto command       = m_commands[derivationId];
+  auto binaryToSut   = toSutData.DataRightAligned();
+  auto binaryFromSut = m_remoteProtocol->SendScanVector(command, toSutData.BitsCount(), binaryToSut);
+  auto fromSutData   = BinaryVector::CreateFromRightAlignedBuffer(std::move(binaryFromSut), toSutData.BitsCount());
 
-  return toSutData;
+  return fromSutData;
 }
 
 
@@ -86,6 +90,7 @@ BinaryVector Remote_Protocol_Proxy::DoAction (uint32_t derivationId, void* /* in
 //!
 void Remote_Protocol_Proxy::DoReset (bool doSynchronousReset)
 {
+  m_remoteProtocol->DoReset(doSynchronousReset);
 }
 //
 //  End of: Remote_Protocol_Proxy::DoReset

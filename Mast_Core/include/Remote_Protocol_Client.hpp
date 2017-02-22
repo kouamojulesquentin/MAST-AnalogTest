@@ -24,6 +24,8 @@ namespace mast
 //!
 //! @note This is an abstract base class
 //!
+//! @note MUST be compilable by C++03 only compiler !
+//!
 class Remote_Protocol_Client
 {
   // ---------------- Public  Methods
@@ -37,13 +39,21 @@ class Remote_Protocol_Client
   {
   }
 
+  typedef std::vector<unsigned char> ScanVector_t;  // Type used to exchange scan vectors with remote SUT
+
+  //+ (begin JFC February/22/2017): for debug purpose
+  #ifndef uint32_t
+  #define uint32_t unsigned int
+  #endif  // not define uint32_t
+
+  //+ (end   JFC February/22/2017):
   //! Sends scan vector to System Under Test
   //!
   //! @param commandName  Command name (SIR, SDR, RST...)
   //! @param scanVector   Binary data to send to SUT (default is right aligned)
   //!
   //! @return Error code (0 means no error)
-  virtual int SendScanVector(const std::string& commandName, const std::vector<unsigned char>& scanVector) = 0;
+  virtual ScanVector_t SendScanVector(const std::string& commandName, unsigned int bitsCount, const ScanVector_t& scanVector) = 0;
 
   //! Returns current remote server URL
   //!
@@ -53,6 +63,13 @@ class Remote_Protocol_Client
   //! Returns readable type of protocol (Remote_I2C, Remote_Loopback, Remote_Advantest_ATE...)
   //!
   virtual std::string KindName() const { return m_kindName; }
+
+  //! Forces the ResetPort to be asserted on the target module
+  //!
+  //! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence
+  //!
+  virtual void DoReset(bool doSynchronousReset) = 0;
+
 
   // ---------------- Protected Methods
   //

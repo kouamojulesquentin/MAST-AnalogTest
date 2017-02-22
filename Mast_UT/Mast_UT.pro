@@ -47,6 +47,7 @@ SOURCES += \
     SystemModel/UT_ParentNode.cpp                       \
     SystemModel/UT_PrettyPrinter.cpp                    \
     SystemModel/UT_PropagatePendingVisitor.cpp          \
+    SystemModel/UT_Remote_Protocol_Proxy.cpp            \
     SystemModel/UT_Register.cpp                         \
     SystemModel/UT_I2C_EmulationProtocol.cpp            \
     SystemModel/UT_STIL_EmulationProtocol.cpp           \
@@ -91,6 +92,7 @@ HEADERS += \
     SystemModel/UT_ParentNode.hpp                     \
     SystemModel/UT_PrettyPrinter.hpp                  \
     SystemModel/UT_PropagatePendingVisitor.hpp        \
+    SystemModel/UT_Remote_Protocol_Proxy.hpp          \
     SystemModel/UT_Register.hpp                       \
     SystemModel/UT_I2C_EmulationProtocol.hpp          \
     SystemModel/UT_STIL_EmulationProtocol.hpp         \

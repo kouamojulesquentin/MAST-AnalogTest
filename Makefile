@@ -28,11 +28,13 @@ RUN    =
 BIN_DIR              = Bin
 MAST_UT_EXE_NAME     = Mast_UT.exe
 CPP_EXAMPLE_EXE_NAME = MastExample_CPP.exe
+OPTIONAL_UT_EXE_NAME = Optionals_UT.exe
 SIT_UT_EXE_NAME      = SIT_Reader_UT.exe
 SIT_READER_EXE_NAME  = SIT_reader_demo.exe
 TESTCASES_EXE_NAME   = TestCasesApp.exe
 
 MAST_UT_EXE_PATH      = $(BIN_DIR)\$(MAST_UT_EXE_NAME)
+OPTIONAL_UT_EXE_PATH  = $(BIN_DIR)\$(OPTIONAL_UT_EXE_NAME)
 SIT_UT_EXE_PATH       = $(BIN_DIR)\$(SIT_UT_EXE_NAME)
 SIT_READER_EXE_PATH   = $(SIT_READER_EXE_NAME)
 SIT_READER_INPUT_FILE = ..\..\SIT_reader\prova.txt
@@ -52,12 +54,14 @@ RUN    = ./
 
 BIN_DIR              = Bin
 MAST_UT_EXE_NAME     = Mast_UT
+OPTIONAL_UT_EXE_NAME = Optionals_UT
 TESTCASES_EXE_NAME   = TestCasesApp
 CPP_EXAMPLE_EXE_NAME = MastExample_CPP
 SIT_READER_EXE_NAME  = SIT_reader_demo
 SIT_UT_EXE_NAME      = SIT_Reader_UT
 
 MAST_UT_EXE_PATH      = $(BIN_DIR)/$(MAST_UT_EXE_NAME)
+OPTIONAL_UT_EXE_PATH  = $(BIN_DIR)/$(OPTIONAL_UT_EXE_NAME)
 SIT_UT_EXE_PATH       = $(BIN_DIR)/$(SIT_UT_EXE_NAME)
 SIT_READER_EXE_PATH   = $(SIT_READER_EXE_NAME)
 SIT_READER_INPUT_FILE = ../../SIT_reader/prova.txt
@@ -128,6 +132,21 @@ ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(MAST_UT_EXE_NAME))","
 else
 >  @echo "    ==== No Release Lib UT available ========"
 endif
+
+run_optionals_debug:
+ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(OPTIONAL_UT_EXE_NAME))","")
+>  cd $(CMAKE_DEBUG_BUILD_DIR) && $(RUN)$(OPTIONAL_UT_EXE_PATH)
+else
+>  @echo "    ==== No Debug Optionals Libs UT available ========"
+endif
+
+run_optionals_release:
+ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(OPTIONAL_UT_EXE_NAME))","")
+>  cd $(CMAKE_RELEASE_BUILD_DIR) && $(RUN)$(OPTIONAL_UT_EXE_PATH)
+else
+>  @echo "    ==== No Release Optionals Libs UT available ========"
+endif
+
 
 run_sit_ut_debug:
 ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(SIT_UT_EXE_NAME))","")
@@ -243,6 +262,7 @@ ifeq ($(OS), Windows_NT)
 else
 > $(RM)     Mast_UT$(SEP)Generated$(SEP)Runner.cpp
 > $(RM)     SIT_reader_UT$(SEP)Generated$(SEP)Runner.cpp
+> $(RM)     Optional_Libs_UT$(SEP)Generated$(SEP)Runner.cpp
 > $(RM_DIR) $(CMAKE_RELEASE_BUILD_DIR)
 > $(RM_DIR) $(CMAKE_DEBUG_BUILD_DIR)
 > $(RM_DIR) $(CMAKE_ARM_BUILD_DIR)

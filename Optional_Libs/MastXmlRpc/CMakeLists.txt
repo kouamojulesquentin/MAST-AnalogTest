@@ -11,26 +11,17 @@ if (WIN32)
   message(FATAL_ERROR STATUS "MastXmlRpc: WIN32 is not supported for XplRPC")
 endif()
 
-#+set (CMAKE_CXX_COMPILER "g++")
+set (CMAKE_CXX_COMPILER "g++")
 #+set (CMAKE_C_COMPILER   "gcc")
 
+set(BaseProjectPath "../..")
+include_directories(${BaseProjectPath}/Mast_Core/include/)
+#+include_directories(${BaseProjectPath}/Logger/)
+#+include_directories(${BaseProjectPath}/Logger/g3log/)
 
-
-set_property(GLOBAL PROPERTY CXX_STANDARD 98)
+#+set_property(GLOBAL PROPERTY CXX_STANDARD 98)
 set_property(GLOBAL PROPERTY CXX_STANDARD_REQUIRED ON)
 
-#+    xmlrpc
-#+    xmlrpc_abyss
-#+    xmlrpc_abyss++
-#+    xmlrpc_client
-#+    xmlrpc_cpp
-#+    xmlrpc_packetsocket
-#+    xmlrpc_server
-#+    xmlrpc_server_abyss
-#+    xmlrpc_server_pstream+  +
-#+    xmlrpc_util
-#+    xmlrpc_xmlparse
-#+    xmlrpc_xmltok
 
 if (NOT XmlRpcInstall)
   message(FATAL_ERROR STATUS "MastXmlRpc: Missing definition for XmlRpcInstall")
@@ -42,11 +33,24 @@ message("")
 
 find_package(LibXmlRpc  REQUIRED)
 include_directories(${LibXmlRpc_INCLUDE_DIRS})
-set(LIBS ${LIBS} ${LibXmlRpc_LIBRARIES})
 
-set(ClientSources XmlRpc_Protocol_Client.cpp)
+set(WARNINGS      "-Wall -Wextra -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default")
+set(CLIENT_FLAGS  "-std=c++03 -fPIC -g ${WARNINGS}")
+file(GLOB ClientSources "*.cpp")
 
-add_library           (Mast_RPC_Client SHARED     ${ClientSources})
-set_target_properties (Mast_RPC_Client PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
-target_link_libraries (Mast_RPC_Client ${LIBXMLRPC_LIBRARIES})
+#+set(ClientSources XmlRpc_Protocol_Client.cpp)
+
+message("")
+message("================================================================================")
+message(STATUS "MastXmlRpc: CMAKE_LINK_LIBRARY_FLAG:  ${CMAKE_LINK_LIBRARY_FLAG}")
+message(STATUS "MastXmlRpc: CLIENT_FLAGS:             ${CLIENT_FLAGS}")
+message(STATUS "MastXmlRpc: ClientSources:            ${ClientSources}")
+message(STATUS "MastXmlRpc: LIBXMLRPC_LIBRARIES:      ${LIBXMLRPC_LIBRARIES}")
+message("================================================================================")
+message("")
+
+
+add_library           (Mast_RPC_Client SHARED     "${ClientSources}")
+set_target_properties (Mast_RPC_Client PROPERTIES COMPILE_FLAGS "${CLIENT_FLAGS}" )
+target_link_libraries (Mast_RPC_Client Mast_Core ${LIBXMLRPC_LIBRARIES})
 

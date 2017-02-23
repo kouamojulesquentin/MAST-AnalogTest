@@ -26,16 +26,20 @@ add_custom_command (OUTPUT    ${UT_RootPath}/Generated/Runner.cpp
 										)
 
 include_directories(${CXXTEST_INCLUDE_DIR})
-#+include_directories(${UT_RootPath}/CxxTest_Traits)
-#+include_directories(${UT_RootPath}/UT_Helpers/)
-include_directories(../Mast_Core/include/)
+include_directories(${LibXmlRpc_INCLUDE_DIRS})
+include_directories(../Optional_Libs/MastRpc/)
 include_directories(../Optional_Libs/MastXmlRpc/)
+include_directories(../Mast_Core/include/)
 include_directories(../Logger/)
 include_directories(../Logger/g3log/)
+#+include_directories(${UT_RootPath}/CxxTest_Traits)
+#+include_directories(${UT_RootPath}/UT_Helpers/)
 
+file(GLOB UT_MAST_RPC     "UT_MastRpc/*")
 file(GLOB UT_XML_RPC      "UT_XmlRpc/*")
 set(UT_GENERATED_RUNNER   "Generated/Runner.cpp")
-set(UT_SOURCES ${UT_GENERATED_RUNNER} ${UT_XML_RPC} )
+
+set(UT_SOURCES ${UT_GENERATED_RUNNER} ${UT_MAST_RPC} ${UT_XML_RPC} )
 
 set_source_files_properties(${UT_GENERATED_RUNNER} GENERATED)
 
@@ -44,8 +48,8 @@ add_executable        (Optionals_UT ${UT_SOURCES})
 set_target_properties (Optionals_UT PROPERTIES COMPILE_FLAGS "${UT_CFLAGS}" )
 
 if (WIN32)
-  target_link_libraries(Optionals_UT Mast_RPC_Client Mast_Core Logger DbgHelp )
+  target_link_libraries(Optionals_UT Mast_RPC Mast_RPC_Client Mast_RPC_Server Logger DbgHelp )
 else ()
-  target_link_libraries(Optionals_UT Mast_RPC_Client Mast_Core Logger pthread)
+  target_link_libraries(Optionals_UT Mast_RPC Mast_RPC_Client Mast_RPC_Server Logger pthread)
 endif ()
 

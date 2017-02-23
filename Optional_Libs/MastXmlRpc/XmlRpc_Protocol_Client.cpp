@@ -51,6 +51,28 @@ XmlRpc_Protocol_Client::XmlRpc_Protocol_Client (const std::string& parameters)
 //---------------------------------------------------------------------------
 
 
+//! Sends command for forcing the ResetPort to be asserted on the target module
+//!
+//! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence
+//!
+void XmlRpc_Protocol_Client::SendDoReset (bool doSynchronousReset)
+{
+  const string methodName("XmlRpc_Protocol_Server.DoReset");
+
+  xmlrpc_c::paramList params;
+
+  params.add(xmlrpc_c::value_boolean (doSynchronousReset));
+
+  xmlrpc_c::value        result;
+  xmlrpc_c::clientSimple client;
+
+  client.call(ServerUrl(), methodName, params, &result);
+}
+//
+//  End of: XmlRpc_Protocol_Client::DoReset
+//---------------------------------------------------------------------------
+
+
 
 //! Sends scan vector to System Under Test
 //!

@@ -18,13 +18,17 @@
 #include <string>
 #include <vector>
 
+#ifndef uint32_t
+#include <stdint.h>     // Make it compilable as C++03
+#endif
+
 namespace mast
 {
 //! Represents a remote protocol with client role for RPC
 //!
 //! @note This is an abstract base class
 //!
-//! @note MUST be compilable by C++03 only compiler !
+//! @note MUST be compilable by C++03 only compilers !
 //!
 class Remote_Protocol_Client
 {
@@ -39,21 +43,15 @@ class Remote_Protocol_Client
   {
   }
 
-  typedef std::vector<unsigned char> ScanVector_t;  // Type used to exchange scan vectors with remote SUT
+  typedef std::vector<uint8_t> ScanVector_t;  // Type used to exchange scan vectors with remote SUT
 
-  //+ (begin JFC February/22/2017): for debug purpose
-  #ifndef uint32_t
-  #define uint32_t unsigned int
-  #endif  // not define uint32_t
-
-  //+ (end   JFC February/22/2017):
   //! Sends scan vector to System Under Test
   //!
   //! @param commandName  Command name (SIR, SDR, RST...)
   //! @param scanVector   Binary data to send to SUT (default is right aligned)
   //!
-  //! @return Error code (0 means no error)
-  virtual ScanVector_t SendScanVector(const std::string& commandName, unsigned int bitsCount, const ScanVector_t& scanVector) = 0;
+  //! @return data scanned out from SUT (same format and alignment)
+  virtual ScanVector_t SendScanVector(const std::string& commandName, uint32_t bitsCount, const ScanVector_t& scanVector) = 0;
 
   //! Returns current remote server URL
   //!
@@ -64,16 +62,11 @@ class Remote_Protocol_Client
   //!
   virtual std::string KindName() const { return m_kindName; }
 
-  //! Forces the ResetPort to be asserted on the target module
+  //! Sends command for forcing the ResetPort to be asserted on the target module
   //!
   //! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence
   //!
-  virtual void DoReset(bool doSynchronousReset) = 0;
-
-
-  // ---------------- Protected Methods
-  //
-  protected:
+  virtual void SendDoReset(bool doSynchronousReset) = 0;
 
   // ---------------- Private  Methods
   //

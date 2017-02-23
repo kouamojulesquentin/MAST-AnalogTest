@@ -110,6 +110,7 @@ HEADERS += \
     include/PathSelector.hpp                            \
     include/PrettyPrinter.hpp                           \
     include/PropagatePendingVisitor.hpp                 \
+    include/Remote_Protocol.hpp                         \
     include/Remote_Protocol_Client.hpp                  \
     include/Remote_Protocol_Proxy.hpp                   \
     include/Register.hpp                                \

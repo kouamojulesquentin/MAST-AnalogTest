@@ -90,7 +90,7 @@ BinaryVector Remote_Protocol_Proxy::DoAction (uint32_t derivationId, void* inter
 //!
 void Remote_Protocol_Proxy::DoReset (bool doSynchronousReset)
 {
-  m_remoteProtocol->DoReset(doSynchronousReset);
+  m_remoteProtocol->SendDoReset(doSynchronousReset);
 }
 //
 //  End of: Remote_Protocol_Proxy::DoReset

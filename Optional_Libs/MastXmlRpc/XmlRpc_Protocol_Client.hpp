@@ -46,6 +46,12 @@ class XmlRpc_Protocol_Client : public Remote_Protocol_Client
   virtual std::vector<unsigned char> SendScanVector(const std::string&                commandName,
                                                     uint32_t                          bitsCount,
                                                     const std::vector<unsigned char>& toSutScanVector);
+
+  //! Sends command for forcing the ResetPort to be asserted on the target module
+  //!
+  //! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence
+  //!
+  virtual void SendDoReset(bool doSynchronousReset);
 };
 //
 //  End of XmlRpc_Protocol_Client class declaration

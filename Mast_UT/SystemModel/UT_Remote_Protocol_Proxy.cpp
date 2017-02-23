@@ -80,7 +80,7 @@ namespace
       return scanVector;
     }
 
-    virtual void DoReset(bool doSynchronousReset)
+    virtual void SendDoReset(bool doSynchronousReset)
     {
       if (doSynchronousReset)
       {

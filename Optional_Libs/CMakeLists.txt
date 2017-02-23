@@ -1,4 +1,5 @@
 
+add_subdirectory(MastRpc)
 
 message("")
 message("================================================================================")
@@ -14,4 +15,5 @@ if (USE_XML_RPC)
   message("")
   add_subdirectory(MastXmlRpc)
 endif()
+
 

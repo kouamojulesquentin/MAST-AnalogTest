@@ -27,23 +27,11 @@ class UT_XmlRpc_Protocol_Client : public CxxTest::TestSuite
    UT_XmlRpc_Protocol_Client() = default;
 
   // ================ Test Methods ================
-  //! @todo [JFC]-[February/22/2017]: Remove "test_No_test_yet_for_Guard" method when all tests are implemented
-  //!
-  void test_No_test_yet_for_Guard ();
 
-  // ================ Other Methods ================
+  void test_Constructor_Default ();
 
-  void setUp(); //!< Initializes test (called for each test)
-
-  void tearDown();  //!< Cleanups test (called for each test)
-
-  // ---------------- Private  Methods
-  //
-  private:
-
-  // ---------------- Private  Fields
-  //
-  private:
+  void test_SendDoReset_NoServer ();
+  void test_SendScanVector_NoServer ();
 };
 //
 //  End of UT_XmlRpc_Protocol_Client class declaration

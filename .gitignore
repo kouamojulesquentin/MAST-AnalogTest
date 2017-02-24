@@ -37,6 +37,7 @@
 /cxxtest/python/python3/cxxtest/parsetab.py
 /Lib_UT/Generated/Runner.cpp
 /Build_Qt
+/Build_Qt_CMake
 /NewMast.pro.user
 /cxxtest/.hg
 /cxxtest/*.hgignore
@@ -80,6 +81,7 @@
 /Doxygen_Doc/MastDev/*.lnk
 /Doxygen_Doc/MastDev/html
 build
+/External_Libs/xmlrpc-c/lib/*/*.so
 /External_Libs/xmlrpc-c/config.log
 /External_Libs/xmlrpc-c/config.mk
 /External_Libs/xmlrpc-c/config.status
@@ -149,4 +151,7 @@ build
 /External_Libs/xmlrpc-c/xmlrpc-c-config.test
 /External_Libs/xmlrpc-c/xmlrpc_amconfig.h
 /External_Libs/xmlrpc-c/xmlrpc_config.h
+/openocd/lib/*.so
+/openocd/openocd/autom4te.cache*
+/openocd/openocd/jimtcl/configure.gnu
 /Optional_Libs_UT/Generated/Runner.cpp

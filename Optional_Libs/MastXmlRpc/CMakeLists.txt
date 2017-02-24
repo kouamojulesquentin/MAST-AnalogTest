@@ -34,10 +34,12 @@ set(CLIENT_FLAGS "-std=c++03 -fPIC -g ${WARNINGS}")
 set(SERVER_FLAGS "${CLIENT_FLAGS}")
 
 
-set(ClientSources XmlRpc_Protocol_Client.cpp
+set(ClientSources XmlRpc_Protocol_Common.hpp
+                  XmlRpc_Protocol_Client.cpp
                   XmlRpc_Protocol_Client.hpp)
 
-set(ServerSources XmlRpc_Protocol_Server.cpp
+set(ServerSources XmlRpc_Protocol_Common.hpp
+                  XmlRpc_Protocol_Server.cpp
                   XmlRpc_Protocol_Server.hpp)
 
 include_directories(${BaseProjectPath}/Mast_Core/include/)

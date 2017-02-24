@@ -14,6 +14,7 @@
 
 #include "XmlRpc_Protocol_Server.hpp"
 #include "Remote_Protocol.hpp"
+#include "XmlRpc_Protocol_Common.hpp"
 
 #include <xmlrpc-c/girerr.hpp>
 #include <xmlrpc-c/base.hpp>
@@ -135,8 +136,8 @@ void XmlRpc_Protocol_Server::Start ()
 
     xmlrpc_c::registry myRegistry;
 
-    myRegistry.addMethod("XmlRpc_Protocol_Server.DoReset",        pDoReset_Executer);
-    myRegistry.addMethod("XmlRpc_Protocol_Server.SendScanVector", pScanVector_Executer);
+    myRegistry.addMethod(XML_RPC_COMMAND_DO_RESET,         pDoReset_Executer);
+    myRegistry.addMethod(XML_RPC_COMMAND_SEND_SCAN_VECTOR, pScanVector_Executer);
 
     // ---------------- Configure server
     //

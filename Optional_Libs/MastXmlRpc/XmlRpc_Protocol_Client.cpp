@@ -13,7 +13,7 @@
 
 
 #include "XmlRpc_Protocol_Client.hpp"
-//+#include "g3log/g3log.hpp"   // Need C++11 (or 14 ?)
+#include "XmlRpc_Protocol_Common.hpp"
 
 #include <xmlrpc-c/girerr.hpp>
 #include <xmlrpc-c/base.hpp>
@@ -57,7 +57,7 @@ XmlRpc_Protocol_Client::XmlRpc_Protocol_Client (const std::string& parameters)
 //!
 void XmlRpc_Protocol_Client::SendDoReset (bool doSynchronousReset)
 {
-  const string methodName("XmlRpc_Protocol_Server.DoReset");
+  const string methodName(XML_RPC_COMMAND_DO_RESET);
 
   xmlrpc_c::paramList params;
 
@@ -83,7 +83,7 @@ void XmlRpc_Protocol_Client::SendDoReset (bool doSynchronousReset)
 //! @return from SUT scan vector
 vector<unsigned char> XmlRpc_Protocol_Client::SendScanVector (const std::string& commandName, uint32_t bitsCount, const vector<unsigned char>& toSutScanVector)
 {
-  const string methodName("XmlRpc_Protocol_Server.SendScanVector");
+  const string methodName(XML_RPC_COMMAND_SEND_SCAN_VECTOR);
 
   xmlrpc_c::paramList params;
 

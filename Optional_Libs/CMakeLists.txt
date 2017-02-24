@@ -16,4 +16,6 @@ if (USE_XML_RPC)
   add_subdirectory(MastXmlRpc)
 endif()
 
+add_subdirectory(Examples)
+
 

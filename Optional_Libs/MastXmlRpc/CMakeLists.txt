@@ -14,7 +14,7 @@ endif()
 set (CMAKE_CXX_COMPILER "g++")
 
 set(BaseProjectPath "../..")
-include_directories(${BaseProjectPath}/Mast_Core/include/)
+
 
 set_property(GLOBAL PROPERTY CXX_STANDARD          03)
 set_property(GLOBAL PROPERTY CXX_STANDARD_REQUIRED ON)
@@ -26,10 +26,8 @@ endif()
 message(STATUS "MastXmlRpc: XmlRpcInstall:         ${XmlRpcInstall}")
 message("================================================================================")
 message("")
-
-
 find_package(LibXmlRpc  REQUIRED)
-include_directories(${LibXmlRpc_INCLUDE_DIRS})
+
 
 set(WARNINGS     "-Wall -Wextra -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default")
 set(CLIENT_FLAGS "-std=c++03 -fPIC -g ${WARNINGS}")
@@ -42,6 +40,9 @@ set(ClientSources XmlRpc_Protocol_Client.cpp
 set(ServerSources XmlRpc_Protocol_Server.cpp
                   XmlRpc_Protocol_Server.hpp)
 
+include_directories(${BaseProjectPath}/Mast_Core/include/)
+include_directories(${LIBXMLRPC_INCLUDE_DIRS})
+
 message("")
 message("================================================================================")
 message(STATUS "MastXmlRpc: CMAKE_LINK_LIBRARY_FLAG:  ${CMAKE_LINK_LIBRARY_FLAG}")
@@ -49,7 +50,8 @@ message(STATUS "MastXmlRpc: CLIENT_FLAGS:             ${CLIENT_FLAGS}")
 message(STATUS "MastXmlRpc: ClientSources:            ${ClientSources}")
 message(STATUS "MastXmlRpc: SERVER_FLAGS:             ${SERVER_FLAGS}")
 message(STATUS "MastXmlRpc: ServerSources:            ${ServerSources}")
-message(STATUS "MastXmlRpc: LIBXMLRPC_LIBRARIES:      ${LIBXMLRPC_LIBRARIES}")
+message(STATUS "MastXmlRpc: ServerSources:            ${ServerSources}")
+message(STATUS "MastXmlRpc: LIBXMLRPC_INCLUDE_DIRS:   ${LIBXMLRPC_INCLUDE_DIRS}")
 message("================================================================================")
 message("")
 

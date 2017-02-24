@@ -29,8 +29,9 @@ class UT_XmlRpc_Protocol_Server : public CxxTest::TestSuite
   // ================ Test Methods ================
 
   void test_Constructor_Default ();
-
+  void test_Stop_not_Started ();
   void test_Start_when_no_Protocol ();
+  void test_Start_and_Stop ();
 
 };
 //

@@ -105,7 +105,7 @@ namespace
 
 
 
-//! `Releases ...`
+//! Does nothing.
 XmlRpc_Protocol_Server::~XmlRpc_Protocol_Server ()
 {
 }
@@ -140,15 +140,23 @@ void XmlRpc_Protocol_Server::Start ()
 
     // ---------------- Configure server
     //
-    xmlrpc_c::serverAbyss server(xmlrpc_c::serverAbyss::constrOpt().registryP(&myRegistry).portNumber(PortNumber()));
+    xmlrpc_c::serverAbyss::constrOpt serverOptions;
+    serverOptions.registryP(&myRegistry).portNumber(PortNumber());
+
+    xmlrpc_c::serverAbyss server(serverOptions);
+
+    m_abyssServer = &server;  // This is used to terminate the server
 
     // ---------------- Start server
     //
     server.run();
-    assert(false); // xmlrpc_c::serverAbyss.run() never returns
+
+    m_abyssServer = NULL;
   }
   catch (const std::exception& exc)
   {
+    m_abyssServer = NULL;   // Make sure we do not point on destructed server !
+                            //
     throw std::runtime_error(string("XmlRpc_Protocol_Server ==> Something failed: ") + exc.what());
   }
 }
@@ -156,6 +164,22 @@ void XmlRpc_Protocol_Server::Start ()
 //  End of: XmlRpc_Protocol_Server::Start
 //---------------------------------------------------------------------------
 
+
+
+//! Stops running server
+//!
+//! @note Does nothing if the server is no currently running
+void XmlRpc_Protocol_Server::Stop ()
+{
+  if (m_abyssServer)
+  {
+    m_abyssServer->terminate();
+    m_abyssServer = NULL;
+  }
+}
+//
+//  End of: XmlRpc_Protocol_Server::Stop
+//---------------------------------------------------------------------------
 
 
 //===========================================================================

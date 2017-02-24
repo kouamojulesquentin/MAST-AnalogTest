@@ -28,6 +28,8 @@ class UT_XmlRpc_Client_Server : public CxxTest::TestSuite
   // ================ Test Methods ================
 
   void test_SendDoReset ();
+  void test_SendScanVector_Single ();
+  void test_SendScanVector_Multiple ();
 
 };
 //

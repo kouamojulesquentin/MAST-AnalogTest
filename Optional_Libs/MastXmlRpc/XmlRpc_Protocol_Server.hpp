@@ -22,11 +22,16 @@
 #include <stdint.h>     // Make it compilable as C++03
 #endif
 
+namespace xmlrpc_c
+{
+  class serverAbyss;
+}
 
 namespace mast
 {
 //! Acts as a remote server based upon Xml-RPC protocol
 //!
+//! @note MUST be compilable by C++03 only compilers !
 class XmlRpc_Protocol_Server : public Remote_Protocol_Server
 {
   // ---------------- Public  Methods
@@ -36,9 +41,11 @@ class XmlRpc_Protocol_Server : public Remote_Protocol_Server
 
   XmlRpc_Protocol_Server(uint32_t portNumber, Remote_Protocol* protocol)
     : Remote_Protocol_Server (portNumber, protocol)
+    , m_abyssServer          (NULL)
   {}
 
   XmlRpc_Protocol_Server()
+    : m_abyssServer (NULL)
   {}
 
   //! Constructs using string encoded parameters
@@ -50,6 +57,18 @@ class XmlRpc_Protocol_Server : public Remote_Protocol_Server
   //! Starts server
   //! @note This is a blocking call that never return !!!
   virtual void Start();
+
+  //! Returns true when the server has been started (and not yet stopped)
+  //!
+  virtual bool Started() const { return m_abyssServer != NULL; }
+
+  //! Stops running server
+  //!
+  virtual void Stop();
+
+  // ---------------- Private  Fields
+  //
+  xmlrpc_c::serverAbyss* m_abyssServer;
 };
 //
 //  End of XmlRpc_Protocol_Server class declaration

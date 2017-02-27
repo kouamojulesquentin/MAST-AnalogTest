@@ -21,6 +21,8 @@
 #include <string>
 #include <experimental/string_view>
 
+#include "Platform.hpp"
+
 namespace mast
 {
 //! Defines common implementation for factories using register creation methods
@@ -30,7 +32,7 @@ namespace mast
 //!       creation methods)
 //!
 template<typename BuildType>
-class Factory
+class DLL_EXPORT Factory
 {
   // ---------------- Public  Methods
   //

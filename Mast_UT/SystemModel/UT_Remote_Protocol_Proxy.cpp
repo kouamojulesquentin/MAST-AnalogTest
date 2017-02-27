@@ -15,7 +15,7 @@
 #include "UT_Remote_Protocol_Proxy.hpp"
 #include "Remote_Protocol_Proxy.hpp"
 #include "Remote_Protocol_Client.hpp"
-//+#include "RemoteProtocolFactories.hpp"
+#include "RemoteProtocolFactory.hpp"
 
 #include <memory>
 #include <tuple>
@@ -24,6 +24,7 @@
 
 using std::unique_ptr;
 using std::make_unique;
+using std::make_shared;
 using std::pair;
 using std::make_pair;
 using std::tuple;
@@ -32,7 +33,7 @@ using std::string;
 using std::experimental::string_view;
 using std::vector;
 
-//+using mast::RemoteProtocolFactories;
+using mast::RemoteProtocolFactory;
 using mast::Remote_Protocol_Proxy;
 using mast::Remote_Protocol_Client;
 using mast::BinaryVector;
@@ -139,12 +140,13 @@ void UT_Remote_Protocol_Proxy::test_Constructor_StringParameters ()
 {
   // ---------------- Setup
   //
-  string                            parameters("SpyProtocol, RST, SIR, SDR");
-  unique_ptr<Remote_Protocol_Proxy> proxy;
-//+  auto&                             factories = RemoteProtocolFactories::Instance();
-
   CxxTest::setAbortTestOnFail(true);
-//+  TS_ASSERT_THROWS_NOTHING (factories.AddFactory("SpyProtocol", [](const string& /* parameters */) { return make_unique<Spy_ClientProtocol>(); }));
+  auto& factory = RemoteProtocolFactory::Instance();
+
+  TS_ASSERT_THROWS_NOTHING(factory.RegisterCreator("SpyProtocol", [](const string& /* parameters */) { return make_shared<Spy_ClientProtocol>(); }));
+
+  unique_ptr<Remote_Protocol_Proxy> proxy;
+  string parameters("SpyProtocol, RST, SIR, SDR");
 
   // ---------------- Exercise & Verify
   //
@@ -152,6 +154,7 @@ void UT_Remote_Protocol_Proxy::test_Constructor_StringParameters ()
 
   // ---------------- Verify
   //
+  TS_ASSERT_NOT_NULLPTR (proxy);
   TS_ASSERT_EQUALS (proxy->MaxSupportedDerivations(), 3u);
   TS_ASSERT_EQUALS (proxy->KindName(),                "Remote_Spy"sv);
 }

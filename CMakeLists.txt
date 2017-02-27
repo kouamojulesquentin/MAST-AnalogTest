@@ -57,7 +57,7 @@ add_subdirectory (SIT_reader)
 add_subdirectory (Mast)
 
 if (USE_EXTERNAL_LIBS)
-#+  add_subdirectory(External_Libs)
+  add_subdirectory(External_Libs)
   add_subdirectory(Optional_Libs)
   add_subdirectory(Optional_Libs_UT)
 endif()

@@ -12,6 +12,7 @@ message("=======================================================================
 if (NOT DEFINED(XmlRpcInstall))
   message(STATUS "FindLibXmlRpc: Will set XmlRpcInstall")
   set(XmlRpcInstall ${CMAKE_CURRENT_LIST_DIR}/../xmlrpc-c/build)
+#  set(XmlRpcInstall ${XMLRPC_CMAKE_INSTALL})
 endif()
 message(STATUS "FindLibXmlRpc: XmlRpcInstall:           ${XmlRpcInstall}")
 

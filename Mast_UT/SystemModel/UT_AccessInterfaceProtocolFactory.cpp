@@ -1,20 +1,20 @@
 //===========================================================================
-//                           UT_AccessInterfaceProtocolFactories.cpp
+//                           UT_AccessInterfaceProtocolFactory.cpp
 //===========================================================================
 // Copyright (C) 2017 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file UT_AccessInterfaceProtocolFactories.cpp
+//! @file UT_AccessInterfaceProtocolFactory.cpp
 //!
-//! Implements test fixture for testing AccessInterfaceProtocolFactories
+//! Implements test fixture for testing AccessInterfaceProtocolFactory
 //!
 //===========================================================================
 
 
-#include "UT_AccessInterfaceProtocolFactories.hpp"
+#include "UT_AccessInterfaceProtocolFactory.hpp"
 
-#include "AccessInterfaceProtocolFactories.hpp"
+#include "AccessInterfaceProtocolFactory.hpp"
 #include "AccessInterfaceProtocol.hpp"
 #include "LoopbackAccessInterfaceProtocol.hpp"
 #include "SVF_SimulationProtocol.hpp"
@@ -38,18 +38,18 @@ using std::string;
 using namespace mast;
 
 
-//! Checks AccessInterfaceProtocolFactories::Instance()
+//! Checks AccessInterfaceProtocolFactory::Instance()
 //!
-void UT_AccessInterfaceProtocolFactories::test_Instance ()
+void UT_AccessInterfaceProtocolFactory::test_Instance ()
 {
   // ---------------- Setup
   //
-  AccessInterfaceProtocolFactories* pInstance = nullptr;
+  AccessInterfaceProtocolFactory* pInstance = nullptr;
 
   // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (
-                              pInstance = &AccessInterfaceProtocolFactories::Instance();
+                              pInstance = &AccessInterfaceProtocolFactory::Instance();
                            );
 
   // ---------------- Verify
@@ -62,9 +62,9 @@ void UT_AccessInterfaceProtocolFactories::test_Instance ()
 
 
 
-//! Checks AccessInterfaceProtocolFactories::Create() when must be successful
+//! Checks AccessInterfaceProtocolFactory::Create() when must be successful
 //!
-void UT_AccessInterfaceProtocolFactories::test_Create_Success ()
+void UT_AccessInterfaceProtocolFactory::test_Create_Success ()
 {
   // ---------------- DDT Setup
   //
@@ -76,7 +76,7 @@ void UT_AccessInterfaceProtocolFactories::test_Create_Success ()
     auto  creatorParameters    = std::get<1>(data);
     auto& expectedProtocolType = std::get<2>(data);
 
-    auto& instance = AccessInterfaceProtocolFactories::Instance();
+    auto& instance = AccessInterfaceProtocolFactory::Instance();
 
     shared_ptr<AccessInterfaceProtocol> protocol;
 
@@ -115,9 +115,9 @@ void UT_AccessInterfaceProtocolFactories::test_Create_Success ()
 }
 
 
-//! Checks AccessInterfaceProtocolFactories::Create() when must detect an error
+//! Checks AccessInterfaceProtocolFactory::Create() when must detect an error
 //!
-void UT_AccessInterfaceProtocolFactories::test_Create_Error ()
+void UT_AccessInterfaceProtocolFactory::test_Create_Error ()
 {
   // ---------------- DDT Setup
   //
@@ -128,7 +128,7 @@ void UT_AccessInterfaceProtocolFactories::test_Create_Error ()
     auto creatorId         = std::get<0>(data);
     auto creatorParameters = std::get<1>(data);
 
-    auto& instance = AccessInterfaceProtocolFactories::Instance();
+    auto& instance = AccessInterfaceProtocolFactory::Instance();
 
     shared_ptr<AccessInterfaceProtocol> protocol;
 
@@ -159,13 +159,13 @@ void UT_AccessInterfaceProtocolFactories::test_Create_Error ()
 }
 
 
-//! Checks AccessInterfaceProtocolFactories::Clear()
+//! Checks AccessInterfaceProtocolFactory::Clear()
 //!
-void UT_AccessInterfaceProtocolFactories::test_Clear ()
+void UT_AccessInterfaceProtocolFactory::test_Clear ()
 {
   // ---------------- Setup
   //
-  auto& sut = AccessInterfaceProtocolFactories::Instance();
+  auto& sut = AccessInterfaceProtocolFactory::Instance();
 
   // ---------------- Exercise
   //
@@ -177,13 +177,13 @@ void UT_AccessInterfaceProtocolFactories::test_Clear ()
 }
 
 
-//! Checks AccessInterfaceProtocolFactories::InitializeWithDefaults() when there are none before
+//! Checks AccessInterfaceProtocolFactory::InitializeWithDefaults() when there are none before
 //!
-void UT_AccessInterfaceProtocolFactories::test_InitializeWithDefaults ()
+void UT_AccessInterfaceProtocolFactory::test_InitializeWithDefaults ()
 {
   // ---------------- Setup
   //
-  auto& sut = AccessInterfaceProtocolFactories::Instance();
+  auto& sut = AccessInterfaceProtocolFactory::Instance();
   sut.Clear();  // Remove default factories added at construction
 
   // ---------------- Exercise
@@ -197,13 +197,13 @@ void UT_AccessInterfaceProtocolFactories::test_InitializeWithDefaults ()
 
 
 
-//! Checks AccessInterfaceProtocolFactories::RegisterCreator() when adding a new one on top of default one
+//! Checks AccessInterfaceProtocolFactory::RegisterCreator() when adding a new one on top of default one
 //!
-void UT_AccessInterfaceProtocolFactories::test_RegisterCreator_NewOne_when_Defaults ()
+void UT_AccessInterfaceProtocolFactory::test_RegisterCreator_NewOne_when_Defaults ()
 {
   // ---------------- Setup
   //
-  auto& sut         = AccessInterfaceProtocolFactories::Instance();
+  auto& sut         = AccessInterfaceProtocolFactory::Instance();
   auto  nbFactories = sut.RegisteredCreatorsCount();
 
   auto  newFactory  = [](const string& nbDerivations) { return make_shared<STIL_EmulationProtocol>(nbDerivations); };
@@ -232,13 +232,13 @@ void UT_AccessInterfaceProtocolFactories::test_RegisterCreator_NewOne_when_Defau
 }
 
 
-//! Checks AccessInterfaceProtocolFactories::RegisterCreator() when adding a new one when none are registeres
+//! Checks AccessInterfaceProtocolFactory::RegisterCreator() when adding a new one when none are registeres
 //!
-void UT_AccessInterfaceProtocolFactories::test_RegisterCreator_NewOne_when_None ()
+void UT_AccessInterfaceProtocolFactory::test_RegisterCreator_NewOne_when_None ()
 {
   // ---------------- Setup
   //
-  auto& sut         = AccessInterfaceProtocolFactories::Instance();
+  auto& sut         = AccessInterfaceProtocolFactory::Instance();
   auto  newFactory  = [](const string& nbDerivations) { return make_shared<STIL_EmulationProtocol>(nbDerivations); };
 
   sut.Clear();
@@ -266,13 +266,13 @@ void UT_AccessInterfaceProtocolFactories::test_RegisterCreator_NewOne_when_None 
   TS_ASSERT_EQUALS (asSTILL_EmulationProtocol->MaxSupportedDerivations(), 13u);
 }
 
-//! Checks AccessInterfaceProtocolFactories::RegisterCreator() when replacing a default one
+//! Checks AccessInterfaceProtocolFactory::RegisterCreator() when replacing a default one
 //!
-void UT_AccessInterfaceProtocolFactories::test_RegisterCreator_Replace_Default ()
+void UT_AccessInterfaceProtocolFactory::test_RegisterCreator_Replace_Default ()
 {
   // ---------------- Setup
   //
-  auto& sut = AccessInterfaceProtocolFactories::Instance();
+  auto& sut = AccessInterfaceProtocolFactory::Instance();
   sut.Clear();  // Remove default factories added at construction
   sut.InitializeWithDefaults();
 
@@ -303,5 +303,5 @@ void UT_AccessInterfaceProtocolFactories::test_RegisterCreator_Replace_Default (
 }
 
 //===========================================================================
-// End of UT_AccessInterfaceProtocolFactories.cpp
+// End of UT_AccessInterfaceProtocolFactory.cpp
 //===========================================================================

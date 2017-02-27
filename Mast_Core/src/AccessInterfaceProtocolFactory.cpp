@@ -1,17 +1,17 @@
 //===========================================================================
-//                           AccessInterfaceProtocolFactories.cpp
+//                           AccessInterfaceProtocolFactory.cpp
 //===========================================================================
 // Copyright (C) 2017 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file AccessInterfaceProtocolFactories.cpp
+//! @file AccessInterfaceProtocolFactory.cpp
 //!
-//! Implements class AccessInterfaceProtocolFactories
+//! Implements class AccessInterfaceProtocolFactory
 //!
 //===========================================================================
 
-#include "AccessInterfaceProtocolFactories.hpp"
+#include "AccessInterfaceProtocolFactory.hpp"
 #include "Utility.hpp"
 
 // For default AccessInterfaceProtocol
@@ -34,26 +34,26 @@ using std::experimental::string_view;
 using namespace std::experimental::literals::string_view_literals;
 using namespace mast;
 
-using mast::AccessInterfaceProtocolFactories;
+using mast::AccessInterfaceProtocolFactory;
 
 //! Called once to create single instance
 //!
 //! @note This is extracted from Instance() to separated initialization of defaults and request for instance
-std::unique_ptr<AccessInterfaceProtocolFactories> AccessInterfaceProtocolFactories::CreateInstanceWithDefaultFactories ()
+std::unique_ptr<AccessInterfaceProtocolFactory> AccessInterfaceProtocolFactory::CreateInstanceWithDefaultFactories ()
 {
-  auto instance = unique_ptr<AccessInterfaceProtocolFactories>(new AccessInterfaceProtocolFactories());
+  auto instance = unique_ptr<AccessInterfaceProtocolFactory>(new AccessInterfaceProtocolFactory());
   instance->InitializeWithDefaults();
   return instance;
 }
 //
-//  End of: AccessInterfaceProtocolFactories::CreateInstanceWithDefaultFactories
+//  End of: AccessInterfaceProtocolFactory::CreateInstanceWithDefaultFactories
 //---------------------------------------------------------------------------
 
 
 
 //! Creates an AccessInterfaceProtocol using ceation function indentified by a name and optional parameters
 //!
-shared_ptr<AccessInterfaceProtocol> AccessInterfaceProtocolFactories::Create (const std::string& creatorId, const std::string& parameters) const
+shared_ptr<AccessInterfaceProtocol> AccessInterfaceProtocolFactory::Create (const std::string& creatorId, const std::string& parameters) const
 {
   auto instance = CreateImpl(creatorId, parameters);
   if (!instance)
@@ -64,7 +64,7 @@ shared_ptr<AccessInterfaceProtocol> AccessInterfaceProtocolFactories::Create (co
   return instance;
 }
 //
-//  End of: AccessInterfaceProtocolFactories::Create
+//  End of: AccessInterfaceProtocolFactory::Create
 //---------------------------------------------------------------------------
 
 
@@ -72,7 +72,7 @@ shared_ptr<AccessInterfaceProtocol> AccessInterfaceProtocolFactories::Create (co
 
 //! Fills up with default AccessInterfaceProtocol
 //!
-void AccessInterfaceProtocolFactories::InitializeWithDefaults ()
+void AccessInterfaceProtocolFactory::InitializeWithDefaults ()
 {
   RegisterCreator("JTAG_Loopback",       [](const string& /* parameters */) { return make_shared<LoopbackAccessInterfaceProtocol>();     });
   RegisterCreator("JTAG_SVF_Simulation", [](const string& /* parameters */) { return make_shared<SVF_SimulationProtocol>();              });
@@ -82,23 +82,23 @@ void AccessInterfaceProtocolFactories::InitializeWithDefaults ()
   RegisterCreator("I2C_Emulation",       [](const string& parameters)       { return make_shared<I2C_EmulationProtocol>(parameters);     });
 }
 //
-//  End of: AccessInterfaceProtocolFactories::InitializeWithDefaults
+//  End of: AccessInterfaceProtocolFactory::InitializeWithDefaults
 //---------------------------------------------------------------------------
 
 
 //! Returns sole instance
 //!
 //! @note It is thread safe
-AccessInterfaceProtocolFactories& AccessInterfaceProtocolFactories::Instance ()
+AccessInterfaceProtocolFactory& AccessInterfaceProtocolFactory::Instance ()
 {
   static auto instance = CreateInstanceWithDefaultFactories();
 
   return *instance.get();
 }
 //
-//  End of: AccessInterfaceProtocolFactories::Instance
+//  End of: AccessInterfaceProtocolFactory::Instance
 //---------------------------------------------------------------------------
 
 //===========================================================================
-// End of AccessInterfaceProtocolFactories.cpp
+// End of AccessInterfaceProtocolFactory.cpp
 //===========================================================================

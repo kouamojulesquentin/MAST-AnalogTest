@@ -1,30 +1,30 @@
 //===========================================================================
-//                           UT_AccessInterfaceProtocolFactories.hpp
+//                           UT_AccessInterfaceProtocolFactory.hpp
 //===========================================================================
 // Copyright (C) 2017 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file UT_AccessInterfaceProtocolFactories.hpp
+//! @file UT_AccessInterfaceProtocolFactory.hpp
 //!
-//! Declares test fixture class for testing AccessInterfaceProtocolFactories
+//! Declares test fixture class for testing AccessInterfaceProtocolFactory
 //!
 //===========================================================================
 
 
-#ifndef UT_ACCESSINTERFACEPROTOCOLFACTORIES_H__AB34E0F4_45E3_4903_56B3_B11678D1A08A__INCLUDED_
-  #define UT_ACCESSINTERFACEPROTOCOLFACTORIES_H__AB34E0F4_45E3_4903_56B3_B11678D1A08A__INCLUDED_
+#ifndef UT_ACCESSINTERFACEPROTOCOLFACTORY_H__906155E3_A05E_4CEA_6A7_755751180F__INCLUDED_
+  #define UT_ACCESSINTERFACEPROTOCOLFACTORY_H__906155E3_A05E_4CEA_6A7_755751180F__INCLUDED_
 
 #include <cxxtest/TestSuite.h>
 
-//! Unit tests for class AccessInterfaceProtocolFactories
+//! Unit tests for class AccessInterfaceProtocolFactory
 //!
 //!
-class UT_AccessInterfaceProtocolFactories : public CxxTest::TestSuite
+class UT_AccessInterfaceProtocolFactory : public CxxTest::TestSuite
 {
   public:
-  ~UT_AccessInterfaceProtocolFactories() = default;
-   UT_AccessInterfaceProtocolFactories() = default;
+  ~UT_AccessInterfaceProtocolFactory() = default;
+   UT_AccessInterfaceProtocolFactory() = default;
 
   // ================ Test Methods ================
 
@@ -42,11 +42,11 @@ class UT_AccessInterfaceProtocolFactories : public CxxTest::TestSuite
   void test_RegisterCreator_Replace_Default ();
 };
 //
-//  End of UT_AccessInterfaceProtocolFactories class declaration
+//  End of UT_AccessInterfaceProtocolFactory class declaration
 //---------------------------------------------------------------------------
 
 
-#endif  // not defined UT_ACCESSINTERFACEPROTOCOLFACTORIES_H__AB34E0F4_45E3_4903_56B3_B11678D1A08A__INCLUDED_
+#endif  // not defined UT_ACCESSINTERFACEPROTOCOLFACTORY_H__906155E3_A05E_4CEA_6A7_755751180F__INCLUDED_
 //===========================================================================
-// End of UT_AccessInterfaceProtocolFactories.hpp
+// End of UT_AccessInterfaceProtocolFactory.hpp
 //===========================================================================

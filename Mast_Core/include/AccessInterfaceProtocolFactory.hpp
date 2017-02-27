@@ -1,19 +1,19 @@
 //===========================================================================
-//                           AccessInterfaceProtocolFactories.hpp
+//                           AccessInterfaceProtocolFactory.hpp
 //===========================================================================
 // Copyright (C) 2017 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file AccessInterfaceProtocolFactories.hpp
+//! @file AccessInterfaceProtocolFactory.hpp
 //!
-//! Declares AccessInterfaceProtocolFactories class
+//! Declares AccessInterfaceProtocolFactory class
 //!
 //===========================================================================
 
 
-#ifndef ACCESSINTERFACEPROTOCOLFACTORIES_H__1A3C4FD_59BD_4F04_FA8E_1434A12434AD__INCLUDED_
-  #define ACCESSINTERFACEPROTOCOLFACTORIES_H__1A3C4FD_59BD_4F04_FA8E_1434A12434AD__INCLUDED_
+#ifndef ACCESSINTERFACEPROTOCOLFACTORY_H__B1F211CA_FF00_49A4_1FA6_E83DEC699EC7__INCLUDED_
+  #define ACCESSINTERFACEPROTOCOLFACTORY_H__B1F211CA_FF00_49A4_1FA6_E83DEC699EC7__INCLUDED_
 
 #include "Platform.hpp"
 #include "Factory.hpp"
@@ -32,16 +32,16 @@ class AccessInterfaceProtocol;
 //! @note This is a singleton
 //! @note Creation of the singleton initializes it with factories for default AccessInterfaceProtocol
 //!
-class DLL_EXPORT AccessInterfaceProtocolFactories final : public Factory<AccessInterfaceProtocol>
+class DLL_EXPORT AccessInterfaceProtocolFactory final : public Factory<AccessInterfaceProtocol>
 {
   // ---------------- Public  Methods
   //
   public:
-  ~AccessInterfaceProtocolFactories() = default;
+  ~AccessInterfaceProtocolFactory() = default;
 
   //! Returns sole instance
   //!
-  static AccessInterfaceProtocolFactories& Instance();
+  static AccessInterfaceProtocolFactory& Instance();
 
   using Creator_t = Factory<AccessInterfaceProtocol>::Creator_t;
 
@@ -68,22 +68,23 @@ class DLL_EXPORT AccessInterfaceProtocolFactories final : public Factory<AccessI
   // ---------------- Protected Methods
   //
   protected:
-  AccessInterfaceProtocolFactories() = default;
+  AccessInterfaceProtocolFactory() = default;
 
   // ---------------- Private  Methods
   //
   private:
-  static std::unique_ptr<AccessInterfaceProtocolFactories> CreateInstanceWithDefaultFactories();  //!< Called once to create single instance initialized with default factories
+  static std::unique_ptr<AccessInterfaceProtocolFactory> CreateInstanceWithDefaultFactories();  //!< Called once to create single instance initialized with default factories
 };
 //
-//  End of AccessInterfaceProtocolFactories class declaration
+//  End of AccessInterfaceProtocolFactory class declaration
 //---------------------------------------------------------------------------
 } // End of namespace mast
 
 
 
-#endif  // not defined ACCESSINTERFACEPROTOCOLFACTORIES_H__1A3C4FD_59BD_4F04_FA8E_1434A12434AD__INCLUDED_
+
+#endif  // not defined ACCESSINTERFACEPROTOCOLFACTORY_H__B1F211CA_FF00_49A4_1FA6_E83DEC699EC7__INCLUDED_
 
 //===========================================================================
-// End of AccessInterfaceProtocolFactories.hpp
+// End of AccessInterfaceProtocolFactory.hpp
 //===========================================================================

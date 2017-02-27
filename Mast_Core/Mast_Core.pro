@@ -53,6 +53,7 @@ SOURCES +=  \
     src/PrettyPrinter.cpp                           \
     src/PropagatePendingVisitor.cpp                 \
     src/Register.cpp                                \
+    src/Remote_Protocol_Client_Factory.cpp          \
     src/Remote_Protocol_Proxy.cpp                   \
     src/Session.cpp                                 \
     src/SPI_Player.cpp                              \
@@ -113,6 +114,7 @@ HEADERS += \
     include/PropagatePendingVisitor.hpp                 \
     include/Remote_Protocol.hpp                         \
     include/Remote_Protocol_Client.hpp                  \
+    include/Remote_Protocol_Client_Factory.hpp          \
     include/Remote_Protocol_Proxy.hpp                   \
     include/Register.hpp                                \
     include/SPI_Player.hpp                              \

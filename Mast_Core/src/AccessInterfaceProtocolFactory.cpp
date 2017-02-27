@@ -21,6 +21,7 @@
 #include "SVF_EmulationProtocol.hpp"
 #include "STIL_EmulationProtocol.hpp"
 #include "I2C_EmulationProtocol.hpp"
+#include "Remote_Protocol_Proxy.hpp"
 
 #include <memory>
 
@@ -80,6 +81,7 @@ void AccessInterfaceProtocolFactory::InitializeWithDefaults ()
   RegisterCreator("Offline",             [](const string& /* parameters */) { return make_shared<OfflineProtocol>();                     });
   RegisterCreator("STIL_Emulation",      [](const string& nbDerivations)    { return make_shared<STIL_EmulationProtocol>(nbDerivations); });
   RegisterCreator("I2C_Emulation",       [](const string& parameters)       { return make_shared<I2C_EmulationProtocol>(parameters);     });
+  RegisterCreator("RemoteProxy",         [](const string& parameters)       { return make_shared<Remote_Protocol_Proxy>(parameters);     });
 }
 //
 //  End of: AccessInterfaceProtocolFactory::InitializeWithDefaults

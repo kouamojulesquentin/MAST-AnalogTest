@@ -57,7 +57,7 @@ void UT_AccessInterfaceProtocolFactory::test_Instance ()
   CxxTest::setAbortTestOnFail(true);
   TS_ASSERT_NOT_NULLPTR (pInstance);
 
-  TS_ASSERT_EQUALS (pInstance->RegisteredCreatorsCount(), 6u);   // This is to detect when a test must be added for a new default factory
+  TS_ASSERT_EQUALS (pInstance->RegisteredCreatorsCount(), 7u);   // This is to detect when one should consider adding a new test for a new default creation method
 }
 
 
@@ -142,8 +142,8 @@ void UT_AccessInterfaceProtocolFactory::test_Create_Error ()
   auto data =
   {
     make_tuple("JTAG_LoopbacK",  ""),                             // 00: Wrong casing
-    make_tuple("Foo",            ""),                             // 01: Unregistered factory name
-    make_tuple("STIL",           ""),                             // 02: Unregistered factory name (start of name is not sufficient)
+    make_tuple("Foo",            ""),                             // 01: Unregistered creator name
+    make_tuple("STIL",           ""),                             // 02: Unregistered creator name (start of name is not sufficient)
     make_tuple("STIL_Emulation", ""),                             // 03: Missing parameter
     make_tuple("STIL_Emulation", "five"),                         // 04: Parameter is not a number
     make_tuple("STIL_Emulation", " "),                            // 05: Parameter is not a number

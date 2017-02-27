@@ -43,11 +43,9 @@ class DLL_EXPORT AccessInterfaceProtocolFactory final : public Factory<AccessInt
   //!
   static AccessInterfaceProtocolFactory& Instance();
 
-  using Creator_t = Factory<AccessInterfaceProtocol>::Creator_t;
-
-  //! Creates an AccessInterfaceProtocol using factory indentified by a name and optional parameters
+  //! Creates an AccessInterfaceProtocol using registered creation function
   //!
-  //! @param creatorId  A name that identified registered factory (may be name of default)
+  //! @param creatorId    A name that identified registered creation function
   //! @param parameters   String of (optional) parameters
   //!
   virtual std::shared_ptr<AccessInterfaceProtocol> Create(const std::string& creatorId, const std::string& parameters = "") const override;
@@ -61,6 +59,7 @@ class DLL_EXPORT AccessInterfaceProtocolFactory final : public Factory<AccessInt
   //!         - STIL_Emulation
   //!         - OfflineProtocol
   //!         - I2C_EmulationProtocol
+  //!         - RemoteProxy
   //!
   virtual void InitializeWithDefaults() override;
 

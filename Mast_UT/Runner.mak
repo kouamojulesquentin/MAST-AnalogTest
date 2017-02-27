@@ -41,7 +41,8 @@ Suites = \
       $(UT_RootPath)/SystemModel/UT_SVF_SimulationProtocol.hpp           \
       $(UT_RootPath)/SystemModel/UT_I2C_EmulationProtocol.hpp            \
       $(UT_RootPath)/SystemModel/UT_STIL_EmulationProtocol.hpp           \
-      $(UT_RootPath)/SystemModel/UT_AccessInterfaceProtocolFactories.hpp \
+      $(UT_RootPath)/SystemModel/UT_Remote_Protocol_Proxy.hpp            \
+      $(UT_RootPath)/SystemModel/UT_AccessInterfaceProtocolFactory.hpp   \
       $(UT_RootPath)/SystemModel/UT_SystemModelManager.hpp               \
       $(UT_RootPath)/API_CPP/UT_PDL_Adapter_CPP.hpp                      \
       $(UT_RootPath)/API_C/UT_PDL_Adapter_C.hpp

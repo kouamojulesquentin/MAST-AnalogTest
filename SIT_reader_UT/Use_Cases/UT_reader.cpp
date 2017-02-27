@@ -975,7 +975,14 @@ void UT_reader::test_JTAG_TAP_Failure ()
     //
     std::this_thread::sleep_for(5ms); // To get messages from logger (running in another thread)
     const auto gotErrorMessage = errorSink.str();
-    TS_ASSERT_EQUALS (gotErrorMessage.find(expected_ErrorMsg), 0);
+
+    auto containsExpected = gotErrorMessage.find(expected_ErrorMsg) != string::npos;
+
+    //+ (begin JFC February/07/2017): for debug purpose
+    if (!containsExpected) { TS_FAIL (gotErrorMessage); }
+    //+ (end   JFC February/07/2017):
+
+    TS_ASSERT_TRUE (containsExpected);
   };
 
   auto data =
@@ -985,7 +992,7 @@ void UT_reader::test_JTAG_TAP_Failure ()
                "{"
                "  REGISTER test_reg 4 Bypass: \"0b1100\""
                "}\n",
-               "Line 1:31-32: node my_tap Cannot create protocol: \"SVF_openOCD\"; std::invalid_argument: There is no factory registered with name: JTAG_SVF_openOCD."
+               "Line 1:31-32: node my_tap Cannot create protocol: \"SVF_openOCD\"; std::invalid_argument: There is no creation method registered with name: JTAG_SVF_openOCD."
                ),
   };
 
@@ -1230,7 +1237,7 @@ void UT_reader::test_ACCES_INTERFACE_Failure ()
                "  REGISTER reg_1 3 Bypass: \"0b101\"\n"
                "  REGISTER reg_2 5 Bypass: \"0b11001\"\n"
                "}\n",
-               "Line 2:1-2: node Unregistered_Protocol Cannot create protocol: \"MyProtocol\"; std::invalid_argument: There is no factory registered with name: MyProtocol."),
+               "Line 2:1-2: node Unregistered_Protocol Cannot create protocol: \"MyProtocol\"; std::invalid_argument: There is no creation method registered with name: MyProtocol."),
 
     // 02: No AccessInterface name (same as no protocol)
     make_tuple("ACCESS_INTERFACE Offline  \n"

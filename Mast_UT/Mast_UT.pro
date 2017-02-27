@@ -33,7 +33,7 @@ SOURCES += \
     Generated/Runner.cpp                                \
     API_C/UT_PDL_Adapter_C.cpp                          \
     API_CPP/UT_PDL_Adapter_CPP.cpp                      \
-    SystemModel/UT_AccessInterfaceProtocolFactories.cpp \
+    SystemModel/UT_AccessInterfaceProtocolFactory.cpp   \
     SystemModel/UT_ConfigureVisitor.cpp                 \
     SystemModel/UT_DataCycle.cpp                        \
     SystemModel/UT_DefaultBinaryPathSelector.cpp        \
@@ -47,6 +47,7 @@ SOURCES += \
     SystemModel/UT_ParentNode.cpp                       \
     SystemModel/UT_PrettyPrinter.cpp                    \
     SystemModel/UT_PropagatePendingVisitor.cpp          \
+    SystemModel/UT_Remote_Protocol_Proxy.cpp            \
     SystemModel/UT_Register.cpp                         \
     SystemModel/UT_I2C_EmulationProtocol.cpp            \
     SystemModel/UT_STIL_EmulationProtocol.cpp           \
@@ -77,7 +78,7 @@ HEADERS += \
     CxxTest_Traits/C_API_Traits.hpp                   \
     API_C/UT_PDL_Adapter_C.hpp                        \
     API_CPP/UT_PDL_Adapter_CPP.hpp                    \
-    SystemModel/UT_AccessInterfaceProtocolFactories.h \
+    SystemModel/UT_AccessInterfaceProtocolFactory.h   \
     SystemModel/UT_ConfigureVisitor.hpp               \
     SystemModel/UT_DataCycle.hpp                      \
     SystemModel/UT_DefaultBinaryPathSelector.hpp      \
@@ -91,6 +92,7 @@ HEADERS += \
     SystemModel/UT_ParentNode.hpp                     \
     SystemModel/UT_PrettyPrinter.hpp                  \
     SystemModel/UT_PropagatePendingVisitor.hpp        \
+    SystemModel/UT_Remote_Protocol_Proxy.hpp          \
     SystemModel/UT_Register.hpp                       \
     SystemModel/UT_I2C_EmulationProtocol.hpp          \
     SystemModel/UT_STIL_EmulationProtocol.hpp         \

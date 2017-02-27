@@ -218,6 +218,22 @@ catch(exc_t&)   \
 #define RETHROW_OUT_OF_RANGE(action, msg)     RETHROW_WITH_NESTED(action, std::out_of_range,     msg)
 #define RETHROW_RUNTIME_ERROR(action, msg)    RETHROW_WITH_NESTED(action, std::runtime_error,    msg)
 
+//! Checks that a pointer (parameter) IS, semantically, nullptr, otherwise it throws an exception
+//!
+//! @note It is mainly intended to report that some parameter is not supported (in overriding context)
+//!
+//! @return given parameter if "nullptr"
+template<typename T>
+T CheckParameterIsNullptr(const char* file, const char* function, int line, T ptr, std::experimental::string_view  msg)
+{
+  if (ptr)
+  {
+    throw std::invalid_argument(mast::Utility::MakeExceptionMessage(file, function, line, "std::invalid_argument", msg));
+  }
+  return ptr;
+}
+
+
 //! Checks that a pointer (parameter) is not nullptr, otherwise it throws an exception
 //!
 //! @return given parameter if not nullptr
@@ -273,6 +289,7 @@ T CheckValueIsNotNullptr(const char* file, const char* function, int line, T val
 template<typename T, typename U, typename V>
 bool InRange(const T& val, const U& minVal, const V& maxVal) { return (val >= minVal) && (val <= maxVal); }
 
+#define CHECK_PARAMETER_NULL(ptr,     msg)    CheckParameterIsNullptr    (__FILE__, __func__, __LINE__, ptr, msg)
 #define CHECK_PARAMETER_NOT_NULL(ptr, msg)    CheckParameterIsNotNullptr (__FILE__, __func__, __LINE__, ptr, msg)
 #define CHECK_PARAMETER_NOT_ZERO(val, msg)    CheckParameterIsNotZero    (__FILE__, __func__, __LINE__, val, msg)
 

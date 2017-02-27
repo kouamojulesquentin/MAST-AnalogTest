@@ -36,10 +36,9 @@ using namespace mast;
 
 using mast::AccessInterfaceProtocolFactories;
 
-
-
 //! Called once to create single instance
 //!
+//! @note This is extracted from Instance() to separated initialization of defaults and request for instance
 std::unique_ptr<AccessInterfaceProtocolFactories> AccessInterfaceProtocolFactories::CreateInstanceWithDefaultFactories ()
 {
   auto instance = unique_ptr<AccessInterfaceProtocolFactories>(new AccessInterfaceProtocolFactories());
@@ -52,26 +51,20 @@ std::unique_ptr<AccessInterfaceProtocolFactories> AccessInterfaceProtocolFactori
 
 
 
-//! Creates an AccessInterfaceProtocol using factory indentified by a name and optional parameters
+//! Creates an AccessInterfaceProtocol using ceation function indentified by a name and optional parameters
 //!
-shared_ptr<AccessInterfaceProtocol> AccessInterfaceProtocolFactories::CreateProtocol (const std::string& factoryName, const std::string& parameters) const
+shared_ptr<AccessInterfaceProtocol> AccessInterfaceProtocolFactories::Create (const std::string& creatorId, const std::string& parameters) const
 {
-  shared_ptr<AccessInterfaceProtocol> protocol;
-
-  auto pos = m_factories.find(factoryName);
-  if (pos != m_factories.end())
+  auto instance = CreateImpl(creatorId, parameters);
+  if (!instance)
   {
-    protocol = pos->second(parameters);
-  }
-  else
-  {
-    THROW_INVALID_ARGUMENT("There is no factory registered with name: "sv + factoryName);
+    THROW_INVALID_ARGUMENT("There is no creation method registered with name: "sv + creatorId);
   }
 
-  return protocol;
+  return instance;
 }
 //
-//  End of: AccessInterfaceProtocolFactories::CreateProtocol
+//  End of: AccessInterfaceProtocolFactories::Create
 //---------------------------------------------------------------------------
 
 
@@ -81,12 +74,12 @@ shared_ptr<AccessInterfaceProtocol> AccessInterfaceProtocolFactories::CreateProt
 //!
 void AccessInterfaceProtocolFactories::InitializeWithDefaults ()
 {
-  m_factories["JTAG_Loopback"]       = [](const string& /* parameters */) { return make_shared<LoopbackAccessInterfaceProtocol>();     };
-  m_factories["JTAG_SVF_Simulation"] = [](const string& /* parameters */) { return make_shared<SVF_SimulationProtocol>();              };
-  m_factories["JTAG_SVF_Emulation"]  = [](const string& /* parameters */) { return make_shared<SVF_EmulationProtocol>();               };
-  m_factories["Offline"]             = [](const string& /* parameters */) { return make_shared<OfflineProtocol>();                     };
-  m_factories["STIL_Emulation"]      = [](const string& nbDerivations)    { return make_shared<STIL_EmulationProtocol>(nbDerivations); };
-  m_factories["I2C_Emulation"]       = [](const string& parameters)       { return make_shared<I2C_EmulationProtocol>(parameters);     };
+  RegisterCreator("JTAG_Loopback",       [](const string& /* parameters */) { return make_shared<LoopbackAccessInterfaceProtocol>();     });
+  RegisterCreator("JTAG_SVF_Simulation", [](const string& /* parameters */) { return make_shared<SVF_SimulationProtocol>();              });
+  RegisterCreator("JTAG_SVF_Emulation",  [](const string& /* parameters */) { return make_shared<SVF_EmulationProtocol>();               });
+  RegisterCreator("Offline",             [](const string& /* parameters */) { return make_shared<OfflineProtocol>();                     });
+  RegisterCreator("STIL_Emulation",      [](const string& nbDerivations)    { return make_shared<STIL_EmulationProtocol>(nbDerivations); });
+  RegisterCreator("I2C_Emulation",       [](const string& parameters)       { return make_shared<I2C_EmulationProtocol>(parameters);     });
 }
 //
 //  End of: AccessInterfaceProtocolFactories::InitializeWithDefaults

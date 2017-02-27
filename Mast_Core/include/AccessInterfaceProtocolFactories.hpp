@@ -15,13 +15,10 @@
 #ifndef ACCESSINTERFACEPROTOCOLFACTORIES_H__1A3C4FD_59BD_4F04_FA8E_1434A12434AD__INCLUDED_
   #define ACCESSINTERFACEPROTOCOLFACTORIES_H__1A3C4FD_59BD_4F04_FA8E_1434A12434AD__INCLUDED_
 
-#include <string>
-#include <experimental/string_view>
-#include <functional>
-#include <memory>
-#include <map>
-
 #include "Platform.hpp"
+#include "Factory.hpp"
+
+
 
 namespace mast
 {
@@ -35,7 +32,7 @@ class AccessInterfaceProtocol;
 //! @note This is a singleton
 //! @note Creation of the singleton initializes it with factories for default AccessInterfaceProtocol
 //!
-class DLL_EXPORT AccessInterfaceProtocolFactories final
+class DLL_EXPORT AccessInterfaceProtocolFactories final : public Factory<AccessInterfaceProtocol>
 {
   // ---------------- Public  Methods
   //
@@ -46,34 +43,14 @@ class DLL_EXPORT AccessInterfaceProtocolFactories final
   //!
   static AccessInterfaceProtocolFactories& Instance();
 
-  using Factory_t = std::function<std::shared_ptr<AccessInterfaceProtocol>(const std::string& parameters)>;
-
-  //! Returns the number of factories currently registered (associated with a name)
-  //!
-  //! @note Mainly intended for test/check purpose
-  size_t RegisteredFactoriesCount() const { return m_factories.size(); }
-
-
-  //! Appends a factories
-  //!
-  //! @note If a factory already exists with the same factory name, it is replaced with the new one
-  //!
-  //! @param factoryName  Name associated with the factory (typically named after the AccessInterfaceProtocol to create)
-  //! @param factory      An AccessInterfaceProtocol factory
-  //!
-  void AddFactory(const std::string& factoryName, Factory_t factory) { m_factories[factoryName] = factory; }
-
-
-  //! Removes any factories
-  //!
-  void Clear() { m_factories.clear(); }
+  using Creator_t = Factory<AccessInterfaceProtocol>::Creator_t;
 
   //! Creates an AccessInterfaceProtocol using factory indentified by a name and optional parameters
   //!
-  //! @param factoryName  A name that identified registered factory (may be name of default)
+  //! @param creatorId  A name that identified registered factory (may be name of default)
   //! @param parameters   String of (optional) parameters
   //!
-  std::shared_ptr<AccessInterfaceProtocol> CreateProtocol(const std::string& factoryName, const std::string& parameters = "") const;
+  virtual std::shared_ptr<AccessInterfaceProtocol> Create(const std::string& creatorId, const std::string& parameters = "") const override;
 
   //! Fills up with default AccessInterfaceProtocol
   //!
@@ -85,7 +62,7 @@ class DLL_EXPORT AccessInterfaceProtocolFactories final
   //!         - OfflineProtocol
   //!         - I2C_EmulationProtocol
   //!
-  void InitializeWithDefaults();
+  virtual void InitializeWithDefaults() override;
 
 
   // ---------------- Protected Methods
@@ -97,11 +74,6 @@ class DLL_EXPORT AccessInterfaceProtocolFactories final
   //
   private:
   static std::unique_ptr<AccessInterfaceProtocolFactories> CreateInstanceWithDefaultFactories();  //!< Called once to create single instance initialized with default factories
-
-  // ---------------- Private  Fields
-  //
-  private:
-  std::map<std::string, Factory_t>  m_factories;
 };
 //
 //  End of AccessInterfaceProtocolFactories class declaration

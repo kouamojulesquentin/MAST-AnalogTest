@@ -14,6 +14,10 @@
 #include "Remote_Loopback_Protocol.hpp"
 #include "XmlRpc_Protocol_Server.hpp"
 
+#include <stdexcept>
+#include <iostream>
+#include <cstdlib>
+
 using mast::Remote_Loopback_Protocol;
 using mast::XmlRpc_Protocol_Server;
 
@@ -21,11 +25,25 @@ using mast::XmlRpc_Protocol_Server;
 //!
 int main(int argc, const char* argv[])
 {
-  Remote_Loopback_Protocol protocol;
-  XmlRpc_Protocol_Server   server(8080, &protocol);
+  try
+  {
+    Remote_Loopback_Protocol protocol;
+    XmlRpc_Protocol_Server   server(8080, &protocol);
 
-  server.Start(); // Do not return - use Ctrl-C 'or kill -9 ' to exit
-  return 0;
+    server.Start(); // Do not return - use Ctrl-C 'or kill -9 ' to exit
+  }
+  catch(std::exception& exc)  // Catch C++ standard exceptions
+  {
+    std::cerr << "XmlRpc Loopback Server got std::exception: " << exc.what();
+    return EXIT_FAILURE;
+  }
+  catch (...)
+  {
+    std::cerr << "XmlRpc Loopback Server got unknown type exeption";
+    return EXIT_FAILURE;
+  }
+
+  return EXIT_SUCCESS;
 }
 
 //===========================================================================

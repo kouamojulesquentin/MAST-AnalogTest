@@ -465,7 +465,7 @@ t_ACCESS_INTERFACE  node_name AI_identifier AI_protocol_parameters
     try
     {
       auto& factories = AccessInterfaceProtocolFactories::Instance();
-      auto  protocol  = factories.CreateProtocol(protocolName, protocolParameters);
+      auto  protocol  = factories.Create(protocolName, protocolParameters);
 
       if (!protocol)
       {
@@ -498,13 +498,13 @@ t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_
   const auto  nbDRChains         = $7;
   const auto  nbDerivations      = nbDRChains + 1u;
 
-  string      factoryName("JTAG_");
-  factoryName.append(protocolName);
+  string      creatorId("JTAG_");
+  creatorId.append(protocolName);
 
   try
   {
     auto& factories = AccessInterfaceProtocolFactories::Instance();
-    auto  protocol  = factories.CreateProtocol(factoryName, protocolParameters);
+    auto  protocol  = factories.Create(creatorId, protocolParameters);
 
     if (!protocol)
     {

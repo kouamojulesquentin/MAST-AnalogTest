@@ -57,14 +57,14 @@ void UT_AccessInterfaceProtocolFactories::test_Instance ()
   CxxTest::setAbortTestOnFail(true);
   TS_ASSERT_NOT_NULLPTR (pInstance);
 
-  TS_ASSERT_EQUALS (pInstance->RegisteredFactoriesCount(), 6u);   // This is to detect when a test must be added for a new default factory
+  TS_ASSERT_EQUALS (pInstance->RegisteredCreatorsCount(), 6u);   // This is to detect when a test must be added for a new default factory
 }
 
 
 
-//! Checks AccessInterfaceProtocolFactories::CreateProtocol() when must be successful
+//! Checks AccessInterfaceProtocolFactories::Create() when must be successful
 //!
-void UT_AccessInterfaceProtocolFactories::test_CreateProtocol_Success ()
+void UT_AccessInterfaceProtocolFactories::test_Create_Success ()
 {
   // ---------------- DDT Setup
   //
@@ -72,8 +72,8 @@ void UT_AccessInterfaceProtocolFactories::test_CreateProtocol_Success ()
   {
     // ---------------- Setup
     //
-    auto  factoryName          = std::get<0>(data);
-    auto  factoryParameters    = std::get<1>(data);
+    auto  creatorId            = std::get<0>(data);
+    auto  creatorParameters    = std::get<1>(data);
     auto& expectedProtocolType = std::get<2>(data);
 
     auto& instance = AccessInterfaceProtocolFactories::Instance();
@@ -84,7 +84,7 @@ void UT_AccessInterfaceProtocolFactories::test_CreateProtocol_Success ()
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS_NOTHING (protocol = instance.CreateProtocol(factoryName, factoryParameters));
+    TS_ASSERT_THROWS_NOTHING (protocol = instance.Create(creatorId, creatorParameters));
 
     // ---------------- Verify
     //
@@ -115,9 +115,9 @@ void UT_AccessInterfaceProtocolFactories::test_CreateProtocol_Success ()
 }
 
 
-//! Checks AccessInterfaceProtocolFactories::CreateProtocol() when must detect an error
+//! Checks AccessInterfaceProtocolFactories::Create() when must detect an error
 //!
-void UT_AccessInterfaceProtocolFactories::test_CreateProtocol_Error ()
+void UT_AccessInterfaceProtocolFactories::test_Create_Error ()
 {
   // ---------------- DDT Setup
   //
@@ -125,8 +125,8 @@ void UT_AccessInterfaceProtocolFactories::test_CreateProtocol_Error ()
   {
     // ---------------- Setup
     //
-    auto factoryName       = std::get<0>(data);
-    auto factoryParameters = std::get<1>(data);
+    auto creatorId         = std::get<0>(data);
+    auto creatorParameters = std::get<1>(data);
 
     auto& instance = AccessInterfaceProtocolFactories::Instance();
 
@@ -136,7 +136,7 @@ void UT_AccessInterfaceProtocolFactories::test_CreateProtocol_Error ()
 
     // ---------------- Exercise & Verify
     //
-    TS_ASSERT_THROWS (protocol = instance.CreateProtocol(factoryName, factoryParameters), std::exception);
+    TS_ASSERT_THROWS (protocol = instance.Create(creatorId, creatorParameters), std::exception);
   };
 
   auto data =
@@ -173,7 +173,7 @@ void UT_AccessInterfaceProtocolFactories::test_Clear ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS (sut.RegisteredFactoriesCount(), 0u);
+  TS_ASSERT_EQUALS (sut.RegisteredCreatorsCount(), 0u);
 }
 
 
@@ -192,34 +192,34 @@ void UT_AccessInterfaceProtocolFactories::test_InitializeWithDefaults ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_GREATER_THAN_EQUALS (sut.RegisteredFactoriesCount(), 6u);
+  TS_ASSERT_GREATER_THAN_EQUALS (sut.RegisteredCreatorsCount(), 6u);
 }
 
 
 
-//! Checks AccessInterfaceProtocolFactories::AddFactory() when adding a new one on top of default one
+//! Checks AccessInterfaceProtocolFactories::RegisterCreator() when adding a new one on top of default one
 //!
-void UT_AccessInterfaceProtocolFactories::test_AddFactory_NewOne_when_Defaults ()
+void UT_AccessInterfaceProtocolFactories::test_RegisterCreator_NewOne_when_Defaults ()
 {
   // ---------------- Setup
   //
   auto& sut         = AccessInterfaceProtocolFactories::Instance();
-  auto  nbFactories = sut.RegisteredFactoriesCount();
+  auto  nbFactories = sut.RegisteredCreatorsCount();
 
   auto  newFactory  = [](const string& nbDerivations) { return make_shared<STIL_EmulationProtocol>(nbDerivations); };
 
   // ---------------- Exercise
   //
-  sut.AddFactory("Foo", newFactory);
+  sut.RegisterCreator("Foo", newFactory);
 
   // ---------------- Verify
   //
   CxxTest::setAbortTestOnFail(true);
 
-  auto newNbFactories = sut.RegisteredFactoriesCount();
+  auto newNbFactories = sut.RegisteredCreatorsCount();
   TS_ASSERT_EQUALS (newNbFactories, nbFactories + 1u);
 
-  auto protocol = sut.CreateProtocol("Foo", "12");
+  auto protocol = sut.Create("Foo", "12");
   TS_ASSERT_NOT_NULLPTR (protocol);
 
   const auto&       actualProtocolType = typeid(*protocol);
@@ -232,9 +232,9 @@ void UT_AccessInterfaceProtocolFactories::test_AddFactory_NewOne_when_Defaults (
 }
 
 
-//! Checks AccessInterfaceProtocolFactories::AddFactory() when adding a new one when none are registeres
+//! Checks AccessInterfaceProtocolFactories::RegisterCreator() when adding a new one when none are registeres
 //!
-void UT_AccessInterfaceProtocolFactories::test_AddFactory_NewOne_when_None ()
+void UT_AccessInterfaceProtocolFactories::test_RegisterCreator_NewOne_when_None ()
 {
   // ---------------- Setup
   //
@@ -245,16 +245,16 @@ void UT_AccessInterfaceProtocolFactories::test_AddFactory_NewOne_when_None ()
 
   // ---------------- Exercise
   //
-  sut.AddFactory("Foo", newFactory);
+  sut.RegisterCreator("Foo", newFactory);
 
   // ---------------- Verify
   //
   CxxTest::setAbortTestOnFail(true);
 
-  auto newNbFactories = sut.RegisteredFactoriesCount();
+  auto newNbFactories = sut.RegisteredCreatorsCount();
   TS_ASSERT_EQUALS (newNbFactories, 1u);
 
-  auto protocol = sut.CreateProtocol("Foo", "13");
+  auto protocol = sut.Create("Foo", "13");
   TS_ASSERT_NOT_NULLPTR (protocol);
 
   const auto&       actualProtocolType = typeid(*protocol);
@@ -266,9 +266,9 @@ void UT_AccessInterfaceProtocolFactories::test_AddFactory_NewOne_when_None ()
   TS_ASSERT_EQUALS (asSTILL_EmulationProtocol->MaxSupportedDerivations(), 13u);
 }
 
-//! Checks AccessInterfaceProtocolFactories::AddFactory() when replacing a default one
+//! Checks AccessInterfaceProtocolFactories::RegisterCreator() when replacing a default one
 //!
-void UT_AccessInterfaceProtocolFactories::test_AddFactory_Replace_Default ()
+void UT_AccessInterfaceProtocolFactories::test_RegisterCreator_Replace_Default ()
 {
   // ---------------- Setup
   //
@@ -276,21 +276,21 @@ void UT_AccessInterfaceProtocolFactories::test_AddFactory_Replace_Default ()
   sut.Clear();  // Remove default factories added at construction
   sut.InitializeWithDefaults();
 
-  auto  nbFactories = sut.RegisteredFactoriesCount();
+  auto  nbFactories = sut.RegisteredCreatorsCount();
   auto  newFactory  = [](const string& nbDerivations) { return make_shared<STIL_EmulationProtocol>(nbDerivations); };
 
   // ---------------- Exercise
   //
-  sut.AddFactory("STIL_Emulation", newFactory);
+  sut.RegisterCreator("STIL_Emulation", newFactory);
 
   // ---------------- Verify
   //
   CxxTest::setAbortTestOnFail(true);
 
-  auto newNbFactories = sut.RegisteredFactoriesCount();
+  auto newNbFactories = sut.RegisteredCreatorsCount();
   TS_ASSERT_EQUALS (newNbFactories, nbFactories);
 
-  auto protocol = sut.CreateProtocol("STIL_Emulation", "14");
+  auto protocol = sut.Create("STIL_Emulation", "14");
   TS_ASSERT_NOT_NULLPTR (protocol);
 
   const auto&       actualProtocolType = typeid(*protocol);

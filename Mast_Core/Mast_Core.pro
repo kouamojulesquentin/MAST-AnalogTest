@@ -95,6 +95,7 @@ HEADERS += \
     include/DefaultTableBasedPathSelector.hpp           \
     include/DefaultOneHotPathSelector.hpp               \
     include/DefaultNHotPathSelector.hpp                 \
+    include/Factory.hpp                                 \
     include/GenericAccessInterfaceProtocol.hpp          \
     include/GmlPrinter.hpp                              \
     include/FromSutUpdater.hpp                          \

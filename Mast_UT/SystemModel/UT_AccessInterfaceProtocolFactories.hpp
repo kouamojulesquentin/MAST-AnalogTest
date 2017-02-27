@@ -23,27 +23,23 @@
 class UT_AccessInterfaceProtocolFactories : public CxxTest::TestSuite
 {
   public:
-  UT_AccessInterfaceProtocolFactories() = default;
-  virtual ~UT_AccessInterfaceProtocolFactories() = default;
+  ~UT_AccessInterfaceProtocolFactories() = default;
+   UT_AccessInterfaceProtocolFactories() = default;
 
   // ================ Test Methods ================
 
   void test_Instance ();
-  void test_CreateProtocol_Success ();
-  void test_CreateProtocol_Error ();
+  void test_Create_Success ();
+  void test_Create_Error ();
 
   // ---------------- Protocols Management
   //
   void test_Clear ();
   void test_InitializeWithDefaults ();
 
-
-  void test_AddFactory_NewOne_when_Defaults ();
-  void test_AddFactory_NewOne_when_None ();
-  void test_AddFactory_Replace_Default ();
-
-  // ================ Other Methods ================
-
+  void test_RegisterCreator_NewOne_when_Defaults ();
+  void test_RegisterCreator_NewOne_when_None ();
+  void test_RegisterCreator_Replace_Default ();
 };
 //
 //  End of UT_AccessInterfaceProtocolFactories class declaration

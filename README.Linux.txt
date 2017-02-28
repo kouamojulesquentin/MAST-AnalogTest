@@ -32,9 +32,9 @@ Xml RPC may be needed for optional features.
         - make sure you have execution right on files
           - configure
           - install-sh
-        - ./configure  --prefix=$(pwd)/build
+        - ./configure  --prefix=$(pwd)/../Install/xmlrpc-c
         - make
-        - make intall
+        - make install
         - That should be all
     - MastXmlRpc Mast libraries related to XmlRpc (in Optional_Libs directory)
 

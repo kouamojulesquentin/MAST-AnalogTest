@@ -68,9 +68,10 @@ SET_SOURCE_FILES_PROPERTIES(${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc   GENERATED)
 #+include_directories(${CMAKE_BINARY_DIR}/SIT_parser/)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
-include_directories(../Mast_Core/include/)
-include_directories(../Logger/)
-include_directories(../Logger/g3log/)
+include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
+include_directories(${LIBLOGGER_INCLUDE_DIRS})
+
+set(LIBSIT_READER_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/." PARENT_SCOPE)
 
 if (${INTEL_EXPERIMENT})
 #+  message("Cmake.Sit_Reader: Using INTEL_EXPERIMENT")

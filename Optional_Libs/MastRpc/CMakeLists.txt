@@ -11,8 +11,11 @@ if (WIN32)
 endif()
 
 set(BaseProjectPath "../..")
-include_directories(${BaseProjectPath}/Mast_Core/include/)
+
 include_directories(.)
+include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
+
+set(LIBMASTRPC_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/." PARENT_SCOPE)
 
 set_property(GLOBAL PROPERTY CXX_STANDARD          03)
 set_property(GLOBAL PROPERTY CXX_STANDARD_REQUIRED ON)

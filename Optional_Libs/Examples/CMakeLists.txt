@@ -22,9 +22,9 @@ if (USE_XML_RPC)
   message(STATUS "Optionals_Examples: CMAKE_CXX_COMPILER_ID:  ${CMAKE_CXX_COMPILER_ID}")
 
   include_directories(${LIBXMLRPC_INCLUDE_DIRS})
-  include_directories(../../Mast_Core/include/)
-  include_directories(../MastRpc)
-  include_directories(../MastXmlRpc)
+  include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
+  include_directories(${LIBMASTRPC_INCLUDE_DIRS})
+  include_directories(${LIBMASTXMLRPC_INCLUDE_DIRS})
 
   set_property(GLOBAL PROPERTY CXX_STANDARD          03)
   set_property(GLOBAL PROPERTY CXX_STANDARD_REQUIRED ON)
@@ -33,7 +33,7 @@ if (USE_XML_RPC)
 #+  set(FLAGS    "-std=c++03 -fPIC -g ${WARNINGS}")
 
   set(XML_RPC_LOOPBACK_SERVER_SOURCES  "./XmlRpc_Loopback_Server.cpp")
-  message(STATUS "Optionals_Examples: XML_RPC_LOOPBACK_SERVER_SOURCES: ${XML_RPC_LOOPBACK_SERVER_SOURCES  }")
+  message(STATUS "Optionals_Examples: XML_RPC_LOOPBACK_SERVER_SOURCES: ${XML_RPC_LOOPBACK_SERVER_SOURCES}")
 
   add_executable        (XmlRpc_Loopback_Server "${XML_RPC_LOOPBACK_SERVER_SOURCES}")
   set_target_properties (XmlRpc_Loopback_Server PROPERTIES COMPILE_FLAGS "${FLAGS}" )

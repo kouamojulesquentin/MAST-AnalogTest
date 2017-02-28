@@ -10,9 +10,8 @@ else()
 
   file(GLOB Intel_SOURCES "src/*.cpp")
   include_directories(./src/)
-  include_directories(../Mast_Core/include/)
-  include_directories(../Logger/)
-  include_directories(../Logger/g3log/)
+  include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
+  include_directories(${LIBLOGGER_INCLUDE_DIRS})
 
   add_library           (Intel_Exp SHARED     ${Intel_SOURCES})
   set_target_properties (Intel_Exp PROPERTIES COMPILE_FLAGS "${CFLAGS}")

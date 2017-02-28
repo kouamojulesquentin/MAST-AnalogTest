@@ -4,6 +4,7 @@ include_directories(./)
 include_directories(g3log/)
 include_directories(Unix/)
 include_directories(Windows/)
+set(LIBLOGGER_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/g3log" "${CMAKE_CURRENT_SOURCE_DIR}/." PARENT_SCOPE)
 
 add_definitions(${LOGGER_WARNINGS})
 set (LOGGER_WARNINGS "-Wall -Wextra -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-include-dirs -Wswitch-enum -Wswitch-default")

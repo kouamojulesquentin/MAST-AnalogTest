@@ -10,12 +10,12 @@ set (P_WARNINGS "-Wall -Wno-sign-compare -Wnon-virtual-dtor -Wredundant-decls -W
 add_definitions(${P_CFLAGS})
 set (P_CFLAGS "${P_WARNINGS} -std=c++14")
 
-include_directories(../Mast_Core/include/)
-include_directories(../Mast/CPP_API/)
-include_directories(../Mast/C_API/)
-include_directories(../Logger/)
-include_directories(../Logger/g3log/)
-include_directories(../SIT_reader/)
+include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
+include_directories(${LIBMAST_CPP_API_INCLUDE_DIRS})
+include_directories(${LIBMAST_C_API_INCLUDE_DIRS})
+include_directories(${LIBLOGGER_INCLUDE_DIRS})
+include_directories(${LIBSIT_READER_INCLUDE_DIRS})
+
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
 

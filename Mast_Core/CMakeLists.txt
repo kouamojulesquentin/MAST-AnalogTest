@@ -1,15 +1,20 @@
 project(Mast_Core)
 
 include_directories(include/)
-include_directories(../Logger/)
-include_directories(../Logger/g3log/)
+include_directories(${LIBLOGGER_INCLUDE_DIRS})
 
-set(LIBUSB_CFLAGS "")
-set(HIDAPI_CFLAGS "")
-set(LIBFTDISPI_CFLAGS "")
+set(LIBUSB_CFLAGS             "")
+set(HIDAPI_CFLAGS             "")
+set(LIBFTDISPI_CFLAGS         "")
+set(LIBMAST_CORE_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include/" PARENT_SCOPE)
 
-message("Mast_Core.CMake: USE_OPEN_OCD: ${USE_OPEN_OCD}")
-message("Mast_Core.CMake: USE_LIBFTDISPI: ${USE_LIBFTDISPI}")
+
+message("")
+message("================================================================================")
+message(STATUS "Mast_Core:  USE_OPEN_OCD:               ${USE_OPEN_OCD}")
+message(STATUS "Mast_Core:  USE_LIBFTDISPI:             ${USE_LIBFTDISPI}")
+message("================================================================================")
+message("")
 
 
 if (${USE_OPEN_OCD})

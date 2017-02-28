@@ -2,10 +2,12 @@ project(mast)
 
 include_directories(CPP_API/)
 include_directories(C_API/)
-include_directories(../Mast_Core/include/)
-include_directories(../Logger/)
-include_directories(../Logger/g3log/)
-include_directories(../SIT_reader/)
+include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
+include_directories(${LIBLOGGER_INCLUDE_DIRS})
+include_directories(${LIBSIT_READER_INCLUDE_DIRS})
+
+set(LIBMAST_CPP_API_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/CPP_API" PARENT_SCOPE)
+set(LIBMAST_C_API_INCLUDE_DIRS   "${CMAKE_CURRENT_SOURCE_DIR}/C_API"   PARENT_SCOPE)
 
 set (CFLAGS "${CFLAGS}")
 

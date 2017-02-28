@@ -42,9 +42,10 @@ set(ServerSources XmlRpc_Protocol_Common.hpp
                   XmlRpc_Protocol_Server.cpp
                   XmlRpc_Protocol_Server.hpp)
 
-include_directories(${BaseProjectPath}/Mast_Core/include/)
 include_directories(${LIBXMLRPC_INCLUDE_DIRS})
+include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
 
+set(LIBMASTXMLRPC_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/." PARENT_SCOPE)
 message("")
 message("================================================================================")
 message(STATUS "MastXmlRpc: CMAKE_LINK_LIBRARY_FLAG:  ${CMAKE_LINK_LIBRARY_FLAG}")

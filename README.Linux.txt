@@ -32,7 +32,7 @@ Xml RPC may be needed for optional features.
         - make sure you have execution right on files
           - configure
           - install-sh
-        - ./configure  --prefix=$(pwd)/../Install/xmlrpc-c
+        - ./configure  --prefix=$(pwd)/../xmlrpc-c/build
         - make
         - make install
         - That should be all

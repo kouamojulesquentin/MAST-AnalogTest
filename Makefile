@@ -60,6 +60,7 @@ CPP_EXAMPLE_EXE_NAME = MastExample_CPP
 SIT_READER_EXE_NAME  = SIT_reader_demo
 SIT_UT_EXE_NAME      = SIT_Reader_UT
 
+
 MAST_UT_EXE_PATH      = $(BIN_DIR)/$(MAST_UT_EXE_NAME)
 OPTIONAL_UT_EXE_PATH  = $(BIN_DIR)/$(OPTIONAL_UT_EXE_NAME)
 SIT_UT_EXE_PATH       = $(BIN_DIR)/$(SIT_UT_EXE_NAME)
@@ -68,6 +69,12 @@ SIT_READER_INPUT_FILE = ../../SIT_reader/prova.txt
 TESTCASES_EXE_PATH    = $(BIN_DIR)/$(TESTCASES_EXE_NAME)
 CPP_EXAMPLE_EXE_PATH  = $(BIN_DIR)/$(CPP_EXAMPLE_EXE_NAME)
 endif
+
+EXTDIR_ROOT_DIR=External_Libs
+EXTDIR_INSTALL_DIR=Install
+XMLRPC_ROOT_DIR = xmlrpc-c
+CMAKE_FLAGS+= -DEXTDIR_INSTALL_DIR_ABS=$(PWD)/$(EXTDIR_ROOT_DIR)/$(EXTDIR_INSTALL_DIR)
+CMAKE_FLAGS+= -DXMLRPC_ROOT_DIR=$(XMLRPC_ROOT_DIR)
 
 #+BUILD_UT = ON
 
@@ -91,6 +98,7 @@ MAKE_FLAGS= -j4
 
 OPENOCD_INSTALL_DIR=./openocd/
 
+
 all: debug
 
 ifeq ("$(USE_OPEN_OCD)","ON")
@@ -100,6 +108,12 @@ else
 debug:   debug_cmake
 release: release_cmake
 endif
+
+external_libs: xmlrpc-c
+
+xmlrpc-c: 
+> cd       $(EXTDIR_ROOT_DIR)/$(XMLRPC_ROOT_DIR) && ./configure  --prefix=$(PWD)/$(EXTDIR_ROOT_DIR)/$(EXTDIR_INSTALL_DIR)/$(XMLRPC_ROOT_DIR)
+> cd       $(EXTDIR_ROOT_DIR)/$(XMLRPC_ROOT_DIR) && make && make install
 
 debug_cmake:
 ifeq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR))","")

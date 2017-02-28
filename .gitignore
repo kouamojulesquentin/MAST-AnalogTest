@@ -95,6 +95,9 @@ Intel/src/archive/
 *.gml
 *.sit
 build
+/External_Libs/xmlrpc-c/lib/*.so
+/External_Libs/xmlrpc-c/lib/*.so*
+/External_Libs/xmlrpc-c/lib/*.a
 /External_Libs/xmlrpc-c/lib/*/*.so
 /External_Libs/xmlrpc-c/config.log
 /External_Libs/xmlrpc-c/config.mk

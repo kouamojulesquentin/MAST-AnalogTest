@@ -16,23 +16,31 @@
 #include "AppFunctionAndNodePath_CPP.hpp"
 #include "AppFunctionAndName_CPP.hpp"
 #include "SystemModelAdapter_CPP.hpp"
+#include "DefaultMastMain.hpp"
+#include "Utility.hpp"
 
 #include <vector>
 #include <string>
 #include <iostream>
 using std::vector;
+using std::string;
 
 using namespace mast;
 
-extern std::string                               GetSitModelFilePath       (int argc, char* argv []);
-extern std::vector<mast::AppFunctionAndName>     GetAlgorithmsNames        (int argc, char* argv []);
-extern std::vector<mast::AppFunctionAndNodePath> GetAlgorithmsAndNodePaths (int argc, char* argv []);
+extern void                          Init                      (int argc, char* argv []); //!< Does special init for specific example (can do nothing)
+extern string                        GetSitModelFilePath       (int argc, char* argv []); //!< Returns path for SIT file describing System Model
+extern vector<AppFunctionAndName>    GetAlgorithmsNames        (int argc, char* argv []); //!< Returns associations between a PDL algorithm function and a name
+extern vector<AppFunctionAndNodePath> GetAlgorithmsAndNodePaths (int argc, char* argv []); //!< Returns associations be ween a PDL algorithm function and a node path
 
-#include "DefaultMastMain.hpp"
 
 using namespace mast;
 
 //! Runs some mast example main
+//!
+//! @note This is just a skeleton that can be shared between different kind of examples
+//! @note - Init may do something to initialize the example
+//!       - GetSitModelFilePath must return a valid SIT file path
+//!       - Either GetAlgorithmsNames or GetAlgorithmsAndNodePaths must return non empty association
 //!
 int DefaultMastMain (int argc, char* argv [])
 {
@@ -41,11 +49,28 @@ int DefaultMastMain (int argc, char* argv [])
   try
   {
     auto session     = Session(true);  // True enable logging
+
+    Init(argc, argv);
+
     auto sitFilePath = GetSitModelFilePath (argc, argv);
 
     if (sitFilePath.empty())
     {
       throw std::runtime_error("A valid SIT file path must be provided !");
+    }
+
+    if (!Utility::FileExists(sitFilePath))
+    {
+      auto withPathPrefix = string("SIT/") + sitFilePath;
+      if (Utility::FileExists(withPathPrefix))
+      {
+        sitFilePath = withPathPrefix;
+      }
+
+      if (!Utility::FileExists(sitFilePath))
+      {
+        throw std::runtime_error(string("Cannot find SIT file: ") + sitFilePath);
+      }
     }
 
     auto algoAndNames = GetAlgorithmsNames  (argc, argv);
@@ -74,12 +99,12 @@ int DefaultMastMain (int argc, char* argv [])
     }
     std::cout << "Mast example done\n";
   }
-  catch(std::invalid_argument& exc) { retCode = -1; std::cout << exc.what(); }
-  catch(std::out_of_range&     exc) { retCode = -1; std::cout << exc.what(); }
-  catch(std::logic_error&      exc) { retCode = -1; std::cout << exc.what(); }
-  catch(std::runtime_error&    exc) { retCode = -1; std::cout << exc.what(); }
-  catch(std::exception&        exc) { retCode = -1; std::cout << exc.what(); }
-  catch(...)                        { retCode = -1; std::cout << "Got non std::exception"; }
+  catch(std::invalid_argument& exc) { retCode = -1; std::cout << exc.what() << std::endl; }
+  catch(std::out_of_range&     exc) { retCode = -1; std::cout << exc.what() << std::endl; }
+  catch(std::logic_error&      exc) { retCode = -1; std::cout << exc.what() << std::endl; }
+  catch(std::runtime_error&    exc) { retCode = -1; std::cout << exc.what() << std::endl; }
+  catch(std::exception&        exc) { retCode = -1; std::cout << exc.what() << std::endl; }
+  catch(...)                        { retCode = -1; std::cout << "Got non std::exception" << std::endl; }
 
   return retCode;
 }

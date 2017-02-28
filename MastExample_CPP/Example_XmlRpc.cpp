@@ -1,30 +1,33 @@
 //===========================================================================
-//                           Example.cpp
+//                           Example_XmlRpc.cpp
 //===========================================================================
-//! @file Example.cpp
+// Copyright (C) 2017 G-INP/Tima. All rights reserved.
+//
+// Project : Mast
+//
+//! @file Example_XmlRpc.cpp
 //!
-//! Example of PDL like algorithm implementation and association to node
+//! Implements specific initialization for example based upon Xml-Rpc client-server
 //!
 //===========================================================================
 
 #include "AppFunctionAndNodePath_CPP.hpp"
 #include "AppFunctionAndName_CPP.hpp"
 #include "PDL_Adapter_CPP.hpp"
-//+#include "g3log/g3log.hpp"
+#include "XmlRpc_Protocol_Client.hpp"
+#include "RemoteProtocolFactory.hpp"
 
-#include <string>
-#include <vector>
-
-
-using std::vector;
 using std::string;
+using std::vector;
+using std::shared_ptr;
+using std::make_shared;
 
-using namespace std::string_literals;
 using namespace mast;
 
-std::string                               GetSitModelFilePath       (int argc, char* argv []);
-std::vector<mast::AppFunctionAndName>     GetAlgorithmsNames        (int argc, char* argv []);
-std::vector<mast::AppFunctionAndNodePath> GetAlgorithmsAndNodePaths (int argc, char* argv []);
+void                           Init                      (int argc, char* argv []);
+string                         GetSitModelFilePath       (int argc, char* argv []);
+vector<AppFunctionAndName>     GetAlgorithmsNames        (int argc, char* argv []);
+vector<AppFunctionAndNodePath> GetAlgorithmsAndNodePaths (int argc, char* argv []);
 
 
 namespace
@@ -170,6 +173,7 @@ vector<mast::AppFunctionAndName> GetAlgorithmsNames (int /* argc */, char* /* ar
 //---------------------------------------------------------------------------
 
 
+
 //! Returns SIT formatted file path to create a SystemModel from.
 //!
 string GetSitModelFilePath (int argc, char* argv[])
@@ -179,13 +183,26 @@ string GetSitModelFilePath (int argc, char* argv[])
     return string(argv[1]);
   }
 
-  return "Example.sit";
+  return "Example_XmlRpc.sit";
 }
 //
 //  End of: GetSitModelFilePath
 //---------------------------------------------------------------------------
 
 
+
+
+//! Doe special init for specific example (can do nothing)
+//!
+void Init (int /* argc */, char* /* argv */ [])
+{
+  auto& factory = RemoteProtocolFactory::Instance();
+
+  factory.RegisterCreator("XmlRpc", [](const string& /* parameters */) { return make_shared<XmlRpc_Protocol_Client>(); } );
+}
+
+
+
 //===========================================================================
-// End of Example.cpp
+// End of Example_XmlRpc.cpp
 //===========================================================================

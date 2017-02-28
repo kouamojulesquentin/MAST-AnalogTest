@@ -56,7 +56,7 @@ windowing (int n, kiss_fft_scalar *data, float scale,  kiss_fft_scalar *out)
 return;
 }
 
-  //! This algorithm Computes the FFT 
+  //! This algorithm Computes the FFT
   //!
   void compute_FFT ()
   {
@@ -76,7 +76,7 @@ return;
     kissCfg = kiss_fftr_alloc(n_samples, 0, 0, 0);
     std::cout << "Retrieving " << n_samples << " samples from " <<registerPath << "\n";
     while (i<n_samples)
-    {  
+    {
      curValue=iGetRefresh<uint16_t>(registerPath);
      if (curValue==0)
         adcValue =  static_cast<kiss_fft_scalar>(-1);
@@ -86,10 +86,10 @@ return;
      i++;
     }
      std::cout << "Applying Blackman windowing\n";
-   windowing (n_samples, adcSamples, 1.0,adcSamples);     
+   windowing (n_samples, adcSamples, 1.0,adcSamples);
      std::cout << "Running FFT\n";
-     kiss_fftr(kissCfg, adcSamples, fftOutput);  
-   
+     kiss_fftr(kissCfg, adcSamples, fftOutput);
+
    ofstream out_real,out_complex;
    out_real.open   ("Output_real.dat");
    out_complex.open("Output_complex.dat");
@@ -102,14 +102,14 @@ return;
     }
    out_real.close();
    out_complex.close();
-   
+
    /*Making image*/
 /*   nfft = n_samples;
   fout = fopen("FFT.png","wb");
   make_png(fftOutput);
 
   fclose(fout);*/
- 
+
  }
   //
   //  End of: Algo_Increment
@@ -154,7 +154,7 @@ vector<mast::AppFunctionAndName> GetAlgorithmsNames (int /* argc */, char* /* ar
   return names;
 }
 //
-//  End of: GetSitModelFilePath
+//  End of: GetAlgorithmsNames
 //---------------------------------------------------------------------------
 
 

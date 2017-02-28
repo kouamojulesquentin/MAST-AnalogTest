@@ -1,0 +1,11 @@
+ACCESS_INTERFACE TAP RemoteProxy "RST, SIR, SDR, §KIND:Remote_Loopback§, §ID:XmlRpc§, http://localhost:8080/RPC2"
+{
+  WRAPPER_1500 W_1500 4
+  PDL Incr, Decr, Copy, Shift
+  {
+    REGISTER reg_0 12 Hold_value Bypass: "0b0001:0110:1100"
+    REGISTER reg_1 16 Hold_value Bypass: "0xAA55"
+    REGISTER reg_2 24 Hold_value Bypass: "0x842100"
+    REGISTER reg_3 25            Bypass: "0b1/xCABEEF"
+  }
+}

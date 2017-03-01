@@ -3,6 +3,9 @@
 cmake_minimum_required(VERSION 3.5)
 project(MastExample_CPP)
 
+message("MastExample_CPP.CMake:   INTEL_EXPERIMENT: ${INTEL_EXPERIMENT}")
+message("MastExample_CPP.CMake:   KISSFFT: ${KISSFFT}")
+
 add_definitions(${P_WARNINGS})
 set (P_WARNINGS "-Wall -Wno-sign-compare -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-include-dirs")
 add_definitions(${P_CFLAGS})
@@ -31,6 +34,8 @@ if (WIN32) # Package png not installed on Windows ==> Cannot use kiss_fft (as is
   target_link_libraries(MastExample_CPP Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
   target_link_libraries(Tutorial        Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
 else ()
+  if (${KISSFFT})
+
   include_directories(kissfft/)
   include_directories(kissfft/tools)
 
@@ -48,17 +53,22 @@ else ()
   add_library           (kiss_fft SHARED     ${KissFFT_Files})
   set_target_properties (kiss_fft PROPERTIES COMPILE_FLAGS "-Wall" )
 
-  add_executable        (Intel main.cpp   DefaultMastMain.cpp EmptyInit.cpp Intel.cpp)
-  set_target_properties (Intel PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
-
   add_executable        (ML505 main.cpp    DefaultMastMain.cpp EmptyInit.cpp ml505_demo.cpp)
   set_target_properties (ML505 PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
-  add_executable        (ML505SPI main.cpp DefaultMastMain.cpp EmptyInit.cpp ml505_spi.cpp)
-  set_target_properties (ML505SPI PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
-
   add_executable        (ETS17 main.cpp    DefaultMastMain.cpp EmptyInit.cpp ETS17.cpp)
   set_target_properties (ETS17 PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+
+  target_link_libraries(ML505           Mast Mast_Core SIT_Reader_Lib pthread dl kiss_fft)
+  target_link_libraries(ETS17           Mast Mast_Core SIT_Reader_Lib pthread dl kiss_fft ${PNG_LIBRARY})
+
+  endif()
+
+  add_executable        (Intel main.cpp   DefaultMastMain.cpp EmptyInit.cpp Intel.cpp)
+  set_target_properties (Intel PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+
+  add_executable        (ML505SPI main.cpp DefaultMastMain.cpp EmptyInit.cpp ml505_spi.cpp)
+  set_target_properties (ML505SPI PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
   if (USE_XML_RPC)
     include_directories(${LIBMASTRPC_INCLUDE_DIRS})
@@ -72,9 +82,9 @@ else ()
   target_link_libraries(MastExample_CPP Mast Mast_Core SIT_Reader_Lib pthread dl)
   target_link_libraries(Tutorial        Mast Mast_Core SIT_Reader_Lib pthread dl)
   target_link_libraries(Intel           Mast Mast_Core SIT_Reader_Lib pthread dl)
-  target_link_libraries(ML505           Mast Mast_Core SIT_Reader_Lib pthread dl kiss_fft)
   target_link_libraries(ML505SPI        Mast Mast_Core SIT_Reader_Lib pthread dl)
-  target_link_libraries(ETS17           Mast Mast_Core SIT_Reader_Lib pthread dl kiss_fft ${PNG_LIBRARY})
+
+
 endif ()
 
 message("")

@@ -40,7 +40,7 @@ class DLL_EXPORT Factory
   virtual ~Factory() = default;
   Factory()  = default;
 
-  using Creator_t = std::function<std::shared_ptr<BuildType>(const std::string& parameters)>;
+  using Creator_t = std::function<std::unique_ptr<BuildType>(const std::string& parameters)>;
 
   //! Fills up with default creation methods
   //! @note Default creation methods a those that must not be registered explicitly
@@ -72,7 +72,7 @@ class DLL_EXPORT Factory
   //! @param creatorId    A name that identifies registered creation method
   //! @param parameters   String of (optional) parameters
   //!
-  virtual std::shared_ptr<BuildType> Create(const std::string& creatorId, const std::string& parameters = "") const = 0;
+  virtual std::unique_ptr<BuildType> Create(const std::string& creatorId, const std::string& parameters = "") const = 0;
 
   // ---------------- Protected Methods
   //
@@ -87,9 +87,9 @@ class DLL_EXPORT Factory
   //!
   //!
   //! @return Created instance or nullptr when no creation method has been register with given name
-  std::shared_ptr<BuildType> CreateImpl(const std::string& creatorId, const std::string& parameters = "") const
+  std::unique_ptr<BuildType> CreateImpl(const std::string& creatorId, const std::string& parameters = "") const
   {
-    std::shared_ptr<BuildType> instance;
+    std::unique_ptr<BuildType> instance;
 
     auto pos = m_creators.find(creatorId);
     if (pos != m_creators.end())

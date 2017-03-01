@@ -71,15 +71,6 @@ class Remote_Protocol_Proxy : public AccessInterfaceProtocol
   //!
   virtual void DoReset(bool doSynchronousReset);
 
-
-  // ---------------- Protected Methods
-  //
-  protected:
-
-  // ---------------- Private  Methods
-  //
-  private:
-
   // ---------------- Private  Fields
   //
   private:

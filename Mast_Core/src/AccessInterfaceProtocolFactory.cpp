@@ -27,8 +27,7 @@
 
 
 using std::unique_ptr;
-using std::shared_ptr;
-using std::make_shared;
+using std::make_unique;
 using std::string;
 using std::experimental::string_view;
 
@@ -54,7 +53,7 @@ std::unique_ptr<AccessInterfaceProtocolFactory> AccessInterfaceProtocolFactory::
 
 //! Creates an AccessInterfaceProtocol using ceation function indentified by a name and optional parameters
 //!
-shared_ptr<AccessInterfaceProtocol> AccessInterfaceProtocolFactory::Create (const std::string& creatorId, const std::string& parameters) const
+unique_ptr<AccessInterfaceProtocol> AccessInterfaceProtocolFactory::Create (const std::string& creatorId, const std::string& parameters) const
 {
   auto instance = CreateImpl(creatorId, parameters);
   if (!instance)
@@ -75,13 +74,13 @@ shared_ptr<AccessInterfaceProtocol> AccessInterfaceProtocolFactory::Create (cons
 //!
 void AccessInterfaceProtocolFactory::InitializeWithDefaults ()
 {
-  RegisterCreator("JTAG_Loopback",       [](const string& /* parameters */) { return make_shared<LoopbackAccessInterfaceProtocol>();     });
-  RegisterCreator("JTAG_SVF_Simulation", [](const string& /* parameters */) { return make_shared<SVF_SimulationProtocol>();              });
-  RegisterCreator("JTAG_SVF_Emulation",  [](const string& /* parameters */) { return make_shared<SVF_EmulationProtocol>();               });
-  RegisterCreator("Offline",             [](const string& /* parameters */) { return make_shared<OfflineProtocol>();                     });
-  RegisterCreator("STIL_Emulation",      [](const string& nbDerivations)    { return make_shared<STIL_EmulationProtocol>(nbDerivations); });
-  RegisterCreator("I2C_Emulation",       [](const string& parameters)       { return make_shared<I2C_EmulationProtocol>(parameters);     });
-  RegisterCreator("RemoteProxy",         [](const string& parameters)       { return make_shared<Remote_Protocol_Proxy>(parameters);     });
+  RegisterCreator("JTAG_Loopback",       [](const string& /* parameters */) { return make_unique<LoopbackAccessInterfaceProtocol>();     });
+  RegisterCreator("JTAG_SVF_Simulation", [](const string& /* parameters */) { return make_unique<SVF_SimulationProtocol>();              });
+  RegisterCreator("JTAG_SVF_Emulation",  [](const string& /* parameters */) { return make_unique<SVF_EmulationProtocol>();               });
+  RegisterCreator("Offline",             [](const string& /* parameters */) { return make_unique<OfflineProtocol>();                     });
+  RegisterCreator("STIL_Emulation",      [](const string& nbDerivations)    { return make_unique<STIL_EmulationProtocol>(nbDerivations); });
+  RegisterCreator("I2C_Emulation",       [](const string& parameters)       { return make_unique<I2C_EmulationProtocol>(parameters);     });
+  RegisterCreator("RemoteProxy",         [](const string& parameters)       { return make_unique<Remote_Protocol_Proxy>(parameters);     });
 }
 //
 //  End of: AccessInterfaceProtocolFactory::InitializeWithDefaults

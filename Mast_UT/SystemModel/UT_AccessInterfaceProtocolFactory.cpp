@@ -32,7 +32,7 @@
 using std::tuple;
 using std::make_tuple;
 using std::shared_ptr;
-using std::make_shared;
+using std::make_unique;
 using std::string;
 
 using namespace mast;
@@ -206,7 +206,7 @@ void UT_AccessInterfaceProtocolFactory::test_RegisterCreator_NewOne_when_Default
   auto& sut         = AccessInterfaceProtocolFactory::Instance();
   auto  nbFactories = sut.RegisteredCreatorsCount();
 
-  auto  newFactory  = [](const string& nbDerivations) { return make_shared<STIL_EmulationProtocol>(nbDerivations); };
+  auto  newFactory  = [](const string& nbDerivations) { return make_unique<STIL_EmulationProtocol>(nbDerivations); };
 
   // ---------------- Exercise
   //
@@ -219,7 +219,7 @@ void UT_AccessInterfaceProtocolFactory::test_RegisterCreator_NewOne_when_Default
   auto newNbFactories = sut.RegisteredCreatorsCount();
   TS_ASSERT_EQUALS (newNbFactories, nbFactories + 1u);
 
-  auto protocol = sut.Create("Foo", "12");
+  auto protocol = shared_ptr<AccessInterfaceProtocol>(std::move(sut.Create("Foo", "12")));
   TS_ASSERT_NOT_NULLPTR (protocol);
 
   const auto&       actualProtocolType = typeid(*protocol);
@@ -239,7 +239,7 @@ void UT_AccessInterfaceProtocolFactory::test_RegisterCreator_NewOne_when_None ()
   // ---------------- Setup
   //
   auto& sut         = AccessInterfaceProtocolFactory::Instance();
-  auto  newFactory  = [](const string& nbDerivations) { return make_shared<STIL_EmulationProtocol>(nbDerivations); };
+  auto  newFactory  = [](const string& nbDerivations) { return make_unique<STIL_EmulationProtocol>(nbDerivations); };
 
   sut.Clear();
 
@@ -254,7 +254,7 @@ void UT_AccessInterfaceProtocolFactory::test_RegisterCreator_NewOne_when_None ()
   auto newNbFactories = sut.RegisteredCreatorsCount();
   TS_ASSERT_EQUALS (newNbFactories, 1u);
 
-  auto protocol = sut.Create("Foo", "13");
+  auto protocol = shared_ptr<AccessInterfaceProtocol>(std::move(sut.Create("Foo", "13")));
   TS_ASSERT_NOT_NULLPTR (protocol);
 
   const auto&       actualProtocolType = typeid(*protocol);
@@ -277,7 +277,7 @@ void UT_AccessInterfaceProtocolFactory::test_RegisterCreator_Replace_Default ()
   sut.InitializeWithDefaults();
 
   auto  nbFactories = sut.RegisteredCreatorsCount();
-  auto  newFactory  = [](const string& nbDerivations) { return make_shared<STIL_EmulationProtocol>(nbDerivations); };
+  auto  newFactory  = [](const string& nbDerivations) { return make_unique<STIL_EmulationProtocol>(nbDerivations); };
 
   // ---------------- Exercise
   //
@@ -296,7 +296,7 @@ void UT_AccessInterfaceProtocolFactory::test_RegisterCreator_Replace_Default ()
   const auto&       actualProtocolType = typeid(*protocol);
   TS_ASSERT_EQUALS (actualProtocolType,  typeid(STIL_EmulationProtocol));
 
-  auto asSTILL_EmulationProtocol = std::dynamic_pointer_cast<STIL_EmulationProtocol>(protocol);
+  auto asSTILL_EmulationProtocol = dynamic_cast<STIL_EmulationProtocol*>(protocol.get());
   TS_ASSERT_NOT_NULLPTR (asSTILL_EmulationProtocol);
 
   TS_ASSERT_EQUALS (asSTILL_EmulationProtocol->MaxSupportedDerivations(), 14u);

@@ -48,7 +48,7 @@ class DLL_EXPORT AccessInterfaceProtocolFactory final : public Factory<AccessInt
   //! @param creatorId    A name that identified registered creation function
   //! @param parameters   String of (optional) parameters
   //!
-  virtual std::shared_ptr<AccessInterfaceProtocol> Create(const std::string& creatorId, const std::string& parameters = "") const override;
+  virtual std::unique_ptr<AccessInterfaceProtocol> Create(const std::string& creatorId, const std::string& parameters = "") const override;
 
   //! Fills up with default AccessInterfaceProtocol
   //!

@@ -19,8 +19,8 @@
 
 using std::string;
 using std::vector;
-using std::shared_ptr;
-using std::make_shared;
+using std::unique_ptr;
+using std::make_unique;
 
 using namespace mast;
 
@@ -198,7 +198,7 @@ void Init (int /* argc */, char* /* argv */ [])
 {
   auto& factory = RemoteProtocolFactory::Instance();
 
-  factory.RegisterCreator("XmlRpc", [](const string& /* parameters */) { return make_shared<XmlRpc_Protocol_Client>(); } );
+  factory.RegisterCreator("XmlRpc", [](const string& /* parameters */) { return make_unique<XmlRpc_Protocol_Client>(); } );
 }
 
 

@@ -27,6 +27,7 @@ class AccessInterfaceProtocol
   // ---------------- Public  Methods
   //
   public:
+  virtual ~AccessInterfaceProtocol() = default;
 
   //! Does any action required to transfer scan data to and from SUT
   //!
@@ -59,7 +60,6 @@ class AccessInterfaceProtocol
   // ---------------- Protected Methods
   //
   protected:
-  virtual ~AccessInterfaceProtocol() = default;
   AccessInterfaceProtocol()          = default;
 };
 //

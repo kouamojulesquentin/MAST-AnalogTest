@@ -15,7 +15,6 @@
 #include "Utility.hpp"
 
 using std::unique_ptr;
-using std::shared_ptr;
 using std::string;
 using std::experimental::string_view;
 
@@ -43,7 +42,7 @@ unique_ptr<RemoteProtocolFactory> RemoteProtocolFactory::CreateFactoryWithDefaul
 
 //! Creates an AccessInterfaceProtocol using ceation function indentified by a name and optional parameters
 //!
-shared_ptr<Remote_Protocol_Client> RemoteProtocolFactory::Create (const string& creatorId, const string& parameters) const
+unique_ptr<Remote_Protocol_Client> RemoteProtocolFactory::Create (const string& creatorId, const string& parameters) const
 {
   auto instance = CreateImpl(creatorId, parameters);
   if (!instance)

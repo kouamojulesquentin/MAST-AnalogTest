@@ -21,6 +21,8 @@ using std::string;
 using std::experimental::string_view;
 using std::vector;
 
+using namespace std::string_literals;
+using namespace std::experimental::literals::string_view_literals;
 using namespace mast;
 
 
@@ -50,14 +52,14 @@ Remote_Protocol_Proxy::Remote_Protocol_Proxy (unique_ptr<Remote_Protocol_Client>
 
 //! Constructs from string parameters defining actual Remote_Protocol_Client and parameters
 //!
-//! @note Parameters are formatted like this:
+//! @note Parameters are TEMPORARILY formatted like this:
 //!       REMOTE_PROTOCOL_PROXY_PARAMETERS ::= COMMANDS [, KIND_NAME], CREATOR_ID [, REMOTE_CLIENT_PARAMETERS]
 //!       COMMANDS                         ::= STRING_LIST
-//!       KIND_NAME                        ::= §KIND:STRING§
-//!       CREATOR_ID                       ::= §ID:STRING§
+//!       KIND_NAME                        ::= |KIND:STRING|
+//!       CREATOR_ID                       ::= |ID:STRING|
 //!       REMOTE_CLIENT_PARAMETERS         ::= STRING_LIST
 //!
-//!       Example: RST, SIR, SDR, §KIND:Remote_Loopback§, §ID:XmlRpc§, http://localhost:8080/RPC2
+//!       Example: RST, SIR, SDR, |KIND:Remote_Loopback|, |ID:XmlRpc|, http://localhost:8080/RPC2
 //!
 //!
 //! @param parameters Parameters defining actual Remote_Protocol_Client,
@@ -65,14 +67,75 @@ Remote_Protocol_Proxy::Remote_Protocol_Proxy (unique_ptr<Remote_Protocol_Client>
 //!
 Remote_Protocol_Proxy::Remote_Protocol_Proxy (const string& parameters)
 {
-  CHECK_TRUE(false, "Not Yet Implemented");
+  CHECK_PARAMETER_NOT_EMPTY(parameters, "Remote_Protocol_Proxy must contain at least a set of commands and an identifier to create Remote_Protocol_Client (got empty parameters)");
+  string_view parsedParams(parameters);
 
-  //! @todo [JFC]-[February/22/2017]: Complete AccessInterfaceProtocolFactories to support, by default, construction of Remote_Protocol_Proxy
-  //!                                 ==> Need a Remote_Protocol_Client_Factory !!!
+  const auto notFound = string_view::npos;
 
-  auto& factory = RemoteProtocolFactory::Instance();
+  // ---------------- Define utility to extract a part of parameters
+  //
+  auto findPart = [&](string_view prefix)
+  {
+    auto text   = ""s;
+    auto begin  = parsedParams.find(prefix);
+    auto end    = notFound;
 
-  CHECK_PARAMETER_NOT_NULL(m_remoteProtocol.get(), "Could not create a valid Remote_Protocol_Client");
+    if (begin != notFound)
+    {
+      auto middle = begin + prefix.length();
+      end         = parsedParams.find("|", middle);
+
+      if (end != notFound)
+      {
+        text = string(parsedParams.substr(middle, end - middle));
+      }
+    }
+    return make_tuple(begin, end, text);
+  };
+
+  // ---------------- Get Kind Name
+  //
+  auto kindBegin = notFound;
+  auto kindEnd   = notFound;
+  std::tie(kindBegin, kindEnd, m_kindName) = findPart("|KIND:"sv);
+  CHECK_PARAMETER_GT(kindBegin, 5u, "Missing RemoteProtocolFactory commands");
+
+  // ---------------- Get creator id
+  //
+  auto creatorBegin = notFound;
+  auto creatorEnd   = notFound;
+  auto creatorId    = ""s;
+  std::tie(creatorBegin, creatorEnd, creatorId) = findPart("|ID:"sv);
+
+  CHECK_PARAMETER_NOT_EMPTY(creatorId, "Missing RemoteProtocolFactory creation function identifier");
+  CHECK_PARAMETER_GT(creatorBegin, 5u, "Missing RemoteProtocolFactory commands");
+
+  // ---------------- Get creator parameters
+  //
+  auto remoteProtocolParameters = parsedParams.substr(creatorEnd + 1u);
+  Utility::TrimBoth(remoteProtocolParameters);
+  if (!remoteProtocolParameters.empty() && (remoteProtocolParameters[0] == ','))
+  {
+    remoteProtocolParameters.remove_prefix(1u);
+    Utility::TrimLeft(remoteProtocolParameters);
+  }
+
+  auto& factory    = RemoteProtocolFactory::Instance();
+  m_remoteProtocol = factory.Create(creatorId, string(remoteProtocolParameters));
+
+  CHECK_PARAMETER_NOT_NULL(m_remoteProtocol.get(), "Failed to create a remote protocol with id: "sv + creatorId);
+
+  // ---------------- Get commands
+  //
+  auto commandsEnd = (kindBegin != notFound) ? kindBegin - 1u : creatorBegin - 1u;
+  auto commands    = Utility::Split(parsedParams.substr(0, commandsEnd), ","sv);
+  for (const auto& command : commands)
+  {
+    if (!command.empty())
+    {
+      m_commands.emplace_back(command.cbegin(), command.length());
+    }
+  }
   CHECK_PARAMETER_GTE(m_commands.size(), 2,  "Could not associate at least two commands (including one for reset)");
 }
 
@@ -82,7 +145,7 @@ Remote_Protocol_Proxy::Remote_Protocol_Proxy (const string& parameters)
 BinaryVector Remote_Protocol_Proxy::DoAction (uint32_t derivationId, void* interfaceData, const BinaryVector& toSutData)
 {
   CHECK_PARAMETER_NULL (interfaceData, "Interface data is not supported by remote protocols (there is no sharing of address space)");
-  CHECK_PARAMETER_LTE  (derivationId, m_commands.size(), "Derivation id must not be greater than supported commands");
+  CHECK_PARAMETER_LT   (derivationId, m_commands.size(), "Derivation id must not be greater than supported commands");
 
   auto command       = m_commands[derivationId];
   auto binaryToSut   = toSutData.DataRightAligned();
@@ -111,7 +174,7 @@ void Remote_Protocol_Proxy::DoReset (bool doSynchronousReset)
 //!
 string_view Remote_Protocol_Proxy::KindName () const
 {
-  if (m_kindName.empty())
+  if (m_kindName.empty() && (m_remoteProtocol != nullptr))
   {
     m_kindName = m_remoteProtocol->KindName();
   }

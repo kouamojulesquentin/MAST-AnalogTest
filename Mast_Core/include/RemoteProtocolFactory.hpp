@@ -40,7 +40,7 @@ class DLL_EXPORT RemoteProtocolFactory final : public Factory<Remote_Protocol_Cl
   //! @param creatorId    A name that identified registered creation function
   //! @param parameters   String of (optional) parameters
   //!
-  virtual std::shared_ptr<Remote_Protocol_Client> Create(const std::string& creatorId, const std::string& parameters = "") const override;
+  virtual std::unique_ptr<Remote_Protocol_Client> Create(const std::string& creatorId, const std::string& parameters = "") const override;
 
   //! Fills up with default Remote_Protocol_Client
   //!

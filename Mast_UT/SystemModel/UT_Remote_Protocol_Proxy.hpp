@@ -29,7 +29,8 @@ class UT_Remote_Protocol_Proxy : public CxxTest::TestSuite
   // ================ Test Methods ================
 
   void test_Constructor_RemoteClient ();
-  void test_Constructor_StringParameters ();
+  void test_Constructor_StringParameters_Success ();
+  void test_Constructor_StringParameters_Failure ();
 
   void test_DoReset_Sync ();
   void test_DoReset_ASync ();

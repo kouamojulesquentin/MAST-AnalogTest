@@ -19,12 +19,13 @@
 
 #include <memory>
 #include <tuple>
+#include "Cpp_11_Traits.hpp"
 #include <cxxtest/ValueTraits.h>
 
 
 using std::unique_ptr;
 using std::make_unique;
-using std::make_shared;
+using std::make_unique;
 using std::pair;
 using std::make_pair;
 using std::tuple;
@@ -48,21 +49,32 @@ namespace
   class Spy_ClientProtocol : public Remote_Protocol_Client
   {
     public:
-    using          CapturedCall_t = vector<tuple<string, uint32_t, vector<unsigned char>>>;
 
-    CapturedCall_t capturedCall;       //!< This saved parameters used when calling SendScanVector
-    uint32_t       asyncReset     = 0; //!< Tally request for asynchronous reset
-    uint32_t       syncReset      = 0; //!< Tally request for synchronous reset
+    static Spy_ClientProtocol* pLastCreated;  //!< To track Spy_ClientProtocol created by factory
 
-    ~Spy_ClientProtocol() {}
+    using CapturedCall_t = vector<tuple<string, uint32_t, vector<unsigned char>>>;
+
+    CapturedCall_t capturedCall;          //!< This saved parameters used when calling SendScanVector
+    uint32_t       asyncReset = 0;        //!< Tally request for asynchronous reset
+    uint32_t       syncReset  = 0;        //!< Tally request for synchronous reset
+    string         constructorParameters; //!< Parameters given to constructor taking a string
+
+    ~Spy_ClientProtocol()
+    {
+      pLastCreated = nullptr; // It can no more been used
+    }
 
     Spy_ClientProtocol()
       : Remote_Protocol_Client("http://localhost:8080/Test")
-    {}
+    {
+      pLastCreated = this;
+    }
 
     Spy_ClientProtocol(const std::string& parameters)
       : Remote_Protocol_Client(parameters)
     {
+      pLastCreated          = this;
+      constructorParameters = parameters;
     }
 
     virtual string KindName() const { return "Remote_Spy"; };
@@ -94,6 +106,9 @@ namespace
     }
 
   };
+
+  Spy_ClientProtocol* Spy_ClientProtocol::pLastCreated = nullptr; // Initialize the static variable
+
 } // End of unnamed namespace
 
 //! Initializes test (called for each test)
@@ -134,30 +149,103 @@ void UT_Remote_Protocol_Proxy::test_Constructor_RemoteClient ()
 }
 
 
-//! Checks Remote_Protocol_Proxy constructor giving it some string parameters
+//! Checks Remote_Protocol_Proxy constructor giving it some (well formated) string parameters
 //!
-void UT_Remote_Protocol_Proxy::test_Constructor_StringParameters ()
+void UT_Remote_Protocol_Proxy::test_Constructor_StringParameters_Success ()
 {
-  // ---------------- Setup
+  // ---------------- DDT Setup
   //
-  CxxTest::setAbortTestOnFail(true);
-  auto& factory = RemoteProtocolFactory::Instance();
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto parameters        = string(std::get<0>(data));
+    const auto expectedKind      = std::get<1>(data);
+    const auto expectedSpyParams = std::get<2>(data);
 
-  TS_ASSERT_THROWS_NOTHING(factory.RegisterCreator("SpyProtocol", [](const string& /* parameters */) { return make_shared<Spy_ClientProtocol>(); }));
+    CxxTest::setAbortTestOnFail(true);
+    auto& factory = RemoteProtocolFactory::Instance();
 
-  unique_ptr<Remote_Protocol_Proxy> proxy;
-  string parameters("SpyProtocol, RST, SIR, SDR");
+    TS_ASSERT_THROWS_NOTHING(factory.RegisterCreator("SpyProtocol", [](const string& parameters) { return make_unique<Spy_ClientProtocol>(parameters); }));
 
-  // ---------------- Exercise & Verify
+    unique_ptr<Remote_Protocol_Proxy> proxy;
+    Spy_ClientProtocol::pLastCreated = nullptr;
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS_NOTHING (proxy = make_unique<Remote_Protocol_Proxy>(parameters));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_NOT_NULLPTR (proxy);
+    TS_ASSERT_EQUALS      (proxy->MaxSupportedDerivations(), 3u);
+    TS_ASSERT_EQUALS      (proxy->KindName(),                expectedKind);
+
+    // Check a Client Protocol has been created and use as appropriate
+    TS_ASSERT_NOT_NULLPTR (Spy_ClientProtocol::pLastCreated);
+    TS_ASSERT_EQUALS      (Spy_ClientProtocol::pLastCreated->constructorParameters, expectedSpyParams);
+    proxy->DoReset(true);
+    TS_ASSERT_EQUALS      (Spy_ClientProtocol::pLastCreated->syncReset, 1u);
+
+  };
+
+  auto data =
+  {          // Parameters,                                                            Expected kind,  Expected Spy parameters
+    make_tuple("RST, SIR, SDR, |ID:SpyProtocol|"sv,                                    "Remote_Spy"sv, ""sv),                  // 00
+    make_tuple("RST, SIR, SDR, |KIND:Foo_Spy|, |ID:SpyProtocol|"sv,                    "Foo_Spy"sv,    ""sv),                  // 01
+    make_tuple("RST, SIR, SDR, |ID:SpyProtocol|, 192.168.1.45:8080"sv,                 "Remote_Spy"sv, "192.168.1.45:8080"sv), // 02
+    make_tuple("RST, SIR, SDR, |KIND:Foo_Spy|, |ID:SpyProtocol|, 192.168.1.45:8080"sv, "Foo_Spy"sv,    "192.168.1.45:8080"sv), // 03
+    make_tuple("RST, SIR, SDR  |KIND:Foo_Spy|, |ID:SpyProtocol|"sv,                    "Foo_Spy"sv,    ""sv),                  // 04
+    make_tuple("RST, SIR, SDR, |ID:SpyProtocol| 192.168.1.45:8080"sv,                  "Remote_Spy"sv, "192.168.1.45:8080"sv), // 05
+    make_tuple("RST, SIR, SDR, |KIND:Foo_Spy|, |ID:SpyProtocol| 192.168.1.45:8080"sv,  "Foo_Spy"sv,    "192.168.1.45:8080"sv), // 06
+    make_tuple("RST, SIR, SDR, |KIND:Foo_Spy| |ID:SpyProtocol| 192.168.1.45:8080"sv,   "Foo_Spy"sv,    "192.168.1.45:8080"sv), // 07
+    make_tuple("RST, SIR, SDR, |KIND:Foo_Spy||ID:SpyProtocol| 192.168.1.45:8080"sv,    "Foo_Spy"sv,    "192.168.1.45:8080"sv), // 08
+    make_tuple("RST, SIR, SDR, |KIND:Foo_Spy| |ID:SpyProtocol|192.168.1.45:8080"sv,    "Foo_Spy"sv,    "192.168.1.45:8080"sv), // 09
+    make_tuple("RST, SIR, SDR, |KIND:Foo_Spy| |ID:SpyProtocol|192.168.1.45:8080   "sv, "Foo_Spy"sv,    "192.168.1.45:8080"sv), // 10
+  };
+
+  // ---------------- DDT Exercise
   //
-  TS_ASSERT_THROWS_NOTHING (proxy = make_unique<Remote_Protocol_Proxy>(parameters));
-
-  // ---------------- Verify
-  //
-  TS_ASSERT_NOT_NULLPTR (proxy);
-  TS_ASSERT_EQUALS (proxy->MaxSupportedDerivations(), 3u);
-  TS_ASSERT_EQUALS (proxy->KindName(),                "Remote_Spy"sv);
+  TS_DATA_DRIVEN_TEST(checker, data);
 }
+
+
+//! Checks Remote_Protocol_Proxy constructor giving it some badly formated parameters
+//!
+void UT_Remote_Protocol_Proxy::test_Constructor_StringParameters_Failure ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string parameters(data);
+    auto& factory = RemoteProtocolFactory::Instance();
+
+    factory.RegisterCreator("SpyProtocol", [](const string& parameters) { return make_unique<Spy_ClientProtocol>(parameters); });
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (Remote_Protocol_Proxy proxy(parameters), std::exception);
+  };
+
+  auto data =
+  {
+    "RST, ID:SpyProtocol|"sv,                                              // 0 - not enough commands
+    "|KIND:Foo_Spy|, |ID:SpyProtocol|"sv,                                  // 1 - no command at all
+    "RST, SIR, SDR, 192.168.1.45:8080"sv,                                  // 2 - no creator id
+    "RST, SIR, SDR  |KIND:Foo_Spy| |ID:SpyProtocol"sv,                     // 4 - missing |
+    "RST, SIR, SDR, |SpyProtocol| 192.168.1.45:8080"sv,                    // 5 - missing ID:
+    "RST, SIR, SDR, |KIND:Foo_Spy|, |ID:Spy| 192.168.1.45:8080"sv,         // 6 - unregistered creator id
+    "RST, SIR, SDR, |KIND:Foo_Spy|, |ID:| 192.168.1.45:8080"sv,            // 7 - empty creator id
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
 
 
 

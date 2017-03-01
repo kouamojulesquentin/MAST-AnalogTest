@@ -43,6 +43,7 @@
 #include "SystemModelBuilder.hpp"
 #include "AccessInterfaceProtocolFactory.hpp"
 #include "AppFunctionNameAndNode.hpp"
+#include "AccessInterfaceProtocol.hpp"
 #include "Utility.hpp"
 #include "UnresolvedPathSelector.hpp"
 #include "g3log/g3log.hpp"
@@ -464,8 +465,8 @@ t_ACCESS_INTERFACE  node_name AI_identifier AI_protocol_parameters
 
     try
     {
-      auto& factories = AccessInterfaceProtocolFactory::Instance();
-      auto  protocol  = factories.Create(protocolName, protocolParameters);
+      auto& factory  = AccessInterfaceProtocolFactory::Instance();
+      auto  protocol = factory.Create(protocolName, protocolParameters);
 
       if (!protocol)
       {
@@ -475,7 +476,7 @@ t_ACCESS_INTERFACE  node_name AI_identifier AI_protocol_parameters
       }
       else
       {
-        auto node = driver.main_sm->CreateAccessInterface(nodeName, protocol);
+        auto node = driver.main_sm->CreateAccessInterface(nodeName, shared_ptr<AccessInterfaceProtocol>(std::move(protocol)));
         $$ = node;
       }
     }
@@ -503,8 +504,8 @@ t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_
 
   try
   {
-    auto& factories = AccessInterfaceProtocolFactory::Instance();
-    auto  protocol  = factories.Create(creatorId, protocolParameters);
+    auto& factory  = AccessInterfaceProtocolFactory::Instance();
+    auto  protocol = factory.Create(creatorId, protocolParameters);
 
     if (!protocol)
     {
@@ -516,7 +517,10 @@ t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_
     {
       if (irTable.empty())
       {
-        auto node = driver.builder->Create_JTAG_TAP(nodeName, irSize, nbDerivations, protocol);
+        auto node = driver.builder->Create_JTAG_TAP(nodeName,
+                                                    irSize,
+                                                    nbDerivations,
+                                                    shared_ptr<AccessInterfaceProtocol>(std::move(protocol)));
         $$ = node;
       }
       else
@@ -526,7 +530,11 @@ t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_
           LOG(ERROR_LVL) << "Error Coding must be provided for bypass register and each chain";
           YYERROR;
         }
-        auto node = driver.builder->Create_JTAG_TAP(nodeName, irSize, nbDerivations, protocol, irTable);
+        auto node = driver.builder->Create_JTAG_TAP(nodeName,
+                                                    irSize,
+                                                    nbDerivations,
+                                                    shared_ptr<AccessInterfaceProtocol>(std::move(protocol)),
+                                                    irTable);
         $$ = node;
       }
     }

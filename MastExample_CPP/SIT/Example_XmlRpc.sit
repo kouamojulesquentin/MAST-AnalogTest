@@ -1,4 +1,4 @@
-ACCESS_INTERFACE TAP RemoteProxy "RST, SIR, SDR, §KIND:Remote_Loopback§, §ID:XmlRpc§, http://localhost:8080/RPC2"
+ACCESS_INTERFACE TAP RemoteProxy "RST, SIR, SDR, |KIND:Remote_Loopback|, |ID:XmlRpc|, http://localhost:8080/RPC2"
 {
   WRAPPER_1500 W_1500 4
   PDL Incr, Decr, Copy, Shift

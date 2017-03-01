@@ -30,7 +30,7 @@ find_package(LibXmlRpc  REQUIRED)
 
 
 set(WARNINGS     "-Wall -Wextra -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default")
-set(CLIENT_FLAGS "-std=c++03 -fPIC -g ${WARNINGS}")
+set(CLIENT_FLAGS "-std=c++03 -fPIC -g ${WARNINGS} -Wno-long-long")
 set(SERVER_FLAGS "${CLIENT_FLAGS}")
 
 

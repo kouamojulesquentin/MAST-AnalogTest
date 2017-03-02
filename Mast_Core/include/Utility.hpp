@@ -304,7 +304,8 @@ bool InRange(const T& val, const U& minVal, const V& maxVal) { return (val >= mi
 #define CHECK_PARAMETER_RANGE(val, minVal, maxVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), InRange((val), (minVal), (maxVal)), msg)
 
 #define CHECK_VALUE_NOT_NULL(ptr, msg)  CheckValueIsNotNullptr (__FILE__, __func__, __LINE__, ptr, msg)
-#define CHECK_TRUE(expr, msg)            if (!(expr))  throw std::runtime_error(mast::Utility::MakeExceptionMessage(__FILE__, __func__, __LINE__, "std::runtime_error", msg))
+#define CHECK_TRUE(expr, msg) if (!(expr))  throw std::runtime_error(mast::Utility::MakeExceptionMessage(__FILE__, __func__, __LINE__, "std::runtime_error", msg))
+#define CHECK_FAILED(msg)                   throw std::runtime_error(mast::Utility::MakeExceptionMessage(__FILE__, __func__, __LINE__, "std::runtime_error", msg))
 #define CHECK_FILE_EXISTS(filePath) CHECK_TRUE(mast::Utility::FileExists(filePath), "File: '"s + (filePath) + "' does not exist (or cannot be opened)" )
 
 #endif  // not defined UTILITY_H__AB0B55F8_1F3A_4D8D_893_CA234E5BFD9D__INCLUDED_

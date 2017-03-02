@@ -29,9 +29,8 @@ class XmlRpc_Protocol_Client : public Remote_Protocol_Client
   public:
   ~XmlRpc_Protocol_Client();
 
-  XmlRpc_Protocol_Client()
-    : Remote_Protocol_Client("http://localhost:8080/RPC2")
-  {}
+  XmlRpc_Protocol_Client();
+
 
   //! Constructs using string encoded parameters
   XmlRpc_Protocol_Client(const std::string& parameters);
@@ -52,6 +51,14 @@ class XmlRpc_Protocol_Client : public Remote_Protocol_Client
   //! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence
   //!
   virtual void SendDoReset(bool doSynchronousReset);
+
+  // ---------------- Private  Methods
+  //
+  void CheckCallId (uint32_t callId);
+
+  // ---------------- Private  Fields
+  //
+  uint32_t m_callId;  //!< Identifies a call between client and server (response must return same id)
 };
 //
 //  End of XmlRpc_Protocol_Client class declaration

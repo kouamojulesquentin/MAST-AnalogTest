@@ -39,15 +39,47 @@ XmlRpc_Protocol_Client::~XmlRpc_Protocol_Client ()
 //---------------------------------------------------------------------------
 
 
-
-//! Constructs using string encoded parameters
+//! Initializes for using local host and port 8080
 //!
-XmlRpc_Protocol_Client::XmlRpc_Protocol_Client (const std::string& parameters)
-  : Remote_Protocol_Client(parameters)
+XmlRpc_Protocol_Client::XmlRpc_Protocol_Client ()
+  : Remote_Protocol_Client ("http://localhost:8080/RPC2")
+  , m_callId               (0)
 {
 }
 //
 //  End of: XmlRpc_Protocol_Client::XmlRpc_Protocol_Client
+//---------------------------------------------------------------------------
+
+
+
+
+//! Constructs using string encoded parameters
+//!
+XmlRpc_Protocol_Client::XmlRpc_Protocol_Client (const std::string& parameters)
+  : Remote_Protocol_Client (parameters)
+  , m_callId               (0)
+{
+}
+//
+//  End of: XmlRpc_Protocol_Client::XmlRpc_Protocol_Client
+//---------------------------------------------------------------------------
+
+
+//! Check that a call id from a response match current call id then increment current call id
+//!
+void XmlRpc_Protocol_Client::CheckCallId (uint32_t callId)
+{
+  if (callId != m_callId)
+  {
+    std::ostringstream os;
+    os << "Xml-Client expected call id: " << m_callId << ", got: " << callId;
+    throw std::runtime_error(os.str());
+  }
+
+  ++m_callId;
+}
+//
+//  End of: XmlRpc_Protocol_Client::CheckCallId
 //---------------------------------------------------------------------------
 
 
@@ -61,12 +93,19 @@ void XmlRpc_Protocol_Client::SendDoReset (bool doSynchronousReset)
 
   xmlrpc_c::paramList params;
 
+  params.add(xmlrpc_c::value_int     (m_callId));
   params.add(xmlrpc_c::value_boolean (doSynchronousReset));
 
   xmlrpc_c::clientSimple client;
   xmlrpc_c::value        result;
 
   client.call(ServerUrl(), methodName, params, &result);
+
+  xmlrpc_c::value_struct retValues  = xmlrpc_c::value_struct(result);
+  StructFields_t         fields     = retValues.cvalue();
+  xmlrpc_c::value_int    xml_callId = fields.at(XML_RPC_FIELD_CALL_ID);
+
+  CheckCallId(xml_callId.cvalue());
 }
 //
 //  End of: XmlRpc_Protocol_Client::DoReset
@@ -88,6 +127,7 @@ XmlRpc_Protocol_Client::SendScanVector (const string& commandName, uint32_t bits
 
   xmlrpc_c::paramList params;
 
+  params.add(xmlrpc_c::value_int        (m_callId));
   params.add(xmlrpc_c::value_string     (commandName));
   params.add(xmlrpc_c::value_int        (bitsCount));
   params.add(xmlrpc_c::value_bytestring (toSutScanVector));
@@ -98,10 +138,13 @@ XmlRpc_Protocol_Client::SendScanVector (const string& commandName, uint32_t bits
   client.call(ServerUrl(), methodName, params, &result);
 
   xmlrpc_c::value_struct retValues = xmlrpc_c::value_struct(result);
-  std::map<string, xmlrpc_c::value> retValuesMapping = static_cast<StructFields_t>(retValues);
+  StructFields_t         fields    = retValues.cvalue();
 
-  xmlrpc_c::value_int        xml_bitsCount   = retValuesMapping.at(XML_RPC_FIELD_BITS_COUNT);
-  xmlrpc_c::value_bytestring xml_fromSutData = retValuesMapping.at(XML_RPC_FIELD_FROM_SUT_DATA);
+  xmlrpc_c::value_int        xml_callId      = fields.at(XML_RPC_FIELD_CALL_ID);
+  xmlrpc_c::value_int        xml_bitsCount   = fields.at(XML_RPC_FIELD_BITS_COUNT);
+  xmlrpc_c::value_bytestring xml_fromSutData = fields.at(XML_RPC_FIELD_FROM_SUT_DATA);
+
+  CheckCallId(xml_callId.cvalue());
 
   uint32_t        fromSutBitsCount  = xml_bitsCount.cvalue();
   vector<uint8_t> fromSutScanVector = xml_fromSutData.cvalue();

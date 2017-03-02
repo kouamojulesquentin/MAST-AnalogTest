@@ -25,6 +25,7 @@
 typedef std::map<std::string, xmlrpc_c::value> StructFields_t; //!< Defines with what struct fields are streamed with XML-RPC
 
 // Name for returning "struct" fields
+#define XML_RPC_FIELD_CALL_ID       "callId"
 #define XML_RPC_FIELD_BITS_COUNT    "bitsCount"
 #define XML_RPC_FIELD_FROM_SUT_DATA "fromSutData"
 

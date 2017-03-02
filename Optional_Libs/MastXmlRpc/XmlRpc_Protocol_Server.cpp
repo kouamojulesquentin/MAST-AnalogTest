@@ -117,13 +117,19 @@ namespace
     {
       try
       {
-        paramList.verifyEnd(1);
+        paramList.verifyEnd(2);
 
-        bool doSynchronousReset = (paramList.getBoolean (0));
+        uint32_t callId             = paramList.getInt     (0);   // This is for response check
+        bool     doSynchronousReset = paramList.getBoolean (1);
 
         m_protocol->DoReset(doSynchronousReset);
 
         *pRetValue = xmlrpc_c::value_int(XML_RPC_SUCCESS);
+
+        StructFields_t fields;
+        fields[XML_RPC_FIELD_CALL_ID] = xmlrpc_c::value_int(callId);
+
+        *pRetValue = xmlrpc_c::value_struct(fields);
       }
       catch(xmlrpc_c::fault& exc)
       {
@@ -159,11 +165,12 @@ namespace
       {
         // ---------------- Extract parameters
         //
-        paramList.verifyEnd(3);
+        paramList.verifyEnd(4);
 
-        string          command   (paramList.getString     (0));
-        uint32_t        bitsCount (paramList.getInt        (1));
-        vector<uint8_t> toSutData (paramList.getBytestring (2));
+        uint32_t        callId    (paramList.getInt        (0)); // This is for response check
+        string          command   (paramList.getString     (1));
+        uint32_t        bitsCount (paramList.getInt        (2));
+        vector<uint8_t> toSutData (paramList.getBytestring (3));
 
         // ---------------- Call DoAction
         //
@@ -174,12 +181,13 @@ namespace
         uint32_t               fromSutBitsCount = doActionResult.first;
         const vector<uint8_t>& fromSutData      = doActionResult.second;
 
-        StructFields_t retValuesMapping;
+        StructFields_t fields;
 
-        retValuesMapping[XML_RPC_FIELD_BITS_COUNT]    = xmlrpc_c::value_int(fromSutBitsCount);
-        retValuesMapping[XML_RPC_FIELD_FROM_SUT_DATA] = xmlrpc_c::value_bytestring(fromSutData);;
+        fields[XML_RPC_FIELD_CALL_ID]       = xmlrpc_c::value_int(callId);
+        fields[XML_RPC_FIELD_BITS_COUNT]    = xmlrpc_c::value_int(fromSutBitsCount);
+        fields[XML_RPC_FIELD_FROM_SUT_DATA] = xmlrpc_c::value_bytestring(fromSutData);
 
-        *pRetValue = xmlrpc_c::value_struct(retValuesMapping);
+        *pRetValue = xmlrpc_c::value_struct(fields);
       }
       catch(xmlrpc_c::fault& exc)
       {

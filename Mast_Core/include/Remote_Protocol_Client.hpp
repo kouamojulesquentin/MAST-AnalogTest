@@ -44,7 +44,7 @@ class Remote_Protocol_Client
   {
   }
 
-  typedef std::vector<uint8_t> ScanVector_t;                         //! Type used to exchange scan vectors with remote SUT
+  typedef std::vector<uint8_t> ScanVector_t;                         //!< Type used to exchange scan vectors with remote SUT
   typedef std::pair<uint32_t,  ScanVector_t> SendScanVectorReturn_t; //!< Type return by SendScanVector
 
   //! Sends scan vector to System Under Test

@@ -20,6 +20,7 @@
 #include <stdexcept>
 #include <cxxtest/ValueTraits.h>
 
+using mast::Remote_Protocol_Client;
 using mast::Remote_Loopback_Protocol;
 using mast::XmlRpc_Protocol_Client;
 using mast::XmlRpc_Protocol_Server;
@@ -115,19 +116,24 @@ void UT_XmlRpc_Client_Server::test_SendScanVector_Single ()
   string          commandName("SDR");
   uint32_t        bitsCount = 19;
   vector<uint8_t> toSutData {0x05, 0xC3, 0x81};
-  vector<uint8_t> fromSutData;
+
+  Remote_Protocol_Client::SendScanVectorReturn_t sendResult;
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS_NOTHING (fromSutData = ctx.client.SendScanVector(commandName, bitsCount, toSutData));
+  TS_ASSERT_THROWS_NOTHING (sendResult = ctx.client.SendScanVector(commandName, bitsCount, toSutData));
 
   // ---------------- Verify
   //
   ctx.Stop();
 
+  const auto  fromSutBitsCount = sendResult.first;
+  const auto& fromSutData      = sendResult.second;
+
   TS_ASSERT_FALSE  (ctx.gotException);
   TS_ASSERT_EQUALS (ctx.exceptionMessage, "");
-  TS_ASSERT_EQUALS (fromSutData, toSutData);
+  TS_ASSERT_EQUALS (fromSutBitsCount,     bitsCount);
+  TS_ASSERT_EQUALS (fromSutData,          toSutData);
 }
 
 
@@ -158,7 +164,12 @@ void UT_XmlRpc_Client_Server::test_SendScanVector_Multiple ()
   (
     for (const auto& toSutData : toSutDatas)
     {
-      auto fromSutData = ctx.client.SendScanVector(commandName, bitsCount, toSutData);
+      auto result = ctx.client.SendScanVector(commandName, bitsCount, toSutData);
+
+      const auto  fromSutBitsCount = result.first;
+      const auto& fromSutData      = result.second;
+
+      TS_ASSERT_EQUALS (fromSutBitsCount, bitsCount);
       fromSutDatas.emplace_back(std::move(fromSutData));
     }
   );

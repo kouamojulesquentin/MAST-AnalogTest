@@ -887,7 +887,7 @@ void SystemModelManager::Start ()
     }
     catch(std::exception& exc)  // Catch C++ standard exceptions
     {
-      LOG(ERROR_LVL) << "SystemModelManager background thread caught " << exc.what();
+      LOG(ERROR_LVL) << "SystemModelManager background thread caught std::exception: " << exc.what();
       {
         std::lock_guard<std::mutex> lock(m_loopMutex);
         m_runLoop = false;

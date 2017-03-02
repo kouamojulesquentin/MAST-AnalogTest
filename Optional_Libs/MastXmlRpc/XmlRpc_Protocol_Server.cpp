@@ -33,58 +33,112 @@ using mast::Remote_Protocol;
 
 namespace
 {
-  class DoReset_Executer : public xmlrpc_c::method
+  class MastXmlRpcMethod : public xmlrpc_c::method
+  {
+    public:
+    virtual ~MastXmlRpcMethod() {}
+
+    MastXmlRpcMethod(Remote_Protocol* protocol, string methodName, bool logErrors, bool logInfos)
+      : m_protocol   (protocol)
+      , m_methodName (methodName)
+      , m_logErrors  (logErrors)
+      , m_logInfos   (logInfos)
+    {
+    }
+
+    void Rethrow(std::exception& exc) const
+    {
+      ThrowWithMessage(MessagePrefix().append(exc.what()));
+    }
+
+    void Rethrow() const
+    {
+      ThrowWithMessage(MessagePrefix().append("Unknown type exception"));
+    }
+
+    // ---------------- Private  Methods
+    //
+    string MessagePrefix() const
+    {
+      return string("While processing \"").append(m_methodName).append("\", got: ");
+    }
+
+    void ThrowWithMessage(const string& message) const
+    {
+      if (m_logErrors)
+      {
+        std::cerr << message << std::endl;
+      }
+      throw girerr::error(message);
+    }
+
+    void LogInfo(const string& message) const
+    {
+      if (m_logInfos)
+      {
+        std::cout << message << std::endl;
+      }
+    }
+
+    // ---------------- Protected Fields
+    //
+    protected:
+    Remote_Protocol* m_protocol;   //!< Effective protocol to use
+    string           m_methodName; //!< Method name to format error message
+    bool             m_logErrors;  //!< To enable logging of errors on std::cerr
+    bool             m_logInfos;   //!< To enable logging of infos messages on std::cout
+  };
+
+  class DoReset_Executer : public MastXmlRpcMethod
   {
     public:
 
-    DoReset_Executer (Remote_Protocol* protocol)
-      : m_protocol (protocol)
+    DoReset_Executer (Remote_Protocol* protocol, bool logErrors, bool logInfos)
+      : MastXmlRpcMethod (protocol, "DoReset", logErrors, logInfos)
     {
       this->_help = "Forces the ResetPort to be asserted on the target module";
+      LogInfo("DoReset executer started");
     }
 
     //! Extracts client parameter, then forward call to actual Remote_Protocol
     //!
     void execute (const xmlrpc_c::paramList& paramList, xmlrpc_c::value* const pRetValue)
     {
-      //! @todo [JFC]-[February/23/2017]: In execute(): Catch errors
-      //!
-
       paramList.verifyEnd(1);
+      try
+      {
+        bool doSynchronousReset = (paramList.getBoolean (0));
 
-      bool doSynchronousReset = (paramList.getBoolean (0));
+        m_protocol->DoReset(doSynchronousReset);
 
-      m_protocol->DoReset(doSynchronousReset);
-
-      *pRetValue = xmlrpc_c::value_int(0);
+        *pRetValue = xmlrpc_c::value_int(XML_RPC_SUCCESS);
+      }
+      catch(std::exception& exc)
+      {
+        Rethrow(exc);
+      }
+      catch (...)
+      {
+        Rethrow();
+      }
     }
-
-    // ---------------- Private  Fields
-    //
-    Remote_Protocol* m_protocol;  //!< Effective protocol to use
   };
 
 
-  class SendScanVector_Executer : public xmlrpc_c::method
+  class SendScanVector_Executer : public MastXmlRpcMethod
   {
     public:
-
-    SendScanVector_Executer (Remote_Protocol* protocol)
-      : m_protocol (protocol)
+    SendScanVector_Executer (Remote_Protocol* protocol, bool logErrors, bool logInfos)
+      : MastXmlRpcMethod (protocol, "DoAction", logErrors, logInfos)
     {
-      // signature and help strings are documentation -- the client
-      // can query this information with a system.methodSignature and
-      // system.methodHelp RPC.
-  //+    this->_signature = "vector<unsigned char>:vector<unsigned char>";
-
       this->_help = "Forward request to actual remote protocol \"DoAction\"";
+      LogInfo("SendScanVector executer started");
     }
 
     //! Extracts client parameters, then forward call to actual Remote_Protocol
     //!
     void execute (const xmlrpc_c::paramList& paramList, xmlrpc_c::value* const pRetValue)
     {
-      //! @todo [JFC]-[February/23/2017]: In execute(): Catch errors
 
       paramList.verifyEnd(3);
 
@@ -92,16 +146,30 @@ namespace
       uint32_t        bitsCount (paramList.getInt        (1));
       vector<uint8_t> toSutData (paramList.getBytestring (2));
 
-      vector<uint8_t> fromSutData = m_protocol->DoAction(command, bitsCount, toSutData);
+      try
+      {
+        Remote_Protocol::DoActionReturn_t doActionResult = m_protocol->DoAction(command, bitsCount, toSutData);
 
-      *pRetValue = xmlrpc_c::value_bytestring(fromSutData);
+        uint32_t               fromSutBitsCount = doActionResult.first;
+        const vector<uint8_t>& fromSutData      = doActionResult.second;
+
+        StructFields_t retValuesMapping;
+
+        retValuesMapping[XML_RPC_FIELD_BITS_COUNT]    = xmlrpc_c::value_int(fromSutBitsCount);
+        retValuesMapping[XML_RPC_FIELD_FROM_SUT_DATA] = xmlrpc_c::value_bytestring(fromSutData);;
+
+        *pRetValue = xmlrpc_c::value_struct(retValuesMapping);
+      }
+      catch(std::exception& exc)
+      {
+        Rethrow(exc);
+      }
+      catch (...)
+      {
+        Rethrow();
+      }
     }
-
-    // ---------------- Private  Fields
-    //
-    Remote_Protocol* m_protocol;  //!< Effective protocol to use
   };
-
 } // End of unnamed namespace
 
 
@@ -122,17 +190,23 @@ XmlRpc_Protocol_Server::~XmlRpc_Protocol_Server ()
 //!
 void XmlRpc_Protocol_Server::Start ()
 {
+  if (!Protocol())
+  {
+    string message("A valid Remote_Protocol must have been set before starting Xml-RPC server");
+    if (m_logErrors)
+    {
+      std::cerr << message << std::endl;
+    }
+    throw std::runtime_error(message);
+  }
+
   try
   {
-    if (!Protocol())
-    {
-      throw std::runtime_error("A valid Remote_Protocol must have been set before starting Xml-RPC server");
-    }
 
     // ---------------- Register supported "call"
     //
-    const xmlrpc_c::methodPtr pDoReset_Executer    (new DoReset_Executer(Protocol()));
-    const xmlrpc_c::methodPtr pScanVector_Executer (new SendScanVector_Executer(Protocol()));
+    const xmlrpc_c::methodPtr pDoReset_Executer    (new DoReset_Executer(Protocol(),        m_logErrors, m_logInfos));
+    const xmlrpc_c::methodPtr pScanVector_Executer (new SendScanVector_Executer(Protocol(), m_logErrors, m_logInfos));
 
     xmlrpc_c::registry myRegistry;
 
@@ -157,8 +231,13 @@ void XmlRpc_Protocol_Server::Start ()
   catch (const std::exception& exc)
   {
     m_abyssServer = NULL;   // Make sure we do not point on destructed server !
-                            //
-    throw std::runtime_error(string("XmlRpc_Protocol_Server ==> Something failed: ") + exc.what());
+
+    string message = string("XmlRpc_Protocol_Server ==> Something failed: ").append(exc.what());
+    if (m_logErrors)
+    {
+      std::cerr << message << std::endl;
+    }
+    throw std::runtime_error(message);
   }
 }
 //

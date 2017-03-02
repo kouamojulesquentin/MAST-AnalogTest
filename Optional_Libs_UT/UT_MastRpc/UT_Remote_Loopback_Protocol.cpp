@@ -20,6 +20,8 @@
 
 using std::string;
 using std::vector;
+
+using mast::Remote_Protocol;
 using mast::Remote_Loopback_Protocol;
 
 
@@ -54,17 +56,22 @@ void UT_Remote_Loopback_Protocol::test_DoAction ()
   string          commandName("SIR");
   uint32_t        bitsCount = 11;
   vector<uint8_t> toSutData{0x01, 0xC3, 0xFA};
-  vector<uint8_t> fromSutData;
+
+  Remote_Protocol::DoActionReturn_t doActionResult;
 
   Remote_Loopback_Protocol sut;
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS_NOTHING (fromSutData = sut.DoAction(commandName, bitsCount, toSutData));
+  TS_ASSERT_THROWS_NOTHING (doActionResult = sut.DoAction(commandName, bitsCount, toSutData));
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS (fromSutData, toSutData);
+  const auto& fromSutBitscount = doActionResult.first;
+  const auto& fromSutData      = doActionResult.second;
+
+  TS_ASSERT_EQUALS (fromSutBitscount, bitsCount);
+  TS_ASSERT_EQUALS (fromSutData,      toSutData);
 }
 
 

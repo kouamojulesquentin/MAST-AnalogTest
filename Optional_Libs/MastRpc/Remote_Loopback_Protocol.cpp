@@ -15,6 +15,9 @@
 
 using std::string;
 using std::vector;
+using std::pair;
+
+using std::make_pair;
 using namespace mast;
 
 //! Destructor does nothing
@@ -37,11 +40,12 @@ Remote_Loopback_Protocol::Remote_Loopback_Protocol ()
 //! @param scanVector   Binary data to send to SUT (default is right aligned)
 //!
 //! @return data scanned out from SUT
-vector<uint8_t> Remote_Loopback_Protocol::DoAction (const string&          /* commandName */,
-                                                    uint32_t               /* bitsCount */,
-                                                    const vector<uint8_t>& toSutScanVector)
+pair<uint32_t, vector<uint8_t> >
+Remote_Loopback_Protocol::DoAction (const string&          /* commandName */,
+                                    uint32_t               bitsCount,
+                                    const vector<uint8_t>& toSutScanVector)
 {
-  return toSutScanVector;
+  return make_pair(bitsCount, toSutScanVector);
 }
 
 

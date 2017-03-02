@@ -87,10 +87,12 @@ namespace
     //! @param scanVector   Binary data to send to SUT (default is right aligned)
     //!
     //! @return Error code (0 means no error)
-    virtual ScanVector_t SendScanVector(const std::string& commandName, uint32_t bitsCount, const ScanVector_t& scanVector)
+    virtual SendScanVectorReturn_t SendScanVector(const string&       commandName,
+                                                  uint32_t            bitsCount,
+                                                  const ScanVector_t& scanVector)
     {
       capturedCall.emplace_back(make_tuple(commandName, bitsCount, scanVector));
-      return scanVector;
+      return make_pair(bitsCount, scanVector);
     }
 
     virtual void SendDoReset(bool doSynchronousReset)

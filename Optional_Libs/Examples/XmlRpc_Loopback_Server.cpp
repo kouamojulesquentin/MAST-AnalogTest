@@ -30,6 +30,8 @@ int main(int argc, const char* argv[])
     Remote_Loopback_Protocol protocol;
     XmlRpc_Protocol_Server   server(8080, &protocol);
 
+    server.LogInfos (true);
+    server.LogErrors(true);
     server.Start(); // Do not return - use Ctrl-C 'or kill -9 ' to exit
   }
   catch(std::exception& exc)  // Catch C++ standard exceptions

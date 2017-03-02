@@ -17,6 +17,7 @@
 
 #include <string>
 #include <vector>
+#include <utility>
 
 #ifndef uint32_t
 #include <stdint.h>     // Make it compilable as C++03
@@ -43,7 +44,8 @@ class Remote_Protocol_Client
   {
   }
 
-  typedef std::vector<uint8_t> ScanVector_t;  // Type used to exchange scan vectors with remote SUT
+  typedef std::vector<uint8_t> ScanVector_t;                         //! Type used to exchange scan vectors with remote SUT
+  typedef std::pair<uint32_t,  ScanVector_t> SendScanVectorReturn_t; //!< Type return by SendScanVector
 
   //! Sends scan vector to System Under Test
   //!
@@ -51,7 +53,9 @@ class Remote_Protocol_Client
   //! @param scanVector   Binary data to send to SUT (default is right aligned)
   //!
   //! @return data scanned out from SUT (same format and alignment)
-  virtual ScanVector_t SendScanVector(const std::string& commandName, uint32_t bitsCount, const ScanVector_t& scanVector) = 0;
+  virtual SendScanVectorReturn_t SendScanVector(const std::string&  commandName,
+                                                uint32_t            bitsCount,
+                                                const ScanVector_t& scanVector) = 0;
 
   //! Returns current remote server URL
   //!

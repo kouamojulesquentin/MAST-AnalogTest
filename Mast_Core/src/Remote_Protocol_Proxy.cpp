@@ -16,6 +16,8 @@
 #include "RemoteProtocolFactory.hpp"
 #include "Utility.hpp"
 
+#include <sstream>
+
 using std::unique_ptr;
 using std::string;
 using std::experimental::string_view;
@@ -149,8 +151,21 @@ BinaryVector Remote_Protocol_Proxy::DoAction (uint32_t derivationId, void* inter
 
   auto command       = m_commands[derivationId];
   auto binaryToSut   = toSutData.DataRightAligned();
-  auto binaryFromSut = m_remoteProtocol->SendScanVector(command, toSutData.BitsCount(), binaryToSut);
-  auto fromSutData   = BinaryVector::CreateFromRightAlignedBuffer(std::move(binaryFromSut), toSutData.BitsCount());
+
+  auto sendResult    = m_remoteProtocol->SendScanVector(command, toSutData.BitsCount(), binaryToSut);
+
+  auto  fromSutBitsCount = sendResult.first;
+  auto& fromSutBinary    = sendResult.second;
+
+  if (fromSutBitsCount != toSutData.BitsCount())
+  {
+    std::ostringstream os;
+    os << "Got " << fromSutBitsCount << " bits from SUT while expecting " << toSutData.BitsCount();
+    CHECK_FAILED(os.str());
+  }
+
+
+  auto fromSutData = BinaryVector::CreateFromRightAlignedBuffer(std::move(fromSutBinary), fromSutBitsCount);
 
   return fromSutData;
 }

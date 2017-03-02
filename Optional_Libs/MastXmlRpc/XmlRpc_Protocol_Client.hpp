@@ -38,14 +38,14 @@ class XmlRpc_Protocol_Client : public Remote_Protocol_Client
 
   //! Sends scan vector to System Under Test
   //!
-  //! @param commandName  Command name (SIR, SDR, RST...)
+  //! @param commandName  Command name (e.g. SIR, SDR, RST...)
   //! @param bitsCount    Number of valid bits in scan vector
   //! @param scanVector   Binary data to send to SUT (default is right aligned)
   //!
   //! @return Error code (0 means no error)
-  virtual std::vector<unsigned char> SendScanVector(const std::string&                commandName,
-                                                    uint32_t                          bitsCount,
-                                                    const std::vector<unsigned char>& toSutScanVector);
+  virtual SendScanVectorReturn_t SendScanVector(const std::string&         commandName,
+                                                uint32_t                   bitsCount,
+                                                const std::vector<unsigned char>& toSutScanVector);
 
   //! Sends command for forcing the ResetPort to be asserted on the target module
   //!

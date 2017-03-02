@@ -17,6 +17,7 @@
 
 #include <vector>
 #include <string>
+#include <utility>
 #ifndef uint32_t
 #include <stdint.h>     // Make it compilable as C++03
 #endif
@@ -35,6 +36,8 @@ class Remote_Protocol
   virtual ~Remote_Protocol() {}
   Remote_Protocol()  {}
 
+  typedef std::pair<uint32_t, std::vector<uint8_t> > DoActionReturn_t;
+
   //! Does action according to command and scan vector
   //!
   //! @param commandName  Command name (SIR, SDR, RST...)
@@ -42,9 +45,8 @@ class Remote_Protocol
   //! @param scanVector   Binary data to send to SUT (default is right aligned)
   //!
   //! @return data scanned out from SUT
-  virtual std::vector<uint8_t> DoAction(const std::string&          commandName,
-                                        uint32_t                    bitsCount,
-                                        const std::vector<uint8_t>& toSutScanVector) = 0;
+  virtual DoActionReturn_t
+  DoAction(const std::string& commandName, uint32_t bitsCount, const std::vector<uint8_t>& toSutScanVector) = 0;
 
   //! Forces the ResetPort to be asserted on the target module
   //!

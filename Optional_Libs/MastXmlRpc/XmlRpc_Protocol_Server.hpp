@@ -42,10 +42,14 @@ class XmlRpc_Protocol_Server : public Remote_Protocol_Server
   XmlRpc_Protocol_Server(uint32_t portNumber, Remote_Protocol* protocol)
     : Remote_Protocol_Server (portNumber, protocol)
     , m_abyssServer          (NULL)
+    , m_logErrors            (false)
+    , m_logInfos             (false)
   {}
 
   XmlRpc_Protocol_Server()
     : m_abyssServer (NULL)
+    , m_logErrors   (false)
+    , m_logInfos    (false)
   {}
 
   //! Constructs using string encoded parameters
@@ -66,9 +70,29 @@ class XmlRpc_Protocol_Server : public Remote_Protocol_Server
   //!
   virtual void Stop();
 
+  //! Returns whether error are logged on std::cerr
+  //!
+  bool  LogErrors() const { return m_logErrors; }
+
+  //! Sets whether error are logged on std::cerr
+  //!
+  void  LogErrors (bool logOnError) { m_logErrors = logOnError; }
+
+
+  //! Returns whether infos are logged on std::cout
+  //!
+  bool  LogInfos() const { return m_logInfos; }
+
+  //! Sets whether infos are logged on std::cout
+  //!
+  void  LogInfos (bool logInfos) { m_logInfos = logInfos; }
+
+
   // ---------------- Private  Fields
   //
-  xmlrpc_c::serverAbyss* m_abyssServer;
+  xmlrpc_c::serverAbyss* m_abyssServer; //!< This is the actual http server
+  bool                   m_logErrors;   //!< To enable logging of errors on std::cerr
+  bool                   m_logInfos;    //!< To enable logging of info messages on std::cout
 };
 //
 //  End of XmlRpc_Protocol_Server class declaration

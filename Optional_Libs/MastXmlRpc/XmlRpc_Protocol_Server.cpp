@@ -46,6 +46,17 @@ namespace
     {
     }
 
+
+    void Rethrow(xmlrpc_c::fault& exc) const
+    {
+      string message = MessagePrefix().append(exc.getDescription());
+      if (m_logErrors)
+      {
+        std::cerr << message << std::endl;
+      }
+      throw xmlrpc_c::fault(message, exc.getCode());
+    }
+
     void Rethrow(std::exception& exc) const
     {
       ThrowWithMessage(MessagePrefix().append(exc.what()));
@@ -104,14 +115,19 @@ namespace
     //!
     void execute (const xmlrpc_c::paramList& paramList, xmlrpc_c::value* const pRetValue)
     {
-      paramList.verifyEnd(1);
       try
       {
+        paramList.verifyEnd(1);
+
         bool doSynchronousReset = (paramList.getBoolean (0));
 
         m_protocol->DoReset(doSynchronousReset);
 
         *pRetValue = xmlrpc_c::value_int(XML_RPC_SUCCESS);
+      }
+      catch(xmlrpc_c::fault& exc)
+      {
+        Rethrow(exc);
       }
       catch(std::exception& exc)
       {
@@ -139,17 +155,22 @@ namespace
     //!
     void execute (const xmlrpc_c::paramList& paramList, xmlrpc_c::value* const pRetValue)
     {
-
-      paramList.verifyEnd(3);
-
-      string          command   (paramList.getString     (0));
-      uint32_t        bitsCount (paramList.getInt        (1));
-      vector<uint8_t> toSutData (paramList.getBytestring (2));
-
       try
       {
+        // ---------------- Extract parameters
+        //
+        paramList.verifyEnd(3);
+
+        string          command   (paramList.getString     (0));
+        uint32_t        bitsCount (paramList.getInt        (1));
+        vector<uint8_t> toSutData (paramList.getBytestring (2));
+
+        // ---------------- Call DoAction
+        //
         Remote_Protocol::DoActionReturn_t doActionResult = m_protocol->DoAction(command, bitsCount, toSutData);
 
+        // ---------------- Prepare response
+        //
         uint32_t               fromSutBitsCount = doActionResult.first;
         const vector<uint8_t>& fromSutData      = doActionResult.second;
 
@@ -159,6 +180,10 @@ namespace
         retValuesMapping[XML_RPC_FIELD_FROM_SUT_DATA] = xmlrpc_c::value_bytestring(fromSutData);;
 
         *pRetValue = xmlrpc_c::value_struct(retValuesMapping);
+      }
+      catch(xmlrpc_c::fault& exc)
+      {
+        Rethrow(exc);
       }
       catch(std::exception& exc)
       {
@@ -202,7 +227,6 @@ void XmlRpc_Protocol_Server::Start ()
 
   try
   {
-
     // ---------------- Register supported "call"
     //
     const xmlrpc_c::methodPtr pDoReset_Executer    (new DoReset_Executer(Protocol(),        m_logErrors, m_logInfos));

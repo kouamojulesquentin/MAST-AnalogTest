@@ -74,7 +74,7 @@ else ()
     include_directories(${LIBMASTRPC_INCLUDE_DIRS})
     include_directories(${LIBMASTXMLRPC_INCLUDE_DIRS})
 
-    add_executable        (Example_RmlRpc main.cpp DefaultMastMain.cpp Example_XmlRpc.cpp)
+    add_executable        (Example_RmlRpc main.cpp DefaultMastMain.cpp Examples_Utils.cpp Example_XmlRpc.cpp)
     set_target_properties (Example_RmlRpc PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
     target_link_libraries (Example_RmlRpc Mast Mast_Core Mast_RPC_Client SIT_Reader_Lib pthread dl)
   endif()

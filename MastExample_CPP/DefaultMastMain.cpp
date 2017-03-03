@@ -73,6 +73,8 @@ int DefaultMastMain (int argc, char* argv [])
       }
     }
 
+    std::cout << "Using SIT file: " << sitFilePath << std::endl;
+
     auto algoAndNames = GetAlgorithmsNames  (argc, argv);
 
     auto options =  RunMastOptions::CheckModel

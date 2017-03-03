@@ -16,12 +16,17 @@
 #include "PDL_Adapter_CPP.hpp"
 #include "XmlRpc_Protocol_Client.hpp"
 #include "RemoteProtocolFactory.hpp"
+#include "Examples_Utils.hpp"
+
 
 using std::string;
+using std::experimental::string_view;
 using std::vector;
 using std::unique_ptr;
 using std::make_unique;
 
+using namespace std::string_literals;
+using namespace std::experimental::literals::string_view_literals;
 using namespace mast;
 
 void                           Init                      (int argc, char* argv []);
@@ -174,16 +179,20 @@ vector<mast::AppFunctionAndName> GetAlgorithmsNames (int /* argc */, char* /* ar
 
 
 
+
+
 //! Returns SIT formatted file path to create a SystemModel from.
 //!
 string GetSitModelFilePath (int argc, char* argv[])
 {
-  if (argc > 1)
+  auto sitFile = GetFromArgs(argc, argv, "--sit");
+
+  if (sitFile.empty())
   {
-    return string(argv[1]);
+    sitFile = "Example_XmlRpc.sit";
   }
 
-  return "Example_XmlRpc.sit";
+  return sitFile;
 }
 //
 //  End of: GetSitModelFilePath
@@ -191,14 +200,25 @@ string GetSitModelFilePath (int argc, char* argv[])
 
 
 
-
 //! Doe special init for specific example (can do nothing)
 //!
-void Init (int /* argc */, char* /* argv */ [])
+void Init (int argc, char* argv[])
 {
+  auto url = GetFromArgs(argc, argv, "--url");
+
   auto& factory = RemoteProtocolFactory::Instance();
 
-  factory.RegisterCreator("XmlRpc", [](const string& /* parameters */) { return make_unique<XmlRpc_Protocol_Client>(); } );
+  auto creator = [url](const string& parameters)
+  {
+    if (!url.empty())
+    {
+      return make_unique<XmlRpc_Protocol_Client>(url);
+    }
+
+    return make_unique<XmlRpc_Protocol_Client>(parameters);
+  };
+
+  factory.RegisterCreator("XmlRpc", creator);
 }
 
 

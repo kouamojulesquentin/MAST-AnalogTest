@@ -23,7 +23,7 @@ DEPENDPATH += include        \
 
 SOURCES +=  \
     src/AccessInterface.cpp                         \
-    src/AccessInterfaceProtocolFactories.cpp        \
+    src/AccessInterfaceProtocolFactory.cpp          \
     src/LoopbackAccessInterfaceProtocol.cpp         \
     src/BinaryVector.cpp                            \
     src/BrocadeSelector.cpp                         \
@@ -53,8 +53,8 @@ SOURCES +=  \
     src/PrettyPrinter.cpp                           \
     src/PropagatePendingVisitor.cpp                 \
     src/Register.cpp                                \
-    src/Remote_Protocol_Client_Factory.cpp          \
     src/Remote_Protocol_Proxy.cpp                   \
+    src/RemoteProtocolFactory.cpp                   \
     src/Session.cpp                                 \
     src/SPI_Player.cpp                              \
     src/SPI_Protocol.cpp                            \
@@ -80,7 +80,7 @@ SOURCES +=  \
 HEADERS += \
     include/AccessInterface.hpp                         \
     include/AccessInterfaceProtocol.hpp                 \
-    include/AccessInterfaceProtocolFactories.hpp        \
+    include/AccessInterfaceProtocolFactory.hpp          \
     include/AppFunctionAndNode.hpp                      \
     include/LoopbackAccessInterfaceProtocol.hpp         \
     include/BinaryVector.hpp                            \
@@ -114,8 +114,8 @@ HEADERS += \
     include/PropagatePendingVisitor.hpp                 \
     include/Remote_Protocol.hpp                         \
     include/Remote_Protocol_Client.hpp                  \
-    include/Remote_Protocol_Client_Factory.hpp          \
     include/Remote_Protocol_Proxy.hpp                   \
+    include/RemoteProtocolFactory.hpp                   \
     include/Register.hpp                                \
     include/SPI_Player.hpp                              \
     include/SPI_Protocol.hpp                            \

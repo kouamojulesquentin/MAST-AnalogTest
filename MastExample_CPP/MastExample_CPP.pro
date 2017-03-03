@@ -27,6 +27,7 @@ win32 {
 SOURCES +=              \
     main.cpp            \
     DefaultMastMain.cpp \
+    EmptyInit.cpp       \
     Example.cpp
 
 

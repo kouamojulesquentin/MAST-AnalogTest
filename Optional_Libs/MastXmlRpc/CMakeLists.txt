@@ -11,11 +11,6 @@ if (WIN32)
   message(FATAL_ERROR "MastXmlRpc: WIN32 is not supported yet for XmlRpc")
 endif()
 
-set (CMAKE_CXX_COMPILER "g++")
-
-set(BaseProjectPath "../..")
-
-
 set_property(GLOBAL PROPERTY CXX_STANDARD          03)
 set_property(GLOBAL PROPERTY CXX_STANDARD_REQUIRED ON)
 
@@ -29,18 +24,13 @@ message("")
 find_package(LibXmlRpc  REQUIRED)
 
 
-set(WARNINGS     "-Wall -Wextra -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default")
-set(CLIENT_FLAGS "-std=c++03 -fPIC -g ${WARNINGS} -Wno-long-long")
+set(WARNINGS     "-Wall -Wextra -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-include-dirs -Wswitch-enum -Wswitch-default")
+set(CLIENT_FLAGS "-fPIC -g ${WARNINGS} -Wno-long-long")
 set(SERVER_FLAGS "${CLIENT_FLAGS}")
 
 
-set(ClientSources XmlRpc_Protocol_Common.hpp
-                  XmlRpc_Protocol_Client.cpp
-                  XmlRpc_Protocol_Client.hpp)
-
-set(ServerSources XmlRpc_Protocol_Common.hpp
-                  XmlRpc_Protocol_Server.cpp
-                  XmlRpc_Protocol_Server.hpp)
+set(ClientSources XmlRpc_Protocol_Client.cpp)
+set(ServerSources XmlRpc_Protocol_Server.cpp)
 
 include_directories(${LIBXMLRPC_INCLUDE_DIRS})
 include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
@@ -54,6 +44,7 @@ message(STATUS "MastXmlRpc: ClientSources:            ${ClientSources}")
 message(STATUS "MastXmlRpc: SERVER_FLAGS:             ${SERVER_FLAGS}")
 message(STATUS "MastXmlRpc: ServerSources:            ${ServerSources}")
 message(STATUS "MastXmlRpc: ServerSources:            ${ServerSources}")
+message(STATUS "MastXmlRpc: LIBMAST_CORE_INCLUDE_DIRS ${LIBMAST_CORE_INCLUDE_DIRS}")
 message(STATUS "MastXmlRpc: LIBXMLRPC_INCLUDE_DIRS:   ${LIBXMLRPC_INCLUDE_DIRS}")
 message("================================================================================")
 message("")

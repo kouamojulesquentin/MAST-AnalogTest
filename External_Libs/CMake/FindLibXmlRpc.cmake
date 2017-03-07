@@ -8,12 +8,6 @@ set(LIBXMLRPC_FOUND FALSE)
 
 message("")
 message("================================================================================")
-
-if (NOT DEFINED(XmlRpcInstall))
-  message(STATUS "FindLibXmlRpc: Will set XmlRpcInstall")
-  set(XmlRpcInstall ${CMAKE_CURRENT_LIST_DIR}/../xmlrpc-c/build)
-#  set(XmlRpcInstall ${XMLRPC_CMAKE_INSTALL})
-endif()
 message(STATUS "FindLibXmlRpc: XmlRpcInstall:           ${XmlRpcInstall}")
 
 find_path(LIBXMLRPC_INCLUDE_DIR xmlrpc.h HINTS ${XmlRpcInstall}/include )
@@ -27,16 +21,6 @@ find_library(LIBXMLRPC_SERVER_PLUS_PLUS_LIBRARY       NAMES xmlrpc_server++     
 find_library(LIBXMLRPC_SERVER_ABYSS_PLUS_PLUS_LIBRARY NAMES xmlrpc_server_abyss++ libxmlrpc_server_abyss++ HINTS ${XmlRpcInstall}/lib)
 find_library(LIBXMLRPC_UTIL_LIBRARY                   NAMES xmlrpc_util           libxmlrpc_util           HINTS ${XmlRpcInstall}/lib)
 find_library(LIBXMLRPC_UTIL_PLUS_PLUS_LIBRARY         NAMES xmlrpc_util++         libxmlrpc_util++         HINTS ${XmlRpcInstall}/lib)
-
-#+    xmlrpc_abyss
-#+    xmlrpc_abyss++
-#+    xmlrpc_cpp
-#+    xmlrpc_server
-#+    xmlrpc_server_abyss
-#+    xmlrpc_server_pstream+  +
-#+    xmlrpc_xmlparse
-#+    xmlrpc_xmltok
-
 
 include(FindPackageHandleStandardArgs)
 # handle the QUIETLY and REQUIRED arguments and set LIBXMLRPC_FOUND to TRUE

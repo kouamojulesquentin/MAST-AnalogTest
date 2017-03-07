@@ -4,7 +4,7 @@ include(ExternalProject)
 
 if (NOT XmlRpcInstall)
   message(STATUS "External_Libs: Setting XmlRpcInstall")
-  set(XmlRpcInstall ${CMAKE_CURRENT_LIST_DIR}/xmlrpc-c)
+  set(XmlRpcInstall ${CMAKE_CURRENT_SOURCE_DIR}/xmlrpc-c)
 endif()
 
 message("")

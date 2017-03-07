@@ -124,8 +124,6 @@ namespace
 
         m_protocol->DoReset(doSynchronousReset);
 
-        *pRetValue = xmlrpc_c::value_int(XML_RPC_SUCCESS);
-
         StructFields_t fields;
         fields[XML_RPC_FIELD_CALL_ID] = xmlrpc_c::value_int(callId);
 

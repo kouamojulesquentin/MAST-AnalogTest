@@ -76,8 +76,7 @@ class XmlRpc_Protocol_Server : public Remote_Protocol_Server
 
   //! Sets whether error are logged on std::cerr
   //!
-  void  LogErrors (bool logOnError) { m_logErrors = logOnError; }
-
+  void  LogErrors (bool logErrors) { m_logErrors = logErrors; }
 
   //! Returns whether infos are logged on std::cout
   //!

@@ -20,6 +20,8 @@
 #include <xmlrpc-c/client_simple.hpp>
 
 #include <sstream>
+#include <iostream>
+#include <stdexcept>
 
 using std::string;
 using std::vector;
@@ -45,6 +47,10 @@ XmlRpc_Protocol_Client::XmlRpc_Protocol_Client ()
   : Remote_Protocol_Client ("http://localhost:8080/RPC2")
   , m_callId               (0)
 {
+  if (LogInfos())
+  {
+    std::cout << "Xml-Rpc client will connect to server: " << ServerUrl() << std::endl;
+  }
 }
 //
 //  End of: XmlRpc_Protocol_Client::XmlRpc_Protocol_Client
@@ -59,6 +65,10 @@ XmlRpc_Protocol_Client::XmlRpc_Protocol_Client (const std::string& parameters)
   : Remote_Protocol_Client (parameters)
   , m_callId               (0)
 {
+  if (LogInfos())
+  {
+    std::cout << "Xml-Rpc client will connect to server: " << ServerUrl() << std::endl;
+  }
 }
 //
 //  End of: XmlRpc_Protocol_Client::XmlRpc_Protocol_Client
@@ -73,6 +83,10 @@ void XmlRpc_Protocol_Client::CheckCallId (uint32_t callId)
   {
     std::ostringstream os;
     os << "Xml-Client expected call id: " << m_callId << ", got: " << callId;
+    if (LogErrors())
+    {
+      std::cerr << os.str() << std::endl;
+    }
     throw std::runtime_error(os.str());
   }
 
@@ -154,11 +168,6 @@ XmlRpc_Protocol_Client::SendScanVector (const string& commandName, uint32_t bits
 //
 //  End of: XmlRpc_Protocol_Client::SendScanVector
 //---------------------------------------------------------------------------
-
-
-
-
-
 
 //===========================================================================
 // End of XmlRpc_Protocol_Client.cpp

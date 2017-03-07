@@ -58,7 +58,7 @@ class XmlRpc_Protocol_Client : public Remote_Protocol_Client
 
   // ---------------- Private  Fields
   //
-  uint32_t m_callId;  //!< Identifies a call between client and server (response must return same id)
+  uint32_t m_callId;    //!< Identifies a call between client and server (response must return same id)
 };
 //
 //  End of XmlRpc_Protocol_Client class declaration

@@ -27,7 +27,7 @@ namespace mast
 {
 //! Represents a remote protocol with client role for RPC
 //!
-//! @note This is an abstract base class
+//! @note This is an abstract base class that can be used as an interface
 //!
 //! @note MUST be compilable by C++03 only compilers !
 //!
@@ -38,9 +38,11 @@ class Remote_Protocol_Client
   public:
   virtual ~Remote_Protocol_Client() {}
 
-  Remote_Protocol_Client(const std::string& serverUrl)
+  Remote_Protocol_Client(const std::string& serverUrl, bool logInfos = false, bool logErrors = false)
     : m_serverUrl (serverUrl)
-    , m_kindName  ("Remote_Client")  // This is the default when not yet got actual name from a server
+    , m_kindName  ("Remote_Client") // This is the default when not yet got actual name from a server
+    , m_logInfos  (logInfos)
+    , m_logErrors (logErrors)
   {
   }
 
@@ -72,6 +74,23 @@ class Remote_Protocol_Client
   //!
   virtual void SendDoReset(bool doSynchronousReset) = 0;
 
+  //! Returns whether error are logged on std::cerr
+  //!
+  bool  LogErrors() const { return m_logErrors; }
+
+  //! Sets whether error are logged on std::cerr
+  //!
+  void  LogErrors (bool logErrors) { m_logErrors = logErrors; }
+
+  //! Returns whether infos are logged on std::cout
+  //!
+  bool  LogInfos() const { return m_logInfos; }
+
+  //! Sets whether infos are logged on std::cout
+  //!
+  void  LogInfos (bool logInfos) { m_logInfos = logInfos; }
+
+
   // ---------------- Private  Methods
   //
   private:
@@ -80,8 +99,10 @@ class Remote_Protocol_Client
   // ---------------- Private  Fields
   //
   private:
-  std::string m_serverUrl;  //!< Url for connection to remote protocol server
-  std::string m_kindName;   //!< Should be retrieved from call to a server
+  std::string m_serverUrl; //!< Url for connection to remote protocol server
+  std::string m_kindName;  //!< Should be retrieved from call to a server
+  bool        m_logInfos;  //!< To enable logging of info messages on std::cout
+  bool        m_logErrors; //!< To enable logging of errors on std::cerr
 };
 //
 //  End of Remote_Protocol_Client class declaration

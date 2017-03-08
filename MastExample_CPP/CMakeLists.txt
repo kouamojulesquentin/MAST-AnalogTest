@@ -3,8 +3,13 @@
 cmake_minimum_required(VERSION 3.5)
 project(MastExample_CPP)
 
-message("MastExample_CPP.CMake:   INTEL_EXPERIMENT: ${INTEL_EXPERIMENT}")
-message("MastExample_CPP.CMake:   KISSFFT: ${KISSFFT}")
+message("")
+message("================================================================================")
+message(STATUS "MastExample_CPP: LIBMAST_CORE_INCLUDE_DIRS:       ${LIBMAST_CORE_INCLUDE_DIRS}")
+message(STATUS "MastExample_CPP: INTEL_EXPERIMENT                 ${INTEL_EXPERIMENT}")
+message(STATUS "MastExample_CPP: KISSFFT:                         ${KISSFFT}")
+message("================================================================================")
+message("")
 
 add_definitions(${P_WARNINGS})
 set (P_WARNINGS "-Wall -Wno-sign-compare -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-include-dirs")
@@ -74,9 +79,9 @@ else ()
     include_directories(${LIBMASTRPC_INCLUDE_DIRS})
     include_directories(${LIBMASTXMLRPC_INCLUDE_DIRS})
 
-    add_executable        (Example_RmlRpc main.cpp DefaultMastMain.cpp Examples_Utils.cpp Example_XmlRpc.cpp)
-    set_target_properties (Example_RmlRpc PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
-    target_link_libraries (Example_RmlRpc Mast Mast_Core Mast_RPC_Client SIT_Reader_Lib pthread dl)
+    add_executable        (Example_XmlRpc main.cpp DefaultMastMain.cpp Examples_Utils.cpp Example_XmlRpc.cpp)
+    set_target_properties (Example_XmlRpc PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+    target_link_libraries (Example_XmlRpc Mast Mast_Core Mast_RPC_Client SIT_Reader_Lib pthread dl)
   endif()
 
   target_link_libraries(MastExample_CPP Mast Mast_Core SIT_Reader_Lib pthread dl)

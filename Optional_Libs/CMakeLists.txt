@@ -18,6 +18,12 @@ if (USE_XML_RPC)
   set(LIBMASTXMLRPC_INCLUDE_DIRS "${LIBMASTXMLRPC_INCLUDE_DIRS}" PARENT_SCOPE)
 endif()
 
-add_subdirectory(Examples)
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/ATE_Server AND DEFINED BUILD_ATE_SERVER AND (${BUILD_ATE_SERVER} MATCHES "TRUE|ON"))
+  add_subdirectory(ATE_Server)
+endif()
+
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/Examples)
+  add_subdirectory(Examples)
+endif()
 
 

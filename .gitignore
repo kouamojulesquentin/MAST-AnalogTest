@@ -168,6 +168,7 @@ build
 /External_Libs/xmlrpc-c/xmlrpc-c-config.test
 /External_Libs/xmlrpc-c/xmlrpc_amconfig.h
 /External_Libs/xmlrpc-c/xmlrpc_config.h
+/_Exports
 /openocd/lib/*.so
 /openocd/openocd/autom4te.cache*
 /openocd/openocd/jimtcl/configure.gnu

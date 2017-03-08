@@ -28,26 +28,32 @@ endif()
 set_property(GLOBAL PROPERTY CXX_STANDARD 14)
 set_property(GLOBAL PROPERTY CXX_STANDARD_REQUIRED ON)
 
-set (CMAKE_EXE_LINKER_FLAGS         "${CMAKE_EXE_LINKER_FLAGS} -lpthread")
-set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Bin")
-set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Lib")
+set(CMAKE_EXE_LINKER_FLAGS         "${CMAKE_EXE_LINKER_FLAGS} -lpthread")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Bin")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Lib")
+set(EXPORT_DIR                      ${CMAKE_CURRENT_LIST_DIR}/_Exports)
 
 message(STATUS "")
 message(STATUS "Master: USE_OPEN_OCD:       ${USE_OPEN_OCD}")
 message(STATUS "Master: USE_LIBFTDISPI:     ${USE_LIBFTDISPI}")
 message(STATUS "Master: USE_XML_RPC:        ${USE_XML_RPC}")
 message(STATUS "Master: INTEL_EXPERIMENT:   ${INTEL_EXPERIMENT}")
-message(STATUS "Master: KISSFFT:   ${KISSFFT}")
+message(STATUS "Master: KISSFFT:            ${KISSFFT}")
 
 message(STATUS "")
 message(STATUS "Master: CMAKE_MODULE_PATH:              ${CMAKE_MODULE_PATH}")
 message(STATUS "Master: CMAKE_RUNTIME_OUTPUT_DIRECTORY: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 message(STATUS "Master: CMAKE_LIBRARY_OUTPUT_DIRECTORY: ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+message(STATUS "Master: EXPORT_DIR:                     ${EXPORT_DIR}")
 
 if (USE_XML_RPC)
   set(USE_EXTERNAL_LIBS ON)
-  set(XmlRpcInstall ${CMAKE_CURRENT_LIST_DIR}/External_Libs/xmlrpc-c/build)
+
+  set(XmlRpcInstall     ${CMAKE_CURRENT_LIST_DIR}/External_Libs/xmlrpc-c/build)
+  set(ATE_SERVER_EXPORT ${EXPORT_DIR}/ATE_Server)
+
   message(STATUS "Master: XmlRpcInstall:                  ${XmlRpcInstall}")
+  message(STATUS "Master: ATE_SERVER_EXPORT:              ${ATE_SERVER_EXPORT}")
 endif()
 
 message("================================================================================")
@@ -82,3 +88,20 @@ if(${INTEL_EXPERIMENT})
 	add_subdirectory (Intel)
 endif()
 
+
+if (USE_XML_RPC)
+  set(Xmlrpc_Excluded "/xmlrpc-c/(build|tmp|(xmlrpc_config.h|xmlrpc_amconfig.h|xmlrpc-c-config.test|xmlrpc-c-config)$)|(blddir|srcdir)$")
+  set(Server_Headers Mast_Core/include/Remote_Protocol.hpp
+                     Mast_Core/include/Remote_Protocol_Client.hpp
+                     Mast_Core/include/Remote_Protocol_Server.hpp)
+
+  set(Optionals_Excluded "ATE_Server.cmake|Examples|run_cmake.sh")
+
+  install(DIRECTORY Optional_Libs                             DESTINATION ${ATE_SERVER_EXPORT}               REGEX ${Optionals_Excluded} EXCLUDE)
+  install(DIRECTORY External_Libs/CMake                       DESTINATION ${ATE_SERVER_EXPORT}/External_Libs)
+  install(DIRECTORY External_Libs/xmlrpc-c                    DESTINATION ${ATE_SERVER_EXPORT}/External_Libs REGEX ${Xmlrpc_Excluded} EXCLUDE)
+  install(FILES     External_Libs/xmlrpc-c/build.sh           DESTINATION ${ATE_SERVER_EXPORT}/External_Libs/xmlrpc-c)
+  install(FILES     ${Server_Headers}                         DESTINATION ${ATE_SERVER_EXPORT}/Mast_Headers)
+  install(FILES     Optional_Libs/ATE_Server/ATE_Server.cmake DESTINATION ${ATE_SERVER_EXPORT}               RENAME CMakeLists.txt)
+  install(FILES     Optional_Libs/ATE_Server/run_cmake.sh     DESTINATION ${ATE_SERVER_EXPORT})
+endif()

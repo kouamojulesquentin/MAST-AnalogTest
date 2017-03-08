@@ -3,7 +3,7 @@
 CMAKE_RELEASE_BUILD_DIR = cmake_release
 CMAKE_DEBUG_BUILD_DIR   = cmake_debug
 CMAKE_ARM_BUILD_DIR     = cmake_arm
-CMAKE_RISCV32_BUILD_DIR     = cmake_riscV32
+CMAKE_RISCV32_BUILD_DIR = cmake_riscV32
 
 #+CMAKE_DEBUG_BUILD_MAKEFILE =$(CMAKE_DEBUG_BUILD_DIR)/Makefile
 
@@ -49,6 +49,7 @@ USE_OPEN_OCD     = ON
 USE_LIBFTDISPI   = ON
 INTEL_EXPERIMENT = ON
 KISSFFT          = ON
+
 MKDIR  = mkdir -p
 RM     = rm -f
 RM_DIR = rm -rf
@@ -79,15 +80,11 @@ XMLRPC_ROOT_DIR = xmlrpc-c
 CMAKE_FLAGS+= -DEXTDIR_INSTALL_DIR_ABS=$(PWD)/$(EXTDIR_ROOT_DIR)/$(EXTDIR_INSTALL_DIR)
 CMAKE_FLAGS+= -DXMLRPC_ROOT_DIR=$(XMLRPC_ROOT_DIR)
 
-#+BUILD_UT = ON
-
 CPP_DEFINES  = -DUSE_XML_RPC:BOOL=$(USE_XML_RPC)
 CPP_DEFINES += -DUSE_OPEN_OCD:BOOL=$(USE_OPEN_OCD)
 CPP_DEFINES += -DUSE_LIBFTDISPI:BOOL=$(USE_LIBFTDISPI)
 CPP_DEFINES += -DINTEL_EXPERIMENT:BOOL=$(INTEL_EXPERIMENT)
 CPP_DEFINES += -DKISSFFT:BOOL=$(KISSFFT)
-
-#+CPP_DEFINES += -DBUILD_UT:BOOL=$(BUILD_UT)
 
 CMAKE_DEBUG_FLAGS=    -DCMAKE_BUILD_TYPE=Debug   $(CMAKE_FLAGS) $(CPP_DEFINES)
 CMAKE_RELEASE_FLAGS=  -DCMAKE_BUILD_TYPE=Release $(CMAKE_FLAGS) $(CPP_DEFINES)
@@ -125,7 +122,7 @@ endif
 
 external_libs: xmlrpc-c
 
-xmlrpc-c: 
+xmlrpc-c:
 > cd       $(EXTDIR_ROOT_DIR)/$(XMLRPC_ROOT_DIR) && ./configure  --prefix=$(PWD)/$(EXTDIR_ROOT_DIR)/$(EXTDIR_INSTALL_DIR)/$(XMLRPC_ROOT_DIR)
 > cd       $(EXTDIR_ROOT_DIR)/$(XMLRPC_ROOT_DIR) && make && make install
 
@@ -146,6 +143,14 @@ endif
 > $(info ==> Makefile: Use Open OCD: $(USE_OPEN_OCD))
 #+> $(info ==> Makefile: Build UT:     $(BUILD_UT))
 > cd $(CMAKE_RELEASE_BUILD_DIR) && make  $(MAKE_FLAGS)
+
+
+install_debug:
+> cd $(CMAKE_DEBUG_BUILD_DIR)   && make install
+
+install_release:
+> cd $(CMAKE_RELEASE_BUILD_DIR) && make install
+
 
 run_debug:
 ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(MAST_UT_EXE_NAME))","")

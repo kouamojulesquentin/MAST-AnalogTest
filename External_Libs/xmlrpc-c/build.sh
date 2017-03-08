@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Helper script to build xmlrpc-c lib for MAST Usage
+# It can be used only as a model (to check that each steps run smoothly)
 
 if [ -z "$1" ]
 then

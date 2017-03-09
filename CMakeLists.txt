@@ -1,18 +1,17 @@
 cmake_minimum_required(VERSION 3.5)
+project(Mast)
 
 message("")
 message("================================================================================")
 if (WIN32)
-	if (NOT ${CMAKE_GENERATOR} MATCHES "MinGW Makefiles")
-		message("\n>>>>>>>>>>>>>>> Syntax should be: cmake -G \"MinGW Makefiles\" <<<<<<<<<<<<<<<\n\n")
-	endif()
+  if (NOT ${CMAKE_GENERATOR} MATCHES "MinGW Makefiles")
+    message("\n>>>>>>>>>>>>>>> Syntax should be: cmake -G \"MinGW Makefiles\" <<<<<<<<<<<<<<<\n\n")
+  endif()
   set (CMAKE_CXX_COMPILER "g++")
   set (CMAKE_C_COMPILER   "gcc")
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/External_Libs/CMake ${CMAKE_MODULE_PATH})
-
-project(mast)
 
 add_definitions(${WARNINGS})
 set (WARNINGS "-Wall -Wextra -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default")
@@ -31,7 +30,7 @@ set_property(GLOBAL PROPERTY CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXE_LINKER_FLAGS         "${CMAKE_EXE_LINKER_FLAGS} -lpthread")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Lib")
-set(EXPORT_DIR                      ${CMAKE_CURRENT_LIST_DIR}/_Exports)
+set(EXPORT_DIR                     ".")
 
 message(STATUS "")
 message(STATUS "Master: USE_OPEN_OCD:       ${USE_OPEN_OCD}")
@@ -48,12 +47,9 @@ message(STATUS "Master: EXPORT_DIR:                     ${EXPORT_DIR}")
 
 if (USE_XML_RPC)
   set(USE_EXTERNAL_LIBS ON)
-
   set(XmlRpcInstall     ${CMAKE_CURRENT_LIST_DIR}/External_Libs/xmlrpc-c/build)
-  set(ATE_SERVER_EXPORT ${EXPORT_DIR}/ATE_Server)
 
   message(STATUS "Master: XmlRpcInstall:                  ${XmlRpcInstall}")
-  message(STATUS "Master: ATE_SERVER_EXPORT:              ${ATE_SERVER_EXPORT}")
 endif()
 
 message("================================================================================")
@@ -90,19 +86,22 @@ endif()
 
 
 if (USE_XML_RPC)
-  set(Xmlrpc_Excluded "/xmlrpc-c/(build|tmp|(xmlrpc_config.h|xmlrpc_amconfig.h|xmlrpc-c-config.test|xmlrpc-c-config)$)|(blddir|srcdir)$")
-  set(Server_Headers Mast_Core/include/Remote_Protocol.hpp
-                     Mast_Core/include/Remote_Protocol_Client.hpp
-                     Mast_Core/include/Remote_Protocol_Server.hpp)
-
-  set(Optionals_Excluded "ATE_Server.cmake|Examples|run_cmake.sh")
-
-  install(DIRECTORY Optional_Libs                             DESTINATION ${ATE_SERVER_EXPORT}               REGEX ${Optionals_Excluded} EXCLUDE)
-  install(DIRECTORY External_Libs/CMake                       DESTINATION ${ATE_SERVER_EXPORT}/External_Libs)
-  install(DIRECTORY External_Libs/xmlrpc-c                    DESTINATION ${ATE_SERVER_EXPORT}/External_Libs REGEX ${Xmlrpc_Excluded} EXCLUDE)
-  install(FILES     External_Libs/xmlrpc-c/build.sh           DESTINATION ${ATE_SERVER_EXPORT}/External_Libs/xmlrpc-c PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE)
-  install(FILES     ${Server_Headers}                         DESTINATION ${ATE_SERVER_EXPORT}/Mast_Headers)
-  install(FILES     Optional_Libs/ATE_Server/ATE_Server.cmake DESTINATION ${ATE_SERVER_EXPORT}               RENAME CMakeLists.txt)
-  install(FILES     Optional_Libs/ATE_Server/run_cmake.sh     DESTINATION ${ATE_SERVER_EXPORT}               PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE)
+  include(Export_ATE_Server.cmake)
 endif()
+
+set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY  OFF)
+set(CPACK_COMPONENTS_GROUPING         ONE_PER_GROUP)
+set(CPACK_COMPONENTS_ALL              ATE_Server SIT_Files)
+
+set(CPACK_PACKAGE_VENDOR              "Mast")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY   "${ATE_SERVER_EXPORT}")
+set(CPACK_PACKAGE_NAME                "ATE_Server")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Files to build an ATE server on system with only C++03")
+set(CPACK_PACKAGE_VERSION_MAJOR       "1")
+set(CPACK_PACKAGE_VERSION_MINOR       "0")
+set(CPACK_PACKAGE_VERSION_PATCH       "0")
+set(CPACK_PACKAGE_VERSION             "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}")
+set(CPACK_SYSTEM_NAME                 "") # To prevent "-Linux" in file name
+
+include(CPack)
 

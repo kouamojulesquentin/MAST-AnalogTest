@@ -110,7 +110,9 @@ MAKE_FLAGS= -j4
 OPENOCD_INSTALL_DIR=./openocd/
 
 
-all: debug
+all:     debug
+install: install_debug
+pack:    pack_debug
 
 ifeq ("$(USE_OPEN_OCD)","ON")
 debug:   openocd_debug
@@ -151,6 +153,8 @@ install_debug:
 install_release:
 > cd $(CMAKE_RELEASE_BUILD_DIR) && make install
 
+pack_debug:
+> cd $(CMAKE_DEBUG_BUILD_DIR)   && cpack -G TGZ
 
 run_debug:
 ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(MAST_UT_EXE_NAME))","")

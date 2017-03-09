@@ -100,4 +100,4 @@ message(STATUS "MastExample_CPP: CMAKE_RUNTIME_OUTPUT_DIRECTORY:  ${CMAKE_RUNTIM
 message("================================================================================")
 message("")
 
-install(DIRECTORY SIT DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+install(DIRECTORY SIT DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COMPONENT SIT_Files)

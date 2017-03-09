@@ -7,8 +7,6 @@ if (WIN32)
   if (NOT ${CMAKE_GENERATOR} MATCHES "MinGW Makefiles")
     message("\n>>>>>>>>>>>>>>> Syntax should be: cmake -G \"MinGW Makefiles\" <<<<<<<<<<<<<<<\n\n")
   endif()
-  set (CMAKE_CXX_COMPILER "g++")
-  set (CMAKE_C_COMPILER   "gcc")
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/External_Libs/CMake ${CMAKE_MODULE_PATH})

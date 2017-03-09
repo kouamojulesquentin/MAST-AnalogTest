@@ -32,7 +32,7 @@ install(DIRECTORY   External_Libs/xmlrpc-c
 install(FILES       External_Libs/xmlrpc-c/build.sh
         COMPONENT   ATE_Server
         DESTINATION ${ATE_SERVER_EXPORT}/External_Libs/xmlrpc-c
-        PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE)
+        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ)
 
 install(FILES       ${Server_Headers}
         COMPONENT   ATE_Server
@@ -46,9 +46,5 @@ install(FILES       Optional_Libs/ATE_Server/ATE_Server.cmake
 install(FILES       Optional_Libs/ATE_Server/run_cmake.sh
         COMPONENT   ATE_Server
         DESTINATION ${ATE_SERVER_EXPORT}
-        PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE)
-
-
-
-
+        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ)
 

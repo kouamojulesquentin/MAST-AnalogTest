@@ -31,8 +31,18 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Lib")
 set(EXPORT_DIR                     ".")
 
 message(STATUS "")
+message(STATUS "Master: User specific values for build options can be overridden in UserOptions.cmake")
+message(STATUS "Master: See model file: UserOptions.model.cmake")
+
+if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/UserOptions.cmake)
+  message("STATUS")
+  include(${CMAKE_CURRENT_LIST_DIR}/UserOptions.cmake)
+endif()
+
+message(STATUS "")
 message(STATUS "Master: USE_OPEN_OCD:       ${USE_OPEN_OCD}")
 message(STATUS "Master: USE_LIBFTDISPI:     ${USE_LIBFTDISPI}")
+message(STATUS "Master: BUILD_ATE_SERVER:   ${BUILD_ATE_SERVER}")
 message(STATUS "Master: USE_XML_RPC:        ${USE_XML_RPC}")
 message(STATUS "Master: INTEL_EXPERIMENT:   ${INTEL_EXPERIMENT}")
 message(STATUS "Master: KISSFFT:            ${KISSFFT}")

@@ -173,3 +173,4 @@ build
 /openocd/openocd/autom4te.cache*
 /openocd/openocd/jimtcl/configure.gnu
 /Optional_Libs_UT/Generated/Runner.cpp
+/UserOptions.cmake

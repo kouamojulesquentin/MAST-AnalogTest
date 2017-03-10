@@ -23,6 +23,12 @@ Build: make
 
 Clean make clean
 
+Alternatively, one can use makefile in project root directory:
+  make debug|release
+  make clean|distclean
+
+To override default values of variables that drive build process, see UserOptions.model.cmake
+
 [TESTS]
 Standard CMAKE test: make run_debug or make run_release
 Custom MAST test: ./Mast_UT

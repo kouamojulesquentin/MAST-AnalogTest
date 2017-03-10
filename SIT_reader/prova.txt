@@ -1,7 +1,0 @@
-CHAIN root
-  {
-   MIB test_MIB POST HIGH 4 Binary 
-    {REGISTER test_reg_1 4 Bypass: "0b1001"
-     REGISTER test_reg_2 4 Bypass: "0b1100"
-    }
- }

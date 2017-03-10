@@ -5,7 +5,8 @@ project(TestCasesApp)
 
 message("")
 message("================================================================================")
-message(STATUS "TestCasesApp: INTEL_EXPERIMENT:   ${INTEL_EXPERIMENT}")
+message(STATUS "TestCasesApp: INTEL_EXPERIMENT:         ${INTEL_EXPERIMENT}")
+message(STATUS "TestCasesApp: LIBMASTSPI_INCLUDE_DIRS:  ${LIBMASTSPI_INCLUDE_DIRS}")
 
 add_definitions(${P_WARNINGS})
 set (P_WARNINGS "-Wall -Wno-sign-compare -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-include-dirs")
@@ -17,6 +18,7 @@ include_directories(${LIBMAST_CPP_API_INCLUDE_DIRS})
 include_directories(${LIBMAST_C_API_INCLUDE_DIRS})
 include_directories(${LIBLOGGER_INCLUDE_DIRS})
 include_directories(${LIBSIT_READER_INCLUDE_DIRS})
+include_directories(${LIBMASTSPI_INCLUDE_DIRS})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
 
@@ -97,8 +99,15 @@ set_target_properties	(TestCasesApp PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 if (WIN32)
 	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib DbgHelp)
 elseif( NOT ${USE_OPEN_OCD})
-	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib pthread dl kiss_fft)
+	target_link_libraries(TestCasesApp Mast 
+                                     Mast_Core 
+                                     Logger 
+                                     SIT_Reader_Lib 
+                                     ${LIBMASTSPI_LIBRARIES} 
+                                     kiss_fft
+                                     pthread
+                                     dl)
 else ()
     # $LIBUSB_CFLAGS, ldl and libjim.a args are required by OpenOCD.
-	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib pthread ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/lib/libopenocd.so dl kiss_fft)
+	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib ${LIBMASTSPI_LIBRARIES} pthread ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/lib/libopenocd.so dl kiss_fft)
 endif ()

@@ -13,8 +13,15 @@ message(STATUS "External_Libs: XmlRpcInstall:            ${XmlRpcInstall}")
 message("================================================================================")
 message("")
 
-if(${USE_LIBFTDISPI})
+if(${USE_LIBFTDISPI} MATCHES "ON")
   add_subdirectory (FTDI_SPI)
+  set(LIBFTDI_SPI_INCLUDE_DIRS "${LIBFTDI_SPI_INCLUDE_DIRS}" PARENT_SCOPE)
+  
+  message("")
+  message("================================================================================")
+  message(STATUS "External_Libs: LIBFTDI_SPI_INCLUDE_DIRS:  ${LIBFTDI_SPI_INCLUDE_DIRS}")
+  message("================================================================================")
+  message("")
 endif()
 
 # Unused: external libraries are built separately
@@ -47,6 +54,6 @@ endif()
 #set (XMLRPC_CMAKE_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/xmlrpc-c/include/)
 #message("================================================================================")
 #message(STATUS "External_Libs: XMLRPC_CMAKE_INSTALL:            ${XMLRPC_CMAKE_INSTALL}")
-#message(STATUS "External_Libs: XMLRPC_CMAKE_INCLUDE_DIRS:            ${XMLRPC_CMAKE_INCLUDE_DIRS}")
+#message(STATUS "External_Libs: XMLRPC_CMAKE_INCLUDE_DIRS:       ${XMLRPC_CMAKE_INCLUDE_DIRS}")
 #message("================================================================================")
 #

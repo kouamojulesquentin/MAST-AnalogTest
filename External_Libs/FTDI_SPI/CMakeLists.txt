@@ -12,6 +12,10 @@ else()
                   /usr/include/libftdi
                   /usr/local/include/libftdi)
 
+  set(LIBFTDI_SPI_INCLUDE_DIRS "${LIBFTDI_SPI_INCLUDE_DIRS}" 
+                               "${CMAKE_CURRENT_SOURCE_DIR}/include" 
+                               PARENT_SCOPE)
+
   find_library(FTDI_LIBRARY
                NAMES ftdi
                PATHS /usr/lib

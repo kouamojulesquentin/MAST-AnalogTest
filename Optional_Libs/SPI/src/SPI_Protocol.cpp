@@ -18,13 +18,7 @@
 #include <thread>
 #include <chrono>
 #include <iostream>
-
-#ifdef USE_LIBFTDISPI
-  #include <ftdispi.h>
-#else // Defines the struct to allow unique_ptr destructor to know their size
-  struct ftdi_context {};
-  struct ftdispi_context {};
-#endif
+#include <ftdispi.h>
 
 using std::experimental::string_view;
 using std::string;
@@ -41,12 +35,10 @@ using namespace std::string_literals;
 //!
 SPI_Protocol::~SPI_Protocol()
 {
-  #ifdef USE_LIBFTDISPI
   if (m_ftdispi_ctx)
   {
     ftdispi_close(m_ftdispi_ctx.get(), 1);
   }
-  #endif
 }
 
 //! Initializes ftdi spi library
@@ -59,7 +51,6 @@ SPI_Protocol::~SPI_Protocol()
 //! @param commandsPrefix       Optional text that will be prepended to actual SPI command
 //! @param usbDeviceID          Optional (machine specific) USB device identifier
 //!
-#ifdef USE_LIBFTDISPI
 SPI_Protocol::SPI_Protocol (vector<uint32_t> chipSelectCommands,
                             vector<uint32_t> readCommands,
                             vector<uint32_t> writeCommands,
@@ -101,21 +92,6 @@ SPI_Protocol::SPI_Protocol (vector<uint32_t> chipSelectCommands,
   ftdispi_setclock    (m_ftdispi_ctx.get(), 200000);                  // Here we request a 200kHz bus speed
   ftdispi_setloopback (m_ftdispi_ctx.get(), 0);
 }
-#else
-SPI_Protocol::SPI_Protocol (vector<uint32_t> chipSelectCommands,
-                            vector<uint32_t> readCommands,
-                            vector<uint32_t> writeCommands,
-                            string_view      commandsPrefix,
-                            uint16_t         /* usbDeviceID */)
-  : SPI_Player(std::move(chipSelectCommands), std::move(readCommands), std::move(writeCommands), commandsPrefix)
-{
-  LOG(ERROR_LVL) << "SPI_Protocol is not supported by this built ==> DON'T USE IT";
-
-  // Emulate error we get on platform supporting SPI FTDI when cannot open USB
-  // (this is to get similar behaviour in unit tests)
-  THROW_RUNTIME_ERROR("OPEN: "s + "usb_find_busses() failed");
-}
-#endif
 //
 //  End of: SPI_Protocol::SPI_Protocol
 //---------------------------------------------------------------------------
@@ -125,7 +101,6 @@ SPI_Protocol::SPI_Protocol (vector<uint32_t> chipSelectCommands,
 
 //! Loopbacks "to SUT data" logging SPI command(s) that would have been issued if libFTDIspi was installed.
 //!
-#ifndef USE_LIBFTDISPI
 BinaryVector SPI_Protocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   auto command = CreateSPICommand(derivationId, toSutData);
@@ -143,38 +118,6 @@ BinaryVector SPI_Protocol::DoAction (uint32_t derivationId, void* /* interfaceDa
 
   return toSutData;
 }
-#else
-BinaryVector SPI_Protocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
-{
-  // Getting chip-select, and read and write commands for the given derivationId.
-  auto chipSelectCommand = GetChipSelectCommand(derivationId);
-  auto readCommand       = GetReadCommand(derivationId);
-  auto writeCommand      = GetWriteCommand(derivationId);
-
-  auto bitsCount       = toSutData.BitsCount();
-  auto bytesCount      = toSutData.BytesCount();
-  auto spiBufferLength = bytesCount+1u;                  // +1 byte is needed to host command.
-  auto spiBufferRead   = vector<uint8_t>(bytesCount+1u);
-  auto spiBufferWrite  = vector<uint8_t>();
-
-  auto toSutDataBuffer    = toSutData.DataRightAligned();
-  //auto fromSutDataBuffer  = vector<uint8_t>(toSutData.BytesCount());
-
-  spiBufferRead.insert  (spiBufferRead.begin(),  readCommand);    // Adding the read command at the beginning of the read packet.
-  spiBufferWrite.insert (spiBufferWrite.begin(), writeCommand);   // Adding the write command at the beginning of the read packet.
-  spiBufferWrite.insert (spiBufferWrite.end(),   toSutDataBuffer.begin(), toSutDataBuffer.end());
-
-  ftdispi_read  (m_ftdispi_ctx.get(), spiBufferRead.data(), spiBufferLength, chipSelectCommand);    // Read request with libftdispi
-  LOG(INFO) << "SPI_WRITE(" << toSutData.DataAsMixString() << ")";
-  ftdispi_write (m_ftdispi_ctx.get(), spiBufferWrite.data(), spiBufferLength, chipSelectCommand);  // Write request with libftdispi
-
-  vector<uint8_t> fromSutDataBuffer(spiBufferRead.begin()+1, spiBufferRead.end());          // Removing the first byte: dummy value due to the SPI command
-
-  auto fromSutData = BinaryVector::CreateFromRightAlignedBuffer(std::move(fromSutDataBuffer), bitsCount);
-
-  return fromSutData;
-}
-#endif
 //
 //  End of: SPI_Protocol::DoAction
 //---------------------------------------------------------------------------
@@ -186,11 +129,7 @@ BinaryVector SPI_Protocol::DoAction (uint32_t derivationId, void* /* interfaceDa
 //!
 void SPI_Protocol::DoReset(bool /* doSynchronousReset */)
 {
-  #ifndef USE_LIBFTDISPI
   LOG(INFO) << "SPI_RESET()";
-  #else
-  LOG(WARNING) << "SPI_RESET() ==> Not Yet Implemented";
-  #endif
 }
 
 

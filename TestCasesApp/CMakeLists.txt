@@ -3,7 +3,9 @@
 cmake_minimum_required(VERSION 3.5)
 project(TestCasesApp)
 
-message("TestCasesApp.CMake:   INTEL_EXPERIMENT: ${INTEL_EXPERIMENT}")
+message("")
+message("================================================================================")
+message(STATUS "TestCasesApp: INTEL_EXPERIMENT:   ${INTEL_EXPERIMENT}")
 
 add_definitions(${P_WARNINGS})
 set (P_WARNINGS "-Wall -Wno-sign-compare -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-include-dirs")
@@ -16,17 +18,17 @@ include_directories(${LIBMAST_C_API_INCLUDE_DIRS})
 include_directories(${LIBLOGGER_INCLUDE_DIRS})
 include_directories(${LIBSIT_READER_INCLUDE_DIRS})
 
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
 
 if (WIN32)
-  message("\n>>>>>>>>>>>>>>> TestCasesApp.CMake:   kissfft not used on Windows !!!\n")
-#+	target_sources(TestCasesApp, PRIVATE, main.cpp Options.cpp Zybo.cpp)
+  message(STATUS "TestCasesApp: kissfft not used on Windows!!!")
+  message("================================================================================")
 else()
   include_directories(../MastExample_CPP/)
   include_directories(../MastExample_CPP/kissfft/)
   include_directories(../MastExample_CPP/kissfft/tools/)
 endif()
+message("================================================================================")
 
 if (${USE_OPEN_OCD})
   set (P_CFLAGS "${P_CFLAGS} -DUSE_OPEN_OCD")
@@ -78,10 +80,6 @@ if (${USE_OPEN_OCD})
       set(HIDAPI_FOUND true)
       set(HIDAPI_CFLAGS "--Ihidapi/hidapi")
   endif(HIDAPI_INCLUDE_DIR AND HIDAPI_LIBRARY)
-endif()
-
-if (${USE_LIBFTDISPI})
-  set (P_CFLAGS "${P_CFLAGS} -DUSE_LIBFTDISPI")
 endif()
 
 if (WIN32)

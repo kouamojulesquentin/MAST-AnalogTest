@@ -13,6 +13,10 @@ message(STATUS "External_Libs: XmlRpcInstall:            ${XmlRpcInstall}")
 message("================================================================================")
 message("")
 
+if(${USE_LIBFTDISPI})
+  add_subdirectory (FTDI_SPI)
+endif()
+
 # Unused: external libraries are built separately
 #ExternalProject_Add( project_xmlprc
 #  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/xmlrpc-c"
@@ -30,11 +34,11 @@ message("")
 #set_property(TARGET xmlprc PROPERTY IMPORTED_LOCATION ${install_dir}/lib/libxmlrpc++.so)
 #set_property(TARGET xmlprc PROPERTY IMPORTED_LOCATION ${install_dir}/lib/libxmlrpc_packetsocket.so)
 #set_property(TARGET xmlprc PROPERTY IMPORTED_LOCATION ${install_dir}/lib/libxmlrpc_client.so)
-#set_property(TARGET xmlprc PROPERTY IMPORTED_LOCATION ${install_dir}/lib/libxmlrpc_client++.so) 
-#set_property(TARGET xmlprc PROPERTY IMPORTED_LOCATION ${install_dir}/lib/libxmlrpc_server++.so) 
+#set_property(TARGET xmlprc PROPERTY IMPORTED_LOCATION ${install_dir}/lib/libxmlrpc_client++.so)
+#set_property(TARGET xmlprc PROPERTY IMPORTED_LOCATION ${install_dir}/lib/libxmlrpc_server++.so)
 #set_property(TARGET xmlprc PROPERTY IMPORTED_LOCATION ${install_dir}/lib/libxmlrpc_server_abyss++.so)
 #set_property(TARGET xmlprc PROPERTY IMPORTED_LOCATION ${install_dir}/lib/libxmlrpc_util.so)
-#set_property(TARGET xmlprc PROPERTY IMPORTED_LOCATION ${install_dir}/lib/libxmlrpc_util++.so) 
+#set_property(TARGET xmlprc PROPERTY IMPORTED_LOCATION ${install_dir}/lib/libxmlrpc_util++.so)
 #add_dependencies(xmlprc project_xmlprc)
 #
 #add_definitions(${XMLRPC_CMAKE_INSTALL})

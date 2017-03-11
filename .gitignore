@@ -85,7 +85,6 @@
 /tmp/*
 /to_RTL/*
 *.dat
-*.txt
 License/license.mast
 MastExample_CPP/SIT/*.gml
 *.svf

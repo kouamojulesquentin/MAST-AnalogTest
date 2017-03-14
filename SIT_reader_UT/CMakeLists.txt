@@ -54,3 +54,5 @@ else ()
 	target_link_libraries(SIT_Reader_UT  Mast_Core Logger  SIT_Reader_Lib pthread)
 endif ()
 
+include(CTest)
+add_test(NAME SIT_Reader_UT COMMAND SIT_Reader_UT)

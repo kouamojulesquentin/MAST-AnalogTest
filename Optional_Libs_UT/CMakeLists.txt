@@ -54,3 +54,5 @@ else ()
   target_link_libraries(Optionals_UT Mast_RPC Mast_RPC_Client Mast_RPC_Server Logger pthread)
 endif ()
 
+include(CTest)
+add_test(NAME Optionals_UT COMMAND Optionals_UT)

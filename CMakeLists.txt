@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(Mast)
+enable_testing()
 
 message("")
 message("================================================================================")

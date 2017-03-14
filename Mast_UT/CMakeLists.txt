@@ -53,3 +53,5 @@ else ()
 	target_link_libraries(Mast_UT Mast Mast_Core Logger pthread)
 endif ()
 
+include(CTest)
+add_test(NAME Mast_UT COMMAND Mast_UT)

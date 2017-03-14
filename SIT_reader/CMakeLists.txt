@@ -14,8 +14,7 @@ if (NOT BISON_FOUND)
  message(FATAL_ERROR "Bison not found")
 endif()
 
-message(STATUS "SIT_reader: USE_OPEN_OCD:               ${USE_OPEN_OCD}")
-message(STATUS "SIT_reader: INTEL_EXPERIMENT:           ${INTEL_EXPERIMENT}")
+message(STATUS "SIT_reader: USE_OPEN_OCD:    ${USE_OPEN_OCD}")
 
 add_definitions(${P_WARNINGS})
 set (P_WARNINGS "-Wall -Wno-sign-compare -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs")
@@ -36,10 +35,6 @@ endif()
 #
 if (${USE_OPEN_OCD})
   set (CFLAGS "${CFLAGS} -DUSE_OPEN_OCD")
-endif()
-
-if (${INTEL_EXPERIMENT})
-  set (CFLAGS "${CFLAGS} -DINTEL_EXPERIMENT")
 endif()
 
 set (LEX_YACC_SRC_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/")
@@ -75,11 +70,6 @@ include_directories(${LIBLOGGER_INCLUDE_DIRS})
 
 set(LIBSIT_READER_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/." PARENT_SCOPE)
 
-if (${INTEL_EXPERIMENT})
-#+  message(STATUS "SIT_reader: Using INTEL_EXPERIMENT")
-  include_directories(../Intel/src/)
-endif()
-
 if (WIN32)
   include_directories($ENV{FLEX_DIR})
 endif()
@@ -88,11 +78,7 @@ add_library(SIT_Reader_Lib SHARED  ${LEX_YACC_SRC_DIR}SIT_reader.cpp ${LEX_YACC_
 
 set_target_properties(SIT_Reader_Lib  PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
-if (${INTEL_EXPERIMENT})
-  target_link_libraries(SIT_Reader_Lib Mast_Core Intel_Exp)
-else()
-  target_link_libraries(SIT_Reader_Lib Mast_Core)
-endif()
+target_link_libraries(SIT_Reader_Lib Mast_Core)
 
 message("================================================================================")
 message("")

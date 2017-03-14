@@ -5,7 +5,6 @@ project(TestCasesApp)
 
 message("")
 message("================================================================================")
-message(STATUS "TestCasesApp: INTEL_EXPERIMENT:         ${INTEL_EXPERIMENT}")
 message(STATUS "TestCasesApp: LIBMASTSPI_INCLUDE_DIRS:  ${LIBMASTSPI_INCLUDE_DIRS}")
 
 add_definitions(${P_WARNINGS})
@@ -99,11 +98,11 @@ set_target_properties	(TestCasesApp PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 if (WIN32)
 	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib DbgHelp)
 elseif( NOT ${USE_OPEN_OCD})
-	target_link_libraries(TestCasesApp Mast 
-                                     Mast_Core 
-                                     Logger 
-                                     SIT_Reader_Lib 
-                                     ${LIBMASTSPI_LIBRARIES} 
+	target_link_libraries(TestCasesApp Mast
+                                     Mast_Core
+                                     Logger
+                                     SIT_Reader_Lib
+                                     ${LIBMASTSPI_LIBRARIES}
                                      kiss_fft
                                      pthread
                                      dl)

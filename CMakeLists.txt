@@ -83,12 +83,6 @@ add_subdirectory (MastExample_CPP)
 add_subdirectory (Mast_UT)
 add_subdirectory (SIT_reader_UT)
 
-
-if(${INTEL_EXPERIMENT})
-	add_subdirectory (Intel)
-endif()
-
-
 if (USE_XML_RPC)
   include(Export_ATE_Server.cmake)
 endif()

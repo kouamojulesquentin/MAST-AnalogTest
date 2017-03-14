@@ -1,6 +1,4 @@
 
-add_subdirectory(MastRpc)
-set(LIBMASTRPC_INCLUDE_DIRS "${LIBMASTRPC_INCLUDE_DIRS}" PARENT_SCOPE)
 
 message("")
 message("================================================================================")
@@ -17,6 +15,10 @@ if (USE_XML_RPC)
 
   message("================================================================================")
   message("")
+
+  add_subdirectory(MastRpc)
+  set(LIBMASTRPC_INCLUDE_DIRS "${LIBMASTRPC_INCLUDE_DIRS}" PARENT_SCOPE)
+
   add_subdirectory(MastXmlRpc)
   set(LIBMASTXMLRPC_INCLUDE_DIRS "${LIBMASTXMLRPC_INCLUDE_DIRS}" PARENT_SCOPE)
 

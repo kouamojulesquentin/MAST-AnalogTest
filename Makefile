@@ -89,6 +89,16 @@ CPP_DEFINES += -DKISSFFT:BOOL=$(KISSFFT)
 CMAKE_DEBUG_FLAGS=    -DCMAKE_BUILD_TYPE=Debug   $(CMAKE_FLAGS) $(CPP_DEFINES)
 CMAKE_RELEASE_FLAGS=  -DCMAKE_BUILD_TYPE=Release $(CMAKE_FLAGS) $(CPP_DEFINES)
 
+CMAKE_CENTOS_FLAGS=  -DCMAKE_BUILD_TYPE=Debug   $(CMAKE_FLAGS)
+CMAKE_CENTOS_FLAGS += -DCMAKE_CXX_COMPILER="/home/michele/local_gcc-4.9.3/bin/g++"
+CMAKE_CENTOS_FLAGS += -DCMAKE_C_COMPILER="/home/michele/local_gcc-4.9.3/bin/gcc"
+
+CMAKE_CENTOS_FLAGS += -DUSE_XML_RPC:BOOL=ON
+CMAKE_CENTOS_FLAGS += -DUSE_OPEN_OCD:BOOL=OFF
+CMAKE_CENTOS_FLAGS += -DUSE_LIBFTDISPI:BOOL=OFF
+CMAKE_CENTOS_FLAGS += -DINTEL_EXPERIMENT:BOOL=OFF
+CMAKE_CENTOS_FLAGS += -DKISSFFT:BOOL=OFF
+
 
 
 CMAKE_ARM_FLAGS  = -D CMAKE_TOOLCHAIN_FILE=Toolchain-arm.cmake
@@ -146,6 +156,24 @@ endif
 #+> $(info ==> Makefile: Build UT:     $(BUILD_UT))
 > cd $(CMAKE_RELEASE_BUILD_DIR) && make  $(MAKE_FLAGS)
 
+
+centos:
+ifeq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR))","")
+> $(MKDIR) $(CMAKE_DEBUG_BUILD_DIR)
+> cd       $(CMAKE_DEBUG_BUILD_DIR) && cmake $(CMAKE_CENTOS_FLAGS) ..
+endif
+> $(info ==> Makefile: Use Open OCD: $(USE_OPEN_OCD))
+#+> $(info ==> Makefile: Build UT:     $(BUILD_UT))
+> cd $(CMAKE_DEBUG_BUILD_DIR) && make $(MAKE_FLAGS)
+
+release_cmake:
+ifeq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR))","")
+> $(MKDIR) $(CMAKE_RELEASE_BUILD_DIR)
+> cd $(CMAKE_RELEASE_BUILD_DIR) && cmake  $(CMAKE_RELEASE_FLAGS)  ..
+endif
+> $(info ==> Makefile: Use Open OCD: $(USE_OPEN_OCD))
+#+> $(info ==> Makefile: Build UT:     $(BUILD_UT))
+> cd $(CMAKE_RELEASE_BUILD_DIR) && make  $(MAKE_FLAGS)
 
 install_debug:
 > cd $(CMAKE_DEBUG_BUILD_DIR)   && make install

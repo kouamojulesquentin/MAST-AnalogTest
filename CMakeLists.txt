@@ -74,7 +74,6 @@ add_subdirectory (Mast)
 
 add_subdirectory(External_Libs)
 add_subdirectory(Optional_Libs)
-add_subdirectory(Optional_Libs_UT)
 
 
 if (NOT WIN32)
@@ -84,11 +83,13 @@ endif()
 if (${KISSFFT})
   add_subdirectory (TestCasesApp)
 endif()
+
 add_subdirectory (MastExample_CPP)
 add_subdirectory (Mast_UT)
 add_subdirectory (SIT_reader_UT)
 
 if (USE_XML_RPC)
+  add_subdirectory(Optional_Libs_UT)
   include(Export_ATE_Server.cmake)
 endif()
 

@@ -22,13 +22,16 @@
 #include "SVF_EmulationProtocol.hpp"
 #include "I2C_EmulationProtocol.hpp"
 #include "OpenOCDProtocol.hpp"
-#include "SPI_Protocol.hpp"
 #include "GmlPrinter.hpp"
 #include "PrettyPrinter.hpp"
 #include "g3log/g3log.hpp"
 #include "Options.hpp"
 #include "Zybo.hpp"
 #include "MastConfig.hpp"
+
+#if defined(USE_LIBFTDISPI)
+  #include "SPI_Protocol.hpp"
+#endif
 
 #if defined(USE_KISS_FFT)
   #include "ml505_demo.hpp"
@@ -297,15 +300,19 @@ shared_ptr<AccessInterfaceProtocol> GetProtocol (Options::Protocol protocol, con
       aiProtocol = make_shared<OpenOCDProtocol> (configFilePath, "zybo", 11); // @todo passer la longueur IR (int) - NG
       break;
     }
-		case Options::Protocol::SPI:
-		{
-			initializer_list<uint32_t> csCommands			=	{ 0x00, 0x00 };
-			initializer_list<uint32_t> readCommands		=	{	0x10, 0x80 };
-			initializer_list<uint32_t> writeCommands	=	{ 0x10, 0x00 };
-			string_view                commandsPrefix = "";
-			aiProtocol = make_shared<SPI_Protocol>(csCommands, readCommands, writeCommands, commandsPrefix);
-			break;
-		}
+    case Options::Protocol::SPI:
+    {
+      #if defined(USE_LIBFTDISPI)
+      initializer_list<uint32_t> csCommands     = { 0x00, 0x00 };
+      initializer_list<uint32_t> readCommands   = { 0x10, 0x80 };
+      initializer_list<uint32_t> writeCommands  = { 0x10, 0x00 };
+      string_view                commandsPrefix = "";
+      aiProtocol = make_shared<SPI_Protocol>(csCommands, readCommands, writeCommands, commandsPrefix);
+      break;
+      #else
+      THROW_LOGIC_ERROR("SPI protocol is not supported (at least for this build)");
+      #endif
+    }
     case Options::Protocol::I2C_Emulation:
     {
       initializer_list<uint32_t> addresses      = { 0x00, 0x01, 0x02 };
@@ -315,7 +322,7 @@ shared_ptr<AccessInterfaceProtocol> GetProtocol (Options::Protocol protocol, con
       break;
     }
     case Options::Protocol::Generic:
-      THROW_LOGIC_ERROR("Not yet implemented");
+      THROW_LOGIC_ERROR("Generic protocol is not supported");
       break;
     default:
       THROW_INVALID_ARGUMENT("Unsupported aiProtocol");

@@ -20,8 +20,14 @@ DEPENDPATH += $$PWD/../Mast_Core/include \
               $$PWD/../Logger            \
               $$PWD/../SIT_reader
 
+
 win32 {
   INCLUDEPATH +=  "$$(FLEX_DIR)"
+}
+
+unix {
+  INCLUDEPATH += $$PWD/../Optional_Libs/SPI/include
+  DEPENDPATH  += $$PWD/../Optional_Libs/SPI/include
 }
 
 SOURCES +=         \
@@ -56,4 +62,5 @@ else: CONFIG(release, debug|release) {
 
 unix {
     LIBS += -lpthread
+    LIBS += -lSpi
 }

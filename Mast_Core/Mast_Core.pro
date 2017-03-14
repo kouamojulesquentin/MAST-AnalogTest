@@ -56,8 +56,6 @@ SOURCES +=  \
     src/Remote_Protocol_Proxy.cpp                   \
     src/RemoteProtocolFactory.cpp                   \
     src/Session.cpp                                 \
-    src/SPI_Player.cpp                              \
-    src/SPI_Protocol.cpp                            \
     src/Startup.cpp                                 \
     src/STIL_Player.cpp                             \
     src/STIL_EmulationProtocol.cpp                  \
@@ -103,6 +101,7 @@ HEADERS += \
     include/I2C_EmulationProtocol.hpp                   \
     include/I2C_Player.hpp                              \
     include/Linker.hpp                                  \
+    include/MastConfig.hpp                              \
     include/MismatchesCollector.hpp                     \
     include/NamesChecker.hpp                            \
     include/NodePathResolver.hpp                        \
@@ -117,8 +116,6 @@ HEADERS += \
     include/Remote_Protocol_Proxy.hpp                   \
     include/RemoteProtocolFactory.hpp                   \
     include/Register.hpp                                \
-    include/SPI_Player.hpp                              \
-    include/SPI_Protocol.hpp                            \
     include/STIL_Player.hpp                             \
     include/STIL_EmulationProtocol.hpp                  \
     include/SVF_Player.hpp                              \

@@ -34,6 +34,12 @@ On the CENTOS 5 machine:
       - cd ply-3.10
       - python3 setup.py install
 
+ -- INSTALL MAKE 4.0 from sources:
+   ./configure
+   make
+   sudo make install
+
+
   -- SIT_PARSER:
      copy generated files into SIT_parser directory to bypass flex
 

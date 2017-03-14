@@ -32,8 +32,6 @@ endif()
 message("================================================================================")
 
 if (${USE_OPEN_OCD})
-  set (P_CFLAGS "${P_CFLAGS} -DUSE_OPEN_OCD")
-
   set(LIBUSB_CFLAGS "")
   set(HIDAPI_CFLAGS "")
 
@@ -87,7 +85,6 @@ if (WIN32)
   include_directories($ENV{FLEX_DIR})
   set (APP_SOURCES "main.cpp" "Options.cpp" "Zybo.cpp")
 else()
-  set (P_CFLAGS "${P_CFLAGS} -DUSE_KISS_FFT")
   file(GLOB APP_SOURCES "*")
 endif()
 

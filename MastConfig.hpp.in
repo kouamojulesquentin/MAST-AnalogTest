@@ -1,0 +1,11 @@
+// Defines optional configuration for Mast Core or Mast related projects
+// It will be converted by cmake to MastConfig.hpp in the binary build tree
+// So, any source files that need to use any of this definitions must include
+// MastConfig.hpp
+
+#cmakedefine USE_OPEN_OCD
+#cmakedefine USE_LIBFTDISPI
+#cmakedefine BUILD_ATE_SERVER
+#cmakedefine USE_XML_RPC
+#cmakedefine INTEL_EXPERIMENT
+#cmakedefine KISSFFT

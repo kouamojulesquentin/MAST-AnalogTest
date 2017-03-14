@@ -48,11 +48,15 @@ message(STATUS "Master: USE_XML_RPC:        ${USE_XML_RPC}")
 message(STATUS "Master: INTEL_EXPERIMENT:   ${INTEL_EXPERIMENT}")
 message(STATUS "Master: KISSFFT:            ${KISSFFT}")
 
+configure_file      ("${PROJECT_SOURCE_DIR}/MastConfig.hpp.in" "${PROJECT_BINARY_DIR}/MastConfig.hpp")
+include_directories ("${PROJECT_BINARY_DIR}")
+
 message(STATUS "")
 message(STATUS "Master: CMAKE_MODULE_PATH:              ${CMAKE_MODULE_PATH}")
 message(STATUS "Master: CMAKE_RUNTIME_OUTPUT_DIRECTORY: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 message(STATUS "Master: CMAKE_LIBRARY_OUTPUT_DIRECTORY: ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 message(STATUS "Master: EXPORT_DIR:                     ${EXPORT_DIR}")
+
 
 if (USE_XML_RPC)
   set(XmlRpcInstall ${CMAKE_CURRENT_LIST_DIR}/External_Libs/xmlrpc-c/build)

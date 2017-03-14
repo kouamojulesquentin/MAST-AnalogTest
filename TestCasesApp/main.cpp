@@ -28,6 +28,7 @@
 #include "g3log/g3log.hpp"
 #include "Options.hpp"
 #include "Zybo.hpp"
+#include "MastConfig.hpp"
 
 #if defined(USE_KISS_FFT)
   #include "ml505_demo.hpp"

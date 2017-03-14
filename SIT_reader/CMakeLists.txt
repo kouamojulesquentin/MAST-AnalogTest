@@ -14,8 +14,6 @@ if (NOT BISON_FOUND)
  message(FATAL_ERROR "Bison not found")
 endif()
 
-message(STATUS "SIT_reader: USE_OPEN_OCD:    ${USE_OPEN_OCD}")
-
 add_definitions(${P_WARNINGS})
 set (P_WARNINGS "-Wall -Wno-sign-compare -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs")
 add_definitions(${P_CFLAGS})
@@ -23,18 +21,10 @@ set (P_CFLAGS "${P_WARNINGS} -std=c++14")
 
 add_definitions(${Flex_Switches})
 if (WIN32)
-#+  set (P_CFLAGS ${P_CFLAGS} -DBUILD_DLL)
-  set (P_CFLAGS ${P_CFLAGS})
   set (Flex_Switches -v -L --wincompat)
 else()
   set (P_CFLAGS "${P_CFLAGS} -fPIC")
   set (Flex_Switches -v -L)
-endif()
-
-# Set defines depending of what is enabled/disabled
-#
-if (${USE_OPEN_OCD})
-  set (CFLAGS "${CFLAGS} -DUSE_OPEN_OCD")
 endif()
 
 set (LEX_YACC_SRC_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/")

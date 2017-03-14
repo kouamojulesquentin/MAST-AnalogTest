@@ -18,8 +18,6 @@ message("")
 
 
 if (${USE_OPEN_OCD})
-	set (CFLAGS "${CFLAGS} -DUSE_OPEN_OCD")
-
   # OpenOCD has C header files but using gcc with -std=c++14 args creates warnings
   # (like if C99 was not enabled).
   # by calling these third-party software headers with the SYSTEM attribute in the
@@ -70,12 +68,6 @@ if (${USE_OPEN_OCD})
   endif(HIDAPI_INCLUDE_DIR AND HIDAPI_LIBRARY)
 
 endif() # if (${USE_OPEN_OCD})
-
-#+if (${USE_LIBFTDISPI})
-#+  set (CFLAGS "${CFLAGS} -DUSE_LIBFTDISPI")
-#+  set (FTTDI_SPI_LIBS "ftdi_spi")
-#+  include_directories(SYSTEM ${LIBFTDI_SPI_INCLUDE_DIRS})
-#+endif() # if (${USE_LIBFTDISPI})
 
 if (WIN32)
   set (CFLAGS "${CFLAGS} -D__LITTLE_ENDIAN=1 -D__BIG_ENDIAN=2 -D__BYTE_ORDER=1")

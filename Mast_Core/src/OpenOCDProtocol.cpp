@@ -14,6 +14,7 @@
 #include "Utility.hpp"
 #include "g3log/g3log.hpp"
 #include "OpenOCDProtocol.hpp"
+#include "MastConfig.hpp"
 
 #include <vector>
 #include <string>

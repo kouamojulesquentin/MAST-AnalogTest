@@ -74,11 +74,12 @@ TESTCASES_EXE_PATH    = $(BIN_DIR)/$(TESTCASES_EXE_NAME)
 CPP_EXAMPLE_EXE_PATH  = $(BIN_DIR)/$(CPP_EXAMPLE_EXE_NAME)
 endif
 
-EXTDIR_ROOT_DIR=External_Libs
-EXTDIR_INSTALL_DIR=Install
-XMLRPC_ROOT_DIR = xmlrpc-c
-CMAKE_FLAGS+= -DEXTDIR_INSTALL_DIR_ABS=$(PWD)/$(EXTDIR_ROOT_DIR)/$(EXTDIR_INSTALL_DIR)
-CMAKE_FLAGS+= -DXMLRPC_ROOT_DIR=$(XMLRPC_ROOT_DIR)
+#+EXTDIR_ROOT_DIR=External_Libs
+#+EXTDIR_INSTALL_DIR=Install
+#+CMAKE_FLAGS+= -DEXTDIR_INSTALL_DIR_ABS=$(PWD)/$(EXTDIR_ROOT_DIR)/$(EXTDIR_INSTALL_DIR)
+#+XMLRPC_ROOT_DIR = xmlrpc-c
+#+CMAKE_FLAGS+= -DXMLRPC_ROOT_DIR=$(XMLRPC_ROOT_DIR)
+
 
 CPP_DEFINES  = -DUSE_XML_RPC:BOOL=$(USE_XML_RPC)
 CPP_DEFINES += -DUSE_OPEN_OCD:BOOL=$(USE_OPEN_OCD)
@@ -112,8 +113,6 @@ CMAKE_RISCV32_FLAGS += -DUSE_OPEN_OCD:BOOL=OFF
 CMAKE_RISCV32_FLAGS += -DUSE_LIBFTDISPI:BOOL=OFF
 CMAKE_RISCV32_FLAGS += -DINTEL_EXPERIMENT:BOOL=OFF
 CMAKE_RISCV32_FLAGS += -DKISSFFT:BOOL=OFF
-
-
 
 MAKE_FLAGS= -j4
 
@@ -166,23 +165,24 @@ endif
 #+> $(info ==> Makefile: Build UT:     $(BUILD_UT))
 > cd $(CMAKE_DEBUG_BUILD_DIR) && make $(MAKE_FLAGS)
 
-release_cmake:
-ifeq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR))","")
-> $(MKDIR) $(CMAKE_RELEASE_BUILD_DIR)
-> cd $(CMAKE_RELEASE_BUILD_DIR) && cmake  $(CMAKE_RELEASE_FLAGS)  ..
-endif
-> $(info ==> Makefile: Use Open OCD: $(USE_OPEN_OCD))
-#+> $(info ==> Makefile: Build UT:     $(BUILD_UT))
-> cd $(CMAKE_RELEASE_BUILD_DIR) && make  $(MAKE_FLAGS)
-
+install: install_debug
+>>>>>>> 254651f5d276b84841bebc970c08945dcfb9a7f5
 install_debug:
 > cd $(CMAKE_DEBUG_BUILD_DIR)   && make install
 
 install_release:
 > cd $(CMAKE_RELEASE_BUILD_DIR) && make install
 
+pack: pack_debug
 pack_debug:
 > cd $(CMAKE_DEBUG_BUILD_DIR)   && cpack -G TGZ
+
+test: test_debug
+test_debug:
+> cd $(CMAKE_DEBUG_BUILD_DIR) && ctest -j4 --output-on-failure
+
+test_release:
+> cd $(CMAKE_RELEASE_BUILD_DIR) && ctest -j4 --output-on-failure
 
 run_debug:
 ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(MAST_UT_EXE_NAME))","")

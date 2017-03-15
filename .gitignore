@@ -55,11 +55,11 @@
 /SIT_reader/SIT_parser.output
 /SIT_reader_UT/Generated/Runner.cpp
 /SIT_reader/*.txt
-/openocd/bin/*
-/openocd/include/*
-/openocd/openocd-builder/openocd/*
-/openocd/openocd-builder/build/*
-/openocd/*
+/External_Libs/OpenOCD/bin/*
+/External_Libs/OpenOCD/include/*
+/External_Libs/OpenOCD/openocd-builder/openocd/*
+/External_Libs/OpenOCD/openocd-builder/build/*
+/External_Libs/OpenOCD/*
 /Mast_UT/Generated/Runner.cpp
 /Doxygen_Doc/html/index.html
 /Doxygen_Doc/html

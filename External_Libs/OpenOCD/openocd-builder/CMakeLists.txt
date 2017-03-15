@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
-project (mast)
 
-include (CheckTypeSize)
-INCLUDE (CheckIncludeFiles)
+include(CheckTypeSize)
+include(CheckIncludeFiles)
 include(ExternalProject)
 
 check_include_files (stdint.h HAVE_STDINT_H)
@@ -29,12 +28,12 @@ ExternalProject_Add(OpenOCD
    )
 set(OPENOCD_GENERATED_DIR  ${CMAKE_CURRENT_BINARY_DIR}/OpenOCD-prefix/src/OpenOCD-build/)
 set(OPENOCD_GENERATED_O_DIR ${OPENOCD_GENERATED_DIR}/src/)
-   
+
 # Trying to find libusb0
 find_path(LIBUSB0_INCLUDE_DIR
   NAMES usb.h
-  PATH_SUFFIXES "include" "libusb")  
-     
+  PATH_SUFFIXES "include" "libusb")
+
 find_library(LIBUSB0_LIBRARY
   NAMES usb
   PATH_SUFFIXES "lib" "lib32" "lib64" )
@@ -42,10 +41,10 @@ find_library(LIBUSB0_LIBRARY
 # Trying to find libusb1
 find_path(LIBUSB1_INCLUDE_DIR
   NAMES libusb.h
-  PATH_SUFFIXES "include" "libusb-1.0")  
-     
+  PATH_SUFFIXES "include" "libusb-1.0")
+
 find_library(LIBUSB1_LIBRARY
-  NAMES usb-1.0 
+  NAMES usb-1.0
   PATH_SUFFIXES "lib" "lib32" "lib64" )
 
 set(LIBUSB_CFLAGS "")
@@ -75,7 +74,7 @@ if(HIDAPI_INCLUDE_DIR AND HIDAPI_LIBRARY)
     set(HIDAPI_FOUND true)
     set(HIDAPI_CFLAGS "--Ihidapi/hidapi")
 endif(HIDAPI_INCLUDE_DIR AND HIDAPI_LIBRARY)
-  
+
 
 set(whole_libraries)
 set(whole_lib_files)
@@ -139,7 +138,7 @@ if(${LIBUSB1_FOUND})
 
 endif(${LIBUSB1_FOUND})
 
-# Sometimes libusb0 may already be installed. Hence, OpenOCD configuration script will automatically 
+# Sometimes libusb0 may already be installed. Hence, OpenOCD configuration script will automatically
 # build libusb0 specific .o file. Here we add them when needed.
 IF(${LIBUSB0_FOUND})
     list(APPEND whole_lib_files "${OPENOCD_GENERATED_O_DIR}/jtag/drivers/libocdjtagdrivers_la-usb_common.o")
@@ -195,8 +194,8 @@ ENDIF(${LIBUSB1_FOUND})
 
 
 # note, this will only work on linux/unix platforms, also it does building
-# in the source tree which is also sort of bad style and keeps out of source 
-# builds from working.  
+# in the source tree which is also sort of bad style and keeps out of source
+# builds from working.
 #add_executable (dev_openocd_app dev_openocd.c)
 
 # -ldl is needed by JimTcl, -lusb-1.0 is needed for FTDI drivers, and -lm for <math.h>.

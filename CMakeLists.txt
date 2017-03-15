@@ -67,14 +67,13 @@ endif()
 message("================================================================================")
 message("")
 
-add_subdirectory (Logger)
-add_subdirectory (Mast_Core)
-add_subdirectory (SIT_reader)
-add_subdirectory (Mast)
-
 add_subdirectory(External_Libs)
-add_subdirectory(Optional_Libs)
+add_subdirectory(Logger)
+add_subdirectory(Mast_Core)
+add_subdirectory(SIT_reader)
+add_subdirectory(Mast)
 
+add_subdirectory(Optional_Libs)
 
 if (NOT WIN32)
 add_subdirectory (License)

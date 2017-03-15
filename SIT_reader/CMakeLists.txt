@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(SIT_parser)
 
-message("")
-message("================================================================================")
-
 find_package(FLEX)
 find_package(BISON)
 if (NOT FLEX_FOUND)
@@ -69,6 +66,3 @@ add_library(SIT_Reader_Lib SHARED  ${LEX_YACC_SRC_DIR}SIT_reader.cpp ${LEX_YACC_
 set_target_properties(SIT_Reader_Lib  PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
 target_link_libraries(SIT_Reader_Lib Mast_Core)
-
-message("================================================================================")
-message("")

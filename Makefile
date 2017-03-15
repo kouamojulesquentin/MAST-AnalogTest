@@ -116,7 +116,7 @@ CMAKE_RISCV32_FLAGS += -DKISSFFT:BOOL=OFF
 
 MAKE_FLAGS= -j4
 
-OPENOCD_INSTALL_DIR=./openocd/
+OPENOCD_INSTALL_DIR=./External_Libs/OpenOCD/
 
 
 all:     debug

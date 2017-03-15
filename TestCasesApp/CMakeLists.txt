@@ -35,9 +35,14 @@ if (${USE_OPEN_OCD})
   set(LIBUSB_CFLAGS "")
   set(HIDAPI_CFLAGS "")
 
-  include_directories(SYSTEM ../openocd/include/)
-  include_directories(SYSTEM ../openocd/include/src/)
-  include_directories(SYSTEM ../openocd/include/jimtcl/)
+  message("")
+  message("================================================================================")
+  message(STATUS "TestCasesApp: OPEN_OCD_LIBRARIES:        ${OPEN_OCD_LIBRARIES}")
+  message(STATUS "TestCasesApp: LIBOPEN_OCD_INCLUDE_DIRS:  ${LIBOPEN_OCD_INCLUDE_DIRS}")
+  message("================================================================================")
+  message("")
+
+  include_directories(SYSTEM ${LIBOPEN_OCD_INCLUDE_DIRS})
 
   # Trying to find libusb0
   find_path(LIBUSB0_INCLUDE_DIR
@@ -93,17 +98,14 @@ add_executable 				(TestCasesApp ${APP_SOURCES})
 set_target_properties	(TestCasesApp PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
 if (WIN32)
-	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib DbgHelp)
-elseif( NOT ${USE_OPEN_OCD})
-	target_link_libraries(TestCasesApp Mast
-                                     Mast_Core
-                                     Logger
-                                     SIT_Reader_Lib
-                                     ${LIBMASTSPI_LIBRARIES}
-                                     kiss_fft
-                                     pthread
-                                     dl)
-else ()
-    # $LIBUSB_CFLAGS, ldl and libjim.a args are required by OpenOCD.
-	target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib ${LIBMASTSPI_LIBRARIES} pthread ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/lib/libopenocd.so dl kiss_fft)
-endif ()
+  set(EXTRA_LIBS ${EXTRA_LIBS} DbgHelp)
+else()
+  set(EXTRA_LIBS ${EXTRA_LIBS} pthread dl)
+  set(EXTRA_LIBS ${EXTRA_LIBS} ${LIBMASTSPI_LIBRARIES} kiss_fft)
+
+  if (${USE_OPEN_OCD})
+    set(EXTRA_LIBS ${EXTRA_LIBS} ${OPEN_OCD_LIBRARIES})
+  endif()
+endif()
+
+target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib ${EXTRA_LIBS})

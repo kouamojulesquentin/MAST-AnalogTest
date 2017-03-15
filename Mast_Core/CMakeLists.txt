@@ -18,13 +18,19 @@ message("")
 
 
 if (${USE_OPEN_OCD})
+
+  message("")
+  message("================================================================================")
+  message(STATUS "Mast_Core: OPEN_OCD_LIBRARIES:        ${OPEN_OCD_LIBRARIES}")
+  message(STATUS "Mast_Core: LIBOPEN_OCD_INCLUDE_DIRS:  ${LIBOPEN_OCD_INCLUDE_DIRS}")
+  message("================================================================================")
+  message("")
+
   # OpenOCD has C header files but using gcc with -std=c++14 args creates warnings
   # (like if C99 was not enabled).
   # by calling these third-party software headers with the SYSTEM attribute in the
   # include_directories() function, we skip these warnings.
-  include_directories(SYSTEM ../openocd/include/)
-  include_directories(SYSTEM ../openocd/include/src/)
-  include_directories(SYSTEM ../openocd/include/jimtcl/)
+  include_directories(SYSTEM ${LIBOPEN_OCD_INCLUDE_DIRS})
 
   # Trying to find libusb0
   find_path(LIBUSB0_INCLUDE_DIR
@@ -71,8 +77,6 @@ endif() # if (${USE_OPEN_OCD})
 
 if (WIN32)
   set (CFLAGS "${CFLAGS} -D__LITTLE_ENDIAN=1 -D__BIG_ENDIAN=2 -D__BYTE_ORDER=1")
-elseif(${USE_OPEN_OCD})
-  set (CFLAGS "${CFLAGS}")
 endif()
 
 
@@ -81,9 +85,13 @@ add_library						(Mast_Core SHARED ${Mast_Core_SOURCES})
 set_target_properties	(Mast_Core PROPERTIES COMPILE_FLAGS "${CFLAGS}")
 
 if (WIN32)
-	target_link_libraries(Mast_Core Logger DbgHelp)
-elseif(${USE_OPEN_OCD})
-  target_link_libraries(Mast_Core Logger pthread ${LIBUSB_CFLAGS} ${HIDAPI_CFLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/lib/libopenocd.so dl) #${CMAKE_CURRENT_SOURCE_DIR}/../openocd/openocd/jimtcl/libjim.a dl)
-else ()
-  target_link_libraries(Mast_Core Logger pthread)
-endif ()
+  set(EXTRA_LIBS ${EXTRA_LIBS} DbgHelp)
+else()
+  set(EXTRA_LIBS ${EXTRA_LIBS} pthread)
+endif()
+
+if (${USE_OPEN_OCD})
+  set(EXTRA_LIBS ${EXTRA_LIBS} ${OPEN_OCD_LIBRARIES} ${LIBUSB_CFLAGS} ${HIDAPI_CFLAGS} dl)
+endif()
+
+target_link_libraries(Mast_Core Logger ${EXTRA_LIBS})

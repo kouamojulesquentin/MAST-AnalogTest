@@ -20,9 +20,13 @@ add_library						(Mast SHARED 	${Mast_SOURCES})
 set_target_properties	(Mast PROPERTIES COMPILE_FLAGS "${CFLAGS}")
 
 if (WIN32)
-	target_link_libraries(Mast SIT_Reader_Lib Mast_Core Logger DbgHelp)
-elseif( NOT ${USE_OPEN_OCD})
-  target_link_libraries(Mast SIT_Reader_Lib Mast_Core Logger pthread  dl)
+  set(EXTRA_LIBS ${EXTRA_LIBS} DbgHelp)
 else ()
-  target_link_libraries(Mast SIT_Reader_Lib Mast_Core Logger pthread ${CMAKE_CURRENT_SOURCE_DIR}/../openocd/lib/libopenocd.so ${LIBUSB_CFLAGS} dl)
+  set(EXTRA_LIBS ${EXTRA_LIBS} pthread dl)
 endif ()
+
+if (${USE_OPEN_OCD})
+  set(EXTRA_LIBS ${EXTRA_LIBS} ${OPEN_OCD_LIBRARIES} ${LIBUSB_CFLAGS})
+endif()
+
+target_link_libraries(Mast SIT_Reader_Lib Mast_Core Logger ${EXTRA_LIBS})

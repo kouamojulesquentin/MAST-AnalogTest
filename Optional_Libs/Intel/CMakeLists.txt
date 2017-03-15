@@ -9,9 +9,9 @@ if (WIN32)
 else()
   set (CFLAGS "${CFLAGS}")
 
-  set(INTEL_EXP_LIBRARIES   "Intel_Exp"                           PARENT_SCOPE)
+  set(INTEL_EXP_LIBRARIES   "Intel_Exp"               PARENT_SCOPE)
   set(LIBINTEL_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include")
-  set(LIBINTEL_INCLUDE_DIRS &{LIBINTEL_INCLUDE_DIRS} PARENT_SCOPE)
+  set(LIBINTEL_INCLUDE_DIRS  ${LIBINTEL_INCLUDE_DIRS} PARENT_SCOPE)
 
   file(GLOB Intel_SOURCES "src/*.cpp")
   include_directories(${LIBINTEL_INCLUDE_DIRS})

@@ -16,12 +16,24 @@ message("")
 if(${USE_LIBFTDISPI} MATCHES "ON")
   add_subdirectory (FTDI_SPI)
   set(LIBFTDI_SPI_INCLUDE_DIRS "${LIBFTDI_SPI_INCLUDE_DIRS}" PARENT_SCOPE)
-  
+
   message("")
   message("================================================================================")
   message(STATUS "External_Libs: LIBFTDI_SPI_INCLUDE_DIRS:  ${LIBFTDI_SPI_INCLUDE_DIRS}")
   message("================================================================================")
   message("")
+endif()
+
+if (${USE_OPEN_OCD} MATCHES "ON")
+  add_subdirectory(OpenOCD)
+  message("")
+  message("================================================================================")
+  message(STATUS "External_Libs: OPEN_OCD_LIBRARIES:        ${OPEN_OCD_LIBRARIES}")
+  message(STATUS "External_Libs: LIBOPEN_OCD_INCLUDE_DIRS:  ${LIBOPEN_OCD_INCLUDE_DIRS}")
+  message("================================================================================")
+  message("")
+  set(OPEN_OCD_LIBRARIES       ${OPEN_OCD_LIBRARIES}       PARENT_SCOPE)
+  set(LIBOPEN_OCD_INCLUDE_DIRS ${LIBOPEN_OCD_INCLUDE_DIRS} PARENT_SCOPE)
 endif()
 
 # Unused: external libraries are built separately

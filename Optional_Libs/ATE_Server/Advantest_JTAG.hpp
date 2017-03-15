@@ -18,6 +18,8 @@
 #ifndef ADVANTEST_JTAG_HPP__9928A8FD_BE37_47A7_3EA5_A5789A7F7472__INCLUDED_
   #define ADVANTEST_JTAG_HPP__9928A8FD_BE37_47A7_3EA5_A5789A7F7472__INCLUDED_
 
+  #include <string>
+
   void jtag_access            (int ir_data_in, int    dr_data_in, const std::string& id_ir_dr_data);
   void jtag_access_dr         (int dr_data_in,                    const std::string& id_dr_data);
   void jtag_access_ir         (int ir_data_in,                    const std::string& id_ir_data);

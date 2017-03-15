@@ -36,12 +36,12 @@ int main(int /* argc */, const char* /* argv*/[])
   }
   catch(std::exception& exc)  // Catch C++ standard exceptions
   {
-    std::cerr << "XmlRpc Loopback Server got std::exception: " << exc.what();
+    std::cerr << "Mast Server for Advantest got std::exception: " << exc.what();
     return EXIT_FAILURE;
   }
   catch (...)
   {
-    std::cerr << "XmlRpc Loopback Server got unknown type exeption";
+    std::cerr << "Mast Server for Advantest got unknown type exeption";
     return EXIT_FAILURE;
   }
 

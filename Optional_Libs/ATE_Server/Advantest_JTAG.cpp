@@ -10,12 +10,10 @@
 //! Implements functions to abstract JTAG access on ADVANTEST ATE
 //===========================================================================
 
-#include "testmethod.hpp"
-
-//for test method API interfaces
-#include "mapi.hpp"
+//+#include "mapi.hpp"
 #include "rdi.hpp"
 #include "Advantest_JTAG.hpp"
+
 
 using std::string;
 

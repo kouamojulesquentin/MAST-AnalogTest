@@ -19,9 +19,6 @@
 #include <vector>
 #include <string>
 
-
-#ifdef USE_OPEN_OCD
-
 extern "C"
 {
     #include <config.h>
@@ -39,13 +36,15 @@ extern "C"
     #include <server/server.h>
     #include <server/gdb_server.h>
 }
+
+
 static const char openocd_startup_tcl[] = {
 #include "startup_tcl.inc"
 0 // Terminate with zero
 };
 
 extern "C" struct command_context *setup_command_handler(Jim_Interp *interp);
-#endif
+
 
 
 
@@ -57,18 +56,11 @@ using std::experimental::string_view;
 
 //! Initializes OpenOCD "engine"
 //!
-#ifndef USE_OPEN_OCD
-OpenOCDProtocol::OpenOCDProtocol (string_view /* configFilePath */, string_view /* designName */, int /* iIrLength */)
-  : m_openOCD_initialized (true)
-{
-}
-#else
 OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, string_view designName, int iIrLength)
   : m_openOCD_initialized (false)
 {
   Initialize(configFilePath, designName, iIrLength);
 }
-#endif
 //
 //  End of: OpenOCDProtocol::OpenOCDProtocol
 //---------------------------------------------------------------------------
@@ -76,12 +68,6 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, string_view design
 
 
 //! Constructs a OpenOCDProtocol using string encoded parameters
-#ifndef USE_OPEN_OCD
-OpenOCDProtocol::OpenOCDProtocol (const string& /* parameters */)
-  : m_openOCD_initialized (true)
-{
-}
-#else
 OpenOCDProtocol::OpenOCDProtocol (const string& parameters)
   : m_openOCD_initialized (false)
 {
@@ -120,7 +106,6 @@ OpenOCDProtocol::OpenOCDProtocol (const string& parameters)
 
 //+  Initialize(configFilePath, designName, iIrLength);
 }
-#endif
 //
 //  End of: OpenOCDProtocol::OpenOCDProtocol
 //---------------------------------------------------------------------------
@@ -131,8 +116,6 @@ OpenOCDProtocol::OpenOCDProtocol (const string& parameters)
 //!
 OpenOCDProtocol::~OpenOCDProtocol()
 {
-  #ifdef USE_OPEN_OCD
-
   if (!m_openOCD_initialized) // There was an error during construction
   {
     LOG(WARNING) << "As there was an error during construction, we do nothing in destructor";
@@ -168,7 +151,6 @@ OpenOCDProtocol::~OpenOCDProtocol()
   unregister_all_commands(m_cmd_ctx, nullptr);
   command_done(m_cmd_ctx);
   adapter_quit();
-  #endif
 }
 //
 //  End of: OpenOCDProtocol::~OpenOCDProtocol
@@ -183,27 +165,6 @@ OpenOCDProtocol::~OpenOCDProtocol()
 //!
 //! @return Bitstream retrieved from SUT
 //!
-#ifndef USE_OPEN_OCD
-BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
-{
-  switch (derivationId)
-  {
-    case 0u:
-      LOG(INFO) << "OpenOCD_RST_LB";
-      break;
-    case 1u:
-      LOG(INFO) << "OpenOCD_IR_LB(" << toSutData.DataAsMixString() << ")";
-      break;
-    case 2u:
-      LOG(INFO) << "OpenOCD_DR_LB(" << toSutData.DataAsMixString() << ")";
-      break;
-    default:
-      THROW_INVALID_ARGUMENT("DerivationId must be '0' (for Reset), '1' (for IR) or '2' (for DR)");
-      break;
-  }
-  return toSutData; // Just do a loopback
-}
-#else
 BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   auto bitsCount         = toSutData.BitsCount();
@@ -240,18 +201,17 @@ BinaryVector OpenOCDProtocol::DoAction (uint32_t derivationId, void* /* interfac
       break;
   }
 
-  auto ir = jtag_execute_queue();				// Executing tasks queued in the scheduler.
+  auto ir = jtag_execute_queue();               // Executing tasks queued in the scheduler.
 
   CHECK_TRUE(ir == ERROR_OK, "[OpenOCD] jtag_execute_queue has failed.");
 
-  vector<uint8_t> v_openocd_out = fromSutDataBuffer;				// Inverse of what is done in 1u and 2u derivationId. We set incoming data in the MAST-supported format.
+  vector<uint8_t> v_openocd_out = fromSutDataBuffer;                // Inverse of what is done in 1u and 2u derivationId. We set incoming data in the MAST-supported format.
   reverse(v_openocd_out.begin(), v_openocd_out.end());
 
   auto   fromSutData = BinaryVector::CreateFromRightAlignedBuffer(v_openocd_out, bitsCount);
 
   return fromSutData;
 }
-#endif
 //
 //  End of: OpenOCDProtocol::DoAction
 //---------------------------------------------------------------------------
@@ -265,7 +225,6 @@ void OpenOCDProtocol::DoReset(bool doSynchronousReset)
 {
   LOG(INFO) << "OpenOCD_RST sync = " << std::boolalpha << doSynchronousReset;
 
-  #ifdef USE_OPEN_OCD
   if(m_supportTrst && !doSynchronousReset)
   {
     jtag_add_reset(1, 0);           // TRST is enabled for one TCK cycle.
@@ -274,17 +233,11 @@ void OpenOCDProtocol::DoReset(bool doSynchronousReset)
   {
     jtag_add_statemove(TAP_RESET);  // One of the toolchain components does not provide a TRST pin ==> Use FSM instead.
   }
-  #endif
 }
 
 
 //! Initializes the connection using Open OCD library
 //!
-#ifndef USE_OPEN_OCD
-void OpenOCDProtocol::Initialize (string_view /* configFilePath */, string_view /* designName */, int /* iIrLength */)
-{
-}
-#else
 void OpenOCDProtocol::Initialize (string_view configFilePath, string_view designName, int iIrLength)
 {
   // setup_command_handler registers all handlers used by all different blocs from OpenOCD,
@@ -345,7 +298,6 @@ void OpenOCDProtocol::Initialize (string_view configFilePath, string_view design
 
   m_openOCD_initialized = true;
 }
-#endif
 //
 //  End of: OpenOCDProtocol::Initialize
 //---------------------------------------------------------------------------

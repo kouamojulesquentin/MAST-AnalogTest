@@ -20,9 +20,13 @@ set(LIBMASTOPEN_OCD_LIBRARIES    Mast_OpenOCD                          PARENT_SC
 
 file(GLOB Sources src/*.cpp)
 
+set(CPP_FLAGS "-Wall -Wextra -Wno-sign-compare -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-include-dirs") # not -Wpedantic on purpose (because of included header)
+set(CPP_FLAGS "${CPP_FLAGS} -Wno-variadic-macros") # GCC: ISO C++ does not permit named variadic macros [-Wvariadic-macros]
+set(CPP_FLAGS "${CPP_FLAGS} -std=c++14")
+
 
 add_library           (Mast_OpenOCD SHARED     "${Sources}")
-set_target_properties (Mast_OpenOCD PROPERTIES COMPILE_FLAGS "${CFLAGS} -std=c++14")
+set_target_properties (Mast_OpenOCD PROPERTIES COMPILE_FLAGS ${CPP_FLAGS})
 target_link_libraries (Mast_OpenOCD ${OPEN_OCD_LIBRARIES})
 
 

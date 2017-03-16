@@ -3,7 +3,8 @@ CONFIG  += ordered
 CONFIG  -= qml_debug
 
 unix {
-  SUBDIRS += \
-      Spi
+  SUBDIRS +=  \
+      Spi     \
+      OpenOCD
 }
 

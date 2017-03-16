@@ -21,13 +21,16 @@
 #include "SVF_SimulationProtocol.hpp"
 #include "SVF_EmulationProtocol.hpp"
 #include "I2C_EmulationProtocol.hpp"
-#include "OpenOCDProtocol.hpp"
 #include "GmlPrinter.hpp"
 #include "PrettyPrinter.hpp"
 #include "g3log/g3log.hpp"
 #include "Options.hpp"
 #include "Zybo.hpp"
 #include "MastConfig.hpp"
+
+#if defined(USE_OPEN_OCD)
+  #include "OpenOCDProtocol.hpp"
+#endif
 
 #if defined(USE_LIBFTDISPI)
   #include "SPI_Protocol.hpp"
@@ -296,9 +299,13 @@ shared_ptr<AccessInterfaceProtocol> GetProtocol (Options::Protocol protocol, con
     }
     case Options::Protocol::OpenOCD:
     {
+      #if defined(USE_OPEN_OCD)
       auto configFilePath = protocolOptions;
       aiProtocol = make_shared<OpenOCDProtocol> (configFilePath, "zybo", 11); // @todo passer la longueur IR (int) - NG
       break;
+      #else
+      THROW_LOGIC_ERROR("Open OCD protocol is not supported (at least for this build)");
+      #endif
     }
     case Options::Protocol::SPI:
     {

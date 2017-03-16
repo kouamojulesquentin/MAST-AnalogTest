@@ -47,7 +47,6 @@ SOURCES +=  \
     src/NamesChecker.cpp                            \
     src/NodePathResolver.cpp                        \
     src/OfflineProtocol.cpp                         \
-    src/OpenOCDProtocol.cpp                         \
     src/PathSelector.cpp                            \
     src/ParentNode.cpp                              \
     src/PrettyPrinter.cpp                           \
@@ -106,7 +105,6 @@ HEADERS += \
     include/NamesChecker.hpp                            \
     include/NodePathResolver.hpp                        \
     include/OfflineProtocol.hpp                         \
-    include/OpenOCDProtocol.hpp                         \
     include/ParentNode.hpp                              \
     include/PathSelector.hpp                            \
     include/PrettyPrinter.hpp                           \

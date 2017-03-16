@@ -4,6 +4,7 @@ message("")
 message("================================================================================")
 message(STATUS "Optional_Libs: USE_LIBFTDISPI:    ${USE_LIBFTDISPI}")
 message(STATUS "Optional_Libs: USE_XML_RPC:       ${USE_XML_RPC}")
+message(STATUS "Optional_Libs: USE_OPEN_OCD:      ${USE_OPEN_OCD}")
 message(STATUS "Optional_Libs: INTEL_EXPERIMENT   ${INTEL_EXPERIMENT}")
 message(STATUS "Optional_Libs: BUILD_ATE_SERVER   ${BUILD_ATE_SERVER}")
 
@@ -35,6 +36,16 @@ if(${USE_LIBFTDISPI})
   set(LIBMASTSPI_LIBRARIES    ${LIBMASTSPI_LIBRARIES}    PARENT_SCOPE)
 endif()
 
+if (${USE_OPEN_OCD})
+  add_subdirectory (OpenOCD)
+  set(LIBMASTOPEN_OCD_INCLUDE_DIRS ${LIBMASTOPEN_OCD_INCLUDE_DIRS} PARENT_SCOPE)
+  set(LIBMASTOPEN_OCD_LIBRARIES    ${LIBMASTOPEN_OCD_LIBRARIES}    PARENT_SCOPE)
+  message("================================================================================")
+  message(STATUS "Optional_Libs: LIBMASTOPEN_OCD_LIBRARIES:     ${LIBMASTOPEN_OCD_LIBRARIES}")
+  message(STATUS "Optional_Libs: LIBMASTOPEN_OCD_INCLUDE_DIRS:  ${LIBMASTOPEN_OCD_INCLUDE_DIRS}")
+  message("================================================================================")
+endif()
+
 # ---------------- Intel library
 #
 if(${INTEL_EXPERIMENT})
@@ -42,10 +53,11 @@ if(${INTEL_EXPERIMENT})
   set(LIBINTEL_INCLUDE_DIRS ${LIBINTEL_INCLUDE_DIRS} PARENT_SCOPE)
   set(INTEL_EXP_LIBRARIES   ${INTEL_EXP_LIBRARIES}   PARENT_SCOPE)
   message("================================================================================")
-  message(STATUS "Optional_Libs: INTEL_EXP_LIBRARIES:   ${INTEL_EXP_LIBRARIES}")
-  message(STATUS "Optional_Libs: LIBINTEL_INCLUDE_DIRS: ${LIBINTEL_INCLUDE_DIRS}")
+  message(STATUS "Optional_Libs: INTEL_EXP_LIBRARIES:           ${INTEL_EXP_LIBRARIES}")
+  message(STATUS "Optional_Libs: LIBINTEL_INCLUDE_DIRS:         ${LIBINTEL_INCLUDE_DIRS}")
   message("================================================================================")
 endif()
+
 
 # ---------------- Examples
 #

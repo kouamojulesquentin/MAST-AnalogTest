@@ -26,7 +26,7 @@ else ()
 endif ()
 
 if (${USE_OPEN_OCD})
-  set(EXTRA_LIBS ${EXTRA_LIBS} ${OPEN_OCD_LIBRARIES} ${LIBUSB_CFLAGS})
+  set(EXTRA_LIBS ${EXTRA_LIBS} ${LIBMASTOPEN_OCD_LIBRARIES} ${LIBUSB_CFLAGS})
 endif()
 
 target_link_libraries(Mast SIT_Reader_Lib Mast_Core Logger ${EXTRA_LIBS})

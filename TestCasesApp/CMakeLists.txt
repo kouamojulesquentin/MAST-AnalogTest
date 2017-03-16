@@ -37,12 +37,14 @@ if (${USE_OPEN_OCD})
 
   message("")
   message("================================================================================")
-  message(STATUS "TestCasesApp: OPEN_OCD_LIBRARIES:        ${OPEN_OCD_LIBRARIES}")
-  message(STATUS "TestCasesApp: LIBOPEN_OCD_INCLUDE_DIRS:  ${LIBOPEN_OCD_INCLUDE_DIRS}")
+  message(STATUS "TestCasesApp: OPEN_OCD_LIBRARIES:           ${OPEN_OCD_LIBRARIES}")
+  message(STATUS "TestCasesApp: LIBOPEN_OCD_INCLUDE_DIRS:     ${LIBOPEN_OCD_INCLUDE_DIRS}")
+  message(STATUS "TestCasesApp: LIBMASTOPEN_OCD_INCLUDE_DIRS: ${LIBMASTOPEN_OCD_INCLUDE_DIRS}")
   message("================================================================================")
   message("")
 
   include_directories(SYSTEM ${LIBOPEN_OCD_INCLUDE_DIRS})
+  include_directories(SYSTEM ${LIBMASTOPEN_OCD_INCLUDE_DIRS})
 
   # Trying to find libusb0
   find_path(LIBUSB0_INCLUDE_DIR
@@ -104,7 +106,7 @@ else()
   set(EXTRA_LIBS ${EXTRA_LIBS} ${LIBMASTSPI_LIBRARIES} kiss_fft)
 
   if (${USE_OPEN_OCD})
-    set(EXTRA_LIBS ${EXTRA_LIBS} ${OPEN_OCD_LIBRARIES})
+    set(EXTRA_LIBS ${EXTRA_LIBS} ${OPEN_OCD_LIBRARIES} ${LIBMASTOPEN_OCD_LIBRARIES})
   endif()
 endif()
 

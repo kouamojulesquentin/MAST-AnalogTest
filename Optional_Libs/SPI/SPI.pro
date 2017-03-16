@@ -25,8 +25,8 @@ SOURCES += \
 
 
 HEADERS += \
-    src/SPI_Player.hpp \
-    src/SPI_Protocol.hpp
+    include/SPI_Player.hpp \
+    include/SPI_Protocol.hpp
 
 
 CONFIG(debug,   debug|release) {

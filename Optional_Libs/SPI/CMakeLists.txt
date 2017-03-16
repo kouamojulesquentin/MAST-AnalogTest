@@ -3,8 +3,6 @@ project(MastSpi)
 
 message("")
 message("================================================================================")
-message(STATUS "MastSpi: CMAKE_PREFIX_PATH:         ${CMAKE_PREFIX_PATH}")
-message(STATUS "MastSpi: CMAKE_CXX_COMPILER_ID:     ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "MastSpi: LIBMAST_CORE_INCLUDE_DIRS: ${LIBMAST_CORE_INCLUDE_DIRS}")
 message(STATUS "MastSpi: LIBFTDI_SPI_INCLUDE_DIRS:  ${LIBFTDI_SPI_INCLUDE_DIRS}")
 

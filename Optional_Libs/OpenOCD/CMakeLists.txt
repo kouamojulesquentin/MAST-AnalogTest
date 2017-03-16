@@ -22,7 +22,7 @@ file(GLOB Sources src/*.cpp)
 
 
 add_library           (Mast_OpenOCD SHARED     "${Sources}")
-set_target_properties (Mast_OpenOCD PROPERTIES COMPILE_FLAGS "${CFLAGS}" )
+set_target_properties (Mast_OpenOCD PROPERTIES COMPILE_FLAGS "${CFLAGS} -std=c++14")
 target_link_libraries (Mast_OpenOCD ${OPEN_OCD_LIBRARIES})
 
 

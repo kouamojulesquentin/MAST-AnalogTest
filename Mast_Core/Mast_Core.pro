@@ -30,6 +30,7 @@ SOURCES +=  \
     src/Chain.cpp                                   \
     src/Checker.cpp                                 \
     src/ConfigureVisitor.cpp                        \
+    src/ConfigureAlgorithmFactory.cpp               \
     src/ConfigureAlgorithm_Last_Lazy.cpp            \
     src/ConfigureAlgorithm_LastOrDefault.cpp        \
     src/ConfigureAlgorithm_LastOrDefault_Greedy.cpp \
@@ -85,11 +86,12 @@ HEADERS += \
     include/Chain.hpp                                   \
     include/Checker.hpp                                 \
     include/ConfigurationAlgorithm.hpp                  \
-    include/ConfigureVisitor.hpp                        \
-    include/DefaultBinaryPathSelector.hpp               \
+    include/ConfigureAlgorithmFactory.hpp               \
     include/ConfigureAlgorithm_Last_Lazy.hpp            \
     include/ConfigureAlgorithm_LastOrDefault.hpp        \
     include/ConfigureAlgorithm_LastOrDefault_Greedy.hpp \
+    include/ConfigureVisitor.hpp                        \
+    include/DefaultBinaryPathSelector.hpp               \
     include/DefaultTableBasedPathSelector.hpp           \
     include/DefaultOneHotPathSelector.hpp               \
     include/DefaultNHotPathSelector.hpp                 \

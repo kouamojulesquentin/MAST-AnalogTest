@@ -34,6 +34,7 @@ SOURCES += \
     API_C/UT_PDL_Adapter_C.cpp                          \
     API_CPP/UT_PDL_Adapter_CPP.cpp                      \
     SystemModel/UT_AccessInterfaceProtocolFactory.cpp   \
+    SystemModel/UT_ConfigureAlgorithmFactory.cpp        \
     SystemModel/UT_ConfigureVisitor.cpp                 \
     SystemModel/UT_DataCycle.cpp                        \
     SystemModel/UT_DefaultBinaryPathSelector.cpp        \
@@ -79,6 +80,7 @@ HEADERS += \
     API_C/UT_PDL_Adapter_C.hpp                        \
     API_CPP/UT_PDL_Adapter_CPP.hpp                    \
     SystemModel/UT_AccessInterfaceProtocolFactory.h   \
+    SystemModel/UT_ConfigureAlgorithmFactory.hpp      \
     SystemModel/UT_ConfigureVisitor.hpp               \
     SystemModel/UT_DataCycle.hpp                      \
     SystemModel/UT_DefaultBinaryPathSelector.hpp      \

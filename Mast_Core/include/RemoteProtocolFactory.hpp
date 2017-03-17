@@ -44,8 +44,7 @@ class DLL_EXPORT RemoteProtocolFactory final : public Factory<Remote_Protocol_Cl
 
   //! Fills up with default Remote_Protocol_Client
   //!
-  //! @note Default Remote_Protocol_Clientare:
-  //!         -
+  //! @note There are, currently, no default Remote_Protocol_Client
   //!
   virtual void InitializeWithDefaults() override;
 

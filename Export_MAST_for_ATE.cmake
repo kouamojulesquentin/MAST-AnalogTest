@@ -36,12 +36,6 @@ else()
 endif()
 
 
-message("")
-message("================================================================================")
-message(STATUS "Export_ATE: G++_PATH:          ${Gxx_PATH}")
-message("================================================================================")
-message("")
-  
 #install(FILES       Optional_Libs/ATE_Build/run_cmake.sh
 #        COMPONENT   ATE_Build
 #        DESTINATION ${ATE_Build_EXPORT}

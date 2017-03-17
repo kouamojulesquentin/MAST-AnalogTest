@@ -1,5 +1,6 @@
 .RECIPEPREFIX = >
 
+#LOCAL_GCC_PATH = /home/michele/local_gcc-4.9.3/bin/
 CMAKE_RELEASE_BUILD_DIR = cmake_release
 CMAKE_DEBUG_BUILD_DIR   = cmake_debug
 CMAKE_ARM_BUILD_DIR     = cmake_arm
@@ -123,8 +124,19 @@ all:     debug
 install: install_debug
 pack:    pack_debug
 
+ifneq ($(wildcard $(LOCAL_GCC_PATH).*),)
+set_compiler:
+> @echo "STATUS: Makefile found a local GCC/G++" 
+CMAKE_COMPILER_FLAGS = -DCMAKE_CXX_COMPILER="$(LOCAL_GCC_PATH)g++"
+CMAKE_COMPILER_FLAGS += -DCMAKE_C_COMPILER="$(LOCAL_GCC_PATH)gcc"
+CMAKE_COMPILER_FLAGS += -DLOCAL_GCC_PATH="$(LOCAL_GCC_PATH)"
+else
+set_compiler:
+CMAKE_COMPILER_FLAGS = ""
+endif
+
 ifeq ("$(USE_OPEN_OCD)","ON")
-debug:   openocd_debug
+debug:   openocd_debug 
 release: openocd_release
 else
 debug:   debug_cmake
@@ -137,19 +149,19 @@ xmlrpc-c:
 > cd       $(EXTDIR_ROOT_DIR)/$(XMLRPC_ROOT_DIR) && ./configure  --prefix=$(PWD)/$(EXTDIR_ROOT_DIR)/$(EXTDIR_INSTALL_DIR)/$(XMLRPC_ROOT_DIR)
 > cd       $(EXTDIR_ROOT_DIR)/$(XMLRPC_ROOT_DIR) && make && make install
 
-debug_cmake:
+debug_cmake: set_compiler
 ifeq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR))","")
 > $(MKDIR) $(CMAKE_DEBUG_BUILD_DIR)
-> cd       $(CMAKE_DEBUG_BUILD_DIR) && cmake $(CMAKE_DEBUG_FLAGS) ..
+> cd       $(CMAKE_DEBUG_BUILD_DIR) && cmake $(CMAKE_COMPILER_FLAGS) $(CMAKE_DEBUG_FLAGS) ..
 endif
 > $(info ==> Makefile: Use Open OCD: $(USE_OPEN_OCD))
 #+> $(info ==> Makefile: Build UT:     $(BUILD_UT))
 > cd $(CMAKE_DEBUG_BUILD_DIR) && make $(MAKE_FLAGS)
 
-release_cmake:
+release_cmake: set_compiler
 ifeq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR))","")
 > $(MKDIR) $(CMAKE_RELEASE_BUILD_DIR)
-> cd $(CMAKE_RELEASE_BUILD_DIR) && cmake  $(CMAKE_RELEASE_FLAGS)  ..
+> cd $(CMAKE_RELEASE_BUILD_DIR) && cmake  $(CMAKE_COMPILER_FLAGS)  $(CMAKE_RELEASE_FLAGS)  ..
 endif
 > $(info ==> Makefile: Use Open OCD: $(USE_OPEN_OCD))
 #+> $(info ==> Makefile: Build UT:     $(BUILD_UT))
@@ -174,7 +186,7 @@ install_release:
 > cd $(CMAKE_RELEASE_BUILD_DIR) && make install
 
 pack: pack_debug
-pack_debug:
+pack_debug: set_compiler
 > cd $(CMAKE_DEBUG_BUILD_DIR)   && cpack -G TGZ
 
 test: test_debug

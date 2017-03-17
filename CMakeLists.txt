@@ -47,6 +47,8 @@ message(STATUS "Master: BUILD_ATE_SERVER:   ${BUILD_ATE_SERVER}")
 message(STATUS "Master: USE_XML_RPC:        ${USE_XML_RPC}")
 message(STATUS "Master: INTEL_EXPERIMENT:   ${INTEL_EXPERIMENT}")
 message(STATUS "Master: KISSFFT:            ${KISSFFT}")
+message(STATUS "Master: C++ compiler:       ${CMAKE_CXX_COMPILER}")
+message(STATUS "Master: C   compiler:       ${CMAKE_C_COMPILER}")
 
 configure_file      ("${PROJECT_SOURCE_DIR}/MastConfig.hpp.in" "${PROJECT_BINARY_DIR}/MastConfig.hpp")
 include_directories ("${PROJECT_BINARY_DIR}")

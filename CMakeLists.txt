@@ -90,15 +90,16 @@ add_subdirectory (SIT_reader_UT)
 if (USE_XML_RPC)
   add_subdirectory(Optional_Libs_UT)
   include(Export_ATE_Server.cmake)
+  include(Export_MAST_for_ATE.cmake)
 endif()
 
 set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY  OFF)
 set(CPACK_COMPONENTS_GROUPING         ONE_PER_GROUP)
-set(CPACK_COMPONENTS_ALL              ATE_Server SIT_Files)
+set(CPACK_COMPONENTS_ALL              ATE_Server ATE_Build) #SIT_Files
 
-set(CPACK_PACKAGE_VENDOR              "Mast")
+set(CPACK_PACKAGE_VENDOR              "OWL")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY   "${CMAKE_BINARY_DIR}/${EXPORT_DIR}")
-set(CPACK_PACKAGE_NAME                "ATE_Server")
+set(CPACK_PACKAGE_NAME                "MAST")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Files to build an ATE server on system with only C++03")
 set(CPACK_PACKAGE_VERSION_MAJOR       "1")
 set(CPACK_PACKAGE_VERSION_MINOR       "0")
@@ -106,5 +107,6 @@ set(CPACK_PACKAGE_VERSION_PATCH       "0")
 set(CPACK_PACKAGE_VERSION             "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}")
 set(CPACK_SYSTEM_NAME                 "") # To prevent "-Linux" in file name
 
+set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
 include(CPack)
 

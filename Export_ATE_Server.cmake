@@ -48,3 +48,4 @@ install(FILES       Optional_Libs/ATE_Server/run_cmake.sh
         DESTINATION ${ATE_SERVER_EXPORT}
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ)
 
+#Create a new COMPONENT, for install "Mast_Advantest"

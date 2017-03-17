@@ -8,18 +8,14 @@ CMAKE_RISCV32_BUILD_DIR = cmake_riscV32
 
 #+CMAKE_DEBUG_BUILD_MAKEFILE =$(CMAKE_DEBUG_BUILD_DIR)/Makefile
 
-CMAKE_FLAGS=  -DCMAKE_CXX_COMPILER=g++
-LIB_DIR    = Lib
+CMAKE_FLAGS = -DCMAKE_CXX_COMPILER=g++
+LIB_DIR     = Lib
 
 ifeq ($(OS), Windows_NT)
 $(info ==> Building for Windows)
-USE_OPEN_OCD     = OFF
-CMAKE_FLAGS+= -G "MinGW Makefiles"
+USE_OPEN_OCD  = OFF
+CMAKE_FLAGS  += -G "MinGW Makefiles"
 
-IF_EXIST = if exist
-
-RM     = del /Q
-RM_DIR = rmdir /S /Q
 MKDIR  = mkdir
 SEP    = "\"
 RUN    =
@@ -44,8 +40,6 @@ else   # ==> not Windows
 USE_OPEN_OCD     = ON
 
 MKDIR  = mkdir -p
-RM     = rm -f
-RM_DIR = rm -rf
 SEP    = /
 RUN    = ./
 
@@ -66,13 +60,6 @@ SIT_READER_INPUT_FILE = ../../SIT_reader/prova.txt
 TESTCASES_EXE_PATH    = $(BIN_DIR)/$(TESTCASES_EXE_NAME)
 CPP_EXAMPLE_EXE_PATH  = $(BIN_DIR)/$(CPP_EXAMPLE_EXE_NAME)
 endif
-
-#+EXTDIR_ROOT_DIR=External_Libs
-#+EXTDIR_INSTALL_DIR=Install
-#+CMAKE_FLAGS+= -DEXTDIR_INSTALL_DIR_ABS=$(PWD)/$(EXTDIR_ROOT_DIR)/$(EXTDIR_INSTALL_DIR)
-#+XMLRPC_ROOT_DIR = xmlrpc-c
-#+CMAKE_FLAGS+= -DXMLRPC_ROOT_DIR=$(XMLRPC_ROOT_DIR)
-
 
 CPP_DEFINES += -DUSE_OPEN_OCD:BOOL=$(USE_OPEN_OCD)
 
@@ -102,7 +89,7 @@ pack:    pack_debug
 
 ifneq ($(wildcard $(LOCAL_GCC_PATH).*),)
 set_compiler:
-> @echo "STATUS: Makefile found a local GCC/G++" 
+> @echo "STATUS: Makefile found a local GCC/G++"
 CMAKE_COMPILER_FLAGS = -DCMAKE_CXX_COMPILER="$(LOCAL_GCC_PATH)g++"
 CMAKE_COMPILER_FLAGS += -DCMAKE_C_COMPILER="$(LOCAL_GCC_PATH)gcc"
 CMAKE_COMPILER_FLAGS += -DLOCAL_GCC_PATH="$(LOCAL_GCC_PATH)"
@@ -112,7 +99,7 @@ CMAKE_COMPILER_FLAGS = ""
 endif
 
 ifeq ("$(USE_OPEN_OCD)","ON")
-debug:   openocd_debug 
+debug:   openocd_debug
 release: openocd_release
 else
 debug:   debug_cmake
@@ -299,33 +286,21 @@ ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/Makefile)","")
 endif
 
 docs:
-ifeq ($(OS), Windows_NT)
-> $(IF_EXIST) Doxygen_Doc$(SEP)MastDev$(SEP)html  $(RM_DIR) Doxygen_Doc$(SEP)MastDev$(SEP)html
-> $(IF_EXIST) Doxygen_Doc$(SEP)FULL_API$(SEP)html $(RM_DIR) Doxygen_Doc$(SEP)FULL_API$(SEP)html
-> $(IF_EXIST) Doxygen_Doc$(SEP)CPP_API$(SEP)html  $(RM_DIR) Doxygen_Doc$(SEP)CPP_API$(SEP)html
-> $(IF_EXIST) Doxygen_Doc$(SEP)C_API$(SEP)html    $(RM_DIR) Doxygen_Doc$(SEP)C_API$(SEP)html
-else
-> $(RM_DIR)   Doxygen_Doc$(SEP)html
-endif
+> cmake   -E remove_directory Doxygen_Doc/MastDev/html
+> cmake   -E remove_directory Doxygen_Doc/FULL_API/html
+> cmake   -E remove_directory Doxygen_Doc/CPP_API/html
+> cmake   -E remove_directory Doxygen_Doc/C_API/html
 > doxygen Doxyfile_MastDev.cfg
 > doxygen Doxyfile_FULL_API.cfg
 > doxygen Doxyfile_CPP_API.cfg
 > doxygen Doxyfile_C_API.cfg
 
 distclean:
-ifeq ($(OS), Windows_NT)
-> $(IF_EXIST) Mast_UT$(SEP)Generated$(SEP)Runner.cpp       $(RM)     Mast_UT$(SEP)Generated$(SEP)Runner.cpp
-> $(IF_EXIST) SIT_reader_UT$(SEP)Generated$(SEP)Runner.cpp $(RM)     SIT_reader_UT$(SEP)Generated$(SEP)Runner.cpp
-> $(IF_EXIST) $(CMAKE_RELEASE_BUILD_DIR)                   $(RM_DIR) $(CMAKE_RELEASE_BUILD_DIR)
-> $(IF_EXIST) $(CMAKE_DEBUG_BUILD_DIR)                     $(RM_DIR) $(CMAKE_DEBUG_BUILD_DIR)
-> $(IF_EXIST) $(CMAKE_ARM_BUILD_DIR)                       $(RM_DIR) $(CMAKE_ARM_BUILD_DIR)
-else
-> $(RM)     Mast_UT$(SEP)Generated$(SEP)Runner.cpp
-> $(RM)     SIT_reader_UT$(SEP)Generated$(SEP)Runner.cpp
-> $(RM)     Optional_Libs_UT$(SEP)Generated$(SEP)Runner.cpp
-> $(RM_DIR) $(CMAKE_RELEASE_BUILD_DIR)
-> $(RM_DIR) $(CMAKE_DEBUG_BUILD_DIR)
-> $(RM_DIR) $(CMAKE_ARM_BUILD_DIR)
-> $(RM_DIR) $(CMAKE_RISCV32_BUILD_DIR)
-endif
+> cmake -E remove_directory $(CMAKE_DEBUG_BUILD_DIR)
+> cmake -E remove_directory $(CMAKE_RELEASE_BUILD_DIR)
+> cmake -E remove_directory $(CMAKE_ARM_BUILD_DIR)
+> cmake -E remove_directory $(CMAKE_RISCV32_BUILD_DIR)
+> cmake -E remove -f Mast_UT/Generated/Runner.cpp
+> cmake -E remove -f SIT_reader_UT/Generated/Runner.cpp
+> cmake -E remove -f Optional_Libs_UT/Generated/Runner.cpp
 

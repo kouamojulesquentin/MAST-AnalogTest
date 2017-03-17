@@ -11,7 +11,6 @@
 //!
 //===========================================================================
 
-#include "Startup.hpp"
 #include "AppFunctionAndNodePath_CPP.hpp"
 #include "PDL_Adapter_CPP.hpp"
 //+#include "g3log/g3log.hpp"
@@ -116,13 +115,13 @@ vector<AppFunctionAndNodePath> test::ml505_CreateApplicationsDescriptor ()
 					fftOutputMaxAmplitudesRight = fftOutputAmplitudesRight;
 			}
 
-			
+
 			// 16-bit output word for both audio channels:
 			// MSB contains the left channel amplitude, LSB the right one.
 			lcdCalculatedAmplitudes = static_cast<uint16_t>(fftOutputMaxAmplitudesLeft);
 			lcdCalculatedAmplitudes<<=8;
 			lcdCalculatedAmplitudes += static_cast<uint16_t>(fftOutputMaxAmplitudesRight);
-			
+
       iWrite(lcdRegisterPath, lcdCalculatedAmplitudes);
 
      std::cout << "\n Cycle "<< i << ": Sampled " << (int)adcLeftChannelSamples[fft_nb_bins-1]

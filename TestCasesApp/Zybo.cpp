@@ -11,7 +11,6 @@
 //!
 //===========================================================================
 
-#include "Startup.hpp"
 #include "AppFunctionAndNodePath_CPP.hpp"
 #include "PDL_Adapter_CPP.hpp"
 //+#include "g3log/g3log.hpp"

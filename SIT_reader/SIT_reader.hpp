@@ -19,6 +19,7 @@ namespace mast
   class SystemModelBuilder;
   class SystemModel;
   class SystemModelNode;
+  class Register;
 }
 
 namespace SIT
@@ -59,13 +60,13 @@ public:
     * parse - parse from a c++ input stream
     * @param is - std::istream&, valid input stream
     */
-   bool parse( std::istream &iss );
+   bool parse(std::istream &iss);
 
    std::shared_ptr<mast::SystemModelNode>    parsed_sut;    //!< SystemModel tree build from SIT file
    std::vector<mast::AppFunctionNameAndNode> namesAndNodes; //!< Associations of algorithms name a node
 
-   std::map<std::string,  std::shared_ptr<mast::SystemModelNode>> declared_registers;
-   std::queue<linker_information> unresolved_linkers;
+   std::map<std::string, std::shared_ptr<mast::Register>> declared_registers; //!< Created registers - kept to potentially associate to PathSelector (at end of parsing)
+   std::queue<linker_information>                         unresolved_linkers; //!< Informations to create PathSelector associated with linker (register driving the selector may be yet unknown when the linker is created)
 
 private:  // Part used by SIT_Parser
   friend class SIT_Parser;

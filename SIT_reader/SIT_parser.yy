@@ -58,6 +58,7 @@
 using std::vector;
 using std::shared_ptr;
 using std::make_shared;
+using std::make_unique;
 using std::dynamic_pointer_cast;
 using std::pair;
 using std::string;
@@ -66,6 +67,7 @@ using std::experimental::string_view;
 using namespace std::experimental::literals::string_view_literals;
 using namespace mast;
 
+#define STREAM_MY_LOCATION  "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": "
 
 #undef yylex
 #define yylex scanner.yylex
@@ -76,14 +78,15 @@ extern int nlines;
 extern SIT::SIT_Parser::location_type *my_location;
 
 
-enum class PathSelectorKind {Binary, One_Hot, N_Hot, Binary_noidle, One_Hot_noidle, N_Hot_noidle};
+const vector<string> Path_Selector_table  = {"Binary", "One_Hot", "N_Hot", "Binary_noidle", "One_Hot_noidle", "N_Hot_noidle"};
+enum class           PathSelectorKind       { Binary,   One_Hot,   N_Hot,   Binary_noidle,   One_Hot_noidle,   N_Hot_noidle};
+
 const vector<PathSelectorKind> PathSelectorKinds {PathSelectorKind::Binary,
                                                   PathSelectorKind::One_Hot,
                                                   PathSelectorKind::N_Hot,
                                                   PathSelectorKind::Binary_noidle,
                                                   PathSelectorKind::One_Hot_noidle,
                                                   PathSelectorKind::N_Hot_noidle};
-const vector<string> Path_Selector_table  = {"Binary", "One_Hot", "N_Hot", "Binary_noidle", "One_Hot_noidle", "N_Hot_noidle"};
 
 const std::vector<SelectorProperty> Path_Selector_prop_t {SelectorProperty::Binary_Default,
                                                           SelectorProperty::One_Hot_Default,
@@ -116,59 +119,49 @@ int index_in_table(const std::vector<std::string>& table, const std::string& s)
 }
 
 
-std::pair<shared_ptr<Register>, shared_ptr<PathSelector>> make_PathSelector
-             (
-             std::shared_ptr<mast::SystemModelBuilder> builder,
-             PathSelectorKind                          SelectorType,
-             const SelectorProperty&                   sel_properties,
-             const std::string&                        selectorRegName,
-             std::uint32_t                             max_derivations
-             )
+pair<shared_ptr<Register>, shared_ptr<PathSelector>>  make_PathSelector(shared_ptr<SystemModelBuilder> builder,
+                                                                        PathSelectorKind               selectorKind,
+                                                                        SelectorProperty               selectorProperty,
+                                                                        const string&                  selectorRegName,
+                                                                        uint32_t                       maxDerivations)
 {
-  pair < shared_ptr <Register>, shared_ptr < PathSelector >> res; /*cannot use auto inside a switch*/
-
-  switch (SelectorType)
+  switch (selectorKind)
   {
     case PathSelectorKind::Binary :
     case PathSelectorKind::Binary_noidle :
-      res = builder->Create_PathSelector(SelectorKind::Binary, selectorRegName, max_derivations, sel_properties);
-      break;
+      return builder->Create_PathSelector(SelectorKind::Binary, selectorRegName, maxDerivations, selectorProperty);
     case PathSelectorKind::One_Hot :
     case PathSelectorKind::One_Hot_noidle :
-      res = builder->Create_PathSelector(SelectorKind::One_Hot, selectorRegName, max_derivations, sel_properties);
-      break;
+      return builder->Create_PathSelector(SelectorKind::One_Hot, selectorRegName, maxDerivations, selectorProperty);
     case PathSelectorKind::N_Hot :
     case PathSelectorKind::N_Hot_noidle :
-      res = builder->Create_PathSelector(SelectorKind::N_Hot, selectorRegName, max_derivations, sel_properties);
-      break;
+      return builder->Create_PathSelector(SelectorKind::N_Hot, selectorRegName, maxDerivations, selectorProperty);
+    default:
+      THROW_RUNTIME_ERROR("Unexpected selector type ");
   }
-  return res;
 }
 
-std::shared_ptr <PathSelector>make_PathSelector (std::shared_ptr         <mast::SystemModelBuilder>builder,
-                                                 PathSelectorKind        SelectorType,
-                                                 const SelectorProperty& sel_properties,
-                                                 std::shared_ptr         <Register>selectorReg,
-                                                 std::uint32_t           max_derivations)
+shared_ptr<PathSelector> make_PathSelector (shared_ptr<SystemModelBuilder> builder,
+                                            PathSelectorKind               selectorKind,
+                                            SelectorProperty               selectorProperty,
+                                            shared_ptr<Register>           selectorReg,
+                                            uint32_t                       maxDerivations)
 {
-  shared_ptr <PathSelector>res; /*cannot use auto inside a switch*/
-
-  switch (SelectorType)
+  switch (selectorKind)
   {
     case PathSelectorKind::Binary :
     case PathSelectorKind::Binary_noidle :
-      res = builder->Create_PathSelector(SelectorKind::Binary, selectorReg, max_derivations, sel_properties);
-      break;
+      return builder->Create_PathSelector(SelectorKind::Binary, selectorReg, maxDerivations, selectorProperty);
     case PathSelectorKind::One_Hot :
     case PathSelectorKind::One_Hot_noidle :
-      res = builder->Create_PathSelector(SelectorKind::One_Hot, selectorReg, max_derivations, sel_properties);
+      return builder->Create_PathSelector(SelectorKind::One_Hot, selectorReg, maxDerivations, selectorProperty);
       break;
     case PathSelectorKind::N_Hot :
     case PathSelectorKind::N_Hot_noidle :
-      res = builder->Create_PathSelector(SelectorKind::N_Hot, selectorReg, max_derivations, sel_properties);
-      break;
+      return builder->Create_PathSelector(SelectorKind::N_Hot, selectorReg, maxDerivations, selectorProperty);
+    default:
+      THROW_RUNTIME_ERROR("Unexpected selector type ");
   }
-  return res;
 }
 } // End of: unnamed namespace
 
@@ -184,14 +177,14 @@ std::shared_ptr <PathSelector>make_PathSelector (std::shared_ptr         <mast::
 %type <name_type>             node_name
 %type <std::uint8_t>          hold
 %type <std::string>           bypass
-%type <mast::MuxRegPlacement> position
+%type <mast::MuxRegPlacement> mux_register_position
 
 
 %type <mast::SelectorProperty>          active
 %type <mast::SelectorProperty>          reverse
 %type <std::uint32_t>                   max_derivations
-%type <std::string>                     path_selector
-%type <std::string>                     ctrl_node
+%type <std::string>                     path_selector_kind
+%type <std::string>                     selector_register_name
 %type <std::uint32_t>                   IR_size
 %type <std::uint32_t>                   size
 %type <std::uint32_t>                   n_DR_chains
@@ -254,31 +247,33 @@ root_node:
     /*resolve evetual Linkers*/
     while (!driver.unresolved_linkers.empty())
     {
-      const auto& this_linker = driver.unresolved_linkers.front();
+      const auto& linkerInfo = driver.unresolved_linkers.front();
 
-      // remove resolved linker
-      auto selector_info= driver.declared_registers.find(this_linker.selector_name);
-      if (selector_info==driver.declared_registers.end())
+      // remove resolved linkerInfo
+      const auto& registerIter = driver.declared_registers.find(linkerInfo.selector_name);
+      if (registerIter == driver.declared_registers.end())
       {
-        LOG(ERROR_LVL) << "Error, Selector register " << this_linker.selector_name << " required by linker " <<  this_linker.linker_node->Name() << " at line " << this_linker.line <<":"<<this_linker.column << " does not exist" ;
+        LOG(ERROR_LVL) << "Error, Selector register \"" << linkerInfo.selector_name << "\" required by linker \"" << linkerInfo.linker_node->Name() << "\""
+                       << " at line " << linkerInfo.line << ":" << linkerInfo.column << " does not exist" ;
         YYERROR;
       }
 
-      auto properties   = Path_Selector_prop_t[this_linker.selector_kind_index];
-      auto selectorKind = PathSelectorKinds[this_linker.selector_kind_index];
-      auto selector = make_PathSelector (driver.builder,
-                                         selectorKind,
-                                         properties,
-                                         dynamic_pointer_cast<Register>(selector_info->second),
-                                         this_linker.derivations);
+      auto registerNode = registerIter->second;
+      auto properties   = Path_Selector_prop_t[linkerInfo.selector_kind_index];
+      auto selectorKind = PathSelectorKinds[linkerInfo.selector_kind_index];
+      auto selector     = make_PathSelector (driver.builder,
+                                             selectorKind,
+                                             properties,
+                                             registerNode,
+                                             linkerInfo.max_derivations);
 
-      auto linker_node = dynamic_pointer_cast<Linker>(this_linker.linker_node);
-      linker_node->ReplacePathSelector(selector);
+      auto linkerNode = linkerInfo.linker_node;
+      linkerNode->ReplacePathSelector(selector);
       driver.unresolved_linkers.pop();
     }
-    driver.parsed_sut=$1;
+    driver.parsed_sut = $[node];
   }
-   ;
+  ;
 
 children_list:
   t_START_HIERARCHY node_list  t_END_HIERARCHY{ $$ = $2;}
@@ -291,26 +286,25 @@ node_list:
                      $$.nodes = tmp;
         }
   |   node { $$.name = $1->Name();$$.n_nodes = 1;$$.nodes.push_back($1);}
-  ;
+;
 
 node:
-   parent_node_with_children { $$ = $1;}
-  | leaf_node
-          { $$ = $1;}
-  ;
+   parent_node_with_children { $$ = $1; }
+ | leaf_node                 { $$ = $1; }
+;
 
 is_transparent:
- t_TRANSPARENT {$$ = 1;}
+   t_TRANSPARENT {$$ = 1;}
  |
   { $$ = 0;}
 ;
 
 node_name :  t_WORD is_transparent
-          {
-            $$.name = $1;
-            $$.is_transparent = $2;
-          }
-     ;
+{
+  $$.name           = $[t_WORD];
+  $$.is_transparent = $[is_transparent];
+}
+;
 
 parent_node_with_children: parent_node PDL_declaration children_list
 {
@@ -359,107 +353,92 @@ function_list:
    }
 ;
 
-
 parent_node:
 t_CHAIN  node_name
 {
-         auto node = driver.main_sm->CreateChain($2.name);
-         if ($2.is_transparent)
-               node->IgnoreForNodePath(true);
-         $$ = node;
+  auto chain = driver.main_sm->CreateChain($[node_name].name);
+  chain->IgnoreForNodePath($[node_name].is_transparent);
+  $$ = chain;
 }
- |
-t_LINKER  node_name path_selector ctrl_node max_derivations
+|
+t_LINKER  node_name path_selector_kind selector_register_name max_derivations
 {
-  int selectorKindIndex = index_in_table(Path_Selector_table, $3);
+  int selectorKindIndex = index_in_table(Path_Selector_table, $[path_selector_kind]);
   if (selectorKindIndex == -1)
   {
-    LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-"
-                   << my_location->end.column << ": "
-                   << "node " << $2.name<< " \""<< $3 << "\"" << ": Unknown Linker Path Selector";
+    LOG(ERROR_LVL) << STREAM_MY_LOCATION << "node " << $[node_name].name << " \"" << $[path_selector_kind] << "\": Unsupported Linker Path Selector kind";
     YYERROR;
   }
 
-  if ($4 == "")
+  if ($[selector_register_name] == "")
   {
-    LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-"
-                   << my_location->end.column << ": "
-                   << "Must specify a control node for path selector";
+    LOG(ERROR_LVL) << STREAM_MY_LOCATION << "Must specify a control node (Register) for linker path selector";
     YYERROR;
   }
 
   std::ostringstream os;
-  os << "Node type LINKER, idf " << $2.name << " ";
-  if ($2.is_transparent)
+  os << "Node type LINKER, idf " << $[node_name].name << " ";
+  if ($[node_name].is_transparent)
     os << "(transparent) ";
-  os << $3 << "_PathSelector";
-  os << " controlled by node " << $4;
+  os << $[path_selector_kind] << "_PathSelector controlled by node " << $[selector_register_name];
   LOG(DEBUG) << os.str();
 
   auto pathSelector = make_shared<UnresolvedPathSelector>();
-  auto node = driver.main_sm->CreateLinker ($2.name, pathSelector);
+  auto linker       = driver.main_sm->CreateLinker ($[node_name].name, pathSelector);
 
   linker_information linkerInfo;
-  linkerInfo.linker_node         = node;
+  linkerInfo.linker_node         = linker;
   linkerInfo.column              = my_location->begin.column;
   linkerInfo.line                = my_location->begin.line;
   linkerInfo.selector_kind_index = selectorKindIndex;
-  linkerInfo.selector_name       = $4;
-  linkerInfo.derivations         = $5;
+  linkerInfo.selector_name       = $[selector_register_name];
+  linkerInfo.max_derivations     = $[max_derivations];
   driver.unresolved_linkers.push(linkerInfo);
+
+  $$ = linker;
+}
+|
+t_SIB node_name mux_register_position active
+{
+  auto node =  driver.builder->Create_SIB($[node_name].name, $[active], $[mux_register_position]);
+  $$ = node;
+}
+|
+t_MIB node_name mux_register_position active reverse max_derivations path_selector_kind
+{
+  int index = index_in_table(Path_Selector_table, $[path_selector_kind]);
+  if (index == -1)
+  {
+    LOG(ERROR_LVL) << STREAM_MY_LOCATION << "node " << $[node_name].name << " \"" << $[path_selector_kind] << "\" Unknown MIB Path Selector kind";
+    YYERROR;
+  }
+
+  auto             selectorKind     = PathSelectorKinds[index];
+  auto             selectorRegName  = $[node_name].name + MIB_CTRL_EXT;
+  SelectorProperty selectorProperty = $[active] | $[reverse] | Path_Selector_prop_t[index];
+
+  auto res = make_PathSelector(driver.builder,
+                               selectorKind,
+                               selectorProperty,
+                               selectorRegName,
+                               $[max_derivations]);
+
+  auto selectorReg = res.first;
+  auto selector    = res.second;
+  auto node        = driver.builder->Create_MIB($[node_name].name, selector, selectorReg, $[mux_register_position]);
 
   $$ = node;
 }
- |
- t_SIB node_name position active
-  {
-      {
-  auto node =  driver.builder->Create_SIB($2.name,$4,$3);
-
+|
+t_1500_WRAPPER node_name max_derivations
+{
+  auto node = driver.builder->Create_1500_Wrapper ($[node_name].name,$3);
   $$ = node;
-       }
-  }
- |
- t_MIB node_name position active reverse max_derivations path_selector
-  {
-  {
-    int index = index_in_table(Path_Selector_table,$7);
-    if (index==-1)
-    {
-      LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": "
-                     << "node " << $2.name << " \"" << $7 << "\"" << ": Unknown MIB Path Selector";
-      YYERROR;
-    }
-
-    auto selectorRegName = $2.name + MIB_CTRL_EXT;
-    SelectorProperty sel_properties = $4 | $5| Path_Selector_prop_t[index];
-
-    auto selectorKind = PathSelectorKinds[index];
-    auto res = make_PathSelector(driver.builder,
-                                selectorKind,
-                                sel_properties,
-                                selectorRegName,
-                                $6);
-
-    auto selectorReg = res.first;
-    auto selector    = res.second;
-    auto node        = driver.builder->Create_MIB($2.name, selector, selectorReg, $3);
-
-    $$ = node;
-  }
-  }
- |
- t_1500_WRAPPER node_name max_derivations
-  {
-      {
-        auto node = driver.builder->Create_1500_Wrapper ($2.name,$3);
-        $$ = node;
-       }
-  }
+}
 |
 t_ACCESS_INTERFACE  node_name AI_identifier AI_protocol_parameters
 {
-    const auto& nodeName           = $2.name;
+    const auto& nodeName           = $[node_name].name;
     const auto& protocolName       = $3;
     const auto& protocolParameters = $4;
 
@@ -552,11 +531,12 @@ JTAG_protocol: t_WORD
    {$$ =$1;}
    ;
 
-path_selector: t_WORD
+path_selector_kind: t_WORD
    { $$ =$1;}
    ;
-ctrl_node: t_WORD
-   { $$ =$1;}
+
+selector_register_name: t_WORD
+   { $$ = $1;}
    |
    { $$ = "";}
    ;
@@ -609,10 +589,10 @@ IR_Coding_list:
 max_derivations :
  t_DecimalLiteral { $$ = $1;}
 ;
-position :
+mux_register_position :
  t_POST { $$ = MuxRegPlacement::AfterMux;}
  |
- t_PRE{ $$ = MuxRegPlacement::BeforeMux;}
+ t_PRE  { $$ = MuxRegPlacement::BeforeMux;}
  ;
 
 active :
@@ -627,34 +607,35 @@ reverse :
  {  $$ = SelectorProperty::None; }
  ;
 
-leaf_node: register_node {     $$=  $1;
-                           }
-  ;
+leaf_node: register_node
+{
+  $$=  $1;
+}
+;
 
 register_node:
    t_REGISTER  node_name size hold bypass
    {
-     auto bin_value = BinaryVector::CreateFromString(remove_quotes($5));
-     if (bin_value.BitsCount() != $3)
+     auto bin_value = BinaryVector::CreateFromString(remove_quotes($[bypass]));
+     if (bin_value.BitsCount() != $[size])
      {
-       LOG(ERROR_LVL) << "Line " << my_location->begin.line << ":" << my_location->begin.column << "-" << my_location->end.column << ": "
-                      << "Node " << $2.name << " size " << $3 << " does not match Bypass value bit count " << bin_value.BitsCount();
+       LOG(ERROR_LVL) << STREAM_MY_LOCATION
+                      << "Node " << $[node_name].name << " size (" << $[size] << ") "
+                      << "does not match Bypass value bit count (" << bin_value.BitsCount() << ")";
        YYERROR;
      }
 
-     auto node = driver.main_sm->CreateRegister ($2.name, bin_value , nullptr);
-     /*TODO: save return value and check if binaryVector.size == size is correct
-     and raise error if not*/
-     if ($4==1)
-     {
-       node->SetHoldValue(true);
-     }
-     driver.declared_registers.insert (std::pair<std::string, std::shared_ptr<mast::SystemModelNode>>($2.name,node) );
+     auto registerNode = driver.main_sm->CreateRegister ($[node_name].name, bin_value, nullptr);
 
-     $$ = node;
-    }
+     //! @todo  save return value and check if binaryVector.size == size is correct and report error if not
 
-size :
+     registerNode->SetHoldValue($[hold] == 1);
+     driver.declared_registers.insert (make_pair($[node_name].name, registerNode));
+
+     $$ = registerNode;
+   }
+
+size:
  t_DecimalLiteral { $$ = $1;}
 ;
 

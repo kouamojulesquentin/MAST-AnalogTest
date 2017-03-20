@@ -172,11 +172,11 @@ void UT_reader::test_register_Error ()
   {
     // 00: Wrong Bypass length
     make_tuple("REGISTER test_register 8 Bypass: \"0b1001:011\"\n",
-               "Line 1:34-46: Node test_register size 8 does not match Bypass value bit count 7\nParse failed!!\n"),
+               "Line 1:34-46: Node test_register size (8) does not match Bypass value bit count (7)\nParse failed!!\n"),
 
     // 01: Missing register name
     make_tuple("REGISTER test_register 5 Bypass: \"0b001:0110:1100\"\n",
-               "Line 1:34-51: Node test_register size 5 does not match Bypass value bit count 11\nParse failed!!\n"),
+               "Line 1:34-51: Node test_register size (5) does not match Bypass value bit count (11)\nParse failed!!\n"),
 
     // 02: Missing register length
     make_tuple("REGISTER test_register Bypass: \"0b001\"\n",
@@ -1415,7 +1415,7 @@ void UT_reader::test_LINKER_Error ()
                "{REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
                "REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
                "}"s,
-               "Line 1:27-28: Must specify a control node for path selector\nParse failed!!\n"s),
+               "Line 1:27-28: Must specify a control node (Register) for linker path selector\nParse failed!!\n"s),
 
     // 01 ==> Error: selector register does not exist
     make_tuple("LINKER test_LINKER Binary selector_reg 4\n"
@@ -1423,7 +1423,7 @@ void UT_reader::test_LINKER_Error ()
                "  REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
                "  REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
                "}"s,
-               "Error, Selector register selector_reg required by linker test_LINKER at line 1:40 does not exist\n"
+               "Error, Selector register \"selector_reg\" required by linker \"test_LINKER\" at line 1:40 does not exist\n"
                "Parse failed!!\n"s),
   };
 

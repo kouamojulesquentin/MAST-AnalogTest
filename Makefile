@@ -61,6 +61,11 @@ TESTCASES_EXE_PATH    = $(BIN_DIR)/$(TESTCASES_EXE_NAME)
 CPP_EXAMPLE_EXE_PATH  = $(BIN_DIR)/$(CPP_EXAMPLE_EXE_NAME)
 endif
 
+ifneq ("$(wildcard Makefile.local)","")
+include Makefile.local
+endif
+
+
 CPP_DEFINES += -DUSE_OPEN_OCD:BOOL=$(USE_OPEN_OCD)
 
 CMAKE_DEBUG_FLAGS=    -DCMAKE_BUILD_TYPE=Debug   $(CMAKE_FLAGS) $(CPP_DEFINES)

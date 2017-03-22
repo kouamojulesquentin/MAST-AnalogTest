@@ -72,9 +72,7 @@ string DefaultTableBasedPathSelector::DebugSelectorInfo (bool onlyProperties) co
 //! @param pathsCount           Number of managed paths (including, optional, bypass register)
 //! @param selectTable          Table to use for selecting a path
 //! @param deselectTable        Table to use for deselecting a path
-//! @param isInverted           When true the bits for selecting a path are inverted (relative to the path identifier number)
-//! @param canSelectNone        When true zero is reserved to select 'no path' otherwise 0 is used to select first path
-//!                             (provided it is not inverted)
+//! @param properties           Properties of the selector (mainly to report that it can select no path or not)
 //!
 DefaultTableBasedPathSelector::DefaultTableBasedPathSelector (shared_ptr<Register> associatedRegister,
                                                               uint32_t             pathsCount,
@@ -100,6 +98,60 @@ DefaultTableBasedPathSelector::DefaultTableBasedPathSelector (shared_ptr<Registe
     ostringstream os;
     os << "Selection and deselection table must have an entry for not used path identifier zero";
     THROW_INVALID_ARGUMENT(os.str());
+  }
+}
+//
+//  End of: DefaultTableBasedPathSelector::DefaultTableBasedPathSelector
+//---------------------------------------------------------------------------
+
+
+//! Initializes selector for selection/deselection of a paths
+//!
+//! @note This version is based upon string defined tables values (for description by text file)
+//!
+//! @param associatedRegister   Register that is used to drive the path multiplexer
+//! @param pathsCount           Number of managed paths (including, optional, bypass register)
+//! @param properties           Properties of the selector are currently ignored (but are saved for report purpose)
+//! @param tables               String encoded select/deselect table with coma separated values
+//!                             First half values are for the selection table,
+//!                             second half for the deselection table
+//!
+DefaultTableBasedPathSelector::DefaultTableBasedPathSelector (shared_ptr<Register> associatedRegister,
+                                                              uint32_t             pathsCount,
+                                                              SelectorProperty     properties,
+                                                              string_view          tables)
+  : PathSelector    (properties)
+  , m_pathsCount    (pathsCount)
+  , m_muxRegister   (CHECK_PARAMETER_NOT_NULL (associatedRegister, "associatedRegister must be a valid Register"))
+{
+  auto vectors     = Utility::Split(tables, ",");
+  auto valuesCount = vectors.size();
+  auto tableDepth  = valuesCount / 2;
+
+  CHECK_PARAMETER_NEQ (valuesCount,      0,          "Missing values for defining select/deselect tables");
+  CHECK_PARAMETER_EQ  (valuesCount % 2u, 0,          "There must be same number of select/deselect table value");
+  CHECK_PARAMETER_GT  (tableDepth,       pathsCount, "Tables depth must be at least one greater than selectable paths count");
+
+  // ---------------- Fill selection table
+  //
+  for (size_t ii = 0 ; ii < tableDepth; ++ii)
+  {
+    auto value        = vectors[ii];
+    auto binaryVector = BinaryVector::CreateFromString(value);
+
+    CHECK_PARAMETER_EQ(binaryVector.BitsCount(), associatedRegister->BitsCount(), "Selection table element must have same size as associated REGISTER");
+    m_selectTable.emplace_back(std::move(binaryVector));
+  }
+
+  // ---------------- Fill deselection table
+  //
+  for (size_t ii = tableDepth ; ii < valuesCount; ++ii)
+  {
+    auto value        = vectors[ii];
+    auto binaryVector = BinaryVector::CreateFromString(value);
+
+    CHECK_PARAMETER_EQ(binaryVector.BitsCount(), associatedRegister->BitsCount(), "Deselection table element must have same size as associated REGISTER");
+    m_deselectTable.emplace_back(std::move(binaryVector));
   }
 }
 //

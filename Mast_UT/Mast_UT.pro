@@ -40,6 +40,7 @@ SOURCES += \
     SystemModel/UT_DefaultBinaryPathSelector.cpp        \
     SystemModel/UT_DefaultNHotPathSelector.cpp          \
     SystemModel/UT_DefaultOneHotPathSelector.cpp        \
+    SystemModel/UT_DefaultTableBasedPathSelector.cpp    \
     SystemModel/UT_FromSutUpdater.cpp                   \
     SystemModel/UT_GenericAccessInterfaceProtocol.cpp   \
     SystemModel/UT_GmlPrinter.cpp                       \
@@ -88,6 +89,7 @@ HEADERS += \
     SystemModel/UT_DefaultBinaryPathSelector.hpp      \
     SystemModel/UT_DefaultNHotPathSelector.hpp        \
     SystemModel/UT_DefaultOneHotPathSelector.hpp      \
+    SystemModel/UT_DefaultTableBasedPathSelector.hpp  \
     SystemModel/UT_FromSutUpdater.hpp                 \
     SystemModel/UT_GenericAccessInterfaceProtocol.hpp \
     SystemModel/UT_GmlPrinter.hpp                     \

@@ -26,8 +26,12 @@ namespace mast
 {
 class Register;
 
-//! Abstract base class for implementation of path selector that are based upon a LUTs
+//! Base class for implementation of path selector that are based upon a LUTs
 //! for selection and deselection values
+//!
+//! @note Do not support independent selection
+//!       Only one path can be selected at any given time (unless there are voluntarily coupled)
+//! @note Do not support independent deselection
 //!
 //! @note Path identifier are defined in range [1..nb_path]
 //!
@@ -41,13 +45,20 @@ class DLL_EXPORT DefaultTableBasedPathSelector : public PathSelector
 
   using TablesType = std::vector<BinaryVector> ; //!< Selection/deselection LUT types
 
-  //! Constructs selection and deselection tables with pathCount entries
+  //! Constructs from selection and deselection tables with pathCount entries
   //!
   DefaultTableBasedPathSelector(std::shared_ptr<Register> associatedRegister,
                                 uint32_t                  pathsCount,
                                 TablesType                selectTable,
                                 TablesType                deselectTable,
                                 SelectorProperty          properties = SelectorProperty::None);
+
+  //! Constructs from tables defined as string parameters
+  //!
+  DefaultTableBasedPathSelector(std::shared_ptr<Register>      associatedRegister,
+                                uint32_t                       pathsCount,
+                                SelectorProperty               properties,
+                                std::experimental::string_view tables);
 
   virtual bool IsActive            (uint32_t pathIdentifier) const override; //!< Returns true when the specified path is already active
   virtual bool IsSelected          (uint32_t pathIdentifier) const override; //!< Returns true when the specified path is selected
@@ -91,10 +102,10 @@ class DLL_EXPORT DefaultTableBasedPathSelector : public PathSelector
   // ---------------- Protected Fields
   //
   protected:
-  uint32_t                  m_pathsCount;             //!< Number of managed paths
-  std::shared_ptr<Register> m_muxRegister;            //!< Register that drives the paths multiplexer
-  const TablesType          m_selectTable;            //!< Selection LUT
-  const TablesType          m_deselectTable;          //!< Deselection LUT
+  uint32_t                  m_pathsCount;    //!< Number of managed paths
+  std::shared_ptr<Register> m_muxRegister;   //!< Register that drives the paths multiplexer
+  TablesType                m_selectTable;   //!< Selection LUT   (non const because of deferred initialization)
+  TablesType                m_deselectTable; //!< Deselection LUT (non const because of deferred initialization)
 };
 //
 //  End of DefaultTableBasedPathSelector class declaration

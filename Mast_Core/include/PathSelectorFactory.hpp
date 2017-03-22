@@ -120,8 +120,13 @@ class DLL_EXPORT PathSelectorFactory
   //! Fills up with default PathSelector
   //!
   //! @note Default PathSelector are:
-  //!         -
-  //!         -
+  //!         - Binary
+  //!         - Binary_noidle
+  //!         - One_Hot
+  //!         - One_Hot_noidle
+  //!         - N_Hot
+  //!         - N_Hot_noidle
+  //!         - Table_Based  (custom table)
   //!
   virtual void InitializeWithDefaults();
 

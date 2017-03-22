@@ -23,6 +23,7 @@
 #include <typeinfo>
 #include <tuple>
 #include <memory>
+#include <experimental/string_view>
 
 #include "Cpp_11_Traits.hpp"
 #include "Mast_Core_Traits.hpp"
@@ -33,6 +34,8 @@ using std::shared_ptr;
 using std::make_shared;
 using std::make_unique;
 using std::string;
+using std::experimental::string_view;
+using namespace std::experimental::literals::string_view_literals;
 
 using namespace mast;
 
@@ -56,7 +59,7 @@ void UT_PathSelectorFactory::test_Instance ()
   CxxTest::setAbortTestOnFail(true);
   TS_ASSERT_NOT_NULLPTR (pInstance);
 
-  TS_ASSERT_EQUALS (pInstance->RegisteredCreatorsCount(), 6u);   // This is to detect when one should consider adding a new test for a new default creation method
+  TS_ASSERT_EQUALS (pInstance->RegisteredCreatorsCount(), 7u);   // This is to detect when one should consider adding a new test for a new default creation method
 }
 
 
@@ -240,6 +243,37 @@ void UT_PathSelectorFactory::test_Create_Std_Param_Error ()
   //
   TS_DATA_DRIVEN_TEST(checker, data);
 }
+
+
+//! Checks PathSelectorFactory::Create() for "custom" PathSelector when must be successful
+//!
+void UT_PathSelectorFactory::test_Create_Custom_Success ()
+{
+  // ---------------- Setup
+  //
+  auto associatedRegister = make_shared<Register>("Ctrl", BinaryVector::CreateFromBinaryString("0b111"), true);
+  auto tablesValues       = "0b000, 0b001, 0b010, 0b000, 0b000, 0b000"s;
+
+  auto& instance = PathSelectorFactory::Instance();
+
+  shared_ptr<PathSelector> pathSelector;
+
+  CxxTest::setAbortTestOnFail(true);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (pathSelector = instance.Create("Table_Based", 2u, tablesValues, associatedRegister));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_NOT_NULLPTR (pathSelector);
+
+  const auto& actualSelectorType = typeid(*pathSelector);
+
+  TS_ASSERT_EQUALS (actualSelectorType,              typeid(DefaultTableBasedPathSelector));
+  TS_ASSERT_EQUALS (pathSelector->SelectablePaths(), 2);
+}
+
 
 //! Checks PathSelectorFactory::Clear()
 //!

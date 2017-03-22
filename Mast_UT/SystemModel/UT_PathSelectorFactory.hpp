@@ -26,11 +26,20 @@ class UT_PathSelectorFactory : public CxxTest::TestSuite
 
   // ================ Test Methods ================
 
+  // ---------------- Instance
+  //
   void test_Instance ();
+
+  // ---------------- Create
+  //
   void test_Create_Std_Success ();
   void test_Create_Std_Success_CanSelectNone ();
   void test_Create_Std_Id_Error ();
   void test_Create_Std_Param_Error ();
+
+  void test_Create_Custom_Success ();
+//+  void test_Create_Custom_Id_Error ();
+//+  void test_Create_Custom_Param_Error ();
 
   // ---------------- Factory Management
   //

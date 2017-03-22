@@ -162,7 +162,8 @@ void PathSelectorFactory::InitializeWithDefaults ()
 
   // ---------------- Custom
   //
-//+  RegisterCreator("LastOrDefault",        [](const string& /* parameters */) { return make_unique<ConfigureAlgorithm_LastOrDefault>();        });
+  m_customCreators["Table_Based"] = [](uint32_t pathsCount, const string& parameters, shared_ptr<Register> associatedRegister)
+                                    { return make_unique<DefaultTableBasedPathSelector>(associatedRegister, pathsCount, SelectorProperty::None, parameters); };
 }
 //
 //  End of: PathSelectorFactory::InitializeWithDefaults

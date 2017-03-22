@@ -549,13 +549,12 @@ pair<shared_ptr<Register>, shared_ptr<PathSelector>> SystemModelBuilder::Create_
     case SelectorKind::N_Hot:
       registerInitialValue = DefaultNHotPathSelector::AssociatedRegisterInitialValue(pathsCount, properties);
       break;
-    case SelectorKind::Unresolved:
-      registerInitialValue = UnresolvedPathSelector::AssociatedRegisterInitialValue(pathsCount, properties);
-      break;
+    case SelectorKind::Unresolved:  // No break intended
     default:
       THROW_INVALID_ARGUMENT("Can only support Binary, One_Hot and N_Hot type path selector");
       break;
   }
+
   auto holdValue = true;
   auto associatedRegister = m_model.CreateRegister (registerName, registerInitialValue, holdValue);
 

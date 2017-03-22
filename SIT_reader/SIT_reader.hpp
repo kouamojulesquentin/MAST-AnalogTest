@@ -2,6 +2,7 @@
 #define __SITDRIVER_HPP__ 1
 
 #include "AppFunctionNameAndNode.hpp"
+#include "PathSelector.hpp"
 
 #include <string>
 #include <vector>
@@ -12,6 +13,7 @@
 #include <iostream>
 #include <map>
 #include <queue>
+#include <functional>
 #include "SIT_types.h"
 
 namespace mast
@@ -65,13 +67,20 @@ public:
    std::shared_ptr<mast::SystemModelNode>    parsed_sut;    //!< SystemModel tree build from SIT file
    std::vector<mast::AppFunctionNameAndNode> namesAndNodes; //!< Associations of algorithms name a node
 
-   std::map<std::string, std::shared_ptr<mast::Register>> declared_registers; //!< Created registers - kept to potentially associate to PathSelector (at end of parsing)
-   std::queue<linker_information>                         unresolved_linkers; //!< Informations to create PathSelector associated with linker (register driving the selector may be yet unknown when the linker is created)
-
 private:  // Part used by SIT_Parser
   friend class SIT_Parser;
+
+  std::map<std::string, std::shared_ptr<mast::Register>> declared_registers; //!< Created registers - kept to potentially associate to PathSelector (at end of parsing)
+  std::queue<linker_information>                         unresolved_linkers; //!< Informations to create PathSelector associated with linker (register driving the selector may be yet unknown when the linker is created)
+
   std::shared_ptr<mast::SystemModel>        main_sm;
   std::shared_ptr<mast::SystemModelBuilder> builder;
+
+  using RegisterCreator_t = std::function<std::shared_ptr<mast::Register>(const std::string&     selectorRegName,
+                                                                          uint32_t               pathsCount,
+                                                                          mast::SelectorProperty properties)>; //!< Function to create a register for a PathSelector
+
+  std::map<std::string, RegisterCreator_t>  selector_register_creator;  //!< Creators to create a register for a PathSelector
 
 private:
 

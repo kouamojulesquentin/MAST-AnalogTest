@@ -10,6 +10,7 @@ namespace mast
 {
   class SystemModelNode;
   class Linker;
+  enum class SelectorProperty;
 } // End of namespace mast
 
 
@@ -18,9 +19,6 @@ struct name_type
   std::uint8_t is_transparent;
   std::string  name;
 };
-
-enum ctrl_position { BEFORE, AFTER};
-enum logic_polarity { HIGH, LOW};
 
 struct node_list_type
 {
@@ -36,10 +34,12 @@ struct node_list_type
 struct linker_information
 {
   std::shared_ptr<mast::Linker> linker_node;
-  uint32_t                      column;
-  uint32_t                      line;
-  uint32_t                      max_derivations;
-  uint32_t                      selector_kind_index;
+  uint32_t                      line              = 0;
+  uint32_t                      beginColumn       = 0;
+  uint32_t                      endColumn         = 0;
+  uint32_t                      max_derivations   = 0;
+  mast::SelectorProperty        selector_property = static_cast<mast::SelectorProperty>(0);
+  std::string                   selector_kind_name;
   std::string                   selector_name;
 };
 

@@ -48,8 +48,9 @@ SOURCES +=  \
     src/NamesChecker.cpp                            \
     src/NodePathResolver.cpp                        \
     src/OfflineProtocol.cpp                         \
-    src/PathSelector.cpp                            \
     src/ParentNode.cpp                              \
+    src/PathSelector.cpp                            \
+    src/PathSelectorFactory.cpp                     \
     src/PrettyPrinter.cpp                           \
     src/PropagatePendingVisitor.cpp                 \
     src/Register.cpp                                \
@@ -109,6 +110,7 @@ HEADERS += \
     include/OfflineProtocol.hpp                         \
     include/ParentNode.hpp                              \
     include/PathSelector.hpp                            \
+    include/PathSelectorFactory.hpp                     \
     include/PrettyPrinter.hpp                           \
     include/PropagatePendingVisitor.hpp                 \
     include/Remote_Protocol.hpp                         \

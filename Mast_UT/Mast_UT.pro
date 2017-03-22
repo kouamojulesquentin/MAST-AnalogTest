@@ -46,6 +46,7 @@ SOURCES += \
     SystemModel/UT_NamesChecker.cpp                     \
     SystemModel/UT_NodePathResolver.cpp                 \
     SystemModel/UT_ParentNode.cpp                       \
+    SystemModel/UT_PathSelectorFactory.cpp              \
     SystemModel/UT_PrettyPrinter.cpp                    \
     SystemModel/UT_PropagatePendingVisitor.cpp          \
     SystemModel/UT_Remote_Protocol_Proxy.cpp            \
@@ -73,10 +74,11 @@ SOURCES += \
 
 HEADERS += \
     CxxTest_Traits/BinaryVector_Traits.hpp            \
-    CxxTest_Traits/SystemModelCheckResult_Traits.hpp  \
     CxxTest_Traits/Cpp_11_Traits.hpp                  \
     CxxTest_Traits/CPP_API_Traits.hpp                 \
     CxxTest_Traits/C_API_Traits.hpp                   \
+    CxxTest_Traits/Mast_Core_Traits.hpp               \
+    CxxTest_Traits/SystemModelCheckResult_Traits.hpp  \
     API_C/UT_PDL_Adapter_C.hpp                        \
     API_CPP/UT_PDL_Adapter_CPP.hpp                    \
     SystemModel/UT_AccessInterfaceProtocolFactory.h   \
@@ -92,6 +94,7 @@ HEADERS += \
     SystemModel/UT_NamesChecker.hpp                   \
     SystemModel/UT_NodePathResolver.hpp               \
     SystemModel/UT_ParentNode.hpp                     \
+    SystemModel/UT_PathSelectorFactory.hpp            \
     SystemModel/UT_PrettyPrinter.hpp                  \
     SystemModel/UT_PropagatePendingVisitor.hpp        \
     SystemModel/UT_Remote_Protocol_Proxy.hpp          \

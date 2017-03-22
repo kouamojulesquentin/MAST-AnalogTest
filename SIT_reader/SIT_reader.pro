@@ -38,11 +38,12 @@ SOURCES += \
     SIT_reader.cpp
 
 
-HEADERS += \
-    location.hh \
-    position.hh \
+HEADERS +=         \
+    location.hh    \
+    position.hh    \
     SIT_reader.hpp \
-    stack.hh
+    stack.hh       \
+    UnresolvedPathSelector.hpp
 
 
 CONFIG(debug,   debug|release) {

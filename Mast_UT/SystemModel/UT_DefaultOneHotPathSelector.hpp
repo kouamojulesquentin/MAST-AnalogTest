@@ -36,6 +36,7 @@ class UT_DefaultOneHotPathSelector : public CxxTest::TestSuite
   void test_Constructor_ReverseOrder ();
   void test_Constructor_InvertedReverseOrder ();
   void test_Constructor_TooSmallRegister ();
+  void test_Constructor_nullptr_Register ();
 
   // ---------------- Select
   //

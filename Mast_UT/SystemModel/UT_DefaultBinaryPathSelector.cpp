@@ -20,7 +20,9 @@
 #include <utility>
 #include <memory>
 #include <sstream>
+
 using std::ostringstream;
+using std::shared_ptr;
 using std::make_shared;
 
 using namespace mast;
@@ -129,6 +131,20 @@ void UT_DefaultBinaryPathSelector::test_Constructor_CanSelectNone ()
   TS_ASSERT_FALSE  (sut.IsActive(3));
   TS_ASSERT_FALSE  (sut.IsActive(4));
   TS_ASSERT_FALSE  (sut.IsActive(5));
+}
+
+
+//! Checks DefaultBinaryPathSelector constructor when associated register is not valid (nullptr)
+//!
+void UT_DefaultBinaryPathSelector::test_Constructor_nullptr_Register ()
+{
+  // ---------------- Setup
+  //
+  auto associatedNode = shared_ptr<Register>();
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS (DefaultBinaryPathSelector(associatedNode, 5, SelectorProperty::Binary_Default), std::exception);
 }
 
 

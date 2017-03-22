@@ -33,6 +33,7 @@ class UT_DefaultBinaryPathSelector : public CxxTest::TestSuite
   //
   void test_Constructor_CannotSelectNone ();
   void test_Constructor_CanSelectNone ();
+  void test_Constructor_nullptr_Register ();
 
   // ---------------- Select
   //

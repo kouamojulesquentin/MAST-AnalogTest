@@ -18,23 +18,31 @@
 #include <stdexcept>
 #include <limits>
 #include <sstream>
+#include <experimental/string_view>
 
 using std::ostringstream;
 using std::shared_ptr;
+using std::experimental::string_view;
 
+using namespace std::experimental::literals::string_view_literals;
 using namespace mast;
+
+namespace
+{
+  auto REQUIRED_REGISTER_MESSAGE = "A valid associated register is mandatory to create DefaultTableBasedPathSelector"sv;
+}
 
 //! Initializes selector for fast selection/deselection of a path
 //!
-//! @param associatedRegister   Register that is used to drive the path multiplexer
+//! @param associatedRegister   Register that is used to drive the path multiplexer (must be not nullptr)
 //! @param pathsCount           Number of managed paths (including, optional, bypass register)
 //! @param properties           Properties of the selector (bit order can be reverse or it can use negative logic)
 //!
 DefaultBinaryPathSelector::DefaultBinaryPathSelector(shared_ptr<Register> associatedRegister, uint32_t pathsCount, SelectorProperty properties)
-  : DefaultTableBasedPathSelector (associatedRegister,
+  : DefaultTableBasedPathSelector (CHECK_PARAMETER_NOT_NULL(associatedRegister, REQUIRED_REGISTER_MESSAGE),
                                    pathsCount,
-                                   CreateSelectTable   (associatedRegister->BitsCount(), pathsCount, properties),
-                                   CreateDeselectTable (associatedRegister->BitsCount(), pathsCount, properties),
+                                   CreateSelectTable   (CHECK_PARAMETER_NOT_NULL(associatedRegister, REQUIRED_REGISTER_MESSAGE)->BitsCount(), pathsCount, properties),
+                                   CreateDeselectTable (CHECK_PARAMETER_NOT_NULL(associatedRegister, REQUIRED_REGISTER_MESSAGE)->BitsCount(), pathsCount, properties),
                                    properties
                                   )
 {

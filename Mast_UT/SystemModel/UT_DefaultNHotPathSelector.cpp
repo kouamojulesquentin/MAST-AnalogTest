@@ -20,7 +20,9 @@
 #include <utility>
 #include <memory>
 #include <sstream>
+
 using std::ostringstream;
+using std::shared_ptr;
 using std::make_shared;
 using std::initializer_list;
 
@@ -399,6 +401,20 @@ void UT_DefaultNHotPathSelector::test_Constructor_TooSmallRegister ()
   //
   TS_ASSERT_THROWS (DefaultNHotPathSelector(associatedNode, 5u);, std::exception);
 }
+
+//! Checks DefaultNHotPathSelector constructor when associated register is not valid (nullptr)
+//!
+void UT_DefaultNHotPathSelector::test_Constructor_nullptr_Register()
+{
+  // ---------------- Setup
+  //
+  auto associatedNode = shared_ptr<Register>();
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (DefaultNHotPathSelector(associatedNode, 5u);, std::exception);
+}
+
 
 //! Checks DefaultNHotPathSelector::Select()
 //!

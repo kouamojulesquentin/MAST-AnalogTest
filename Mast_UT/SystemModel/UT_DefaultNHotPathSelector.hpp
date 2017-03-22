@@ -40,6 +40,7 @@ class UT_DefaultNHotPathSelector : public CxxTest::TestSuite
   void test_Constructor_Multiple_ReverseOrder ();
   void test_Constructor_Multiple_InvertedReverseOrder ();
   void test_Constructor_TooSmallRegister ();
+  void test_Constructor_nullptr_Register ();
 
   // ---------------- Select
   //

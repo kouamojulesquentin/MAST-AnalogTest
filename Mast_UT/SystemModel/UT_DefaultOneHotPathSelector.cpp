@@ -20,7 +20,9 @@
 #include <utility>
 #include <memory>
 #include <sstream>
+
 using std::ostringstream;
+using std::shared_ptr;
 using std::make_shared;
 
 using namespace mast;
@@ -211,6 +213,21 @@ void UT_DefaultOneHotPathSelector::test_Constructor_TooSmallRegister ()
   //
   TS_ASSERT_THROWS (DefaultOneHotPathSelector(associatedNode, 5u);, std::exception);
 }
+
+
+//! Checks DefaultOneHotPathSelector constructor when associated register is nullptr
+//!
+void UT_DefaultOneHotPathSelector::test_Constructor_nullptr_Register ()
+{
+  // ---------------- Setup
+  //
+  auto associatedNode = shared_ptr<Register>();
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (DefaultOneHotPathSelector(associatedNode, 5u);, std::exception);
+}
+
 
 //! Checks DefaultOneHotPathSelector::Select()
 //!

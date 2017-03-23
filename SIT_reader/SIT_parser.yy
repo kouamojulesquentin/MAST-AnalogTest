@@ -56,6 +56,7 @@
 
 using std::vector;
 using std::shared_ptr;
+using std::unique_ptr;
 using std::make_shared;
 using std::make_unique;
 using std::dynamic_pointer_cast;
@@ -98,6 +99,7 @@ inline std::string remove_quotes(std::string s)
 %type <std::uint8_t>          is_transparent
 %type <name_type>             node_name
 %type <std::uint8_t>          hold
+%type <std::string>           Optional_unquoted_string
 %type <std::string>           bypass
 %type <mast::MuxRegPlacement> mux_register_position
 
@@ -106,6 +108,7 @@ inline std::string remove_quotes(std::string s)
 %type <mast::SelectorProperty>          reverse
 %type <std::uint32_t>                   max_derivations
 %type <std::string>                     path_selector_kind
+%type <std::string>                     path_selector_parameters
 %type <std::string>                     selector_register_name
 %type <std::uint32_t>                   IR_size
 %type <std::uint32_t>                   size
@@ -167,6 +170,7 @@ root_node:
   node END
   {
     const auto& selectorFactory = PathSelectorFactory::Instance();
+    unique_ptr<PathSelector> selector;
 
     // ---------------- Create real PathSelector for linkers that referred to a Register by its name
     //
@@ -175,20 +179,31 @@ root_node:
       const auto& linkerInfo = driver.unresolved_linkers.front();
 
       // remove resolved linkerInfo
-      const auto& registerIter = driver.declared_registers.find(linkerInfo.selector_name);
+      const auto& registerIter = driver.declared_registers.find(linkerInfo.selector_reg_name);
       if (registerIter == driver.declared_registers.end())
       {
         LOG(ERROR_LVL) << STREAM_LOCATION(linkerInfo.line, linkerInfo.beginColumn, linkerInfo.endColumn)
                        << STREAM_NODE_NAME("LINKER", linkerInfo.linker_node->Name())
-                       << "Error, specified selector register \"" << linkerInfo.selector_name << "\" does not exist";
+                       << "Error, specified selector register \"" << linkerInfo.selector_reg_name << "\" does not exist";
         YYERROR;
       }
 
       auto registerNode = registerIter->second;
-      auto selector     = selectorFactory.Create(linkerInfo.selector_kind_name,
-                                                 linkerInfo.max_derivations,
-                                                 linkerInfo.selector_property,
-                                                 registerNode);
+
+      if (!linkerInfo.selector_parameters.empty())
+      {
+        selector = selectorFactory.Create(linkerInfo.selector_kind_name,
+                                          linkerInfo.max_derivations,
+                                          linkerInfo.selector_parameters,
+                                          registerNode);
+      }
+      else
+      {
+        selector = selectorFactory.Create(linkerInfo.selector_kind_name,
+                                          linkerInfo.max_derivations,
+                                          linkerInfo.selector_property,
+                                          registerNode);
+      }
 
       auto linkerNode = linkerInfo.linker_node;
       linkerNode->ReplacePathSelector(shared_ptr<PathSelector>(std::move(selector)));
@@ -284,7 +299,7 @@ t_CHAIN  node_name
   $$ = chain;
 }
 |
-t_LINKER  node_name path_selector_kind selector_register_name max_derivations
+t_LINKER  node_name path_selector_kind selector_register_name max_derivations path_selector_parameters
 {
   if ($[selector_register_name] == "")
   {
@@ -292,25 +307,19 @@ t_LINKER  node_name path_selector_kind selector_register_name max_derivations
     YYERROR;
   }
 
-//+  std::ostringstream os;
-//+  os << "Node type LINKER, idf " << $[node_name].name << " ";
-//+  if ($[node_name].is_transparent)
-//+    os << "(transparent) ";
-//+  os << $[path_selector_kind] << "_PathSelector controlled by node " << $[selector_register_name];
-//+  LOG(DEBUG) << os.str();
-
   auto pathSelector = make_shared<UnresolvedPathSelector>();
   auto linker       = driver.main_sm->CreateLinker ($[node_name].name, pathSelector);
 
-  linker_information            linkerInfo;
-  linkerInfo.linker_node        = linker;
-  linkerInfo.line               = my_location->begin.line;
-  linkerInfo.beginColumn        = my_location->begin.column;
-  linkerInfo.endColumn          = my_location->end.column;
-  linkerInfo.selector_property  = SelectorProperty::None;
-  linkerInfo.selector_kind_name = $[path_selector_kind];
-  linkerInfo.selector_name      = $[selector_register_name];
-  linkerInfo.max_derivations    = $[max_derivations];
+  linker_information             linkerInfo;
+  linkerInfo.linker_node         = linker;
+  linkerInfo.line                = my_location->begin.line;
+  linkerInfo.beginColumn         = my_location->begin.column;
+  linkerInfo.endColumn           = my_location->end.column;
+  linkerInfo.selector_property   = SelectorProperty::None;
+  linkerInfo.selector_reg_name   = $[selector_register_name];
+  linkerInfo.selector_kind_name  = $[path_selector_kind];
+  linkerInfo.selector_parameters = $[path_selector_parameters];
+  linkerInfo.max_derivations     = $[max_derivations];
   driver.unresolved_linkers.push(linkerInfo);
 
   $$ = linker;
@@ -471,6 +480,23 @@ AI_identifier:
   {
      $$ = $1;
   }
+;
+
+Optional_unquoted_string:
+ t_QUOTED_STRING
+ {
+   $$ = remove_quotes($1);
+ }
+|
+ {
+   $$="";
+ }
+;
+
+path_selector_parameters: Optional_unquoted_string
+{
+  $$ = $[Optional_unquoted_string];
+}
 ;
 
 AI_protocol_parameters:

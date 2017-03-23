@@ -1408,6 +1408,10 @@ void UT_reader::test_LINKER_Success ()
 }
 
 
+
+
+
+
 // Test construction of LINKERs macro from Simplified ICL Tree input - in case of errors
 //
 void UT_reader::test_LINKER_Error ()
@@ -1445,7 +1449,7 @@ void UT_reader::test_LINKER_Error ()
                "{REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
                "REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
                "}"s,
-               "Line 1:27-28: LINKER node \"test_LINKER\" Must specify a control node (Register) for its path selector\n"
+               "Line 2:1-2: LINKER node \"test_LINKER\" Must specify a control node (Register) for its path selector\n"
                "Parse failed!!\n"s),
 
     // 01 ==> Error: selector register does not exist
@@ -1454,7 +1458,7 @@ void UT_reader::test_LINKER_Error ()
                "  REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
                "  REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
                "}"s,
-               "Line 1:40-41: LINKER node \"test_LINKER\" Error, specified selector register \"selector_reg\" does not exist\n"
+               "Line 2:1-2: LINKER node \"test_LINKER\" Error, specified selector register \"selector_reg\" does not exist\n"
                "Parse failed!!\n"s),
   };
 
@@ -1463,6 +1467,65 @@ void UT_reader::test_LINKER_Error ()
   TS_DATA_DRIVEN_TEST (checker, data);
 }
 
+// Test construction of LINKERs macro with selector defined from custom table
+//
+void UT_reader::test_LINKER_CustomTable_Success ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [&](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto input_SIT            = std::get<0>(data);
+    auto expected_PrettyPrint = std::get<1>(data);
+
+    REDIRECT_CERR(errorSink);
+
+    // ---------------- Exercise
+    //
+    auto parseResult = UT_reader_wrapper::run_parser_for_UT(input_SIT, sm);
+
+    // ---------------- Verify
+    //
+    CxxTest::setAbortTestOnFail(true);
+
+    // Error messages
+    std::this_thread::sleep_for(5ms); // To get messages from logger (running in another thread)
+    const auto gotErrorMessage = errorSink.str();
+    TS_ASSERT_EQUALS (gotErrorMessage, "");
+
+    // With PrettyPrint
+    auto actual_PrettyPrint = parseResult.first;
+    TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
+    // With Checker
+    PrependWithTap(sm, parseResult.second);   // This is to avoid warnings about missing AccessInterface
+    auto checkResult = sm->Check();
+    TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
+
+  };
+
+  auto data =
+  {
+    // 01 ==> correct syntax
+    make_tuple("LINKER Link_0 Table_Based reg_1 3 \"0b1111, 0b0001, 0b0011, 0b0111,  0b1111, 0b0000, 0b0000, 0b0000\"\n"
+               "{\n"
+               "  REGISTER reg_1 4 Bypass: \"0b1001\"\n"
+               "  REGISTER reg_2 3 Bypass: \"0b110\"\n"
+               "  REGISTER reg_3 2 Bypass: \"0b10\"\n"
+               "}"s,
+               "[Linker](0)    \"Link_0\"\n"
+               " :Selector:(1)  \"reg_1\", kind: Table_Based, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n"
+               " [Register](1)  \"reg_1\", length: 4, bypass: 1001\n"
+               " [Register](2)  \"reg_2\", length: 3, bypass: 110\n"
+               " [Register](3)  \"reg_3\", length: 2, bypass: 10"s),
+    };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
 
 //===========================================================================
 // End of UT_reader.cpp

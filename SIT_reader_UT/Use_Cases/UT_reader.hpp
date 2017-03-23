@@ -48,6 +48,7 @@ class UT_reader : public CxxTest::TestSuite
   void test_1500 ();
   void test_LINKER_Success ();
   void test_LINKER_Error ();
+  void test_LINKER_CustomTable_Success ();
 
   // ---------------- Other methods
   //

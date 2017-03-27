@@ -50,6 +50,10 @@ class DLL_EXPORT Utility final
   //!
   static uint32_t BytesCountFromBitsCount(uint32_t bitsCount) { return (bitsCount + 7) / 8; }
 
+  //! Returns whether some text ends with some subtring
+  //!
+  static bool EndsWith (std::experimental::string_view text, std::experimental::string_view substring);
+
   //! Trims both leading and trailing space characters (including \\t)
   //!
   static void TrimBoth(std::experimental::string_view& text) { TrimLeft(text); TrimRight(text); }

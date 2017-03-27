@@ -91,6 +91,57 @@ void UT_Utility::test_MinimalBitsForValue ()
 }
 
 
+//! Checks Utility::EndsWith(StringView, StringView)
+//!
+void UT_Utility::test_StringView_Utility_EndsWith ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto sut       = std::get<0>(data);
+    auto subString = std::get<1>(data);
+    auto expected  = std::get<2>(data);
+
+    // ---------------- Exercise
+    //
+    auto result = Utility::EndsWith(sut, subString);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (result, expected);
+  };
+
+  using data_t = tuple<string_view, string_view, bool>;
+  auto  data =
+  {
+    data_t("",                          "",              false), // 00
+    data_t("Hello::world",              "",              false), // 01
+    data_t("Hello::world",              " ",             false), // 02
+    data_t("Hello::world",              "D",             false), // 03
+    data_t("Hello::world",              "H",             false), // 04
+    data_t("Hello::world",              "w",             false), // 05
+    data_t("a nice and strange usage ", "and",           false), // 06
+    data_t("a nice and strange usage ", "usage",         false), // 07
+    data_t("a nice and strange usage",  "Usage",         false), // 08
+    data_t("Hello::world",              "d",             true),  // 09
+    data_t("Hello::world",              "Hello::world",  true),  // 10
+    data_t("Hello::world",              "world",         true),  // 11
+    data_t("a nice and strange usage ", "usage ",        true),  // 12
+    data_t("a nice and strange usage",  " usage",        true),  // 13
+    data_t("a nice and strange usage",  "strange usage", true),  // 14
+
+    data_t(static_cast<const char*>(nullptr), static_cast<const char*>(nullptr), false), // 15
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
 //! Checks Utility::Split(StringView, StringView)
 //!
 void UT_Utility::test_StringView_Utility_Split ()

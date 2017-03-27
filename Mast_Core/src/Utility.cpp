@@ -27,6 +27,35 @@ using std::ifstream;
 using namespace mast;
 
 
+//! Returns whether some text ends with some subtring
+//!
+//! @note This is a case sensitive comparison
+//!
+//! @param text       Text to compare its ends to
+//! @param substring  Sub string to compare at end of text
+//!
+//! @return true when substring is not empty and it is found at the very end of text, false otherwise
+//!
+bool Utility::EndsWith (string_view text, string_view substring)
+{
+  if (substring.empty())
+  {
+    return false;
+  }
+
+  if (substring.length() > text.length())
+  {
+    return false;
+  }
+
+  text.remove_prefix(text.length() - substring.length());
+  return text == substring;
+}
+//
+//  End of: Utility::EndsWith
+//---------------------------------------------------------------------------
+
+
 
 //! Tests if a file exists
 //!

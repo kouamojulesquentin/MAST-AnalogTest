@@ -14,11 +14,18 @@ endif
 
 UT_RootPath  = $(RootPath)
 
-Suites = \
-      $(UT_RootPath)/UT_MastRpc/UT_Remote_Loopback_Protocol.hpp \
-      $(UT_RootPath)/UT_XmlRpc/UT_XmlRpc_Protocol_Client.hpp    \
-      $(UT_RootPath)/UT_XmlRpc/UT_XmlRpc_Protocol_Server.hpp    \
-      $(UT_RootPath)/UT_XmlRpc/UT_XmlRpc_Client_Server.hpp
+Suites  = $(UT_RootPath)/UT_Plugins/UT_Plugins.hpp
+
+ifeq ("$(USE_XML_RPC)", "ON")
+  $(info Adding tests related to XML RPC)
+  Suites += \
+        $(UT_RootPath)/UT_MastRpc/UT_Remote_Loopback_Protocol.hpp \
+        $(UT_RootPath)/UT_XmlRpc/UT_XmlRpc_Protocol_Client.hpp    \
+        $(UT_RootPath)/UT_XmlRpc/UT_XmlRpc_Protocol_Server.hpp    \
+        $(UT_RootPath)/UT_XmlRpc/UT_XmlRpc_Client_Server.hpp
+endif
+
+
 
 #+Generator   = ..\..\CxxTest\bin\cxxtestgen.py
 Generator    = $(RootPath)/../cxxtest/bin/cxxtestgen.py

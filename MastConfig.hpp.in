@@ -9,3 +9,5 @@
 #cmakedefine USE_XML_RPC
 #cmakedefine INTEL_EXPERIMENT
 #cmakedefine KISSFFT
+#cmakedefine DIRECTORY_SEPARATOR      "@DIRECTORY_SEPARATOR@"
+#cmakedefine PLUGINS_DIRECTORY_NAME   "@PLUGINS_DIRECTORY_NAME@"

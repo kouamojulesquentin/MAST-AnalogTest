@@ -5,7 +5,13 @@
 #include "LogFormatter.h"
 #include "LoggerSinks.h"
 #include "CustomFileSink.h"
+#include "MastConfig.hpp"
+
+
 #include <memory>
+#include <experimental/string_view>
+
+std::experimental::string_view Exe_Dir_Path; // Mainly for testing plugins related code
 
 int main( int argc, char *argv[] )
 {
@@ -31,6 +37,15 @@ int main( int argc, char *argv[] )
     g3::initializeLogging(logworker.get());
     LOG(INFO) << "Start of Unit tests";
     g3::logEnabled(false);
+
+    // ---------------- Set Exe_Dir_Path
+    //
+    Exe_Dir_Path = std::experimental::string_view(argv[0]);
+    auto sepPos  = Exe_Dir_Path.rfind(DIRECTORY_SEPARATOR);
+    if (sepPos != std::experimental::string_view::npos)
+    {
+      Exe_Dir_Path.remove_suffix(Exe_Dir_Path.length() - sepPos);
+    }
 
     // ---------------- Start UT framework
     //

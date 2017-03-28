@@ -27,7 +27,7 @@ using std::ifstream;
 using namespace mast;
 
 
-//! Returns whether some text ends with some subtring
+//! Returns whether some text ends with some sub-string
 //!
 //! @note This is a case sensitive comparison
 //!
@@ -225,6 +225,35 @@ vector<string_view> Utility::Split (string_view text, string_view separator)
 }
 //
 //  End of: Utility::Split
+//---------------------------------------------------------------------------
+
+
+//! Returns whether some text starts with some sub-string
+//!
+//! @note This is a case sensitive comparison
+//!
+//! @param text       Text to compare its ends to
+//! @param substring  Sub string to compare at start of text
+//!
+//! @return true when substring is not empty and it is found at the very beginning of text, false otherwise
+//!
+bool Utility::StartsWith (string_view text, string_view substring)
+{
+  if (substring.empty())
+  {
+    return false;
+  }
+
+  if (substring.length() > text.length())
+  {
+    return false;
+  }
+
+  text.remove_suffix(text.length() - substring.length());
+  return text == substring;
+}
+//
+//  Start of: Utility::StartsWith
 //---------------------------------------------------------------------------
 
 

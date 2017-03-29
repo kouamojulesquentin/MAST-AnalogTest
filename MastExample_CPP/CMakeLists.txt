@@ -28,7 +28,7 @@ endif()
 
 
 add_executable        (MastExample_CPP main.cpp DefaultMastMain.cpp EmptyInit.cpp Example.cpp)
-set_target_properties	(MastExample_CPP PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+set_target_properties (MastExample_CPP PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
 add_executable        (Tutorial main.cpp   DefaultMastMain.cpp EmptyInit.cpp Tutorial.cpp)
 set_target_properties (Tutorial PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
@@ -98,5 +98,6 @@ add_test(NAME MastExample_CPP COMMAND MastExample_CPP ${SIT_PATH}/Example.sit)
 add_test(NAME Tutorial        COMMAND Tutorial        ${SIT_PATH}/Example.sit)
 
 if (USE_XML_RPC)
-add_test(NAME Example_XmlRpc  COMMAND Example_XmlRpc  ${SIT_PATH}/Example_XmlRpc.sit)
+#Cannot be run because it needs to also start the server side...
+#add_test(NAME Example_XmlRpc  COMMAND Example_XmlRpc "--sit ${SIT_PATH}/Example_XmlRpc.sit")
 endif()

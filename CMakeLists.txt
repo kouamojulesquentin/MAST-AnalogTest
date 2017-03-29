@@ -19,7 +19,7 @@ set (CFLAGS "${WARNINGS} -std=c++14 -g")
 
 if (WIN32)
   set(CFLAGS ${CFLAGS})
-  set(DIRECTORY_SEPARATOR "\\")
+  set(DIRECTORY_SEPARATOR "\\\\")
 else()
   set(CFLAGS "${CFLAGS} -fPIC")
   set(DIRECTORY_SEPARATOR "/")

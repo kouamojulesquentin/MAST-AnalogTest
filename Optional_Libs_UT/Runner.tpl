@@ -38,13 +38,18 @@ int main( int argc, char *argv[] )
     LOG(INFO) << "Start of Unit tests";
     g3::logEnabled(false);
 
-    // ---------------- Set Exe_Dir_Path
+    // ---------------- Set Exe_Dir_Path with only directory path of runner application
     //
     Exe_Dir_Path = std::experimental::string_view(argv[0]);
-    auto sepPos  = Exe_Dir_Path.rfind(DIRECTORY_SEPARATOR);
+    auto sepPos  = Exe_Dir_Path.rfind("/"); // Search for last Linux directory separator
+    if (sepPos == std::experimental::string_view::npos)
+    {
+      sepPos  = Exe_Dir_Path.rfind("\\");   // Search for last Windows directory separator
+    }
+
     if (sepPos != std::experimental::string_view::npos)
     {
-      Exe_Dir_Path.remove_suffix(Exe_Dir_Path.length() - sepPos);
+      Exe_Dir_Path.remove_suffix(Exe_Dir_Path.length() - sepPos);  // Remove exe name (keeping only directory path)
     }
 
     // ---------------- Start UT framework

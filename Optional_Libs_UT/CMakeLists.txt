@@ -27,6 +27,7 @@ set(EXTRA_LIBS Logger Plugins)
 
 message(STATUS "Optional_Libs_UT: CXXTEST_INCLUDE_DIR:        ${CXXTEST_INCLUDE_DIR}")
 message(STATUS "Optional_Libs_UT: LIBPLUGINS_INCLUDE_DIRS     ${LIBPLUGINS_INCLUDE_DIRS}")
+message(STATUS "Optional_Libs_UT: PLUGINS_DIR                 ${PLUGINS_DIR}")
 message(STATUS "Optional_Libs_UT: USE_XML_RPC:                ${USE_XML_RPC}")
 
 # ---------------- XML RPC
@@ -90,10 +91,12 @@ target_link_libraries (Optionals_UT ${PLATFORM_LIBS} ${EXTRA_LIBS})
 
 # ---------------- Fake plugins
 #
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PLUGINS_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PLUGINS_DIR})  # For Windows
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PLUGINS_DIR})  # For Linux
+
 add_library           (Fake_Plugin_1 SHARED     "UT_Plugins/Fake_Plugin_1.cpp")
 set_target_properties (Fake_Plugin_1 PROPERTIES COMPILE_FLAGS "${WARNINGS} -std=c++14")
-target_link_libraries (Fake_Plugin_1 ${PLATFORM_LIBS})
+target_link_libraries (Fake_Plugin_1 ${PLATFORM_LIBS} Optional_UT_Helpers)
 
 include(CTest)
 add_test(NAME Optionals_UT COMMAND Optionals_UT)

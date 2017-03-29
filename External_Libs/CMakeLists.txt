@@ -36,6 +36,20 @@ if (${USE_OPEN_OCD} MATCHES "ON")
   set(LIBOPEN_OCD_INCLUDE_DIRS ${LIBOPEN_OCD_INCLUDE_DIRS} PARENT_SCOPE)
 endif()
 
+# ---------------- Kiss FFT library
+#
+if (${KISSFFT} MATCHES "ON")
+  add_subdirectory(kissfft)
+  message("")
+  message("================================================================================")
+  message(STATUS "External_Libs: KISS_FFT_LIBRARIES:        ${KISS_FFT_LIBRARIES}")
+  message(STATUS "External_Libs: LIBKISSFFT_INCLUDE_DIRS:   ${LIBKISSFFT_INCLUDE_DIRS}")
+  message("================================================================================")
+  message("")
+  set(LIBKISSFFT_INCLUDE_DIRS ${LIBKISSFFT_INCLUDE_DIRS} PARENT_SCOPE)
+  set(KISS_FFT_LIBRARIES      ${KISS_FFT_LIBRARIES}      PARENT_SCOPE)
+endif()
+
 # Unused: external libraries are built separately
 #ExternalProject_Add( project_xmlprc
 #  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/xmlrpc-c"

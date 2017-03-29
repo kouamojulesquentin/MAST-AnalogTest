@@ -27,46 +27,37 @@ if (WIN32)
 endif()
 
 
-#+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "../Bin")
-
 add_executable        (MastExample_CPP main.cpp DefaultMastMain.cpp EmptyInit.cpp Example.cpp)
 set_target_properties	(MastExample_CPP PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
 add_executable        (Tutorial main.cpp   DefaultMastMain.cpp EmptyInit.cpp Tutorial.cpp)
 set_target_properties (Tutorial PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
+if (WIN32)
+  set(EXTRA_LIBS ${EXTRA_LIBS} DbgHelp)
+else()
+  set(EXTRA_LIBS ${EXTRA_LIBS} pthread dl)
+endif()
+
 if (WIN32) # Package png not installed on Windows ==> Cannot use kiss_fft (as is)
   target_link_libraries(MastExample_CPP Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
   target_link_libraries(Tutorial        Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
 else ()
   if (${KISSFFT})
+    include_directories(${LIBKISSFFT_INCLUDE_DIRS})
+    set(EXTRA_LIBS ${EXTRA_LIBS} ${KISS_FFT_LIBRARIES})
 
-  include_directories(kissfft/)
-  include_directories(kissfft/tools)
+    find_package(PNG REQUIRED)
+    include_directories(${PNG_INCLUDE_DIR})
 
-  find_package(PNG REQUIRED)
-  include_directories(${PNG_INCLUDE_DIR})
+    add_executable        (ML505 main.cpp   DefaultMastMain.cpp EmptyInit.cpp ml505_demo.cpp)
+    set_target_properties (ML505 PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
-  set(KissFFT_Files # main FFT implementation
-                    kissfft/kiss_fft.c
-                    # from the tools/ directory
-                    kissfft/tools/kfc.c
-                    kissfft/tools/kiss_fftnd.c
-                    kissfft/tools/kiss_fftndr.c
-                    kissfft/tools/kiss_fftr.c
-  )
-  add_library           (kiss_fft SHARED     ${KissFFT_Files})
-  set_target_properties (kiss_fft PROPERTIES COMPILE_FLAGS "-Wall" )
+    add_executable        (ETS17 main.cpp   DefaultMastMain.cpp EmptyInit.cpp ETS17.cpp)
+    set_target_properties (ETS17 PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
-  add_executable        (ML505 main.cpp    DefaultMastMain.cpp EmptyInit.cpp ml505_demo.cpp)
-  set_target_properties (ML505 PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
-
-  add_executable        (ETS17 main.cpp    DefaultMastMain.cpp EmptyInit.cpp ETS17.cpp)
-  set_target_properties (ETS17 PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
-
-  target_link_libraries(ML505           Mast Mast_Core SIT_Reader_Lib pthread dl kiss_fft)
-  target_link_libraries(ETS17           Mast Mast_Core SIT_Reader_Lib pthread dl kiss_fft ${PNG_LIBRARY})
-
+    target_link_libraries(ML505 Mast Mast_Core SIT_Reader_Lib ${EXTRA_LIBS})
+    target_link_libraries(ETS17 Mast Mast_Core SIT_Reader_Lib ${PNG_LIBRARY} ${EXTRA_LIBS})
   endif()
 
   add_executable        (Intel main.cpp   DefaultMastMain.cpp EmptyInit.cpp Intel.cpp)
@@ -81,22 +72,20 @@ else ()
 
     add_executable        (Example_XmlRpc main.cpp DefaultMastMain.cpp Examples_Utils.cpp Example_XmlRpc.cpp)
     set_target_properties (Example_XmlRpc PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
-    target_link_libraries (Example_XmlRpc Mast Mast_Core Mast_RPC_Client SIT_Reader_Lib pthread dl)
+    target_link_libraries (Example_XmlRpc Mast Mast_Core Mast_RPC_Client SIT_Reader_Lib ${EXTRA_LIBS})
   endif()
 
-  target_link_libraries(MastExample_CPP Mast Mast_Core SIT_Reader_Lib pthread dl)
-  target_link_libraries(Tutorial        Mast Mast_Core SIT_Reader_Lib pthread dl)
-  target_link_libraries(Intel           Mast Mast_Core SIT_Reader_Lib pthread dl)
-  target_link_libraries(ML505SPI        Mast Mast_Core SIT_Reader_Lib pthread dl)
-
-
+  target_link_libraries(MastExample_CPP Mast Mast_Core SIT_Reader_Lib ${EXTRA_LIBS})
+  target_link_libraries(Tutorial        Mast Mast_Core SIT_Reader_Lib ${EXTRA_LIBS})
+  target_link_libraries(Intel           Mast Mast_Core SIT_Reader_Lib ${EXTRA_LIBS})
+  target_link_libraries(ML505SPI        Mast Mast_Core SIT_Reader_Lib ${EXTRA_LIBS})
 endif ()
 
 message("")
 message("================================================================================")
 message(STATUS "MastExample_CPP: LIBMAST_CORE_INCLUDE_DIRS:       ${LIBMAST_CORE_INCLUDE_DIRS}")
 message(STATUS "MastExample_CPP: LIBMAST_CPP_API_INCLUDE_DIRS:    ${LIBMAST_CPP_API_INCLUDE_DIRS}")
-message(STATUS "MastExample_CPP: CMAKE_RUNTIME_OUTPUT_DIRECTORY:  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+message(STATUS "MastExample_CPP: LIBKISSFFT_INCLUDE_DIRS:         ${LIBKISSFFT_INCLUDE_DIRS}")
 message("================================================================================")
 message("")
 

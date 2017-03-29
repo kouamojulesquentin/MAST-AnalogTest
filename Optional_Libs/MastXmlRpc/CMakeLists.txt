@@ -35,7 +35,7 @@ set(ServerSources XmlRpc_Protocol_Server.cpp)
 include_directories(${LIBXMLRPC_INCLUDE_DIRS})
 include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
 
-set(LIBMASTXMLRPC_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/." PARENT_SCOPE)
+set(LIBMASTXMLRPC_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/." "${LIBXMLRPC_INCLUDE_DIRS}" PARENT_SCOPE)
 message("")
 message("================================================================================")
 message(STATUS "MastXmlRpc: CMAKE_LINK_LIBRARY_FLAG:  ${CMAKE_LINK_LIBRARY_FLAG}")

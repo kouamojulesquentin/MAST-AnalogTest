@@ -40,8 +40,6 @@ else()
 endif()
 
 if (WIN32) # Package png not installed on Windows ==> Cannot use kiss_fft (as is)
-  target_link_libraries(MastExample_CPP Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
-  target_link_libraries(Tutorial        Mast Mast_Core Logger SIT_Reader_Lib DbgHelp )
 else ()
   if (${KISSFFT})
     include_directories(${LIBKISSFFT_INCLUDE_DIRS})
@@ -72,21 +70,33 @@ else ()
 
     add_executable        (Example_XmlRpc main.cpp DefaultMastMain.cpp Examples_Utils.cpp Example_XmlRpc.cpp)
     set_target_properties (Example_XmlRpc PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
-    target_link_libraries (Example_XmlRpc Mast Mast_Core Mast_RPC_Client SIT_Reader_Lib ${EXTRA_LIBS})
+    target_link_libraries (Example_XmlRpc Mast Mast_RPC_Client SIT_Reader_Lib ${EXTRA_LIBS})
   endif()
 
-  target_link_libraries(MastExample_CPP Mast Mast_Core SIT_Reader_Lib ${EXTRA_LIBS})
-  target_link_libraries(Tutorial        Mast Mast_Core SIT_Reader_Lib ${EXTRA_LIBS})
-  target_link_libraries(Intel           Mast Mast_Core SIT_Reader_Lib ${EXTRA_LIBS})
-  target_link_libraries(ML505SPI        Mast Mast_Core SIT_Reader_Lib ${EXTRA_LIBS})
+  target_link_libraries(Intel    Mast Mast_Core SIT_Reader_Lib ${EXTRA_LIBS})
+  target_link_libraries(ML505SPI Mast Mast_Core SIT_Reader_Lib ${EXTRA_LIBS})
 endif ()
+
+target_link_libraries(Tutorial        Mast SIT_Reader_Lib ${EXTRA_LIBS})
+target_link_libraries(MastExample_CPP Mast SIT_Reader_Lib ${EXTRA_LIBS})
+
+set(SIT_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SIT)
 
 message("")
 message("================================================================================")
 message(STATUS "MastExample_CPP: LIBMAST_CORE_INCLUDE_DIRS:       ${LIBMAST_CORE_INCLUDE_DIRS}")
 message(STATUS "MastExample_CPP: LIBMAST_CPP_API_INCLUDE_DIRS:    ${LIBMAST_CPP_API_INCLUDE_DIRS}")
 message(STATUS "MastExample_CPP: LIBKISSFFT_INCLUDE_DIRS:         ${LIBKISSFFT_INCLUDE_DIRS}")
+message(STATUS "MastExample_CPP: SIT_PATH:                        ${SIT_PATH}")
 message("================================================================================")
 message("")
 
 install(DIRECTORY SIT DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COMPONENT SIT_Files)
+
+include(CTest)
+add_test(NAME MastExample_CPP COMMAND MastExample_CPP ${SIT_PATH}/Example.sit)
+add_test(NAME Tutorial        COMMAND Tutorial        ${SIT_PATH}/Example.sit)
+
+if (USE_XML_RPC)
+add_test(NAME Example_XmlRpc  COMMAND Example_XmlRpc  ${SIT_PATH}/Example_XmlRpc.sit)
+endif()

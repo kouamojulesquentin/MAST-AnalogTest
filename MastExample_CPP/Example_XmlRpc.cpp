@@ -17,6 +17,7 @@
 #include "XmlRpc_Protocol_Client.hpp"
 #include "RemoteProtocolFactory.hpp"
 #include "Examples_Utils.hpp"
+#include <iostream>
 
 
 using std::string;
@@ -47,6 +48,7 @@ namespace
     auto     loopCount    = 20u;
     uint16_t initialValue = 1u;
 
+    std::cout << "Running Increment for "<< loopCount << " times \n";
     while (loopCount--)
     {
       iWrite(registerPath, initialValue);
@@ -54,6 +56,7 @@ namespace
 
       ++initialValue;
     }
+    std::cout << "Increment finished\n";
   }
   //
   //  End of: Algo_Increment
@@ -70,6 +73,8 @@ namespace
     auto     loopCount    = 60u;
     uint16_t value        = 0xCAFEu;
 
+    std::cout << "Running Decrement for "<< loopCount << " times \n";
+
     while (loopCount--)
     {
       iWrite(registerPath, value);
@@ -77,6 +82,7 @@ namespace
 
       --value;
     }
+    std::cout << "Decrement finished\n";
   }
   //
   //  End of: Algo_Increment
@@ -94,6 +100,8 @@ namespace
     auto toPath    = "reg_2";
     auto loopCount = 20u;
 
+    std::cout << "Running Copy from " << fromPath<<" to "<< toPath<<" for "<< loopCount << " times \n";
+
     while (loopCount--)
     {
       auto gotValue = iGetRefresh<uint32_t>(fromPath);
@@ -101,6 +109,8 @@ namespace
       iWrite(toPath, gotValue);
       iApply();
     }
+       std::cout << "Copy finished \n";
+ 
   }
   //
   //  End of: Algo_Copy
@@ -117,6 +127,8 @@ namespace
     auto toPath    = "reg_3";
     auto loopCount = 20u;
 
+    std::cout << "Running Shift from " << fromPath<<" to "<< toPath<<" for "<< loopCount << " times \n";
+
     while (loopCount--)
     {
       auto gotValue = iGetRefresh<uint32_t>(fromPath);
@@ -124,6 +136,7 @@ namespace
       iWrite(toPath, gotValue);
       iApply();
     }
+    std::cout << "End Shift\n";
   }
   //
   //  End of: Algo_Shift

@@ -154,6 +154,7 @@ install_release:
 
 pack: pack_debug
 pack_debug: set_compiler
+> echo "Gcc path: "$(LOCAL_GCC_PATH)
 > cd $(CMAKE_DEBUG_BUILD_DIR)   && cpack -G TGZ
 
 test: test_debug

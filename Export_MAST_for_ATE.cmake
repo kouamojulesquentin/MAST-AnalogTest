@@ -48,15 +48,15 @@ install(FILES   ${STD_LIBS_PATH}libgcc_s.so.1 ${STD_LIBS_PATH}libstdc++.so.6 ${S
         COMPONENT   ATE_Build
         DESTINATION ${ATE_Build_EXPORT}/Std_libs)
 else()
- message(STATUS "Export_ATE: using global STD_LIBS_PATH")
- install(FILES   ${STD_LIBS_PATH}libgcc_s.so.1 ${STD_LIBS_PATH}libm.so.6
-        COMPONENT   ATE_Build
-        DESTINATION ${ATE_Build_EXPORT}/Std_libs)
- install(FILES   /usr/lib/x86_64-linux-gnu/libstdc++.so.6
-        COMPONENT   ATE_Build
-        DESTINATION ${ATE_Build_EXPORT}/Std_libs)
+ message(STATUS "Export_ATE: using global GCC/G++, no libraries are exported")
+# install(FILES   ${STD_LIBS_PATH}libgcc_s.so.1 ${STD_LIBS_PATH}libm.so.6
+#        COMPONENT   ATE_Build
+#        DESTINATION ${ATE_Build_EXPORT}/Std_libs)
+# install(FILES   /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+#        COMPONENT   ATE_Build
+#        DESTINATION ${ATE_Build_EXPORT}/Std_libs)
 endif()
-message(STATUS "Export_ATE: STD_LIBS_PATH:          ${STD_LIBS_PATH}")
+#message(STATUS "Export_ATE: STD_LIBS_PATH:          ${STD_LIBS_PATH}")
 message("================================================================================")
 message("")
 

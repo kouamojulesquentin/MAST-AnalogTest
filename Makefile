@@ -92,7 +92,7 @@ all:     debug
 install: install_debug
 pack:    pack_debug
 
-ifeq ($(wildcard $(LOCAL_GCC_PATH).*),)
+ifneq ($(LOCAL_GCC_PATH),)
 set_compiler:
 > @echo "STATUS: Makefile found a local GCC/G++"
 CMAKE_COMPILER_FLAGS = -DCMAKE_CXX_COMPILER="$(LOCAL_GCC_PATH)g++"
@@ -101,6 +101,7 @@ CMAKE_COMPILER_FLAGS += -DLOCAL_GCC_PATH="$(LOCAL_GCC_PATH)"
 else
 set_compiler:
 > @echo "STATUS: Using system-wide GCC/G++"
+> @echo "STATUS: LOCAL_GCC_PATH "$(LOCAL_GCC_PATH)
 CMAKE_COMPILER_FLAGS = ""
 endif
 

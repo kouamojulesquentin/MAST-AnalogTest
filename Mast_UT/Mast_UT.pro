@@ -13,17 +13,17 @@ QMAKE_CXXFLAGS += -fmax-errors=3
     error("Generated/Runner.cpp has not been generated")
 }
 
-INCLUDEPATH += $$PWD/../Mast_Core/include \
-               $$PWD/../Mast/CPP_API      \
-               $$PWD/../Mast/C_API        \
+INCLUDEPATH += $$PWD/../Mast_API_Core/include \
+               $$PWD/../Mast_API_CPP/include  \
+               $$PWD/../Mast_API_C/include    \
                $$PWD/../Logger            \
                $$PWD/../cxxtest           \
                CxxTest_Traits             \
                UT_Helpers
 
-DEPENDPATH += $$PWD/../Mast_Core/include \
-              $$PWD/../Mast/CPP_API      \
-              $$PWD/../Mast/C_API        \
+DEPENDPATH += $$PWD/../Mast_API_Core/include \
+              $$PWD/../Mast_API_CPP/include  \
+              $$PWD/../Mast_API_C/include    \
               $$PWD/../cxxtest           \
               CxxTest_Traits             \
               UT_Helpers
@@ -78,7 +78,7 @@ HEADERS += \
     CxxTest_Traits/Cpp_11_Traits.hpp                  \
     CxxTest_Traits/CPP_API_Traits.hpp                 \
     CxxTest_Traits/C_API_Traits.hpp                   \
-    CxxTest_Traits/Mast_Core_Traits.hpp               \
+    CxxTest_Traits/Mast_API_Core_Traits.hpp               \
     CxxTest_Traits/SystemModelCheckResult_Traits.hpp  \
     API_C/UT_PDL_Adapter_C.hpp                        \
     API_CPP/UT_PDL_Adapter_CPP.hpp                    \
@@ -126,12 +126,12 @@ HEADERS += \
 CONFIG(debug,   debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Mast_UT/debug)
   DESTDIR     = $$clean_path($$PWD/../Build_Qt/Bin/debug)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/debug)   -lMast -lMast_Core -lLogger -lSIT_reader_Lib
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/debug)   -lMast_API_CPP -lMast_API_C -lMast_Core -lLogger -lSIT_reader_Lib
 }
 else: CONFIG(release, debug|release) {
   OBJECTS_DIR = $$clean_path($$PWD/../Build_Qt/Mast_UT/release)
   DESTDIR     = $$clean_path($$PWD/../Build_Qt/Bin/release)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/release) -lMast -lMast_Core -lLogger -lSIT_reader_Lib
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/release) -lMast_API_CPP -lMast_API_C -lMast_Core -lLogger -lSIT_reader_Lib
 }
 
 unix {

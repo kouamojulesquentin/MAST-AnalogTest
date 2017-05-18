@@ -16,7 +16,7 @@
 #include "AppFunctionAndNode.hpp"
 #include "AppFunctionNameAndNode.hpp"
 #include "SystemModelManager.hpp"
-#include "Commons_C.hpp"
+//+#include "Commons_C.hpp"
 #include "Startup.hpp"
 #include "Utility.hpp"
 #include "Session.hpp"
@@ -152,7 +152,7 @@ vector<AppFunctionNameAndNode> CPP_API_IMPL::LoadSystemModel (string_view filePa
   CHECK_FILE_EXISTS(filePath);
 
   auto sm     = Startup::GetSystemModel();
-  
+
   auto reader = SIT::SIT_Reader(sm);
 
   reader.parse(filePath);

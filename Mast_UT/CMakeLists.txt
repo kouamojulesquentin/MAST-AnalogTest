@@ -48,9 +48,9 @@ add_executable 				(Mast_UT ${Mast_UT_SOURCES})
 set_target_properties	(Mast_UT PROPERTIES COMPILE_FLAGS "${UT_CFLAGS}" )
 
 if (WIN32)
-	target_link_libraries(Mast_UT Mast Mast_Core Logger DbgHelp )
+  target_link_libraries(Mast_UT Mast_API_CPP Mast_API_C Logger DbgHelp )
 else ()
-	target_link_libraries(Mast_UT Mast Mast_Core Logger pthread)
+  target_link_libraries(Mast_UT Mast_API_CPP Mast_API_C Logger pthread)
 endif ()
 
 include(CTest)

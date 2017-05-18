@@ -54,8 +54,8 @@ else ()
     add_executable        (ETS17 main.cpp   DefaultMastMain.cpp EmptyInit.cpp ETS17.cpp)
     set_target_properties (ETS17 PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
-    target_link_libraries(ML505 Mast Mast_Core SIT_Reader_Lib ${EXTRA_LIBS})
-    target_link_libraries(ETS17 Mast Mast_Core SIT_Reader_Lib ${PNG_LIBRARY} ${EXTRA_LIBS})
+    target_link_libraries (ML505 Mast_API_CPP SIT_Reader_Lib ${EXTRA_LIBS})
+    target_link_libraries (ETS17 Mast_API_CPP SIT_Reader_Lib ${PNG_LIBRARY} ${EXTRA_LIBS})
   endif()
 
   add_executable        (Intel main.cpp   DefaultMastMain.cpp EmptyInit.cpp Intel.cpp)
@@ -70,15 +70,15 @@ else ()
 
     add_executable        (Example_XmlRpc main.cpp DefaultMastMain.cpp Examples_Utils.cpp Example_XmlRpc.cpp)
     set_target_properties (Example_XmlRpc PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
-    target_link_libraries (Example_XmlRpc Mast Mast_RPC_Client SIT_Reader_Lib ${EXTRA_LIBS})
+    target_link_libraries (Example_XmlRpc Mast_API_CPP Mast_RPC_Client SIT_Reader_Lib ${EXTRA_LIBS})
   endif()
 
-  target_link_libraries(Intel    Mast Mast_Core SIT_Reader_Lib ${EXTRA_LIBS})
-  target_link_libraries(ML505SPI Mast Mast_Core SIT_Reader_Lib ${EXTRA_LIBS})
+  target_link_libraries(Intel    Mast_API_CPP SIT_Reader_Lib ${EXTRA_LIBS})
+  target_link_libraries(ML505SPI Mast_API_CPP SIT_Reader_Lib ${EXTRA_LIBS})
 endif ()
 
-target_link_libraries(Tutorial        Mast SIT_Reader_Lib ${EXTRA_LIBS})
-target_link_libraries(MastExample_CPP Mast SIT_Reader_Lib ${EXTRA_LIBS})
+target_link_libraries(Tutorial        Mast_API_CPP SIT_Reader_Lib ${EXTRA_LIBS})
+target_link_libraries(MastExample_CPP Mast_API_CPP SIT_Reader_Lib ${EXTRA_LIBS})
 
 set(SIT_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SIT)
 

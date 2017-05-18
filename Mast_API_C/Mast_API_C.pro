@@ -1,12 +1,7 @@
 #-------------------------------------------------
-#
-# Project created by QtCreator 2016-05-24T21:12:04
-#
-#-------------------------------------------------
-
 QT -= core gui
 
-TARGET   = Mast
+TARGET   = Mast_API_C
 TEMPLATE = lib
 
 DEFINES += LIB_LIBRARY
@@ -14,34 +9,25 @@ CONFIG  += c++14
 QMAKE_CXXFLAGS += -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default
 QMAKE_CXXFLAGS += -fmax-errors=3
 
-INCLUDEPATH += C_API                      \
-               CPP_API                    \
+INCLUDEPATH += include                    \
                $$PWD/../SIT_reader        \
                $$PWD/../Mast_Core/include \
                $$PWD/../Logger
 
-DEPENDPATH  += C_API                      \
-               CPP_API                    \
+DEPENDPATH  += include                    \
                $$PWD/../SIT_reader        \
                $$PWD/../Mast_Core/include \
                $$PWD/../Logger
 
 
-SOURCES += \
-           CPP_API/PDL_Adapter_CPP.cpp        \
-           CPP_API/SystemModelAdapter_CPP.cpp \
-           C_API/PDL_Adapter_C.cpp            \
-           C_API/SystemModelAdapter_C.cpp
+SOURCES += src/PDL_Adapter_C.cpp            \
+           src/SystemModelAdapter_C.cpp
 
 HEADERS += \
-    CPP_API/AppFunctionAndName_CPP.hpp     \
-    CPP_API/AppFunctionAndNodePath_CPP.hpp \
-    CPP_API/PDL_Adapter_CPP.hpp            \
-    CPP_API/SystemModelAdapter_CPP.hpp     \
-    C_API/Commons_C.hpp                    \
-    C_API/ErrorCode_C.h                    \
-    C_API/PDL_Adapter_C.h                  \
-    C_API/SystemModelAdapter_C.h
+    include/Commons_C.hpp                    \
+    include/ErrorCode_C.h                    \
+    include/PDL_Adapter_C.h                  \
+    include/SystemModelAdapter_C.h
 
 #unix {
 #    target.path = /usr/lib
@@ -50,12 +36,12 @@ HEADERS += \
 
 
 CONFIG(debug,   debug|release) {
-  OBJECTS_DIR =   $$clean_path($$PWD/../Build_Qt/Mast/debug)
+  OBJECTS_DIR =   $$clean_path($$PWD/../Build_Qt/Mast_API_C/debug)
   DESTDIR     =   $$clean_path($$PWD/../Build_Qt/Bin/debug)
   LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/debug) -lSIT_reader_Lib -lLogger -lMast_Core
 }
 else: CONFIG(release, debug|release) {
-  OBJECTS_DIR =   $$clean_path($$PWD/../Build_Qt/Mast/release)
+  OBJECTS_DIR =   $$clean_path($$PWD/../Build_Qt/Mast_API_C/release)
   DESTDIR     =   $$clean_path($$PWD/../Build_Qt/Bin/release)
   LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/release) -lSIT_reader_Lib -lLogger -lMast_Core
 }

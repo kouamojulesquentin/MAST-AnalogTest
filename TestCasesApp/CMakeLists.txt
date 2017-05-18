@@ -62,4 +62,4 @@ else()
   set(EXTRA_LIBS ${EXTRA_LIBS} ${LIBMASTSPI_LIBRARIES} ${KISS_FFT_LIBRARIES})
 endif()
 
-target_link_libraries(TestCasesApp Mast Mast_Core Logger SIT_Reader_Lib ${EXTRA_LIBS})
+target_link_libraries(TestCasesApp Mast_API_CPP Mast_API_C Logger SIT_Reader_Lib ${EXTRA_LIBS})

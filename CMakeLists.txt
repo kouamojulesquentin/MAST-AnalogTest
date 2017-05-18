@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(Mast)
+set (CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/Install")  # Avoid it to be in /usr/local
 enable_testing()
 
 message("")

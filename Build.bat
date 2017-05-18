@@ -1,4 +1,3 @@
-@title Build.bat
 
 @if not defined chain  (set chain=Build_Qt)
 @REM @if not defined chain  (set chain=Build_CB)
@@ -6,10 +5,12 @@
 @set target=%1
 @if not defined target (set target=debug)
 
+
 @set Build_Qt=Build_Qt
 @set UT_targetFile=".\Build_Qt\bin\%target%\Mast_UT.exe"
 @set TCA_targetFile=".\Build_Qt\bin\%target%\TestCasesApp.exe"
 
+@title Build Mast %target% into %Build_Qt%
 @echo.
 @echo ======= Chain: %chain%, Target File: %UT_targetFile%
 @echo.
@@ -38,9 +39,14 @@
 %make_exe% -j4 -C %Build_Qt%\SIT_reader -f Makefile    %target%
 
 @echo.
-@echo ===================== Building Mast =====================
+@echo ===================== Building Mast CPP API =====================
 @echo.
-%make_exe% -j4 -C %Build_Qt%\Mast -f Makefile    %target%
+%make_exe% -j4 -C %Build_Qt%\Mast_API_CPP -f Makefile    %target%
+
+@echo.
+@echo ===================== Building Mast C API =====================
+@echo.
+%make_exe% -j4 -C %Build_Qt%\Mast_API_C -f Makefile    %target%
 
 @if errorlevel 0  (
 @echo.

@@ -22,4 +22,4 @@ else ()
   set(EXTRA_LIBS ${EXTRA_LIBS} pthread dl)
 endif ()
 
-target_link_libraries(Mast_API_CPP Mast_Core Logger ${EXTRA_LIBS})
+target_link_libraries(Mast_API_CPP Mast_Core SIT_Reader_Lib Logger ${EXTRA_LIBS})

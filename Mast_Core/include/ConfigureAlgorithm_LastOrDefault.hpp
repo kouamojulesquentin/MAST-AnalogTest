@@ -15,7 +15,7 @@
   #define CONFIGUREALGORITHM_LASTORDEFAULT_H__E633E366_59FF_447A_1283_B30BD9795B06__INCLUDED_
 
 #include "ConfigurationAlgorithm.hpp"
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 
 namespace mast
 {
@@ -25,7 +25,7 @@ namespace mast
 //!       not already selected (that way pending paths will be streamed as fast as possible)
 //!
 //! @note This is appropriate when registers are not modified between data cycles
-class DLL_EXPORT ConfigureAlgorithm_LastOrDefault final : public ConfigurationAlgorithm
+class MAST_CORE_EXPORT ConfigureAlgorithm_LastOrDefault final : public ConfigurationAlgorithm
 {
   // ---------------- Public  Methods
   //

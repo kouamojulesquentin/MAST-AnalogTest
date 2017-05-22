@@ -27,7 +27,7 @@ namespace mast
 //! binary digits that represents bit values shifted from SUT
 //!
 //!
-class DLL_EXPORT SVF_SimulationProtocol final : public SVF_Player
+class MAST_CORE_EXPORT SVF_SimulationProtocol final : public SVF_Player
 {
   // ---------------- Public  Methods
   //

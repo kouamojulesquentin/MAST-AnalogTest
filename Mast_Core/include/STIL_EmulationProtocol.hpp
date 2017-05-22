@@ -25,7 +25,7 @@ namespace mast
 //! Implement loopback AccessInterfaceProtocol while logging STIL commands that
 //! a real STIL protocol would issue
 //!
-class DLL_EXPORT STIL_EmulationProtocol final : public STIL_Player
+class MAST_CORE_EXPORT STIL_EmulationProtocol final : public STIL_Player
 {
   // ---------------- Public  Methods
   //

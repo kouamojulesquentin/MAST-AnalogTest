@@ -3,10 +3,10 @@ project(Plugins)
 
 
 set (WARNINGS "-Wall -Wextra -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default")
-set (CFLAGS "${WARNINGS} -std=c++14 -g")
+set (CFLAGS "${WARNINGS} -std=c++14 -g -DPLUGINS_EXPORTS")
 
 include_directories(include)
-include_directories(include_private)
+include_directories(internal)
 include_directories(${LIBLOGGER_INCLUDE_DIRS})
 include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
 

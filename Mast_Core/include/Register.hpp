@@ -23,7 +23,7 @@ class SystemModel;
 
 //! Represents a register in the scan chain
 //!
-class DLL_EXPORT Register : public SystemModelNode
+class MAST_CORE_EXPORT Register : public SystemModelNode
 {
   // ---------------- Public  Methods
   //

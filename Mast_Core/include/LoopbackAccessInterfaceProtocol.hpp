@@ -23,7 +23,7 @@ namespace mast
 //!
 //! @note This is mainly provided for tests purposes
 //!
-class DLL_EXPORT LoopbackAccessInterfaceProtocol : public AccessInterfaceProtocol
+class MAST_CORE_EXPORT LoopbackAccessInterfaceProtocol : public AccessInterfaceProtocol
 {
   // ---------------- Public  Methods
   //

@@ -11,9 +11,7 @@
 //!
 //===========================================================================
 
-#include "AppFunctionAndNodePath_CPP.hpp"
-#include "AppFunctionAndName_CPP.hpp"
-#include "PDL_Adapter_CPP.hpp"
+#include "CPP_API.hpp"
 #include "XmlRpc_Protocol_Client.hpp"
 #include "RemoteProtocolFactory.hpp"
 #include "Examples_Utils.hpp"
@@ -110,7 +108,7 @@ namespace
       iApply();
     }
        std::cout << "Copy finished \n";
- 
+
   }
   //
   //  End of: Algo_Copy

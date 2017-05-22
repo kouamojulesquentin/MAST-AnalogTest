@@ -30,7 +30,7 @@ namespace mast
 //!
 //! @note This is intended to be used by SystemModel::Check()
 //!
-class DLL_EXPORT SystemModelChecker final : public Checker, public SystemModelVisitor
+class MAST_CORE_EXPORT SystemModelChecker final : public Checker, public SystemModelVisitor
 {
   // ---------------- Public  Methods
   //

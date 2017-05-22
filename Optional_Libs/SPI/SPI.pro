@@ -11,11 +11,13 @@ QMAKE_CXXFLAGS += -fmax-errors=3
 
 INCLUDEPATH += include \
                $$PWD/../../Mast_Core/include \
+               $$PWD/../../Mast_Core/internal \
                $$PWD/../../Logger            \
                $$PWD/../../External_Libs/FTDI_SPI/include
 
 DEPENDPATH  += include \
                $$PWD/../../Mast_Core/include  \
+               $$PWD/../../Mast_Core/internal \
                $$PWD/../../Logger             \
                $$PWD/../../External_Libs/FTDI_SPI/include
 

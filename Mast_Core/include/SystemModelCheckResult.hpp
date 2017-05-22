@@ -15,7 +15,7 @@
 #ifndef SYSTEMMODELCHECKRESULT_H__FFBEA6CE_417E_43A0_32B5_EA2A1A0AF395__INCLUDED_
   #define SYSTEMMODELCHECKRESULT_H__FFBEA6CE_417E_43A0_32B5_EA2A1A0AF395__INCLUDED_
 
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 
 #include <string>
 #include <sstream>
@@ -26,7 +26,7 @@ namespace mast
 {
 //! Collects warning and error while SystemModel is being checked
 //!
-class DLL_EXPORT SystemModelCheckResult final
+class MAST_CORE_EXPORT SystemModelCheckResult final
 {
   public:
   ~SystemModelCheckResult() = default;

@@ -16,7 +16,7 @@
 
 #include "PathSelector.hpp"
 #include "BinaryVector.hpp"
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 
 #include <vector>
 #include <memory>
@@ -35,7 +35,7 @@ class Register;
 //!
 //! @note Path identifier are defined in range [1..nb_path]
 //!
-class DLL_EXPORT DefaultTableBasedPathSelector : public PathSelector
+class MAST_CORE_EXPORT DefaultTableBasedPathSelector : public PathSelector
 {
   // ---------------- Public  Methods
   //

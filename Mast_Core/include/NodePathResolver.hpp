@@ -15,7 +15,7 @@
   #define NODEPATHRESOLVER_H__CC7B2EE6_BC6_4C29_8380_19E010CCA737__INCLUDED_
 
 #include "ParentNode.hpp"
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 
 #include <memory>
 #include <string>
@@ -29,7 +29,7 @@ class Register;
 //! Associates paths with actual nodes
 //! @note Path are defined relative to a, fix, reference node
 //!       User can register at will a prefix that is a path relative to reference node
-class DLL_EXPORT NodePathResolver final
+class MAST_CORE_EXPORT NodePathResolver final
 {
   // ---------------- Public  Methods
   //

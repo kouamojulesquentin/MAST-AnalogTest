@@ -16,7 +16,6 @@
   #define UnresolvedPATHSELECTOR_H__8EA048FA_454_4D96_79A2_13E04D156F73__INCLUDED_
 
 #include "BinaryVector.hpp"
-#include "DefaultBinaryPathSelector.hpp"
 #include "Utility.hpp"
 #include <vector>
 #include <memory>
@@ -31,7 +30,7 @@ class Register;
 //!
 //! NB: the class is not functional, its members should NEVER be called
 
-class DLL_EXPORT UnresolvedPathSelector : public PathSelector
+class UnresolvedPathSelector : public PathSelector
 {
   // ---------------- Public  Methods
   //
@@ -39,29 +38,28 @@ class DLL_EXPORT UnresolvedPathSelector : public PathSelector
   ~UnresolvedPathSelector() = default;
   UnresolvedPathSelector() = default;
 
-  std::shared_ptr<Register> dummyRegister;           
+  std::shared_ptr<Register> dummyRegister;
   BinaryVector dummy;
 
-  bool IsActive (uint32_t /*pathIdentifier*/) const {return false;};
-  uint32_t ActiveCount() const {return 0;};
-  bool IsSelected (uint32_t /*pathIdentifier*/) const {return false;};
-  bool IsSelectedAndActive (uint32_t /*pathIdentifier*/) const {return false;};
-  void Accept   (SystemModelVisitor& /*visitor*/) {
-  		THROW_LOGIC_ERROR("UnresolvedPathSelector should never be exerciced");
-		return;}; 
-  uint32_t SelectablePaths() const {return 0;};
-  std::shared_ptr<const Register> AssociatedRegister() const {return nullptr;};
-  const BinaryVector& SelectionValue (uint32_t /*pathIdentifier*/) const {return dummy;};
+  uint32_t ActiveCount()     const { return 0; };
+  uint32_t SelectablePaths() const { return 0; };
+
+  bool     IsActive            (uint32_t     /*pathIdentifier*/) const { return false; };
+  bool     IsSelected          (uint32_t     /*pathIdentifier*/) const { return false; };
+  bool     IsSelectedAndActive (uint32_t     /*pathIdentifier*/) const { return false; };
+
+  void Accept   (SystemModelVisitor& /*visitor*/) { THROW_LOGIC_ERROR("UnresolvedPathSelector should never be exerciced"); };
+  std::shared_ptr<const Register> AssociatedRegister() const { return nullptr; };
+  const BinaryVector& SelectionValue (uint32_t /*pathIdentifier*/) const { return dummy; };
   std::string DebugSelectorInfo(bool /*onlyProperties*/) const { return "UnresolvedPathSelector"; };
 
   static BinaryVector AssociatedRegisterInitialValue(uint32_t /*pathsCount*/, SelectorProperty /*properties*/)
-  {return BinaryVector(1, 0, SizeProperty::Fixed);}
+  { return BinaryVector(1, 0, SizeProperty::Fixed); }
 
-  void Select   (uint32_t /*pathIdentifier*/) {return;};
-  void Deselect (uint32_t /*pathIdentifier*/) {return;};
+  void Select   (uint32_t /*pathIdentifier*/) {};
+  void Deselect (uint32_t /*pathIdentifier*/) {};
 
   std::experimental::string_view KindName() const { return "Unresolved"; }; //!< Returns readable type of selector
-
 };
 //
 //  End of UnresolvedPathSelector class declaration

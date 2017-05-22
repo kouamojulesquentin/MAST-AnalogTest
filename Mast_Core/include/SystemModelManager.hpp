@@ -15,13 +15,12 @@
 #ifndef SYSTEMMODELMANAGER_H__F0470D3B_5E63_4DAF_B2A8_60A2E4F4A868__INCLUDED_
   #define SYSTEMMODELMANAGER_H__F0470D3B_5E63_4DAF_B2A8_60A2E4F4A868__INCLUDED_
 
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 #include "ConfigureVisitor.hpp"
 #include "PropagatePendingVisitor.hpp"
 #include "ToSutVisitor.hpp"
 #include "FromSutUpdater.hpp"
 #include "NodePathResolver.hpp"
-#include "SystemModelManagerMonitor.hpp"
 
 #include <string>
 #include <memory>
@@ -39,6 +38,7 @@ namespace mast
 {
 class AccessInterface;
 class SystemModel;
+class SystemModelManagerMonitor;
 
 //! Coordinates the dynamic aspects of the system model
 //!
@@ -46,7 +46,7 @@ class SystemModel;
 //!       collect the bitstream to sent to SUT, retrieve the bitstream
 //!       from SUT and updating the system model with it
 //!
-class DLL_EXPORT SystemModelManager final
+class MAST_CORE_EXPORT SystemModelManager final
 {
   // ---------------- Public  Methods
   //

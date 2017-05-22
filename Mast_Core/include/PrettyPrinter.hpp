@@ -47,7 +47,7 @@ enum class PrettyPrinterOptions
 //! System model visitors for creation of a text, readable, and hierarchical
 //! representation of the system mode tree
 //!
-class DLL_EXPORT PrettyPrinter : public SystemModelVisitor
+class MAST_CORE_EXPORT PrettyPrinter : public SystemModelVisitor
 {
   // ---------------- Public  Methods
   //

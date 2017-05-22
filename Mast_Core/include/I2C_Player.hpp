@@ -16,7 +16,7 @@
   #define I2C_PLAYER_H__8B42501C_8D39_4E13_938C_F7447B1DC5C3__INCLUDED_
 
 #include "AccessInterfaceProtocol.hpp"
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 
 #include <string>
 #include <vector>
@@ -27,7 +27,7 @@ namespace mast
 {
 //! Constructs I2C commands for I2C related AccessInterfaceProtocol
 //!
-class DLL_EXPORT I2C_Player : public AccessInterfaceProtocol
+class MAST_CORE_EXPORT I2C_Player : public AccessInterfaceProtocol
 {
   // ---------------- Public  Methods
   //

@@ -1,11 +1,11 @@
 //===========================================================================
-//                           AppFunctionAndName_CPP.hpp
+//                           AppFunctionAndName.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file AppFunctionAndName_CPP.hpp
+//! @file AppFunctionAndName.hpp
 //!
 //! Declares AppFunctionAndName class
 //!
@@ -15,6 +15,7 @@
 #ifndef APPFUNCTIONANDNAME_H__B015061F_458B_44A7_F2AC_CB095D17494B__INCLUDED_
   #define APPFUNCTIONANDNAME_H__B015061F_458B_44A7_F2AC_CB095D17494B__INCLUDED_
 
+#include "CPP_API_export.hpp"
 #include <string>
 #include <functional>
 
@@ -22,7 +23,7 @@ namespace mast
 {
   //! Associates application function (an algorithm) with a name to identify it
   //!
-  struct AppFunctionAndName final
+   struct CPP_API_EXPORT AppFunctionAndName final
   {
     using Application_t = std::function<void()>;
 
@@ -43,5 +44,5 @@ namespace mast
 #endif  // not defined APPFUNCTIONANDNAME_H__B015061F_458B_44A7_F2AC_CB095D17494B__INCLUDED_
 
 //===========================================================================
-// End of AppFunctionAndName_CPP.hpp
+// End of AppFunctionAndName.hpp
 //===========================================================================

@@ -24,7 +24,7 @@ namespace mast
 //! Factory for creating Remote_Protocol_Client derived instance
 //!
 //!
-class DLL_EXPORT RemoteProtocolFactory final : public Factory<Remote_Protocol_Client>
+class MAST_CORE_EXPORT RemoteProtocolFactory final : public Factory<Remote_Protocol_Client>
 {
   // ---------------- Public  Methods
   //

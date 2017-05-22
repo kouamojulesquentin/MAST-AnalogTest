@@ -14,7 +14,7 @@
 #ifndef SYSTEMMODELNODE_H__1BEF31DB_FB8A_405C_78B9_75CDBD328A52__INCLUDED_
   #define SYSTEMMODELNODE_H__1BEF31DB_FB8A_405C_78B9_75CDBD328A52__INCLUDED_
 
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 #include <cstdint>
 #include <string>
 #include <experimental/string_view>
@@ -42,7 +42,7 @@ constexpr char DEFAULT_TAP_MUX_BPY_EXT[]  = "_BPY";
 
 //! Abstract base for common features of system model nodes
 //!
-class DLL_EXPORT SystemModelNode
+class MAST_CORE_EXPORT SystemModelNode
 {
   // ---------------- Public  Methods
   //

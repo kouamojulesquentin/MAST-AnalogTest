@@ -13,7 +13,7 @@
 #ifndef SYSTEMMODELADAPTER_CPP_H__D20B38D9_1D62_4C8A_59AE_115AEF979C69__INCLUDED_
   #define SYSTEMMODELADAPTER_CPP_H__D20B38D9_1D62_4C8A_59AE_115AEF979C69__INCLUDED_
 
-#include "Platform.hpp"
+#include "CPP_API_export.hpp"
 #include <string>
 #include <vector>
 #include <experimental/string_view>
@@ -61,55 +61,56 @@ namespace mast
 
   //! Creates a system model from configuration file, then runs Mast till applications terminates
   //!
-  DLL_EXPORT void RunMast(std::experimental::string_view         modelFilePath,
+  CPP_API_EXPORT void RunMast(std::experimental::string_view         modelFilePath,
                           const std::vector<AppFunctionAndName>& appFunctionsAndNames,
                           RunMastOptions                         options = RunMastOptions::None);
 
 
   //! Creates a system model from configuration file, then runs Mast till applications terminates
   //!
-  DLL_EXPORT void RunMast(std::experimental::string_view             modelFilePath,
+  CPP_API_EXPORT void RunMast(std::experimental::string_view             modelFilePath,
                           const std::vector<AppFunctionAndNodePath>& appAssociations,
                           RunMastOptions                             options = RunMastOptions::None);
 
   //! Runs Mast till applications terminates
   //!
   //! @note Mast must have been initialized and system model been created beforehand
-  DLL_EXPORT void RunMast(const std::vector<AppFunctionAndNodePath>& appFunctionsAndPaths, RunMastOptions options = RunMastOptions::None);
+  CPP_API_EXPORT void RunMast(const std::vector<AppFunctionAndNodePath>& appFunctionsAndPaths, RunMastOptions options = RunMastOptions::None);
 
   //! Starts up mast library, building model using specified file
   //!
   //! @note  This is to be used when there is no specific code to
   //!        build initialize the model and an associated manager
-  DLL_EXPORT void InitializeMast(std::experimental::string_view modelFilePath);
+  CPP_API_EXPORT void InitializeMast(std::experimental::string_view modelFilePath);
+
   //! Starts up mast library,without  building the model
   //!
   //! @note  This is to be used when there is no specific code to
   //!        build initialize the model and an associated manager
-  DLL_EXPORT void InitializeMast();
+  CPP_API_EXPORT void InitializeMast();
 
   //! Cleans up Mast library
   //!
   //! @note  To start using Mast (e.g. with a new model), one must call InitializeMast again
   //!
-  DLL_EXPORT void CleanupMast();
+  CPP_API_EXPORT void CleanupMast();
 
   //! Starts System Model Manager
   //!
-  DLL_EXPORT void Start();
+  CPP_API_EXPORT void Start();
 
   //! Stops System Model Manager
   //!
-  DLL_EXPORT void Stop();
+  CPP_API_EXPORT void Stop();
 
 
   //! Registers applications functions with their associated node to the System Model Manager
   //!
-  DLL_EXPORT void CreateApplications(const std::vector<AppFunctionAndNodePath>& appFunctionsAndPaths);
+  CPP_API_EXPORT void CreateApplications(const std::vector<AppFunctionAndNodePath>& appFunctionsAndPaths);
 
   //! Waits (blocks) until all application thread terminate (on their own or by a mechanism unknown to mast manager)
   //!
-  DLL_EXPORT void WaitForApplicationsEnd();
+  CPP_API_EXPORT void WaitForApplicationsEnd();
 }
 
 

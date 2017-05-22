@@ -26,7 +26,7 @@ class SystemModelNode;
 
 //! Abstract class for checking stuff
 //!
-class DLL_EXPORT Checker
+class MAST_CORE_EXPORT Checker
 {
   // ---------------- Public  Methods
   //

@@ -14,7 +14,7 @@ endif()
 add_definitions(${P_WARNINGS})
 set (P_WARNINGS "-Wall -Wno-sign-compare -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs")
 add_definitions(${P_CFLAGS})
-set (P_CFLAGS "${P_WARNINGS} -std=c++14")
+set (P_CFLAGS "${P_WARNINGS} -DSIT_READER_EXPORTS -std=c++14")
 
 add_definitions(${Flex_Switches})
 if (WIN32)

@@ -16,7 +16,7 @@
   #define PROPAGATEPENDINGVISITOR_H__27D56DAD_131D_48B7_7497_844F54AB975C__INCLUDED_
 
 #include "SystemModelVisitor.hpp"
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 #include <cstdint>
 
 namespace mast
@@ -28,7 +28,7 @@ namespace mast
 //!       it before)
 //!
 //! @note Visiting system model nodes can only set nodes pending flags (it never resets it)
-class DLL_EXPORT PropagatePendingVisitor final : public SystemModelVisitor
+class MAST_CORE_EXPORT PropagatePendingVisitor final : public SystemModelVisitor
 {
   // ---------------- Public  Methods
   //

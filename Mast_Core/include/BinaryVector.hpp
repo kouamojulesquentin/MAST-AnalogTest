@@ -15,7 +15,7 @@
 #ifndef SCANVECTORS_H__3E0880BD_14C4_4089_BA8F_A382FB9EE011__INCLUDED_
   #define SCANVECTORS_H__3E0880BD_14C4_4089_BA8F_A382FB9EE011__INCLUDED_
 
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 #include <vector>
 #include <initializer_list>
 #include <experimental/string_view>
@@ -51,7 +51,7 @@ enum class DontCare
 
 //! Contains bitstream vector in compact binary format
 //!
-class DLL_EXPORT BinaryVector final
+class MAST_CORE_EXPORT BinaryVector final
 {
   // ---------------- Public  Methods
   //

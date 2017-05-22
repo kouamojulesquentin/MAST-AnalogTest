@@ -13,9 +13,7 @@
 
 
 #include "Session.hpp"
-#include "AppFunctionAndNodePath_CPP.hpp"
-#include "AppFunctionAndName_CPP.hpp"
-#include "SystemModelAdapter_CPP.hpp"
+#include "CPP_API.hpp"
 #include "DefaultMastMain.hpp"
 #include "Utility.hpp"
 

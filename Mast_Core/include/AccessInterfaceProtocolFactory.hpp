@@ -15,7 +15,7 @@
 #ifndef ACCESSINTERFACEPROTOCOLFACTORY_H__B1F211CA_FF00_49A4_1FA6_E83DEC699EC7__INCLUDED_
   #define ACCESSINTERFACEPROTOCOLFACTORY_H__B1F211CA_FF00_49A4_1FA6_E83DEC699EC7__INCLUDED_
 
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 #include "Factory.hpp"
 
 
@@ -32,7 +32,7 @@ class AccessInterfaceProtocol;
 //! @note This is a singleton
 //! @note Creation of the singleton initializes it with factories for default AccessInterfaceProtocol
 //!
-class DLL_EXPORT AccessInterfaceProtocolFactory final : public Factory<AccessInterfaceProtocol>
+class MAST_CORE_EXPORT AccessInterfaceProtocolFactory final : public Factory<AccessInterfaceProtocol>
 {
   // ---------------- Public  Methods
   //

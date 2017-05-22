@@ -29,7 +29,7 @@ namespace mast
 //! Implement loopback AccessInterfaceProtocol while logging I2C commands that
 //! a real I2C protocol would issue
 //!
-class DLL_EXPORT SPI_Protocol final : public SPI_Player
+class SPI_Protocol final : public SPI_Player
 {
   // ---------------- Public  Methods
   //

@@ -1,11 +1,11 @@
 //===========================================================================
-//                           AppFunctionAndNodePath_CPP.hpp
+//                           AppFunctionAndNodePath.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file AppFunctionAndNodePath_CPP.hpp
+//! @file AppFunctionAndNodePath.hpp
 //!
 //! Declares AppFunctionAndNodePath class
 //!
@@ -15,6 +15,7 @@
 #ifndef APPLICATIONASSOCIATION_CPP_H__63BEBF56_89D4_4EC6_FFBF_B574CCDCB07C__INCLUDED_
   #define APPLICATIONASSOCIATION_CPP_H__63BEBF56_89D4_4EC6_FFBF_B574CCDCB07C__INCLUDED_
 
+#include "CPP_API_export.hpp"
 #include <string>
 #include <functional>
 
@@ -22,7 +23,7 @@ namespace mast
 {
   //! Associates application functions (algorithm) with some node path and optionally an application name
   //!
-  struct AppFunctionAndNodePath final
+  struct CPP_API_EXPORT AppFunctionAndNodePath final
   {
     using Application_t = std::function<void()>;
 
@@ -47,5 +48,5 @@ namespace mast
 #endif  // not defined APPLICATIONASSOCIATION_CPP_H__63BEBF56_89D4_4EC6_FFBF_B574CCDCB07C__INCLUDED_
 
 //===========================================================================
-// End of AppFunctionAndNodePath_CPP.hpp
+// End of AppFunctionAndNodePath.hpp
 //===========================================================================

@@ -16,8 +16,6 @@
   #define SPI_PLAYER_H__8B42501C_8D39_4E13_938C_F7447B1DC5C3__INCLUDED_
 
 #include "AccessInterfaceProtocol.hpp"
-#include "Platform.hpp"
-
 #include <string>
 #include <vector>
 #include <initializer_list>
@@ -27,7 +25,7 @@ namespace mast
 {
 //! Constructs SPI commands for SPI related AccessInterfaceProtocol
 //!
-class DLL_EXPORT SPI_Player : public AccessInterfaceProtocol
+class SPI_Player : public AccessInterfaceProtocol
 {
   // ---------------- Public  Methods
   //

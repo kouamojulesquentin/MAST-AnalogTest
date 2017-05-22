@@ -15,8 +15,6 @@
 #ifndef PLUGINSREGISTRY_H__7E9CFCAB_843E_4242_CA2_8004EE0DC83F__INCLUDED_
   #define PLUGINSREGISTRY_H__7E9CFCAB_843E_4242_CA2_8004EE0DC83F__INCLUDED_
 
-#include "Platform.hpp"
-
 #include <vector>
 #include <string>
 
@@ -24,7 +22,7 @@ namespace test
 {
 //! Provides a way to check registered plugins
 //!
-class DLL_EXPORT PluginsRegistry final
+class PluginsRegistry final
 {
   // ---------------- Public  Methods
   //
@@ -53,9 +51,6 @@ class DLL_EXPORT PluginsRegistry final
 //  End of PluginsRegistry class declaration
 //---------------------------------------------------------------------------
 } // End of namespace test
-
-
-
 
 #endif  // not defined PLUGINSREGISTRY_H__7E9CFCAB_843E_4242_CA2_8004EE0DC83F__INCLUDED_
 

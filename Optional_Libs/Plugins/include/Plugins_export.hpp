@@ -1,33 +1,34 @@
 //===========================================================================
-//                           Platform.hpp
+//                           Plugins_export.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file Platform.hpp
+//! @file Plugins_export.hpp
 //!
-//! Defines platform dependant stuffs
+//! Defines DLL export dependant stuffs
 //===========================================================================
 
-
-#ifndef PLATFORM_H__31EE6B85_BB3D_4B14_E288_56C12101BFE0__INCLUDED_
-  #define PLATFORM_H__31EE6B85_BB3D_4B14_E288_56C12101BFE0__INCLUDED_
+#ifndef PLUGINS_EXPORT_H__ADF2524_327A_4FE2_FFBB_3B59FB1D4887__INCLUDED_
+  #define PLUGINS_EXPORT_H__ADF2524_327A_4FE2_FFBB_3B59FB1D4887__INCLUDED_
 
   #if defined(WINDOWS)
     #include <windows.h>
-    #ifdef BUILD_DLL
-        #define DLL_EXPORT __declspec(dllexport)
+    #ifdef PLUGINS_EXPORTS
+        #define PLUGINS_EXPORT __declspec(dllexport)
     #else
-        #define DLL_EXPORT __declspec(dllimport)
+        #define PLUGINS_EXPORT __declspec(dllimport)
     #endif
   #else
-      #define DLL_EXPORT
+      #define PLUGINS_EXPORT
   #endif
 
-#endif  // not defined PLATFORM_H__31EE6B85_BB3D_4B14_E288_56C12101BFE0__INCLUDED_
+
+
+#endif  // not defined PLUGINS_EXPORT_H__ADF2524_327A_4FE2_FFBB_3B59FB1D4887__INCLUDED_
 //===========================================================================
-// End of Platform.hpp
+// End of Plugins_export.hpp
 //===========================================================================
 
 

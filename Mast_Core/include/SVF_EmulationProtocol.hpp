@@ -25,7 +25,7 @@ namespace mast
 //! Implement loopback AccessInterfaceProtocol while logging SVF commands that
 //! a real SVF protocol would issue
 //!
-class DLL_EXPORT SVF_EmulationProtocol final : public SVF_Player
+class MAST_CORE_EXPORT SVF_EmulationProtocol final : public SVF_Player
 {
   // ---------------- Public  Methods
   //

@@ -16,7 +16,7 @@
   #define SVF_PLAYER_H__CE0DE4BD_2B23_4BD0_82B1_DCE5A1CD5B2__INCLUDED_
 
 #include "AccessInterfaceProtocol.hpp"
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 
 #include <string>
 
@@ -25,7 +25,7 @@ namespace mast
 {
 //! Constructs SVF commands for SVF related AccessInterfaceProtocol
 //!
-class DLL_EXPORT SVF_Player : public AccessInterfaceProtocol
+class MAST_CORE_EXPORT SVF_Player : public AccessInterfaceProtocol
 {
   // ---------------- Public  Methods
   //

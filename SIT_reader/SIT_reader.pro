@@ -6,6 +6,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 CONFIG += warn_off
 
+DEFINES += SIT_READER_EXPORTS
 QMAKE_CXXFLAGS += -Wnarrowing -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-include-dirs -Wswitch-enum
 QMAKE_CXXFLAGS += -fmax-errors=3
 
@@ -18,12 +19,12 @@ QMAKE_CXXFLAGS += -fmax-errors=3
     error("Parser has not been generated")
 }
 
-INCLUDEPATH += $$PWD/../Mast_Core/include            \
-               $$PWD/../Mast_Core/public_include     \
+INCLUDEPATH += $$PWD/../Mast_Core/include   \
+               $$PWD/../Mast_Core/internal  \
                $$PWD/../Logger
 
-DEPENDPATH += $$PWD/../Mast_Core/include        \
-              $$PWD/../Mast_Core/public_include \
+DEPENDPATH += $$PWD/../Mast_Core/include  \
+              $$PWD/../Mast_Core/internal \
               $$PWD/../Logger
 
 win32 {

@@ -18,7 +18,7 @@
 #include "SystemModelNode.hpp"
 #include "SystemModelVisitor.hpp"
 #include "BinaryVector.hpp"
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 
 #include <vector>
 
@@ -26,7 +26,7 @@ namespace mast
 {
 //! Collects content of active Registers along with their identifier
 //!
-class DLL_EXPORT ToSutVisitor : public SystemModelVisitor
+class MAST_CORE_EXPORT ToSutVisitor : public SystemModelVisitor
 {
   // ---------------- Public  Methods
   //

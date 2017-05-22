@@ -16,7 +16,6 @@
   #define Intel_Packet_PLAYER_H__CE0DE4BD_2B23_4BD0_82B1_DCE5A1CD5B2__INCLUDED_
 
 #include "AccessInterfaceProtocol.hpp"
-#include "Platform.hpp"
 
 #include <string>
 #include <vector>
@@ -36,7 +35,7 @@ namespace mast
 {
 //! Constructs Intel_Packet commands for Intel_Packet related AccessInterfaceProtocol
 //!
-class DLL_EXPORT Intel_Packet_Player : public AccessInterfaceProtocol
+class Intel_Packet_Player : public AccessInterfaceProtocol
 {
   // ---------------- Public  Methods
   //
@@ -72,12 +71,12 @@ class DLL_EXPORT Intel_Packet_Player : public AccessInterfaceProtocol
   uint32_t m_n_chains = 0; //!< When true, TRST instruction is used for reset unless synchronous reset is requested
   blocking_queue<ring_packet> *outgoing_packets;
   blocking_queue<ring_packet> *incoming_packet_queue;
-  
+
   std::vector<std::bitset<ID_WIDTH>> region_id;
   std::vector<std::bitset<ADDR_WIDTH>> region_addr;
 
-  std::thread out_client; 
-  std::thread in_server; 
+  std::thread out_client;
+  std::thread in_server;
 
 
 };

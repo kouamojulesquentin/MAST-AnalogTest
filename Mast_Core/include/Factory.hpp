@@ -21,7 +21,7 @@
 #include <string>
 #include <experimental/string_view>
 
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 
 namespace mast
 {
@@ -32,7 +32,7 @@ namespace mast
 //!       creation methods)
 //!
 template<typename BuildType>
-class DLL_EXPORT Factory
+class MAST_CORE_EXPORT Factory
 {
   // ---------------- Public  Methods
   //

@@ -25,7 +25,7 @@ namespace mast
 //! Implement loopback AccessInterfaceProtocol while logging I2C commands that
 //! a real I2C protocol would issue
 //!
-class DLL_EXPORT I2C_EmulationProtocol final : public I2C_Player
+class MAST_CORE_EXPORT I2C_EmulationProtocol final : public I2C_Player
 {
   // ---------------- Public  Methods
   //

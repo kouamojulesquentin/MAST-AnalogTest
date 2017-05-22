@@ -11,16 +11,17 @@
 //===========================================================================
 
 #include "SystemModelAdapter_CPP.hpp"
-#include "AppFunctionAndNodePath_CPP.hpp"
-#include "AppFunctionAndName_CPP.hpp"
+#include "AppFunctionAndNodePath.hpp"
+#include "AppFunctionAndName.hpp"
 #include "AppFunctionAndNode.hpp"
 #include "AppFunctionNameAndNode.hpp"
 #include "SystemModelManager.hpp"
-//+#include "Commons_C.hpp"
+#include "SystemModelManagerMonitor.hpp"
 #include "Startup.hpp"
 #include "Utility.hpp"
 #include "Session.hpp"
 #include "SIT_reader.hpp"
+#include "GmlPrinter.hpp"
 #include "Utility.hpp"
 #include "g3log/g3log.hpp"
 
@@ -354,7 +355,7 @@ void mast::RunMast (string_view modelFilePath, const vector<AppFunctionAndName>&
   auto initializeLogger = IsSet(options, RunMastOptions::LogManagerActivity);
   Session session(initializeLogger);
 
-  auto namesAndNodes     = CPP_API_IMPL::LoadSystemModel(modelFilePath); 
+  auto namesAndNodes     = CPP_API_IMPL::LoadSystemModel(modelFilePath);
   auto functionsAndNodes = CPP_API_IMPL::GetFunctionsAndNodes(appFunctionsAndNames, namesAndNodes);
 
   CPP_API_IMPL::RunMast(functionsAndNodes, options);

@@ -27,7 +27,7 @@ namespace mast
 //!       is the first bit scanned out for TDO and MASK data.
 //!       This bit ordering is consistent with the IEEE 1149.1 convention.
 //!
-class DLL_EXPORT SVFVector final
+class MAST_CORE_EXPORT SVFVector final
 {
   // ---------------- Public  Methods
   //

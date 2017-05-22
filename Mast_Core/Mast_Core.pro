@@ -9,16 +9,17 @@ QT -= core gui
 TARGET   = Mast_Core
 TEMPLATE = lib
 
-DEFINES += LIB_LIBRARY
 CONFIG  += c++14
 QMAKE_CXXFLAGS += -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default
 QMAKE_CXXFLAGS += -fmax-errors=3
 
-INCLUDEPATH += include        \
+INCLUDEPATH += include  \
+               internal \
                $$PWD/../Logger
 
-DEPENDPATH += include        \
-               $$PWD/../Logger
+DEPENDPATH += include  \
+              internal \
+              $$PWD/../Logger
 
 
 SOURCES +=  \
@@ -99,13 +100,11 @@ HEADERS += \
     include/Factory.hpp                                 \
     include/GenericAccessInterfaceProtocol.hpp          \
     include/GmlPrinter.hpp                              \
-    include/FromSutUpdater.hpp                          \
     include/I2C_EmulationProtocol.hpp                   \
     include/I2C_Player.hpp                              \
     include/Linker.hpp                                  \
+    include/Mast_Core_export.hpp                        \
     include/MastConfig.hpp                              \
-    include/MismatchesCollector.hpp                     \
-    include/NamesChecker.hpp                            \
     include/NodePathResolver.hpp                        \
     include/OfflineProtocol.hpp                         \
     include/ParentNode.hpp                              \
@@ -136,9 +135,11 @@ HEADERS += \
     include/SystemModelNodes.hpp                        \
     include/SystemModelReseter.hpp                      \
     include/SystemModelVisitor.hpp                      \
+    include/FromSutUpdater.hpp                          \
     include/ToSutVisitor.hpp                            \
     include/Utility.hpp                                 \
-    include/Platform.hpp
+    internal/MismatchesCollector.hpp                    \
+    internal/NamesChecker.hpp
 
 unix {
     target.path = /usr/lib
@@ -147,7 +148,8 @@ unix {
 
 
 win32 {
-  DEFINES += WINDOWS BUILD_DLL
+  DEFINES += WINDOWS
+  DEFINES += MAST_CORE_EXPORTS
   DEFINES += __LITTLE_ENDIAN=1
   DEFINES += __BIG_ENDIAN=2
   DEFINES += __BYTE_ORDER=1

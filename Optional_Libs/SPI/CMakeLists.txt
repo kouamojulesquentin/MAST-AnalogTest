@@ -14,6 +14,7 @@ endif()
 include_directories(./include)
 include_directories(${LIBLOGGER_INCLUDE_DIRS})
 include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
+include_directories(${LIBMAST_CORE_INTERNAL_DIRS})
 include_directories(${LIBFTDI_SPI_INCLUDE_DIRS})
 
 set(LIBMASTSPI_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include" PARENT_SCOPE)

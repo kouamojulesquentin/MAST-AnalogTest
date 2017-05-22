@@ -15,7 +15,7 @@
   #define PATHSELECTORFACTORY_H__58D08908_4AFF_41C6_828A_47267EDB6719__INCLUDED_
 
 #include "PathSelector.hpp"
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 
 #include <functional>
 #include <memory>
@@ -29,7 +29,7 @@ class Register;
 
 //! Factory for creating PathSelector derived class instances
 //!
-class DLL_EXPORT PathSelectorFactory
+class MAST_CORE_EXPORT PathSelectorFactory
 {
   // ---------------- Public  Methods
   //

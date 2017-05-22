@@ -160,7 +160,7 @@ void CopyBinaryVectorToCstr (const BinaryVector& binVector, char* readDataBuffer
 
 //! Waits for all queued operations to be executed
 //!
-DLL_EXPORT ErrorCode iApply ()
+ErrorCode iApply ()
 {
   auto retCode = ErrorCode::Ok;
 
@@ -268,7 +268,7 @@ ErrorCode iGetRefresh_int64_t  (const char* registerPath, int64_t*  readData) { 
 //! @param [out] failureCount   Pointer to return the number of failures
 //! @param [in]  clearCounter   When true, the mismatch counter is reset
 //!
-DLL_EXPORT ErrorCode iGetNodeStatus (const char* nodePath, uint32_t* failureCount, bool clearCounter)
+ErrorCode iGetNodeStatus (const char* nodePath, uint32_t* failureCount, bool clearCounter)
 {
   auto retCode = ErrorCode::Ok;
 
@@ -287,7 +287,7 @@ DLL_EXPORT ErrorCode iGetNodeStatus (const char* nodePath, uint32_t* failureCoun
 //! @param [out] failureCount   Pointer to return the number of failures
 //! @param [in]  clearCounter   When true, the mismatch counter is reset
 //!
-DLL_EXPORT ErrorCode iGetStatus (uint32_t* failureCount, bool clearCounter)
+ErrorCode iGetStatus (uint32_t* failureCount, bool clearCounter)
 {
   auto retCode = ErrorCode::Ok;
 
@@ -302,7 +302,7 @@ DLL_EXPORT ErrorCode iGetStatus (uint32_t* failureCount, bool clearCounter)
 
 //! Changes path prefix
 //!
-DLL_EXPORT ErrorCode iPrefix (const char* registerPath)
+ErrorCode iPrefix (const char* registerPath)
 {
   auto retCode = ErrorCode::Ok;
 
@@ -349,7 +349,7 @@ ErrorCode iRead_with_DontCare_int64_t  (const char* registerPath, int64_t  expec
 
 //! Changes path prefix
 //!
-DLL_EXPORT ErrorCode iRefresh (const char* registerPath)
+ErrorCode iRefresh (const char* registerPath)
 {
   auto retCode = ErrorCode::Ok;
 

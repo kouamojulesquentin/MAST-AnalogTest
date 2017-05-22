@@ -25,7 +25,7 @@ namespace mast
 //! System model tree visitor for configuration
 //!
 //!
-class DLL_EXPORT ConfigureVisitor : public SystemModelVisitor
+class MAST_CORE_EXPORT ConfigureVisitor : public SystemModelVisitor
 {
   // ---------------- Public  Methods
   //

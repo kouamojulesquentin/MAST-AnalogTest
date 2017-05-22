@@ -15,7 +15,7 @@
   #define CONFIGUREALGORITHM_LAST_LAZY_H__EC19B64F_D34D_4A92_C8BD_2BDA4BC9A33__INCLUDED_
 
 #include "ConfigurationAlgorithm.hpp"
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 
 namespace mast
 {
@@ -26,7 +26,7 @@ namespace mast
 //!
 //! @note This is appropriate when registers may be modified between data cycles
 //!
-class DLL_EXPORT ConfigureAlgorithm_Last_Lazy final : public ConfigurationAlgorithm
+class MAST_CORE_EXPORT ConfigureAlgorithm_Last_Lazy final : public ConfigurationAlgorithm
 {
   // ---------------- Public  Methods
   //

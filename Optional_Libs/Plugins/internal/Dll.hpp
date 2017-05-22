@@ -15,13 +15,13 @@
 #ifndef DLL_H__328B051D_756A_4D35_788F_837D15FD2819__INCLUDED_
   #define DLL_H__328B051D_756A_4D35_788F_837D15FD2819__INCLUDED_
 
-#include "Platform.hpp"
+#include "Plugins_export.hpp"
 #include <string>
 #include <vector>
 
 namespace mast
 {
-  class DLL_EXPORT Dll final
+  class PLUGINS_EXPORT Dll final
   {
     public:
     Dll() = delete;

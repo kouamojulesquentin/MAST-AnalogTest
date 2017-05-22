@@ -27,7 +27,7 @@ namespace mast
 //! binary digits that represents bit values shifted from SUT
 //!
 //!
-class DLL_EXPORT OfflineProtocol final : public AccessInterfaceProtocol
+class MAST_CORE_EXPORT OfflineProtocol final : public AccessInterfaceProtocol
 {
   // ---------------- Public  Methods
   //

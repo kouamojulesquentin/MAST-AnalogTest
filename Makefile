@@ -25,14 +25,11 @@ MAST_UT_EXE_NAME     = Mast_UT.exe
 CPP_EXAMPLE_EXE_NAME = MastExample_CPP.exe
 OPTIONAL_UT_EXE_NAME = Optionals_UT.exe
 SIT_UT_EXE_NAME      = SIT_Reader_UT.exe
-SIT_READER_EXE_NAME  = SIT_reader_demo.exe
 TESTCASES_EXE_NAME   = TestCasesApp.exe
 
 MAST_UT_EXE_PATH      = $(BIN_DIR)\$(MAST_UT_EXE_NAME)
 OPTIONAL_UT_EXE_PATH  = $(BIN_DIR)\$(OPTIONAL_UT_EXE_NAME)
 SIT_UT_EXE_PATH       = $(BIN_DIR)\$(SIT_UT_EXE_NAME)
-SIT_READER_EXE_PATH   = $(SIT_READER_EXE_NAME)
-SIT_READER_INPUT_FILE = ..\..\SIT_reader\prova.txt
 TESTCASES_EXE_PATH    = $(BIN_DIR)\$(TESTCASES_EXE_NAME)
 CPP_EXAMPLE_EXE_PATH  = $(BIN_DIR)\$(CPP_EXAMPLE_EXE_NAME)
 
@@ -48,15 +45,12 @@ MAST_UT_EXE_NAME     = Mast_UT
 OPTIONAL_UT_EXE_NAME = Optionals_UT
 TESTCASES_EXE_NAME   = TestCasesApp
 CPP_EXAMPLE_EXE_NAME = MastExample_CPP
-SIT_READER_EXE_NAME  = SIT_reader_demo
 SIT_UT_EXE_NAME      = SIT_Reader_UT
 
 
 MAST_UT_EXE_PATH      = $(BIN_DIR)/$(MAST_UT_EXE_NAME)
 OPTIONAL_UT_EXE_PATH  = $(BIN_DIR)/$(OPTIONAL_UT_EXE_NAME)
 SIT_UT_EXE_PATH       = $(BIN_DIR)/$(SIT_UT_EXE_NAME)
-SIT_READER_EXE_PATH   = $(SIT_READER_EXE_NAME)
-SIT_READER_INPUT_FILE = ../../SIT_reader/prova.txt
 TESTCASES_EXE_PATH    = $(BIN_DIR)/$(TESTCASES_EXE_NAME)
 CPP_EXAMPLE_EXE_PATH  = $(BIN_DIR)/$(CPP_EXAMPLE_EXE_NAME)
 endif
@@ -68,10 +62,10 @@ endif
 
 CPP_DEFINES += -DUSE_OPEN_OCD:BOOL=$(USE_OPEN_OCD)
 
-CMAKE_DEBUG_FLAGS=    -DCMAKE_BUILD_TYPE=Debug   $(CMAKE_FLAGS) $(CPP_DEFINES)
-CMAKE_RELEASE_FLAGS=  -DCMAKE_BUILD_TYPE=Release $(CMAKE_FLAGS) $(CPP_DEFINES)
+CMAKE_DEBUG_FLAGS   =  -DCMAKE_BUILD_TYPE=Debug   $(CMAKE_FLAGS) $(CPP_DEFINES)
+CMAKE_RELEASE_FLAGS =  -DCMAKE_BUILD_TYPE=Release $(CMAKE_FLAGS) $(CPP_DEFINES)
 
-CMAKE_CENTOS_FLAGS=  -DCMAKE_BUILD_TYPE=Debug   $(CMAKE_FLAGS)
+CMAKE_CENTOS_FLAGS =  -DCMAKE_BUILD_TYPE=Debug   $(CMAKE_FLAGS)
 CMAKE_CENTOS_FLAGS += -DCMAKE_CXX_COMPILER="/home/michele/local_gcc-4.9.3/bin/g++"
 CMAKE_CENTOS_FLAGS += -DCMAKE_C_COMPILER="/home/michele/local_gcc-4.9.3/bin/gcc"
 
@@ -216,20 +210,6 @@ ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(SIT_READER_EXE_NAME))",
 >  cd $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR) && $(RUN)$(SIT_READER_EXE_NAME)
 else
 >  @echo "    ==== No Debug parser available ========"
-endif
-
-run_sit_reader_release:
-ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(SIT_READER_EXE_NAME))","")
->  cd $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR) && $(RUN)$(SIT_READER_EXE_NAME)
-else
->  @echo "    ==== No Release parser available ========"
-endif
-
-run_testcases_debug:
-ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(TESTCASES_EXE_NAME))","")
->  cd $(CMAKE_DEBUG_BUILD_DIR) && $(RUN)$(TESTCASES_EXE_PATH)
-else
->  @echo "    ==== No Debug testcases available ========"
 endif
 
 run_testcases_release:

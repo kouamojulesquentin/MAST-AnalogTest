@@ -31,7 +31,7 @@ class Register;
 //!
 //! @note Path identifier are one based (in range [1..path_count])
 //! @note Internal table contains a reserved slot at index zero
-class DLL_EXPORT DefaultBinaryPathSelector : public DefaultTableBasedPathSelector
+class MAST_CORE_EXPORT DefaultBinaryPathSelector : public DefaultTableBasedPathSelector
 {
   // ---------------- Public  Methods
   //

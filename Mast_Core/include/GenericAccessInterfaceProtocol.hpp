@@ -15,7 +15,7 @@
   #define GENERICACCESSINTERFACEPROTOCOL_H__ED4322E2_314_4FDF_85AC_27E06DBA5D09__INCLUDED_
 
 #include "AccessInterfaceProtocol.hpp"
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 
 #include <vector>
 #include <initializer_list>
@@ -26,7 +26,7 @@ namespace mast
 {
 //! Manages AccessInterfaceProtocol using actions and protocol tables
 //!
-class DLL_EXPORT GenericAccessInterfaceProtocol : public AccessInterfaceProtocol
+class MAST_CORE_EXPORT GenericAccessInterfaceProtocol : public AccessInterfaceProtocol
 {
   // ---------------- Public  Methods
   //

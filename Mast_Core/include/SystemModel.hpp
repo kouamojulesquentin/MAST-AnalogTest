@@ -25,7 +25,7 @@ namespace mast
 
 //! Manages the system model tree
 //!
-class DLL_EXPORT SystemModel
+class MAST_CORE_EXPORT SystemModel
 {
   // ---------------- Public  Methods
   //

@@ -26,7 +26,7 @@ class Remote_Protocol_Client;
 
 //! Adapts a Remote_Protocol_Client to AccessInterfaceProtocol
 //!
-class DLL_EXPORT Remote_Protocol_Proxy : public AccessInterfaceProtocol
+class MAST_CORE_EXPORT Remote_Protocol_Proxy : public AccessInterfaceProtocol
 {
   // ---------------- Public  Methods
   //

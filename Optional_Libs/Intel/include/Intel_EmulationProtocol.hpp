@@ -25,7 +25,7 @@ namespace mast
 //! Implement loopback AccessInterfaceProtocol while logging Intel commands that
 //! a real Intel protocol would issue
 //!
-class DLL_EXPORT Intel_EmulationProtocol final : public Intel_Packet_Player
+class Intel_EmulationProtocol final : public Intel_Packet_Player
 {
   // ---------------- Public  Methods
   //

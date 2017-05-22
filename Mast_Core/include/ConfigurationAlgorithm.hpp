@@ -14,7 +14,7 @@
 #ifndef CONFIGURATIONALGORITHM_H__5DB75F2E_2048_4019_E9B3_3C893FB3DBC6__INCLUDED_
   #define CONFIGURATIONALGORITHM_H__5DB75F2E_2048_4019_E9B3_3C893FB3DBC6__INCLUDED_
 
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 #include <cstdint>
 #include <memory>
 
@@ -25,7 +25,7 @@ class SystemModelNode;
 
 //! Defines interface for algorithms to select a Linker path (derivation)
 //!
-class DLL_EXPORT ConfigurationAlgorithm
+class MAST_CORE_EXPORT ConfigurationAlgorithm
 {
   public:
   virtual ~ConfigurationAlgorithm() = default;
@@ -49,7 +49,7 @@ class DLL_EXPORT ConfigurationAlgorithm
 
   //! Does what need to be done when all linker children have been processed
   //!
-  //! @note Must be called after linker pending state has been updated (this permit stateless algorithm) 
+  //! @note Must be called after linker pending state has been updated (this permit stateless algorithm)
   //! @note Post-condition: a selection choice must have done (by this method or by one call of ProcessPending for current linker)
   //!
   //! @param linker The linker currently configured

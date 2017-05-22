@@ -52,7 +52,7 @@ enum class SelectorKind
 
 //! Provides facilities to create SystemModel sub-trees
 //!
-class DLL_EXPORT SystemModelBuilder final
+class MAST_CORE_EXPORT SystemModelBuilder final
 {
   // ---------------- Public  Methods
   //

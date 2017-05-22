@@ -21,7 +21,7 @@ namespace mast
 {
 //! Factory for creating ConfigurationAlgorithm derived class instances
 //!
-class DLL_EXPORT ConfigureAlgorithmFactory final : public Factory<ConfigurationAlgorithm>
+class MAST_CORE_EXPORT ConfigureAlgorithmFactory final : public Factory<ConfigurationAlgorithm>
 {
   // ---------------- Public  Methods
   //

@@ -15,7 +15,7 @@
   #define CONFIGUREALGORITHM_LASTORDEFAULT_GREEDY_H__94D5C729_3AD4_4FD5_EEA4_7613390B5BCC__INCLUDED_
 
 #include "ConfigurationAlgorithm.hpp"
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 
 namespace mast
 {
@@ -27,7 +27,7 @@ namespace mast
 //!
 //! @note This is appropriate when registers are not modified between data cycles
 //!
-class DLL_EXPORT ConfigureAlgorithm_LastOrDefault_Greedy final : public ConfigurationAlgorithm
+class MAST_CORE_EXPORT ConfigureAlgorithm_LastOrDefault_Greedy final : public ConfigurationAlgorithm
 {
   // ---------------- Public  Methods
   //

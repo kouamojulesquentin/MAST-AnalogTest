@@ -3,29 +3,35 @@ QT -= core gui
 TARGET   = Mast_API_CPP
 TEMPLATE = lib
 
-DEFINES += LIB_LIBRARY
+DEFINES += CPP_API_EXPORTS
 CONFIG  += c++14
 QMAKE_CXXFLAGS += -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default
 QMAKE_CXXFLAGS += -fmax-errors=3
 
-INCLUDEPATH += include                    \
-               $$PWD/../SIT_reader        \
-               $$PWD/../Mast_Core/include \
+INCLUDEPATH += include                     \
+               internal                    \
+               $$PWD/../SIT_reader         \
+               $$PWD/../Mast_Core/include  \
+               $$PWD/../Mast_Core/internal \
                $$PWD/../Logger
 
-DEPENDPATH  += include                    \
-               $$PWD/../SIT_reader        \
-               $$PWD/../Mast_Core/include \
+DEPENDPATH  += include                     \
+               internal                    \
+               $$PWD/../SIT_reader         \
+               $$PWD/../Mast_Core/include  \
+               $$PWD/../Mast_Core/internal \
                $$PWD/../Logger
 
 
 SOURCES += src/PDL_Adapter_CPP.cpp        \
            src/SystemModelAdapter_CPP.cpp
 
-HEADERS += \
-    include/AppFunctionAndName_CPP.hpp     \
-    include/AppFunctionAndNodePath_CPP.hpp \
-    include/PDL_Adapter_CPP.hpp            \
+HEADERS +=                             \
+    include/CPP_API.hpp                \
+    include/CPP_API_export.hpp         \
+    include/AppFunctionAndName.hpp     \
+    include/AppFunctionAndNodePath.hpp \
+    include/PDL_Adapter_CPP.hpp        \
     include/SystemModelAdapter_CPP.hpp
 
 #unix {

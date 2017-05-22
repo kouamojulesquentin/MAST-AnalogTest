@@ -26,7 +26,7 @@ namespace mast
 //! binary digits that represents bit values shifted from SUT
 //!
 //!
-class DLL_EXPORT OpenOCDProtocol final : public AccessInterfaceProtocol
+class OpenOCDProtocol final : public AccessInterfaceProtocol
 {
   // ---------------- Public  Methods
   //

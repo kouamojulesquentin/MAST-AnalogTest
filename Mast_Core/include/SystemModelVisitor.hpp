@@ -13,7 +13,7 @@
 #ifndef SYSTEMMODELVISITOR_H__D20D9DFE_5339_4A93_CAAB_34F1335416B2__INCLUDED_
   #define SYSTEMMODELVISITOR_H__D20D9DFE_5339_4A93_CAAB_34F1335416B2__INCLUDED_
 
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 
 namespace mast
 {
@@ -28,7 +28,7 @@ class Register;
 //!
 //! @note In fact, this is an abstract base class as it provides 3 helpers to ease visits of parents children
 //!
-class DLL_EXPORT SystemModelVisitor
+class MAST_CORE_EXPORT SystemModelVisitor
 {
   // ---------------- Public  Methods
   //

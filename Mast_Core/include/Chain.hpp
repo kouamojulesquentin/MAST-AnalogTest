@@ -26,7 +26,7 @@ namespace mast
 //! @note note that a CHAIN node with only one derivation has no functional effect on the execution, but it can be
 //! used to package some sub-system and exploit the "append" method to assure correct construction.
 //!
-class DLL_EXPORT Chain : public ParentNode
+class MAST_CORE_EXPORT Chain : public ParentNode
 {
   // ---------------- Public  Methods
   //

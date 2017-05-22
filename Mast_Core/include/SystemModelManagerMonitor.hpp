@@ -15,12 +15,13 @@
 #ifndef SYSTEMMODELMANAGERMONITOR_H__831655E4_CE44_4DFD_F886_30ECFC1CC3FC__INCLUDED_
   #define SYSTEMMODELMANAGERMONITOR_H__831655E4_CE44_4DFD_F886_30ECFC1CC3FC__INCLUDED_
 
-#include "GmlPrinter.hpp"
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 #include <string>
+#include <experimental/string_view>
 
 namespace mast
 {
+class SystemModelNode;
 class ParentNode;
 class BinaryVector;
 
@@ -47,7 +48,7 @@ enum class ManagerMonitorOptions
 
 //! Provides monitoring of SystemModelManager behavior and SystemModel state
 //!
-class DLL_EXPORT SystemModelManagerMonitor
+class MAST_CORE_EXPORT SystemModelManagerMonitor
 {
   // ---------------- Public  Methods
   //

@@ -7,10 +7,7 @@
 //!
 //===========================================================================
 
-#include "AppFunctionAndNodePath_CPP.hpp"
-#include "AppFunctionAndName_CPP.hpp"
-#include "PDL_Adapter_CPP.hpp"
-//+#include "g3log/g3log.hpp"
+#include "CPP_API.hpp"
 
 #include <string>
 #include <vector>
@@ -30,7 +27,7 @@ std::vector<mast::AppFunctionAndNodePath> GetAlgorithmsAndNodePaths (int argc, c
 
 namespace
 {
-  //! This algorithm increment "reg" 
+  //! This algorithm increment "reg"
   //!
   void Algo_Increment ()
   {

@@ -15,7 +15,7 @@
 #ifndef SESSION_H__F9BF7523_CC0A_4C47_6489_D8B23FC91559__INCLUDED_
   #define SESSION_H__F9BF7523_CC0A_4C47_6489_D8B23FC91559__INCLUDED_
 
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 #include <memory>
 
 namespace g3
@@ -33,7 +33,7 @@ class SystemModelManager;
 //!
 //! @note One can extend its behaviour to fit special needs
 //!
-class DLL_EXPORT Session
+class MAST_CORE_EXPORT Session
 {
   // ---------------- Public  Methods
   //

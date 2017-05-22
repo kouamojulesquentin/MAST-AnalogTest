@@ -25,7 +25,7 @@ class AccessInterfaceProtocol;
 
 //! Represents an access point to scan chain (the physical interface to the SUT)
 //!
-class DLL_EXPORT AccessInterface : public ParentNode
+class MAST_CORE_EXPORT AccessInterface : public ParentNode
 {
   // ---------------- Public  Methods
   //

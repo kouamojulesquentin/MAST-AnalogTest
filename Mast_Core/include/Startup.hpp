@@ -15,7 +15,7 @@
 #ifndef STARTUP_H__F34EFB54_17C0_4861_41A4_5FD5CC09AA7F__INCLUDED_
   #define STARTUP_H__F34EFB54_17C0_4861_41A4_5FD5CC09AA7F__INCLUDED_
 
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 #include <memory>
 
 namespace g3
@@ -31,7 +31,7 @@ class SystemModelManager;
 //! Provides startup facilities to build a system model and run the manager
 //!
 //!
-class DLL_EXPORT Startup final
+class MAST_CORE_EXPORT Startup final
 {
   // ---------------- Public  Methods
   //

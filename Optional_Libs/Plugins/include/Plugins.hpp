@@ -15,17 +15,18 @@
 #ifndef PLUGINS_H__EEF4BAD3_11BA_451A_629D_B5CA8437CD1__INCLUDED_
   #define PLUGINS_H__EEF4BAD3_11BA_451A_629D_B5CA8437CD1__INCLUDED_
 
+#include "Plugins_export.hpp"
+
 #include <string>
 #include <vector>
 
-#include "Platform.hpp"
 
 namespace mast
 {
 //! Manages search and load of plugins DLL for MAST
 //!
 //! @note MAST plugins are expected to register their feature by themselve using MAST factories
-class DLL_EXPORT Plugins final
+class PLUGINS_EXPORT Plugins final
 {
   // ---------------- Public  Methods
   //
@@ -43,19 +44,11 @@ class DLL_EXPORT Plugins final
   //!
   static void LoadPlugin(const std::string& pluginPath);
 
-  // ---------------- Protected Methods
-  //
-  protected:
-
   // ---------------- Private  Methods
   //
   private:
   ~Plugins() = default;
   Plugins()  = default;
-
-  // ---------------- Private  Fields
-  //
-  private:
 };
 //
 //  End of Plugins class declaration

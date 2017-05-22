@@ -14,6 +14,7 @@ QMAKE_CXXFLAGS += -fmax-errors=3
 }
 
 INCLUDEPATH += $$PWD/../Mast_Core/include    \
+               $$PWD/../Mast_Core/internal   \
                $$PWD/../Mast_API_CPP/include \
                $$PWD/../Mast_API_C/include   \
                $$PWD/../Logger               \
@@ -22,6 +23,7 @@ INCLUDEPATH += $$PWD/../Mast_Core/include    \
                UT_Helpers
 
 DEPENDPATH += $$PWD/../Mast_Core/include    \
+              $$PWD/../Mast_Core/internal   \
               $$PWD/../Mast_API_CPP/include \
               $$PWD/../Mast_API_C/include   \
               $$PWD/../cxxtest              \

@@ -21,7 +21,7 @@ namespace mast
 {
 //! Abstract class to represent nodes that can have children
 //!
-class DLL_EXPORT ParentNode : public SystemModelNode, public std::enable_shared_from_this<ParentNode>
+class MAST_CORE_EXPORT ParentNode : public SystemModelNode, public std::enable_shared_from_this<ParentNode>
 {
   // ---------------- Public  Methods
   //

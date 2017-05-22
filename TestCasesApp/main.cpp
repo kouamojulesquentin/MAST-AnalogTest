@@ -10,10 +10,9 @@
 //! Defines main for testcases application
 //===========================================================================
 
+#include "CPP_API.hpp"
 #include "Session.hpp"
 #include "Startup.hpp"
-#include "AppFunctionAndNodePath_CPP.hpp"
-#include "SystemModelAdapter_CPP.hpp"
 #include "ErrorCode_C.h"
 #include "SystemModelBuilder.hpp"
 #include "SystemModelManager.hpp"
@@ -26,7 +25,7 @@
 #include "g3log/g3log.hpp"
 #include "Options.hpp"
 #include "Zybo.hpp"
-#include "MastConfig.hpp"
+#include "SystemModelManagerMonitor.hpp"
 
 #if defined(USE_OPEN_OCD)
   #include "OpenOCDProtocol.hpp"

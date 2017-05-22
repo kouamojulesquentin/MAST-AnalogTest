@@ -26,7 +26,7 @@ namespace mast
 {
 //! Checks name coherency of a SystemModel (sub-)tree
 //!
-class DLL_EXPORT NamesChecker final : public Checker
+class MAST_CORE_EXPORT NamesChecker final : public Checker
 {
   // ---------------- Public  Methods
   //

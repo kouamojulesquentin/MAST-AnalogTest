@@ -15,7 +15,7 @@
   #define FROMSUTUPDATER_H__DB106156_53FA_4185_BBB_EE8E7A3FBE72__INCLUDED_
 
 #include "SystemModel.hpp"
-#include "Platform.hpp"
+#include "Mast_Core_export.hpp"
 
 #include <vector>
 
@@ -25,7 +25,7 @@ class BinaryVector;
 
 //! Helper to update system model from data received from SUT
 //!
-class DLL_EXPORT FromSutUpdater final
+class MAST_CORE_EXPORT FromSutUpdater final
 {
   // ---------------- Public  Methods
   //

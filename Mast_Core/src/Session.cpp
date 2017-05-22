@@ -13,6 +13,7 @@
 
 #include "Session.hpp"
 #include "Startup.hpp"
+#include "SystemModelNode.hpp"
 #include "SystemModelManager.hpp"
 #include "SystemModelManagerMonitor.hpp"
 

@@ -17,6 +17,7 @@
 #include "AppFunctionNameAndNode.hpp"
 #include "SystemModelManager.hpp"
 #include "SystemModelManagerMonitor.hpp"
+#include "SystemModel.hpp"
 #include "Startup.hpp"
 #include "Utility.hpp"
 #include "Session.hpp"

@@ -12,6 +12,7 @@
 
 #include "PDL_Adapter_C.h"
 #include "SystemModelManager.hpp"
+#include "BinaryVector.hpp"
 #include "Startup.hpp"
 #include "Commons_C.hpp"
 #include "Utility.hpp"

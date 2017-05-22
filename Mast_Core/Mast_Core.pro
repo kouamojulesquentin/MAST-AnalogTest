@@ -68,6 +68,7 @@ SOURCES +=  \
     src/SystemModel.cpp                             \
     src/SystemModelBuilder.cpp                      \
     src/SystemModelManager.cpp                      \
+    src/SystemModelManager_impl.cpp                 \
     src/SystemModelManagerMonitor.cpp               \
     src/SystemModelChecker.cpp                      \
     src/SystemModelCheckResult.cpp                  \
@@ -139,7 +140,8 @@ HEADERS += \
     include/ToSutVisitor.hpp                            \
     include/Utility.hpp                                 \
     internal/MismatchesCollector.hpp                    \
-    internal/NamesChecker.hpp
+    internal/NamesChecker.hpp                           \
+    internal/SystemModelManager_impl.hpp
 
 unix {
     target.path = /usr/lib

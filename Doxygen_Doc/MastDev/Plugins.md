@@ -87,3 +87,9 @@ Path Selector
 | N_Hot          | N encoded selector that support selecting no derivation at all                 |
 | N_Hot_noidle   | N hot encoded selector - always select at least one derivation -               |
 | Table_Based    | Special encoding that use custom tables to define selection/deselection values |
+
+[DLL]:  Acronyms.html "sfd"
+[DLL]
+[`link_text`][DLL]
+
+{#sfddsq}

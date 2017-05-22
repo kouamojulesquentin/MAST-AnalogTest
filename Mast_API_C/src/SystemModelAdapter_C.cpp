@@ -12,6 +12,7 @@
 
 #include "SystemModelAdapter_C.h"
 #include "SystemModelManager.hpp"
+#include "SystemModel.hpp"
 #include "Commons_C.hpp"
 #include "Startup.hpp"
 #include "Utility.hpp"

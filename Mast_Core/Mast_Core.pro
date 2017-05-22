@@ -112,7 +112,6 @@ HEADERS += \
     include/PathSelector.hpp                            \
     include/PathSelectorFactory.hpp                     \
     include/PrettyPrinter.hpp                           \
-    include/PropagatePendingVisitor.hpp                 \
     include/Remote_Protocol.hpp                         \
     include/Remote_Protocol_Client.hpp                  \
     include/Remote_Protocol_Proxy.hpp                   \
@@ -134,11 +133,12 @@ HEADERS += \
     include/SystemModelCheckResult.hpp                  \
     include/SystemModelNode.hpp                         \
     include/SystemModelNodes.hpp                        \
-    include/SystemModelReseter.hpp                      \
     include/SystemModelVisitor.hpp                      \
-    include/FromSutUpdater.hpp                          \
-    include/ToSutVisitor.hpp                            \
     include/Utility.hpp                                 \
+    internal/PropagatePendingVisitor.hpp                \
+    internal/SystemModelReseter.hpp                     \
+    internal/FromSutUpdater.hpp                         \
+    internal/ToSutVisitor.hpp                           \
     internal/MismatchesCollector.hpp                    \
     internal/NamesChecker.hpp                           \
     internal/SystemModelManager_impl.hpp

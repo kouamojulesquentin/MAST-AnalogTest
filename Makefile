@@ -16,6 +16,7 @@ ifeq ($(OS), Windows_NT)
 $(info ==> Building for Windows)
 USE_OPEN_OCD  = OFF
 CMAKE_FLAGS  += -G "MinGW Makefiles"
+PYTHON = python
 
 MKDIR  = mkdir
 SEP    = "\"
@@ -36,6 +37,7 @@ CPP_EXAMPLE_EXE_PATH  = $(BIN_DIR)\$(CPP_EXAMPLE_EXE_NAME)
 
 else   # ==> not Windows
 USE_OPEN_OCD     = ON
+PYTHON = python3
 
 MKDIR  = mkdir -p
 SEP    = /
@@ -168,8 +170,8 @@ ifeq ("$(wildcard CodeCoverage)","")
 > $(MKDIR) CodeCoverage
 endif
 > $(info CODE_COVERAGE_PARAMETERS: $(CODE_COVERAGE_PARAMETERS))
-> python gcovr.py $(CODE_COVERAGE_PARAMETERS)
-#+> python gcovr.py --verbose --verbose_debug $(CODE_COVERAGE_PARAMETERS)
+> $(PYTHON) gcovr.py $(CODE_COVERAGE_PARAMETERS)
+#+> $(PYTHON) --verbose --verbose_debug gcovr.py $(CODE_COVERAGE_PARAMETERS)
 
 code_coverage_clean:
 > cmake -E remove_directory $(CMAKE_CODE_COVERAGE_BUILD_DIR)

@@ -11,15 +11,13 @@ set(LIBMAST_CORE_INCLUDE_DIRS  "${CMAKE_CURRENT_SOURCE_DIR}/include/"  PARENT_SC
 set(LIBMAST_CORE_INTERNAL_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/internal/" PARENT_SCOPE)
 
 
-message("")
-message("================================================================================")
-message(STATUS "Mast_Core:  USE_OPEN_OCD:               ${USE_OPEN_OCD}")
-message(STATUS "Mast_Core:  USE_LIBFTDISPI:             ${USE_LIBFTDISPI}")
-message("================================================================================")
-message("")
 
 if (WIN32)
   set (CFLAGS "${CFLAGS} -DMAST_CORE_EXPORTS -D__LITTLE_ENDIAN=1 -D__BIG_ENDIAN=2 -D__BYTE_ORDER=1")
+endif()
+
+if (CODE_COVERAGE)
+  set(CMAKE_CXX_FLAGS "--coverage ${CMAKE_CXX_FLAGS}")
 endif()
 
 
@@ -32,5 +30,15 @@ if (WIN32)
 else()
   set(EXTRA_LIBS ${EXTRA_LIBS} pthread)
 endif()
+
+message("")
+message("================================================================================")
+message(STATUS "Mast_Core:  CODE_COVERAGE:              ${CODE_COVERAGE}")
+message(STATUS "Mast_Core:  USE_OPEN_OCD:               ${USE_OPEN_OCD}")
+message(STATUS "Mast_Core:  USE_LIBFTDISPI:             ${USE_LIBFTDISPI}")
+message(STATUS "Mast_Core:  CMAKE_CXX_FLAGS:            ${CMAKE_CXX_FLAGS}")
+message("================================================================================")
+message("")
+
 
 target_link_libraries(Mast_Core Logger ${EXTRA_LIBS})

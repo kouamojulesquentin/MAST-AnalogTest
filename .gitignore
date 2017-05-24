@@ -173,3 +173,5 @@ build
 /openocd/openocd/jimtcl/configure.gnu
 /Optional_Libs_UT/Generated/Runner.cpp
 /UserOptions.cmake
+/cmake_code_coverage
+/CodeCoverage

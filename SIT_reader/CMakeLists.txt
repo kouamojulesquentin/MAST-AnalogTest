@@ -4,17 +4,21 @@ project(SIT_parser)
 find_package(FLEX)
 find_package(BISON)
 if (NOT FLEX_FOUND)
- message( FATAL_ERROR "Flex not found")
+ message(FATAL_ERROR "SIT_parser: Flex not found")
 endif()
 
 if (NOT BISON_FOUND)
- message(FATAL_ERROR "Bison not found")
+ message(FATAL_ERROR "SIT_parser: Bison not found")
 endif()
 
 add_definitions(${P_WARNINGS})
 set (P_WARNINGS "-Wall -Wno-sign-compare -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs")
 add_definitions(${P_CFLAGS})
 set (P_CFLAGS "${P_WARNINGS} -DSIT_READER_EXPORTS -std=c++14")
+
+if (CODE_COVERAGE)
+  set(CMAKE_CXX_FLAGS "--coverage ${CMAKE_CXX_FLAGS} ")
+endif()
 
 add_definitions(${Flex_Switches})
 if (WIN32)
@@ -23,6 +27,13 @@ else()
   set (P_CFLAGS "${P_CFLAGS} -fPIC")
   set (Flex_Switches -v -L)
 endif()
+
+message("")
+message("================================================================================")
+message(STATUS "SIT_parser: CODE_COVERAGE     ${CODE_COVERAGE}")
+message(STATUS "SIT_parser: CMAKE_CXX_FLAGS:  ${CMAKE_CXX_FLAGS}")
+message("================================================================================")
+message("")
 
 set (LEX_YACC_SRC_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/")
 
@@ -63,6 +74,5 @@ endif()
 
 add_library(SIT_Reader_Lib SHARED  ${LEX_YACC_SRC_DIR}SIT_reader.cpp ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc)
 
-set_target_properties(SIT_Reader_Lib  PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
-
+set_target_properties(SIT_Reader_Lib PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 target_link_libraries(SIT_Reader_Lib Mast_Core)

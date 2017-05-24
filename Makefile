@@ -1,10 +1,11 @@
 .RECIPEPREFIX = >
 
 #LOCAL_GCC_PATH = /home/michele/local_gcc-4.9.3/bin/
-CMAKE_RELEASE_BUILD_DIR = cmake_release
-CMAKE_DEBUG_BUILD_DIR   = cmake_debug
-CMAKE_ARM_BUILD_DIR     = cmake_arm
-CMAKE_RISCV32_BUILD_DIR = cmake_riscV32
+CMAKE_RELEASE_BUILD_DIR       = cmake_release
+CMAKE_DEBUG_BUILD_DIR         = cmake_debug
+CMAKE_CODE_COVERAGE_BUILD_DIR = cmake_code_coverage
+CMAKE_ARM_BUILD_DIR           = cmake_arm
+CMAKE_RISCV32_BUILD_DIR       = cmake_riscV32
 
 #+CMAKE_DEBUG_BUILD_MAKEFILE =$(CMAKE_DEBUG_BUILD_DIR)/Makefile
 
@@ -62,8 +63,9 @@ endif
 
 CPP_DEFINES += -DUSE_OPEN_OCD:BOOL=$(USE_OPEN_OCD)
 
-CMAKE_DEBUG_FLAGS   =  -DCMAKE_BUILD_TYPE=Debug   $(CMAKE_FLAGS) $(CPP_DEFINES)
-CMAKE_RELEASE_FLAGS =  -DCMAKE_BUILD_TYPE=Release $(CMAKE_FLAGS) $(CPP_DEFINES)
+CMAKE_DEBUG_FLAGS         =  -DCMAKE_BUILD_TYPE=Debug   $(CMAKE_FLAGS) $(CPP_DEFINES)
+CMAKE_RELEASE_FLAGS       =  -DCMAKE_BUILD_TYPE=Release $(CMAKE_FLAGS) $(CPP_DEFINES)
+CMAKE_CODE_COVERAGE_FLAGS = $(CMAKE_DEBUG_FLAGS) -DCODE_COVERAGE:BOOL=ON
 
 CMAKE_CENTOS_FLAGS =  -DCMAKE_BUILD_TYPE=Debug   $(CMAKE_FLAGS)
 CMAKE_CENTOS_FLAGS += -DCMAKE_CXX_COMPILER="/home/michele/local_gcc-4.9.3/bin/g++"
@@ -89,7 +91,7 @@ pack:    pack_debug
 ifneq ($(LOCAL_GCC_PATH),)
 set_compiler:
 > @echo "STATUS: Makefile found a local GCC/G++"
-CMAKE_COMPILER_FLAGS = -DCMAKE_CXX_COMPILER="$(LOCAL_GCC_PATH)g++"
+CMAKE_COMPILER_FLAGS  = -DCMAKE_CXX_COMPILER="$(LOCAL_GCC_PATH)g++"
 CMAKE_COMPILER_FLAGS += -DCMAKE_C_COMPILER="$(LOCAL_GCC_PATH)gcc"
 CMAKE_COMPILER_FLAGS += -DLOCAL_GCC_PATH="$(LOCAL_GCC_PATH)"
 else
@@ -110,8 +112,8 @@ endif
 external_libs: xmlrpc-c
 
 xmlrpc-c:
-> cd       $(EXTDIR_ROOT_DIR)/$(XMLRPC_ROOT_DIR) && ./configure  --prefix=$(PWD)/$(EXTDIR_ROOT_DIR)/$(EXTDIR_INSTALL_DIR)/$(XMLRPC_ROOT_DIR)
-> cd       $(EXTDIR_ROOT_DIR)/$(XMLRPC_ROOT_DIR) && make && make install
+> cd  $(EXTDIR_ROOT_DIR)/$(XMLRPC_ROOT_DIR) && ./configure  --prefix=$(PWD)/$(EXTDIR_ROOT_DIR)/$(EXTDIR_INSTALL_DIR)/$(XMLRPC_ROOT_DIR)
+> cd  $(EXTDIR_ROOT_DIR)/$(XMLRPC_ROOT_DIR) && make && make install
 
 debug_cmake: set_compiler
 ifeq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR))","")
@@ -130,6 +132,48 @@ endif
 > $(info ==> Makefile: Use Open OCD: $(USE_OPEN_OCD))
 #+> $(info ==> Makefile: Build UT:     $(BUILD_UT))
 > cd $(CMAKE_RELEASE_BUILD_DIR) && make  $(MAKE_FLAGS)
+
+code_coverage_build: set_compiler
+ifeq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR))","")
+> $(MKDIR) $(CMAKE_CODE_COVERAGE_BUILD_DIR)
+> cd       $(CMAKE_CODE_COVERAGE_BUILD_DIR) && cmake $(CMAKE_COMPILER_FLAGS) $(CMAKE_CODE_COVERAGE_FLAGS) ..
+endif
+> cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && make $(MAKE_FLAGS)
+
+code_coverage_run_mast: code_coverage_build
+ifneq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR)/$(BIN_DIR)/$(MAST_UT_EXE_NAME))","")
+> cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && $(RUN)$(MAST_UT_EXE_PATH)
+else
+> $(error     ==== No Lib UT available for Code Coverage ========)
+endif
+
+code_coverage_run_sit_reader: code_coverage_run_mast
+ifneq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR)/$(BIN_DIR)/$(SIT_UT_EXE_NAME))","")
+> cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && $(RUN)$(SIT_UT_EXE_PATH)
+else
+> $(error     ==== No SIT Reader Lib UT available for Code Coverage ========)
+endif
+
+code_coverage_run: code_coverage_run_mast code_coverage_run_sit_reader
+
+CODE_COVERAGE_EXCLUDED      = --gcov-exclude=".*(SIT_reader.UnresolvedPathSelector.hpp).*"
+CODE_COVERAGE_FILTERS       = --gcov-filter=".*(Mast_Core|Mast_API_CPP|Mast_API_C|SIT_reader).*"
+CODE_COVERAGE_OUTPUT        = -o CodeCoverage/CodeCoverage.html
+CODE_COVERAGE_OBJECT_DIR    = --object-directory="$(CMAKE_CODE_COVERAGE_BUILD_DIR)"
+CODE_COVERAGE_OUTPUT_FORMAT = --html --html-details --print-summary --print-tabular
+CODE_COVERAGE_PARAMETERS    = --exclude-unreachable-branches $(CODE_COVERAGE_OUTPUT_FORMAT) $(CODE_COVERAGE_FILTERS) $(CODE_COVERAGE_EXCLUDED) $(CODE_COVERAGE_OUTPUT)
+
+code_coverage_report: code_coverage_run
+ifeq ("$(wildcard CodeCoverage)","")
+> $(MKDIR) CodeCoverage
+endif
+> $(info CODE_COVERAGE_PARAMETERS: $(CODE_COVERAGE_PARAMETERS))
+> python gcovr.py $(CODE_COVERAGE_PARAMETERS)
+#+> python gcovr.py --verbose --verbose_debug $(CODE_COVERAGE_PARAMETERS)
+
+code_coverage_clean:
+> cmake -E remove_directory $(CMAKE_CODE_COVERAGE_BUILD_DIR)
+> cmake -E remove_directory CodeCoverage
 
 
 centos:
@@ -283,7 +327,7 @@ docs:
 > doxygen Doxyfile_CPP_API.cfg
 > doxygen Doxyfile_C_API.cfg
 
-distclean:
+distclean: code_coverage_clean
 > cmake -E remove_directory $(CMAKE_DEBUG_BUILD_DIR)
 > cmake -E remove_directory $(CMAKE_RELEASE_BUILD_DIR)
 > cmake -E remove_directory $(CMAKE_ARM_BUILD_DIR)

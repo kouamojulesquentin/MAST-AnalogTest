@@ -18,6 +18,8 @@ set (WARNINGS "-Wall -Wextra -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -W
 add_definitions(${CFLAGS})
 set (CFLAGS "${WARNINGS} -std=c++14 -g")
 
+set (CFLAGS_CODE_COVERAGE "-fprofile-arcs -ftest-coverage")
+
 if (WIN32)
   set(CFLAGS ${CFLAGS})
   set(DIRECTORY_SEPARATOR "\\\\")
@@ -64,6 +66,7 @@ if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/UserOptions.cmake)
 endif()
 
 message(STATUS "")
+message(STATUS "Master: CODE_COVERAGE:          ${CODE_COVERAGE}")
 message(STATUS "Master: USE_OPEN_OCD:           ${USE_OPEN_OCD}")
 message(STATUS "Master: USE_LIBFTDISPI:         ${USE_LIBFTDISPI}")
 message(STATUS "Master: BUILD_ATE_SERVER:       ${BUILD_ATE_SERVER}")

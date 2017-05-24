@@ -98,3 +98,4 @@
 @if not exist %UT_targetFile%  echo =============== Error: Failed to generate Mast_UT executable =====================
 @if not exist %TCA_targetFile% echo =============== Error: Failed to generate TestCasesApp executable =====================
 @echo.
+@echo =============================== End of Mast Build %target% ===============================

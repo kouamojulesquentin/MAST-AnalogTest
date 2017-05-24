@@ -9,6 +9,9 @@ include_directories(${LIBSIT_READER_INCLUDE_DIRS})
 set(LIBMAST_CPP_API_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include" PARENT_SCOPE)
 
 set (CFLAGS "${CFLAGS} -DCPP_API_EXPORTS")
+if (CODE_COVERAGE)
+  set(CMAKE_CXX_FLAGS "--coverage ${CMAKE_CXX_FLAGS}")
+endif()
 
 file(GLOB Mast_SOURCES_CPP_API "src/*")
 
@@ -17,10 +20,21 @@ set (Mast_SOURCES ${Mast_SOURCES_CPP_API})
 add_library           (Mast_API_CPP SHARED   ${Mast_SOURCES})
 set_target_properties (Mast_API_CPP PROPERTIES COMPILE_FLAGS "${CFLAGS}")
 
+
+
 if (WIN32)
   set(EXTRA_LIBS ${EXTRA_LIBS} DbgHelp)
 else ()
   set(EXTRA_LIBS ${EXTRA_LIBS} pthread dl)
 endif ()
+
+message("")
+message("================================================================================")
+message(STATUS "Mast_API_CPP: CODE_COVERAGE     ${CODE_COVERAGE}")
+message(STATUS "Mast_API_CPP: CFLAGS:           ${CFLAGS}")
+message(STATUS "Mast_API_CPP: EXTRA_LIBS:       ${EXTRA_LIBS}")
+message(STATUS "Mast_API_CPP: CMAKE_CXX_FLAGS:  ${CMAKE_CXX_FLAGS}")
+message("================================================================================")
+message("")
 
 target_link_libraries(Mast_API_CPP Mast_Core SIT_Reader_Lib Logger ${EXTRA_LIBS})

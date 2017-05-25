@@ -2249,7 +2249,7 @@ def GetOptions():
            "the output.",
       action="store",
       dest="root",
-      default=None
+      default="."
   )
   parser.add_option(
       "-x", "--xml",

@@ -864,11 +864,12 @@ def commonpath( files ):
 # Get the list of datafiles in the directories specified by the user
 #
 def get_datafiles(flist):
+
     allfiles = set()
     for dir_ in flist:
         if options.gcov_files:
             if options.verbose:
-                sys.stdout.write("Scanning directory %s for gcov files...\n" % (dir_, ))
+                sys.stdout.write("Scanning from directory %s for gcov files...\n" % (dir_, ))
             files = search_file(".*\.gcov$", dir_)
             gcov_files = [file for file in files if file.endswith('gcov')]
             if options.verbose:
@@ -876,7 +877,7 @@ def get_datafiles(flist):
             allfiles.update(gcov_files)
         else:
             if options.verbose:
-                sys.stdout.write( "Scanning directory '%s' for gcda/gcno files...\n" % (dir_, ) )
+                sys.stdout.write( "Scanning from directory '%s' for gcda/gcno files...\n" % (dir_, ) )
             files = search_file(".*\.gc(da|no)$", dir_)
 
             # gcno files will *only* produce uncovered results; however,
@@ -1174,7 +1175,8 @@ def process_datafile(filename, covdata):
     Done = False
 
     if options.objdir:
-        print ("  options.objdir: ", options.objdir)
+        if options.verbose_debug:
+            print ("  options.objdir: ", options.objdir)
         #print "X - objdir"
         src_components = abs_filename.split(os.sep)
         components = normpath(options.objdir).split(os.sep)
@@ -1429,7 +1431,7 @@ def print_text_report(covdata):
     _printHeaderSeparator()
     OUTPUT.write("\n")
     _printCentered("GCC Code Coverage Report\n")
-    if options.root is not None:
+    if options.root and options.root != ".":
         OUTPUT.write("Directory: %s\n" % options.root)
 
     _printHeaderSeparator()
@@ -1488,12 +1490,14 @@ def print_summary(covdata):
     percent_branches = branches_total and \
         (100.0 * branches_covered / branches_total)
 
-    lines_out    = "lines:".ljust(10)    + "%0.1f%% (%s out of %s)\n" % (percent,          lines_covered,    lines_total)
-    branches_out = "branches:".ljust(10) + "%0.1f%% (%s out of %s)\n" % (percent_branches, branches_covered, branches_total)
+    lines_out    = "lines:".ljust(10)    + "%0.1f%% (%s out of %s)" % (percent,          lines_covered,    lines_total)
+    branches_out = "branches:".ljust(10) + "%0.1f%% (%s out of %s)" % (percent_branches, branches_covered, branches_total)
 
-    sys.stdout.write(lines_out)
-    sys.stdout.write(branches_out)
-
+    print("\nSummary:")
+    print("=======")
+    print(lines_out)
+    print(branches_out)
+    print("")
 
 
 def calculate_coverage(covered, total):
@@ -1724,7 +1728,7 @@ def print_html_report(covdata, details):
         filename             = os.path.relpath(os.path.realpath(cdata._filename), data['DIRECTORY'])
         filenameAbsolutePath = os.path.realpath(cdata._filename)
         filenameFromRoot     = os.path.relpath(filenameAbsolutePath, root_dir)
-        outputFileBaseName   = filenameFromRoot.replace("\\", ".") + ".html"
+        outputFileBaseName   = filenameFromRoot.replace(os.sep, ".") + ".html"
         outputFilePath       = outputDir + os.sep + outputFileBaseName
 
         if options.verbose_debug:
@@ -1747,7 +1751,7 @@ def print_html_report(covdata, details):
                        BranchesCoverage   = branches_covered
         )
 
-#+        if options.verbose:
+#+        if options.verbose_debug:
 #+            print ("row:   ", row)
 
         data['ROWS'].append(row)
@@ -2354,7 +2358,7 @@ def GetOptions():
   parser.usage       = "gcovr [options]"
   parser.description = "An utility to run gcov and generate a simple report that summarizes the coverage"
 
-  return parser.parse_args(args=sys.argv)
+  return parser.parse_args(args = sys.argv)
 #
 #  End of function 'BuildParser'
 #---------------------------------------------------------------------------
@@ -2460,18 +2464,18 @@ def main():
   # Get data files
   #
   print("Collecting data files...")
+  if options.verbose_debug:
+      print ("len(args): ", len(args))
   if len(args) == 1:
-      if options.root is None:
-          search_paths = ["."]
-      else:
+      if options.objdir:
+          search_paths = [options.objdir]
+      elif options.root:
           search_paths = [options.root]
-
-      if options.objdir is not None:
-          search_paths.append(options.objdir)
+      else:
+          search_paths = ["."]
 
       if options.verbose:
           print ("search_paths:         ", search_paths)
-
 
       datafiles = get_datafiles(search_paths)
   else:
@@ -2490,7 +2494,7 @@ def main():
       else:
           process_datafile(file_, covdata)
 
-  print("Gathered coveraged data for %d files" % len(covdata))
+  print("\nGathered coveraged data for %d files" % len(covdata))
 
   #
   # Print report

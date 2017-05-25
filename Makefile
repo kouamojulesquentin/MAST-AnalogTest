@@ -161,9 +161,11 @@ code_coverage_run: code_coverage_run_mast code_coverage_run_sit_reader
 CODE_COVERAGE_EXCLUDED      = --gcov-exclude=".*(SIT_reader.UnresolvedPathSelector.hpp).*"
 CODE_COVERAGE_FILTERS       = --gcov-filter=".*(Mast_Core|Mast_API_CPP|Mast_API_C|SIT_reader).*"
 CODE_COVERAGE_OUTPUT        = -o CodeCoverage/CodeCoverage.html
+#+CODE_COVERAGE_SOURCE_DIR    = --root=$(PWD)
+CODE_COVERAGE_SOURCE_DIR    = --root=.
 CODE_COVERAGE_OBJECT_DIR    = --object-directory="$(CMAKE_CODE_COVERAGE_BUILD_DIR)"
 CODE_COVERAGE_OUTPUT_FORMAT = --html --html-details --print-summary --print-tabular
-CODE_COVERAGE_PARAMETERS    = --exclude-unreachable-branches $(CODE_COVERAGE_OUTPUT_FORMAT) $(CODE_COVERAGE_FILTERS) $(CODE_COVERAGE_EXCLUDED) $(CODE_COVERAGE_OUTPUT)
+CODE_COVERAGE_PARAMETERS    = --exclude-unreachable-branches $(CODE_COVERAGE_OUTPUT_FORMAT) $(CODE_COVERAGE_FILTERS) $(CODE_COVERAGE_EXCLUDED) $(CODE_COVERAGE_OUTPUT) $(CODE_COVERAGE_OBJECT_DIR) $(CODE_COVERAGE_SOURCE_DIR)
 
 code_coverage_report: code_coverage_run
 ifeq ("$(wildcard CodeCoverage)","")
@@ -171,7 +173,7 @@ ifeq ("$(wildcard CodeCoverage)","")
 endif
 > $(info CODE_COVERAGE_PARAMETERS: $(CODE_COVERAGE_PARAMETERS))
 > $(PYTHON) gcovr.py $(CODE_COVERAGE_PARAMETERS)
-#+> $(PYTHON) --verbose --verbose_debug gcovr.py $(CODE_COVERAGE_PARAMETERS)
+#+> $(PYTHON) gcovr.py --verbose --verbose_debug $(CODE_COVERAGE_PARAMETERS)
 
 code_coverage_clean:
 > cmake -E remove_directory $(CMAKE_CODE_COVERAGE_BUILD_DIR)

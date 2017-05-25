@@ -142,21 +142,15 @@ ifeq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR))","")
 endif
 > cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && make $(MAKE_FLAGS)
 
-code_coverage_run_mast: code_coverage_build
-ifneq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR)/$(BIN_DIR)/$(MAST_UT_EXE_NAME))","")
-> cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && $(RUN)$(MAST_UT_EXE_PATH)
-else
+code_coverage_run: code_coverage_build
+ifeq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR)/$(BIN_DIR)/$(MAST_UT_EXE_NAME))","")
 > $(error     ==== No Lib UT available for Code Coverage ========)
 endif
-
-code_coverage_run_sit_reader: code_coverage_run_mast
-ifneq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR)/$(BIN_DIR)/$(SIT_UT_EXE_NAME))","")
-> cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && $(RUN)$(SIT_UT_EXE_PATH)
-else
+ifeq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR)/$(BIN_DIR)/$(SIT_UT_EXE_NAME))","")
 > $(error     ==== No SIT Reader Lib UT available for Code Coverage ========)
 endif
-
-code_coverage_run: code_coverage_run_mast code_coverage_run_sit_reader
+> cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && $(RUN)$(MAST_UT_EXE_PATH)
+> cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && $(RUN)$(SIT_UT_EXE_PATH)
 
 CODE_COVERAGE_EXCLUDED      = --gcov-exclude=".*(SIT_reader.UnresolvedPathSelector.hpp).*"
 CODE_COVERAGE_FILTERS       = --gcov-filter=".*(Mast_Core|Mast_API_CPP|Mast_API_C|SIT_reader).*"

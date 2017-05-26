@@ -85,6 +85,16 @@ MAKE_FLAGS= -j4
 
 OPENOCD_INSTALL_DIR=./External_Libs/OpenOCD/
 
+ifeq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR))","")
+  DO_DEBUG_INSTALL = TRUE
+else
+  DO_DEBUG_INSTALL = FALSE
+endif  
+ifeq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR))","")
+  DO_RELEASE_INSTALL = TRUE
+else
+  DO_RELEASE_INSTALL = FALSE
+endif  
 
 all:     debug
 install: install_debug
@@ -117,6 +127,7 @@ xmlrpc-c:
 > cd  $(EXTDIR_ROOT_DIR)/$(XMLRPC_ROOT_DIR) && ./configure  --prefix=$(PWD)/$(EXTDIR_ROOT_DIR)/$(EXTDIR_INSTALL_DIR)/$(XMLRPC_ROOT_DIR)
 > cd  $(EXTDIR_ROOT_DIR)/$(XMLRPC_ROOT_DIR) && make && make install
 
+
 debug_cmake: set_compiler
 ifeq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR))","")
 > $(MKDIR) $(CMAKE_DEBUG_BUILD_DIR)
@@ -125,6 +136,9 @@ endif
 > $(info ==> Makefile: Use Open OCD: $(USE_OPEN_OCD))
 #+> $(info ==> Makefile: Build UT:     $(BUILD_UT))
 > cd $(CMAKE_DEBUG_BUILD_DIR) && make $(MAKE_FLAGS)
+ifeq ($(DO_DEBUG_INSTALL),TRUE)
+> cd $(CMAKE_DEBUG_BUILD_DIR)   && make install
+endif
 
 release_cmake: set_compiler
 ifeq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR))","")
@@ -134,6 +148,9 @@ endif
 > $(info ==> Makefile: Use Open OCD: $(USE_OPEN_OCD))
 #+> $(info ==> Makefile: Build UT:     $(BUILD_UT))
 > cd $(CMAKE_RELEASE_BUILD_DIR) && make  $(MAKE_FLAGS)
+ifeq ($(DO_RELEASE_INSTALL),TRUE)
+> cd $(CMAKE_RELEASE_BUILD_DIR)   && make install
+endif
 
 code_coverage_build: set_compiler
 ifeq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR))","")

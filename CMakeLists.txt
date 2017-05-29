@@ -16,9 +16,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/External_Libs/CMake ${CMAKE_MO
 add_definitions(${WARNINGS})
 set (WARNINGS "-Wall -Wextra -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default")
 add_definitions(${CFLAGS})
-set (CFLAGS "${WARNINGS} -std=c++14 -g")
 
+set (CFLAGS               "${WARNINGS} -std=c++14 -g")
 set (CFLAGS_CODE_COVERAGE "-fprofile-arcs -ftest-coverage")
+set (CMAKE_CXX_FLAGS      "-std=c++14 -DHAS_EXPERIMENTAL_STRING_VIEW")
 
 if (WIN32)
   set(CFLAGS ${CFLAGS})
@@ -98,6 +99,7 @@ message("=======================================================================
 message("")
 
 add_subdirectory(External_Libs)
+add_subdirectory(External_Libs_UT)
 add_subdirectory(Logger)
 add_subdirectory(Mast_Core)
 add_subdirectory(SIT_reader)

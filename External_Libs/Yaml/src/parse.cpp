@@ -16,7 +16,7 @@ Node Load(const std::string& input) {
   return Load(stream);
 }
 
-#if (HAS_EXPERIMENTAL_STRING_VIEW)
+#if defined(HAS_EXPERIMENTAL_STRING_VIEW)
 Node Load(std::experimental::string_view input)
 {
   std::stringstream stream(input.data());

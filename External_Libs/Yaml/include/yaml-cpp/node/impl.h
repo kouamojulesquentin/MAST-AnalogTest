@@ -13,7 +13,7 @@
 #include "yaml-cpp/node/detail/node.h"
 #include "yaml-cpp/exceptions.h"
 #include <string>
-#if (HAS_EXPERIMENTAL_STRING_VIEW)
+#if defined(HAS_EXPERIMENTAL_STRING_VIEW)
 #include <experimental/string_view>
 #endif
 
@@ -106,7 +106,7 @@ struct as_if<std::string, S> {
   explicit as_if(const Node& node_) : node(node_) {}
   const Node& node;
 
-  const std::string operator()(const S& fallback) const {
+  std::string operator()(const S& fallback) const {
     if (node.Type() != NodeType::Scalar)
       return fallback;
     return node.Scalar();
@@ -118,7 +118,7 @@ struct as_if<T, void> {
   explicit as_if(const Node& node_) : node(node_) {}
   const Node& node;
 
-  const T operator()() const {
+  T operator()() const {
     if (!node.m_pNode)
       throw TypedBadConversion<T>(node.Mark());
 
@@ -134,7 +134,7 @@ struct as_if<std::string, void> {
   explicit as_if(const Node& node_) : node(node_) {}
   const Node& node;
 
-  const std::string operator()() const {
+  std::string operator()() const {
     if (node.Type() != NodeType::Scalar)
       throw TypedBadConversion<std::string>(node.Mark());
     return node.Scalar();
@@ -397,7 +397,7 @@ struct to_value_t<char[N]> {
   const std::string operator()() const { return t; }
 };
 
-#if (HAS_EXPERIMENTAL_STRING_VIEW)
+#if defined(HAS_EXPERIMENTAL_STRING_VIEW)
 template <>
 struct to_value_t<std::experimental::string_view>
 {

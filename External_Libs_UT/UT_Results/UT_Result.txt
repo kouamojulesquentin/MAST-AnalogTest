@@ -1,0 +1,5 @@
+Running External_Lib tests (31 tests)
+
+................................................................
+
+OK! (64 tests including 45 'sub' tests from 12 data driven tests)

@@ -119,6 +119,8 @@ include_directories(${YAML_CPP_SOURCE_DIR}/src)
 include_directories(${YAML_CPP_SOURCE_DIR}/include)
 
 
+set(LIBYAML_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include PARENT_SCOPE)
+set(YAML_LIBRARIES       "yaml-cpp"                          PARENT_SCOPE)
 
 ###
 ### General compilation settings

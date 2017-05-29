@@ -113,6 +113,8 @@ inline node& node_data::get(const Key& key, shared_memory_holder pMemory) {
       break;
     case NodeType::Scalar:
       throw BadSubscript();
+    default: // Should not fall there !
+    throw InvalidNode();
   }
 
   for (node_map::const_iterator it = m_map.begin(); it != m_map.end(); ++it) {
@@ -156,6 +158,8 @@ inline void node_data::force_insert(const Key& key, const Value& value,
       break;
     case NodeType::Scalar:
       throw BadInsert();
+    default: // Should not fall there !
+      throw InvalidNode();
   }
 
   node& k = convert_to_node(key, pMemory);

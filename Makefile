@@ -25,12 +25,14 @@ RUN    =
 BIN_DIR              = Bin
 MAST_UT_EXE_NAME     = Mast_UT.exe
 CPP_EXAMPLE_EXE_NAME = MastExample_CPP.exe
+EXTERNAL_UT_EXE_NAME = Externals_UT.exe
 OPTIONAL_UT_EXE_NAME = Optionals_UT.exe
 SIT_UT_EXE_NAME      = SIT_Reader_UT.exe
 TESTCASES_EXE_NAME   = TestCasesApp.exe
 
 MAST_UT_EXE_PATH      = $(BIN_DIR)\$(MAST_UT_EXE_NAME)
 OPTIONAL_UT_EXE_PATH  = $(BIN_DIR)\$(OPTIONAL_UT_EXE_NAME)
+EXTERNAL_UT_EXE_PATH  = $(BIN_DIR)\$(EXTERNAL_UT_EXE_NAME)
 SIT_UT_EXE_PATH       = $(BIN_DIR)\$(SIT_UT_EXE_NAME)
 TESTCASES_EXE_PATH    = $(BIN_DIR)\$(TESTCASES_EXE_NAME)
 CPP_EXAMPLE_EXE_PATH  = $(BIN_DIR)\$(CPP_EXAMPLE_EXE_NAME)
@@ -89,12 +91,12 @@ ifeq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR))","")
   DO_DEBUG_INSTALL = TRUE
 else
   DO_DEBUG_INSTALL = FALSE
-endif  
+endif
 ifeq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR))","")
   DO_RELEASE_INSTALL = TRUE
 else
   DO_RELEASE_INSTALL = FALSE
-endif  
+endif
 
 all:     debug
 install: install_debug
@@ -232,6 +234,21 @@ ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(MAST_UT_EXE_NAME))","
 else
 >  @echo "    ==== No Release Lib UT available ========"
 endif
+
+run_external_debug:
+ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(EXTERNAL_UT_EXE_NAME))","")
+>  cd $(CMAKE_DEBUG_BUILD_DIR) && $(RUN)$(EXTERNAL_UT_EXE_PATH)
+else
+>  @echo "    ==== No Debug Externals Libs UT available ========"
+endif
+
+run_external_release:
+ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(EXTERNAL_UT_EXE_NAME))","")
+>  cd $(CMAKE_RELEASE_BUILD_DIR) && $(RUN)$(EXTERNAL_UT_EXE_PATH)
+else
+>  @echo "    ==== No Release Optionals Libs UT available ========"
+endif
+
 
 run_optionals_debug:
 ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(OPTIONAL_UT_EXE_NAME))","")

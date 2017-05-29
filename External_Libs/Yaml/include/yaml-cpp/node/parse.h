@@ -10,7 +10,7 @@
 #include <iosfwd>
 #include <string>
 #include <vector>
-#if (HAS_EXPERIMENTAL_STRING_VIEW)
+#if defined(HAS_EXPERIMENTAL_STRING_VIEW)
 #include <experimental/string_view>
 #endif
 
@@ -26,7 +26,7 @@ class Node;
  */
 YAML_CPP_API Node Load(const std::string& input);
 
-#if (HAS_EXPERIMENTAL_STRING_VIEW)
+#if defined(HAS_EXPERIMENTAL_STRING_VIEW)
 //! Loads the input string as a single YAML document.
 //!
 //! @throws {@link ParserException} if it is malformed.

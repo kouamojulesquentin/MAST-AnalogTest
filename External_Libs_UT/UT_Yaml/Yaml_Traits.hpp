@@ -11,7 +11,7 @@
 #ifndef YAML_TRAITS_H__D0FFA8D8_7F7_4097_F493_486497D50E8__INCLUDED_
   #define YAML_TRAITS_H__D0FFA8D8_7F7_4097_F493_486497D50E8__INCLUDED_
 
-#include "yaml-cpp\node\type.h"
+#include "yaml-cpp/node/type.h"
 #include <cxxtest/ValueTraits.h>
 
 //! Enables CxxTest to display enums using their names (instead of their integer values)

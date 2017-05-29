@@ -175,3 +175,4 @@ build
 /UserOptions.cmake
 /cmake_code_coverage
 /CodeCoverage
+/External_Libs_UT/Generated

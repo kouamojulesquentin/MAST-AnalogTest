@@ -2,6 +2,24 @@ cmake_minimum_required(VERSION 2.6)
 project(External_Libs)
 include(ExternalProject)
 
+# ---------------- YAML
+#
+set(YAML_CPP_BUILD_TOOLS   OFF CACHE  BOOL "Enable testing and parse tools"  FORCE)
+set(YAML_CPP_BUILD_CONTRIB OFF CACHE  BOOL "Enable contrib stuff in library" FORCE)
+set(BUILD_SHARED_LIBS      ON  CACHE  BOOL "Build Shared Libraries"          FORCE)
+
+add_subdirectory(Yaml)
+set(LIBYAML_INCLUDE_DIRS "Yaml/include")
+set(YAML_LIBRARIES       "yaml-cpp")
+set(LIBYAML_INCLUDE_DIRS ${LIBYAML_INCLUDE_DIRS}  PARENT_SCOPE)
+set(YAML_LIBRARIES       ${YAML_LIBRARIES}        PARENT_SCOPE)
+message("")
+message("================================================================================")
+message(STATUS "External_Libs: YAML_LIBRARIES:           ${YAML_LIBRARIES}")
+message(STATUS "External_Libs: LIBYAML_INCLUDE_DIRS:     ${LIBYAML_INCLUDE_DIRS}")
+message("================================================================================")
+message("")
+
 if (NOT XmlRpcInstall)
   message(STATUS "External_Libs: Setting XmlRpcInstall")
   set(XmlRpcInstall ${CMAKE_CURRENT_SOURCE_DIR}/xmlrpc-c)

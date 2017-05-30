@@ -1,6 +1,7 @@
 TEMPLATE = app
 
 DEFINES += CXXTEST_HAVE_EH CXXTEST_HAVE_STD CXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION
+DEFINES += HAS_EXPERIMENTAL_STRING_VIEW
 CONFIG += console c++14
 CONFIG -= app_bundle
 CONFIG -= qt
@@ -13,21 +14,23 @@ QMAKE_CXXFLAGS += -fmax-errors=3
     error("Generated/Runner.cpp has not been generated")
 }
 
-INCLUDEPATH += $$PWD/../Mast_Core/include    \
-               $$PWD/../Mast_Core/internal   \
-               $$PWD/../Mast_API_CPP/include \
-               $$PWD/../Mast_API_C/include   \
-               $$PWD/../Logger               \
-               $$PWD/../cxxtest              \
-               CxxTest_Traits                \
+INCLUDEPATH += $$PWD/../Mast_Core/include          \
+               $$PWD/../Mast_Core/internal         \
+               $$PWD/../Mast_API_CPP/include       \
+               $$PWD/../Mast_API_C/include         \
+               $$PWD/../Logger                     \
+               $$PWD/../cxxtest                    \
+               $$PWD/../External_Libs/Yaml/include \
+               CxxTest_Traits                      \
                UT_Helpers
 
-DEPENDPATH += $$PWD/../Mast_Core/include    \
-              $$PWD/../Mast_Core/internal   \
-              $$PWD/../Mast_API_CPP/include \
-              $$PWD/../Mast_API_C/include   \
-              $$PWD/../cxxtest              \
-              CxxTest_Traits                \
+DEPENDPATH += $$PWD/../Mast_Core/include          \
+              $$PWD/../Mast_Core/internal         \
+              $$PWD/../Mast_API_CPP/include       \
+              $$PWD/../Mast_API_C/include         \
+              $$PWD/../External_Libs/Yaml/include \
+              $$PWD/../cxxtest                    \
+              CxxTest_Traits                      \
               UT_Helpers
 
 
@@ -72,7 +75,8 @@ SOURCES += \
     UT_Helpers/UT_TestModelBuilder.cpp                  \
     Utility/UT_BinaryVector.cpp                         \
     Utility/UT_SVFVector.cpp                            \
-    Utility/UT_Utility.cpp
+    Utility/UT_Utility.cpp                              \
+    Yaml/UT_YamlFile.cpp
 
 
 HEADERS += \
@@ -122,7 +126,8 @@ HEADERS += \
     UT_Helpers/UT_TestModelBuilder.hpp                \
     Utility/UT_BinaryVector.hpp                       \
     Utility/UT_SVFVector.hpp                          \
-    Utility/UT_Utility.hpp
+    Utility/UT_Utility.hpp                            \
+    Yaml/UT_YamlFile.hpp
 
 
 CONFIG(debug,   debug|release) {

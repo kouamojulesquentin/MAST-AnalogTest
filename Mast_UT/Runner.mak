@@ -48,7 +48,8 @@ Suites = \
       $(UT_RootPath)/SystemModel/UT_PathSelectorFactory.hpp              \
       $(UT_RootPath)/SystemModel/UT_SystemModelManager.hpp               \
       $(UT_RootPath)/API_CPP/UT_PDL_Adapter_CPP.hpp                      \
-      $(UT_RootPath)/API_C/UT_PDL_Adapter_C.hpp
+      $(UT_RootPath)/API_C/UT_PDL_Adapter_C.hpp                          \
+      $(UT_RootPath)/Yaml/UT_YamlFile.hpp
 
 ProjectFile  = $(RootPath)/Mast_UT.pro
 

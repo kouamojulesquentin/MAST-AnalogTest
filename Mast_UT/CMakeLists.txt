@@ -23,12 +23,14 @@ add_custom_command (OUTPUT 		${UT_RootPath}/Generated/Runner.cpp
 include_directories(${CXXTEST_INCLUDE_DIR})
 include_directories(${UT_RootPath}/CxxTest_Traits)
 include_directories(${UT_RootPath}/UT_Helpers/)
+include_directories(${UT_RootPath}/Yaml/)
 include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
 include_directories(${LIBMAST_CORE_INTERNAL_DIRS})
 include_directories(${LIBMAST_CPP_API_INCLUDE_DIRS})
 include_directories(${LIBMAST_C_API_INCLUDE_DIRS})
 include_directories(${LIBLOGGER_INCLUDE_DIRS})
 include_directories(${LIBSIT_READER_INCLUDE_DIRS})
+include_directories(${LIBYAML_INCLUDE_DIRS})
 
 
 #add_compile_options(${UT_CFLAGS})
@@ -37,10 +39,17 @@ file(GLOB Mast_UT_C_API        "API_C/*")
 file(GLOB Mast_UT_CPP_API      "API_CPP/*")
 file(GLOB Mast_UT_UTILITY      "Utility/*")
 file(GLOB Mast_UT_SYSTEM_MODEL "SystemModel/*")
+file(GLOB Mast_UT_YAML         "Yaml/*")
 file(GLOB Mast_UT_HELPERS      "UT_Helpers/*")
 set(Mast_UT_GENERATED 				 "Generated/Runner.cpp")
 
-set (Mast_UT_SOURCES ${Mast_UT_C_API} ${Mast_UT_CPP_API} ${Mast_UT_UTILITY} ${Mast_UT_SYSTEM_MODEL} ${Mast_UT_HELPERS} ${Mast_UT_GENERATED})
+set (Mast_UT_SOURCES ${Mast_UT_C_API}
+                     ${Mast_UT_CPP_API}
+                     ${Mast_UT_UTILITY}
+                     ${Mast_UT_SYSTEM_MODEL}
+                     ${Mast_UT_YAML}
+                     ${Mast_UT_HELPERS}
+                     ${Mast_UT_GENERATED})
 
 set_source_files_properties(${Mast_UT_GENERATED} GENERATED)
 

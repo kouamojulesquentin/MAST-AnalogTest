@@ -13,13 +13,15 @@ CONFIG  += c++14
 QMAKE_CXXFLAGS += -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default
 QMAKE_CXXFLAGS += -fmax-errors=3
 
-INCLUDEPATH += include  \
-               internal \
-               $$PWD/../Logger
+INCLUDEPATH += include         \
+               internal        \
+               $$PWD/../Logger \
+               $$PWD/../External_Libs/Yaml/include
 
-DEPENDPATH += include  \
-              internal \
-              $$PWD/../Logger
+DEPENDPATH += include         \
+              internal        \
+              $$PWD/../Logger \
+              $$PWD/../External_Libs/Yaml/include
 
 
 SOURCES +=  \
@@ -76,7 +78,9 @@ SOURCES +=  \
     src/SystemModelReseter.cpp                      \
     src/SystemModelVisitor.cpp                      \
     src/ToSutVisitor.cpp                            \
-    src/Utility.cpp
+    src/Utility.cpp                                 \
+    src/YamlFile.cpp                                \
+    src/YamlNodesCache.cpp
 
 HEADERS += \
     include/AccessInterface.hpp                         \
@@ -135,13 +139,15 @@ HEADERS += \
     include/SystemModelNodes.hpp                        \
     include/SystemModelVisitor.hpp                      \
     include/Utility.hpp                                 \
+    include/YamlFile.hpp                                \
     internal/PropagatePendingVisitor.hpp                \
     internal/SystemModelReseter.hpp                     \
     internal/FromSutUpdater.hpp                         \
     internal/ToSutVisitor.hpp                           \
     internal/MismatchesCollector.hpp                    \
     internal/NamesChecker.hpp                           \
-    internal/SystemModelManager_impl.hpp
+    internal/SystemModelManager_impl.hpp                \
+    internal/YamlNodesCache.hpp
 
 unix {
     target.path = /usr/lib
@@ -157,14 +163,16 @@ win32 {
   DEFINES += __BYTE_ORDER=1
 }
 
+DEFINES += HAS_EXPERIMENTAL_STRING_VIEW
+
 
 CONFIG(debug,   debug|release) {
   OBJECTS_DIR =   $$clean_path($$PWD/../Build_Qt/Mast_Core/debug)
   DESTDIR     =   $$clean_path($$PWD/../Build_Qt/Bin/debug)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/debug) -lLogger
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/debug) -lLogger -lyaml-cpp
 }
 else: CONFIG(release, debug|release) {
   OBJECTS_DIR =   $$clean_path($$PWD/../Build_Qt/Mast_Core/release)
   DESTDIR     =   $$clean_path($$PWD/../Build_Qt/Bin/release)
-  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/release) -lLogger
+  LIBS       += -L$$clean_path($$PWD/../Build_Qt/Bin/release) -lLogger -lyaml-cpp
 }

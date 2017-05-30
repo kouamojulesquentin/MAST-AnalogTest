@@ -82,6 +82,18 @@ class MAST_CORE_EXPORT Utility final
   //!
   static std::vector<std::experimental::string_view> Split(std::experimental::string_view text, std::experimental::string_view separator);
 
+  //! Returns last token from a string_view
+  //!
+  static std::experimental::string_view BackToken(std::experimental::string_view text, std::experimental::string_view separator);
+
+  //! Returns all tokens from a string_view except last one
+  //!
+  static std::experimental::string_view FrontTokens(std::experimental::string_view text, std::experimental::string_view separator);
+
+  //! Counts the number of tokens in a string_view
+  //!
+  static size_t TokensCount (std::experimental::string_view text, std::experimental::string_view separator);
+
 
   //! Formats message for (std) exception
   //!

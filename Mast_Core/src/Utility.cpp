@@ -26,6 +26,40 @@ using std::ifstream;
 
 using namespace mast;
 
+//! Returns last token from a string_view
+//!
+//! @note No trimming is done
+//!
+//! @param text       Text for which last token is requested
+//! @param separator  Token separator (may be several character width)
+//!
+//! @return Last token or given text when there is no separator in text
+string_view Utility::BackToken (string_view text, string_view separator)
+{
+  if (text.empty() || separator.empty())
+  {
+    return text;
+  }
+
+  string_view token;
+  auto        foundPos = text.rfind(separator);
+
+  if (foundPos == std::string::npos)
+  {
+    token = text;
+  }
+  else
+  {
+    foundPos += separator.length();
+    token    =  text.substr(foundPos);
+  }
+
+  return token;
+}
+//
+//  End of: Utility::BackToken
+//---------------------------------------------------------------------------
+
 
 //! Returns whether some text ends with some sub-string
 //!
@@ -70,6 +104,41 @@ bool Utility::FileExists (string_view filePath)
 }
 //
 //  End of: Utility::FileExists
+//---------------------------------------------------------------------------
+
+
+
+//! Returns all tokens from a string_view except last one
+//!
+//! @note No trimming is done
+//!
+//! @param text       Text for which last token is "discarded"
+//! @param separator  Token separator (may be several character width)
+//!
+//! @return First tokens without the last one or given text
+string_view Utility::FrontTokens (string_view text, string_view separator)
+{
+  if (text.empty())
+  {
+    return text;
+  }
+
+  auto count  = text.length();
+
+  if (!separator.empty())
+  {
+    auto endPos = text.rfind(separator);
+    if (endPos != string_view::npos)
+    {
+      count = endPos;  // Count ignore (discard) the separator
+    }
+  }
+
+  auto tokens = text.substr(0, count);
+  return tokens;
+}
+//
+//  End of: Utility::FrontTokens
 //---------------------------------------------------------------------------
 
 
@@ -188,7 +257,7 @@ string Utility::SingleQuote (string_view text)
 //!
 //! @note No trimming is done
 //!
-//! @param text         Text to spli
+//! @param text         Text to split
 //! @param separator    Chunk separator (may be several character width)
 //!
 //! @return A list of string_view (tokens) without the separators
@@ -256,6 +325,43 @@ bool Utility::StartsWith (string_view text, string_view substring)
 //  Start of: Utility::StartsWith
 //---------------------------------------------------------------------------
 
+
+
+//! Counts the number of tokens in a string_view
+//!
+//! @param text       Text for which to count tokens
+//! @param separator  Token separator (may be several character width)
+//!
+//! @return Tokens count
+size_t Utility::TokensCount (string_view text, string_view separator)
+{
+  if (text.empty())
+  {
+    return 0;
+  }
+
+  size_t count = 1u;  // There is at least one token if there is no separators
+  auto   separatorLength = separator.length();
+  if (separatorLength != 0)
+  {
+    string_view::size_type pos = 0;
+    do
+    {
+      pos = text.find(separator, pos);
+      if (pos == string_view::npos)
+      {
+        break;
+      }
+
+      pos += separatorLength;
+      ++count;
+    } while (true);
+  }
+  return count;
+}
+//
+//  End of: Utility::TokensCount
+//---------------------------------------------------------------------------
 
 
 //! Trims leading space characters (including \\t)

@@ -29,6 +29,11 @@
 %make_exe% -j4 -C %Build_Qt%\Logger -f Makefile    %target%
 
 @echo.
+@echo ===================== Building Yaml Lib =====================
+@echo.
+%make_exe% -j4 -C %Build_Qt%\External_Libs\Yaml -f Makefile    %target%
+
+@echo.
 @echo ===================== Building Mast_Core =====================
 @echo.
 %make_exe% -j4 -C %Build_Qt%\Mast_Core -f Makefile    %target%
@@ -70,10 +75,6 @@
 @echo.
 %make_exe% -j4 -C %Build_Qt%\SIT_reader_UT -f Makefile %target%
 
-@echo.
-@echo ===================== Building External_Libs =====================
-@echo.
-%make_exe% -j4 -C %Build_Qt%\External_Libs -f Makefile %target%
 
 @echo.
 @echo ===================== Building Optional_Libs =====================

@@ -3,6 +3,7 @@ project(Mast_Core)
 include_directories(include/)
 include_directories(internal/)
 include_directories(${LIBLOGGER_INCLUDE_DIRS})
+include_directories(${LIBYAML_INCLUDE_DIRS})
 
 set(LIBUSB_CFLAGS              "")
 set(HIDAPI_CFLAGS              "")
@@ -41,4 +42,4 @@ message("=======================================================================
 message("")
 
 
-target_link_libraries(Mast_Core Logger ${EXTRA_LIBS})
+target_link_libraries(Mast_Core Logger ${YAML_LIBRARIES} ${EXTRA_LIBS})

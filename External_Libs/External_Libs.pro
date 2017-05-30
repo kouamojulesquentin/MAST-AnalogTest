@@ -2,8 +2,10 @@ TEMPLATE = subdirs
 CONFIG  += ordered
 CONFIG  -= qml_debug
 
+SUBDIRS += Yaml
+
 unix {
-  SUBDIRS += \
+  SUBDIRS +=    \
       FTDI_SPI
 }
 

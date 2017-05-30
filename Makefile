@@ -87,12 +87,14 @@ MAKE_FLAGS= -j4
 
 OPENOCD_INSTALL_DIR=./External_Libs/OpenOCD/
 
-ifeq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR))","")
+# ----------------- Detect when install must be done
+#
+ifeq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/SIT)","")
   DO_DEBUG_INSTALL = TRUE
 else
   DO_DEBUG_INSTALL = FALSE
 endif
-ifeq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR))","")
+ifeq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/SIT)","")
   DO_RELEASE_INSTALL = TRUE
 else
   DO_RELEASE_INSTALL = FALSE

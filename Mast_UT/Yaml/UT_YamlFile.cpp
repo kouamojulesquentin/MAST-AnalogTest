@@ -1447,7 +1447,7 @@ void UT_YamlFile::test_GetAsString_Sequence_NoDefault_NotExist ()
   };
 
   using data_t = tuple<string_view, int>;
-  auto data
+  auto data =
   {
     data_t{"Path1",                3}, // 0
     data_t{"Path2",                0}, // 1
@@ -1761,7 +1761,7 @@ void UT_YamlFile::test_GetAsInt_Sequence_NoDefault_NotExist ()
   };
 
   using data_t = tuple<string_view, int>;
-  auto data
+  auto data =
   {
     data_t{"Path1",                3}, // 0
     data_t{"Path2",                0}, // 1
@@ -2066,7 +2066,7 @@ void UT_YamlFile::test_GetAsBool_Sequence_NoDefault_NotExist ()
   };
 
   using data_t = tuple<string_view, int>;
-  auto data
+  auto data =
   {
     data_t{"Path1",                3}, // 0
     data_t{"Path2",                0}, // 1

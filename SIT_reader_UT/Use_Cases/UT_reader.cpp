@@ -1022,7 +1022,7 @@ void UT_reader::test_JTAG_TAP_Failure ()
                "{"
                "  REGISTER test_reg 4 Bypass: \"0b1100\""
                "}\n",
-               "Line 1:31-32: JTAG_TAP node \"my_tap\" Cannot create protocol: \"SVF_openOCD\"; std::invalid_argument: There is no creation method registered with name: JTAG_SVF_openOCD."
+               "Line 1:31-32: JTAG_TAP node \"my_tap\" Cannot create protocol: \"SVF_openOCD\"; std::invalid_argument: There is no creation method registered with name: SVF_openOCD."
                ),
   };
 
@@ -1072,7 +1072,7 @@ void UT_reader::test_ACCES_INTERFACE_Success ()
   auto data =
   {
     // 00: Loopback
-    make_tuple("ACCESS_INTERFACE my_tap JTAG_Loopback\n"
+    make_tuple("ACCESS_INTERFACE my_tap Loopback\n"
                "{\n"
                "  REGISTER test_reg 4 Bypass: \"0b1100\"\n"
                "}\n",
@@ -1080,7 +1080,7 @@ void UT_reader::test_ACCES_INTERFACE_Success ()
                " [Register](1)  \"test_reg\", length: 4, bypass: 1100"),
 
     // 01: SVF Simulation
-    make_tuple("ACCESS_INTERFACE my_tap JTAG_SVF_Simulation\n"
+    make_tuple("ACCESS_INTERFACE my_tap SVF_Simulation\n"
                "{\n"
                "  REGISTER reg_1 3 Bypass: \"0b101\"\n"
                "  REGISTER reg_2 5 Bypass: \"0b11001\"\n"
@@ -1090,7 +1090,7 @@ void UT_reader::test_ACCES_INTERFACE_Success ()
                " [Register](2)  \"reg_2\", length: 5, bypass: 1100_1"),
 
     // 02: SVF Emulation
-    make_tuple("ACCESS_INTERFACE my_tap  JTAG_SVF_Emulation \n"
+    make_tuple("ACCESS_INTERFACE my_tap  SVF_Emulation \n"
                "{\n"
                "   REGISTER r1 1 Bypass: \"0b1\"\n"
                "   REGISTER r2 2 Bypass: \"0b11\"\n"
@@ -1255,11 +1255,11 @@ void UT_reader::test_ACCES_INTERFACE_Failure ()
   auto data =
   {
     // 00: Empty integer array
-    make_tuple("ACCESS_INTERFACE Useless_Square_Brackets JTAG_Loopback []\n"
+    make_tuple("ACCESS_INTERFACE Useless_Square_Brackets Loopback []\n"
                "{\n"
                "  REGISTER test_reg 4 Bypass: \"0b1100\"\n"
                "}\n",
-               "Line 1:56-57: syntax error"),
+               "Line 1:51-52: syntax error"),
 
     // 01: Unregistered protocol type
     make_tuple("ACCESS_INTERFACE Unregistered_Protocol MyProtocol\n"

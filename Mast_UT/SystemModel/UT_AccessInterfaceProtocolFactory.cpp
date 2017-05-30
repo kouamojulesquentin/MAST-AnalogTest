@@ -97,10 +97,10 @@ void UT_AccessInterfaceProtocolFactory::test_Create_Success ()
 
   auto data =
   {
-    make_tuple("JTAG_Loopback",       "",                  std::cref(typeid(LoopbackAccessInterfaceProtocol))), // 00
-    make_tuple("JTAG_Loopback",       "Hello",             std::cref(typeid(LoopbackAccessInterfaceProtocol))), // 01 Hello is ignored
-    make_tuple("JTAG_SVF_Simulation", "",                  std::cref(typeid(SVF_SimulationProtocol))),          // 02
-    make_tuple("JTAG_SVF_Emulation",  "",                  std::cref(typeid(SVF_EmulationProtocol))),           // 03
+    make_tuple("Loopback",       "",                  std::cref(typeid(LoopbackAccessInterfaceProtocol))), // 00
+    make_tuple("Loopback",       "Hello",             std::cref(typeid(LoopbackAccessInterfaceProtocol))), // 01 Hello is ignored
+    make_tuple("SVF_Simulation", "",                  std::cref(typeid(SVF_SimulationProtocol))),          // 02
+    make_tuple("SVF_Emulation",  "",                  std::cref(typeid(SVF_EmulationProtocol))),           // 03
     make_tuple("Offline",             "",                  std::cref(typeid(OfflineProtocol))),                 // 04
     make_tuple("STIL_Emulation",      "4",                 std::cref(typeid(STIL_EmulationProtocol))),          // 05
     make_tuple("STIL_Emulation",      "+5",                std::cref(typeid(STIL_EmulationProtocol))),          // 06
@@ -141,7 +141,7 @@ void UT_AccessInterfaceProtocolFactory::test_Create_Error ()
 
   auto data =
   {
-    make_tuple("JTAG_LoopbacK",  ""),                             // 00: Wrong casing
+    make_tuple("LoopbacK",  ""),                             // 00: Wrong casing
     make_tuple("Foo",            ""),                             // 01: Unregistered creator name
     make_tuple("STIL",           ""),                             // 02: Unregistered creator name (start of name is not sufficient)
     make_tuple("STIL_Emulation", ""),                             // 03: Missing parameter

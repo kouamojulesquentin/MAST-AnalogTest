@@ -397,8 +397,9 @@ t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_
   const auto  nbDRChains         = $7;
   const auto  nbDerivations      = nbDRChains + 1u;
 
-  string      creatorId("JTAG_");
-  creatorId.append(protocolName);
+//  string      creatorId("JTAG_");
+//  creatorId.append(protocolName);
+  string      creatorId(protocolName);
 
   try
   {

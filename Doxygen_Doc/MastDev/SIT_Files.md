@@ -3,16 +3,15 @@ SIT files documentation  {#SIT_Files}
 
 [TOC]
 [API]:   Acronyms.html "Application Programming Interface"
-[ATE]:   Acronyms.html "Automatic Test Equipment"
+[ATE]:   Acronyms.html "Automated Test Equipment"
 [API]:   Acronyms.html "Application Programming Interface"
-[ATE]:   Acronyms.html "Automatic Test Equipment"
-[ATPG]:  Acronyms.html "Automatic Test Pattern Generator"
+[ATPG]:  Acronyms.html "Automated Test Pattern Generation"
 [HSDL]:  Acronyms.html "Hierarchical Scan Description Language"
 [ICL]:   Acronyms.html "Instrument Connectivity Language"
 [JTAG]:  Acronyms.html "Joint Test Association Group"
-[MAST]:  Acronyms.html "MAnager for System-Centric Test"
+[MAST]:  Acronyms.html "MAnager for SoC Test"
 [MIBs]:  Acronyms.html "Multiple Segment Insertion Bits"
-[PDL]:   Acronyms.html "Procedure Description Language"
+[PDL]:   Acronyms.html "Procedural Description Language"
 [SIB]:   Acronyms.html "Segment Insertion Bit"
 [JTAG]:  Acronyms.html "Joint Test Action Group"
 [SJTAG]: Acronyms.html "System JTAG (working group)"
@@ -40,23 +39,21 @@ Syntax is:
 <table>
   <caption id="Register"></caption>
   <tr>
-    <th width=100>Node Type</th>
-    <th>Node Information</th>
-  </tr>
-  <tr>
-    <td>Register</td>
+    <td>REGISTER</td>
     <td>
-      <Size> Hold_value* Bypass : "<bypass_value>"<br>
-      <Size>: number of bits composing the register in decimal notation<br>
-      Hold_value: if provided, sets the "hold" property of the register to true<br>
-      <Bypass_value> : the bypass sequence, written following MAST's BinaryVector convention
+      <Size> Hold_value* Bypass: "<bypass_value>"<br>
+      <table>
+        <tr><td><Size>:         </td><td>  number of bits composing the register in decimal notation            </td></tr>
+        <tr><td>Hold_value:     </td><td>  if provided, sets the "hold" property of the register to true  (i.e. the bypass value corresponds to the last value it has been assigned)      </td></tr>
+        <tr><td><Bypass_value>: </td><td>  the bypass sequence, written following MAST's BinaryVector convention</td></tr>
+      </table>
     </td>
   </tr>
 </table>
 
 ## Parent NODES
 
-Parent nodes represent hierarchical information: they can be either 1687 elements, such as [ICL] instances, or abstract constructs.
+Parent nodes represent hierarchical information: they can be either 1687 elements, such as [ICL] instances, or abstract constructs to help representing hierarchy.
 
 Each node follows the same syntax:
 
@@ -67,31 +64,19 @@ Each node follows the same syntax:
   <tr><td><node_type>:  </td><td>  it can be either a base node (REGISTER,CHAIN,LINKER,ACCESS_INTERFACE) or a composite node identifying a
                                    specific configuration (ex: [SIB], 1500_WRAPPER, AI_1149_1, [TAP]_1149_1, etc...).</td></tr>
   <tr><td><node_name>:  </td><td>  standard identifier. Can be shared by different nodes (the Builder will assign an unique identifier)</td></tr>
+<tr><td><PDL_association>:  </td><td> used to indicate that the function identified by "function_name_list" (comma-separated identifiers) is to be associated with the current Parent Node (see main documentation for details).<br>
+It is the equivalent of the [PDL] <code>iProcsForModule</code> command.</td></tr>
+<tr><td><children_list>+ : </td><td>non-empty list of nodes in the lower hierarchical level</td></tr>
+<tr><td><node information>: </td><td>a variable field containing information specific to a given node_type, as explained in the following table. NB: underlined strings depict language token</td></tr>
 </table>
 
-
-__Optional field__ used to indicate that the function identified by "function_name_list" (comma-separated identifiers) is to be associated with the current Parent Node (see main documentation for details).<br>
-It is the equivalent of the [PDL] <code>iProcsForModule</code> command.<br>
-<children_list>+ : non-empty list of nodes in the lower hierarchical level<br>
-<node information>: a variable field containing information specific to a given node_type, as explained in the following table. NB: underlined strings depict language token<br>
-
+### NODE INFORMATION DEPENDING ON NODE TYPE 
 <table>
   <caption id="Parent_node"></caption>
   <tr><th width = 100>Node Type   </th><th>   Node Information</th></tr>
   <tr>
     <td>CHAIN</td>
     <td>NOT_IN_PATH*: if provided, the name of the chain is not used when composing a path (used by [PDL] [API] to identify registers)</td>
-  </tr>
-  <tr>
-    <td>REGISTER</td>
-    <td>
-      <Size> Hold_value* Bypass: "<bypass_value>"<br>
-      <table>
-        <tr><td><Size>:         </td><td>  number of bits composing the register in decimal notation            </td></tr>
-        <tr><td>Hold_value:     </td><td>  if provided, sets the "hold" property of the register to true        </td></tr>
-        <tr><td><Bypass_value>: </td><td>  the bypass sequence, written following MAST's BinaryVector convention</td></tr>
-      </table>
-    </td>
   </tr>
   <tr>
     <td>MIB</td>
@@ -120,25 +105,6 @@ It is the equivalent of the [PDL] <code>iProcsForModule</code> command.<br>
     </td>
   </tr>
   <tr>
-    <td>[JTAG]_[TAP]</td>
-    <td>
-      <protocol> <optional_AI_identifier>* <IR_size>  <optional_IR_coding>* <max_DR_chains><br>
-      Creates an IEEE-1149.1 compliant Test Access Port composed by a AI_1149_1 node having a "IR_size" IR register controlling <br>
-      a DR_MUX for "chain count" derivations, with a 1-bit bypass register already appended.<br>
-      When no coding is provided, BYPASS is selected by FFFF (all ones), and chains by a binary selection starting at 0x01.<br>
-
-      <table>
-        <tr><td>  <protocol>:               </td><td>  the protocol used by the underlying AccessInterface. <br>Can be Loopback, SVF_simulation or SVF_openOCD</td></tr>
-        <tr><td>  <optional_AI_identifier>: </td><td>  an optional string that might be required by the protocol. <br>For instance, SVF_openOCD requires a Design Name to be provided</td></tr>
-        <tr><td>  <IR_size>:                </td><td>  decimal number indicating the size in bits of the IR register</td></tr>
-        <tr><td>  <max_DR_chains>:          </td><td>  decimal number indicating the maximum number of chains</td></tr>
-        <tr><td>  <optional_IR_coding>:     </td><td>  the coding  used by the IR, starting from the Bypass Register, provided as a comma-separated list  between square brackets.
-                                                       Parenthesis can be used for visual help but have no semantic value.<br>
-                                                       For instance, [  "0xFF" ,  "0x42" ,"0x00"] == [  "0xFF" , ( "0x42" ,"0x00")] ==[  ("0xFF" ,  "0x42" ,("0x00"]</td></tr>
-      </table>
-    </td>
-  </tr>
-  <tr>
     <td>WRAPPER_1500</td>
     <td>
       IEEE-1500 compliant wrapper  derivations. <br>
@@ -146,24 +112,6 @@ It is the equivalent of the [PDL] <code>iProcsForModule</code> command.<br>
       <table>
         <tr><td><max_derivations>:  </td><td> Maximum number of wrapper registers</td></tr>
       </table>
-    </td>
-  </tr>
-  <tr>
-    <td>ACCES_INTERFACE</td>
-    <td>
-      <protocol> <AI_identifier>* <AI_table><br>
-      Creates an Access Interface node implementing the provided protocol<br>
-      <table>
-        <tr><td> <protocol>:        </td><td>  the protocol used by the underlying AccessInterface. Can be JTAG_Loopback, JTAG_SVF_simulation, JTAG_SVF_Emulation or SPI_FTDI</td></tr>
-        <tr><td> <AI_identifier>*:  </td><td>  an optional string that might be required by the protocol. <br>
-                                               For instance, SPI_FTDI might specify an usbDeviceID as quoted-string bit/hex value.</td> </tr>
-        <tr><td> <AI_TABLE>:        </td><td>  the addresses used by the protocol provided as a comma-separated list between square brackets.<br>
-                                               Parenthesis can be used for visual help but have no semantic value. <br>
-                                               For instance:<br>
-                                               [ ( "0x41" , "0x42" ,"0x0" ), ( "0x1" , "0x2" ,"0x3" )] == [ "0x41" , "0x42" ,"0x0" , "0x1" , "0x2" ,"0x3" ] == [ ( "0x41" , "0x42" ),"0x0" , ( "0x1" , "0x2" ,("0x3" ]</td></tr>
-      </table>
-      <br>
-      NB: openOCD protocol supposes a fully-formed [TAP] in the System Under Test, so it can be instantiated only inside the [TAP] macro<br>
     </td>
   </tr>
   <tr>
@@ -225,6 +173,43 @@ It is the equivalent of the [PDL] <code>iProcsForModule</code> command.<br>
             Table_Based Not supported yet
           </td>
         </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td>ACCES_INTERFACE</td>
+    <td>
+      <protocol> <AI_identifier>* <AI_table><br>
+      Creates an Access Interface node implementing the provided protocol<br>
+      <table>
+        <tr><td> <protocol>:        </td><td>  the protocol used by the underlying AccessInterface. Can be JTAG_Loopback, JTAG_SVF_simulation, JTAG_SVF_Emulation or SPI_FTDI</td></tr>
+        <tr><td> <AI_identifier>*:  </td><td>  an optional string that might be required by the protocol. <br>
+                                               For instance, SPI_FTDI might specify an usbDeviceID as quoted-string bit/hex value.</td> </tr>
+        <tr><td> <AI_TABLE>:        </td><td>  the addresses used by the protocol provided as a comma-separated list between square brackets.<br>
+                                               Parenthesis can be used for visual help but have no semantic value. <br>
+                                               For instance:<br>
+                                               [ ( "0x41" , "0x42" ,"0x0" ), ( "0x1" , "0x2" ,"0x3" )] == [ "0x41" , "0x42" ,"0x0" , "0x1" , "0x2" ,"0x3" ] == [ ( "0x41" , "0x42" ),"0x0" , ( "0x1" , "0x2" ,("0x3" ]</td></tr>
+      </table>
+      <br>
+      NB: openOCD protocol supposes a fully-formed [TAP] in the System Under Test, so it can be instantiated only inside the [TAP] macro<br>
+    </td>
+  </tr>
+  <tr>
+    <td>[JTAG]_[TAP]</td>
+    <td>
+      <protocol> <optional_AI_identifier>* <IR_size>  <optional_IR_coding>* <max_DR_chains><br>
+      Creates an IEEE-1149.1 compliant Test Access Port composed by a AI_1149_1 node having a "IR_size" IR register controlling <br>
+      a DR_MUX for "chain count" derivations, with a 1-bit bypass register already appended.<br>
+      When no coding is provided, BYPASS is selected by FFFF (all ones), and chains by a binary selection starting at 0x01.<br>
+
+      <table>
+        <tr><td>  <protocol>:               </td><td>  the protocol used by the underlying AccessInterface. <br>Can be Loopback, SVF_simulation or SVF_openOCD</td></tr>
+        <tr><td>  <optional_AI_identifier>: </td><td>  an optional string that might be required by the protocol. <br>For instance, SVF_openOCD requires a Design Name to be provided</td></tr>
+        <tr><td>  <IR_size>:                </td><td>  decimal number indicating the size in bits of the IR register</td></tr>
+        <tr><td>  <max_DR_chains>:          </td><td>  decimal number indicating the maximum number of chains</td></tr>
+        <tr><td>  <optional_IR_coding>:     </td><td>  the coding  used by the IR, starting from the Bypass Register, provided as a comma-separated list  between square brackets.
+                                                       Parenthesis can be used for visual help but have no semantic value.<br>
+                                                       For instance, [  "0xFF" ,  "0x42" ,"0x00"] == [  "0xFF" , ( "0x42" ,"0x00")] ==[  ("0xFF" ,  "0x42" ,("0x00"]</td></tr>
       </table>
     </td>
   </tr>

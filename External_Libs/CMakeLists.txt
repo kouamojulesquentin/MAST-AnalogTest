@@ -2,7 +2,17 @@ cmake_minimum_required(VERSION 2.6)
 project(External_Libs)
 include(ExternalProject)
 
-# ---------------- YAML
+# ---------------- tclap library
+#
+add_subdirectory(tclap)
+set(LIBTCLAP_INCLUDE_DIRS ${LIBTCLAP_INCLUDE_DIRS} PARENT_SCOPE)
+message("")
+message("================================================================================")
+message(STATUS "External_Libs: LIBTCLAP_INCLUDE_DIRS:    ${LIBTCLAP_INCLUDE_DIRS}")
+message("================================================================================")
+message("")
+
+# ---------------- YAML library
 #
 set(YAML_CPP_BUILD_TOOLS   OFF CACHE  BOOL "Enable testing and parse tools"  FORCE)
 set(YAML_CPP_BUILD_CONTRIB OFF CACHE  BOOL "Enable contrib stuff in library" FORCE)
@@ -17,6 +27,8 @@ message(STATUS "External_Libs: LIBYAML_INCLUDE_DIRS:     ${LIBYAML_INCLUDE_DIRS}
 message("================================================================================")
 message("")
 
+# ---------------- Xml-RPC library
+#
 if (NOT XmlRpcInstall)
   message(STATUS "External_Libs: Setting XmlRpcInstall")
   set(XmlRpcInstall ${CMAKE_CURRENT_SOURCE_DIR}/xmlrpc-c)
@@ -28,6 +40,8 @@ message(STATUS "External_Libs: XmlRpcInstall:            ${XmlRpcInstall}")
 message("================================================================================")
 message("")
 
+# ---------------- FTDI-SPI library
+#
 if(${USE_LIBFTDISPI} MATCHES "ON")
   add_subdirectory (FTDI_SPI)
   set(LIBFTDI_SPI_INCLUDE_DIRS "${LIBFTDI_SPI_INCLUDE_DIRS}" PARENT_SCOPE)

@@ -11,19 +11,29 @@ set(UT_RootPath         "${CMAKE_CURRENT_LIST_DIR}")
 set(CXXTEST_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../cxxtest")
 
 include_directories(${CXXTEST_INCLUDE_DIR})
+include_directories(${LIBTCLAP_INCLUDE_DIRS})
 include_directories(${LIBYAML_INCLUDE_DIRS})
 
 set(UT_GENERATED_RUNNER   "Generated/Runner.cpp")
 
 file(GLOB UT_YAML_HEADERS  "UT_Yaml/UT_*.hpp")
-file(GLOB UT_YAML          "UT_Yaml/UT_*.cpp")
+file(GLOB UT_YAML_SOURCES  "UT_Yaml/UT_*.cpp")
 
-set(UT_HEADERS ${UT_HEADERS}          ${UT_YAML_HEADERS})
-set(UT_SOURCES ${UT_GENERATED_RUNNER} ${UT_YAML})
+file(GLOB UT_TCLAP_HEADERS  "UT_TClap/UT_*.hpp")
+file(GLOB UT_TCLAP_SOURCES  "UT_TClap/UT_*.cpp")
+
+set(UT_HEADERS ${UT_HEADERS}
+               ${UT_TCLAP_HEADERS}
+               ${UT_YAML_HEADERS})
+
+set(UT_SOURCES ${UT_GENERATED_RUNNER}
+               ${UT_TCLAP_SOURCES}
+               ${UT_YAML_SOURCES})
 
 set(EXTRA_LIBS ${YAML_LIBRARIES})
 
 message(STATUS "External_Libs_UT: CXXTEST_INCLUDE_DIR:        ${CXXTEST_INCLUDE_DIR}")
+message(STATUS "External_Libs_UT: LIBTCLAP_INCLUDE_DIRS       ${LIBTCLAP_INCLUDE_DIRS}")
 message(STATUS "External_Libs_UT: LIBYAML_INCLUDE_DIRS        ${LIBYAML_INCLUDE_DIRS}")
 
 

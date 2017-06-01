@@ -2,9 +2,9 @@ SIT files documentation  {#SIT_Files}
 =======================
 
 [TOC]
+
 [API]:   Acronyms.html "Application Programming Interface"
 [ATE]:   Acronyms.html "Automated Test Equipment"
-[API]:   Acronyms.html "Application Programming Interface"
 [ATPG]:  Acronyms.html "Automated Test Pattern Generation"
 [HSDL]:  Acronyms.html "Hierarchical Scan Description Language"
 [ICL]:   Acronyms.html "Instrument Connectivity Language"
@@ -13,10 +13,9 @@ SIT files documentation  {#SIT_Files}
 [MIBs]:  Acronyms.html "Multiple Segment Insertion Bits"
 [PDL]:   Acronyms.html "Procedural Description Language"
 [SIB]:   Acronyms.html "Segment Insertion Bit"
-[JTAG]:  Acronyms.html "Joint Test Action Group"
+[SIT]:   Acronyms.html "Simplified [ICL] Tree Reader"
 [SJTAG]: Acronyms.html "System JTAG (working group)"
 [SM]:    Acronyms.html "System Model"
-[SIT]:   Acronyms.html "Simplified [ICL] Tree Reader"
 [SPI]:   Acronyms.html "Serial Peripheral Interface"
 [STIL]:  Acronyms.html "Standard Test Interface Language (For Digital Test Vectors)"
 [SUT]:   Acronyms.html "System Under Test"
@@ -70,7 +69,7 @@ It is the equivalent of the [PDL] <code>iProcsForModule</code> command.</td></tr
 <tr><td><node information>: </td><td>a variable field containing information specific to a given node_type, as explained in the following table. NB: underlined strings depict language token</td></tr>
 </table>
 
-### NODE INFORMATION DEPENDING ON NODE TYPE 
+### NODE INFORMATION DEPENDING ON NODE TYPE
 <table>
   <caption id="Parent_node"></caption>
   <tr><th width = 100>Node Type   </th><th>   Node Information</th></tr>

@@ -1,4 +1,7 @@
-@page SIT_Reader SIT files parser
+SIT Files Parser {#SIT_Reader}
+================
+
+[TOC]
 
 @section intro Introduction
 

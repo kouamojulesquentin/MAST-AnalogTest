@@ -1,4 +1,5 @@
-@mainpage MAST overview
+MAST Overview
+=============
 
 [Acronyms]:   Acronyms.html
 [API]:        Acronyms.html "Application Programming Interface"
@@ -13,10 +14,11 @@
 [SIT Reader]: SIT_Reader.html
 [SIT]:        SIT_Files.html
 [MAST API]:   MAST_API.html
+[Options]:    MastOptions.html
 
 [TOC]
 
-@section  Introduction
+@section Introduction
 MAST project is composed of sub-projects:
 
   - @ref MAST_Core is the main MAST library that provides all capabilities of MAST
@@ -39,6 +41,8 @@ MAST project is composed of sub-projects:
     - FTDI_SPI for interfacing MAST to [SUT] using a [SPI] port
     - kissfft is used by some examples algorithm to compute an FFT on some audio sample
     - xmlrpc-c is used to provide RPC (e.g. to run MAST on a remote machine)
+    - Yaml is [yaml-cpp](https://github.com/jbeder/yaml-cpp) library for parsing yaml files
+    - [tclap](http://tclap.sourceforge.net/) is a Templatized C++ Command Line Parser Library
   - TestCasesApp is an application for testing integration of the different libraries with different kind of testcases
   - MastExample_CPP give some MAST simple usages examples
   - License manages the licensing rights to use MAST
@@ -65,6 +69,10 @@ Algorithms can be written in C++ using mast::SystemModelManager instance or use 
 
 @section Plugins
 Mast behavior can be adapted to user needs using [plugins][Plugins] extension points.
+
+@section Mast Options
+See Mast [Options] can be configured through configuration file and/or command line.
+
 
 @section Build
 For building Mast projects, see README.txt, README.linux.txt, README.Windows.txt and README.cmake.txt

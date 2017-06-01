@@ -1,14 +1,15 @@
-@page plugins Customizing Mast using plugins
+Customizing Mast using plugins {#Plugins}
+================
 
 [TOC]
-[Acronyms]:   Acronyms.html
 
-[API]:        Acronyms.html "Application Programming Interface"
-[DLL]:        Acronyms.html "Dynamically Linked Library"
-[JTAG]:       Acronyms.html "Joint Test Action Group"
-[SUT]:        Acronyms.html "System Under Test"
+[Acronyms]: Acronyms.html
 
-[SIT]:        SIT_Files.html
+[API]:  Acronyms.html "Application Programming Interface"
+[DLL]:  Acronyms.html "Dynamically Linked Library"
+[JTAG]: Acronyms.html "Joint Test Action Group"
+[SUT]:  Acronyms.html "System Under Test"
+[SIT]:  SIT_Files.html
 
 @section intro Introduction
 
@@ -34,7 +35,7 @@ The initialization part of the [DLL] - global static object(s) - must register p
 @note A single [DLL] can provide several customization aspects
 
 For cases when the application is build by the user, it can manages itself loading of plugin [DLL](s).
-To do that, it simply include include Plugins.hpp header, use its trivial API and link to the plugins [DLL] helper,
+To do that, it simply include include Plugins.hpp header, use its trivial [API] and link to the plugins [DLL] helper,
 That way it can easily browse for plugin [DLL]s, load a single plugin or all plugins found in a single directory.
 
 To register plugin function(s) to a factory, just get the single instance of the factory and call its RegisterCreator method
@@ -45,10 +46,8 @@ Mast have already pre-registered creational methods for "standard" needs. Those 
 (by registering another method with the same identifier) or completly removed (using corresponding factory Clear method).
 
 
-@section Default Default aspects
-
-Configuration
--------------
+# Default aspects # {#Default}
+## Configuration ## {#Configuration}
 
 | Identifier           | Description |
 | ----------           | ----------- |
@@ -57,8 +56,7 @@ Configuration
 | Last_Lazy            | Selects pending path with highest identifier that is not already selected - It never tries to select path 0 |
 
 
-Access interface protocol
--------------------------
+## Access interface protocol ## {#Access_Interface_Protocol}
 
 | Identifier                      | Description |
 | ----------                      | ----------- |
@@ -70,13 +68,11 @@ Access interface protocol
 | OfflineProtocol                 | Issue SVF commands when sending data [SUT], and read some binary file as data from [SUT] |
 | RemoteProxy                     | Sends data to and receives from a remove interface |
 
-Remote prototol
----------------
+## Remote prototol ## {#Remote_Prototol}
 
 Currently there is no default remote protocol.
 
-Path Selector
--------------
+## Path Selector ## {#Path_Selector}
 
 | Identifier     | Description                                                                    |
 | ----------     | -----------                                                                    |
@@ -88,8 +84,3 @@ Path Selector
 | N_Hot_noidle   | N hot encoded selector - always select at least one derivation -               |
 | Table_Based    | Special encoding that use custom tables to define selection/deselection values |
 
-[DLL]:  Acronyms.html "sfd"
-[DLL]
-[`link_text`][DLL]
-
-{#sfddsq}

@@ -1,12 +1,11 @@
-@page Acronyms
+Acronyms {#Acronyms}
+========
 
 [Acronyms]:   Acronyms.html
 
 [ABI]:   Acronyms.html "Application Binary Interface"
 [API]:   Acronyms.html "Application Programming Interface"
 [ATE]:   Acronyms.html "Automatic Test Equipment"
-[ABI]:   Acronyms.html "Application Binary Interface"
-[API]:   Acronyms.html "Application Programming Interface"
 [ATE]:   Acronyms.html "Automatic Test Equipment"
 [ATPG]:  Acronyms.html "Automatic Test Pattern Generator"
 [BSDL]:  Acronyms.html "Boundary Scan Description Language"
@@ -14,6 +13,7 @@
 [CSU]:   Acronyms.html "Capture-Shift-Update"
 [DLL]:   Acronyms.html "Dynamically Linked Library"
 [ETS]:   Acronyms.html "European Test Symposium"
+[GML]:   Acronyms.html "Graph Modelling Language"
 [HDR]:   Acronyms.html ""
 [HIR]:   Acronyms.html ""
 [HSDL]:  Acronyms.html "Hierarchical Scan Description Language"
@@ -55,15 +55,13 @@ Acronyms | Definitions
 ABI      | Application Binary Interface
 API      | Application Programming Interface
 ATE      | Automatic Test Equipment
-ABI      | Application Binary Interface
-API      | Application Programming Interface
-ATE      | Automatic Test Equipment
 ATPG     | Automatic Test Pattern Generator
 BSDL     | Boundary Scan Description Language
 CDC      | Clock Domain Crossing
 CSU      | Capture-Shift-Update
 DLL      | Dynamically Linked Library
 ETS      | European Test Symposium
+GML      | [Graph Modelling Language](https://en.wikipedia.org/wiki/Graph_Modelling_Language)
 HDR      | |
 HIR      | |
 HSDL     | Hierarchical Scan Description Language
@@ -80,10 +78,9 @@ PDL      | Procedure Description Language
 POC      | Proof Of Concept
 RPC      | Remote Procedure Call
 SIB      | Segment Insertion Bit
-JTAG     | Joint Test Action Group
+SIT      | Simplified ICL Tree Reader
 SJTAG    | System JTAG (working group)
 SM       | System Model
-SIT      | Simplified ICL Tree Reader
 SPI      | Serial Peripheral Interface
 STIL     | Standard Test Interface Language (For Digital Test Vectors)
 SUT      | System Under Test

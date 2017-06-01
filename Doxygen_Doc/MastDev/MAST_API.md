@@ -1,7 +1,14 @@
-@page MAST_API
-MAST_API_CPP and MAST_API_C projects provide, respectively, simplified 'C++' or 'C' API to use MAST with PDL like syntax.
+MAST API {#MAST_API}
+========
 
-@note Simple API implies it does not have the full-fledged capabilities of @ref MAST_Core.
+[TOC]
+
+[API]: Acronyms.html "Application Programming Interface"
+[PDL]: Acronyms.html "Procedure Description Language"
+
+MAST_API_CPP and MAST_API_C projects provide, respectively, simplified 'C++' or 'C' [API] to use MAST with [PDL] like syntax.
+
+@note Simple [API] implies it does not have the full-fledged capabilities of @ref MAST_Core.
 
 __C++ based algorithm example__
 

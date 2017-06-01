@@ -29,7 +29,7 @@ class BinaryVector;
 //!
 enum class ManagerMonitorOptions
 {
-  Min                 = 0,
+  Default             = 0,
   Verbose             = 1 << 0, //!< When active, more information may be reported
   AppThreadCreation   = 1 << 1, //!< Monitor application thread creation
   PDLCommands         = 1 << 2, //!< Monitor PDL commands issued by applications
@@ -115,7 +115,6 @@ class MAST_CORE_EXPORT SystemModelManagerMonitor
   uint32_t              m_dataCyclesCount = 0; //!< Number of data cycles since startup or last reset
   std::string           m_exportBasePath;      //!< Base path use when exporting graph representing system model
   ManagerMonitorOptions m_options         = ManagerMonitorOptions::Std;
-//+  ManagerMonitorOptions m_options         = ManagerMonitorOptions::Std_Debug;
 };
 //
 //  End of SystemModelManagerMonitor class declaration

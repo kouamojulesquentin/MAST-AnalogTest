@@ -30,13 +30,13 @@ class PathSelector;
 enum class PrettyPrinterOptions
 {
   None                   = 0,
-  Verbose                = 1 << 0,  //!< Show all Register values
-  DisplayValueAuto       = 1 << 1,  //!< To show Register values as binary when small, hexa when large and end of large string as binary when cannot form a plain nibble
-  ShowProtocol           = 1 << 2,  //!< To show Linker selector associated register with an edge between the Linker and the Register
-  ShowSelectionState     = 1 << 3,
-  ShowSelectionValue     = 1 << 4,
-  ShowSelectorProperties = 1 << 5,
-  ShowNodeIsIgnored      = 1 << 6,
+  Verbose                = 1 << 0,  //!< To report whether a node is pending, has conditioner, its priority, is ignored for path specification, protocol name for access interface, all values for registers
+  DisplayValueAuto       = 1 << 1,  //!< To report Register values as binary when small, hexa when large and end of large string as binary when cannot form a plain nibble
+  ShowProtocol           = 1 << 2,  //!< To report Protocol name of an access interface
+  ShowSelectionState     = 1 << 3,  //!< To report whether a node is selected or active
+  ShowSelectionValue     = 1 << 4,  //!< To report which selector value select the nodes
+  ShowSelectorProperties = 1 << 5,  //!< To report selector properties (kind, can_select_none, inverted_bits, reverted_order...)
+  ShowNodeIsIgnored      = 1 << 6,  //!< To report parent node that are ignored when defining a node path
 
   Default           = None,
   Std               = Verbose | DisplayValueAuto,

@@ -37,7 +37,7 @@ enum class GmlPrinterOptions
   DisplayIdentifiers     = 1 << 0, //!< To display node identifier
   DisplayRegisterValue   = 1 << 1, //!< To show Register values
   DisplayValueAuto       = 1 << 2, //!< To show Register values as binary when small, hexa when large and end of large string as binary when cannot form a plain nibble
-  ShowProtocol           = 1 << 3, //!< To show Linker selector associated register with an edge between the Linker and the Register
+  ShowProtocol           = 1 << 3, //!< To show Protocol name of an access interface
   ShowSelectorWithEdge   = 1 << 4, //!< To show Linker selector associated register with an edge between the Linker and the Register
   ShowSelectorProperties = 1 << 5, //!< To show selector properties
   ShowSelectorTables     = 1 << 6, //!< To show selector tables for selection/deselection

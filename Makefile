@@ -368,5 +368,6 @@ distclean: code_coverage_clean
 > cmake -E remove_directory $(CMAKE_RISCV32_BUILD_DIR)
 > cmake -E remove -f Mast_UT/Generated/Runner.cpp
 > cmake -E remove -f SIT_reader_UT/Generated/Runner.cpp
+> cmake -E remove -f External_Libs_UT/Generated/Runner.cpp
 > cmake -E remove -f Optional_Libs_UT/Generated/Runner.cpp
 

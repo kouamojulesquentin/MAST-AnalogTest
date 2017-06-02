@@ -71,7 +71,7 @@ Algorithms can be written in C++ using mast::SystemModelManager instance or use 
 Mast behavior can be adapted to user needs using [plugins][Plugins] extension points.
 
 @section Mast Options
-See Mast [Options] can be configured through configuration file and/or command line.
+Mast [Options] can be configured through configuration file and/or command line switches.
 
 
 @section Build

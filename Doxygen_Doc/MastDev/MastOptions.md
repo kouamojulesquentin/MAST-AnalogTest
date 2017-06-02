@@ -18,7 +18,7 @@ Configuration file follows [YAML](https://fr.wikipedia.org/wiki/YAML) syntax.
 Default configuration file looks like this:
 
      Mast_Options:
-       SIT_file_path: project.sit               # [SIT] file used by the project
+       SIT_file_path: DUT.sit                   # [SIT] file used by the project
        Configuration_algorithm: last_or_default # One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a [plugin])
        Access_interface_protocol: SIT           # When different to "SIT", it override the one define in [SIT] file
        Plugin_DLLs:  Plugins                    # Root path and/or list of file(s) path
@@ -96,6 +96,8 @@ This can be one of Mast built-in algorithm (see bellow) or one defined by a [plu
 ## State printing {#State_Printing}
 ### Moments       {#Moments}
 
+Defines moment(s) in the vector generation for which model state is reported
+
 | | |
 |-|-|
 | after_model_parsing  | Just after [SIT] file has been parsed
@@ -103,6 +105,8 @@ This can be one of Mast built-in algorithm (see bellow) or one defined by a [plu
 | after_configuration  | Monitor System_model state after each configuration   (when manager activity reporting is enabled)
 
 ### GML options  {#GML_Options}
+
+Defines what kind of model information pieces are displayed in the [GML] model state report.
 
 | | |
 |-|-|
@@ -120,6 +124,8 @@ This can be one of Mast built-in algorithm (see bellow) or one defined by a [plu
 
 ### Textual options {#Textual_Options}
 
+Defines what kind of model information pieces are reported in the textual model state report.
+
 | | |
 |-|-|
 | default             | Minimal information is produced
@@ -135,6 +141,7 @@ This can be one of Mast built-in algorithm (see bellow) or one defined by a [plu
 
 ### Manager activity  {#Manager_Activity}
 
+Defines what Mast manager main activities are reported in the log
 | | |
 |-|-|
 | verbose              | Log more information
@@ -147,6 +154,9 @@ This can be one of Mast built-in algorithm (see bellow) or one defined by a [plu
 
 ## Logger  {#logger}
 ### Kind   {#Logger_Kind}
+
+Defines what kind of logger is used.
+
 | | |
 |-|-|
 | std                 | Messages are logged only to log file
@@ -154,6 +164,9 @@ This can be one of Mast built-in algorithm (see bellow) or one defined by a [plu
 | copy_errors_on_cerr | Messages are logged to log file AND error messages also to the console
 
 ### Shown items {#Logger_Shown_Items}
+
+Defines what are the auxiliary elements reported in the log.
+
 | | |
 |-|-|
 | date          | Show (calendar) date of message
@@ -168,6 +181,9 @@ This can be one of Mast built-in algorithm (see bellow) or one defined by a [plu
 | all           | Equivalent to all options
 
 ### Level {#Logger_Level}
+
+Defines level of information that is logged.
+
 | | |
 |-|-|
 | debug   | All messages are logged (including debug ones)

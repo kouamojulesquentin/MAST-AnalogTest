@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.5)
 project(Mast)
+
+set(MAST_VERSION_MAJOR "0")
+set(MAST_VERSION_MINOR "9")
+set(MAST_VERSION_PATCH "x")
+set(MAST_VERSION "${MAST_VERSION_MAJOR}.${MAST_VERSION_MINOR}.${MAST_VERSION_PATCH}")
+
 set (CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/Install")  # Avoid it to be in /usr/local
 enable_testing()
 

@@ -47,6 +47,7 @@ SOURCES +=  \
     src/I2C_EmulationProtocol.cpp                   \
     src/I2C_Player.cpp                              \
     src/Linker.cpp                                  \
+    src/MastConfiguration.cpp                       \
     src/MismatchesCollector.cpp                     \
     src/NamesChecker.cpp                            \
     src/NodePathResolver.cpp                        \
@@ -144,6 +145,7 @@ HEADERS += \
     internal/SystemModelReseter.hpp                     \
     internal/FromSutUpdater.hpp                         \
     internal/ToSutVisitor.hpp                           \
+    internal/MastConfiguration.hpp                      \
     internal/MismatchesCollector.hpp                    \
     internal/NamesChecker.hpp                           \
     internal/SystemModelManager_impl.hpp                \

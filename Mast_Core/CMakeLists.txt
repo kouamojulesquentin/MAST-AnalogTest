@@ -3,6 +3,7 @@ project(Mast_Core)
 include_directories(include/)
 include_directories(internal/)
 include_directories(${LIBLOGGER_INCLUDE_DIRS})
+include_directories(${LIBTCLAP_INCLUDE_DIRS})
 include_directories(${LIBYAML_INCLUDE_DIRS})
 
 set(LIBUSB_CFLAGS              "")
@@ -40,6 +41,5 @@ message(STATUS "Mast_Core:  USE_LIBFTDISPI:             ${USE_LIBFTDISPI}")
 message(STATUS "Mast_Core:  CMAKE_CXX_FLAGS:            ${CMAKE_CXX_FLAGS}")
 message("================================================================================")
 message("")
-
 
 target_link_libraries(Mast_Core Logger ${YAML_LIBRARIES} ${EXTRA_LIBS})

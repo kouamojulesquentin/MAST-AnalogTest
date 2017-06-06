@@ -470,8 +470,8 @@ inline void CmdLine::parse(std::vector<std::string>& args)
     for (int i = 0; static_cast<unsigned int>(i) < args.size(); i++)
     {
       bool matched = false;
-      for (ArgListIterator it = _argList.begin();
-           it != _argList.end(); it++) {
+      for (ArgListIterator it = _argList.begin(); it != _argList.end(); it++)
+      {
         if ((*it)->processArg(&i, args))
         {
           requiredCount += _xorHandler.check(*it);

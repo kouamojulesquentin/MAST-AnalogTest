@@ -29,6 +29,11 @@ class UT_TClap : public CxxTest::TestSuite
 
   // ================ Test Methods ================
 
+  // ---------------- ValueArg
+  //
+  void test_ValueArg_Constructor_Minimal ();
+  void test_ValueArg_Constructor_BadSpecification ();
+
   // ---------------- CmdLine
   //
   void test_CmdLine_Constructor_Minimal ();

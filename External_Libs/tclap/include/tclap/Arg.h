@@ -391,14 +391,17 @@ class Arg
 };
 
 /**
- * Typedef of an Arg list iterator.
- */
-typedef std::list<Arg*>::iterator ArgListIterator;
+* Typedef of an Arg list iterator.
+*/
+typedef std::list<Arg*>::iterator         ArgListIterator;
+typedef std::list<Arg*>::const_iterator   ArgListConstIterator;
+typedef std::list<Arg*>::reverse_iterator ArgListReverseIterator;
 
 /**
- * Typedef of an Arg vector iterator.
- */
-typedef std::vector<Arg*>::iterator ArgVectorIterator;
+* Typedef of an Arg vector iterator.
+*/
+typedef std::vector<Arg*>::iterator       ArgVectorIterator;
+typedef std::vector<Arg*>::const_iterator ArgVectorConstIterator;
 
 /**
  * Typedef of a Visitor list iterator.

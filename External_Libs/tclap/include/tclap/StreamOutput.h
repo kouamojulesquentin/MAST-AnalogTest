@@ -37,6 +37,8 @@ class StreamOutput : public CmdLineOutput
 {
   std::ostream& m_stdStream; //!< Reference to output stream to which standard messages will be sent to
   std::ostream& m_errStream; //!< Reference to output stream to which error messages will be sent to
+  size_t        m_maxWidth  = 95u;
+  size_t        m_stdIndent = 2u;
 
   //! @todo [JFC]-[May/31/2017]: Factor this and StdOutput into a single one requesting stream for std and error messages
   //!
@@ -111,9 +113,9 @@ class StreamOutput : public CmdLineOutput
      */
     void spacePrint(std::ostream&      os,
                     const std::string& s,
-                    int                maxWidth,
-                    int                indentSpaces,
-                    int                secondLineOffset) const;
+                    size_t             maxWidth,
+                    size_t             indentSpaces,
+                    size_t             secondLineOffset) const;
 };
 
 
@@ -169,93 +171,132 @@ inline void StreamOutput::_shortUsage(CmdLineInterface& _cmd, std::ostream& os) 
   XorHandler xorHandler                  = _cmd.getXorHandler();
   std::vector<std::vector<Arg*>> xorList = xorHandler.getXorList();
 
-  std::string s = progName + " ";
+  os << std::string(m_stdIndent, ' ') << progName;
+
+  size_t currentIndent    = 2u; // (after program name)
+  size_t secondLineOffset = 5u; // Offset relative to first line
+
+  size_t indent = m_stdIndent + progName.length() + 2u;
+
+  if (indent > (m_maxWidth / 2u)) // Must deal with tool long program name
+  {
+    indent        = m_maxWidth / 2u;
+    currentIndent = indent;
+  }
 
   // first the xor
+  std::string s;
   for (int i = 0; static_cast<unsigned int>(i) < xorList.size(); i++)
   {
     s += " {";
-    for (ArgVectorIterator it = xorList[i].begin();
-            it != xorList[i].end(); it++)
+    for (ArgVectorIterator it = xorList[i].begin(); it != xorList[i].end(); it++)
       s += (*it)->shortID() + "|";
 
     s[s.length()-1] = '}';
   }
 
-  // then the rest
+  if (!s.empty())
+  {
+    spacePrint(os, s, m_maxWidth, m_stdIndent, secondLineOffset);
+    currentIndent = indent;
+  }
+
+  // then the rest (normally aligned to the end of application name)
   for (ArgListIterator it = argList.begin(); it != argList.end(); it++)
+  {
     if (!xorHandler.contains((*it)))
-      s += " " + (*it)->shortID();
-
-  // if the program name is too long, then adjust the second line offset
-  int secondLineOffset = static_cast<int>(progName.length()) + 2;
-  if (secondLineOffset > 75/2)
-      secondLineOffset = static_cast<int>(75/2);
-
-  spacePrint(os, s, 75, 3, secondLineOffset);
+    {
+      spacePrint(os, (*it)->shortID(), m_maxWidth, currentIndent, secondLineOffset);
+      currentIndent = indent;
+    }
+  }
 }
 
 inline void StreamOutput::_longUsage(CmdLineInterface& _cmd, std::ostream& os) const
 {
-  std::list<Arg*> argList                = _cmd.getArgList();
-  std::string message                    = _cmd.getMessage();
-  XorHandler xorHandler                  = _cmd.getXorHandler();
-  std::vector<std::vector<Arg*>> xorList = xorHandler.getXorList();
+  const std::list<Arg*>&                argList    = _cmd.getArgList();
+  const XorHandler&                     xorHandler = _cmd.getXorHandler();
+  const std::vector<std::vector<Arg*>>& xorList    = xorHandler.getXorList();
+
+  spacePrint(os, _cmd.getMessage(), m_maxWidth, m_stdIndent, 0);
+  os << std::endl;
 
   // first the xor
-  for (int i = 0; static_cast<unsigned int>(i) < xorList.size(); i++)
+  for (size_t i = 0; i < xorList.size(); i++)
   {
-    for (ArgVectorIterator it = xorList[i].begin();
-        it != xorList[i].end();
-        it++)
+    for (ArgVectorConstIterator it = xorList[i].cbegin(); it != xorList[i].cend(); it++)
     {
-      spacePrint(os, (*it)->longID(), 75, 3, 3);
-      spacePrint(os, (*it)->getDescription(), 75, 5, 0);
+      spacePrint(os, (*it)->longID(),         m_maxWidth, m_stdIndent, 3u);
+      spacePrint(os, (*it)->getDescription(), m_maxWidth, m_stdIndent + 2u, 0);
 
       if (it+1 != xorList[i].end())
-        spacePrint(os, "-- OR --", 75, 9, 0);
+        spacePrint(os, "-- OR --", m_maxWidth, 9, 0);
     }
     os << std::endl << std::endl;
   }
 
   // then the rest
-  for (ArgListIterator it = argList.begin(); it != argList.end(); it++)
-    if (!xorHandler.contains((*it)))
+  for (ArgListConstIterator it = argList.cbegin(); it != argList.cend(); it++)
+  {
+    if (!xorHandler.contains(*it))
     {
-      spacePrint(os, (*it)->longID(), 75, 3, 3);
-      spacePrint(os, (*it)->getDescription(), 75, 5, 0);
+      const std::string& longID = (*it)->longID();
+      if (longID.length() < (m_maxWidth - m_stdIndent - 3u))
+      {
+        spacePrint(os, longID, m_maxWidth, m_stdIndent, 3u);
+      }
+      else
+      {
+        size_t dashDashPos = longID.find("--");
+        if (dashDashPos != std::string::npos)
+        {
+          spacePrint(os, longID.substr(0, dashDashPos), m_maxWidth, m_stdIndent, 3u);
+          spacePrint(os, longID.substr(dashDashPos),    m_maxWidth, m_stdIndent, 3u);
+        }
+        else
+        {
+          spacePrint(os, longID, m_maxWidth, m_stdIndent, 3u);
+        }
+      }
+      spacePrint(os, (*it)->getDescription(), m_maxWidth, m_stdIndent + 2u, 0);
+
       os << std::endl;
     }
-
-  os << std::endl;
-
-  spacePrint(os, message, 75, 3, 0);
+  }
 }
 
 inline void StreamOutput::spacePrint(std::ostream&      os,
                                      const std::string& s,
-                                     int                maxWidth,
-                                     int                indentSpaces,
-                                     int                secondLineOffset) const
+                                     size_t             maxWidth,
+                                     size_t             indentSpaces,
+                                     size_t             secondLineOffset) const
 {
-  int len = static_cast<int>(s.length());
+  const std::string indent           = std::string(indentSpaces, ' ');
+  const std::string secondLineIndent = std::string(indentSpaces  + secondLineOffset, ' ');
+
+  size_t len = s.length();
 
   if ((len + indentSpaces > maxWidth) && maxWidth > 0)
   {
-    int allowedLen = maxWidth - indentSpaces;
-    int start = 0;
+    size_t allowedLen = maxWidth - indentSpaces;
+    size_t start      = 0;
+
     while (start < len)
     {
       // find the substring length
-      int stringLen = std::min<int>(len - start, allowedLen);
+      size_t stringLen = std::min<size_t>(len - start, allowedLen);
 
       // trim the length so it doesn't end in middle of a word
       if (stringLen == allowedLen)
-						while ( stringLen >= 0 &&
-								s[stringLen+start] != ' ' &&
+      {
+        while (stringLen          != 0   &&
+               s[stringLen+start] != ' ' &&
                s[stringLen+start] != ',' &&
-								s[stringLen+start] != '|' )
+               s[stringLen+start] != '|')
+        {
           stringLen--;
+        }
+      }
 
       // ok, the word is longer than the line, so just split
       // wherever the line ends
@@ -263,27 +304,27 @@ inline void StreamOutput::spacePrint(std::ostream&      os,
         stringLen = allowedLen;
 
       // check for newlines
-      for (int i = 0; i < stringLen; i++)
+      for (size_t i = 0; i < stringLen; i++)
         if (s[start+i] == '\n')
           stringLen = i+1;
 
-      // print the indent
-      for (int i = 0; i < indentSpaces; i++)
-        os << " ";
 
       if (start == 0)
       {
-        // handle second line offsets
-        indentSpaces += secondLineOffset;
+        os << indent;
 
-        // adjust allowed len
-        allowedLen -= secondLineOffset;
+        indentSpaces += secondLineOffset;
+        allowedLen   -= secondLineOffset;
+      }
+      else
+      {
+        os << secondLineIndent;
       }
 
-      os << s.substr(start,stringLen) << std::endl;
+      os << s.substr(start, stringLen) << std::endl;
 
       // so we don't start a line with a space
-      while (s[stringLen+start] == ' ' && start < len)
+      while (s[stringLen + start] == ' ' && start < len)
         start++;
 
       start += stringLen;
@@ -291,9 +332,7 @@ inline void StreamOutput::spacePrint(std::ostream&      os,
   }
   else
   {
-    for (int i = 0; i < indentSpaces; i++)
-        os << " ";
-    os << s << std::endl;
+    os << indent << s << std::endl;
   }
 }
 } //namespace TCLAP

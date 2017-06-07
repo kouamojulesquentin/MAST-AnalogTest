@@ -118,6 +118,20 @@ class UT_YamlFile : public CxxTest::TestSuite
   void test_GetAsBool_Sequence_NoDefault ();
   void test_GetAsBool_Sequence_NoDefault_NotExist ();
 
+  // ---------------- TryGetAsStringVector
+  //
+  void test_TryGetAsStringVector_EmptyPath ();
+  void test_TryGetAsStringVector_NotExist ();
+  void test_TryGetAsStringVector_Empty ();
+  void test_TryGetAsStringVector_Success ();
+
+  // ---------------- TryGetAsIntVector
+  //
+  void test_TryGetAsIntVector_EmptyPath ();
+  void test_TryGetAsIntVector_NotExist ();
+  void test_TryGetAsIntVector_Empty ();
+  void test_TryGetAsIntVector_Success ();
+
   // ---------------- GetAsXxx for sequences of sequences
   //
 

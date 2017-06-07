@@ -19,6 +19,7 @@ Suites = \
       $(UT_RootPath)/Utility/UT_BinaryVector.hpp                         \
       $(UT_RootPath)/Utility/UT_SVFVector.hpp                            \
       $(UT_RootPath)/Utility/UT_MastConfiguration.hpp                    \
+      $(UT_RootPath)/Yaml/UT_YamlFile.hpp                                \
       $(UT_RootPath)/SystemModel/UT_SystemModelNode.hpp                  \
       $(UT_RootPath)/SystemModel/UT_Register.hpp                         \
       $(UT_RootPath)/SystemModel/UT_ParentNode.hpp                       \
@@ -49,8 +50,7 @@ Suites = \
       $(UT_RootPath)/SystemModel/UT_PathSelectorFactory.hpp              \
       $(UT_RootPath)/SystemModel/UT_SystemModelManager.hpp               \
       $(UT_RootPath)/API_CPP/UT_PDL_Adapter_CPP.hpp                      \
-      $(UT_RootPath)/API_C/UT_PDL_Adapter_C.hpp                          \
-      $(UT_RootPath)/Yaml/UT_YamlFile.hpp
+      $(UT_RootPath)/API_C/UT_PDL_Adapter_C.hpp
 
 ProjectFile  = $(RootPath)/Mast_UT.pro
 

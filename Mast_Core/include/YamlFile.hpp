@@ -15,6 +15,7 @@
 #include "Utility.hpp"
 #include "YamlNodesCache.hpp"
 
+#include <vector>
 #include <string>
 #include <experimental/string_view>
 #include <memory>
@@ -87,9 +88,13 @@ class MAST_CORE_EXPORT YamlFile
   int         GetAsInt    (string_view path, int index, int                defaultValue, bool autoCreate); //!< Gets sequence value at path as int
   bool        GetAsBool   (string_view path, int index, bool               defaultValue, bool autoCreate); //!< Gets sequence value at path as bool
 
+
   std::tuple<bool, std::string> TryGetAsString (string_view path); //!< Tries getting value at path as string
   std::tuple<bool, int>         TryGetAsInt    (string_view path); //!< Tries getting value at path as int
   std::tuple<bool, bool>        TryGetAsBool   (string_view path); //!< Tries getting value at path as bool
+
+  std::tuple<bool, std::vector<std::string>> TryGetAsStringVector (string_view path); //!< Tries to gets a set of values at path as a strings
+  std::tuple<bool, std::vector<int>>         TryGetAsIntVector    (string_view path); //!< Tries to gets a set of values at path as a ints
 
   std::tuple<bool, std::string> TryGet (string_view path, const std::string&) { return TryGetAsString (path); } //!< Tries getting value at path as string @note this overload is useful in template context
   std::tuple<bool, int>         TryGet (string_view path, int)                { return TryGetAsInt    (path); } //!< Tries getting value at path as int    @note this overload is useful in template context
@@ -130,6 +135,30 @@ class MAST_CORE_EXPORT YamlFile
 
     return std::make_tuple(false, T());
   }
+
+
+  //! Tries to get a set a values (with same type) for specified path.
+  //!
+  //! @note Is private to avoid too many expansions of code template
+  template<typename T>
+  std::tuple<bool, std::vector<T>> TryGetSequenceAs_impl (string_view path)
+  {
+    std::vector<T> sequence;
+    bool           successful = false;
+
+    std::lock_guard<std::mutex> lock(m_yamlMutex);
+
+    auto sequenceNode = GetNodeForPath(path, false);
+
+    if (sequenceNode.IsDefined() && sequenceNode.IsSequence())
+    {
+      sequence   = std::move(sequenceNode.as<std::vector<T>>());
+      successful = true;
+    }
+
+    return std::make_tuple(successful, std::move(sequence));
+  }
+
 
   //! Returns specified typed value for specified path.
   //! @note Is private to avoid too many expansions of code template

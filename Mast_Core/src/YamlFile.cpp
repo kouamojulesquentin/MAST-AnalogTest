@@ -16,6 +16,7 @@
 #include <regex>
 #include <fstream>
 
+using std::vector;
 using std::regex;
 using std::regex_match;
 using std::smatch;
@@ -701,6 +702,21 @@ tuple<bool, int> YamlFile::TryGetAsInt (string_view path)
 //---------------------------------------------------------------------------
 
 
+//! Tries to gets a set of values at path as a ints
+//!
+//! @param path Paths from root node to requested value
+//!
+//! @return Found value and success (true) bool or empty vector and failure (false) bool
+tuple<bool, vector<int>> YamlFile::TryGetAsIntVector (string_view path)
+{
+  CHECK_PARAMETER_NOT_EMPTY(path, "Path must not be empty");
+  return TryGetSequenceAs_impl<int>(path);
+}
+//
+//  End of: YamlFile::TryGetAsIntVector
+//---------------------------------------------------------------------------
+
+
 //! Tries to gets value at path as a string
 //!
 //! @param path Paths from root node to requested value ('/' separated keys)
@@ -713,6 +729,21 @@ tuple<bool, string> YamlFile::TryGetAsString (string_view path)
 }
 //
 //  End of: YamlFile::TryGetAsString
+//---------------------------------------------------------------------------
+
+
+//! Tries to gets a set of values at path as a strings
+//!
+//! @param path Paths from root node to requested value
+//!
+//! @return Found value and success (true) bool or empty vector and failure (false) bool
+tuple<bool, vector<string>> YamlFile::TryGetAsStringVector (string_view path)
+{
+  CHECK_PARAMETER_NOT_EMPTY(path, "Path must not be empty");
+  return TryGetSequenceAs_impl<string>(path);
+}
+//
+//  End of: YamlFile::TryGetAsStringVector
 //---------------------------------------------------------------------------
 
 

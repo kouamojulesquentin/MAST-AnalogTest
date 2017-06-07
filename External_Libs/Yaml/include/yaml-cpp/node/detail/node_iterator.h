@@ -111,6 +111,8 @@ class node_iterator_base
         return m_seqIt == rhs.m_seqIt;
       case iterator_type::Map:
         return m_mapIt == rhs.m_mapIt;
+      default:
+        return false;
     }
     return true;
   }
@@ -131,6 +133,8 @@ class node_iterator_base
         ++m_mapIt;
         m_mapIt = increment_until_defined(m_mapIt);
         break;
+      default:
+        break;
     }
     return *this;
   }
@@ -141,16 +145,19 @@ class node_iterator_base
     return iterator_pre;
   }
 
-  value_type operator*() const {
-    switch (m_type) {
+  value_type operator*() const
+  {
+    switch (m_type)
+    {
       case iterator_type::None:
         return value_type();
       case iterator_type::Sequence:
         return value_type(**m_seqIt);
       case iterator_type::Map:
         return value_type(*m_mapIt->first, *m_mapIt->second);
+      default:
+        return value_type();
     }
-    return value_type();
   }
 
   proxy operator->() const { return proxy(**this); }

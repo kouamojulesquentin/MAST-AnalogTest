@@ -2082,6 +2082,254 @@ void UT_YamlFile::test_GetAsBool_Sequence_NoDefault_NotExist ()
 }
 
 
+//! Checks YamlFile::TryGetAsStringVector() when providing an, invalid, empty path
+//!
+void UT_YamlFile::test_TryGetAsStringVector_EmptyPath ()
+{
+  // ---------------- Setup
+  //
+  YamlFile sut;
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut.TryGetAsStringVector(""), std::exception);
+}
+
+
+//! Checks YamlFile::TryGetAsStringVector() when providing not existing empty path
+//!
+void UT_YamlFile::test_TryGetAsStringVector_NotExist ()
+{
+  // ---------------- Setup
+  //
+  auto yaml = "Direction: North\n"
+              "Color: [Red, Green, Blue, Yellow]\n"
+              "Numbers:\n"
+              "  - One\n"
+              "  - Two\n"
+              "  - Three";
+
+  YamlFile sut;
+  sut.Load(yaml);
+
+  bool           succeeded = false;
+  vector<string> got;
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (tie(succeeded, got) = sut.TryGetAsStringVector("Hubert"));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE (sut.IsDirty());
+  TS_ASSERT_FALSE (succeeded);
+  TS_ASSERT_TRUE  (got.empty());
+}
+
+
+//! Checks YamlFile::TryGetAsStringVector() when providing the sequence is empty
+//!
+void UT_YamlFile::test_TryGetAsStringVector_Empty ()
+{
+  // ---------------- Setup
+  //
+  auto yaml = "Direction: North\n"
+              "Color: [Red, Green, Blue, Yellow]\n"
+              "Numbers:\n"
+              "  - One\n"
+              "  - Two\n"
+              "  - Three\n"
+              "Tree:";
+
+  YamlFile sut;
+  sut.Load(yaml);
+
+  bool           succeeded = false;
+  vector<string> got;
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (tie(succeeded, got) = sut.TryGetAsStringVector("Tree"));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE (sut.IsDirty());
+  TS_ASSERT_FALSE (succeeded);
+  TS_ASSERT_TRUE  (got.empty());
+}
+
+
+//! Checks YamlFile::TryGetAsStringVector() when providing the sequence is not empty
+//!
+void UT_YamlFile::test_TryGetAsStringVector_Success ()
+{
+  // ---------------- Setup
+  //
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto  path     = std::get<0>(data);
+    const auto& expected = std::get<1>(data);
+
+    auto yaml = "Direction: [North]\n"
+                "Color: [Red, Green, Blue, Yellow]\n"
+                "Numbers:\n"
+                "  - One\n"
+                "  - Two\n"
+                "  - Three\n"
+                "Tree: []";
+
+    YamlFile sut;
+    sut.Load(yaml);
+
+    bool           succeeded = false;
+    vector<string> got;
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (tie(succeeded, got) = sut.TryGetAsStringVector(path));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_TRUE   (succeeded);
+    TS_ASSERT_EQUALS (got, expected);
+  };
+
+  using data_t = tuple<string_view, vector<string>>;
+  auto data =
+  {
+    data_t("Tree",      {}),
+    data_t("Direction", {"North"}),
+    data_t("Color",     {"Red", "Green", "Blue", "Yellow"}),
+    data_t("Numbers",   {"One", "Two",   "Three"}),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks YamlFile::TryGetAsIntVector() when providing an, invalid, empty path
+//!
+void UT_YamlFile::test_TryGetAsIntVector_EmptyPath ()
+{
+  // ---------------- Setup
+  //
+  YamlFile sut;
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut.TryGetAsIntVector(""), std::exception);
+}
+
+
+//! Checks YamlFile::TryGetAsIntVector() when providing not existing empty path
+//!
+void UT_YamlFile::test_TryGetAsIntVector_NotExist ()
+{
+  // ---------------- Setup
+  //
+  auto yaml = "Odds:   [1, 3, 5, 7]\n"
+              "Primes: [1, 3, 5, 7, 11, 13, 17]\n";
+
+  YamlFile sut;
+  sut.Load(yaml);
+
+  bool        succeeded = false;
+  vector<int> got;
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (tie(succeeded, got) = sut.TryGetAsIntVector("Even"));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE (sut.IsDirty());
+  TS_ASSERT_FALSE (succeeded);
+  TS_ASSERT_TRUE  (got.empty());
+}
+
+
+//! Checks YamlFile::TryGetAsIntVector() when providing the sequence is empty
+//!
+void UT_YamlFile::test_TryGetAsIntVector_Empty ()
+{
+  // ---------------- Setup
+  //
+  auto yaml = "Odds:   [1, 3, 5, 7]\n"
+              "Primes: [1, 3, 5, 7, 11, 13, 17]\n"
+              "Empty:";
+
+  YamlFile sut;
+  sut.Load(yaml);
+
+  bool        succeeded = false;
+  vector<int> got;
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (tie(succeeded, got) = sut.TryGetAsIntVector("Empty"));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE (sut.IsDirty());
+  TS_ASSERT_FALSE (succeeded);
+  TS_ASSERT_TRUE  (got.empty());
+}
+
+
+//! Checks YamlFile::TryGetAsIntVector() when providing the sequence is not empty
+//!
+void UT_YamlFile::test_TryGetAsIntVector_Success ()
+{
+  // ---------------- Setup
+  //
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto  path     = std::get<0>(data);
+    const auto& expected = std::get<1>(data);
+
+    auto yaml = "Odds:   [1, 3, 5, 7]\n"
+                "Primes: [1, 3, 5, 7, 11, 13, 17]\n"
+                "Empty:";
+
+    YamlFile sut;
+    sut.Load(yaml);
+
+    bool        succeeded = false;
+    vector<int> got;
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (tie(succeeded, got) = sut.TryGetAsIntVector(path));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (got, expected);
+  };
+
+  using data_t = tuple<string_view, vector<int>>;
+  auto data =
+  {
+    data_t("Empty",  {}),
+    data_t("Odds",   {1, 3, 5, 7}),
+    data_t("Primes", {1, 3, 5, 7, 11, 13, 17}),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
 
 
 //! Checks YamlFile::Set() for string when providing an invalid empty path

@@ -43,6 +43,7 @@ enum class LoggerKind
 //!
 enum class LoggerShownItems
 {
+   None         = 0,
    Date         = 1 << 0, //!< Show (calendar) date of message
    Time         = 1 << 1, //!< Show (clock) time of message
    Microseconds = 1 << 2, //!< Show microsecond of message (from start of logger)
@@ -70,9 +71,9 @@ enum class LoggerLevel
 //!
 enum class ReportMoments
 {
-  AfterModelParsing    = 1 << 0, //!< Just after [SIT] file has been parsed
-  BeforeConfiguration, = 1 << 1, //!< Monitor System_model state before each configuration  (when manager activity reporting is enabled)
-  AfterConfiguration,  = 1 << 2, //!< Monitor System_model state after each configuration   (when manager activity reporting is enabled)
+  AfterModelParsing   = 1 << 0, //!< Just after [SIT] file has been parsed
+  BeforeConfiguration = 1 << 1, //!< Monitor System_model state before each configuration  (when manager activity reporting is enabled)
+  AfterConfiguration  = 1 << 2, //!< Monitor System_model state after each configuration   (when manager activity reporting is enabled)
 };
 
 //! Mast configuration options.

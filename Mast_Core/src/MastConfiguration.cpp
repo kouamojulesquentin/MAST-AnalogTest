@@ -23,6 +23,7 @@
 #include <map>
 #include <tuple>
 #include <initializer_list>
+#include <type_traits>
 
 using std::vector;
 using std::string;
@@ -69,7 +70,23 @@ static const map<string, mast::LoggerShownItems> loggerShownItemMapping
   {"all",           mast::LoggerShownItems::All},
 };
 
-//+    GmlPrinterOptions        m_gmlOptions
+  // ---------------- Maps logger Show_Item option to internal value
+  //
+  static const map<string, mast::GmlPrinterOptions> gmlPrinterOptionsMapping
+  {
+    {"gml_printer_options",      GmlPrinterOptions::Default},
+    {"display_identifiers",      GmlPrinterOptions::DisplayIdentifiers},
+    {"display_register_value",   GmlPrinterOptions::DisplayRegisterValue},
+    {"display_value_auto",       GmlPrinterOptions::DisplayValueAuto},
+    {"show_protocol",            GmlPrinterOptions::ShowProtocol},
+    {"show_selector_with_edge",  GmlPrinterOptions::ShowSelectorWithEdge},
+    {"show_selector_properties", GmlPrinterOptions::ShowSelectorProperties},
+    {"show_selector_tables",     GmlPrinterOptions::ShowSelectorTables},
+    {"show_selection_values",    GmlPrinterOptions::ShowSelectionValues},
+    {"std",                      GmlPrinterOptions::Std},
+    {"all",                      GmlPrinterOptions::All},
+  };
+
 //+    ManagerMonitorOptions    m_managerActivityOptions
 //+    PrettyPrinterOptions     m_prettyPrintingOptions
 //+    mast::ReportMoments      m_gmlReportMoments
@@ -163,6 +180,7 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
       return path;
     };
 
+    // String updater
     string gotString;
     auto updateString = [&yaml, &gotString, &makePath](string& option, initializer_list<const char*> pathItems)
     {
@@ -174,6 +192,7 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
       }
     };
 
+    // Enum flags updater
     auto updateEnum = [&yaml, &gotString, &makePath](auto& option, const auto& mapping, initializer_list<const char*> pathItems)
     {
       auto ok = false;
@@ -188,7 +207,35 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
       }
     };
 
+    // Enum flags updater
+    vector<string> gotFlags;  // To be re-used for each flag option parsing
+    auto updateFlags = [&yaml, &gotFlags, &makePath](auto& option, const auto& mapping, initializer_list<const char*> pathItems)
+    {
+      auto ok = false;
+      tie(ok, gotFlags) = yaml.TryGetAsStringVector (makePath(pathItems));
+      if (ok)
+      {
+        using enum_type = std::remove_reference_t<decltype(option)>;
 
+        option = static_cast<enum_type>(0);
+
+        for (const auto& flag : gotFlags)
+        {
+          auto pos = mapping.find(flag);
+          if (pos != mapping.cend())
+          {
+            option = option | pos->second;
+          }
+          else
+          {
+            LOG(INFO) << "Invalid flag: " << flag;
+          }
+        }
+      }
+    };
+
+
+    // Bool updater
     auto updateBool = [&yaml, &gotString, &makePath](bool& option, initializer_list<const char*> pathItems)
     {
       auto ok  = false;
@@ -201,6 +248,18 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
       }
     };
 
+    // Enum flags updater
+    auto updateSequence = [&yaml, &makePath](auto& option, initializer_list<const char*> pathItems)
+    {
+      auto           ok = false;
+      vector<string> gotSequence;
+
+      tie(ok, gotSequence) = yaml.TryGetAsStringVector (makePath(pathItems));
+      if (ok)
+      {
+        option = std::move(gotSequence);
+      }
+    };
 
     updateString (m_sitFilePath,                 {"SIT_file_path"});
     updateString (m_accessInterfaceProtocol,     {"Access_interface_protocol"});
@@ -217,17 +276,17 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
     updateBool   (m_prettyPrinting,              {"Debug",          "Model_textual_print", "Enable"});
     updateBool   (m_reportManagerActivity,       {"Debug",          "Manager_activity",    "Enable"});
 
-    updateEnum (m_loggerKind,  loggerKindMapping,  {"Debug", "Logging", "Logger_Kind"});
-    updateEnum (m_loggerLevel, loggerLevelMapping, {"Debug", "Logging", "Level"});
+    updateEnum  (m_loggerKind,       loggerKindMapping,        {"Debug", "Logging",            "Logger_Kind"});
+    updateEnum  (m_loggerLevel,      loggerLevelMapping,       {"Debug", "Logging",            "Level"});
+    updateFlags (m_loggerShownItems, loggerShownItemMapping,   {"Debug", "Logging",            "Shown_items"});
+    updateFlags (m_gmlOptions,       gmlPrinterOptionsMapping, {"Debug", "Model_GML_printing", "Options"});
 
-//+    GmlPrinterOptions        m_gmlOptions
 //+    ManagerMonitorOptions    m_managerActivityOptions
 //+    PrettyPrinterOptions     m_prettyPrintingOptions
-//+    mast::LoggerShownItems   m_loggerShownItems
 //+    mast::ReportMoments      m_gmlReportMoments
 //+    mast::ReportMoments      m_prettyPrintingReportMoments
 
-//+    std::vector<std::string> m_pluginDLLs
+    updateSequence (m_pluginDLLs, {"Plugin_DLLs"});
   }
 }
 //
@@ -322,6 +381,10 @@ void MastConfiguration::Update (vector<string> arguments)
           if (pos != mapping.cend())
           {
             option = pos->second;
+          }
+          else
+          {
+            LOG(INFO) << "Invalid flag: " << arg.getValue();
           }
         }
       };

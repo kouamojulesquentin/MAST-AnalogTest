@@ -392,7 +392,11 @@ void UT_MastConfiguration::test_ParseYamlConfiguration_PartialConfiguration ()
   TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::CopyErrorsOnCerr);
   TS_ASSERT_EQUALS (sut.LoggerLevel(),               mast::LoggerLevel::Debug);
   TS_ASSERT_EQUALS (sut.LoggerShownItems(),          mast::LoggerShownItems::Date
-                                                   | mast::LoggerShownItems::Time);
+                                                   | mast::LoggerShownItems::Time
+                                                   | mast::LoggerShownItems::Microseconds
+                                                   | mast::LoggerShownItems::Level
+                                                   | mast::LoggerShownItems::ThreadId);
+
   TS_ASSERT_EQUALS (sut.GmlReportMoments(),          mast::ReportMoments::AfterModelParsing);
   TS_ASSERT_EQUALS (sut.PrettyPrintReportMoments(),  mast::ReportMoments::AfterModelParsing);
 

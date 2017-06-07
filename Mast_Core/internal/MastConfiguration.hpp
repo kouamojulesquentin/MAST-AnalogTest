@@ -70,9 +70,9 @@ enum class LoggerLevel
 //!
 enum class ReportMoments
 {
-  AfterModelParsing,   //!< Just after [SIT] file has been parsed
-  BeforeConfiguration, //!< Monitor System_model state before each configuration  (when manager activity reporting is enabled)
-  AfterConfiguration,  //!< Monitor System_model state after each configuration   (when manager activity reporting is enabled)
+  AfterModelParsing    = 1 << 0, //!< Just after [SIT] file has been parsed
+  BeforeConfiguration, = 1 << 1, //!< Monitor System_model state before each configuration  (when manager activity reporting is enabled)
+  AfterConfiguration,  = 1 << 2, //!< Monitor System_model state after each configuration   (when manager activity reporting is enabled)
 };
 
 //! Mast configuration options.
@@ -139,6 +139,7 @@ class MAST_CORE_EXPORT MastConfiguration final
   // ---------------- Private Methods
   //
   void ParseConfigurationFile (const std::string& configurationFile);
+  void ParseYamlConfiguration (const std::string& yamlConfiguration);
 
   // ---------------- Private Fields
   //

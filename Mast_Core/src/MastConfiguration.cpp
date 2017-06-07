@@ -15,15 +15,20 @@
 #include "MastConfig.hpp"
 #include "g3log/g3log.hpp"
 #include "Utility.hpp"
+#include "YamlFile.hpp"
 
 #include <tclap/CmdLine.h>
 #include <tclap/StreamOutput.h>
 
 #include <map>
+#include <tuple>
+#include <initializer_list>
 
 using std::vector;
 using std::string;
 using std::map;
+using std::tie;
+using std::initializer_list;
 
 using namespace mast;
 
@@ -48,19 +53,29 @@ static const map<string, mast::LoggerLevel> loggerLevelMapping
   {"error",   mast::LoggerLevel::Error},
 };
 
-} // End of unnamed namespace
-
-//! Does nothing in particular
-//! @internal
-//! @note Not in header file as default because there is unique_ptr member variable
-//!       with only forward declared class.
-//! @endinternal
-//+MastConfiguration::~MastConfiguration ()
-//+{
-//+}
+// ---------------- Maps logger Show_Item option to internal value
 //
-//  End of: MastConfiguration::~MastConfiguration
-//---------------------------------------------------------------------------
+static const map<string, mast::LoggerShownItems> loggerShownItemMapping
+{
+  {"date",          mast::LoggerShownItems::Date},
+  {"time",          mast::LoggerShownItems::Time},
+  {"microseconds",  mast::LoggerShownItems::Microseconds},
+  {"level",         mast::LoggerShownItems::Level},
+  {"thread_id",     mast::LoggerShownItems::ThreadId},
+  {"file_name",     mast::LoggerShownItems::FileName},
+  {"line_number",   mast::LoggerShownItems::LineNumber},
+  {"function_name", mast::LoggerShownItems::FunctionName},
+  {"std",           mast::LoggerShownItems::Std},
+  {"all",           mast::LoggerShownItems::All},
+};
+
+//+    GmlPrinterOptions        m_gmlOptions
+//+    ManagerMonitorOptions    m_managerActivityOptions
+//+    PrettyPrinterOptions     m_prettyPrintingOptions
+//+    mast::ReportMoments      m_gmlReportMoments
+//+    mast::ReportMoments      m_prettyPrintingReportMoments
+
+} // End of unnamed namespace
 
 
 
@@ -92,12 +107,132 @@ MastConfiguration::MastConfiguration ()
 //!
 void MastConfiguration::ParseConfigurationFile (const string& configurationFile)
 {
+  CHECK_PARAMETER_NOT_EMPTY(configurationFile, "Cannot parse file with empty path");
+
+  if (!Utility::FileExists(configurationFile))
+  {
+    LOG(INFO) << "Cannot find configuration file: " << configurationFile;
+    return;
+  }
+
+  auto yaml = Utility::ReadTextFile(configurationFile);
+  ParseYamlConfiguration(yaml);
+
+  if (yaml.empty())
+  {
+    LOG(INFO) << "Empty configuration file";
+  }
 }
 //
 //  End of: MastConfiguration::ParseConfigurationFile
 //---------------------------------------------------------------------------
 
 
+//! Parses MAST options from YAML text
+//!
+//! @param yamlConfiguration  YAML configuration
+//!
+void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
+{
+  if (!yamlConfiguration.empty())
+  {
+    // ---------------- Check configuration respects YAML syntax
+    //
+    auto ok           = false;
+    auto errorMessage = ""s;
+
+    tie(ok, errorMessage) = YamlFile::Check(yamlConfiguration);
+    CHECK_TRUE(ok, errorMessage);
+
+    // ---------------- Parse YAML configuration
+    //
+    YamlFile  yaml;
+    yaml.Load(yamlConfiguration);
+
+    // ---------------- Update MAST options from the configuration
+    //
+    string path;
+    auto makePath = [&path](initializer_list<const char*> pathItems)
+    {
+      path.clear();
+      path.append("Mast_Options");
+      for (const auto& pathItem : pathItems)
+      {
+        path.append(YamlFile::PATH_SEPARATOR_S).append(pathItem);
+      }
+      return path;
+    };
+
+    string gotString;
+    auto updateString = [&yaml, &gotString, &makePath](string& option, initializer_list<const char*> pathItems)
+    {
+      auto ok = false;
+      tie(ok, gotString) = yaml.TryGetAsString (makePath(pathItems));
+      if (ok)
+      {
+        option = gotString;
+      }
+    };
+
+    auto updateEnum = [&yaml, &gotString, &makePath](auto& option, const auto& mapping, initializer_list<const char*> pathItems)
+    {
+      auto ok = false;
+      tie(ok, gotString) = yaml.TryGetAsString (makePath(pathItems));
+      if (ok)
+      {
+        auto pos = mapping.find(gotString);
+        if (pos != mapping.cend())
+        {
+          option = pos->second;
+        }
+      }
+    };
+
+
+    auto updateBool = [&yaml, &gotString, &makePath](bool& option, initializer_list<const char*> pathItems)
+    {
+      auto ok  = false;
+      auto got = false;
+
+      tie(ok, got) = yaml.TryGetAsBool (makePath(pathItems));
+      if (ok)
+      {
+        option = got;
+      }
+    };
+
+
+    updateString (m_sitFilePath,                 {"SIT_file_path"});
+    updateString (m_accessInterfaceProtocol,     {"Access_interface_protocol"});
+    updateString (m_configurationAlgorithm,      {"Configuration_algorithm"});
+    updateString (m_modelCheckingFilePath,       {"Model_checking", "File_path"});
+    updateString (m_gmlFilePath,                 {"Debug",          "Model_GML_printing",  "File_path"});
+    updateString (m_gmlGraphName,                {"Debug",          "Model_GML_printing",  "Graph_name"});
+    updateString (m_prettyPrintingFilePath,      {"Debug",          "Model_textual_print", "File_path"});
+    updateString (m_loggerFilePath,              {"Debug",          "Logging",             "File_path"});
+    updateString (m_managerActivityFileBasePath, {"Debug",          "Manager_activity",    "File_path"});
+    updateBool   (m_modelChecking,               {"Model_checking", "Enable"});
+    updateBool   (m_loggerEnabled,               {"Debug",          "Logging",             "Enable"});
+    updateBool   (m_gmlPrinting,                 {"Debug",          "Model_GML_printing",  "Enable"});
+    updateBool   (m_prettyPrinting,              {"Debug",          "Model_textual_print", "Enable"});
+    updateBool   (m_reportManagerActivity,       {"Debug",          "Manager_activity",    "Enable"});
+
+    updateEnum (m_loggerKind,  loggerKindMapping,  {"Debug", "Logging", "Logger_Kind"});
+    updateEnum (m_loggerLevel, loggerLevelMapping, {"Debug", "Logging", "Level"});
+
+//+    GmlPrinterOptions        m_gmlOptions
+//+    ManagerMonitorOptions    m_managerActivityOptions
+//+    PrettyPrinterOptions     m_prettyPrintingOptions
+//+    mast::LoggerShownItems   m_loggerShownItems
+//+    mast::ReportMoments      m_gmlReportMoments
+//+    mast::ReportMoments      m_prettyPrintingReportMoments
+
+//+    std::vector<std::string> m_pluginDLLs
+  }
+}
+//
+//  End of: MastConfiguration::ParseYamlConfiguration
+//---------------------------------------------------------------------------
 
 
 //! Updates from C-Style command line arguments
@@ -235,7 +370,6 @@ void MastConfiguration::Update (vector<string> arguments)
     m_shouldExit = true;
     throw;
   }
-
 }
 //
 //  End of: MastConfiguration::Update

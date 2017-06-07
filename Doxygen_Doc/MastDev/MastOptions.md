@@ -22,7 +22,8 @@ Default configuration file looks like this:
        Configuration_algorithm: last_or_default # One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a [plugin])
        Access_interface_protocol: SIT           # When different to "SIT", it override the one define in [SIT] file
        Plugin_DLLs:  Plugins                    # Root path and/or list of file(s) path
-       Model_checking: false                    # Enable/Disable model checking (provided it has been parsed successfully)
+       Model_checking:
+         Enable:    false                       # Enable/Disable model checking (provided it has been parsed successfully)
          File_path: ""                          # Optional file path (logged when no path when logged is enabled)
        Debug:
          Logging:
@@ -31,20 +32,23 @@ Default configuration file looks like this:
            File_path:  ""                       # File path for logging (there is always a file logging when enabled)
            Shown_items: std                     # Any of [date, time, microseconds, level, thread_id, file_name, line_number, function_name, std, all]
            Level: info                          # One of [debug, info, warning, error]
-         Model_GML_printing: false              # Enable/Disable printing of GML representation of the model state
+         Model_GML_printing:
+           Enable:  false                       # Enable/Disable printing of GML representation of the model state
            Moments:                             # Any of [after_model_parsing, before_configuration, after_configuration] (see bellow)
              - After_Parsing
            File_path: ""                        # Optional file path for GML graph printing
            Graph_name:      ""                  # Optional graph name
            Options: std                         # Any of [default, identifiers, register_value, auto_value, protocol, selector_with_edge, selector_properties, selector_tables, selection_values, std, all]
-         Model_textual_print: false             # Enable/Disable printing of textual representation of the model state
+         Model_textual_print:
+           Enable:  false                       # Enable/Disable printing of textual representation of the model state
            Moments:                             # Any of [after_model_parsing, before_configuration, after_configuration] (see bellow)
              - After_Parsing
            File_path: ""                        # Optional file path
            Options:  default                    # Any of [default, verbose, auto_value, protocol_name, selection_state, selection_value, selector_properties, ignored_nodes, std, all]
-         Manager_activity:  false               # Enable/Disable logging and optionally reporting model state at specific point of manager activity
+         Manager_activity:
+           Enable:         false                # Enable/Disable logging and optionally reporting model state at specific point of manager activity
            File_base_name: ""                   # Path where pretty print and/or GML files are saved
-           Options: PDL_commands                # Any of [verbose, app_thread_creation, PDL_commands, data_cycles, std, all]
+           Options:        PDL_commands         # Any of [verbose, app_thread_creation, PDL_commands, data_cycles, std, all]
      Plugins_Options: ""                        # Defines plugins specific options (ignored by Mast)
 
 Same default values are used when no configuration file is provided nor found in current directory.

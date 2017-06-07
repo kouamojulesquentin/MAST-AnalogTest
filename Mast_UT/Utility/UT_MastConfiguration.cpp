@@ -14,6 +14,8 @@
 #include "UT_MastConfiguration.hpp"
 #include "MastConfiguration.hpp"
 #include "MastConfig.hpp"
+#include "Utility.hpp"
+
 #include <tclap/ArgException.h>
 #include <tclap/StreamOutput.h>
 
@@ -299,6 +301,159 @@ void UT_MastConfiguration::test_Update_LongSwitches ()
   TS_ASSERT_EQUALS (plugins.size(),  2u);
   TS_ASSERT_EQUALS (plugins[0], "MyPlugins");
   TS_ASSERT_EQUALS (plugins[1], "customPlugins.dll");
+}
+
+
+//! Checks MastConfiguration::ParseYamlConfiguration() when yaml is empty
+//!
+void UT_MastConfiguration::test_ParseYamlConfiguration_Empty ()
+{
+  // ---------------- Setup
+  //
+  MastConfiguration sut;
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.ParseYamlConfiguration(""));
+
+  // ---------------- Verify
+  //
+  Check_DefaultConfiguration(sut);
+}
+
+
+//! Checks MastConfiguration::ParseYamlConfiguration() when yaml there is syntax error(s)
+//!
+void UT_MastConfiguration::test_ParseYamlConfiguration_SyntaxErrors ()
+{
+  // ---------------- Setup
+  //
+  MastConfiguration sut;
+  string yaml("Mast_Options:\n"
+              "  Foo: false\n"
+              "    Bar: true\n" // yaml-cpp: error at line 3, column 14: illegal map value.
+             );
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut.ParseYamlConfiguration(yaml), std::exception);
+}
+
+
+//! Checks MastConfiguration::ParseYamlConfiguration() when yaml provides only settings for some options
+//!
+void UT_MastConfiguration::test_ParseYamlConfiguration_PartialConfiguration ()
+{
+  // ---------------- Setup
+  //
+  MastConfiguration sut;
+  string yaml(
+              "Mast_Options:\n"
+              "  SIT_file_path: myDesign.sit\n"
+              "  Configuration_algorithm: last_lazy\n"
+              "  Plugin_DLLs:  \n"
+              "    - Plugins\n"
+              "    - myPlugin.so\n"
+              "  Debug:\n"
+              "    Logging:\n"
+              "      Enable: true\n"
+              "      Logger_Kind: copy_errors_on_cerr\n"
+              "      File_path:   myProject.log\n"
+              "      Shown_items: [date, time, microseconds, level, thread_id]\n"
+              "      Level: debug\n"
+             );  // There must be a space after the colon
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.ParseYamlConfiguration(yaml));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE (sut.ShouldExit());
+  TS_ASSERT_TRUE  (sut.LoggerEnabled());
+  TS_ASSERT_FALSE (sut.ModelChecking());
+  TS_ASSERT_FALSE (sut.GmlPrinting());
+  TS_ASSERT_FALSE (sut.PrettyPrinting());
+  TS_ASSERT_FALSE (sut.ReportManagerActivity());
+
+  TS_ASSERT_EQUALS (sut.SitFilePath(),                 "myDesign.sit");
+  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocol(),     "");
+  TS_ASSERT_EQUALS (sut.ConfigurationAlgorithm(),      "last_lazy");
+  TS_ASSERT_EQUALS (sut.GmlFilePath(),                 "MastModel.gml");
+  TS_ASSERT_EQUALS (sut.GmlGraphName(),                "DUT");
+  TS_ASSERT_EQUALS (sut.LoggerFilePath(),              "myProject.log");
+  TS_ASSERT_EQUALS (sut.ManagerActivityFileBasePath(), "DUT");
+  TS_ASSERT_EQUALS (sut.ModelCheckingFilePath(),       "");
+  TS_ASSERT_EQUALS (sut.PrettyPrintFilePath(),         "MastModel.txt");
+
+  TS_ASSERT_EQUALS (sut.GmlOptions(),                GmlPrinterOptions::Std);
+  TS_ASSERT_EQUALS (sut.ManagerActivityOptions(),    ManagerMonitorOptions::Std);
+  TS_ASSERT_EQUALS (sut.PrettyPrintOptions(),        PrettyPrinterOptions::Std);
+  TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::CopyErrorsOnCerr);
+  TS_ASSERT_EQUALS (sut.LoggerLevel(),               mast::LoggerLevel::Debug);
+  TS_ASSERT_EQUALS (sut.LoggerShownItems(),          mast::LoggerShownItems::Date
+                                                   | mast::LoggerShownItems::Time);
+  TS_ASSERT_EQUALS (sut.GmlReportMoments(),          mast::ReportMoments::AfterModelParsing);
+  TS_ASSERT_EQUALS (sut.PrettyPrintReportMoments(),  mast::ReportMoments::AfterModelParsing);
+
+  CxxTest::setAbortTestOnFail(true);
+  const auto& plugins = sut.PluginDLLs();
+  TS_ASSERT_EQUALS (plugins.size(),  2u);
+  TS_ASSERT_EQUALS (plugins[0], "Plugins");
+  TS_ASSERT_EQUALS (plugins[1], "myPlugin.so");
+}
+
+
+//! Checks MastConfiguration::ParseYamlConfiguration() when yaml provides settings for all options
+//!
+void UT_MastConfiguration::test_ParseYamlConfiguration_FullConfiguration ()
+{
+  // ---------------- Setup
+  //
+  MastConfiguration sut;
+  string yaml(
+              "Mast_Options:\n"                              // 01
+              "  SIT_file_path: DUT.sit\n"                   // 02
+              "  Configuration_algorithm: last_or_default\n" // 03
+              "  Access_interface_protocol: SIT\n"           // 04
+              "  Plugin_DLLs:  Plugins\n"                    // 05
+              "  Model_checking: \n"                         // 06
+              "    Enable: false\n"                          // 07
+              "    File_path:\n"                             // 08
+              "  Debug:\n"                                   // 09
+              "    Logging:\n"                               // 10
+              "      Enable: false\n"                        // 11
+              "      Logger_Kind: std\n"                     // 12
+              "      File_path:\n"                           // 13
+              "      Shown_items: std\n"                     // 14
+              "      Level: info\n"                          // 15
+              "    Model_GML_printing: \n"                   // 16
+              "      Enable: false\n"                        // 17
+              "      Moments:\n"                             // 18
+              "        - After_Parsing\n"                    // 19
+              "      File_path:\n"                           // 20
+              "      Graph_name:\n"                          // 21
+              "      Options: std\n"                         // 22
+              "    Model_textual_print: \n"                  // 23
+              "      Enable: false\n"                        // 24
+              "      Moments:\n"                             // 25
+              "        - After_Parsing\n"                    // 26
+              "      File_path:\n"                           // 27
+              "      Options:         default\n"             // 28
+              "    Manager_activity:  \n"                    // 29
+              "      Enable: false\n"                        // 30
+              "      File_base_name:\n"                      // 31
+              "      Options:         PDL_commands\n"        // 32
+              "Plugins_Options: ""\n"                        // 33
+             );
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.ParseYamlConfiguration(yaml));
+
+  // ---------------- Verify
+  //
+  TS_WARN ("Test not yet implemented");
 }
 
 

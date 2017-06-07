@@ -28,13 +28,24 @@ class UT_MastConfiguration : public CxxTest::TestSuite
 
   // ================ Test Methods ================
 
+  // ---------------- Constructor
+  //
   void test_constructor ();
 
+  // ---------------- Update
+  //
   void test_Update_NoArguments ();
   void test_Update_OnlyAppName ();
   void test_Update_BadArguments ();
   void test_Update_ShortSwitches ();
   void test_Update_LongSwitches ();
+
+  // ---------------- ParseYamlConfiguration
+  //
+  void test_ParseYamlConfiguration_Empty ();
+  void test_ParseYamlConfiguration_SyntaxErrors ();
+  void test_ParseYamlConfiguration_PartialConfiguration ();
+  void test_ParseYamlConfiguration_FullConfiguration ();
 };
 //
 //  End of UT_MastConfiguration class declaration

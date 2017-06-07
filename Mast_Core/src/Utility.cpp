@@ -237,6 +237,37 @@ string Utility::IfNotEmpty_SingleQuoteAndSuffixWithSpace (string_view text)
 //---------------------------------------------------------------------------
 
 
+
+//! Reads a text file into a string
+//!
+//! @note There is no function to do such thing in the STL !
+//!
+//! @param filePath Path to file to read
+//!
+//! @return Read file content
+string Utility::ReadTextFile (const string& filePath)
+{
+  CHECK_FILE_EXISTS(filePath);
+
+  ifstream ifs(filePath);
+  CHECK_TRUE(ifs.is_open(), "Failed to open file: "s + filePath);
+
+  string content;
+
+  ifs.seekg(0, std::ios::end);
+  content.reserve(ifs.tellg());
+  ifs.seekg(0, std::ios::beg);
+
+  content.assign((std::istreambuf_iterator<char>(ifs)),
+                  std::istreambuf_iterator<char>());
+  return content;
+}
+//
+//  End of: Utility::ReadTextFile
+//---------------------------------------------------------------------------
+
+
+
 //! Surrounds some text with single quotes
 //!
 //! @param text   Text to surround with quotes

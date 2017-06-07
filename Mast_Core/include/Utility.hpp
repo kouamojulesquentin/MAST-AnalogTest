@@ -42,6 +42,10 @@ class MAST_CORE_EXPORT Utility final
   //!
   static bool FileExists (std::experimental::string_view filePath);
 
+  //! Reads a text file into a string
+  //!
+  static std::string ReadTextFile (const std::string& filePath);
+
   //! Returns the minimal number of bits to encode a binary value
   //!
   static uint32_t MinimalBitsForValue(uint32_t value);

@@ -81,7 +81,7 @@ enum class ReportMoments
 //!       Command line switches override configuration file values that override default settings
 //!
 //! @see @ref MastOptions for further documentation of configuration file and command line switches
-class MastConfiguration final
+class MAST_CORE_EXPORT MastConfiguration final
 {
   // ---------------- Public Methods
   //

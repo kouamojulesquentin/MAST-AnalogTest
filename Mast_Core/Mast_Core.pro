@@ -112,7 +112,6 @@ HEADERS += \
     include/I2C_Player.hpp                              \
     include/Linker.hpp                                  \
     include/Mast_Core_export.hpp                        \
-    include/MastConfig.hpp                              \
     include/NodePathResolver.hpp                        \
     include/OfflineProtocol.hpp                         \
     include/ParentNode.hpp                              \
@@ -147,6 +146,7 @@ HEADERS += \
     internal/SystemModelReseter.hpp                     \
     internal/FromSutUpdater.hpp                         \
     internal/ToSutVisitor.hpp                           \
+    internal/MastConfig.hpp                             \
     internal/MastConfiguration.hpp                      \
     internal/MismatchesCollector.hpp                    \
     internal/NamesChecker.hpp                           \

@@ -14,13 +14,41 @@
 #include "MastConfiguration.hpp"
 #include "MastConfig.hpp"
 #include "g3log/g3log.hpp"
+#include "Utility.hpp"
 
 #include <tclap/CmdLine.h>
 #include <tclap/StreamOutput.h>
 
+#include <map>
+
 using std::vector;
 using std::string;
+using std::map;
+
 using namespace mast;
+
+namespace
+{
+// ---------------- Maps logger kind arguments to internal value
+//
+static const map<string, mast::LoggerKind>  loggerKindMapping
+{
+  {"std",                 mast::LoggerKind::Std},
+  {"copy_all_on_cout",    mast::LoggerKind::CopyAllOnCout},
+  {"copy_errors_on_cerr", mast::LoggerKind::CopyErrorsOnCerr},
+};
+
+// ---------------- Maps logger level arguments to internal value
+//
+static const map<string, mast::LoggerLevel> loggerLevelMapping
+{
+  {"debug",   mast::LoggerLevel::Debug},
+  {"info",    mast::LoggerLevel::Info},
+  {"warning", mast::LoggerLevel::Warning},
+  {"error",   mast::LoggerLevel::Error},
+};
+
+} // End of unnamed namespace
 
 //! Does nothing in particular
 //! @internal
@@ -53,6 +81,20 @@ MastConfiguration::MastConfiguration ()
 }
 //
 //  End of: MastConfiguration::MastConfiguration
+//---------------------------------------------------------------------------
+
+
+//! Parses MAST options in configuration file
+//!
+//! @note If the file does not exist, this is logged as an info
+//!
+//! @param configurationFile  Path to file to parse
+//!
+void MastConfiguration::ParseConfigurationFile (const string& configurationFile)
+{
+}
+//
+//  End of: MastConfiguration::ParseConfigurationFile
 //---------------------------------------------------------------------------
 
 
@@ -89,7 +131,8 @@ void MastConfiguration::Update (vector<string> arguments)
   {
     // ---------------- Prepare the parser
     //
-    TCLAP::CmdLine cmdLine("Mast", '=', MAST_VERSION);
+    TCLAP::CmdLine cmdLine("Mast: Manager for System On Chip Tests", '=', MAST_VERSION, false);
+
 
     if (m_cmdLineOutput)
     {
@@ -105,36 +148,94 @@ void MastConfiguration::Update (vector<string> arguments)
     TCLAP::ValuesConstraint<string> logLevelConstraint(allowedLogLevel);
     TCLAP::ValuesConstraint<string> logKindConstraint(allowedLogKind);
 
-    TCLAP::ValueArg<std::string> configurationFileArg ("-c", "--conf",        "Define configuration file",                                                      false, "mast.cfg",               "File path", cmdLine);
-    TCLAP::ValueArg<std::string> sitFilePathArg       ("-s", "--sit",         "Define SIT that specified SUT model",                                            false, "project.sit",            "File path", cmdLine);
-    TCLAP::ValueArg<std::string> configurationAlgoArg ("-a", "--config_algo", "Name of configuration algorithm used to select linker  (mux) path",              false, "last_or_default",        "One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a plugin", cmdLine);
-    TCLAP::ValueArg<std::string> aiProtocolArg        ("",   "--protocol",    "Override access interface protocol defined in SIT file",                         false, "",                       "Protocol name", cmdLine);
-    TCLAP::ValueArg<std::string> checkModelFileArg    ("",   "--check_file",  "Defines result of model checking  (it is always logged when logger is enabled)", false, "mast_check.txt",         "File path", cmdLine);
-    TCLAP::ValueArg<std::string> logFileArg           ("",   "--log_file",    "Define logger file path",                                                        false, "mast.log",               "File path", cmdLine);
-    TCLAP::ValueArg<std::string> logLevelArg          ("",   "--log_level",   "Define log level",                                                               false, "info",                   &logLevelConstraint, cmdLine);
-    TCLAP::ValueArg<std::string> logKindArg           ("",   "--log_kind",    "Define logger kind",                                                             false, "std",                    &logKindConstraint, cmdLine);
-    TCLAP::SwitchArg             logEnabledArg        ("-l", "--log",         "Enable logger",                                                                  cmdLine, false);
-    TCLAP::SwitchArg             checkModelArg        ("",   "--check",       "Enable model checking  (resulting from parsing SIT file)",                       cmdLine, false);
-    TCLAP::MultiArg<std::string> pluginDLLsArg        ("",   "--plugin",      "Define plugins to load  (may be directory of file path)",                        false, "Directory or file path", cmdLine);
+    // Insert in reverse order of the USAGE print()
+    TCLAP::ValueArg<std::string> aiProtocolArg        ("",  "protocol",    "Override access interface protocol defined in SIT file",                        false, "",                       "Protocol name", cmdLine);
+    TCLAP::ValueArg<std::string> configurationAlgoArg ("a", "config_algo", "Name of configuration algorithm used to select linker  (mux) path",             false, "last_or_default",        "last_lazy|last_or_default|last_or_default_greedy| \"name defined by a plugin\"", cmdLine);
+    TCLAP::ValueArg<std::string> checkModelFileArg    ("",  "check_file",  "Defines result of model checking (it is always logged when logger is enabled)", false, "mast_check.txt",         "File path", cmdLine);
+    TCLAP::SwitchArg             checkModelArg        ("",  "check",       "Enable model checking (resulting from parsing SIT file)",                       cmdLine, false);
+    TCLAP::ValueArg<std::string> logKindArg           ("",  "log_kind",    "Define logger kind",                                                            false, "std",                    &logKindConstraint, cmdLine);
+    TCLAP::ValueArg<std::string> logLevelArg          ("",  "log_level",   "Define log level",                                                              false, "info",                   &logLevelConstraint, cmdLine);
+    TCLAP::ValueArg<std::string> logFileArg           ("",  "log_file",    "Define logger file path",                                                       false, "mast.log",               "File path", cmdLine);
+    TCLAP::SwitchArg             logEnabledArg        ("l", "log",         "Enable logger",                                                                 cmdLine, false);
+    TCLAP::MultiArg<std::string> pluginDLLsArg        ("",  "plugins",     "Define plugins to load (may be directory of file path)",                        false, "Directory or file path", cmdLine);
+    TCLAP::ValueArg<std::string> sitFilePathArg       ("s", "sit",         "Define SIT that specified SUT model",                                           false, "project.sit",            "File path", cmdLine);
+    TCLAP::ValueArg<std::string> configurationFileArg ("c", "conf",        "Define configuration file",                                                     false, "mast.cfg",               "File path", cmdLine);
 
     // ---------------- Do parse command line arguments
     //
     cmdLine.parse(arguments);
+
+    m_shouldExit = cmdLine.shouldExit();
+
+    if (!m_shouldExit)
+    {
+      // ---------------- Get parsed values
+      //
+      auto setOption = [](auto& option, const auto& arg)
+      {
+        if (arg.isSet())
+        {
+          option = arg.getValue();
+        }
+      };
+
+      auto setMappedOption = [](auto& option, const auto& arg, const auto& mapping)
+      {
+        if (arg.isSet())
+        {
+          auto pos = mapping.find(arg.getValue());
+          if (pos != mapping.cend())
+          {
+            option = pos->second;
+          }
+        }
+      };
+
+      // ---------------- Save parsed option
+      //
+      // Begin with configuration file (it has a lower priority relative to command line)
+      auto configurationFile = "mast.cfg"s;
+      setOption(configurationFile, configurationFileArg);
+      ParseConfigurationFile(configurationFile);
+
+      setOption(m_sitFilePath,             sitFilePathArg);
+      setOption(m_configurationAlgorithm,  configurationAlgoArg);
+      setOption(m_pluginDLLs,              pluginDLLsArg);
+      setOption(m_modelChecking,           checkModelArg);
+      setOption(m_modelCheckingFilePath,   checkModelFileArg);
+      setOption(m_loggerEnabled,           logEnabledArg);
+      setOption(m_loggerFilePath,          logFileArg);
+      setOption(m_accessInterfaceProtocol, aiProtocolArg);
+
+      setMappedOption(m_loggerKind,  logKindArg,  loggerKindMapping);
+      setMappedOption(m_loggerLevel, logLevelArg, loggerLevelMapping);
+    }
+  }
+  catch(TCLAP::CmdLineParseException& exc)
+  {
+    LOG(ERROR_LVL) << "Failed to parse command line: " << exc.what();
+    m_shouldExit = true;
+    throw;
+  }
+  catch(TCLAP::SpecificationException& exc)
+  {
+    LOG(ERROR_LVL) << "Internal error: " << exc.what();
+    m_shouldExit = true;
+    throw;
   }
   catch(std::exception& exc)  // Catch C++ standard exceptions
   {
-    LOG(ERROR_LVL) << "Failed to parse command line: " << exc.what();
+    LOG(ERROR_LVL) << "Failed to parse command line, getting unexpected exception: " << exc.what();
+    m_shouldExit = true;
     throw;
   }
   catch (...)
   {
-    LOG(ERROR_LVL) << "Cautch unknown exception while parsing command line";
+    LOG(ERROR_LVL) << "Caught unknown exception while parsing command line";
+    m_shouldExit = true;
     throw;
   }
 
-
-  //! @todo [JFC]-[June/02/2017]: use try catch re-throw to provide additional context
-  //!
 }
 //
 //  End of: MastConfiguration::Update

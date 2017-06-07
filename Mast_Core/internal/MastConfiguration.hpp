@@ -136,11 +136,9 @@ class MastConfiguration final
   //! @note This is useful for unit tests purpose
   bool ShouldExit() const { return m_shouldExit; }
 
-
-
-  // ---------------- Protected Methods
+  // ---------------- Private Methods
   //
-  protected:
+  void ParseConfigurationFile (const std::string& configurationFile);
 
   // ---------------- Private Fields
   //
@@ -150,9 +148,9 @@ class MastConfiguration final
   std::string              m_configurationAlgorithm;                                               //!< One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a [plugin])
   std::string              m_accessInterfaceProtocol;                                              //!< When different to "SIT", it override the one define in [SIT] file
   std::vector<std::string> m_pluginDLLs;                                                           //!< Root path and/or list of file(s) path
-  bool                     m_modelChecking               = true;                                   //!< Enable/Disable model checking (provided it has been parsed successfully)
+  bool                     m_modelChecking               = false;                                  //!< Enable/Disable model checking (provided it has been parsed successfully)
   std::string              m_modelCheckingFilePath;                                                //!< Optional file path (logged when no path when logged is enabled)
-  bool                     m_loggerEnabled               = true;                                   //!< Enable/Disable general logging
+  bool                     m_loggerEnabled               = false;                                  //!< Enable/Disable general logging
   mast::LoggerKind         m_loggerKind                  = mast::LoggerKind::Std;                  //!< Defines what kind of logger is used.
   std::string              m_loggerFilePath;                                                       //!< File path for logging (there is always a file logging when enabled)
   mast::LoggerShownItems   m_loggerShownItems            = mast::LoggerShownItems::Std;            //!< Kinds of element that are reported in the log

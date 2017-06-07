@@ -30,6 +30,11 @@ class UT_MastConfiguration : public CxxTest::TestSuite
 
   void test_constructor ();
 
+  void test_Update_NoArguments ();
+  void test_Update_OnlyAppName ();
+  void test_Update_BadArguments ();
+  void test_Update_ShortSwitches ();
+  void test_Update_LongSwitches ();
 };
 //
 //  End of UT_MastConfiguration class declaration

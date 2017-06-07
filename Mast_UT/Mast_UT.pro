@@ -14,23 +14,25 @@ QMAKE_CXXFLAGS += -fmax-errors=3
     error("Generated/Runner.cpp has not been generated")
 }
 
-INCLUDEPATH += $$PWD/../Mast_Core/include          \
-               $$PWD/../Mast_Core/internal         \
-               $$PWD/../Mast_API_CPP/include       \
-               $$PWD/../Mast_API_C/include         \
-               $$PWD/../Logger                     \
-               $$PWD/../cxxtest                    \
-               $$PWD/../External_Libs/Yaml/include \
-               CxxTest_Traits                      \
+INCLUDEPATH += $$PWD/../Mast_Core/include           \
+               $$PWD/../Mast_Core/internal          \
+               $$PWD/../Mast_API_CPP/include        \
+               $$PWD/../Mast_API_C/include          \
+               $$PWD/../Logger                      \
+               $$PWD/../cxxtest                     \
+               $$PWD/../External_Libs/tclap/include \
+               $$PWD/../External_Libs/Yaml/include  \
+               CxxTest_Traits                       \
                UT_Helpers
 
-DEPENDPATH += $$PWD/../Mast_Core/include          \
-              $$PWD/../Mast_Core/internal         \
-              $$PWD/../Mast_API_CPP/include       \
-              $$PWD/../Mast_API_C/include         \
-              $$PWD/../External_Libs/Yaml/include \
-              $$PWD/../cxxtest                    \
-              CxxTest_Traits                      \
+DEPENDPATH += $$PWD/../Mast_Core/include           \
+              $$PWD/../Mast_Core/internal          \
+              $$PWD/../Mast_API_CPP/include        \
+              $$PWD/../Mast_API_C/include          \
+              $$PWD/../External_Libs/tclap/include \
+              $$PWD/../External_Libs/Yaml/include  \
+              $$PWD/../cxxtest                     \
+              CxxTest_Traits                       \
               UT_Helpers
 
 

@@ -22,11 +22,11 @@ Default configuration file looks like this:
        Configuration_algorithm: last_or_default # One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a [plugin])
        Access_interface_protocol: SIT           # When different to "SIT", it override the one define in [SIT] file
        Plugin_DLLs:  Plugins                    # Root path and/or list of file(s) path
-       Model_checking: true                     # Enable/Disable model checking (provided it has been parsed successfully)
+       Model_checking: false                    # Enable/Disable model checking (provided it has been parsed successfully)
          File_path: ""                          # Optional file path (logged when no path when logged is enabled)
        Debug:
          Logging:
-           Enable: true                         # Enable/Disable general logging
+           Enable: false                        # Enable/Disable general logging
            Logger_Kind: std                     # One of [std, copy_all_on_cout, copy_errors_on_cerr]
            File_path:  ""                       # File path for logging (there is always a file logging when enabled)
            Shown_items: std                     # Any of [date, time, microseconds, level, thread_id, file_name, line_number, function_name, std, all]
@@ -58,23 +58,61 @@ Command line switches override same value in configuration file.
 
 Usage is:
 
-    Mast [--conf= _path_to_configuration_file_] [other_options]
+    USAGE:
+      Mast [-c=<File path>]
+           [-s=<File path>]
+           [--plugins=<Directory or file path>] ...
+           [-l]
+           [--log_file=<File path>]
+           [--log_level=<debug|info|warning|error>]
+           [--log_kind=<std|copy_all_on_cout|copy_errors_on_cerr>]
+           [--check]
+           [--check_file=<File path>]
+           [-a=<last_lazy|last_or_default|last_or_default_greedy| "name defined by a plugin">]
+           [--protocol=<Protocol name>]
+           [--]
 
-| Short | Long | Default value | Description |
-| ----- | ---- | ------------- | ----------- |
-| -h  | --help        | n/a             | Display command line help and exit
-| -v  | --version     | n/a             | Display Mast version and exit
-| -c  | --conf        | mast.cfg        | Define configuration file
-| -s  | --sit         | project.sit     | Define [SIT] that specified [SUT] model
-| -a  | --config_algo | last_or_default | Name of configuration algorithm used to select linker (mux) path
-| n/a | --protocol    | [SIT]           | Override access interface protocol defined in [SIT] file
-| n/a | --plugin      | plugins         | Define [plugin]s to load (may be directory of file path) - Can be repeated as much as necessary
-| n/a | --check       | n/a             | Enable model checking (resulting from parsing [SIT] file)
-| n/a | --check_file  | mast_check.txt  | Defines result of model checking (it is always logged when logger is enabled)
-| -l  | --log         | n/a             | Enable logger
-| n/a | --log_file    | mast.log        | Define logger file path
-| n/a | --log_level   | info            | Define log level: one of [debug, info, warning, error]
-| n/a | --log_kind    | std             | Define logger kind: one of [std, copy_all_on_cout, copy_errors_on_cerr]
+    Where:
+
+      Mast: Manager for System On Chip Tests
+
+      -c=<File path>,  --conf=<File path>
+        Define configuration file
+
+      -s=<File path>,  --sit=<File path>
+        Define SIT that specified SUT model
+
+      --plugins=<Directory or file path>  (accepted multiple times)
+        Define plugins to load (may be directory of file path)
+
+      -l,  --log
+        Enable logger
+
+      --log_file=<File path>
+        Define logger file path
+
+      --log_level=<debug|info|warning|error>
+        Define log level
+
+      --log_kind=<std|copy_all_on_cout|copy_errors_on_cerr>
+        Define logger kind
+
+      --check
+        Enable model checking (resulting from parsing SIT file)
+
+      --check_file=<File path>
+        Defines result of model checking (it is always logged when logger is enabled)
+
+      -a=<last_lazy|last_or_default|last_or_default_greedy| "name defined by a plugin">,
+      --config_algo=<last_lazy|last_or_default|last_or_default_greedy| "name defined by a plugin">
+        Name of configuration algorithm used to select linker  (mux) path
+
+      --protocol=<Protocol name>
+        Override access interface protocol defined in SIT file
+
+      --,  --ignore_rest
+        Ignores the rest of the labeled arguments following this flag.
+
 
 If there is a `mast.cfg` file in current working directory, it will be used as the configuration file.
 

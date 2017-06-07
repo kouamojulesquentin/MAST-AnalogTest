@@ -30,6 +30,7 @@ include_directories(${LIBMAST_CPP_API_INCLUDE_DIRS})
 include_directories(${LIBMAST_C_API_INCLUDE_DIRS})
 include_directories(${LIBLOGGER_INCLUDE_DIRS})
 include_directories(${LIBSIT_READER_INCLUDE_DIRS})
+include_directories(${LIBTCLAP_INCLUDE_DIRS})
 include_directories(${LIBYAML_INCLUDE_DIRS})
 
 

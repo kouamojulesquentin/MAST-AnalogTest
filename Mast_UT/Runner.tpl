@@ -25,6 +25,10 @@ int main( int argc, char *argv[] )
     {
       Exe_Dir_Path.erase(sepPos);           // Remove exe name (keeping only directory path)
     }
+    else
+    {
+      Exe_Dir_Path = ".";                   // When no separator ==> there is only application name ==> this is current directory
+    }
 
     // ---------------- Initialize logger
     //

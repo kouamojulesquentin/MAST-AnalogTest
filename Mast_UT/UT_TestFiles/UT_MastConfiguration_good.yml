@@ -1,0 +1,42 @@
+Mast_Options:
+  SIT_file_path: myProject.sit
+  Configuration_algorithm: myConfiguration
+  Access_interface_protocol: myProtocol
+  Plugin_DLLs:  [Plugins, myPlugin.dll]
+  Model_checking:
+    Enable: true
+    File_path: modelCheck.txt
+  Debug:
+    Logging:
+      Enable: true
+      Logger_Kind: copy_errors_on_cerr
+      File_path:   myProject.log
+      Shown_items: [microseconds, level, thread_id, function_name]
+      Level: warning
+    Model_GML_printing:
+      Enable: true
+      Moments:
+        - after_model_parsing
+        - after_configuration
+      File_path: ./myproject
+      Graph_name: Foo
+      Options: std
+    Model_textual_print:
+      Enable: true
+      Moments:
+        - after_model_parsing
+        - before_configuration
+      File_path: ../Tests/Bar
+      Options:
+         - verbose
+         - auto_value
+         - protocol_name
+         - selection_state
+         - selection_value
+         - selector_properties
+         - ignored_nodes
+    Manager_activity:
+      Enable: true
+      File_base_name: managerActivity
+      Options: [verbose, app_thread_creation, PDL_commands, data_cycles]
+Plugins_Options:

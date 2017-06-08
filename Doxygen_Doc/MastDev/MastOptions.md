@@ -8,8 +8,16 @@ Mast Options  {#MastOptions}
 [PDL]:   Acronyms.html "Procedure Description Language"
 [SUT]:   Acronyms.html "System Under Test"
 
-[SIT]:    SIT_Files.html
-[plugin]: Plugins.html
+[SIT]:     SIT_Files.html
+[plugin]:  Plugins.html
+[plugins]: Plugins.html
+
+# Introduction # {#Intro}
+
+[MAST] can be configured in using command line arguments, configuration files and [plugins]. <br>
+Indication of plugin(s) can be done using configuration file or command line arguments.
+Configuration file options override built-in default value and command line argument override configuration file options.
+So option can be freely defined through a mix of configuration file options and command line arguments.
 
 # Configuration File # {#Config_File}
 
@@ -17,39 +25,40 @@ Configuration file follows [YAML](https://fr.wikipedia.org/wiki/YAML) syntax.
 
 Default configuration file looks like this:
 
-     Mast_Options:
-       SIT_file_path: DUT.sit                   # [SIT] file used by the project
-       Configuration_algorithm: last_or_default # One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a [plugin])
-       Access_interface_protocol: SIT           # When different to "SIT", it override the one define in [SIT] file
-       Plugin_DLLs:  Plugins                    # Root path and/or list of file(s) path
-       Model_checking:
-         Enable:    false                       # Enable/Disable model checking (provided it has been parsed successfully)
-         File_path: ""                          # Optional file path (logged when no path when logged is enabled)
-       Debug:
-         Logging:
-           Enable: false                        # Enable/Disable general logging
-           Logger_Kind: std                     # One of [std, copy_all_on_cout, copy_errors_on_cerr]
-           File_path:  ""                       # File path for logging (there is always a file logging when enabled)
-           Shown_items: std                     # Any of [date, time, microseconds, level, thread_id, file_name, line_number, function_name, std, all]
-           Level: info                          # One of [debug, info, warning, error]
-         Model_GML_printing:
-           Enable:  false                       # Enable/Disable printing of GML representation of the model state
-           Moments:                             # Any of [after_model_parsing, before_configuration, after_configuration] (see bellow)
-             - After_Parsing
-           File_path: ""                        # Optional file path for GML graph printing
-           Graph_name:      ""                  # Optional graph name
-           Options: std                         # Any of [default, identifiers, register_value, auto_value, protocol, selector_with_edge, selector_properties, selector_tables, selection_values, std, all]
-         Model_textual_print:
-           Enable:  false                       # Enable/Disable printing of textual representation of the model state
-           Moments:                             # Any of [after_model_parsing, before_configuration, after_configuration] (see bellow)
-             - After_Parsing
-           File_path: ""                        # Optional file path
-           Options:  default                    # Any of [default, verbose, auto_value, protocol_name, selection_state, selection_value, selector_properties, ignored_nodes, std, all]
-         Manager_activity:
-           Enable:         false                # Enable/Disable logging and optionally reporting model state at specific point of manager activity
-           File_base_name: ""                   # Path where pretty print and/or GML files are saved
-           Options:        PDL_commands         # Any of [verbose, app_thread_creation, PDL_commands, data_cycles, std, all]
-     Plugins_Options: ""                        # Defines plugins specific options (ignored by Mast)
+    Mast_Options:
+      SIT_file_path: DUT.sit                   # [SIT] file used by the project
+      Configuration_algorithm: last_or_default # One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a [plugin])
+      Access_interface_protocol:               # When different to "SIT", it override the one define in [SIT] file
+      Plugin_DLLs:  Plugins                    # Root path and/or list of file(s) path
+      Model_checking:
+        Enable:    false                       # Enable/Disable model checking (provided it has been parsed successfully)
+        File_path: ""                          # Optional file path (logged when no path when logged is enabled)
+      Debug:
+        Logging:
+          Enable: false                        # Enable/Disable general logging
+          Logger_Kind: std                     # One of [std, copy_all_on_cout, copy_errors_on_cerr]
+          File_path:  "Mast.log"               # File path for logging (there is always a file logging when enabled)
+          Shown_items: std                     # Any of [date, time, microseconds, level, thread_id, file_name, line_number, function_name, std, all]
+          Level: info                          # One of [debug, info, warning, error]
+        Model_GML_printing:
+          Enable:  false                       # Enable/Disable printing of GML representation of the model state
+          Moments:                             # Any of [after_model_parsing, before_configuration, after_configuration] (see bellow)
+            - after_model_parsing
+          File_path:   "MastModel.gml"         # Optional file path for GML graph printing
+          Graph_name:  "DUT"                   # Optional graph name
+          Options: std                         # Any of [default, identifiers, register_value, auto_value, protocol_name, selector_with_edge, selector_properties, selector_tables, selection_value, std, all]
+        Model_textual_print:
+          Enable:  false                       # Enable/Disable printing of textual representation of the model state
+          Moments:                             # Any of [after_model_parsing, before_configuration, after_configuration] (see bellow)
+            - after_model_parsing
+          File_path: "MastModel.txt"           # Optional file path
+          Options:  default                    # Any of [default, verbose, auto_value, protocol_name, selection_state, selection_value, selector_properties, ignored_nodes, std, all]
+        Manager_activity:
+          Enable:         false                # Enable/Disable logging and optionally reporting model state at specific point of manager activity
+          File_base_name: "DUT"                # Path where pretty print and/or GML files are saved
+          Options:        PDL_commands         # Any of [verbose, app_thread_creation, PDL_commands, data_cycles, std, all]
+    Plugins_Options: ""                        # Defines plugins specific options (ignored by Mast)
+
 
 Same default values are used when no configuration file is provided nor found in current directory.
 
@@ -156,7 +165,7 @@ Defines what kind of model information pieces are displayed in the [GML] model s
 | identifiers         | To show node identifier
 | register_value      | To show Register values
 | auto_value          | To show Register values as binary when small, hexa when large and end of large string as binary when cannot form a plain nibble
-| protocol            | To show Protocol name of an access interface
+| protocol_name       | To show Protocol name of an access interface
 | selector_with_edge  | To show Linker selector associated register with an edge between the Linker and the Register (this can cause out of order display)
 | selector_properties | To show selector properties
 | selector_tables     | To show selector tables for selection/deselection

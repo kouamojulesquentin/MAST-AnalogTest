@@ -90,7 +90,7 @@ class MAST_CORE_EXPORT MastConfiguration final
   ~MastConfiguration() = default;
   MastConfiguration();
 
-  void Update(int argc, char* argv[]);             //!< Updates from C-Style command line arguments
+  void Update(int argc, const char* argv[]);       //!< Updates from C-Style command line arguments
   void Update(std::vector<std::string> arguments); //!< Updates from list of command line arguments
 
   // ---------------- Options getters

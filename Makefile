@@ -162,6 +162,9 @@ ifeq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR))","")
 > cd       $(CMAKE_CODE_COVERAGE_BUILD_DIR) && cmake $(CMAKE_COMPILER_FLAGS) $(CMAKE_CODE_COVERAGE_FLAGS) ..
 endif
 > cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && make $(MAKE_FLAGS)
+ifeq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR)/$(BIN_DIR)/SIT)","")
+> cd $(CMAKE_CODE_COVERAGE_BUILD_DIR)   && make install
+endif
 
 code_coverage_run: code_coverage_build
 ifeq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR)/$(BIN_DIR)/$(MAST_UT_EXE_NAME))","")

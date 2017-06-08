@@ -64,5 +64,7 @@ else ()
   target_link_libraries(Mast_UT Mast_API_CPP Mast_API_C Logger pthread)
 endif ()
 
+install(DIRECTORY UT_TestFiles DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Mast_Core)
+
 include(CTest)
 add_test(NAME Mast_UT COMMAND Mast_UT)

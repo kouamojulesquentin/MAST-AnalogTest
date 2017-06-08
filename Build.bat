@@ -63,6 +63,7 @@
 @echo ===================== Building Mast_UT =====================
 @echo.
 %make_exe% -j4 -C %Build_Qt%\Mast_UT -f Makefile %target%
+@robocopy Mast_UT\UT_TestFiles /mir  %Build_Qt%\Bin\%target%\Mast_Core\UT_TestFiles
 
 @echo.
 @echo ===================== Building SIT_Reader_UT Runner.cpp =====================

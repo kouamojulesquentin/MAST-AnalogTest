@@ -6,9 +6,26 @@
 #include "LoggerSinks.h"
 #include "CustomFileSink.h"
 #include <memory>
+#include <string>
+
+std::string Exe_Dir_Path; // Mainly for mast configuration related code
 
 int main( int argc, char *argv[] )
 {
+    // ---------------- Set Exe_Dir_Path with only directory path of runner application
+    //
+    Exe_Dir_Path = std::string(argv[0]);
+    auto sepPos  = Exe_Dir_Path.rfind("/"); // Search for last Linux directory separator
+    if (sepPos == std::string::npos)
+    {
+      sepPos  = Exe_Dir_Path.rfind("\\");   // Search for last Windows directory separator
+    }
+
+    if (sepPos != std::string::npos)
+    {
+      Exe_Dir_Path.erase(sepPos);           // Remove exe name (keeping only directory path)
+    }
+
     // ---------------- Initialize logger
     //
     auto logworker  = g3::LogWorker::createLogWorker();

@@ -74,6 +74,7 @@ SOURCES += \
     UT_Helpers/Spy_STIL_Protocol.cpp                    \
     UT_Helpers/Spy_SVF_Protocol.cpp                     \
     UT_Helpers/TestModelBuilder.cpp                     \
+    UT_Helpers/TestUtilities.cpp                        \
     UT_Helpers/UT_TestModelBuilder.cpp                  \
     Utility/UT_MastConfiguration.cpp                    \
     Utility/UT_BinaryVector.cpp                         \
@@ -126,6 +127,7 @@ HEADERS += \
     UT_Helpers/Spy_STIL_Protocol.hpp                  \
     UT_Helpers/Spy_SVF_Protocol.hpp                   \
     UT_Helpers/TestModelBuilder.hpp                   \
+    UT_Helpers/TestUtilities.hpp                      \
     UT_Helpers/UT_TestModelBuilder.hpp                \
     Utility/UT_BinaryVector.hpp                       \
     Utility/UT_MastConfiguration.hpp                  \

@@ -70,28 +70,63 @@ static const map<string, mast::LoggerShownItems> loggerShownItemMapping
   {"all",           mast::LoggerShownItems::All},
 };
 
-  // ---------------- Maps logger Show_Item option to internal value
-  //
-  static const map<string, mast::GmlPrinterOptions> gmlPrinterOptionsMapping
-  {
-    {"gml_printer_options",      GmlPrinterOptions::Default},
-    {"display_identifiers",      GmlPrinterOptions::DisplayIdentifiers},
-    {"display_register_value",   GmlPrinterOptions::DisplayRegisterValue},
-    {"display_value_auto",       GmlPrinterOptions::DisplayValueAuto},
-    {"show_protocol",            GmlPrinterOptions::ShowProtocol},
-    {"show_selector_with_edge",  GmlPrinterOptions::ShowSelectorWithEdge},
-    {"show_selector_properties", GmlPrinterOptions::ShowSelectorProperties},
-    {"show_selector_tables",     GmlPrinterOptions::ShowSelectorTables},
-    {"show_selection_values",    GmlPrinterOptions::ShowSelectionValues},
-    {"std",                      GmlPrinterOptions::Std},
-    {"all",                      GmlPrinterOptions::All},
-  };
+// ---------------- Maps GML printer options to internal value
+//
+static const map<string, mast::GmlPrinterOptions> gmlPrinterOptionsMapping
+{
+  {"default",             GmlPrinterOptions::Default},
+  {"identifiers",         GmlPrinterOptions::DisplayIdentifiers},
+  {"register_value",      GmlPrinterOptions::DisplayRegisterValue},
+  {"auto_value",          GmlPrinterOptions::DisplayValueAuto},
+  {"protocol",            GmlPrinterOptions::ShowProtocol},
+  {"selector_with_edge",  GmlPrinterOptions::ShowSelectorWithEdge},
+  {"selector_properties", GmlPrinterOptions::ShowSelectorProperties},
+  {"selector_tables",     GmlPrinterOptions::ShowSelectorTables},
+  {"selection_value",     GmlPrinterOptions::ShowSelectionValues},
+  {"std",                 GmlPrinterOptions::Std},
+  {"all",                 GmlPrinterOptions::All},
+};
 
-//+    ManagerMonitorOptions    m_managerActivityOptions
-//+    PrettyPrinterOptions     m_prettyPrintingOptions
-//+    mast::ReportMoments      m_gmlReportMoments
-//+    mast::ReportMoments      m_prettyPrintingReportMoments
+// ---------------- Maps Pretty printer options to internal value
+//
+static const map<string, mast::PrettyPrinterOptions> prettyPrinterOptionsMapping
+{
+  {"verbose",             PrettyPrinterOptions::Verbose},
+  {"auto_value",          PrettyPrinterOptions::DisplayValueAuto},
+  {"protocol_name",       PrettyPrinterOptions::ShowProtocol},
+  {"selection_state",     PrettyPrinterOptions::ShowSelectionState},
+  {"selector_properties", PrettyPrinterOptions::ShowSelectorProperties},
+  {"selection_value",     PrettyPrinterOptions::ShowSelectionValue},
+  {"ignored_nodes",       PrettyPrinterOptions::ShowNodeIsIgnored},
+  {"default",             PrettyPrinterOptions::Default},
+  {"none",                PrettyPrinterOptions::None},
+  {"std",                 PrettyPrinterOptions::Std},
+  {"all",                 PrettyPrinterOptions::All},
+  {"parser_debug",        PrettyPrinterOptions::Parser_debug},
+};
 
+// ---------------- Maps manager activity options to internal value
+//
+static const map<string, mast::ManagerMonitorOptions> managerActivityOptionsMapping
+{
+  {"default",             ManagerMonitorOptions::Default},
+  {"verbose",             ManagerMonitorOptions::Verbose},
+  {"app_thread_creation", ManagerMonitorOptions::AppThreadCreation},
+  {"PDL_commands",        ManagerMonitorOptions::PDLCommands},
+  {"data_cycles",         ManagerMonitorOptions::DataCycles},
+  {"internal_debug",      ManagerMonitorOptions::InternalDebug},
+  {"std",                 ManagerMonitorOptions::Std},
+  {"all",                 ManagerMonitorOptions::All},
+};
+
+// ---------------- Maps report moment options to internal value
+//
+static const map<string, mast::ReportMoments> reportMomentsMapping
+{
+  {"after_model_parsing",  ReportMoments::AfterModelParsing},
+  {"before_configuration", ReportMoments::BeforeConfiguration},
+  {"after_configuration",  ReportMoments::AfterConfiguration},
+};
 } // End of unnamed namespace
 
 
@@ -100,7 +135,7 @@ static const map<string, mast::LoggerShownItems> loggerShownItemMapping
 //!
 MastConfiguration::MastConfiguration ()
   : m_sitFilePath                 ("DUT.sit")
-  , m_configurationAlgorithm      ("LastOrDefault")
+  , m_configurationAlgorithm      ("last_or_default")
   , m_accessInterfaceProtocol     ("")
   , m_pluginDLLs                  ({PLUGINS_DIRECTORY_NAME})
   , m_modelCheckingFilePath       ()
@@ -269,22 +304,21 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
     updateString (m_gmlGraphName,                {"Debug",          "Model_GML_printing",  "Graph_name"});
     updateString (m_prettyPrintingFilePath,      {"Debug",          "Model_textual_print", "File_path"});
     updateString (m_loggerFilePath,              {"Debug",          "Logging",             "File_path"});
-    updateString (m_managerActivityFileBasePath, {"Debug",          "Manager_activity",    "File_path"});
+    updateString (m_managerActivityFileBasePath, {"Debug",          "Manager_activity",    "File_base_name"});
     updateBool   (m_modelChecking,               {"Model_checking", "Enable"});
     updateBool   (m_loggerEnabled,               {"Debug",          "Logging",             "Enable"});
     updateBool   (m_gmlPrinting,                 {"Debug",          "Model_GML_printing",  "Enable"});
     updateBool   (m_prettyPrinting,              {"Debug",          "Model_textual_print", "Enable"});
     updateBool   (m_reportManagerActivity,       {"Debug",          "Manager_activity",    "Enable"});
 
-    updateEnum  (m_loggerKind,       loggerKindMapping,        {"Debug", "Logging",            "Logger_Kind"});
-    updateEnum  (m_loggerLevel,      loggerLevelMapping,       {"Debug", "Logging",            "Level"});
-    updateFlags (m_loggerShownItems, loggerShownItemMapping,   {"Debug", "Logging",            "Shown_items"});
-    updateFlags (m_gmlOptions,       gmlPrinterOptionsMapping, {"Debug", "Model_GML_printing", "Options"});
-
-//+    ManagerMonitorOptions    m_managerActivityOptions
-//+    PrettyPrinterOptions     m_prettyPrintingOptions
-//+    mast::ReportMoments      m_gmlReportMoments
-//+    mast::ReportMoments      m_prettyPrintingReportMoments
+    updateEnum  (m_loggerKind,                  loggerKindMapping,             {"Debug", "Logging",             "Logger_Kind"});
+    updateEnum  (m_loggerLevel,                 loggerLevelMapping,            {"Debug", "Logging",             "Level"});
+    updateFlags (m_loggerShownItems,            loggerShownItemMapping,        {"Debug", "Logging",             "Shown_items"});
+    updateFlags (m_gmlOptions,                  gmlPrinterOptionsMapping,      {"Debug", "Model_GML_printing",  "Options"});
+    updateFlags (m_gmlReportMoments,            reportMomentsMapping,          {"Debug", "Model_GML_printing",  "Moments"});
+    updateFlags (m_prettyPrintingOptions,       prettyPrinterOptionsMapping,   {"Debug", "Model_textual_print", "Options"});
+    updateFlags (m_prettyPrintingReportMoments, reportMomentsMapping,          {"Debug", "Model_textual_print", "Moments"});
+    updateFlags (m_managerActivityOptions,      managerActivityOptionsMapping, {"Debug", "Manager_activity",    "Options"});
 
     updateSequence (m_pluginDLLs, {"Plugin_DLLs"});
   }
@@ -299,7 +333,7 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
 //! @param argc   Number of arguments (first one is application name)
 //! @param argv   Array of arguments
 //!
-void MastConfiguration::Update (int argc, char* argv[])
+void MastConfiguration::Update (int argc, const char* argv[])
 {
   vector<string> arguments;
 
@@ -326,7 +360,6 @@ void MastConfiguration::Update (vector<string> arguments)
     // ---------------- Prepare the parser
     //
     TCLAP::CmdLine cmdLine("Mast: Manager for System On Chip Tests", '=', MAST_VERSION, false);
-
 
     if (m_cmdLineOutput)
     {
@@ -378,13 +411,13 @@ void MastConfiguration::Update (vector<string> arguments)
         if (arg.isSet())
         {
           auto pos = mapping.find(arg.getValue());
-          if (pos != mapping.cend())
+          if (pos != mapping.cend())  // ==> Should be always true unless mapping is not complete !
           {
             option = pos->second;
           }
           else
           {
-            LOG(INFO) << "Invalid flag: " << arg.getValue();
+            LOG(INFO) << "Internal error; no mapping for flag: " << arg.getValue();
           }
         }
       };

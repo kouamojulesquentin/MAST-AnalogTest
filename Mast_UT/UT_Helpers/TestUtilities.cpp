@@ -1,0 +1,51 @@
+//===========================================================================
+//                           TestUtilities.cpp
+//===========================================================================
+// Copyright (C) 2017 G-INP/Tima. All rights reserved.
+//
+// Project : Mast
+//
+//! @file TestUtilities.cpp
+//!
+//! Implements utilities for testing Mast Core
+//!
+//===========================================================================
+
+//+#include "Utility.hpp"
+#include "TestUtilities.hpp"
+#include "MastConfig.hpp"
+
+#include <initializer_list>
+#include <cxxtest/TestSuite.h>
+
+using std::string;
+using std::initializer_list;
+
+extern string Exe_Dir_Path;
+
+//! Returns file path given a test file name
+//!
+//! @param fileName Name for file used in test
+//!
+string test::GetTestFilePath(const string& fileName)
+{
+  string filePath(fileName);
+
+  auto makePath = [](string first, initializer_list<string> otherParts)
+  {
+    string filePath(first);
+    for (const auto& part : otherParts)
+    {
+      filePath.append(DIRECTORY_SEPARATOR).append(part);
+    }
+    return filePath;
+  };
+
+  filePath = makePath(Exe_Dir_Path, {"Mast_Core", "UT_TestFiles", fileName});
+  TS_ASSERT_FILE_EXISTS (filePath);
+  return filePath;
+}
+
+//===========================================================================
+// End of TestUtilities.cpp
+//===========================================================================

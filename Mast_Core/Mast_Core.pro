@@ -16,13 +16,13 @@ QMAKE_CXXFLAGS += -fmax-errors=3
 INCLUDEPATH += include         \
                internal        \
                $$PWD/../Logger \
-               $$PWD/../External_Libs/tclap/include
+               $$PWD/../External_Libs/tclap/include \
                $$PWD/../External_Libs/Yaml/include
 
 DEPENDPATH += include         \
               internal        \
               $$PWD/../Logger \
-              $$PWD/../External_Libs/tclap/include
+              $$PWD/../External_Libs/tclap/include  \
               $$PWD/../External_Libs/Yaml/include
 
 

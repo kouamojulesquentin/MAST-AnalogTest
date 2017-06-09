@@ -111,6 +111,7 @@ add_subdirectory(Mast_Core)
 add_subdirectory(SIT_reader)
 add_subdirectory(Mast_API_CPP)
 add_subdirectory(Mast_API_C)
+add_subdirectory(Mast_App)
 
 add_subdirectory(Optional_Libs)
 

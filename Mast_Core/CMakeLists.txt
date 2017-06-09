@@ -38,7 +38,7 @@ set_target_properties (Mast_Core PROPERTIES COMPILE_FLAGS "${CFLAGS}")
 if (WIN32)
   set(EXTRA_LIBS ${EXTRA_LIBS} DbgHelp)
 else()
-  set(EXTRA_LIBS ${EXTRA_LIBS} pthread)
+  set(EXTRA_LIBS ${EXTRA_LIBS} pthread dl)  # dl is for loading dlls
 endif()
 
 message("")

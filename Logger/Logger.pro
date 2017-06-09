@@ -10,6 +10,7 @@ TARGET   = Logger
 TEMPLATE = lib
 
 CONFIG  += c++14
+DEFINES = G3_DYNAMIC_LOGGING
 
 #+QMAKE_CXXFLAGS += -Wpedantic  -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-include-dirs -Wswitch-enum -Wswitch-default
 #+QMAKE_CXXFLAGS += -fmax-errors=3

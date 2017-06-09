@@ -37,49 +37,52 @@ DEPENDPATH += $$PWD/../Mast_Core/include           \
 
 
 SOURCES += \
-    Generated/Runner.cpp                                \
-    API_C/UT_PDL_Adapter_C.cpp                          \
-    API_CPP/UT_PDL_Adapter_CPP.cpp                      \
-    SystemModel/UT_AccessInterfaceProtocolFactory.cpp   \
-    SystemModel/UT_ConfigureAlgorithmFactory.cpp        \
-    SystemModel/UT_ConfigureVisitor.cpp                 \
-    SystemModel/UT_DataCycle.cpp                        \
-    SystemModel/UT_DefaultBinaryPathSelector.cpp        \
-    SystemModel/UT_DefaultNHotPathSelector.cpp          \
-    SystemModel/UT_DefaultOneHotPathSelector.cpp        \
-    SystemModel/UT_DefaultTableBasedPathSelector.cpp    \
-    SystemModel/UT_FromSutUpdater.cpp                   \
-    SystemModel/UT_GenericAccessInterfaceProtocol.cpp   \
-    SystemModel/UT_GmlPrinter.cpp                       \
-    SystemModel/UT_NamesChecker.cpp                     \
-    SystemModel/UT_NodePathResolver.cpp                 \
-    SystemModel/UT_ParentNode.cpp                       \
-    SystemModel/UT_PathSelectorFactory.cpp              \
-    SystemModel/UT_PrettyPrinter.cpp                    \
-    SystemModel/UT_PropagatePendingVisitor.cpp          \
-    SystemModel/UT_Remote_Protocol_Proxy.cpp            \
-    SystemModel/UT_Register.cpp                         \
-    SystemModel/UT_I2C_EmulationProtocol.cpp            \
-    SystemModel/UT_STIL_EmulationProtocol.cpp           \
-    SystemModel/UT_SVF_SimulationProtocol.cpp           \
-    SystemModel/UT_SystemModel.cpp                      \
-    SystemModel/UT_SystemModelBuilder.cpp               \
-    SystemModel/UT_SystemModelChecker.cpp               \
-    SystemModel/UT_ToSutVisitor.cpp                     \
-    SystemModel/UT_SystemModelManager.cpp               \
-    SystemModel/UT_SystemModelNode.cpp                  \
-    UT_Helpers/Fake_SVF_Simulator.cpp                   \
-    UT_Helpers/Spy_AccessInterfaceProtocols.cpp         \
-    UT_Helpers/Spy_I2C_Protocol.cpp                     \
-    UT_Helpers/Spy_STIL_Protocol.cpp                    \
-    UT_Helpers/Spy_SVF_Protocol.cpp                     \
-    UT_Helpers/TestModelBuilder.cpp                     \
-    UT_Helpers/TestUtilities.cpp                        \
-    UT_Helpers/UT_TestModelBuilder.cpp                  \
-    Utility/UT_MastConfiguration.cpp                    \
-    Utility/UT_BinaryVector.cpp                         \
-    Utility/UT_SVFVector.cpp                            \
-    Utility/UT_Utility.cpp                              \
+    Generated/Runner.cpp                              \
+    API_C/UT_PDL_Adapter_C.cpp                        \
+    API_CPP/UT_PDL_Adapter_CPP.cpp                    \
+    Core/UT_MastEnvironment.cpp                       \
+    Plugins/PluginsRegistry.cpp                       \
+    Plugins/UT_Plugins.cpp                            \
+    SystemModel/UT_AccessInterfaceProtocolFactory.cpp \
+    SystemModel/UT_ConfigureAlgorithmFactory.cpp      \
+    SystemModel/UT_ConfigureVisitor.cpp               \
+    SystemModel/UT_DataCycle.cpp                      \
+    SystemModel/UT_DefaultBinaryPathSelector.cpp      \
+    SystemModel/UT_DefaultNHotPathSelector.cpp        \
+    SystemModel/UT_DefaultOneHotPathSelector.cpp      \
+    SystemModel/UT_DefaultTableBasedPathSelector.cpp  \
+    SystemModel/UT_FromSutUpdater.cpp                 \
+    SystemModel/UT_GenericAccessInterfaceProtocol.cpp \
+    SystemModel/UT_GmlPrinter.cpp                     \
+    SystemModel/UT_NamesChecker.cpp                   \
+    SystemModel/UT_NodePathResolver.cpp               \
+    SystemModel/UT_ParentNode.cpp                     \
+    SystemModel/UT_PathSelectorFactory.cpp            \
+    SystemModel/UT_PrettyPrinter.cpp                  \
+    SystemModel/UT_PropagatePendingVisitor.cpp        \
+    SystemModel/UT_Remote_Protocol_Proxy.cpp          \
+    SystemModel/UT_Register.cpp                       \
+    SystemModel/UT_I2C_EmulationProtocol.cpp          \
+    SystemModel/UT_STIL_EmulationProtocol.cpp         \
+    SystemModel/UT_SVF_SimulationProtocol.cpp         \
+    SystemModel/UT_SystemModel.cpp                    \
+    SystemModel/UT_SystemModelBuilder.cpp             \
+    SystemModel/UT_SystemModelChecker.cpp             \
+    SystemModel/UT_ToSutVisitor.cpp                   \
+    SystemModel/UT_SystemModelManager.cpp             \
+    SystemModel/UT_SystemModelNode.cpp                \
+    UT_Helpers/Fake_SVF_Simulator.cpp                 \
+    UT_Helpers/Spy_AccessInterfaceProtocols.cpp       \
+    UT_Helpers/Spy_I2C_Protocol.cpp                   \
+    UT_Helpers/Spy_STIL_Protocol.cpp                  \
+    UT_Helpers/Spy_SVF_Protocol.cpp                   \
+    UT_Helpers/TestModelBuilder.cpp                   \
+    UT_Helpers/TestUtilities.cpp                      \
+    UT_Helpers/UT_TestModelBuilder.cpp                \
+    Utility/UT_MastConfiguration.cpp                  \
+    Utility/UT_BinaryVector.cpp                       \
+    Utility/UT_SVFVector.cpp                          \
+    Utility/UT_Utility.cpp                            \
     Yaml/UT_YamlFile.cpp
 
 
@@ -92,6 +95,9 @@ HEADERS += \
     CxxTest_Traits/SystemModelCheckResult_Traits.hpp  \
     API_C/UT_PDL_Adapter_C.hpp                        \
     API_CPP/UT_PDL_Adapter_CPP.hpp                    \
+    Core/UT_MastEnvironment.hpp                       \
+    Plugins/PluginsRegistry.hpp                       \
+    Plugins/UT_Plugins.hpp                            \
     SystemModel/UT_AccessInterfaceProtocolFactory.h   \
     SystemModel/UT_ConfigureAlgorithmFactory.hpp      \
     SystemModel/UT_ConfigureVisitor.hpp               \

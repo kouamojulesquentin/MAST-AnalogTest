@@ -13,9 +13,15 @@ set(LIBMAST_CORE_INCLUDE_DIRS  "${CMAKE_CURRENT_SOURCE_DIR}/include/"  PARENT_SC
 set(LIBMAST_CORE_INTERNAL_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/internal/" PARENT_SCOPE)
 
 
+set (CFLAGS "${CFLAGS} -DG3_DYNAMIC_LOGGING")
 
 if (WIN32)
   set (CFLAGS "${CFLAGS} -DMAST_CORE_EXPORTS -D__LITTLE_ENDIAN=1 -D__BIG_ENDIAN=2 -D__BYTE_ORDER=1")
+  file(GLOB Mast_Core_Platform_SOURCES "src/Windows/*")
+elseif(UNIX)
+  file(GLOB Mast_Core_Platform_SOURCES "src/Linux/*")
+else()
+  file(GLOB Mast_Core_Platform_SOURCES "src/Dummy/*")
 endif()
 
 if (CODE_COVERAGE)
@@ -24,6 +30,8 @@ endif()
 
 
 file(GLOB Mast_Core_SOURCES "src/*")
+set(Mast_Core_SOURCES ${Mast_Core_SOURCES} ${Mast_Core_Platform_SOURCES})
+
 add_library           (Mast_Core SHARED ${Mast_Core_SOURCES})
 set_target_properties (Mast_Core PROPERTIES COMPILE_FLAGS "${CFLAGS}")
 

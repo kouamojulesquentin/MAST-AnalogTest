@@ -59,11 +59,6 @@ if(${INTEL_EXPERIMENT})
 endif()
 
 
-if (WIN32 OR UNIX)
-  add_subdirectory(Plugins)
-  set(LIBPLUGINS_INCLUDE_DIRS ${LIBPLUGINS_INCLUDE_DIRS} PARENT_SCOPE)
-endif()
-
 # ---------------- Examples
 #
 if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/Examples)

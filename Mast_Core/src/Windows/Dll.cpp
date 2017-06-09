@@ -126,6 +126,7 @@ void Dll::Load (const string& dllPath)
     os << "Failed to load dll \"" << fixedPath << "\": " << errorCode;
     CHECK_FAILED(os.str());
   }
+  LOG(INFO) << "Loaded dll: \"" << fixedPath << "\"";
 }
 //
 //  End of: Dll::Load

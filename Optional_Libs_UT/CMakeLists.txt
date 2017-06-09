@@ -11,23 +11,14 @@ set(UT_RootPath         "${CMAKE_CURRENT_LIST_DIR}")
 set(CXXTEST_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../cxxtest")
 
 include_directories(${CXXTEST_INCLUDE_DIR})
-include_directories(${LIBPLUGINS_INCLUDE_DIRS})
 include_directories(${LIBLOGGER_INCLUDE_DIRS})
 include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
 
 set(UT_GENERATED_RUNNER   "Generated/Runner.cpp")
 
-file(GLOB UT_PLUGINS_HEADERS  "UT_Plugins/UT_*.hpp")
-file(GLOB UT_PLUGINS          "UT_Plugins/UT_*")
-
-set(UT_HEADERS ${UT_HEADERS}          ${UT_PLUGINS_HEADERS})
-set(UT_SOURCES ${UT_GENERATED_RUNNER} ${UT_PLUGINS})
-
-set(EXTRA_LIBS Logger Plugins)
-
+set(UT_SOURCES ${UT_GENERATED_RUNNER})
+set(EXTRA_LIBS Logger)
 message(STATUS "Optional_Libs_UT: CXXTEST_INCLUDE_DIR:        ${CXXTEST_INCLUDE_DIR}")
-message(STATUS "Optional_Libs_UT: LIBPLUGINS_INCLUDE_DIRS     ${LIBPLUGINS_INCLUDE_DIRS}")
-message(STATUS "Optional_Libs_UT: PLUGINS_DIR                 ${PLUGINS_DIR}")
 message(STATUS "Optional_Libs_UT: USE_XML_RPC:                ${USE_XML_RPC}")
 
 # ---------------- XML RPC
@@ -74,29 +65,11 @@ else()
   set(PLATFORM_LIBS pthread)
 endif()
 
-
-# ---------------- Helpers DLL
-#
-add_library           (Optional_UT_Helpers SHARED     "UT_Plugins/PluginsRegistry.cpp")
-set_target_properties (Optional_UT_Helpers PROPERTIES COMPILE_FLAGS "${WARNINGS} -std=c++14")
-target_link_libraries (Optional_UT_Helpers ${PLATFORM_LIBS})
-
-set(EXTRA_LIBS ${EXTRA_LIBS} Optional_UT_Helpers)
-
 # ---------------- Runner application
 #
 add_executable        (Optionals_UT ${UT_SOURCES})
 set_target_properties (Optionals_UT PROPERTIES COMPILE_FLAGS "${UT_CFLAGS}" )
 target_link_libraries (Optionals_UT ${PLATFORM_LIBS} ${EXTRA_LIBS})
-
-# ---------------- Fake plugins
-#
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PLUGINS_DIR})  # For Windows
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PLUGINS_DIR})  # For Linux
-
-add_library           (Fake_Plugin_1 SHARED     "UT_Plugins/Fake_Plugin_1.cpp")
-set_target_properties (Fake_Plugin_1 PROPERTIES COMPILE_FLAGS "${WARNINGS} -std=c++14")
-target_link_libraries (Fake_Plugin_1 ${PLATFORM_LIBS} Optional_UT_Helpers)
 
 include(CTest)
 add_test(NAME Optionals_UT COMMAND Optionals_UT)

@@ -32,7 +32,7 @@ using test::PluginsRegistry;
 using namespace std::string_literals;
 using namespace std::experimental::literals::string_view_literals;
 
-extern string_view Exe_Dir_Path;
+extern string Exe_Dir_Path;
 
 namespace
 {
@@ -40,7 +40,8 @@ namespace
   //!
   string PluginPath(string_view pluginName = ""sv)
   {
-    static const auto pluginsDirectory = string(Exe_Dir_Path) + DIRECTORY_SEPARATOR + PLUGINS_DIRECTORY_NAME;
+    string pluginsDirectory;
+    pluginsDirectory.append(Exe_Dir_Path).append(DIRECTORY_SEPARATOR).append(PLUGINS_DIRECTORY_NAME);
 
     if (pluginName.empty())
     {
@@ -48,9 +49,10 @@ namespace
     }
 
     auto   path = pluginsDirectory;
-    return path.append(DIRECTORY_SEPARATOR).append(pluginName.cbegin(), pluginName.cend());
-  }
+    path.append(DIRECTORY_SEPARATOR).append(pluginName.cbegin(), pluginName.cend());
 
+    return path;
+  }
 }
 
 

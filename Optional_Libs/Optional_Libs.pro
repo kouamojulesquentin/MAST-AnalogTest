@@ -4,7 +4,7 @@ CONFIG  -= qml_debug
 
 unix {
   SUBDIRS +=  \
-      Spi     \
+      SPI     \
       OpenOCD
 }
 

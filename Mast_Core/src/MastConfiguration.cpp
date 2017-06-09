@@ -355,6 +355,12 @@ void MastConfiguration::Update (int argc, const char* argv[])
 //!
 void MastConfiguration::Update (vector<string> arguments)
 {
+  LOG(INFO) << "Hello !!!!!!!!!";
+  if (!arguments.empty())
+  {
+    LOG(INFO) << "Application: " << arguments.front();
+  }
+
   try
   {
     // ---------------- Prepare the parser

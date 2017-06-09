@@ -51,12 +51,14 @@ SOURCES +=  \
     src/Linker.cpp                                  \
     src/MastConfiguration.cpp                       \
     src/MismatchesCollector.cpp                     \
+    src/MastEnvironment.cpp                         \
     src/NamesChecker.cpp                            \
     src/NodePathResolver.cpp                        \
     src/OfflineProtocol.cpp                         \
     src/ParentNode.cpp                              \
     src/PathSelector.cpp                            \
     src/PathSelectorFactory.cpp                     \
+    src/Plugins.cpp                                 \
     src/PrettyPrinter.cpp                           \
     src/PropagatePendingVisitor.cpp                 \
     src/Register.cpp                                \
@@ -112,11 +114,13 @@ HEADERS += \
     include/I2C_Player.hpp                              \
     include/Linker.hpp                                  \
     include/Mast_Core_export.hpp                        \
+    include/MastEnvironment.hpp                         \
     include/NodePathResolver.hpp                        \
     include/OfflineProtocol.hpp                         \
     include/ParentNode.hpp                              \
     include/PathSelector.hpp                            \
     include/PathSelectorFactory.hpp                     \
+    include/PluginDLLs.hpp                              \
     include/PrettyPrinter.hpp                           \
     include/Remote_Protocol.hpp                         \
     include/Remote_Protocol_Client.hpp                  \
@@ -142,24 +146,28 @@ HEADERS += \
     include/SystemModelVisitor.hpp                      \
     include/Utility.hpp                                 \
     include/YamlFile.hpp                                \
-    internal/PropagatePendingVisitor.hpp                \
-    internal/SystemModelReseter.hpp                     \
+    internal/Dll.hpp                                    \
     internal/FromSutUpdater.hpp                         \
-    internal/ToSutVisitor.hpp                           \
     internal/MastConfig.hpp                             \
     internal/MastConfiguration.hpp                      \
     internal/MismatchesCollector.hpp                    \
     internal/NamesChecker.hpp                           \
+    internal/PropagatePendingVisitor.hpp                \
     internal/SystemModelManager_impl.hpp                \
+    internal/SystemModelReseter.hpp                     \
+    internal/ToSutVisitor.hpp                           \
     internal/YamlNodesCache.hpp
 
 unix {
+    SOURCES += src/Linux/Dll.cpp
     target.path = /usr/lib
     INSTALLS += target
 }
 
+DEFINES = G3_DYNAMIC_LOGGING
 
 win32 {
+  SOURCES += src/Windows/Dll.cpp
   DEFINES += WINDOWS
   DEFINES += MAST_CORE_EXPORTS
   DEFINES += __LITTLE_ENDIAN=1

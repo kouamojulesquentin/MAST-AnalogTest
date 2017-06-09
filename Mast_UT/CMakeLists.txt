@@ -41,30 +41,59 @@ file(GLOB Mast_UT_CPP_API      "API_CPP/*")
 file(GLOB Mast_UT_UTILITY      "Utility/*")
 file(GLOB Mast_UT_SYSTEM_MODEL "SystemModel/*")
 file(GLOB Mast_UT_YAML         "Yaml/*")
+file(GLOB Mast_UT_CORE         "Core/*")
+file(GLOB Mast_UT_PLUGINS      "Plugins/UT_*")
 file(GLOB Mast_UT_HELPERS      "UT_Helpers/*")
-set(Mast_UT_GENERATED 				 "Generated/Runner.cpp")
+
+#+set(Mast_UT_PLUGINS ${Mast_UT_PLUGINS} "Plugins/PluginsRegistry.hpp" "Plugins/PluginsRegistry.cpp")
+
+if (WIN32)
+  set(PLATFORM_LIBS DbgHelp)
+else()
+  set(PLATFORM_LIBS pthread)
+endif()
+
+# ---------------- Helpers DLL
+#
+add_library           (Mast_UT_Helpers SHARED     "Plugins/PluginsRegistry.cpp")
+set_target_properties (Mast_UT_Helpers PROPERTIES COMPILE_FLAGS "${WARNINGS} -std=c++14")
+target_link_libraries (Mast_UT_Helpers ${PLATFORM_LIBS})
+
+#+set(EXTRA_LIBS ${EXTRA_LIBS} Mast_UT_Helpers)
+
+
+set(Mast_UT_GENERATED "Generated/Runner.cpp")
 
 set (Mast_UT_SOURCES ${Mast_UT_C_API}
                      ${Mast_UT_CPP_API}
                      ${Mast_UT_UTILITY}
                      ${Mast_UT_SYSTEM_MODEL}
                      ${Mast_UT_YAML}
+                     ${Mast_UT_CORE}
+                     ${Mast_UT_PLUGINS}
                      ${Mast_UT_HELPERS}
                      ${Mast_UT_GENERATED})
 
 set_source_files_properties(${Mast_UT_GENERATED} GENERATED)
 
+
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "../Bin")
 add_executable 				(Mast_UT ${Mast_UT_SOURCES})
 set_target_properties	(Mast_UT PROPERTIES COMPILE_FLAGS "${UT_CFLAGS}" )
 
-if (WIN32)
-  target_link_libraries(Mast_UT Mast_API_CPP Mast_API_C Logger DbgHelp )
-else ()
-  target_link_libraries(Mast_UT Mast_API_CPP Mast_API_C Logger pthread)
-endif ()
+target_link_libraries(Mast_UT Mast_UT_Helpers Mast_API_CPP Mast_API_C Logger ${PLATFORM_LIBS})
 
 install(DIRECTORY UT_TestFiles DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Mast_Core)
+
+# ---------------- Fake plugins
+#
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PLUGINS_DIR})  # For Windows
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PLUGINS_DIR})  # For Linux
+
+add_library           (Fake_Plugin_1 SHARED     "Plugins/Fake_Plugin_1.cpp")
+set_target_properties (Fake_Plugin_1 PROPERTIES COMPILE_FLAGS "${WARNINGS} -std=c++14")
+target_link_libraries (Fake_Plugin_1 ${PLATFORM_LIBS} Mast_UT_Helpers)
+
 
 include(CTest)
 add_test(NAME Mast_UT COMMAND Mast_UT)

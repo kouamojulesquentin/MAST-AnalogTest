@@ -74,7 +74,8 @@ Usage is:
     USAGE:
       Mast [-c=<File path>]
            [-s=<File path>]
-           [--plugins=<Directory or file path>] ...
+           [--plugin=<file>] ...
+           [--plugin_dir=<Directory>] ...
            [-l]
            [--log_file=<File path>]
            [--log_level=<debug|info|warning|error>]
@@ -95,8 +96,11 @@ Usage is:
       -s=<File path>,  --sit=<File path>
         Define SIT that specified SUT model
 
-      --plugins=<Directory or file path>  (accepted multiple times)
-        Define plugins to load (may be directory of file path)
+      --plugin=<File path>  (accepted multiple times)
+        Loads plugins file
+
+      --plugin_dir=<Directory>  (accepted multiple times)
+        Loads all plugins in <Directory>
 
       -l,  --log
         Enable logger
@@ -132,6 +136,17 @@ If there is a `mast.cfg` file in current working directory, it will be used as t
 ----
 
 # Options details # {#Option_Details}
+
+## Plugins ## {#plugins}
+
+This option controls which plugins are loaded at startup. Loading is done following this order:
+ - Plugins given at Command-line 
+ - Plugins contained in directories given at Command-line
+ - Plugins given in Configuration file
+ - Plugin contained in directory given in Configuration file
+ - Plugins in current directory
+ - Plugins in MAST root plugin directory
+  
 
 ## Configuration algorithm ## {#Config_Algo}
 

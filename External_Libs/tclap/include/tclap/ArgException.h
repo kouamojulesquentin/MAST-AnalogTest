@@ -77,15 +77,15 @@ class ArgException : public std::exception
     /**
      * Returns the arg id and error text.
      */
-    const char* what() const throw()
+    virtual const char* what() const throw() override
     {
-      std::string ex;
+      _whatMessage.clear(); // In case it is call more than once!
       if (!_argId.empty())
       {
-        ex.append(_argId).append(" -- ");
+        _whatMessage.append(_argId).append(" -- ");
       }
-      ex.append(_errorText);
-      return ex.c_str();
+      _whatMessage.append(_errorText);
+      return _whatMessage.c_str();
     }
 
     /**
@@ -116,6 +116,9 @@ class ArgException : public std::exception
      */
     std::string _typeDescription;
 
+    //! Holds message return by what()
+    //!
+    mutable std::string _whatMessage; // Mutable because what() is const
 };
 
 /**

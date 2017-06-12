@@ -35,14 +35,16 @@ namespace CxxTest
 
 inline void print_help(const char* name)
 {
-    CXXTEST_STD(cerr) << name << " <suitename>"                                                                   << CXXTEST_STD(endl);
-    CXXTEST_STD(cerr) << name << " <suitename> <testname>"                                                        << CXXTEST_STD(endl);
-    CXXTEST_STD(cerr) << name << " -h"                                                                            << CXXTEST_STD(endl);
-    CXXTEST_STD(cerr) << name << " --help"                                                                        << CXXTEST_STD(endl);
-    CXXTEST_STD(cerr) << name << " --help-tests"                                                                  << CXXTEST_STD(endl);
-    CXXTEST_STD(cerr) << name << " -v             Enable tracing output."                                         << CXXTEST_STD(endl);
-    CXXTEST_STD(cerr) << name << " --display_path    Display full file path."                                     << CXXTEST_STD(endl);
-    CXXTEST_STD(cerr) << name << " --display_success Display all successes (useful for crashes or traits debug)." << CXXTEST_STD(endl);
+    CXXTEST_STD(cerr) << name << " <suitename>"                                                                         << CXXTEST_STD(endl);
+    CXXTEST_STD(cerr) << name << " <suitename> <testname>"                                                              << CXXTEST_STD(endl);
+    CXXTEST_STD(cerr) << name << " -h"                                                                                  << CXXTEST_STD(endl);
+    CXXTEST_STD(cerr) << name << " --help"                                                                              << CXXTEST_STD(endl);
+    CXXTEST_STD(cerr) << name << " --help-tests"                                                                        << CXXTEST_STD(endl);
+    CXXTEST_STD(cerr) << name << " -v                      Enable tracing output."                                      << CXXTEST_STD(endl);
+    CXXTEST_STD(cerr) << name << " --display_path          Display full file path."                                     << CXXTEST_STD(endl);
+    CXXTEST_STD(cerr) << name << " --display_success       Display all successes (useful for crashes or traits debug)." << CXXTEST_STD(endl);
+    CXXTEST_STD(cerr) << name << " -dtd                    Display each tests duration."                                << CXXTEST_STD(endl);
+    CXXTEST_STD(cerr) << name << " --display_test_duration Display each tests duration."                                << CXXTEST_STD(endl);
 }
 #endif
 
@@ -103,6 +105,16 @@ int Main(TesterT& tmp, int argc, char* argv[])
         else if ((CXXTEST_STD(strcmp)(argp, "--display_success") == 0))
         {
             CxxTest::RealWorldDescription::_displaySuccess = true; // To display all successes (useful for crashes or traits debug)
+        }
+        else if (   (CXXTEST_STD(strcmp)(argp, "-dtd")                    == 0)
+                 || (CXXTEST_STD(strcmp)(argp, "--display_test_duration") == 0)
+                )
+        {
+            #if (__cplusplus >= 201103L)
+            tracker().display_test_duration = true;
+            #else
+            CXXTEST_STD(cout) << "display_test_duration is not supported for version < Cpp 11";
+            #endif
         }
         else
         {

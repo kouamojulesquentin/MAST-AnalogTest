@@ -62,6 +62,15 @@ else :
 
     remove_extra_path_prefixes_on_windows = False
 
+# Prints message about missing PLY module
+#
+def printMissingPlyMessage():
+  print ("Python Ply (Python Lex-Yacc) module is required for FOG parser!\nInstall PLY with command: 'python -m pip install ply'")
+#
+#  End of function 'printMissingPlyMessage'
+#---------------------------------------------------------------------------
+
+
 def find(filename, executable = False, isfile = True,  validate = None) :
     #
     # Use the PATH environment if it is defined and not empty
@@ -405,7 +414,7 @@ class BaseTestCase(object) :
 
         if self.cxxtest_import :
             try :
-#+              if verbose :   print ("Using cxxtest_import")
+                if verbose :   print ("Using cxxtest_import")
                 os.chdir(currentDir)
                 status = cxxtest.cxxtestgen.main(['cxxtestgen', self.fog, '-o', self.py_cpp] + re.split('[ ]+', args) + allSourcesRelativePath, True)
             except :
@@ -413,7 +422,7 @@ class BaseTestCase(object) :
         else :
             cmd = join_commands("cd %s" % currentDir,
                             "%s %s%s %s -o %s %s > %s 2>&1" % (sys.executable, currentDir, cxxtestgenDir, self.fog, self.py_cpp, args + allSourcesRelativePath, self.py_out))
-#+            if verbose : print ("cmd: {0}".format(cmd))
+            if verbose : print ("cmd: {0}".format(cmd))
             status = subprocess.call(cmd, shell = True)
 
         # ---------------- Check if the unit tests main generation was expected to fail
@@ -872,6 +881,15 @@ class BaseTestCase(object) :
         """Tests 'abort test on failure' for most assertions"""
         self.compile(prefix = 'test_unexpected_exceptions', args = '--error-printer --world=UT_UnexpectedExceptions', hppSources = ['UT_UnexpectedExceptions.h'], cppSources = ['UT_UnexpectedExceptions.cpp'], output = 'test_unexpected_exceptions.out')
 
+    def test_expected_exceptions(self) :
+        """Tests 'expecting exception' assertions"""
+        self.compile(prefix     = 'test_expected_exceptions',
+                     args       = '--error-printer  --have-std --world=UT_ExpectedExceptions',
+                     compilerOptionalSwitches = "-DCXXTEST_HAVE_STD",
+                     hppSources = ['UT_ExpectedExceptions.h'],
+                     cppSources = ['UT_ExpectedExceptions.cpp'],
+                     output     = 'test_expected_exceptions.out')
+
     def test_predicates(self) :
         """Tests 'predicates and relations assertions with lambda expression' """
         self.compile(prefix = 'test_predicates', args = '--error-printer --world=UT_Predicates', hppSources = ['UT_Predicates.h'], cppSources = ['UT_Predicates.cpp'], output = 'test_predicates.out', compilerOptionalSwitches = self.std14Flags)
@@ -980,6 +998,7 @@ class TestCppFOG(TestCpp) :
     def run(self, *args, **kwds) :
         if ply_available :
             return TestCpp.run(self, *args, **kwds)
+        else: printMissingPlyMessage()
 
 
 class TestGpp(BaseTestCase, unittest.TestCase) :
@@ -1057,6 +1076,7 @@ class TestGppFOG(TestGpp) :
     def run(self, *args, **kwds) :
         if ply_available :
             return TestGpp.run(self, *args, **kwds)
+        else: printMissingPlyMessage()
 
 
 class TestGppFOGPy(TestGppFOG) :
@@ -1119,6 +1139,7 @@ class TestGppFOGValgrind(TestGppValgrind) :
     def run(self, *args, **kwds) :
         if ply_available :
             return TestGppValgrind.run(self, *args, **kwds)
+        else: printMissingPlyMessage()
 
 
 class TestClang(BaseTestCase, unittest.TestCase) :
@@ -1190,6 +1211,7 @@ class TestClangFOG(TestClang) :
     def run(self, *args, **kwds) :
         if ply_available :
             return TestClang.run(self, *args, **kwds)
+        else: printMissingPlyMessage()
 
 
 class TestCL(BaseTestCase, unittest.TestCase) :
@@ -1285,7 +1307,7 @@ class TestCLFOG(TestCL) :
     def run(self, *args, **kwds) :
         if ply_available :
             return TestCL.run(self, *args, **kwds)
-
+        else: printMissingPlyMessage()
 
 if __name__ == '__main__' :
     parser = argparse.ArgumentParser()

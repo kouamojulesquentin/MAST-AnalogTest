@@ -341,9 +341,13 @@ public:
                          xStr << " ), found !" << predicate << "( " << x << " )" << endl;
     }
 
-    virtual void failedAssertThrows(const char* message, const char *file, int line,
-                            const char *expression, const char *type,
-                            bool otherThrown)
+    virtual void failedAssertThrows(const char* message,
+                                    const char* file,
+                                    int         line,
+                                    const char* expression,
+                                    const char* /*exceptionMessage*/,
+                                    const char* type,
+                                    bool        otherThrown)
     {
         stop(file, line) << "Error: Expected (" << expression << ") to throw (" <<
                          type << ") but it " << (otherThrown ? "threw something else" : "didn't throw") <<

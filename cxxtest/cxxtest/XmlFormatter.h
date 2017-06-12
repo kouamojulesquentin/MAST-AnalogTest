@@ -685,14 +685,29 @@ public:
                 xStr << " ), found !" << predicate << "( " << x << " )";
     }
 
-    virtual void failedAssertThrows(const char* message, const char *file, int line,
-                            const char *expression, const char *type,
-                            bool otherThrown)
+    virtual void failedAssertThrows(const char* message,
+                                    const char* file,
+                                    int         line,
+                                    const char* expression,
+                                    const char* exceptionMessage,
+                                    const char* type,
+                                    bool        otherThrown)
     {
-        testFailure(message, file, line, "failedAssertThrows")
-                << "Error: Expected (" << expression << ") to throw ("  <<
-                type << ") but it "
-                << (otherThrown ? "threw something else" : "didn't throw");
+        std::stringstream& os = testFailure(message, file, line, "failedAssertThrows");
+
+        os << "Error: Expected (" << expression << ") to throw (" << type << ") but it ";
+        if (otherThrown)
+        {
+          os << "threw something else";
+          if (exceptionMessage)
+          {
+            os << ": " << exceptionMessage;
+          }
+        }
+        else
+        {
+          os << "didn't throw";
+        }
     }
 
     virtual void failedAssertThrowsNothing(const char* message, const char *file, int line, const char *expression, const char* exceptionMessage)

@@ -20,6 +20,10 @@
 #include <cxxtest/DummyDescriptions.h>
 #include <cxxtest/DummyListener.h>
 
+#if (__cplusplus >= 201103L)
+#include <chrono>
+#endif
+
 namespace CxxTest
 {
 struct DifferenceInfo;
@@ -31,6 +35,7 @@ public:
 
     static TestTracker &tracker();
     static bool print_tracing;
+    static bool display_test_duration;
 
 
           TestDescription&  test()        { return *fixTest(_test);  }  // Make sure that no reference from NULL pointer is returned !
@@ -100,7 +105,7 @@ public:
     virtual void failedAssertGreaterThanEquals (const char* message, const char* file, int line, const char* xStr,        const char* yStr, const char* x, const char* y);
     virtual void failedAssertPredicate         (const char* message, const char* file, int line, const char* predicate,   const char* xStr, const char* x);
     virtual void failedAssertRelation          (const char* message, const char* file, int line, const char* relation,    const char* xStr, const char* yStr, const char* x, const char* y);
-    virtual void failedAssertThrows            (const char* message, const char* file, int line, const char* expression,  const char* type, bool        otherThrown);
+    virtual void failedAssertThrows            (const char* message, const char* file, int line, const char* expression,  const char* exceptionMessage, const char* type, bool otherThrown);
     virtual void failedAssertThrowsNothing     (const char* message, const char* file, int line, const char* expression,  const char* exceptionMessage);
     virtual void failedAssertThrowsAnything    (const char* message, const char* file, int line, const char* expression);
     virtual void failedAssertSameFiles         (const char* message, const char* file, int line, const char* file1, const char* file2, const char* explanation);
@@ -123,7 +128,7 @@ public:
     virtual void succeededAssertPredicate         (const char* message, const char* file, int line, const char* pStr, const char* xStr, const char* x);
     virtual void succeededAssertRelation          (const char* message, const char* file, int line, const char* rStr, const char* xStr, const char* yStr,    const char* x, const char* y);
     virtual void succeededAssertSameData          (const char* message, const char* file, int line, const char* xStr, const char* yStr, const char* sizeStr, const void* x, const void* y, unsigned size);
-    virtual void succeededAssertThrows            (const char* message, const char* file, int line, const char* expr, const char* type, const char* exceptionMessage);
+    virtual void succeededAssertThrows            (const char* message, const char* file, int line, const char* expr, const char* exceptionMessage, const char* type);
     virtual void succeededAssertThrowsNothing     (const char* message, const char* file, int line, const char* expr);
     virtual void succeededAssertThrowsAnything    (const char* message, const char* file, int line, const char* expr);
     virtual void succeededAssertSameFiles         (const char* message, const char* file, int line, const char* file1, const char* file2);
@@ -186,6 +191,14 @@ private:
     unsigned _overallDataDrivenTestsSamples; //!< The number of samples used (as input and optionally expected result) by ALL data driven tests
     bool     _withinDataDrivenTest;          //!< Memorizes that a data driven test sub-test is running
 
+    #if (__cplusplus >= 201103L)
+    public:
+    int64_t testDuration() const { return _duration_microseconds; }             //!< Returns Nb of microseconds used to run last test
+    private:
+    std::chrono::time_point<std::chrono::steady_clock> _startTime;            //!< Current test start time
+    std::chrono::time_point<std::chrono::steady_clock> _stopTime;             //!< Current test stop time
+    int64_t                                            _duration_microseconds; //!< Time used by last run test
+    #endif
 };
 
 inline TestTracker &tracker() { return TestTracker::tracker(); }

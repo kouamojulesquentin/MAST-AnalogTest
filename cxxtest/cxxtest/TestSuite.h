@@ -26,6 +26,7 @@
 #include <sstream>
 #include <cstring>
 
+
 #if defined(_CXXTEST_HAVE_STD)
 #   include <stdexcept>
 #endif // _CXXTEST_HAVE_STD
@@ -59,7 +60,37 @@ class StringMerger
 
   //! Appends a string to current one
   //!
-  void append(const char* str);
+  StringMerger& append(const char* str);
+
+  //! Appends 2 strings to current one
+  //!
+  StringMerger& append(const char* str1, const char* str2)
+  {
+    return append(str1).append(str2);
+  }
+
+  //! Appends 3 strings to current one
+  //!
+  StringMerger& append(const char* str1, const char* str2, const char* str3)
+  {
+    return append(str1, str2).append(str3);
+  }
+
+  //! Appends some type converted to string to current one
+  //!
+  template<typename T>
+  StringMerger& append(const T& value)
+  {
+    return append(ValueTraits<T>(value).asString());
+  }
+
+  //! Appends a string and some type converted to string to current one
+  //!
+  template<typename T>
+  StringMerger& append(const char* str, const T& value)
+  {
+    return append(str).append(value);
+  }
 
   const char* get() const
   {
@@ -411,7 +442,6 @@ void doAssertDelta(const char *file, int line,
     }
 }
 
-void doFailAssertThrows     (const char* file, int line, const char* expr, const char* type, bool otherThrown, const char* message, const char* exception = 0);
 void doAssertThrows         (const char* file, int line, const char* expression, const char* message, const char* expectedExceptionType, const char* exceptionMessage, bool hasThrown, bool otherThrown);
 void doAssertThrowsNothing  (const char* file, int line, const char* expression, const char* message, const char* exceptionMessage, bool hasThrown);
 void doAssertThrowsAnything (const char* file, int line, const char* expression, const char* message, bool        hasThrown);
@@ -990,14 +1020,19 @@ inline EqualTrait<T> MakeEqualTrait(const T& x) { return EqualTrait<T>(x); }
               _TS_CATCH_TYPE( (t), { a; hasThrown = true; CxxTest::doAssertThrows((f), (l), #e, (m), #t, NULL, hasThrown,  false); } ) \
             } \
             _TS_CATCH_ABORT( { throw; } ) \
-            _TS_CATCH_STD( ex, { hasThrown = true; CxxTest::doAssertThrows((f), (l), #e, (m), #t, ex.what(), hasThrown,  true ); } ) \
-            _TS_LAST_CATCH(    { hasThrown = true; CxxTest::doAssertThrows((f), (l), #e, (m), #t, NULL,      hasThrown,  true ); } ) \
+            _TS_CATCH_STD( ex,                 { hasThrown = true; CxxTest::StringMerger sm; CxxTest::doAssertThrows((f), (l), #e, (m), #t, sm.append("std::exception(",          ex.what(), ")").get(), hasThrown, true); }) \
+            _TS_CATCH_TYPE((bool         val), { hasThrown = true; CxxTest::StringMerger sm; CxxTest::doAssertThrows((f), (l), #e, (m), #t, sm.append("bool exception with value: ",         val).get(), hasThrown, true); }) \
+            _TS_CATCH_TYPE((int          val), { hasThrown = true; CxxTest::StringMerger sm; CxxTest::doAssertThrows((f), (l), #e, (m), #t, sm.append("int exception with value: ",          val).get(), hasThrown, true); }) \
+            _TS_CATCH_TYPE((unsigned int val), { hasThrown = true; CxxTest::StringMerger sm; CxxTest::doAssertThrows((f), (l), #e, (m), #t, sm.append("unsigned int exception with value: ", val).get(), hasThrown, true); }) \
+            _TS_LAST_CATCH(                    { hasThrown = true; CxxTest::StringMerger sm; CxxTest::doAssertThrows((f), (l), #e, (m), #t, NULL,                                                        hasThrown, true); }) \
                                                                    \
             if (!hasThrown)                                        \
             {                                                      \
               CxxTest::doAssertThrows((f), (l), #e, (m), #t, NULL, false, false);  \
             }                                                      \
           }
+
+//+          _TS_CATCH_STD( ex,                 { hasThrown = true; CxxTest::doAssertThrows((f), (l), #e, (m), #t, y_x.append("std::exception(",          ex.what(), ")").get(), hasThrown, true); } )
 
 #   define _TS_ASSERT_THROWS_ASSERT(f,l,e,t,a) ___TS_ASSERT_THROWS_ASSERT(f,l,e,t,a,0)
 #   define TS_ASSERT_THROWS_ASSERT(e,t,a) _TS_ASSERT_THROWS_ASSERT(__FILE__,__LINE__,e,t,a)

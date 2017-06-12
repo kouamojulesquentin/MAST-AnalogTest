@@ -47,7 +47,7 @@ StringMerger::StringMerger(const char* str1, const char* str2)
 
 //! Appends a string to current one
 //!
-void StringMerger::append (const char* str)
+StringMerger& StringMerger::append (const char* str)
 {
   if (str)
   {
@@ -56,6 +56,7 @@ void StringMerger::append (const char* str)
     size_t remainingBytes = endOfBuffer - m_pNextChar;
     m_pNextChar = copyStringN(m_pNextChar, str, remainingBytes);
   }
+  return *this;
 }
 //
 //  End of fct_StringMerger::append
@@ -569,26 +570,16 @@ void doAssertSameFiles(const char* file, int line, const char* file1, const char
 }
 
 
-void doFailAssertThrows(const char* file, int line,
-                        const char* expr, const char* type,
-                        bool  otherThrown,
-                        const char* message,
-                        const char* /* exception */)
-{
-    tracker().failedAssertThrows(message, file, line, expr, type, otherThrown);
-    TS_ABORT();
-}
-
 void doAssertThrows(const char* file, int line, const char* expression, const char* message, const char* expectedExceptionType, const char* exceptionMessage, bool hasThrown, bool otherThrown)
 {
     if (!hasThrown || otherThrown)
     {
-      tracker().failedAssertThrows(message, file, line, expression, expectedExceptionType, otherThrown);
+      tracker().failedAssertThrows(message, file, line, expression, exceptionMessage, expectedExceptionType, otherThrown);
       TS_ABORT();
     }
     else
     {
-      tracker().succeededAssertThrows(message, file, line, expression, expectedExceptionType, exceptionMessage);
+      tracker().succeededAssertThrows(message, file, line, expression, exceptionMessage, expectedExceptionType);
     }
 }
 

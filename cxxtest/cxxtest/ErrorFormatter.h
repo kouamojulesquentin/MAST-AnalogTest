@@ -15,7 +15,7 @@
 // prints reports of the errors to an output
 // stream.  Since we cannot rely on the standard
 // iostreams, this header defines a base class
-// analogout to std::ostream.
+// analog to std::ostream.
 //
 
 #include <cxxtest/TestRunner.h>
@@ -24,6 +24,11 @@
 #include <cxxtest/ValueTraits.h>
 #include <cxxtest/DifferenceInfo.h>
 #include <cstdio>
+
+#if (__cplusplus >= 201103L)  // To print properly test duration
+#include <sstream>
+#include <iomanip>
+#endif
 
 namespace CxxTest
 {
@@ -141,7 +146,6 @@ public:
 
     virtual void leaveTest(const TestDescription& testDescription)
     {
-
         TestTracker& testTracker = tracker();
 
         if (testTracker.testSkipped())
@@ -182,6 +186,32 @@ public:
             _dotting = true;
         }
 
+        #if (__cplusplus >= 201103L)
+        if (testTracker.display_test_duration && !testTracker.testHasNoAssertion())
+        {
+
+          constexpr auto millisecondsPerMicrosecond = 1000LL;
+          constexpr auto secondsPerMicrosecond      = 1000000LL;
+          constexpr auto secondsPerMinute           = 60LL;
+
+          auto microseconds          = testTracker.testDuration();
+          auto seconds               = microseconds          / secondsPerMicrosecond;
+          auto remainingMicroseconds = microseconds          % secondsPerMicrosecond;
+          auto milliseconds          = remainingMicroseconds / millisecondsPerMicrosecond;
+
+          microseconds = remainingMicroseconds % millisecondsPerMicrosecond;
+
+          const auto& test = testTracker.test();
+          std::ostringstream os;
+          os << "Duration for " << test.suiteName() << "::" << test.testName() << ": ";
+          os << std::setfill('0');
+          os << "[" << std::setw(2) << seconds % secondsPerMinute;
+          os << ":" << std::setw(3) << milliseconds;
+          os << "." << std::setw(3) << microseconds;
+          os << " us]";
+          (*_o) << os.str().c_str() << endl;
+        }
+        #endif
         _lastAssertsCount = testTracker.testAsserts();
     }
 
@@ -569,16 +599,28 @@ public:
         reportFailedAssert(message, file, line, checkMessage.str().c_str(), resultMessage.str().c_str());
     }
 
-    virtual void failedAssertThrows(const char* message, const char* file, int line,
-                            const char* expression, const char* type,
-                            bool otherThrown)
+    virtual void failedAssertThrows(const char* message, const char* file, int line, const char* expression, const char* exceptionMessage, const char* type, bool otherThrown)
     {
         std::ostringstream checkMessage;
         std::ostringstream resultMessage;
 
         checkMessage  << _preExpr << expression << _postExpr << " to throw " << _preExpr << type << _postExpr;
-        resultMessage << "it "    << (otherThrown ?  "threw something else" :  "didn't throw");
 
+        if (otherThrown)
+        {
+          if (!isNullOrEmpty(exceptionMessage))
+          {
+            resultMessage << "it threw \"" << exceptionMessage << "\"";
+          }
+          else
+          {
+            resultMessage << "it threw something else";
+          }
+        }
+        else
+        {
+          resultMessage << "it didn't throw";
+        }
         reportFailedAssert(message, file, line, checkMessage.str().c_str(), resultMessage.str().c_str());
     }
 

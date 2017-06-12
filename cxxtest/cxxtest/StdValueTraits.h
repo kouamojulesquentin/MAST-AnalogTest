@@ -97,7 +97,19 @@ public:
         const char* bound = stringResultsOnNewLine() ? "\n" : "\"";
 
         *this << bound;
-        for (unsigned i = 0; i < s.length(); ++ i)
+
+        bool     truncated = false;
+        unsigned length    = s.length();
+
+        // ---------------- Prevent from uninitialized (or plainly too large) strings
+        //
+        if (length > 10000u)
+        {
+          length    = 10000u;
+          truncated = true;
+        }
+
+        for (unsigned i = 0; i < length; ++ i)
         {
             if (is_mb(s, i))
             {
@@ -114,6 +126,11 @@ public:
                 charToString(s[i], c);
                 *this << c;
             }
+        }
+
+        if (truncated)
+        {
+          *this << "...";
         }
         *this << bound;
     }

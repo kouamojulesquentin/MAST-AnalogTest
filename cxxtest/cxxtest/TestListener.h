@@ -73,7 +73,7 @@ public:
     virtual void failedAssertLessThanEquals    (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*xStr*/, const char* /*yStr*/, const char* /*x*/, const char* /*y*/) = 0;
     virtual void failedAssertPredicate         (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*predicate*/, const char* /*xStr*/, const char* /*x*/) = 0;
     virtual void failedAssertRelation          (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*relation*/, const char* /*xStr*/, const char* /*yStr*/, const char* /*x*/, const char* /*y*/) = 0;
-    virtual void failedAssertThrows            (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*expression*/, const char* /*type*/, bool /*otherThrown*/) = 0;
+    virtual void failedAssertThrows            (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*expression*/, const char* /*exceptionMessage*/, const char* /*type*/, bool /*otherThrown*/) = 0;
     virtual void failedAssertThrowsNothing     (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*expression*/, const char* /*exceptionMessage*/) = 0;
     virtual void failedAssertThrowsAnything    (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*expression*/) = 0;
 

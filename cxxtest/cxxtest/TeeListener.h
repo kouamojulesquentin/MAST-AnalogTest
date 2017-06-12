@@ -245,12 +245,10 @@ public:
         _second->failedAssertRelation(message, file, line, relation, xStr, yStr, x, y);
     }
 
-    virtual void failedAssertThrows(const char* message, const char *file, int line,
-                            const char *expression, const char *type,
-                            bool otherThrown)
+    virtual void failedAssertThrows(const char* message, const char *file, int line, const char *expression, const char* exceptionMessage, const char *type, bool otherThrown)
     {
-        _first->failedAssertThrows(message, file, line, expression, type, otherThrown);
-        _second->failedAssertThrows(message, file, line, expression, type, otherThrown);
+        _first->failedAssertThrows  (message, file, line, expression, exceptionMessage, type, otherThrown);
+        _second->failedAssertThrows (message, file, line, expression, exceptionMessage, type, otherThrown);
     }
 
     virtual void failedAssertThrowsNothing(const char* message, const char *file, int line, const char *expression, const char* exceptionMessage)

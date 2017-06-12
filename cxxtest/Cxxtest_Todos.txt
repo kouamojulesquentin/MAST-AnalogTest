@@ -9,6 +9,7 @@ Add tests for:
   - double equality/inequality/less/greater
   - mix float and double equality/inequality/less/greater
   - very long strings
+  - doAssertThrows must use exceptionMessage when otherThrown ==> This would be most helpful for debug !!!!
 
 ====================
 Presentation changes:
@@ -19,7 +20,6 @@ Presentation changes:
 Behavior:
 ========
 
-
 ====================================
 Implementation details / Refactoring
 ====================================
@@ -29,7 +29,17 @@ Implementation details / Refactoring
 ============
 New feature:
 ============
-  - Assertion
+  Assertions:
+    TS_ASSERT_EMPTY_STRING:
+    TS_ASSERT_NOT_EMPTY_STRING:
+    TS_ASSERT_STR_CONTAINS: (text, sub_text)
+      - Equivalent to (but with standard way to display errors and successes):
+        auto contains = stdMessage.find(sub_text) != std::string::npos;
+        TS_ASSERT_TRUE   (contains);
+        if (!contains)
+        {
+          TS_FAIL ("text: "s + text + " does not contains " + sub_text);
+        }
 
 ======
 Traits:
@@ -45,6 +55,7 @@ FIXED:
 
 DONE:
 ====
+  - For TS_ASSERT_THROWS tell when got std::exception, int, unsigned int or bool instead of other kind of exception
   - Move countAssert to header file (to avoid stepping in it when debugging)
   - Add TS_ASSERT_EQUALS_PTR and TS_ASSERT_DIFFERS_PTR  that report value of pointers as nullptr or not nullptr
   - Consider displaying strings in user code in double quotes

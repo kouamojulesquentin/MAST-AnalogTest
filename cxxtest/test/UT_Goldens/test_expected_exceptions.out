@@ -1,0 +1,28 @@
+Running UT_ExpectedExceptions tests (8 tests)
+
+.
+
+In UT_ExpectedExceptions::test_Expected_Failure_NoException:
+UT_ExpectedExceptions.cpp:80: Error: Expected (doNotThrow()) to throw (std::exception), but found it didn't throw
+
+In UT_ExpectedExceptions::test_Expected_Failure_StdException:
+UT_ExpectedExceptions.cpp:87: Error: Expected (doThrowRuntimeError()) to throw (std::invalid_argument), but found it threw "std::exception(This is runtime_error !!!)"
+
+In UT_ExpectedExceptions::test_Expected_Failure_UnknownException:
+UT_ExpectedExceptions.cpp:95: Error: Expected (doThrowUnknown()) to throw (std::invalid_argument), but found it threw something else
+
+In UT_ExpectedExceptions::test_Expected_Failure_IntException:
+UT_ExpectedExceptions.cpp:103: Error: Expected (doThrowInt()) to throw (std::invalid_argument), but found it threw "int exception with value: -12"
+
+In UT_ExpectedExceptions::test_Expected_Failure_UIntException:
+UT_ExpectedExceptions.cpp:111: Error: Expected (throw 36u) to throw (std::invalid_argument), but found it threw "unsigned int exception with value: 36"
+
+In UT_ExpectedExceptions::test_Expected_Failure_BoolException_true:
+UT_ExpectedExceptions.cpp:119: Error: Expected (throw true) to throw (std::invalid_argument), but found it threw "bool exception with value: true"
+
+In UT_ExpectedExceptions::test_Expected_Failure_BoolException_false:
+UT_ExpectedExceptions.cpp:127: Error: Expected (throw false) to throw (std::invalid_argument), but found it threw "bool exception with value: false"
+
+Failed 7 and Skipped 0 of 8 tests
+Success rate: 12%
+Error level = 7

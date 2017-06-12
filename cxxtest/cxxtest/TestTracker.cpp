@@ -14,8 +14,9 @@
 
 namespace CxxTest
 {
-bool TestTracker::_created      = false;
-bool TestTracker::print_tracing = true;         // We want tracing by default
+bool TestTracker::_created              = false;
+bool TestTracker::print_tracing         = true; // We want tracing by default
+bool TestTracker::display_test_duration = false;
 
 TestTracker::TestTracker()
 {
@@ -148,6 +149,13 @@ void TestTracker::enterTest(TestDescription& td)
   _lastAssertFile       = NULL;
   _lastAssertLine       = 0;
   _withinDataDrivenTest = false;
+
+  #if (__cplusplus >= 201103L)
+  _duration_microseconds = 0;
+  _startTime = _stopTime = std::chrono::steady_clock::now();
+  #endif
+
+
   m_pListener->enterTest(td);
 }
 
@@ -186,6 +194,12 @@ void TestTracker::updateTestHasNoAssertion ()
 void TestTracker::leaveTest(const TestDescription &td)
 {
     updateTestHasNoAssertion();
+
+    #if (__cplusplus >= 201103L)
+    _stopTime              = std::chrono::steady_clock::now();
+    _duration_microseconds = std::chrono::duration_cast<std::chrono::microseconds>(_stopTime - _startTime).count();
+    #endif
+
     m_pListener->leaveTest(td);
 
     _lastAssertFile       = NULL;
@@ -418,10 +432,10 @@ void TestTracker::failedAssertRelation(const char *message, const char *file, in
     _lastAssertLine = line;
 }
 
-void TestTracker::failedAssertThrows(const char *message, const char *file, int line, const char *expression, const char *type, bool otherThrown)
+void TestTracker::failedAssertThrows(const char *message, const char *file, int line, const char *expression, const char* exceptionMessage, const char *type, bool otherThrown)
 {
     countFailure();
-    m_pListener->failedAssertThrows(message, file, line, expression, type, otherThrown);
+    m_pListener->failedAssertThrows(message, file, line, expression, exceptionMessage, type, otherThrown);
     _lastAssertFile = file;
     _lastAssertLine = line;
 }
@@ -643,7 +657,7 @@ void TestTracker::succeededAssertSameFiles(const char *message, const char *file
 
 //! Reports a successful "assert throws"
 //!
-void TestTracker::succeededAssertThrows(const char* message, const char* file, int line, const char* expr, const char* type, const char* exceptionMessage)
+void TestTracker::succeededAssertThrows(const char* message, const char* file, int line, const char* expr, const char* exceptionMessage, const char* type)
 {
     m_pListener->succeededAssertThrows(message, file, line, expr, type, exceptionMessage);
     _lastAssertFile = file;

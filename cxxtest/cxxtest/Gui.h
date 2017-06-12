@@ -225,9 +225,13 @@ public:
         redBarSafe();
     }
 
-    virtual void failedAssertThrows(const char* /* message */, const char * /*file*/, int /*line*/,
-                            const char * /*expression*/, const char * /*type*/,
-                            bool /*otherThrown*/)
+    virtual void failedAssertThrows(const char* /* message */,
+                                    const char* /*file*/,
+                                    int         /*line*/,
+                                    const char* /*expression*/,
+                                    const char* /*exceptionMessage*/,
+                                    const char* /*type*/,
+                                    bool        /*otherThrown*/)
     {
         redBarSafe();
     }

@@ -137,7 +137,7 @@ MastConfiguration::MastConfiguration ()
   : m_sitFilePath                 ("DUT.sit")
   , m_configurationAlgorithm      ("last_or_default")
   , m_accessInterfaceProtocol     ("")
-  , m_pluginDLLs                  ({PLUGINS_DIRECTORY_NAME})
+  , m_pluginDirectories           ({PLUGINS_DIRECTORY_NAME})
   , m_modelCheckingFilePath       ()
   , m_loggerFilePath              ("Mast.log")
   , m_gmlFilePath                 ("MastModel.gml")
@@ -149,6 +149,40 @@ MastConfiguration::MastConfiguration ()
 //
 //  End of: MastConfiguration::MastConfiguration
 //---------------------------------------------------------------------------
+
+
+//! Extracts for current application path (usually got from argv[0]), the directory path
+//!
+//! @note This is not work properly if the application path is reduced to application name
+//!
+//! @param applicationPath  The application path
+//!
+//! @return Extracted path or "." when no path has been found
+string MastConfiguration::ExtractApplicationDirectoryPath (const string& applicationPath)
+{
+  // ---------------- Set dirPath with only directory path of runner application
+  //
+  auto dirPath = applicationPath;
+  auto sepPos  = dirPath.rfind("/"); // Search for last Linux directory separator
+  if (sepPos == std::string::npos)
+  {
+    sepPos  = dirPath.rfind("\\");   // Search for last Windows directory separator
+  }
+
+  if (sepPos != std::string::npos)
+  {
+    dirPath.erase(sepPos);           // Remove exe name (keeping only directory path)
+  }
+  else
+  {
+    dirPath = ".";                   // When no separator ==> there is only application name ==> this is current directory
+  }
+  return dirPath;
+}
+//
+//  End of: MastConfiguration::ExtractApplicationDirectoryPath
+//---------------------------------------------------------------------------
+
 
 
 //! Parses MAST options in configuration file
@@ -320,7 +354,8 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
     updateFlags (m_prettyPrintingReportMoments, reportMomentsMapping,          {"Debug", "Model_textual_print", "Moments"});
     updateFlags (m_managerActivityOptions,      managerActivityOptionsMapping, {"Debug", "Manager_activity",    "Options"});
 
-    updateSequence (m_pluginDLLs, {"Plugin_DLLs"});
+    updateSequence (m_pluginDLLs,        {"Plugins", "Files"});
+    updateSequence (m_pluginDirectories, {"Plugins", "Directories"});
   }
 }
 //
@@ -355,10 +390,11 @@ void MastConfiguration::Update (int argc, const char* argv[])
 //!
 void MastConfiguration::Update (vector<string> arguments)
 {
-  LOG(INFO) << "Hello !!!!!!!!!";
   if (!arguments.empty())
   {
-    LOG(INFO) << "Application: " << arguments.front();
+    m_applicationDirectoryPath = ExtractApplicationDirectoryPath(arguments.front());
+    LOG(INFO) << "Application path:           " << arguments.front();
+    LOG(INFO) << "Application directory path: " << m_applicationDirectoryPath;
   }
 
   try
@@ -390,9 +426,10 @@ void MastConfiguration::Update (vector<string> arguments)
     TCLAP::ValueArg<std::string> logLevelArg          ("",  "log_level",   "Define log level",                                                              false, "info",                   &logLevelConstraint, cmdLine);
     TCLAP::ValueArg<std::string> logFileArg           ("",  "log_file",    "Define logger file path",                                                       false, "mast.log",               "File path", cmdLine);
     TCLAP::SwitchArg             logEnabledArg        ("l", "log",         "Enable logger",                                                                 cmdLine, false);
-    TCLAP::MultiArg<std::string> pluginDLLsArg        ("",  "plugins",     "Define plugins to load (may be directory of file path)",                        false, "Directory or file path", cmdLine);
-    TCLAP::ValueArg<std::string> sitFilePathArg       ("s", "sit",         "Define SIT that specified SUT model",                                           false, "project.sit",            "File path", cmdLine);
-    TCLAP::ValueArg<std::string> configurationFileArg ("c", "conf",        "Define configuration file",                                                     false, "mast.cfg",               "File path", cmdLine);
+    TCLAP::MultiArg<std::string> pluginFilesArg       ("",  "plugin",      "Define a plugin file to load",                                                  false, "File path",      cmdLine);
+    TCLAP::MultiArg<std::string> pluginDirsArg        ("",  "plugin_dir",  "Define a plugin directory (all plugins in it are loaded)",                      false, "Directory path", cmdLine);
+    TCLAP::ValueArg<std::string> sitFilePathArg       ("s", "sit",         "Define SIT that specified SUT model",                                           false, "project.sit",    "File path", cmdLine);
+    TCLAP::ValueArg<std::string> configurationFileArg ("c", "conf",        "Define configuration file",                                                     false, "mast.cfg",       "File path", cmdLine);
 
     // ---------------- Do parse command line arguments
     //
@@ -437,7 +474,8 @@ void MastConfiguration::Update (vector<string> arguments)
 
       setOption(m_sitFilePath,             sitFilePathArg);
       setOption(m_configurationAlgorithm,  configurationAlgoArg);
-      setOption(m_pluginDLLs,              pluginDLLsArg);
+      setOption(m_pluginDLLs,              pluginFilesArg);
+      setOption(m_pluginDirectories,       pluginDirsArg);
       setOption(m_modelChecking,           checkModelArg);
       setOption(m_modelCheckingFilePath,   checkModelFileArg);
       setOption(m_loggerEnabled,           logEnabledArg);

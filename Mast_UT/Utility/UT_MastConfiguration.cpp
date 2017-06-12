@@ -82,9 +82,9 @@ namespace
     TS_ASSERT_EQUALS (sut.PrettyPrintReportMoments(),  mast::ReportMoments::AfterModelParsing);
 
     CxxTest::setAbortTestOnFail(true);
-    const auto& plugins = sut.PluginDLLs();
-    TS_ASSERT_EQUALS (plugins.size(),  1u);
-    TS_ASSERT_EQUALS (plugins.front(), PLUGINS_DIRECTORY_NAME);
+    const auto& pluginDirs = sut.PluginDirectories();
+    TS_ASSERT_EQUALS (pluginDirs.size(),  1u);
+    TS_ASSERT_EQUALS (pluginDirs.front(), PLUGINS_DIRECTORY_NAME);
   }
 } // End of unnamed namespace
 
@@ -175,9 +175,9 @@ void UT_MastConfiguration::test_ParseYamlConfiguration_PartialConfiguration ()
               "Mast_Options:\n"
               "  SIT_file_path: myDesign.sit\n"
               "  Configuration_algorithm: last_lazy\n"
-              "  Plugin_DLLs:  \n"
-              "    - Plugins\n"
-              "    - myPlugin.so\n"
+              "  Plugins:  \n"
+              "    Files:       [myPlugin.so] \n"
+              "    Directories: [Plugins_1, Plugins_2] \n"
               "  Debug:\n"
               "    Logging:\n"
               "      Enable: true\n"
@@ -226,9 +226,13 @@ void UT_MastConfiguration::test_ParseYamlConfiguration_PartialConfiguration ()
 
   CxxTest::setAbortTestOnFail(true);
   const auto& plugins = sut.PluginDLLs();
-  TS_ASSERT_EQUALS (plugins.size(),  2u);
-  TS_ASSERT_EQUALS (plugins[0], "Plugins");
-  TS_ASSERT_EQUALS (plugins[1], "myPlugin.so");
+  TS_ASSERT_EQUALS (plugins.size(),  1u);
+  TS_ASSERT_EQUALS (plugins[0], "myPlugin.so");
+
+  const auto& pluginDirs = sut.PluginDirectories();
+  TS_ASSERT_EQUALS (pluginDirs.size(),  2u);
+  TS_ASSERT_EQUALS (pluginDirs[0], "Plugins_1");
+  TS_ASSERT_EQUALS (pluginDirs[1], "Plugins_2");
 }
 
 
@@ -244,44 +248,46 @@ void UT_MastConfiguration::test_ParseYamlConfiguration_FullConfiguration ()
               "  SIT_file_path: myProject.sit\n"                                           // 02
               "  Configuration_algorithm: myConfiguration\n"                               // 03
               "  Access_interface_protocol: myProtocol\n"                                  // 04
-              "  Plugin_DLLs:  [Plugins, myPlugin.dll]\n"                                  // 05
-              "  Model_checking: \n"                                                       // 06
-              "    Enable: true\n"                                                         // 07
-              "    File_path: modelCheck.txt\n"                                            // 08
-              "  Debug:\n"                                                                 // 09
-              "    Logging:\n"                                                             // 10
-              "      Enable: true\n"                                                       // 11
-              "      Logger_Kind: copy_errors_on_cerr\n"                                   // 12
-              "      File_path:   myProject.log\n"                                         // 13
-              "      Shown_items: [microseconds, level, thread_id, function_name]\n"       // 14
-              "      Level: warning\n"                                                     // 15
-              "    Model_GML_printing: \n"                                                 // 16
-              "      Enable: true\n"                                                       // 17
-              "      Moments:\n"                                                           // 18
-              "        - after_model_parsing\n"                                            // 19
-              "        - after_configuration\n"                                            // 20
-              "      File_path: ./myproject\n"                                             // 21
-              "      Graph_name: Foo\n"                                                    // 22
-              "      Options: std\n"                                                       // 23
-              "    Model_textual_print: \n"                                                // 24
-              "      Enable: true\n"                                                       // 25
-              "      Moments:\n"                                                           // 26
-              "        - after_model_parsing\n"                                            // 27
-              "        - before_configuration\n"                                           // 28
-              "      File_path: ../Tests/Bar\n"                                            // 29
-              "      Options:         \n"                                                  // 30
-              "         - verbose \n"                                                      // 31
-              "         - auto_value \n"                                                   // 32
-              "         - protocol_name \n"                                                // 33
-              "         - selection_state \n"                                              // 34
-              "         - selection_value \n"                                              // 35
-              "         - selector_properties \n"                                          // 36
-              "         - ignored_nodes  \n"                                               // 37
-              "    Manager_activity:  \n"                                                  // 38
-              "      Enable: true\n"                                                       // 39
-              "      File_base_name: managerActivity\n"                                    // 40
-              "      Options: [verbose, app_thread_creation, PDL_commands, data_cycles]\n" // 41
-              "Plugins_Options: ""\n"                                                      // 42
+              "  Plugins:  \n"                                                             // 05
+              "    Files:       [myPlugin.dll] \n"                                         // 06
+              "    Directories: [Plugins] \n"                                              // 07
+              "  Model_checking: \n"                                                       // 08
+              "    Enable: true\n"                                                         // 09
+              "    File_path: modelCheck.txt\n"                                            // 10
+              "  Debug:\n"                                                                 // 11
+              "    Logging:\n"                                                             // 12
+              "      Enable: true\n"                                                       // 13
+              "      Logger_Kind: copy_errors_on_cerr\n"                                   // 14
+              "      File_path:   myProject.log\n"                                         // 15
+              "      Shown_items: [microseconds, level, thread_id, function_name]\n"       // 16
+              "      Level: warning\n"                                                     // 17
+              "    Model_GML_printing: \n"                                                 // 18
+              "      Enable: true\n"                                                       // 19
+              "      Moments:\n"                                                           // 20
+              "        - after_model_parsing\n"                                            // 21
+              "        - after_configuration\n"                                            // 22
+              "      File_path: ./myproject\n"                                             // 23
+              "      Graph_name: Foo\n"                                                    // 24
+              "      Options: std\n"                                                       // 25
+              "    Model_textual_print: \n"                                                // 26
+              "      Enable: true\n"                                                       // 27
+              "      Moments:\n"                                                           // 28
+              "        - after_model_parsing\n"                                            // 29
+              "        - before_configuration\n"                                           // 30
+              "      File_path: ../Tests/Bar\n"                                            // 31
+              "      Options:         \n"                                                  // 32
+              "         - verbose \n"                                                      // 33
+              "         - auto_value \n"                                                   // 34
+              "         - protocol_name \n"                                                // 35
+              "         - selection_state \n"                                              // 36
+              "         - selection_value \n"                                              // 37
+              "         - selector_properties \n"                                          // 38
+              "         - ignored_nodes  \n"                                               // 39
+              "    Manager_activity:  \n"                                                  // 40
+              "      Enable: true\n"                                                       // 41
+              "      File_base_name: managerActivity\n"                                    // 42
+              "      Options: [verbose, app_thread_creation, PDL_commands, data_cycles]\n" // 43
+              "Plugins_Options: ""\n"                                                      // 44
              );
 
   // ---------------- Exercise
@@ -330,9 +336,12 @@ void UT_MastConfiguration::test_ParseYamlConfiguration_FullConfiguration ()
 
   CxxTest::setAbortTestOnFail(true);
   const auto& plugins = sut.PluginDLLs();
-  TS_ASSERT_EQUALS (plugins.size(),  2u);
-  TS_ASSERT_EQUALS (plugins[0], "Plugins");
-  TS_ASSERT_EQUALS (plugins[1], "myPlugin.dll");
+  TS_ASSERT_EQUALS (plugins.size(),  1u);
+  TS_ASSERT_EQUALS (plugins[0], "myPlugin.dll");
+
+  const auto& pluginDirs = sut.PluginDirectories();
+  TS_ASSERT_EQUALS (pluginDirs.size(),  1u);
+  TS_ASSERT_EQUALS (pluginDirs[0], "Plugins");
 }
 
 
@@ -443,9 +452,12 @@ void UT_MastConfiguration::test_ParseConfigurationFile_Good ()
 
   CxxTest::setAbortTestOnFail(true);
   const auto& plugins = sut.PluginDLLs();
-  TS_ASSERT_EQUALS (plugins.size(),  2u);
-  TS_ASSERT_EQUALS (plugins[0], "Plugins");
-  TS_ASSERT_EQUALS (plugins[1], "myPlugin.dll");
+  TS_ASSERT_EQUALS (plugins.size(),  1u);
+  TS_ASSERT_EQUALS (plugins[0], "myOwnPlugin.dll");
+
+  const auto& pluginDirs = sut.PluginDirectories();
+  TS_ASSERT_EQUALS (pluginDirs.size(), 1u);
+  TS_ASSERT_EQUALS (pluginDirs[0], "Plugins");
 }
 
 
@@ -611,9 +623,9 @@ void UT_MastConfiguration::test_Update_ShortSwitches ()
   TS_ASSERT_EQUALS (sut.PrettyPrintReportMoments(),  mast::ReportMoments::AfterModelParsing);
 
   CxxTest::setAbortTestOnFail(true);
-  const auto& plugins = sut.PluginDLLs();
-  TS_ASSERT_EQUALS (plugins.size(),  1u);
-  TS_ASSERT_EQUALS (plugins.front(), PLUGINS_DIRECTORY_NAME);
+  const auto& pluginDirs = sut.PluginDirectories();
+  TS_ASSERT_EQUALS (pluginDirs.size(),  1u);
+  TS_ASSERT_EQUALS (pluginDirs.front(), PLUGINS_DIRECTORY_NAME);
 
   TS_ASSERT_STR_EMPTY (stdStream.str());
   TS_ASSERT_STR_EMPTY (errStream.str());
@@ -631,8 +643,8 @@ void UT_MastConfiguration::test_Update_LongSwitches ()
                                 "--sit=myDesign.sit",
                                 "--protocol=myProtocol",
                                 "--config_algo=last_lazy",
-                                "--plugins=MyPlugins",
-                                "--plugins=customPlugins.dll",
+                                "--plugin_dir=MyPlugins",
+                                "--plugin=customPlugins.dll",
                                 "--log",
                                 "--log_file=myProject.log",
                                 "--log_level=debug",
@@ -685,9 +697,12 @@ void UT_MastConfiguration::test_Update_LongSwitches ()
 
   CxxTest::setAbortTestOnFail(true);
   const auto& plugins = sut.PluginDLLs();
-  TS_ASSERT_EQUALS (plugins.size(),  2u);
-  TS_ASSERT_EQUALS (plugins[0], "MyPlugins");
-  TS_ASSERT_EQUALS (plugins[1], "customPlugins.dll");
+  TS_ASSERT_EQUALS (plugins.size(),  1u);
+  TS_ASSERT_EQUALS (plugins[0], "customPlugins.dll");
+
+  const auto& pluginDirs = sut.PluginDirectories();
+  TS_ASSERT_EQUALS (pluginDirs.size(),  1u);
+  TS_ASSERT_EQUALS (pluginDirs[0], "MyPlugins");
 }
 
 
@@ -702,8 +717,8 @@ void UT_MastConfiguration::test_Update_UsingArgv ()
                                 "--sit=myDesign.sit",          // 01
                                 "--protocol=myProtocol",       // 02
                                 "--config_algo=last_lazy",     // 03
-                                "--plugins=MyPlugins",         // 04
-                                "--plugins=customPlugins.dll", // 05
+                                "--plugin_dir=MyPlugins",      // 04
+                                "--plugin=customPlugins.dll",  // 05
                                 "--log",                       // 06
                                 "--log_file=myProject.log",    // 07
                                 "--log_level=debug",           // 08
@@ -757,9 +772,12 @@ void UT_MastConfiguration::test_Update_UsingArgv ()
 
   CxxTest::setAbortTestOnFail(true);
   const auto& plugins = sut.PluginDLLs();
-  TS_ASSERT_EQUALS (plugins.size(),  2u);
-  TS_ASSERT_EQUALS (plugins[0], "MyPlugins");
-  TS_ASSERT_EQUALS (plugins[1], "customPlugins.dll");
+  TS_ASSERT_EQUALS (plugins.size(),  1u);
+  TS_ASSERT_EQUALS (plugins[0], "customPlugins.dll");
+
+  const auto& pluginDirs = sut.PluginDirectories();
+  TS_ASSERT_EQUALS (pluginDirs.size(),  1u);
+  TS_ASSERT_EQUALS (pluginDirs[0], "MyPlugins");
 }
 
 
@@ -826,9 +844,12 @@ void UT_MastConfiguration::test_Update_OnlyYamlConfig ()
 
   CxxTest::setAbortTestOnFail(true);
   const auto& plugins = sut.PluginDLLs();
-  TS_ASSERT_EQUALS (plugins.size(),  2u);
-  TS_ASSERT_EQUALS (plugins[0], "Plugins");
-  TS_ASSERT_EQUALS (plugins[1], "myPlugin.dll");
+  TS_ASSERT_EQUALS (plugins.size(),  1u);
+  TS_ASSERT_EQUALS (plugins[0], "myOwnPlugin.dll");
+
+  const auto& pluginDirs = sut.PluginDirectories();
+  TS_ASSERT_EQUALS (pluginDirs.size(),  1u);
+  TS_ASSERT_EQUALS (pluginDirs[0], "Plugins");
 }
 
 
@@ -841,8 +862,8 @@ void UT_MastConfiguration::test_Update_Arguments_and_YamlConfig ()
   vector<string>    arguments{
                                 "MyAppWithLongName",
                                 "--sit=myDesign.sit",
-                                "--plugins=MyPlugins",
-                                "--plugins=customPlugins.so",
+                                "--plugin_dir=MyPlugins",
+                                "--plugin=customPlugins.so",
                              };
 
   arguments.emplace_back("--conf="s + test::GetTestFilePath("UT_MastConfiguration_good.yml"));
@@ -901,9 +922,12 @@ void UT_MastConfiguration::test_Update_Arguments_and_YamlConfig ()
 
   CxxTest::setAbortTestOnFail(true);
   const auto& plugins = sut.PluginDLLs();
-  TS_ASSERT_EQUALS (plugins.size(),  2u);
-  TS_ASSERT_EQUALS (plugins[0], "MyPlugins");
-  TS_ASSERT_EQUALS (plugins[1], "customPlugins.so");
+  TS_ASSERT_EQUALS (plugins.size(),  1u);
+  TS_ASSERT_EQUALS (plugins[0], "customPlugins.so");
+
+  const auto& pluginDirs = sut.PluginDirectories();
+  TS_ASSERT_EQUALS (pluginDirs.size(),  1u);
+  TS_ASSERT_EQUALS (pluginDirs[0], "MyPlugins");
 }
 
 

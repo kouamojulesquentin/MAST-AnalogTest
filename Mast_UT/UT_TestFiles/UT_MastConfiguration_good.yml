@@ -2,7 +2,9 @@ Mast_Options:
   SIT_file_path: myProject.sit
   Configuration_algorithm: myConfiguration
   Access_interface_protocol: myProtocol
-  Plugin_DLLs:  [Plugins, myPlugin.dll]
+  Plugins:
+    Files:       [myOwnPlugin.dll] # List of plugin file(s) path (absolute or relative path)
+    Directories: [Plugins]         # Directory from where to load plugin files (absolute or relative path)
   Model_checking:
     Enable: true
     File_path: modelCheck.txt

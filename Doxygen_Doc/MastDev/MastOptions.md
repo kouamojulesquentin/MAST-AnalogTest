@@ -29,7 +29,9 @@ Default configuration file looks like this:
       SIT_file_path: DUT.sit                   # [SIT] file used by the project
       Configuration_algorithm: last_or_default # One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a [plugin])
       Access_interface_protocol:               # When different to "SIT", it override the one define in [SIT] file
-      Plugin_DLLs:  Plugins                    # Root path and/or list of file(s) path
+      Plugins:
+        Files: []                              # List of plugin file(s) path (absolute or relative path)
+        Directories: []                        # Directory from where to load plugin files (absolute or relative path)
       Model_checking:
         Enable:    false                       # Enable/Disable model checking (provided it has been parsed successfully)
         File_path: ""                          # Optional file path (logged when no path when logged is enabled)
@@ -139,14 +141,15 @@ If there is a `mast.cfg` file in current working directory, it will be used as t
 
 ## Plugins ## {#plugins}
 
-This option controls which plugins are loaded at startup. Loading is done following this order:
- - Plugins given at Command-line 
+This option controls which plugins are loaded at startup. <br>
+Loading is done following this order:
+ - Plugins given at Command-line
  - Plugins contained in directories given at Command-line
  - Plugins given in Configuration file
- - Plugin contained in directory given in Configuration file
+ - Plugins contained in directory given in Configuration file
  - Plugins in current directory
- - Plugins in MAST root plugin directory
-  
+ - Plugins in MAST root "Plugins" directory
+
 
 ## Configuration algorithm ## {#Config_Algo}
 

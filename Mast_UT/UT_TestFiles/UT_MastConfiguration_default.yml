@@ -2,7 +2,9 @@
    SIT_file_path: DUT.sit                   # [SIT] file used by the project
    Configuration_algorithm: last_or_default # One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a [plugin])
    Access_interface_protocol:               # When different to "SIT", it override the one define in [SIT] file
-   Plugin_DLLs:  Plugins                    # Root path and/or list of file(s) path
+   Plugins:
+     Files: []                              # List of plugin file(s) path (absolute or relative path)
+     Directories: [Plugins]                 # Directory from where to load plugin files (absolute or relative path)
    Model_checking:
      Enable:    false                       # Enable/Disable model checking (provided it has been parsed successfully)
      File_path: ""                          # Optional file path (logged when no path when logged is enabled)

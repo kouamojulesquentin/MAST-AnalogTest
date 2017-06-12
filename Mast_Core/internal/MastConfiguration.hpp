@@ -98,7 +98,9 @@ class MAST_CORE_EXPORT MastConfiguration final
   std::string                     SitFilePath()                 const { return m_sitFilePath;                 } //!< SIT file used by the project
   std::string                     ConfigurationAlgorithm()      const { return m_configurationAlgorithm;      } //!< One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a [plugin])
   std::string                     AccessInterfaceProtocol()     const { return m_accessInterfaceProtocol;     } //!< When different to "SIT", it override the one define in [SIT] file
-  const std::vector<std::string>& PluginDLLs()                  const { return m_pluginDLLs;                  } //!< Root path and/or list of file(s) path
+  std::string                     ApplicationPath()             const { return m_applicationDirectoryPath;    } //!< Application directory path (extracted from argv[0])
+  const std::vector<std::string>& PluginDLLs()                  const { return m_pluginDLLs;                  } //!< List of plugins files paths
+  const std::vector<std::string>& PluginDirectories()           const { return m_pluginDirectories;           } //!< List of plugins directories paths
   bool                            ModelChecking()               const { return m_modelChecking;               } //!< Enable/Disable model checking (provided it has been parsed successfully)
   std::string                     ModelCheckingFilePath()       const { return m_modelCheckingFilePath;       } //!< Optional model checking result file path (logged when no path when logged is enabled)
   bool                            LoggerEnabled()               const { return m_loggerEnabled;               } //!< Enable/Disable general logging
@@ -139,17 +141,21 @@ class MAST_CORE_EXPORT MastConfiguration final
 
   // ---------------- Private Methods
   //
-  void ParseConfigurationFile (const std::string& configurationFile);
-  void ParseYamlConfiguration (const std::string& yamlConfiguration);
+  std::string ExtractApplicationDirectoryPath (const std::string& applicationPath);
+  void        ParseConfigurationFile          (const std::string& configurationFile);
+  void        ParseYamlConfiguration          (const std::string& yamlConfiguration);
 
   // ---------------- Private Fields
   //
   private:
 
+
+  std::string              m_applicationDirectoryPath;                                             //!< Application directory path (extracted from argv[0])
   std::string              m_sitFilePath;                                                          //!< SIT file used by the project
   std::string              m_configurationAlgorithm;                                               //!< One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a [plugin])
   std::string              m_accessInterfaceProtocol;                                              //!< When different to "SIT", it override the one define in [SIT] file
-  std::vector<std::string> m_pluginDLLs;                                                           //!< Root path and/or list of file(s) path
+  std::vector<std::string> m_pluginDLLs;                                                           //!< List of plugins files paths
+  std::vector<std::string> m_pluginDirectories;                                                    //!< List of plugins directories paths
   bool                     m_modelChecking               = false;                                  //!< Enable/Disable model checking (provided it has been parsed successfully)
   std::string              m_modelCheckingFilePath;                                                //!< Optional file path (logged when no path when logged is enabled)
   bool                     m_loggerEnabled               = false;                                  //!< Enable/Disable general logging

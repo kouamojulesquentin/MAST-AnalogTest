@@ -19,7 +19,9 @@
 #include "CustomFileSink.h"
 #include "LoggerSinks.h"
 #include "Utility.hpp"
+#include "FileSystem.hpp"
 #include "Plugins.hpp"
+#include "MastConfig.hpp"
 
 using std::vector;
 using std::string;
@@ -71,6 +73,14 @@ void MastEnvironment::ConfigureLogger ()
     m_logFormatter->ShowFileName     (IsSet(shownItems, mast::LoggerShownItems::FileName));
     m_logFormatter->ShowFunctionName (IsSet(shownItems, mast::LoggerShownItems::FunctionName));
     m_logFormatter->ShowLineNumber   (IsSet(shownItems, mast::LoggerShownItems::LineNumber));
+
+    //+ (begin JFC June/12/2017): for debug purpose
+    m_logFormatter->ShowDate         (false);
+    m_logFormatter->ShowTime         (false);
+    m_logFormatter->ShowMicroseconds (false);
+    m_logFormatter->ShowFileName     (false);
+    m_logFormatter->ShowLineNumber   (false);
+    //+ (end   JFC June/12/2017):
 
 
     g3::only_change_at_initialization::setLogLevel(ERROR_LVL, true);
@@ -138,11 +148,11 @@ void MastEnvironment::InitializeLogger ()
 
   // ---------------- Sink for logging errors to std::cerr
   //
-  auto cerrSink = std::make_unique<g3::ErrorsOnCerrLoggerSink>();
+  auto cerrSink = std::make_unique<g3::ErrorsOnCerrLoggerSink>(*m_logFormatter);
   m_logger->addSink(std::move(cerrSink), &g3::ErrorsOnCerrLoggerSink::ReceiveLogMessage);
 
   //+ (begin JFC June/09/2017): for debug purpose
-  auto coutSink = std::make_unique<g3::CoutLoggerSink>();
+  auto coutSink = std::make_unique<g3::CoutLoggerSink>(*m_logFormatter);
   m_logger->addSink(std::move(coutSink), &g3::CoutLoggerSink::ReceiveLogMessage);
   //+ (end   JFC June/09/2017):
 
@@ -157,23 +167,73 @@ void MastEnvironment::InitializeLogger ()
 
 //! Loads plugins defined by options
 //!
+//! @note Plugins are loaded in following order:
+//!   - Plugins given at Command-line
+//!   - Plugins contained in directories given at Command-line
+//!   - Plugins given in Configuration file
+//!   - Plugins contained in directory given in Configuration file
+//!   - Plugins in current directory
+//!   - Plugins in MAST root "Plugins" directory
+//!
 void MastEnvironment::LoadPlugins ()
 {
   CHECK_VALUE_NOT_NULL(m_configuration, "Configuration (options) must have been parsed before loading plugin(s)");
 
-  const auto& plugins = m_configuration->PluginDLLs();
+  // The directories from where plugins search is done
+  vector<string> candidateDirs {
+                                 "",
+                                 "."s,
+                                 "."s
+                                   .append(DIRECTORY_SEPARATOR)
+                                   .append(PLUGINS_DIRECTORY_NAME),
+                                 m_configuration->ApplicationPath(),
+                                 string()
+                                   .append(m_configuration->ApplicationPath())
+                                   .append(DIRECTORY_SEPARATOR)
+                                   .append(PLUGINS_DIRECTORY_NAME),
+                               };
 
+
+  // ---------------- Plugins Files
+  //
+  const auto& plugins = m_configuration->PluginDLLs();
   for (const auto& name : plugins)
   {
-    if (Utility::FileExists(name))
+    auto loaded = false;
+    for (const auto& hintDir : candidateDirs)
     {
-      LOG(INFO) << "Will try to load plugin: " << name;
-      Plugins::LoadPlugin(name);
+      LOG(INFO) << "Will try to load plugin: " << name << " - Trying in directory \"" << hintDir << "\" -";
+      auto effectiveDllPath = Plugins::TryLoadPlugin(hintDir, name);
+      if (!effectiveDllPath.empty())
+      {
+        loaded = true;
+        LOG(INFO) << "Loaded plugin: " << effectiveDllPath;
+        break;
+      }
     }
-    else
+
+    if (!loaded)
     {
-      LOG(INFO) << "Will try to load plugin(s) from directory: " << name;
-      Plugins::LoadPlugins(name);
+      LOG(INFO) << "Failed to load plugin: " << name;
+    }
+  }
+
+  // ---------------- Plugins directories
+  //
+  const auto& pluginDirs = m_configuration->PluginDirectories();
+  for (const auto& name : pluginDirs)
+  {
+    for (const auto& hintDir : candidateDirs)
+    {
+      auto dirPath = hintDir.empty() ? name
+                                     : hintDir + DIRECTORY_SEPARATOR + name;
+
+      if (FileSystem::IsDirectory(dirPath))
+      {
+        LOG(INFO) << "Will try to load plugin(s) from directory: " << dirPath;
+        Plugins::LoadPlugins(dirPath);
+        break;
+      }
     }
   }
 }

@@ -46,6 +46,14 @@ string test::GetTestFilePath(const string& fileName)
   return filePath;
 }
 
+//! Returns directory path of currently running test runner
+//!
+const string& test::GetRunnerDirectoryPath()
+{
+  return Exe_Dir_Path;
+}
+
+
 //===========================================================================
 // End of TestUtilities.cpp
 //===========================================================================

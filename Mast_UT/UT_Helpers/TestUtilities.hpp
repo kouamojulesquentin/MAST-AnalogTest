@@ -22,6 +22,11 @@ namespace test
   //! Returns file path given a test file name
   //!
   extern std::string GetTestFilePath(const std::string& fileName);
+
+  //! Returns directory path of currently running test runner
+  //!
+  extern const std::string& GetRunnerDirectoryPath();
+
 } // End of namespace test
 
 #endif  // not defined TESTUTILITIES_H__79C2AF65_C90B_4E55_1D88_1E6D53095C0__INCLUDED_

@@ -7,53 +7,68 @@
 //
 //! @file Dll.cpp
 //!
-//! Implements dummy class Dll for platform that have no support for it
+//! Implements parts class Dll that are platform independent
 //!
 //===========================================================================
 
 #include "Dll.hpp"
 #include "Utility.hpp"
+#include "MastConfig.hpp"
 #include "g3log/g3log.hpp"
 
-
-#include <experimental/string_view>
 using std::experimental::string_view;
 using std::string;
-using std::vector;
+using std::tuple;
+using std::make_tuple;
 
 using namespace std::string_literals;
 using namespace std::experimental::literals::string_view_literals;
 using namespace mast;
 
-
-
-//! Returns empty list of DLLs
+//! Returns true if file exist with or without a path hint
 //!
-//! @param directoryPath  Path to directory to search *.so or *.dll
-//!
-vector<string> Dll::GetInDirectory (const std::string& directoryPath)
+tuple<bool, string> Dll::FileExists (const string& pathHint, const string& filePath)
 {
-  CHECK_FAILED("No support, for current platform, to get Dll in directory: "s + directoryPath);
-//+  LOG(WARNING) << "No support, for current platform, to get Dll in directory: \"" << directoryPath << "\"" ;
-//+  return vector<string>();
+  if (Utility::FileExists(filePath))
+  {
+    return make_tuple(true, filePath);
+  }
+
+  auto pathWithHint = pathHint + DIRECTORY_SEPARATOR + filePath;
+//+  LOG(INFO) << "pathHint: pathWithHint";
+  if (Utility::FileExists(pathWithHint))
+  {
+    return make_tuple(true, pathWithHint);
+  }
+
+  return make_tuple(false, ""s);
 }
 //
-//  End of: Dll::GetInDirectory
+//  End of: Dll::FileExists
 //---------------------------------------------------------------------------
 
 
-
-//! Does nothing instead of loading a DLL
+//! Loads a DLL
 //!
 //! @param dllPath  Path to DLL to load.
+//!                 If does not end with ".so", ".so" is appended to the path
+//!                 If it does not exist and does not begin with "lib", path is prefixed with "lib"
 //!
-string Dll::TryLoad (const std::string& /* pathHint */, const string& dllPath)
+string Dll::Load (const string& dllPath)
 {
-  CHECK_FAILED("No support, for current platform, to try loading Dll: "s + dllPath);
+  auto loadedDll = TryLoad("", dllPath);
+  if (loadedDll.empty())
+  {
+    CHECK_FAILED("Failed to load Dll: "s + dllPath);
+  }
+  return loadedDll;
 }
 //
-//  End of: Dll::TryLoad
+//  End of: Dll::Load
 //---------------------------------------------------------------------------
+
+
+
 
 //===========================================================================
 // End of Dll.cpp

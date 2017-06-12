@@ -16,8 +16,10 @@
   #define DLL_H__328B051D_756A_4D35_788F_837D15FD2819__INCLUDED_
 
 #include "Mast_Core_export.hpp"
+
 #include <string>
 #include <vector>
+#include <tuple>
 
 namespace mast
 {
@@ -32,7 +34,16 @@ namespace mast
 
     //! Loads a Dll
     //!
-    static void Load(const std::string& dllPath);
+    static std::string Load(const std::string& dllPath);
+
+    //! Trie loading a DLL
+    //!
+    static std::string TryLoad(const std::string& pathHint, const std::string& dllPath);
+
+    //! Returns true if file exist with or without a path hint
+    //!
+    static std::tuple<bool, std::string> FileExists (const std::string& pathHint, const std::string& filePath);
+
   };
 } // End of namespace mast
 

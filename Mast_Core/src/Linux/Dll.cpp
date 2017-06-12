@@ -62,30 +62,46 @@ vector<string> Dll::GetInDirectory (const std::string& directoryPath)
 //  End of: Dll::GetInDirectory
 //---------------------------------------------------------------------------
 
-
-
-//! Loads a DLL
+//! Tries loading a DLL
 //!
+//! @param hintPath Hint for path when dllPath cannot be found
 //! @param dllPath  Path to DLL to load.
 //!                 If does not end with ".so", ".so" is appended to the path
 //!                 If it does not exist and does not begin with "lib", path is prefixed with "lib"
 //!
-void Dll::Load (const string& dllPath)
+//! @return Effective path of loaded DLL, empty string otherwise
+//!
+string Dll::TryLoad (const std::string& pathHint, const string& dllPath)
 {
   auto fixedPath = dllPath;
 
+  auto checkFileExist = [pathHint](string& fixedPath)
+  {
+    auto fileExists        = false;
+    auto effectiveFilePath = ""s;
+
+    tie(fileExists, effectiveFilePath) = FileExists(pathHint, fixedPath);
+    if (fileExists)
+    {
+      fixedPath = effectiveFilePath;
+    }
+    return fileExists;
+  };
+
+  auto fileExists = checkFileExist(fixedPath);
+
   // ---------------- Deal with possibly missing ".so" extension
   //
-  if (   !Utility::FileExists(fixedPath)
-      && !Utility::EndsWith(fixedPath, ".so"sv))
+  if (!fileExists && !Utility::EndsWith(fixedPath, ".so"sv))
   {
     LOG(INFO) << "Forcing extension \".so\" to dll file: " << fixedPath;
     fixedPath.append(".so");
+    fileExists = checkFileExist(fixedPath);
   }
 
   // ---------------- Deal with possibly missing "lib" prefix
   //
-  if (!Utility::FileExists(fixedPath))
+  if (!fileExists)
   {
     auto   namePos = fixedPath.rfind("/");
     string name    = (namePos != string::npos)
@@ -102,24 +118,32 @@ void Dll::Load (const string& dllPath)
       newPath.append("lib").append(name);
       fixedPath.swap(newPath);
       LOG(INFO) << "Forcing prefix \"lib\" to dll file name: " << name;
+
+      fileExists = checkFileExist(fixedPath);
     }
   }
 
-  CHECK_FILE_EXISTS(fixedPath);
-
-  // ---------------- Try to open the dll file
-  //
-  auto handle = ::dlopen(fixedPath.c_str(), RTLD_NOW);
-
-  if (!handle)
+  if (!Utility::FileExists(fixedPath))
   {
-    ostringstream os;
-    os << "Failed to load dll \"" << fixedPath << "\":" << ::dlerror();
-    CHECK_FAILED(os.str());
+    fixedPath.clear();  // To report failure of loading dll file
   }
+  else
+  {
+    // ---------------- Try to open the dll file
+    //
+    auto handle = ::dlopen(fixedPath.c_str(), RTLD_NOW);
+
+    if (!handle)
+    {
+      LOG(INFO) << "Failed to load, as a DLL, file: \"" << fixedPath << "\", got error: " << ::dlerror();
+      fixedPath.clear();
+    }
+  }
+
+  return fixedPath;
 }
 //
-//  End of: Dll::Load
+//  End of: Dll::TryLoad
 //---------------------------------------------------------------------------
 
 

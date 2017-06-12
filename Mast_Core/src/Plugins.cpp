@@ -40,9 +40,9 @@ vector<string> Plugins::GetPlugins (const string& directoryPath)
 //!
 //! @param pluginPath Path to the plugin to load
 //!
-void Plugins::LoadPlugin (const string& pluginPath)
+string Plugins::LoadPlugin (const string& pluginPath)
 {
-  Dll::Load(pluginPath);
+  return Dll::Load(pluginPath);
 }
 //
 //  End of: Plugins::LoadPlugin
@@ -71,6 +71,7 @@ uint32_t Plugins::LoadPlugins (const string& directoryPath)
       dllPath.append(dllFile);
       LoadPlugin(dllPath);
       ++loadedCount;
+      LOG(INFO) << "Have loaded plugin: " << dllPath;
     }
     catch(std::runtime_error& exc)  // Catch C++ standard exceptions
     {
@@ -80,12 +81,32 @@ uint32_t Plugins::LoadPlugins (const string& directoryPath)
     }
   }
 
+  if (loadedCount == 0)
+  {
+    LOG(INFO) << "No plugin(s) found in directory: " << directoryPath;
+  }
+  else
+  {
+    LOG(INFO) << "Have loaded " << loadedCount << " plugin(s) from directory: " << directoryPath;
+  }
   return loadedCount;
 }
 //
 //  End of: Plugins::LoadPlugins
 //---------------------------------------------------------------------------
 
+//! Tries loading a plugin file with hint path
+//!
+//! @param hintPath   Hint for path when pluginPath cannot be found
+//! @param pluginPath Path to the plugin to load
+//!
+string Plugins::TryLoadPlugin (const string& hintPath, const string& pluginPath)
+{
+  return Dll::TryLoad(hintPath, pluginPath);
+}
+//
+//  End of: Plugins::LoadPlugin
+//---------------------------------------------------------------------------
 
 
 //===========================================================================

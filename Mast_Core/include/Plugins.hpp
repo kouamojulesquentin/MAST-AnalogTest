@@ -42,7 +42,11 @@ class MAST_CORE_EXPORT Plugins final
 
   //! Loads a plugin file
   //!
-  static void LoadPlugin(const std::string& pluginPath);
+  static std::string LoadPlugin(const std::string& pluginPath);
+
+  //! Tries loading a plugin file with hint path
+  //!
+  static std::string TryLoadPlugin(const std::string& hintPath, const std::string& pluginRelativePath);
 
   // ---------------- Private  Methods
   //

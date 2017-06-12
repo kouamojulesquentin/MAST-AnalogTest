@@ -50,7 +50,8 @@ class ArgException : public std::exception
       : std::exception(),
         _errorText(text),
         _argId(id),
-        _typeDescription(td)
+        _typeDescription(td),
+        _whatMessage(makeWhatMessage(id, text))
     { }
 
     /**
@@ -74,17 +75,12 @@ class ArgException : public std::exception
         return ("Argument: " + _argId);
     }
 
+
     /**
      * Returns the arg id and error text.
      */
     virtual const char* what() const throw() override
     {
-      _whatMessage.clear(); // In case it is call more than once!
-      if (!_argId.empty())
-      {
-        _whatMessage.append(_argId).append(" -- ");
-      }
-      _whatMessage.append(_errorText);
       return _whatMessage.c_str();
     }
 
@@ -99,6 +95,18 @@ class ArgException : public std::exception
 
 
   private:
+    //! Returns the arg id and error text.
+    //!
+    static std::string makeWhatMessage(const std::string& argId, const std::string& errorText)
+    {
+      std::string whatMessage;
+      if (!argId.empty())
+      {
+        whatMessage.append(argId).append(" -- ");
+      }
+      whatMessage.append(errorText);
+      return whatMessage;
+    }
 
     /**
      * The text of the exception message.
@@ -118,7 +126,7 @@ class ArgException : public std::exception
 
     //! Holds message return by what()
     //!
-    mutable std::string _whatMessage; // Mutable because what() is const
+    std::string _whatMessage;
 };
 
 /**

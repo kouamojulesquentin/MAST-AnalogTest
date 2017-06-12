@@ -16,6 +16,7 @@ UT_RootPath  = $(RootPath)
 
 Suites = \
       $(UT_RootPath)/Utility/UT_Utility.hpp                            \
+      $(UT_RootPath)/Utility/UT_FileSystem.hpp                         \
       $(UT_RootPath)/Utility/UT_BinaryVector.hpp                       \
       $(UT_RootPath)/Utility/UT_SVFVector.hpp                          \
       $(UT_RootPath)/Utility/UT_MastConfiguration.hpp                  \

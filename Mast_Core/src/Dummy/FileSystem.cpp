@@ -18,6 +18,13 @@ using std::string;
 
 using namespace mast;
 
+//! Report not supported on current platform
+//!
+string FileSystem::CurrentPath()
+{
+  CHECK_FAILED("No support, for current platform, to tell current directory");
+}
+
 //! Tells whether some path is a directory or not
 //!
 bool FileSystem::IsDirectory(const string& /* path */)

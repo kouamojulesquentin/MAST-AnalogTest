@@ -12,12 +12,29 @@
 //===========================================================================
 
 #include "FileSystem.hpp"
+#include "Utility.hpp"
 #include "g3log/g3log.hpp"
 #include <dirent.h>
+#include <unistd.h>
 
 using std::string;
 
 using namespace mast;
+
+
+//! Returns the absolute path of the current working directory, obtained as if
+//! (in native format) by POSIX getcwd
+//!
+string FileSystem::CurrentPath()
+{
+  auto buffer = ::getcwd(nullptr, 0);
+
+  CHECK_VALUE_NOT_NULL(buffer, "Failed to get current working directory. Got errno: "s + std::to_string(errno));
+
+  auto atExit      = MakeScopeExit([buffer](){ std::free(buffer);});
+  auto currentPath = string(buffer);
+  return currentPath;
+}
 
 //! Tells whether some path is a directory or not
 //!

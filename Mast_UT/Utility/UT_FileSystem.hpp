@@ -31,6 +31,10 @@ class UT_FileSystem : public CxxTest::TestSuite
   //
   void test_IsDirectory_when_ItIsNot ();
   void test_IsDirectory_when_ItIs ();
+
+  // ---------------- CurrentPath
+  //
+  void test_CurrentPath ();
 };
 //
 //  End of UT_FileSystem class declaration

@@ -52,6 +52,21 @@ void UT_FileSystem::test_IsDirectory_when_ItIs ()
 }
 
 
+//! Checks FileSystem::CurrentPath()
+//!
+void UT_FileSystem::test_CurrentPath ()
+{
+  // ---------------- Exercise
+  //
+  auto currentWorkingDirectory = FileSystem::CurrentPath();
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE (currentWorkingDirectory.empty());
+}
+
+
+
 //===========================================================================
 // End of UT_FileSystem.cpp
 //===========================================================================

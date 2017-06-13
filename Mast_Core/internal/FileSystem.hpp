@@ -26,6 +26,11 @@ namespace mast
     public:
     FileSystem() = delete;
 
+    //! Returns the absolute path of the current working directory, obtained as if
+    //! (in native format) by POSIX getcwd
+    //!
+    static std::string CurrentPath();
+
     //! Tells whether some path is a directory or not
     //!
     static bool IsDirectory(const std::string& path);

@@ -27,9 +27,30 @@ class UT_Plugins : public CxxTest::TestSuite
 
   // ================ Test Methods ================
 
+  // ---------------- GetPlugins
+  //
   void test_GetPlugins ();
+
+  // ---------------- LoadPlugin
+  //
+  void test_LoadPlugin_not_Exists ();
   void test_LoadPlugin ();
+
+
+  // ---------------- TryLoadPlugin
+  //
+  void test_TryLoadPlugin_not_Exists ();
+  void test_TryLoadPlugin_Exists ();
+
+  // ---------------- LoadPlugins
+  //
   void test_LoadPlugins (); // Must be after test_LoadPlugin because loaded DLL are not unloaded (March/28/2017)
+
+  // ---------------- LoadPluginsExcept
+  //
+  void test_TryLoadPluginsExcept_not_Exists ();
+  void test_TryLoadPluginsExcept_Exists_Ignored ();
+  void test_TryLoadPluginsExcept_Exists_not_Ignored ();
 };
 //
 //  End of UT_Plugins class declaration

@@ -17,6 +17,7 @@
 #include "Utility.hpp"
 #include "MastConfig.hpp"
 
+#include <algorithm>
 using std::string;
 using std::vector;
 
@@ -56,7 +57,25 @@ string Plugins::LoadPlugin (const string& pluginPath)
 //!
 uint32_t Plugins::LoadPlugins (const string& directoryPath)
 {
-  uint32_t loadedCount = 0;
+  vector<string> notToLoadPaths;
+  auto loadedPath = LoadPluginsExcept(directoryPath, notToLoadPaths);
+  return loadedPath.size();
+}
+//
+//  End of: Plugins::LoadPlugins
+//---------------------------------------------------------------------------
+
+
+
+//! Loads all plugins found in specified directory except for those specified (usually already loaded)
+//!
+//! @param directoryPath  Path to directory holding plugins files (*.dll or *.so)
+//! @param notToLoadPaths Paths of plugins to ignore (to not load)
+//!
+//! @return List of loaded plugins
+vector<string> Plugins::LoadPluginsExcept (const string& directoryPath, const vector<string>& notToLoadPaths)
+{
+  vector<string> loadedPlugins;
 
   auto dllFiles = Dll::GetInDirectory(directoryPath);
   auto dllPath  = directoryPath;
@@ -69,9 +88,18 @@ uint32_t Plugins::LoadPlugins (const string& directoryPath)
     {
       dllPath.resize(baseLength);   // Keep only directory base path (with ending separator)
       dllPath.append(dllFile);
+
+      // ---------------- Ignore this file if it is in the ignore list
+      //
+      if (std::find(notToLoadPaths.cbegin(), notToLoadPaths.cend(), dllPath) != notToLoadPaths.cend())
+      {
+        LOG(DEBUG) << "Ignoring plugin file: " << dllPath;
+        continue;
+      }
+
       LoadPlugin(dllPath);
-      ++loadedCount;
-      LOG(INFO) << "Have loaded plugin: " << dllPath;
+      loadedPlugins.emplace_back(dllPath);
+      LOG(DEBUG) << "Have loaded plugin: " << dllPath;
     }
     catch(std::runtime_error& exc)  // Catch C++ standard exceptions
     {
@@ -81,19 +109,20 @@ uint32_t Plugins::LoadPlugins (const string& directoryPath)
     }
   }
 
-  if (loadedCount == 0)
+  if (loadedPlugins.empty())
   {
-    LOG(INFO) << "No plugin(s) found in directory: " << directoryPath;
+    LOG(DEBUG) << "No plugin(s) found in directory: " << directoryPath;
   }
   else
   {
-    LOG(INFO) << "Have loaded " << loadedCount << " plugin(s) from directory: " << directoryPath;
+    LOG(DEBUG) << "Have loaded " << loadedPlugins.size() << " plugin(s) from directory: " << directoryPath;
   }
-  return loadedCount;
+  return loadedPlugins;
 }
 //
-//  End of: Plugins::LoadPlugins
+//  End of: Plugins::LoadPluginsExcept
 //---------------------------------------------------------------------------
+
 
 //! Tries loading a plugin file with hint path
 //!

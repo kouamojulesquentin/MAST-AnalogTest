@@ -105,7 +105,7 @@ string Dll::TryLoad (const std::string& pathHint, const string& dllPath)
   if (!fileExists && !Utility::EndsWith(fixedPath, ".dll"sv))
   {
     fixedPath.append(".dll");
-    LOG(INFO) << "Forcing extension \".dll\" to dll file ==> " << fixedPath;
+    LOG(DEBUG) << "Forcing extension \".dll\" to dll file ==> " << fixedPath;
 
     fileExists = checkFileExist(fixedPath);
   }
@@ -128,7 +128,7 @@ string Dll::TryLoad (const std::string& pathHint, const string& dllPath)
       }
       newPath.append("lib").append(name);
       fixedPath.swap(newPath);
-      LOG(INFO) << "Forcing prefix \"lib\" to dll file name ==> " << fixedPath;
+      LOG(DEBUG) << "Forcing prefix \"lib\" to dll file name ==> " << fixedPath;
 
       fileExists = checkFileExist(fixedPath);
     }
@@ -148,10 +148,10 @@ string Dll::TryLoad (const std::string& pathHint, const string& dllPath)
     {
       auto errorCode = ::GetLastError();
 
-      LOG(INFO) << "Failed to load, as a DLL, file: \"" << fixedPath << "\", got error: " << errorCode ;
+      LOG(DEBUG) << "Failed to load, as a DLL, file: \"" << fixedPath << "\", got error: " << errorCode ;
       fixedPath.clear();
     }
-    LOG(INFO) << "Loaded dll: \"" << fixedPath << "\"";
+    LOG(DEBUG) << "Loaded dll: \"" << fixedPath << "\"";
   }
 
   return fixedPath;

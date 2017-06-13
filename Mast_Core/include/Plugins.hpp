@@ -40,6 +40,10 @@ class MAST_CORE_EXPORT Plugins final
   //!
   static uint32_t LoadPlugins(const std::string& directoryPath);
 
+  //! Loads all plugins found in specified directory except for those specified (usually already loaded)
+  //!
+  static std::vector<std::string> LoadPluginsExcept(const std::string& directoryPath, const std::vector<std::string>& notToLoadPaths);
+
   //! Loads a plugin file
   //!
   static std::string LoadPlugin(const std::string& pluginPath);

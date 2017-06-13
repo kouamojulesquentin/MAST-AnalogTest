@@ -179,20 +179,27 @@ void MastEnvironment::LoadPlugins ()
 {
   CHECK_VALUE_NOT_NULL(m_configuration, "Configuration (options) must have been parsed before loading plugin(s)");
 
-  // The directories from where plugins search is done
-  vector<string> candidateDirs {
-                                 "",
-                                 "."s,
-                                 "."s
-                                   .append(DIRECTORY_SEPARATOR)
-                                   .append(PLUGINS_DIRECTORY_NAME),
-                                 m_configuration->ApplicationPath(),
-                                 string()
-                                   .append(m_configuration->ApplicationPath())
-                                   .append(DIRECTORY_SEPARATOR)
-                                   .append(PLUGINS_DIRECTORY_NAME),
-                               };
+  const auto cwd    = FileSystem::CurrentPath();
+  const auto appDir = m_configuration->ApplicationPath();
 
+  auto makePathWithDefaultPluginName = [](string basePath)
+  {
+    basePath.append(DIRECTORY_SEPARATOR).append(PLUGINS_DIRECTORY_NAME);
+    return basePath;
+  };
+
+  // The directories from where plugins search is done
+  const vector<string> candidateDirs {
+                                       "",
+                                       "."s,
+                                       makePathWithDefaultPluginName("."),
+                                       cwd,
+                                       makePathWithDefaultPluginName(cwd),
+                                       appDir,
+                                       makePathWithDefaultPluginName(appDir),
+                                     };
+
+  vector<string> loadedPluginsPath; // To avoid loading them twice
 
   // ---------------- Plugins Files
   //
@@ -202,12 +209,13 @@ void MastEnvironment::LoadPlugins ()
     auto loaded = false;
     for (const auto& hintDir : candidateDirs)
     {
-      LOG(INFO) << "Will try to load plugin: " << name << " - Trying in directory \"" << hintDir << "\" -";
+      LOG(DEBUG) << "Will try to load plugin: " << name << " - Trying in directory \"" << hintDir << "\" -";
       auto effectiveDllPath = Plugins::TryLoadPlugin(hintDir, name);
       if (!effectiveDllPath.empty())
       {
         loaded = true;
         LOG(INFO) << "Loaded plugin: " << effectiveDllPath;
+        loadedPluginsPath.emplace_back(std::move(effectiveDllPath));
         break;
       }
     }
@@ -230,8 +238,16 @@ void MastEnvironment::LoadPlugins ()
 
       if (FileSystem::IsDirectory(dirPath))
       {
-        LOG(INFO) << "Will try to load plugin(s) from directory: " << dirPath;
-        Plugins::LoadPlugins(dirPath);
+        LOG(DEBUG) << "Will try to load plugin(s) from directory: " << dirPath;
+        auto loaded = Plugins::LoadPluginsExcept(dirPath, loadedPluginsPath);
+        LOG(INFO) << "Have loaded " << loaded.size() << " plugin(s) from directory: " << dirPath;
+
+        // ---------------- Save loaded plugins
+        //
+        for (auto& loadedPlugin : loaded)
+        {
+          loadedPluginsPath.emplace_back(std::move(loadedPlugin));
+        }
         break;
       }
     }
@@ -279,7 +295,7 @@ void MastEnvironment::ParseOptions (vector<string> arguments)
   if (!m_unitTestsContext)
   {
     ConfigureLogger();
-    LOG(INFO) << "Logger (re)configured";
+    LOG(DEBUG) << "Logger (re)configured";
   }
 }
 //

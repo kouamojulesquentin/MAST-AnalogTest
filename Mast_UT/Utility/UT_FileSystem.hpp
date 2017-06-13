@@ -29,6 +29,7 @@ class UT_FileSystem : public CxxTest::TestSuite
 
   // ---------------- IsDirectory
   //
+  void test_IsDirectory_when_EmptyPath ();
   void test_IsDirectory_when_ItIsNot ();
   void test_IsDirectory_when_ItIs ();
 

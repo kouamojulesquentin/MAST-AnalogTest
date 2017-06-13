@@ -19,6 +19,19 @@
 
 using mast::FileSystem;
 
+//! Checks FileSystem::IsDirectory() when giving empty path
+//!
+void UT_FileSystem::test_IsDirectory_when_EmptyPath ()
+{
+  // ---------------- Exercise
+  //
+  auto isDirectory = FileSystem::IsDirectory("");
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_FALSE (isDirectory);
+}
+
 
 //! Checks FileSystem::IsDirectory() when it is not
 //!

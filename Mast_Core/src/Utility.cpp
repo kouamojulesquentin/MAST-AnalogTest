@@ -12,6 +12,7 @@
 //===========================================================================
 
 #include "Utility.hpp"
+#include "g3log/g3log.hpp"
 
 #include <string>
 #include <sstream>
@@ -157,6 +158,12 @@ string Utility::MakeExceptionMessage(const char*                    file,
                                      std::experimental::string_view issueKind,
                                      std::experimental::string_view userMessage)
 {
+  // ---------------- Log any exception user message
+  //
+  IF_CAN_LOG(ERROR_LVL) LogCapture(file, line, function, ERROR_LVL).stream() << userMessage.data();
+
+  // ---------------- Create effective exception message
+  //
   std::ostringstream os;
 
   os << issueKind << ": " << userMessage << "." << std::endl;

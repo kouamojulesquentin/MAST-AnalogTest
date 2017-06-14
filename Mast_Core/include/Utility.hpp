@@ -297,13 +297,52 @@ T CheckParameterCondition(const char* file, const char* function, int line, T va
   return value;
 }
 
-//! Checks that a parameter value is != 0, otherwise it throws an exception
+//! Checks that a pointer IS, semantically, nullptr, otherwise it throws an exception
 //!
-//! @return given parameter if not zero
+//! @return nullptr
 template<typename T>
-T CheckValueIsNotNullptr(const char* file, const char* function, int line, T value, std::experimental::string_view  msg)
+T CheckValueIsNullptr(const char* file, const char* function, int line, T ptr, std::experimental::string_view  msg)
+{
+  if (ptr != nullptr)
+  {
+    throw std::runtime_error(mast::Utility::MakeExceptionMessage(file, function, line, "std::runtime_error", msg));
+  }
+  return ptr;
+}
+
+//! Checks that a pointer value is not nullptr, otherwise it throws an exception
+//!
+//! @return given pointer if not nullptr
+template<typename T>
+T CheckValueIsNotNullptr(const char* file, const char* function, int line, T ptr, std::experimental::string_view  msg)
+{
+  if (ptr == nullptr)
+  {
+    throw std::runtime_error(mast::Utility::MakeExceptionMessage(file, function, line, "std::runtime_error", msg));
+  }
+  return ptr;
+}
+
+//! Checks that a value is != 0, otherwise it throws an exception
+//!
+//! @return given value if not zero
+template<typename T>
+T CheckValueIsNotZero(const char* file, const char* function, int line, T value, std::experimental::string_view  msg)
 {
   if (value == 0)
+  {
+    throw std::runtime_error(mast::Utility::MakeExceptionMessage(file, function, line, "std::runtime_error", msg));
+  }
+  return value;
+}
+
+//! Checks that a value (not a parameter) meet a condition, otherwise it throws an exception
+//!
+//! @return given value if not zero
+template<typename T>
+T CheckValueCondition(const char* file, const char* function, int line, T value, bool conditionMet, std::experimental::string_view  msg)
+{
+  if (!conditionMet)
   {
     throw std::runtime_error(mast::Utility::MakeExceptionMessage(file, function, line, "std::runtime_error", msg));
   }
@@ -327,7 +366,19 @@ bool InRange(const T& val, const U& minVal, const V& maxVal) { return (val >= mi
 #define CHECK_PARAMETER_LTE(val, maxVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (val <= maxVal), msg)
 #define CHECK_PARAMETER_RANGE(val, minVal, maxVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), InRange((val), (minVal), (maxVal)), msg)
 
-#define CHECK_VALUE_NOT_NULL(ptr, msg)  CheckValueIsNotNullptr (__FILE__, __func__, __LINE__, ptr, msg)
+#define CHECK_VALUE_NULL(ptr,     msg) CheckValueIsNullptr    (__FILE__, __func__, __LINE__, ptr, msg)
+#define CHECK_VALUE_NOT_NULL(ptr, msg) CheckValueIsNotNullptr (__FILE__, __func__, __LINE__, ptr, msg)
+#define CHECK_VALUE_NOT_ZERO(val, msg) CheckValueIsNotZero    (__FILE__, __func__, __LINE__, val, msg)
+
+#define CHECK_VALUE_NOT_EMPTY(val, msg)   CheckValueCondition (__FILE__, __func__, __LINE__, (val), !(val).empty(),  msg)
+#define CHECK_VALUE_EQ(val,  refVal, msg) CheckValueCondition (__FILE__, __func__, __LINE__, (val), (val == refVal), msg)
+#define CHECK_VALUE_NEQ(val, refVal, msg) CheckValueCondition (__FILE__, __func__, __LINE__, (val), (val != refVal), msg)
+#define CHECK_VALUE_GT(val,  minVal, msg) CheckValueCondition (__FILE__, __func__, __LINE__, (val), (val >  minVal), msg)
+#define CHECK_VALUE_GTE(val, minVal, msg) CheckValueCondition (__FILE__, __func__, __LINE__, (val), (val >= minVal), msg)
+#define CHECK_VALUE_LT(val,  maxVal, msg) CheckValueCondition (__FILE__, __func__, __LINE__, (val), (val <  maxVal), msg)
+#define CHECK_VALUE_LTE(val, maxVal, msg) CheckValueCondition (__FILE__, __func__, __LINE__, (val), (val <= maxVal), msg)
+#define CHECK_VALUE_RANGE(val, minVal, maxVal, msg) CheckValueCondition (__FILE__, __func__, __LINE__, (val), InRange((val), (minVal), (maxVal)), msg)
+
 #define CHECK_TRUE(expr, msg) if (!(expr))  throw std::runtime_error(mast::Utility::MakeExceptionMessage(__FILE__, __func__, __LINE__, "std::runtime_error", msg))
 #define CHECK_FAILED(msg)                   throw std::runtime_error(mast::Utility::MakeExceptionMessage(__FILE__, __func__, __LINE__, "std::runtime_error", msg))
 #define CHECK_FILE_EXISTS(filePath) CHECK_TRUE(mast::Utility::FileExists(filePath), "File: '"s + (filePath) + "' does not exist (or cannot be opened)" )

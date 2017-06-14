@@ -125,8 +125,8 @@ inline std::string remove_quotes(std::string s)
 %type <std::shared_ptr<mast::SystemModelNode>> parent_node
 %type <std::shared_ptr<mast::SystemModelNode>> node
 %type <std::shared_ptr<mast::SystemModelNode>> parent_node_with_children
-%type <std::vector<std::string>>               function_list
-%type <std::pair<std::vector<std::string>, std::uint32_t>>  PDL_declaration
+%type <std::vector<std::string>>               function_list                 // List of PDL algorithm function names
+%type <std::pair<std::vector<std::string>, std::uint32_t>>  PDL_declaration  // List of PDL algorithm function names and line number of declaration
 
 %token END 0 "end of file"
 %token UPPER
@@ -264,31 +264,25 @@ parent_node_with_children: parent_node PDL_declaration children_list
 PDL_declaration:
  t_PDL function_list
  {
-   pair <std::vector<std::string>,std::uint32_t> ret;
-   ret.first = $2;
-   ret.second =nlines;
-   $$ = ret;
+   $$ = make_pair($[function_list], nlines);
  }
  |
  {
-   std::pair <std::vector<std::string>,std::uint32_t> ret;
-   ret.first = std::vector<std::string>();
-   ret.second =nlines;
-   $$ = ret;
+   $$ = make_pair(vector<string>(), nlines);
  }
 ;
 
 function_list:
- t_WORD
-    {
-    $$.push_back($1);
-    }
- |
- t_WORD t_Comma  function_list
+  t_WORD
   {
-   $$ = $3;
-   $$.push_back($1);
-   }
+    $$.push_back($[t_WORD]);
+  }
+  |
+  function_list[left] t_Comma t_WORD
+  {
+    $$ = $[left];
+    $$.push_back($[t_WORD]);
+  }
 ;
 
 parent_node:
@@ -593,13 +587,12 @@ bypass:
 
 void SIT::SIT_Parser::error( const location_type &l, const std::string &err_message )
 {
-  std::ostringstream os;
-
-  os << STREAM_MY_LOCATION << err_message;
-
-  LOG(ERROR_LVL) << os.str();
   driver.parsed_sut = nullptr;
 
-  auto exceptionMessage = "SIT parsing error: "s + os.str();
+  std::ostringstream os;
+
+  os << "SIT parsing error: " << STREAM_MY_LOCATION << err_message;
+
+  auto exceptionMessage = os.str();
   THROW_PARSER_ERROR(exceptionMessage);
 }

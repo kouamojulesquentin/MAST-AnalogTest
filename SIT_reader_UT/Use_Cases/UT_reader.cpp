@@ -25,18 +25,22 @@
 #include <experimental/string_view>
 #include <iostream>
 #include <tuple>
+#include <vector>
 #include <memory>
 
 using std::tuple;
 using std::make_tuple;
 using std::string;
+using std::stringstream;
 using std::experimental::string_view;
-using namespace std::chrono_literals;
-using namespace std::experimental::literals::string_view_literals;
+using std::vector;
 using std::shared_ptr;
 using std::make_shared;
+
 using test::UT_reader_wrapper;
 
+using namespace std::chrono_literals;
+using namespace std::experimental::literals::string_view_literals;
 using namespace mast;
 
 #define REDIRECT_CERR(OSS_VAR) \
@@ -180,7 +184,7 @@ void UT_reader::test_register_Error ()
 
     // 02: Missing register length
     make_tuple("REGISTER test_register Bypass: \"0b001\"\n",
-               "Line 1:24-30: syntax error\nParse failed!!\n"),
+               "SIT parsing error: Line 1:24-30: syntax error\nParse failed!!\n"),
   };
 
   // ---------------- DDT Exercise
@@ -1009,7 +1013,7 @@ void UT_reader::test_JTAG_TAP_Failure ()
     auto containsExpected = gotErrorMessage.find(expected_ErrorMsg) != string::npos;
 
     //+ (begin JFC February/07/2017): for debug purpose
-    if (!containsExpected) { TS_FAIL (gotErrorMessage); }
+//+    if (!containsExpected) { TS_FAIL (gotErrorMessage); }
     //+ (end   JFC February/07/2017):
 
     TS_ASSERT_TRUE (containsExpected);
@@ -1520,6 +1524,128 @@ void UT_reader::test_LINKER_CustomTable_Success ()
                " [Register](1)  \"reg_1\", length: 4, bypass: 1001\n"
                " [Register](2)  \"reg_2\", length: 3, bypass: 110\n"
                " [Register](3)  \"reg_3\", length: 2, bypass: 10"s),
+    };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+// Test construction of PDL statement with 1 PDL algorithm name in case of success
+//
+void UT_reader::test_PDL_Success ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [&](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    stringstream    sit(std::get<0>(data));
+    auto            expectedAlgoNames = std::get<1>(data);
+    auto            sm                = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
+
+    REDIRECT_CERR(errorSink);
+
+    // ---------------- Exercise
+    //
+    auto succeeded = sut.parse(sit);
+
+    // ---------------- Verify
+    //
+    CxxTest::setAbortTestOnFail(true);
+    TS_ASSERT_TRUE (succeeded);
+
+    vector<string>   gotAlgoNames;
+    vector<uint32_t> gotLineNumbers;
+    const auto&      nameNodesAssociations = sut.namesAndNodes;
+
+    for (const auto& association : nameNodesAssociations)
+    {
+      gotAlgoNames.emplace_back (association.appName);
+      gotLineNumbers.push_back  (association.SIT_line);
+    }
+
+    TS_ASSERT_EQUALS (gotAlgoNames, expectedAlgoNames);
+  };
+
+  using data_t = tuple<string, vector<string>>;
+  auto data =
+  {
+    // 01 ==> One PDL algorithm
+    data_t("JTAG_TAP TAP Loopback 4 1\n"
+           "PDL Incr\n"
+           "{\n"
+           "  REGISTER reg 12 Bypass: \"0xABC\"\n"
+           "}\n",
+           {"Incr"}
+          ),
+
+    // 02 ==> Two PDL algorithms
+    data_t("JTAG_TAP TAP Loopback 4 1\n"
+           "PDL Incr, Decr\n"
+           "{\n"
+           "  REGISTER reg 12 Bypass: \"0xABC\"\n"
+           "}\n",
+           {"Incr", "Decr"}
+          ),
+    };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+// Test construction of PDL statement with 1 PDL algorithm name in case of failure
+//
+void UT_reader::itest_PDL_Failure ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [&](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    stringstream    sit(std::get<0>(data));
+    auto            expectedAlgoNames = std::get<1>(data);
+    auto            sm                = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
+
+    REDIRECT_CERR(errorSink);
+
+    // ---------------- Exercise
+    //
+    auto succeeded = sut.parse(sit);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_FALSE  (succeeded);
+    TS_ASSERT_EQUALS (sut.namesAndNodes.size(), 0);
+  };
+
+  using data_t = tuple<string, vector<string>>;
+  auto data =
+  {
+    // 01 ==> One PDL algorithm
+    data_t("JTAG_TAP TAP Loopback 4 1\n"
+           "PDL : Incr\n"   // ==> Unexpected colon
+           "{\n"
+           "  REGISTER reg 12 Bypass: \"0xABC\"\n"
+           "}\n",
+           {"Incr"}
+          ),
+
+    // 02 ==> Two PDL algorithms
+    data_t("JTAG_TAP TAP Loopback 4 1\n"
+           "PDL increment; Decr\n"  // ==> unexpected semi-colon
+           "{\n"
+           "  REGISTER reg 12 Bypass: \"0xABC\"\n"
+           "}\n",
+           {"Incr", "Decr"}
+          ),
     };
 
   // ---------------- DDT Exercise

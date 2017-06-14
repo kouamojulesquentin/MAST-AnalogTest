@@ -31,7 +31,7 @@ class UT_reader : public CxxTest::TestSuite
    UT_reader() = default;
   ~UT_reader() = default;
 
-  // ---------------- Tests
+  // ---------------- Register, Chain, MIB, SIB...
   //
   void test_register_Success ();
   void test_register_Error ();
@@ -39,16 +39,30 @@ class UT_reader : public CxxTest::TestSuite
   void test_MIB ();
   void test_SIB ();
 
+  // ---------------- JTAG TAP
+  //
   void test_JTAG_TAP_Success ();
   void test_JTAG_TAP_Failure ();
 
+  // ---------------- AccessInterface
+  //
   void test_ACCES_INTERFACE_Success ();
   void test_ACCES_INTERFACE_Failure ();
 
+  // ---------------- 1500
+  //
   void test_1500 ();
+
+  // ---------------- Linker
+  //
   void test_LINKER_Success ();
   void test_LINKER_Error ();
   void test_LINKER_CustomTable_Success ();
+
+  // ---------------- PDL Statement
+  //
+  void test_PDL_Success ();
+  void itest_PDL_Failure ();
 
   // ---------------- Other methods
   //

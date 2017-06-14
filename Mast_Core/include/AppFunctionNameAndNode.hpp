@@ -26,13 +26,15 @@ namespace mast
   //!
   struct AppFunctionNameAndNode final
   {
-    std::string                 appName;
-    std::shared_ptr<ParentNode> node;
-    int 			SIT_line;
-    
+    std::string                 appName;  //!< PDL algorithm name
+    std::shared_ptr<ParentNode> node;     //!< Associated node
+    uint32_t                    SIT_line; //!< SIT file line number where the PDL declaration was
+
+    //! Initializes instance with parameters
+    //!
     AppFunctionNameAndNode(std::string p_appName, std::shared_ptr<ParentNode> p_node, int p_SIT_line)
-      : appName (std::move(p_appName))
-      , node    (p_node)
+      : appName  (std::move(p_appName))
+      , node     (p_node)
       , SIT_line (p_SIT_line)
     {}
   };

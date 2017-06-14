@@ -62,16 +62,12 @@ class UT_reader : public CxxTest::TestSuite
   // ---------------- PDL Statement
   //
   void test_PDL_Success ();
-  void itest_PDL_Failure ();
+  void test_PDL_Failure ();
 
   // ---------------- Other methods
   //
   void setUp();    //!< Initializes test (called for each test)
   void tearDown(); //!< Cleanups test (called for each test)
-
-  private:
-  std::shared_ptr<mast::SystemModel> sm;
-  bool m_loggerInitialState = false;      //!< To enable logger for each test
 };
 //
 //  End of UT_reader class declaration

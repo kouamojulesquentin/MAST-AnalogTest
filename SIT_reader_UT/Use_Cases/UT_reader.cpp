@@ -19,7 +19,6 @@
 #include "LoopbackAccessInterfaceProtocol.hpp"
 #include "g3log/g3log.hpp"
 #include "UT_reader.hpp"
-#include "UT_reader_wrapper.hpp"
 
 #include <cxxtest/ValueTraits.h>
 #include <experimental/string_view>
@@ -37,15 +36,9 @@ using std::vector;
 using std::shared_ptr;
 using std::make_shared;
 
-using test::UT_reader_wrapper;
-
 using namespace std::chrono_literals;
 using namespace std::experimental::literals::string_view_literals;
 using namespace mast;
-
-#define REDIRECT_CERR(OSS_VAR) \
-std::ostringstream OSS_VAR;    \
-AT_SCOPE_EXIT([prevRdBuf = std::cerr.rdbuf(errorSink.rdbuf())]() { std::cerr.rdbuf(prevRdBuf); })
 
 namespace
 {
@@ -65,8 +58,6 @@ void PrependWithTap (shared_ptr<SystemModel> sm, shared_ptr<SystemModelNode> nod
 //
 //  End of: PrependWithTap
 //---------------------------------------------------------------------------
-
-
 } // End of unnamed namespace
 
 
@@ -76,17 +67,13 @@ void UT_reader::setUp ()
 {
   CxxTest::setStringResultsOnNewLine(true);
   CxxTest::setCharactersMapping(CxxTest::CharacterMapping::MAP_CHARS_MINIMAL);  // Keep quotes, HT, and new lines unescaped
-  /*Faire un reset des identifiants, regarder les UT du SystemModel*/
-  SystemModelNode::ResetNodeIdentifier();
 
-  sm = std::make_shared<mast::SystemModel> ();
-  m_loggerInitialState = g3::logEnabled(true);
+  SystemModelNode::ResetNodeIdentifier(); // Needed to check with pretty print that include node identifiers
 }
 
 //! Cleanups test (called for each test)
 void UT_reader::tearDown ()
 {
-  g3::logEnabled(m_loggerInitialState);
 }
 
 
@@ -101,28 +88,27 @@ void UT_reader::test_register_Success ()
   {
     // ---------------- Setup
     //
-    auto input_SIT            = std::get<0> (data);
-    auto expected_PrettyPrint = std::get<1> (data);
-
-    REDIRECT_CERR(errorSink);
+    stringstream    sit(std::get<0>(data));
+    auto            expected_PrettyPrint = std::get<1> (data);
+    auto            sm                   = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
 
     // ---------------- Exercise
     //
-    auto parseResult = UT_reader_wrapper::run_parser_for_UT(input_SIT, sm);
+    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
 
     // ---------------- Verify
     //
-    std::this_thread::sleep_for(5ms); // To get messages from logger (running in another thread)
+    TS_ASSERT_TRUE (sut.ErrorMessage().empty());
 
-    const auto gotErrorMessage = errorSink.str();
-    TS_ASSERT_TRUE (gotErrorMessage.empty());
+    auto parsedModel = sut.ParsedSystemModel();
 
     // With PrettyPrinter
-    auto actual_PrettyPrint = parseResult.first;
+    auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(parsedModel, PrettyPrinterOptions::Parser_debug);
     TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
 
     // With Checker
-    PrependWithTap(sm, parseResult.second);   // This is to avoid warnings about missing AccessInterface
+    PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
     TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
   };
@@ -153,22 +139,23 @@ void UT_reader::test_register_Error ()
   {
     // ---------------- Setup
     //
-    auto input_SIT       = std::get<0> (data);
-    auto expected_errMSG = std::get<1> (data);
-    REDIRECT_CERR(errorSink);
+    stringstream    sit(std::get<0>(data));
+    auto            expected_errMSG = std::get<1>(data);
+    auto            sm              = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
 
     // ---------------- Exercise
     //
-    auto parseResult = UT_reader_wrapper::run_parser_for_UT(input_SIT, sm);
+    TS_ASSERT_THROWS (sut.parse(sit), SIT::ParserException);
 
     // ---------------- Verify
     //
     std::this_thread::sleep_for(10ms); // To get messages from logger (running in another thread)
 
-    const auto gotErrorMessage = errorSink.str();
+    const auto gotErrorMessage = sut.ErrorMessage();
     TS_ASSERT_EQUALS  (gotErrorMessage, expected_errMSG);
 
-    auto systemModelNode = parseResult.second;
+    auto systemModelNode = sut.ParsedSystemModel();
     TS_ASSERT_NULLPTR(systemModelNode);
   };
 
@@ -176,15 +163,15 @@ void UT_reader::test_register_Error ()
   {
     // 00: Wrong Bypass length
     make_tuple("REGISTER test_register 8 Bypass: \"0b1001:011\"\n",
-               "Line 1:34-46: REGISTER node \"test_register\" size (8) does not match Bypass value bit count (7)\nParse failed!!\n"),
+               "SIT parsing error: Line 1:34-46: REGISTER node \"test_register\" size (8) does not match Bypass value bit count (7)"),
 
     // 01: Missing register name
     make_tuple("REGISTER test_register 5 Bypass: \"0b001:0110:1100\"\n",
-               "Line 1:34-51: REGISTER node \"test_register\" size (5) does not match Bypass value bit count (11)\nParse failed!!\n"),
+               "SIT parsing error: Line 1:34-51: REGISTER node \"test_register\" size (5) does not match Bypass value bit count (11)"),
 
     // 02: Missing register length
     make_tuple("REGISTER test_register Bypass: \"0b001\"\n",
-               "SIT parsing error: Line 1:24-30: syntax error\nParse failed!!\n"),
+               "SIT parsing error: Line 1:24-30: syntax error"),
   };
 
   // ---------------- DDT Exercise
@@ -203,21 +190,25 @@ void UT_reader::test_chain ()
   {
     // ---------------- Setup
     //
-    auto input_SIT              = std::get<0> (data);
-    auto expected_PrettyPrint = std::get<1> (data);
+    stringstream    sit(std::get<0>(data));
+    auto            expected_PrettyPrint = std::get<1> (data);
+    auto            sm                   = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
 
     // ---------------- Exercise
     //
-    auto parseResult = UT_reader_wrapper::run_parser_for_UT(input_SIT, sm);
+    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
 
     // ---------------- Verify
     //
+    auto parsedModel = sut.ParsedSystemModel();
+
     // With PrettyPrinter
-    auto actual_PrettyPrint = parseResult.first;
+    auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(parsedModel, PrettyPrinterOptions::Parser_debug);
     TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
 
     // With Checker
-    PrependWithTap(sm, parseResult.second);   // This is to avoid warnings about missing AccessInterface
+    PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
     TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
   };
@@ -278,21 +269,25 @@ void UT_reader::test_MIB ()
   {
     // ---------------- Setup
     //
-    auto input_SIT            = std::get<0> (data);
-    auto expected_PrettyPrint = std::get<1> (data);
+    stringstream    sit(std::get<0>(data));
+    auto            expected_PrettyPrint = std::get<1> (data);
+    auto            sm                   = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
 
     // ---------------- Exercise
     //
-    auto parseResult = UT_reader_wrapper::run_parser_for_UT(input_SIT, sm);
+    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
 
     // ---------------- Verify
     //
-    // With PrettyPrint
-    auto actual_PrettyPrint = parseResult.first;
+    auto parsedModel = sut.ParsedSystemModel();
+
+    // With PrettyPrinter
+    auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(parsedModel, PrettyPrinterOptions::Parser_debug);
     TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
 
     // With Checker
-    PrependWithTap(sm, parseResult.second);   // This is to avoid warnings about missing AccessInterface
+    PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
     TS_ASSERT_EQUALS (checkResult.warningsCount, 1u); // 1 for "Linker 'test_xxx' (id: x) has only 2 children, even though it can select 4 paths"
     TS_ASSERT_EQUALS (checkResult.errorsCount,   0u);
@@ -834,21 +829,25 @@ void UT_reader::test_SIB ()
   {
     // ---------------- Setup
     //
-    auto input_SIT            = std::get<0> (data);
-    auto expected_PrettyPrint = std::get<1> (data);
+    stringstream    sit(std::get<0>(data));
+    auto            expected_PrettyPrint = std::get<1> (data);
+    auto            sm                   = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
 
     // ---------------- Exercise
     //
-    auto parseResult = UT_reader_wrapper::run_parser_for_UT(input_SIT, sm);
+    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
 
     // ---------------- Verify
     //
-    // With PrettyPrint
-    auto actual_PrettyPrint = parseResult.first;
+    auto parsedModel = sut.ParsedSystemModel();
+
+    // With PrettyPrinter
+    auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(parsedModel, PrettyPrinterOptions::Parser_debug);
     TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
 
     // With Checker
-    PrependWithTap(sm, parseResult.second);   // This is to avoid warnings about missing AccessInterface
+    PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
     TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
   };
@@ -903,27 +902,27 @@ void UT_reader::test_JTAG_TAP_Success ()
   {
     // ---------------- Setup
     //
-    auto input_SIT            = std::get<0> (data);
-    auto expected_PrettyPrint = std::get<1> (data);
-
-    REDIRECT_CERR(errorSink);
+    stringstream    sit(std::get<0>(data));
+    auto            expected_PrettyPrint = std::get<1> (data);
+    auto            sm                   = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
 
     // ---------------- Exercise
     //
-    auto parseResult = UT_reader_wrapper::run_parser_for_UT(input_SIT, sm);
+    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
 
     // ---------------- Verify
     //
-    // Error messages
-    std::this_thread::sleep_for(5ms); // To get messages from logger (running in another thread)
-    const auto gotErrorMessage = errorSink.str();
-    TS_ASSERT_EQUALS (gotErrorMessage, "");
+    TS_ASSERT_TRUE (sut.ErrorMessage().empty());
 
-    // With PrettyPrint
-    auto actual_PrettyPrint = parseResult.first;
+    auto parsedModel = sut.ParsedSystemModel();
+
+    // With PrettyPrinter
+    auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(parsedModel, PrettyPrinterOptions::Parser_debug);
     TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
 
     // With Checker
+    PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
     TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
   };
@@ -996,19 +995,19 @@ void UT_reader::test_JTAG_TAP_Failure ()
   {
     // ---------------- Setup
     //
-    auto input_SIT         = std::get<0> (data);
-    auto expected_ErrorMsg = std::get<1> (data);
+    stringstream    sit(std::get<0>(data));
+    auto            expected_ErrorMsg = std::get<1>(data);
+    auto            sm                = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
 
-    REDIRECT_CERR(errorSink);
-
-    // ---------------- Exercise
+    // ---------------- Exercise & Verify
     //
-    auto parseResult = UT_reader_wrapper::run_parser_for_UT(input_SIT, sm);
+    TS_ASSERT_THROWS (sut.parse(sit), SIT::ParserException);
 
     // ---------------- Verify
     //
     std::this_thread::sleep_for(5ms); // To get messages from logger (running in another thread)
-    const auto gotErrorMessage = errorSink.str();
+    const auto gotErrorMessage = sut.ErrorMessage();
 
     auto containsExpected = gotErrorMessage.find(expected_ErrorMsg) != string::npos;
 
@@ -1045,29 +1044,29 @@ void UT_reader::test_ACCES_INTERFACE_Success ()
   {
     // ---------------- Setup
     //
-    auto input_SIT            = std::get<0> (data);
-    auto expected_PrettyPrint = std::get<1> (data);
-
-    REDIRECT_CERR(errorSink);
+    stringstream    sit(std::get<0>(data));
+    auto            expected_PrettyPrint = std::get<1> (data);
+    auto            sm                   = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
 
     // ---------------- Exercise
     //
-    auto parseResult = UT_reader_wrapper::run_parser_for_UT(input_SIT, sm);
+    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
 
     // ---------------- Verify
     //
     CxxTest::setAbortTestOnFail(true);
 
-    // Error messages
-    std::this_thread::sleep_for(5ms); // To get messages from logger (running in another thread)
-    const auto gotErrorMessage = errorSink.str();
-    TS_ASSERT_EQUALS (gotErrorMessage, "");
+    TS_ASSERT_TRUE (sut.ErrorMessage().empty());
 
-    // With PrettyPrint
-    auto actual_PrettyPrint = parseResult.first;
+    auto parsedModel = sut.ParsedSystemModel();
+
+    // With PrettyPrinter
+    auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(parsedModel, PrettyPrinterOptions::Parser_debug);
     TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
 
     // With Checker
+    PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
     TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
   };
@@ -1227,21 +1226,21 @@ void UT_reader::test_ACCES_INTERFACE_Failure ()
   {
     // ---------------- Setup
     //
-    auto input_SIT         = std::get<0> (data);
-    auto expected_ErrorMsg = std::get<1> (data);
+    stringstream    sit(std::get<0>(data));
+    auto            expected_ErrorMsg = std::get<1>(data);
+    auto            sm                = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
 
-    REDIRECT_CERR(errorSink);
-
-    // ---------------- Exercise
+    // ---------------- Exercise & Verify
     //
-    auto parseResult = UT_reader_wrapper::run_parser_for_UT(input_SIT, sm);
+    TS_ASSERT_THROWS (sut.parse(sit), SIT::ParserException);
 
     // ---------------- Verify
     //
     CxxTest::setAbortTestOnFail(true);
 
     std::this_thread::sleep_for(5ms);         // To get messages from logger (running in another thread)
-    const auto gotErrorMessage = errorSink.str();
+    const auto gotErrorMessage = sut.ErrorMessage();
 
     TS_ASSERT_FALSE (gotErrorMessage.empty()); // Make sure there is an error message
 
@@ -1303,21 +1302,27 @@ void UT_reader::test_1500 ()
   //
   auto checker = [&](auto data)
   {
-    auto input_SIT            = std::get<0> (data);
-    auto expected_PrettyPrint = std::get<1> (data);
+    // ---------------- Setup
+    //
+    stringstream    sit(std::get<0>(data));
+    auto            expected_PrettyPrint = std::get<1> (data);
+    auto            sm                   = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
 
     // ---------------- Exercise
     //
-    auto parseResult = UT_reader_wrapper::run_parser_for_UT(input_SIT, sm);
+    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
 
     // ---------------- Verify
     //
-    // With PrettyPrint
-    auto actual_PrettyPrint = parseResult.first;
+    auto parsedModel = sut.ParsedSystemModel();
+
+    // With PrettyPrinter
+    auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(parsedModel, PrettyPrinterOptions::Parser_debug);
     TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
 
     // With Checker
-    PrependWithTap(sm, parseResult.second);   // This is to avoid warnings about missing AccessInterface
+    PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
     TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
   };
@@ -1359,30 +1364,29 @@ void UT_reader::test_LINKER_Success ()
   {
     // ---------------- Setup
     //
-    auto input_SIT            = std::get<0>(data);
-    auto expected_PrettyPrint = std::get<1>(data);
-
-    REDIRECT_CERR(errorSink);
+    stringstream    sit(std::get<0>(data));
+    auto            expected_PrettyPrint = std::get<1> (data);
+    auto            sm                   = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
 
     // ---------------- Exercise
     //
-    auto parseResult = UT_reader_wrapper::run_parser_for_UT(input_SIT, sm);
+    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
 
     // ---------------- Verify
     //
     CxxTest::setAbortTestOnFail(true);
 
-    // Error messages
-    std::this_thread::sleep_for(5ms); // To get messages from logger (running in another thread)
-    const auto gotErrorMessage = errorSink.str();
-    TS_ASSERT_EQUALS (gotErrorMessage, "");
+    TS_ASSERT_TRUE (sut.ErrorMessage().empty());
 
-    // With PrettyPrint
-    auto actual_PrettyPrint = parseResult.first;
+    auto parsedModel = sut.ParsedSystemModel();
+
+    // With PrettyPrinter
+    auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(parsedModel, PrettyPrinterOptions::Parser_debug);
     TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
 
     // With Checker
-    PrependWithTap(sm, parseResult.second);   // This is to avoid warnings about missing AccessInterface
+    PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
     TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
 
@@ -1426,23 +1430,24 @@ void UT_reader::test_LINKER_Error ()
   {
     // ---------------- Setup
     //
-    auto input_SIT       = std::get<0> (data);
-    auto expected_errMSG = std::get<1> (data);
+    stringstream    sit(std::get<0>(data));
+    auto            expected_errMSG = std::get<1>(data);
+    auto            sm              = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
 
-    REDIRECT_CERR(errorSink);
-
-    // ---------------- Exercise
+    // ---------------- Exercise & Verify
     //
-    auto parseResult = UT_reader_wrapper::run_parser_for_UT(input_SIT, sm);
+    TS_ASSERT_THROWS (sut.parse(sit), SIT::ParserException);
 
     // ---------------- Verify
     //
     std::this_thread::sleep_for(10ms); // To get messages from logger (running in another thread)
 
-    const auto gotErrorMessage = errorSink.str();
+
+    const auto gotErrorMessage = sut.ErrorMessage();
     TS_ASSERT_EQUALS  (gotErrorMessage, expected_errMSG);
 
-    auto systemModelNode = parseResult.second;
+    auto systemModelNode = sut.ParsedSystemModel();
     TS_ASSERT_NULLPTR(systemModelNode);
   };
 
@@ -1453,8 +1458,7 @@ void UT_reader::test_LINKER_Error ()
                "{REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
                "REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
                "}"s,
-               "Line 2:1-2: LINKER node \"test_LINKER\" Must specify a control node (Register) for its path selector\n"
-               "Parse failed!!\n"s),
+               "SIT parsing error: Line 2:1-2: LINKER node \"test_LINKER\" Must specify a control node (Register) for its path selector"),
 
     // 01 ==> Error: selector register does not exist
     make_tuple("LINKER test_LINKER Binary selector_reg 4\n"
@@ -1462,8 +1466,7 @@ void UT_reader::test_LINKER_Error ()
                "  REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
                "  REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
                "}"s,
-               "Line 2:1-2: LINKER node \"test_LINKER\" Error, specified selector register \"selector_reg\" does not exist\n"
-               "Parse failed!!\n"s),
+               "SIT parsing error: Line 2:1-2: LINKER node \"test_LINKER\" Error, specified selector register \"selector_reg\" does not exist"),
   };
 
   // ---------------- DDT Exercise
@@ -1481,30 +1484,29 @@ void UT_reader::test_LINKER_CustomTable_Success ()
   {
     // ---------------- Setup
     //
-    auto input_SIT            = std::get<0>(data);
-    auto expected_PrettyPrint = std::get<1>(data);
-
-    REDIRECT_CERR(errorSink);
+    stringstream    sit(std::get<0>(data));
+    auto            expected_PrettyPrint = std::get<1> (data);
+    auto            sm                   = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
 
     // ---------------- Exercise
     //
-    auto parseResult = UT_reader_wrapper::run_parser_for_UT(input_SIT, sm);
+    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
 
     // ---------------- Verify
     //
     CxxTest::setAbortTestOnFail(true);
 
-    // Error messages
-    std::this_thread::sleep_for(5ms); // To get messages from logger (running in another thread)
-    const auto gotErrorMessage = errorSink.str();
-    TS_ASSERT_EQUALS (gotErrorMessage, "");
+    TS_ASSERT_TRUE (sut.ErrorMessage().empty());
 
-    // With PrettyPrint
-    auto actual_PrettyPrint = parseResult.first;
+    auto parsedModel = sut.ParsedSystemModel();
+
+    // With PrettyPrinter
+    auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(parsedModel, PrettyPrinterOptions::Parser_debug);
     TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
 
     // With Checker
-    PrependWithTap(sm, parseResult.second);   // This is to avoid warnings about missing AccessInterface
+    PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
     TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
 
@@ -1546,8 +1548,6 @@ void UT_reader::test_PDL_Success ()
     auto            expectedAlgoNames = std::get<1>(data);
     auto            sm                = make_shared<SystemModel>();
     SIT::SIT_Reader sut(sm);
-
-    REDIRECT_CERR(errorSink);
 
     // ---------------- Exercise
     //
@@ -1601,7 +1601,7 @@ void UT_reader::test_PDL_Success ()
 
 // Test construction of PDL statement with 1 PDL algorithm name in case of failure
 //
-void UT_reader::itest_PDL_Failure ()
+void UT_reader::test_PDL_Failure ()
 {
   // ---------------- DDT Setup
   //
@@ -1614,15 +1614,12 @@ void UT_reader::itest_PDL_Failure ()
     auto            sm                = make_shared<SystemModel>();
     SIT::SIT_Reader sut(sm);
 
-    REDIRECT_CERR(errorSink);
-
-    // ---------------- Exercise
+    // ---------------- Exercise & Verify
     //
-    auto succeeded = sut.parse(sit);
+    TS_ASSERT_THROWS (sut.parse(sit), SIT::ParserException);
 
     // ---------------- Verify
     //
-    TS_ASSERT_FALSE  (succeeded);
     TS_ASSERT_EQUALS (sut.namesAndNodes.size(), 0);
   };
 

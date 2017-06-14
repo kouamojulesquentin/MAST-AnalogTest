@@ -71,6 +71,10 @@ using namespace mast;
 #define STREAM_MY_LOCATION                         STREAM_LOCATION(my_location->begin.line, my_location->begin.column, my_location->end.column)
 #define STREAM_NODE_NAME(nodeKind, nodeName)       nodeKind << " node \"" << nodeName << "\" "
 
+#define ERROR_MESSAGE(msg)                  std::ostringstream msg; msg
+#define THROW_SYNTAX_ERROR(msg)             throw syntax_error(*my_location, msg.str())
+#define THROW_SYNTAX_ERROR_AT_LOC(msg, loc) throw syntax_error(loc, msg.str())
+
 #undef yylex
 #define yylex scanner.yylex
 
@@ -88,6 +92,17 @@ inline std::string remove_quotes(std::string s)
     );
  return s;
 }
+
+namespace
+{
+  SIT::location MakeLocation(const linker_information& linkerInfo)
+  {
+    auto locBegin = SIT::position(nullptr, linkerInfo.line, linkerInfo.beginColumn);
+    auto locEnd   = SIT::position(nullptr, linkerInfo.line, linkerInfo.endColumn);
+    auto location = SIT::location(locBegin, locEnd);
+    return location;
+  }
+} // End of unnamed namespace
 
 } /*end of %code section*/
 
@@ -182,10 +197,10 @@ root_node:
       const auto& registerIter = driver.declared_registers.find(linkerInfo.selector_reg_name);
       if (registerIter == driver.declared_registers.end())
       {
-        LOG(ERROR_LVL) << STREAM_LOCATION(linkerInfo.line, linkerInfo.beginColumn, linkerInfo.endColumn)
-                       << STREAM_NODE_NAME("LINKER", linkerInfo.linker_node->Name())
-                       << "Error, specified selector register \"" << linkerInfo.selector_reg_name << "\" does not exist";
-        YYERROR;
+        ERROR_MESSAGE(msg) << STREAM_NODE_NAME("LINKER", linkerInfo.linker_node->Name())
+                           << "Error, specified selector register \"" << linkerInfo.selector_reg_name << "\" does not exist";
+
+        THROW_SYNTAX_ERROR_AT_LOC(msg, MakeLocation(linkerInfo));
       }
 
       auto registerNode = registerIter->second;
@@ -297,8 +312,8 @@ t_LINKER  node_name path_selector_kind selector_register_name max_derivations pa
 {
   if ($[selector_register_name] == "")
   {
-    LOG(ERROR_LVL) << STREAM_MY_LOCATION << STREAM_NODE_NAME("LINKER", $[node_name].name) << "Must specify a control node (Register) for its path selector";
-    YYERROR;
+    ERROR_MESSAGE(msg) << STREAM_NODE_NAME("LINKER", $[node_name].name) << "Must specify a control node (Register) for its path selector";
+    THROW_SYNTAX_ERROR(msg);
   }
 
   auto pathSelector = make_shared<UnresolvedPathSelector>();
@@ -330,8 +345,8 @@ t_MIB node_name mux_register_position active reverse max_derivations path_select
   auto iter = driver.selector_register_creator.find($[path_selector_kind]);
   if (iter == driver.selector_register_creator.end())
   {
-    LOG(ERROR_LVL) << STREAM_MY_LOCATION << STREAM_NODE_NAME("MIB", $[node_name].name) << "\"" << $[path_selector_kind] << "\" Unknown MIB Path Selector kind";
-    YYERROR;
+    ERROR_MESSAGE(msg) << STREAM_NODE_NAME("MIB", $[node_name].name) << "\"" << $[path_selector_kind] << "\" Unknown MIB Path Selector kind";
+    THROW_SYNTAX_ERROR(msg);
   }
 
   const auto&      creator          = iter->second;
@@ -364,8 +379,8 @@ t_ACCESS_INTERFACE  node_name AI_identifier AI_protocol_parameters
 
       if (!protocol)
       {
-        LOG(ERROR_LVL) << STREAM_MY_LOCATION << STREAM_NODE_NAME("ACCESS_INTERFACE", $[node_name].name) << "Cannot create protocol: \"" << protocolName << "\"";
-        YYERROR;
+        ERROR_MESSAGE(msg) << STREAM_NODE_NAME("ACCESS_INTERFACE", $[node_name].name) << "Cannot create protocol: \"" << protocolName << "\"";
+        THROW_SYNTAX_ERROR(msg);
       }
       else
       {
@@ -375,8 +390,8 @@ t_ACCESS_INTERFACE  node_name AI_identifier AI_protocol_parameters
     }
     catch(std::invalid_argument exc)  // Catch C++ standard exceptions
     {
-      LOG(ERROR_LVL) << STREAM_MY_LOCATION << STREAM_NODE_NAME("ACCESS_INTERFACE", $[node_name].name) << "Cannot create protocol: \"" << protocolName << "\"; " << exc.what();
-      YYERROR;
+      ERROR_MESSAGE(msg) << STREAM_NODE_NAME("ACCESS_INTERFACE", $[node_name].name) << "Cannot create protocol: \"" << protocolName << "\"; " << exc.what();
+      THROW_SYNTAX_ERROR(msg);
     }
 }
 |
@@ -402,9 +417,9 @@ t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_
 
     if (!protocol)
     {
-      LOG(ERROR_LVL) << STREAM_MY_LOCATION << STREAM_NODE_NAME("JTAG_TAP", $[node_name].name)
-                     << "Cannot create protocol: \"" << protocolName << "\"";
-      YYERROR;
+      ERROR_MESSAGE(msg) << STREAM_NODE_NAME("JTAG_TAP", $[node_name].name)
+                         << "Cannot create protocol: \"" << protocolName << "\"";
+      THROW_SYNTAX_ERROR(msg);
     }
     else
     {
@@ -420,9 +435,9 @@ t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_
       {
         if (irTable.size() != nbDerivations)
         {
-          LOG(ERROR_LVL) << STREAM_MY_LOCATION << STREAM_NODE_NAME("JTAG_TAP", $[node_name].name)
-                         << "Error Coding must be provided for bypass register and each chain";
-          YYERROR;
+          ERROR_MESSAGE(msg) << STREAM_NODE_NAME("JTAG_TAP", $[node_name].name)
+                             << "Error Coding must be provided for bypass register and each chain";
+          THROW_SYNTAX_ERROR(msg);
         }
         auto node = driver.builder->Create_JTAG_TAP(nodeName,
                                                     irSize,
@@ -435,9 +450,9 @@ t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_
   }
   catch(std::invalid_argument exc)  // Catch C++ standard exceptions
   {
-    LOG(ERROR_LVL) << STREAM_MY_LOCATION << STREAM_NODE_NAME("JTAG_TAP", $[node_name].name)
-                   << "Cannot create protocol: \"" << protocolName << "\"; " << exc.what();
-    YYERROR;
+    ERROR_MESSAGE(msg) << STREAM_NODE_NAME("JTAG_TAP", $[node_name].name)
+                       << "Cannot create protocol: \"" << protocolName << "\"; " << exc.what();
+    THROW_SYNTAX_ERROR(msg);
   }
 }
 ;
@@ -552,9 +567,9 @@ register_node:
      auto bin_value = BinaryVector::CreateFromString(remove_quotes($[bypass]));
      if (bin_value.BitsCount() != $[size])
      {
-       LOG(ERROR_LVL) << STREAM_MY_LOCATION << STREAM_NODE_NAME("REGISTER", $[node_name].name)
-                      << "size (" << $[size] << ") does not match Bypass value bit count (" << bin_value.BitsCount() << ")";
-       YYERROR;
+       ERROR_MESSAGE(msg) << STREAM_NODE_NAME("REGISTER", $[node_name].name)
+                          << "size (" << $[size] << ") does not match Bypass value bit count (" << bin_value.BitsCount() << ")";
+       THROW_SYNTAX_ERROR(msg);
      }
 
      auto registerNode = driver.main_sm->CreateRegister ($[node_name].name, bin_value, nullptr);
@@ -585,14 +600,24 @@ bypass:
 
 %%
 
-void SIT::SIT_Parser::error( const location_type &l, const std::string &err_message )
+void SIT::SIT_Parser::error(const location_type& loc, const std::string& error_message)
 {
   driver.parsed_sut = nullptr;
 
   std::ostringstream os;
+  os << "SIT parsing error: ";
 
-  os << "SIT parsing error: " << STREAM_MY_LOCATION << err_message;
+  auto isValidLoc = loc.begin != loc.end;
+  if (isValidLoc)
+  {
+    os << STREAM_LOCATION(loc.begin.line, loc.begin.column, loc.end.column);
+  }
+  else
+  {
+    os << STREAM_MY_LOCATION;
+  }
+  os << error_message;
 
-  auto exceptionMessage = os.str();
-  THROW_PARSER_ERROR(exceptionMessage);
+  driver.error_message = os.str();
+  THROW_PARSER_ERROR(driver.error_message);
 }

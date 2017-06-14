@@ -49,7 +49,7 @@ void LoadSystemModel (string_view filePath)
 
   reader.parse(filePath);
 
-  auto topNode = dynamic_pointer_cast<ParentNode>(reader.parsed_sut);
+  auto topNode = dynamic_pointer_cast<ParentNode>(reader.ParsedSystemModel());
 
   sm->ReplaceRoot(topNode, false);
 }

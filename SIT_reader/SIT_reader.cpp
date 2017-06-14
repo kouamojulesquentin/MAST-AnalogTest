@@ -22,10 +22,8 @@ using namespace mast;
 
 
 SIT::SIT_Reader::SIT_Reader( std::shared_ptr<mast::SystemModel> sm)
-  : parsed_sut    (nullptr)
-  , namesAndNodes ()
-  , main_sm       (sm)
-  , builder       (make_shared<mast::SystemModelBuilder>(*main_sm))
+  : main_sm (sm)
+  , builder (make_shared<mast::SystemModelBuilder>(*main_sm))
 {
   #define MAKE_LAMBDA(selectorClass, forcedProperty)                                                                          \
   [model = main_sm](const string& selectorRegName, uint32_t pathsCount, SelectorProperty selectorProperty)                    \
@@ -75,64 +73,27 @@ SIT::SIT_Reader::parse( std::istream &stream )
 }
 
 
-bool
-SIT::SIT_Reader::parse_helper( std::istream &stream )
+bool SIT::SIT_Reader::parse_helper(std::istream& stream)
 {
-  try
-  {
-    try
-    {
-       scanner = make_shared<SIT_Scanner>(&stream);
-    }
-    catch( std::bad_alloc &ba )
-    {
-       std::cerr << "Failed to allocate scanner: ("
-                 << ba.what() << "), exiting!!\n";
-       return false;
-    }
+  scanner = make_shared<SIT_Scanner>(&stream);
+  parser  = make_shared<SIT_Parser>(*scanner, *this /* driver */);
 
-    try
-    {
-       parser = make_shared<SIT_Parser>(*scanner /* scanner */, *this /* driver */);
-    }
-    catch( std::bad_alloc &ba )
-    {
-       std::cerr << "Failed to allocate parser: ("
-                 << ba.what() << "), exiting!!\n";
-       return false;
-    }
-
-    constexpr int accept = 0;
-    if (parser->parse() == accept)
-    {
-      return true;
-    }
-  }
-  catch(ParserException& exc) // Do nothing because it is the normal way parser error are reported
+  auto success = parser->parse() == 0;
+  if (success)
   {
-  }
-  catch(std::exception& exc)  // Catch C++ standard exceptions
-  {
-    LOG(ERROR_LVL) << "Got unexpected std::exception while parsing: " << exc.what();
-  }
-  catch (...)
-  {
-    LOG(ERROR_LVL) << "Got unknown type of exception";
+    LOG(DEBUG) << "SIT has been parsed successfully";
   }
 
-  LOG(ERROR_LVL) << "Parse failed!!";
-  return false;
+  return success;
 }
 
-void
-SIT::SIT_Reader::add_newline()
+void SIT::SIT_Reader::add_newline()
 {
    ++line;
    column=0;
 }
 
-void
-SIT::SIT_Reader::add_column()
+void SIT::SIT_Reader::add_column()
 {
    ++column;
 }

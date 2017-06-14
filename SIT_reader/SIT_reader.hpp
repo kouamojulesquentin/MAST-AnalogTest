@@ -64,15 +64,24 @@ public:
     */
    bool parse(std::istream &iss);
 
-   std::shared_ptr<mast::SystemModelNode>    parsed_sut;    //!< SystemModel tree build from SIT file
+   //! Returns SystemModelNode build from SIT
+   //!
+   std::shared_ptr<mast::SystemModelNode> ParsedSystemModel() { return parsed_sut; }
+
+   //! Returns error message in case of failure, empty string otherwise
+   //!
+   std::string ErrorMessage() const { return error_message; }
+
    std::vector<mast::AppFunctionNameAndNode> namesAndNodes; //!< Associations of algorithms name a node
 
 private:  // Part used by SIT_Parser
   friend class SIT_Parser;
 
+
   std::map<std::string, std::shared_ptr<mast::Register>> declared_registers; //!< Created registers - kept to potentially associate to PathSelector (at end of parsing)
   std::queue<linker_information>                         unresolved_linkers; //!< Informations to create PathSelector associated with linker (register driving the selector may be yet unknown when the linker is created)
 
+  std::shared_ptr<mast::SystemModelNode>    parsed_sut;    //!< SystemModel tree build from SIT file
   std::shared_ptr<mast::SystemModel>        main_sm;
   std::shared_ptr<mast::SystemModelBuilder> builder;
 
@@ -92,6 +101,7 @@ private:
    std::size_t                  line   = 0;
    std::shared_ptr<SIT_Parser>  parser;
    std::shared_ptr<SIT_Scanner> scanner;
+   std::string                  error_message;  //!< Error message build while parsing SIT (empty when successful)
 };
 
 } /* end namespace SIT */

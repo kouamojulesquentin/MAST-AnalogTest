@@ -159,7 +159,7 @@ vector<AppFunctionNameAndNode> CPP_API_IMPL::LoadSystemModel (string_view filePa
 
   reader.parse(filePath);
 
-  auto topNode = dynamic_pointer_cast<ParentNode>(reader.parsed_sut);
+  auto topNode = dynamic_pointer_cast<ParentNode>(reader.ParsedSystemModel());
   CHECK_VALUE_NOT_NULL(topNode, "Failed to parse file: " + filePath);
   sm->ReplaceRoot(topNode, false);
 

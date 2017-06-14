@@ -41,12 +41,12 @@ pair<string, std::shared_ptr<mast::SystemModelNode>> UT_reader_wrapper::run_pars
 
   if (!succeeded)
   {
-    return make_pair(""s, driver.parsed_sut);
+    return make_pair(""s, driver.ParsedSystemModel());
   }
 
-  auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(driver.parsed_sut, PrettyPrinterOptions::Parser_debug);
+  auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(driver.ParsedSystemModel(), PrettyPrinterOptions::Parser_debug);
 
-  return make_pair(std::move(actual_PrettyPrint), driver.parsed_sut);
+  return make_pair(std::move(actual_PrettyPrint), driver.ParsedSystemModel());
 }
 
 

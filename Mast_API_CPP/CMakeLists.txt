@@ -8,7 +8,9 @@ include_directories(${LIBSIT_READER_INCLUDE_DIRS})
 
 set(LIBMAST_CPP_API_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include" PARENT_SCOPE)
 
+set (CFLAGS "${CFLAGS} -DG3_DYNAMIC_LOGGING")
 set (CFLAGS "${CFLAGS} -DCPP_API_EXPORTS")
+
 if (CODE_COVERAGE)
   set(CMAKE_CXX_FLAGS "--coverage ${CMAKE_CXX_FLAGS}")
 endif()
@@ -30,10 +32,11 @@ endif ()
 
 message("")
 message("================================================================================")
-message(STATUS "Mast_API_CPP: CODE_COVERAGE     ${CODE_COVERAGE}")
-message(STATUS "Mast_API_CPP: CFLAGS:           ${CFLAGS}")
-message(STATUS "Mast_API_CPP: EXTRA_LIBS:       ${EXTRA_LIBS}")
-message(STATUS "Mast_API_CPP: CMAKE_CXX_FLAGS:  ${CMAKE_CXX_FLAGS}")
+message(STATUS "Mast_API_CPP: CODE_COVERAGE           ${CODE_COVERAGE}")
+message(STATUS "Mast_API_CPP: LIBLOGGER_INCLUDE_DIRS: ${LIBLOGGER_INCLUDE_DIRS}")
+message(STATUS "Mast_API_CPP: CFLAGS:                 ${CFLAGS}")
+message(STATUS "Mast_API_CPP: EXTRA_LIBS:             ${EXTRA_LIBS}")
+message(STATUS "Mast_API_CPP: CMAKE_CXX_FLAGS:        ${CMAKE_CXX_FLAGS}")
 message("================================================================================")
 message("")
 

@@ -15,7 +15,7 @@
 #ifndef MASTENVIRONMENT_H__6F78EBE_7DDB_4A71_D889_4FB6C8F94905__INCLUDED_
   #define MASTENVIRONMENT_H__6F78EBE_7DDB_4A71_D889_4FB6C8F94905__INCLUDED_
 
-#include "Mast_Core_export.hpp"
+#include "CPP_API_export.hpp"
 
 #include <memory>
 #include <vector>
@@ -43,7 +43,7 @@ class SystemModelManager;
 //!
 //! @note The environment encompass a logger, a SystemModel and SystemModelManager
 //!
-class MAST_CORE_EXPORT MastEnvironment final
+class CPP_API_EXPORT MastEnvironment final
 {
   // ---------------- Public Methods
   //

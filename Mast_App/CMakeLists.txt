@@ -15,7 +15,8 @@ add_definitions(${P_CFLAGS})
 set (P_CFLAGS "${P_WARNINGS} -std=c++14")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
-include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
+include_directories(${LIBMAST_CPP_API_INCLUDE_DIRS})
+#+include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
 
 if (WIN32)
   include_directories($ENV{FLEX_DIR})

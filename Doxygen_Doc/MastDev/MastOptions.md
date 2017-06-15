@@ -81,7 +81,7 @@ Usage is:
            [-l]
            [--log_file=<File path>]
            [--log_level=<debug|info|warning|error>]
-           [--log_kind=<std|copy_all_on_cout|copy_errors_on_cerr>]
+           [--log_kind=<std|cout|copy_all_on_cout|copy_errors_on_cerr>]
            [--log_show=<all|date|file_name|function_name|level|line_number|microseconds|std|std_less|std_more|thread_id|time>]
            [--check]
            [--check_file=<File path>]
@@ -116,7 +116,7 @@ Usage is:
    --log_level=<debug|info|warning|error>
      Define log level
 
-   --log_kind=<std|copy_all_on_cout|copy_errors_on_cerr>
+   --log_kind=<std|cout|copy_all_on_cout|copy_errors_on_cerr>
      Define logger kind
 
    --check
@@ -233,6 +233,7 @@ Defines what kind of logger is used.
 | | |
 |-|-|
 | std                 | Messages are logged only to log file
+| cout                | Messages are logged only to cout
 | copy_all_on_cout    | Messages are logged to log file AND to the console
 | copy_errors_on_cerr | Messages are logged to log file AND error messages also to the console
 

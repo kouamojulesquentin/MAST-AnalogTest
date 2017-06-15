@@ -40,6 +40,7 @@ namespace
 static const map<string, mast::LoggerKind>  loggerKindMapping
 {
   {"std",                 mast::LoggerKind::Std},
+  {"cout",                mast::LoggerKind::Cout},
   {"copy_all_on_cout",    mast::LoggerKind::CopyAllOnCout},
   {"copy_errors_on_cerr", mast::LoggerKind::CopyErrorsOnCerr},
 };
@@ -393,17 +394,19 @@ void MastConfiguration::Update (vector<string> arguments)
 
     // ---------------- Prepare accepted arguments
     //
-    vector<string> allowedLogLevel {"debug", "info", "warning", "error"};
-    vector<string> allowedLogKind  {"std", "copy_all_on_cout", "copy_errors_on_cerr"};
-    vector<string> allowedLogShow;
-    for (const auto& element : loggerShownItemMapping)
+    auto makeAllowedSet = [](const auto& mapper)
     {
-      allowedLogShow.emplace_back(element.first);
-    }
+      vector<string> allowed;
+      for (const auto& element : mapper)
+      {
+        allowed.emplace_back(element.first);
+      }
+      return allowed;
+    };
 
-    TCLAP::ValuesConstraint<string> logLevelConstraint(allowedLogLevel);
-    TCLAP::ValuesConstraint<string> logKindConstraint(allowedLogKind);
-    TCLAP::ValuesConstraint<string> logShowConstraint(allowedLogShow);
+    TCLAP::ValuesConstraint<string> logLevelConstraint(makeAllowedSet(loggerLevelMapping));
+    TCLAP::ValuesConstraint<string> logKindConstraint (makeAllowedSet(loggerKindMapping));
+    TCLAP::ValuesConstraint<string> logShowConstraint (makeAllowedSet(loggerShownItemMapping));
 
     // Insert in reverse order of the USAGE print()
     TCLAP::ValueArg<std::string> aiProtocolArg        ("",  "protocol",    "Override access interface protocol defined in SIT file",                        false, "",                       "Protocol name", cmdLine);

@@ -163,7 +163,13 @@ void MastEnvironment::ConfigureLogger ()
         break;
     }
 
-    if (m_configuration->LoggerKind() == mast::LoggerKind::Std)
+    bool useCout =   (m_configuration->LoggerKind() == mast::LoggerKind::Cout)
+                  || (m_configuration->LoggerKind() == mast::LoggerKind::CopyAllOnCout);
+
+    bool useFile =   (m_configuration->LoggerKind() == mast::LoggerKind::Std)
+                  || (m_configuration->LoggerKind() == mast::LoggerKind::CopyAllOnCout);
+
+    if (useFile)
     {
       // ---------------- Sink for logging to file
       //
@@ -174,7 +180,8 @@ void MastEnvironment::ConfigureLogger ()
       customSink->Clear();
       m_logger->addSink(std::move(customSink), &g3::CustomFileSink::ReceiveLogUnformattedMessage);
     }
-    else if (m_configuration->LoggerKind() == mast::LoggerKind::CopyAllOnCout)
+
+    if (useCout)
     {
       auto coutSink = std::make_unique<g3::CoutLoggerSink>(*m_logFormatter);
       m_logger->addSink(std::move(coutSink), &g3::CoutLoggerSink::ReceiveLogMessage);

@@ -35,6 +35,7 @@ namespace mast
 enum class LoggerKind
 {
   Std,              //!< Logs only into logger file
+  Cout,             //!< Logs only onto cout (console)
   CopyAllOnCout,    //!< Messages are logged to log file AND to the console
   CopyErrorsOnCerr, //!< Messages are logged to log file AND error messages also to the console
 };

@@ -24,7 +24,7 @@
 
 namespace mast
 {
-//! Manages AccessInterfaceProtocol using actions and protocol tables
+//! Manages AccessInterfaceProtocol using callbacks and protocol tables
 //!
 class MAST_CORE_EXPORT GenericAccessInterfaceProtocol : public AccessInterfaceProtocol
 {
@@ -40,11 +40,11 @@ class MAST_CORE_EXPORT GenericAccessInterfaceProtocol : public AccessInterfacePr
   //!
   using Primitive = std::function<void(void*)>;
 
-  //! Prototype of the commands used to access a derivation
+  //! Prototype of the commands used to access a endpoint
   //! Parameters:
   //!  - The protocol table of available functions
   //!  - The optional data the AI might requite
-  //!  - The total number of the derivations
+  //!  - The total number of the endpoints
   //!  - The vector to push into the SUT (obtained from the current System Model)
   //!
   //! Return
@@ -53,25 +53,25 @@ class MAST_CORE_EXPORT GenericAccessInterfaceProtocol : public AccessInterfacePr
   //!
   using Action  = std::function<BinaryVector(const std::vector<Primitive>&, void*, const BinaryVector&)>;
 
-  //! Gets the number of derivations supported by the specific protocol
+  //! Gets the number of endpoints supported by the specific protocol
   //!
-  //! @note Derivation id 0 is reserved for reset operation, so protocol must support a least two derivations
+  //! @note EndPoint id 0 is reserved for reset operation, so protocol must support a least two endpoints
   //!
-  //! @return The number of supported derivation (including pseudo derivation 0 for reset)
+  //! @return The number of supported endpoint (including pseudo endpoint 0 for reset)
   //!
-  virtual uint32_t MaxSupportedDerivations() const override { return m_actions.size(); }
+  virtual uint32_t MaxSupportedEndPoints() const override { return m_callbacks.size(); }
 
-  GenericAccessInterfaceProtocol(std::initializer_list<Action> actions, std::initializer_list<Primitive> primitives);
-  GenericAccessInterfaceProtocol(std::vector<Action>           actions, std::vector<Primitive>           primitives);
+  GenericAccessInterfaceProtocol(std::initializer_list<Action> callbacks, std::initializer_list<Primitive> primitives);
+  GenericAccessInterfaceProtocol(std::vector<Action>           callbacks, std::vector<Primitive>           primitives);
 
-  //! Calls action associated with AccessInterface derivation
+  //! Calls callback associated with AccessInterface endpoint
   //!
-  //! @param derivationId   Identifies the derivation to act for (zero based)
+  //! @param endpointId   Identifies the endpoint to act for (zero based)
   //! @param interfaceData  Application data stored in the AccessInterface
   //! @param toSutData      Bits stream to transfer to SUT
   //!
   //! @return Bits stream retrieved from SUT
-  virtual BinaryVector DoAction(uint32_t derivationId, void* interfaceData, const BinaryVector& toSutData) override;
+  virtual BinaryVector DoCallback(uint32_t endpointId, void* interfaceData, const BinaryVector& toSutData) override;
 
   //! Returns readable type of protocol
   //!
@@ -86,7 +86,7 @@ class MAST_CORE_EXPORT GenericAccessInterfaceProtocol : public AccessInterfacePr
 
   // ---------------- Private  Fields
   //
-  std::vector<Action>    m_actions;    //!< Provide Actions to access the derivations based on the set of primitives
+  std::vector<Action>    m_callbacks;    //!< Provide Actions to access the endpoints based on the set of primitives
   std::vector<Primitive> m_primitives; //!< Primitives composing the protocol
 };
 //

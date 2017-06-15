@@ -39,7 +39,7 @@ class Spy_STIL_Protocol final : public mast::STIL_Player
 
   //! Spies content how binary vector to SUT is transformed to STIL command while returning the BinaryVector unchanged
   //!
-  virtual mast::BinaryVector DoAction(uint32_t derivationId, void* interfaceData, const mast::BinaryVector& toSutData) override;
+  virtual mast::BinaryVector DoCallback(uint32_t endpointId, void* interfaceData, const mast::BinaryVector& toSutData) override;
 
   const std::vector<std::string>& STILCommands() const { return m_spiedCommands->Commands(); }
 

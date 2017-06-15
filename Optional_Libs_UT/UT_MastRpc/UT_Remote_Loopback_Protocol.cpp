@@ -47,9 +47,9 @@ void UT_Remote_Loopback_Protocol::test_DoReset ()
   TS_ASSERT_THROWS_NOTHING (sut.DoReset(true));
 }
 
-//! Checks Remote_Loopback_Protocol::DoAction()
+//! Checks Remote_Loopback_Protocol::DoCallback()
 //!
-void UT_Remote_Loopback_Protocol::test_DoAction ()
+void UT_Remote_Loopback_Protocol::test_DoCallback ()
 {
   // ---------------- Setup
   //
@@ -57,13 +57,13 @@ void UT_Remote_Loopback_Protocol::test_DoAction ()
   uint32_t        bitsCount = 11;
   vector<uint8_t> toSutData{0x01, 0xC3, 0xFA};
 
-  Remote_Protocol::DoActionReturn_t doActionResult;
+  Remote_Protocol::DoCallbackReturn_t doActionResult;
 
   Remote_Loopback_Protocol sut;
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS_NOTHING (doActionResult = sut.DoAction(commandName, bitsCount, toSutData));
+  TS_ASSERT_THROWS_NOTHING (doActionResult = sut.DoCallback(commandName, bitsCount, toSutData));
 
   // ---------------- Verify
   //

@@ -44,7 +44,7 @@ Advantest_SmartRDI_Protocol::Advantest_SmartRDI_Protocol ()
 //!
 //! @return data scanned out from SUT
 pair<uint32_t, vector<uint8_t> >
-Advantest_SmartRDI_Protocol::DoAction (const string&          commandName,
+Advantest_SmartRDI_Protocol::DoCallback (const string&          commandName,
                                        uint32_t               bitsCount,
                                        const vector<uint8_t>& toSutScanVector)
 {
@@ -53,17 +53,17 @@ Advantest_SmartRDI_Protocol::DoAction (const string&          commandName,
 
   if ((bitsCount == 0) || (bytesCount == 0))
   {
-    throw std::runtime_error("DoAction: Invalid due to no bits to send to SUT");
+    throw std::runtime_error("DoCallback: Invalid due to no bits to send to SUT");
   }
 
   if (((bitsCount + 7u) / 8u) != bytesCount)
   {
-    throw std::runtime_error("DoAction: Invalid due to incoherence between bits count and data vector bytes count");
+    throw std::runtime_error("DoCallback: Invalid due to incoherence between bits count and data vector bytes count");
   }
 
   if ((bitsCount %32u) != 0)
   {
-    throw std::runtime_error("DoAction: Do not support yet bits count not a multiple of 32");
+    throw std::runtime_error("DoCallback: Do not support yet bits count not a multiple of 32");
   }
 
   JtagFunction_t jtagFunc = NULL;
@@ -78,7 +78,7 @@ Advantest_SmartRDI_Protocol::DoAction (const string&          commandName,
 
   if (!jtagFunc)
   {
-    string message = string("DoAction: Got not supported command name \"").append(commandName).append("\"");
+    string message = string("DoCallback: Got not supported command name \"").append(commandName).append("\"");
     throw std::runtime_error(message);
   }
 
@@ -88,7 +88,7 @@ Advantest_SmartRDI_Protocol::DoAction (const string&          commandName,
       CONNECT();                // make sure device is connected if debugging a single test suite
       RDI_BEGIN();
 
-      //! @todo [JFC]-[March/15/2017]: In DoAction(): Consider refactoring that to specialize versions of
+      //! @todo [JFC]-[March/15/2017]: In DoCallback(): Consider refactoring that to specialize versions of
       //!                              jtag_access_xx for vector of data
       //!
       uint32_t        remainingBitsCount = bitsCount;

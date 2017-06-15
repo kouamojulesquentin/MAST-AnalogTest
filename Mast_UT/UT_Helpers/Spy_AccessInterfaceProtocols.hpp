@@ -32,17 +32,17 @@ class Spy_AccessInterfaceProtocols final : public mast::AccessInterfaceProtocol
 
   //! Spies content of parameter toSutData and return it unchanged
   //!
-  virtual mast::BinaryVector DoAction(uint32_t derivationId, void* interfaceData, const mast::BinaryVector& toSutData) override;
+  virtual mast::BinaryVector DoCallback(uint32_t endpointId, void* interfaceData, const mast::BinaryVector& toSutData) override;
 
   const std::vector<mast::BinaryVector>& ToSutVectors() const { return m_toSutVectors; }
 
-  //! Gets the number of derivations supported by the specific protocol
+  //! Gets the number of endpoints supported by the specific protocol
   //!
-  //! @note Derivation id 0 is reserved for reset operation, so protocol must support a least two derivations
+  //! @note EndPoint id 0 is reserved for reset operation, so protocol must support a least two endpoints
   //!
-  //! @return The number of supported derivation (including pseudo derivation 0 for reset)
+  //! @return The number of supported endpoint (including pseudo endpoint 0 for reset)
   //!
-  virtual uint32_t MaxSupportedDerivations() const override { return 10u; }  // 10 is just used to be able to report that an AccessInterface as fewer derivation than is supported by its interface
+  virtual uint32_t MaxSupportedEndPoints() const override { return 10u; }  // 10 is just used to be able to report that an AccessInterface as fewer endpoint than is supported by its interface
 
   //! Returns readable type of protocol
   //!

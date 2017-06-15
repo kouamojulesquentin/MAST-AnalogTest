@@ -820,9 +820,9 @@ void UT_SystemModelChecker::test_Check_When_RootIsChainWithMixKindChildren ()
 //+}
 
 
-//! Checks SystemModelChecker::CheckTree() when root is and AccessInterface but has 1 too much derivation
+//! Checks SystemModelChecker::CheckTree() when root is and AccessInterface but has 1 too much endpoint
 //!
-void UT_SystemModelChecker::test_Check_When_AccessInterface_has_MoreDerivations ()
+void UT_SystemModelChecker::test_Check_When_AccessInterface_has_MoreEndPoints ()
 {
   // ---------------- Setup
   //
@@ -848,9 +848,9 @@ void UT_SystemModelChecker::test_Check_When_AccessInterface_has_MoreDerivations 
 
 
 //! Checks SystemModelChecker::CheckTree() when root is and AccessInterface but has fewer
-//! derivations than supported by its derivation
+//! endpoints than supported by its endpoint
 //!
-void UT_SystemModelChecker::test_Check_When_AccessInterface_has_LessDerivations ()
+void UT_SystemModelChecker::test_Check_When_AccessInterface_has_LessEndPoints ()
 {
   // ---------------- Setup
   //

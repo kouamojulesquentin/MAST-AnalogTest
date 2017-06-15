@@ -38,7 +38,7 @@ Remote_Protocol_Proxy::~Remote_Protocol_Proxy ()
 //! Constructs from actual Remote_Protocol_Client and associated commands
 //!
 //! @param remoteProtocol Actual Remote_Protocol_Client (must be not nullptr)
-//! @param commands       Associated commands (first one for reset and next ones for each supported derivations)
+//! @param commands       Associated commands (first one for reset and next ones for each supported endpoints)
 //!
 Remote_Protocol_Proxy::Remote_Protocol_Proxy (unique_ptr<Remote_Protocol_Client> remoteProtocol, vector<string> commands)
   : m_remoteProtocol (std::move(remoteProtocol))
@@ -144,12 +144,12 @@ Remote_Protocol_Proxy::Remote_Protocol_Proxy (const string& parameters)
 
 //! Loopbacks "to SUT data" logging SVF command(s) that would be issued if it was really an operating protocol
 //!
-BinaryVector Remote_Protocol_Proxy::DoAction (uint32_t derivationId, void* interfaceData, const BinaryVector& toSutData)
+BinaryVector Remote_Protocol_Proxy::DoCallback (uint32_t endpointId, void* interfaceData, const BinaryVector& toSutData)
 {
   CHECK_PARAMETER_NULL (interfaceData, "Interface data is not supported by remote protocols (there is no sharing of address space)");
-  CHECK_PARAMETER_LT   (derivationId, m_commands.size(), "Derivation id must not be greater than supported commands");
+  CHECK_PARAMETER_LT   (endpointId, m_commands.size(), "EndPoint id must not be greater than supported commands");
 
-  auto command       = m_commands[derivationId];
+  auto command       = m_commands[endpointId];
   auto binaryToSut   = toSutData.DataRightAligned();
 
   auto sendResult    = m_remoteProtocol->SendScanVector(command, toSutData.BitsCount(), binaryToSut);

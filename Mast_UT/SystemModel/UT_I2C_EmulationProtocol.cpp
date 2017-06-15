@@ -70,7 +70,7 @@ void UT_I2C_EmulationProtocol::test_Constructor_Integer_Error ()
 
 
 
-void UT_I2C_EmulationProtocol::test_MaxSupportedDerivations ()
+void UT_I2C_EmulationProtocol::test_MaxSupportedEndPoints ()
 {
   // ---------------- Setup
   //
@@ -78,14 +78,14 @@ void UT_I2C_EmulationProtocol::test_MaxSupportedDerivations ()
 
   // ---------------- Exercise
   //
-  auto maxSupportedDerivations = sut.MaxSupportedDerivations();
+  auto maxSupportedEndPoints = sut.MaxSupportedEndPoints();
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS (maxSupportedDerivations, 2u);
+  TS_ASSERT_EQUALS (maxSupportedEndPoints, 2u);
 }
 
-//! Checks I2C_EmulationProtocol constructor given max derivation as a string
+//! Checks I2C_EmulationProtocol constructor given max endpoint as a string
 //!
 void UT_I2C_EmulationProtocol::test_Constructor_String ()
 {
@@ -96,7 +96,7 @@ void UT_I2C_EmulationProtocol::test_Constructor_String ()
     // ---------------- Setup
     //
     auto parameters             = string(std::get<0>(data));
-    auto expectedMaxDerivations = std::get<1>(data);
+    auto expectedMaxEndPoints = std::get<1>(data);
 
     // ---------------- Exercise
     //
@@ -104,8 +104,8 @@ void UT_I2C_EmulationProtocol::test_Constructor_String ()
 
     // ---------------- Verify
     //
-    auto maxSupportedDerivations = sut.MaxSupportedDerivations();
-    TS_ASSERT_EQUALS (maxSupportedDerivations, expectedMaxDerivations);
+    auto maxSupportedEndPoints = sut.MaxSupportedEndPoints();
+    TS_ASSERT_EQUALS (maxSupportedEndPoints, expectedMaxEndPoints);
   };
 
   auto data =
@@ -122,7 +122,7 @@ void UT_I2C_EmulationProtocol::test_Constructor_String ()
 }
 
 
-//! Checks I2C_EmulationProtocol constructor given max derivation as a string but with not valid numbers
+//! Checks I2C_EmulationProtocol constructor given max endpoint as a string but with not valid numbers
 //!
 void UT_I2C_EmulationProtocol::test_Constructor_String_Error ()
 {
@@ -152,9 +152,9 @@ void UT_I2C_EmulationProtocol::test_Constructor_String_Error ()
   TS_DATA_DRIVEN_TEST(checker, data);
 }
 
-//! Checks I2C_EmulationProtocol DoAction
+//! Checks I2C_EmulationProtocol DoCallback
 //!
-void UT_I2C_EmulationProtocol::test_DoAction ()
+void UT_I2C_EmulationProtocol::test_DoCallback ()
 {
   // ---------------- DDT Setup
   //
@@ -163,7 +163,7 @@ void UT_I2C_EmulationProtocol::test_DoAction ()
   {
     // ---------------- Setup
     //
-    auto        derivationId    = std::get<0> (data);
+    auto        endpointId    = std::get<0> (data);
     auto        toSutVector     = BinaryVector::CreateFromString(std::get<1> (data));
     const auto& expectedCommand = std::get<2> (data);
 
@@ -172,7 +172,7 @@ void UT_I2C_EmulationProtocol::test_DoAction ()
 
     // ---------------- Exercise
     //
-    auto fromSutVector = sut.DoAction(derivationId, nullptr, toSutVector);
+    auto fromSutVector = sut.DoCallback(endpointId, nullptr, toSutVector);
 
     // ---------------- Verify
     //
@@ -204,9 +204,9 @@ void UT_I2C_EmulationProtocol::test_DoAction ()
   TS_DATA_DRIVEN_TEST (checker, data);
 }
 
-//! Checks I2C_EmulationProtocol DoAction when having been constructed from string
+//! Checks I2C_EmulationProtocol DoCallback when having been constructed from string
 //!
-void UT_I2C_EmulationProtocol::test_DoAction_String()
+void UT_I2C_EmulationProtocol::test_DoCallback_String()
 {
   // ---------------- DDT Setup
   //
@@ -215,7 +215,7 @@ void UT_I2C_EmulationProtocol::test_DoAction_String()
   {
     // ---------------- Setup
     //
-    auto        derivationId    = std::get<0> (data);
+    auto        endpointId    = std::get<0> (data);
     auto        toSutVector     = BinaryVector::CreateFromString(std::get<1> (data));
     const auto& expectedCommand = std::get<2> (data);
 
@@ -223,7 +223,7 @@ void UT_I2C_EmulationProtocol::test_DoAction_String()
 
     // ---------------- Exercise
     //
-    auto fromSutVector = sut.DoAction(derivationId, nullptr, toSutVector);
+    auto fromSutVector = sut.DoCallback(endpointId, nullptr, toSutVector);
 
     // ---------------- Verify
     //

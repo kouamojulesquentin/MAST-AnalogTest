@@ -248,22 +248,22 @@ void SystemModelManager_impl::DoDataCycles_Impl ()
           auto protocol = nextAccessInterface->Protocol();
           CHECK_VALUE_NOT_NULL(protocol, "All AccessInterface must be associated with a valid protocol");
 
-          uint32_t derivationId   = 1u;
-          auto     nextDerivation = nextAccessInterface->FirstChild();
+          uint32_t endpointId   = 1u;
+          auto     nextEndPoint = nextAccessInterface->FirstChild();
 
-          while (nextDerivation)
+          while (nextEndPoint)
           {
-            if (nextDerivation->IsPending())
+            if (nextEndPoint->IsPending())
             {
               m_toSutVisitor.Reset();
-              nextDerivation->Accept(m_toSutVisitor);
+              nextEndPoint->Accept(m_toSutVisitor);
 
               const auto& toSutVector = m_toSutVisitor.ToSutVector();
               if (!toSutVector.IsEmpty())   // This can be empty when actual SUT state prevent from serving pending Registers
               {
                 const auto& activeRegs  = m_toSutVisitor.ActiveRegistersIdentifiers();
 
-                auto fromSutVector = protocol->DoAction(derivationId, nextDerivation->ApplicationData(), toSutVector);
+                auto fromSutVector = protocol->DoCallback(endpointId, nextEndPoint->ApplicationData(), toSutVector);
 
                 m_fromSutUpdater.UpdateRegisters(activeRegs, fromSutVector);
                 ReportServedRegisters(activeRegs);
@@ -271,8 +271,8 @@ void SystemModelManager_impl::DoDataCycles_Impl ()
               }
             }
 
-            nextDerivation = nextDerivation->NextSibling();
-            ++derivationId;
+            nextEndPoint = nextEndPoint->NextSibling();
+            ++endpointId;
           }
         }
 

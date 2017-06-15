@@ -143,7 +143,7 @@ void UT_Remote_Protocol_Proxy::test_Constructor_RemoteClient ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS (proxy->MaxSupportedDerivations(), 3u);
+  TS_ASSERT_EQUALS (proxy->MaxSupportedEndPoints(), 3u);
   TS_ASSERT_EQUALS (proxy->KindName(),                "Remote_Spy"sv);
   TS_ASSERT_EQUALS (pSpy->syncReset,                  0);
   TS_ASSERT_EQUALS (pSpy->asyncReset,                 0);
@@ -180,7 +180,7 @@ void UT_Remote_Protocol_Proxy::test_Constructor_StringParameters_Success ()
     // ---------------- Verify
     //
     TS_ASSERT_NOT_NULLPTR (proxy);
-    TS_ASSERT_EQUALS      (proxy->MaxSupportedDerivations(), 3u);
+    TS_ASSERT_EQUALS      (proxy->MaxSupportedEndPoints(), 3u);
     TS_ASSERT_EQUALS      (proxy->KindName(),                expectedKind);
 
     // Check a Client Protocol has been created and use as appropriate
@@ -300,9 +300,9 @@ void UT_Remote_Protocol_Proxy::test_DoReset_ASync ()
 
 
 
-//! Checks Remote_Protocol_Proxy::DoAction()
+//! Checks Remote_Protocol_Proxy::DoCallback()
 //!
-void UT_Remote_Protocol_Proxy::test_DoAction ()
+void UT_Remote_Protocol_Proxy::test_DoCallback ()
 {
   // ---------------- DDT Setup
   //
@@ -310,7 +310,7 @@ void UT_Remote_Protocol_Proxy::test_DoAction ()
   {
     // ---------------- Setup
     //
-    auto         derivationId    = std::get<0>(data);
+    auto         endpointId    = std::get<0>(data);
     const auto&  toSutData       = BinaryVector::CreateFromString(std::get<1>(data));
     auto         expectedCommand = std::get<2>(data);
     const auto&  expectedBinary  = std::get<3>(data);
@@ -323,7 +323,7 @@ void UT_Remote_Protocol_Proxy::test_DoAction ()
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS_NOTHING (fromSutData = sut.DoAction(derivationId, nullptr, toSutData));
+    TS_ASSERT_THROWS_NOTHING (fromSutData = sut.DoCallback(endpointId, nullptr, toSutData));
 
     // ---------------- Verify
     //
@@ -358,9 +358,9 @@ void UT_Remote_Protocol_Proxy::test_DoAction ()
 }
 
 
-//! Checks Remote_Protocol_Proxy::DoAction() with invalid derivation id
+//! Checks Remote_Protocol_Proxy::DoCallback() with invalid endpoint id
 //!
-void UT_Remote_Protocol_Proxy::test_DoAction_invalid_DerivationId ()
+void UT_Remote_Protocol_Proxy::test_DoCallback_invalid_EndPointId ()
 {
   // ---------------- Setup
   //
@@ -370,15 +370,15 @@ void UT_Remote_Protocol_Proxy::test_DoAction_invalid_DerivationId ()
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (sut.DoAction(3, nullptr, toSutData), std::exception);
+  TS_ASSERT_THROWS (sut.DoCallback(3, nullptr, toSutData), std::exception);
 }
 
 
-//! Checks Remote_Protocol_Proxy::DoAction() with invalid (not nullptr) interface data
+//! Checks Remote_Protocol_Proxy::DoCallback() with invalid (not nullptr) interface data
 //!
 //! @note Remote protocols cannot use interfaceData pointer has there is not sharing of address space
 //!
-void UT_Remote_Protocol_Proxy::test_DoAction_invalid_InterfaceData ()
+void UT_Remote_Protocol_Proxy::test_DoCallback_invalid_InterfaceData ()
 {
   // ---------------- Setup
   //
@@ -390,7 +390,7 @@ void UT_Remote_Protocol_Proxy::test_DoAction_invalid_InterfaceData ()
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (sut.DoAction(2, interfaceData, toSutData), std::exception);
+  TS_ASSERT_THROWS (sut.DoCallback(2, interfaceData, toSutData), std::exception);
 }
 
 

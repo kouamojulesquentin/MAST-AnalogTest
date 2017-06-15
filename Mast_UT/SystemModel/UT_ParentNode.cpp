@@ -162,11 +162,11 @@ void UT_ParentNode::test_SetChildAppender ()
   TS_ASSERT_NULLPTR    (node_3->NextSibling());
 }
 
-//! Checks ParentNode::DisconnectDerivation() when first and only one
+//! Checks ParentNode::DisconnectEndPoint() when first and only one
 //!
 //! @note As this is an abstract base class, it uses a Chain to have an instance
 //!
-void UT_ParentNode::test_DisconnectDerivation_1st_OutOf_1 ()
+void UT_ParentNode::test_DisconnectEndPoint_1st_OutOf_1 ()
 {
   // ---------------- Setup
   //
@@ -177,7 +177,7 @@ void UT_ParentNode::test_DisconnectDerivation_1st_OutOf_1 ()
 
   // ---------------- Exercise
   //
-  TS_ASSERT_THROWS_NOTHING (sut.DisconnectDerivation(1u));
+  TS_ASSERT_THROWS_NOTHING (sut.DisconnectEndPoint(1u));
 
   // ---------------- Verify
   //
@@ -186,11 +186,11 @@ void UT_ParentNode::test_DisconnectDerivation_1st_OutOf_1 ()
 }
 
 
-//! Checks ParentNode::DisconnectDerivation() when first out of 2
+//! Checks ParentNode::DisconnectEndPoint() when first out of 2
 //!
 //! @note As this is an abstract base class, it uses a Chain to have an instance
 //!
-void UT_ParentNode::test_DisconnectDerivation_1st_OutOf_2 ()
+void UT_ParentNode::test_DisconnectEndPoint_1st_OutOf_2 ()
 {
   // ---------------- Setup
   //
@@ -203,7 +203,7 @@ void UT_ParentNode::test_DisconnectDerivation_1st_OutOf_2 ()
 
   // ---------------- Exercise
   //
-  TS_ASSERT_THROWS_NOTHING (sut.DisconnectDerivation(1u));
+  TS_ASSERT_THROWS_NOTHING (sut.DisconnectEndPoint(1u));
 
   // ---------------- Verify
   //
@@ -212,11 +212,11 @@ void UT_ParentNode::test_DisconnectDerivation_1st_OutOf_2 ()
 }
 
 
-//! Checks ParentNode::DisconnectDerivation() when 2nd out of 2
+//! Checks ParentNode::DisconnectEndPoint() when 2nd out of 2
 //!
 //! @note As this is an abstract base class, it uses a Chain to have an instance
 //!
-void UT_ParentNode::test_DisconnectDerivation_2nd_OutOf_2 ()
+void UT_ParentNode::test_DisconnectEndPoint_2nd_OutOf_2 ()
 {
   // ---------------- Setup
   //
@@ -229,7 +229,7 @@ void UT_ParentNode::test_DisconnectDerivation_2nd_OutOf_2 ()
 
   // ---------------- Exercise
   //
-  TS_ASSERT_THROWS_NOTHING (sut.DisconnectDerivation(2u));
+  TS_ASSERT_THROWS_NOTHING (sut.DisconnectEndPoint(2u));
 
   // ---------------- Verify
   //
@@ -239,11 +239,11 @@ void UT_ParentNode::test_DisconnectDerivation_2nd_OutOf_2 ()
 }
 
 
-//! Checks ParentNode::DisconnectDerivation() when 2nd out of 3
+//! Checks ParentNode::DisconnectEndPoint() when 2nd out of 3
 //!
 //! @note As this is an abstract base class, it uses a Chain to have an instance
 //!
-void UT_ParentNode::test_DisconnectDerivation_2nd_OutOf_3 ()
+void UT_ParentNode::test_DisconnectEndPoint_2nd_OutOf_3 ()
 {
   // ---------------- Setup
   //
@@ -258,7 +258,7 @@ void UT_ParentNode::test_DisconnectDerivation_2nd_OutOf_3 ()
 
   // ---------------- Exercise
   //
-  TS_ASSERT_THROWS_NOTHING (sut.DisconnectDerivation(2u));
+  TS_ASSERT_THROWS_NOTHING (sut.DisconnectEndPoint(2u));
 
   // ---------------- Verify
   //
@@ -268,11 +268,11 @@ void UT_ParentNode::test_DisconnectDerivation_2nd_OutOf_3 ()
 }
 
 
-//! Checks ParentNode::DisconnectDerivation() when 3rd out of 2
+//! Checks ParentNode::DisconnectEndPoint() when 3rd out of 2
 //!
 //! @note As this is an abstract base class, it uses a Chain to have an instance
 //!
-void UT_ParentNode::test_DisconnectDerivation_3rd_OutOf_2 ()
+void UT_ParentNode::test_DisconnectEndPoint_3rd_OutOf_2 ()
 {
   // ---------------- Setup
   //
@@ -285,15 +285,15 @@ void UT_ParentNode::test_DisconnectDerivation_3rd_OutOf_2 ()
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (sut.DisconnectDerivation(3u), std::exception);
+  TS_ASSERT_THROWS (sut.DisconnectEndPoint(3u), std::exception);
 }
 
 
-//! Checks ParentNode::DisconnectDerivation() when 0 out of 2
+//! Checks ParentNode::DisconnectEndPoint() when 0 out of 2
 //!
 //! @note As this is an abstract base class, it uses a Chain to have an instance
 //!
-void UT_ParentNode::test_DisconnectDerivation_0_OutOf_2 ()
+void UT_ParentNode::test_DisconnectEndPoint_0_OutOf_2 ()
 {
   // ---------------- Setup
   //
@@ -306,15 +306,15 @@ void UT_ParentNode::test_DisconnectDerivation_0_OutOf_2 ()
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (sut.DisconnectDerivation(0u), std::exception);
+  TS_ASSERT_THROWS (sut.DisconnectEndPoint(0u), std::exception);
 }
 
 
-//! Checks ParentNode::DisconnectDerivation() when derivation 0 out of 0
+//! Checks ParentNode::DisconnectEndPoint() when endpoint 0 out of 0
 //!
 //! @note As this is an abstract base class, it uses a Chain to have an instance
 //!
-void UT_ParentNode::test_DisconnectDerivation_0_OutOf_0 ()
+void UT_ParentNode::test_DisconnectEndPoint_0_OutOf_0 ()
 {
   // ---------------- Setup
   //
@@ -322,14 +322,14 @@ void UT_ParentNode::test_DisconnectDerivation_0_OutOf_0 ()
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (sut.DisconnectDerivation(0u), std::exception);
+  TS_ASSERT_THROWS (sut.DisconnectEndPoint(0u), std::exception);
 }
 
-//! Checks ParentNode::DisconnectDerivation() when derivation 1 out of 0
+//! Checks ParentNode::DisconnectEndPoint() when endpoint 1 out of 0
 //!
 //! @note As this is an abstract base class, it uses a Chain to have an instance
 //!
-void UT_ParentNode::test_DisconnectDerivation_1_OutOf_0 ()
+void UT_ParentNode::test_DisconnectEndPoint_1_OutOf_0 ()
 {
   // ---------------- Setup
   //
@@ -337,7 +337,7 @@ void UT_ParentNode::test_DisconnectDerivation_1_OutOf_0 ()
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (sut.DisconnectDerivation(1u), std::exception);
+  TS_ASSERT_THROWS (sut.DisconnectEndPoint(1u), std::exception);
 }
 
 //! Checks ParentNode::DisconnectChild() when first and only one

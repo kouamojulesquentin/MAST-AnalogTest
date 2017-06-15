@@ -37,12 +37,12 @@ class UT_GenericAccessInterfaceProtocol : public CxxTest::TestSuite
   void test_Constructor_Vector_TooFew_Primitives ();
   void test_Constructor_Vector_TooFew_Actions ();
 
-  // ---------------- DoAction
+  // ---------------- DoCallback
   //
-  void test_DoAction_0 ();
-  void test_DoAction_1 ();
-  void test_DoAction_2 ();
-  void test_DoAction_3 ();
+  void test_DoCallback_0 ();
+  void test_DoCallback_1 ();
+  void test_DoCallback_2 ();
+  void test_DoCallback_3 ();
 
   // ================ Other Methods ================
 

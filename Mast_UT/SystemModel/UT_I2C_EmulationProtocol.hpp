@@ -30,11 +30,11 @@ class UT_I2C_EmulationProtocol : public CxxTest::TestSuite
 
   void test_Constructor_Integer ();
   void test_Constructor_Integer_Error ();
-  void test_MaxSupportedDerivations ();
+  void test_MaxSupportedEndPoints ();
   void test_Constructor_String ();
   void test_Constructor_String_Error ();
-  void test_DoAction ();
-  void test_DoAction_String ();
+  void test_DoCallback ();
+  void test_DoCallback_String ();
 };
 //
 //  End of UT_I2C_EmulationProtocol class declaration

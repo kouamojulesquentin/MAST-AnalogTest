@@ -31,7 +31,7 @@ using namespace mast;
 
 //! Spies content of parameter toSutData and return it unchanged
 //!
-BinaryVector OfflineProtocol::DoAction (uint32_t /* derivationId */, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector OfflineProtocol::DoCallback (uint32_t /* endpointId */, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   auto command = toSutData.DataAsBinaryString ();
   SendCommand(command);
@@ -40,7 +40,7 @@ BinaryVector OfflineProtocol::DoAction (uint32_t /* derivationId */, void* /* in
   return fromSutData;
 }
 //
-//  End of: Spy_AccessInterfaceProtocols::DoAction
+//  End of: Spy_AccessInterfaceProtocols::DoCallback
 //---------------------------------------------------------------------------
 
 

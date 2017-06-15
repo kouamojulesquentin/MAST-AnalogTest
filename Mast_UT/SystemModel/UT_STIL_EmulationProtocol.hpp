@@ -29,11 +29,11 @@ class UT_STIL_EmulationProtocol : public CxxTest::TestSuite
   // ================ Test Methods ================
 
   void test_Constructor_Integer ();
-  void test_MaxSupportedDerivations ();
+  void test_MaxSupportedEndPoints ();
   void test_Constructor_String ();
   void test_Constructor_String_Error ();
   void test_SPY_Constructor ();
-  void test_DoAction ();
+  void test_DoCallback ();
 
   // ================ Other Methods ================
 

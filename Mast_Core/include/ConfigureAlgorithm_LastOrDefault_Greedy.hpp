@@ -19,7 +19,7 @@
 
 namespace mast
 {
-//! Implements algorithm to select last pending derivation or derivation '0' when all derivation
+//! Implements algorithm to select last pending endpoint or endpoint '0' when all endpoint
 //! are bound to be "served"
 //!
 //! @note This algorithm selects last (with highest path identifier) pending path that is
@@ -53,7 +53,7 @@ class MAST_CORE_EXPORT ConfigureAlgorithm_LastOrDefault_Greedy final : public Co
   virtual void ProcessPending(Linker& linker, uint32_t pathIdentifier, std::shared_ptr<SystemModelNode> child) override;
 
 //! Selects path 0 when linker is not pending, otherwise if there is just one
-//! pending, select path 0 if currently selected derivation is already active
+//! pending, select path 0 if currently selected endpoint is already active
 //!
 //! @note Must be called after linker pending count has been updated
 //! @note Post-condition: a selection choice must have been done (by this method

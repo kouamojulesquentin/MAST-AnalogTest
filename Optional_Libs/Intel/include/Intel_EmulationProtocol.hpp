@@ -36,21 +36,21 @@ class Intel_EmulationProtocol final : public Intel_Packet_Player
 
   //! Does any action required to transfer scan data to and from SUT
   //!
-  //! @param derivationId   Identifies the derivation to act for (zero based)
+  //! @param endpointId   Identifies the endpoint to act for (zero based)
   //! @param interfaceData  Application data stored in the AccessInterface
   //! @param toSutData      Bits stream to transfer to SUT
   //!
   //! @return Bitstream retrieved from SUT
   //!
-  virtual BinaryVector DoAction(uint32_t derivationId, void* interfaceData, const BinaryVector& toSutData) override;
+  virtual BinaryVector DoCallback(uint32_t endpointId, void* interfaceData, const BinaryVector& toSutData) override;
 
-  //! Gets the number of derivations supported by the specific protocol
+  //! Gets the number of endpoints supported by the specific protocol
   //!
-  //! @note Derivation id 0 is reserved for reset operation, so protocol must support a least two derivations
+  //! @note EndPoint id 0 is reserved for reset operation, so protocol must support a least two endpoints
   //!
-  //! @return The number of supported derivation (including pseudo derivation 0 for reset)
+  //! @return The number of supported endpoint (including pseudo endpoint 0 for reset)
   //!
-  virtual uint32_t MaxSupportedDerivations() const override { return m_n_chains; }
+  virtual uint32_t MaxSupportedEndPoints() const override { return m_n_chains; }
 
   //! Returns readable type of protocol
   //!

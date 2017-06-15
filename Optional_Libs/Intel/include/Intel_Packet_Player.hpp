@@ -55,7 +55,7 @@ class Intel_Packet_Player : public AccessInterfaceProtocol
 
   //! Sends a stream of Intel Packets from BinaryVector to send to SUT and returns received data
   //!
-  BinaryVector Send_Intel_Packet_Stream(uint32_t derivationId, const BinaryVector& toSutData) const;
+  BinaryVector Send_Intel_Packet_Stream(uint32_t endpointId, const BinaryVector& toSutData) const;
 
   //! Creates an Intel_Packet reset command
   //!

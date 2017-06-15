@@ -26,25 +26,25 @@ using namespace std::experimental::literals::string_view_literals;
 using namespace mast;
 
 
-//! Initializes a with number of derivations defined by a string
+//! Initializes a with number of endpoints defined by a string
 //!
-STIL_Player::STIL_Player (const std::string& nbDerivations)
+STIL_Player::STIL_Player (const std::string& nbEndPoints)
 {
   try
   {
-    auto number = std::stoull(string(nbDerivations), nullptr, 0);
+    auto number = std::stoull(string(nbEndPoints), nullptr, 0);
 
-    CHECK_PARAMETER_LTE(number, UINT32_MAX, nbDerivations + ", is out of range for a 32 bit number");
+    CHECK_PARAMETER_LTE(number, UINT32_MAX, nbEndPoints + ", is out of range for a 32 bit number");
 
-    m_nbDerivations = static_cast<uint32_t>(number);
+    m_nbEndPoints = static_cast<uint32_t>(number);
   }
   catch(std::out_of_range& exc)     // Conversion to number is not possible ==> it must be the prefix
   {
-    THROW_INVALID_ARGUMENT("Parameter: "sv + nbDerivations + ", is out of range for a 32 bit number");
+    THROW_INVALID_ARGUMENT("Parameter: "sv + nbEndPoints + ", is out of range for a 32 bit number");
   }
   catch(std::exception& exc)
   {
-    THROW_INVALID_ARGUMENT("Parameter: \""sv + nbDerivations + "\", is not a number (to define number of derivations)");
+    THROW_INVALID_ARGUMENT("Parameter: \""sv + nbEndPoints + "\", is not a number (to define number of endpoints)");
   }
 }
 //
@@ -53,25 +53,25 @@ STIL_Player::STIL_Player (const std::string& nbDerivations)
 
 
 
-//! Creates an STIL command associated to derivation identifier and BinaryVector to send to SUT
+//! Creates an STIL command associated to endpoint identifier and BinaryVector to send to SUT
 //!
-std::vector <string>STIL_Player::CreateSTILCommand (uint32_t derivationId, const BinaryVector& toSutData) const
+std::vector <string>STIL_Player::CreateSTILCommand (uint32_t endpointId, const BinaryVector& toSutData) const
 {
   std::vector <string>STIL_commands;
 
   ostringstream os;
   BinaryVector select;
 
-  if (derivationId == 0)
+  if (endpointId == 0)
   {
     STIL_commands.push_back(CreateResetSTILCommand(false));
     return STIL_commands;
   }
 
-  if (derivationId > m_nbDerivations)
-    THROW_INVALID_ARGUMENT("DerivationId must be comprised between '0' (for Reset) and tha total number of chains");
+  if (endpointId > m_nbEndPoints)
+    THROW_INVALID_ARGUMENT("EndPointId must be comprised between '0' (for Reset) and tha total number of chains");
 
-  select.Append(derivationId, m_nbDerivations);
+  select.Append(endpointId, m_nbEndPoints);
 
   os << "V{ CHAIN = " << select.DataAsBinaryString("", "") << "010-T}\n"; //Capture Cycle
   STIL_commands.push_back(os.str());

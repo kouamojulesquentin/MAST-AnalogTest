@@ -69,7 +69,7 @@ void UT_SVF_SimulationProtocol::test_Constructor_Bad_ToSutPath ()
 }
 
 
-//! Checks SVF_SimulationProtocol constructor DoAction when cannot open "From SUT path"
+//! Checks SVF_SimulationProtocol constructor DoCallback when cannot open "From SUT path"
 //!
 void UT_SVF_SimulationProtocol::test_Constructor_Bad_FromSutPath ()
 {
@@ -89,9 +89,9 @@ void UT_SVF_SimulationProtocol::test_Constructor_Bad_FromSutPath ()
 
 
 
-//! Checks SVF_SimulationProtocol::DoAction when the exchanges are synchronous (same thread)
+//! Checks SVF_SimulationProtocol::DoCallback when the exchanges are synchronous (same thread)
 //!
-void UT_SVF_SimulationProtocol::test_DoAction_Sync ()
+void UT_SVF_SimulationProtocol::test_DoCallback_Sync ()
 {
   // ---------------- DDT Setup
   //
@@ -105,7 +105,7 @@ void UT_SVF_SimulationProtocol::test_DoAction_Sync ()
   {
     // ---------------- Setup
     //
-    auto derivationId = std::get<0>(data);
+    auto endpointId = std::get<0>(data);
     auto toSutData    = std::get<1>(data);
 
     auto toSutVector = BinaryVector::CreateFromString(toSutData);
@@ -115,7 +115,7 @@ void UT_SVF_SimulationProtocol::test_DoAction_Sync ()
 
     // ---------------- Exercise
     //
-    auto fromSutVector = sut.DoAction(derivationId, nullptr, toSutVector);
+    auto fromSutVector = sut.DoCallback(endpointId, nullptr, toSutVector);
 
     // ---------------- Verify
     //
@@ -186,9 +186,9 @@ void UT_SVF_SimulationProtocol::test_DoAction_Sync ()
 }
 
 
-//! Checks SVF_SimulationProtocol::DoAction when the exchanges are asynchronous (different thread)
+//! Checks SVF_SimulationProtocol::DoCallback when the exchanges are asynchronous (different thread)
 //!
-void UT_SVF_SimulationProtocol::test_DoAction_ASync ()
+void UT_SVF_SimulationProtocol::test_DoCallback_ASync ()
 {
   // ---------------- DDT Setup
   //
@@ -203,7 +203,7 @@ void UT_SVF_SimulationProtocol::test_DoAction_ASync ()
   {
     // ---------------- Setup
     //
-    auto derivationId = std::get<0>(data);
+    auto endpointId = std::get<0>(data);
     auto toSutData    = std::get<1>(data);
 
     auto toSutVector = BinaryVector::CreateFromString(toSutData);
@@ -211,7 +211,7 @@ void UT_SVF_SimulationProtocol::test_DoAction_ASync ()
 
     // ---------------- Exercise
     //
-    auto fromSutVector = sut.DoAction(derivationId, nullptr, toSutVector);
+    auto fromSutVector = sut.DoCallback(endpointId, nullptr, toSutVector);
 
     // ---------------- Verify
     //

@@ -35,9 +35,9 @@ class UT_Remote_Protocol_Proxy : public CxxTest::TestSuite
   void test_DoReset_Sync ();
   void test_DoReset_ASync ();
 
-  void test_DoAction ();
-  void test_DoAction_invalid_DerivationId ();
-  void test_DoAction_invalid_InterfaceData ();
+  void test_DoCallback ();
+  void test_DoCallback_invalid_EndPointId ();
+  void test_DoCallback_invalid_InterfaceData ();
 
   // ================ Other Methods ================
 

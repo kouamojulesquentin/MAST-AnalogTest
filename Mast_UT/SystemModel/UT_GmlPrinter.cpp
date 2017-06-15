@@ -410,7 +410,7 @@ void UT_GmlPrinter::test_Visit_NoEdgeForSelector ()
 }
 
 
-//! Checks GmlPrinter::Visit_xxx() when requesting selection values for Linker derivations
+//! Checks GmlPrinter::Visit_xxx() when requesting selection values for Linker endpoints
 //!
 void UT_GmlPrinter::test_Visit_SelectionValues ()
 {

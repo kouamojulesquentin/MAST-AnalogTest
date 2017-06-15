@@ -57,7 +57,7 @@ void SystemModelChecker::CheckAccessInterface ()
 
   if (rootAsAI)
   {
-    CheckNumberOfDerivations(rootAsAI);
+    CheckNumberOfEndPoints(rootAsAI);
 //+    CheckNoAccessInterfaceBellow(rootAsAI);
   }
   else if (rootAsChain)
@@ -70,7 +70,7 @@ void SystemModelChecker::CheckAccessInterface ()
       if (childAsAi)
       {
         ++aiCount;
-        CheckNumberOfDerivations(childAsAi);
+        CheckNumberOfEndPoints(childAsAi);
 //+        CheckNoAccessInterfaceBellow(childAsAi);
       }
       else
@@ -210,40 +210,40 @@ bool SystemModelChecker::CheckChildNode (shared_ptr<const ParentNode> parent, sh
 //---------------------------------------------------------------------------
 
 
-//! Checks the an interface has no more derivation than is supported by its protocol
+//! Checks the an interface has no more endpoint than is supported by its protocol
 //!
 //! @note Does no check when there is no protocol (this is checked everywhere)
 //!
-void SystemModelChecker::CheckNumberOfDerivations (shared_ptr<AccessInterface> accessInterface)
+void SystemModelChecker::CheckNumberOfEndPoints (shared_ptr<AccessInterface> accessInterface)
 {
   auto protocol = accessInterface->Protocol();
 
   if (protocol)
   {
-    auto maxDerivations = protocol->MaxSupportedDerivations();
+    auto maxEndPoints = protocol->MaxSupportedEndPoints();
     auto childrenCount  = accessInterface->DirectChildrenCount();
 
-    if (childrenCount >= maxDerivations) // Max derivations includes pseudo derivation reserved to do "Reset" action
+    if (childrenCount >= maxEndPoints) // Max endpoints includes pseudo endpoint reserved to do "Reset" action
     {
       auto message =   " has too many children ("                + to_string(childrenCount)
-                     + ") ; its protocol supports a maximum of " + to_string(maxDerivations)
-                     + " derivations (including one 'pseudo derivation' reserved for reset action)";
+                     + ") ; its protocol supports a maximum of " + to_string(maxEndPoints)
+                     + " endpoints (including one 'pseudo endpoint' reserved for reset action)";
       ReportError(*accessInterface, message);
     }
-    else if (maxDerivations > (childrenCount + 1u))
+    else if (maxEndPoints > (childrenCount + 1u))
     {
-      auto diff = maxDerivations - childrenCount;
-      if (diff < 100u)  // Do not report for virtually unlimited maxDerivations
+      auto diff = maxEndPoints - childrenCount;
+      if (diff < 100u)  // Do not report for virtually unlimited maxEndPoints
       {
         ReportInfo(*accessInterface,   " has only "                                                + to_string(childrenCount)
-                                     + " children even though its protocol supports a maximum of " + to_string(maxDerivations)
-                                     + " derivations (including one 'pseudo derivation' reserved for reset action)");
+                                     + " children even though its protocol supports a maximum of " + to_string(maxEndPoints)
+                                     + " endpoints (including one 'pseudo endpoint' reserved for reset action)");
       }
     }
   }
 }
 //
-//  End of: SystemModelChecker::CheckNumberOfDerivations
+//  End of: SystemModelChecker::CheckNumberOfEndPoints
 //---------------------------------------------------------------------------
 
 

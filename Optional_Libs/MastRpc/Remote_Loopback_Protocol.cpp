@@ -41,7 +41,7 @@ Remote_Loopback_Protocol::Remote_Loopback_Protocol ()
 //!
 //! @return data scanned out from SUT
 pair<uint32_t, vector<uint8_t> >
-Remote_Loopback_Protocol::DoAction (const string&          /* commandName */,
+Remote_Loopback_Protocol::DoCallback (const string&          /* commandName */,
                                     uint32_t               bitsCount,
                                     const vector<uint8_t>& toSutScanVector)
 {

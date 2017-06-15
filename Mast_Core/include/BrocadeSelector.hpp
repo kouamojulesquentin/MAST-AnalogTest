@@ -52,8 +52,8 @@ class MAST_CORE_EXPORT BrocadeSelector : public DefaultTableBasedPathSelector
 
   using TablesType = DefaultTableBasedPathSelector::TablesType;
 
-  static TablesType CreateSelectTable   (uint32_t pathsCount, SelectorProperty properties);  //!< Create N_Hot style table to select a derivation
-  static TablesType CreateDeselectTable (uint32_t pathsCount, SelectorProperty properties);  //!< Create N_Hot style table to unselect a derivation
+  static TablesType CreateSelectTable   (uint32_t pathsCount, SelectorProperty properties);  //!< Create N_Hot style table to select a endpoint
+  static TablesType CreateDeselectTable (uint32_t pathsCount, SelectorProperty properties);  //!< Create N_Hot style table to unselect a endpoint
 
   virtual std::experimental::string_view KindName() const override { return "Brocade"; }; //!< Returns readable type of selector
 

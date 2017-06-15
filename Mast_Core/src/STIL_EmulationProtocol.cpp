@@ -31,15 +31,15 @@ STIL_EmulationProtocol::STIL_EmulationProtocol(uint32_t n_chains)
 }
 
 
-//! Initializes a with number of derivations defined by a string
+//! Initializes a with number of endpoints defined by a string
 //!
-//! @param nbDerivations  Number of derivation defined as C/C++ decimal,
+//! @param nbEndPoints  Number of endpoint defined as C/C++ decimal,
 //!                       hexadecimal or octal
 //!
 //! @note It is useful when parsing SystemModel from text file
 //!
-STIL_EmulationProtocol::STIL_EmulationProtocol (const string& nbDerivations)
-  : STIL_Player(nbDerivations)
+STIL_EmulationProtocol::STIL_EmulationProtocol (const string& nbEndPoints)
+  : STIL_Player(nbEndPoints)
 {
 }
 //
@@ -51,9 +51,9 @@ STIL_EmulationProtocol::STIL_EmulationProtocol (const string& nbDerivations)
 
 //! Loopbacks "to SUT data" logging STIL command(s) that would be issued if it was really an operating protocol
 //!
-BinaryVector STIL_EmulationProtocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector STIL_EmulationProtocol::DoCallback (uint32_t endpointId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
-  for (auto command : CreateSTILCommand(derivationId, toSutData) )
+  for (auto command : CreateSTILCommand(endpointId, toSutData) )
  {
    while (command.back() == '\n')
    {

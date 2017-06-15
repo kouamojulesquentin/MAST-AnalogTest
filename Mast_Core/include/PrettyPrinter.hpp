@@ -103,7 +103,7 @@ class MAST_CORE_EXPORT PrettyPrinter : public SystemModelVisitor
   private:
   uint32_t                      m_depth                  = 0u;    //!< Current nodes tree depth
   std::shared_ptr<PathSelector> m_selector;                       //!< This is used to tell when a child of a linker is selected/active
-  uint32_t                      m_childId                = 0u;    //!< When m_selector is valid, it tells what derivation id is currently beeing "Pretty Printed"
+  uint32_t                      m_childId                = 0u;    //!< When m_selector is valid, it tells what endpoint id is currently beeing "Pretty Printed"
   std::ostringstream            m_os;                             //!< Stream to build up a representation of visited system model nodes
   bool                          m_processingSelector     = false; //!< When true, we are visiting a path selector (while visiting a linker)
   pos_type                      m_startPos               = 0;     //!< Position, in stream, of first character of current line

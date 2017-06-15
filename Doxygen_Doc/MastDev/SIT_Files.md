@@ -198,7 +198,7 @@ It is the equivalent of the [PDL] <code>iProcsForModule</code> command.</td></tr
     <td>
       <protocol> <optional_AI_identifier>* <IR_size>  <optional_IR_coding>* <max_DR_chains><br>
       Creates an IEEE-1149.1 compliant Test Access Port composed by a AI_1149_1 node having a "IR_size" IR register controlling <br>
-      a DR_MUX for "chain count" derivations, with a 1-bit bypass register already appended.<br>
+      a DR_MUX for "chain count" endpoints, with a 1-bit bypass register already appended.<br>
       When no coding is provided, BYPASS is selected by FFFF (all ones), and chains by a binary selection starting at 0x01.<br>
 
       <table>

@@ -31,22 +31,22 @@ class MAST_CORE_EXPORT LoopbackAccessInterfaceProtocol : public AccessInterfaceP
   ~LoopbackAccessInterfaceProtocol() = default;
   LoopbackAccessInterfaceProtocol()  = default;
 
-  //! Does any action required to transfer scan data to and from SUT
+  //! Does any callback required to transfer scan data to and from SUT
   //!
-  //! @param derivationId   Identifies the derivation to act for (zero based)
+  //! @param endpointId   Identifies the endpoint to act for (zero based)
   //! @param interfaceData  Application data stored in the AccessInterface
   //! @param toSutData      Bits stream to transfer to SUT
   //!
   //! @return Bits stream retrieved from SUT
-  virtual BinaryVector DoAction(uint32_t derivationId, void* interfaceData, const BinaryVector& toSutData) override;
+  virtual BinaryVector DoCallback(uint32_t endpointId, void* interfaceData, const BinaryVector& toSutData) override;
 
-  //! Gets the number of derivations supported by the specific protocol
+  //! Gets the number of endpoints supported by the specific protocol
   //!
-  //! @note Derivation id 0 is reserved for reset operation, so protocol must support a least two derivations
+  //! @note EndPoint id 0 is reserved for reset operation, so protocol must support a least two endpoints
   //!
-  //! @return The number of supported derivation (including pseudo derivation 0 for reset)
+  //! @return The number of supported endpoint (including pseudo endpoint 0 for reset)
   //!
-  virtual uint32_t MaxSupportedDerivations() const override { return UINT32_MAX; }
+  virtual uint32_t MaxSupportedEndPoints() const override { return UINT32_MAX; }
 
   //! Returns readable type of protocol
   //!

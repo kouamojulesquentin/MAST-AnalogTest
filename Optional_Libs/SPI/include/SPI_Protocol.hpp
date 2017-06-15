@@ -48,13 +48,13 @@ class SPI_Protocol final : public SPI_Player
 
   //! Does any action required to transfer scan data to and from SUT
   //!
-  //! @param derivationId   Identifies the derivation to act for (zero based)
+  //! @param endpointId   Identifies the endpoint to act for (zero based)
   //! @param interfaceData  Application data stored in the AccessInterface
   //! @param toSutData      Bits stream to transfer to SUT
   //!
   //! @return Bitstream retrieved from SUT
   //!
-  virtual BinaryVector DoAction(uint32_t derivationId, void* interfaceData, const BinaryVector& toSutData) override;
+  virtual BinaryVector DoCallback(uint32_t endpointId, void* interfaceData, const BinaryVector& toSutData) override;
 
   //! Returns readable type of protocol
   //!

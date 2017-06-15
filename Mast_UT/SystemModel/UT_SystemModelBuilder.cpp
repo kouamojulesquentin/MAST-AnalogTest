@@ -327,9 +327,9 @@ void UT_SystemModelBuilder::test_Create_PathSelector_NHot_CanSelectNone ()
 }
 
 
-//! Checks TestModelBuilder::Create_MIB() with 1 Derivation
+//! Checks TestModelBuilder::Create_MIB() with 1 EndPoint
 //!
-void UT_SystemModelBuilder::test_Create_MIB_1_Derivation ()
+void UT_SystemModelBuilder::test_Create_MIB_1_EndPoint ()
 {
   // ---------------- Setup
   //
@@ -401,7 +401,7 @@ void UT_SystemModelBuilder::test_Create_MIB_1_Derivation ()
 
 //! Checks TestModelBuilder::Create_MIB() with 4 chains
 //!
-void UT_SystemModelBuilder::test_Create_MIB_4_Derivations ()
+void UT_SystemModelBuilder::test_Create_MIB_4_EndPoints ()
 {
   // ---------------- Setup
   //

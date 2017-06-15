@@ -236,8 +236,8 @@ vector<AppFunctionAndNodePath> CreateTestcase (shared_ptr<AccessInterfaceProtoco
       //!
       auto builder          = SystemModelBuilder(*sm);
       auto accessInterface  = builder.Create_JTAG_TAP("Tap", 8u, 2u, protocol);
-      auto derivationsCount = uint32_t(4u);
-      auto wrapper          = builder.Create_1500_Wrapper("1500", derivationsCount);
+      auto endpointsCount = uint32_t(4u);
+      auto wrapper          = builder.Create_1500_Wrapper("1500", endpointsCount);
 
       accessInterface->AppendChild(wrapper);
       auto registerNamePrefix = "dynamic_";

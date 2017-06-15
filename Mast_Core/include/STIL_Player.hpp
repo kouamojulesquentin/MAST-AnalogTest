@@ -32,19 +32,19 @@ class MAST_CORE_EXPORT STIL_Player : public AccessInterfaceProtocol
   public:
   ~STIL_Player() = default;
   STIL_Player() = delete;
-  STIL_Player(uint32_t nbDerivations) { m_nbDerivations = nbDerivations; }
+  STIL_Player(uint32_t nbEndPoints) { m_nbEndPoints = nbEndPoints; }
 
-  //! Initializes a with number of derivations defined by a string
+  //! Initializes a with number of endpoints defined by a string
   //!
-  STIL_Player(const std::string& nbDerivations);
+  STIL_Player(const std::string& nbEndPoints);
 
-  //! Gets the number of derivations supported by the specific protocol
+  //! Gets the number of endpoints supported by the specific protocol
   //!
-  //! @note Derivation id 0 is reserved for reset operation, so protocol must support a least two derivations
+  //! @note EndPoint id 0 is reserved for reset operation, so protocol must support a least two endpoints
   //!
-  //! @return The number of supported derivation (including pseudo derivation 0 for reset)
+  //! @return The number of supported endpoint (including pseudo endpoint 0 for reset)
   //!
-  virtual uint32_t MaxSupportedDerivations() const override { return m_nbDerivations; }
+  virtual uint32_t MaxSupportedEndPoints() const override { return m_nbEndPoints; }
 
   //! Returns true when TRST JTAG port is supported
   //!
@@ -55,9 +55,9 @@ class MAST_CORE_EXPORT STIL_Player : public AccessInterfaceProtocol
   void  SupportTRST (bool supportTRST) { m_supportTRST = supportTRST; }
 
 
-  //! Creates an STIL command associated to derivation identifier and BinaryVector to send to SUT
+  //! Creates an STIL command associated to endpoint identifier and BinaryVector to send to SUT
   //!
-  std::vector<std::string> CreateSTILCommand(uint32_t derivationId, const BinaryVector& toSutData) const;
+  std::vector<std::string> CreateSTILCommand(uint32_t endpointId, const BinaryVector& toSutData) const;
 
   //! Creates an STIL reset command
   //!
@@ -68,7 +68,7 @@ class MAST_CORE_EXPORT STIL_Player : public AccessInterfaceProtocol
   //
   private:
   bool     m_supportTRST   = false; //!< When true, TRST instruction is used for reset unless synchronous reset is requested
-  uint32_t m_nbDerivations = 0;     //!< Number of derivations
+  uint32_t m_nbEndPoints = 0;     //!< Number of endpoints
 };
 //
 //  End of STIL_Player class declaration

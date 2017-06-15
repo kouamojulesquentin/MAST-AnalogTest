@@ -316,24 +316,24 @@ std::shared_ptr<GenericAccessInterfaceProtocol> CreateGenericAccessInterfaceProt
     return BinaryVector();
   };
 
-  auto derivationAction = [](const std::vector<Primitive>& primitives, uint32_t derivationId, void* /* data */, const BinaryVector& toSutData)
+  auto endpointAction = [](const std::vector<Primitive>& primitives, uint32_t endpointId, void* /* data */, const BinaryVector& toSutData)
   {
     BinaryVector   fromSutData;
     PrimitiveParam param(toSutData, fromSutData);
 
-    primitives[derivationId](&param);
+    primitives[endpointId](&param);
 
     return param.fromSutData;
   };
 
-  auto action_1 = [derivationAction](const std::vector<Primitive>& primitives, void* data, const BinaryVector& toSutData)
+  auto action_1 = [endpointAction](const std::vector<Primitive>& primitives, void* data, const BinaryVector& toSutData)
   {
-    return derivationAction(primitives, 1u, data, toSutData);
+    return endpointAction(primitives, 1u, data, toSutData);
   };
 
-  auto action_2 = [derivationAction](const std::vector<Primitive>& primitives, void* data, const BinaryVector& toSutData)
+  auto action_2 = [endpointAction](const std::vector<Primitive>& primitives, void* data, const BinaryVector& toSutData)
   {
-    return derivationAction(primitives, 2u, data, toSutData);
+    return endpointAction(primitives, 2u, data, toSutData);
   };
 
   vector<Primitive> primitives = {primitive_0, primitive_1, primitive_2};

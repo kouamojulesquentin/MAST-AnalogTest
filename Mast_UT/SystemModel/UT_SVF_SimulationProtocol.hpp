@@ -32,8 +32,8 @@ class UT_SVF_SimulationProtocol : public CxxTest::TestSuite
   void test_Constructor_Bad_ToSutPath ();
   void test_Constructor_Bad_FromSutPath ();
 
-  void test_DoAction_Sync ();
-  void test_DoAction_ASync ();
+  void test_DoCallback_Sync ();
+  void test_DoCallback_ASync ();
 
   void test_DoReset ();
   void test_DoReset_SupportTRST ();

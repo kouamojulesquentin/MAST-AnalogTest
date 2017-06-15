@@ -36,10 +36,10 @@ class BinaryVector;
 
 //! Represents dynamically selectable chains of registers
 //! It models dynamic topologies, like for instance the ScanMux/SIB of 1687.
-//! Like the Chain node it has some derivations stored as child, but they are not always available (i.e. "active") for
+//! Like the Chain node it has some endpoints stored as child, but they are not always available (i.e. "active") for
 //! data access.
 //!
-//! Based on its status, the LINKER can determine if each of its derivations is "active", and is therefore part of the
+//! Based on its status, the LINKER can determine if each of its endpoints is "active", and is therefore part of the
 //! active scan path.
 //!
 class MAST_CORE_EXPORT Linker : public ParentNode

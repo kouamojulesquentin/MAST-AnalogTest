@@ -47,7 +47,7 @@ bool is_space(unsigned char const c ){ return std::isspace(c);};
 //!
 //! @return data scanned out from SUT
 pair<uint32_t, vector<uint8_t> >
-Advantest_SmartRDI_Protocol::DoAction (const string&          commandName,
+Advantest_SmartRDI_Protocol::DoCallback (const string&          commandName,
                                        uint32_t               bitsCount,
                                        const vector<uint8_t>& toSutScanVector)
 {
@@ -57,16 +57,16 @@ Advantest_SmartRDI_Protocol::DoAction (const string&          commandName,
   uint8_t bytesCount = toSutScanVector.size();
 //  vector<uint8_t> fromSutScanVector;
 
-  std::cout << "Advantest_SmartRDI_Protocol::DoAction\n";
+  std::cout << "Advantest_SmartRDI_Protocol::DoCallback\n";
 
   if ((bitsCount == 0) || (bytesCount == 0))
   {
-    throw std::runtime_error("DoAction: Invalid due to no bits to send to SUT");
+    throw std::runtime_error("DoCallback: Invalid due to no bits to send to SUT");
   }
 
   if (((bitsCount + 7u) / 8u) != bytesCount)
   {
-    throw std::runtime_error("DoAction: Invalid due to incoherence between bits count and data vector bytes count");
+    throw std::runtime_error("DoCallback: Invalid due to incoherence between bits count and data vector bytes count");
   }
 
   JtagFunction_t jtagFunc = NULL;
@@ -84,7 +84,7 @@ Advantest_SmartRDI_Protocol::DoAction (const string&          commandName,
 
   if (!jtagFunc)
   {
-    string message = string("DoAction: Got not supported command name \"").append(local_commandName).append("\"");
+    string message = string("DoCallback: Got not supported command name \"").append(local_commandName).append("\"");
     throw std::runtime_error(message);
   }
 

@@ -22,9 +22,9 @@ using namespace test;
 
 //! Spies content how binary vector to SUT is transformed to STIL command while returning the BinaryVector unchanged
 //!
-BinaryVector Spy_STIL_Protocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector Spy_STIL_Protocol::DoCallback (uint32_t endpointId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
-  for (auto command : CreateSTILCommand(derivationId, toSutData) )
+  for (auto command : CreateSTILCommand(endpointId, toSutData) )
    {
    SaveCommands(command);
    }
@@ -32,7 +32,7 @@ BinaryVector Spy_STIL_Protocol::DoAction (uint32_t derivationId, void* /* interf
   return toSutData;
 }
 //
-//  End of: Spy_STIL_Protocol::DoAction
+//  End of: Spy_STIL_Protocol::DoCallback
 //---------------------------------------------------------------------------
 
 

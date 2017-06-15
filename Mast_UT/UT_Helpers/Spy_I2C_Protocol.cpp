@@ -26,14 +26,14 @@ using namespace test;
 
 //! Spies content how binary vector to SUT is transformed to I2C command while returning the BinaryVector unchanged
 //!
-BinaryVector Spy_I2C_Protocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector Spy_I2C_Protocol::DoCallback (uint32_t endpointId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
-  auto commands = CreateI2CCommand(derivationId, toSutData);
+  auto commands = CreateI2CCommand(endpointId, toSutData);
   SaveCommands(commands);
   return toSutData;
 }
 //
-//  End of: Spy_I2C_Protocol::DoAction
+//  End of: Spy_I2C_Protocol::DoCallback
 //---------------------------------------------------------------------------
 
 

@@ -82,25 +82,25 @@ GenericAccessInterfaceProtocol CreateSut (string& loggedActions)
     return BinaryVector();
   };
 
-  auto derivationAction = [](const std::vector<Primitive>& primitives, uint32_t derivationId, void* data, const BinaryVector& toSutData)
+  auto endpointAction = [](const std::vector<Primitive>& primitives, uint32_t endpointId, void* data, const BinaryVector& toSutData)
   {
     const string&  context = *reinterpret_cast<const string*>(data);
     BinaryVector   fromSutData;
     PrimitiveParam param(context, toSutData, fromSutData);
 
-    primitives[derivationId](&param);
+    primitives[endpointId](&param);
 
     return param.fromSutData;
   };
 
-  auto action_1 = [derivationAction](const std::vector<Primitive>& primitives, void* data, const BinaryVector& toSutData)
+  auto action_1 = [endpointAction](const std::vector<Primitive>& primitives, void* data, const BinaryVector& toSutData)
   {
-    return derivationAction(primitives, 1u, data, toSutData);
+    return endpointAction(primitives, 1u, data, toSutData);
   };
 
-  auto action_2 = [derivationAction](const std::vector<Primitive>& primitives, void* data, const BinaryVector& toSutData)
+  auto action_2 = [endpointAction](const std::vector<Primitive>& primitives, void* data, const BinaryVector& toSutData)
   {
-    return derivationAction(primitives, 2u, data, toSutData);
+    return endpointAction(primitives, 2u, data, toSutData);
   };
 
   vector<Primitive> primitives = {primitive_0, primitive_1, primitive_2};
@@ -252,9 +252,9 @@ void UT_GenericAccessInterfaceProtocol::test_Constructor_Vector_TooFew_Actions (
 
 
 
-//! Checks GenericAccessInterfaceProtocol::DoAction with derivation identifier 0
+//! Checks GenericAccessInterfaceProtocol::DoCallback with endpoint identifier 0
 //!
-void UT_GenericAccessInterfaceProtocol::test_DoAction_0 ()
+void UT_GenericAccessInterfaceProtocol::test_DoCallback_0 ()
 {
   // ---------------- Setup
   //
@@ -265,7 +265,7 @@ void UT_GenericAccessInterfaceProtocol::test_DoAction_0 ()
 
   // ---------------- Exercise
   //
-  auto gotVector = sut.DoAction(0u, &text, toSutData);
+  auto gotVector = sut.DoCallback(0u, &text, toSutData);
 
   // ---------------- Verify
   //
@@ -274,9 +274,9 @@ void UT_GenericAccessInterfaceProtocol::test_DoAction_0 ()
 }
 
 
-//! Checks GenericAccessInterfaceProtocol::DoAction with derivation identifier 1
+//! Checks GenericAccessInterfaceProtocol::DoCallback with endpoint identifier 1
 //!
-void UT_GenericAccessInterfaceProtocol::test_DoAction_1 ()
+void UT_GenericAccessInterfaceProtocol::test_DoCallback_1 ()
 {
   // ---------------- Setup
   //
@@ -287,7 +287,7 @@ void UT_GenericAccessInterfaceProtocol::test_DoAction_1 ()
 
   // ---------------- Exercise
   //
-  auto gotVector = sut.DoAction(1u, &context, toSutData);
+  auto gotVector = sut.DoCallback(1u, &context, toSutData);
 
   // ---------------- Verify
   //
@@ -296,9 +296,9 @@ void UT_GenericAccessInterfaceProtocol::test_DoAction_1 ()
 }
 
 
-//! Checks GenericAccessInterfaceProtocol::DoAction with derivation identifier 2
+//! Checks GenericAccessInterfaceProtocol::DoCallback with endpoint identifier 2
 //!
-void UT_GenericAccessInterfaceProtocol::test_DoAction_2 ()
+void UT_GenericAccessInterfaceProtocol::test_DoCallback_2 ()
 {
   // ---------------- Setup
   //
@@ -309,7 +309,7 @@ void UT_GenericAccessInterfaceProtocol::test_DoAction_2 ()
 
   // ---------------- Exercise
   //
-  auto gotVector = sut.DoAction(2u, &context, toSutData);
+  auto gotVector = sut.DoCallback(2u, &context, toSutData);
 
   // ---------------- Verify
   //
@@ -318,9 +318,9 @@ void UT_GenericAccessInterfaceProtocol::test_DoAction_2 ()
 }
 
 
-//! Checks GenericAccessInterfaceProtocol::DoAction with derivation identifier 3
+//! Checks GenericAccessInterfaceProtocol::DoCallback with endpoint identifier 3
 //!
-void UT_GenericAccessInterfaceProtocol::test_DoAction_3 ()
+void UT_GenericAccessInterfaceProtocol::test_DoCallback_3 ()
 {
   // ---------------- Setup
   //
@@ -331,7 +331,7 @@ void UT_GenericAccessInterfaceProtocol::test_DoAction_3 ()
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (sut.DoAction(3u, &context, toSutData), std::exception);
+  TS_ASSERT_THROWS (sut.DoCallback(3u, &context, toSutData), std::exception);
 }
 
 //===========================================================================

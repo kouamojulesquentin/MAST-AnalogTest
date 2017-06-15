@@ -29,23 +29,23 @@ class AccessInterfaceProtocol
   public:
   virtual ~AccessInterfaceProtocol() = default;
 
-  //! Does any action required to transfer scan data to and from SUT
+  //! Does any callback required to transfer scan data to and from SUT
   //!
-  //! @param derivationId   Identifies the derivation to act for (zero based)
-  //!                       Derivation 0 is reserved for reset operation
+  //! @param endpointId   Identifies the endpoint to act for (zero based)
+  //!                       EndPoint 0 is reserved for reset operation
   //! @param interfaceData  Application data stored in the AccessInterface
   //! @param toSutData      Bits stream to transfer to SUT
   //!
   //! @return Bits stream retrieved from SUT
-  virtual BinaryVector DoAction(uint32_t derivationId, void* interfaceData, const BinaryVector& toSutData) = 0;
+  virtual BinaryVector DoCallback(uint32_t endpointId, void* interfaceData, const BinaryVector& toSutData) = 0;
 
-  //! Gets the number of derivations supported by the specific protocol
+  //! Gets the number of endpoints supported by the specific protocol
   //!
-  //! @note Derivation id 0 is reserved for reset operation, so protocol must support a least two derivations
+  //! @note EndPoint id 0 is reserved for reset operation, so protocol must support a least two endpoints
   //!
-  //! @return The number of supported derivation (including pseudo derivation 0 for reset)
+  //! @return The number of supported endpoint (including pseudo endpoint 0 for reset)
   //!
-  virtual uint32_t MaxSupportedDerivations() const = 0;
+  virtual uint32_t MaxSupportedEndPoints() const = 0;
 
   //! Returns readable type of protocol (I2C, SVF_Simu, OpenOCD, SPI...)
   //!

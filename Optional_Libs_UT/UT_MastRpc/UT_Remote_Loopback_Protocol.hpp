@@ -30,7 +30,7 @@ class UT_Remote_Loopback_Protocol : public CxxTest::TestSuite
 
   void test_Constructor ();
   void test_DoReset ();
-  void test_DoAction ();
+  void test_DoCallback ();
 };
 //
 //  End of UT_Remote_Loopback_Protocol class declaration

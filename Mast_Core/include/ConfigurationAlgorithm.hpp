@@ -23,7 +23,7 @@ namespace mast
 class Linker;
 class SystemModelNode;
 
-//! Defines interface for algorithms to select a Linker path (derivation)
+//! Defines interface for algorithms to select a Linker path (endpoint)
 //!
 class MAST_CORE_EXPORT ConfigurationAlgorithm
 {

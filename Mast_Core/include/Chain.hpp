@@ -23,7 +23,7 @@ namespace mast
 //! This node represents the concatenation of elements (register, ScanMuxes etc..) in the SUT through the cardinality
 //! of children nodes: node(i+1) follows node (i).
 //!
-//! @note note that a CHAIN node with only one derivation has no functional effect on the execution, but it can be
+//! @note note that a CHAIN node with only one endpoint has no functional effect on the execution, but it can be
 //! used to package some sub-system and exploit the "append" method to assure correct construction.
 //!
 class MAST_CORE_EXPORT Chain : public ParentNode

@@ -404,7 +404,7 @@ t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_
   const auto  irSize             = $5;
   const auto& irTable            = $6;
   const auto  nbDRChains         = $7;
-  const auto  nbDerivations      = nbDRChains + 1u;
+  const auto  nbEndPoints      = nbDRChains + 1u;
 
 //  string      creatorId("JTAG_");
 //  creatorId.append(protocolName);
@@ -427,13 +427,13 @@ t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_
       {
         auto node = driver.builder->Create_JTAG_TAP(nodeName,
                                                     irSize,
-                                                    nbDerivations,
+                                                    nbEndPoints,
                                                     shared_ptr<AccessInterfaceProtocol>(std::move(protocol)));
         $$ = node;
       }
       else
       {
-        if (irTable.size() != nbDerivations)
+        if (irTable.size() != nbEndPoints)
         {
           ERROR_MESSAGE(msg) << STREAM_NODE_NAME("JTAG_TAP", $[node_name].name)
                              << "Error Coding must be provided for bypass register and each chain";
@@ -441,7 +441,7 @@ t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_
         }
         auto node = driver.builder->Create_JTAG_TAP(nodeName,
                                                     irSize,
-                                                    nbDerivations,
+                                                    nbEndPoints,
                                                     shared_ptr<AccessInterfaceProtocol>(std::move(protocol)),
                                                     irTable);
         $$ = node;

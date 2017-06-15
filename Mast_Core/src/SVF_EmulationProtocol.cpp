@@ -28,9 +28,9 @@ using namespace std::string_literals;
 
 //! Loopbacks "to SUT data" logging SVF command(s) that would be issued if it was really an operating protocol
 //!
-BinaryVector SVF_EmulationProtocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector SVF_EmulationProtocol::DoCallback (uint32_t endpointId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
-  auto command = CreateSVFCommand(derivationId, toSutData);
+  auto command = CreateSVFCommand(endpointId, toSutData);
 
   while (command.back() == '\n')
   {

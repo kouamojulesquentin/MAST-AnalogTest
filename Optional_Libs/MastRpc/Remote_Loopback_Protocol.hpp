@@ -38,7 +38,7 @@ class Remote_Loopback_Protocol : public Remote_Protocol
   //!
   //! @return data scanned out from SUT
   virtual std::pair<uint32_t, std::vector<uint8_t> >
-  DoAction(const std::string& commandName, uint32_t bitsCount, const std::vector<uint8_t>& toSutScanVector);
+  DoCallback(const std::string& commandName, uint32_t bitsCount, const std::vector<uint8_t>& toSutScanVector);
 
   //! Forces the ResetPort to be asserted on the target module
   //!

@@ -32,7 +32,7 @@ using namespace mast;
 using namespace test;
 
 
-//! Checks STIL_EmulationProtocol constructor given max derivation as an integer
+//! Checks STIL_EmulationProtocol constructor given max endpoint as an integer
 //!
 void UT_STIL_EmulationProtocol::test_Constructor_Integer ()
 {
@@ -48,7 +48,7 @@ void UT_STIL_EmulationProtocol::test_Constructor_Integer ()
 
 
 
-void UT_STIL_EmulationProtocol::test_MaxSupportedDerivations ()
+void UT_STIL_EmulationProtocol::test_MaxSupportedEndPoints ()
 {
   // ---------------- Setup
   //
@@ -56,14 +56,14 @@ void UT_STIL_EmulationProtocol::test_MaxSupportedDerivations ()
 
   // ---------------- Exercise
   //
-  auto maxSupportedDerivations = sut.MaxSupportedDerivations();
+  auto maxSupportedEndPoints = sut.MaxSupportedEndPoints();
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS (maxSupportedDerivations, 3u);
+  TS_ASSERT_EQUALS (maxSupportedEndPoints, 3u);
 }
 
-//! Checks STIL_EmulationProtocol constructor given max derivation as a string
+//! Checks STIL_EmulationProtocol constructor given max endpoint as a string
 //!
 void UT_STIL_EmulationProtocol::test_Constructor_String ()
 {
@@ -73,17 +73,17 @@ void UT_STIL_EmulationProtocol::test_Constructor_String ()
   {
     // ---------------- Setup
     //
-    auto maxDerivationsString   = string(std::get<0>(data));
-    auto expectedMaxDerivations = std::get<1>(data);
+    auto maxEndPointsString   = string(std::get<0>(data));
+    auto expectedMaxEndPoints = std::get<1>(data);
 
     // ---------------- Exercise
     //
-    auto sut = STIL_EmulationProtocol(maxDerivationsString);
+    auto sut = STIL_EmulationProtocol(maxEndPointsString);
 
     // ---------------- Verify
     //
-    auto maxSupportedDerivations = sut.MaxSupportedDerivations();
-    TS_ASSERT_EQUALS (maxSupportedDerivations, expectedMaxDerivations);
+    auto maxSupportedEndPoints = sut.MaxSupportedEndPoints();
+    TS_ASSERT_EQUALS (maxSupportedEndPoints, expectedMaxEndPoints);
   };
 
   auto data =
@@ -105,7 +105,7 @@ void UT_STIL_EmulationProtocol::test_Constructor_String ()
 }
 
 
-//! Checks STIL_EmulationProtocol constructor given max derivation as a string but with not valid numbers
+//! Checks STIL_EmulationProtocol constructor given max endpoint as a string but with not valid numbers
 //!
 void UT_STIL_EmulationProtocol::test_Constructor_String_Error ()
 {
@@ -115,11 +115,11 @@ void UT_STIL_EmulationProtocol::test_Constructor_String_Error ()
   {
     // ---------------- Setup
     //
-    string maxSupportedDerivations(data);
+    string maxSupportedEndPoints(data);
 
     // ---------------- Exercise & Verify
     //
-    TS_ASSERT_THROWS (auto sut = STIL_EmulationProtocol(maxSupportedDerivations), std::exception);
+    TS_ASSERT_THROWS (auto sut = STIL_EmulationProtocol(maxSupportedEndPoints), std::exception);
   };
 
   auto data =
@@ -154,11 +154,11 @@ void UT_STIL_EmulationProtocol::test_SPY_Constructor()
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS (sut.MaxSupportedDerivations(), n_chains);
+  TS_ASSERT_EQUALS (sut.MaxSupportedEndPoints(), n_chains);
 }
 
 
-void UT_STIL_EmulationProtocol::test_DoAction ()
+void UT_STIL_EmulationProtocol::test_DoCallback ()
 {
   // ---------------- Setup
   //
@@ -167,7 +167,7 @@ void UT_STIL_EmulationProtocol::test_DoAction ()
   // ---------------- Exercise & Verify
   //
   Spy_STIL_Protocol sut(n_chains);
-  TS_ASSERT_EQUALS (sut.MaxSupportedDerivations(), n_chains);
+  TS_ASSERT_EQUALS (sut.MaxSupportedEndPoints(), n_chains);
 
   auto checker = [&](auto data)
   {
@@ -179,7 +179,7 @@ void UT_STIL_EmulationProtocol::test_DoAction ()
 
     sut.resetCommands();
 
-    auto fromSutVector = sut.DoAction(n_chain,nullptr,toSutVector);
+    auto fromSutVector = sut.DoCallback(n_chain,nullptr,toSutVector);
     TS_ASSERT_EQUALS (toSutVector,fromSutVector); //It is a loopback
 
     auto gotSTILCommands=sut.STILCommands();

@@ -26,11 +26,11 @@ using namespace mast;
 
 //! Constructor from initializer_list
 //!
-GenericAccessInterfaceProtocol::GenericAccessInterfaceProtocol (initializer_list<Action> actions, initializer_list<Primitive> primitives)
-  : m_actions    (actions)
+GenericAccessInterfaceProtocol::GenericAccessInterfaceProtocol (initializer_list<Action> callbacks, initializer_list<Primitive> primitives)
+  : m_callbacks    (callbacks)
   , m_primitives (primitives)
 {
-  if (m_actions.size() < 2)
+  if (m_callbacks.size() < 2)
   {
     THROW_INVALID_ARGUMENT("Actions table must have at least two entries (including one reserved for reset)");
   }
@@ -49,11 +49,11 @@ GenericAccessInterfaceProtocol::GenericAccessInterfaceProtocol (initializer_list
 
 //! Constructor from vectors
 //!
-GenericAccessInterfaceProtocol::GenericAccessInterfaceProtocol (vector<Action> actions, vector<Primitive> primitives)
-  : m_actions    (std::move(actions))
+GenericAccessInterfaceProtocol::GenericAccessInterfaceProtocol (vector<Action> callbacks, vector<Primitive> primitives)
+  : m_callbacks    (std::move(callbacks))
   , m_primitives (std::move(primitives))
 {
-  if (m_actions.size() < 2)
+  if (m_callbacks.size() < 2)
   {
     THROW_INVALID_ARGUMENT("Actions table must have at least two entries (including one reserved for reset)");
   }
@@ -68,27 +68,27 @@ GenericAccessInterfaceProtocol::GenericAccessInterfaceProtocol (vector<Action> a
 //---------------------------------------------------------------------------
 
 
-//! Calls action associated with AccessInterface derivation
+//! Calls callback associated with AccessInterface endpoint
 //!
-//! @param derivationId   Identifies the derivation to act for (zero based)
+//! @param endpointId   Identifies the endpoint to act for (zero based)
 //! @param interfaceData  Application data stored in the AccessInterface
 //! @param toSutData      Bits stream to transfer to SUT
 //!
 //! @return Bits stream retrieved from SUT
-BinaryVector GenericAccessInterfaceProtocol::DoAction (uint32_t derivationId, void* interfaceData, const BinaryVector& toSutData)
+BinaryVector GenericAccessInterfaceProtocol::DoCallback (uint32_t endpointId, void* interfaceData, const BinaryVector& toSutData)
 {
-  if (derivationId >= m_actions.size())
+  if (endpointId >= m_callbacks.size())
   {
-    THROW_INVALID_ARGUMENT("Only have actions for "s + std::to_string(m_actions.size() - 1) + " derivations");
+    THROW_INVALID_ARGUMENT("Only have callbacks for "s + std::to_string(m_callbacks.size() - 1) + " endpoints");
   }
 
-  auto& action       = m_actions[derivationId];
-  auto fromSutVector = action(m_primitives, interfaceData, toSutData);
+  auto& callback       = m_callbacks[endpointId];
+  auto fromSutVector = callback(m_primitives, interfaceData, toSutData);
 
   return fromSutVector;
 }
 //
-//  End of: GenericAccessInterfaceProtocol::DoAction
+//  End of: GenericAccessInterfaceProtocol::DoCallback
 //---------------------------------------------------------------------------
 
 

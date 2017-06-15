@@ -52,7 +52,7 @@ class MAST_CORE_EXPORT AccessInterface : public ParentNode
   // ---------------- Private  Fields
   //
   private:
-  uint32_t                                 m_numberOfDerivations = 0; //!< Number of nodes (derivations) accessible through the access interface
+  uint32_t                                 m_numberOfEndPoints = 0; //!< Number of nodes (endpoints) accessible through the access interface
   std::shared_ptr<AccessInterfaceProtocol> m_protocol;                //!< Protocol to use to manage physical interface
 };
 //

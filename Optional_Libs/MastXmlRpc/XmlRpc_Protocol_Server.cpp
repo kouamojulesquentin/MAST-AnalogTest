@@ -149,9 +149,9 @@ namespace
   {
     public:
     SendScanVector_Executer (Remote_Protocol* protocol, bool logErrors, bool logInfos)
-      : MastXmlRpcMethod (protocol, "DoAction", logErrors, logInfos)
+      : MastXmlRpcMethod (protocol, "DoCallback", logErrors, logInfos)
     {
-      this->_help = "Forward request to actual remote protocol \"DoAction\"";
+      this->_help = "Forward request to actual remote protocol \"DoCallback\"";
       LogInfo("SendScanVector executer started");
     }
 
@@ -170,9 +170,9 @@ namespace
         uint32_t        bitsCount (paramList.getInt        (2));
         vector<uint8_t> toSutData (paramList.getBytestring (3));
 
-        // ---------------- Call DoAction
+        // ---------------- Call DoCallback
         //
-        Remote_Protocol::DoActionReturn_t doActionResult = m_protocol->DoAction(command, bitsCount, toSutData);
+        Remote_Protocol::DoCallbackReturn_t doActionResult = m_protocol->DoCallback(command, bitsCount, toSutData);
 
         // ---------------- Prepare response
         //

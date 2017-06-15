@@ -38,13 +38,13 @@ class SPI_Player : public AccessInterfaceProtocol
              std::vector<uint32_t>          writeCommands,
              std::experimental::string_view commandsPrefix = "");
 
-  //! Gets the number of derivations supported by the specific protocol
+  //! Gets the number of endpoints supported by the specific protocol
   //!
-  //! @note Derivation id 0 is reserved for reset operation, so protocol must support a least two derivations
+  //! @note EndPoint id 0 is reserved for reset operation, so protocol must support a least two endpoints
   //!
-  //! @return The number of supported derivation (including pseudo derivation 0 for reset)
+  //! @return The number of supported endpoint (including pseudo endpoint 0 for reset)
   //!
-  virtual uint32_t MaxSupportedDerivations() const override { return (m_readCommands.size() > m_writeCommands.size()) ? m_readCommands.size(): m_writeCommands.size(); }
+  virtual uint32_t MaxSupportedEndPoints() const override { return (m_readCommands.size() > m_writeCommands.size()) ? m_readCommands.size(): m_writeCommands.size(); }
 
   std::string CommandsPrefix() const { return m_commandPrefix; }  //!< Returns current commands prefix
 
@@ -54,28 +54,28 @@ class SPI_Player : public AccessInterfaceProtocol
   //
   protected:
 
-  //! Creates an SPI command associated to derivation identifier and BinaryVector to send to SUT
+  //! Creates an SPI command associated to endpoint identifier and BinaryVector to send to SUT
   //!
-  std::string CreateSPICommand(uint32_t derivationId, const BinaryVector& toSutData);
+  std::string CreateSPICommand(uint32_t endpointId, const BinaryVector& toSutData);
 
-	//! Returns the chip select command for a specified derivation
+	//! Returns the chip select command for a specified endpoint
   //!
-  uint32_t GetChipSelectCommand(uint32_t derivationId) const;
+  uint32_t GetChipSelectCommand(uint32_t endpointId) const;
 
-  //! Returns read command for a specified derivation
+  //! Returns read command for a specified endpoint
   //!
-  uint32_t GetReadCommand(uint32_t derivationId) const;
+  uint32_t GetReadCommand(uint32_t endpointId) const;
 
-  //! Returns write command for a specified derivation
+  //! Returns write command for a specified endpoint
   //!
-  uint32_t GetWriteCommand(uint32_t derivationId) const;
+  uint32_t GetWriteCommand(uint32_t endpointId) const;
 
   // ---------------- Private  Fields
   //
   std::string           m_commandPrefix;      //!< Text leading SPI command (mainly used for logs in order to ease grep regex)
-  std::vector<uint32_t> m_chipSelectCommands; //!< Chip select (GPIOs) combination associated with derivation ids (at offset 1 for derivation 1). If the chip select value for a derivation is zero, it is assumed the adapter has one embedded chip select in its SPI module, not passing by GPIOs.
-  std::vector<uint32_t> m_readCommands;       //!< Read commands associated with derivation ids (at offset 1 for derivation 1)
-  std::vector<uint32_t> m_writeCommands;      //!< Write commands associated with derivation ids (at offset 1 for derivation 1)
+  std::vector<uint32_t> m_chipSelectCommands; //!< Chip select (GPIOs) combination associated with endpoint ids (at offset 1 for endpoint 1). If the chip select value for a endpoint is zero, it is assumed the adapter has one embedded chip select in its SPI module, not passing by GPIOs.
+  std::vector<uint32_t> m_readCommands;       //!< Read commands associated with endpoint ids (at offset 1 for endpoint 1)
+  std::vector<uint32_t> m_writeCommands;      //!< Write commands associated with endpoint ids (at offset 1 for endpoint 1)
 };
 //
 //  End of SPI_Player class declaration

@@ -41,7 +41,7 @@ enum class GmlPrinterOptions
   ShowSelectorWithEdge   = 1 << 4, //!< To show Linker selector associated register with an edge between the Linker and the Register
   ShowSelectorProperties = 1 << 5, //!< To show selector properties
   ShowSelectorTables     = 1 << 6, //!< To show selector tables for selection/deselection
-  ShowSelectionValues    = 1 << 7, //!< To show Selector Register value along edge between linker and derivations
+  ShowSelectionValues    = 1 << 7, //!< To show Selector Register value along edge between linker and endpoints
 
   Std                  = DisplayIdentifiers | DisplayRegisterValue | DisplayValueAuto | ShowSelectionValues,
   All                  = Std | ShowProtocol | ShowSelectionValues,
@@ -146,7 +146,7 @@ class MAST_CORE_EXPORT GmlPrinter : public SystemModelVisitor
   bool               m_showSelectorWithEdge   = false;     //!< When true an edge is drawn from Linkers and Registers used by the selector
   bool               m_showSelectorProperties = false;     //!< When true, selector properties are displayed
   bool               m_showSelectorTables     = false;     //!< When true, selector properties AND tables are displayed
-  bool               m_showSelectionValues    = false;     //!< When true the value to select a Linker derivation is displayed along side of derivation id (label of the edge)
+  bool               m_showSelectionValues    = false;     //!< When true the value to select a Linker endpoint is displayed along side of endpoint id (label of the edge)
   const Linker*      m_linker                 = nullptr;   //!< When not nullptr, we are visiting a path selector (while visiting a linker)
   std::ostringstream m_osGraph;                            //!< Stream to build up a representation of visited system model nodes
   std::ostringstream m_osEdges;                            //!< Stream to build up links between nodes

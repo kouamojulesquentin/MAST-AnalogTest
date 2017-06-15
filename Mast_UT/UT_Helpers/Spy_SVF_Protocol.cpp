@@ -22,16 +22,16 @@ using namespace test;
 
 //! Spies content how binary vector to SUT is transformed to SVF command while returning the BinaryVector unchanged
 //!
-BinaryVector Spy_SVF_Protocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector Spy_SVF_Protocol::DoCallback (uint32_t endpointId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
-  auto command = CreateSVFCommand(derivationId, toSutData);
+  auto command = CreateSVFCommand(endpointId, toSutData);
 
   SaveCommands(command);
 
   return toSutData;
 }
 //
-//  End of: Spy_SVF_Protocol::DoAction
+//  End of: Spy_SVF_Protocol::DoCallback
 //---------------------------------------------------------------------------
 
 

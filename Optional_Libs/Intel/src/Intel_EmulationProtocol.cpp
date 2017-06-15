@@ -32,10 +32,10 @@ Intel_EmulationProtocol::Intel_EmulationProtocol(std::vector<uint32_t> Region_ad
 
 //! Loopbacks "to SUT data" logging Intel command(s) that would be issued if it was really an operating protocol
 //!
-BinaryVector Intel_EmulationProtocol::DoAction (uint32_t derivationId, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector Intel_EmulationProtocol::DoCallback (uint32_t endpointId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
 
-  auto fromSutData = Send_Intel_Packet_Stream(derivationId, toSutData);
+  auto fromSutData = Send_Intel_Packet_Stream(endpointId, toSutData);
 
   return fromSutData;
 }

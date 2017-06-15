@@ -41,13 +41,13 @@ class MAST_CORE_EXPORT I2C_Player : public AccessInterfaceProtocol
   //!
   I2C_Player(const std::string& parameters);
 
-  //! Gets the number of derivations supported by the specific protocol
+  //! Gets the number of endpoints supported by the specific protocol
   //!
-  //! @note Derivation id 0 is reserved for reset operation, so protocol must support a least two derivations
+  //! @note EndPoint id 0 is reserved for reset operation, so protocol must support a least two endpoints
   //!
-  //! @return The number of supported derivation (including pseudo derivation 0 for reset)
+  //! @return The number of supported endpoint (including pseudo endpoint 0 for reset)
   //!
-  virtual uint32_t MaxSupportedDerivations() const override { return m_addresses.size(); }
+  virtual uint32_t MaxSupportedEndPoints() const override { return m_addresses.size(); }
 
   //! Returns current commands prefix
   //!
@@ -65,18 +65,18 @@ class MAST_CORE_EXPORT I2C_Player : public AccessInterfaceProtocol
   //
   protected:
 
-  //! Creates an I2C command associated to derivation identifier and BinaryVector to send to SUT
+  //! Creates an I2C command associated to endpoint identifier and BinaryVector to send to SUT
   //!
-  std::string CreateI2CCommand(uint32_t derivationId, const BinaryVector& toSutData);
+  std::string CreateI2CCommand(uint32_t endpointId, const BinaryVector& toSutData);
 
-  //! Returns address for specified derivation
+  //! Returns address for specified endpoint
   //!
-  uint32_t GetAddress(uint32_t derivationId) const;
+  uint32_t GetAddress(uint32_t endpointId) const;
 
   // ---------------- Private  Fields
   //
   std::string           m_commandPrefix; //!< Text leading I2C command (mainly used for logs in order to ease grep regex)
-  std::vector<uint32_t> m_addresses;     //!< Addresses associated with derivation ids (at offset 1 for derivation 1)
+  std::vector<uint32_t> m_addresses;     //!< Addresses associated with endpoint ids (at offset 1 for endpoint 1)
 };
 //
 //  End of I2C_Player class declaration

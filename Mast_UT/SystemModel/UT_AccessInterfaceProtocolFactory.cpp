@@ -206,7 +206,7 @@ void UT_AccessInterfaceProtocolFactory::test_RegisterCreator_NewOne_when_Default
   auto& sut         = AccessInterfaceProtocolFactory::Instance();
   auto  nbFactories = sut.RegisteredCreatorsCount();
 
-  auto  newFactory  = [](const string& nbDerivations) { return make_unique<STIL_EmulationProtocol>(nbDerivations); };
+  auto  newFactory  = [](const string& nbEndPoints) { return make_unique<STIL_EmulationProtocol>(nbEndPoints); };
 
   // ---------------- Exercise
   //
@@ -228,7 +228,7 @@ void UT_AccessInterfaceProtocolFactory::test_RegisterCreator_NewOne_when_Default
   auto asSTILL_EmulationProtocol = std::dynamic_pointer_cast<STIL_EmulationProtocol>(protocol);
   TS_ASSERT_NOT_NULLPTR (asSTILL_EmulationProtocol);
 
-  TS_ASSERT_EQUALS (asSTILL_EmulationProtocol->MaxSupportedDerivations(), 12u);
+  TS_ASSERT_EQUALS (asSTILL_EmulationProtocol->MaxSupportedEndPoints(), 12u);
 }
 
 
@@ -239,7 +239,7 @@ void UT_AccessInterfaceProtocolFactory::test_RegisterCreator_NewOne_when_None ()
   // ---------------- Setup
   //
   auto& sut         = AccessInterfaceProtocolFactory::Instance();
-  auto  newFactory  = [](const string& nbDerivations) { return make_unique<STIL_EmulationProtocol>(nbDerivations); };
+  auto  newFactory  = [](const string& nbEndPoints) { return make_unique<STIL_EmulationProtocol>(nbEndPoints); };
 
   sut.Clear();
 
@@ -263,7 +263,7 @@ void UT_AccessInterfaceProtocolFactory::test_RegisterCreator_NewOne_when_None ()
   auto asSTILL_EmulationProtocol = std::dynamic_pointer_cast<STIL_EmulationProtocol>(protocol);
   TS_ASSERT_NOT_NULLPTR (asSTILL_EmulationProtocol);
 
-  TS_ASSERT_EQUALS (asSTILL_EmulationProtocol->MaxSupportedDerivations(), 13u);
+  TS_ASSERT_EQUALS (asSTILL_EmulationProtocol->MaxSupportedEndPoints(), 13u);
 }
 
 //! Checks AccessInterfaceProtocolFactory::RegisterCreator() when replacing a default one
@@ -277,7 +277,7 @@ void UT_AccessInterfaceProtocolFactory::test_RegisterCreator_Replace_Default ()
   sut.InitializeWithDefaults();
 
   auto  nbFactories = sut.RegisteredCreatorsCount();
-  auto  newFactory  = [](const string& nbDerivations) { return make_unique<STIL_EmulationProtocol>(nbDerivations); };
+  auto  newFactory  = [](const string& nbEndPoints) { return make_unique<STIL_EmulationProtocol>(nbEndPoints); };
 
   // ---------------- Exercise
   //
@@ -299,7 +299,7 @@ void UT_AccessInterfaceProtocolFactory::test_RegisterCreator_Replace_Default ()
   auto asSTILL_EmulationProtocol = dynamic_cast<STIL_EmulationProtocol*>(protocol.get());
   TS_ASSERT_NOT_NULLPTR (asSTILL_EmulationProtocol);
 
-  TS_ASSERT_EQUALS (asSTILL_EmulationProtocol->MaxSupportedDerivations(), 14u);
+  TS_ASSERT_EQUALS (asSTILL_EmulationProtocol->MaxSupportedEndPoints(), 14u);
 }
 
 //===========================================================================

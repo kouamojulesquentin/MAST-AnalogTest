@@ -145,22 +145,22 @@ void incoming_packet_server(blocking_queue<ring_packet>& incoming_packet_queue)
 
  }
 
-//! Creates an Intel_Packet command associated to derivation identifier and BinaryVector to send to SUT
+//! Creates an Intel_Packet command associated to endpoint identifier and BinaryVector to send to SUT
 //!
-BinaryVector Intel_Packet_Player::Send_Intel_Packet_Stream (uint32_t derivationId, const BinaryVector& toSutData) const
+BinaryVector Intel_Packet_Player::Send_Intel_Packet_Stream (uint32_t endpointId, const BinaryVector& toSutData) const
 {
   BinaryVector from_SUT;
 
-  if (derivationId == 0)
+  if (endpointId == 0)
   {
     return from_SUT;
   }
 
-  if (derivationId > m_n_chains)
-    THROW_INVALID_ARGUMENT("DerivationId must be comprised between '0' (for Reset) and the total number of chains");
+  if (endpointId > m_n_chains)
+    THROW_INVALID_ARGUMENT("EndPointId must be comprised between '0' (for Reset) and the total number of chains");
 
-  std::bitset <ID_WIDTH>   stream_id = region_id[derivationId];
-//+  std::bitset <ADDR_WIDTH> Phy_Addr = region_addr[derivationId];
+  std::bitset <ID_WIDTH>   stream_id = region_id[endpointId];
+//+  std::bitset <ADDR_WIDTH> Phy_Addr = region_addr[endpointId];
   /*Assign target region a stream id */
   send_packet(SELECT, stream_id, FIRST_REGION_ADDR);
   receive_packet(); //SELECT packet comes back identical from ring

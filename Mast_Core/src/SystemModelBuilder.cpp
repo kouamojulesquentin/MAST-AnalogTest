@@ -162,7 +162,7 @@ void SystemModelBuilder::AppendRegisters (uint32_t            count,
 
 //! Creates a "1500" style wrapper
 //!
-std::shared_ptr<Chain> SystemModelBuilder::Create_1500_Wrapper (string_view name, uint32_t maxDerivations)
+std::shared_ptr<Chain> SystemModelBuilder::Create_1500_Wrapper (string_view name, uint32_t maxEndPoints)
 {
   // ---------------- Create wrapper
   //
@@ -182,9 +182,9 @@ std::shared_ptr<Chain> SystemModelBuilder::Create_1500_Wrapper (string_view name
 
   // ---------------- WIR
   //
-  auto totalDerivations = maxDerivations + 1u;   // +1 is to take into account bypass register (wirBypass)
+  auto totalEndPoints = maxEndPoints + 1u;   // +1 is to take into account bypass register (wirBypass)
 
-       res         = Create_PathSelector(SelectorKind::Binary, "WIR_reg", totalDerivations);
+       res         = Create_PathSelector(SelectorKind::Binary, "WIR_reg", totalEndPoints);
   auto wirReg      = res.first;
   auto wirSelector = res.second;
   auto wirMib      = Create_MIB("WIR", wirSelector, wirReg, MuxRegPlacement::Remote);
@@ -264,8 +264,8 @@ shared_ptr<Chain> SystemModelBuilder::Create_Brocade (shared_ptr<AccessInterface
   {
     // ---------------- Diconnect pieces from AccessInterface
     //
-    auto mux = dynamic_pointer_cast<Linker>   (tap->DisconnectDerivation(2u));
-    auto ir  = dynamic_pointer_cast<Register> (tap->DisconnectDerivation(1u));
+    auto mux = dynamic_pointer_cast<Linker>   (tap->DisconnectEndPoint(2u));
+    auto ir  = dynamic_pointer_cast<Register> (tap->DisconnectEndPoint(1u));
 
     // ---------------- Reconnect to Brocade muxes
     //
@@ -623,8 +623,8 @@ void SystemModelBuilder::DaisyChain_JTAG_TAPS (shared_ptr<AccessInterface> tap1,
   //
   if (aiType1 == AccessInterfaceAssessment::JTAG_TAP)
   {
-    auto mux = dynamic_pointer_cast<Linker>   (tap1->DisconnectDerivation(2u));;
-    auto ir  = dynamic_pointer_cast<Register> (tap1->DisconnectDerivation(1u));;
+    auto mux = dynamic_pointer_cast<Linker>   (tap1->DisconnectEndPoint(2u));;
+    auto ir  = dynamic_pointer_cast<Register> (tap1->DisconnectEndPoint(1u));;
 
     auto irChain  = m_model.CreateChain("IR_DaisyChain",     tap1);
     auto muxChain = m_model.CreateChain("DR_Mux_DaisyChain", tap1);
@@ -644,8 +644,8 @@ void SystemModelBuilder::DaisyChain_JTAG_TAPS (shared_ptr<AccessInterface> tap1,
 
   // ---------------- Chain second tap
   //
-  auto mux = dynamic_pointer_cast<Linker>   (tap2->DisconnectDerivation(2u));
-  auto ir  = dynamic_pointer_cast<Register> (tap2->DisconnectDerivation(1u));
+  auto mux = dynamic_pointer_cast<Linker>   (tap2->DisconnectEndPoint(2u));
+  auto ir  = dynamic_pointer_cast<Register> (tap2->DisconnectEndPoint(1u));
 
   auto irChain  = dynamic_pointer_cast<Chain>(tap1->FirstChild());
   CHECK_VALUE_NOT_NULL(irChain, "Houps tap1 is not already a chain of JTAG TAP");

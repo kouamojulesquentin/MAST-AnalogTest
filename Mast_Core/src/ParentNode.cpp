@@ -139,28 +139,28 @@ void ParentNode::DisconnectChild (shared_ptr<SystemModelNode> child)
 //---------------------------------------------------------------------------
 
 
-//! Disconnects a derivation from the parent
+//! Disconnects a endpoint from the parent
 //!
-//! @param derivationId Identifies the derivation to disconnect
+//! @param endpointId Identifies the endpoint to disconnect
 //!
-//! @return Disconnected derivation
+//! @return Disconnected endpoint
 //!
-shared_ptr<SystemModelNode> ParentNode::DisconnectDerivation (uint32_t derivationId)
+shared_ptr<SystemModelNode> ParentNode::DisconnectEndPoint (uint32_t endpointId)
 {
-  CHECK_PARAMETER_NOT_ZERO (derivationId,  "Cannot remove derivation '0'");
-  CHECK_VALUE_NOT_NULL     (m_pFirstChild, "Cannot disconnect a derivation when there is no child");
+  CHECK_PARAMETER_NOT_ZERO (endpointId,  "Cannot remove endpoint '0'");
+  CHECK_VALUE_NOT_NULL     (m_pFirstChild, "Cannot disconnect a endpoint when there is no child");
 
   uint32_t currentId       = 1u;
   auto     currentChild    = m_pFirstChild;
   auto     previousSibling = shared_ptr<SystemModelNode>();
 
-  while (currentId != derivationId)
+  while (currentId != endpointId)
   {
     previousSibling = currentChild;
     currentChild    = currentChild->NextSibling();
 
-    CHECK_VALUE_NOT_NULL (currentChild, "Cannot disconnect derivation "s + to_string(derivationId) +
-                                        " when there is/are only "       + to_string(currentId) + " derivation(s)");
+    CHECK_VALUE_NOT_NULL (currentChild, "Cannot disconnect endpoint "s + to_string(endpointId) +
+                                        " when there is/are only "       + to_string(currentId) + " endpoint(s)");
     ++currentId;
   }
 
@@ -169,7 +169,7 @@ shared_ptr<SystemModelNode> ParentNode::DisconnectDerivation (uint32_t derivatio
   return currentChild;
 }
 //
-//  End of: ParentNode::DisconnectDerivation
+//  End of: ParentNode::DisconnectEndPoint
 //---------------------------------------------------------------------------
 
 

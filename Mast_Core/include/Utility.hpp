@@ -130,7 +130,7 @@ inline std::string& operator+=(std::string& lhs, std::experimental::string_view 
 //! @return A string with the concatenation
 inline std::string operator+(std::experimental::string_view lhs, const std::string& rhs) { return std::string(lhs.cbegin(), lhs.cend()).append(rhs); }
 
-//! Combination of flag type enum items (bitwise or)
+//! Combines enum flags (bitwise or)
 //!
 template<typename ENUM_T>
 constexpr ENUM_T operator | (ENUM_T X, ENUM_T Y)
@@ -139,6 +139,29 @@ constexpr ENUM_T operator | (ENUM_T X, ENUM_T Y)
                              | static_cast<std::underlying_type_t<ENUM_T>>(Y)
                             );
 }
+
+
+//! Combines enum flags type enum items in place (bitwise or)
+//!
+template<typename ENUM_T>
+ENUM_T& operator |= (ENUM_T& X, ENUM_T Y)
+{
+  auto result = static_cast<ENUM_T>(  static_cast<std::underlying_type_t<ENUM_T>>(X)
+                                    | static_cast<std::underlying_type_t<ENUM_T>>(Y)
+                                   );
+  X = result;
+  return X;
+}
+
+//! Forces an enum value (casting away enum type)
+//!
+template<typename ENUM_T>
+ENUM_T& ForceValue(ENUM_T& X, int value)
+{
+  X = static_cast<ENUM_T>(static_cast<std::underlying_type_t<ENUM_T>>(value));
+  return X;
+}
+
 
 //! Tests of flag type enum item
 //!

@@ -38,6 +38,10 @@ class MAST_CORE_EXPORT Utility final
   ~Utility() = delete;
   Utility()  = delete;
 
+  //! Extracts file (or directory) parent directory path
+  //!
+  static std::string ExtractDirectoryPath (const std::string& filePath);
+
   //! Tests if a file exists
   //!
   static bool FileExists (std::experimental::string_view filePath);

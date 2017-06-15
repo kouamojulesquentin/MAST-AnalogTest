@@ -192,6 +192,59 @@ void SystemModelManager_impl::CreateApplicationThread (shared_ptr<ParentNode> ap
 //  End of: SystemModelManager_impl::CreateApplicationThread
 //---------------------------------------------------------------------------
 
+//! Does a data cycles for a hierarchical subset of the SystemModel
+//!
+//! @note It does the data cycle only on the target AccessInterface, fromSUTVector and toSUTVector are locally defined
+//!
+void SystemModelManager_impl::DoHierarchicalDataCycle (std::shared_ptr<AccessInterface>  currentAccessInterface, 
+							std::shared_ptr<AccessInterface>  InterfaceTranslator)
+{
+   if (currentAccessInterface->IsPending())
+   {
+   auto protocol = currentAccessInterface->Protocol();
+   CHECK_VALUE_NOT_NULL(protocol, "All AccessInterface must be associated with a valid protocol");
+
+   uint32_t endpointId   = 1u;
+   auto     nextEndPoint = currentAccessInterface->FirstChild();
+
+   while (nextEndPoint)
+   {
+    if (nextEndPoint->IsPending())
+    {
+     m_toSutVisitor.Reset();
+     nextEndPoint->Accept(m_toSutVisitor);
+
+     const auto& toSutVector = m_toSutVisitor.ToSutVector();
+     if (!toSutVector.IsEmpty())   // This can be empty when actual SUT state prevent from serving pending Registers
+       {
+        const auto& activeRegs  = m_toSutVisitor.ActiveRegistersIdentifiers();
+        
+	BinaryVector fromSutVector;
+        if (InterfaceTranslator==nullptr) //Standard case, use built-in Callbacks
+   	   fromSutVector = protocol->DoCallback(endpointId, nextEndPoint->ApplicationData(), toSutVector);
+	else
+	{
+	 auto CallbackId=protocol->CallbackId(endpointId);
+   	 /*dummy callback to prevent breakdown while developing*/
+	 /*Here we should have something like : 
+	 fromSutVector = xxxx->DoTranslationCallback(CallbackId, nextEndPoint->ApplicationData(), toSutVector);
+	 */
+	 fromSutVector = protocol->DoCallback(endpointId, nextEndPoint->ApplicationData(), toSutVector);
+	}
+        
+        m_fromSutUpdater.UpdateRegisters(activeRegs, fromSutVector);
+        ReportServedRegisters(activeRegs);
+        ReleaseServedThreads();
+        }
+      }
+      nextEndPoint = nextEndPoint->NextSibling();
+     ++endpointId;
+     }
+   }
+ }
+//
+//  End of: SystemModelManager_impl::DoHierarchicalDataCycle
+//---------------------------------------------------------------------------
 
 //! Does a complete data cycles for SystemModel as long as there are pending nodes
 //!
@@ -243,40 +296,8 @@ void SystemModelManager_impl::DoDataCycles_Impl ()
 
       while (nextAccessInterface)
       {
-        if (nextAccessInterface->IsPending())
-        {
-          auto protocol = nextAccessInterface->Protocol();
-          CHECK_VALUE_NOT_NULL(protocol, "All AccessInterface must be associated with a valid protocol");
-
-          uint32_t endpointId   = 1u;
-          auto     nextEndPoint = nextAccessInterface->FirstChild();
-
-          while (nextEndPoint)
-          {
-            if (nextEndPoint->IsPending())
-            {
-              m_toSutVisitor.Reset();
-              nextEndPoint->Accept(m_toSutVisitor);
-
-              const auto& toSutVector = m_toSutVisitor.ToSutVector();
-              if (!toSutVector.IsEmpty())   // This can be empty when actual SUT state prevent from serving pending Registers
-              {
-                const auto& activeRegs  = m_toSutVisitor.ActiveRegistersIdentifiers();
-
-                auto fromSutVector = protocol->DoCallback(endpointId, nextEndPoint->ApplicationData(), toSutVector);
-
-                m_fromSutUpdater.UpdateRegisters(activeRegs, fromSutVector);
-                ReportServedRegisters(activeRegs);
-                ReleaseServedThreads();
-              }
-            }
-
-            nextEndPoint = nextEndPoint->NextSibling();
-            ++endpointId;
-          }
-        }
-
-        nextAccessInterface = dynamic_pointer_cast<AccessInterface>(nextAccessInterface->NextSibling());;
+       DoHierarchicalDataCycle(nextAccessInterface,nullptr);
+       nextAccessInterface = dynamic_pointer_cast<AccessInterface>(nextAccessInterface->NextSibling());;
       }
 
       // ---------------- Release mutex and wait awhile for blocked (but not pending) threads can move forward

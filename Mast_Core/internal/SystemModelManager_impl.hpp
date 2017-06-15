@@ -303,6 +303,7 @@ class SystemModelManager_impl final
 
   void ProcessQueuedRequests (std::shared_ptr<ApplicationData> appData);
   void LoopOnDataCycle ();
+  void DoHierarchicalDataCycle (std::shared_ptr<AccessInterface>  currentAccessInterface, std::shared_ptr<AccessInterface>  InterfaceTranslator);
   void DoDataCycles_Impl ();
   void RegisterPendingThread (std::shared_ptr<Register> reg);
   void ReleaseServedThreads ();

@@ -66,7 +66,9 @@ static const map<string, mast::LoggerShownItems> loggerShownItemMapping
   {"file_name",     mast::LoggerShownItems::FileName},
   {"line_number",   mast::LoggerShownItems::LineNumber},
   {"function_name", mast::LoggerShownItems::FunctionName},
+  {"std_less",      mast::LoggerShownItems::Std_Less},
   {"std",           mast::LoggerShownItems::Std},
+  {"std_more",      mast::LoggerShownItems::Std_More},
   {"all",           mast::LoggerShownItems::All},
 };
 
@@ -134,7 +136,7 @@ static const map<string, mast::ReportMoments> reportMomentsMapping
 //! Initializes with default configurations
 //!
 MastConfiguration::MastConfiguration ()
-  : m_sitFilePath                 ("DUT.sit")
+  : m_sitFilePath                 ("")
   , m_configurationAlgorithm      ("last_or_default")
   , m_accessInterfaceProtocol     ("")
   , m_pluginDirectories           ({PLUGINS_DIRECTORY_NAME})
@@ -151,33 +153,16 @@ MastConfiguration::MastConfiguration ()
 //---------------------------------------------------------------------------
 
 
-//! Extracts for current application path (usually got from argv[0]), the directory path
+//! Extracts from current application path (usually got from argv[0]), the, parent, directory path
 //!
-//! @note This is not work properly if the application path is reduced to application name
+//! @note This may not work properly if the application path is reduced to application name
 //!
 //! @param applicationPath  The application path
 //!
 //! @return Extracted path or "." when no path has been found
 string MastConfiguration::ExtractApplicationDirectoryPath (const string& applicationPath)
 {
-  // ---------------- Set dirPath with only directory path of runner application
-  //
-  auto dirPath = applicationPath;
-  auto sepPos  = dirPath.rfind("/"); // Search for last Linux directory separator
-  if (sepPos == std::string::npos)
-  {
-    sepPos  = dirPath.rfind("\\");   // Search for last Windows directory separator
-  }
-
-  if (sepPos != std::string::npos)
-  {
-    dirPath.erase(sepPos);           // Remove exe name (keeping only directory path)
-  }
-  else
-  {
-    dirPath = ".";                   // When no separator ==> there is only application name ==> this is current directory
-  }
-  return dirPath;
+  return Utility::ExtractDirectoryPath(applicationPath);
 }
 //
 //  End of: MastConfiguration::ExtractApplicationDirectoryPath
@@ -413,9 +398,15 @@ void MastConfiguration::Update (vector<string> arguments)
     //
     vector<string> allowedLogLevel {"debug", "info", "warning", "error"};
     vector<string> allowedLogKind  {"std", "copy_all_on_cout", "copy_errors_on_cerr"};
+    vector<string> allowedLogShow;
+    for (const auto& element : loggerShownItemMapping)
+    {
+      allowedLogShow.emplace_back(element.first);
+    }
 
     TCLAP::ValuesConstraint<string> logLevelConstraint(allowedLogLevel);
     TCLAP::ValuesConstraint<string> logKindConstraint(allowedLogKind);
+    TCLAP::ValuesConstraint<string> logShowConstraint(allowedLogShow);
 
     // Insert in reverse order of the USAGE print()
     TCLAP::ValueArg<std::string> aiProtocolArg        ("",  "protocol",    "Override access interface protocol defined in SIT file",                        false, "",                       "Protocol name", cmdLine);
@@ -424,6 +415,7 @@ void MastConfiguration::Update (vector<string> arguments)
     TCLAP::SwitchArg             checkModelArg        ("",  "check",       "Enable model checking (resulting from parsing SIT file)",                       cmdLine, false);
     TCLAP::ValueArg<std::string> logKindArg           ("",  "log_kind",    "Define logger kind",                                                            false, "std",                    &logKindConstraint, cmdLine);
     TCLAP::ValueArg<std::string> logLevelArg          ("",  "log_level",   "Define log level",                                                              false, "info",                   &logLevelConstraint, cmdLine);
+    TCLAP::ValueArg<std::string> logShowArg           ("",  "log_show",    "Define log shown items",                                                        false, "level",                  &logShowConstraint,  cmdLine);
     TCLAP::ValueArg<std::string> logFileArg           ("",  "log_file",    "Define logger file path",                                                       false, "mast.log",               "File path", cmdLine);
     TCLAP::SwitchArg             logEnabledArg        ("l", "log",         "Enable logger",                                                                 cmdLine, false);
     TCLAP::MultiArg<std::string> pluginFilesArg       ("",  "plugin",      "Define a plugin file to load",                                                  false, "File path",      cmdLine);
@@ -482,8 +474,9 @@ void MastConfiguration::Update (vector<string> arguments)
       setOption(m_loggerFilePath,          logFileArg);
       setOption(m_accessInterfaceProtocol, aiProtocolArg);
 
-      setMappedOption(m_loggerKind,  logKindArg,  loggerKindMapping);
-      setMappedOption(m_loggerLevel, logLevelArg, loggerLevelMapping);
+      setMappedOption(m_loggerKind,       logKindArg,  loggerKindMapping);
+      setMappedOption(m_loggerLevel,      logLevelArg, loggerLevelMapping);
+      setMappedOption(m_loggerShownItems, logShowArg,  loggerShownItemMapping);
     }
   }
   catch(TCLAP::CmdLineParseException& exc)

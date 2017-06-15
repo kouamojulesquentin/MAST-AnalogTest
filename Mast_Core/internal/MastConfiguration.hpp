@@ -53,8 +53,10 @@ enum class LoggerShownItems
    LineNumber   = 1 << 6, //!< Show source line number from which the message was logged (for Mast developer team)
    FunctionName = 1 << 7, //!< Show function name from which the message was logged (for Mast developer team)
 
-   Std = Time + Microseconds + Level      + ThreadId,
-   All = Std  + FileName     + LineNumber + FunctionName,
+   Std_Less = Level    + ThreadId,
+   Std      = Std_Less + Microseconds,
+   Std_More = Std      + FunctionName,
+   All      = Std_More + FileName + LineNumber,
 };
 
 //! Defines what level of information are logged (from error only to debug messages)
@@ -95,30 +97,30 @@ class MAST_CORE_EXPORT MastConfiguration final
 
   // ---------------- Options getters
   //
-  std::string                     SitFilePath()                 const { return m_sitFilePath;                 } //!< SIT file used by the project
-  std::string                     ConfigurationAlgorithm()      const { return m_configurationAlgorithm;      } //!< One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a [plugin])
-  std::string                     AccessInterfaceProtocol()     const { return m_accessInterfaceProtocol;     } //!< When different to "SIT", it override the one define in [SIT] file
-  std::string                     ApplicationPath()             const { return m_applicationDirectoryPath;    } //!< Application directory path (extracted from argv[0])
+  const std::string&              SitFilePath()                 const { return m_sitFilePath;                 } //!< SIT file used by the project
+  const std::string&              ConfigurationAlgorithm()      const { return m_configurationAlgorithm;      } //!< One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a [plugin])
+  const std::string&              AccessInterfaceProtocol()     const { return m_accessInterfaceProtocol;     } //!< When different to "SIT", it override the one define in [SIT] file
+  const std::string&              ApplicationPath()             const { return m_applicationDirectoryPath;    } //!< Application directory path (extracted from argv[0])
   const std::vector<std::string>& PluginDLLs()                  const { return m_pluginDLLs;                  } //!< List of plugins files paths
   const std::vector<std::string>& PluginDirectories()           const { return m_pluginDirectories;           } //!< List of plugins directories paths
   bool                            ModelChecking()               const { return m_modelChecking;               } //!< Enable/Disable model checking (provided it has been parsed successfully)
-  std::string                     ModelCheckingFilePath()       const { return m_modelCheckingFilePath;       } //!< Optional model checking result file path (logged when no path when logged is enabled)
+  const std::string&              ModelCheckingFilePath()       const { return m_modelCheckingFilePath;       } //!< Optional model checking result file path (logged when no path when logged is enabled)
   bool                            LoggerEnabled()               const { return m_loggerEnabled;               } //!< Enable/Disable general logging
   mast::LoggerKind                LoggerKind()                  const { return m_loggerKind;                  } //!< Defines what kind of logger is used.
-  std::string                     LoggerFilePath()              const { return m_loggerFilePath;              } //!< File path for logging (there is always a file logging when enabled)
+  const std::string&              LoggerFilePath()              const { return m_loggerFilePath;              } //!< File path for logging (there is always a file logging when enabled)
   mast::LoggerShownItems          LoggerShownItems()            const { return m_loggerShownItems;            } //!< Kinds of element that are reported in the log
   mast::LoggerLevel               LoggerLevel()                 const { return m_loggerLevel;                 } //!< Defines what level of information are logged (from error only to debug messages)
   bool                            GmlPrinting()                 const { return m_gmlPrinting;                 } //!< Enable/Disable printing of GML representation of the model state
   mast::ReportMoments             GmlReportMoments()            const { return m_gmlReportMoments;            } //!< Defines moment(s) in the vector generation for which model state is exported as GML file
-  std::string                     GmlFilePath()                 const { return m_gmlFilePath;                 } //!< Optional file path for GML graph printing
-  std::string                     GmlGraphName()                const { return m_gmlGraphName;                } //!< Optional graph name
+  const std::string&              GmlFilePath()                 const { return m_gmlFilePath;                 } //!< Optional file path for GML graph printing
+  const std::string&              GmlGraphName()                const { return m_gmlGraphName;                } //!< Optional graph name
   GmlPrinterOptions               GmlOptions()                  const { return m_gmlOptions;                  } //!< Defines what kind of model information pieces are displayed in the model state report.
   bool                            PrettyPrinting()              const { return m_prettyPrinting;              } //!< Enable/Disable printing of textual representation of the model state
   mast::ReportMoments             PrettyPrintReportMoments()    const { return m_prettyPrintingReportMoments; } //!< Defines moment(s) in the vector generation for which model state is exported as text file
-  std::string                     PrettyPrintFilePath()         const { return m_prettyPrintingFilePath;      } //!< Optional file path for pretty print
+  const std::string&              PrettyPrintFilePath()         const { return m_prettyPrintingFilePath;      } //!< Optional file path for pretty print
   PrettyPrinterOptions            PrettyPrintOptions()          const { return m_prettyPrintingOptions;       } //!< Defines what kind of model information pieces are reported in the textual model state report
   bool                            ReportManagerActivity()       const { return m_reportManagerActivity;       } //!< Enable/Disable logging and optionally reporting model state at specific point of manager activity
-  std::string                     ManagerActivityFileBasePath() const { return m_managerActivityFileBasePath; } //!< Base file path where pretty print and/or GML files are saved
+  const std::string&              ManagerActivityFileBasePath() const { return m_managerActivityFileBasePath; } //!< Base file path where pretty print and/or GML files are saved
   ManagerMonitorOptions           ManagerActivityOptions()      const { return m_managerActivityOptions;      } //!< Defines what Mast manager main activities are reported in the log
 
   //! Sets command line parser object in charge for output messages
@@ -161,7 +163,7 @@ class MAST_CORE_EXPORT MastConfiguration final
   bool                     m_loggerEnabled               = false;                                  //!< Enable/Disable general logging
   mast::LoggerKind         m_loggerKind                  = mast::LoggerKind::Std;                  //!< Defines what kind of logger is used.
   std::string              m_loggerFilePath;                                                       //!< File path for logging (there is always a file logging when enabled)
-  mast::LoggerShownItems   m_loggerShownItems            = mast::LoggerShownItems::Std;            //!< Kinds of element that are reported in the log
+  mast::LoggerShownItems   m_loggerShownItems            = mast::LoggerShownItems::Std_Less;       //!< Kinds of element that are reported in the log
   mast::LoggerLevel        m_loggerLevel                 = mast::LoggerLevel::Info;                //!< Defines what level of information are logged (from error only to debug messages)
   bool                     m_gmlPrinting                 = false;                                  //!< Enable/Disable printing of GML representation of the model state
   mast::ReportMoments      m_gmlReportMoments            = mast::ReportMoments::AfterModelParsing; //!< Defines moment(s) in the vector generation for which model state is exported as GML file

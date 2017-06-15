@@ -40,7 +40,7 @@ Default configuration file looks like this:
           Enable: false                        # Enable/Disable general logging
           Logger_Kind: std                     # One of [std, copy_all_on_cout, copy_errors_on_cerr]
           File_path:  "Mast.log"               # File path for logging (there is always a file logging when enabled)
-          Shown_items: std                     # Any of [date, time, microseconds, level, thread_id, file_name, line_number, function_name, std, all]
+          Shown_items: std_less                # Any of [date, time, microseconds, level, thread_id, file_name, line_number, function_name, std_less, std, std_more,all]
           Level: info                          # One of [debug, info, warning, error]
         Model_GML_printing:
           Enable:  false                       # Enable/Disable printing of GML representation of the model state
@@ -82,6 +82,7 @@ Usage is:
            [--log_file=<File path>]
            [--log_level=<debug|info|warning|error>]
            [--log_kind=<std|copy_all_on_cout|copy_errors_on_cerr>]
+           [--log_show=<all|date|file_name|function_name|level|line_number|microseconds|std|std_less|std_more|thread_id|time>]
            [--check]
            [--check_file=<File path>]
            [-a=<last_lazy|last_or_default|last_or_default_greedy| "name defined by a plugin">]
@@ -90,48 +91,51 @@ Usage is:
 
     Where:
 
-      Mast: Manager for System On Chip Tests
+   -c=<File path>,  --conf=<File path>
+     Define configuration file
 
-      -c=<File path>,  --conf=<File path>
-        Define configuration file
+   -s=<File path>,  --sit=<File path>
+     Define SIT that specified SUT model
 
-      -s=<File path>,  --sit=<File path>
-        Define SIT that specified SUT model
+   --plugin_dir=<Directory path>  (accepted multiple times)
+     Define a plugin directory (all plugins in it are loaded)
 
-      --plugin=<File path>  (accepted multiple times)
-        Loads plugins file
+   --plugin=<File path>  (accepted multiple times)
+     Define a plugin file to load
 
-      --plugin_dir=<Directory>  (accepted multiple times)
-        Loads all plugins in <Directory>
+   -l,  --log
+     Enable logger
 
-      -l,  --log
-        Enable logger
+   --log_file=<File path>
+     Define logger file path
 
-      --log_file=<File path>
-        Define logger file path
+   --log_show=<all|date|file_name|function_name|level|line_number
+      |microseconds|std|std_less|std_more|thread_id|time>
+     Define log shown items
 
-      --log_level=<debug|info|warning|error>
-        Define log level
+   --log_level=<debug|info|warning|error>
+     Define log level
 
-      --log_kind=<std|copy_all_on_cout|copy_errors_on_cerr>
-        Define logger kind
+   --log_kind=<std|copy_all_on_cout|copy_errors_on_cerr>
+     Define logger kind
 
-      --check
-        Enable model checking (resulting from parsing SIT file)
+   --check
+     Enable model checking (resulting from parsing SIT file)
 
-      --check_file=<File path>
-        Defines result of model checking (it is always logged when logger is enabled)
+   --check_file=<File path>
+     Defines result of model checking (it is always logged when logger is
+     enabled)
 
-      -a=<last_lazy|last_or_default|last_or_default_greedy| "name defined by a plugin">,
-      --config_algo=<last_lazy|last_or_default|last_or_default_greedy| "name defined by a plugin">
-        Name of configuration algorithm used to select linker  (mux) path
+   -a=<last_lazy|last_or_default|last_or_default_greedy| "name defined by a
+      plugin">,  --config_algo=<last_lazy|last_or_default
+      |last_or_default_greedy| "name defined by a plugin">
+     Name of configuration algorithm used to select linker  (mux) path
 
-      --protocol=<Protocol name>
-        Override access interface protocol defined in SIT file
+   --protocol=<Protocol name>
+     Override access interface protocol defined in SIT file
 
-      --,  --ignore_rest
-        Ignores the rest of the labeled arguments following this flag.
-
+   --,  --ignore_rest
+     Ignores the rest of the labeled arguments following this flag.
 
 If there is a `mast.cfg` file in current working directory, it will be used as the configuration file.
 
@@ -246,7 +250,9 @@ Defines what are the auxiliary elements reported in the log.
 | file_name     | Show file name from which the message was logged (for Mast developer team)
 | line_number   | Show source line number from which the message was logged (for Mast developer team)
 | function_name | Show function name from which the message was logged (for Mast developer team)
-| std           | Equivalent to [time, microseconds, level, thread_id]
+| std_less      | Equivalent to [level, thread_id]
+| std           | Equivalent to [microseconds, level, thread_id]
+| std_more      | Equivalent to [function_name, microseconds, level, thread_id]
 | all           | Equivalent to all options
 
 ### Level {#Logger_Level}

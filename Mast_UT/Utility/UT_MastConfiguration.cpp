@@ -62,7 +62,7 @@ namespace
     TS_ASSERT_FALSE (sut.PrettyPrinting());
     TS_ASSERT_FALSE (sut.ReportManagerActivity());
 
-    TS_ASSERT_EQUALS (sut.SitFilePath(),                 "DUT.sit");
+    TS_ASSERT_EQUALS (sut.SitFilePath(),                 "");
     TS_ASSERT_EQUALS (sut.AccessInterfaceProtocol(),     "");
     TS_ASSERT_EQUALS (sut.ConfigurationAlgorithm(),      "last_or_default");
     TS_ASSERT_EQUALS (sut.GmlFilePath(),                 "MastModel.gml");
@@ -77,7 +77,7 @@ namespace
     TS_ASSERT_EQUALS (sut.PrettyPrintOptions(),        PrettyPrinterOptions::Std);
     TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::Std);
     TS_ASSERT_EQUALS (sut.LoggerLevel(),               mast::LoggerLevel::Info);
-    TS_ASSERT_EQUALS (sut.LoggerShownItems(),          mast::LoggerShownItems::Std);
+    TS_ASSERT_EQUALS (sut.LoggerShownItems(),          mast::LoggerShownItems::Std_Less);
     TS_ASSERT_EQUALS (sut.GmlReportMoments(),          mast::ReportMoments::AfterModelParsing);
     TS_ASSERT_EQUALS (sut.PrettyPrintReportMoments(),  mast::ReportMoments::AfterModelParsing);
 
@@ -618,7 +618,7 @@ void UT_MastConfiguration::test_Update_ShortSwitches ()
   TS_ASSERT_EQUALS (sut.PrettyPrintOptions(),        PrettyPrinterOptions::Std);
   TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::Std);
   TS_ASSERT_EQUALS (sut.LoggerLevel(),               mast::LoggerLevel::Info);
-  TS_ASSERT_EQUALS (sut.LoggerShownItems(),          mast::LoggerShownItems::Std);
+  TS_ASSERT_EQUALS (sut.LoggerShownItems(),          mast::LoggerShownItems::Std_Less);
   TS_ASSERT_EQUALS (sut.GmlReportMoments(),          mast::ReportMoments::AfterModelParsing);
   TS_ASSERT_EQUALS (sut.PrettyPrintReportMoments(),  mast::ReportMoments::AfterModelParsing);
 
@@ -688,7 +688,7 @@ void UT_MastConfiguration::test_Update_LongSwitches ()
   TS_ASSERT_EQUALS (sut.PrettyPrintOptions(),        PrettyPrinterOptions::Std);
   TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::CopyAllOnCout);
   TS_ASSERT_EQUALS (sut.LoggerLevel(),               mast::LoggerLevel::Debug);
-  TS_ASSERT_EQUALS (sut.LoggerShownItems(),          mast::LoggerShownItems::Std);
+  TS_ASSERT_EQUALS (sut.LoggerShownItems(),          mast::LoggerShownItems::Std_Less);
   TS_ASSERT_EQUALS (sut.GmlReportMoments(),          mast::ReportMoments::AfterModelParsing);
   TS_ASSERT_EQUALS (sut.PrettyPrintReportMoments(),  mast::ReportMoments::AfterModelParsing);
 
@@ -763,7 +763,7 @@ void UT_MastConfiguration::test_Update_UsingArgv ()
   TS_ASSERT_EQUALS (sut.PrettyPrintOptions(),        PrettyPrinterOptions::Std);
   TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::CopyAllOnCout);
   TS_ASSERT_EQUALS (sut.LoggerLevel(),               mast::LoggerLevel::Debug);
-  TS_ASSERT_EQUALS (sut.LoggerShownItems(),          mast::LoggerShownItems::Std);
+  TS_ASSERT_EQUALS (sut.LoggerShownItems(),          mast::LoggerShownItems::Std_Less);
   TS_ASSERT_EQUALS (sut.GmlReportMoments(),          mast::ReportMoments::AfterModelParsing);
   TS_ASSERT_EQUALS (sut.PrettyPrintReportMoments(),  mast::ReportMoments::AfterModelParsing);
 

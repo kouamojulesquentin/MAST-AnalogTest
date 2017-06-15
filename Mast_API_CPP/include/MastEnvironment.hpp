@@ -64,6 +64,7 @@ class CPP_API_EXPORT MastEnvironment final
   // ---------------- Private Methods
   //
   private:
+  void CheckModel ();
   void ConfigureLogger ();
   void InitializeLogger ();
   std::string GetActualSitFilePath (const std::string& sitFile) const;

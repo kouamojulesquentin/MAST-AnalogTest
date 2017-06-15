@@ -24,12 +24,16 @@
 #include "MastConfig.hpp"
 #include "PDL_AlgorithmsRepository.hpp"
 #include "SystemModel.hpp"
-//+#include "SIT_reader.hpp"
+#include "SIT_reader.hpp"
+
+#include <fstream>
 
 using std::vector;
 using std::string;
 using std::shared_ptr;
 using std::make_shared;
+using std::dynamic_pointer_cast;
+using std::ofstream;
 
 using namespace mast;
 
@@ -53,6 +57,60 @@ MastEnvironment::MastEnvironment (bool unitTestContext)
 //---------------------------------------------------------------------------
 
 
+
+//! Checks model reporting any issues
+//! @note Either save report to user defined report file and log only minimal status
+//!       or log complete status
+//!       Optional report file MUST be different than log file
+void MastEnvironment::CheckModel ()
+{
+  auto checkResult = m_sm->Check();
+
+  const auto& checkFilePath = m_configuration->ModelCheckingFilePath();
+  if (!checkFilePath.empty()) // Save report to specific file?
+  {
+    ofstream os(checkFilePath);
+    if (os.is_open())
+    {
+      if (!checkResult.HasIssues())
+      {
+        auto message = "No issue found in model";
+        LOG(INFO) << message;
+        os        << message;
+      }
+      else
+      {
+        LOG(ERROR_LVL) << "Model is not correct. See file: \"" << checkFilePath << "\" for details";
+        os << checkResult.MakeReport();
+      }
+    }
+  }
+  else // Only log status
+  {
+    if (checkResult.HasErrors())
+    {
+      LOG(ERROR_LVL) << checkResult.MakeReport();
+    }
+    else if (checkResult.HasWarnings())
+    {
+      LOG(WARNING) << checkResult.MakeReport();
+    }
+    else if (checkResult.HasIssues())
+    {
+      LOG(INFO) << checkResult.MakeReport();
+    }
+    else
+    {
+      LOG(INFO) << "No issue found in model";
+    }
+  }
+}
+//
+//  End of: MastEnvironment::CheckModel
+//---------------------------------------------------------------------------
+
+
+
 //! Configures logger according to parsed options
 //!
 void MastEnvironment::ConfigureLogger ()
@@ -61,7 +119,6 @@ void MastEnvironment::ConfigureLogger ()
 
   if (!m_configuration->LoggerEnabled())  // Always keep error level!
   {
-//+    g3::logEnabled(false);
     g3l::setLogLevel(DEBUG,   false);
     g3l::setLogLevel(INFO,    false);
     g3l::setLogLevel(WARNING, false);
@@ -148,17 +205,23 @@ void MastEnvironment::CreateSystemModel ()
   LOG(INFO) << "Creating SystemModel";
   m_sm = make_shared<SystemModel>();
 
-//+  auto reader = SIT::SIT_Reader(m_sm);
+  auto reader = SIT::SIT_Reader(m_sm);
 
-//+  reader.parse(filePath);
+  reader.parse(sitFile);
 
-//+  auto topNode = dynamic_pointer_cast<ParentNode>(reader.parsed_sut);
+  auto topNode = dynamic_pointer_cast<ParentNode>(reader.ParsedSystemModel());
 
-//+  CHECK_VALUE_NOT_NULL(topNode, "Failed to parse file: " + filePath);
-//+  m_sm->ReplaceRoot(topNode, false);
+  CHECK_VALUE_NOT_NULL(topNode, "Failed to parse file: "s + sitFile);
+  LOG(INFO) << "SIT has been parsed successfully";
 
-//+  auto namesAndNodes = reader.namesAndNodes;
+  m_sm->ReplaceRoot(topNode, false);
 
+  if (m_configuration->ModelChecking())
+  {
+    CheckModel();
+  }
+
+//+  const auto& namesAndNodes = reader.namesAndNodes;
 }
 //
 //  End of: MastEnvironment::CreateSystemModel

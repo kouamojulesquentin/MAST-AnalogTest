@@ -55,6 +55,17 @@ class MAST_CORE_EXPORT SVF_EmulationProtocol final : public SVF_Player
   //!
   virtual std::experimental::string_view KindName() const override { return "SVF_Emulation"; }
 
+  //! readable identifier for given endpoint
+  //!
+  std::string CallbackId(int EndPoint) { 
+     switch (EndPoint){
+       case 0: return "TRSRT"; 
+       case 1: return "SIR"; 
+       case 2: return "SRD"; 
+       default: return "UNDEFINED";
+       }
+      }
+
   //! Forces the ResetPort to be asserted on the target module
   //!
   virtual void DoReset(bool doSynchronousReset) override;

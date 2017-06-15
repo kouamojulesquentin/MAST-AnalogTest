@@ -67,6 +67,17 @@ class MAST_CORE_EXPORT SVF_SimulationProtocol final : public SVF_Player
   //!
   virtual std::experimental::string_view KindName() const override { return "SVF_Simulation"; }
 
+  //! readable identifier for given endpoint
+  //!
+  std::string CallbackId(int EndPoint) { 
+     switch (EndPoint){
+       case 0: return "TRSRT"; 
+       case 1: return "SIR"; 
+       case 2: return "SRD"; 
+       default: return "UNDEFINED";
+       }
+      }
+
   //! Sets maximum time to wait for data from SUT
   //!
   void FromSutDataTimeout (std::chrono::milliseconds fromSutTimeout) { m_fromSutTimeout = fromSutTimeout; }

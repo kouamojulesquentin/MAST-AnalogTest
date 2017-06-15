@@ -22,6 +22,9 @@
 #include "FileSystem.hpp"
 #include "Plugins.hpp"
 #include "MastConfig.hpp"
+#include "PDL_AlgorithmsRepository.hpp"
+#include "SystemModel.hpp"
+//+#include "SIT_reader.hpp"
 
 using std::vector;
 using std::string;
@@ -133,6 +136,98 @@ void MastEnvironment::ConfigureLogger ()
 //---------------------------------------------------------------------------
 
 
+
+//! Creates system model using parsed options and loaded plugins
+//!
+void MastEnvironment::CreateSystemModel ()
+{
+  const auto& algos = PDL_AlgorithmsRepository::Instance();
+
+  CHECK_VALUE_NOT_ZERO(algos.RegisteredAlgorithmCount(), "A plugin must be loaded with at least one registered PDL algorithm function");
+
+  auto sitFile = m_configuration->SitFilePath();
+  CHECK_VALUE_NOT_EMPTY(sitFile, "A valid (non empty) SIT file path must be provided");
+
+  sitFile = GetActualSitFilePath(sitFile);
+  CHECK_FILE_EXISTS(sitFile);
+  LOG(INFO) << "Using SIT file: " << sitFile;
+
+  LOG(INFO) << "Creating SystemModel";
+  m_sm = make_shared<SystemModel>();
+
+//+  auto reader = SIT::SIT_Reader(m_sm);
+
+//+  reader.parse(filePath);
+
+//+  auto topNode = dynamic_pointer_cast<ParentNode>(reader.parsed_sut);
+
+//+  CHECK_VALUE_NOT_NULL(topNode, "Failed to parse file: " + filePath);
+//+  m_sm->ReplaceRoot(topNode, false);
+
+//+  auto namesAndNodes = reader.namesAndNodes;
+
+}
+//
+//  End of: MastEnvironment::CreateSystemModel
+//---------------------------------------------------------------------------
+
+
+
+//! Tries to find actual SIT file path from its name
+//!
+//! @param sitFile  A SIT file name (or path)
+//!
+//! @return sitFile if it represents a file that can be open from current working directory, first found actual path otherwise
+string MastEnvironment::GetActualSitFilePath (const string& sitFile) const
+{
+  if (Utility::FileExists(sitFile))
+  {
+    return sitFile;
+  }
+
+  // ---------------- Extract directories paths of loaded plugins (at least one should be associated with PDL algorithms)
+  //
+  vector<string> candidateDirs {
+                                 ".",
+                               };
+
+  for (const auto& pluginPath : m_loadedPluginsPath)
+  {
+    // ---------------- Extract directory path
+    //
+    auto directoryPath = Utility::ExtractDirectoryPath(pluginPath);
+
+    if (std::find(candidateDirs.cbegin(), candidateDirs.cend(), directoryPath) == candidateDirs.cend())
+    {
+      candidateDirs.emplace_back(directoryPath);
+    }
+  }
+
+  for (const auto& hintDir : candidateDirs)
+  {
+    auto dirPath = hintDir.empty() ? sitFile
+                                   : hintDir + DIRECTORY_SEPARATOR + sitFile;
+    // Try with hint directory path
+    if (Utility::FileExists(dirPath))
+    {
+      return dirPath;
+    }
+
+    // Try with default extension
+    dirPath.append(".sit");
+    if (Utility::FileExists(dirPath))
+    {
+      return dirPath;
+    }
+  }
+
+  return sitFile;
+}
+//
+//  End of: MastEnvironment::GetActualSitFilePath
+//---------------------------------------------------------------------------
+
+
 //! Initializes logger
 //!
 void MastEnvironment::InitializeLogger ()
@@ -152,8 +247,8 @@ void MastEnvironment::InitializeLogger ()
   m_logger->addSink(std::move(cerrSink), &g3::ErrorsOnCerrLoggerSink::ReceiveLogMessage);
 
   //+ (begin JFC June/09/2017): for debug purpose
-  auto coutSink = std::make_unique<g3::CoutLoggerSink>(*m_logFormatter);
-  m_logger->addSink(std::move(coutSink), &g3::CoutLoggerSink::ReceiveLogMessage);
+//+  auto coutSink = std::make_unique<g3::CoutLoggerSink>(*m_logFormatter);
+//+  m_logger->addSink(std::move(coutSink), &g3::CoutLoggerSink::ReceiveLogMessage);
   //+ (end   JFC June/09/2017):
 
   g3::initializeLogging(m_logger.get());
@@ -199,7 +294,7 @@ void MastEnvironment::LoadPlugins ()
                                        makePathWithDefaultPluginName(appDir),
                                      };
 
-  vector<string> loadedPluginsPath; // To avoid loading them twice
+  m_loadedPluginsPath.clear();
 
   // ---------------- Plugins Files
   //
@@ -215,7 +310,7 @@ void MastEnvironment::LoadPlugins ()
       {
         loaded = true;
         LOG(INFO) << "Loaded plugin: " << effectiveDllPath;
-        loadedPluginsPath.emplace_back(std::move(effectiveDllPath));
+        m_loadedPluginsPath.emplace_back(std::move(effectiveDllPath));
         break;
       }
     }
@@ -239,14 +334,14 @@ void MastEnvironment::LoadPlugins ()
       if (FileSystem::IsDirectory(dirPath))
       {
         LOG(DEBUG) << "Will try to load plugin(s) from directory: " << dirPath;
-        auto loaded = Plugins::LoadPluginsExcept(dirPath, loadedPluginsPath);
+        auto loaded = Plugins::LoadPluginsExcept(dirPath, m_loadedPluginsPath);
         LOG(INFO) << "Have loaded " << loaded.size() << " plugin(s) from directory: " << dirPath;
 
         // ---------------- Save loaded plugins
         //
         for (auto& loadedPlugin : loaded)
         {
-          loadedPluginsPath.emplace_back(std::move(loadedPlugin));
+          m_loadedPluginsPath.emplace_back(std::move(loadedPlugin));
         }
         break;
       }

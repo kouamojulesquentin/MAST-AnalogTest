@@ -88,6 +88,8 @@ void PDL_AlgorithmsRepository::RegisterAlgorithm (const string& algorithmName, P
 
   LOG(INFO) << "Registering PDL algorithm with the name: " << algorithmName;
   m_algorithms[algorithmName] = pdlAlgorithm;
+  LOG(INFO) << m_algorithms.size() << " PDL algorithm(s) have been registered so far";
+
 }
 //
 //  End of: PDL_AlgorithmsRepository::RegisterAlgorithm

@@ -31,6 +31,7 @@ int main (int argc, const char* argv[])
 
     mast.ParseOptions(argc, argv);
     mast.LoadPlugins();
+    mast.CreateSystemModel();
   }
   catch(std::exception& exc) { retCode = -1; cout << "Got: " << exc.what() << endl; }
   catch(...)                 { retCode = -1; cout << "Got non std::exception" << endl; }

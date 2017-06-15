@@ -66,6 +66,7 @@ class MAST_CORE_EXPORT MastEnvironment final
   private:
   void ConfigureLogger ();
   void InitializeLogger ();
+  std::string GetActualSitFilePath (const std::string& sitFile) const;
 
   // ---------------- Private Fields
   //
@@ -75,6 +76,7 @@ class MAST_CORE_EXPORT MastEnvironment final
   std::shared_ptr<g3::LogWorker>      m_logger;
   std::shared_ptr<SystemModel>        m_sm;
   std::shared_ptr<SystemModelManager> m_manager;
+  std::vector<std::string>            m_loadedPluginsPath; //!< To avoid loading them twice and to search for SIT file in same directories
 
   bool m_unitTestsContext = false;  //!< To manage logger differently in unit tests context
 };

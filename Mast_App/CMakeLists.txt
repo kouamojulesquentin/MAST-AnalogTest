@@ -31,14 +31,4 @@ else()
   set(EXTRA_LIBS ${EXTRA_LIBS} pthread dl)
 endif()
 
-
 target_link_libraries(Mast Mast_API_CPP Mast_API_C SIT_Reader_Lib ${EXTRA_LIBS})
-
-message("")
-message("================================================================================")
-message(STATUS "Mast_APP: LIBMAST_CORE_INCLUDE_DIRS:       ${LIBMAST_CORE_INCLUDE_DIRS}")
-message("================================================================================")
-message("")
-
-include(CTest)
-add_test(NAME Mast_Bare COMMAND Mast --log --log_kind=copy_all_on_cout)

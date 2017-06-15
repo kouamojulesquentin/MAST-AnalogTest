@@ -30,12 +30,15 @@ namespace mast
 //! @note PDL algorithms are usually provided by plugins that register
 //!       their algorithm with this repository
 //!
-class MAST_CORE_EXPORT PDL_AlgorithmsRepository
+class MAST_CORE_EXPORT PDL_AlgorithmsRepository final
 {
   // ---------------- Public  Methods
   //
   public:
-  virtual ~PDL_AlgorithmsRepository() = default;
+  ~PDL_AlgorithmsRepository() = default;
+
+  PDL_AlgorithmsRepository(const PDL_AlgorithmsRepository&) = delete;
+  PDL_AlgorithmsRepository& operator=(const PDL_AlgorithmsRepository&) = delete;
 
   //! Returns sole instance
   //!

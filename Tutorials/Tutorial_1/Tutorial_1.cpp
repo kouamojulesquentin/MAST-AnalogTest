@@ -56,7 +56,7 @@ bool RegisterAlgorithms ()
 {
   // ---------------- Get an handle on PDL algorithm repository
   //
-  auto repo = PDL_AlgorithmsRepository::Instance();
+  auto& repo = PDL_AlgorithmsRepository::Instance();
 
   // ---------------- Do register algorithm(s) with a name
   //

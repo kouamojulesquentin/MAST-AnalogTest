@@ -18,6 +18,7 @@ include_directories(${LIBMAST_CPP_API_INCLUDE_DIRS})
 #+include_directories(${LIBLOGGER_INCLUDE_DIRS})
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Tutorial_1")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 add_library           (Tutorial_1 SHARED Tutorial_1.cpp)
 set_target_properties (Tutorial_1 PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )

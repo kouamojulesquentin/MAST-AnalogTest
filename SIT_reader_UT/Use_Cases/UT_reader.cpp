@@ -110,7 +110,7 @@ void UT_reader::test_register_Success ()
     // With Checker
     PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
-    TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
+    TS_ASSERT_EMPTY (checkResult.InformativeReport());
   };
 
   auto data =
@@ -210,7 +210,7 @@ void UT_reader::test_chain ()
     // With Checker
     PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
-    TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
+    TS_ASSERT_EMPTY (checkResult.InformativeReport());
   };
 
   auto data =
@@ -295,7 +295,7 @@ void UT_reader::test_MIB ()
 
     if (checkResult.errorsCount != 0)
     {
-      TS_ASSERT_EQUALS (checkResult.MakeReport(), "");
+      TS_ASSERT_EMPTY (checkResult.MakeReport());
     }
   };
 
@@ -849,7 +849,7 @@ void UT_reader::test_SIB ()
     // With Checker
     PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
-    TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
+    TS_ASSERT_EMPTY (checkResult.InformativeReport());
   };
 
   auto data =
@@ -924,7 +924,7 @@ void UT_reader::test_JTAG_TAP_Success ()
     // With Checker
     PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
-    TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
+    TS_ASSERT_EMPTY (checkResult.InformativeReport());
   };
 
 
@@ -1068,7 +1068,7 @@ void UT_reader::test_ACCES_INTERFACE_Success ()
     // With Checker
     PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
-    TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
+    TS_ASSERT_EMPTY (checkResult.InformativeReport());
   };
 
 
@@ -1324,7 +1324,7 @@ void UT_reader::test_1500 ()
     // With Checker
     PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
-    TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
+    TS_ASSERT_EMPTY (checkResult.InformativeReport());
   };
 
   auto data =
@@ -1388,7 +1388,7 @@ void UT_reader::test_LINKER_Success ()
     // With Checker
     PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
-    TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
+    TS_ASSERT_EMPTY (checkResult.InformativeReport());
 
   };
 
@@ -1508,8 +1508,7 @@ void UT_reader::test_LINKER_CustomTable_Success ()
     // With Checker
     PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
-    TS_ASSERT_EQUALS (checkResult.InformativeReport(), "");
-
+    TS_ASSERT_EMPTY (checkResult.InformativeReport());
   };
 
   auto data =

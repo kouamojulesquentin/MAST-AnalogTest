@@ -32,12 +32,6 @@ using namespace std::string_literals;
       TS_FAIL(string(#text).append(": ").append((text)).append(", does not contain: ").append((sub_text)));\
     }
 
-#define TS_ASSERT_STR_EMPTY(text)                                           \
-    if (!(text).empty())                                                    \
-    {                                                                       \
-      TS_FAIL(string(#text).append(" is not empty. Got: ").append((text))); \
-    }
-
 
 //! Checks ValueArg constructor with minimal parameters
 //!
@@ -184,8 +178,8 @@ void UT_TClap::test_CmdLine_parse_only_ExeName ()
   //
   TS_ASSERT_FALSE (sut.shouldExit());
 
-  TS_ASSERT_EQUALS (stdStream.str(), "");
-  TS_ASSERT_EQUALS (errStream.str(), "");
+  TS_ASSERT_EMPTY (stdStream.str());
+  TS_ASSERT_EMPTY (errStream.str());
 }
 
 
@@ -212,7 +206,7 @@ void UT_TClap::test_CmdLine_parse_Help ()
   TS_ASSERT_TRUE (sut.shouldExit());
 
   TS_ASSERT_STR_CONTAINS (stdStream.str(), "USAGE: ");
-  TS_ASSERT_EQUALS       (errStream.str(), "");
+  TS_ASSERT_EMPTY       (errStream.str());
 }
 
 
@@ -239,7 +233,7 @@ void UT_TClap::test_CmdLine_parse_Version ()
   TS_ASSERT_TRUE (sut.shouldExit());
 
   TS_ASSERT_STR_CONTAINS(stdStream.str(), "MySuperApp  version: 0.9.x");
-  TS_ASSERT_EQUALS (errStream.str(), "");
+  TS_ASSERT_EMPTY (errStream.str());
 }
 
 
@@ -328,8 +322,8 @@ void UT_TClap::test_CmdLine_parse_all_Parameters ()
   // ---------------- Verify
   //
   TS_ASSERT_FALSE (sut.shouldExit());
-  TS_ASSERT_STR_EMPTY(stdStream.str());
-  TS_ASSERT_STR_EMPTY(errStream.str());
+  TS_ASSERT_EMPTY (stdStream.str());
+  TS_ASSERT_EMPTY (errStream.str());
 
   TS_ASSERT_EQUALS (fooArg.getValue(), 5);
 }

@@ -67,7 +67,7 @@ SystemModel Create_SimpleMIB ()
 
 //+  GmlPrinter gmlPrinter("Simple MIB", true, true, true);
 //+  root->Accept(gmlPrinter);
-//+  TS_ASSERT_EQUALS (gmlPrinter.Graph(), "");
+//+  TS_ASSERT_EMPTY (gmlPrinter.Graph());
 
   return sm;
 }

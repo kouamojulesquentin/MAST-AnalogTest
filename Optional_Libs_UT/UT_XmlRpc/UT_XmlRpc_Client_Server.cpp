@@ -99,7 +99,7 @@ void UT_XmlRpc_Client_Server::test_SendDoReset ()
   // ---------------- Verify
   //
   TS_ASSERT_FALSE  (ctx.gotException);
-  TS_ASSERT_EQUALS (ctx.exceptionMessage, "");
+  TS_ASSERT_EMPTY (ctx.exceptionMessage);
 }
 
 
@@ -131,7 +131,7 @@ void UT_XmlRpc_Client_Server::test_SendScanVector_Single ()
   const auto& fromSutData      = sendResult.second;
 
   TS_ASSERT_FALSE  (ctx.gotException);
-  TS_ASSERT_EQUALS (ctx.exceptionMessage, "");
+  TS_ASSERT_EMPTY (ctx.exceptionMessage);
   TS_ASSERT_EQUALS (fromSutBitsCount,     bitsCount);
   TS_ASSERT_EQUALS (fromSutData,          toSutData);
 }
@@ -179,7 +179,7 @@ void UT_XmlRpc_Client_Server::test_SendScanVector_Multiple ()
   ctx.Stop();
 
   TS_ASSERT_FALSE  (ctx.gotException);
-  TS_ASSERT_EQUALS (ctx.exceptionMessage, "");
+  TS_ASSERT_EMPTY (ctx.exceptionMessage);
   TS_ASSERT_EQUALS (fromSutDatas, toSutDatas);
 }
 

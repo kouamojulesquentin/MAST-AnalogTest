@@ -319,7 +319,7 @@ void UT_YamlLib::test_Emitter_Empty ()
   TS_ASSERT_TRUE (emitter.good());
 
   auto got = emitter.str();
-  TS_ASSERT_EQUALS (got, "");
+  TS_ASSERT_EMPTY (got);
 }
 
 

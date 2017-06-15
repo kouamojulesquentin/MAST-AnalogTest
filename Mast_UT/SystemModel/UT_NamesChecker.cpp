@@ -65,7 +65,7 @@ void UT_NamesChecker::test_Check_SameNames_Only_Regs ()
   TS_ASSERT_EQUALS (result.infosCount,    0u);
   TS_ASSERT_EQUALS (result.warningsCount, 0u);
   TS_ASSERT_EQUALS (result.errorsCount,   1u);
-//+  TS_ASSERT_EQUALS (result.MakeReport(), "");
+//+  TS_ASSERT_EMPTY (result.MakeReport());
 }
 
 
@@ -248,7 +248,7 @@ void UT_NamesChecker::test_Check_SameNames_Mix_Regs_and_Ignored_2 ()
   TS_ASSERT_EQUALS (result.infosCount,    1u);  // For same name but ignored
   TS_ASSERT_EQUALS (result.warningsCount, 0u);
   TS_ASSERT_EQUALS (result.errorsCount,   0u);
-//+  TS_ASSERT_EQUALS (result.MakeReport(), "");
+//+  TS_ASSERT_EMPTY (result.MakeReport());
 }
 
 
@@ -302,7 +302,7 @@ void UT_NamesChecker::test_Check_NoName_Parent ()
   TS_ASSERT_EQUALS (result.infosCount,    0u);
   TS_ASSERT_EQUALS (result.warningsCount, 1u);
   TS_ASSERT_EQUALS (result.errorsCount,   0u);
-//+  TS_ASSERT_EQUALS (result.MakeReport(), "");
+//+  TS_ASSERT_EMPTY (result.MakeReport());
 }
 
 
@@ -330,7 +330,7 @@ void UT_NamesChecker::test_Check_NoName_Ignored ()
   TS_ASSERT_EQUALS (result.infosCount,    0u);
   TS_ASSERT_EQUALS (result.warningsCount, 0u);
   TS_ASSERT_EQUALS (result.errorsCount,   0u);
-//+  TS_ASSERT_EQUALS (result.MakeReport(), "");
+//+  TS_ASSERT_EMPTY (result.MakeReport());
 }
 
 
@@ -359,7 +359,7 @@ void UT_NamesChecker::test_Check_SamePath_Downward_2_Regs ()
   TS_ASSERT_EQUALS (result.infosCount,    0u);
   TS_ASSERT_EQUALS (result.warningsCount, 0u);
   TS_ASSERT_EQUALS (result.errorsCount,   1u);
-//+  TS_ASSERT_EQUALS (result.MakeReport(), "");
+//+  TS_ASSERT_EMPTY (result.MakeReport());
 }
 
 
@@ -390,7 +390,7 @@ void UT_NamesChecker::test_Check_SamePath_Downward_3_Regs ()
   TS_ASSERT_EQUALS (result.infosCount,    0u);
   TS_ASSERT_EQUALS (result.warningsCount, 0u);
   TS_ASSERT_EQUALS (result.errorsCount,   2u);
-//+  TS_ASSERT_EQUALS (result.MakeReport(), "");
+//+  TS_ASSERT_EMPTY (result.MakeReport());
 }
 
 
@@ -451,7 +451,7 @@ void UT_NamesChecker::test_Check_SamePath_Sideward_3_Regs ()
   TS_ASSERT_EQUALS (result.infosCount,    0u);
   TS_ASSERT_EQUALS (result.warningsCount, 0u);
   TS_ASSERT_EQUALS (result.errorsCount,   2u);
-//+  TS_ASSERT_EQUALS (result.MakeReport(), "");
+//+  TS_ASSERT_EMPTY (result.MakeReport());
 }
 
 

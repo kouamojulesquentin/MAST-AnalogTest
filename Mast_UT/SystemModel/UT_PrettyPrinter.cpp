@@ -48,7 +48,7 @@ void UT_PrettyPrinter::test_Constructor ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS (sut.PrettyPrint(), "");
+  TS_ASSERT_EMPTY (sut.PrettyPrint());
 }
 
 //! Checks PrettyPrinter::VisitAccessInterface()

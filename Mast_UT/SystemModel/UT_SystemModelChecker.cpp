@@ -816,7 +816,7 @@ void UT_SystemModelChecker::test_Check_When_RootIsChainWithMixKindChildren ()
 //+  // ---------------- Verify
 //+  //
 //+  TS_ASSERT_FALSE (result.HasWarnings());
-//+  TS_ASSERT_EQUALS (result.MakeReport(), "");
+//+  TS_ASSERT_EMPTY (result.MakeReport());
 //+}
 
 
@@ -875,7 +875,7 @@ void UT_SystemModelChecker::test_Check_When_AccessInterface_has_LessEndPoints ()
   TS_ASSERT_FALSE  (result.HasWarnings());
   TS_ASSERT_FALSE  (result.HasErrors());
   TS_ASSERT_EQUALS (result.infosCount,  1u);
-//+  TS_ASSERT_EQUALS (result.MakeReport(), "");
+//+  TS_ASSERT_EMPTY (result.MakeReport());
 }
 
 

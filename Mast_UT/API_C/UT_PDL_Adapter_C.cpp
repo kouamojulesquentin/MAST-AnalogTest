@@ -177,7 +177,7 @@ namespace
     auto errorMsg = ErrorMessage();
 
     TS_ASSERT_EQUALS (retCode,  ErrorCode::Ok);
-    TS_ASSERT_EQUALS (errorMsg, "");
+    TS_ASSERT_EMPTY (errorMsg);
     TS_ASSERT_EQUALS (readData, expectedData);
   }
 
@@ -255,7 +255,7 @@ namespace
     TS_ASSERT_EQUALS         (retCode, ErrorCode::Ok);
 
     auto errorMsg = ErrorMessage();
-    TS_ASSERT_EQUALS (errorMsg, "");
+    TS_ASSERT_EMPTY (errorMsg);
 
     auto reg               = Startup::GetSystemModel()->RegisterWithId(7u);
     auto expectedNextToSut = BinaryVector::CreateFromHexString(expected);

@@ -45,13 +45,6 @@ using namespace mast;
       TS_FAIL(string(#text).append(": ").append((text)).append(", does not contain: ").append((sub_text)));\
     }
 
-    #define TS_ASSERT_STR_EMPTY(text)                                           \
-        if (!(text).empty())                                                    \
-        {                                                                       \
-          TS_FAIL(string(#text).append(" is not empty. Got: ").append((text))); \
-        }
-
-
 namespace
 {
   void Check_DefaultConfiguration(const MastConfiguration& sut)
@@ -627,8 +620,8 @@ void UT_MastConfiguration::test_Update_ShortSwitches ()
   TS_ASSERT_EQUALS (pluginDirs.size(),  1u);
   TS_ASSERT_EQUALS (pluginDirs.front(), PLUGINS_DIRECTORY_NAME);
 
-  TS_ASSERT_STR_EMPTY (stdStream.str());
-  TS_ASSERT_STR_EMPTY (errStream.str());
+  TS_ASSERT_EMPTY (stdStream.str());
+  TS_ASSERT_EMPTY (errStream.str());
 }
 
 
@@ -692,8 +685,8 @@ void UT_MastConfiguration::test_Update_LongSwitches ()
   TS_ASSERT_EQUALS (sut.GmlReportMoments(),          mast::ReportMoments::AfterModelParsing);
   TS_ASSERT_EQUALS (sut.PrettyPrintReportMoments(),  mast::ReportMoments::AfterModelParsing);
 
-  TS_ASSERT_STR_EMPTY (stdStream.str());
-  TS_ASSERT_STR_EMPTY (errStream.str());
+  TS_ASSERT_EMPTY (stdStream.str());
+  TS_ASSERT_EMPTY (errStream.str());
 
   CxxTest::setAbortTestOnFail(true);
   const auto& plugins = sut.PluginDLLs();
@@ -767,8 +760,8 @@ void UT_MastConfiguration::test_Update_UsingArgv ()
   TS_ASSERT_EQUALS (sut.GmlReportMoments(),          mast::ReportMoments::AfterModelParsing);
   TS_ASSERT_EQUALS (sut.PrettyPrintReportMoments(),  mast::ReportMoments::AfterModelParsing);
 
-  TS_ASSERT_STR_EMPTY (stdStream.str());
-  TS_ASSERT_STR_EMPTY (errStream.str());
+  TS_ASSERT_EMPTY (stdStream.str());
+  TS_ASSERT_EMPTY (errStream.str());
 
   CxxTest::setAbortTestOnFail(true);
   const auto& plugins = sut.PluginDLLs();

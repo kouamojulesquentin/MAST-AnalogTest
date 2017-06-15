@@ -85,7 +85,7 @@ void UT_YamlFile::test_Check_Valid ()
   // ---------------- Verify
   //
   TS_ASSERT_TRUE   (ok);
-  TS_ASSERT_EQUALS (errorMessage, "");
+  TS_ASSERT_EMPTY (errorMessage);
 }
 
 
@@ -355,7 +355,7 @@ void UT_YamlFile::test_GetAsString_AutoCreate_true ()
     TS_ASSERT_EQUALS (got, defaultValue);
 
     //+ (begin JFC October/26/2016): for debug purpose
-//+    TS_ASSERT_EQUALS (sut.AsString(), "");
+//+    TS_ASSERT_EMPTY (sut.AsString());
     //+ (end   JFC October/26/2016):
   };
 
@@ -925,7 +925,7 @@ void UT_YamlFile::test_TryGetAsString_NotExist ()
     //
     TS_ASSERT_FALSE  (sut.IsDirty());
     TS_ASSERT_FALSE  (succeeded);
-    TS_ASSERT_EQUALS (got, "");
+    TS_ASSERT_EMPTY (got);
   };
 
   auto data =
@@ -3024,7 +3024,7 @@ void UT_YamlFile::test_CheckFile_Valid ()
   // ---------------- Verify
   //
   TS_ASSERT_TRUE (ok);
-  TS_ASSERT_EQUALS (errorMessage, "");
+  TS_ASSERT_EMPTY (errorMessage);
 }
 
 
@@ -3208,7 +3208,7 @@ void UT_YamlFile::test_TryLoadFile_Valid ()
   //
   TS_ASSERT_FALSE  (sut.IsDirty());
   TS_ASSERT_TRUE   (succeeded);
-  TS_ASSERT_EQUALS (message, "");
+  TS_ASSERT_EMPTY (message);
 }
 
 

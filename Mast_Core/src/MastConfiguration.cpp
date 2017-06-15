@@ -269,9 +269,7 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
       tie(ok, gotFlags) = yaml.TryGetAsStringVector (makePath(pathItems));
       if (ok)
       {
-        using enum_type = std::remove_reference_t<decltype(option)>;
-
-        option = static_cast<enum_type>(0);
+        ForceValue(option, 0);
 
         for (const auto& flag : gotFlags)
         {
@@ -368,7 +366,6 @@ void MastConfiguration::Update (int argc, const char* argv[])
 //---------------------------------------------------------------------------
 
 
-
 //! Updates from list of command line arguments
 //!
 //! @param arguments  Command line arguments (first one is application name)
@@ -413,9 +410,9 @@ void MastConfiguration::Update (vector<string> arguments)
     TCLAP::ValueArg<std::string> configurationAlgoArg ("a", "config_algo", "Name of configuration algorithm used to select linker  (mux) path",             false, "last_or_default",        "last_lazy|last_or_default|last_or_default_greedy| \"name defined by a plugin\"", cmdLine);
     TCLAP::ValueArg<std::string> checkModelFileArg    ("",  "check_file",  "Defines result of model checking (it is always logged when logger is enabled)", false, "mast_check.txt",         "File path", cmdLine);
     TCLAP::SwitchArg             checkModelArg        ("",  "check",       "Enable model checking (resulting from parsing SIT file)",                       cmdLine, false);
-    TCLAP::ValueArg<std::string> logKindArg           ("",  "log_kind",    "Define logger kind",                                                            false, "std",                    &logKindConstraint, cmdLine);
-    TCLAP::ValueArg<std::string> logLevelArg          ("",  "log_level",   "Define log level",                                                              false, "info",                   &logLevelConstraint, cmdLine);
-    TCLAP::ValueArg<std::string> logShowArg           ("",  "log_show",    "Define log shown items",                                                        false, "level",                  &logShowConstraint,  cmdLine);
+    TCLAP::MultiArg<std::string> logKindArg           ("",  "log_kind",    "Define logger kind",                                                            false,                   &logKindConstraint,  cmdLine);
+    TCLAP::MultiArg<std::string> logLevelArg          ("",  "log_level",   "Define log level",                                                              false,                   &logLevelConstraint, cmdLine);
+    TCLAP::MultiArg<std::string> logShowArg           ("",  "log_show",    "Define log shown items",                                                        false,                   &logShowConstraint,  cmdLine);
     TCLAP::ValueArg<std::string> logFileArg           ("",  "log_file",    "Define logger file path",                                                       false, "mast.log",               "File path", cmdLine);
     TCLAP::SwitchArg             logEnabledArg        ("l", "log",         "Enable logger",                                                                 cmdLine, false);
     TCLAP::MultiArg<std::string> pluginFilesArg       ("",  "plugin",      "Define a plugin file to load",                                                  false, "File path",      cmdLine);
@@ -441,18 +438,25 @@ void MastConfiguration::Update (vector<string> arguments)
         }
       };
 
-      auto setMappedOption = [](auto& option, const auto& arg, const auto& mapping)
+      auto setMappedOptionFlags = [](auto& option, const auto& arg, const auto& mapping)
       {
         if (arg.isSet())
         {
-          auto pos = mapping.find(arg.getValue());
-          if (pos != mapping.cend())  // ==> Should be always true unless mapping is not complete !
+          ForceValue(option, 0);
+
+          const auto& options = arg.getValue();
+
+          for (const auto& optionString : options)
           {
-            option = pos->second;
-          }
-          else
-          {
-            LOG(INFO) << "Internal error; no mapping for flag: " << arg.getValue();
+            auto pos = mapping.find(optionString);
+            if (pos != mapping.cend())  // ==> Should be always true unless mapping is not complete !
+            {
+              option |= pos->second;
+            }
+            else
+            {
+              LOG(INFO) << "Internal error; no mapping for flag: " << optionString;
+            }
           }
         }
       };
@@ -474,9 +478,9 @@ void MastConfiguration::Update (vector<string> arguments)
       setOption(m_loggerFilePath,          logFileArg);
       setOption(m_accessInterfaceProtocol, aiProtocolArg);
 
-      setMappedOption(m_loggerKind,       logKindArg,  loggerKindMapping);
-      setMappedOption(m_loggerLevel,      logLevelArg, loggerLevelMapping);
-      setMappedOption(m_loggerShownItems, logShowArg,  loggerShownItemMapping);
+      setMappedOptionFlags(m_loggerKind,       logKindArg,  loggerKindMapping);
+      setMappedOptionFlags(m_loggerLevel,      logLevelArg, loggerLevelMapping);
+      setMappedOptionFlags(m_loggerShownItems, logShowArg,  loggerShownItemMapping);
     }
   }
   catch(TCLAP::CmdLineParseException& exc)

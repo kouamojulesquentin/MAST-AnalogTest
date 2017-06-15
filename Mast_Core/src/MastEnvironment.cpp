@@ -68,23 +68,16 @@ void MastEnvironment::ConfigureLogger ()
   }
   else
   {
-    auto shownItems = LoggerShownItems();
+    auto shownItems = m_configuration->LoggerShownItems();
 
     m_logFormatter->ShowDate         (IsSet(shownItems, mast::LoggerShownItems::Date));
     m_logFormatter->ShowTime         (IsSet(shownItems, mast::LoggerShownItems::Time));
     m_logFormatter->ShowMicroseconds (IsSet(shownItems, mast::LoggerShownItems::Microseconds));
+    m_logFormatter->ShowLevel        (IsSet(shownItems, mast::LoggerShownItems::Level));
+    m_logFormatter->ShowThreadId     (IsSet(shownItems, mast::LoggerShownItems::ThreadId));
     m_logFormatter->ShowFileName     (IsSet(shownItems, mast::LoggerShownItems::FileName));
     m_logFormatter->ShowFunctionName (IsSet(shownItems, mast::LoggerShownItems::FunctionName));
     m_logFormatter->ShowLineNumber   (IsSet(shownItems, mast::LoggerShownItems::LineNumber));
-
-    //+ (begin JFC June/12/2017): for debug purpose
-    m_logFormatter->ShowDate         (false);
-    m_logFormatter->ShowTime         (false);
-    m_logFormatter->ShowMicroseconds (false);
-    m_logFormatter->ShowFileName     (false);
-    m_logFormatter->ShowLineNumber   (false);
-    //+ (end   JFC June/12/2017):
-
 
     g3::only_change_at_initialization::setLogLevel(ERROR_LVL, true);
     switch (m_configuration->LoggerLevel())
@@ -126,7 +119,7 @@ void MastEnvironment::ConfigureLogger ()
     }
     else if (m_configuration->LoggerKind() == mast::LoggerKind::CopyAllOnCout)
     {
-      auto coutSink = std::make_unique<g3::CoutLoggerSink>();
+      auto coutSink = std::make_unique<g3::CoutLoggerSink>(*m_logFormatter);
       m_logger->addSink(std::move(coutSink), &g3::CoutLoggerSink::ReceiveLogMessage);
     }
   }
@@ -235,21 +228,18 @@ void MastEnvironment::InitializeLogger ()
   m_logger       = g3::LogWorker::createLogWorker();
   m_logFormatter = make_shared<g3::LogFormatter>();
 
-  m_logFormatter->ShowDate(false);
-  m_logFormatter->ShowTime(true);
-  m_logFormatter->ShowFileName(false);
-  m_logFormatter->ShowFunctionName(true);
-  m_logFormatter->ShowLineNumber(false);
+  m_logFormatter->ShowDate         (false);
+  m_logFormatter->ShowTime         (true);
+  m_logFormatter->ShowFileName     (false);
+  m_logFormatter->ShowFunctionName (true);
+  m_logFormatter->ShowLineNumber   (false);
+  m_logFormatter->ShowLevel        (true);
+  m_logFormatter->ShowThreadId     (false);
 
   // ---------------- Sink for logging errors to std::cerr
   //
   auto cerrSink = std::make_unique<g3::ErrorsOnCerrLoggerSink>(*m_logFormatter);
   m_logger->addSink(std::move(cerrSink), &g3::ErrorsOnCerrLoggerSink::ReceiveLogMessage);
-
-  //+ (begin JFC June/09/2017): for debug purpose
-//+  auto coutSink = std::make_unique<g3::CoutLoggerSink>(*m_logFormatter);
-//+  m_logger->addSink(std::move(coutSink), &g3::CoutLoggerSink::ReceiveLogMessage);
-  //+ (end   JFC June/09/2017):
 
   g3::initializeLogging(m_logger.get());
   g3::logEnabled(true);

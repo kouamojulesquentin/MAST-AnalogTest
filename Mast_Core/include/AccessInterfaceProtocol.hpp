@@ -51,6 +51,13 @@ class AccessInterfaceProtocol
   //!
   virtual std::experimental::string_view KindName() const = 0;
 
+  //! readable identifier for given endpoint
+  //!
+  std::string CallbackId(int EndPoint) { 
+         return AccessInterfaceProtocol::KindName().to_string()+"_"+std::to_string(EndPoint); 
+	 };
+
+
   //! Forces the ResetPort to be asserted on the target module
   //!
   //! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence

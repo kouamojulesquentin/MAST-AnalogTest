@@ -452,6 +452,42 @@ void doAssertFileNotExists (const char* file, int line, const char* checkedFile,
 void doAssertFileSize      (const char* file, int line, const char* checkedFile, int         expecteSize,     const char* message);
 void doAssertFileContent   (const char* file, int line, const char* filePath,    const char* expectedContentExpr, const char* expectedContent, const char* message);
 
+template<class T>
+inline bool isEmpty(const T& x)
+{
+  return x.empty();
+}
+
+inline bool isEmpty(const char* pStr)
+{
+  if (!pStr)
+  {
+    return true;
+  }
+
+  return pStr[0] == '\0';
+}
+
+template<size_t N>
+inline bool isEmpty(const char pStr[N]) { return isEmpty(static_cast<const char*>(pStr)); }
+inline bool isEmpty(char*      pStr)    { return isEmpty(static_cast<const char*>(pStr)); }
+
+
+
+template<typename T>
+void doAssertEmpty (const char* file, int line, const char *containerExpr, const T& container, const char* message)
+{
+  if (!isEmpty(container))
+  {
+      tracker().failedAssertEmpty  (message, file, line, containerExpr, TS_AS_STRING(container));
+      TS_ABORT();
+  }
+  else
+  {
+    tracker().succeededAssertEmpty (message, file, line, containerExpr);
+  }
+}
+
 template<typename TExc>
 void doUnexpectedException(const char *file, int line, const char* typeName, const TExc& exc)
 {
@@ -998,6 +1034,23 @@ inline EqualTrait<T> MakeEqualTrait(const T& x) { return EqualTrait<T>(x); }
 #   define TSM_ASSERT_FILE_CONTENT(m,cfp,efc) _TSM_ASSERT_FILE_CONTENT(__FILE__,__LINE__,m,cfp,efc)
 
 
+// TS_ASSERT_EMPTY
+// Check that container is empty
+#   define ___ETS_ASSERT_EMPTY(f,l,x,m) CxxTest::countAssert(); CxxTest::doAssertEmpty((f), (l), #x, (x), (m))
+#   define ___TS_ASSERT_EMPTY(f,l,x,m) { _TS_TRY { ___ETS_ASSERT_EMPTY(f,l,x,m); } __TS_CATCH(f,l) }
+
+#   define _ETS_ASSERT_EMPTY(f,l,x) ___ETS_ASSERT_EMPTY(f,l,x,0)
+#   define _TS_ASSERT_EMPTY(f,l,x) ___TS_ASSERT_EMPTY(f,l,x,0)
+
+#   define ETS_ASSERT_EMPTY(x) _ETS_ASSERT_EMPTY(__FILE__,__LINE__,x)
+#   define TS_ASSERT_EMPTY(x) _TS_ASSERT_EMPTY(__FILE__,__LINE__,x)
+
+#   define _ETSM_ASSERT_EMPTY(f,l,m,x) ___ETS_ASSERT_EMPTY(f,l,x,TS_AS_STRING_NO_QUOTES(m))
+#   define _TSM_ASSERT_EMPTY(f,l,m,x) ___TS_ASSERT_EMPTY(f,l,x,TS_AS_STRING_NO_QUOTES(m))
+
+#   define ETSM_ASSERT_EMPTY(m,x) _ETSM_ASSERT_EMPTY(__FILE__,__LINE__,m,x)
+#   define TSM_ASSERT_EMPTY(m,x) _TSM_ASSERT_EMPTY(__FILE__,__LINE__,m,x)
+
 
 
 // TS_ASSERT_THROWS
@@ -1031,8 +1084,6 @@ inline EqualTrait<T> MakeEqualTrait(const T& x) { return EqualTrait<T>(x); }
               CxxTest::doAssertThrows((f), (l), #e, (m), #t, NULL, false, false);  \
             }                                                      \
           }
-
-//+          _TS_CATCH_STD( ex,                 { hasThrown = true; CxxTest::doAssertThrows((f), (l), #e, (m), #t, y_x.append("std::exception(",          ex.what(), ")").get(), hasThrown, true); } )
 
 #   define _TS_ASSERT_THROWS_ASSERT(f,l,e,t,a) ___TS_ASSERT_THROWS_ASSERT(f,l,e,t,a,0)
 #   define TS_ASSERT_THROWS_ASSERT(e,t,a) _TS_ASSERT_THROWS_ASSERT(__FILE__,__LINE__,e,t,a)

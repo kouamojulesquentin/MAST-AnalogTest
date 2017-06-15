@@ -58,6 +58,7 @@ public:
     virtual void failedAssertFalse             (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*expression*/) = 0;
     virtual void failedAssertNotNullptr        (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*expression*/) = 0;
     virtual void failedAssertNullptr           (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*expression*/) = 0;
+    virtual void failedAssertEmpty             (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*containerExpr*/, const char* /*containerContent*/) = 0;
     virtual void failedAssertEquals            (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*xStr*/, const char* /*yStr*/, const char* /*x*/, const char* /*y*/) = 0;
     virtual void failedAssertSameData          (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*xStr*/, const char* /*yStr*/, const char* /*sizeStr*/, const void * /*x*/, const void * /*y*/, unsigned /*size*/) = 0;
     virtual void failedAssertFileContent       (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*checkedFile*/, const char* /*expectedContent*/, const char* /*expectedContentExpr*/, const DifferenceInfo& /*diffInfo*/) = 0;
@@ -87,6 +88,7 @@ public:
     virtual void succeededAssertNullptr           (const char* /*assertionMessage*/, const char* /*file*/, int  /*line*/, const char* /*expression*/) Intention \
     virtual void succeededAssertDelta             (const char* /*assertionMessage*/, const char* /*file*/, int  /*line*/, const char* /*xStr*/,  const char* /*yStr*/, const char* /*dStr*/, const char* /*x*/, const char* /*y*/, const char* /*d*/) Intention \
     virtual void succeededAssertDiffers           (const char* /*assertionMessage*/, const char* /*file*/, int  /*line*/, const char* /*xStr*/,  const char* /*yStr*/, const char* /*x*/, const char* /*y*/) Intention \
+    virtual void succeededAssertEmpty             (const char* /*assertionMessage*/, const char* /*file*/, int  /*line*/, const char* /*containerExpr*/) Intention \
     virtual void succeededAssertEquals            (const char* /*assertionMessage*/, const char* /*file*/, int  /*line*/, const char* /*xStr*/,  const char* /*yStr*/, const char* /*x*/, const char* /*y*/) Intention \
     virtual void succeededAssertFileContent       (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*checkedFile*/, const char* /*expectedContent*/, const char* /*expectedContentExpr*/, const DifferenceInfo& /*diffInfo*/) Intention \
     virtual void succeededAssertFileExists        (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*checkedFile*/) Intention \

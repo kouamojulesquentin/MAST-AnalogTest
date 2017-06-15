@@ -13,6 +13,14 @@
 #include "UT_Asserts_Failures.h"
 #include <stdexcept>
 #include <functional>
+#include <string>
+#include <vector>
+#include <map>
+
+
+using std::string;
+using std::vector;
+using std::map;
 
 namespace
 {
@@ -286,6 +294,81 @@ void UT_Asserts_Failures::test_ASSERT_SAME_DATA ()
 }
 
 
+//! Runs TS_ASSERT_EMPTY with non empty char[]
+//!
+void UT_Asserts_Failures::test_ASSERT_EMPTY_CharArray ()
+{
+    // ---------------- Setup
+    //
+    const char notEmptyCharArray[] = "I'm not an empty char[]";
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_EMPTY(notEmptyCharArray);
+}
+
+
+//! Runs TS_ASSERT_EMPTY with non empty C-Style string
+//!
+void UT_Asserts_Failures::test_ASSERT_EMPTY_C_String ()
+{
+    // ---------------- Setup
+    //
+    const char* notEmptyC_String = "I'm not an empty C-Style string";
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_EMPTY(notEmptyC_String);
+}
+
+
+//! Runs TS_ASSERT_EMPTY with non empty std::string
+//!
+void UT_Asserts_Failures::test_ASSERT_EMPTY_String ()
+{
+    // ---------------- Setup
+    //
+    string notEmptyString("I'm not an empty string");
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_EMPTY(notEmptyString);
+}
+
+//! Runs TS_ASSERT_EMPTY with non empty std::vector
+//!
+void UT_Asserts_Failures::test_ASSERT_EMPTY_Vector ()
+{
+    // ---------------- Setup
+    //
+    vector<int> notEmptyVector;
+    notEmptyVector.push_back(3);
+    notEmptyVector.push_back(2);
+    notEmptyVector.push_back(1);
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_EMPTY(notEmptyVector);
+}
+
+
+//! Runs TS_ASSERT_EMPTY with non empty std::map
+//!
+void UT_Asserts_Failures::test_ASSERT_EMPTY_Map ()
+{
+    // ---------------- Setup
+    //
+    map<int, string> notEmptyMap;
+
+    notEmptyMap[3]  = "Hello";
+    notEmptyMap[21] = "World";
+    notEmptyMap[99] = "Foo";
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_EMPTY(notEmptyMap);
+}
+
 //! Runs TSM_ASSERT with an expression that evaluates to false
 //!
 void UT_Asserts_Failures::test_ASSERT_MESSAGE ()
@@ -294,6 +377,8 @@ void UT_Asserts_Failures::test_ASSERT_MESSAGE ()
 
     TSM_ASSERT("This is assertion message for TSM_ASSERT", incrementIntCounter() == value);
 }
+
+
 
 //! Runs TSM_ASSERT_FALSE with an expression that evaluates to true
 //!
@@ -476,6 +561,18 @@ void UT_Asserts_Failures::test_ASSERT_MESSAGE_THROWS_NOTHING ()
     TSM_ASSERT_THROWS_NOTHING("This is assertion message for TSM_ASSERT_THROWS_NOTHING", throwException());
 }
 
+//! Runs TSM_ASSERT_EMPTY with non empty std::string
+//!
+void UT_Asserts_Failures::test_ASSERT_MESSAGE_EMPTY ()
+{
+    // ---------------- Setup
+    //
+    const char* notEmptyC_String = "I'm not an empty C-Style string";
+
+    // ---------------- Exercise & Verify
+    //
+    TSM_ASSERT_EMPTY("This is assertion message for TSM_ASSERT_EMPTY", notEmptyC_String);
+}
 
 //===========================================================================
 // End of UT_Asserts_Failures.cpp

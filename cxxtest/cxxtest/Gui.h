@@ -113,6 +113,12 @@ public:
         redBarSafe();
     }
 
+    virtual void failedAssertEmpty (const char* /*message*/, const char* /*file*/, int /*line*/, const char* /*containerExpr*/, const char* /*containerContent*/)
+    {
+      redBarSafe();
+    }
+
+
     virtual void failedAssertEquals(const char* /* message */, const char * /*file*/, int /*line*/,
                             const char * /*xStr*/, const char * /*yStr*/,
                             const char * /*x*/, const char * /*y*/)
@@ -245,6 +251,7 @@ public:
     {
         redBarSafe();
     }
+
 
     IGNORE_SUCCEEDED_ASSERTIONS
 

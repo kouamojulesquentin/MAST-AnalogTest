@@ -1,286 +1,315 @@
-Running UT_Asserts_Successes tests (65 tests)
+Running UT_Asserts_Successes tests (72 tests)
 
 
 In UT_Asserts_Successes::test_ASSERT:
-UT_Asserts_Successes.cpp:112: Success: Expected (incrementIntCounter() == value) to be true, Result: It is true
+UT_Asserts_Successes.cpp:120: Success: Expected (incrementIntCounter() == value) to be true, Result: It is true
 .
 
 In UT_Asserts_Successes::test_ASSERT_FALSE:
-UT_Asserts_Successes.cpp:120: Success: Expected (incrementIntCounter() == value) to be false, Result: It is false
+UT_Asserts_Successes.cpp:128: Success: Expected (incrementIntCounter() == value) to be false, Result: It is false
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS:
-UT_Asserts_Successes.cpp:128: Success: Expected (incrementIntCounter() == value), Result: (1 == 1)
+UT_Asserts_Successes.cpp:136: Success: Expected (incrementIntCounter() == value), Result: (1 == 1)
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Int_Signed_Unsigned:
-UT_Asserts_Successes.cpp:138: Success: Expected (signedValue == unsignedValue), Result: (123 == 123)
+UT_Asserts_Successes.cpp:146: Success: Expected (signedValue == unsignedValue), Result: (123 == 123)
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Int_Unsigned_unsigned:
-UT_Asserts_Successes.cpp:148: Success: Expected (unsignedValue == signedValue), Result: (123 == 123)
+UT_Asserts_Successes.cpp:156: Success: Expected (unsignedValue == signedValue), Result: (123 == 123)
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Short_Signed_Unsigned:
-UT_Asserts_Successes.cpp:158: Success: Expected (signedValue == unsignedValue), Result: (123 == 123)
+UT_Asserts_Successes.cpp:166: Success: Expected (signedValue == unsignedValue), Result: (123 == 123)
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Short_Unsigned_unsigned:
-UT_Asserts_Successes.cpp:168: Success: Expected (unsignedValue == signedValue), Result: (123 == 123)
+UT_Asserts_Successes.cpp:176: Success: Expected (unsignedValue == signedValue), Result: (123 == 123)
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Char_Plain_Unsigned:
-UT_Asserts_Successes.cpp:180: Success: Expected (plainValue == unsignedValue), Result: ('{' == 123)
+UT_Asserts_Successes.cpp:188: Success: Expected (plainValue == unsignedValue), Result: ('{' == 123)
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Char_Unsigned_Plain:
-UT_Asserts_Successes.cpp:190: Success: Expected (unsignedValue == plainValue), Result: (123 == '{')
+UT_Asserts_Successes.cpp:198: Success: Expected (unsignedValue == plainValue), Result: (123 == '{')
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Char_Signed_Unsigned:
-UT_Asserts_Successes.cpp:200: Success: Expected (signedValue == unsignedValue), Result: ('{' == 123)
+UT_Asserts_Successes.cpp:208: Success: Expected (signedValue == unsignedValue), Result: ('{' == 123)
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Char_Unsigned_Signed:
-UT_Asserts_Successes.cpp:211: Success: Expected (unsignedValue == signedValue), Result: (123 == '{')
+UT_Asserts_Successes.cpp:219: Success: Expected (unsignedValue == signedValue), Result: (123 == '{')
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Char_Plain_Short_Unsigned:
-UT_Asserts_Successes.cpp:222: Success: Expected (plainValue == unsignedValue), Result: ('{' == 123)
+UT_Asserts_Successes.cpp:230: Success: Expected (plainValue == unsignedValue), Result: ('{' == 123)
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Short_Signed_Char_Plain:
-UT_Asserts_Successes.cpp:232: Success: Expected (signedValue == plainValue), Result: (123 == '{')
+UT_Asserts_Successes.cpp:240: Success: Expected (signedValue == plainValue), Result: (123 == '{')
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Char_Signed_Short_Unsigned:
-UT_Asserts_Successes.cpp:243: Success: Expected (signedValue == unsignedValue), Result: ('{' == 123)
+UT_Asserts_Successes.cpp:251: Success: Expected (signedValue == unsignedValue), Result: ('{' == 123)
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Short_Signed_Char_Unsigned:
-UT_Asserts_Successes.cpp:253: Success: Expected (signedValue == unsignedValue), Result: (123 == 123)
+UT_Asserts_Successes.cpp:261: Success: Expected (signedValue == unsignedValue), Result: (123 == 123)
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Char_Plain_Int_Unsigned:
-UT_Asserts_Successes.cpp:265: Success: Expected (plainValue == unsignedValue), Result: ('{' == 123)
+UT_Asserts_Successes.cpp:273: Success: Expected (plainValue == unsignedValue), Result: ('{' == 123)
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Int_Signed_Char_Plain:
-UT_Asserts_Successes.cpp:275: Success: Expected (signedValue == plainValue), Result: (123 == '{')
+UT_Asserts_Successes.cpp:283: Success: Expected (signedValue == plainValue), Result: (123 == '{')
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Char_Signed_Int_Unsigned:
-UT_Asserts_Successes.cpp:286: Success: Expected (signedValue == unsignedValue), Result: ('{' == 123)
+UT_Asserts_Successes.cpp:294: Success: Expected (signedValue == unsignedValue), Result: ('{' == 123)
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Int_Signed_Char_Unsigned:
-UT_Asserts_Successes.cpp:296: Success: Expected (signedValue == unsignedValue), Result: (123 == 123)
+UT_Asserts_Successes.cpp:304: Success: Expected (signedValue == unsignedValue), Result: (123 == 123)
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Char_Arrays:
-UT_Asserts_Successes.cpp:306: Success: Expected (str1 == str2), Result: ("Test string" == "Test string")
+UT_Asserts_Successes.cpp:314: Success: Expected (str1 == str2), Result: ("Test string" == "Test string")
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Char_Pointers_const_const:
-UT_Asserts_Successes.cpp:316: Success: Expected (pStr1 == pStr2), Result: ("Test string" == "Test string")
+UT_Asserts_Successes.cpp:324: Success: Expected (pStr1 == pStr2), Result: ("Test string" == "Test string")
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Char_Pointers_const_notconst:
-UT_Asserts_Successes.cpp:327: Success: Expected (pStr1 == pStr2), Result: ("Test string" == "Test string")
+UT_Asserts_Successes.cpp:335: Success: Expected (pStr1 == pStr2), Result: ("Test string" == "Test string")
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Char_Pointers_notconst_const:
-UT_Asserts_Successes.cpp:338: Success: Expected (pStr1 == pStr2), Result: ("Test string" == "Test string")
+UT_Asserts_Successes.cpp:346: Success: Expected (pStr1 == pStr2), Result: ("Test string" == "Test string")
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Char_Pointers_notconst_notconst:
-UT_Asserts_Successes.cpp:349: Success: Expected (pStr1 == pStr2), Result: ("Test string" == "Test string")
+UT_Asserts_Successes.cpp:357: Success: Expected (pStr1 == pStr2), Result: ("Test string" == "Test string")
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Char_ArrayPtr:
-UT_Asserts_Successes.cpp:360: Success: Expected (str1 == pStr2), Result: ("Test string" == "Test string")
+UT_Asserts_Successes.cpp:368: Success: Expected (str1 == pStr2), Result: ("Test string" == "Test string")
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_Char_PtrArray:
-UT_Asserts_Successes.cpp:370: Success: Expected (pStr1 == str2), Result: ("Test string" == "Test string")
+UT_Asserts_Successes.cpp:378: Success: Expected (pStr1 == str2), Result: ("Test string" == "Test string")
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_AUTO_Value:
-UT_Asserts_Successes.cpp:378: Success: Expected (incrementIntCounter() == value), Result: (1 == 1)
+UT_Asserts_Successes.cpp:386: Success: Expected (incrementIntCounter() == value), Result: (1 == 1)
 .
 
 In UT_Asserts_Successes::test_ASSERT_EQUALS_AUTO_Pointer:
-UT_Asserts_Successes.cpp:387: Success: Expected (&value == &value) to be true, Result: It is true
+UT_Asserts_Successes.cpp:395: Success: Expected (&value == &value) to be true, Result: It is true
 .
 
 In UT_Asserts_Successes::test_ASSERT_DIFFERS:
-UT_Asserts_Successes.cpp:397: Success: Expected (incrementIntCounter() != value), Result: (1 != 2)
+UT_Asserts_Successes.cpp:405: Success: Expected (incrementIntCounter() != value), Result: (1 != 2)
 .
 
 In UT_Asserts_Successes::test_ASSERT_DIFFERS_Char_Arrays:
-UT_Asserts_Successes.cpp:406: Success: Expected (str1 != str2), Result: ("Test string" != "Test spring")
+UT_Asserts_Successes.cpp:414: Success: Expected (str1 != str2), Result: ("Test string" != "Test spring")
 .
 
 In UT_Asserts_Successes::test_ASSERT_DIFFERS_Char_Pointers:
-UT_Asserts_Successes.cpp:416: Success: Expected (pStr1 != pStr2), Result: ("Test string" != "Test strong")
+UT_Asserts_Successes.cpp:424: Success: Expected (pStr1 != pStr2), Result: ("Test string" != "Test strong")
 .
 
 In UT_Asserts_Successes::test_ASSERT_DIFFERS_Char_ArrayPtr:
-UT_Asserts_Successes.cpp:426: Success: Expected (str1 != pStr2), Result: ("This local string differs from the one from getString()!" != "Test string")
+UT_Asserts_Successes.cpp:434: Success: Expected (str1 != pStr2), Result: ("This local string differs from the one from getString()!" != "Test string")
 .
 
 In UT_Asserts_Successes::test_ASSERT_DIFFERS_Char_PtrArray:
-UT_Asserts_Successes.cpp:436: Success: Expected (pStr1 != str2), Result: ("Test string" != "This local string differs from the one from getString()!")
+UT_Asserts_Successes.cpp:444: Success: Expected (pStr1 != str2), Result: ("Test string" != "This local string differs from the one from getString()!")
 .
 
 In UT_Asserts_Successes::test_ASSERT_GREATER_THAN_GreaterThan:
-UT_Asserts_Successes.cpp:445: Success: Expected (incrementIntCounter() > value), Result: (1 > 0)
+UT_Asserts_Successes.cpp:453: Success: Expected (incrementIntCounter() > value), Result: (1 > 0)
 .
 
 In UT_Asserts_Successes::test_ASSERT_GREATER_THAN_EQUAL_GreaterThan:
-UT_Asserts_Successes.cpp:454: Success: Expected (incrementIntCounter() >= value), Result: (1 >= 0)
+UT_Asserts_Successes.cpp:462: Success: Expected (incrementIntCounter() >= value), Result: (1 >= 0)
 .
 
 In UT_Asserts_Successes::test_ASSERT_GREATER_THAN_EQUAL_Equal:
-UT_Asserts_Successes.cpp:463: Success: Expected (incrementIntCounter() >= value), Result: (1 >= 1)
+UT_Asserts_Successes.cpp:471: Success: Expected (incrementIntCounter() >= value), Result: (1 >= 1)
 .
 
 In UT_Asserts_Successes::test_ASSERT_LESS_THAN_LessThan:
-UT_Asserts_Successes.cpp:471: Success: Expected (incrementIntCounter() < 2), Result: (1 < 2)
+UT_Asserts_Successes.cpp:479: Success: Expected (incrementIntCounter() < 2), Result: (1 < 2)
 .
 
 In UT_Asserts_Successes::test_ASSERT_LESS_THAN_EQUAL_LessThan:
-UT_Asserts_Successes.cpp:480: Success: Expected (incrementIntCounter() < value), Result: (1 < 2)
+UT_Asserts_Successes.cpp:488: Success: Expected (incrementIntCounter() < value), Result: (1 < 2)
 .
 
 In UT_Asserts_Successes::test_ASSERT_LESS_THAN_EQUAL_Equal:
-UT_Asserts_Successes.cpp:489: Success: Expected (incrementIntCounter() <= value), Result: (1 <= 1)
+UT_Asserts_Successes.cpp:497: Success: Expected (incrementIntCounter() <= value), Result: (1 <= 1)
 .
 
 In UT_Asserts_Successes::test_ASSERT_DELTA:
-UT_Asserts_Successes.cpp:499: Success: Expected (sqrt(4.0) == expectedValue)  with tolerance (expectedTolerance), Result: (2.0 == 2.0)  with tolerance (0.0000000000199999)
+UT_Asserts_Successes.cpp:507: Success: Expected (sqrt(4.0) == expectedValue)  with tolerance (expectedTolerance), Result: (2.0 == 2.0)  with tolerance (0.0000000000199999)
 .
 
 In UT_Asserts_Successes::test_ASSERT_PREDICATE:
-UT_Asserts_Successes.cpp:510: Success: Expected IsOddPredicate()(value) shall be true, Result: IsOddPredicate()(29) is true
+UT_Asserts_Successes.cpp:518: Success: Expected IsOddPredicate()(value) to be true, Result: IsOddPredicate()(29) is true
 .
 
 In UT_Asserts_Successes::test_ASSERT_RELATION:
-UT_Asserts_Successes.cpp:520: Success: Expected AreEqualRelation()(lhs, rhs) shall be true, Result: AreEqualRelation()(500, 500) is true
+UT_Asserts_Successes.cpp:528: Success: Expected AreEqualRelation()(lhs, rhs) to be true, Result: AreEqualRelation()(500, 500) is true
 .
 
 In UT_Asserts_Successes::test_ASSERT_SAME_DATA:
-UT_Asserts_Successes.cpp:536: Success: Expected first (26) bytes to be equal at (lhs) and (rhs), Result: 26 first bytes are equal:
+UT_Asserts_Successes.cpp:544: Success: Expected first (26) bytes to be equal at (lhs) and (rhs), Result: 26 first bytes are equal:
 { 54 68 65 20 71 75 69 63 6B 20 62 72 6F 77 6E 20 66 6F 78 20 72 61 6E 20 6F 76 }
 .
 
+In UT_Asserts_Successes::test_ASSERT_EMPTY_CharArray:
+UT_Asserts_Successes.cpp:558: Success: Expected (emptyCharArray) to be empty, Result: it is empty
+.
+
+In UT_Asserts_Successes::test_ASSERT_EMPTY_C_String:
+UT_Asserts_Successes.cpp:572: Success: Expected (emptyC_String) to be empty, Result: it is empty
+.
+
+In UT_Asserts_Successes::test_ASSERT_EMPTY_NullPtr:
+UT_Asserts_Successes.cpp:586: Success: Expected (nullPtr) to be empty, Result: it is empty
+.
+
+In UT_Asserts_Successes::test_ASSERT_EMPTY_String:
+UT_Asserts_Successes.cpp:600: Success: Expected (emptyString) to be empty, Result: it is empty
+.
+
+In UT_Asserts_Successes::test_ASSERT_EMPTY_Vector:
+UT_Asserts_Successes.cpp:613: Success: Expected (emptyVector) to be empty, Result: it is empty
+.
+
+In UT_Asserts_Successes::test_ASSERT_EMPTY_Map:
+UT_Asserts_Successes.cpp:627: Success: Expected (emptyMap) to be empty, Result: it is empty
+.
+
 In UT_Asserts_Successes::test_ASSERT_MESSAGE:
-UT_Asserts_Successes.cpp:546: Message: This is assertion message for TSM_ASSERT
-UT_Asserts_Successes.cpp:546: Success: Expected (incrementIntCounter() == value) to be true, Result: It is true
+UT_Asserts_Successes.cpp:636: Message: This is assertion message for TSM_ASSERT
+UT_Asserts_Successes.cpp:636: Success: Expected (incrementIntCounter() == value) to be true, Result: It is true
 .
 
 In UT_Asserts_Successes::test_ASSERT_FALSE_MESSAGE:
-UT_Asserts_Successes.cpp:555: Message: This is assertion message for TSM_ASSERT_FALSE
-UT_Asserts_Successes.cpp:555: Success: Expected (incrementIntCounter() == value) to be false, Result: It is false
+UT_Asserts_Successes.cpp:645: Message: This is assertion message for TSM_ASSERT_FALSE
+UT_Asserts_Successes.cpp:645: Success: Expected (incrementIntCounter() == value) to be false, Result: It is false
 .
 
 In UT_Asserts_Successes::test_ASSERT_MESSAGE_EQUALS:
-UT_Asserts_Successes.cpp:565: Message: This is assertion message for TSM_ASSERT_EQUALS
-UT_Asserts_Successes.cpp:565: Success: Expected (incrementIntCounter() == value), Result: (1 == 1)
+UT_Asserts_Successes.cpp:655: Message: This is assertion message for TSM_ASSERT_EQUALS
+UT_Asserts_Successes.cpp:655: Success: Expected (incrementIntCounter() == value), Result: (1 == 1)
 .
 
 In UT_Asserts_Successes::test_ASSERT_MESSAGE_EQUALS_AUTO_Value:
-UT_Asserts_Successes.cpp:574: Message: This is assertion message for TSMA_ASSERT_EQUALS
-UT_Asserts_Successes.cpp:574: Success: Expected (incrementIntCounter() == value), Result: (1 == 1)
+UT_Asserts_Successes.cpp:664: Message: This is assertion message for TSMA_ASSERT_EQUALS
+UT_Asserts_Successes.cpp:664: Success: Expected (incrementIntCounter() == value), Result: (1 == 1)
 .
 
 In UT_Asserts_Successes::test_ASSERT_MESSAGE_EQUALS_AUTO_Pointer:
-UT_Asserts_Successes.cpp:583: Message: This is assertion message for TSMA_ASSERT_EQUALS with pointers
-UT_Asserts_Successes.cpp:583: Success: Expected (&value == &value) to be true, Result: It is true
+UT_Asserts_Successes.cpp:673: Message: This is assertion message for TSMA_ASSERT_EQUALS with pointers
+UT_Asserts_Successes.cpp:673: Success: Expected (&value == &value) to be true, Result: It is true
 .
 
 In UT_Asserts_Successes::test_ASSERT_MESSAGE_DIFFERS:
-UT_Asserts_Successes.cpp:594: Message: This is assertion message for TSM_ASSERT_DIFFERS
-UT_Asserts_Successes.cpp:594: Success: Expected (incrementIntCounter() != value), Result: (1 != 2)
+UT_Asserts_Successes.cpp:684: Message: This is assertion message for TSM_ASSERT_DIFFERS
+UT_Asserts_Successes.cpp:684: Success: Expected (incrementIntCounter() != value), Result: (1 != 2)
 .
 
 In UT_Asserts_Successes::test_ASSERT_MESSAGE_GREATER_THAN_GreaterThan:
-UT_Asserts_Successes.cpp:604: Message: This is assertion message for TSM_ASSERT_GREATER_THAN
-UT_Asserts_Successes.cpp:604: Success: Expected (incrementIntCounter() > value), Result: (1 > 0)
+UT_Asserts_Successes.cpp:694: Message: This is assertion message for TSM_ASSERT_GREATER_THAN
+UT_Asserts_Successes.cpp:694: Success: Expected (incrementIntCounter() > value), Result: (1 > 0)
 .
 
 In UT_Asserts_Successes::test_ASSERT_MESSAGE_GREATER_THAN_EQUAL_GreaterThan:
-UT_Asserts_Successes.cpp:613: Message: This is assertion message for TSM_ASSERT_GREATER_THAN_EQUALS
-UT_Asserts_Successes.cpp:613: Success: Expected (incrementIntCounter() >= value), Result: (1 >= 0)
+UT_Asserts_Successes.cpp:703: Message: This is assertion message for TSM_ASSERT_GREATER_THAN_EQUALS
+UT_Asserts_Successes.cpp:703: Success: Expected (incrementIntCounter() >= value), Result: (1 >= 0)
 .
 
 In UT_Asserts_Successes::test_ASSERT_MESSAGE_GREATER_THAN_EQUAL_Equal:
-UT_Asserts_Successes.cpp:622: Message: This is assertion message for TSM_ASSERT_GREATER_THAN_EQUALS
-UT_Asserts_Successes.cpp:622: Success: Expected (incrementIntCounter() >= value), Result: (1 >= 1)
+UT_Asserts_Successes.cpp:712: Message: This is assertion message for TSM_ASSERT_GREATER_THAN_EQUALS
+UT_Asserts_Successes.cpp:712: Success: Expected (incrementIntCounter() >= value), Result: (1 >= 1)
 .
 
 In UT_Asserts_Successes::test_ASSERT_MESSAGE_LESS_THAN_LessThan:
-UT_Asserts_Successes.cpp:633: Message: This is assertion message for TSM_ASSERT_LESS_THAN
-UT_Asserts_Successes.cpp:633: Success: Expected (incrementIntCounter() < value), Result: (1 < 2)
+UT_Asserts_Successes.cpp:723: Message: This is assertion message for TSM_ASSERT_LESS_THAN
+UT_Asserts_Successes.cpp:723: Success: Expected (incrementIntCounter() < value), Result: (1 < 2)
 .
 
 In UT_Asserts_Successes::test_ASSERT_MESSAGE_LESS_THAN_EQUAL_LessThan:
-UT_Asserts_Successes.cpp:640: Message: This is assertion message for TSM_ASSERT_LESS_THAN_EQUALS
-UT_Asserts_Successes.cpp:640: Success: Expected (incrementIntCounter() <= 2), Result: (1 <= 2)
+UT_Asserts_Successes.cpp:730: Message: This is assertion message for TSM_ASSERT_LESS_THAN_EQUALS
+UT_Asserts_Successes.cpp:730: Success: Expected (incrementIntCounter() <= 2), Result: (1 <= 2)
 .
 
 In UT_Asserts_Successes::test_ASSERT_MESSAGE_LESS_THAN_EQUAL_Equal:
-UT_Asserts_Successes.cpp:649: Message: This is assertion message for TSM_ASSERT_LESS_THAN_EQUALS
-UT_Asserts_Successes.cpp:649: Success: Expected (incrementIntCounter() <= value), Result: (1 <= 1)
+UT_Asserts_Successes.cpp:739: Message: This is assertion message for TSM_ASSERT_LESS_THAN_EQUALS
+UT_Asserts_Successes.cpp:739: Success: Expected (incrementIntCounter() <= value), Result: (1 <= 1)
 .
 
 In UT_Asserts_Successes::test_ASSERT_MESSAGE_DELTA:
-UT_Asserts_Successes.cpp:659: Message: This is assertion message for TSM_ASSERT_DELTA
-UT_Asserts_Successes.cpp:659: Success: Expected (sqrt(4.0) == expectedValue)  with tolerance (expectedTolerance), Result: (2.0 == 2.0)  with tolerance (0.0000999999974737)
+UT_Asserts_Successes.cpp:749: Message: This is assertion message for TSM_ASSERT_DELTA
+UT_Asserts_Successes.cpp:749: Success: Expected (sqrt(4.0) == expectedValue)  with tolerance (expectedTolerance), Result: (2.0 == 2.0)  with tolerance (0.0000999999974737)
 .
 
 In UT_Asserts_Successes::test_ASSERT_MESSAGE_PREDICATE:
-UT_Asserts_Successes.cpp:670: Message: This is assertion message for TSM_ASSERT_PREDICATE
-UT_Asserts_Successes.cpp:670: Success: Expected IsOddPredicate()(value) shall be true, Result: IsOddPredicate()(29) is true
+UT_Asserts_Successes.cpp:760: Message: This is assertion message for TSM_ASSERT_PREDICATE
+UT_Asserts_Successes.cpp:760: Success: Expected IsOddPredicate()(value) to be true, Result: IsOddPredicate()(29) is true
 .
 
 In UT_Asserts_Successes::test_ASSERT_MESSAGE_RELATION:
-UT_Asserts_Successes.cpp:680: Message: This is assertion message for TSM_ASSERT_RELATION
-UT_Asserts_Successes.cpp:680: Success: Expected AreEqualRelation()(lhs, rhs) shall be true, Result: AreEqualRelation()(500, 500) is true
+UT_Asserts_Successes.cpp:770: Message: This is assertion message for TSM_ASSERT_RELATION
+UT_Asserts_Successes.cpp:770: Success: Expected AreEqualRelation()(lhs, rhs) to be true, Result: AreEqualRelation()(500, 500) is true
 .
 
 In UT_Asserts_Successes::test_ASSERT_MESSAGE_SAME_DATA:
-UT_Asserts_Successes.cpp:696: Message: This is assertion message for TSM_ASSERT_SAME_DATA
-UT_Asserts_Successes.cpp:696: Success: Expected first (26) bytes to be equal at (lhs) and (rhs), Result: 26 first bytes are equal:
+UT_Asserts_Successes.cpp:786: Message: This is assertion message for TSM_ASSERT_SAME_DATA
+UT_Asserts_Successes.cpp:786: Success: Expected first (26) bytes to be equal at (lhs) and (rhs), Result: 26 first bytes are equal:
 { 54 68 65 20 71 75 69 63 6B 20 62 72 6F 77 6E 20 66 6F 78 20 72 61 6E 20 6F 76 }
 .
 
 In UT_Asserts_Successes::test_ASSERT_THROWS:
-UT_Asserts_Successes.cpp:703: Success: Expected (throwException()) to throw (std::range_error), Result: It did throw (std::range_error)
+UT_Asserts_Successes.cpp:793: Success: Expected (throwException()) to throw (std::range_error), Result: It did throw (std::range_error)
 .
 
 In UT_Asserts_Successes::test_ASSERT_THROWS_ANYTHING:
-UT_Asserts_Successes.cpp:710: Success: Expected (throwException()) to throw any type of exceptions, Result: It did throw
+UT_Asserts_Successes.cpp:800: Success: Expected (throwException()) to throw any type of exceptions, Result: It did throw
 .
 
 In UT_Asserts_Successes::test_ASSERT_THROWS_NOTHING:
-UT_Asserts_Successes.cpp:717: Success: Expected (incrementIntCounter()) to not throw any type of exceptions, Result: It did not throw
+UT_Asserts_Successes.cpp:807: Success: Expected (incrementIntCounter()) to not throw any type of exceptions, Result: It did not throw
 .
 
 In UT_Asserts_Successes::test_ASSERT_MESSAGE_THROWS:
-UT_Asserts_Successes.cpp:725: Message: This is assertion message for TSM_ASSERT_THROWS
-UT_Asserts_Successes.cpp:725: Success: Expected (throwException()) to throw (std::exception), Result: It did throw (std::exception)
+UT_Asserts_Successes.cpp:815: Message: This is assertion message for TSM_ASSERT_THROWS
+UT_Asserts_Successes.cpp:815: Success: Expected (throwException()) to throw (std::exception), Result: It did throw (std::exception)
 .
 
 In UT_Asserts_Successes::test_ASSERT_MESSAGE_THROWS_ANYTHING:
-UT_Asserts_Successes.cpp:732: Message: This is assertion message for TSM_ASSERT_THROWS_ANYTHING
-UT_Asserts_Successes.cpp:732: Success: Expected (throwException()) to throw any type of exceptions, Result: It did throw
+UT_Asserts_Successes.cpp:822: Message: This is assertion message for TSM_ASSERT_THROWS_ANYTHING
+UT_Asserts_Successes.cpp:822: Success: Expected (throwException()) to throw any type of exceptions, Result: It did throw
 .
 
 In UT_Asserts_Successes::test_ASSERT_MESSAGE_THROWS_NOTHING:
-UT_Asserts_Successes.cpp:739: Message: This is assertion message for TSM_ASSERT_THROWS_NOTHING
-UT_Asserts_Successes.cpp:739: Success: Expected (incrementIntCounter()) to not throw any type of exceptions, Result: It did not throw
+UT_Asserts_Successes.cpp:829: Message: This is assertion message for TSM_ASSERT_THROWS_NOTHING
+UT_Asserts_Successes.cpp:829: Success: Expected (incrementIntCounter()) to not throw any type of exceptions, Result: It did not throw
 .
 
-OK! (65 tests)
+In UT_Asserts_Successes::test_ASSERT_MESSAGE_EMPTY:
+UT_Asserts_Successes.cpp:843: Message: This is assertion message for TSM_ASSERT_EMPTY
+UT_Asserts_Successes.cpp:843: Success: Expected (emptyString) to be empty, Result: it is empty
+.
+
+OK! (72 tests)
 Error level = 0

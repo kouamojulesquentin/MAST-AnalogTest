@@ -383,6 +383,19 @@ public:
         reportFailedAssert(message, file, line, checkMessage.str().c_str(), resultMessage.str().c_str());
     }
 
+    //! Reports a failed "assert empty"
+    //!
+    virtual void failedAssertEmpty    (const char* message, const char* file, int line, const char* containerExpr, const char* containerContent)
+    {
+      std::ostringstream checkMessage;
+      std::ostringstream resultMessage;
+
+      checkMessage  << _preExpr << containerExpr   << _postExpr << " to be empty";
+      resultMessage << "it contains: " << containerContent;
+
+      reportFailedAssert(message, file, line, checkMessage.str().c_str(), resultMessage.str().c_str());
+    }
+
 
     virtual void failedAssertEquals(const char* message, const char* file, int line, const char* xStr, const char* yStr, const char* x, const char* y)
     {
@@ -652,6 +665,7 @@ public:
 
 
 
+
     //! Reports a successful "assert true"
     //!
     virtual void succeededAssertTrue(const char* assertionMessage, const char* file, int line, const char* expression)
@@ -734,6 +748,19 @@ public:
         reportSuccessfulAssert(assertionMessage, file, line, checkMessage.str().c_str(), resultMessage.str().c_str());
     }
 
+    //! Reports a successful "assert empty"
+    //!
+    virtual void succeededAssertEmpty (const char* message, const char* file, int line, const char* containerExpr)
+    {
+      std::ostringstream checkMessage;
+      std::ostringstream resultMessage;
+
+      checkMessage  << _preExpr << containerExpr << _postExpr << " to be empty";
+      resultMessage << "it is empty";
+
+      reportSuccessfulAssert(message, file, line, checkMessage.str().c_str(), resultMessage.str().c_str());
+    }
+
 
     //! Reports a successful "assert equal"
     //!
@@ -813,7 +840,7 @@ public:
         std::ostringstream checkMessage;
         std::ostringstream resultMessage;
 
-        checkMessage   << pStr << _preExpr << xStr << _postExpr << " shall be true";
+        checkMessage   << pStr << _preExpr << xStr << _postExpr << " to be true";
         resultMessage  << pStr << _preExpr << x    << _postExpr << " is true";
 
         reportSuccessfulAssert(assertionMessage, file, line, checkMessage.str().c_str(), resultMessage.str().c_str());
@@ -827,7 +854,7 @@ public:
         std::ostringstream checkMessage;
         std::ostringstream resultMessage;
 
-        checkMessage   << rStr << _preExpr << xStr << ", " << yStr << _postExpr << " shall be true";
+        checkMessage   << rStr << _preExpr << xStr << ", " << yStr << _postExpr << " to be true";
         resultMessage  << rStr << _preExpr << x    << ", " << y    << _postExpr << " is true";
 
         reportSuccessfulAssert(assertionMessage, file, line, checkMessage.str().c_str(), resultMessage.str().c_str());
@@ -915,7 +942,7 @@ public:
       std::ostringstream checkMessage;
       std::ostringstream resultMessage;
 
-      checkMessage   << " file: " << _preStr << file1 << _postStr << " shall be equal to file " << _preStr << file2 << _postStr;
+      checkMessage   << " file: " << _preStr << file1 << _postStr << " to be equal to file " << _preStr << file2 << _postStr;
       resultMessage  << " files are equal";
 
       reportSuccessfulAssert(assertionMessage, file, line, checkMessage.str().c_str(), resultMessage.str().c_str());

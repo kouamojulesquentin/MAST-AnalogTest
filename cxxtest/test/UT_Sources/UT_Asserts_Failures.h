@@ -53,6 +53,12 @@ class UT_Asserts_Failures : public CxxTest::TestSuite
     void test_ASSERT_RELATION ();
     void test_ASSERT_SAME_DATA ();
 
+    void test_ASSERT_EMPTY_CharArray ();
+    void test_ASSERT_EMPTY_C_String ();
+    void test_ASSERT_EMPTY_String ();
+    void test_ASSERT_EMPTY_Vector ();
+    void test_ASSERT_EMPTY_Map ();
+
     // ---------------- Assertions with failure (with message)
     //
     void test_ASSERT_MESSAGE ();
@@ -84,6 +90,7 @@ class UT_Asserts_Failures : public CxxTest::TestSuite
     void test_ASSERT_MESSAGE_THROWS_ANYTHING ();
     void test_ASSERT_MESSAGE_THROWS_NOTHING ();
 
+    void test_ASSERT_MESSAGE_EMPTY ();
 
     //      TS_ASSERT_THROWS_ASSERT(expr,arg,assertion)
     //      TS_ASSERT_THROWS_EQUALS(expr,arg,x,y)

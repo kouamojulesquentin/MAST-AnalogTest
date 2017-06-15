@@ -2,7 +2,7 @@ Running UT_FileAsserts_Successes tests (17 tests)
 
 
 In UT_FileAsserts_Successes::test_TS_ASSERT_SAME_FILES_std_string:
-UT_FileAsserts_Successes.cpp:50: Success: Expected  file: "UT_Sources/Files_to_compare/TwoLines - Copie.txt" shall be equal to file "UT_Sources/Files_to_compare/TwoLines.txt", Result:  files are equal
+UT_FileAsserts_Successes.cpp:50: Success: Expected  file: "UT_Sources/Files_to_compare/TwoLines - Copie.txt" to be equal to file "UT_Sources/Files_to_compare/TwoLines.txt", Result:  files are equal
 .
 
 In UT_FileAsserts_Successes::test_TS_ASSERT_FILE_EXISTS:

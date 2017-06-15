@@ -519,6 +519,11 @@ public:
         testFailure(message, file, line, "failedAssertNotNullptr") << "Assertion failed: " << expression;
     }
 
+    virtual void failedAssertEmpty(const char* message, const char* file, int line, const char* containerExpr, const char* containerContent)
+    {
+      std::stringstream& os = testFailure(message, file, line, "failedAssertEmpty");
+      os << "Error: Expected (" << containerExpr << ") to be empty, but it is not.\nIts content is: " << containerContent;
+    }
 
     virtual void failedAssertEquals(const char* message, const char *file, int line,
                             const char* xStr, const char* yStr,

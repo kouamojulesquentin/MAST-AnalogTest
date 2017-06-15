@@ -110,6 +110,9 @@ public:
     virtual void failedAssertThrowsAnything    (const char* message, const char* file, int line, const char* expression);
     virtual void failedAssertSameFiles         (const char* message, const char* file, int line, const char* file1, const char* file2, const char* explanation);
 
+    virtual void failedAssertEmpty    (const char* message, const char* file, int line, const char* containerExpr, const char* containerContent);
+    virtual void succeededAssertEmpty (const char* message, const char* file, int line, const char* containerExpr);
+
     virtual void succeededAssertTrue              (const char* message, const char* file, int line, const char* expression);
     virtual void succeededAssertFalse             (const char* message, const char* file, int line, const char* expression);
     virtual void succeededAssertNotNullptr        (const char* message, const char* file, int line, const char* expression);

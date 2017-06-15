@@ -11,8 +11,16 @@
 //===========================================================================
 
 #include "UT_Asserts_Successes.h"
+
 #include <functional>
 #include <stdexcept>
+#include <vector>
+#include <string>
+#include <map>
+
+using std::vector;
+using std::string;
+using std::map;
 
 
 namespace
@@ -537,6 +545,88 @@ void UT_Asserts_Successes::test_ASSERT_SAME_DATA ()
 }
 
 
+//! Runs TS_ASSERT_EMPTY with empty char[]
+//!
+void UT_Asserts_Successes::test_ASSERT_EMPTY_CharArray ()
+{
+    // ---------------- Setup
+    //
+    const char emptyCharArray[] = "";
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_EMPTY(emptyCharArray);
+}
+
+
+//! Runs TS_ASSERT_EMPTY with empty C-Style string
+//!
+void UT_Asserts_Successes::test_ASSERT_EMPTY_C_String ()
+{
+    // ---------------- Setup
+    //
+    const char* emptyC_String = "";
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_EMPTY(emptyC_String);
+}
+
+
+//! Runs TS_ASSERT_EMPTY with nullptr
+//!
+void UT_Asserts_Successes::test_ASSERT_EMPTY_NullPtr ()
+{
+    // ---------------- Setup
+    //
+    const char* nullPtr = NULL;
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_EMPTY(nullPtr);
+}
+
+
+//! Runs TS_ASSERT_EMPTY with empty std::string
+//!
+void UT_Asserts_Successes::test_ASSERT_EMPTY_String ()
+{
+    // ---------------- Setup
+    //
+    string emptyString;
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_EMPTY(emptyString);
+}
+
+//! Runs TS_ASSERT_EMPTY with empty std::vector
+//!
+void UT_Asserts_Successes::test_ASSERT_EMPTY_Vector ()
+{
+    // ---------------- Setup
+    //
+    vector<int> emptyVector;
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_EMPTY(emptyVector);
+}
+
+
+//! Runs TS_ASSERT_EMPTY with empty std::map
+//!
+void UT_Asserts_Successes::test_ASSERT_EMPTY_Map ()
+{
+    // ---------------- Setup
+    //
+    map<int, string> emptyMap;
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_EMPTY(emptyMap);
+}
+
 //! Runs TSM_ASSERT with an expression that evaluates to true
 //!
 void UT_Asserts_Successes::test_ASSERT_MESSAGE ()
@@ -737,6 +827,20 @@ void UT_Asserts_Successes::test_ASSERT_MESSAGE_THROWS_ANYTHING ()
 void UT_Asserts_Successes::test_ASSERT_MESSAGE_THROWS_NOTHING ()
 {
     TSM_ASSERT_THROWS_NOTHING("This is assertion message for TSM_ASSERT_THROWS_NOTHING", incrementIntCounter());
+}
+
+
+//! Runs TSM_ASSERT_EMPTY with empty std::string
+//!
+void UT_Asserts_Successes::test_ASSERT_MESSAGE_EMPTY ()
+{
+    // ---------------- Setup
+    //
+    string emptyString;
+
+    // ---------------- Exercise & Verify
+    //
+    TSM_ASSERT_EMPTY("This is assertion message for TSM_ASSERT_EMPTY", emptyString);
 }
 
 //===========================================================================

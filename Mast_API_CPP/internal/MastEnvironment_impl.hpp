@@ -15,6 +15,8 @@
 #ifndef MASTENVIRONMENT_IMPL_H__8AA36FD0_4B76_4464_E0BA_FCCE3E4926FA__INCLUDED_
   #define MASTENVIRONMENT_IMPL_H__8AA36FD0_4B76_4464_E0BA_FCCE3E4926FA__INCLUDED_
 
+#include "LoggerSinks.h"
+
 #include <memory>
 #include <vector>
 #include <string>
@@ -69,6 +71,9 @@ class MastEnvironment_impl final
   // ---------------- Private Fields
   //
   private:
+  using CerrSinkHandle_t = g3::SinkHandle<g3::ErrorsOnCerrLoggerSink>;
+
+  std::unique_ptr<CerrSinkHandle_t>   m_cerrSinkHandle; //!< Initial logger sink that is disabled once user requested sink are connected
   std::shared_ptr<g3::LogFormatter>   m_logFormatter;
   std::shared_ptr<g3::LogWorker>      m_logger;
   std::shared_ptr<MastConfiguration>  m_configuration;

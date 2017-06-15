@@ -17,7 +17,6 @@
 #include "g3log/logworker.hpp"
 #include "g3log/loglevels.hpp"
 #include "CustomFileSink.h"
-#include "LoggerSinks.h"
 #include "Utility.hpp"
 #include "FileSystem.hpp"
 #include "Plugins.hpp"
@@ -186,7 +185,15 @@ void MastEnvironment_impl::ConfigureLogger ()
       auto coutSink = std::make_unique<g3::CoutLoggerSink>(*m_logFormatter);
       m_logger->addSink(std::move(coutSink), &g3::CoutLoggerSink::ReceiveLogMessage);
     }
+
+    // ---------------- Disable, now useless, initial logger sink
+    //
+    if (useCout | useFile)
+    {
+      std::future<bool> received = m_cerrSinkHandle->call(&g3::LoggerSink::Enabled, false);
+    }
   }
+
 }
 //
 //  End of: MastEnvironment_impl::ConfigureLogger
@@ -206,7 +213,7 @@ void MastEnvironment_impl::CreateSystemModel ()
   CHECK_VALUE_NOT_EMPTY(sitFile, "A valid (non empty) SIT file path must be provided");
 
   sitFile = GetActualSitFilePath(sitFile);
-  CHECK_FILE_EXISTS(sitFile);
+  CHECK_FILE_EXISTS_EX(sitFile, "SIT file: ");
   LOG(INFO) << "Using SIT file: " << sitFile;
 
   LOG(INFO) << "Creating SystemModel";
@@ -306,10 +313,6 @@ void MastEnvironment_impl::InitializeLogger ()
   m_logFormatter->ShowLevel        (true);
   m_logFormatter->ShowThreadId     (false);
 
-  //+ (begin JFC June/15/2017): To move to header once it has been split
-  using CerrSinkHandle_t = g3::SinkHandle<g3::ErrorsOnCerrLoggerSink>;
-  std::unique_ptr<CerrSinkHandle_t>   m_cerrSinkHandle; //!< Initial logger sink that is disabled once user requested sink are connected
-  //+ (end   JFC June/15/2017):
 
   // ---------------- Sink for logging errors to std::cerr
   //

@@ -643,12 +643,12 @@ void UT_SystemModelChecker::test_Check_When_NoAccessInterface ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_TRUE    (result.HasErrors());
-  TS_ASSERT_FALSE   (result.HasWarnings());
-  TS_ASSERT_EQUALS  (result.infosCount,   0u);
-  TS_ASSERT_EQUALS  (result.errorsCount,  2u);  // 2 for No AccessInterface + for child not an AccessInterface
-  TS_ASSERT_DIFFERS (result.errors,       "");
-  TS_ASSERT_DIFFERS (result.MakeReport(), "");
+  TS_ASSERT_TRUE      (result.HasErrors());
+  TS_ASSERT_FALSE     (result.HasWarnings());
+  TS_ASSERT_EQUALS    (result.infosCount,  0u);
+  TS_ASSERT_EQUALS    (result.errorsCount, 2u); // 2 for No AccessInterface + for child not an AccessInterface
+  TS_ASSERT_NOT_EMPTY (result.errors);
+  TS_ASSERT_NOT_EMPTY (result.MakeReport());
 }
 
 
@@ -931,12 +931,12 @@ void UT_SystemModelChecker::test_Check_NoProtocol ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_TRUE    (result.HasWarnings());
-  TS_ASSERT_FALSE   (result.HasErrors());
-  TS_ASSERT_EQUALS  (result.infosCount, 0u);
-  TS_ASSERT_EQUALS  (result.warningsCount, 1u);
-  TS_ASSERT_DIFFERS (result.warnings,      "");
-  TS_ASSERT_DIFFERS (result.MakeReport(),  "");
+  TS_ASSERT_TRUE      (result.HasWarnings());
+  TS_ASSERT_FALSE     (result.HasErrors());
+  TS_ASSERT_EQUALS    (result.infosCount,    0u);
+  TS_ASSERT_EQUALS    (result.warningsCount, 1u);
+  TS_ASSERT_NOT_EMPTY (result.warnings);
+  TS_ASSERT_NOT_EMPTY (result.MakeReport());
 }
 
 //===========================================================================

@@ -125,7 +125,7 @@ namespace
     auto errorMsg = ErrorMessage();
 
     TS_ASSERT_EQUALS  (retCode,  ErrorCode::RuntimeError);
-    TS_ASSERT_DIFFERS (errorMsg, "");
+    TS_ASSERT_NOT_EMPTY (errorMsg);
   }
 
 
@@ -150,7 +150,7 @@ namespace
     auto errorMsg = ErrorMessage();
 
     TS_ASSERT_EQUALS  (retCode,  ErrorCode::InvalidArgument);
-    TS_ASSERT_DIFFERS (errorMsg, "");
+    TS_ASSERT_NOT_EMPTY (errorMsg);
   }
 
 
@@ -203,7 +203,7 @@ namespace
     auto errorMsg = ErrorMessage();
 
     TS_ASSERT_EQUALS  (retCode,  ErrorCode::InvalidArgument);
-    TS_ASSERT_DIFFERS (errorMsg, "");
+    TS_ASSERT_NOT_EMPTY (errorMsg);
   }
 
   //! Checks SystemModelManager::iWrite_xxx() using same thread as SystemModelManager
@@ -224,7 +224,7 @@ namespace
     auto errorMsg = ErrorMessage();
 
     TS_ASSERT_EQUALS  (retCode,  ErrorCode::RuntimeError);
-    TS_ASSERT_DIFFERS (errorMsg, "");
+    TS_ASSERT_NOT_EMPTY (errorMsg);
   }
 
 
@@ -304,7 +304,7 @@ void UT_PDL_Adapter_C::test_iPrefix_NotInitialized ()
   auto errorMsg = ErrorMessage();
 
   TS_ASSERT_EQUALS  (retCode,  ErrorCode::RuntimeError);
-  TS_ASSERT_DIFFERS (errorMsg, "");
+  TS_ASSERT_NOT_EMPTY (errorMsg);
 }
 
 
@@ -327,7 +327,7 @@ void UT_PDL_Adapter_C::test_iGet_String_NotInitialized ()
   auto errorMsg = ErrorMessage();
 
   TS_ASSERT_EQUALS  (retCode,  ErrorCode::RuntimeError);
-  TS_ASSERT_DIFFERS (errorMsg, "");
+  TS_ASSERT_NOT_EMPTY (errorMsg);
 }
 
 void UT_PDL_Adapter_C::test_iGet_uint8_NotInitialized        () { Check_iGet_NotInitialized<uint8_t>(iGet_uint8_t);          }
@@ -361,7 +361,7 @@ void UT_PDL_Adapter_C::test_iGet_String_Nullptr_Path ()
   auto errorMsg = ErrorMessage();
 
   TS_ASSERT_EQUALS  (retCode,  ErrorCode::InvalidArgument);
-  TS_ASSERT_DIFFERS (errorMsg, "");
+  TS_ASSERT_NOT_EMPTY (errorMsg);
 }
 
 void UT_PDL_Adapter_C::test_iGet_uint8_Nullptr_Path        () { Check_iGet_Nullptr_Path<uint8_t>(iGet_uint8_t);        }
@@ -394,7 +394,7 @@ void UT_PDL_Adapter_C::test_iGet_String_Nullptr_ReadData ()
   auto errorMsg = ErrorMessage();
 
   TS_ASSERT_EQUALS  (retCode,  ErrorCode::InvalidArgument);
-  TS_ASSERT_DIFFERS (errorMsg, "");
+  TS_ASSERT_NOT_EMPTY (errorMsg);
 }
 
 void UT_PDL_Adapter_C::test_iGet_uint8_Nullptr_ReadData        () { Check_iGet_Nullptr_ReadData<uint8_t>(iGet_uint8_t);        }

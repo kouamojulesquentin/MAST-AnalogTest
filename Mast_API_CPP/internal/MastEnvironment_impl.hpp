@@ -33,6 +33,7 @@ class MastConfiguration;
 class SystemModelManagerMonitor;
 class SystemModel;
 class SystemModelManager;
+class AppFunctionNameAndNode;
 
 //! Defines complete environment for running mast.
 //!
@@ -47,15 +48,18 @@ class MastEnvironment_impl final
   // ---------------- Public Methods
   //
   public:
-  ~MastEnvironment_impl() = default;
+  ~MastEnvironment_impl();
 
   MastEnvironment_impl(bool unitTestContext = false);         //!< Initializes MastEnvironment_impl
 
   void ParseOptions(int argc, const char* argv[]);       //!< Parses options - from C-Style command line arguments
   void ParseOptions(std::vector<std::string> arguments); //!< Parses options - from list of command line arguments
 
-  void LoadPlugins();       //!< Loads plugin(s) defined by parsed options
-  void CreateSystemModel(); //!< Creates system model using parsed options and loaded plugins
+  void LoadPlugins();         //!< Loads plugin(s) defined by parsed options
+  void CreateSystemModel();   //!< Creates system model using parsed options and loaded plugins
+  void CreateManager      (); //! Creates system model manager
+  void CreateApplications (); //! Creates PDL algorithm with their associated nodes
+  void Start();               //! Starts system model manager AND wait till it ends
 
 //+  bool UnitTestsContext() const { return m_unitTestsContext; }
 //+  void UnitTestsContext (bool unitTestsContext) { m_unitTestsContext = unitTestsContext; }
@@ -73,15 +77,15 @@ class MastEnvironment_impl final
   private:
   using CerrSinkHandle_t = g3::SinkHandle<g3::ErrorsOnCerrLoggerSink>;
 
-  std::unique_ptr<CerrSinkHandle_t>   m_cerrSinkHandle; //!< Initial logger sink that is disabled once user requested sink are connected
-  std::shared_ptr<g3::LogFormatter>   m_logFormatter;
-  std::shared_ptr<g3::LogWorker>      m_logger;
-  std::shared_ptr<MastConfiguration>  m_configuration;
-  std::shared_ptr<SystemModel>        m_sm;
-  std::shared_ptr<SystemModelManager> m_manager;
-  std::vector<std::string>            m_loadedPluginsPath; //!< To avoid loading them twice and to search for SIT file in same directories
-
-  bool m_unitTestsContext = false;  //!< To manage logger differently in unit tests context
+  std::shared_ptr<g3::LogWorker>      m_logger;                     //!< Global runner
+  std::shared_ptr<g3::LogFormatter>   m_logFormatter;               //!< Logger message formatter
+  std::unique_ptr<CerrSinkHandle_t>   m_cerrSinkHandle;             //!< Initial logger sink that is disabled once user requested sink are connected
+  std::shared_ptr<MastConfiguration>  m_configuration;              //!< Mast option overriden or not by user via configuration file or command line arguments
+  std::shared_ptr<SystemModel>        m_systemModel;                //!< Managed system model
+  std::shared_ptr<SystemModelManager> m_manager;                    //!< Manager for system model
+  std::vector<std::string>            m_loadedPluginsPath;          //!< To avoid loading them twice and to search for SIT file in same directories
+  std::vector<AppFunctionNameAndNode> m_algoNamesAssociatedToNodes; //!< Associations of PDL algorithm names to nodes
+  bool                                m_unitTestsContext = false;   //!< To manage logger differently in unit tests context
 };
 //
 //  End of MastEnvironment_impl class declaration

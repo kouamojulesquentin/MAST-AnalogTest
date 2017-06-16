@@ -22,7 +22,9 @@
 #include "Plugins.hpp"
 #include "MastConfig.hpp"
 #include "PDL_AlgorithmsRepository.hpp"
+#include "ConfigureAlgorithmFactory.hpp"
 #include "SystemModel.hpp"
+#include "SystemModelManager.hpp"
 #include "SIT_reader.hpp"
 
 #include <fstream>
@@ -35,6 +37,16 @@ using std::dynamic_pointer_cast;
 using std::ofstream;
 
 using namespace mast;
+
+//! Only destructs members
+//!
+//! @note Not declared as default reduce included headers in header
+MastEnvironment_impl::~MastEnvironment_impl ()
+{
+}
+//
+//  End of: MastEnvironment_impl::~MastEnvironment_impl
+//---------------------------------------------------------------------------
 
 
 //! Initializes default logger if not in unit tests context
@@ -63,7 +75,7 @@ MastEnvironment_impl::MastEnvironment_impl (bool unitTestContext)
 //!       Optional report file MUST be different than log file
 void MastEnvironment_impl::CheckModel ()
 {
-  auto checkResult = m_sm->Check();
+  auto checkResult = m_systemModel->Check();
 
   const auto& checkFilePath = m_configuration->ModelCheckingFilePath();
   if (!checkFilePath.empty()) // Save report to specific file?
@@ -201,6 +213,83 @@ void MastEnvironment_impl::ConfigureLogger ()
 
 
 
+//! Creates PDL algorithm with their associated nodes
+//!
+void MastEnvironment_impl::CreateApplications ()
+{
+  CHECK_VALUE_NOT_NULL(m_manager, "Manager must be created before PDL algorithm creation");
+
+  const auto& algosRepository = PDL_AlgorithmsRepository::Instance();
+
+  LOG(INFO) << "Creating PDL algorithm associated to nodes (from SIT description)";
+  for (const auto& association : m_algoNamesAssociatedToNodes)
+  {
+    CHECK_VALUE_NOT_EMPTY (association.appName, "PDL algorithm name cannot be empty");
+    CHECK_VALUE_NOT_NULL  (association.node,    "Cannot create PDL algorithm " + Utility::IfNotEmpty_SingleQuoteAndSuffixWithSpace(association.appName));
+
+    auto algo = algosRepository.GetAlgorithm(association.appName);
+
+    LOG(DEBUG) << "Try to create PDL algorithm \"" << association.appName      << "\""
+               << " associated to node \""         << association.node->Name() << "\"";
+
+    m_manager->CreateApplicationThread(association.node, algo, association.appName);
+
+    LOG(INFO) << "PDL algorithm \""                              << association.appName
+              << "\" has been created and associated to node \"" << association.node->Name() << "\"";
+  }
+}
+//
+//  End of: MastEnvironment_impl::CreateApplications
+//---------------------------------------------------------------------------
+
+
+//! Creates system model manager
+//!
+void MastEnvironment_impl::CreateManager ()
+{
+  LOG(INFO) << "Creating system model manager";
+
+  // ---------------- Configuration algorithm
+  //
+  auto configAlgoName    = m_configuration->ConfigurationAlgorithm();
+  auto configAlgoFactory = ConfigureAlgorithmFactory::Instance();
+  auto configAlgo        = configAlgoFactory.Create(configAlgoName);
+
+  // ---------------- Manager monitor
+  //
+  auto managerMonitor = shared_ptr<SystemModelManagerMonitor>() ;
+  if (m_configuration->ReportManagerActivity())
+  {
+    auto options = m_configuration->ManagerActivityOptions();
+
+    if (   IsSet(m_configuration->GmlReportMoments(),         ReportMoments::BeforeConfiguration)
+        || IsSet(m_configuration->PrettyPrintReportMoments(), ReportMoments::BeforeConfiguration)
+       )
+    {
+      options |= ManagerMonitorOptions::BeforeConfiguration;
+    }
+
+    if (   IsSet(m_configuration->GmlReportMoments(),         ReportMoments::AfterConfiguration)
+        || IsSet(m_configuration->PrettyPrintReportMoments(), ReportMoments::AfterConfiguration)
+       )
+    {
+      options |= ManagerMonitorOptions::AfterConfiguration;
+    }
+
+    managerMonitor = make_shared<SystemModelManagerMonitor>(options);
+    managerMonitor->ExportBasePath(m_configuration->ManagerActivityFileBasePath());
+  }
+
+  // ---------------- System Model Manager
+  //
+  m_manager = make_shared<SystemModelManager>(*m_systemModel, std::move(configAlgo), managerMonitor);
+}
+//
+//  End of: MastEnvironment_impl::CreateManager
+//---------------------------------------------------------------------------
+
+
+
 //! Creates system model using parsed options and loaded plugins
 //!
 void MastEnvironment_impl::CreateSystemModel ()
@@ -217,9 +306,9 @@ void MastEnvironment_impl::CreateSystemModel ()
   LOG(INFO) << "Using SIT file: " << sitFile;
 
   LOG(INFO) << "Creating SystemModel";
-  m_sm = make_shared<SystemModel>();
+  m_systemModel = make_shared<SystemModel>();
 
-  auto reader = SIT::SIT_Reader(m_sm);
+  auto reader = SIT::SIT_Reader(m_systemModel);
 
   reader.parse(sitFile);
 
@@ -228,14 +317,16 @@ void MastEnvironment_impl::CreateSystemModel ()
   CHECK_VALUE_NOT_NULL(topNode, "Failed to parse file: "s + sitFile);
   LOG(INFO) << "SIT has been parsed successfully";
 
-  m_sm->ReplaceRoot(topNode, false);
+  m_systemModel->ReplaceRoot(topNode, false);
 
+  m_algoNamesAssociatedToNodes = reader.PDLAlgorithmNameToNodeAssociation();
+
+  // ---------------- Checks
+  //
   if (m_configuration->ModelChecking())
   {
     CheckModel();
   }
-
-//+  const auto& namesAndNodes = reader.namesAndNodes;
 }
 //
 //  End of: MastEnvironment_impl::CreateSystemModel
@@ -464,6 +555,24 @@ void MastEnvironment_impl::ParseOptions (vector<string> arguments)
 //
 //  End of: MastEnvironment_impl::ParseOptions
 //---------------------------------------------------------------------------
+
+
+
+//! Starts system model manager AND wait till it ends
+//!
+//! @note This is a blocking call, till the end of all the PDL algorithms!
+//!
+void MastEnvironment_impl::Start ()
+{
+  m_manager->Start();
+  m_manager->StartCreatedApplicationThreads();
+  m_manager->WaitForApplicationsEnd();
+  m_manager->Stop();
+}
+//
+//  End of: MastEnvironment_impl::Start
+//---------------------------------------------------------------------------
+
 
 
 

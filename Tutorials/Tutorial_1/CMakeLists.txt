@@ -15,7 +15,7 @@ set (P_CFLAGS "${P_WARNINGS} -std=c++14")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
 include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
 include_directories(${LIBMAST_CPP_API_INCLUDE_DIRS})
-#+include_directories(${LIBLOGGER_INCLUDE_DIRS})
+include_directories(${LIBLOGGER_INCLUDE_DIRS})
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Tutorial_1")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
@@ -27,6 +27,6 @@ target_link_libraries (Tutorial_1 Mast_API_CPP ${EXTRA_LIBS})
 install(FILES Tutorial_1.sit DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 include(CTest)
-add_test(NAME Tutorial_1 COMMAND Mast --log --log_kind=copy_errors_on_cerr --log_level=error --plugin_dir=Tutorial_1 --sit=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Tutorial_1.sit)
+add_test(NAME Smoke:Tutorial_1 COMMAND Mast --log --log_kind=copy_errors_on_cerr --log_level=error --plugin_dir=Tutorial_1 --sit=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Tutorial_1.sit)
 
 

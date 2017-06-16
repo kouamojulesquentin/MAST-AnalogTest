@@ -45,6 +45,8 @@ class CPP_API_EXPORT MastEnvironment final
   void ParseOptions(std::vector<std::string> arguments); //!< Parses options - from list of command line arguments
   void LoadPlugins();                                    //!< Loads plugin(s) defined by parsed options
   void CreateSystemModel();                              //!< Creates system model using parsed options and loaded plugins
+  void CreateManager();                                  //!< Creates system model manager
+  void CreateApplications();                             //! Creates PDL algorithm with their associated nodes
 
   // ---------------- Private Fields
   //

@@ -48,7 +48,26 @@ MastEnvironment::MastEnvironment (bool unitTestContext)
 //  End of: MastEnvironment::MastEnvironment
 //---------------------------------------------------------------------------
 
+//! Creates system model manager
+//!
+void MastEnvironment::CreateApplications ()
+{
+  m_impl->CreateApplications();
+}
+//
+//  End of: MastEnvironment::CreateApplications
+//---------------------------------------------------------------------------
 
+
+//! Creates system model manager
+//!
+void MastEnvironment::CreateManager ()
+{
+  m_impl->CreateManager();
+}
+//
+//  End of: MastEnvironment::CreateManager
+//---------------------------------------------------------------------------
 
 
 //! Creates system model using parsed options and loaded plugins
@@ -91,13 +110,7 @@ void MastEnvironment::LoadPlugins ()
 //!
 void MastEnvironment::ParseOptions (int argc, const char* argv[])
 {
-  vector<string> arguments;
-
-  for (int ii = 0 ; ii < argc ; ++ii)
-  {
-    arguments.emplace_back(argv[ii]);
-  }
-  ParseOptions(arguments);
+  m_impl->ParseOptions(argc, argv);
 }
 //
 //  End of: MastEnvironment::ParseOptions
@@ -115,9 +128,6 @@ void MastEnvironment::ParseOptions (vector<string> arguments)
 //
 //  End of: MastEnvironment::ParseOptions
 //---------------------------------------------------------------------------
-
-
-
 
 
 //===========================================================================

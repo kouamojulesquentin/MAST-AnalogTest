@@ -13,6 +13,7 @@
 
 #include "PDL_AlgorithmsRepository.hpp"
 #include "CPP_API.hpp"
+#include "g3log/g3log.hpp"
 
 #include <iostream>
 
@@ -29,19 +30,19 @@ void Increment ()
   auto     loopCount    = 5u;
   uint16_t initialValue = 1u;
 
-  std::cout << "Running " << loopCount << " iWrites on register " << registerPath << "\n";
+  LOG(INFO) << "\"Increment\" PDL algorithm Will do " << loopCount << " iWrites on register \"" << registerPath << "\"";
 
   for (int cycle = 0 ; cycle < loopCount ; ++cycle)
   {
     iWrite(registerPath, initialValue);
     auto curValue = iGet<uint16_t>(registerPath);
-    std::cout << "\n Cycle " << cycle << ": Wrote " << initialValue ;
-    std::cout << "\n       " << cycle << ": Read " << curValue ;
+
+    LOG(INFO) << "Cycle " << cycle << ": Wrote " << initialValue ;
+    LOG(INFO) << "Cycle"  << cycle << ": Read "  << curValue ;
     iApply();
 
     ++initialValue;
   }
-  std::cout << "\n" ;
 }
 //
 //  End of: Increment

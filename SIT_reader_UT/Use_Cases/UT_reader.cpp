@@ -99,7 +99,7 @@ void UT_reader::test_register_Success ()
 
     // ---------------- Verify
     //
-    TS_ASSERT_TRUE (sut.ErrorMessage().empty());
+    TS_ASSERT_EMPTY (sut.ErrorMessage());
 
     auto parsedModel = sut.ParsedSystemModel();
 
@@ -913,7 +913,7 @@ void UT_reader::test_JTAG_TAP_Success ()
 
     // ---------------- Verify
     //
-    TS_ASSERT_TRUE (sut.ErrorMessage().empty());
+    TS_ASSERT_EMPTY (sut.ErrorMessage());
 
     auto parsedModel = sut.ParsedSystemModel();
 
@@ -1057,7 +1057,7 @@ void UT_reader::test_ACCES_INTERFACE_Success ()
     //
     CxxTest::setAbortTestOnFail(true);
 
-    TS_ASSERT_TRUE (sut.ErrorMessage().empty());
+    TS_ASSERT_EMPTY (sut.ErrorMessage());
 
     auto parsedModel = sut.ParsedSystemModel();
 
@@ -1242,7 +1242,7 @@ void UT_reader::test_ACCES_INTERFACE_Failure ()
     std::this_thread::sleep_for(5ms);         // To get messages from logger (running in another thread)
     const auto gotErrorMessage = sut.ErrorMessage();
 
-    TS_ASSERT_FALSE (gotErrorMessage.empty()); // Make sure there is an error message
+    TS_ASSERT_NOT_EMPTY (gotErrorMessage);    // Make sure there is an error message
 
 
     auto containsExpected = gotErrorMessage.find(expected_ErrorMsg) != string::npos;
@@ -1377,7 +1377,7 @@ void UT_reader::test_LINKER_Success ()
     //
     CxxTest::setAbortTestOnFail(true);
 
-    TS_ASSERT_TRUE (sut.ErrorMessage().empty());
+    TS_ASSERT_EMPTY (sut.ErrorMessage());
 
     auto parsedModel = sut.ParsedSystemModel();
 
@@ -1497,7 +1497,7 @@ void UT_reader::test_LINKER_CustomTable_Success ()
     //
     CxxTest::setAbortTestOnFail(true);
 
-    TS_ASSERT_TRUE (sut.ErrorMessage().empty());
+    TS_ASSERT_EMPTY (sut.ErrorMessage());
 
     auto parsedModel = sut.ParsedSystemModel();
 
@@ -1559,7 +1559,7 @@ void UT_reader::test_PDL_Success ()
 
     vector<string>   gotAlgoNames;
     vector<uint32_t> gotLineNumbers;
-    const auto&      nameNodesAssociations = sut.namesAndNodes;
+    const auto&      nameNodesAssociations = sut.PDLAlgorithmNameToNodeAssociation();
 
     for (const auto& association : nameNodesAssociations)
     {
@@ -1619,7 +1619,7 @@ void UT_reader::test_PDL_Failure ()
 
     // ---------------- Verify
     //
-    TS_ASSERT_EQUALS (sut.namesAndNodes.size(), 0);
+    TS_ASSERT_EMPTY (sut.PDLAlgorithmNameToNodeAssociation());
   };
 
   using data_t = tuple<string, vector<string>>;

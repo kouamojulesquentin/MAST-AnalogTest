@@ -68,15 +68,19 @@ public:
    //!
    std::shared_ptr<mast::SystemModelNode> ParsedSystemModel() { return parsed_sut; }
 
+   //! Associations of PDL algorithm names to nodes
+   //!
+   const std::vector<mast::AppFunctionNameAndNode>& PDLAlgorithmNameToNodeAssociation() { return namesAndNodes; };
+
    //! Returns error message in case of failure, empty string otherwise
    //!
    std::string ErrorMessage() const { return error_message; }
 
-   std::vector<mast::AppFunctionNameAndNode> namesAndNodes; //!< Associations of algorithms name a node
 
 private:  // Part used by SIT_Parser
   friend class SIT_Parser;
 
+  std::vector<mast::AppFunctionNameAndNode>              namesAndNodes;      //!< Associations of algorithms name a node
 
   std::map<std::string, std::shared_ptr<mast::Register>> declared_registers; //!< Created registers - kept to potentially associate to PathSelector (at end of parsing)
   std::queue<linker_information>                         unresolved_linkers; //!< Informations to create PathSelector associated with linker (register driving the selector may be yet unknown when the linker is created)

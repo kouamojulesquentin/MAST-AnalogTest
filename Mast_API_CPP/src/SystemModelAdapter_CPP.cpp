@@ -163,13 +163,15 @@ vector<AppFunctionNameAndNode> CPP_API_IMPL::LoadSystemModel (string_view filePa
   CHECK_VALUE_NOT_NULL(topNode, "Failed to parse file: " + filePath);
   sm->ReplaceRoot(topNode, false);
 
-  auto namesAndNodes = reader.namesAndNodes;
+  auto namesAndNodes = reader.PDLAlgorithmNameToNodeAssociation();
 
   return namesAndNodes;
 }
 //
 //  End of: LoadSystemModel
 //---------------------------------------------------------------------------
+
+
 
 //! Runs Mast til applications terminates
 //!

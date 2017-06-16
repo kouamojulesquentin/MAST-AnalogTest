@@ -15,6 +15,8 @@
 #ifndef STARTUP_H__F34EFB54_17C0_4861_41A4_5FD5CC09AA7F__INCLUDED_
   #define STARTUP_H__F34EFB54_17C0_4861_41A4_5FD5CC09AA7F__INCLUDED_
 
+#include "LoggerSinks.h"
+
 #include "Mast_Core_export.hpp"
 #include <memory>
 
@@ -51,9 +53,16 @@ class MAST_CORE_EXPORT Startup final
   // ---------------- Private  Fields
   //
   private:
+  static void InitializeLogger ();
+
+  using CerrSinkHandle_t = g3::SinkHandle<g3::ErrorsOnCerrLoggerSink>;
+
+  static std::shared_ptr<g3::LogWorker>      sm_logger;
+  static std::shared_ptr<g3::LogFormatter>   sm_logFormatter;   //!< Logger message formatter
+  static std::unique_ptr<CerrSinkHandle_t>   sm_cerrSinkHandle; //!< Initial logger sink that is disabled once user requested sink are connected
+
   static std::shared_ptr<SystemModel>        sm_systemModel;
   static std::shared_ptr<SystemModelManager> sm_manager;
-  static std::shared_ptr<g3::LogWorker>      sm_logger;
 };
 //
 //  End of Startup class declaration

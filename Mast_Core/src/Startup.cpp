@@ -23,50 +23,16 @@
 
 
 using std::shared_ptr;
+using std::unique_ptr;
 using std::make_shared;
 
 using namespace mast;
 
-shared_ptr<g3::LogWorker>      Startup::sm_logger;
-shared_ptr<SystemModel>        Startup::sm_systemModel;
-shared_ptr<SystemModelManager> Startup::sm_manager;
-
-namespace
-{
-//! Initializes logger facility
-//!
-std::unique_ptr<g3::LogWorker> InitializeLogger ()
-{
-  auto logworker    = g3::LogWorker::createLogWorker();
-  auto logFormatter = g3::LogFormatter();
-
-  logFormatter.ShowDate(false);
-  logFormatter.ShowTime(true);
-  logFormatter.ShowFileName(false);
-  logFormatter.ShowFunctionName(true);
-  logFormatter.ShowLineNumber(false);
-
-  // ---------------- Sink for logging to file
-  //
-  auto customSink = std::make_unique<g3::CustomFileSink>("Log.txt", g3::CustomFileSink::FlushMode::AutoBackground, logFormatter);
-  customSink->Clear();
-
-  logworker->addSink(std::move(customSink), &g3::CustomFileSink::ReceiveLogUnformattedMessage);
-
-  // ---------------- Sink for logging errors to std::cerr
-  //
-  auto cerrSink = std::make_unique<g3::ErrorsOnCerrLoggerSink>();
-  logworker->addSink(std::move(cerrSink), &g3::ErrorsOnCerrLoggerSink::ReceiveLogMessage);
-
-  g3::initializeLogging(logworker.get());
-  g3::logEnabled(true);
-  LOG(DEBUG) << "Logger started";
-  return logworker;
-}
-//
-//  End of: InitializeLogger
-//---------------------------------------------------------------------------
-} // End of unnamed namespace
+shared_ptr<SystemModel>               Startup::sm_systemModel;
+shared_ptr<SystemModelManager>        Startup::sm_manager;
+shared_ptr<g3::LogWorker>             Startup::sm_logger;
+shared_ptr<g3::LogFormatter>          Startup::sm_logFormatter;   //!< Logger message formatter
+unique_ptr<Startup::CerrSinkHandle_t> Startup::sm_cerrSinkHandle; //!< Initial logger sink that is disabled once user requested sink are connected
 
 //! Gets rid of common SystemModel
 //!
@@ -103,7 +69,7 @@ shared_ptr<g3::LogWorker> Startup::GetLogger ()
 {
   if (!sm_logger)
   {
-    sm_logger = InitializeLogger();
+    InitializeLogger();
   }
   return sm_logger;
 }
@@ -150,6 +116,41 @@ shared_ptr<SystemModel> Startup::GetSystemModel ()
 //  End of: Startup::GetSystemModel
 //---------------------------------------------------------------------------
 
+//! Initializes logger facility
+//!
+void Startup::InitializeLogger ()
+{
+  sm_logger       = g3::LogWorker::createLogWorker();
+  sm_logFormatter = make_shared<g3::LogFormatter>();
+
+  sm_logFormatter->ShowDate         (false);
+  sm_logFormatter->ShowTime         (true);
+  sm_logFormatter->ShowFileName     (false);
+  sm_logFormatter->ShowFunctionName (true);
+  sm_logFormatter->ShowLineNumber   (false);
+  sm_logFormatter->ShowLevel        (true);
+  sm_logFormatter->ShowThreadId     (false);
+
+  // ---------------- Sink for logging to file
+  //
+  auto customSink = std::make_unique<g3::CustomFileSink>("Log.txt", g3::CustomFileSink::FlushMode::AutoBackground, *sm_logFormatter);
+  customSink->Clear();
+
+  sm_logger->addSink(std::move(customSink), &g3::CustomFileSink::ReceiveLogUnformattedMessage);
+
+  // ---------------- Sink for logging errors to std::cerr
+  //
+  auto cerrSink = std::make_unique<g3::ErrorsOnCerrLoggerSink>(*sm_logFormatter);
+  sm_cerrSinkHandle = sm_logger->addSink(std::move(cerrSink), &g3::ErrorsOnCerrLoggerSink::ReceiveLogMessage);
+
+  g3::initializeLogging(sm_logger.get());
+  g3::logEnabled(true);
+  LOG(DEBUG) << "Logger started";
+}
+//
+//  End of: Startup::InitializeLogger
+//---------------------------------------------------------------------------
+
 
 //! Initializes logger facility
 //!
@@ -157,7 +158,7 @@ void Startup::StartLogger ()
 {
   if (!sm_logger)
   {
-    sm_logger = InitializeLogger();
+    InitializeLogger();
   }
 }
 //
@@ -174,6 +175,8 @@ void Startup::StopLogger ()
     LOG(INFO) << "Stopping logger";
     g3::logEnabled(false);
     sm_logger.reset();
+    sm_cerrSinkHandle.reset();
+    sm_logFormatter.reset();
   }
 }
 //

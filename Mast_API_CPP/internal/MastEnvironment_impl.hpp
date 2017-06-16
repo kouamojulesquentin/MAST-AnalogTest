@@ -52,8 +52,19 @@ class MastEnvironment_impl final
 
   MastEnvironment_impl(bool unitTestContext = false);         //!< Initializes MastEnvironment_impl
 
-  void ParseOptions(int argc, const char* argv[]);       //!< Parses options - from C-Style command line arguments
+  void Start(std::vector<std::string> arguments); //!< Starts MAST using options from list of command line arguments
+  void Start(int argc, const char* argv[])        //!< Starts MAST using options from C-Style command line arguments
+  {
+    Start(MakeArgumentsVector(argc, argv));
+  }
+
+  // ---------------- Optional API (this is what Start call)
+  //
   void ParseOptions(std::vector<std::string> arguments); //!< Parses options - from list of command line arguments
+  void ParseOptions(int argc, const char* argv[])        //!< Parses options - from C-Style command line arguments
+  {
+    ParseOptions(MakeArgumentsVector(argc, argv));
+  }
 
   void LoadPlugins();         //!< Loads plugin(s) defined by parsed options
   void CreateSystemModel();   //!< Creates system model using parsed options and loaded plugins
@@ -72,17 +83,12 @@ class MastEnvironment_impl final
   void InitializeLogger ();
   std::string GetActualSitFilePath (const std::string& sitFile) const;
 
+  static std::vector<std::string> MakeArgumentsVector (int argc, const char* argv[]);
+
   // ---------------- Private Fields
   //
   private:
-  using CerrSinkHandle_t = g3::SinkHandle<g3::ErrorsOnCerrLoggerSink>;
-
-  std::shared_ptr<g3::LogWorker>      m_logger;                     //!< Global runner
-  std::shared_ptr<g3::LogFormatter>   m_logFormatter;               //!< Logger message formatter
-  std::unique_ptr<CerrSinkHandle_t>   m_cerrSinkHandle;             //!< Initial logger sink that is disabled once user requested sink are connected
   std::shared_ptr<MastConfiguration>  m_configuration;              //!< Mast option overriden or not by user via configuration file or command line arguments
-  std::shared_ptr<SystemModel>        m_systemModel;                //!< Managed system model
-  std::shared_ptr<SystemModelManager> m_manager;                    //!< Manager for system model
   std::vector<std::string>            m_loadedPluginsPath;          //!< To avoid loading them twice and to search for SIT file in same directories
   std::vector<AppFunctionNameAndNode> m_algoNamesAssociatedToNodes; //!< Associations of PDL algorithm names to nodes
   bool                                m_unitTestsContext = false;   //!< To manage logger differently in unit tests context

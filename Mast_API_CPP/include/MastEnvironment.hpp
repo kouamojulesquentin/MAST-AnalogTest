@@ -32,6 +32,7 @@ class MastEnvironment_impl;
 //!
 //! @note The environment encompass a logger, a SystemModel and SystemModelManager
 //!
+//! @see MastEnvironment_impl for detaisl
 class CPP_API_EXPORT MastEnvironment final
 {
   // ---------------- Public Methods
@@ -41,12 +42,16 @@ class CPP_API_EXPORT MastEnvironment final
 
   MastEnvironment(bool unitTestContext = false);         //!< Initializes MastEnvironment
 
+  void Start(std::vector<std::string> arguments);        //!< Starts MAST using options from list of command line arguments
+  void Start(int argc, const char* argv[]);              //!< Starts MAST using options from C-Style command line arguments
+
   void ParseOptions(int argc, const char* argv[]);       //!< Parses options - from C-Style command line arguments
   void ParseOptions(std::vector<std::string> arguments); //!< Parses options - from list of command line arguments
   void LoadPlugins();                                    //!< Loads plugin(s) defined by parsed options
   void CreateSystemModel();                              //!< Creates system model using parsed options and loaded plugins
   void CreateManager();                                  //!< Creates system model manager
   void CreateApplications();                             //! Creates PDL algorithm with their associated nodes
+  void Start();                                          //! Starts system model manager AND wait till it ends
 
   // ---------------- Private Fields
   //

@@ -172,7 +172,7 @@ void Startup::StopLogger ()
 {
   if (sm_logger)
   {
-    LOG(INFO) << "Stopping logger";
+    LOG(DEBUG) << "Stopping logger";
     g3::logEnabled(false);
     sm_logger.reset();
     sm_cerrSinkHandle.reset();

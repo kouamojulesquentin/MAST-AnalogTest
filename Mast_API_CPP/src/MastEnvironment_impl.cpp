@@ -26,6 +26,7 @@
 #include "SystemModel.hpp"
 #include "SystemModelManager.hpp"
 #include "SIT_reader.hpp"
+#include "Startup.hpp"
 
 #include <fstream>
 
@@ -43,6 +44,13 @@ using namespace mast;
 //! @note Not declared as default reduce included headers in header
 MastEnvironment_impl::~MastEnvironment_impl ()
 {
+  LOG(DEBUG) << "Cleaning up MAST environment";
+  Startup::ForgetSystemModel();
+  Startup::ForgetManager();
+  SystemModelNode::ResetNodeIdentifier();
+
+  LOG(INFO) << "MAST Stopped";
+  Startup::StopLogger();
 }
 //
 //  End of: MastEnvironment_impl::~MastEnvironment_impl
@@ -75,7 +83,7 @@ MastEnvironment_impl::MastEnvironment_impl (bool unitTestContext)
 //!       Optional report file MUST be different than log file
 void MastEnvironment_impl::CheckModel ()
 {
-  auto checkResult = m_systemModel->Check();
+  auto checkResult = Startup::sm_systemModel->Check();
 
   const auto& checkFilePath = m_configuration->ModelCheckingFilePath();
   if (!checkFilePath.empty()) // Save report to specific file?
@@ -138,14 +146,16 @@ void MastEnvironment_impl::ConfigureLogger ()
   {
     auto shownItems = m_configuration->LoggerShownItems();
 
-    m_logFormatter->ShowDate         (IsSet(shownItems, mast::LoggerShownItems::Date));
-    m_logFormatter->ShowTime         (IsSet(shownItems, mast::LoggerShownItems::Time));
-    m_logFormatter->ShowMicroseconds (IsSet(shownItems, mast::LoggerShownItems::Microseconds));
-    m_logFormatter->ShowLevel        (IsSet(shownItems, mast::LoggerShownItems::Level));
-    m_logFormatter->ShowThreadId     (IsSet(shownItems, mast::LoggerShownItems::ThreadId));
-    m_logFormatter->ShowFileName     (IsSet(shownItems, mast::LoggerShownItems::FileName));
-    m_logFormatter->ShowFunctionName (IsSet(shownItems, mast::LoggerShownItems::FunctionName));
-    m_logFormatter->ShowLineNumber   (IsSet(shownItems, mast::LoggerShownItems::LineNumber));
+    auto logFormatter = Startup::sm_logFormatter;
+
+    logFormatter->ShowDate         (IsSet(shownItems, mast::LoggerShownItems::Date));
+    logFormatter->ShowTime         (IsSet(shownItems, mast::LoggerShownItems::Time));
+    logFormatter->ShowMicroseconds (IsSet(shownItems, mast::LoggerShownItems::Microseconds));
+    logFormatter->ShowLevel        (IsSet(shownItems, mast::LoggerShownItems::Level));
+    logFormatter->ShowThreadId     (IsSet(shownItems, mast::LoggerShownItems::ThreadId));
+    logFormatter->ShowFileName     (IsSet(shownItems, mast::LoggerShownItems::FileName));
+    logFormatter->ShowFunctionName (IsSet(shownItems, mast::LoggerShownItems::FunctionName));
+    logFormatter->ShowLineNumber   (IsSet(shownItems, mast::LoggerShownItems::LineNumber));
 
     g3::only_change_at_initialization::setLogLevel(ERROR_LVL, true);
     switch (m_configuration->LoggerLevel())
@@ -186,26 +196,25 @@ void MastEnvironment_impl::ConfigureLogger ()
       //
       auto customSink = std::make_unique<g3::CustomFileSink>(m_configuration->LoggerFilePath(),
                                                              g3::CustomFileSink::FlushMode::AutoBackground,
-                                                             *m_logFormatter);
+                                                             *logFormatter);
 
       customSink->Clear();
-      m_logger->addSink(std::move(customSink), &g3::CustomFileSink::ReceiveLogUnformattedMessage);
+      Startup::sm_logger->addSink(std::move(customSink), &g3::CustomFileSink::ReceiveLogUnformattedMessage);
     }
 
     if (useCout)
     {
-      auto coutSink = std::make_unique<g3::CoutLoggerSink>(*m_logFormatter);
-      m_logger->addSink(std::move(coutSink), &g3::CoutLoggerSink::ReceiveLogMessage);
+      auto coutSink = std::make_unique<g3::CoutLoggerSink>(*logFormatter);
+      Startup::sm_logger->addSink(std::move(coutSink), &g3::CoutLoggerSink::ReceiveLogMessage);
     }
 
     // ---------------- Disable, now useless, initial logger sink
     //
     if (useCout | useFile)
     {
-      std::future<bool> received = m_cerrSinkHandle->call(&g3::LoggerSink::Enabled, false);
+      std::future<bool> received = Startup::sm_cerrSinkHandle->call(&g3::LoggerSink::Enabled, false);
     }
   }
-
 }
 //
 //  End of: MastEnvironment_impl::ConfigureLogger
@@ -217,7 +226,7 @@ void MastEnvironment_impl::ConfigureLogger ()
 //!
 void MastEnvironment_impl::CreateApplications ()
 {
-  CHECK_VALUE_NOT_NULL(m_manager, "Manager must be created before PDL algorithm creation");
+  CHECK_VALUE_NOT_NULL(Startup::sm_manager, "Manager must be created before PDL algorithm creation");
 
   const auto& algosRepository = PDL_AlgorithmsRepository::Instance();
 
@@ -232,7 +241,7 @@ void MastEnvironment_impl::CreateApplications ()
     LOG(DEBUG) << "Try to create PDL algorithm \"" << association.appName      << "\""
                << " associated to node \""         << association.node->Name() << "\"";
 
-    m_manager->CreateApplicationThread(association.node, algo, association.appName);
+    Startup::sm_manager->CreateApplicationThread(association.node, algo, association.appName);
 
     LOG(INFO) << "PDL algorithm \""                              << association.appName
               << "\" has been created and associated to node \"" << association.node->Name() << "\"";
@@ -282,7 +291,9 @@ void MastEnvironment_impl::CreateManager ()
 
   // ---------------- System Model Manager
   //
-  m_manager = make_shared<SystemModelManager>(*m_systemModel, std::move(configAlgo), managerMonitor);
+  Startup::sm_manager = make_shared<SystemModelManager>(*Startup::sm_systemModel, std::move(configAlgo), managerMonitor);
+
+  LOG(DEBUG) << "Created system model manager";
 }
 //
 //  End of: MastEnvironment_impl::CreateManager
@@ -305,10 +316,10 @@ void MastEnvironment_impl::CreateSystemModel ()
   CHECK_FILE_EXISTS_EX(sitFile, "SIT file: ");
   LOG(INFO) << "Using SIT file: " << sitFile;
 
-  LOG(INFO) << "Creating SystemModel";
-  m_systemModel = make_shared<SystemModel>();
+  LOG(INFO) << "Creating System Model";
+  auto systemModel = make_shared<SystemModel>();
 
-  auto reader = SIT::SIT_Reader(m_systemModel);
+  auto reader = SIT::SIT_Reader(systemModel);
 
   reader.parse(sitFile);
 
@@ -317,7 +328,8 @@ void MastEnvironment_impl::CreateSystemModel ()
   CHECK_VALUE_NOT_NULL(topNode, "Failed to parse file: "s + sitFile);
   LOG(INFO) << "SIT has been parsed successfully";
 
-  m_systemModel->ReplaceRoot(topNode, false);
+  systemModel->ReplaceRoot(topNode, false);
+  Startup::sm_systemModel = systemModel;
 
   m_algoNamesAssociatedToNodes = reader.PDLAlgorithmNameToNodeAssociation();
 
@@ -327,6 +339,7 @@ void MastEnvironment_impl::CreateSystemModel ()
   {
     CheckModel();
   }
+  LOG(INFO) << "Created System Model";
 }
 //
 //  End of: MastEnvironment_impl::CreateSystemModel
@@ -393,24 +406,27 @@ string MastEnvironment_impl::GetActualSitFilePath (const string& sitFile) const
 //!
 void MastEnvironment_impl::InitializeLogger ()
 {
-  m_logger       = g3::LogWorker::createLogWorker();
-  m_logFormatter = make_shared<g3::LogFormatter>();
+  auto logger       = g3::LogWorker::createLogWorker();
+  auto logFormatter = make_shared<g3::LogFormatter>();
 
-  m_logFormatter->ShowDate         (false);
-  m_logFormatter->ShowTime         (true);
-  m_logFormatter->ShowFileName     (false);
-  m_logFormatter->ShowFunctionName (true);
-  m_logFormatter->ShowLineNumber   (false);
-  m_logFormatter->ShowLevel        (true);
-  m_logFormatter->ShowThreadId     (false);
-
+  logFormatter->ShowDate         (false);
+  logFormatter->ShowTime         (true);
+  logFormatter->ShowFileName     (false);
+  logFormatter->ShowFunctionName (true);
+  logFormatter->ShowLineNumber   (false);
+  logFormatter->ShowLevel        (true);
+  logFormatter->ShowThreadId     (false);
 
   // ---------------- Sink for logging errors to std::cerr
   //
-  auto cerrSink = std::make_unique<g3::ErrorsOnCerrLoggerSink>(*m_logFormatter);
-  m_cerrSinkHandle = m_logger->addSink(std::move(cerrSink), &g3::ErrorsOnCerrLoggerSink::ReceiveLogMessage);
+  auto cerrSink = std::make_unique<g3::ErrorsOnCerrLoggerSink>(*logFormatter);
+  Startup::sm_cerrSinkHandle = logger->addSink(std::move(cerrSink), &g3::ErrorsOnCerrLoggerSink::ReceiveLogMessage);
 
-  g3::initializeLogging(m_logger.get());
+  g3::initializeLogging(logger.get());
+
+  Startup::sm_logFormatter = logFormatter;
+  Startup::sm_logger       = std::move(logger);
+
   g3::logEnabled(true);
   LOG(DEBUG) << "Mast started";
 }
@@ -512,13 +528,12 @@ void MastEnvironment_impl::LoadPlugins ()
 //---------------------------------------------------------------------------
 
 
-
-//! Parses options - from C-Style command line arguments
+//! Builds a vector of options from command line arguments
 //!
 //! @param argc   Number of arguments (first one is application name)
 //! @param argv   Array of arguments
 //!
-void MastEnvironment_impl::ParseOptions (int argc, const char* argv[])
+vector<string> MastEnvironment_impl::MakeArgumentsVector (int argc, const char* argv[])
 {
   vector<string> arguments;
 
@@ -526,11 +541,12 @@ void MastEnvironment_impl::ParseOptions (int argc, const char* argv[])
   {
     arguments.emplace_back(argv[ii]);
   }
-  ParseOptions(arguments);
+  return arguments;
 }
 //
-//  End of: MastEnvironment_impl::ParseOptions
+//  End of: MastEnvironment_impl::MakeArgumentsVector
 //---------------------------------------------------------------------------
+
 
 
 //! Parses options - from list of command line arguments
@@ -539,18 +555,19 @@ void MastEnvironment_impl::ParseOptions (int argc, const char* argv[])
 //!
 void MastEnvironment_impl::ParseOptions (vector<string> arguments)
 {
+  LOG(INFO) << "Parsing MAST options";
   if (!m_configuration)
   {
     m_configuration = make_shared<MastConfiguration>();
   }
   m_configuration->Update(arguments);
-  LOG(INFO) << "Options parsed";
 
   if (!m_unitTestsContext)
   {
     ConfigureLogger();
     LOG(DEBUG) << "Logger (re)configured";
   }
+  LOG(INFO) << "MAST options parsed";
 }
 //
 //  End of: MastEnvironment_impl::ParseOptions
@@ -564,19 +581,33 @@ void MastEnvironment_impl::ParseOptions (vector<string> arguments)
 //!
 void MastEnvironment_impl::Start ()
 {
-  m_manager->Start();
-  m_manager->StartCreatedApplicationThreads();
-  m_manager->WaitForApplicationsEnd();
-  m_manager->Stop();
+  LOG(INFO) << "Starting MAST scheduler and PDL algorithm(s)";
+  Startup::sm_manager->Start();
+  Startup::sm_manager->StartCreatedApplicationThreads();
+  Startup::sm_manager->WaitForApplicationsEnd();
+  Startup::sm_manager->Stop();
 }
 //
 //  End of: MastEnvironment_impl::Start
 //---------------------------------------------------------------------------
 
 
-
-
-
+//! Starts MAST with options from command line arguments
+//!
+//! @param arguments  Command line arguments (first one is application name)
+//!
+void MastEnvironment_impl::Start (std::vector<std::string> arguments)
+{
+  ParseOptions(arguments);
+  LoadPlugins();
+  CreateSystemModel();
+  CreateManager();
+  CreateApplications();
+  Start();
+}
+//
+//  End of: MastEnvironment_impl::Start
+//---------------------------------------------------------------------------
 
 //===========================================================================
 // End of MastEnvironment_impl.cpp

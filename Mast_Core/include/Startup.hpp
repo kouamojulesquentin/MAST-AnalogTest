@@ -53,6 +53,8 @@ class MAST_CORE_EXPORT Startup final
   // ---------------- Private  Fields
   //
   private:
+  friend class MastEnvironment_impl;
+
   static void InitializeLogger ();
 
   using CerrSinkHandle_t = g3::SinkHandle<g3::ErrorsOnCerrLoggerSink>;

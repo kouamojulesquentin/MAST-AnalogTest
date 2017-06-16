@@ -196,7 +196,7 @@ void SystemModelManager_impl::CreateApplicationThread (shared_ptr<ParentNode> ap
 //!
 //! @note It does the data cycle only on the target AccessInterface, fromSUTVector and toSUTVector are locally defined
 //!
-void SystemModelManager_impl::DoHierarchicalDataCycle (std::shared_ptr<AccessInterface>  currentAccessInterface, 
+void SystemModelManager_impl::DoHierarchicalDataCycle (std::shared_ptr<AccessInterface>  currentAccessInterface,
 							std::shared_ptr<AccessInterface>  InterfaceTranslator)
 {
    if (currentAccessInterface->IsPending())
@@ -218,7 +218,7 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (std::shared_ptr<AccessInt
      if (!toSutVector.IsEmpty())   // This can be empty when actual SUT state prevent from serving pending Registers
        {
         const auto& activeRegs  = m_toSutVisitor.ActiveRegistersIdentifiers();
-        
+
 	BinaryVector fromSutVector;
         if (InterfaceTranslator==nullptr) //Standard case, use built-in Callbacks
    	   fromSutVector = protocol->DoCallback(endpointId, nextEndPoint->ApplicationData(), toSutVector);
@@ -226,12 +226,12 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (std::shared_ptr<AccessInt
 	{
 	 auto CallbackId=protocol->CallbackId(endpointId);
    	 /*dummy callback to prevent breakdown while developing*/
-	 /*Here we should have something like : 
+	 /*Here we should have something like :
 	 fromSutVector = xxxx->DoTranslationCallback(CallbackId, nextEndPoint->ApplicationData(), toSutVector);
 	 */
 	 fromSutVector = protocol->DoCallback(endpointId, nextEndPoint->ApplicationData(), toSutVector);
 	}
-        
+
         m_fromSutUpdater.UpdateRegisters(activeRegs, fromSutVector);
         ReportServedRegisters(activeRegs);
         ReleaseServedThreads();
@@ -923,7 +923,7 @@ void SystemModelManager_impl::Start ()
       }
       m_loopCV.notify_one();
     }
-    LOG(WARNING) << "Exiting SystemModelManager background thread";
+    LOG(DEBUG) << "Exiting SystemModelManager background thread";
   };
 
   m_managerThread   = std::thread(threadFunctor);

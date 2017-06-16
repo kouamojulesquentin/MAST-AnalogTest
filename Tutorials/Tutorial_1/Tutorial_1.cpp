@@ -30,15 +30,15 @@ void Increment ()
   auto     loopCount    = 5u;
   uint16_t initialValue = 1u;
 
-  LOG(INFO) << "\"Increment\" PDL algorithm Will do " << loopCount << " iWrites on register \"" << registerPath << "\"";
+  LOG(INFO) << "PDL algorithm \"Incr\" Will do " << loopCount << " iWrites on register \"" << registerPath << "\"";
 
   for (int cycle = 0 ; cycle < loopCount ; ++cycle)
   {
     iWrite(registerPath, initialValue);
     auto curValue = iGet<uint16_t>(registerPath);
 
-    LOG(INFO) << "Cycle " << cycle << ": Wrote " << initialValue ;
-    LOG(INFO) << "Cycle"  << cycle << ": Read "  << curValue ;
+    LOG(INFO) << "PDL algorithm \"Incr\": Cycle " << cycle << ": Wrote " << initialValue ;
+    LOG(INFO) << "PDL algorithm \"Incr\": Cycle " << cycle << ": Read "  << curValue ;
     iApply();
 
     ++initialValue;

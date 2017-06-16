@@ -488,6 +488,22 @@ void doAssertEmpty (const char* file, int line, const char *containerExpr, const
   }
 }
 
+
+template<typename T>
+void doAssertNotEmpty (const char* file, int line, const char *containerExpr, const T& container, const char* message)
+{
+  if (isEmpty(container))
+  {
+      tracker().failedAssertNotEmpty  (message, file, line, containerExpr);
+      TS_ABORT();
+  }
+  else
+  {
+    tracker().succeededAssertNotEmpty (message, file, line, containerExpr, TS_AS_STRING(container));
+  }
+}
+
+
 template<typename TExc>
 void doUnexpectedException(const char *file, int line, const char* typeName, const TExc& exc)
 {
@@ -1050,6 +1066,25 @@ inline EqualTrait<T> MakeEqualTrait(const T& x) { return EqualTrait<T>(x); }
 
 #   define ETSM_ASSERT_EMPTY(m,x) _ETSM_ASSERT_EMPTY(__FILE__,__LINE__,m,x)
 #   define TSM_ASSERT_EMPTY(m,x) _TSM_ASSERT_EMPTY(__FILE__,__LINE__,m,x)
+
+
+// TS_ASSERT_NOT_EMPTY
+// Check that container is empty
+#   define ___ETS_ASSERT_NOT_EMPTY(f,l,x,m) CxxTest::countAssert(); CxxTest::doAssertNotEmpty((f), (l), #x, (x), (m))
+#   define ___TS_ASSERT_NOT_EMPTY(f,l,x,m) { _TS_TRY { ___ETS_ASSERT_NOT_EMPTY(f,l,x,m); } __TS_CATCH(f,l) }
+
+#   define _ETS_ASSERT_NOT_EMPTY(f,l,x) ___ETS_ASSERT_NOT_EMPTY(f,l,x,0)
+#   define _TS_ASSERT_NOT_EMPTY(f,l,x) ___TS_ASSERT_NOT_EMPTY(f,l,x,0)
+
+#   define ETS_ASSERT_NOT_EMPTY(x) _ETS_ASSERT_NOT_EMPTY(__FILE__,__LINE__,x)
+#   define TS_ASSERT_NOT_EMPTY(x) _TS_ASSERT_NOT_EMPTY(__FILE__,__LINE__,x)
+
+#   define _ETSM_ASSERT_NOT_EMPTY(f,l,m,x) ___ETS_ASSERT_NOT_EMPTY(f,l,x,TS_AS_STRING_NO_QUOTES(m))
+#   define _TSM_ASSERT_NOT_EMPTY(f,l,m,x) ___TS_ASSERT_NOT_EMPTY(f,l,x,TS_AS_STRING_NO_QUOTES(m))
+
+#   define ETSM_ASSERT_NOT_EMPTY(m,x) _ETSM_ASSERT_NOT_EMPTY(__FILE__,__LINE__,m,x)
+#   define TSM_ASSERT_NOT_EMPTY(m,x) _TSM_ASSERT_NOT_EMPTY(__FILE__,__LINE__,m,x)
+
 
 
 

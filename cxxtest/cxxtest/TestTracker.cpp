@@ -326,6 +326,16 @@ void TestTracker::failedAssertEmpty (const char* message, const char* file, int 
 }
 
 
+//! Reports a failed "assert not empty"
+//!
+void TestTracker::failedAssertNotEmpty (const char* message, const char* file, int line, const char* containerExpr)
+{
+  countFailure();
+  m_pListener->failedAssertNotEmpty(message, file, line, containerExpr);
+  _lastAssertFile = file;
+  _lastAssertLine = line;
+}
+
 void TestTracker::failedAssertEquals(const char *message, const char *file, int line, const char *xStr, const char *yStr, const char *x, const char *y)
 {
     countFailure();
@@ -559,6 +569,17 @@ void TestTracker::succeededAssertEmpty (const char* message, const char* file, i
   _lastAssertFile = file;
   _lastAssertLine = line;
 }
+
+
+//! Reports a successful "assert not empty"
+//!
+void TestTracker::succeededAssertNotEmpty (const char* message, const char* file, int line, const char* containerExpr, const char* containerContent)
+{
+  m_pListener->succeededAssertNotEmpty(message, file, line, containerExpr, containerContent);
+  _lastAssertFile = file;
+  _lastAssertLine = line;
+}
+
 
 //! Reports a successful "assert equal"
 //!

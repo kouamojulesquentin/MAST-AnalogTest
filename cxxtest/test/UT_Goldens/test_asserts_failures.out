@@ -1,4 +1,4 @@
-Running UT_Asserts_Failures tests (46 tests)
+Running UT_Asserts_Failures tests (53 tests)
 
 
 In UT_Asserts_Failures::test_ASSERT:
@@ -80,102 +80,124 @@ UT_Asserts_Failures.cpp:351: Error: Expected (notEmptyVector) to be empty, but f
 
 
 In UT_Asserts_Failures::test_ASSERT_EMPTY_Map:
-UT_Asserts_Failures.cpp:369: Error: Expected (notEmptyMap) to be empty, but found it contains: {
+UT_Asserts_Failures.cpp:368: Error: Expected (notEmptyMap) to be empty, but found it contains: {
 <3, "Hello">,
 <21, "World">,
 <99, "Foo">,
 }
 
 
+In UT_Asserts_Failures::test_ASSERT_NOT_EMPTY_NullPtr:
+UT_Asserts_Failures.cpp:381: Error: Expected (nullPtr) to be not empty, but found it is empty
+
+In UT_Asserts_Failures::test_ASSERT_NOT_EMPTY_CharArray:
+UT_Asserts_Failures.cpp:395: Error: Expected (emptyCharArray) to be not empty, but found it is empty
+
+In UT_Asserts_Failures::test_ASSERT_NOT_EMPTY_C_String:
+UT_Asserts_Failures.cpp:409: Error: Expected (emptyC_String) to be not empty, but found it is empty
+
+In UT_Asserts_Failures::test_ASSERT_NOT_EMPTY_String:
+UT_Asserts_Failures.cpp:423: Error: Expected (emptyString) to be not empty, but found it is empty
+
+In UT_Asserts_Failures::test_ASSERT_NOT_EMPTY_Vector:
+UT_Asserts_Failures.cpp:437: Error: Expected (emptyVector) to be not empty, but found it is empty
+
+In UT_Asserts_Failures::test_ASSERT_NOT_EMPTY_Map:
+UT_Asserts_Failures.cpp:451: Error: Expected (emptyMap) to be not empty, but found it is empty
+
 In UT_Asserts_Failures::test_ASSERT_MESSAGE:
-UT_Asserts_Failures.cpp:378: Message: This is assertion message for TSM_ASSERT
-UT_Asserts_Failures.cpp:378: Error: Expected (incrementIntCounter() == value) to be true, but found it is false
+UT_Asserts_Failures.cpp:461: Message: This is assertion message for TSM_ASSERT
+UT_Asserts_Failures.cpp:461: Error: Expected (incrementIntCounter() == value) to be true, but found it is false
 
 In UT_Asserts_Failures::test_ASSERT_FALSE_MESSAGE:
-UT_Asserts_Failures.cpp:388: Message: This is assertion message for TSM_ASSERT_FALSE
-UT_Asserts_Failures.cpp:388: Error: Expected (incrementIntCounter() == value) to be false, but found it is true
+UT_Asserts_Failures.cpp:471: Message: This is assertion message for TSM_ASSERT_FALSE
+UT_Asserts_Failures.cpp:471: Error: Expected (incrementIntCounter() == value) to be false, but found it is true
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_EQUALS:
-UT_Asserts_Failures.cpp:398: Message: This is assertion message for TSM_ASSERT_EQUALS
-UT_Asserts_Failures.cpp:398: Error: Expected (incrementIntCounter() == value), but found (1 != 0)
+UT_Asserts_Failures.cpp:481: Message: This is assertion message for TSM_ASSERT_EQUALS
+UT_Asserts_Failures.cpp:481: Error: Expected (incrementIntCounter() == value), but found (1 != 0)
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_EQUALS_CString:
-UT_Asserts_Failures.cpp:405: Message: This is assertion message for TSM_ASSERT_EQUALS
-UT_Asserts_Failures.cpp:405: Error: Expected ("How are you?" == "How are you."), but found ("How are you?" != "How are you.")
+UT_Asserts_Failures.cpp:488: Message: This is assertion message for TSM_ASSERT_EQUALS
+UT_Asserts_Failures.cpp:488: Error: Expected ("How are you?" == "How are you."), but found ("How are you?" != "How are you.")
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_EQUALS_AUTO_Value:
-UT_Asserts_Failures.cpp:414: Message: This is assertion message for TSMA_ASSERT_EQUALS
-UT_Asserts_Failures.cpp:414: Error: Expected (incrementIntCounter() == value), but found (1 != 0)
+UT_Asserts_Failures.cpp:497: Message: This is assertion message for TSMA_ASSERT_EQUALS
+UT_Asserts_Failures.cpp:497: Error: Expected (incrementIntCounter() == value), but found (1 != 0)
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_EQUALS_AUTO_Pointer:
-UT_Asserts_Failures.cpp:424: Message: This is assertion message for TSMA_ASSERT_EQUALS with pointers
-UT_Asserts_Failures.cpp:424: Error: Expected (&value_a == &value_b) to be true, but found it is false
+UT_Asserts_Failures.cpp:507: Message: This is assertion message for TSMA_ASSERT_EQUALS with pointers
+UT_Asserts_Failures.cpp:507: Error: Expected (&value_a == &value_b) to be true, but found it is false
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_DIFFERS:
-UT_Asserts_Failures.cpp:434: Message: This is assertion message for TSM_ASSERT_DIFFERS
-UT_Asserts_Failures.cpp:434: Error: Expected (incrementIntCounter() != value), but found (1 == 1)
+UT_Asserts_Failures.cpp:517: Message: This is assertion message for TSM_ASSERT_DIFFERS
+UT_Asserts_Failures.cpp:517: Error: Expected (incrementIntCounter() != value), but found (1 == 1)
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_GREATER_THAN_Equal:
-UT_Asserts_Failures.cpp:443: Message: This is assertion message for TSM_ASSERT_GREATER_THAN
-UT_Asserts_Failures.cpp:443: Error: Expected (incrementIntCounter() > value), but found (1 <= 1)
+UT_Asserts_Failures.cpp:526: Message: This is assertion message for TSM_ASSERT_GREATER_THAN
+UT_Asserts_Failures.cpp:526: Error: Expected (incrementIntCounter() > value), but found (1 <= 1)
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_GREATER_THAN_EQUAL_GreaterThan:
-UT_Asserts_Failures.cpp:452: Message: This is assertion message for TSM_ASSERT_GREATER_THAN_EQUALS
-UT_Asserts_Failures.cpp:452: Error: Expected (incrementIntCounter() >= value), but found (1 < 9)
+UT_Asserts_Failures.cpp:535: Message: This is assertion message for TSM_ASSERT_GREATER_THAN_EQUALS
+UT_Asserts_Failures.cpp:535: Error: Expected (incrementIntCounter() >= value), but found (1 < 9)
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_LESS_THAN_Equal:
-UT_Asserts_Failures.cpp:462: Message: This is assertion message for TSM_ASSERT_LESS_THAN
-UT_Asserts_Failures.cpp:462: Error: Expected (incrementIntCounter() < value), but found (1 >= 1)
+UT_Asserts_Failures.cpp:545: Message: This is assertion message for TSM_ASSERT_LESS_THAN
+UT_Asserts_Failures.cpp:545: Error: Expected (incrementIntCounter() < value), but found (1 >= 1)
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_LESS_THAN_EQUAL_GreaterThan:
-UT_Asserts_Failures.cpp:471: Message: This is assertion message for TSM_ASSERT_LESS_THAN_EQUALS
-UT_Asserts_Failures.cpp:471: Error: Expected (incrementIntCounter() <= value), but found (1 > 0)
+UT_Asserts_Failures.cpp:554: Message: This is assertion message for TSM_ASSERT_LESS_THAN_EQUALS
+UT_Asserts_Failures.cpp:554: Error: Expected (incrementIntCounter() <= value), but found (1 > 0)
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_DELTA:
-UT_Asserts_Failures.cpp:481: Message: This is assertion message for TSM_ASSERT_DELTA
-UT_Asserts_Failures.cpp:481: Error: Expected (sqrt(4.0) == expectedValue) within delta: (expectedTolerance), but found (2.0 != 2.0099999904632568) and delta = 0.0000999999974737
+UT_Asserts_Failures.cpp:564: Message: This is assertion message for TSM_ASSERT_DELTA
+UT_Asserts_Failures.cpp:564: Error: Expected (sqrt(4.0) == expectedValue) within delta: (expectedTolerance), but found (2.0 != 2.0099999904632568) and delta = 0.0000999999974737
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_PREDICATE:
-UT_Asserts_Failures.cpp:492: Message: This is assertion message for TSM_ASSERT_PREDICATE
-UT_Asserts_Failures.cpp:492: Error: Expected IsOddPredicate()(value) to be true, but found IsOddPredicate()(28) is false
+UT_Asserts_Failures.cpp:575: Message: This is assertion message for TSM_ASSERT_PREDICATE
+UT_Asserts_Failures.cpp:575: Error: Expected IsOddPredicate()(value) to be true, but found IsOddPredicate()(28) is false
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_RELATION:
-UT_Asserts_Failures.cpp:502: Message: This is assertion message for TSM_ASSERT_RELATION
-UT_Asserts_Failures.cpp:502: Error: Expected AreEqualRelation()(lhs, rhs) to be true, but found AreEqualRelation()(1000, 1001) is false
+UT_Asserts_Failures.cpp:585: Message: This is assertion message for TSM_ASSERT_RELATION
+UT_Asserts_Failures.cpp:585: Error: Expected AreEqualRelation()(lhs, rhs) to be true, but found AreEqualRelation()(1000, 1001) is false
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_SAME_DATA:
-UT_Asserts_Failures.cpp:516: Message: This is assertion message for TSM_ASSERT_SAME_DATA
-UT_Asserts_Failures.cpp:516: Error: Expected first (sizeof(lhs))  (9) bytes to be equal at (lhs)  and (rhs),
+UT_Asserts_Failures.cpp:599: Message: This is assertion message for TSM_ASSERT_SAME_DATA
+UT_Asserts_Failures.cpp:599: Error: Expected first (sizeof(lhs))  (9) bytes to be equal at (lhs)  and (rhs),
 But found:
 { 4C 61 7A 79 20 64 6F 67 00 }
 Differing from:
 { 4C 61 64 79 20 64 6F 67 00 }
 
 In UT_Asserts_Failures::test_ASSERT_THROWS:
-UT_Asserts_Failures.cpp:524: Error: Expected (incrementIntCounter()) to throw (std::exception), but found it didn't throw
+UT_Asserts_Failures.cpp:607: Error: Expected (incrementIntCounter()) to throw (std::exception), but found it didn't throw
 
 In UT_Asserts_Failures::test_ASSERT_THROWS_ANYTHING:
-UT_Asserts_Failures.cpp:531: Error: Expected (incrementIntCounter())to throw anything, but found it did not throw
+UT_Asserts_Failures.cpp:614: Error: Expected (incrementIntCounter())to throw anything, but found it did not throw
 
 In UT_Asserts_Failures::test_ASSERT_THROWS_NOTHING:
-UT_Asserts_Failures.cpp:539: Error: Expected (throwException()) not to throw, but found it did throw
+UT_Asserts_Failures.cpp:622: Error: Expected (throwException()) not to throw, but found it did throw
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_THROWS:
-UT_Asserts_Failures.cpp:546: Message: This is assertion message for TSM_ASSERT_THROWS
-UT_Asserts_Failures.cpp:546: Error: Expected (incrementIntCounter()) to throw (std::exception), but found it didn't throw
+UT_Asserts_Failures.cpp:629: Message: This is assertion message for TSM_ASSERT_THROWS
+UT_Asserts_Failures.cpp:629: Error: Expected (incrementIntCounter()) to throw (std::exception), but found it didn't throw
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_THROWS_ANYTHING:
-UT_Asserts_Failures.cpp:553: Message: This is assertion message for TSM_ASSERT_THROWS_ANYTHING
-UT_Asserts_Failures.cpp:553: Error: Expected (incrementIntCounter())to throw anything, but found it did not throw
+UT_Asserts_Failures.cpp:636: Message: This is assertion message for TSM_ASSERT_THROWS_ANYTHING
+UT_Asserts_Failures.cpp:636: Error: Expected (incrementIntCounter())to throw anything, but found it did not throw
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_THROWS_NOTHING:
-UT_Asserts_Failures.cpp:561: Message: This is assertion message for TSM_ASSERT_THROWS_NOTHING
-UT_Asserts_Failures.cpp:561: Error: Expected (throwException()) not to throw, but found it did throw
+UT_Asserts_Failures.cpp:644: Message: This is assertion message for TSM_ASSERT_THROWS_NOTHING
+UT_Asserts_Failures.cpp:644: Error: Expected (throwException()) not to throw, but found it did throw
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_EMPTY:
-UT_Asserts_Failures.cpp:574: Message: This is assertion message for TSM_ASSERT_EMPTY
-UT_Asserts_Failures.cpp:574: Error: Expected (notEmptyC_String) to be empty, but found it contains: "I'm not an empty C-Style string"
+UT_Asserts_Failures.cpp:657: Message: This is assertion message for TSM_ASSERT_EMPTY
+UT_Asserts_Failures.cpp:657: Error: Expected (notEmptyC_String) to be empty, but found it contains: "I'm not an empty C-Style string"
 
-Failed 46 and Skipped 0 of 46 tests
+In UT_Asserts_Failures::test_ASSERT_MESSAGE_NOT_EMPTY:
+UT_Asserts_Failures.cpp:671: Message: This is assertion message for TSM_ASSERT_NOT_EMPTY
+UT_Asserts_Failures.cpp:671: Error: Expected (emptyC_String) to be not empty, but found it is empty
+
+Failed 53 and Skipped 0 of 53 tests
 Success rate: 0%
-Error level = 46
+Error level = 53

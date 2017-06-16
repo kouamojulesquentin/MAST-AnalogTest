@@ -385,7 +385,7 @@ public:
 
     //! Reports a failed "assert empty"
     //!
-    virtual void failedAssertEmpty    (const char* message, const char* file, int line, const char* containerExpr, const char* containerContent)
+    virtual void failedAssertEmpty(const char* message, const char* file, int line, const char* containerExpr, const char* containerContent)
     {
       std::ostringstream checkMessage;
       std::ostringstream resultMessage;
@@ -395,6 +395,20 @@ public:
 
       reportFailedAssert(message, file, line, checkMessage.str().c_str(), resultMessage.str().c_str());
     }
+
+    //! Reports a failed "assert not empty"
+    //!
+    virtual void failedAssertNotEmpty(const char* message, const char* file, int line, const char* containerExpr)
+    {
+      std::ostringstream checkMessage;
+      std::ostringstream resultMessage;
+
+      checkMessage  << _preExpr << containerExpr   << _postExpr << " to be not empty";
+      resultMessage << "it is empty";
+
+      reportFailedAssert(message, file, line, checkMessage.str().c_str(), resultMessage.str().c_str());
+    }
+
 
 
     virtual void failedAssertEquals(const char* message, const char* file, int line, const char* xStr, const char* yStr, const char* x, const char* y)
@@ -760,6 +774,20 @@ public:
 
       reportSuccessfulAssert(message, file, line, checkMessage.str().c_str(), resultMessage.str().c_str());
     }
+
+    //! Reports a successful "assert not empty"
+    //!
+    virtual void succeededAssertNotEmpty (const char* message, const char* file, int line, const char* containerExpr, const char* containerContent)
+    {
+      std::ostringstream checkMessage;
+      std::ostringstream resultMessage;
+
+      checkMessage  << _preExpr << containerExpr << _postExpr << " to be not empty";
+      resultMessage << "it is not empty; it contains: " << containerContent;;
+
+      reportSuccessfulAssert(message, file, line, checkMessage.str().c_str(), resultMessage.str().c_str());
+    }
+
 
 
     //! Reports a successful "assert equal"

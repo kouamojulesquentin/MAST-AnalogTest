@@ -84,6 +84,11 @@ class UT_Asserts_Successes : public CxxTest::TestSuite
     void test_ASSERT_EMPTY_Vector ();
     void test_ASSERT_EMPTY_Map ();
 
+    void test_ASSERT_NOT_EMPTY_CharArray ();
+    void test_ASSERT_NOT_EMPTY_C_String ();
+    void test_ASSERT_NOT_EMPTY_String ();
+    void test_ASSERT_NOT_EMPTY_Vector ();
+    void test_ASSERT_NOT_EMPTY_Map ();
 
     // ---------------- Assertions with success (with message)
     //
@@ -117,6 +122,7 @@ class UT_Asserts_Successes : public CxxTest::TestSuite
     void test_ASSERT_MESSAGE_THROWS_NOTHING ();
 
     void test_ASSERT_MESSAGE_EMPTY ();
+    void test_ASSERT_MESSAGE_NOT_EMPTY ();
 
     //! Initializes test (called for each test)
     //!

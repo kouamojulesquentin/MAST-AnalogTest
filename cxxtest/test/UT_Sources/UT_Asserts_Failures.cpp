@@ -359,7 +359,6 @@ void UT_Asserts_Failures::test_ASSERT_EMPTY_Map ()
     // ---------------- Setup
     //
     map<int, string> notEmptyMap;
-
     notEmptyMap[3]  = "Hello";
     notEmptyMap[21] = "World";
     notEmptyMap[99] = "Foo";
@@ -368,6 +367,90 @@ void UT_Asserts_Failures::test_ASSERT_EMPTY_Map ()
     //
     TS_ASSERT_EMPTY(notEmptyMap);
 }
+
+//! Runs TS_ASSERT_NOT_EMPTY with nullptr
+//!
+void UT_Asserts_Failures::test_ASSERT_NOT_EMPTY_NullPtr ()
+{
+    // ---------------- Setup
+    //
+    const char* nullPtr = NULL;
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_NOT_EMPTY(nullPtr);
+}
+
+
+//! Runs TS_ASSERT_NOT_EMPTY with empty char[]
+//!
+void UT_Asserts_Failures::test_ASSERT_NOT_EMPTY_CharArray ()
+{
+    // ---------------- Setup
+    //
+    const char emptyCharArray[] = "";
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_NOT_EMPTY(emptyCharArray);
+}
+
+
+//! Runs TS_ASSERT_NOT_EMPTY with empty C-Style string
+//!
+void UT_Asserts_Failures::test_ASSERT_NOT_EMPTY_C_String ()
+{
+    // ---------------- Setup
+    //
+    const char* emptyC_String = "";
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_NOT_EMPTY(emptyC_String);
+}
+
+
+//! Runs TS_ASSERT_NOT_EMPTY with empty std::string
+//!
+void UT_Asserts_Failures::test_ASSERT_NOT_EMPTY_String ()
+{
+    // ---------------- Setup
+    //
+    string emptyString("");
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_NOT_EMPTY(emptyString);
+}
+
+
+//! Runs TS_ASSERT_NOT_EMPTY with empty std::vector
+//!
+void UT_Asserts_Failures::test_ASSERT_NOT_EMPTY_Vector ()
+{
+    // ---------------- Setup
+    //
+    vector<int> emptyVector;
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_NOT_EMPTY(emptyVector);
+}
+
+
+//! Runs TS_ASSERT_NOT_EMPTY with empty std::map
+//!
+void UT_Asserts_Failures::test_ASSERT_NOT_EMPTY_Map ()
+{
+    // ---------------- Setup
+    //
+    map<int, string> emptyMap;
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_NOT_EMPTY(emptyMap);
+}
+
 
 //! Runs TSM_ASSERT with an expression that evaluates to false
 //!
@@ -573,6 +656,21 @@ void UT_Asserts_Failures::test_ASSERT_MESSAGE_EMPTY ()
     //
     TSM_ASSERT_EMPTY("This is assertion message for TSM_ASSERT_EMPTY", notEmptyC_String);
 }
+
+
+//! Runs TSM_ASSERT_NOT_EMPTY with empty string
+//!
+void UT_Asserts_Failures::test_ASSERT_MESSAGE_NOT_EMPTY ()
+{
+    // ---------------- Setup
+    //
+    const char* emptyC_String = "";
+
+    // ---------------- Exercise & Verify
+    //
+    TSM_ASSERT_NOT_EMPTY("This is assertion message for TSM_ASSERT_NOT_EMPTY", emptyC_String);
+}
+
 
 //===========================================================================
 // End of UT_Asserts_Failures.cpp

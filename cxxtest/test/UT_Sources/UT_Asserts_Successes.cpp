@@ -627,6 +627,83 @@ void UT_Asserts_Successes::test_ASSERT_EMPTY_Map ()
     TS_ASSERT_EMPTY(emptyMap);
 }
 
+
+//! Runs TS_ASSERT_NOT_EMPTY with not empty char[]
+//!
+void UT_Asserts_Successes::test_ASSERT_NOT_EMPTY_CharArray ()
+{
+    // ---------------- Setup
+    //
+    const char notEmptyCharArray[] = "I'm not an empty char[]";
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_NOT_EMPTY(notEmptyCharArray);
+}
+
+
+//! Runs TS_ASSERT_NOT_EMPTY with not empty C-Style string
+//!
+void UT_Asserts_Successes::test_ASSERT_NOT_EMPTY_C_String ()
+{
+    // ---------------- Setup
+    //
+    const char* notEmptyC_String = "I'm not an empty C-Style string";
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_NOT_EMPTY(notEmptyC_String);
+}
+
+
+//! Runs TS_ASSERT_NOT_EMPTY with not empty std::string
+//!
+void UT_Asserts_Successes::test_ASSERT_NOT_EMPTY_String ()
+{
+    // ---------------- Setup
+    //
+    string notEmptyString("I'm not an empty string");
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_NOT_EMPTY(notEmptyString);
+}
+
+
+//! Runs TS_ASSERT_NOT_EMPTY with not empty std::vector
+//!
+void UT_Asserts_Successes::test_ASSERT_NOT_EMPTY_Vector ()
+{
+    // ---------------- Setup
+    //
+    vector<int> notEmptyVector;
+    notEmptyVector.push_back(3);
+    notEmptyVector.push_back(2);
+    notEmptyVector.push_back(1);
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_NOT_EMPTY(notEmptyVector);
+}
+
+
+//! Runs TS_ASSERT_NOT_EMPTY with not empty std::map
+//!
+void UT_Asserts_Successes::test_ASSERT_NOT_EMPTY_Map ()
+{
+    // ---------------- Setup
+    //
+    map<int, string> notEmptyMap;
+    notEmptyMap[3]  = "Hello";
+    notEmptyMap[21] = "World";
+    notEmptyMap[99] = "Foo";
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_NOT_EMPTY(notEmptyMap);
+}
+
+
 //! Runs TSM_ASSERT with an expression that evaluates to true
 //!
 void UT_Asserts_Successes::test_ASSERT_MESSAGE ()
@@ -841,6 +918,20 @@ void UT_Asserts_Successes::test_ASSERT_MESSAGE_EMPTY ()
     // ---------------- Exercise & Verify
     //
     TSM_ASSERT_EMPTY("This is assertion message for TSM_ASSERT_EMPTY", emptyString);
+}
+
+
+//! Runs TSM_ASSERT_NOT_EMPTY with empty string
+//!
+void UT_Asserts_Successes::test_ASSERT_MESSAGE_NOT_EMPTY ()
+{
+    // ---------------- Setup
+    //
+    const char* notEmptyC_String = "I'm not an empty C-Style string";
+
+    // ---------------- Exercise & Verify
+    //
+    TSM_ASSERT_NOT_EMPTY("This is assertion message for TSM_ASSERT_NOT_EMPTY", notEmptyC_String);
 }
 
 //===========================================================================

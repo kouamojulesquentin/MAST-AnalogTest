@@ -194,6 +194,12 @@ public:
       stop(file, line) << "Error: Expected (" << containerExpr << ") to be empty, but it is not. Its content is: " << containerContent << endl;
     }
 
+    virtual void failedAssertEmpty(const char* message, const char* file, int line, const char* containerExpr)
+    {
+      stop(file, line) << "Error: Expected (" << containerExpr << ") to be not empty, found it is" << endl;
+    }
+
+
     virtual void failedAssertEquals(const char* message, const char *file, int line,
                             const char *xStr, const char *yStr,
                             const char *x, const char *y)

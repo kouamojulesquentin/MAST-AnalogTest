@@ -140,6 +140,13 @@ public:
       _second->failedAssertEmpty (message, file, line, containerExpr, containerContent);
     }
 
+    virtual void failedAssertNotEmpty    (const char* message, const char* file, int line, const char* containerExpr)
+    {
+      _first->failedAssertNotEmpty  (message, file, line, containerExpr);
+      _second->failedAssertNotEmpty (message, file, line, containerExpr);
+    }
+
+
     virtual void failedAssertEquals(const char* message, const char *file, int line,
                             const char *xStr, const char *yStr,
                             const char *x, const char *y)
@@ -313,6 +320,13 @@ public:
       _first->succeededAssertEmpty  (message, file, line, containerExpr);
       _second->succeededAssertEmpty (message, file, line, containerExpr);
     }
+
+    virtual void succeededAssertNotEmpty (const char* message, const char* file, int line, const char* containerExpr, const char* containerContent)
+    {
+      _first->succeededAssertNotEmpty  (message, file, line, containerExpr, containerContent);
+      _second->succeededAssertNotEmpty (message, file, line, containerExpr, containerContent);
+    }
+
 
     virtual void succeededAssertEquals            (const char* assertionMessage, const char* file, int  line, const char* xStr,  const char* yStr, const char* x, const char* y)
     {

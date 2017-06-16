@@ -525,6 +525,13 @@ public:
       os << "Error: Expected (" << containerExpr << ") to be empty, but it is not.\nIts content is: " << containerContent;
     }
 
+    virtual void failedAssertNotEmpty(const char* message, const char* file, int line, const char* containerExpr)
+    {
+      std::stringstream& os = testFailure(message, file, line, "failedAssertNotEmpty");
+      os << "Error: Expected (" << containerExpr << ") to be not empty, found it is.\n";
+    }
+
+
     virtual void failedAssertEquals(const char* message, const char *file, int line,
                             const char* xStr, const char* yStr,
                             const char *x, const char *y)

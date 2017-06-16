@@ -66,9 +66,9 @@ unique_ptr<ConfigurationAlgorithm> ConfigureAlgorithmFactory::Create (const stri
 //!
 void ConfigureAlgorithmFactory::InitializeWithDefaults ()
 {
-  RegisterCreator("LastOrDefault",        [](const string& /* parameters */) { return make_unique<ConfigureAlgorithm_LastOrDefault>();        });
-  RegisterCreator("LastOrDefault_Greedy", [](const string& /* parameters */) { return make_unique<ConfigureAlgorithm_LastOrDefault_Greedy>(); });
-  RegisterCreator("Last_Lazy",            [](const string& /* parameters */) { return make_unique<ConfigureAlgorithm_Last_Lazy>();            });
+  RegisterCreator("last_or_default",        [](const string& /* parameters */) { return make_unique<ConfigureAlgorithm_LastOrDefault>();        });
+  RegisterCreator("last_or_default_greedy", [](const string& /* parameters */) { return make_unique<ConfigureAlgorithm_LastOrDefault_Greedy>(); });
+  RegisterCreator("last_lazy",              [](const string& /* parameters */) { return make_unique<ConfigureAlgorithm_Last_Lazy>();            });
 }
 //
 //  End of: ConfigureAlgorithmFactory::InitializeWithDefaults

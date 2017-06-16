@@ -93,10 +93,10 @@ void UT_ConfigureAlgorithmFactory::test_Create_Success ()
 
   auto data =
   {
-    make_tuple("LastOrDefault",        "",      std::cref(typeid(ConfigureAlgorithm_LastOrDefault))),        // 00
-    make_tuple("LastOrDefault_Greedy", "",      std::cref(typeid(ConfigureAlgorithm_LastOrDefault_Greedy))), // 01
-    make_tuple("Last_Lazy",            "",      std::cref(typeid(ConfigureAlgorithm_Last_Lazy))),            // 02
-    make_tuple("Last_Lazy",            "Hello", std::cref(typeid(ConfigureAlgorithm_Last_Lazy))),            // 03 (Hello is ignored)
+    make_tuple("last_or_default",        "",      std::cref(typeid(ConfigureAlgorithm_LastOrDefault))),        // 00
+    make_tuple("last_or_default_greedy", "",      std::cref(typeid(ConfigureAlgorithm_LastOrDefault_Greedy))), // 01
+    make_tuple("last_lazy",              "",      std::cref(typeid(ConfigureAlgorithm_Last_Lazy))),            // 02
+    make_tuple("last_lazy",              "Hello", std::cref(typeid(ConfigureAlgorithm_Last_Lazy))),            // 03 (Hello is ignored)
   };
 
   // ---------------- DDT Exercise
@@ -261,7 +261,7 @@ void UT_ConfigureAlgorithmFactory::test_RegisterCreator_Replace_Default ()
 
   // ---------------- Exercise
   //
-  sut.RegisterCreator("Last_Lazy", newFactory);
+  sut.RegisterCreator("last_lazy", newFactory);
 
   // ---------------- Verify
   //
@@ -270,7 +270,7 @@ void UT_ConfigureAlgorithmFactory::test_RegisterCreator_Replace_Default ()
   auto newNbFactories = sut.RegisteredCreatorsCount();
   TS_ASSERT_EQUALS (newNbFactories, nbFactories);
 
-  auto configureAlgo = sut.Create("Last_Lazy", "");
+  auto configureAlgo = sut.Create("last_lazy", "");
   TS_ASSERT_NOT_NULLPTR (configureAlgo);
 
   const auto&       actualProtocolType = typeid(*configureAlgo);

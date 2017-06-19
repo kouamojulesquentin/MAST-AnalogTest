@@ -122,8 +122,8 @@ void MastEnvironment_impl::CheckModel ()
       }
       else
       {
-        LOG(ERROR_LVL) << "Model is not correct. See file: \"" << checkFilePath << "\" for details";
         os << checkResult.MakeReport();
+        CHECK_FAILED("Model is not correct. See file: \""s + checkFilePath + "\" for details");
       }
     }
   }
@@ -131,7 +131,9 @@ void MastEnvironment_impl::CheckModel ()
   {
     if (checkResult.HasErrors())
     {
-      LOG(ERROR_LVL) << checkResult.MakeReport();
+      auto report = checkResult.MakeCompactErrorReport();
+      std::replace(report.begin(), report.end(), '\n', ' ');
+      CHECK_FAILED("Model is not correct:" + report);
     }
     else if (checkResult.HasWarnings())
     {

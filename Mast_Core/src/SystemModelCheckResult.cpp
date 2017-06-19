@@ -59,6 +59,27 @@ string SystemModelCheckResult::IssuesReport () const
 //  End of: SystemModelCheckResult::IssuesReport
 //---------------------------------------------------------------------------
 
+//! Returns a string representing only error that stands on a single line when there is just one error
+//!
+string SystemModelCheckResult::MakeCompactErrorReport() const
+{
+  ostringstream os;
+
+  if (errorsCount == 0)
+  {
+    os << "No errors";
+  }
+  else if (errorsCount == 1)
+  {
+    os << errors;
+  }
+  else
+  {
+    os << "Errors(" << errorsCount << "): " << errors;
+  }
+
+  return os.str();
+}
 
 
 //! Returns a string representing the check result

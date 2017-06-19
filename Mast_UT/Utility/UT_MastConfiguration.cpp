@@ -49,15 +49,16 @@ namespace
     TS_ASSERT_FALSE (sut.PrettyPrinting());
     TS_ASSERT_FALSE (sut.ReportManagerActivity());
 
-    TS_ASSERT_EQUALS (sut.SitFilePath(),                 "");
-    TS_ASSERT_EQUALS (sut.AccessInterfaceProtocol(),     "");
-    TS_ASSERT_EQUALS (sut.ConfigurationAlgorithm(),      "last_or_default");
-    TS_ASSERT_EQUALS (sut.GmlFilePath(),                 "MastModel.gml");
-    TS_ASSERT_EQUALS (sut.GmlGraphName(),                "DUT");
-    TS_ASSERT_EQUALS (sut.LoggerFilePath(),              "Mast.log");
-    TS_ASSERT_EQUALS (sut.ManagerActivityFileBasePath(), "DUT");
-    TS_ASSERT_EQUALS (sut.ModelCheckingFilePath(),       "");
-    TS_ASSERT_EQUALS (sut.PrettyPrintFilePath(),         "MastModel.txt");
+    TS_ASSERT_EQUALS (sut.SitFilePath(),                       "");
+    TS_ASSERT_EQUALS (sut.AccessInterfaceProtocolName(),       "");
+    TS_ASSERT_EQUALS (sut.AccessInterfaceProtocolParameters(), "");
+    TS_ASSERT_EQUALS (sut.ConfigurationAlgorithm(),            "last_or_default");
+    TS_ASSERT_EQUALS (sut.GmlFilePath(),                       "MastModel.gml");
+    TS_ASSERT_EQUALS (sut.GmlGraphName(),                      "DUT");
+    TS_ASSERT_EQUALS (sut.LoggerFilePath(),                    "Mast.log");
+    TS_ASSERT_EQUALS (sut.ManagerActivityFileBasePath(),       "DUT");
+    TS_ASSERT_EQUALS (sut.ModelCheckingFilePath(),             "");
+    TS_ASSERT_EQUALS (sut.PrettyPrintFilePath(),               "MastModel.txt");
 
     TS_ASSERT_EQUALS (sut.GmlOptions(),                GmlPrinterOptions::Std);
     TS_ASSERT_EQUALS (sut.ManagerActivityOptions(),    ManagerMonitorOptions::Std);
@@ -188,7 +189,7 @@ void UT_MastConfiguration::test_ParseYamlConfiguration_PartialConfiguration ()
   TS_ASSERT_FALSE (sut.ReportManagerActivity());
 
   TS_ASSERT_EQUALS (sut.SitFilePath(),                 "myDesign.sit");
-  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocol(),     "");
+  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocolName(),     "");
   TS_ASSERT_EQUALS (sut.ConfigurationAlgorithm(),      "last_lazy");
   TS_ASSERT_EQUALS (sut.GmlFilePath(),                 "MastModel.gml");
   TS_ASSERT_EQUALS (sut.GmlGraphName(),                "DUT");
@@ -234,47 +235,49 @@ void UT_MastConfiguration::test_ParseYamlConfiguration_FullConfiguration ()
               "Mast_Options:\n"                                                            // 01
               "  SIT_file_path: myProject.sit\n"                                           // 02
               "  Configuration_algorithm: myConfiguration\n"                               // 03
-              "  Access_interface_protocol: myProtocol\n"                                  // 04
-              "  Plugins:  \n"                                                             // 05
-              "    Files:       [myPlugin.dll] \n"                                         // 06
-              "    Directories: [Plugins] \n"                                              // 07
-              "  Model_checking: \n"                                                       // 08
-              "    Enable: true\n"                                                         // 09
-              "    File_path: modelCheck.txt\n"                                            // 10
-              "  Debug:\n"                                                                 // 11
-              "    Logging:\n"                                                             // 12
-              "      Enable: true\n"                                                       // 13
-              "      Kind: only_errors_on_cerr\n"                                          // 14
-              "      File_path:   myProject.log\n"                                         // 15
-              "      Shown_items: [microseconds, level, thread_id, function_name]\n"       // 16
-              "      Level: warning\n"                                                     // 17
-              "    Model_GML_printing: \n"                                                 // 18
-              "      Enable: true\n"                                                       // 19
-              "      Moments:\n"                                                           // 20
-              "        - after_model_parsing\n"                                            // 21
-              "        - after_configuration\n"                                            // 22
-              "      File_path: ./myproject\n"                                             // 23
-              "      Graph_name: Foo\n"                                                    // 24
-              "      Options: std\n"                                                       // 25
-              "    Model_textual_print: \n"                                                // 26
-              "      Enable: true\n"                                                       // 27
-              "      Moments:\n"                                                           // 28
-              "        - after_model_parsing\n"                                            // 29
-              "        - before_configuration\n"                                           // 30
-              "      File_path: ../Tests/Bar\n"                                            // 31
-              "      Options:         \n"                                                  // 32
-              "         - verbose \n"                                                      // 33
-              "         - auto_value \n"                                                   // 34
-              "         - protocol_name \n"                                                // 35
-              "         - selection_state \n"                                              // 36
-              "         - selection_value \n"                                              // 37
-              "         - selector_properties \n"                                          // 38
-              "         - ignored_nodes  \n"                                               // 39
-              "    Manager_activity:  \n"                                                  // 40
-              "      Enable: true\n"                                                       // 41
-              "      File_base_name: managerActivity\n"                                    // 42
-              "      Options: [verbose, app_thread_creation, PDL_commands, data_cycles]\n" // 43
-              "Plugins_Options: ""\n"                                                      // 44
+              "  Access_interface_protocol: \n"                                            // 04
+              "    Name: myProtocol\n"                                                     // 05
+              "    Parameters: myProtocolParams\n"                                         // 06
+              "  Plugins:  \n"                                                             // 07
+              "    Files:       [myPlugin.dll] \n"                                         // 08
+              "    Directories: [Plugins] \n"                                              // 09
+              "  Model_checking: \n"                                                       // 10
+              "    Enable: true\n"                                                         // 11
+              "    File_path: modelCheck.txt\n"                                            // 12
+              "  Debug:\n"                                                                 // 13
+              "    Logging:\n"                                                             // 14
+              "      Enable: true\n"                                                       // 15
+              "      Kind: only_errors_on_cerr\n"                                          // 16
+              "      File_path:   myProject.log\n"                                         // 17
+              "      Shown_items: [microseconds, level, thread_id, function_name]\n"       // 18
+              "      Level: warning\n"                                                     // 19
+              "    Model_GML_printing: \n"                                                 // 20
+              "      Enable: true\n"                                                       // 21
+              "      Moments:\n"                                                           // 22
+              "        - after_model_parsing\n"                                            // 23
+              "        - after_configuration\n"                                            // 24
+              "      File_path: ./myproject\n"                                             // 25
+              "      Graph_name: Foo\n"                                                    // 26
+              "      Options: std\n"                                                       // 27
+              "    Model_textual_print: \n"                                                // 28
+              "      Enable: true\n"                                                       // 29
+              "      Moments:\n"                                                           // 30
+              "        - after_model_parsing\n"                                            // 31
+              "        - before_configuration\n"                                           // 32
+              "      File_path: ../Tests/Bar\n"                                            // 33
+              "      Options:         \n"                                                  // 34
+              "         - verbose \n"                                                      // 35
+              "         - auto_value \n"                                                   // 36
+              "         - protocol_name \n"                                                // 37
+              "         - selection_state \n"                                              // 38
+              "         - selection_value \n"                                              // 39
+              "         - selector_properties \n"                                          // 40
+              "         - ignored_nodes  \n"                                               // 41
+              "    Manager_activity:  \n"                                                  // 42
+              "      Enable: true\n"                                                       // 43
+              "      File_base_name: managerActivity\n"                                    // 44
+              "      Options: [verbose, app_thread_creation, PDL_commands, data_cycles]\n" // 45
+              "Plugins_Options: ""\n"                                                      // 46
              );
 
   // ---------------- Exercise
@@ -290,15 +293,16 @@ void UT_MastConfiguration::test_ParseYamlConfiguration_FullConfiguration ()
   TS_ASSERT_TRUE  (sut.PrettyPrinting());
   TS_ASSERT_TRUE  (sut.ReportManagerActivity());
 
-  TS_ASSERT_EQUALS (sut.SitFilePath(),                 "myProject.sit");
-  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocol(),     "myProtocol");
-  TS_ASSERT_EQUALS (sut.ConfigurationAlgorithm(),      "myConfiguration");
-  TS_ASSERT_EQUALS (sut.GmlFilePath(),                 "./myproject");
-  TS_ASSERT_EQUALS (sut.GmlGraphName(),                "Foo");
-  TS_ASSERT_EQUALS (sut.LoggerFilePath(),              "myProject.log");
-  TS_ASSERT_EQUALS (sut.ManagerActivityFileBasePath(), "managerActivity");
-  TS_ASSERT_EQUALS (sut.ModelCheckingFilePath(),       "modelCheck.txt");
-  TS_ASSERT_EQUALS (sut.PrettyPrintFilePath(),         "../Tests/Bar");
+  TS_ASSERT_EQUALS (sut.SitFilePath(),                       "myProject.sit");
+  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocolName(),       "myProtocol");
+  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocolParameters(), "myProtocolParams");
+  TS_ASSERT_EQUALS (sut.ConfigurationAlgorithm(),            "myConfiguration");
+  TS_ASSERT_EQUALS (sut.GmlFilePath(),                       "./myproject");
+  TS_ASSERT_EQUALS (sut.GmlGraphName(),                      "Foo");
+  TS_ASSERT_EQUALS (sut.LoggerFilePath(),                    "myProject.log");
+  TS_ASSERT_EQUALS (sut.ManagerActivityFileBasePath(),       "managerActivity");
+  TS_ASSERT_EQUALS (sut.ModelCheckingFilePath(),             "modelCheck.txt");
+  TS_ASSERT_EQUALS (sut.PrettyPrintFilePath(),               "../Tests/Bar");
 
   TS_ASSERT_EQUALS (sut.GmlOptions(),                GmlPrinterOptions::Std);
   TS_ASSERT_EQUALS (sut.ManagerActivityOptions(),    ManagerMonitorOptions::Verbose           |
@@ -406,15 +410,16 @@ void UT_MastConfiguration::test_ParseConfigurationFile_Good ()
   TS_ASSERT_TRUE  (sut.PrettyPrinting());
   TS_ASSERT_TRUE  (sut.ReportManagerActivity());
 
-  TS_ASSERT_EQUALS (sut.SitFilePath(),                 "myProject.sit");
-  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocol(),     "myProtocol");
-  TS_ASSERT_EQUALS (sut.ConfigurationAlgorithm(),      "myConfiguration");
-  TS_ASSERT_EQUALS (sut.GmlFilePath(),                 "./myproject");
-  TS_ASSERT_EQUALS (sut.GmlGraphName(),                "Foo");
-  TS_ASSERT_EQUALS (sut.LoggerFilePath(),              "myProject.log");
-  TS_ASSERT_EQUALS (sut.ManagerActivityFileBasePath(), "managerActivity");
-  TS_ASSERT_EQUALS (sut.ModelCheckingFilePath(),       "modelCheck.txt");
-  TS_ASSERT_EQUALS (sut.PrettyPrintFilePath(),         "../Tests/Bar");
+  TS_ASSERT_EQUALS (sut.SitFilePath(),                       "myProject.sit");
+  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocolName(),       "myProtocol");
+  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocolParameters(), "myProtocolParams");
+  TS_ASSERT_EQUALS (sut.ConfigurationAlgorithm(),            "myConfiguration");
+  TS_ASSERT_EQUALS (sut.GmlFilePath(),                       "./myproject");
+  TS_ASSERT_EQUALS (sut.GmlGraphName(),                      "Foo");
+  TS_ASSERT_EQUALS (sut.LoggerFilePath(),                    "myProject.log");
+  TS_ASSERT_EQUALS (sut.ManagerActivityFileBasePath(),       "managerActivity");
+  TS_ASSERT_EQUALS (sut.ModelCheckingFilePath(),             "modelCheck.txt");
+  TS_ASSERT_EQUALS (sut.PrettyPrintFilePath(),               "../Tests/Bar");
 
   TS_ASSERT_EQUALS (sut.GmlOptions(),                GmlPrinterOptions::Std);
   TS_ASSERT_EQUALS (sut.ManagerActivityOptions(),    ManagerMonitorOptions::Verbose           |
@@ -591,7 +596,7 @@ void UT_MastConfiguration::test_Update_ShortSwitches ()
   TS_ASSERT_FALSE (sut.ReportManagerActivity());
 
   TS_ASSERT_EQUALS (sut.SitFilePath(),                 "myDesign.sit");
-  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocol(),     "");
+  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocolName(),     "");
   TS_ASSERT_EQUALS (sut.ConfigurationAlgorithm(),      "last_lazy");
   TS_ASSERT_EQUALS (sut.GmlFilePath(),                 "MastModel.gml");
   TS_ASSERT_EQUALS (sut.GmlGraphName(),                "DUT");
@@ -628,7 +633,8 @@ void UT_MastConfiguration::test_Update_LongSwitches ()
   vector<string>    arguments{
                                 "MyAppWithLongName",
                                 "--sit=myDesign.sit",
-                                "--protocol=myProtocol",
+                                "--protocol_name=myProtocol",
+                                "--protocol_parameters=myProtocolParameters",
                                 "--config_algo=last_lazy",
                                 "--plugin_dir=MyPlugins",
                                 "--plugin=customPlugins.dll",
@@ -661,15 +667,16 @@ void UT_MastConfiguration::test_Update_LongSwitches ()
   TS_ASSERT_FALSE (sut.PrettyPrinting());
   TS_ASSERT_FALSE (sut.ReportManagerActivity());
 
-  TS_ASSERT_EQUALS (sut.SitFilePath(),                 "myDesign.sit");
-  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocol(),     "myProtocol");
-  TS_ASSERT_EQUALS (sut.ConfigurationAlgorithm(),      "last_lazy");
-  TS_ASSERT_EQUALS (sut.GmlFilePath(),                 "MastModel.gml");
-  TS_ASSERT_EQUALS (sut.GmlGraphName(),                "DUT");
-  TS_ASSERT_EQUALS (sut.LoggerFilePath(),              "myProject.log");
-  TS_ASSERT_EQUALS (sut.ManagerActivityFileBasePath(), "DUT");
-  TS_ASSERT_EQUALS (sut.ModelCheckingFilePath(),       "modelCheck.txt");
-  TS_ASSERT_EQUALS (sut.PrettyPrintFilePath(),         "MastModel.txt");
+  TS_ASSERT_EQUALS (sut.SitFilePath(),                       "myDesign.sit");
+  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocolName(),       "myProtocol");
+  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocolParameters(), "myProtocolParameters");
+  TS_ASSERT_EQUALS (sut.ConfigurationAlgorithm(),            "last_lazy");
+  TS_ASSERT_EQUALS (sut.GmlFilePath(),                       "MastModel.gml");
+  TS_ASSERT_EQUALS (sut.GmlGraphName(),                      "DUT");
+  TS_ASSERT_EQUALS (sut.LoggerFilePath(),                    "myProject.log");
+  TS_ASSERT_EQUALS (sut.ManagerActivityFileBasePath(),       "DUT");
+  TS_ASSERT_EQUALS (sut.ModelCheckingFilePath(),             "modelCheck.txt");
+  TS_ASSERT_EQUALS (sut.PrettyPrintFilePath(),               "MastModel.txt");
 
   TS_ASSERT_EQUALS (sut.GmlOptions(),                GmlPrinterOptions::Std);
   TS_ASSERT_EQUALS (sut.ManagerActivityOptions(),    ManagerMonitorOptions::Std);
@@ -703,7 +710,7 @@ void UT_MastConfiguration::test_Update_UsingArgv ()
   const char* arguments[] = {
                                 "MyAppWithLongName",           // 00
                                 "--sit=myDesign.sit",          // 01
-                                "--protocol=myProtocol",       // 02
+                                "--protocol_name=myProtocol",  // 02
                                 "--config_algo=last_lazy",     // 03
                                 "--plugin_dir=MyPlugins",      // 04
                                 "--plugin=customPlugins.dll",  // 05
@@ -739,7 +746,7 @@ void UT_MastConfiguration::test_Update_UsingArgv ()
   TS_ASSERT_FALSE (sut.ReportManagerActivity());
 
   TS_ASSERT_EQUALS (sut.SitFilePath(),                 "myDesign.sit");
-  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocol(),     "myProtocol");
+  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocolName(), "myProtocol");
   TS_ASSERT_EQUALS (sut.ConfigurationAlgorithm(),      "last_lazy");
   TS_ASSERT_EQUALS (sut.GmlFilePath(),                 "MastModel.gml");
   TS_ASSERT_EQUALS (sut.GmlGraphName(),                "DUT");
@@ -802,7 +809,7 @@ void UT_MastConfiguration::test_Update_OnlyYamlConfig ()
   TS_ASSERT_TRUE  (sut.ReportManagerActivity());
 
   TS_ASSERT_EQUALS (sut.SitFilePath(),                 "myProject.sit");
-  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocol(),     "myProtocol");
+  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocolName(),     "myProtocol");
   TS_ASSERT_EQUALS (sut.ConfigurationAlgorithm(),      "myConfiguration");
   TS_ASSERT_EQUALS (sut.GmlFilePath(),                 "./myproject");
   TS_ASSERT_EQUALS (sut.GmlGraphName(),                "Foo");
@@ -880,7 +887,7 @@ void UT_MastConfiguration::test_Update_Arguments_and_YamlConfig ()
   TS_ASSERT_TRUE  (sut.ReportManagerActivity());
 
   TS_ASSERT_EQUALS (sut.SitFilePath(),                 "myDesign.sit");
-  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocol(),     "myProtocol");
+  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocolName(), "myProtocol");
   TS_ASSERT_EQUALS (sut.ConfigurationAlgorithm(),      "myConfiguration");
   TS_ASSERT_EQUALS (sut.GmlFilePath(),                 "./myproject");
   TS_ASSERT_EQUALS (sut.GmlGraphName(),                "Foo");

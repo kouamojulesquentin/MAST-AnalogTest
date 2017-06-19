@@ -138,7 +138,8 @@ static const map<string, mast::ReportMoments> reportMomentsMapping
 MastConfiguration::MastConfiguration ()
   : m_sitFilePath                 ("")
   , m_configurationAlgorithm      ("last_or_default")
-  , m_accessInterfaceProtocol     ("")
+  , m_aiProtocolName              ("")
+  , m_aiProtocolParameters        ("")
   , m_pluginDirectories           ({PLUGINS_DIRECTORY_NAME})
   , m_modelCheckingFilePath       ()
   , m_loggerFilePath              ("Mast.log")
@@ -319,19 +320,20 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
     };
 
     updateString (m_sitFilePath,                 {"SIT_file_path"});
-    updateString (m_accessInterfaceProtocol,     {"Access_interface_protocol"});
+    updateString (m_aiProtocolName,              {"Access_interface_protocol", "Name"});
+    updateString (m_aiProtocolParameters,        {"Access_interface_protocol", "Parameters"});
     updateString (m_configurationAlgorithm,      {"Configuration_algorithm"});
-    updateString (m_modelCheckingFilePath,       {"Model_checking", "File_path"});
-    updateString (m_gmlFilePath,                 {"Debug",          "Model_GML_printing",  "File_path"});
-    updateString (m_gmlGraphName,                {"Debug",          "Model_GML_printing",  "Graph_name"});
-    updateString (m_prettyPrintingFilePath,      {"Debug",          "Model_textual_print", "File_path"});
-    updateString (m_loggerFilePath,              {"Debug",          "Logging",             "File_path"});
-    updateString (m_managerActivityFileBasePath, {"Debug",          "Manager_activity",    "File_base_name"});
-    updateBool   (m_modelChecking,               {"Model_checking", "Enable"});
-    updateBool   (m_loggerEnabled,               {"Debug",          "Logging",             "Enable"});
-    updateBool   (m_gmlPrinting,                 {"Debug",          "Model_GML_printing",  "Enable"});
-    updateBool   (m_prettyPrinting,              {"Debug",          "Model_textual_print", "Enable"});
-    updateBool   (m_reportManagerActivity,       {"Debug",          "Manager_activity",    "Enable"});
+    updateString (m_modelCheckingFilePath,       {"Model_checking",            "File_path"});
+    updateString (m_gmlFilePath,                 {"Debug",                     "Model_GML_printing",  "File_path"});
+    updateString (m_gmlGraphName,                {"Debug",                     "Model_GML_printing",  "Graph_name"});
+    updateString (m_prettyPrintingFilePath,      {"Debug",                     "Model_textual_print", "File_path"});
+    updateString (m_loggerFilePath,              {"Debug",                     "Logging",             "File_path"});
+    updateString (m_managerActivityFileBasePath, {"Debug",                     "Manager_activity",    "File_base_name"});
+    updateBool   (m_modelChecking,               {"Model_checking",            "Enable"});
+    updateBool   (m_loggerEnabled,               {"Debug",                     "Logging",             "Enable"});
+    updateBool   (m_gmlPrinting,                 {"Debug",                     "Model_GML_printing",  "Enable"});
+    updateBool   (m_prettyPrinting,              {"Debug",                     "Model_textual_print", "Enable"});
+    updateBool   (m_reportManagerActivity,       {"Debug",                     "Manager_activity",    "Enable"});
 
     updateEnum  (m_loggerLevel,                 loggerLevelMapping,            {"Debug", "Logging",             "Level"});
     updateFlags (m_loggerKind,                  loggerKindMapping,             {"Debug", "Logging",             "Kind"});
@@ -413,19 +415,20 @@ void MastConfiguration::Update (vector<string> arguments)
     TCLAP::ValuesConstraint<string> logShowConstraint (makeAllowedSet(loggerShownItemMapping));
 
     // Insert in reverse order of the USAGE print()
-    TCLAP::ValueArg<std::string> aiProtocolArg        ("",  "protocol",    "Override access interface protocol defined in SIT file",                        false, "",                       "Protocol name", cmdLine);
-    TCLAP::ValueArg<std::string> configurationAlgoArg ("a", "config_algo", "Name of configuration algorithm used to select linker  (mux) path",             false, "last_or_default",        "last_lazy|last_or_default|last_or_default_greedy| \"name defined by a plugin\"", cmdLine);
-    TCLAP::ValueArg<std::string> checkModelFileArg    ("",  "check_file",  "Defines result of model checking (it is always logged when logger is enabled)", false, "mast_check.txt",         "File path", cmdLine);
-    TCLAP::SwitchArg             checkModelArg        ("",  "check",       "Enable model checking (resulting from parsing SIT file)",                       cmdLine, false);
-    TCLAP::MultiArg<std::string> logKindArg           ("",  "log_kind",    "Define logger kind",                                                            false,                   &logKindConstraint,  cmdLine);
-    TCLAP::MultiArg<std::string> logLevelArg          ("",  "log_level",   "Define log level",                                                              false,                   &logLevelConstraint, cmdLine);
-    TCLAP::MultiArg<std::string> logShowArg           ("",  "log_show",    "Define log shown items",                                                        false,                   &logShowConstraint,  cmdLine);
-    TCLAP::ValueArg<std::string> logFileArg           ("",  "log_file",    "Define logger file path",                                                       false, "mast.log",               "File path", cmdLine);
-    TCLAP::SwitchArg             logEnabledArg        ("l", "log",         "Enable logger",                                                                 cmdLine, false);
-    TCLAP::MultiArg<std::string> pluginFilesArg       ("",  "plugin",      "Define a plugin file to load",                                                  false, "File path",      cmdLine);
-    TCLAP::MultiArg<std::string> pluginDirsArg        ("",  "plugin_dir",  "Define a plugin directory (all plugins in it are loaded)",                      false, "Directory path", cmdLine);
-    TCLAP::ValueArg<std::string> sitFilePathArg       ("s", "sit",         "Define SIT that specified SUT model",                                           false, "project.sit",    "File path", cmdLine);
-    TCLAP::ValueArg<std::string> configurationFileArg ("c", "conf",        "Define configuration file",                                                     false, "mast.cfg",       "File path", cmdLine);
+    TCLAP::ValueArg<std::string> aiProtocolNameArg       ("",  "protocol_name",       "Overrides access interface protocol defined in SIT file",                       false,   "",                  "Protocol name",                                                                  cmdLine);
+    TCLAP::ValueArg<std::string> aiProtocolParametersArg ("",  "protocol_parameters", "Optional access interface protocol parameters",                                 false,   "",                  "Protocol parameter(s)",                                                          cmdLine);
+    TCLAP::ValueArg<std::string> configurationAlgoArg    ("a", "config_algo",         "Name of configuration algorithm used to select linker  (mux) path",             false,   "last_or_default",   "last_lazy|last_or_default|last_or_default_greedy| \"name defined by a plugin\"", cmdLine);
+    TCLAP::ValueArg<std::string> checkModelFileArg       ("",  "check_file",          "Defines result of model checking (it is always logged when logger is enabled)", false,   "mast_check.txt",    "File path",                                                                      cmdLine);
+    TCLAP::SwitchArg             checkModelArg           ("",  "check",               "Enables model checking (resulting from parsing SIT file)",                       cmdLine, false);
+    TCLAP::MultiArg<std::string> logKindArg              ("",  "log_kind",            "Defines logger kind",                                                            false,   &logKindConstraint,  cmdLine);
+    TCLAP::MultiArg<std::string> logLevelArg             ("",  "log_level",           "Defines log level",                                                              false,   &logLevelConstraint, cmdLine);
+    TCLAP::MultiArg<std::string> logShowArg              ("",  "log_show",            "Defines log shown items",                                                        false,   &logShowConstraint,  cmdLine);
+    TCLAP::ValueArg<std::string> logFileArg              ("",  "log_file",            "Defines logger file path",                                                       false,   "mast.log",          "File path",                                                                      cmdLine);
+    TCLAP::SwitchArg             logEnabledArg           ("l", "log",                 "Enables logger",                                                                 cmdLine, false);
+    TCLAP::MultiArg<std::string> pluginFilesArg          ("",  "plugin",              "Defines a plugin file to load",                                                  false,   "File path",         cmdLine);
+    TCLAP::MultiArg<std::string> pluginDirsArg           ("",  "plugin_dir",          "Defines a plugin directory (all plugins in it are loaded)",                      false,   "Directory path",    cmdLine);
+    TCLAP::ValueArg<std::string> sitFilePathArg          ("s", "sit",                 "Defines SIT that specified SUT model",                                           false,   "project.sit",       "File path",                                                                      cmdLine);
+    TCLAP::ValueArg<std::string> configurationFileArg    ("c", "conf",                "Defines configuration file",                                                     false,   "mast.cfg",          "File path",                                                                      cmdLine);
 
     // ---------------- Do parse command line arguments
     //
@@ -475,15 +478,16 @@ void MastConfiguration::Update (vector<string> arguments)
       setOption(configurationFile, configurationFileArg);
       ParseConfigurationFile(configurationFile);
 
-      setOption(m_sitFilePath,             sitFilePathArg);
-      setOption(m_configurationAlgorithm,  configurationAlgoArg);
-      setOption(m_pluginDLLs,              pluginFilesArg);
-      setOption(m_pluginDirectories,       pluginDirsArg);
-      setOption(m_modelChecking,           checkModelArg);
-      setOption(m_modelCheckingFilePath,   checkModelFileArg);
-      setOption(m_loggerEnabled,           logEnabledArg);
-      setOption(m_loggerFilePath,          logFileArg);
-      setOption(m_accessInterfaceProtocol, aiProtocolArg);
+      setOption(m_sitFilePath,            sitFilePathArg);
+      setOption(m_configurationAlgorithm, configurationAlgoArg);
+      setOption(m_pluginDLLs,             pluginFilesArg);
+      setOption(m_pluginDirectories,      pluginDirsArg);
+      setOption(m_modelChecking,          checkModelArg);
+      setOption(m_modelCheckingFilePath,  checkModelFileArg);
+      setOption(m_loggerEnabled,          logEnabledArg);
+      setOption(m_loggerFilePath,         logFileArg);
+      setOption(m_aiProtocolName,         aiProtocolNameArg);
+      setOption(m_aiProtocolParameters,   aiProtocolParametersArg);
 
       setMappedOptionFlags(m_loggerKind,       logKindArg,  loggerKindMapping);
       setMappedOptionFlags(m_loggerLevel,      logLevelArg, loggerLevelMapping);

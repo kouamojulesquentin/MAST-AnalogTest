@@ -26,41 +26,42 @@ Configuration file follows [YAML](https://fr.wikipedia.org/wiki/YAML) syntax.
 Default configuration file looks like this:
 
     Mast_Options:
-      SIT_file_path: DUT.sit                   # [SIT] file used by the project
-      Configuration_algorithm: last_or_default # One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a [plugin])
-      Access_interface_protocol:               # When different to "SIT", it override the one define in [SIT] file
+      SIT_file_path:                                          # [SIT] file used by the project
+      Access_interface_protocol:
+        Name:                                                 # When defined, it overrides the one defined in [SIT] file
+        Parameters:                                           # Optional access interface protocol parameters (in case the one in [SIT] file is overriden)
+      Configuration_algorithm: last_or_default                # One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a [plugin])
       Plugins:
-        Files: []                              # List of plugin file(s) path (absolute or relative path)
-        Directories: []                        # Directory from where to load plugin files (absolute or relative path)
+        Files: []                                             # List of plugin file(s) path (absolute or relative path)
+        Directories: [Plugins]                                # Directory from where to load plugin files (absolute or relative path)
       Model_checking:
-        Enable:    false                       # Enable/Disable model checking (provided it has been parsed successfully)
-        File_path: ""                          # Optional file path (logged when no path when logged is enabled)
+        Enable:    false                                      # Enable/Disable model checking (provided it has been parsed successfully)
+        File_path: ""                                         # Optional file path (logged when no path when logged is enabled)
       Debug:
         Logging:
-          Enable: false                        # Enable/Disable general logging
-          Logger_Kind: std                     # One of [std, copy_all_on_cout, copy_errors_on_cerr]
-          File_path:  "Mast.log"               # File path for logging (there is always a file logging when enabled)
-          Shown_items: std_less                # Any of [date, time, microseconds, level, thread_id, file_name, line_number, function_name, std_less, std, std_more,all]
-          Level: info                          # One of [debug, info, warning, error]
+          Enable: false                                       # Enable/Disable general logging
+          Kind:   [file]                                      # One of [file, cout, only_errors_on_cerr]
+          File_path:  "Mast.log"                              # File path for logging (there is always a file logging when enabled)
+          Shown_items: [std_less]                             # Any of [date, time, microseconds, level, thread_id, file_name, line_number, function_name, std_less, std, std_more,all]
+          Level: info                                         # One of [debug, info, warning, error]
         Model_GML_printing:
-          Enable:  false                       # Enable/Disable printing of GML representation of the model state
-          Moments:                             # Any of [after_model_parsing, before_configuration, after_configuration] (see bellow)
+          Enable:  false                                      # Enable/Disable printing of GML representation of the model state
+          Moments:                                            # Any of [after_model_parsing, before_configuration, after_configuration] (see bellow)
             - after_model_parsing
-          File_path:   "MastModel.gml"         # Optional file path for GML graph printing
-          Graph_name:  "DUT"                   # Optional graph name
-          Options: std                         # Any of [default, identifiers, register_value, auto_value, protocol_name, selector_with_edge, selector_properties, selector_tables, selection_value, std, all]
+          File_path:   "MastModel.gml"                        # Optional file path for GML graph printing
+          Graph_name:  "DUT"                                  # Optional graph name
+          Options: [std]                                      # Any of [default, identifiers, register_value, auto_value, protocol_name, selector_with_edge, selector_properties, selector_tables, selection_value, std, all]
         Model_textual_print:
-          Enable:  false                       # Enable/Disable printing of textual representation of the model state
-          Moments:                             # Any of [after_model_parsing, before_configuration, after_configuration] (see bellow)
+          Enable:  false                                      # Enable/Disable printing of textual representation of the model state
+          Moments:                                            # Any of [after_model_parsing, before_configuration, after_configuration] (see bellow)
             - after_model_parsing
-          File_path: "MastModel.txt"           # Optional file path
-          Options:  default                    # Any of [default, verbose, auto_value, protocol_name, selection_state, selection_value, selector_properties, ignored_nodes, std, all]
+          File_path: "MastModel.txt"                          # Optional file path
+          Options:   [std]                                    # Any of [default, verbose, auto_value, protocol_name, selection_state, selection_value, selector_properties, ignored_nodes, std, all]
         Manager_activity:
-          Enable:         false                # Enable/Disable logging and optionally reporting model state at specific point of manager activity
-          File_base_name: "DUT"                # Path where pretty print and/or GML files are saved
-          Options:        PDL_commands         # Any of [verbose, app_thread_creation, PDL_commands, data_cycles, std, all]
-    Plugins_Options: ""                        # Defines plugins specific options (ignored by Mast)
-
+          Enable:         false                               # Enable/Disable logging and optionally reporting model state at specific point of manager activity
+          File_base_name: "DUT"                               # Path where pretty print and/or GML files are saved
+          Options:        [app_thread_creation, PDL_commands] # Any of [verbose, app_thread_creation, PDL_commands, data_cycles, std, all]
+    Plugins_Options: ""                                       # Defines plugins specific options (ignored by Mast)
 
 Same default values are used when no configuration file is provided nor found in current directory.
 
@@ -81,61 +82,68 @@ Usage is:
            [-l]
            [--log_file=<File path>]
            [--log_level=<debug|info|warning|error>]
-           [--log_kind=<std|cout|copy_all_on_cout|copy_errors_on_cerr>]
+           [--log_kind=<std|cout|only_errors_on_cerr>]
            [--log_show=<all|date|file_name|function_name|level|line_number|microseconds|std|std_less|std_more|thread_id|time>]
            [--check]
            [--check_file=<File path>]
            [-a=<last_lazy|last_or_default|last_or_default_greedy| "name defined by a plugin">]
-           [--protocol=<Protocol name>]
+           [--protocol_name=<Protocol name>]
+           [--protocol_parameters=<Protocol paramter(s)>]
            [--]
 
     Where:
 
-   -c=<File path>,  --conf=<File path>
-     Define configuration file
+    -c=<File path>,  --conf=<File path>
+      Defines configuration file
 
-   -s=<File path>,  --sit=<File path>
-     Define SIT that specified SUT model
+    -s=<File path>,  --sit=<File path>
+      Defines SIT that specified SUT model
 
-   --plugin_dir=<Directory path>  (accepted multiple times)
-     Define a plugin directory (all plugins in it are loaded)
+    --plugin_dir=<Directory path>  (accepted multiple times)
+      Defines a plugin directory (all plugins in it are loaded)
 
-   --plugin=<File path>  (accepted multiple times)
-     Define a plugin file to load
+    --plugin=<File path>  (accepted multiple times)
+      Defines a plugin file to load
 
-   -l,  --log
-     Enable logger
+    -l,  --log
+      Enables logger
 
-   --log_file=<File path>
-     Define logger file path
+    --log_file=<File path>
+      Defines logger file path
 
-   --log_show=<all|date|file_name|function_name|level|line_number
-      |microseconds|std|std_less|std_more|thread_id|time>
-     Define log shown items
+    --log_show=<all|date|file_name|function_name|level|line_number|microseconds|std|std_less|std_more|thread_id|time>
+      (accepted multiple times)
+      Defines log shown items
 
-   --log_level=<debug|info|warning|error>
-     Define log level
+    --log_level=<debug|error|info|warning>  (accepted multiple times)
+      Defines log level
 
-   --log_kind=<std|cout|copy_all_on_cout|copy_errors_on_cerr>
-     Define logger kind
+    --log_kind=<cout|file|only_errors_on_cerr>  (accepted multiple times)
+      Defines logger kind
 
-   --check
-     Enable model checking (resulting from parsing SIT file)
+    --check
+      Enables model checking (resulting from parsing SIT file)
 
-   --check_file=<File path>
-     Defines result of model checking (it is always logged when logger is
-     enabled)
+    --check_file=<File path>
+      Defines result of model checking (it is always logged when logger is
+      enabled)
 
-   -a=<last_lazy|last_or_default|last_or_default_greedy| "name defined by a
-      plugin">,  --config_algo=<last_lazy|last_or_default
-      |last_or_default_greedy| "name defined by a plugin">
-     Name of configuration algorithm used to select linker  (mux) path
+    -a=<last_lazy|last_or_default|last_or_default_greedy| "name defined by a plugin">,
+    --config_algo=<last_lazy|last_or_default|last_or_default_greedy| "name defined by a plugin">
+      Name of configuration algorithm used to select linker  (mux) path
 
-   --protocol=<Protocol name>
-     Override access interface protocol defined in SIT file
+    --protocol_parameters=<Protocol parameter(s)>
+      Optional access interface protocol parameters
 
-   --,  --ignore_rest
-     Ignores the rest of the labeled arguments following this flag.
+    --protocol_name=<Protocol name>
+      Overrides access interface protocol defined in SIT file
+
+    --,  --ignore_rest
+      Ignores the rest of the labeled arguments following this flag.
+
+
+    Mast: Manager for System On Chip Tests
+
 
 If there is a `mast.cfg` file in current working directory, it will be used as the configuration file.
 

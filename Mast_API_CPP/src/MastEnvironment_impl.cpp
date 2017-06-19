@@ -82,17 +82,40 @@ MastEnvironment_impl::MastEnvironment_impl (bool unitTestContext)
 
 //! Changes top level AccessInterface protocol with one defined by user
 //!
+//! @param protocolName
+//!
 //! @param protocolName Identifier of protocol ; it must be a built-in one or
 //!                     have been registered by a plugin
+//! @param parameters   Optional parameters to create the protocol
 //!
-void MastEnvironment_impl::ChangeAccessInterfaceProtocol (const string& protocolName)
+void MastEnvironment_impl::ChangeAccessInterfaceProtocol (const string& protocolName, const string& parameters)
 {
   LOG(DEBUG) << "Force protocol \"" << protocolName << "\" to top level access interface";
 
   auto factory  = AccessInterfaceProtocolFactory::Instance();
-  auto protocol = factory.Create(protocolName);
+  auto protocol = factory.Create(protocolName, parameters);
 
-  LOG(WARNING) << "Changing protocol is Not Yet Implemented !!!";
+  auto topNode            = Startup::sm_systemModel->Root();
+  auto topAccessInterface = dynamic_pointer_cast<AccessInterface>(topNode);
+
+  if (!topAccessInterface)
+  {
+    auto topChain = dynamic_pointer_cast<Chain>(topNode);
+    CHECK_VALUE_NOT_NULL (topChain, "Model top node is not an access interface nor a chain");
+    CHECK_TRUE           (HasOnlyChilrenOfType<AccessInterface>(topChain), "Top chain is not composed of only access interface(s)");
+
+    topAccessInterface = dynamic_pointer_cast<AccessInterface>(topChain->FirstChild());;
+
+    if (topAccessInterface->NextSibling())
+    {
+      LOG(WARNING) << "Changing protocol for multiple AccessInterface is Not Yet Implemented !!!";
+    }
+  }
+
+  CHECK_VALUE_NOT_NULL(topAccessInterface, "Model top node is not an access interface");
+
+  topAccessInterface->SetProtocol(std::move(protocol));
+  LOG(INFO) << "Have forced protocol \"" << protocolName << "\" on access interface \"" << topAccessInterface->Name() << "\"";
 }
 //
 //  End of: MastEnvironment_impl::ChangeAccessInterfaceProtocol
@@ -360,9 +383,10 @@ void MastEnvironment_impl::CreateSystemModel ()
 
   m_algoNamesAssociatedToNodes = reader.PDLAlgorithmNameToNodeAssociation();
 
-  if (!m_configuration->AccessInterfaceProtocol().empty())
+  if (!m_configuration->AccessInterfaceProtocolName().empty())
   {
-    ChangeAccessInterfaceProtocol(m_configuration->AccessInterfaceProtocol());
+    ChangeAccessInterfaceProtocol(m_configuration->AccessInterfaceProtocolName(),
+                                  m_configuration->AccessInterfaceProtocolParameters());
   }
 
   // ---------------- Checks

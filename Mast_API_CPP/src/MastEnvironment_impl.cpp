@@ -13,9 +13,6 @@
 
 #include "MastEnvironment_impl.hpp"
 #include "MastConfiguration.hpp"
-#include "g3log/g3log.hpp"
-#include "g3log/logworker.hpp"
-#include "g3log/loglevels.hpp"
 #include "CustomFileSink.h"
 #include "Utility.hpp"
 #include "FileSystem.hpp"
@@ -23,10 +20,16 @@
 #include "MastConfig.hpp"
 #include "PDL_AlgorithmsRepository.hpp"
 #include "ConfigureAlgorithmFactory.hpp"
+#include "AccessInterfaceProtocolFactory.hpp"
+#include "AccessInterfaceProtocol.hpp"
 #include "SystemModel.hpp"
 #include "SystemModelManager.hpp"
 #include "SIT_reader.hpp"
 #include "Startup.hpp"
+
+#include "g3log/g3log.hpp"
+#include "g3log/logworker.hpp"
+#include "g3log/loglevels.hpp"
 
 #include <fstream>
 
@@ -73,6 +76,26 @@ MastEnvironment_impl::MastEnvironment_impl (bool unitTestContext)
 }
 //
 //  End of: MastEnvironment_impl::MastEnvironment_impl
+//---------------------------------------------------------------------------
+
+
+
+//! Changes top level AccessInterface protocol with one defined by user
+//!
+//! @param protocolName Identifier of protocol ; it must be a built-in one or
+//!                     have been registered by a plugin
+//!
+void MastEnvironment_impl::ChangeAccessInterfaceProtocol (const string& protocolName)
+{
+  LOG(DEBUG) << "Force protocol \"" << protocolName << "\" to top level access interface";
+
+  auto factory  = AccessInterfaceProtocolFactory::Instance();
+  auto protocol = factory.Create(protocolName);
+
+  LOG(WARNING) << "Changing protocol is Not Yet Implemented !!!";
+}
+//
+//  End of: MastEnvironment_impl::ChangeAccessInterfaceProtocol
 //---------------------------------------------------------------------------
 
 
@@ -184,13 +207,9 @@ void MastEnvironment_impl::ConfigureLogger ()
         break;
     }
 
-    bool useCout =   (m_configuration->LoggerKind() == mast::LoggerKind::Cout)
-                  || (m_configuration->LoggerKind() == mast::LoggerKind::CopyAllOnCout);
+    auto loggerKind = m_configuration->LoggerKind();
 
-    bool useFile =   (m_configuration->LoggerKind() == mast::LoggerKind::Std)
-                  || (m_configuration->LoggerKind() == mast::LoggerKind::CopyAllOnCout);
-
-    if (useFile)
+    if (IsSet(loggerKind, mast::LoggerKind::File))
     {
       // ---------------- Sink for logging to file
       //
@@ -202,15 +221,15 @@ void MastEnvironment_impl::ConfigureLogger ()
       Startup::sm_logger->addSink(std::move(customSink), &g3::CustomFileSink::ReceiveLogUnformattedMessage);
     }
 
-    if (useCout)
+    if (IsSet(loggerKind, mast::LoggerKind::Cout))
     {
       auto coutSink = std::make_unique<g3::CoutLoggerSink>(*logFormatter);
       Startup::sm_logger->addSink(std::move(coutSink), &g3::CoutLoggerSink::ReceiveLogMessage);
     }
 
-    // ---------------- Disable, now useless, initial logger sink
+    // ---------------- Disable, "Cerr" logger if not requested
     //
-    if (useCout | useFile)
+    if (!IsSet(loggerKind, mast::LoggerKind::OnlyErrorsOnCerr))
     {
       std::future<bool> received = Startup::sm_cerrSinkHandle->call(&g3::LoggerSink::Enabled, false);
     }
@@ -264,9 +283,14 @@ void MastEnvironment_impl::CreateManager ()
   auto configAlgoFactory = ConfigureAlgorithmFactory::Instance();
   auto configAlgo        = configAlgoFactory.Create(configAlgoName);
 
+  LOG(INFO) << "Using configuration algorithm: \"" << configAlgoName << "\"";
+
   // ---------------- Manager monitor
   //
-  auto managerMonitor = shared_ptr<SystemModelManagerMonitor>() ;
+  //! @todo [JFC]-[June/16/2017]:
+  //!
+  LOG(WARNING) << "Export of gml/txt of system model during execution is Not Yet Implemented";
+  auto managerMonitor = shared_ptr<SystemModelManagerMonitor>();
   if (m_configuration->ReportManagerActivity())
   {
     auto options = m_configuration->ManagerActivityOptions();
@@ -284,6 +308,7 @@ void MastEnvironment_impl::CreateManager ()
     {
       options |= ManagerMonitorOptions::AfterConfiguration;
     }
+
 
     managerMonitor = make_shared<SystemModelManagerMonitor>(options);
     managerMonitor->ExportBasePath(m_configuration->ManagerActivityFileBasePath());
@@ -333,12 +358,23 @@ void MastEnvironment_impl::CreateSystemModel ()
 
   m_algoNamesAssociatedToNodes = reader.PDLAlgorithmNameToNodeAssociation();
 
+  if (!m_configuration->AccessInterfaceProtocol().empty())
+  {
+    ChangeAccessInterfaceProtocol(m_configuration->AccessInterfaceProtocol());
+  }
+
   // ---------------- Checks
   //
   if (m_configuration->ModelChecking())
   {
     CheckModel();
   }
+
+  //! @todo [JFC]-[June/16/2017]:
+  //!
+  LOG(WARNING) << "Export of gml/txt of system model is Not Yet Implemented";
+
+
   LOG(INFO) << "Created System Model";
 }
 //
@@ -560,7 +596,14 @@ void MastEnvironment_impl::ParseOptions (vector<string> arguments)
   {
     m_configuration = make_shared<MastConfiguration>();
   }
+
+  m_configuration->AutomaticExit(false);  // To get an opportunity to log errors befores closing "properly"
   m_configuration->Update(arguments);
+
+  if (m_configuration->ShouldExit())
+  {
+    throw std::runtime_error("Failed to parse user options");
+  }
 
   if (!m_unitTestsContext)
   {

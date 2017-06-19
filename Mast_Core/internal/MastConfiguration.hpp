@@ -34,10 +34,10 @@ namespace mast
 //!
 enum class LoggerKind
 {
-  Std,              //!< Logs only into logger file
-  Cout,             //!< Logs only onto cout (console)
-  CopyAllOnCout,    //!< Messages are logged to log file AND to the console
-  CopyErrorsOnCerr, //!< Messages are logged to log file AND error messages also to the console
+  None             = 0,
+  File             = 1 << 0, //!< Logs into logger file
+  Cout             = 1 << 1, //!< Logs onto cout (console)
+  OnlyErrorsOnCerr = 1 << 2, //!< Logs only error messages to cerr
 };
 
 //! Kinds of element that are reported in the log
@@ -162,7 +162,7 @@ class MAST_CORE_EXPORT MastConfiguration final
   bool                     m_modelChecking               = false;                                  //!< Enable/Disable model checking (provided it has been parsed successfully)
   std::string              m_modelCheckingFilePath;                                                //!< Optional file path (logged when no path when logged is enabled)
   bool                     m_loggerEnabled               = false;                                  //!< Enable/Disable general logging
-  mast::LoggerKind         m_loggerKind                  = mast::LoggerKind::Std;                  //!< Defines what kind of logger is used.
+  mast::LoggerKind         m_loggerKind                  = mast::LoggerKind::File;                 //!< Defines what kind of logger is used.
   std::string              m_loggerFilePath;                                                       //!< File path for logging (there is always a file logging when enabled)
   mast::LoggerShownItems   m_loggerShownItems            = mast::LoggerShownItems::Std_Less;       //!< Kinds of element that are reported in the log
   mast::LoggerLevel        m_loggerLevel                 = mast::LoggerLevel::Info;                //!< Defines what level of information are logged (from error only to debug messages)

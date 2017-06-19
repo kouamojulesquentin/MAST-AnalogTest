@@ -29,21 +29,19 @@ int main (int argc, const char* argv[])
   {
     MastEnvironment mast;
 
-    //  Detailed actions:
+    //  Detailed version:
 //+    mast.ParseOptions(argc, argv);
 //+    mast.LoadPlugins();
 //+    mast.CreateSystemModel();
 //+    mast.CreateManager();
 //+    mast.CreateApplications();
 //+    mast.Start();
-    //  Single line:
+
+    //  Single line version:
     mast.Start(argc, argv);
-    // --------------------------------------------------
-    // End of JFC modification (16-Jun-2017 3:35PM)
-    // --------------------------------------------------
   }
-  catch(std::exception& exc) { retCode = -1; cout << "\n\nMast got: " << exc.what() << endl; }
-  catch(...)                 { retCode = -1; cout << "\n\nMast got non std::exception" << endl; }
+  catch(std::exception& exc) { retCode = -1; cout << "\n\n" << exc.what() << endl; }
+  catch(...)                 { retCode = -1; cout << "\n\nUnexpected error" << endl; }
 
   return retCode;
 }

@@ -39,10 +39,9 @@ namespace
 //
 static const map<string, mast::LoggerKind>  loggerKindMapping
 {
-  {"std",                 mast::LoggerKind::Std},
+  {"file",                mast::LoggerKind::File},
   {"cout",                mast::LoggerKind::Cout},
-  {"copy_all_on_cout",    mast::LoggerKind::CopyAllOnCout},
-  {"copy_errors_on_cerr", mast::LoggerKind::CopyErrorsOnCerr},
+  {"only_errors_on_cerr", mast::LoggerKind::OnlyErrorsOnCerr},
 };
 
 // ---------------- Maps logger level arguments to internal value
@@ -94,6 +93,7 @@ static const map<string, mast::GmlPrinterOptions> gmlPrinterOptionsMapping
 //
 static const map<string, mast::PrettyPrinterOptions> prettyPrinterOptionsMapping
 {
+  {"default",             PrettyPrinterOptions::Default},
   {"verbose",             PrettyPrinterOptions::Verbose},
   {"auto_value",          PrettyPrinterOptions::DisplayValueAuto},
   {"protocol_name",       PrettyPrinterOptions::ShowProtocol},
@@ -101,7 +101,6 @@ static const map<string, mast::PrettyPrinterOptions> prettyPrinterOptionsMapping
   {"selector_properties", PrettyPrinterOptions::ShowSelectorProperties},
   {"selection_value",     PrettyPrinterOptions::ShowSelectionValue},
   {"ignored_nodes",       PrettyPrinterOptions::ShowNodeIsIgnored},
-  {"default",             PrettyPrinterOptions::Default},
   {"none",                PrettyPrinterOptions::None},
   {"std",                 PrettyPrinterOptions::Std},
   {"all",                 PrettyPrinterOptions::All},
@@ -241,7 +240,7 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
     {
       auto ok = false;
       tie(ok, gotString) = yaml.TryGetAsString (makePath(pathItems));
-      if (ok)
+      if (ok && !gotString.empty())
       {
         option = gotString;
       }
@@ -252,7 +251,7 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
     {
       auto ok = false;
       tie(ok, gotString) = yaml.TryGetAsString (makePath(pathItems));
-      if (ok)
+      if (ok && !gotString.empty())
       {
         auto pos = mapping.find(gotString);
         if (pos != mapping.cend())
@@ -264,7 +263,8 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
 
     // Enum flags updater
     vector<string> gotFlags;  // To be re-used for each flag option parsing
-    auto updateFlags = [&yaml, &gotFlags, &makePath](auto& option, const auto& mapping, initializer_list<const char*> pathItems)
+    auto updateFlags = [&yaml, &gotFlags, &makePath, &updateEnum]
+                       (auto& option, const auto& mapping, initializer_list<const char*> pathItems)
     {
       auto ok = false;
       tie(ok, gotFlags) = yaml.TryGetAsStringVector (makePath(pathItems));
@@ -284,6 +284,10 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
             LOG(INFO) << "Invalid flag: " << flag;
           }
         }
+      }
+      else  // Try with plain string (single value)
+      {
+        updateEnum(option, mapping, pathItems);
       }
     };
 
@@ -329,8 +333,8 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
     updateBool   (m_prettyPrinting,              {"Debug",          "Model_textual_print", "Enable"});
     updateBool   (m_reportManagerActivity,       {"Debug",          "Manager_activity",    "Enable"});
 
-    updateEnum  (m_loggerKind,                  loggerKindMapping,             {"Debug", "Logging",             "Logger_Kind"});
     updateEnum  (m_loggerLevel,                 loggerLevelMapping,            {"Debug", "Logging",             "Level"});
+    updateFlags (m_loggerKind,                  loggerKindMapping,             {"Debug", "Logging",             "Kind"});
     updateFlags (m_loggerShownItems,            loggerShownItemMapping,        {"Debug", "Logging",             "Shown_items"});
     updateFlags (m_gmlOptions,                  gmlPrinterOptionsMapping,      {"Debug", "Model_GML_printing",  "Options"});
     updateFlags (m_gmlReportMoments,            reportMomentsMapping,          {"Debug", "Model_GML_printing",  "Moments"});

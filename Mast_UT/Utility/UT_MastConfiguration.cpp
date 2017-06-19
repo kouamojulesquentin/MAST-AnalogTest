@@ -62,7 +62,7 @@ namespace
     TS_ASSERT_EQUALS (sut.GmlOptions(),                GmlPrinterOptions::Std);
     TS_ASSERT_EQUALS (sut.ManagerActivityOptions(),    ManagerMonitorOptions::Std);
     TS_ASSERT_EQUALS (sut.PrettyPrintOptions(),        PrettyPrinterOptions::Std);
-    TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::Std);
+    TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::File);
     TS_ASSERT_EQUALS (sut.LoggerLevel(),               mast::LoggerLevel::Info);
     TS_ASSERT_EQUALS (sut.LoggerShownItems(),          mast::LoggerShownItems::Std_Less);
     TS_ASSERT_EQUALS (sut.GmlReportMoments(),          mast::ReportMoments::AfterModelParsing);
@@ -168,7 +168,7 @@ void UT_MastConfiguration::test_ParseYamlConfiguration_PartialConfiguration ()
               "  Debug:\n"
               "    Logging:\n"
               "      Enable: true\n"
-              "      Logger_Kind: copy_errors_on_cerr\n"
+              "      Kind:   [only_errors_on_cerr]\n"
               "      File_path:   myProject.log\n"
               "      Shown_items: [date, time, microseconds, level, thread_id]\n"
               "      Level: debug\n"
@@ -200,7 +200,7 @@ void UT_MastConfiguration::test_ParseYamlConfiguration_PartialConfiguration ()
   TS_ASSERT_EQUALS (sut.GmlOptions(),                GmlPrinterOptions::Std);
   TS_ASSERT_EQUALS (sut.ManagerActivityOptions(),    ManagerMonitorOptions::Std);
   TS_ASSERT_EQUALS (sut.PrettyPrintOptions(),        PrettyPrinterOptions::Std);
-  TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::CopyErrorsOnCerr);
+  TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::OnlyErrorsOnCerr);
   TS_ASSERT_EQUALS (sut.LoggerLevel(),               mast::LoggerLevel::Debug);
   TS_ASSERT_EQUALS (sut.LoggerShownItems(),          mast::LoggerShownItems::Date
                                                    | mast::LoggerShownItems::Time
@@ -244,7 +244,7 @@ void UT_MastConfiguration::test_ParseYamlConfiguration_FullConfiguration ()
               "  Debug:\n"                                                                 // 11
               "    Logging:\n"                                                             // 12
               "      Enable: true\n"                                                       // 13
-              "      Logger_Kind: copy_errors_on_cerr\n"                                   // 14
+              "      Kind: only_errors_on_cerr\n"                                          // 14
               "      File_path:   myProject.log\n"                                         // 15
               "      Shown_items: [microseconds, level, thread_id, function_name]\n"       // 16
               "      Level: warning\n"                                                     // 17
@@ -312,7 +312,7 @@ void UT_MastConfiguration::test_ParseYamlConfiguration_FullConfiguration ()
                                                      PrettyPrinterOptions::ShowSelectionValue     |
                                                      PrettyPrinterOptions::ShowSelectorProperties |
                                                      PrettyPrinterOptions::ShowNodeIsIgnored);
-  TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::CopyErrorsOnCerr);
+  TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::OnlyErrorsOnCerr);
   TS_ASSERT_EQUALS (sut.LoggerLevel(),               mast::LoggerLevel::Warning);
   TS_ASSERT_EQUALS (sut.LoggerShownItems(),          mast::LoggerShownItems::Microseconds |
                                                      mast::LoggerShownItems::Level        |
@@ -428,7 +428,7 @@ void UT_MastConfiguration::test_ParseConfigurationFile_Good ()
                                                      PrettyPrinterOptions::ShowSelectionValue     |
                                                      PrettyPrinterOptions::ShowSelectorProperties |
                                                      PrettyPrinterOptions::ShowNodeIsIgnored);
-  TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::CopyErrorsOnCerr);
+  TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::OnlyErrorsOnCerr);
   TS_ASSERT_EQUALS (sut.LoggerLevel(),               mast::LoggerLevel::Warning);
   TS_ASSERT_EQUALS (sut.LoggerShownItems(),          mast::LoggerShownItems::Microseconds |
                                                      mast::LoggerShownItems::Level        |
@@ -603,7 +603,7 @@ void UT_MastConfiguration::test_Update_ShortSwitches ()
   TS_ASSERT_EQUALS (sut.GmlOptions(),                GmlPrinterOptions::Std);
   TS_ASSERT_EQUALS (sut.ManagerActivityOptions(),    ManagerMonitorOptions::Std);
   TS_ASSERT_EQUALS (sut.PrettyPrintOptions(),        PrettyPrinterOptions::Std);
-  TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::Std);
+  TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::File);
   TS_ASSERT_EQUALS (sut.LoggerLevel(),               mast::LoggerLevel::Info);
   TS_ASSERT_EQUALS (sut.LoggerShownItems(),          mast::LoggerShownItems::Std_Less);
   TS_ASSERT_EQUALS (sut.GmlReportMoments(),          mast::ReportMoments::AfterModelParsing);
@@ -635,7 +635,8 @@ void UT_MastConfiguration::test_Update_LongSwitches ()
                                 "--log",
                                 "--log_file=myProject.log",
                                 "--log_level=debug",
-                                "--log_kind=copy_all_on_cout",
+                                "--log_kind=file",
+                                "--log_kind=cout",
                                 "--check",
                                 "--check_file=modelCheck.txt",
                              };
@@ -673,7 +674,7 @@ void UT_MastConfiguration::test_Update_LongSwitches ()
   TS_ASSERT_EQUALS (sut.GmlOptions(),                GmlPrinterOptions::Std);
   TS_ASSERT_EQUALS (sut.ManagerActivityOptions(),    ManagerMonitorOptions::Std);
   TS_ASSERT_EQUALS (sut.PrettyPrintOptions(),        PrettyPrinterOptions::Std);
-  TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::CopyAllOnCout);
+  TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::File | mast::LoggerKind::Cout);
   TS_ASSERT_EQUALS (sut.LoggerLevel(),               mast::LoggerLevel::Debug);
   TS_ASSERT_EQUALS (sut.LoggerShownItems(),          mast::LoggerShownItems::Std_Less);
   TS_ASSERT_EQUALS (sut.GmlReportMoments(),          mast::ReportMoments::AfterModelParsing);
@@ -709,14 +710,16 @@ void UT_MastConfiguration::test_Update_UsingArgv ()
                                 "--log",                       // 06
                                 "--log_file=myProject.log",    // 07
                                 "--log_level=debug",           // 08
-                                "--log_kind=copy_all_on_cout", // 09
-                                "--check",                     // 10
-                                "--check_file=modelCheck.txt", // 11
+                                "--log_kind=cout",             // 09
+                                "--log_kind=file",             // 10
+                                "--check",                     // 11
+                                "--check_file=modelCheck.txt", // 12
                             };
 
   ostringstream     stdStream;
   ostringstream     errStream;
   auto              streamOutput = make_shared<TCLAP::StreamOutput>(stdStream, errStream);
+  auto              argc = std::extent<decltype(arguments)>::value;
   MastConfiguration sut;
 
   sut.CommandLineParserOutput(streamOutput);
@@ -724,7 +727,7 @@ void UT_MastConfiguration::test_Update_UsingArgv ()
 
   // ---------------- Exercise
   //
-  TS_ASSERT_THROWS_NOTHING (sut.Update(12, arguments));
+  TS_ASSERT_THROWS_NOTHING (sut.Update(argc, arguments));
 
   // ---------------- Verify
   //
@@ -748,7 +751,7 @@ void UT_MastConfiguration::test_Update_UsingArgv ()
   TS_ASSERT_EQUALS (sut.GmlOptions(),                GmlPrinterOptions::Std);
   TS_ASSERT_EQUALS (sut.ManagerActivityOptions(),    ManagerMonitorOptions::Std);
   TS_ASSERT_EQUALS (sut.PrettyPrintOptions(),        PrettyPrinterOptions::Std);
-  TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::CopyAllOnCout);
+  TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::File | mast::LoggerKind::Cout);
   TS_ASSERT_EQUALS (sut.LoggerLevel(),               mast::LoggerLevel::Debug);
   TS_ASSERT_EQUALS (sut.LoggerShownItems(),          mast::LoggerShownItems::Std_Less);
   TS_ASSERT_EQUALS (sut.GmlReportMoments(),          mast::ReportMoments::AfterModelParsing);
@@ -820,7 +823,7 @@ void UT_MastConfiguration::test_Update_OnlyYamlConfig ()
                                                      PrettyPrinterOptions::ShowSelectionValue     |
                                                      PrettyPrinterOptions::ShowSelectorProperties |
                                                      PrettyPrinterOptions::ShowNodeIsIgnored);
-  TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::CopyErrorsOnCerr);
+  TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::OnlyErrorsOnCerr);
   TS_ASSERT_EQUALS (sut.LoggerLevel(),               mast::LoggerLevel::Warning);
   TS_ASSERT_EQUALS (sut.LoggerShownItems(),          mast::LoggerShownItems::Microseconds |
                                                      mast::LoggerShownItems::Level        |
@@ -898,7 +901,7 @@ void UT_MastConfiguration::test_Update_Arguments_and_YamlConfig ()
                                                      PrettyPrinterOptions::ShowSelectionValue     |
                                                      PrettyPrinterOptions::ShowSelectorProperties |
                                                      PrettyPrinterOptions::ShowNodeIsIgnored);
-  TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::CopyErrorsOnCerr);
+  TS_ASSERT_EQUALS (sut.LoggerKind(),                mast::LoggerKind::OnlyErrorsOnCerr);
   TS_ASSERT_EQUALS (sut.LoggerLevel(),               mast::LoggerLevel::Warning);
   TS_ASSERT_EQUALS (sut.LoggerShownItems(),          mast::LoggerShownItems::Microseconds |
                                                      mast::LoggerShownItems::Level        |

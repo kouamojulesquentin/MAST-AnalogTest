@@ -11,7 +11,7 @@ Mast_Options:
   Debug:
     Logging:
       Enable: true
-      Logger_Kind: copy_errors_on_cerr
+      Kind:   only_errors_on_cerr  # One of [file, cout, only_errors_on_cerr]
       File_path:   myProject.log
       Shown_items: [microseconds, level, thread_id, function_name]
       Level: warning
@@ -22,7 +22,7 @@ Mast_Options:
         - after_configuration
       File_path: ./myproject
       Graph_name: Foo
-      Options: std
+      Options: [std]
     Model_textual_print:
       Enable: true
       Moments:

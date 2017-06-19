@@ -320,7 +320,6 @@ class SystemModelManager_impl final
   std::shared_ptr<AccessInterface>           m_firstAccessInterface; //!< The first AccessInterface of the system
   ConfigureVisitor                           m_configurator;         //!< In charge of configuration
   PropagatePendingVisitor                    m_propagator;           //!< In charge of propagating pending status bottom up
-  ToSutVisitor                               m_toSutVisitor;         //!< In charge of collecting bitstream to SUT
   FromSutUpdater                             m_fromSutUpdater;       //!< In charge of updating SystemModel from bitstream from SUT
   NodePathResolver                           m_pathResolver;         //!< Node path resolver for SystemModelManager thread
   std::shared_ptr<SystemModelManagerMonitor> m_monitor;              //!< Provides monitoring point

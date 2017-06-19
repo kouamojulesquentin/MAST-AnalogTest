@@ -75,7 +75,6 @@ SystemModelManager_impl::SystemModelManager_impl(SystemModel&                   
   , m_firstAccessInterface           ()
   , m_configurator                   (configurationAlgorithm)
   , m_propagator                     ()
-  , m_toSutVisitor                   ()
   , m_fromSutUpdater                 (sm)
   , m_pathResolver                   (sm.Root())
   , m_monitor                        (monitor)
@@ -211,13 +210,16 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (std::shared_ptr<AccessInt
    {
     if (nextEndPoint->IsPending())
     {
-     m_toSutVisitor.Reset();
-     nextEndPoint->Accept(m_toSutVisitor);
+     auto local_toSutVisitor = new ToSutVisitor();
 
-     const auto& toSutVector = m_toSutVisitor.ToSutVector();
+     local_toSutVisitor->Reset();
+    nextEndPoint->Accept(*local_toSutVisitor);
+
+     const auto& toSutVector = local_toSutVisitor->ToSutVector();
+     
      if (!toSutVector.IsEmpty())   // This can be empty when actual SUT state prevent from serving pending Registers
        {
-        const auto& activeRegs  = m_toSutVisitor.ActiveRegistersIdentifiers();
+        const auto& activeRegs  = local_toSutVisitor->ActiveRegistersIdentifiers();
 
 	BinaryVector fromSutVector;
         if (InterfaceTranslator==nullptr) //Standard case, use built-in Callbacks

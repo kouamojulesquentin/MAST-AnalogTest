@@ -40,7 +40,7 @@ class StreamOutput : public CmdLineOutput
   size_t        m_maxWidth  = 95u;
   size_t        m_stdIndent = 2u;
 
-  //! @todo [JFC]-[May/31/2017]: Factor this and StdOutput into a single one requesting stream for std and error messages
+  //! @todo [JFC]-[May/31/2017]: Factor this and StdOutput into a single one "StreamOutputBase" requesting stream for std and error messages
   //!
 
   public:
@@ -55,9 +55,10 @@ class StreamOutput : public CmdLineOutput
     //! @param stdStream   Output stream for standard messages
     //! @param errStream   Output stream for error messages
     //!
-    StreamOutput(std::ostream& stdStream, std::ostream& errStream)
+    StreamOutput(std::ostream& stdStream, std::ostream& errStream, size_t maxWidth = 95u)
       : m_stdStream (stdStream)
       , m_errStream (errStream)
+      , m_maxWidth  (maxWidth)
     {
     }
 

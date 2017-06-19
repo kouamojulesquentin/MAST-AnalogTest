@@ -26,12 +26,6 @@ using std::string;
 using std::vector;
 using namespace std::string_literals;
 
-#define TS_ASSERT_STR_CONTAINS(text, sub_text)                                                              \
-    if ((text).find((sub_text)) == std::string::npos)                                                       \
-    {                                                                                                       \
-      TS_FAIL(string(#text).append(": ").append((text)).append(", does not contain: ").append((sub_text)));\
-    }
-
 
 //! Checks ValueArg constructor with minimal parameters
 //!
@@ -205,8 +199,8 @@ void UT_TClap::test_CmdLine_parse_Help ()
   //
   TS_ASSERT_TRUE (sut.shouldExit());
 
-  TS_ASSERT_STR_CONTAINS (stdStream.str(), "USAGE: ");
-  TS_ASSERT_EMPTY       (errStream.str());
+  TS_ASSERT_CONTAINS (stdStream.str(), "USAGE: ");
+  TS_ASSERT_EMPTY    (errStream.str());
 }
 
 
@@ -232,7 +226,7 @@ void UT_TClap::test_CmdLine_parse_Version ()
   //
   TS_ASSERT_TRUE (sut.shouldExit());
 
-  TS_ASSERT_STR_CONTAINS(stdStream.str(), "MySuperApp  version: 0.9.x");
+  TS_ASSERT_CONTAINS(stdStream.str(), "MySuperApp  version: 0.9.x");
   TS_ASSERT_EMPTY (errStream.str());
 }
 
@@ -262,9 +256,9 @@ void UT_TClap::test_CmdLine_parse_UnregisteredSwitch ()
   auto stdMessage = stdStream.str();
   auto errMessage = errStream.str();
 
-  TS_ASSERT_STR_CONTAINS(stdMessage, "MyApp");
-  TS_ASSERT_STR_CONTAINS(stdMessage, "[--version]");
-  TS_ASSERT_STR_CONTAINS(errMessage, "PARSE ERROR: Argument: --foo");
+  TS_ASSERT_CONTAINS(stdMessage, "MyApp");
+  TS_ASSERT_CONTAINS(stdMessage, "[--version]");
+  TS_ASSERT_CONTAINS(errMessage, "PARSE ERROR: Argument: --foo");
 }
 
 
@@ -293,9 +287,9 @@ void UT_TClap::test_CmdLine_parse_UnregisteredParam ()
   auto stdMessage = stdStream.str();
   auto errMessage = errStream.str();
 
-  TS_ASSERT_STR_CONTAINS(stdMessage, "MyApp");
-  TS_ASSERT_STR_CONTAINS(stdMessage, "[--version]");
-  TS_ASSERT_STR_CONTAINS(errMessage, "PARSE ERROR: Argument: foo");
+  TS_ASSERT_CONTAINS(stdMessage, "MyApp");
+  TS_ASSERT_CONTAINS(stdMessage, "[--version]");
+  TS_ASSERT_CONTAINS(errMessage, "PARSE ERROR: Argument: foo");
 }
 
 
@@ -357,8 +351,8 @@ void UT_TClap::test_CmdLine_parse_missing_Required ()
   auto stdMessage = stdStream.str();
   auto errMessage = errStream.str();
 
-  TS_ASSERT_STR_CONTAINS (stdMessage, "MyApp  -b=<bar level>");
-  TS_ASSERT_STR_CONTAINS (errMessage, "Required argument missing: bar");
+  TS_ASSERT_CONTAINS (stdMessage, "MyApp  -b=<bar level>");
+  TS_ASSERT_CONTAINS (errMessage, "Required argument missing: bar");
 
   TS_ASSERT_EQUALS (fooArg.getValue(), 7);
 }

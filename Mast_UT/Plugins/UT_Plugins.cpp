@@ -34,17 +34,6 @@ using namespace std::experimental::literals::string_view_literals;
 
 extern string Exe_Dir_Path;
 
-#define TS_ASSERT_STR_CONTAINS(text, sub_text)                                                              \
-    if ((text).find((sub_text)) == std::string::npos)                                                       \
-    {                                                                                                       \
-      TS_FAIL(string(#text).append(": ").append((text)).append(", does not contain: ").append((sub_text))); \
-    }                                                                                                       \
-    else                                                                                                    \
-    {                                                                                                       \
-      TS_ASSERT_TRUE (true);                                                                                \
-    }
-
-
 namespace
 {
   //! Returns path for plugins directory or for a plugin name
@@ -174,8 +163,8 @@ void UT_Plugins::test_TryLoadPlugin_Exists ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_STR_CONTAINS (effectivePluginPath, pluginPath);
-  TS_ASSERT_STR_CONTAINS (effectivePluginPath, hintPath);
+  TS_ASSERT_CONTAINS (effectivePluginPath, pluginPath);
+  TS_ASSERT_CONTAINS (effectivePluginPath, hintPath);
 
   //+ (JFC June/13/2017): When unloading dll is in place ==> Check that it is effectively loaded
 //+  CxxTest::setAbortTestOnFail(true);

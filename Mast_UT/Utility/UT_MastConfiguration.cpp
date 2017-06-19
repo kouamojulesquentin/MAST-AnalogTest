@@ -39,12 +39,6 @@ using std::initializer_list;
 using namespace mast;
 
 
-#define TS_ASSERT_STR_CONTAINS(text, sub_text)                                                              \
-    if ((text).find((sub_text)) == std::string::npos)                                                       \
-    {                                                                                                       \
-      TS_FAIL(string(#text).append(": ").append((text)).append(", does not contain: ").append((sub_text)));\
-    }
-
 namespace
 {
   void Check_DefaultConfiguration(const MastConfiguration& sut)
@@ -528,8 +522,8 @@ void UT_MastConfiguration::test_Update_BadArguments ()
   auto stdMessage = stdStream.str();
   auto errMessage = errStream.str();
 
-  TS_ASSERT_STR_CONTAINS (stdMessage, "USAGE:")
-  TS_ASSERT_STR_CONTAINS (errMessage, "PARSE ERROR: Argument:")
+  TS_ASSERT_CONTAINS (stdMessage, "USAGE:")
+  TS_ASSERT_CONTAINS (errMessage, "PARSE ERROR: Argument:")
 }
 
 
@@ -562,8 +556,8 @@ void UT_MastConfiguration::test_Update_UnsupportedFlags ()
   auto stdMessage = stdStream.str();
   auto errMessage = errStream.str();
 
-  TS_ASSERT_STR_CONTAINS (stdMessage, "USAGE:")
-  TS_ASSERT_STR_CONTAINS (errMessage, "PARSE ERROR: Argument:")
+  TS_ASSERT_CONTAINS (stdMessage, "USAGE:")
+  TS_ASSERT_CONTAINS (errMessage, "PARSE ERROR: Argument:")
 }
 
 

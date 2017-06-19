@@ -1009,13 +1009,7 @@ void UT_reader::test_JTAG_TAP_Failure ()
     std::this_thread::sleep_for(5ms); // To get messages from logger (running in another thread)
     const auto gotErrorMessage = sut.ErrorMessage();
 
-    auto containsExpected = gotErrorMessage.find(expected_ErrorMsg) != string::npos;
-
-    //+ (begin JFC February/07/2017): for debug purpose
-//+    if (!containsExpected) { TS_FAIL (gotErrorMessage); }
-    //+ (end   JFC February/07/2017):
-
-    TS_ASSERT_TRUE (containsExpected);
+    TS_ASSERT_CONTAINS (gotErrorMessage, expected_ErrorMsg);
   };
 
   auto data =
@@ -1242,16 +1236,7 @@ void UT_reader::test_ACCES_INTERFACE_Failure ()
     std::this_thread::sleep_for(5ms);         // To get messages from logger (running in another thread)
     const auto gotErrorMessage = sut.ErrorMessage();
 
-    TS_ASSERT_NOT_EMPTY (gotErrorMessage);    // Make sure there is an error message
-
-
-    auto containsExpected = gotErrorMessage.find(expected_ErrorMsg) != string::npos;
-
-    //+ (begin JFC February/07/2017): for debug purpose
-    if (!containsExpected) { TS_FAIL (gotErrorMessage); }
-    //+ (end   JFC February/07/2017):
-
-    TS_ASSERT_TRUE (containsExpected);
+    TS_ASSERT_CONTAINS (gotErrorMessage, expected_ErrorMsg);
   };
 
 

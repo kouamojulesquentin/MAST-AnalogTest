@@ -25,6 +25,7 @@ set_target_properties (Tutorial_1 PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 target_link_libraries (Tutorial_1 Mast_API_CPP ${EXTRA_LIBS})
 
 install(FILES Tutorial_1.sit DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+install(FILES Tutorial_1.yml DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 include(CTest)
 add_test(NAME Smoke:Tutorial_1 COMMAND Mast --check --log --log_kind=only_errors_on_cerr --log_level=error --plugin_dir=Tutorial_1 --sit=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Tutorial_1.sit)

@@ -70,6 +70,7 @@ class MastEnvironment_impl final
   void CreateSystemModel();   //!< Creates system model using parsed options and loaded plugins
   void CreateManager      (); //! Creates system model manager
   void CreateApplications (); //! Creates PDL algorithm with their associated nodes
+  void ReportParsedModel();   //! Save GML/Text view of parsed SIT model
   void Start();               //! Starts system model manager AND wait till it ends
 
 //+  bool UnitTestsContext() const { return m_unitTestsContext; }
@@ -84,7 +85,8 @@ class MastEnvironment_impl final
   void InitializeLogger ();
   std::string GetActualSitFilePath (const std::string& sitFile) const;
 
-  static std::vector<std::string> MakeArgumentsVector (int argc, const char* argv[]);
+  std::shared_ptr<SystemModelManagerMonitor> MakeManagerMonitor ();
+  static std::vector<std::string>            MakeArgumentsVector (int argc, const char* argv[]);
 
   // ---------------- Private Fields
   //

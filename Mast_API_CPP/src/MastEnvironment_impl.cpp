@@ -310,34 +310,8 @@ void MastEnvironment_impl::CreateManager ()
 
   LOG(INFO) << "Using configuration algorithm: \"" << configAlgoName << "\"";
 
-  // ---------------- Manager monitor
-  //
-  //! @todo [JFC]-[June/16/2017]:
-  //!
-  LOG(WARNING) << "Export of gml/txt of system model during execution is Not Yet Implemented";
-  auto managerMonitor = shared_ptr<SystemModelManagerMonitor>();
-  if (m_configuration->ReportManagerActivity())
-  {
-    auto options = m_configuration->ManagerActivityOptions();
+  auto managerMonitor = MakeManagerMonitor();
 
-    if (   IsSet(m_configuration->GmlReportMoments(),         ReportMoments::BeforeConfiguration)
-        || IsSet(m_configuration->PrettyPrintReportMoments(), ReportMoments::BeforeConfiguration)
-       )
-    {
-      options |= ManagerMonitorOptions::BeforeConfiguration;
-    }
-
-    if (   IsSet(m_configuration->GmlReportMoments(),         ReportMoments::AfterConfiguration)
-        || IsSet(m_configuration->PrettyPrintReportMoments(), ReportMoments::AfterConfiguration)
-       )
-    {
-      options |= ManagerMonitorOptions::AfterConfiguration;
-    }
-
-
-    managerMonitor = make_shared<SystemModelManagerMonitor>(options);
-    managerMonitor->ExportBasePath(m_configuration->ManagerActivityFileBasePath());
-  }
 
   // ---------------- System Model Manager
   //
@@ -396,11 +370,7 @@ void MastEnvironment_impl::CreateSystemModel ()
     CheckModel();
   }
 
-  //! @todo [JFC]-[June/16/2017]:
-  //!
-  LOG(WARNING) << "Export of gml/txt of system model is Not Yet Implemented";
-
-
+  ReportParsedModel();
   LOG(INFO) << "Created System Model";
 }
 //
@@ -611,6 +581,76 @@ vector<string> MastEnvironment_impl::MakeArgumentsVector (int argc, const char* 
 
 
 
+//! Creates a manager monitor according to user options
+//!
+//! @note Default is no monitoring
+//!
+shared_ptr<SystemModelManagerMonitor> MastEnvironment_impl::MakeManagerMonitor ()
+{
+  // ---------------- Manager monitor
+  //
+  auto managerMonitor = shared_ptr<SystemModelManagerMonitor>();
+
+  if (!m_configuration->ReportManagerActivity())
+  {
+    LOG(INFO) << "No manager monitoring";
+  }
+  else
+  {
+    auto gml                = m_configuration->GmlPrinting();
+    auto gmlMoments         = m_configuration->GmlReportMoments();
+    auto gmlBefore          = gml & IsSet(gmlMoments, ReportMoments::BeforeConfiguration);
+    auto gmlAfter           = gml & IsSet(gmlMoments, ReportMoments::AfterConfiguration);
+
+    auto prettyPrint        = m_configuration->PrettyPrinting();
+    auto prettyPrintMoments = m_configuration->PrettyPrintReportMoments();
+    auto prettyPrintBefore  = prettyPrint & IsSet(prettyPrintMoments, ReportMoments::BeforeConfiguration);
+    auto prettyPrintAfter   = prettyPrint & IsSet(prettyPrintMoments, ReportMoments::AfterConfiguration);
+
+    auto before = gmlBefore | prettyPrintBefore;
+    auto after  = gmlAfter  | prettyPrintAfter;
+
+    auto options = m_configuration->ManagerActivityOptions();
+    if (before)
+    {
+      LOG(INFO) << "Will report model view before configurations";
+      options |= ManagerMonitorOptions::BeforeConfiguration;
+    }
+
+    if (after)
+    {
+      LOG(INFO) << "Will report model view after configurations";
+      options |= ManagerMonitorOptions::AfterConfiguration;
+    }
+
+
+    if (gmlBefore || gmlAfter)
+    {
+      LOG(INFO) << "Will export GML graph model view for configurations";
+      options |= ManagerMonitorOptions::ExportGml;
+    }
+
+    if (prettyPrintBefore ||prettyPrintAfter)
+    {
+      LOG(INFO) << "Will export textual model view for configurations";
+      options |= ManagerMonitorOptions::ExportPrettyPrint;
+    }
+
+    managerMonitor = make_shared<SystemModelManagerMonitor>(options);
+
+    managerMonitor->ExportBasePath       (m_configuration->ManagerActivityFileBasePath());
+    managerMonitor->GmlPrinterOptions    (m_configuration->GmlOptions());
+    managerMonitor->PrettyPrinterOptions (m_configuration->PrettyPrintOptions());
+  }
+
+  return managerMonitor;
+}
+//
+//  End of: MastEnvironment_impl::MakeManagerMonitor
+//---------------------------------------------------------------------------
+
+
+
 //! Parses options - from list of command line arguments
 //!
 //! @param arguments  Command line arguments (first one is application name)
@@ -640,6 +680,44 @@ void MastEnvironment_impl::ParseOptions (vector<string> arguments)
 }
 //
 //  End of: MastEnvironment_impl::ParseOptions
+//---------------------------------------------------------------------------
+
+
+
+//! Save GML/Text view of parsed SIT model
+//!
+//! @note Only if options are enabled
+void MastEnvironment_impl::ReportParsedModel ()
+{
+  // ---------------- GML
+  //
+  if (    m_configuration->GmlPrinting()
+      &&  IsSet(m_configuration->GmlReportMoments(), ReportMoments::AfterModelParsing))
+  {
+    auto graph = GmlPrinter::Graph(Startup::sm_systemModel->Root(),
+                                   m_configuration->GmlGraphName(),
+                                   m_configuration->GmlOptions());
+
+    ofstream os(m_configuration->GmlFilePath());
+    os << graph;
+    os.flush();
+  }
+
+  // ---------------- Pretty Print
+  //
+  if (   m_configuration->PrettyPrinting()
+      && IsSet(m_configuration->PrettyPrintReportMoments(), ReportMoments::AfterModelParsing))
+  {
+    auto prettyPrint = PrettyPrinter::PrettyPrint(Startup::sm_systemModel->Root(),
+                                                  m_configuration->PrettyPrintOptions());
+
+    ofstream os(m_configuration->PrettyPrintFilePath());
+    os << prettyPrint;
+    os.flush();
+  }
+}
+//
+//  End of: MastEnvironment_impl::ReportParsedModel
 //---------------------------------------------------------------------------
 
 

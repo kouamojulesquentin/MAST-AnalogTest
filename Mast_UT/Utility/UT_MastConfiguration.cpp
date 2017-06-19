@@ -358,13 +358,9 @@ void UT_MastConfiguration::test_ParseConfigurationFile_Empty ()
   MastConfiguration sut;
   auto              filePath = test::GetTestFilePath("UT_MastConfiguration_empty.yml");
 
-  // ---------------- Exercise
+  // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS_NOTHING (sut.ParseConfigurationFile(filePath));
-
-  // ---------------- Verify
-  //
-  Check_DefaultConfiguration(sut);
+  TS_ASSERT_THROWS (sut.ParseConfigurationFile(filePath), std::runtime_error);
 }
 
 
@@ -573,7 +569,8 @@ void UT_MastConfiguration::test_Update_ShortSwitches ()
 {
   // ---------------- Setup
   //
-  vector<string>    arguments{ "MyAppWithLongName", "-s=myDesign.sit", "-a=last_lazy", "-l", "-c=myConf.yml" };
+  auto              configFilePath = test::GetTestFilePath("UT_MastConfiguration_minimal.yml");
+  vector<string>    arguments{ "MyAppWithLongName", "-s=myDesign.sit", "-a=last_lazy", "-l", "-c=" + configFilePath };
   ostringstream     stdStream;
   ostringstream     errStream;
   auto              streamOutput = make_shared<TCLAP::StreamOutput>(stdStream, errStream);
@@ -596,7 +593,7 @@ void UT_MastConfiguration::test_Update_ShortSwitches ()
   TS_ASSERT_FALSE (sut.ReportManagerActivity());
 
   TS_ASSERT_EQUALS (sut.SitFilePath(),                 "myDesign.sit");
-  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocolName(),     "");
+  TS_ASSERT_EQUALS (sut.AccessInterfaceProtocolName(), "");
   TS_ASSERT_EQUALS (sut.ConfigurationAlgorithm(),      "last_lazy");
   TS_ASSERT_EQUALS (sut.GmlFilePath(),                 "MastModel.gml");
   TS_ASSERT_EQUALS (sut.GmlGraphName(),                "DUT");

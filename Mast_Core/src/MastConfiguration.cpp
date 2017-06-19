@@ -30,6 +30,7 @@ using std::string;
 using std::map;
 using std::tie;
 using std::initializer_list;
+using std::make_shared;
 
 using namespace mast;
 
@@ -179,21 +180,13 @@ string MastConfiguration::ExtractApplicationDirectoryPath (const string& applica
 //!
 void MastConfiguration::ParseConfigurationFile (const string& configurationFile)
 {
-  CHECK_PARAMETER_NOT_EMPTY(configurationFile, "Cannot parse file with empty path");
-
-  if (!Utility::FileExists(configurationFile))
-  {
-    LOG(INFO) << "Cannot find configuration file: " << configurationFile;
-    return;
-  }
+  CHECK_PARAMETER_NOT_EMPTY (configurationFile, "Configuration file path cannot be empty");
+  CHECK_FILE_EXISTS_EX      (configurationFile, "Configuration file: '");
 
   auto yaml = Utility::ReadTextFile(configurationFile);
-  ParseYamlConfiguration(yaml);
+  CHECK_VALUE_NOT_EMPTY(yaml, "Empty configuration file: \"" + configurationFile + "\"" );
 
-  if (yaml.empty())
-  {
-    LOG(INFO) << "Empty configuration file";
-  }
+  ParseYamlConfiguration(yaml);
 }
 //
 //  End of: MastConfiguration::ParseConfigurationFile
@@ -392,10 +385,11 @@ void MastConfiguration::Update (vector<string> arguments)
     //
     TCLAP::CmdLine cmdLine("Mast: Manager for System On Chip Tests", '=', MAST_VERSION, false);
 
-    if (m_cmdLineOutput)
+    if (!m_cmdLineOutput)
     {
-      cmdLine.setOutput(m_cmdLineOutput.get());
+      m_cmdLineOutput = make_shared<TCLAP::StdOutput>(160u);
     }
+    cmdLine.setOutput(m_cmdLineOutput.get());
     cmdLine.automaticExit(m_automaticExit);
 
     // ---------------- Prepare accepted arguments
@@ -474,9 +468,12 @@ void MastConfiguration::Update (vector<string> arguments)
       // ---------------- Save parsed option
       //
       // Begin with configuration file (it has a lower priority relative to command line)
-      auto configurationFile = "mast.cfg"s;
+      auto configurationFile = ""s;
       setOption(configurationFile, configurationFileArg);
-      ParseConfigurationFile(configurationFile);
+      if (!configurationFile.empty())
+      {
+        ParseConfigurationFile(configurationFile);
+      }
 
       setOption(m_sitFilePath,            sitFilePathArg);
       setOption(m_configurationAlgorithm, configurationAlgoArg);

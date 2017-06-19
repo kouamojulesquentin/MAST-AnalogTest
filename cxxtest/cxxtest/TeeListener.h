@@ -133,6 +133,17 @@ public:
         _second->failedAssertNotNullptr (message, file, line, expression);
     }
 
+    virtual void failedAssertContains (const char* message, const char* file, int line, const char* containerExpr, const char* valueExpr, const char* containerContent, const char* value)
+    {
+      _first->failedAssertContains  (message, file, line, containerExpr, valueExpr, containerContent, value);
+      _second->failedAssertContains (message, file, line, containerExpr, valueExpr, containerContent, value);
+    }
+
+    virtual void failedAssertNotContains (const char* message, const char* file, int line, const char* containerExpr, const char* valueExpr, const char* containerContent, const char* value)
+    {
+      _first->failedAssertNotContains  (message, file, line, containerExpr, valueExpr, containerContent, value);
+      _second->failedAssertNotContains (message, file, line, containerExpr, valueExpr, containerContent, value);
+    }
 
     virtual void failedAssertEmpty    (const char* message, const char* file, int line, const char* containerExpr, const char* containerContent)
     {
@@ -301,6 +312,19 @@ public:
     {
       _first  ->succeededAssertNullptr(assertionMessage, file, line, expression);
       _second ->succeededAssertNullptr(assertionMessage, file, line, expression);
+    }
+
+    virtual void succeededAssertContains (const char* message, const char* file, int line, const char* containerExpr, const char* valueExpr, const char* containerContent, const char* value)
+    {
+      _first->succeededAssertContains  (message, file, line, containerExpr, valueExpr, containerContent, value);
+      _second->succeededAssertContains (message, file, line, containerExpr, valueExpr, containerContent, value);
+    }
+
+
+    virtual void succeededAssertNotContains (const char* message, const char* file, int line, const char* containerExpr, const char* valueExpr, const char* containerContent, const char* value)
+    {
+      _first->succeededAssertNotContains  (message, file, line, containerExpr, valueExpr, containerContent, value);
+      _second->succeededAssertNotContains (message, file, line, containerExpr, valueExpr, containerContent, value);
     }
 
     virtual void succeededAssertDelta             (const char* assertionMessage, const char* file, int  line, const char* xStr,  const char* yStr, const char* dStr, const char* x, const char* y, const char* d)

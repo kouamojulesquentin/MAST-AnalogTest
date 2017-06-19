@@ -91,6 +91,8 @@ public:
     virtual void failedAssertFalse             (const char* message, const char* file, int line, const char* expression);
     virtual void failedAssertNullptr           (const char* message, const char* file, int line, const char* expression);
     virtual void failedAssertNotNullptr        (const char* message, const char* file, int line, const char* expression);
+    virtual void failedAssertContains          (const char* message, const char* file, int line, const char* containerExpr, const char* valueExpr, const char* containerContent, const char* value);
+    virtual void failedAssertNotContains       (const char* message, const char* file, int line, const char* containerExpr, const char* valueExpr, const char* containerContent, const char* value);
     virtual void failedAssertEmpty             (const char* message, const char* file, int line, const char* containerExpr, const char* containerContent);
     virtual void failedAssertNotEmpty          (const char* message, const char* file, int line, const char* containerExpr);
     virtual void failedAssertEquals            (const char* message, const char* file, int line, const char* xStr, const char* yStr, const char* x,       const char* y);
@@ -120,6 +122,8 @@ public:
     virtual void succeededAssertDelta             (const char* message, const char* file, int line, const char* xStr, const char* yStr, const char* dStr,    const char* x, const char* y, const char* d);
     virtual void succeededAssertDiffers           (const char* message, const char* file, int line, const char* xStr, const char* yStr, const char* x,       const char* y);
     virtual void succeededAssertEquals            (const char* message, const char* file, int line, const char* xStr, const char* yStr, const char* x,       const char* y);
+    virtual void succeededAssertContains          (const char* message, const char* file, int line, const char* containerExpr, const char* valueExpr, const char* containerContent, const char* value);
+    virtual void succeededAssertNotContains       (const char* message, const char* file, int line, const char* containerExpr, const char* valueExpr, const char* containerContent, const char* value);
     virtual void succeededAssertEmpty             (const char* message, const char* file, int line, const char* containerExpr);
     virtual void succeededAssertNotEmpty          (const char* message, const char* file, int line, const char* containerExpr, const char* containerContent);
     virtual void succeededAssertFileContent       (const char* message, const char* file, int line, const char* checkedFile, const char* expectedContent, const char* expectedContentExpr, const DifferenceInfo& diffInfo);

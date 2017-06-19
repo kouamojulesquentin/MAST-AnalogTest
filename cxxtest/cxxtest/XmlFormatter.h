@@ -519,6 +519,20 @@ public:
         testFailure(message, file, line, "failedAssertNotNullptr") << "Assertion failed: " << expression;
     }
 
+    virtual void failedAssertContains(const char* message, const char* file, int line, const char* containerExpr, const char* valueExpr, const char* containerContent, const char* value)
+    {
+      std::stringstream& os = testFailure(message, file, line, "failedAssertContains");
+      os << "Error: Expected (" << containerExpr    << ") to contain "      << "(" << valueExpr << ")"
+         << ", found: "         << containerContent << " does not contain " << value;
+    }
+
+    virtual void failedAssertNotContains(const char* message, const char* file, int line, const char* containerExpr, const char* valueExpr, const char* containerContent, const char* value)
+    {
+      std::stringstream& os = testFailure(message, file, line, "failedAssertNotContains");
+      os << "Error: Expected (" << containerExpr    << ") to not contain "      << "(" << valueExpr << ")"
+         << ", found: "         << containerContent << " contains "             << value;
+    }
+
     virtual void failedAssertEmpty(const char* message, const char* file, int line, const char* containerExpr, const char* containerContent)
     {
       std::stringstream& os = testFailure(message, file, line, "failedAssertEmpty");

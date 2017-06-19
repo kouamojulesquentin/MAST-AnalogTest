@@ -208,14 +208,15 @@ def file_diff(filename1, filename2, filtered_reader) :
 
 
 class BaseTestCase(object) :
-
+    testId         = 1;   # This is used to easily identify progression
     fog            = ''
     valgrind       = ''
     cxxtest_import = False
     testOutputsDir = ''
 
     def setUp(self) :
-        sys.stderr.write("(" + self.__class__.__name__ + ") ")
+        sys.stderr.write("%2d ==> %s:%s: " % (BaseTestCase.testId, self.__class__.__name__, self.shortDescription()))
+        BaseTestCase.testId += 1
 
         self.passed       = False
         self.prefix       = ''
@@ -242,15 +243,22 @@ class BaseTestCase(object) :
             files.append(self.build_log)
         if os.path.exists(self.build_target) and not 'CXXTEST_GCOV_FLAGS' in os.environ :
             files.append(self.build_target)
+
+        filesNotRemoved = False
         for file in files :
             try :
                 os.remove(file)
             except :
-                time.sleep(2)
-                try :
-                    os.remove(file)
-                except :
-                    print( "Error removing file '%s'" % file)
+                fileNotRemoved = True
+
+        if filesNotRemoved:
+          time.sleep(1)
+          for file in files :
+            try :
+              if os.path.exists(file):
+                os.remove(file)
+            except :
+              print("Error removing file '%s'" % file)
 
 
     # This is a "generator" that just reads a file and normalizes the lines

@@ -21,6 +21,7 @@
 using std::vector;
 using std::string;
 using std::map;
+using std::pair;
 
 
 namespace
@@ -704,6 +705,258 @@ void UT_Asserts_Successes::test_ASSERT_NOT_EMPTY_Map ()
 }
 
 
+//! Runs TS_ASSERT_CONTAINS with char[], when it does not contain
+//!
+void UT_Asserts_Successes::test_ASSERT_CONTAINS_CharArray ()
+{
+    // ---------------- Setup
+    //
+    const char text[] = "I'm a char[]";
+    const char sub[]  = "char";
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_CONTAINS(text, sub);
+}
+
+
+//! Runs TS_ASSERT_CONTAINS with C-Style string, when it does not contain
+//!
+void UT_Asserts_Successes::test_ASSERT_CONTAINS_C_String ()
+{
+    // ---------------- Setup
+    //
+    const char* text = "I'm not a C-Style string";
+    const char* sub  = "C-Style";
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_CONTAINS(text, sub);
+}
+
+
+//! Runs TS_ASSERT_CONTAINS with std::string, when it does not contain
+//!
+void UT_Asserts_Successes::test_ASSERT_CONTAINS_String ()
+{
+    // ---------------- Setup
+    //
+    string text ("I'm string");
+    string sub  ("string");
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_CONTAINS(text, sub);
+}
+
+//! Runs TS_ASSERT_CONTAINS with std::vector, when it does not contain
+//!
+void UT_Asserts_Successes::test_ASSERT_CONTAINS_Vector ()
+{
+    // ---------------- Setup
+    //
+    vector<int> container;
+    container.push_back(3);
+    container.push_back(2);
+    container.push_back(1);
+
+    int value = 2;
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_CONTAINS(container, value);
+}
+
+
+//! Runs TS_ASSERT_CONTAINS with std::map, when it does not contain
+//!
+void UT_Asserts_Successes::test_ASSERT_CONTAINS_Map_key ()
+{
+    // ---------------- Setup
+    //
+    map<int, string> container;
+    container[3]  = "Hello";
+    container[21] = "World";
+    container[99] = "Foo";
+
+    int key = 99;
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_CONTAINS(container, key);
+}
+
+
+//! Runs TS_ASSERT_CONTAINS with std::map, when it does not contain
+//!
+void UT_Asserts_Successes::test_ASSERT_CONTAINS_Map_key_value ()
+{
+    // ---------------- Setup
+    //
+    map<int, string> container;
+    container[3]  = "Hello";
+    container[21] = "World";
+    container[99] = "Foo";
+
+    pair<int, string> key_value(3, "Hello");
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_CONTAINS(container, key_value);
+}
+
+
+
+//! Runs TS_ASSERT_NOT_CONTAINS with char[], when it does not contain
+//!
+void UT_Asserts_Successes::test_ASSERT_NOT_CONTAINS_CharArray ()
+{
+    // ---------------- Setup
+    //
+    const char text[] = "I'm a char[]";
+    const char sub[]  = "cat";
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_NOT_CONTAINS(text, sub);
+}
+
+
+//! Runs TS_ASSERT_NOT_CONTAINS with C-Style string, when it does not contain
+//!
+void UT_Asserts_Successes::test_ASSERT_NOT_CONTAINS_C_String ()
+{
+    // ---------------- Setup
+    //
+    const char* text = "I'm not a C-Style string";
+    const char* sub  = "sub";
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_NOT_CONTAINS(text, sub);
+}
+
+
+//! Runs TS_ASSERT_NOT_CONTAINS with C-Style string, when text to search into is a nullptr
+//!
+void UT_Asserts_Successes::test_ASSERT_NOT_CONTAINS_C_String_NullPtr_l ()
+{
+    // ---------------- Setup
+    //
+    const char* text = NULL;
+    const char* sub  = "sub";
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_NOT_CONTAINS(text, sub);
+}
+
+
+//! Runs TS_ASSERT_NOT_CONTAINS with C-Style string, when text to search is a nullptr
+//!
+void UT_Asserts_Successes::test_ASSERT_NOT_CONTAINS_C_String_NullPtr_r ()
+{
+    // ---------------- Setup
+    //
+    const char* text = "I'm not a C-Style string";
+    const char* sub  = NULL;
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_NOT_CONTAINS(text, sub);
+}
+
+
+//! Runs TS_ASSERT_NOT_CONTAINS with C-Style string, when both pointer are nullptr
+//!
+void UT_Asserts_Successes::test_ASSERT_NOT_CONTAINS_C_String_NullPtr_lr ()
+{
+    // ---------------- Setup
+    //
+    const char* text = NULL;
+    const char* sub  = NULL;
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_NOT_CONTAINS(text, sub);
+}
+
+
+
+//! Runs TS_ASSERT_NOT_CONTAINS with std::string, when it does not contain
+//!
+void UT_Asserts_Successes::test_ASSERT_NOT_CONTAINS_String ()
+{
+    // ---------------- Setup
+    //
+    string text ("I'm string");
+    string sub  ("spring");
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_NOT_CONTAINS(text, sub);
+}
+
+
+//! Runs TS_ASSERT_NOT_CONTAINS with std::vector, when it does not contain
+//!
+void UT_Asserts_Successes::test_ASSERT_NOT_CONTAINS_Vector ()
+{
+    // ---------------- Setup
+    //
+    vector<int> container;
+    container.push_back(3);
+    container.push_back(2);
+    container.push_back(1);
+
+    int value = 15;
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_NOT_CONTAINS(container, value);
+}
+
+
+
+//! Runs TS_ASSERT_NOT_CONTAINS with std::map, when it does not contain
+//!
+void UT_Asserts_Successes::test_ASSERT_NOT_CONTAINS_Map_key ()
+{
+    // ---------------- Setup
+    //
+    map<int, string> container;
+    container[3]  = "Hello";
+    container[21] = "World";
+    container[99] = "Foo";
+
+    int key = 15;
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_NOT_CONTAINS(container, key);
+}
+
+
+//! Runs TS_ASSERT_NOT_CONTAINS with std::map, when it does not contain
+//!
+void UT_Asserts_Successes::test_ASSERT_NOT_CONTAINS_Map_key_value ()
+{
+    // ---------------- Setup
+    //
+    map<int, string> container;
+    container[3]  = "Hello";
+    container[21] = "World";
+    container[99] = "Foo";
+
+    pair<int, string> key_value(99, "bar");
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_NOT_CONTAINS(container, key_value);
+}
+
+
+
 //! Runs TSM_ASSERT with an expression that evaluates to true
 //!
 void UT_Asserts_Successes::test_ASSERT_MESSAGE ()
@@ -933,6 +1186,36 @@ void UT_Asserts_Successes::test_ASSERT_MESSAGE_NOT_EMPTY ()
     //
     TSM_ASSERT_NOT_EMPTY("This is assertion message for TSM_ASSERT_NOT_EMPTY", notEmptyC_String);
 }
+
+//! Runs TS_ASSERT_CONTAINS with std::string, when it does contain
+//!
+void UT_Asserts_Successes::test_ASSERT_MESSAGE_CONTAINS ()
+{
+    // ---------------- Setup
+    //
+    string text ("I'm string");
+    string sub  ("string");
+
+    // ---------------- Exercise & Verify
+    //
+    TSM_ASSERT_CONTAINS("This is assertion message for TSM_ASSERT_CONTAINS", text, sub);
+}
+
+
+//! Runs TS_ASSERT_NOT_CONTAINS with std::string, when it does not contain
+//!
+void UT_Asserts_Successes::test_ASSERT_MESSAGE_NOT_CONTAINS ()
+{
+    // ---------------- Setup
+    //
+    string text ("I'm string");
+    string sub  ("spring");
+
+    // ---------------- Exercise & Verify
+    //
+    TSM_ASSERT_NOT_CONTAINS("This is assertion message for TSM_ASSERT_NOT_CONTAINS", text, sub);
+}
+
 
 //===========================================================================
 // End of UT_Asserts_Successes.cpp

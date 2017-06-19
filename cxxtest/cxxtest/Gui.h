@@ -113,6 +113,16 @@ public:
         redBarSafe();
     }
 
+    virtual void failedAssertContains (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*containerExpr*/, const char* /*valueExpr*/, const char* /*containerContent*/, const char* /*value*/)
+    {
+      redBarSafe();
+    }
+
+    virtual void failedAssertNotContains (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*containerExpr*/, const char* /*valueExpr*/, const char* /*containerContent*/, const char* /*value*/)
+    {
+      redBarSafe();
+    }
+
     virtual void failedAssertEmpty (const char* /*message*/, const char* /*file*/, int /*line*/, const char* /*containerExpr*/, const char* /*containerContent*/)
     {
       redBarSafe();

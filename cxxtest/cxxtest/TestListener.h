@@ -58,6 +58,8 @@ public:
     virtual void failedAssertFalse             (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*expression*/) = 0;
     virtual void failedAssertNotNullptr        (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*expression*/) = 0;
     virtual void failedAssertNullptr           (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*expression*/) = 0;
+    virtual void failedAssertContains          (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*containerExpr*/, const char* /*valueExpr*/, const char* /*containerContent*/, const char* /*value*/) = 0;
+    virtual void failedAssertNotContains       (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*containerExpr*/, const char* /*valueExpr*/, const char* /*containerContent*/, const char* /*value*/) = 0;
     virtual void failedAssertEmpty             (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*containerExpr*/, const char* /*containerContent*/) = 0;
     virtual void failedAssertNotEmpty          (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*containerExpr*/) = 0;
     virtual void failedAssertEquals            (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*xStr*/, const char* /*yStr*/, const char* /*x*/, const char* /*y*/) = 0;
@@ -87,6 +89,8 @@ public:
     virtual void succeededAssertFalse             (const char* /*assertionMessage*/, const char* /*file*/, int  /*line*/, const char* /*expression*/) Intention \
     virtual void succeededAssertNotNullptr        (const char* /*assertionMessage*/, const char* /*file*/, int  /*line*/, const char* /*expression*/) Intention \
     virtual void succeededAssertNullptr           (const char* /*assertionMessage*/, const char* /*file*/, int  /*line*/, const char* /*expression*/) Intention \
+    virtual void succeededAssertContains          (const char* /*assertionMessage*/, const char* /*file*/, int  /*line*/, const char* /*containerExpr*/, const char* /*valueExpr*/, const char* /*containerContent*/, const char* /*value*/) Intention \
+    virtual void succeededAssertNotContains       (const char* /*assertionMessage*/, const char* /*file*/, int  /*line*/, const char* /*containerExpr*/, const char* /*valueExpr*/, const char* /*containerContent*/, const char* /*value*/) Intention \
     virtual void succeededAssertDelta             (const char* /*assertionMessage*/, const char* /*file*/, int  /*line*/, const char* /*xStr*/,  const char* /*yStr*/, const char* /*dStr*/, const char* /*x*/, const char* /*y*/, const char* /*d*/) Intention \
     virtual void succeededAssertDiffers           (const char* /*assertionMessage*/, const char* /*file*/, int  /*line*/, const char* /*xStr*/,  const char* /*yStr*/, const char* /*x*/, const char* /*y*/) Intention \
     virtual void succeededAssertEmpty             (const char* /*assertionMessage*/, const char* /*file*/, int  /*line*/, const char* /*containerExpr*/) Intention \

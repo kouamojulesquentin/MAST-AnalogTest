@@ -383,6 +383,33 @@ public:
         reportFailedAssert(message, file, line, checkMessage.str().c_str(), resultMessage.str().c_str());
     }
 
+    //! Reports a failed "assert contains"
+    //!
+    virtual void failedAssertContains(const char* message, const char* file, int line, const char* containerExpr, const char* valueExpr, const char* containerContent, const char* value)
+    {
+      std::ostringstream checkMessage;
+      std::ostringstream resultMessage;
+
+      checkMessage  << _preExpr << containerExpr   << _postExpr << " to contain " << _preExpr << valueExpr << _postExpr;
+      resultMessage <<             containerContent             << " does not contain "       << value;
+
+      reportFailedAssert(message, file, line, checkMessage.str().c_str(), resultMessage.str().c_str());
+    }
+
+
+    //! Reports a failed "assert not contains"
+    //!
+    virtual void failedAssertNotContains(const char* message, const char* file, int line, const char* containerExpr, const char* valueExpr, const char* containerContent, const char* value)
+    {
+      std::ostringstream checkMessage;
+      std::ostringstream resultMessage;
+
+      checkMessage  << _preExpr << containerExpr   << _postExpr << " to not contain " << _preExpr << valueExpr << _postExpr;
+      resultMessage <<             containerContent             << " contains "                   << value;
+
+      reportFailedAssert(message, file, line, checkMessage.str().c_str(), resultMessage.str().c_str());
+    }
+
     //! Reports a failed "assert empty"
     //!
     virtual void failedAssertEmpty(const char* message, const char* file, int line, const char* containerExpr, const char* containerContent)
@@ -730,6 +757,33 @@ public:
         resultMessage  << "It is not nullptr";
 
         reportSuccessfulAssert(assertionMessage, file, line, checkMessage.str().c_str(), resultMessage.str().c_str());
+    }
+
+    //! Reports a successful "assert contains"
+    //!
+    virtual void succeededAssertContains(const char* message, const char* file, int line, const char* containerExpr, const char* valueExpr, const char* containerContent, const char* value)
+    {
+      std::ostringstream checkMessage;
+      std::ostringstream resultMessage;
+
+      checkMessage  << _preExpr << containerExpr   << _postExpr << " to contain " << _preExpr << valueExpr << _postExpr;
+      resultMessage <<             containerContent             << " contains "   << value;
+
+      reportSuccessfulAssert(message, file, line, checkMessage.str().c_str(), resultMessage.str().c_str());
+    }
+
+
+    //! Reports a successful "assert not contains"
+    //!
+    virtual void succeededAssertNotContains(const char* message, const char* file, int line, const char* containerExpr, const char* valueExpr, const char* containerContent, const char* value)
+    {
+      std::ostringstream checkMessage;
+      std::ostringstream resultMessage;
+
+      checkMessage  << _preExpr << containerExpr   << _postExpr << " to not contain " << _preExpr << valueExpr << _postExpr;
+      resultMessage <<             containerContent             << " does not contain "           << value;
+
+      reportSuccessfulAssert(message, file, line, checkMessage.str().c_str(), resultMessage.str().c_str());
     }
 
 

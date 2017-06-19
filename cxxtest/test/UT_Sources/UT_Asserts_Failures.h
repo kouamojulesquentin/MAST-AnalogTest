@@ -66,6 +66,34 @@ class UT_Asserts_Failures : public CxxTest::TestSuite
     void test_ASSERT_NOT_EMPTY_Vector ();
     void test_ASSERT_NOT_EMPTY_Map ();
 
+    void test_ASSERT_CONTAINS_CharArray ();
+    void test_ASSERT_CONTAINS_C_String ();
+    void test_ASSERT_CONTAINS_C_String_NullPtr_l ();
+    void test_ASSERT_CONTAINS_C_String_NullPtr_r ();
+    void test_ASSERT_CONTAINS_C_String_NullPtr_lr ();
+    void test_ASSERT_CONTAINS_C_String_Empty_l ();
+    void test_ASSERT_CONTAINS_C_String_Empty_r ();
+    void test_ASSERT_CONTAINS_C_String_Empty_lr ();
+    void test_ASSERT_CONTAINS_String ();
+    void test_ASSERT_CONTAINS_String_Empty_l ();
+    void test_ASSERT_CONTAINS_String_Empty_r ();
+    void test_ASSERT_CONTAINS_String_Empty_lr ();
+    void test_ASSERT_CONTAINS_String_C_String ();
+    void test_ASSERT_CONTAINS_String_Null_C_String ();
+    void test_ASSERT_CONTAINS_Null_C_String_String ();
+    void test_ASSERT_CONTAINS_Vector ();
+    void test_ASSERT_CONTAINS_Vector_Empty ();
+    void test_ASSERT_CONTAINS_Map_key ();
+    void test_ASSERT_CONTAINS_Map_key_value ();
+
+    void test_ASSERT_NOT_CONTAINS_CharArray ();
+    void test_ASSERT_NOT_CONTAINS_C_String ();
+    void test_ASSERT_NOT_CONTAINS_String ();
+    void test_ASSERT_NOT_CONTAINS_Vector ();
+    void test_ASSERT_NOT_CONTAINS_Map_key ();
+    void test_ASSERT_NOT_CONTAINS_Map_key_value ();
+
+
     // ---------------- Assertions with failure (with message)
     //
     void test_ASSERT_MESSAGE ();
@@ -99,6 +127,9 @@ class UT_Asserts_Failures : public CxxTest::TestSuite
 
     void test_ASSERT_MESSAGE_EMPTY ();
     void test_ASSERT_MESSAGE_NOT_EMPTY ();
+
+    void test_ASSERT_MESSAGE_CONTAINS ();
+    void test_ASSERT_MESSAGE_NOT_CONTAINS ();
 
     //      TS_ASSERT_THROWS_ASSERT(expr,arg,assertion)
     //      TS_ASSERT_THROWS_EQUALS(expr,arg,x,y)

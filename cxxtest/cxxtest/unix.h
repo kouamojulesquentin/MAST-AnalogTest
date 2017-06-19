@@ -189,6 +189,20 @@ public:
         os << endl;
     }
 
+    virtual void failedAssertContains(const char* message, const char* file, int line, const char* containerExpr, const char* valueExpr, const char* containerContent, const char* value)
+    {
+      stop(file, line) << "Error: Expected (" << containerExpr    << ") to contain ("      << valueExpr
+                       << "), found: "        << containerContent << " does not contain: " << value << endl;
+    }
+
+
+    virtual void failedAssertNotContains(const char* message, const char* file, int line, const char* containerExpr, const char* valueExpr, const char* containerContent, const char* value)
+    {
+      stop(file, line) << "Error: Expected (" << containerExpr    << ") to not contain (" << valueExpr
+                       << "), found: "        << containerContent << " contains: "        << value << endl;
+    }
+
+
     virtual void failedAssertEmpty(const char* message, const char* file, int line, const char* containerExpr, const char* containerContent)
     {
       stop(file, line) << "Error: Expected (" << containerExpr << ") to be empty, but it is not. Its content is: " << containerContent << endl;

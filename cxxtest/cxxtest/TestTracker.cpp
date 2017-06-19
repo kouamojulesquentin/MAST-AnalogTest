@@ -315,6 +315,28 @@ void TestTracker::failedAssertNotNullptr(const char *message, const char *file, 
     _lastAssertLine = line;
 }
 
+//! Reports a failed "assert contains"
+//!
+void TestTracker::failedAssertContains(const char* message, const char* file, int line, const char* containerExpr, const char* valueExpr, const char* containerContent, const char* value)
+{
+  countFailure();
+  m_pListener->failedAssertContains(message, file, line, containerExpr, valueExpr, containerContent, value);
+  _lastAssertFile = file;
+  _lastAssertLine = line;
+}
+
+
+//! Reports a failed "assert not contains"
+//!
+void TestTracker::failedAssertNotContains(const char* message, const char* file, int line, const char* containerExpr, const char* valueExpr, const char* containerContent, const char* value)
+{
+  countFailure();
+  m_pListener->failedAssertNotContains(message, file, line, containerExpr, valueExpr, containerContent, value);
+  _lastAssertFile = file;
+  _lastAssertLine = line;
+}
+
+
 //! Reports a failed "assert empty"
 //!
 void TestTracker::failedAssertEmpty (const char* message, const char* file, int line, const char* containerExpr, const char* containerContent)
@@ -560,6 +582,26 @@ void TestTracker::succeededAssertDiffers(const char *message, const char *file, 
     _lastAssertFile = file;
     _lastAssertLine = line;
 }
+
+
+//! Reports a successful "assert contains"
+//!
+void TestTracker::succeededAssertContains(const char* message, const char* file, int line, const char* containerExpr, const char* valueExpr, const char* containerContent, const char* value)
+{
+  m_pListener->succeededAssertContains(message, file, line, containerExpr, valueExpr, containerContent, value);
+  _lastAssertFile = file;
+  _lastAssertLine = line;
+}
+
+//! Reports a successful "assert not contains"
+//!
+void TestTracker::succeededAssertNotContains(const char* message, const char* file, int line, const char* containerExpr, const char* valueExpr, const char* containerContent, const char* value)
+{
+  m_pListener->succeededAssertNotContains(message, file, line, containerExpr, valueExpr, containerContent, value);
+  _lastAssertFile = file;
+  _lastAssertLine = line;
+}
+
 
 //! Reports a successful "assert empty"
 //!

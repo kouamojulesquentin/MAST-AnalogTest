@@ -55,6 +55,8 @@ public:
     virtual void failedAssertFalse             (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*expression*/) {}
     virtual void failedAssertNotNullptr        (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*expression*/) {}
     virtual void failedAssertNullptr           (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*expression*/) {}
+    virtual void failedAssertContains          (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*containerExpr*/, const char* /*valueExpr*/, const char* /*containerContent*/, const char* /*value*/) {}
+    virtual void failedAssertNotContains       (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*containerExpr*/, const char* /*valueExpr*/, const char* /*containerContent*/, const char* /*value*/) {}
     virtual void failedAssertEmpty             (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*containerExpr*/, const char* /*containerContent*/) {}
     virtual void failedAssertNotEmpty          (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*containerExpr*/) {}
     virtual void failedAssertEquals            (const char* /*assertionMessage*/, const char* /*file*/, int /*line*/, const char* /*xStr*/, const char* /*yStr*/, const char* /*x*/, const char* /*y*/) {}

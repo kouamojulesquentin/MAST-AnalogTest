@@ -25,6 +25,8 @@
 #include <cxxtest/StdValueTraits.h>
 #include <sstream>
 #include <cstring>
+#include <algorithm>
+#include <utility>  // for std::pair
 
 
 #if defined(_CXXTEST_HAVE_STD)
@@ -137,6 +139,14 @@ class CountAssertDisabler
    CountAssertDisabler() { disableAssertionCount = true; }
   ~CountAssertDisabler() { disableAssertionCount = false; }
 };
+
+
+//! Detector of nullptr
+//!
+template<typename T>
+inline bool isNullptr(const T&)     { return false; } // Not a pointer ==> cannot be nullptr
+template<typename T>
+inline bool isNullptr(const T* ptr) { return ptr == NULL; }
 
 template<class X, class Y>
 inline bool areEqual(const X& x, const Y& y)
@@ -479,8 +489,8 @@ void doAssertEmpty (const char* file, int line, const char *containerExpr, const
 {
   if (!isEmpty(container))
   {
-      tracker().failedAssertEmpty  (message, file, line, containerExpr, TS_AS_STRING(container));
-      TS_ABORT();
+    tracker().failedAssertEmpty  (message, file, line, containerExpr, TS_AS_STRING(container));
+    TS_ABORT();
   }
   else
   {
@@ -500,6 +510,116 @@ void doAssertNotEmpty (const char* file, int line, const char *containerExpr, co
   else
   {
     tracker().succeededAssertNotEmpty (message, file, line, containerExpr, TS_AS_STRING(container));
+  }
+}
+
+
+
+template<typename T, typename U>
+inline bool contains(const T& container, const U& value)
+{
+  return CXXTEST_STD(find)(container.begin(), container.end(), value) != container.end();
+}
+
+template<typename K, typename V, typename KC, typename VC>
+inline bool contains(const CXXTEST_STD(map)<K, V>& container, const CXXTEST_STD(pair)<KC, VC>& key_value)
+{
+  CXXTEST_STD(pair)<const K, V> searchedPair(static_cast<const K> (key_value.first), static_cast<V> (key_value.second));
+
+  return CXXTEST_STD(find)(container.begin(), container.end(), searchedPair) != container.end();
+}
+
+
+template<typename K, typename V>
+inline bool contains(const CXXTEST_STD(map)<K, V>& container, const K& key)
+{
+  return container.find(key) != container.end();
+}
+
+
+inline bool contains(const CXXTEST_STD(string)& str, const CXXTEST_STD(string)& sub)
+{
+  if (str.empty() || sub.empty())
+  {
+    return false;
+  }
+  return str.find(sub) != std::string::npos;
+}
+
+
+template<typename T>
+inline bool contains(const CXXTEST_STD(string)& str, const T& value)
+{
+  if (isNullptr(value))
+  {
+    return false;
+  }
+
+  return contains(str, CXXTEST_STD(string)(value));
+}
+
+template<typename T>
+inline bool contains(const T& str, const CXXTEST_STD(string)& sub)
+{
+  if (isNullptr(str))
+  {
+    return false;
+  }
+
+  return contains(CXXTEST_STD(string)(str), sub);
+}
+
+
+inline bool contains(const char* pStr, const char* pStrSub)
+{
+  if (   !pStr
+      || !pStrSub
+      || (pStr[0]    == '\0')
+      || (pStrSub[0] == '\0')
+     )
+  {
+    return false;
+  }
+
+  return ::strstr(pStr, pStrSub);
+}
+
+template<size_t N1, size_t N2>
+inline bool contains(const char pStr[N1], const char pStrSub[N2]) { return contains(static_cast<const char*>(pStr), static_cast<const char*>(pStrSub)); }
+inline bool contains(char*      pStr,     char*      pStrSub)     { return contains(static_cast<const char*>(pStr), static_cast<const char*>(pStrSub)); }
+
+template<typename T, typename U>
+void doAssertContains (const char* file,          int      line,
+                       const char* containerExpr, const T& container,
+                       const char* valueExpr,     const U& value,
+                       const char* message)
+{
+  if (!contains(container, value))
+  {
+    tracker().failedAssertContains(message, file, line, containerExpr, valueExpr, TS_AS_STRING(container), TS_AS_STRING(value));
+    TS_ABORT();
+  }
+  else
+  {
+    tracker().succeededAssertContains(message, file, line, containerExpr, valueExpr, TS_AS_STRING(container), TS_AS_STRING(value));
+  }
+}
+
+
+template<typename T, typename U>
+void doAssertNotContains (const char* file,          int      line,
+                          const char* containerExpr, const T& container,
+                          const char* valueExpr,     const U& value,
+                          const char* message)
+{
+  if (contains(container, value))
+  {
+    tracker().failedAssertNotContains(message, file, line, containerExpr, valueExpr, TS_AS_STRING(container), TS_AS_STRING(value));
+    TS_ABORT();
+  }
+  else
+  {
+    tracker().succeededAssertNotContains(message, file, line, containerExpr, valueExpr, TS_AS_STRING(container), TS_AS_STRING(value));
   }
 }
 
@@ -718,6 +838,8 @@ class EqualTrait<T*>
 template<typename T>
 inline EqualTrait<T> MakeEqualTrait(const T& x) { return EqualTrait<T>(x); }
 
+// Same as TS_ASSERT_EQUAL but in "Automatic" mode to recognize pointers (processed differently)
+//
 #define _TSMA_ASSERT_EQUALS(f,l,m,x,y) { _TS_TRY { CxxTest::MakeEqualTrait(x).checkEqual((f), (l), (m), #x, #y, (y)); } __TS_CATCH(f,l) }
 #define _TSA_ASSERT_EQUALS(f,l,x,y)   _TSMA_ASSERT_EQUALS(f, l, NULL, x, y)
 #define TSMA_ASSERT_EQUALS(m,x,y)     _TSMA_ASSERT_EQUALS(__FILE__, __LINE__, m,  x, y)
@@ -1048,6 +1170,52 @@ inline EqualTrait<T> MakeEqualTrait(const T& x) { return EqualTrait<T>(x); }
 
 #   define ETSM_ASSERT_FILE_CONTENT(m,cfp,efc) _ETSM_ASSERT_FILE_CONTENT(__FILE__,__LINE__,m,cfp,efc)
 #   define TSM_ASSERT_FILE_CONTENT(m,cfp,efc) _TSM_ASSERT_FILE_CONTENT(__FILE__,__LINE__,m,cfp,efc)
+
+
+// TS_ASSERT_CONTAINS
+// Check that a container (or string) contains some value
+//
+// For std::map, it can check containment of key or <key, value> pair
+// Empty strings or container are reported to contains nothing (always failed)
+// Empty strings or nullptr are reported to not be contained in other strings (always failed)
+//
+#   define ___ETS_ASSERT_CONTAINS(f,l,c,v,m) CxxTest::countAssert(); CxxTest::doAssertContains( (f), (l), #c, (c), #v, (v), (m) )
+#   define ___TS_ASSERT_CONTAINS(f,l,c,v,m) { _TS_TRY { ___ETS_ASSERT_CONTAINS(f,l,c,v,m); } __TS_CATCH(f,l) }
+
+#   define _ETS_ASSERT_CONTAINS(f,l,c,v) ___ETS_ASSERT_CONTAINS(f,l,c,v,0)
+#   define _TS_ASSERT_CONTAINS(f,l,c,v) ___TS_ASSERT_CONTAINS(f,l,c,v,0)
+
+#   define ETS_ASSERT_CONTAINS(c,v) _ETS_ASSERT_CONTAINS(__FILE__,__LINE__,c,v)
+#   define TS_ASSERT_CONTAINS(c,v) _TS_ASSERT_CONTAINS(__FILE__,__LINE__,c,v)
+
+#   define _ETSM_ASSERT_CONTAINS(f,l,m,c,v) ___ETS_ASSERT_CONTAINS(f,l,c,v,TS_AS_STRING_NO_QUOTES(m))
+#   define _TSM_ASSERT_CONTAINS(f,l,m,c,v) ___TS_ASSERT_CONTAINS(f,l,c,v,TS_AS_STRING_NO_QUOTES(m))
+
+#   define ETSM_ASSERT_CONTAINS(m,c,v) _ETSM_ASSERT_CONTAINS(__FILE__,__LINE__,m,c,v)
+#   define TSM_ASSERT_CONTAINS(m,c,v) _TSM_ASSERT_CONTAINS(__FILE__,__LINE__,m,c,v)
+
+
+// TS_ASSERT_NOT_CONTAINS
+// Check that a container (or string) does not contain some value
+//
+// For std::map, it can check containment of key or <key, value> pair
+// Empty strings or container are reported to contains nothing (always successful)
+// Empty strings or nullptr are reported to not be contained in other strings (always successful)
+//
+#   define ___ETS_ASSERT_NOT_CONTAINS(f,l,c,v,m) CxxTest::countAssert(); CxxTest::doAssertNotContains( (f), (l), #c, (c), #v, (v), (m) )
+#   define ___TS_ASSERT_NOT_CONTAINS(f,l,c,v,m) { _TS_TRY { ___ETS_ASSERT_NOT_CONTAINS(f,l,c,v,m); } __TS_CATCH(f,l) }
+
+#   define _ETS_ASSERT_NOT_CONTAINS(f,l,c,v) ___ETS_ASSERT_NOT_CONTAINS(f,l,c,v,0)
+#   define _TS_ASSERT_NOT_CONTAINS(f,l,c,v) ___TS_ASSERT_NOT_CONTAINS(f,l,c,v,0)
+
+#   define ETS_ASSERT_NOT_CONTAINS(c,v) _ETS_ASSERT_NOT_CONTAINS(__FILE__,__LINE__,c,v)
+#   define TS_ASSERT_NOT_CONTAINS(c,v) _TS_ASSERT_NOT_CONTAINS(__FILE__,__LINE__,c,v)
+
+#   define _ETSM_ASSERT_NOT_CONTAINS(f,l,m,c,v) ___ETS_ASSERT_NOT_CONTAINS(f,l,c,v,TS_AS_STRING_NO_QUOTES(m))
+#   define _TSM_ASSERT_NOT_CONTAINS(f,l,m,c,v) ___TS_ASSERT_NOT_CONTAINS(f,l,c,v,TS_AS_STRING_NO_QUOTES(m))
+
+#   define ETSM_ASSERT_NOT_CONTAINS(m,c,v) _ETSM_ASSERT_NOT_CONTAINS(__FILE__,__LINE__,m,c,v)
+#   define TSM_ASSERT_NOT_CONTAINS(m,c,v) _TSM_ASSERT_NOT_CONTAINS(__FILE__,__LINE__,m,c,v)
 
 
 // TS_ASSERT_EMPTY

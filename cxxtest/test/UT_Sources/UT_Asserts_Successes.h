@@ -90,7 +90,24 @@ class UT_Asserts_Successes : public CxxTest::TestSuite
     void test_ASSERT_NOT_EMPTY_Vector ();
     void test_ASSERT_NOT_EMPTY_Map ();
 
-    // ---------------- Assertions with success (with message)
+    void test_ASSERT_CONTAINS_CharArray ();
+    void test_ASSERT_CONTAINS_C_String ();
+    void test_ASSERT_CONTAINS_String ();
+    void test_ASSERT_CONTAINS_Vector ();
+    void test_ASSERT_CONTAINS_Map_key ();
+    void test_ASSERT_CONTAINS_Map_key_value ();
+
+    void test_ASSERT_NOT_CONTAINS_CharArray ();
+    void test_ASSERT_NOT_CONTAINS_C_String ();
+    void test_ASSERT_NOT_CONTAINS_C_String_NullPtr_l ();
+    void test_ASSERT_NOT_CONTAINS_C_String_NullPtr_r ();
+    void test_ASSERT_NOT_CONTAINS_C_String_NullPtr_lr ();
+    void test_ASSERT_NOT_CONTAINS_String ();
+    void test_ASSERT_NOT_CONTAINS_Vector ();
+    void test_ASSERT_NOT_CONTAINS_Map_key ();
+    void test_ASSERT_NOT_CONTAINS_Map_key_value ();
+
+    // ---------------- Assertions with failure (with message)
     //
     void test_ASSERT_MESSAGE ();
     void test_ASSERT_FALSE_MESSAGE ();
@@ -123,6 +140,9 @@ class UT_Asserts_Successes : public CxxTest::TestSuite
 
     void test_ASSERT_MESSAGE_EMPTY ();
     void test_ASSERT_MESSAGE_NOT_EMPTY ();
+
+    void test_ASSERT_MESSAGE_CONTAINS ();
+    void test_ASSERT_MESSAGE_NOT_CONTAINS ();
 
     //! Initializes test (called for each test)
     //!

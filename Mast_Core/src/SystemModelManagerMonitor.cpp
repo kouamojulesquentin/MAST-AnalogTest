@@ -41,7 +41,8 @@ void SystemModelManagerMonitor::AfterConfiguration (ParentNode& root)
   if (IsSet(m_options, ManagerMonitorOptions::AfterConfiguration))
   {
     LOG(INFO) << "Configuration: End";
-    ExportGml("After", root);
+    ExportGml         ("After", root);
+    ExportPrettyPrint ("After", root);
   }
 }
 //
@@ -58,7 +59,8 @@ void SystemModelManagerMonitor::BeforeConfiguration (ParentNode& root)
   if (IsSet(m_options, ManagerMonitorOptions::BeforeConfiguration))
   {
     LOG(INFO) << "Configuration: Begin";
-    ExportGml("Before", root);
+    ExportGml         ("Before", root);
+    ExportPrettyPrint ("Before", root);
   }
 }
 //
@@ -92,7 +94,7 @@ void SystemModelManagerMonitor::ExportGml (string_view step, ParentNode& root)
   {
     // ---------------- Make graph
     //
-    auto graph = GmlPrinter::Graph(root, "Mast");
+    auto graph = GmlPrinter::Graph(root, "Mast", m_gmlPrinterOptions);
 
     // ---------------- Save graph to file
     //
@@ -114,7 +116,7 @@ void SystemModelManagerMonitor::ExportPrettyPrint (string_view step, ParentNode&
   {
     // ---------------- Make graph
     //
-    auto prettyPrint = PrettyPrinter::PrettyPrint(root);
+    auto prettyPrint = PrettyPrinter::PrettyPrint(root, m_prettyPrinterOptions);
 
     // ---------------- Save graph to file
     //

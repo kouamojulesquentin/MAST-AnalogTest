@@ -16,6 +16,8 @@
   #define SYSTEMMODELMANAGERMONITOR_H__831655E4_CE44_4DFD_F886_30ECFC1CC3FC__INCLUDED_
 
 #include "Mast_Core_export.hpp"
+#include "GmlPrinter.hpp"
+#include "PrettyPrinter.hpp"
 #include <string>
 #include <experimental/string_view>
 
@@ -82,16 +84,20 @@ class MAST_CORE_EXPORT SystemModelManagerMonitor
   //!
   virtual void PDLCommand (string_view message, string_view nodePath, const BinaryVector& value, const ParentNode& topNode, string_view debugName);
 
-  virtual void StartBackgroundThread();                                                                     //!< Monitors start of SystemModelManager background thread
-  virtual void StartDataCycles();                                                                           //!< Monitors start of new data cycles
-  virtual void StartDataCycle();                                                                            //!< Monitors start of a new data cycle
-  virtual void BeforeConfiguration (ParentNode&       root);                                                //!< Monitors state of SystemModel (from parentNode) before configuration
-  virtual void AfterConfiguration  (ParentNode&       root);                                                //!< Monitors state of SystemModel (from parentNode) after configuration
+  virtual void StartBackgroundThread();                //!< Monitors start of SystemModelManager background thread
+  virtual void StartDataCycles();                      //!< Monitors start of new data cycles
+  virtual void StartDataCycle();                       //!< Monitors start of a new data cycle
+  virtual void BeforeConfiguration (ParentNode& root); //!< Monitors state of SystemModel (from parentNode) before configuration
+  virtual void AfterConfiguration  (ParentNode& root); //!< Monitors state of SystemModel (from parentNode) after configuration
 
 
-  std::string ExportBasePath() const { return m_exportBasePath; } //!< Returns the file path (without extension) for export files (extension depends on export type)
+  std::string                ExportBasePath()       const { return m_exportBasePath;       } //!< Returns the file path (without extension) for export files (extension depends on export type)
+  mast::GmlPrinterOptions    GmlPrinterOptions()    const { return m_gmlPrinterOptions;    } //!< Returns options when exporting GML graph of model view
+  mast::PrettyPrinterOptions PrettyPrinterOptions() const { return m_prettyPrinterOptions; } //!< Returns options when exporting pretty print of model view
 
-  void ExportBasePath (std::string exportBasePath) { m_exportBasePath = exportBasePath; } //!< Set file path (without extension) for export files (extension depends on export type)
+  void ExportBasePath       (std::string                exportBasePath)       { m_exportBasePath       = exportBasePath;       } //!< Sets file path (without extension) for export files (extension depends on export type)
+  void GmlPrinterOptions    (mast::GmlPrinterOptions    gmlPrinterOptions)    { m_gmlPrinterOptions    = gmlPrinterOptions;    } //!< Sets options when exporting GML graph of model view
+  void PrettyPrinterOptions (mast::PrettyPrinterOptions prettyPrinterOptions) { m_prettyPrinterOptions = prettyPrinterOptions; } //!< Sets options when exporting pretty print of model view
 
 
   // ---------------- Protected Methods
@@ -112,9 +118,11 @@ class MAST_CORE_EXPORT SystemModelManagerMonitor
   // ---------------- Private  Fields
   //
   private:
-  uint32_t              m_dataCyclesCount = 0; //!< Number of data cycles since startup or last reset
-  std::string           m_exportBasePath;      //!< Base path use when exporting graph representing system model
-  ManagerMonitorOptions m_options         = ManagerMonitorOptions::Std;
+  uint32_t                   m_dataCyclesCount      = 0;                                   //!< Number of data cycles since startup or last reset
+  std::string                m_exportBasePath;                                             //!< Base path use when exporting graph representing system model
+  ManagerMonitorOptions      m_options              = ManagerMonitorOptions::Std;
+  mast::GmlPrinterOptions    m_gmlPrinterOptions    = mast::GmlPrinterOptions::Default;    //!< Options for GML reports
+  mast::PrettyPrinterOptions m_prettyPrinterOptions = mast::PrettyPrinterOptions::Default; //!< Options for pretty print reports
 };
 //
 //  End of SystemModelManagerMonitor class declaration

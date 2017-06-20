@@ -22,7 +22,7 @@ using namespace mast;
 //!
 void ToSutVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 {
-  VisitChildren(accessInterface);
+ // VisitChildren(accessInterface);
 }
 //
 //  End of: ToSutVisitor::VisitAccessInterface

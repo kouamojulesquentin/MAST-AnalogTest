@@ -21,7 +21,7 @@ namespace test
 {
   //! Returns file path given a test file name
   //!
-  extern std::string GetTestFilePath(const std::string& fileName);
+  extern std::string GetTestFilePath(const std::string& fileName, bool checkExists = true);
 
   //! Returns directory path of currently running test runner
   //!

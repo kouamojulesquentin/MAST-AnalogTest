@@ -35,19 +35,47 @@ class UT_MastEnvironment : public CxxTest::TestSuite
   // ---------------- ParseOptions
   //
   void test_ParseOptions_NoOptions ();
+  void test_ParseOptions_bad_Args ();
+  void test_ParseOptions_no_Yaml ();
+  void test_ParseOptions_with_Yaml ();
+  void test_ParseOptions_Argc_Argv ();
 
   // ---------------- LoadPlugins
   //
   void test_LoadPlugins_BeforeParsingOptions ();
+  void test_LoadPlugins_AfterParsingOptions ();
 
   // ---------------- CreateSystemModel
   //
+  void test_CreateSystemModel_BeforeLoadPlugins ();
+  void test_CreateSystemModel_AfterLoadPlugins ();
+  void test_CreateSystemModel_SIT_Error ();
+  void test_CreateSystemModel_SIT_Error_no_CheckFile ();
+  void test_CreateSystemModel_ChangeProtocol ();
+  void test_CreateSystemModel_ChangeProtocol_TopIsChain ();
+
+  // ---------------- CreateManager
+  //
+  void test_CreateManager_BeforeCreateSystemModel ();
+  void test_CreateManager_AfterCreateSystemModel ();
+
+  // ---------------- CreateApplications
+  //
+  void test_CreateApplications_BeforeCreateManager ();
+  void test_CreateApplications_AfterCreateManager ();
+  void test_CreateApplications_NotFoundApp ();
 
   // ---------------- Start
   //
+  void test_Start_BeforeCreateApp ();
+  void test_Start_AfterCreateApp ();
+  void test_Start_RealPDLAlgo ();
+  void test_Start_Arguments_RealPDLAlgo ();
+  void test_Start_Argc_Argv_RealPDLAlgo ();
 
   // ================ Other Methods ================
 
+  void setUp(); //!< Initializes test (called for each test)
 };
 //
 //  End of UT_MastEnvironment class declaration

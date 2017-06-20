@@ -41,6 +41,7 @@ class MAST_CORE_EXPORT Startup final
   ~Startup() = delete;
   Startup()  = delete;
 
+  static std::shared_ptr<SystemModel>        GetSystemModel_NoCreate() { return sm_systemModel; }
   static std::shared_ptr<SystemModel>        GetSystemModel(); //!< Returns shared SystemModel
   static std::shared_ptr<SystemModelManager> GetManager();     //!< Returns shared SystemModelManager
   static std::shared_ptr<g3::LogWorker>      GetLogger();      //!< Returns shared logger

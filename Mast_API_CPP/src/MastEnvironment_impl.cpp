@@ -27,6 +27,8 @@
 #include "SIT_reader.hpp"
 #include "Startup.hpp"
 
+#include "tclap/DiscardOutput.h"
+
 #include "g3log/g3log.hpp"
 #include "g3log/logworker.hpp"
 #include "g3log/loglevels.hpp"
@@ -69,6 +71,9 @@ MastEnvironment_impl::~MastEnvironment_impl ()
 MastEnvironment_impl::MastEnvironment_impl (bool unitTestContext)
   : m_unitTestsContext(unitTestContext)
 {
+  Startup::ForgetSystemModel();
+  Startup::ForgetManager();
+
   if (!m_unitTestsContext)
   {
     InitializeLogger();
@@ -127,9 +132,10 @@ void MastEnvironment_impl::ChangeAccessInterfaceProtocol (const string& protocol
 //! @note Either save report to user defined report file and log only minimal status
 //!       or log complete status
 //!       Optional report file MUST be different than log file
-void MastEnvironment_impl::CheckModel ()
+void MastEnvironment_impl::CheckModel (shared_ptr<SystemModel> systemModel)
 {
-  auto checkResult = Startup::sm_systemModel->Check();
+  CHECK_PARAMETER_NOT_NULL(systemModel, "Cannot check system model from nullptr");
+  auto checkResult = systemModel->Check();
 
   const auto& checkFilePath = m_configuration->ModelCheckingFilePath();
   if (!checkFilePath.empty()) // Save report to specific file?
@@ -301,6 +307,7 @@ void MastEnvironment_impl::CreateApplications ()
 void MastEnvironment_impl::CreateManager ()
 {
   LOG(INFO) << "Creating system model manager";
+  CHECK_VALUE_NOT_NULL(Startup::sm_systemModel, "System model must be created before starting the manager");
 
   // ---------------- Configuration algorithm
   //
@@ -353,7 +360,15 @@ void MastEnvironment_impl::CreateSystemModel ()
   LOG(INFO) << "SIT has been parsed successfully";
 
   systemModel->ReplaceRoot(topNode, false);
+
+  // ---------------- Checks
+  //
+  if (m_configuration->ModelChecking())
+  {
+    CheckModel(systemModel);
+  }
   Startup::sm_systemModel = systemModel;
+
 
   m_algoNamesAssociatedToNodes = reader.PDLAlgorithmNameToNodeAssociation();
 
@@ -361,13 +376,6 @@ void MastEnvironment_impl::CreateSystemModel ()
   {
     ChangeAccessInterfaceProtocol(m_configuration->AccessInterfaceProtocolName(),
                                   m_configuration->AccessInterfaceProtocolParameters());
-  }
-
-  // ---------------- Checks
-  //
-  if (m_configuration->ModelChecking())
-  {
-    CheckModel();
   }
 
   ReportParsedModel();
@@ -661,6 +669,10 @@ void MastEnvironment_impl::ParseOptions (vector<string> arguments)
   if (!m_configuration)
   {
     m_configuration = make_shared<MastConfiguration>();
+    if (m_unitTestsContext)
+    {
+      m_configuration->CommandLineParserOutput(make_shared<TCLAP::DiscardOutput>());
+    }
   }
 
   m_configuration->AutomaticExit(false);  // To get an opportunity to log errors befores closing "properly"

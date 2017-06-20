@@ -80,7 +80,7 @@ class MastEnvironment_impl final
   //
   private:
   void ChangeAccessInterfaceProtocol (const std::string& protocolName, const std::string& parameters);
-  void CheckModel ();
+  void CheckModel (std::shared_ptr<SystemModel> systemModel);
   void ConfigureLogger ();
   void InitializeLogger ();
   std::string GetActualSitFilePath (const std::string& sitFile) const;

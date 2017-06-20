@@ -25,10 +25,13 @@ extern string Exe_Dir_Path;
 
 //! Returns file path given a test file name
 //!
-//! @param fileName Name for file used in test
+//! @param fileName     Name for file used in test
+//! @param checkExists  When true, file reality is checked (useful for input files)
 //!
-string test::GetTestFilePath(const string& fileName)
+string test::GetTestFilePath(const string& fileName, bool checkExists)
 {
+  CxxTest::CountAssertDisabler assertDisabler;  // To not count the assertion below as a caller test assertion
+
   string filePath(fileName);
 
   auto makePath = [](string first, initializer_list<string> otherParts)
@@ -42,7 +45,10 @@ string test::GetTestFilePath(const string& fileName)
   };
 
   filePath = makePath(Exe_Dir_Path, {"Mast_Core", "UT_TestFiles", fileName});
-  TS_ASSERT_FILE_EXISTS (filePath);
+  if (checkExists)
+  {
+    TS_ASSERT_FILE_EXISTS (filePath);
+  }
   return filePath;
 }
 

@@ -30,7 +30,7 @@ namespace TCLAP
 
 //! Stream output for the CmdLine into an output stream
 //!
-//! @note This is somewhat a copy from StdOutput
+//! @note This is somewhat an improvement of original "StdOutput"
 //! @note This is useful for unit tests using string stream
 //!
 class StreamOutput : public CmdLineOutput
@@ -39,9 +39,6 @@ class StreamOutput : public CmdLineOutput
   std::ostream& m_errStream; //!< Reference to output stream to which error messages will be sent to
   size_t        m_maxWidth  = 95u;
   size_t        m_stdIndent = 2u;
-
-  //! @todo [JFC]-[May/31/2017]: Factor this and StdOutput into a single one "StreamOutputBase" requesting stream for std and error messages
-  //!
 
   public:
     virtual ~StreamOutput() = default;

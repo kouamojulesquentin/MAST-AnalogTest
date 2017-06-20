@@ -20,7 +20,7 @@ using namespace mast;
 
 //! Visits AccessInterface pending children
 //!
-void ToSutVisitor::VisitAccessInterface (AccessInterface& accessInterface)
+void ToSutVisitor::VisitAccessInterface (AccessInterface& /* accessInterface */)
 {
  // VisitChildren(accessInterface);
 }

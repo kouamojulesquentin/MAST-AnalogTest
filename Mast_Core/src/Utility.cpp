@@ -24,6 +24,7 @@ using std::string;
 using std::experimental::string_view;
 using std::vector;
 using std::ifstream;
+using std::ofstream;
 
 using namespace mast;
 
@@ -59,6 +60,23 @@ string_view Utility::BackToken (string_view text, string_view separator)
 }
 //
 //  End of: Utility::BackToken
+//---------------------------------------------------------------------------
+
+
+//! Clears file content if the file exists
+//!
+//! @param filePath File path
+//!
+void Utility::ClearFile (string_view filePath)
+{
+  if (FileExists(filePath))
+  {
+    ofstream ofs;
+    ofs.open(filePath.data());
+  }
+}
+//
+//  End of: Utility::ClearFile
 //---------------------------------------------------------------------------
 
 

@@ -42,6 +42,10 @@ class MAST_CORE_EXPORT Utility final
   //!
   static std::string ExtractDirectoryPath (const std::string& filePath);
 
+  //! Clears file content if the file exists
+  //!
+  static void ClearFile (std::experimental::string_view filePath);
+
   //! Tests if a file exists
   //!
   static bool FileExists (std::experimental::string_view filePath);

@@ -21,6 +21,7 @@
 #include "MismatchesCollector.hpp"
 #include "SystemModelReseter.hpp"
 #include "g3log/g3log.hpp"
+#include "DataCycleVisitor.hpp"
 
 #include <utility>
 using std::shared_ptr;
@@ -200,6 +201,7 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (std::shared_ptr<AccessInt
 {
    if (currentAccessInterface->IsPending())
    {
+
    auto protocol = currentAccessInterface->Protocol();
    CHECK_VALUE_NOT_NULL(protocol, "All AccessInterface must be associated with a valid protocol");
 
@@ -241,6 +243,7 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (std::shared_ptr<AccessInt
       }
       nextEndPoint = nextEndPoint->NextSibling();
      ++endpointId;
+
      }
    }
  }
@@ -283,7 +286,6 @@ void SystemModelManager_impl::DoDataCycles_Impl ()
   do
   {
     lock.lock();
-
     MONITOR(StartDataCycle());
     MONITOR(BeforeConfiguration(*root));
     root->Accept(m_configurator);
@@ -291,22 +293,17 @@ void SystemModelManager_impl::DoDataCycles_Impl ()
     MONITOR(AfterConfiguration(*root));
 
     doDataCycle = root->IsPending();
+    
 
     if (doDataCycle)
     {
-      auto nextAccessInterface = m_firstAccessInterface;
-
-      while (nextAccessInterface)
-      {
-       DoHierarchicalDataCycle(nextAccessInterface,nullptr);
-       nextAccessInterface = dynamic_pointer_cast<AccessInterface>(nextAccessInterface->NextSibling());;
-      }
-
-      // ---------------- Release mutex and wait awhile for blocked (but not pending) threads can move forward
+      auto DC_visitor = new DataCycleVisitor(this);
+      root->Accept(*DC_visitor);
+          // ---------------- Release mutex and wait awhile for blocked (but not pending) threads can move forward
       //
       lock.unlock();
       std::this_thread::sleep_for(m_sleepTimeBetweenConfigurations);
-    } // End of: if (doDataCycle)
+     } // End of: if (doDataCycle)
   } while (doDataCycle);
 
   // ---------------- Release threads blocked in iApply without any pending registers

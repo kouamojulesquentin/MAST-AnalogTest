@@ -227,6 +227,10 @@ class SystemModelManager_impl final
   void  Monitor (std::shared_ptr<SystemModelManagerMonitor> monitor) { m_monitor = monitor; }
 
 
+  //! Triggers a data cycle on the Endpoints of the currentAccessInterface
+  //!
+  void DoHierarchicalDataCycle (std::shared_ptr<AccessInterface>  currentAccessInterface, std::shared_ptr<AccessInterface>  InterfaceTranslator);
+
   // ---------------- Private  Methods
   //
   private:
@@ -303,7 +307,6 @@ class SystemModelManager_impl final
 
   void ProcessQueuedRequests (std::shared_ptr<ApplicationData> appData);
   void LoopOnDataCycle ();
-  void DoHierarchicalDataCycle (std::shared_ptr<AccessInterface>  currentAccessInterface, std::shared_ptr<AccessInterface>  InterfaceTranslator);
   void DoDataCycles_Impl ();
   void RegisterPendingThread (std::shared_ptr<Register> reg);
   void ReleaseServedThreads ();

@@ -51,6 +51,7 @@ class UT_MastEnvironment : public CxxTest::TestSuite
   void test_CreateSystemModel_AfterLoadPlugins ();
   void test_CreateSystemModel_SIT_Error ();
   void test_CreateSystemModel_SIT_Error_no_CheckFile ();
+  void test_CreateSystemModel_SIT_Model_Exports ();
   void test_CreateSystemModel_ChangeProtocol ();
   void test_CreateSystemModel_ChangeProtocol_TopIsChain ();
 
@@ -58,6 +59,7 @@ class UT_MastEnvironment : public CxxTest::TestSuite
   //
   void test_CreateManager_BeforeCreateSystemModel ();
   void test_CreateManager_AfterCreateSystemModel ();
+  void test_CreateManager_Monitoring ();
 
   // ---------------- CreateApplications
   //

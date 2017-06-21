@@ -18,7 +18,7 @@ Mast_Options:
       Shown_items: [function_name]                        # Any of [date, time, microseconds, level, thread_id, file_name, line_number, function_name, std_less, std, std_more,all]
       Level: info                                         # One of [debug, info, warning, error]
     Model_GML_printing:
-      Enable:  false                                      # Enable/Disable printing of GML representation of the model state
+      Enable:  true                                       # Enable/Disable printing of GML representation of the model state
       Moments:                                            # Any of [after_model_parsing, before_configuration, after_configuration] (see bellow)
         - after_model_parsing
 #+        - before_configuration
@@ -35,7 +35,7 @@ Mast_Options:
       File_path: "MastModel.txt"                          # Optional file path
       Options:   [default]                                # Any of [default, verbose, auto_value, protocol_name, selection_state, selection_value, selector_properties, ignored_nodes, std, all]
     Manager_activity:
-      Enable:         true  # Enable/Disable logging and optionally reporting model state at specific point of manager activity
+      Enable:         true                                # Enable/Disable logging and optionally reporting model state at specific point of manager activity
       File_base_name: "DUT"                               # Path where pretty print and/or GML files are saved
       Options:        [app_thread_creation, PDL_commands] # Any of [verbose, app_thread_creation, PDL_commands, data_cycles, std, all]
 Plugins_Options: ""                                       # Defines plugins specific options (ignored by Mast)

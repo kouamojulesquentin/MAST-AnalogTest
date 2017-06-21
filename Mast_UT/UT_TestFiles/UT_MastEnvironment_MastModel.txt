@@ -1,0 +1,6 @@
+[Access_I](0)  "TAP"
+ [Register](1)  "TAP_IR", length: 4, Hold value: true, bypass: 1111
+ [Linker](2)    "TAP_DR_Mux"
+  :Selector:(1)  "TAP_IR"
+  [Register](3)  "TAP_BPY", length: 1, bypass: 1
+  [Register](4)  "reg", length: 12, bypass: 1010_1011:1100

@@ -387,6 +387,47 @@ void UT_MastEnvironment::test_CreateSystemModel_SIT_Error_no_CheckFile ()
 }
 
 
+//! Checks MastEnvironment::CreateSystemModel() when parsed SIT model
+//! is exported as GML and pretty print
+//!
+void UT_MastEnvironment::test_CreateSystemModel_SIT_Model_Exports ()
+{
+  // ---------------- Setup
+  //
+  auto gmlExpectedFile         = test::GetTestFilePath("UT_MastEnvironment_MastModel.gml");
+  auto prettyPrintExpectedFile = test::GetTestFilePath("UT_MastEnvironment_MastModel.txt");
+  auto gmlFile                 = "MastModel.gml";
+  auto prettyPrintFile         = "MastModel.txt";
+
+  Utility::ClearFile(gmlFile);
+  Utility::ClearFile(prettyPrintFile);
+
+  // Fake plugin registation
+  PDL_AlgorithmsRepository::Instance().RegisterAlgorithm("Fake", Fake_PDL_Algorithm);
+
+  vector<string> arguments {
+                             "Mast.exe",
+                             "--conf=" + test::GetTestFilePath("UT_MastEnvironment.yml"),
+                             "--sit="  + test::GetTestFilePath("UT_MastEnvironment.sit"),
+                           };
+  MastEnvironment sut(true);
+  sut.ParseOptions(arguments);
+  sut.LoadPlugins();
+
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.CreateSystemModel());
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_NOT_NULLPTR (Startup::GetSystemModel_NoCreate());
+  TS_ASSERT_SAME_FILES  (gmlFile,         gmlExpectedFile);
+  TS_ASSERT_SAME_FILES  (prettyPrintFile, prettyPrintExpectedFile);
+}
+
+
+
 //! Checks MastEnvironment::CreateSystemModel() with change of protocol
 //!
 void UT_MastEnvironment::test_CreateSystemModel_ChangeProtocol ()
@@ -518,8 +559,39 @@ void UT_MastEnvironment::test_CreateManager_AfterCreateSystemModel ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_NOT_NULLPTR (Startup::GetManager());
+  TS_ASSERT_NOT_NULLPTR (Startup::GetManager_NoCreate());
 }
+
+
+//! Checks MastEnvironment::CreateManager() when activating manager monitoring
+//!
+void UT_MastEnvironment::test_CreateManager_Monitoring ()
+{
+  // ---------------- Setup
+  //
+  // Fake plugin registation
+  PDL_AlgorithmsRepository::Instance().RegisterAlgorithm("Fake", Fake_PDL_Algorithm);
+
+  vector<string> arguments {
+                             "Mast.exe",
+                             "--conf=" + test::GetTestFilePath("UT_MastEnvironment.yml"),
+                             "--sit="  + test::GetTestFilePath("UT_MastEnvironment.sit"),
+                           };
+
+  MastEnvironment sut(true);
+  sut.ParseOptions(arguments);
+  sut.LoadPlugins();
+  sut.CreateSystemModel();
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.CreateManager());
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_NOT_NULLPTR (Startup::GetManager_NoCreate());
+}
+
 
 
 

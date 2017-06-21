@@ -473,12 +473,13 @@ bool sameFiles(const char* file1, const char* file2, std::ostringstream & explan
     }
 
     int nline = 1;
-    int ncol  = 1;
-    char c1, c2;
+    std::string line1;
+    std::string line2;
     while (true)
     {
-        is1.get(c1);
-        is2.get(c2);
+        std::getline(is1, line1);
+        std::getline(is2, line2);
+
         if (!is1 && !is2)
         {
           return true;
@@ -489,29 +490,15 @@ bool sameFiles(const char* file1, const char* file2, std::ostringstream & explan
             explanation << "File '" << file1 << "' ended before file '" << file2 << "' (line " << nline << ")";
 
             // Previous lines context
-            if (nline > 3)  explanation << std::endl << "= " << ppprev_line << "'";
-            if (nline > 2)  explanation << std::endl << "= " << pprev_line  << "'";
-            if (nline > 1)  explanation << std::endl << "= " << prev_line   << "'";
+            if (nline > 3)  explanation << "\n= [" << nline - 3 << "]: '" << ppprev_line << "'";
+            if (nline > 2)  explanation << "\n= [" << nline - 2 << "]: '" << pprev_line  << "'";
+            if (nline > 1)  explanation << "\n= [" << nline - 1 << "]: '" << prev_line   << "'";
 
             // Left side file
-            explanation << std::endl << "< " << curr_line;
-            is1.get(c1);
-            while (is1 && (c1 != '\n'))
-            {
-                explanation << c1;
-                is1.get(c1);
-            }
-            explanation << "'";
+            explanation << "\n< [" << nline << "]: '" << line1 << "'";
 
             // Right side file
-            explanation << std::endl << "> " << curr_line;
-            is2.get(c2);
-            while (is2 && (c2 != '\n'))
-            {
-                explanation << c2;
-                is2.get(c2);
-            }
-            explanation << "'";
+            explanation << "\n> [" << nline << "]: '" << line2 << "'";
 
             return false;
         }
@@ -521,81 +508,67 @@ bool sameFiles(const char* file1, const char* file2, std::ostringstream & explan
             explanation << "File '" << file1 << "' ended after file '" << file2 << "' (line " << nline << ")";
 
             // Previous lines context
-            if (nline > 3)  explanation << std::endl << "= " << ppprev_line << "'";
-            if (nline > 2)  explanation << std::endl << "= " << pprev_line  << "'";
-            if (nline > 1)  explanation << std::endl << "= " << prev_line   << "'";
+            if (nline > 3)  explanation << "\n= [" << nline - 3 << "]: '" << ppprev_line << "'";
+            if (nline > 2)  explanation << "\n= [" << nline - 2 << "]: '" << pprev_line  << "'";
+            if (nline > 1)  explanation << "\n= [" << nline - 1 << "]: '" << prev_line   << "'";
 
             // Left side file
-            explanation << std::endl << "< " << curr_line;
-            is1.get(c1);
-            while (is1 && (c1 != '\n'))
-            {
-                explanation << c1;
-                is1.get(c1);
-            }
-            explanation << "'";
+            explanation << "\n< [" << nline << "]: '" << line1 << "'";
 
             // Right side file
-            explanation << std::endl << "> " << curr_line;
-            is2.get(c2);
-            while (is2 && (c2 != '\n'))
-            {
-                explanation << c2;
-                is2.get(c2);
-            }
-            explanation << "'";
+            explanation << "\n> [" << nline << "]: '" << line2 << "'";
 
             return false;
         }
 
-        if (c1 != c2)
+        size_t length1 = line1.size();
+        if ((length1 != 0) && (line1[length1 -1u] == '\r'))
         {
+          line1.resize(length1 - 1u);
+        }
+
+        size_t length2 = line2.size();
+        if ((length2 != 0) && (line2[length2 -1u] == '\r'))
+        {
+          line2.resize(length2 - 1u);
+        }
+
+        if (line1 != line2)
+        {
+            int ncol = 1;
+            int maxCompareCol = std::min(line1.size(), line2.size());
+            while (ncol <= maxCompareCol)
+            {
+              if (line1[ncol - 1u] != line2[ncol - 1u])
+              {
+                break;
+              }
+              ++ncol;
+            }
+
+            //+ Todo (JFC) (June/21/2017) : find column of difference !!!!
+            //+
             explanation << "Files '" << file1 << "' and '" << file2 << "' differ at line: " << nline << ", col: " << ncol;
 
             // Previous lines context
-            if (nline > 3)  explanation << std::endl << "= " << ppprev_line << "'";
-            if (nline > 2)  explanation << std::endl << "= " << pprev_line  << "'";
-            if (nline > 1)  explanation << std::endl << "= " << prev_line   << "'";
+            if (nline > 3)  explanation << "\n= [" << nline - 3 << "]: '" << ppprev_line << "'";
+            if (nline > 2)  explanation << "\n= [" << nline - 2 << "]: '" << pprev_line  << "'";
+            if (nline > 1)  explanation << "\n= [" << nline - 1 << "]: '" << prev_line   << "'";
 
             // Left side file
-            explanation << std::endl << "< " << curr_line;
-            while (is1 && (c1 != '\n'))
-            {
-                explanation << c1;
-                is1.get(c1);
-            }
-            explanation << "'";
+            explanation << "\n< [" << nline << "]: '" << line1 << "'";
 
             // Right side file
-            explanation << std::endl << "> " << curr_line;
-            while (is2 && (c2 != '\n'))
-            {
-                explanation << c2;
-                is2.get(c2);
-            }
-            explanation << "'";
+            explanation << "\n> [" << nline << "]: '" << line2 << "'";
 
             return false;
         }
 
-        if (c1 == '\n')
-        {
-            ncol = 1;
-            ++nline;
+        ++nline;
 
-            ppprev_line = pprev_line;
-            pprev_line  = prev_line;
-            prev_line   = curr_line;
-
-            std::ostringstream os;
-            os << "[" << nline << "]: '";
-            curr_line = os.str();
-        }
-        else
-        {
-            curr_line += c1;
-            ++ncol;
-        }
+        ppprev_line = pprev_line;
+        pprev_line  = prev_line;
+        prev_line   = line1;
     }
 }
 #endif

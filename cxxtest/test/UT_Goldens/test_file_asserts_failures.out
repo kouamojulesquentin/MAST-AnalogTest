@@ -6,13 +6,13 @@ UT_FileAsserts_Failures.cpp:59: Error: File 'UT_Sources/Files_to_compare/TwoLine
 = [1]: '1st Line'
 = [2]: '2nd Line from resources !!!'
 < [3]: ''
-> [3]: '   This is third line'
+> [3]: '    This is third line'
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_SAME_FILES_Left_MoreLines:
 UT_FileAsserts_Failures.cpp:66: Error: File 'UT_Sources/Files_to_compare/FiveLines.txt' ended after file 'UT_Sources/Files_to_compare/TwoLines.txt' (line 3)
 = [1]: '1st Line'
 = [2]: '2nd Line from resources !!!'
-< [3]: '   This is third line'
+< [3]: '    This is third line'
 > [3]: ''
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_SAME_FILES_Differ_at_FirstCol:

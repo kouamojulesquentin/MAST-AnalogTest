@@ -196,60 +196,62 @@ void SystemModelManager_impl::CreateApplicationThread (shared_ptr<ParentNode> ap
 //!
 //! @note It does the data cycle only on the target AccessInterface, fromSUTVector and toSUTVector are locally defined
 //!
-void SystemModelManager_impl::DoHierarchicalDataCycle (std::shared_ptr<AccessInterface>  currentAccessInterface,
-							std::shared_ptr<AccessInterface>  InterfaceTranslator)
+void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentAccessInterface, AccessInterface* interfaceTranslator)
 {
-   if (currentAccessInterface->IsPending())
-   {
+  CHECK_PARAMETER_NOT_NULL(currentAccessInterface, "Houps can only operate on valid AccessInterface");
 
-   auto protocol = currentAccessInterface->Protocol();
-   CHECK_VALUE_NOT_NULL(protocol, "All AccessInterface must be associated with a valid protocol");
+  if (currentAccessInterface->IsPending())
+  {
+    auto protocol = currentAccessInterface->Protocol();
+    CHECK_VALUE_NOT_NULL(protocol, "All AccessInterface must be associated with a valid protocol");
 
-   uint32_t endpointId   = 1u;
-   auto     nextEndPoint = currentAccessInterface->FirstChild();
+    uint32_t endpointId = 1u;
+    auto nextEndPoint = currentAccessInterface->FirstChild();
 
-   while (nextEndPoint)
-   {
-    if (nextEndPoint->IsPending())
+    while (nextEndPoint)
     {
-     auto local_toSutVisitor = new ToSutVisitor();
+      if (nextEndPoint->IsPending())
+      {
+        ToSutVisitor local_toSutVisitor;
 
-     local_toSutVisitor->Reset();
-    nextEndPoint->Accept(*local_toSutVisitor);
+        nextEndPoint->Accept(local_toSutVisitor);
 
-     const auto& toSutVector = local_toSutVisitor->ToSutVector();
-     
-     if (!toSutVector.IsEmpty())   // This can be empty when actual SUT state prevent from serving pending Registers
-       {
-        const auto& activeRegs  = local_toSutVisitor->ActiveRegistersIdentifiers();
+        const auto& toSutVector = local_toSutVisitor.ToSutVector();
 
-	BinaryVector fromSutVector;
-        if (InterfaceTranslator==nullptr) //Standard case, use built-in Callbacks
-   	   fromSutVector = protocol->DoCallback(endpointId, nextEndPoint->ApplicationData(), toSutVector);
-	else
-	{
-	 auto CallbackId=protocol->CallbackId(endpointId);
-   	 /*dummy callback to prevent breakdown while developing*/
-	 /*Here we should have something like :
-	 fromSutVector = xxxx->DoTranslationCallback(CallbackId, nextEndPoint->ApplicationData(), toSutVector);
-	 */
-	 fromSutVector = protocol->DoCallback(endpointId, nextEndPoint->ApplicationData(), toSutVector);
-	}
+        if (!toSutVector.IsEmpty()) // This can be empty when actual SUT state prevent from serving pending Registers
+        {
+          const auto& activeRegs = local_toSutVisitor.ActiveRegistersIdentifiers();
 
-        m_fromSutUpdater.UpdateRegisters(activeRegs, fromSutVector);
-        ReportServedRegisters(activeRegs);
-        ReleaseServedThreads();
+          BinaryVector fromSutVector;
+
+          if (interfaceTranslator == nullptr) // Standard case ==> use built-in Callbacks
+          {
+            fromSutVector = protocol->DoCallback(endpointId, nextEndPoint->ApplicationData(), toSutVector);
+          }
+          else
+          {
+            auto CallbackId = protocol->CallbackId(endpointId);
+
+            // dummy callback to prevent breakdown while developing
+            // Here we should have something like :
+            // fromSutVector = xxxx->DoTranslationCallback(CallbackId, nextEndPoint->ApplicationData(), toSutVector);
+            fromSutVector = protocol->DoCallback(endpointId, nextEndPoint->ApplicationData(), toSutVector);
+          }
+
+          m_fromSutUpdater.UpdateRegisters(activeRegs, fromSutVector);
+          ReportServedRegisters(activeRegs);
+          ReleaseServedThreads();
         }
       }
       nextEndPoint = nextEndPoint->NextSibling();
-     ++endpointId;
-
-     }
-   }
- }
+      ++endpointId;
+    }
+  }
+}
 //
 //  End of: SystemModelManager_impl::DoHierarchicalDataCycle
 //---------------------------------------------------------------------------
+
 
 //! Does a complete data cycles for SystemModel as long as there are pending nodes
 //!
@@ -293,13 +295,14 @@ void SystemModelManager_impl::DoDataCycles_Impl ()
     MONITOR(AfterConfiguration(*root));
 
     doDataCycle = root->IsPending();
-    
+
 
     if (doDataCycle)
     {
-      auto DC_visitor = new DataCycleVisitor(this);
-      root->Accept(*DC_visitor);
-          // ---------------- Release mutex and wait awhile for blocked (but not pending) threads can move forward
+      DataCycleVisitor dataCycleVisitor(this);
+      root->Accept(dataCycleVisitor);
+
+      // ---------------- Release mutex and wait awhile for blocked (but not pending) threads can move forward
       //
       lock.unlock();
       std::this_thread::sleep_for(m_sleepTimeBetweenConfigurations);

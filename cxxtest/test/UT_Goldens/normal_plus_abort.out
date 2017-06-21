@@ -58,46 +58,42 @@ Differing from:
 
 In SameFiles::testAssertFileShorter:
 SameFiles.h:19: Error: File 'UT_Sources/SameFiles.h' ended before file 'UT_Sources/SameFilesLonger.h' (line 43)
-=     }
-=  };
-=
-<
-
+= [40]: '    }'
+= [41]: '};'
+= [42]: ''
+< [43]: ''
+> [43]: '/ This is a bit longer than SameFiles.h, so we can test the logic of file comparison'
 
 In SameFiles::testAssertFileLonger:
-SameFiles.h:24: Error: File 'UT_Sources/SameFiles.h' ended before file 'UT_Sources/SameFilesLonger.h' (line 43)
-=     }
-=  };
-=
->
-
+SameFiles.h:24: Error: File 'UT_Sources/SameFilesLonger.h' ended after file 'UT_Sources/SameFiles.h' (line 43)
+= [40]: '    }'
+= [41]: '};'
+= [42]: ''
+< [43]: '/ This is a bit longer than SameFiles.h, so we can test the logic of file comparison'
+> [43]: ''
 
 In SameFiles::testAssertMessageSameFiles:
 SameFiles.h:29: Message: Not same files
-SameFiles.h:29: Error: Files 'UT_Sources/SameFiles.h' and 'UT_Sources/SameData.h' differ at line 4
-= #include <cxxtest/TestSuite.h>
-=
-= //
-< // This test suite demonstrates TS_ASSERT_SAME_ATA
-
-> // This test suite demonstrates TS_ASSERT_SAME_//
-
+SameFiles.h:29: Error: Files 'UT_Sources/SameFiles.h' and 'UT_Sources/SameData.h' differ at line: 4, col: 48
+= [1]: '#include <cxxtest/TestSuite.h>'
+= [2]: ''
+= [3]: '//'
+< [4]: '// This test suite demonstrates TS_ASSERT_SAME_FILES'
+> [4]: '// This test suite demonstrates TS_ASSERT_SAME_DATA'
 .
 
 In SameFiles::testSafeAssertMessageSameFiles:
 SameFiles.h:39: Message: Not same files
-SameFiles.h:39: Error: Files 'UT_Sources/SameFiles.h' and 'UT_Sources/SameData.h' differ at line 4
-= #include <cxxtest/TestSuite.h>
-=
-= //
-< // This test suite demonstrates TS_ASSERT_SAME_ATA
-
-> // This test suite demonstrates TS_ASSERT_SAME_//
-
+SameFiles.h:39: Error: Files 'UT_Sources/SameFiles.h' and 'UT_Sources/SameData.h' differ at line: 4, col: 48
+= [1]: '#include <cxxtest/TestSuite.h>'
+= [2]: ''
+= [3]: '//'
+< [4]: '// This test suite demonstrates TS_ASSERT_SAME_FILES'
+> [4]: '// This test suite demonstrates TS_ASSERT_SAME_DATA'
 
 In TestMessageMacros::testMessageMacros:
 Tsm.h:15: Message: String
-Tsm.h:15: Error: Expected (false)to be true, but found it is false
+Tsm.h:15: Error: Expected (false) to be true, but found it is false
 
 In Traits_Strings::testCharTraits:
 Traits_Strings.h:14: Error: 'A'

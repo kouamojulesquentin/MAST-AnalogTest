@@ -7,10 +7,10 @@ import sys
 import os
 from os.path import realpath, dirname
 if sys.version_info < (3,0):
-    print ('Using Python < 3.0')
+    print ('cxxtestgen run with Python < 3.0')
     sys.path.insert(0, dirname(dirname(realpath(__file__)))+os.sep+'python')
 else:
-    print ('Using Python 3.x')
+    print ('cxxtestgen run with Python 3.x')
     sys.path.insert(0, dirname(dirname(realpath(__file__)))+os.sep+'python'+os.sep+'python3')
 sys.path.append(".")
 

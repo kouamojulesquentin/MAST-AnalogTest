@@ -1,141 +1,177 @@
-Running UT_FileAsserts_Failures tests (38 tests)
+Running UT_FileAsserts_Failures tests (43 tests)
 
+
+In UT_FileAsserts_Failures::test_TS_ASSERT_SAME_FILES_Left_LessLines:
+UT_FileAsserts_Failures.cpp:59: Error: File 'UT_Sources/Files_to_compare/TwoLines.txt' ended before file 'UT_Sources/Files_to_compare/FiveLines.txt' (line 3)
+= [1]: '1st Line'
+= [2]: '2nd Line from resources !!!'
+< [3]: ''
+> [3]: '   This is third line'
+
+In UT_FileAsserts_Failures::test_TS_ASSERT_SAME_FILES_Left_MoreLines:
+UT_FileAsserts_Failures.cpp:66: Error: File 'UT_Sources/Files_to_compare/FiveLines.txt' ended after file 'UT_Sources/Files_to_compare/TwoLines.txt' (line 3)
+= [1]: '1st Line'
+= [2]: '2nd Line from resources !!!'
+< [3]: '   This is third line'
+> [3]: ''
+
+In UT_FileAsserts_Failures::test_TS_ASSERT_SAME_FILES_Differ_at_FirstCol:
+UT_FileAsserts_Failures.cpp:73: Error: Files 'UT_Sources/Files_to_compare/FiveLines.txt' and 'UT_Sources/Files_to_compare/FiveLines_Differ_Col_1.txt' differ at line: 2, col: 1
+= [1]: '1st Line'
+< [2]: '2nd Line from resources !!!'
+> [2]: 'the Line from resources !!!'
+
+In UT_FileAsserts_Failures::test_TS_ASSERT_SAME_FILES_Differ_at_MiddleCol:
+UT_FileAsserts_Failures.cpp:81: Error: Files 'UT_Sources/Files_to_compare/FiveLines.txt' and 'UT_Sources/Files_to_compare/FiveLines_Differ_Col_39.txt' differ at line: 5, col: 39
+= [2]: '2nd Line from resources !!!'
+= [3]: '    This is third line'
+= [4]: ''
+< [5]: '      This is fifth line (after empty 4th one).'
+> [5]: '      This is fifth line (after empty fourth one).'
+
+In UT_FileAsserts_Failures::test_TS_ASSERT_SAME_FILES_Differ_at_LastCol:
+UT_FileAsserts_Failures.cpp:88: Error: Files 'UT_Sources/Files_to_compare/FiveLines.txt' and 'UT_Sources/Files_to_compare/FiveLines_Differ_Col_47.txt' differ at line: 5, col: 47
+= [2]: '2nd Line from resources !!!'
+= [3]: '    This is third line'
+= [4]: ''
+< [5]: '      This is fifth line (after empty 4th one).'
+> [5]: '      This is fifth line (after empty 4th one)!'
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_SAME_FILES_Exception_inside:
-UT_FileAsserts_Failures.cpp:57: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
+UT_FileAsserts_Failures.cpp:96: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_SAME_FILES_Exception_after:
-UT_FileAsserts_Failures.cpp:64: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
+UT_FileAsserts_Failures.cpp:103: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_SAME_FILES_Exception_inside_and_after:
-UT_FileAsserts_Failures.cpp:72: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
-UT_FileAsserts_Failures.cpp:72: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
+UT_FileAsserts_Failures.cpp:111: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
+UT_FileAsserts_Failures.cpp:111: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_EXISTS:
-UT_FileAsserts_Failures.cpp:80: Error: Expected "UT_Sources/Files_to_compare/!!! Please_delete_this_file_!!!.txt" file to exist, but found it does not exist
+UT_FileAsserts_Failures.cpp:119: Error: Expected "UT_Sources/Files_to_compare/!!! Please_delete_this_file_!!!.txt" file to exist, but found it does not exist
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_EXISTS_message:
-UT_FileAsserts_Failures.cpp:87: Message: Message from test_TS_ASSERT_FILE_EXISTS_message
-UT_FileAsserts_Failures.cpp:87: Error: Expected "UT_Sources/Files_to_compare/!!! Please_delete_this_file_!!!.txt" file to exist, but found it does not exist
+UT_FileAsserts_Failures.cpp:126: Message: Message from test_TS_ASSERT_FILE_EXISTS_message
+UT_FileAsserts_Failures.cpp:126: Error: Expected "UT_Sources/Files_to_compare/!!! Please_delete_this_file_!!!.txt" file to exist, but found it does not exist
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_EXISTS_Exception_inside:
-UT_FileAsserts_Failures.cpp:94: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
+UT_FileAsserts_Failures.cpp:133: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_EXISTS_Exception_after:
-UT_FileAsserts_Failures.cpp:101: Error: Expected "UT_Sources/Files_to_compare/!!! Please_delete_this_file_!!!.txt" file to exist, but found it does not exist
-UT_FileAsserts_Failures.cpp:101: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
+UT_FileAsserts_Failures.cpp:140: Error: Expected "UT_Sources/Files_to_compare/!!! Please_delete_this_file_!!!.txt" file to exist, but found it does not exist
+UT_FileAsserts_Failures.cpp:140: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_EXISTS_Exception_inside_and_after:
-UT_FileAsserts_Failures.cpp:109: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
-UT_FileAsserts_Failures.cpp:109: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
+UT_FileAsserts_Failures.cpp:148: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
+UT_FileAsserts_Failures.cpp:148: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_NOT_EXISTS:
-UT_FileAsserts_Failures.cpp:117: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file to not exist, but found it does exist
+UT_FileAsserts_Failures.cpp:156: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file to not exist, but found it does exist
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_NOT_EXISTS_message:
-UT_FileAsserts_Failures.cpp:124: Message: Message from test_TS_ASSERT_FILE_NOT_EXISTS_message
-UT_FileAsserts_Failures.cpp:124: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file to not exist, but found it does exist
+UT_FileAsserts_Failures.cpp:163: Message: Message from test_TS_ASSERT_FILE_NOT_EXISTS_message
+UT_FileAsserts_Failures.cpp:163: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file to not exist, but found it does exist
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_NOT_EXISTS_Exception_inside:
-UT_FileAsserts_Failures.cpp:131: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
+UT_FileAsserts_Failures.cpp:170: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_NOT_EXISTS_Exception_after:
-UT_FileAsserts_Failures.cpp:138: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file to not exist, but found it does exist
-UT_FileAsserts_Failures.cpp:138: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
+UT_FileAsserts_Failures.cpp:177: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file to not exist, but found it does exist
+UT_FileAsserts_Failures.cpp:177: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_NOT_EXISTS_Exception_inside_and_after:
-UT_FileAsserts_Failures.cpp:146: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
-UT_FileAsserts_Failures.cpp:146: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
+UT_FileAsserts_Failures.cpp:185: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
+UT_FileAsserts_Failures.cpp:185: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_SIZE:
-UT_FileAsserts_Failures.cpp:155: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file size = 100, but found effective file size = 39
+UT_FileAsserts_Failures.cpp:194: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file size = 100, but found effective file size = 39
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_SIZE_message:
-UT_FileAsserts_Failures.cpp:162: Message: Message from test_TS_ASSERT_FILE_SIZE_message
-UT_FileAsserts_Failures.cpp:162: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file size = 200, but found effective file size = 39
+UT_FileAsserts_Failures.cpp:201: Message: Message from test_TS_ASSERT_FILE_SIZE_message
+UT_FileAsserts_Failures.cpp:201: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file size = 200, but found effective file size = 39
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_SIZE_std_string:
-UT_FileAsserts_Failures.cpp:169: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file size = 220, but found effective file size = 39
+UT_FileAsserts_Failures.cpp:208: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file size = 220, but found effective file size = 39
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_SIZE_not_exist:
-UT_FileAsserts_Failures.cpp:176: Error: Expected "UT_Sources/Files_to_compare/!!! Please_delete_this_file_!!!.txt" file size = 39, but found file cannot be opened
+UT_FileAsserts_Failures.cpp:215: Error: Expected "UT_Sources/Files_to_compare/!!! Please_delete_this_file_!!!.txt" file size = 39, but found file cannot be opened
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_SIZE_Exception_inside:
-UT_FileAsserts_Failures.cpp:183: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
+UT_FileAsserts_Failures.cpp:222: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_SIZE_Exception_after:
-UT_FileAsserts_Failures.cpp:190: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file size = 400, but found effective file size = 39
-UT_FileAsserts_Failures.cpp:190: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
+UT_FileAsserts_Failures.cpp:229: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file size = 400, but found effective file size = 39
+UT_FileAsserts_Failures.cpp:229: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_SIZE_Exception_inside_and_after:
-UT_FileAsserts_Failures.cpp:198: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
-UT_FileAsserts_Failures.cpp:198: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
+UT_FileAsserts_Failures.cpp:237: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
+UT_FileAsserts_Failures.cpp:237: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_EMPTY:
-UT_FileAsserts_Failures.cpp:207: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file size = 0, but found effective file size = 39
+UT_FileAsserts_Failures.cpp:246: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file size = 0, but found effective file size = 39
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_EMPTY_message:
-UT_FileAsserts_Failures.cpp:214: Message: Message from test_TS_ASSERT_FILE_EMPTY_message
-UT_FileAsserts_Failures.cpp:214: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file size = 0, but found effective file size = 39
+UT_FileAsserts_Failures.cpp:253: Message: Message from test_TS_ASSERT_FILE_EMPTY_message
+UT_FileAsserts_Failures.cpp:253: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file size = 0, but found effective file size = 39
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_EMPTY_std_string:
-UT_FileAsserts_Failures.cpp:221: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file size = 0, but found effective file size = 39
+UT_FileAsserts_Failures.cpp:260: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file size = 0, but found effective file size = 39
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_EMPTY_not_exist:
-UT_FileAsserts_Failures.cpp:228: Error: Expected "UT_Sources/Files_to_compare/!!! Please_delete_this_file_!!!.txt" file size = 0, but found file cannot be opened
+UT_FileAsserts_Failures.cpp:267: Error: Expected "UT_Sources/Files_to_compare/!!! Please_delete_this_file_!!!.txt" file size = 0, but found file cannot be opened
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_EMPTY_Exception_inside:
-UT_FileAsserts_Failures.cpp:235: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
+UT_FileAsserts_Failures.cpp:274: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_EMPTY_Exception_after:
-UT_FileAsserts_Failures.cpp:242: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file size = 0, but found effective file size = 39
-UT_FileAsserts_Failures.cpp:242: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
+UT_FileAsserts_Failures.cpp:281: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file size = 0, but found effective file size = 39
+UT_FileAsserts_Failures.cpp:281: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_EMPTY_Exception_inside_and_after:
-UT_FileAsserts_Failures.cpp:250: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
-UT_FileAsserts_Failures.cpp:250: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
+UT_FileAsserts_Failures.cpp:289: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
+UT_FileAsserts_Failures.cpp:289: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_CONTENT_Differ_At_Line_1:
-UT_FileAsserts_Failures.cpp:259: Error: Expected "UT_Sources/Files_to_compare/FiveLines.txt" file content to be equal to ("1st line"), but found file differ at line 1
+UT_FileAsserts_Failures.cpp:298: Error: Expected "UT_Sources/Files_to_compare/FiveLines.txt" file content to be equal to ("1st line"), but found file differ at line 1
 Expected content at line 1: "1st line"
 File content at line     1: "1st Line"
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_CONTENT_file_empty:
-UT_FileAsserts_Failures.cpp:266: Error: Expected "UT_Sources/Files_to_compare/Empty.txt" file content to be equal to ("1st line"), but found file is shorter: (empty) than expected content (1 line)
+UT_FileAsserts_Failures.cpp:305: Error: Expected "UT_Sources/Files_to_compare/Empty.txt" file content to be equal to ("1st line"), but found file is shorter: (empty) than expected content (1 line)
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_CONTENT_file_smaller:
-UT_FileAsserts_Failures.cpp:273: Error: Expected "UT_Sources/Files_to_compare/OneLine.txt" file content to be equal to ("This is the only one line of this file\n?\n"), but found file is shorter: (1 line) than expected content (2 lines)
+UT_FileAsserts_Failures.cpp:312: Error: Expected "UT_Sources/Files_to_compare/OneLine.txt" file content to be equal to ("This is the only one line of this file\n?\n"), but found file is shorter: (1 line) than expected content (2 lines)
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_CONTENT_file_larger:
-UT_FileAsserts_Failures.cpp:280: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file content to be equal to ("1st Line"), but found file is larger: (2 lines) than expected content (1 line)
+UT_FileAsserts_Failures.cpp:319: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file content to be equal to ("1st Line"), but found file is larger: (2 lines) than expected content (1 line)
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_CONTENT_empty_expected:
-UT_FileAsserts_Failures.cpp:287: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file content to be equal to (""), but found file is larger: (2 lines) than expected content (empty)
+UT_FileAsserts_Failures.cpp:326: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file content to be equal to (""), but found file is larger: (2 lines) than expected content (empty)
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_CONTENT_message:
-UT_FileAsserts_Failures.cpp:295: Message: Message from test_TS_ASSERT_FILE_CONTENT_message
-UT_FileAsserts_Failures.cpp:295: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file content to be equal to ("\n"), but found file differ at line 1
+UT_FileAsserts_Failures.cpp:334: Message: Message from test_TS_ASSERT_FILE_CONTENT_message
+UT_FileAsserts_Failures.cpp:334: Error: Expected "UT_Sources/Files_to_compare/TwoLines.txt" file content to be equal to ("\n"), but found file differ at line 1
 Expected content at line 1: ""
 File content at line     1: "1st Line"
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_CONTENT_std_string:
-UT_FileAsserts_Failures.cpp:303: Error: Expected "UT_Sources/Files_to_compare/FiveLines.txt" file content to be equal to (expectedContent), but found file differ at line 3
+UT_FileAsserts_Failures.cpp:342: Error: Expected "UT_Sources/Files_to_compare/FiveLines.txt" file content to be equal to (expectedContent), but found file differ at line 3
 Expected content at line 3: "This is third line"
 File content at line     3: "    This is third line"
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_CONTENT_not_exist:
-UT_FileAsserts_Failures.cpp:310: Error: Expected "UT_Sources/Files_to_compare/!!! Please_delete_this_file_!!!.txt" file content to be equal to ("1st Line\n2nd Line from resources !!!\n    This is third line\n\n      This is fifth line (after empty 4th one)."), but found Left file does not exist (or cannot be opened)
+UT_FileAsserts_Failures.cpp:349: Error: Expected "UT_Sources/Files_to_compare/!!! Please_delete_this_file_!!!.txt" file content to be equal to ("1st Line\n2nd Line from resources !!!\n    This is third line\n\n      This is fifth line (after empty 4th one)."), but found Left file does not exist (or cannot be opened)
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_CONTENT_Exception_inside:
-UT_FileAsserts_Failures.cpp:317: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
+UT_FileAsserts_Failures.cpp:356: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_CONTENT_Exception_after:
-UT_FileAsserts_Failures.cpp:324: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
+UT_FileAsserts_Failures.cpp:363: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
 
 In UT_FileAsserts_Failures::test_TS_ASSERT_FILE_CONTENT_Exception_inside_and_after:
-UT_FileAsserts_Failures.cpp:332: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
-UT_FileAsserts_Failures.cpp:332: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
+UT_FileAsserts_Failures.cpp:371: Error: Unexpected 'char*' exception thrown from test with value: 'Hello from getFilePathThrowing() !!!'
+UT_FileAsserts_Failures.cpp:371: Error: Unexpected 'char*' exception thrown from test with value: 'This was thrown from justThrowSomething().' (After assertion at specified line)
 
-Failed 38 and Skipped 0 of 38 tests
+Failed 43 and Skipped 0 of 43 tests
 Success rate: 0%
-Error level = 38
+Error level = 43

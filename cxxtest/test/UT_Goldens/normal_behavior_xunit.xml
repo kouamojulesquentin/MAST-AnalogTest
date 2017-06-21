@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite name="cxxtest" date="Tue Oct 06 10:58:08 2015" tests="36" errors="0" failures="29" time="0" >
+<testsuite name="cxxtest" date="Wed Jun 21 13:00:15 2017" tests="36" errors="0" failures="29" time="0" >
 <testcase classname="LessThanEquals" name="testLessThanEquals" line="11">
 <failure file="LessThanEquals.h" line="16" type="failedAssertLessThanEquals" >Error: Expected (1 &lt;= 0), found (1 &gt; 0)
 Message: 1 &lt;=? 0
@@ -162,66 +162,62 @@ Differing from:
 </testcase>
 <testcase classname="SameFiles" name="testAssertFileShorter" line="17">
 <failure file="SameFiles.h" line="19" type="failedAssertSameFiles" >Error: File &apos;UT_Sources/SameFiles.h&apos; ended before file &apos;UT_Sources/SameFilesLonger.h&apos; (line 43)
-=     }
-=  };
-=
-&lt;
-
+= [40]: &apos;    }&apos;
+= [41]: &apos;};&apos;
+= [42]: &apos;&apos;
+&lt; [43]: &apos;&apos;
+&gt; [43]: &apos;/ This is a bit longer than SameFiles.h, so we can test the logic of file comparison&apos;
 </failure>
 <system-out >
 
 In SameFiles::testAssertFileShorter:
 SameFiles.h:19: Error: File &apos;UT_Sources/SameFiles.h&apos; ended before file &apos;UT_Sources/SameFilesLonger.h&apos; (line 43)
-=     }
-=  };
-=
-&lt;
-
+= [40]: &apos;    }&apos;
+= [41]: &apos;};&apos;
+= [42]: &apos;&apos;
+&lt; [43]: &apos;&apos;
+&gt; [43]: &apos;/ This is a bit longer than SameFiles.h, so we can test the logic of file comparison&apos;
 </system-out>
 </testcase>
 <testcase classname="SameFiles" name="testAssertFileLonger" line="22">
-<failure file="SameFiles.h" line="24" type="failedAssertSameFiles" >Error: File &apos;UT_Sources/SameFiles.h&apos; ended before file &apos;UT_Sources/SameFilesLonger.h&apos; (line 43)
-=     }
-=  };
-=
-&gt;
-
+<failure file="SameFiles.h" line="24" type="failedAssertSameFiles" >Error: File &apos;UT_Sources/SameFilesLonger.h&apos; ended after file &apos;UT_Sources/SameFiles.h&apos; (line 43)
+= [40]: &apos;    }&apos;
+= [41]: &apos;};&apos;
+= [42]: &apos;&apos;
+&lt; [43]: &apos;/ This is a bit longer than SameFiles.h, so we can test the logic of file comparison&apos;
+&gt; [43]: &apos;&apos;
 </failure>
 <system-out >
 
 In SameFiles::testAssertFileLonger:
-SameFiles.h:24: Error: File &apos;UT_Sources/SameFiles.h&apos; ended before file &apos;UT_Sources/SameFilesLonger.h&apos; (line 43)
-=     }
-=  };
-=
-&gt;
-
+SameFiles.h:24: Error: File &apos;UT_Sources/SameFilesLonger.h&apos; ended after file &apos;UT_Sources/SameFiles.h&apos; (line 43)
+= [40]: &apos;    }&apos;
+= [41]: &apos;};&apos;
+= [42]: &apos;&apos;
+&lt; [43]: &apos;/ This is a bit longer than SameFiles.h, so we can test the logic of file comparison&apos;
+&gt; [43]: &apos;&apos;
 </system-out>
 </testcase>
 <testcase classname="SameFiles" name="testAssertMessageSameFiles" line="27">
 <failure file="SameFiles.h" line="29" type="failedAssertSameFiles" >
 Message: Not same files
-Error: Files &apos;UT_Sources/SameFiles.h&apos; and &apos;UT_Sources/SameData.h&apos; differ at line 4
-= #include &lt;cxxtest/TestSuite.h&gt;
-=
-= //
-&lt; // This test suite demonstrates TS_ASSERT_SAME_ATA
-
-&gt; // This test suite demonstrates TS_ASSERT_SAME_//
-
+Error: Files &apos;UT_Sources/SameFiles.h&apos; and &apos;UT_Sources/SameData.h&apos; differ at line: 4, col: 48
+= [1]: &apos;#include &lt;cxxtest/TestSuite.h&gt;&apos;
+= [2]: &apos;&apos;
+= [3]: &apos;//&apos;
+&lt; [4]: &apos;// This test suite demonstrates TS_ASSERT_SAME_FILES&apos;
+&gt; [4]: &apos;// This test suite demonstrates TS_ASSERT_SAME_DATA&apos;
 </failure>
 <system-out >
 
 In SameFiles::testAssertMessageSameFiles:
 SameFiles.h:29: Message: Not same files
-SameFiles.h:29: Error: Files &apos;UT_Sources/SameFiles.h&apos; and &apos;UT_Sources/SameData.h&apos; differ at line 4
-= #include &lt;cxxtest/TestSuite.h&gt;
-=
-= //
-&lt; // This test suite demonstrates TS_ASSERT_SAME_ATA
-
-&gt; // This test suite demonstrates TS_ASSERT_SAME_//
-
+SameFiles.h:29: Error: Files &apos;UT_Sources/SameFiles.h&apos; and &apos;UT_Sources/SameData.h&apos; differ at line: 4, col: 48
+= [1]: &apos;#include &lt;cxxtest/TestSuite.h&gt;&apos;
+= [2]: &apos;&apos;
+= [3]: &apos;//&apos;
+&lt; [4]: &apos;// This test suite demonstrates TS_ASSERT_SAME_FILES&apos;
+&gt; [4]: &apos;// This test suite demonstrates TS_ASSERT_SAME_DATA&apos;
 </system-out>
 </testcase>
 <testcase classname="SameFiles" name="testSafeAssertSameFiles" line="32">
@@ -231,27 +227,23 @@ SameFiles.h:29: Error: Files &apos;UT_Sources/SameFiles.h&apos; and &apos;UT_Sou
 <testcase classname="SameFiles" name="testSafeAssertMessageSameFiles" line="37">
 <failure file="SameFiles.h" line="39" type="failedAssertSameFiles" >
 Message: Not same files
-Error: Files &apos;UT_Sources/SameFiles.h&apos; and &apos;UT_Sources/SameData.h&apos; differ at line 4
-= #include &lt;cxxtest/TestSuite.h&gt;
-=
-= //
-&lt; // This test suite demonstrates TS_ASSERT_SAME_ATA
-
-&gt; // This test suite demonstrates TS_ASSERT_SAME_//
-
+Error: Files &apos;UT_Sources/SameFiles.h&apos; and &apos;UT_Sources/SameData.h&apos; differ at line: 4, col: 48
+= [1]: &apos;#include &lt;cxxtest/TestSuite.h&gt;&apos;
+= [2]: &apos;&apos;
+= [3]: &apos;//&apos;
+&lt; [4]: &apos;// This test suite demonstrates TS_ASSERT_SAME_FILES&apos;
+&gt; [4]: &apos;// This test suite demonstrates TS_ASSERT_SAME_DATA&apos;
 </failure>
 <system-out >
 
 In SameFiles::testSafeAssertMessageSameFiles:
 SameFiles.h:39: Message: Not same files
-SameFiles.h:39: Error: Files &apos;UT_Sources/SameFiles.h&apos; and &apos;UT_Sources/SameData.h&apos; differ at line 4
-= #include &lt;cxxtest/TestSuite.h&gt;
-=
-= //
-&lt; // This test suite demonstrates TS_ASSERT_SAME_ATA
-
-&gt; // This test suite demonstrates TS_ASSERT_SAME_//
-
+SameFiles.h:39: Error: Files &apos;UT_Sources/SameFiles.h&apos; and &apos;UT_Sources/SameData.h&apos; differ at line: 4, col: 48
+= [1]: &apos;#include &lt;cxxtest/TestSuite.h&gt;&apos;
+= [2]: &apos;&apos;
+= [3]: &apos;//&apos;
+&lt; [4]: &apos;// This test suite demonstrates TS_ASSERT_SAME_FILES&apos;
+&gt; [4]: &apos;// This test suite demonstrates TS_ASSERT_SAME_DATA&apos;
 </system-out>
 </testcase>
 <testcase classname="TestMessageMacros" name="testMessageMacros" line="10">
@@ -309,9 +301,9 @@ Error: Expected (i == 43), found (42 != 43)
 
 In TestMessageMacros::testMessageMacros:
 Tsm.h:15: Message: String
-Tsm.h:15: Error: Expected (false)to be true, but found it is false
+Tsm.h:15: Error: Expected (false) to be true, but found it is false
 Tsm.h:16: Message: 42
-Tsm.h:16: Error: Expected (false)to be true, but found it is false
+Tsm.h:16: Error: Expected (false) to be true, but found it is false
 Tsm.h:17: Message: String
 Tsm.h:17: Error: Expected (2 + 2 == 5), but found (4 != 5)
 Tsm.h:18: Message: 42

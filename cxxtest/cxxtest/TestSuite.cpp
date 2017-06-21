@@ -452,13 +452,13 @@ bool fileHasExpectedContent(const char* filePath, const std::string& expectedCon
 #if defined(_CXXTEST_HAVE_STD)
 bool sameFiles(const char* file1, const char* file2, std::ostringstream & explanation)
 {
-    std::string ppprev_line;
-    std::string pprev_line;
+    std::string curr_line("[1]: '"); // prefix is for line number
     std::string prev_line;
-    std::string curr_line;
+    std::string pprev_line;
+    std::string ppprev_line;
 
     std::ifstream is1;
-    is1.open(file1);
+    is1.open (file1);
     std::ifstream is2;
     is2.open(file2);
     if (!is1)
@@ -473,8 +473,9 @@ bool sameFiles(const char* file1, const char* file2, std::ostringstream & explan
     }
 
     int nline = 1;
+    int ncol  = 1;
     char c1, c2;
-    while (1)
+    while (true)
     {
         is1.get(c1);
         is2.get(c2);
@@ -486,43 +487,23 @@ bool sameFiles(const char* file1, const char* file2, std::ostringstream & explan
         if (!is1)
         {
             explanation << "File '" << file1 << "' ended before file '" << file2 << "' (line " << nline << ")";
-            explanation << std::endl << "= " << ppprev_line << std::endl << "=  " << pprev_line << std::endl << "= " << prev_line << std::endl << "< " << curr_line;
+
+            // Previous lines context
+            if (nline > 3)  explanation << std::endl << "= " << ppprev_line << "'";
+            if (nline > 2)  explanation << std::endl << "= " << pprev_line  << "'";
+            if (nline > 1)  explanation << std::endl << "= " << prev_line   << "'";
+
+            // Left side file
+            explanation << std::endl << "< " << curr_line;
             is1.get(c1);
             while (is1 && (c1 != '\n'))
             {
                 explanation << c1;
                 is1.get(c1);
             }
-            explanation << std::endl;
-            return false;
-        }
-        if (!is2)
-        {
-            explanation << "File '" << file2 << "' ended before file '" << file1 << "' (line " << nline << ")";
-            explanation << std::endl << "= " << ppprev_line << std::endl << "=  " << pprev_line << std::endl << "= " << prev_line << std::endl << "> " << curr_line;
-            is2.get(c2);
-            while (is2 && (c2 != '\n'))
-            {
-                explanation << c2;
-                is2.get(c2);
-            }
-            explanation << std::endl;
-            return false;
-        }
-        if (c1 != c2)
-        {
-            explanation << "Files '" << file1 << "' and '" << file2 << "' differ at line " << nline;
-            explanation << std::endl << "= " << ppprev_line << std::endl << "=  " << pprev_line << std::endl << "= " << prev_line;
+            explanation << "'";
 
-            explanation << std::endl << "< " << curr_line;
-            is2.get(c1);
-            while (is1 && (c1 != '\n'))
-            {
-                explanation << c1;
-                is2.get(c1);
-            }
-            explanation << std::endl;
-
+            // Right side file
             explanation << std::endl << "> " << curr_line;
             is2.get(c2);
             while (is2 && (c2 != '\n'))
@@ -530,21 +511,90 @@ bool sameFiles(const char* file1, const char* file2, std::ostringstream & explan
                 explanation << c2;
                 is2.get(c2);
             }
-            explanation << std::endl;
+            explanation << "'";
 
             return false;
         }
+
+        if (!is2)
+        {
+            explanation << "File '" << file1 << "' ended after file '" << file2 << "' (line " << nline << ")";
+
+            // Previous lines context
+            if (nline > 3)  explanation << std::endl << "= " << ppprev_line << "'";
+            if (nline > 2)  explanation << std::endl << "= " << pprev_line  << "'";
+            if (nline > 1)  explanation << std::endl << "= " << prev_line   << "'";
+
+            // Left side file
+            explanation << std::endl << "< " << curr_line;
+            is1.get(c1);
+            while (is1 && (c1 != '\n'))
+            {
+                explanation << c1;
+                is1.get(c1);
+            }
+            explanation << "'";
+
+            // Right side file
+            explanation << std::endl << "> " << curr_line;
+            is2.get(c2);
+            while (is2 && (c2 != '\n'))
+            {
+                explanation << c2;
+                is2.get(c2);
+            }
+            explanation << "'";
+
+            return false;
+        }
+
+        if (c1 != c2)
+        {
+            explanation << "Files '" << file1 << "' and '" << file2 << "' differ at line: " << nline << ", col: " << ncol;
+
+            // Previous lines context
+            if (nline > 3)  explanation << std::endl << "= " << ppprev_line << "'";
+            if (nline > 2)  explanation << std::endl << "= " << pprev_line  << "'";
+            if (nline > 1)  explanation << std::endl << "= " << prev_line   << "'";
+
+            // Left side file
+            explanation << std::endl << "< " << curr_line;
+            while (is1 && (c1 != '\n'))
+            {
+                explanation << c1;
+                is1.get(c1);
+            }
+            explanation << "'";
+
+            // Right side file
+            explanation << std::endl << "> " << curr_line;
+            while (is2 && (c2 != '\n'))
+            {
+                explanation << c2;
+                is2.get(c2);
+            }
+            explanation << "'";
+
+            return false;
+        }
+
         if (c1 == '\n')
         {
+            ncol = 1;
+            ++nline;
+
             ppprev_line = pprev_line;
-            pprev_line = prev_line;
-            prev_line = curr_line;
-            curr_line = "";
-            nline++;
+            pprev_line  = prev_line;
+            prev_line   = curr_line;
+
+            std::ostringstream os;
+            os << "[" << nline << "]: '";
+            curr_line = os.str();
         }
         else
         {
             curr_line += c1;
+            ++ncol;
         }
     }
 }

@@ -1,0 +1,5 @@
+1st Line
+2nd Line from resources !!!
+    This is third line
+
+      This is fifth line (after empty 4th one)!

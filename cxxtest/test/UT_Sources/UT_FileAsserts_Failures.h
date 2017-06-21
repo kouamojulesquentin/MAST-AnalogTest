@@ -36,6 +36,11 @@ class UT_FileAsserts_Failures : public CxxTest::TestSuite
 
   // ---------------- TS_ASSERT_SAME_FILES
   //
+  void test_TS_ASSERT_SAME_FILES_Left_LessLines ();
+  void test_TS_ASSERT_SAME_FILES_Left_MoreLines ();
+  void test_TS_ASSERT_SAME_FILES_Differ_at_FirstCol ();
+  void test_TS_ASSERT_SAME_FILES_Differ_at_MiddleCol ();
+  void test_TS_ASSERT_SAME_FILES_Differ_at_LastCol ();
   void test_TS_ASSERT_SAME_FILES_Exception_inside ();
   void test_TS_ASSERT_SAME_FILES_Exception_after ();
   void test_TS_ASSERT_SAME_FILES_Exception_inside_and_after ();

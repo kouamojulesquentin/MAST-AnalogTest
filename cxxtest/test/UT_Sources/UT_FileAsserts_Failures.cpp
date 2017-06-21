@@ -19,13 +19,16 @@
 #include "UT_FileAsserts_Failures.h"
 #include <cxxtest/ValueTraits.h>
 
-#define SAMPLE_FILES_DIR   "UT_Sources/Files_to_compare/"
-#define EMPTY_FILE         SAMPLE_FILES_DIR "Empty.txt"
-#define ONE_LINE_FILE      SAMPLE_FILES_DIR "OneLine.txt"
-#define SMALL_FILE         SAMPLE_FILES_DIR "TwoLines.txt"
-#define SAME_AS_SMALL_FILE SAMPLE_FILES_DIR "TwoLines - Copie.txt"
-#define FIVE_LINES_FILE    SAMPLE_FILES_DIR "FiveLines.txt"
-#define NOT_EXISTING_FILE  SAMPLE_FILES_DIR "!!! Please_delete_this_file_!!!.txt"
+#define SAMPLE_FILES_DIR              "UT_Sources/Files_to_compare/"
+#define EMPTY_FILE                    SAMPLE_FILES_DIR "Empty.txt"
+#define ONE_LINE_FILE                 SAMPLE_FILES_DIR "OneLine.txt"
+#define SMALL_FILE                    SAMPLE_FILES_DIR "TwoLines.txt"
+#define SAME_AS_SMALL_FILE            SAMPLE_FILES_DIR "TwoLines - Copie.txt"
+#define FIVE_LINES_FILE               SAMPLE_FILES_DIR "FiveLines.txt"
+#define FIVE_LINES_FILE_DIFFER_COL_1  SAMPLE_FILES_DIR "FiveLines_Differ_Col_1.txt"
+#define FIVE_LINES_FILE_DIFFER_COL_39 SAMPLE_FILES_DIR "FiveLines_Differ_Col_39.txt"
+#define FIVE_LINES_FILE_DIFFER_COL_47 SAMPLE_FILES_DIR "FiveLines_Differ_Col_47.txt"
+#define NOT_EXISTING_FILE             SAMPLE_FILES_DIR "!!! Please_delete_this_file_!!!.txt"
 
 #define FIVE_LINES_FILE_CONTENT "1st Line\n2nd Line from resources !!!\n    This is third line\n\n      This is fifth line (after empty 4th one)."
 
@@ -47,6 +50,42 @@ UT_FileAsserts_Failures::UT_FileAsserts_Failures ()
 
 UT_FileAsserts_Failures::~UT_FileAsserts_Failures ()
 {
+}
+
+//! Checks that TS_ASSERT_SAME_FILES() lhs file have less lines
+//!
+void UT_FileAsserts_Failures::test_TS_ASSERT_SAME_FILES_Left_LessLines ()
+{
+  TS_ASSERT_SAME_FILES(SMALL_FILE, FIVE_LINES_FILE);
+}
+
+//! Checks that TS_ASSERT_SAME_FILES() lhs file have more lines
+//!
+void UT_FileAsserts_Failures::test_TS_ASSERT_SAME_FILES_Left_MoreLines ()
+{
+  TS_ASSERT_SAME_FILES(FIVE_LINES_FILE, SMALL_FILE);
+}
+
+//! Checks that TS_ASSERT_SAME_FILES() when files differ at col 1
+//!
+void UT_FileAsserts_Failures::test_TS_ASSERT_SAME_FILES_Differ_at_FirstCol ()
+{
+  TS_ASSERT_SAME_FILES(FIVE_LINES_FILE, FIVE_LINES_FILE_DIFFER_COL_1);
+}
+
+
+//! Checks that TS_ASSERT_SAME_FILES() when files differ at col 39
+//!
+void UT_FileAsserts_Failures::test_TS_ASSERT_SAME_FILES_Differ_at_MiddleCol ()
+{
+  TS_ASSERT_SAME_FILES(FIVE_LINES_FILE, FIVE_LINES_FILE_DIFFER_COL_39);
+}
+
+//! Checks that TS_ASSERT_SAME_FILES() when files differ at col 47 (last char)
+//!
+void UT_FileAsserts_Failures::test_TS_ASSERT_SAME_FILES_Differ_at_LastCol ()
+{
+  TS_ASSERT_SAME_FILES(FIVE_LINES_FILE, FIVE_LINES_FILE_DIFFER_COL_47);
 }
 
 

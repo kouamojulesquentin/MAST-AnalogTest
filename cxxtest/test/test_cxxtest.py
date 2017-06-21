@@ -412,8 +412,8 @@ class BaseTestCase(object) :
         """Runs cxxtestgen and compiles the code that is generated along with optional cpp sources"""
         self.init(prefix)
 
-        if compilerOptionalSwitches is None : compilerOptionalSwitches = ""
-
+        # ---------------- Creating runner (using cxxtestgen)
+        #
         allSourcesRelativePath = [] if (self.cxxtest_import) else (' ')
         if hppSources is not None :
             for hppSource in hppSources :
@@ -430,7 +430,7 @@ class BaseTestCase(object) :
         else :
             cmd = join_commands("cd %s" % currentDir,
                             "%s %s%s %s -o %s %s > %s 2>&1" % (sys.executable, currentDir, cxxtestgenDir, self.fog, self.py_cpp, args + allSourcesRelativePath, self.py_out))
-            if verbose : print ("cmd: {0}".format(cmd))
+            if verbose : print ("\nCxxtestgen cmd: {0}".format(cmd))
             status = subprocess.call(cmd, shell = True)
 
         # ---------------- Check if the unit tests main generation was expected to fail
@@ -444,13 +444,17 @@ class BaseTestCase(object) :
 
         if not self.cxxtest_import :
             self.assertEqual(status, 0, 'Error executing command: ' + cmd)
-        #
+
+        # Compiling source files
         if cppSources is None : cppSources = []
         if main : cppSources += ['main.cpp']
 
+        if compilerOptionalSwitches is None : compilerOptionalSwitches = ""
+
         compilerCommand = self.getCompilerCommand(cppSources, haveExceptionHandling, compilerOptionalSwitches)
         cmd = join_commands("cd %s" % currentDir, compilerCommand)
-#+        print ("compilerCommand: {0}".format(compilerCommand))
+        if verbose: print ("\nCompiler command: %s" % compilerCommand)
+
         cppSources = []
         status = subprocess.call(cmd, shell = True)
         if failBuild :
@@ -1320,7 +1324,6 @@ class TestCLFOG(TestCL) :
 if __name__ == '__main__' :
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--verbose', dest = 'verbosity', action = 'store_const', const = 0, help = 'Verbose output')
-#+    parser.add_argument('files', nargs = '+')
     parser.add_argument('files', nargs = argparse.REMAINDER)
     param = parser.parse_args()
     unittest.main()

@@ -469,6 +469,40 @@ void UT_Asserts_Failures::test_ASSERT_CONTAINS_CharArray ()
 }
 
 
+
+//! Runs TS_ASSERT_CONTAINS with char[] and C-Style string
+//!
+void UT_Asserts_Failures::test_ASSERT_CONTAINS_CharArray_C_String ()
+{
+    // ---------------- Setup
+    //
+    const char  text[] = "I'm a char[]";
+    const char* sub    = "I'm a const char*";
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_CONTAINS(text, sub);
+}
+
+
+
+//! Runs TS_ASSERT_CONTAINS with char[] and std::string
+//!
+void UT_Asserts_Failures::test_ASSERT_CONTAINS_CharArray_StdString ()
+{
+    // ---------------- Setup
+    //
+    const char text[] = "I'm a char[]";
+    string     sub    = "I'm a std::string";
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_CONTAINS(text, sub);
+}
+
+
+
+
 //! Runs TS_ASSERT_CONTAINS with C-Style string, when it does not contain
 //!
 void UT_Asserts_Failures::test_ASSERT_CONTAINS_C_String ()
@@ -574,6 +608,49 @@ void UT_Asserts_Failures::test_ASSERT_CONTAINS_C_String_Empty_lr ()
 }
 
 
+//! Runs TS_ASSERT_CONTAINS with C-Style string and char[]
+//!
+void UT_Asserts_Failures::test_ASSERT_CONTAINS_C_String_CharArray ()
+{
+    // ---------------- Setup
+    //
+    const char* text  = "I'm a C-Style string";
+    const char  sub[] = "I'm a char[]";
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_CONTAINS(text, sub);
+}
+
+
+//! Runs TS_ASSERT_CONTAINS with C-Style string and std::string
+//!
+void UT_Asserts_Failures::test_ASSERT_CONTAINS_C_String_StdString ()
+{
+    // ---------------- Setup
+    //
+    const char* text = "I'm a C-Style string";
+    string sub       = "I'm a std::string";
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_CONTAINS(text, sub);
+}
+
+//! Runs TS_ASSERT_CONTAINS with C-Style string nullptr "container" and std::string
+//!
+void UT_Asserts_Failures::test_ASSERT_CONTAINS_Null_C_String_String ()
+{
+    // ---------------- Setup
+    //
+    const char* text = NULL;
+    string      sub ("sub");
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_CONTAINS(text, sub);
+}
+
 
 
 //! Runs TS_ASSERT_CONTAINS with std::string, when it does not contain
@@ -657,8 +734,8 @@ void UT_Asserts_Failures::test_ASSERT_CONTAINS_String_Null_C_String ()
 {
     // ---------------- Setup
     //
-    string      text ("I'm string");
-    const char* sub = NULL;
+    string text ("I'm string");
+    char*  sub  = NULL;
 
     // ---------------- Exercise & Verify
     //
@@ -666,14 +743,14 @@ void UT_Asserts_Failures::test_ASSERT_CONTAINS_String_Null_C_String ()
 }
 
 
-//! Runs TS_ASSERT_CONTAINS with C-Style string nullptr "container" and std::string
+//! Runs TS_ASSERT_CONTAINS with std::string "container" and char[]
 //!
-void UT_Asserts_Failures::test_ASSERT_CONTAINS_Null_C_String_String ()
+void UT_Asserts_Failures::test_ASSERT_CONTAINS_String_CharArray ()
 {
     // ---------------- Setup
     //
-    const char* text = NULL;
-    string      sub ("sub");
+    string text ("I'm string");
+    const char sub[]  = "cat";
 
     // ---------------- Exercise & Verify
     //
@@ -682,9 +759,10 @@ void UT_Asserts_Failures::test_ASSERT_CONTAINS_Null_C_String_String ()
 
 
 
-//! Runs TS_ASSERT_CONTAINS with std::vector, when it does not contain
+
+//! Runs TS_ASSERT_CONTAINS with std::vector<int>, when it does not contain
 //!
-void UT_Asserts_Failures::test_ASSERT_CONTAINS_Vector ()
+void UT_Asserts_Failures::test_ASSERT_CONTAINS_Vector_int ()
 {
     // ---------------- Setup
     //
@@ -699,6 +777,26 @@ void UT_Asserts_Failures::test_ASSERT_CONTAINS_Vector ()
     //
     TS_ASSERT_CONTAINS(container, value);
 }
+
+
+//! Runs TS_ASSERT_CONTAINS with std::vector<int>, when it does not contain
+//!
+void UT_Asserts_Failures::test_ASSERT_CONTAINS_Vector_stdString ()
+{
+    // ---------------- Setup
+    //
+    vector<string> container;
+    container.push_back("One");
+    container.push_back("Two");
+    container.push_back("Three");
+
+    string value("Four");
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_CONTAINS(container, value);
+}
+
 
 
 //! Runs TS_ASSERT_CONTAINS with std::vector, when it is empty

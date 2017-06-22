@@ -146,7 +146,7 @@ class CountAssertDisabler
 template<typename T>
 inline bool isNullptr(const T&)     { return false; } // Not a pointer ==> cannot be nullptr
 template<typename T>
-inline bool isNullptr(const T* ptr) { return ptr == NULL; }
+inline bool isNullptr(const T* ptr) { return !ptr; }
 
 template<class X, class Y>
 inline bool areEqual(const X& x, const Y& y)
@@ -536,7 +536,7 @@ inline bool contains(const CXXTEST_STD(map)<K, V>& container, const K& key)
   return container.find(key) != container.end();
 }
 
-
+// std::string have a specific find method
 inline bool contains(const CXXTEST_STD(string)& str, const CXXTEST_STD(string)& sub)
 {
   if (str.empty() || sub.empty())
@@ -546,30 +546,18 @@ inline bool contains(const CXXTEST_STD(string)& str, const CXXTEST_STD(string)& 
   return str.find(sub) != std::string::npos;
 }
 
-
-template<typename T>
-inline bool contains(const CXXTEST_STD(string)& str, const T& value)
+// Must manage specifically char* (must not be converted to string if nullptr)
+inline bool contains(const CXXTEST_STD(string)& str, const char* const pSub)
 {
-  if (isNullptr(value))
+  if (str.empty() || !pSub || (pSub[0] == '\0'))
   {
     return false;
   }
 
-  return contains(str, CXXTEST_STD(string)(value));
+  return ::strstr(str.data(), pSub);
 }
 
-template<typename T>
-inline bool contains(const T& str, const CXXTEST_STD(string)& sub)
-{
-  if (isNullptr(str))
-  {
-    return false;
-  }
-
-  return contains(CXXTEST_STD(string)(str), sub);
-}
-
-
+// Must manage specifically char* (must not be converted to string if nullptr)
 inline bool contains(const char* pStr, const char* pStrSub)
 {
   if (   !pStr
@@ -584,9 +572,11 @@ inline bool contains(const char* pStr, const char* pStrSub)
   return ::strstr(pStr, pStrSub);
 }
 
-template<size_t N1, size_t N2>
-inline bool contains(const char pStr[N1], const char pStrSub[N2]) { return contains(static_cast<const char*>(pStr), static_cast<const char*>(pStrSub)); }
-inline bool contains(char*      pStr,     char*      pStrSub)     { return contains(static_cast<const char*>(pStr), static_cast<const char*>(pStrSub)); }
+inline bool contains(const CXXTEST_STD(string)& str, char* const pSub) { return contains(str, static_cast<const char*>(pSub)); }
+template<size_t N1, typename T>
+inline bool contains(const char  pStr[N1], const T& sub) { return contains(static_cast<const char*>(pStr), TS_AS_STRING(sub)); }
+template<typename T>
+inline bool contains(const char* pStr,     const T& sub) { return contains(static_cast<const char*>(pStr), TS_AS_STRING(sub)); }
 
 template<typename T, typename U>
 void doAssertContains (const char* file,          int      line,

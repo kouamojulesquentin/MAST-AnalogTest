@@ -1,4 +1,4 @@
-Running UT_Asserts_Failures tests (80 tests)
+Running UT_Asserts_Failures tests (86 tests)
 
 
 In UT_Asserts_Failures::test_ASSERT:
@@ -108,61 +108,84 @@ UT_Asserts_Failures.cpp:453: Error: Expected (emptyMap) to be not empty, but fou
 In UT_Asserts_Failures::test_ASSERT_CONTAINS_CharArray:
 UT_Asserts_Failures.cpp:468: Error: Expected (text) to contain (sub), but found "I'm a char[]" does not contain "cat"
 
+In UT_Asserts_Failures::test_ASSERT_CONTAINS_CharArray_C_String:
+UT_Asserts_Failures.cpp:484: Error: Expected (text) to contain (sub), but found "I'm a char[]" does not contain "I'm a const char*"
+
+In UT_Asserts_Failures::test_ASSERT_CONTAINS_CharArray_StdString:
+UT_Asserts_Failures.cpp:500: Error: Expected (text) to contain (sub), but found "I'm a char[]" does not contain "I\'m a std::string"
+
 In UT_Asserts_Failures::test_ASSERT_CONTAINS_C_String:
-UT_Asserts_Failures.cpp:483: Error: Expected (text) to contain (sub), but found "I'm not a C-Style string" does not contain "sub"
+UT_Asserts_Failures.cpp:517: Error: Expected (text) to contain (sub), but found "I'm not a C-Style string" does not contain "sub"
 
 In UT_Asserts_Failures::test_ASSERT_CONTAINS_C_String_NullPtr_l:
-UT_Asserts_Failures.cpp:498: Error: Expected (text) to contain (sub), but found NULL does not contain "sub"
+UT_Asserts_Failures.cpp:532: Error: Expected (text) to contain (sub), but found NULL does not contain "sub"
 
 In UT_Asserts_Failures::test_ASSERT_CONTAINS_C_String_NullPtr_r:
-UT_Asserts_Failures.cpp:513: Error: Expected (text) to contain (sub), but found "I'm not a C-Style string" does not contain NULL
+UT_Asserts_Failures.cpp:547: Error: Expected (text) to contain (sub), but found "I'm not a C-Style string" does not contain NULL
 
 In UT_Asserts_Failures::test_ASSERT_CONTAINS_C_String_NullPtr_lr:
-UT_Asserts_Failures.cpp:528: Error: Expected (text) to contain (sub), but found NULL does not contain NULL
+UT_Asserts_Failures.cpp:562: Error: Expected (text) to contain (sub), but found NULL does not contain NULL
 
 In UT_Asserts_Failures::test_ASSERT_CONTAINS_C_String_Empty_l:
-UT_Asserts_Failures.cpp:543: Error: Expected (text) to contain (sub), but found "" does not contain "sub"
+UT_Asserts_Failures.cpp:577: Error: Expected (text) to contain (sub), but found "" does not contain "sub"
 
 In UT_Asserts_Failures::test_ASSERT_CONTAINS_C_String_Empty_r:
-UT_Asserts_Failures.cpp:558: Error: Expected (text) to contain (sub), but found "I'm not a C-Style string" does not contain ""
+UT_Asserts_Failures.cpp:592: Error: Expected (text) to contain (sub), but found "I'm not a C-Style string" does not contain ""
 
 In UT_Asserts_Failures::test_ASSERT_CONTAINS_C_String_Empty_lr:
-UT_Asserts_Failures.cpp:573: Error: Expected (text) to contain (sub), but found "" does not contain ""
+UT_Asserts_Failures.cpp:607: Error: Expected (text) to contain (sub), but found "" does not contain ""
 
-In UT_Asserts_Failures::test_ASSERT_CONTAINS_String:
-UT_Asserts_Failures.cpp:590: Error: Expected (text) to contain (sub), but found "I\'m string" does not contain "spring"
+In UT_Asserts_Failures::test_ASSERT_CONTAINS_C_String_CharArray:
+UT_Asserts_Failures.cpp:622: Error: Expected (text) to contain (sub), but found "I'm a C-Style string" does not contain "I'm a char[]"
 
-In UT_Asserts_Failures::test_ASSERT_CONTAINS_String_Empty_l:
-UT_Asserts_Failures.cpp:605: Error: Expected (text) to contain (sub), but found "" does not contain "spring"
-
-In UT_Asserts_Failures::test_ASSERT_CONTAINS_String_Empty_r:
-UT_Asserts_Failures.cpp:620: Error: Expected (text) to contain (sub), but found "I\'m string" does not contain ""
-
-In UT_Asserts_Failures::test_ASSERT_CONTAINS_String_Empty_lr:
-UT_Asserts_Failures.cpp:635: Error: Expected (text) to contain (sub), but found "" does not contain ""
-
-In UT_Asserts_Failures::test_ASSERT_CONTAINS_String_C_String:
-UT_Asserts_Failures.cpp:650: Error: Expected (text) to contain (sub), but found "I\'m string" does not contain "sub"
-
-In UT_Asserts_Failures::test_ASSERT_CONTAINS_String_Null_C_String:
-UT_Asserts_Failures.cpp:665: Error: Expected (text) to contain (sub), but found "I\'m string" does not contain NULL
+In UT_Asserts_Failures::test_ASSERT_CONTAINS_C_String_StdString:
+UT_Asserts_Failures.cpp:637: Error: Expected (text) to contain (sub), but found "I'm a C-Style string" does not contain "I\'m a std::string"
 
 In UT_Asserts_Failures::test_ASSERT_CONTAINS_Null_C_String_String:
-UT_Asserts_Failures.cpp:680: Error: Expected (text) to contain (sub), but found NULL does not contain "sub"
+UT_Asserts_Failures.cpp:651: Error: Expected (text) to contain (sub), but found NULL does not contain "sub"
 
-In UT_Asserts_Failures::test_ASSERT_CONTAINS_Vector:
-UT_Asserts_Failures.cpp:700: Error: Expected (container) to contain (value), but found {
+In UT_Asserts_Failures::test_ASSERT_CONTAINS_String:
+UT_Asserts_Failures.cpp:667: Error: Expected (text) to contain (sub), but found "I\'m string" does not contain "spring"
+
+In UT_Asserts_Failures::test_ASSERT_CONTAINS_String_Empty_l:
+UT_Asserts_Failures.cpp:682: Error: Expected (text) to contain (sub), but found "" does not contain "spring"
+
+In UT_Asserts_Failures::test_ASSERT_CONTAINS_String_Empty_r:
+UT_Asserts_Failures.cpp:697: Error: Expected (text) to contain (sub), but found "I\'m string" does not contain ""
+
+In UT_Asserts_Failures::test_ASSERT_CONTAINS_String_Empty_lr:
+UT_Asserts_Failures.cpp:712: Error: Expected (text) to contain (sub), but found "" does not contain ""
+
+In UT_Asserts_Failures::test_ASSERT_CONTAINS_String_C_String:
+UT_Asserts_Failures.cpp:727: Error: Expected (text) to contain (sub), but found "I\'m string" does not contain "sub"
+
+In UT_Asserts_Failures::test_ASSERT_CONTAINS_String_Null_C_String:
+UT_Asserts_Failures.cpp:742: Error: Expected (text) to contain (sub), but found "I\'m string" does not contain NULL
+
+In UT_Asserts_Failures::test_ASSERT_CONTAINS_String_CharArray:
+UT_Asserts_Failures.cpp:757: Error: Expected (text) to contain (sub), but found "I\'m string" does not contain "cat"
+
+In UT_Asserts_Failures::test_ASSERT_CONTAINS_Vector_int:
+UT_Asserts_Failures.cpp:778: Error: Expected (container) to contain (value), but found {
 3,
 2,
 1,
 }
 does not contain 15
 
+In UT_Asserts_Failures::test_ASSERT_CONTAINS_Vector_stdString:
+UT_Asserts_Failures.cpp:797: Error: Expected (container) to contain (value), but found {
+"One",
+"Two",
+"Three",
+}
+does not contain "Four"
+
 In UT_Asserts_Failures::test_ASSERT_CONTAINS_Vector_Empty:
-UT_Asserts_Failures.cpp:716: Error: Expected (container) to contain (value), but found {} does not contain 15
+UT_Asserts_Failures.cpp:814: Error: Expected (container) to contain (value), but found {} does not contain 15
 
 In UT_Asserts_Failures::test_ASSERT_CONTAINS_Map_key:
-UT_Asserts_Failures.cpp:736: Error: Expected (container) to contain (key), but found {
+UT_Asserts_Failures.cpp:834: Error: Expected (container) to contain (key), but found {
 <3, "Hello">,
 <21, "World">,
 <99, "Foo">,
@@ -170,7 +193,7 @@ UT_Asserts_Failures.cpp:736: Error: Expected (container) to contain (key), but f
 does not contain 15
 
 In UT_Asserts_Failures::test_ASSERT_CONTAINS_Map_key_value:
-UT_Asserts_Failures.cpp:755: Error: Expected (container) to contain (key_value), but found {
+UT_Asserts_Failures.cpp:853: Error: Expected (container) to contain (key_value), but found {
 <3, "Hello">,
 <21, "World">,
 <99, "Foo">,
@@ -178,16 +201,16 @@ UT_Asserts_Failures.cpp:755: Error: Expected (container) to contain (key_value),
 does not contain <99, "bar">
 
 In UT_Asserts_Failures::test_ASSERT_NOT_CONTAINS_CharArray:
-UT_Asserts_Failures.cpp:770: Error: Expected (text) to not contain (sub), but found "I'm a char[]" contains "char"
+UT_Asserts_Failures.cpp:868: Error: Expected (text) to not contain (sub), but found "I'm a char[]" contains "char"
 
 In UT_Asserts_Failures::test_ASSERT_NOT_CONTAINS_C_String:
-UT_Asserts_Failures.cpp:785: Error: Expected (text) to not contain (sub), but found "I'm not a C-Style string" contains "C-Style"
+UT_Asserts_Failures.cpp:883: Error: Expected (text) to not contain (sub), but found "I'm not a C-Style string" contains "C-Style"
 
 In UT_Asserts_Failures::test_ASSERT_NOT_CONTAINS_String:
-UT_Asserts_Failures.cpp:800: Error: Expected (text) to not contain (sub), but found "I\'m string" contains "string"
+UT_Asserts_Failures.cpp:898: Error: Expected (text) to not contain (sub), but found "I\'m string" contains "string"
 
 In UT_Asserts_Failures::test_ASSERT_NOT_CONTAINS_Vector:
-UT_Asserts_Failures.cpp:818: Error: Expected (container) to not contain (value), but found {
+UT_Asserts_Failures.cpp:916: Error: Expected (container) to not contain (value), but found {
 3,
 2,
 1,
@@ -195,7 +218,7 @@ UT_Asserts_Failures.cpp:818: Error: Expected (container) to not contain (value),
 contains 2
 
 In UT_Asserts_Failures::test_ASSERT_NOT_CONTAINS_Map_key:
-UT_Asserts_Failures.cpp:837: Error: Expected (container) to not contain (key), but found {
+UT_Asserts_Failures.cpp:935: Error: Expected (container) to not contain (key), but found {
 <3, "Hello">,
 <21, "World">,
 <99, "Foo">,
@@ -203,7 +226,7 @@ UT_Asserts_Failures.cpp:837: Error: Expected (container) to not contain (key), b
 contains 99
 
 In UT_Asserts_Failures::test_ASSERT_NOT_CONTAINS_Map_key_value:
-UT_Asserts_Failures.cpp:856: Error: Expected (container) to not contain (key_value), but found {
+UT_Asserts_Failures.cpp:954: Error: Expected (container) to not contain (key_value), but found {
 <3, "Hello">,
 <21, "World">,
 <99, "Foo">,
@@ -211,106 +234,106 @@ UT_Asserts_Failures.cpp:856: Error: Expected (container) to not contain (key_val
 contains <3, "Hello">
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE:
-UT_Asserts_Failures.cpp:868: Message: This is assertion message for TSM_ASSERT
-UT_Asserts_Failures.cpp:868: Error: Expected (incrementIntCounter() == value) to be true, but found it is false
+UT_Asserts_Failures.cpp:966: Message: This is assertion message for TSM_ASSERT
+UT_Asserts_Failures.cpp:966: Error: Expected (incrementIntCounter() == value) to be true, but found it is false
 
 In UT_Asserts_Failures::test_ASSERT_FALSE_MESSAGE:
-UT_Asserts_Failures.cpp:878: Message: This is assertion message for TSM_ASSERT_FALSE
-UT_Asserts_Failures.cpp:878: Error: Expected (incrementIntCounter() == value) to be false, but found it is true
+UT_Asserts_Failures.cpp:976: Message: This is assertion message for TSM_ASSERT_FALSE
+UT_Asserts_Failures.cpp:976: Error: Expected (incrementIntCounter() == value) to be false, but found it is true
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_EQUALS:
-UT_Asserts_Failures.cpp:888: Message: This is assertion message for TSM_ASSERT_EQUALS
-UT_Asserts_Failures.cpp:888: Error: Expected (incrementIntCounter() == value), but found (1 != 0)
+UT_Asserts_Failures.cpp:986: Message: This is assertion message for TSM_ASSERT_EQUALS
+UT_Asserts_Failures.cpp:986: Error: Expected (incrementIntCounter() == value), but found (1 != 0)
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_EQUALS_CString:
-UT_Asserts_Failures.cpp:895: Message: This is assertion message for TSM_ASSERT_EQUALS
-UT_Asserts_Failures.cpp:895: Error: Expected ("How are you?" == "How are you."), but found ("How are you?" != "How are you.")
+UT_Asserts_Failures.cpp:993: Message: This is assertion message for TSM_ASSERT_EQUALS
+UT_Asserts_Failures.cpp:993: Error: Expected ("How are you?" == "How are you."), but found ("How are you?" != "How are you.")
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_EQUALS_AUTO_Value:
-UT_Asserts_Failures.cpp:904: Message: This is assertion message for TSMA_ASSERT_EQUALS
-UT_Asserts_Failures.cpp:904: Error: Expected (incrementIntCounter() == value), but found (1 != 0)
+UT_Asserts_Failures.cpp:1002: Message: This is assertion message for TSMA_ASSERT_EQUALS
+UT_Asserts_Failures.cpp:1002: Error: Expected (incrementIntCounter() == value), but found (1 != 0)
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_EQUALS_AUTO_Pointer:
-UT_Asserts_Failures.cpp:914: Message: This is assertion message for TSMA_ASSERT_EQUALS with pointers
-UT_Asserts_Failures.cpp:914: Error: Expected (&value_a == &value_b) to be true, but found it is false
+UT_Asserts_Failures.cpp:1012: Message: This is assertion message for TSMA_ASSERT_EQUALS with pointers
+UT_Asserts_Failures.cpp:1012: Error: Expected (&value_a == &value_b) to be true, but found it is false
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_DIFFERS:
-UT_Asserts_Failures.cpp:924: Message: This is assertion message for TSM_ASSERT_DIFFERS
-UT_Asserts_Failures.cpp:924: Error: Expected (incrementIntCounter() != value), but found (1 == 1)
+UT_Asserts_Failures.cpp:1022: Message: This is assertion message for TSM_ASSERT_DIFFERS
+UT_Asserts_Failures.cpp:1022: Error: Expected (incrementIntCounter() != value), but found (1 == 1)
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_GREATER_THAN_Equal:
-UT_Asserts_Failures.cpp:933: Message: This is assertion message for TSM_ASSERT_GREATER_THAN
-UT_Asserts_Failures.cpp:933: Error: Expected (incrementIntCounter() > value), but found (1 <= 1)
+UT_Asserts_Failures.cpp:1031: Message: This is assertion message for TSM_ASSERT_GREATER_THAN
+UT_Asserts_Failures.cpp:1031: Error: Expected (incrementIntCounter() > value), but found (1 <= 1)
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_GREATER_THAN_EQUAL_GreaterThan:
-UT_Asserts_Failures.cpp:942: Message: This is assertion message for TSM_ASSERT_GREATER_THAN_EQUALS
-UT_Asserts_Failures.cpp:942: Error: Expected (incrementIntCounter() >= value), but found (1 < 9)
+UT_Asserts_Failures.cpp:1040: Message: This is assertion message for TSM_ASSERT_GREATER_THAN_EQUALS
+UT_Asserts_Failures.cpp:1040: Error: Expected (incrementIntCounter() >= value), but found (1 < 9)
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_LESS_THAN_Equal:
-UT_Asserts_Failures.cpp:952: Message: This is assertion message for TSM_ASSERT_LESS_THAN
-UT_Asserts_Failures.cpp:952: Error: Expected (incrementIntCounter() < value), but found (1 >= 1)
+UT_Asserts_Failures.cpp:1050: Message: This is assertion message for TSM_ASSERT_LESS_THAN
+UT_Asserts_Failures.cpp:1050: Error: Expected (incrementIntCounter() < value), but found (1 >= 1)
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_LESS_THAN_EQUAL_GreaterThan:
-UT_Asserts_Failures.cpp:961: Message: This is assertion message for TSM_ASSERT_LESS_THAN_EQUALS
-UT_Asserts_Failures.cpp:961: Error: Expected (incrementIntCounter() <= value), but found (1 > 0)
+UT_Asserts_Failures.cpp:1059: Message: This is assertion message for TSM_ASSERT_LESS_THAN_EQUALS
+UT_Asserts_Failures.cpp:1059: Error: Expected (incrementIntCounter() <= value), but found (1 > 0)
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_DELTA:
-UT_Asserts_Failures.cpp:971: Message: This is assertion message for TSM_ASSERT_DELTA
-UT_Asserts_Failures.cpp:971: Error: Expected (sqrt(4.0) == expectedValue) within delta: (expectedTolerance), but found (2.0 != 2.0099999904632568) and delta = 0.0000999999974737
+UT_Asserts_Failures.cpp:1069: Message: This is assertion message for TSM_ASSERT_DELTA
+UT_Asserts_Failures.cpp:1069: Error: Expected (sqrt(4.0) == expectedValue) within delta: (expectedTolerance), but found (2.0 != 2.0099999904632568) and delta = 0.0000999999974737
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_PREDICATE:
-UT_Asserts_Failures.cpp:982: Message: This is assertion message for TSM_ASSERT_PREDICATE
-UT_Asserts_Failures.cpp:982: Error: Expected IsOddPredicate()(value) to be true, but found IsOddPredicate()(28) is false
+UT_Asserts_Failures.cpp:1080: Message: This is assertion message for TSM_ASSERT_PREDICATE
+UT_Asserts_Failures.cpp:1080: Error: Expected IsOddPredicate()(value) to be true, but found IsOddPredicate()(28) is false
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_RELATION:
-UT_Asserts_Failures.cpp:992: Message: This is assertion message for TSM_ASSERT_RELATION
-UT_Asserts_Failures.cpp:992: Error: Expected AreEqualRelation()(lhs, rhs) to be true, but found AreEqualRelation()(1000, 1001) is false
+UT_Asserts_Failures.cpp:1090: Message: This is assertion message for TSM_ASSERT_RELATION
+UT_Asserts_Failures.cpp:1090: Error: Expected AreEqualRelation()(lhs, rhs) to be true, but found AreEqualRelation()(1000, 1001) is false
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_SAME_DATA:
-UT_Asserts_Failures.cpp:1006: Message: This is assertion message for TSM_ASSERT_SAME_DATA
-UT_Asserts_Failures.cpp:1006: Error: Expected first (sizeof(lhs))  (9) bytes to be equal at (lhs)  and (rhs),
+UT_Asserts_Failures.cpp:1104: Message: This is assertion message for TSM_ASSERT_SAME_DATA
+UT_Asserts_Failures.cpp:1104: Error: Expected first (sizeof(lhs))  (9) bytes to be equal at (lhs)  and (rhs),
 But found:
 { 4C 61 7A 79 20 64 6F 67 00 }
 Differing from:
 { 4C 61 64 79 20 64 6F 67 00 }
 
 In UT_Asserts_Failures::test_ASSERT_THROWS:
-UT_Asserts_Failures.cpp:1014: Error: Expected (incrementIntCounter()) to throw (std::exception), but found it didn't throw
+UT_Asserts_Failures.cpp:1112: Error: Expected (incrementIntCounter()) to throw (std::exception), but found it didn't throw
 
 In UT_Asserts_Failures::test_ASSERT_THROWS_ANYTHING:
-UT_Asserts_Failures.cpp:1021: Error: Expected (incrementIntCounter())to throw anything, but found it did not throw
+UT_Asserts_Failures.cpp:1119: Error: Expected (incrementIntCounter())to throw anything, but found it did not throw
 
 In UT_Asserts_Failures::test_ASSERT_THROWS_NOTHING:
-UT_Asserts_Failures.cpp:1029: Error: Expected (throwException()) not to throw, but found it did throw
+UT_Asserts_Failures.cpp:1127: Error: Expected (throwException()) not to throw, but found it did throw
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_THROWS:
-UT_Asserts_Failures.cpp:1036: Message: This is assertion message for TSM_ASSERT_THROWS
-UT_Asserts_Failures.cpp:1036: Error: Expected (incrementIntCounter()) to throw (std::exception), but found it didn't throw
+UT_Asserts_Failures.cpp:1134: Message: This is assertion message for TSM_ASSERT_THROWS
+UT_Asserts_Failures.cpp:1134: Error: Expected (incrementIntCounter()) to throw (std::exception), but found it didn't throw
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_THROWS_ANYTHING:
-UT_Asserts_Failures.cpp:1043: Message: This is assertion message for TSM_ASSERT_THROWS_ANYTHING
-UT_Asserts_Failures.cpp:1043: Error: Expected (incrementIntCounter())to throw anything, but found it did not throw
+UT_Asserts_Failures.cpp:1141: Message: This is assertion message for TSM_ASSERT_THROWS_ANYTHING
+UT_Asserts_Failures.cpp:1141: Error: Expected (incrementIntCounter())to throw anything, but found it did not throw
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_THROWS_NOTHING:
-UT_Asserts_Failures.cpp:1051: Message: This is assertion message for TSM_ASSERT_THROWS_NOTHING
-UT_Asserts_Failures.cpp:1051: Error: Expected (throwException()) not to throw, but found it did throw
+UT_Asserts_Failures.cpp:1149: Message: This is assertion message for TSM_ASSERT_THROWS_NOTHING
+UT_Asserts_Failures.cpp:1149: Error: Expected (throwException()) not to throw, but found it did throw
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_EMPTY:
-UT_Asserts_Failures.cpp:1064: Message: This is assertion message for TSM_ASSERT_EMPTY
-UT_Asserts_Failures.cpp:1064: Error: Expected (notEmptyC_String) to be empty, but found it contains: "I'm not an empty C-Style string"
+UT_Asserts_Failures.cpp:1162: Message: This is assertion message for TSM_ASSERT_EMPTY
+UT_Asserts_Failures.cpp:1162: Error: Expected (notEmptyC_String) to be empty, but found it contains: "I'm not an empty C-Style string"
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_NOT_EMPTY:
-UT_Asserts_Failures.cpp:1078: Message: This is assertion message for TSM_ASSERT_NOT_EMPTY
-UT_Asserts_Failures.cpp:1078: Error: Expected (emptyC_String) to be not empty, but found it is empty
+UT_Asserts_Failures.cpp:1176: Message: This is assertion message for TSM_ASSERT_NOT_EMPTY
+UT_Asserts_Failures.cpp:1176: Error: Expected (emptyC_String) to be not empty, but found it is empty
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_CONTAINS:
-UT_Asserts_Failures.cpp:1093: Message: This is assertion message for TSM_ASSERT_CONTAINS
-UT_Asserts_Failures.cpp:1093: Error: Expected (text) to contain (sub), but found "I\'m string" does not contain "spring"
+UT_Asserts_Failures.cpp:1191: Message: This is assertion message for TSM_ASSERT_CONTAINS
+UT_Asserts_Failures.cpp:1191: Error: Expected (text) to contain (sub), but found "I\'m string" does not contain "spring"
 
 In UT_Asserts_Failures::test_ASSERT_MESSAGE_NOT_CONTAINS:
-UT_Asserts_Failures.cpp:1108: Message: This is assertion message for TSM_ASSERT_NOT_CONTAINS
-UT_Asserts_Failures.cpp:1108: Error: Expected (text) to not contain (sub), but found "I\'m string" contains "string"
+UT_Asserts_Failures.cpp:1206: Message: This is assertion message for TSM_ASSERT_NOT_CONTAINS
+UT_Asserts_Failures.cpp:1206: Error: Expected (text) to not contain (sub), but found "I\'m string" contains "string"
 
-Failed 80 and Skipped 0 of 80 tests
+Failed 86 and Skipped 0 of 86 tests
 Success rate: 0%
-Error level = 80
+Error level = 86

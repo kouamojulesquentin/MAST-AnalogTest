@@ -450,29 +450,35 @@ bool fileHasExpectedContent(const char* filePath, const std::string& expectedCon
 
 
 #if defined(_CXXTEST_HAVE_STD)
+//! Compare two ascii files
+//!
+//! @note Support Windows/Linux files comparison
 bool sameFiles(const char* file1, const char* file2, std::ostringstream & explanation)
 {
-    std::string curr_line("[1]: '"); // prefix is for line number
-    std::string prev_line;
-    std::string pprev_line;
-    std::string ppprev_line;
-
+    // ---------------- Check files exist
+    //
     std::ifstream is1;
     is1.open (file1);
-    std::ifstream is2;
-    is2.open(file2);
     if (!is1)
     {
         explanation << "File '" << file1 << "' does not exist!";
         return false;
     }
+
+    std::ifstream is2;
+    is2.open(file2);
     if (!is2)
     {
         explanation << "File '" << file2 << "' does not exist!";
         return false;
     }
 
+    // ---------------- Do compare files line by line
+    //
     int nline = 1;
+    std::string prev_line;
+    std::string pprev_line;
+    std::string ppprev_line;
     std::string line1;
     std::string line2;
     while (true)
@@ -521,6 +527,8 @@ bool sameFiles(const char* file1, const char* file2, std::ostringstream & explan
             return false;
         }
 
+        // ---------------- Ignore Windows \r at end of line (when run on Linux)
+        //
         size_t length1 = line1.size();
         if ((length1 != 0) && (line1[length1 -1u] == '\r'))
         {
@@ -535,6 +543,8 @@ bool sameFiles(const char* file1, const char* file2, std::ostringstream & explan
 
         if (line1 != line2)
         {
+            // ---------------- Find difference position
+            //
             int ncol = 1;
             int maxCompareCol = std::min(line1.size(), line2.size());
             while (ncol <= maxCompareCol)
@@ -546,8 +556,8 @@ bool sameFiles(const char* file1, const char* file2, std::ostringstream & explan
               ++ncol;
             }
 
-            //+ Todo (JFC) (June/21/2017) : find column of difference !!!!
-            //+
+            // ---------------- Make report
+            //
             explanation << "Files '" << file1 << "' and '" << file2 << "' differ at line: " << nline << ", col: " << ncol;
 
             // Previous lines context
@@ -564,8 +574,9 @@ bool sameFiles(const char* file1, const char* file2, std::ostringstream & explan
             return false;
         }
 
+        // ---------------- Update rolling context
+        //
         ++nline;
-
         ppprev_line = pprev_line;
         pprev_line  = prev_line;
         prev_line   = line1;

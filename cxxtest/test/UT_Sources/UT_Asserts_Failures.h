@@ -67,6 +67,8 @@ class UT_Asserts_Failures : public CxxTest::TestSuite
     void test_ASSERT_NOT_EMPTY_Map ();
 
     void test_ASSERT_CONTAINS_CharArray ();
+    void test_ASSERT_CONTAINS_CharArray_C_String ();
+    void test_ASSERT_CONTAINS_CharArray_StdString ();
     void test_ASSERT_CONTAINS_C_String ();
     void test_ASSERT_CONTAINS_C_String_NullPtr_l ();
     void test_ASSERT_CONTAINS_C_String_NullPtr_r ();
@@ -74,14 +76,18 @@ class UT_Asserts_Failures : public CxxTest::TestSuite
     void test_ASSERT_CONTAINS_C_String_Empty_l ();
     void test_ASSERT_CONTAINS_C_String_Empty_r ();
     void test_ASSERT_CONTAINS_C_String_Empty_lr ();
+    void test_ASSERT_CONTAINS_C_String_CharArray ();
+    void test_ASSERT_CONTAINS_C_String_StdString ();
+    void test_ASSERT_CONTAINS_Null_C_String_String ();
     void test_ASSERT_CONTAINS_String ();
     void test_ASSERT_CONTAINS_String_Empty_l ();
     void test_ASSERT_CONTAINS_String_Empty_r ();
     void test_ASSERT_CONTAINS_String_Empty_lr ();
     void test_ASSERT_CONTAINS_String_C_String ();
     void test_ASSERT_CONTAINS_String_Null_C_String ();
-    void test_ASSERT_CONTAINS_Null_C_String_String ();
-    void test_ASSERT_CONTAINS_Vector ();
+    void test_ASSERT_CONTAINS_String_CharArray ();
+    void test_ASSERT_CONTAINS_Vector_int ();
+    void test_ASSERT_CONTAINS_Vector_stdString ();
     void test_ASSERT_CONTAINS_Vector_Empty ();
     void test_ASSERT_CONTAINS_Map_key ();
     void test_ASSERT_CONTAINS_Map_key_value ();

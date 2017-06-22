@@ -28,6 +28,7 @@ using std::ofstream;
 
 using namespace mast;
 
+
 //! Returns last token from a string_view
 //!
 //! @note No trimming is done
@@ -413,6 +414,8 @@ bool Utility::StartsWith (string_view text, string_view substring)
 
 
 
+
+
 //! Counts the number of tokens in a string_view
 //!
 //! @param text       Text for which to count tokens
@@ -447,6 +450,52 @@ size_t Utility::TokensCount (string_view text, string_view separator)
 }
 //
 //  End of: Utility::TokensCount
+//---------------------------------------------------------------------------
+
+//! Converts string to amount of milliseconds
+//!
+//! @note - Support only 'ms' and 's' suffixes
+//!       - Number must be expressed as a positive (or no sign) integer
+//!       - Suffix can be separated from number by spaces
+//!
+//! @param durationStr  Duration expressed by a string
+//!
+std::chrono::milliseconds Utility::ToMilliseconds(string_view durationStr)
+{
+  TrimBoth(durationStr);
+
+  CHECK_PARAMETER_NOT_EMPTY (durationStr,              "Cannot convert empty string to a duration");
+  CHECK_PARAMETER_NEQ       (durationStr.front(), '-', "Duration can be expressed only with positive value");
+  CHECK_PARAMETER_EQ        (durationStr.back(),  's', "Duration must me specified with 'ms' or 'suffix'");
+
+  durationStr.remove_suffix(1u);   // Remove the 's' at the end
+
+  // ---------------- Check it start with an integral number
+  //
+  if (durationStr.front() == '+')
+  {
+    durationStr.remove_prefix(1u);   // Remove the '+' at the begining
+    TrimLeft(durationStr);
+  }
+  CHECK_PARAMETER_TRUE(std::isdigit(durationStr.front()), "Duration must be expressed with a positive integral number");
+
+  unsigned long long factor = 1000u; // By default, tell it is specified using seconds
+
+  if (durationStr.back() == 'm')
+  {
+    factor = 1u;   // This is in fact 'ms'
+    durationStr.remove_suffix(1u);
+  }
+  TrimRight(durationStr);  // Support spaces between number and suffix
+
+  CHECK_PARAMETER_TRUE(std::isdigit(durationStr.back()), "Duration must be expressed with only a positive integral number");
+
+  unsigned long long duration = std::stoull(string(durationStr));
+
+  return std::chrono::milliseconds(duration * factor);
+}
+//
+//  End of Utility::ToMilliseconds
 //---------------------------------------------------------------------------
 
 

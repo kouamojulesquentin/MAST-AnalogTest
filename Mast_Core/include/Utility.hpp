@@ -21,6 +21,7 @@
 #include <string>
 #include <experimental/string_view>
 #include <type_traits>    // For enum item manipulation
+#include <chrono>
 
 using namespace std::string_literals;
 
@@ -37,6 +38,10 @@ class MAST_CORE_EXPORT Utility final
   public:
   ~Utility() = delete;
   Utility()  = delete;
+
+  //! Converts string to amount of milliseconds
+  //!
+  static std::chrono::milliseconds ToMilliseconds(std::experimental::string_view durationStr);
 
   //! Extracts file (or directory) parent directory path
   //!
@@ -395,6 +400,7 @@ bool InRange(const T& val, const U& minVal, const V& maxVal) { return (val >= mi
 #define CHECK_PARAMETER_GTE(val, minVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (val >= minVal), msg)
 #define CHECK_PARAMETER_LT(val,  maxVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (val <  maxVal), msg)
 #define CHECK_PARAMETER_LTE(val, maxVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (val <= maxVal), msg)
+#define CHECK_PARAMETER_TRUE(val,        msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (bool)(val),     msg)
 #define CHECK_PARAMETER_RANGE(val, minVal, maxVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), InRange((val), (minVal), (maxVal)), msg)
 
 #define CHECK_VALUE_NULL(ptr,     msg) CheckValueIsNullptr    (__FILE__, __func__, __LINE__, ptr, msg)

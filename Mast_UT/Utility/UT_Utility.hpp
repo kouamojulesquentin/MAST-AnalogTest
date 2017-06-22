@@ -30,6 +30,8 @@ class UT_Utility : public CxxTest::TestSuite
 
   void test_MinimalBitsForValue ();
 
+  // ---------------- string_view
+  //
   void test_StringView_Utility_StartsWith ();
   void test_StringView_Utility_EndsWith ();
   void test_StringView_Utility_Split ();
@@ -37,6 +39,10 @@ class UT_Utility : public CxxTest::TestSuite
   void test_StringView_Utility_TrimRight ();
   void test_StringView_Utility_TrimBoth ();
 
+  // ---------------- chrono::duration
+  //
+  void test_ToMilliseconds_BadStr ();
+  void test_ToMilliseconds_SupportedStr ();
 
 };
 //

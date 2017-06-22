@@ -28,6 +28,8 @@ using std::vector;
 using mast::Utility;
 
 
+using namespace std::chrono_literals;
+
 
 //! Checks MinimalBitsForValue::MinimalBitsForValue() `...`
 //!
@@ -389,6 +391,89 @@ void UT_Utility::test_StringView_Utility_TrimBoth ()
   //
   TS_DATA_DRIVEN_TEST(checker, data);
 }
+
+
+
+//! Checks Utility::ToMilliseconds() with bad strings
+//!
+void UT_Utility::test_ToMilliseconds_BadStr ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& strDuration)
+  {
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (Utility::ToMilliseconds(strDuration), std::invalid_argument);
+  };
+
+  auto data =
+  {
+    "",            // 01
+    "2",           // 02
+    "ms",          // 03
+    "s",           // 04
+    "5  m",        // 05
+    "6  sm",       // 06
+    "7  mm",       // 07
+    "8 ss",        // 08
+    "9 us",        // 09
+    "10 mn",       // 10
+    "11 Stuff ms", // 11
+    "12 Stuffms",  // 12
+    "Foo 12 ms",   // 13
+    "-10 ms",      // 14
+    "Bar ms",      // 15
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Utility::ToMilliseconds() with supported strings
+//!
+void UT_Utility::test_ToMilliseconds_SupportedStr ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto strDuration      = std::get<0>(data);
+    auto expectedDuration = std::get<1>(data);
+
+    // ---------------- Exercise
+    //
+    auto gotDuration = Utility::ToMilliseconds(strDuration);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (gotDuration, expectedDuration);
+  };
+
+  auto data =
+  {
+    make_tuple("0 ms",    0ms),      // 00
+    make_tuple("1 ms",    1ms),      // 01
+    make_tuple("+2 ms",   2ms),      // 02
+    make_tuple("  3ms",   3ms),      // 03
+    make_tuple("4 ms ",   4ms),      // 04
+    make_tuple(" 5 ms ",  5ms),      // 05
+    make_tuple(" 66 ms ", 66ms),     // 06
+    make_tuple(" 777 s ", 777000ms), // 07
+    make_tuple(" 0 s ",   0ms),      // 08
+
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
 
 //===========================================================================
 // End of UT_Utility.cpp

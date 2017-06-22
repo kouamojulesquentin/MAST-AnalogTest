@@ -18,6 +18,7 @@
 #include "PDL_Adapter_CPP.hpp"
 #include "Startup.hpp"
 #include "SystemModel.hpp"
+#include "SystemModelManager.hpp"
 #include "Utility.hpp"
 
 #include "TestUtilities.hpp"
@@ -25,6 +26,7 @@
 #include "Spy_SVF_Protocol.hpp"
 
 #include <cxxtest/ValueTraits.h>
+#include <cxxtest/traits/STL11_Traits.h>
 #include <vector>
 #include <array>
 #include <string>
@@ -36,6 +38,7 @@ using std::make_shared;
 using std::make_unique;
 
 using namespace mast;
+using namespace std::chrono_literals;
 
 namespace
 {
@@ -47,6 +50,8 @@ vector<string> MakeCmdlineArguments ()
 {
   vector<string> arguments {
                              "Mast.exe",
+                             "--min_cycle=12ms",
+                             "--max_cycle=36ms",
                              "--sit=" + test::GetTestFilePath("UT_MastEnvironment.sit"),
                              "--check",
                              "--check_file=" + test::GetTestFilePath("Model_Check.txt", false), // Do not check it exists
@@ -550,7 +555,12 @@ void UT_MastEnvironment::test_CreateManager_AfterCreateSystemModel ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_NOT_NULLPTR (Startup::GetManager_NoCreate());
+  CxxTest::setAbortTestOnFail(true);
+  auto manager = Startup::GetManager_NoCreate();
+
+  TS_ASSERT_NOT_NULLPTR (manager);
+  TS_ASSERT_EQUALS      (manager->SleepTimeBetweenConfigurations(), 12ms); // See MakeCmdlineArguments for value
+  TS_ASSERT_EQUALS      (manager->DataCycleLoopTimeout(),           36ms); // See MakeCmdlineArguments for value
 }
 
 
@@ -580,7 +590,12 @@ void UT_MastEnvironment::test_CreateManager_Monitoring ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_NOT_NULLPTR (Startup::GetManager_NoCreate());
+  CxxTest::setAbortTestOnFail(true);
+  auto manager = Startup::GetManager_NoCreate();
+
+  TS_ASSERT_NOT_NULLPTR (manager);
+  TS_ASSERT_EQUALS      (manager->SleepTimeBetweenConfigurations(), 17ms); // See UT_MastEnvironment.yml for value
+  TS_ASSERT_EQUALS      (manager->DataCycleLoopTimeout(),           23ms); // See UT_MastEnvironment.yml for value
 }
 
 

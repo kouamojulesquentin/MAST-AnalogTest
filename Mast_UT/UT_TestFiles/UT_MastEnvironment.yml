@@ -4,6 +4,9 @@ Mast_Options:
     Name:                                                 # When defined, it overrides the one defined in [SIT] file
     Parameters:                                           # Optional access interface protocol parameters (in case the one in [SIT] file is overriden)
   Configuration_algorithm: last_or_default                # One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a [plugin])
+  Manager:
+    Min_time_between_cycles: 17ms                         # Minimal time between two I/O cycles
+    Max_time_between_cycles: 23ms                         # Maximal time between I/O cycles. It corresponds to the maximal delay between an iApply assertion and its execution
   Plugins:
     Files: []                                             # List of plugin file(s) path (absolute or relative path)
     Directories: [Plugins]                                # Directory from where to load plugin files (absolute or relative path)

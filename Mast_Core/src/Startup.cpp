@@ -38,8 +38,11 @@ unique_ptr<Startup::CerrSinkHandle_t> Startup::sm_cerrSinkHandle; //!< Initial l
 //!
 void Startup::ForgetSystemModel ()
 {
-  LOG(DEBUG) << "Get rid of SystemModel";
-  sm_systemModel.reset();
+  if (sm_systemModel)
+  {
+    LOG(DEBUG) << "Get rid of SystemModel";
+    sm_systemModel.reset();
+  }
 }
 //
 //  End of: Startup::ForgetSystemModel

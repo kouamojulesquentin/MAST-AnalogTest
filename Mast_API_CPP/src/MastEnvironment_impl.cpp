@@ -324,6 +324,9 @@ void MastEnvironment_impl::CreateManager ()
   //
   Startup::sm_manager = make_shared<SystemModelManager>(*Startup::sm_systemModel, std::move(configAlgo), managerMonitor);
 
+  Startup::sm_manager->SleepTimeBetweenConfigurations (m_configuration->MinTimeBetweenCycles());
+  Startup::sm_manager->DataCycleLoopTimeout           (m_configuration->MaxTimeBetweenCycles());
+
   LOG(DEBUG) << "Created system model manager";
 }
 //

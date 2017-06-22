@@ -89,26 +89,17 @@ void PDL_Algorithm ()
 //---------------------------------------------------------------------------
 
 
-//! Returns expected SVF command for PDL_Algorithm function
+//! Returns expected SVF command for PDL_Algorithm function using "last_lazy" configuration file
 //!
-vector<string> PDLAlgoExpectedSVFCommands ()
+vector<string> PDLAlgoExpectedSVFCommands_Lazy ()
 {
   vector<string> expectedCommands {
                                     "SIR 4 TDI(01);",
                                     "SDR 12 TDI(0001);",
-                                    "SIR 4 TDI(0F);",
-                                    "SIR 4 TDI(01);",
                                     "SDR 12 TDI(0002);",
-                                    "SIR 4 TDI(0F);",
-                                    "SIR 4 TDI(01);",
                                     "SDR 12 TDI(0003);",
-                                    "SIR 4 TDI(0F);",
-                                    "SIR 4 TDI(01);",
                                     "SDR 12 TDI(0004);",
-                                    "SIR 4 TDI(0F);",
-                                    "SIR 4 TDI(01);",
                                     "SDR 12 TDI(0005);",
-                                    "SIR 4 TDI(0F);",
                                   };
   return expectedCommands;
 }
@@ -727,6 +718,7 @@ void UT_MastEnvironment::test_Start_RealPDLAlgo ()
   vector<string> arguments {
                              "Mast.exe",
                              "--protocol_name=Spy",
+                             "--config_algo=last_lazy",
                              "--sit="        + test::GetTestFilePath("UT_MastEnvironment.sit"),
                              "--check",
                              "--check_file=" + test::GetTestFilePath("Model_Check.txt", false), // Do not check it exists
@@ -748,7 +740,7 @@ void UT_MastEnvironment::test_Start_RealPDLAlgo ()
   //
   TS_ASSERT_EQUALS (g_Fake_PDL_AlgorithmCallCount, 0u); // Fake algorithm has not been started (not associated with a node)
 
-  auto expectedCommands = PDLAlgoExpectedSVFCommands();
+  auto expectedCommands = PDLAlgoExpectedSVFCommands_Lazy();  // Lazy algorithm should not be thread dependent
   TS_ASSERT_EQUALS (spiedCommands->Commands(), expectedCommands);
 }
 
@@ -787,8 +779,12 @@ void UT_MastEnvironment::test_Start_Arguments_RealPDLAlgo ()
   //
   TS_ASSERT_EQUALS (g_Fake_PDL_AlgorithmCallCount, 0u); // Fake algorithm has not been started (not associated with a node)
 
-  auto expectedCommands = PDLAlgoExpectedSVFCommands();
-  TS_ASSERT_EQUALS (spiedCommands->Commands(), expectedCommands);
+  const auto& effectiveCommands = spiedCommands->Commands();
+  auto minimalExpectedCommands  = PDLAlgoExpectedSVFCommands_Lazy();  // Last_or_default algorithm depends on threads scheduling
+  for (const auto& command : minimalExpectedCommands)
+  {
+    TS_ASSERT_CONTAINS (effectiveCommands, command);
+  }
 }
 
 
@@ -829,9 +825,12 @@ void UT_MastEnvironment::test_Start_Argc_Argv_RealPDLAlgo ()
   //
   TS_ASSERT_EQUALS (g_Fake_PDL_AlgorithmCallCount, 0u); // Fake algorithm has not been started (not associated with a node)
 
-  auto expectedCommands = PDLAlgoExpectedSVFCommands();
-
-  TS_ASSERT_EQUALS (spiedCommands->Commands(), expectedCommands);
+  const auto& effectiveCommands = spiedCommands->Commands();
+  auto minimalExpectedCommands  = PDLAlgoExpectedSVFCommands_Lazy();  // Last_or_default algorithm depends on threads scheduling
+  for (const auto& command : minimalExpectedCommands)
+  {
+    TS_ASSERT_CONTAINS (effectiveCommands, command);
+  }
 }
 
 

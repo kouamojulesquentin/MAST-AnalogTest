@@ -19,6 +19,7 @@
 #include <tuple>
 #include <experimental/string_view>
 #include <cxxtest/ValueTraits.h>
+#include <cxxtest/traits/STL11_Traits.h>
 
 using std::tuple;
 using std::make_tuple;
@@ -465,7 +466,8 @@ void UT_Utility::test_ToMilliseconds_SupportedStr ()
     make_tuple(" 66 ms ", 66ms),     // 06
     make_tuple(" 777 s ", 777000ms), // 07
     make_tuple(" 0 s ",   0ms),      // 08
-
+    make_tuple("9s",      9000ms),   // 09
+    make_tuple("10ms",    10ms),     // 10
   };
 
   // ---------------- DDT Exercise

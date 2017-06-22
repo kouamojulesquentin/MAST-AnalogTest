@@ -21,6 +21,7 @@
 #include <tclap/StreamOutput.h>
 
 #include <cxxtest/ValueTraits.h>
+#include <cxxtest/traits/STL11_Traits.h>
 #include <vector>
 #include <string>
 #include <experimental/string_view>
@@ -36,6 +37,7 @@ using std::shared_ptr;
 using std::make_shared;
 using std::initializer_list;
 
+using namespace std::chrono_literals;
 using namespace mast;
 
 
@@ -241,43 +243,46 @@ void UT_MastConfiguration::test_ParseYamlConfiguration_FullConfiguration ()
               "  Plugins:  \n"                                                             // 07
               "    Files:       [myPlugin.dll] \n"                                         // 08
               "    Directories: [Plugins] \n"                                              // 09
-              "  Model_checking: \n"                                                       // 10
-              "    Enable: true\n"                                                         // 11
-              "    File_path: modelCheck.txt\n"                                            // 12
-              "  Debug:\n"                                                                 // 13
-              "    Logging:\n"                                                             // 14
-              "      Enable: true\n"                                                       // 15
-              "      Kind: only_errors_on_cerr\n"                                          // 16
-              "      File_path:   myProject.log\n"                                         // 17
-              "      Shown_items: [microseconds, level, thread_id, function_name]\n"       // 18
-              "      Level: warning\n"                                                     // 19
-              "    Model_GML_printing: \n"                                                 // 20
-              "      Enable: true\n"                                                       // 21
-              "      Moments:\n"                                                           // 22
-              "        - after_model_parsing\n"                                            // 23
-              "        - after_configuration\n"                                            // 24
-              "      File_path: ./myproject\n"                                             // 25
-              "      Graph_name: Foo\n"                                                    // 26
-              "      Options: std\n"                                                       // 27
-              "    Model_textual_print: \n"                                                // 28
-              "      Enable: true\n"                                                       // 29
-              "      Moments:\n"                                                           // 30
-              "        - after_model_parsing\n"                                            // 31
-              "        - before_configuration\n"                                           // 32
-              "      File_path: ../Tests/Bar\n"                                            // 33
-              "      Options:         \n"                                                  // 34
-              "         - verbose \n"                                                      // 35
-              "         - auto_value \n"                                                   // 36
-              "         - protocol_name \n"                                                // 37
-              "         - selection_state \n"                                              // 38
-              "         - selection_value \n"                                              // 39
-              "         - selector_properties \n"                                          // 40
-              "         - ignored_nodes  \n"                                               // 41
-              "    Manager_activity:  \n"                                                  // 42
-              "      Enable: true\n"                                                       // 43
-              "      File_base_name: managerActivity\n"                                    // 44
-              "      Options: [verbose, app_thread_creation, PDL_commands, data_cycles]\n" // 45
-              "Plugins_Options: ""\n"                                                      // 46
+              "  Manager: \n"                                                              // 10
+              "    Min_time_between_cycles: 5ms\n"                                         // 11
+              "    Max_time_between_cycles: 2s\n"                                          // 12
+              "  Model_checking: \n"                                                       // 13
+              "    Enable: true\n"                                                         // 14
+              "    File_path: modelCheck.txt\n"                                            // 15
+              "  Debug:\n"                                                                 // 16
+              "    Logging:\n"                                                             // 17
+              "      Enable: true\n"                                                       // 18
+              "      Kind: only_errors_on_cerr\n"                                          // 19
+              "      File_path:   myProject.log\n"                                         // 20
+              "      Shown_items: [microseconds, level, thread_id, function_name]\n"       // 21
+              "      Level: warning\n"                                                     // 22
+              "    Model_GML_printing: \n"                                                 // 23
+              "      Enable: true\n"                                                       // 24
+              "      Moments:\n"                                                           // 25
+              "        - after_model_parsing\n"                                            // 26
+              "        - after_configuration\n"                                            // 27
+              "      File_path: ./myproject\n"                                             // 28
+              "      Graph_name: Foo\n"                                                    // 29
+              "      Options: std\n"                                                       // 30
+              "    Model_textual_print: \n"                                                // 31
+              "      Enable: true\n"                                                       // 32
+              "      Moments:\n"                                                           // 33
+              "        - after_model_parsing\n"                                            // 34
+              "        - before_configuration\n"                                           // 35
+              "      File_path: ../Tests/Bar\n"                                            // 36
+              "      Options:         \n"                                                  // 37
+              "         - verbose \n"                                                      // 38
+              "         - auto_value \n"                                                   // 39
+              "         - protocol_name \n"                                                // 40
+              "         - selection_state \n"                                              // 41
+              "         - selection_value \n"                                              // 42
+              "         - selector_properties \n"                                          // 43
+              "         - ignored_nodes  \n"                                               // 44
+              "    Manager_activity:  \n"                                                  // 45
+              "      Enable: true\n"                                                       // 46
+              "      File_base_name: managerActivity\n"                                    // 47
+              "      Options: [verbose, app_thread_creation, PDL_commands, data_cycles]\n" // 48
+              "Plugins_Options: ""\n"                                                      // 49
              );
 
   // ---------------- Exercise
@@ -292,6 +297,9 @@ void UT_MastConfiguration::test_ParseYamlConfiguration_FullConfiguration ()
   TS_ASSERT_TRUE  (sut.GmlPrinting());
   TS_ASSERT_TRUE  (sut.PrettyPrinting());
   TS_ASSERT_TRUE  (sut.ReportManagerActivity());
+
+  TS_ASSERT_EQUALS (sut.MinTimeBetweenCycles(),              5ms);
+  TS_ASSERT_EQUALS (sut.MaxTimeBetweenCycles(),              2000ms);
 
   TS_ASSERT_EQUALS (sut.SitFilePath(),                       "myProject.sit");
   TS_ASSERT_EQUALS (sut.AccessInterfaceProtocolName(),       "myProtocol");
@@ -628,20 +636,22 @@ void UT_MastConfiguration::test_Update_LongSwitches ()
   // ---------------- Setup
   //
   vector<string>    arguments{
-                                "MyAppWithLongName",
-                                "--sit=myDesign.sit",
-                                "--protocol_name=myProtocol",
-                                "--protocol_parameters=myProtocolParameters",
-                                "--config_algo=last_lazy",
-                                "--plugin_dir=MyPlugins",
-                                "--plugin=customPlugins.dll",
-                                "--log",
-                                "--log_file=myProject.log",
-                                "--log_level=debug",
-                                "--log_kind=file",
-                                "--log_kind=cout",
-                                "--check",
-                                "--check_file=modelCheck.txt",
+                               "MyAppWithLongName",
+                               "--min_cycle=5ms",
+                               "--max_cycle=2s",
+                               "--sit=myDesign.sit",
+                               "--protocol_name=myProtocol",
+                               "--protocol_parameters=myProtocolParameters",
+                               "--config_algo=last_lazy",
+                               "--plugin_dir=MyPlugins",
+                               "--plugin=customPlugins.dll",
+                               "--log",
+                               "--log_file=myProject.log",
+                               "--log_level=debug",
+                               "--log_kind=file",
+                               "--log_kind=cout",
+                               "--check",
+                               "--check_file=modelCheck.txt",
                              };
   ostringstream     stdStream;
   ostringstream     errStream;
@@ -663,6 +673,9 @@ void UT_MastConfiguration::test_Update_LongSwitches ()
   TS_ASSERT_FALSE (sut.GmlPrinting());
   TS_ASSERT_FALSE (sut.PrettyPrinting());
   TS_ASSERT_FALSE (sut.ReportManagerActivity());
+
+  TS_ASSERT_EQUALS (sut.MinTimeBetweenCycles(),              5ms);
+  TS_ASSERT_EQUALS (sut.MaxTimeBetweenCycles(),              2000ms);
 
   TS_ASSERT_EQUALS (sut.SitFilePath(),                       "myDesign.sit");
   TS_ASSERT_EQUALS (sut.AccessInterfaceProtocolName(),       "myProtocol");

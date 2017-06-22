@@ -22,6 +22,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <chrono>
 
 namespace TCLAP
 {
@@ -103,6 +104,8 @@ class MAST_CORE_EXPORT MastConfiguration final
   const std::string&              AccessInterfaceProtocolName()       const { return m_aiProtocolName;              } //!< When different to "SIT", it override the one define in [SIT] file
   const std::string&              AccessInterfaceProtocolParameters() const { return m_aiProtocolParameters;        } //!< Parameters for protocol overriding the one in [SIT] file
   const std::string&              ApplicationPath()                   const { return m_applicationDirectoryPath;    } //!< Application directory path (extracted from argv[0])
+  std::chrono::milliseconds       MinTimeBetweenCycles()              const { return m_minTimeBetweenCycles;        } //!< Minimal time between two physical interfaces streaming of data stream
+  std::chrono::milliseconds       MaxTimeBetweenCycles()              const { return m_maxTimeBetweenCycles;        } //!< Maximal time to take into account an iApply
   const std::vector<std::string>& PluginDLLs()                        const { return m_pluginDLLs;                  } //!< List of plugins files paths
   const std::vector<std::string>& PluginDirectories()                 const { return m_pluginDirectories;           } //!< List of plugins directories paths
   bool                            ModelChecking()                     const { return m_modelChecking;               } //!< Enable/Disable model checking (provided it has been parsed successfully)
@@ -154,32 +157,35 @@ class MAST_CORE_EXPORT MastConfiguration final
   private:
 
 
-  std::string              m_applicationDirectoryPath;                                             //!< Application directory path (extracted from argv[0])
-  std::string              m_sitFilePath;                                                          //!< SIT file used by the project
-  std::string              m_configurationAlgorithm;                                               //!< One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a [plugin])
-  std::string              m_aiProtocolName;                                                       //!< When not empty, it overrides the one defined in [SIT] file
-  std::string              m_aiProtocolParameters;                                                 //!< Optional access interface protocol parameters (in case the one in [SIT] file is overriden)
-  std::vector<std::string> m_pluginDLLs;                                                           //!< List of plugins files paths
-  std::vector<std::string> m_pluginDirectories;                                                    //!< List of plugins directories paths
-  bool                     m_modelChecking               = false;                                  //!< Enable/Disable model checking (provided it has been parsed successfully)
-  std::string              m_modelCheckingFilePath;                                                //!< Optional file path (logged when no path when logged is enabled)
-  bool                     m_loggerEnabled               = false;                                  //!< Enable/Disable general logging
-  mast::LoggerKind         m_loggerKind                  = mast::LoggerKind::File;                 //!< Defines what kind of logger is used.
-  std::string              m_loggerFilePath;                                                       //!< File path for logging (there is always a file logging when enabled)
-  mast::LoggerShownItems   m_loggerShownItems            = mast::LoggerShownItems::Std_Less;       //!< Kinds of element that are reported in the log
-  mast::LoggerLevel        m_loggerLevel                 = mast::LoggerLevel::Info;                //!< Defines what level of information are logged (from error only to debug messages)
-  bool                     m_gmlPrinting                 = false;                                  //!< Enable/Disable printing of GML representation of the model state
-  mast::ReportMoments      m_gmlReportMoments            = mast::ReportMoments::AfterModelParsing; //!< Defines moment(s) in the vector generation for which model state is exported as GML file
-  std::string              m_gmlFilePath;                                                          //!< Optional file path for GML graph printing
-  std::string              m_gmlGraphName;                                                         //!< Optional graph name
-  GmlPrinterOptions        m_gmlOptions                  = GmlPrinterOptions::Std;                 //!< Defines what kind of model information pieces are displayed in the model state report.
-  bool                     m_prettyPrinting              = false;                                  //!< Enable/Disable printing of textual representation of the model state
-  mast::ReportMoments      m_prettyPrintingReportMoments = mast::ReportMoments::AfterModelParsing; //!< Defines moment(s) in the vector generation for which model state is exported as text file
-  std::string              m_prettyPrintingFilePath;                                               //!< Optional file path for pretty print
-  PrettyPrinterOptions     m_prettyPrintingOptions       = PrettyPrinterOptions::Std;              //!< Defines what kind of model information pieces are reported in the textual model state report
-  bool                     m_reportManagerActivity       = false;                                  //!< Enable/Disable logging and optionally reporting model state at specific point of manager activity
-  std::string              m_managerActivityFileBasePath;                                          //!< Base file path where pretty print and/or GML files are saved
-  ManagerMonitorOptions    m_managerActivityOptions      = ManagerMonitorOptions::Std;             //!< Defines what Mast manager main activities are reported in the log
+
+  std::chrono::milliseconds m_minTimeBetweenCycles;                                                 //!< Minimal time between two physical interfaces streaming of data stream
+  std::chrono::milliseconds m_maxTimeBetweenCycles;                                                 //!< Maximal time to take into account an iApply
+  std::string               m_applicationDirectoryPath;                                             //!< Application directory path (extracted from argv[0])
+  std::string               m_sitFilePath;                                                          //!< SIT file used by the project
+  std::string               m_configurationAlgorithm;                                               //!< One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a [plugin])
+  std::string               m_aiProtocolName;                                                       //!< When not empty, it overrides the one defined in [SIT] file
+  std::string               m_aiProtocolParameters;                                                 //!< Optional access interface protocol parameters (in case the one in [SIT] file is overriden)
+  std::vector<std::string>  m_pluginDLLs;                                                           //!< List of plugins files paths
+  std::vector<std::string>  m_pluginDirectories;                                                    //!< List of plugins directories paths
+  bool                      m_modelChecking               = false;                                  //!< Enable/Disable model checking (provided it has been parsed successfully)
+  std::string               m_modelCheckingFilePath;                                                //!< Optional file path (logged when no path when logged is enabled)
+  bool                      m_loggerEnabled               = false;                                  //!< Enable/Disable general logging
+  mast::LoggerKind          m_loggerKind                  = mast::LoggerKind::File;                 //!< Defines what kind of logger is used.
+  std::string               m_loggerFilePath;                                                       //!< File path for logging (there is always a file logging when enabled)
+  mast::LoggerShownItems    m_loggerShownItems            = mast::LoggerShownItems::Std_Less;       //!< Kinds of element that are reported in the log
+  mast::LoggerLevel         m_loggerLevel                 = mast::LoggerLevel::Info;                //!< Defines what level of information are logged (from error only to debug messages)
+  bool                      m_gmlPrinting                 = false;                                  //!< Enable/Disable printing of GML representation of the model state
+  mast::ReportMoments       m_gmlReportMoments            = mast::ReportMoments::AfterModelParsing; //!< Defines moment(s) in the vector generation for which model state is exported as GML file
+  std::string               m_gmlFilePath;                                                          //!< Optional file path for GML graph printing
+  std::string               m_gmlGraphName;                                                         //!< Optional graph name
+  GmlPrinterOptions         m_gmlOptions                  = GmlPrinterOptions::Std;                 //!< Defines what kind of model information pieces are displayed in the model state report.
+  bool                      m_prettyPrinting              = false;                                  //!< Enable/Disable printing of textual representation of the model state
+  mast::ReportMoments       m_prettyPrintingReportMoments = mast::ReportMoments::AfterModelParsing; //!< Defines moment(s) in the vector generation for which model state is exported as text file
+  std::string               m_prettyPrintingFilePath;                                               //!< Optional file path for pretty print
+  PrettyPrinterOptions      m_prettyPrintingOptions       = PrettyPrinterOptions::Std;              //!< Defines what kind of model information pieces are reported in the textual model state report
+  bool                      m_reportManagerActivity       = false;                                  //!< Enable/Disable logging and optionally reporting model state at specific point of manager activity
+  std::string               m_managerActivityFileBasePath;                                          //!< Base file path where pretty print and/or GML files are saved
+  ManagerMonitorOptions     m_managerActivityOptions      = ManagerMonitorOptions::Std;             //!< Defines what Mast manager main activities are reported in the log
 
   std::shared_ptr<TCLAP::CmdLineOutput> m_cmdLineOutput;         //!< Useful for unit tests (to catch command line parse output)
   bool                                  m_automaticExit = true;  //!< For unit tests context (to prevent unit tests exit)

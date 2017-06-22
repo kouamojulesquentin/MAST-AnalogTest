@@ -33,9 +33,13 @@ using std::initializer_list;
 using std::make_shared;
 
 using namespace mast;
+using namespace std::chrono_literals;
 
 namespace
 {
+
+
+
 // ---------------- Maps logger kind arguments to internal value
 //
 static const map<string, mast::LoggerKind>  loggerKindMapping
@@ -137,7 +141,9 @@ static const map<string, mast::ReportMoments> reportMomentsMapping
 //! Initializes with default configurations
 //!
 MastConfiguration::MastConfiguration ()
-  : m_sitFilePath                 ("")
+  : m_minTimeBetweenCycles        (10ms)
+  , m_maxTimeBetweenCycles        (1s)
+  , m_sitFilePath                 ("")
   , m_configurationAlgorithm      ("last_or_default")
   , m_aiProtocolName              ("")
   , m_aiProtocolParameters        ("")
@@ -312,6 +318,18 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
       }
     };
 
+    // Duration updater
+    auto updateDuration = [&yaml, &gotString, &makePath](auto& option, initializer_list<const char*> pathItems)
+    {
+      auto ok = false;
+      tie(ok, gotString) = yaml.TryGetAsString (makePath(pathItems));
+      if (ok && !gotString.empty())
+      {
+        option = Utility::ToMilliseconds(gotString);
+      }
+    };
+
+
     updateString (m_sitFilePath,                 {"SIT_file_path"});
     updateString (m_aiProtocolName,              {"Access_interface_protocol", "Name"});
     updateString (m_aiProtocolParameters,        {"Access_interface_protocol", "Parameters"});
@@ -339,6 +357,9 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
 
     updateSequence (m_pluginDLLs,        {"Plugins", "Files"});
     updateSequence (m_pluginDirectories, {"Plugins", "Directories"});
+
+    updateDuration (m_minTimeBetweenCycles, {"Manager", "Min_time_between_cycles"});
+    updateDuration (m_maxTimeBetweenCycles, {"Manager", "Max_time_between_cycles"});
   }
 }
 //
@@ -409,20 +430,22 @@ void MastConfiguration::Update (vector<string> arguments)
     TCLAP::ValuesConstraint<string> logShowConstraint (makeAllowedSet(loggerShownItemMapping));
 
     // Insert in reverse order of the USAGE print()
-    TCLAP::ValueArg<std::string> aiProtocolNameArg       ("",  "protocol_name",       "Overrides access interface protocol defined in SIT file",                       false,   "",                  "Protocol name",                                                                  cmdLine);
-    TCLAP::ValueArg<std::string> aiProtocolParametersArg ("",  "protocol_parameters", "Optional access interface protocol parameters",                                 false,   "",                  "Protocol parameter(s)",                                                          cmdLine);
+    TCLAP::ValueArg<std::string> aiProtocolNameArg       ("",  "protocol_name",       "Overrides access interface protocol defined in SIT file",                       false,   "", "Protocol name",         cmdLine);
+    TCLAP::ValueArg<std::string> aiProtocolParametersArg ("",  "protocol_parameters", "Optional access interface protocol parameters",                                 false,   "", "Protocol parameter(s)", cmdLine);
+    TCLAP::ValueArg<std::string> minCycleArg             ("",  "min_cycle",           "Minimal time between two physical interfaces streaming of data stream",         false,   "1ms", "Positive integer with 'ms' or 's' suffix", cmdLine);
+    TCLAP::ValueArg<std::string> maxCycleArg             ("",  "max_cycle",           "Maximal time to take into account an iApply",                                   false,   "1s",  "Positive integer with 'ms' or 's' suffix", cmdLine);
     TCLAP::ValueArg<std::string> configurationAlgoArg    ("a", "config_algo",         "Name of configuration algorithm used to select linker  (mux) path",             false,   "last_or_default",   "last_lazy|last_or_default|last_or_default_greedy| \"name defined by a plugin\"", cmdLine);
-    TCLAP::ValueArg<std::string> checkModelFileArg       ("",  "check_file",          "Defines result of model checking (it is always logged when logger is enabled)", false,   "mast_check.txt",    "File path",                                                                      cmdLine);
+    TCLAP::ValueArg<std::string> checkModelFileArg       ("",  "check_file",          "Defines result of model checking (it is always logged when logger is enabled)", false,   "mast_check.txt",    "File path", cmdLine);
     TCLAP::SwitchArg             checkModelArg           ("",  "check",               "Enables model checking (resulting from parsing SIT file)",                       cmdLine, false);
     TCLAP::MultiArg<std::string> logKindArg              ("",  "log_kind",            "Defines logger kind",                                                            false,   &logKindConstraint,  cmdLine);
     TCLAP::MultiArg<std::string> logLevelArg             ("",  "log_level",           "Defines log level",                                                              false,   &logLevelConstraint, cmdLine);
     TCLAP::MultiArg<std::string> logShowArg              ("",  "log_show",            "Defines log shown items",                                                        false,   &logShowConstraint,  cmdLine);
-    TCLAP::ValueArg<std::string> logFileArg              ("",  "log_file",            "Defines logger file path",                                                       false,   "mast.log",          "File path",                                                                      cmdLine);
+    TCLAP::ValueArg<std::string> logFileArg              ("",  "log_file",            "Defines logger file path",                                                       false,   "mast.log",          "File path", cmdLine);
     TCLAP::SwitchArg             logEnabledArg           ("l", "log",                 "Enables logger",                                                                 cmdLine, false);
     TCLAP::MultiArg<std::string> pluginFilesArg          ("",  "plugin",              "Defines a plugin file to load",                                                  false,   "File path",         cmdLine);
     TCLAP::MultiArg<std::string> pluginDirsArg           ("",  "plugin_dir",          "Defines a plugin directory (all plugins in it are loaded)",                      false,   "Directory path",    cmdLine);
-    TCLAP::ValueArg<std::string> sitFilePathArg          ("s", "sit",                 "Defines SIT that specified SUT model",                                           false,   "project.sit",       "File path",                                                                      cmdLine);
-    TCLAP::ValueArg<std::string> configurationFileArg    ("c", "conf",                "Defines configuration file",                                                     false,   "mast.cfg",          "File path",                                                                      cmdLine);
+    TCLAP::ValueArg<std::string> sitFilePathArg          ("s", "sit",                 "Defines SIT that specified SUT model",                                           false,   "project.sit",       "File path", cmdLine);
+    TCLAP::ValueArg<std::string> configurationFileArg    ("c", "conf",                "Defines configuration file",                                                     false,   "mast.cfg",          "File path", cmdLine);
 
     // ---------------- Do parse command line arguments
     //
@@ -441,6 +464,15 @@ void MastConfiguration::Update (vector<string> arguments)
           option = arg.getValue();
         }
       };
+
+      auto setDurationOption = [](auto& option, const auto& arg)
+      {
+        if (arg.isSet())
+        {
+          option = Utility::ToMilliseconds(arg.getValue());
+        }
+      };
+
 
       auto setMappedOptionFlags = [](auto& option, const auto& arg, const auto& mapping)
       {
@@ -485,6 +517,9 @@ void MastConfiguration::Update (vector<string> arguments)
       setOption(m_loggerFilePath,         logFileArg);
       setOption(m_aiProtocolName,         aiProtocolNameArg);
       setOption(m_aiProtocolParameters,   aiProtocolParametersArg);
+
+      setDurationOption(m_minTimeBetweenCycles, minCycleArg);
+      setDurationOption(m_maxTimeBetweenCycles, maxCycleArg);
 
       setMappedOptionFlags(m_loggerKind,       logKindArg,  loggerKindMapping);
       setMappedOptionFlags(m_loggerLevel,      logLevelArg, loggerLevelMapping);

@@ -4,28 +4,19 @@
 
 @if "%Build%"=="" goto Syntax
 
-@set originalPath=%path%
-@REM @set Path=C:\MinGW\bin;%Path%
+@REM @set originalPath=%path%
 @set DestFile=Mast_UT\UT_Results\UT_Result.txt
 
-@if not defined chain  (set chain=Build_Qt)
-@REM @if not defined chain  (set chain=Build_CB)
-
-@set Build_Qt=Build_Qt
-@if /i %chain% equ %Build_Qt% (
-set targetDir=".\Build_Qt\bin\%Build%"
-@set DestFileFromExe=..\..\..\%DestFile%
-) else (
-set  targetDir=".\bin\%Build%"
+@set Build_Dir=cmake_%Build%
+@set targetDir=".\%Build_Dir%\Bin\"
 @set DestFileFromExe=..\..\%DestFile%
-)
 
 @echo ===== Target dir: %targetDir%
 @pushd %targetDir%
 
 @if not exist Mast_UT.exe goto No_exe
-@REM @echo Dir: %cd%
-@REM @dir
+@REM @echo Dir:             %cd%
+@REM @echo DestFileFromExe: %DestFileFromExe%
 
 
 @if     "%Options%"=="--display_success"  Mast_UT.exe %Options% >      %DestFileFromExe%
@@ -47,6 +38,6 @@ set  targetDir=".\bin\%Build%"
 @goto :EOF
 :Syntax
 @echo.
-@echo. Syntax is: "UT_Run Debug|Release"
+@echo. Syntax is: "UT_Run Debug|Release [Options]"
 @echo.
 @goto :EOF

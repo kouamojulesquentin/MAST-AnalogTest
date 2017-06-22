@@ -11,17 +11,17 @@
 //!
 //===========================================================================
 
-
-#ifndef DATACYCLEVISITOR_H__9C86FE0D_78AA_4852_8CA8_25CA6E34AC9__INCLUDED_
-  #define DATACYCLEVISITOR_H__9C86FE0D_78AA_4852_8CA8_25CA6E34AC9__INCLUDED_
+#ifndef DATACYCLEVISITOR_H__24D9D68B_89A7_4534_A995_73BC5F29EBDB__INCLUDED_
+  #define DATACYCLEVISITOR_H__24D9D68B_89A7_4534_A995_73BC5F29EBDB__INCLUDED_
 
 #include "SystemModelVisitor.hpp"
-#include "SystemModelManager_impl.hpp"
 
 #include <memory>
 
 namespace mast
 {
+class SystemModelManager_impl;
+
 //! System model tree visitor for Data Cycle triggering
 //!
 //!
@@ -31,20 +31,20 @@ class MAST_CORE_EXPORT DataCycleVisitor : public SystemModelVisitor
   //
   public:
   ~DataCycleVisitor() = default;
-  DataCycleVisitor(SystemModelManager_impl* current_smm)
-  : m_current_smm (current_smm)
+  DataCycleVisitor(SystemModelManager_impl* manager)
+    : m_manager (manager)
   {
   }
 
   virtual void VisitAccessInterface (AccessInterface& accessInterface) override;
   virtual void VisitChain           (Chain&           chain)           override;
   virtual void VisitLinker          (Linker&          linker)          override;
-  virtual void VisitRegister        (Register&        )             override;
+  virtual void VisitRegister        (Register&        reg)             override;
 
   // ---------------- Private  Fields
   //
   private:
-  SystemModelManager_impl*       m_current_smm;        //!< The current system model
+  SystemModelManager_impl* m_manager = nullptr; //!< The current system model
 };
 //
 //  End of ConfigureVisitor class declaration
@@ -53,8 +53,7 @@ class MAST_CORE_EXPORT DataCycleVisitor : public SystemModelVisitor
 
 
 
-
-#endif  // not defined CONFIGUREVISITOR_H__9C86FE0D_78AA_4852_8CA8_25CA6E34AC9__INCLUDED_
+#endif  // not defined DATACYCLEVISITOR_H__24D9D68B_89A7_4534_A995_73BC5F29EBDB__INCLUDED_
 
 //===========================================================================
 // End of ConfigureVisitor.hpp

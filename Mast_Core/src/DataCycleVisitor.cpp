@@ -1,7 +1,7 @@
 //===========================================================================
 //                           DataCycleVisitor.cpp
 //===========================================================================
-// Copyright (C) 2016 G-INP/Tima. All rights reserved.
+// Copyright (C) 2017 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
@@ -13,6 +13,7 @@
 
 #include "DataCycleVisitor.hpp"
 #include "SystemModelNodes.hpp"
+#include "SystemModelManager_impl.hpp"
 
 using namespace mast;
 
@@ -22,13 +23,15 @@ using std::make_shared;
 
 //! Updates AccessInterface pending flag
 //!
+
 void DataCycleVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 {
- VisitChildren(accessInterface);
- if (accessInterface.IsPending())
-    {
-    m_current_smm->DoHierarchicalDataCycle(make_shared<AccessInterface>(accessInterface),nullptr);
-    }
+  VisitChildren(accessInterface);
+
+  if (accessInterface.IsPending())
+  {
+    m_manager->DoHierarchicalDataCycle(&accessInterface, nullptr);
+  }
 }
 //
 //  End of: DataCycleVisitor::VisitAccessInterface
@@ -46,18 +49,14 @@ void DataCycleVisitor::VisitChain (Chain& chain)
 //  End of: DataCycleVisitor::VisitChain
 //---------------------------------------------------------------------------
 
-//! Does nothing
+
+//! Ignores Register
 //!
-void DataCycleVisitor::VisitRegister (Register& )
+void DataCycleVisitor::VisitRegister (Register&)
 {
 }
 //
 //  End of: DataCycleVisitor::VisitRegister
-//---------------------------------------------------------------------------
-
-
-///
-//  End of: DataCycleVisitor::ConfigureChildren
 //---------------------------------------------------------------------------
 
 

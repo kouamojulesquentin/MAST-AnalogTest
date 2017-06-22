@@ -769,6 +769,7 @@ void UT_MastEnvironment::test_Start_Arguments_RealPDLAlgo ()
 
   vector<string> arguments {
                              "Mast.exe",
+                             "--config_algo=last_or_default",
                              "--protocol_name=Spy",
                              "--sit="        + test::GetTestFilePath("UT_MastEnvironment.sit"),
                              "--check",

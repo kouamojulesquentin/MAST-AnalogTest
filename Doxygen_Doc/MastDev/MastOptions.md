@@ -38,8 +38,8 @@ Default configuration file looks like this:
         Enable:    false                                      # Enable/Disable model checking (provided it has been parsed successfully)
         File_path: ""                                         # Optional file path (logged when no path when logged is enabled)
       Manager:
-        Min_time_between_cycles: 10ms                         # Minimal time between two physical interfaces streaming of data stream
-        Max_time_between_cycles: 1s                           # Maximal time to take into account an iApply
+        Min_time_between_cycles: 10ms                         # Minimal time between two I/O cycles
+        Max_time_between_cycles: 1s                           # Maximal time between I/O cycles. It corresponds to the maximal delay between an iApply assertion and its execution
       Debug:
         Logging:
           Enable: false                                       # Enable/Disable general logging
@@ -137,10 +137,11 @@ Usage is:
         Name of configuration algorithm used to select linker  (mux) path
 
       --max_cycle=<Positive integer with 'ms' or 's' suffix>
-        Maximal time to take into account an iApply
+        Maximal time to take into account an iApplyMaximal time between I/O cycles.
+        It corresponds to the maximal delay between an iApply assertion and its execution
 
       --min_cycle=<Positive integer with 'ms' or 's' suffix>
-        Minimal time between two physical interfaces streaming of data stream
+        Minimal time between two I/O cycles
 
       --protocol_parameters=<Protocol parameter(s)>
         Optional access interface protocol parameters

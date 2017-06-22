@@ -104,7 +104,7 @@ class MAST_CORE_EXPORT MastConfiguration final
   const std::string&              AccessInterfaceProtocolName()       const { return m_aiProtocolName;              } //!< When different to "SIT", it override the one define in [SIT] file
   const std::string&              AccessInterfaceProtocolParameters() const { return m_aiProtocolParameters;        } //!< Parameters for protocol overriding the one in [SIT] file
   const std::string&              ApplicationPath()                   const { return m_applicationDirectoryPath;    } //!< Application directory path (extracted from argv[0])
-  std::chrono::milliseconds       MinTimeBetweenCycles()              const { return m_minTimeBetweenCycles;        } //!< Minimal time between two physical interfaces streaming of data stream
+  std::chrono::milliseconds       MinTimeBetweenCycles()              const { return m_minTimeBetweenCycles;        } //!< Minimal time between two I/O cycles
   std::chrono::milliseconds       MaxTimeBetweenCycles()              const { return m_maxTimeBetweenCycles;        } //!< Maximal time to take into account an iApply
   const std::vector<std::string>& PluginDLLs()                        const { return m_pluginDLLs;                  } //!< List of plugins files paths
   const std::vector<std::string>& PluginDirectories()                 const { return m_pluginDirectories;           } //!< List of plugins directories paths
@@ -158,8 +158,8 @@ class MAST_CORE_EXPORT MastConfiguration final
 
 
 
-  std::chrono::milliseconds m_minTimeBetweenCycles;                                                 //!< Minimal time between two physical interfaces streaming of data stream
-  std::chrono::milliseconds m_maxTimeBetweenCycles;                                                 //!< Maximal time to take into account an iApply
+  std::chrono::milliseconds m_minTimeBetweenCycles;                                                 //!< Minimal time between two I/O cycles
+  std::chrono::milliseconds m_maxTimeBetweenCycles;                                                 //!< Maximal time between I/O cycles. It corresponds to the maximal delay between an iApply assertion and its execution
   std::string               m_applicationDirectoryPath;                                             //!< Application directory path (extracted from argv[0])
   std::string               m_sitFilePath;                                                          //!< SIT file used by the project
   std::string               m_configurationAlgorithm;                                               //!< One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a [plugin])

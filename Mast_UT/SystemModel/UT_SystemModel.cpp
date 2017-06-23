@@ -339,13 +339,13 @@ void UT_SystemModel::test_CreateCallbackRequest ()
   // ---------------- Setup
   //
   SystemModel sut;
-  string_view name = "unnamed";//"Callback_name";
+  string_view name = "undefined";//"Callback_name";
 
   // ---------------- Exercise
   //
 
 
-  //--un named CT
+  //--Undefined Callback
   auto  test = new CallbackRequest();
 
   // ---------------- Verify
@@ -353,7 +353,13 @@ void UT_SystemModel::test_CreateCallbackRequest ()
   CxxTest::setAbortTestOnFail(true);
 
   TS_ASSERT_NOT_NULLPTR (test);
-  TS_ASSERT_EQUALS      (test->KindName(), name);
+  TS_ASSERT_EQUALS      (test->CallbackId(), name);
+  TS_ASSERT_NULLPTR (test->interfaceData());
+  TS_ASSERT_EQUALS  (test->ToSutVector().BitsCount(),  0);
+  TS_ASSERT_EQUALS  (test->ToSutVector().BytesCount(), 0);
+  TS_ASSERT_TRUE    (test->ToSutVector().IsEmpty());
+  TS_ASSERT_FALSE   (test->ToSutVector().HasFixedSize());
+  TS_ASSERT_NULLPTR (test->ToSutVector().DataLeftAligned());
 
   free(test);
   //--Named CT
@@ -362,9 +368,59 @@ void UT_SystemModel::test_CreateCallbackRequest ()
 
   test = new CallbackRequest(name);
   TS_ASSERT_NOT_NULLPTR (test);
-  TS_ASSERT_EQUALS      (test->KindName(), name);
+  TS_ASSERT_EQUALS      (test->CallbackId(), name);
+  TS_ASSERT_NULLPTR (test->interfaceData());
+  TS_ASSERT_EQUALS  (test->ToSutVector().BitsCount(),  0);
+  TS_ASSERT_EQUALS  (test->ToSutVector().BytesCount(), 0);
+  TS_ASSERT_TRUE    (test->ToSutVector().IsEmpty());
+  TS_ASSERT_FALSE   (test->ToSutVector().HasFixedSize());
+  TS_ASSERT_NULLPTR (test->ToSutVector().DataLeftAligned());
+  free(test);
 
- free(test);
+  //--Named CT with additional data
+  int dummy=3;
+  test = new CallbackRequest(name,(void *)&dummy);
+  TS_ASSERT_NOT_NULLPTR (test);
+  TS_ASSERT_EQUALS      (test->CallbackId(), name);
+  TS_ASSERT_NOT_NULLPTR (test->interfaceData());
+  TS_ASSERT_EQUALS  (test->interfaceData(),  (void *)&dummy);
+  TS_ASSERT_EQUALS  (*(int *)test->interfaceData(),  dummy);
+  TS_ASSERT_EQUALS  (test->interfaceData(),  (void *)&dummy);
+  TS_ASSERT_EQUALS  (test->ToSutVector().BitsCount(),  0);
+  TS_ASSERT_EQUALS  (test->ToSutVector().BytesCount(), 0);
+  TS_ASSERT_TRUE    (test->ToSutVector().IsEmpty());
+  TS_ASSERT_FALSE   (test->ToSutVector().HasFixedSize());
+  TS_ASSERT_NULLPTR (test->ToSutVector().DataLeftAligned());
+  free(test);
+
+  auto toSutVector = BinaryVector::CreateFromBinaryString("01");
+  test = new CallbackRequest(name,toSutVector);
+  TS_ASSERT_NOT_NULLPTR (test);
+  TS_ASSERT_EQUALS      (test->CallbackId(), name);
+  TS_ASSERT_NULLPTR (test->interfaceData());
+
+    TS_ASSERT_EQUALS (toSutVector.BitsCount(),  2);
+    TS_ASSERT_EQUALS (toSutVector.BytesCount(), 1);
+    TS_ASSERT_EQUALS (toSutVector.IsEmpty(),    2 == 0);
+    TS_ASSERT_FALSE  (toSutVector.HasFixedSize());
+ //Not testing actual content, BinaryVector is tested separately
+  free(test);
+
+  test = new CallbackRequest(name,toSutVector,(void *)&dummy);
+  TS_ASSERT_NOT_NULLPTR (test);
+  TS_ASSERT_EQUALS      (test->CallbackId(), name);
+  TS_ASSERT_NOT_NULLPTR (test->interfaceData());
+  TS_ASSERT_EQUALS  (test->interfaceData(),  (void *)&dummy);
+  TS_ASSERT_EQUALS  (*(int *)test->interfaceData(),  dummy);
+  TS_ASSERT_EQUALS  (test->interfaceData(),  (void *)&dummy);
+
+    TS_ASSERT_EQUALS (toSutVector.BitsCount(),  2);
+    TS_ASSERT_EQUALS (toSutVector.BytesCount(), 1);
+    TS_ASSERT_EQUALS (toSutVector.IsEmpty(),    2 == 0);
+    TS_ASSERT_FALSE  (toSutVector.HasFixedSize());
+ //Not testing actual content, BinaryVector is tested separately
+  free(test);
+
 }
 
 

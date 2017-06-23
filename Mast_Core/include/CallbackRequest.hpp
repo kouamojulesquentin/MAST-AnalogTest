@@ -28,21 +28,43 @@ class CallbackRequest
   //
   public:
   ~CallbackRequest() = default;
-  CallbackRequest() {m_KindName="unnamed";};
-  CallbackRequest(std::experimental::string_view KindName) 
-   : m_KindName(KindName)
-  {};
+  CallbackRequest() {m_CallbackId="undefined";};
+  CallbackRequest(std::experimental::string_view CallbackId) 
+   : m_CallbackId(CallbackId)
+  {}
   
-  std::experimental::string_view KindName() {return m_KindName;};
+  CallbackRequest(std::experimental::string_view CallbackId,
+		  void* interfaceData) 
+   : m_CallbackId(CallbackId)
+   , m_interfaceData(interfaceData)
+  {}
+  
+  CallbackRequest( std::experimental::string_view CallbackId,
+                   BinaryVector	   ToSutVector,
+		   void* interfaceData
+                  ) 
+   : m_CallbackId(CallbackId)
+   , m_ToSutVector(ToSutVector)
+   , m_interfaceData(interfaceData)
+  {}
 
-  protected:
-  BinaryVector		ToSutVector;
-  void* interfaceData;
-  std::string CallbackId;
-  
+  CallbackRequest( std::experimental::string_view CallbackId,
+                   BinaryVector	   ToSutVector
+                  ) 
+   : m_CallbackId(CallbackId)
+   , m_ToSutVector(ToSutVector)
+  {}
+
+  std::experimental::string_view CallbackId() {return m_CallbackId;};
+  BinaryVector	ToSutVector() {return m_ToSutVector;}	;
+  void* interfaceData() { return m_interfaceData;};
+
   private:
-  std::experimental::string_view m_KindName;
-   
+  std::string m_CallbackId;
+  BinaryVector  m_ToSutVector;
+  void* m_interfaceData=nullptr;
+  
+  
 };
 //
 //  End of AccessInterfaceProtocol class declaration

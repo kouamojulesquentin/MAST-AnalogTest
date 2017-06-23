@@ -37,6 +37,7 @@ Syntax is:
 <br>
 <table>
   <caption id="Register"></caption>
+  <tr><th width = 100>Node Type   </th><th>   Node Information</th></tr>
   <tr>
     <td>REGISTER</td>
     <td>
@@ -50,6 +51,30 @@ Syntax is:
   </tr>
 </table>
 
+Another leaf node is 'INSTANCE_OF' that represents the instanciation of a module at the point of insertion (as for any other child nodes). <br>
+Syntax is:
+
+      INSTANCE_OF SIT      <sit_file>
+    | INSTANCE_OF FACTORY  <factory_name>
+
+
+<br>
+<table>
+  <tr><th width = 100>Node Type   </th><th>   Node Information</th></tr>
+  <tr>
+    <td>INSTANCE_OF</td>
+    <td>
+      SIT     <sit_file>   <br>
+      FACTORY <factory_name>
+      <table>
+        <tr><td><sit_file></td><td>  name or path of a SIT file            </td></tr>
+        <tr><td><factory_name></td><td> identify a model factory registered by a plugin</td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+
 ## Parent NODES
 
 Parent nodes represent hierarchical information: they can be either 1687 elements, such as [ICL] instances, or abstract constructs to help representing hierarchy.
@@ -62,11 +87,11 @@ Each node follows the same syntax:
 <table>
   <tr><td><node_type>:  </td><td>  it can be either a base node (REGISTER,CHAIN,LINKER,ACCESS_INTERFACE) or a composite node identifying a
                                    specific configuration (ex: [SIB], 1500_WRAPPER, AI_1149_1, [TAP]_1149_1, etc...).</td></tr>
-  <tr><td><node_name>:  </td><td>  standard identifier. Can be shared by different nodes (the Builder will assign an unique identifier)</td></tr>
-<tr><td><PDL_association>:  </td><td> used to indicate that the function identified by "function_name_list" (comma-separated identifiers) is to be associated with the current Parent Node (see main documentation for details).<br>
+  <tr><td><node_name>  </td><td>  standard identifier. Can be shared by different nodes (the Builder will assign an unique identifier)</td></tr>
+<tr><td><PDL_association>  </td><td> used to indicate that the function identified by "function_name_list" (comma-separated identifiers) is to be associated with the current Parent Node (see main documentation for details).<br>
 It is the equivalent of the [PDL] <code>iProcsForModule</code> command.</td></tr>
-<tr><td><children_list>+ : </td><td>non-empty list of nodes in the lower hierarchical level</td></tr>
-<tr><td><node information>: </td><td>a variable field containing information specific to a given node_type, as explained in the following table. NB: underlined strings depict language token</td></tr>
+<tr><td><children_list>+  </td><td>non-empty list of nodes in the lower hierarchical level</td></tr>
+<tr><td><node information> </td><td>a variable field containing information specific to a given node_type, as explained in the following table. NB: underlined strings depict language token</td></tr>
 </table>
 
 ### NODE INFORMATION DEPENDING ON NODE TYPE
@@ -84,11 +109,11 @@ It is the equivalent of the [PDL] <code>iProcsForModule</code> command.</td></tr
       <position> <active> <reverse>* <max_derivations> <path_selector><br>
 
       <table>
-        <tr><td><position>:         </td><td>  can be either PRE (the control register precedes the Linker) or POST (the control register follows the Linker)                     </td></tr>
-        <tr><td><active>:           </td><td>  can be either HIGH ( active-high logic selection) or LOW (active-low logic selection)                                              </td></tr>
-        <tr><td><reverse>*:         </td><td>  if set to REVERSE, bit mapping in the control register is reversed (i.e. leftmost bit selects rightmost derivation)                </td></tr>
-        <tr><td><max_derivations>:  </td><td>  the maximum number of derivations accepted by the MIB, as a decimal number. NB: a MIB can have fewer derivations that its maximum  </td></tr>
-        <tr><td><path_selector>:    </td><td>  a string selecting the decoding strategy. See "Linker" for this lsit and description of supported selectors                        </td></tr>
+        <tr><td><position>         </td><td>  can be either PRE (the control register precedes the Linker) or POST (the control register follows the Linker)                     </td></tr>
+        <tr><td><active>           </td><td>  can be either HIGH ( active-high logic selection) or LOW (active-low logic selection)                                              </td></tr>
+        <tr><td><reverse>         </td><td>  if set to REVERSE, bit mapping in the control register is reversed (i.e. leftmost bit selects rightmost derivation)                </td></tr>
+        <tr><td><max_derivations>  </td><td>  the maximum number of derivations accepted by the MIB, as a decimal number. NB: a MIB can have fewer derivations that its maximum  </td></tr>
+        <tr><td><path_selector>    </td><td>  a string selecting the decoding strategy. See "Linker" for this lsit and description of supported selectors                        </td></tr>
       </table>
     </td>
   </tr>
@@ -98,8 +123,8 @@ It is the equivalent of the [PDL] <code>iProcsForModule</code> command.</td></tr
       Macro to generate a 1-bit register controlling a 1- derivation linker, as defined in the standard document.<br>
       <position> <active><br>
       <table>
-        <tr><td><position>: </td><td>  can be either PRE (the control register precedes the Linker) or POST (the control register follows the Linker)</td></tr>
-        <tr><td><active>:   </td><td>  can be either HIGH ( active-high logic selection) or LOW (active-low logic selection)                         </td></tr>
+        <tr><td><position> </td><td>  can be either PRE (the control register precedes the Linker) or POST (the control register follows the Linker)</td></tr>
+        <tr><td><active>   </td><td>  can be either HIGH ( active-high logic selection) or LOW (active-low logic selection)                         </td></tr>
       </table>
     </td>
   </tr>
@@ -109,7 +134,7 @@ It is the equivalent of the [PDL] <code>iProcsForModule</code> command.</td></tr
       IEEE-1500 compliant wrapper  derivations. <br>
       Selector is set as Binary <br>
       <table>
-        <tr><td><max_derivations>:  </td><td> Maximum number of wrapper registers</td></tr>
+        <tr><td><max_derivations>  </td><td> Maximum number of wrapper registers</td></tr>
       </table>
     </td>
   </tr>
@@ -118,9 +143,9 @@ It is the equivalent of the [PDL] <code>iProcsForModule</code> command.</td></tr
     <td>
       <path_selector> <ctrl_node> <max_derivations>
       <table>
-        <tr><td>  <path_selector>:    </td><td>  a string selecting the decoding strategy of the Linker</td></tr>
-        <tr><td>  <max_derivations>:  </td><td>  maximum number of allowed paths (i.e. number of children)</td></tr>
-        <tr><td>  <ctrl_reg>:         </td><td>  string denoting the "node_name" of the register controlling the linker</td></tr>
+        <tr><td>  <path_selector>    </td><td>  a string selecting the decoding strategy of the Linker</td></tr>
+        <tr><td>  <max_derivations>  </td><td>  maximum number of allowed paths (i.e. number of children)</td></tr>
+        <tr><td>  <ctrl_reg>         </td><td>  string denoting the "node_name" of the register controlling the linker</td></tr>
       </table>
       <br>
       NB: the control register can be declared anywhere in the [SIT] file, not necessarily before the Linker.
@@ -181,10 +206,10 @@ It is the equivalent of the [PDL] <code>iProcsForModule</code> command.</td></tr
       <protocol> <AI_identifier>* <AI_table><br>
       Creates an Access Interface node implementing the provided protocol<br>
       <table>
-        <tr><td> <protocol>:        </td><td>  the protocol used by the underlying AccessInterface. Can be JTAG_Loopback, JTAG_SVF_simulation, JTAG_SVF_Emulation or SPI_FTDI</td></tr>
-        <tr><td> <AI_identifier>*:  </td><td>  an optional string that might be required by the protocol. <br>
+        <tr><td> <protocol>        </td><td>  the protocol used by the underlying AccessInterface. Can be JTAG_Loopback, JTAG_SVF_simulation, JTAG_SVF_Emulation or SPI_FTDI</td></tr>
+        <tr><td> <AI_identifier>  </td><td>  an optional string that might be required by the protocol. <br>
                                                For instance, SPI_FTDI might specify an usbDeviceID as quoted-string bit/hex value.</td> </tr>
-        <tr><td> <AI_TABLE>:        </td><td>  the addresses used by the protocol provided as a comma-separated list between square brackets.<br>
+        <tr><td> <AI_TABLE>        </td><td>  the addresses used by the protocol provided as a comma-separated list between square brackets.<br>
                                                Parenthesis can be used for visual help but have no semantic value. <br>
                                                For instance:<br>
                                                [ ( "0x41" , "0x42" ,"0x0" ), ( "0x1" , "0x2" ,"0x3" )] == [ "0x41" , "0x42" ,"0x0" , "0x1" , "0x2" ,"0x3" ] == [ ( "0x41" , "0x42" ),"0x0" , ( "0x1" , "0x2" ,("0x3" ]</td></tr>
@@ -202,11 +227,11 @@ It is the equivalent of the [PDL] <code>iProcsForModule</code> command.</td></tr
       When no coding is provided, BYPASS is selected by FFFF (all ones), and chains by a binary selection starting at 0x01.<br>
 
       <table>
-        <tr><td>  <protocol>:               </td><td>  the protocol used by the underlying AccessInterface. <br>Can be Loopback, SVF_simulation or SVF_openOCD</td></tr>
-        <tr><td>  <optional_AI_identifier>: </td><td>  an optional string that might be required by the protocol. <br>For instance, SVF_openOCD requires a Design Name to be provided</td></tr>
-        <tr><td>  <IR_size>:                </td><td>  decimal number indicating the size in bits of the IR register</td></tr>
-        <tr><td>  <max_DR_chains>:          </td><td>  decimal number indicating the maximum number of chains</td></tr>
-        <tr><td>  <optional_IR_coding>:     </td><td>  the coding  used by the IR, starting from the Bypass Register, provided as a comma-separated list  between square brackets.
+        <tr><td>  <protocol>               </td><td>  the protocol used by the underlying AccessInterface. <br>Can be Loopback, SVF_simulation or SVF_openOCD</td></tr>
+        <tr><td>  <optional_AI_identifier> </td><td>  an optional string that might be required by the protocol. <br>For instance, SVF_openOCD requires a Design Name to be provided</td></tr>
+        <tr><td>  <IR_size>                </td><td>  decimal number indicating the size in bits of the IR register</td></tr>
+        <tr><td>  <max_DR_chains>          </td><td>  decimal number indicating the maximum number of chains</td></tr>
+        <tr><td>  <optional_IR_coding>     </td><td>  the coding  used by the IR, starting from the Bypass Register, provided as a comma-separated list  between square brackets.
                                                        Parenthesis can be used for visual help but have no semantic value.<br>
                                                        For instance, [  "0xFF" ,  "0x42" ,"0x00"] == [  "0xFF" , ( "0x42" ,"0x00")] ==[  ("0xFF" ,  "0x42" ,("0x00"]</td></tr>
       </table>

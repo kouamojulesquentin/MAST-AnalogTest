@@ -343,7 +343,7 @@ shared_ptr<AccessInterface> SystemModelBuilder::Create_JTAG_TAP (string_view    
                                                                  uint32_t                            irBitsCount,
                                                                  uint32_t                            muxPathsCount,
                                                                  shared_ptr<AccessInterfaceProtocol> protocol,
-								 std::vector<mast::BinaryVector>	IR_coding)
+                                                                 std::vector<mast::BinaryVector>        IR_coding)
 {
   CHECK_PARAMETER_NOT_ZERO (irBitsCount, "irBitsCount must be != 0");
   CHECK_PARAMETER_GT       (muxPathsCount, 1, "muxPathsCount must be > 1");

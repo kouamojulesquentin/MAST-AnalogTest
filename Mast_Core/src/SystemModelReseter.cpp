@@ -12,11 +12,8 @@
 //===========================================================================
 
 #include "SystemModelReseter.hpp"
-#include "AccessInterface.hpp"
 #include "AccessInterfaceProtocol.hpp"
-#include "Chain.hpp"
-#include "Linker.hpp"
-#include "Register.hpp"
+#include "SystemModelNodes.hpp"
 
 using namespace mast;
 

@@ -158,6 +158,38 @@ shared_ptr<Register> SystemModel::CreateRegister (string_view            name,
 //---------------------------------------------------------------------------
 
 
+//! Creates a new AccessInterfaceTranslator node
+//!
+//! @param name       Name for the AccessInterfaceTranslator (can be empty)
+//! @param parentNode If not nullptr, the newly created AccessInterface will be appended
+//!                   as a child to this ParentNode
+//!
+//! @note If no parent node is provided and there is no root yet and auto root mode is active,
+//!       created node will become the root node
+//!
+//! @return Newly created AccessInterfaceTranslator
+//!
+shared_ptr<AccessInterfaceTranslator> SystemModel::CreateAccessInterfaceTranslator (string_view                         name,
+                                                                shared_ptr<ParentNode>              parentNode)
+{
+  auto node = make_shared<AccessInterfaceTranslator> (name);
+
+  RegisterNode(node);
+
+  if (!parentNode && !m_root && m_autoRootNode)
+  {
+    m_root = node;
+  }
+  else if (parentNode)
+  {
+    parentNode->AppendChild(node);
+  }
+
+  return node;
+}
+//
+//  End of: SystemModel::CreateAccessInterfaceTranslator
+//---------------------------------------------------------------------------
 
 
 //! Returns node associated with a node identifier

@@ -55,7 +55,7 @@ class AccessInterfaceProtocol
   //!
   std::string CallbackId(int EndPoint) { 
          return KindName().to_string()+"_"+std::to_string(EndPoint); 
-	 };
+         };
 
 
   //! Forces the ResetPort to be asserted on the target module

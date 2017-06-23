@@ -85,6 +85,11 @@ class MAST_CORE_EXPORT SystemModel
     return reg;
   }
 
+  //! Creates a new AccessInterfaceTranslator node
+  //!
+  std::shared_ptr<AccessInterfaceTranslator> CreateAccessInterfaceTranslator (std::experimental::string_view           name,
+                                                          std::shared_ptr<ParentNode>              parentNode = nullptr);
+
   //! Sets root node
   //!
   void SetRoot(std::shared_ptr<ParentNode> newRoot) { ReplaceRoot(newRoot, true); };

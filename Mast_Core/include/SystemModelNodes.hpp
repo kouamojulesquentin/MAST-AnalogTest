@@ -16,6 +16,7 @@
   #define SYSTEMMODELNODES_H__AE0093C8_7CE7_463E_49B4_F6D79633F6FD__INCLUDED_
 
 #include "AccessInterface.hpp"
+#include "AccessInterfaceTranslator.hpp"
 #include "Register.hpp"
 #include "Chain.hpp"
 #include "Linker.hpp"

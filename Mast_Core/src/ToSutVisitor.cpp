@@ -13,6 +13,7 @@
 
 #include "ToSutVisitor.hpp"
 #include "SystemModelNodes.hpp"
+#include "AccessInterfaceTranslator.hpp"
 
 using namespace mast;
 

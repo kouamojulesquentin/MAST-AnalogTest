@@ -23,6 +23,7 @@ class AccessInterface;
 class Chain;
 class Linker;
 class Register;
+class AccessInterfaceTranslator;
 
 //! System model visitors interface
 //!

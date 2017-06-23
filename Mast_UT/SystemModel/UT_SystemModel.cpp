@@ -304,6 +304,34 @@ void UT_SystemModel::test_NotAutoRoot ()
 }
 
 
+//! Checks SystemModel::CreateAccessInterface()
+//!
+void UT_SystemModel::test_CreateAccessInterfaceTranslator ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sut;
+  string_view name = "AT name";
+
+  // ---------------- Exercise
+  //
+  auto node = sut.CreateAccessInterfaceTranslator(name, nullptr);
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  TS_ASSERT_NOT_NULLPTR (node);
+  TS_ASSERT_EQUALS      (node->Name(), name);
+
+  auto id = node->Identifier();
+
+  TS_ASSERT_EQUALS      (id, 0);
+  TS_ASSERT_NOT_NULLPTR (sut.Root());
+  TS_ASSERT_NOT_NULLPTR (sut.NodeWithId(id));
+  TS_ASSERT_EQUALS_PTR  (sut.Root(), sut.NodeWithId(id));
+}
+
 //! Checks SystemModel::SetRoot()
 //!
 void UT_SystemModel::test_SetRoot ()

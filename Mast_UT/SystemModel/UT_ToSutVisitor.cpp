@@ -36,6 +36,7 @@ SystemModel CreateSystemModel_AccessInterface (uint8_t regValue)
   auto tap    = builder.Create_TestCase_AccessInterface("TAP");
   auto reg    = sm.RegisterWithId(7u);
 
+  CxxTest::CountAssertDisabler assertDisabler;  // As this is common to many test, it would mask test without assertion!
   TS_ASSERT_NOT_NULLPTR (reg);
 
   reg->SetToSut(BinaryVector(STATIC_TDR_LEN, regValue));  // Make the register pending
@@ -217,7 +218,7 @@ void UT_ToSutVisitor::test_Accept_Testcase_1500_Nothing_Pending ()
 
   // ---------------- Exercise
   //
-  //IR 
+  //IR
   TS_ASSERT_THROWS_NOTHING (endpoint->Accept(sut));
 
   // ---------------- Verify
@@ -234,7 +235,7 @@ void UT_ToSutVisitor::test_Accept_Testcase_1500_Nothing_Pending ()
   TS_ASSERT_EQUALS (sutVector,             expectedVector);
 
  endpoint = endpoint->NextSibling();
-  //BPY 
+  //BPY
   ToSutVisitor bpy_sut;
   TS_ASSERT_THROWS_NOTHING (endpoint->Accept(bpy_sut));
   const auto& bpy_identifiers = bpy_sut.ActiveRegistersIdentifiers();
@@ -288,7 +289,7 @@ void UT_ToSutVisitor::test_Accept_Testcase_1500_BypassMode_IgnorePending ()
  sut.Reset();
  sut.IgnorePendingState(true);
   TS_ASSERT_THROWS_NOTHING (endpoint->Accept(sut));
-  
+
   auto& bpy_identifiers = sut.ActiveRegistersIdentifiers();
   auto& bpy_sutVector   = sut.ToSutVector();
 
@@ -372,7 +373,7 @@ void UT_ToSutVisitor::test_Accept_Testcase_AccessInterface_1_Pending_Step_2 ()
   auto updater = FromSutUpdater(sm);
 
   if (1) return;
-  
+
   TS_ASSERT_TRUE (reg_2->IsPending());
 
   ToSutVisitor sut;

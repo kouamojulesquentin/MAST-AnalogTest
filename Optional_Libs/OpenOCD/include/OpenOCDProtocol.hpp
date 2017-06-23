@@ -36,7 +36,7 @@ class OpenOCDProtocol final : public AccessInterfaceProtocol
   OpenOCDProtocol(std::experimental::string_view configFilePath, std::experimental::string_view designName, int iIrLength);
 
   //! Constructs a OpenOCDProtocol using string encoded parameters
-  OpenOCDProtocol (const std::string& parameters);
+  OpenOCDProtocol (const std::string& );
 
   //! Returns whether it has been completly (properly) initialized
   //!

@@ -68,7 +68,7 @@ OpenOCDProtocol::OpenOCDProtocol (string_view configFilePath, string_view design
 
 
 //! Constructs a OpenOCDProtocol using string encoded parameters
-OpenOCDProtocol::OpenOCDProtocol (const string& parameters)
+OpenOCDProtocol::OpenOCDProtocol (const string& )
   : m_openOCD_initialized (false)
 {
   #define OPENOCD_DEFAULT_CONFIG "openocd-ft2232.cfg"

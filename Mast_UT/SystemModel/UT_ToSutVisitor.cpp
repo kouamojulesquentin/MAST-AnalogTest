@@ -206,11 +206,10 @@ void UT_ToSutVisitor::test_Accept_Testcase_1500_Nothing_Pending ()
 {
   // ---------------- Setup
   //
-  SystemModel        sm;
+  SystemModel      sm;
   TestModelBuilder builder(sm);
-
-  auto tap = builder.Create_TestCase_1500("TAP", 3u);
-  auto endpoint=tap->FirstChild();
+  auto             tap      = builder.Create_TestCase_1500("TAP", 3u);
+  auto             endpoint = tap->FirstChild();
 
   ConfigureVisitor configurator;
   tap->Accept(configurator);
@@ -234,7 +233,8 @@ void UT_ToSutVisitor::test_Accept_Testcase_1500_Nothing_Pending ()
   TS_ASSERT_EQUALS (sutVector.BitsCount(), expectedBitsCount);
   TS_ASSERT_EQUALS (sutVector,             expectedVector);
 
- endpoint = endpoint->NextSibling();
+  endpoint = endpoint->NextSibling();
+
   //BPY
   ToSutVisitor bpy_sut;
   TS_ASSERT_THROWS_NOTHING (endpoint->Accept(bpy_sut));
@@ -248,7 +248,6 @@ void UT_ToSutVisitor::test_Accept_Testcase_1500_Nothing_Pending ()
   TS_ASSERT_EQUALS (bpy_identifiers.size(),    bpy_expectedActiveRegistersCount);
   TS_ASSERT_EQUALS (bpy_sutVector.BitsCount(), bpy_expectedBitsCount);
   TS_ASSERT_EQUALS (bpy_sutVector,             bpy_expectedVector);
-
 }
 
 //! Checks ToSutVisitor::Accept using Testcase_1500() when a nothing is pending but ToSutVisitor
@@ -258,10 +257,10 @@ void UT_ToSutVisitor::test_Accept_Testcase_1500_BypassMode_IgnorePending ()
 {
   // ---------------- Setup
   //
-  SystemModel        sm;
+  SystemModel      sm;
   TestModelBuilder builder(sm);
-  auto tap = builder.Create_TestCase_1500("TAP", 3u);
-  auto endpoint=tap->FirstChild();
+  auto             tap      = builder.Create_TestCase_1500("TAP", 3u);
+  auto             endpoint = tap->FirstChild();
 
   ToSutVisitor sut;
   sut.IgnorePendingState(true);
@@ -274,8 +273,8 @@ void UT_ToSutVisitor::test_Accept_Testcase_1500_BypassMode_IgnorePending ()
   //
   CxxTest::setAbortTestOnFail(true);
 
-  auto& identifiers = sut.ActiveRegistersIdentifiers();
-  auto& sutVector   = sut.ToSutVector();
+  const auto& identifiers = sut.ActiveRegistersIdentifiers();
+  const auto& sutVector   = sut.ToSutVector();
 
   size_t   expectedActiveRegistersCount = 1u;
   uint32_t expectedBitsCount            = test::DEFAULT_IR_LEN;         // Tap is still in bypass mode
@@ -285,13 +284,13 @@ void UT_ToSutVisitor::test_Accept_Testcase_1500_BypassMode_IgnorePending ()
   TS_ASSERT_EQUALS (sutVector.BitsCount(), expectedBitsCount);
   TS_ASSERT_EQUALS (sutVector,             expectedVector);
 
- endpoint = endpoint->NextSibling();
- sut.Reset();
- sut.IgnorePendingState(true);
+  endpoint = endpoint->NextSibling();
+  sut.Reset();
+  sut.IgnorePendingState(true);
   TS_ASSERT_THROWS_NOTHING (endpoint->Accept(sut));
 
-  auto& bpy_identifiers = sut.ActiveRegistersIdentifiers();
-  auto& bpy_sutVector   = sut.ToSutVector();
+  const auto& bpy_identifiers = sut.ActiveRegistersIdentifiers();
+  const auto& bpy_sutVector   = sut.ToSutVector();
 
   expectedActiveRegistersCount = 1u;
   expectedBitsCount            = test::DEFAULT_BPY_LEN;         // Tap is still in bypass mode
@@ -300,7 +299,6 @@ void UT_ToSutVisitor::test_Accept_Testcase_1500_BypassMode_IgnorePending ()
   TS_ASSERT_EQUALS (bpy_identifiers.size(),    expectedActiveRegistersCount);
   TS_ASSERT_EQUALS (bpy_sutVector.BitsCount(), expectedBitsCount);
   TS_ASSERT_EQUALS (bpy_sutVector,             expectedVector);
-
 }
 
 
@@ -308,19 +306,19 @@ void UT_ToSutVisitor::test_Accept_Testcase_1500_BypassMode_IgnorePending ()
 //!
 //! Step 1: Request to select the branch where the register stands
 //!
-void UT_ToSutVisitor::test_Accept_Testcase_AccessInterface_1_Pending_Step_1 ()
+void UT_ToSutVisitor::test_Accept_Testcase_AccessInterface_1_Pending_Step_1_ir ()
 {
   // ---------------- Setup
   //
   auto sm  = CreateSystemModel_AccessInterface(0x5A);
   auto tap = sm.Root();
-  auto endpoint=tap->FirstChild();
+  auto ir  = tap->FirstChild();
 
   ToSutVisitor sut;
 
   // ---------------- Exercise
   //
-  TS_ASSERT_THROWS_NOTHING (endpoint->Accept(sut));
+  TS_ASSERT_THROWS_NOTHING (ir->Accept(sut));
 
   // ---------------- Verify
   //
@@ -336,25 +334,48 @@ void UT_ToSutVisitor::test_Accept_Testcase_AccessInterface_1_Pending_Step_1 ()
   TS_ASSERT_EQUALS (identifiers.size(),    expectedActiveRegistersCount);
   TS_ASSERT_EQUALS (sutVector.BitsCount(), expectedBitsCount);
   TS_ASSERT_EQUALS (sutVector,             expectedVector);
-
-  endpoint = endpoint->NextSibling();
-  sut.Reset();
-  TS_ASSERT_THROWS_NOTHING (endpoint->Accept(sut));
-
-  const auto& sdr_identifiers = sut.ActiveRegistersIdentifiers();
-  const auto& sdr_sutVector   = sut.ToSutVector();
-
-  expectedActiveRegistersCount = 1u;
-  expectedBitsCount            = test::DEFAULT_BPY_LEN;
-  expectedVector               = BinaryVector::CreateFromBinaryString("1");  // Request to select 3rd path
-  TS_ASSERT_EQUALS (sdr_identifiers.size(),    expectedActiveRegistersCount);
-  TS_ASSERT_EQUALS (sdr_sutVector.BitsCount(), expectedBitsCount);
-  TS_ASSERT_EQUALS (sdr_sutVector,             expectedVector);
-
-  TS_ASSERT_TRUE   (tap->IsPending());
-
-
 }
+
+
+//! Checks ToSutVisitor::Accept using Testcase_AccessInterface when a (single) register is pending
+//!
+//! Step 1: Request to select the branch where the register stands (processing the dr side)
+//!
+void UT_ToSutVisitor::test_Accept_Testcase_AccessInterface_1_Pending_Step_1_dr ()
+{
+  // ---------------- Setup
+  //
+  auto sm  = CreateSystemModel_AccessInterface(0x5A);
+  auto tap = sm.Root();
+  auto ir  = tap->FirstChild();
+  auto dr  = ir->NextSibling();
+
+  ToSutVisitor sut;
+
+  TS_ASSERT_THROWS_NOTHING (ir->Accept(sut));
+  sut.Reset();
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (dr->Accept(sut));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  const auto& identifiers = sut.ActiveRegistersIdentifiers();
+  const auto& sutVector   = sut.ToSutVector();
+
+  auto expectedActiveRegistersCount = 1u;
+  auto expectedBitsCount            = test::DEFAULT_BPY_LEN;
+  auto expectedVector               = BinaryVector::CreateFromBinaryString("1");  // Request to select 3rd path
+
+  TS_ASSERT_EQUALS (identifiers.size(),    expectedActiveRegistersCount);
+  TS_ASSERT_EQUALS (sutVector.BitsCount(), expectedBitsCount);
+  TS_ASSERT_EQUALS (sutVector,             expectedVector);
+  TS_ASSERT_TRUE   (tap->IsPending());
+}
+
 
 
 //! Checks ToSutVisitor::Accept using Testcase_AccessInterface when a (single) register is pending
@@ -371,15 +392,17 @@ void UT_ToSutVisitor::test_Accept_Testcase_AccessInterface_1_Pending_Step_2 ()
   auto ir      = sm.RegisterWithId(1u);
   auto reg_2   = sm.RegisterWithId(7u);
   auto updater = FromSutUpdater(sm);
-
-  if (1) return;
+  auto irSide  = tap->FirstChild();
+  auto drSide  = irSide->NextSibling();
 
   TS_ASSERT_TRUE (reg_2->IsPending());
 
   ToSutVisitor sut;
+
   // Step 1:
-  tap->Accept(sut);                                                             // New value for Tap_Ir is build up
+  irSide->Accept(sut);                                                          // New value for Tap_Ir is build up
   updater.UpdateRegisters(sut.ActiveRegistersIdentifiers(), sut.ToSutVector()); // Kind of loop back, static_2 register is reported to be selected
+  drSide->Accept(sut);                                                          // New value for BPY register is build up
   TS_ASSERT_TRUE (reg_2->IsPending());
 
   // Step 2:
@@ -390,18 +413,18 @@ void UT_ToSutVisitor::test_Accept_Testcase_AccessInterface_1_Pending_Step_2 ()
 
   // ---------------- Exercise (step 2)
   //
-  TS_ASSERT_THROWS_NOTHING (tap->Accept(sut));
+  // Emulates as if the two branches of AccessInterface had been processed simultaneously
+  TS_ASSERT_THROWS_NOTHING (irSide->Accept(sut));
+  TS_ASSERT_THROWS_NOTHING (drSide->Accept(sut));
 
   // ---------------- Verify
   //
-  CxxTest::setAbortTestOnFail(true);
-
   const auto& identifiers = sut.ActiveRegistersIdentifiers();
   const auto& sutVector   = sut.ToSutVector();
 
-  size_t   expectedActiveRegistersCount = 2u;
+  size_t   expectedActiveRegistersCount = 2u; // ir + Reg2
   uint32_t expectedBitsCount            = test::DEFAULT_IR_LEN + test::STATIC_TDR_LEN;
-  auto     expectedVector               = BinaryVector::CreateFromHexString("02:5A5A");
+  auto     expectedVector               = BinaryVector::CreateFromHexString("0x02:5A5A"); // IR and DR parts
 
   TS_ASSERT_EQUALS (identifiers.size(),    expectedActiveRegistersCount);
   TS_ASSERT_EQUALS (sutVector.BitsCount(), expectedBitsCount);

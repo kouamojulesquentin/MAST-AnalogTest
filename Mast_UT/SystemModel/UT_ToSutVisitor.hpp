@@ -34,7 +34,8 @@ class UT_ToSutVisitor : public CxxTest::TestSuite
   void test_Accept_Mib_Binary_CannotSelectNone ();
   void test_Accept_Testcase_1500_Nothing_Pending ();
   void test_Accept_Testcase_1500_BypassMode_IgnorePending ();
-  void test_Accept_Testcase_AccessInterface_1_Pending_Step_1 ();
+  void test_Accept_Testcase_AccessInterface_1_Pending_Step_1_ir ();
+  void test_Accept_Testcase_AccessInterface_1_Pending_Step_1_dr ();
   void test_Accept_Testcase_AccessInterface_1_Pending_Step_2 ();
 //+  void test_Accept_Testcase_1500_2_Pending ();
 

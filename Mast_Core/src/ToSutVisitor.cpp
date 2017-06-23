@@ -19,11 +19,13 @@ using namespace mast;
 
 
 
-//! Visits AccessInterface pending children
+//! Stops recursing down the model hierarchy
+//!
+//! @note ToSutVisitor must stop at AccessInterface boundary in order to manage hierarchical processing of the model
+//!       By CONSEQUENCE it MUST NOT initially be started on an AccessInterface BUT successively on its endpoints (children)
 //!
 void ToSutVisitor::VisitAccessInterface (AccessInterface& /* accessInterface */)
 {
- // VisitChildren(accessInterface);
 }
 //
 //  End of: ToSutVisitor::VisitAccessInterface

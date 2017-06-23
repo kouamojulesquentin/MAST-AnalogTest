@@ -16,7 +16,7 @@
 
 #include "ParentNode.hpp"
 #include "BinaryVector.hpp"
-#include "CallbackTranslator.hpp"
+#include "CallbackRequest.hpp"
 #include <functional>
 #include <vector>
 #include <queue>          // std::queue
@@ -46,7 +46,7 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
   private:
   uint32_t                                 m_numberOfEndPoints = 0; //!< Number of nodes (endpoints) accessible through the access interface
   
-  std::queue<CallbackTranslator> CallbackQueue;  
+  std::queue<CallbackRequest> CallbackQueue;  
   std::queue<BinaryVector> fromSutQueue;  
 };
 //

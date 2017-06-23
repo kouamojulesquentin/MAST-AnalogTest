@@ -304,7 +304,7 @@ void UT_SystemModel::test_NotAutoRoot ()
 }
 
 
-//! Checks SystemModel::CreateAccessInterface()
+//! Checks SystemModel::CreateAccessInterfaceRequest()
 //!
 void UT_SystemModel::test_CreateAccessInterfaceTranslator ()
 {
@@ -331,6 +331,42 @@ void UT_SystemModel::test_CreateAccessInterfaceTranslator ()
   TS_ASSERT_NOT_NULLPTR (sut.NodeWithId(id));
   TS_ASSERT_EQUALS_PTR  (sut.Root(), sut.NodeWithId(id));
 }
+
+//! Checks SystemModel::CreateCallbackRequest()
+//!
+void UT_SystemModel::test_CreateCallbackRequest ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sut;
+  string_view name = "unnamed";//"Callback_name";
+
+  // ---------------- Exercise
+  //
+
+
+  //--un named CT
+  auto  test = new CallbackRequest();
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  TS_ASSERT_NOT_NULLPTR (test);
+  TS_ASSERT_EQUALS      (test->KindName(), name);
+
+  free(test);
+  //--Named CT
+  
+    name = "Callback_name";
+
+  test = new CallbackRequest(name);
+  TS_ASSERT_NOT_NULLPTR (test);
+  TS_ASSERT_EQUALS      (test->KindName(), name);
+
+ free(test);
+}
+
 
 //! Checks SystemModel::SetRoot()
 //!

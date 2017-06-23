@@ -12,30 +12,36 @@
 //===========================================================================
 
 
-#ifndef CALLBACKTRANSLATOR_H__B0FE4245_A913_4634_F1BD_725570BFDC80__INCLUDED_
-  #define CALLBACKTRANSLATOR_H__B0FE4245_A913_4634_F1BD_725570BFDC80__INCLUDED_
+#ifndef CALLBACKRequest_H__B0FE4245_A913_4634_F1BD_725570BFDC80__INCLUDED_
+  #define CALLBACKRequest_H__B0FE4245_A913_4634_F1BD_725570BFDC80__INCLUDED_
 
 #include "BinaryVector.hpp"
 #include <experimental/string_view>
 
 namespace mast
 {
-//! Defines Callbacks for AccessInterface Translators
+//! Defines Callbacks for AccessInterface Requests
 //!
-class CallbackTranslator 
+class CallbackRequest 
 {
   // ---------------- Public  Methods
   //
   public:
-  virtual ~CallbackTranslator() = default;
-
-  virtual std::experimental::string_view KindName() const = 0;
+  ~CallbackRequest() = default;
+  CallbackRequest() {m_KindName="unnamed";};
+  CallbackRequest(std::experimental::string_view KindName) 
+   : m_KindName(KindName)
+  {};
+  
+  std::experimental::string_view KindName() {return m_KindName;};
 
   protected:
-  CallbackTranslator()          = default;
   BinaryVector		ToSutVector;
   void* interfaceData;
   std::string CallbackId;
+  
+  private:
+  std::experimental::string_view m_KindName;
    
 };
 //
@@ -46,8 +52,8 @@ class CallbackTranslator
 
 
 
-#endif  // not defined CALLBACKTRANSLATOR_H__B0FE4245_A913_4634_F1BD_725570BFDC80__INCLUDED_
+#endif  // not defined CALLBACKRequest_H__B0FE4245_A913_4634_F1BD_725570BFDC80__INCLUDED_
 
 //===========================================================================
-// End of CallbackTranslator.hpp
+// End of CallbackRequest.hpp
 //===========================================================================

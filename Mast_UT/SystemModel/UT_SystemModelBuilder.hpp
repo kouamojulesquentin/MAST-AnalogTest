@@ -58,6 +58,10 @@ class UT_SystemModelBuilder : public CxxTest::TestSuite
   void test_Create_Brocade_5xTAPs ();
 //+  void test_Create_Brocade_6xTAPs ();
 
+
+  // ---------------- AccessInterfaceTranslators
+  void test_AccessInterfaceTranslator_queues();
+
   // ================ Other Methods ================
 
   void setUp(); //!< Initializes test (called for each test)

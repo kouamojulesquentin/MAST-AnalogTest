@@ -1129,6 +1129,20 @@ void UT_SystemModelBuilder::test_Create_Brocade_5xTAPs ()
 }
 
 
+//! Checks ability to send/receive messages on the queues in a AccessInterfaceRequest
+//!
+void UT_SystemModelBuilder::test_AccessInterfaceTranslator_queues()
+{  // ---------------- Setup
+  //
+  SystemModel sut;
+  string_view name = "AT name";
+
+  // ---------------- Exercise
+  //
+  auto node = sut.CreateAccessInterfaceTranslator(name, nullptr);
+
+}
+
 //===========================================================================
 // End of UT_SystemModelBuilder.cpp
 //===========================================================================

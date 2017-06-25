@@ -17,6 +17,7 @@
 #include "ParentNode.hpp"
 #include "BinaryVector.hpp"
 #include "CallbackRequest.hpp"
+#include "MTQueue.hpp"
 #include <functional>
 #include <vector>
 #include <queue>          // std::queue
@@ -40,14 +41,19 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
 
   virtual std::experimental::string_view TypeName() const override { return "AccessInterfaceTranslator"; } //!< Returns readable type name
+  
+  void PushRequest(CallbackRequest Request) {m_CallbackQueue.Push(Request);}; //!<Queues a new Callback Request
+  CallbackRequest PopRequest() {return m_CallbackQueue.Pop();}; //!<returns the oldest request. NB: it is a BLOCKING call
+  BinaryVector PopResult() { return  m_fromSutQueue.Pop();};//!< returns the oldest callback result. NB: it is a BLOCKING call
+  void PushResult(BinaryVector Result) { m_fromSutQueue.Push(Result);};//!< Queues a new callback result
 
   // ---------------- Private  Fields
   //
   private:
   uint32_t                                 m_numberOfEndPoints = 0; //!< Number of nodes (endpoints) accessible through the access interface
   
-  std::queue<CallbackRequest> CallbackQueue;  
-  std::queue<BinaryVector> fromSutQueue;  
+  MTQueue<CallbackRequest> m_CallbackQueue;  
+  MTQueue<BinaryVector> m_fromSutQueue;  
 };
 //
 //  End of AccessInterface class declaration

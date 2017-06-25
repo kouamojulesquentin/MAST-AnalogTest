@@ -39,6 +39,7 @@
 
 // ---------------- What is needed for parser to build the SystemModel
 //
+#include "AccessInterfaceTranslator.hpp"
 #include "AccessInterfaceProtocolFactory.hpp"
 #include "AppFunctionNameAndNode.hpp"
 #include "AccessInterfaceProtocol.hpp"

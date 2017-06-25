@@ -304,7 +304,7 @@ void UT_SystemModel::test_NotAutoRoot ()
 }
 
 
-//! Checks SystemModel::CreateAccessInterfaceRequest()
+//! Checks SystemModel::CreateAccessInterfaceTranslator()
 //!
 void UT_SystemModel::test_CreateAccessInterfaceTranslator ()
 {
@@ -423,6 +423,100 @@ void UT_SystemModel::test_CreateCallbackRequest ()
 
 }
 
+//! Checks SystemModel::CreateAccessInterfaceTranslator() capability
+//! of handling Request queues in Non-blocking situations
+//! Blocking behaviour checked in UT_MTQueue
+//!
+void UT_SystemModel::test_CreateAccessInterfaceTranslator_Request_Queues_NB ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sut;
+  string_view name = "AT name";
+  string_view Request = "Request_";
+
+  // ---------------- Exercise
+  //
+  auto node = sut.CreateAccessInterfaceTranslator(name, nullptr);
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  // One Request
+  auto  test = CallbackRequest(Request+"1");
+  node->PushRequest(test);
+  auto result = node->PopRequest();
+  TS_ASSERT_NOT_NULLPTR (&result);
+  TS_ASSERT_EQUALS      (result.CallbackId(), test.CallbackId());
+
+
+  // Multiple Request
+  test = CallbackRequest(Request+"1");
+  node->PushRequest(test);
+  result = node->PopRequest();
+  TS_ASSERT_NOT_NULLPTR (&result);
+  TS_ASSERT_EQUALS      (result.CallbackId(), test.CallbackId());
+
+
+  for (int i=0;i<10;i++)
+     {
+     test = CallbackRequest(Request+std::to_string(i));
+      node->PushRequest(test);
+     }
+
+  for (int i=0;i<10;i++)
+     {
+     result = node->PopRequest();
+     TS_ASSERT_NOT_NULLPTR (&result);
+     TS_ASSERT_EQUALS      (result.CallbackId(), Request+std::to_string(i));
+     }
+
+}
+
+//! Checks SystemModel::CreateAccessInterfaceTranslator() capability
+//! of handling Result queues in Non-blocking situations
+//! Blocking behaviour checked in UT_MTQueue
+//!
+void UT_SystemModel::test_CreateAccessInterfaceTranslator_Result_Queues_NB ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sut;
+  string_view name = "AT name";
+
+  // ---------------- Exercise
+  //
+  auto node = sut.CreateAccessInterfaceTranslator(name, nullptr);
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  // One Request
+  auto  test = BinaryVector::CreateFromBinaryString("01");
+  node->PushResult(test);
+  auto result = node->PopResult();
+  TS_ASSERT_NOT_NULLPTR (&result);
+  TS_ASSERT_TRUE      (result.CompareEqualTo(test));
+
+
+  // Multiple Request
+
+  for (int i=0;i<10;i++)
+     {
+     test = BinaryVector::CreateFromHexString("01"+std::to_string(i));
+      node->PushResult(test);
+     }
+
+  for (int i=0;i<10;i++)
+     {
+     result = node->PopResult();
+     TS_ASSERT_NOT_NULLPTR (&result);
+    TS_ASSERT_TRUE      (result.CompareEqualTo(BinaryVector::CreateFromHexString("01"+std::to_string(i))));
+     }
+
+}
 
 //! Checks SystemModel::SetRoot()
 //!

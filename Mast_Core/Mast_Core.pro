@@ -156,6 +156,7 @@ HEADERS += \
     internal/SystemModelManager_impl.hpp                \
     internal/SystemModelReseter.hpp                     \
     internal/ToSutVisitor.hpp                           \
+    internal/MTQueue.hpp                           \
     internal/YamlNodesCache.hpp
 
 unix {

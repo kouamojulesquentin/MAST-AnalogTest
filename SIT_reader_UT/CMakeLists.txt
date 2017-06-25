@@ -22,7 +22,6 @@ add_custom_command (OUTPUT 		${UT_RootPath}/Generated/Runner.cpp
 
 include_directories(${CXXTEST_INCLUDE_DIR})
 include_directories(${UT_RootPath}/../Mast_UT/CxxTest_Traits)
-include_directories(${UT_RootPath}/UT_Helpers/)
 include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
 include_directories(${LIBMAST_CPP_API_INCLUDE_DIRS})
 include_directories(${LIBLOGGER_INCLUDE_DIRS})

@@ -174,10 +174,11 @@ class StaticTestSpyBased_MultiThread_Tester
   public:
   //! Checks Push/Pop with given number of producers, consumers and produced items count
   //!
+  //! @note It is difficult to check that all consumers take part of the share
+  //!       So test is tried multiple time until all consumer get some data or loop count is exhausted
+  //!
   void test (size_t producersCount, size_t consumersCount, size_t itemsCount)
   {
-    // ---------------- Setup
-    //
     ostringstream os;
     os << "producers:"    << producersCount
        << ", consumers: " << consumersCount
@@ -189,126 +190,141 @@ class StaticTestSpyBased_MultiThread_Tester
     using TProducer = Producer<TPayload, TDataTransferStrategy>;
     using TConsumer = Consumer<TPayload>;
 
-    MTQueue<TPayload>  sut;
-    std::atomic<bool>  moreToProduce (true);
-    std::promise<void> promise;           // This is for threads synchronization
-    auto               threadSynchronizer  = promise.get_future().share();
-    vector<TProducer>  producers(producersCount, TProducer(sut, threadSynchronizer));
-    vector<TConsumer>  consumers(consumersCount, TConsumer(sut, moreToProduce, threadSynchronizer, itemsCount));
+    uint32_t tryCount         = 10u;
+    auto     consumerFamished = false;
 
-    TPayload start     (0);
-    TPayload end       (itemsCount);
-    TPayload increment (producers.size());
-
-    StaticTestSpy::ResetAll();
-
-    // ---------------- Exercise
-    //
-    // Start consumers
-    using TConsumerFuture = decltype(std::async(std::launch::async, TConsumer(sut, moreToProduce)));
-    std::vector<TConsumerFuture> consumerFutures;
-    for (auto& consumer : consumers)
+    do
     {
-      consumerFutures.emplace_back(std::async(std::launch::async, std::ref(consumer)));
-    }
+      // ---------------- Setup
+      //
+      consumerFamished = false;
 
-    // Start producers
-    using TProducerFuture = decltype(std::async(std::launch::async, TProducer(sut, threadSynchronizer), start, end, increment));
-    std::vector<TProducerFuture> producerFutures;
-    for (auto& producer : producers)
-    {
-      producerFutures.emplace_back(std::async(std::launch::async, std::ref(producer), start, end, increment));
-      ++start;
-    }
-    promise.set_value();  // Synchronize all threads
+      MTQueue<TPayload>  sut;
+      std::atomic<bool>  moreToProduce (true);
+      std::promise<void> promise;           // This is for threads synchronization
+      auto               threadSynchronizer  = promise.get_future().share();
+      vector<TProducer>  producers(producersCount, TProducer(sut, threadSynchronizer));
+      vector<TConsumer>  consumers(consumersCount, TConsumer(sut, moreToProduce, threadSynchronizer, itemsCount));
+
+      TPayload start     (0);
+      TPayload end       (itemsCount);
+      TPayload increment (producers.size());
+
+      StaticTestSpy::ResetAll();
+
+      // ---------------- Exercise
+      //
+      // Start consumers
+      using TConsumerFuture = decltype(std::async(std::launch::async, TConsumer(sut, moreToProduce)));
+      std::vector<TConsumerFuture> consumerFutures;
+      for (auto& consumer : consumers)
+      {
+        consumerFutures.emplace_back(std::async(std::launch::async, std::ref(consumer)));
+      }
+
+      // Start producers
+      using TProducerFuture = decltype(std::async(std::launch::async, TProducer(sut, threadSynchronizer), start, end, increment));
+      std::vector<TProducerFuture> producerFutures;
+      for (auto& producer : producers)
+      {
+        producerFutures.emplace_back(std::async(std::launch::async, std::ref(producer), start, end, increment));
+        ++start;
+      }
+      promise.set_value();  // Synchronize all threads
 
 
-    // ---------------- Verify
-    //
-    const auto timeout = 100ms;
+      // ---------------- Verify
+      //
+      const auto timeout = 100ms;
 
-    // Wait for producer threads to terminate their job
-    for (auto& producerFuture: producerFutures)
-    {
-      auto status = producerFuture.wait_for(timeout);
-      TS_ASSERT_EQUALS (status, future_status::ready);
-    }
+      // Wait for producer threads to terminate their job
+      for (auto& producerFuture: producerFutures)
+      {
+        auto status = producerFuture.wait_for(timeout);
+        TS_ASSERT_EQUALS (status, future_status::ready);
+      }
 
-    moreToProduce = false;
+      moreToProduce = false;
 
-    // Wait for consumer threads to terminate their job
-    for (auto& consumerFuture: consumerFutures)
-    {
-      auto status = consumerFuture.wait_for(timeout);
-      TS_ASSERT_EQUALS (status, future_status::ready);
-    }
+      // Wait for consumer threads to terminate their job
+      for (auto& consumerFuture: consumerFutures)
+      {
+        auto status = consumerFuture.wait_for(timeout);
+        TS_ASSERT_EQUALS (status, future_status::ready);
+      }
 
 
-    CxxTest::setAbortTestOnFail(false);
+      CxxTest::setAbortTestOnFail(false);
 
-    size_t pushCopyConstructed                        = 0;
-    size_t pushMoveConstructed                        = 0;
-    size_t pushEmplaceConstructed                     = 0;
-    size_t popMoveAssigned                            = itemsCount;                      // Each popped items is moved from the queue
-    size_t popDefaultConstructed                      = consumersCount;                  // Consumers create each one instance to pop items from the queue;
-    size_t parameterPassingMoveConstructed            = producersCount * 6U;             // This comes from passing start, end and increment values
-    size_t savedPoppedItemsCopyConstructed            = itemsCount;
-    size_t rangeAndIncrementManagementCopyConstructed = 0;
-    size_t totalValueConstructed                      = 0;
-    size_t totalCopyConstructed                       = 0;
-    size_t totalMoveConstructed                       = 0;
+      size_t pushCopyConstructed                        = 0;
+      size_t pushMoveConstructed                        = 0;
+      size_t pushEmplaceConstructed                     = 0;
+      size_t popMoveAssigned                            = itemsCount;                      // Each popped items is moved from the queue
+      size_t popDefaultConstructed                      = consumersCount;                  // Consumers create each one instance to pop items from the queue;
+      size_t parameterPassingMoveConstructed            = producersCount * 6U;             // This comes from passing start, end and increment values
+      size_t savedPoppedItemsCopyConstructed            = itemsCount;
+      size_t rangeAndIncrementManagementCopyConstructed = 0;
+      size_t totalValueConstructed                      = 0;
+      size_t totalCopyConstructed                       = 0;
+      size_t totalMoveConstructed                       = 0;
 
-    if (strategy == DataTransferStrategy::Copy)
-    {
-      pushCopyConstructed                        = itemsCount;
-      rangeAndIncrementManagementCopyConstructed = producersCount * 4U; // For producer there are 3 for range + 1 that is incremented
-    }
-    if (strategy == DataTransferStrategy::Move)
-    {
-      pushMoveConstructed                        = itemsCount;
-      totalValueConstructed                      = producersCount;                  // This is the value that is first initialized, then incremented and moved
-      rangeAndIncrementManagementCopyConstructed = producersCount * 4U;             // For producer there are 3 for range + 1 that is incremented
-    }
-    if (strategy == DataTransferStrategy::Emplace)
-    {
-      pushEmplaceConstructed                     = itemsCount;
-      rangeAndIncrementManagementCopyConstructed = producersCount * 3U; // For producer there are 3 for range
-    }
+      if (strategy == DataTransferStrategy::Copy)
+      {
+        pushCopyConstructed                        = itemsCount;
+        rangeAndIncrementManagementCopyConstructed = producersCount * 4U; // For producer there are 3 for range + 1 that is incremented
+      }
+      if (strategy == DataTransferStrategy::Move)
+      {
+        pushMoveConstructed                        = itemsCount;
+        totalValueConstructed                      = producersCount;                  // This is the value that is first initialized, then incremented and moved
+        rangeAndIncrementManagementCopyConstructed = producersCount * 4U;             // For producer there are 3 for range + 1 that is incremented
+      }
+      if (strategy == DataTransferStrategy::Emplace)
+      {
+        pushEmplaceConstructed                     = itemsCount;
+        rangeAndIncrementManagementCopyConstructed = producersCount * 3U; // For producer there are 3 for range
+      }
 
-    totalValueConstructed += pushEmplaceConstructed;
+      totalValueConstructed += pushEmplaceConstructed;
 
-    totalCopyConstructed =  pushCopyConstructed
-                          + savedPoppedItemsCopyConstructed
-                          + rangeAndIncrementManagementCopyConstructed;
+      totalCopyConstructed =  pushCopyConstructed
+                            + savedPoppedItemsCopyConstructed
+                            + rangeAndIncrementManagementCopyConstructed;
 
-    totalMoveConstructed =   pushMoveConstructed
-                           + parameterPassingMoveConstructed;
+      totalMoveConstructed =   pushMoveConstructed
+                             + parameterPassingMoveConstructed;
 
-    size_t totalAnyConstructed  =   totalCopyConstructed
-                                  + totalMoveConstructed
-                                  + totalValueConstructed
-                                  + popDefaultConstructed;
+      size_t totalAnyConstructed  =   totalCopyConstructed
+                                    + totalMoveConstructed
+                                    + totalValueConstructed
+                                    + popDefaultConstructed;
 
-    TS_ASSERT_EQUALS (StaticTestSpy::GetNbCopyConstructorCall(),    totalCopyConstructed);
-    TS_ASSERT_EQUALS (StaticTestSpy::GetNbMoveConstructorCall(),    totalMoveConstructed);
-    TS_ASSERT_EQUALS (StaticTestSpy::GetNbValueConstructorCall(),   totalValueConstructed);
-    TS_ASSERT_EQUALS (StaticTestSpy::GetNbMoveAssignmentCall(),     popMoveAssigned);
-    TS_ASSERT_EQUALS (StaticTestSpy::GetNbDefaultConstructorCall(), popDefaultConstructed);
-    TS_ASSERT_EQUALS (StaticTestSpy::GetNbAnyConstructorsCall(),    totalAnyConstructed);
+      TS_ASSERT_EQUALS (StaticTestSpy::GetNbCopyConstructorCall(),    totalCopyConstructed);
+      TS_ASSERT_EQUALS (StaticTestSpy::GetNbMoveConstructorCall(),    totalMoveConstructed);
+      TS_ASSERT_EQUALS (StaticTestSpy::GetNbValueConstructorCall(),   totalValueConstructed);
+      TS_ASSERT_EQUALS (StaticTestSpy::GetNbMoveAssignmentCall(),     popMoveAssigned);
+      TS_ASSERT_EQUALS (StaticTestSpy::GetNbDefaultConstructorCall(), popDefaultConstructed);
+      TS_ASSERT_EQUALS (StaticTestSpy::GetNbAnyConstructorsCall(),    totalAnyConstructed);
 
-    // Merge and sort popped items
-    vector<TPayload>  poppedItems;
-    auto minimalShare = 1u;
-    for (const auto& consumer : consumers)
-    {
-      TS_ASSERT_LESS_THAN_EQUALS(minimalShare, consumer.PoppedItems().size());   // Workload should be shared by all threads
-      poppedItems.insert(poppedItems.end(), consumer.PoppedItems().cbegin(), consumer.PoppedItems().cend());
-    }
-    std::sort(poppedItems.begin(), poppedItems.end());
+      // Merge and sort popped items
+      vector<TPayload>  poppedItems;
+      for (const auto& consumer : consumers)
+      {
+        if (consumer.PoppedItems().size() == 0)
+        {
+          consumerFamished = true;
+          std::this_thread::sleep_for(15ms); // Wait a little while to try next time in a "different threading context"
+        }
+        poppedItems.insert(poppedItems.end(), consumer.PoppedItems().cbegin(), consumer.PoppedItems().cend());
+      }
+      std::sort(poppedItems.begin(), poppedItems.end());
 
-    TSM_ASSERT        (context.c_str(), !poppedItems.empty());
-    TSM_ASSERT_EQUALS (context.c_str(), poppedItems.size(), itemsCount);
-    Check_Content     (__LINE__, poppedItems);
+      TSM_ASSERT        (context.c_str(), !poppedItems.empty());
+      TSM_ASSERT_EQUALS (context.c_str(), poppedItems.size(), itemsCount);
+      Check_Content     (__LINE__, poppedItems);
+    } while (consumerFamished && (--tryCount != 0));
+
+    TSM_ASSERT_FALSE("Workload should be shared by all threads (at least minimally)", consumerFamished);
   }
 
   private:
@@ -901,60 +917,77 @@ void UT_MTQueue::test_When_1_Producers_1_Consumers()
 
 //! Checks in context of high contentions with 1 producer and N consumers
 //!
+//! @note It is difficult to check that all consumers take part of the share
+//!       So test is tried multiple time until all consumer get some data or loop count is exhausted
+//!
 void UT_MTQueue::test_When_1_Producers_N_Consumers()
 {
-  // ---------------- Setup
-  //
-  using                      TPayload      = int;
-  MTQueue<TPayload>          sut;
-  std::atomic<bool>          moreToProduce (true);
-  int                        itemsCount    = 200;
-  std::promise<void>         promise;           // This is for threads synchronization
-  auto                       threadSynchronizer  = promise.get_future().share();
-  Producer<TPayload>         producer(sut, threadSynchronizer);
-  vector<Consumer<TPayload>> consumers(3, Consumer<TPayload>(sut, moreToProduce, threadSynchronizer));
+  uint32_t tryCount         = 10u;
+  auto     consumerFamished = false;
 
-  // ---------------- Exercise
-  //
-  vector<std::thread> consumerThreads;
-  for (auto& consumer : consumers)
+  do
   {
-    consumerThreads.emplace_back(std::ref(consumer));
-  }
+    consumerFamished = false;
 
-  auto producerThread = std::thread(std::ref(producer), 0, itemsCount, 1);
+    // ---------------- Setup
+    //
+    using                      TPayload      = int;
+    MTQueue<TPayload>          sut;
+    std::atomic<bool>          moreToProduce (true);
+    int                        itemsCount    = 200;
+    std::promise<void>         promise;           // This is for threads synchronization
+    auto                       threadSynchronizer  = promise.get_future().share();
+    Producer<TPayload>         producer(sut, threadSynchronizer);
+    vector<Consumer<TPayload>> consumers(3, Consumer<TPayload>(sut, moreToProduce, threadSynchronizer));
 
-  promise.set_value();  // Synchronize all threads
+    // ---------------- Exercise
+    //
+    vector<std::thread> consumerThreads;
+    for (auto& consumer : consumers)
+    {
+      consumerThreads.emplace_back(std::ref(consumer));
+    }
 
-  // ---------------- Release threads
-  //
-  producerThread.join();
-  moreToProduce = false;
-  for (auto& consumerThread : consumerThreads)
-  {
-    consumerThread.join();
-  }
+    auto producerThread = std::thread(std::ref(producer), 0, itemsCount, 1);
 
-  // ---------------- Verify
-  //
-  CxxTest::setAbortTestOnFail(false);
+    promise.set_value();  // Synchronize all threads
 
-  TS_ASSERT        (sut.IsEmpty());
+    // ---------------- Release threads
+    //
+    producerThread.join();
+    moreToProduce = false;
+    for (auto& consumerThread : consumerThreads)
+    {
+      consumerThread.join();
+    }
 
-  vector<TPayload> poppedItems;
-  auto maximalTimeouts =  itemsCount / consumers.size();
-  for (const auto& consumer : consumers)
-  {
-    TSM_ASSERT_LESS_THAN_EQUALS("Workload should be shared by all threads", 1u, consumer.PoppedItems().size());
-    TS_ASSERT_LESS_THAN_EQUALS (consumer.Timeouts(), maximalTimeouts);
+    // ---------------- Verify
+    //
+    CxxTest::setAbortTestOnFail(false);
 
-    poppedItems.insert(poppedItems.end(), consumer.PoppedItems().cbegin(), consumer.PoppedItems().cend());
-  }
-  std::sort(poppedItems.begin(), poppedItems.end());
+    TS_ASSERT        (sut.IsEmpty());
 
-  TS_ASSERT           (!poppedItems.empty());
-  TS_ASSERT_EQUALS    (poppedItems.size(), itemsCount);
-  Check_Content       (__LINE__, poppedItems);
+    vector<TPayload> poppedItems;
+    auto maximalTimeouts =  itemsCount / consumers.size();
+    for (const auto& consumer : consumers)
+    {
+      if (consumer.PoppedItems().size() == 0)
+      {
+        consumerFamished = true;
+        std::this_thread::sleep_for(15ms); // Wait a little while to try next time in a "different threading context"
+      }
+      TS_ASSERT_LESS_THAN_EQUALS (consumer.Timeouts(), maximalTimeouts);
+
+      poppedItems.insert(poppedItems.end(), consumer.PoppedItems().cbegin(), consumer.PoppedItems().cend());
+    }
+    std::sort(poppedItems.begin(), poppedItems.end());
+
+    TS_ASSERT           (!poppedItems.empty());
+    TS_ASSERT_EQUALS    (poppedItems.size(), itemsCount);
+    Check_Content       (__LINE__, poppedItems);
+  } while (consumerFamished && (--tryCount != 0));
+
+  TSM_ASSERT_FALSE("Workload should be shared by all threads (at least minimally)", consumerFamished);
 }
 
 
@@ -1013,70 +1046,85 @@ void UT_MTQueue::test_When_N_Producers_1_Consumers()
 
 //! Checks in context of high contentions with N producers and N consumers
 //!
+//! @note It is difficult to check that all consumers take part of the share
+//!       So test is tried multiple time until all consumer get some data or loop count is exhausted
+//!
 void UT_MTQueue::test_When_N_Producers_N_Consumers()
 {
-  // ---------------- Setup
-  //
   using TPayload  = int;
   using TProducer = Producer<TPayload>;
   using TConsumer = Consumer<TPayload>;
 
-  MTQueue<TPayload>  sut;
-  std::atomic<bool>  moreToProduce (true);
-  std::promise<void> promise;           // This is for threads synchronization
-  auto               threadSynchronizer  = promise.get_future().share();
-  vector<TConsumer>  consumers(3, TConsumer(sut, moreToProduce, threadSynchronizer));
-  vector<TProducer>  producers(3, TProducer(sut, threadSynchronizer));
-  auto               itemsCount = 500U;
-  auto               start      = 0;
-  auto               end        = itemsCount;
-  auto               increment  = producers.size();
-
-  // ---------------- Exercise
-  //
-  vector<std::thread> consumerThreads;
-  for (auto& consumer : consumers)
+  uint32_t tryCount         = 10u;
+  auto     consumerFamished = false;
+  do
   {
-    consumerThreads.emplace_back(std::ref(consumer));
-  }
+    consumerFamished = false;
 
-  vector<std::thread> producerThreads;
-  for (auto& producer : producers)
-  {
-    producerThreads.emplace_back(std::ref(producer), start, end, increment);
-    ++start;
-  }
-  promise.set_value();  // Synchronize all threads
+    // ---------------- Setup
+    //
+    MTQueue<TPayload>  sut;
+    std::atomic<bool>  moreToProduce (true);
+    std::promise<void> promise;           // This is for threads synchronization
+    auto               threadSynchronizer  = promise.get_future().share();
+    vector<TConsumer>  consumers(3, TConsumer(sut, moreToProduce, threadSynchronizer));
+    vector<TProducer>  producers(3, TProducer(sut, threadSynchronizer));
+    auto               itemsCount = 500U;
+    auto               start      = 0;
+    auto               end        = itemsCount;
+    auto               increment  = producers.size();
 
-  // ---------------- Verify
-  //
-  for (auto& producerThread : producerThreads)
-  {
-    producerThread.join();
-  }
-  moreToProduce = false;
+    // ---------------- Exercise
+    //
+    vector<std::thread> consumerThreads;
+    for (auto& consumer : consumers)
+    {
+      consumerThreads.emplace_back(std::ref(consumer));
+    }
 
-  for (auto& consumerThread : consumerThreads)
-  {
-    consumerThread.join();
-  }
+    vector<std::thread> producerThreads;
+    for (auto& producer : producers)
+    {
+      producerThreads.emplace_back(std::ref(producer), start, end, increment);
+      ++start;
+    }
+    promise.set_value();  // Synchronize all threads
 
-  TS_ASSERT (sut.IsEmpty());
+    // ---------------- Verify
+    //
+    for (auto& producerThread : producerThreads)
+    {
+      producerThread.join();
+    }
+    moreToProduce = false;
 
-  vector<TPayload>  poppedItems;
-  auto minimalShare = (itemsCount/consumers.size()) / 20;
-  auto maxTimeouts  = itemsCount/consumers.size();
-  for (const auto& consumer : consumers)
-  {
-    TSM_ASSERT_GREATER_THAN_EQUALS("Workload should be shared by all threads", consumer.PoppedItems().size(), minimalShare);
-    TS_ASSERT_LESS_THAN (consumer.Timeouts(), maxTimeouts);
+    for (auto& consumerThread : consumerThreads)
+    {
+      consumerThread.join();
+    }
 
-    poppedItems.insert(poppedItems.end(), consumer.PoppedItems().cbegin(), consumer.PoppedItems().cend());
-  }
-  std::sort(poppedItems.begin(), poppedItems.end());
+    TS_ASSERT (sut.IsEmpty());
 
-  TS_ASSERT_EQUALS    (poppedItems.size(), itemsCount);
-  Check_Content       (__LINE__, poppedItems);
+    vector<TPayload>  poppedItems;
+    auto maxTimeouts  = itemsCount/consumers.size();
+    for (const auto& consumer : consumers)
+    {
+      if (consumer.PoppedItems().size() == 0)
+      {
+        consumerFamished = true;
+        std::this_thread::sleep_for(15ms); // Wait a little while to try next time in a "different threading context"
+      }
+      TS_ASSERT_LESS_THAN (consumer.Timeouts(), maxTimeouts);
+
+      poppedItems.insert(poppedItems.end(), consumer.PoppedItems().cbegin(), consumer.PoppedItems().cend());
+    }
+    std::sort(poppedItems.begin(), poppedItems.end());
+
+    TS_ASSERT_EQUALS    (poppedItems.size(), itemsCount);
+    Check_Content       (__LINE__, poppedItems);
+  } while (consumerFamished && (--tryCount != 0));
+
+  TSM_ASSERT_FALSE("Workload should be shared by all threads (at least minimally)", consumerFamished);
 }
 
 

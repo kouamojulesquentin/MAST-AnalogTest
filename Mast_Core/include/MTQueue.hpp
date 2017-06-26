@@ -2,8 +2,8 @@
 //                           MTQueue.hpp
 //===========================================================================
 // Copyright (C) 2015 Jean-Francois Coulon. All rights reserved.
-//               2017 Michele Portolan, TIMA             
-// 
+//               2017 Michele Portolan, TIMA
+//
 // Project : C++11 blocking queues
 // based on : Multi-Edit extension DLL
 //
@@ -161,15 +161,11 @@ class MTQueue final
 //  End of MTQueue class declaration
 //---------------------------------------------------------------------------
 
-} // End of namespace MewExt
-
-
-
-
+} // End of namespace Mast
 
 
 #endif  // not defined MTQUEUE_H__3ACE24EF_7BE_4DFE_F1BC_98E02E40CECE__INCLUDED_
 
 //===========================================================================
-// End of MTQueue.h
+// End of MTQueue.hpp
 //===========================================================================

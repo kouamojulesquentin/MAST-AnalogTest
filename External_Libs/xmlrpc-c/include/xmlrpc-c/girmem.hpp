@@ -41,8 +41,7 @@ protected:
 
 private:
     class Impl;
-
-    std::auto_ptr<Impl> const implP;
+    const std::unique_ptr<Impl> implP;
 
     // Because of 'implP', we cannot allow copy construction, so this is
     // private:
@@ -54,9 +53,9 @@ public:
     autoObjectPtr();
     autoObjectPtr(girmem::autoObject * objectP);
     autoObjectPtr(girmem::autoObjectPtr const& autoObjectPtr);
-    
+
     ~autoObjectPtr();
-    
+
     void
     point(girmem::autoObject * const objectP);
 
@@ -65,10 +64,10 @@ public:
 
     autoObjectPtr
     operator=(girmem::autoObjectPtr const& objectPtr);
-    
+
     girmem::autoObject *
     operator->() const;
-    
+
     girmem::autoObject *
     get() const;
 

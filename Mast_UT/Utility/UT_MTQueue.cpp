@@ -89,7 +89,7 @@ class Consumer final
 
   void operator()()
   {
-    constexpr auto timeout = std::chrono::milliseconds(5);
+    constexpr auto timeout = 15ms;
     TPayload  poppedItem;                     // Outside the loop to avoid to tally this construction many times
 
     m_poppedItems.reserve(m_reserveCount);    // To avoid many reallocation (put there because Consumers may be copied around before actual usage)
@@ -313,7 +313,7 @@ class StaticTestSpyBased_MultiThread_Tester
         if (consumer.PoppedItems().size() == 0)
         {
           consumerFamished = true;
-          std::this_thread::sleep_for(15ms); // Wait a little while to try next time in a "different threading context"
+          std::this_thread::sleep_for(27ms); // Wait a little while to try next time in a "different threading context"
         }
         poppedItems.insert(poppedItems.end(), consumer.PoppedItems().cbegin(), consumer.PoppedItems().cend());
       }
@@ -974,7 +974,7 @@ void UT_MTQueue::test_When_1_Producers_N_Consumers()
       if (consumer.PoppedItems().size() == 0)
       {
         consumerFamished = true;
-        std::this_thread::sleep_for(15ms); // Wait a little while to try next time in a "different threading context"
+        std::this_thread::sleep_for(27ms); // Wait a little while to try next time in a "different threading context"
       }
       TS_ASSERT_LESS_THAN_EQUALS (consumer.Timeouts(), maximalTimeouts);
 
@@ -1033,7 +1033,7 @@ void UT_MTQueue::test_When_N_Producers_1_Consumers()
   TS_ASSERT        (sut.IsEmpty());
 
   auto poppedItems = consumer.PoppedItems();
-  auto maxTimeouts = itemsCount / 200;
+  auto maxTimeouts = itemsCount / 100;  // The number is somewhat arbitrary (but it statically increase with itemsCount)
 
   std::sort(poppedItems.begin(), poppedItems.end());
 
@@ -1112,7 +1112,7 @@ void UT_MTQueue::test_When_N_Producers_N_Consumers()
       if (consumer.PoppedItems().size() == 0)
       {
         consumerFamished = true;
-        std::this_thread::sleep_for(15ms); // Wait a little while to try next time in a "different threading context"
+        std::this_thread::sleep_for(27ms); // Wait a little while to try next time in a "different threading context"
       }
       TS_ASSERT_LESS_THAN (consumer.Timeouts(), maxTimeouts);
 

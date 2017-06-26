@@ -18,9 +18,12 @@
 #include <memory>
 #include <cxxtest/ValueTraits.h>
 
+using std::string;
 using std::shared_ptr;
 using std::make_shared;
+
 using namespace mast;
+using namespace std::string_literals;
 
 namespace
 {
@@ -41,7 +44,8 @@ void UT_SystemModelNode::test_Constructor ()
 {
   // ---------------- Setup
   //
-  auto name = "A name";
+  string name;
+  name.append("A").append(" ").append("name");  // Make sure name is not constructed from a litteral (to avoid reference to it)
 
   // ---------------- Exercise
   //
@@ -49,7 +53,9 @@ void UT_SystemModelNode::test_Constructor ()
 
   // ---------------- Verify (SystemModelNode part)
   //
-  TS_ASSERT_EQUALS  (sut.Name(),     name);
+  name = "This is no more initial name";  // To check that this is not a reference that is saved
+
+  TS_ASSERT_EQUALS  (sut.Name(),     "A name");
   TS_ASSERT_EQUALS  (sut.Priority(), 0);
   TS_ASSERT_FALSE   (sut.IsPending());
   TS_ASSERT_FALSE   (sut.HasConditioner());

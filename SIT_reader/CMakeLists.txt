@@ -30,10 +30,8 @@ endif()
 
 message("")
 message("================================================================================")
-message(STATUS "SIT_parser: CODE_COVERAGE     ${CODE_COVERAGE}")
+message(STATUS "SIT_parser: CODE_COVERAGE:    ${CODE_COVERAGE}")
 message(STATUS "SIT_parser: CMAKE_CXX_FLAGS:  ${CMAKE_CXX_FLAGS}")
-message("================================================================================")
-message("")
 
 set (LEX_YACC_SRC_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/")
 
@@ -46,10 +44,15 @@ add_custom_command(
 )
 
 # Create target for the parser
+set(Bison_Switches -d --verbose --no-lines --warnings=all --feature=caret --report=itemset --debug)
+message(STATUS "SIT_parser: Bison_Switches:   ${Bison_Switches}")
+message("================================================================================")
+message("")
+
 add_custom_target(SIT_Parser_class echo "Creating SIT_parser")
 add_custom_command(
   OUTPUT ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_parser.tab.hh
-  COMMAND bison -d -v -l ${LEX_YACC_SRC_DIR}SIT_parser.yy -o ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc
+  COMMAND bison ${Bison_Switches} ${LEX_YACC_SRC_DIR}SIT_parser.yy -o ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc
   DEPENDS SIT_parser.yy
 )
 

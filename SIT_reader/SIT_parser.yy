@@ -26,6 +26,7 @@
 #include "SystemModelBuilder.hpp"
 #include "SystemModelNode.hpp"
 #include "PathSelector.hpp"
+#include "SubModelPlaceHolder.hpp"
 }
 
 %parse-param { SIT_Scanner  &scanner  }
@@ -110,14 +111,18 @@ namespace
 %define api.value.type variant
 %define parse.assert
 
-%type <node_list_type>        node_list
-%type <node_list_type>        children_list
-%type <std::uint8_t>          is_transparent
-%type <name_type>             node_name
-%type <std::uint8_t>          hold
-%type <std::string>           Optional_unquoted_string
-%type <std::string>           bypass
-%type <mast::MuxRegPlacement> mux_register_position
+%type <std::string>            instance_name
+%type <std::string>            factory_name
+%type <std::string>            file_name
+%type <std::string>            file_path
+%type <node_list_type>         node_list
+%type <node_list_type>         children_list
+%type <std::uint8_t>           is_transparent
+%type <name_type>              node_name
+%type <std::uint8_t>           hold
+%type <std::string>            Optional_unquoted_string
+%type <std::string>            bypass
+%type <mast::MuxRegPlacement>  mux_register_position
 
 
 %type <mast::SelectorProperty>          active
@@ -137,6 +142,7 @@ namespace
 
 %type <std::shared_ptr<mast::SystemModelNode>> root_node
 %type <std::shared_ptr<mast::SystemModelNode>> register_node
+%type <std::shared_ptr<mast::SystemModelNode>> instance_of      // Represents an instance of a sub-model
 %type <std::shared_ptr<mast::SystemModelNode>> leaf_node
 %type <std::shared_ptr<mast::SystemModelNode>> parent_node
 %type <std::shared_ptr<mast::SystemModelNode>> node
@@ -144,10 +150,15 @@ namespace
 %type <std::vector<std::string>>               function_list                 // List of PDL algorithm function names
 %type <std::pair<std::vector<std::string>, std::uint32_t>>  PDL_declaration  // List of PDL algorithm function names and line number of declaration
 
+%type <std::tuple<mast::PlaceHolderKind, std::string, std::string>> instance_of_sub  // Parameters for constructing a sub-model
+
 %token END 0 "end of file"
 %token UPPER
 %token LOWER
 %token CHAR
+%token t_Dot
+%token t_Backslash
+%token t_Slash
 %token t_SEMICOLON
 %token t_START_HIERARCHY
 %token t_END_HIERARCHY
@@ -160,8 +171,10 @@ namespace
 %token <std::string>   t_WORD
 %token <std::string>   t_CHAIN
 %token <std::string>   t_REGISTER
+%token <std::string>   t_INSTANCE
 %token <std::string>   t_LINKER
 %token <std::string>   t_ACCESS_INTERFACE
+%token <std::string>   t_OF
 %token <std::string>   t_SIB
 %token <std::string>   t_MIB
 %token <std::string>   t_1500_WRAPPER
@@ -230,16 +243,25 @@ root_node:
   ;
 
 children_list:
-  t_START_HIERARCHY node_list  t_END_HIERARCHY{ $$ = $2;}
+  t_START_HIERARCHY node_list t_END_HIERARCHY
+  { $$ = $2;}
   ;
 
 node_list:
-    node node_list { $$.name = $1->Name() + ' ' + $2.name; $$.n_nodes = $2.n_nodes+1;
-                     auto tmp = $2.nodes;
-                     tmp.insert(tmp.begin(),$1);
-                     $$.nodes = tmp;
-        }
-  |   node { $$.name = $1->Name();$$.n_nodes = 1;$$.nodes.push_back($1);}
+    node
+    {
+      $$.name    = $[node]->Name();
+      $$.n_nodes = 1;
+      $$.nodes.emplace_back($[node]);
+    }
+  | node_list[left] node
+    {
+      $$.name    = $[left].name + ' ' + $[node]->Name();
+      $$.n_nodes = $[left].n_nodes++;
+
+      $[left].nodes.emplace_back($[node]);
+      $$.nodes = std::move($[left].nodes);
+    }
 ;
 
 node:
@@ -248,34 +270,38 @@ node:
 ;
 
 is_transparent:
-   t_TRANSPARENT {$$ = 1;}
- |
-  { $$ = 0;}
+   t_TRANSPARENT { $$ = 1; }
+ | %empty        { $$ = 0; }
 ;
 
-node_name :  t_WORD is_transparent
-{
-  $$.name           = $[t_WORD];
-  $$.is_transparent = $[is_transparent];
-}
+node_name:
+  t_WORD is_transparent
+  {
+    $$.name           = $[t_WORD];
+    $$.is_transparent = $[is_transparent];
+  }
 ;
 
-parent_node_with_children: parent_node PDL_declaration children_list
-{
-  auto asParentNode = dynamic_pointer_cast <ParentNode>($1);
-
-  for (auto this_child : $3.nodes)
+parent_node_with_children:
+  parent_node PDL_declaration children_list
   {
-    asParentNode->AppendChild(this_child);
-  }
-  $$ = $1;
+    auto asParentNode = dynamic_pointer_cast <ParentNode>($[parent_node]);
 
-  if (!$2.first.empty())
-  {
-    for (auto this_function : $2.first)
-      driver.namesAndNodes.push_back(AppFunctionNameAndNode(this_function, asParentNode, $2.second));
+    for (auto this_child : $[children_list].nodes)
+    {
+      asParentNode->AppendChild(this_child);
+    }
+    $$ = $[parent_node];
+
+    if (!$[PDL_declaration].first.empty())
+    {
+      for (auto this_function : $[PDL_declaration].first)
+      {
+        driver.namesAndNodes.emplace_back(this_function, asParentNode, $[PDL_declaration].second);
+      }
+    }
   }
-}
+;
 
 PDL_declaration:
  t_PDL function_list
@@ -283,6 +309,7 @@ PDL_declaration:
    $$ = make_pair($[function_list], nlines);
  }
  |
+ %empty
  {
    $$ = make_pair(vector<string>(), nlines);
  }
@@ -466,11 +493,10 @@ path_selector_kind: t_WORD
    { $$ =$1;}
    ;
 
-selector_register_name: t_WORD
-   { $$ = $1;}
-   |
-   { $$ = "";}
-   ;
+selector_register_name:
+    t_WORD { $$ = $1; }
+  | %empty { $$ = ""; }
+  ;
 
 IR_size :
  t_DecimalLiteral { $$ = $1;}
@@ -482,8 +508,8 @@ n_DR_chains :
 
 
 IR_TABLE:
- t_LeftBracket IR_Coding_list t_RightBracket  {$$=$2;}
- |  {$$ = std::vector<mast::BinaryVector>();}
+   t_LeftBracket IR_Coding_list t_RightBracket  {$$=$2;}
+ | %empty {$$ = std::vector<mast::BinaryVector>();}
  ;
 
 AI_identifier:
@@ -494,14 +520,14 @@ AI_identifier:
 ;
 
 Optional_unquoted_string:
- t_QUOTED_STRING
- {
-   $$ = remove_quotes($1);
- }
-|
- {
-   $$="";
- }
+  t_QUOTED_STRING
+  {
+    $$ = remove_quotes($1);
+  }
+| %empty
+  {
+    $$="";
+  }
 ;
 
 path_selector_parameters: Optional_unquoted_string
@@ -511,15 +537,15 @@ path_selector_parameters: Optional_unquoted_string
 ;
 
 AI_protocol_parameters:
- t_QUOTED_STRING
- {
-   $$ = remove_quotes($1);
- }
-|
- {
-   $$="";
- }
-;
+  t_QUOTED_STRING
+  {
+    $$ = remove_quotes($1);
+  }
+| %empty
+  {
+    $$="";
+  }
+  ;
 
 IR_Coding_list:
   t_QUOTED_STRING
@@ -550,16 +576,19 @@ active :
  ;
 
 reverse :
- t_REVERSE
- {  $$ = SelectorProperty::ReverseOrder; }
- |
- {  $$ = SelectorProperty::None; }
+ t_REVERSE { $$ = SelectorProperty::ReverseOrder; }
+ | %empty  { $$ = SelectorProperty::None; }
  ;
 
-leaf_node: register_node
-{
-  $$=  $1;
-}
+leaf_node:
+    register_node
+    {
+      $$=  $1;
+    }
+  | instance_of
+    {
+      $$=  $1;
+    }
 ;
 
 register_node:
@@ -582,14 +611,15 @@ register_node:
 
      $$ = registerNode;
    }
+;
 
 size:
- t_DecimalLiteral { $$ = $1;}
+ t_DecimalLiteral { $$ = $1; }
 ;
 
 hold:
- t_HOLD_VALUE{  $$=1 ; }
- |{  $$=0 ; }
+   t_HOLD_VALUE { $$ = 1; }
+ | %empty       { $$ = 0; }
  ;
 
 bypass:
@@ -597,6 +627,49 @@ bypass:
   {
    $$=$3 ;
   }
+  ;
+
+instance_of:
+  instance_of_sub
+  {
+    auto        kind          = std::get<0>($[instance_of_sub]);
+    const auto& instance_name = std::get<1>($[instance_of_sub]);
+    const auto& identifier    = std::get<2>($[instance_of_sub]);
+
+    auto chain = driver.main_sm->CreateChain(instance_name);
+    chain->IgnoreForNodePath(false);
+
+    driver.placeHolders.emplace_back(kind, identifier, chain);
+    $$ = chain;
+  }
+
+instance_of_sub:
+  t_INSTANCE instance_name t_OF file_path
+  {
+    $$ = make_tuple(PlaceHolderKind::SIT,     $[instance_name], $[file_path]);
+  }
+| t_INSTANCE instance_name t_OF factory_name
+  {
+    $$ = make_tuple(PlaceHolderKind::Factory, $[instance_name], $[factory_name]);
+  }
+  ;
+
+file_name:
+  t_WORD[left] t_Dot t_WORD[right]  { $$ = $[left].append(".").append($[right]); }
+  ;
+
+file_path:
+    file_name                                 { $$ = $[file_name]; }
+  | t_QUOTED_STRING                           { $$ = remove_quotes($[t_QUOTED_STRING]); }
+  | t_WORD[left] t_Slash     file_path[right] { $$ = $[left].append("/").append($[right]); }
+  | t_WORD[left] t_Backslash file_path[right] { $$ = $[left].append("\\").append($[right]); }
+  ;
+
+instance_name:
+  t_WORD { $$ = $[t_WORD]; }
+  ;
+factory_name:
+  t_WORD { $$ = $[t_WORD]; }
   ;
 
 %%

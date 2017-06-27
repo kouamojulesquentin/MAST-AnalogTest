@@ -20,6 +20,8 @@
 #include "g3log/g3log.hpp"
 #include "UT_reader.hpp"
 
+#include "Mast_Core_Traits.hpp"
+
 #include <cxxtest/ValueTraits.h>
 #include <experimental/string_view>
 #include <iostream>
@@ -35,6 +37,7 @@ using std::experimental::string_view;
 using std::vector;
 using std::shared_ptr;
 using std::make_shared;
+using std::dynamic_pointer_cast;
 
 using namespace std::chrono_literals;
 using namespace std::experimental::literals::string_view_literals;
@@ -100,6 +103,7 @@ void UT_reader::test_register_Success ()
     // ---------------- Verify
     //
     TS_ASSERT_EMPTY (sut.ErrorMessage());
+    TS_ASSERT_EMPTY (sut.PlaceHolders());
 
     auto parsedModel = sut.ParsedSystemModel();
 
@@ -203,6 +207,8 @@ void UT_reader::test_chain ()
     //
     auto parsedModel = sut.ParsedSystemModel();
 
+    TS_ASSERT_EMPTY (sut.PlaceHolders());
+
     // With PrettyPrinter
     auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(parsedModel, PrettyPrinterOptions::Parser_debug);
     TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
@@ -281,6 +287,8 @@ void UT_reader::test_MIB ()
     // ---------------- Verify
     //
     auto parsedModel = sut.ParsedSystemModel();
+
+    TS_ASSERT_EMPTY (sut.PlaceHolders());
 
     // With PrettyPrinter
     auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(parsedModel, PrettyPrinterOptions::Parser_debug);
@@ -842,6 +850,8 @@ void UT_reader::test_SIB ()
     //
     auto parsedModel = sut.ParsedSystemModel();
 
+    TS_ASSERT_EMPTY (sut.PlaceHolders());
+
     // With PrettyPrinter
     auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(parsedModel, PrettyPrinterOptions::Parser_debug);
     TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
@@ -914,6 +924,7 @@ void UT_reader::test_JTAG_TAP_Success ()
     // ---------------- Verify
     //
     TS_ASSERT_EMPTY (sut.ErrorMessage());
+    TS_ASSERT_EMPTY (sut.PlaceHolders());
 
     auto parsedModel = sut.ParsedSystemModel();
 
@@ -1052,6 +1063,7 @@ void UT_reader::test_ACCES_INTERFACE_Success ()
     CxxTest::setAbortTestOnFail(true);
 
     TS_ASSERT_EMPTY (sut.ErrorMessage());
+    TS_ASSERT_EMPTY (sut.PlaceHolders());
 
     auto parsedModel = sut.ParsedSystemModel();
 
@@ -1300,6 +1312,8 @@ void UT_reader::test_1500 ()
 
     // ---------------- Verify
     //
+    TS_ASSERT_EMPTY (sut.PlaceHolders());
+
     auto parsedModel = sut.ParsedSystemModel();
 
     // With PrettyPrinter
@@ -1363,6 +1377,7 @@ void UT_reader::test_LINKER_Success ()
     CxxTest::setAbortTestOnFail(true);
 
     TS_ASSERT_EMPTY (sut.ErrorMessage());
+    TS_ASSERT_EMPTY (sut.PlaceHolders());
 
     auto parsedModel = sut.ParsedSystemModel();
 
@@ -1483,6 +1498,7 @@ void UT_reader::test_LINKER_CustomTable_Success ()
     CxxTest::setAbortTestOnFail(true);
 
     TS_ASSERT_EMPTY (sut.ErrorMessage());
+    TS_ASSERT_EMPTY (sut.PlaceHolders());
 
     auto parsedModel = sut.ParsedSystemModel();
 
@@ -1540,7 +1556,8 @@ void UT_reader::test_PDL_Success ()
     // ---------------- Verify
     //
     CxxTest::setAbortTestOnFail(true);
-    TS_ASSERT_TRUE (succeeded);
+    TS_ASSERT_TRUE  (succeeded);
+    TS_ASSERT_EMPTY (sut.PlaceHolders());
 
     vector<string>   gotAlgoNames;
     vector<uint32_t> gotLineNumbers;
@@ -1581,6 +1598,9 @@ void UT_reader::test_PDL_Success ()
   //
   TS_DATA_DRIVEN_TEST (checker, data);
 }
+
+
+
 
 
 // Test construction of PDL statement with 1 PDL algorithm name in case of failure
@@ -1633,6 +1653,211 @@ void UT_reader::test_PDL_Failure ()
   //
   TS_DATA_DRIVEN_TEST (checker, data);
 }
+
+// Test of INSTANCE OF statement with 1 INSTANCE OF
+//
+void UT_reader::test_INSTANCE_OF_Single_Success ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [&](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    stringstream sit(std::get<0>(data));
+    auto         expectedKind         = std::get<1>(data);
+    auto         expectedInstanceName = std::get<2>(data);
+    auto         expectedIdentifier   = std::get<3>(data);
+
+    auto sm = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
+
+    CxxTest::setAbortTestOnFail(true);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
+
+    // ---------------- Verify
+    //
+    const auto& placeHolders = sut.PlaceHolders();
+    TS_ASSERT_EQUALS (placeHolders.size(), 1u);
+
+    const auto& placeHolder = placeHolders[0];
+
+    TS_ASSERT_EQUALS (placeHolder.Kind(),        expectedKind);
+    TS_ASSERT_EQUALS (placeHolder.Identififer(), expectedIdentifier);
+
+    auto parent = placeHolder.Parent();
+    TS_ASSERT_NOT_NULLPTR (parent);
+    TS_ASSERT_EQUALS      (parent->Name(), expectedInstanceName);
+    TS_ASSERT_NOT_NULLPTR (dynamic_pointer_cast<Chain>(parent));
+  };
+
+  using data_t = tuple<string, PlaceHolderKind, string, string>;
+  auto data =
+  {
+    // 01 ==> One SIT INSTANCE_OF 1st node
+    data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
+           "{\n"                                     // 2
+           "  CHAIN chain_name\n"                    // 3
+           "  {\n"                                   // 4
+           "    INSTANCE Bar OF Foo.sit\n"           // 5
+           "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 6
+           "  }\n"                                   // 7
+           "}\n",                                    // 8
+           PlaceHolderKind::SIT,
+           "Bar",
+           "Foo.sit"
+          ),
+
+    // 02 ==> One SIT INSTANCE - last node
+    data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
+           "{\n"                                     // 2
+           "  CHAIN chain_name\n"                    // 3
+           "  {\n"                                   // 4
+           "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
+           "    INSTANCE Bat OF Foot.sit\n"          // 6
+           "  }\n"                                   // 7
+           "}\n",                                    // 8
+           PlaceHolderKind::SIT,
+           "Bat",
+           "Foot.sit"
+          ),
+
+      // 03 ==> One SIT INSTANCE - middle node
+      data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
+             "{\n"                                     // 2
+             "  CHAIN chain_name\n"                    // 3
+             "  {\n"                                   // 4
+             "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
+             "    INSTANCE Bot OF Fool.sit\n"          // 6
+             "    REGISTER reg_2 4 Bypass: \"0xC\"\n"  // 7
+             "  }\n"                                   // 8
+             "}\n",                                    // 9
+             PlaceHolderKind::SIT,
+             "Bot",
+             "Fool.sit"
+            ),
+
+      // 04 ==> One SIT INSTANCE - file path
+      data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
+             "{\n"                                     // 2
+             "  CHAIN chain_name\n"                    // 3
+             "  {\n"                                   // 4
+             "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
+             "    INSTANCE Rat OF One/Two/Three.sit\n" // 6
+             "  }\n"                                   // 7
+             "}\n",                                    // 8
+             PlaceHolderKind::SIT,
+             "Rat",
+             "One/Two/Three.sit"
+            ),
+
+    // 05 ==> One SIT INSTANCE - file path with embedded spaces
+    data_t("JTAG_TAP TAP Loopback 4 1\n"                 // 1
+           "{\n"                                         // 2
+           "  CHAIN chain_name\n"                        // 3
+           "  {\n"                                       // 4
+           "    REGISTER reg 12 Bypass: \"0xABC\"\n"     // 5
+           "    INSTANCE Put OF \"One Two Three.sit\"\n" // 6
+           "  }\n"                                       // 7
+           "}\n",                                        // 8
+           PlaceHolderKind::SIT,
+           "Put",
+           "One Two Three.sit"
+          ),
+
+
+    // 05 ==> Factory INSTANCE
+    data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
+           "{\n"                                     // 2
+           "  CHAIN chain_name\n"                    // 3
+           "  {\n"                                   // 4
+           "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
+           "    INSTANCE but OF Build_Sub\n"         // 6
+           "  }\n"                                   // 7
+           "}\n",                                    // 8
+           PlaceHolderKind::Factory,
+           "but",
+           "Build_Sub"
+          ),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+// Test of INSTANCE OF statement with multiple INSTANCE OF
+//
+void UT_reader::test_INSTANCE_OF_Multiple_Success ()
+{
+  // ---------------- Setup
+  //
+  stringstream sit
+  (
+    "JTAG_TAP TAP Loopback 4 1\n"             // 01
+    "{\n"                                     // 02
+    "  CHAIN chain_name\n"                    // 03
+    "  {\n"                                   // 04
+    "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 05
+    "    INSTANCE Bar OF Foo.sit\n"           // 06
+    "    INSTANCE Bat OF Fool\n"              // 07
+    "    INSTANCE Bit OF \"Pool.sit\"\n"      // 08
+    "  }\n"                                   // 09
+    "}\n"                                     // 10
+  );
+
+  auto sm = make_shared<SystemModel>();
+  SIT::SIT_Reader sut(sm);
+
+  CxxTest::setAbortTestOnFail(true);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
+
+  // ---------------- Verify
+  //
+  const auto& placeHolders = sut.PlaceHolders();
+  TS_ASSERT_EQUALS (placeHolders.size(), 3u);
+
+  // Instance 1
+  const auto& placeHolder_1 = placeHolders[0];
+
+  TS_ASSERT_EQUALS (placeHolder_1.Kind(),        PlaceHolderKind::SIT);
+  TS_ASSERT_EQUALS (placeHolder_1.Identififer(), "Foo.sit");
+
+  auto parent_1 = placeHolder_1.Parent();
+  TS_ASSERT_NOT_NULLPTR (parent_1);
+  TS_ASSERT_EQUALS      (parent_1->Name(), "Bar");
+  TS_ASSERT_NOT_NULLPTR (dynamic_pointer_cast<Chain>(parent_1));
+
+  // Instance 2
+  const auto& placeHolder_2 = placeHolders[1];
+  const auto  parent_2      = placeHolder_2.Parent();
+
+  TS_ASSERT_EQUALS      (placeHolder_2.Kind(),        PlaceHolderKind::Factory);
+  TS_ASSERT_EQUALS      (placeHolder_2.Identififer(), "Fool");
+  TS_ASSERT_NOT_NULLPTR (parent_2);
+  TS_ASSERT_EQUALS      (parent_2->Name(),            "Bat");
+  TS_ASSERT_NOT_NULLPTR (dynamic_pointer_cast<Chain>(parent_2));
+  TS_ASSERT_TRUE        (parent_1->NextSibling() == parent_2);
+
+  // Instance 3
+  const auto& placeHolder_3 = placeHolders[2];
+  const auto  parent_3      = placeHolder_3.Parent();
+
+  TS_ASSERT_EQUALS      (placeHolder_3.Kind(),        PlaceHolderKind::SIT);
+  TS_ASSERT_EQUALS      (placeHolder_3.Identififer(), "Pool.sit");
+  TS_ASSERT_NOT_NULLPTR (parent_3);
+  TS_ASSERT_EQUALS      (parent_3->Name(),            "Bit");
+  TS_ASSERT_NOT_NULLPTR (dynamic_pointer_cast<Chain>(parent_3));
+  TS_ASSERT_TRUE        (parent_2->NextSibling() == parent_3);
+}
+
 
 //===========================================================================
 // End of UT_reader.cpp

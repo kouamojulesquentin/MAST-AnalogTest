@@ -43,31 +43,30 @@ Syntax is:
     <td>
       <Size> Hold_value* Bypass: "<bypass_value>"<br>
       <table>
-        <tr><td><Size>:         </td><td>  number of bits composing the register in decimal notation            </td></tr>
-        <tr><td>Hold_value:     </td><td>  if provided, sets the "hold" property of the register to true  (i.e. the bypass value corresponds to the last value it has been assigned)      </td></tr>
-        <tr><td><Bypass_value>: </td><td>  the bypass sequence, written following MAST's BinaryVector convention</td></tr>
+        <tr><td><Size>         </td><td>  number of bits composing the register in decimal notation            </td></tr>
+        <tr><td>Hold_value     </td><td>  if provided, sets the "hold" property of the register to true  (i.e. the bypass value corresponds to the last value it has been assigned)      </td></tr>
+        <tr><td><Bypass_value> </td><td>  the bypass sequence, written following MAST's BinaryVector convention</td></tr>
       </table>
     </td>
   </tr>
 </table>
 
-Another leaf node is 'INSTANCE_OF' that represents the instanciation of a module at the point of insertion (as for any other child nodes). <br>
+Another leaf node is 'INSTANCE' that represents the instanciation of a module at the point of insertion (as for any other child nodes). <br>
 Syntax is:
 
-      INSTANCE_OF SIT      <sit_file>
-    | INSTANCE_OF FACTORY  <factory_name>
-
+      INSTANCE <name> OF <sit_file> | <factory_name>
 
 <br>
 <table>
   <tr><th width = 100>Node Type   </th><th>   Node Information</th></tr>
   <tr>
-    <td>INSTANCE_OF</td>
+    <td>INSTANCE</td>
     <td>
-      SIT     <sit_file>   <br>
-      FACTORY <factory_name>
+      <name> OF <sit_file>   <br>
+      <name> OF <factory_name>
       <table>
-        <tr><td><sit_file></td><td>  name or path of a SIT file            </td></tr>
+        <tr><td><name></td><td>  instance name</td></tr>
+        <tr><td><sit_file></td><td>  name or path of a SIT file with <b>.sit</b> extension</td></tr>
         <tr><td><factory_name></td><td> identify a model factory registered by a plugin</td></tr>
       </table>
     </td>

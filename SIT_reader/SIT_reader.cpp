@@ -21,7 +21,7 @@ using std::make_shared;
 using namespace mast;
 
 
-SIT::SIT_Reader::SIT_Reader( std::shared_ptr<mast::SystemModel> sm)
+SIT::SIT_Reader::SIT_Reader(std::shared_ptr<mast::SystemModel> sm)
   : main_sm (sm)
   , builder (make_shared<mast::SystemModelBuilder>(*main_sm))
 {
@@ -42,8 +42,7 @@ SIT::SIT_Reader::SIT_Reader( std::shared_ptr<mast::SystemModel> sm)
   #undef MAKE_LAMBDA
 }
 
-bool
-SIT::SIT_Reader::parse(string_view filename)
+bool SIT::SIT_Reader::parse(string_view filename)
 {
   if (filename.empty())
   {
@@ -61,15 +60,14 @@ SIT::SIT_Reader::parse(string_view filename)
   return parse_helper(sitFile);
 }
 
-bool
-SIT::SIT_Reader::parse( std::istream &stream )
+bool SIT::SIT_Reader::parse(std::istream& stream)
 {
-   if( ! stream.good()  && stream.eof() )
+   if (!stream.good() && stream.eof())
    {
-       return false;
+     return false;
    }
 
-   return parse_helper( stream );
+   return parse_helper(stream);
 }
 
 
@@ -87,15 +85,15 @@ bool SIT::SIT_Reader::parse_helper(std::istream& stream)
   return success;
 }
 
-void SIT::SIT_Reader::add_newline()
-{
-   ++line;
-   column=0;
-}
+//+void SIT::SIT_Reader::add_newline()
+//+{
+//+   ++line;
+//+   column=0;
+//+}
 
-void SIT::SIT_Reader::add_column()
-{
-   ++column;
-}
+//+void SIT::SIT_Reader::add_column()
+//+{
+//+   ++column;
+//+}
 
 

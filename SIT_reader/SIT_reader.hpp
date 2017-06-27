@@ -3,6 +3,7 @@
 
 #include "AppFunctionNameAndNode.hpp"
 #include "PathSelector.hpp"
+#include "SubModelPlaceHolder.hpp"
 
 #include <string>
 #include <vector>
@@ -52,17 +53,17 @@ public:
    SIT_Reader( std::shared_ptr<mast::SystemModel> sm);
 
 
-   /**
-    * parse - parse from a file
-    * @param filename - valid string with input file
-    */
+   //! Parses a SIT file to construct a SystemModel
+   //!
+   //! @param filename  SIT file path
+   //!
    bool parse(std::experimental::string_view filename);
 
-   /**
-    * parse - parse from a c++ input stream
-    * @param is - std::istream&, valid input stream
-    */
-   bool parse(std::istream &iss);
+   //! Parses a SIT formatted stream to construct a SystemModel
+   //!
+   //! @param stream Input stream to get model representation from
+   //!
+   bool parse(std::istream& stream);
 
    //! Returns SystemModelNode build from SIT
    //!
@@ -76,12 +77,15 @@ public:
    //!
    std::string ErrorMessage() const { return error_message; }
 
+   //! Identifies parts of the model that not instanciated yet and where to insert (splice) them
+   //!
+   const std::vector<mast::SubModelPlaceHolder>& PlaceHolders() const { return placeHolders; }
 
 private:  // Part used by SIT_Parser
   friend class SIT_Parser;
 
   std::vector<mast::AppFunctionNameAndNode>              namesAndNodes;      //!< Associations of algorithms name a node
-
+  std::vector<mast::SubModelPlaceHolder>                 placeHolders;       //!< Represents sub-model to instantiate and splice in this parsed SIT file
   std::map<std::string, std::shared_ptr<mast::Register>> declared_registers; //!< Created registers - kept to potentially associate to PathSelector (at end of parsing)
   std::queue<linker_information>                         unresolved_linkers; //!< Informations to create PathSelector associated with linker (register driving the selector may be yet unknown when the linker is created)
 
@@ -97,8 +101,8 @@ private:  // Part used by SIT_Parser
 
 private:
 
-   void add_newline();
-   void add_column();
+//+   void add_newline();
+//+   void add_column();
    bool parse_helper( std::istream &stream );
 
    std::size_t                  column = 0;

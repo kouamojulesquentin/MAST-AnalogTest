@@ -27,57 +27,54 @@ using token = SIT::SIT_Parser::token;
     yylloc.first_column = yycolumn; yylloc.last_column = yycolumn+yyleng-1; \
     yycolumn += yyleng;
 */
-#define KEYWORD_MAXSIZE   20
-#define N_KEYWORDS    17
 
-typedef struct {
-        char name[KEYWORD_MAXSIZE];
-        int kval;
-        } keywords_type;
-
-static keywords_type keywords_table []=
+namespace
 {
-  {"CHAIN",            token::t_CHAIN},             // 01
-  {"REGISTER",         token::t_REGISTER},          // 02
-  {"LINKER",           token::t_LINKER},            // 03
-  {"ACCESS_INTERFACE", token::t_ACCESS_INTERFACE},  // 04
-  {"NOT_IN_PATH",      token::t_TRANSPARENT},       // 05
-  {"Hold_value",       token::t_HOLD_VALUE},        // 06
-  {"Bypass",           token::t_BYPASS},            // 07
-  {"SIB",              token::t_SIB},               // 08
-  {"POST",             token::t_POST},              // 09
-  {"PRE",              token::t_PRE},               // 10
-  {"HIGH",             token::t_HIGH},              // 11
-  {"LOW",              token::t_LOW},               // 12
-  {"REVERSE",          token::t_REVERSE},           // 13
-  {"MIB",              token::t_MIB},               // 14
-  {"WRAPPER_1500",     token::t_1500_WRAPPER},      // 15
-  {"JTAG_TAP",         token::t_JTAG_TAP},          // 16
-  {"PDL",              token::t_PDL},               // 17
-};
+  struct keywords
+  {
+   static constexpr size_t KEYWORD_MAXSIZE = 20u;
 
-static int find_keyword(char *s)
+   char name[KEYWORD_MAXSIZE];
+   int  keyword;
+  };
+
+  static keywords keywords_table []=
+  {
+    {"CHAIN",            token::t_CHAIN},             // 01
+    {"REGISTER",         token::t_REGISTER},          // 02
+    {"LINKER",           token::t_LINKER},            // 03
+    {"ACCESS_INTERFACE", token::t_ACCESS_INTERFACE},  // 04
+    {"NOT_IN_PATH",      token::t_TRANSPARENT},       // 05
+    {"Hold_value",       token::t_HOLD_VALUE},        // 06
+    {"Bypass",           token::t_BYPASS},            // 07
+    {"SIB",              token::t_SIB},               // 08
+    {"POST",             token::t_POST},              // 09
+    {"PRE",              token::t_PRE},               // 10
+    {"HIGH",             token::t_HIGH},              // 11
+    {"LOW",              token::t_LOW},               // 12
+    {"REVERSE",          token::t_REVERSE},           // 13
+    {"MIB",              token::t_MIB},               // 14
+    {"WRAPPER_1500",     token::t_1500_WRAPPER},      // 15
+    {"JTAG_TAP",         token::t_JTAG_TAP},          // 16
+    {"PDL",              token::t_PDL},               // 17
+    {"INSTANCE",         token::t_INSTANCE},          // 18
+    {"OF",               token::t_OF},                // 19
+  };
+}
+
+
+static int find_keyword(const char* word)
 {
-  int   l;
-  keywords_type *pt;
-
-  pt = NULL;
-
- for (l=0;l<N_KEYWORDS;l++)
-   {
-    if (strcmp(keywords_table[l].name,s)==0)
-     {
-     pt=&(keywords_table[l]);
-//    std::cout << "Found Token "<< keywords_table[l].name<<" \n";
-     break;
-     }
-   }
-  if (pt==NULL)
-   {
-//    std::cerr << "Unregnized Token "<< s <<" \n";
-    return(-1);
-   }
-  else return(pt->kval);
+  for (const auto& entry : keywords_table)
+  {
+    if (strcmp(entry.name, word) == 0)
+    {
+ //    std::cout << "Found Token " << entry.name<<" \n";
+      return entry.keyword;
+    }
+  }
+ //    std::cerr << "Unrecognized Token: " << word << "\n";
+  return -1;
 }
 
 int nlines = 1;
@@ -155,36 +152,28 @@ BV_value    ({extended_digit}|{BV_base_specifier})
 {base_specifier}({extended_digit}(_?{extended_digit}))*  {
          yylval->build< std::string >( yytext );
          return( token::t_BASED_INTEGER );
-            }
+}
 \"({string_content})*\" {
          yylval->build< std::string >( yytext );
          return( token::t_QUOTED_STRING );
  }
 
-"{" {
-           return( token::t_START_HIERARCHY);
-   }
-"}" {
-           return( token::t_END_HIERARCHY);
-   }
-\:  {
-           return( token::t_SEMICOLON);
-   }
-
-\n          {
-              nlines++;
-        loc->lines();
-            }
-
+"{"  { return( token::t_START_HIERARCHY); }
+"}"  { return( token::t_END_HIERARCHY);   }
+\:   { return( token::t_SEMICOLON);       }
+"."  { return( token::t_Dot);             }
+"\\" { return( token::t_Backslash);       }
+"/"  { return( token::t_Slash);           }
+\n  {
+      nlines++;
+      loc->lines();
+    }
 \[  { return( token::t_LeftBracket);}
 \]  { return( token::t_RightBracket);}
-
 \(  {}
 \)  {}
 \,  { return( token::t_Comma);}
-
-.           {
-            }
+.   { }
 
 %%
 

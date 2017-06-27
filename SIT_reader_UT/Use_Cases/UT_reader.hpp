@@ -64,6 +64,11 @@ class UT_reader : public CxxTest::TestSuite
   void test_PDL_Success ();
   void test_PDL_Failure ();
 
+  // ---------------- INSTANCE_OF
+  //
+  void test_INSTANCE_OF_Single_Success ();
+  void test_INSTANCE_OF_Multiple_Success ();
+
   // ---------------- Other methods
   //
   void setUp();    //!< Initializes test (called for each test)

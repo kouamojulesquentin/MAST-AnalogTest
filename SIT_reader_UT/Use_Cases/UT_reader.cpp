@@ -154,8 +154,6 @@ void UT_reader::test_register_Error ()
 
     // ---------------- Verify
     //
-    std::this_thread::sleep_for(10ms); // To get messages from logger (running in another thread)
-
     const auto gotErrorMessage = sut.ErrorMessage();
     TS_ASSERT_EQUALS  (gotErrorMessage, expected_errMSG);
 
@@ -1017,7 +1015,6 @@ void UT_reader::test_JTAG_TAP_Failure ()
 
     // ---------------- Verify
     //
-    std::this_thread::sleep_for(5ms); // To get messages from logger (running in another thread)
     const auto gotErrorMessage = sut.ErrorMessage();
 
     TS_ASSERT_CONTAINS (gotErrorMessage, expected_ErrorMsg);
@@ -1245,7 +1242,6 @@ void UT_reader::test_ACCES_INTERFACE_Failure ()
     //
     CxxTest::setAbortTestOnFail(true);
 
-    std::this_thread::sleep_for(5ms);         // To get messages from logger (running in another thread)
     const auto gotErrorMessage = sut.ErrorMessage();
 
     TS_ASSERT_CONTAINS (gotErrorMessage, expected_ErrorMsg);
@@ -1292,7 +1288,8 @@ void UT_reader::test_ACCES_INTERFACE_Failure ()
 }
 
 
-/*Test 1500 Wrapper macro from Simplified ICL Tree input*/
+//! Test 1500 Wrapper macro from Simplified ICL Tree input
+//!
 void UT_reader::test_1500 ()
 {
   // ---------------- Setup
@@ -1394,7 +1391,7 @@ void UT_reader::test_LINKER_Success ()
 
   auto data =
   {
-    // 01 ==> correct syntax
+    // 00 ==> correct syntax
     make_tuple("LINKER test_LINKER One_Hot test_reg_1 4\n"
                "{\n"
                "  REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
@@ -1414,9 +1411,6 @@ void UT_reader::test_LINKER_Success ()
   //
   TS_DATA_DRIVEN_TEST (checker, data);
 }
-
-
-
 
 
 
@@ -1441,9 +1435,6 @@ void UT_reader::test_LINKER_Error ()
 
     // ---------------- Verify
     //
-    std::this_thread::sleep_for(10ms); // To get messages from logger (running in another thread)
-
-
     const auto gotErrorMessage = sut.ErrorMessage();
     TS_ASSERT_EQUALS  (gotErrorMessage, expected_errMSG);
 
@@ -1514,7 +1505,7 @@ void UT_reader::test_LINKER_CustomTable_Success ()
 
   auto data =
   {
-    // 01 ==> correct syntax
+    // 00 ==> correct syntax
     make_tuple("LINKER Link_0 Table_Based reg_1 3 \"0b1111, 0b0001, 0b0011, 0b0111,  0b1111, 0b0000, 0b0000, 0b0000\"\n"
                "{\n"
                "  REGISTER reg_1 4 Bypass: \"0b1001\"\n"
@@ -1575,7 +1566,7 @@ void UT_reader::test_PDL_Success ()
   using data_t = tuple<string, vector<string>>;
   auto data =
   {
-    // 01 ==> One PDL algorithm
+    // 00 ==> One PDL algorithm
     data_t("JTAG_TAP TAP Loopback 4 1\n"
            "PDL Incr\n"
            "{\n"
@@ -1584,7 +1575,7 @@ void UT_reader::test_PDL_Success ()
            {"Incr"}
           ),
 
-    // 02 ==> Two PDL algorithms
+    // 01 ==> Two PDL algorithms
     data_t("JTAG_TAP TAP Loopback 4 1\n"
            "PDL Incr, Decr\n"
            "{\n"
@@ -1598,9 +1589,6 @@ void UT_reader::test_PDL_Success ()
   //
   TS_DATA_DRIVEN_TEST (checker, data);
 }
-
-
-
 
 
 // Test construction of PDL statement with 1 PDL algorithm name in case of failure
@@ -1630,7 +1618,7 @@ void UT_reader::test_PDL_Failure ()
   using data_t = tuple<string, vector<string>>;
   auto data =
   {
-    // 01 ==> One PDL algorithm
+    // 00 ==> One PDL algorithm
     data_t("JTAG_TAP TAP Loopback 4 1\n"
            "PDL : Incr\n"   // ==> Unexpected colon
            "{\n"
@@ -1639,7 +1627,7 @@ void UT_reader::test_PDL_Failure ()
            {"Incr"}
           ),
 
-    // 02 ==> Two PDL algorithms
+    // 01 ==> Two PDL algorithms
     data_t("JTAG_TAP TAP Loopback 4 1\n"
            "PDL increment; Decr\n"  // ==> unexpected semi-colon
            "{\n"
@@ -1685,8 +1673,8 @@ void UT_reader::test_INSTANCE_OF_Single_Success ()
 
     const auto& placeHolder = placeHolders[0];
 
-    TS_ASSERT_EQUALS (placeHolder.Kind(),        expectedKind);
-    TS_ASSERT_EQUALS (placeHolder.Identififer(), expectedIdentifier);
+    TS_ASSERT_EQUALS (placeHolder.Kind(),       expectedKind);
+    TS_ASSERT_EQUALS (placeHolder.Identifier(), expectedIdentifier);
 
     auto parent = placeHolder.Parent();
     TS_ASSERT_NOT_NULLPTR (parent);
@@ -1697,7 +1685,7 @@ void UT_reader::test_INSTANCE_OF_Single_Success ()
   using data_t = tuple<string, PlaceHolderKind, string, string>;
   auto data =
   {
-    // 01 ==> One SIT INSTANCE_OF 1st node
+    // 00 ==> One SIT INSTANCE_OF 1st node
     data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
            "{\n"                                     // 2
            "  CHAIN chain_name\n"                    // 3
@@ -1711,7 +1699,7 @@ void UT_reader::test_INSTANCE_OF_Single_Success ()
            "Foo.sit"
           ),
 
-    // 02 ==> One SIT INSTANCE - last node
+    // 01 ==> One SIT INSTANCE - last node
     data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
            "{\n"                                     // 2
            "  CHAIN chain_name\n"                    // 3
@@ -1725,36 +1713,36 @@ void UT_reader::test_INSTANCE_OF_Single_Success ()
            "Foot.sit"
           ),
 
-      // 03 ==> One SIT INSTANCE - middle node
-      data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
-             "{\n"                                     // 2
-             "  CHAIN chain_name\n"                    // 3
-             "  {\n"                                   // 4
-             "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
-             "    INSTANCE Bot OF Fool.sit\n"          // 6
-             "    REGISTER reg_2 4 Bypass: \"0xC\"\n"  // 7
-             "  }\n"                                   // 8
-             "}\n",                                    // 9
-             PlaceHolderKind::SIT,
-             "Bot",
-             "Fool.sit"
-            ),
+    // 02 ==> One SIT INSTANCE - middle node
+    data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
+           "{\n"                                     // 2
+           "  CHAIN chain_name\n"                    // 3
+           "  {\n"                                   // 4
+           "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
+           "    INSTANCE Bot OF Fool.sit\n"          // 6
+           "    REGISTER reg_2 4 Bypass: \"0xC\"\n"  // 7
+           "  }\n"                                   // 8
+           "}\n",                                    // 9
+           PlaceHolderKind::SIT,
+           "Bot",
+           "Fool.sit"
+          ),
 
-      // 04 ==> One SIT INSTANCE - file path
-      data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
-             "{\n"                                     // 2
-             "  CHAIN chain_name\n"                    // 3
-             "  {\n"                                   // 4
-             "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
-             "    INSTANCE Rat OF One/Two/Three.sit\n" // 6
-             "  }\n"                                   // 7
-             "}\n",                                    // 8
-             PlaceHolderKind::SIT,
-             "Rat",
-             "One/Two/Three.sit"
-            ),
+    // 03 ==> One SIT INSTANCE - file path
+    data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
+           "{\n"                                     // 2
+           "  CHAIN chain_name\n"                    // 3
+           "  {\n"                                   // 4
+           "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
+           "    INSTANCE Rat OF One/Two/Three.sit\n" // 6
+           "  }\n"                                   // 7
+           "}\n",                                    // 8
+           PlaceHolderKind::SIT,
+           "Rat",
+           "One/Two/Three.sit"
+          ),
 
-    // 05 ==> One SIT INSTANCE - file path with embedded spaces
+    // 04 ==> One SIT INSTANCE - file path with embedded spaces
     data_t("JTAG_TAP TAP Loopback 4 1\n"                 // 1
            "{\n"                                         // 2
            "  CHAIN chain_name\n"                        // 3
@@ -1788,6 +1776,10 @@ void UT_reader::test_INSTANCE_OF_Single_Success ()
   //
   TS_DATA_DRIVEN_TEST (checker, data);
 }
+
+
+
+
 
 
 // Test of INSTANCE OF statement with multiple INSTANCE OF
@@ -1827,8 +1819,8 @@ void UT_reader::test_INSTANCE_OF_Multiple_Success ()
   // Instance 1
   const auto& placeHolder_1 = placeHolders[0];
 
-  TS_ASSERT_EQUALS (placeHolder_1.Kind(),        PlaceHolderKind::SIT);
-  TS_ASSERT_EQUALS (placeHolder_1.Identififer(), "Foo.sit");
+  TS_ASSERT_EQUALS (placeHolder_1.Kind(),       PlaceHolderKind::SIT);
+  TS_ASSERT_EQUALS (placeHolder_1.Identifier(), "Foo.sit");
 
   auto parent_1 = placeHolder_1.Parent();
   TS_ASSERT_NOT_NULLPTR (parent_1);
@@ -1839,25 +1831,134 @@ void UT_reader::test_INSTANCE_OF_Multiple_Success ()
   const auto& placeHolder_2 = placeHolders[1];
   const auto  parent_2      = placeHolder_2.Parent();
 
-  TS_ASSERT_EQUALS      (placeHolder_2.Kind(),        PlaceHolderKind::Factory);
-  TS_ASSERT_EQUALS      (placeHolder_2.Identififer(), "Fool");
+  TS_ASSERT_EQUALS      (placeHolder_2.Kind(),       PlaceHolderKind::Factory);
+  TS_ASSERT_EQUALS      (placeHolder_2.Identifier(), "Fool");
   TS_ASSERT_NOT_NULLPTR (parent_2);
-  TS_ASSERT_EQUALS      (parent_2->Name(),            "Bat");
+  TS_ASSERT_EQUALS      (parent_2->Name(),           "Bat");
   TS_ASSERT_NOT_NULLPTR (dynamic_pointer_cast<Chain>(parent_2));
-  TS_ASSERT_TRUE        (parent_1->NextSibling() == parent_2);
+  TS_ASSERT_TRUE        (parent_1->NextSibling()     == parent_2);
 
   // Instance 3
   const auto& placeHolder_3 = placeHolders[2];
   const auto  parent_3      = placeHolder_3.Parent();
 
-  TS_ASSERT_EQUALS      (placeHolder_3.Kind(),        PlaceHolderKind::SIT);
-  TS_ASSERT_EQUALS      (placeHolder_3.Identififer(), "Pool.sit");
+  TS_ASSERT_EQUALS      (placeHolder_3.Kind(),       PlaceHolderKind::SIT);
+  TS_ASSERT_EQUALS      (placeHolder_3.Identifier(), "Pool.sit");
   TS_ASSERT_NOT_NULLPTR (parent_3);
-  TS_ASSERT_EQUALS      (parent_3->Name(),            "Bit");
+  TS_ASSERT_EQUALS      (parent_3->Name(),           "Bit");
   TS_ASSERT_NOT_NULLPTR (dynamic_pointer_cast<Chain>(parent_3));
-  TS_ASSERT_TRUE        (parent_2->NextSibling() == parent_3);
+  TS_ASSERT_TRUE        (parent_2->NextSibling()     == parent_3);
 }
 
+// Test of INSTANCE OF statement in case of failure
+//
+void UT_reader::test_INSTANCE_OF_Failure ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [&](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    stringstream sit(std::get<0>(data));
+    auto         expectedErrorMessage = std::get<1>(data);
+
+    auto sm = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
+
+    CxxTest::setAbortTestOnFail(true);
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (sut.parse(sit), std::runtime_error);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_CONTAINS (sut.ErrorMessage(), expectedErrorMessage);
+  };
+
+  using data_t = tuple<string, string>;
+  auto data =
+  {
+    // 00
+    data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
+           "{\n"                                     // 2
+           "  CHAIN chain_name\n"                    // 3
+           "  {\n"                                   // 4
+           "    INSTANCE Bar Foo.sit\n"              // 5 ==> Missing keyword OF
+           "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 6
+           "  }\n"                                   // 7
+           "}\n",                                    // 8
+           "Line 5:18-21: syntax error"
+          ),
+
+    // 01
+    data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
+           "{\n"                                     // 2
+           "  CHAIN chain_name\n"                    // 3
+           "  {\n"                                   // 4
+           "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
+           "    INSTANCE Bat OF Hello World.sit\n"   // 6 ==> Path with embedded spaces must be within double quote strings (it is parsed correctly up to 'Hello')
+           "  }\n"                                   // 7
+           "}\n",                                    // 8
+           "Line 6:27-32: syntax error"
+          ),
+
+    // 02
+    data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
+           "{\n"                                     // 2
+           "  CHAIN chain_name\n"                    // 3
+           "  {\n"                                   // 4
+           "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
+           "    INSTANCE OF Fool.sit\n"              // 6  ==> Missing instance name
+           "    REGISTER reg_2 4 Bypass: \"0xC\"\n"  // 7
+           "  }\n"                                   // 8
+           "}\n",                                    // 9
+           "Line 6:14-16: syntax error"
+          ),
+
+    // 03
+    data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
+           "{\n"                                     // 2
+           "  CHAIN chain_name\n"                    // 3
+           "  {\n"                                   // 4
+           "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
+           "    INSTANCE Rat OF \n"                  // 6 ==> Missing SIT file or factory name
+           "  }\n"                                   // 7
+           "}\n",                                    // 8
+           "Line 7:3-4: syntax error"
+          ),
+
+    // 04
+    data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
+           "{\n"                                     // 2
+           "  CHAIN chain_name\n"                    // 3
+           "  {\n"                                   // 4
+           "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
+           "    INSTANCE OF Put Far\n"               // 6 ==> Out of order
+           "  }\n"                                   // 7
+           "}\n",                                    // 8
+           "error: Line 6:14-16"        // Report misleadingly: Line 6:14-19 ==> Should be Line 6:14-15 !
+          ),
+
+
+    // 05
+    data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
+           "{\n"                                     // 2
+           "  CHAIN chain_name\n"                    // 3
+           "  {\n"                                   // 4
+           "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
+           "    INSTANCE \"but\" OF Build_Sub\n"     // 6 ==> Instance must not be quoted
+           "  }\n"                                   // 7
+           "}\n",                                    // 8
+           "Line 6:14-19: syntax error"
+          ),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
 
 //===========================================================================
 // End of UT_reader.cpp

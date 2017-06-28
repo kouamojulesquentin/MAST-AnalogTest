@@ -68,6 +68,7 @@ class UT_reader : public CxxTest::TestSuite
   //
   void test_INSTANCE_OF_Single_Success ();
   void test_INSTANCE_OF_Multiple_Success ();
+  void test_INSTANCE_OF_Failure ();
 
   // ---------------- Other methods
   //

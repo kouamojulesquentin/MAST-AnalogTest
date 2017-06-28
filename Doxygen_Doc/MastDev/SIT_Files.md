@@ -66,7 +66,8 @@ Syntax is:
       <name> OF <factory_name>
       <table>
         <tr><td><name></td><td>  instance name</td></tr>
-        <tr><td><sit_file></td><td>  name or path of a SIT file with <b>.sit</b> extension</td></tr>
+        <tr><td><sit_file></td><td>  name or path of a SIT file with <b>.sit</b> extension <br>
+                                     must be enclosed between double quotes if it contains spaces or reserved keywords</td></tr>
         <tr><td><factory_name></td><td> identify a model factory registered by a plugin</td></tr>
       </table>
     </td>

@@ -71,7 +71,7 @@ class MAST_CORE_EXPORT SubModelPlaceHolder final
 
   //! Identifies the model to construct, instanciate and splice instead of the SubModelPlaceHolder
   //!
-  std::string Identififer() const { return m_identifier; }
+  std::string Identifier() const { return m_identifier; }
 
   //! Parent node in which represented sub-model must be spliced
   //!

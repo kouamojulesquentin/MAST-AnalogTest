@@ -1,0 +1,5 @@
+CHAIN FooChain
+{
+  REGISTER BarReg 8 Bypass: "0xBD"
+}
+

@@ -1,0 +1,7 @@
+CHAIN FooChain NOT_IN_PATH
+{
+  REGISTER CatReg 4 Bypass: "0xA"
+  REGISTER BatReg 5 Bypass: "0b1/xB"
+  INSTANCE Sub_level_2  OF UT_ModelBuildDriver_Sub_1.sit
+}
+

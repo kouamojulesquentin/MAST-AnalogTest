@@ -1,10 +1,9 @@
 #include <cctype>
+#include <experimental/string_view>
 #include <fstream>
 #include <cassert>
 #include <memory>
 
-#include "g3log/g3log.hpp"
-#include "Utility.hpp"
 #include "SystemModelBuilder.hpp"
 #include "SIT_reader.hpp"
 #include "SIT_parser.tab.hh"
@@ -12,12 +11,17 @@
 #include "DefaultBinaryPathSelector.hpp"
 #include "DefaultOneHotPathSelector.hpp"
 #include "DefaultNHotPathSelector.hpp"
+#include "Utility.hpp"
 
+#include "g3log/g3log.hpp"
 
 using std::experimental::string_view;
 using std::string;
 
 using std::make_shared;
+
+using namespace std::string_literals;
+using namespace std::experimental::literals::string_view_literals;
 using namespace mast;
 
 
@@ -44,18 +48,11 @@ SIT::SIT_Reader::SIT_Reader(std::shared_ptr<mast::SystemModel> sm)
 
 bool SIT::SIT_Reader::parse(string_view filename)
 {
-  if (filename.empty())
-  {
-    LOG(ERROR_LVL) << "Must specify a valid file path";
-    return false;
-  }
+  CHECK_PARAMETER_NOT_EMPTY(filename, "Must specify a valid file path");
 
   std::ifstream sitFile(filename.data());
-  if (!sitFile.good())
-  {
-    LOG(WARNING) << "Cannot open file:" << filename;
-    return false;
-  }
+
+  CHECK_TRUE(sitFile.good(), "Cannot open file: "s.append(filename.cbegin(), filename.cend()));
 
   return parse_helper(sitFile);
 }
@@ -85,15 +82,6 @@ bool SIT::SIT_Reader::parse_helper(std::istream& stream)
   return success;
 }
 
-//+void SIT::SIT_Reader::add_newline()
-//+{
-//+   ++line;
-//+   column=0;
-//+}
-
-//+void SIT::SIT_Reader::add_column()
-//+{
-//+   ++column;
-//+}
-
-
+//===========================================================================
+// End of SIT_reader.cpp
+//===========================================================================

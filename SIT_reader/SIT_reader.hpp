@@ -101,8 +101,6 @@ private:  // Part used by SIT_Parser
 
 private:
 
-//+   void add_newline();
-//+   void add_column();
    bool parse_helper( std::istream &stream );
 
    std::size_t                  column = 0;

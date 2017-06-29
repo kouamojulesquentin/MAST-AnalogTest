@@ -43,7 +43,7 @@ ModelBuildDriver::~ModelBuildDriver ()
 //! Initializes members
 //!
 ModelBuildDriver::ModelBuildDriver ()
-  : m_sitSearchPaths{""}
+  : m_sitSearchPaths {""} // This is to have opportunity to check file existence just by appending ".sit" to file name
 {
 }
 //
@@ -62,7 +62,7 @@ void ModelBuildDriver::AppendToSearchPath (const string& filePath)
   }
 
   auto path            = Utility::ExtractDirectoryPath(filePath);
-  auto notInSearchPath = std::find(m_sitSearchPaths.cbegin(), m_sitSearchPaths.cend(), path) == m_sitSearchPaths.cend();
+  auto notInSearchPath = std::find(m_sitSearchPaths.begin(), m_sitSearchPaths.end(), path) == m_sitSearchPaths.end();
 
   if (notInSearchPath)
   {
@@ -103,6 +103,7 @@ string ModelBuildDriver::AssessActualSitFilePath (const string& sitFileName)
     dirPath.append(".sit");
     if (Utility::FileExists(dirPath))
     {
+      AppendToSearchPath(dirPath);
       return dirPath;
     }
   }

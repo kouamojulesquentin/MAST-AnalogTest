@@ -26,6 +26,7 @@
 #include "SystemModelManager.hpp"
 #include "SIT_reader.hpp"
 #include "Startup.hpp"
+#include "ModelBuildDriver.hpp"
 
 #include "tclap/DiscardOutput.h"
 
@@ -349,20 +350,14 @@ void MastEnvironment_impl::CreateSystemModel ()
   sitFile = GetActualSitFilePath(sitFile);
   CHECK_FILE_EXISTS_EX(sitFile, "SIT file: ");
   LOG(INFO) << "Using SIT file: " << sitFile;
-
   LOG(INFO) << "Creating System Model";
-  auto systemModel = make_shared<SystemModel>();
 
-  auto reader = SIT::SIT_Reader(systemModel);
-
-  reader.parse(sitFile);
-
-  auto topNode = dynamic_pointer_cast<ParentNode>(reader.ParsedSystemModel());
+  ModelBuildDriver buildDriver;
+  auto systemModel = buildDriver.CreateModelFromSitFile(sitFile);
+  auto topNode     = dynamic_pointer_cast<ParentNode>(systemModel->Root());
 
   CHECK_VALUE_NOT_NULL(topNode, "Failed to parse file: "s + sitFile);
-  LOG(INFO) << "SIT has been parsed successfully";
-
-  systemModel->ReplaceRoot(topNode, false);
+  LOG(INFO) << "SIT file has been parsed successfully";
 
   // ---------------- Checks
   //
@@ -373,7 +368,7 @@ void MastEnvironment_impl::CreateSystemModel ()
   Startup::sm_systemModel = systemModel;
 
 
-  m_algoNamesAssociatedToNodes = reader.PDLAlgorithmNameToNodeAssociation();
+  m_algoNamesAssociatedToNodes = buildDriver.PDLAlgorithmNameToNodeAssociation();
 
   if (!m_configuration->AccessInterfaceProtocolName().empty())
   {

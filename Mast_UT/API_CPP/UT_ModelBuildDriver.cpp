@@ -66,7 +66,7 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_EmptyPath ()
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (sut.CreateModelFromSitFile(""), std::runtime_error);
+  TS_ASSERT_THROWS (sut.CreateModelFromSitFile(""), std::invalid_argument);
 }
 
 

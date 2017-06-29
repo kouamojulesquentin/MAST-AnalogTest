@@ -56,6 +56,11 @@ ModelBuildDriver::ModelBuildDriver ()
 //!
 void ModelBuildDriver::AppendToSearchPath (const string& filePath)
 {
+  if (filePath.empty())
+  {
+    return;
+  }
+
   auto path            = Utility::ExtractDirectoryPath(filePath);
   auto notInSearchPath = std::find(m_sitSearchPaths.cbegin(), m_sitSearchPaths.cend(), path) == m_sitSearchPaths.cend();
 
@@ -118,6 +123,8 @@ string ModelBuildDriver::AssessActualSitFilePath (const string& sitFileName)
 //!
 shared_ptr<SystemModel> ModelBuildDriver::CreateModelFromSitFile (const string& sitFilePath)
 {
+  CHECK_PARAMETER_NOT_EMPTY(sitFilePath, "Must specify a valid SIT file path");
+
   m_systemModel = make_shared<SystemModel>();
 
   auto topNode = ParseSitFile(AssessActualSitFilePath(sitFilePath));
@@ -141,6 +148,7 @@ shared_ptr<SystemModel> ModelBuildDriver::CreateModelFromSitFile (const string& 
 //!
 shared_ptr<ParentNode> ModelBuildDriver::ParseSitFile (const string& sitFilePath)
 {
+  CHECK_PARAMETER_NOT_EMPTY(sitFilePath, "SIT file path must not be empty");
   auto reader = SIT::SIT_Reader(m_systemModel);
 
   try

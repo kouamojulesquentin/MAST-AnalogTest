@@ -112,23 +112,34 @@ bool Utility::EndsWith (string_view text, string_view substring)
 
 //! Extracts file (or directory) parent directory path
 //!
-//! @param filePath  The application path
+//! @param filePath  A file path
 //!
-//! @return Extracted path or "." when no path has been found
+//! @return Extracted path (with trailing path separator) or "." when no path has been found
 string Utility::ExtractDirectoryPath (const string& filePath)
 {
   // ---------------- Set dirPath with only directory path of runner application
   //
-  auto dirPath = filePath;
-  auto sepPos  = dirPath.rfind("/"); // Search for last Linux directory separator
-  if (sepPos == std::string::npos)
+  auto dirPath       = filePath;
+  auto sepPosLinux   = dirPath.rfind("/");  // Search for last Linux directory separator
+  auto sepPosWindows = dirPath.rfind("\\"); // Search for last Windows directory separator
+  auto sepPos        = std::string::npos;
+
+  if (sepPosLinux == std::string::npos)
   {
-    sepPos  = dirPath.rfind("\\");   // Search for last Windows directory separator
+    sepPos = sepPosWindows;
+  }
+  else if (sepPosWindows == std::string::npos)
+  {
+    sepPos = sepPosLinux;
+  }
+  else  // Both are valid
+  {
+    sepPos = (sepPosLinux > sepPosWindows) ? sepPosLinux : sepPosWindows;
   }
 
   if (sepPos != std::string::npos)
   {
-    dirPath.erase(sepPos);           // Remove file name (keeping only directory path)
+    dirPath.erase(sepPos + 1);           // Remove file name (keeping only directory path)
   }
   else
   {

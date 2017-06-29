@@ -32,7 +32,13 @@ using mast::Utility;
 using namespace std::chrono_literals;
 
 
-//! Checks MinimalBitsForValue::MinimalBitsForValue() `...`
+//! Initializes test (called for each test)
+void UT_Utility::setUp ()
+{
+  CxxTest::setCharactersMapping(CxxTest::CharacterMapping::MAP_CHARS_MINIMAL);  // Keep quotes, HT, and new lines unescaped
+}
+
+//! Checks MinimalBitsForValue::MinimalBitsForValue()
 //!
 void UT_Utility::test_MinimalBitsForValue ()
 {
@@ -393,6 +399,50 @@ void UT_Utility::test_StringView_Utility_TrimBoth ()
   TS_DATA_DRIVEN_TEST(checker, data);
 }
 
+
+
+//! Checks Utility::ExtractDirectoryPath()
+//!
+void UT_Utility::test_ExtractDirectoryPath ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto inputPath    = std::get<0>(data);
+    auto expectedPath = std::get<1>(data);
+
+    // ---------------- Exercise
+    //
+    auto extractedPath = Utility::ExtractDirectoryPath(inputPath);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (extractedPath, expectedPath);
+  };
+
+  auto data =
+  {
+    make_tuple("",                          "."),              // 00
+    make_tuple(".",                         "."),              // 01
+    make_tuple("Foo",                       "."),              // 02
+    make_tuple("Foo.bar",                   "."),              // 03
+    make_tuple("/Foo.bar",                  "/"),              // 04
+    make_tuple("\\Foo.bar",                 "\\"),             // 05
+    make_tuple("C:\\Foo.bar",               "C:\\"),           // 06
+    make_tuple("C:\\Foo\\Bar\\Read me.txt", "C:\\Foo\\Bar\\"), // 07
+    make_tuple("/usr/bin/Foo.bar",          "/usr/bin/"),      // 08
+    make_tuple("C:\\Foo/Bar\\Read me.txt",  "C:\\Foo/Bar\\"),  // 09
+    make_tuple("/Foo\\Bar/Read me.txt",     "/Foo\\Bar/"),     // 10
+  };
+
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
 
 
 //! Checks Utility::ToMilliseconds() with bad strings

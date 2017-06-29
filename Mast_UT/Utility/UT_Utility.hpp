@@ -39,11 +39,18 @@ class UT_Utility : public CxxTest::TestSuite
   void test_StringView_Utility_TrimRight ();
   void test_StringView_Utility_TrimBoth ();
 
+  // ---------------- ExtractDirectoryPath
+  //
+  void test_ExtractDirectoryPath ();
+
   // ---------------- chrono::duration
   //
   void test_ToMilliseconds_BadStr ();
   void test_ToMilliseconds_SupportedStr ();
 
+  // ================ Other Methods ================
+
+  void setUp(); //!< Initializes test (called for each test)
 };
 //
 //  End of UT_Utility class declaration

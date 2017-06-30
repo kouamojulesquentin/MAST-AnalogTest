@@ -27,6 +27,8 @@ class MAST_CORE_EXPORT ParentNode : public SystemModelNode, public std::enable_s
   //
   public:
 
+  virtual ~ParentNode() = default;
+
   void AppendChild    (std::shared_ptr<SystemModelNode> node);       //!< Appends a new child node
   bool HasDirectChild (std::shared_ptr<SystemModelNode> node) const; //!< Returns true if node is a direct child
 
@@ -56,7 +58,6 @@ class MAST_CORE_EXPORT ParentNode : public SystemModelNode, public std::enable_s
   // ---------------- Protected Methods
   //
   protected:
-  virtual ~ParentNode() = default;
   ParentNode() = delete;
   ParentNode(std::experimental::string_view name) : SystemModelNode(name) {}
 

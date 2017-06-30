@@ -92,7 +92,6 @@ MastExample_CPP/SIT/*.gml
 Intel/src/archive/
 *.gz
 *.gml
-*.sit
 build
 /External_Libs/xmlrpc-c/lib/*.so
 /External_Libs/xmlrpc-c/lib/*.so*

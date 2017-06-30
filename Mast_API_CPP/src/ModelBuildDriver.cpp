@@ -13,6 +13,7 @@
 
 #include "ModelBuildDriver.hpp"
 #include "SystemModel.hpp"
+#include "SystemModelFactory.hpp"
 #include "ParentNode.hpp"
 #include "SIT_reader.hpp"
 #include "Utility.hpp"
@@ -182,18 +183,23 @@ shared_ptr<ParentNode> ModelBuildDriver::ParseSitFile (const string& sitFilePath
   const auto& placeHolders = reader.PlaceHolders();
   for (const auto& placeHolder : placeHolders)
   {
+    auto        localTop = placeHolder.Parent();
+    const auto& identifier  = placeHolder.Identifier();
+
+    shared_ptr<ParentNode> subTop;
+
     if (placeHolder.Kind() == PlaceHolderKind::SIT)
     {
-      auto        localTop = placeHolder.Parent();
-      const auto& subFile  = placeHolder.Identifier();
-      auto        subTop   = ParseSitFile(AssessActualSitFilePath(subFile));
-
-      localTop->AppendChild(subTop);
+      subTop = ParseSitFile(AssessActualSitFilePath(identifier));
     }
     else
     {
-      CHECK_FAILED("Only support construction from SIT file");
+      CHECK_VALUE_EQ(placeHolder.Kind(), PlaceHolderKind::Factory, "Internal Error: Unsupported PlaceHolderKind");
+      const auto& factory = SystemModelFactory::Instance();
+
+      subTop = factory.Create(identifier, *m_systemModel);
     }
+    localTop->AppendChild(subTop);
   }
 
   return topNode;

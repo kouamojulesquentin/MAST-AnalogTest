@@ -1,0 +1,7 @@
+CHAIN Sub4Chain NOT_IN_PATH
+{
+  REGISTER Sub_4_Reg_1 8 Bypass: "0x03"
+  REGISTER Sub_4_Reg_2 6 Bypass: "0b10/x5"
+  INSTANCE Level_4_SIB OF Make_SIB
+}
+

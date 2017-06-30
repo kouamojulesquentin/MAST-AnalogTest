@@ -43,6 +43,10 @@ class UT_ModelBuildDriver : public CxxTest::TestSuite
   void test_CreateModelFromSitFile_Hierarchical_SubDir ();
   void test_CreateModelFromSitFile_ParsingError ();
 
+  void test_CreateModelFromSitFile_OneFactoryInstance ();
+  void test_CreateModelFromSitFile_MixKindsInstances ();
+  void test_CreateModelFromSitFile_MissingFactory ();
+
   // ================ Other Methods ================
 
   void setUp(); //!< Initializes test (called for each test)

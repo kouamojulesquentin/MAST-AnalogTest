@@ -41,6 +41,8 @@ class MAST_CORE_EXPORT Factory
   public:
   virtual ~Factory() = default;
   Factory()  = default;
+  Factory(const Factory&) = delete;
+  Factory& operator=(const Factory&) = delete;
 
 //+  using Creator_t = std::function<std::unique_ptr<BuildType>(const std::string& parameters)>;
 

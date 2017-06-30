@@ -98,8 +98,8 @@ void MastEnvironment_impl::ChangeAccessInterfaceProtocol (const string& protocol
 {
   LOG(DEBUG) << "Force protocol \"" << protocolName << "\" to top level access interface";
 
-  auto factory  = AccessInterfaceProtocolFactory::Instance();
-  auto protocol = factory.Create(protocolName, parameters);
+  auto& factory  = AccessInterfaceProtocolFactory::Instance();
+  auto  protocol = factory.Create(protocolName, parameters);
 
   auto topNode            = Startup::sm_systemModel->Root();
   auto topAccessInterface = dynamic_pointer_cast<AccessInterface>(topNode);
@@ -312,9 +312,9 @@ void MastEnvironment_impl::CreateManager ()
 
   // ---------------- Configuration algorithm
   //
-  auto configAlgoName    = m_configuration->ConfigurationAlgorithm();
-  auto configAlgoFactory = ConfigureAlgorithmFactory::Instance();
-  auto configAlgo        = configAlgoFactory.Create(configAlgoName);
+  const auto& configAlgoName    = m_configuration->ConfigurationAlgorithm();
+  const auto& configAlgoFactory = ConfigureAlgorithmFactory::Instance();
+  auto        configAlgo        = configAlgoFactory.Create(configAlgoName);
 
   LOG(INFO) << "Using configuration algorithm: \"" << configAlgoName << "\"";
 

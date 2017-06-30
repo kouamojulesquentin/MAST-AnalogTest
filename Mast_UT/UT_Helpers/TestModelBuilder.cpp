@@ -86,8 +86,6 @@ std::shared_ptr<Chain> TestModelBuilder::Create_Default_SIB (string_view name)
 
   // ---------------- Create the sib (a mib with only one possible endpoint)
   //
-  SystemModelBuilder m_builder(m_model);
-
   auto sib = m_builder.Create_MIB(sibName, selector, selectorReg, MuxRegPlacement::BeforeMux);
 
   return sib;

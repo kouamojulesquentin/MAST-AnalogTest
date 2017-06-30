@@ -147,6 +147,26 @@ void UT_SystemModelFactory::test_RegisterCreator_NewOne_when_One ()
 }
 
 
+//! Checks SystemModelFactory::Create() without providing SystemModel throw an exception
+//!
+void UT_SystemModelFactory::test_Create_BadVersion ()
+{
+  // ---------------- Setup
+  //
+  auto& sut = SystemModelFactory::Instance();
+  sut.RegisterCreator("Make-Sub", [](SystemModel& sm, const string& parameters)
+  {
+    test::TestModelBuilder builder(sm);
+    auto node = builder.Create_Default_SIB(parameters);
+    return node;
+  });
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut.Create("Make-Sub"), std::runtime_error);
+}
+
+
 //! Checks SystemModelFactory::Create() when must be successful
 //!
 void UT_SystemModelFactory::test_Create_Success ()
@@ -250,6 +270,10 @@ void UT_SystemModelFactory::test_Create_Success ()
   //
   TS_DATA_DRIVEN_TEST(checker, data);
 }
+    //
+    //  End of test_Create_Success
+    //---------------------------------------------------------------------------
+
 
 
 //! Checks SystemModelFactory::Create() when must detect an error

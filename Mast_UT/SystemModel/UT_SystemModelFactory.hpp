@@ -33,6 +33,7 @@ class UT_SystemModelFactory : public CxxTest::TestSuite
   void test_Clear ();
   void test_RegisterCreator_NewOne_when_One ();
 
+  void test_Create_BadVersion ();
   void test_Create_Success ();
   void test_Create_Error ();
 

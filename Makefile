@@ -193,6 +193,9 @@ endif
 > $(PYTHON) gcovr.py $(CODE_COVERAGE_PARAMETERS)
 #+> $(PYTHON) gcovr.py --verbose --verbose_debug $(CODE_COVERAGE_PARAMETERS)
 
+code_coverage_install:
+> cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && make install
+
 code_coverage_clean:
 > cmake -E remove_directory $(CMAKE_CODE_COVERAGE_BUILD_DIR)
 > cmake -E remove_directory CodeCoverage

@@ -31,7 +31,9 @@ namespace mast
 //!       Concrete class are requested to implement InitializeWithDefaults (the common way to initialize default
 //!       creation methods)
 //!
-template<typename BuildType>
+template<typename BuildType,
+         typename return_t  = std::unique_ptr<BuildType>,
+         typename Creator_t = std::function<return_t(const std::string& parameters)>>
 class MAST_CORE_EXPORT Factory
 {
   // ---------------- Public  Methods
@@ -40,7 +42,7 @@ class MAST_CORE_EXPORT Factory
   virtual ~Factory() = default;
   Factory()  = default;
 
-  using Creator_t = std::function<std::unique_ptr<BuildType>(const std::string& parameters)>;
+//+  using Creator_t = std::function<std::unique_ptr<BuildType>(const std::string& parameters)>;
 
   //! Fills up with default creation methods
   //! @note Default creation methods a those that must not be registered explicitly
@@ -67,12 +69,24 @@ class MAST_CORE_EXPORT Factory
   void Clear() { m_creators.clear(); }
 
 
+  //! Returns creation function associated with identifier
+  //!
+  //! @param creatorId    A name that identifies registered creation method
+  //!
+  bool HasCreator(const std::string& creatorId)
+  {
+    auto pos = m_creators.find(creatorId);
+    return pos != m_creators.end();
+  }
+
+
+
   //! Creates a BuildType instance using registered creation method and optional parameters
   //!
   //! @param creatorId    A name that identifies registered creation method
   //! @param parameters   String of (optional) parameters
   //!
-  virtual std::unique_ptr<BuildType> Create(const std::string& creatorId, const std::string& parameters = "") const = 0;
+  virtual return_t Create(const std::string& creatorId, const std::string& parameters = "") const = 0;
 
   // ---------------- Protected Methods
   //
@@ -87,14 +101,15 @@ class MAST_CORE_EXPORT Factory
   //!
   //!
   //! @return Created instance or nullptr when no creation method has been register with given name
-  std::unique_ptr<BuildType> CreateImpl(const std::string& creatorId, const std::string& parameters = "") const
+  template<typename ... Args>
+  return_t CreateImpl(const std::string& creatorId, Args&... args) const
   {
-    std::unique_ptr<BuildType> instance;
+    return_t instance;
 
     auto pos = m_creators.find(creatorId);
     if (pos != m_creators.end())
     {
-      instance = pos->second(parameters);
+      instance = pos->second(args...);
     }
 
     return instance;

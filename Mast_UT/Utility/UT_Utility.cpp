@@ -29,6 +29,8 @@ using std::vector;
 using mast::Utility;
 
 
+using namespace std::string_literals;
+using namespace std::experimental::literals::string_view_literals;
 using namespace std::chrono_literals;
 
 
@@ -392,6 +394,294 @@ void UT_Utility::test_StringView_Utility_TrimBoth ()
     make_tuple("  Hello ", "Hello"), // 13
 
     make_tuple(static_cast<const char*>(nullptr), static_cast<const char*>(nullptr)), // 14
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+
+//! Checks Utility::BackToken()
+//!
+void UT_Utility::test_BackToken ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto text          = std::get<0>(data);
+    const auto separator     = std::get<1>(data);
+    const auto expectedToken = std::get<2>(data);
+
+    // ---------------- Exercise
+    //
+    auto token = Utility::BackToken(text, separator);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (token, expectedToken);
+  };
+
+  auto data =
+  {
+    make_tuple(""sv,                       ""sv,   ""sv),            // 00
+    make_tuple("text"sv,                   ""sv,   "text"sv),        // 01
+    make_tuple(""sv,                       ","sv,  ""sv),            // 02
+    make_tuple("Hello World"sv,            " "sv,  "World"sv),       // 03
+    make_tuple("Hello World"sv,            ","sv,  "Hello World"sv), // 04
+    make_tuple("Who is the best   !!!"sv,  " "sv,  "!!!"sv),         // 05
+    make_tuple("  One ! Two "sv,           "!"sv,  " Two "sv),       // 06 ==> No trimming
+    make_tuple("  One!Two!Three!Four  "sv, "!"sv,  "Four  "sv),      // 07 ==> No trimming
+    make_tuple("  One::Two::Three:Four"sv, "::"sv, "Three:Four"sv),  // 08
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+//! Checks Utility::FrontTokens()
+//!
+void UT_Utility::test_FrontTokens ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto text          = std::get<0>(data);
+    const auto separator     = std::get<1>(data);
+    const auto expectedToken = std::get<2>(data);
+
+    // ---------------- Exercise
+    //
+    auto token = Utility::FrontTokens(text, separator);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (token, expectedToken);
+  };
+
+  auto data =
+  {
+    make_tuple(""sv,                          ""sv,   ""sv),                     // 00
+    make_tuple("text"sv,                      ""sv,   "text"sv),                 // 01
+    make_tuple(""sv,                          ","sv,  ""sv),                     // 02
+    make_tuple("Hello World, how are you?"sv, " "sv,  "Hello World, how are"sv), // 03
+    make_tuple("Hello World"sv,               ","sv,  "Hello World"sv),          // 04
+    make_tuple("Who is the best   !!!"sv,     " "sv,  "Who is the best  "sv),    // 05
+    make_tuple("  One ! Two "sv,              "!"sv,  "  One "sv),               // 06 ==> No trimming
+    make_tuple("  One!!Two!!Three!Four  "sv,  "!!"sv, "  One!!Two"sv),           // 07 ==> No trimming
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Utility::TokensCount()
+//!
+void UT_Utility::test_TokensCount ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto text          = std::get<0>(data);
+    const auto separator     = std::get<1>(data);
+    const auto expectedCount = std::get<2>(data);
+
+    // ---------------- Exercise
+    //
+    auto token = Utility::TokensCount(text, separator);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (token, expectedCount);
+  };
+
+  auto data =
+  {
+    make_tuple(""sv,                          ""sv,   0u), // 00
+    make_tuple("text"sv,                      ""sv,   1u), // 01
+    make_tuple(""sv,                          ","sv,  0u), // 02
+    make_tuple("Hello World, how are you?"sv, " "sv,  5u), // 03
+    make_tuple("Hello World"sv,               ","sv,  1u), // 04
+    make_tuple("Who is he ?"sv,               " "sv,  4u), // 05
+    make_tuple("  One ! Two "sv,              "!"sv,  2u), // 06 ==> No trimming
+    make_tuple("  One!!Two!!Three!Four  "sv,  "!!"sv, 3u), // 07 ==> No trimming
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Utility::StartsWith ()
+//!
+void UT_Utility::test_StartsWith  ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto text      = std::get<0>(data);
+    const auto subStr = std::get<1>(data);
+    const auto expected  = std::get<2>(data);
+
+    // ---------------- Exercise
+    //
+    auto endsWith = Utility::StartsWith (text, subStr);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (endsWith, expected);
+  };
+
+  auto data =
+  {
+    make_tuple(""sv,                  ""sv,            false), // 00
+    make_tuple(""sv,                  ","sv,           false), // 01
+    make_tuple("text"sv,              ""sv,            false), // 02
+    make_tuple("Hello World"sv,       "Hella"sv,       false), // 03
+    make_tuple("Hello"sv,             "Hello World"sv, false), // 04
+    make_tuple("Who is he ?"sv,       " Who"sv,        false), // 05
+    make_tuple("  One ! Two "sv,      "One"sv,         false), // 06
+    make_tuple("Hello World"sv,       "Hello "sv,      true),  // 07
+    make_tuple("Hello World"sv,       "Hello"sv,       true),  // 08
+    make_tuple("Hello World"sv,       "He"sv,          true),  // 09
+    make_tuple("Hello World"sv,       "H"sv,           true),  // 10
+    make_tuple("  One, two, three"sv, " "sv,           true),  // 11
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Utility::EndsWith()
+//!
+void UT_Utility::test_EndsWith ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto text      = std::get<0>(data);
+    const auto subStr = std::get<1>(data);
+    const auto expected  = std::get<2>(data);
+
+    // ---------------- Exercise
+    //
+    auto endsWith = Utility::EndsWith(text, subStr);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (endsWith, expected);
+  };
+
+  auto data =
+  {
+    make_tuple(""sv,                          ""sv,            false), // 00
+    make_tuple(""sv,                          ","sv,           false), // 01
+    make_tuple("text"sv,                      ""sv,            false), // 02
+    make_tuple("Hello World"sv,               "Hello"sv,       false), // 03
+    make_tuple("Hello World"sv,               "Word"sv,        false), // 04
+    make_tuple("Hello"sv,                     "Hello World"sv, false), // 05
+    make_tuple("Who is he ?"sv,               "? "sv,          false), // 06
+    make_tuple("  One ! Two "sv,              "Two"sv,         false), // 07
+    make_tuple("Hello World, how are you?"sv, "?"sv,           true),  // 08
+    make_tuple("Hello World"sv,               "World"sv,       true),  // 09
+    make_tuple("Hello World"sv,               "ld"sv,          true),  // 10
+    make_tuple("Hello World"sv,               "d"sv,           true),  // 11
+    make_tuple("  One!!Two!!Three!Four  "sv,  " "sv,           true),  // 12
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Utility::SingleQuote()
+//!
+void UT_Utility::test_SingleQuote ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto text     = std::get<0>(data);
+    const auto expected = std::get<1>(data);
+
+    // ---------------- Exercise
+    //
+    auto got = Utility::SingleQuote(text);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (got, expected);
+  };
+
+  auto data =
+  {
+    make_tuple(""sv,            "''"sv),            // 00
+    make_tuple("text"sv,        "'text'"sv),        // 01
+    make_tuple("Hello World"sv, "'Hello World'"sv), // 02
+    make_tuple("  One, Two "sv, "'  One, Two '"sv), // 03
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Utility::IfNotEmpty_SingleQuoteAndSuffixWithSpace()
+//!
+void UT_Utility::test_IfNotEmpty_SingleQuoteAndSuffixWithSpace ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto text     = std::get<0>(data);
+    const auto expected = std::get<1>(data);
+
+    // ---------------- Exercise
+    //
+    auto got = Utility::IfNotEmpty_SingleQuoteAndSuffixWithSpace(text);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (got, expected);
+  };
+
+  auto data =
+  {
+    make_tuple(""sv,            ""sv),               // 00
+    make_tuple(" "sv,           "' ' "sv),           // 01
+    make_tuple("text"sv,        "'text' "sv),        // 02
+    make_tuple("Hello World"sv, "'Hello World' "sv), // 03
+    make_tuple("  One, Two "sv, "'  One, Two ' "sv), // 04
   };
 
   // ---------------- DDT Exercise

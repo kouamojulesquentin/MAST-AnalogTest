@@ -39,6 +39,34 @@ class UT_Utility : public CxxTest::TestSuite
   void test_StringView_Utility_TrimRight ();
   void test_StringView_Utility_TrimBoth ();
 
+  // ---------------- BackToken
+  //
+  void test_BackToken ();
+
+  // ---------------- FrontToken
+  //
+  void test_FrontTokens ();
+
+  // ---------------- TokensCount
+  //
+  void test_TokensCount ();
+
+  // ---------------- StartsWith
+  //
+  void test_StartsWith  ();
+
+  // ---------------- EndsWith
+  //
+  void test_EndsWith ();
+
+  // ---------------- SingleQuote
+  //
+  void test_SingleQuote ();
+
+  // ---------------- IfNotEmpty_SingleQuoteAndSuffixWithSpace
+  //
+  void test_IfNotEmpty_SingleQuoteAndSuffixWithSpace ();
+
   // ---------------- ExtractDirectoryPath
   //
   void test_ExtractDirectoryPath ();

@@ -53,6 +53,8 @@ Suites = \
       $(UT_RootPath)/SystemModel/UT_PathSelectorFactory.hpp            \
       $(UT_RootPath)/SystemModel/UT_SystemModelFactory.hpp             \
       $(UT_RootPath)/SystemModel/UT_SystemModelManager.hpp             \
+      $(UT_RootPath)/SystemModel/UT_AccessInterfaceTranslator.hpp      \
+      $(UT_RootPath)/SystemModel/UT_SVF_RawPlayer.hpp                  \
       $(UT_RootPath)/Core/UT_PDL_AlgorithmsRepository.hpp              \
       $(UT_RootPath)/API_CPP/UT_ModelBuildDriver.hpp                   \
       $(UT_RootPath)/API_CPP/UT_MastEnvironment.hpp                    \

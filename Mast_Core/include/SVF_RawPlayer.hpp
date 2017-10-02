@@ -45,17 +45,9 @@ class MAST_CORE_EXPORT SVF_RawPlayer final: public AccessInterfaceRawProtocol
   void  SupportTRST (bool supportTRST) { m_supportTRST = supportTRST; }
 
 
-  //! Creates an SVF command associated to endpoint identifier and BinaryVector to send to SUT
-  //!
-  std::string CreateSVFCommand(uint32_t endpointId, const BinaryVector& toSutData) const;
-
-  //! Creates an SVF reset command
-  //!
-  std::string CreateResetSVFCommand (bool doSynchronousReset) const ;
-
   //! readable identifier for given endpoint
   //!
-  std::string CallbackId(int EndPoint) { 
+  std::string CallbackId(int EndPoint) const { 
      switch (EndPoint){
        case 0: return TRSRT; 
        case 1: return SIR; 
@@ -84,7 +76,7 @@ class MAST_CORE_EXPORT SVF_RawPlayer final: public AccessInterfaceRawProtocol
 
   //! Returns readable type of protocol
   //!
-  virtual std::experimental::string_view KindName() const override { return SVF_EMULATION; }
+  virtual std::experimental::string_view KindName() const override { return SVF; }
 
 
   //! Forces the ResetPort to be asserted on the target module

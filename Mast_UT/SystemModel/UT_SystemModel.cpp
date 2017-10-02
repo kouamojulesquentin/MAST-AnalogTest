@@ -398,12 +398,12 @@ void UT_SystemModel::test_CreateCallbackRequest ()
   TS_ASSERT_NOT_NULLPTR (test);
   TS_ASSERT_EQUALS      (test->CallbackId(), name);
   TS_ASSERT_NULLPTR (test->interfaceData());
-
-    TS_ASSERT_EQUALS (toSutVector.BitsCount(),  2);
-    TS_ASSERT_EQUALS (toSutVector.BytesCount(), 1);
-    TS_ASSERT_EQUALS (toSutVector.IsEmpty(),    2 == 0);
-    TS_ASSERT_FALSE  (toSutVector.HasFixedSize());
- //Not testing actual content, BinaryVector is tested separately
+  TS_ASSERT_EQUALS      (test->FormattedData(),"01");
+    TS_ASSERT_EQUALS (test->ToSutVector().BitsCount(),  2);
+    TS_ASSERT_EQUALS (test->ToSutVector().BytesCount(), 1);
+    TS_ASSERT_FALSE (test->ToSutVector().IsEmpty());
+    TS_ASSERT_FALSE  (test->ToSutVector().HasFixedSize());
+    
   free(test);
 
   test = new CallbackRequest(name,toSutVector,(void *)&dummy);
@@ -413,14 +413,49 @@ void UT_SystemModel::test_CreateCallbackRequest ()
   TS_ASSERT_EQUALS  (test->interfaceData(),  (void *)&dummy);
   TS_ASSERT_EQUALS  (*(int *)test->interfaceData(),  dummy);
   TS_ASSERT_EQUALS  (test->interfaceData(),  (void *)&dummy);
+  TS_ASSERT_EQUALS      (test->FormattedData(),"01");
+    TS_ASSERT_EQUALS (test->ToSutVector().BitsCount(),  2);
+    TS_ASSERT_EQUALS (test->ToSutVector().BytesCount(), 1);
+    TS_ASSERT_FALSE (test->ToSutVector().IsEmpty());
+    TS_ASSERT_FALSE  (test->ToSutVector().HasFixedSize());
 
-    TS_ASSERT_EQUALS (toSutVector.BitsCount(),  2);
-    TS_ASSERT_EQUALS (toSutVector.BytesCount(), 1);
-    TS_ASSERT_EQUALS (toSutVector.IsEmpty(),    2 == 0);
-    TS_ASSERT_FALSE  (toSutVector.HasFixedSize());
- //Not testing actual content, BinaryVector is tested separately
+  free(test);
+ 
+ //--Named CT with formatted data
+  test = new CallbackRequest(name,toSutVector,"XY");
+  TS_ASSERT_NOT_NULLPTR (test);
+  TS_ASSERT_EQUALS      (test->CallbackId(), name);
+  TS_ASSERT_NULLPTR (test->interfaceData());
+  TS_ASSERT_EQUALS      (test->FormattedData(),"XY");
+    TS_ASSERT_EQUALS (test->ToSutVector().BitsCount(),  2);
+    TS_ASSERT_EQUALS (test->ToSutVector().BytesCount(), 1);
+    TS_ASSERT_FALSE (test->ToSutVector().IsEmpty());
+    TS_ASSERT_FALSE  (test->ToSutVector().HasFixedSize());
+  free(test);
+ 
+  test = new CallbackRequest(name,toSutVector,"SQ",(void *)&dummy);
+  TS_ASSERT_NOT_NULLPTR (test);
+  TS_ASSERT_EQUALS      (test->CallbackId(), name);
+  TS_ASSERT_EQUALS      (test->FormattedData(),"SQ");
+  TS_ASSERT_EQUALS  (test->interfaceData(),  (void *)&dummy);
+  TS_ASSERT_EQUALS  (*(int *)test->interfaceData(),  dummy);
+  TS_ASSERT_EQUALS  (test->interfaceData(),  (void *)&dummy);
+    TS_ASSERT_EQUALS (test->ToSutVector().BitsCount(),  2);
+    TS_ASSERT_EQUALS (test->ToSutVector().BytesCount(), 1);
+    TS_ASSERT_FALSE (test->ToSutVector().IsEmpty());
+    TS_ASSERT_FALSE  (test->ToSutVector().HasFixedSize());
   free(test);
 
+ //--Named CT with only formatted data
+  test = new CallbackRequest(name,"XY");
+  TS_ASSERT_NOT_NULLPTR (test);
+  TS_ASSERT_EQUALS      (test->CallbackId(), name);
+  TS_ASSERT_NULLPTR (test->interfaceData());
+  TS_ASSERT_EQUALS      (test->FormattedData(),"XY");
+    TS_ASSERT_EQUALS (test->ToSutVector().BitsCount(),  0);
+  free(test);
+
+ 
 }
 
 //! Checks SystemModel::CreateAccessInterfaceTranslator() capability
@@ -471,6 +506,12 @@ void UT_SystemModel::test_CreateAccessInterfaceTranslator_Request_Queues_NB ()
      TS_ASSERT_NOT_NULLPTR (&result);
      TS_ASSERT_EQUALS      (result.CallbackId(), Request+std::to_string(i));
      }
+
+ //Formatted data
+  test = CallbackRequest(Request,"100");
+  TS_ASSERT_NULLPTR(test.interfaceData());
+  TS_ASSERT_EQUALS (test.FormattedData(),"100");
+  TS_ASSERT_EQUALS (test.ToSutVector().BitsCount(),  0);
 
 }
 

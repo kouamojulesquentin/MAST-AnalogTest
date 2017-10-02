@@ -44,8 +44,11 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
   
   void PushRequest(CallbackRequest Request) {m_CallbackQueue.Push(Request);}; //!<Queues a new Callback Request
   CallbackRequest PopRequest() {return m_CallbackQueue.Pop();}; //!<returns the oldest request. NB: it is a BLOCKING call
-  BinaryVector PopResult() { return  m_fromSutQueue.Pop();};//!< returns the oldest callback result. NB: it is a BLOCKING call
-  void PushResult(BinaryVector Result) { m_fromSutQueue.Push(Result);};//!< Queues a new callback result
+
+  void PushResult(BinaryVector Result) {m_fromSutQueue.Push(std::make_pair(Result,*(new std::string)));};//!< Queues a new callback result
+  BinaryVector PopResult() { return  m_fromSutQueue.Pop().first;};//!< returns the oldest callback result. NB: it is a BLOCKING call
+  std::string PopFormattedResult() { auto tmp=m_fromSutQueue.Pop(); if (!tmp.second.empty()) return tmp.second; 
+                                      else return tmp.first.DataAsBinaryString();};//!< returns the Formatted Data of the oldest callback result. NB: it is a BLOCKING call
 
   // ---------------- Private  Fields
   //
@@ -53,7 +56,7 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
   uint32_t                                 m_numberOfEndPoints = 0; //!< Number of nodes (endpoints) accessible through the access interface
   
   MTQueue<CallbackRequest> m_CallbackQueue;  
-  MTQueue<BinaryVector> m_fromSutQueue;  
+  MTQueue<std::pair<BinaryVector,std::string>> m_fromSutQueue;  
 };
 //
 //  End of AccessInterface class declaration

@@ -87,7 +87,7 @@ install(DIRECTORY SmokeTests_Files DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 set(SMOKE_FILES_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ICL/SmokeTests_Files)
 include(CTest)
 
-add_test(NAME ICL:Parser:fragment.icl_source.comment      COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/fragment.icl_source.comment.icl "Line 1:144-145: syntax error")
+add_test(NAME ICL:Parser:fragment.icl_source.comment      COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/fragment.icl_source.comment.icl "ICL parsing error: Line 1:")
 add_test(NAME ICL:Parser:fragment.icl_source.module_items COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/fragment.icl_source.module_items.icl)
 add_test(NAME ICL:Parser:fragment.icl_source.namespace    COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/fragment.icl_source.namespace.icl)
 add_test(NAME ICL:Parser:fragment.icl_source.ports        COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/fragment.icl_source.ports.icl)

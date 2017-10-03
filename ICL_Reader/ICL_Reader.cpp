@@ -27,7 +27,7 @@ using namespace mast;
 
 ICL::ICL_Reader::ICL_Reader(std::shared_ptr<mast::SystemModel> sm)
   : systemModel (sm)
-  , builder     (*systemModel)
+//+  , builder     (*systemModel)
 {
   #define MAKE_LAMBDA(selectorClass, forcedProperty)                                                                          \
   [model = systemModel](const string& selectorRegName, uint32_t pathsCount, SelectorProperty selectorProperty)                    \

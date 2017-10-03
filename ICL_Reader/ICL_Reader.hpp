@@ -105,7 +105,7 @@ private:  // Part used by ICL_Parser
 
   std::shared_ptr<mast::SystemModelNode>    parsedTopNode;    //!< SystemModel tree build from ICL file
   std::shared_ptr<mast::SystemModel>        systemModel;
-  mast::SystemModelBuilder                  builder;
+//+  mast::SystemModelBuilder                  builder;
 
   using RegisterCreator_t = std::function<std::shared_ptr<mast::Register>(const std::string&     selectorRegName,
                                                                           uint32_t               pathsCount,

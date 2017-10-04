@@ -70,6 +70,7 @@ typedef void* yyscan_t;
 #include "PathSelectorFactory.hpp"
 #include "Utility.hpp"
 //+#include "UnresolvedPathSelector.hpp"
+#include "ParserException.hpp"
 #include "g3log/g3log.hpp"
 
 #include <iostream>
@@ -92,7 +93,7 @@ using std::experimental::string_view;
 using namespace std::experimental::literals::string_view_literals;
 using namespace mast;
 
-#define STREAM_LOCATION(line, beginCol, endColumn) "Line "  << line << ":" << beginCol << "-" << endColumn << ": "
+#define STREAM_LOCATION(line, beginCol, endCol) "Line "  << line << ":" << beginCol << "-" << endCol << ": "
 #define STREAM_MY_LOCATION                         STREAM_LOCATION(my_location->begin.line, my_location->begin.column, my_location->end.column)
 #define STREAM_NODE_NAME(nodeKind, nodeName)       nodeKind << " node \"" << nodeName << "\" "
 
@@ -120,7 +121,6 @@ namespace
 } // End of unnamed namespace
 
 } /*end of %code section*/
-//+%define api.pure full
 //%lex-param   { yyscan_t scanner }
 //%parse-param { yyscan_t scanner }
 

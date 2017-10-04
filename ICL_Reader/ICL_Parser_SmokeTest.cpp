@@ -15,6 +15,7 @@
 #include "ICL_Reader.hpp"
 #include "Session.hpp"
 #include "Utility.hpp"
+#include "ParserException.hpp"
 #include "g3log/g3log.hpp"
 
 #include <iostream>
@@ -43,10 +44,11 @@ int main (int argc, char* argv[])
   }
   catch(ICL::ParserException& exc)
   {
+    std::string errorMessage(exc.what());
+
     bool haveMessageExerpt = argc == 3;
     if (haveMessageExerpt)
     {
-      std::string errorMessage(exc.what());
       std::string errorMessageExcerpt(argv[2]);
 
       auto errorMessageIsExpected = errorMessage.find(errorMessageExcerpt) != std::string::npos;
@@ -56,12 +58,17 @@ int main (int argc, char* argv[])
         return 0;
       }
       std::cerr << "\n"
-                << "Error message: \n"
+                << "Error message: \"" << errorMessage << "\"\n"
                 << "=============\n"
-                << errorMessage << "\n"
                 << "Does not contains expected excerpt: \"" << errorMessageExcerpt << "\"\n"
                 << "================================== \n";
 
+    }
+    else
+    {
+      std::cerr << "\n"
+                << "Error message: \"" << errorMessage << "\"\n"
+                << "=============\n";
     }
   }
   catch(std::exception& exc)  // Catch C++ standard exceptions

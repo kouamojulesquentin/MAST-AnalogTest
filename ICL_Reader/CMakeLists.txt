@@ -82,12 +82,12 @@ add_executable        (ICL_SmokeTest ICL_Parser_SmokeTest.cpp)
 set_target_properties (ICL_SmokeTest PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 target_link_libraries (ICL_SmokeTest ICL_Reader Mast_Core)
 
-install(DIRECTORY SmokeTests_Files DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ICL)
-
-set(SMOKE_FILES_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ICL/SmokeTests_Files)
 include(CTest)
 
-add_test(NAME ICL:Parser:fragment.icl_source.comment      COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/fragment.icl_source.comment.icl "Line 1:144-145: syntax error")
+install(DIRECTORY SmokeTests_Files DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ICL)
+set(SMOKE_FILES_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ICL/SmokeTests_Files)
+
+add_test(NAME ICL:Parser:fragment.icl_source.comment      COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/fragment.icl_source.comment.icl "ICL error: Line 5:12-14: ")
 add_test(NAME ICL:Parser:fragment.icl_source.module_items COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/fragment.icl_source.module_items.icl)
 add_test(NAME ICL:Parser:fragment.icl_source.namespace    COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/fragment.icl_source.namespace.icl)
 add_test(NAME ICL:Parser:fragment.icl_source.ports        COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/fragment.icl_source.ports.icl)
@@ -122,3 +122,12 @@ add_test(NAME ICL:Parser:example_E_20 COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/e
 add_test(NAME ICL:Parser:example_E_21 COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_21.icl)
 
 add_test(NAME ICL:Parser:annex_e_ICL  COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/annex_e_ICL.icl)
+
+
+install(DIRECTORY Benches DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ICL)
+set(SMOKE_FILES_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ICL/Benches)
+
+add_test(NAME ICL:Parser:Bench:ScanCell       COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/ScanCell.icl)
+add_test(NAME ICL:Parser:Bench:NetworkStructs COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/NetworkStructs.icl)
+add_test(NAME ICL:Parser:Bench:Instruments    COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/Instruments.icl)
+add_test(NAME ICL:Parser:Bench:E30            COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/E30.icl)

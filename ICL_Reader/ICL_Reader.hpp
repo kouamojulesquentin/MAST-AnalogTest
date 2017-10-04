@@ -44,20 +44,6 @@ namespace ICL
 class ICL_Parser;
 class ICL_Scanner;
 
-//! Exception thrown internally by ICL_Parser
-//!
-//! @note Should not yet been used externally
-class ParserException : public std::runtime_error
-{
-  public:
-  ParserException(const std::string& what_arg)
-   : std::runtime_error(what_arg)
-  { }
-
-  ParserException(const char* what_arg)
-   : std::runtime_error(what_arg)
-  { }
-};
 
 class ICL_Reader
 {

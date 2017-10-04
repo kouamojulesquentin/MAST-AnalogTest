@@ -14,32 +14,27 @@ SUCH DAMAGE.
 */
 
 %{
+/* Implementation of yyFlexScanner */
+#include "ICL_Scanner.hpp"
+#include "ICL_Parser.tab.hh"
+#include "ParserException.hpp"
+
 /* C++ string header, for string ops below */
 #include <string>
 #include <stdio.h>
 
-/* Implementation of yyFlexScanner */
-#include "ICL_Scanner.hpp"
-#include "ICL_Parser.tab.hh"
+using namespace std::string_literals;
 
 #undef  YY_DECL
-#define YY_DECL int ICL::ICL_Scanner::yylex( ICL::ICL_Parser::semantic_type * const lval, ICL::ICL_Parser::location_type *location )
+#define YY_DECL int ICL::ICL_Scanner::yylex(ICL::ICL_Parser::semantic_type* const lval, ICL::ICL_Parser::location_type* location)
 
 /* typedef to make the returns for the tokens shorter */
 using token = ICL::ICL_Parser::token;
-
-/* define yyterminate as this instead of NULL */
-//+#define yyterminate() return( token::END )
-
-/* msvc2010 requires that we exclude this header file. */
-//+#define YY_NO_UNISTD_H
 
 /* update location on matching */
 #define YY_USER_ACTION loc->step(); loc->columns(yyleng);
 /* handle locations */
 
-
-int nlines = 1;
 ICL::ICL_Parser::location_type* my_location;
 %}
 
@@ -51,31 +46,42 @@ ICL::ICL_Parser::location_type* my_location;
 %x COMMENT
 
 %%
-%{          /** Code executed at the beginning of yylex **/
-    yylval = lval;
+%{    /** Code executed at the beginning of yylex **/
+    yylval      = lval;
     my_location = loc;
 %}
 
 <COMMENT>{
-[^*\n]*        /* consume anything that's not a '*' or newline */
-"*"+[^*/\n]*   /* this pattern is similar to the previous one but
-                           it also consumes 1 or more leading *'s. For example, if
-                           the comment were "brad **** smiley" than the
-                           first pattern would consume "brad " and this
-                           pattern would consume "**** smiley". */
-\n            { ++yylineno; }
-"*"+"/"        { /* end of comment--resume initial state. Note that
-                             this pattern specifies one or more "*"'s followed
-                             by a "/", so it picks up comments ended by an
-                             arbitrary number of *'s */
-                          BEGIN(INITIAL);
-                        }
+[/][*] {
+  // Detect invalid block comment opening sequence within a block comment
+  //
+  // @note  Must be 1st rule to avoid being masked by other comment rules
+  throw ICL::ParserException(my_location->begin.line,
+                             my_location->begin.column,
+                             my_location->end.column,
+                             "'/*' not allowed inside block comments (Rule: Block comments shall not include additional (i.e., nested) block comments.)"
+                            );
+}
+[^*/\n]*        /* consume anything that's not a '*' or newline */
+"*"+[^*/\n]* {
+  // This pattern is similar to the previous one but it also consumes 1 or more leading *'s.
+  // For example, if the comment were "brad **** smiley" than the first pattern would consume "brad
+  // " and this pattern would consume "**** smiley".
+}
+\n {
+  loc->lines();
+}
+"*"+"/"  {
+  //  End of comment--resume initial state.
+  //  Note that this pattern specifies one or more "*"'s followed by a "/", so it picks up comments
+  //  ended by an arbitrary number of *'s
+  BEGIN(INITIAL);}
 }
 <INITIAL>{
 	"/*"         BEGIN(COMMENT);
-	[ \r\t]+            { /* Skip blanks. */ }
-	[/][/][^\n]* { /* Skip comments. */ }
-	\n { yylineno++; }
+  [ \r\t]+     { /* Skip blanks. */ }
+  [/][/][^\n]* { /* Skip comments. */ }
+  \n { loc->lines(); }
 
   AccessLink                    return token::ACCESSLINK;
   AccessTogether                return token::ACCESSTOGETHER;
@@ -197,7 +203,13 @@ ICL::ICL_Parser::location_type* my_location;
   WriteEnSource                 return token::WRITEENSOURCE;
   [a-zA-Z][a-zA-Z0-9_]*         return token::SCALAR_ID;
   \^                            return token::XOR;
-  . { LexerError("lex Unknown character"); }
+  . {
+      throw ICL::ParserException(my_location->begin.line,
+                                 my_location->begin.column,
+                                 my_location->end.column,
+                                 "Found invalid character '"s.append(yytext).append("'")
+                                );
+  }
 }
 
 %%

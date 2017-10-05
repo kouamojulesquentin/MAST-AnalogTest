@@ -416,7 +416,8 @@ bool InRange(const T& val, const U& minVal, const V& maxVal) { return (val >= mi
 #define CHECK_VALUE_LTE(val, maxVal, msg) CheckValueCondition (__FILE__, __func__, __LINE__, (val), (val <= maxVal), msg)
 #define CHECK_VALUE_RANGE(val, minVal, maxVal, msg) CheckValueCondition (__FILE__, __func__, __LINE__, (val), InRange((val), (minVal), (maxVal)), msg)
 
-#define CHECK_TRUE(expr, msg) if (!(expr))  throw std::runtime_error(mast::Utility::MakeExceptionMessage(__FILE__, __func__, __LINE__, "std::runtime_error", msg))
+#define CHECK_FALSE(expr, msg) if ( (expr)) throw std::runtime_error(mast::Utility::MakeExceptionMessage(__FILE__, __func__, __LINE__, "std::runtime_error", msg))
+#define CHECK_TRUE(expr, msg)  if (!(expr)) throw std::runtime_error(mast::Utility::MakeExceptionMessage(__FILE__, __func__, __LINE__, "std::runtime_error", msg))
 #define CHECK_FAILED(msg)                   throw std::runtime_error(mast::Utility::MakeExceptionMessage(__FILE__, __func__, __LINE__, "std::runtime_error", msg))
 
 #define CHECK_FILE_EXISTS(filePath)         CHECK_TRUE(mast::Utility::FileExists(filePath), std::string("File: '") + filePath + "' does not exist (or cannot be opened)")

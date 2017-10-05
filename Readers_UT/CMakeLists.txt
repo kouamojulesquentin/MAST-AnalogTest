@@ -60,7 +60,7 @@ set_target_properties (Readers_UT PROPERTIES COMPILE_FLAGS "${UT_CFLAGS}" )
 target_link_libraries (Readers_UT ${PLATFORM_LIBS} ${EXTRA_LIBS})
 
 
-install(DIRECTORY UT_TestFiles DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Readers_UT)
+install(DIRECTORY UT_TestFiles DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Readers)
 
 include(CTest)
 add_test(NAME Readers_UT COMMAND Readers_UT)

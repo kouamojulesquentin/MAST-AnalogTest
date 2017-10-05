@@ -54,7 +54,7 @@ namespace
 //!
 string GetTestFilePath (string_view dirName, string_view fileName)
 {
-  return test::GetTestFilePath({"Readers_UT"s, "UT_TestFiles"s, "ICL"s, string(dirName), string(fileName)});
+  return test::GetTestFilePath({"Readers"s, "UT_TestFiles"s, "ICL"s, string(dirName), string(fileName)});
 }
 //
 //  End of: GetTestFilePath

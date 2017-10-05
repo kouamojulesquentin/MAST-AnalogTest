@@ -16,27 +16,38 @@ include_directories(${UT_RootPath}/UT_Helpers)
 include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
 include_directories(${LIBMAST_CPP_API_INCLUDE_DIRS})
 include_directories(${LIBLOGGER_INCLUDE_DIRS})
+include_directories(${LIBSIT_READER_INCLUDE_DIRS})
 include_directories(${LIBICL_READER_INCLUDE_DIRS})
 
-set(UT_GENERATED_RUNNER   "Generated/Runner.cpp")
 
-set(UT_SOURCES ${UT_GENERATED_RUNNER})
 set(EXTRA_LIBS Logger)
 message(STATUS "Readers_UT: CXXTEST_INCLUDE_DIR:        ${CXXTEST_INCLUDE_DIR}")
+message(STATUS "Readers_UT: LIBSIT_READER_INCLUDE_DIRS  ${LIBSIT_READER_INCLUDE_DIRS}")
 message(STATUS "Readers_UT: LIBICL_READER_INCLUDE_DIRS  ${LIBICL_READER_INCLUDE_DIRS}")
 
+file(GLOB UT_SIT_READER_HEADERS "SIT/UT_*.hpp")
+file(GLOB UT_SIT_READER_FILES   "SIT/*")
 file(GLOB UT_ICL_READER_HEADERS "ICL/UT_*.hpp")
 file(GLOB UT_ICL_READER_FILES   "ICL/*")
 file(GLOB UT_HELPERS_FILES      "UT_Helpers/*")
 
-set(UT_HEADERS ${UT_HEADERS} ${UT_ICL_READER_HEADERS})
-set(UT_SOURCES ${UT_SOURCES} ${UT_ICL_READER_FILES} ${UT_HELPERS_FILES})
+set(GENERATED_RUNNER            "Generated/Runner.cpp")
 
-set(EXTRA_LIBS ${EXTRA_LIBS} ICL_Reader)
+set(UT_HEADERS  ${UT_SIT_READER_HEADERS}
+                ${UT_ICL_READER_HEADERS}
+   )
+
+set(UT_SOURCES  ${UT_SIT_READER_FILES}
+                ${UT_ICL_READER_FILES}
+                ${UT_HELPERS_FILES}
+                ${GENERATED_RUNNER}
+   )
+
+set(EXTRA_LIBS ${EXTRA_LIBS} ICL_Reader SIT_Reader_Lib)
 
 # ---------------- Runner
 #
-set(RUNNER_PATH          ${UT_RootPath}/Generated/Runner.cpp)
+set(RUNNER_PATH          ${UT_RootPath}/${GENERATED_RUNNER})
 set(EXTRA_RUNNER_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/../UserOptions.cmake ${CMAKE_CURRENT_LIST_FILE})
 set(CXXTEST_PATH         ${CXXTEST_INCLUDE_DIR})
 

@@ -127,7 +127,6 @@ endif()
 
 add_subdirectory(MastExample_CPP)
 add_subdirectory(Mast_UT)
-add_subdirectory(SIT_reader_UT)
 add_subdirectory(Readers_UT)
 
 add_subdirectory(Optional_Libs_UT)

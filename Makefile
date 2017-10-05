@@ -47,12 +47,10 @@ MAST_UT_EXE_NAME     := Mast_UT$(EXT)
 OPTIONAL_UT_EXE_NAME := Optionals_UT$(EXT)
 TESTCASES_EXE_NAME   := TestCasesApp$(EXT)
 CPP_EXAMPLE_EXE_NAME := MastExample_CPP$(EXT)
-SIT_UT_EXE_NAME      := SIT_Reader_UT$(EXT)
 READERS_UT_EXE_NAME  := Readers_UT$(EXT)
 
 MAST_UT_EXE_PATH      := $(BIN_DIR)$(SEP)$(MAST_UT_EXE_NAME)
 OPTIONAL_UT_EXE_PATH  := $(BIN_DIR)$(SEP)$(OPTIONAL_UT_EXE_NAME)
-SIT_UT_EXE_PATH       := $(BIN_DIR)$(SEP)$(SIT_UT_EXE_NAME)
 READERS_UT_EXE_PATH   := $(BIN_DIR)$(SEP)$(READERS_UT_EXE_NAME)
 TESTCASES_EXE_PATH    := $(BIN_DIR)$(SEP)$(TESTCASES_EXE_NAME)
 CPP_EXAMPLE_EXE_PATH  := $(BIN_DIR)$(SEP)$(CPP_EXAMPLE_EXE_NAME)
@@ -165,20 +163,16 @@ endif
 
 code_coverage_run: code_coverage_build
 ifeq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR)/$(BIN_DIR)/$(MAST_UT_EXE_NAME))","")
-> $(error     ==== No Lib UT available for Code Coverage ========)
-endif
-ifeq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR)/$(BIN_DIR)/$(SIT_UT_EXE_NAME))","")
-> $(error     ==== No SIT Reader Lib UT available for Code Coverage ========)
+> $(error     ==== No Mast UT available for Code Coverage ========)
 endif
 ifeq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR)/$(BIN_DIR)/$(READERS_UT_EXE_NAME))","")
-> $(error     ==== No Readers Lib UT available for Code Coverage ========)
+> $(error     ==== No Readers UT available for Code Coverage ========)
 endif
 > cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && $(RUN)$(MAST_UT_EXE_PATH)
-> cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && $(RUN)$(SIT_UT_EXE_PATH)
 > cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && $(RUN)$(READERS_UT_EXE_PATH)
 
 CODE_COVERAGE_EXCLUDED      = --gcov-exclude=".*(SIT_reader.UnresolvedPathSelector.hpp).*"
-CODE_COVERAGE_FILTERS       = --gcov-filter=".*(Mast_Core|Mast_API_CPP|Mast_API_C|SIT_reader).*"
+CODE_COVERAGE_FILTERS       = --gcov-filter=".*(Mast_Core|Mast_API_CPP|Mast_API_C|Readers|SIT_reader).*"
 CODE_COVERAGE_OUTPUT        = -o CodeCoverage/CodeCoverage.html
 #+CODE_COVERAGE_SOURCE_DIR    = --root=$(PWD)
 CODE_COVERAGE_SOURCE_DIR    = --root=.
@@ -271,23 +265,6 @@ ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(OPTIONAL_UT_EXE_NAME)
 >  cd $(CMAKE_RELEASE_BUILD_DIR) && $(RUN)$(OPTIONAL_UT_EXE_PATH)
 else
 >  @echo "    ==== No Release Optionals Libs UT available ========"
-endif
-
-
-run_sit_ut_debug:
-ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(SIT_UT_EXE_NAME))","")
->  cd $(CMAKE_DEBUG_BUILD_DIR) && $(RUN)$(SIT_UT_EXE_PATH)
-else
->  @echo "    ==== No Debug Sit UT available ========"
->  @echo "    ==== $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(SIT_UT_EXE_NAME)
-endif
-
-run_sit_ut_release:
-ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(SIT_UT_EXE_NAME))","")
->  cd $(CMAKE_RELEASE_BUILD_DIR) && $(RUN)$(SIT_UT_EXE_PATH)
-else
->  @echo "    ==== No Release Sit UT available ========"
->  @echo "    ==== Expecting: $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(SIT_UT_EXE_NAME) ========"
 endif
 
 run_readers: run_readers_ut_debug
@@ -385,7 +362,7 @@ distclean: code_coverage_clean
 > cmake -E remove_directory $(CMAKE_ARM_BUILD_DIR)
 > cmake -E remove_directory $(CMAKE_RISCV32_BUILD_DIR)
 > cmake -E remove -f Mast_UT/Generated/Runner.cpp
-> cmake -E remove -f SIT_reader_UT/Generated/Runner.cpp
+> cmake -E remove -f Readers_UT/Generated/Runner.cpp
 > cmake -E remove -f External_Libs_UT/Generated/Runner.cpp
 > cmake -E remove -f Optional_Libs_UT/Generated/Runner.cpp
 

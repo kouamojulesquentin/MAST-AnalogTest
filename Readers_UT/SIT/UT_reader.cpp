@@ -5,7 +5,7 @@
 //
 // Project : Mast
 //
-//! @file UT_GmlPrinter.cpp
+//! @file UT_reader.cpp
 //!
 //! Implements test fixture for testing SIT_Reader
 //!

@@ -172,7 +172,7 @@ endif
 > cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && $(RUN)$(READERS_UT_EXE_PATH)
 
 CODE_COVERAGE_EXCLUDED      = --gcov-exclude=".*(SIT_reader.UnresolvedPathSelector.hpp).*"
-CODE_COVERAGE_FILTERS       = --gcov-filter=".*(Mast_Core|Mast_API_CPP|Mast_API_C|Readers|SIT_reader).*"
+CODE_COVERAGE_FILTERS       = --gcov-filter=".*(Mast_Core|Mast_API_CPP|Mast_API_C|Readers).*"
 CODE_COVERAGE_OUTPUT        = -o CodeCoverage/CodeCoverage.html
 #+CODE_COVERAGE_SOURCE_DIR    = --root=$(PWD)
 CODE_COVERAGE_SOURCE_DIR    = --root=.

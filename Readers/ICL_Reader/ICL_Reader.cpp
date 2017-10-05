@@ -46,40 +46,31 @@ ICL::ICL_Reader::ICL_Reader(std::shared_ptr<mast::SystemModel> sm)
   #undef MAKE_LAMBDA
 }
 
-bool ICL::ICL_Reader::Parse(string_view filename)
+void ICL::ICL_Reader::Parse(string_view filename)
 {
   CHECK_PARAMETER_NOT_EMPTY(filename, "Must specify a valid file path");
 
-  std::ifstream iclFile(filename.data());
+  std::ifstream iclFileStream(filename.data());
 
-  CHECK_TRUE(iclFile.good(), "Cannot open file: "s.append(filename.cbegin(), filename.cend()));
+  CHECK_TRUE  (iclFileStream.good(), "Cannot open file: "s            .append(filename.cbegin(), filename.cend()));
+  CHECK_FALSE (iclFileStream.eof(),  "Cannot parse empty ICL file: "s .append(filename.cbegin(), filename.cend()));
 
-  return Parse_Impl(iclFile);
+  return Parse_Impl(iclFileStream);
 }
 
-bool ICL::ICL_Reader::Parse(std::istream& stream)
+void ICL::ICL_Reader::Parse_Impl(std::istream& stream)
 {
-   if (!stream.good() && stream.eof())
-   {
-     return false;
-   }
+  CHECK_TRUE  (stream.good(), "Invalid ICL stream");
+  CHECK_FALSE (stream.eof(),  "Cannot parse ICL from empty stream");
 
-   return Parse_Impl(stream);
-}
-
-
-bool ICL::ICL_Reader::Parse_Impl(std::istream& stream)
-{
   ICL_Scanner scanner(stream);
   ICL_Parser  parser(scanner, *this /* driver */);
 
-  auto success = parser.parse() == 0;
-  if (success)
-  {
-    LOG(DEBUG) << "ICL has been parsed successfully";
-  }
+  auto succeeded = parser.parse() == 0;
 
-  return success;
+  CHECK_TRUE(succeeded, "Failed to parse ICL stream");
+
+  LOG(INFO) << "ICL has been parsed successfully";
 }
 
 //===========================================================================

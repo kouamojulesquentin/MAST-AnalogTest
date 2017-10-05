@@ -41,29 +41,21 @@ namespace mast
 
 namespace ICL
 {
-class ICL_Parser;
-class ICL_Scanner;
+//+class ICL_Parser;
 
-
-class ICL_Reader
+class ICL_Reader final
 {
 public:
-   virtual ~ICL_Reader() = default;
+   ~ICL_Reader() = default;
    ICL_Reader() = delete;
-   ICL_Reader( std::shared_ptr<mast::SystemModel> sm);
+   ICL_Reader(std::shared_ptr<mast::SystemModel> sm);
 
 
    //! Parses a ICL file to construct a SystemModel
    //!
    //! @param filename  ICL file path
    //!
-   bool Parse(std::experimental::string_view filename);
-
-   //! Parses a ICL formatted stream to construct a SystemModel
-   //!
-   //! @param stream Input stream to get model representation from
-   //!
-   bool Parse(std::istream& stream);
+   void Parse(std::experimental::string_view filename);
 
    //! Returns SystemModelNode build from ICL
    //!
@@ -93,6 +85,7 @@ private:  // Part used by ICL_Parser
   std::shared_ptr<mast::SystemModel>        systemModel;
 //+  mast::SystemModelBuilder                  builder;
 
+
   using RegisterCreator_t = std::function<std::shared_ptr<mast::Register>(const std::string&     selectorRegName,
                                                                           uint32_t               pathsCount,
                                                                           mast::SelectorProperty properties)>; //!< Function to create a register for a PathSelector
@@ -101,13 +94,13 @@ private:  // Part used by ICL_Parser
 
 private:
 
-   bool Parse_Impl(std::istream& stream);
+  void Parse_Impl(std::istream& stream);
 
-   //! @todo [JFC]-[October/03/2017]: group those information into "ParserErrorInfo" and move try moving instanciation into the paser
-   //!
-   std::size_t m_column = 0;
-   std::size_t m_line   = 0;
-   std::string m_errorMessage; //!< Error message build while parsing ICL (empty when successful)
+  //! @todo [JFC]-[October/03/2017]: group those information into "ParserErrorInfo" and move try moving instanciation into the paser
+  //!
+  std::size_t m_column = 0;
+  std::size_t m_line   = 0;
+  std::string m_errorMessage; //!< Error message build while parsing ICL (empty when successful)
 };
 
 } // End of: namespace ICL

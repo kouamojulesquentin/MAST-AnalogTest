@@ -11,6 +11,3 @@ message(STATUS "Readers: LIBICL_READER_INCLUDE_DIRS:    ${LIBICL_READER_INCLUDE_
 message("================================================================================")
 message("")
 
-
-
-#+add_subdirectory(ICL_Reader_UT)

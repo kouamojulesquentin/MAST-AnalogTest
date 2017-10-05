@@ -84,46 +84,6 @@ target_link_libraries (ICL_SmokeTest ICL_Reader Mast_Core)
 
 include(CTest)
 
-install(DIRECTORY SmokeTests_Files DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ICL)
-set(SMOKE_FILES_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ICL/SmokeTests_Files)
-
-add_test(NAME ICL:Parser:fragment.icl_source.comment      COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/fragment.icl_source.comment.icl "ICL error: Line 5:12-14: ")
-add_test(NAME ICL:Parser:fragment.icl_source.module_items COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/fragment.icl_source.module_items.icl)
-add_test(NAME ICL:Parser:fragment.icl_source.namespace    COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/fragment.icl_source.namespace.icl)
-add_test(NAME ICL:Parser:fragment.icl_source.ports        COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/fragment.icl_source.ports.icl)
-
-add_test(NAME ICL:Parser:guide_F_1    COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/guide_F_1.icl)
-add_test(NAME ICL:Parser:guide_F_2    COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/guide_F_2.icl)
-add_test(NAME ICL:Parser:guide_F_3    COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/guide_F_3.icl)
-add_test(NAME ICL:Parser:guide_F_4    COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/guide_F_4.icl)
-add_test(NAME ICL:Parser:guide_F_5    COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/guide_F_5.icl)
-add_test(NAME ICL:Parser:guide_F_6    COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/guide_F_6.icl)
-
-add_test(NAME ICL:Parser:example_E_1  COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_1.icl)
-add_test(NAME ICL:Parser:example_E_2  COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_2.icl)
-add_test(NAME ICL:Parser:example_E_3  COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_3.icl)
-add_test(NAME ICL:Parser:example_E_4  COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_4.icl)
-add_test(NAME ICL:Parser:example_E_5  COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_5.icl)
-add_test(NAME ICL:Parser:example_E_6  COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_6.icl)
-add_test(NAME ICL:Parser:example_E_7  COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_7.icl)
-add_test(NAME ICL:Parser:example_E_8  COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_8.icl)
-add_test(NAME ICL:Parser:example_E_9  COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_9.icl)
-add_test(NAME ICL:Parser:example_E_10 COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_10.icl)
-add_test(NAME ICL:Parser:example_E_11 COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_11.icl)
-add_test(NAME ICL:Parser:example_E_12 COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_12.icl)
-add_test(NAME ICL:Parser:example_E_13 COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_13.icl)
-add_test(NAME ICL:Parser:example_E_14 COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_14.icl)
-add_test(NAME ICL:Parser:example_E_15 COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_15.icl)
-add_test(NAME ICL:Parser:example_E_16 COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_16.icl)
-add_test(NAME ICL:Parser:example_E_17 COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_17.icl)
-add_test(NAME ICL:Parser:example_E_18 COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_18.icl)
-add_test(NAME ICL:Parser:example_E_19 COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_19.icl)
-add_test(NAME ICL:Parser:example_E_20 COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_20.icl)
-add_test(NAME ICL:Parser:example_E_21 COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/example_E_21.icl)
-
-add_test(NAME ICL:Parser:annex_e_ICL  COMMAND ICL_SmokeTest ${SMOKE_FILES_DIR}/annex_e_ICL.icl)
-
-
 install(DIRECTORY Benches DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ICL)
 set(SMOKE_FILES_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ICL/Benches)
 

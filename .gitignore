@@ -175,3 +175,4 @@ build
 /cmake_code_coverage
 /CodeCoverage
 /External_Libs_UT/Generated
+/UT_Tests_Common_Log.txt

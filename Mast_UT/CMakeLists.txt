@@ -58,7 +58,7 @@ endif()
 #
 add_library           (Mast_UT_Helpers SHARED     "Plugins/PluginsRegistry.cpp")
 set_target_properties (Mast_UT_Helpers PROPERTIES COMPILE_FLAGS "${WARNINGS} -std=c++14")
-target_link_libraries (Mast_UT_Helpers ${PLATFORM_LIBS})
+target_link_libraries (Mast_UT_Helpers Tests_Common ${PLATFORM_LIBS})
 
 #+set(EXTRA_LIBS ${EXTRA_LIBS} Mast_UT_Helpers)
 

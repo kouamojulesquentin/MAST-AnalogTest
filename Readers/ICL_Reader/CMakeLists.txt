@@ -72,8 +72,9 @@ endif()
 
 add_library(ICL_Reader SHARED  ${LEX_YACC_SRC_DIR}ICL_Reader.cpp ${LEX_YACC_SRC_DIR}ICL_Parser.tab.cc ${LEX_YACC_SRC_DIR}ICL_Lexer.yy.cc)
 
-set_target_properties(ICL_Reader PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
-target_link_libraries(ICL_Reader Mast_Core)
+set_target_properties      (ICL_Reader PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+target_include_directories (ICL_Reader PUBLIC .)
+target_link_libraries      (ICL_Reader Mast_Core)
 
 
 # ---------------- Smoke tests

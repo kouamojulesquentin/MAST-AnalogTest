@@ -43,6 +43,18 @@ using namespace mast;
 
 namespace
 {
+  //! Returns path of a file accessible by test runner
+  //!
+  //! @param fileName   File name used by test
+  //!
+  string GetTestFilePath (string_view fileName, bool checkExists = true)
+  {
+    return test::GetTestFilePath({"Mast_Core"s, "UT_TestFiles"s, string(fileName)}, checkExists);
+  }
+  //
+  //  End of: GetTestFilePath
+  //---------------------------------------------------------------------------
+
   void Check_DefaultConfiguration(const MastConfiguration& sut)
   {
     TS_ASSERT_FALSE (sut.LoggerEnabled());
@@ -364,7 +376,7 @@ void UT_MastConfiguration::test_ParseConfigurationFile_Empty ()
   // ---------------- Setup
   //
   MastConfiguration sut;
-  auto              filePath = test::GetTestFilePath("UT_MastConfiguration_empty.yml");
+  auto              filePath = GetTestFilePath("UT_MastConfiguration_empty.yml");
 
   // ---------------- Exercise & Verify
   //
@@ -379,7 +391,7 @@ void UT_MastConfiguration::test_ParseConfigurationFile_Default ()
   // ---------------- Setup
   //
   MastConfiguration sut;
-  auto              filePath = test::GetTestFilePath("UT_MastConfiguration_default.yml");
+  auto              filePath = GetTestFilePath("UT_MastConfiguration_default.yml");
 
   // ---------------- Exercise
   //
@@ -399,7 +411,7 @@ void UT_MastConfiguration::test_ParseConfigurationFile_Good ()
   //
   MastConfiguration sut;
 
-  auto filePath = test::GetTestFilePath("UT_MastConfiguration_good.yml");
+  auto filePath = GetTestFilePath("UT_MastConfiguration_good.yml");
 
   // ---------------- Exercise
   //
@@ -577,7 +589,7 @@ void UT_MastConfiguration::test_Update_ShortSwitches ()
 {
   // ---------------- Setup
   //
-  auto              configFilePath = test::GetTestFilePath("UT_MastConfiguration_minimal.yml");
+  auto              configFilePath = GetTestFilePath("UT_MastConfiguration_minimal.yml");
   vector<string>    arguments{ "MyAppWithLongName", "-s=myDesign.sit", "-a=last_lazy", "-l", "-c=" + configFilePath };
   ostringstream     stdStream;
   ostringstream     errStream;
@@ -795,7 +807,7 @@ void UT_MastConfiguration::test_Update_OnlyYamlConfig ()
   // ---------------- Setup
   //
   vector<string> arguments{ "MyAppWithLongName" };
-  arguments.emplace_back("--conf="s + test::GetTestFilePath("UT_MastConfiguration_good.yml"));
+  arguments.emplace_back("--conf="s + GetTestFilePath("UT_MastConfiguration_good.yml"));
 
   ostringstream     stdStream;
   ostringstream     errStream;
@@ -873,7 +885,7 @@ void UT_MastConfiguration::test_Update_Arguments_and_YamlConfig ()
                                 "--plugin=customPlugins.so",
                              };
 
-  arguments.emplace_back("--conf="s + test::GetTestFilePath("UT_MastConfiguration_good.yml"));
+  arguments.emplace_back("--conf="s + GetTestFilePath("UT_MastConfiguration_good.yml"));
 
   ostringstream     stdStream;
   ostringstream     errStream;

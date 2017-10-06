@@ -25,14 +25,32 @@
 #include "TestModelBuilder.hpp"
 #include "TestUtilities.hpp"
 
+#include <experimental/string_view>
 #include <cxxtest/ValueTraits.h>
 
 using std::string;
+using std::experimental::string_view;
 using std::shared_ptr;
 
 using namespace std::string_literals;
 using namespace mast;
 
+namespace
+{
+
+//! Returns path of a file accessible by test runner
+//!
+//! @param fileName   File name used by test
+//!
+string GetTestFilePath (string_view fileName, bool checkExists = true)
+{
+  return test::GetTestFilePath({"Mast_Core"s, "UT_TestFiles"s, string(fileName)}, checkExists);
+}
+//
+//  End of: GetTestFilePath
+//---------------------------------------------------------------------------
+
+} // End of unnamed namespace
 
 //! Initializes test (called for each test)
 void UT_ModelBuildDriver::setUp ()
@@ -93,7 +111,7 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_NoInstance ()
   // ---------------- Setup
   //
   ModelBuildDriver        sut;
-  auto                    sitFile = test::GetTestFilePath("UT_ModelBuildDriver_no_Instance.sit");
+  auto                    sitFile = GetTestFilePath("UT_ModelBuildDriver_no_Instance.sit");
   shared_ptr<SystemModel> sm;
 
   CxxTest::setAbortTestOnFail(true);
@@ -126,7 +144,7 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_OneInstance ()
   // ---------------- Setup
   //
   ModelBuildDriver        sut;
-  auto                    sitFile = test::GetTestFilePath("UT_ModelBuildDriver_one_Instance.sit");
+  auto                    sitFile = GetTestFilePath("UT_ModelBuildDriver_one_Instance.sit");
   shared_ptr<SystemModel> sm;
 
   CxxTest::setAbortTestOnFail(true);
@@ -162,7 +180,7 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_OneInstance_no_Ext ()
   // ---------------- Setup
   //
   ModelBuildDriver        sut;
-  auto                    sitFile = test::GetTestFilePath("UT_ModelBuildDriver_one_Instance", false); // No ".sit" intended
+  auto                    sitFile = GetTestFilePath("UT_ModelBuildDriver_one_Instance", false); // No ".sit" intended
   shared_ptr<SystemModel> sm;
 
   CxxTest::setAbortTestOnFail(true);
@@ -198,7 +216,7 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_TwoInstances ()
   // ---------------- Setup
   //
   ModelBuildDriver        sut;
-  auto                    sitFile = test::GetTestFilePath("UT_ModelBuildDriver_two_Instances.sit");
+  auto                    sitFile = GetTestFilePath("UT_ModelBuildDriver_two_Instances.sit");
   shared_ptr<SystemModel> sm;
 
   CxxTest::setAbortTestOnFail(true);
@@ -241,7 +259,7 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_Hierarchical ()
   // ---------------- Setup
   //
   ModelBuildDriver        sut;
-  auto                    sitFile = test::GetTestFilePath("UT_ModelBuildDriver_hierarchical.sit");
+  auto                    sitFile = GetTestFilePath("UT_ModelBuildDriver_hierarchical.sit");
   shared_ptr<SystemModel> sm;
 
   CxxTest::setAbortTestOnFail(true);
@@ -291,7 +309,7 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_Hierarchical_SubDir ()
   // ---------------- Setup
   //
   ModelBuildDriver        sut;
-  auto                    sitFile = test::GetTestFilePath("UT_ModelBuildDriver_hierarchical_2.sit");
+  auto                    sitFile = GetTestFilePath("UT_ModelBuildDriver_hierarchical_2.sit");
   shared_ptr<SystemModel> sm;
 
   CxxTest::setAbortTestOnFail(true);
@@ -340,7 +358,7 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_ParsingError ()
   // ---------------- Setup
   //
   ModelBuildDriver        sut;
-  auto                    sitFile = test::GetTestFilePath("UT_ModelBuildDriver_with_BadSit.sit");
+  auto                    sitFile = GetTestFilePath("UT_ModelBuildDriver_with_BadSit.sit");
   shared_ptr<SystemModel> sm;
 
   // ---------------- Exercise
@@ -361,7 +379,7 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_OneFactoryInstance ()
   // ---------------- Setup
   //
   ModelBuildDriver        sut;
-  auto                    sitFile = test::GetTestFilePath("UT_ModelBuildDriver_one_FactoryInstance.sit");
+  auto                    sitFile = GetTestFilePath("UT_ModelBuildDriver_one_FactoryInstance.sit");
   shared_ptr<SystemModel> sm;
 
   SystemModelFactory::Instance().RegisterCreator("Make_MIB"s, [](SystemModel& sm, const string& /* parameters */)
@@ -413,7 +431,7 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_MixKindsInstances ()
   // ---------------- Setup
   //
   ModelBuildDriver        sut;
-  auto                    sitFile = test::GetTestFilePath("UT_ModelBuildDriver_MixKindsInstances.sit");
+  auto                    sitFile = GetTestFilePath("UT_ModelBuildDriver_MixKindsInstances.sit");
   shared_ptr<SystemModel> sm;
 
   auto& factory = SystemModelFactory::Instance();
@@ -486,7 +504,7 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_MissingFactory ()
   // ---------------- Setup
   //
   ModelBuildDriver        sut;
-  auto                    sitFile = test::GetTestFilePath("UT_ModelBuildDriver_one_FactoryInstance.sit");
+  auto                    sitFile = GetTestFilePath("UT_ModelBuildDriver_one_FactoryInstance.sit");
   shared_ptr<SystemModel> sm;
 
   SystemModelFactory::Instance().Clear();

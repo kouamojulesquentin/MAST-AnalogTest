@@ -1,7 +1,7 @@
 project(Mast_Core)
 
-include_directories(include/)
-include_directories(internal/)
+#+include_directories(include/)
+#+include_directories(internal/)
 include_directories(${LIBLOGGER_INCLUDE_DIRS})
 include_directories(${LIBTCLAP_INCLUDE_DIRS})
 include_directories(${LIBYAML_INCLUDE_DIRS})
@@ -32,8 +32,10 @@ endif()
 file(GLOB Mast_Core_SOURCES "src/*")
 set(Mast_Core_SOURCES ${Mast_Core_SOURCES} ${Mast_Core_Platform_SOURCES})
 
-add_library           (Mast_Core SHARED ${Mast_Core_SOURCES})
-set_target_properties (Mast_Core PROPERTIES COMPILE_FLAGS "${CFLAGS}")
+add_library                (Mast_Core SHARED ${Mast_Core_SOURCES})
+target_include_directories (Mast_Core PUBLIC  include
+                                      PRIVATE internal)
+set_target_properties      (Mast_Core PROPERTIES COMPILE_FLAGS "${CFLAGS}")
 
 if (WIN32)
   set(EXTRA_LIBS ${EXTRA_LIBS} DbgHelp)

@@ -24,6 +24,8 @@ else ()
 endif ()
 
 add_library(Logger SHARED ${Logger_SOURCES})
+target_include_directories(Logger PUBLIC . g3log)
+
 if (WIN32)
 	target_link_libraries(Logger DbgHelp)
 else ()

@@ -30,9 +30,12 @@
 #include <vector>
 #include <array>
 #include <string>
+#include <experimental/string_view>
 
 using std::vector;
 using std::string;
+using std::experimental::string_view;
+using namespace std::experimental::literals::string_view_literals;
 using std::dynamic_pointer_cast;
 using std::make_shared;
 using std::make_unique;
@@ -44,6 +47,18 @@ namespace
 {
 uint32_t g_Fake_PDL_AlgorithmCallCount = 0;
 
+//! Returns path of a file accessible by test runner
+//!
+//! @param fileName   File name used by test
+//!
+string GetTestFilePath (string_view fileName, bool checkExists = true)
+{
+  return test::GetTestFilePath({"Mast_Core"s, "UT_TestFiles"s, string(fileName)}, checkExists);
+}
+//
+//  End of: GetTestFilePath
+//---------------------------------------------------------------------------
+
 //! Builds up some command line arguments
 //!
 vector<string> MakeCmdlineArguments ()
@@ -52,9 +67,9 @@ vector<string> MakeCmdlineArguments ()
                              "Mast.exe",
                              "--min_cycle=12ms",
                              "--max_cycle=36ms",
-                             "--sit=" + test::GetTestFilePath("UT_MastEnvironment.sit"),
+                             "--sit="        + GetTestFilePath("UT_MastEnvironment.sit"),
                              "--check",
-                             "--check_file=" + test::GetTestFilePath("Model_Check.txt", false), // Do not check it exists
+                             "--check_file=" + GetTestFilePath("Model_Check.txt", false), // Do not check it exists
                              "--plugin=Fake_Plugin_1",
                            };
   return arguments;
@@ -113,7 +128,11 @@ vector<string> PDLAlgoExpectedSVFCommands_Lazy ()
 //---------------------------------------------------------------------------
 
 
+
+
 } // End of unnamed namespace
+
+
 
 //! Initializes test (called for each test)
 void UT_MastEnvironment::setUp ()
@@ -179,7 +198,7 @@ void UT_MastEnvironment::test_ParseOptions_no_Yaml ()
   MastEnvironment sut(true);
   vector<string>  arguments {
                               "Mast.exe",
-                              "--sit=" + test::GetTestFilePath("UT_MastEnvironment.sit"),
+                              "--sit=" + GetTestFilePath("UT_MastEnvironment.sit"),
                               "--check",
                             };
 
@@ -198,8 +217,8 @@ void UT_MastEnvironment::test_ParseOptions_with_Yaml ()
   MastEnvironment sut(true);
   vector<string>  arguments {
                               "Mast.exe",
-                              "--conf=" + test::GetTestFilePath("UT_MastEnvironment.yml"),
-                              "--sit="  + test::GetTestFilePath("UT_MastEnvironment.sit"),
+                              "--conf=" + GetTestFilePath("UT_MastEnvironment.yml"),
+                              "--sit="  + GetTestFilePath("UT_MastEnvironment.sit"),
                               "--check",
                             };
 
@@ -216,7 +235,7 @@ void UT_MastEnvironment::test_ParseOptions_Argc_Argv ()
   //
   MastEnvironment sut(true);
 
-  auto sitArg        = "--sit="        + test::GetTestFilePath("UT_MastEnvironment.sit");
+  auto sitArg        = "--sit="        + GetTestFilePath("UT_MastEnvironment.sit");
   const char* argv[] = {
                          "Mast.exe",
                          "--sit=not_exists.sit"
@@ -281,7 +300,7 @@ void UT_MastEnvironment::test_CreateSystemModel_AfterLoadPlugins ()
 {
   // ---------------- Setup
   //
-  auto checkResultFile = test::GetTestFilePath("Model_Check.txt", false);
+  auto checkResultFile = GetTestFilePath("Model_Check.txt", false);
   Utility::ClearFile(checkResultFile);
 
   MastEnvironment sut(true);
@@ -311,15 +330,15 @@ void UT_MastEnvironment::test_CreateSystemModel_SIT_Error ()
 {
   // ---------------- Setup
   //
-  auto checkResultFile = test::GetTestFilePath("Model_Check.txt", false);
+  auto checkResultFile = GetTestFilePath("Model_Check.txt", false);
   Utility::ClearFile(checkResultFile);
 
 
   vector<string> arguments {
                              "Mast.exe",
-                             "--sit="        + test::GetTestFilePath("UT_MastEnvironment_with_error.sit"),
+                             "--sit="        + GetTestFilePath("UT_MastEnvironment_with_error.sit"),
                              "--check",
-                             "--check_file=" + test::GetTestFilePath("Model_Check.txt", false), // Do not check it exists
+                             "--check_file=" + GetTestFilePath("Model_Check.txt", false), // Do not check it exists
                            };
   MastEnvironment sut(true);
   sut.ParseOptions(arguments);
@@ -355,12 +374,12 @@ void UT_MastEnvironment::test_CreateSystemModel_SIT_Error_no_CheckFile ()
 {
   // ---------------- Setup
   //
-  auto checkResultFile = test::GetTestFilePath("Model_Check.txt", false);
+  auto checkResultFile = GetTestFilePath("Model_Check.txt", false);
   Utility::ClearFile(checkResultFile);
 
   vector<string> arguments {
                              "Mast.exe",
-                             "--sit=" + test::GetTestFilePath("UT_MastEnvironment_with_error.sit"),
+                             "--sit=" + GetTestFilePath("UT_MastEnvironment_with_error.sit"),
                              "--check",
                            };
   MastEnvironment sut(true);
@@ -390,8 +409,8 @@ void UT_MastEnvironment::test_CreateSystemModel_SIT_Model_Exports ()
 {
   // ---------------- Setup
   //
-  auto gmlExpectedFile         = test::GetTestFilePath("UT_MastEnvironment_MastModel.gml");
-  auto prettyPrintExpectedFile = test::GetTestFilePath("UT_MastEnvironment_MastModel.txt");
+  auto gmlExpectedFile         = GetTestFilePath("UT_MastEnvironment_MastModel.gml");
+  auto prettyPrintExpectedFile = GetTestFilePath("UT_MastEnvironment_MastModel.txt");
   auto gmlFile                 = "MastModel.gml";
   auto prettyPrintFile         = "MastModel.txt";
 
@@ -403,8 +422,8 @@ void UT_MastEnvironment::test_CreateSystemModel_SIT_Model_Exports ()
 
   vector<string> arguments {
                              "Mast.exe",
-                             "--conf=" + test::GetTestFilePath("UT_MastEnvironment.yml"),
-                             "--sit="  + test::GetTestFilePath("UT_MastEnvironment.sit"),
+                             "--conf=" + GetTestFilePath("UT_MastEnvironment.yml"),
+                             "--sit="  + GetTestFilePath("UT_MastEnvironment.sit"),
                            };
   MastEnvironment sut(true);
   sut.ParseOptions(arguments);
@@ -441,7 +460,7 @@ void UT_MastEnvironment::test_CreateSystemModel_ChangeProtocol ()
   vector<string> arguments {
                              "Mast.exe",
                              "--protocol_name=Spy",
-                             "--sit="        + test::GetTestFilePath("UT_MastEnvironment.sit"),
+                             "--sit="        + GetTestFilePath("UT_MastEnvironment.sit"),
                              "--plugin=Fake_Plugin_1",
                            };
 
@@ -486,7 +505,7 @@ void UT_MastEnvironment::test_CreateSystemModel_ChangeProtocol_TopIsChain ()
   vector<string> arguments {
                              "Mast.exe",
                              "--protocol_name=Spy",
-                             "--sit="        + test::GetTestFilePath("UT_MastEnvironment_top_chain.sit"),
+                             "--sit="        + GetTestFilePath("UT_MastEnvironment_top_chain.sit"),
                              "--plugin=Fake_Plugin_1",
                            };
 
@@ -575,8 +594,8 @@ void UT_MastEnvironment::test_CreateManager_Monitoring ()
 
   vector<string> arguments {
                              "Mast.exe",
-                             "--conf=" + test::GetTestFilePath("UT_MastEnvironment.yml"),
-                             "--sit="  + test::GetTestFilePath("UT_MastEnvironment.sit"),
+                             "--conf=" + GetTestFilePath("UT_MastEnvironment.yml"),
+                             "--sit="  + GetTestFilePath("UT_MastEnvironment.sit"),
                            };
 
   MastEnvironment sut(true);
@@ -734,9 +753,9 @@ void UT_MastEnvironment::test_Start_RealPDLAlgo ()
                              "Mast.exe",
                              "--protocol_name=Spy",
                              "--config_algo=last_lazy",
-                             "--sit="        + test::GetTestFilePath("UT_MastEnvironment.sit"),
+                             "--sit="        + GetTestFilePath("UT_MastEnvironment.sit"),
                              "--check",
-                             "--check_file=" + test::GetTestFilePath("Model_Check.txt", false), // Do not check it exists
+                             "--check_file=" + GetTestFilePath("Model_Check.txt", false), // Do not check it exists
                              "--plugin=Fake_Plugin_1",
                            };
 
@@ -778,9 +797,9 @@ void UT_MastEnvironment::test_Start_Arguments_RealPDLAlgo ()
                              "Mast.exe",
                              "--config_algo=last_or_default",
                              "--protocol_name=Spy",
-                             "--sit="        + test::GetTestFilePath("UT_MastEnvironment.sit"),
+                             "--sit="        + GetTestFilePath("UT_MastEnvironment.sit"),
                              "--check",
-                             "--check_file=" + test::GetTestFilePath("Model_Check.txt", false), // Do not check it exists
+                             "--check_file=" + GetTestFilePath("Model_Check.txt", false), // Do not check it exists
                              "--plugin=Fake_Plugin_1",
                            };
 
@@ -817,8 +836,8 @@ void UT_MastEnvironment::test_Start_Argc_Argv_RealPDLAlgo ()
   auto creator       = [spiedCommands](const string& /*params*/) { return make_unique<test::Spy_SVF_Protocol>(spiedCommands); };
   AccessInterfaceProtocolFactory::Instance().RegisterCreator("Spy", creator);
 
-  auto sitArg       = "--sit="        + test::GetTestFilePath("UT_MastEnvironment.sit");
-  auto checkFileArg = "--check_file=" + test::GetTestFilePath("Model_Check.txt", false); // Do not check it exists
+  auto sitArg       = "--sit="        + GetTestFilePath("UT_MastEnvironment.sit");
+  auto checkFileArg = "--check_file=" + GetTestFilePath("Model_Check.txt", false); // Do not check it exists
 
   const char* argv[] = {
                          "Mast.exe",

@@ -75,7 +75,8 @@ if (WIN32)
   include_directories($ENV{FLEX_DIR})
 endif()
 
-add_library(SIT_Reader_Lib SHARED  ${LEX_YACC_SRC_DIR}SIT_reader.cpp ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc)
+add_library                (SIT_Reader_Lib SHARED  ${LEX_YACC_SRC_DIR}SIT_reader.cpp ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc)
+target_include_directories (SIT_Reader_Lib PUBLIC .)
 
 set_target_properties(SIT_Reader_Lib PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 target_link_libraries(SIT_Reader_Lib Mast_Core)

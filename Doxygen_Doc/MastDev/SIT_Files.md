@@ -141,14 +141,14 @@ It is the equivalent of the [PDL] <code>iProcsForModule</code> command.</td></tr
   <tr>
     <td>LINKER</td>
     <td>
-      <path_selector> <ctrl_node> <max_derivations>
+      <path_selector> <ctrl_reg> <max_derivations>
       <table>
         <tr><td>  <path_selector>    </td><td>  a string selecting the decoding strategy of the Linker</td></tr>
-        <tr><td>  <max_derivations>  </td><td>  maximum number of allowed paths (i.e. number of children)</td></tr>
         <tr><td>  <ctrl_reg>         </td><td>  string denoting the "node_name" of the register controlling the linker</td></tr>
+        <tr><td>  <max_derivations>  </td><td>  maximum number of allowed paths (i.e. number of children)</td></tr>
       </table>
       <br>
-      NB: the control register can be declared anywhere in the [SIT] file, not necessarily before the Linker.
+      NB: the control register can be declared anywhere in the [SIT] file (not necessarily before the Linker).
       <table>
         <tr>
           <td>Binary</td>
@@ -201,7 +201,7 @@ It is the equivalent of the [PDL] <code>iProcsForModule</code> command.</td></tr
     </td>
   </tr>
   <tr>
-    <td>ACCES_INTERFACE</td>
+    <td>ACCESS_INTERFACE</td>
     <td>
       <protocol> <AI_identifier>* <AI_table><br>
       Creates an Access Interface node implementing the provided protocol<br>

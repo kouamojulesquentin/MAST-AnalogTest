@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(SIT_parser)
+project(SIT_parser CXX)
 
 find_package(FLEX)
 find_package(BISON)
@@ -11,10 +11,10 @@ if (NOT BISON_FOUND)
  message(FATAL_ERROR "SIT_parser: Bison not found")
 endif()
 
-add_definitions(${P_WARNINGS})
-set (P_WARNINGS "-Wall -Wno-sign-compare -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs")
-add_definitions(${P_CFLAGS})
-set (P_CFLAGS "${P_WARNINGS} -DSIT_READER_EXPORTS -std=c++14")
+#+add_definitions(${P_WARNINGS})
+#+set (P_WARNINGS "-Wall -Wno-sign-compare -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs")
+#+add_definitions(${P_CFLAGS})
+#+set (P_CFLAGS "${P_WARNINGS} -DSIT_READER_EXPORTS -std=c++14")
 
 if (CODE_COVERAGE)
   set(CMAKE_CXX_FLAGS "--coverage ${CMAKE_CXX_FLAGS} ")
@@ -24,7 +24,7 @@ add_definitions(${Flex_Switches})
 if (WIN32)
   set (Flex_Switches -v -L --wincompat)
 else()
-  set (P_CFLAGS "${P_CFLAGS} -fPIC")
+#+  set (P_CFLAGS "${P_CFLAGS} -fPIC")
   set (Flex_Switches -v -L)
 endif()
 
@@ -56,9 +56,6 @@ add_custom_command(
   DEPENDS SIT_parser.yy
 )
 
-# Add parser.c to the list of sources
-#+SET(SIT_parser_SRCS ${SIT_parser_SRC} ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc)
-
 # Since parser.c does not exists yet when cmake is run, mark it as generated
 set_source_files_properties(${LEX_YACC_SRC_DIR}SIT_parser.tab.cc GENERATED)
 set_source_files_properties(${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc   GENERATED)
@@ -75,8 +72,23 @@ if (WIN32)
   include_directories($ENV{FLEX_DIR})
 endif()
 
-add_library                (SIT_Reader_Lib SHARED  ${LEX_YACC_SRC_DIR}SIT_reader.cpp ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc)
+add_library(SIT_Reader_Lib SHARED  ${LEX_YACC_SRC_DIR}SIT_reader.cpp
+                                   ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc
+                                   ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc
+                                   SIT_Printer.cpp)
+
 target_include_directories (SIT_Reader_Lib PUBLIC .)
 
-set_target_properties(SIT_Reader_Lib PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+#+set_target_properties(SIT_Reader_Lib PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+target_compile_options(SIT_Reader_Lib PRIVATE -Wall
+                                              -Wno-sign-compare
+                                              -Wnon-virtual-dtor
+                                              -Wredundant-decls
+                                              -Wundef
+                                              -Wmissing-declarations
+                                              -Wmissing-include-dirs
+                                              -std=c++14
+                                              $<$<NOT:$<PLATFORM_ID:Windows>>:-fPIC>
+                                              )
+
 target_link_libraries(SIT_Reader_Lib Mast_Core)

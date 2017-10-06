@@ -1,5 +1,17 @@
-Running Mast_SIT_reader tests (18 tests)
+Running Mast_Readers tests (34 tests)
 
-..........................................................................................................
+.........
 
-OK! (106 tests including 105 'sub' tests from 17 data driven tests)
+In UT_SIT_Printer::test_VisitTap: 
+UT_SIT_Printer.cpp:368: Warning: Table based not defined
+.
+
+In UT_SIT_Printer::test_VisitTap_With_SubNodes: 
+UT_SIT_Printer.cpp:413: Warning: Table based not defined
+.
+
+In UT_SIT_Printer::test_MakeSIT: 
+UT_SIT_Printer.cpp:451: Warning: Table based not defined
+..........................................................................................................................................
+
+OK! (149 tests including 136 'sub' tests from 21 data driven tests)

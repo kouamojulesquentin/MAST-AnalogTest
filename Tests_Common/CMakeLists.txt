@@ -20,7 +20,7 @@ endif()
 
 # ---------------- Tests Commons Library
 #
-add_library           (Tests_Common  SHARED TestUtilities.cpp
+add_library           (Tests_Common  STATIC TestUtilities.cpp
                                             TestModelBuilder.cpp
                       )
 target_compile_options      (Tests_Common PUBLIC  -fexceptions -std=c++14)
@@ -55,7 +55,8 @@ message("")
 
 # ---------------- Runner application (to check provided common utilities)
 #
-add_executable        (Tests_Common_UT ${UT_SOURCES} ${RUNNER_PATH})
+#+add_executable        (Tests_Common_UT ${UT_SOURCES} ${RUNNER_PATH})
+add_executable        (Tests_Common_UT ${UT_SOURCES} ${GENERATED_RUNNER})
 target_link_libraries (Tests_Common_UT ${PLATFORM_LIBS} Tests_Common Logger)
 
 include(CTest)

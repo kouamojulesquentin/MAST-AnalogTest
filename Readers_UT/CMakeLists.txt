@@ -13,7 +13,6 @@ file(GLOB UT_SIT_READER_HEADERS "SIT/UT_*.hpp")
 file(GLOB UT_SIT_READER_FILES   "SIT/*")
 file(GLOB UT_ICL_READER_HEADERS "ICL/UT_*.hpp")
 file(GLOB UT_ICL_READER_FILES   "ICL/*")
-file(GLOB UT_HELPERS_FILES      "UT_Helpers/*")
 
 set(GENERATED_RUNNER            "Generated/Runner.cpp")
 
@@ -23,7 +22,6 @@ set(UT_HEADERS  ${UT_SIT_READER_HEADERS}
 
 set(UT_SOURCES  ${UT_SIT_READER_FILES}
                 ${UT_ICL_READER_FILES}
-                ${UT_HELPERS_FILES}
                 ${GENERATED_RUNNER}
    )
 
@@ -33,7 +31,7 @@ set(RUNNER_PATH          ${UT_RootPath}/${GENERATED_RUNNER})
 set(EXTRA_RUNNER_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/../UserOptions.cmake ${CMAKE_CURRENT_LIST_FILE})
 set(CXXTEST_PATH         ${CXXTEST_INCLUDE_DIR})
 
-message(STATUS "Readers_UT: UT_HEADERS:                             ${UT_HEADERS}")
+message(STATUS "Readers_UT: UT_HEADERS:                 ${UT_HEADERS}")
 include(../Tests_Common/MakeRunner.cmake)
 MakeRunner(${CXXTEST_PATH} ${RUNNER_PATH} "${EXTRA_RUNNER_DEPENDS}" "${UT_HEADERS}")
 

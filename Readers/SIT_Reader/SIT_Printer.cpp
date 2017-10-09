@@ -26,40 +26,6 @@ using std::ostringstream;
 
 using namespace mast;
 
-//! Adds spaces to force next insertion point to be at target position relative
-//! to reference position
-//!
-//! @param refPos       Reference position
-//! @param targetPos    Target position relative to refPos
-//!
-void SIT_Printer::AlignRelativeTo (pos_type refPos, pos_type targetPos)
-{
-  auto curPos      = m_os.tellp();
-  auto startLength = curPos - refPos;
-
-  if (startLength < targetPos)
-  {
-    m_os << string(targetPos - startLength, ' ');
-  }
-}
-//
-//  End of: SIT_Printer::AlignRelativeTo
-//---------------------------------------------------------------------------
-
-
-//! Inserts new line and align position on target position oin newly added line
-//!
-//! @param targetPos  Position set after adding a new line
-//!
-void SIT_Printer::AlignOnNewLine (pos_type targetPos)
-{
-  m_os << std::endl;
-  m_os << string(targetPos, ' ');
-}
-//
-//  End of: SIT_Printer::AlignOnNewLine
-//---------------------------------------------------------------------------
-
 
 //! Returns model representation starting from a "top" node using SIT files syntax
 //!
@@ -90,7 +56,9 @@ string SIT_Printer::MakeSIT (shared_ptr<SystemModelNode> topNode)
 //  End of: SIT_Printer::SIT_Print
 //---------------------------------------------------------------------------
 
-//! SIT_ print childrens of a parent node
+//! Inserts childrens of a parent node
+//!
+//! @param parentNode Parent node for which children are "printed" using SIT file format
 //!
 void SIT_Printer::PrintChildren (const ParentNode& parentNode)
 {
@@ -101,23 +69,16 @@ void SIT_Printer::PrintChildren (const ParentNode& parentNode)
 
   ++m_depth;
 
-  auto pLinker  = dynamic_cast<const Linker*>(&parentNode);
-  auto selector = pLinker ? pLinker->Selector() : nullptr;
-  auto childId  = uint32_t(1u);
+  auto childId = uint32_t(1u);
+  auto child   = parentNode.FirstChild();
 
-  auto child = parentNode.FirstChild();
   while (child)
   {
-    m_selector = selector;
-    m_childId  = childId;
-
     child->Accept(*this);
     child = child->NextSibling();
 
     ++childId;
   }
-  m_selector = nullptr;
-  m_childId  = 0;
 }
 //
 //  End of: SIT_Printer::PrintChildren
@@ -162,31 +123,15 @@ void SIT_Printer::StreamNodeHeader(string_view type, const SystemModelNode& node
     m_os << "\n";
   }
 
-  m_startPos = m_os.tellp();
   StreamDepth();
 
-  if (!m_processingSelector)
-  {
-    m_os << type;
-  }
-  else
-  {
-    m_os << ":Selector:";
-  }
+  m_os << type;
 
   StreamNodeName(m_os, node);
 
   if (!notes.empty())
   {
     m_os << " " << notes;
-  }
-
-  if (m_selector && m_processingSelector)
-  {
-    m_os << " Kind: "            << m_selector->KindName();
-    m_os << " Can_select_none: " << IsSet(m_selector->Properties(), SelectorProperty::CanSelectNone);
-    m_os << " Inverted_bits: "   << IsSet(m_selector->Properties(), SelectorProperty::InvertedBits);
-    m_os << " Reversed_order: "  << IsSet(m_selector->Properties(), SelectorProperty::ReverseOrder);
   }
 
   m_first = false;
@@ -249,7 +194,6 @@ void SIT_Printer::VisitChain (Chain& chain)
 void SIT_Printer::VisitLinker (Linker& linker)
 {
   auto selector = linker.Selector();
-  m_selector    = selector;
 
   ostringstream os;
   if (selector)
@@ -278,23 +222,16 @@ void SIT_Printer::VisitLinker (Linker& linker)
 //!
 void SIT_Printer::VisitRegister (Register& reg)
 {
-  if (m_processingSelector)
+  StreamNodeHeader("REGISTER", reg);
+
+  m_os << " " << reg.BypassSequence().BitsCount();
+
+  if (reg.HoldValue())
   {
-    StreamNodeHeader("", reg);
+    m_os << " Hold_value";
   }
-  else
-  {
-    StreamNodeHeader("REGISTER", reg);
 
-    m_os << " " << reg.BypassSequence().BitsCount();
-
-    if (reg.HoldValue())
-    {
-      m_os << " Hold_value";
-    }
-
-    m_os << " Bypass: \"" << reg.BypassSequence().DataAsMixString(8u, "_", ":") << "\"";
-  }
+  m_os << " Bypass: \"" << reg.BypassSequence().DataAsMixString(8u, "_", ":") << "\"";
 }
 
 //===========================================================================

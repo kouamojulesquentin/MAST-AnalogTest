@@ -409,11 +409,14 @@ void UT_MastEnvironment::test_CreateSystemModel_SIT_Model_Exports ()
 {
   // ---------------- Setup
   //
+  auto sitExportExpectedFile   = GetTestFilePath("UT_MastEnvironment_ExpectedExport.sit");
   auto gmlExpectedFile         = GetTestFilePath("UT_MastEnvironment_MastModel.gml");
   auto prettyPrintExpectedFile = GetTestFilePath("UT_MastEnvironment_MastModel.txt");
+  auto sitExportFile           = "MastModel_Export.sit";
   auto gmlFile                 = "MastModel.gml";
   auto prettyPrintFile         = "MastModel.txt";
 
+  Utility::ClearFile(sitExportFile);
   Utility::ClearFile(gmlFile);
   Utility::ClearFile(prettyPrintFile);
 
@@ -439,6 +442,7 @@ void UT_MastEnvironment::test_CreateSystemModel_SIT_Model_Exports ()
   TS_ASSERT_NOT_NULLPTR (Startup::GetSystemModel_NoCreate());
   TS_ASSERT_SAME_FILES  (gmlFile,         gmlExpectedFile);
   TS_ASSERT_SAME_FILES  (prettyPrintFile, prettyPrintExpectedFile);
+  TS_ASSERT_SAME_FILES  (sitExportFile,   sitExportExpectedFile);
 }
 
 

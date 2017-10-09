@@ -115,6 +115,8 @@ class MAST_CORE_EXPORT MastConfiguration final
   const std::string&              LoggerFilePath()                    const { return m_loggerFilePath;              } //!< File path for logging (there is always a file logging when enabled)
   mast::LoggerShownItems          LoggerShownItems()                  const { return m_loggerShownItems;            } //!< Kinds of element that are reported in the log
   mast::LoggerLevel               LoggerLevel()                       const { return m_loggerLevel;                 } //!< Defines what level of information are logged (from error only to debug messages)
+  bool                            SitExport()                         const { return m_sitExport;                   } //!< Enable/Disable export of the model connectivity using SIT file format
+  const std::string&              SitExportFilePath()                 const { return m_sitExportFilePath;           } //!< Optional file path for SIT export
   bool                            GmlPrinting()                       const { return m_gmlPrinting;                 } //!< Enable/Disable printing of GML representation of the model state
   mast::ReportMoments             GmlReportMoments()                  const { return m_gmlReportMoments;            } //!< Defines moment(s) in the vector generation for which model state is exported as GML file
   const std::string&              GmlFilePath()                       const { return m_gmlFilePath;                 } //!< Optional file path for GML graph printing
@@ -174,6 +176,8 @@ class MAST_CORE_EXPORT MastConfiguration final
   std::string               m_loggerFilePath;                                                       //!< File path for logging (there is always a file logging when enabled)
   mast::LoggerShownItems    m_loggerShownItems            = mast::LoggerShownItems::Std_Less;       //!< Kinds of element that are reported in the log
   mast::LoggerLevel         m_loggerLevel                 = mast::LoggerLevel::Info;                //!< Defines what level of information are logged (from error only to debug messages)
+  bool                      m_sitExport                   = false;                                  //!< Enable/Disable export of the model connectivity using SIT file format
+  std::string               m_sitExportFilePath;                                                    //!< Optional file path for SIT export
   bool                      m_gmlPrinting                 = false;                                  //!< Enable/Disable printing of GML representation of the model state
   mast::ReportMoments       m_gmlReportMoments            = mast::ReportMoments::AfterModelParsing; //!< Defines moment(s) in the vector generation for which model state is exported as GML file
   std::string               m_gmlFilePath;                                                          //!< Optional file path for GML graph printing

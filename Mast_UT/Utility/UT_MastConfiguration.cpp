@@ -290,11 +290,14 @@ void UT_MastConfiguration::test_ParseYamlConfiguration_FullConfiguration ()
               "         - selection_value \n"                                              // 42
               "         - selector_properties \n"                                          // 43
               "         - ignored_nodes  \n"                                               // 44
-              "    Manager_activity:  \n"                                                  // 45
+              "    Model_SIT_export: \n"                                                   // 45
               "      Enable: true\n"                                                       // 46
-              "      File_base_name: managerActivity\n"                                    // 47
-              "      Options: [verbose, app_thread_creation, PDL_commands, data_cycles]\n" // 48
-              "Plugins_Options: ""\n"                                                      // 49
+              "      File_path: export.sit\n"                                              // 47
+              "    Manager_activity:  \n"                                                  // 48
+              "      Enable: true\n"                                                       // 49
+              "      File_base_name: managerActivity\n"                                    // 50
+              "      Options: [verbose, app_thread_creation, PDL_commands, data_cycles]\n" // 51
+              "Plugins_Options: ""\n"                                                      // 52
              );
 
   // ---------------- Exercise
@@ -308,6 +311,7 @@ void UT_MastConfiguration::test_ParseYamlConfiguration_FullConfiguration ()
   TS_ASSERT_TRUE  (sut.ModelChecking());
   TS_ASSERT_TRUE  (sut.GmlPrinting());
   TS_ASSERT_TRUE  (sut.PrettyPrinting());
+  TS_ASSERT_TRUE  (sut.SitExport());
   TS_ASSERT_TRUE  (sut.ReportManagerActivity());
 
   TS_ASSERT_EQUALS (sut.MinTimeBetweenCycles(),              5ms);
@@ -317,6 +321,7 @@ void UT_MastConfiguration::test_ParseYamlConfiguration_FullConfiguration ()
   TS_ASSERT_EQUALS (sut.AccessInterfaceProtocolName(),       "myProtocol");
   TS_ASSERT_EQUALS (sut.AccessInterfaceProtocolParameters(), "myProtocolParams");
   TS_ASSERT_EQUALS (sut.ConfigurationAlgorithm(),            "myConfiguration");
+  TS_ASSERT_EQUALS (sut.SitExportFilePath(),                 "export.sit");
   TS_ASSERT_EQUALS (sut.GmlFilePath(),                       "./myproject");
   TS_ASSERT_EQUALS (sut.GmlGraphName(),                      "Foo");
   TS_ASSERT_EQUALS (sut.LoggerFilePath(),                    "myProject.log");

@@ -25,6 +25,7 @@
 #include "SystemModel.hpp"
 #include "SystemModelManager.hpp"
 #include "SIT_reader.hpp"
+#include "SIT_Printer.hpp"
 #include "Startup.hpp"
 #include "ModelBuildDriver.hpp"
 
@@ -699,6 +700,18 @@ void MastEnvironment_impl::ParseOptions (vector<string> arguments)
 //! @note Only if options are enabled
 void MastEnvironment_impl::ReportParsedModel ()
 {
+
+  // ---------------- SIT
+  //
+  if (m_configuration->SitExport())
+  {
+    auto sit = SIT_Printer::MakeSIT(Startup::sm_systemModel->Root());
+
+    ofstream os(m_configuration->SitExportFilePath());
+    os << sit;
+    os.flush();
+  }
+
   // ---------------- GML
   //
   if (    m_configuration->GmlPrinting()

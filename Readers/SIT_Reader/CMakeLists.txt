@@ -11,31 +11,29 @@ if (NOT BISON_FOUND)
  message(FATAL_ERROR "SIT_parser: Bison not found")
 endif()
 
-#+add_definitions(${P_WARNINGS})
-#+set (P_WARNINGS "-Wall -Wno-sign-compare -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-declarations -Wmissing-include-dirs")
-#+add_definitions(${P_CFLAGS})
-#+set (P_CFLAGS "${P_WARNINGS} -DSIT_READER_EXPORTS -std=c++14")
-
 if (CODE_COVERAGE)
   set(CMAKE_CXX_FLAGS "--coverage ${CMAKE_CXX_FLAGS} ")
 endif()
 
-add_definitions(${Flex_Switches})
+set (Flex_Switches -v -L --c++)
 if (WIN32)
-  set (Flex_Switches -v -L --wincompat)
-else()
-#+  set (P_CFLAGS "${P_CFLAGS} -fPIC")
-  set (Flex_Switches -v -L)
+  set (Flex_Switches ${Flex_Switches} --wincompat)
 endif()
+
+set (Bison_Switches -d --verbose --no-lines --warnings=all --feature=caret --report=itemset --debug)
+set (LEX_YACC_SRC_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/")
 
 message("")
 message("================================================================================")
 message(STATUS "SIT_parser: CODE_COVERAGE:    ${CODE_COVERAGE}")
 message(STATUS "SIT_parser: CMAKE_CXX_FLAGS:  ${CMAKE_CXX_FLAGS}")
+message(STATUS "SIT_parser: Flex_Switches:    ${Flex_Switches}")
+message(STATUS "SIT_parser: Bison_Switches:   ${Bison_Switches}")
+message("================================================================================")
+message("")
 
-set (LEX_YACC_SRC_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/")
-
-# Create custom command for flex/lex (note the outputs)
+# Create custom command for lexer (using flex)
+#
 add_custom_target(SIT_Lexer_class echo "Creating SIT_lexer")
 add_custom_command(
   OUTPUT ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc
@@ -43,12 +41,8 @@ add_custom_command(
   DEPENDS SIT_lexer.l
 )
 
-# Create target for the parser
-set(Bison_Switches -d --verbose --no-lines --warnings=all --feature=caret --report=itemset --debug)
-message(STATUS "SIT_parser: Bison_Switches:   ${Bison_Switches}")
-message("================================================================================")
-message("")
-
+# Create custom command for parser (using Bison)
+#
 add_custom_target(SIT_Parser_class echo "Creating SIT_parser")
 add_custom_command(
   OUTPUT ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_parser.tab.hh
@@ -56,39 +50,26 @@ add_custom_command(
   DEPENDS SIT_parser.yy
 )
 
-# Since parser.c does not exists yet when cmake is run, mark it as generated
 set_source_files_properties(${LEX_YACC_SRC_DIR}SIT_parser.tab.cc GENERATED)
 set_source_files_properties(${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc   GENERATED)
 
-# Include binary directory to include lexer.c in parser.c
+add_library(SIT_Reader SHARED  ${LEX_YACC_SRC_DIR}SIT_reader.cpp
+                               ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc
+                               ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc
+                               SIT_Printer.cpp)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
-include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
-include_directories(${LIBLOGGER_INCLUDE_DIRS})
+target_include_directories (SIT_Reader PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}
+                                               ${CMAKE_CURRENT_SOURCE_DIR}/../Common
+                                       PRIVATE $<$<PLATFORM_ID:Windows>:$ENV{FLEX_DIR}>)
 
-set(LIBSIT_READER_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/." PARENT_SCOPE)
+target_compile_options     (SIT_Reader PRIVATE -std=c++14
+                                               -Wall
+                                               -Wno-sign-compare
+                                               -Wnon-virtual-dtor
+                                               -Wredundant-decls
+                                               -Wundef
+                                               -Wmissing-declarations
+                                               -Wmissing-include-dirs
+                                               $<$<NOT:$<PLATFORM_ID:Windows>>:-fPIC>)
 
-if (WIN32)
-  include_directories($ENV{FLEX_DIR})
-endif()
-
-add_library(SIT_Reader_Lib SHARED  ${LEX_YACC_SRC_DIR}SIT_reader.cpp
-                                   ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc
-                                   ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc
-                                   SIT_Printer.cpp)
-
-target_include_directories (SIT_Reader_Lib PUBLIC .)
-
-#+set_target_properties(SIT_Reader_Lib PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
-target_compile_options(SIT_Reader_Lib PRIVATE -Wall
-                                              -Wno-sign-compare
-                                              -Wnon-virtual-dtor
-                                              -Wredundant-decls
-                                              -Wundef
-                                              -Wmissing-declarations
-                                              -Wmissing-include-dirs
-                                              -std=c++14
-                                              $<$<NOT:$<PLATFORM_ID:Windows>>:-fPIC>
-                                              )
-
-target_link_libraries(SIT_Reader_Lib Mast_Core)
+target_link_libraries       (SIT_Reader Mast_Core)

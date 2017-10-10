@@ -816,20 +816,11 @@ void ICL::ICL_Parser::error(const location_type& loc, const std::string& errorMe
 {
   driver.parsedTopNode.reset();
 
-  std::ostringstream os;
-  os << "ICL parsing error: ";
-
   auto isValidLoc = loc.begin != loc.end;
   if (isValidLoc)
   {
-    os << STREAM_LOCATION(loc.begin.line, loc.begin.column, loc.end.column);
+    throw ParserException("ICL", "", loc.begin.line, loc.begin.column, loc.end.column, errorMessage);
   }
-  else
-  {
-    os << STREAM_MY_LOCATION;
-  }
-  os << errorMessage;
 
-  driver.m_errorMessage = os.str();
-  THROW_PARSER_ERROR(driver.m_errorMessage);
+  throw ParserException("ICL", "", my_location->begin.line, my_location->begin.column, my_location->end.column, errorMessage);
 }

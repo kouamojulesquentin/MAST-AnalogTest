@@ -20,7 +20,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
 include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
 include_directories(${LIBMAST_CPP_API_INCLUDE_DIRS})
 include_directories(${LIBLOGGER_INCLUDE_DIRS})
-include_directories(${LIBSIT_READER_INCLUDE_DIRS})
 
 if (WIN32)
   include_directories($ENV{FLEX_DIR})
@@ -54,8 +53,8 @@ else ()
     add_executable        (ETS17 main.cpp   DefaultMastMain.cpp EmptyInit.cpp ETS17.cpp)
     set_target_properties (ETS17 PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 
-    target_link_libraries (ML505 Mast_API_CPP SIT_Reader_Lib ${EXTRA_LIBS})
-    target_link_libraries (ETS17 Mast_API_CPP SIT_Reader_Lib ${PNG_LIBRARY} ${EXTRA_LIBS})
+    target_link_libraries (ML505 Mast_API_CPP SIT_Reader ${EXTRA_LIBS})
+    target_link_libraries (ETS17 Mast_API_CPP SIT_Reader ${PNG_LIBRARY} ${EXTRA_LIBS})
   endif()
 
   add_executable        (Intel main.cpp   DefaultMastMain.cpp EmptyInit.cpp Intel.cpp)
@@ -70,15 +69,15 @@ else ()
 
     add_executable        (Example_XmlRpc main.cpp DefaultMastMain.cpp Examples_Utils.cpp Example_XmlRpc.cpp)
     set_target_properties (Example_XmlRpc PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
-    target_link_libraries (Example_XmlRpc Mast_API_CPP Mast_RPC_Client SIT_Reader_Lib ${EXTRA_LIBS})
+    target_link_libraries (Example_XmlRpc Mast_API_CPP Mast_RPC_Client SIT_Reader ${EXTRA_LIBS})
   endif()
 
-  target_link_libraries(Intel    Mast_API_CPP SIT_Reader_Lib ${EXTRA_LIBS})
-  target_link_libraries(ML505SPI Mast_API_CPP SIT_Reader_Lib ${EXTRA_LIBS})
+  target_link_libraries(Intel    Mast_API_CPP SIT_Reader ${EXTRA_LIBS})
+  target_link_libraries(ML505SPI Mast_API_CPP SIT_Reader ${EXTRA_LIBS})
 endif ()
 
-target_link_libraries(Tutorial        Mast_API_CPP SIT_Reader_Lib ${EXTRA_LIBS})
-target_link_libraries(MastExample_CPP Mast_API_CPP SIT_Reader_Lib ${EXTRA_LIBS})
+target_link_libraries(Tutorial        Mast_API_CPP SIT_Reader ${EXTRA_LIBS})
+target_link_libraries(MastExample_CPP Mast_API_CPP SIT_Reader ${EXTRA_LIBS})
 
 set(SIT_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SIT)
 

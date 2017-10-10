@@ -8,6 +8,7 @@
 #include "ICL_Reader.hpp"
 #include "ICL_Parser.tab.hh"
 #include "ICL_Scanner.hpp"
+#include "ParserException.hpp"
 #include "DefaultBinaryPathSelector.hpp"
 #include "DefaultOneHotPathSelector.hpp"
 #include "DefaultNHotPathSelector.hpp"
@@ -55,7 +56,19 @@ void ICL::ICL_Reader::Parse(string_view filename)
   CHECK_TRUE  (iclFileStream.good(), "Cannot open file: "s            .append(filename.cbegin(), filename.cend()));
   CHECK_FALSE (iclFileStream.eof(),  "Cannot parse empty ICL file: "s .append(filename.cbegin(), filename.cend()));
 
-  return Parse_Impl(iclFileStream);
+  try
+  {
+    Parse_Impl(iclFileStream);
+  }
+  catch(ParserException& exc)
+  {
+    if (exc.filePath.empty())
+    {
+      exc.filePath.append(filename.cbegin(), filename.cend());
+      throw exc;
+    }
+    throw;
+  }
 }
 
 void ICL::ICL_Reader::Parse_Impl(std::istream& stream)

@@ -8,6 +8,7 @@
 #include "SIT_reader.hpp"
 #include "SIT_parser.tab.hh"
 #include "SIT_scanner.hpp"
+#include "ParserException.hpp"
 #include "DefaultBinaryPathSelector.hpp"
 #include "DefaultOneHotPathSelector.hpp"
 #include "DefaultNHotPathSelector.hpp"
@@ -46,40 +47,64 @@ SIT::SIT_Reader::SIT_Reader(std::shared_ptr<mast::SystemModel> sm)
   #undef MAKE_LAMBDA
 }
 
-bool SIT::SIT_Reader::parse(string_view filename)
+void SIT::SIT_Reader::parse(string_view filename)
 {
   CHECK_PARAMETER_NOT_EMPTY(filename, "Must specify a valid file path");
 
-  std::ifstream sitFile(filename.data());
+  std::ifstream sitFileStream(filename.data());
 
-  CHECK_TRUE(sitFile.good(), "Cannot open file: "s.append(filename.cbegin(), filename.cend()));
+  CHECK_TRUE  (sitFileStream.good(), "Cannot open file: "s            .append(filename.cbegin(), filename.cend()));
+  CHECK_FALSE (sitFileStream.eof(),  "Cannot parse empty SIT file: "s .append(filename.cbegin(), filename.cend()));
 
-  return parse_helper(sitFile);
-}
-
-bool SIT::SIT_Reader::parse(std::istream& stream)
-{
-   if (!stream.good() && stream.eof())
-   {
-     return false;
-   }
-
-   return parse_helper(stream);
-}
-
-
-bool SIT::SIT_Reader::parse_helper(std::istream& stream)
-{
-  scanner = make_shared<SIT_Scanner>(&stream);
-  parser  = make_shared<SIT_Parser>(*scanner, *this /* driver */);
-
-  auto success = parser->parse() == 0;
-  if (success)
+  try
   {
-    LOG(DEBUG) << "SIT has been parsed successfully";
+    Parse_Impl(sitFileStream);
   }
+  catch(ParserException& exc)
+  {
+    if (exc.filePath.empty())
+    {
+      exc.filePath.append(filename.cbegin(), filename.cend());
+      error_message = exc.Message();
+      throw exc;
+    }
 
-  return success;
+    error_message = exc.Message();
+    throw;
+  }
+}
+
+
+void SIT::SIT_Reader::parse(std::istream& stream)
+{
+  CHECK_TRUE  (stream.good(), "Invalid stream: ");
+  CHECK_FALSE (stream.eof(),  "Cannot parse empty SIT: ");
+
+  try
+  {
+    Parse_Impl(stream);
+  }
+  catch(ParserException& exc)
+  {
+    error_message = exc.Message();
+    throw;
+  }
+}
+
+
+void SIT::SIT_Reader::Parse_Impl(std::istream& stream)
+{
+  CHECK_TRUE  (stream.good(), "Invalid SIT stream");
+  CHECK_FALSE (stream.eof(),  "Cannot parse SIT from empty stream");
+
+  SIT_Scanner scanner(&stream);
+  SIT_Parser  parser(scanner, *this /* driver */);
+
+  auto succeeded = parser.parse() == 0;
+
+  CHECK_TRUE(succeeded, "Failed to parse SIT stream");
+
+  LOG(INFO) << "SIT has been parsed successfully";
 }
 
 //===========================================================================

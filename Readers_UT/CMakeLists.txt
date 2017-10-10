@@ -49,7 +49,7 @@ endif()
 add_executable             (Readers_UT ${UT_SOURCES})
 target_compile_options     (Readers_UT PUBLIC  -fexceptions -std=c++14)
 target_compile_definitions (Readers_UT PUBLIC  CXXTEST_HAVE_EH CXXTEST_HAVE_STD CXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION)
-target_link_libraries      (Readers_UT ${PLATFORM_LIBS} Tests_Common ICL_Reader SIT_Reader_Lib)
+target_link_libraries      (Readers_UT ${PLATFORM_LIBS} Tests_Common ICL_Reader SIT_Reader)
 
 
 install(DIRECTORY UT_TestFiles DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Readers)

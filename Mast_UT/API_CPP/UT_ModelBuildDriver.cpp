@@ -21,6 +21,7 @@
 #include "PrettyPrinter.hpp"
 #include "Utility.hpp"
 #include "SIT_reader.hpp"
+#include "ParserException.hpp"
 
 #include "TestModelBuilder.hpp"
 #include "TestUtilities.hpp"
@@ -363,7 +364,7 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_ParsingError ()
 
   // ---------------- Exercise
   //
-  TS_ASSERT_THROWS (sm = sut.CreateModelFromSitFile(sitFile), SIT::ParserException);
+  TS_ASSERT_THROWS (sm = sut.CreateModelFromSitFile(sitFile), ParserException);
 
   // ---------------- Verify
   //

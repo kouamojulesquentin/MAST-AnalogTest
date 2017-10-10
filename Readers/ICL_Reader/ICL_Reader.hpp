@@ -41,8 +41,6 @@ namespace mast
 
 namespace ICL
 {
-//+class ICL_Parser;
-
 class ICL_Reader final
 {
 public:

@@ -30,21 +30,6 @@ namespace SIT
 class SIT_Parser;
 class SIT_Scanner;
 
-//! Exception thrown internally by SIT_Parser
-//!
-//! @note Should not yet been used externally
-class ParserException : public std::runtime_error
-{
-  public:
-  ParserException(const std::string& what_arg)
-   : std::runtime_error(what_arg)
-  { }
-
-  ParserException(const char* what_arg)
-   : std::runtime_error(what_arg)
-  { }
-};
-
 class SIT_Reader
 {
 public:
@@ -57,13 +42,13 @@ public:
    //!
    //! @param filename  SIT file path
    //!
-   bool parse(std::experimental::string_view filename);
+   void parse(std::experimental::string_view filename);
 
    //! Parses a SIT formatted stream to construct a SystemModel
    //!
    //! @param stream Input stream to get model representation from
    //!
-   bool parse(std::istream& stream);
+   void parse(std::istream& stream);
 
    //! Returns SystemModelNode build from SIT
    //!
@@ -101,7 +86,7 @@ private:  // Part used by SIT_Parser
 
 private:
 
-   bool parse_helper( std::istream &stream );
+   void Parse_Impl(std::istream& stream);
 
    std::size_t                  column = 0;
    std::size_t                  line   = 0;

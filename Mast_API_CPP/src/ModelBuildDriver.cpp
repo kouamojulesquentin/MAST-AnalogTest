@@ -18,6 +18,7 @@
 #include "SIT_reader.hpp"
 #include "Utility.hpp"
 #include "MastConfig.hpp"
+#include "ParserException.hpp"
 
 #include "g3log/g3log.hpp"
 
@@ -157,7 +158,7 @@ shared_ptr<ParentNode> ModelBuildDriver::ParseSitFile (const string& sitFilePath
   {
     reader.parse(sitFilePath);
   }
-  catch(SIT::ParserException&)
+  catch(ParserException&)
   {
     m_errorMessage = reader.ErrorMessage();
     LOG(ERROR_LVL) << "Failed to create model from SIT file \"" << sitFilePath << "\". " << m_errorMessage;

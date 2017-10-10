@@ -6,7 +6,6 @@ include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
 include_directories(${LIBMAST_CORE_INTERNAL_DIRS})
 include_directories(${LIBTCLAP_INCLUDE_DIRS})
 include_directories(${LIBLOGGER_INCLUDE_DIRS})
-include_directories(${LIBSIT_READER_INCLUDE_DIRS})
 
 set(LIBMAST_CPP_API_INCLUDE_DIRS  "${CMAKE_CURRENT_SOURCE_DIR}/include"  PARENT_SCOPE)
 set(LIBMAST_CPP_API_INTERNAL_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/internal" PARENT_SCOPE)
@@ -43,4 +42,4 @@ message(STATUS "Mast_API_CPP: CMAKE_CXX_FLAGS:        ${CMAKE_CXX_FLAGS}")
 message("================================================================================")
 message("")
 
-target_link_libraries(Mast_API_CPP Mast_Core SIT_Reader_Lib Logger ${EXTRA_LIBS})
+target_link_libraries(Mast_API_CPP Mast_Core SIT_Reader ICL_Reader Logger ${EXTRA_LIBS})

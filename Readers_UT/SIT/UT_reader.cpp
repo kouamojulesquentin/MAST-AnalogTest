@@ -13,6 +13,7 @@
 
 
 #include "SIT_reader.hpp"
+#include "ParserException.hpp"
 #include "PrettyPrinter.hpp"
 #include "SystemModelBuilder.hpp"
 #include "Utility.hpp"
@@ -150,7 +151,7 @@ void UT_reader::test_register_Error ()
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS (sut.parse(sit), SIT::ParserException);
+    TS_ASSERT_THROWS (sut.parse(sit), mast::ParserException);
 
     // ---------------- Verify
     //
@@ -165,15 +166,15 @@ void UT_reader::test_register_Error ()
   {
     // 00: Wrong Bypass length
     make_tuple("REGISTER test_register 8 Bypass: \"0b1001:011\"\n",
-               "SIT parsing error: Line 1:34-46: REGISTER node \"test_register\" size (8) does not match Bypass value bit count (7)"),
+               "SIT Parsing error: Line 1:34-46: REGISTER node \"test_register\" size (8) does not match Bypass value bit count (7)"),
 
     // 01: Missing register name
     make_tuple("REGISTER test_register 5 Bypass: \"0b001:0110:1100\"\n",
-               "SIT parsing error: Line 1:34-51: REGISTER node \"test_register\" size (5) does not match Bypass value bit count (11)"),
+               "SIT Parsing error: Line 1:34-51: REGISTER node \"test_register\" size (5) does not match Bypass value bit count (11)"),
 
     // 02: Missing register length
     make_tuple("REGISTER test_register Bypass: \"0b001\"\n",
-               "SIT parsing error: Line 1:24-30: syntax error"),
+               "SIT Parsing error: Line 1:24-30: syntax error"),
   };
 
   // ---------------- DDT Exercise
@@ -1011,7 +1012,7 @@ void UT_reader::test_JTAG_TAP_Failure ()
 
     // ---------------- Exercise & Verify
     //
-    TS_ASSERT_THROWS (sut.parse(sit), SIT::ParserException);
+    TS_ASSERT_THROWS (sut.parse(sit), mast::ParserException);
 
     // ---------------- Verify
     //
@@ -1236,7 +1237,7 @@ void UT_reader::test_ACCES_INTERFACE_Failure ()
 
     // ---------------- Exercise & Verify
     //
-    TS_ASSERT_THROWS (sut.parse(sit), SIT::ParserException);
+    TS_ASSERT_THROWS (sut.parse(sit), mast::ParserException);
 
     // ---------------- Verify
     //
@@ -1431,7 +1432,7 @@ void UT_reader::test_LINKER_Error ()
 
     // ---------------- Exercise & Verify
     //
-    TS_ASSERT_THROWS (sut.parse(sit), SIT::ParserException);
+    TS_ASSERT_THROWS (sut.parse(sit), mast::ParserException);
 
     // ---------------- Verify
     //
@@ -1449,7 +1450,7 @@ void UT_reader::test_LINKER_Error ()
                "{REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
                "REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
                "}"s,
-               "SIT parsing error: Line 2:1-2: LINKER node \"test_LINKER\" Must specify a control node (Register) for its path selector"),
+               "SIT Parsing error: Line 2:1-2: LINKER node \"test_LINKER\" Must specify a control node (Register) for its path selector"),
 
     // 01 ==> Error: selector register does not exist
     make_tuple("LINKER test_LINKER Binary selector_reg 4\n"
@@ -1457,7 +1458,7 @@ void UT_reader::test_LINKER_Error ()
                "  REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
                "  REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
                "}"s,
-               "SIT parsing error: Line 2:1-2: LINKER node \"test_LINKER\" Error, specified selector register \"selector_reg\" does not exist"),
+               "SIT Parsing error: Line 2:1-2: LINKER node \"test_LINKER\" Error, specified selector register \"selector_reg\" does not exist"),
   };
 
   // ---------------- DDT Exercise
@@ -1540,14 +1541,15 @@ void UT_reader::test_PDL_Success ()
     auto            sm                = make_shared<SystemModel>();
     SIT::SIT_Reader sut(sm);
 
+    CxxTest::setAbortTestOnFail(true);
+
     // ---------------- Exercise
     //
-    auto succeeded = sut.parse(sit);
+    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
 
     // ---------------- Verify
     //
     CxxTest::setAbortTestOnFail(true);
-    TS_ASSERT_TRUE  (succeeded);
     TS_ASSERT_EMPTY (sut.PlaceHolders());
 
     vector<string>   gotAlgoNames;
@@ -1608,7 +1610,7 @@ void UT_reader::test_PDL_Failure ()
 
     // ---------------- Exercise & Verify
     //
-    TS_ASSERT_THROWS (sut.parse(sit), SIT::ParserException);
+    TS_ASSERT_THROWS (sut.parse(sit), mast::ParserException);
 
     // ---------------- Verify
     //

@@ -47,6 +47,7 @@
 #include "PathSelectorFactory.hpp"
 #include "Utility.hpp"
 #include "UnresolvedPathSelector.hpp"
+#include "ParserException.hpp"
 #include "g3log/g3log.hpp"
 
 #include <iostream>
@@ -674,24 +675,15 @@ factory_name:
 
 %%
 
-void SIT::SIT_Parser::error(const location_type& loc, const std::string& error_message)
+void SIT::SIT_Parser::error(const location_type& loc, const std::string& errorMessage)
 {
-  driver.parsed_sut = nullptr;
-
-  std::ostringstream os;
-  os << "SIT parsing error: ";
+  driver.parsed_sut.reset();
 
   auto isValidLoc = loc.begin != loc.end;
   if (isValidLoc)
   {
-    os << STREAM_LOCATION(loc.begin.line, loc.begin.column, loc.end.column);
+    throw ParserException("SIT", "", loc.begin.line, loc.begin.column, loc.end.column, errorMessage);
   }
-  else
-  {
-    os << STREAM_MY_LOCATION;
-  }
-  os << error_message;
 
-  driver.error_message = os.str();
-  THROW_PARSER_ERROR(driver.error_message);
+  throw ParserException("SIT", "", my_location->begin.line, my_location->begin.column, my_location->end.column, errorMessage);
 }

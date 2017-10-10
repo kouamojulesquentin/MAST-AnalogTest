@@ -42,7 +42,7 @@ int main (int argc, char* argv[])
     reader.Parse(iclFile);
     return 0;
   }
-  catch(ICL::ParserException& exc)
+  catch(mast::ParserException& exc)
   {
     std::string errorMessage(exc.what());
 

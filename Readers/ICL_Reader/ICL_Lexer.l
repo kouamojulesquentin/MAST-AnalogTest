@@ -56,11 +56,11 @@ ICL::ICL_Parser::location_type* my_location;
   // Detect invalid block comment opening sequence within a block comment
   //
   // @note  Must be 1st rule to avoid being masked by other comment rules
-  throw ICL::ParserException(my_location->begin.line,
-                             my_location->begin.column,
-                             my_location->end.column,
-                             "'/*' not allowed inside block comments (Rule: Block comments shall not include additional (i.e., nested) block comments.)"
-                            );
+  throw mast::ParserException(my_location->begin.line,
+                              my_location->begin.column,
+                              my_location->end.column,
+                              "'/*' not allowed inside block comments (Rule: Block comments shall not include additional (i.e., nested) block comments.)"
+                             );
 }
 [^*/\n]*        /* consume anything that's not a '*' or newline */
 "*"+[^*/\n]* {
@@ -204,11 +204,11 @@ ICL::ICL_Parser::location_type* my_location;
   [a-zA-Z][a-zA-Z0-9_]*         return token::SCALAR_ID;
   \^                            return token::XOR;
   . {
-      throw ICL::ParserException(my_location->begin.line,
-                                 my_location->begin.column,
-                                 my_location->end.column,
-                                 "Found invalid character '"s.append(yytext).append("'")
-                                );
+      throw mast::ParserException(my_location->begin.line,
+                                  my_location->begin.column,
+                                  my_location->end.column,
+                                  "Found invalid character '"s.append(yytext).append("'")
+                                 );
   }
 }
 

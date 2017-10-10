@@ -32,4 +32,4 @@ else()
   set(EXTRA_LIBS ${EXTRA_LIBS} pthread dl)
 endif()
 
-target_link_libraries(Mast Mast_API_CPP Mast_API_C SIT_Reader_Lib ${EXTRA_LIBS})
+target_link_libraries(Mast Mast_API_CPP Mast_API_C SIT_Reader ${EXTRA_LIBS})

@@ -310,10 +310,10 @@ void UT_reader::test_MIB ()
   {
     // 00
     make_tuple("MIB test_MIB POST HIGH 4 Binary \n"
-               "{\n"
+               "(\n"
                " REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
                " REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
-               "}\n",
+               ")\n",
                "[Chain](1)     \"test_MIB\"\n"
                " [Linker](2)    \"test_MIB_mux\"\n"
                "  :Selector:(0)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 1, inverted_bits: 0, reversed_order: 0\n"
@@ -323,10 +323,10 @@ void UT_reader::test_MIB ()
 
     // 01
     make_tuple("MIB test_MIB POST HIGH 4 Binary_noidle \n"
-               "{\n"
+               "(\n"
                "  REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
                "  REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
-               "}\n",
+               ")\n",
                "[Chain](1)     \"test_MIB\"\n"
                " [Linker](2)    \"test_MIB_mux\"\n"
                "  :Selector:(0)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n"
@@ -336,9 +336,9 @@ void UT_reader::test_MIB ()
 
     // 02
     make_tuple( "MIB test_MIB POST LOW 4 Binary \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 1, inverted_bits: 1, reversed_order: 0\n\
@@ -348,9 +348,9 @@ void UT_reader::test_MIB ()
 
     // 03
     make_tuple( "MIB test_MIB PRE LOW 4 Binary \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 3, Hold value: true, bypass: 000\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -360,9 +360,9 @@ void UT_reader::test_MIB ()
 
     // 04
     make_tuple( "MIB test_MIB PRE HIGH 4 Binary \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 3, Hold value: true, bypass: 000\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -372,9 +372,9 @@ void UT_reader::test_MIB ()
 
     // 05
     make_tuple( "MIB test_MIB PRE HIGH REVERSE 4 Binary \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 3, Hold value: true, bypass: 000\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -384,9 +384,9 @@ void UT_reader::test_MIB ()
 
     // 06
     make_tuple( "MIB test_MIB PRE LOW REVERSE 4 Binary \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 3, Hold value: true, bypass: 000\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -396,9 +396,9 @@ void UT_reader::test_MIB ()
 
     // 07
     make_tuple( "MIB test_MIB POST LOW REVERSE 4 Binary \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 1, inverted_bits: 1, reversed_order: 1\n\
@@ -408,9 +408,9 @@ void UT_reader::test_MIB ()
 
     // 08
     make_tuple( "MIB test_MIB POST HIGH REVERSE 4 Binary \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 1, inverted_bits: 0, reversed_order: 1\n\
@@ -419,9 +419,9 @@ void UT_reader::test_MIB ()
  [Register](0)  \"test_MIB_ctrl\", length: 3, Hold value: true, bypass: 000"),
 
 make_tuple( "MIB test_MIB POST HIGH 4 N_Hot \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 1, inverted_bits: 0, reversed_order: 0\n\
@@ -429,9 +429,9 @@ make_tuple( "MIB test_MIB POST HIGH 4 N_Hot \
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0000"),
 make_tuple( "MIB test_MIB POST LOW 4 N_Hot \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 1, inverted_bits: 1, reversed_order: 0\n\
@@ -439,9 +439,9 @@ make_tuple( "MIB test_MIB POST LOW 4 N_Hot \
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1111"),
 make_tuple( "MIB test_MIB PRE LOW 4 N_Hot \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1111\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -449,9 +449,9 @@ make_tuple( "MIB test_MIB PRE LOW 4 N_Hot \
   [Register](3)  \"test_reg_1\", length: 4, bypass: 1001\n\
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100"),
 make_tuple( "MIB test_MIB PRE HIGH 4 N_Hot \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0000\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -459,9 +459,9 @@ make_tuple( "MIB test_MIB PRE HIGH 4 N_Hot \
   [Register](3)  \"test_reg_1\", length: 4, bypass: 1001\n\
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100"),
 make_tuple( "MIB test_MIB PRE HIGH REVERSE 4 N_Hot \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0000\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -469,9 +469,9 @@ make_tuple( "MIB test_MIB PRE HIGH REVERSE 4 N_Hot \
   [Register](3)  \"test_reg_1\", length: 4, bypass: 1001\n\
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100"),
 make_tuple( "MIB test_MIB PRE LOW REVERSE 4 N_Hot \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1111\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -479,9 +479,9 @@ make_tuple( "MIB test_MIB PRE LOW REVERSE 4 N_Hot \
   [Register](3)  \"test_reg_1\", length: 4, bypass: 1001\n\
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100"),
 make_tuple( "MIB test_MIB POST LOW REVERSE 4 N_Hot \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 1, inverted_bits: 1, reversed_order: 1\n\
@@ -489,9 +489,9 @@ make_tuple( "MIB test_MIB POST LOW REVERSE 4 N_Hot \
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1111"),
 make_tuple( "MIB test_MIB POST HIGH REVERSE 4 N_Hot \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 1, inverted_bits: 0, reversed_order: 1\n\
@@ -499,9 +499,9 @@ make_tuple( "MIB test_MIB POST HIGH REVERSE 4 N_Hot \
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0000"),
 make_tuple( "MIB test_MIB POST HIGH 4 One_Hot \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 1, inverted_bits: 0, reversed_order: 0\n\
@@ -509,9 +509,9 @@ make_tuple( "MIB test_MIB POST HIGH 4 One_Hot \
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0000"),
 make_tuple( "MIB test_MIB POST LOW 4 One_Hot \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 1, inverted_bits: 1, reversed_order: 0\n\
@@ -519,9 +519,9 @@ make_tuple( "MIB test_MIB POST LOW 4 One_Hot \
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1111"),
 make_tuple( "MIB test_MIB PRE LOW 4 One_Hot \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1111\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -529,9 +529,9 @@ make_tuple( "MIB test_MIB PRE LOW 4 One_Hot \
   [Register](3)  \"test_reg_1\", length: 4, bypass: 1001\n\
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100"),
 make_tuple( "MIB test_MIB PRE HIGH 4 One_Hot \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0000\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -539,9 +539,9 @@ make_tuple( "MIB test_MIB PRE HIGH 4 One_Hot \
   [Register](3)  \"test_reg_1\", length: 4, bypass: 1001\n\
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100"),
 make_tuple( "MIB test_MIB PRE HIGH REVERSE 4 One_Hot \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0000\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -549,9 +549,9 @@ make_tuple( "MIB test_MIB PRE HIGH REVERSE 4 One_Hot \
   [Register](3)  \"test_reg_1\", length: 4, bypass: 1001\n\
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100"),
 make_tuple( "MIB test_MIB PRE LOW REVERSE 4 One_Hot \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1111\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -559,9 +559,9 @@ make_tuple( "MIB test_MIB PRE LOW REVERSE 4 One_Hot \
   [Register](3)  \"test_reg_1\", length: 4, bypass: 1001\n\
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100"),
 make_tuple( "MIB test_MIB POST LOW REVERSE 4 One_Hot \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 1, inverted_bits: 1, reversed_order: 1\n\
@@ -569,9 +569,9 @@ make_tuple( "MIB test_MIB POST LOW REVERSE 4 One_Hot \
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1111"),
 make_tuple( "MIB test_MIB POST HIGH REVERSE 4 One_Hot \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 1, inverted_bits: 0, reversed_order: 1\n\
@@ -579,9 +579,9 @@ make_tuple( "MIB test_MIB POST HIGH REVERSE 4 One_Hot \
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0000"),
 make_tuple( "MIB test_MIB POST HIGH 4 Binary_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
@@ -589,9 +589,9 @@ make_tuple( "MIB test_MIB POST HIGH 4 Binary_noidle \
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100\n\
  [Register](0)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00"),
 make_tuple( "MIB test_MIB POST LOW 4 Binary_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 1, reversed_order: 0\n\
@@ -599,9 +599,9 @@ make_tuple( "MIB test_MIB POST LOW 4 Binary_noidle \
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100\n\
  [Register](0)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00"),
 make_tuple( "MIB test_MIB PRE LOW 4 Binary_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -609,9 +609,9 @@ make_tuple( "MIB test_MIB PRE LOW 4 Binary_noidle \
   [Register](3)  \"test_reg_1\", length: 4, bypass: 1001\n\
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100"),
 make_tuple( "MIB test_MIB PRE HIGH 4 Binary_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -619,9 +619,9 @@ make_tuple( "MIB test_MIB PRE HIGH 4 Binary_noidle \
   [Register](3)  \"test_reg_1\", length: 4, bypass: 1001\n\
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100"),
 make_tuple( "MIB test_MIB PRE HIGH REVERSE 4 Binary_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -629,9 +629,9 @@ make_tuple( "MIB test_MIB PRE HIGH REVERSE 4 Binary_noidle \
   [Register](3)  \"test_reg_1\", length: 4, bypass: 1001\n\
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100"),
 make_tuple( "MIB test_MIB PRE LOW REVERSE 4 Binary_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -639,9 +639,9 @@ make_tuple( "MIB test_MIB PRE LOW REVERSE 4 Binary_noidle \
   [Register](3)  \"test_reg_1\", length: 4, bypass: 1001\n\
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100"),
 make_tuple( "MIB test_MIB POST LOW REVERSE 4 Binary_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 1, reversed_order: 1\n\
@@ -649,9 +649,9 @@ make_tuple( "MIB test_MIB POST LOW REVERSE 4 Binary_noidle \
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100\n\
  [Register](0)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00"),
 make_tuple( "MIB test_MIB POST HIGH REVERSE 4 Binary_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: Binary, can_select_none: 0, inverted_bits: 0, reversed_order: 1\n\
@@ -659,9 +659,9 @@ make_tuple( "MIB test_MIB POST HIGH REVERSE 4 Binary_noidle \
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100\n\
  [Register](0)  \"test_MIB_ctrl\", length: 2, Hold value: true, bypass: 00"),
 make_tuple( "MIB test_MIB POST HIGH 4 One_Hot_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
@@ -669,9 +669,9 @@ make_tuple( "MIB test_MIB POST HIGH 4 One_Hot_noidle \
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1000"),
 make_tuple( "MIB test_MIB POST LOW 4 One_Hot_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 0, inverted_bits: 1, reversed_order: 0\n\
@@ -679,9 +679,9 @@ make_tuple( "MIB test_MIB POST LOW 4 One_Hot_noidle \
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0111"),
 make_tuple( "MIB test_MIB PRE LOW 4 One_Hot_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0111\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -689,9 +689,9 @@ make_tuple( "MIB test_MIB PRE LOW 4 One_Hot_noidle \
   [Register](3)  \"test_reg_1\", length: 4, bypass: 1001\n\
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100"),
 make_tuple( "MIB test_MIB PRE HIGH 4 One_Hot_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1000\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -699,9 +699,9 @@ make_tuple( "MIB test_MIB PRE HIGH 4 One_Hot_noidle \
   [Register](3)  \"test_reg_1\", length: 4, bypass: 1001\n\
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100"),
 make_tuple( "MIB test_MIB PRE HIGH REVERSE 4 One_Hot_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0001\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -709,9 +709,9 @@ make_tuple( "MIB test_MIB PRE HIGH REVERSE 4 One_Hot_noidle \
   [Register](3)  \"test_reg_1\", length: 4, bypass: 1001\n\
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100"),
 make_tuple( "MIB test_MIB PRE LOW REVERSE 4 One_Hot_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1110\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -719,9 +719,9 @@ make_tuple( "MIB test_MIB PRE LOW REVERSE 4 One_Hot_noidle \
   [Register](3)  \"test_reg_1\", length: 4, bypass: 1001\n\
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100"),
 make_tuple( "MIB test_MIB POST LOW REVERSE 4 One_Hot_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 0, inverted_bits: 1, reversed_order: 1\n\
@@ -729,9 +729,9 @@ make_tuple( "MIB test_MIB POST LOW REVERSE 4 One_Hot_noidle \
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1110"),
 make_tuple( "MIB test_MIB POST HIGH REVERSE 4 One_Hot_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: One_Hot, can_select_none: 0, inverted_bits: 0, reversed_order: 1\n\
@@ -739,9 +739,9 @@ make_tuple( "MIB test_MIB POST HIGH REVERSE 4 One_Hot_noidle \
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0001"),
 make_tuple( "MIB test_MIB POST HIGH 4 N_Hot_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n\
@@ -749,9 +749,9 @@ make_tuple( "MIB test_MIB POST HIGH 4 N_Hot_noidle \
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1000"),
 make_tuple( "MIB test_MIB POST LOW 4 N_Hot_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 0, inverted_bits: 1, reversed_order: 0\n\
@@ -759,9 +759,9 @@ make_tuple( "MIB test_MIB POST LOW 4 N_Hot_noidle \
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0111"),
 make_tuple( "MIB test_MIB PRE LOW 4 N_Hot_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0111\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -769,9 +769,9 @@ make_tuple( "MIB test_MIB PRE LOW 4 N_Hot_noidle \
   [Register](3)  \"test_reg_1\", length: 4, bypass: 1001\n\
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100"),
 make_tuple( "MIB test_MIB PRE HIGH 4 N_Hot_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1000\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -779,9 +779,9 @@ make_tuple( "MIB test_MIB PRE HIGH 4 N_Hot_noidle \
   [Register](3)  \"test_reg_1\", length: 4, bypass: 1001\n\
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100"),
 make_tuple( "MIB test_MIB PRE HIGH REVERSE 4 N_Hot_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 0001\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -789,9 +789,9 @@ make_tuple( "MIB test_MIB PRE HIGH REVERSE 4 N_Hot_noidle \
   [Register](3)  \"test_reg_1\", length: 4, bypass: 1001\n\
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100"),
 make_tuple( "MIB test_MIB PRE LOW REVERSE 4 N_Hot_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1110\n\
  [Linker](2)    \"test_MIB_mux\"\n\
@@ -799,9 +799,9 @@ make_tuple( "MIB test_MIB PRE LOW REVERSE 4 N_Hot_noidle \
   [Register](3)  \"test_reg_1\", length: 4, bypass: 1001\n\
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100"),
 make_tuple( "MIB test_MIB POST LOW REVERSE 4 N_Hot_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 0, inverted_bits: 1, reversed_order: 1\n\
@@ -809,9 +809,9 @@ make_tuple( "MIB test_MIB POST LOW REVERSE 4 N_Hot_noidle \
   [Register](4)  \"test_reg_2\", length: 4, bypass: 1100\n\
  [Register](0)  \"test_MIB_ctrl\", length: 4, Hold value: true, bypass: 1110"),
 make_tuple( "MIB test_MIB POST HIGH REVERSE 4 N_Hot_noidle \
-    {REGISTER test_reg_1 4 Bypass: \"0b1001\"\
+    (REGISTER test_reg_1 4 Bypass: \"0b1001\"\
      REGISTER test_reg_2 4 Bypass: \"0b1100\"\
-    }",
+    )",
 "[Chain](1)     \"test_MIB\"\n\
  [Linker](2)    \"test_MIB_mux\"\n\
   :Selector:(0)  \"test_MIB_ctrl\", kind: N_Hot, can_select_none: 0, inverted_bits: 0, reversed_order: 1\n\
@@ -864,7 +864,7 @@ void UT_reader::test_SIB ()
   auto data =
   { /*Exhaustive test of all possible macro parameter combinations*/
    make_tuple( "SIB test_SIB POST HIGH\
-    {REGISTER test_reg 4 Bypass: \"0b1001\"}\n",
+    (REGISTER test_reg 4 Bypass: \"0b1001\")\n",
 
 "[Chain](1)     \"test_SIB\"\n\
  [Linker](2)    \"test_SIB_mux\"\n\
@@ -872,7 +872,7 @@ void UT_reader::test_SIB ()
   [Register](3)  \"test_reg\", length: 4, bypass: 1001\n\
  [Register](0)  \"test_SIB_ctrl\", length: 1, Hold value: true, bypass: 0"),
    make_tuple( "SIB test_SIB POST LOW\
-    {REGISTER test_reg 4 Bypass: \"0b1001\"}\n",
+    (REGISTER test_reg 4 Bypass: \"0b1001\")\n",
 
 "[Chain](1)     \"test_SIB\"\n\
  [Linker](2)    \"test_SIB_mux\"\n\
@@ -880,14 +880,14 @@ void UT_reader::test_SIB ()
   [Register](3)  \"test_reg\", length: 4, bypass: 1001\n\
  [Register](0)  \"test_SIB_ctrl\", length: 1, Hold value: true, bypass: 0"),
    make_tuple( "SIB test_SIB PRE HIGH\
-    {REGISTER test_reg 4 Bypass: \"0b1001\"}\n",
+    (REGISTER test_reg 4 Bypass: \"0b1001\")\n",
 "[Chain](1)     \"test_SIB\"\n\
  [Register](0)  \"test_SIB_ctrl\", length: 1, Hold value: true, bypass: 0\n\
  [Linker](2)    \"test_SIB_mux\"\n\
   :Selector:(0)  \"test_SIB_ctrl\", kind: Binary, can_select_none: 1, inverted_bits: 0, reversed_order: 0\n\
   [Register](3)  \"test_reg\", length: 4, bypass: 1001"),
    make_tuple( "SIB test_SIB PRE LOW\
-    {REGISTER test_reg 4 Bypass: \"0b1001\"}\n",
+    (REGISTER test_reg 4 Bypass: \"0b1001\")\n",
 "[Chain](1)     \"test_SIB\"\n\
  [Register](0)  \"test_SIB_ctrl\", length: 1, Hold value: true, bypass: 0\n\
  [Linker](2)    \"test_SIB_mux\"\n\
@@ -942,9 +942,9 @@ void UT_reader::test_JTAG_TAP_Success ()
   {
     // 00: Loopback
     make_tuple("JTAG_TAP my_tap Loopback 4 1\n"
-               "{"
+               "("
                "  REGISTER test_reg 4 Bypass: \"0b1100\"\n"
-               "}\n",
+               ")\n",
                "[Access_I](0)  \"my_tap\", Protocol: Loopback\n"
                " [Register](1)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n"
                " [Linker](2)    \"my_tap_DR_Mux\"\n"
@@ -954,9 +954,9 @@ void UT_reader::test_JTAG_TAP_Success ()
 
     // 01: SVF Simulation
     make_tuple("JTAG_TAP my_tap SVF_Simulation 4 1\n"
-               "{\n"
+               "(\n"
                "  REGISTER test_reg 4 Bypass: \"0b1100\"\n"
-               "}\n",
+               ")\n",
                "[Access_I](0)  \"my_tap\", Protocol: SVF_Simulation\n"
                " [Register](1)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n"
                " [Linker](2)    \"my_tap_DR_Mux\"\n"
@@ -966,9 +966,9 @@ void UT_reader::test_JTAG_TAP_Success ()
 
     // 02: SVF Simulation
     make_tuple("JTAG_TAP my_tap SVF_Simulation 4 [ \"0xF\" , \"0x2\" ] 1"    // Ignored array
-               "{"
+               "("
                " REGISTER test_reg 4 Bypass: \"0b1100\""
-               "}\n",
+               ")\n",
                "[Access_I](0)  \"my_tap\", Protocol: SVF_Simulation\n"
                " [Register](1)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n"
                " [Linker](2)    \"my_tap_DR_Mux\"\n"
@@ -978,9 +978,9 @@ void UT_reader::test_JTAG_TAP_Success ()
 
     // 03: SVF Emulation
     make_tuple("JTAG_TAP my_tap SVF_Emulation 4 1"
-               "{"
+               "("
                " REGISTER test_reg 4 Bypass: \"0b1100\""
-               "}\n",
+               ")\n",
                "[Access_I](0)  \"my_tap\", Protocol: SVF_Emulation\n"
                " [Register](1)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n"
                " [Linker](2)    \"my_tap_DR_Mux\"\n"
@@ -1025,9 +1025,9 @@ void UT_reader::test_JTAG_TAP_Failure ()
   {
     // 00: SVF OpenOCD
     make_tuple("JTAG_TAP my_tap SVF_openOCD 4 1"
-               "{"
+               "("
                "  REGISTER test_reg 4 Bypass: \"0b1100\""
-               "}\n",
+               ")\n",
                "Line 1:31-32: JTAG_TAP node \"my_tap\" Cannot create protocol: \"SVF_openOCD\"; std::invalid_argument: There is no creation method registered with name: SVF_openOCD."
                ),
   };
@@ -1080,118 +1080,118 @@ void UT_reader::test_ACCES_INTERFACE_Success ()
   {
     // 00: Loopback
     make_tuple("ACCESS_INTERFACE my_tap Loopback\n"
-               "{\n"
+               "(\n"
                "  REGISTER test_reg 4 Bypass: \"0b1100\"\n"
-               "}\n",
+               ")\n",
                "[Access_I](0)  \"my_tap\", Protocol: Loopback\n"
                " [Register](1)  \"test_reg\", length: 4, bypass: 1100"),
 
     // 01: SVF Simulation
     make_tuple("ACCESS_INTERFACE my_tap SVF_Simulation\n"
-               "{\n"
+               "(\n"
                "  REGISTER reg_1 3 Bypass: \"0b101\"\n"
                "  REGISTER reg_2 5 Bypass: \"0b11001\"\n"
-               "}\n",
+               ")\n",
                "[Access_I](0)  \"my_tap\", Protocol: SVF_Simulation\n"
                " [Register](1)  \"reg_1\", length: 3, bypass: 101\n"
                " [Register](2)  \"reg_2\", length: 5, bypass: 1100_1"),
 
     // 02: SVF Emulation
     make_tuple("ACCESS_INTERFACE my_tap  SVF_Emulation \n"
-               "{\n"
+               "(\n"
                "   REGISTER r1 1 Bypass: \"0b1\"\n"
                "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               "}\n",
+               ")\n",
                "[Access_I](0)  \"my_tap\", Protocol: SVF_Emulation\n"
                " [Register](1)  \"r1\", length: 1, bypass: 1\n"
                " [Register](2)  \"r2\", length: 2, bypass: 11"),
 
     // 03: Offline
     make_tuple("ACCESS_INTERFACE my_tap  Offline  \n"
-               "{\n"
+               "(\n"
                "   REGISTER r1 1 Bypass: \"0b1\"\n"
                "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               "}\n",
+               ")\n",
                "[Access_I](0)  \"my_tap\", Protocol: Offline\n"
                " [Register](1)  \"r1\", length: 1, bypass: 1\n"
                " [Register](2)  \"r2\", length: 2, bypass: 11"),
 
     // 04: STIL_Emulation
     make_tuple("ACCESS_INTERFACE my_tap  STIL_Emulation \"3\" \n"
-               "{\n"
+               "(\n"
                "   REGISTER r1 1 Bypass: \"0b1\"\n"
                "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               "}\n",
+               ")\n",
                "[Access_I](0)  \"my_tap\", Protocol: STIL_Emulation\n"
                " [Register](1)  \"r1\", length: 1, bypass: 1\n"
                " [Register](2)  \"r2\", length: 2, bypass: 11"),
 
     // 05: I2C_Emulation
     make_tuple("ACCESS_INTERFACE my_tap  I2C_Emulation \"0x40, 0x41, 0x42, [I2C]\" \n"
-               "{\n"
+               "(\n"
                "   REGISTER r1 1 Bypass: \"0b1\"\n"
                "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               "}\n",
+               ")\n",
                "[Access_I](0)  \"my_tap\", Protocol: I2C_Emulation\n"
                " [Register](1)  \"r1\", length: 1, bypass: 1\n"
                " [Register](2)  \"r2\", length: 2, bypass: 11"),
 
     // 06: Any letter in parameters
     make_tuple("ACCESS_INTERFACE letters I2C_Emulation \"0x40, 0x41, 0x42, abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ\" \n"
-               "{\n"
+               "(\n"
                "   REGISTER r1 1 Bypass: \"0b1\"\n"
                "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               "}\n",
+               ")\n",
                "[Access_I](0)  \"letters\", Protocol: I2C_Emulation\n"
                " [Register](1)  \"r1\", length: 1, bypass: 1\n"
                " [Register](2)  \"r2\", length: 2, bypass: 11"),
 
     // 07: Any digits in parameters
     make_tuple("ACCESS_INTERFACE digits I2C_Emulation \"0x40, 0x41, 0x42, _0123456789 \" \n"
-               "{\n"
+               "(\n"
                "   REGISTER r1 1 Bypass: \"0b1\"\n"
                "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               "}\n",
+               ")\n",
                "[Access_I](0)  \"digits\", Protocol: I2C_Emulation\n"
                " [Register](1)  \"r1\", length: 1, bypass: 1\n"
                " [Register](2)  \"r2\", length: 2, bypass: 11"),
 
     // 08: Any brackets characters in parameters
     make_tuple("ACCESS_INTERFACE brackets  I2C_Emulation \"0x40, 0x41, 0x42, ([<()>])\" \n"
-               "{\n"
+               "(\n"
                "   REGISTER r1 1 Bypass: \"0b1\"\n"
                "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               "}\n",
+               ")\n",
                "[Access_I](0)  \"brackets\", Protocol: I2C_Emulation\n"
                " [Register](1)  \"r1\", length: 1, bypass: 1\n"
                " [Register](2)  \"r2\", length: 2, bypass: 11"),
 
     // 09: Any punctuation characters in parameters
     make_tuple("ACCESS_INTERFACE punctuation  I2C_Emulation \"0x40, 0x41, 0x42, ?!.:; \" \n"
-               "{\n"
+               "(\n"
                "   REGISTER r1 1 Bypass: \"0b1\"\n"
                "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               "}\n",
+               ")\n",
                "[Access_I](0)  \"punctuation\", Protocol: I2C_Emulation\n"
                " [Register](1)  \"r1\", length: 1, bypass: 1\n"
                " [Register](2)  \"r2\", length: 2, bypass: 11"),
 
     // 10: Any operators characters in parameters
     make_tuple("ACCESS_INTERFACE operators  I2C_Emulation \"0x40, 0x41, 0x42, /*-+~%\" \n"
-               "{\n"
+               "(\n"
                "   REGISTER r1 1 Bypass: \"0b1\"\n"
                "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               "}\n",
+               ")\n",
                "[Access_I](0)  \"operators\", Protocol: I2C_Emulation\n"
                " [Register](1)  \"r1\", length: 1, bypass: 1\n"
                " [Register](2)  \"r2\", length: 2, bypass: 11"),
 
     // 11: Any special characters in parameters
     make_tuple("ACCESS_INTERFACE special  I2C_Emulation \"0x40, 0x41, 0x42, $=@'_|& \" \n"
-               "{\n"
+               "(\n"
                "   REGISTER r1 1 Bypass: \"0b1\"\n"
                "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               "}\n",
+               ")\n",
                "[Access_I](0)  \"special\", Protocol: I2C_Emulation\n"
                " [Register](1)  \"r1\", length: 1, bypass: 1\n"
                " [Register](2)  \"r2\", length: 2, bypass: 11"),
@@ -1200,10 +1200,10 @@ void UT_reader::test_ACCES_INTERFACE_Success ()
     #ifdef INTEL_EXPERIMENT
     // 12: Intel_Packet
     make_tuple("ACCESS_INTERFACE tap  Intel_Packet \"0x41, 0x42\" \n"
-               "{\n"
+               "(\n"
                "   REGISTER r1 1 Bypass: \"0b1\"\n"
                "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               "}\n",
+               ")\n",
                "[Access_I](0)  \"tap\", Protocol: Intel_Packet\n"
                " [Register](1)  \"r1\", length: 1, bypass: 1\n"
                " [Register](2)  \"r2\", length: 2, bypass: 11"),
@@ -1253,33 +1253,33 @@ void UT_reader::test_ACCES_INTERFACE_Failure ()
   {
     // 00: Empty integer array
     make_tuple("ACCESS_INTERFACE Useless_Square_Brackets Loopback []\n"
-               "{\n"
+               "(\n"
                "  REGISTER test_reg 4 Bypass: \"0b1100\"\n"
-               "}\n",
+               ")\n",
                "Line 1:51-52: syntax error"),
 
     // 01: Unregistered protocol type
     make_tuple("ACCESS_INTERFACE Unregistered_Protocol MyProtocol\n"
-               "{\n"
+               "(\n"
                "  REGISTER reg_1 3 Bypass: \"0b101\"\n"
                "  REGISTER reg_2 5 Bypass: \"0b11001\"\n"
-               "}\n",
+               ")\n",
                "Line 2:1-2: ACCESS_INTERFACE node \"Unregistered_Protocol\" Cannot create protocol: \"MyProtocol\"; std::invalid_argument: There is no creation method registered with name: MyProtocol."),
 
     // 02: No AccessInterface name (same as no protocol)
     make_tuple("ACCESS_INTERFACE Offline  \n"
-               "{\n"
+               "(\n"
                "   REGISTER r1 1 Bypass: \"0b1\"\n"
                "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               "}\n",
+               ")\n",
                "Line 2:1-2: syntax error"),
 
     // 03: Not enough addresses
     make_tuple("ACCESS_INTERFACE Not_enough_Adresses I2C_Emulation \"0x40, (i2c)\"  \n"
-               "{\n"
+               "(\n"
                "   REGISTER r1 1 Bypass: \"0b1\"\n"
                "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               "}\n",
+               ")\n",
                "Line 1:52-65: ACCESS_INTERFACE node \"Not_enough_Adresses\" Cannot create protocol: \"I2C_Emulation\"; std::invalid_argument: I2C Addresses must have at least two entries."),
   };
 
@@ -1327,8 +1327,8 @@ void UT_reader::test_1500 ()
   auto data =
   {
    make_tuple( "WRAPPER_1500 test_wrapper 2\
- { REGISTER test_register_1 12 Bypass: \"0b1001:0110:1100\"\
-   REGISTER test_register_2 12 Bypass: \"0b1001:0110:1100\"}\n",
+ ( REGISTER test_register_1 12 Bypass: \"0b1001:0110:1100\"\
+   REGISTER test_register_2 12 Bypass: \"0b1001:0110:1100\")\n",
 "[Chain](0)     \"test_wrapper\"\n\
  [Chain](2)     \"SWIR\"\n\
   [Register](1)  \"SWIR_ctrl\", length: 1, Hold value: true, bypass: 0\n\
@@ -1394,12 +1394,12 @@ void UT_reader::test_LINKER_Success ()
   {
     // 00 ==> correct syntax
     make_tuple("LINKER test_LINKER One_Hot test_reg_1 4\n"
-               "{\n"
+               "(\n"
                "  REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
                "  REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
                "  REGISTER test_reg_3 2 Bypass: \"0b10\"\n"
                "  REGISTER test_reg_4 5 Bypass: \"0b11001\"\n"
-               "}"s,
+               ")"s,
                "[Linker](0)    \"test_LINKER\"\n"
                " :Selector:(1)  \"test_reg_1\", kind: One_Hot, can_select_none: 1, inverted_bits: 0, reversed_order: 0\n"
                " [Register](1)  \"test_reg_1\", length: 4, bypass: 1001\n"
@@ -1449,15 +1449,15 @@ void UT_reader::test_LINKER_Error ()
     make_tuple("LINKER test_LINKER Binary 4\n"
                "{REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
                "REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
-               "}"s,
+               ")"s,
                "SIT Parsing error: Line 2:1-2: LINKER node \"test_LINKER\" Must specify a control node (Register) for its path selector"),
 
     // 01 ==> Error: selector register does not exist
     make_tuple("LINKER test_LINKER Binary selector_reg 4\n"
-               "{\n"
+               "(\n"
                "  REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
                "  REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
-               "}"s,
+               ")"s,
                "SIT Parsing error: Line 2:1-2: LINKER node \"test_LINKER\" Error, specified selector register \"selector_reg\" does not exist"),
   };
 
@@ -1508,11 +1508,11 @@ void UT_reader::test_LINKER_CustomTable_Success ()
   {
     // 00 ==> correct syntax
     make_tuple("LINKER Link_0 Table_Based reg_1 3 \"0b1111, 0b0001, 0b0011, 0b0111,  0b1111, 0b0000, 0b0000, 0b0000\"\n"
-               "{\n"
+               "(\n"
                "  REGISTER reg_1 4 Bypass: \"0b1001\"\n"
                "  REGISTER reg_2 3 Bypass: \"0b110\"\n"
                "  REGISTER reg_3 2 Bypass: \"0b10\"\n"
-               "}"s,
+               ")"s,
                "[Linker](0)    \"Link_0\"\n"
                " :Selector:(1)  \"reg_1\", kind: Table_Based, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n"
                " [Register](1)  \"reg_1\", length: 4, bypass: 1001\n"
@@ -1571,18 +1571,18 @@ void UT_reader::test_PDL_Success ()
     // 00 ==> One PDL algorithm
     data_t("JTAG_TAP TAP Loopback 4 1\n"
            "PDL Incr\n"
-           "{\n"
+           "(\n"
            "  REGISTER reg 12 Bypass: \"0xABC\"\n"
-           "}\n",
+           ")\n",
            {"Incr"}
           ),
 
     // 01 ==> Two PDL algorithms
     data_t("JTAG_TAP TAP Loopback 4 1\n"
            "PDL Incr, Decr\n"
-           "{\n"
+           "(\n"
            "  REGISTER reg 12 Bypass: \"0xABC\"\n"
-           "}\n",
+           ")\n",
            {"Incr", "Decr"}
           ),
     };
@@ -1623,18 +1623,18 @@ void UT_reader::test_PDL_Failure ()
     // 00 ==> One PDL algorithm
     data_t("JTAG_TAP TAP Loopback 4 1\n"
            "PDL : Incr\n"   // ==> Unexpected colon
-           "{\n"
+           "(\n"
            "  REGISTER reg 12 Bypass: \"0xABC\"\n"
-           "}\n",
+           ")\n",
            {"Incr"}
           ),
 
     // 01 ==> Two PDL algorithms
     data_t("JTAG_TAP TAP Loopback 4 1\n"
            "PDL increment; Decr\n"  // ==> unexpected semi-colon
-           "{\n"
+           "(\n"
            "  REGISTER reg 12 Bypass: \"0xABC\"\n"
-           "}\n",
+           ")\n",
            {"Incr", "Decr"}
           ),
     };
@@ -1689,13 +1689,13 @@ void UT_reader::test_INSTANCE_OF_Single_Success ()
   {
     // 00 ==> One SIT INSTANCE_OF 1st node
     data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
-           "{\n"                                     // 2
+           "(\n"                                     // 2
            "  CHAIN chain_name\n"                    // 3
            "  {\n"                                   // 4
            "    INSTANCE Bar OF Foo.sit\n"           // 5
            "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 6
            "  }\n"                                   // 7
-           "}\n",                                    // 8
+           ")\n",                                    // 8
            PlaceHolderKind::SIT,
            "Bar",
            "Foo.sit"
@@ -1703,13 +1703,13 @@ void UT_reader::test_INSTANCE_OF_Single_Success ()
 
     // 01 ==> One SIT INSTANCE - last node
     data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
-           "{\n"                                     // 2
+           "(\n"                                     // 2
            "  CHAIN chain_name\n"                    // 3
            "  {\n"                                   // 4
            "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
            "    INSTANCE Bat OF Foot.sit\n"          // 6
            "  }\n"                                   // 7
-           "}\n",                                    // 8
+           ")\n",                                    // 8
            PlaceHolderKind::SIT,
            "Bat",
            "Foot.sit"
@@ -1717,14 +1717,14 @@ void UT_reader::test_INSTANCE_OF_Single_Success ()
 
     // 02 ==> One SIT INSTANCE - middle node
     data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
-           "{\n"                                     // 2
+           "(\n"                                     // 2
            "  CHAIN chain_name\n"                    // 3
            "  {\n"                                   // 4
            "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
            "    INSTANCE Bot OF Fool.sit\n"          // 6
            "    REGISTER reg_2 4 Bypass: \"0xC\"\n"  // 7
            "  }\n"                                   // 8
-           "}\n",                                    // 9
+           ")\n",                                    // 9
            PlaceHolderKind::SIT,
            "Bot",
            "Fool.sit"
@@ -1732,13 +1732,13 @@ void UT_reader::test_INSTANCE_OF_Single_Success ()
 
     // 03 ==> One SIT INSTANCE - file path
     data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
-           "{\n"                                     // 2
+           "(\n"                                     // 2
            "  CHAIN chain_name\n"                    // 3
            "  {\n"                                   // 4
            "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
            "    INSTANCE Rat OF One/Two/Three.sit\n" // 6
            "  }\n"                                   // 7
-           "}\n",                                    // 8
+           ")\n",                                    // 8
            PlaceHolderKind::SIT,
            "Rat",
            "One/Two/Three.sit"
@@ -1746,13 +1746,13 @@ void UT_reader::test_INSTANCE_OF_Single_Success ()
 
     // 04 ==> One SIT INSTANCE - file path with embedded spaces
     data_t("JTAG_TAP TAP Loopback 4 1\n"                 // 1
-           "{\n"                                         // 2
+           "(\n"                                         // 2
            "  CHAIN chain_name\n"                        // 3
            "  {\n"                                       // 4
            "    REGISTER reg 12 Bypass: \"0xABC\"\n"     // 5
            "    INSTANCE Put OF \"One Two Three.sit\"\n" // 6
            "  }\n"                                       // 7
-           "}\n",                                        // 8
+           ")\n",                                        // 8
            PlaceHolderKind::SIT,
            "Put",
            "One Two Three.sit"
@@ -1761,13 +1761,13 @@ void UT_reader::test_INSTANCE_OF_Single_Success ()
 
     // 05 ==> Factory INSTANCE
     data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
-           "{\n"                                     // 2
+           "(\n"                                     // 2
            "  CHAIN chain_name\n"                    // 3
            "  {\n"                                   // 4
            "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
            "    INSTANCE but OF Build_Sub\n"         // 6
            "  }\n"                                   // 7
-           "}\n",                                    // 8
+           ")\n",                                    // 8
            PlaceHolderKind::Factory,
            "but",
            "Build_Sub"
@@ -1793,7 +1793,7 @@ void UT_reader::test_INSTANCE_OF_Multiple_Success ()
   stringstream sit
   (
     "JTAG_TAP TAP Loopback 4 1\n"             // 01
-    "{\n"                                     // 02
+    "(\n"                                     // 02
     "  CHAIN chain_name\n"                    // 03
     "  {\n"                                   // 04
     "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 05
@@ -1801,7 +1801,7 @@ void UT_reader::test_INSTANCE_OF_Multiple_Success ()
     "    INSTANCE Bat OF Fool\n"              // 07
     "    INSTANCE Bit OF \"Pool.sit\"\n"      // 08
     "  }\n"                                   // 09
-    "}\n"                                     // 10
+    ")\n"                                     // 10
   );
 
   auto sm = make_shared<SystemModel>();
@@ -1884,75 +1884,75 @@ void UT_reader::test_INSTANCE_OF_Failure ()
   {
     // 00
     data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
-           "{\n"                                     // 2
+           "(\n"                                     // 2
            "  CHAIN chain_name\n"                    // 3
            "  {\n"                                   // 4
            "    INSTANCE Bar Foo.sit\n"              // 5 ==> Missing keyword OF
            "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 6
            "  }\n"                                   // 7
-           "}\n",                                    // 8
+           ")\n",                                    // 8
            "Line 5:18-21: syntax error"
           ),
 
     // 01
     data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
-           "{\n"                                     // 2
+           "(\n"                                     // 2
            "  CHAIN chain_name\n"                    // 3
            "  {\n"                                   // 4
            "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
            "    INSTANCE Bat OF Hello World.sit\n"   // 6 ==> Path with embedded spaces must be within double quote strings (it is parsed correctly up to 'Hello')
            "  }\n"                                   // 7
-           "}\n",                                    // 8
+           ")\n",                                    // 8
            "Line 6:27-32: syntax error"
           ),
 
     // 02
     data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
-           "{\n"                                     // 2
+           "(\n"                                     // 2
            "  CHAIN chain_name\n"                    // 3
            "  {\n"                                   // 4
            "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
            "    INSTANCE OF Fool.sit\n"              // 6  ==> Missing instance name
            "    REGISTER reg_2 4 Bypass: \"0xC\"\n"  // 7
            "  }\n"                                   // 8
-           "}\n",                                    // 9
+           ")\n",                                    // 9
            "Line 6:14-16: syntax error"
           ),
 
     // 03
     data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
-           "{\n"                                     // 2
+           "(\n"                                     // 2
            "  CHAIN chain_name\n"                    // 3
            "  {\n"                                   // 4
            "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
            "    INSTANCE Rat OF \n"                  // 6 ==> Missing SIT file or factory name
            "  }\n"                                   // 7
-           "}\n",                                    // 8
+           ")\n",                                    // 8
            "Line 7:3-4: syntax error"
           ),
 
     // 04
     data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
-           "{\n"                                     // 2
+           "(\n"                                     // 2
            "  CHAIN chain_name\n"                    // 3
            "  {\n"                                   // 4
            "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
            "    INSTANCE OF Put Far\n"               // 6 ==> Out of order
            "  }\n"                                   // 7
-           "}\n",                                    // 8
+           ")\n",                                    // 8
            "error: Line 6:14-16"        // Report misleadingly: Line 6:14-19 ==> Should be Line 6:14-15 !
           ),
 
 
     // 05
     data_t("JTAG_TAP TAP Loopback 4 1\n"             // 1
-           "{\n"                                     // 2
+           "(\n"                                     // 2
            "  CHAIN chain_name\n"                    // 3
            "  {\n"                                   // 4
            "    REGISTER reg 12 Bypass: \"0xABC\"\n" // 5
            "    INSTANCE \"but\" OF Build_Sub\n"     // 6 ==> Instance must not be quoted
            "  }\n"                                   // 7
-           "}\n",                                    // 8
+           ")\n",                                    // 8
            "Line 6:14-19: syntax error"
           ),
   };

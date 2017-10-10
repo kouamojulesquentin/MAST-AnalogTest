@@ -117,7 +117,7 @@ namespace
 %type <std::string>            file_name
 %type <std::string>            file_path
 %type <node_list_type>         node_list
-%type <node_list_type>         children_list
+%type <std::pair<node_list_type,bool>>         children_list
 %type <std::uint8_t>           is_transparent
 %type <name_type>              node_name
 %type <std::uint8_t>           hold
@@ -145,7 +145,7 @@ namespace
 %type <std::shared_ptr<mast::SystemModelNode>> register_node
 %type <std::shared_ptr<mast::SystemModelNode>> instance_of      // Represents an instance of a sub-model
 %type <std::shared_ptr<mast::SystemModelNode>> leaf_node
-%type <std::shared_ptr<mast::SystemModelNode>> parent_node
+%type <std::pair<std::shared_ptr<mast::SystemModelNode>,bool>> parent_node
 %type <std::shared_ptr<mast::SystemModelNode>> node
 %type <std::shared_ptr<mast::SystemModelNode>> parent_node_with_children
 %type <std::vector<std::string>>               function_list                 // List of PDL algorithm function names
@@ -245,7 +245,10 @@ root_node:
 
 children_list:
   t_START_HIERARCHY node_list t_END_HIERARCHY
-  { $$ = $2;}
+  { $$ = std::make_pair($2,true);}
+  |
+  t_LeftParenthesis node_list t_RightParenthesis
+  { $$ = std::make_pair($2,false);}
   ;
 
 node_list:
@@ -286,13 +289,25 @@ node_name:
 parent_node_with_children:
   parent_node PDL_declaration children_list
   {
-    auto asParentNode = dynamic_pointer_cast <ParentNode>($[parent_node]);
+  
+   /*Check that {} and () are correctly used*/
+   if ($[parent_node].second != $[children_list].second)
+    {
+     std::ostringstream msg;
+     if ($[parent_node].second==true)
+       msg << "Node " << $[parent_node].first->Name() << " must be followed by '{', not '('"  ;
+     else
+       msg << "Node " << $[parent_node].first->Name() << " must be followed by '(', not '{'"  ;
+      THROW_SYNTAX_ERROR(msg);
+      }
 
-    for (auto this_child : $[children_list].nodes)
+    auto asParentNode = dynamic_pointer_cast <ParentNode>($[parent_node].first);
+
+    for (auto this_child : $[children_list].first.nodes)
     {
       asParentNode->AppendChild(this_child);
     }
-    $$ = $[parent_node];
+    $$ = $[parent_node].first;
 
     if (!$[PDL_declaration].first.empty())
     {
@@ -334,7 +349,7 @@ t_CHAIN  node_name
 {
   auto chain = driver.main_sm->CreateChain($[node_name].name);
   chain->IgnoreForNodePath($[node_name].is_transparent);
-  $$ = chain;
+  $$ = std::make_pair(chain,true);
 }
 |
 t_LINKER  node_name path_selector_kind selector_register_name max_derivations path_selector_parameters
@@ -360,13 +375,13 @@ t_LINKER  node_name path_selector_kind selector_register_name max_derivations pa
   linkerInfo.max_derivations     = $[max_derivations];
   driver.unresolved_linkers.push(linkerInfo);
 
-  $$ = linker;
+  $$ = std::make_pair(linker,false);
 }
 |
 t_SIB node_name mux_register_position active
 {
   auto node =  driver.builder->Create_SIB($[node_name].name, $[active], $[mux_register_position]);
-  $$ = node;
+  $$ = std::make_pair(node,false);
 }
 |
 t_MIB node_name mux_register_position active reverse max_derivations path_selector_kind
@@ -386,13 +401,13 @@ t_MIB node_name mux_register_position active reverse max_derivations path_select
   auto             selector         = selectorFactory.Create($[path_selector_kind], $[max_derivations], selectorProperty, selectorRegister);
 
   auto mibNode = driver.builder->Create_MIB($[node_name].name, std::move(selector), selectorRegister, $[mux_register_position]);
-  $$ = mibNode;
+  $$ = std::make_pair(mibNode,false);
 }
 |
 t_1500_WRAPPER node_name max_derivations
 {
   auto node = driver.builder->Create_1500_Wrapper ($[node_name].name, $[max_derivations]);
-  $$ = node;
+  $$ = std::make_pair(node,false);
 }
 |
 t_ACCESS_INTERFACE  node_name AI_identifier AI_protocol_parameters
@@ -414,7 +429,7 @@ t_ACCESS_INTERFACE  node_name AI_identifier AI_protocol_parameters
       else
       {
         auto node = driver.main_sm->CreateAccessInterface(nodeName, shared_ptr<AccessInterfaceProtocol>(std::move(protocol)));
-        $$ = node;
+        $$ = std::make_pair(node,false);
       }
     }
     catch(std::invalid_argument exc)  // Catch C++ standard exceptions
@@ -458,7 +473,7 @@ t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_
                                                     irSize,
                                                     nbEndPoints,
                                                     shared_ptr<AccessInterfaceProtocol>(std::move(protocol)));
-        $$ = node;
+        $$ = std::make_pair(node,false);
       }
       else
       {
@@ -473,7 +488,7 @@ t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_
                                                     nbEndPoints,
                                                     shared_ptr<AccessInterfaceProtocol>(std::move(protocol)),
                                                     irTable);
-        $$ = node;
+        $$ = std::make_pair(node,false);
       }
     }
   }

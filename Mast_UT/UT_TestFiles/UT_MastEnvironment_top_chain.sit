@@ -2,8 +2,8 @@ CHAIN mychain
 {
   ACCESS_INTERFACE my_tap Loopback
   PDL Incr
-  {
+  (
     REGISTER reg 12 Bypass: "0xABC"
-  }
+  )
 }
 

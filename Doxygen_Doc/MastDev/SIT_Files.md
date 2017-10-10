@@ -79,10 +79,11 @@ Syntax is:
 
 Parent nodes represent hierarchical information: they can be either 1687 elements, such as [ICL] instances, or abstract constructs to help representing hierarchy.
 
-Each node follows the same syntax:
+Each node declaration follows the same syntax:
 
 <[PDL]_association>* :  [PDL] <function_name_list><br>
 <node_type> <node_name> <node information>* <[PDL]_association>* { <children_list>+ }
+<node_type> <node_name> <node information>* <[PDL]_association>* ( <children_list>+ )
 
 <table>
   <tr><td><node_type>:  </td><td>  it can be either a base node (REGISTER,CHAIN,LINKER,ACCESS_INTERFACE) or a composite node identifying a
@@ -94,7 +95,29 @@ It is the equivalent of the [PDL] <code>iProcsForModule</code> command.</td></tr
 <tr><td><node information> </td><td>a variable field containing information specific to a given node_type, as explained in the following table. NB: underlined strings depict language token</td></tr>
 </table>
 
-### NODE INFORMATION DEPENDING ON NODE TYPE
+There are two types of possible hierarchies: chained or linked. 
+
+
+### CHAINED hierarchy
+In a chained hierarchy, all children nodes are always selected from left to right. As its name says, this rules models a scan chain composed of multiple segments, and it also the easiest way to add hierarchical information to a design. Chained hierarchies are identified by Accolades.
+
+The children of a given node are listed between two accolades following it.<br>
+The order in the list is respected when appending children.<br>
+For instance:
+
+    CHAIN test_chain
+    {
+      REGISTER test_register_1 12 Bypass: "0b1001:0110:1100"
+      REGISTER test_register_2 12 Bypass: "0b1001:0110:1100"
+    }
+
+
+Register nodes test_register_1 and test_register_2 are respectively the first and second child of chain node test_chain.<br>
+Due to Lex/Yacc limitations, SIT_Reader does not support empty hierarchies. At least one node must be provided.<br>
+<br>
+NB: Trying to provide children to a Register node will cause a syntax error.<br>
+
+#### NODE INFORMATION DEPENDING ON NODE TYPE FOR CHAINED HIERARCHIES
 <table>
   <caption id="Parent_node"></caption>
   <tr><th width = 100>Node Type   </th><th>   Node Information</th></tr>
@@ -102,6 +125,36 @@ It is the equivalent of the [PDL] <code>iProcsForModule</code> command.</td></tr
     <td>CHAIN</td>
     <td>NOT_IN_PATH*: if provided, the name of the chain is not used when composing a path (used by [PDL] [API] to identify registers)</td>
   </tr>
+  <tr>
+</table>
+
+
+### 
+### LINKED hierarchy
+
+In a selected hierarchy, not all children are necessary active at the same time: it depends on the internal state of the System, typically expressed, as its names says, by a Linker node. Linker hierarchies also comprise AccessInterfaces and the macro derived from one of more Linkers, like SIBs or MIBs. Linked Hierarchies are identified by Parenthesis
+
+The children of a given node are listed between two parenthesis following it.<br>
+The order in the list is respected when applying the selection protocol<br>
+For instance:
+
+    LINKER test_LINKER One_Hot test_reg_1 2
+    (
+      REGISTER test_register_1 12 Bypass: "0b1001:0110:1100"
+      REGISTER test_register_2 12 Bypass: "0b1001:0110:1100"
+    )
+
+
+Register nodes test_register_1 and test_register_2 are respectively the first and second child of linker node test_linker.<br>
+Due to Lex/Yacc limitations, SIT_Reader does not support empty hierarchies. At least one node must be provided.<br>
+<br>
+NB: Trying to provide children to a Register node will cause a syntax error.<br>
+
+
+#### NODE INFORMATION DEPENDING ON NODE TYPE FOR LINKED HIERARCHIES
+<table>
+  <caption id="Parent_node"></caption>
+  <tr><th width = 100>Node Type   </th><th>   Node Information</th></tr>
   <tr>
     <td>MIB</td>
     <td>
@@ -240,23 +293,6 @@ It is the equivalent of the [PDL] <code>iProcsForModule</code> command.</td></tr
 </table>
 
 
-
-## Hierarchy
-The children of a given node are listed between two accolades following it.<br>
-The order in the list is respected when appending children.<br>
-For instance:
-
-    CHAIN test_chain
-    {
-      REGISTER test_register_1 12 Bypass: "0b1001:0110:1100"
-      REGISTER test_register_2 12 Bypass: "0b1001:0110:1100"
-    }
-
-
-Register nodes test_register_1 and test_register_2 are respectively the first and second child of chain node test_chain.<br>
-Due to Lex/Yacc limitations, SIT_Reader does not support empty hierarchies. At least one node must be provided.<br>
-<br>
-NB: Trying to provide children to a Register node will cause a syntax error.<br>
 
 ## USAGE
 To use the SIT_reader, the <code>SIT_Reader.hpp</code> header must be included.<br>

@@ -1,7 +1,7 @@
 JTAG_TAP TAP Loopback 4 1
 PDL Incr
-{
+(
   REGISTER reg 12 Bypass: "0xABC"
   INSTANCE Inst_1 OF Make_MIB
-}
+)
 

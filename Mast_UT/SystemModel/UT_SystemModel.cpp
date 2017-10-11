@@ -559,6 +559,51 @@ void UT_SystemModel::test_CreateAccessInterfaceTranslator_Result_Queues_NB ()
 
 }
 
+
+//! Checks SystemModel::CreateAccessInterfaceTranslator() capability
+//! of handling Update queues in Non-blocking situations
+//! Blocking behaviour checked in UT_MTQueue
+//!
+void UT_SystemModel::test_CreateAccessInterfaceTranslator_Update_Queues_NB ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sut;
+  string_view name = "AT name";
+
+  // ---------------- Exercise
+  //
+  auto node = sut.CreateAccessInterfaceTranslator(name, nullptr);
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  // One Request
+  auto  test = BinaryVector::CreateFromBinaryString("01");
+  node->PushUpdate(test);
+  auto Update = node->PopUpdate();
+  TS_ASSERT_NOT_NULLPTR (&Update);
+  TS_ASSERT_TRUE      (Update.CompareEqualTo(test));
+
+
+  // Multiple Request
+
+  for (int i=0;i<10;i++)
+     {
+     test = BinaryVector::CreateFromHexString("01"+std::to_string(i));
+      node->PushUpdate(test);
+     }
+
+  for (int i=0;i<10;i++)
+     {
+     Update = node->PopUpdate();
+     TS_ASSERT_NOT_NULLPTR (&Update);
+    TS_ASSERT_TRUE      (Update.CompareEqualTo(BinaryVector::CreateFromHexString("01"+std::to_string(i))));
+     }
+
+}
+
 //! Checks SystemModel::SetRoot()
 //!
 void UT_SystemModel::test_SetRoot ()

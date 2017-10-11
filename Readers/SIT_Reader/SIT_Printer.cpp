@@ -18,6 +18,7 @@
 #include "Utility.hpp"
 
 #include <sstream>
+#include <memory>
 
 using std::string;
 using std::shared_ptr;
@@ -154,13 +155,15 @@ void SIT_Printer::StreamParentNode (std::experimental::string_view type, const P
     m_os << " NOT_IN_PATH";
   }
 
+  auto isChain = dynamic_cast<const Chain*>(&parentNode) != nullptr;
+
   m_os << "\n";
-  StreamDepth() << "{";
+  StreamDepth() << (isChain ? "{" : "(");
 
   PrintChildren(parentNode);
 
   m_os << "\n";
-  StreamDepth() << "}";
+  StreamDepth() << (isChain ? "}" : ")");
 }
 //
 //  End of: SIT_Printer::StreamParentNode

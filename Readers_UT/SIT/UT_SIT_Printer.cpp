@@ -71,8 +71,8 @@ void UT_SIT_Printer::test_VisitAccessInterface ()
   //
   auto got      = sut.SIT_Text();
   auto expected = "ACCESS_INTERFACE \"Access interface name\" PROTOCOL_NOT_SET\n"
-                  "{\n"
-                  "}";
+                  "(\n"
+                  ")";
   TS_ASSERT_EQUALS (got, expected);
 }
 
@@ -128,8 +128,8 @@ void UT_SIT_Printer::test_VisitLinker ()
   //
   auto got      = sut.SIT_Text();
   auto expected = "LINKER \"Linker name\" Binary \"Mux register name\" 5 NOT_IN_PATH\n"
-                  "{\n"
-                  "}";
+                  "(\n"
+                  ")";
   TS_ASSERT_EQUALS (got, expected);
 }
 
@@ -258,7 +258,7 @@ void UT_SIT_Printer::test_VisitLinker_with_Child ()
   //
   auto got      = sut.SIT_Text();
   auto expected = "LINKER Link Binary Mux_Reg 3 NOT_IN_PATH\n"
-                  "{\n"
+                  "(\n"
                   "  CHAIN Chain\n"
                   "  {\n"
                   "    REGISTER Mux_Reg 2 Bypass: \"0b01\"\n"
@@ -268,7 +268,7 @@ void UT_SIT_Printer::test_VisitLinker_with_Child ()
                   "  }\n"
                   "  REGISTER R_A 15 Bypass: \"0xEEF/b101\"\n"
                   "  REGISTER R_b 20 Bypass: \"0xEEFA_E\"\n"
-                  "}";
+                  ")";
   TS_ASSERT_EQUALS (got, expected);
 }
 
@@ -313,7 +313,7 @@ void UT_SIT_Printer::test_VisitAccessInterface_with_Child ()
   //
   auto got      = sut.SIT_Text();
   auto expected = "ACCESS_INTERFACE \"Access interface name\" PROTOCOL_NOT_SET\n"
-                  "{\n"
+                  "(\n"
                   "  CHAIN \"Chain name\"\n"
                   "  {\n"
                   "    REGISTER Reg_1 5 Bypass: \"0b1010_1\"\n"
@@ -322,11 +322,11 @@ void UT_SIT_Printer::test_VisitAccessInterface_with_Child ()
                   "    REGISTER SReg 2 Bypass: \"0b01\"\n"
                   "  }\n"
                   "  LINKER \"Linker name\" Binary SReg 2 NOT_IN_PATH\n"
-                  "  {\n"
+                  "  (\n"
                   "    REGISTER R_A 15 Bypass: \"0xEEF/b101\"\n"
                   "    REGISTER \"the register\" 20 Bypass: \"0xEEFA_E\"\n"
-                  "  }\n"
-                  "}";
+                  "  )\n"
+                  ")";
   TS_ASSERT_EQUALS (got, expected);
 }
 
@@ -357,13 +357,13 @@ void UT_SIT_Printer::test_VisitTap ()
   //
   auto got      = sut.SIT_Text();
   auto expected = "ACCESS_INTERFACE 1149_1_TAP Loopback\n"
-                  "{\n"
+                  "(\n"
                   "  REGISTER TAP_IR 6 Hold_value Bypass: \"0b1111_11\"\n"
                   "  LINKER TAP_DR_Mux Table_Based TAP_IR 5 NOT_IN_PATH\n"
-                  "  {\n"
+                  "  (\n"
                   "    REGISTER TAP_BPY 1 Bypass: \"0b1\"\n"
-                  "  }\n"
-                  "}";
+                  "  )\n"
+                  ")";
   TS_ASSERT_EQUALS (got, expected);
   TS_WARN ("Table based not defined");
 }
@@ -397,18 +397,18 @@ void UT_SIT_Printer::test_VisitTap_With_SubNodes ()
   //
   auto got      = sut.SIT_Text();
   auto expected = "ACCESS_INTERFACE 1149_1_TAP Loopback\n"
-                  "{\n"
+                  "(\n"
                   "  REGISTER TAP_IR 6 Hold_value Bypass: \"0b1111_11\"\n"
                   "  LINKER TAP_DR_Mux Table_Based TAP_IR 5 NOT_IN_PATH\n"
-                  "  {\n"
+                  "  (\n"
                   "    REGISTER TAP_BPY 1 Bypass: \"0b1\"\n"
                   "    CHAIN \"Chain name\"\n"
                   "    {\n"
                   "    }\n"
                   "    REGISTER Reg_1 6 Bypass: \"0b1010_01\"\n"
                   "    REGISTER Reg_2 6 Bypass: \"0b1010_10\"\n"
-                  "  }\n"
-                  "}";
+                  "  )\n"
+                  ")";
   TS_ASSERT_EQUALS (got, expected);
   TS_WARN ("Table based not defined");
 }
@@ -435,18 +435,18 @@ void UT_SIT_Printer::test_MakeSIT ()
   // ---------------- Verify
   //
   auto expected = "ACCESS_INTERFACE 1149_1_TAP Loopback\n"
-                  "{\n"
+                  "(\n"
                   "  REGISTER TAP_IR 5 Hold_value Bypass: \"0b1111_1\"\n"
                   "  LINKER TAP_DR_Mux Table_Based TAP_IR 4 NOT_IN_PATH\n"
-                  "  {\n"
+                  "  (\n"
                   "    REGISTER TAP_BPY 1 Bypass: \"0b1\"\n"
                   "    CHAIN \"Chain name\"\n"
                   "    {\n"
                   "    }\n"
                   "    REGISTER Reg_1 6 Bypass: \"0b1010_01\"\n"
                   "    REGISTER Reg_2 6 Bypass: \"0b1010_10\"\n"
-                  "  }\n"
-                  "}";
+                  "  )\n"
+                  ")";
   TS_ASSERT_EQUALS (got, expected);
   TS_WARN ("Table based not defined");
 }

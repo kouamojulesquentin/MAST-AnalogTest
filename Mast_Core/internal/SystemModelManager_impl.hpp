@@ -310,7 +310,7 @@ class SystemModelManager_impl final
 
   //! Triggers a data cycle on the Endpoints of the currentAccessInterface
   //!
-  void DoHierarchicalDataCycle (AccessInterface* currentAccessInterface, AccessInterface* interfaceTranslator = nullptr);
+  void DoHierarchicalDataCycle (AccessInterface* currentAccessInterface);
   void RegisterPendingThread (std::shared_ptr<Register> reg);
   void ReleaseServedThreads ();
   void ReportServedRegisters (const std::vector<NodeIdentifier>& activeRegisters);

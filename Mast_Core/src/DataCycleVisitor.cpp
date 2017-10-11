@@ -30,7 +30,7 @@ void DataCycleVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 
   if (accessInterface.IsPending())
   {
-    m_manager->DoHierarchicalDataCycle(&accessInterface, nullptr);
+    m_manager->DoHierarchicalDataCycle(&accessInterface);
   }
 }
 //

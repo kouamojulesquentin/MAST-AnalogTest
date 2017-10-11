@@ -15,6 +15,7 @@
 #include "SystemModel.hpp"
 #include "AccessInterface.hpp"
 #include "AccessInterfaceProtocol.hpp"
+#include "AccessInterfaceRawProtocol.hpp"
 #include "Chain.hpp"
 #include "Utility.hpp"
 #include "SystemModelManagerMonitor.hpp"
@@ -197,7 +198,7 @@ void SystemModelManager_impl::CreateApplicationThread (shared_ptr<ParentNode> ap
 //!
 //! @note It does the data cycle only on the target AccessInterface, fromSUTVector and toSUTVector are locally defined
 //!
-void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentAccessInterface, AccessInterface* interfaceTranslator)
+void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentAccessInterface)
 {
   CHECK_PARAMETER_NOT_NULL(currentAccessInterface, "Houps can only operate on valid AccessInterface");
 
@@ -224,8 +225,10 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
           const auto& activeRegs = local_toSutVisitor.ActiveRegistersIdentifiers();
 
           BinaryVector fromSutVector;
+          
+          auto protocol_is_raw = std::dynamic_pointer_cast<AccessInterfaceRawProtocol>(protocol);
 
-          if (interfaceTranslator == nullptr) // Standard case ==> use built-in Callbacks
+          if (protocol_is_raw == nullptr) // Standard case ==> use built-in Callbacks
           {
             fromSutVector = protocol->DoCallback(endpointId, nextEndPoint->ApplicationData(), toSutVector);
           }

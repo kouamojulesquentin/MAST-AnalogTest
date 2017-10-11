@@ -56,12 +56,33 @@ class UT_BinaryVector : public CxxTest::TestSuite
   void test_DataAsBinaryString_Without_NewLine ();
   void test_DataAsBinaryString_With_NewLine ();
   void test_DataAsBinaryString_Without_Separators ();
+
+  // ---------------- DataAsHexString
+  //
   void test_DataAsHexString_Without_NewLine ();
   void test_DataAsHexString_With_NewLine ();
   void test_DataAsHexString_Without_Separators ();
+
+  // ---------------- DataAsMixString
+  //
   void test_DataAsMixString_Without_Separators ();
   void test_DataAsMixString_Without_NewLine ();
   void test_DataAsMixString_With_NewLine ();
+
+  // ---------------- DataAsICLBinaryString
+  //
+  void test_DataAsICLBinaryString ();
+
+  // ---------------- DataAsICLHexString
+  //
+  void test_DataAsICLHexString ();
+
+  // ---------------- DataAsICLMixString
+  //
+  void test_DataAsICLMixString_hexStyleThreshold_8 ();
+  void test_DataAsICLMixString_hexStyleThreshold_5 ();
+  void test_DataAsICLMixString_hexStyleThreshold_4 ();
+
 
   // ---------------- CompareEqualTo
   //

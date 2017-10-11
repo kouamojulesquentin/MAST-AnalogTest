@@ -112,6 +112,20 @@ class MAST_CORE_EXPORT BinaryVector final
                                std::experimental::string_view eolSeparator      = ","
                               ) const;         //!< Gets content as mix of hex and binary digits (size dependent)
 
+  // ---------------- ICL export
+
+  //! Makes string, binary, representation using ICL syntax
+  //!
+  std::string DataAsICLBinaryString () const;
+
+  //! Makes string, hexadecimal, representation using ICL syntax
+  //!
+  std::string DataAsICLHexString () const;
+
+  //! Makes string representation using ICL syntax
+  //!
+  std::string DataAsICLMixString (uint32_t hexStyleThreshold = 8) const;
+
   BinaryVector& operator=(const BinaryVector&);   //!< Copy assignment
   BinaryVector& operator=(BinaryVector&&);        //!< Move assignment
 
@@ -228,9 +242,10 @@ class MAST_CORE_EXPORT BinaryVector final
   // ---------------- Private  Fields
   //
   private:
-  std::vector<uint8_t> m_data;                                  //!< Bytes formatted bit stream MSB first and last byte bits are left aligned (on msb)
-  uint32_t             m_usedBits     = 0;                      //!< Number of effective bits (last byte may be not all used)
-  SizeProperty         m_sizeProperty = SizeProperty::NotFixed; //!< When true, the number of used bits cannot be changed (once constructed)
+  static constexpr bool PREFIX_WITH_BASE_ID = true;                   //!< Optional base prefix requirement
+  std::vector<uint8_t>  m_data;                                       //!< Bytes formatted bit stream MSB first and last byte bits are left aligned (on msb)
+  uint32_t              m_usedBits          = 0;                      //!< Number of effective bits (last byte may be not all used)
+  SizeProperty          m_sizeProperty      = SizeProperty::NotFixed; //!< When true, the number of used bits cannot be changed (once constructed)
 };
 //
 //  End of BinaryVector class declaration

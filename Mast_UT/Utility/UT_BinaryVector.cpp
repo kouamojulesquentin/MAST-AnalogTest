@@ -988,6 +988,311 @@ void UT_BinaryVector::test_DataAsBinaryString_Without_Separators ()
   TS_DATA_DRIVEN_TEST (checker, data);
 }
 
+//! Checks BinaryVector::DataAsICLBinaryString()
+//!
+void UT_BinaryVector::test_DataAsICLBinaryString ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits  = std::get<0>(data);
+    string      expected = std::get<1>(data);
+
+    auto sut = BinaryVector::CreateFromBinaryString(sutBits);
+
+    // ---------------- Exercise
+    //
+    auto sutAsString = sut.DataAsICLBinaryString();
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sutAsString, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,                            result
+    make_tuple("0",                            "1'b0"),                             // 00
+    make_tuple("1",                            "1'b1"),                             // 01
+    make_tuple("10",                           "2'b10"),                            // 02
+    make_tuple("11",                           "2'b11"),                            // 03
+    make_tuple("100",                          "3'b100"),                           // 04
+    make_tuple("101",                          "3'b101"),                           // 05
+    make_tuple("110",                          "3'b110"),                           // 06
+    make_tuple("111",                          "3'b111"),                           // 07
+    make_tuple("1000",                         "4'b1000"),                          // 08
+    make_tuple("1001",                         "4'b1001"),                          // 09
+    make_tuple("1010",                         "4'b1010"),                          // 10
+    make_tuple("1011",                         "4'b1011"),                          // 11
+    make_tuple("1100",                         "4'b1100"),                          // 12
+    make_tuple("1101",                         "4'b1101"),                          // 13
+    make_tuple("1110",                         "4'b1110"),                          // 14
+    make_tuple("1111",                         "4'b1111"),                          // 15
+    make_tuple("1011_0",                       "5'b1011_0"),                        // 16
+    make_tuple("1011_1",                       "5'b1011_1"),                        // 17
+    make_tuple("1011_10",                      "6'b1011_10"),                       // 18
+    make_tuple("1011_11",                      "6'b1011_11"),                       // 19
+    make_tuple("1011_100",                     "7'b1011_100"),                      // 20
+    make_tuple("1011_101",                     "7'b1011_101"),                      // 21
+    make_tuple("1011_110",                     "7'b1011_110"),                      // 22
+    make_tuple("1011_111",                     "7'b1011_111"),                      // 23
+    make_tuple("1011_1000",                    "8'b1011_1000"),                     // 24
+    make_tuple("1011_1001",                    "8'b1011_1001"),                     // 25
+    make_tuple("1011_1010",                    "8'b1011_1010"),                     // 26
+    make_tuple("1011_1011",                    "8'b1011_1011"),                     // 27
+    make_tuple("1011_1100",                    "8'b1011_1100"),                     // 28
+    make_tuple("1011_1101",                    "8'b1011_1101"),                     // 29
+    make_tuple("1011_1110",                    "8'b1011_1110"),                     // 30
+    make_tuple("1011_1111",                    "8'b1011_1111"),                     // 31
+    make_tuple("1110_0000:1",                  "9'b1110_0000_1"),                   // 32
+    make_tuple("1110_0000:11",                 "10'b1110_0000_11"),                 // 33
+    make_tuple("1110_0000:1100_1011:1010",     "20'b1110_0000_1100_1011_1010"),     // 34
+    make_tuple("1110_0000:1100_1011:1010_1",   "21'b1110_0000_1100_1011_1010_1"),   // 35
+    make_tuple("1110_0000:1100_1011:1010_101", "23'b1110_0000_1100_1011_1010_101"), // 36
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+//! Checks HexVector::DataAsICLHexString()
+//!
+void UT_BinaryVector::test_DataAsICLHexString ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits  = std::get<0>(data);
+    string      expected = std::get<1>(data);
+
+    auto sut   = BinaryVector::CreateFromBinaryString(sutBits);
+
+    // ---------------- Exercise
+    //
+    auto sutAsString = sut.DataAsICLHexString();
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sutAsString, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,            result
+    make_tuple("0000",                                         "4'h0"),            // 00
+    make_tuple("0001",                                         "4'h1"),            // 01
+    make_tuple("0010",                                         "4'h2"),            // 02
+    make_tuple("0011",                                         "4'h3"),            // 03
+    make_tuple("0100",                                         "4'h4"),            // 04
+    make_tuple("0101",                                         "4'h5"),            // 05
+    make_tuple("0110",                                         "4'h6"),            // 06
+    make_tuple("0111",                                         "4'h7"),            // 07
+    make_tuple("1000",                                         "4'h8"),            // 08
+    make_tuple("1001",                                         "4'h9"),            // 09
+    make_tuple("1010",                                         "4'hA"),            // 10
+    make_tuple("1011",                                         "4'hB"),            // 11
+    make_tuple("1100",                                         "4'hC"),            // 12
+    make_tuple("1101",                                         "4'hD"),            // 13
+    make_tuple("1110",                                         "4'hE"),            // 14
+    make_tuple("1111",                                         "4'hF"),            // 15
+    make_tuple("0",                                            "1'h0"),            // 16
+    make_tuple("1",                                            "1'h8"),            // 17
+    make_tuple("10",                                           "2'h8"),            // 18
+    make_tuple("11",                                           "2'hC"),            // 19
+    make_tuple("100",                                          "3'h8"),            // 20
+    make_tuple("101",                                          "3'hA"),            // 21
+    make_tuple("110",                                          "3'hC"),            // 22
+    make_tuple("111",                                          "3'hE"),            // 23
+    make_tuple("1011_0",                                       "5'hB0"),           // 24
+    make_tuple("1011_1",                                       "5'hB8"),           // 25
+    make_tuple("1011_10",                                      "6'hB8"),           // 26
+    make_tuple("1011_11",                                      "6'hBC"),           // 27
+    make_tuple("1011_100",                                     "7'hB8"),           // 28
+    make_tuple("1011_101",                                     "7'hBA"),           // 29
+    make_tuple("1011_110",                                     "7'hBC"),           // 30
+    make_tuple("1011_111",                                     "7'hBE"),           // 31
+    make_tuple("1011_1000",                                    "8'hB8"),           // 32
+    make_tuple("1011_1001",                                    "8'hB9"),           // 33
+    make_tuple("1011_1010",                                    "8'hBA"),           // 34
+    make_tuple("1011_1011",                                    "8'hBB"),           // 35
+    make_tuple("1011_1100",                                    "8'hBC"),           // 36
+    make_tuple("1011_1101",                                    "8'hBD"),           // 37
+    make_tuple("1011_1110",                                    "8'hBE"),           // 38
+    make_tuple("1011_1111",                                    "8'hBF"),           // 39
+    make_tuple("1110_0000:1",                                  "9'hE08"),          // 40
+    make_tuple("1110_0000:11",                                 "10'hE0C"),         // 41
+    make_tuple("1110_0000:1100_1011:1010",                     "20'hE0CB_A"),      // 42
+    make_tuple("1110_0000:1100_1011:1010_1",                   "21'hE0CB_A8"),     // 43
+    make_tuple("1110_0000:1100_1011:1010_101",                 "23'hE0CB_AA"),     // 44
+    make_tuple("1110_0000:1100_1011:1010_1011:1010_0101",      "32'hE0CB_ABA5"),   // 45
+    make_tuple("1110_0000:1100_1011:1010_1011:1010_0101:1100", "36'hE0CB_ABA5_C"), // 46
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::DataAsICLMixString() when hexStyleThreshold parameter is 8
+//!
+void UT_BinaryVector::test_DataAsICLMixString_hexStyleThreshold_8 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits  = std::get<0>(data);
+    string      expected = std::get<1>(data);
+
+    auto sut = BinaryVector::CreateFromBinaryString(sutBits);
+
+    // ---------------- Exercise
+    //
+    auto sutAsString = sut.DataAsICLMixString(8);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sutAsString, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,                                           result
+    make_tuple("",                                            ""),                      // 00
+    make_tuple("1",                                           "1'b1"),                  // 01
+    make_tuple("10",                                          "2'b10"),                 // 02
+    make_tuple("010",                                         "3'b010"),                // 03
+    make_tuple("0101",                                        "4'b0101"),               // 04
+    make_tuple("1010_1",                                      "5'b1010_1"),             // 05
+    make_tuple("1010_11",                                     "6'b1010_11"),            // 06
+    make_tuple("1101_011",                                    "7'b1101_011"),           // 07
+    make_tuple("1101_0101",                                   "8'hD5"),                 // 08
+    make_tuple("1110_0000:1",                                 "8'hE0, 1'b1"),           // 09
+    make_tuple("1110_0000:10",                                "8'hE0, 2'b10"),          // 10
+    make_tuple("1110_0000:101",                               "8'hE0, 3'b101"),         // 11
+    make_tuple("1110_0000:1010",                              "12'hE0A"),               // 12
+    make_tuple("1110_0000:1010_1",                            "12'hE0A, 1'b1"),         // 13
+    make_tuple("1110_0000:1010_10",                           "12'hE0A, 2'b10"),        // 14
+    make_tuple("1110_0000:1100_111",                          "12'hE0C, 3'b111"),       // 15
+    make_tuple("1110_0000:1100_1011:1010",                    "20'hE0CB_A"),            // 16
+    make_tuple("1110_0000:1100_1011:1010_1",                  "20'hE0CB_A, 1'b1"),      // 17
+    make_tuple("1110_0000:1100_1011:1010_0011:0010_0001:000", "32'hE0CB_A321, 3'b000"), // 18
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::DataAsICLMixString() when hexStyleThreshold parameter is 5
+//!
+void UT_BinaryVector::test_DataAsICLMixString_hexStyleThreshold_5 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits  = std::get<0>(data);
+    string      expected = std::get<1>(data);
+
+    auto sut = BinaryVector::CreateFromBinaryString(sutBits);
+
+    // ---------------- Exercise
+    //
+    auto sutAsString = sut.DataAsICLMixString(5);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sutAsString, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,                          result
+    make_tuple("",                           ""),                 // 00
+    make_tuple("1",                          "1'b1"),             // 01
+    make_tuple("10",                         "2'b10"),            // 02
+    make_tuple("010",                        "3'b010"),           // 03
+    make_tuple("0101",                       "4'b0101"),          // 04
+    make_tuple("1010_1",                     "4'hA, 1'b1"),       // 05
+    make_tuple("1011_01",                    "4'hB, 2'b01"),      // 06
+    make_tuple("1101_011",                   "4'hD, 3'b011"),     // 07
+    make_tuple("1101_0101",                  "8'hD5"),            // 08
+    make_tuple("1110_0000:1",                "8'hE0, 1'b1"),      // 09
+    make_tuple("1110_0000:101",              "8'hE0, 3'b101"),    // 10
+    make_tuple("1110_0000:1010",             "12'hE0A"),          // 11
+    make_tuple("1110_0000:1100_1011:1010",   "20'hE0CB_A"),       // 12
+    make_tuple("1110_0000:1100_1011:1010_1", "20'hE0CB_A, 1'b1"), // 13
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::DataAsICLMixString() when hexStyleThreshold parameter is 4
+//!
+void UT_BinaryVector::test_DataAsICLMixString_hexStyleThreshold_4 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits  = std::get<0>(data);
+    string      expected = std::get<1>(data);
+
+    auto sut = BinaryVector::CreateFromBinaryString(sutBits);
+
+    // ---------------- Exercise
+    //
+    auto sutAsString = sut.DataAsICLMixString(4);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sutAsString, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,                          result
+    make_tuple("",                   ""),                // 00
+    make_tuple("1",                  "1'b1"),            // 01
+    make_tuple("10",                 "2'b10"),           // 02
+    make_tuple("010",                "3'b010"),          // 03
+    make_tuple("0101",               "4'h5"),            // 04
+    make_tuple("1010_1",             "4'hA, 1'b1"),      // 05
+    make_tuple("1101_011",           "4'hD, 3'b011"),    // 06
+    make_tuple("1101_0101",          "8'hD5"),           // 07
+    make_tuple("1110_0000:1",        "8'hE0, 1'b1"),     // 08
+    make_tuple("1110_0000:101",      "8'hE0, 3'b101"),   // 09
+    make_tuple("1110_0000:1010",     "12'hE0A"),         // 10
+    make_tuple("1110_0000:1010_1",   "12'hE0A, 1'b1"),   // 11
+    make_tuple("1110_0000:1100_111", "12'hE0C, 3'b111"), // 12
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+
 
 //! Checks BinaryVector::CompareEqualTo with empty mask when they are equal
 //!

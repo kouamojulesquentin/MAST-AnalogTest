@@ -1312,10 +1312,10 @@ string BinaryVector::DataAsMixString (uint32_t    hexStyleThreshold,
 
   if (m_usedBits < hexStyleThreshold)
   {
-    return DataAsBinaryString(quadSeparator, octaSeparator, bytesPerLine, eolSeparator, true);
+    return DataAsBinaryString(quadSeparator, octaSeparator, bytesPerLine, eolSeparator, PREFIX_WITH_BASE_ID);
   }
 
-  auto smartString       = DataAsHexString(quadSeparator, octaSeparator, bytesPerLine, eolSeparator, true);
+  auto smartString       = DataAsHexString(quadSeparator, octaSeparator, bytesPerLine, eolSeparator, PREFIX_WITH_BASE_ID);
   auto lastByteBitsCount = m_usedBits % 8;
   auto lastQuadBitsCount = m_usedBits % 4;
 
@@ -1335,6 +1335,99 @@ string BinaryVector::DataAsMixString (uint32_t    hexStyleThreshold,
 //  End of: BinaryVector::DataAsMixString
 //---------------------------------------------------------------------------
 
+
+//! Gets content formatted as ICL binary string - AS SAVED INTERNALLY - (bits are appended from left to right)
+//!
+//! @note An example of formatting is: 23'b0001_1111:0011_0100:0101_010
+//!
+string BinaryVector::DataAsICLBinaryString () const
+{
+  ostringstream os;
+  os << m_usedBits << "'b" << DataAsBinaryString("_", "_", 0, "", !PREFIX_WITH_BASE_ID);
+  return os.str();
+}
+//
+//  End of: BinaryVector::DataAsICLBinaryString
+//---------------------------------------------------------------------------
+
+
+
+//! Gets content formatted as ICL hexadecimal string - AS SAVED INTERNALLY - (bits are appended from left to right)
+//!
+//! @note An example of formatting is: 22'hface_dead_beef_0123_cafe_4 (where last '4' may mean '0b0100' or '0b010' or '0b01')
+//! @note FOR PRECISE DISPLAY OF LAST BITS, please use DataAsMixString (or DataAsBinaryString)
+//!
+string BinaryVector::DataAsICLHexString () const
+{
+  ostringstream os;
+  os << m_usedBits << "'h" << DataAsHexString("_", "_", 0, "", !PREFIX_WITH_BASE_ID);
+  return os.str();
+}
+//
+//  End of: BinaryVector::DataAsICLHexString
+//---------------------------------------------------------------------------
+
+
+
+//! Gets content formatted as ICL as hexadecimal or/and binary string
+//!
+//!
+//! @note An example of formatting is: 0xFACE_DEAD:BEEF_0123:CAFE_/b01
+//!
+//! @param hexStyleThreshold  The number of bits that makes the result starting as hex string (preference is to be >= 8)
+//!
+string BinaryVector::DataAsICLMixString (uint32_t hexStyleThreshold) const
+{
+  if (m_usedBits == 0)
+  {
+    return "";
+  }
+
+  hexStyleThreshold = std::max(hexStyleThreshold, 4u);  // Must ensure that reported value is not misleading (last nibble incomplete but reported in hexadecimal)
+  if (m_usedBits < hexStyleThreshold)
+  {
+    return DataAsICLBinaryString();
+  }
+
+  // ---------------- Deal with plain nibbles
+  //
+  auto plainNibblesCount = m_usedBits / 4u;
+  auto lastQuadBitsCount = m_usedBits % 4;
+  auto lastByteBitsCount = m_usedBits % 8;
+
+  ostringstream os;
+  os << plainNibblesCount * 4u << "'h" << DataAsHexString("_", "_", 0, "", !PREFIX_WITH_BASE_ID);
+
+  auto smartString = os.str();
+
+  if (lastQuadBitsCount != 0)
+  {
+    smartString.pop_back();
+  }
+
+  if (smartString.back() == '_')
+  {
+    smartString.pop_back();
+  }
+
+  // ---------------- Deals with remaining bits
+  //
+  if (lastQuadBitsCount != 0)
+  {
+    // ---------------- Replace last digit with its binary equivalent
+    //
+    auto shiftCount = (lastByteBitsCount < 4) ? 8u - lastQuadBitsCount    // For cases last bits are on msb
+                                              : 4u - lastQuadBitsCount;   // For cases last bits are on lsb
+    auto byte       = (m_data.back() >> shiftCount) & 0x0F;
+    auto lastBits   = BINARY_NIBBLES[byte].substr(4u - lastQuadBitsCount, lastQuadBitsCount);
+
+    smartString.append(", ").append(to_string(lastQuadBitsCount)).append("'b").append(string(lastBits));
+  }
+  return smartString;
+}
+//
+//  End of: BinaryVector::DataAsICLHexString
+//---------------------------------------------------------------------------
 
 //! Returns data right aligned in a new buffer
 //!

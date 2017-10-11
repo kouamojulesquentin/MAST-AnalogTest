@@ -17,6 +17,7 @@
 #include <array>
 #include <algorithm>
 #include <cstring>
+#include <tuple>
 
 
 using std::array;
@@ -26,6 +27,7 @@ using std::ostringstream;
 using std::string;
 using std::to_string;
 using std::experimental::string_view;
+using std::make_tuple;
 
 using namespace std::string_literals;
 using namespace mast;
@@ -928,6 +930,7 @@ BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty size
     Undefined,   //!< Format is not defined
     Binary,      //!< Format is recognized as binary
     Hexadecimal, //!< Format is recognized hexadecimal
+    Decimal,     //!< Format is recognized decimal
   };
 
   // ---------------- Skip leading blank spaces
@@ -948,7 +951,8 @@ BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty size
 
   // ---------------- Skip leading blank chars
   //
-  auto bitId  = size_t(0);
+  size_t bitId = 0;
+
   while (   (bitId < bits.length())
          && (   (bits[bitId] == '\n')
              || (bits[bitId] == '\t')
@@ -958,85 +962,127 @@ BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty size
   {
     ++bitId;
   }
+  bits.remove_prefix(bitId);
+  bitId = 0;
 
-  auto format = StringFormat::Undefined;
-  auto firstCharOk = (bits[bitId] == '0') || (bits[bitId] == '/') || (bits[bitId] == '\\');
-  ++bitId;
-  if      (firstCharOk && ((bits[bitId] == 'x') || (bits[bitId] == 'X')))
+  // Lamba: Define used base from leading char
+  auto formatFromBaseChar = [&bits](size_t bitId)
   {
-    format = StringFormat::Hexadecimal;
-  }
-  else if (firstCharOk && ((bits[bitId] == 'b') || (bits[bitId] == 'B')))
+    auto baseChar = bits[bitId];
+    if (Utility::Contains("bB", baseChar))
+    {
+      return StringFormat::Binary;
+    }
+
+    if (Utility::Contains("xXhH", baseChar))
+    {
+      return StringFormat::Hexadecimal;
+    }
+
+    if (Utility::Contains("dD", baseChar))
+    {
+      return StringFormat::Decimal;
+    }
+
+    return StringFormat::Undefined;
+  };
+
+  auto firstChunk = true;
+
+  // Lamba: Extract base from leading sequence of characters (can be embedded in a large liste of sequence)
+  auto extractFormat = [&bits, &bitId, &firstChunk, &formatFromBaseChar]()
   {
-    format = StringFormat::Binary;
-  }
+    auto firstChar   = bits[bitId];
+    auto isStdPrefix = firstChunk ? Utility::Contains("0/\\", firstChar)
+                                  : Utility::Contains("/\\",  firstChar);
+    firstChunk = false;
+
+    if (isStdPrefix)
+    {
+      ++bitId;
+      return formatFromBaseChar(bitId);
+    }
+    else  // ICL syntax?
+    {
+      if (Utility::Contains("123456789", bits[bitId]))  // length prefix
+      {
+        while (Utility::Contains("0123456789", bits[bitId]))
+        {
+          ++bitId;
+        }
+      }
+
+      auto nextChar = bits[bitId];
+      if (nextChar == '\'')
+      {
+        ++bitId;
+        return formatFromBaseChar(bitId);
+      }
+    }
+    return StringFormat::Undefined;
+  };
 
   // ---------------- Defines how to get next, largest, chunk of current format
   //
-  auto getNextChunk = [&bits, &format]()
+  // Lamba:
+  auto getNextChunk = [&bits, &bitId, &extractFormat]()
   {
+    Utility::TrimLeft(bits);
+    auto format = extractFormat();
+    if (format == StringFormat::Undefined)
+    {
+      THROW_INVALID_ARGUMENT("Cannot tell whether value is in decimal, hexadecimal or binary");
+    }
+
+    bits.remove_prefix(bitId + 1u);  // Remove sequence that tells base encoding of next sequence value
+    bitId = 0;
+
     // ---------------- Find format change
     //
-    auto foundFormatChange = false;
-    auto offset            = string_view::size_type(0u);
-
-    do
+    auto offset = bits.find_first_of("/,\\'", 0u);
+    if (   (offset == string_view::npos)  // Not found
+        || (offset == bits.length())      // Found at end of string ==> can be ignored
+       )
     {
-      offset = bits.find_first_of("/\\", offset);
-      if (   (offset == string_view::npos)  // Not found
-          || (offset == bits.length())      // Found at end of string ==> can be ignored
-         )
-      {
-        break;
-      }
-
-      auto nextChar     = bits[offset + 1];
-      foundFormatChange = (format == StringFormat::Binary) ? (nextChar == 'x') || (nextChar == 'X')
-                                                           : (nextChar == 'b') || (nextChar == 'B');
-      if (!foundFormatChange)
-      {
-        ++offset;
-      }
-    } while (!foundFormatChange);
-
-
-    auto chunk = bits;
-
-    if (!foundFormatChange)
-    {
-      bits.remove_prefix(bits.length());  // Clear remaining (this was the last chunk)
-    }
-    else
-    {
-      chunk = bits.substr(0, offset);
-      bits.remove_prefix(offset + 2u);
+      auto chunk = bits;  // All remaining is supposed to be of single base encoding
+      bits.clear();       // Nothing to process after this chunk
+      return make_tuple(format, chunk);
     }
 
-    return chunk;
+    auto chunk = bits.substr(0, offset);
+    bits.remove_prefix(offset);
+    if (bits.front() == ',')
+    {
+      bits.remove_prefix(1);
+      Utility::TrimLeft(bits);
+    }
+
+    return make_tuple(format, chunk);
   };
 
-  if (format == StringFormat::Undefined)
-  {
-    THROW_INVALID_ARGUMENT("Cannot tell if bits start as binary or hexadecimal");
-  }
-
+  // ---------------- Core job starts here
+  //
   BinaryVector result;
   BinaryVector chunkVector;
 
-  bits.remove_prefix(bitId + 1);  // Remove leading blank chars and one of: '0x', '/x', '\x', '0b', '/b' and '\b'
   while (!bits.empty())
   {
-    auto bitsChunk = getNextChunk();
+    string_view  bitsChunk;
+    StringFormat format;
+
+    std::tie(format, bitsChunk) = getNextChunk();
 
     if (format == StringFormat::Binary)
     {
       chunkVector = BinaryVector::CreateFromBinaryString(bitsChunk, SizeProperty::NotFixed, dontCare);
-      format      = StringFormat::Hexadecimal;
     }
-    else
+    else if (format == StringFormat::Hexadecimal)
     {
       chunkVector = BinaryVector::CreateFromHexString(bitsChunk, SizeProperty::NotFixed, dontCare);
-      format      = StringFormat::Binary;
+    }
+    else if (format == StringFormat::Decimal)
+    {
+      THROW_INVALID_ARGUMENT("Decimal numbers are not yet supported!");
     }
     result.Append(chunkVector);
   }

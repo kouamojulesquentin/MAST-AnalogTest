@@ -59,6 +59,10 @@ class UT_Utility : public CxxTest::TestSuite
   //
   void test_EndsWith ();
 
+  // ---------------- Contains
+  //
+  void test_Contains ();
+
   // ---------------- SingleQuote
   //
   void test_SingleQuote ();

@@ -75,6 +75,10 @@ class MAST_CORE_EXPORT Utility final
   //!
   static bool StartsWith (std::experimental::string_view text, std::experimental::string_view substring);
 
+  //! Returns whether some text constains some character
+  //!
+  static bool Contains (std::experimental::string_view text, char aChar) { return text.find(aChar) != std::experimental::string_view::npos; }
+
   //! Trims both leading and trailing space characters (including \\t)
   //!
   static void TrimBoth(std::experimental::string_view& text) { TrimLeft(text); TrimRight(text); }

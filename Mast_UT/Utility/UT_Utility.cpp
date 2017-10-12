@@ -666,6 +666,125 @@ void UT_Utility::test_Contains ()
 }
 
 
+//! Checks Utility::ToUInt32() when must succeed
+//!
+void UT_Utility::test_ToUInt32_Success ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto text                   = std::get<0>(data);
+    auto expectedValue          = std::get<1>(data);
+    auto expectedProcessedCount = std::get<2>(data);
+
+    uint32_t gotValue       = 0;
+    size_t   processedCount = 0;
+
+    CxxTest::setAbortTestOnFail(true);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (std::tie(gotValue, processedCount) = Utility::ToUInt32(text));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (gotValue,       expectedValue);
+    TS_ASSERT_EQUALS (processedCount, expectedProcessedCount);
+  };
+
+  using data_t = tuple<string_view, uint32_t, size_t>;
+  auto data =
+  {   // text, expected value, expected processed count
+    data_t("0",          0,          1),  // 00
+    data_t("1",          1,          1),  // 01
+    data_t("2",          2,          1),  // 02
+    data_t("3",          3,          1),  // 03
+    data_t("4",          4,          1),  // 04
+    data_t("5",          5,          1),  // 05
+    data_t("6",          6,          1),  // 06
+    data_t("7",          7,          1),  // 07
+    data_t("8",          8,          1),  // 08
+    data_t("9",          9,          1),  // 09
+    data_t("10",         10,         2),  // 10
+    data_t("21",         21,         2),  // 11
+    data_t("4294967295", 4294967295, 10), // 12
+    data_t("000",        0,          3),  // 13
+    data_t(" 0",         0,          2),  // 14
+    data_t("  10",       10,         4),  // 15
+    data_t(" 21",        21,         3),  // 16
+    data_t(" 89, Hello", 89,         3),  // 17
+    data_t("+13",        13,         3),  // 18
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+
+
+//! Checks Utility::ToUInt32() when giving text representing out of range value
+//!
+void UT_Utility::test_ToUInt32_Failure_OutOfRange ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto text)
+  {
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (Utility::ToUInt32(text), std::out_of_range);
+  };
+
+  auto data =
+  {
+    "4294967296",  // 00
+    "42949672950", // 01
+    "10000000000", // 02
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Utility::ToUInt32() when giving invalid text to parse
+//!
+void UT_Utility::test_ToUInt32_Failure_Invalid ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto text)
+  {
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (Utility::ToUInt32(text), std::invalid_argument);
+  };
+
+  auto data =
+  {
+    "",    // 00
+    "  ",  // 01
+    "?",   // 02
+    " ? ", // 03
+    "+",   // 04
+    "-",   // 05
+    "-12", // 06
+    "a12", // 07
+    "d2",  // 08
+    "'d3", // 09
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
 
 //! Checks Utility::SingleQuote()
 //!

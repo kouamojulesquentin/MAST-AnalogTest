@@ -19,9 +19,12 @@
 #include <fstream>
 #include <array>
 #include <vector>
+#include <cctype>
 
 using std::string;
 using std::experimental::string_view;
+using std::tuple;
+using std::make_tuple;
 using std::vector;
 using std::ifstream;
 using std::ofstream;
@@ -507,6 +510,81 @@ std::chrono::milliseconds Utility::ToMilliseconds(string_view durationStr)
 }
 //
 //  End of Utility::ToMilliseconds
+//---------------------------------------------------------------------------
+
+
+
+//! Parses the beginning of a text as an unsigned integer value
+//!
+//! @param text Text to parse (using ASCII encoding)
+//!
+//! @exception std::invalid_argument if no conversion could be performed
+//! @exception std::out_of_range if the converted value would fall out of the range of the result type
+//!
+//! @return Parsed value and number of processed characters
+tuple<uint32_t, size_t> Utility::ToUInt32 (string_view text)
+{
+  auto curText = text;
+  TrimLeft(curText);
+
+  CHECK_PARAMETER_NOT_EMPTY(curText, "Invalid empty text");
+
+  // ---------------- Ignore 1st '+'
+  //
+  if (curText.front() == '+')
+  {
+    curText.remove_prefix(1);
+  }
+  auto processedCharacters = text.length() - curText.length();
+  bool parsedDigits        = false;
+
+  // ---------------- Skip leading zeros
+  //
+  while (curText.front() == '0')
+  {
+    parsedDigits = true;
+    curText.remove_prefix(1);
+    ++processedCharacters;
+  }
+
+  uint32_t value = 0;
+  auto     cur   = curText.cbegin();
+  auto     end   = curText.cend();
+
+  while (cur != end)
+  {
+    auto curChar = *cur;
+    if (!std::isdigit(static_cast<unsigned char>(curChar)))
+    {
+      break;
+    }
+
+    if (value > (UINT32_MAX / 10u))
+    {
+      THROW_OUT_OF_RANGE("Parsed value is out of uint32_t range");
+    }
+
+    auto digit = static_cast<uint32_t>(curChar - '0');
+    value *= 10;
+
+    if ((value + digit) < value)
+    {
+      THROW_OUT_OF_RANGE("Parsed value is out of uint32_t range");
+    }
+    value += digit;
+
+    ++cur;
+  }
+
+  size_t parsedCount = cur - curText.cbegin();
+
+  CHECK_PARAMETER_TRUE(parsedDigits || (parsedCount != 0), "Found nothing to parse as an uint32_t");
+
+  processedCharacters += parsedCount;
+  return make_tuple(value, processedCharacters);
+}
+//
+//  End of: Utility::ToUInt32
 //---------------------------------------------------------------------------
 
 

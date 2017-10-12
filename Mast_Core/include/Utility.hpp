@@ -20,6 +20,7 @@
 #include <vector>
 #include <string>
 #include <experimental/string_view>
+#include <tuple>
 #include <type_traits>    // For enum item manipulation
 #include <chrono>
 
@@ -74,6 +75,10 @@ class MAST_CORE_EXPORT Utility final
   //! Returns whether some text start with some sub-string
   //!
   static bool StartsWith (std::experimental::string_view text, std::experimental::string_view substring);
+
+  //! Parses the beginning of a text as an unsigned integer value
+  //!
+  static std::tuple<uint32_t, size_t> ToUInt32 (std::experimental::string_view text);
 
   //! Returns whether some text constains some character
   //!

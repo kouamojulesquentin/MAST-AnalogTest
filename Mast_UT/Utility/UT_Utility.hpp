@@ -63,6 +63,12 @@ class UT_Utility : public CxxTest::TestSuite
   //
   void test_Contains ();
 
+  // ---------------- ToUInt32
+  //
+  void test_ToUInt32_Success ();
+  void test_ToUInt32_Failure_OutOfRange ();
+  void test_ToUInt32_Failure_Invalid ();
+
   // ---------------- SingleQuote
   //
   void test_SingleQuote ();

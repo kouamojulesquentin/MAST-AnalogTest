@@ -661,25 +661,35 @@ void UT_BinaryVector::test_CreateFromString ()
     make_tuple("0x0123\n4567",        "0000_0001:0010_0011:0100_0101:0110_0111"), // 19
     make_tuple("0x01234567\n",        "0000_0001:0010_0011:0100_0101:0110_0111"), // 20
     // ICL syntax
-    make_tuple("'b01",         "01"),                                      // 21
-    make_tuple("'h01",         "0000_0001"),                               // 22
-    make_tuple("1'b1",         "1"),                                       // 23
-    make_tuple("2'b01",        "01"),                                      // 24
-    make_tuple("8'hA5",        "1010_0101"),                               // 25
-    make_tuple("'h01234567",   "0000_0001:0010_0011:0100_0101:0110_0111"), // 26
-    make_tuple("'h89AbcDeF",   "1000_1001:1010_1011:1100_1101:1110_1111"), // 27
-    make_tuple("5'b 10101",    "1010_1"),                                  // 28
-    make_tuple("'h 89A",       "1000_1001:1010"),                          // 29
-    make_tuple("'hab, 'b01",   "1010_1011:01"),                            // 30
-    make_tuple("'b01, 'h01",   "01:0000_0001"),                            // 31
-    make_tuple("'hBAD, 'b101", "1011_1010_1101:101"),                      // 32
-//+    make_tuple("8'h0",         "0000_0000"),                               // 33
-//+    make_tuple("9'b0",         "0000_0000_0"),                             // 34
+    make_tuple("'b01",                "01"),                                      // 21
+    make_tuple("'h01",                "0000_0001"),                               // 22
+    make_tuple("1'b1",                "1"),                                       // 23
+    make_tuple("2'b01",               "01"),                                      // 24
+    make_tuple("8'hA5",               "1010_0101"),                               // 25
+    make_tuple("'h01234567",          "0000_0001:0010_0011:0100_0101:0110_0111"), // 26
+    make_tuple("'h89AbcDeF",          "1000_1001:1010_1011:1100_1101:1110_1111"), // 27
+    make_tuple("5'b 10101",           "1010_1"),                                  // 28
+    make_tuple("'h 89A",              "1000_1001:1010"),                          // 29
+    make_tuple("'hab, 'b01",          "1010_1011:01"),                            // 30
+    make_tuple("'b01, 'h01",          "01:0000_0001"),                            // 31
+    make_tuple("'hBAD, 'b101",        "1011_1010_1101:101"),                      // 32
+    make_tuple("~4'b1000",            "0111"),                                    // 33 ==> means 4'b0111
+    make_tuple("~8'hAB",              "0101_0100"),                               // 34 ==> means 8'h55
+    make_tuple("5'h1A",               "1_1010"),                                  // 35 ==> keep only 5 LSB
+    make_tuple("6'h1",                "00_0001"),                                 // 36
+    make_tuple("6'hA",                "11_1010"),                                 // 37
+    make_tuple("7'b1",                "111_1111"),                                // 38
+    make_tuple("8'h0",                "0000_0000"),                               // 39
+    make_tuple("9'b0",                "0000_0000_0"),                             // 40
+    make_tuple("~4'b0",               "1111"),                                    // 42
+    make_tuple("1'b0, ~4'b0,  5'h1a", "0_1111_1_1010"),                           // 44 ==> means 01_1111_1010
   };
 
   // ---------------- DDT Exercise
   //
   TS_DATA_DRIVEN_TEST (checker, data);
+
+//+  TS_WARN ("Not tested cases: Decimal numbers (with or without base prefix)");
 }
 
 

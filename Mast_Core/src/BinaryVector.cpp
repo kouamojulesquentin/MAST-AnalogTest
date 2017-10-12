@@ -28,6 +28,7 @@ using std::string;
 using std::to_string;
 using std::experimental::string_view;
 using std::make_tuple;
+using std::tie;
 
 using namespace std::string_literals;
 using namespace mast;
@@ -905,16 +906,29 @@ BinaryVector BinaryVector::CreateFromHexString (string_view bits, SizeProperty s
 
 //! Creates a BinaryVector from mix of hexadecimal and binary representation
 //!
-//! @note Firstly intended for test purposes, but can be used for anything else
+//! @note Support both SIT and ICL formats
+//!       For ICL see IEEE P1687/D1.71 §6.3.11 "Inversion and concatenation"
+//! @note When using ICL format:
+//!       - Sized numbers may be concatenated with other sized numbers, and at most one unsized number
+//!         can be included with a group of sized numbers.
+//!         Since the size of all targets is known, the "size" of an unsized number in this situation is
+//!         inferred to be the difference between the target size and the sum of the sized numbers’
+//!         widths and is required to be equal to or greater than the number of bits required for the
+//!         unsized number.
+//!       - When a value is preceded by a tilde (~), each bit in the binary representation of the value
+//!         of that identifier is complemented.
+//!
+//! @note DO NO SUPPORT DECIMAL REPRESENTATION YET!!!
 //!
 //! @param bits         Sequence of characters representing content of BinaryVector to create
 //!                     Characters in \",':_- \t/\" are ignored (can be used to ease display of string)
 //!                     An exception is thrown if there is any character different from
 //!                     set \"0123456789abcdefABCDEF,':_- \t/\"
 //!                     '0x' is ignored at start of string. An exception is thrown everywhere else
-//!                     '/x', '/X', '\\x', '\\X' constructions are interpreted as: What follow is hexadecimal
-//!                     '/b', '/B', '\\b', '\\B' constructions are interpreted as: What follow is binary
-//! @param sizeProperty Size property
+//!                     '/x', '/X', '\\x', '\\X' ''h', ''H' constructions are interpreted as: What follow is hexadecimal
+//!                     '/b', '/B', '\\b', '\\B' ''b', ''B' constructions are interpreted as: What follow is binary
+//!
+//! @param sizeProperty Size property tell whether the size can change after construction and if this property is copied to destination
 //! @param dontCare     Tells how to handle "dont't care" special characters 'x' and 'X'
 //!
 //! @return A new BinaryVector initialized as defined by bits text
@@ -933,6 +947,20 @@ BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty size
     Decimal,     //!< Format is recognized decimal
   };
 
+  struct EncodingInfo
+  {
+    StringFormat format    = StringFormat::Undefined;
+    bool         inverted  = false;
+    uint32_t     bitsCount = 0; //!< Value 0 means unspecified
+
+    EncodingInfo(StringFormat p_format = StringFormat::Undefined, bool p_inverted = false, uint32_t p_bitsCount = 0)
+      : format    (p_format)
+      , inverted  (p_inverted)
+      , bitsCount (p_bitsCount)
+    {
+    }
+  };
+
   // ---------------- Skip leading blank spaces
   //
   Utility::TrimLeft(bits);
@@ -949,21 +977,6 @@ BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty size
     THROW_INVALID_ARGUMENT("Cannot interpret one, non space, character");
   }
 
-  // ---------------- Skip leading blank chars
-  //
-  size_t bitId = 0;
-
-  while (   (bitId < bits.length())
-         && (   (bits[bitId] == '\n')
-             || (bits[bitId] == '\t')
-             || (bits[bitId] == ' ')
-            )
-        )
-  {
-    ++bitId;
-  }
-  bits.remove_prefix(bitId);
-  bitId = 0;
 
   // Lamba: Define used base from leading char
   auto formatFromBaseChar = [&bits](size_t bitId)
@@ -987,10 +1000,11 @@ BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty size
     return StringFormat::Undefined;
   };
 
-  auto firstChunk = true;
+  size_t bitId      = 0;
+  auto   firstChunk = true;
 
-  // Lamba: Extract base from leading sequence of characters (can be embedded in a large liste of sequence)
-  auto extractFormat = [&bits, &bitId, &firstChunk, &formatFromBaseChar]()
+  // Lamba: Extract base, optional bits inversion and bits count from leading sequence of characters (can be embedded in a large list of sequences)
+  auto extractEncodingInfo = [&bits, &bitId, &firstChunk, &formatFromBaseChar]()
   {
     auto firstChar   = bits[bitId];
     auto isStdPrefix = firstChunk ? Utility::Contains("0/\\", firstChar)
@@ -1000,36 +1014,49 @@ BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty size
     if (isStdPrefix)
     {
       ++bitId;
-      return formatFromBaseChar(bitId);
+      return EncodingInfo{formatFromBaseChar(bitId)};
     }
-    else  // ICL syntax?
-    {
-      if (Utility::Contains("123456789", bits[bitId]))  // length prefix
-      {
-        while (Utility::Contains("0123456789", bits[bitId]))
-        {
-          ++bitId;
-        }
-      }
 
-      auto nextChar = bits[bitId];
-      if (nextChar == '\'')
+    // ICL syntax?
+    EncodingInfo encodingInfo;
+
+    if (firstChar == '~')
+    {
+      ++bitId;
+      encodingInfo.inverted = true;
+    }
+
+    if (Utility::Contains("123456789", bits[bitId]))  // length prefix
+    {
+      auto firstBitId = bitId;
+      while (Utility::Contains("0123456789", bits[bitId]))
       {
         ++bitId;
-        return formatFromBaseChar(bitId);
       }
+      auto span = bits.substr(firstBitId, bitId - firstBitId);
+      size_t processedCount = 0;
+      tie(encodingInfo.bitsCount, processedCount) = Utility::ToUInt32(span);
     }
-    return StringFormat::Undefined;
+
+    auto nextChar = bits[bitId];
+    if (nextChar == '\'')
+    {
+      ++bitId;
+      encodingInfo.format = formatFromBaseChar(bitId);
+    }
+    return encodingInfo;
   };
 
   // ---------------- Defines how to get next, largest, chunk of current format
   //
   // Lamba:
-  auto getNextChunk = [&bits, &bitId, &extractFormat]()
+  auto getNextChunk = [&bits, &bitId, &extractEncodingInfo]()
   {
     Utility::TrimLeft(bits);
-    auto format = extractFormat();
-    if (format == StringFormat::Undefined)
+
+    auto encodingInfo = extractEncodingInfo();
+
+    if (encodingInfo.format == StringFormat::Undefined)
     {
       THROW_INVALID_ARGUMENT("Cannot tell whether value is in decimal, hexadecimal or binary");
     }
@@ -1046,7 +1073,7 @@ BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty size
     {
       auto chunk = bits;  // All remaining is supposed to be of single base encoding
       bits.clear();       // Nothing to process after this chunk
-      return make_tuple(format, chunk);
+      return make_tuple(encodingInfo, chunk);
     }
 
     auto chunk = bits.substr(0, offset);
@@ -1057,32 +1084,70 @@ BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty size
       Utility::TrimLeft(bits);
     }
 
-    return make_tuple(format, chunk);
+    return make_tuple(encodingInfo, chunk);
   };
 
   // ---------------- Core job starts here
   //
+
+  // Skip leading blank chars
+  //
+  while (   (bitId < bits.length())
+         && (   (bits[bitId] == '\n')
+             || (bits[bitId] == '\t')
+             || (bits[bitId] == ' ')
+            )
+        )
+  {
+    ++bitId;
+  }
+  bits.remove_prefix(bitId);
+  bitId = 0;
+
   BinaryVector result;
   BinaryVector chunkVector;
 
   while (!bits.empty())
   {
     string_view  bitsChunk;
-    StringFormat format;
+    EncodingInfo encodingInfo;
 
-    std::tie(format, bitsChunk) = getNextChunk();
+    std::tie(encodingInfo, bitsChunk) = getNextChunk();
+    auto bitsCount   = encodingInfo.bitsCount;
+    auto hasSizeInfo = bitsCount != 0;
 
-    if (format == StringFormat::Binary)
+    if      (encodingInfo.format == StringFormat::Binary)
     {
       chunkVector = BinaryVector::CreateFromBinaryString(bitsChunk, SizeProperty::NotFixed, dontCare);
     }
-    else if (format == StringFormat::Hexadecimal)
+    else if (encodingInfo.format == StringFormat::Hexadecimal)
     {
       chunkVector = BinaryVector::CreateFromHexString(bitsChunk, SizeProperty::NotFixed, dontCare);
     }
-    else if (format == StringFormat::Decimal)
+    else if (encodingInfo.format == StringFormat::Decimal)
     {
       THROW_INVALID_ARGUMENT("Decimal numbers are not yet supported!");
+    }
+
+    auto chunkBitsCount = chunkVector.BitsCount();
+
+    if (hasSizeInfo && (bitsCount != chunkBitsCount))
+    {
+      if (bitsCount < chunkBitsCount)
+      {
+        chunkVector = chunkVector.Slice(chunkBitsCount - bitsCount, bitsCount); // Truncation
+      }
+      else
+      {
+        auto isNegative = chunkVector.IsNegative();
+        auto appendOnes = encodingInfo.inverted ? !isNegative : isNegative;
+        result.AppendBits(appendOnes, bitsCount - chunkBitsCount);
+      }
+    }
+
+    if ( encodingInfo.inverted)
+    {
+      chunkVector.ToggleBits();
     }
     result.Append(chunkVector);
   }

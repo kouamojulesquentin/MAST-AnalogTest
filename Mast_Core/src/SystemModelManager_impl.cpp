@@ -226,21 +226,7 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
 
           BinaryVector fromSutVector;
           
-          auto protocol_is_raw = std::dynamic_pointer_cast<AccessInterfaceRawProtocol>(protocol);
-
-          if (protocol_is_raw == nullptr) // Standard case ==> use built-in Callbacks
-          {
             fromSutVector = protocol->DoCallback(endpointId, nextEndPoint->ApplicationData(), toSutVector);
-          }
-          else
-          {
-            auto CallbackId = protocol->CallbackId(endpointId);
-
-            // dummy callback to prevent breakdown while developing
-            // Here we should have something like :
-            // fromSutVector = xxxx->DoTranslationCallback(CallbackId, nextEndPoint->ApplicationData(), toSutVector);
-            fromSutVector = protocol->DoCallback(endpointId, nextEndPoint->ApplicationData(), toSutVector);
-          }
 
           m_fromSutUpdater.UpdateRegisters(activeRegs, fromSutVector);
           ReportServedRegisters(activeRegs);
@@ -1151,6 +1137,61 @@ void SystemModelManager_impl::WakeupDataCycles ()
 //---------------------------------------------------------------------------
 
 
+void SystemModelManager_impl::MultithreadlDataCycle (AccessInterface* currentAccessInterface)
+{
+  CHECK_PARAMETER_NOT_NULL(currentAccessInterface, "Houps can only operate on valid AccessInterface");
+
+    auto protocol = currentAccessInterface->Protocol();
+
+    CHECK_VALUE_NOT_NULL(protocol, "All AccessInterface must be associated with a valid protocol");
+
+ auto protocol_is_raw = std::dynamic_pointer_cast<AccessInterfaceRawProtocol>(protocol);
+
+  CHECK_VALUE_NOT_NULL(protocol_is_raw, "Multithreaded execution is reserved to raw protocols");
+
+  if (currentAccessInterface->IsPending())
+  {
+
+    uint32_t endpointId = 1u;
+    auto nextEndPoint = currentAccessInterface->FirstChild();
+
+    while (nextEndPoint)
+    {
+      if (nextEndPoint->IsPending())
+      {
+        ToSutVisitor local_toSutVisitor;
+
+        nextEndPoint->Accept(local_toSutVisitor);
+
+        const auto& toSutVector = local_toSutVisitor.ToSutVector();
+
+        if (!toSutVector.IsEmpty()) // This can be empty when actual SUT state prevent from serving pending Registers
+        {
+          const auto& activeRegs = local_toSutVisitor.ActiveRegistersIdentifiers();
+
+          BinaryVector fromSutVector;
+
+            auto CallbackId = protocol->CallbackId(endpointId);
+
+            // dummy callback to prevent breakdown while developing
+            // Here we should have something like :
+            // fromSutVector = xxxx->DoTranslationCallback(CallbackId, nextEndPoint->ApplicationData(), toSutVector);
+            fromSutVector = protocol->DoCallback(endpointId, nextEndPoint->ApplicationData(), toSutVector);
+
+
+          m_fromSutUpdater.UpdateRegisters(activeRegs, fromSutVector);
+          ReportServedRegisters(activeRegs);
+          ReleaseServedThreads();
+        }
+      }
+      nextEndPoint = nextEndPoint->NextSibling();
+      ++endpointId;
+    }
+  }
+}
+//
+//  End of:MultithreaDataCycle
+//---------------------------------------------------------------------------
 
 
 

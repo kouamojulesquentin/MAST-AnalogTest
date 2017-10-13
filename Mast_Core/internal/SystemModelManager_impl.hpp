@@ -316,6 +316,9 @@ class SystemModelManager_impl final
   void ReportServedRegisters (const std::vector<NodeIdentifier>& activeRegisters);
   void WakeupDataCycles ();
 
+  //! Multithread implementation used for RAW protocols
+  //!
+  void MultithreadlDataCycle (AccessInterface*  currentAccessInterface);
 
 
   // ---------------- Private  Fields

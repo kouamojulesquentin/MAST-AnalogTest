@@ -14,6 +14,8 @@
 #include "DataCycleVisitor.hpp"
 #include "SystemModelNodes.hpp"
 #include "SystemModelManager_impl.hpp"
+#include "AccessInterfaceRawProtocol.hpp"
+#include "Utility.hpp"
 
 using namespace mast;
 
@@ -28,9 +30,17 @@ void DataCycleVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 {
   VisitChildren(accessInterface);
 
+    auto protocol = accessInterface.Protocol();
+
+    CHECK_VALUE_NOT_NULL(protocol, "All AccessInterface must be associated with a valid protocol");
+
+ auto protocol_is_raw =  std::dynamic_pointer_cast<AccessInterfaceRawProtocol>(protocol);
+
   if (accessInterface.IsPending())
   {
-    m_manager->DoHierarchicalDataCycle(&accessInterface);
+   if (!protocol_is_raw)
+     m_manager->DoHierarchicalDataCycle(&accessInterface);
+   /*Here, notificaton to Raw protocol blocked on the queue*/  
   }
 }
 //

@@ -13,6 +13,7 @@
 
 #include "BinaryVector.hpp"
 #include "Utility.hpp"
+#include "g3log/g3log.hpp"
 #include <sstream>
 #include <array>
 #include <algorithm>
@@ -41,6 +42,23 @@ using namespace mast;
 
 namespace
 {
+  //! Reports how a value is encoded within a string
+  //!
+  struct EncodingInfo
+  {
+    NumberBase base      = NumberBase::Undefined;
+    bool       inverted  = false;
+    uint32_t   bitsCount = 0; //!< Value 0 means unspecified
+
+    EncodingInfo(NumberBase p_base = NumberBase::Undefined, bool p_inverted = false, uint32_t p_bitsCount = 0)
+      : base      (p_base)
+      , inverted  (p_inverted)
+      , bitsCount (p_bitsCount)
+    {
+    }
+  };
+
+
   //! Defines a mask to keep most significant bits of a uint8_t
   //!
   constexpr uint8_t LEFT_BITS_MASK_8[] =
@@ -114,7 +132,10 @@ namespace
     "1110",  // 14
     "1111",  // 15
   };
+
 } // End of unnamed namespace
+
+
 
 //! Initializes with constant value for all bits
 //!
@@ -441,6 +462,8 @@ BinaryVector& BinaryVector::AppendChunks (uint8_t numberOfBits, BitsAlignment al
   auto    chunks    = chunksList.begin();
   uint8_t chunkId   = 0;
 
+  // ---------------- Assess which byte to start from and threshold value to know when to stop processing
+  //
   while (threshold >= numberOfBits)
   {
     threshold -= 8;
@@ -755,6 +778,163 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
 //---------------------------------------------------------------------------
 
 
+//! Creates a BinaryVector from text decimal representation
+//!
+//! @note It only support values that can be encoded using uint64_t (18446744073709551615)
+//!
+//! @param bits         Sequence of characters representing content of BinaryVector to create:
+//!                     Characters in \",':_- \t/\" are ignored (can be used to ease display of string)
+//!                     An exception is thrown if there is any character different from
+//!                     set \"0123456789,':_- \\t\\n/\"
+//!                     'd is ignored at start of string (ICL format). An exception is thrown everywhere else.
+//!                     Don't care 'x' or 'X' are not allowed and lead to thrown exception
+//!
+//! @param sizeProperty Size property
+//! @param dontCare     Tells how to handle "dont't care" special characters 'x' and 'X'
+//!
+//! @return A new BinaryVector initialized as defined by bits text
+//!
+BinaryVector BinaryVector::CreateFromDecString (string_view bits, SizeProperty sizeProperty)
+{
+  CHECK_PARAMETER_NOT_NULL(bits.data(), "BinaryVector cannot be created from nullptr");
+
+  // ---------------- Skip leading blank spaces
+  //
+  Utility::TrimLeft(bits);
+
+  // ---------------- Tolerate empty vector
+  //
+  if (bits.empty())
+  {
+    return BinaryVector();
+  }
+
+  // ---------------- Capture "inverted bits" option
+  //
+  auto inverted = false;
+  if (bits[0] == '~')
+  {
+    inverted = true;
+    bits.remove_prefix(1);
+  }
+
+  auto bitsCount    = 32u;  // This is the default integer size
+  auto parsedDigits = false;
+  auto hasSize      = false;
+
+  // ---------------- Skip leading zeros
+  //
+  while (bits.front() == '0')
+  {
+    parsedDigits = true;
+    bits.remove_prefix(1);
+  }
+
+  auto     nextMustBe_D = false; // Memorize that we parsed a quote that must be followed with a 'd' or 'D'
+  uint64_t value        = 0;
+
+  for (const auto nextChar : bits)
+  {
+    CHECK_PARAMETER_TRUE(!nextMustBe_D || (nextChar == 'd') || (nextChar == 'D'), "Unexpected character '"s.append(1, nextChar).append("'after quote (') found while parsing decimal number: " + bits));
+
+    auto     hasDigit = true;
+    uint64_t digit    = 0;
+
+    switch (nextChar)
+    {
+      case '0': digit = 0; break;
+      case '1': digit = 1; break;
+      case '2': digit = 2; break;
+      case '3': digit = 3; break;
+      case '4': digit = 4; break;
+      case '5': digit = 5; break;
+      case '6': digit = 6; break;
+      case '7': digit = 7; break;
+      case '8': digit = 8; break;
+      case '9': digit = 9; break;
+      case '\'':
+      {
+        CHECK_PARAMETER_TRUE(!hasSize, "Unexpected quote (') found while parsing decimal number: " + bits);
+        if (parsedDigits)
+        {
+          bitsCount    = value;
+          value        = 0;
+          CHECK_PARAMETER_NOT_ZERO(bitsCount, "Bits count must be at least one!");
+          parsedDigits = false;
+          hasSize      = true;
+        }
+        nextMustBe_D = true;
+        hasDigit     = false;
+        break;
+      }
+      case 'd':
+      case 'D':
+        CHECK_PARAMETER_TRUE(nextMustBe_D, "Unexpected 'd' found while parsing decimal number: " + bits);
+        nextMustBe_D = false;
+        break;  // Condition has been checked at top of loop, we can ignore it safely
+      case '-':
+      case '_':
+      case ':':
+      case '|':
+      case ',':
+      case '\t':
+      case '\n':
+      case ' ':
+      case '\0':
+      case '/':
+      case '\\':
+        hasDigit = false;
+        break;  // Ignored characters
+      case 'x':
+      case 'X':
+        THROW_INVALID_ARGUMENT("CreateFromDecString found unexpected \"don't care character\" that is not supported in decimal values");
+      default:
+        THROW_INVALID_ARGUMENT("CreateFromDecString only support characters in '0123456789xX,\':|_-\\x20\\t\\n/', got: '"s.append(1, nextChar).append("'"));
+    }
+
+    if (hasDigit)
+    {
+      parsedDigits = true;
+      if (value > (UINT64_MAX / 10u))
+      {
+        THROW_OUT_OF_RANGE("Parsed value is out of uint64_t range");
+      }
+
+      value *= 10u;
+
+      if ((value + digit) < value)
+      {
+        THROW_OUT_OF_RANGE("Parsed value is out of uint64_t range");
+      }
+      value += digit;
+    }
+  }
+
+  CHECK_PARAMETER_TRUE(parsedDigits, "Failed to parse an integer from: "s + bits);
+
+  // ---------------- Fix bit count?
+  //
+  if (!hasSize && (value > UINT32_MAX))
+  {
+    bitsCount = 64u;
+  }
+
+  BinaryVector result;
+  result.Append(value, bitsCount, BitsAlignment::Right);
+  result.m_sizeProperty = sizeProperty;
+  if (inverted)
+  {
+    result.ToggleBits();
+  }
+
+  return result;
+}
+//
+//  End of: BinaryVector::CreateFromBinaryString
+//---------------------------------------------------------------------------
+
+
+
 //! Creates a BinaryVector from text hexadecimal representation
 //!
 //! @note Firstly intended for test purposes, but can be used for anything else
@@ -918,7 +1098,7 @@ BinaryVector BinaryVector::CreateFromHexString (string_view bits, SizeProperty s
 //!       - When a value is preceded by a tilde (~), each bit in the binary representation of the value
 //!         of that identifier is complemented.
 //!
-//! @note DO NO SUPPORT DECIMAL REPRESENTATION YET!!!
+//! @note Supports empty vector only using empty (or spaces only) input string
 //!
 //! @param bits         Sequence of characters representing content of BinaryVector to create
 //!                     Characters in \",':_- \t/\" are ignored (can be used to ease display of string)
@@ -933,88 +1113,40 @@ BinaryVector BinaryVector::CreateFromHexString (string_view bits, SizeProperty s
 //!
 //! @return A new BinaryVector initialized as defined by bits text
 //!
-BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty sizeProperty, DontCare dontCare)
+BinaryVector BinaryVector::CreateFromString (string_view stringValue, SizeProperty sizeProperty, DontCare dontCare)
 {
-  CHECK_PARAMETER_NOT_NULL(bits.data(), "BinaryVector cannot be created from nullptr");
-
-  //! Defines how a string is formatted to represent BinaryVector content
-  //!
-  enum class StringFormat
-  {
-    Undefined,   //!< Format is not defined
-    Binary,      //!< Format is recognized as binary
-    Hexadecimal, //!< Format is recognized hexadecimal
-    Decimal,     //!< Format is recognized decimal
-  };
-
-  struct EncodingInfo
-  {
-    StringFormat format    = StringFormat::Undefined;
-    bool         inverted  = false;
-    uint32_t     bitsCount = 0; //!< Value 0 means unspecified
-
-    EncodingInfo(StringFormat p_format = StringFormat::Undefined, bool p_inverted = false, uint32_t p_bitsCount = 0)
-      : format    (p_format)
-      , inverted  (p_inverted)
-      , bitsCount (p_bitsCount)
-    {
-    }
-  };
+  CHECK_PARAMETER_NOT_NULL(stringValue.data(), "BinaryVector cannot be created from nullptr");
 
   // ---------------- Skip leading blank spaces
   //
-  Utility::TrimLeft(bits);
+  Utility::TrimLeft(stringValue);
 
-  // ---------------- Tolerate strings beginning with "0x"
+  // ---------------- Tolerate empty vector
   //
-  if (bits.length() == 0)
+  if (stringValue.length() == 0)
   {
     return BinaryVector();
   }
 
-  if (bits.length() == 1)
+  auto firstChunk = true;
+
+  // Lamba: Extract base, optional stringValue inversion and stringValue count from leading sequence of characters (can be embedded in a large list of sequences)
+  //
+  auto extractEncodingInfo = [&firstChunk](string_view stringValue)
   {
-    THROW_INVALID_ARGUMENT("Cannot interpret one, non space, character");
-  }
-
-
-  // Lamba: Define used base from leading char
-  auto formatFromBaseChar = [&bits](size_t bitId)
-  {
-    auto baseChar = bits[bitId];
-    if (Utility::Contains("bB", baseChar))
-    {
-      return StringFormat::Binary;
-    }
-
-    if (Utility::Contains("xXhH", baseChar))
-    {
-      return StringFormat::Hexadecimal;
-    }
-
-    if (Utility::Contains("dD", baseChar))
-    {
-      return StringFormat::Decimal;
-    }
-
-    return StringFormat::Undefined;
-  };
-
-  size_t bitId      = 0;
-  auto   firstChunk = true;
-
-  // Lamba: Extract base, optional bits inversion and bits count from leading sequence of characters (can be embedded in a large list of sequences)
-  auto extractEncodingInfo = [&bits, &bitId, &firstChunk, &formatFromBaseChar]()
-  {
-    auto firstChar   = bits[bitId];
+    auto firstChar   = stringValue.front();
     auto isStdPrefix = firstChunk ? Utility::Contains("0/\\", firstChar)
                                   : Utility::Contains("/\\",  firstChar);
     firstChunk = false;
 
     if (isStdPrefix)
     {
-      ++bitId;
-      return EncodingInfo{formatFromBaseChar(bitId)};
+      auto format = NumberBaseForValuePrefix(stringValue.substr(1u));
+      if (format != NumberBase::Undefined)
+      {
+        stringValue.remove_prefix(2u); // Remove '0x' or /x or \x ...
+      }
+      return make_tuple(EncodingInfo(format), stringValue);
     }
 
     // ICL syntax?
@@ -1022,69 +1154,77 @@ BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty size
 
     if (firstChar == '~')
     {
-      ++bitId;
+      stringValue.remove_prefix(1u);
       encodingInfo.inverted = true;
-    }
-
-    if (Utility::Contains("123456789", bits[bitId]))  // length prefix
-    {
-      auto firstBitId = bitId;
-      while (Utility::Contains("0123456789", bits[bitId]))
+      if (stringValue.empty())
       {
-        ++bitId;
+        return make_tuple(encodingInfo, stringValue);
       }
-      auto span = bits.substr(firstBitId, bitId - firstBitId);
-      size_t processedCount = 0;
-      tie(encodingInfo.bitsCount, processedCount) = Utility::ToUInt32(span);
     }
 
-    auto nextChar = bits[bitId];
-    if (nextChar == '\'')
+    size_t bitId = 0;
+
+    if (Utility::Contains("123456789", stringValue.front()))  // length prefix
     {
-      ++bitId;
-      encodingInfo.format = formatFromBaseChar(bitId);
+      tie(encodingInfo.bitsCount, bitId) = Utility::ToUInt32(stringValue);
     }
-    return encodingInfo;
+
+    if ((bitId < stringValue.length()) && (stringValue[bitId] == '\''))
+    {
+      stringValue.remove_prefix(bitId + 1u);
+
+      encodingInfo.base = NumberBaseForValuePrefix(stringValue);
+      if (encodingInfo.base != NumberBase::Undefined)
+      {
+        stringValue.remove_prefix(1u);
+      }
+    }
+    else if (encodingInfo.bitsCount != 0)
+    {
+      encodingInfo.bitsCount = 0;
+      encodingInfo.base      = NumberBase::Decimal;
+    }
+    return make_tuple(encodingInfo, stringValue);
   };
 
-  // ---------------- Defines how to get next, largest, chunk of current format
+  // Lamba: Provides next chunk of string encode value to parse along with its encoding infor
   //
-  // Lamba:
-  auto getNextChunk = [&bits, &bitId, &extractEncodingInfo]()
+  auto getNextChunk = [&extractEncodingInfo](string_view stringValue)
   {
-    Utility::TrimLeft(bits);
+    Utility::TrimLeft(stringValue);
 
-    auto encodingInfo = extractEncodingInfo();
+    EncodingInfo encodingInfo;
+    std::tie(encodingInfo, stringValue) = extractEncodingInfo(stringValue);
 
-    if (encodingInfo.format == StringFormat::Undefined)
+    auto chunk = stringValue;  // Default: all remaining is supposed to be of single base encoding
+
+    if (encodingInfo.base == NumberBase::Undefined)
     {
-      THROW_INVALID_ARGUMENT("Cannot tell whether value is in decimal, hexadecimal or binary");
+      return make_tuple(encodingInfo, chunk, stringValue);
     }
 
-    bits.remove_prefix(bitId + 1u);  // Remove sequence that tells base encoding of next sequence value
-    bitId = 0;
 
-    // ---------------- Find format change
+    // ---------------- Find other format indication
     //
-    auto offset = bits.find_first_of("/,\\'", 0u);
+    auto offset = stringValue.find_first_of("/,\\'", 0u);
     if (   (offset == string_view::npos)  // Not found
-        || (offset == bits.length())      // Found at end of string ==> can be ignored
+        || (offset == stringValue.length())      // Found at end of string ==> can be ignored
        )
     {
-      auto chunk = bits;  // All remaining is supposed to be of single base encoding
-      bits.clear();       // Nothing to process after this chunk
-      return make_tuple(encodingInfo, chunk);
+      stringValue.clear();       // Nothing to process after this chunk
     }
-
-    auto chunk = bits.substr(0, offset);
-    bits.remove_prefix(offset);
-    if (bits.front() == ',')
+    else
     {
-      bits.remove_prefix(1);
-      Utility::TrimLeft(bits);
+      chunk = stringValue.substr(0, offset);   // Take only first part
+      stringValue.remove_prefix(offset);       // Remove first part from remaining
+      if (stringValue.front() == ',')
+      {
+        stringValue.remove_prefix(1);
+        Utility::TrimLeft(stringValue);
+      }
     }
 
-    return make_tuple(encodingInfo, chunk);
+    return make_tuple(encodingInfo, chunk, stringValue);
   };
 
   // ---------------- Core job starts here
@@ -1092,41 +1232,43 @@ BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty size
 
   // Skip leading blank chars
   //
-  while (   (bitId < bits.length())
-         && (   (bits[bitId] == '\n')
-             || (bits[bitId] == '\t')
-             || (bits[bitId] == ' ')
-            )
-        )
+  while (!stringValue.empty() && Utility::Contains(" \t\n", stringValue.front()))
   {
-    ++bitId;
+    stringValue.remove_prefix(1u);
   }
-  bits.remove_prefix(bitId);
-  bitId = 0;
 
   BinaryVector result;
   BinaryVector chunkVector;
 
-  while (!bits.empty())
+  while (!stringValue.empty())
   {
     string_view  bitsChunk;
     EncodingInfo encodingInfo;
 
-    std::tie(encodingInfo, bitsChunk) = getNextChunk();
+    std::tie(encodingInfo, bitsChunk, stringValue) = getNextChunk(stringValue);
+
+    CHECK_PARAMETER_NOT_EMPTY(bitsChunk, "Cannot parse empty number");
+
     auto bitsCount   = encodingInfo.bitsCount;
     auto hasSizeInfo = bitsCount != 0;
-
-    if      (encodingInfo.format == StringFormat::Binary)
+    switch (encodingInfo.base)
     {
-      chunkVector = BinaryVector::CreateFromBinaryString(bitsChunk, SizeProperty::NotFixed, dontCare);
-    }
-    else if (encodingInfo.format == StringFormat::Hexadecimal)
-    {
-      chunkVector = BinaryVector::CreateFromHexString(bitsChunk, SizeProperty::NotFixed, dontCare);
-    }
-    else if (encodingInfo.format == StringFormat::Decimal)
-    {
-      THROW_INVALID_ARGUMENT("Decimal numbers are not yet supported!");
+      case NumberBase::Binary:
+        chunkVector = BinaryVector::CreateFromBinaryString(bitsChunk, SizeProperty::NotFixed, dontCare);
+        break;
+      case NumberBase::Hexadecimal:
+        chunkVector = BinaryVector::CreateFromHexString(bitsChunk, SizeProperty::NotFixed, dontCare);
+        break;
+      case NumberBase::Decimal:
+        chunkVector = BinaryVector::CreateFromDecString(bitsChunk, SizeProperty::NotFixed);
+        break;
+      case NumberBase::Octal:
+        THROW_INVALID_ARGUMENT("Octal numbers are not supported!");
+        break;
+      case NumberBase::Undefined:
+        THROW_INVALID_ARGUMENT("Cannot tell whether value is in decimal, hexadecimal or binary");
+      default:
+        CHECK_FAILED("Houps, NumberBase not managed");
     }
 
     auto chunkBitsCount = chunkVector.BitsCount();
@@ -1135,17 +1277,19 @@ BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty size
     {
       if (bitsCount < chunkBitsCount)
       {
+        LOG(WARNING) << "Truncating value: " << bitsChunk;
         chunkVector = chunkVector.Slice(chunkBitsCount - bitsCount, bitsCount); // Truncation
       }
       else
       {
+        LOG(INFO) << "Extending value: " << bitsChunk;
         auto isNegative = chunkVector.IsNegative();
         auto appendOnes = encodingInfo.inverted ? !isNegative : isNegative;
         result.AppendBits(appendOnes, bitsCount - chunkBitsCount);
       }
     }
 
-    if ( encodingInfo.inverted)
+    if (encodingInfo.inverted)
     {
       chunkVector.ToggleBits();
     }
@@ -1610,6 +1754,41 @@ vector<uint8_t> BinaryVector::DataRightAligned () const
 //  End of: BinaryVector::DataRightAligned
 //---------------------------------------------------------------------------
 
+
+
+//! Defines used based from leading char of number string
+//!
+NumberBase BinaryVector::NumberBaseForValuePrefix (string_view number)
+{
+  if (!number.empty())
+  {
+    auto baseChar = number.front();
+    switch (baseChar)
+    {
+      case 'b':
+      case 'B':
+        return NumberBase::Binary;
+      case 'h':
+      case 'H':
+      case 'x':
+      case 'X':
+        return NumberBase::Hexadecimal;
+      case 'd':
+      case 'D':
+        return NumberBase::Decimal;
+      case 'o':
+      case 'O':
+      return NumberBase::Octal;
+      default:
+        return NumberBase::Undefined;
+    }
+  }
+
+  return NumberBase::Undefined;
+}
+//
+//  End of: BinaryVector::NumberBaseForValuePrefix
+//---------------------------------------------------------------------------
 
 
 //! Copy assignment

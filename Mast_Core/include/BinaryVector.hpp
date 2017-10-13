@@ -49,6 +49,17 @@ enum class DontCare
   IsOne,   //!< 'x' or 'X' outside format specifier are replaced with ones
 };
 
+//! Defines base use to encode a value in a
+//!
+enum class NumberBase
+{
+  Undefined,   //!< Base is not defined
+  Binary,      //!< Base is binary
+  Hexadecimal, //!< Base is hexadecimal
+  Decimal,     //!< Base is decimal
+  Octal,       //!< Base is octal
+};
+
 //! Contains bitstream vector in compact binary format
 //!
 class MAST_CORE_EXPORT BinaryVector final
@@ -71,6 +82,7 @@ class MAST_CORE_EXPORT BinaryVector final
 
   using string_view = std::experimental::string_view;
 
+  static BinaryVector CreateFromDecString    (string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed);                                          //!< Creates a BinaryVector from text decimal representation
   static BinaryVector CreateFromBinaryString (string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed, DontCare dontCare = DontCare::IsError);   //!< Creates a BinaryVector from text binary representation
   static BinaryVector CreateFromHexString    (string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed, DontCare dontCare = DontCare::IsError);   //!< Creates a BinaryVector from text hexadecimal representation
   static BinaryVector CreateFromString       (string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed, DontCare dontCare = DontCare::IsError);   //!< Creates a BinaryVector from mixed hexadecimal and binary representation
@@ -208,6 +220,8 @@ class MAST_CORE_EXPORT BinaryVector final
 
   BinaryVector    Slice    (uint32_t firstBitOffset, uint32_t bitsCount) const; //!< Returns a slice from BinaryVector
 //+  BinaryVector_View Slice_View (uint32_t firstBitOffset, uint32_t bitsCount) const; //!< Returns a reference to a slice from BinaryVector
+
+  static NumberBase NumberBaseForValuePrefix (string_view number); //!< Defines used based from leading char of number string
 
   // ---------------- Private  Methods
   //

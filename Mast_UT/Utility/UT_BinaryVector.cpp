@@ -587,6 +587,243 @@ void UT_BinaryVector::test_CreateFromHexString_DontCare_as_One ()
 }
 
 
+//! Checks BinaryVector::CreateFromDecString()
+//!
+//! @note Suppose that CreateFromBinaryString is working properly
+//!
+void UT_BinaryVector::test_CreateFromDecString_Unsized ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto decBits         = std::get<0>(data);
+    auto expectedBinBits = std::get<1>(data);
+
+    // ---------------- Exercise
+    //
+    auto sut = BinaryVector::CreateFromDecString(decBits);
+
+    // ---------------- Verify
+    //
+    const auto expectedBinaryVector = BinaryVector::CreateFromBinaryString(expectedBinBits);
+
+    uint32_t expectedBitsCount  = expectedBinaryVector.BitsCount();
+    uint32_t expectedBytesCount = expectedBinaryVector.BytesCount();
+
+    TS_ASSERT_EQUALS (sut.BitsCount(),  expectedBitsCount);
+    TS_ASSERT_EQUALS (sut.BytesCount(), expectedBytesCount);
+
+    if (expectedBytesCount != 0u)
+    {
+      const uint8_t* pSutData      = sut.DataLeftAligned();
+      const uint8_t* pExpectedData = expectedBinaryVector.DataLeftAligned();
+
+      CxxTest::setAbortTestOnFail(true);
+      TS_ASSERT_NOT_NULLPTR (pSutData);
+      TS_ASSERT_NOT_NULLPTR (pExpectedData);
+
+      ostringstream os;
+      for (uint32_t ii = 0 ; ii < expectedBytesCount ; ++ii)
+      {
+        os.str("");
+        os << "pSutData[" << ii << "]";
+        auto msg = os.str().c_str();
+        TSM_ASSERT_EQUALS (msg, pSutData[ii], pExpectedData[ii]);
+      }
+    }
+  };
+
+  using data_t = tuple<string_view, string_view>;
+  auto data =
+  {
+    data_t("0",           "0000_0000_0000_0000_0000_0000_0000_0000"), // 00
+    data_t("1",           "0000_0000_0000_0000_0000_0000_0000_0001"), // 01
+    data_t("2",           "0000_0000_0000_0000_0000_0000_0000_0010"), // 02
+    data_t("3",           "0000_0000_0000_0000_0000_0000_0000_0011"), // 03
+    data_t("4",           "0000_0000_0000_0000_0000_0000_0000_0100"), // 04
+    data_t("5",           "0000_0000_0000_0000_0000_0000_0000_0101"), // 05
+    data_t("6",           "0000_0000_0000_0000_0000_0000_0000_0110"), // 06
+    data_t("7",           "0000_0000_0000_0000_0000_0000_0000_0111"), // 07
+    data_t("8",           "0000_0000_0000_0000_0000_0000_0000_1000"), // 08
+    data_t("9",           "0000_0000_0000_0000_0000_0000_0000_1001"), // 09
+    data_t("10",          "0000_0000_0000_0000_0000_0000_0000_1010"), // 10
+    data_t("21",          "0000_0000_0000_0000_0000_0000_0001_0101"), // 11
+    data_t("4294967295",  "1111_1111_1111_1111_1111_1111_1111_1111"), // 12
+    data_t("000",         "0000_0000_0000_0000_0000_0000_0000_0000"), // 13
+    data_t(" 0",          "0000_0000_0000_0000_0000_0000_0000_0000"), // 14
+    data_t("  12",        "0000_0000_0000_0000_0000_0000_0000_1100"), // 15
+    data_t(" 23",         "0000_0000_0000_0000_0000_0000_0001_0111"), // 16
+    data_t(" 89",         "0000_0000_0000_0000_0000_0000_0101_1001"), // 17
+    data_t("1 2 7",       "0000_0000_0000_0000_0000_0000_0111_1111"), // 18
+    data_t("1_2_8",       "0000_0000_0000_0000_0000_0000_1000_0000"), // 19
+    data_t("_1 2 9_",     "0000_0000_0000_0000_0000_0000_1000_0001"), // 20
+    data_t("'d89",        "0000_0000_0000_0000_0000_0000_0101_1001"), // 21
+    data_t("~0",          "1111_1111_1111_1111_1111_1111_1111_1111"), // 22
+    data_t("~6",          "1111_1111_1111_1111_1111_1111_1111_1001"), // 23
+    data_t("~4294967294", "0000_0000_0000_0000_0000_0000_0000_0001"), // 24
+    data_t("~4294967295", "0000_0000_0000_0000_0000_0000_0000_0000"), // 25
+
+    data_t("12345678909876500000",  "1010_1011:0101_0100:1010_1001:1000_1110:1110_1110:0011_1000:0111_0110:0010_0000"), // 26
+    data_t("12345678909876543210",  "1010_1011:0101_0100:1010_1001:1000_1110:1110_1110:0011_1001:0001_1110:1110_1010"), // 27
+    data_t("18446744073709551614",  "1111_1111:1111_1111:1111_1111:1111_1111:1111_1111:1111_1111:1111_1111:1111_1110"), // 28
+    data_t("18446744073709551615",  "1111_1111:1111_1111:1111_1111:1111_1111:1111_1111:1111_1111:1111_1111:1111_1111"), // 29
+    data_t("~18446744073709551614", "0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0001"), // 30
+    data_t("~18446744073709551615", "0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000"), // 31
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::CreateFromDecString() when target size is encoded before the value (along with 'd prefix)
+//!
+//! @note Suppose that CreateFromBinaryString is working properly
+//!
+void UT_BinaryVector::test_CreateFromDecString_Sized ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto decBits         = std::get<0>(data);
+    auto expectedBinBits = std::get<1>(data);
+
+    // ---------------- Exercise
+    //
+    auto sut = BinaryVector::CreateFromDecString(decBits);
+
+    // ---------------- Verify
+    //
+    const auto expectedBinaryVector = BinaryVector::CreateFromBinaryString(expectedBinBits);
+
+    uint32_t expectedBitsCount  = expectedBinaryVector.BitsCount();
+    uint32_t expectedBytesCount = expectedBinaryVector.BytesCount();
+
+    TS_ASSERT_EQUALS (sut.BitsCount(),  expectedBitsCount);
+    TS_ASSERT_EQUALS (sut.BytesCount(), expectedBytesCount);
+
+    if (expectedBytesCount != 0u)
+    {
+      const uint8_t* pSutData      = sut.DataLeftAligned();
+      const uint8_t* pExpectedData = expectedBinaryVector.DataLeftAligned();
+
+      CxxTest::setAbortTestOnFail(true);
+      TS_ASSERT_NOT_NULLPTR (pSutData);
+      TS_ASSERT_NOT_NULLPTR (pExpectedData);
+
+      ostringstream os;
+      for (uint32_t ii = 0 ; ii < expectedBytesCount ; ++ii)
+      {
+        os.str("");
+        os << "pSutData[" << ii << "]";
+        auto msg = os.str().c_str();
+        TSM_ASSERT_EQUALS (msg, pSutData[ii], pExpectedData[ii]);
+      }
+    }
+  };
+
+  using data_t = tuple<string_view, string_view>;
+  auto data =
+  {
+    data_t("1'd0",         "0"),                // 00
+    data_t("3'd0",         "000"),              // 01
+    data_t("8'D23",        "0001_0111"),        // 02
+    data_t("7'D23",        "001_0111"),         // 03
+    data_t("5'D23",        "1_0111"),           // 04
+    data_t("5'D 23",       "1_0111"),           // 05
+    data_t("  13'd 57  ",  "0_0000_0011_1001"), // 06
+    data_t("  13'd 5_7  ", "0_0000_0011_1001"), // 07
+    data_t("~1'd0",        "1"),                // 08
+    data_t("~3'd0",        "111"),              // 09
+    data_t("~8'D23",       "1110_1000"),        // 10
+    data_t("~7'D23",       "_110_1000"),        // 11
+
+    data_t("64'd1",                     "0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0001"), // 12
+    data_t("63'd1",                     "_000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0001"), // 13
+    data_t("64'd 12345678909876543210", "1010_1011:0101_0100:1010_1001:1000_1110:1110_1110:0011_1001:0001_1110:1110_1010"), // 14
+    data_t("63'd 12345678909876543210", "_010_1011:0101_0100:1010_1001:1000_1110:1110_1110:0011_1001:0001_1110:1110_1010"), // 15
+    data_t("64'd18446744073709551614",  "1111_1111:1111_1111:1111_1111:1111_1111:1111_1111:1111_1111:1111_1111:1111_1110"), // 16
+    data_t("64'd18446744073709551615",  "1111_1111:1111_1111:1111_1111:1111_1111:1111_1111:1111_1111:1111_1111:1111_1111"), // 17
+    data_t("~64'd18446744073709551614", "0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0001"), // 18
+    data_t("~64'd18446744073709551615", "0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000:0000_0000"), // 19
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+
+//! Checks BinaryVector::CreateFromDecString() when value is out of range (support only up to 64 bits)
+//!
+void UT_BinaryVector::test_CreateFromDecString_OutOfRange ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](string_view bits)
+  {
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (BinaryVector::CreateFromDecString(bits), std::out_of_range);
+  };
+
+  auto data =
+  {
+    "18446744073709551616",  // 01
+    "18446744073709551619",  // 02
+    "100000000000000000000", // 02
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+//! Checks BinaryVector::CreateFromDecString() when invalid characters are used
+//!
+void UT_BinaryVector::test_CreateFromDecString_InvalidChars ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](string_view bits)
+  {
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (BinaryVector::CreateFromDecString(bits), std::invalid_argument);
+  };
+
+  auto data =
+  {
+    "'",                               // 10
+    static_cast<const char*>(nullptr), // 00
+    "x",                               // 01
+    "X",                               // 02
+    "2A",                              // 03
+    "2d27",                            // 04
+    "d12",                             // 05
+    "'25",                             // 06
+    "d'8",                             // 07
+    "/d68",                            // 08
+    "0d123",                           // 09
+    "~",                               // 11
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+
+
 
 //! Checks BinaryVector::CreateFromString()
 //!
@@ -605,7 +842,7 @@ void UT_BinaryVector::test_CreateFromString ()
 
     // ---------------- Exercise
     //
-    auto sut = BinaryVector::CreateFromString(text);
+    auto sut = BinaryVector::CreateFromString(text, SizeProperty::NotFixed, DontCare::IsError);
 
     // ---------------- Verify
     //
@@ -639,57 +876,65 @@ void UT_BinaryVector::test_CreateFromString ()
 
   auto data =
   {
-    make_tuple(" ",                   ""),                                        // 00
-    make_tuple("0b01",                "01"),                                      // 01
-    make_tuple("/b101",               "101"),                                     // 02
-    make_tuple("0x01234567",          "0000_0001:0010_0011:0100_0101:0110_0111"), // 03
-    make_tuple("/x89AbcDeF",          "1000_1001:1010_1011:1100_1101:1110_1111"), // 04
-    make_tuple("/xab/b01",            "1010_1011:01"),                            // 05
-    make_tuple("/b01/x01",            "01:0000_0001"),                            // 06
-    make_tuple("0xBAD\\b101",         "1011_1010_1101:101"),                      // 07
-    make_tuple("0XA /B1",             "1010:1"),                                  // 08
-    make_tuple("0B1101:/XA",          "1101:1010"),                               // 09
-    make_tuple("0xCA/X",              "1100_1010"),                               // 10
-    make_tuple("0XFE/b",              "1111_1110"),                               // 11
-    make_tuple("  0x5A/xFE  /b1",     "0101_1010:1111_1110:1"),                   // 12
-    make_tuple("  0b00010   /x  7",   "0001_0:0111"),                             // 13
-    make_tuple("  0b00010   /x  7/b", "0001_0:0111"),                             // 14
-    make_tuple("  0b00010   /x  7/x", "0001_0:0111"),                             // 15
-    make_tuple("/x89Ab/XcDeF",        "1000_1001:1010_1011:1100_1101:1110_1111"), // 16
-    make_tuple("/xab/b01/b11/x2",     "1010_1011:01:11:0010"),                    // 17
-    make_tuple("\n0x01234567",        "0000_0001:0010_0011:0100_0101:0110_0111"), // 18
-    make_tuple("0x0123\n4567",        "0000_0001:0010_0011:0100_0101:0110_0111"), // 19
-    make_tuple("0x01234567\n",        "0000_0001:0010_0011:0100_0101:0110_0111"), // 20
+    make_tuple(" ",                 ""),                                                // 00 ==> Empty vector!
+    make_tuple("0b01",              "01"),                                              // 01
+    make_tuple("/b101",             "101"),                                             // 02
+    make_tuple("0x01234567",        "0000_0001:0010_0011:0100_0101:0110_0111"),         // 03
+    make_tuple("/x89AbcDeF",        "1000_1001:1010_1011:1100_1101:1110_1111"),         // 04
+    make_tuple("/xab/b01",          "1010_1011:01"),                                    // 05
+    make_tuple("/b01/x01",          "01:0000_0001"),                                    // 06
+    make_tuple("0xBAD\\b101",       "1011_1010_1101:101"),                              // 07
+    make_tuple("0XA /B1",           "1010:1"),                                          // 08
+    make_tuple("0B1101:/XA",        "1101:1010"),                                       // 09
+    make_tuple("  0x5A/xFE  /b1",   "0101_1010:1111_1110:1"),                           // 10
+    make_tuple("  0b00010   /x  7", "0001_0:0111"),                                     // 11
+    make_tuple("/x89Ab/XcDeF",      "1000_1001:1010_1011:1100_1101:1110_1111"),         // 12
+    make_tuple("/xab/b01/b11/x2",   "1010_1011:01:11:0010"),                            // 13
+    make_tuple("\n0x01234567",      "0000_0001:0010_0011:0100_0101:0110_0111"),         // 14
+    make_tuple("0x0123\n4567",      "0000_0001:0010_0011:0100_0101:0110_0111"),         // 15
+    make_tuple("0x01234567\n",      "0000_0001:0010_0011:0100_0101:0110_0111"),         // 16
     // ICL syntax
-    make_tuple("'b01",                "01"),                                      // 21
-    make_tuple("'h01",                "0000_0001"),                               // 22
-    make_tuple("1'b1",                "1"),                                       // 23
-    make_tuple("2'b01",               "01"),                                      // 24
-    make_tuple("8'hA5",               "1010_0101"),                               // 25
-    make_tuple("'h01234567",          "0000_0001:0010_0011:0100_0101:0110_0111"), // 26
-    make_tuple("'h89AbcDeF",          "1000_1001:1010_1011:1100_1101:1110_1111"), // 27
-    make_tuple("5'b 10101",           "1010_1"),                                  // 28
-    make_tuple("'h 89A",              "1000_1001:1010"),                          // 29
-    make_tuple("'hab, 'b01",          "1010_1011:01"),                            // 30
-    make_tuple("'b01, 'h01",          "01:0000_0001"),                            // 31
-    make_tuple("'hBAD, 'b101",        "1011_1010_1101:101"),                      // 32
-    make_tuple("~4'b1000",            "0111"),                                    // 33 ==> means 4'b0111
-    make_tuple("~8'hAB",              "0101_0100"),                               // 34 ==> means 8'h55
-    make_tuple("5'h1A",               "1_1010"),                                  // 35 ==> keep only 5 LSB
-    make_tuple("6'h1",                "00_0001"),                                 // 36
-    make_tuple("6'hA",                "11_1010"),                                 // 37
-    make_tuple("7'b1",                "111_1111"),                                // 38
-    make_tuple("8'h0",                "0000_0000"),                               // 39
-    make_tuple("9'b0",                "0000_0000_0"),                             // 40
-    make_tuple("~4'b0",               "1111"),                                    // 42
-    make_tuple("1'b0, ~4'b0,  5'h1a", "0_1111_1_1010"),                           // 44 ==> means 01_1111_1010
+    make_tuple("'b01",                      "01"),                                      // 17
+    make_tuple("'h01",                      "0000_0001"),                               // 18
+    make_tuple("1'b1",                      "1"),                                       // 19
+    make_tuple("2'b01",                     "01"),                                      // 20
+    make_tuple("8'hA5",                     "1010_0101"),                               // 21
+    make_tuple("'h01234567",                "0000_0001:0010_0011:0100_0101:0110_0111"), // 22
+    make_tuple("'h89AbcDeF",                "1000_1001:1010_1011:1100_1101:1110_1111"), // 23
+    make_tuple("5'b 10101",                 "1010_1"),                                  // 24
+    make_tuple("'h 89A",                    "1000_1001:1010"),                          // 25
+    make_tuple("'hab, 'b01",                "1010_1011:01"),                            // 26
+    make_tuple("'b01, 'h01",                "01:0000_0001"),                            // 27
+    make_tuple("'hBAD, 'b101",              "1011_1010_1101:101"),                      // 28
+    make_tuple("~4'b1000",                  "0111"),                                    // 29 ==> means 4'b0111
+    make_tuple("~8'hAB",                    "0101_0100"),                               // 30 ==> means 8'h55
+    make_tuple("5'h1A",                     "1_1010"),                                  // 31 ==> keep only 5 LSB
+    make_tuple("6'h1",                      "00_0001"),                                 // 32
+    make_tuple("6'hA",                      "11_1010"),                                 // 33
+    make_tuple("7'b1",                      "111_1111"),                                // 34
+    make_tuple("8'h0",                      "0000_0000"),                               // 35
+    make_tuple("5'd28",                     "1_1100"),                                  // 36
+    make_tuple("9'b0",                      "0000_0000_0"),                             // 37
+    make_tuple("~4'b0",                     "1111"),                                    // 38
+    make_tuple("1'b0, ~4'b0,  5'h1a",       "0_1111_1_1010"),                           // 39 ==> means 01_1111_1010
+    make_tuple("'d01",                      "0000_0000:0000_0000:0000_0000:0000_0001"), // 40 ==> default is 32 bits
+    make_tuple("'D10",                      "0000_0000:0000_0000:0000_0000:0000_1010"), // 41
+    make_tuple("1'd1",                      "1"),                                       // 42
+    make_tuple("2'd01",                     "01"),                                      // 43
+    make_tuple("5'd03",                     "0_0011"),                                  // 44
+    make_tuple("7'd13",                     "000_1101"),                                // 45
+    make_tuple("~7'd13",                    "111_0010"),                                // 46
+    make_tuple("1'b0, ~4'b0,  5'd13",       "0_1111_0_1101"),                           // 47
+    make_tuple("~1'b0, 4'b0, ~5'd13",       "1_0000_1_0010"),                           // 48
+    make_tuple("9",                         "0000_0000:0000_0000:0000_0000:0000_1001"), // 49 ==> plain number are accepted provided they are decimal
+    make_tuple("72",                        "0000_0000:0000_0000:0000_0000:0100_1000"), // 50 ==> plain number are accepted provided they are decimal
+    make_tuple("~72",                       "1111_1111:1111_1111:1111_1111:1011_0111"), // 51 ==> plain number are accepted provided they are decimal
+    make_tuple("3'b1, /xB4, /b101, ~5'h1a", "111:1011_0100:101:0_0101"),                // 52 ==> Mix of SIT and ICL notation!
   };
 
   // ---------------- DDT Exercise
   //
   TS_DATA_DRIVEN_TEST (checker, data);
-
-//+  TS_WARN ("Not tested cases: Decimal numbers (with or without base prefix)");
 }
 
 
@@ -727,6 +972,12 @@ void UT_BinaryVector::test_CreateFromString_InvalidChars ()
     "0b0001/x7/",                      // 16 ==> / at the end is not valid!
     "0b0010/x7\\",                     // 17 ==> \ at the end is not valid!
     "0b0011/x7'",                      // 18 ==> ' at the end is not valid!
+    "7'o13",                           // 19 ==> Octal is not supported
+    "7'O13",                           // 20 ==> Octal is not supported
+    "12'hAxB",                         // 21 ==> Don't care is error (defined by parameter)
+    "h",                               // 22
+    "'",                               // 23 ==> This is not enough
+    "~",                               // 24 ==> This is not enough
   };
 
   // ---------------- DDT Exercise
@@ -1345,16 +1596,15 @@ void UT_BinaryVector::test_CompareEqualTo_With_EmptyMask_Equal ()
 
   auto data =
   {
-    "0b",              // 00
-    "0b0",             // 01
-    "0b1",             // 02
-    "0b01",            // 03
-    "0b10",            // 04
-    "0b1011",          // 05
-    "0b0110_0101",     // 06
-    "0b1110_0000:1",   // 07
-    "0b1110_0010:10",  // 08
-    "0xE29EA/b1",      // 09
+    "0b0",             // 00
+    "0b1",             // 01
+    "0b01",            // 02
+    "0b10",            // 03
+    "0b1011",          // 04
+    "0b0110_0101",     // 05
+    "0b1110_0000:1",   // 06
+    "0b1110_0010:10",  // 07
+    "0xE29EA/b1",      // 08
   };
 
   // ---------------- DDT Exercise
@@ -1388,11 +1638,11 @@ void UT_BinaryVector::test_CompareEqualTo_With_EmptyMask_NotEqual ()
 
   auto data =
   {
-    make_tuple("0b",             "0b0"),            // 00
+    make_tuple("",               "0b0"),            // 00
     make_tuple("0b0",            "0b1"),            // 01
     make_tuple("0b1",            "0b11"),           // 02
     make_tuple("0b01",           "0b001"),          // 03
-    make_tuple("0b10",           "0b"),             // 04
+    make_tuple("0b10",           ""),               // 04
     make_tuple("0b1011",         "0b1010"),         // 05
     make_tuple("0b0110_0101",    "0b0110_010"),     // 06
     make_tuple("0b1110_0000:1",  "0b1110_0000:0"),  // 07
@@ -2354,7 +2604,7 @@ void UT_BinaryVector::test_Constructor_FromRawDataVector ()
   using data_t = tuple<initializer_list<uint8_t>, uint32_t, string_view>;
   auto  data =
   {
-    data_t({},                 0,     "0b"),                  // 00
+    data_t({},                 0,     ""),                    // 00
     data_t({},                 1,     "0b0"),                 // 01
     data_t({},                 13,    "0b0000_0000:0000_0" ), // 02
     data_t({0b10000000},       1,     "0b1"),                 // 03
@@ -2407,7 +2657,7 @@ void UT_BinaryVector::test_Constructor_FromRawDataVector_Moved ()
   using data_t = tuple<initializer_list<uint8_t>, uint32_t, string_view>;
   auto  data =
   {
-    data_t({},                 0,     "0b"),                  // 00
+    data_t({},                 0,     ""),                    // 00
     data_t({},                 1,     "0b0"),                 // 01
     data_t({},                 13,    "0b0000_0000:0000_0" ), // 02
     data_t({0b10000000},       1,     "0b1"),                 // 03
@@ -3698,10 +3948,9 @@ void UT_BinaryVector::test_Append_1_to_64_bits_When_Empty_Right_Aligned ()
   {
     // ---------------- Setup
     //
-    const auto& input    = std::get<0>(data);
-    const auto& expected = std::get<1>(data) ;
-    auto value           = std::get<0>(input);
-    auto numberOfBits    = std::get<1>(input);
+    const auto value        = std::get<0>(data);
+    const auto numberOfBits = std::get<1>(data);
+    const auto expectedBits = std::get<2>(data);
 
     BinaryVector sut;
 
@@ -3711,80 +3960,83 @@ void UT_BinaryVector::test_Append_1_to_64_bits_When_Empty_Right_Aligned ()
 
     // ---------------- Verify
     //
+    auto expected = BinaryVector::CreateFromBinaryString(expectedBits);
     TS_ASSERT_EQUALS (sut, expected);
   };
 
-  auto bbv     = [](string_view asBinaryString) { return BinaryVector::CreateFromBinaryString(asBinaryString); };
-  using TInput = tuple<uint64_t, uint8_t> ; // Value, Number of bits (taken from LSB)
-
+  using data_t = tuple<uint64_t, uint8_t, string_view> ; // Value, Number of bits (taken from LSB), expected
   auto data    =   // Value, bits
   {
-    make_tuple(TInput(0x0000000000000000, 1),  bbv("0")),                                                                               // 00
-    make_tuple(TInput(0x0000000000000001, 1),  bbv("1")),                                                                               // 01
-    make_tuple(TInput(0x0000000000000002, 2),  bbv("10")),                                                                              // 02
-    make_tuple(TInput(0x0000000000000003, 2),  bbv("11")),                                                                              // 03
-    make_tuple(TInput(0x0000000000000003, 3),  bbv("011")),                                                                             // 04
-    make_tuple(TInput(0x0000000000000009, 4),  bbv("1001")),                                                                            // 05
-    make_tuple(TInput(0x0000000000000011, 5),  bbv("1000_1")),                                                                          // 06
-    make_tuple(TInput(0x0000000000000012, 6),  bbv("0100_10")),                                                                         // 07
-    make_tuple(TInput(0x000000000000004A, 7),  bbv("1001_010")),                                                                        // 08
-    make_tuple(TInput(0x000000000000007B, 8),  bbv("0111_1011")),                                                                       // 09
-    make_tuple(TInput(0x000000000000017B, 9),  bbv("1:0111_1011")),                                                                     // 10
-    make_tuple(TInput(0x000000000000017B, 10), bbv("01:0111_1011")),                                                                    // 11
-    make_tuple(TInput(0x000000000000037B, 11), bbv("011:0111_1011")),                                                                   // 12
-    make_tuple(TInput(0x000000000000037B, 12), bbv("0011:0111_1011")),                                                                  // 13
-    make_tuple(TInput(0x0000000000005ACE, 13), bbv("1:1010_1100:1110")),                                                                // 14
-    make_tuple(TInput(0x0000000000005ACE, 14), bbv("01:1010_1100:1110")),                                                               // 15
-    make_tuple(TInput(0x0000000000005ACE, 15), bbv("101:1010_1100:1110")),                                                              // 16
-    make_tuple(TInput(0x000000000000FACE, 16), bbv("1111_1010:1100_1110")),                                                             // 17
-    make_tuple(TInput(0x000000008164BACE, 17), bbv("0:1011_1010:1100_1110")),                                                           // 18
-    make_tuple(TInput(0x000000008164BACE, 18), bbv("00:1011_1010:1100_1110")),                                                          // 19
-    make_tuple(TInput(0x000000008164BACE, 19), bbv("100:1011_1010:1100_1110")),                                                         // 20
-    make_tuple(TInput(0x000000008164BACE, 20), bbv("0100:1011_1010:1100_1110")),                                                        // 21
-    make_tuple(TInput(0x000000008164BACE, 21), bbv("0_0100:1011_1010:1100_1110")),                                                      // 22
-    make_tuple(TInput(0x000000008164BACE, 22), bbv("10_0100:1011_1010:1100_1110")),                                                     // 23
-    make_tuple(TInput(0x000000008164BACE, 23), bbv("110_0100:1011_1010:1100_1110")),                                                    // 24
-    make_tuple(TInput(0x000000008164BACE, 24), bbv("0110_0100:1011_1010:1100_1110")),                                                   // 25
-    make_tuple(TInput(0x000000008164BACE, 25), bbv("1:0110_0100:1011_1010:1100_1110")),                                                 // 26
-    make_tuple(TInput(0x000000008164BACE, 26), bbv("01:0110_0100:1011_1010:1100_1110")),                                                // 27
-    make_tuple(TInput(0x000000008164BACE, 27), bbv("001:0110_0100:1011_1010:1100_1110")),                                               // 28
-    make_tuple(TInput(0x000000008164BACE, 28), bbv("0001:0110_0100:1011_1010:1100_1110")),                                              // 29
-    make_tuple(TInput(0x000000008164BACE, 29), bbv("0_0001:0110_0100:1011_1010:1100_1110")),                                            // 30
-    make_tuple(TInput(0x000000008164BACE, 30), bbv("00_0001:0110_0100:1011_1010:1100_1110")),                                           // 31
-    make_tuple(TInput(0x000000008164BACE, 31), bbv("000_0001:0110_0100:1011_1010:1100_1110")),                                          // 32
-    make_tuple(TInput(0x000000008164BACE, 32), bbv("1000_0001:0110_0100:1011_1010:1100_1110")),                                         // 33
-    make_tuple(TInput(0xFaceB01d98765432, 33), bbv("1:1001_1000:0111_0110:0101_0100:0011_0010")),                                       // 34
-    make_tuple(TInput(0xFaceB01d98765432, 34), bbv("01:1001_1000:0111_0110:0101_0100:0011_0010")),                                      // 35
-    make_tuple(TInput(0xFaceB01d98765432, 35), bbv("101:1001_1000:0111_0110:0101_0100:0011_0010")),                                     // 36
-    make_tuple(TInput(0xFaceB01d98765432, 36), bbv("1101:1001_1000:0111_0110:0101_0100:0011_0010")),                                    // 37
-    make_tuple(TInput(0xFaceB01d98765432, 37), bbv("1_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                                  // 38
-    make_tuple(TInput(0xFaceB01d98765432, 38), bbv("01_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                                 // 39
-    make_tuple(TInput(0xFaceB01d98765432, 39), bbv("001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                                // 40
-    make_tuple(TInput(0xFaceB01d98765432, 40), bbv("0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                               // 41
-    make_tuple(TInput(0xFaceB01d98765432, 41), bbv("0:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                             // 42
-    make_tuple(TInput(0xFaceB01d98765432, 42), bbv("00:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                            // 43
-    make_tuple(TInput(0xFaceB01d98765432, 43), bbv("000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                           // 44
-    make_tuple(TInput(0xFaceB01d98765432, 44), bbv("0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                          // 45
-    make_tuple(TInput(0xFaceB01d98765432, 45), bbv("1_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                        // 46
-    make_tuple(TInput(0xFaceB01d98765432, 46), bbv("11_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                       // 47
-    make_tuple(TInput(0xFaceB01d98765432, 47), bbv("011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                      // 48
-    make_tuple(TInput(0xFaceB01d98765432, 48), bbv("1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                     // 49
-    make_tuple(TInput(0xFaceB01d98765432, 49), bbv("0:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                   // 50
-    make_tuple(TInput(0xFaceB01d98765432, 50), bbv("10:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                  // 51
-    make_tuple(TInput(0xFaceB01d98765432, 51), bbv("110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                 // 52
-    make_tuple(TInput(0xFaceB01d98765432, 52), bbv("1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),                // 53
-    make_tuple(TInput(0xFaceB01d98765432, 53), bbv("0_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),              // 54
-    make_tuple(TInput(0xFaceB01d98765432, 54), bbv("00_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),             // 55
-    make_tuple(TInput(0xFaceB01d98765432, 55), bbv("100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),            // 56
-    make_tuple(TInput(0xFaceB01d98765432, 56), bbv("1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),           // 57
-    make_tuple(TInput(0xFaceB01d98765432, 57), bbv("0:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),         // 58
-    make_tuple(TInput(0xFaceB01d98765432, 58), bbv("10:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),        // 59
-    make_tuple(TInput(0xFaceB01d98765432, 59), bbv("010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),       // 60
-    make_tuple(TInput(0xFaceB01d98765432, 60), bbv("1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),      // 61
-    make_tuple(TInput(0xFaceB01d98765432, 61), bbv("1_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),    // 62
-    make_tuple(TInput(0xFaceB01d98765432, 62), bbv("11_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),   // 63
-    make_tuple(TInput(0xFaceB01d98765432, 63), bbv("111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")),  // 64
-    make_tuple(TInput(0xFaceB01d98765432, 64), bbv("1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010")), // 65
+    data_t(0x0000000000000000,      1,  "0"),                                                                               // 00
+    data_t(0x0000000000000001,      1,  "1"),                                                                               // 01
+    data_t(0x0000000000000002,      2,  "10"),                                                                              // 02
+    data_t(0x0000000000000003,      2,  "11"),                                                                              // 03
+    data_t(0x0000000000000003,      3,  "011"),                                                                             // 04
+    data_t(0x0000000000000009,      4,  "1001"),                                                                            // 05
+    data_t(0x0000000000000011,      5,  "1000_1"),                                                                          // 06
+    data_t(0x0000000000000012,      6,  "0100_10"),                                                                         // 07
+    data_t(0x000000000000004A,      7,  "1001_010"),                                                                        // 08
+    data_t(0x000000000000007B,      8,  "0111_1011"),                                                                       // 09
+    data_t(0x000000000000017B,      9,  "1:0111_1011"),                                                                     // 10
+    data_t(0x000000000000017B,      10, "01:0111_1011"),                                                                    // 11
+    data_t(0x000000000000037B,      11, "011:0111_1011"),                                                                   // 12
+    data_t(0x000000000000037B,      12, "0011:0111_1011"),                                                                  // 13
+    data_t(0x0000000000005ACE,      13, "1:1010_1100:1110"),                                                                // 14
+    data_t(0x0000000000005ACE,      14, "01:1010_1100:1110"),                                                               // 15
+    data_t(0x0000000000005ACE,      15, "101:1010_1100:1110"),                                                              // 16
+    data_t(0x000000000000FACE,      16, "1111_1010:1100_1110"),                                                             // 17
+    data_t(0x000000008164BACE,      17, "0:1011_1010:1100_1110"),                                                           // 18
+    data_t(0x000000008164BACE,      18, "00:1011_1010:1100_1110"),                                                          // 19
+    data_t(0x000000008164BACE,      19, "100:1011_1010:1100_1110"),                                                         // 20
+    data_t(0x000000008164BACE,      20, "0100:1011_1010:1100_1110"),                                                        // 21
+    data_t(0x000000008164BACE,      21, "0_0100:1011_1010:1100_1110"),                                                      // 22
+    data_t(0x000000008164BACE,      22, "10_0100:1011_1010:1100_1110"),                                                     // 23
+    data_t(0x000000008164BACE,      23, "110_0100:1011_1010:1100_1110"),                                                    // 24
+    data_t(0x000000008164BACE,      24, "0110_0100:1011_1010:1100_1110"),                                                   // 25
+    data_t(0x000000008164BACE,      25, "1:0110_0100:1011_1010:1100_1110"),                                                 // 26
+    data_t(0x000000008164BACE,      26, "01:0110_0100:1011_1010:1100_1110"),                                                // 27
+    data_t(0x000000008164BACE,      27, "001:0110_0100:1011_1010:1100_1110"),                                               // 28
+    data_t(0x000000008164BACE,      28, "0001:0110_0100:1011_1010:1100_1110"),                                              // 29
+    data_t(0x000000008164BACE,      29, "0_0001:0110_0100:1011_1010:1100_1110"),                                            // 30
+    data_t(0x000000008164BACE,      30, "00_0001:0110_0100:1011_1010:1100_1110"),                                           // 31
+    data_t(0x000000008164BACE,      31, "000_0001:0110_0100:1011_1010:1100_1110"),                                          // 32
+    data_t(0x000000008164BACE,      32, "1000_0001:0110_0100:1011_1010:1100_1110"),                                         // 33
+    data_t(0xFaceB01d98765432,      33, "1:1001_1000:0111_0110:0101_0100:0011_0010"),                                       // 34
+    data_t(0xFaceB01d98765432,      34, "01:1001_1000:0111_0110:0101_0100:0011_0010"),                                      // 35
+    data_t(0xFaceB01d98765432,      35, "101:1001_1000:0111_0110:0101_0100:0011_0010"),                                     // 36
+    data_t(0xFaceB01d98765432,      36, "1101:1001_1000:0111_0110:0101_0100:0011_0010"),                                    // 37
+    data_t(0xFaceB01d98765432,      37, "1_1101:1001_1000:0111_0110:0101_0100:0011_0010"),                                  // 38
+    data_t(0xFaceB01d98765432,      38, "01_1101:1001_1000:0111_0110:0101_0100:0011_0010"),                                 // 39
+    data_t(0xFaceB01d98765432,      39, "001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),                                // 40
+    data_t(0xFaceB01d98765432,      40, "0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),                               // 41
+    data_t(0xFaceB01d98765432,      41, "0:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),                             // 42
+    data_t(0xFaceB01d98765432,      42, "00:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),                            // 43
+    data_t(0xFaceB01d98765432,      43, "000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),                           // 44
+    data_t(0xFaceB01d98765432,      44, "0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),                          // 45
+    data_t(0xFaceB01d98765432,      45, "1_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),                        // 46
+    data_t(0xFaceB01d98765432,      46, "11_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),                       // 47
+    data_t(0xFaceB01d98765432,      47, "011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),                      // 48
+    data_t(0xFaceB01d98765432,      48, "1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),                     // 49
+    data_t(0xFaceB01d98765432,      49, "0:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),                   // 50
+    data_t(0xFaceB01d98765432,      50, "10:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),                  // 51
+    data_t(0xFaceB01d98765432,      51, "110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),                 // 52
+    data_t(0xFaceB01d98765432,      52, "1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),                // 53
+    data_t(0xFaceB01d98765432,      53, "0_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),              // 54
+    data_t(0xFaceB01d98765432,      54, "00_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),             // 55
+    data_t(0xFaceB01d98765432,      55, "100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),            // 56
+    data_t(0xFaceB01d98765432,      56, "1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),           // 57
+    data_t(0xFaceB01d98765432,      57, "0:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),         // 58
+    data_t(0xFaceB01d98765432,      58, "10:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),        // 59
+    data_t(0xFaceB01d98765432,      59, "010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),       // 60
+    data_t(0xFaceB01d98765432,      60, "1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),      // 61
+    data_t(0xFaceB01d98765432,      61, "1_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),    // 62
+    data_t(0xFaceB01d98765432,      62, "11_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),   // 63
+    data_t(0xFaceB01d98765432,      63, "111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"),  // 64
+    data_t(0xFaceB01d98765432,      64, "1111_1010:1100_1110:1011_0000:0001_1101:1001_1000:0111_0110:0101_0100:0011_0010"), // 65
+    data_t(12345678909876500000ULL, 64, "1010_1011:0101_0100:1010_1001:1000_1110:1110_1110:0011_1000:0111_0110:0010_0000"), // 66
+    data_t(12345678909876543210ULL, 64, "1010_1011:0101_0100:1010_1001:1000_1110:1110_1110:0011_1001:0001_1110:1110_1010"), // 67
+    data_t(18446744073709551614ULL, 64, "1111_1111:1111_1111:1111_1111:1111_1111:1111_1111:1111_1111:1111_1111:1111_1110"), // 68
+    data_t(18446744073709551615ULL, 64, "1111_1111:1111_1111:1111_1111:1111_1111:1111_1111:1111_1111:1111_1111:1111_1111"), // 68
   };
 
   // ---------------- DDT Exercise
@@ -7422,38 +7674,6 @@ void UT_BinaryVector::test_Slice ()
   TS_DATA_DRIVEN_TEST (checker, data);
 }
 
-#include <vector>
-using std::vector;
-
-namespace
-{
-  void test_PrettyPrinter ()
-  {
-    vector<uint8_t> v1;
-    vector<uint8_t> v2(1);
-    vector<uint8_t> v3(2);
-    vector<uint8_t> v4(3);
-    vector<uint8_t> v5(4);
-    vector<uint8_t> v6(5);
-
-
-    auto bv1 = BinaryVector::CreateFromHexString("");
-    auto bv2 = BinaryVector::CreateFromHexString("A1");
-    auto bv3 = BinaryVector::CreateFromHexString("B02");
-    auto bv4 = BinaryVector::CreateFromHexString("C000_3");
-    auto bv5 = BinaryVector::CreateFromHexString("D000_004");
-    auto bv6 = BinaryVector(63, 0xF3);
-    auto bv7 = BinaryVector(64, 0xF4);
-    auto bv8 = BinaryVector(65, 0x65);
-    auto bv9 = BinaryVector(127, 0x3C);
-    auto bv0 = BinaryVector(2000, 0xAB);
-
-//+    int *p;
-//+    p = nullptr;
-    return;
-  }
-} // End of unnamed namespace
-
 
 //! Checks BinaryVector::Slice() when required slice exceed BinaryVector capacity
 //!
@@ -7492,8 +7712,6 @@ void UT_BinaryVector::test_Slice_When_Exceeding_Capacity ()
   // ---------------- DDT Exercise
   //
   TS_DATA_DRIVEN_TEST (checker, data);
-
-  test_PrettyPrinter();
 }
 
 
@@ -7588,7 +7806,7 @@ void UT_BinaryVector::test_CreateFromRightAlignedBuffer ()
   using data_t = tuple<initializer_list<uint8_t>, string_view> ;
   initializer_list<data_t> data =
   {
-    data_t({0x00},                      "0b"),                                // 00
+    data_t({0x00},                      "0x00"),                              // 00
     data_t({0xA5},                      "0xA5"),                              // 01
     data_t({0xA5,  0xB6},               "0xA5B6"),                            // 02
     data_t({0x0A,  0x5B,  0x6C},        "0xA5B6C"),                           // 03
@@ -7655,7 +7873,7 @@ void UT_BinaryVector::test_CreateFromRightAlignedBuffer_Moved ()
   using data_t = tuple<initializer_list<uint8_t>, string_view> ;
   initializer_list<data_t> data =
   {
-    data_t({0x00},                      "0b"),                                // 00
+    data_t({0x00},                      "0x00"),                              // 00
     data_t({0xA5},                      "0xA5"),                              // 01
     data_t({0xA5,  0xB6},               "0xA5B6"),                            // 02
     data_t({0x0A,  0x5B,  0x6C},        "0xA5B6C"),                           // 03

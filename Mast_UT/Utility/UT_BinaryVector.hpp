@@ -34,18 +34,32 @@ class UT_BinaryVector : public CxxTest::TestSuite
   void test_Constructor_Copy_When_SrcIsEmpty ();
   void test_Constructor_Move_When_SrcIsEmpty ();
 
-  // ---------------- CreateFromXXXString
+  // ---------------- CreateFromBinString
   //
   void test_CreateFromBinaryString ();
   void test_CreateFromBinaryString_InvalidChars ();
   void test_CreateFromBinaryString_DontCare_as_Zero ();
   void test_CreateFromBinaryString_DontCare_as_One ();
 
+  // ---------------- CreateFromHexString
+  //
   void test_CreateFromHexString ();
   void test_CreateFromHexString_InvalidChars ();
   void test_CreateFromHexString_DontCare_as_Zero ();
   void test_CreateFromHexString_DontCare_as_One ();
 
+  // ---------------- CreateFromDecString
+  //
+  void test_CreateFromDecString_Unsized ();
+  void test_CreateFromDecString_Sized ();
+  void test_CreateFromDecString_OutOfRange ();
+  void test_CreateFromDecString_InvalidChars ();
+
+  // ---------------- CreateFromSizedDecString
+  //
+
+  // ---------------- CreateFromString
+  //
   void test_CreateFromString ();
   void test_CreateFromString_InvalidChars ();
   void test_CreateFromString_DontCare_as_Zero ();

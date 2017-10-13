@@ -1211,7 +1211,7 @@ BinaryVector BinaryVector::CreateFromString (string_view stringValue, SizeProper
         || (offset == stringValue.length())      // Found at end of string ==> can be ignored
        )
     {
-      stringValue.clear();       // Nothing to process after this chunk
+      stringValue.remove_prefix(stringValue.length());       // Nothing to process after this chunk
     }
     else
     {

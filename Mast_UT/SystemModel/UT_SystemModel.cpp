@@ -536,10 +536,10 @@ void UT_SystemModel::test_CreateAccessInterfaceTranslator_Result_Queues_NB ()
 
   // One Request
   auto  test = BinaryVector::CreateFromBinaryString("01");
-  node->PushResult(test);
-  auto result = node->PopResult();
-  TS_ASSERT_NOT_NULLPTR (&result);
-  TS_ASSERT_TRUE      (result.CompareEqualTo(test));
+  node->PushfromSut(test);
+  auto fromSut = node->PopfromSut();
+  TS_ASSERT_NOT_NULLPTR (&fromSut);
+  TS_ASSERT_TRUE      (fromSut.CompareEqualTo(test));
 
 
   // Multiple Request
@@ -547,14 +547,14 @@ void UT_SystemModel::test_CreateAccessInterfaceTranslator_Result_Queues_NB ()
   for (int i=0;i<10;i++)
      {
      test = BinaryVector::CreateFromHexString("01"+std::to_string(i));
-      node->PushResult(test);
+      node->PushfromSut(test);
      }
 
   for (int i=0;i<10;i++)
      {
-     result = node->PopResult();
-     TS_ASSERT_NOT_NULLPTR (&result);
-    TS_ASSERT_TRUE      (result.CompareEqualTo(BinaryVector::CreateFromHexString("01"+std::to_string(i))));
+     fromSut = node->PopfromSut();
+     TS_ASSERT_NOT_NULLPTR (&fromSut);
+    TS_ASSERT_TRUE      (fromSut.CompareEqualTo(BinaryVector::CreateFromHexString("01"+std::to_string(i))));
      }
 
 }
@@ -564,7 +564,7 @@ void UT_SystemModel::test_CreateAccessInterfaceTranslator_Result_Queues_NB ()
 //! of handling Update queues in Non-blocking situations
 //! Blocking behaviour checked in UT_MTQueue
 //!
-void UT_SystemModel::test_CreateAccessInterfaceTranslator_Update_Queues_NB ()
+void UT_SystemModel::test_CreateAccessInterfaceTranslator_Pending_Queues_NB ()
 {
   // ---------------- Setup
   //
@@ -580,26 +580,24 @@ void UT_SystemModel::test_CreateAccessInterfaceTranslator_Update_Queues_NB ()
   CxxTest::setAbortTestOnFail(true);
 
   // One Request
-  auto  test = BinaryVector::CreateFromBinaryString("01");
-  node->PushUpdate(test);
-  auto Update = node->PopUpdate();
-  TS_ASSERT_NOT_NULLPTR (&Update);
-  TS_ASSERT_TRUE      (Update.CompareEqualTo(test));
+  node->PushPending();
+  auto Pending = node->PopPending();
+  TS_ASSERT_NOT_NULLPTR (&Pending);
+    TS_ASSERT_TRUE      (Pending);
 
 
   // Multiple Request
 
   for (int i=0;i<10;i++)
      {
-     test = BinaryVector::CreateFromHexString("01"+std::to_string(i));
-      node->PushUpdate(test);
+       node->PushPending();
      }
 
   for (int i=0;i<10;i++)
      {
-     Update = node->PopUpdate();
-     TS_ASSERT_NOT_NULLPTR (&Update);
-    TS_ASSERT_TRUE      (Update.CompareEqualTo(BinaryVector::CreateFromHexString("01"+std::to_string(i))));
+     Pending = node->PopPending();
+     TS_ASSERT_NOT_NULLPTR (&Pending);
+    TS_ASSERT_TRUE      (Pending);
      }
 
 }

@@ -45,24 +45,22 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
   void PushRequest(CallbackRequest Request) {m_CallbackQueue.Push(Request);}; //!<Queues a new Callback Request
   CallbackRequest PopRequest() {return m_CallbackQueue.Pop();}; //!<returns the oldest request. NB: it is a BLOCKING call
 
-  void PushResult(BinaryVector Result) {m_fromSutQueue.Push(std::make_pair(Result,*(new std::string)));};//!< Queues a new callback result
-  BinaryVector PopResult() { return  m_fromSutQueue.Pop().first;};//!< returns the oldest callback result. NB: it is a BLOCKING call
-  std::string PopFormattedResult() { auto tmp=m_fromSutQueue.Pop(); if (!tmp.second.empty()) return tmp.second; 
+  void PushfromSut(BinaryVector Result) {m_fromSutQueue.Push(std::make_pair(Result,*(new std::string)));};//!< Queues a new callback result
+  BinaryVector PopfromSut() { return  m_fromSutQueue.Pop().first;};//!< returns the oldest callback result. NB: it is a BLOCKING call
+  std::string PopFormattedfromSut() { auto tmp=m_fromSutQueue.Pop(); if (!tmp.second.empty()) return tmp.second; 
                                       else return tmp.first.DataAsBinaryString();};//!< returns the Formatted Data of the oldest callback result. NB: it is a BLOCKING call
 
-  void PushUpdate(BinaryVector Update) {m_toSutQueue.Push(std::make_pair(Update,*(new std::string)));};//!< Queues a new toSut Update value
-  BinaryVector PopUpdate() { return  m_toSutQueue.Pop().first;};//!< returns the oldest toSut Update value NB: it is a BLOCKING call
-  std::string PopFormattedUpdate() { auto tmp=m_toSutQueue.Pop(); if (!tmp.second.empty()) return tmp.second; 
-                                      else return tmp.first.DataAsBinaryString();};//!< returns the Formatted Data of the oldesttoSut Update value. NB: it is a BLOCKING call
+  void PushPending() {m_Pending.Push(true);};//!< Queues a new toSut Update value
+  bool PopPending() { return  m_Pending.Pop();};//!< returns the oldest toSut Update value NB: it is a BLOCKING call
 
   // ---------------- Private  Fields
   //
   private:
   uint32_t                                 m_numberOfEndPoints = 0; //!< Number of nodes (endpoints) accessible through the access interface
   
-  MTQueue<CallbackRequest> m_CallbackQueue;  
-  MTQueue<std::pair<BinaryVector,std::string>> m_fromSutQueue;  
-  MTQueue<std::pair<BinaryVector,std::string>> m_toSutQueue;  
+  MTQueue<CallbackRequest> m_CallbackQueue;  //DataCycleThread pushes to_SUT data and CallbackId to this queue
+  MTQueue<std::pair<BinaryVector,std::string>> m_fromSutQueue;   //DataCycleThread waits on this queue to update its registers
+  MTQueue<bool> m_Pending;  //DataCycleThread waits on this queue for pending cycles: only used for synchro, data is not important
 };
 //
 //  End of AccessInterface class declaration

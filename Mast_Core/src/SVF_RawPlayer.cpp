@@ -28,7 +28,8 @@ using std::ostringstream;
 //  os << commandType << " " << toSutData.BitsCount() << " TDI(" << SVFVector(toSutData).Data() << ");\n";
 
 //! Loopbacks "to SUT data" logging SVF command(s) that would be issued if it was really an operating protocol
-//!
+//! NOT VERIFIED YET!!! CHECK!!!!!!!
+
 BinaryVector SVF_RawPlayer::DoCallback (uint32_t endpointId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   
@@ -36,7 +37,7 @@ BinaryVector SVF_RawPlayer::DoCallback (uint32_t endpointId, void* /* interfaceD
   ParentInterface()->PushRequest(*request);
   
   /*NB: this is a BLOCKING call*/
-  auto result = ParentInterface()->PopResult();
+  auto result = ParentInterface()->PopfromSut();
   
   return result;
 }

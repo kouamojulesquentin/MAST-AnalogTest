@@ -420,6 +420,18 @@ void SystemModelChecker::VisitAccessInterface (AccessInterface& accessInterface)
 //---------------------------------------------------------------------------
 
 
+//! Checks consistency specific to AccessInterfaceTranslator nodes
+//!
+void SystemModelChecker::VisitAccessInterfaceTranslator (AccessInterfaceTranslator& )
+{
+ //TODO: check child is an AccessInterface with a Raw Protocol
+return;
+}
+//
+//  End of: SystemModelChecker::VisitAccessInterfaceTranslator
+//---------------------------------------------------------------------------
+
+
 //! Checks consistency specific to Chain nodes
 //!
 void SystemModelChecker::VisitChain (Chain& )

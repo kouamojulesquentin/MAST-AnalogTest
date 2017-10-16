@@ -34,6 +34,7 @@ class MAST_CORE_EXPORT SystemModelVisitor
   // ---------------- Public  Methods
   //
   public:
+  virtual void VisitAccessInterfaceTranslator (AccessInterfaceTranslator&accessInterfaceTranslator) = 0;
   virtual void VisitAccessInterface (AccessInterface& accessInterface) = 0;
   virtual void VisitChain           (Chain&           chain)           = 0;
   virtual void VisitLinker          (Linker&          linker)          = 0;

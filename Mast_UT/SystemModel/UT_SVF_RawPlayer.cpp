@@ -47,6 +47,8 @@ void UT_SVF_RawPlayer::test_empty_Constructor ()
   TS_ASSERT_THROWS_NOTHING (SVF_RawPlayer sut());
   SVF_RawPlayer sut;
   TS_ASSERT_NULLPTR(sut.ParentInterface())
+  //checks that it is recognized as a Raw protocol
+  
 }
 
 //! Checks SVF_RawPlayer constructor with parameter
@@ -61,7 +63,10 @@ void UT_SVF_RawPlayer::test_not_empty_Constructor ()
   //
   TS_ASSERT_THROWS_NOTHING (SVF_RawPlayer sut(Interface));
   SVF_RawPlayer sut(Interface);
-  TS_ASSERT_EQUALS(sut.ParentInterface(),Interface)
+  TS_ASSERT_EQUALS(sut.ParentInterface(),Interface) 
+  auto protocol_is_raw =  dynamic_cast<AccessInterfaceRawProtocol*>(&sut);
+  TS_ASSERT_TRUE(protocol_is_raw);
+
 }
 
 //! Checks SVF_RawPlayer can set the Parent interface

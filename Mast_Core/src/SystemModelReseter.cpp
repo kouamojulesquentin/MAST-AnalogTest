@@ -18,6 +18,12 @@
 using namespace mast;
 
 
+//! TODO: still empty, needs to clear up chains!
+//!
+void SystemModelReseter::VisitAccessInterfaceTranslator (AccessInterfaceTranslator& accessInterfaceTranslator)
+{
+  VisitParent(accessInterfaceTranslator);
+}
 
 //! Resets Linker and all its children nodes then issue a reset sequence at the AccessInterface level
 //!

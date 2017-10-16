@@ -40,13 +40,26 @@ void DataCycleVisitor::VisitAccessInterface (AccessInterface& accessInterface)
   {
    if (!protocol_is_raw)
      m_manager->DoHierarchicalDataCycle(&accessInterface);
-   /*Here, notificaton to Raw protocol blocked on the queue*/  
   }
 }
 //
 //  End of: DataCycleVisitor::VisitAccessInterface
 //---------------------------------------------------------------------------
 
+
+//! If Pending, sends a notification to the Raw protocol waiting on the pending queue
+//!
+void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator&accessInterfaceTranslator)
+
+{
+  VisitChildren(accessInterfaceTranslator);
+  if (accessInterfaceTranslator.IsPending())
+  {
+  }
+}
+//
+//  End of: DataCycleVisitor::VisitRegister
+//---------------------------------------------------------------------------
 
 
 //! Updates Chain pending flag

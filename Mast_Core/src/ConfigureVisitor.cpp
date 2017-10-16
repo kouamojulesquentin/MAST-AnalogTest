@@ -29,6 +29,16 @@ void ConfigureVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 //  End of: ConfigureVisitor::VisitAccessInterface
 //---------------------------------------------------------------------------
 
+//! Updates AccessInterfaceTranslator pending flag
+//!
+void ConfigureVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator& accessInterfaceTranslator)
+{
+  auto pendingCount = ConfigureChildren(accessInterfaceTranslator);
+  accessInterfaceTranslator.SetPendingCount(pendingCount);
+}
+//
+//  End of: ConfigureVisitor::VisitAccessInterfaceTranslator
+//---------------------------------------------------------------------------
 
 
 //! Updates Chain pending flag

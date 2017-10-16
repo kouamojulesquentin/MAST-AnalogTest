@@ -298,6 +298,18 @@ void PrettyPrinter::VisitAccessInterface (AccessInterface& accessInterface)
   StreamParentNode("Access_I", accessInterface, note);
 }
 
+//! Appends content of AccessInterfaceTranslator node in text representation and visits
+//! sub-nodes
+//!
+void PrettyPrinter::VisitAccessInterfaceTranslator (AccessInterfaceTranslator& accessInterfaceTranslator)
+{
+  string note;
+
+ //TODO: specific formatting
+ 
+  StreamParentNode("Access_T", accessInterfaceTranslator, note);
+}
+
 //! Appends content of Chain node in text representation and visits
 //! sub-nodes
 //!

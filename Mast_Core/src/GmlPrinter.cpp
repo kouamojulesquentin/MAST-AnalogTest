@@ -499,6 +499,16 @@ void GmlPrinter::VisitAccessInterface (AccessInterface& accessInterface)
   AppendParentNode(m_shape_AccessInterface, m_color_AccessInterface, note, accessInterface);
 }
 
+//! Appends AccessInterfaceTranslator node to GML graph
+//! TODO: configure a specific appearance
+//!
+void GmlPrinter::VisitAccessInterfaceTranslator (AccessInterfaceTranslator& accessInterfaceTranslator)
+{
+  auto note     = string();
+
+  AppendParentNode(m_shape_AccessInterface, m_color_AccessInterface, note, accessInterfaceTranslator);
+}
+
 //! Appends Chain node to GML graph
 //!
 void GmlPrinter::VisitChain (Chain& chain)

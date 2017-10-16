@@ -14,6 +14,7 @@
 #include "SystemModelChecker.hpp"
 #include "PathSelector.hpp"
 #include "AccessInterfaceProtocol.hpp"
+#include "AccessInterfaceRawProtocol.hpp"
 #include "NamesChecker.hpp"
 
 using namespace mast;
@@ -53,6 +54,7 @@ SystemModelCheckResult SystemModelChecker::Check ()
 void SystemModelChecker::CheckAccessInterface ()
 {
   auto rootAsAI    = dynamic_pointer_cast<AccessInterface > (m_root);
+  auto rootAsAT    = dynamic_pointer_cast<AccessInterfaceTranslator > (m_root);
   auto rootAsChain = dynamic_pointer_cast<Chain>(m_root);
 
   if (rootAsAI)
@@ -60,29 +62,34 @@ void SystemModelChecker::CheckAccessInterface ()
     CheckNumberOfEndPoints(rootAsAI);
 //+    CheckNoAccessInterfaceBellow(rootAsAI);
   }
+  else if (rootAsAT){}
   else if (rootAsChain)
   {
     auto aiCount = 0u;
+    auto aTCount = 0u;
     auto child = rootAsChain->FirstChild();
     while (child)
     {
       auto childAsAi = dynamic_pointer_cast<AccessInterface>(child);
+      auto childAsAT = dynamic_pointer_cast<AccessInterfaceTranslator>(child);
       if (childAsAi)
       {
         ++aiCount;
         CheckNumberOfEndPoints(childAsAi);
 //+        CheckNoAccessInterfaceBellow(childAsAi);
       }
-      else
-      {
-        ReportError(*child, ", children of Chain root node is not an AccessInterface");
-      }
+      if (childAsAT)
+        ++aTCount;
+        
+      if (!childAsAi)
+        if (!childAsAT)
+         ReportError(*child, ", children of Chain root node must be either AccessInterface or AccessInterfaceTranslator");
       child = child->NextSibling();
     }
 
-    if (aiCount == 0)
+    if (aiCount+aTCount == 0)
     {
-      ReportError(*rootAsChain, " has no AccessInterface child");
+      ReportError(*rootAsChain, " has no AccessInterface or AccessInterfaceTranslator child");
     }
   }
   else
@@ -422,9 +429,32 @@ void SystemModelChecker::VisitAccessInterface (AccessInterface& accessInterface)
 
 //! Checks consistency specific to AccessInterfaceTranslator nodes
 //!
-void SystemModelChecker::VisitAccessInterfaceTranslator (AccessInterfaceTranslator& )
+void SystemModelChecker::VisitAccessInterfaceTranslator (AccessInterfaceTranslator& accessInterfaceTranslator)
 {
- //TODO: check child is an AccessInterface with a Raw Protocol
+
+ auto node = accessInterfaceTranslator.FirstChild();
+ auto accessInterface = std::dynamic_pointer_cast<AccessInterface>(node);
+
+ if ((!node) ||(!accessInterface))
+  {
+      ostringstream os;
+      Stream(os, accessInterfaceTranslator) << " must have a child of type AccessInterface ";
+      ReportError(os.str());
+      return;
+   }
+  
+
+ auto protocol = accessInterface->Protocol();
+ auto protocol_is_raw =  std::dynamic_pointer_cast<AccessInterfaceRawProtocol>(protocol);
+ if (!protocol_is_raw)
+  {
+      ostringstream os;
+      Stream(os, accessInterfaceTranslator) << " Must be associated with a Raw protocol, while AccessInterface ";
+      os << node->Name() << " has a non-raw protocol";
+      ReportError(os.str());
+   }
+
+
 return;
 }
 //

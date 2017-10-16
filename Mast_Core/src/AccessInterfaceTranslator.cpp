@@ -20,7 +20,7 @@ using namespace mast;
 //!
 void AccessInterfaceTranslator::Accept (SystemModelVisitor& visitor)
 {
-  visitor.VisitChildren(*this);
+  visitor.VisitAccessInterfaceTranslator(*this);
 }
 
 

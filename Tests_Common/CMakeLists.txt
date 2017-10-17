@@ -1,4 +1,4 @@
-# Tests_Common: Regroup parts that are potentially used by multiple unit tests projects
+# Tests_Common: Regroups parts that are potentially used by multiple unit tests projects
 # It depends on MAST core to provide facilities to build a model of SUT
 
 project (Tests_Common CXX)
@@ -21,18 +21,15 @@ endif()
 # ---------------- Tests Commons Library
 #
 add_library           (Tests_Common  STATIC TestUtilities.cpp
-                                            TestModelBuilder.cpp
-                      )
+                                            TestModelBuilder.cpp)
+
 target_compile_options      (Tests_Common PUBLIC  -fexceptions -std=c++14)
 target_compile_definitions  (Tests_Common PUBLIC  CXXTEST_HAVE_EH CXXTEST_HAVE_STD CXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION)
 target_include_directories  (Tests_Common PUBLIC  ${CXXTEST_INCLUDE_DIR}
                                                   ${CMAKE_CURRENT_SOURCE_DIR}
-                                                  ${CMAKE_CURRENT_SOURCE_DIR}/CxxTest_Traits
-                          )
+                                                  ${CMAKE_CURRENT_SOURCE_DIR}/CxxTest_Traits)
 
 target_link_libraries (Tests_Common  ${PLATFORM_LIBS} Mast_Core)
-#+set_target_properties (Tests_Common  PROPERTIES       COMPILE_FLAGS "${UT_CFLAGS}" )
-
 
 # ---------------- Build Runner.cpp
 #
@@ -55,7 +52,6 @@ message("")
 
 # ---------------- Runner application (to check provided common utilities)
 #
-#+add_executable        (Tests_Common_UT ${UT_SOURCES} ${RUNNER_PATH})
 add_executable        (Tests_Common_UT ${UT_SOURCES} ${GENERATED_RUNNER})
 target_link_libraries (Tests_Common_UT ${PLATFORM_LIBS} Tests_Common Logger)
 

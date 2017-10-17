@@ -6,7 +6,7 @@ add_definitions(${UT_WARNINGS})
 set (UT_WARNINGS ${WARNINGS})
 
 add_definitions(${UT_CFLAGS})
-set (UT_CFLAGS "${UT_WARNINGS} -fexceptions -std=c++14 -DCXXTEST_HAVE_EH -DCXXTEST_HAVE_STD -DCXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION")
+#+set (UT_CFLAGS "${UT_WARNINGS} -fexceptions -std=c++14 -DCXXTEST_HAVE_EH -DCXXTEST_HAVE_STD -DCXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION")
 
 
 #if(CXXTEST_FOUND)
@@ -33,19 +33,29 @@ include_directories(${LIBLOGGER_INCLUDE_DIRS})
 include_directories(${LIBTCLAP_INCLUDE_DIRS})
 include_directories(${LIBYAML_INCLUDE_DIRS})
 
-
-#add_compile_options(${UT_CFLAGS})
-
 file(GLOB Mast_UT_C_API        "API_C/*")
 file(GLOB Mast_UT_CPP_API      "API_CPP/*")
-file(GLOB Mast_UT_UTILITY      "Utility/*")
 file(GLOB Mast_UT_SYSTEM_MODEL "SystemModel/*")
 file(GLOB Mast_UT_YAML         "Yaml/*")
 file(GLOB Mast_UT_CORE         "Core/*")
 file(GLOB Mast_UT_PLUGINS      "Plugins/UT_*")
 file(GLOB Mast_UT_HELPERS      "UT_Helpers/*")
 
-#+set(Mast_UT_PLUGINS ${Mast_UT_PLUGINS} "Plugins/PluginsRegistry.hpp" "Plugins/PluginsRegistry.cpp")
+set(Mast_UT_UTILITY Utility/UT_BinaryVector.cpp
+                    Utility/UT_BinaryVector.hpp
+                    Utility/UT_FileSystem.cpp
+                    Utility/UT_FileSystem.hpp
+                    Utility/UT_IndexedRange.cpp
+                    Utility/UT_IndexedRange.hpp
+                    Utility/UT_MastConfiguration.cpp
+                    Utility/UT_MastConfiguration.hpp
+                    Utility/UT_MTQueue.cpp
+                    Utility/UT_MTQueue.hpp
+                    Utility/UT_SVFVector.cpp
+                    Utility/UT_SVFVector.hpp
+                    Utility/UT_Utility.cpp
+                    Utility/UT_Utility.hpp
+                    )
 
 if (WIN32)
   set(PLATFORM_LIBS DbgHelp)
@@ -58,9 +68,6 @@ endif()
 add_library           (Mast_UT_Helpers SHARED     "Plugins/PluginsRegistry.cpp")
 set_target_properties (Mast_UT_Helpers PROPERTIES COMPILE_FLAGS "${WARNINGS} -std=c++14")
 target_link_libraries (Mast_UT_Helpers Tests_Common ${PLATFORM_LIBS})
-
-#+set(EXTRA_LIBS ${EXTRA_LIBS} Mast_UT_Helpers)
-
 
 set(Mast_UT_GENERATED "Generated/Runner.cpp")
 
@@ -78,10 +85,14 @@ set_source_files_properties(${Mast_UT_GENERATED} GENERATED)
 
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "../Bin")
-add_executable 				(Mast_UT ${Mast_UT_SOURCES})
-set_target_properties	(Mast_UT PROPERTIES COMPILE_FLAGS "${UT_CFLAGS}" )
+add_executable             (Mast_UT ${Mast_UT_SOURCES})
+set_target_properties      (Mast_UT PROPERTIES COMPILE_FLAGS "${UT_CFLAGS}" )
+target_compile_options     (Mast_UT PRIVATE -fexceptions -std=c++14)
+target_compile_definitions (Mast_UT PRIVATE CXXTEST_HAVE_EH
+                                            CXXTEST_HAVE_STD
+                                            CXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION)
 
-target_link_libraries(Mast_UT Mast_UT_Helpers Mast_API_CPP Mast_API_C Logger ${PLATFORM_LIBS})
+target_link_libraries(Mast_UT Mast_UT_Helpers Tests_Common Mast_API_CPP Mast_API_C Logger ${PLATFORM_LIBS})
 
 install(DIRECTORY UT_TestFiles DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Mast_Core)
 

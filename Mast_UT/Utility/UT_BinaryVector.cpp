@@ -14,6 +14,7 @@
 #include "UT_BinaryVector.hpp"
 #include "BinaryVector.hpp"
 #include "BinaryVector_Traits.hpp"
+#include "IndexedRange_Traits.hpp"
 
 #include <vector>
 #include <memory>
@@ -29,6 +30,9 @@ using std::initializer_list;
 using std::ostringstream;
 using std::string;
 using std::experimental::string_view;
+
+using namespace std::string_literals;
+using namespace std::experimental::literals::string_view_literals;
 
 using namespace mast;
 
@@ -639,32 +643,33 @@ void UT_BinaryVector::test_CreateFromDecString_Unsized ()
   using data_t = tuple<string_view, string_view>;
   auto data =
   {
-    data_t("0",           "0000_0000_0000_0000_0000_0000_0000_0000"), // 00
-    data_t("1",           "0000_0000_0000_0000_0000_0000_0000_0001"), // 01
-    data_t("2",           "0000_0000_0000_0000_0000_0000_0000_0010"), // 02
-    data_t("3",           "0000_0000_0000_0000_0000_0000_0000_0011"), // 03
-    data_t("4",           "0000_0000_0000_0000_0000_0000_0000_0100"), // 04
-    data_t("5",           "0000_0000_0000_0000_0000_0000_0000_0101"), // 05
-    data_t("6",           "0000_0000_0000_0000_0000_0000_0000_0110"), // 06
-    data_t("7",           "0000_0000_0000_0000_0000_0000_0000_0111"), // 07
-    data_t("8",           "0000_0000_0000_0000_0000_0000_0000_1000"), // 08
-    data_t("9",           "0000_0000_0000_0000_0000_0000_0000_1001"), // 09
-    data_t("10",          "0000_0000_0000_0000_0000_0000_0000_1010"), // 10
-    data_t("21",          "0000_0000_0000_0000_0000_0000_0001_0101"), // 11
-    data_t("4294967295",  "1111_1111_1111_1111_1111_1111_1111_1111"), // 12
-    data_t("000",         "0000_0000_0000_0000_0000_0000_0000_0000"), // 13
-    data_t(" 0",          "0000_0000_0000_0000_0000_0000_0000_0000"), // 14
-    data_t("  12",        "0000_0000_0000_0000_0000_0000_0000_1100"), // 15
-    data_t(" 23",         "0000_0000_0000_0000_0000_0000_0001_0111"), // 16
-    data_t(" 89",         "0000_0000_0000_0000_0000_0000_0101_1001"), // 17
-    data_t("1 2 7",       "0000_0000_0000_0000_0000_0000_0111_1111"), // 18
-    data_t("1_2_8",       "0000_0000_0000_0000_0000_0000_1000_0000"), // 19
-    data_t("_1 2 9_",     "0000_0000_0000_0000_0000_0000_1000_0001"), // 20
-    data_t("'d89",        "0000_0000_0000_0000_0000_0000_0101_1001"), // 21
-    data_t("~0",          "1111_1111_1111_1111_1111_1111_1111_1111"), // 22
-    data_t("~6",          "1111_1111_1111_1111_1111_1111_1111_1001"), // 23
-    data_t("~4294967294", "0000_0000_0000_0000_0000_0000_0000_0001"), // 24
-    data_t("~4294967295", "0000_0000_0000_0000_0000_0000_0000_0000"), // 25
+    data_t("",            ""),                                        // 00 ==> Vector is empty
+    data_t("0",           "0000_0000_0000_0000_0000_0000_0000_0000"), // 01
+    data_t("1",           "0000_0000_0000_0000_0000_0000_0000_0001"), // 02
+    data_t("2",           "0000_0000_0000_0000_0000_0000_0000_0010"), // 03
+    data_t("3",           "0000_0000_0000_0000_0000_0000_0000_0011"), // 04
+    data_t("4",           "0000_0000_0000_0000_0000_0000_0000_0100"), // 05
+    data_t("5",           "0000_0000_0000_0000_0000_0000_0000_0101"), // 06
+    data_t("6",           "0000_0000_0000_0000_0000_0000_0000_0110"), // 07
+    data_t("7",           "0000_0000_0000_0000_0000_0000_0000_0111"), // 08
+    data_t("8",           "0000_0000_0000_0000_0000_0000_0000_1000"), // 09
+    data_t("9",           "0000_0000_0000_0000_0000_0000_0000_1001"), // 10
+    data_t("10",          "0000_0000_0000_0000_0000_0000_0000_1010"), // 11
+    data_t("21",          "0000_0000_0000_0000_0000_0000_0001_0101"), // 12
+    data_t("4294967295",  "1111_1111_1111_1111_1111_1111_1111_1111"), // 13
+    data_t("000",         "0000_0000_0000_0000_0000_0000_0000_0000"), // 14
+    data_t(" 0",          "0000_0000_0000_0000_0000_0000_0000_0000"), // 15
+    data_t("  12",        "0000_0000_0000_0000_0000_0000_0000_1100"), // 16
+    data_t(" 23",         "0000_0000_0000_0000_0000_0000_0001_0111"), // 17
+    data_t(" 89",         "0000_0000_0000_0000_0000_0000_0101_1001"), // 18
+    data_t("1 2 7",       "0000_0000_0000_0000_0000_0000_0111_1111"), // 19
+    data_t("1_2_8",       "0000_0000_0000_0000_0000_0000_1000_0000"), // 20
+    data_t("_1 2 9_",     "0000_0000_0000_0000_0000_0000_1000_0001"), // 21
+    data_t("'d89",        "0000_0000_0000_0000_0000_0000_0101_1001"), // 22
+    data_t("~0",          "1111_1111_1111_1111_1111_1111_1111_1111"), // 23
+    data_t("~6",          "1111_1111_1111_1111_1111_1111_1111_1001"), // 24
+    data_t("~4294967294", "0000_0000_0000_0000_0000_0000_0000_0001"), // 25
+    data_t("~4294967295", "0000_0000_0000_0000_0000_0000_0000_0000"), // 26
 
     data_t("12345678909876500000",  "1010_1011:0101_0100:1010_1001:1000_1110:1110_1110:0011_1000:0111_0110:0010_0000"), // 26
     data_t("12345678909876543210",  "1010_1011:0101_0100:1010_1001:1000_1110:1110_1110:0011_1001:0001_1110:1110_1010"), // 27
@@ -930,6 +935,7 @@ void UT_BinaryVector::test_CreateFromString ()
     make_tuple("72",                        "0000_0000:0000_0000:0000_0000:0100_1000"), // 50 ==> plain number are accepted provided they are decimal
     make_tuple("~72",                       "1111_1111:1111_1111:1111_1111:1011_0111"), // 51 ==> plain number are accepted provided they are decimal
     make_tuple("3'b1, /xB4, /b101, ~5'h1a", "111:1011_0100:101:0_0101"),                // 52 ==> Mix of SIT and ICL notation!
+    make_tuple("'xBad",                     "1011_1010_1101"),                          // 53 ==> 'x is supported as an extension to ICL extension
   };
 
   // ---------------- DDT Exercise
@@ -975,6 +981,7 @@ void UT_BinaryVector::test_CreateFromString_InvalidChars ()
     "7'o13",                           // 19 ==> Octal is not supported
     "7'O13",                           // 20 ==> Octal is not supported
     "12'hAxB",                         // 21 ==> Don't care is error (defined by parameter)
+    "'cBad",                           // 22 ==> 'c' is not a recognized base
     "h",                               // 22
     "'",                               // 23 ==> This is not enough
     "~",                               // 24 ==> This is not enough
@@ -1596,15 +1603,16 @@ void UT_BinaryVector::test_CompareEqualTo_With_EmptyMask_Equal ()
 
   auto data =
   {
-    "0b0",             // 00
-    "0b1",             // 01
-    "0b01",            // 02
-    "0b10",            // 03
-    "0b1011",          // 04
-    "0b0110_0101",     // 05
-    "0b1110_0000:1",   // 06
-    "0b1110_0010:10",  // 07
-    "0xE29EA/b1",      // 08
+    "",                // 00
+    "0b0",             // 01
+    "0b1",             // 02
+    "0b01",            // 03
+    "0b10",            // 04
+    "0b1011",          // 05
+    "0b0110_0101",     // 06
+    "0b1110_0000:1",   // 07
+    "0b1110_0010:10",  // 08
+    "0xE29EA/b1",      // 09
   };
 
   // ---------------- DDT Exercise
@@ -1681,15 +1689,16 @@ void UT_BinaryVector::test_CompareEqualTo_With_Mask_Equal ()
 
   auto data =
   {
-    make_tuple("0b0",         "0b0",         "0b0"),         // 00
-    make_tuple("0b1",         "0b0",         "0b0"),         // 01
-    make_tuple("0b0",         "0b0",         "0b1"),         // 02
-    make_tuple("0b01",        "0b01",        "0b11"),        // 03
-    make_tuple("0b10",        "0b11",        "0b10"),        // 04
-    make_tuple("0b1011",      "0b1000",      "0b1100"),      // 05
-    make_tuple("0xFADE/b110", "0xFADE/b110", "0xFFFF/b111"), // 06
-    make_tuple("0xFADE/b110", "0xF55E/b110", "0xF00F/b111"), // 07
-    make_tuple("0xFADE/b110", "0xFADE/b000", "0xFFFF/b000"), // 08
+    make_tuple("",            "",            "0b0"),         // 00 ==> Don't care mask is not used as both vector are empty!
+    make_tuple("0b0",         "0b0",         "0b0"),         // 01
+    make_tuple("0b1",         "0b0",         "0b0"),         // 02
+    make_tuple("0b0",         "0b0",         "0b1"),         // 03
+    make_tuple("0b01",        "0b01",        "0b11"),        // 04
+    make_tuple("0b10",        "0b11",        "0b10"),        // 05
+    make_tuple("0b1011",      "0b1000",      "0b1100"),      // 06
+    make_tuple("0xFADE/b110", "0xFADE/b110", "0xFFFF/b111"), // 07
+    make_tuple("0xFADE/b110", "0xF55E/b110", "0xF00F/b111"), // 08
+    make_tuple("0xFADE/b110", "0xFADE/b000", "0xFFFF/b000"), // 09
   };
 
   // ---------------- DDT Exercise
@@ -7673,6 +7682,64 @@ void UT_BinaryVector::test_Slice ()
   //
   TS_DATA_DRIVEN_TEST (checker, data);
 }
+
+
+
+//! Checks BinaryVector::Slice() with IndexedRange parameter
+//!
+void UT_BinaryVector::test_Slice_with_Range ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits      = std::get<0>(data);
+    auto        range        = std::get<1>(data);
+    string_view expectedBits = std::get<2>(data);
+
+    auto sut      = BinaryVector::CreateFromBinaryString(sutBits);
+    auto expected = BinaryVector::CreateFromBinaryString(expectedBits);
+
+    // ---------------- Exercise
+    //
+    auto result = sut.Slice(range);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (result, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,                        range,               expected
+    make_tuple("0",                        IndexedRange(0, 0),  "0"),             // 00
+    make_tuple("1",                        IndexedRange(0, 0),  "1"),             // 01
+    make_tuple("10",                       IndexedRange(0, 0),  "1"),             // 02
+    make_tuple("10",                       IndexedRange(0, 1),  "10"),            // 03
+    make_tuple("1011",                     IndexedRange(1, 1),  "0"),             // 04
+    make_tuple("1001",                     IndexedRange(1, 2),  "00"),            // 05
+    make_tuple("1011_0",                   IndexedRange(1, 3),  "011"),           // 06
+    make_tuple("1011_1",                   IndexedRange(1, 4),  "0111"),          // 07
+    make_tuple("1011_1101:101",            IndexedRange(1, 5),  "0111_1"),        // 08
+    make_tuple("1011_1101:101",            IndexedRange(1, 6),  "0111_10"),       // 09
+    make_tuple("1011_1101:101",            IndexedRange(1, 7),  "0111_101"),      // 10
+    make_tuple("1011_1101:101",            IndexedRange(1, 8),  "0111_1011"),     // 11
+    make_tuple("1011_1101:101",            IndexedRange(2, 6),  "1111_0"),        // 12
+    make_tuple("1011_1101:101",            IndexedRange(2, 7),  "1111_01"),       // 13
+    make_tuple("1011_1101:101",            IndexedRange(2, 8),  "1111_011"),      // 14
+    make_tuple("1011_1101:1011_1110:0101", IndexedRange(3, 11), "1110_1101:1"),   // 15
+    make_tuple("1011_1101:1011_1110:0101", IndexedRange(3, 12), "1110_1101:11"),  // 16
+    make_tuple("1011_1101:1011_1110:0101", IndexedRange(4, 13), "1101_1011:11"),  // 17
+    make_tuple("1011_1101:1011_1110:0101", IndexedRange(5, 15), "1011_0111:110"), // 18
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
 
 
 //! Checks BinaryVector::Slice() when required slice exceed BinaryVector capacity

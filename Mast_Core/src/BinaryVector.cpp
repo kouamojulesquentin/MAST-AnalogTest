@@ -2326,6 +2326,7 @@ void BinaryVector::SetSigned (T value)
   else
   {
     m_sizeProperty = SizeProperty::NotFixed;
+    AT_SCOPE_EXIT([this]() { m_sizeProperty = SizeProperty::Fixed; });
 
     auto bitsCountToAppend = initialBitsCount;
 
@@ -2338,7 +2339,6 @@ void BinaryVector::SetSigned (T value)
     }
 
     Append(static_cast<std::make_unsigned_t<T>>(value), bitsCountToAppend);
-    m_sizeProperty = SizeProperty::Fixed;
   }
 }
 
@@ -2362,6 +2362,7 @@ void BinaryVector::SetUnsigned (T value)
   else
   {
     m_sizeProperty = SizeProperty::NotFixed;
+    AT_SCOPE_EXIT([this]() { m_sizeProperty = SizeProperty::Fixed; });
 
     auto bitsCountToAppend = initialBitsCount;
 
@@ -2643,6 +2644,23 @@ BinaryVector BinaryVector::Slice (uint32_t firstBitOffset, uint32_t bitsCount) c
   }
 
   return result;
+}
+//
+//  End of: BinaryVector::Slice
+//---------------------------------------------------------------------------
+
+
+//! Returns a slice from BinaryVector
+//!
+//! @note   This call is not valid if it define a slice that exceed the actual
+//!         bits count
+//!
+//! @param range          Ranges of bits to returns
+//!
+//! @return A new BinaryVector containing a copy of defined slice
+BinaryVector BinaryVector::Slice (IndexedRange range) const
+{
+  return Slice(range.left, range.Width());
 }
 //
 //  End of: BinaryVector::Slice

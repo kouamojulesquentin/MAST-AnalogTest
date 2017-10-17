@@ -289,6 +289,7 @@ class UT_BinaryVector : public CxxTest::TestSuite
   // ---------------- Slice
   //
   void test_Slice ();
+  void test_Slice_with_Range ();
   void test_Slice_When_Exceeding_Capacity ();
 
   // ---------------- DataRightAligned

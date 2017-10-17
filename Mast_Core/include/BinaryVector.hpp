@@ -16,6 +16,7 @@
   #define SCANVECTORS_H__3E0880BD_14C4_4089_BA8F_A382FB9EE011__INCLUDED_
 
 #include "Mast_Core_export.hpp"
+#include "IndexedRange.hpp"
 #include <vector>
 #include <initializer_list>
 #include <experimental/string_view>
@@ -219,6 +220,8 @@ class MAST_CORE_EXPORT BinaryVector final
   std::vector<uint8_t> DataRightAligned() const;                                                     //!< Returns data right aligned in a new buffer
 
   BinaryVector    Slice    (uint32_t firstBitOffset, uint32_t bitsCount) const; //!< Returns a slice from BinaryVector
+  BinaryVector    Slice    (IndexedRange range) const;                          //!< Returns a slice from BinaryVector
+                                                                                //!<
 //+  BinaryVector_View Slice_View (uint32_t firstBitOffset, uint32_t bitsCount) const; //!< Returns a reference to a slice from BinaryVector
 
   static NumberBase NumberBaseForValuePrefix (string_view number); //!< Defines used based from leading char of number string

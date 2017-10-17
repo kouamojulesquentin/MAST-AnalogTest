@@ -366,3 +366,50 @@ distclean: code_coverage_clean
 > cmake -E remove -f External_Libs_UT/Generated/Runner.cpp
 > cmake -E remove -f Optional_Libs_UT/Generated/Runner.cpp
 
+# ----------------- Displays list of targets
+#
+# Usage: make -s targets
+#
+targets:
+> cmake -E echo List of targets:
+> cmake -E echo all
+> cmake -E echo arm
+> cmake -E echo centos
+> cmake -E echo clean
+> cmake -E echo code_coverage_build
+> cmake -E echo code_coverage_clean
+> cmake -E echo code_coverage_install
+> cmake -E echo code_coverage_report
+> cmake -E echo code_coverage_run
+> cmake -E echo debug
+> cmake -E echo debug_cmake
+> cmake -E echo distclean
+> cmake -E echo docs
+> cmake -E echo external_libs
+> cmake -E echo install
+> cmake -E echo install_debug
+> cmake -E echo install_release
+> cmake -E echo openocd_debug
+> cmake -E echo openocd_release
+> cmake -E echo pack
+> cmake -E echo pack_debug
+> cmake -E echo release
+> cmake -E echo release_cmake
+> cmake -E echo riscV32
+> cmake -E echo run_arm
+> cmake -E echo run_cpp_example_debug
+> cmake -E echo run_cpp_example_release
+> cmake -E echo run_debug
+> cmake -E echo run_external_debug
+> cmake -E echo run_external_release
+> cmake -E echo run_optionals_debug
+> cmake -E echo run_optionals_release
+> cmake -E echo run_readers
+> cmake -E echo run_readers_ut_debug
+> cmake -E echo run_readers_ut_release
+> cmake -E echo run_release
+> cmake -E echo run_testcases_release
+> cmake -E echo set_compiler
+> cmake -E echo test
+> cmake -E echo test_debug
+> cmake -E echo test_release

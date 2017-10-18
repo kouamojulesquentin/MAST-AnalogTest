@@ -74,6 +74,22 @@ namespace
     0b11111111, // 8 bits
   };
 
+
+  //! Defines a mask to clear most significant bits of a uint8_t (keeping lsb)
+  //!
+  constexpr uint8_t LEFT_BITS_CLEAR_MASK_8[] =
+  {
+    0b11111111, // 0 bits
+    0b01111111, // 1 bits
+    0b00111111, // 2 bits
+    0b00011111, // 3 bits
+    0b00001111, // 4 bits
+    0b00000111, // 5 bits
+    0b00000011, // 6 bits
+    0b00000001, // 7 bits
+    0b00000000, // 8 bits
+  };
+
   //! Defines a mask to least most significant bits of a uint8_t
   //!
   constexpr uint8_t RIGHT_BITS_MASK_8[] =
@@ -2250,7 +2266,7 @@ void BinaryVector::MaskLastByte ()
 //! Merges bits from two bytes viewed as signed
 //!
 //! @param lsbOffset      Rightmost byte to merge
-//! @param lsbBitsCount   Number of bits to take form rightmost byte
+//! @param lsbBitsCount   Number of bits to take from rightmost byte
 //! @param asSigned       When true underlying value is considered signed
 //!
 uint8_t BinaryVector::MergeToByte (uint32_t lsbOffset, uint8_t lsbBitsCount, bool asSigned) const
@@ -2484,6 +2500,152 @@ void BinaryVector::SetBit (uint32_t bitOffset)
 }
 //
 //  End of: BinaryVector::SetBit
+//---------------------------------------------------------------------------
+
+
+
+//! Assigns a portion of the BinaryVector
+//!
+//! @note It is optimized for small number of copied bytes
+//!
+//! @param startOffset  Zero based bit offset (from left)
+//! @param value        Other BinaryVector to assign to slice
+//!
+//! @return Reference to this (to allow cascading calls)
+BinaryVector& BinaryVector::SetSlice (uint32_t startOffset, const BinaryVector& value)
+{
+  CHECK_FALSE(IsEmpty(),                                            "Cannot set slice of an empty BinaryVector");
+  CHECK_PARAMETER_RANGE(startOffset, 0u, BitsCount() - 1u,          "Out of range offset: "s + std::to_string(startOffset));
+  CHECK_PARAMETER_LTE(startOffset + value.BitsCount(), BitsCount(), "Slice is partially out of range");
+
+  const auto dstByteOffset      = startOffset   / 8u;
+  const auto offsetInFirstBytes = startOffset   % 8u;
+  const auto srcBitsCount       = value.BitsCount();
+  const auto bytesCount         = value.BytesCount();
+
+  auto dest = m_data.data() + dstByteOffset;
+  auto srce = value.DataLeftAligned();
+
+  if (offsetInFirstBytes == 0) // Are bits left aligned?
+  {
+    const auto srcLastByteBitsCount = srcBitsCount % 8u;
+    const auto onlyFull             = srcLastByteBitsCount == 0;
+    const auto fullBytesCount       = onlyFull ? bytesCount : bytesCount - 1u;
+
+    for (uint32_t ii = 0 ; ii < fullBytesCount ; ++ii)
+    {
+      *dest++ = *srce++;
+    }
+
+    if (!onlyFull)
+    {
+      const auto dstMask = LEFT_BITS_CLEAR_MASK_8[srcLastByteBitsCount];
+      const auto srcMask = LEFT_BITS_MASK_8[srcLastByteBitsCount];
+
+      auto dstValue = *dest & dstMask;
+      auto srcValue = *srce & srcMask;
+
+      dstValue |= srcValue;
+      *dest = dstValue;
+    }
+  }
+  else  // ==> Source bytes are split into destination bytes
+  {
+    auto boundaryOffset =  startOffset  % 8u;                 // Split point in destination bytes
+    bool partialByte    = (boundaryOffset + srcBitsCount) < 8u; // Detect case when source spans only parts of a destination byte
+    if (partialByte)
+    {
+      // ---------------- Example
+      //                    ____
+      // srce:         |abcxxxxx|               (3 bits)
+      // dest:    |01274567|01234567|012yyyyy|  (19 bits)
+      // result:  |012abc67|01234567|012yyyyy|
+      //
+      auto dstLastBitOffset = boundaryOffset + srcBitsCount - 1u;
+      auto dstMask          = LEFT_BITS_MASK_8[boundaryOffset] | LEFT_BITS_CLEAR_MASK_8[dstLastBitOffset + 1]; // e.g. 0b11100000 | 0b00000011 ==> 0b11100011
+      auto srcMask          = LEFT_BITS_MASK_8[srcBitsCount];                                               // e.g. 0b11100000
+
+      auto dstValue = *dest & dstMask; // Clear bits that will be assigned
+      auto srcValue = *srce & srcMask; // Keep only bits to assign
+
+      srcValue >>= boundaryOffset;        // Align source bits with destination bits
+      dstValue |=  srcValue;           // Merge source bits into destination value
+
+      *dest = dstValue;
+    }
+    else
+    {
+      // ---------------- Examples
+      //
+      // With boundaryOffset = 5
+      //                    ____ ___
+      // srce:         |abcdefgh|ijklmxxx|          (13 bits)
+      // dest:    |01274567|01234567|012yyyyy|      (19 bits)
+      // result:  |01274abc|defghijk|lm2yyyyy|
+      //
+      // With boundaryOffset = 1
+      //                    ____ ___
+      // srce:     |abcdefgh|ijxxxxxx|          (10 bits)
+      // dest:    |01274567|01234567|012yyyyy|  (19 bits)
+      // result:  |0abcdefg|hij34567|012yyyyy|
+      //
+      const auto srcMsbBitsCount      = 8u - offsetInFirstBytes;
+      const auto srcLastByteBitsCount = (srcBitsCount - srcMsbBitsCount) % 8u;
+
+      const auto dstKeepMsbMask = LEFT_BITS_MASK_8[boundaryOffset];  // e.g. 0b1111_1000
+      const auto srcKeepMsbMask = LEFT_BITS_MASK_8[srcMsbBitsCount]; // e.g. 0b1110_0000
+      const auto srcKeepLsbMask = RIGHT_BITS_MASK_8[boundaryOffset]; // e.g. 0b0001_1111
+
+      // Assign first dest byte
+      //
+      auto remainingBits = srcBitsCount;
+
+      auto dstValue = *dest & dstKeepMsbMask; // Clear bits that will be assigned
+      auto srcValue = *srce & srcKeepMsbMask; // Keep only bits to assign
+
+      srcValue >>= boundaryOffset;        // Align source bits with destination bits
+      dstValue |=  srcValue;              // Merge source bits into destination value
+
+      *dest++ = dstValue;
+      remainingBits -= srcMsbBitsCount;
+
+      // Assign remaining bits, with potential "middle" bytes (assign full dest byte from source chunks)
+      //
+      while (remainingBits != 0)
+      {
+        auto srcValue_msb = *srce & srcKeepLsbMask;       // Keep only bits to assign
+        ++srce;
+        auto srcValue_lsb = *srce & srcKeepMsbMask;       // Keep only bits to assign
+
+        srcValue_msb <<= srcMsbBitsCount;
+        srcValue_lsb >>= boundaryOffset;
+        srcValue = srcValue_msb | srcValue_lsb;
+
+        if (remainingBits >= 8u) // Can assign full byte?
+        {
+          *dest++ = srcValue;
+          remainingBits -= 8u;
+        }
+        else
+        {
+          const auto dstKeepLsbMask = LEFT_BITS_CLEAR_MASK_8[srcLastByteBitsCount]; // e.g. 0b0011_1111
+
+          srcValue &= ~dstKeepLsbMask;
+
+          dstValue  = *dest & dstKeepLsbMask;
+          dstValue |=  srcValue;           // Merge source bits into destination value
+
+          *dest = dstValue;
+          remainingBits = 0u;
+        }
+      }
+    }
+  }
+
+  return *this;
+}
+//
+//  End of: BinaryVector::SetSlice
 //---------------------------------------------------------------------------
 
 

@@ -206,6 +206,8 @@ class MAST_CORE_EXPORT BinaryVector final
   void          Set(int32_t value); //!< Assigns signed 32 bits value to the BinaryVector
   void          Set(int64_t value); //!< Assigns signed 64 bits value to the BinaryVector
 
+  BinaryVector& SetSlice (uint32_t startOffset, const BinaryVector& value); //!< Assigns a portion of the BinaryVector
+
   void SetBit    (uint32_t bitOffset); //!< Sets specified bit (zero based)
   void ClearBit  (uint32_t bitOffset); //!< Clears specified bit (zero based)
   void ToggleBit (uint32_t bitOffset); //!< Toggles specified bit (zero based)
@@ -215,14 +217,12 @@ class MAST_CORE_EXPORT BinaryVector final
   bool                 HasFixedSize()     const { return m_sizeProperty != SizeProperty::NotFixed; } //!< Returns true if number of used bits cannot be changed
   bool                 IsEmpty()          const { return m_data.empty();}                            //!< Returns true when there is no bit in the BinaryVector, false otherwise
   uint32_t             BitsCount()        const { return m_usedBits;    }                            //!< Returns total number of valid bits in the BinaryVector
-  uint32_t             BytesCount()       const { return m_data.size(); }                            //!< Returns total number of valid bits in the BinaryVector
+  uint32_t             BytesCount()       const { return m_data.size(); }                            //!< Returns total number of valid bytes in the BinaryVector (last one may be not complete)
   const uint8_t*       DataLeftAligned()  const { return m_data.data(); }                            //!< Returns pointer on raw bits stream data (only valid as long as content is not modified)
   std::vector<uint8_t> DataRightAligned() const;                                                     //!< Returns data right aligned in a new buffer
 
   BinaryVector    Slice    (uint32_t firstBitOffset, uint32_t bitsCount) const; //!< Returns a slice from BinaryVector
   BinaryVector    Slice    (IndexedRange range) const;                          //!< Returns a slice from BinaryVector
-                                                                                //!<
-//+  BinaryVector_View Slice_View (uint32_t firstBitOffset, uint32_t bitsCount) const; //!< Returns a reference to a slice from BinaryVector
 
   static NumberBase NumberBaseForValuePrefix (string_view number); //!< Defines used based from leading char of number string
 

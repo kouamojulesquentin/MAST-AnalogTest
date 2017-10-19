@@ -23,7 +23,7 @@ namespace mast
 {
 //! Defines a range of indexes
 //!
-//! @note This is intended to be use primarily in context of BinaryVector
+//! @note This is intended to be used primarily in context of BinaryVector
 //!
 struct IndexedRange final
 {
@@ -86,12 +86,27 @@ struct IndexedRange final
     return IndexedRange(right, left);
   }
 
-  //! Returns true when left index is greater or same as right index
+  //! Returns true when range represents a single bit
   //!
-  bool HasStandardOrdering() const
+  bool IsSingleBit() const
   {
-    return left >= right;
+    return left == right;
   }
+
+  //! Returns true when left index is greater than right index
+  //!
+  bool IncreasesTowardLeft() const
+  {
+    return left > right;
+  }
+
+  //! Returns true when left index is less than right index
+  //!
+  bool IncreasesTowardRight() const
+  {
+    return left < right;
+  }
+
 
   //! Returns number of bits for the range
   //!

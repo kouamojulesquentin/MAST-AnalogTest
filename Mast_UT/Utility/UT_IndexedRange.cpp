@@ -37,7 +37,9 @@ void UT_IndexedRange::test_Constructor_Default ()
   TS_ASSERT_EQUALS (sut.left,    0);
   TS_ASSERT_EQUALS (sut.right,   0);
   TS_ASSERT_EQUALS (sut.Width(), 1u);
-  TS_ASSERT_TRUE   (sut.HasStandardOrdering());
+  TS_ASSERT_TRUE   (sut.IsSingleBit());
+  TS_ASSERT_FALSE  (sut.IncreasesTowardLeft());
+  TS_ASSERT_FALSE  (sut.IncreasesTowardRight());
 }
 
 
@@ -57,7 +59,9 @@ void UT_IndexedRange::test_Constructor_SingleIndex ()
     TS_ASSERT_EQUALS (sut.left,    index);
     TS_ASSERT_EQUALS (sut.right,   index);
     TS_ASSERT_EQUALS (sut.Width(), 1u);
-    TS_ASSERT_TRUE   (sut.HasStandardOrdering());
+    TS_ASSERT_TRUE   (sut.IsSingleBit());
+    TS_ASSERT_FALSE  (sut.IncreasesTowardLeft());
+    TS_ASSERT_FALSE  (sut.IncreasesTowardRight());
   };
 
   auto data =
@@ -82,10 +86,9 @@ void UT_IndexedRange::test_Constructor_DualIndex ()
   {
     // ---------------- Setup
     //
-    auto leftIndex              = std::get<0>(data);
-    auto rightIndex             = std::get<1>(data);
-    auto expectedWidth          = std::get<2>(data);
-    auto expectedHasSrdOrdering = std::get<3>(data);
+    auto leftIndex     = std::get<0>(data);
+    auto rightIndex    = std::get<1>(data);
+    auto expectedWidth = std::get<2>(data);
 
     // ---------------- Exercise
     //
@@ -93,23 +96,25 @@ void UT_IndexedRange::test_Constructor_DualIndex ()
 
     // ---------------- Verify
     //
-    TS_ASSERT_EQUALS (sut.left,    leftIndex);
-    TS_ASSERT_EQUALS (sut.right,   rightIndex);
-    TS_ASSERT_EQUALS (sut.Width(), expectedWidth);
-    TS_ASSERT_EQUALS (sut.HasStandardOrdering(), expectedHasSrdOrdering);
+    TS_ASSERT_EQUALS (sut.left,                  leftIndex);
+    TS_ASSERT_EQUALS (sut.right,                 rightIndex);
+    TS_ASSERT_EQUALS (sut.Width(),               expectedWidth);
+    TS_ASSERT_EQUALS (sut.IsSingleBit(),         leftIndex == rightIndex);
+    TS_ASSERT_EQUALS (sut.IncreasesTowardLeft(),  leftIndex >  rightIndex);
+    TS_ASSERT_EQUALS (sut.IncreasesTowardRight(), leftIndex <  rightIndex);
   };
 
   auto data =
-  {
-    make_tuple(0u,         0u,         1u,            true),  // 00
-    make_tuple(1u,         0u,         2u,            true),  // 01
-    make_tuple(0u,         1u,         2u,            false), // 02
-    make_tuple(1u,         1u,         1u,            true),  // 03
-    make_tuple(2u,         1u,         2u,            true),  // 04
-    make_tuple(1u,         2u,         2u,            false), // 05
-    make_tuple(UINT32_MAX, UINT32_MAX, 1u,            true),  // 06
-    make_tuple(1u,         UINT32_MAX, UINT32_MAX,    false), // 07
-    make_tuple(2u,         UINT32_MAX, UINT32_MAX-1u, false), // 08
+  {        //  left,       right,      expected width
+    make_tuple(0u,         0u,         1u),            // 00
+    make_tuple(1u,         0u,         2u),            // 01
+    make_tuple(0u,         1u,         2u),            // 02
+    make_tuple(1u,         1u,         1u),            // 03
+    make_tuple(2u,         1u,         2u),            // 04
+    make_tuple(1u,         2u,         2u),            // 05
+    make_tuple(UINT32_MAX, UINT32_MAX, 1u),            // 06
+    make_tuple(1u,         UINT32_MAX, UINT32_MAX),    // 07
+    make_tuple(2u,         UINT32_MAX, UINT32_MAX-1u), // 08
   };
 
   // ---------------- DDT Exercise
@@ -126,10 +131,9 @@ void UT_IndexedRange::test_CopyConstructor ()
   {
     // ---------------- Setup
     //
-    auto leftIndex              = std::get<0>(data);
-    auto rightIndex             = std::get<1>(data);
-    auto expectedWidth          = std::get<2>(data);
-    auto expectedHasSrdOrdering = std::get<3>(data);
+    auto leftIndex     = std::get<0>(data);
+    auto rightIndex    = std::get<1>(data);
+    auto expectedWidth = std::get<2>(data);
 
     IndexedRange rhs(leftIndex, rightIndex);
 
@@ -139,23 +143,25 @@ void UT_IndexedRange::test_CopyConstructor ()
 
     // ---------------- Verify
     //
-    TS_ASSERT_EQUALS (sut.left,    leftIndex);
-    TS_ASSERT_EQUALS (sut.right,   rightIndex);
-    TS_ASSERT_EQUALS (sut.Width(), expectedWidth);
-    TS_ASSERT_EQUALS (sut.HasStandardOrdering(), expectedHasSrdOrdering);
+    TS_ASSERT_EQUALS (sut.left,                  leftIndex);
+    TS_ASSERT_EQUALS (sut.right,                 rightIndex);
+    TS_ASSERT_EQUALS (sut.Width(),               expectedWidth);
+    TS_ASSERT_EQUALS (sut.IsSingleBit(),         rhs.IsSingleBit());
+    TS_ASSERT_EQUALS (sut.IncreasesTowardLeft(),  rhs.IncreasesTowardLeft());
+    TS_ASSERT_EQUALS (sut.IncreasesTowardRight(), rhs.IncreasesTowardRight());
   };
 
   auto data =
-  {
-    make_tuple(0u,         0u,         1u,            true),  // 00
-    make_tuple(1u,         0u,         2u,            true),  // 01
-    make_tuple(0u,         1u,         2u,            false), // 02
-    make_tuple(1u,         1u,         1u,            true),  // 03
-    make_tuple(20u,        15u,        6u,            true),  // 04
-    make_tuple(16u,        20u,        5u,            false), // 05
-    make_tuple(UINT32_MAX, UINT32_MAX, 1u,            true),  // 06
-    make_tuple(1u,         UINT32_MAX, UINT32_MAX,    false), // 07
-    make_tuple(2u,         UINT32_MAX, UINT32_MAX-1u, false), // 08
+  {        //  left,       right,      expected width
+    make_tuple(0u,         0u,         1u),            // 00
+    make_tuple(1u,         0u,         2u),            // 01
+    make_tuple(0u,         1u,         2u),            // 02
+    make_tuple(1u,         1u,         1u),            // 03
+    make_tuple(20u,        15u,        6u),            // 04
+    make_tuple(16u,        20u,        5u),            // 05
+    make_tuple(UINT32_MAX, UINT32_MAX, 1u),            // 06
+    make_tuple(1u,         UINT32_MAX, UINT32_MAX),    // 07
+    make_tuple(2u,         UINT32_MAX, UINT32_MAX-1u), // 08
   };
 
   // ---------------- DDT Exercise

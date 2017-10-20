@@ -34,9 +34,10 @@ void UT_IndexedRange::test_Constructor_Default ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS (sut.left,    0);
-  TS_ASSERT_EQUALS (sut.right,   0);
-  TS_ASSERT_EQUALS (sut.Width(), 1u);
+  TS_ASSERT_EQUALS (sut.left,       0u);
+  TS_ASSERT_EQUALS (sut.right,      0u);
+  TS_ASSERT_EQUALS (sut.MaxIndex(), 0u);
+  TS_ASSERT_EQUALS (sut.Width(),    1u);
   TS_ASSERT_TRUE   (sut.IsSingleBit());
   TS_ASSERT_FALSE  (sut.IncreasesTowardLeft());
   TS_ASSERT_FALSE  (sut.IncreasesTowardRight());
@@ -56,9 +57,10 @@ void UT_IndexedRange::test_Constructor_SingleIndex ()
 
     // ---------------- Verify
     //
-    TS_ASSERT_EQUALS (sut.left,    index);
-    TS_ASSERT_EQUALS (sut.right,   index);
-    TS_ASSERT_EQUALS (sut.Width(), 1u);
+    TS_ASSERT_EQUALS (sut.left,       index);
+    TS_ASSERT_EQUALS (sut.right,      index);
+    TS_ASSERT_EQUALS (sut.MaxIndex(), index);
+    TS_ASSERT_EQUALS (sut.Width(),    1u);
     TS_ASSERT_TRUE   (sut.IsSingleBit());
     TS_ASSERT_FALSE  (sut.IncreasesTowardLeft());
     TS_ASSERT_FALSE  (sut.IncreasesTowardRight());
@@ -98,6 +100,7 @@ void UT_IndexedRange::test_Constructor_DualIndex ()
     //
     TS_ASSERT_EQUALS (sut.left,                  leftIndex);
     TS_ASSERT_EQUALS (sut.right,                 rightIndex);
+    TS_ASSERT_EQUALS (sut.MaxIndex(),            leftIndex > rightIndex ? leftIndex : rightIndex);
     TS_ASSERT_EQUALS (sut.Width(),               expectedWidth);
     TS_ASSERT_EQUALS (sut.IsSingleBit(),         leftIndex == rightIndex);
     TS_ASSERT_EQUALS (sut.IncreasesTowardLeft(),  leftIndex >  rightIndex);

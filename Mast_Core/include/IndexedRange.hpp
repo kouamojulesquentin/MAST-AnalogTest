@@ -107,6 +107,12 @@ struct IndexedRange final
     return left < right;
   }
 
+  //! Returns left index when it is larger than right index, right index otherwise
+  //!
+  uint32_t MaxIndex() const
+  {
+    return std::max(left, right);
+  }
 
   //! Returns number of bits for the range
   //!

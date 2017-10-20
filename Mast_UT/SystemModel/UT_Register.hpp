@@ -28,6 +28,10 @@ class UT_Register : public CxxTest::TestSuite
 
   // ================ Test Methods ================
 
+  // ---------------- Sizeof
+  //
+  void test_Sizeof ();
+
   // ---------------- Constructor
   //
   void test_Constructor ();

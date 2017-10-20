@@ -28,6 +28,10 @@ class UT_BinaryVector : public CxxTest::TestSuite
 
   // ================ Test Methods ================
 
+  // ---------------- Sizeof
+  //
+  void test_Sizeof ();
+
   // ---------------- Constructors
   //
   void test_Constructor_Default ();

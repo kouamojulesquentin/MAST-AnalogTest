@@ -20,42 +20,118 @@ add_custom_command (OUTPUT 		${UT_RootPath}/Generated/Runner.cpp
 										COMMAND 	make -C ${UT_RootPath} -f Runner.mak
 										)
 
-include_directories(${CXXTEST_INCLUDE_DIR})
-include_directories(${UT_RootPath}/CxxTest_Traits)
-include_directories(${UT_RootPath}/UT_Helpers/)
-include_directories(${UT_RootPath}/Yaml/)
-include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
-include_directories(${LIBMAST_CORE_INTERNAL_DIRS})
-include_directories(${LIBMAST_CPP_API_INCLUDE_DIRS})
-include_directories(${LIBMAST_CPP_API_INTERNAL_DIRS})
-include_directories(${LIBMAST_C_API_INCLUDE_DIRS})
-include_directories(${LIBLOGGER_INCLUDE_DIRS})
-include_directories(${LIBTCLAP_INCLUDE_DIRS})
-include_directories(${LIBYAML_INCLUDE_DIRS})
 
-file(GLOB Mast_UT_C_API        "API_C/*")
-file(GLOB Mast_UT_CPP_API      "API_CPP/*")
-file(GLOB Mast_UT_SYSTEM_MODEL "SystemModel/*")
-file(GLOB Mast_UT_YAML         "Yaml/*")
-file(GLOB Mast_UT_CORE         "Core/*")
-file(GLOB Mast_UT_PLUGINS      "Plugins/UT_*")
-file(GLOB Mast_UT_HELPERS      "UT_Helpers/*")
+set(Mast_UT_HELPERS      UT_Helpers/Fake_SVF_Simulator.cpp
+                         UT_Helpers/Fake_SVF_Simulator.hpp
+                         UT_Helpers/Pusher.hpp
+                         UT_Helpers/SpiedProtocolsCommands.hpp
+                         UT_Helpers/Spy_AccessInterfaceProtocols.cpp
+                         UT_Helpers/Spy_AccessInterfaceProtocols.hpp
+                         UT_Helpers/Spy_I2C_Protocol.cpp
+                         UT_Helpers/Spy_I2C_Protocol.hpp
+                         UT_Helpers/Spy_STIL_Protocol.cpp
+                         UT_Helpers/Spy_STIL_Protocol.hpp
+                         UT_Helpers/Spy_SVF_Protocol.cpp
+                         UT_Helpers/Spy_SVF_Protocol.hpp
+                         UT_Helpers/StaticTestSpy.cpp
+                         UT_Helpers/StaticTestSpy.hpp
+                         UT_Helpers/TestStrategies.hpp)
 
-set(Mast_UT_UTILITY Utility/UT_BinaryVector.cpp
-                    Utility/UT_BinaryVector.hpp
-                    Utility/UT_FileSystem.cpp
-                    Utility/UT_FileSystem.hpp
-                    Utility/UT_IndexedRange.cpp
-                    Utility/UT_IndexedRange.hpp
-                    Utility/UT_MastConfiguration.cpp
-                    Utility/UT_MastConfiguration.hpp
-                    Utility/UT_MTQueue.cpp
-                    Utility/UT_MTQueue.hpp
-                    Utility/UT_SVFVector.cpp
-                    Utility/UT_SVFVector.hpp
-                    Utility/UT_Utility.cpp
-                    Utility/UT_Utility.hpp
-                    )
+set(Mast_UT_CPP_API      API_CPP/UT_MastEnvironment.cpp
+                         API_CPP/UT_MastEnvironment.hpp
+                         API_CPP/UT_ModelBuildDriver.cpp
+                         API_CPP/UT_ModelBuildDriver.hpp
+                         API_CPP/UT_PDL_Adapter_CPP.cpp
+                         API_CPP/UT_PDL_Adapter_CPP.hpp)
+
+set(Mast_UT_C_API        API_C/UT_PDL_Adapter_C.cpp
+                         API_C/UT_PDL_Adapter_C.hpp)
+
+set(Mast_UT_CORE         Core/UT_PDL_AlgorithmsRepository.cpp
+                         Core/UT_PDL_AlgorithmsRepository.hpp)
+
+set(Mast_UT_PLUGINS      Plugins/UT_Plugins.cpp
+                         Plugins/UT_Plugins.hpp)
+
+set(Mast_UT_YAML         Yaml/UT_YamlFile.cpp
+                         Yaml/UT_YamlFile.hpp)
+
+set(Mast_UT_SYSTEM_MODEL SystemModel/UT_AccessInterfaceProtocolFactory.cpp
+                         SystemModel/UT_AccessInterfaceProtocolFactory.hpp
+                         SystemModel/UT_ConfigureAlgorithmFactory.cpp
+                         SystemModel/UT_ConfigureAlgorithmFactory.hpp
+                         SystemModel/UT_ConfigureVisitor.cpp
+                         SystemModel/UT_ConfigureVisitor.hpp
+                         SystemModel/UT_DataCycle.cpp
+                         SystemModel/UT_DataCycle.hpp
+                         SystemModel/UT_DefaultBinaryPathSelector.cpp
+                         SystemModel/UT_DefaultBinaryPathSelector.hpp
+                         SystemModel/UT_DefaultNHotPathSelector.cpp
+                         SystemModel/UT_DefaultNHotPathSelector.hpp
+                         SystemModel/UT_DefaultOneHotPathSelector.cpp
+                         SystemModel/UT_DefaultOneHotPathSelector.hpp
+                         SystemModel/UT_DefaultTableBasedPathSelector.cpp
+                         SystemModel/UT_DefaultTableBasedPathSelector.hpp
+                         SystemModel/UT_FromSutUpdater.cpp
+                         SystemModel/UT_FromSutUpdater.hpp
+                         SystemModel/UT_GenericAccessInterfaceProtocol.cpp
+                         SystemModel/UT_GenericAccessInterfaceProtocol.hpp
+                         SystemModel/UT_GmlPrinter.cpp
+                         SystemModel/UT_GmlPrinter.hpp
+                         SystemModel/UT_I2C_EmulationProtocol.cpp
+                         SystemModel/UT_I2C_EmulationProtocol.hpp
+                         SystemModel/UT_NamesChecker.cpp
+                         SystemModel/UT_NamesChecker.hpp
+                         SystemModel/UT_NodePathResolver.cpp
+                         SystemModel/UT_NodePathResolver.hpp
+                         SystemModel/UT_ParentNode.cpp
+                         SystemModel/UT_ParentNode.hpp
+                         SystemModel/UT_PathSelectorFactory.cpp
+                         SystemModel/UT_PathSelectorFactory.hpp
+                         SystemModel/UT_PrettyPrinter.cpp
+                         SystemModel/UT_PrettyPrinter.hpp
+                         SystemModel/UT_PropagatePendingVisitor.cpp
+                         SystemModel/UT_PropagatePendingVisitor.hpp
+                         SystemModel/UT_Register.cpp
+                         SystemModel/UT_Register.hpp
+                         SystemModel/UT_Remote_Protocol_Proxy.cpp
+                         SystemModel/UT_Remote_Protocol_Proxy.hpp
+                         SystemModel/UT_STIL_EmulationProtocol.cpp
+                         SystemModel/UT_STIL_EmulationProtocol.hpp
+                         SystemModel/UT_SVF_SimulationProtocol.cpp
+                         SystemModel/UT_SVF_SimulationProtocol.hpp
+                         SystemModel/UT_SystemModel.cpp
+                         SystemModel/UT_SystemModel.hpp
+                         SystemModel/UT_SystemModelBuilder.cpp
+                         SystemModel/UT_SystemModelBuilder.hpp
+                         SystemModel/UT_SystemModelChecker.cpp
+                         SystemModel/UT_SystemModelChecker.hpp
+                         SystemModel/UT_SystemModelFactory.cpp
+                         SystemModel/UT_SystemModelFactory.hpp
+                         SystemModel/UT_SystemModelManager.cpp
+                         SystemModel/UT_SystemModelManager.hpp
+                         SystemModel/UT_SystemModelNode.cpp
+                         SystemModel/UT_SystemModelNode.hpp
+                         SystemModel/UT_ToSutVisitor.cpp
+                         SystemModel/UT_ToSutVisitor.hpp
+                         SystemModel/UT_VirtualRegister.cpp
+                         SystemModel/UT_VirtualRegister.hpp)
+
+set(Mast_UT_UTILITY      Utility/UT_BinaryVector.cpp
+                         Utility/UT_BinaryVector.hpp
+                         Utility/UT_FileSystem.cpp
+                         Utility/UT_FileSystem.hpp
+                         Utility/UT_IndexedRange.cpp
+                         Utility/UT_IndexedRange.hpp
+                         Utility/UT_MastConfiguration.cpp
+                         Utility/UT_MastConfiguration.hpp
+                         Utility/UT_MTQueue.cpp
+                         Utility/UT_MTQueue.hpp
+                         Utility/UT_SVFVector.cpp
+                         Utility/UT_SVFVector.hpp
+                         Utility/UT_Utility.cpp
+                         Utility/UT_Utility.hpp
+                         )
 
 if (WIN32)
   set(PLATFORM_LIBS DbgHelp)
@@ -71,15 +147,15 @@ target_link_libraries (Mast_UT_Helpers Tests_Common ${PLATFORM_LIBS})
 
 set(Mast_UT_GENERATED "Generated/Runner.cpp")
 
-set (Mast_UT_SOURCES ${Mast_UT_C_API}
-                     ${Mast_UT_CPP_API}
-                     ${Mast_UT_UTILITY}
-                     ${Mast_UT_SYSTEM_MODEL}
-                     ${Mast_UT_YAML}
-                     ${Mast_UT_CORE}
-                     ${Mast_UT_PLUGINS}
-                     ${Mast_UT_HELPERS}
-                     ${Mast_UT_GENERATED})
+set(Mast_UT_SOURCES ${Mast_UT_C_API}
+                    ${Mast_UT_CPP_API}
+                    ${Mast_UT_UTILITY}
+                    ${Mast_UT_SYSTEM_MODEL}
+                    ${Mast_UT_YAML}
+                    ${Mast_UT_CORE}
+                    ${Mast_UT_PLUGINS}
+                    ${Mast_UT_HELPERS}
+                    ${Mast_UT_GENERATED})
 
 set_source_files_properties(${Mast_UT_GENERATED} GENERATED)
 
@@ -91,6 +167,18 @@ target_compile_options     (Mast_UT PRIVATE -fexceptions -std=c++14)
 target_compile_definitions (Mast_UT PRIVATE CXXTEST_HAVE_EH
                                             CXXTEST_HAVE_STD
                                             CXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION)
+target_include_directories (Mast_UT PRIVATE  ${CMAKE_CURRENT_SOURCE_DIR}/../cxxtest
+                                             ${UT_RootPath}/CxxTest_Traits
+                                             ${UT_RootPath}/UT_Helpers/
+                                             ${UT_RootPath}/Yaml/
+                                             ${LIBMAST_CORE_INCLUDE_DIRS}
+                                             ${LIBMAST_CORE_INTERNAL_DIRS}
+                                             ${LIBMAST_CPP_API_INCLUDE_DIRS}
+                                             ${LIBMAST_CPP_API_INTERNAL_DIRS}
+                                             ${LIBMAST_C_API_INCLUDE_DIRS}
+                                             ${LIBLOGGER_INCLUDE_DIRS}
+                                             ${LIBTCLAP_INCLUDE_DIRS}
+                                             ${LIBYAML_INCLUDE_DIRS})
 
 target_link_libraries(Mast_UT Mast_UT_Helpers Tests_Common Mast_API_CPP Mast_API_C Logger ${PLATFORM_LIBS})
 

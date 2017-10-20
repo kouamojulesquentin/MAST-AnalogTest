@@ -16,6 +16,7 @@
 
 #include "SystemModelNode.hpp"
 #include "BinaryVector.hpp"
+#include "BitsOrdering.hpp"
 
 namespace mast
 {
@@ -30,8 +31,16 @@ class MAST_CORE_EXPORT Register : public SystemModelNode
   public:
   ~Register() = default;
   Register()  = delete;
-  Register(std::experimental::string_view name, mast::BinaryVector bypassSequence, bool holdValue = false);
-  Register(std::experimental::string_view name, mast::BinaryVector bypassSequence, mast::BinaryVector resetSequence, bool holdValue = false);
+  Register(std::experimental::string_view name,
+           mast::BinaryVector             bypassSequence,
+           bool                           holdValue    = false,
+           mast::BitsOrdering             bitsOrdering = mast::BitsOrdering::Downto);
+
+  Register(std::experimental::string_view name,
+           mast::BinaryVector             bypassSequence,
+           mast::BinaryVector             resetSequence,
+           bool                           holdValue    = false,
+           mast::BitsOrdering             bitsOrdering = mast::BitsOrdering::Downto);
   friend SystemModel;
 
   // ---------------- Miscellaneous
@@ -43,6 +52,7 @@ class MAST_CORE_EXPORT Register : public SystemModelNode
   // ---------------- Getters
   //
   uint32_t            BitsCount()         const { return m_bypass.BitsCount(); } //!< Returns Register numbers of bits
+  mast::BitsOrdering  BitsOrdering()      const { return m_bitsOrdering;       } //!< Returns BitsOrdering
   const BinaryVector& BypassSequence()    const { return m_bypass;             } //!< Returns bypass sequence
   const BinaryVector& ExpectedFromSut()   const { return m_expectedFromSut;    } //!< Returns expected sequence
   const BinaryVector& LastFromSut()       const { return m_lastFromSut;        } //!< Returns last sequence received from SUT
@@ -174,18 +184,19 @@ class MAST_CORE_EXPORT Register : public SystemModelNode
   // ---------------- Private  Fields
   //
   private:
-  bool         m_pendingRead       = false; //!< True when there is a pending request to read register value from SUT
-  bool         m_holdValue         = false; //!< When true, force bypass value to be equal to nextToSut (The value will not be changed while the register is selected)
-  bool         m_mustCheckExpected = false; //!< When true, it triggers a check of received vs expected data during the following shift from sut
-  uint32_t     m_mismatches        = 0;     //!< Number of mismatches following IEEE 1687 rules
-  BinaryVector m_nextToSut;                 //!< Sequence of bits that should be shifted into SUT (during the next iApply cycle)
-  BinaryVector m_lastToSut;                 //!< Last sent sequence of bits: It stores the status of the SUT (SIBs, etc...) after an apply cycle
-  BinaryVector m_lastFromSut;               //!< Last sequence of bits that have been shifted from SUT
-  BinaryVector m_lastReadFromSut;           //!< Last sequence of bits that have been shifted from SUT when pending read is true
-  BinaryVector m_expectedFromSut;           //!< Sequence of expected bits when scanning from SUT
-  BinaryVector m_bypass;                    //!< Sequence to shift into the sut when no iApply cycle has been defined on the register
-  BinaryVector m_dontCareMask;              //!< When not empty, each one bit represent a bit to compare and each zero bit represent a bit we don't care
-  BinaryVector m_resetValue;                //!< When not empty, it is the value used to reflect the register value after a iReset command
+  bool               m_pendingRead       = false;                      //!< True when there is a pending request to read register value from SUT
+  bool               m_holdValue         = false;                      //!< When true, force bypass value to be equal to nextToSut (The value will not be changed while the register is selected)
+  bool               m_mustCheckExpected = false;                      //!< When true, it triggers a check of received vs expected data during the following shift from sut
+  mast::BitsOrdering m_bitsOrdering      = mast::BitsOrdering::Downto; //!< Defines whether MSB are on the left or right hand side
+  uint32_t           m_mismatches        = 0;                          //!< Number of mismatches following IEEE 1687 rules
+  BinaryVector       m_nextToSut;                                      //!< Sequence of bits that should be shifted into SUT (during the next iApply cycle)
+  BinaryVector       m_lastToSut;                                      //!< Last sent sequence of bits: It stores the status of the SUT (SIBs, etc...) after an apply cycle
+  BinaryVector       m_lastFromSut;                                    //!< Last sequence of bits that have been shifted from SUT
+  BinaryVector       m_lastReadFromSut;                                //!< Last sequence of bits that have been shifted from SUT when pending read is true
+  BinaryVector       m_expectedFromSut;                                //!< Sequence of expected bits when scanning from SUT
+  BinaryVector       m_bypass;                                         //!< Sequence to shift into the sut when no iApply cycle has been defined on the register
+  BinaryVector       m_dontCareMask;                                   //!< When not empty, each one bit represent a bit to compare and each zero bit represent a bit we don't care
+  BinaryVector       m_resetValue;                                     //!< When not empty, it is the value used to reflect the register value after a iReset command
 };
 //
 //  End of Register class declaration

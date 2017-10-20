@@ -26,6 +26,7 @@ Suites = \
       $(UT_RootPath)/Yaml/UT_YamlFile.hpp                              \
       $(UT_RootPath)/SystemModel/UT_SystemModelNode.hpp                \
       $(UT_RootPath)/SystemModel/UT_Register.hpp                       \
+      $(UT_RootPath)/SystemModel/UT_VirtualRegister.hpp                \
       $(UT_RootPath)/SystemModel/UT_ParentNode.hpp                     \
       $(UT_RootPath)/SystemModel/UT_NodePathResolver.hpp               \
       $(UT_RootPath)/SystemModel/UT_DefaultTableBasedPathSelector.hpp  \

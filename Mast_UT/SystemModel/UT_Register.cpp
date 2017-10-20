@@ -70,6 +70,17 @@ void Check_SetExpectedFromSut_DontCare (T expected, T mask)
 
 } // End of unnamed namespace
 
+
+//! Pseudo test of sizeof(Register)
+//! @note This is mainly used as an information on real sizeof Register
+//!       and to detect/validate changes.
+//!       This is the minimal memory usage (when it is empty)
+void UT_Register::test_Sizeof ()
+{
+  TS_ASSERT_EQUALS (sizeof(Register), 208); // Including 8 x BinaryVector (20 bytes)
+}
+
+
 //! Checks Register:: constructor
 //!
 //! @note SystemModelNode parts have been test elsewhere

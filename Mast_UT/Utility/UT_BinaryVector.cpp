@@ -13,8 +13,7 @@
 
 #include "UT_BinaryVector.hpp"
 #include "BinaryVector.hpp"
-#include "BinaryVector_Traits.hpp"
-#include "IndexedRange_Traits.hpp"
+#include "Mast_Core_Traits.hpp"
 
 #include <vector>
 #include <memory>
@@ -40,6 +39,16 @@ using namespace mast;
 void UT_BinaryVector::setUp ()
 {
   CxxTest::setDisplayUnsignedAsHex(true);
+}
+
+
+//! Pseudo test of sizeof(BinaryVector)
+//! @note This is mainly used as an information on real sizeof BinaryVector
+//!       and to detect/validate changes.
+//!       This is the minimal memory usage (when it is empty)
+void UT_BinaryVector::test_Sizeof ()
+{
+  TS_ASSERT_EQUALS (sizeof(BinaryVector), 20);
 }
 
 //! Checks BinaryVector defaut constructor

@@ -3974,7 +3974,7 @@ void UT_BinaryVector::test_Append_1_to_64_bits_When_Empty_Right_Aligned ()
   };
 
   using data_t = tuple<uint64_t, uint8_t, string_view> ; // Value, Number of bits (taken from LSB), expected
-  auto data    =   // Value, bits
+  auto data    =  // Value, start offset, expected result
   {
     data_t(0x0000000000000000,      1,  "0"),                                                                               // 00
     data_t(0x0000000000000001,      1,  "1"),                                                                               // 01
@@ -7797,6 +7797,8 @@ void UT_BinaryVector::test_SetSlice_BinaryVector ()
     auto source   = BinaryVector::CreateFromBinaryString(std::get<2>(data));
     auto expected = BinaryVector::CreateFromBinaryString(std::get<3>(data));
 
+    CxxTest::setAbortTestOnFail(true);
+
     // ---------------- Exercise
     //
     TS_ASSERT_THROWS_NOTHING (sut.SetSlice(offset, source));
@@ -7895,6 +7897,600 @@ void UT_BinaryVector::test_SetSlice_BinaryVector_OutOfRange ()
   //
   TS_DATA_DRIVEN_TEST(checker, data);
 }
+
+
+//! Checks BinaryVector::SetSlice() from uint8_t
+//!
+void UT_BinaryVector::test_SetSlice_uint_8 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto    sut      = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    auto    range    = IndexedRange(std::get<1>(data), std::get<2>(data));
+    uint8_t value    = std::get<3>(data);
+    auto    expected = BinaryVector::CreateFromBinaryString(std::get<4>(data));
+
+    CxxTest::setAbortTestOnFail(true);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.SetSlice(range, value));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto data = // sut, left index, right index, value, expected result
+  {
+    make_tuple("1",                          0u, 0u,  0u,   "0"),                           // 00
+    make_tuple("0",                          0u, 0u,  1u,   "1"),                           // 01
+    make_tuple("10",                         0u, 1u,  1u,   "01"),                          // 02
+    make_tuple("101",                        1u, 1u,  1u,   "111"),                         // 03
+    make_tuple("101",                        0u, 1u,  1u,   "011"),                         // 04
+    make_tuple("101",                        0u, 2u,  2u,   "010"),                         // 05
+    make_tuple("000",                        0u, 2u,  5u,   "101"),                         // 06
+    make_tuple("101",                        2u, 2u,  0u,   "100"),                         // 07
+    make_tuple("1011_0111:1",                0u, 3u,  4u,   "0100:0111_1"),                 // 08
+    make_tuple("1011_0111:1",                1u, 5u,  21u,  "1:10101:111"),                 // 09
+    make_tuple("1011_0111:1",                2u, 6u,  22u,  "10:10110:11"),                 // 10
+    make_tuple("1011_0111:0",                0u, 7u,  23u,  "0001_0111:0"),                 // 11
+    make_tuple("1011_0111:0",                1u, 8u,  23u,  "1:0001_0111"),                 // 12
+    make_tuple("1010_0111:00",               4u, 8u,  23u,  "1010:1_0111:0"),               // 13
+    make_tuple("1010_0111:00",               5u, 9u,  23u,  "1010_0:1_0111"),               // 14
+    make_tuple("1010_0111:0101_1100_1011_0", 5u, 17u, 25u,  "1010_0:0_0000_0001_1001:110"), // 15
+
+    make_tuple("1010_0111:0101_1100_1011_0", 5u, 17u, 129u, "1010_0:0_0000_1000_0001:110"), // 16
+    make_tuple("1010_0111:0101_1100_1011_0", 5u, 17u, 153u, "1010_0:0_0000_1001_1001:110"), // 17
+    make_tuple("1010_1111:0101_1100_1001_0", 5u, 17u, 255u, "1010_1:0_0000_1111_1111:010"), // 18
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+
+//! Checks BinaryVector::SetSlice() from uint8_t when requesting out of range slice
+//!
+void UT_BinaryVector::test_SetSlice_uint_8_OutOfRange_Indexes ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto    sut   = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    auto    range = IndexedRange(std::get<1>(data), std::get<2>(data));
+    uint8_t value = 17; // Actual value as no effect
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (sut.SetSlice(range, value), std::exception);
+  };
+
+  auto data =
+  {
+    make_tuple("",            0u, 0u), // 00
+    make_tuple("1",           1u, 1u), // 01
+    make_tuple("1",           0u, 1u), // 02
+    make_tuple("1",           1u, 0u), // 03
+    make_tuple("101",         3u, 3u), // 04
+    make_tuple("101",         3u, 4u), // 05
+    make_tuple("101",         4u, 3u), // 06
+    make_tuple("101",         4u, 4u), // 07
+    make_tuple("1011_0111:1", 8u, 9u), // 08
+    make_tuple("1011_0111:1", 9u, 8u), // 09
+    make_tuple("1011_0111:1", 9u, 9u), // 10
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks BinaryVector::SetSlice() from uint8_t when requesting out of range value (relative to the specified range)
+//!
+void UT_BinaryVector::test_SetSlice_uint_8_OutOfRange_Value ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto    sut   = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    auto    range = IndexedRange(std::get<1>(data), std::get<2>(data));
+    uint8_t value = std::get<3>(data);
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (sut.SetSlice(range, value), std::exception);
+  };
+
+  auto data =
+  {
+    make_tuple("1",           0u, 0u, 2u),   // 00
+    make_tuple("1011_0111:1", 1u, 1u, 2u),   // 01
+    make_tuple("1011_0111:1", 0u, 2u, 8u),   // 02
+    make_tuple("1011_0111:1", 0u, 3u, 16u),  // 03
+    make_tuple("1011_0111:1", 0u, 4u, 33u),  // 04
+    make_tuple("1011_0111:1", 0u, 5u, 64u),  // 05
+    make_tuple("1011_0111:1", 0u, 6u, 128u), // 06
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks BinaryVector::SetSlice() from uint16_t
+//!
+void UT_BinaryVector::test_SetSlice_uint_16 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto     sut      = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    auto     range    = IndexedRange(std::get<1>(data), std::get<2>(data));
+    uint16_t value    = std::get<3>(data);
+    auto     expected = BinaryVector::CreateFromBinaryString(std::get<4>(data));
+
+    CxxTest::setAbortTestOnFail(true);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.SetSlice(range, value));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto data = // sut, left index, right index, value, expected result
+  {
+    make_tuple("1",                          0u, 0u,  0u,     "0"),                           // 00
+    make_tuple("0",                          0u, 0u,  1u,     "1"),                           // 01
+    make_tuple("10",                         0u, 1u,  1u,     "01"),                          // 02
+    make_tuple("101",                        1u, 1u,  1u,     "111"),                         // 03
+    make_tuple("101",                        0u, 1u,  1u,     "011"),                         // 04
+    make_tuple("101",                        0u, 2u,  2u,     "010"),                         // 05
+    make_tuple("000",                        0u, 2u,  5u,     "101"),                         // 06
+    make_tuple("101",                        2u, 2u,  0u,     "100"),                         // 07
+    make_tuple("1011_0111:1",                0u, 3u,  4u,     "0100:0111_1"),                 // 08
+    make_tuple("1011_0111:1",                1u, 5u,  21u,    "1:10101:111"),                 // 09
+    make_tuple("1011_0111:1",                2u, 6u,  22u,    "10:10110:11"),                 // 10
+    make_tuple("1011_0111:0",                0u, 7u,  23u,    "0001_0111:0"),                 // 11
+    make_tuple("1011_0111:0",                1u, 8u,  23u,    "1:0001_0111"),                 // 12
+    make_tuple("1010_0111:00",               4u, 8u,  23u,    "1010:1_0111:0"),               // 13
+    make_tuple("1010_0111:00",               5u, 9u,  23u,    "1010_0:1_0111"),               // 14
+    make_tuple("1010_0111:0101_1100_1011_0", 5u, 17u, 25u,    "1010_0:0_0000_0001_1001:110"), // 15
+    make_tuple("1010_0111:0101_1100_1011_0", 5u, 17u, 129u,   "1010_0:0_0000_1000_0001:110"), // 16
+    make_tuple("1010_0111:0101_1100_1011_0", 5u, 17u, 153u,   "1010_0:0_0000_1001_1001:110"), // 17
+    make_tuple("1010_1111:0101_1100_1001_0", 5u, 17u, 255u,   "1010_1:0_0000_1111_1111:010"), // 18
+    make_tuple("1010_1111:0101_1100_1001_0", 5u, 17u, 256u,   "1010_1:0_0001_0000_0000:010"), // 19
+    make_tuple("1010_1111:0101_1100_1001_0", 5u, 17u, 4097u,  "1010_1:1_0000_0000_0001:010"), // 20
+    make_tuple("1010_1111:0101_1100_1001_0", 5u, 20u, 4097u,  "1010_1:0001_0000_0000_0001"),  // 21
+    make_tuple("1010_1111:0101_1100_1001_0", 5u, 20u, 4098u,  "1010_1:0001_0000_0000_0010"),  // 22
+    make_tuple("1010_1111:0101_1100_1001_0", 5u, 20u, 32769u, "1010_1:1000_0000_0000_0001"),  // 23
+    make_tuple("1010_1111:0101_1100_1001_0", 5u, 20u, 33153u, "1010_1:1000_0001_1000_0001"),  // 24
+    make_tuple("1010_1111:0101_1100_1001_0", 5u, 20u, 65535u, "1010_1:1111_1111_1111_1111"),  // 25
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+
+//! Checks BinaryVector::SetSlice() from uint16_t when requesting out of range slice
+//!
+void UT_BinaryVector::test_SetSlice_uint_16_OutOfRange_Indexes ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto     sut   = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    auto     range = IndexedRange(std::get<1>(data), std::get<2>(data));
+    uint16_t value = 17; // Actual value as no effect
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (sut.SetSlice(range, value), std::exception);
+  };
+
+  auto data =
+  {
+    make_tuple("",            0u, 0u), // 00
+    make_tuple("1",           1u, 1u), // 01
+    make_tuple("1",           0u, 1u), // 02
+    make_tuple("1",           1u, 0u), // 03
+    make_tuple("101",         3u, 3u), // 04
+    make_tuple("101",         3u, 4u), // 05
+    make_tuple("101",         4u, 3u), // 06
+    make_tuple("101",         4u, 4u), // 07
+    make_tuple("1011_0111:1", 8u, 9u), // 08
+    make_tuple("1011_0111:1", 9u, 8u), // 09
+    make_tuple("1011_0111:1", 9u, 9u), // 10
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks BinaryVector::SetSlice() from uint16_t when requesting out of range value (relative to the specified range)
+//!
+void UT_BinaryVector::test_SetSlice_uint_16_OutOfRange_Value ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto    sut   = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    auto    range = IndexedRange(std::get<1>(data), std::get<2>(data));
+    uint16_t value = std::get<3>(data);
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (sut.SetSlice(range, value), std::exception);
+  };
+
+  //                   sut_value,   left,    right    value
+  using data_t = tuple<string_view, uint8_t, uint8_t, uint16_t>;
+  auto data =
+  {
+    data_t("1",                     0u, 0u,  2u),     // 00
+    data_t("1011_0111:1",           0u, 2u,  8u),     // 01
+    data_t("1011_0111:1",           0u, 3u,  16u),    // 02
+    data_t("1011_0111:1",           0u, 4u,  33u),    // 03
+    data_t("1011_0111:1",           0u, 5u,  64u),    // 04
+    data_t("1011_0111:1001_1100_1", 0u, 6u,  128u),   // 05
+    data_t("1011_0111:1001_1100_1", 0u, 9u,  1025u),  // 06
+    data_t("1011_0111:1001_1100_1", 0u, 10u, 2050u),  // 07
+    data_t("1011_0111:1001_1100_1", 0u, 14u, 32768u), // 08
+    data_t("1011_0111:1001_1100_1", 0u, 14u, 65535u), // 09
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks BinaryVector::SetSlice() from uint32_t
+//!
+void UT_BinaryVector::test_SetSlice_uint_32 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto     sut      = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    auto     range    = IndexedRange(std::get<1>(data), std::get<2>(data));
+    uint32_t value    = std::get<3>(data);
+    auto     expected = BinaryVector::CreateFromBinaryString(std::get<4>(data));
+
+    CxxTest::setAbortTestOnFail(true);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.SetSlice(range, value));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  auto data = // sut, left index, right index, value, expected result
+  {
+    make_tuple("1",                                           0u, 0u,  0u,          "0"),                                            // 00
+    make_tuple("0",                                           0u, 0u,  1u,          "1"),                                            // 01
+    make_tuple("10",                                          0u, 1u,  1u,          "01"),                                           // 02
+    make_tuple("101",                                         1u, 1u,  1u,          "111"),                                          // 03
+    make_tuple("101",                                         0u, 1u,  1u,          "011"),                                          // 04
+    make_tuple("101",                                         0u, 2u,  2u,          "010"),                                          // 05
+    make_tuple("000",                                         0u, 2u,  5u,          "101"),                                          // 06
+    make_tuple("101",                                         2u, 2u,  0u,          "100"),                                          // 07
+    make_tuple("1011_0111:1",                                 0u, 3u,  4u,          "0100:0111_1"),                                  // 08
+    make_tuple("1011_0111:1",                                 1u, 5u,  21u,         "1:10101:111"),                                  // 09
+    make_tuple("1011_0111:1",                                 2u, 6u,  22u,         "10:10110:11"),                                  // 10
+    make_tuple("1011_0111:0",                                 0u, 7u,  23u,         "0001_0111:0"),                                  // 11
+    make_tuple("1011_0111:0",                                 1u, 8u,  23u,         "1:0001_0111"),                                  // 12
+    make_tuple("1010_0111:00",                                4u, 8u,  23u,         "1010:1_0111:0"),                                // 13
+    make_tuple("1010_0111:00",                                5u, 9u,  23u,         "1010_0:1_0111"),                                // 14
+    make_tuple("1010_0111:0101_1100:1011_0",                  5u, 17u, 25u,         "1010_0:0_0000_0001_1001:110"),                  // 15
+    make_tuple("1010_0111:0101_1100:1011_0",                  5u, 17u, 129u,        "1010_0:0_0000_1000_0001:110"),                  // 16
+    make_tuple("1010_0111:0101_1100:1011_0",                  5u, 17u, 153u,        "1010_0:0_0000_1001_1001:110"),                  // 17
+    make_tuple("1010_1111:0101_1100:1001_0",                  5u, 17u, 255u,        "1010_1:0_0000_1111_1111:010"),                  // 18
+    make_tuple("1010_1111:0101_1100:1001_0",                  5u, 17u, 256u,        "1010_1:0_0001_0000_0000:010"),                  // 19
+    make_tuple("1010_1111:0101_1100:1001_0",                  5u, 17u, 4097u,       "1010_1:1_0000_0000_0001:010"),                  // 20
+    make_tuple("1010_1111:0101_1100:1001_0",                  5u, 20u, 4097u,       "1010_1:0001_0000_0000_0001"),                   // 21
+    make_tuple("1010_1111:0101_1100:1001_0",                  5u, 20u, 4098u,       "1010_1:0001_0000_0000_0010"),                   // 22
+    make_tuple("1010_1111:0101_1100:1001_0",                  5u, 20u, 32769u,      "1010_1:1000_0000_0000_0001"),                   // 23
+    make_tuple("1010_1111:0101_1100:1001_0",                  5u, 20u, 33153u,      "1010_1:1000_0001_1000_0001"),                   // 24
+    make_tuple("1010_1111:0101_1100:1001_0",                  5u, 20u, 65535u,      "1010_1:1111_1111_1111_1111"),                   // 25
+    make_tuple("1010_1111:0101_1100:1001_0110_1110",          9u, 25u, 65535u,      "1010_1111_0:0_1111_1111_1111_1111:10"),         // 26
+    make_tuple("1010_1111:0101_1100:1001_0110_1110",          9u, 26u, 260000u,     "1010_1111_0:11_1111_0111_1010_0000:0"),         // 27
+    make_tuple("1010_1111:0101_1100:1001_0110_1110",          7u, 26u, 543210u,     "1010_111:1000_0100_1001_1110_1010:0"),          // 28
+    make_tuple("1010_1111:0101_1100:1001_0110_1110_0001_101", 2u, 33u, 0x80000001u, "10:1000_0000_0000_0000_0000_0000_0000_0001:1"), // 29
+    make_tuple("1010_1111:0101_1100:1001_0110_1110_0001_101", 2u, 33u, 0xFFFFFFFFu, "10:1111_1111_1111_1111_1111_1111_1111_1111:1"), // 30
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+
+//! Checks BinaryVector::SetSlice() from uint32_t when requesting out of range slice
+//!
+void UT_BinaryVector::test_SetSlice_uint_32_OutOfRange_Indexes ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto     sut   = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    auto     range = IndexedRange(std::get<1>(data), std::get<2>(data));
+    uint32_t value = 17; // Actual value as no effect
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (sut.SetSlice(range, value), std::exception);
+  };
+
+  auto data =
+  {
+    make_tuple("",                    0u,  0u),  // 00
+    make_tuple("1",                   1u,  1u),  // 01
+    make_tuple("1",                   0u,  1u),  // 02
+    make_tuple("1",                   1u,  0u),  // 03
+    make_tuple("101",                 3u,  3u),  // 04
+    make_tuple("101",                 3u,  4u),  // 05
+    make_tuple("101",                 4u,  3u),  // 06
+    make_tuple("101",                 4u,  4u),  // 07
+    make_tuple("1011_0111:1",         8u,  9u),  // 08
+    make_tuple("1011_0111:1",         9u,  8u),  // 09
+    make_tuple("1011_0111:1",         9u,  9u),  // 10
+    make_tuple("1011_0111:1011_1110", 16u, 16u), // 11
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks BinaryVector::SetSlice() from uint32_t when requesting out of range value (relative to the specified range)
+//!
+void UT_BinaryVector::test_SetSlice_uint_32_OutOfRange_Value ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto    sut   = BinaryVector::CreateFromHexString(std::get<0>(data));
+    auto    range = IndexedRange(std::get<1>(data), std::get<2>(data));
+    uint32_t value = std::get<3>(data);
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (sut.SetSlice(range, value), std::exception);
+  };
+
+  //                   sut_value,   left,    right    value
+  using data_t = tuple<string_view, uint8_t, uint8_t, uint32_t>;
+  auto data =
+  {
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 0u,  2u),         // 00
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 2u,  8u),         // 01
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 3u,  16u),        // 02
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 4u,  33u),        // 03
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 5u,  64u),        // 04
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 6u,  128u),       // 05
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 9u,  1025u),      // 06
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 10u, 2050u),      // 07
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 14u, 32768u),     // 08
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 14u, 65535u),     // 09
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 15u, 65536u),     // 10
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 23u, 0x1000000),  // 11
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 30u, 0x8234FFFF), // 12
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+
+//! Checks BinaryVector::SetSlice() from uint64_t
+//!
+void UT_BinaryVector::test_SetSlice_uint_64 ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto     sut      = BinaryVector::CreateFromString(std::get<0>(data));
+    auto     range    = IndexedRange(std::get<1>(data), std::get<2>(data));
+    uint64_t value    = std::get<3>(data);
+    auto     expected = BinaryVector::CreateFromString(std::get<4>(data));
+
+    CxxTest::setAbortTestOnFail(true);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.SetSlice(range, value));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  using data_t = tuple<string_view, uint8_t, uint8_t, uint64_t, string_view>;
+  auto data = // sut,                  left index, right index, value, expected result
+  {
+    data_t("0b1",                        0u,  0u,  0u,                    "0b0"),                                  // 00
+    data_t("0b0",                        0u,  0u,  1u,                    "0b1"),                                  // 01
+    data_t("0b10",                       0u,  1u,  1u,                    "0b01"),                                 // 02
+    data_t("0b101",                      1u,  1u,  1u,                    "0b111"),                                // 03
+    data_t("0b101",                      0u,  1u,  1u,                    "0b011"),                                // 04
+    data_t("0b101",                      0u,  2u,  2u,                    "0b010"),                                // 05
+    data_t("0b000",                      0u,  2u,  5u,                    "0b101"),                                // 06
+    data_t("0b101",                      2u,  2u,  0u,                    "0b100"),                                // 07
+    data_t("0b1011_0111:1",              0u,  3u,  4u,                    "0b0100:0111_1"),                        // 08
+    data_t("0b1011_0111:1",              1u,  5u,  21u,                   "0b1:10101:111"),                        // 09
+    data_t("0b1011_0111:1",              2u,  6u,  22u,                   "0b10:10110:11"),                        // 10
+    data_t("0b1011_0111:0",              0u,  7u,  23u,                   "0b0001_0111:0"),                        // 11
+    data_t("0b1011_0111:0",              1u,  8u,  23u,                   "0b1:0001_0111"),                        // 12
+    data_t("0b1010_0111:00",             4u,  8u,  23u,                   "0b1010:1_0111:0"),                      // 13
+    data_t("0b1010_0111:00",             5u,  9u,  23u,                   "0b1010_0:1_0111"),                      // 14
+    data_t("0xA75C_B/b0",                5u,  17u, 25u,                   "0b1010_0:0_0000_0001_1001:110"),        // 15
+    data_t("0xA75C_B/b0",                5u,  17u, 129u,                  "0b1010_0:0_0000_1000_0001:110"),        // 16
+    data_t("0xA75C_B/b0",                5u,  17u, 153u,                  "0b1010_0:0_0000_1001_1001:110"),        // 17
+    data_t("0xAF5C_9/b0",                5u,  17u, 255u,                  "0b1010_1:0_0000_1111_1111:010"),        // 18
+    data_t("0xAF5C_9/b0",                5u,  17u, 256u,                  "0b1010_1:0_0001_0000_0000:010"),        // 19
+    data_t("0xAF5C_9/b0",                5u,  17u, 4097u,                 "0b1010_1:1_0000_0000_0001:010"),        // 20
+    data_t("0xAF5C_9/b0",                5u,  20u, 4097u,                 "0b1010_1:0001_0000_0000_0001"),         // 21
+    data_t("0xAF5C_9/b0",                5u,  20u, 4098u,                 "0b1010_1:0001_0000_0000_0010"),         // 22
+    data_t("0xAF5C_9/b0",                5u,  20u, 32769u,                "0b1010_1:1000_0000_0000_0001"),         // 23
+    data_t("0xAF5C_9/b0",                5u,  20u, 33153u,                "0b1010_1:1000_0001_1000_0001"),         // 24
+    data_t("0xAF5C_9/b0",                5u,  20u, 65535u,                "0b1010_1:/xFFFF"),                      // 25
+    data_t("0xAF5C_96E",                 9u,  25u, 65535u,                "0xAF/b0:0_/xFFFF:/b10"),                // 26
+    data_t("0xAF5C_96E",                 9u,  26u, 260000u,               "0xAF/b0:11/xF7A0:/b0"),                 // 27
+    data_t("0xAF5C_96E",                 7u,  26u, 543210u,               "0b1010_111:/x849EA:/b0"),               // 28
+    data_t("0xAF5C_96E1_/b101",          2u,  33u, 0x80000001u,           "0b10:/x80000001:/b1"),                  // 29
+    data_t("0xAF5C_96E1_/b101",          2u,  33u, 0xFFFFFFFFu,           "0b10:/xFFFFFFFF:/b1"),                  // 30
+    data_t("0xAF5C_96E1_FADE_CAFE_007",  8u,  51u, 0x98765432109ull,      "0xAF:98765432109:AF_E007"),             // 31
+    data_t("0xAF5C_96E1_FADE_CAFE_007",  9u,  52u, 0x98765432109ull,      "0xAF/b0:/x98765432109:/b010/xF_E007"),  // 32
+    data_t("0xAF5C_96E1_FADE_CAFE_007",  13u, 56u, 0x98765432109ull,      "0xAF5/b1:/x98765432109:/b111/x_E007"),  // 33
+    data_t("0xAF5C_96E1_FADE_CAFE_0071", 13u, 76u, 0x98765432109ull,      "0xAF5/b1:/x0000_0987_6543_2109:/b001"), // 34
+    data_t("0xAF5C_96E1_FADE_CAFE_0071", 13u, 76u, 0xDEAD098765432109ull, "0xAF5/b1:/xDEAD_0987_6543_2109:/b001"), // 35
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+
+//! Checks BinaryVector::SetSlice() from uint64_t when requesting out of range slice
+//!
+void UT_BinaryVector::test_SetSlice_uint_64_OutOfRange_Indexes ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto     sut   = BinaryVector::CreateFromBinaryString(std::get<0>(data));
+    auto     range = IndexedRange(std::get<1>(data), std::get<2>(data));
+    uint64_t value = 17; // Actual value as no effect
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (sut.SetSlice(range, value), std::exception);
+  };
+
+  auto data =
+  {
+    make_tuple("",                    0u,  0u),  // 00
+    make_tuple("1",                   1u,  1u),  // 01
+    make_tuple("1",                   0u,  1u),  // 02
+    make_tuple("1",                   1u,  0u),  // 03
+    make_tuple("101",                 3u,  3u),  // 04
+    make_tuple("101",                 3u,  4u),  // 05
+    make_tuple("101",                 4u,  3u),  // 06
+    make_tuple("101",                 4u,  4u),  // 07
+    make_tuple("1011_0111:1",         8u,  9u),  // 08
+    make_tuple("1011_0111:1",         9u,  8u),  // 09
+    make_tuple("1011_0111:1",         9u,  9u),  // 10
+    make_tuple("1011_0111:1011_1110", 16u, 16u), // 11
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks BinaryVector::SetSlice() from uint64_t when requesting out of range value (relative to the specified range)
+//!
+void UT_BinaryVector::test_SetSlice_uint_64_OutOfRange_Value ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto    sut   = BinaryVector::CreateFromHexString(std::get<0>(data));
+    auto    range = IndexedRange(std::get<1>(data), std::get<2>(data));
+    uint64_t value = std::get<3>(data);
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (sut.SetSlice(range, value), std::exception);
+  };
+
+  //                   sut_value,   left,    right    value
+  using data_t = tuple<string_view, uint8_t, uint8_t, uint64_t>;
+  auto data =
+  {
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 0u,  2u),                 // 00
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 2u,  8u),                 // 01
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 3u,  16u),                // 02
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 4u,  33u),                // 03
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 5u,  64u),                // 04
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 6u,  128u),               // 05
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 9u,  1025u),              // 06
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 10u, 2050u),              // 07
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 14u, 32768u),             // 08
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 14u, 65535u),             // 09
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 15u, 65536u),             // 10
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 23u, 0x1000000),          // 11
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 30u, 0x8234FFFF),         // 12
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 43u, 0x1A1234567890),     // 13
+    data_t("ABCD_EF00_BADE_DEAD_FADE", 0u, 62u, 0x8642DADE8234FFFF), // 14
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
 
 
 

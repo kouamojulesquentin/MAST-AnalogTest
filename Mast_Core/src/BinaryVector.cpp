@@ -149,6 +149,75 @@ namespace
     "1111",  // 15
   };
 
+  constexpr std::array<uint64_t, 65> MAX_UNSIGNED_VALUE_FOR_BITS_COUNT =
+  {
+    0x0000000000000000, // 00 bits
+    0x0000000000000001, // 01 bits
+    0x0000000000000003, // 02 bits
+    0x0000000000000007, // 03 bits
+    0x000000000000000f, // 04 bits
+    0x000000000000001f, // 05 bits
+    0x000000000000003f, // 06 bits
+    0x000000000000007f, // 07 bits
+    0x00000000000000ff, // 08 bits
+    0x00000000000001ff, // 09 bits
+    0x00000000000003ff, // 10 bits
+    0x00000000000007ff, // 11 bits
+    0x0000000000000fff, // 12 bits
+    0x0000000000001fff, // 13 bits
+    0x0000000000003fff, // 14 bits
+    0x0000000000007fff, // 15 bits
+    0x000000000000ffff, // 16 bits
+    0x000000000001ffff, // 17 bits
+    0x000000000003ffff, // 18 bits
+    0x000000000007ffff, // 19 bits
+    0x00000000000fffff, // 20 bits
+    0x00000000001fffff, // 21 bits
+    0x00000000003fffff, // 22 bits
+    0x00000000007fffff, // 23 bits
+    0x0000000000ffffff, // 24 bits
+    0x0000000001ffffff, // 25 bits
+    0x0000000003ffffff, // 26 bits
+    0x0000000007ffffff, // 27 bits
+    0x000000000fffffff, // 28 bits
+    0x000000001fffffff, // 29 bits
+    0x000000003fffffff, // 30 bits
+    0x000000007fffffff, // 31 bits
+    0x00000000ffffffff, // 32 bits
+    0x00000001ffffffff, // 33 bits
+    0x00000003ffffffff, // 34 bits
+    0x00000007ffffffff, // 35 bits
+    0x0000000fffffffff, // 36 bits
+    0x0000001fffffffff, // 37 bits
+    0x0000003fffffffff, // 38 bits
+    0x0000007fffffffff, // 39 bits
+    0x000000ffffffffff, // 40 bits
+    0x000001ffffffffff, // 41 bits
+    0x000003ffffffffff, // 42 bits
+    0x000007ffffffffff, // 43 bits
+    0x00000fffffffffff, // 44 bits
+    0x00001fffffffffff, // 45 bits
+    0x00003fffffffffff, // 46 bits
+    0x00007fffffffffff, // 47 bits
+    0x0000ffffffffffff, // 48 bits
+    0x0001ffffffffffff, // 49 bits
+    0x0003ffffffffffff, // 50 bits
+    0x0007ffffffffffff, // 51 bits
+    0x000fffffffffffff, // 52 bits
+    0x001fffffffffffff, // 53 bits
+    0x003fffffffffffff, // 54 bits
+    0x007fffffffffffff, // 55 bits
+    0x00ffffffffffffff, // 56 bits
+    0x01ffffffffffffff, // 57 bits
+    0x03ffffffffffffff, // 58 bits
+    0x07ffffffffffffff, // 59 bits
+    0x0fffffffffffffff, // 60 bits
+    0x1fffffffffffffff, // 61 bits
+    0x3fffffffffffffff, // 62 bits
+    0x7fffffffffffffff, // 63 bits
+    0xffffffffffffffff, // 64 bits
+  };
+
 } // End of unnamed namespace
 
 
@@ -300,7 +369,7 @@ BinaryVector& BinaryVector::Append (uint8_t value, uint8_t numberOfBits, BitsAli
 
   if (numberOfBits > 8 * sizeof(uint8_t))
   {
-    THROW_INVALID_ARGUMENT("Number of bits to append cannot exceed the number of bits of value.");
+    THROW_INVALID_ARGUMENT("Number of bits to append cannot exceed the number of bits of value");
   }
 
   // ---------------- Align (pack) added bits to the MSB
@@ -457,10 +526,41 @@ BinaryVector& BinaryVector::Append (uint64_t value, uint8_t numberOfBits, BitsAl
 //---------------------------------------------------------------------------
 
 
+//! Appends 0 or 1 bit N times
+//!
+//! @param bitIsOne   When true '1' otherwise '0' are appended to the vector
+//! @param count      Number of '0' or '1' to append
+//!
+BinaryVector& BinaryVector::AppendBits (bool bitIsOne, uint32_t count)
+{
+  uint8_t value = bitIsOne ? 0xFF : 0;
+  auto    bytesCount = count / 8u;
+
+  if (bytesCount != 0)
+  {
+    m_data.insert(m_data.cend(), bytesCount, value);
+
+    auto addedBits = 8u * bytesCount;
+    m_usedBits    += addedBits;
+    count         -= addedBits;
+  }
+
+  if (count != 0)
+  {
+    Append(value, count);
+  }
+
+  return *this;
+}
+//
+//  End of: BinaryVector::AppendBits
+//---------------------------------------------------------------------------
+
+
 //! Appends from a list of uint8_t ordered from msb to lsb
 //!
 //! @param numberOfBits   Number of bits to use from chunksList
-//! @param alignment      Tells whether bits are left (msb) or right (lsb) aligned
+//! @param alignment      Tells whether (source) bits in chunksList are left (msb) or right (lsb) aligned
 //! @param chunksList     A set of uint8_t from msb to lsb
 //!
 BinaryVector& BinaryVector::AppendChunks (uint8_t numberOfBits, BitsAlignment alignment, initializer_list<uint8_t> chunksList)
@@ -2294,35 +2394,6 @@ uint8_t BinaryVector::MergeToByte (uint32_t lsbOffset, uint8_t lsbBitsCount, boo
 //---------------------------------------------------------------------------
 
 
-//! Appends 0 or 1 bit N times
-//!
-//! @param bitIsOne   When true '1' otherwise '0' are appended to the vector
-//! @param count      Number of '0' or '1' to append
-//!
-BinaryVector& BinaryVector::AppendBits (bool bitIsOne, uint32_t count)
-{
-  uint8_t value = bitIsOne ? 0xFF : 0;
-  auto    bytesCount = count / 8u;
-
-  if (bytesCount != 0)
-  {
-    m_data.insert(m_data.cend(), bytesCount, value);
-
-    auto addedBits = 8u * bytesCount;
-    m_usedBits    += addedBits;
-    count         -= addedBits;
-  }
-
-  if (count != 0)
-  {
-    Append(value, count);
-  }
-
-  return *this;
-}
-//
-//  End of: BinaryVector::AppendBits
-//---------------------------------------------------------------------------
 
 //! Sets from N signed bits
 //!
@@ -2503,7 +2574,6 @@ void BinaryVector::SetBit (uint32_t bitOffset)
 //---------------------------------------------------------------------------
 
 
-
 //! Assigns a portion of the BinaryVector
 //!
 //! @note It is optimized for small number of copied bytes
@@ -2514,23 +2584,208 @@ void BinaryVector::SetBit (uint32_t bitOffset)
 //! @return Reference to this (to allow cascading calls)
 BinaryVector& BinaryVector::SetSlice (uint32_t startOffset, const BinaryVector& value)
 {
-  CHECK_FALSE(IsEmpty(),                                            "Cannot set slice of an empty BinaryVector");
-  CHECK_PARAMETER_RANGE(startOffset, 0u, BitsCount() - 1u,          "Out of range offset: "s + std::to_string(startOffset));
-  CHECK_PARAMETER_LTE(startOffset + value.BitsCount(), BitsCount(), "Slice is partially out of range");
+  return SetSlice_Impl(startOffset, value.BitsCount(), value.DataLeftAligned());
+}
 
-  const auto dstByteOffset      = startOffset   / 8u;
-  const auto offsetInFirstBytes = startOffset   % 8u;
-  const auto srcBitsCount       = value.BitsCount();
-  const auto bytesCount         = value.BytesCount();
+
+//! Assigns an unsigned 8 bits into a slice
+//!
+//! @note Range left/right boundaries are reversed relative to bits numbering in
+//!       BinaryVector.
+//!       BinaryVector has it leftmost bits identified at offset 0 while an ICL
+//!       vector range is usually numbered from its rightmost bit
+//!
+//!         e.g. an IndexedRange(7, 0):
+//!           - relative to a  8 bits BinaryVector is equivalent to bits offsets [0, 7]
+//!           - relative to a 10 bits BinaryVector is equivalent to bits offsets [2, 9]
+//!
+//!         e.g. an IndexedRange(0, 7):
+//!           ? relative to a  8 bits BinaryVector is equivalent to bits offsets [7, 0]
+//!           ? relative to a 10 bits BinaryVector is equivalent to bits offsets [9, 2]
+//!           ? in that cases, values are reversed before being effectively assigned
+//!
+//! @param range  Ranges of bits to assign
+//! @param value  Value to assign
+//!
+//! @return Reference to this (to allow cascading calls)
+BinaryVector& BinaryVector::SetSlice (IndexedRange range, uint8_t value)
+{
+  return SetSlice_T(range, value);
+}
+//
+//  End of: BinaryVector::SetSlice
+//---------------------------------------------------------------------------
+
+
+//! Assigns an unsigned 16 bits into a slice
+//!
+//! @note Range left/right boundaries are reversed relative to bits numbering in
+//!       BinaryVector.
+//!       BinaryVector has it leftmost bits identified at offset 0 while an ICL
+//!       vector range is usually numbered from its rightmost bit
+//!
+//!         e.g. an IndexedRange(7, 0):
+//!           - relative to a  8 bits BinaryVector is equivalent to bits offsets [0, 7]
+//!           - relative to a 10 bits BinaryVector is equivalent to bits offsets [2, 9]
+//!
+//!         e.g. an IndexedRange(0, 7):
+//!           ? relative to a  8 bits BinaryVector is equivalent to bits offsets [7, 0]
+//!           ? relative to a 10 bits BinaryVector is equivalent to bits offsets [9, 2]
+//!           ? in that cases, values are reversed before being effectively assigned
+//!
+//! @param range  Ranges of bits to assign
+//! @param value  Value to assign
+//!
+//! @return Reference to this (to allow cascading calls)
+BinaryVector& BinaryVector::SetSlice (IndexedRange range, uint16_t value)
+{
+  return SetSlice_T(range, value);
+}
+
+
+//! Assigns an unsigned 32 bits into a slice
+//!
+//! @note Range left/right boundaries are reversed relative to bits numbering in
+//!       BinaryVector.
+//!       BinaryVector has it leftmost bits identified at offset 0 while an ICL
+//!       vector range is usually numbered from its rightmost bit
+//!
+//!         e.g. an IndexedRange(7, 0):
+//!           - relative to a  8 bits BinaryVector is equivalent to bits offsets [0, 7]
+//!           - relative to a 10 bits BinaryVector is equivalent to bits offsets [2, 9]
+//!
+//!         e.g. an IndexedRange(0, 7):
+//!           ? relative to a  8 bits BinaryVector is equivalent to bits offsets [7, 0]
+//!           ? relative to a 10 bits BinaryVector is equivalent to bits offsets [9, 2]
+//!           ? in that cases, values are reversed before being effectively assigned
+//!
+//! @param range  Ranges of bits to assign
+//! @param value  Value to assign
+//!
+//! @return Reference to this (to allow cascading calls)
+BinaryVector& BinaryVector::SetSlice (IndexedRange range, uint32_t value)
+{
+  return SetSlice_T(range, value);
+}
+
+//! Assigns an unsigned 64 bits into a slice
+//!
+//! @note Range left/right boundaries are reversed relative to bits numbering in
+//!       BinaryVector.
+//!       BinaryVector has it leftmost bits identified at offset 0 while an ICL
+//!       vector range is usually numbered from its rightmost bit
+//!
+//!         e.g. an IndexedRange(7, 0):
+//!           - relative to a  8 bits BinaryVector is equivalent to bits offsets [0, 7]
+//!           - relative to a 10 bits BinaryVector is equivalent to bits offsets [2, 9]
+//!
+//!         e.g. an IndexedRange(0, 7):
+//!           ? relative to a  8 bits BinaryVector is equivalent to bits offsets [7, 0]
+//!           ? relative to a 10 bits BinaryVector is equivalent to bits offsets [9, 2]
+//!           ? in that cases, values are reversed before being effectively assigned
+//!
+//! @param range  Ranges of bits to assign
+//! @param value  Value to assign
+//!
+//! @return Reference to this (to allow cascading calls)
+BinaryVector& BinaryVector::SetSlice (IndexedRange range, uint64_t value)
+{
+  return SetSlice_T(range, value);
+}
+
+
+
+//! Assigns an unsigned N bits into a slice
+//!
+//! @note Range left/right boundaries are reversed relative to bits numbering in
+//!       BinaryVector.
+//!       BinaryVector has it leftmost bits identified at offset 0 while an ICL
+//!       vector range is usually numbered from its rightmost bit
+//!
+//!         e.g. an IndexedRange(7, 0):
+//!           - relative to a  8 bits BinaryVector is equivalent to bits offsets [0, 7]
+//!           - relative to a 10 bits BinaryVector is equivalent to bits offsets [2, 9]
+//!
+//!         e.g. an IndexedRange(0, 7):
+//!           ? relative to a  8 bits BinaryVector is equivalent to bits offsets [7, 0]
+//!           ? relative to a 10 bits BinaryVector is equivalent to bits offsets [9, 2]
+//!           ? in that cases, values are reversed before being effectively assigned
+//!
+//! @param range  Ranges of bits to assign
+//! @param value  Value to assign
+//!
+//! @return Reference to this (to allow cascading calls)
+template<typename T>
+BinaryVector& BinaryVector::SetSlice_T (IndexedRange range, T value)
+{
+  CHECK_FALSE(IsEmpty(),                           "Cannot set slice of an empty BinaryVector");
+  CHECK_PARAMETER_LTE (range.Width(), BitsCount(), "Range is too large");
+  CHECK_PARAMETER_LT  (range.right,   BitsCount(), "Range extends past destination boundary");
+
+  CHECK_PARAMETER_TRUE(   range.IsSingleBit()
+                       || range.IncreasesTowardRight(), "Do not support reversed range yet");
+
+  auto rangeBitsCount = range.Width();
+
+  auto constexpr valueBitsCount = 8u * sizeof(T);
+
+  auto appendBitsCount = rangeBitsCount;
+
+  BinaryVector asBinaryVector;
+
+  // ---------------- Assigmnent into larger chunk
+  //
+  if (rangeBitsCount > valueBitsCount) // Must assign into a larger chunk ?
+  {
+    // ---------------- Place value into a BinaryVector of proper bits count first
+    //
+    asBinaryVector.AppendBits(false, rangeBitsCount - valueBitsCount);
+    appendBitsCount = valueBitsCount;
+  }
+  else if (rangeBitsCount < valueBitsCount)
+  {
+    auto maxValue = MAX_UNSIGNED_VALUE_FOR_BITS_COUNT[rangeBitsCount];
+    CHECK_PARAMETER_LTE(value, maxValue, "Value is too large for target range");
+  }
+
+  asBinaryVector.Append(value, appendBitsCount, BitsAlignment::Right);
+
+  return SetSlice_Impl(range.left, rangeBitsCount, asBinaryVector.DataLeftAligned());
+}
+//
+//  End of: BinaryVector::SetSlice_T
+//---------------------------------------------------------------------------
+
+
+//! Assigns a portion of the BinaryVector
+//!
+//! @note It is optimized for small number of copied bytes
+//!
+//! @param startOffset  Zero based bit offset (from left)
+//! @param bitsCount    Number of bits to assign
+//! @param source       Points to, left aligned, source data
+//!
+//! @return Reference to this (to allow cascading calls)
+//!
+BinaryVector& BinaryVector::SetSlice_Impl (uint32_t startOffset, uint32_t bitsCount, const uint8_t* source)
+{
+  CHECK_PARAMETER_NOT_NULL(source,                          "Source must not be nullptr");
+  CHECK_FALSE(IsEmpty(),                                    "Cannot set slice of an empty BinaryVector");
+  CHECK_PARAMETER_RANGE(startOffset, 0u, BitsCount() - 1u,  "Out of range offset: "s + std::to_string(startOffset));
+  CHECK_PARAMETER_LTE(startOffset + bitsCount, BitsCount(), "Slice is partially out of range");
+
+  const auto srcBitsCount       = bitsCount;
+  const auto dstByteOffset      = startOffset / 8u;
+  const auto offsetInFirstBytes = startOffset % 8u;
 
   auto dest = m_data.data() + dstByteOffset;
-  auto srce = value.DataLeftAligned();
+  auto srce = source;
 
   if (offsetInFirstBytes == 0) // Are bits left aligned?
   {
     const auto srcLastByteBitsCount = srcBitsCount % 8u;
     const auto onlyFull             = srcLastByteBitsCount == 0;
-    const auto fullBytesCount       = onlyFull ? bytesCount : bytesCount - 1u;
+    const auto fullBytesCount       = srcBitsCount / 8u;
 
     for (uint32_t ii = 0 ; ii < fullBytesCount ; ++ii)
     {
@@ -2568,7 +2823,7 @@ BinaryVector& BinaryVector::SetSlice (uint32_t startOffset, const BinaryVector& 
       auto dstValue = *dest & dstMask; // Clear bits that will be assigned
       auto srcValue = *srce & srcMask; // Keep only bits to assign
 
-      srcValue >>= boundaryOffset;        // Align source bits with destination bits
+      srcValue >>= boundaryOffset;     // Align source bits with destination bits
       dstValue |=  srcValue;           // Merge source bits into destination value
 
       *dest = dstValue;
@@ -2633,7 +2888,7 @@ BinaryVector& BinaryVector::SetSlice (uint32_t startOffset, const BinaryVector& 
           srcValue &= ~dstKeepLsbMask;
 
           dstValue  = *dest & dstKeepLsbMask;
-          dstValue |=  srcValue;           // Merge source bits into destination value
+          dstValue |=  srcValue;
 
           *dest = dstValue;
           remainingBits = 0u;
@@ -2647,6 +2902,9 @@ BinaryVector& BinaryVector::SetSlice (uint32_t startOffset, const BinaryVector& 
 //
 //  End of: BinaryVector::SetSlice
 //---------------------------------------------------------------------------
+
+
+
 
 
 

@@ -10,8 +10,6 @@
 //! Declares BinaryVector and
 //===========================================================================
 
-
-
 #ifndef SCANVECTORS_H__3E0880BD_14C4_4089_BA8F_A382FB9EE011__INCLUDED_
   #define SCANVECTORS_H__3E0880BD_14C4_4089_BA8F_A382FB9EE011__INCLUDED_
 
@@ -208,6 +206,11 @@ class MAST_CORE_EXPORT BinaryVector final
 
   BinaryVector& SetSlice (uint32_t startOffset, const BinaryVector& value); //!< Assigns a portion of the BinaryVector
 
+  BinaryVector& SetSlice (IndexedRange range, uint8_t  value); //!< Assigns an unsigned  8 bits into a slice
+  BinaryVector& SetSlice (IndexedRange range, uint16_t value); //!< Assigns an unsigned 16 bits into a slice
+  BinaryVector& SetSlice (IndexedRange range, uint32_t value); //!< Assigns an unsigned 32 bits into a slice
+  BinaryVector& SetSlice (IndexedRange range, uint64_t value); //!< Assigns an unsigned 64 bits into a slice
+
   void SetBit    (uint32_t bitOffset); //!< Sets specified bit (zero based)
   void ClearBit  (uint32_t bitOffset); //!< Clears specified bit (zero based)
   void ToggleBit (uint32_t bitOffset); //!< Toggles specified bit (zero based)
@@ -232,6 +235,10 @@ class MAST_CORE_EXPORT BinaryVector final
   uint8_t                   MergeToByte (uint32_t lsbOffset, uint8_t lsbBitsCount, bool asSigned = false) const;
   template<typename T> void SetUnsigned (T value);
   template<typename T> void SetSigned   (T value);
+
+  template<typename T> BinaryVector& SetSlice_T (IndexedRange range, T value);
+
+  BinaryVector& SetSlice_Impl(uint32_t startOffset, uint32_t bitsCount, const uint8_t* source); //!< Assigns a portion of the BinaryVector
 
   bool FixedSize()  const { return m_sizeProperty == SizeProperty::Fixed; }
   bool IsNegative() const { return (m_data[0] & 0x80) != 0; }

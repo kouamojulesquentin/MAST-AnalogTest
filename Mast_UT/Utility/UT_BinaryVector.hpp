@@ -296,6 +296,18 @@ class UT_BinaryVector : public CxxTest::TestSuite
   //
   void test_SetSlice_BinaryVector ();
   void test_SetSlice_BinaryVector_OutOfRange ();
+  void test_SetSlice_uint_8 ();
+  void test_SetSlice_uint_8_OutOfRange_Indexes ();
+  void test_SetSlice_uint_8_OutOfRange_Value ();
+  void test_SetSlice_uint_16 ();
+  void test_SetSlice_uint_16_OutOfRange_Indexes ();
+  void test_SetSlice_uint_16_OutOfRange_Value ();
+  void test_SetSlice_uint_32 ();
+  void test_SetSlice_uint_32_OutOfRange_Indexes ();
+  void test_SetSlice_uint_32_OutOfRange_Value ();
+  void test_SetSlice_uint_64 ();
+  void test_SetSlice_uint_64_OutOfRange_Indexes ();
+  void test_SetSlice_uint_64_OutOfRange_Value ();
 
   // ---------------- DataRightAligned
   //

@@ -15,7 +15,7 @@
 #include <map>
 #include <queue>
 #include <functional>
-#include "SIT_types.h"
+#include "SIT_Types.h"
 
 namespace mast
 {

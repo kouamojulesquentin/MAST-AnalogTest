@@ -21,7 +21,7 @@
 #  endif
 # endif
 
-#include "SIT_types.h"
+#include "SIT_Types.h"
 #include "BinaryVector.hpp"
 #include "SystemModelBuilder.hpp"
 #include "SystemModelNode.hpp"
@@ -34,9 +34,8 @@
 
 %code{
 /* include for all driver functions */
-#include "SIT_reader.hpp"
-#include "SIT_scanner.hpp"
-#include "SIT_types.h"
+#include "SIT_Reader.hpp"
+#include "SIT_Scanner.hpp"
 
 // ---------------- What is needed for parser to build the SystemModel
 //
@@ -289,7 +288,7 @@ node_name:
 parent_node_with_children:
   parent_node PDL_declaration children_list
   {
-  
+
    /*Check that {} and () are correctly used*/
    if ($[parent_node].second != $[children_list].second)
     {

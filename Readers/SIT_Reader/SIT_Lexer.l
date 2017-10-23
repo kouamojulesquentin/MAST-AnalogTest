@@ -3,8 +3,8 @@
 #include <string>
 
 /* Implementation of yyFlexScanner */
-#include "SIT_scanner.hpp"
-#include "SIT_parser.tab.hh"
+#include "SIT_Scanner.hpp"
+#include "SIT_Parser.tab.hh"
 
 #undef  YY_DECL
 #define YY_DECL int SIT::SIT_Scanner::yylex( SIT::SIT_Parser::semantic_type * const lval, SIT::SIT_Parser::location_type *location )

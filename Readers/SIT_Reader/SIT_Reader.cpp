@@ -6,7 +6,7 @@
 
 #include "SystemModelBuilder.hpp"
 #include "SIT_Reader.hpp"
-#include "SIT_parser.tab.hh"
+#include "SIT_Parser.tab.hh"
 #include "SIT_Scanner.hpp"
 #include "ParserException.hpp"
 #include "DefaultBinaryPathSelector.hpp"

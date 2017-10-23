@@ -5,7 +5,7 @@
 #include <FlexLexer.h>
 #endif
 
-#include "SIT_parser.tab.hh"
+#include "SIT_Parser.tab.hh"
 #include "location.hh"
 
 namespace SIT{

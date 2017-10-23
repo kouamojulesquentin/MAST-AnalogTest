@@ -72,12 +72,12 @@ void Check_SetExpectedFromSut_DontCare (T expected, T mask)
 
 
 //! Pseudo test of sizeof(Register)
-//! @note This is mainly used as an information on real sizeof Register
+//! @note This is mainly used as an information on real size of Register
 //!       and to detect/validate changes.
 //!       This is the minimal memory usage (when it is empty)
 void UT_Register::test_Sizeof ()
 {
-  TS_ASSERT_EQUALS (sizeof(Register), 208); // Including 8 x BinaryVector (20 bytes)
+  TS_ASSERT_LESS_THAN_EQUALS (sizeof(Register), 360u);     // On Windows (32 bits), it is 208, even though in both case sizeof(int) is 4!
 }
 
 

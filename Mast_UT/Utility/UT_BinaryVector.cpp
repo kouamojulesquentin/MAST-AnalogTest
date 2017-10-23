@@ -43,12 +43,12 @@ void UT_BinaryVector::setUp ()
 
 
 //! Pseudo test of sizeof(BinaryVector)
-//! @note This is mainly used as an information on real sizeof BinaryVector
+//! @note This is mainly used as an information on real size of BinaryVector
 //!       and to detect/validate changes.
 //!       This is the minimal memory usage (when it is empty)
 void UT_BinaryVector::test_Sizeof ()
 {
-  TS_ASSERT_EQUALS (sizeof(BinaryVector), 20);
+  TS_ASSERT_LESS_THAN_EQUALS (sizeof(BinaryVector), 32u);     // On Windows (32 bits), it is 20, even though in both case sizeof(int) is 4!
 }
 
 //! Checks BinaryVector defaut constructor

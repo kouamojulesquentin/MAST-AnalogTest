@@ -42,9 +42,25 @@ class UT_VirtualRegister : public CxxTest::TestSuite
   //
   void test_SetPending ();
 
+  // ---------------- LastToSut
+  //
+  void test_LastToSut_1_Register ();
+  void test_LastToSut_2_Registers ();
+  void test_LastToSut_when_HasNoRegister ();
+
+  // ---------------- NextToSut
+  //
+  void test_NextToSut_1_Register ();
+  void test_NextToSut_2_Registers ();
+  void test_NextToSut_when_HasNoRegister ();
+
   // ---------------- SetToSut
   //
-  void test_SetToSut ();
+  void test_SetToSut_Upto ();
+  void test_SetToSut_Downto ();
+  void test_SetToSut_when_HasNoRegister ();
+  void test_SetToSut_when_Empty ();
+//+  void test_SetToSut_when_InvalidBitsCount ();
 
 };
 //

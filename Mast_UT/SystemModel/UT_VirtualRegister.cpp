@@ -52,9 +52,9 @@ void UT_VirtualRegister::test_Constructor_Default ()
     TS_ASSERT_EQUALS (sut.BitsCount(),    0u);
     TS_ASSERT_EQUALS (sut.BitsOrdering(), BitsOrdering::Undefined);
     TS_ASSERT_EQUALS (sut.TypeName(),     "VirtualRegister");
-    TS_ASSERT_EQUALS (sut.LastToSut(),    emptyVector);
-    TS_ASSERT_EQUALS (sut.NextToSut(),    emptyVector);
   );
+
+
 }
 
 
@@ -73,7 +73,6 @@ void UT_VirtualRegister::test_Append_First ()
     auto leftIndex         = std::get<2>(data);
     auto rightIndex        = std::get<3>(data);
     auto expectedWidth     = std::get<4>(data);
-    auto expectedLastToSut = BinaryVector::CreateFromString(std::get<5>(data));
 
 
     auto reg        = make_shared<Register>("reg", regValue, false, bitsOrdering);
@@ -89,22 +88,19 @@ void UT_VirtualRegister::test_Append_First ()
     //
     TS_ASSERT_EQUALS (sut.BitsCount(),    expectedWidth);
     TS_ASSERT_EQUALS (sut.BitsOrdering(), bitsOrdering);
-//+    TS_ASSERT_EQUALS (sut.LastToSut(),    expectedLastToSut);
   };
 
-  using data_t = tuple<string_view, BitsOrdering, uint32_t, uint32_t, uint32_t, string_view>;
+  using data_t = tuple<string_view, BitsOrdering, uint32_t, uint32_t, uint32_t>;
   auto data = // Register value, Bits ordering, left Index, Right Index, expected Width
   {
-    data_t{"/xDEAF", BitsOrdering::Downto, 15, 0,  16, "/xDEAF"},        // 00
-    data_t{"/xDEAF", BitsOrdering::Downto, 14, 1,  14, "/b011/xEA/b11"}, // 01
-    data_t{"/xDEAF", BitsOrdering::Upto,   5,  10, 6,  "/b11_0101"},     // 02   1011_1:110_101:0_1111
-    data_t{"/xDEAF", BitsOrdering::Downto, 0,  0,  1,  "/b1"},           // 03
-    data_t{"/xDEAF", BitsOrdering::Upto,   3,  3,  1,  "/b0"},           // 04
-    data_t{"/x1234", BitsOrdering::Downto, 9,  9,  1,  "/b0"},           // 05
-    data_t{"/xDEAF", BitsOrdering::Downto, 15, 15, 1,  "/b1"},           // 06
+    data_t{"/xDEAF", BitsOrdering::Downto, 15, 0,  16}, // 0
+    data_t{"/xDEAF", BitsOrdering::Downto, 14, 1,  14}, // 1
+    data_t{"/xDEAF", BitsOrdering::Upto,   5,  10, 6},  // 2
+    data_t{"/xDEAF", BitsOrdering::Downto, 0,  0,  1},  // 3
+    data_t{"/xDEAF", BitsOrdering::Upto,   3,  3,  1},  // 4
+    data_t{"/x1234", BitsOrdering::Downto, 9,  9,  1},  // 5
+    data_t{"/xDEAF", BitsOrdering::Downto, 15, 15, 1},  // 6
   };
-
-  TS_WARN ("Add checking of LastToSut OR add test method for that");
 
   // ---------------- DDT Exercise
   //
@@ -155,13 +151,13 @@ void UT_VirtualRegister::test_Append_Second ()
   using data_t = tuple<string_view, BitsOrdering, uint32_t, uint32_t, uint32_t>;
   auto data = // Register value, Bits ordering, left Index, Right Index, expected Width
   {
-    data_t{"/xDEAF", BitsOrdering::Downto, 15, 0,  16}, // 00
-    data_t{"/xDEAF", BitsOrdering::Downto, 14, 1,  14}, // 01
-    data_t{"/xDEAF", BitsOrdering::Upto,   5,  10, 6},  // 02
-    data_t{"/xDEAF", BitsOrdering::Downto, 0,  0,  1},  // 03
-    data_t{"/xDEAF", BitsOrdering::Upto,   1,  1,  1},  // 04
-    data_t{"/xDEAF", BitsOrdering::Downto, 9,  9,  1},  // 05
-    data_t{"/xDEAF", BitsOrdering::Downto, 15, 15, 1},  // 06
+    data_t{"/xDEAF", BitsOrdering::Downto, 15, 0,  16}, // 0
+    data_t{"/xDEAF", BitsOrdering::Downto, 14, 1,  14}, // 1
+    data_t{"/xDEAF", BitsOrdering::Upto,   5,  10, 6},  // 2
+    data_t{"/xDEAF", BitsOrdering::Downto, 0,  0,  1},  // 3
+    data_t{"/xDEAF", BitsOrdering::Upto,   1,  1,  1},  // 4
+    data_t{"/xDEAF", BitsOrdering::Downto, 9,  9,  1},  // 5
+    data_t{"/xDEAF", BitsOrdering::Downto, 15, 15, 1},  // 6
   };
 
   // ---------------- DDT Exercise
@@ -295,48 +291,419 @@ void UT_VirtualRegister::test_SetPending ()
 }
 
 
+
+//! Checks VirtualRegister::LastToSut() when there is only 1 "interfaced" Register
+//!
+void UT_VirtualRegister::test_LastToSut_1_Register ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto regValue          = BinaryVector::CreateFromString(std::get<0>(data));
+    auto bitsOrdering      = std::get<1>(data);
+    auto leftIndex         = std::get<2>(data);
+    auto rightIndex        = std::get<3>(data);
+    auto expectedLastToSut = BinaryVector::CreateFromString(std::get<4>(data));
+
+    auto reg        = make_shared<Register>("reg", regValue, false, bitsOrdering);
+    IndexedRange    range(leftIndex,   rightIndex);
+    RegisterSlice   registerSlice{reg, range};
+    VirtualRegister sut;
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Append(registerSlice));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.LastToSut(), expectedLastToSut);
+  };
+
+  using data_t = tuple<string_view, BitsOrdering, uint32_t, uint32_t, string_view>;
+  auto data = // Register value, Bits ordering, left Index, Right Index, expected result
+  {
+    data_t{"/xDEAF", BitsOrdering::Upto,   3,  3,  "/b1"},            // 00
+    data_t{"/xDEAF", BitsOrdering::Upto,   3,  4,  "/b11"},           // 01
+    data_t{"/xD7AF", BitsOrdering::Upto,   3,  4,  "/b10"},           // 02
+    data_t{"/xDEAF", BitsOrdering::Upto,   5,  10, "/b11_0101"},      // 03
+    data_t{"/xDEAF", BitsOrdering::Downto, 15, 0,  "/xDEAF"},         // 04
+    data_t{"/xDEAF", BitsOrdering::Downto, 14, 1,  "/b101/xEA/b111"}, // 05
+    data_t{"/xDEAF", BitsOrdering::Downto, 0,  0,  "/b1"},            // 06
+    data_t{"/xDEAF", BitsOrdering::Downto, 15, 15, "/b1"},            // 07
+    data_t{"/x1234", BitsOrdering::Downto, 8,  8,  "/b0"},            // 08
+    data_t{"/x1234", BitsOrdering::Downto, 9,  9,  "/b1"},            // 09
+    data_t{"/x1234", BitsOrdering::Downto, 9,  8,  "/b10"},           // 10
+    data_t{"/x1234", BitsOrdering::Downto, 10, 8,  "/b010"},          // 11
+    data_t{"/x1234", BitsOrdering::Downto, 10, 7,  "/b010:0"},        // 12
+    data_t{"/x1234", BitsOrdering::Downto, 10, 6,  "/b010:00"},       // 13
+    data_t{"/x1234", BitsOrdering::Downto, 10, 5,  "/b010:001"},      // 14
+    data_t{"/x1234", BitsOrdering::Downto, 11, 5,  "/b0010:001"},     // 15
+    data_t{"/x1234", BitsOrdering::Downto, 12, 5,  "/b1_0010:001"},   // 16
+    data_t{"/x1234", BitsOrdering::Downto, 12, 4,  "/b1_0010:0011"},  // 17
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+
+//! Checks VirtualRegister::LastToSut() when there is only 1 "interfaced" Register
+//!
+void UT_VirtualRegister::test_LastToSut_2_Registers ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto regValue          = std::get<0>(data);
+    auto bitsOrdering      = std::get<1>(data);
+    auto leftIndex         = std::get<2>(data);
+    auto rightIndex        = std::get<3>(data);
+    auto expectedLastToSut = BinaryVector::CreateFromString(std::get<4>(data));
+
+    auto range_1    = bitsOrdering == BitsOrdering::Downto ? IndexedRange(7u, 3u) : IndexedRange(3u, 7u);
+    auto reg_1      = make_shared<Register>("reg_1", BinaryVector::CreateFromString("/xCAFE/b101"), false, bitsOrdering);
+    auto regSlice_1 = RegisterSlice{reg_1, range_1};    // ==> Viewed slice: Upto ==> /b0_1010; Downto ==> /b1_0101
+
+    auto range_2    = IndexedRange(leftIndex, rightIndex);
+    auto reg_2      = make_shared<Register>("reg_2", BinaryVector::CreateFromString(regValue), false, bitsOrdering);
+    auto regSlice_2 = RegisterSlice{reg_2, range_2};
+
+    VirtualRegister sut;
+    sut.Append(regSlice_1);
+
+    CxxTest::setAbortTestOnFail(true);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Append(regSlice_2));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.BitsCount(),    range_1.Width() + range_2.Width());
+    TS_ASSERT_EQUALS (sut.BitsOrdering(), bitsOrdering);
+  };
+
+  using data_t = tuple<string_view, BitsOrdering, uint32_t, uint32_t, string_view>;
+  auto data = // Register value, Bits ordering, left Index, Right Index, expected result
+  {
+    data_t{"/xDEAF", BitsOrdering::Upto,   3,  3,  "/b0_1010:1"},            // 00
+    data_t{"/xDEAF", BitsOrdering::Upto,   3,  4,  "/b0_1010:11"},           // 01
+    data_t{"/xD7AF", BitsOrdering::Upto,   3,  4,  "/b0_1010:10"},           // 02
+    data_t{"/xDEAF", BitsOrdering::Upto,   5,  10, "/b0_1010:11_0101"},      // 03
+    data_t{"/xDEAF", BitsOrdering::Downto, 15, 0,  "/b1_0101:/xDEAF"},       // 04
+    data_t{"/xDEAF", BitsOrdering::Downto, 14, 1,  "/b1_0101:101/xEA/b111"}, // 05
+    data_t{"/xDEAF", BitsOrdering::Downto, 0,  0,  "/b1_0101:1"},            // 06
+    data_t{"/xDEAF", BitsOrdering::Downto, 15, 15, "/b1_0101:1"},            // 07
+    data_t{"/x1234", BitsOrdering::Downto, 8,  8,  "/b1_0101:0"},            // 08
+    data_t{"/x1234", BitsOrdering::Downto, 9,  9,  "/b1_0101:1"},            // 09
+    data_t{"/x1234", BitsOrdering::Downto, 9,  8,  "/b1_0101:10"},           // 10
+    data_t{"/x1234", BitsOrdering::Downto, 10, 8,  "/b1_0101:010"},          // 11
+    data_t{"/x1234", BitsOrdering::Downto, 10, 7,  "/b1_0101:010:0"},        // 12
+    data_t{"/x1234", BitsOrdering::Downto, 10, 6,  "/b1_0101:010:00"},       // 13
+    data_t{"/x1234", BitsOrdering::Downto, 10, 5,  "/b1_0101:010:001"},      // 14
+    data_t{"/x1234", BitsOrdering::Downto, 11, 5,  "/b1_0101:0010:001"},     // 15
+    data_t{"/x1234", BitsOrdering::Downto, 12, 5,  "/b1_0101:1_0010:001"},   // 16
+    data_t{"/x1234", BitsOrdering::Downto, 12, 4,  "/b1_0101:1_0010:0011"},  // 17
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks VirtualRegister::LastToSut() when no Register are "interfaced" by VirtualRegister
+//!
+void UT_VirtualRegister::test_LastToSut_when_HasNoRegister ()
+{
+  // ---------------- Setup
+  //
+  VirtualRegister sut;
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut.LastToSut(), std::runtime_error);
+}
+
+
+//! Checks VirtualRegister::NextToSut() when there is only 1 "interfaced" Register
+//!
+void UT_VirtualRegister::test_NextToSut_1_Register ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto regValue          = BinaryVector::CreateFromString(std::get<0>(data));
+    auto bitsOrdering      = std::get<1>(data);
+    auto leftIndex         = std::get<2>(data);
+    auto rightIndex        = std::get<3>(data);
+    auto expectedNextToSut = BinaryVector::CreateFromString(std::get<4>(data));
+
+    auto reg        = make_shared<Register>("reg", regValue, false, bitsOrdering);
+    IndexedRange    range(leftIndex,   rightIndex);
+    RegisterSlice   registerSlice{reg, range};
+    VirtualRegister sut;
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Append(registerSlice));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.NextToSut(), expectedNextToSut);
+  };
+
+  using data_t = tuple<string_view, BitsOrdering, uint32_t, uint32_t, string_view>;
+  auto data = // Register value, Bits ordering, left Index, Right Index, expected result
+  {
+    data_t{"/xDEAF", BitsOrdering::Upto,   3,  3,  "/b1"},            // 00
+    data_t{"/xDEAF", BitsOrdering::Upto,   3,  4,  "/b11"},           // 01
+    data_t{"/xD7AF", BitsOrdering::Upto,   3,  4,  "/b10"},           // 02
+    data_t{"/xDEAF", BitsOrdering::Upto,   5,  10, "/b11_0101"},      // 03
+    data_t{"/xDEAF", BitsOrdering::Downto, 15, 0,  "/xDEAF"},         // 04
+    data_t{"/xDEAF", BitsOrdering::Downto, 14, 1,  "/b101/xEA/b111"}, // 05
+    data_t{"/xDEAF", BitsOrdering::Downto, 0,  0,  "/b1"},            // 06
+    data_t{"/xDEAF", BitsOrdering::Downto, 15, 15, "/b1"},            // 07
+    data_t{"/x1234", BitsOrdering::Downto, 8,  8,  "/b0"},            // 08
+    data_t{"/x1234", BitsOrdering::Downto, 9,  9,  "/b1"},            // 09
+    data_t{"/x1234", BitsOrdering::Downto, 9,  8,  "/b10"},           // 10
+    data_t{"/x1234", BitsOrdering::Downto, 10, 8,  "/b010"},          // 11
+    data_t{"/x1234", BitsOrdering::Downto, 10, 7,  "/b010:0"},        // 12
+    data_t{"/x1234", BitsOrdering::Downto, 10, 6,  "/b010:00"},       // 13
+    data_t{"/x1234", BitsOrdering::Downto, 10, 5,  "/b010:001"},      // 14
+    data_t{"/x1234", BitsOrdering::Downto, 11, 5,  "/b0010:001"},     // 15
+    data_t{"/x1234", BitsOrdering::Downto, 12, 5,  "/b1_0010:001"},   // 16
+    data_t{"/x1234", BitsOrdering::Downto, 12, 4,  "/b1_0010:0011"},  // 17
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+
+//! Checks VirtualRegister::NextToSut() when there is only 1 "interfaced" Register
+//!
+void UT_VirtualRegister::test_NextToSut_2_Registers ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto regValue          = std::get<0>(data);
+    auto bitsOrdering      = std::get<1>(data);
+    auto leftIndex         = std::get<2>(data);
+    auto rightIndex        = std::get<3>(data);
+    auto expectedNextToSut = BinaryVector::CreateFromString(std::get<4>(data));
+
+    auto range_1    = bitsOrdering == BitsOrdering::Downto ? IndexedRange(7u, 3u) : IndexedRange(3u, 7u);
+    auto reg_1      = make_shared<Register>("reg_1", BinaryVector::CreateFromString("/xCAFE/b101"), false, bitsOrdering);
+    auto regSlice_1 = RegisterSlice{reg_1, range_1};    // ==> Viewed slice: Upto ==> /b0_1010; Downto ==> /b1_0101
+
+    auto range_2    = IndexedRange(leftIndex, rightIndex);
+    auto reg_2      = make_shared<Register>("reg_2", BinaryVector::CreateFromString(regValue), false, bitsOrdering);
+    auto regSlice_2 = RegisterSlice{reg_2, range_2};
+
+    VirtualRegister sut;
+    sut.Append(regSlice_1);
+
+    CxxTest::setAbortTestOnFail(true);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Append(regSlice_2));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.BitsCount(),    range_1.Width() + range_2.Width());
+    TS_ASSERT_EQUALS (sut.BitsOrdering(), bitsOrdering);
+  };
+
+  using data_t = tuple<string_view, BitsOrdering, uint32_t, uint32_t, string_view>;
+  auto data = // Register value, Bits ordering, left Index, Right Index, expected result
+  {
+    data_t{"/xDEAF", BitsOrdering::Upto,   3,  3,  "/b0_1010:1"},            // 00
+    data_t{"/xDEAF", BitsOrdering::Upto,   3,  4,  "/b0_1010:11"},           // 01
+    data_t{"/xD7AF", BitsOrdering::Upto,   3,  4,  "/b0_1010:10"},           // 02
+    data_t{"/xDEAF", BitsOrdering::Upto,   5,  10, "/b0_1010:11_0101"},      // 03
+    data_t{"/xDEAF", BitsOrdering::Downto, 15, 0,  "/b1_0101:/xDEAF"},       // 04
+    data_t{"/xDEAF", BitsOrdering::Downto, 14, 1,  "/b1_0101:101/xEA/b111"}, // 05
+    data_t{"/xDEAF", BitsOrdering::Downto, 0,  0,  "/b1_0101:1"},            // 06
+    data_t{"/xDEAF", BitsOrdering::Downto, 15, 15, "/b1_0101:1"},            // 07
+    data_t{"/x1234", BitsOrdering::Downto, 8,  8,  "/b1_0101:0"},            // 08
+    data_t{"/x1234", BitsOrdering::Downto, 9,  9,  "/b1_0101:1"},            // 09
+    data_t{"/x1234", BitsOrdering::Downto, 9,  8,  "/b1_0101:10"},           // 10
+    data_t{"/x1234", BitsOrdering::Downto, 10, 8,  "/b1_0101:010"},          // 11
+    data_t{"/x1234", BitsOrdering::Downto, 10, 7,  "/b1_0101:010:0"},        // 12
+    data_t{"/x1234", BitsOrdering::Downto, 10, 6,  "/b1_0101:010:00"},       // 13
+    data_t{"/x1234", BitsOrdering::Downto, 10, 5,  "/b1_0101:010:001"},      // 14
+    data_t{"/x1234", BitsOrdering::Downto, 11, 5,  "/b1_0101:0010:001"},     // 15
+    data_t{"/x1234", BitsOrdering::Downto, 12, 5,  "/b1_0101:1_0010:001"},   // 16
+    data_t{"/x1234", BitsOrdering::Downto, 12, 4,  "/b1_0101:1_0010:0011"},  // 17
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks VirtualRegister::NextToSut() when no Register are "interfaced" by VirtualRegister
+//!
+void UT_VirtualRegister::test_NextToSut_when_HasNoRegister ()
+{
+  // ---------------- Setup
+  //
+  VirtualRegister sut;
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut.NextToSut(), std::runtime_error);
+}
+
+
 //! Checks VirtualRegister::SetToSut()
 //!
-void UT_VirtualRegister::test_SetToSut ()
+void UT_VirtualRegister::test_SetToSut_Upto ()
 {
-//+  // ---------------- DDT Setup
-//+  //
-//+  auto checker = [](const auto& data)
-//+  {
-//+    auto toSutValue    = BinaryVector::CreateFromString(std::get<0>(data));
-//+    auto expectedValue = BinaryVector::CreateFromString(std::get<1>(data));
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    auto toSutValue = BinaryVector::CreateFromString(data);
 
-//+    auto range_1    = IndexedRange(7u, 3u);
-//+    auto reg_1      = make_shared<Register>("reg_1", BinaryVector::CreateFromString("/xFAC"), false, BitsOrdering::Downto);
-//+    auto regSlice_1 = RegisterSlice{reg_1, range_1};
+    auto range_1    = IndexedRange(3u, 7u);
+    auto reg_1      = make_shared<Register>("reg_1", BinaryVector::CreateFromString("/xF6C"), false, BitsOrdering::Upto);
+    auto regSlice_1 = RegisterSlice{reg_1, range_1};  // ==> Viewed slice: 1_0110
 
-//+    auto range_2    = IndexedRange(12, 9);
-//+    auto reg_2      = make_shared<Register>("reg_1", BinaryVector::CreateFromString("/xCAF/b101"), false, BitsOrdering::Downto);
-//+    auto regSlice_2 = RegisterSlice{reg_2, range_2};
+    auto range_2    = IndexedRange(1, 11);
+    auto reg_2      = make_shared<Register>("reg_1", BinaryVector::CreateFromString("/xCAB/b101"), false, BitsOrdering::Upto);
+    auto regSlice_2 = RegisterSlice{reg_2, range_2};  // ==> Viewed slice: 100:1010_1011
 
-//+    VirtualRegister sut;
-//+    sut.Append(regSlice_1);
-//+    sut.Append(regSlice_2);
+    VirtualRegister sut;
+    sut.Append(regSlice_1); // ==> Viewed slice: 1_0110
+    sut.Append(regSlice_2); // ==> Viewed slice: 1_0110:100_1010_1011 (0xB4AB)
 
-//+    CxxTest::setAbortTestOnFail(true);
+    CxxTest::setAbortTestOnFail(true);
 
-//+    // ---------------- Exercise
-//+    //
-//+    TS_ASSERT_THROWS_NOTHING (sut.SetPending());
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.SetToSut(toSutValue));
 
-//+    // ---------------- Verify
-//+    //
-//+    TS_ASSERT_EQUALS (sut.NextToSut(), newValue);
-//+    TS_ASSERT_EQUALS (sut.LastToSut(), initial);
-//+  };
+    // ---------------- Verify
+    //
+    auto initialToSut = BinaryVector::CreateFromBinaryString("/b1_0110:100_1010_1011");
+    TS_ASSERT_EQUALS (sut.LastToSut(), initialToSut);
+    TS_ASSERT_EQUALS (sut.NextToSut(), toSutValue);
+  };
 
-//+  auto data =
-//+  {
-//+  };
+  auto data =
+  {
+    "/x1234", // 0
+    "/x5678", // 1
+    "/x9ABC", // 2
+    "/xEDF0", // 3
+  };
 
-//+  // ---------------- DDT Exercise
-//+  //
-//+  TS_DATA_DRIVEN_TEST(checker, data);
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+
+//! Checks VirtualRegister::SetToSut()
+//!
+void UT_VirtualRegister::test_SetToSut_Downto ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    auto toSutValue = BinaryVector::CreateFromString(data);
+
+    auto range_1    = IndexedRange(7u, 3u);
+    auto reg_1      = make_shared<Register>("reg_1", BinaryVector::CreateFromString("/xF5C"), false, BitsOrdering::Downto);
+    auto regSlice_1 = RegisterSlice{reg_1, range_1};  // ==> Viewed slice: 0101_1
+
+    auto range_2    = IndexedRange(11, 1);
+    auto reg_2      = make_shared<Register>("reg_1", BinaryVector::CreateFromString("/xCAB/b101"), false, BitsOrdering::Downto);
+    auto regSlice_2 = RegisterSlice{reg_2, range_2};  // ==> Viewed slice: 0:1010_1011:10
+
+    VirtualRegister sut;
+    sut.Append(regSlice_1); // ==> Viewed slice: 1010_1
+    sut.Append(regSlice_2); // ==> Viewed slice: 0101_1:0_1010_1011_10  (0x5AAE)
+
+    CxxTest::setAbortTestOnFail(true);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.SetToSut(toSutValue));
+
+    // ---------------- Verify
+    //
+    auto initialToSut = BinaryVector::CreateFromBinaryString("/b0101_1:0_1010_1011_10");
+    TS_ASSERT_EQUALS (sut.LastToSut(), initialToSut);
+    TS_ASSERT_EQUALS (sut.NextToSut(), toSutValue);
+  };
+
+  auto data =
+  {
+    "/x1234", // 0
+    "/x5678", // 1
+    "/x9ABC", // 2
+    "/xEDF0", // 3
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+//! Checks VirtualRegister::SetToSut() when no Register are "interfaced" by VirtualRegister
+//!
+void UT_VirtualRegister::test_SetToSut_when_HasNoRegister ()
+{
+  // ---------------- Setup
+  //
+  auto            value = BinaryVector::CreateFromString("/xDead");
+  VirtualRegister sut;
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut.SetToSut(value), std::runtime_error);
+}
+
+
+//! Checks VirtualRegister::SetToSut() when providing empty BinaryVector
+//!
+void UT_VirtualRegister::test_SetToSut_when_Empty ()
+{
+  // ---------------- Setup
+  //
+  BinaryVector    emptyVector;
+  VirtualRegister sut;
+  auto range    = IndexedRange(7, 0);
+  auto reg      = make_shared<Register>("reg", BinaryVector::CreateFromString("/xBEEF"), false, BitsOrdering::Downto);
+  auto regSlice = RegisterSlice{reg, range};
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS (sut.SetToSut(emptyVector), std::invalid_argument);
 }
 
 //===========================================================================

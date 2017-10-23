@@ -18,6 +18,7 @@
 #include "IndexedRange.hpp"
 #include "BitsOrdering.hpp"
 #include <vector>
+#include <functional>
 
 namespace mast
 {
@@ -72,6 +73,16 @@ class MAST_CORE_EXPORT VirtualRegister final
   {
     static_assert(std::is_integral<T>::value, "SetToSut requires BinaryVector or integral types");
   }
+
+  // ---------------- Private Methods
+  //
+  static BinaryVector GetSlice (const IndexedRange& range, mast::BitsOrdering bitsOrdering, const BinaryVector& binaryVector);
+  static void         SetSlice (const IndexedRange& range, mast::BitsOrdering bitsOrdering,       BinaryVector& binaryVector, const BinaryVector& value);
+
+  BinaryVector        GetView  (std::function<BinaryVector (const Register&)> getter) const;
+  void                SetView  (std::function<BinaryVector (const Register&)>                      getter,
+                                std::function<void         (      Register&, const BinaryVector&)> setter,
+                                const BinaryVector&                                                value);
 
   // ---------------- Private  Fields
   //

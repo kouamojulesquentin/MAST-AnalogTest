@@ -409,6 +409,7 @@ bool InRange(const T& val, const U& minVal, const V& maxVal) { return (val >= mi
 #define CHECK_PARAMETER_GTE(val, minVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (val >= minVal), msg)
 #define CHECK_PARAMETER_LT(val,  maxVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (val <  maxVal), msg)
 #define CHECK_PARAMETER_LTE(val, maxVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (val <= maxVal), msg)
+#define CHECK_PARAMETER_FALSE(val,       msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), !(bool)(val),    msg)
 #define CHECK_PARAMETER_TRUE(val,        msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (bool)(val),     msg)
 #define CHECK_PARAMETER_RANGE(val, minVal, maxVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), InRange((val), (minVal), (maxVal)), msg)
 

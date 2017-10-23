@@ -15,7 +15,7 @@
 #include "SystemModel.hpp"
 #include "SystemModelFactory.hpp"
 #include "ParentNode.hpp"
-#include "SIT_reader.hpp"
+#include "SIT_Reader.hpp"
 #include "Utility.hpp"
 #include "MastConfig.hpp"
 #include "ParserException.hpp"

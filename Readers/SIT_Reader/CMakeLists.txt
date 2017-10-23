@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 3.5)
-project(SIT_parser CXX)
+project(SIT_Parser CXX)
 
 find_package(FLEX)
 find_package(BISON)
 if (NOT FLEX_FOUND)
- message(FATAL_ERROR "SIT_parser: Flex not found")
+ message(FATAL_ERROR "SIT_Parser: Flex not found")
 endif()
 
 if (NOT BISON_FOUND)
- message(FATAL_ERROR "SIT_parser: Bison not found")
+ message(FATAL_ERROR "SIT_Parser: Bison not found")
 endif()
 
 if (CODE_COVERAGE)
@@ -25,37 +25,37 @@ set (LEX_YACC_SRC_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/")
 
 message("")
 message("================================================================================")
-message(STATUS "SIT_parser: CODE_COVERAGE:    ${CODE_COVERAGE}")
-message(STATUS "SIT_parser: CMAKE_CXX_FLAGS:  ${CMAKE_CXX_FLAGS}")
-message(STATUS "SIT_parser: Flex_Switches:    ${Flex_Switches}")
-message(STATUS "SIT_parser: Bison_Switches:   ${Bison_Switches}")
+message(STATUS "SIT_Parser: CODE_COVERAGE:    ${CODE_COVERAGE}")
+message(STATUS "SIT_Parser: CMAKE_CXX_FLAGS:  ${CMAKE_CXX_FLAGS}")
+message(STATUS "SIT_Parser: Flex_Switches:    ${Flex_Switches}")
+message(STATUS "SIT_Parser: Bison_Switches:   ${Bison_Switches}")
 message("================================================================================")
 message("")
 
 # Create custom command for lexer (using flex)
 #
-add_custom_target(SIT_Lexer_class echo "Creating SIT_lexer")
+add_custom_target(SIT_Lexer_class echo "Creating SIT_Lexer")
 add_custom_command(
-  OUTPUT ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc
-  COMMAND flex ${Flex_Switches}  --outfile=${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc ${LEX_YACC_SRC_DIR}SIT_lexer.l
-  DEPENDS SIT_lexer.l
+  OUTPUT ${LEX_YACC_SRC_DIR}SIT_Lexer.yy.cc
+  COMMAND flex ${Flex_Switches}  --outfile=${LEX_YACC_SRC_DIR}SIT_Lexer.yy.cc ${LEX_YACC_SRC_DIR}SIT_Lexer.l
+  DEPENDS SIT_Lexer.l
 )
 
 # Create custom command for parser (using Bison)
 #
-add_custom_target(SIT_Parser_class echo "Creating SIT_parser")
+add_custom_target(SIT_Parser_class echo "Creating SIT_Parser")
 add_custom_command(
-  OUTPUT ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_parser.tab.hh
-  COMMAND bison ${Bison_Switches} ${LEX_YACC_SRC_DIR}SIT_parser.yy -o ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc
-  DEPENDS SIT_parser.yy
+  OUTPUT ${LEX_YACC_SRC_DIR}SIT_Parser.tab.cc ${LEX_YACC_SRC_DIR}SIT_Parser.tab.hh
+  COMMAND bison ${Bison_Switches} ${LEX_YACC_SRC_DIR}SIT_Parser.yy -o ${LEX_YACC_SRC_DIR}SIT_Parser.tab.cc
+  DEPENDS SIT_Parser.yy
 )
 
-set_source_files_properties(${LEX_YACC_SRC_DIR}SIT_parser.tab.cc GENERATED)
-set_source_files_properties(${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc   GENERATED)
+set_source_files_properties(${LEX_YACC_SRC_DIR}SIT_Parser.tab.cc GENERATED)
+set_source_files_properties(${LEX_YACC_SRC_DIR}SIT_Lexer.yy.cc   GENERATED)
 
-add_library(SIT_Reader SHARED  ${LEX_YACC_SRC_DIR}SIT_reader.cpp
-                               ${LEX_YACC_SRC_DIR}SIT_parser.tab.cc
-                               ${LEX_YACC_SRC_DIR}SIT_lexer.yy.cc
+add_library(SIT_Reader SHARED  ${LEX_YACC_SRC_DIR}SIT_Reader.cpp
+                               ${LEX_YACC_SRC_DIR}SIT_Parser.tab.cc
+                               ${LEX_YACC_SRC_DIR}SIT_Lexer.yy.cc
                                SIT_Printer.cpp)
 
 target_include_directories (SIT_Reader PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}

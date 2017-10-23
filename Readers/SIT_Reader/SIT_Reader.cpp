@@ -5,9 +5,9 @@
 #include <memory>
 
 #include "SystemModelBuilder.hpp"
-#include "SIT_reader.hpp"
+#include "SIT_Reader.hpp"
 #include "SIT_parser.tab.hh"
-#include "SIT_scanner.hpp"
+#include "SIT_Scanner.hpp"
 #include "ParserException.hpp"
 #include "DefaultBinaryPathSelector.hpp"
 #include "DefaultOneHotPathSelector.hpp"
@@ -108,5 +108,5 @@ void SIT::SIT_Reader::Parse_Impl(std::istream& stream)
 }
 
 //===========================================================================
-// End of SIT_reader.cpp
+// End of SIT_Reader.cpp
 //===========================================================================

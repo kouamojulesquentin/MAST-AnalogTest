@@ -17,7 +17,7 @@
 #include "Startup.hpp"
 #include "Utility.hpp"
 #include "Session.hpp"
-#include "SIT_reader.hpp"
+#include "SIT_Reader.hpp"
 #include "g3log/g3log.hpp"
 
 #include <memory>

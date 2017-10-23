@@ -24,7 +24,7 @@
 #include "AccessInterfaceProtocol.hpp"
 #include "SystemModel.hpp"
 #include "SystemModelManager.hpp"
-#include "SIT_reader.hpp"
+#include "SIT_Reader.hpp"
 #include "SIT_Printer.hpp"
 #include "Startup.hpp"
 #include "ModelBuildDriver.hpp"

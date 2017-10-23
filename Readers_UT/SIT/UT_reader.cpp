@@ -12,7 +12,7 @@
 //===========================================================================
 
 
-#include "SIT_reader.hpp"
+#include "SIT_Reader.hpp"
 #include "ParserException.hpp"
 #include "PrettyPrinter.hpp"
 #include "SystemModelBuilder.hpp"

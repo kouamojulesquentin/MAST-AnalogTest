@@ -10,7 +10,8 @@
 
 namespace SIT{
 
-class SIT_Scanner : public yyFlexLexer{
+class SIT_Scanner final: public yyFlexLexer
+{
 public:
 
    SIT_Scanner(std::istream *in) : yyFlexLexer(in)
@@ -18,25 +19,21 @@ public:
       loc = new SIT::SIT_Parser::location_type();
       loc ->initialize();
    };
-   virtual ~SIT_Scanner() {
+
+   ~SIT_Scanner()
+   {
       delete loc;
    };
 
    //get rid of override virtual function warning
    using FlexLexer::yylex;
 
-   virtual
-   int yylex( SIT_Parser::semantic_type * const lval,
-              SIT_Parser::location_type *location );
-   // YY_DECL defined in SIT_lexer.l
-   // Method body created by flex in SIT_lexer.yy.cc
+   int yylex(SIT_Parser::semantic_type* const lval, SIT_Parser::location_type* location);
 
 
 private:
-   /* yyval ptr */
-   SIT_Parser::semantic_type *yylval = nullptr;
-   /* location ptr */
-   SIT_Parser::location_type *loc    = nullptr;
+   SIT_Parser::semantic_type* yylval = nullptr;
+   SIT_Parser::location_type* loc    = nullptr;
 };
 
 } /* end namespace SIT */

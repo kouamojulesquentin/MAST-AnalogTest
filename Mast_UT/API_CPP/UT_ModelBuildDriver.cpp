@@ -20,7 +20,7 @@
 #include "AppFunctionNameAndNode.hpp"
 #include "PrettyPrinter.hpp"
 #include "Utility.hpp"
-#include "SIT_reader.hpp"
+#include "SIT_Reader.hpp"
 #include "ParserException.hpp"
 
 #include "TestModelBuilder.hpp"

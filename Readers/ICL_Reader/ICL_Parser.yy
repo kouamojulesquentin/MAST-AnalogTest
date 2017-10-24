@@ -44,6 +44,7 @@ typedef void* yyscan_t;
 #  endif
 # endif
 
+#include "Parser_Types.h"
 #include "BinaryVector.hpp"
 #include "SystemModelBuilder.hpp"
 #include "SystemModelNode.hpp"
@@ -59,7 +60,6 @@ typedef void* yyscan_t;
 //
 #include "ICL_Reader.hpp"
 #include "ICL_Scanner.hpp"
-#include "ICL_Types.h"
 
 // ---------------- What is needed for parser to build the SystemModel
 //

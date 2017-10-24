@@ -99,7 +99,7 @@ void UT_reader::test_register_Success ()
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
+    TS_ASSERT_THROWS_NOTHING (sut.ParseExcerpt(sit));
 
     // ---------------- Verify
     //
@@ -151,7 +151,7 @@ void UT_reader::test_register_Error ()
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS (sut.parse(sit), mast::ParserException);
+    TS_ASSERT_THROWS (sut.ParseExcerpt(sit), mast::ParserException);
 
     // ---------------- Verify
     //
@@ -200,7 +200,7 @@ void UT_reader::test_chain ()
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
+    TS_ASSERT_THROWS_NOTHING (sut.ParseExcerpt(sit));
 
     // ---------------- Verify
     //
@@ -281,7 +281,7 @@ void UT_reader::test_MIB ()
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
+    TS_ASSERT_THROWS_NOTHING (sut.ParseExcerpt(sit));
 
     // ---------------- Verify
     //
@@ -843,7 +843,7 @@ void UT_reader::test_SIB ()
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
+    TS_ASSERT_THROWS_NOTHING (sut.ParseExcerpt(sit));
 
     // ---------------- Verify
     //
@@ -918,7 +918,7 @@ void UT_reader::test_JTAG_TAP_Success ()
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
+    TS_ASSERT_THROWS_NOTHING (sut.ParseExcerpt(sit));
 
     // ---------------- Verify
     //
@@ -1012,7 +1012,7 @@ void UT_reader::test_JTAG_TAP_Failure ()
 
     // ---------------- Exercise & Verify
     //
-    TS_ASSERT_THROWS (sut.parse(sit), mast::ParserException);
+    TS_ASSERT_THROWS (sut.ParseExcerpt(sit), mast::ParserException);
 
     // ---------------- Verify
     //
@@ -1054,7 +1054,7 @@ void UT_reader::test_ACCES_INTERFACE_Success ()
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
+    TS_ASSERT_THROWS_NOTHING (sut.ParseExcerpt(sit));
 
     // ---------------- Verify
     //
@@ -1237,7 +1237,7 @@ void UT_reader::test_ACCES_INTERFACE_Failure ()
 
     // ---------------- Exercise & Verify
     //
-    TS_ASSERT_THROWS (sut.parse(sit), mast::ParserException);
+    TS_ASSERT_THROWS (sut.ParseExcerpt(sit), mast::ParserException);
 
     // ---------------- Verify
     //
@@ -1306,7 +1306,7 @@ void UT_reader::test_1500 ()
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
+    TS_ASSERT_THROWS_NOTHING (sut.ParseExcerpt(sit));
 
     // ---------------- Verify
     //
@@ -1368,7 +1368,7 @@ void UT_reader::test_LINKER_Success ()
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
+    TS_ASSERT_THROWS_NOTHING (sut.ParseExcerpt(sit));
 
     // ---------------- Verify
     //
@@ -1432,7 +1432,7 @@ void UT_reader::test_LINKER_Error ()
 
     // ---------------- Exercise & Verify
     //
-    TS_ASSERT_THROWS (sut.parse(sit), mast::ParserException);
+    TS_ASSERT_THROWS (sut.ParseExcerpt(sit), mast::ParserException);
 
     // ---------------- Verify
     //
@@ -1483,7 +1483,7 @@ void UT_reader::test_LINKER_CustomTable_Success ()
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
+    TS_ASSERT_THROWS_NOTHING (sut.ParseExcerpt(sit));
 
     // ---------------- Verify
     //
@@ -1545,7 +1545,7 @@ void UT_reader::test_PDL_Success ()
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
+    TS_ASSERT_THROWS_NOTHING (sut.ParseExcerpt(sit));
 
     // ---------------- Verify
     //
@@ -1610,7 +1610,7 @@ void UT_reader::test_PDL_Failure ()
 
     // ---------------- Exercise & Verify
     //
-    TS_ASSERT_THROWS (sut.parse(sit), mast::ParserException);
+    TS_ASSERT_THROWS (sut.ParseExcerpt(sit), mast::ParserException);
 
     // ---------------- Verify
     //
@@ -1666,7 +1666,7 @@ void UT_reader::test_INSTANCE_OF_Single_Success ()
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
+    TS_ASSERT_THROWS_NOTHING (sut.ParseExcerpt(sit));
 
     // ---------------- Verify
     //
@@ -1811,7 +1811,7 @@ void UT_reader::test_INSTANCE_OF_Multiple_Success ()
 
   // ---------------- Exercise
   //
-  TS_ASSERT_THROWS_NOTHING (sut.parse(sit));
+  TS_ASSERT_THROWS_NOTHING (sut.ParseExcerpt(sit));
 
   // ---------------- Verify
   //
@@ -1862,8 +1862,8 @@ void UT_reader::test_INSTANCE_OF_Failure ()
   {
     // ---------------- Setup
     //
-    stringstream sit(std::get<0>(data));
-    auto         expectedErrorMessage = std::get<1>(data);
+    auto sit                  = std::get<0>(data);
+    auto expectedErrorMessage = std::get<1>(data);
 
     auto sm = make_shared<SystemModel>();
     SIT::SIT_Reader sut(sm);
@@ -1872,7 +1872,7 @@ void UT_reader::test_INSTANCE_OF_Failure ()
 
     // ---------------- Exercise & Verify
     //
-    TS_ASSERT_THROWS (sut.parse(sit), std::runtime_error);
+    TS_ASSERT_THROWS (sut.ParseExcerpt(sit), std::runtime_error);
 
     // ---------------- Verify
     //

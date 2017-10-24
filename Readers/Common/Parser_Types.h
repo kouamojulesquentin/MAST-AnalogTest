@@ -1,15 +1,24 @@
+//===========================================================================
+//                           Parser_Types.h
+//===========================================================================
+// Copyright (C) 2017 G-INP/Tima. All rights reserved.
+//
+// Project : Mast
+//
+//! @file Parser_Types.h
+//!
+//! Declares types shared by parsers
+//!
+//===========================================================================
 
-
-#ifndef ICL_TYPES_H__13976FFB_1B98_4AF7_78B3_F79FFC44E47C__INCLUDED_
-  #define ICL_TYPES_H__13976FFB_1B98_4AF7_78B3_F79FFC44E47C__INCLUDED_
+#ifndef PARSER_TYPES_H__5A3DC243_5770_4F28_48BF_29298BCCAB8F__INCLUDED_
+  #define PARSER_TYPES_H__5A3DC243_5770_4F28_48BF_29298BCCAB8F__INCLUDED_
 
 #include <string>
 #include <vector>
 #include <memory>
 #include <stdint.h>
 
-//! @todo [JFC]-[October/02/2017]: Refactor AND comment that (this is a copy from SIT reader)
-//!
 namespace mast
 {
   class SystemModelNode;
@@ -48,4 +57,10 @@ struct linker_information
   mast::SelectorProperty        selector_property = static_cast<mast::SelectorProperty>(0);
 };
 
-#endif  // not defined ICL_TYPES_H__13976FFB_1B98_4AF7_78B3_F79FFC44E47C__INCLUDED_
+#endif  // not defined PARSER_TYPES_H__5A3DC243_5770_4F28_48BF_29298BCCAB8F__INCLUDED_
+//===========================================================================
+// End of Parser_Types.h
+//===========================================================================
+
+
+

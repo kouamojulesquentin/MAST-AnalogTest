@@ -1,5 +1,19 @@
-#ifndef __SITDRIVER_HPP__
-#define __SITDRIVER_HPP__ 1
+//===========================================================================
+//                           SIT_Reader.hpp
+//===========================================================================
+// Copyright (C) 2017 G-INP/Tima. All rights reserved.
+//
+// Project : Mast
+//
+//! @file SIT_Reader.hpp
+//!
+//! Declares  class for managing parsing of SIT files
+//!
+//===========================================================================
+
+
+#ifndef SIT_READER_H__947F16CC_2E70_465F_4486_B6BDF227A8A3__INCLUDED_
+  #define SIT_READER_H__947F16CC_2E70_465F_4486_B6BDF227A8A3__INCLUDED_
 
 #include "AppFunctionNameAndNode.hpp"
 #include "PathSelector.hpp"
@@ -15,7 +29,7 @@
 #include <map>
 #include <queue>
 #include <functional>
-#include "SIT_Types.h"
+#include "Parser_Types.h"
 
 namespace mast
 {
@@ -30,29 +44,29 @@ namespace SIT
 class SIT_Parser;
 class SIT_Scanner;
 
-class SIT_Reader
+class SIT_Reader final
 {
 public:
-   virtual ~SIT_Reader() = default;
-   SIT_Reader() = delete;
-   SIT_Reader( std::shared_ptr<mast::SystemModel> sm);
+  ~SIT_Reader() = default;
 
+  SIT_Reader() = delete;
+  SIT_Reader(std::shared_ptr<mast::SystemModel> sm);
 
-   //! Parses a SIT file to construct a SystemModel
-   //!
-   //! @param filename  SIT file path
-   //!
-   void parse(std::experimental::string_view filename);
+  //! Parses a SIT file to construct a SystemModel
+  //!
+  void Parse(std::experimental::string_view filePath);
 
-   //! Parses a SIT formatted stream to construct a SystemModel
-   //!
-   //! @param stream Input stream to get model representation from
-   //!
-   void parse(std::istream& stream);
+  //! Parses a SIT formatted excerpt to construct a SystemModel
+  //!
+  void ParseExcerpt(std::istream& stream);
 
-   //! Returns SystemModelNode build from SIT
+  //! Parses a SIT formatted excerpt to construct a SystemModel
+  //!
+  void ParseExcerpt(const std::string& excerpt);
+
+   //! Returns SystemModelNode build by the actual parser
    //!
-   std::shared_ptr<mast::SystemModelNode> ParsedSystemModel() { return parsed_sut; }
+   std::shared_ptr<mast::SystemModelNode> ParsedSystemModel() { return parsedTopNode; }
 
    //! Associations of PDL algorithm names to nodes
    //!
@@ -60,9 +74,9 @@ public:
 
    //! Returns error message in case of failure, empty string otherwise
    //!
-   std::string ErrorMessage() const { return error_message; }
+   std::string ErrorMessage() const { return m_errorMessage; }
 
-   //! Identifies parts of the model that not instanciated yet and where to insert (splice) them
+   //! Identifies parts of the model that are not instanciated yet and where to insert (splice) them
    //!
    const std::vector<mast::SubModelPlaceHolder>& PlaceHolders() const { return placeHolders; }
 
@@ -70,12 +84,12 @@ private:  // Part used by SIT_Parser
   friend class SIT_Parser;
 
   std::vector<mast::AppFunctionNameAndNode>              namesAndNodes;      //!< Associations of algorithms name a node
-  std::vector<mast::SubModelPlaceHolder>                 placeHolders;       //!< Represents sub-model to instantiate and splice in this parsed SIT file
+  std::vector<mast::SubModelPlaceHolder>                 placeHolders;       //!< Represents sub-model to instantiate and splice in created (sub)model (from file or exerpt)
   std::map<std::string, std::shared_ptr<mast::Register>> declared_registers; //!< Created registers - kept to potentially associate to PathSelector (at end of parsing)
   std::queue<linker_information>                         unresolved_linkers; //!< Informations to create PathSelector associated with linker (register driving the selector may be yet unknown when the linker is created)
 
-  std::shared_ptr<mast::SystemModelNode>    parsed_sut;    //!< SystemModel tree build from SIT file
-  std::shared_ptr<mast::SystemModel>        main_sm;
+  std::shared_ptr<mast::SystemModelNode>    parsedTopNode;    //!< SystemModel tree build from SIT file
+  std::shared_ptr<mast::SystemModel>        systemModel;
   std::shared_ptr<mast::SystemModelBuilder> builder;
 
   using RegisterCreator_t = std::function<std::shared_ptr<mast::Register>(const std::string&     selectorRegName,
@@ -86,14 +100,12 @@ private:  // Part used by SIT_Parser
 
 private:
 
-   void Parse_Impl(std::istream& stream);
+  void Parse_Impl(std::istream& stream);
 
-   std::size_t                  column = 0;
-   std::size_t                  line   = 0;
-   std::shared_ptr<SIT_Parser>  parser;
-   std::shared_ptr<SIT_Scanner> scanner;
-   std::string                  error_message;  //!< Error message build while parsing SIT (empty when successful)
+  std::string m_errorMessage; //!< Error message build while parsing (empty when successful)
 };
 
-} /* end namespace SIT */
-#endif /* END __SITDRIVER_HPP__ */
+} // End of: namespace SIT
+
+
+#endif  // not defined SIT_READER_H__947F16CC_2E70_465F_4486_B6BDF227A8A3__INCLUDED_

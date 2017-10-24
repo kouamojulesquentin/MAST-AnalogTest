@@ -29,7 +29,7 @@
 #include <map>
 #include <queue>
 #include <functional>
-#include "ICL_Types.h"
+#include "Parser_Types.h"
 
 namespace mast
 {
@@ -51,11 +51,9 @@ public:
 
    //! Parses a ICL file to construct a SystemModel
    //!
-   //! @param filename  ICL file path
-   //!
-   void Parse(std::experimental::string_view filename);
+  void Parse(std::experimental::string_view filePath);
 
-   //! Returns SystemModelNode build from ICL
+   //! Returns SystemModelNode build by the actual parser
    //!
    std::shared_ptr<mast::SystemModelNode> ParsedSystemModel() { return parsedTopNode; }
 
@@ -75,14 +73,13 @@ private:  // Part used by ICL_Parser
   friend class ICL_Parser;
 
   std::vector<mast::AppFunctionNameAndNode>              namesAndNodes;      //!< Associations of algorithms name a node
-  std::vector<mast::SubModelPlaceHolder>                 placeHolders;       //!< Represents sub-model to instantiate and splice in this parsed ICL file
+  std::vector<mast::SubModelPlaceHolder>                 placeHolders;       //!< Represents sub-model to instantiate and splice in created (sub)model (from file or exerpt)
   std::map<std::string, std::shared_ptr<mast::Register>> declared_registers; //!< Created registers - kept to potentially associate to PathSelector (at end of parsing)
   std::queue<linker_information>                         unresolved_linkers; //!< Informations to create PathSelector associated with linker (register driving the selector may be yet unknown when the linker is created)
 
   std::shared_ptr<mast::SystemModelNode>    parsedTopNode;    //!< SystemModel tree build from ICL file
   std::shared_ptr<mast::SystemModel>        systemModel;
 //+  mast::SystemModelBuilder                  builder;
-
 
   using RegisterCreator_t = std::function<std::shared_ptr<mast::Register>(const std::string&     selectorRegName,
                                                                           uint32_t               pathsCount,
@@ -94,11 +91,7 @@ private:
 
   void Parse_Impl(std::istream& stream);
 
-  //! @todo [JFC]-[October/03/2017]: group those information into "ParserErrorInfo" and move try moving instanciation into the paser
-  //!
-  std::size_t m_column = 0;
-  std::size_t m_line   = 0;
-  std::string m_errorMessage; //!< Error message build while parsing ICL (empty when successful)
+  std::string m_errorMessage; //!< Error message build while parsing (empty when successful)
 };
 
 } // End of: namespace ICL

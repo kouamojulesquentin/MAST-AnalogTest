@@ -27,11 +27,11 @@ using namespace mast;
 
 
 SIT::SIT_Reader::SIT_Reader(std::shared_ptr<mast::SystemModel> sm)
-  : main_sm (sm)
-  , builder (make_shared<mast::SystemModelBuilder>(*main_sm))
+  : systemModel (sm)
+  , builder (make_shared<mast::SystemModelBuilder>(*systemModel))
 {
   #define MAKE_LAMBDA(selectorClass, forcedProperty)                                                                          \
-  [model = main_sm](const string& selectorRegName, uint32_t pathsCount, SelectorProperty selectorProperty)                    \
+  [model = systemModel](const string& selectorRegName, uint32_t pathsCount, SelectorProperty selectorProperty)                    \
   {                                                                                                                           \
     auto registerInitialValue = selectorClass::AssociatedRegisterInitialValue(pathsCount, selectorProperty | forcedProperty); \
     return model->CreateRegister (selectorRegName, registerInitialValue, true);                                               \
@@ -47,14 +47,18 @@ SIT::SIT_Reader::SIT_Reader(std::shared_ptr<mast::SystemModel> sm)
   #undef MAKE_LAMBDA
 }
 
-void SIT::SIT_Reader::parse(string_view filename)
+//! Parses a SIT file to construct a SystemModel
+//!
+//! @param filePath SIT file path
+//!
+void SIT::SIT_Reader::Parse(string_view filePath)
 {
-  CHECK_PARAMETER_NOT_EMPTY(filename, "Must specify a valid file path");
+  CHECK_PARAMETER_NOT_EMPTY(filePath, "Must specify a valid file path");
 
-  std::ifstream sitFileStream(filename.data());
+  std::ifstream sitFileStream(filePath.data());
 
-  CHECK_TRUE  (sitFileStream.good(), "Cannot open file: "s            .append(filename.cbegin(), filename.cend()));
-  CHECK_FALSE (sitFileStream.eof(),  "Cannot parse empty SIT file: "s .append(filename.cbegin(), filename.cend()));
+  CHECK_TRUE  (sitFileStream.good(), "Cannot open file: "s            .append(filePath.cbegin(), filePath.cend()));
+  CHECK_FALSE (sitFileStream.eof(),  "Cannot parse empty SIT file: "s .append(filePath.cbegin(), filePath.cend()));
 
   try
   {
@@ -64,18 +68,18 @@ void SIT::SIT_Reader::parse(string_view filename)
   {
     if (exc.filePath.empty())
     {
-      exc.filePath.append(filename.cbegin(), filename.cend());
-      error_message = exc.Message();
+      exc.filePath.append(filePath.cbegin(), filePath.cend());
+      m_errorMessage = exc.Message();
       throw exc;
     }
 
-    error_message = exc.Message();
+    m_errorMessage = exc.Message();
     throw;
   }
 }
 
 
-void SIT::SIT_Reader::parse(std::istream& stream)
+void SIT::SIT_Reader::ParseExcerpt(std::istream& stream)
 {
   CHECK_TRUE  (stream.good(), "Invalid stream: ");
   CHECK_FALSE (stream.eof(),  "Cannot parse empty SIT: ");
@@ -86,18 +90,44 @@ void SIT::SIT_Reader::parse(std::istream& stream)
   }
   catch(ParserException& exc)
   {
-    error_message = exc.Message();
+    m_errorMessage = exc.Message();
     throw;
   }
 }
 
 
+//! Parses a SIT formatted excerpt to construct a SystemModel
+//!
+//! @param excerpt  SIT formatted excerpt to parse
+//!
+void SIT::SIT_Reader::ParseExcerpt(const string& excerpt)
+{
+  CHECK_PARAMETER_NOT_EMPTY(excerpt, "Cannot parse empty string");
+
+  try
+  {
+    std::stringstream stream(excerpt);
+    Parse_Impl(stream);
+  }
+  catch(ParserException& exc)
+  {
+    m_errorMessage = exc.Message();
+    throw;
+  }
+}
+
+
+
+//! Parses a SIT formatted excerpt to construct a SystemModel
+//!
+//! @param stream   Input stream to get SIT excerpt to parse
+//!
 void SIT::SIT_Reader::Parse_Impl(std::istream& stream)
 {
   CHECK_TRUE  (stream.good(), "Invalid SIT stream");
   CHECK_FALSE (stream.eof(),  "Cannot parse SIT from empty stream");
 
-  SIT_Scanner scanner(&stream);
+  SIT_Scanner scanner(stream);
   SIT_Parser  parser(scanner, *this /* driver */);
 
   auto succeeded = parser.parse() == 0;

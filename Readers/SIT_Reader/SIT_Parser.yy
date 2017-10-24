@@ -21,7 +21,7 @@
 #  endif
 # endif
 
-#include "SIT_Types.h"
+#include "Parser_Types.h"
 #include "BinaryVector.hpp"
 #include "SystemModelBuilder.hpp"
 #include "SystemModelNode.hpp"
@@ -30,7 +30,7 @@
 }
 
 %parse-param { SIT_Scanner  &scanner  }
-%parse-param { SIT_Reader  &driver  }
+%parse-param { SIT_Reader   &driver  }
 
 %code{
 /* include for all driver functions */
@@ -238,7 +238,7 @@ root_node:
       linkerNode->ReplacePathSelector(shared_ptr<PathSelector>(std::move(selector)));
       driver.unresolved_linkers.pop();
     }
-    driver.parsed_sut = $[node];
+    driver.parsedTopNode = $[node];
   }
   ;
 
@@ -346,7 +346,7 @@ function_list:
 parent_node:
 t_CHAIN  node_name
 {
-  auto chain = driver.main_sm->CreateChain($[node_name].name);
+  auto chain = driver.systemModel->CreateChain($[node_name].name);
   chain->IgnoreForNodePath($[node_name].is_transparent);
   $$ = std::make_pair(chain,true);
 }
@@ -360,7 +360,7 @@ t_LINKER  node_name path_selector_kind selector_register_name max_derivations pa
   }
 
   auto pathSelector = make_shared<UnresolvedPathSelector>();
-  auto linker       = driver.main_sm->CreateLinker ($[node_name].name, pathSelector);
+  auto linker       = driver.systemModel->CreateLinker ($[node_name].name, pathSelector);
 
   linker_information             linkerInfo;
   linkerInfo.linker_node         = linker;
@@ -427,7 +427,7 @@ t_ACCESS_INTERFACE  node_name AI_identifier AI_protocol_parameters
       }
       else
       {
-        auto node = driver.main_sm->CreateAccessInterface(nodeName, shared_ptr<AccessInterfaceProtocol>(std::move(protocol)));
+        auto node = driver.systemModel->CreateAccessInterface(nodeName, shared_ptr<AccessInterfaceProtocol>(std::move(protocol)));
         $$ = std::make_pair(node,false);
       }
     }
@@ -617,7 +617,7 @@ register_node:
        THROW_SYNTAX_ERROR(msg);
      }
 
-     auto registerNode = driver.main_sm->CreateRegister ($[node_name].name, bin_value, nullptr);
+     auto registerNode = driver.systemModel->CreateRegister ($[node_name].name, bin_value, nullptr);
 
      //! @todo  save return value and check if binaryVector.size == size is correct and report error if not
 
@@ -651,7 +651,7 @@ instance_of:
     const auto& instance_name = std::get<1>($[instance_of_sub]);
     const auto& identifier    = std::get<2>($[instance_of_sub]);
 
-    auto chain = driver.main_sm->CreateChain(instance_name);
+    auto chain = driver.systemModel->CreateChain(instance_name);
     chain->IgnoreForNodePath(false);
 
     driver.placeHolders.emplace_back(kind, identifier, chain);
@@ -691,7 +691,7 @@ factory_name:
 
 void SIT::SIT_Parser::error(const location_type& loc, const std::string& errorMessage)
 {
-  driver.parsed_sut.reset();
+  driver.parsedTopNode.reset();
 
   auto isValidLoc = loc.begin != loc.end;
   if (isValidLoc)

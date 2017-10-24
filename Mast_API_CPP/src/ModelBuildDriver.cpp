@@ -156,7 +156,7 @@ shared_ptr<ParentNode> ModelBuildDriver::ParseSitFile (const string& sitFilePath
 
   try
   {
-    reader.parse(sitFilePath);
+    reader.Parse(sitFilePath);
   }
   catch(ParserException&)
   {

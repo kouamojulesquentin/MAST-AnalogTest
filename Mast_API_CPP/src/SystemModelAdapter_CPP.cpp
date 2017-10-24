@@ -157,7 +157,7 @@ vector<AppFunctionNameAndNode> CPP_API_IMPL::LoadSystemModel (string_view filePa
 
   auto reader = SIT::SIT_Reader(sm);
 
-  reader.parse(filePath);
+  reader.Parse(filePath);
 
   auto topNode = dynamic_pointer_cast<ParentNode>(reader.ParsedSystemModel());
   CHECK_VALUE_NOT_NULL(topNode, "Failed to parse file: " + filePath);

@@ -1,11 +1,11 @@
 //===========================================================================
-//                           Parser_Types.h
+//                           Parser_Types.hpp
 //===========================================================================
 // Copyright (C) 2017 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file Parser_Types.h
+//! @file Parser_Types.hpp
 //!
 //! Declares types shared by parsers
 //!
@@ -59,7 +59,7 @@ struct linker_information
 
 #endif  // not defined PARSER_TYPES_H__5A3DC243_5770_4F28_48BF_29298BCCAB8F__INCLUDED_
 //===========================================================================
-// End of Parser_Types.h
+// End of Parser_Types.hpp
 //===========================================================================
 
 

@@ -70,7 +70,7 @@ target_compile_options     (ICL_Reader PRIVATE -std=c++14
                                                -Wmissing-declarations
                                                -Wmissing-include-dirs
                                                $<$<NOT:$<PLATFORM_ID:Windows>>:-fPIC>)
-target_link_libraries      (ICL_Reader Mast_Core)
+target_link_libraries      (ICL_Reader Reader_Common)
 
 
 # ---------------- Smoke tests

@@ -30,6 +30,11 @@ namespace ICL
   class ICL_Reader;
   class ICL_Scanner;
 }
+namespace Parsers
+{
+  struct Parser_PublicData;
+  struct Parser_PrivateData;
+}
 
 #ifndef YY_TYPEDEF_YY_SCANNER_T
 #define YY_TYPEDEF_YY_SCANNER_T
@@ -44,7 +49,7 @@ typedef void* yyscan_t;
 #  endif
 # endif
 
-#include "Parser_Types.h"
+#include "Parser_Types.hpp"
 #include "BinaryVector.hpp"
 #include "SystemModelBuilder.hpp"
 #include "SystemModelNode.hpp"
@@ -52,12 +57,17 @@ typedef void* yyscan_t;
 #include "SubModelPlaceHolder.hpp"
 }
 
-%parse-param { ICL_Scanner  &scanner }
-%parse-param { ICL_Reader   &driver  }
+%parse-param { ICL_Scanner&                 scanner     }
+%parse-param { ICL_Reader&                  driver      }
+%parse-param { Parsers::Parser_PublicData&  publicData  }
+%parse-param { Parsers::Parser_PrivateData& privateData }
+
 %code
 {
 // ---------------- Includes for all driver functions
 //
+#include "Parser_PublicData.hpp"
+#include "Parser_PrivateData.hpp"
 #include "ICL_Reader.hpp"
 #include "ICL_Scanner.hpp"
 
@@ -814,8 +824,6 @@ attribute_value : concat_string | concat_number ;
 
 void ICL::ICL_Parser::error(const location_type& loc, const std::string& errorMessage)
 {
-  driver.parsedTopNode.reset();
-
   auto isValidLoc = loc.begin != loc.end;
   if (isValidLoc)
   {

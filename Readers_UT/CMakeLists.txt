@@ -7,33 +7,41 @@ message("=======================================================================
 set(UT_RootPath         "${CMAKE_CURRENT_LIST_DIR}")
 set(CXXTEST_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../cxxtest")
 
-message(STATUS "Readers_UT: CXXTEST_INCLUDE_DIR:        ${CXXTEST_INCLUDE_DIR}")
 
-file(GLOB UT_SIT_READER_HEADERS "SIT/UT_*.hpp")
-file(GLOB UT_SIT_READER_FILES   "SIT/*")
-file(GLOB UT_ICL_READER_HEADERS "ICL/UT_*.hpp")
-file(GLOB UT_ICL_READER_FILES   "ICL/*")
+set(UT_SIT_READER_HEADERS "${CMAKE_CURRENT_LIST_DIR}/SIT/UT_SIT_Printer.hpp"
+                          "${CMAKE_CURRENT_LIST_DIR}/SIT/UT_reader.hpp")
 
-set(GENERATED_RUNNER            "Generated/Runner.cpp")
+set(UT_SIT_READER_SOURCES "${CMAKE_CURRENT_LIST_DIR}/SIT/UT_SIT_Printer.cpp"
+                          "${CMAKE_CURRENT_LIST_DIR}/SIT/UT_reader.cpp")
 
-set(UT_HEADERS  ${UT_SIT_READER_HEADERS}
+set(UT_ICL_READER_HEADERS "${CMAKE_CURRENT_LIST_DIR}/ICL/UT_IEEE_P1687.hpp"
+                          "${CMAKE_CURRENT_LIST_DIR}/ICL/UT_Fragments.hpp")
+
+set(UT_ICL_READER_SOURCES "${CMAKE_CURRENT_LIST_DIR}/ICL/UT_IEEE_P1687.cpp"
+                          "${CMAKE_CURRENT_LIST_DIR}/ICL/UT_Fragments.cpp")
+
+set(UT_COMMON_HEADERS     "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_PrettyPrinter.hpp")
+set(UT_COMMON_SOURCES     "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_PrettyPrinter.cpp")
+
+set(GENERATED_RUNNER      "${CMAKE_CURRENT_LIST_DIR}/Generated/Runner.cpp")
+
+set(UT_HEADERS  ${UT_COMMON_HEADERS}
                 ${UT_ICL_READER_HEADERS}
-   )
+                ${UT_SIT_READER_HEADERS})
 
-set(UT_SOURCES  ${UT_SIT_READER_FILES}
-                ${UT_ICL_READER_FILES}
-                ${GENERATED_RUNNER}
-   )
+set(UT_SOURCES  ${UT_COMMON_SOURCES}
+                ${UT_ICL_READER_SOURCES}
+                ${UT_SIT_READER_SOURCES}
+                ${GENERATED_RUNNER})
 
 # ---------------- Generate Runner.cpp
 #
-set(RUNNER_PATH          ${UT_RootPath}/${GENERATED_RUNNER})
 set(EXTRA_RUNNER_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/../UserOptions.cmake ${CMAKE_CURRENT_LIST_FILE})
 set(CXXTEST_PATH         ${CXXTEST_INCLUDE_DIR})
 
-message(STATUS "Readers_UT: UT_HEADERS:                 ${UT_HEADERS}")
+message(STATUS "Readers_UT: CXXTEST_INCLUDE_DIR:        ${CXXTEST_INCLUDE_DIR}")
 include(../Tests_Common/MakeRunner.cmake)
-MakeRunner(${CXXTEST_PATH} ${RUNNER_PATH} "${EXTRA_RUNNER_DEPENDS}" "${UT_HEADERS}")
+MakeRunner(${CXXTEST_PATH} ${GENERATED_RUNNER} "${EXTRA_RUNNER_DEPENDS}" "${UT_HEADERS}")
 
 message("================================================================================")
 message("")
@@ -46,7 +54,7 @@ endif()
 
 # ---------------- Runner application
 #
-add_executable             (Readers_UT ${UT_SOURCES})
+add_executable             (Readers_UT ${UT_SOURCES} ${UT_HEADERS})
 target_compile_options     (Readers_UT PUBLIC  -fexceptions -std=c++14)
 target_compile_definitions (Readers_UT PUBLIC  CXXTEST_HAVE_EH CXXTEST_HAVE_STD CXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION)
 target_link_libraries      (Readers_UT ${PLATFORM_LIBS} Tests_Common ICL_Reader SIT_Reader)

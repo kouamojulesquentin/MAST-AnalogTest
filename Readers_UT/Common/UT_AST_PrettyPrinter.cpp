@@ -1,0 +1,88 @@
+//===========================================================================
+//                           UT_AST_PrettyPrinter.cpp
+//===========================================================================
+// Copyright (C) 2017 G-INP/Tima. All rights reserved.
+//
+// Project : Mast
+//
+//! @file UT_AST_PrettyPrinter.cpp
+//!
+//! Implements test fixture for testing AST_PrettyPrinter
+//!
+//===========================================================================
+
+#include "UT_AST_PrettyPrinter.hpp"
+#include "AST_PrettyPrinter.hpp"
+#include "AST.hpp"
+
+#include <cxxtest/ValueTraits.h>
+
+using Parsers::AST;
+using Parsers::AST_PrettyPrinter;
+
+
+//! Initializes test (called for each test)
+void UT_AST_PrettyPrinter::setUp ()
+{
+  CxxTest::setStringResultsOnNewLine(true);
+  CxxTest::setCharactersMapping(CxxTest::CharacterMapping::MAP_CHARS_MINIMAL);  // Keep quotes, HT, and new lines unescaped
+}
+
+
+//! Checks AST_PrettyPrinter::Visit_Module() when the module is empty (no children)
+//!
+void UT_AST_PrettyPrinter::test_Visit_Module_empty ()
+{
+  // ---------------- Setup
+  //
+  AST  ast;
+  auto node = ast.Create_Module("Dibona");
+
+  AST_PrettyPrinter sut;
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.Visit_Module(node));
+
+  // ---------------- Verify
+  //
+  auto got      = sut.PrettyPrint();
+  auto expected = "Module Dibona\n"
+                  "{\n"
+                  "}\n";
+
+  TS_ASSERT_EQUALS (got, expected);
+}
+
+
+//! Checks AST_PrettyPrinter::Visit_ScanRegister() when the module is empty (no children)
+//!
+void UT_AST_PrettyPrinter::test_Visit_ScanRegister_empty ()
+{
+  // ---------------- Setup
+  //
+  AST  ast;
+  auto node = ast.Create_ScanRegister("Ecrin");
+
+  AST_PrettyPrinter sut;
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.Visit_ScanRegister(node));
+
+  // ---------------- Verify
+  //
+  auto got      = sut.PrettyPrint();
+  auto expected = "ScanRegister Ecrin\n"
+                  "{\n"
+                  "}\n";
+
+  TS_ASSERT_EQUALS (got, expected);
+}
+
+
+
+
+//===========================================================================
+// End of UT_AST_PrettyPrinter.cpp
+//===========================================================================

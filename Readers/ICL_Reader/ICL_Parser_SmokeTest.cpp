@@ -37,7 +37,8 @@ int main (int argc, char* argv[])
     LOG(INFO) << "iclFile: " << iclFile;
 
     auto systemModel = std::make_shared<mast::SystemModel>();
-    auto reader      = ICL::ICL_Reader(systemModel);
+
+    ICL::ICL_Reader reader(systemModel);
 
     reader.Parse(iclFile);
     return 0;

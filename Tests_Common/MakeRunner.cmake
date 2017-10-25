@@ -14,7 +14,6 @@ else()  # ==> Linux
   set(python python3)
 endif()
 
-message(STATUS "MakeRunner: python:           ${python}")
 
 function(MakeRunner cxxtestPath runnerPath extraDepends headers)
 
@@ -22,11 +21,17 @@ function(MakeRunner cxxtestPath runnerPath extraDepends headers)
   set(templateFile    ${CMAKE_CURRENT_SOURCE_DIR}/Runner.tpl)
   set(generatorParams --error-printer --have-eh --have-std --fog-parse --root -o ${runnerPath} --template ${templateFile})
 
-  message(STATUS "MakeRunner: generator:        ${generator}")
-  message(STATUS "MakeRunner: extraDepends:     ${extraDepends}")
-  message(STATUS "MakeRunner: templateFile:     ${templateFile}")
-  message(STATUS "MakeRunner: generatorParams:  ${generatorParams}")
-  message(STATUS "MakeRunner: headers:          ${headers}")
+  message(STATUS "MakeRunner: python:                 ${python}")
+  message(STATUS "MakeRunner: CMAKE_CURRENT_LIST_DIR: ${CMAKE_CURRENT_LIST_DIR}")
+  message(STATUS "MakeRunner: generator:              ${generator}")
+  message(STATUS "MakeRunner: extraDepends:           ${extraDepends}")
+  message(STATUS "MakeRunner: templateFile:           ${templateFile}")
+  message(STATUS "MakeRunner: generatorParams:        ${generatorParams}")
+  message(STATUS "MakeRunner: headers:")
+
+  foreach(item ${headers})
+    message(STATUS "MakeRunner:                         ${item}")
+  endforeach()
 
   add_custom_command (OUTPUT    ${runnerPath}
                       DEPENDS   ${headers} ${extraDepends} ${templateFile}

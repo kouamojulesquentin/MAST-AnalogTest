@@ -1,4 +1,4 @@
-Running Mast_Readers tests (34 tests)
+Running Mast_Readers tests (35 tests)
 
 .........
 
@@ -12,6 +12,11 @@ UT_SIT_Printer.cpp:413: Warning: Table based not defined
 
 In UT_SIT_Printer::test_MakeSIT: 
 UT_SIT_Printer.cpp:451: Warning: Table based not defined
-..........................................................................................................................................
+...........................................................................................................
 
-OK! (149 tests including 136 'sub' tests from 21 data driven tests)
+In UT_Fragments::test_ParseExcerpt_ScanRegister: 
+UT_Fragments.cpp:126: Error: Expected (parsedModel) to be not nullptr, but found it is nullptr
+...............................
+
+Failed 1 and Skipped 0 of 150 tests including 136 'sub' tests from 21 data driven tests
+Success rate: 99%

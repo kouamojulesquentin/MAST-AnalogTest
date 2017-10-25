@@ -7,7 +7,19 @@ message(STATUS "Reader_Common: CODE_COVERAGE:   ${CODE_COVERAGE}")
 message("================================================================================")
 message("")
 
-add_library (Reader_Common SHARED ParserException.hpp
+add_library (Reader_Common SHARED AST.hpp
+                                  AST.cpp
+                                  AST_Node.hpp
+                                  AST_NamedNode.hpp
+                                  AST_ParentNode.hpp
+                                  AST_Module.hpp
+                                  AST_Module.cpp
+                                  AST_ScanRegister.hpp
+                                  AST_ScanRegister.cpp
+                                  AST_Visitor.hpp
+                                  AST_PrettyPrinter.hpp
+                                  AST_PrettyPrinter.cpp
+                                  ParserException.hpp
                                   Parser_Types.hpp
                                   Parser_PublicData.hpp
                                   Parser_PrivateData.hpp

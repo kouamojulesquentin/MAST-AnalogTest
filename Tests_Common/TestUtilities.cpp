@@ -13,11 +13,19 @@
 
 #include "TestUtilities.hpp"
 #include "MastConfig.hpp"
+#include "SystemModel.hpp"
+#include "SystemModelNode.hpp"
+#include "SystemModelBuilder.hpp"
+#include "LoopbackAccessInterfaceProtocol.hpp"
 
 #include <cxxtest/TestSuite.h>
 
 using std::string;
 using std::initializer_list;
+using std::shared_ptr;
+using std::make_shared;
+
+using namespace mast;
 
 extern string Exe_Dir_Path;
 
@@ -54,6 +62,29 @@ const string& test::GetRunnerDirectoryPath()
 {
   return Exe_Dir_Path;
 }
+
+//! Adds a JTAG Tap to system mode, then append node to it
+//!
+void test::PrependWithTap (shared_ptr<SystemModel> sm, shared_ptr<SystemModelNode> node)
+{
+  auto protocol = make_shared<LoopbackAccessInterfaceProtocol> ();
+  SystemModelBuilder builder(*sm);
+
+  auto tap = builder.Create_JTAG_TAP("TAP", 8u, 2u, protocol);
+
+  sm->ReplaceRoot(tap, false);
+  tap->AppendChild(node);
+}
+//
+//  End of: PrependWithTap
+//---------------------------------------------------------------------------
+
+
+namespace
+{
+
+} // End of unnamed namespace
+
 
 
 //===========================================================================

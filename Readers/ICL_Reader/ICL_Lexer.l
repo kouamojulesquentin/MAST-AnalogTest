@@ -201,7 +201,10 @@ ICL::ICL_Parser::location_type* my_location;
   WriteDataSource               return token::WRITEDATASOURCE;
   WriteEnPort                   return token::WRITEENPORT;
   WriteEnSource                 return token::WRITEENSOURCE;
-  [a-zA-Z][a-zA-Z0-9_]*         return token::SCALAR_ID;
+  [a-zA-Z][a-zA-Z0-9_]* {
+    yylval->build<std::string>(yytext);
+    return token::SCALAR_ID;
+  }
   \^                            return token::XOR;
   . {
       throw mast::ParserException(my_location->begin.line,

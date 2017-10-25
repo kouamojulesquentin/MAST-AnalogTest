@@ -22,18 +22,26 @@ namespace mast
 {
   class SystemModel;
 }
+namespace Parsers
+{
+  class AST;
+}
 
 namespace ICL
 {
-class ICL_Reader final : public Parsers::Reader
+class ICL_Reader : public Parsers::Reader
 {
   public:
-  ~ICL_Reader() = default;
-  ICL_Reader()  = delete;
+  virtual ~ICL_Reader();
+  ICL_Reader() = delete;
   ICL_Reader(std::shared_ptr<mast::SystemModel> sm);
 
   protected:
   virtual void Parse_Impl(std::istream& stream) override;
+
+  Parsers::AST* AST() const { return m_ast.get(); } //!< Returns current AST (for debug purpose)
+
+  std::unique_ptr<Parsers::AST>  m_ast;  //!< Instance member to be visible by unit tests (for debug purpose)
 };
 } // End of: namespace ICL
 

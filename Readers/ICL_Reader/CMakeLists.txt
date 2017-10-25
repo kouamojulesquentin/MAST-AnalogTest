@@ -53,14 +53,25 @@ add_custom_command(
 
 set_source_files_properties(${LEX_YACC_SRC_DIR}ICL_Parser.tab.cc GENERATED)
 set_source_files_properties(${LEX_YACC_SRC_DIR}ICL_Lexer.yy.cc   GENERATED)
+set_source_files_properties(${LEX_YACC_SRC_DIR}ICL_Parser.tab.hh GENERATED)
+set_source_files_properties(${LEX_YACC_SRC_DIR}location.tab.hh   GENERATED)
+set_source_files_properties(${LEX_YACC_SRC_DIR}position.tab.hh   GENERATED)
+set_source_files_properties(${LEX_YACC_SRC_DIR}stack.tab.hh      GENERATED)
 
 add_library(ICL_Reader SHARED  ${LEX_YACC_SRC_DIR}ICL_Reader.cpp
+                               ${LEX_YACC_SRC_DIR}ICL_Reader.hpp
+                               ${LEX_YACC_SRC_DIR}ICL_Scanner.hpp
                                ${LEX_YACC_SRC_DIR}ICL_Parser.tab.cc
+                               ${LEX_YACC_SRC_DIR}ICL_Parser.tab.hh
+                               ${LEX_YACC_SRC_DIR}location.tab.hh
+                               ${LEX_YACC_SRC_DIR}position.tab.hh
+                               ${LEX_YACC_SRC_DIR}stack.tab.hh
                                ${LEX_YACC_SRC_DIR}ICL_Lexer.yy.cc)
 
 target_include_directories (ICL_Reader PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}
                                                ${CMAKE_CURRENT_SOURCE_DIR}/../Common
                                        PRIVATE $<$<PLATFORM_ID:Windows>:$ENV{FLEX_DIR}>)
+
 target_compile_options     (ICL_Reader PRIVATE -std=c++14
                                                -Wall
                                                -Wno-sign-compare
@@ -70,6 +81,7 @@ target_compile_options     (ICL_Reader PRIVATE -std=c++14
                                                -Wmissing-declarations
                                                -Wmissing-include-dirs
                                                $<$<NOT:$<PLATFORM_ID:Windows>>:-fPIC>)
+
 target_link_libraries      (ICL_Reader Reader_Common)
 
 

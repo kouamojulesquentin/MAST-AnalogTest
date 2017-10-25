@@ -385,7 +385,7 @@ T CheckValueIsNotZero(const char* file, const char* function, int line, T value,
 //!
 //! @return given value if not zero
 template<typename T>
-T CheckValueCondition(const char* file, const char* function, int line, T value, bool conditionMet, std::experimental::string_view  msg)
+const T& CheckValueCondition(const char* file, const char* function, int line, const T& value, bool conditionMet, std::experimental::string_view  msg)
 {
   if (!conditionMet)
   {

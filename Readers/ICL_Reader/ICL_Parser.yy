@@ -32,6 +32,9 @@ namespace ICL
 }
 namespace Parsers
 {
+  class  AST;
+  class  AST_Module;
+  class  AST_ScanRegister;
   struct Parser_PublicData;
   struct Parser_PrivateData;
 }
@@ -57,10 +60,10 @@ typedef void* yyscan_t;
 #include "SubModelPlaceHolder.hpp"
 }
 
-%parse-param { ICL_Scanner&                 scanner     }
-%parse-param { ICL_Reader&                  driver      }
-%parse-param { Parsers::Parser_PublicData&  publicData  }
-%parse-param { Parsers::Parser_PrivateData& privateData }
+%parse-param { ICL_Scanner&                 scanner      }
+%parse-param { Parsers::Parser_PublicData&  driverPublic }
+%parse-param { Parsers::Parser_PrivateData& myData}
+%parse-param { Parsers::AST&                ast}
 
 %code
 {
@@ -68,19 +71,11 @@ typedef void* yyscan_t;
 //
 #include "Parser_PublicData.hpp"
 #include "Parser_PrivateData.hpp"
+#include "ParserException.hpp"
+#include "AST.hpp"
 #include "ICL_Reader.hpp"
 #include "ICL_Scanner.hpp"
-
-// ---------------- What is needed for parser to build the SystemModel
-//
-#include "AccessInterfaceTranslator.hpp"
-#include "AccessInterfaceProtocolFactory.hpp"
-#include "AppFunctionNameAndNode.hpp"
-#include "AccessInterfaceProtocol.hpp"
-#include "PathSelectorFactory.hpp"
 #include "Utility.hpp"
-//+#include "UnresolvedPathSelector.hpp"
-#include "ParserException.hpp"
 #include "g3log/g3log.hpp"
 
 #include <iostream>
@@ -131,8 +126,29 @@ namespace
 } // End of unnamed namespace
 
 } /*end of %code section*/
-//%lex-param   { yyscan_t scanner }
-//%parse-param { yyscan_t scanner }
+
+%define api.value.type variant
+%define parse.assert
+
+%type <std::string> SCALAR_ID
+%type <std::string> alias_name
+%type <std::string> instance_name
+%type <std::string> module_name
+%type <std::string> namespace_name
+%type <std::string> oneHotScanGroup_name
+%type <std::string> port_name
+%type <std::string> reg_port_signal_id
+%type <std::string> register_name
+%type <std::string> scanInPort_name
+%type <std::string> scanInterfaceChain_name
+%type <std::string> scanInterface_name
+%type <std::string> scanMux_name
+%type <std::string> scanOutPort_name
+%type <std::string> scanRegister_name
+%type <std::string> vector_id
+
+%type <Parsers::AST_Module*>       module_def
+%type <Parsers::AST_ScanRegister*> scanRegister_def
 
 %token ACCESSLINK
 %token ACCESSTOGETHER
@@ -254,6 +270,7 @@ namespace
 %token WRITEENSOURCE
 %token XOR
 %token ZERO
+%token END 0 "end of file"
 
 
 %start icl_source
@@ -289,11 +306,17 @@ concat_number : number | TILDE number | concat_number COMMA number | concat_numb
 //unsized number within a concat_number. See section 6.4.10.
 concat_number_list : concat_number | concat_number_list PIPE concat_number ;
 pin_id : instance_name DOT pin_id | instance_name DOT port_name  ;
-port_name : SCALAR_ID | vector_id ;
-register_name : SCALAR_ID | vector_id ;
-instance_name : SCALAR_ID;
-namespace_name : SCALAR_ID;
-module_name : SCALAR_ID;
+
+port_name :     SCALAR_ID | vector_id ;
+register_name :
+  SCALAR_ID { $$ = $[SCALAR_ID]; }
+| vector_id { $$ = $[vector_id]; }
+;
+
+instance_name  : SCALAR_ID { $$ = $[SCALAR_ID]; };
+namespace_name : SCALAR_ID { $$ = $[SCALAR_ID]; };
+module_name    : SCALAR_ID { $$ = $[SCALAR_ID]; };
+
 reg_port_signal_id : SCALAR_ID | vector_id;
 signal : number | reg_port_signal_id | pin_id  ;
 x_signal : signal | TILDE signal ;
@@ -328,8 +351,18 @@ nameSpace_def : NAMESPACE namespace_name SEMICOLON | NAMESPACE SEMICOLON ;
 useNameSpace_def : USENAMESPACE namespace_name SEMICOLON | USENAMESPACE SEMICOLON ;
 
 // 6.4.5
-module_def : MODULE module_name LEFT_BRACE module_items RIGHT_BRACE
-           | MODULE module_name LEFT_BRACE              RIGHT_BRACE ;
+module_def :
+  MODULE module_name LEFT_BRACE module_items RIGHT_BRACE
+  {
+    $$ = ast.Create_Module($[module_name]);
+  }
+  |
+  MODULE module_name LEFT_BRACE              RIGHT_BRACE
+  {
+    $$ = ast.Create_Module($[module_name]);
+  }
+;
+
 module_items : module_items module_item | module_item;
 module_item : useNameSpace_def |
 attribute_def |
@@ -610,8 +643,12 @@ parameter_override : parameter_def;
 instance_addressValue : ADDRESSVALUE number SEMICOLON ;
 
 // 6.4.8
-scanRegister_def : SCANREGISTER scanRegister_name scanRegister_tail ;
-scanRegister_name : register_name ;
+scanRegister_def : SCANREGISTER scanRegister_name scanRegister_tail
+{
+  $$ = ast.Create_ScanRegister($[scanRegister_name]);
+}
+;
+scanRegister_name : register_name { $$ = $[register_name]; }
 scanRegister_tail: SEMICOLON | LEFT_BRACE scanRegister_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 scanRegister_items: scanRegister_items scanRegister_item | scanRegister_item;
 scanRegister_item : attribute_def |
@@ -811,14 +848,6 @@ attribute_def : ATTRIBUTE attribute_name EQUAL attribute_value SEMICOLON
               | ATTRIBUTE attribute_name SEMICOLON ;
 attribute_name : SCALAR_ID;
 attribute_value : concat_string | concat_number ;
-//STRING : '"' (~('"'|'\\')|'\\\\'|'\\"')* '"' ;
-
-// ANTLR skip directives
-//SPACE : ( ' ' | '\t' | ('\r'? '\n') )+ -> skip ;
-// Multi-line Comments
-//ML_COMMENT : '/*' .*? '*/' -> skip ;
-// Single-line Comments
-//SL_COMMENT : '//' (~('\r'|'\n')*) '\r'? '\n' -> skip ;
 
 %%
 

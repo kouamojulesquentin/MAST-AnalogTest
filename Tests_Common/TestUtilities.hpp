@@ -16,6 +16,13 @@
 
 #include <string>
 #include <initializer_list>
+#include <memory>
+
+namespace mast
+{
+  class SystemModel;
+  class SystemModelNode;
+}
 
 namespace test
 {
@@ -26,6 +33,10 @@ namespace test
   //! Returns directory path of currently running test runner
   //!
   extern const std::string& GetRunnerDirectoryPath();
+
+  //! Adds a JTAG Tap to system mode, then append node to it
+  //!
+  extern void PrependWithTap (std::shared_ptr<mast::SystemModel> sm, std::shared_ptr<mast::SystemModelNode> node);
 
 } // End of namespace test
 

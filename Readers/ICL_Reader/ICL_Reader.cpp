@@ -21,8 +21,11 @@
 #include "ParserException.hpp"
 #include "Parser_PrivateData.hpp"
 #include "Utility.hpp"
+#include "AST.hpp"
 
 #include "g3log/g3log.hpp"
+
+using ICL::ICL_Reader;
 
 using std::experimental::string_view;
 using std::string;
@@ -30,21 +33,30 @@ using std::string;
 using namespace std::string_literals;
 using namespace std::experimental::literals::string_view_literals;
 
+//! Release resources
+//!
+ICL_Reader::~ICL_Reader ()
+{
+}
 
-ICL::ICL_Reader::ICL_Reader(std::shared_ptr<mast::SystemModel> sm)
+
+//! Initializes instance
+//!
+ICL_Reader::ICL_Reader(std::shared_ptr<mast::SystemModel> sm)
   : Reader (sm)
 {
 }
 
-void ICL::ICL_Reader::Parse_Impl(std::istream& stream)
+void ICL_Reader::Parse_Impl(std::istream& stream)
 {
   CHECK_TRUE  (stream.good(), "Invalid ICL stream");
   CHECK_FALSE (stream.eof(),  "Cannot parse ICL from empty stream");
 
-  Parsers::Parser_PrivateData privateData(PublicData().systemModel);
+  m_ast = std::make_unique<Parsers::AST>();
 
-  ICL_Scanner scanner(stream);
-  ICL_Parser  parser(scanner, *this /* driver */, PublicData(), privateData);
+  Parsers::Parser_PrivateData privateData(PublicData().systemModel);
+  ICL_Scanner                 scanner(stream);
+  ICL_Parser                  parser(scanner, PublicData(), privateData, *m_ast);
 
   auto succeeded = parser.parse() == 0;
 

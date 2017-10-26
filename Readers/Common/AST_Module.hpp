@@ -38,10 +38,10 @@ class AST_Module final : public AST_ParentNode
   //
   private:
   friend class AST;                                                   // This is AST that manages construction/destruction of AST nodes
-  MAKE_UNIQUE_AS_FRIEND(AST_Module)(std::experimental::string_view&); // AST currently uses make_unit<T>() to create nodes
+  MAKE_UNIQUE_AS_FRIEND(AST_Module)(std::experimental::string_view&, std::vector<AST_Node*>&&); // AST currently uses make_unit<T>() to create nodes
 
-  AST_Module(std::experimental::string_view name)
-    : AST_ParentNode (name)
+  AST_Module(std::experimental::string_view name, std::vector<AST_Node*>&& children)
+    : AST_ParentNode (name, std::move(children))
   {
   }
 

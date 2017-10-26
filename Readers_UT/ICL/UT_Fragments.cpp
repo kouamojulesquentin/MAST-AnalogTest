@@ -148,6 +148,9 @@ void UT_Fragments::test_ParseExcerpt_ScanRegister ()
 
   auto expected_AST_PrettyPrint = "Module SReg\n"
                                   "{\n"
+                                  "  ScanRegister SR[7:0]\n"
+                                  "  {\n"
+                                  "  }\n"
                                   "}\n";
   auto actual_ASTPring          = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
   TS_ASSERT_EQUALS (actual_ASTPring, expected_AST_PrettyPrint);

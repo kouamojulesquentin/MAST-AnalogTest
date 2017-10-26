@@ -15,9 +15,39 @@
 #include "AST_Module.hpp"
 #include "AST_ScanRegister.hpp"
 
+#include <sstream>
+
 using std::experimental::string_view;
 using namespace Parsers;
 
+namespace Parsers
+{
+
+  //! Inserts hierarchy open/close sequence and increases depth
+  //!
+  //! @note Do 1st half of the job in constructor and the 2nd one in the destructor
+  //!
+  struct HierarchyInserter final
+  {
+    ~HierarchyInserter()
+    {
+      --m_printer.m_depth;
+      m_printer.StreamDepth() << "}\n";
+    }
+
+    HierarchyInserter(AST_PrettyPrinter& printer)
+      : m_printer(printer)
+    {
+      m_printer.m_os << "\n";
+      m_printer.StreamDepth() << "{\n";
+      ++m_printer.m_depth;
+    }
+
+    AST_PrettyPrinter& m_printer;
+  };
+
+
+} // End of Parsers namespace
 
 //! Adds spaces to force next insertion point to be at target position relative
 //! to reference position
@@ -77,11 +107,6 @@ string AST_PrettyPrinter::PrettyPrint (AST_Node* topNode)
 //!
 void AST_PrettyPrinter::StreamNodeHeader(string_view kind, const AST_NamedNode* node, string_view notes)
 {
-  if (!m_first)
-  {
-    m_os << std::endl;
-  }
-
   m_startPos = m_os.tellp();
   StreamDepth();
 
@@ -89,10 +114,8 @@ void AST_PrettyPrinter::StreamNodeHeader(string_view kind, const AST_NamedNode* 
 
   if (!notes.empty())
   {
-    m_os << ", " << notes;
+    m_os << notes;
   }
-
-  m_first = false;
 }
 
 //! Appends content of parent node in text representation and visits
@@ -120,7 +143,19 @@ void AST_PrettyPrinter::StreamParentNode (std::experimental::string_view kind, c
 //! sub-nodes
 void AST_PrettyPrinter::Visit_Module (AST_Module* module)
 {
-  StreamParentNode("Module", module, "");
+  StreamNodeHeader("Module", module, "");
+
+  HierarchyInserter hierarchyInserter(*this);
+
+  for (const auto& node : module->UnprocessedChildren())
+  {
+    if (node != nullptr)
+    {
+      node->Accept(*this);
+    }
+  }
+
+
 }
 //
 //  End of: AST_PrettyPrinter::Visit_Module
@@ -131,7 +166,31 @@ void AST_PrettyPrinter::Visit_Module (AST_Module* module)
 //! sub-nodes
 void AST_PrettyPrinter::Visit_ScanRegister (AST_ScanRegister* scanRegister)
 {
-  StreamParentNode("ScanRegister", scanRegister, "");
+  std::ostringstream range;
+  const auto& left  = scanRegister->RangeLeft();
+  const auto& right = scanRegister->RangeRight();
+
+  if (!left.empty())
+  {
+    range << "[" << left;
+    if (!right.empty())
+    {
+      range << ":" << right;
+    }
+    range << "]";
+  }
+
+  StreamNodeHeader("ScanRegister", scanRegister, range.str());
+
+  HierarchyInserter hierarchyInserter(*this);
+
+  for (const auto& node : scanRegister->UnprocessedChildren())
+  {
+    if (node != nullptr)
+    {
+      node->Accept(*this);
+    }
+  }
 }
 //
 //  End of: AST_PrettyPrinter::Visit_ScanRegister

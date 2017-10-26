@@ -16,6 +16,7 @@
   #define AST_PARENTNODE_H__9C01A73E_808_43D6_A6B3_243B7A5440B__INCLUDED_
 
 #include "AST_NamedNode.hpp"
+#include <vector>
 
 namespace Parsers
 {
@@ -31,6 +32,12 @@ class AST_ParentNode : public AST_NamedNode
   virtual ~AST_ParentNode() = default;
   AST_ParentNode()          = delete;
 
+  //! Returns handle on not yet processed children
+  //!
+  //! @note This is mainly intended to be "processed" by visitors
+  //!
+  std::vector<AST_Node*>& UnprocessedChildren() { return m_unprocessedChildren; }
+
   // ---------------- Protected Methods
   //
   protected:
@@ -39,13 +46,19 @@ class AST_ParentNode : public AST_NamedNode
   {
   }
 
-  // ---------------- Private Methods
-  //
-  private:
+  AST_ParentNode(std::experimental::string_view name, std::vector<AST_Node*>&& children)
+    : AST_NamedNode         (name)
+    , m_unprocessedChildren (std::move(children))
+  {
+  }
 
-  // ---------------- Private Fields
+
+
+
+  // ---------------- Protected Fields
   //
-  private:
+  protected:
+  std::vector<AST_Node*>  m_unprocessedChildren; //!< Children nodes got from parsing and not yet processed (some may be nullptr)
 };
 //
 //  End of AST_ParentNode class declaration

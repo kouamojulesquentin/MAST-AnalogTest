@@ -35,8 +35,10 @@ class AST final
   ~AST();
   AST();
 
-  AST_Module*       Create_Module       (std::experimental::string_view name);
-  AST_ScanRegister* Create_ScanRegister (std::experimental::string_view name);
+  AST_Module*       Create_Module       (std::experimental::string_view name, std::vector<AST_Node*>&& children);
+  AST_ScanRegister* Create_ScanRegister (std::experimental::string_view name,
+                                         std::experimental::string_view rangeLeft  = "",
+                                         std::experimental::string_view rangeRight = "");
 
   //! Returns "top" module node
   //!

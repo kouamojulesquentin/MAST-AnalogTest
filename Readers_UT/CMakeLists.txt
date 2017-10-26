@@ -7,6 +7,8 @@ message("=======================================================================
 set(UT_RootPath         "${CMAKE_CURRENT_LIST_DIR}")
 set(CXXTEST_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../cxxtest")
 
+set(UT_COMMON_HEADERS     "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_PrettyPrinter.hpp")
+set(UT_COMMON_SOURCES     "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_PrettyPrinter.cpp")
 
 set(UT_SIT_READER_HEADERS "${CMAKE_CURRENT_LIST_DIR}/SIT/UT_SIT_Printer.hpp"
                           "${CMAKE_CURRENT_LIST_DIR}/SIT/UT_reader.hpp")
@@ -14,14 +16,13 @@ set(UT_SIT_READER_HEADERS "${CMAKE_CURRENT_LIST_DIR}/SIT/UT_SIT_Printer.hpp"
 set(UT_SIT_READER_SOURCES "${CMAKE_CURRENT_LIST_DIR}/SIT/UT_SIT_Printer.cpp"
                           "${CMAKE_CURRENT_LIST_DIR}/SIT/UT_reader.cpp")
 
-set(UT_ICL_READER_HEADERS "${CMAKE_CURRENT_LIST_DIR}/ICL/UT_IEEE_P1687.hpp"
-                          "${CMAKE_CURRENT_LIST_DIR}/ICL/UT_Fragments.hpp")
+set(UT_ICL_READER_HEADERS "${CMAKE_CURRENT_LIST_DIR}/ICL/UT_Fragments.hpp"
+                          "${CMAKE_CURRENT_LIST_DIR}/ICL/UT_IEEE_P1687.hpp"
+                          )
 
 set(UT_ICL_READER_SOURCES "${CMAKE_CURRENT_LIST_DIR}/ICL/UT_IEEE_P1687.cpp"
                           "${CMAKE_CURRENT_LIST_DIR}/ICL/UT_Fragments.cpp")
 
-set(UT_COMMON_HEADERS     "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_PrettyPrinter.hpp")
-set(UT_COMMON_SOURCES     "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_PrettyPrinter.cpp")
 
 set(GENERATED_RUNNER      "${CMAKE_CURRENT_LIST_DIR}/Generated/Runner.cpp")
 

@@ -149,7 +149,7 @@ ICL::ICL_Parser::location_type* my_location;
   [|]                           return token::PIPE;
   [+]                           return token::PLUS;
   Port                          return token::PORT;
-  [0-9][0-9_]*                  return token::POS_INT;
+  [0-9][0-9_]*                  { yylval->build<std::string>(yytext); return token::POS_INT; };
   ps                            return token::PSEC;
   ReadCallBack                  return token::READCALLBACK;
   ReadDataSource                return token::READDATASOURCE;

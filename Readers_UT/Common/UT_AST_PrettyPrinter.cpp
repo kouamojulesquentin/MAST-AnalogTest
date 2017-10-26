@@ -18,7 +18,10 @@
 #include <cxxtest/ValueTraits.h>
 
 using Parsers::AST;
+using Parsers::AST_Node;
+using Parsers::AST_Module;
 using Parsers::AST_PrettyPrinter;
+using std::vector;
 
 
 //! Initializes test (called for each test)
@@ -36,7 +39,7 @@ void UT_AST_PrettyPrinter::test_Visit_Module_empty ()
   // ---------------- Setup
   //
   AST  ast;
-  auto node = ast.Create_Module("Dibona");
+  auto node = ast.Create_Module("Dibona", vector<AST_Node*>());
 
   AST_PrettyPrinter sut;
 

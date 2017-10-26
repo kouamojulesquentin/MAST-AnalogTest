@@ -34,21 +34,34 @@ class AST_ScanRegister final : public AST_ParentNode
   //!
   void Accept (AST_Visitor& visitor) override;
 
+
+  const std::string& RangeLeft()  const { return m_rangeLeft;  }
+  const std::string& RangeRight() const { return m_rangeRight; }
+
+
   // ---------------- Private Methods
   //
   private:
 
   friend class AST;                                                         // This is AST that manages construction/destruction of AST nodes
-  MAKE_UNIQUE_AS_FRIEND(AST_ScanRegister)(std::experimental::string_view&); // AST currently uses make_unit<T>() to create nodes
+  MAKE_UNIQUE_AS_FRIEND(AST_ScanRegister)(std::experimental::string_view&,
+                                          std::experimental::string_view&,
+                                          std::experimental::string_view&); // AST currently uses make_unit<T>() to create nodes
 
-  AST_ScanRegister(string_view name)
+  AST_ScanRegister(std::experimental::string_view name,
+                   std::experimental::string_view rangeLeft  = "",
+                   std::experimental::string_view rangeRight = "")
     : AST_ParentNode (name)
+    , m_rangeLeft    (rangeLeft)
+    , m_rangeRight   (rangeRight)
   {
   }
 
   // ---------------- Private Fields
   //
   private:
+  std::string m_rangeLeft;
+  std::string m_rangeRight;
 };
 //
 //  End of AST_ScanRegister class declaration

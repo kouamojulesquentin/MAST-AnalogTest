@@ -17,6 +17,8 @@
 
 #include <sstream>
 #include <stdexcept>
+#include <string>
+#include <experimental/string_view>
 
 namespace mast
 {

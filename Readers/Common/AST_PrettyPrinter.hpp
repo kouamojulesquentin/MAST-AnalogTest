@@ -49,6 +49,7 @@ class AST_PrettyPrinter final : public AST_Visitor
   // ---------------- Private  Methods
   //
   private:
+  friend class HierarchyInserter; //!< Helper class to insert hierarchy open/close sequences
   using pos_type = std::ostringstream::pos_type;
 
   void AlignOnNewLine  (pos_type targetPos);
@@ -56,7 +57,7 @@ class AST_PrettyPrinter final : public AST_Visitor
 
   std::ostringstream& StreamDepth()
   {
-    m_os << std::string(m_depth, ' ');
+    m_os << std::string(2u * m_depth, ' ');
     return m_os;
   }
 

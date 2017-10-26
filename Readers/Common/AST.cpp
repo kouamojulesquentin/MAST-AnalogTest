@@ -16,10 +16,12 @@
 #include "AST_ScanRegister.hpp"
 #include "Utility.hpp"
 
+using std::vector;
+using std::make_unique;
+
 using namespace Parsers;
 using namespace mast;
 
-using std::make_unique;
 
 //! Releases constructed AST nodes
 //!
@@ -47,9 +49,9 @@ AST::AST ()
 //!
 //! @param name Module name
 //!
-AST_Module* AST::Create_Module (string_view name)
+AST_Module* AST::Create_Module (string_view name, vector<AST_Node*>&& children)
 {
-  auto node    = make_unique<AST_Module>(name);
+  auto node    = make_unique<AST_Module>(name, std::move(children));
   auto pointer = node.get();
 
   m_modulesNodes.emplace_back(std::move(node));
@@ -65,9 +67,11 @@ AST_Module* AST::Create_Module (string_view name)
 //!
 //! @param name ScanRegister name
 //!
-AST_ScanRegister* AST::Create_ScanRegister (string_view name)
+AST_ScanRegister* AST::Create_ScanRegister (string_view name,
+                                            string_view rangeLeft,
+                                            string_view rangeRight)
 {
-  auto node    = make_unique<AST_ScanRegister>(name);
+  auto node    = make_unique<AST_ScanRegister>(name, rangeLeft, rangeRight);
   auto pointer = node.get();
 
   m_nodes.emplace_back(std::move(node));

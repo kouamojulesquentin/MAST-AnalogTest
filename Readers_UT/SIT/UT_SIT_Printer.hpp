@@ -54,6 +54,8 @@ class UT_SIT_Printer : public CxxTest::TestSuite
   //
   void test_MakeSIT ();
 
+  void test_Warnings ();
+
   // ---------------- Private  Methods
   //
   void setUp(); //!< Initializes test (called for each test)

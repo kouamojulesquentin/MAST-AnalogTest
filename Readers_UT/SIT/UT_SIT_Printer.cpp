@@ -365,7 +365,7 @@ void UT_SIT_Printer::test_VisitTap ()
                   "  )\n"
                   ")";
   TS_ASSERT_EQUALS (got, expected);
-  TS_WARN ("Table based not defined");
+//+  TS_WARN ("Table based not defined");
 }
 
 
@@ -410,7 +410,7 @@ void UT_SIT_Printer::test_VisitTap_With_SubNodes ()
                   "  )\n"
                   ")";
   TS_ASSERT_EQUALS (got, expected);
-  TS_WARN ("Table based not defined");
+//+  TS_WARN ("Table based not defined");
 }
 
 
@@ -448,9 +448,18 @@ void UT_SIT_Printer::test_MakeSIT ()
                   "  )\n"
                   ")";
   TS_ASSERT_EQUALS (got, expected);
-  TS_WARN ("Table based not defined");
+//+  TS_WARN ("Table based not defined");
 }
 
+
+
+//! @todo [JFC]-[October/26/2017]: Remove "No_test_yet_for_Guard" method when all tests are implemented
+//!
+void UT_SIT_Printer::test_Warnings ()
+{
+  TS_WARN ("Table based path selectors checks incomplete (no SIT support yet for tables)");
+  TS_ASSERT_TRUE (true); // Avoid the "no assertion" warning (there is already a message)
+}
 
 
 //===========================================================================

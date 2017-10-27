@@ -14,6 +14,8 @@
 #include "AST.hpp"
 #include "AST_Module.hpp"
 #include "AST_ScanRegister.hpp"
+#include "AST_ScalarIdentifier.hpp"
+#include "AST_Identifier.hpp"
 #include "Utility.hpp"
 
 using std::vector;
@@ -49,9 +51,11 @@ AST::AST ()
 //!
 //! @param name Module name
 //!
-AST_Module* AST::Create_Module (string_view name, vector<AST_Node*>&& children)
+AST_Module* AST::Create_Module (AST_ScalarIdentifier* identifier, vector<AST_Node*>&& children)
 {
-  auto node    = make_unique<AST_Module>(name, std::move(children));
+  CHECK_PARAMETER_NOT_NULL(identifier, "identifier must not be nullptr");
+
+  auto node    = make_unique<AST_Module>(identifier, std::move(children));
   auto pointer = node.get();
 
   m_modulesNodes.emplace_back(std::move(node));
@@ -62,20 +66,47 @@ AST_Module* AST::Create_Module (string_view name, vector<AST_Node*>&& children)
 //---------------------------------------------------------------------------
 
 
+//! Creates an AST_ScalarIdentifier node
+//!
+//! @param name Identifier
+//!
+AST_ScalarIdentifier* AST::Create_ScalarIdentifier (string_view name)
+{
+  return Create_Node<AST_ScalarIdentifier>(name);
+}
+//
+//  End of: AST::Create_ScalarIdentifier
+//---------------------------------------------------------------------------
+
+
+//! Creates an AST_Identifier node
+//!
+//! @param name         Identifier
+//! @param leftIndex    Left index
+//! @param rightIndex   Right index (can be empty for single bit identifier)
+//!
+//! @return Created AST_Identifier
+//!
+AST_Identifier* AST::Create_Identifier (string_view name,
+                                        string_view leftIndex,
+                                        string_view rightIndex)
+{
+  return Create_Node<AST_Identifier>(name, leftIndex, rightIndex);
+}
+//
+//  End of: AST::Create_ScanRegister
+//---------------------------------------------------------------------------
+
 
 //! Creates an AST_ScanRegister node
 //!
-//! @param name ScanRegister name
+//! @param identifier   ScanRegister identifier
 //!
-AST_ScanRegister* AST::Create_ScanRegister (string_view name,
-                                            string_view rangeLeft,
-                                            string_view rangeRight)
+//! @return Created AST_ScanRegister
+//!
+AST_ScanRegister* AST::Create_ScanRegister (AST_Identifier* identifier)
 {
-  auto node    = make_unique<AST_ScanRegister>(name, rangeLeft, rangeRight);
-  auto pointer = node.get();
-
-  m_nodes.emplace_back(std::move(node));
-  return pointer;
+  return Create_Node<AST_ScanRegister>(identifier);
 }
 //
 //  End of: AST::Create_ScanRegister

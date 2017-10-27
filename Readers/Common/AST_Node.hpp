@@ -16,6 +16,7 @@
   #define AST_NODE_H__E1535643_2BE2_4F0C_92B8_43667E41845B__INCLUDED_
 
 #include "EnumsUtility.hpp"
+#include <memory>
 #include <initializer_list>
 #include <cstdint>
 
@@ -25,16 +26,19 @@ namespace Parsers
   enum class Kind : uint8_t
   {
     Undefined,
-    Alias,
-    TranslationUnit,
-    Namespace_def,
-    Namespace_ref,
-    Enum_def,
-    Enum_item,
-    Enum_ref,
-    Module,
-    Instance,
-    ScanRegister,
+
+    Alias,            //!< For alias definitions
+    Enum_def,         //!< For enums definitions
+    Enum_item,        //!< For enums items
+    Enum_ref,         //!< For enums references
+    Identifier,       //!< For identifiers with a without scope prefix and bit or range identifier
+    Instance,         //!< For modules instances
+    Module,           //!< For modules
+    Namespace_def,    //!< For namespace definitions
+    Namespace_ref,    //!< For namespace references
+    ScalarIdentifier, //!< For identifier with a without scope prefix and no bit nor range identifier
+    ScanRegister,     //!< For scan registers
+    TranslationUnit,  //!< For source files as a all
   };
 
   //! Returns whether one kind is one of specified kind
@@ -54,17 +58,20 @@ namespace Parsers
 
 
 ENUM_TRAITS(Parsers::Kind,
+            ENUM_MEMBER(Parsers::Kind::Undefined)
+
             ENUM_MEMBER(Parsers::Kind::Alias)
             ENUM_MEMBER(Parsers::Kind::Enum_def)
             ENUM_MEMBER(Parsers::Kind::Enum_item)
             ENUM_MEMBER(Parsers::Kind::Enum_ref)
+            ENUM_MEMBER(Parsers::Kind::Identifier)
             ENUM_MEMBER(Parsers::Kind::Instance)
             ENUM_MEMBER(Parsers::Kind::Module)
             ENUM_MEMBER(Parsers::Kind::Namespace_def)
             ENUM_MEMBER(Parsers::Kind::Namespace_ref)
+            ENUM_MEMBER(Parsers::Kind::ScalarIdentifier)
             ENUM_MEMBER(Parsers::Kind::ScanRegister)
             ENUM_MEMBER(Parsers::Kind::TranslationUnit)
-            ENUM_MEMBER(Parsers::Kind::Undefined)
            );
 
 namespace Parsers
@@ -75,16 +82,13 @@ class AST_Visitor;
 //!
 class AST_Node
 {
-  public:
-
-
   // ---------------- Public Methods
   //
   public:
   virtual ~AST_Node() = default;
   AST_Node() = delete;
 
-  virtual void Accept (AST_Visitor& visitor) = 0; //!< Visited part of the Visitor pattern
+  virtual void Accept (AST_Visitor& visitor) {  }; //!< Visited part of the Visitor pattern (by default, do not participate in tree traversal)
 
   std::experimental::string_view KindName() const { return NameString(m_kind); }  //!< Returns human readable kind
 

@@ -33,11 +33,11 @@ namespace ICL
 }
 namespace Parsers
 {
-  class  AST;
-  class  AST_Node;
-  class  AST_Module;
-  struct Parser_PublicData;
-  struct Parser_PrivateData;
+  class AST;
+  class AST_Node;
+  class AST_Module;
+  class AST_ScalarIdentifier;
+  class AST_Identifier;
 }
 
 using std::string;
@@ -57,21 +57,18 @@ typedef void* yyscan_t;
 
 }
 
-%parse-param { ICL_Scanner&                 scanner      }
-%parse-param { Parsers::Parser_PublicData&  driverPublic }
-%parse-param { Parsers::Parser_PrivateData& myData}
-%parse-param { Parsers::AST&                ast}
+%parse-param { ICL_Scanner&  scanner }
+%parse-param { Parsers::AST& ast}
 
 %code
 {
 // ---------------- Includes for all driver functions
 //
-#include "Parser_PublicData.hpp"
-#include "Parser_PrivateData.hpp"
 #include "ParserException.hpp"
 #include "AST.hpp"
 #include "AST_ScanRegister.hpp"
-#include "ICL_Reader.hpp"
+#include "AST_ScalarIdentifier.hpp"
+#include "AST_Identifier.hpp"
 #include "ICL_Scanner.hpp"
 #include "Utility.hpp"
 #include "g3log/g3log.hpp"
@@ -123,7 +120,7 @@ namespace
 
 %type <std::string> SCALAR_ID
 %type <std::string> instance_name
-%type <std::string> module_name
+%type <Parsers::AST_ScalarIdentifier*> module_name
 %type <std::string> namespace_name
 %type <std::string> scanInterfaceChain_name
 %type <std::string> scanInterface_name
@@ -511,7 +508,7 @@ reg_port_signal_id :
 
 instance_name  : SCALAR_ID { $$ = $[SCALAR_ID]; };
 namespace_name : SCALAR_ID { $$ = $[SCALAR_ID]; };
-module_name    : SCALAR_ID { $$ = $[SCALAR_ID]; };
+module_name    : SCALAR_ID { $$ = ast.Create_ScalarIdentifier($[SCALAR_ID]); };
 
 
 signal : number | reg_port_signal_id | pin_id  ;
@@ -1137,7 +1134,9 @@ scanRegister_def : SCANREGISTER scanRegister_name scanRegister_tail
   auto& left  = std::get<1>($[scanRegister_name]);
   auto& right = std::get<2>($[scanRegister_name]);
 
-  auto node = ast.Create_ScanRegister(name, left, right);
+  auto identifier = ast.Create_Identifier(name, left, right);
+  auto node       = ast.Create_ScanRegister(identifier);
+
   $$ = node;
 }
 ;

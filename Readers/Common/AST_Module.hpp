@@ -15,8 +15,10 @@
   #define AST_MODULE_H__A9A400A_9537_4176_349E_822BAF7E4956__INCLUDED_
 
 #include "AST_ParentNode.hpp"
+#include "AST_ScalarIdentifier.hpp"
 #include <memory>
 #include <experimental/string_view>
+#include <string>
 
 namespace Parsers
 {
@@ -34,20 +36,26 @@ class AST_Module final : public AST_ParentNode
   //!
   void Accept (AST_Visitor& visitor) override;
 
+  //! Module name
+  //!
+  std::string Name() const override { return m_identifier->Name(); }
+
   // ---------------- Private Methods
   //
   private:
-  friend class AST;                                                   // This is AST that manages construction/destruction of AST nodes
-  MAKE_UNIQUE_AS_FRIEND(AST_Module)(std::experimental::string_view&, std::vector<AST_Node*>&&); // AST currently uses make_unit<T>() to create nodes
+  friend class AST;                                                                             // This is AST that manages construction/destruction of AST nodes
+  MAKE_UNIQUE_AS_FRIEND(AST_Module)(Parsers::AST_ScalarIdentifier*&, std::vector<AST_Node*>&&); // AST currently uses make_unit<T>() to create nodes
 
-  AST_Module(std::experimental::string_view name, std::vector<AST_Node*>&& children)
-    : AST_ParentNode (Kind::Module, name, std::move(children))
+  AST_Module(AST_ScalarIdentifier* identifier, std::vector<AST_Node*>&& children)
+    : AST_ParentNode (Kind::Module, std::move(children))
+    , m_identifier   (identifier)
   {
   }
 
   // ---------------- Private Fields
   //
   private:
+  const AST_ScalarIdentifier* m_identifier = nullptr; //!< Module name
 };
 //
 //  End of AST_Module class declaration

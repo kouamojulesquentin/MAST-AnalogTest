@@ -17,6 +17,7 @@
 
 #include <sstream>
 
+using std::string;
 using std::experimental::string_view;
 using namespace Parsers;
 
@@ -164,21 +165,7 @@ void AST_PrettyPrinter::Visit_Module (AST_Module* module)
 //! sub-nodes
 void AST_PrettyPrinter::Visit_ScanRegister (AST_ScanRegister* scanRegister)
 {
-  std::ostringstream range;
-  const auto& left  = scanRegister->RangeLeft();
-  const auto& right = scanRegister->RangeRight();
-
-  if (!left.empty())
-  {
-    range << "[" << left;
-    if (!right.empty())
-    {
-      range << ":" << right;
-    }
-    range << "]";
-  }
-
-  StreamNodeHeader(scanRegister, range.str());
+  StreamNodeHeader(scanRegister, "");
 
   HierarchyInserter hierarchyInserter(*this);
 

@@ -28,9 +28,6 @@ class UT_Fragments : public CxxTest::TestSuite
 
   // ================ Test Methods ================
 
-  // ---------------- ParseExcerpt
-  //
-  void test_ParseExcerpt_ScanRegister ();
 
   // ---------------- Fragments
   //

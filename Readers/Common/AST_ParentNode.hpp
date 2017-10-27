@@ -20,8 +20,9 @@
 
 namespace Parsers
 {
+class AST_ScalarIdentifier;
+
 //! Represents a named AST node that can have children
-//!
 //!
 //!
 class AST_ParentNode : public AST_NamedNode
@@ -41,19 +42,16 @@ class AST_ParentNode : public AST_NamedNode
   // ---------------- Protected Methods
   //
   protected:
-  AST_ParentNode(Kind kind, std::experimental::string_view name)
-    : AST_NamedNode(kind, name)
+  AST_ParentNode(Kind kind)
+    : AST_NamedNode(kind)
   {
   }
 
-  AST_ParentNode(Kind kind, std::experimental::string_view name, std::vector<AST_Node*>&& children)
-    : AST_NamedNode         (kind, name)
+  AST_ParentNode(Kind kind, std::vector<AST_Node*>&& children)
+    : AST_NamedNode         (kind)
     , m_unprocessedChildren (std::move(children))
   {
   }
-
-
-
 
   // ---------------- Protected Fields
   //

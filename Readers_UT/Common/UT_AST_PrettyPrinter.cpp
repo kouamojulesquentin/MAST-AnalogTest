@@ -39,7 +39,8 @@ void UT_AST_PrettyPrinter::test_Visit_Module_empty ()
   // ---------------- Setup
   //
   AST  ast;
-  auto node = ast.Create_Module("Dibona", vector<AST_Node*>());
+  auto identifier = ast.Create_ScalarIdentifier("Dibona");
+  auto node       = ast.Create_Module(identifier, vector<AST_Node*>());
 
   AST_PrettyPrinter sut;
 
@@ -65,7 +66,8 @@ void UT_AST_PrettyPrinter::test_Visit_ScanRegister_empty ()
   // ---------------- Setup
   //
   AST  ast;
-  auto node = ast.Create_ScanRegister("Ecrin");
+  auto identifier = ast.Create_Identifier("Ecrin", "", "");
+  auto node       = ast.Create_ScanRegister(identifier);
 
   AST_PrettyPrinter sut;
 

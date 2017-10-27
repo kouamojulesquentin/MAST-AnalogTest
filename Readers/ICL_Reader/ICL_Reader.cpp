@@ -47,23 +47,49 @@ ICL_Reader::ICL_Reader(std::shared_ptr<mast::SystemModel> sm)
 {
 }
 
+//! Parses an excerpt to construct a SystemModel
+//!
+//! @param stream  Stream to get excerpt to parse from
+//!
 void ICL_Reader::Parse_Impl(std::istream& stream)
 {
   CHECK_TRUE  (stream.good(), "Invalid ICL stream");
   CHECK_FALSE (stream.eof(),  "Cannot parse ICL from empty stream");
 
-  m_ast = std::make_unique<Parsers::AST>();
+  UpdateAstFromIcl(stream);
 
-  Parsers::Parser_PrivateData privateData(PublicData().systemModel);
-  ICL_Scanner                 scanner(stream);
-  ICL_Parser                  parser(scanner, PublicData(), privateData, *m_ast);
+  LOG(INFO) << "ICL has been parsed successfully";
+}
+//
+//  End of Parse_Impl
+//---------------------------------------------------------------------------
+
+
+
+//! Parses an ICL fragment to update current AST
+//!
+//! @note Supports multiple ICL parsing before converting to SystemModel
+//!
+//! @param stream  Stream to get excerpt to parse from
+//!
+void ICL_Reader::UpdateAstFromIcl (std::istream& stream)
+{
+  if (m_ast == nullptr)
+  {
+    m_ast = std::make_unique<Parsers::AST>();
+  }
+
+  ICL_Scanner scanner(stream);
+  ICL_Parser  parser(scanner, *m_ast);
 
   auto succeeded = parser.parse() == 0;
 
   CHECK_TRUE(succeeded, "Failed to parse ICL stream");
-
-  LOG(INFO) << "ICL has been parsed successfully";
 }
+//
+//  End of: ICL_Reader::UpdateAstFromIcl
+//---------------------------------------------------------------------------
+
 
 //===========================================================================
 // End of ICL_Reader.cpp

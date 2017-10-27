@@ -15,6 +15,8 @@
   #define AST_SCANREGISTER_H__A8AADEC0_468C_4F9B_7B8F_A81761036A43__INCLUDED_
 
 #include "AST_ParentNode.hpp"
+#include "AST_Identifier.hpp"
+
 #include <memory>
 using std::experimental::string_view;
 
@@ -34,34 +36,32 @@ class AST_ScanRegister final : public AST_ParentNode
   //!
   void Accept (AST_Visitor& visitor) override;
 
+  //! Module name
+  //!
+  std::string Name() const override { return m_identifier->AsText(); }
 
-  const std::string& RangeLeft()  const { return m_rangeLeft;  }
-  const std::string& RangeRight() const { return m_rangeRight; }
+
+  std::experimental::string_view RangeLeft()  const { return m_identifier->LeftIndex();  }
+  std::experimental::string_view RangeRight() const { return m_identifier->RightIndex(); }
 
 
   // ---------------- Private Methods
   //
   private:
 
-  friend class AST;                                                         // This is AST that manages construction/destruction of AST nodes
-  MAKE_UNIQUE_AS_FRIEND(AST_ScanRegister)(std::experimental::string_view&,
-                                          std::experimental::string_view&,
-                                          std::experimental::string_view&); // AST currently uses make_unit<T>() to create nodes
+  friend class AST;                                                   // This is AST that manages construction/destruction of AST nodes
+  MAKE_UNIQUE_AS_FRIEND(AST_ScanRegister)(Parsers::AST_Identifier*&); // AST currently uses make_unit<T>() to create nodes
 
-  AST_ScanRegister(std::experimental::string_view name,
-                   std::experimental::string_view rangeLeft  = "",
-                   std::experimental::string_view rangeRight = "")
-    : AST_ParentNode (Kind::ScanRegister, name)
-    , m_rangeLeft    (rangeLeft)
-    , m_rangeRight   (rangeRight)
+  AST_ScanRegister(Parsers::AST_Identifier* identifier)
+    : AST_ParentNode (Kind::ScanRegister)
+    , m_identifier   (identifier)
   {
   }
 
   // ---------------- Private Fields
   //
   private:
-  std::string m_rangeLeft;
-  std::string m_rangeRight;
+  const AST_Identifier* m_identifier = nullptr; //!< Module name
 };
 //
 //  End of AST_ScanRegister class declaration

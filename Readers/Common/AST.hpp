@@ -24,6 +24,8 @@ namespace Parsers
 class AST_Node;
 class AST_Module;
 class AST_ScanRegister;
+class AST_ScalarIdentifier;
+class AST_Identifier;
 
 //! Abstract Syntax Tree built when parsing some test network description
 //!
@@ -35,22 +37,27 @@ class AST final
   ~AST();
   AST();
 
-  AST_Module*       Create_Module       (std::experimental::string_view name, std::vector<AST_Node*>&& children);
-  AST_ScanRegister* Create_ScanRegister (std::experimental::string_view name,
-                                         std::experimental::string_view rangeLeft  = "",
-                                         std::experimental::string_view rangeRight = "");
+  AST_Module*           Create_Module           (AST_ScalarIdentifier* identifier, std::vector<AST_Node*>&& children);
+  AST_ScanRegister*     Create_ScanRegister     (AST_Identifier*       identifier);
+  AST_ScalarIdentifier* Create_ScalarIdentifier (std::experimental::string_view name);
+  AST_Identifier*       Create_Identifier       (std::experimental::string_view name,
+                                                 std::experimental::string_view leftIndex,
+                                                 std::experimental::string_view rightIndex = "");
 
   //! Returns "top" module node
   //!
   AST_Module* TopModule();
 
-  // ---------------- Protected Methods
-  //
-  protected:
-
   // ---------------- Private Methods
   //
-  private:
+  template<typename T, typename... TArgs> T* Create_Node (TArgs ... args)
+  {
+    auto node    = std::make_unique<T>(args ...);
+    auto pointer = node.get();
+
+    m_nodes.emplace_back(std::move(node));
+    return pointer;
+  }
 
   // ---------------- Private Fields
   //

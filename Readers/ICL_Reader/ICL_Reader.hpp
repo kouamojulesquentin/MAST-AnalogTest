@@ -37,7 +37,8 @@ class ICL_Reader : public Parsers::Reader
   ICL_Reader(std::shared_ptr<mast::SystemModel> sm);
 
   protected:
-  virtual void Parse_Impl(std::istream& stream) override;
+  virtual void Parse_Impl       (std::istream& stream) override;
+  virtual void UpdateAstFromIcl (std::istream& stream);
 
   Parsers::AST* AST() const { return m_ast.get(); } //!< Returns current AST (for debug purpose)
 

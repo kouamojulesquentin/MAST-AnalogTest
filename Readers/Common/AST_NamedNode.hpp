@@ -15,11 +15,10 @@
   #define AST_NAMEDNODE_H__A9E167DF_B162_4845_A187_CEAE38557F__INCLUDED_
 
 #include "AST_Node.hpp"
+#include "AST_ScalarIdentifier.hpp"
+
 #include <string>
 #include <experimental/string_view>
-
-using std::string;
-using std::experimental::string_view;
 
 namespace Parsers
 {
@@ -35,22 +34,16 @@ class AST_NamedNode : public AST_Node
 
   //! Name of parsed entity
   //!
-  std::experimental::string_view Name() const { return m_name; }
+  virtual std::string Name() const = 0;
 
   // ---------------- Protected Methods
   //
   protected:
 
-  AST_NamedNode(Kind kind, std::experimental::string_view name)
+  AST_NamedNode(Kind kind)
     : AST_Node (kind)
-    , m_name   (name)
   {
   }
-
-  // ---------------- Private Fields
-  //
-  private:
-  std::string m_name; //!< Name of parsed entity
 };
 //
 //  End of AST_NamedNode class declaration

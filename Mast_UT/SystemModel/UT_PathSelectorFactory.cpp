@@ -19,6 +19,7 @@
 #include "DefaultNHotPathSelector.hpp"
 #include "DefaultOneHotPathSelector.hpp"
 #include "Register.hpp"
+#include "EnumsUtility.hpp"
 
 #include <typeinfo>
 #include <tuple>

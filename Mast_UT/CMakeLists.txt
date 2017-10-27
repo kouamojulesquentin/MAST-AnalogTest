@@ -131,6 +131,8 @@ set(Mast_UT_UTILITY      Utility/UT_BinaryVector.cpp
                          Utility/UT_SVFVector.hpp
                          Utility/UT_Utility.cpp
                          Utility/UT_Utility.hpp
+                         Utility/UT_EnumsUtility.cpp
+                         Utility/UT_EnumsUtility.hpp
                          )
 
 if (WIN32)

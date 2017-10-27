@@ -14,7 +14,6 @@
 #include "MastEnvironment_impl.hpp"
 #include "MastConfiguration.hpp"
 #include "CustomFileSink.h"
-#include "Utility.hpp"
 #include "FileSystem.hpp"
 #include "Plugins.hpp"
 #include "MastConfig.hpp"
@@ -28,6 +27,8 @@
 #include "SIT_Printer.hpp"
 #include "Startup.hpp"
 #include "ModelBuildDriver.hpp"
+#include "Utility.hpp"
+#include "EnumsUtility.hpp"
 
 #include "tclap/DiscardOutput.h"
 

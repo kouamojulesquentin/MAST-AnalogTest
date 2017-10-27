@@ -20,6 +20,7 @@
 #include "SystemModel.hpp"
 #include "Startup.hpp"
 #include "Utility.hpp"
+#include "EnumsUtility.hpp"
 #include "Session.hpp"
 #include "SIT_Reader.hpp"
 #include "GmlPrinter.hpp"
@@ -182,7 +183,6 @@ vector<AppFunctionNameAndNode> CPP_API_IMPL::LoadSystemModel (string_view filePa
 //!
 void CPP_API_IMPL::RunMast (const vector<AppFunctionAndNode>& functionsAndNodes, RunMastOptions options)
 {
-
   if (IsSet(options, RunMastOptions::CheckModel))
   {
     CheckSystemModel();

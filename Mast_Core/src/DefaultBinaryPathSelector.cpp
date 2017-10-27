@@ -14,6 +14,7 @@
 #include "DefaultBinaryPathSelector.hpp"
 #include "Register.hpp"
 #include "Utility.hpp"
+#include "EnumsUtility.hpp"
 
 #include <stdexcept>
 #include <limits>

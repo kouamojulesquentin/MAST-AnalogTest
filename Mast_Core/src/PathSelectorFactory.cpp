@@ -15,7 +15,7 @@
 #include "DefaultBinaryPathSelector.hpp"
 #include "DefaultNHotPathSelector.hpp"
 #include "DefaultOneHotPathSelector.hpp"
-
+#include "EnumsUtility.hpp"
 #include "Utility.hpp"
 
 using std::unique_ptr;

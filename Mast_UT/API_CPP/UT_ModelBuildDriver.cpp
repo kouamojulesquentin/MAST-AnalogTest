@@ -19,6 +19,7 @@
 #include "SystemModelFactory.hpp"
 #include "AppFunctionNameAndNode.hpp"
 #include "PrettyPrinter.hpp"
+#include "EnumsUtility.hpp"
 #include "Utility.hpp"
 #include "SIT_Reader.hpp"
 #include "ParserException.hpp"

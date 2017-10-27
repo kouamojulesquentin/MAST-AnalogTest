@@ -16,7 +16,8 @@
 #include "DefaultBinaryPathSelector.hpp"
 #include "DefaultOneHotPathSelector.hpp"
 #include "DefaultNHotPathSelector.hpp"
-//+#include "Utility.hpp"
+#include "EnumsUtility.hpp"
+#include "Utility.hpp"
 
 using std::string;
 

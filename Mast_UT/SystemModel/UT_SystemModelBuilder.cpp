@@ -25,6 +25,8 @@
 #include "GmlPrinter.hpp"
 #include "PrettyPrinter.hpp"
 #include "Utility.hpp"
+#include "EnumsUtility.hpp"
+
 
 #include "BinaryVector_Traits.hpp"
 #include "SystemModelCheckResult_Traits.hpp"

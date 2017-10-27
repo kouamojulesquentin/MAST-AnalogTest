@@ -15,6 +15,7 @@
 #include "MastConfiguration.hpp"
 #include "MastConfig.hpp"
 #include "Utility.hpp"
+#include "EnumsUtility.hpp"
 #include "TestUtilities.hpp"
 
 #include <tclap/ArgException.h>

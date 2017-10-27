@@ -45,6 +45,7 @@
 #include "AccessInterfaceProtocol.hpp"
 #include "PathSelectorFactory.hpp"
 #include "Utility.hpp"
+#include "EnumsUtility.hpp"
 #include "UnresolvedPathSelector.hpp"
 #include "ParserException.hpp"
 #include "g3log/g3log.hpp"

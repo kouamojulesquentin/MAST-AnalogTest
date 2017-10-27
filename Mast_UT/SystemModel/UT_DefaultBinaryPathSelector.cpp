@@ -16,6 +16,7 @@
 #include "DefaultBinaryPathSelector.hpp"
 #include "BinaryVector_Traits.hpp"
 #include "Register.hpp"
+#include "EnumsUtility.hpp"
 
 #include <utility>
 #include <memory>

@@ -16,6 +16,7 @@
 #include "PathSelector.hpp"
 #include "AccessInterfaceProtocol.hpp"
 #include "Utility.hpp"
+#include "EnumsUtility.hpp"
 
 using std::string;
 using std::shared_ptr;

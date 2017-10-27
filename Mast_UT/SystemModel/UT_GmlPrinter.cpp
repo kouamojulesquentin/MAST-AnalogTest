@@ -18,6 +18,7 @@
 #include "DefaultBinaryPathSelector.hpp"
 #include "SystemModelBuilder.hpp"
 #include "TestModelBuilder.hpp"
+#include "EnumsUtility.hpp"
 
 #include <cxxtest/ValueTraits.h>
 using std::string;

@@ -15,6 +15,7 @@
 #include "MastConfig.hpp"
 #include "g3log/g3log.hpp"
 #include "Utility.hpp"
+#include "EnumsUtility.hpp"
 #include "YamlFile.hpp"
 
 #include <tclap/CmdLine.h>

@@ -12,6 +12,7 @@
 #include "DefaultBinaryPathSelector.hpp"
 #include "DefaultOneHotPathSelector.hpp"
 #include "DefaultNHotPathSelector.hpp"
+#include "EnumsUtility.hpp"
 #include "Utility.hpp"
 
 #include "g3log/g3log.hpp"
@@ -31,7 +32,7 @@ SIT::SIT_Reader::SIT_Reader(std::shared_ptr<mast::SystemModel> sm)
   , builder (make_shared<mast::SystemModelBuilder>(*systemModel))
 {
   #define MAKE_LAMBDA(selectorClass, forcedProperty)                                                                          \
-  [model = systemModel](const string& selectorRegName, uint32_t pathsCount, SelectorProperty selectorProperty)                    \
+  [model = systemModel](const string& selectorRegName, uint32_t pathsCount, SelectorProperty selectorProperty)                \
   {                                                                                                                           \
     auto registerInitialValue = selectorClass::AssociatedRegisterInitialValue(pathsCount, selectorProperty | forcedProperty); \
     return model->CreateRegister (selectorRegName, registerInitialValue, true);                                               \

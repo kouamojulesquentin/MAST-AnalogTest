@@ -13,9 +13,10 @@
 
 #include "GmlPrinter.hpp"
 #include "SystemModelNodes.hpp"
-#include "Utility.hpp"
 #include "PathSelector.hpp"
 #include "AccessInterfaceProtocol.hpp"
+#include "Utility.hpp"
+#include "EnumsUtility.hpp"
 
 #include <algorithm>
 using std::shared_ptr;

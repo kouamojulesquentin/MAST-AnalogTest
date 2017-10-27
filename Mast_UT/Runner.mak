@@ -16,6 +16,7 @@ UT_RootPath  = $(RootPath)
 
 Suites = \
       $(UT_RootPath)/Utility/UT_Utility.hpp                            \
+      $(UT_RootPath)/Utility/UT_EnumsUtility.hpp                       \
       $(UT_RootPath)/Utility/UT_MTQueue.hpp                            \
       $(UT_RootPath)/Utility/UT_FileSystem.hpp                         \
       $(UT_RootPath)/Utility/UT_IndexedRange.hpp                       \

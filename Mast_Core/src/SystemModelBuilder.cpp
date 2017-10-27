@@ -20,6 +20,8 @@
 #include "AccessInterfaceProtocol.hpp"
 #include "BrocadeSelector.hpp"
 #include "Utility.hpp"
+#include "EnumsUtility.hpp"
+
 
 using std::string;
 using std::experimental::string_view;
@@ -466,19 +468,19 @@ shared_ptr<Chain> SystemModelBuilder::Create_MIB (string_view              name,
 //! @param sel_properties    Properties of the SIB: only InvertedBits is taken into account
 //! @param muxRegPlacement       Whether mux is placed before or after the register that will drive it
 //!
-shared_ptr<Chain> SystemModelBuilder::Create_SIB (string_view              name,
-                                           SelectorProperty sel_properties,
-                                                  MuxRegPlacement          muxRegPlacement
+shared_ptr<Chain> SystemModelBuilder::Create_SIB (string_view      name,
+                                                  SelectorProperty sel_properties,
+                                                  MuxRegPlacement  muxRegPlacement
                                                  )
-  {
-  auto SIB_properties= sel_properties | SelectorProperty::CanSelectNone;
+{
+  auto SIB_properties  = sel_properties | SelectorProperty::CanSelectNone;
   auto selectorRegName = string(name)+ MIB_CTRL_EXT;
- auto res=      Create_PathSelector(SelectorKind::Binary, selectorRegName, 1,SIB_properties);
-  auto selectorReg = res.first;
-  auto selector    = res.second;
+  auto res             = Create_PathSelector(SelectorKind::Binary, selectorRegName, 1,SIB_properties);
+  auto selectorReg     = res.first;
+  auto selector        = res.second;
 
-   return Create_MIB(name, selector, selectorReg,muxRegPlacement );
-  }
+  return Create_MIB(name, selector, selectorReg,muxRegPlacement );
+}
 //
 //  End of: SystemModelBuilder::Create_SIB
 //---------------------------------------------------------------------------

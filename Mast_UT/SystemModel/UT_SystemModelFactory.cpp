@@ -16,6 +16,7 @@
 #include "TestModelBuilder.hpp"
 #include "PrettyPrinter.hpp"
 #include "Utility.hpp"
+#include "EnumsUtility.hpp"
 
 #include <typeinfo>
 #include <tuple>

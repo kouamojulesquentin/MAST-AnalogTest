@@ -51,7 +51,7 @@ class AST_ScanRegister final : public AST_ParentNode
   AST_ScanRegister(std::experimental::string_view name,
                    std::experimental::string_view rangeLeft  = "",
                    std::experimental::string_view rangeRight = "")
-    : AST_ParentNode (name)
+    : AST_ParentNode (Kind::ScanRegister, name)
     , m_rangeLeft    (rangeLeft)
     , m_rangeRight   (rangeRight)
   {

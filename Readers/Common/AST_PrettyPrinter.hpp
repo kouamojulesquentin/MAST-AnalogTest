@@ -61,8 +61,8 @@ class AST_PrettyPrinter final : public AST_Visitor
     return m_os;
   }
 
-  void StreamNodeHeader (std::experimental::string_view kind, const AST_NamedNode*  node,       std::experimental::string_view notes);
-  void StreamParentNode (std::experimental::string_view kind, const AST_ParentNode* parentNode, std::experimental::string_view notes);
+  void StreamNodeHeader (const AST_NamedNode*  node,       std::experimental::string_view notes);
+  void StreamParentNode (const AST_ParentNode* parentNode, std::experimental::string_view notes);
 
   // ---------------- Private  Fields
   //

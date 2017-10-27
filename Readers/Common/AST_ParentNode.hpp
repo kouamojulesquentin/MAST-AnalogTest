@@ -41,13 +41,13 @@ class AST_ParentNode : public AST_NamedNode
   // ---------------- Protected Methods
   //
   protected:
-  AST_ParentNode(std::experimental::string_view name)
-    : AST_NamedNode(name)
+  AST_ParentNode(Kind kind, std::experimental::string_view name)
+    : AST_NamedNode(kind, name)
   {
   }
 
-  AST_ParentNode(std::experimental::string_view name, std::vector<AST_Node*>&& children)
-    : AST_NamedNode         (name)
+  AST_ParentNode(Kind kind, std::experimental::string_view name, std::vector<AST_Node*>&& children)
+    : AST_NamedNode         (kind, name)
     , m_unprocessedChildren (std::move(children))
   {
   }

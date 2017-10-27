@@ -41,7 +41,7 @@ class AST_Module final : public AST_ParentNode
   MAKE_UNIQUE_AS_FRIEND(AST_Module)(std::experimental::string_view&, std::vector<AST_Node*>&&); // AST currently uses make_unit<T>() to create nodes
 
   AST_Module(std::experimental::string_view name, std::vector<AST_Node*>&& children)
-    : AST_ParentNode (name, std::move(children))
+    : AST_ParentNode (Kind::Module, name, std::move(children))
   {
   }
 

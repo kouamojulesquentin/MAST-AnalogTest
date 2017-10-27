@@ -101,16 +101,15 @@ string AST_PrettyPrinter::PrettyPrint (AST_Node* topNode)
 
 //! Streams node common information: identifier, name and type
 //!
-//! @param kind   Text representation of the node type
 //! @param node   The node for which header is to be streamed
 //! @param notes  Optional note to add after node name
 //!
-void AST_PrettyPrinter::StreamNodeHeader(string_view kind, const AST_NamedNode* node, string_view notes)
+void AST_PrettyPrinter::StreamNodeHeader(const AST_NamedNode* node, string_view notes)
 {
   m_startPos = m_os.tellp();
   StreamDepth();
 
-  m_os << kind << " " << node->Name();
+  m_os << node->KindName() << " " << node->Name();
 
   if (!notes.empty())
   {
@@ -121,13 +120,12 @@ void AST_PrettyPrinter::StreamNodeHeader(string_view kind, const AST_NamedNode* 
 //! Appends content of parent node in text representation and visits
 //! sub-nodes
 //!
-//! @param kind   Text representation of the node type
 //! @param node   The node for which header is to be streamed
 //! @param notes  Optional note to add after node name
 //!
-void AST_PrettyPrinter::StreamParentNode (std::experimental::string_view kind, const AST_ParentNode* parentNode, string_view notes)
+void AST_PrettyPrinter::StreamParentNode (const AST_ParentNode* parentNode, string_view notes)
 {
-  StreamNodeHeader(kind, parentNode, notes);
+  StreamNodeHeader(parentNode, notes);
   m_os << "\n";
   StreamDepth() << "{\n";
 
@@ -143,7 +141,7 @@ void AST_PrettyPrinter::StreamParentNode (std::experimental::string_view kind, c
 //! sub-nodes
 void AST_PrettyPrinter::Visit_Module (AST_Module* module)
 {
-  StreamNodeHeader("Module", module, "");
+  StreamNodeHeader(module, "");
 
   HierarchyInserter hierarchyInserter(*this);
 
@@ -180,7 +178,7 @@ void AST_PrettyPrinter::Visit_ScanRegister (AST_ScanRegister* scanRegister)
     range << "]";
   }
 
-  StreamNodeHeader("ScanRegister", scanRegister, range.str());
+  StreamNodeHeader(scanRegister, range.str());
 
   HierarchyInserter hierarchyInserter(*this);
 

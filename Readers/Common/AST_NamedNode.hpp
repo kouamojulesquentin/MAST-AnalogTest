@@ -41,8 +41,9 @@ class AST_NamedNode : public AST_Node
   //
   protected:
 
-  AST_NamedNode(std::experimental::string_view name)
-    : m_name (name)
+  AST_NamedNode(Kind kind, std::experimental::string_view name)
+    : AST_Node (kind)
+    , m_name   (name)
   {
   }
 

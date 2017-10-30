@@ -1,17 +1,17 @@
 //===========================================================================
-//                           AST_Identifier.cpp
+//                           AST_VectorIdentifier.cpp
 //===========================================================================
 // Copyright (C) 2017 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file AST_Identifier.cpp
+//! @file AST_VectorIdentifier.cpp
 //!
-//! Implements class AST_Identifier
+//! Implements class AST_VectorIdentifier
 //!
 //===========================================================================
 
-#include "AST_Identifier.hpp"
+#include "AST_VectorIdentifier.hpp"
 #include <sstream>
 
 using std::string;
@@ -20,7 +20,7 @@ using namespace Parsers;
 
 //! Text representation of identifier with its index(es)
 //!
-string AST_Identifier::AsText () const
+string AST_VectorIdentifier::AsText () const
 {
   std::ostringstream os;
 
@@ -35,13 +35,13 @@ string AST_Identifier::AsText () const
 }
 
 //
-//  End of: AST_Identifier::AsText
+//  End of: AST_VectorIdentifier::AsText
 //---------------------------------------------------------------------------
 
 
 //! Text representation of only index(es)
 //!
-string AST_Identifier::RangeAsText () const
+string AST_VectorIdentifier::RangeAsText () const
 {
   std::ostringstream os;
 
@@ -56,10 +56,10 @@ string AST_Identifier::RangeAsText () const
   return os.str();
 }
 //
-//  End of: AST_Identifier::RangeAsText
+//  End of: AST_VectorIdentifier::RangeAsText
 //---------------------------------------------------------------------------
 
 
 //===========================================================================
-// End of AST_Identifier.cpp
+// End of AST_VectorIdentifier.cpp
 //===========================================================================

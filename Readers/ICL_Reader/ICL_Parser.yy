@@ -36,8 +36,9 @@ namespace Parsers
   class AST;
   class AST_Node;
   class AST_Module;
-  class AST_ScalarIdentifier;
   class AST_Identifier;
+  class AST_ScalarIdentifier;
+  class AST_VectorIdentifier;
 }
 
 using std::string;
@@ -68,7 +69,7 @@ typedef void* yyscan_t;
 #include "AST.hpp"
 #include "AST_ScanRegister.hpp"
 #include "AST_ScalarIdentifier.hpp"
-#include "AST_Identifier.hpp"
+#include "AST_VectorIdentifier.hpp"
 #include "ICL_Scanner.hpp"
 #include "Utility.hpp"
 #include "g3log/g3log.hpp"
@@ -128,18 +129,19 @@ namespace
 %type <std::string> parameter_ref
 %type <std::string> index
 
-%type <std::tuple<string, string>>         range                // Left & Right indexes
-%type <std::tuple<string, string>>         index_or_range       // Left & Right indexes (Right can be empty)
-%type <std::tuple<string, string, string>> alias_name           // Name, Left & Right indexes (Right can be empty)
-%type <std::tuple<string, string, string>> vector_id            // Name, Left & Right indexes (Right can be empty)
-%type <std::tuple<string, string, string>> oneHotScanGroup_name // Name, Left & Right indexes (Left & Right can be empty)
-%type <std::tuple<string, string, string>> port_name            // Name, Left & Right indexes (Left & Right can be empty)
-%type <std::tuple<string, string, string>> register_name        // Name, Left & Right indexes (Left & Right can be empty)
-%type <std::tuple<string, string, string>> scanMux_name         // Name, Left & Right indexes (Left & Right can be empty)
-%type <std::tuple<string, string, string>> scanInPort_name      // Name, Left & Right indexes (Left & Right can be empty)
-%type <std::tuple<string, string, string>> scanOutPort_name     // Name, Left & Right indexes (Left & Right can be empty)
-%type <std::tuple<string, string, string>> scanRegister_name    // Name, Left & Right indexes (Left & Right can be empty)
-%type <std::tuple<string, string, string>> reg_port_signal_id   // Name, Left & Right indexes (Left & Right can be empty)
+%type <std::tuple<string, string>> range          // Left & Right indexes
+%type <std::tuple<string, string>> index_or_range // Left & Right indexes (Right can be empty)
+
+%type <Parsers::AST_Identifier*> alias_name           // Name, Left & Right indexes (Right can be empty)
+%type <Parsers::AST_Identifier*> oneHotScanGroup_name // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_Identifier*> scanMux_name         // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_Identifier*> scanInPort_name      // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_Identifier*> scanOutPort_name     // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_Identifier*> reg_port_signal_id   // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_Identifier*> port_name            // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> vector_id            // Name, Left & Right indexes (Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> register_name        // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> scanRegister_name    // Name, Left & Right indexes (Left & Right can be empty)
 
 
 %type <std::string> POS_INT
@@ -353,10 +355,12 @@ number : UNSIZED_DEC_NUM | UNSIZED_BIN_NUM | UNSIZED_HEX_NUM
 vector_id : SCALAR_ID LEFT_BRACKET index_or_range RIGHT_BRACKET
 {
   // vector_id : SCALAR_ID LEFT_BRACKET index_or_range RIGHT_BRACKET
-  auto& baseName = $[SCALAR_ID];
-  auto& range    = $[index_or_range];
-  auto  combined = make_tuple(std::move(baseName), std::move(std::get<0>(range)), std::move(std::get<1>(range)));
-  $$ = std::move(combined);
+  auto& baseName  = $[SCALAR_ID];
+  auto& left      = std::get<0>($[index_or_range]);
+  auto& right     = std::get<1>($[index_or_range]);
+  auto identifier = ast.Create_VectorIdentifier(std::move(baseName), std::move(left), std::move(right));
+
+  $$ = identifier;
 }
 ;
 
@@ -468,8 +472,10 @@ port_name :
   SCALAR_ID
   {
     // port_name : SCALAR_ID
-    auto& name = $[SCALAR_ID];
-    $$ = make_tuple(std::move(name), ""s, ""s);
+    auto& name       = $[SCALAR_ID];
+    auto  identifier = ast.Create_VectorIdentifier(std::move(name), "", "");
+
+    $$ = identifier;
   }
 | vector_id
   {
@@ -482,8 +488,10 @@ register_name :
   SCALAR_ID
   {
     // register_name : SCALAR_ID
-    auto& name = $[SCALAR_ID];
-    $$ = make_tuple(std::move(name), ""s, ""s);
+    auto& name       = $[SCALAR_ID];
+    auto  identifier = ast.Create_VectorIdentifier(std::move(name), "", "");
+
+    $$ = identifier;
   }
 | vector_id
   {
@@ -496,8 +504,10 @@ reg_port_signal_id :
   SCALAR_ID
   {
     // reg_port_signal_id : SCALAR_ID
-    auto& name = $[SCALAR_ID];
-    $$ = make_tuple(std::move(name), ""s, ""s);
+    auto& name       = $[SCALAR_ID];
+    auto  identifier = ast.Create_VectorIdentifier(std::move(name), "", "");
+
+    $$ = identifier;
   }
 | vector_id
   {
@@ -1130,13 +1140,7 @@ instance_addressValue : ADDRESSVALUE number SEMICOLON ;
 scanRegister_def : SCANREGISTER scanRegister_name scanRegister_tail
 {
   // scanRegister_def : SCANREGISTER scanRegister_name scanRegister_tail
-  auto& name  = std::get<0>($[scanRegister_name]);
-  auto& left  = std::get<1>($[scanRegister_name]);
-  auto& right = std::get<2>($[scanRegister_name]);
-
-  auto identifier = ast.Create_Identifier(name, left, right);
-  auto node       = ast.Create_ScanRegister(identifier);
-
+  auto node = ast.Create_ScanRegister($[scanRegister_name]);
   $$ = node;
 }
 ;

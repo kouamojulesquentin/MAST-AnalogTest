@@ -31,7 +31,6 @@ namespace Parsers
     Enum_def,         //!< For enums definitions
     Enum_item,        //!< For enums items
     Enum_ref,         //!< For enums references
-    Identifier,       //!< For identifiers with a without scope prefix and bit or range identifier
     Instance,         //!< For modules instances
     Module,           //!< For modules
     Namespace_def,    //!< For namespace definitions
@@ -39,6 +38,7 @@ namespace Parsers
     ScalarIdentifier, //!< For identifier with a without scope prefix and no bit nor range identifier
     ScanRegister,     //!< For scan registers
     TranslationUnit,  //!< For source files as a all
+    VectorIdentifier, //!< For identifiers with a without scope prefix and bit or range identifier
   };
 
   //! Returns whether one kind is one of specified kind
@@ -64,7 +64,6 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::Enum_def)
             ENUM_MEMBER(Parsers::Kind::Enum_item)
             ENUM_MEMBER(Parsers::Kind::Enum_ref)
-            ENUM_MEMBER(Parsers::Kind::Identifier)
             ENUM_MEMBER(Parsers::Kind::Instance)
             ENUM_MEMBER(Parsers::Kind::Module)
             ENUM_MEMBER(Parsers::Kind::Namespace_def)
@@ -72,6 +71,7 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::ScalarIdentifier)
             ENUM_MEMBER(Parsers::Kind::ScanRegister)
             ENUM_MEMBER(Parsers::Kind::TranslationUnit)
+            ENUM_MEMBER(Parsers::Kind::VectorIdentifier)
            );
 
 namespace Parsers

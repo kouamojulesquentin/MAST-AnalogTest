@@ -24,8 +24,9 @@ namespace Parsers
 class AST_Node;
 class AST_Module;
 class AST_ScanRegister;
-class AST_ScalarIdentifier;
 class AST_Identifier;
+class AST_ScalarIdentifier;
+class AST_VectorIdentifier;
 
 //! Abstract Syntax Tree built when parsing some test network description
 //!
@@ -38,9 +39,9 @@ class AST final
   AST();
 
   AST_Module*           Create_Module           (AST_ScalarIdentifier* identifier, std::vector<AST_Node*>&& children);
-  AST_ScanRegister*     Create_ScanRegister     (AST_Identifier*       identifier);
+  AST_ScanRegister*     Create_ScanRegister     (AST_VectorIdentifier* identifier);
   AST_ScalarIdentifier* Create_ScalarIdentifier (std::experimental::string_view name);
-  AST_Identifier*       Create_Identifier       (std::experimental::string_view name,
+  AST_VectorIdentifier* Create_VectorIdentifier (std::experimental::string_view name,
                                                  std::experimental::string_view leftIndex,
                                                  std::experimental::string_view rightIndex = "");
 

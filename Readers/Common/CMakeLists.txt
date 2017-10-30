@@ -15,10 +15,11 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_Module.hpp
                                   AST_Module.cpp
                                   AST_Identifier.hpp
-                                  AST_Identifier.cpp
                                   AST_ScalarIdentifier.hpp
                                   AST_ScanRegister.hpp
                                   AST_ScanRegister.cpp
+                                  AST_VectorIdentifier.hpp
+                                  AST_VectorIdentifier.cpp
                                   AST_Visitor.hpp
                                   AST_PrettyPrinter.hpp
                                   AST_PrettyPrinter.cpp

@@ -15,10 +15,12 @@
 #include "AST_Module.hpp"
 #include "AST_ScanRegister.hpp"
 #include "AST_ScalarIdentifier.hpp"
-#include "AST_Identifier.hpp"
+#include "AST_VectorIdentifier.hpp"
 #include "Utility.hpp"
 
 using std::vector;
+using std::string;
+using std::experimental::string_view;
 using std::make_unique;
 
 using namespace Parsers;
@@ -85,16 +87,16 @@ AST_ScalarIdentifier* AST::Create_ScalarIdentifier (string_view name)
 //! @param leftIndex    Left index
 //! @param rightIndex   Right index (can be empty for single bit identifier)
 //!
-//! @return Created AST_Identifier
+//! @return Created AST_VectorIdentifier
 //!
-AST_Identifier* AST::Create_Identifier (string_view name,
-                                        string_view leftIndex,
-                                        string_view rightIndex)
+AST_VectorIdentifier* AST::Create_VectorIdentifier (string_view name,
+                                                    string_view leftIndex,
+                                                    string_view rightIndex)
 {
-  return Create_Node<AST_Identifier>(name, leftIndex, rightIndex);
+  return Create_Node<AST_VectorIdentifier>(name, leftIndex, rightIndex);
 }
 //
-//  End of: AST::Create_ScanRegister
+//  End of: AST::Create_VectorIdentifier
 //---------------------------------------------------------------------------
 
 
@@ -104,7 +106,7 @@ AST_Identifier* AST::Create_Identifier (string_view name,
 //!
 //! @return Created AST_ScanRegister
 //!
-AST_ScanRegister* AST::Create_ScanRegister (AST_Identifier* identifier)
+AST_ScanRegister* AST::Create_ScanRegister (AST_VectorIdentifier* identifier)
 {
   return Create_Node<AST_ScanRegister>(identifier);
 }

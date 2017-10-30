@@ -38,7 +38,7 @@ class AST_Module final : public AST_ParentNode
 
   //! Module name
   //!
-  std::string Name() const override { return m_identifier->Name(); }
+  std::string Name() const override { return m_identifier->AsText(); }
 
   // ---------------- Private Methods
   //

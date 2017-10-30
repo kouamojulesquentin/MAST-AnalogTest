@@ -14,14 +14,15 @@
 #ifndef AST_SCALARIDENTIFIER_H__22E87096_14D1_4D26_65BD_D689E2BB6FA3__INCLUDED_
   #define AST_SCALARIDENTIFIER_H__22E87096_14D1_4D26_65BD_D689E2BB6FA3__INCLUDED_
 
-#include "AST_Node.hpp"
+#include "AST_Identifier.hpp"
+#include <string>
 #include <experimental/string_view>
 
 namespace Parsers
 {
 //! Specifies a plain name or a single bit name
 //!
-class AST_ScalarIdentifier final : public AST_Node
+class AST_ScalarIdentifier final : public AST_Identifier
 {
   // ---------------- Public Methods
   //
@@ -29,9 +30,9 @@ class AST_ScalarIdentifier final : public AST_Node
   ~AST_ScalarIdentifier() = default;
   AST_ScalarIdentifier()  = delete;
 
-  //! Text representation of identifier
-  //!
-  std::string Name() const { return m_identifier; }
+//+  std::string Name() const { return m_identifier; } //!< Text representation of identifier
+
+  std::string AsText() const override { return m_identifier; }; //!< Text representation of identifier
 
   // ---------------- Private Methods
   //
@@ -39,8 +40,8 @@ class AST_ScalarIdentifier final : public AST_Node
   MAKE_UNIQUE_AS_FRIEND(AST_ScalarIdentifier)(std::experimental::string_view&); // AST currently uses make_unit<T>() to create nodes
 
   AST_ScalarIdentifier(std::experimental::string_view identifier)
-    : AST_Node     (Kind::ScalarIdentifier)
-    , m_identifier (identifier)
+    : AST_Identifier (Kind::ScalarIdentifier)
+    , m_identifier   (identifier)
   {
   }
 

@@ -12,8 +12,9 @@
 //===========================================================================
 
 #include "UT_AST_PrettyPrinter.hpp"
-#include "AST_PrettyPrinter.hpp"
 #include "AST.hpp"
+#include "AST_VectorIdentifier.hpp"
+#include "AST_PrettyPrinter.hpp"
 
 #include <cxxtest/ValueTraits.h>
 
@@ -66,7 +67,7 @@ void UT_AST_PrettyPrinter::test_Visit_ScanRegister_empty ()
   // ---------------- Setup
   //
   AST  ast;
-  auto identifier = ast.Create_Identifier("Ecrin", "", "");
+  auto identifier = ast.Create_VectorIdentifier("Ecrin", "", "");
   auto node       = ast.Create_ScanRegister(identifier);
 
   AST_PrettyPrinter sut;

@@ -135,6 +135,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_ScanRegister ()
                                   "{\n"
                                   "  ScanRegister SR[7:0]\n"
                                   "  {\n"
+                                  "    ResetValue 8'b00000000;\n"
                                   "  }\n"
                                   "}\n";
   auto actual_AST_String          = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);

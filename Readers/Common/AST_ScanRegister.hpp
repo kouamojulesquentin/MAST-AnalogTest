@@ -18,11 +18,14 @@
 #include "AST_VectorIdentifier.hpp"
 
 #include <memory>
+#include <vector>
 #include <string>
 #include <experimental/string_view>
 
 namespace Parsers
 {
+class AST_Value;
+
 //! Represents a parsed test network, instiable, module
 //!
 class AST_ScanRegister final : public AST_ParentNode
@@ -41,28 +44,35 @@ class AST_ScanRegister final : public AST_ParentNode
   //!
   std::string Name() const override { return m_identifier->AsText(); }
 
-
   std::experimental::string_view RangeLeft()  const;
   std::experimental::string_view RangeRight() const;
+
+
+  const AST_Value* ResetValue() const { return m_resetValue; }  //!< Scan register reset value
 
 
   // ---------------- Private Methods
   //
   private:
 
-  friend class AST;                                                             // This is AST that manages construction/destruction of AST nodes
-  MAKE_UNIQUE_AS_FRIEND(AST_ScanRegister)(Parsers::AST_VectorIdentifier*&);  // AST currently uses make_unit<T>() to create nodes
+  friend class AST;                                                         // This is AST that manages construction/destruction of AST nodes
+  MAKE_UNIQUE_AS_FRIEND(AST_ScanRegister)(Parsers::AST_VectorIdentifier*&,
+                                          std::vector<AST_Node*>&&);        // AST currently uses make_unit<T>() to create nodes
 
-  AST_ScanRegister(AST_VectorIdentifier* identifier)
-    : AST_ParentNode (Kind::ScanRegister)
+  AST_ScanRegister(AST_VectorIdentifier* identifier, std::vector<AST_Node*>&& children)
+    : AST_ParentNode (Kind::ScanRegister, std::move(children))
     , m_identifier   (identifier)
   {
+    DispatchChildren();
   }
+
+  void DispatchChildren ();
 
   // ---------------- Private Fields
   //
   private:
-  const AST_VectorIdentifier* m_identifier = nullptr; //!< Module name
+  const AST_VectorIdentifier* m_identifier = nullptr; //!< Scan register name
+  const AST_Value*            m_resetValue = nullptr; //!< Scan register reset value expression
 };
 //
 //  End of AST_ScanRegister class declaration

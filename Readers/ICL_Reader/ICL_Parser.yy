@@ -28,12 +28,12 @@ SUCH DAMAGE.
 #include <tuple>
 namespace ICL
 {
-  class ICL_Reader;
   class ICL_Scanner;
 }
 namespace Parsers
 {
   class AST;
+  class AST_Value;
   class AST_Node;
   class AST_Module;
   class AST_Identifier;
@@ -67,6 +67,7 @@ typedef void* yyscan_t;
 //
 #include "ParserException.hpp"
 #include "AST.hpp"
+#include "AST_Value.hpp"
 #include "AST_ScanRegister.hpp"
 #include "AST_ScalarIdentifier.hpp"
 #include "AST_VectorIdentifier.hpp"
@@ -120,14 +121,28 @@ namespace
 %define parse.assert
 
 %type <std::string> SCALAR_ID
+%type <std::string> STRING
 %type <std::string> instance_name
-%type <Parsers::AST_ScalarIdentifier*> module_name
 %type <std::string> namespace_name
 %type <std::string> scanInterfaceChain_name
 %type <std::string> scanInterface_name
 
+%type <Parsers::AST_ScalarIdentifier*> module_name
+
 %type <std::string> parameter_ref
 %type <std::string> index
+
+%type <std::string> UNSIZED_DEC_NUM
+%type <std::string> UNSIZED_BIN_NUM
+%type <std::string> UNSIZED_HEX_NUM
+
+%type <std::string> number
+%type <std::string> number_or_enum
+%type <std::string> concat_number
+%type <std::string> enum_symbol
+%type <std::string> enum_name
+%type <std::string> enum_value
+//+%type <std::string> signal_or_enum
 
 %type <std::tuple<string, string>> range          // Left & Right indexes
 %type <std::tuple<string, string>> index_or_range // Left & Right indexes (Right can be empty)
@@ -139,10 +154,12 @@ namespace
 %type <Parsers::AST_Identifier*> scanOutPort_name     // Name, Left & Right indexes (Left & Right can be empty)
 %type <Parsers::AST_Identifier*> reg_port_signal_id   // Name, Left & Right indexes (Left & Right can be empty)
 %type <Parsers::AST_Identifier*> port_name            // Name, Left & Right indexes (Left & Right can be empty)
-%type <Parsers::AST_VectorIdentifier*> vector_id            // Name, Left & Right indexes (Right can be empty)
-%type <Parsers::AST_VectorIdentifier*> register_name        // Name, Left & Right indexes (Left & Right can be empty)
-%type <Parsers::AST_VectorIdentifier*> scanRegister_name    // Name, Left & Right indexes (Left & Right can be empty)
 
+%type <Parsers::AST_VectorIdentifier*> vector_id         // Name, Left & Right indexes (Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> register_name     // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> scanRegister_name // Name, Left & Right indexes (Left & Right can be empty)
+
+%type <Parsers::AST_Value*>            scanRegister_resetValue  // Value expression
 
 %type <std::string> POS_INT
 %type <std::string> pos_int
@@ -207,9 +224,15 @@ namespace
 %type <Parsers::AST_Node*>              updateEnPort_def
 %type <Parsers::AST_Node*>              writeEnPort_def
 
-
+%type <Parsers::AST_Node*>              scanRegister_captureSource
+%type <Parsers::AST_Node*>              scanRegister_defaultLoadValue
+%type <Parsers::AST_Node*>              scanRegister_item
+%type <Parsers::AST_Node*>              scanRegister_refEnum
+%type <Parsers::AST_Node*>              scanRegister_scanInSource
 
 %type <std::vector<Parsers::AST_Node*>> module_items
+%type <std::vector<Parsers::AST_Node*>> scanRegister_tail
+%type <std::vector<Parsers::AST_Node*>> scanRegister_items
 
 %token ACCESSLINK
 %token ACCESSTOGETHER
@@ -345,20 +368,45 @@ pos_int :
 | ZERO    { $$ = "0"; }
 ;
 
-number : UNSIZED_DEC_NUM | UNSIZED_BIN_NUM | UNSIZED_HEX_NUM
-       | integer_expr UNSIZED_DEC_NUM
-       | integer_expr UNSIZED_BIN_NUM
-       | integer_expr UNSIZED_HEX_NUM
-       | integer_expr ;
+number :
+  UNSIZED_DEC_NUM   { $$ = std::move($1); /* number : UNSIZED_DEC_NUM */ }
+| UNSIZED_BIN_NUM   { $$ = std::move($1); /* number : UNSIZED_BIN_NUM */ }
+| UNSIZED_HEX_NUM   { $$ = std::move($1); /* number : UNSIZED_HEX_NUM */ }
+| integer_expr UNSIZED_DEC_NUM
+  {
+    // number : integer_expr UNSIZED_DEC_NUM
+    auto expr = std::move($[integer_expr]);
+    expr.append(" ").append($[UNSIZED_DEC_NUM]);
+
+    $$ = std::move(expr);
+  }
+| integer_expr UNSIZED_BIN_NUM
+  {
+    // number : integer_expr UNSIZED_BIN_NUM
+    auto expr = std::move($[integer_expr]);
+    expr.append($[UNSIZED_BIN_NUM]);
+
+    $$ = std::move(expr);
+  }
+| integer_expr UNSIZED_HEX_NUM
+  {
+    // number : integer_expr UNSIZED_HEX_NUM
+    auto expr = std::move($[integer_expr]);
+    expr.append($[UNSIZED_HEX_NUM]);
+
+    $$ = expr;
+  }
+| integer_expr { $$ = std::move($1); /* number : integer_expr */}
+;
 
 // 6.3.12
 vector_id : SCALAR_ID LEFT_BRACKET index_or_range RIGHT_BRACKET
 {
   // vector_id : SCALAR_ID LEFT_BRACKET index_or_range RIGHT_BRACKET
-  auto& baseName  = $[SCALAR_ID];
-  auto& left      = std::get<0>($[index_or_range]);
-  auto& right     = std::get<1>($[index_or_range]);
-  auto identifier = ast.Create_VectorIdentifier(std::move(baseName), std::move(left), std::move(right));
+  auto& baseName   = $[SCALAR_ID];
+  auto& left       = std::get<0>($[index_or_range]);
+  auto& right      = std::get<1>($[index_or_range]);
+  auto  identifier = ast.Create_VectorIdentifier(std::move(baseName), std::move(left), std::move(right));
 
   $$ = identifier;
 }
@@ -462,9 +510,39 @@ parameter_ref : DOLLAR SCALAR_ID
 }
 ;
 
-concat_number : number | TILDE number | concat_number COMMA number | concat_number COMMA TILDE number;
 //semantic rules prevents inverting unsized numbers and having more than one
 //unsized number within a concat_number. See section 6.4.10.
+concat_number :
+  number
+  {
+    // concat_number : number
+    $$ = std::move($1);
+  }
+| TILDE number
+  {
+    // concat_number : TILDE number
+    auto expr = "~"s.append($[number]);
+
+    $$ = std::move(expr);
+  }
+| concat_number[lhs_concat_number] COMMA number
+  {
+    // concat_number : concat_number COMMA number
+    auto expr = std::move($[lhs_concat_number]);
+    expr.append(",").append($[number]);
+
+    $$ = std::move(expr);
+  }
+| concat_number[lhs_concat_number] COMMA TILDE number
+  {
+    // concat_number : concat_number COMMA TILDE number
+    auto expr = std::move($[lhs_concat_number]);
+    expr.append(", ~").append($[number]);
+
+    $$ = std::move(expr);
+  }
+;
+
 concat_number_list : concat_number | concat_number_list PIPE concat_number ;
 pin_id : instance_name DOT pin_id | instance_name DOT port_name  ;
 
@@ -601,8 +679,7 @@ module_items[result] :
     }
     $result = std::move($[previous]);
   }
-|
-  module_item
+| module_item
   {
     // module_items[result] : module_item
     std::vector<Parsers::AST_Node*> children;
@@ -1115,6 +1192,7 @@ readEnPort_name : port_name ;
 // 6.4.7
 instance_def : INSTANCE instance_name OF instance_module instance_tail
 {
+  // instance_def : INSTANCE instance_name OF instance_module instance_tail
   $$ = nullptr;
 }
 ;
@@ -1140,28 +1218,97 @@ instance_addressValue : ADDRESSVALUE number SEMICOLON ;
 scanRegister_def : SCANREGISTER scanRegister_name scanRegister_tail
 {
   // scanRegister_def : SCANREGISTER scanRegister_name scanRegister_tail
-  auto node = ast.Create_ScanRegister($[scanRegister_name]);
+  auto& name     = $[scanRegister_name];
+  auto& children = $[scanRegister_tail];
+  auto  node     = ast.Create_ScanRegister(name, std::move(children));
+
   $$ = node;
 }
 ;
 scanRegister_name : register_name { $$ = $[register_name]; }
-scanRegister_tail: SEMICOLON | LEFT_BRACE scanRegister_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
-scanRegister_items: scanRegister_items scanRegister_item | scanRegister_item;
-scanRegister_item :
-  attribute_def
-| scanRegister_scanInSource
-| scanRegister_defaultLoadValue
-| scanRegister_captureSource
-| scanRegister_resetValue
-| scanRegister_refEnum
+scanRegister_tail:
+  SEMICOLON
+  {
+    // scanRegister_tail: SEMICOLON
+    std::vector<Parsers::AST_Node*> children;
+    $$ = children;
+  }
+| LEFT_BRACE scanRegister_items RIGHT_BRACE
+  {
+    // scanRegister_tail: LEFT_BRACE scanRegister_items RIGHT_BRACE
+    auto& children = $[scanRegister_items];
+    $$ = std::move(children);
+  }
+| LEFT_BRACE RIGHT_BRACE
+  {
+    // scanRegister_tail: LEFT_BRACE RIGHT_BRACE
+    std::vector<Parsers::AST_Node*> children;
+    $$ = children;
+  }
 ;
 
-scanRegister_scanInSource : SCANINSOURCE scan_signal SEMICOLON ;
-scanRegister_defaultLoadValue : DEFAULTLOADVALUE number_or_enum SEMICOLON ;
-scanRegister_captureSource : CAPTURESOURCE signal_or_enum SEMICOLON;
-scanRegister_resetValue : RESETVALUE number_or_enum SEMICOLON ;
-scanRegister_refEnum : REFENUM enum_name SEMICOLON ;
-number_or_enum : concat_number | enum_symbol;
+scanRegister_items:
+  scanRegister_items[lhs] scanRegister_item
+  {
+    // scanRegister_items: scanRegister_items[lhs] scanRegister_item
+    auto& children = $[lhs];
+    auto  item     = $[scanRegister_item];
+
+    if (item != nullptr)
+    {
+      children.push_back(item);
+    }
+    $$ = std::move(children);
+  }
+| scanRegister_item
+  {
+    // scanRegister_items: scanRegister_item
+    std::vector<Parsers::AST_Node*> children;
+
+    auto item = $[scanRegister_item];
+    if (item != nullptr)
+    {
+      children.push_back(item);
+    }
+    $$ = std::move(children);
+  }
+;
+
+scanRegister_item :
+  attribute_def                   { $$ = $1; /* scanRegister_item : attribute_def */ }
+| scanRegister_scanInSource       { $$ = $1; /* scanRegister_item : scanRegister_scanInSource      */ }
+| scanRegister_defaultLoadValue   { $$ = $1; /* scanRegister_item : scanRegister_defaultLoadValue  */ }
+| scanRegister_captureSource      { $$ = $1; /* scanRegister_item : scanRegister_captureSource     */ }
+| scanRegister_resetValue         { $$ = $1; /* scanRegister_item : scanRegister_resetValue        */ }
+| scanRegister_refEnum            { $$ = $1; /* scanRegister_item : scanRegister_refEnum           */ }
+;
+
+scanRegister_scanInSource     : SCANINSOURCE     scan_signal    SEMICOLON { $$ = scan_signal; /* scanRegister_scanInSource : SCANINSOURCE scan_signal SEMICOLON */};
+scanRegister_defaultLoadValue : DEFAULTLOADVALUE number_or_enum SEMICOLON { $$ = nullptr; /* scanRegister_defaultLoadValue : DEFAULTLOADVALUE number_or_enum SEMICOLON */};
+scanRegister_captureSource    : CAPTURESOURCE    signal_or_enum SEMICOLON { $$ = nullptr; /* scanRegister_captureSource : CAPTURESOURCE signal_or_enum SEMICOLON */};
+
+scanRegister_resetValue : RESETVALUE number_or_enum SEMICOLON
+{
+  // scanRegister_resetValue : RESETVALUE number_or_enum SEMICOLON
+  auto& valueExpression = $[number_or_enum];
+  auto  node            = ast.Create_Value(Parsers::Kind::ResetValue, valueExpression);
+
+  $$ = node;
+}
+;
+
+scanRegister_refEnum : REFENUM enum_name SEMICOLON { $$ = nullptr; /* scanRegister_refEnum : REFENUM enum_name SEMICOLON */};
+
+number_or_enum :
+  concat_number
+  {
+    $$ = std::move($1);
+  }
+| enum_symbol
+  {
+    $$ = std::move($1);
+  }
+;
 signal_or_enum : number | SCALAR_ID | pin_id;
 
 // 6.4.9
@@ -1368,10 +1515,10 @@ enum_def : ENUM enum_name LEFT_BRACE enum_items RIGHT_BRACE
 }
 ;
 enum_items : enum_items enum_item | enum_item;
-enum_name : SCALAR_ID ;
+enum_name : SCALAR_ID { $$ = $1; };
 enum_item : enum_symbol EQUAL enum_value SEMICOLON ;
-enum_symbol : SCALAR_ID;
-enum_value : concat_number;
+enum_symbol : SCALAR_ID     { $$ = $1; };
+enum_value : concat_number  { $$ = $1; };
 
 // 6.5.4
 parameter_def : PARAMETER parameter_name EQUAL parameter_value SEMICOLON

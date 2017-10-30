@@ -1,22 +1,9 @@
-Running Mast_Readers tests (35 tests)
+Running Mast_Readers tests (38 tests)
 
-.........
+..............................................
 
-In UT_SIT_Printer::test_VisitTap: 
-UT_SIT_Printer.cpp:368: Warning: Table based not defined
-.
-
-In UT_SIT_Printer::test_VisitTap_With_SubNodes: 
-UT_SIT_Printer.cpp:413: Warning: Table based not defined
-.
-
-In UT_SIT_Printer::test_MakeSIT: 
-UT_SIT_Printer.cpp:451: Warning: Table based not defined
+In UT_SIT_Printer::test_Warnings: 
+UT_SIT_Printer.cpp:460: Warning: Table based path selectors checks incomplete (no SIT support yet for tables)
 ...........................................................................................................
 
-In UT_Fragments::test_ParseExcerpt_ScanRegister: 
-UT_Fragments.cpp:126: Error: Expected (parsedModel) to be not nullptr, but found it is nullptr
-...............................
-
-Failed 1 and Skipped 0 of 150 tests including 136 'sub' tests from 21 data driven tests
-Success rate: 99%
+OK! (153 tests including 136 'sub' tests from 21 data driven tests)

@@ -16,7 +16,7 @@ if (CODE_COVERAGE)
   set(CMAKE_CXX_FLAGS "--coverage ${CMAKE_CXX_FLAGS} ")
 endif()
 
-set (Flex_Switches -v -L --c++)
+set (Flex_Switches -v -L --c++ --debug)
 if (WIN32)
   set (Flex_Switches ${Flex_Switches} --wincompat)
 endif()

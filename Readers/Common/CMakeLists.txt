@@ -20,6 +20,7 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_ScanRegister.cpp
                                   AST_VectorIdentifier.hpp
                                   AST_VectorIdentifier.cpp
+                                  AST_Value.hpp
                                   AST_Visitor.hpp
                                   AST_PrettyPrinter.hpp
                                   AST_PrettyPrinter.cpp

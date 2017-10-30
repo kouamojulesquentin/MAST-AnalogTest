@@ -12,6 +12,7 @@
 //===========================================================================
 
 #include "AST.hpp"
+#include "AST_Value.hpp"
 #include "AST_Module.hpp"
 #include "AST_ScanRegister.hpp"
 #include "AST_ScalarIdentifier.hpp"
@@ -51,7 +52,8 @@ AST::AST ()
 
 //! Creates a AST_Module node
 //!
-//! @param name Module name
+//! @param identifier   Module name
+//! @param children     Module children nodes
 //!
 AST_Module* AST::Create_Module (AST_ScalarIdentifier* identifier, vector<AST_Node*>&& children)
 {
@@ -103,15 +105,32 @@ AST_VectorIdentifier* AST::Create_VectorIdentifier (string_view name,
 //! Creates an AST_ScanRegister node
 //!
 //! @param identifier   ScanRegister identifier
+//! @param children     ScanRegister children nodes
 //!
 //! @return Created AST_ScanRegister
 //!
-AST_ScanRegister* AST::Create_ScanRegister (AST_VectorIdentifier* identifier)
+AST_ScanRegister* AST::Create_ScanRegister (AST_VectorIdentifier* identifier, vector<AST_Node*>&& children)
 {
-  return Create_Node<AST_ScanRegister>(identifier);
+  return Create_Node<AST_ScanRegister>(identifier, std::move(children));
 }
 //
 //  End of: AST::Create_ScanRegister
+//---------------------------------------------------------------------------
+
+
+//! Creates an AST_Value node
+//!
+//! @param kind             Kind of value
+//! @param valueExpression  Value expression
+//!
+//! @return Created AST_Value
+//!
+AST_Value* AST::Create_Value (Kind kind, string_view valueExpression)
+{
+  return Create_Node<AST_Value>(kind, valueExpression);
+}
+//
+//  End of: AST::Create_Value
 //---------------------------------------------------------------------------
 
 

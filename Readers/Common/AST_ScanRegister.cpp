@@ -13,6 +13,7 @@
 
 #include "AST_ScanRegister.hpp"
 #include "AST_VectorIdentifier.hpp"
+#include "AST_Value.hpp"
 #include "AST_Visitor.hpp"
 #include "Utility.hpp"
 
@@ -27,6 +28,35 @@ void AST_ScanRegister::Accept (AST_Visitor& visitor)
 {
   visitor.Visit_ScanRegister(this);
 }
+
+
+//! Dispatches children to specific member (for ease of use)
+//!
+void AST_ScanRegister::DispatchChildren ()
+{
+  for (auto&  child:  UnprocessedChildren())
+  {
+    if (child != nullptr)
+    {
+      switch (child->GetKind())
+      {
+        case Parsers::Kind::ResetValue :
+          m_resetValue = static_cast<AST_Value*>(child);
+          child = nullptr;
+          break;
+        case Parsers::Kind::DefaultLoadValue:
+          break;
+        default:  // Ignore all other for now
+          break;
+      }
+    }
+  }
+}
+//
+//  End of: AST_ScanRegister::DispatchChildren
+//---------------------------------------------------------------------------
+
+
 
 
 

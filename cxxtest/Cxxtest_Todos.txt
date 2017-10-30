@@ -36,6 +36,8 @@ Traits:
 ======
   - For STL   + tests
   - For STL11 + tests
+    - std::shared_ptr ==> Print shared_ptr<T> + nullptr or traits of pointed to
+    - std::unique_ptr ==> Print unique_ptr<T> + nullptr or traits of pointed to
   - For Qt    + tests
 ================================================================================================================================================================
 

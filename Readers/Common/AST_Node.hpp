@@ -28,6 +28,7 @@ namespace Parsers
     Undefined,
 
     Alias,            //!< For alias definitions
+    DefaultLoadValue, //!< For registers default load value
     Enum_def,         //!< For enums definitions
     Enum_item,        //!< For enums items
     Enum_ref,         //!< For enums references
@@ -35,6 +36,7 @@ namespace Parsers
     Module,           //!< For modules
     Namespace_def,    //!< For namespace definitions
     Namespace_ref,    //!< For namespace references
+    ResetValue,       //!< For registers reset value
     ScalarIdentifier, //!< For identifier with a without scope prefix and no bit nor range identifier
     ScanRegister,     //!< For scan registers
     TranslationUnit,  //!< For source files as a all
@@ -61,6 +63,7 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::Undefined)
 
             ENUM_MEMBER(Parsers::Kind::Alias)
+            ENUM_MEMBER(Parsers::Kind::DefaultLoadValue)
             ENUM_MEMBER(Parsers::Kind::Enum_def)
             ENUM_MEMBER(Parsers::Kind::Enum_item)
             ENUM_MEMBER(Parsers::Kind::Enum_ref)
@@ -68,6 +71,7 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::Module)
             ENUM_MEMBER(Parsers::Kind::Namespace_def)
             ENUM_MEMBER(Parsers::Kind::Namespace_ref)
+            ENUM_MEMBER(Parsers::Kind::ResetValue)
             ENUM_MEMBER(Parsers::Kind::ScalarIdentifier)
             ENUM_MEMBER(Parsers::Kind::ScanRegister)
             ENUM_MEMBER(Parsers::Kind::TranslationUnit)
@@ -107,10 +111,6 @@ class AST_Node
     : m_kind (kind)
   {
   }
-
-  // ---------------- Private Methods
-  //
-  private:
 
   // ---------------- Private Fields
   //

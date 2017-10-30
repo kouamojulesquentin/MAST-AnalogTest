@@ -13,6 +13,7 @@
 
 #include "AST_PrettyPrinter.hpp"
 #include "AST_Module.hpp"
+#include "AST_Value.hpp"
 #include "AST_ScanRegister.hpp"
 
 #include <sstream>
@@ -168,6 +169,12 @@ void AST_PrettyPrinter::Visit_ScanRegister (AST_ScanRegister* scanRegister)
   StreamNodeHeader(scanRegister, "");
 
   HierarchyInserter hierarchyInserter(*this);
+
+  auto resetValue = scanRegister->ResetValue();
+  if (resetValue != nullptr)
+  {
+    StreamDepth() << resetValue->KindName() << " " << resetValue->AsText() << ";\n";
+  }
 
   for (const auto& node : scanRegister->UnprocessedChildren())
   {

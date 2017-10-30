@@ -68,7 +68,8 @@ void UT_AST_PrettyPrinter::test_Visit_ScanRegister_empty ()
   //
   AST  ast;
   auto identifier = ast.Create_VectorIdentifier("Ecrin", "", "");
-  auto node       = ast.Create_ScanRegister(identifier);
+  auto chidren    = vector<AST_Node*>();
+  auto node       = ast.Create_ScanRegister(identifier, std::move(chidren));
 
   AST_PrettyPrinter sut;
 

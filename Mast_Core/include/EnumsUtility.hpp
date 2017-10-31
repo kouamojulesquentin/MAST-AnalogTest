@@ -189,12 +189,17 @@ inline std::experimental::string_view NameString(TYPE value)  \
 {                                                             \
   return EnumTraits<TYPE>(value).Name();                      \
 }                                                             \
-inline std::string ScopedNameString(TYPE value)               \
-{                                                             \
-  auto name = EnumTraits<TYPE>(value).Name();                 \
-  return std::string(EnumTraits<TYPE>(value).Scope())         \
-             .append(name.cbegin(), name.cend());             \
-}                                                             \
+  \
+inline std::string ScopedNameString(TYPE value)                                  \
+{                                                                                \
+  auto name = EnumTraits<TYPE>(value).Name();                                    \
+  if (name.find("::Unknown_enum_value") != std::experimental::string_view::npos) \
+  {                                                                              \
+    return std::string(name);                                                    \
+  }                                                                              \
+  return std::string(EnumTraits<TYPE>(value).Scope())                            \
+             .append(name.cbegin(), name.cend());                                \
+}                                                                                \
    \
 inline std::string ToStdString(TYPE value)                                        \
 {                                                                                 \

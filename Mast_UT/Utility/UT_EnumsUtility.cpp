@@ -151,11 +151,11 @@ void UT_EnumsUtility::test_Enum_NameString ()
 
   auto data =
   {
-    make_tuple(NS_EnumsUtility::Inner::Foo::First,           "First"),              // 0
-    make_tuple(NS_EnumsUtility::Inner::Foo::Bar,             "Bar"),                // 1
-    make_tuple(NS_EnumsUtility::Inner::Foo::Bier,            "Bier"),               // 2
-    make_tuple(NS_EnumsUtility::Inner::Foo::Last,            "Last"),               // 3
-    make_tuple(static_cast<NS_EnumsUtility::Inner::Foo>(12), "Unknown_enum_value"), // 4
+    make_tuple(NS_EnumsUtility::Inner::Foo::First,           "First"),                                           // 0
+    make_tuple(NS_EnumsUtility::Inner::Foo::Bar,             "Bar"),                                             // 1
+    make_tuple(NS_EnumsUtility::Inner::Foo::Bier,            "Bier"),                                            // 2
+    make_tuple(NS_EnumsUtility::Inner::Foo::Last,            "Last"),                                            // 3
+    make_tuple(static_cast<NS_EnumsUtility::Inner::Foo>(12), "NS_EnumsUtility::Inner::Foo::Unknown_enum_value"), // 4
   };
 
   // ---------------- DDT Exercise

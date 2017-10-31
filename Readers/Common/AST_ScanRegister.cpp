@@ -14,6 +14,7 @@
 #include "AST_ScanRegister.hpp"
 #include "AST_VectorIdentifier.hpp"
 #include "AST_Value.hpp"
+#include "AST_Source.hpp"
 #include "AST_Visitor.hpp"
 #include "Utility.hpp"
 
@@ -46,11 +47,17 @@ void AST_ScanRegister::DispatchChildren ()
           break;
         case Parsers::Kind::DefaultLoadValue:
           break;
+        case Parsers::Kind::ScanInSource:
+          m_scanInSource = static_cast<AST_Source*>(child);
+          child = nullptr;
+          break;
         default:  // Ignore all other for now
           break;
       }
     }
   }
+
+  CHECK_VALUE_NOT_NULL(m_scanInSource, "The source of the scan input data for a ScanRegister is required");
 }
 //
 //  End of: AST_ScanRegister::DispatchChildren

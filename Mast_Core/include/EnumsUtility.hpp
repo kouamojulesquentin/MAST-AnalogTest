@@ -167,7 +167,7 @@ class EnumTraits<TYPE> \
           default: \
             _isUnknown = true; \
             _scopeString = #TYPE "::"; \
-            _nameString  = "Unknown_enum_value"; \
+            _nameString  = #TYPE "::Unknown_enum_value"; \
       } \
     } \
     bool IsUnknown() const { return _isUnknown; } \

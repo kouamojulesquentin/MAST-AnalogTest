@@ -34,6 +34,8 @@ namespace Parsers
 {
   class AST;
   class AST_Value;
+  class AST_Signal;
+  class AST_Source;
   class AST_Node;
   class AST_Module;
   class AST_Identifier;
@@ -67,6 +69,8 @@ typedef void* yyscan_t;
 //
 #include "ParserException.hpp"
 #include "AST.hpp"
+#include "AST_Signal.hpp"
+#include "AST_Source.hpp"
 #include "AST_Value.hpp"
 #include "AST_ScanRegister.hpp"
 #include "AST_ScalarIdentifier.hpp"
@@ -122,12 +126,15 @@ namespace
 
 %type <std::string> SCALAR_ID
 %type <std::string> STRING
-%type <std::string> instance_name
-%type <std::string> namespace_name
 %type <std::string> scanInterfaceChain_name
 %type <std::string> scanInterface_name
 
+%type <Parsers::AST_ScalarIdentifier*> instance_name
+%type <Parsers::AST_ScalarIdentifier*> namespace_name
 %type <Parsers::AST_ScalarIdentifier*> module_name
+
+%type <std::vector<Parsers::AST_ScalarIdentifier*>>                                       scoped_instance_name
+%type <std::tuple<std::vector<Parsers::AST_ScalarIdentifier*>, Parsers::AST_Identifier*>> scoped_port_name
 
 %type <std::string> parameter_ref
 %type <std::string> index
@@ -147,17 +154,23 @@ namespace
 %type <std::tuple<string, string>> range          // Left & Right indexes
 %type <std::tuple<string, string>> index_or_range // Left & Right indexes (Right can be empty)
 
-%type <Parsers::AST_Identifier*> alias_name           // Name, Left & Right indexes (Right can be empty)
-%type <Parsers::AST_Identifier*> oneHotScanGroup_name // Name, Left & Right indexes (Left & Right can be empty)
-%type <Parsers::AST_Identifier*> scanMux_name         // Name, Left & Right indexes (Left & Right can be empty)
-%type <Parsers::AST_Identifier*> scanInPort_name      // Name, Left & Right indexes (Left & Right can be empty)
-%type <Parsers::AST_Identifier*> scanOutPort_name     // Name, Left & Right indexes (Left & Right can be empty)
-%type <Parsers::AST_Identifier*> reg_port_signal_id   // Name, Left & Right indexes (Left & Right can be empty)
-%type <Parsers::AST_Identifier*> port_name            // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_Signal*>     signal
+%type <Parsers::AST_Signal*>     signal_or_inverted_signal
+%type <Parsers::AST_Signal*>     data_signal
+%type <Parsers::AST_Signal*>     scan_signal
+%type <Parsers::AST_Signal*>     x_signal
 
-%type <Parsers::AST_VectorIdentifier*> vector_id         // Name, Left & Right indexes (Right can be empty)
-%type <Parsers::AST_VectorIdentifier*> register_name     // Name, Left & Right indexes (Left & Right can be empty)
-%type <Parsers::AST_VectorIdentifier*> scanRegister_name // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> alias_name           // Name, Left & Right indexes (Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> oneHotScanGroup_name // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> port_name            // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> reg_port_signal_id   // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> register_name        // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> scalar_or_vector_id  // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> scanInPort_name      // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> scanMux_name         // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> scanOutPort_name     // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> scanRegister_name    // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> vector_id            // Name, Left & Right indexes (Right can be empty)
 
 %type <Parsers::AST_Value*>            scanRegister_resetValue  // Value expression
 
@@ -228,7 +241,7 @@ namespace
 %type <Parsers::AST_Node*>              scanRegister_defaultLoadValue
 %type <Parsers::AST_Node*>              scanRegister_item
 %type <Parsers::AST_Node*>              scanRegister_refEnum
-%type <Parsers::AST_Node*>              scanRegister_scanInSource
+%type <Parsers::AST_Source*>            scanRegister_scanInSource
 
 %type <std::vector<Parsers::AST_Node*>> module_items
 %type <std::vector<Parsers::AST_Node*>> scanRegister_tail
@@ -363,9 +376,9 @@ namespace
 
 //size : pos_int | parameter_ref ;
 pos_int :
-  POS_INT { $$ = std::move($1); }
-| ONE     { $$ = "1"; }
-| ZERO    { $$ = "0"; }
+  POS_INT { $$ = std::move($1); /* pos_int : POS_INT */ }
+| ONE     { $$ = "1";           /* pos_int : ONE */ }
+| ZERO    { $$ = "0";           /* pos_int : ZERO*/ }
 ;
 
 number :
@@ -413,8 +426,8 @@ vector_id : SCALAR_ID LEFT_BRACKET index_or_range RIGHT_BRACKET
 ;
 
 index_or_range :
-  index { $$ = make_tuple(std::move($[index]), ""s); }
-| range { $$ = std::move($1); }
+  index { $$ = make_tuple(std::move($[index]), ""s); /* index_or_range : index */ }
+| range { $$ = std::move($1);                        /* index_or_range : range */ }
 ;
 
 index : integer_expr { $$ = std::move($1); };
@@ -439,7 +452,6 @@ integer_expr_lvl1 :
 | integer_expr_lvl2 integer_expr_lvl1_b
   {
     // integer_expr_lvl1 : integer_expr_lvl2 integer_expr_lvl1_b
-    //
     auto combined = $[integer_expr_lvl2].append($[integer_expr_lvl1]);
     $$ = std::move(combined);
   }
@@ -447,15 +459,14 @@ integer_expr_lvl1 :
 integer_expr_lvl1_b : plus_or_minus integer_expr_lvl1
 {
   // integer_expr_lvl1_b : plus_or_minus integer_expr_lvl1
-  //
   auto combined = $[plus_or_minus].append($[integer_expr_lvl1]);
   $$ = std::move(combined);
 }
 ;
 
 plus_or_minus :
-  PLUS  { $$ = " + "; }
-| MINUS { $$ = " - "; }
+  PLUS  { $$ = " + "; /* plus_or_minus: PLUS */}
+| MINUS { $$ = " - "; /* plus_or_minus: MINUS*/}
 ;
 
 integer_expr_lvl2 :
@@ -475,7 +486,6 @@ integer_expr_lvl2 :
 integer_expr_lvl2_b : star_or_slash_or_percent integer_expr_lvl2
 {
   // integer_expr_lvl2_b : star_or_slash_or_percent integer_expr_lvl2
-  //
   auto op   = $[star_or_slash_or_percent];
   auto expr = $[integer_expr_lvl2];
   $$ = op.append(expr);
@@ -483,28 +493,28 @@ integer_expr_lvl2_b : star_or_slash_or_percent integer_expr_lvl2
 ;
 
 star_or_slash_or_percent :
-  STAR    { $$ = " * "; }
-| SLASH   { $$ = " // "; }
-| PERCENT { $$ = " % "; }
+  STAR    { $$ = " * ";  /* star_or_slash_or_percent : STAR */}
+| SLASH   { $$ = " // "; /* star_or_slash_or_percent : SLASH*/}
+| PERCENT { $$ = " % ";  /* star_or_slash_or_percent : PERCENT*/}
 ;
 
 integer_expr_paren : LEFT_PAREN integer_expr RIGHT_PAREN
 {
   // integer_expr_paren : LEFT_PAREN integer_expr RIGHT_PAREN
-  //
   auto combined = "("s.append($[integer_expr]).append(")");
   $$ = std::move(combined);
 }
 ;
 
 integer_expr_arg :
-  integer_expr_paren { $$ = std::move($1); }
-| pos_int            { $$ = std::move($1); }
-| parameter_ref      { $$ = std::move($1); }
+  integer_expr_paren { $$ = std::move($1); /* integer_expr_arg : integer_expr_paren */ }
+| pos_int            { $$ = std::move($1); /* integer_expr_arg : pos_int*/ }
+| parameter_ref      { $$ = std::move($1); /* integer_expr_arg : parameter_ref*/ }
 ;
 
 parameter_ref : DOLLAR SCALAR_ID
 {
+  // parameter_ref : DOLLAR SCALAR_ID
   auto combined = "$"s.append($[SCALAR_ID]);
   $$ = std::move(combined);
 }
@@ -544,12 +554,11 @@ concat_number :
 ;
 
 concat_number_list : concat_number | concat_number_list PIPE concat_number ;
-pin_id : instance_name DOT pin_id | instance_name DOT port_name  ;
 
-port_name :
+scalar_or_vector_id:
   SCALAR_ID
   {
-    // port_name : SCALAR_ID
+    // scalar_or_vector_id : SCALAR_ID
     auto& name       = $[SCALAR_ID];
     auto  identifier = ast.Create_VectorIdentifier(std::move(name), "", "");
 
@@ -557,52 +566,108 @@ port_name :
   }
 | vector_id
   {
-    // port_name : vector_id
+    // scalar_or_vector_id : vector_id
     $$ = $[vector_id];
   }
 ;
 
-register_name :
-  SCALAR_ID
-  {
-    // register_name : SCALAR_ID
-    auto& name       = $[SCALAR_ID];
-    auto  identifier = ast.Create_VectorIdentifier(std::move(name), "", "");
+port_name          : scalar_or_vector_id { $$ = $1; /* port_name : scalar_or_vector_id */}
+register_name      : scalar_or_vector_id { $$ = $1; /* register_name : scalar_or_vector_id */}
+reg_port_signal_id : scalar_or_vector_id { $$ = $1; /* reg_port_signal_id : scalar_or_vector_id */}
 
-    $$ = identifier;
-  }
-| vector_id
-  {
-    // register_name : vector_id
-    $$ = $[vector_id];
-  }
-;
-
-reg_port_signal_id :
-  SCALAR_ID
-  {
-    // reg_port_signal_id : SCALAR_ID
-    auto& name       = $[SCALAR_ID];
-    auto  identifier = ast.Create_VectorIdentifier(std::move(name), "", "");
-
-    $$ = identifier;
-  }
-| vector_id
-  {
-    // reg_port_signal_id : vector_id
-    $$ = $[vector_id];
-  }
-;
-
-instance_name  : SCALAR_ID { $$ = $[SCALAR_ID]; };
-namespace_name : SCALAR_ID { $$ = $[SCALAR_ID]; };
+instance_name  : SCALAR_ID { $$ = ast.Create_ScalarIdentifier($[SCALAR_ID]); };
+namespace_name : SCALAR_ID { $$ = ast.Create_ScalarIdentifier($[SCALAR_ID]); };
 module_name    : SCALAR_ID { $$ = ast.Create_ScalarIdentifier($[SCALAR_ID]); };
 
+scoped_instance_name :
+  scoped_instance_name[lhs] DOT instance_name
+  {
+    // scoped_instance_name : scoped_instance_name[lhs] DOT instance_name
+    auto& identifiers = $[lhs];
 
-signal : number | reg_port_signal_id | pin_id  ;
-x_signal : signal | TILDE signal ;
-data_signal : signal | TILDE signal ;
-scan_signal : signal | TILDE signal ;
+    auto instanceName = $[instance_name];
+    if (instanceName != nullptr)
+    {
+      identifiers.push_back(instanceName);
+    }
+    $$ = std::move(identifiers);
+  }
+| instance_name
+  {
+    // scoped_instance_name : instance_name
+    std::vector<Parsers::AST_ScalarIdentifier*> identifiers;
+
+    auto instanceName = $[instance_name];
+    if (instanceName != nullptr)
+    {
+      identifiers.push_back(instanceName);
+    }
+    $$ = std::move(identifiers);
+  }
+;
+
+scoped_port_name : scoped_instance_name DOT port_name
+{
+  // scoped_port_name : scoped_instance_name DOT port_name
+  auto& identifiers = $[scoped_instance_name];
+  auto  portName    = $[port_name];
+
+  $$ = make_tuple(std::move(identifiers), portName);
+}
+;
+
+
+signal : // alias_name is already reg_port_signal_id
+  number
+  {
+    // signal : number
+    auto node = ast.Create_Signal($[number]);
+
+    $$ = node;
+  }
+| reg_port_signal_id
+  {
+    // signal : reg_port_signal_id
+    auto node = ast.Create_Signal($[reg_port_signal_id]);
+
+    $$ = node;
+  }
+| scoped_port_name
+  {
+    // signal : scoped_port_name
+    auto& path     = std::get<0>($[scoped_port_name]);
+    auto  portName = std::get<1>($[scoped_port_name]);
+    auto  node     = ast.Create_Signal(std::move(path), portName);
+
+    $$ = node;
+  }
+;
+
+
+signal_or_inverted_signal :
+  signal
+  {
+    // scan_signal : signal
+    $$ = $1;
+  }
+| TILDE signal
+  {
+    // scan_signal : TILDE signal
+    auto signalNode = $[signal];
+    if (signalNode == nullptr)
+    {
+      $$ = nullptr;
+    }
+
+    signalNode->IsInverted(true);
+    $$ = signalNode;
+  }
+;
+
+x_signal    : signal_or_inverted_signal { $$ = $1; /* x_signal : signal_or_inverted_signal */    };
+data_signal : signal_or_inverted_signal { $$ = $1; /* data_signal : signal_or_inverted_signal */ };
+scan_signal : signal_or_inverted_signal { $$ = $1; /* scan_signal : signal_or_inverted_signal */ };
+
 //clock_signal : signal | TILDE signal ;
 //tck_signal : signal ;
 //tms_signal : signal ;
@@ -629,10 +694,12 @@ iclSource_items : nameSpace_def | useNameSpace_def | module_def;
 nameSpace_def :
   NAMESPACE namespace_name SEMICOLON
   {
+    // nameSpace_def : namespace_name SEMICOLON
     $$ = nullptr;
   }
 | NAMESPACE SEMICOLON
   {
+    // nameSpace_def : NAMESPACE SEMICOLON
     $$ = nullptr;
   }
 ;
@@ -641,10 +708,12 @@ nameSpace_def :
 useNameSpace_def :
   USENAMESPACE namespace_name SEMICOLON
   {
+    // useNameSpace_def : USENAMESPACE namespace_name SEMICOLON
     $$ = nullptr;
   }
 | USENAMESPACE SEMICOLON
   {
+    // useNameSpace_def : USENAMESPACE SEMICOLON
     $$ = nullptr;
   }
 ;
@@ -694,76 +763,94 @@ module_items[result] :
 ;
 
 module_item :
- useNameSpace_def
- {
-   $$ = $1;
- }
+  useNameSpace_def
+  {
+    // module_item : useNameSpace_def
+    $$ = $1;
+  }
 | attribute_def
   {
+    // module_item : attribute_def
     $$ = $1;
   }
 | parameter_def
   {
+    // module_item : parameter_def
     $$ = $1;
   }
 | localParameter_def
   {
+    // module_item : localParameter_def
     $$ = $1;
   }
 | scanInterface_def
   {
+    // module_item : scanInterface_def
     $$ = $1;
   }
 | port_def
   {
+    // module_item : port_def
     $$ = $1;
   }
 | instance_def
   {
+    // module_item : instance_def
     $$ = $1;
   }
 | logicSignal_def
   {
+    // module_item : logicSignal_def
     $$ = $1;
   }
 | scanRegister_def
   {
+    // module_item : scanRegister_def
     $$ = $1;
   }
 | dataRegister_def
   {
+    // module_item : dataRegister_def
     $$ = $1;
   }
 | scanMux_def
   {
+    // module_item : scanMux_def
     $$ = $1;
   }
 | dataMux_def
   {
+    // module_item : dataMux_def
     $$ = $1;
   }
 | clockMux_def
   {
+    // module_item : clockMux_def
     $$ = $1;
   }
 | oneHotDataGroup_def
   {
+    // module_item : oneHotDataGroup_def
     $$ = $1;
   }
 | oneHotScanGroup_def
   {
+    // module_item : oneHotScanGroup_def
     $$ = $1;
   }
 | enum_def
   {
+    // module_item : enum_def
     $$ = $1;
   }
 | alias_def
   {
+    // module_item : alias_def
     $$ = $1;
   }
 | accessLink_def
   {
+    // module_item : accessLink_def
     $$ = $1;
   }
 ;
@@ -771,113 +858,144 @@ module_item :
 port_def :
   scanInPort_def
   {
+    // port_def : scanInPort_def
     $$ = $1;
   }
 | scanOutPort_def
   {
+    // port_def : scanOutPort_def
     $$ = $1;
   }
 | shiftEnPort_def
   {
+    // port_def : shiftEnPort_def
     $$ = $1;
   }
 | captureEnPort_def
   {
+    // port_def : captureEnPort_def
     $$ = $1;
   }
 | updateEnPort_def
   {
+    // port_def : updateEnPort_def
     $$ = $1;
   }
 | dataInPort_def
   {
+    // port_def : dataInPort_def
     $$ = $1;
   }
 | dataOutPort_def
   {
+    // port_def : dataOutPort_def
     $$ = $1;
   }
 | toShiftEnPort_def
   {
+    // port_def : toShiftEnPort_def
     $$ = $1;
   }
 | toUpdateEnPort_def
   {
+    // port_def : toUpdateEnPort_def
     $$ = $1;
   }
 | toCaptureEnPort_def
   {
+    // port_def : toCaptureEnPort_def
     $$ = $1;
   }
 | selectPort_def
   {
+    // port_def : selectPort_def
     $$ = $1;
   }
 | toSelectPort_def
   {
+    // port_def : toSelectPort_def
     $$ = $1;
   }
 | resetPort_def
   {
+    // port_def : resetPort_def
     $$ = $1;
   }
 | toIRSelectPort_def
   {
+    // port_def : toIRSelectPort_def
     $$ = $1;
   }
 | tmsPort_def
   {
+    // port_def : tmsPort_def
     $$ = $1;
   }
 | toTmsPort_def
   {
+    // port_def : toTmsPort_def
     $$ = $1;
   }
 | tckPort_def
   {
+    // port_def : tckPort_def
     $$ = $1;
   }
 | toTckPort_def
   {
+    // port_def : toTckPort_def
     $$ = $1;
   }
 | clockPort_def
   {
+    // port_def : clockPort_def
     $$ = $1;
   }
 | toClockPort_def
   {
+    // port_def : toClockPort_def
     $$ = $1;
   }
 | trstPort_def
   {
+    // port_def : trstPort_def
     $$ = $1;
   }
 | toTrstPort_def
   {
+    // port_def : toTrstPort_def
     $$ = $1;
   }
 | toResetPort_def
   {
+    // port_def : toResetPort_def
     $$ = $1;
   }
 | addressPort_def
   {
+    // port_def : addressPort_def
     $$ = $1;
   }
 | writeEnPort_def
   {
+    // port_def : writeEnPort_def
     $$ = $1;
   }
 | readEnPort_def
+  {
+    // port_def : readEnPort_def
+    $$ = $1;
+  }
 ;
 
 // 6.4.6.1
 scanInPort_def : SCANINPORT scanInPort_name  scanInPort_tail
 {
+  // scanInPort_def : SCANINPORT scanInPort_name  scanInPort_tail
   $$ = nullptr;
 }
 ;
+
 scanInPort_tail: SEMICOLON | LEFT_BRACE scanInPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 scanInPort_items: scanInPort_items attribute_def | attribute_def;
 scanInPort_name : port_name ;
@@ -885,9 +1003,11 @@ scanInPort_name : port_name ;
 // 6.4.6.2
 scanOutPort_def : SCANOUTPORT scanOutPort_name scanOutPort_tail
 {
+  // scanOutPort_def : SCANOUTPORT scanOutPort_name scanOutPort_tail
   $$ = nullptr;
 }
 ;
+
 scanOutPort_tail: SEMICOLON | LEFT_BRACE scanOutPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 scanOutPort_items: scanOutPort_items scanOutPort_item | scanOutPort_item;
 scanOutPort_name : port_name;
@@ -903,9 +1023,11 @@ rising_or_falling : RISING | FALLING;
 // 6.4.6.3
 shiftEnPort_def : SHIFTENPORT shiftEnPort_name shiftEnPort_tail
 {
+  // shiftEnPort_def : SHIFTENPORT shiftEnPort_name shiftEnPort_tail
   $$ = nullptr;
 }
 ;
+
 shiftEnPort_tail: SEMICOLON | LEFT_BRACE shiftEnPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 shiftEnPort_items: shiftEnPort_items attribute_def | attribute_def;
 shiftEnPort_name : port_name ;
@@ -913,9 +1035,11 @@ shiftEnPort_name : port_name ;
 // 6.4.6.4
 captureEnPort_def : CAPTUREENPORT captureEnPort_name captureEnPort_tail
 {
+  // captureEnPort_def : CAPTUREENPORT captureEnPort_name captureEnPort_tail
   $$ = nullptr;
 }
 ;
+
 captureEnPort_tail: SEMICOLON | LEFT_BRACE captureEnPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 captureEnPort_items: captureEnPort_items attribute_def | attribute_def;
 captureEnPort_name : port_name ;
@@ -923,9 +1047,11 @@ captureEnPort_name : port_name ;
 // 6.4.6.5
 updateEnPort_def : UPDATEENPORT updateEnPort_name updateEnPort_tail
 {
+  // updateEnPort_def : UPDATEENPORT updateEnPort_name updateEnPort_tail
   $$ = nullptr;
 }
 ;
+
 updateEnPort_tail: SEMICOLON | LEFT_BRACE updateEnPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 updateEnPort_items: updateEnPort_items attribute_def | attribute_def;
 updateEnPort_name : port_name ;
@@ -933,9 +1059,11 @@ updateEnPort_name : port_name ;
 // 6.4.6.6
 dataInPort_def : DATAINPORT dataInPort_name dataInPort_tail
 {
+  // dataInPort_def : DATAINPORT dataInPort_name dataInPort_tail
   $$ = nullptr;
 }
 ;
+
 dataInPort_tail: SEMICOLON | LEFT_BRACE dataInPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 dataInPort_items: dataInPort_items dataInPort_item | dataInPort_item;
 dataInPort_name : port_name ;
@@ -945,9 +1073,11 @@ dataInPort_refEnum : REFENUM enum_name SEMICOLON ;
 // 6.4.6.7
 dataOutPort_def : DATAOUTPORT dataOutPort_name dataOutPort_tail
 {
+  // dataOutPort_def : DATAOUTPORT dataOutPort_name dataOutPort_tail
   $$ = nullptr;
 }
 ;
+
 dataOutPort_tail: SEMICOLON | LEFT_BRACE dataOutPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 dataOutPort_items: dataOutPort_items dataOutPort_item | dataOutPort_item;
 dataOutPort_name : port_name ;
@@ -962,9 +1092,11 @@ dataOutPort_refEnum : REFENUM enum_name SEMICOLON ;
 // 6.4.6.8
 toShiftEnPort_def : TOSHIFTENPORT toShiftEnPort_name toShiftEnPort_tail
 {
+  // toShiftEnPort_def : TOSHIFTENPORT toShiftEnPort_name toShiftEnPort_tail
   $$ = nullptr;
 }
 ;
+
 toShiftEnPort_tail: SEMICOLON | LEFT_BRACE toShiftEnPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 toShiftEnPort_items: toShiftEnPort_items toShiftEnPort_item | toShiftEnPort_item;
 toShiftEnPort_name : port_name ;
@@ -975,9 +1107,11 @@ toShiftEnPort_source : SOURCE concat_shiftEn_signal SEMICOLON ;
 // 6.4.6.9
 toCaptureEnPort_def : TOCAPTUREENPORT toCaptureEnPort_name toCaptureEnPort_tail
 {
+  // toCaptureEnPort_def : TOCAPTUREENPORT toCaptureEnPort_name toCaptureEnPort_tail
   $$ = nullptr;
 }
 ;
+
 toCaptureEnPort_tail: SEMICOLON | LEFT_BRACE toCaptureEnPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 toCaptureEnPort_items: toCaptureEnPort_items toCaptureEnPort_item | toCaptureEnPort_item;
 toCaptureEnPort_name : port_name ;
@@ -988,9 +1122,11 @@ toCaptureEnPort_source : SOURCE captureEn_signal SEMICOLON ;
 // 6.4.6.10
 toUpdateEnPort_def : TOUPDATEENPORT toUpdateEnPort_name toUpdateEnPort_tail
 {
+  // toUpdateEnPort_def : TOUPDATEENPORT toUpdateEnPort_name toUpdateEnPort_tail
   $$ = nullptr;
 }
 ;
+
 toUpdateEnPort_tail: SEMICOLON | LEFT_BRACE toUpdateEnPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 toUpdateEnPort_items: toUpdateEnPort_items toUpdateEnPort_item | toUpdateEnPort_item;
 toUpdateEnPort_name : port_name ;
@@ -1000,9 +1136,11 @@ toUpdateEnPort_source : SOURCE updateEn_signal SEMICOLON ;
 // 6.4.6.11
 selectPort_def : SELECTPORT selectPort_name selectPort_tail
 {
+  // selectPort_def : SELECTPORT selectPort_name selectPort_tail
   $$ = nullptr;
 }
 ;
+
 selectPort_tail: SEMICOLON | LEFT_BRACE selectPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 selectPort_items: selectPort_items attribute_def | attribute_def;
 selectPort_name : port_name ;
@@ -1010,9 +1148,11 @@ selectPort_name : port_name ;
 // 6.4.6.12
 toSelectPort_def : TOSELECTPORT toSelectPort_name toSelectPort_tail
 {
+  // toSelectPort_def : TOSELECTPORT toSelectPort_name toSelectPort_tail
   $$ = nullptr;
 }
 ;
+
 toSelectPort_name : port_name ;
 toSelectPort_tail: SEMICOLON | LEFT_BRACE toSelectPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 toSelectPort_items: toSelectPort_items toSelectPort_item | toSelectPort_item;
@@ -1022,9 +1162,11 @@ toSelectPort_source : SOURCE concat_data_signal SEMICOLON ;
 // 6.4.6.13
 resetPort_def : RESETPORT resetPort_name resetPort_tail
 {
+  // resetPort_def : RESETPORT resetPort_name resetPort_tail
   $$ = nullptr;
 }
 ;
+
 resetPort_name : port_name ;
 resetPort_tail: SEMICOLON | LEFT_BRACE resetPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 resetPort_items: resetPort_items resetPort_item | resetPort_item;
@@ -1036,9 +1178,11 @@ zero_or_one : ZERO | ONE;
 // 6.4.6.14
 toResetPort_def : TORESETPORT toResetPort_name toResetPort_tail
 {
+  // toResetPort_def : TORESETPORT toResetPort_name toResetPort_tail
   $$ = nullptr;
 }
 ;
+
 toResetPort_name : port_name ;
 toResetPort_tail: SEMICOLON | LEFT_BRACE toResetPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 toResetPort_items: toResetPort_items toResetPort_item | toResetPort_item;
@@ -1051,9 +1195,11 @@ toResetPort_polarity : ACTIVEPOLARITY zero_or_one SEMICOLON ;
 // 6.4.6.15
 tmsPort_def : TMSPORT tmsPort_name tmsPort_tail
 {
+  // tmsPort_def : TMSPORT tmsPort_name tmsPort_tail
   $$ = nullptr;
 }
 ;
+
 tmsPort_tail: SEMICOLON | LEFT_BRACE tmsPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 tmsPort_items: tmsPort_items attribute_def | attribute_def;
 tmsPort_name : port_name ;
@@ -1061,6 +1207,7 @@ tmsPort_name : port_name ;
 // 6.4.6.16
 toTmsPort_def : TOTMSPORT toTmsPort_name toTmsPort_tail
 {
+  // toTmsPort_def : TOTMSPORT toTmsPort_name toTmsPort_tail
   $$ = nullptr;
 }
 ;
@@ -1074,9 +1221,11 @@ toTmsPort_source : SOURCE concat_tms_signal SEMICOLON ;
 // 6.4.6.17
 toIRSelectPort_def : TOIRSELECTPORT toIRSelectPort_name toIRSelectPort_tail
 {
+  // toIRSelectPort_def : TOIRSELECTPORT toIRSelectPort_name toIRSelectPort_tail
   $$ = nullptr;
 }
 ;
+
 toIRSelectPort_tail: SEMICOLON | LEFT_BRACE toIRSelectPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 toIRSelectPort_items: toIRSelectPort_items attribute_def | attribute_def;
 toIRSelectPort_name : port_name ;
@@ -1084,9 +1233,11 @@ toIRSelectPort_name : port_name ;
 // 6.4.6.18
 tckPort_def : TCKPORT tckPort_name tckPort_tail
 {
+  // tckPort_def : TCKPORT tckPort_name tckPort_tail
   $$ = nullptr;
 }
 ;
+
 tckPort_tail: SEMICOLON | LEFT_BRACE tckPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 tckPort_items: tckPort_items attribute_def | attribute_def;
 tckPort_name : port_name ;
@@ -1094,9 +1245,11 @@ tckPort_name : port_name ;
 // 6.4.6.19
 toTckPort_def : TOTCKPORT toTckPort_name toTckPort_tail
 {
+  // toTckPort_def : TOTCKPORT toTckPort_name toTckPort_tail
   $$ = nullptr;
 }
 ;
+
 toTckPort_tail: SEMICOLON | LEFT_BRACE toTckPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 toTckPort_items: toTckPort_items attribute_def | attribute_def;
 toTckPort_name : port_name ;
@@ -1104,6 +1257,7 @@ toTckPort_name : port_name ;
 // 6.4.6.20
 clockPort_def : CLOCKPORT clockPort_name clockPort_tail
 {
+  // clockPort_def : CLOCKPORT clockPort_name clockPort_tail
   $$ = nullptr;
 }
 ;
@@ -1117,9 +1271,12 @@ clockPort_diffPort : DIFFERENTIALINVOF concat_clock_signal SEMICOLON ;
 // 6.4.6.21
 toClockPort_def : TOCLOCKPORT toClockPort_name toClockPort_tail
 {
+  // toClockPort_def : TOCLOCKPORT toClockPort_name toClockPort_tail
   $$ = nullptr;
 }
 ;
+
+
 toClockPort_name : port_name ;
 toClockPort_tail: SEMICOLON | LEFT_BRACE toClockPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 toClockPort_items: toClockPort_items toClockPort_item | toClockPort_item;
@@ -1139,6 +1296,7 @@ tunit : SEC | MSEC | USEC | NSEC | PSEC ;
 // 6.4.6.22
 trstPort_def : TRSTPORT trstPort_name trstPort_tail
 {
+  // trstPort_def : TRSTPORT trstPort_name trstPort_tail
   $$ = nullptr;
 }
 ;
@@ -1149,6 +1307,7 @@ trstPort_name : port_name ;
 // 6.4.6.23
 toTrstPort_def : TOTRSTPORT toTrstPort_name toTrstPort_tail
 {
+  // toTrstPort_def : TOTRSTPORT toTrstPort_name toTrstPort_tail
   $$ = nullptr;
 }
 ;
@@ -1162,9 +1321,11 @@ toTrstPort_source : SOURCE concat_trst_signal SEMICOLON ;
 // 6.4.6.24
 addressPort_def : ADDRESSPORT addressPort_name addressPort_tail
 {
+  // addressPort_def : ADDRESSPORT addressPort_name addressPort_tail
   $$ = nullptr;
 }
 ;
+
 addressPort_tail: SEMICOLON | LEFT_BRACE addressPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 addressPort_items: addressPort_items attribute_def | attribute_def;
 addressPort_name : port_name ;
@@ -1172,9 +1333,11 @@ addressPort_name : port_name ;
 // 6.4.6.25
 writeEnPort_def : WRITEENPORT writeEnPort_name writeEnPort_tail
 {
+  // writeEnPort_def : WRITEENPORT writeEnPort_name writeEnPort_tail
   $$ = nullptr;
 }
 ;
+
 writeEnPort_tail: SEMICOLON | LEFT_BRACE writeEnPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 writeEnPort_items: writeEnPort_items attribute_def | attribute_def;
 writeEnPort_name : port_name ;
@@ -1182,9 +1345,11 @@ writeEnPort_name : port_name ;
 // 6.4.6.26
 readEnPort_def : READENPORT readEnPort_name readEnPort_tail
 {
+  // readEnPort_def : READENPORT readEnPort_name readEnPort_tail
   $$ = nullptr;
 }
 ;
+
 readEnPort_tail: SEMICOLON | LEFT_BRACE readEnPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 readEnPort_items: readEnPort_items attribute_def | attribute_def;
 readEnPort_name : port_name ;
@@ -1226,6 +1391,7 @@ scanRegister_def : SCANREGISTER scanRegister_name scanRegister_tail
 }
 ;
 scanRegister_name : register_name { $$ = $[register_name]; }
+
 scanRegister_tail:
   SEMICOLON
   {
@@ -1283,9 +1449,29 @@ scanRegister_item :
 | scanRegister_refEnum            { $$ = $1; /* scanRegister_item : scanRegister_refEnum           */ }
 ;
 
-scanRegister_scanInSource     : SCANINSOURCE     scan_signal    SEMICOLON { $$ = scan_signal; /* scanRegister_scanInSource : SCANINSOURCE scan_signal SEMICOLON */};
-scanRegister_defaultLoadValue : DEFAULTLOADVALUE number_or_enum SEMICOLON { $$ = nullptr; /* scanRegister_defaultLoadValue : DEFAULTLOADVALUE number_or_enum SEMICOLON */};
+scanRegister_scanInSource : SCANINSOURCE scan_signal SEMICOLON
+{
+  // scanRegister_scanInSource : SCANINSOURCE scan_signal SEMICOLON
+  auto signal = $[scan_signal];
+  auto source = ast.Create_Source(Parsers::Kind::ScanInSource, signal);
+
+  $$ = source;
+};
+
+pin_id : instance_name DOT pin_id | instance_name DOT port_name  ;
+signal_or_enum : number | SCALAR_ID | pin_id;
+
 scanRegister_captureSource    : CAPTURESOURCE    signal_or_enum SEMICOLON { $$ = nullptr; /* scanRegister_captureSource : CAPTURESOURCE signal_or_enum SEMICOLON */};
+
+
+scanRegister_defaultLoadValue : DEFAULTLOADVALUE number_or_enum SEMICOLON
+{
+  // scanRegister_defaultLoadValue : DEFAULTLOADVALUE number_or_enum SEMICOLON
+  auto& valueExpression = $[number_or_enum];
+  auto  node            = ast.Create_Value(Parsers::Kind::DefaultLoadValue, valueExpression);
+
+  $$ = node;
+};
 
 scanRegister_resetValue : RESETVALUE number_or_enum SEMICOLON
 {
@@ -1302,18 +1488,20 @@ scanRegister_refEnum : REFENUM enum_name SEMICOLON { $$ = nullptr; /* scanRegist
 number_or_enum :
   concat_number
   {
+    // number_or_enum : concat_number
     $$ = std::move($1);
   }
 | enum_symbol
   {
+    // number_or_enum : enum_symbol
     $$ = std::move($1);
   }
 ;
-signal_or_enum : number | SCALAR_ID | pin_id;
 
 // 6.4.9
 dataRegister_def : DATAREGISTER dataRegister_name dataRegister_tail
 {
+  // dataRegister_def : DATAREGISTER dataRegister_name dataRegister_tail
   $$ = nullptr;
 }
 ;
@@ -1366,6 +1554,7 @@ parameter_ref ;
 // 6.4.10
 logicSignal_def : LOGICSIGNAL logicSignal_name LEFT_BRACE logic_expr SEMICOLON RIGHT_BRACE
 {
+  // logicSignal_def : LOGICSIGNAL logicSignal_name LEFT_BRACE logic_expr SEMICOLON RIGHT_BRACE
   $$ = nullptr;
 }
 ;
@@ -1388,6 +1577,7 @@ logic_expr_num_arg : number | enum_name | LEFT_PAREN logic_expr_num_arg RIGHT_PA
 // 6.4.11
 scanMux_def : SCANMUX scanMux_name SELECTEDBY scanMux_select LEFT_BRACE scanMux_selections RIGHT_BRACE
 {
+  // scanMux_def : SCANMUX scanMux_name SELECTEDBY scanMux_select LEFT_BRACE scanMux_selections RIGHT_BRACE
   $$ = nullptr;
 }
 ;
@@ -1399,6 +1589,7 @@ scanMux_selection : concat_number_list COLON concat_scan_signal SEMICOLON ;
 // 6.4.12
 dataMux_def : DATAMUX dataMux_name SELECTEDBY dataMux_select LEFT_BRACE dataMux_selections RIGHT_BRACE
 {
+  // dataMux_def : DATAMUX dataMux_name SELECTEDBY dataMux_select LEFT_BRACE dataMux_selections RIGHT_BRACE
   $$ = nullptr;
 }
 ;
@@ -1410,6 +1601,7 @@ dataMux_selection : concat_number_list COLON concat_data_signal SEMICOLON ;
 // 6.4.13
 clockMux_def : CLOCKMUX clockMux_name SELECTEDBY clockMux_select LEFT_BRACE clockMux_selections RIGHT_BRACE
 {
+  // clockMux_def : CLOCKMUX clockMux_name SELECTEDBY clockMux_select LEFT_BRACE clockMux_selections RIGHT_BRACE
   $$ = nullptr;
 }
 ;
@@ -1421,6 +1613,7 @@ clockMux_selection : concat_number_list COLON concat_clock_signal SEMICOLON ;
 // 6.4.14
 oneHotScanGroup_def : ONEHOTSCANGROUP oneHotScanGroup_name LEFT_BRACE oneHotScanGroup_items RIGHT_BRACE
 {
+  // oneHotScanGroup_def : ONEHOTSCANGROUP oneHotScanGroup_name LEFT_BRACE oneHotScanGroup_items RIGHT_BRACE
   $$ = nullptr;
 }
 ;
@@ -1431,6 +1624,7 @@ oneHotScanGroup_item : PORT concat_scan_signal SEMICOLON ;
 // 6.4.15
 oneHotDataGroup_def : ONEHOTDATAGROUP oneHotDataGroup_name LEFT_BRACE oneHotDataGroup_items RIGHT_BRACE
 {
+  // oneHotDataGroup_def : ONEHOTDATAGROUP oneHotDataGroup_name LEFT_BRACE oneHotDataGroup_items RIGHT_BRACE
   $$ = nullptr;
 }
 ;
@@ -1445,6 +1639,7 @@ oneHotDataGroup_portSource : PORT concat_data_signal SEMICOLON ;
 accessLink_def : accessLink1149_def | accessLinkGeneric_def;
 accessLinkGeneric_def : ACCESSLINK accessLink_name OF accessLink_genericID  LEFT_BRACE RIGHT_BRACE
 {
+  // accessLinkGeneric_def : ACCESSLINK accessLink_name OF accessLink_genericID  LEFT_BRACE RIGHT_BRACE
   $$ = nullptr;
 }
 ;
@@ -1452,6 +1647,7 @@ accessLinkGeneric_def : ACCESSLINK accessLink_name OF accessLink_genericID  LEFT
 accessLink_genericID : SCALAR_ID;
 accessLink1149_def : ACCESSLINK accessLink_name OF accessLink1149_stds LEFT_BRACE BSDLENTITIY bsdlEntity_name SEMICOLON bsdl_instr_refs RIGHT_BRACE
 {
+  // accessLink1149_def : ACCESSLINK accessLink_name OF accessLink1149_stds LEFT_BRACE BSDLENTITIY bsdlEntity_name SEMICOLON bsdl_instr_refs RIGHT_BRACE
   $$ = nullptr;
 }
 ;
@@ -1475,6 +1671,7 @@ accessLink1149_ScanInterface_name : instance_name | instance_name DOT scanInterf
 // 6.4.17
 scanInterface_def : SCANINTERFACE scanInterface_name LEFT_BRACE scanInterface_items RIGHT_BRACE
 {
+  // scanInterface_def : SCANINTERFACE scanInterface_name LEFT_BRACE scanInterface_items RIGHT_BRACE
   $$ = nullptr;
 }
 ;
@@ -1491,6 +1688,7 @@ defaultLoad_def : DEFAULTLOADVALUE concat_number SEMICOLON ;
 // 6.5.2
 alias_def : ALIAS alias_name EQUAL concat_hier_data_signal alias_tail
 {
+  // alias_def : ALIAS alias_name EQUAL concat_hier_data_signal alias_tail
   $$ = nullptr;
 }
 ;
@@ -1511,6 +1709,7 @@ hier_data_signal_instances : hier_data_signal_instances instance_name DOT | inst
 // 6.5.3
 enum_def : ENUM enum_name LEFT_BRACE enum_items RIGHT_BRACE
 {
+  // enum_def : ENUM enum_name LEFT_BRACE enum_items RIGHT_BRACE
   $$ = nullptr;
 }
 ;
@@ -1523,11 +1722,14 @@ enum_value : concat_number  { $$ = $1; };
 // 6.5.4
 parameter_def : PARAMETER parameter_name EQUAL parameter_value SEMICOLON
 {
+  // parameter_def : PARAMETER parameter_name EQUAL parameter_value SEMICOLON
   $$ = nullptr;
 }
 ;
+
 localParameter_def : LOCALPARAMETER parameter_name EQUAL parameter_value SEMICOLON
 {
+  // localParameter_def : LOCALPARAMETER parameter_name EQUAL parameter_value SEMICOLON
   $$ = nullptr;
 }
 ;
@@ -1540,14 +1742,16 @@ string_or_parm : STRING | parameter_ref;
 attribute_def :
   ATTRIBUTE attribute_name EQUAL attribute_value SEMICOLON
   {
+    // attribute_def : ATTRIBUTE attribute_name EQUAL attribute_value SEMICOLON
     $$ = nullptr;
   }
-|
-  ATTRIBUTE attribute_name SEMICOLON
+| ATTRIBUTE attribute_name SEMICOLON
   {
+    // attribute_def : ATTRIBUTE attribute_name SEMICOLON
     $$ = nullptr;
   }
 ;
+
 attribute_name : SCALAR_ID;
 attribute_value : concat_string | concat_number ;
 

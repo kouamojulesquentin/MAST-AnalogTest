@@ -12,6 +12,8 @@
 //===========================================================================
 
 #include "AST.hpp"
+#include "AST_Signal.hpp"
+#include "AST_Source.hpp"
 #include "AST_Value.hpp"
 #include "AST_Module.hpp"
 #include "AST_ScanRegister.hpp"
@@ -83,6 +85,79 @@ AST_ScalarIdentifier* AST::Create_ScalarIdentifier (string_view name)
 //---------------------------------------------------------------------------
 
 
+
+//! Creates an AST_Signal node
+//!
+//! @param number Signal value
+//!
+AST_Signal* AST::Create_Signal (string_view number)
+{
+  return Create_Node<AST_Signal>(number);
+}
+//
+//  End of: AST::Create_Signal
+//---------------------------------------------------------------------------
+
+
+//! Creates an AST_Signal node
+//!
+//! @param portName   Port name
+//!
+AST_Signal* AST::Create_Signal (AST_Identifier* portName)
+{
+  return Create_Node<AST_Signal>(portName);
+}
+//
+//  End of: AST::Create_Signal
+//---------------------------------------------------------------------------
+
+
+//! Creates an AST_Signal node
+//!
+//! @param scope      Port scope (dot separated instances names)
+//! @param portName   Port name
+//!
+AST_Signal* AST::Create_Signal (std::vector<AST_ScalarIdentifier*>&& scope, AST_Identifier* portName)
+{
+  return Create_Node<AST_Signal>(std::move(scope), portName);
+}
+//
+//  End of: AST::Create_Signal
+//---------------------------------------------------------------------------
+
+
+//! Creates an AST_Source node
+//!
+//! @param kind     Kind of source
+//! @param signal   Source signal
+//!
+//! @return Created AST_Source
+//!
+AST_Source* AST::Create_Source (Kind kind, AST_Signal* signal)
+{
+  return Create_Node<AST_Source>(kind, signal);
+}
+//
+//  End of: AST::Create_Source
+//---------------------------------------------------------------------------
+
+
+//! Creates an AST_Source node
+//!
+//! @param kind     Kind of source
+//! @param signals  Source signals
+//!
+//! @return Created AST_Source
+//!
+AST_Source* AST::Create_Source (Kind kind, vector<AST_Signal*>&& signals)
+{
+  return Create_Node<AST_Source>(kind, std::move(signals));
+}
+//
+//  End of: AST::Create_Source
+//---------------------------------------------------------------------------
+
+
 //! Creates an AST_Identifier node
 //!
 //! @param name         Identifier
@@ -100,6 +175,8 @@ AST_VectorIdentifier* AST::Create_VectorIdentifier (string_view name,
 //
 //  End of: AST::Create_VectorIdentifier
 //---------------------------------------------------------------------------
+
+
 
 
 //! Creates an AST_ScanRegister node

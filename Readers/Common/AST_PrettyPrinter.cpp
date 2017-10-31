@@ -14,6 +14,7 @@
 #include "AST_PrettyPrinter.hpp"
 #include "AST_Module.hpp"
 #include "AST_Value.hpp"
+#include "AST_Source.hpp"
 #include "AST_ScanRegister.hpp"
 
 #include <sstream>
@@ -170,12 +171,24 @@ void AST_PrettyPrinter::Visit_ScanRegister (AST_ScanRegister* scanRegister)
 
   HierarchyInserter hierarchyInserter(*this);
 
+  // ---------------- ScanInSource
+  //
+  auto scanInSource = scanRegister->ScanInSource();
+  if (scanInSource != nullptr)
+  {
+    StreamDepth() << scanInSource->KindName() << " " << scanInSource->AsText() << ";\n";
+  }
+
+  // ---------------- ResetValue
+  //
   auto resetValue = scanRegister->ResetValue();
   if (resetValue != nullptr)
   {
     StreamDepth() << resetValue->KindName() << " " << resetValue->AsText() << ";\n";
   }
 
+  // ---------------- Others (unprocessed children)
+  //
   for (const auto& node : scanRegister->UnprocessedChildren())
   {
     if (node != nullptr)

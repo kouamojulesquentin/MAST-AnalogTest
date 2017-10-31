@@ -37,7 +37,9 @@ namespace Parsers
     Namespace_def,    //!< For namespace definitions
     Namespace_ref,    //!< For namespace references
     ResetValue,       //!< For registers reset value
+    Signal,           //!< For signal definitions
     ScalarIdentifier, //!< For identifier with a without scope prefix and no bit nor range identifier
+    ScanInSource,     //!< For input of scan registers
     ScanRegister,     //!< For scan registers
     TranslationUnit,  //!< For source files as a all
     VectorIdentifier, //!< For identifiers with a without scope prefix and bit or range identifier
@@ -72,7 +74,9 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::Namespace_def)
             ENUM_MEMBER(Parsers::Kind::Namespace_ref)
             ENUM_MEMBER(Parsers::Kind::ResetValue)
+            ENUM_MEMBER(Parsers::Kind::Signal)
             ENUM_MEMBER(Parsers::Kind::ScalarIdentifier)
+            ENUM_MEMBER(Parsers::Kind::ScanInSource)
             ENUM_MEMBER(Parsers::Kind::ScanRegister)
             ENUM_MEMBER(Parsers::Kind::TranslationUnit)
             ENUM_MEMBER(Parsers::Kind::VectorIdentifier)

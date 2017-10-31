@@ -13,6 +13,7 @@
 
 #include "UT_AST_PrettyPrinter.hpp"
 #include "AST.hpp"
+#include "AST_Source.hpp"
 #include "AST_VectorIdentifier.hpp"
 #include "AST_PrettyPrinter.hpp"
 
@@ -67,9 +68,13 @@ void UT_AST_PrettyPrinter::test_Visit_ScanRegister_empty ()
   // ---------------- Setup
   //
   AST  ast;
-  auto identifier = ast.Create_VectorIdentifier("Ecrin", "", "");
-  auto chidren    = vector<AST_Node*>();
-  auto node       = ast.Create_ScanRegister(identifier, std::move(chidren));
+  auto registerIdentifier    = ast.Create_VectorIdentifier("Ecrin", "", "");
+  auto inputSourceIdentifier = ast.Create_VectorIdentifier("SI",    "", "");
+  auto sourceSignal          = ast.Create_Signal(inputSourceIdentifier);
+  auto source                = ast.Create_Source(Parsers::Kind::ScanInSource, sourceSignal); // An input source is required (and checked)
+  auto chidren               = vector<AST_Node*>();
+  chidren.push_back(source);
+  auto node                  = ast.Create_ScanRegister(registerIdentifier, std::move(chidren));
 
   AST_PrettyPrinter sut;
 
@@ -82,6 +87,7 @@ void UT_AST_PrettyPrinter::test_Visit_ScanRegister_empty ()
   auto got      = sut.PrettyPrint();
   auto expected = "ScanRegister Ecrin\n"
                   "{\n"
+                  "  ScanInSource SI;\n"
                   "}\n";
 
   TS_ASSERT_EQUALS (got, expected);

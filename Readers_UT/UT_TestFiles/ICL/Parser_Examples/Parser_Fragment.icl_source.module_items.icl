@@ -1,3 +1,5 @@
+// This can only be used to check grammar as the semantic part is not correct !
+// ===========================================================================
 
 //Addressable type
 Module M1 {

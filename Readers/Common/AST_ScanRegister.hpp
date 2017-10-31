@@ -25,6 +25,7 @@
 namespace Parsers
 {
 class AST_Value;
+class AST_Source;
 
 //! Represents a parsed test network, instiable, module
 //!
@@ -48,7 +49,8 @@ class AST_ScanRegister final : public AST_ParentNode
   std::experimental::string_view RangeRight() const;
 
 
-  const AST_Value* ResetValue() const { return m_resetValue; }  //!< Scan register reset value
+  const AST_Source* ScanInSource() const { return m_scanInSource; } //!< Scan register input source
+  const AST_Value*  ResetValue()   const { return m_resetValue;   } //!< Scan register reset value
 
 
   // ---------------- Private Methods
@@ -71,8 +73,9 @@ class AST_ScanRegister final : public AST_ParentNode
   // ---------------- Private Fields
   //
   private:
-  const AST_VectorIdentifier* m_identifier = nullptr; //!< Scan register name
-  const AST_Value*            m_resetValue = nullptr; //!< Scan register reset value expression
+  const AST_VectorIdentifier* m_identifier   = nullptr; //!< Scan register name
+  const AST_Value*            m_resetValue   = nullptr; //!< Scan register reset value expression
+  const AST_Source*           m_scanInSource = nullptr; //!< Scan register input source
 };
 //
 //  End of AST_ScanRegister class declaration

@@ -12,6 +12,8 @@
 //===========================================================================
 
 #include "AST.hpp"
+#include "AST_Attribute.hpp"
+#include "AST_Port.hpp"
 #include "AST_Signal.hpp"
 #include "AST_Source.hpp"
 #include "AST_Value.hpp"
@@ -27,17 +29,12 @@ using std::experimental::string_view;
 using std::make_unique;
 
 using namespace Parsers;
-using namespace mast;
-
 
 //! Releases constructed AST nodes
 //!
 AST::~AST ()
 {
 }
-//
-//  End of: AST::~AST
-//---------------------------------------------------------------------------
 
 
 //! Initializes AST
@@ -45,11 +42,19 @@ AST::~AST ()
 AST::AST ()
 {
 }
+
+
+//! Creates an AST_Attribute node
+//!
+//! @param name   Attribute name
+//!
+AST_Attribute* AST::Create_Attribute (string&& name)
+{
+  return Create_Node<AST_Attribute>(std::move(name));
+}
 //
-//  End of: AST::AST
+//  End of: AST::Create_Attribute
 //---------------------------------------------------------------------------
-
-
 
 
 //! Creates a AST_Module node
@@ -72,6 +77,39 @@ AST_Module* AST::Create_Module (AST_ScalarIdentifier* identifier, vector<AST_Nod
 //---------------------------------------------------------------------------
 
 
+//! Creates an AST_Port node
+//!
+//! @param kind         Kind of port
+//! @param identifier   Port identifier
+//!
+//! @return Created AST_Port
+//!
+AST_Port* AST::Create_Port (Kind kind, AST_VectorIdentifier* identifier)
+{
+  return Create_Node<AST_Port>(kind, identifier);
+}
+//
+//  End of: AST::Create_Port
+//---------------------------------------------------------------------------
+
+
+//! Creates an AST_Port node
+//!
+//! @param kind         Kind of port
+//! @param identifier   Port identifier
+//! @param children     Port children nodes
+//!
+//! @return Created AST_Port
+//!
+AST_Port* AST::Create_Port (Kind kind, AST_VectorIdentifier* identifier, vector<AST_Node*>&& children)
+{
+  return Create_Node<AST_Port>(kind, identifier, std::move(children));
+}
+//
+//  End of: AST::Create_Port
+//---------------------------------------------------------------------------
+
+
 //! Creates an AST_ScalarIdentifier node
 //!
 //! @param name Identifier
@@ -85,6 +123,23 @@ AST_ScalarIdentifier* AST::Create_ScalarIdentifier (string_view name)
 //---------------------------------------------------------------------------
 
 
+
+
+
+//! Creates an AST_ScanRegister node
+//!
+//! @param identifier   ScanRegister identifier
+//! @param children     ScanRegister children nodes
+//!
+//! @return Created AST_ScanRegister
+//!
+AST_ScanRegister* AST::Create_ScanRegister (AST_VectorIdentifier* identifier, vector<AST_Node*>&& children)
+{
+  return Create_Node<AST_ScanRegister>(identifier, std::move(children));
+}
+//
+//  End of: AST::Create_ScanRegister
+//---------------------------------------------------------------------------
 
 //! Creates an AST_Signal node
 //!
@@ -117,7 +172,7 @@ AST_Signal* AST::Create_Signal (AST_Identifier* portName)
 //! @param scope      Port scope (dot separated instances names)
 //! @param portName   Port name
 //!
-AST_Signal* AST::Create_Signal (std::vector<AST_ScalarIdentifier*>&& scope, AST_Identifier* portName)
+AST_Signal* AST::Create_Signal (vector<AST_ScalarIdentifier*>&& scope, AST_Identifier* portName)
 {
   return Create_Node<AST_Signal>(std::move(scope), portName);
 }
@@ -179,20 +234,6 @@ AST_VectorIdentifier* AST::Create_VectorIdentifier (string_view name,
 
 
 
-//! Creates an AST_ScanRegister node
-//!
-//! @param identifier   ScanRegister identifier
-//! @param children     ScanRegister children nodes
-//!
-//! @return Created AST_ScanRegister
-//!
-AST_ScanRegister* AST::Create_ScanRegister (AST_VectorIdentifier* identifier, vector<AST_Node*>&& children)
-{
-  return Create_Node<AST_ScanRegister>(identifier, std::move(children));
-}
-//
-//  End of: AST::Create_ScanRegister
-//---------------------------------------------------------------------------
 
 
 //! Creates an AST_Value node

@@ -9,12 +9,16 @@ message("")
 
 add_library (Reader_Common SHARED AST.hpp
                                   AST.cpp
+                                  AST_Attribute.hpp
+                                  AST_Attribute.cpp
                                   AST_Node.hpp
                                   AST_NamedNode.hpp
                                   AST_ParentNode.hpp
+                                  AST_Identifier.hpp
                                   AST_Module.hpp
                                   AST_Module.cpp
-                                  AST_Identifier.hpp
+                                  AST_Port.hpp
+                                  AST_Port.cpp
                                   AST_ScalarIdentifier.hpp
                                   AST_Signal.hpp
                                   AST_Signal.cpp

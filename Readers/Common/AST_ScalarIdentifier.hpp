@@ -30,8 +30,6 @@ class AST_ScalarIdentifier final : public AST_Identifier
   ~AST_ScalarIdentifier() = default;
   AST_ScalarIdentifier()  = delete;
 
-//+  std::string Name() const { return m_identifier; } //!< Text representation of identifier
-
   std::string AsText() const override { return m_identifier; }; //!< Text representation of identifier
 
   // ---------------- Private Methods

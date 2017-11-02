@@ -37,26 +37,37 @@ class AST_ParentNode : public AST_NamedNode
   //!
   //! @note This is mainly intended to be "processed" by visitors
   //!
-  std::vector<AST_Node*>& UnprocessedChildren() { return m_unprocessedChildren; }
+  std::vector<AST_Node*>& UndispatchedChildren() { return m_undispatchedChildren; }
 
   // ---------------- Protected Methods
   //
   protected:
+
+  //! Initializes with no children
+  //!
+  //! @note This is for case when children are optional
+  //!
   AST_ParentNode(Kind kind)
     : AST_NamedNode(kind)
   {
   }
 
+  //! Initializes with children
+  //!
   AST_ParentNode(Kind kind, std::vector<AST_Node*>&& children)
-    : AST_NamedNode         (kind)
-    , m_unprocessedChildren (std::move(children))
+    : AST_NamedNode          (kind)
+    , m_undispatchedChildren (std::move(children))
   {
   }
+
+  //! Dispatches children to specific members
+  //!
+  virtual void DispatchChildren () = 0;
 
   // ---------------- Protected Fields
   //
   protected:
-  std::vector<AST_Node*>  m_unprocessedChildren; //!< Children nodes got from parsing and not yet processed (some may be nullptr)
+  std::vector<AST_Node*>  m_undispatchedChildren; //!< Children nodes got from parsing and not yet processed (some may be nullptr)
 };
 //
 //  End of AST_ParentNode class declaration

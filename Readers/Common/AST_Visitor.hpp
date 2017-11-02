@@ -16,6 +16,7 @@
 namespace Parsers
 {
 class AST_Module;
+class AST_Port;
 class AST_ScanRegister;
 
 //! AST visitors interface
@@ -27,6 +28,7 @@ class AST_Visitor
   public:
   virtual void Visit_Module       (AST_Module*       module) = 0;
   virtual void Visit_ScanRegister (AST_ScanRegister* scanRegister) = 0;
+  virtual void Visit_Port         (AST_Port*         port) = 0;
 
   // ---------------- Protected Methods
   //

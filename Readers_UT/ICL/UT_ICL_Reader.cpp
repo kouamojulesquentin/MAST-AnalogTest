@@ -133,6 +133,8 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_ScanRegister ()
 
   auto expected_AST_PrettyPrint = "Module SReg\n"
                                   "{\n"
+                                  "  ScanInPort SI;\n"
+//+                                  "  ScanOutPort SO { Source SR[0];}\n"
                                   "  ScanRegister SR[7:0]\n"
                                   "  {\n"
                                   "    ScanInSource SI;\n"

@@ -35,7 +35,7 @@ void AST_ScanRegister::Accept (AST_Visitor& visitor)
 //!
 void AST_ScanRegister::DispatchChildren ()
 {
-  for (auto&  child:  UnprocessedChildren())
+  for (auto&  child:  UndispatchedChildren())
   {
     if (child != nullptr)
     {
@@ -62,9 +62,6 @@ void AST_ScanRegister::DispatchChildren ()
 //
 //  End of: AST_ScanRegister::DispatchChildren
 //---------------------------------------------------------------------------
-
-
-
 
 
 //! Returns scan register left index or empty string when defined as a scalar identifier (single bit)

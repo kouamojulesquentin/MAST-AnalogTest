@@ -33,13 +33,16 @@ namespace ICL
 namespace Parsers
 {
   class AST;
-  class AST_Value;
+  class AST_Attribute;
+  class AST_Identifier;
+  class AST_Module;
+  class AST_Node;
+  class AST_Port;
+  class AST_ScalarIdentifier;
+  class AST_ScanRegister;
   class AST_Signal;
   class AST_Source;
-  class AST_Node;
-  class AST_Module;
-  class AST_Identifier;
-  class AST_ScalarIdentifier;
+  class AST_Value;
   class AST_VectorIdentifier;
 }
 
@@ -69,6 +72,8 @@ typedef void* yyscan_t;
 //
 #include "ParserException.hpp"
 #include "AST.hpp"
+#include "AST_Attribute.hpp"
+#include "AST_Port.hpp"
 #include "AST_Signal.hpp"
 #include "AST_Source.hpp"
 #include "AST_Value.hpp"
@@ -128,6 +133,8 @@ namespace
 %type <std::string> STRING
 %type <std::string> scanInterfaceChain_name
 %type <std::string> scanInterface_name
+%type <std::string> parameter_name
+%type <std::string> attribute_name
 
 %type <Parsers::AST_ScalarIdentifier*> instance_name
 %type <Parsers::AST_ScalarIdentifier*> namespace_name
@@ -187,11 +194,12 @@ namespace
 %type <std::string> star_or_slash_or_percent
 
 %type <Parsers::AST_Module*>            module_def
+%type <Parsers::AST_Attribute*>         attribute_def
+%type <Parsers::AST_ScanRegister*>      scanRegister_def
 %type <Parsers::AST_Node*>              accessLink_def
 %type <Parsers::AST_Node*>              accessLinkGeneric_def
 %type <Parsers::AST_Node*>              accessLink1149_def
 %type <Parsers::AST_Node*>              alias_def
-%type <Parsers::AST_Node*>              attribute_def
 %type <Parsers::AST_Node*>              clockMux_def
 %type <Parsers::AST_Node*>              dataMux_def
 %type <Parsers::AST_Node*>              dataRegister_def
@@ -206,36 +214,35 @@ namespace
 %type <Parsers::AST_Node*>              parameter_def
 %type <Parsers::AST_Node*>              scanInterface_def
 %type <Parsers::AST_Node*>              scanMux_def
-%type <Parsers::AST_Node*>              scanRegister_def
 %type <Parsers::AST_Node*>              useNameSpace_def
 
-%type <Parsers::AST_Node*>              addressPort_def
-%type <Parsers::AST_Node*>              captureEnPort_def
-%type <Parsers::AST_Node*>              clockPort_def
-%type <Parsers::AST_Node*>              dataInPort_def
-%type <Parsers::AST_Node*>              dataOutPort_def
-%type <Parsers::AST_Node*>              port_def
-%type <Parsers::AST_Node*>              readEnPort_def
-%type <Parsers::AST_Node*>              resetPort_def
-%type <Parsers::AST_Node*>              scanInPort_def
-%type <Parsers::AST_Node*>              scanOutPort_def
-%type <Parsers::AST_Node*>              selectPort_def
-%type <Parsers::AST_Node*>              shiftEnPort_def
-%type <Parsers::AST_Node*>              tckPort_def
-%type <Parsers::AST_Node*>              tmsPort_def
-%type <Parsers::AST_Node*>              toCaptureEnPort_def
-%type <Parsers::AST_Node*>              toClockPort_def
-%type <Parsers::AST_Node*>              toIRSelectPort_def
-%type <Parsers::AST_Node*>              toResetPort_def
-%type <Parsers::AST_Node*>              toSelectPort_def
-%type <Parsers::AST_Node*>              toShiftEnPort_def
-%type <Parsers::AST_Node*>              toTckPort_def
-%type <Parsers::AST_Node*>              toTmsPort_def
-%type <Parsers::AST_Node*>              toTrstPort_def
-%type <Parsers::AST_Node*>              toUpdateEnPort_def
-%type <Parsers::AST_Node*>              trstPort_def
-%type <Parsers::AST_Node*>              updateEnPort_def
-%type <Parsers::AST_Node*>              writeEnPort_def
+%type <Parsers::AST_Port*>              addressPort_def
+%type <Parsers::AST_Port*>              captureEnPort_def
+%type <Parsers::AST_Port*>              clockPort_def
+%type <Parsers::AST_Port*>              dataInPort_def
+%type <Parsers::AST_Port*>              dataOutPort_def
+%type <Parsers::AST_Port*>              port_def
+%type <Parsers::AST_Port*>              readEnPort_def
+%type <Parsers::AST_Port*>              resetPort_def
+%type <Parsers::AST_Port*>              scanInPort_def
+%type <Parsers::AST_Port*>              scanOutPort_def
+%type <Parsers::AST_Port*>              selectPort_def
+%type <Parsers::AST_Port*>              shiftEnPort_def
+%type <Parsers::AST_Port*>              tckPort_def
+%type <Parsers::AST_Port*>              tmsPort_def
+%type <Parsers::AST_Port*>              toCaptureEnPort_def
+%type <Parsers::AST_Port*>              toClockPort_def
+%type <Parsers::AST_Port*>              toIRSelectPort_def
+%type <Parsers::AST_Port*>              toResetPort_def
+%type <Parsers::AST_Port*>              toSelectPort_def
+%type <Parsers::AST_Port*>              toShiftEnPort_def
+%type <Parsers::AST_Port*>              toTckPort_def
+%type <Parsers::AST_Port*>              toTmsPort_def
+%type <Parsers::AST_Port*>              toTrstPort_def
+%type <Parsers::AST_Port*>              toUpdateEnPort_def
+%type <Parsers::AST_Port*>              trstPort_def
+%type <Parsers::AST_Port*>              updateEnPort_def
+%type <Parsers::AST_Port*>              writeEnPort_def
 
 %type <Parsers::AST_Node*>              scanRegister_captureSource
 %type <Parsers::AST_Node*>              scanRegister_defaultLoadValue
@@ -246,6 +253,7 @@ namespace
 %type <std::vector<Parsers::AST_Node*>> module_items
 %type <std::vector<Parsers::AST_Node*>> scanRegister_tail
 %type <std::vector<Parsers::AST_Node*>> scanRegister_items
+%type <std::vector<Parsers::AST_Node*>> scanInPort_items
 
 %token ACCESSLINK
 %token ACCESSTOGETHER
@@ -989,16 +997,68 @@ port_def :
 ;
 
 // 6.4.6.1
-scanInPort_def : SCANINPORT scanInPort_name  scanInPort_tail
-{
-  // scanInPort_def : SCANINPORT scanInPort_name  scanInPort_tail
-  $$ = nullptr;
-}
+scanInPort_def :
+  SCANINPORT scanInPort_name  SEMICOLON
+  {
+    // scanInPort_def : SCANINPORT scanInPort_name SEMICOLON
+    auto& name     = $[scanInPort_name];
+    auto  node     = ast.Create_Port(Parsers::Kind::ScanInPort, name);
+
+    $$ = node;
+  }
+| SCANINPORT scanInPort_name  LEFT_BRACE RIGHT_BRACE
+  {
+    // scanInPort_def : SCANINPORT scanInPort_name  LEFT_BRACE RIGHT_BRACE
+    auto& name     = $[scanInPort_name];
+    auto  node     = ast.Create_Port(Parsers::Kind::ScanInPort, name);
+
+    $$ = node;
+  }
+| SCANINPORT scanInPort_name LEFT_BRACE scanInPort_items RIGHT_BRACE
+  {
+    // scanInPort_def : SCANINPORT scanInPort_name  LEFT_BRACE scanInPort_items RIGHT_BRACE
+    auto& name     = $[scanInPort_name];
+    auto& children = $[scanInPort_items];
+    auto  node     = ast.Create_Port(Parsers::Kind::ScanInPort, name, std::move(children));
+
+    $$ = node;
+  }
 ;
 
-scanInPort_tail: SEMICOLON | LEFT_BRACE scanInPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
-scanInPort_items: scanInPort_items attribute_def | attribute_def;
-scanInPort_name : port_name ;
+scanInPort_items:
+  scanInPort_items[lhs] attribute_def
+  {
+    // scanInPort_items: scanInPort_items[lhs] attribute_def
+    auto& children = $[lhs];
+    auto  item     = $[attribute_def];
+
+    if (item != nullptr)
+    {
+      children.push_back(item);
+    }
+    $$ = std::move(children);
+  }
+| attribute_def
+  {
+    // scanInPort_items: attribute_def
+    std::vector<Parsers::AST_Node*> children;
+
+    auto item = $[attribute_def];
+    if (item != nullptr)
+    {
+      children.push_back(item);
+    }
+    $$ = std::move(children);
+  }
+;
+
+
+scanInPort_name : port_name
+{
+  // scanInPort_name : port_name
+  $$ = std::move($1);
+}
+;
 
 // 6.4.6.2
 scanOutPort_def : SCANOUTPORT scanOutPort_name scanOutPort_tail
@@ -1390,6 +1450,7 @@ scanRegister_def : SCANREGISTER scanRegister_name scanRegister_tail
   $$ = node;
 }
 ;
+
 scanRegister_name : register_name { $$ = $[register_name]; }
 
 scanRegister_tail:
@@ -1719,6 +1780,9 @@ enum_item : enum_symbol EQUAL enum_value SEMICOLON ;
 enum_symbol : SCALAR_ID     { $$ = $1; };
 enum_value : concat_number  { $$ = $1; };
 
+concat_string : concat_string COMMA string_or_parm | string_or_parm ;
+string_or_parm : STRING | parameter_ref;
+
 // 6.5.4
 parameter_def : PARAMETER parameter_name EQUAL parameter_value SEMICOLON
 {
@@ -1733,26 +1797,46 @@ localParameter_def : LOCALPARAMETER parameter_name EQUAL parameter_value SEMICOL
   $$ = nullptr;
 }
 ;
-parameter_name : SCALAR_ID;
+
+parameter_name : SCALAR_ID
+{
+  // parameter_name : SCALAR_ID
+  $$ = std::move($1);
+}
+;
+
 parameter_value : concat_string | concat_number;
-concat_string : concat_string COMMA string_or_parm | string_or_parm ;
-string_or_parm : STRING | parameter_ref;
+
 
 // 6.5.5
 attribute_def :
   ATTRIBUTE attribute_name EQUAL attribute_value SEMICOLON
   {
     // attribute_def : ATTRIBUTE attribute_name EQUAL attribute_value SEMICOLON
-    $$ = nullptr;
+    auto& name = $[attribute_name];
+    auto  node = ast.Create_Attribute(std::move(name));
+
+    LOG(DEBUG) << "attribute_value is discarded !!!";
+
+    $$ = node;
   }
 | ATTRIBUTE attribute_name SEMICOLON
   {
     // attribute_def : ATTRIBUTE attribute_name SEMICOLON
-    $$ = nullptr;
+    auto& name = $[attribute_name];
+    auto  node = ast.Create_Attribute(std::move(name));
+
+    $$ = node;
   }
 ;
 
-attribute_name : SCALAR_ID;
+attribute_name : SCALAR_ID
+{
+  // attribute_name : SCALAR_ID
+  $$ = std::move($1);
+}
+;
+
 attribute_value : concat_string | concat_number ;
 
 %%

@@ -41,7 +41,7 @@ class AST_ScanRegister final : public AST_ParentNode
   //!
   void Accept (AST_Visitor& visitor) override;
 
-  //! Module name
+  //! ScanRegister name
   //!
   std::string Name() const override { return m_identifier->AsText(); }
 
@@ -68,7 +68,9 @@ class AST_ScanRegister final : public AST_ParentNode
     DispatchChildren();
   }
 
-  void DispatchChildren ();
+  //! Dispatches children to specific members
+  //!
+  void DispatchChildren () override;
 
   // ---------------- Private Fields
   //

@@ -28,6 +28,7 @@ namespace Parsers
     Undefined,
 
     Alias,            //!< For alias definitions
+    Attribute,        //!< For attribute definitions
     DefaultLoadValue, //!< For registers default load value
     Enum_def,         //!< For enums definitions
     Enum_item,        //!< For enums items
@@ -37,10 +38,12 @@ namespace Parsers
     Namespace_def,    //!< For namespace definitions
     Namespace_ref,    //!< For namespace references
     ResetValue,       //!< For registers reset value
-    Signal,           //!< For signal definitions
     ScalarIdentifier, //!< For identifier with a without scope prefix and no bit nor range identifier
+    ScanInPort,       //!< For modules scan input port
     ScanInSource,     //!< For input of scan registers
+    ScanOutPort,      //!< For modules scan output port
     ScanRegister,     //!< For scan registers
+    Signal,           //!< For signal definitions
     TranslationUnit,  //!< For source files as a all
     VectorIdentifier, //!< For identifiers with a without scope prefix and bit or range identifier
   };
@@ -65,6 +68,7 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::Undefined)
 
             ENUM_MEMBER(Parsers::Kind::Alias)
+            ENUM_MEMBER(Parsers::Kind::Attribute)
             ENUM_MEMBER(Parsers::Kind::DefaultLoadValue)
             ENUM_MEMBER(Parsers::Kind::Enum_def)
             ENUM_MEMBER(Parsers::Kind::Enum_item)
@@ -74,10 +78,12 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::Namespace_def)
             ENUM_MEMBER(Parsers::Kind::Namespace_ref)
             ENUM_MEMBER(Parsers::Kind::ResetValue)
-            ENUM_MEMBER(Parsers::Kind::Signal)
             ENUM_MEMBER(Parsers::Kind::ScalarIdentifier)
+            ENUM_MEMBER(Parsers::Kind::ScanInPort)
             ENUM_MEMBER(Parsers::Kind::ScanInSource)
+            ENUM_MEMBER(Parsers::Kind::ScanOutPort)
             ENUM_MEMBER(Parsers::Kind::ScanRegister)
+            ENUM_MEMBER(Parsers::Kind::Signal)
             ENUM_MEMBER(Parsers::Kind::TranslationUnit)
             ENUM_MEMBER(Parsers::Kind::VectorIdentifier)
            );

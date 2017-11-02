@@ -12,10 +12,13 @@
 //===========================================================================
 
 #include "AST_PrettyPrinter.hpp"
+#include "AST_Attribute.hpp"
 #include "AST_Module.hpp"
+#include "AST_Port.hpp"
 #include "AST_Value.hpp"
 #include "AST_Source.hpp"
 #include "AST_ScanRegister.hpp"
+#include "Utility.hpp"
 
 #include <sstream>
 
@@ -148,7 +151,15 @@ void AST_PrettyPrinter::Visit_Module (AST_Module* module)
 
   HierarchyInserter hierarchyInserter(*this);
 
-  for (const auto& node : module->UnprocessedChildren())
+  // ---------------- ScanInPort
+  //
+  const auto scanInPort = module->ScanInPort();
+  if (scanInPort != nullptr)
+  {
+    scanInPort->Accept(*this);
+  }
+
+  for (const auto& node : module->UndispatchedChildren())
   {
     if (node != nullptr)
     {
@@ -156,10 +167,58 @@ void AST_PrettyPrinter::Visit_Module (AST_Module* module)
     }
   }
 
+  // ---------------- Scan registers
+  //
+  for (const auto& scanRegister : module->ScanRegisters())
+  {
+    CHECK_VALUE_NOT_NULL(scanRegister, "Unexpected hold nullptr ScanRegister in module");
+
+    scanRegister->Accept(*this);
+  }
 
 }
 //
 //  End of: AST_PrettyPrinter::Visit_Module
+//---------------------------------------------------------------------------
+
+
+//! Appends content of a Port node in text representation and visits
+//! sub-nodes
+void AST_PrettyPrinter::Visit_Port (AST_Port* port)
+{
+  StreamNodeHeader(port, "");
+
+  const auto& attributes   = port->Attributes();
+  const auto& undispatched = port->UndispatchedChildren();
+
+  if (!attributes.empty() || !undispatched.empty())
+  {
+    HierarchyInserter hierarchyInserter(*this);
+
+    for (const auto attribute : attributes)
+    {
+      CHECK_VALUE_NOT_NULL(attribute, "Unexpected nullptr attribute in port");
+
+      StreamDepth() << attribute->AsText() << ";\n";
+    }
+
+    // ---------------- Others (unprocessed children)
+    //
+    for (const auto node : undispatched)
+    {
+      if (node != nullptr)
+      {
+        node->Accept(*this);
+      }
+    }
+  }
+  else
+  {
+    m_os << ";\n";
+  }
+}
+//
+//  End of: AST_PrettyPrinter::Visit_Port
 //---------------------------------------------------------------------------
 
 
@@ -189,7 +248,7 @@ void AST_PrettyPrinter::Visit_ScanRegister (AST_ScanRegister* scanRegister)
 
   // ---------------- Others (unprocessed children)
   //
-  for (const auto& node : scanRegister->UnprocessedChildren())
+  for (const auto node : scanRegister->UndispatchedChildren())
   {
     if (node != nullptr)
     {

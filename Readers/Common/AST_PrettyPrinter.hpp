@@ -38,6 +38,7 @@ class AST_PrettyPrinter final : public AST_Visitor
   AST_PrettyPrinter()  = default;
 
   virtual void Visit_Module       (AST_Module*       module)       override;
+  virtual void Visit_Port         (AST_Port*         port)         override;
   virtual void Visit_ScanRegister (AST_ScanRegister* scanRegister) override;
 
   std::string PrettyPrint() const { return m_os.str(); } //!< Returns currently visited nodes representation

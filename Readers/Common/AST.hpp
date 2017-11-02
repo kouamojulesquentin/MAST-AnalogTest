@@ -21,13 +21,15 @@
 
 namespace Parsers
 {
-class AST_Value;
+class AST_Identifier;
+class AST_Module;
+class AST_Port;
+class AST_ScalarIdentifier;
+class AST_ScanRegister;
 class AST_Signal;
 class AST_Source;
-class AST_Module;
-class AST_ScanRegister;
-class AST_Identifier;
-class AST_ScalarIdentifier;
+class AST_Value;
+class AST_Attribute;
 class AST_VectorIdentifier;
 
 //! Abstract Syntax Tree built when parsing some test network description
@@ -40,11 +42,14 @@ class AST final
   ~AST();
   AST();
 
+  AST_Attribute*        Create_Attribute        (std::string&& name);
   AST_Signal*           Create_Signal           (std::experimental::string_view number);
   AST_Signal*           Create_Signal           (AST_Identifier* portName);
   AST_Signal*           Create_Signal           (std::vector<AST_ScalarIdentifier*>&& scope, AST_Identifier* portName);
   AST_Source*           Create_Source           (Kind kind, AST_Signal* signal);
   AST_Source*           Create_Source           (Kind kind, std::vector<AST_Signal*>&& signals);
+  AST_Port*             Create_Port             (Kind kind, AST_VectorIdentifier* identifier);
+  AST_Port*             Create_Port             (Kind kind, AST_VectorIdentifier* identifier, std::vector<AST_Node*>&& children);
   AST_Module*           Create_Module           (AST_ScalarIdentifier* identifier, std::vector<AST_Node*>&& children);
   AST_ScanRegister*     Create_ScanRegister     (AST_VectorIdentifier* identifier, std::vector<AST_Node*>&& children);
   AST_ScalarIdentifier* Create_ScalarIdentifier (std::experimental::string_view name);

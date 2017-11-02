@@ -22,6 +22,9 @@
 
 namespace Parsers
 {
+class AST_ScanRegister;
+class AST_Port;
+
 //! Represents a parsed test network, instiable, module
 //!
 class AST_Module final : public AST_ParentNode
@@ -36,9 +39,22 @@ class AST_Module final : public AST_ParentNode
   //!
   void Accept (AST_Visitor& visitor) override;
 
-  //! Module name
+  //! Returns module name
   //!
   std::string Name() const override { return m_identifier->AsText(); }
+
+  //! Returns scan registers defined in module
+  //!
+  const std::vector<AST_ScanRegister*>& ScanRegisters() const { return m_scanRegisters; }
+
+  //! Returns module ScanInPort
+  //!
+  AST_Port* ScanInPort() const { return m_scanInPort; }
+
+  //! Returns module ScanOutPort
+  //!
+  AST_Port* ScanOutPort() const { return m_scanOutPort; }
+
 
   // ---------------- Private Methods
   //
@@ -50,12 +66,20 @@ class AST_Module final : public AST_ParentNode
     : AST_ParentNode (Kind::Module, std::move(children))
     , m_identifier   (identifier)
   {
+    DispatchChildren();
   }
+
+  //! Dispatches children to specific members
+  //!
+  void DispatchChildren () override;
 
   // ---------------- Private Fields
   //
   private:
-  const AST_ScalarIdentifier* m_identifier = nullptr; //!< Module name
+  const AST_ScalarIdentifier*    m_identifier  = nullptr; //!< Module name
+  AST_Port*                      m_scanInPort  = nullptr; //!< Scan input port
+  AST_Port*                      m_scanOutPort = nullptr; //!< Scan output port
+  std::vector<AST_ScanRegister*> m_scanRegisters;         //!< Scan registers defined in module
 };
 //
 //  End of AST_Module class declaration

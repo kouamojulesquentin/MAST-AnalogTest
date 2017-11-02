@@ -1,35 +1,38 @@
 //===========================================================================
-//                           AST_Module.cpp
+//                           AST_Port.cpp
 //===========================================================================
 // Copyright (C) 2017 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file AST_Module.cpp
+//! @file AST_Port.cpp
 //!
-//! Implements class AST_Module
+//! Implements class AST_Port
 //!
 //===========================================================================
 
-#include "AST_Module.hpp"
-#include "AST_ScanRegister.hpp"
 #include "AST_Port.hpp"
+#include "AST_Attribute.hpp"
 #include "AST_Visitor.hpp"
 
 using namespace Parsers;
 
 
+
 //! Visited part of the Visitor pattern
 //!
-void AST_Module::Accept (AST_Visitor& visitor)
+void AST_Port::Accept (AST_Visitor& visitor)
 {
-  visitor.Visit_Module(this);
+  visitor.Visit_Port(this);
 }
+//
+//  End of: AST_Port::Accept
+//---------------------------------------------------------------------------
 
 
 //! Dispatches children to specific member (for ease of use)
 //!
-void AST_Module::DispatchChildren ()
+void AST_Port::DispatchChildren ()
 {
   for (auto& child : UndispatchedChildren())
   {
@@ -37,16 +40,8 @@ void AST_Module::DispatchChildren ()
     {
       switch (child->GetKind())
       {
-        case Parsers::Kind::ScanRegister :
-          m_scanRegisters.push_back(static_cast<AST_ScanRegister*>(child));
-          child = nullptr;
-          break;
-        case Parsers::Kind::ScanInPort:
-          m_scanInPort = static_cast<AST_Port*>(child);
-          child = nullptr;
-          break;
-        case Parsers::Kind::ScanOutPort:
-          m_scanOutPort = static_cast<AST_Port*>(child);
+        case Parsers::Kind::Attribute :
+          m_attributes.push_back(static_cast<AST_Attribute*>(child));
           child = nullptr;
           break;
         default:  // Ignore all other for now
@@ -56,11 +51,10 @@ void AST_Module::DispatchChildren ()
   }
 }
 //
-//  End of: AST_Module::DispatchChildren
+//  End of: AST_Port::DispatchChildren
 //---------------------------------------------------------------------------
 
 
-
 //===========================================================================
-// End of AST_Module.cpp
+// End of AST_Port.cpp
 //===========================================================================

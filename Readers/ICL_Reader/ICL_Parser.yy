@@ -161,11 +161,17 @@ namespace
 %type <std::tuple<string, string>> range          // Left & Right indexes
 %type <std::tuple<string, string>> index_or_range // Left & Right indexes (Right can be empty)
 
-%type <Parsers::AST_Signal*>     signal
-%type <Parsers::AST_Signal*>     signal_or_inverted_signal
-%type <Parsers::AST_Signal*>     data_signal
-%type <Parsers::AST_Signal*>     scan_signal
-%type <Parsers::AST_Signal*>     x_signal
+%type <Parsers::AST_Signal*>              signal
+%type <Parsers::AST_Signal*>              signal_or_inverted_signal
+%type <Parsers::AST_Signal*>              data_signal
+%type <Parsers::AST_Signal*>              scan_signal
+%type <std::vector<Parsers::AST_Signal*>> concat_signal_or_inverted_signal
+%type <std::vector<Parsers::AST_Signal*>> concat_scan_signal
+%type <std::vector<Parsers::AST_Signal*>> concat_reset_signal
+%type <std::vector<Parsers::AST_Signal*>> concat_data_signal
+%type <std::vector<Parsers::AST_Signal*>> concat_clock_signal
+%type <std::vector<Parsers::AST_Signal*>> concat_shiftEn_signal
+%type <std::vector<Parsers::AST_Signal*>> concat_trst_signal
 
 %type <Parsers::AST_VectorIdentifier*> alias_name           // Name, Left & Right indexes (Right can be empty)
 %type <Parsers::AST_VectorIdentifier*> oneHotScanGroup_name // Name, Left & Right indexes (Left & Right can be empty)
@@ -249,11 +255,18 @@ namespace
 %type <Parsers::AST_Node*>              scanRegister_item
 %type <Parsers::AST_Node*>              scanRegister_refEnum
 %type <Parsers::AST_Source*>            scanRegister_scanInSource
+%type <Parsers::AST_Source*>            port_source
+%type <Parsers::AST_Source*>            scanOutPort_source
+
+%type <Parsers::AST_Node*>              scanOutPort_item
 
 %type <std::vector<Parsers::AST_Node*>> module_items
 %type <std::vector<Parsers::AST_Node*>> scanRegister_tail
 %type <std::vector<Parsers::AST_Node*>> scanRegister_items
 %type <std::vector<Parsers::AST_Node*>> scanInPort_items
+%type <std::vector<Parsers::AST_Node*>> scanOutPort_items
+
+
 
 %token ACCESSLINK
 %token ACCESSTOGETHER
@@ -449,7 +462,7 @@ range : index[LEFT] COLON index[RIGHT]
 ;
 
 
-integer_expr : integer_expr_lvl1 { $$ = std::move($1); };
+integer_expr : integer_expr_lvl1 { $$ = std::move($1); /* integer_expr : integer_expr_lvl1 */};
 
 integer_expr_lvl1 :
   integer_expr_lvl2
@@ -583,9 +596,9 @@ port_name          : scalar_or_vector_id { $$ = $1; /* port_name : scalar_or_vec
 register_name      : scalar_or_vector_id { $$ = $1; /* register_name : scalar_or_vector_id */}
 reg_port_signal_id : scalar_or_vector_id { $$ = $1; /* reg_port_signal_id : scalar_or_vector_id */}
 
-instance_name  : SCALAR_ID { $$ = ast.Create_ScalarIdentifier($[SCALAR_ID]); };
-namespace_name : SCALAR_ID { $$ = ast.Create_ScalarIdentifier($[SCALAR_ID]); };
-module_name    : SCALAR_ID { $$ = ast.Create_ScalarIdentifier($[SCALAR_ID]); };
+instance_name  : SCALAR_ID { $$ = ast.Create_ScalarIdentifier($[SCALAR_ID]); /* instance_name: SCALAR_ID */ };
+namespace_name : SCALAR_ID { $$ = ast.Create_ScalarIdentifier($[SCALAR_ID]); /* namespace_name: SCALAR_ID */ };
+module_name    : SCALAR_ID { $$ = ast.Create_ScalarIdentifier($[SCALAR_ID]); /* module_name: SCALAR_ID */ };
 
 scoped_instance_name :
   scoped_instance_name[lhs] DOT instance_name
@@ -666,15 +679,44 @@ signal_or_inverted_signal :
     {
       $$ = nullptr;
     }
-
-    signalNode->IsInverted(true);
-    $$ = signalNode;
+    else
+    {
+      signalNode->IsInverted(true);
+      $$ = signalNode;
+    }
   }
 ;
 
-x_signal    : signal_or_inverted_signal { $$ = $1; /* x_signal : signal_or_inverted_signal */    };
 data_signal : signal_or_inverted_signal { $$ = $1; /* data_signal : signal_or_inverted_signal */ };
 scan_signal : signal_or_inverted_signal { $$ = $1; /* scan_signal : signal_or_inverted_signal */ };
+
+concat_signal_or_inverted_signal :
+  signal_or_inverted_signal
+  {
+    // concat_signal_or_inverted_signal: signal_or_inverted_signal
+    std::vector<Parsers::AST_Signal*> signals;
+
+    auto signal = $[signal_or_inverted_signal];
+    if (signal != nullptr)
+    {
+      signals.push_back(signal);
+    }
+    $$ = std::move(signals);
+  }
+| concat_signal_or_inverted_signal[lhs] COMMA signal_or_inverted_signal
+  {
+    // concat_signal_or_inverted_signal: concat_signal_or_inverted_signal[lhs] signal_or_inverted_signal
+    auto& signals = $[lhs];
+    auto  signal  = $[signal_or_inverted_signal];
+
+    if (signal != nullptr)
+    {
+      signals.push_back(signal);
+    }
+    $$ = std::move(signals);
+  }
+;
+
 
 //clock_signal : signal | TILDE signal ;
 //tck_signal : signal ;
@@ -683,16 +725,15 @@ scan_signal : signal_or_inverted_signal { $$ = $1; /* scan_signal : signal_or_in
 //shiftEn_signal : signal ;
 captureEn_signal : concat_data_signal ;
 updateEn_signal : concat_data_signal ;
-concat_reset_signal : x_signal | concat_reset_signal COMMA x_signal;
-concat_data_signal : x_signal | concat_data_signal COMMA x_signal;
-concat_scan_signal : x_signal | concat_scan_signal COMMA x_signal;
-concat_clock_signal : x_signal | concat_clock_signal COMMA x_signal;
-//concat_tck_signal : x_signal | concat_tck_signal COMMA x_signal;
-concat_shiftEn_signal : x_signal | concat_shiftEn_signal COMMA x_signal;
-//concat_captureEn_signal : x_signal | concat_captureEn_signal COMMA x_signal;
-//concat_updateEn_signal : x_signal | concat_updateEn_signal COMMA x_signal;
+
+concat_reset_signal   : concat_signal_or_inverted_signal { $$ = std::move($1); /* concat_reset_signal   : concat_signal_or_inverted_signal */};
+concat_data_signal    : concat_signal_or_inverted_signal { $$ = std::move($1); /* concat_data_signal    : concat_signal_or_inverted_signal */};
+concat_scan_signal    : concat_signal_or_inverted_signal { $$ = std::move($1); /* concat_scan_signal    : concat_signal_or_inverted_signal */};
+concat_clock_signal   : concat_signal_or_inverted_signal { $$ = std::move($1); /* concat_clock_signal   : concat_signal_or_inverted_signal */};
+concat_shiftEn_signal : concat_signal_or_inverted_signal { $$ = std::move($1); /* concat_shiftEn_signal : concat_signal_or_inverted_signal */};
+concat_trst_signal    : concat_signal_or_inverted_signal { $$ = std::move($1); /* concat_trst_signal    : concat_signal_or_inverted_signal */};
+
 concat_tms_signal : signal | concat_tms_signal COMMA signal;
-concat_trst_signal : x_signal | concat_trst_signal COMMA x_signal;
 
 // 6.4.2
 icl_source : iclSource_items | icl_source iclSource_items;
@@ -1061,21 +1102,108 @@ scanInPort_name : port_name
 ;
 
 // 6.4.6.2
-scanOutPort_def : SCANOUTPORT scanOutPort_name scanOutPort_tail
+scanOutPort_def :
+  SCANOUTPORT scanOutPort_name  SEMICOLON
+  {
+    // scanOutPort_def : SCANOUTPORT scanOutPort_name SEMICOLON
+    auto& name     = $[scanOutPort_name];
+    auto  node     = ast.Create_Port(Parsers::Kind::ScanOutPort, name);
+
+    $$ = node;
+  }
+| SCANOUTPORT scanOutPort_name  LEFT_BRACE RIGHT_BRACE
+  {
+    // scanOutPort_def : SCANOUTPORT scanOutPort_name  LEFT_BRACE RIGHT_BRACE
+    auto& name     = $[scanOutPort_name];
+    auto  node     = ast.Create_Port(Parsers::Kind::ScanOutPort, name);
+
+    $$ = node;
+  }
+| SCANOUTPORT scanOutPort_name LEFT_BRACE scanOutPort_items RIGHT_BRACE
+  {
+    // scanOutPort_def : SCANOUTPORT scanOutPort_name  LEFT_BRACE scanOutPort_items RIGHT_BRACE
+    auto& name     = $[scanOutPort_name];
+    auto& children = $[scanOutPort_items];
+    auto  node     = ast.Create_Port(Parsers::Kind::ScanOutPort, name, std::move(children));
+
+    $$ = node;
+  }
+;
+
+scanOutPort_name : port_name
 {
-  // scanOutPort_def : SCANOUTPORT scanOutPort_name scanOutPort_tail
-  $$ = nullptr;
+  // scanOutPort_name : port_name
+  $$ = std::move($1);
 }
 ;
 
-scanOutPort_tail: SEMICOLON | LEFT_BRACE scanOutPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
-scanOutPort_items: scanOutPort_items scanOutPort_item | scanOutPort_item;
-scanOutPort_name : port_name;
-scanOutPort_item : attribute_def |
-scanOutPort_source |
-scanOutPort_enable |
-scanOutPort_launchEdge ;
-scanOutPort_source : SOURCE concat_scan_signal SEMICOLON;
+scanOutPort_items:
+  scanOutPort_items[lhs] scanOutPort_item
+  {
+    // scanOutPort_items: scanOutPort_items[lhs] scanOutPort_item
+    auto& children = $[lhs];
+    auto  item     = $[scanOutPort_item];
+
+    if (item != nullptr)
+    {
+      children.push_back(item);
+    }
+    $$ = std::move(children);
+  }
+| scanOutPort_item
+  {
+    // scanOutPort_items: scanOutPort_item
+    std::vector<Parsers::AST_Node*> children;
+
+    auto item = $[scanOutPort_item];
+    if (item != nullptr)
+    {
+      children.push_back(item);
+    }
+    $$ = std::move(children);
+  }
+;
+
+scanOutPort_item :
+  attribute_def
+  {
+    // scanOutPort_item : attribute_def
+    $$ = $1;
+  }
+| scanOutPort_source
+  {
+    // scanOutPort_item : scanOutPort_source
+    $$ = $1;
+  }
+| scanOutPort_enable
+  {
+    // scanOutPort_item : scanOutPort_enable
+    $$ = nullptr;
+  }
+| scanOutPort_launchEdge
+  {
+    // scanOutPort_item : scanOutPort_launchEdge
+    $$ = nullptr;
+  }
+;
+
+
+port_source : SOURCE concat_scan_signal SEMICOLON
+{
+  // port_source : SOURCE concat_scan_signal SEMICOLON
+  auto& signals = $[concat_scan_signal];
+  auto  source  = ast.Create_Source(Parsers::Kind::Source, std::move(signals));
+
+  $$ = source;
+}
+
+scanOutPort_source : port_source
+{
+  // scanOutPort_source : port_source
+  auto source = $[port_source];
+  $$ = source;
+}
+;
 scanOutPort_enable : ENABLE data_signal SEMICOLON;
 scanOutPort_launchEdge : LAUNCHEDGE rising_or_falling SEMICOLON ;
 rising_or_falling : RISING | FALLING;
@@ -1175,8 +1303,11 @@ toCaptureEnPort_def : TOCAPTUREENPORT toCaptureEnPort_name toCaptureEnPort_tail
 toCaptureEnPort_tail: SEMICOLON | LEFT_BRACE toCaptureEnPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
 toCaptureEnPort_items: toCaptureEnPort_items toCaptureEnPort_item | toCaptureEnPort_item;
 toCaptureEnPort_name : port_name ;
-toCaptureEnPort_item : attribute_def |
-toCaptureEnPort_source ;
+toCaptureEnPort_item :
+  attribute_def
+| toCaptureEnPort_source
+;
+
 toCaptureEnPort_source : SOURCE captureEn_signal SEMICOLON ;
 
 // 6.4.6.10

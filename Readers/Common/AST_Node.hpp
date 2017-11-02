@@ -44,6 +44,7 @@ namespace Parsers
     ScanOutPort,      //!< For modules scan output port
     ScanRegister,     //!< For scan registers
     Signal,           //!< For signal definitions
+    Source,           //!< For unspecifed source signal(s)
     TranslationUnit,  //!< For source files as a all
     VectorIdentifier, //!< For identifiers with a without scope prefix and bit or range identifier
   };
@@ -84,6 +85,7 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::ScanOutPort)
             ENUM_MEMBER(Parsers::Kind::ScanRegister)
             ENUM_MEMBER(Parsers::Kind::Signal)
+            ENUM_MEMBER(Parsers::Kind::Source)
             ENUM_MEMBER(Parsers::Kind::TranslationUnit)
             ENUM_MEMBER(Parsers::Kind::VectorIdentifier)
            );

@@ -12,12 +12,15 @@
 //===========================================================================
 
 #include "AST_PrettyPrinter.hpp"
+
 #include "AST_Attribute.hpp"
 #include "AST_Module.hpp"
 #include "AST_Port.hpp"
-#include "AST_Value.hpp"
-#include "AST_Source.hpp"
 #include "AST_ScanRegister.hpp"
+#include "AST_Signal.hpp"
+#include "AST_Source.hpp"
+#include "AST_Value.hpp"
+
 #include "Utility.hpp"
 
 #include <sstream>
@@ -112,10 +115,7 @@ string AST_PrettyPrinter::PrettyPrint (AST_Node* topNode)
 //!
 void AST_PrettyPrinter::StreamNodeHeader(const AST_NamedNode* node, string_view notes)
 {
-  m_startPos = m_os.tellp();
-  StreamDepth();
-
-  m_os << node->KindName() << " " << node->Name();
+  StreamDepth() << node->KindName() << " " << node->Name();
 
   if (!notes.empty())
   {
@@ -158,6 +158,15 @@ void AST_PrettyPrinter::Visit_Module (AST_Module* module)
   {
     scanInPort->Accept(*this);
   }
+
+  // ---------------- ScanOutPort
+  //
+  const auto scanOutPort = module->ScanOutPort();
+  if (scanOutPort != nullptr)
+  {
+    scanOutPort->Accept(*this);
+  }
+
 
   for (const auto& node : module->UndispatchedChildren())
   {
@@ -261,6 +270,15 @@ void AST_PrettyPrinter::Visit_ScanRegister (AST_ScanRegister* scanRegister)
 //---------------------------------------------------------------------------
 
 
+//! Appends content of a Source node in text representation and visits
+//! sub-nodes
+void AST_PrettyPrinter::Visit_Source (AST_Source* source)
+{
+  StreamDepth() << source->KindName() << " " << source->AsText() << ";\n";
+}
+//
+//  End of: AST_PrettyPrinter::Visit_Source
+//---------------------------------------------------------------------------
 
 
 //===========================================================================

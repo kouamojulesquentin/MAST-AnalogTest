@@ -33,6 +33,14 @@ class AST_Source final : public AST_Node
   ~AST_Source() = default;
   AST_Source()  = delete;
 
+  //! Visited part of the Visitor pattern
+  //!
+  void Accept (AST_Visitor& visitor) override;
+
+  //! Returns source signals
+  //!
+  const std::vector<AST_Signal*>& Signals() const { return m_signals; }
+
   //! Text representation of source
   //!
   std::string AsText() const;

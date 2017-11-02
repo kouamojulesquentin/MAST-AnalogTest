@@ -24,18 +24,27 @@ using namespace Parsers;
 //!
 string AST_Signal::AsText () const
 {
+  ostringstream os;
+
+  if (IsInverted())
+  {
+    os << "~";
+  }
+
   if (IsNumber())
   {
-    return m_number;
+    os << m_number;
   }
-
-  ostringstream os;
-  for (const auto& instanceName : m_path)
+  else
   {
-    os << instanceName->AsText() << ".";
+    for (const auto& instanceName : m_path)
+    {
+      os << instanceName->AsText() << ".";
+    }
+
+    os << m_portName->AsText();
   }
 
-  os << m_portName->AsText();
   return os.str();
 }
 //

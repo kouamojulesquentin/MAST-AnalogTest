@@ -13,12 +13,24 @@
 
 #include "AST_Source.hpp"
 #include "AST_Signal.hpp"
+#include "AST_Visitor.hpp"
 
 #include <sstream>
 
 using std::ostringstream;
 using std::string;
 using namespace Parsers;
+
+
+//! Visited part of the Visitor pattern
+//!
+void AST_Source::Accept (AST_Visitor& visitor)
+{
+  visitor.Visit_Source(this);
+}
+//
+//  End of: AST_Source::Accept
+//---------------------------------------------------------------------------
 
 
 //! Text representation of source

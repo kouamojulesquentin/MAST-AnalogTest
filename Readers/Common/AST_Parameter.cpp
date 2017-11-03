@@ -12,6 +12,7 @@
 //===========================================================================
 
 #include "AST_Parameter.hpp"
+#include "Utility.hpp"
 
 #include <sstream>
 
@@ -28,17 +29,31 @@ string AST_Parameter::AsText () const
 {
   ostringstream os;
 
-
   os << m_name;
 
   if      (!m_numbersValue.empty())
   {
     os << " = " << m_numbersValue;
   }
-//+  else if (m_stringsValue != nullptr)
-//+  {
-//+    os << " = " << m_numbersValue.AsText();
-//+  }
+  else if (!m_stringsValue.empty())
+  {
+    os << " = ";
+
+    auto first = true;
+    for (const auto node : m_stringsValue)
+    {
+      CHECK_VALUE_NOT_NULL(node, "Expected to have not nullptr string or parameter ref");
+      if (!first)
+      {
+        os << ", ";
+      }
+      else
+      {
+        first = false;
+      }
+      os << node->AsText();
+    }
+  }
 
   return os.str();
 }

@@ -12,10 +12,13 @@
 //===========================================================================
 
 #include "AST_Module.hpp"
+#include "AST_Attribute.hpp"
 #include "AST_ScanRegister.hpp"
 #include "AST_Parameter.hpp"
 #include "AST_Port.hpp"
 #include "AST_Visitor.hpp"
+
+#include <type_traits>
 
 using namespace Parsers;
 
@@ -32,31 +35,49 @@ void AST_Module::Accept (AST_Visitor& visitor)
 //!
 void AST_Module::DispatchChildren ()
 {
+  auto appendChild = [](AST_Node*& child, auto& dest)
+  {
+    using t1 = decltype(dest);
+    using t2 = typename std::remove_reference<t1>::type;
+    using dest_t = typename t2::value_type;
+
+    dest.push_back(static_cast<dest_t>(child));
+    child = nullptr;
+  };
+
+  auto setChild = [](AST_Node*& child, auto& dest)
+  {
+    using t1 = decltype(dest);
+    using dest_t = typename std::remove_reference<t1>::type;
+
+    dest = static_cast<dest_t>(child);
+    child = nullptr;
+  };
+
+
   for (auto& child : UndispatchedChildren())
   {
     if (child != nullptr)
     {
       switch (child->GetKind())
       {
+        case Parsers::Kind::Attribute:
+          appendChild(child, m_attributes);
+          break;
         case Parsers::Kind::LocalParameter :
-          m_localParameters.push_back(static_cast<AST_Parameter*>(child));
-          child = nullptr;
+          appendChild(child, m_localParameters);
           break;
         case Parsers::Kind::Parameter :
-          m_parameters.push_back(static_cast<AST_Parameter*>(child));
-          child = nullptr;
+          appendChild(child, m_parameters);
           break;
         case Parsers::Kind::ScanRegister :
-          m_scanRegisters.push_back(static_cast<AST_ScanRegister*>(child));
-          child = nullptr;
+          appendChild(child, m_scanRegisters);
           break;
         case Parsers::Kind::ScanInPort:
-          m_scanInPort = static_cast<AST_Port*>(child);
-          child = nullptr;
+          setChild(child, m_scanInPort);
           break;
         case Parsers::Kind::ScanOutPort:
-          m_scanOutPort = static_cast<AST_Port*>(child);
-          child = nullptr;
+          setChild(child, m_scanOutPort);
           break;
         default:  // Ignore all other for now
           break;

@@ -17,6 +17,7 @@
 #include "AST_SimpleNode.hpp"
 #include <experimental/string_view>
 #include <string>
+#include <vector>
 
 namespace Parsers
 {
@@ -34,7 +35,7 @@ class AST_Parameter final : public AST_SimpleNode
   //!
 //+  void Accept (AST_Visitor& visitor) override;
 
-  //! Attribute name
+  //! Parameter name
   //!
   const std::string& Name() const { return m_name; }
 
@@ -45,8 +46,9 @@ class AST_Parameter final : public AST_SimpleNode
   // ---------------- Private Methods
   //
   private:
-  friend class AST;                                                                   // This is AST that manages construction/destruction of AST nodes
-  MAKE_UNIQUE_AS_FRIEND(AST_Parameter)(Parsers::Kind&, std::string&&, std::string&&); // AST currently uses make_unit<T>() to create nodes
+  friend class AST;   // This is AST that manages construction/destruction of AST nodes (it uses make_unit<T>() to create nodes)
+  MAKE_UNIQUE_AS_FRIEND(AST_Parameter)(Parsers::Kind&, std::string&&, std::string&&);
+  MAKE_UNIQUE_AS_FRIEND(AST_Parameter)(Parsers::Kind&, std::string&&, std::vector<AST_SimpleNode*>&&);
 
   //! Initializes AST_Parameter with a number
   //!
@@ -61,12 +63,26 @@ class AST_Parameter final : public AST_SimpleNode
   {
   }
 
+  //! Initializes AST_Parameter with a number
+  //!
+  //! @param kind               Either Parameter or LocalParameter
+  //! @param name               Parameter name
+  //! @param stringsOrRefsValue Strings and/or parameter ref that define parameter value
+  //!                           Should be AST_String and AST_ParameterRef
+  //!
+  AST_Parameter(Kind kind, std::string&& name, std::vector<AST_SimpleNode*>&& stringsOrRefsValue)
+    : AST_SimpleNode (kind)
+    , m_name         (std::move(name))
+    , m_stringsValue (std::move(stringsOrRefsValue))
+  {
+  }
+
   // ---------------- Private Fields
   //
   private:
-  const std::string        m_name;                   //!< Attribute name
-  const std::string        m_numbersValue;           //!< Attribute value when defined as numbers
-//+  AST_StringConcatenation* m_stringsValue = nullptr; //!< Attribute value when defined as strings
+  const std::string            m_name;         //!< Parameter name
+  const std::string            m_numbersValue; //!< Parameter value when defined as numbers
+  std::vector<AST_SimpleNode*> m_stringsValue; //!< Parameter value when defined as strings and/or parameter reference
 };
 //
 //  End of AST_Parameter class declaration

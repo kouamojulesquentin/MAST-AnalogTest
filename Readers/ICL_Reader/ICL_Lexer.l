@@ -178,7 +178,7 @@ ICL::ICL_Parser::location_type* my_location;
   \*                            return token::STAR;
   STD_1149_1_2001               return token::STD_1149_1_2001;
   STD_1149_1_2013               return token::STD_1149_1_2013;
-  \"(([^\"\\])|\\\\|\\)*\"    { yylval->build<std::string>(yytext); return token::STRING; };
+  \"(([^\"\\])|\\\\|\\\")*\"    { yylval->build<std::string>(yytext); return token::STRING; };
   TCKPort                       return token::TCKPORT;
   ~                             return token::TILDE;
   !                             return token::LOGIC_NOT;

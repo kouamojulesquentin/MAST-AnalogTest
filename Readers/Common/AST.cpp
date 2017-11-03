@@ -15,11 +15,13 @@
 #include "AST_Attribute.hpp"
 #include "AST_Module.hpp"
 #include "AST_Parameter.hpp"
+#include "AST_ParameterRef.hpp"
 #include "AST_Port.hpp"
 #include "AST_ScalarIdentifier.hpp"
 #include "AST_ScanRegister.hpp"
 #include "AST_Signal.hpp"
 #include "AST_Source.hpp"
+#include "AST_String.hpp"
 #include "AST_Value.hpp"
 #include "AST_VectorIdentifier.hpp"
 
@@ -59,12 +61,41 @@ AST_Attribute* AST::Create_Attribute (string&& name)
 //---------------------------------------------------------------------------
 
 
+//! Creates an AST_Attribute node
+//!
+//! @param name           Attribute name
+//! @param numbersValue   Numbers that define parameter value
+//!
+AST_Attribute* AST::Create_Attribute (string&& name, std::string&& numbersValue)
+{
+  return Create_Node<AST_Attribute>(std::move(name), std::move(numbersValue));
+}
+//
+//  End of: AST::Create_Attribute
+//---------------------------------------------------------------------------
+
+
+//! Creates an AST_Attribute node
+//!
+//! @param name                 Attribute name
+//! @param stringsOrRefsValue   Strings and/or parameter ref that define parameter value
+//!                             Should be AST_String and/or AST_ParameterRef
+//!
+AST_Attribute* AST::Create_Attribute (string&& name, std::vector<AST_SimpleNode*>&& stringsOrRefsValue)
+{
+  return Create_Node<AST_Attribute>(std::move(name), std::move(stringsOrRefsValue));
+}
+//
+//  End of: AST::Create_Attribute
+//---------------------------------------------------------------------------
+
+
 //! Creates an AST_Parameter node for local parameter
 //!
 //! @param name           Local parameter name
 //! @param numbersValue   Numbers that define parameter value
 //!
-AST_Parameter* AST::Create_LocalParameter (std::string&& name, std::string&& numbersValue)
+AST_Parameter* AST::Create_LocalParameter (string&& name, string&& numbersValue)
 {
   auto kind = Kind::LocalParameter;
   return Create_Node<AST_Parameter>(kind, std::move(name), std::move(numbersValue));
@@ -76,16 +107,17 @@ AST_Parameter* AST::Create_LocalParameter (std::string&& name, std::string&& num
 
 //! Creates an AST_Parameter node for local parameter
 //!
-//! @param name           Parameter name
-//! @param numbersValue   Numbers that define parameter value
+//! @param name               Parameter name
+//! @param stringsOrRefsValue Strings and/or parameter ref that define parameter value
+//!                           Should be AST_String and AST_ParameterRef
 //!
-AST_Parameter* AST::Create_Parameter (std::string&& name, std::string&& numbersValue)
+AST_Parameter* AST::Create_LocalParameter (string&& name, vector<AST_SimpleNode*>&& stringsOrRefsValue)
 {
-  auto kind = Kind::Parameter;
-  return Create_Node<AST_Parameter>(kind, std::move(name), std::move(numbersValue));
+  auto kind = Kind::LocalParameter;
+  return Create_Node<AST_Parameter>(kind, std::move(name), std::move(stringsOrRefsValue));
 }
 //
-//  End of: AST::Create_Parameter
+//  End of: AST::Create_LocalParameter
 //---------------------------------------------------------------------------
 
 
@@ -107,6 +139,52 @@ AST_Module* AST::Create_Module (AST_ScalarIdentifier* identifier, vector<AST_Nod
 //
 //  End of: AST::Create_Module
 //---------------------------------------------------------------------------
+
+
+//! Creates an AST_Parameter node for local parameter
+//!
+//! @param name           Parameter name
+//! @param numbersValue   Numbers that define parameter value
+//!
+AST_Parameter* AST::Create_Parameter (string&& name, string&& numbersValue)
+{
+  auto kind = Kind::Parameter;
+  return Create_Node<AST_Parameter>(kind, std::move(name), std::move(numbersValue));
+}
+//
+//  End of: AST::Create_Parameter
+//---------------------------------------------------------------------------
+
+
+//! Creates an AST_Parameter node for local parameter
+//!
+//! @param name               Parameter name
+//! @param stringsOrRefsValue Strings and/or parameter ref that define parameter value
+//!                           Should be AST_String and/or AST_ParameterRef
+//!
+AST_Parameter* AST::Create_Parameter (string&& name, vector<AST_SimpleNode*>&& stringsOrRefsValue)
+{
+  auto kind = Kind::Parameter;
+  return Create_Node<AST_Parameter>(kind, std::move(name), std::move(stringsOrRefsValue));
+}
+//
+//  End of: AST::Create_Parameter
+//---------------------------------------------------------------------------
+
+
+//! Creates an AST_ParameterRef node
+//!
+//! @param name   Refered parameter name
+//!
+AST_ParameterRef* AST::Create_ParameterRef (string&& name)
+{
+  return Create_Node<AST_ParameterRef>(std::move(name));
+}
+//
+//  End of: AST::Create_ParameterRef
+//---------------------------------------------------------------------------
+
+
 
 
 //! Creates an AST_Port node
@@ -242,6 +320,19 @@ AST_Source* AST::Create_Source (Kind kind, vector<AST_Signal*>&& signals)
 }
 //
 //  End of: AST::Create_Source
+//---------------------------------------------------------------------------
+
+
+//! Creates an AST_String node
+//!
+//! @param content  String content
+//!
+AST_String* AST::Create_String (string&& content)
+{
+  return Create_Node<AST_String>(std::move(content));
+}
+//
+//  End of: AST::Create_String
 //---------------------------------------------------------------------------
 
 

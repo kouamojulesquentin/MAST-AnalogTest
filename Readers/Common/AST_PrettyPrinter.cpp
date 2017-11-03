@@ -121,8 +121,10 @@ void AST_PrettyPrinter::Visit_Module (AST_Module* module)
 
   HierarchyInserter hierarchyInserter(*this);
 
+  StreamSimpleNodes (module->Attributes());
   StreamSimpleNodes (module->Parameters());
   StreamSimpleNodes (module->LocalParameters());
+
   AcceptNode        (module->ScanInPort());
   AcceptNode        (module->ScanOutPort());
   AcceptNodes       (module->UndispatchedChildren());

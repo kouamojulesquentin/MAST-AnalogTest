@@ -159,6 +159,11 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_3_ScanRegister ()
   //
   auto               sm  = make_shared<SystemModel>();
   std::istringstream excerpt("Module SReg {\n"
+//+                             "Attribute      Foo_1 = \"\", $Junk, \"Hel\\\"lo\", \" World\";\n"
+//+                             "Parameter      Foo_2 = \"\", $Junk, \"Hello\", \" World\";\n"
+//+                             "LocalParameter Foo_3 = \"\", $Junk, \"Hello\", \" World\";\n"
+//+                             "LocalParameter Foo_4 = $Junk;\n"
+//+                             "LocalParameter Foo_5 = \"\", $Junk, \"He\\\\llo\";\n"
                              "ScanInPort    SI;\n"
                              "ScanOutPort   SO { Source  SR_3[0];}\n"
                              "ShiftEnPort   SE;\n"

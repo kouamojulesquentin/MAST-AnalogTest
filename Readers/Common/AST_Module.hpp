@@ -25,6 +25,7 @@ namespace Parsers
 class AST_ScanRegister;
 class AST_Port;
 class AST_Parameter;
+class AST_Attribute;
 
 //! Represents a parsed test network, instiable, module
 //!
@@ -51,6 +52,10 @@ class AST_Module final : public AST_ParentNode
   //! Returns module local parameters
   //!
   const std::vector<AST_Parameter*>& LocalParameters() const { return m_localParameters; }
+
+  //! Returns module attributes
+  //!
+  const std::vector<AST_Attribute*>& Attributes() const { return m_attributes; }
 
 
   //! Returns scan registers defined in module
@@ -91,6 +96,7 @@ class AST_Module final : public AST_ParentNode
   AST_Port*                      m_scanOutPort = nullptr; //!< Scan output port
   std::vector<AST_Parameter*>    m_parameters;            //!< Generic module  parameters
   std::vector<AST_Parameter*>    m_localParameters;       //!< Module local parameters
+  std::vector<AST_Attribute*>    m_attributes;            //!< Module attributes
   std::vector<AST_ScanRegister*> m_scanRegisters;         //!< Scan registers defined in module
 };
 //

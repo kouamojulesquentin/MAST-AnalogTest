@@ -19,6 +19,7 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_Module.cpp
                                   AST_Parameter.hpp
                                   AST_Parameter.cpp
+                                  AST_ParameterRef.hpp
                                   AST_Port.hpp
                                   AST_Port.cpp
                                   AST_ScalarIdentifier.hpp
@@ -29,6 +30,8 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_Source.cpp
                                   AST_ScanRegister.hpp
                                   AST_ScanRegister.cpp
+                                  AST_String.hpp
+                                  AST_String.cpp
                                   AST_VectorIdentifier.hpp
                                   AST_VectorIdentifier.cpp
                                   AST_Value.hpp

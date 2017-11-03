@@ -21,7 +21,7 @@ if (WIN32)
   set (Flex_Switches ${Flex_Switches} --wincompat)
 endif()
 
-set (Bison_Switches -d --verbose --no-lines --warnings=all --feature=caret --report=itemset --debug)
+set (Bison_Switches -d --verbose --warnings=all --feature=caret --report=all --debug)
 set (LEX_YACC_SRC_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/")
 
 message("")

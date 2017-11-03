@@ -38,11 +38,14 @@ namespace Parsers
   class AST_Module;
   class AST_Node;
   class AST_Parameter;
+  class AST_ParameterRef;
   class AST_Port;
   class AST_ScalarIdentifier;
   class AST_ScanRegister;
   class AST_Signal;
+  class AST_SimpleNode;
   class AST_Source;
+  class AST_String;
   class AST_Value;
   class AST_VectorIdentifier;
 }
@@ -71,18 +74,22 @@ typedef void* yyscan_t;
 {
 // ---------------- Includes for all driver functions
 //
+#include "ICL_Scanner.hpp"
 #include "ParserException.hpp"
+
 #include "AST.hpp"
 #include "AST_Attribute.hpp"
 #include "AST_Parameter.hpp"
+#include "AST_ParameterRef.hpp"
 #include "AST_Port.hpp"
+#include "AST_ScalarIdentifier.hpp"
+#include "AST_ScanRegister.hpp"
 #include "AST_Signal.hpp"
 #include "AST_Source.hpp"
+#include "AST_String.hpp"
 #include "AST_Value.hpp"
-#include "AST_ScanRegister.hpp"
-#include "AST_ScalarIdentifier.hpp"
 #include "AST_VectorIdentifier.hpp"
-#include "ICL_Scanner.hpp"
+
 #include "Utility.hpp"
 #include "g3log/g3log.hpp"
 
@@ -117,6 +124,50 @@ extern ICL::ICL_Parser::location_type* my_location;
 
 namespace
 {
+  //! Removes leading and trailing double quotes and transform escaped
+  //! characters with their plain value (normally for double quotes and backslashes)
+  //!
+  string CleanString(const string& str)
+  {
+    auto strView = string_view(str);
+
+    if (strView.front() == '"')
+    {
+      strView.remove_prefix(1u);
+    }
+
+    if (strView.back() == '"')
+    {
+      strView.remove_suffix(1u);
+    }
+
+    string result;
+    auto acceptBackslash = false;
+    for (const auto& character : strView)
+    {
+      if (character != '\\')
+      {
+        result.push_back(character);
+        acceptBackslash = false;
+      }
+      else if (acceptBackslash)
+      {
+        result.push_back(character);
+        acceptBackslash = false;
+      }
+      else
+      {
+        acceptBackslash = true;
+      }
+    }
+
+    return result;
+  }
+  //
+  //  End of RemoveBoundaryQuotes
+  //---------------------------------------------------------------------------
+
+
 //+  ICL::location MakeLocation(const linker_information& linkerInfo)
 //+  {
 //+    auto locBegin = ICL::position(nullptr, linkerInfo.line, linkerInfo.beginColumn);
@@ -145,8 +196,10 @@ namespace
 %type <std::vector<Parsers::AST_ScalarIdentifier*>>                                       scoped_instance_name
 %type <std::tuple<std::vector<Parsers::AST_ScalarIdentifier*>, Parsers::AST_Identifier*>> scoped_port_name
 
-%type <std::string> parameter_ref
 %type <std::string> index
+%type <Parsers::AST_ParameterRef*> parameter_ref
+
+%type <std::vector<Parsers::AST_SimpleNode*>>  concat_string
 
 %type <std::string> UNSIZED_DEC_NUM
 %type <std::string> UNSIZED_BIN_NUM
@@ -399,9 +452,14 @@ namespace
 
 //size : pos_int | parameter_ref ;
 pos_int :
-  POS_INT { $$ = std::move($1); /* pos_int : POS_INT */ }
-| ONE     { $$ = "1";           /* pos_int : ONE */ }
-| ZERO    { $$ = "0";           /* pos_int : ZERO*/ }
+  POS_INT
+  {
+    // pos_int : POS_INT
+    auto& posInt = $[POS_INT];
+    $$ = std::move(posInt);
+  }
+| ONE  { $$ = "1"; /* pos_int : ONE */ }
+| ZERO { $$ = "0"; /* pos_int : ZERO*/ }
 ;
 
 number :
@@ -432,7 +490,12 @@ number :
 
     $$ = expr;
   }
-| integer_expr { $$ = std::move($1); /* number : integer_expr */}
+| integer_expr
+  {
+    // number : integer_expr
+    auto& expr = $[integer_expr];
+    $$ = std::move(expr);
+  }
 ;
 
 // 6.3.12
@@ -532,14 +595,25 @@ integer_expr_paren : LEFT_PAREN integer_expr RIGHT_PAREN
 integer_expr_arg :
   integer_expr_paren { $$ = std::move($1); /* integer_expr_arg : integer_expr_paren */ }
 | pos_int            { $$ = std::move($1); /* integer_expr_arg : pos_int*/ }
-| parameter_ref      { $$ = std::move($1); /* integer_expr_arg : parameter_ref*/ }
+| parameter_ref
+  {
+    // integer_expr_arg : parameter_ref
+    auto parameterRef = $[parameter_ref];
+    auto asString     = "$"s.append(parameterRef->Name());
+
+    LOG(DEBUG) << "parameter_ref has been downgraded as mere string !!!";
+
+    $$ = std::move(asString);
+  }
 ;
 
 parameter_ref : DOLLAR SCALAR_ID
 {
   // parameter_ref : DOLLAR SCALAR_ID
-  auto combined = "$"s.append($[SCALAR_ID]);
-  $$ = std::move(combined);
+  auto& parameterName = $[SCALAR_ID];
+  auto  node          = ast.Create_ParameterRef(std::move(parameterName));
+
+  $$ = node;
 }
 ;
 
@@ -549,7 +623,8 @@ concat_number :
   number
   {
     // concat_number : number
-    $$ = std::move($1);
+    auto& numberValue = $[number];
+    $$ = std::move(numberValue);
   }
 | TILDE number
   {
@@ -1683,12 +1758,14 @@ number_or_enum :
   concat_number
   {
     // number_or_enum : concat_number
-    $$ = std::move($1);
+    auto& numbers = $[concat_number];
+    $$ = std::move(numbers);
   }
 | enum_symbol
   {
     // number_or_enum : enum_symbol
-    $$ = std::move($1);
+    auto& enumSymbol = $[enum_symbol];
+    $$ = std::move(enumSymbol);
   }
 ;
 
@@ -1736,10 +1813,13 @@ dataRegister_writeCallBack : WRITECALLBACK iProc_namespace iProc_name iProc_argl
 iProc_namespace : namespace_name DOUBLE_COLON ref_module_name
  DOUBLE_COLON sub_namespace | namespace_name DOUBLE_COLON ref_module_name | ref_module_name ;
 iProc_name : SCALAR_ID | parameter_ref ;
-iProc_args : D_SUBST |
-R_SUBST |
-number |
-STRING ;
+
+iProc_args :
+  D_SUBST
+| R_SUBST
+| number
+| STRING ;
+
 sub_namespace : SCALAR_ID |
 parameter_ref ;
 ref_module_name : SCALAR_ID |
@@ -1908,13 +1988,81 @@ enum_def : ENUM enum_name LEFT_BRACE enum_items RIGHT_BRACE
 }
 ;
 enum_items : enum_items enum_item | enum_item;
-enum_name : SCALAR_ID { $$ = $1; };
+enum_name : SCALAR_ID
+{
+  // enum_name : SCALAR_ID
+  auto& enumName = $[SCALAR_ID];
+  $$ = std::move(enumName);
+}
+;
 enum_item : enum_symbol EQUAL enum_value SEMICOLON ;
-enum_symbol : SCALAR_ID     { $$ = $1; };
-enum_value : concat_number  { $$ = $1; };
+enum_symbol : SCALAR_ID
+{
+  // enum_symbol : SCALAR_ID
+  auto& enumSymbol = $[SCALAR_ID];
+  $$ = std::move(enumSymbol);
+}
+;
 
-concat_string : concat_string COMMA string_or_parm | string_or_parm ;
-string_or_parm : STRING | parameter_ref;
+enum_value : concat_number
+{
+  // enum_value : concat_number
+  auto& concatNumber = $[concat_number];
+  $$ = std::move(concatNumber);
+};
+
+
+concat_string :
+  STRING
+  {
+    // concat_string : STRING
+    vector<Parsers::AST_SimpleNode*> concatenatedString;
+    auto stringContent = CleanString($[STRING]);
+
+    if (!stringContent.empty())
+    {
+      auto node = ast.Create_String(std::move(stringContent));
+      concatenatedString.emplace_back(node);
+    }
+
+    $$ = std::move(concatenatedString);
+  }
+| parameter_ref
+  {
+    // concat_string : parameter_ref
+    vector<Parsers::AST_SimpleNode*> concatenatedString;
+
+    auto  paramRef = $[parameter_ref];
+
+    concatenatedString.emplace_back(paramRef);
+
+    $$ = std::move(concatenatedString);
+  }
+| concat_string[lhs] COMMA STRING
+  {
+    // concat_string : concat_string[lhs] COMMA STRING
+    auto& concatenatedString = $[lhs];
+    auto  stringContent      = CleanString($[STRING]);
+
+    if (!stringContent.empty())
+    {
+      auto node = ast.Create_String(std::move(stringContent));
+      concatenatedString.emplace_back(node);
+    }
+
+    $$ = std::move(concatenatedString);
+  }
+| concat_string[lhs] COMMA parameter_ref
+  {
+    // concat_string : concat_string[lhs] COMMA parameter_ref
+    auto& concatenatedString = $[lhs];;
+    auto& paramRef           = $[parameter_ref];
+
+    concatenatedString.emplace_back(paramRef);
+
+    $$ = std::move(concatenatedString);
+  }
+;
 
 // 6.5.4
 parameter_def :
@@ -1931,56 +2079,67 @@ parameter_def :
   {
     // parameter_def : PARAMETER parameter_name EQUAL concat_string SEMICOLON
     auto& name  = $[parameter_name];
-    auto  value = "discarded_concat_string (cf. parameter_def )"s;
+    auto  value = $[concat_string];
     auto  node  = ast.Create_Parameter(std::move(name), std::move(value));
-
-    LOG(DEBUG) << "parameter_value is discarded !!!";
 
     $$ = node;
   }
-
 ;
 
-localParameter_def : LOCALPARAMETER parameter_name EQUAL parameter_value SEMICOLON
-{
-  // localParameter_def : LOCALPARAMETER parameter_name EQUAL parameter_value SEMICOLON
-  auto& name  = $[parameter_name];
-  auto  value = "discarded_value (cf. localParameter_def )"s;
-  auto  node  = ast.Create_LocalParameter(std::move(name), std::move(value));
+localParameter_def :
+  LOCALPARAMETER parameter_name EQUAL concat_number SEMICOLON
+  {
+    // localParameter_def : LOCALPARAMETER parameter_name EQUAL concat_number SEMICOLON
+    auto& name  = $[parameter_name];
+    auto  value = $[concat_number];
+    auto  node  = ast.Create_LocalParameter(std::move(name), std::move(value));
 
-  LOG(DEBUG) << "Local parameter_value is discarded !!!";
+    $$ = node;
+  }
+| LOCALPARAMETER parameter_name EQUAL concat_string SEMICOLON
+  {
+    // localParameter_def : LOCALPARAMETER parameter_name EQUAL concat_string SEMICOLON
+    auto& name  = $[parameter_name];
+    auto  value = $[concat_string];
+    auto  node  = ast.Create_LocalParameter(std::move(name), std::move(value));
 
-  $$ = node;
-}
+    $$ = node;
+  }
 ;
 
 parameter_name : SCALAR_ID
 {
   // parameter_name : SCALAR_ID
-  $$ = std::move($1);
+  auto& name = $[SCALAR_ID];
+  $$ = std::move(name);
 }
 ;
 
-parameter_value : concat_string | concat_number;
-
-
 // 6.5.5
 attribute_def :
-  ATTRIBUTE attribute_name EQUAL attribute_value SEMICOLON
-  {
-    // attribute_def : ATTRIBUTE attribute_name EQUAL attribute_value SEMICOLON
-    auto& name = $[attribute_name];
-    auto  node = ast.Create_Attribute(std::move(name));
-
-    LOG(DEBUG) << "attribute_value is discarded !!!";
-
-    $$ = node;
-  }
-| ATTRIBUTE attribute_name SEMICOLON
+  ATTRIBUTE attribute_name SEMICOLON
   {
     // attribute_def : ATTRIBUTE attribute_name SEMICOLON
     auto& name = $[attribute_name];
     auto  node = ast.Create_Attribute(std::move(name));
+
+    $$ = node;
+  }
+| ATTRIBUTE attribute_name EQUAL concat_number SEMICOLON
+  {
+    // attribute_def : ATTRIBUTE attribute_name EQUAL concat_number SEMICOLON
+    auto& name  = $[attribute_name];
+    auto  value = $[concat_number];
+    auto  node  = ast.Create_Attribute(std::move(name), std::move(value));
+
+    $$ = node;
+  }
+| ATTRIBUTE attribute_name EQUAL concat_string SEMICOLON
+  {
+    // attribute_def : ATTRIBUTE attribute_name EQUAL concat_string SEMICOLON
+    auto& name  = $[attribute_name];
+    auto  value = $[concat_string];
+    auto  node  = ast.Create_Attribute(std::move(name), std::move(value));
 
     $$ = node;
   }
@@ -1989,11 +2148,10 @@ attribute_def :
 attribute_name : SCALAR_ID
 {
   // attribute_name : SCALAR_ID
-  $$ = std::move($1);
+  auto& name = $[SCALAR_ID];
+  $$ = std::move(name);
 }
 ;
-
-attribute_value : concat_string | concat_number ;
 
 %%
 

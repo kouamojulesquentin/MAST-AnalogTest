@@ -15,7 +15,7 @@
 #ifndef AST_SOURCE_H__98B7A0F4_334_4BA7_FEA3_76B2A0D8944B__INCLUDED_
   #define AST_SOURCE_H__98B7A0F4_334_4BA7_FEA3_76B2A0D8944B__INCLUDED_
 
-#include "AST_Node.hpp"
+#include "AST_SimpleNode.hpp"
 #include <vector>
 #include <string>
 
@@ -25,7 +25,7 @@ class AST_Signal;
 
 //! Represents some source as single or multible signal(s)
 //!
-class AST_Source final : public AST_Node
+class AST_Source final : public AST_SimpleNode
 {
   // ---------------- Public Methods
   //
@@ -43,7 +43,7 @@ class AST_Source final : public AST_Node
 
   //! Text representation of source
   //!
-  std::string AsText() const;
+  std::string AsText() const override;
 
   // ---------------- Private Methods
   //
@@ -56,8 +56,8 @@ class AST_Source final : public AST_Node
   //! Constructs from a single signal
   //!
   AST_Source(Kind kind, AST_Signal* signal)
-    : AST_Node  (kind)
-    , m_signals ()
+    : AST_SimpleNode (kind)
+    , m_signals      ()
   {
     m_signals.push_back(signal);
   }
@@ -65,8 +65,8 @@ class AST_Source final : public AST_Node
   //! Constructs from a bunch of ordered (concatenated) signals
   //!
   AST_Source(Kind kind, std::vector<AST_Signal*>&& signals)
-    : AST_Node  (kind)
-    , m_signals (std::move(signals))
+    : AST_SimpleNode (kind)
+    , m_signals      (std::move(signals))
   {
   }
 

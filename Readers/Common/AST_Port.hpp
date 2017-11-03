@@ -53,9 +53,9 @@ class AST_Port final : public AST_ParentNode
   private:
 
   friend class AST;                                              // This is AST that manages construction/destruction of AST nodes
-  MAKE_UNIQUE_AS_FRIEND(AST_Port)(Parsers::Kind& kind,
+  MAKE_UNIQUE_AS_FRIEND(AST_Port)(Parsers::Kind&,
                                   Parsers::AST_VectorIdentifier*&);
-  MAKE_UNIQUE_AS_FRIEND(AST_Port)(Parsers::Kind& kind,
+  MAKE_UNIQUE_AS_FRIEND(AST_Port)(Parsers::Kind&,
                                   Parsers::AST_VectorIdentifier*&,
                                   std::vector<AST_Node*>&&);
 

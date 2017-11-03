@@ -21,15 +21,16 @@
 
 namespace Parsers
 {
+class AST_Attribute;
 class AST_Identifier;
 class AST_Module;
+class AST_Parameter;
 class AST_Port;
 class AST_ScalarIdentifier;
 class AST_ScanRegister;
 class AST_Signal;
 class AST_Source;
 class AST_Value;
-class AST_Attribute;
 class AST_VectorIdentifier;
 
 //! Abstract Syntax Tree built when parsing some test network description
@@ -43,6 +44,8 @@ class AST final
   AST();
 
   AST_Attribute*        Create_Attribute        (std::string&& name);
+  AST_Parameter*        Create_LocalParameter   (std::string&& name, std::string&& numbersValue);
+  AST_Parameter*        Create_Parameter        (std::string&& name, std::string&& numbersValue);
   AST_Signal*           Create_Signal           (std::experimental::string_view number);
   AST_Signal*           Create_Signal           (AST_Identifier* portName);
   AST_Signal*           Create_Signal           (std::vector<AST_ScalarIdentifier*>&& scope, AST_Identifier* portName);

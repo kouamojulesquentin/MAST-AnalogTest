@@ -29,7 +29,9 @@ class UT_ICL_Reader : public CxxTest::TestSuite
 
   // ---------------- UpdateAstFromIcl
   //
-  void test_UpdateAstFromIcl_ScanRegister ();
+  void test_UpdateAstFromIcl_1_ScanRegister ();
+  void test_UpdateAstFromIcl_3_ScanRegister ();
+  void test_UpdateAstFromIcl_1_ScanRegister_parameters ();
 
   // ================ Other Methods ================
 

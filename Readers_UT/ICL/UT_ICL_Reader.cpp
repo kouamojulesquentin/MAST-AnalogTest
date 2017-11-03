@@ -31,6 +31,7 @@ using std::tuple;
 using std::make_tuple;
 using std::string;
 using std::stringstream;
+using std::istringstream;
 using std::experimental::string_view;
 using std::shared_ptr;
 using std::make_shared;
@@ -107,13 +108,13 @@ void UT_ICL_Reader::setUp ()
 }
 
 
-//! Checks ICL_Reader::ParseExcerpt() when parsing only a ScanRegister
+//! Checks ICL_Reader::ParseExcerpt() when parsing a single ScanRegister
 //!
-void UT_ICL_Reader::test_UpdateAstFromIcl_ScanRegister ()
+void UT_ICL_Reader::test_UpdateAstFromIcl_1_ScanRegister ()
 {
   // ---------------- Setup
   //
-  std::istringstream excerpt(excerpt_Module_SReg_8_bits);
+  istringstream excerpt(excerpt_Module_SReg_8_bits);
 
   auto           sm = make_shared<SystemModel>();
   ICL_Reader_TSS sut(sm);
@@ -144,7 +145,130 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_ScanRegister ()
                                   "    ResetValue 8'b00000000;\n"
                                   "  }\n"
                                   "}\n";
-  auto actual_AST_String          = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
+
+
+//! Checks ICL_Reader::ParseExcerpt() when parsing a three ScanRegister
+//!
+void UT_ICL_Reader::test_UpdateAstFromIcl_3_ScanRegister ()
+{
+  // ---------------- Setup
+  //
+  auto               sm  = make_shared<SystemModel>();
+  std::istringstream excerpt("Module SReg {\n"
+                             "ScanInPort    SI;\n"
+                             "ScanOutPort   SO { Source  SR_3[0];}\n"
+                             "ShiftEnPort   SE;\n"
+                             "CaptureEnPort CE;\n"
+                             "UpdateEnPort  UE;\n"
+                             "SelectPort    SEL;\n"
+                             "ResetPort     RST;\n"
+                             "TCKPort       TCK;\n"
+                             "DataInPort    DI[7:0];\n"
+                             "DataOutPort   DO[7:0] {Source SR_1; }\n"
+                             "ScanInterface scan_client { Port SI; Port SO; Port SEL; }\n"
+                             "\n"
+                             "ScanRegister SR_3[7:0] { ScanInSource SR_2[0];\n"
+                             "                       CaptureSource DI;\n"
+                             "                       ResetValue 8'b00000011; }\n"
+                             "\n"
+                             "ScanRegister SR_1[5:0] { ScanInSource SI;\n"
+                             "                       CaptureSource DI;\n"
+                             "                       ResetValue 8'b000001; }\n"
+                             "\n"
+                             "ScanRegister SR_2[6:0] { ScanInSource SR_1[0];\n"
+                             "                       CaptureSource DI;\n"
+                             "                       ResetValue 8'b0000010; }\n"
+                             "}\n"s);
+
+  ICL_Reader_TSS sut(sm);
+
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto topModule = ast->TopModule();
+  TS_ASSERT_NOT_NULLPTR (topModule);
+
+  auto expected_AST_PrettyPrint = "Module SReg\n"
+                                  "{\n"
+                                  "  ScanInPort SI;\n"
+                                  "  ScanOutPort SO\n"
+                                  "  {\n"
+                                  "    Source SR_3[0];\n"
+                                  "  }\n"
+                                  "  ScanRegister SR_3[7:0]\n"
+                                  "  {\n"
+                                  "    ScanInSource SR_2[0];\n"
+                                  "    ResetValue 8'b00000011;\n"
+                                  "  }\n"
+                                  "  ScanRegister SR_1[5:0]\n"
+                                  "  {\n"
+                                  "    ScanInSource SI;\n"
+                                  "    ResetValue 8'b000001;\n"
+                                  "  }\n"
+                                  "  ScanRegister SR_2[6:0]\n"
+                                  "  {\n"
+                                  "    ScanInSource SR_1[0];\n"
+                                  "    ResetValue 8'b0000010;\n"
+                                  "  }\n"
+                                  "}\n"s;
+
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
+
+
+//! Checks ICL_Reader::ParseExcerpt() when parsing a single ScanRegister with parameters
+//!
+void UT_ICL_Reader::test_UpdateAstFromIcl_1_ScanRegister_parameters ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt(excerpt_Module_SReg_parameterized);
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto topModule = ast->TopModule();
+  TS_ASSERT_NOT_NULLPTR (topModule);
+
+  auto expected_AST_PrettyPrint = "Module SReg\n"
+                                  "{\n"
+                                  "  Parameter MSB = 7;\n"
+                                  "  ScanInPort SI;\n"
+                                  "  ScanOutPort SO\n"
+                                  "  {\n"
+                                  "    Source SR[0];\n"
+                                  "  }\n"
+                                  "  ScanRegister SR[$MSB:0]\n"
+                                  "  {\n"
+                                  "    ScanInSource SI;\n"
+                                  "    ResetValue 'b0;\n"
+                                  "  }\n"
+                                  "}\n";
+
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
 }
 

@@ -34,6 +34,7 @@ class AST_ScalarIdentifier final : public AST_Identifier
 
   // ---------------- Private Methods
   //
+  private:
   friend class AST;                                                             // This is AST that manages construction/destruction of AST nodes
   MAKE_UNIQUE_AS_FRIEND(AST_ScalarIdentifier)(std::experimental::string_view&); // AST currently uses make_unit<T>() to create nodes
 
@@ -43,6 +44,9 @@ class AST_ScalarIdentifier final : public AST_Identifier
   {
   }
 
+  // ---------------- Private Fields
+  //
+  private:
   std::string m_identifier; //!< Textual representation of identifier
 };
 //

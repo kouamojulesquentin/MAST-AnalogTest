@@ -13,14 +13,16 @@
 
 #include "AST.hpp"
 #include "AST_Attribute.hpp"
+#include "AST_Module.hpp"
+#include "AST_Parameter.hpp"
 #include "AST_Port.hpp"
+#include "AST_ScalarIdentifier.hpp"
+#include "AST_ScanRegister.hpp"
 #include "AST_Signal.hpp"
 #include "AST_Source.hpp"
 #include "AST_Value.hpp"
-#include "AST_Module.hpp"
-#include "AST_ScanRegister.hpp"
-#include "AST_ScalarIdentifier.hpp"
 #include "AST_VectorIdentifier.hpp"
+
 #include "Utility.hpp"
 
 using std::vector;
@@ -54,6 +56,36 @@ AST_Attribute* AST::Create_Attribute (string&& name)
 }
 //
 //  End of: AST::Create_Attribute
+//---------------------------------------------------------------------------
+
+
+//! Creates an AST_Parameter node for local parameter
+//!
+//! @param name           Local parameter name
+//! @param numbersValue   Numbers that define parameter value
+//!
+AST_Parameter* AST::Create_LocalParameter (std::string&& name, std::string&& numbersValue)
+{
+  auto kind = Kind::LocalParameter;
+  return Create_Node<AST_Parameter>(kind, std::move(name), std::move(numbersValue));
+}
+//
+//  End of: AST::Create_LocalParameter
+//---------------------------------------------------------------------------
+
+
+//! Creates an AST_Parameter node for local parameter
+//!
+//! @param name           Parameter name
+//! @param numbersValue   Numbers that define parameter value
+//!
+AST_Parameter* AST::Create_Parameter (std::string&& name, std::string&& numbersValue)
+{
+  auto kind = Kind::Parameter;
+  return Create_Node<AST_Parameter>(kind, std::move(name), std::move(numbersValue));
+}
+//
+//  End of: AST::Create_Parameter
 //---------------------------------------------------------------------------
 
 

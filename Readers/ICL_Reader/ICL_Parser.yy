@@ -37,6 +37,7 @@ namespace Parsers
   class AST_Identifier;
   class AST_Module;
   class AST_Node;
+  class AST_Parameter;
   class AST_Port;
   class AST_ScalarIdentifier;
   class AST_ScanRegister;
@@ -73,6 +74,7 @@ typedef void* yyscan_t;
 #include "ParserException.hpp"
 #include "AST.hpp"
 #include "AST_Attribute.hpp"
+#include "AST_Parameter.hpp"
 #include "AST_Port.hpp"
 #include "AST_Signal.hpp"
 #include "AST_Source.hpp"
@@ -201,6 +203,8 @@ namespace
 
 %type <Parsers::AST_Module*>            module_def
 %type <Parsers::AST_Attribute*>         attribute_def
+%type <Parsers::AST_Parameter*>         localParameter_def
+%type <Parsers::AST_Parameter*>         parameter_def
 %type <Parsers::AST_ScanRegister*>      scanRegister_def
 %type <Parsers::AST_Node*>              accessLink_def
 %type <Parsers::AST_Node*>              accessLinkGeneric_def
@@ -211,13 +215,11 @@ namespace
 %type <Parsers::AST_Node*>              dataRegister_def
 %type <Parsers::AST_Node*>              enum_def
 %type <Parsers::AST_Node*>              instance_def
-%type <Parsers::AST_Node*>              localParameter_def
 %type <Parsers::AST_Node*>              logicSignal_def
 %type <Parsers::AST_Node*>              module_item
 %type <Parsers::AST_Node*>              nameSpace_def
 %type <Parsers::AST_Node*>              oneHotDataGroup_def
 %type <Parsers::AST_Node*>              oneHotScanGroup_def
-%type <Parsers::AST_Node*>              parameter_def
 %type <Parsers::AST_Node*>              scanInterface_def
 %type <Parsers::AST_Node*>              scanMux_def
 %type <Parsers::AST_Node*>              useNameSpace_def
@@ -1915,17 +1917,40 @@ concat_string : concat_string COMMA string_or_parm | string_or_parm ;
 string_or_parm : STRING | parameter_ref;
 
 // 6.5.4
-parameter_def : PARAMETER parameter_name EQUAL parameter_value SEMICOLON
-{
-  // parameter_def : PARAMETER parameter_name EQUAL parameter_value SEMICOLON
-  $$ = nullptr;
-}
+parameter_def :
+  PARAMETER parameter_name EQUAL concat_number SEMICOLON
+  {
+    // parameter_def : PARAMETER parameter_name EQUAL concat_number SEMICOLON
+    auto& name  = $[parameter_name];
+    auto  value = $[concat_number];
+    auto  node  = ast.Create_Parameter(std::move(name), std::move(value));
+
+    $$ = node;
+  }
+| PARAMETER parameter_name EQUAL concat_string SEMICOLON
+  {
+    // parameter_def : PARAMETER parameter_name EQUAL concat_string SEMICOLON
+    auto& name  = $[parameter_name];
+    auto  value = "discarded_concat_string (cf. parameter_def )"s;
+    auto  node  = ast.Create_Parameter(std::move(name), std::move(value));
+
+    LOG(DEBUG) << "parameter_value is discarded !!!";
+
+    $$ = node;
+  }
+
 ;
 
 localParameter_def : LOCALPARAMETER parameter_name EQUAL parameter_value SEMICOLON
 {
   // localParameter_def : LOCALPARAMETER parameter_name EQUAL parameter_value SEMICOLON
-  $$ = nullptr;
+  auto& name  = $[parameter_name];
+  auto  value = "discarded_value (cf. localParameter_def )"s;
+  auto  node  = ast.Create_LocalParameter(std::move(name), std::move(value));
+
+  LOG(DEBUG) << "Local parameter_value is discarded !!!";
+
+  $$ = node;
 }
 ;
 

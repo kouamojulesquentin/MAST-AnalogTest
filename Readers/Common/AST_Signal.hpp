@@ -14,7 +14,7 @@
 #ifndef AST_SIGNAL_H__C83B6175_C11F_4E05_B4A2_722C4034A2A__INCLUDED_
   #define AST_SIGNAL_H__C83B6175_C11F_4E05_B4A2_722C4034A2A__INCLUDED_
 
-#include "AST_Node.hpp"
+#include "AST_SimpleNode.hpp"
 #include <vector>
 #include <string>
 
@@ -25,7 +25,7 @@ class AST_Identifier;
 
 //! Represents a signal, i.e. a scoped port name or a number
 //!
-class AST_Signal final : public AST_Node
+class AST_Signal final : public AST_SimpleNode
 {
   // ---------------- Public Methods
   //
@@ -35,7 +35,7 @@ class AST_Signal final : public AST_Node
 
   //! Text representation of signal
   //!
-  std::string AsText() const;
+  std::string AsText() const override;
 
   //! Returns true when signal is a number
   //!
@@ -74,25 +74,25 @@ class AST_Signal final : public AST_Node
   //! Constructs from sole number
   //!
   AST_Signal(std::experimental::string_view number)
-    : AST_Node (Kind::Signal)
-    , m_number (number)
+    : AST_SimpleNode (Kind::Signal)
+    , m_number       (number)
   {
   }
 
   //! Constructs from only port name
   //!
   AST_Signal(AST_Identifier* portName)
-    : AST_Node   (Kind::Signal)
-    , m_portName (portName)
+    : AST_SimpleNode (Kind::Signal)
+    , m_portName     (portName)
   {
   }
 
   //! Constructs from path and port name
   //!
   AST_Signal(std::vector<AST_ScalarIdentifier*>&& path, AST_Identifier* portName)
-    : AST_Node   (Kind::Signal)
-    , m_path     (std::move(path))
-    , m_portName (portName)
+    : AST_SimpleNode (Kind::Signal)
+    , m_path         (std::move(path))
+    , m_portName     (portName)
   {
   }
 

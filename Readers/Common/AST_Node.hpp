@@ -35,8 +35,10 @@ namespace Parsers
     Enum_ref,         //!< For enums references
     Instance,         //!< For modules instances
     Module,           //!< For modules
+    LocalParameter,   //!< For local parameters definitions
     Namespace_def,    //!< For namespace definitions
     Namespace_ref,    //!< For namespace references
+    Parameter,        //!< For parameters definitions
     ResetValue,       //!< For registers reset value
     ScalarIdentifier, //!< For identifier with a without scope prefix and no bit nor range identifier
     ScanInPort,       //!< For modules scan input port
@@ -75,9 +77,11 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::Enum_item)
             ENUM_MEMBER(Parsers::Kind::Enum_ref)
             ENUM_MEMBER(Parsers::Kind::Instance)
+            ENUM_MEMBER(Parsers::Kind::LocalParameter)
             ENUM_MEMBER(Parsers::Kind::Module)
             ENUM_MEMBER(Parsers::Kind::Namespace_def)
             ENUM_MEMBER(Parsers::Kind::Namespace_ref)
+            ENUM_MEMBER(Parsers::Kind::Parameter)
             ENUM_MEMBER(Parsers::Kind::ResetValue)
             ENUM_MEMBER(Parsers::Kind::ScalarIdentifier)
             ENUM_MEMBER(Parsers::Kind::ScanInPort)

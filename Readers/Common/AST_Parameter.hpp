@@ -1,18 +1,18 @@
 //===========================================================================
-//                           AST_Attribute.hpp
+//                           AST_Parameter.hpp
 //===========================================================================
 // Copyright (C) 2017 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file AST_Attribute.hpp
+//! @file AST_Parameter.hpp
 //!
-//! Declares AST_Attribute class
+//! Declares AST_Parameter class
 //!
 //===========================================================================
 
-#ifndef AST_ATTRIBUTE_H__5F066B0A_8C66_4E96_D1BE_D6C341DAE98__INCLUDED_
-  #define AST_ATTRIBUTE_H__5F066B0A_8C66_4E96_D1BE_D6C341DAE98__INCLUDED_
+#ifndef AST_PARAMETER_H__6601FC1C_1BB0_4FE1_3DA7_E138C1507BC2__INCLUDED_
+  #define AST_PARAMETER_H__6601FC1C_1BB0_4FE1_3DA7_E138C1507BC2__INCLUDED_
 
 #include "AST_SimpleNode.hpp"
 #include <experimental/string_view>
@@ -20,15 +20,15 @@
 
 namespace Parsers
 {
-//! Represents an attribute
+//! Represents a parameter (for generic modules) or local parameter (for convenience)
 //!
-class AST_Attribute final : public AST_SimpleNode
+class AST_Parameter final : public AST_SimpleNode
 {
   // ---------------- Public Methods
   //
   public:
-  ~AST_Attribute() = default;
-  AST_Attribute()  = delete;
+  ~AST_Parameter() = default;
+  AST_Parameter()  = delete;
 
   //! Visited part of the Visitor pattern
   //!
@@ -38,19 +38,26 @@ class AST_Attribute final : public AST_SimpleNode
   //!
   const std::string& Name() const { return m_name; }
 
-  //! Text representation of attribute
+  //! Text representation of parameter
   //!
   std::string AsText() const override;
 
   // ---------------- Private Methods
   //
   private:
-  friend class AST;                               // This is AST that manages construction/destruction of AST nodes
-  MAKE_UNIQUE_AS_FRIEND(AST_Attribute)(string&&); // AST currently uses make_unit<T>() to create nodes
+  friend class AST;                                                                   // This is AST that manages construction/destruction of AST nodes
+  MAKE_UNIQUE_AS_FRIEND(AST_Parameter)(Parsers::Kind&, std::string&&, std::string&&); // AST currently uses make_unit<T>() to create nodes
 
-  AST_Attribute(std::string&& name)
-    : AST_SimpleNode (Kind::Attribute)
+  //! Initializes AST_Parameter with a number
+  //!
+  //! @param kind         Either Parameter or LocalParameter
+  //! @param name         Parameter name
+  //! @param numbersValue Numbers that define parameter value
+  //!
+  AST_Parameter(Kind kind, std::string&& name, std::string&& numbersValue)
+    : AST_SimpleNode (kind)
     , m_name         (std::move(name))
+    , m_numbersValue (std::move(numbersValue))
   {
   }
 
@@ -62,15 +69,12 @@ class AST_Attribute final : public AST_SimpleNode
 //+  AST_StringConcatenation* m_stringsValue = nullptr; //!< Attribute value when defined as strings
 };
 //
-//  End of AST_Attribute class declaration
+//  End of AST_Parameter class declaration
 //---------------------------------------------------------------------------
 } // End of namespace Parsers
 
 
-
-
-
-#endif  // not defined AST_ATTRIBUTE_H__5F066B0A_8C66_4E96_D1BE_D6C341DAE98__INCLUDED_
+#endif  // not defined AST_PARAMETER_H__6601FC1C_1BB0_4FE1_3DA7_E138C1507BC2__INCLUDED_
 //===========================================================================
-// End of AST_Attribute.hpp
+// End of AST_Parameter.hpp
 //===========================================================================

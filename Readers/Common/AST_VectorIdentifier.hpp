@@ -35,7 +35,7 @@ class AST_VectorIdentifier final : public AST_Identifier
 
   std::experimental::string_view BaseName()    const { return m_identifier; } //!< Text representation of identifier base name - without index(es)
   std::string                    RangeAsText() const;                         //!< Text representation of only index(es)
-  std::string                    AsText()      const;                         //!< Text representation of identifier with its index(es)
+  std::string                    AsText()      const override;                //!< Text representation of identifier with its index(es)
 
 
   bool IsScalar()    const { return  m_right.empty() && m_left.empty(); }      //!< Returns true when both left and right indexes are empty (equivalent to ScalarIdentifier)

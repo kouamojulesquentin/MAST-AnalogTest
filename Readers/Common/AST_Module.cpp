@@ -13,6 +13,7 @@
 
 #include "AST_Module.hpp"
 #include "AST_ScanRegister.hpp"
+#include "AST_Parameter.hpp"
 #include "AST_Port.hpp"
 #include "AST_Visitor.hpp"
 
@@ -37,6 +38,14 @@ void AST_Module::DispatchChildren ()
     {
       switch (child->GetKind())
       {
+        case Parsers::Kind::LocalParameter :
+          m_localParameters.push_back(static_cast<AST_Parameter*>(child));
+          child = nullptr;
+          break;
+        case Parsers::Kind::Parameter :
+          m_parameters.push_back(static_cast<AST_Parameter*>(child));
+          child = nullptr;
+          break;
         case Parsers::Kind::ScanRegister :
           m_scanRegisters.push_back(static_cast<AST_ScanRegister*>(child));
           child = nullptr;

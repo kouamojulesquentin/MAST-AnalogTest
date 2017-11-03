@@ -15,6 +15,7 @@
 
 #include "AST_Attribute.hpp"
 #include "AST_Module.hpp"
+#include "AST_Parameter.hpp"
 #include "AST_Port.hpp"
 #include "AST_ScanRegister.hpp"
 #include "AST_Signal.hpp"
@@ -25,6 +26,7 @@
 
 #include <sstream>
 
+using std::vector;
 using std::string;
 using std::experimental::string_view;
 using namespace Parsers;
@@ -58,39 +60,6 @@ namespace Parsers
 
 } // End of Parsers namespace
 
-//! Adds spaces to force next insertion point to be at target position relative
-//! to reference position
-//!
-//! @param refPos       Reference position
-//! @param targetPos    Target position relative to refPos
-//!
-void AST_PrettyPrinter::AlignRelativeTo (pos_type refPos, pos_type targetPos)
-{
-  auto curPos      = m_os.tellp();
-  auto startLength = curPos - refPos;
-
-  if (startLength < targetPos)
-  {
-    m_os << string(targetPos - startLength, ' ');
-  }
-}
-//
-//  End of: AST_PrettyPrinter::AlignRelativeTo
-//---------------------------------------------------------------------------
-
-
-//! Inserts new line and align position on target position on newly added line
-//!
-//! @param targetPos  Position set after adding a new line
-//!
-void AST_PrettyPrinter::AlignOnNewLine (pos_type targetPos)
-{
-  m_os << std::endl;
-  m_os << string(targetPos, ' ');
-}
-//
-//  End of: AST_PrettyPrinter::AlignOnNewLine
-//---------------------------------------------------------------------------
 
 
 //! Returns textual model representation starting from a "top" node
@@ -122,26 +91,27 @@ void AST_PrettyPrinter::StreamNodeHeader(const AST_NamedNode* node, string_view 
     m_os << notes;
   }
 }
+//
+//  End of StreamNodeHeader
+//---------------------------------------------------------------------------
 
-//! Appends content of parent node in text representation and visits
-//! sub-nodes
+
+//! Streams children (not parent) node
 //!
-//! @param node   The node for which header is to be streamed
-//! @param notes  Optional note to add after node name
+//! @param node   Node to stream textual representation
 //!
-void AST_PrettyPrinter::StreamParentNode (const AST_ParentNode* parentNode, string_view notes)
+void AST_PrettyPrinter::StreamSimpleNode(const AST_SimpleNode* node)
 {
-  StreamNodeHeader(parentNode, notes);
-  m_os << "\n";
-  StreamDepth() << "{\n";
-
-//+  PrintChildren(parentNode);
-
-  StreamDepth() << "}\n";
+  if (node != nullptr)
+  {
+    StreamDepth() << node->KindName() << " " << node->AsText() << ";\n";
+  }
 }
 //
-//  End of: AST_PrettyPrinter::StreamParentNode
+//  End of StreamSimpleNode
 //---------------------------------------------------------------------------
+
+
 
 //! Appends content of a Module node in text representation and visits
 //! sub-nodes
@@ -151,40 +121,12 @@ void AST_PrettyPrinter::Visit_Module (AST_Module* module)
 
   HierarchyInserter hierarchyInserter(*this);
 
-  // ---------------- ScanInPort
-  //
-  const auto scanInPort = module->ScanInPort();
-  if (scanInPort != nullptr)
-  {
-    scanInPort->Accept(*this);
-  }
-
-  // ---------------- ScanOutPort
-  //
-  const auto scanOutPort = module->ScanOutPort();
-  if (scanOutPort != nullptr)
-  {
-    scanOutPort->Accept(*this);
-  }
-
-
-  for (const auto& node : module->UndispatchedChildren())
-  {
-    if (node != nullptr)
-    {
-      node->Accept(*this);
-    }
-  }
-
-  // ---------------- Scan registers
-  //
-  for (const auto& scanRegister : module->ScanRegisters())
-  {
-    CHECK_VALUE_NOT_NULL(scanRegister, "Unexpected hold nullptr ScanRegister in module");
-
-    scanRegister->Accept(*this);
-  }
-
+  StreamSimpleNodes (module->Parameters());
+  StreamSimpleNodes (module->LocalParameters());
+  AcceptNode        (module->ScanInPort());
+  AcceptNode        (module->ScanOutPort());
+  AcceptNodes       (module->UndispatchedChildren());
+  AcceptNodes       (module->ScanRegisters());
 }
 //
 //  End of: AST_PrettyPrinter::Visit_Module
@@ -204,22 +146,9 @@ void AST_PrettyPrinter::Visit_Port (AST_Port* port)
   {
     HierarchyInserter hierarchyInserter(*this);
 
-    for (const auto attribute : attributes)
-    {
-      CHECK_VALUE_NOT_NULL(attribute, "Unexpected nullptr attribute in port");
+    StreamSimpleNodes(attributes);
 
-      StreamDepth() << attribute->AsText() << ";\n";
-    }
-
-    // ---------------- Others (unprocessed children)
-    //
-    for (const auto node : undispatched)
-    {
-      if (node != nullptr)
-      {
-        node->Accept(*this);
-      }
-    }
+    AcceptNodes(undispatched);
   }
   else
   {
@@ -239,31 +168,9 @@ void AST_PrettyPrinter::Visit_ScanRegister (AST_ScanRegister* scanRegister)
 
   HierarchyInserter hierarchyInserter(*this);
 
-  // ---------------- ScanInSource
-  //
-  auto scanInSource = scanRegister->ScanInSource();
-  if (scanInSource != nullptr)
-  {
-    StreamDepth() << scanInSource->KindName() << " " << scanInSource->AsText() << ";\n";
-  }
-
-  // ---------------- ResetValue
-  //
-  auto resetValue = scanRegister->ResetValue();
-  if (resetValue != nullptr)
-  {
-    StreamDepth() << resetValue->KindName() << " " << resetValue->AsText() << ";\n";
-  }
-
-  // ---------------- Others (unprocessed children)
-  //
-  for (const auto node : scanRegister->UndispatchedChildren())
-  {
-    if (node != nullptr)
-    {
-      node->Accept(*this);
-    }
-  }
+  StreamSimpleNode (scanRegister->ScanInSource());
+  StreamSimpleNode (scanRegister->ResetValue());
+  AcceptNodes      (scanRegister->UndispatchedChildren());
 }
 //
 //  End of: AST_PrettyPrinter::Visit_ScanRegister
@@ -274,7 +181,7 @@ void AST_PrettyPrinter::Visit_ScanRegister (AST_ScanRegister* scanRegister)
 //! sub-nodes
 void AST_PrettyPrinter::Visit_Source (AST_Source* source)
 {
-  StreamDepth() << source->KindName() << " " << source->AsText() << ";\n";
+  StreamSimpleNode(source);
 }
 //
 //  End of: AST_PrettyPrinter::Visit_Source

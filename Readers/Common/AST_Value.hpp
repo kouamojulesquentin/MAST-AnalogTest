@@ -15,14 +15,14 @@
 #ifndef AST_VALUE_H__C7D6CDC4_753_49F0_45B7_9FFA68F2FD4C__INCLUDED_
   #define AST_VALUE_H__C7D6CDC4_753_49F0_45B7_9FFA68F2FD4C__INCLUDED_
 
-#include "AST_Node.hpp"
+#include "AST_SimpleNode.hpp"
 #include <string>
 
 namespace Parsers
 {
 //! Represents some value
 //!
-class AST_Value final : public AST_Node
+class AST_Value final : public AST_SimpleNode
 {
   // ---------------- Public Methods
   //
@@ -30,11 +30,7 @@ class AST_Value final : public AST_Node
   ~AST_Value() = default;
   AST_Value()  = delete;
 
-  std::string AsText() const { return m_valueExpression; }; //!< Text representation of value
-
-  // ---------------- Protected Methods
-  //
-  protected:
+  std::string AsText() const override { return m_valueExpression; }; //!< Text representation of value
 
   // ---------------- Private Methods
   //
@@ -45,7 +41,7 @@ class AST_Value final : public AST_Node
   //! Initializes the value with specific value kind
   //!
   AST_Value(Kind kind, std::experimental::string_view valueExpression)
-    : AST_Node          (kind)
+    : AST_SimpleNode    (kind)
     , m_valueExpression (valueExpression)
   {
   }

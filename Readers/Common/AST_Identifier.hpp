@@ -14,14 +14,14 @@
 #ifndef AST_IDENTIFIER_H__2904C7ED_BEBD_4BB4_9BBD_F627A1EF620F__INCLUDED_
   #define AST_IDENTIFIER_H__2904C7ED_BEBD_4BB4_9BBD_F627A1EF620F__INCLUDED_
 
-#include "AST_Node.hpp"
+#include "AST_SimpleNode.hpp"
 #include <string>
 
 namespace Parsers
 {
 //! Abstract identifier
 //!
-class AST_Identifier : public AST_Node
+class AST_Identifier : public AST_SimpleNode
 {
   // ---------------- Public Methods
   //
@@ -29,13 +29,11 @@ class AST_Identifier : public AST_Node
   ~AST_Identifier() = default;
   AST_Identifier()  = delete;
 
-  virtual std::string AsText() const = 0; //!< Text representation of identifier with or without index(es)
-
   // ---------------- Protected Methods
   //
   protected:
   AST_Identifier(Kind kind)
-    : AST_Node  (kind)
+    : AST_SimpleNode (kind)
   {
   }
 };

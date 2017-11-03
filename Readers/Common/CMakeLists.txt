@@ -17,9 +17,12 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_Identifier.hpp
                                   AST_Module.hpp
                                   AST_Module.cpp
+                                  AST_Parameter.hpp
+                                  AST_Parameter.cpp
                                   AST_Port.hpp
                                   AST_Port.cpp
                                   AST_ScalarIdentifier.hpp
+                                  AST_SimpleNode.hpp
                                   AST_Signal.hpp
                                   AST_Signal.cpp
                                   AST_Source.hpp

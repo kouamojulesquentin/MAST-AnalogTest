@@ -16,6 +16,7 @@
 
 #include "AST_Visitor.hpp"
 #include <string>
+#include <vector>
 #include <sstream>
 #include <memory>
 #include <experimental/string_view>
@@ -23,6 +24,7 @@
 namespace Parsers
 {
 class AST_Node;
+class AST_SimpleNode;
 class AST_NamedNode;
 class AST_ParentNode;
 
@@ -54,17 +56,43 @@ class AST_PrettyPrinter final : public AST_Visitor
   friend class HierarchyInserter; //!< Helper class to insert hierarchy open/close sequences
   using pos_type = std::ostringstream::pos_type;
 
-  void AlignOnNewLine  (pos_type targetPos);
-  void AlignRelativeTo (pos_type refPos, pos_type targetPos);
-
   std::ostringstream& StreamDepth()
   {
     m_os << std::string(2u * m_depth, ' ');
     return m_os;
   }
 
-  void StreamNodeHeader (const AST_NamedNode*  node,       std::experimental::string_view notes);
-  void StreamParentNode (const AST_ParentNode* parentNode, std::experimental::string_view notes);
+  void StreamNodeHeader  (const AST_NamedNode* node, std::experimental::string_view notes);
+  void StreamSimpleNode  (const AST_SimpleNode*               node);
+  void StreamSimpleNodes (const std::vector<AST_SimpleNode*>& nodes);
+
+  template<typename T>
+  void StreamSimpleNodes(const std::vector<T*>& nodes)
+  {
+    for (const auto node : nodes)
+    {
+      StreamSimpleNode(node);
+    }
+  }
+
+  template<typename T>
+  void AcceptNode (T* node)
+  {
+    if (node != nullptr)
+    {
+      node->Accept(*this);
+    }
+  }
+
+  template<typename T>
+  void AcceptNodes (const std::vector<T*>& nodes)
+  {
+    for (const auto node : nodes)
+    {
+      AcceptNode(node);
+    }
+  }
+
 
   // ---------------- Private  Fields
   //

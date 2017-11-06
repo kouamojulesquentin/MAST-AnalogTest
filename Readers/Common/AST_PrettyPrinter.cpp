@@ -17,6 +17,8 @@
 #include "AST_Module.hpp"
 #include "AST_Parameter.hpp"
 #include "AST_Port.hpp"
+#include "AST_ScanMux.hpp"
+#include "AST_ScanMuxSelection.hpp"
 #include "AST_ScanRegister.hpp"
 #include "AST_Signal.hpp"
 #include "AST_Source.hpp"
@@ -38,23 +40,41 @@ namespace Parsers
   //!
   //! @note Do 1st half of the job in constructor and the 2nd one in the destructor
   //!
-  struct HierarchyInserter final
+  class HierarchyInserter final
   {
+    public:
     ~HierarchyInserter()
     {
-      --m_printer.m_depth;
-      m_printer.StreamDepth() << "}\n";
+      if (m_simpleHierarchy)
+      {
+        m_printer.m_os << " }\n";
+      }
+      else
+      {
+        --m_printer.m_depth;
+        m_printer.StreamDepth() << "}\n";
+      }
     }
 
-    HierarchyInserter(AST_PrettyPrinter& printer)
-      : m_printer(printer)
+    HierarchyInserter(AST_PrettyPrinter& printer, bool simpleHierarchy = false)
+      : m_printer         (printer)
+      , m_simpleHierarchy (simpleHierarchy)
     {
-      m_printer.m_os << "\n";
-      m_printer.StreamDepth() << "{\n";
-      ++m_printer.m_depth;
+      if (m_simpleHierarchy)
+      {
+        m_printer.m_os << " { ";
+      }
+      else
+      {
+        m_printer.m_os << "\n";
+        m_printer.StreamDepth() << "{\n";
+        ++m_printer.m_depth;
+      }
     }
 
+    private:
     AST_PrettyPrinter& m_printer;
+    bool               m_simpleHierarchy = false;
   };
 
 
@@ -82,7 +102,7 @@ string AST_PrettyPrinter::PrettyPrint (AST_Node* topNode)
 //! @param node   The node for which header is to be streamed
 //! @param notes  Optional note to add after node name
 //!
-void AST_PrettyPrinter::StreamNodeHeader(const AST_NamedNode* node, string_view notes)
+std::ostringstream& AST_PrettyPrinter::StreamNodeHeader(const AST_NamedNode* node, string_view notes)
 {
   StreamDepth() << node->KindName() << " " << node->Name();
 
@@ -90,6 +110,7 @@ void AST_PrettyPrinter::StreamNodeHeader(const AST_NamedNode* node, string_view 
   {
     m_os << notes;
   }
+  return m_os;
 }
 //
 //  End of StreamNodeHeader
@@ -125,8 +146,8 @@ void AST_PrettyPrinter::Visit_Module (AST_Module* module)
   StreamSimpleNodes (module->Parameters());
   StreamSimpleNodes (module->LocalParameters());
 
-  AcceptNode        (module->ScanInPort());
-  AcceptNode        (module->ScanOutPort());
+  AcceptNodes       (module->ScanInPorts());
+  AcceptNodes       (module->ScanOutPorts());
   AcceptNodes       (module->UndispatchedChildren());
   AcceptNodes       (module->ScanRegisters());
 }
@@ -143,14 +164,45 @@ void AST_PrettyPrinter::Visit_Port (AST_Port* port)
 
   const auto& attributes   = port->Attributes();
   const auto& undispatched = port->UndispatchedChildren();
+  const auto  portSource   = port->Source();
 
-  if (!attributes.empty() || !undispatched.empty())
+  if ((portSource != nullptr) || !attributes.empty() || !undispatched.empty())
   {
-    HierarchyInserter hierarchyInserter(*this);
+    auto totalItemsCount = attributes.size() + undispatched.size();
+    if (portSource != nullptr)
+    {
+      ++totalItemsCount;
+    }
 
-    StreamSimpleNodes(attributes);
+    auto simpleHierarchy = totalItemsCount == 1u;
 
-    AcceptNodes(undispatched);
+    if (simpleHierarchy)
+    {
+      HierarchyInserter hierarchyInserter(*this, simpleHierarchy);
+
+      if (portSource != nullptr)
+      {
+        m_os << portSource->KindName() << " " << portSource->AsText() << ";";
+      }
+      else if (!attributes.empty())
+      {
+        auto node = attributes.front();
+        m_os << node->KindName() << " " << node->AsText() << ";";
+      }
+      else
+      {
+        auto node = undispatched.front();
+
+        AcceptNode(node);
+      }
+    }
+    else
+    {
+      HierarchyInserter hierarchyInserter(*this);
+
+      StreamSimpleNodes(attributes);
+      AcceptNodes(undispatched);
+    }
   }
   else
   {
@@ -159,6 +211,28 @@ void AST_PrettyPrinter::Visit_Port (AST_Port* port)
 }
 //
 //  End of: AST_PrettyPrinter::Visit_Port
+//---------------------------------------------------------------------------
+
+
+//! Appends content of a ScanMux node in text representation and visits
+//! sub-nodes
+void AST_PrettyPrinter::Visit_ScanMux (AST_ScanMux* scanMux)
+{
+  StreamNodeHeader(scanMux, " SelectedBy ");
+
+  const auto& selectors = scanMux->Selectors();
+  m_os << AST_SimpleNode::AsText(selectors, ", ");
+
+  HierarchyInserter hierarchyInserter(*this);
+
+  const auto& selectionsTable = scanMux->SelectionsTable();
+  for (const auto& selection : selectionsTable)
+  {
+    StreamDepth() << selection->AsText() << ";\n";
+  }
+}
+//
+//  End of: AST_PrettyPrinter::Visit_ScanMux
 //---------------------------------------------------------------------------
 
 

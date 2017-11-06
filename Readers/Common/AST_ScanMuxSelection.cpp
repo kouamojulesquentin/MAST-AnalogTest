@@ -1,53 +1,48 @@
 //===========================================================================
-//                           AST_Source.cpp
+//                           AST_ScanMuxSelection.cpp
 //===========================================================================
 // Copyright (C) 2017 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file AST_Source.cpp
+//! @file AST_ScanMuxSelection.cpp
 //!
-//! Implements class AST_Source
+//! Implements class AST_ScanMuxSelection
 //!
 //===========================================================================
 
-#include "AST_Source.hpp"
+#include "AST_ScanMuxSelection.hpp"
 #include "AST_Signal.hpp"
-#include "AST_Visitor.hpp"
 
 #include <sstream>
 
 using std::ostringstream;
 using std::string;
+
 using namespace Parsers;
 
 
-//! Visited part of the Visitor pattern
+
+//! Text representation of value
 //!
-void AST_Source::Accept (AST_Visitor& visitor)
+string AST_ScanMuxSelection::AsText () const
 {
-  visitor.Visit_Source(this);
+  ostringstream os;
+
+  os << AST_SimpleNode::AsText(m_selectionValues, " | ");
+  os << " : ";
+  os << AST_SimpleNode::AsText(m_selectedSignals, ", ");
+
+  return os.str();
 }
 //
-//  End of: AST_Source::Accept
+//  End of: AST_ScanMuxSelection::AsText
 //---------------------------------------------------------------------------
 
-
-//! Text representation of source
-//!
-string AST_Source::AsText () const
-{
-  auto asText =  AST_SimpleNode::AsText(m_signals, ", ");
-
-  return asText;
-}
-//
-//  End of: AST_Source::AsText
-//---------------------------------------------------------------------------
 
 
 
 
 //===========================================================================
-// End of AST_Source.cpp
+// End of AST_ScanMuxSelection.cpp
 //===========================================================================

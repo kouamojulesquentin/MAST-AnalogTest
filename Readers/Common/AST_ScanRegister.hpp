@@ -66,6 +66,7 @@ class AST_ScanRegister final : public AST_ParentNode
     , m_identifier   (identifier)
   {
     DispatchChildren();
+    CleanupChildren();
   }
 
   //! Dispatches children to specific members

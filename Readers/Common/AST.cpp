@@ -19,6 +19,8 @@
 #include "AST_Port.hpp"
 #include "AST_ScalarIdentifier.hpp"
 #include "AST_ScanRegister.hpp"
+#include "AST_ScanMux.hpp"
+#include "AST_ScanMuxSelection.hpp"
 #include "AST_Signal.hpp"
 #include "AST_Source.hpp"
 #include "AST_String.hpp"
@@ -233,6 +235,35 @@ AST_ScalarIdentifier* AST::Create_ScalarIdentifier (string_view name)
 //---------------------------------------------------------------------------
 
 
+//! Creates an Create_ScanMux node
+//!
+//! @param identifier           ScanMux identifier
+//! @param selectors            Selection signals that are used to drive the ScanMux
+//! @param scanMuxSelections    Selections definition i.e. which value(s) select which signal(s)
+//!
+AST_ScanMux* AST::Create_ScanMux (AST_VectorIdentifier*           identifier,
+                                  vector<Parsers::AST_Signal*>&&  selectors,
+                                  vector<AST_ScanMuxSelection*>&& scanMuxSelections)
+{
+  return Create_Node<AST_ScanMux>(identifier, std::move(selectors), std::move(scanMuxSelections));
+}
+//
+//  End of: AST::Create_ScanMux
+//---------------------------------------------------------------------------
+
+
+//! Creates an Create_ScanMuxSelection node
+//!
+//! @param selectionValues  Selection values
+//! @param selectedSignals  Selected signal when multiplex selector has one of selection values
+//!
+AST_ScanMuxSelection* AST::Create_ScanMuxSelection (vector<string>&& selectionValues, vector<Parsers::AST_Signal*>&& selectedSignals)
+{
+  return Create_Node<AST_ScanMuxSelection>(std::move(selectionValues), std::move(selectedSignals));
+}
+//
+//  End of: AST::Create_ScanMuxSelection
+//---------------------------------------------------------------------------
 
 
 

@@ -41,6 +41,8 @@ namespace Parsers
   class AST_ParameterRef;
   class AST_Port;
   class AST_ScalarIdentifier;
+  class AST_ScanMux;
+  class AST_ScanMuxSelection;
   class AST_ScanRegister;
   class AST_Signal;
   class AST_SimpleNode;
@@ -83,6 +85,8 @@ typedef void* yyscan_t;
 #include "AST_ParameterRef.hpp"
 #include "AST_Port.hpp"
 #include "AST_ScalarIdentifier.hpp"
+#include "AST_ScanMux.hpp"
+#include "AST_ScanMuxSelection.hpp"
 #include "AST_ScanRegister.hpp"
 #include "AST_Signal.hpp"
 #include "AST_Source.hpp"
@@ -211,7 +215,8 @@ namespace
 %type <std::string> enum_symbol
 %type <std::string> enum_name
 %type <std::string> enum_value
-//+%type <std::string> signal_or_enum
+
+%type <std::vector<std::string>> concat_number_list
 
 %type <std::tuple<string, string>> range          // Left & Right indexes
 %type <std::tuple<string, string>> index_or_range // Left & Right indexes (Right can be empty)
@@ -220,9 +225,15 @@ namespace
 %type <Parsers::AST_Signal*>              signal_or_inverted_signal
 %type <Parsers::AST_Signal*>              data_signal
 %type <Parsers::AST_Signal*>              scan_signal
+%type <Parsers::AST_ScanMuxSelection*>    scanMux_selection
+
+%type <std::vector<Parsers::AST_ScanMuxSelection*>> scanMux_selections
+
+
 %type <std::vector<Parsers::AST_Signal*>> concat_signal_or_inverted_signal
 %type <std::vector<Parsers::AST_Signal*>> concat_scan_signal
 %type <std::vector<Parsers::AST_Signal*>> concat_reset_signal
+%type <std::vector<Parsers::AST_Signal*>> scanMux_select
 %type <std::vector<Parsers::AST_Signal*>> concat_data_signal
 %type <std::vector<Parsers::AST_Signal*>> concat_clock_signal
 %type <std::vector<Parsers::AST_Signal*>> concat_shiftEn_signal
@@ -259,6 +270,7 @@ namespace
 %type <Parsers::AST_Parameter*>         localParameter_def
 %type <Parsers::AST_Parameter*>         parameter_def
 %type <Parsers::AST_ScanRegister*>      scanRegister_def
+%type <Parsers::AST_ScanMux*>           scanMux_def
 %type <Parsers::AST_Node*>              accessLink_def
 %type <Parsers::AST_Node*>              accessLinkGeneric_def
 %type <Parsers::AST_Node*>              accessLink1149_def
@@ -274,7 +286,6 @@ namespace
 %type <Parsers::AST_Node*>              oneHotDataGroup_def
 %type <Parsers::AST_Node*>              oneHotScanGroup_def
 %type <Parsers::AST_Node*>              scanInterface_def
-%type <Parsers::AST_Node*>              scanMux_def
 %type <Parsers::AST_Node*>              useNameSpace_def
 
 %type <Parsers::AST_Port*>              addressPort_def
@@ -637,7 +648,7 @@ concat_number :
   {
     // concat_number : concat_number COMMA number
     auto expr = std::move($[lhs_concat_number]);
-    expr.append(",").append($[number]);
+    expr.append(", ").append($[number]);
 
     $$ = std::move(expr);
   }
@@ -651,7 +662,34 @@ concat_number :
   }
 ;
 
-concat_number_list : concat_number | concat_number_list PIPE concat_number ;
+concat_number_list :
+  concat_number
+  {
+    // concat_number
+    vector<string> concatList;
+    auto&          number = $[concat_number];
+
+    if (!number.empty())
+    {
+      concatList.emplace_back(std::move(number));
+    }
+
+    $$ = std::move(concatList);
+  }
+| concat_number_list[lhs] PIPE concat_number
+  {
+    // concat_number_list PIPE concat_number
+    auto& concatList = $[lhs];
+    auto& number     = $[concat_number];
+
+    if (!number.empty())
+    {
+      concatList.emplace_back(std::move(number));
+    }
+
+    $$ = std::move(concatList);
+  }
+;
 
 scalar_or_vector_id:
   SCALAR_ID
@@ -1852,14 +1890,61 @@ logic_expr_num_arg : number | enum_name | LEFT_PAREN logic_expr_num_arg RIGHT_PA
 scanMux_def : SCANMUX scanMux_name SELECTEDBY scanMux_select LEFT_BRACE scanMux_selections RIGHT_BRACE
 {
   // scanMux_def : SCANMUX scanMux_name SELECTEDBY scanMux_select LEFT_BRACE scanMux_selections RIGHT_BRACE
-  $$ = nullptr;
+  auto& name           = $[scanMux_name];
+  auto& selectors      = $[scanMux_select];
+  auto& selectionTable = $[scanMux_selections];
+
+  auto  node = ast.Create_ScanMux(name, std::move(selectors), std::move(selectionTable));
+
+  $$ = node;
 }
 ;
-scanMux_selections : scanMux_selections scanMux_selection | scanMux_selection ;
-scanMux_name : reg_port_signal_id ;
-scanMux_select : concat_data_signal ;
-scanMux_selection : concat_number_list COLON concat_scan_signal SEMICOLON ;
 
+scanMux_selections :
+  scanMux_selection
+  {
+    // scanMux_selections : scanMux_selection
+    auto  selections = std::vector<Parsers::AST_ScanMuxSelection*>();
+    auto  selection  = $[scanMux_selection];
+
+    selections.push_back(selection);
+
+    $$ = std::move(selections);
+  }
+| scanMux_selections[lhs] scanMux_selection
+  {
+    // scanMux_selections : scanMux_selections[lhs] scanMux_selection
+    auto& selections = $[lhs];
+    auto  selection  = $[scanMux_selection];
+
+    selections.push_back(selection);
+
+    $$ = std::move(selections);
+  }
+;
+
+scanMux_name : reg_port_signal_id ;
+
+scanMux_select : concat_data_signal
+{
+  // scanMux_select : concat_data_signal
+  auto& concatSignals = $[concat_data_signal];
+
+  $$ = std::move(concatSignals);
+}
+;
+
+scanMux_selection : concat_number_list COLON concat_scan_signal SEMICOLON
+{
+  // scanMux_selection : concat_number_list COLON concat_scan_signal SEMICOLON
+  auto& selectionValues = $[concat_number_list];
+  auto& selectedSignals = $[concat_scan_signal];
+
+  auto node = ast.Create_ScanMuxSelection(std::move(selectionValues), std::move(selectedSignals));
+
+  $$ = node;
+}
+;
 // 6.4.12
 dataMux_def : DATAMUX dataMux_name SELECTEDBY dataMux_select LEFT_BRACE dataMux_selections RIGHT_BRACE
 {

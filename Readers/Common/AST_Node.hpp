@@ -44,6 +44,8 @@ namespace Parsers
     ScalarIdentifier, //!< For identifier with a without scope prefix and no bit nor range identifier
     ScanInPort,       //!< For modules scan input port
     ScanInSource,     //!< For input of scan registers
+    ScanMux,          //!< For scan multiplexers
+    ScanMuxSelection, //!< For description of scan multiplexer selection
     ScanOutPort,      //!< For modules scan output port
     ScanRegister,     //!< For scan registers
     Signal,           //!< For signal definitions
@@ -90,6 +92,8 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::ScanInPort)
             ENUM_MEMBER(Parsers::Kind::ScanInSource)
             ENUM_MEMBER(Parsers::Kind::ScanOutPort)
+            ENUM_MEMBER(Parsers::Kind::ScanMux)
+            ENUM_MEMBER(Parsers::Kind::ScanMuxSelection)
             ENUM_MEMBER(Parsers::Kind::ScanRegister)
             ENUM_MEMBER(Parsers::Kind::Signal)
             ENUM_MEMBER(Parsers::Kind::Source)

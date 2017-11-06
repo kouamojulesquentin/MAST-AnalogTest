@@ -14,6 +14,7 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_Node.hpp
                                   AST_NamedNode.hpp
                                   AST_ParentNode.hpp
+                                  AST_ParentNode.cpp
                                   AST_Identifier.hpp
                                   AST_Module.hpp
                                   AST_Module.cpp
@@ -28,6 +29,10 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_Signal.cpp
                                   AST_Source.hpp
                                   AST_Source.cpp
+                                  AST_ScanMux.hpp
+                                  AST_ScanMux.cpp
+                                  AST_ScanMuxSelection.hpp
+                                  AST_ScanMuxSelection.cpp
                                   AST_ScanRegister.hpp
                                   AST_ScanRegister.cpp
                                   AST_String.hpp

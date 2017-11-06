@@ -33,11 +33,15 @@ class AST_ParentNode : public AST_NamedNode
   virtual ~AST_ParentNode() = default;
   AST_ParentNode()          = delete;
 
-  //! Returns handle on not yet processed children
+  //! Returns handle on not yet "dispatched" children
   //!
   //! @note This is mainly intended to be "processed" by visitors
   //!
   std::vector<AST_Node*>& UndispatchedChildren() { return m_undispatchedChildren; }
+
+  //! Removes children that have been dispatched from undispatched list
+  //!
+  void CleanupChildren ();
 
   // ---------------- Protected Methods
   //

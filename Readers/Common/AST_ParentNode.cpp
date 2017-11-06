@@ -1,55 +1,46 @@
 //===========================================================================
-//                           AST_Attribute.cpp
+//                           AST_ParentNode.cpp
 //===========================================================================
 // Copyright (C) 2017 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file AST_Attribute.cpp
+//! @file AST_ParentNode.cpp
 //!
-//! Implements class AST_Attribute
+//! Implements class AST_ParentNode
 //!
 //===========================================================================
 
-#include "AST_Attribute.hpp"
-#include "Utility.hpp"
+#include "AST_ParentNode.hpp"
 
-#include <sstream>
-
-using std::string;
-using std::ostringstream;
+using std::vector;
 
 using namespace Parsers;
 
 
-
-//! Text representation of attribute
+//! Removes children that have been dispatched (leaving nullptr)
 //!
-string AST_Attribute::AsText () const
+void AST_ParentNode::CleanupChildren ()
 {
-  ostringstream os;
+  vector<AST_Node*> cleanedUp;
 
-  os << m_name;
-
-  if      (!m_numbersValue.empty())
+  for (const auto node : m_undispatchedChildren)
   {
-    os << " = " << m_numbersValue;
-  }
-  else if (!m_stringsValue.empty())
-  {
-    os << " = ";
-    os << AST_SimpleNode::AsText(m_stringsValue, ", ");
+    if (node != nullptr)
+    {
+      cleanedUp.push_back(node);
+    }
   }
 
-  return os.str();
+  std::swap(cleanedUp, m_undispatchedChildren);
 }
 //
-//  End of: AST_Attribute::AsText
+//  End of: AST_ParentNode::CleanupChildren
 //---------------------------------------------------------------------------
 
 
 
 
 //===========================================================================
-// End of AST_Attribute.cpp
+// End of AST_ParentNode.cpp
 //===========================================================================

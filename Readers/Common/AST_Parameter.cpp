@@ -38,21 +38,7 @@ string AST_Parameter::AsText () const
   else if (!m_stringsValue.empty())
   {
     os << " = ";
-
-    auto first = true;
-    for (const auto node : m_stringsValue)
-    {
-      CHECK_VALUE_NOT_NULL(node, "Expected to have not nullptr string or parameter ref");
-      if (!first)
-      {
-        os << ", ";
-      }
-      else
-      {
-        first = false;
-      }
-      os << node->AsText();
-    }
+    os << AST_SimpleNode::AsText(m_stringsValue, ", ");
   }
 
   return os.str();

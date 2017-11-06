@@ -64,11 +64,11 @@ class AST_Module final : public AST_ParentNode
 
   //! Returns module ScanInPort
   //!
-  AST_Port* ScanInPort() const { return m_scanInPort; }
+  const std::vector<AST_Port*>& ScanInPorts() const { return m_scanInPorts; }
 
   //! Returns module ScanOutPort
   //!
-  AST_Port* ScanOutPort() const { return m_scanOutPort; }
+  const std::vector<AST_Port*>& ScanOutPorts() const { return m_scanOutPorts; }
 
 
   // ---------------- Private Methods
@@ -82,6 +82,7 @@ class AST_Module final : public AST_ParentNode
     , m_identifier   (identifier)
   {
     DispatchChildren();
+    CleanupChildren();
   }
 
   //! Dispatches children to specific members
@@ -91,13 +92,13 @@ class AST_Module final : public AST_ParentNode
   // ---------------- Private Fields
   //
   private:
-  const AST_ScalarIdentifier*    m_identifier  = nullptr; //!< Module name
-  AST_Port*                      m_scanInPort  = nullptr; //!< Scan input port
-  AST_Port*                      m_scanOutPort = nullptr; //!< Scan output port
-  std::vector<AST_Parameter*>    m_parameters;            //!< Generic module  parameters
-  std::vector<AST_Parameter*>    m_localParameters;       //!< Module local parameters
-  std::vector<AST_Attribute*>    m_attributes;            //!< Module attributes
-  std::vector<AST_ScanRegister*> m_scanRegisters;         //!< Scan registers defined in module
+  const AST_ScalarIdentifier*    m_identifier = nullptr; //!< Module name
+  std::vector<AST_Port*>         m_scanInPorts;          //!< Scan input port(s)
+  std::vector<AST_Port*>         m_scanOutPorts;         //!< Scan output port(s)
+  std::vector<AST_Parameter*>    m_parameters;           //!< Generic module  parameters
+  std::vector<AST_Parameter*>    m_localParameters;      //!< Module local parameters
+  std::vector<AST_Attribute*>    m_attributes;           //!< Module attributes
+  std::vector<AST_ScanRegister*> m_scanRegisters;        //!< Scan registers defined in module
 };
 //
 //  End of AST_Module class declaration

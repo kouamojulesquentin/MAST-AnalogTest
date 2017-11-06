@@ -37,11 +37,7 @@ string AST_Signal::AsText () const
   }
   else
   {
-    for (const auto& instanceName : m_path)
-    {
-      os << instanceName->AsText() << ".";
-    }
-
+    os << AST_SimpleNode::AsText(m_path, "", ".");
     os << m_portName->AsText();
   }
 

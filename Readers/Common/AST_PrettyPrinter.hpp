@@ -41,6 +41,7 @@ class AST_PrettyPrinter final : public AST_Visitor
 
   virtual void Visit_Module       (AST_Module*       module)       override;
   virtual void Visit_Port         (AST_Port*         port)         override;
+  virtual void Visit_ScanMux      (AST_ScanMux*      scanMux)      override;
   virtual void Visit_ScanRegister (AST_ScanRegister* scanRegister) override;
   virtual void Visit_Source       (AST_Source*       source)       override;
 
@@ -62,9 +63,9 @@ class AST_PrettyPrinter final : public AST_Visitor
     return m_os;
   }
 
-  void StreamNodeHeader  (const AST_NamedNode* node, std::experimental::string_view notes);
-  void StreamSimpleNode  (const AST_SimpleNode*               node);
-  void StreamSimpleNodes (const std::vector<AST_SimpleNode*>& nodes);
+  std::ostringstream& StreamNodeHeader  (const AST_NamedNode* node, std::experimental::string_view notes);
+
+  void StreamSimpleNode (const AST_SimpleNode* node);
 
   template<typename T>
   void StreamSimpleNodes(const std::vector<T*>& nodes)

@@ -25,6 +25,7 @@
 namespace Parsers
 {
 class AST_Attribute;
+class AST_Source;
 
 //! Represents a parsed test network, instiable, module
 //!
@@ -48,6 +49,10 @@ class AST_Port final : public AST_ParentNode
   //!
   const std::vector<AST_Attribute*>& Attributes() const { return m_attributes; }
 
+  //! Returns port source (if any)
+  //!
+  const AST_Source* Source() const { return m_source; }
+
   // ---------------- Private Methods
   //
   private:
@@ -70,6 +75,7 @@ class AST_Port final : public AST_ParentNode
     , m_identifier   (identifier)
   {
     DispatchChildren();
+    CleanupChildren();
   }
 
   //! Dispatches children to specific members
@@ -80,6 +86,7 @@ class AST_Port final : public AST_ParentNode
   //
   private:
   const AST_VectorIdentifier* m_identifier = nullptr; //!< Port identifier
+  const AST_Source*           m_source     = nullptr; //!< Port Source (for output ports)
   std::vector<AST_Attribute*> m_attributes;           //!< Port attributes
 };
 //

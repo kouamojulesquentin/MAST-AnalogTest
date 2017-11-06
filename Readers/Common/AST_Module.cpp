@@ -35,6 +35,15 @@ void AST_Module::Accept (AST_Visitor& visitor)
 //!
 void AST_Module::DispatchChildren ()
 {
+//+  auto setChild = [](AST_Node*& child, auto& dest)
+//+  {
+//+    using t1 = decltype(dest);
+//+    using dest_t = typename std::remove_reference<t1>::type;
+
+//+    dest = static_cast<dest_t>(child);
+//+    child = nullptr;
+//+  };
+
   auto appendChild = [](AST_Node*& child, auto& dest)
   {
     using t1 = decltype(dest);
@@ -44,16 +53,6 @@ void AST_Module::DispatchChildren ()
     dest.push_back(static_cast<dest_t>(child));
     child = nullptr;
   };
-
-  auto setChild = [](AST_Node*& child, auto& dest)
-  {
-    using t1 = decltype(dest);
-    using dest_t = typename std::remove_reference<t1>::type;
-
-    dest = static_cast<dest_t>(child);
-    child = nullptr;
-  };
-
 
   for (auto& child : UndispatchedChildren())
   {
@@ -74,10 +73,10 @@ void AST_Module::DispatchChildren ()
           appendChild(child, m_scanRegisters);
           break;
         case Parsers::Kind::ScanInPort:
-          setChild(child, m_scanInPort);
+          appendChild(child, m_scanInPorts);
           break;
         case Parsers::Kind::ScanOutPort:
-          setChild(child, m_scanOutPort);
+          appendChild(child, m_scanOutPorts);
           break;
         default:  // Ignore all other for now
           break;

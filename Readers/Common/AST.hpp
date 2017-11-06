@@ -28,6 +28,8 @@ class AST_Parameter;
 class AST_ParameterRef;
 class AST_Port;
 class AST_ScalarIdentifier;
+class AST_ScanMux;
+class AST_ScanMuxSelection;
 class AST_ScanRegister;
 class AST_Signal;
 class AST_SimpleNode;
@@ -58,6 +60,10 @@ class AST final
   AST_Signal*           Create_Signal           (std::experimental::string_view number);
   AST_Signal*           Create_Signal           (AST_Identifier* portName);
   AST_Signal*           Create_Signal           (std::vector<AST_ScalarIdentifier*>&& scope, AST_Identifier* portName);
+  AST_ScanMux*          Create_ScanMux          (AST_VectorIdentifier*                identifier,
+                                                 std::vector<Parsers::AST_Signal*>&&  selectors,
+                                                 std::vector<AST_ScanMuxSelection*>&& scanMuxSelection);
+  AST_ScanMuxSelection* Create_ScanMuxSelection (std::vector<std::string>&& selectionValues, std::vector<Parsers::AST_Signal*>&& selectedSignals);
   AST_Source*           Create_Source           (Kind kind, AST_Signal* signal);
   AST_Source*           Create_Source           (Kind kind, std::vector<AST_Signal*>&& signals);
   AST_Port*             Create_Port             (Kind kind, AST_VectorIdentifier* identifier);

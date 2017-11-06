@@ -1,53 +1,44 @@
 //===========================================================================
-//                           AST_Source.cpp
+//                           AST_ScanMux.cpp
 //===========================================================================
 // Copyright (C) 2017 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file AST_Source.cpp
+//! @file AST_ScanMux.cpp
 //!
-//! Implements class AST_Source
+//! Implements class AST_ScanMux
 //!
 //===========================================================================
 
-#include "AST_Source.hpp"
-#include "AST_Signal.hpp"
+#include "AST_ScanMux.hpp"
 #include "AST_Visitor.hpp"
 
-#include <sstream>
-
-using std::ostringstream;
-using std::string;
 using namespace Parsers;
+
 
 
 //! Visited part of the Visitor pattern
 //!
-void AST_Source::Accept (AST_Visitor& visitor)
+void AST_ScanMux::Accept (AST_Visitor& visitor)
 {
-  visitor.Visit_Source(this);
+  visitor.Visit_ScanMux(this);
 }
 //
-//  End of: AST_Source::Accept
+//  End of: AST_ScanMux::Accept
 //---------------------------------------------------------------------------
 
 
-//! Text representation of source
+//! Does nothing
 //!
-string AST_Source::AsText () const
+void AST_ScanMux::DispatchChildren ()
 {
-  auto asText =  AST_SimpleNode::AsText(m_signals, ", ");
-
-  return asText;
 }
 //
-//  End of: AST_Source::AsText
+//  End of: AST_ScanMux::DispatchChildren
 //---------------------------------------------------------------------------
-
-
 
 
 //===========================================================================
-// End of AST_Source.cpp
+// End of AST_ScanMux.cpp
 //===========================================================================

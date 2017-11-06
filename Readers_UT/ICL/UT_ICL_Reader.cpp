@@ -135,10 +135,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_1_ScanRegister ()
   auto expected_AST_PrettyPrint = "Module SReg\n"
                                   "{\n"
                                   "  ScanInPort SI;\n"
-                                  "  ScanOutPort SO\n"
-                                  "  {\n"
-                                  "    Source SR[0];\n"
-                                  "  }\n"
+                                  "  ScanOutPort SO { Source SR[0]; }\n"
                                   "  ScanRegister SR[7:0]\n"
                                   "  {\n"
                                   "    ScanInSource SI;\n"
@@ -203,10 +200,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_3_ScanRegister ()
   auto expected_AST_PrettyPrint = "Module SReg\n"
                                   "{\n"
                                   "  ScanInPort SI;\n"
-                                  "  ScanOutPort SO\n"
-                                  "  {\n"
-                                  "    Source SR_3[0];\n"
-                                  "  }\n"
+                                  "  ScanOutPort SO { Source SR_3[0]; }\n"
                                   "  ScanRegister SR_3[7:0]\n"
                                   "  {\n"
                                   "    ScanInSource SR_2[0];\n"
@@ -257,10 +251,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_value ()
                                   "{\n"
                                   "  Parameter MSB = 7;\n"
                                   "  ScanInPort SI;\n"
-                                  "  ScanOutPort SO\n"
-                                  "  {\n"
-                                  "    Source SR[0];\n"
-                                  "  }\n"
+                                  "  ScanOutPort SO { Source SR[0]; }\n"
                                   "  ScanRegister SR[$MSB:0]\n"
                                   "  {\n"
                                   "    ScanInSource SI;\n"
@@ -286,8 +277,6 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_strings ()
                         "  Parameter      Param_3 = \"Hello\", \" \\\"World\\\"\";\n"
                         "  LocalParameter Lp_1 = \"Hello\", \" World\";\n"
                         "  LocalParameter Lp_2 = \"Hello\", \" \\\\World\\\\\";\n"
-                        "  ScanInPort     SI;\n"
-                        "  ScanOutPort    SO { Source SR[0];}\n"
                         "  ScanRegister   SR[8:0]\n"
                         "  {\n"
                         "    ScanInSource  SI;\n"
@@ -318,11 +307,6 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_strings ()
                                   "  Parameter Param_3 = \"Hello\", \" \\\"World\\\"\";\n"
                                   "  LocalParameter Lp_1 = \"Hello\", \" World\";\n"
                                   "  LocalParameter Lp_2 = \"Hello\", \" \\\\World\\\\\";\n"
-                                  "  ScanInPort SI;\n"
-                                  "  ScanOutPort SO\n"
-                                  "  {\n"
-                                  "    Source SR[0];\n"
-                                  "  }\n"
                                   "  ScanRegister SR[8:0]\n"
                                   "  {\n"
                                   "    ScanInSource SI;\n"
@@ -345,8 +329,6 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_param_ref ()
                         "{\n"
                         "  Parameter      Param      = $Foo;\n"
                         "  LocalParameter LocalParam = $Bar;\n"
-                        "  ScanInPort     SI;\n"
-                        "  ScanOutPort    SO { Source SR[0];}\n"
                         "  ScanRegister   SR[8:0]\n"
                         "  {\n"
                         "    ScanInSource  SI;\n"
@@ -374,11 +356,6 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_param_ref ()
                                   "{\n"
                                   "  Parameter Param = $Foo;\n"
                                   "  LocalParameter LocalParam = $Bar;\n"
-                                  "  ScanInPort SI;\n"
-                                  "  ScanOutPort SO\n"
-                                  "  {\n"
-                                  "    Source SR[0];\n"
-                                  "  }\n"
                                   "  ScanRegister SR[8:0]\n"
                                   "  {\n"
                                   "    ScanInSource SI;\n"
@@ -404,8 +381,6 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_string_and_param_ref ()
                         "{\n"
                         "  Parameter      Param      = \"Hello\", \" world\",  $Foo;\n"
                         "  LocalParameter LocalParam = \"At the\", $Bar;\n"
-                        "  ScanInPort     SI;\n"
-                        "  ScanOutPort    SO { Source SR[0];}\n"
                         "  ScanRegister   SR[8:0]\n"
                         "  {\n"
                         "    ScanInSource  SI;\n"
@@ -433,11 +408,6 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_string_and_param_ref ()
                                   "{\n"
                                   "  Parameter Param = \"Hello\", \" world\", $Foo;\n"
                                   "  LocalParameter LocalParam = \"At the\", $Bar;\n"
-                                  "  ScanInPort SI;\n"
-                                  "  ScanOutPort SO\n"
-                                  "  {\n"
-                                  "    Source SR[0];\n"
-                                  "  }\n"
                                   "  ScanRegister SR[8:0]\n"
                                   "  {\n"
                                   "    ScanInSource SI;\n"
@@ -460,8 +430,6 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_param_ref_and_string ()
                         "{\n"
                         "  Parameter      Param      = \"\", $Foo, \"Hello\", \" world\"  ;\n"     // @todo [JFC]-[November/06/2017]: Remove leading empty string workaround
                         "  LocalParameter LocalParam = \"\", $Bar, \"At the\";\n"                  // @todo [JFC]-[November/06/2017]: Remove leading empty string workaround
-                        "  ScanInPort     SI;\n"
-                        "  ScanOutPort    SO { Source SR[0];}\n"
                         "  ScanRegister   SR[8:0]\n"
                         "  {\n"
                         "    ScanInSource  SI;\n"
@@ -492,11 +460,6 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_param_ref_and_string ()
                                   "{\n"
                                   "  Parameter Param = $Foo, \"Hello\", \" world\";\n"
                                   "  LocalParameter LocalParam = $Bar, \"At the\";\n"
-                                  "  ScanInPort SI;\n"
-                                  "  ScanOutPort SO\n"
-                                  "  {\n"
-                                  "    Source SR[0];\n"
-                                  "  }\n"
                                   "  ScanRegister SR[8:0]\n"
                                   "  {\n"
                                   "    ScanInSource SI;\n"
@@ -548,10 +511,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_no_value ()
                                   "{\n"
                                   "  Attribute Tested;\n"
                                   "  ScanInPort SI;\n"
-                                  "  ScanOutPort SO\n"
-                                  "  {\n"
-                                  "    Source SR[0];\n"
-                                  "  }\n"
+                                  "  ScanOutPort SO { Source SR[0]; }\n"
                                   "  ScanRegister SR[8:0]\n"
                                   "  {\n"
                                   "    ScanInSource SI;\n"
@@ -572,7 +532,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_value ()
   //
   istringstream excerpt("Module SReg\n"
                         "{\n"
-                        "  Attribute      Copyright = \"Pikus\";\n"
+                        "  Attribute      Copyright = \"Picus\";\n"
                         "  ScanInPort     SI;\n"
                         "  ScanOutPort    SO { Source SR[0];}\n"
                         "  ScanRegister   SR[8:0]\n"
@@ -600,12 +560,9 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_value ()
 
   auto expected_AST_PrettyPrint = "Module SReg\n"
                                   "{\n"
-                                  "  Attribute Copyright = \"Pikus\";\n"
+                                  "  Attribute Copyright = \"Picus\";\n"
                                   "  ScanInPort SI;\n"
-                                  "  ScanOutPort SO\n"
-                                  "  {\n"
-                                  "    Source SR[0];\n"
-                                  "  }\n"
+                                  "  ScanOutPort SO { Source SR[0]; }\n"
                                   "  ScanRegister SR[8:0]\n"
                                   "  {\n"
                                   "    ScanInSource SI;\n"
@@ -660,10 +617,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_strings ()
                                   "  Attribute Attrib_2 = \"Hello\", \" World\";\n"
                                   "  Attribute Attrib_3 = \"Hello\", \" \\\"World\\\"\";\n"
                                   "  ScanInPort SI;\n"
-                                  "  ScanOutPort SO\n"
-                                  "  {\n"
-                                  "    Source SR[0];\n"
-                                  "  }\n"
+                                  "  ScanOutPort SO { Source SR[0]; }\n"
                                   "  ScanRegister SR[8:0]\n"
                                   "  {\n"
                                   "    ScanInSource SI;\n"
@@ -713,10 +667,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_param_ref ()
                                   "{\n"
                                   "  Attribute Attrib = $Foo;\n"
                                   "  ScanInPort SI;\n"
-                                  "  ScanOutPort SO\n"
-                                  "  {\n"
-                                  "    Source SR[0];\n"
-                                  "  }\n"
+                                  "  ScanOutPort SO { Source SR[0]; }\n"
                                   "  ScanRegister SR[8:0]\n"
                                   "  {\n"
                                   "    ScanInSource SI;\n"
@@ -727,6 +678,129 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_param_ref ()
   auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
 }
+
+
+//! Checks ICL_Reader::ParseExcerpt() when parsing a SIB Scan mux
+//!
+void UT_ICL_Reader::test_UpdateAstFromIcl_ScanMux_SIB ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt("Module SIB_mux_pre\n"
+                        "{\n"
+                        "  ScanInPort   SI;\n"
+                        "  ScanOutPort  SO   { Source SR; }\n"
+                        "  ScanInPort   fromSO;\n"
+                        "  ScanOutPort  toSI { Source SI; }\n"
+                        "  ScanRegister SR\n"
+                        "  {\n"
+                        "    ScanInSource SIBmux;\n"
+                        "    ResetValue   1'b0;\n"
+                        "  }\n"
+                        "\n"
+                        "  ScanMux SIBmux SelectedBy SR\n"
+                        "  {\n"
+                        "    1'b0 : SI;\n"
+                        "    1'b1 : fromSO;\n"
+                        "  }\n"
+                        "}"s);
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto topModule = ast->TopModule();
+  TS_ASSERT_NOT_NULLPTR (topModule);
+
+  auto expected_AST_PrettyPrint = "Module SIB_mux_pre\n"
+                                  "{\n"
+                                  "  ScanInPort SI;\n"
+                                  "  ScanInPort fromSO;\n"
+                                  "  ScanOutPort SO { Source SR; }\n"
+                                  "  ScanOutPort toSI { Source SI; }\n"
+                                  "  ScanMux SIBmux SelectedBy SR\n"
+                                  "  {\n"
+                                  "    1'b0 : SI;\n"
+                                  "    1'b1 : fromSO;\n"
+                                  "  }\n"
+                                  "  ScanRegister SR\n"
+                                  "  {\n"
+                                  "    ScanInSource SIBmux;\n"
+                                  "    ResetValue 1'b0;\n"
+                                  "  }\n"
+                                  "}\n";
+
+
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
+
+
+//! Checks ICL_Reader::ParseExcerpt() when parsing a Scan muxes defined with values list and vector identifiers
+//!
+void UT_ICL_Reader::test_UpdateAstFromIcl_ScanMux_ValueList ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt("Module mux\n"                                                        // 01
+                        "{\n"                                                                 // 02
+                        "  // implements SIB_out = (SIBREG) ? aux[0] : base[0]\n"             // 03
+                        "  ScanMux SIB_out SelectedBy SIBREG {\n"                             // 04
+                        "     1'b0 : base[0];\n"                                              // 05
+                        "     1'b1 : aux[0];\n"                                               // 06
+                        "  }\n"                                                               // 07
+                        "  // implements compare_out = (check_mismatch) ? different : same\n" // 08
+                        "  ScanMux compare_out SelectedBy check_mismatch[1:0] {\n"            // 09
+                        "     1'b0,1'b1|1'b1,1'b0 :     sr.different;\n"                      // 10
+                        "     1'b1, 1'b1 | 1'b0, 1'b0 : sr.same;\n"                           // 11
+                        "  }\n"                                                               // 12
+                        "}"s);                                                                // 13
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto topModule = ast->TopModule();
+  TS_ASSERT_NOT_NULLPTR (topModule);
+
+  auto expected_AST_PrettyPrint = "Module mux\n"
+                                  "{\n"
+                                  "  ScanMux SIB_out SelectedBy SIBREG\n"
+                                  "  {\n"
+                                  "    1'b0 : base[0];\n"
+                                  "    1'b1 : aux[0];\n"
+                                  "  }\n"
+                                  "  ScanMux compare_out SelectedBy check_mismatch[1:0]\n"
+                                  "  {\n"
+                                  "    1'b0, 1'b1 | 1'b1, 1'b0 : sr.different;\n"
+                                  "    1'b1, 1'b1 | 1'b0, 1'b0 : sr.same;\n"
+                                  "  }\n"
+                                  "}\n"sv;
+
+
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
+
+
 
 
 //===========================================================================

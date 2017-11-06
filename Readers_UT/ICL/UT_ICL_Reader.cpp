@@ -159,11 +159,6 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_3_ScanRegister ()
   //
   auto               sm  = make_shared<SystemModel>();
   std::istringstream excerpt("Module SReg {\n"
-//+                             "Attribute      Foo_1 = \"\", $Junk, \"Hel\\\"lo\", \" World\";\n"
-//+                             "Parameter      Foo_2 = \"\", $Junk, \"Hello\", \" World\";\n"
-//+                             "LocalParameter Foo_3 = \"\", $Junk, \"Hello\", \" World\";\n"
-//+                             "LocalParameter Foo_4 = $Junk;\n"
-//+                             "LocalParameter Foo_5 = \"\", $Junk, \"He\\\\llo\";\n"
                              "ScanInPort    SI;\n"
                              "ScanOutPort   SO { Source  SR_3[0];}\n"
                              "ShiftEnPort   SE;\n"
@@ -234,9 +229,9 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_3_ScanRegister ()
 }
 
 
-//! Checks ICL_Reader::ParseExcerpt() when parsing a single ScanRegister with parameters
+//! Checks ICL_Reader::ParseExcerpt() when parsing a with parameter defined with value (not string)
 //!
-void UT_ICL_Reader::test_UpdateAstFromIcl_1_ScanRegister_parameters ()
+void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_value ()
 {
   // ---------------- Setup
   //
@@ -276,6 +271,463 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_1_ScanRegister_parameters ()
   auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
 }
+
+
+//! Checks ICL_Reader::ParseExcerpt() when parsing a with parameter defined strings
+//!
+void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_strings ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt("Module SReg\n"
+                        "{\n"
+                        "  Parameter      Param_1 = \"Hello\";\n"
+                        "  Parameter      Param_2 = \"Hello\", \" World\";\n"
+                        "  Parameter      Param_3 = \"Hello\", \" \\\"World\\\"\";\n"
+                        "  LocalParameter Lp_1 = \"Hello\", \" World\";\n"
+                        "  LocalParameter Lp_2 = \"Hello\", \" \\\\World\\\\\";\n"
+                        "  ScanInPort     SI;\n"
+                        "  ScanOutPort    SO { Source SR[0];}\n"
+                        "  ScanRegister   SR[8:0]\n"
+                        "  {\n"
+                        "    ScanInSource  SI;\n"
+                        "    ResetValue    'b0;\n"
+                        "  }\n"
+                        "}\n"s);
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto topModule = ast->TopModule();
+  TS_ASSERT_NOT_NULLPTR (topModule);
+
+  auto expected_AST_PrettyPrint = "Module SReg\n"
+                                  "{\n"
+                                  "  Parameter Param_1 = \"Hello\";\n"
+                                  "  Parameter Param_2 = \"Hello\", \" World\";\n"
+                                  "  Parameter Param_3 = \"Hello\", \" \\\"World\\\"\";\n"
+                                  "  LocalParameter Lp_1 = \"Hello\", \" World\";\n"
+                                  "  LocalParameter Lp_2 = \"Hello\", \" \\\\World\\\\\";\n"
+                                  "  ScanInPort SI;\n"
+                                  "  ScanOutPort SO\n"
+                                  "  {\n"
+                                  "    Source SR[0];\n"
+                                  "  }\n"
+                                  "  ScanRegister SR[8:0]\n"
+                                  "  {\n"
+                                  "    ScanInSource SI;\n"
+                                  "    ResetValue 'b0;\n"
+                                  "  }\n"
+                                  "}\n";
+
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
+
+
+//! Checks ICL_Reader::ParseExcerpt() when parsing a with parameter defined with a parameter reference
+//!
+void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_param_ref ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt("Module SReg\n"
+                        "{\n"
+                        "  Parameter      Param      = $Foo;\n"
+                        "  LocalParameter LocalParam = $Bar;\n"
+                        "  ScanInPort     SI;\n"
+                        "  ScanOutPort    SO { Source SR[0];}\n"
+                        "  ScanRegister   SR[8:0]\n"
+                        "  {\n"
+                        "    ScanInSource  SI;\n"
+                        "    ResetValue    'b0;\n"
+                        "  }\n"
+                        "}\n"s);
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto topModule = ast->TopModule();
+  TS_ASSERT_NOT_NULLPTR (topModule);
+
+  auto expected_AST_PrettyPrint = "Module SReg\n"
+                                  "{\n"
+                                  "  Parameter Param = $Foo;\n"
+                                  "  LocalParameter LocalParam = $Bar;\n"
+                                  "  ScanInPort SI;\n"
+                                  "  ScanOutPort SO\n"
+                                  "  {\n"
+                                  "    Source SR[0];\n"
+                                  "  }\n"
+                                  "  ScanRegister SR[8:0]\n"
+                                  "  {\n"
+                                  "    ScanInSource SI;\n"
+                                  "    ResetValue 'b0;\n"
+                                  "  }\n"
+                                  "}\n";
+
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
+
+
+
+
+
+//! Checks ICL_Reader::ParseExcerpt() when parsing a with parameter defined with strings and parameter reference
+//!
+void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_string_and_param_ref ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt("Module SReg\n"
+                        "{\n"
+                        "  Parameter      Param      = \"Hello\", \" world\",  $Foo;\n"
+                        "  LocalParameter LocalParam = \"At the\", $Bar;\n"
+                        "  ScanInPort     SI;\n"
+                        "  ScanOutPort    SO { Source SR[0];}\n"
+                        "  ScanRegister   SR[8:0]\n"
+                        "  {\n"
+                        "    ScanInSource  SI;\n"
+                        "    ResetValue    'b0;\n"
+                        "  }\n"
+                        "}\n"s);
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto topModule = ast->TopModule();
+  TS_ASSERT_NOT_NULLPTR (topModule);
+
+  auto expected_AST_PrettyPrint = "Module SReg\n"
+                                  "{\n"
+                                  "  Parameter Param = \"Hello\", \" world\", $Foo;\n"
+                                  "  LocalParameter LocalParam = \"At the\", $Bar;\n"
+                                  "  ScanInPort SI;\n"
+                                  "  ScanOutPort SO\n"
+                                  "  {\n"
+                                  "    Source SR[0];\n"
+                                  "  }\n"
+                                  "  ScanRegister SR[8:0]\n"
+                                  "  {\n"
+                                  "    ScanInSource SI;\n"
+                                  "    ResetValue 'b0;\n"
+                                  "  }\n"
+                                  "}\n";
+
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
+
+
+//! Checks ICL_Reader::ParseExcerpt() when parsing a with parameter defined with parameter reference and strings (in that order)
+//!
+void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_param_ref_and_string ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt("Module SReg\n"
+                        "{\n"
+                        "  Parameter      Param      = \"\", $Foo, \"Hello\", \" world\"  ;\n"     // @todo [JFC]-[November/06/2017]: Remove leading empty string workaround
+                        "  LocalParameter LocalParam = \"\", $Bar, \"At the\";\n"                  // @todo [JFC]-[November/06/2017]: Remove leading empty string workaround
+                        "  ScanInPort     SI;\n"
+                        "  ScanOutPort    SO { Source SR[0];}\n"
+                        "  ScanRegister   SR[8:0]\n"
+                        "  {\n"
+                        "    ScanInSource  SI;\n"
+                        "    ResetValue    'b0;\n"
+                        "  }\n"
+                        "}\n"s);
+
+                        //!
+                        //!
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto topModule = ast->TopModule();
+  TS_ASSERT_NOT_NULLPTR (topModule);
+
+  auto expected_AST_PrettyPrint = "Module SReg\n"
+                                  "{\n"
+                                  "  Parameter Param = $Foo, \"Hello\", \" world\";\n"
+                                  "  LocalParameter LocalParam = $Bar, \"At the\";\n"
+                                  "  ScanInPort SI;\n"
+                                  "  ScanOutPort SO\n"
+                                  "  {\n"
+                                  "    Source SR[0];\n"
+                                  "  }\n"
+                                  "  ScanRegister SR[8:0]\n"
+                                  "  {\n"
+                                  "    ScanInSource SI;\n"
+                                  "    ResetValue 'b0;\n"
+                                  "  }\n"
+                                  "}\n";
+
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
+
+
+//! Checks ICL_Reader::ParseExcerpt() when parsing a with attribute defined with no value at all
+//!
+void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_no_value ()
+{
+  // ---------------- Setup
+  //
+
+  istringstream excerpt("Module SReg\n"
+                        "{\n"
+                        "  Attribute      Tested;\n"
+                        "  ScanInPort     SI;\n"
+                        "  ScanOutPort    SO { Source SR[0];}\n"
+                        "  ScanRegister   SR[8:0]\n"
+                        "  {\n"
+                        "    ScanInSource  SI;\n"
+                        "    ResetValue    'b0;\n"
+                        "  }\n"
+                        "}\n"s);
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto topModule = ast->TopModule();
+  TS_ASSERT_NOT_NULLPTR (topModule);
+
+  auto expected_AST_PrettyPrint = "Module SReg\n"
+                                  "{\n"
+                                  "  Attribute Tested;\n"
+                                  "  ScanInPort SI;\n"
+                                  "  ScanOutPort SO\n"
+                                  "  {\n"
+                                  "    Source SR[0];\n"
+                                  "  }\n"
+                                  "  ScanRegister SR[8:0]\n"
+                                  "  {\n"
+                                  "    ScanInSource SI;\n"
+                                  "    ResetValue 'b0;\n"
+                                  "  }\n"
+                                  "}\n";
+
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
+
+
+//! Checks ICL_Reader::ParseExcerpt() when parsing a with attribute defined with value (not string)
+//!
+void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_value ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt("Module SReg\n"
+                        "{\n"
+                        "  Attribute      Copyright = \"Pikus\";\n"
+                        "  ScanInPort     SI;\n"
+                        "  ScanOutPort    SO { Source SR[0];}\n"
+                        "  ScanRegister   SR[8:0]\n"
+                        "  {\n"
+                        "    ScanInSource  SI;\n"
+                        "    ResetValue    'b0;\n"
+                        "  }\n"
+                        "}\n"s);
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto topModule = ast->TopModule();
+  TS_ASSERT_NOT_NULLPTR (topModule);
+
+  auto expected_AST_PrettyPrint = "Module SReg\n"
+                                  "{\n"
+                                  "  Attribute Copyright = \"Pikus\";\n"
+                                  "  ScanInPort SI;\n"
+                                  "  ScanOutPort SO\n"
+                                  "  {\n"
+                                  "    Source SR[0];\n"
+                                  "  }\n"
+                                  "  ScanRegister SR[8:0]\n"
+                                  "  {\n"
+                                  "    ScanInSource SI;\n"
+                                  "    ResetValue 'b0;\n"
+                                  "  }\n"
+                                  "}\n";
+
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
+
+
+//! Checks ICL_Reader::ParseExcerpt() when parsing a with attribute defined with strings
+//!
+void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_strings ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt("Module SReg\n"
+                        "{\n"
+                        "  Attribute      Attrib_1 = \"Hello\";\n"
+                        "  Attribute      Attrib_2 = \"Hello\", \" World\";\n"
+                        "  Attribute      Attrib_3 = \"Hello\", \" \\\"World\\\"\";\n"
+                        "  ScanInPort     SI;\n"
+                        "  ScanOutPort    SO { Source SR[0];}\n"
+                        "  ScanRegister   SR[8:0]\n"
+                        "  {\n"
+                        "    ScanInSource  SI;\n"
+                        "    ResetValue    'b0;\n"
+                        "  }\n"
+                        "}\n"s);
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto topModule = ast->TopModule();
+  TS_ASSERT_NOT_NULLPTR (topModule);
+
+  auto expected_AST_PrettyPrint = "Module SReg\n"
+                                  "{\n"
+                                  "  Attribute Attrib_1 = \"Hello\";\n"
+                                  "  Attribute Attrib_2 = \"Hello\", \" World\";\n"
+                                  "  Attribute Attrib_3 = \"Hello\", \" \\\"World\\\"\";\n"
+                                  "  ScanInPort SI;\n"
+                                  "  ScanOutPort SO\n"
+                                  "  {\n"
+                                  "    Source SR[0];\n"
+                                  "  }\n"
+                                  "  ScanRegister SR[8:0]\n"
+                                  "  {\n"
+                                  "    ScanInSource SI;\n"
+                                  "    ResetValue 'b0;\n"
+                                  "  }\n"
+                                  "}\n";
+
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
+
+//! Checks ICL_Reader::ParseExcerpt() when parsing a with attribute defined with a attribute reference
+//!
+void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_param_ref ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt("Module SReg\n"
+                        "{\n"
+                        "  Attribute      Attrib      = $Foo;\n"
+                        "  ScanInPort     SI;\n"
+                        "  ScanOutPort    SO { Source SR[0];}\n"
+                        "  ScanRegister   SR[8:0]\n"
+                        "  {\n"
+                        "    ScanInSource  SI;\n"
+                        "    ResetValue    'b0;\n"
+                        "  }\n"
+                        "}\n"s);
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto topModule = ast->TopModule();
+  TS_ASSERT_NOT_NULLPTR (topModule);
+
+  auto expected_AST_PrettyPrint = "Module SReg\n"
+                                  "{\n"
+                                  "  Attribute Attrib = $Foo;\n"
+                                  "  ScanInPort SI;\n"
+                                  "  ScanOutPort SO\n"
+                                  "  {\n"
+                                  "    Source SR[0];\n"
+                                  "  }\n"
+                                  "  ScanRegister SR[8:0]\n"
+                                  "  {\n"
+                                  "    ScanInSource SI;\n"
+                                  "    ResetValue 'b0;\n"
+                                  "  }\n"
+                                  "}\n";
+
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
+
 
 //===========================================================================
 // End of UT_ICL_Reader.cpp

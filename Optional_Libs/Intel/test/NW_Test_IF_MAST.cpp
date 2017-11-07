@@ -33,11 +33,13 @@ void send_packet(ClientSocket&           ring_input,
 int run_TEST_IF_start (int ring_start_port)
 {
   FILE* C_to_ring_file;
-  C_to_ring_file = fopen("../../packets_to_ring.bin", "rb");
+  C_to_ring_file = fopen("./packets_to_ring.bin", "rb");
 
   if (C_to_ring_file != NULL)
     std::cout << "OPEN\n";
-
+  else  
+   {std::cerr << "FILE NOT FOUND\n"; exit(1);}
+ 
   ring_packet packet;
 
   try

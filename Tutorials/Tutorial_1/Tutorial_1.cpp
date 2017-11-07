@@ -48,6 +48,63 @@ void Increment ()
 //  End of: Increment
 //---------------------------------------------------------------------------
 
+  //! This algorithm increment "reg"
+  //!
+  void Algo_Increment ()
+  {
+
+    auto     registerPath = "regHI";
+    auto     loopCount    = 5u;
+    auto     i    = 0u;
+    uint16_t initialValue = 1u;
+    uint16_t curValue;
+
+   curValue=iGetRefresh<uint16_t>(registerPath);
+    std::cout << "\nINCREMENTRunning " << loopCount << " iWrites on register " <<registerPath << "\n";
+    while (i++<loopCount)
+    {
+      iWrite(registerPath, initialValue);
+      iApply();
+      curValue=iGet<uint16_t>(registerPath);
+     std::cout << "\nINCREMENT Cycle "<< i << ": Wrote " << initialValue ;
+     std::cout << "\nINCREMENT       "<< i << ": Read " <<std::hex<< curValue <<"\n" ;
+
+      ++initialValue;
+    }
+     std::cout << "\n" ;
+  }
+  //
+  //  End of: Algo_Increment
+  //---------------------------------------------------------------------------
+
+
+  //! This algorithm decrement "regLO"
+  //!
+  void Algo_Decrement ()
+  {
+    auto     registerPath = "regLO";
+    auto     loopCount    = 5u;
+    uint16_t initialValue = 60u;
+    uint16_t curValue;
+    auto     i    = 0u;
+
+    curValue=iGetRefresh<uint16_t>(registerPath);
+    std::cout << "\nDECREMENT Running " << loopCount << " iWrites on register " <<registerPath << "\n";
+    while (i++<loopCount)
+    {
+      iWrite(registerPath, initialValue);
+      curValue=iGet<uint16_t>(registerPath);
+      std::cout << "\nDECREMENT Cycle "<< i << ": Wrote " << initialValue ;
+      std::cout << "\nDECREMENT       "<< i << ": Read " << curValue ;
+      iApply();
+
+      --initialValue;
+    }
+  }
+  //
+  //  End of: Algo_Decrement
+  //---------------------------------------------------------------------------
+
 
 
 //! Registers PDL algorithm functions in this file
@@ -62,6 +119,8 @@ bool RegisterAlgorithms ()
   // ---------------- Do register algorithm(s) with a name
   //
   repo.RegisterAlgorithm("Incr", Increment);
+  repo.RegisterAlgorithm("Console_Incr", Algo_Increment);
+  repo.RegisterAlgorithm("Console_Decr", Algo_Decrement);
 
   return true;
 }

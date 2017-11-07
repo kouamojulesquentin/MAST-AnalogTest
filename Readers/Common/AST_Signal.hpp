@@ -65,8 +65,8 @@ class AST_Signal final : public AST_SimpleNode
   //
   private:
 
-  friend class AST;                                                   // This is AST that manages construction/destruction of AST nodes
-  MAKE_UNIQUE_AS_FRIEND(AST_Signal)(std::experimental::string_view&); // AST currently uses make_unit<T>() to create nodes
+  friend class AST;   // This is AST that manages construction/destruction of AST nodes (it uses make_unit<T>() to create nodes)
+  MAKE_UNIQUE_AS_FRIEND(AST_Signal)(std::experimental::string_view&);
   MAKE_UNIQUE_AS_FRIEND(AST_Signal)(Parsers::AST_Identifier*&);
   MAKE_UNIQUE_AS_FRIEND(AST_Signal)(std::vector<Parsers::AST_ScalarIdentifier*>&&,
                                     Parsers::AST_Identifier*&);

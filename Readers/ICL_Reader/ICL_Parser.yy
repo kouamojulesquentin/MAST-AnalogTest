@@ -35,7 +35,10 @@ namespace Parsers
   class AST;
   class AST_Attribute;
   class AST_Identifier;
+  class AST_Instance;
+  class AST_ModuleIdentifier;
   class AST_Module;
+  class AST_Namespace;
   class AST_Node;
   class AST_Parameter;
   class AST_ParameterRef;
@@ -81,6 +84,9 @@ typedef void* yyscan_t;
 
 #include "AST.hpp"
 #include "AST_Attribute.hpp"
+#include "AST_Instance.hpp"
+#include "AST_ModuleIdentifier.hpp"
+#include "AST_Namespace.hpp"
 #include "AST_Parameter.hpp"
 #include "AST_ParameterRef.hpp"
 #include "AST_Port.hpp"
@@ -172,13 +178,6 @@ namespace
   //---------------------------------------------------------------------------
 
 
-//+  ICL::location MakeLocation(const linker_information& linkerInfo)
-//+  {
-//+    auto locBegin = ICL::position(nullptr, linkerInfo.line, linkerInfo.beginColumn);
-//+    auto locEnd   = ICL::position(nullptr, linkerInfo.line, linkerInfo.endColumn);
-//+    auto location = ICL::location(locBegin, locEnd);
-//+    return location;
-//+  }
 } // End of unnamed namespace
 
 } /*end of %code section*/
@@ -194,20 +193,36 @@ namespace
 %type <std::string> attribute_name
 
 %type <Parsers::AST_ScalarIdentifier*> instance_name
-%type <Parsers::AST_ScalarIdentifier*> namespace_name
 %type <Parsers::AST_ScalarIdentifier*> module_name
+%type <std::string>                    namespace_name
 
+%type <Parsers::AST_ModuleIdentifier*>                                                    module_identifier
 %type <std::vector<Parsers::AST_ScalarIdentifier*>>                                       scoped_instance_name
 %type <std::tuple<std::vector<Parsers::AST_ScalarIdentifier*>, Parsers::AST_Identifier*>> scoped_port_name
 
 %type <std::string> index
 %type <Parsers::AST_ParameterRef*> parameter_ref
 
+%type <Parsers::AST_Node*>                     parameter_override
+%type <Parsers::AST_Node*>                     instance_item
+%type <std::vector<Parsers::AST_Node*>>        instance_items
 %type <std::vector<Parsers::AST_SimpleNode*>>  concat_string
 
 %type <std::string> UNSIZED_DEC_NUM
 %type <std::string> UNSIZED_BIN_NUM
 %type <std::string> UNSIZED_HEX_NUM
+
+%type <std::string> POS_INT
+%type <std::string> pos_int
+%type <std::string> integer_expr
+%type <std::string> integer_expr_arg
+%type <std::string> integer_expr_paren
+%type <std::string> integer_expr_lvl1
+%type <std::string> integer_expr_lvl1_b
+%type <std::string> plus_or_minus
+%type <std::string> integer_expr_lvl2
+%type <std::string> integer_expr_lvl2_b
+%type <std::string> star_or_slash_or_percent
 
 %type <std::string> number
 %type <std::string> number_or_enum
@@ -215,6 +230,7 @@ namespace
 %type <std::string> enum_symbol
 %type <std::string> enum_name
 %type <std::string> enum_value
+
 
 %type <std::vector<std::string>> concat_number_list
 
@@ -253,19 +269,9 @@ namespace
 
 %type <Parsers::AST_Value*>            scanRegister_resetValue  // Value expression
 
-%type <std::string> POS_INT
-%type <std::string> pos_int
-%type <std::string> integer_expr
-%type <std::string> integer_expr_arg
-%type <std::string> integer_expr_paren
-%type <std::string> integer_expr_lvl1
-%type <std::string> integer_expr_lvl1_b
-%type <std::string> plus_or_minus
-%type <std::string> integer_expr_lvl2
-%type <std::string> integer_expr_lvl2_b
-%type <std::string> star_or_slash_or_percent
 
 %type <Parsers::AST_Module*>            module_def
+%type <Parsers::AST_Instance*>          instance_def
 %type <Parsers::AST_Attribute*>         attribute_def
 %type <Parsers::AST_Parameter*>         localParameter_def
 %type <Parsers::AST_Parameter*>         parameter_def
@@ -279,7 +285,6 @@ namespace
 %type <Parsers::AST_Node*>              dataMux_def
 %type <Parsers::AST_Node*>              dataRegister_def
 %type <Parsers::AST_Node*>              enum_def
-%type <Parsers::AST_Node*>              instance_def
 %type <Parsers::AST_Node*>              logicSignal_def
 %type <Parsers::AST_Node*>              module_item
 %type <Parsers::AST_Node*>              nameSpace_def
@@ -712,8 +717,8 @@ register_name      : scalar_or_vector_id { $$ = $1; /* register_name : scalar_or
 reg_port_signal_id : scalar_or_vector_id { $$ = $1; /* reg_port_signal_id : scalar_or_vector_id */}
 
 instance_name  : SCALAR_ID { $$ = ast.Create_ScalarIdentifier($[SCALAR_ID]); /* instance_name: SCALAR_ID */ };
-namespace_name : SCALAR_ID { $$ = ast.Create_ScalarIdentifier($[SCALAR_ID]); /* namespace_name: SCALAR_ID */ };
 module_name    : SCALAR_ID { $$ = ast.Create_ScalarIdentifier($[SCALAR_ID]); /* module_name: SCALAR_ID */ };
+namespace_name : SCALAR_ID { $$ = $[SCALAR_ID]; /* namespace_name: SCALAR_ID */ };
 
 scoped_instance_name :
   scoped_instance_name[lhs] DOT instance_name
@@ -1661,28 +1666,141 @@ readEnPort_items: readEnPort_items attribute_def | attribute_def;
 readEnPort_name : port_name ;
 
 // 6.4.7
-instance_def : INSTANCE instance_name OF instance_module instance_tail
-{
-  // instance_def : INSTANCE instance_name OF instance_module instance_tail
-  $$ = nullptr;
-}
-;
-instance_module : module_name | namespace_name DOUBLE_COLON module_name | DOUBLE_COLON module_name;
-instance_tail: SEMICOLON | LEFT_BRACE instance_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
-instance_items: instance_items instance_item | instance_item;
+instance_def :
+  INSTANCE instance_name OF module_identifier SEMICOLON
+  {
+    // instance_def : INSTANCE instance_name OF module_identifier SEMICOLON
+    auto instanceName     = $[instance_name];
+    auto moduleIdentifier = $[module_identifier];
+    auto node             = ast.Create_Instance(instanceName, moduleIdentifier);
 
-instance_item : inputPort_connection |
-allowBroadcast_def |
-attribute_def |
-parameter_override |
-instance_addressValue ;
+    $$ = node;
+  }
+| INSTANCE instance_name OF module_identifier LEFT_BRACE RIGHT_BRACE
+  {
+    // instance_def : INSTANCE instance_name OF module_identifier LEFT_BRACE RIGHT_BRACE
+    auto instanceName     = $[instance_name];
+    auto moduleIdentifier = $[module_identifier];
+    auto node             = ast.Create_Instance(instanceName, moduleIdentifier);
+
+    $$ = node;
+  }
+| INSTANCE instance_name OF module_identifier LEFT_BRACE instance_items RIGHT_BRACE
+  {
+    // instance_def : INSTANCE instance_name OF module_identifier LEFT_BRACE instance_items RIGHT_BRACE
+    auto  instanceName     = $[instance_name];
+    auto  moduleIdentifier = $[module_identifier];
+    auto& instanceItems    = $[instance_items];
+    auto  node             = ast.Create_Instance(instanceName, moduleIdentifier, std::move(instanceItems));
+
+    $$ = node;
+  }
+;
+
+module_identifier :
+  module_name
+  {
+    // module_identifier : module_name
+    auto moduleNamespace = ast.InstancesDefaultNamespace();
+    auto moduleName      = $[module_name];
+    auto node            = ast.Create_ModuleIdentifier(moduleNamespace, moduleName);
+
+    $$ = node;
+  }
+| namespace_name DOUBLE_COLON module_name
+  {
+    // module_identifier : namespace_name DOUBLE_COLON module_name
+    auto namespaceName   = $[namespace_name];
+    auto moduleNamespace = ast.Create_Namespace(std::move(namespaceName));
+    auto moduleName      = $[module_name];
+    auto node            = ast.Create_ModuleIdentifier(moduleNamespace, moduleName);
+
+    $$ = node;
+  }
+| DOUBLE_COLON module_name
+  {
+    // module_identifier : DOUBLE_COLON module_name
+    auto moduleNamespace = ast.RootNamespace();
+    auto moduleName      = $[module_name];
+    auto node            = ast.Create_ModuleIdentifier(moduleNamespace, moduleName);
+
+    $$ = node;
+  }
+;
+
+
+instance_items:
+  instance_item
+  {
+    // instance_items : instance_item
+    auto items = vector<Parsers::AST_Node*>();
+    auto item  = $[instance_item];
+
+    if (item != nullptr)
+    {
+      items.push_back(item);
+    }
+
+    $$ = std::move(items);
+  }
+| instance_items[lhs] instance_item
+  {
+    // instance_items : instance_items[lhs] instance_item
+    auto& items = $[lhs];
+    auto  item  = $[instance_item];
+
+    if (item != nullptr)
+    {
+      items.push_back(item);
+    }
+
+    $$ = std::move(items);
+  }
+;
+
+instance_item :
+  inputPort_connection
+  {
+    // instance_item : inputPort_connection
+    $$ = nullptr;
+  }
+| allowBroadcast_def
+  {
+    // instance_item : allowBroadcast_def
+    $$ = nullptr;
+  }
+| attribute_def
+  {
+    // instance_item : attribute_def
+    $$ = $[attribute_def];
+  }
+| parameter_override
+  {
+    // instance_item : parameter_override
+    $$ = $[parameter_override];
+  }
+| instance_addressValue
+  {
+      // instance_item : instance_addressValue
+    $$ = nullptr;
+  }
+;
 
 inputPort_connection : INPUTPORT inputPort_name EQUAL inputPort_source SEMICOLON ;
+
 allowBroadcast_def : ALLOWBROADCASTONSCANINTERFACE allowBroadcast_items SEMICOLON ;
 allowBroadcast_items : allowBroadcast_items COMMA scanInterface_name | scanInterface_name ;
 inputPort_name : port_name ;
 inputPort_source : concat_data_signal ;
-parameter_override : parameter_def;
+
+parameter_override : parameter_def
+{
+  // parameter_override : parameter_def
+  auto parameter = $[parameter_def];
+  $$ = parameter;
+}
+;
+
 instance_addressValue : ADDRESSVALUE number SEMICOLON ;
 
 // 6.4.8

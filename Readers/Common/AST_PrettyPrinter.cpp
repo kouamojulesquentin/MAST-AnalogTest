@@ -14,7 +14,9 @@
 #include "AST_PrettyPrinter.hpp"
 
 #include "AST_Attribute.hpp"
+#include "AST_Instance.hpp"
 #include "AST_Module.hpp"
+#include "AST_ModuleIdentifier.hpp"
 #include "AST_Parameter.hpp"
 #include "AST_Port.hpp"
 #include "AST_ScanMux.hpp"
@@ -132,6 +134,25 @@ void AST_PrettyPrinter::StreamSimpleNode(const AST_SimpleNode* node)
 //  End of StreamSimpleNode
 //---------------------------------------------------------------------------
 
+
+//! Appends content of a Instance node in text representation and visits
+//! sub-nodes
+void AST_PrettyPrinter::Visit_Instance (AST_Instance* instance)
+{
+  auto moduleIdentifier = instance->ModuleIdentifier();
+
+  StreamNodeHeader(instance, " Of ") << moduleIdentifier->AsText();
+
+  HierarchyInserter hierarchyInserter(*this);
+
+  StreamSimpleNodes (instance->Attributes());
+  StreamSimpleNodes (instance->Parameters());
+
+  AcceptNodes       (instance->UndispatchedChildren());
+}
+//
+//  End of: AST_PrettyPrinter::Visit_Instance
+//---------------------------------------------------------------------------
 
 
 //! Appends content of a Module node in text representation and visits

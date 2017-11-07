@@ -801,6 +801,57 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_ScanMux_ValueList ()
 }
 
 
+//! Checks ICL_Reader::ParseExcerpt() when parsing a module instance
+//!
+void UT_ICL_Reader::test_UpdateAstFromIcl_Instance ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt("Module WrappedInstr\n"                                               // 01
+                        "{\n"                                                                 // 02
+                        "  Instance I1 Of Instrument { InputPort DI = reg8.DO; }\n"           // 03
+                        "  Instance reg8  Of  SReg {\n"                                       // 04
+                        "  InputPort SI = SI; InputPort DI = I1.DO; Parameter Size = 8;\n"    // 05
+                        "  }\n"                                                               // 06
+                        "}"s);                                                                // 07
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto topModule = ast->TopModule();
+  TS_ASSERT_NOT_NULLPTR (topModule);
+
+  auto expected_AST_PrettyPrint = "Module WrappedInstr\n"
+                                  "{\n"
+                                  "  Instance I1 Of ::Instrument\n"
+                                  "  {\n"
+//+                                  "    InputPort DI = reg8.DO;\n"
+                                  "  }\n"
+                                  "  Instance reg8 Of ::SReg\n"
+                                  "  {\n"
+//+                                  "    InputPort SI = SI;\n"
+//+                                  "    InputPort DI = I1.DO;\n"
+                                  "    Parameter Size = 8;\n"
+                                  "  }\n"
+                                  "}\n"sv;
+
+
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
+
+
+
 
 
 //===========================================================================

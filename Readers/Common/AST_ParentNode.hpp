@@ -68,6 +68,15 @@ class AST_ParentNode : public AST_NamedNode
   //!
   virtual void DispatchChildren () = 0;
 
+  template<typename T>
+  static void AppendChild(AST_Node*& child, T& dest)
+  {
+    using dest_t = typename T::value_type;
+
+    dest.push_back(static_cast<dest_t>(child));
+    child = nullptr;
+  };
+
   // ---------------- Protected Fields
   //
   protected:

@@ -24,6 +24,7 @@
 namespace Parsers
 {
 class AST_Node;
+class AST_Instance;
 class AST_SimpleNode;
 class AST_NamedNode;
 class AST_ParentNode;
@@ -39,6 +40,7 @@ class AST_PrettyPrinter final : public AST_Visitor
   virtual ~AST_PrettyPrinter() = default;
   AST_PrettyPrinter()  = default;
 
+  virtual void Visit_Instance     (AST_Instance*     instance)     override;
   virtual void Visit_Module       (AST_Module*       module)       override;
   virtual void Visit_Port         (AST_Port*         port)         override;
   virtual void Visit_ScanMux      (AST_ScanMux*      scanMux)      override;

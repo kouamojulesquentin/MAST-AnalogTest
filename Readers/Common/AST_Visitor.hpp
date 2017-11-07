@@ -15,6 +15,7 @@
 
 namespace Parsers
 {
+class AST_Instance;
 class AST_Module;
 class AST_Port;
 class AST_Source;
@@ -28,6 +29,7 @@ class AST_Visitor
   // ---------------- Public  Methods
   //
   public:
+  virtual void Visit_Instance     (AST_Instance*     instance) = 0;
   virtual void Visit_Module       (AST_Module*       module) = 0;
   virtual void Visit_ScanMux      (AST_ScanMux*      scanMux) = 0;
   virtual void Visit_ScanRegister (AST_ScanRegister* scanRegister) = 0;

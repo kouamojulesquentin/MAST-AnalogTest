@@ -15,7 +15,6 @@
   #define AST_NAMEDNODE_H__A9E167DF_B162_4845_A187_CEAE38557F__INCLUDED_
 
 #include "AST_Node.hpp"
-#include "AST_ScalarIdentifier.hpp"
 
 #include <string>
 #include <experimental/string_view>

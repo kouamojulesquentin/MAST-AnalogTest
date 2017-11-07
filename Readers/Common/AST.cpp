@@ -13,7 +13,10 @@
 
 #include "AST.hpp"
 #include "AST_Attribute.hpp"
+#include "AST_Instance.hpp"
+#include "AST_ModuleIdentifier.hpp"
 #include "AST_Module.hpp"
+#include "AST_Namespace.hpp"
 #include "AST_Parameter.hpp"
 #include "AST_ParameterRef.hpp"
 #include "AST_Port.hpp"
@@ -28,11 +31,14 @@
 #include "AST_VectorIdentifier.hpp"
 
 #include "Utility.hpp"
+#include <algorithm>
 
 using std::vector;
 using std::string;
 using std::experimental::string_view;
 using std::make_unique;
+
+using namespace std::string_literals;
 
 using namespace Parsers;
 
@@ -46,6 +52,9 @@ AST::~AST ()
 //! Initializes AST
 //!
 AST::AST ()
+  : m_rootNamespace             (Create_Namespace_Impl(""s))
+  , m_definitionsNamespace      (m_rootNamespace)
+  , m_instancesDefaultNamespace (m_rootNamespace)
 {
 }
 
@@ -89,6 +98,50 @@ AST_Attribute* AST::Create_Attribute (string&& name, std::vector<AST_SimpleNode*
 }
 //
 //  End of: AST::Create_Attribute
+//---------------------------------------------------------------------------
+
+//! Creates an AST_Instance node
+//!
+//! @param instanceIdentifier   Instance name
+//! @param moduleIdentifier     Identifies module to instantiate
+//!
+AST_Instance* AST::Create_Instance (const AST_ScalarIdentifier* instanceIdentifier, const AST_ModuleIdentifier* moduleIdentifier)
+{
+  return Create_Node<AST_Instance>(instanceIdentifier, moduleIdentifier);
+}
+//
+//  End of: AST::Create_Instance
+//---------------------------------------------------------------------------
+
+
+//! Creates an AST_Instance node
+//!
+//! @param instanceIdentifier   Instance name
+//! @param moduleIdentifier     Identifies module to instantiate
+//! @param children             Module children nodes
+//!
+AST_Instance* AST::Create_Instance (const AST_ScalarIdentifier* instanceIdentifier,
+                                    const AST_ModuleIdentifier* moduleIdentifier,
+                                    std::vector<AST_Node*>&&    children)
+{
+  return Create_Node<AST_Instance>(instanceIdentifier, moduleIdentifier, std::move(children));
+}
+//
+//  End of: AST::Create_Instance
+//---------------------------------------------------------------------------
+
+
+//! Creates an AST_ModuleIdentifier node
+//!
+//! @param namespaceName  Namespace of module definition
+//! @param moduleName     Module name in the namespace
+//!
+AST_ModuleIdentifier* AST::Create_ModuleIdentifier (const AST_Namespace* namespaceName, const AST_ScalarIdentifier* moduleName)
+{
+  return Create_Node<AST_ModuleIdentifier>(namespaceName, moduleName);
+}
+//
+//  End of: AST::Create_ModuleIdentifier
 //---------------------------------------------------------------------------
 
 
@@ -135,11 +188,49 @@ AST_Module* AST::Create_Module (AST_ScalarIdentifier* identifier, vector<AST_Nod
   auto node    = make_unique<AST_Module>(identifier, std::move(children));
   auto pointer = node.get();
 
-  m_modulesNodes.emplace_back(std::move(node));
+  m_modules.emplace_back(std::move(node));
   return pointer;
 }
 //
 //  End of: AST::Create_Module
+//---------------------------------------------------------------------------
+
+
+
+//! Creates or returns existing AST_Namespace node
+//!
+//! @param name   Namespace name
+//!
+AST_Namespace* AST::Create_Namespace (string&& name)
+{
+  auto predicate = [&name](const auto& node) { return node->Name() == name; };
+
+  auto pos  = std::find_if(m_namespaces.cbegin(), m_namespaces.cend(), predicate);
+  auto node = (pos == m_namespaces.cend()) ? Create_Namespace_Impl(std::move(name))
+                                           : pos->get();
+
+  return node;
+}
+//
+//  End of: AST::Create_Namespace
+//---------------------------------------------------------------------------
+
+
+//! Creates an AST_Namespace node
+//!
+//! @param name   Namespace name
+//!
+AST_Namespace* AST::Create_Namespace_Impl (string&& name)
+{
+  auto node    = make_unique<AST_Namespace>(std::move(name));
+  auto pointer = node.get();
+
+  m_namespaces.emplace_back(std::move(node));
+
+  return pointer;
+}
+//
+//  End of: AST::Create_Namespace
 //---------------------------------------------------------------------------
 
 
@@ -411,9 +502,9 @@ AST_Value* AST::Create_Value (Kind kind, string_view valueExpression)
 //!
 AST_Module* AST::TopModule ()
 {
-  CHECK_VALUE_NOT_EMPTY(m_modulesNodes, "AST has no module yet");
+  CHECK_VALUE_NOT_EMPTY(m_modules, "AST has no module yet");
 
-  return m_modulesNodes.front().get();
+  return m_modules.front().get();
 }
 //
 //  End of: AST::TopModule

@@ -11,13 +11,19 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST.cpp
                                   AST_Attribute.hpp
                                   AST_Attribute.cpp
+                                  AST_Instance.hpp
+                                  AST_Instance.cpp
                                   AST_Node.hpp
                                   AST_NamedNode.hpp
                                   AST_ParentNode.hpp
                                   AST_ParentNode.cpp
                                   AST_Identifier.hpp
+                                  AST_ModuleIdentifier.hpp
+                                  AST_ModuleIdentifier.cpp
                                   AST_Module.hpp
                                   AST_Module.cpp
+                                  AST_Namespace.hpp
+                                  AST_Namespace.cpp
                                   AST_Parameter.hpp
                                   AST_Parameter.cpp
                                   AST_ParameterRef.hpp

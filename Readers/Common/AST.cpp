@@ -188,6 +188,14 @@ AST_Module* AST::Create_Module (AST_ScalarIdentifier* identifier, vector<AST_Nod
   auto node   = make_unique<AST_Module>(identifier, std::move(children));
   auto module = node.get();
 
+  // ---------------- Restore "UseNameSpace" before module
+  //
+  if (m_savedInstancesDefaultNamespace != nullptr)
+  {
+    m_instancesDefaultNamespace      = m_savedInstancesDefaultNamespace;
+    m_savedInstancesDefaultNamespace = nullptr;
+  }
+
   m_modules.emplace_back(std::move(node));
   m_network.AddModule(m_modulesNamespace, module);
   return module;

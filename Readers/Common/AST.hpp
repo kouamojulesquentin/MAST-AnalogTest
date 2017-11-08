@@ -87,6 +87,9 @@ class AST final
                                                      std::experimental::string_view rightIndex = "");
   AST_Value*              Create_Value              (Kind kind, std::experimental::string_view valueExpression);
 
+
+  void SaveInstanceDefaultNamespace ()           { m_savedInstancesDefaultNamespace = m_instancesDefaultNamespace; }  //!< Saves instance default namespace (before parsing new module body)
+
   void SetRootNamespace ()                       { SetNamespace(m_rootNamespace); }                    //!< Forces following modules to be created in "root" namespace
   void SetModuleNamespace   (std::string&& name) { SetNamespace(Create_Namespace(std::move(name))); }  //!< Forces following modules to be created in specified namespace
   void SetInstanceNamespace ()                   { m_instancesDefaultNamespace = m_rootNamespace; }    //!< Forces following instances to refer to modules in "root" namespace
@@ -123,13 +126,14 @@ class AST final
   // ---------------- Private Fields
   //
   private:
-  AST_Network                                 m_network;                             //!< Build test network
-  std::vector<std::unique_ptr<AST_Module>>    m_modules;                             //!< Managed module nodes
-  std::vector<std::unique_ptr<AST_Node>>      m_nodes;                               //!< Managed, not modules nor namespaces, nodes
-  std::vector<std::unique_ptr<AST_Namespace>> m_namespaces;                          //!< Managed namespace nodes
-  const AST_Namespace*                        m_rootNamespace             = nullptr; //!< Root namespace
-  const AST_Namespace*                        m_modulesNamespace          = nullptr; //!< Namespace used for following module definitions
-  const AST_Namespace*                        m_instancesDefaultNamespace = nullptr; //!< Default namespace used for following module instantiations
+  AST_Network                                 m_network;                                  //!< Build test network
+  std::vector<std::unique_ptr<AST_Module>>    m_modules;                                  //!< Managed module nodes
+  std::vector<std::unique_ptr<AST_Node>>      m_nodes;                                    //!< Managed, not modules nor namespaces, nodes
+  std::vector<std::unique_ptr<AST_Namespace>> m_namespaces;                               //!< Managed namespace nodes
+  const AST_Namespace*                        m_rootNamespace                  = nullptr; //!< Root namespace
+  const AST_Namespace*                        m_modulesNamespace               = nullptr; //!< Namespace used for following module definitions
+  const AST_Namespace*                        m_savedInstancesDefaultNamespace = nullptr; //!< Saved default namespace for instance (to be restored at end of module parsing)
+  const AST_Namespace*                        m_instancesDefaultNamespace      = nullptr; //!< Default namespace used for following module instantiations
 };
 //
 //  End of AST class declaration

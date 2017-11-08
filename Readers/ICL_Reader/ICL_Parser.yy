@@ -272,7 +272,9 @@ namespace
 %type <Parsers::AST_Value*>            scanRegister_resetValue  // Value expression
 
 
+%type <Parsers::AST_Module*>            MODULE  // Pseudo type for mid-rule support (always set as nullptr)
 %type <Parsers::AST_Module*>            module_def
+%type <Parsers::AST_Module*>            module_body
 %type <Parsers::AST_Instance*>          instance_def
 %type <Parsers::AST_Attribute*>         attribute_def
 %type <Parsers::AST_Parameter*>         localParameter_def
@@ -911,15 +913,29 @@ useNameSpace_def :
 
 // 6.4.5
 module_def :
-  MODULE module_name LEFT_BRACE module_items RIGHT_BRACE
+  MODULE
+  {
+    // module_def : MODULE {mid_rule} module_body
+    ast.SaveInstanceDefaultNamespace();
+  }
+  module_body
+  {
+    // module_def : MODULE module_body
+    auto module = $[module_body];
+    $$ = module;
+  }
+;
+
+module_body :
+  module_name LEFT_BRACE module_items RIGHT_BRACE
   {
     // module_def : MODULE module_name LEFT_BRACE module_items RIGHT_BRACE
-    auto name = $[module_name];
+    auto name   = $[module_name];
+    auto module = ast.Create_Module(name, std::move($[module_items]));
 
-    $$ = ast.Create_Module(name, std::move($[module_items]));
+    $$ = module;
   }
-|
-  MODULE module_name LEFT_BRACE              RIGHT_BRACE
+| module_name LEFT_BRACE RIGHT_BRACE
   {
     // module_def : MODULE module_name LEFT_BRACE  RIGHT_BRACE
     std::vector<Parsers::AST_Node*> children;

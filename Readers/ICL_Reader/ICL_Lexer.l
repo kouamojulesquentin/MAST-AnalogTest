@@ -25,6 +25,11 @@ SUCH DAMAGE.
 
 using namespace std::string_literals;
 
+namespace Parsers
+{
+  class AST_Module; // This is to insert mid-rule (for UseNameSpace management) while parsing module
+}
+
 #undef  YY_DECL
 #define YY_DECL int ICL::ICL_Scanner::yylex(ICL::ICL_Parser::semantic_type* const lval, ICL::ICL_Parser::location_type* location)
 
@@ -133,7 +138,7 @@ ICL::ICL_Parser::location_type* my_location;
   ==                            return token::LOGIC_EQUAL;
   [|][|]                        return token::LOGIC_OR;
   -                             return token::MINUS;
-  Module                        return token::MODULE;
+  Module                        { yylval->build<Parsers::AST_Module*>(nullptr); return token::MODULE; };
   ms                            return token::MSEC;
   NameSpace                     return token::NAMESPACE;
   !=                            return token::NOT_EQUAL;

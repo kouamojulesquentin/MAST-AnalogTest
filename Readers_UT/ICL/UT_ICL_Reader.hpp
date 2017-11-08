@@ -44,6 +44,7 @@ class UT_ICL_Reader : public CxxTest::TestSuite
   void test_UpdateAstFromIcl_ScanMux_ValueList ();
   void test_UpdateAstFromIcl_Instance ();
   void test_UpdateAstFromIcl_Namespace_Def ();
+  void test_UpdateAstFromIcl_UseNamespace_Def ();
 
   // ================ Other Methods ================
 

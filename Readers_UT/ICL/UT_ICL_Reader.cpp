@@ -1003,6 +1003,133 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_Namespace_Def ()
 }
 
 
+//! Checks ICL_Reader::ParseExcerpt() when explicitly using some namespace
+//!
+void UT_ICL_Reader::test_UpdateAstFromIcl_UseNamespace_Def ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt(
+                        "Module SReg\n"                                                     // 01
+                        "{\n"                                                               // 02
+                        "  Instance Inst_1 Of Instrument { InputPort DI = reg8; }\n"        // 03
+                        "  Instance Inst_2 Of Picus::Instrument { InputPort DI = reg9; }\n" // 04
+                        "}\n"                                                               // 05
+                        "NameSpace Foo;\n"                                                  // 06
+                        "UseNameSpace;\n"                                                   // 07
+                        "Module WrappedInstr\n"                                             // 08
+                        "{\n"                                                               // 09
+                        "  Instance I1 Of Instrument { InputPort DI = reg8; }\n"            // 10
+                        "  Instance I2 Of Bar::Instrument { InputPort DI = reg9; }\n"       // 11
+                        "  Instance I3 Of Picus::Instrument { InputPort DI = reg10; }\n"    // 12
+                        "}"                                                                 // 13
+                        "\n"                                                                // 14
+                        "NameSpace Bar;\n"                                                  // 15
+                        "UseNameSpace Foo;\n"                                               // 16
+                        "Module SReg\n"                                                     // 17
+                        "{\n"                                                               // 18
+                        "  Instance I1 Of Instrument { InputPort DI = reg8.DO; }\n"         // 19
+                        "}\n"                                                               // 20
+                        "NameSpace Picus;\n"                                                // 21
+                        "Module Reg\n"                                                      // 22
+                        "{\n"                                                               // 23
+                        "  Instance I1 Of Instrument { InputPort DI = reg8; }\n"            // 24
+                        "  Instance I2 Of Foo::Instrument { InputPort DI = reg9; }\n"       // 25
+                        "  Instance I3 Of Bar::Instrument { InputPort DI = reg9; }\n"       // 26
+                        "}\n"                                                               // 27
+                        "UseNameSpace Bar;\n"                                               // 28
+                        "Module SReg\n"                                                     // 29
+                        "{\n"                                                               // 30
+                        "  Instance A Of Instrument { InputPort DI = reg8; }\n"             // 31
+                        "  Instance B Of ::Instrument { InputPort DI = reg9; }\n"           // 32
+                        "}\n"s                                                              // 33
+                        );
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
+
+  auto expected_AST_PrettyPrint =
+                                  "NameSpace;\n"
+                                  "Module SReg\n"
+                                  "{\n"
+                                  "  Instance Inst_1 Of ::Instrument\n"
+                                  "  {\n"
+                                  "    InputPort DI = reg8;\n"
+                                  "  }\n"
+                                  "  Instance Inst_2 Of Picus::Instrument\n"
+                                  "  {\n"
+                                  "    InputPort DI = reg9;\n"
+                                  "  }\n"
+                                  "}\n"
+                                  "NameSpace Bar;\n"
+                                  "Module SReg\n"
+                                  "{\n"
+                                  "  Instance I1 Of Foo::Instrument\n"
+                                  "  {\n"
+                                  "    InputPort DI = reg8.DO;\n"
+                                  "  }\n"
+                                  "}\n"
+                                  "NameSpace Foo;\n"
+                                  "Module WrappedInstr\n"
+                                  "{\n"
+                                  "  Instance I1 Of ::Instrument\n"
+                                  "  {\n"
+                                  "    InputPort DI = reg8;\n"
+                                  "  }\n"
+                                  "  Instance I2 Of Bar::Instrument\n"
+                                  "  {\n"
+                                  "    InputPort DI = reg9;\n"
+                                  "  }\n"
+                                  "  Instance I3 Of Picus::Instrument\n"
+                                  "  {\n"
+                                  "    InputPort DI = reg10;\n"
+                                  "  }\n"
+                                  "}\n"
+                                  "NameSpace Picus;\n"
+                                  "Module Reg\n"
+                                  "{\n"
+                                  "  Instance I1 Of Picus::Instrument\n"
+                                  "  {\n"
+                                  "    InputPort DI = reg8;\n"
+                                  "  }\n"
+                                  "  Instance I2 Of Foo::Instrument\n"
+                                  "  {\n"
+                                  "    InputPort DI = reg9;\n"
+                                  "  }\n"
+                                  "  Instance I3 Of Bar::Instrument\n"
+                                  "  {\n"
+                                  "    InputPort DI = reg9;\n"
+                                  "  }\n"
+                                  "}\n"
+                                  "Module SReg\n"
+                                  "{\n"
+                                  "  Instance A Of Bar::Instrument\n"
+                                  "  {\n"
+                                  "    InputPort DI = reg8;\n"
+                                  "  }\n"
+                                  "  Instance B Of ::Instrument\n"
+                                  "  {\n"
+                                  "    InputPort DI = reg9;\n"
+                                  "  }\n"
+                                  "}\n"s;
+
+  const auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
+  TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
+
 //===========================================================================
 // End of UT_ICL_Reader.cpp
 //===========================================================================

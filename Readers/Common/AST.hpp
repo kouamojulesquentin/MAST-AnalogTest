@@ -87,8 +87,10 @@ class AST final
                                                      std::experimental::string_view rightIndex = "");
   AST_Value*              Create_Value              (Kind kind, std::experimental::string_view valueExpression);
 
-  void SetRootNamespace ()                     { SetNamespace(m_rootNamespace); }                    //!< Forces following modules to be created in "root" namespace
-  void SetModuleNamespace (std::string&& name) { SetNamespace(Create_Namespace(std::move(name))); }  //!< Forces following modules to be created in specified namespace
+  void SetRootNamespace ()                       { SetNamespace(m_rootNamespace); }                    //!< Forces following modules to be created in "root" namespace
+  void SetModuleNamespace   (std::string&& name) { SetNamespace(Create_Namespace(std::move(name))); }  //!< Forces following modules to be created in specified namespace
+  void SetInstanceNamespace ()                   { m_instancesDefaultNamespace = m_rootNamespace; }    //!< Forces following instances to refer to modules in "root" namespace
+  void SetInstanceNamespace (std::string&& name) { m_instancesDefaultNamespace = Create_Namespace(std::move(name)); }  //!< Forces following instances to refer to modules in specified namespace
 
   AST_Network* Network() { return &m_network; } //!< Returns test network
 

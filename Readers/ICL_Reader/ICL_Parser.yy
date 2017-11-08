@@ -859,7 +859,20 @@ concat_trst_signal    : concat_signal_or_inverted_signal { $$ = std::move($1); /
 concat_tms_signal : signal | concat_tms_signal COMMA signal;
 
 // 6.4.2
-icl_source : iclSource_items | icl_source iclSource_items;
+icl_source :
+  iclSource_items
+  {
+    // icl_source : iclSource_items
+    // ==> Reset namespace once ALL iclSource_items have been parsed
+    ast.SetRootNamespace();
+  }
+| icl_source iclSource_items
+  {
+    // icl_source : icl_source iclSource_items
+    // ==> Do not reset namespace each time a a iclSource_items is parsed
+  }
+;
+
 iclSource_items : nameSpace_def | useNameSpace_def | module_def;
 
 // 6.4.3
@@ -884,11 +897,14 @@ useNameSpace_def :
   USENAMESPACE namespace_name SEMICOLON
   {
     // useNameSpace_def : USENAMESPACE namespace_name SEMICOLON
+    auto& name = $[namespace_name];
+    ast.SetInstanceNamespace(std::move(name));
     $$ = nullptr;
   }
 | USENAMESPACE SEMICOLON
   {
     // useNameSpace_def : USENAMESPACE SEMICOLON
+    ast.SetInstanceNamespace();
     $$ = nullptr;
   }
 ;

@@ -46,6 +46,7 @@ void AST_Port::DispatchChildren ()
           child = nullptr;
           break;
         case Parsers::Kind::Source :
+        case Parsers::Kind::InputPortSource :
           m_source = static_cast<AST_Source*>(child);
           child = nullptr;
           break;

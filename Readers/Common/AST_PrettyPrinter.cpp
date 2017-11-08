@@ -187,7 +187,13 @@ void AST_PrettyPrinter::Visit_Port (AST_Port* port)
   const auto& undispatched = port->UndispatchedChildren();
   const auto  portSource   = port->Source();
 
-  if ((portSource != nullptr) || !attributes.empty() || !undispatched.empty())
+  if (port->IsKind(Kind::InputPort))
+  {
+    CHECK_PARAMETER_NOT_NULL(portSource, "InputPort is expected to have valid port source");
+
+    m_os << " = " << portSource->AsText() << ";\n";
+  }
+  else if ((portSource != nullptr) || !attributes.empty() || !undispatched.empty())
   {
     auto totalItemsCount = attributes.size() + undispatched.size();
     if (portSource != nullptr)

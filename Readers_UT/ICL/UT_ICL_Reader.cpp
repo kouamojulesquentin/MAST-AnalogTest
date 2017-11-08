@@ -807,13 +807,14 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_Instance ()
 {
   // ---------------- Setup
   //
-  istringstream excerpt("Module WrappedInstr\n"                                               // 01
-                        "{\n"                                                                 // 02
-                        "  Instance I1 Of Instrument { InputPort DI = reg8.DO; }\n"           // 03
-                        "  Instance reg8  Of  SReg {\n"                                       // 04
-                        "  InputPort SI = SI; InputPort DI = I1.DO; Parameter Size = 8;\n"    // 05
-                        "  }\n"                                                               // 06
-                        "}"s);                                                                // 07
+  istringstream excerpt("Module WrappedInstr\n"                                            // 01
+                        "{\n"                                                              // 02
+                        "  Instance I1 Of Instrument { InputPort DI = reg8.DO; }\n"        // 03
+                        "  Instance reg8  Of  SReg {\n"                                    // 04
+                        "  InputPort SI = SI; InputPort DI = I1.DO; Parameter Size = 8;\n" // 05
+                        "  Attribute Copyright  =  \"Picus\";\n"                           // 06
+                        "  }\n"                                                            // 07
+                        "}"s);                                                             // 08
 
   auto           sm = make_shared<SystemModel>();
   ICL_Reader_TSS sut(sm);
@@ -835,13 +836,14 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_Instance ()
                                   "{\n"
                                   "  Instance I1 Of ::Instrument\n"
                                   "  {\n"
-//+                                  "    InputPort DI = reg8.DO;\n"
+                                  "    InputPort DI = reg8.DO;\n"
                                   "  }\n"
                                   "  Instance reg8 Of ::SReg\n"
                                   "  {\n"
-//+                                  "    InputPort SI = SI;\n"
-//+                                  "    InputPort DI = I1.DO;\n"
+                                  "    Attribute Copyright = \"Picus\";\n"
                                   "    Parameter Size = 8;\n"
+                                  "    InputPort SI = SI;\n"
+                                  "    InputPort DI = I1.DO;\n"
                                   "  }\n"
                                   "}\n"sv;
 

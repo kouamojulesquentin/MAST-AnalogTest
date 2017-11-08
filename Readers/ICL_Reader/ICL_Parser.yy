@@ -254,9 +254,11 @@ namespace
 %type <std::vector<Parsers::AST_Signal*>> concat_clock_signal
 %type <std::vector<Parsers::AST_Signal*>> concat_shiftEn_signal
 %type <std::vector<Parsers::AST_Signal*>> concat_trst_signal
+%type <std::vector<Parsers::AST_Signal*>> inputPort_source
 
 %type <Parsers::AST_VectorIdentifier*> alias_name           // Name, Left & Right indexes (Right can be empty)
 %type <Parsers::AST_VectorIdentifier*> oneHotScanGroup_name // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> inputPort_name       // Name, Left & Right indexes (Left & Right can be empty)
 %type <Parsers::AST_VectorIdentifier*> port_name            // Name, Left & Right indexes (Left & Right can be empty)
 %type <Parsers::AST_VectorIdentifier*> reg_port_signal_id   // Name, Left & Right indexes (Left & Right can be empty)
 %type <Parsers::AST_VectorIdentifier*> register_name        // Name, Left & Right indexes (Left & Right can be empty)
@@ -320,6 +322,7 @@ namespace
 %type <Parsers::AST_Port*>              trstPort_def
 %type <Parsers::AST_Port*>              updateEnPort_def
 %type <Parsers::AST_Port*>              writeEnPort_def
+%type <Parsers::AST_Port*>              inputPort_connection
 
 %type <Parsers::AST_Node*>              scanRegister_captureSource
 %type <Parsers::AST_Node*>              scanRegister_defaultLoadValue
@@ -1762,7 +1765,8 @@ instance_item :
   inputPort_connection
   {
     // instance_item : inputPort_connection
-    $$ = nullptr;
+    auto inputPortConnection = $[inputPort_connection];
+    $$ = inputPortConnection;
   }
 | allowBroadcast_def
   {
@@ -1772,12 +1776,14 @@ instance_item :
 | attribute_def
   {
     // instance_item : attribute_def
-    $$ = $[attribute_def];
+    auto attributeDef = $[attribute_def];
+    $$ = attributeDef;
   }
 | parameter_override
   {
     // instance_item : parameter_override
-    $$ = $[parameter_override];
+    auto parameterOverride = $[parameter_override];
+    $$ = parameterOverride;
   }
 | instance_addressValue
   {
@@ -1786,12 +1792,24 @@ instance_item :
   }
 ;
 
-inputPort_connection : INPUTPORT inputPort_name EQUAL inputPort_source SEMICOLON ;
+inputPort_connection : INPUTPORT inputPort_name EQUAL inputPort_source SEMICOLON
+{
+  // inputPort_connection : INPUTPORT inputPort_name EQUAL inputPort_source SEMICOLON
+  auto  inputPortName   = $[inputPort_name];
+  auto& inputPortSource = $[inputPort_source];
+  auto  source          = ast.Create_Source(Parsers::Kind::InputPortSource, std::move(inputPortSource));
+  auto  children        = vector<Parsers::AST_Node*>({ source });
+  auto  node            = ast.Create_Port(Parsers::Kind::InputPort, inputPortName, std::move(children));
+
+  $$ = node;
+}
+;
 
 allowBroadcast_def : ALLOWBROADCASTONSCANINTERFACE allowBroadcast_items SEMICOLON ;
 allowBroadcast_items : allowBroadcast_items COMMA scanInterface_name | scanInterface_name ;
-inputPort_name : port_name ;
-inputPort_source : concat_data_signal ;
+
+inputPort_name   : port_name          { $$ = $1; /* inputPort_name : port_name */ };
+inputPort_source : concat_data_signal { $$ = std::move($1); /* inputPort_source : concat_data_signal */};
 
 parameter_override : parameter_def
 {

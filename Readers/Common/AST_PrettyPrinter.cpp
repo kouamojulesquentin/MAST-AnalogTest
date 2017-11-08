@@ -181,7 +181,11 @@ void AST_PrettyPrinter::Visit_Network (AST_Network* network)
     }
     m_os << ";\n";
 
+    // ---------------- Get sorted modules
+    //
     auto modules = network->ModulesInNamespace(namespaceNode);
+    std::sort(modules.begin(), modules.end(), comparator);
+
     for (const auto module : modules)
     {
       module->Accept(*this);

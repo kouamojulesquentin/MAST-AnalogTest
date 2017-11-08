@@ -53,14 +53,14 @@ class AST_Namespace final : public AST_SimpleNode
   //! Initializes the namespace as "root"
   //!
   AST_Namespace()
-    : AST_SimpleNode (Kind::Namespace)
+    : AST_SimpleNode (Kind::NameSpace)
   {
   }
 
   //! Initializes the namespace with name
   //!
   AST_Namespace(std::string&& name)
-    : AST_SimpleNode (Kind::Namespace)
+    : AST_SimpleNode (Kind::NameSpace)
     , m_name         (name)
   {
   }

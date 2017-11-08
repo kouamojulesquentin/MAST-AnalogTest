@@ -129,10 +129,12 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_1_ScanRegister ()
 
   auto ast = sut.AST();
   TS_ASSERT_NOT_NULLPTR (ast);
-  auto topModule = ast->TopModule();
-  TS_ASSERT_NOT_NULLPTR (topModule);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
 
-  auto expected_AST_PrettyPrint = "Module SReg\n"
+  auto expected_AST_PrettyPrint =
+                                  "NameSpace;\n"
+                                  "Module SReg\n"
                                   "{\n"
                                   "  ScanInPort SI;\n"
                                   "  ScanOutPort SO { Source SR[0]; }\n"
@@ -143,7 +145,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_1_ScanRegister ()
                                   "  }\n"
                                   "}\n";
 
-  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
 }
 
@@ -194,10 +196,12 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_3_ScanRegister ()
 
   auto ast = sut.AST();
   TS_ASSERT_NOT_NULLPTR (ast);
-  auto topModule = ast->TopModule();
-  TS_ASSERT_NOT_NULLPTR (topModule);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
 
-  auto expected_AST_PrettyPrint = "Module SReg\n"
+  auto expected_AST_PrettyPrint =
+                                  "NameSpace;\n"
+                                  "Module SReg\n"
                                   "{\n"
                                   "  ScanInPort SI;\n"
                                   "  ScanOutPort SO { Source SR_3[0]; }\n"
@@ -218,7 +222,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_3_ScanRegister ()
                                   "  }\n"
                                   "}\n"s;
 
-  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
 }
 
@@ -244,10 +248,12 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_value ()
 
   auto ast = sut.AST();
   TS_ASSERT_NOT_NULLPTR (ast);
-  auto topModule = ast->TopModule();
-  TS_ASSERT_NOT_NULLPTR (topModule);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
 
-  auto expected_AST_PrettyPrint = "Module SReg\n"
+  auto expected_AST_PrettyPrint =
+                                  "NameSpace;\n"
+                                  "Module SReg\n"
                                   "{\n"
                                   "  Parameter MSB = 7;\n"
                                   "  ScanInPort SI;\n"
@@ -259,7 +265,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_value ()
                                   "  }\n"
                                   "}\n";
 
-  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
 }
 
@@ -297,10 +303,12 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_strings ()
 
   auto ast = sut.AST();
   TS_ASSERT_NOT_NULLPTR (ast);
-  auto topModule = ast->TopModule();
-  TS_ASSERT_NOT_NULLPTR (topModule);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
 
-  auto expected_AST_PrettyPrint = "Module SReg\n"
+  auto expected_AST_PrettyPrint =
+                                  "NameSpace;\n"
+                                  "Module SReg\n"
                                   "{\n"
                                   "  Parameter Param_1 = \"Hello\";\n"
                                   "  Parameter Param_2 = \"Hello\", \" World\";\n"
@@ -314,7 +322,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_strings ()
                                   "  }\n"
                                   "}\n";
 
-  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
 }
 
@@ -349,10 +357,12 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_param_ref ()
 
   auto ast = sut.AST();
   TS_ASSERT_NOT_NULLPTR (ast);
-  auto topModule = ast->TopModule();
-  TS_ASSERT_NOT_NULLPTR (topModule);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
 
-  auto expected_AST_PrettyPrint = "Module SReg\n"
+  auto expected_AST_PrettyPrint =
+                                  "NameSpace;\n"
+                                  "Module SReg\n"
                                   "{\n"
                                   "  Parameter Param = $Foo;\n"
                                   "  LocalParameter LocalParam = $Bar;\n"
@@ -363,7 +373,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_param_ref ()
                                   "  }\n"
                                   "}\n";
 
-  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
 }
 
@@ -401,10 +411,12 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_string_and_param_ref ()
 
   auto ast = sut.AST();
   TS_ASSERT_NOT_NULLPTR (ast);
-  auto topModule = ast->TopModule();
-  TS_ASSERT_NOT_NULLPTR (topModule);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
 
-  auto expected_AST_PrettyPrint = "Module SReg\n"
+  auto expected_AST_PrettyPrint =
+                                  "NameSpace;\n"
+                                  "Module SReg\n"
                                   "{\n"
                                   "  Parameter Param = \"Hello\", \" world\", $Foo;\n"
                                   "  LocalParameter LocalParam = \"At the\", $Bar;\n"
@@ -415,7 +427,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_string_and_param_ref ()
                                   "  }\n"
                                   "}\n";
 
-  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
 }
 
@@ -453,10 +465,12 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_param_ref_and_string ()
 
   auto ast = sut.AST();
   TS_ASSERT_NOT_NULLPTR (ast);
-  auto topModule = ast->TopModule();
-  TS_ASSERT_NOT_NULLPTR (topModule);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
 
-  auto expected_AST_PrettyPrint = "Module SReg\n"
+  auto expected_AST_PrettyPrint =
+                                  "NameSpace;\n"
+                                  "Module SReg\n"
                                   "{\n"
                                   "  Parameter Param = $Foo, \"Hello\", \" world\";\n"
                                   "  LocalParameter LocalParam = $Bar, \"At the\";\n"
@@ -467,7 +481,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_param_ref_and_string ()
                                   "  }\n"
                                   "}\n";
 
-  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
 }
 
@@ -504,10 +518,12 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_no_value ()
 
   auto ast = sut.AST();
   TS_ASSERT_NOT_NULLPTR (ast);
-  auto topModule = ast->TopModule();
-  TS_ASSERT_NOT_NULLPTR (topModule);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
 
-  auto expected_AST_PrettyPrint = "Module SReg\n"
+  auto expected_AST_PrettyPrint =
+                                  "NameSpace;\n"
+                                  "Module SReg\n"
                                   "{\n"
                                   "  Attribute Tested;\n"
                                   "  ScanInPort SI;\n"
@@ -519,7 +535,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_no_value ()
                                   "  }\n"
                                   "}\n";
 
-  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
 }
 
@@ -555,10 +571,12 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_value ()
 
   auto ast = sut.AST();
   TS_ASSERT_NOT_NULLPTR (ast);
-  auto topModule = ast->TopModule();
-  TS_ASSERT_NOT_NULLPTR (topModule);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
 
-  auto expected_AST_PrettyPrint = "Module SReg\n"
+  auto expected_AST_PrettyPrint =
+                                  "NameSpace;\n"
+                                  "Module SReg\n"
                                   "{\n"
                                   "  Attribute Copyright = \"Picus\";\n"
                                   "  ScanInPort SI;\n"
@@ -570,7 +588,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_value ()
                                   "  }\n"
                                   "}\n";
 
-  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
 }
 
@@ -608,10 +626,12 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_strings ()
 
   auto ast = sut.AST();
   TS_ASSERT_NOT_NULLPTR (ast);
-  auto topModule = ast->TopModule();
-  TS_ASSERT_NOT_NULLPTR (topModule);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
 
-  auto expected_AST_PrettyPrint = "Module SReg\n"
+  auto expected_AST_PrettyPrint =
+                                  "NameSpace;\n"
+                                  "Module SReg\n"
                                   "{\n"
                                   "  Attribute Attrib_1 = \"Hello\";\n"
                                   "  Attribute Attrib_2 = \"Hello\", \" World\";\n"
@@ -625,7 +645,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_strings ()
                                   "  }\n"
                                   "}\n";
 
-  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
 }
 
@@ -660,10 +680,12 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_param_ref ()
 
   auto ast = sut.AST();
   TS_ASSERT_NOT_NULLPTR (ast);
-  auto topModule = ast->TopModule();
-  TS_ASSERT_NOT_NULLPTR (topModule);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
 
-  auto expected_AST_PrettyPrint = "Module SReg\n"
+  auto expected_AST_PrettyPrint =
+                                  "NameSpace;\n"
+                                  "Module SReg\n"
                                   "{\n"
                                   "  Attribute Attrib = $Foo;\n"
                                   "  ScanInPort SI;\n"
@@ -675,7 +697,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_param_ref ()
                                   "  }\n"
                                   "}\n";
 
-  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
 }
 
@@ -718,10 +740,12 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_ScanMux_SIB ()
 
   auto ast = sut.AST();
   TS_ASSERT_NOT_NULLPTR (ast);
-  auto topModule = ast->TopModule();
-  TS_ASSERT_NOT_NULLPTR (topModule);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
 
-  auto expected_AST_PrettyPrint = "Module SIB_mux_pre\n"
+  auto expected_AST_PrettyPrint =
+                                  "NameSpace;\n"
+                                  "Module SIB_mux_pre\n"
                                   "{\n"
                                   "  ScanInPort SI;\n"
                                   "  ScanInPort fromSO;\n"
@@ -740,7 +764,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_ScanMux_SIB ()
                                   "}\n";
 
 
-  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
 }
 
@@ -778,10 +802,12 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_ScanMux_ValueList ()
 
   auto ast = sut.AST();
   TS_ASSERT_NOT_NULLPTR (ast);
-  auto topModule = ast->TopModule();
-  TS_ASSERT_NOT_NULLPTR (topModule);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
 
-  auto expected_AST_PrettyPrint = "Module mux\n"
+  auto expected_AST_PrettyPrint =
+                                  "NameSpace;\n"
+                                  "Module mux\n"
                                   "{\n"
                                   "  ScanMux SIB_out SelectedBy SIBREG\n"
                                   "  {\n"
@@ -796,7 +822,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_ScanMux_ValueList ()
                                   "}\n"sv;
 
 
-  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
 }
 
@@ -829,10 +855,12 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_Instance ()
 
   auto ast = sut.AST();
   TS_ASSERT_NOT_NULLPTR (ast);
-  auto topModule = ast->TopModule();
-  TS_ASSERT_NOT_NULLPTR (topModule);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
 
-  auto expected_AST_PrettyPrint = "Module WrappedInstr\n"
+  auto expected_AST_PrettyPrint =
+                                  "NameSpace;\n"
+                                  "Module WrappedInstr\n"
                                   "{\n"
                                   "  Instance I1 Of ::Instrument\n"
                                   "  {\n"
@@ -848,12 +876,131 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_Instance ()
                                   "}\n"sv;
 
 
-  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(topModule);
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
 }
 
 
+//! Checks ICL_Reader::ParseExcerpt() when setting non "root" namespace
+//!
+void UT_ICL_Reader::test_UpdateAstFromIcl_Namespace_Def ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt(
+                        "Module SReg\n"                                                     // 01
+                        "{\n"                                                               // 02
+                        "  Instance Inst_1 Of Instrument { InputPort DI = reg8; }\n"        // 03
+                        "  Instance Inst_2 Of Picus::Instrument { InputPort DI = reg9; }\n" // 04
+                        "}\n"                                                               // 05
+                        "NameSpace Foo;\n"                                                  // 06
+                        "Module WrappedInstr\n"                                             // 07
+                        "{\n"                                                               // 08
+                        "  Instance I1 Of Instrument { InputPort DI = reg8.DO; }\n"         // 09
+                        "  Instance reg8  Of  ::SReg {\n"                                   // 10
+                        "  InputPort SI = SI; \n"                                           // 11
+                        "  }\n"                                                             // 12
+                        "}"                                                                 // 13
+                        "\n"                                                                // 14
+                        "NameSpace Bar;\n"                                                  // 15
+                        "Module SReg\n"                                                     // 16
+                        "{\n"                                                               // 17
+                        "  Instance I1 Of Instrument { InputPort DI = reg8.DO; }\n"         // 18
+                        "}\n"                                                               // 19
+                        "NameSpace Picus;\n"                                                // 20
+                        "Module Reg\n"                                                      // 21
+                        "{\n"                                                               // 22
+                        "  Instance I1 Of Instrument { InputPort DI = reg8; }\n"            // 23
+                        "  Instance I2 Of Foo::Instrument { InputPort DI = reg9; }\n"       // 24
+                        "  Instance I3 Of Bar::Instrument { InputPort DI = reg9; }\n"       // 25
+                        "}\n"                                                               // 26
+                        "Module SReg\n"                                                     // 27
+                        "{\n"                                                               // 28
+                        "  Instance A Of Instrument { InputPort DI = reg8; }\n"             // 29
+                        "  Instance B Of ::Instrument { InputPort DI = reg9; }\n"           // 30
+                        "}\n"s                                                              // 31
+                        );
 
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
+
+  auto expected_AST_PrettyPrint =
+                                  "NameSpace;\n"
+                                  "Module SReg\n"
+                                  "{\n"
+                                  "  Instance Inst_1 Of ::Instrument\n"
+                                  "  {\n"
+                                  "    InputPort DI = reg8;\n"
+                                  "  }\n"
+                                  "  Instance Inst_2 Of Picus::Instrument\n"
+                                  "  {\n"
+                                  "    InputPort DI = reg9;\n"
+                                  "  }\n"
+                                  "}\n"
+                                  "NameSpace Bar;\n"
+                                  "Module SReg\n"
+                                  "{\n"
+                                  "  Instance I1 Of Bar::Instrument\n"
+                                  "  {\n"
+                                  "    InputPort DI = reg8.DO;\n"
+                                  "  }\n"
+                                  "}\n"
+                                  "NameSpace Foo;\n"
+                                  "Module WrappedInstr\n"
+                                  "{\n"
+                                  "  Instance I1 Of Foo::Instrument\n"
+                                  "  {\n"
+                                  "    InputPort DI = reg8.DO;\n"
+                                  "  }\n"
+                                  "  Instance reg8 Of ::SReg\n"
+                                  "  {\n"
+                                  "    InputPort SI = SI;\n"
+                                  "  }\n"
+                                  "}\n"
+                                  "NameSpace Picus;\n"
+                                  "Module Reg\n"
+                                  "{\n"
+                                  "  Instance I1 Of Picus::Instrument\n"
+                                  "  {\n"
+                                  "    InputPort DI = reg8;\n"
+                                  "  }\n"
+                                  "  Instance I2 Of Foo::Instrument\n"
+                                  "  {\n"
+                                  "    InputPort DI = reg9;\n"
+                                  "  }\n"
+                                  "  Instance I3 Of Bar::Instrument\n"
+                                  "  {\n"
+                                  "    InputPort DI = reg9;\n"
+                                  "  }\n"
+                                  "}\n"
+                                  "Module SReg\n"
+                                  "{\n"
+                                  "  Instance A Of Picus::Instrument\n"
+                                  "  {\n"
+                                  "    InputPort DI = reg8;\n"
+                                  "  }\n"
+                                  "  Instance B Of ::Instrument\n"
+                                  "  {\n"
+                                  "    InputPort DI = reg9;\n"
+                                  "  }\n"
+                                  "}\n"s;
+
+  const auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
+  TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
 
 
 //===========================================================================

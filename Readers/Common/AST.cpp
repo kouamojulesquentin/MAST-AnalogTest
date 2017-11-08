@@ -53,7 +53,7 @@ AST::~AST ()
 //!
 AST::AST ()
   : m_rootNamespace             (Create_Namespace_Impl(""s))
-  , m_definitionsNamespace      (m_rootNamespace)
+  , m_modulesNamespace          (m_rootNamespace)
   , m_instancesDefaultNamespace (m_rootNamespace)
 {
 }
@@ -185,11 +185,12 @@ AST_Module* AST::Create_Module (AST_ScalarIdentifier* identifier, vector<AST_Nod
 {
   CHECK_PARAMETER_NOT_NULL(identifier, "identifier must not be nullptr");
 
-  auto node    = make_unique<AST_Module>(identifier, std::move(children));
-  auto pointer = node.get();
+  auto node   = make_unique<AST_Module>(identifier, std::move(children));
+  auto module = node.get();
 
   m_modules.emplace_back(std::move(node));
-  return pointer;
+  m_network.AddModule(m_modulesNamespace, module);
+  return module;
 }
 //
 //  End of: AST::Create_Module
@@ -498,14 +499,28 @@ AST_Value* AST::Create_Value (Kind kind, string_view valueExpression)
 
 
 
+//! Changes namespace in which following modules are created
+//!
+//! @param newNamespace   New namespace
+//!
+void AST::SetNamespace (const AST_Namespace* newNamespace)
+{
+  m_modulesNamespace          = newNamespace;
+  m_instancesDefaultNamespace = newNamespace;
+}
+//
+//  End of: AST::SetNamespace
+//---------------------------------------------------------------------------
+
+
 //! Returns "top" parsed module
 //!
-AST_Module* AST::TopModule ()
-{
-  CHECK_VALUE_NOT_EMPTY(m_modules, "AST has no module yet");
+//+AST_Module* AST::TopModule ()
+//+{
+//+  CHECK_VALUE_NOT_EMPTY(m_modules, "AST has no module yet");
 
-  return m_modules.front().get();
-}
+//+  return m_modules.front().get();
+//+}
 //
 //  End of: AST::TopModule
 //---------------------------------------------------------------------------

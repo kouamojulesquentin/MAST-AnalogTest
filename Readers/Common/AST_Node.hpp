@@ -39,7 +39,8 @@ namespace Parsers
     ModuleIdentifier, //!< For modules instances indentification
     Module,           //!< For modules
     LocalParameter,   //!< For local parameters definitions
-    Namespace,        //!< For namespace definitions and references
+    NameSpace,        //!< For namespace definitions and references
+    Network,          //!< For complete test network
     Parameter,        //!< For parameters definitions
     Parameter_ref,    //!< For parameters references
     ResetValue,       //!< For registers reset value
@@ -88,7 +89,8 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::ModuleIdentifier)
             ENUM_MEMBER(Parsers::Kind::LocalParameter)
             ENUM_MEMBER(Parsers::Kind::Module)
-            ENUM_MEMBER(Parsers::Kind::Namespace)
+            ENUM_MEMBER(Parsers::Kind::NameSpace)
+            ENUM_MEMBER(Parsers::Kind::Network)
             ENUM_MEMBER(Parsers::Kind::Parameter)
             ENUM_MEMBER(Parsers::Kind::Parameter_ref)
             ENUM_MEMBER(Parsers::Kind::ResetValue)

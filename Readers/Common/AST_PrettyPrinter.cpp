@@ -17,6 +17,8 @@
 #include "AST_Instance.hpp"
 #include "AST_Module.hpp"
 #include "AST_ModuleIdentifier.hpp"
+#include "AST_Namespace.hpp"
+#include "AST_Network.hpp"
 #include "AST_Parameter.hpp"
 #include "AST_Port.hpp"
 #include "AST_ScanMux.hpp"
@@ -29,6 +31,7 @@
 #include "Utility.hpp"
 
 #include <sstream>
+#include <algorithm>
 
 using std::vector;
 using std::string;
@@ -152,6 +155,41 @@ void AST_PrettyPrinter::Visit_Instance (AST_Instance* instance)
 }
 //
 //  End of: AST_PrettyPrinter::Visit_Instance
+//---------------------------------------------------------------------------
+
+
+//! Appends content of a Module node in text representation and visits
+//! sub-nodes
+void AST_PrettyPrinter::Visit_Network (AST_Network* network)
+{
+  // ---------------- Get sorted namespaces
+  //
+  auto namespaces = network->NamespacesWithDefinedModules();
+  auto comparator = [](const auto lhs, const auto rhs) { return lhs->Name() < rhs->Name(); };
+
+  std::sort(namespaces.begin(), namespaces.end(), comparator);
+
+  // ---------------- Pretty print modules in each namespaces
+  //
+  for (const auto namespaceNode : namespaces)
+  {
+    StreamDepth() << namespaceNode->KindName();
+    const auto name = namespaceNode->Name();
+    if (!name.empty())
+    {
+      m_os << " " << name;
+    }
+    m_os << ";\n";
+
+    auto modules = network->ModulesInNamespace(namespaceNode);
+    for (const auto module : modules)
+    {
+      module->Accept(*this);
+    }
+  }
+}
+//
+//  End of: AST_PrettyPrinter::Visit_Network
 //---------------------------------------------------------------------------
 
 

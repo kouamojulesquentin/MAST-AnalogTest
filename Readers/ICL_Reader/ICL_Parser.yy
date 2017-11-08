@@ -867,11 +867,14 @@ nameSpace_def :
   NAMESPACE namespace_name SEMICOLON
   {
     // nameSpace_def : namespace_name SEMICOLON
+    auto& name = $[namespace_name];
+    ast.SetModuleNamespace(std::move(name));
     $$ = nullptr;
   }
 | NAMESPACE SEMICOLON
   {
     // nameSpace_def : NAMESPACE SEMICOLON
+    ast.SetRootNamespace();
     $$ = nullptr;
   }
 ;

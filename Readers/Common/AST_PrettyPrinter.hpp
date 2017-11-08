@@ -41,6 +41,7 @@ class AST_PrettyPrinter final : public AST_Visitor
   AST_PrettyPrinter()  = default;
 
   virtual void Visit_Instance     (AST_Instance*     instance)     override;
+  virtual void Visit_Network      (AST_Network*      network)      override;
   virtual void Visit_Module       (AST_Module*       module)       override;
   virtual void Visit_Port         (AST_Port*         port)         override;
   virtual void Visit_ScanMux      (AST_ScanMux*      scanMux)      override;

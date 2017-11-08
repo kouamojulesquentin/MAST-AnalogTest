@@ -15,6 +15,7 @@
   #define AST_H__C18638A1_3F91_4757_EBB6_C119CFFA82E__INCLUDED_
 
 #include "AST_Node.hpp"
+#include "AST_Network.hpp"
 #include <vector>
 #include <memory>
 #include <experimental/string_view>
@@ -86,9 +87,14 @@ class AST final
                                                      std::experimental::string_view rightIndex = "");
   AST_Value*              Create_Value              (Kind kind, std::experimental::string_view valueExpression);
 
+  void SetRootNamespace ()                     { SetNamespace(m_rootNamespace); }                    //!< Forces following modules to be created in "root" namespace
+  void SetModuleNamespace (std::string&& name) { SetNamespace(Create_Namespace(std::move(name))); }  //!< Forces following modules to be created in specified namespace
+
+  AST_Network* Network() { return &m_network; } //!< Returns test network
+
   //! Returns "top" module node
   //!
-  AST_Module* TopModule();
+//+  AST_Module* TopModule();
 
   //! Returns root namespace
   //!
@@ -101,6 +107,7 @@ class AST final
   // ---------------- Private Methods
   //
   AST_Namespace* Create_Namespace_Impl (std::string&& name);
+  void           SetNamespace          (const AST_Namespace* newNamespace);
 
   template<typename T, typename... TArgs> T* Create_Node (TArgs&& ... args)
   {
@@ -114,11 +121,12 @@ class AST final
   // ---------------- Private Fields
   //
   private:
+  AST_Network                                 m_network;                             //!< Build test network
   std::vector<std::unique_ptr<AST_Module>>    m_modules;                             //!< Managed module nodes
   std::vector<std::unique_ptr<AST_Node>>      m_nodes;                               //!< Managed, not modules nor namespaces, nodes
   std::vector<std::unique_ptr<AST_Namespace>> m_namespaces;                          //!< Managed namespace nodes
   const AST_Namespace*                        m_rootNamespace             = nullptr; //!< Root namespace
-  const AST_Namespace*                        m_definitionsNamespace      = nullptr; //!< Namespace used for following module definitions
+  const AST_Namespace*                        m_modulesNamespace          = nullptr; //!< Namespace used for following module definitions
   const AST_Namespace*                        m_instancesDefaultNamespace = nullptr; //!< Default namespace used for following module instantiations
 };
 //

@@ -24,6 +24,8 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_Module.cpp
                                   AST_Namespace.hpp
                                   AST_Namespace.cpp
+                                  AST_Network.hpp
+                                  AST_Network.cpp
                                   AST_Parameter.hpp
                                   AST_Parameter.cpp
                                   AST_ParameterRef.hpp

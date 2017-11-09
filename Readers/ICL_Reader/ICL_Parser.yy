@@ -44,6 +44,7 @@ namespace Parsers
   class AST_ParameterRef;
   class AST_Port;
   class AST_ScalarIdentifier;
+  class AST_ScanInterface;
   class AST_ScanMux;
   class AST_ScanMuxSelection;
   class AST_ScanRegister;
@@ -91,6 +92,7 @@ typedef void* yyscan_t;
 #include "AST_ParameterRef.hpp"
 #include "AST_Port.hpp"
 #include "AST_ScalarIdentifier.hpp"
+#include "AST_ScanInterface.hpp"
 #include "AST_ScanMux.hpp"
 #include "AST_ScanMuxSelection.hpp"
 #include "AST_ScanRegister.hpp"
@@ -281,6 +283,7 @@ namespace
 %type <Parsers::AST_Parameter*>         parameter_def
 %type <Parsers::AST_ScanRegister*>      scanRegister_def
 %type <Parsers::AST_ScanMux*>           scanMux_def
+%type <Parsers::AST_ScanInterface*>     scanInterface_def
 %type <Parsers::AST_Node*>              accessLink_def
 %type <Parsers::AST_Node*>              accessLinkGeneric_def
 %type <Parsers::AST_Node*>              accessLink1149_def
@@ -294,7 +297,6 @@ namespace
 %type <Parsers::AST_Node*>              nameSpace_def
 %type <Parsers::AST_Node*>              oneHotDataGroup_def
 %type <Parsers::AST_Node*>              oneHotScanGroup_def
-%type <Parsers::AST_Node*>              scanInterface_def
 %type <Parsers::AST_Node*>              useNameSpace_def
 
 %type <Parsers::AST_Port*>              addressPort_def
@@ -306,6 +308,7 @@ namespace
 %type <Parsers::AST_Port*>              readEnPort_def
 %type <Parsers::AST_Port*>              resetPort_def
 %type <Parsers::AST_Port*>              scanInPort_def
+%type <Parsers::AST_Port*>              scanInterfacePort_def
 %type <Parsers::AST_Port*>              scanOutPort_def
 %type <Parsers::AST_Port*>              selectPort_def
 %type <Parsers::AST_Port*>              shiftEnPort_def
@@ -326,17 +329,21 @@ namespace
 %type <Parsers::AST_Port*>              writeEnPort_def
 %type <Parsers::AST_Port*>              inputPort_connection
 
+
 %type <Parsers::AST_Node*>              scanRegister_captureSource
 %type <Parsers::AST_Node*>              scanRegister_defaultLoadValue
-%type <Parsers::AST_Node*>              scanRegister_item
 %type <Parsers::AST_Node*>              scanRegister_refEnum
 %type <Parsers::AST_Source*>            scanRegister_scanInSource
 %type <Parsers::AST_Source*>            port_source
 %type <Parsers::AST_Source*>            scanOutPort_source
 
+
+%type <Parsers::AST_Node*>              scanInterface_item
 %type <Parsers::AST_Node*>              scanOutPort_item
+%type <Parsers::AST_Node*>              scanRegister_item
 
 %type <std::vector<Parsers::AST_Node*>> module_items
+%type <std::vector<Parsers::AST_Node*>> scanInterface_items
 %type <std::vector<Parsers::AST_Node*>> scanRegister_tail
 %type <std::vector<Parsers::AST_Node*>> scanRegister_items
 %type <std::vector<Parsers::AST_Node*>> scanInPort_items
@@ -2189,10 +2196,11 @@ bsdl_instr_refs : bsdl_instr_refs bsdl_instr_ref | bsdl_instr_ref ;
 bsdl_instr_ref : bsdl_instr_name LEFT_BRACE bsdl_instr_selected_items RIGHT_BRACE ;
 bsdl_instr_selected_items : bsdl_instr_selected_items bsdl_instr_selected_item | bsdl_instr_selected_item ;
 bsdl_instr_name : SCALAR_ID ;
-bsdl_instr_selected_item : SCANINTERFACE
-LEFT_BRACE accessLink1149_ScanInterface_names RIGHT_BRACE |
-ACTIVESIGNALS
-LEFT_BRACE accessLink1149_ActiveSignal_names RIGHT_BRACE  ;
+
+bsdl_instr_selected_item :
+  SCANINTERFACE LEFT_BRACE accessLink1149_ScanInterface_names RIGHT_BRACE
+| ACTIVESIGNALS LEFT_BRACE accessLink1149_ActiveSignal_names RIGHT_BRACE ;
+
 accessLink1149_ScanInterface_names : accessLink1149_ScanInterface_names accessLink1149_ScanInterface_name SEMICOLON | accessLink1149_ScanInterface_name SEMICOLON;
 accessLink1149_ActiveSignal_name : reg_port_signal_id ;
 accessLink1149_ActiveSignal_names : accessLink1149_ActiveSignal_names accessLink1149_ActiveSignal_name SEMICOLON | accessLink1149_ActiveSignal_name SEMICOLON;
@@ -2202,13 +2210,85 @@ accessLink1149_ScanInterface_name : instance_name | instance_name DOT scanInterf
 scanInterface_def : SCANINTERFACE scanInterface_name LEFT_BRACE scanInterface_items RIGHT_BRACE
 {
   // scanInterface_def : SCANINTERFACE scanInterface_name LEFT_BRACE scanInterface_items RIGHT_BRACE
-  $$ = nullptr;
+  auto& name       = $[scanInterface_name];
+  auto& children   = $[scanInterface_items];
+  auto  identifier = ast.Create_ScalarIdentifier(std::move(name));
+
+  auto  node = ast.Create_ScanInterface(identifier, std::move(children));
+
+  $$ = node;
 }
 ;
-scanInterface_items : scanInterface_items scanInterface_item | scanInterface_item ;
-scanInterface_name : SCALAR_ID;
-scanInterface_item : attribute_def | scanInterfacePort_def | defaultLoad_def | scanInterfaceChain_def ;
-scanInterfacePort_def : PORT reg_port_signal_id SEMICOLON;
+
+scanInterface_items :
+  scanInterface_item
+  {
+    // scanInterface_items : scanInterface_item
+    auto items = vector<Parsers::AST_Node*>();
+    auto item  = $[scanInterface_item];
+
+    if (item != nullptr)
+    {
+      items.push_back(item);
+    }
+
+    $$ = std::move(items);
+  }
+| scanInterface_items[lhs] scanInterface_item
+  {
+    // scanInterface_items : scanInterface_items[lhs] scanInterface_item
+    auto& items = $[lhs];
+    auto  item  = $[scanInterface_item];
+
+    if (item != nullptr)
+    {
+      items.push_back(item);
+    }
+
+    $$ = std::move(items);
+  }
+;
+
+scanInterface_name : SCALAR_ID
+{
+  // scanInterface_name : SCALAR_ID
+  auto& name = $[SCALAR_ID];
+
+  $$ = std::move(name);
+};
+
+scanInterface_item :
+  attribute_def
+  {
+    // scanInterface_item : attribute_def
+    $$ = $1;
+  }
+| scanInterfacePort_def
+  {
+    // scanInterface_item : scanInterfacePort_def
+    $$ = $1;
+  }
+| defaultLoad_def
+  {
+    // scanInterface_item : defaultLoad_def
+    $$ = nullptr;
+  }
+| scanInterfaceChain_def
+  {
+    // scanInterface_item : scanInterfaceChain_def
+    $$ = nullptr;
+  }
+;
+
+scanInterfacePort_def : PORT reg_port_signal_id SEMICOLON
+{
+  // scanInterfacePort_def : PORT reg_port_signal_id SEMICOLON
+  auto identifier = $[reg_port_signal_id];
+  auto node       = ast.Create_Port(Parsers::Kind::Port, identifier);
+
+  $$ = node;
+};
+
 scanInterfaceChain_def : CHAIN scanInterfaceChain_name LEFT_BRACE scanInterfaceChain_items RIGHT_BRACE ;
 scanInterfaceChain_items : scanInterfaceChain_items scanInterfaceChain_item | scanInterfaceChain_item ;
 scanInterfaceChain_name : SCALAR_ID;

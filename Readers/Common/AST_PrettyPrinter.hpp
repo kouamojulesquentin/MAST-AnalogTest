@@ -28,6 +28,7 @@ class AST_Instance;
 class AST_SimpleNode;
 class AST_NamedNode;
 class AST_ParentNode;
+class AST_ScanInterface;
 
 //! System model visitors for creation of a text, readable, and hierarchical
 //! representation of the system mode tree
@@ -40,13 +41,14 @@ class AST_PrettyPrinter final : public AST_Visitor
   virtual ~AST_PrettyPrinter() = default;
   AST_PrettyPrinter()  = default;
 
-  virtual void Visit_Instance     (AST_Instance*     instance)     override;
-  virtual void Visit_Network      (AST_Network*      network)      override;
-  virtual void Visit_Module       (AST_Module*       module)       override;
-  virtual void Visit_Port         (AST_Port*         port)         override;
-  virtual void Visit_ScanMux      (AST_ScanMux*      scanMux)      override;
-  virtual void Visit_ScanRegister (AST_ScanRegister* scanRegister) override;
-  virtual void Visit_Source       (AST_Source*       source)       override;
+  virtual void Visit_Instance      (AST_Instance*      instance)      override;
+  virtual void Visit_Network       (AST_Network*       network)       override;
+  virtual void Visit_Module        (AST_Module*        module)        override;
+  virtual void Visit_Port          (AST_Port*          port)          override;
+  virtual void Visit_ScanInterface (AST_ScanInterface* scanInterface) override;
+  virtual void Visit_ScanMux       (AST_ScanMux*       scanMux)       override;
+  virtual void Visit_ScanRegister  (AST_ScanRegister*  scanRegister)  override;
+  virtual void Visit_Source        (AST_Source*        source)        override;
 
   std::string PrettyPrint() const { return m_os.str(); } //!< Returns currently visited nodes representation
 

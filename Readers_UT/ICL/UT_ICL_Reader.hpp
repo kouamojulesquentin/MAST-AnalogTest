@@ -40,6 +40,7 @@ class UT_ICL_Reader : public CxxTest::TestSuite
   void test_UpdateAstFromIcl_attributes_value ();
   void test_UpdateAstFromIcl_attributes_strings ();
   void test_UpdateAstFromIcl_attributes_param_ref ();
+  void test_UpdateAstFromIcl_ScanInterface_InModuleDef ();
   void test_UpdateAstFromIcl_ScanMux_SIB ();
   void test_UpdateAstFromIcl_ScanMux_ValueList ();
   void test_UpdateAstFromIcl_Instance ();

@@ -54,49 +54,6 @@ class ICL_Reader_TSS : public ICL::ICL_Reader
   using ICL_Reader::UpdateAstFromIcl;
 };
 
-
-auto excerpt_Module_SReg_parameterized = "Module SReg\n"
-                                         "{\n"
-                                         "  Parameter     MSB = 7;\n"
-                                         "  ScanInPort    SI;\n"
-                                         "  ScanOutPort   SO { Source SR[0];}\n"
-                                         "  ShiftEnPort   SE;\n"
-                                         "  CaptureEnPort CE;\n"
-                                         "  UpdateEnPort  UE;\n"
-                                         "  SelectPort    SEL;\n"
-                                         "  ResetPort     RST;\n"
-                                         "  TCKPort       TCK;\n"
-                                         "  DataInPort    DI[$MSB:0];\n"
-                                         "  DataOutPort   DO[$MSB:0]  {Source   SR; }\n"
-                                         "  ScanInterface scan_client { Port SI; Port SO; Port SEL; }\n"
-                                         "  ScanRegister  SR[$MSB:0]\n"
-                                         "  {\n"
-                                         "    ScanInSource  SI;\n"
-                                         "    CaptureSource DI;\n"
-                                         "    ResetValue    'b0;\n"
-                                         "  }\n"
-                                         "}\n"s;
-
-auto excerpt_Module_SReg_8_bits = "Module SReg\n"
-                                  "{\n"
-                                  "  ScanInPort    SI;\n"
-                                  "  ScanOutPort   SO { Source SR[0];}\n"
-                                  "  ShiftEnPort   SE;\n"
-                                  "  CaptureEnPort CE;\n"
-                                  "  UpdateEnPort  UE;\n"
-                                  "  SelectPort    SEL;\n"
-                                  "  ResetPort     RST;\n"
-                                  "  TCKPort       TCK;\n"
-                                  "  DataInPort    DI[7:0];\n"
-                                  "  DataOutPort   DO[7:0]     {Source   SR; }\n"
-                                  "  ScanInterface scan_client { Port SI; Port SO; Port SEL; }\n"
-                                  "  ScanRegister  SR[7:0]\n"
-                                  "  {\n"
-                                  "    ScanInSource  SI;\n"
-                                  "    CaptureSource DI;\n"
-                                  "    ResetValue    8'b00000000;\n"
-                                  "  }\n"
-                                  "}\n"s;
 } // End of unnamed namespace
 
 //! Initializes tests (called for each test)
@@ -114,7 +71,26 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_1_ScanRegister ()
 {
   // ---------------- Setup
   //
-  istringstream excerpt(excerpt_Module_SReg_8_bits);
+  istringstream excerpt("Module SReg\n"
+                        "{\n"
+                        "  ScanInPort    SI;\n"
+                        "  ScanOutPort   SO { Source SR[0];}\n"
+                        "  ShiftEnPort   SE;\n"
+                        "  CaptureEnPort CE;\n"
+                        "  UpdateEnPort  UE;\n"
+                        "  SelectPort    SEL;\n"
+                        "  ResetPort     RST;\n"
+                        "  TCKPort       TCK;\n"
+                        "  DataInPort    DI[7:0];\n"
+                        "  DataOutPort   DO[7:0]     {Source   SR; }\n"
+                        "  ScanRegister  SR[7:0]\n"
+                        "  {\n"
+                        "    ScanInSource  SI;\n"
+                        "    CaptureSource DI;\n"
+                        "    ResetValue    8'b00000000;\n"
+                        "  }\n"
+                        "}\n"s);
+
 
   auto           sm = make_shared<SystemModel>();
   ICL_Reader_TSS sut(sm);
@@ -168,7 +144,6 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_3_ScanRegister ()
                              "TCKPort       TCK;\n"
                              "DataInPort    DI[7:0];\n"
                              "DataOutPort   DO[7:0] {Source SR_1; }\n"
-                             "ScanInterface scan_client { Port SI; Port SO; Port SEL; }\n"
                              "\n"
                              "ScanRegister SR_3[7:0] { ScanInSource SR_2[0];\n"
                              "                       CaptureSource DI;\n"
@@ -233,7 +208,26 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_value ()
 {
   // ---------------- Setup
   //
-  istringstream excerpt(excerpt_Module_SReg_parameterized);
+  istringstream excerpt("Module SReg\n"
+                        "{\n"
+                        "  Parameter     MSB = 7;\n"
+                        "  ScanInPort    SI;\n"
+                        "  ScanOutPort   SO { Source SR[0];}\n"
+                        "  ShiftEnPort   SE;\n"
+                        "  CaptureEnPort CE;\n"
+                        "  UpdateEnPort  UE;\n"
+                        "  SelectPort    SEL;\n"
+                        "  ResetPort     RST;\n"
+                        "  TCKPort       TCK;\n"
+                        "  DataInPort    DI[$MSB:0];\n"
+                        "  DataOutPort   DO[$MSB:0]  {Source   SR; }\n"
+                        "  ScanRegister  SR[$MSB:0]\n"
+                        "  {\n"
+                        "    ScanInSource  SI;\n"
+                        "    CaptureSource DI;\n"
+                        "    ResetValue    'b0;\n"
+                        "  }\n"
+                        "}\n"s);
 
   auto           sm = make_shared<SystemModel>();
   ICL_Reader_TSS sut(sm);
@@ -694,6 +688,52 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_param_ref ()
                                   "  {\n"
                                   "    ScanInSource SI;\n"
                                   "    ResetValue 'b0;\n"
+                                  "  }\n"
+                                  "}\n";
+
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
+  TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
+
+
+//! Checks ICL_Reader::ParseExcerpt() when parsing a ScanInterface definition (in a Module definition)
+//!
+void UT_ICL_Reader::test_UpdateAstFromIcl_ScanInterface_InModuleDef ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt("Module SReg\n"
+                        "{\n"
+                        "  ScanInterface scan_client { \n"
+                        "  Attribute Foo = 15; "
+                        "  Port SI; Port SO; Port SEL; }\n"
+                        "}\n"s);
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
+
+  auto expected_AST_PrettyPrint = "NameSpace;\n"
+                                  "Module SReg\n"
+                                  "{\n"
+                                  "  ScanInterface scan_client\n"
+                                  "  {\n"
+                                  "    Attribute Foo = 15;\n"
+                                  "    Port SI;\n"
+                                  "    Port SO;\n"
+                                  "    Port SEL;\n"
                                   "  }\n"
                                   "}\n";
 

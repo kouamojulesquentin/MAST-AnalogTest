@@ -37,6 +37,8 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_Signal.cpp
                                   AST_Source.hpp
                                   AST_Source.cpp
+                                  AST_ScanInterface.hpp
+                                  AST_ScanInterface.cpp
                                   AST_ScanMux.hpp
                                   AST_ScanMux.cpp
                                   AST_ScanMuxSelection.hpp

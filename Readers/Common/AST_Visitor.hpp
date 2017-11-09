@@ -19,9 +19,10 @@ class AST_Instance;
 class AST_Module;
 class AST_Network;
 class AST_Port;
-class AST_Source;
+class AST_ScanInterface;
 class AST_ScanMux;
 class AST_ScanRegister;
+class AST_Source;
 
 //! AST visitors interface
 //!
@@ -30,13 +31,14 @@ class AST_Visitor
   // ---------------- Public  Methods
   //
   public:
-  virtual void Visit_Instance     (AST_Instance*     instance) = 0;
-  virtual void Visit_Module       (AST_Module*       module) = 0;
-  virtual void Visit_Network      (AST_Network*      network) = 0;
-  virtual void Visit_ScanMux      (AST_ScanMux*      scanMux) = 0;
-  virtual void Visit_ScanRegister (AST_ScanRegister* scanRegister) = 0;
-  virtual void Visit_Port         (AST_Port*         port) = 0;
-  virtual void Visit_Source       (AST_Source*       source) = 0;
+  virtual void Visit_Instance      (AST_Instance*      instance) = 0;
+  virtual void Visit_Module        (AST_Module*        module) = 0;
+  virtual void Visit_Network       (AST_Network*       network) = 0;
+  virtual void Visit_ScanInterface (AST_ScanInterface* scanInterface) = 0;
+  virtual void Visit_ScanMux       (AST_ScanMux*       scanMux) = 0;
+  virtual void Visit_ScanRegister  (AST_ScanRegister*  scanRegister) = 0;
+  virtual void Visit_Port          (AST_Port*          port) = 0;
+  virtual void Visit_Source        (AST_Source*        source) = 0;
 
   // ---------------- Protected Methods
   //

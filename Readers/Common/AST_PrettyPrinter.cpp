@@ -21,6 +21,7 @@
 #include "AST_Network.hpp"
 #include "AST_Parameter.hpp"
 #include "AST_Port.hpp"
+#include "AST_ScanInterface.hpp"
 #include "AST_ScanMux.hpp"
 #include "AST_ScanMuxSelection.hpp"
 #include "AST_ScanRegister.hpp"
@@ -280,6 +281,24 @@ void AST_PrettyPrinter::Visit_Port (AST_Port* port)
 }
 //
 //  End of: AST_PrettyPrinter::Visit_Port
+//---------------------------------------------------------------------------
+
+
+
+//! Appends content of a ScanInterface node in text representation and visits
+//! sub-nodes
+void AST_PrettyPrinter::Visit_ScanInterface (AST_ScanInterface* scanInterface)
+{
+  StreamNodeHeader(scanInterface, "");
+
+  HierarchyInserter hierarchyInserter(*this);
+
+  StreamSimpleNodes (scanInterface->Attributes());
+
+  AcceptNodes       (scanInterface->Ports());
+}
+//
+//  End of: AST_PrettyPrinter::Visit_ScanInterface
 //---------------------------------------------------------------------------
 
 

@@ -21,6 +21,7 @@
 #include "AST_ParameterRef.hpp"
 #include "AST_Port.hpp"
 #include "AST_ScalarIdentifier.hpp"
+#include "AST_ScanInterface.hpp"
 #include "AST_ScanRegister.hpp"
 #include "AST_ScanMux.hpp"
 #include "AST_ScanMuxSelection.hpp"
@@ -181,7 +182,7 @@ AST_Parameter* AST::Create_LocalParameter (string&& name, vector<AST_SimpleNode*
 //! @param identifier   Module name
 //! @param children     Module children nodes
 //!
-AST_Module* AST::Create_Module (AST_ScalarIdentifier* identifier, vector<AST_Node*>&& children)
+AST_Module* AST::Create_Module (const AST_ScalarIdentifier* identifier, vector<AST_Node*>&& children)
 {
   CHECK_PARAMETER_NOT_NULL(identifier, "identifier must not be nullptr");
 
@@ -350,6 +351,23 @@ AST_ScanMux* AST::Create_ScanMux (AST_VectorIdentifier*           identifier,
 //
 //  End of: AST::Create_ScanMux
 //---------------------------------------------------------------------------
+
+
+//! Creates a Create_ScanInterface node
+//!
+//! @param identifier   Scan interface name
+//! @param children     Scan interface children nodes
+//!
+AST_ScanInterface* AST::Create_ScanInterface (const AST_ScalarIdentifier* identifier, vector<AST_Node*>&& children)
+{
+  CHECK_PARAMETER_NOT_NULL(identifier, "Scan interface identifier must not be nullptr");
+
+  return Create_Node<AST_ScanInterface>(identifier, std::move(children));
+}
+//
+//  End of: AST::Create_ScanInterface
+//---------------------------------------------------------------------------
+
 
 
 //! Creates an Create_ScanMuxSelection node

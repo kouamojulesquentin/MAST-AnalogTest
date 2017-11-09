@@ -74,10 +74,10 @@ class AST_Module final : public AST_ParentNode
   // ---------------- Private Methods
   //
   private:
-  friend class AST;                                                                             // This is AST that manages construction/destruction of AST nodes
-  MAKE_UNIQUE_AS_FRIEND(AST_Module)(Parsers::AST_ScalarIdentifier*&, std::vector<AST_Node*>&&); // AST currently uses make_unit<T>() to create nodes
+  friend class AST;   // This is AST that manages construction/destruction of AST nodes (it uses make_unit<T>() to create nodes)
+  MAKE_UNIQUE_AS_FRIEND(AST_Module)(const Parsers::AST_ScalarIdentifier*&, std::vector<AST_Node*>&&);
 
-  AST_Module(AST_ScalarIdentifier* identifier, std::vector<AST_Node*>&& children)
+  AST_Module(const AST_ScalarIdentifier* identifier, std::vector<AST_Node*>&& children)
     : AST_ParentNode (Kind::Module, std::move(children))
     , m_identifier   (identifier)
   {

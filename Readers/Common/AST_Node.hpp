@@ -27,6 +27,7 @@ namespace Parsers
   {
     Undefined,
 
+    AccessLink,       //!< For access link
     Alias,            //!< For alias definitions
     Attribute,        //!< For attribute definitions
     DefaultLoadValue, //!< For registers default load value
@@ -36,17 +37,19 @@ namespace Parsers
     InputPort,        //!< For input of instance input port
     InputPortSource,  //!< For input of instance input port source
     Instance,         //!< For modules instances
-    ModuleIdentifier, //!< For modules instances indentification
-    Module,           //!< For modules
     LocalParameter,   //!< For local parameters definitions
+    Module,           //!< For modules
+    ModuleIdentifier, //!< For modules instances indentification
     NameSpace,        //!< For namespace definitions and references
     Network,          //!< For complete test network
     Parameter,        //!< For parameters definitions
     Parameter_ref,    //!< For parameters references
+    Port,             //!< For ScanInterface Ports
     ResetValue,       //!< For registers reset value
     ScalarIdentifier, //!< For identifier with a without scope prefix and no bit nor range identifier
     ScanInPort,       //!< For modules scan input port
     ScanInSource,     //!< For input of scan registers
+    ScanInterface,    //!< For scan interfaces
     ScanMux,          //!< For scan multiplexers
     ScanMuxSelection, //!< For description of scan multiplexer selection
     ScanOutPort,      //!< For modules scan output port
@@ -77,6 +80,7 @@ namespace Parsers
 ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::Undefined)
 
+            ENUM_MEMBER(Parsers::Kind::AccessLink)
             ENUM_MEMBER(Parsers::Kind::Alias)
             ENUM_MEMBER(Parsers::Kind::Attribute)
             ENUM_MEMBER(Parsers::Kind::DefaultLoadValue)
@@ -86,20 +90,22 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::InputPort)
             ENUM_MEMBER(Parsers::Kind::InputPortSource)
             ENUM_MEMBER(Parsers::Kind::Instance)
-            ENUM_MEMBER(Parsers::Kind::ModuleIdentifier)
             ENUM_MEMBER(Parsers::Kind::LocalParameter)
             ENUM_MEMBER(Parsers::Kind::Module)
+            ENUM_MEMBER(Parsers::Kind::ModuleIdentifier)
             ENUM_MEMBER(Parsers::Kind::NameSpace)
             ENUM_MEMBER(Parsers::Kind::Network)
             ENUM_MEMBER(Parsers::Kind::Parameter)
             ENUM_MEMBER(Parsers::Kind::Parameter_ref)
+            ENUM_MEMBER(Parsers::Kind::Port)
             ENUM_MEMBER(Parsers::Kind::ResetValue)
             ENUM_MEMBER(Parsers::Kind::ScalarIdentifier)
             ENUM_MEMBER(Parsers::Kind::ScanInPort)
             ENUM_MEMBER(Parsers::Kind::ScanInSource)
-            ENUM_MEMBER(Parsers::Kind::ScanOutPort)
+            ENUM_MEMBER(Parsers::Kind::ScanInterface)
             ENUM_MEMBER(Parsers::Kind::ScanMux)
             ENUM_MEMBER(Parsers::Kind::ScanMuxSelection)
+            ENUM_MEMBER(Parsers::Kind::ScanOutPort)
             ENUM_MEMBER(Parsers::Kind::ScanRegister)
             ENUM_MEMBER(Parsers::Kind::Signal)
             ENUM_MEMBER(Parsers::Kind::Source)

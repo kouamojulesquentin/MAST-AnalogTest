@@ -32,6 +32,7 @@ class AST_Parameter;
 class AST_ParameterRef;
 class AST_Port;
 class AST_ScalarIdentifier;
+class AST_ScanInterface;
 class AST_ScanMux;
 class AST_ScanMuxSelection;
 class AST_ScanRegister;
@@ -79,7 +80,8 @@ class AST final
                                                      const AST_ModuleIdentifier* moduleIdentifier,
                                                      std::vector<AST_Node*>&&    children);
   AST_ModuleIdentifier*   Create_ModuleIdentifier   (const AST_Namespace* namespaceName, const AST_ScalarIdentifier* moduleName);
-  AST_Module*             Create_Module             (AST_ScalarIdentifier* identifier, std::vector<AST_Node*>&& children);
+  AST_Module*             Create_Module             (const AST_ScalarIdentifier* identifier, std::vector<AST_Node*>&& children);
+  AST_ScanInterface*      Create_ScanInterface      (const AST_ScalarIdentifier* identifier, std::vector<AST_Node*>&& children);
   AST_ScanRegister*       Create_ScanRegister       (AST_VectorIdentifier* identifier, std::vector<AST_Node*>&& children);
   AST_ScalarIdentifier*   Create_ScalarIdentifier   (std::experimental::string_view name);
   AST_VectorIdentifier*   Create_VectorIdentifier   (std::experimental::string_view name,

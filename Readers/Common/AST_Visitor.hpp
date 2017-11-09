@@ -15,6 +15,7 @@
 
 namespace Parsers
 {
+class AST_AccessLink;
 class AST_Instance;
 class AST_Module;
 class AST_Network;
@@ -31,6 +32,7 @@ class AST_Visitor
   // ---------------- Public  Methods
   //
   public:
+  virtual void Visit_AccessLink    (AST_AccessLink*    instance) = 0;
   virtual void Visit_Instance      (AST_Instance*      instance) = 0;
   virtual void Visit_Module        (AST_Module*        module) = 0;
   virtual void Visit_Network       (AST_Network*       network) = 0;

@@ -13,6 +13,7 @@
 
 #include "AST_PrettyPrinter.hpp"
 
+#include "AST_AccessLink.hpp"
 #include "AST_Attribute.hpp"
 #include "AST_Instance.hpp"
 #include "AST_Module.hpp"
@@ -139,6 +140,21 @@ void AST_PrettyPrinter::StreamSimpleNode(const AST_SimpleNode* node)
 //---------------------------------------------------------------------------
 
 
+//! Appends content of a AccessLink node in text representation and visits
+//! sub-nodes
+void AST_PrettyPrinter::Visit_AccessLink (AST_AccessLink* accessLink)
+{
+  StreamNodeHeader(accessLink, " Of ") << accessLink->TypeAsText();
+
+  HierarchyInserter hierarchyInserter(*this);
+
+  AcceptNodes (accessLink->UndispatchedChildren());
+}
+//
+//  End of: AST_PrettyPrinter::Visit_AccessLink
+//---------------------------------------------------------------------------
+
+
 //! Appends content of a Instance node in text representation and visits
 //! sub-nodes
 void AST_PrettyPrinter::Visit_Instance (AST_Instance* instance)
@@ -210,10 +226,15 @@ void AST_PrettyPrinter::Visit_Module (AST_Module* module)
   StreamSimpleNodes (module->Parameters());
   StreamSimpleNodes (module->LocalParameters());
 
-  AcceptNodes       (module->ScanInPorts());
-  AcceptNodes       (module->ScanOutPorts());
-  AcceptNodes       (module->UndispatchedChildren());
-  AcceptNodes       (module->ScanRegisters());
+  if (module->HasAccessLink())
+  {
+    AcceptNode (module->AccessLink());
+  }
+
+  AcceptNodes (module->ScanInPorts());
+  AcceptNodes (module->ScanOutPorts());
+  AcceptNodes (module->UndispatchedChildren());
+  AcceptNodes (module->ScanRegisters());
 }
 //
 //  End of: AST_PrettyPrinter::Visit_Module

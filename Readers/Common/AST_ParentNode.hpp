@@ -77,6 +77,14 @@ class AST_ParentNode : public AST_NamedNode
     child = nullptr;
   };
 
+  template<typename T>
+  static void SetChild(AST_Node*& child, T*& dest)
+  {
+    dest  = static_cast<T*>(child);
+    child = nullptr;
+  };
+
+
   // ---------------- Protected Fields
   //
   protected:

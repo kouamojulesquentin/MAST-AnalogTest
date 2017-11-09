@@ -17,17 +17,17 @@
 #include "AST_ParentNode.hpp"
 #include "AST_ScalarIdentifier.hpp"
 #include <memory>
-#include <experimental/string_view>
 #include <string>
 
 namespace Parsers
 {
+class AST_AccessLink;
 class AST_ScanRegister;
 class AST_Port;
 class AST_Parameter;
 class AST_Attribute;
 
-//! Represents a parsed test network, instiable, module
+//! Represents a Module
 //!
 class AST_Module final : public AST_ParentNode
 {
@@ -57,7 +57,6 @@ class AST_Module final : public AST_ParentNode
   //!
   const std::vector<AST_Attribute*>& Attributes() const { return m_attributes; }
 
-
   //! Returns scan registers defined in module
   //!
   const std::vector<AST_ScanRegister*>& ScanRegisters() const { return m_scanRegisters; }
@@ -69,6 +68,14 @@ class AST_Module final : public AST_ParentNode
   //! Returns module ScanOutPort
   //!
   const std::vector<AST_Port*>& ScanOutPorts() const { return m_scanOutPorts; }
+
+  //! Returns AccessLink or nullptr when none is defined
+  //!
+  AST_AccessLink* AccessLink() const { return m_accessLink; }
+
+  //! Returns whether module defines an AccessLink
+  //!
+  bool HasAccessLink() const { return m_accessLink != nullptr; }
 
 
   // ---------------- Private Methods
@@ -93,6 +100,7 @@ class AST_Module final : public AST_ParentNode
   //
   private:
   const AST_ScalarIdentifier*    m_identifier = nullptr; //!< Module name
+  AST_AccessLink*                m_accessLink = nullptr; //!< AccessLink: for top module (only one per network)
   std::vector<AST_Port*>         m_scanInPorts;          //!< Scan input port(s)
   std::vector<AST_Port*>         m_scanOutPorts;         //!< Scan output port(s)
   std::vector<AST_Parameter*>    m_parameters;           //!< Generic module  parameters

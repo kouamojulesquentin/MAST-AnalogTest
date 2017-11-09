@@ -58,6 +58,12 @@ void AST_Network::AddModule (const AST_Namespace* moduleNamespace, AST_Module* m
     LOG(WARNING) << "Replacing previously defined module: " << moduleNamespace->AsText() << moduleName;
   }
   previous = module;
+
+  if (module->HasAccessLink())
+  {
+    CHECK_VALUE_NULL(m_topModule, "Support only a single \"top\" module");
+    m_topModule = module;
+  }
 }
 //
 //  End of: AST_Network::AddModule

@@ -12,6 +12,7 @@
 //===========================================================================
 
 #include "AST_Module.hpp"
+#include "AST_AccessLink.hpp"
 #include "AST_Attribute.hpp"
 #include "AST_ScanRegister.hpp"
 #include "AST_Parameter.hpp"
@@ -35,25 +36,6 @@ void AST_Module::Accept (AST_Visitor& visitor)
 //!
 void AST_Module::DispatchChildren ()
 {
-//+  auto setChild = [](AST_Node*& child, auto& dest)
-//+  {
-//+    using t1 = decltype(dest);
-//+    using dest_t = typename std::remove_reference<t1>::type;
-
-//+    dest = static_cast<dest_t>(child);
-//+    child = nullptr;
-//+  };
-
-  auto appendChild = [](AST_Node*& child, auto& dest)
-  {
-    using t1 = decltype(dest);
-    using t2 = typename std::remove_reference<t1>::type;
-    using dest_t = typename t2::value_type;
-
-    dest.push_back(static_cast<dest_t>(child));
-    child = nullptr;
-  };
-
   for (auto& child : UndispatchedChildren())
   {
     if (child != nullptr)
@@ -61,22 +43,25 @@ void AST_Module::DispatchChildren ()
       switch (child->GetKind())
       {
         case Parsers::Kind::Attribute:
-          appendChild(child, m_attributes);
+          AST_ParentNode::AppendChild(child, m_attributes);
           break;
         case Parsers::Kind::LocalParameter :
-          appendChild(child, m_localParameters);
+          AST_ParentNode::AppendChild(child, m_localParameters);
           break;
         case Parsers::Kind::Parameter :
-          appendChild(child, m_parameters);
+          AST_ParentNode::AppendChild(child, m_parameters);
           break;
         case Parsers::Kind::ScanRegister :
-          appendChild(child, m_scanRegisters);
+          AST_ParentNode::AppendChild(child, m_scanRegisters);
           break;
         case Parsers::Kind::ScanInPort:
-          appendChild(child, m_scanInPorts);
+          AST_ParentNode::AppendChild(child, m_scanInPorts);
           break;
         case Parsers::Kind::ScanOutPort:
-          appendChild(child, m_scanOutPorts);
+          AST_ParentNode::AppendChild(child, m_scanOutPorts);
+          break;
+        case Parsers::Kind::AccessLink:
+          SetChild(child, m_accessLink);
           break;
         default:  // Ignore all other for now
           break;

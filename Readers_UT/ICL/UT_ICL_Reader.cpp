@@ -696,7 +696,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_param_ref ()
 }
 
 
-//! Checks ICL_Reader::ParseExcerpt() when parsing a ScanInterface definition (in a Module definition)
+//! Checks ICL_Reader::ParseExcerpt() when parsing a ScanInterface statement (in a Module statement)
 //!
 void UT_ICL_Reader::test_UpdateAstFromIcl_ScanInterface_InModuleDef ()
 {
@@ -1296,6 +1296,55 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_UseNamespace_Def_InsideModule ()
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
 }
 
+
+//! Checks ICL_Reader::ParseExcerpt() when parsing a AccessLink statement
+//!
+void UT_ICL_Reader::test_UpdateAstFromIcl_AccessLink_1149_2001 ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt("Module Top\n"
+                        "{\n"
+                        "  AccessLink dot1 Of STD_1149_1_2001 {\n"
+                        "    BSDLEntity chip2542;\n"
+                        "    ijtag_en { // Name of instruction\n"
+                        "      ScanInterface { InstPath.MyScanInterface; } // defines the selected ScanInterface\n"
+                        "    }\n"
+                        "  }\n"
+                        "}\n"s);
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
+
+  auto expected_AST_PrettyPrint = "NameSpace;\n"
+                                  "Module Top\n"
+                                  "{\n"
+                                  "  AccessLink dot1 Of STD_1149_1_2001\n"
+                                  "  {\n"
+//+ Ignored !                                 "    BSDLEntity chip2542;\n"
+//+                                  "    ijtag_en\n"
+//+                                  "    {\n"
+//+                                  "      ScanInterface { InstPath.MyScanInterface; }\n"
+//+                                  "    }\n"
+                                  "  }\n"
+                                  "}\n";
+
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
+  TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
 
 //===========================================================================
 // End of UT_ICL_Reader.cpp

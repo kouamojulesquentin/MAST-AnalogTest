@@ -12,6 +12,7 @@
 //===========================================================================
 
 #include "AST.hpp"
+#include "AST_AccessLink.hpp"
 #include "AST_Attribute.hpp"
 #include "AST_Instance.hpp"
 #include "AST_ModuleIdentifier.hpp"
@@ -58,6 +59,40 @@ AST::AST ()
   , m_instancesDefaultNamespace (m_rootNamespace)
 {
 }
+
+
+//! Creates a Create_AccessLink node
+//!
+//! @param identifier   Access Link name
+//! @param type         Type of Access Link
+//! @param children     Access Link children nodes
+//!
+AST_AccessLink* AST::Create_AccessLink (const AST_ScalarIdentifier* identifier, AccessLinkType type, vector<AST_Node*>&& children)
+{
+  CHECK_PARAMETER_NOT_NULL(identifier, "Access link identifier must not be nullptr");
+
+  return Create_Node<AST_AccessLink>(identifier, type, std::move(children));
+}
+//
+//  End of: AST::Create_AccessLink
+//---------------------------------------------------------------------------
+
+
+//! Creates a Create_AccessLink node
+//!
+//! @param identifier   Access Link name
+//! @param genericId    Generic access link identifier
+//!
+AST_AccessLink* AST::Create_AccessLink (const AST_ScalarIdentifier* identifier, const AST_ScalarIdentifier* genericId)
+{
+  CHECK_PARAMETER_NOT_NULL(identifier, "Access link identifier must not be nullptr");
+  CHECK_PARAMETER_NOT_NULL(genericId,  "Access link generic identifier must not be nullptr");
+
+  return Create_Node<AST_AccessLink>(identifier, genericId);
+}
+//
+//  End of: AST::Create_AccessLink
+//---------------------------------------------------------------------------
 
 
 //! Creates an AST_Attribute node

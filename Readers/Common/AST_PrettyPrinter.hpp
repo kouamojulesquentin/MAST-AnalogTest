@@ -23,6 +23,7 @@
 
 namespace Parsers
 {
+class AST_AccessLink;
 class AST_Node;
 class AST_Instance;
 class AST_SimpleNode;
@@ -41,6 +42,7 @@ class AST_PrettyPrinter final : public AST_Visitor
   virtual ~AST_PrettyPrinter() = default;
   AST_PrettyPrinter()  = default;
 
+  virtual void Visit_AccessLink    (AST_AccessLink*    instance)      override;
   virtual void Visit_Instance      (AST_Instance*      instance)      override;
   virtual void Visit_Network       (AST_Network*       network)       override;
   virtual void Visit_Module        (AST_Module*        module)        override;

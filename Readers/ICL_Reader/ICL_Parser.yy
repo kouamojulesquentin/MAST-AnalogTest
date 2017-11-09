@@ -33,6 +33,7 @@ namespace ICL
 namespace Parsers
 {
   class AST;
+  class AST_AccessLink;
   class AST_Attribute;
   class AST_Identifier;
   class AST_Instance;
@@ -54,6 +55,7 @@ namespace Parsers
   class AST_String;
   class AST_Value;
   class AST_VectorIdentifier;
+  enum class AccessLinkType;
 }
 
 using std::string;
@@ -84,6 +86,7 @@ typedef void* yyscan_t;
 #include "ParserException.hpp"
 
 #include "AST.hpp"
+#include "AST_AccessLink.hpp"
 #include "AST_Attribute.hpp"
 #include "AST_Instance.hpp"
 #include "AST_ModuleIdentifier.hpp"
@@ -193,10 +196,16 @@ namespace
 %type <std::string> scanInterface_name
 %type <std::string> parameter_name
 %type <std::string> attribute_name
+%type <std::string> accessLink_name
+%type <std::string> accessLink_genericID
+
+%type <Parsers::AccessLinkType>        accessLink1149_stds
 
 %type <Parsers::AST_ScalarIdentifier*> instance_name
 %type <Parsers::AST_ScalarIdentifier*> module_name
 %type <std::string>                    namespace_name
+
+
 
 %type <Parsers::AST_ModuleIdentifier*>                                                    module_identifier
 %type <std::vector<Parsers::AST_ScalarIdentifier*>>                                       scoped_instance_name
@@ -284,9 +293,9 @@ namespace
 %type <Parsers::AST_ScanRegister*>      scanRegister_def
 %type <Parsers::AST_ScanMux*>           scanMux_def
 %type <Parsers::AST_ScanInterface*>     scanInterface_def
-%type <Parsers::AST_Node*>              accessLink_def
-%type <Parsers::AST_Node*>              accessLinkGeneric_def
-%type <Parsers::AST_Node*>              accessLink1149_def
+%type <Parsers::AST_AccessLink*>        accessLink_def
+%type <Parsers::AST_AccessLink*>        accessLink1149_def
+%type <Parsers::AST_AccessLink*>        accessLinkGeneric_def
 %type <Parsers::AST_Node*>              alias_def
 %type <Parsers::AST_Node*>              clockMux_def
 %type <Parsers::AST_Node*>              dataMux_def
@@ -2173,24 +2182,74 @@ oneHotDataGroup_portSource ;
 oneHotDataGroup_portSource : PORT concat_data_signal SEMICOLON ;
 
 // 6.4.16
-accessLink_def : accessLink1149_def | accessLinkGeneric_def;
+accessLink_def :
+  accessLink1149_def
+  {
+    // accessLink_def : accessLink1149_def
+    $$ = $1;
+  }
+| accessLinkGeneric_def
+  {
+    // accessLink_def : accessLinkGeneric_def
+    $$ = $1;
+  }
+;
+
 accessLinkGeneric_def : ACCESSLINK accessLink_name OF accessLink_genericID  LEFT_BRACE RIGHT_BRACE
 {
   // accessLinkGeneric_def : ACCESSLINK accessLink_name OF accessLink_genericID  LEFT_BRACE RIGHT_BRACE
-  $$ = nullptr;
+  auto& name          = $[accessLink_name];
+  auto  genericId     = $[accessLink_genericID];
+  auto  nameNode      = ast.Create_ScalarIdentifier(name);
+  auto  genericIdNode = ast.Create_ScalarIdentifier(genericId);
+  auto  node          = ast.Create_AccessLink(nameNode, genericIdNode);
+
+  $$ = node;
 }
 ;
 
-accessLink_genericID : SCALAR_ID;
+accessLink_genericID : SCALAR_ID
+{
+  // accessLink_genericID : SCALAR_ID
+  auto& id = $[SCALAR_ID];
+  $$ = std::move(id);
+};
+
 accessLink1149_def : ACCESSLINK accessLink_name OF accessLink1149_stds LEFT_BRACE BSDLENTITIY bsdlEntity_name SEMICOLON bsdl_instr_refs RIGHT_BRACE
 {
   // accessLink1149_def : ACCESSLINK accessLink_name OF accessLink1149_stds LEFT_BRACE BSDLENTITIY bsdlEntity_name SEMICOLON bsdl_instr_refs RIGHT_BRACE
-  $$ = nullptr;
+  auto& name      = $[accessLink_name];
+  auto  nameId    = ast.Create_ScalarIdentifier(name);
+  auto  type      = $[accessLink1149_stds];
+  auto  children  = vector<Parsers::AST_Node*>();
+  auto  node      = ast.Create_AccessLink(nameId, type, std::move(children));
+
+  // bsdlEntity_name and optional bsdl_instr_refs are ignored!
+
+  $$ = node;
 }
 ;
 
-accessLink1149_stds : STD_1149_1_2001 | STD_1149_1_2013;
-accessLink_name : SCALAR_ID;
+accessLink1149_stds :
+  STD_1149_1_2001
+  {
+    // accessLink1149_stds : STD_1149_1_2001
+    $$ = Parsers::AccessLinkType::STD_1149_1_2001;
+  }
+| STD_1149_1_2013
+  {
+    // accessLink1149_stds : STD_1149_1_2013
+    $$ = Parsers::AccessLinkType::STD_1149_1_2013;
+  }
+;
+
+accessLink_name : SCALAR_ID
+{
+  // accessLink_name : SCALAR_ID
+  auto& name = $[SCALAR_ID];
+  $$ = std::move(name);
+};
+
 bsdlEntity_name : SCALAR_ID ;
 bsdl_instr_refs : bsdl_instr_refs bsdl_instr_ref | bsdl_instr_ref ;
 bsdl_instr_ref : bsdl_instr_name LEFT_BRACE bsdl_instr_selected_items RIGHT_BRACE ;

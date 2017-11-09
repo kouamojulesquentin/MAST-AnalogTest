@@ -42,7 +42,6 @@ class AST_Network final : public AST_Node
   //!
   void AddModule(const AST_Namespace* moduleNamespace, AST_Module* module);
 
-
   //! Returns namespaces for which some modules have been defined
   //!
   std::vector<const AST_Namespace*> NamespacesWithDefinedModules() const;
@@ -66,7 +65,8 @@ class AST_Network final : public AST_Node
   using NameToModuleMapper_t       = std::map<std::string,          AST_Module*>; // String is for module name is usefull for fast search of modules in the namespace
   using NamespaceToModulesMapper_t = std::map<const AST_Namespace*, NameToModuleMapper_t>;
 
-  NamespaceToModulesMapper_t m_modules;  //!< Network modules by namespace they are defined in
+  NamespaceToModulesMapper_t m_modules;             //!< Network modules by namespace they are defined in
+  AST_Module*                m_topModule = nullptr; //!< Top module (the one with an AccessLink)
 };
 //
 //  End of AST_Network class declaration

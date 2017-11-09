@@ -22,6 +22,7 @@
 
 namespace Parsers
 {
+class AST_AccessLink;
 class AST_Attribute;
 class AST_Identifier;
 class AST_Instance;
@@ -42,6 +43,7 @@ class AST_Source;
 class AST_String;
 class AST_Value;
 class AST_VectorIdentifier;
+enum class AccessLinkType;
 
 //! Abstract Syntax Tree built when parsing some test network description
 //!
@@ -53,6 +55,8 @@ class AST final
   ~AST();
   AST();
 
+  AST_AccessLink*         Create_AccessLink         (const AST_ScalarIdentifier* identifier, AccessLinkType type, std::vector<AST_Node*>&& children);
+  AST_AccessLink*         Create_AccessLink         (const AST_ScalarIdentifier* identifier, const AST_ScalarIdentifier* genericId);
   AST_Namespace*          Create_Namespace          (std::string&& name);
   AST_Attribute*          Create_Attribute          (std::string&& name);
   AST_Attribute*          Create_Attribute          (std::string&& name, std::string&& numbersValue);

@@ -126,7 +126,8 @@ if (${KISSFFT})
 endif()
 
 add_subdirectory(MastExample_CPP)
-add_subdirectory(Mast_UT)
+add_subdirectory(Mast_Core_UT)
+add_subdirectory(Mast_API_UT)
 add_subdirectory(Readers_UT)
 add_subdirectory(Optional_Libs_UT)
 

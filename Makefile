@@ -43,13 +43,15 @@ endif
 
 # ----------------- Defines exe names and paths
 #
-MAST_UT_EXE_NAME     := Mast_UT$(EXT)
-OPTIONAL_UT_EXE_NAME := Optionals_UT$(EXT)
-TESTCASES_EXE_NAME   := TestCasesApp$(EXT)
-CPP_EXAMPLE_EXE_NAME := MastExample_CPP$(EXT)
-READERS_UT_EXE_NAME  := Readers_UT$(EXT)
+MAST_CORE_UT_EXE_NAME := Mast_CORE_UT$(EXT)
+MAST_API_UT_EXE_NAME  := Mast_API_UT$(EXT)
+OPTIONAL_UT_EXE_NAME  := Optionals_UT$(EXT)
+TESTCASES_EXE_NAME    := TestCasesApp$(EXT)
+CPP_EXAMPLE_EXE_NAME  := MastExample_CPP$(EXT)
+READERS_UT_EXE_NAME   := Readers_UT$(EXT)
 
-MAST_UT_EXE_PATH      := $(BIN_DIR)$(SEP)$(MAST_UT_EXE_NAME)
+MAST_CORE_UT_EXE_PATH := $(BIN_DIR)$(SEP)$(MAST_CORE_UT_EXE_NAME)
+MAST_API_UT_EXE_PATH  := $(BIN_DIR)$(SEP)$(MAST_API_UT_EXE_NAME)
 OPTIONAL_UT_EXE_PATH  := $(BIN_DIR)$(SEP)$(OPTIONAL_UT_EXE_NAME)
 READERS_UT_EXE_PATH   := $(BIN_DIR)$(SEP)$(READERS_UT_EXE_NAME)
 TESTCASES_EXE_PATH    := $(BIN_DIR)$(SEP)$(TESTCASES_EXE_NAME)
@@ -162,13 +164,14 @@ ifeq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR)/$(BIN_DIR)/SIT)","")
 endif
 
 code_coverage_run: code_coverage_build
-ifeq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR)/$(BIN_DIR)/$(MAST_UT_EXE_NAME))","")
+ifeq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR)/$(BIN_DIR)/$(MAST_CORE_UT_EXE_NAME))","")
 > $(error     ==== No Mast UT available for Code Coverage ========)
 endif
 ifeq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR)/$(BIN_DIR)/$(READERS_UT_EXE_NAME))","")
 > $(error     ==== No Readers UT available for Code Coverage ========)
 endif
-> cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && $(RUN)$(MAST_UT_EXE_PATH)
+> cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && $(RUN)$(MAST_CORE_UT_EXE_PATH)
+> cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && $(RUN)$(MAST_API_UT_EXE_PATH)
 > cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && $(RUN)$(READERS_UT_EXE_PATH)
 
 CODE_COVERAGE_EXCLUDED      = --gcov-exclude=".*(SIT_reader.UnresolvedPathSelector.hpp).*"
@@ -224,19 +227,38 @@ test_debug:
 test_release:
 > cd $(CMAKE_RELEASE_BUILD_DIR) && ctest -j4 --output-on-failure
 
+run_all:         run_all_debug
+run_all_debug:   run_debug   run_api_debug   run_readers_ut_debug
+run_all_release: run_release run_api_release run_readers_ut_release
+
 run_debug:
-ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(MAST_UT_EXE_NAME))","")
->  cd $(CMAKE_DEBUG_BUILD_DIR) && $(RUN)$(MAST_UT_EXE_PATH)
+ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(MAST_CORE_UT_EXE_NAME))","")
+>  cd $(CMAKE_DEBUG_BUILD_DIR) && $(RUN)$(MAST_CORE_UT_EXE_PATH)
 else
->  @echo "    ==== No Debug Lib UT available ========"
+>  @echo "    ==== No Debug Mast Core UT available ========"
 endif
 
 run_release:
-ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(MAST_UT_EXE_NAME))","")
->  cd $(CMAKE_RELEASE_BUILD_DIR) && $(RUN)$(MAST_UT_EXE_PATH)
+ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(MAST_CORE_UT_EXE_NAME))","")
+>  cd $(CMAKE_RELEASE_BUILD_DIR) && $(RUN)$(MAST_CORE_UT_EXE_PATH)
 else
->  @echo "    ==== No Release Lib UT available ========"
+>  @echo "    ==== No Release Mast Core UT available ========"
 endif
+
+run_api_debug:
+ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(MAST_API_UT_EXE_NAME))","")
+>  cd $(CMAKE_DEBUG_BUILD_DIR) && $(RUN)$(MAST_API_UT_EXE_PATH)
+else
+>  @echo "    ==== No Debug Mast API UT available ========"
+endif
+
+run_api_release:
+ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(MAST_API_UT_EXE_NAME))","")
+>  cd $(CMAKE_RELEASE_BUILD_DIR) && $(RUN)$(MAST_API_UT_EXE_PATH)
+else
+>  @echo "    ==== No Release Mast API UT available ========"
+endif
+
 
 run_external_debug:
 ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(EXTERNAL_UT_EXE_NAME))","")
@@ -361,7 +383,8 @@ distclean: code_coverage_clean
 > cmake -E remove_directory $(CMAKE_RELEASE_BUILD_DIR)
 > cmake -E remove_directory $(CMAKE_ARM_BUILD_DIR)
 > cmake -E remove_directory $(CMAKE_RISCV32_BUILD_DIR)
-> cmake -E remove -f Mast_UT/Generated/Runner.cpp
+> cmake -E remove -f Mast_Core_UT/Generated/Runner.cpp
+> cmake -E remove -f Mast_API_UT/Generated/Runner.cpp
 > cmake -E remove -f Readers_UT/Generated/Runner.cpp
 > cmake -E remove -f External_Libs_UT/Generated/Runner.cpp
 > cmake -E remove -f Optional_Libs_UT/Generated/Runner.cpp
@@ -382,7 +405,6 @@ targets:
 > cmake -E echo code_coverage_report
 > cmake -E echo code_coverage_run
 > cmake -E echo debug
-> cmake -E echo debug_cmake
 > cmake -E echo distclean
 > cmake -E echo docs
 > cmake -E echo external_libs
@@ -394,12 +416,17 @@ targets:
 > cmake -E echo pack
 > cmake -E echo pack_debug
 > cmake -E echo release
-> cmake -E echo release_cmake
 > cmake -E echo riscV32
+> cmake -E echo run_all
+> cmake -E echo run_all_debug
+> cmake -E echo run_api_debug
+> cmake -E echo run_debug
 > cmake -E echo run_arm
 > cmake -E echo run_cpp_example_debug
 > cmake -E echo run_cpp_example_release
-> cmake -E echo run_debug
+> cmake -E echo run_all_release
+> cmake -E echo run_api_release
+> cmake -E echo run_release
 > cmake -E echo run_external_debug
 > cmake -E echo run_external_release
 > cmake -E echo run_optionals_debug
@@ -407,7 +434,6 @@ targets:
 > cmake -E echo run_readers
 > cmake -E echo run_readers_ut_debug
 > cmake -E echo run_readers_ut_release
-> cmake -E echo run_release
 > cmake -E echo run_testcases_release
 > cmake -E echo set_compiler
 > cmake -E echo test

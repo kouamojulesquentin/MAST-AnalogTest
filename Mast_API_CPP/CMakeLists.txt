@@ -43,3 +43,4 @@ message("=======================================================================
 message("")
 
 target_link_libraries(Mast_API_CPP Mast_Core SIT_Reader ICL_Reader Logger ${EXTRA_LIBS})
+target_include_directories(Mast_API_CPP PUBLIC include)

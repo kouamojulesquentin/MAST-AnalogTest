@@ -34,6 +34,9 @@ int main( int argc, char *argv[] )
     //
     auto logworker  = g3::LogWorker::createLogWorker();
 
+
+    // ---------------- Sink for capturing all messages in memory
+    //
     g3::UnitTestsLoggerSink::TSinkHandle sinkHandle = logworker->addSink(std::make_unique<g3::UnitTestsLoggerSink>(false), &g3::UnitTestsLoggerSink::ReceiveLogMessage);
     g3::UnitTestsLoggerSink::SetSinkHandle(sinkHandle);    // This is to allow g3log unit tests to have an access point to log at the end of the chain
 
@@ -44,7 +47,7 @@ int main( int argc, char *argv[] )
     logFormatter.ShowFunctionName(false);
     logFormatter.ShowLineNumber(false);
 
-    auto customSink = std::make_unique<g3::CustomFileSink>("Log.txt", g3::CustomFileSink::FlushMode::AutoBackground, logFormatter);
+    auto customSink = std::make_unique<g3::CustomFileSink>("Mast_Core_UT_Log.txt", g3::CustomFileSink::FlushMode::AutoBackground, logFormatter);
     customSink->Clear();
 
     auto customSinkHandle = logworker->addSink(std::move(customSink), &g3::CustomFileSink::ReceiveLogUnformattedMessage);
@@ -55,7 +58,7 @@ int main( int argc, char *argv[] )
 
     // ---------------- Start UT framework
     //
-    CxxTest::RealWorldDescription::_worldName = "Mast_Lib";
+    CxxTest::RealWorldDescription::_worldName = "Mast_Core";
 
     CxxTest::ErrorPrinter tmp;
 

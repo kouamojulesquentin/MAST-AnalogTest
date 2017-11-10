@@ -10,6 +10,27 @@ message("=======================================================================
 message(STATUS "Tests_Common: CXXTEST_INCLUDE_DIR:        ${CXXTEST_INCLUDE_DIR}")
 
 
+set(TRAITS            "${CMAKE_CURRENT_LIST_DIR}/CxxTest_Traits/BinaryVector_Traits.hpp"
+                      "${CMAKE_CURRENT_LIST_DIR}/CxxTest_Traits/Cpp_11_Traits.hpp"
+                      "${CMAKE_CURRENT_LIST_DIR}/CxxTest_Traits/IndexedRange_Traits.hpp"
+                      "${CMAKE_CURRENT_LIST_DIR}/CxxTest_Traits/Mast_Core_Enums_Traits.hpp"
+                      "${CMAKE_CURRENT_LIST_DIR}/CxxTest_Traits/Mast_Core_Traits.hpp"
+                      "${CMAKE_CURRENT_LIST_DIR}/CxxTest_Traits/SystemModelCheckResult_Traits.hpp")
+
+set(HELPERS_HEADERS  "${CMAKE_CURRENT_LIST_DIR}/SpiedProtocolsCommands.hpp"
+                     "${CMAKE_CURRENT_LIST_DIR}/Spy_AccessInterfaceProtocols.hpp"
+                     "${CMAKE_CURRENT_LIST_DIR}/Spy_I2C_Protocol.hpp"
+                     "${CMAKE_CURRENT_LIST_DIR}/Spy_STIL_Protocol.hpp"
+                     "${CMAKE_CURRENT_LIST_DIR}/Spy_SVF_Protocol.hpp")
+
+set(HELPERS_SOURCES  "${CMAKE_CURRENT_LIST_DIR}/Spy_AccessInterfaceProtocols.cpp"
+                     "${CMAKE_CURRENT_LIST_DIR}/Spy_I2C_Protocol.cpp"
+                     "${CMAKE_CURRENT_LIST_DIR}/Spy_STIL_Protocol.cpp"
+                     "${CMAKE_CURRENT_LIST_DIR}/Spy_SVF_Protocol.cpp"
+                     "${CMAKE_CURRENT_LIST_DIR}/TestUtilities.cpp"
+                     "${CMAKE_CURRENT_LIST_DIR}/TestModelBuilder.cpp" )
+
+
 set(TESTS_COMMON_LIBRARIES "Tests_Common" PARENT_SCOPE)
 
 if (WIN32)
@@ -18,10 +39,12 @@ else()
   set(PLATFORM_LIBS pthread)
 endif()
 
+set(HEADERS ${HELPERS_HEADERS} ${TRAITS})
+set(SOURCES ${HELPERS_SOURCES})
+
 # ---------------- Tests Commons Library
 #
-add_library           (Tests_Common  STATIC TestUtilities.cpp
-                                            TestModelBuilder.cpp)
+add_library                 (Tests_Common  STATIC ${SOURCES} ${HEADERS})
 
 target_compile_options      (Tests_Common PUBLIC  -fexceptions -std=c++14)
 target_compile_definitions  (Tests_Common PUBLIC  CXXTEST_HAVE_EH CXXTEST_HAVE_STD CXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION)

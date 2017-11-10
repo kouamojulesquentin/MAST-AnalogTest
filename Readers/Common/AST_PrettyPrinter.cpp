@@ -231,6 +231,7 @@ void AST_PrettyPrinter::Visit_Module (AST_Module* module)
     AcceptNode (module->AccessLink());
   }
 
+  AcceptNodes (module->ScanInterfaces());
   AcceptNodes (module->ScanInPorts());
   AcceptNodes (module->ScanOutPorts());
   AcceptNodes (module->UndispatchedChildren());

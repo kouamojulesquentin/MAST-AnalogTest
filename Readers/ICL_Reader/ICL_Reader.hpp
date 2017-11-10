@@ -21,7 +21,9 @@
 namespace mast
 {
   class SystemModel;
+  class SystemModelNode;
 }
+
 namespace Parsers
 {
   class AST;
@@ -31,17 +33,26 @@ namespace ICL
 {
 class ICL_Reader : public Parsers::Reader
 {
+  // ---------------- Public Methods
+  //
   public:
   virtual ~ICL_Reader();
   ICL_Reader() = delete;
   ICL_Reader(std::shared_ptr<mast::SystemModel> sm);
 
+  // ---------------- Protected Methods
+  //
   protected:
   virtual void Parse_Impl       (std::istream& stream) override;
   virtual void UpdateAstFromIcl (std::istream& stream);
 
   Parsers::AST* AST() const { return m_ast.get(); } //!< Returns current AST (for debug purpose)
 
+  virtual std::shared_ptr<mast::SystemModelNode> GenerateSystemModelNodes (Parsers::AST* ast);
+
+  // ---------------- Private Fields
+  //
+  private:
   std::unique_ptr<Parsers::AST>  m_ast;  //!< Instance member to be visible by unit tests (for debug purpose)
 };
 } // End of: namespace ICL

@@ -50,6 +50,10 @@ class AST_Network final : public AST_Node
   //!
   std::vector<AST_Module*> ModulesInNamespace(const AST_Namespace* modulesNamespace) const;
 
+  //! Returns top module (the one that has an AccessLink) or the first parsed module if none has an AccessLink
+  //!
+  AST_Module* TopModule() const { return m_topModule ? m_topModule : m_firstModule; }
+
   // ---------------- Private Methods
   //
   private:
@@ -65,8 +69,9 @@ class AST_Network final : public AST_Node
   using NameToModuleMapper_t       = std::map<std::string,          AST_Module*>; // String is for module name is usefull for fast search of modules in the namespace
   using NamespaceToModulesMapper_t = std::map<const AST_Namespace*, NameToModuleMapper_t>;
 
-  NamespaceToModulesMapper_t m_modules;             //!< Network modules by namespace they are defined in
-  AST_Module*                m_topModule = nullptr; //!< Top module (the one with an AccessLink)
+  NamespaceToModulesMapper_t m_modules;               //!< Network modules by namespace they are defined in
+  AST_Module*                m_topModule   = nullptr; //!< Top module (the one with an AccessLink)
+  AST_Module*                m_firstModule = nullptr; //!< In case of there is no module with an AccessLink, it will serve as top module
 };
 //
 //  End of AST_Network class declaration

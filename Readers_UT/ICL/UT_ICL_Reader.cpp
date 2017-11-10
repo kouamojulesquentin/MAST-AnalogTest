@@ -52,6 +52,7 @@ class ICL_Reader_TSS : public ICL::ICL_Reader
   ICL_Reader_TSS(std::shared_ptr<mast::SystemModel> sm) : ICL_Reader(sm) {  }
   using ICL_Reader::AST;
   using ICL_Reader::UpdateAstFromIcl;
+  using ICL_Reader::GenerateSystemModelNodes;
 };
 
 } // End of unnamed namespace
@@ -1344,6 +1345,43 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_AccessLink_1149_2001 ()
 
   auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
+
+
+//! Checks ICL_Reader::GenerateSystemModelNodes() when parsing a single ScanRegister
+//!
+void UT_ICL_Reader::test_GenerateSystemModelNodes_1_ScanRegister ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt("Module SReg\n"
+                        "{\n"
+                        "  ScanInPort    SI;\n"
+                        "  ScanOutPort   SO { Source SR[0];}\n"
+                        "  ScanRegister  SR[7:0]\n"
+                        "  {\n"
+                        "    ScanInSource  SI;\n"
+                        "    ResetValue    8'b00000000;\n"
+                        "  }\n"
+                        "}\n"s);
+
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  CxxTest::setAbortTestOnFail(true);
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+
+  // ---------------- Exercise
+  //
+  auto topNode = sut.GenerateSystemModelNodes(ast);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_NOT_NULLPTR (topNode);
+  TS_ASSERT_EQUALS      (topNode->Name(), "SReg");
 }
 
 //===========================================================================

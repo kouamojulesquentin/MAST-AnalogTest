@@ -617,7 +617,7 @@ integer_expr_lvl2_b : star_or_slash_or_percent integer_expr_lvl2
 
 star_or_slash_or_percent :
   STAR    { $$ = " * ";  /* star_or_slash_or_percent : STAR */}
-| SLASH   { $$ = " // "; /* star_or_slash_or_percent : SLASH*/}
+| SLASH   { $$ = " / "; /* star_or_slash_or_percent : SLASH*/}
 | PERCENT { $$ = " % ";  /* star_or_slash_or_percent : PERCENT*/}
 ;
 

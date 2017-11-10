@@ -22,6 +22,7 @@
 namespace Parsers
 {
 class AST_AccessLink;
+class AST_ScanInterface;
 class AST_ScanRegister;
 class AST_Port;
 class AST_Parameter;
@@ -57,15 +58,19 @@ class AST_Module final : public AST_ParentNode
   //!
   const std::vector<AST_Attribute*>& Attributes() const { return m_attributes; }
 
-  //! Returns scan registers defined in module
+  //! Returns module ScanInterface(s)
+  //!
+  const std::vector<AST_ScanInterface*>& ScanInterfaces() const { return m_scanInterfaces; }
+
+  //! Returns module ScanRegister(s)
   //!
   const std::vector<AST_ScanRegister*>& ScanRegisters() const { return m_scanRegisters; }
 
-  //! Returns module ScanInPort
+  //! Returns module ScanInPort(s)
   //!
   const std::vector<AST_Port*>& ScanInPorts() const { return m_scanInPorts; }
 
-  //! Returns module ScanOutPort
+  //! Returns module ScanOutPort(s)
   //!
   const std::vector<AST_Port*>& ScanOutPorts() const { return m_scanOutPorts; }
 
@@ -99,14 +104,15 @@ class AST_Module final : public AST_ParentNode
   // ---------------- Private Fields
   //
   private:
-  const AST_ScalarIdentifier*    m_identifier = nullptr; //!< Module name
-  AST_AccessLink*                m_accessLink = nullptr; //!< AccessLink: for top module (only one per network)
-  std::vector<AST_Port*>         m_scanInPorts;          //!< Scan input port(s)
-  std::vector<AST_Port*>         m_scanOutPorts;         //!< Scan output port(s)
-  std::vector<AST_Parameter*>    m_parameters;           //!< Generic module  parameters
-  std::vector<AST_Parameter*>    m_localParameters;      //!< Module local parameters
-  std::vector<AST_Attribute*>    m_attributes;           //!< Module attributes
-  std::vector<AST_ScanRegister*> m_scanRegisters;        //!< Scan registers defined in module
+  const AST_ScalarIdentifier*     m_identifier = nullptr; //!< Module name
+  AST_AccessLink*                 m_accessLink = nullptr; //!< AccessLink: for top module (only one per network)
+  std::vector<AST_Parameter*>     m_parameters;           //!< Generic module  parameters
+  std::vector<AST_Parameter*>     m_localParameters;      //!< Module local parameters
+  std::vector<AST_ScanInterface*> m_scanInterfaces;       //!< Scan interfaces
+  std::vector<AST_Port*>          m_scanInPorts;          //!< Scan input port(s)
+  std::vector<AST_Port*>          m_scanOutPorts;         //!< Scan output port(s)
+  std::vector<AST_Attribute*>     m_attributes;           //!< Module attributes
+  std::vector<AST_ScanRegister*>  m_scanRegisters;        //!< Scan registers defined in module
 };
 //
 //  End of AST_Module class declaration

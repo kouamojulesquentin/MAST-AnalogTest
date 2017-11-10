@@ -53,6 +53,10 @@ class AST_AccessLink final : public AST_ParentNode
   //!
   const AST_ScalarIdentifier* Identifier() const { return m_identifier; };
 
+  //! Returns generic AccessLink identifier (only valid for generic AccessLink)
+  //!
+  const AST_ScalarIdentifier* GenericIdentifier() const { return m_genericId; };
+
   //! Returns AccessLink type
   //!
   AccessLinkType Type() const { return m_type; }

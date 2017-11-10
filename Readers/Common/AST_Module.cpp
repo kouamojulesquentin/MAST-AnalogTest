@@ -14,6 +14,7 @@
 #include "AST_Module.hpp"
 #include "AST_AccessLink.hpp"
 #include "AST_Attribute.hpp"
+#include "AST_ScanInterface.hpp"
 #include "AST_ScanRegister.hpp"
 #include "AST_Parameter.hpp"
 #include "AST_Port.hpp"
@@ -42,27 +43,16 @@ void AST_Module::DispatchChildren ()
     {
       switch (child->GetKind())
       {
-        case Parsers::Kind::Attribute:
-          AST_ParentNode::AppendChild(child, m_attributes);
-          break;
-        case Parsers::Kind::LocalParameter :
-          AST_ParentNode::AppendChild(child, m_localParameters);
-          break;
-        case Parsers::Kind::Parameter :
-          AST_ParentNode::AppendChild(child, m_parameters);
-          break;
-        case Parsers::Kind::ScanRegister :
-          AST_ParentNode::AppendChild(child, m_scanRegisters);
-          break;
-        case Parsers::Kind::ScanInPort:
-          AST_ParentNode::AppendChild(child, m_scanInPorts);
-          break;
-        case Parsers::Kind::ScanOutPort:
-          AST_ParentNode::AppendChild(child, m_scanOutPorts);
-          break;
-        case Parsers::Kind::AccessLink:
-          SetChild(child, m_accessLink);
-          break;
+        case Parsers::Kind::Attribute:      AST_ParentNode::AppendChild(child, m_attributes);      break;
+        case Parsers::Kind::LocalParameter: AST_ParentNode::AppendChild(child, m_localParameters); break;
+        case Parsers::Kind::Parameter:      AST_ParentNode::AppendChild(child, m_parameters);      break;
+        case Parsers::Kind::ScanInterface:  AST_ParentNode::AppendChild(child, m_scanInterfaces);  break;
+        case Parsers::Kind::ScanInPort:     AST_ParentNode::AppendChild(child, m_scanInPorts);     break;
+        case Parsers::Kind::ScanOutPort:    AST_ParentNode::AppendChild(child, m_scanOutPorts);    break;
+        case Parsers::Kind::ScanRegister:   AST_ParentNode::AppendChild(child, m_scanRegisters);   break;
+
+        case Parsers::Kind::AccessLink :    SetChild(child, m_accessLink); break;
+
         default:  // Ignore all other for now
           break;
       }

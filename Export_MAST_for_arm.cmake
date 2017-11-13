@@ -38,11 +38,12 @@ install(DIRECTORY   ${CMAKE_SOURCE_DIR}/MastExample_CPP/SIT/
 
 get_filename_component(Gxx_PATH ${CMAKE_CXX_COMPILER} DIRECTORY)
 
-SET(CMAKE_FIND_ROOT_PATH /opt/Xilinx/petalinux/tools/linux-i386/gcc-arm-linux-gnueabi/bin)
+SET(CMAKE_ROOT_PATH /opt/Xilinx/petalinux/tools/linux-i386/gcc-arm-linux-gnueabi/bin)
 
- set (STD_LIBS_PATH "${CMAKE_FIND_ROOT_PATH}/../arm-linux-gnueabihf/libc/lib/")
+ set (STD_LIBS_PATH "${CMAKE_ROOT_PATH}/../arm-linux-gnueabihf/libc/lib/")
 
-message(STATUS "Export_ARM: Setting local STD_LIBS_PATH")
+message(STATUS "Export_ARM: CMAKE_ROOT_PATH  set to ${CMAKE_ROOT_PATH}")
+message(STATUS "Export_ARM: STD_LIBS_PATH  set to ${STD_LIBS_PATH}")
 
 install(FILES   ${STD_LIBS_PATH}libgcc_s.so.1 ${STD_LIBS_PATH}libstdc++.so.6.0.22 
         COMPONENT   ARM_Build

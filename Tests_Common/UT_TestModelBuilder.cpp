@@ -17,7 +17,7 @@
 #include "GmlPrinter.hpp"
 #include "PrettyPrinter.hpp"
 
-#include "SystemModelCheckResult_Traits.hpp"
+#include "CheckResult_Traits.hpp"
 
 #include <cxxtest/ValueTraits.h>
 
@@ -91,7 +91,7 @@ void UT_TestModelBuilder::test_Create_TestCase_AccessInterface ()
 
   // Check with SystemModel checker
   auto result = sm.Check();
-  TS_ASSERT_EQUALS (result, SystemModelCheckResult::None);
+  TS_ASSERT_EQUALS (result, CheckResult::None);
 
   // Check with GmlPrinter
   GmlPrinter printer("", GmlPrinterOptions::ShowSelectorWithEdge);
@@ -181,7 +181,7 @@ void UT_TestModelBuilder::test_Create_TestCase_MIB_4_Chains ()
 
   // With SystemModel checker
   auto result = sm.Check();
-  TS_ASSERT_EQUALS (result, SystemModelCheckResult::None);
+  TS_ASSERT_EQUALS (result, CheckResult::None);
 
   // Check with GmlPrinter
 
@@ -337,7 +337,7 @@ void UT_TestModelBuilder::test_Create_TestCase_1687 ()
 
   // With SystemModel checker
   auto result = sm.Check();
-  TS_ASSERT_EQUALS (result, SystemModelCheckResult::None);
+  TS_ASSERT_EQUALS (result, CheckResult::None);
 
   // Check with GmlPrinter
 
@@ -462,7 +462,7 @@ void UT_TestModelBuilder::test_Create_TestCase_1500_3_Chains ()
 
   // With SystemModel checker
   auto result = sm.Check();
-  TS_ASSERT_EQUALS (result, SystemModelCheckResult::None);
+  TS_ASSERT_EQUALS (result, CheckResult::None);
 
   // Check with GmlPrinter
 

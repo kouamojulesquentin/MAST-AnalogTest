@@ -15,7 +15,7 @@
   #define SYSTEMMODEL_H__A9ED8877_8B39_4480_2B8B_2E92C212179C__INCLUDED_
 
 #include "SystemModelNodes.hpp"
-#include "SystemModelCheckResult.hpp"
+#include "CheckResult.hpp"
 #include <memory>
 #include <vector>
 #include <experimental/string_view>
@@ -49,7 +49,7 @@ class MAST_CORE_EXPORT SystemModel
   //!   - Each linker has a number of chidren that matches its selector or an warning is issued when there are to few
   //!     children and an error when there are too much
   //!
-  SystemModelCheckResult Check() const;
+  CheckResult Check() const;
 
 
   //! Creates a new AccessInterface node

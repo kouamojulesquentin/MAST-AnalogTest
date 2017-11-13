@@ -15,7 +15,7 @@ set(TRAITS            "${CMAKE_CURRENT_LIST_DIR}/CxxTest_Traits/BinaryVector_Tra
                       "${CMAKE_CURRENT_LIST_DIR}/CxxTest_Traits/IndexedRange_Traits.hpp"
                       "${CMAKE_CURRENT_LIST_DIR}/CxxTest_Traits/Mast_Core_Enums_Traits.hpp"
                       "${CMAKE_CURRENT_LIST_DIR}/CxxTest_Traits/Mast_Core_Traits.hpp"
-                      "${CMAKE_CURRENT_LIST_DIR}/CxxTest_Traits/SystemModelCheckResult_Traits.hpp")
+                      "${CMAKE_CURRENT_LIST_DIR}/CxxTest_Traits/CheckResult_Traits.hpp")
 
 set(HELPERS_HEADERS  "${CMAKE_CURRENT_LIST_DIR}/SpiedProtocolsCommands.hpp"
                      "${CMAKE_CURRENT_LIST_DIR}/Spy_AccessInterfaceProtocols.hpp"

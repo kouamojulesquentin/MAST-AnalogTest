@@ -17,7 +17,7 @@
 
 #include "TestModelBuilder.hpp"
 #include "GmlPrinter.hpp"
-#include "SystemModelCheckResult_Traits.hpp"
+#include "CheckResult_Traits.hpp"
 
 #include <cxxtest/ValueTraits.h>
 

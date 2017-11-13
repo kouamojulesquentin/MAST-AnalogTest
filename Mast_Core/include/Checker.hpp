@@ -14,7 +14,7 @@
 #ifndef CHECKER_H__AF5E24EC_CA54_4DB4_54B6_4DAAC27D136B__INCLUDED_
   #define CHECKER_H__AF5E24EC_CA54_4DB4_54B6_4DAAC27D136B__INCLUDED_
 
-#include "SystemModelCheckResult.hpp"
+#include "CheckResult.hpp"
 
 #include <memory>
 #include <experimental/string_view>
@@ -35,11 +35,11 @@ class MAST_CORE_EXPORT Checker
 
   //! Runs assigned check
   //!
-  virtual SystemModelCheckResult Check() = 0;
+  virtual CheckResult Check() = 0;
 
-  //! Builds up a SystemModelCheckResult from currently detected issues
+  //! Builds up a CheckResult from currently detected issues
   //!
-  SystemModelCheckResult  MakeCheckResult();
+  CheckResult  MakeCheckResult();
 
   // ---------------- Protected Methods
   //

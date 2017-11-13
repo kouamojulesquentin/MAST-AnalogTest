@@ -19,7 +19,7 @@
 #include "Spy_AccessInterfaceProtocols.hpp"
 #include "TestModelBuilder.hpp"
 #include "GmlPrinter.hpp"
-#include "SystemModelCheckResult_Traits.hpp"
+#include "CheckResult_Traits.hpp"
 
 
 using std::string;
@@ -89,7 +89,7 @@ void UT_SystemModelChecker::test_CheckIdentifiers_With_EmptyModel ()
   //
   auto result = sut.MakeCheckResult();
   TS_ASSERT_FALSE  (result.HasIssues());
-  TS_ASSERT_EQUALS (result, SystemModelCheckResult::None);
+  TS_ASSERT_EQUALS (result, CheckResult::None);
 
   auto   report         = result.MakeReport();
   string expectedReport = "Errors   (0):\n"
@@ -121,7 +121,7 @@ void UT_SystemModelChecker::test_CheckIdentifiers_With_ModelWithTap ()
   //
   auto result = sut.MakeCheckResult();
   TS_ASSERT_FALSE  (result.HasIssues());
-  TS_ASSERT_EQUALS (result, SystemModelCheckResult::None);
+  TS_ASSERT_EQUALS (result, CheckResult::None);
 }
 
 
@@ -149,7 +149,7 @@ void UT_SystemModelChecker::test_CheckIdentifiers_With_UnusedIdentifier ()
   //
   auto result = sut.MakeCheckResult();
   TS_ASSERT_FALSE   (result.HasIssues());
-  TS_ASSERT_DIFFERS (result, SystemModelCheckResult::None);
+  TS_ASSERT_DIFFERS (result, CheckResult::None);
 
   auto   report         = result.MakeReport();
   string expectedReport = "Errors   (0):\n"
@@ -213,7 +213,7 @@ void UT_SystemModelChecker::test_CheckTree_With_ModelWithTap ()
   //
   auto result = sut.MakeCheckResult();
   TS_ASSERT_FALSE  (result.HasIssues());
-  TS_ASSERT_EQUALS (result, SystemModelCheckResult::None);
+  TS_ASSERT_EQUALS (result, CheckResult::None);
 }
 
 

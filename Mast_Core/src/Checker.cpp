@@ -24,11 +24,11 @@ using std::dynamic_pointer_cast;
 //+using std::set;
 using std::ostringstream;
 
-//! Builds up a SystemModelCheckResult from currently selected issues
+//! Builds up a CheckResult from currently selected issues
 //!
-SystemModelCheckResult Checker::MakeCheckResult ()
+CheckResult Checker::MakeCheckResult ()
 {
-  SystemModelCheckResult result;
+  CheckResult result;
 
   result.errors        = m_errors.str();
   result.warnings      = m_warnings.str();

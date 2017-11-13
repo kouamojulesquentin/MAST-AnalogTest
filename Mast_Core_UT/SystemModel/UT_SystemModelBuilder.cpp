@@ -29,7 +29,7 @@
 
 
 #include "BinaryVector_Traits.hpp"
-#include "SystemModelCheckResult_Traits.hpp"
+#include "CheckResult_Traits.hpp"
 
 #include <memory>
 #include <experimental/string_view>

@@ -1,20 +1,18 @@
 //===========================================================================
-//                           SystemModelCheckResult.hpp
+//                           CheckResult.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file SystemModelCheckResult.hpp
+//! @file CheckResult.hpp
 //!
-//! Declares SystemModelCheckResult class
+//! Declares CheckResult class
 //!
 //===========================================================================
 
-
-#ifndef SYSTEMMODELCHECKRESULT_H__FFBEA6CE_417E_43A0_32B5_EA2A1A0AF395__INCLUDED_
-  #define SYSTEMMODELCHECKRESULT_H__FFBEA6CE_417E_43A0_32B5_EA2A1A0AF395__INCLUDED_
-
+#ifndef CHECKRESULT_H__D455A6A2_7741_4A12_A385_9BADE5D4E30__INCLUDED_
+  #define CHECKRESULT_H__D455A6A2_7741_4A12_A385_9BADE5D4E30__INCLUDED_
 #include "Mast_Core_export.hpp"
 
 #include <string>
@@ -26,19 +24,19 @@ namespace mast
 {
 //! Collects warning and error while SystemModel is being checked
 //!
-class MAST_CORE_EXPORT SystemModelCheckResult final
+class MAST_CORE_EXPORT CheckResult final
 {
   public:
-  ~SystemModelCheckResult() = default;
-  SystemModelCheckResult()  = default;
+  ~CheckResult() = default;
+  CheckResult()  = default;
 
   //! Merges other results into this
   //!
-  void Merge(const SystemModelCheckResult& other);
+  void Merge(const CheckResult& other);
 
-  //! Returns true when it equals to another SystemModelCheckResult
+  //! Returns true when it equals to another CheckResult
   //!
-  bool operator==(const SystemModelCheckResult& rhs) const
+  bool operator==(const CheckResult& rhs) const
   {
     return    (infosCount    == rhs.infosCount)
            && (warningsCount == rhs.warningsCount)
@@ -48,9 +46,9 @@ class MAST_CORE_EXPORT SystemModelCheckResult final
            && (errors        == rhs.errors);
   }
 
-  //! Returns true when it differs from another SystemModelCheckResult
+  //! Returns true when it differs from another CheckResult
   //!
-  bool operator!=(const SystemModelCheckResult& rhs) const
+  bool operator!=(const CheckResult& rhs) const
   {
     return !operator==(rhs);
   }
@@ -64,7 +62,7 @@ class MAST_CORE_EXPORT SystemModelCheckResult final
   std::string IssuesReport()           const; //!< Returns a string representing the check result only when there are issues
   std::string InformativeReport()      const; //!< Returns a string representing the check result only when there is something to report
 
-  static const SystemModelCheckResult None; //!< Instance to compare for no error (very useful in unit tests along with traits to show the issues)
+  static const CheckResult None; //!< Instance to compare for no error (very useful in unit tests along with traits to show the issues)
 
   uint32_t    infosCount    = 0; //!< Total number of collected info messages
   uint32_t    warningsCount = 0; //!< Total number of collected warnings messages
@@ -74,15 +72,13 @@ class MAST_CORE_EXPORT SystemModelCheckResult final
   std::string errors;            //!< Collected errors
 };
 //
-//  End of SystemModelCheckResult class declaration
+//  End of CheckResult class declaration
 //---------------------------------------------------------------------------
 } // End of namespace mast
 
 
-
-
-#endif  // not defined SYSTEMMODELCHECKRESULT_H__FFBEA6CE_417E_43A0_32B5_EA2A1A0AF395__INCLUDED_
+#endif  // not defined CHECKRESULT_H__D455A6A2_7741_4A12_A385_9BADE5D4E30__INCLUDED_
 
 //===========================================================================
-// End of SystemModelCheckResult.hpp
+// End of CheckResult.hpp
 //===========================================================================

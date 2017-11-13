@@ -19,7 +19,7 @@
 #include "Mast_Core_Enums_Traits.hpp"
 #include "BinaryVector_Traits.hpp"
 #include "IndexedRange_Traits.hpp"
-#include "SystemModelCheckResult_Traits.hpp"
+#include "CheckResult_Traits.hpp"
 
 #endif  // not defined MAST_CORE_TRAITS_H__D5832FFA_3D66_46E6_D6B0_DD0AFDDB868D__INCLUDED_
 //===========================================================================

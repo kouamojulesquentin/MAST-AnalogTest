@@ -1,17 +1,17 @@
 //===========================================================================
-//                           SystemModelCheckResult.cpp
+//                           CheckResult.cpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file SystemModelCheckResult.cpp
+//! @file CheckResult.cpp
 //!
-//! Implements class SystemModelCheckResult
+//! Implements class CheckResult
 //!
 //===========================================================================
 
-#include "SystemModelCheckResult.hpp"
+#include "CheckResult.hpp"
 #include <experimental/string_view>
 
 using std::string;
@@ -19,13 +19,13 @@ using std::experimental::string_view;
 using std::ostringstream;
 using namespace mast;
 
-const SystemModelCheckResult SystemModelCheckResult::None;  // This is to compare with something that represent no errors
+const CheckResult CheckResult::None;  // This is to compare with something that represent no errors
 
 
 //! Returns a string representing the check result only when there is something to report
 //!
 //! @note This is useful for unit test for comparing with empty string
-string SystemModelCheckResult::InformativeReport () const
+string CheckResult::InformativeReport () const
 {
   if (   (infosCount    != 0)
       || (warningsCount != 0)
@@ -38,7 +38,7 @@ string SystemModelCheckResult::InformativeReport () const
   return string();
 }
 //
-//  End of: SystemModelCheckResult::InformativeReport
+//  End of: CheckResult::InformativeReport
 //---------------------------------------------------------------------------
 
 
@@ -46,7 +46,7 @@ string SystemModelCheckResult::InformativeReport () const
 //! Returns a string representing the check result only when there are issues
 //!
 //! @note This is useful for unit test for comparing with empty string
-string SystemModelCheckResult::IssuesReport () const
+string CheckResult::IssuesReport () const
 {
   if (HasIssues())
   {
@@ -56,12 +56,12 @@ string SystemModelCheckResult::IssuesReport () const
   return string();
 }
 //
-//  End of: SystemModelCheckResult::IssuesReport
+//  End of: CheckResult::IssuesReport
 //---------------------------------------------------------------------------
 
 //! Returns a string representing only error that stands on a single line when there is just one error
 //!
-string SystemModelCheckResult::MakeCompactErrorReport() const
+string CheckResult::MakeCompactErrorReport() const
 {
   ostringstream os;
 
@@ -84,7 +84,7 @@ string SystemModelCheckResult::MakeCompactErrorReport() const
 
 //! Returns a string representing the check result
 //!
-string SystemModelCheckResult::MakeReport() const
+string CheckResult::MakeReport() const
 {
   ostringstream os;
 
@@ -109,7 +109,7 @@ string SystemModelCheckResult::MakeReport() const
 
 //! Merges other results into this
 //!
-void SystemModelCheckResult::Merge (const SystemModelCheckResult& other)
+void CheckResult::Merge (const CheckResult& other)
 {
   infosCount    += other.infosCount;
   warningsCount += other.warningsCount;
@@ -120,11 +120,11 @@ void SystemModelCheckResult::Merge (const SystemModelCheckResult& other)
   if (!other.errors.empty())   errors.append   ("\n").append(other.errors);
 }
 //
-//  End of: SystemModelCheckResult::Merge
+//  End of: CheckResult::Merge
 //---------------------------------------------------------------------------
 
 
 
 //===========================================================================
-// End of SystemModelCheckResult.cpp
+// End of CheckResult.cpp
 //===========================================================================

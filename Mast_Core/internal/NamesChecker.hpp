@@ -39,11 +39,11 @@ class MAST_CORE_EXPORT NamesChecker final : public Checker
 
   //! Checks SystemModelNodes name consistency
   //!
-  static SystemModelCheckResult Check(std::shared_ptr<ParentNode> root) { return NamesChecker(root).Check(); };
+  static CheckResult Check(std::shared_ptr<ParentNode> root) { return NamesChecker(root).Check(); };
 
   //! Checks SystemModelNodes name consistency
   //!
-  virtual SystemModelCheckResult Check() override;
+  virtual CheckResult Check() override;
 
   // ---------------- Private  Methods
   //

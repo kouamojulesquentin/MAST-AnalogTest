@@ -22,11 +22,9 @@
 
 namespace mast
 {
-class SystemModelNode;
-
 //! Abstract class for checking stuff
 //!
-class MAST_CORE_EXPORT Checker
+class Checker
 {
   // ---------------- Public  Methods
   //
@@ -52,12 +50,6 @@ class MAST_CORE_EXPORT Checker
   void ReportWarning (string_view message) { Report(message, m_warningsCount, m_warnings); }
   void ReportError   (string_view message) { Report(message, m_errorsCount,   m_errors);   }
 
-  void ReportInfo    (const SystemModelNode& node, string_view message);
-  void ReportWarning (const SystemModelNode& node, string_view message);
-  void ReportError   (const SystemModelNode& node, string_view message);
-
-  static std::ostringstream& Stream(std::ostringstream& os, string_view header, const SystemModelNode& node);
-  static std::ostringstream& Stream(std::ostringstream& os, const SystemModelNode& node) { return Stream(os, "", node); }
 
   uint32_t InfosCount()   const { return m_infosCount;    }
   uint32_t WarningCount() const { return m_warningsCount; }

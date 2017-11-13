@@ -18,7 +18,7 @@
 #include "CheckResult.hpp"
 #include "SystemModelVisitor.hpp"
 #include "SystemModel.hpp"
-#include "Checker.hpp"
+#include "SystemModelCheckerBase.hpp"
 
 #include <memory>
 #include <vector>
@@ -30,7 +30,7 @@ namespace mast
 //!
 //! @note This is intended to be used by SystemModel::Check()
 //!
-class MAST_CORE_EXPORT SystemModelChecker final : public Checker, public SystemModelVisitor
+class SystemModelChecker final : public SystemModelCheckerBase, public SystemModelVisitor
 {
   // ---------------- Public  Methods
   //

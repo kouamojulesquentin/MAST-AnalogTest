@@ -20,6 +20,7 @@
 #include <vector>
 #include <string>
 #include <experimental/string_view>
+#include <tuple>
 #include <type_traits>    // For enum item manipulation
 #include <chrono>
 
@@ -74,6 +75,14 @@ class MAST_CORE_EXPORT Utility final
   //! Returns whether some text start with some sub-string
   //!
   static bool StartsWith (std::experimental::string_view text, std::experimental::string_view substring);
+
+  //! Parses the beginning of a text as an unsigned integer value
+  //!
+  static std::tuple<uint32_t, size_t> ToUInt32 (std::experimental::string_view text);
+
+  //! Returns whether some text constains some character
+  //!
+  static bool Contains (std::experimental::string_view text, char aChar) { return text.find(aChar) != std::experimental::string_view::npos; }
 
   //! Trims both leading and trailing space characters (including \\t)
   //!
@@ -138,49 +147,6 @@ inline std::string& operator+=(std::string& lhs, std::experimental::string_view 
 //!
 //! @return A string with the concatenation
 inline std::string operator+(std::experimental::string_view lhs, const std::string& rhs) { return std::string(lhs.cbegin(), lhs.cend()).append(rhs); }
-
-//! Combines enum flags (bitwise or)
-//!
-template<typename ENUM_T>
-constexpr ENUM_T operator | (ENUM_T X, ENUM_T Y)
-{
-  return static_cast<ENUM_T>(  static_cast<std::underlying_type_t<ENUM_T>>(X)
-                             | static_cast<std::underlying_type_t<ENUM_T>>(Y)
-                            );
-}
-
-
-//! Combines enum flags type enum items in place (bitwise or)
-//!
-template<typename ENUM_T>
-ENUM_T& operator |= (ENUM_T& X, ENUM_T Y)
-{
-  auto result = static_cast<ENUM_T>(  static_cast<std::underlying_type_t<ENUM_T>>(X)
-                                    | static_cast<std::underlying_type_t<ENUM_T>>(Y)
-                                   );
-  X = result;
-  return X;
-}
-
-//! Forces an enum value (casting away enum type)
-//!
-template<typename ENUM_T>
-ENUM_T& ForceValue(ENUM_T& X, int value)
-{
-  X = static_cast<ENUM_T>(static_cast<std::underlying_type_t<ENUM_T>>(value));
-  return X;
-}
-
-
-//! Tests of flag type enum item
-//!
-template<typename ENUM_T>
-constexpr bool IsSet(ENUM_T value, ENUM_T flags)
-{
-  return (    static_cast<std::underlying_type_t<ENUM_T>>(value)
-            & static_cast<std::underlying_type_t<ENUM_T>>(flags)
-         ) == static_cast<std::underlying_type_t<ENUM_T>>(flags);
-}
 
 
 //! Helper class to set a value for current scope and restore it at scope exit
@@ -376,7 +342,7 @@ T CheckValueIsNotZero(const char* file, const char* function, int line, T value,
 //!
 //! @return given value if not zero
 template<typename T>
-T CheckValueCondition(const char* file, const char* function, int line, T value, bool conditionMet, std::experimental::string_view  msg)
+const T& CheckValueCondition(const char* file, const char* function, int line, const T& value, bool conditionMet, std::experimental::string_view  msg)
 {
   if (!conditionMet)
   {
@@ -400,6 +366,7 @@ bool InRange(const T& val, const U& minVal, const V& maxVal) { return (val >= mi
 #define CHECK_PARAMETER_GTE(val, minVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (val >= minVal), msg)
 #define CHECK_PARAMETER_LT(val,  maxVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (val <  maxVal), msg)
 #define CHECK_PARAMETER_LTE(val, maxVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (val <= maxVal), msg)
+#define CHECK_PARAMETER_FALSE(val,       msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), !(bool)(val),    msg)
 #define CHECK_PARAMETER_TRUE(val,        msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (bool)(val),     msg)
 #define CHECK_PARAMETER_RANGE(val, minVal, maxVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), InRange((val), (minVal), (maxVal)), msg)
 
@@ -416,7 +383,8 @@ bool InRange(const T& val, const U& minVal, const V& maxVal) { return (val >= mi
 #define CHECK_VALUE_LTE(val, maxVal, msg) CheckValueCondition (__FILE__, __func__, __LINE__, (val), (val <= maxVal), msg)
 #define CHECK_VALUE_RANGE(val, minVal, maxVal, msg) CheckValueCondition (__FILE__, __func__, __LINE__, (val), InRange((val), (minVal), (maxVal)), msg)
 
-#define CHECK_TRUE(expr, msg) if (!(expr))  throw std::runtime_error(mast::Utility::MakeExceptionMessage(__FILE__, __func__, __LINE__, "std::runtime_error", msg))
+#define CHECK_FALSE(expr, msg) if ( (expr)) throw std::runtime_error(mast::Utility::MakeExceptionMessage(__FILE__, __func__, __LINE__, "std::runtime_error", msg))
+#define CHECK_TRUE(expr, msg)  if (!(expr)) throw std::runtime_error(mast::Utility::MakeExceptionMessage(__FILE__, __func__, __LINE__, "std::runtime_error", msg))
 #define CHECK_FAILED(msg)                   throw std::runtime_error(mast::Utility::MakeExceptionMessage(__FILE__, __func__, __LINE__, "std::runtime_error", msg))
 
 #define CHECK_FILE_EXISTS(filePath)         CHECK_TRUE(mast::Utility::FileExists(filePath), std::string("File: '") + filePath + "' does not exist (or cannot be opened)")

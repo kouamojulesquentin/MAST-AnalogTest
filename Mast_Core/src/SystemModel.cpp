@@ -39,7 +39,7 @@ using std::experimental::string_view;
 //!   - Each linker has a number of chidren that matches its selector or an warning is issued when there are to few
 //!     children and an error when there are too much
 //!
-SystemModelCheckResult SystemModel::Check () const
+CheckResult SystemModel::Check () const
 {
   SystemModelChecker checker(*this);
 

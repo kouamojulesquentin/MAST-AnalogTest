@@ -1,0 +1,7 @@
+JTAG_TAP TAP Loopback 6 2
+PDL Incr
+(
+  INSTANCE Inst_1 OF UT_ModelBuildDriver_Sub_2.sit
+  INSTANCE Inst_2 OF Sub/UT_ModelBuildDriver_with_error.sit
+)
+

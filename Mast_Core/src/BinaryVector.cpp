@@ -13,10 +13,12 @@
 
 #include "BinaryVector.hpp"
 #include "Utility.hpp"
+#include "g3log/g3log.hpp"
 #include <sstream>
 #include <array>
 #include <algorithm>
 #include <cstring>
+#include <tuple>
 
 
 using std::array;
@@ -26,6 +28,8 @@ using std::ostringstream;
 using std::string;
 using std::to_string;
 using std::experimental::string_view;
+using std::make_tuple;
+using std::tie;
 
 using namespace std::string_literals;
 using namespace mast;
@@ -38,6 +42,23 @@ using namespace mast;
 
 namespace
 {
+  //! Reports how a value is encoded within a string
+  //!
+  struct EncodingInfo
+  {
+    NumberBase base      = NumberBase::Undefined;
+    bool       inverted  = false;
+    uint32_t   bitsCount = 0; //!< Value 0 means unspecified
+
+    EncodingInfo(NumberBase p_base = NumberBase::Undefined, bool p_inverted = false, uint32_t p_bitsCount = 0)
+      : base      (p_base)
+      , inverted  (p_inverted)
+      , bitsCount (p_bitsCount)
+    {
+    }
+  };
+
+
   //! Defines a mask to keep most significant bits of a uint8_t
   //!
   constexpr uint8_t LEFT_BITS_MASK_8[] =
@@ -51,6 +72,22 @@ namespace
     0b11111100, // 6 bits
     0b11111110, // 7 bits
     0b11111111, // 8 bits
+  };
+
+
+  //! Defines a mask to clear most significant bits of a uint8_t (keeping lsb)
+  //!
+  constexpr uint8_t LEFT_BITS_CLEAR_MASK_8[] =
+  {
+    0b11111111, // 0 bits
+    0b01111111, // 1 bits
+    0b00111111, // 2 bits
+    0b00011111, // 3 bits
+    0b00001111, // 4 bits
+    0b00000111, // 5 bits
+    0b00000011, // 6 bits
+    0b00000001, // 7 bits
+    0b00000000, // 8 bits
   };
 
   //! Defines a mask to least most significant bits of a uint8_t
@@ -111,7 +148,79 @@ namespace
     "1110",  // 14
     "1111",  // 15
   };
+
+  constexpr std::array<uint64_t, 65> MAX_UNSIGNED_VALUE_FOR_BITS_COUNT =
+  {
+    0x0000000000000000, // 00 bits
+    0x0000000000000001, // 01 bits
+    0x0000000000000003, // 02 bits
+    0x0000000000000007, // 03 bits
+    0x000000000000000f, // 04 bits
+    0x000000000000001f, // 05 bits
+    0x000000000000003f, // 06 bits
+    0x000000000000007f, // 07 bits
+    0x00000000000000ff, // 08 bits
+    0x00000000000001ff, // 09 bits
+    0x00000000000003ff, // 10 bits
+    0x00000000000007ff, // 11 bits
+    0x0000000000000fff, // 12 bits
+    0x0000000000001fff, // 13 bits
+    0x0000000000003fff, // 14 bits
+    0x0000000000007fff, // 15 bits
+    0x000000000000ffff, // 16 bits
+    0x000000000001ffff, // 17 bits
+    0x000000000003ffff, // 18 bits
+    0x000000000007ffff, // 19 bits
+    0x00000000000fffff, // 20 bits
+    0x00000000001fffff, // 21 bits
+    0x00000000003fffff, // 22 bits
+    0x00000000007fffff, // 23 bits
+    0x0000000000ffffff, // 24 bits
+    0x0000000001ffffff, // 25 bits
+    0x0000000003ffffff, // 26 bits
+    0x0000000007ffffff, // 27 bits
+    0x000000000fffffff, // 28 bits
+    0x000000001fffffff, // 29 bits
+    0x000000003fffffff, // 30 bits
+    0x000000007fffffff, // 31 bits
+    0x00000000ffffffff, // 32 bits
+    0x00000001ffffffff, // 33 bits
+    0x00000003ffffffff, // 34 bits
+    0x00000007ffffffff, // 35 bits
+    0x0000000fffffffff, // 36 bits
+    0x0000001fffffffff, // 37 bits
+    0x0000003fffffffff, // 38 bits
+    0x0000007fffffffff, // 39 bits
+    0x000000ffffffffff, // 40 bits
+    0x000001ffffffffff, // 41 bits
+    0x000003ffffffffff, // 42 bits
+    0x000007ffffffffff, // 43 bits
+    0x00000fffffffffff, // 44 bits
+    0x00001fffffffffff, // 45 bits
+    0x00003fffffffffff, // 46 bits
+    0x00007fffffffffff, // 47 bits
+    0x0000ffffffffffff, // 48 bits
+    0x0001ffffffffffff, // 49 bits
+    0x0003ffffffffffff, // 50 bits
+    0x0007ffffffffffff, // 51 bits
+    0x000fffffffffffff, // 52 bits
+    0x001fffffffffffff, // 53 bits
+    0x003fffffffffffff, // 54 bits
+    0x007fffffffffffff, // 55 bits
+    0x00ffffffffffffff, // 56 bits
+    0x01ffffffffffffff, // 57 bits
+    0x03ffffffffffffff, // 58 bits
+    0x07ffffffffffffff, // 59 bits
+    0x0fffffffffffffff, // 60 bits
+    0x1fffffffffffffff, // 61 bits
+    0x3fffffffffffffff, // 62 bits
+    0x7fffffffffffffff, // 63 bits
+    0xffffffffffffffff, // 64 bits
+  };
+
 } // End of unnamed namespace
+
+
 
 //! Initializes with constant value for all bits
 //!
@@ -260,7 +369,7 @@ BinaryVector& BinaryVector::Append (uint8_t value, uint8_t numberOfBits, BitsAli
 
   if (numberOfBits > 8 * sizeof(uint8_t))
   {
-    THROW_INVALID_ARGUMENT("Number of bits to append cannot exceed the number of bits of value.");
+    THROW_INVALID_ARGUMENT("Number of bits to append cannot exceed the number of bits of value");
   }
 
   // ---------------- Align (pack) added bits to the MSB
@@ -417,10 +526,41 @@ BinaryVector& BinaryVector::Append (uint64_t value, uint8_t numberOfBits, BitsAl
 //---------------------------------------------------------------------------
 
 
+//! Appends 0 or 1 bit N times
+//!
+//! @param bitIsOne   When true '1' otherwise '0' are appended to the vector
+//! @param count      Number of '0' or '1' to append
+//!
+BinaryVector& BinaryVector::AppendBits (bool bitIsOne, uint32_t count)
+{
+  uint8_t value = bitIsOne ? 0xFF : 0;
+  auto    bytesCount = count / 8u;
+
+  if (bytesCount != 0)
+  {
+    m_data.insert(m_data.cend(), bytesCount, value);
+
+    auto addedBits = 8u * bytesCount;
+    m_usedBits    += addedBits;
+    count         -= addedBits;
+  }
+
+  if (count != 0)
+  {
+    Append(value, count);
+  }
+
+  return *this;
+}
+//
+//  End of: BinaryVector::AppendBits
+//---------------------------------------------------------------------------
+
+
 //! Appends from a list of uint8_t ordered from msb to lsb
 //!
 //! @param numberOfBits   Number of bits to use from chunksList
-//! @param alignment      Tells whether bits are left (msb) or right (lsb) aligned
+//! @param alignment      Tells whether (source) bits in chunksList are left (msb) or right (lsb) aligned
 //! @param chunksList     A set of uint8_t from msb to lsb
 //!
 BinaryVector& BinaryVector::AppendChunks (uint8_t numberOfBits, BitsAlignment alignment, initializer_list<uint8_t> chunksList)
@@ -438,6 +578,8 @@ BinaryVector& BinaryVector::AppendChunks (uint8_t numberOfBits, BitsAlignment al
   auto    chunks    = chunksList.begin();
   uint8_t chunkId   = 0;
 
+  // ---------------- Assess which byte to start from and threshold value to know when to stop processing
+  //
   while (threshold >= numberOfBits)
   {
     threshold -= 8;
@@ -752,6 +894,163 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
 //---------------------------------------------------------------------------
 
 
+//! Creates a BinaryVector from text decimal representation
+//!
+//! @note It only support values that can be encoded using uint64_t (18446744073709551615)
+//!
+//! @param bits         Sequence of characters representing content of BinaryVector to create:
+//!                     Characters in \",':_- \t/\" are ignored (can be used to ease display of string)
+//!                     An exception is thrown if there is any character different from
+//!                     set \"0123456789,':_- \\t\\n/\"
+//!                     'd is ignored at start of string (ICL format). An exception is thrown everywhere else.
+//!                     Don't care 'x' or 'X' are not allowed and lead to thrown exception
+//!
+//! @param sizeProperty Size property
+//! @param dontCare     Tells how to handle "dont't care" special characters 'x' and 'X'
+//!
+//! @return A new BinaryVector initialized as defined by bits text
+//!
+BinaryVector BinaryVector::CreateFromDecString (string_view bits, SizeProperty sizeProperty)
+{
+  CHECK_PARAMETER_NOT_NULL(bits.data(), "BinaryVector cannot be created from nullptr");
+
+  // ---------------- Skip leading blank spaces
+  //
+  Utility::TrimLeft(bits);
+
+  // ---------------- Tolerate empty vector
+  //
+  if (bits.empty())
+  {
+    return BinaryVector();
+  }
+
+  // ---------------- Capture "inverted bits" option
+  //
+  auto inverted = false;
+  if (bits[0] == '~')
+  {
+    inverted = true;
+    bits.remove_prefix(1);
+  }
+
+  auto bitsCount    = 32u;  // This is the default integer size
+  auto parsedDigits = false;
+  auto hasSize      = false;
+
+  // ---------------- Skip leading zeros
+  //
+  while (bits.front() == '0')
+  {
+    parsedDigits = true;
+    bits.remove_prefix(1);
+  }
+
+  auto     nextMustBe_D = false; // Memorize that we parsed a quote that must be followed with a 'd' or 'D'
+  uint64_t value        = 0;
+
+  for (const auto nextChar : bits)
+  {
+    CHECK_PARAMETER_TRUE(!nextMustBe_D || (nextChar == 'd') || (nextChar == 'D'), "Unexpected character '"s.append(1, nextChar).append("'after quote (') found while parsing decimal number: " + bits));
+
+    auto     hasDigit = true;
+    uint64_t digit    = 0;
+
+    switch (nextChar)
+    {
+      case '0': digit = 0; break;
+      case '1': digit = 1; break;
+      case '2': digit = 2; break;
+      case '3': digit = 3; break;
+      case '4': digit = 4; break;
+      case '5': digit = 5; break;
+      case '6': digit = 6; break;
+      case '7': digit = 7; break;
+      case '8': digit = 8; break;
+      case '9': digit = 9; break;
+      case '\'':
+      {
+        CHECK_PARAMETER_TRUE(!hasSize, "Unexpected quote (') found while parsing decimal number: " + bits);
+        if (parsedDigits)
+        {
+          bitsCount    = value;
+          value        = 0;
+          CHECK_PARAMETER_NOT_ZERO(bitsCount, "Bits count must be at least one!");
+          parsedDigits = false;
+          hasSize      = true;
+        }
+        nextMustBe_D = true;
+        hasDigit     = false;
+        break;
+      }
+      case 'd':
+      case 'D':
+        CHECK_PARAMETER_TRUE(nextMustBe_D, "Unexpected 'd' found while parsing decimal number: " + bits);
+        nextMustBe_D = false;
+        break;  // Condition has been checked at top of loop, we can ignore it safely
+      case '-':
+      case '_':
+      case ':':
+      case '|':
+      case ',':
+      case '\t':
+      case '\n':
+      case ' ':
+      case '\0':
+      case '/':
+      case '\\':
+        hasDigit = false;
+        break;  // Ignored characters
+      case 'x':
+      case 'X':
+        THROW_INVALID_ARGUMENT("CreateFromDecString found unexpected \"don't care character\" that is not supported in decimal values");
+      default:
+        THROW_INVALID_ARGUMENT("CreateFromDecString only support characters in '0123456789xX,\':|_-\\x20\\t\\n/', got: '"s.append(1, nextChar).append("'"));
+    }
+
+    if (hasDigit)
+    {
+      parsedDigits = true;
+      if (value > (UINT64_MAX / 10u))
+      {
+        THROW_OUT_OF_RANGE("Parsed value is out of uint64_t range");
+      }
+
+      value *= 10u;
+
+      if ((value + digit) < value)
+      {
+        THROW_OUT_OF_RANGE("Parsed value is out of uint64_t range");
+      }
+      value += digit;
+    }
+  }
+
+  CHECK_PARAMETER_TRUE(parsedDigits, "Failed to parse an integer from: "s + bits);
+
+  // ---------------- Fix bit count?
+  //
+  if (!hasSize && (value > UINT32_MAX))
+  {
+    bitsCount = 64u;
+  }
+
+  BinaryVector result;
+  result.Append(value, bitsCount, BitsAlignment::Right);
+  result.m_sizeProperty = sizeProperty;
+  if (inverted)
+  {
+    result.ToggleBits();
+  }
+
+  return result;
+}
+//
+//  End of: BinaryVector::CreateFromBinaryString
+//---------------------------------------------------------------------------
+
+
+
 //! Creates a BinaryVector from text hexadecimal representation
 //!
 //! @note Firstly intended for test purposes, but can be used for anything else
@@ -903,140 +1202,212 @@ BinaryVector BinaryVector::CreateFromHexString (string_view bits, SizeProperty s
 
 //! Creates a BinaryVector from mix of hexadecimal and binary representation
 //!
-//! @note Firstly intended for test purposes, but can be used for anything else
+//! @note Support both SIT and ICL formats
+//!       For ICL see IEEE P1687/D1.71 §6.3.11 "Inversion and concatenation"
+//! @note When using ICL format:
+//!       - Sized numbers may be concatenated with other sized numbers, and at most one unsized number
+//!         can be included with a group of sized numbers.
+//!         Since the size of all targets is known, the "size" of an unsized number in this situation is
+//!         inferred to be the difference between the target size and the sum of the sized numbers’
+//!         widths and is required to be equal to or greater than the number of bits required for the
+//!         unsized number.
+//!       - When a value is preceded by a tilde (~), each bit in the binary representation of the value
+//!         of that identifier is complemented.
+//!
+//! @note Supports empty vector only using empty (or spaces only) input string
 //!
 //! @param bits         Sequence of characters representing content of BinaryVector to create
 //!                     Characters in \",':_- \t/\" are ignored (can be used to ease display of string)
 //!                     An exception is thrown if there is any character different from
 //!                     set \"0123456789abcdefABCDEF,':_- \t/\"
 //!                     '0x' is ignored at start of string. An exception is thrown everywhere else
-//!                     '/x', '/X', '\\x', '\\X' constructions are interpreted as: What follow is hexadecimal
-//!                     '/b', '/B', '\\b', '\\B' constructions are interpreted as: What follow is binary
-//! @param sizeProperty Size property
+//!                     '/x', '/X', '\\x', '\\X' ''h', ''H' constructions are interpreted as: What follow is hexadecimal
+//!                     '/b', '/B', '\\b', '\\B' ''b', ''B' constructions are interpreted as: What follow is binary
+//!
+//! @param sizeProperty Size property tell whether the size can change after construction and if this property is copied to destination
 //! @param dontCare     Tells how to handle "dont't care" special characters 'x' and 'X'
 //!
 //! @return A new BinaryVector initialized as defined by bits text
 //!
-BinaryVector BinaryVector::CreateFromString (string_view bits, SizeProperty sizeProperty, DontCare dontCare)
+BinaryVector BinaryVector::CreateFromString (string_view stringValue, SizeProperty sizeProperty, DontCare dontCare)
 {
-  CHECK_PARAMETER_NOT_NULL(bits.data(), "BinaryVector cannot be created from nullptr");
-
-  //! Defines how a string is formatted to represent BinaryVector content
-  //!
-  enum class StringFormat
-  {
-    Undefined,   //!< Format is not defined
-    Binary,      //!< Format is recognized as binary
-    Hexadecimal, //!< Format is recognized hexadecimal
-  };
+  CHECK_PARAMETER_NOT_NULL(stringValue.data(), "BinaryVector cannot be created from nullptr");
 
   // ---------------- Skip leading blank spaces
   //
-  Utility::TrimLeft(bits);
+  Utility::TrimLeft(stringValue);
 
-  // ---------------- Tolerate strings beginning with "0x"
+  // ---------------- Tolerate empty vector
   //
-  if (bits.length() == 0)
+  if (stringValue.length() == 0)
   {
     return BinaryVector();
   }
 
-  if (bits.length() == 1)
-  {
-    THROW_INVALID_ARGUMENT("Cannot interpret one, non space, character");
-  }
+  auto firstChunk = true;
 
-  // ---------------- Skip leading blank chars
+  // Lamba: Extract base, optional stringValue inversion and stringValue count from leading sequence of characters (can be embedded in a large list of sequences)
   //
-  auto bitId  = size_t(0);
-  while (   (bitId < bits.length())
-         && (   (bits[bitId] == '\n')
-             || (bits[bitId] == '\t')
-             || (bits[bitId] == ' ')
-            )
-        )
+  auto extractEncodingInfo = [&firstChunk](string_view stringValue)
   {
-    ++bitId;
-  }
+    auto firstChar   = stringValue.front();
+    auto isStdPrefix = firstChunk ? Utility::Contains("0/\\", firstChar)
+                                  : Utility::Contains("/\\",  firstChar);
+    firstChunk = false;
 
-  auto format = StringFormat::Undefined;
-  auto firstCharOk = (bits[bitId] == '0') || (bits[bitId] == '/') || (bits[bitId] == '\\');
-  ++bitId;
-  if      (firstCharOk && ((bits[bitId] == 'x') || (bits[bitId] == 'X')))
-  {
-    format = StringFormat::Hexadecimal;
-  }
-  else if (firstCharOk && ((bits[bitId] == 'b') || (bits[bitId] == 'B')))
-  {
-    format = StringFormat::Binary;
-  }
+    if (isStdPrefix)
+    {
+      auto format = NumberBaseForValuePrefix(stringValue.substr(1u));
+      if (format != NumberBase::Undefined)
+      {
+        stringValue.remove_prefix(2u); // Remove '0x' or /x or \x ...
+      }
+      return make_tuple(EncodingInfo(format), stringValue);
+    }
 
-  // ---------------- Defines how to get next, largest, chunk of current format
+    // ICL syntax?
+    EncodingInfo encodingInfo;
+
+    if (firstChar == '~')
+    {
+      stringValue.remove_prefix(1u);
+      encodingInfo.inverted = true;
+      if (stringValue.empty())
+      {
+        return make_tuple(encodingInfo, stringValue);
+      }
+    }
+
+    size_t bitId = 0;
+
+    if (Utility::Contains("123456789", stringValue.front()))  // length prefix
+    {
+      tie(encodingInfo.bitsCount, bitId) = Utility::ToUInt32(stringValue);
+    }
+
+    if ((bitId < stringValue.length()) && (stringValue[bitId] == '\''))
+    {
+      stringValue.remove_prefix(bitId + 1u);
+
+      encodingInfo.base = NumberBaseForValuePrefix(stringValue);
+      if (encodingInfo.base != NumberBase::Undefined)
+      {
+        stringValue.remove_prefix(1u);
+      }
+    }
+    else if (encodingInfo.bitsCount != 0)
+    {
+      encodingInfo.bitsCount = 0;
+      encodingInfo.base      = NumberBase::Decimal;
+    }
+    return make_tuple(encodingInfo, stringValue);
+  };
+
+  // Lamba: Provides next chunk of string encode value to parse along with its encoding infor
   //
-  auto getNextChunk = [&bits, &format]()
+  auto getNextChunk = [&extractEncodingInfo](string_view stringValue)
   {
-    // ---------------- Find format change
+    Utility::TrimLeft(stringValue);
+
+    EncodingInfo encodingInfo;
+    std::tie(encodingInfo, stringValue) = extractEncodingInfo(stringValue);
+
+    auto chunk = stringValue;  // Default: all remaining is supposed to be of single base encoding
+
+    if (encodingInfo.base == NumberBase::Undefined)
+    {
+      return make_tuple(encodingInfo, chunk, stringValue);
+    }
+
+
+    // ---------------- Find other format indication
     //
-    auto foundFormatChange = false;
-    auto offset            = string_view::size_type(0u);
-
-    do
+    auto offset = stringValue.find_first_of("/,\\'", 0u);
+    if (   (offset == string_view::npos)  // Not found
+        || (offset == stringValue.length())      // Found at end of string ==> can be ignored
+       )
     {
-      offset = bits.find_first_of("/\\", offset);
-      if (   (offset == string_view::npos)  // Not found
-          || (offset == bits.length())      // Found at end of string ==> can be ignored
-         )
-      {
-        break;
-      }
-
-      auto nextChar     = bits[offset + 1];
-      foundFormatChange = (format == StringFormat::Binary) ? (nextChar == 'x') || (nextChar == 'X')
-                                                           : (nextChar == 'b') || (nextChar == 'B');
-      if (!foundFormatChange)
-      {
-        ++offset;
-      }
-    } while (!foundFormatChange);
-
-
-    auto chunk = bits;
-
-    if (!foundFormatChange)
-    {
-      bits.remove_prefix(bits.length());  // Clear remaining (this was the last chunk)
+      stringValue.remove_prefix(stringValue.length());       // Nothing to process after this chunk
     }
     else
     {
-      chunk = bits.substr(0, offset);
-      bits.remove_prefix(offset + 2u);
+      chunk = stringValue.substr(0, offset);   // Take only first part
+      stringValue.remove_prefix(offset);       // Remove first part from remaining
+      if (stringValue.front() == ',')
+      {
+        stringValue.remove_prefix(1);
+        Utility::TrimLeft(stringValue);
+      }
     }
 
-    return chunk;
+    return make_tuple(encodingInfo, chunk, stringValue);
   };
 
-  if (format == StringFormat::Undefined)
+  // ---------------- Core job starts here
+  //
+
+  // Skip leading blank chars
+  //
+  while (!stringValue.empty() && Utility::Contains(" \t\n", stringValue.front()))
   {
-    THROW_INVALID_ARGUMENT("Cannot tell if bits start as binary or hexadecimal");
+    stringValue.remove_prefix(1u);
   }
 
   BinaryVector result;
   BinaryVector chunkVector;
 
-  bits.remove_prefix(bitId + 1);  // Remove leading blank chars and one of: '0x', '/x', '\x', '0b', '/b' and '\b'
-  while (!bits.empty())
+  while (!stringValue.empty())
   {
-    auto bitsChunk = getNextChunk();
+    string_view  bitsChunk;
+    EncodingInfo encodingInfo;
 
-    if (format == StringFormat::Binary)
+    std::tie(encodingInfo, bitsChunk, stringValue) = getNextChunk(stringValue);
+
+    CHECK_PARAMETER_NOT_EMPTY(bitsChunk, "Cannot parse empty number");
+
+    auto bitsCount   = encodingInfo.bitsCount;
+    auto hasSizeInfo = bitsCount != 0;
+    switch (encodingInfo.base)
     {
-      chunkVector = BinaryVector::CreateFromBinaryString(bitsChunk, SizeProperty::NotFixed, dontCare);
-      format      = StringFormat::Hexadecimal;
+      case NumberBase::Binary:
+        chunkVector = BinaryVector::CreateFromBinaryString(bitsChunk, SizeProperty::NotFixed, dontCare);
+        break;
+      case NumberBase::Hexadecimal:
+        chunkVector = BinaryVector::CreateFromHexString(bitsChunk, SizeProperty::NotFixed, dontCare);
+        break;
+      case NumberBase::Decimal:
+        chunkVector = BinaryVector::CreateFromDecString(bitsChunk, SizeProperty::NotFixed);
+        break;
+      case NumberBase::Octal:
+        THROW_INVALID_ARGUMENT("Octal numbers are not supported!");
+        break;
+      case NumberBase::Undefined:
+        THROW_INVALID_ARGUMENT("Cannot tell whether value is in decimal, hexadecimal or binary");
+      default:
+        CHECK_FAILED("Houps, NumberBase not managed");
     }
-    else
+
+    auto chunkBitsCount = chunkVector.BitsCount();
+
+    if (hasSizeInfo && (bitsCount != chunkBitsCount))
     {
-      chunkVector = BinaryVector::CreateFromHexString(bitsChunk, SizeProperty::NotFixed, dontCare);
-      format      = StringFormat::Binary;
+      if (bitsCount < chunkBitsCount)
+      {
+        LOG(WARNING) << "Truncating value: " << bitsChunk;
+        chunkVector = chunkVector.Slice(chunkBitsCount - bitsCount, bitsCount); // Truncation
+      }
+      else
+      {
+        LOG(INFO) << "Extending value: " << bitsChunk;
+        auto isNegative = chunkVector.IsNegative();
+        auto appendOnes = encodingInfo.inverted ? !isNegative : isNegative;
+        result.AppendBits(appendOnes, bitsCount - chunkBitsCount);
+      }
+    }
+
+    if (encodingInfo.inverted)
+    {
+      chunkVector.ToggleBits();
     }
     result.Append(chunkVector);
   }
@@ -1312,10 +1683,10 @@ string BinaryVector::DataAsMixString (uint32_t    hexStyleThreshold,
 
   if (m_usedBits < hexStyleThreshold)
   {
-    return DataAsBinaryString(quadSeparator, octaSeparator, bytesPerLine, eolSeparator, true);
+    return DataAsBinaryString(quadSeparator, octaSeparator, bytesPerLine, eolSeparator, PREFIX_WITH_BASE_ID);
   }
 
-  auto smartString       = DataAsHexString(quadSeparator, octaSeparator, bytesPerLine, eolSeparator, true);
+  auto smartString       = DataAsHexString(quadSeparator, octaSeparator, bytesPerLine, eolSeparator, PREFIX_WITH_BASE_ID);
   auto lastByteBitsCount = m_usedBits % 8;
   auto lastQuadBitsCount = m_usedBits % 4;
 
@@ -1335,6 +1706,99 @@ string BinaryVector::DataAsMixString (uint32_t    hexStyleThreshold,
 //  End of: BinaryVector::DataAsMixString
 //---------------------------------------------------------------------------
 
+
+//! Gets content formatted as ICL binary string - AS SAVED INTERNALLY - (bits are appended from left to right)
+//!
+//! @note An example of formatting is: 23'b0001_1111:0011_0100:0101_010
+//!
+string BinaryVector::DataAsICLBinaryString () const
+{
+  ostringstream os;
+  os << m_usedBits << "'b" << DataAsBinaryString("_", "_", 0, "", !PREFIX_WITH_BASE_ID);
+  return os.str();
+}
+//
+//  End of: BinaryVector::DataAsICLBinaryString
+//---------------------------------------------------------------------------
+
+
+
+//! Gets content formatted as ICL hexadecimal string - AS SAVED INTERNALLY - (bits are appended from left to right)
+//!
+//! @note An example of formatting is: 22'hface_dead_beef_0123_cafe_4 (where last '4' may mean '0b0100' or '0b010' or '0b01')
+//! @note FOR PRECISE DISPLAY OF LAST BITS, please use DataAsMixString (or DataAsBinaryString)
+//!
+string BinaryVector::DataAsICLHexString () const
+{
+  ostringstream os;
+  os << m_usedBits << "'h" << DataAsHexString("_", "_", 0, "", !PREFIX_WITH_BASE_ID);
+  return os.str();
+}
+//
+//  End of: BinaryVector::DataAsICLHexString
+//---------------------------------------------------------------------------
+
+
+
+//! Gets content formatted as ICL as hexadecimal or/and binary string
+//!
+//!
+//! @note An example of formatting is: 0xFACE_DEAD:BEEF_0123:CAFE_/b01
+//!
+//! @param hexStyleThreshold  The number of bits that makes the result starting as hex string (preference is to be >= 8)
+//!
+string BinaryVector::DataAsICLMixString (uint32_t hexStyleThreshold) const
+{
+  if (m_usedBits == 0)
+  {
+    return "";
+  }
+
+  hexStyleThreshold = std::max(hexStyleThreshold, 4u);  // Must ensure that reported value is not misleading (last nibble incomplete but reported in hexadecimal)
+  if (m_usedBits < hexStyleThreshold)
+  {
+    return DataAsICLBinaryString();
+  }
+
+  // ---------------- Deal with plain nibbles
+  //
+  auto plainNibblesCount = m_usedBits / 4u;
+  auto lastQuadBitsCount = m_usedBits % 4;
+  auto lastByteBitsCount = m_usedBits % 8;
+
+  ostringstream os;
+  os << plainNibblesCount * 4u << "'h" << DataAsHexString("_", "_", 0, "", !PREFIX_WITH_BASE_ID);
+
+  auto smartString = os.str();
+
+  if (lastQuadBitsCount != 0)
+  {
+    smartString.pop_back();
+  }
+
+  if (smartString.back() == '_')
+  {
+    smartString.pop_back();
+  }
+
+  // ---------------- Deals with remaining bits
+  //
+  if (lastQuadBitsCount != 0)
+  {
+    // ---------------- Replace last digit with its binary equivalent
+    //
+    auto shiftCount = (lastByteBitsCount < 4) ? 8u - lastQuadBitsCount    // For cases last bits are on msb
+                                              : 4u - lastQuadBitsCount;   // For cases last bits are on lsb
+    auto byte       = (m_data.back() >> shiftCount) & 0x0F;
+    auto lastBits   = BINARY_NIBBLES[byte].substr(4u - lastQuadBitsCount, lastQuadBitsCount);
+
+    smartString.append(", ").append(to_string(lastQuadBitsCount)).append("'b").append(string(lastBits));
+  }
+  return smartString;
+}
+//
+//  End of: BinaryVector::DataAsICLHexString
+//---------------------------------------------------------------------------
 
 //! Returns data right aligned in a new buffer
 //!
@@ -1406,6 +1870,41 @@ vector<uint8_t> BinaryVector::DataRightAligned () const
 //  End of: BinaryVector::DataRightAligned
 //---------------------------------------------------------------------------
 
+
+
+//! Defines used based from leading char of number string
+//!
+NumberBase BinaryVector::NumberBaseForValuePrefix (string_view number)
+{
+  if (!number.empty())
+  {
+    auto baseChar = number.front();
+    switch (baseChar)
+    {
+      case 'b':
+      case 'B':
+        return NumberBase::Binary;
+      case 'h':
+      case 'H':
+      case 'x':
+      case 'X':
+        return NumberBase::Hexadecimal;
+      case 'd':
+      case 'D':
+        return NumberBase::Decimal;
+      case 'o':
+      case 'O':
+      return NumberBase::Octal;
+      default:
+        return NumberBase::Undefined;
+    }
+  }
+
+  return NumberBase::Undefined;
+}
+//
+//  End of: BinaryVector::NumberBaseForValuePrefix
+//---------------------------------------------------------------------------
 
 
 //! Copy assignment
@@ -1867,7 +2366,7 @@ void BinaryVector::MaskLastByte ()
 //! Merges bits from two bytes viewed as signed
 //!
 //! @param lsbOffset      Rightmost byte to merge
-//! @param lsbBitsCount   Number of bits to take form rightmost byte
+//! @param lsbBitsCount   Number of bits to take from rightmost byte
 //! @param asSigned       When true underlying value is considered signed
 //!
 uint8_t BinaryVector::MergeToByte (uint32_t lsbOffset, uint8_t lsbBitsCount, bool asSigned) const
@@ -1895,35 +2394,6 @@ uint8_t BinaryVector::MergeToByte (uint32_t lsbOffset, uint8_t lsbBitsCount, boo
 //---------------------------------------------------------------------------
 
 
-//! Appends 0 or 1 bit N times
-//!
-//! @param bitIsOne   When true '1' otherwise '0' are appended to the vector
-//! @param count      Number of '0' or '1' to append
-//!
-BinaryVector& BinaryVector::AppendBits (bool bitIsOne, uint32_t count)
-{
-  uint8_t value = bitIsOne ? 0xFF : 0;
-  auto    bytesCount = count / 8u;
-
-  if (bytesCount != 0)
-  {
-    m_data.insert(m_data.cend(), bytesCount, value);
-
-    auto addedBits = 8u * bytesCount;
-    m_usedBits    += addedBits;
-    count         -= addedBits;
-  }
-
-  if (count != 0)
-  {
-    Append(value, count);
-  }
-
-  return *this;
-}
-//
-//  End of: BinaryVector::AppendBits
-//---------------------------------------------------------------------------
 
 //! Sets from N signed bits
 //!
@@ -1943,6 +2413,7 @@ void BinaryVector::SetSigned (T value)
   else
   {
     m_sizeProperty = SizeProperty::NotFixed;
+    AT_SCOPE_EXIT([this]() { m_sizeProperty = SizeProperty::Fixed; });
 
     auto bitsCountToAppend = initialBitsCount;
 
@@ -1955,7 +2426,6 @@ void BinaryVector::SetSigned (T value)
     }
 
     Append(static_cast<std::make_unsigned_t<T>>(value), bitsCountToAppend);
-    m_sizeProperty = SizeProperty::Fixed;
   }
 }
 
@@ -1979,6 +2449,7 @@ void BinaryVector::SetUnsigned (T value)
   else
   {
     m_sizeProperty = SizeProperty::NotFixed;
+    AT_SCOPE_EXIT([this]() { m_sizeProperty = SizeProperty::Fixed; });
 
     auto bitsCountToAppend = initialBitsCount;
 
@@ -2101,6 +2572,339 @@ void BinaryVector::SetBit (uint32_t bitOffset)
 //
 //  End of: BinaryVector::SetBit
 //---------------------------------------------------------------------------
+
+
+//! Assigns a portion of the BinaryVector
+//!
+//! @note It is optimized for small number of copied bytes
+//!
+//! @param startOffset  Zero based bit offset (from left)
+//! @param value        Other BinaryVector to assign to slice
+//!
+//! @return Reference to this (to allow cascading calls)
+BinaryVector& BinaryVector::SetSlice (uint32_t startOffset, const BinaryVector& value)
+{
+  return SetSlice_Impl(startOffset, value.BitsCount(), value.DataLeftAligned());
+}
+
+
+//! Assigns an unsigned 8 bits into a slice
+//!
+//! @note Range left/right boundaries are reversed relative to bits numbering in
+//!       BinaryVector.
+//!       BinaryVector has it leftmost bits identified at offset 0 while an ICL
+//!       vector range is usually numbered from its rightmost bit
+//!
+//!         e.g. an IndexedRange(7, 0):
+//!           - relative to a  8 bits BinaryVector is equivalent to bits offsets [0, 7]
+//!           - relative to a 10 bits BinaryVector is equivalent to bits offsets [2, 9]
+//!
+//!         e.g. an IndexedRange(0, 7):
+//!           ? relative to a  8 bits BinaryVector is equivalent to bits offsets [7, 0]
+//!           ? relative to a 10 bits BinaryVector is equivalent to bits offsets [9, 2]
+//!           ? in that cases, values are reversed before being effectively assigned
+//!
+//! @param range  Ranges of bits to assign
+//! @param value  Value to assign
+//!
+//! @return Reference to this (to allow cascading calls)
+BinaryVector& BinaryVector::SetSlice (IndexedRange range, uint8_t value)
+{
+  return SetSlice_T(range, value);
+}
+//
+//  End of: BinaryVector::SetSlice
+//---------------------------------------------------------------------------
+
+
+//! Assigns an unsigned 16 bits into a slice
+//!
+//! @note Range left/right boundaries are reversed relative to bits numbering in
+//!       BinaryVector.
+//!       BinaryVector has it leftmost bits identified at offset 0 while an ICL
+//!       vector range is usually numbered from its rightmost bit
+//!
+//!         e.g. an IndexedRange(7, 0):
+//!           - relative to a  8 bits BinaryVector is equivalent to bits offsets [0, 7]
+//!           - relative to a 10 bits BinaryVector is equivalent to bits offsets [2, 9]
+//!
+//!         e.g. an IndexedRange(0, 7):
+//!           ? relative to a  8 bits BinaryVector is equivalent to bits offsets [7, 0]
+//!           ? relative to a 10 bits BinaryVector is equivalent to bits offsets [9, 2]
+//!           ? in that cases, values are reversed before being effectively assigned
+//!
+//! @param range  Ranges of bits to assign
+//! @param value  Value to assign
+//!
+//! @return Reference to this (to allow cascading calls)
+BinaryVector& BinaryVector::SetSlice (IndexedRange range, uint16_t value)
+{
+  return SetSlice_T(range, value);
+}
+
+
+//! Assigns an unsigned 32 bits into a slice
+//!
+//! @note Range left/right boundaries are reversed relative to bits numbering in
+//!       BinaryVector.
+//!       BinaryVector has it leftmost bits identified at offset 0 while an ICL
+//!       vector range is usually numbered from its rightmost bit
+//!
+//!         e.g. an IndexedRange(7, 0):
+//!           - relative to a  8 bits BinaryVector is equivalent to bits offsets [0, 7]
+//!           - relative to a 10 bits BinaryVector is equivalent to bits offsets [2, 9]
+//!
+//!         e.g. an IndexedRange(0, 7):
+//!           ? relative to a  8 bits BinaryVector is equivalent to bits offsets [7, 0]
+//!           ? relative to a 10 bits BinaryVector is equivalent to bits offsets [9, 2]
+//!           ? in that cases, values are reversed before being effectively assigned
+//!
+//! @param range  Ranges of bits to assign
+//! @param value  Value to assign
+//!
+//! @return Reference to this (to allow cascading calls)
+BinaryVector& BinaryVector::SetSlice (IndexedRange range, uint32_t value)
+{
+  return SetSlice_T(range, value);
+}
+
+//! Assigns an unsigned 64 bits into a slice
+//!
+//! @note Range left/right boundaries are reversed relative to bits numbering in
+//!       BinaryVector.
+//!       BinaryVector has it leftmost bits identified at offset 0 while an ICL
+//!       vector range is usually numbered from its rightmost bit
+//!
+//!         e.g. an IndexedRange(7, 0):
+//!           - relative to a  8 bits BinaryVector is equivalent to bits offsets [0, 7]
+//!           - relative to a 10 bits BinaryVector is equivalent to bits offsets [2, 9]
+//!
+//!         e.g. an IndexedRange(0, 7):
+//!           ? relative to a  8 bits BinaryVector is equivalent to bits offsets [7, 0]
+//!           ? relative to a 10 bits BinaryVector is equivalent to bits offsets [9, 2]
+//!           ? in that cases, values are reversed before being effectively assigned
+//!
+//! @param range  Ranges of bits to assign
+//! @param value  Value to assign
+//!
+//! @return Reference to this (to allow cascading calls)
+BinaryVector& BinaryVector::SetSlice (IndexedRange range, uint64_t value)
+{
+  return SetSlice_T(range, value);
+}
+
+
+
+//! Assigns an unsigned N bits into a slice
+//!
+//! @note Range left/right boundaries are reversed relative to bits numbering in
+//!       BinaryVector.
+//!       BinaryVector has it leftmost bits identified at offset 0 while an ICL
+//!       vector range is usually numbered from its rightmost bit
+//!
+//!         e.g. an IndexedRange(7, 0):
+//!           - relative to a  8 bits BinaryVector is equivalent to bits offsets [0, 7]
+//!           - relative to a 10 bits BinaryVector is equivalent to bits offsets [2, 9]
+//!
+//!         e.g. an IndexedRange(0, 7):
+//!           ? relative to a  8 bits BinaryVector is equivalent to bits offsets [7, 0]
+//!           ? relative to a 10 bits BinaryVector is equivalent to bits offsets [9, 2]
+//!           ? in that cases, values are reversed before being effectively assigned
+//!
+//! @param range  Ranges of bits to assign
+//! @param value  Value to assign
+//!
+//! @return Reference to this (to allow cascading calls)
+template<typename T>
+BinaryVector& BinaryVector::SetSlice_T (IndexedRange range, T value)
+{
+  CHECK_FALSE(IsEmpty(),                           "Cannot set slice of an empty BinaryVector");
+  CHECK_PARAMETER_LTE (range.Width(), BitsCount(), "Range is too large");
+  CHECK_PARAMETER_LT  (range.right,   BitsCount(), "Range extends past destination boundary");
+
+  CHECK_PARAMETER_TRUE(   range.IsSingleBit()
+                       || range.IncreasesTowardRight(), "Do not support reversed range yet");
+
+  auto rangeBitsCount = range.Width();
+
+  auto constexpr valueBitsCount = 8u * sizeof(T);
+
+  auto appendBitsCount = rangeBitsCount;
+
+  BinaryVector asBinaryVector;
+
+  // ---------------- Assigmnent into larger chunk
+  //
+  if (rangeBitsCount > valueBitsCount) // Must assign into a larger chunk ?
+  {
+    // ---------------- Place value into a BinaryVector of proper bits count first
+    //
+    asBinaryVector.AppendBits(false, rangeBitsCount - valueBitsCount);
+    appendBitsCount = valueBitsCount;
+  }
+  else if (rangeBitsCount < valueBitsCount)
+  {
+    auto maxValue = MAX_UNSIGNED_VALUE_FOR_BITS_COUNT[rangeBitsCount];
+    CHECK_PARAMETER_LTE(value, maxValue, "Value is too large for target range");
+  }
+
+  asBinaryVector.Append(value, appendBitsCount, BitsAlignment::Right);
+
+  return SetSlice_Impl(range.left, rangeBitsCount, asBinaryVector.DataLeftAligned());
+}
+//
+//  End of: BinaryVector::SetSlice_T
+//---------------------------------------------------------------------------
+
+
+//! Assigns a portion of the BinaryVector
+//!
+//! @note It is optimized for small number of copied bytes
+//!
+//! @param startOffset  Zero based bit offset (from left)
+//! @param bitsCount    Number of bits to assign
+//! @param source       Points to, left aligned, source data
+//!
+//! @return Reference to this (to allow cascading calls)
+//!
+BinaryVector& BinaryVector::SetSlice_Impl (uint32_t startOffset, uint32_t bitsCount, const uint8_t* source)
+{
+  CHECK_PARAMETER_NOT_NULL(source,                          "Source must not be nullptr");
+  CHECK_FALSE(IsEmpty(),                                    "Cannot set slice of an empty BinaryVector");
+  CHECK_PARAMETER_RANGE(startOffset, 0u, BitsCount() - 1u,  "Out of range offset: "s + std::to_string(startOffset));
+  CHECK_PARAMETER_LTE(startOffset + bitsCount, BitsCount(), "Slice is partially out of range");
+
+  const auto srcBitsCount       = bitsCount;
+  const auto dstByteOffset      = startOffset / 8u;
+  const auto offsetInFirstBytes = startOffset % 8u;
+
+  auto dest = m_data.data() + dstByteOffset;
+  auto srce = source;
+
+  if (offsetInFirstBytes == 0) // Are bits left aligned?
+  {
+    const auto srcLastByteBitsCount = srcBitsCount % 8u;
+    const auto onlyFull             = srcLastByteBitsCount == 0;
+    const auto fullBytesCount       = srcBitsCount / 8u;
+
+    for (uint32_t ii = 0 ; ii < fullBytesCount ; ++ii)
+    {
+      *dest++ = *srce++;
+    }
+
+    if (!onlyFull)
+    {
+      const auto dstMask = LEFT_BITS_CLEAR_MASK_8[srcLastByteBitsCount];
+      const auto srcMask = LEFT_BITS_MASK_8[srcLastByteBitsCount];
+
+      auto dstValue = *dest & dstMask;
+      auto srcValue = *srce & srcMask;
+
+      dstValue |= srcValue;
+      *dest = dstValue;
+    }
+  }
+  else  // ==> Source bytes are split into destination bytes
+  {
+    auto boundaryOffset =  startOffset  % 8u;                 // Split point in destination bytes
+    bool partialByte    = (boundaryOffset + srcBitsCount) < 8u; // Detect case when source spans only parts of a destination byte
+    if (partialByte)
+    {
+      // ---------------- Example
+      //                    ____
+      // srce:         |abcxxxxx|               (3 bits)
+      // dest:    |01274567|01234567|012yyyyy|  (19 bits)
+      // result:  |012abc67|01234567|012yyyyy|
+      //
+      auto dstLastBitOffset = boundaryOffset + srcBitsCount - 1u;
+      auto dstMask          = LEFT_BITS_MASK_8[boundaryOffset] | LEFT_BITS_CLEAR_MASK_8[dstLastBitOffset + 1]; // e.g. 0b11100000 | 0b00000011 ==> 0b11100011
+      auto srcMask          = LEFT_BITS_MASK_8[srcBitsCount];                                               // e.g. 0b11100000
+
+      auto dstValue = *dest & dstMask; // Clear bits that will be assigned
+      auto srcValue = *srce & srcMask; // Keep only bits to assign
+
+      srcValue >>= boundaryOffset;     // Align source bits with destination bits
+      dstValue |=  srcValue;           // Merge source bits into destination value
+
+      *dest = dstValue;
+    }
+    else
+    {
+      // ---------------- Examples
+      //
+      // With boundaryOffset = 5
+      //                    ____ ___
+      // srce:         |abcdefgh|ijklmxxx|          (13 bits)
+      // dest:    |01274567|01234567|012yyyyy|      (19 bits)
+      // result:  |01274abc|defghijk|lm2yyyyy|
+      //
+      // With boundaryOffset = 1
+      //                    ____ ___
+      // srce:     |abcdefgh|ijxxxxxx|          (10 bits)
+      // dest:    |01274567|01234567|012yyyyy|  (19 bits)
+      // result:  |0abcdefg|hij34567|012yyyyy|
+      //
+      const auto srcMsbBitsCount      = 8u - offsetInFirstBytes;
+      const auto srcLastByteBitsCount = (srcBitsCount - srcMsbBitsCount) % 8u;
+
+      const auto dstKeepMsbMask = LEFT_BITS_MASK_8[boundaryOffset];  // e.g. 0b1111_1000
+      const auto srcKeepMsbMask = LEFT_BITS_MASK_8[srcMsbBitsCount]; // e.g. 0b1110_0000
+      const auto srcKeepLsbMask = RIGHT_BITS_MASK_8[boundaryOffset]; // e.g. 0b0001_1111
+
+      // Assign first dest byte
+      //
+      auto remainingBits = srcBitsCount;
+
+      auto dstValue = *dest & dstKeepMsbMask; // Clear bits that will be assigned
+      auto srcValue = *srce & srcKeepMsbMask; // Keep only bits to assign
+
+      srcValue >>= boundaryOffset;        // Align source bits with destination bits
+      dstValue |=  srcValue;              // Merge source bits into destination value
+
+      *dest++ = dstValue;
+      remainingBits -= srcMsbBitsCount;
+
+      // Assign remaining bits, with potential "middle" bytes (assign full dest byte from source chunks)
+      //
+      while (remainingBits != 0)
+      {
+        auto srcValue_msb = *srce & srcKeepLsbMask;       // Keep only bits to assign
+        ++srce;
+        auto srcValue_lsb = *srce & srcKeepMsbMask;       // Keep only bits to assign
+
+        srcValue_msb <<= srcMsbBitsCount;
+        srcValue_lsb >>= boundaryOffset;
+        srcValue = srcValue_msb | srcValue_lsb;
+
+        if (remainingBits >= 8u) // Can assign full byte?
+        {
+          *dest++ = srcValue;
+          remainingBits -= 8u;
+        }
+        else
+        {
+          const auto dstKeepLsbMask = LEFT_BITS_CLEAR_MASK_8[srcLastByteBitsCount]; // e.g. 0b0011_1111
+
+          srcValue &= ~dstKeepLsbMask;
+
+          dstValue  = *dest & dstKeepLsbMask;
+          dstValue |=  srcValue;
+
+          *dest = dstValue;
+          remainingBits = 0u;
+        }
+      }
+    }
+  }
+
+  return *this;
+}
+//
+//  End of: BinaryVector::SetSlice
+//---------------------------------------------------------------------------
+
+
+
 
 
 
@@ -2260,6 +3064,23 @@ BinaryVector BinaryVector::Slice (uint32_t firstBitOffset, uint32_t bitsCount) c
   }
 
   return result;
+}
+//
+//  End of: BinaryVector::Slice
+//---------------------------------------------------------------------------
+
+
+//! Returns a slice from BinaryVector
+//!
+//! @note   This call is not valid if it define a slice that exceed the actual
+//!         bits count
+//!
+//! @param range          Ranges of bits to returns
+//!
+//! @return A new BinaryVector containing a copy of defined slice
+BinaryVector BinaryVector::Slice (IndexedRange range) const
+{
+  return Slice(range.left, range.Width());
 }
 //
 //  End of: BinaryVector::Slice

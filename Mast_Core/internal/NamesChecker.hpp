@@ -15,7 +15,7 @@
   #define NAMESCHECKER_H__79FD76EF_7B97_4234_FD95_8B9C834098BB__INCLUDED_
 
 #include "ParentNode.hpp"
-#include "Checker.hpp"
+#include "SystemModelCheckerBase.hpp"
 #include <unordered_map>
 
 #include <memory>
@@ -26,7 +26,7 @@ namespace mast
 {
 //! Checks name coherency of a SystemModel (sub-)tree
 //!
-class MAST_CORE_EXPORT NamesChecker final : public Checker
+class NamesChecker final : public SystemModelCheckerBase
 {
   // ---------------- Public  Methods
   //
@@ -39,11 +39,11 @@ class MAST_CORE_EXPORT NamesChecker final : public Checker
 
   //! Checks SystemModelNodes name consistency
   //!
-  static SystemModelCheckResult Check(std::shared_ptr<ParentNode> root) { return NamesChecker(root).Check(); };
+  static CheckResult Check(std::shared_ptr<ParentNode> root) { return NamesChecker(root).Check(); };
 
   //! Checks SystemModelNodes name consistency
   //!
-  virtual SystemModelCheckResult Check() override;
+  virtual CheckResult Check() override;
 
   // ---------------- Private  Methods
   //

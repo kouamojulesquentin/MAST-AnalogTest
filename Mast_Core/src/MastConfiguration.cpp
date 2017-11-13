@@ -15,6 +15,7 @@
 #include "MastConfig.hpp"
 #include "g3log/g3log.hpp"
 #include "Utility.hpp"
+#include "EnumsUtility.hpp"
 #include "YamlFile.hpp"
 
 #include <tclap/CmdLine.h>
@@ -335,6 +336,7 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
     updateString (m_aiProtocolParameters,        {"Access_interface_protocol", "Parameters"});
     updateString (m_configurationAlgorithm,      {"Configuration_algorithm"});
     updateString (m_modelCheckingFilePath,       {"Model_checking",            "File_path"});
+    updateString (m_sitExportFilePath,           {"Debug",                     "Model_SIT_export",    "File_path"});
     updateString (m_gmlFilePath,                 {"Debug",                     "Model_GML_printing",  "File_path"});
     updateString (m_gmlGraphName,                {"Debug",                     "Model_GML_printing",  "Graph_name"});
     updateString (m_prettyPrintingFilePath,      {"Debug",                     "Model_textual_print", "File_path"});
@@ -342,6 +344,7 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
     updateString (m_managerActivityFileBasePath, {"Debug",                     "Manager_activity",    "File_base_name"});
     updateBool   (m_modelChecking,               {"Model_checking",            "Enable"});
     updateBool   (m_loggerEnabled,               {"Debug",                     "Logging",             "Enable"});
+    updateBool   (m_sitExport,                   {"Debug",                     "Model_SIT_export",    "Enable"});
     updateBool   (m_gmlPrinting,                 {"Debug",                     "Model_GML_printing",  "Enable"});
     updateBool   (m_prettyPrinting,              {"Debug",                     "Model_textual_print", "Enable"});
     updateBool   (m_reportManagerActivity,       {"Debug",                     "Manager_activity",    "Enable"});

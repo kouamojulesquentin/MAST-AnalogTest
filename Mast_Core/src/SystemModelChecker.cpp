@@ -32,7 +32,7 @@ using std::ostringstream;
 //!
 //! @see CheckIdentifiers and CheckTree
 //!
-SystemModelCheckResult SystemModelChecker::Check ()
+CheckResult SystemModelChecker::Check ()
 {
   CheckIdentifiers();
   CheckTree();

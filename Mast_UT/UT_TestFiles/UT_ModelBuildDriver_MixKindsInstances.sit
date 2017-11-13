@@ -1,8 +1,0 @@
-JTAG_TAP TAP Loopback 4 1
-PDL Incr
-{
-  INSTANCE Inst_1 OF Sub/UT_ModelBuildDriver_Sub_4.sit
-  REGISTER reg 12 Bypass: "0xABC"
-  INSTANCE Inst_2 OF Make_MIB
-}
-

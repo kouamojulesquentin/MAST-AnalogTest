@@ -26,12 +26,18 @@ using namespace mast;
 //! @param bypassSequence   Sequence of bits that define initial and bypass value
 //! @param resetSequence    Sequence of bits that define the reset state
 //! @param holdValue        When true, register value from iWrite command is maintained (by setting the bypass with the same value)
+//! @param bitsOrdering     Bits ordering usage for this register
 //!
 //! @note All internal BinaryVector are initialized like the bypass sequence
 //!
-Register::Register (string_view name, mast::BinaryVector bypassSequence, mast::BinaryVector resetSequence, bool holdValue)
+Register::Register (string_view        name,
+                    mast::BinaryVector bypassSequence,
+                    mast::BinaryVector resetSequence,
+                    bool               holdValue,
+                    mast::BitsOrdering bitsOrdering)
   : SystemModelNode   (name)
   , m_holdValue       (holdValue)
+  , m_bitsOrdering    (bitsOrdering)
   , m_nextToSut       (bypassSequence,            SizeProperty::Fixed)
   , m_lastToSut       (bypassSequence,            SizeProperty::Fixed)
   , m_lastFromSut     (bypassSequence,            SizeProperty::Fixed)
@@ -50,16 +56,22 @@ Register::Register (string_view name, mast::BinaryVector bypassSequence, mast::B
 //  End of: Register::Register
 //---------------------------------------------------------------------------
 
+
+
 //! Initializes a new Register
 //!
 //! @param name             Register name (to be identified using a path)
 //! @param bypassSequence   Sequence of bits that define initial and bypass value
 //! @param holdValue        When true, register value from iWrite command is maintained (by setting the bypass with the same value)
+//! @param bitsOrdering     Bits ordering usage for this register
 //!
 //! @note All registers are initialized like the bypass sequence
 //!
-Register::Register (string_view name, mast::BinaryVector bypassSequence, bool holdValue)
-  : Register   (name, bypassSequence, BinaryVector(), holdValue)
+Register::Register (string_view        name,
+                    mast::BinaryVector bypassSequence,
+                    bool               holdValue,
+                    mast::BitsOrdering bitsOrdering)
+  : Register   (name, bypassSequence, BinaryVector(), holdValue, bitsOrdering)
 {
 }
 //

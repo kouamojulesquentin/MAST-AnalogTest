@@ -47,6 +47,9 @@ Default configuration file looks like this:
           File_path:  "Mast.log"                              # File path for logging (there is always a file logging when enabled)
           Shown_items: [std_less]                             # Any of [date, time, microseconds, level, thread_id, file_name, line_number, function_name, std_less, std, std_more,all]
           Level: info                                         # One of [debug, info, warning, error]
+        Model_SIT_export:
+          Enable: false                                       # Enable/Disable export of the model connectivity using SIT file format
+          File_path:   "MastModel_Export.sit"                 # Optional file path for SIT model export
         Model_GML_printing:
           Enable:  false                                      # Enable/Disable printing of GML representation of the model state
           Moments:                                            # Any of [after_model_parsing, before_configuration, after_configuration] (see bellow)

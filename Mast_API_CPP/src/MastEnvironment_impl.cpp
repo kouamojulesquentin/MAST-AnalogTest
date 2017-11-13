@@ -14,7 +14,6 @@
 #include "MastEnvironment_impl.hpp"
 #include "MastConfiguration.hpp"
 #include "CustomFileSink.h"
-#include "Utility.hpp"
 #include "FileSystem.hpp"
 #include "Plugins.hpp"
 #include "MastConfig.hpp"
@@ -24,9 +23,12 @@
 #include "AccessInterfaceProtocol.hpp"
 #include "SystemModel.hpp"
 #include "SystemModelManager.hpp"
-#include "SIT_reader.hpp"
+#include "SIT_Reader.hpp"
+#include "SIT_Printer.hpp"
 #include "Startup.hpp"
 #include "ModelBuildDriver.hpp"
+#include "Utility.hpp"
+#include "EnumsUtility.hpp"
 
 #include "tclap/DiscardOutput.h"
 
@@ -699,6 +701,18 @@ void MastEnvironment_impl::ParseOptions (vector<string> arguments)
 //! @note Only if options are enabled
 void MastEnvironment_impl::ReportParsedModel ()
 {
+
+  // ---------------- SIT
+  //
+  if (m_configuration->SitExport())
+  {
+    auto sit = SIT_Printer::MakeSIT(Startup::sm_systemModel->Root());
+
+    ofstream os(m_configuration->SitExportFilePath());
+    os << sit;
+    os.flush();
+  }
+
   // ---------------- GML
   //
   if (    m_configuration->GmlPrinting()

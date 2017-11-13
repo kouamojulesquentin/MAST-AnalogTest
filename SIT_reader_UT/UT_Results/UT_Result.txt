@@ -1,5 +1,0 @@
-Running Mast_SIT_reader tests (18 tests)
-
-..........................................................................................................
-
-OK! (106 tests including 105 'sub' tests from 17 data driven tests)

@@ -14,7 +14,7 @@
 #ifndef CHECKER_H__AF5E24EC_CA54_4DB4_54B6_4DAAC27D136B__INCLUDED_
   #define CHECKER_H__AF5E24EC_CA54_4DB4_54B6_4DAAC27D136B__INCLUDED_
 
-#include "SystemModelCheckResult.hpp"
+#include "CheckResult.hpp"
 
 #include <memory>
 #include <experimental/string_view>
@@ -22,11 +22,9 @@
 
 namespace mast
 {
-class SystemModelNode;
-
 //! Abstract class for checking stuff
 //!
-class MAST_CORE_EXPORT Checker
+class Checker
 {
   // ---------------- Public  Methods
   //
@@ -35,11 +33,11 @@ class MAST_CORE_EXPORT Checker
 
   //! Runs assigned check
   //!
-  virtual SystemModelCheckResult Check() = 0;
+  virtual CheckResult Check() = 0;
 
-  //! Builds up a SystemModelCheckResult from currently detected issues
+  //! Builds up a CheckResult from currently detected issues
   //!
-  SystemModelCheckResult  MakeCheckResult();
+  CheckResult  MakeCheckResult();
 
   // ---------------- Protected Methods
   //
@@ -52,12 +50,6 @@ class MAST_CORE_EXPORT Checker
   void ReportWarning (string_view message) { Report(message, m_warningsCount, m_warnings); }
   void ReportError   (string_view message) { Report(message, m_errorsCount,   m_errors);   }
 
-  void ReportInfo    (const SystemModelNode& node, string_view message);
-  void ReportWarning (const SystemModelNode& node, string_view message);
-  void ReportError   (const SystemModelNode& node, string_view message);
-
-  static std::ostringstream& Stream(std::ostringstream& os, string_view header, const SystemModelNode& node);
-  static std::ostringstream& Stream(std::ostringstream& os, const SystemModelNode& node) { return Stream(os, "", node); }
 
   uint32_t InfosCount()   const { return m_infosCount;    }
   uint32_t WarningCount() const { return m_warningsCount; }

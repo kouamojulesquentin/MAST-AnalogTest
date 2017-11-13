@@ -20,8 +20,9 @@
 #include "SystemModel.hpp"
 #include "Startup.hpp"
 #include "Utility.hpp"
+#include "EnumsUtility.hpp"
 #include "Session.hpp"
-#include "SIT_reader.hpp"
+#include "SIT_Reader.hpp"
 #include "GmlPrinter.hpp"
 #include "Utility.hpp"
 #include "g3log/g3log.hpp"
@@ -157,7 +158,7 @@ vector<AppFunctionNameAndNode> CPP_API_IMPL::LoadSystemModel (string_view filePa
 
   auto reader = SIT::SIT_Reader(sm);
 
-  reader.parse(filePath);
+  reader.Parse(filePath);
 
   auto topNode = dynamic_pointer_cast<ParentNode>(reader.ParsedSystemModel());
   CHECK_VALUE_NOT_NULL(topNode, "Failed to parse file: " + filePath);
@@ -182,7 +183,6 @@ vector<AppFunctionNameAndNode> CPP_API_IMPL::LoadSystemModel (string_view filePa
 //!
 void CPP_API_IMPL::RunMast (const vector<AppFunctionAndNode>& functionsAndNodes, RunMastOptions options)
 {
-
   if (IsSet(options, RunMastOptions::CheckModel))
   {
     CheckSystemModel();

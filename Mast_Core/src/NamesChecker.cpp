@@ -31,7 +31,7 @@ using std::ostringstream;
 //!
 //! @see CheckIdentifiers and CheckTree
 //!
-SystemModelCheckResult NamesChecker::Check ()
+CheckResult NamesChecker::Check ()
 {
   if (!m_root)
   {

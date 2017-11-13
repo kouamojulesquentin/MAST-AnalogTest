@@ -17,6 +17,8 @@
 #include "GmlPrinter.hpp"
 #include "PrettyPrinter.hpp"
 #include "Utility.hpp"
+#include "EnumsUtility.hpp"
+
 #include "g3log/g3log.hpp"
 
 #include <sstream>

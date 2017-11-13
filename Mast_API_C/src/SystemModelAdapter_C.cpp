@@ -17,7 +17,7 @@
 #include "Startup.hpp"
 #include "Utility.hpp"
 #include "Session.hpp"
-#include "SIT_reader.hpp"
+#include "SIT_Reader.hpp"
 #include "g3log/g3log.hpp"
 
 #include <memory>
@@ -47,7 +47,7 @@ void LoadSystemModel (string_view filePath)
   auto sm     = Startup::GetSystemModel();
   auto reader = SIT::SIT_Reader(sm);
 
-  reader.parse(filePath);
+  reader.Parse(filePath);
 
   auto topNode = dynamic_pointer_cast<ParentNode>(reader.ParsedSystemModel());
 

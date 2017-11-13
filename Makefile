@@ -12,53 +12,50 @@ CMAKE_RISCV32_BUILD_DIR       = cmake_riscV32
 CMAKE_FLAGS = -DCMAKE_CXX_COMPILER=g++
 LIB_DIR     = Lib
 
+# ----------------- Defines what differs include platforms
+#
 ifeq ($(OS), Windows_NT)
 $(info ==> Building for Windows)
 USE_OPEN_OCD  = OFF
 CMAKE_FLAGS  += -G "MinGW Makefiles"
 PYTHON = python
 
-MKDIR  = mkdir
-SEP    = "\"
-RUN    =
+MKDIR   = mkdir
+RUN     =
+EXT     = .exe
+BIN_DIR = Bin
 
-BIN_DIR              = Bin
-MAST_UT_EXE_NAME     = Mast_UT.exe
-CPP_EXAMPLE_EXE_NAME = MastExample_CPP.exe
-EXTERNAL_UT_EXE_NAME = Externals_UT.exe
-OPTIONAL_UT_EXE_NAME = Optionals_UT.exe
-SIT_UT_EXE_NAME      = SIT_Reader_UT.exe
-TESTCASES_EXE_NAME   = TestCasesApp.exe
+# Following trick is to get a single '\' for Windows
+SEP    = \\
+SEP   := $(strip $(SEP:\\=\))
 
-MAST_UT_EXE_PATH      = $(BIN_DIR)\$(MAST_UT_EXE_NAME)
-OPTIONAL_UT_EXE_PATH  = $(BIN_DIR)\$(OPTIONAL_UT_EXE_NAME)
-EXTERNAL_UT_EXE_PATH  = $(BIN_DIR)\$(EXTERNAL_UT_EXE_NAME)
-SIT_UT_EXE_PATH       = $(BIN_DIR)\$(SIT_UT_EXE_NAME)
-TESTCASES_EXE_PATH    = $(BIN_DIR)\$(TESTCASES_EXE_NAME)
-CPP_EXAMPLE_EXE_PATH  = $(BIN_DIR)\$(CPP_EXAMPLE_EXE_NAME)
+else # ==> not Windows
+USE_OPEN_OCD = ON
+PYTHON       = python3
 
-else   # ==> not Windows
-USE_OPEN_OCD     = ON
-PYTHON = python3
-
-MKDIR  = mkdir -p
-SEP    = /
-RUN    = ./
-
-BIN_DIR              = Bin
-MAST_UT_EXE_NAME     = Mast_UT
-OPTIONAL_UT_EXE_NAME = Optionals_UT
-TESTCASES_EXE_NAME   = TestCasesApp
-CPP_EXAMPLE_EXE_NAME = MastExample_CPP
-SIT_UT_EXE_NAME      = SIT_Reader_UT
-
-
-MAST_UT_EXE_PATH      = $(BIN_DIR)/$(MAST_UT_EXE_NAME)
-OPTIONAL_UT_EXE_PATH  = $(BIN_DIR)/$(OPTIONAL_UT_EXE_NAME)
-SIT_UT_EXE_PATH       = $(BIN_DIR)/$(SIT_UT_EXE_NAME)
-TESTCASES_EXE_PATH    = $(BIN_DIR)/$(TESTCASES_EXE_NAME)
-CPP_EXAMPLE_EXE_PATH  = $(BIN_DIR)/$(CPP_EXAMPLE_EXE_NAME)
+MKDIR   = mkdir -p
+RUN     = ./
+EXT     =
+BIN_DIR = Bin
+SEP     = /
 endif
+
+
+# ----------------- Defines exe names and paths
+#
+MAST_CORE_UT_EXE_NAME := Mast_CORE_UT$(EXT)
+MAST_API_UT_EXE_NAME  := Mast_API_UT$(EXT)
+OPTIONAL_UT_EXE_NAME  := Optionals_UT$(EXT)
+TESTCASES_EXE_NAME    := TestCasesApp$(EXT)
+CPP_EXAMPLE_EXE_NAME  := MastExample_CPP$(EXT)
+READERS_UT_EXE_NAME   := Readers_UT$(EXT)
+
+MAST_CORE_UT_EXE_PATH := $(BIN_DIR)$(SEP)$(MAST_CORE_UT_EXE_NAME)
+MAST_API_UT_EXE_PATH  := $(BIN_DIR)$(SEP)$(MAST_API_UT_EXE_NAME)
+OPTIONAL_UT_EXE_PATH  := $(BIN_DIR)$(SEP)$(OPTIONAL_UT_EXE_NAME)
+READERS_UT_EXE_PATH   := $(BIN_DIR)$(SEP)$(READERS_UT_EXE_NAME)
+TESTCASES_EXE_PATH    := $(BIN_DIR)$(SEP)$(TESTCASES_EXE_NAME)
+CPP_EXAMPLE_EXE_PATH  := $(BIN_DIR)$(SEP)$(CPP_EXAMPLE_EXE_NAME)
 
 ifneq ("$(wildcard Makefile.local)","")
 include Makefile.local
@@ -167,17 +164,18 @@ ifeq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR)/$(BIN_DIR)/SIT)","")
 endif
 
 code_coverage_run: code_coverage_build
-ifeq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR)/$(BIN_DIR)/$(MAST_UT_EXE_NAME))","")
-> $(error     ==== No Lib UT available for Code Coverage ========)
+ifeq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR)/$(BIN_DIR)/$(MAST_CORE_UT_EXE_NAME))","")
+> $(error     ==== No Mast UT available for Code Coverage ========)
 endif
-ifeq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR)/$(BIN_DIR)/$(SIT_UT_EXE_NAME))","")
-> $(error     ==== No SIT Reader Lib UT available for Code Coverage ========)
+ifeq ("$(wildcard $(CMAKE_CODE_COVERAGE_BUILD_DIR)/$(BIN_DIR)/$(READERS_UT_EXE_NAME))","")
+> $(error     ==== No Readers UT available for Code Coverage ========)
 endif
-> cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && $(RUN)$(MAST_UT_EXE_PATH)
-> cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && $(RUN)$(SIT_UT_EXE_PATH)
+> cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && $(RUN)$(MAST_CORE_UT_EXE_PATH)
+> cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && $(RUN)$(MAST_API_UT_EXE_PATH)
+> cd $(CMAKE_CODE_COVERAGE_BUILD_DIR) && $(RUN)$(READERS_UT_EXE_PATH)
 
 CODE_COVERAGE_EXCLUDED      = --gcov-exclude=".*(SIT_reader.UnresolvedPathSelector.hpp).*"
-CODE_COVERAGE_FILTERS       = --gcov-filter=".*(Mast_Core|Mast_API_CPP|Mast_API_C|SIT_reader).*"
+CODE_COVERAGE_FILTERS       = --gcov-filter=".*(Mast_Core|Mast_API_CPP|Mast_API_C|Readers).*"
 CODE_COVERAGE_OUTPUT        = -o CodeCoverage/CodeCoverage.html
 #+CODE_COVERAGE_SOURCE_DIR    = --root=$(PWD)
 CODE_COVERAGE_SOURCE_DIR    = --root=.
@@ -233,19 +231,38 @@ test_debug:
 test_release:
 > cd $(CMAKE_RELEASE_BUILD_DIR) && ctest -j4 --output-on-failure
 
+run_all:         run_all_debug
+run_all_debug:   run_debug   run_api_debug   run_readers_ut_debug
+run_all_release: run_release run_api_release run_readers_ut_release
+
 run_debug:
-ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(MAST_UT_EXE_NAME))","")
->  cd $(CMAKE_DEBUG_BUILD_DIR) && $(RUN)$(MAST_UT_EXE_PATH)
+ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(MAST_CORE_UT_EXE_NAME))","")
+>  cd $(CMAKE_DEBUG_BUILD_DIR) && $(RUN)$(MAST_CORE_UT_EXE_PATH)
 else
->  @echo "    ==== No Debug Lib UT available ========"
+>  @echo "    ==== No Debug Mast Core UT available ========"
 endif
 
 run_release:
-ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(MAST_UT_EXE_NAME))","")
->  cd $(CMAKE_RELEASE_BUILD_DIR) && $(RUN)$(MAST_UT_EXE_PATH)
+ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(MAST_CORE_UT_EXE_NAME))","")
+>  cd $(CMAKE_RELEASE_BUILD_DIR) && $(RUN)$(MAST_CORE_UT_EXE_PATH)
 else
->  @echo "    ==== No Release Lib UT available ========"
+>  @echo "    ==== No Release Mast Core UT available ========"
 endif
+
+run_api_debug:
+ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(MAST_API_UT_EXE_NAME))","")
+>  cd $(CMAKE_DEBUG_BUILD_DIR) && $(RUN)$(MAST_API_UT_EXE_PATH)
+else
+>  @echo "    ==== No Debug Mast API UT available ========"
+endif
+
+run_api_release:
+ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(MAST_API_UT_EXE_NAME))","")
+>  cd $(CMAKE_RELEASE_BUILD_DIR) && $(RUN)$(MAST_API_UT_EXE_PATH)
+else
+>  @echo "    ==== No Release Mast API UT available ========"
+endif
+
 
 run_external_debug:
 ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(EXTERNAL_UT_EXE_NAME))","")
@@ -276,28 +293,22 @@ else
 >  @echo "    ==== No Release Optionals Libs UT available ========"
 endif
 
+run_readers: run_readers_ut_debug
 
-run_sit_ut_debug:
-ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(SIT_UT_EXE_NAME))","")
->  cd $(CMAKE_DEBUG_BUILD_DIR) && $(RUN)$(SIT_UT_EXE_PATH)
+run_readers_ut_debug:
+ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(READERS_UT_EXE_NAME))","")
+>  cd $(CMAKE_DEBUG_BUILD_DIR) && $(RUN)$(READERS_UT_EXE_PATH)
 else
->  @echo "    ==== No Debug Sit UT available ========"
->  @echo "    ==== $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(SIT_UT_EXE_NAME)
+>  @echo "    ==== No Debug Readers UT available ========"
+>  @echo "    ==== $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(READERS_UT_EXE_NAME)
 endif
 
-run_sit_ut_release:
-ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(SIT_UT_EXE_NAME))","")
->  cd $(CMAKE_RELEASE_BUILD_DIR) && $(RUN)$(SIT_UT_EXE_PATH)
+run_readers_ut_release:
+ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(READERS_UT_EXE_NAME))","")
+>  cd $(CMAKE_RELEASE_BUILD_DIR) && $(RUN)$(READERS_UT_EXE_PATH)
 else
->  @echo "    ==== No Release Sit UT available ========"
->  @echo "    ==== Expecting: $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(SIT_UT_EXE_NAME) ========"
-endif
-
-run_sit_reader_debug:
-ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR)/$(SIT_READER_EXE_NAME))","")
->  cd $(CMAKE_DEBUG_BUILD_DIR)/$(BIN_DIR) && $(RUN)$(SIT_READER_EXE_NAME)
-else
->  @echo "    ==== No Debug parser available ========"
+>  @echo "    ==== No Release Readers UT available ========"
+>  @echo "    ==== Expecting: $(CMAKE_RELEASE_BUILD_DIR)/$(BIN_DIR)/$(READERS_UT_EXE_NAME) ========"
 endif
 
 run_testcases_release:
@@ -379,8 +390,59 @@ distclean: code_coverage_clean
 > cmake -E remove_directory $(CMAKE_RELEASE_BUILD_DIR)
 > cmake -E remove_directory $(CMAKE_ARM_BUILD_DIR)
 > cmake -E remove_directory $(CMAKE_RISCV32_BUILD_DIR)
-> cmake -E remove -f Mast_UT/Generated/Runner.cpp
-> cmake -E remove -f SIT_reader_UT/Generated/Runner.cpp
+> cmake -E remove -f Mast_Core_UT/Generated/Runner.cpp
+> cmake -E remove -f Mast_API_UT/Generated/Runner.cpp
+> cmake -E remove -f Readers_UT/Generated/Runner.cpp
 > cmake -E remove -f External_Libs_UT/Generated/Runner.cpp
 > cmake -E remove -f Optional_Libs_UT/Generated/Runner.cpp
 
+# ----------------- Displays list of targets
+#
+# Usage: make -s targets
+#
+targets:
+> cmake -E echo List of targets:
+> cmake -E echo all
+> cmake -E echo arm
+> cmake -E echo centos
+> cmake -E echo clean
+> cmake -E echo code_coverage_build
+> cmake -E echo code_coverage_clean
+> cmake -E echo code_coverage_install
+> cmake -E echo code_coverage_report
+> cmake -E echo code_coverage_run
+> cmake -E echo debug
+> cmake -E echo distclean
+> cmake -E echo docs
+> cmake -E echo external_libs
+> cmake -E echo install
+> cmake -E echo install_debug
+> cmake -E echo install_release
+> cmake -E echo openocd_debug
+> cmake -E echo openocd_release
+> cmake -E echo pack
+> cmake -E echo pack_debug
+> cmake -E echo release
+> cmake -E echo riscV32
+> cmake -E echo run_all
+> cmake -E echo run_all_debug
+> cmake -E echo run_api_debug
+> cmake -E echo run_debug
+> cmake -E echo run_arm
+> cmake -E echo run_cpp_example_debug
+> cmake -E echo run_cpp_example_release
+> cmake -E echo run_all_release
+> cmake -E echo run_api_release
+> cmake -E echo run_release
+> cmake -E echo run_external_debug
+> cmake -E echo run_external_release
+> cmake -E echo run_optionals_debug
+> cmake -E echo run_optionals_release
+> cmake -E echo run_readers
+> cmake -E echo run_readers_ut_debug
+> cmake -E echo run_readers_ut_release
+> cmake -E echo run_testcases_release
+> cmake -E echo set_compiler
+> cmake -E echo test
+> cmake -E echo test_debug
+> cmake -E echo test_release

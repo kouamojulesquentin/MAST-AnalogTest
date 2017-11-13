@@ -10,12 +10,11 @@
 //! Declares BinaryVector and
 //===========================================================================
 
-
-
 #ifndef SCANVECTORS_H__3E0880BD_14C4_4089_BA8F_A382FB9EE011__INCLUDED_
   #define SCANVECTORS_H__3E0880BD_14C4_4089_BA8F_A382FB9EE011__INCLUDED_
 
 #include "Mast_Core_export.hpp"
+#include "IndexedRange.hpp"
 #include <vector>
 #include <initializer_list>
 #include <experimental/string_view>
@@ -49,6 +48,17 @@ enum class DontCare
   IsOne,   //!< 'x' or 'X' outside format specifier are replaced with ones
 };
 
+//! Defines base use to encode a value in a
+//!
+enum class NumberBase
+{
+  Undefined,   //!< Base is not defined
+  Binary,      //!< Base is binary
+  Hexadecimal, //!< Base is hexadecimal
+  Decimal,     //!< Base is decimal
+  Octal,       //!< Base is octal
+};
+
 //! Contains bitstream vector in compact binary format
 //!
 class MAST_CORE_EXPORT BinaryVector final
@@ -71,6 +81,7 @@ class MAST_CORE_EXPORT BinaryVector final
 
   using string_view = std::experimental::string_view;
 
+  static BinaryVector CreateFromDecString    (string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed);                                          //!< Creates a BinaryVector from text decimal representation
   static BinaryVector CreateFromBinaryString (string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed, DontCare dontCare = DontCare::IsError);   //!< Creates a BinaryVector from text binary representation
   static BinaryVector CreateFromHexString    (string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed, DontCare dontCare = DontCare::IsError);   //!< Creates a BinaryVector from text hexadecimal representation
   static BinaryVector CreateFromString       (string_view bits, SizeProperty sizeProperty = SizeProperty::NotFixed, DontCare dontCare = DontCare::IsError);   //!< Creates a BinaryVector from mixed hexadecimal and binary representation
@@ -111,6 +122,20 @@ class MAST_CORE_EXPORT BinaryVector final
                                uint32_t                       bytesPerLine      = 0,
                                std::experimental::string_view eolSeparator      = ","
                               ) const;         //!< Gets content as mix of hex and binary digits (size dependent)
+
+  // ---------------- ICL export
+
+  //! Makes string, binary, representation using ICL syntax
+  //!
+  std::string DataAsICLBinaryString () const;
+
+  //! Makes string, hexadecimal, representation using ICL syntax
+  //!
+  std::string DataAsICLHexString () const;
+
+  //! Makes string representation using ICL syntax
+  //!
+  std::string DataAsICLMixString (uint32_t hexStyleThreshold = 8) const;
 
   BinaryVector& operator=(const BinaryVector&);   //!< Copy assignment
   BinaryVector& operator=(BinaryVector&&);        //!< Move assignment
@@ -179,6 +204,13 @@ class MAST_CORE_EXPORT BinaryVector final
   void          Set(int32_t value); //!< Assigns signed 32 bits value to the BinaryVector
   void          Set(int64_t value); //!< Assigns signed 64 bits value to the BinaryVector
 
+  BinaryVector& SetSlice (uint32_t startOffset, const BinaryVector& value); //!< Assigns a portion of the BinaryVector
+
+  BinaryVector& SetSlice (IndexedRange range, uint8_t  value); //!< Assigns an unsigned  8 bits into a slice
+  BinaryVector& SetSlice (IndexedRange range, uint16_t value); //!< Assigns an unsigned 16 bits into a slice
+  BinaryVector& SetSlice (IndexedRange range, uint32_t value); //!< Assigns an unsigned 32 bits into a slice
+  BinaryVector& SetSlice (IndexedRange range, uint64_t value); //!< Assigns an unsigned 64 bits into a slice
+
   void SetBit    (uint32_t bitOffset); //!< Sets specified bit (zero based)
   void ClearBit  (uint32_t bitOffset); //!< Clears specified bit (zero based)
   void ToggleBit (uint32_t bitOffset); //!< Toggles specified bit (zero based)
@@ -188,12 +220,14 @@ class MAST_CORE_EXPORT BinaryVector final
   bool                 HasFixedSize()     const { return m_sizeProperty != SizeProperty::NotFixed; } //!< Returns true if number of used bits cannot be changed
   bool                 IsEmpty()          const { return m_data.empty();}                            //!< Returns true when there is no bit in the BinaryVector, false otherwise
   uint32_t             BitsCount()        const { return m_usedBits;    }                            //!< Returns total number of valid bits in the BinaryVector
-  uint32_t             BytesCount()       const { return m_data.size(); }                            //!< Returns total number of valid bits in the BinaryVector
+  uint32_t             BytesCount()       const { return m_data.size(); }                            //!< Returns total number of valid bytes in the BinaryVector (last one may be not complete)
   const uint8_t*       DataLeftAligned()  const { return m_data.data(); }                            //!< Returns pointer on raw bits stream data (only valid as long as content is not modified)
   std::vector<uint8_t> DataRightAligned() const;                                                     //!< Returns data right aligned in a new buffer
 
   BinaryVector    Slice    (uint32_t firstBitOffset, uint32_t bitsCount) const; //!< Returns a slice from BinaryVector
-//+  BinaryVector_View Slice_View (uint32_t firstBitOffset, uint32_t bitsCount) const; //!< Returns a reference to a slice from BinaryVector
+  BinaryVector    Slice    (IndexedRange range) const;                          //!< Returns a slice from BinaryVector
+
+  static NumberBase NumberBaseForValuePrefix (string_view number); //!< Defines used based from leading char of number string
 
   // ---------------- Private  Methods
   //
@@ -201,6 +235,10 @@ class MAST_CORE_EXPORT BinaryVector final
   uint8_t                   MergeToByte (uint32_t lsbOffset, uint8_t lsbBitsCount, bool asSigned = false) const;
   template<typename T> void SetUnsigned (T value);
   template<typename T> void SetSigned   (T value);
+
+  template<typename T> BinaryVector& SetSlice_T (IndexedRange range, T value);
+
+  BinaryVector& SetSlice_Impl(uint32_t startOffset, uint32_t bitsCount, const uint8_t* source); //!< Assigns a portion of the BinaryVector
 
   bool FixedSize()  const { return m_sizeProperty == SizeProperty::Fixed; }
   bool IsNegative() const { return (m_data[0] & 0x80) != 0; }
@@ -228,9 +266,10 @@ class MAST_CORE_EXPORT BinaryVector final
   // ---------------- Private  Fields
   //
   private:
-  std::vector<uint8_t> m_data;                                  //!< Bytes formatted bit stream MSB first and last byte bits are left aligned (on msb)
-  uint32_t             m_usedBits     = 0;                      //!< Number of effective bits (last byte may be not all used)
-  SizeProperty         m_sizeProperty = SizeProperty::NotFixed; //!< When true, the number of used bits cannot be changed (once constructed)
+  static constexpr bool PREFIX_WITH_BASE_ID = true;                   //!< Optional base prefix requirement
+  std::vector<uint8_t>  m_data;                                       //!< Bytes formatted bit stream MSB first and last byte bits are left aligned (on msb)
+  uint32_t              m_usedBits          = 0;                      //!< Number of effective bits (last byte may be not all used)
+  SizeProperty          m_sizeProperty      = SizeProperty::NotFixed; //!< When true, the number of used bits cannot be changed (once constructed)
 };
 //
 //  End of BinaryVector class declaration

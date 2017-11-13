@@ -16,7 +16,6 @@ include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
 include_directories(${LIBMAST_CPP_API_INCLUDE_DIRS})
 include_directories(${LIBMAST_C_API_INCLUDE_DIRS})
 include_directories(${LIBLOGGER_INCLUDE_DIRS})
-include_directories(${LIBSIT_READER_INCLUDE_DIRS})
 include_directories(${LIBMASTSPI_INCLUDE_DIRS})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
@@ -62,4 +61,4 @@ else()
   set(EXTRA_LIBS ${EXTRA_LIBS} ${LIBMASTSPI_LIBRARIES} ${KISS_FFT_LIBRARIES})
 endif()
 
-target_link_libraries(TestCasesApp Mast_API_CPP Mast_API_C Logger SIT_Reader_Lib ${EXTRA_LIBS})
+target_link_libraries(TestCasesApp Mast_API_CPP Mast_API_C Logger SIT_Reader ${EXTRA_LIBS})

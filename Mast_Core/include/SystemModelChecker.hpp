@@ -15,10 +15,10 @@
 #ifndef SYSTEMMODELCHECKER_H__BB1485FA_44D5_40BA_E5A8_C23F1A1BCC6__INCLUDED_
   #define SYSTEMMODELCHECKER_H__BB1485FA_44D5_40BA_E5A8_C23F1A1BCC6__INCLUDED_
 
-#include "SystemModelCheckResult.hpp"
+#include "CheckResult.hpp"
 #include "SystemModelVisitor.hpp"
 #include "SystemModel.hpp"
-#include "Checker.hpp"
+#include "SystemModelCheckerBase.hpp"
 
 #include <memory>
 #include <vector>
@@ -30,7 +30,7 @@ namespace mast
 //!
 //! @note This is intended to be used by SystemModel::Check()
 //!
-class MAST_CORE_EXPORT SystemModelChecker final : public Checker, public SystemModelVisitor
+class SystemModelChecker final : public SystemModelCheckerBase, public SystemModelVisitor
 {
   // ---------------- Public  Methods
   //
@@ -53,13 +53,13 @@ class MAST_CORE_EXPORT SystemModelChecker final : public Checker, public SystemM
   //!
   //! @see CheckIdentifiers and CheckTree
   //!
-  static SystemModelCheckResult Check(const SystemModel& model) { return SystemModelChecker(model).Check(); };
+  static CheckResult Check(const SystemModel& model) { return SystemModelChecker(model).Check(); };
 
   //! Checks SystemModel consistency
   //!
   //! @see CheckIdentifiers and CheckTree
   //!
-  virtual SystemModelCheckResult Check() override;
+  virtual CheckResult Check() override;
 
   //! Checks consistency of identifiers:
   //!

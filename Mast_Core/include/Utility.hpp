@@ -358,6 +358,7 @@ bool InRange(const T& val, const U& minVal, const V& maxVal) { return (val >= mi
 #define CHECK_PARAMETER_NOT_NULL(ptr, msg)    CheckParameterIsNotNullptr (__FILE__, __func__, __LINE__, ptr, msg)
 #define CHECK_PARAMETER_NOT_ZERO(val, msg)    CheckParameterIsNotZero    (__FILE__, __func__, __LINE__, val, msg)
 
+#define CHECK_PARAMETER_EMPTY(val, msg)       CheckParameterCondition  (__FILE__, __func__, __LINE__, (val),  (val).empty(), msg)
 #define CHECK_PARAMETER_NOT_EMPTY(val, msg)   CheckParameterCondition  (__FILE__, __func__, __LINE__, (val), !(val).empty(), msg)
 
 #define CHECK_PARAMETER_EQ(val,  refVal, msg) CheckParameterCondition (__FILE__, __func__, __LINE__, (val), (val == refVal), msg)
@@ -374,6 +375,7 @@ bool InRange(const T& val, const U& minVal, const V& maxVal) { return (val >= mi
 #define CHECK_VALUE_NOT_NULL(ptr, msg) CheckValueIsNotNullptr (__FILE__, __func__, __LINE__, ptr, msg)
 #define CHECK_VALUE_NOT_ZERO(val, msg) CheckValueIsNotZero    (__FILE__, __func__, __LINE__, val, msg)
 
+#define CHECK_VALUE_EMPTY(val, msg)       CheckValueCondition (__FILE__, __func__, __LINE__, (val), (val).empty(),   msg)
 #define CHECK_VALUE_NOT_EMPTY(val, msg)   CheckValueCondition (__FILE__, __func__, __LINE__, (val), !(val).empty(),  msg)
 #define CHECK_VALUE_EQ(val,  refVal, msg) CheckValueCondition (__FILE__, __func__, __LINE__, (val), (val == refVal), msg)
 #define CHECK_VALUE_NEQ(val, refVal, msg) CheckValueCondition (__FILE__, __func__, __LINE__, (val), (val != refVal), msg)

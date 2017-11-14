@@ -58,10 +58,12 @@ class AST_SystemModelGenerator final : public AST_Visitor
   // ---------------- Private Fields
   //
   private:
-  std::shared_ptr<mast::SystemModel>        m_systemModel;       //!< SystemModel currently being built
-  std::shared_ptr<mast::SystemModelNode>    m_parsedTopNode;     //!< SystemModel tree build from ICL file
-  std::unique_ptr<mast::SystemModelBuilder> m_builder;           //!< Helper to build SystemModel nodes
-  AST_Network*                              m_network = nullptr; //!< Test network AST used to generate SystemModel tree
+  std::shared_ptr<mast::SystemModel>        m_systemModel;                //!< SystemModel currently being built
+  std::unique_ptr<mast::SystemModelBuilder> m_builder;                    //!< Helper to build SystemModel nodes
+  std::shared_ptr<mast::SystemModelNode>    m_parsedTopNode;              //!< SystemModel tree build from ICL file
+  std::shared_ptr<mast::SystemModelNode>    m_lastCreatedNode;            //!< Serves as return value for Visit_xxx
+  const AST_Source*                         m_lastEntitySource = nullptr; //!< Serves as return value for Visit_xxx
+  AST_Network*                              m_network          = nullptr; //!< Test network AST used to generate SystemModel tree
 };
 //
 //  End of AST_SystemModelGenerator class declaration

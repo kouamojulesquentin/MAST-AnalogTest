@@ -362,9 +362,9 @@ AST_Port* AST::Create_Port (Kind kind, AST_VectorIdentifier* identifier, vector<
 //!
 //! @param name Identifier
 //!
-AST_ScalarIdentifier* AST::Create_ScalarIdentifier (string_view name)
+AST_ScalarIdentifier* AST::Create_ScalarIdentifier (std::string&& name)
 {
-  return Create_Node<AST_ScalarIdentifier>(name);
+  return Create_Node<AST_ScalarIdentifier>(std::move(name));
 }
 //
 //  End of: AST::Create_ScalarIdentifier
@@ -528,11 +528,11 @@ AST_String* AST::Create_String (string&& content)
 //!
 //! @return Created AST_VectorIdentifier
 //!
-AST_VectorIdentifier* AST::Create_VectorIdentifier (string_view name,
-                                                    string_view leftIndex,
-                                                    string_view rightIndex)
+AST_VectorIdentifier* AST::Create_VectorIdentifier (std::string&& name,
+                                                    std::string&& leftIndex,
+                                                    std::string&& rightIndex)
 {
-  return Create_Node<AST_VectorIdentifier>(name, leftIndex, rightIndex);
+  return Create_Node<AST_VectorIdentifier>(std::move(name), std::move(leftIndex), std::move(rightIndex));
 }
 //
 //  End of: AST::Create_VectorIdentifier

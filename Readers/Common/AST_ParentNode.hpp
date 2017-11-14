@@ -58,11 +58,7 @@ class AST_ParentNode : public AST_NamedNode
 
   //! Initializes with children
   //!
-  AST_ParentNode(Kind kind, std::vector<AST_Node*>&& children)
-    : AST_NamedNode          (kind)
-    , m_undispatchedChildren (std::move(children))
-  {
-  }
+  AST_ParentNode(Kind kind, std::vector<AST_Node*>&& children);
 
   //! Dispatches children to specific members
   //!

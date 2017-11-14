@@ -52,6 +52,7 @@ class UT_ICL_Reader : public CxxTest::TestSuite
   // ---------------- GenerateSystemModelNodes
   //
   void test_GenerateSystemModelNodes_1_ScanRegister ();
+  void test_GenerateSystemModelNodes_3_ScanRegisters ();
 
   // ================ Other Methods ================
 

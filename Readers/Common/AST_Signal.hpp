@@ -51,7 +51,7 @@ class AST_Signal final : public AST_SimpleNode
   //!
   //! @note Valid only when not a number
   //!
-  AST_Identifier* portName() const { return m_portName; }
+  AST_Identifier* PortName() const { return m_portName; }
 
   //! Tells whether signal bit(s) is/are complemented
   //!

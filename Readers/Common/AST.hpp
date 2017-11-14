@@ -87,10 +87,10 @@ class AST final
   AST_Module*             Create_Module             (const AST_ScalarIdentifier* identifier, std::vector<AST_Node*>&& children);
   AST_ScanInterface*      Create_ScanInterface      (const AST_ScalarIdentifier* identifier, std::vector<AST_Node*>&& children);
   AST_ScanRegister*       Create_ScanRegister       (AST_VectorIdentifier* identifier, std::vector<AST_Node*>&& children);
-  AST_ScalarIdentifier*   Create_ScalarIdentifier   (std::experimental::string_view name);
-  AST_VectorIdentifier*   Create_VectorIdentifier   (std::experimental::string_view name,
-                                                     std::experimental::string_view leftIndex,
-                                                     std::experimental::string_view rightIndex = "");
+  AST_ScalarIdentifier*   Create_ScalarIdentifier   (std::string&& name);
+  AST_VectorIdentifier*   Create_VectorIdentifier   (std::string&& name,
+                                                     std::string&& leftIndex,
+                                                     std::string&& rightIndex = "");
   AST_Value*              Create_Value              (Kind kind, std::experimental::string_view valueExpression);
 
 
@@ -102,10 +102,6 @@ class AST final
   void SetInstanceNamespace (std::string&& name) { m_instancesDefaultNamespace = Create_Namespace(std::move(name)); }  //!< Forces following instances to refer to modules in specified namespace
 
   AST_Network* Network() { return &m_network; } //!< Returns test network
-
-  //! Returns "top" module node
-  //!
-//+  AST_Module* TopModule();
 
   //! Returns root namespace
   //!

@@ -34,9 +34,13 @@ class AST_ModuleIdentifier final : public AST_Identifier
   ~AST_ModuleIdentifier() = default;
   AST_ModuleIdentifier()  = delete;
 
-  //! Text representation of signal
+  //! Text representation of module identifier
   //!
   std::string AsText() const override;
+
+  //! Module name without namespace
+  //!
+  const std::string& Name() const override;
 
   // ---------------- Private Methods
   //
@@ -47,15 +51,7 @@ class AST_ModuleIdentifier final : public AST_Identifier
 
   //! Initializes AST_ModuleIdentifier
   //!
-  //! @param namespaceName  Namespace of module definition
-  //! @param moduleName     Module name in the namespace
-  //!
-  AST_ModuleIdentifier(const AST_Namespace* namespaceName, const AST_ScalarIdentifier* moduleName)
-    : AST_Identifier (Kind::ModuleIdentifier)
-    , m_namespace    (namespaceName)
-    , m_moduleName   (moduleName)
-  {
-  }
+  AST_ModuleIdentifier(const AST_Namespace* namespaceName, const AST_ScalarIdentifier* moduleName);
 
   // ---------------- Private Fields
   //

@@ -16,6 +16,8 @@
   #define AST_VALUE_H__C7D6CDC4_753_49F0_45B7_9FFA68F2FD4C__INCLUDED_
 
 #include "AST_SimpleNode.hpp"
+#include "BinaryVector.hpp"
+
 #include <string>
 
 namespace Parsers
@@ -31,6 +33,8 @@ class AST_Value final : public AST_SimpleNode
   AST_Value()  = delete;
 
   std::string AsText() const override { return m_valueExpression; }; //!< Text representation of value
+
+  mast::BinaryVector AsBinaryVector() const;    //!< Value as a BinaryVector
 
   // ---------------- Private Methods
   //

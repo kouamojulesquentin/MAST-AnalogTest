@@ -29,13 +29,22 @@ class AST_Identifier : public AST_SimpleNode
   ~AST_Identifier() = default;
   AST_Identifier()  = delete;
 
+  virtual const std::string& Name()   const          { return m_identifier; }; //!< Text representation of identifier
+  virtual std::string        AsText() const override { return m_identifier; }; //!< Text representation of identifier
+
   // ---------------- Protected Methods
   //
   protected:
-  AST_Identifier(Kind kind)
+  AST_Identifier(Kind kind, std::string&& identifier)
     : AST_SimpleNode (kind)
+    , m_identifier   (identifier)
   {
   }
+
+  // ---------------- Private Fields
+  //
+  private:
+  std::string m_identifier; //!< Textual representation of identifier
 };
 //
 //  End of AST_Identifier class declaration

@@ -65,6 +65,32 @@ void AST_Module::DispatchChildren ()
 
 
 
+//! Searches for a ScanRegister with specified identifier
+//!
+//! @param identifier   An identifier for ScanRegister to find
+//!
+AST_ScanRegister* AST_Module::FindScanRegister (const AST_Identifier* identifier)
+{
+  CHECK_PARAMETER_NOT_NULL(identifier, "Cannot find ScanRegister from nullptr identifier");
+
+  AST_ScanRegister* foundScanRegister = nullptr;
+
+  for (auto scanRegister : m_scanRegisters)
+  {
+    if (scanRegister->Identifier()->Name() == identifier->Name())
+    {
+      foundScanRegister = scanRegister;
+      break;
+    }
+  }
+
+  return foundScanRegister;
+}
+//
+//  End of: AST_Module::FindScanRegister
+//---------------------------------------------------------------------------
+
+
 //===========================================================================
 // End of AST_Module.cpp
 //===========================================================================

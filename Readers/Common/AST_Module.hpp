@@ -82,6 +82,9 @@ class AST_Module final : public AST_ParentNode
   //!
   bool HasAccessLink() const { return m_accessLink != nullptr; }
 
+  //! Searches for a ScanRegister with specified identifier
+  //!
+  AST_ScanRegister* FindScanRegister (const AST_Identifier* identifier);
 
   // ---------------- Private Methods
   //

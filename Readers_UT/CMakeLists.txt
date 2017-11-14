@@ -7,8 +7,11 @@ message("=======================================================================
 set(UT_RootPath         "${CMAKE_CURRENT_LIST_DIR}")
 set(CXXTEST_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../cxxtest")
 
-set(UT_COMMON_HEADERS     "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_PrettyPrinter.hpp")
-set(UT_COMMON_SOURCES     "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_PrettyPrinter.cpp")
+set(UT_COMMON_HEADERS     "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_PrettyPrinter.hpp"
+                          "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_Checker.hpp")
+
+set(UT_COMMON_SOURCES     "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_PrettyPrinter.cpp"
+                          "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_Checker.cpp")
 
 set(UT_SIT_READER_HEADERS "${CMAKE_CURRENT_LIST_DIR}/SIT/UT_SIT_Printer.hpp"
                           "${CMAKE_CURRENT_LIST_DIR}/SIT/UT_reader.hpp")

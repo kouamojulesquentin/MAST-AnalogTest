@@ -30,24 +30,16 @@ class AST_ScalarIdentifier final : public AST_Identifier
   ~AST_ScalarIdentifier() = default;
   AST_ScalarIdentifier()  = delete;
 
-  std::string AsText() const override { return m_identifier; }; //!< Text representation of identifier
-
   // ---------------- Private Methods
   //
   private:
-  friend class AST;                                                             // This is AST that manages construction/destruction of AST nodes
-  MAKE_UNIQUE_AS_FRIEND(AST_ScalarIdentifier)(std::experimental::string_view&); // AST currently uses make_unit<T>() to create nodes
+  friend class AST;   // This is AST that manages construction/destruction of AST nodes (it uses make_unit<T>() to create nodes)
+  MAKE_UNIQUE_AS_FRIEND(AST_ScalarIdentifier)(std::string&&);
 
-  AST_ScalarIdentifier(std::experimental::string_view identifier)
-    : AST_Identifier (Kind::ScalarIdentifier)
-    , m_identifier   (identifier)
+  AST_ScalarIdentifier(std::string&& identifier)
+    : AST_Identifier (Kind::ScalarIdentifier, std::move(identifier))
   {
   }
-
-  // ---------------- Private Fields
-  //
-  private:
-  std::string m_identifier; //!< Textual representation of identifier
 };
 //
 //  End of AST_ScalarIdentifier class declaration

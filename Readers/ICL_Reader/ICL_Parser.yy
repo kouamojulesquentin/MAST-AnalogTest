@@ -737,8 +737,20 @@ port_name          : scalar_or_vector_id { $$ = $1; /* port_name : scalar_or_vec
 register_name      : scalar_or_vector_id { $$ = $1; /* register_name : scalar_or_vector_id */}
 reg_port_signal_id : scalar_or_vector_id { $$ = $1; /* reg_port_signal_id : scalar_or_vector_id */}
 
-instance_name  : SCALAR_ID { $$ = ast.Create_ScalarIdentifier($[SCALAR_ID]); /* instance_name: SCALAR_ID */ };
-module_name    : SCALAR_ID { $$ = ast.Create_ScalarIdentifier($[SCALAR_ID]); /* module_name: SCALAR_ID */ };
+instance_name : SCALAR_ID
+{
+  // instance_name : SCALAR_ID
+  auto& name = $[SCALAR_ID];
+
+  $$ = ast.Create_ScalarIdentifier(std::move(name));
+};
+module_name    : SCALAR_ID
+{
+  // module_name : SCALAR_ID
+  auto& name = $[SCALAR_ID];
+
+  $$ = ast.Create_ScalarIdentifier(std::move(name));
+};
 namespace_name : SCALAR_ID { $$ = $[SCALAR_ID]; /* namespace_name: SCALAR_ID */ };
 
 scoped_instance_name :
@@ -2200,8 +2212,8 @@ accessLinkGeneric_def : ACCESSLINK accessLink_name OF accessLink_genericID  LEFT
   // accessLinkGeneric_def : ACCESSLINK accessLink_name OF accessLink_genericID  LEFT_BRACE RIGHT_BRACE
   auto& name          = $[accessLink_name];
   auto  genericId     = $[accessLink_genericID];
-  auto  nameNode      = ast.Create_ScalarIdentifier(name);
-  auto  genericIdNode = ast.Create_ScalarIdentifier(genericId);
+  auto  nameNode      = ast.Create_ScalarIdentifier(std::move(name));
+  auto  genericIdNode = ast.Create_ScalarIdentifier(std::move(genericId));
   auto  node          = ast.Create_AccessLink(nameNode, genericIdNode);
 
   $$ = node;
@@ -2219,7 +2231,7 @@ accessLink1149_def : ACCESSLINK accessLink_name OF accessLink1149_stds LEFT_BRAC
 {
   // accessLink1149_def : ACCESSLINK accessLink_name OF accessLink1149_stds LEFT_BRACE BSDLENTITIY bsdlEntity_name SEMICOLON bsdl_instr_refs RIGHT_BRACE
   auto& name      = $[accessLink_name];
-  auto  nameId    = ast.Create_ScalarIdentifier(name);
+  auto  nameId    = ast.Create_ScalarIdentifier(std::move(name));
   auto  type      = $[accessLink1149_stds];
   auto  children  = vector<Parsers::AST_Node*>();
   auto  node      = ast.Create_AccessLink(nameId, type, std::move(children));

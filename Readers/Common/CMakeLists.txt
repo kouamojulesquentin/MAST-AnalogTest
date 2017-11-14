@@ -52,7 +52,10 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_VectorIdentifier.hpp
                                   AST_VectorIdentifier.cpp
                                   AST_Value.hpp
+                                  AST_Value.cpp
                                   AST_Visitor.hpp
+                                  AST_Checker.hpp
+                                  AST_Checker.cpp
                                   AST_PrettyPrinter.hpp
                                   AST_PrettyPrinter.cpp
                                   AST_SystemModelGenerator.hpp

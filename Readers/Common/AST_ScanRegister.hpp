@@ -41,12 +41,27 @@ class AST_ScanRegister final : public AST_ParentNode
   //!
   void Accept (AST_Visitor& visitor) override;
 
+  //! ScanRegister identifier
+  //!
+  const AST_VectorIdentifier* Identifier() const { return m_identifier; }
+
+
   //! ScanRegister name
   //!
   std::string Name() const override { return m_identifier->AsText(); }
 
-  std::experimental::string_view RangeLeft()  const;
-  std::experimental::string_view RangeRight() const;
+  //! ScanRegister base name (without indices)
+  //!
+  const std::string& BaseName() const { return m_identifier->BaseName(); }
+
+  const std::string& RangeLeft()  const;
+  const std::string& RangeRight() const;
+
+  //! ScanRegister source base name (without indices)
+  //!
+  const std::string& SourceBaseName() const;
+
+  size_t BitsCount () const;  //!< Returns ScanRegister bits count
 
 
   const AST_Source* ScanInSource() const { return m_scanInSource; } //!< Scan register input source
@@ -76,9 +91,10 @@ class AST_ScanRegister final : public AST_ParentNode
   // ---------------- Private Fields
   //
   private:
-  const AST_VectorIdentifier* m_identifier   = nullptr; //!< Scan register name
-  const AST_Value*            m_resetValue   = nullptr; //!< Scan register reset value expression
-  const AST_Source*           m_scanInSource = nullptr; //!< Scan register input source
+  const AST_VectorIdentifier* m_identifier       = nullptr; //!< Scan register name
+  const AST_Value*            m_resetValue       = nullptr; //!< Scan register reset value expression
+  const AST_Value*            m_defaultLoadValue = nullptr; //!< Scan register default load value expression
+  const AST_Source*           m_scanInSource     = nullptr; //!< Scan register input source
 };
 //
 //  End of AST_ScanRegister class declaration

@@ -22,6 +22,20 @@ using std::string;
 using namespace Parsers;
 
 
+//! Constructs from a bunch of ordered (concatenated) signals
+//!
+AST_Source::AST_Source (Kind kind, std::vector<AST_Signal*>&& signals)
+  : AST_SimpleNode (kind)
+  , m_signals      (std::move(signals))
+{
+  CHECK_PARAMETER_NOT_EMPTY(m_signals, "Source must have at least one signal");
+}
+//
+//  End of: AST_Source::AST_Source
+//---------------------------------------------------------------------------
+
+
+
 //! Visited part of the Visitor pattern
 //!
 void AST_Source::Accept (AST_Visitor& visitor)

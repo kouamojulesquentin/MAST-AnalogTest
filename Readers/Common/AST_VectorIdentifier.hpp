@@ -30,12 +30,12 @@ class AST_VectorIdentifier final : public AST_Identifier
   ~AST_VectorIdentifier() = default;
   AST_VectorIdentifier()  = delete;
 
-  std::experimental::string_view LeftIndex()  const { return m_left;  } //!< Returns identifier left index
-  std::experimental::string_view RightIndex() const { return m_right; } //!< Returns identifier right index
+  const std::string& LeftIndex()  const { return m_left;  } //!< Returns identifier left index
+  const std::string& RightIndex() const { return m_right; } //!< Returns identifier right index
 
-  std::experimental::string_view BaseName()    const { return m_identifier; } //!< Text representation of identifier base name - without index(es)
-  std::string                    RangeAsText() const;                         //!< Text representation of only index(es)
-  std::string                    AsText()      const override;                //!< Text representation of identifier with its index(es)
+  const std::string& BaseName()    const { return AST_Identifier::Name(); } //!< Text representation of identifier base name - without index(es)
+  std::string        RangeAsText() const;                                   //!< Text representation of only index(es)
+  std::string        AsText()      const override;                          //!< Text representation of identifier with its index(es)
 
 
   bool IsScalar()    const { return  m_right.empty() && m_left.empty(); }      //!< Returns true when both left and right indexes are empty (equivalent to ScalarIdentifier)
@@ -45,27 +45,23 @@ class AST_VectorIdentifier final : public AST_Identifier
   // ---------------- Private Methods
   //
   private:
-  friend class AST;                                                             // This is AST that manages construction/destruction of AST nodes
-  MAKE_UNIQUE_AS_FRIEND(AST_VectorIdentifier)(std::experimental::string_view&,
-                                              std::experimental::string_view&,
-                                              std::experimental::string_view&); // AST currently uses make_unit<T>() to create nodes
+  friend class AST;   // This is AST that manages construction/destruction of AST nodes (it uses make_unit<T>() to create nodes)
+  MAKE_UNIQUE_AS_FRIEND(AST_VectorIdentifier)(std::string&&, std::string&&, std::string&&);
 
-  AST_VectorIdentifier(std::experimental::string_view identifier,
-                       std::experimental::string_view leftIndex,
-                       std::experimental::string_view rightIndex = "")
-    : AST_Identifier (Kind::VectorIdentifier)
-    , m_identifier   (identifier)
-    , m_left         (leftIndex)
-    , m_right        (rightIndex)
+  AST_VectorIdentifier(std::string&& identifier,
+                       std::string&& leftIndex,
+                       std::string&& rightIndex = "")
+    : AST_Identifier (Kind::VectorIdentifier, std::move(identifier))
+    , m_left         (std::move(leftIndex))
+    , m_right        (std::move(rightIndex))
   {
   }
 
   // ---------------- Private Fields
   //
   private:
-  std::string m_identifier; //!< Textual representation of identifier
-  std::string m_left;       //!< Left index
-  std::string m_right;      //!< Right index (can be empty for single bit identifier)
+  std::string m_left;  //!< Left index
+  std::string m_right; //!< Right index (can be empty for single bit identifier)
 };
 //
 //  End of AST_VectorIdentifier class declaration

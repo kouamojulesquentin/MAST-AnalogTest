@@ -24,7 +24,7 @@ string AST_VectorIdentifier::AsText () const
 {
   std::ostringstream os;
 
-  os << m_identifier;
+  os << BaseName();
 
   if (!IsScalar())
   {

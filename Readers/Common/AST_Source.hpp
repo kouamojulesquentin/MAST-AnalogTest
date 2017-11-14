@@ -64,11 +64,7 @@ class AST_Source final : public AST_SimpleNode
 
   //! Constructs from a bunch of ordered (concatenated) signals
   //!
-  AST_Source(Kind kind, std::vector<AST_Signal*>&& signals)
-    : AST_SimpleNode (kind)
-    , m_signals      (std::move(signals))
-  {
-  }
+  AST_Source(Kind kind, std::vector<AST_Signal*>&& signals);
 
   // ---------------- Private Fields
   //

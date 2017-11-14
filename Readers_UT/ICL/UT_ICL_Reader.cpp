@@ -14,12 +14,17 @@
 #include "UT_ICL_Reader.hpp"
 
 #include "ICL_Reader.hpp"
-#include "ParserException.hpp"
-#include "SystemModel.hpp"
-#include "PrettyPrinter.hpp"
 #include "AST.hpp"
 #include "AST_Module.hpp"
 #include "AST_PrettyPrinter.hpp"
+#include "AST_Checker.hpp"
+
+#include "ParserException.hpp"
+#include "SystemModel.hpp"
+#include "SystemModelBuilder.hpp"
+#include "LoopbackAccessInterfaceProtocol.hpp"
+#include "PrettyPrinter.hpp"
+
 #include "TestUtilities.hpp"
 #include "Mast_Core_Traits.hpp"
 
@@ -41,6 +46,7 @@ using namespace std::experimental::literals::string_view_literals;
 using namespace mast;
 
 using ICL::ICL_Reader;
+using namespace Parsers;
 
 namespace
 {
@@ -55,6 +61,21 @@ class ICL_Reader_TSS : public ICL::ICL_Reader
   using ICL_Reader::GenerateSystemModelNodes;
 };
 
+//! Add a JTAG Tap to system mode, then append node to it
+//!
+void PrependWithTap (shared_ptr<SystemModel> sm, shared_ptr<SystemModelNode> node)
+{
+  auto protocol = make_shared<LoopbackAccessInterfaceProtocol> ();
+  SystemModelBuilder builder(*sm);
+
+  auto tap = builder.Create_JTAG_TAP("TAP", 8u, 2u, protocol);
+
+  sm->ReplaceRoot(tap, false);
+  tap->AppendChild(node);
+}
+//
+//  End of: PrependWithTap
+//---------------------------------------------------------------------------
 } // End of unnamed namespace
 
 //! Initializes tests (called for each test)
@@ -63,7 +84,10 @@ void UT_ICL_Reader::setUp ()
 {
   CxxTest::setStringResultsOnNewLine(true);
   CxxTest::setCharactersMapping(CxxTest::CharacterMapping::MAP_CHARS_MINIMAL);  // Keep quotes, HT, and new lines unescaped
+
+  SystemModelNode::ResetNodeIdentifier(); // Needed to check with pretty print that include node identifiers
 }
+
 
 
 //! Checks ICL_Reader::ParseExcerpt() when parsing a single ScanRegister
@@ -1348,7 +1372,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_AccessLink_1149_2001 ()
 }
 
 
-//! Checks ICL_Reader::GenerateSystemModelNodes() when parsing a single ScanRegister
+//! Checks ICL_Reader::GenerateSystemModelNodes() when parsing a single ScanRegister in a single (top module)
 //!
 void UT_ICL_Reader::test_GenerateSystemModelNodes_1_ScanRegister ()
 {
@@ -1374,6 +1398,10 @@ void UT_ICL_Reader::test_GenerateSystemModelNodes_1_ScanRegister ()
   auto ast = sut.AST();
   TS_ASSERT_NOT_NULLPTR (ast);
 
+  auto checkResult = AST_Checker::Check(ast->Network());
+
+  TS_ASSERT_FALSE (checkResult.HasIssues());
+
   // ---------------- Exercise
   //
   auto topNode = sut.GenerateSystemModelNodes(ast);
@@ -1382,7 +1410,155 @@ void UT_ICL_Reader::test_GenerateSystemModelNodes_1_ScanRegister ()
   //
   TS_ASSERT_NOT_NULLPTR (topNode);
   TS_ASSERT_EQUALS      (topNode->Name(), "SReg");
+
+  // With PrettyPrinter
+  auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(topNode, PrettyPrinterOptions::Parser_debug);
+  auto expected_PrettyPrint = "[Chain](0)     \"SReg\"\n"
+                              " [Register](1)  \"SR\", length: 8, bypass: 0000_0000";
+
+  TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
+  // With Checker
+  PrependWithTap(sm, topNode);   // This is to avoid warnings about missing AccessInterface
+  auto modelCheckResult = sm->Check();
+  TS_ASSERT_EMPTY (modelCheckResult.InformativeReport());
 }
+
+
+//! Checks ICL_Reader::GenerateSystemModelNodes() when parsing 3 ScanRegisters in a single (top module)
+//!
+void UT_ICL_Reader::test_GenerateSystemModelNodes_3_ScanRegisters ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto icl                 = std::get<0>(data);
+    auto expectedPrettyPrint = std::get<1>(data);
+
+    std::istringstream excerpt{string(icl.cbegin(), icl.cend())};
+
+    auto           sm = make_shared<SystemModel>();
+    ICL_Reader_TSS sut(sm);
+
+    CxxTest::setAbortTestOnFail(true);
+    TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+    auto ast = sut.AST();
+    TS_ASSERT_NOT_NULLPTR (ast);
+
+    auto checkResult = AST_Checker::Check(ast->Network());
+
+    TS_ASSERT_FALSE (checkResult.HasIssues());
+
+    // ---------------- Exercise
+    //
+    auto topNode = sut.GenerateSystemModelNodes(ast);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_NOT_NULLPTR (topNode);
+
+    // With PrettyPrinter
+    auto actualPrettyPrint   = PrettyPrinter::PrettyPrint(topNode, PrettyPrinterOptions::Parser_debug);
+
+    TS_ASSERT_EQUALS (actualPrettyPrint, expectedPrettyPrint);
+
+    // With Checker
+    PrependWithTap(sm, topNode);   // This is to avoid warnings about missing AccessInterface
+    auto modelCheckResult = sm->Check();
+    TS_ASSERT_EMPTY (modelCheckResult.InformativeReport());
+  };
+
+  using data_t = tuple<string_view, string_view>;
+  auto data =
+  {
+    data_t  // 00
+    {
+      // ICL
+      "Module Test_3x_Reg {\n"
+      "ScanInPort    SI;\n"
+      "ScanOutPort   SO { Source  SR_3[0];}\n"
+      "ShiftEnPort   SE;\n"
+      "CaptureEnPort CE;\n"
+      "UpdateEnPort  UE;\n"
+      "SelectPort    SEL;\n"
+      "ResetPort     RST;\n"
+      "TCKPort       TCK;\n"
+      "DataInPort    DI[7:0];\n"
+      "DataOutPort   DO[7:0] {Source SR_1; }\n"
+      "\n"
+      "ScanRegister SR_3[7:0] { ScanInSource SR_2[0];\n"
+      "                       CaptureSource DI;\n"
+      "                       ResetValue 8'b00000011; }\n"
+      "\n"
+      "ScanRegister SR_1[5:0] { ScanInSource SI;\n"
+      "                       CaptureSource DI;\n"
+      "                       ResetValue 6'b000001; }\n"
+      "\n"
+      "ScanRegister SR_2[6:0] { ScanInSource SR_1[0];\n"
+      "                       CaptureSource DI;\n"
+      "                       ResetValue 7'b0000010; }\n"
+      "}\n"sv,
+      // Pretty Print
+      "[Chain](0)     \"Test_3x_Reg\"\n"
+      " [Register](3)  \"SR_1\", length: 6, bypass: 0000_01\n"
+      " [Register](2)  \"SR_2\", length: 7, bypass: 0000_010\n"
+      " [Register](1)  \"SR_3\", length: 8, bypass: 0000_0011"sv
+    },
+
+    data_t  // 01
+    {
+      // ICL
+      "Module Test_3x_Reg {\n"
+      "ScanInPort    SI;\n"
+      "ScanOutPort   SO { Source  SR_1[0];}\n"
+      "\n"
+      "ScanRegister SR_3[7:0] { ScanInSource SR_2[0];\n"
+      "                       ResetValue 8'b00000011; }\n"
+      "\n"
+      "ScanRegister SR_1[5:0] { ScanInSource SR_3[0];\n"
+      "                       ResetValue 6'b000001; }\n"
+      "\n"
+      "ScanRegister SR_2[6:0] { ScanInSource SI[0];\n"
+      "                       CaptureSource DI;\n"
+      "                       ResetValue 7'b0000010; }\n"
+      "}\n"sv,
+      // Pretty Print
+      "[Chain](0)     \"Test_3x_Reg\"\n"
+      " [Register](3)  \"SR_2\", length: 7, bypass: 0000_010\n"
+      " [Register](2)  \"SR_3\", length: 8, bypass: 0000_0011\n"
+      " [Register](1)  \"SR_1\", length: 6, bypass: 0000_01"sv
+    },
+
+    data_t  // 02
+    {
+      // ICL
+      "Module Test_3x_Reg {\n"
+      "ScanInPort    SI;\n"
+      "ScanOutPort   SO { Source  SR_2[6];}\n"
+      "\n"
+      "ScanRegister SR_1[5:0] { ScanInSource SI;\n"
+      "                       ResetValue 6'b000001; }\n"
+      "\n"
+      "ScanRegister SR_2[0:6] { ScanInSource SR_1[0];\n"
+      "                       CaptureSource DI;\n"
+      "                       ResetValue 7'b0000010; }\n"
+      "}\n"sv,
+      // Pretty Print
+      "[Chain](0)     \"Test_3x_Reg\"\n"
+      " [Register](2)  \"SR_1\", length: 6, bypass: 0000_01\n"
+      " [Register](1)  \"SR_2\", length: 7, bypass: 0000_010"sv
+    },
+
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
 
 //===========================================================================
 // End of UT_ICL_Reader.cpp

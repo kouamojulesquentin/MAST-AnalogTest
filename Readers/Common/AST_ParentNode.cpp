@@ -12,10 +12,28 @@
 //===========================================================================
 
 #include "AST_ParentNode.hpp"
+#include "Utility.hpp"
 
 using std::vector;
 
 using namespace Parsers;
+
+
+//! Initializes with children
+//!
+AST_ParentNode::AST_ParentNode (Kind kind, vector<AST_Node*>&& children)
+  : AST_NamedNode          (kind)
+  , m_undispatchedChildren (std::move(children))
+{
+  for (const auto node : m_undispatchedChildren)
+  {
+    CHECK_PARAMETER_NOT_NULL(node, "AST_ParentNode accepts only not nullptr children");
+  }
+}
+//
+//  End of: AST_ParentNode::AST_ParentNode
+//---------------------------------------------------------------------------
+
 
 
 //! Removes children that have been dispatched (leaving nullptr)

@@ -1372,6 +1372,48 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_AccessLink_1149_2001 ()
 }
 
 
+//! Checks ICL_Reader::GenerateSystemModelNodes() when parsing a single empty top module
+//!
+void UT_ICL_Reader::test_GenerateSystemModelNodes_EmptyModule ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt("Module Empty_top\n"
+                        "{\n"
+                        "  ScanInPort  SI;\n"
+                        "  ScanOutPort SO { Source SI;}\n"
+                        "}\n"s);
+
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  CxxTest::setAbortTestOnFail(true);
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+
+  auto checkResult = AST_Checker::Check(ast->Network());
+
+  TS_ASSERT_FALSE (checkResult.HasIssues());
+
+  // ---------------- Exercise
+  //
+  auto topNode = sut.GenerateSystemModelNodes(ast);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_NOT_NULLPTR (topNode);
+  TS_ASSERT_EQUALS      (topNode->Name(), "Empty_top");
+
+  // With PrettyPrinter
+  auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode, PrettyPrinterOptions::Parser_debug);
+  auto expected_PrettyPrint = "[Chain](0)     \"Empty_top\"";
+
+  TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+}
+
+
 //! Checks ICL_Reader::GenerateSystemModelNodes() when parsing a single ScanRegister in a single (top module)
 //!
 void UT_ICL_Reader::test_GenerateSystemModelNodes_1_ScanRegister ()
@@ -1412,7 +1454,7 @@ void UT_ICL_Reader::test_GenerateSystemModelNodes_1_ScanRegister ()
   TS_ASSERT_EQUALS      (topNode->Name(), "SReg");
 
   // With PrettyPrinter
-  auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(topNode, PrettyPrinterOptions::Parser_debug);
+  auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode, PrettyPrinterOptions::Parser_debug);
   auto expected_PrettyPrint = "[Chain](0)     \"SReg\"\n"
                               " [Register](1)  \"SR\", length: 8, bypass: 0000_0000";
 
@@ -1425,9 +1467,12 @@ void UT_ICL_Reader::test_GenerateSystemModelNodes_1_ScanRegister ()
 }
 
 
-//! Checks ICL_Reader::GenerateSystemModelNodes() when parsing 3 ScanRegisters in a single (top module)
+
+
+
+//! Checks ICL_Reader::GenerateSystemModelNodes() when parsing N ScanRegisters in a single (top module)
 //!
-void UT_ICL_Reader::test_GenerateSystemModelNodes_3_ScanRegisters ()
+void UT_ICL_Reader::test_GenerateSystemModelNodes_N_ScanRegisters ()
 {
   // ---------------- DDT Setup
   //
@@ -1557,6 +1602,205 @@ void UT_ICL_Reader::test_GenerateSystemModelNodes_3_ScanRegisters ()
   // ---------------- DDT Exercise
   //
   TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+
+//! Checks ICL_Reader::GenerateSystemModelNodes() when parsing 2 modules with only ScanRegisters and no parameters
+//!
+void UT_ICL_Reader::test_GenerateSystemModelNodes_2_Modules ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt(
+                        "Module top\n"                                  // 01
+                        "{\n"                                           // 02
+                        "  ScanInPort    SI;\n"                         // 03
+                        "  ScanOutPort   SO { Source SR_2[0];}\n"       // 04
+                        "  ScanRegister  SR_2[7:0]\n"                   // 05
+                        "  {\n"                                         // 06
+                        "    ScanInSource  inst_1.bso;\n"               // 07
+                        "    ResetValue    8'b0001_0010;\n"             // 08
+                        "  }\n"                                         // 09
+                        "  ScanRegister  SR_1[4:0]\n"                   // 10
+                        "  {\n"                                         // 11
+                        "    ScanInSource  SI;\n"                       // 12
+                        "    ResetValue    5'b1_0001;\n"                // 13
+                        "  }\n"                                         // 14
+                        "  Instance inst_1 Of bottom\n"                 // 15
+                        "  {\n"                                         // 16
+                        "    InputPort bsi = SR_1[0];\n"                // 17
+                        "  }\n"                                         // 18
+                        "}\n"                                           // 19
+                        "\n"                                            // 20
+                        "Module bottom\n"                               // 21
+                        "{\n"                                           // 22
+                        "  ScanInPort    bsi;\n"                        // 23
+                        "  ScanOutPort   bso { Source reg_2[0];}\n"     // 24
+                        "  ScanRegister  reg_1[7:0]\n"                  // 25
+                        "  {\n"                                         // 26
+                        "    ScanInSource  bsi;\n"                      // 27
+                        "    ResetValue    8'b0010_0001;\n"             // 28
+                        "  }\n"                                         // 29
+                        "  ScanRegister  reg_2[6:0]\n"                  // 30
+                        "  {\n"                                         // 31
+                        "    ScanInSource  reg_1[0];\n"                 // 32
+                        "    ResetValue    7'b010_0010;\n"              // 33
+                        "  }\n"                                         // 34
+                        "}\n"s);                                        // 35
+
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  CxxTest::setAbortTestOnFail(true);
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+
+  auto checkResult = AST_Checker::Check(ast->Network());
+
+  TS_ASSERT_FALSE (checkResult.HasIssues());
+
+  // ---------------- Exercise
+  //
+  auto topNode = sut.GenerateSystemModelNodes(ast);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_NOT_NULLPTR (topNode);
+  TS_ASSERT_EQUALS      (topNode->Name(), "top");
+
+  // With PrettyPrinter
+  auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(topNode, PrettyPrinterOptions::Parser_debug);
+  auto expected_PrettyPrint = "[Chain](0)     \"top\"\n"
+                              " [Register](5)  \"SR_1\", length: 5, bypass: 1000_1\n"
+                              " [Chain](2)     \"inst_1\"\n"
+                              "  [Register](4)  \"reg_1\", length: 8, bypass: 0010_0001\n"
+                              "  [Register](3)  \"reg_2\", length: 7, bypass: 0100_010\n"
+                              " [Register](1)  \"SR_2\", length: 8, bypass: 0001_0010"
+                              ;
+
+  TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
+  // With Checker
+  PrependWithTap(sm, topNode);   // This is to avoid warnings about missing AccessInterface
+  auto modelCheckResult = sm->Check();
+  TS_ASSERT_EMPTY (modelCheckResult.InformativeReport());
+}
+
+
+
+//! Checks ICL_Reader::GenerateSystemModelNodes() when parsing N modules with only ScanRegisters and no parameters
+//!
+void UT_ICL_Reader::test_GenerateSystemModelNodes_N_Modules ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt(
+                        "Module top\n"                                  // 01
+                        "{\n"                                           // 02
+                        "  ScanInPort    SI;\n"                         // 03
+                        "  ScanOutPort   SO { Source SR_2[0];}\n"       // 04
+                        "  ScanRegister  SR_2[7:0]\n"                   // 05
+                        "  {\n"                                         // 06
+                        "    ScanInSource  inst_1.bso;\n"               // 07
+                        "    ResetValue    8'b0001_0010;\n"             // 08
+                        "  }\n"                                         // 09
+                        "  ScanRegister  SR_1[4:0]\n"                   // 10
+                        "  {\n"                                         // 11
+                        "    ScanInSource  inst_2.midout;\n"            // 12
+                        "    ResetValue    5'b1_0001;\n"                // 13
+                        "  }\n"                                         // 14
+                        "  Instance inst_1 Of bottom\n"                 // 15
+                        "  {\n"                                         // 16
+                        "    InputPort bsi = SR_1[0];\n"                // 17
+                        "  }\n"                                         // 18
+                        "  Instance inst_2 Of middle\n"                 // 19
+                        "  {\n"                                         // 20
+                        "    InputPort midin = SI;\n"                   // 21
+                        "  }\n"                                         // 22
+                        "}\n"                                           // 23
+                        "\n"                                            // 24
+                        "Module bottom\n"                               // 25
+                        "{\n"                                           // 26
+                        "  ScanInPort    bsi;\n"                        // 27
+                        "  ScanOutPort   bso { Source reg_2[0];}\n"     // 28
+                        "  ScanRegister  reg_1[7:0]\n"                  // 29
+                        "  {\n"                                         // 30
+                        "    ScanInSource  bsi;\n"                      // 31
+                        "    ResetValue    8'b0010_0001;\n"             // 32
+                        "  }\n"                                         // 33
+                        "  ScanRegister  reg_2[6:0]\n"                  // 34
+                        "  {\n"                                         // 35
+                        "    ScanInSource  reg_1[0];\n"                 // 36
+                        "    ResetValue    7'b010_0010;\n"              // 37
+                        "  }\n"                                         // 38
+                        "}\n"                                           // 39
+                        "Module middle\n"                               // 40
+                        "{\n"                                           // 41
+                        "  ScanInPort    midin;\n"                      // 42
+                        "  ScanOutPort   midout { Source mreg_2[0];}\n" // 43
+                        "  Instance inst Of bottom\n"                   // 44
+                        "  {\n"                                         // 45
+                        "    InputPort bsi = mreg_1[0];\n"              // 46
+                        "  }\n"                                         // 47
+                        "  ScanRegister  mreg_1[7:0]\n"                 // 48
+                        "  {\n"                                         // 49
+                        "    ScanInSource  midin;\n"                    // 50
+                        "    ResetValue    8'b0010_0001;\n"             // 51
+                        "  }\n"                                         // 52
+                        "  ScanRegister  mreg_2[6:0]\n"                 // 53
+                        "  {\n"                                         // 54
+                        "    ScanInSource  inst.bso;\n"                 // 55
+                        "    ResetValue    7'b010_0010;\n"              // 56
+                        "  }\n"                                         // 57
+                        "}\n"s);                                        // 58
+
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  CxxTest::setAbortTestOnFail(true);
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+
+  auto checkResult = AST_Checker::Check(ast->Network());
+
+  TS_ASSERT_FALSE (checkResult.HasIssues());
+
+  // ---------------- Exercise
+  //
+  auto topNode = sut.GenerateSystemModelNodes(ast);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_NOT_NULLPTR (topNode);
+  TS_ASSERT_EQUALS      (topNode->Name(), "top");
+
+  // With PrettyPrinter
+  auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(topNode, PrettyPrinterOptions::Parser_debug);
+  auto expected_PrettyPrint = "[Chain](0)     \"top\"\n"
+                              " [Chain](6)     \"inst_2\"\n"
+                              "  [Register](11) \"mreg_1\", length: 8, bypass: 0010_0001\n"
+                              "  [Chain](8)     \"inst\"\n"
+                              "   [Register](10) \"reg_1\", length: 8, bypass: 0010_0001\n"
+                              "   [Register](9)  \"reg_2\", length: 7, bypass: 0100_010\n"
+                              "  [Register](7)  \"mreg_2\", length: 7, bypass: 0100_010\n"
+                              " [Register](5)  \"SR_1\", length: 5, bypass: 1000_1\n"
+                              " [Chain](2)     \"inst_1\"\n"
+                              "  [Register](4)  \"reg_1\", length: 8, bypass: 0010_0001\n"
+                              "  [Register](3)  \"reg_2\", length: 7, bypass: 0100_010\n"
+                              " [Register](1)  \"SR_2\", length: 8, bypass: 0001_0010"
+                              ;
+
+  TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
+  // With Checker
+  PrependWithTap(sm, topNode);   // This is to avoid warnings about missing AccessInterface
+  auto modelCheckResult = sm->Check();
+  TS_ASSERT_EMPTY (modelCheckResult.InformativeReport());
 }
 
 

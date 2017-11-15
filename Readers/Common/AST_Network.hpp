@@ -23,6 +23,7 @@ namespace Parsers
 class AST;
 class AST_Namespace;
 class AST_Module;
+class AST_ModuleIdentifier;
 class AST_Visitor;
 
 //! Represents test network
@@ -53,6 +54,10 @@ class AST_Network final : public AST_Node
   //! Returns top module (the one that has an AccessLink) or the first parsed module if none has an AccessLink
   //!
   AST_Module* TopModule() const { return m_topModule ? m_topModule : m_firstModule; }
+
+  //! Returns module matching identifier
+  //!
+  AST_Module* Module(const AST_ModuleIdentifier* identifier) const;
 
   // ---------------- Private Methods
   //

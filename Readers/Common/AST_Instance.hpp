@@ -20,6 +20,8 @@
 #include <vector>
 namespace Parsers
 {
+class AST_Identifier;
+class AST_Port;
 class AST_Parameter;
 class AST_Attribute;
 class AST_ModuleIdentifier;
@@ -50,12 +52,20 @@ class AST_Instance final : public AST_ParentNode
   //!
   const AST_ModuleIdentifier* ModuleIdentifier() const { return m_moduleIdentifier; };
 
+  //! Returns instance input port(s)
+  //!
+  const std::vector<AST_Port*>& InputPorts() const { return m_inputPorts; }
 
-  //! Returns (generic) module parameters
+
+  //! Searches for a InputPort with specified identifier
+  //!
+  const AST_Port* FindInputPort (const AST_Identifier* identifier) const;
+
+  //! Returns (generic) module parameters for the instance
   //!
   const std::vector<AST_Parameter*>& Parameters() const { return m_parameters; }
 
-  //! Returns module attributes
+  //! Returns instance attributes
   //!
   const std::vector<AST_Attribute*>& Attributes() const { return m_attributes; }
 
@@ -114,7 +124,8 @@ class AST_Instance final : public AST_ParentNode
   const AST_ScalarIdentifier* m_instanceIdentifier = nullptr; //!< Instance name
   const AST_ModuleIdentifier* m_moduleIdentifier   = nullptr; //!< Identifies module to instantiate
   std::vector<AST_Parameter*> m_parameters;                   //!< Parameters for module instantiation
-  std::vector<AST_Attribute*> m_attributes;                   //!< Module attributes
+  std::vector<AST_Attribute*> m_attributes;                   //!< Instance attributes
+  std::vector<AST_Port*>      m_inputPorts;                   //!< Instance input ports (connections in enclosing module)
 };
 //
 //  End of AST_Instance class declaration

@@ -13,8 +13,10 @@
 
 #include "AST_Network.hpp"
 #include "AST_Module.hpp"
+#include "AST_ModuleIdentifier.hpp"
 #include "AST_Namespace.hpp"
 #include "AST_Visitor.hpp"
+
 #include "Utility.hpp"
 #include "g3log/g3log.hpp"
 
@@ -92,6 +94,41 @@ vector<const AST_Namespace*> AST_Network::NamespacesWithDefinedModules () const
 }
 //
 //  End of: AST_Network::NamespacesWithDefinedModules
+//---------------------------------------------------------------------------
+
+
+
+//! Returns module matching identifier
+//!
+//! @param identifier Identifier for module to search for
+//!
+AST_Module* AST_Network::Module (const AST_ModuleIdentifier* identifier) const
+{
+  CHECK_PARAMETER_NOT_NULL(identifier, "Cannot search Module from nullptr identifier");
+
+
+  // ---------------- Find collection of modules in given namespace
+  //
+  auto namespaceNode = identifier->Namespace();
+  auto modulesPos    = m_modules.find(namespaceNode);
+
+  CHECK_PARAMETER_NEQ(modulesPos, m_modules.cend(), "Have no namespace with name \""s.append(namespaceNode->Name()).append("\""));
+
+  const auto& modules = modulesPos->second;
+
+  // ---------------- Find module in collection of modules
+  //
+  auto        moduleId   = identifier->ModuleIdentifier();
+  const auto& moduleName = moduleId->Name();
+  auto        modulePos  = modules.find(moduleName);
+
+  CHECK_PARAMETER_NEQ(modulePos, modules.cend(), "Have no module with name \""s.append(moduleName).append("\" in namespace \"").append(namespaceNode->Name()).append("\""));
+
+  auto module = modulePos->second;
+  return module;
+}
+//
+//  End of: AST_Network::Module
 //---------------------------------------------------------------------------
 
 

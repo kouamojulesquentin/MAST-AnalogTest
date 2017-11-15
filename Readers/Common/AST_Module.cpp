@@ -14,6 +14,7 @@
 #include "AST_Module.hpp"
 #include "AST_AccessLink.hpp"
 #include "AST_Attribute.hpp"
+#include "AST_Instance.hpp"
 #include "AST_ScanInterface.hpp"
 #include "AST_ScanRegister.hpp"
 #include "AST_Parameter.hpp"
@@ -50,6 +51,7 @@ void AST_Module::DispatchChildren ()
         case Parsers::Kind::ScanInPort:     AST_ParentNode::AppendChild(child, m_scanInPorts);     break;
         case Parsers::Kind::ScanOutPort:    AST_ParentNode::AppendChild(child, m_scanOutPorts);    break;
         case Parsers::Kind::ScanRegister:   AST_ParentNode::AppendChild(child, m_scanRegisters);   break;
+        case Parsers::Kind::Instance:       AST_ParentNode::AppendChild(child, m_instances);       break;
 
         case Parsers::Kind::AccessLink :    SetChild(child, m_accessLink); break;
 
@@ -69,7 +71,7 @@ void AST_Module::DispatchChildren ()
 //!
 //! @param identifier   An identifier for ScanRegister to find
 //!
-AST_ScanRegister* AST_Module::FindScanRegister (const AST_Identifier* identifier)
+const AST_ScanRegister* AST_Module::FindScanRegister (const AST_Identifier* identifier) const
 {
   CHECK_PARAMETER_NOT_NULL(identifier, "Cannot find ScanRegister from nullptr identifier");
 
@@ -90,6 +92,31 @@ AST_ScanRegister* AST_Module::FindScanRegister (const AST_Identifier* identifier
 //  End of: AST_Module::FindScanRegister
 //---------------------------------------------------------------------------
 
+
+//! Searches for a Instance with specified identifier
+//!
+//! @param identifier   An identifier for Instance to find
+//!
+const AST_Instance* AST_Module::FindInstance (const AST_Identifier* identifier) const
+{
+  CHECK_PARAMETER_NOT_NULL(identifier, "Cannot find Instance from nullptr identifier");
+
+  AST_Instance* foundInstance = nullptr;
+
+  for (auto instance : m_instances)
+  {
+    if (instance->InstanceIdentifier()->Name() == identifier->Name())
+    {
+      foundInstance = instance;
+      break;
+    }
+  }
+
+  return foundInstance;
+}
+//
+//  End of: AST_Module::FindScanRegister
+//---------------------------------------------------------------------------
 
 //===========================================================================
 // End of AST_Module.cpp

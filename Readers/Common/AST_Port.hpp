@@ -45,6 +45,10 @@ class AST_Port final : public AST_ParentNode
   //!
   std::string Name() const override { return m_identifier->AsText(); }
 
+  //! Returns port identifier
+  //!
+  const AST_VectorIdentifier* Identifier() const { return m_identifier; }
+
   //! Returns port attribute
   //!
   const std::vector<AST_Attribute*>& Attributes() const { return m_attributes; }

@@ -22,6 +22,7 @@
 namespace Parsers
 {
 class AST_AccessLink;
+class AST_Instance;
 class AST_ScanInterface;
 class AST_ScanRegister;
 class AST_Port;
@@ -74,6 +75,10 @@ class AST_Module final : public AST_ParentNode
   //!
   const std::vector<AST_Port*>& ScanOutPorts() const { return m_scanOutPorts; }
 
+  //! Returns module Instances
+  //!
+  const std::vector<AST_Instance*>& Instances() const { return m_instances; }
+
   //! Returns AccessLink or nullptr when none is defined
   //!
   AST_AccessLink* AccessLink() const { return m_accessLink; }
@@ -84,7 +89,11 @@ class AST_Module final : public AST_ParentNode
 
   //! Searches for a ScanRegister with specified identifier
   //!
-  AST_ScanRegister* FindScanRegister (const AST_Identifier* identifier);
+  const AST_ScanRegister* FindScanRegister (const AST_Identifier* identifier) const;
+
+  //! Searches for a Instance with specified identifier
+  //!
+  const AST_Instance* FindInstance (const AST_Identifier* identifier) const ;
 
   // ---------------- Private Methods
   //
@@ -115,7 +124,8 @@ class AST_Module final : public AST_ParentNode
   std::vector<AST_Port*>          m_scanInPorts;          //!< Scan input port(s)
   std::vector<AST_Port*>          m_scanOutPorts;         //!< Scan output port(s)
   std::vector<AST_Attribute*>     m_attributes;           //!< Module attributes
-  std::vector<AST_ScanRegister*>  m_scanRegisters;        //!< Scan registers defined in module
+  std::vector<AST_ScanRegister*>  m_scanRegisters;        //!< Scan registers in module
+  std::vector<AST_Instance*>      m_instances;            //!< Instances in module
 };
 //
 //  End of AST_Module class declaration

@@ -11,10 +11,12 @@
 //!
 //===========================================================================
 
+#include "AST_Identifier.hpp"
 #include "AST_Instance.hpp"
 #include "AST_Attribute.hpp"
 #include "AST_ModuleIdentifier.hpp"
 #include "AST_Parameter.hpp"
+#include "AST_Port.hpp"
 #include "AST_ScalarIdentifier.hpp"
 #include "AST_Visitor.hpp"
 
@@ -41,12 +43,10 @@ void AST_Instance::DispatchChildren ()
     {
       switch (child->GetKind())
       {
-        case Parsers::Kind::Attribute:
-          AST_ParentNode::AppendChild(child, m_attributes);
-          break;
-        case Parsers::Kind::Parameter :
-          AST_ParentNode::AppendChild(child, m_parameters);
-          break;
+        case Parsers::Kind::Attribute: AST_ParentNode::AppendChild(child, m_attributes); break;
+        case Parsers::Kind::Parameter: AST_ParentNode::AppendChild(child, m_parameters); break;
+        case Parsers::Kind::InputPort: AST_ParentNode::AppendChild(child, m_inputPorts); break;
+
         default:  // Ignore all other for now
           break;
       }
@@ -57,6 +57,32 @@ void AST_Instance::DispatchChildren ()
 //  End of: AST_Instance::DispatchChildren
 //---------------------------------------------------------------------------
 
+
+
+//! Searches for a InputPort with specified identifier
+//!
+//! @param identifier   An identifier for InputPort to find
+//!
+const AST_Port* AST_Instance::FindInputPort (const AST_Identifier* identifier) const
+{
+  CHECK_PARAMETER_NOT_NULL(identifier, "Cannot find InputPort from nullptr identifier");
+
+  AST_Port* foundInputPort = nullptr;
+
+  for (auto inputPort : m_inputPorts)
+  {
+    if (inputPort->Identifier()->Name() == identifier->Name())
+    {
+      foundInputPort = inputPort;
+      break;
+    }
+  }
+
+  return foundInputPort;
+}
+//
+//  End of: AST_Instance::FindInputPort
+//---------------------------------------------------------------------------
 
 
 //! Returns instance name (in enclosing module)

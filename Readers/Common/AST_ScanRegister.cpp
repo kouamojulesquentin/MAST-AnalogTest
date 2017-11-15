@@ -119,7 +119,7 @@ const string& AST_ScanRegister::SourceBaseName () const
 
   CHECK_VALUE_EQ(signals.size(), 1u, "Expecting ScanOutPort source to be drive by exactly one signal");
   const auto signal      = signals.front();
-  const auto portScope   = signal->PortScope();
+//+  const auto portScope   = signal->PortScope();
   const auto identifier  = signal->PortName();
 
   const auto& name = identifier->Name();

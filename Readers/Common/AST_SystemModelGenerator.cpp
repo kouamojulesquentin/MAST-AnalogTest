@@ -44,7 +44,9 @@
 using std::stack;
 using std::shared_ptr;
 using std::unique_ptr;
+using std::tuple;
 using std::make_unique;
+using std::make_tuple;
 
 using namespace mast;
 using namespace Parsers;
@@ -77,8 +79,7 @@ shared_ptr<mast::SystemModelNode> AST_SystemModelGenerator::Generate (AST_Networ
 {
   m_network = CHECK_PARAMETER_NOT_NULL(network, "Expect valid, not nullptr AST_Network");
 
-  shared_ptr<mast::SystemModelNode> topNode;
-  network->Accept(*this);
+  m_parsedTopNode = Generate_Network(network);
 
   return m_parsedTopNode;
 }
@@ -87,31 +88,47 @@ shared_ptr<mast::SystemModelNode> AST_SystemModelGenerator::Generate (AST_Networ
 //---------------------------------------------------------------------------
 
 
-
-
-//! Generates SystemModel node from AST_AccessLink node
+//! Creates a SystemModel nodes for a module instance
 //!
-void AST_SystemModelGenerator::Visit_AccessLink (AST_AccessLink* accessLink)
+//! @param instance   Instance to be converted to SystemModel nodes
+//!
+//! @return Created SystemModel sub-tree and Instance AST_Source
+tuple<shared_ptr<mast::SystemModelNode>, const AST_Source*>
+AST_SystemModelGenerator::Generate_Instance (const AST_Instance* instance, const AST_Module* instanceModule)
 {
+  const auto& moduleInputPorts = instanceModule->ScanInPorts();
+
+  CHECK_VALUE_NOT_EMPTY(moduleInputPorts,  "Expecting a module \""s.append(instanceModule->Name()).append("\"to have at least one ScanInPort"));
+
+  // ---------------- Find instance source
+  //
+  auto moduleInputPort   = moduleInputPorts.front();
+  auto moduleInputPortId = moduleInputPort->Identifier();
+  auto instanceInputPort = instance->FindInputPort(moduleInputPortId);
+  auto instanceSource    = instanceInputPort->Source();
+
+  // ---------------- Create Chain to "encapsulate" instance sub-nodes
+  //
+  auto name  = instance->Name();
+  auto chain = m_systemModel->CreateChain(name);
+
+  // ---------------- Instantiate module with instance parameters
+  //
+  Generate_Module(chain.get(), instanceModule);
+
+  return make_tuple(chain, instanceSource);
 }
 //
-//  End of: AST_SystemModelGenerator::Visit_AccessLink
+//  End of: AST_SystemModelGenerator::Generate_Instance
 //---------------------------------------------------------------------------
 
 
-//! Generates SystemModel node from AST_Instance node
+//! Creates complete SystemModel from AST_Network
 //!
-void AST_SystemModelGenerator::Visit_Instance (AST_Instance* instance)
-{
-}
-//
-//  End of: AST_SystemModelGenerator::Visit_Instance
-//---------------------------------------------------------------------------
-
-
-//! Generates SystemModel node from AST_Network node
+//! @param network  Network description
 //!
-void AST_SystemModelGenerator::Visit_Network (AST_Network* network)
+//! @return Created SystemModel sub-tree
+shared_ptr<mast::SystemModelNode> AST_SystemModelGenerator::Generate_Network (const AST_Network* network)
 {
   auto topModule = network->TopModule();
   CHECK_VALUE_NOT_NULL(topModule, "Cannot generate SystemModel nodes when network has no modules");
@@ -125,9 +142,11 @@ void AST_SystemModelGenerator::Visit_Network (AST_Network* network)
       case AccessLinkType::STD_1149_1_2001:
       case AccessLinkType::STD_1149_1_2013:
         LOG(INFO) << "Creating STD_1149 AccessLink";
+        CHECK_FAILED("Not Yet Supported: STD_1149 AccessLink");
         break;
       case AccessLinkType::Generic:
         LOG(INFO) << "Creating Generic" << accessLink->GenericIdentifier()->AsText() << " AccessLink";
+        CHECK_FAILED("Not Yet Supported: Generic AccessLink");
         break;
       default:
         CHECK_FAILED("Unexpected AccessLink type");
@@ -136,22 +155,26 @@ void AST_SystemModelGenerator::Visit_Network (AST_Network* network)
   }
   else
   {
-    Visit_Module(topModule);
-    m_parsedTopNode = m_lastCreatedNode;
+    auto name  = topModule->Name();
+    auto chain = m_systemModel->CreateChain(name);
+
+    Generate_Module(chain.get(), topModule);
+    return chain;
   }
 }
 //
-//  End of: AST_SystemModelGenerator::Visit_Network
+//  End of: AST_SystemModelGenerator::Generate_Network
 //---------------------------------------------------------------------------
 
 
-//! Generates SystemModel node from AST_Module node
-//!
-void AST_SystemModelGenerator::Visit_Module (AST_Module* module)
-{
-  auto name  = module->Name();
-  auto chain = m_systemModel->CreateChain(name);
 
+//! Creates a SystemModel nodes for a module
+//!
+//! @param chain  Chain in which SystemModel notes are created
+//! @param module Module to be converted to SystemModel nodes
+//!
+void AST_SystemModelGenerator::Generate_Module (mast::Chain* chain, const AST_Module* module)
+{
   const auto& scanInPorts  = module->ScanInPorts();
   const auto& scanOutPorts = module->ScanOutPorts();
 
@@ -164,43 +187,64 @@ void AST_SystemModelGenerator::Visit_Module (AST_Module* module)
   auto moduleInPortName = scanInPort->Name();
 
   stack<shared_ptr<SystemModelNode>> children;
-  auto foundFirstChild = false;
 
-  do
+  // Lamba: Tells whether some source match module input port (currently only considering first)
+  auto isSourcedByModuleInput = [scanInPort](const AST_Source* source)
   {
     const auto& signals = source->Signals();
 
-    CHECK_VALUE_EQ(signals.size(), 1u, "Expecting ScanOutPort source to be drive by exactly one signal");
+    CHECK_VALUE_EQ(signals.size(), 1u, "Expecting ScanOutPort source to be driven by exactly one signal");
     const auto signal      = signals.front();
     const auto portScope   = signal->PortScope();
     const auto identifier  = signal->PortName();
 
-    CHECK_VALUE_EMPTY(portScope, "Expecting signal without scope");
-
-    auto sourceEntity = module->FindScanRegister(identifier);
-    if (sourceEntity == nullptr)
+    if (!portScope.empty())
     {
-  //+      sourceEntity = module->FindInstance(identifier);
+      return false;
     }
-    CHECK_VALUE_NOT_NULL(sourceEntity, "Cannot find actual source of "s.append(scanOutPort->Name()));
+    return identifier->Name() == scanInPort->Name();
+  };
 
-    m_lastCreatedNode  = nullptr;
-    m_lastEntitySource = nullptr;
+  while (!isSourcedByModuleInput(source))
+  {
+    const auto& signals = source->Signals();
 
-    sourceEntity->Accept(*this);
-    CHECK_VALUE_NOT_NULL(m_lastEntitySource, "Expecting a valid, not nullptr source");
+    CHECK_VALUE_EQ(signals.size(), 1u, "Expecting ScanOutPort source to be driven by exactly one signal");
+    const auto signal      = signals.front();
+    const auto portScope   = signal->PortScope();
+    const auto identifier  = signal->PortName();
 
-    if (m_lastCreatedNode != nullptr)
+    std::shared_ptr<mast::SystemModelNode> createdNode;
+
+    if (portScope.empty())  // scanRegister or ScanMux ?
     {
-      children.emplace(m_lastCreatedNode);
+      auto scanRegister = module->FindScanRegister(identifier);
+      if (scanRegister != nullptr)
+      {
+        std::tie(createdNode, source) = Generate_Register(scanRegister);
+      }
+      else
+      {
+        CHECK_FAILED("ScanMux are not yet supported");
+      }
+    }
+    else   // Instance ?
+    {
+      CHECK_VALUE_EQ(portScope.size(), 1u, "Expecting to have single scope depth for instance");
+
+      auto scope          = portScope.front();
+      auto instance       = module->FindInstance(scope);
+      auto moduleId       = instance->ModuleIdentifier();
+      auto instanceModule = m_network->Module(moduleId);
+
+      std::tie(createdNode, source) = Generate_Instance(instance, instanceModule);
     }
 
-    const auto& entitySourceName = sourceEntity->SourceBaseName();
-
-    foundFirstChild = entitySourceName == moduleInPortName;
-
-    source = m_lastEntitySource;
-  } while (!foundFirstChild);
+    if (createdNode)
+    {
+      children.emplace(createdNode);
+    }
+  }
 
   // ---------------- Append children to Chain
   //
@@ -211,52 +255,24 @@ void AST_SystemModelGenerator::Visit_Module (AST_Module* module)
     chain->AppendChild(child);
     children.pop();
   }
-
-  m_lastCreatedNode = chain;
 }
 //
-//  End of: AST_SystemModelGenerator::Visit_Module
+//  End of: AST_SystemModelGenerator::Generate_Module
 //---------------------------------------------------------------------------
 
 
-//! Generates SystemModel node from AST_Port node
+//! Creates a SystemModel Register from an AST_ScanRegister
 //!
-void AST_SystemModelGenerator::Visit_Port (AST_Port* port)
-{
-}
-//
-//  End of: AST_SystemModelGenerator::Visit_Port
-//---------------------------------------------------------------------------
-
-
-
-//! Generates SystemModel node from AST_ScanInterface node
+//! @param scanRegister   ScanRegister to be converted to SystemModel Register
 //!
-void AST_SystemModelGenerator::Visit_ScanInterface (AST_ScanInterface* scanInterface)
+//! @return Created Register and ScanRegister AST_Source
+tuple<std::shared_ptr<mast::SystemModelNode>, const AST_Source*>
+AST_SystemModelGenerator::Generate_Register (const AST_ScanRegister* scanRegister)
 {
-}
-//
-//  End of: AST_SystemModelGenerator::Visit_ScanInterface
-//---------------------------------------------------------------------------
-
-
-//! Generates SystemModel node from AST_ScanMux node
-//!
-void AST_SystemModelGenerator::Visit_ScanMux (AST_ScanMux* scanMux)
-{
-}
-//
-//  End of: AST_SystemModelGenerator::Visit_ScanMux
-//---------------------------------------------------------------------------
-
-
-//! Generates SystemModel node from AST_ScanRegister node
-//!
-void AST_SystemModelGenerator::Visit_ScanRegister (AST_ScanRegister* scanRegister)
-{
-  auto name       = scanRegister->BaseName();
-  auto bitsCount  = scanRegister->BitsCount();
-  auto resetValue = scanRegister->ResetValue();
+  auto registerSource = scanRegister->ScanInSource();
+  auto name           = scanRegister->BaseName();
+  auto bitsCount      = scanRegister->BitsCount();
+  auto resetValue     = scanRegister->ResetValue();
 
   BinaryVector bypassValue;
   if (resetValue != nullptr)
@@ -269,22 +285,13 @@ void AST_SystemModelGenerator::Visit_ScanRegister (AST_ScanRegister* scanRegiste
     bypassValue = BinaryVector(bitsCount, fillPattern, SizeProperty::Fixed);
   }
 
-  auto holdValue     = false;
-  m_lastCreatedNode  = m_systemModel->CreateRegister(name, bypassValue, holdValue);
-  m_lastEntitySource = scanRegister->ScanInSource();
+  auto holdValue    = false;
+  auto registerNode = m_systemModel->CreateRegister(name, bypassValue, holdValue);
+
+  return make_tuple(registerNode, registerSource);
 }
 //
-//  End of: AST_SystemModelGenerator::Visit_ScanRegister
-//---------------------------------------------------------------------------
-
-
-//! Generates SystemModel node from AST_Source node
-//!
-void AST_SystemModelGenerator::Visit_Source (AST_Source* source)
-{
-}
-//
-//  End of: AST_SystemModelGenerator::Visit_Source
+//  End of: AST_SystemModelGenerator::Generate_Register
 //---------------------------------------------------------------------------
 
 

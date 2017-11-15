@@ -168,6 +168,7 @@ void AST_PrettyPrinter::Visit_Instance (AST_Instance* instance)
   StreamSimpleNodes (instance->Attributes());
   StreamSimpleNodes (instance->Parameters());
 
+  AcceptNodes       (instance->InputPorts());
   AcceptNodes       (instance->UndispatchedChildren());
 }
 //
@@ -235,6 +236,7 @@ void AST_PrettyPrinter::Visit_Module (AST_Module* module)
   AcceptNodes (module->ScanInPorts());
   AcceptNodes (module->ScanOutPorts());
   AcceptNodes (module->UndispatchedChildren());
+  AcceptNodes (module->Instances());
   AcceptNodes (module->ScanRegisters());
 }
 //

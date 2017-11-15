@@ -14,11 +14,12 @@
 #ifndef AST_SYSTEMMODELGENERATOR_H__4AD33E64_B5F0_44D9_839C_E286323534C__INCLUDED_
   #define AST_SYSTEMMODELGENERATOR_H__4AD33E64_B5F0_44D9_839C_E286323534C__INCLUDED_
 
-#include "AST_Visitor.hpp"
 #include <memory>
+#include <tuple>
 
 namespace mast
 {
+class Chain;
 class SystemModel;
 class SystemModelNode;
 class SystemModelBuilder;
@@ -26,9 +27,19 @@ class SystemModelBuilder;
 
 namespace Parsers
 {
+//+class AST_AccessLink;
+class AST_Instance;
+class AST_Module;
+class AST_Network;
+//+class AST_Port;
+//+class AST_ScanInterface;
+//+class AST_ScanMux;
+class AST_ScanRegister;
+class AST_Source;
+
 //! Generates Mast SystemModel from AST
 //!
-class AST_SystemModelGenerator final : public AST_Visitor
+class AST_SystemModelGenerator final
 {
   // ---------------- Public Methods
   //
@@ -41,29 +52,22 @@ class AST_SystemModelGenerator final : public AST_Visitor
   //!
   std::shared_ptr<mast::SystemModelNode> Generate(AST_Network* network);
 
-  virtual void Visit_AccessLink    (AST_AccessLink*    instance)      override;
-  virtual void Visit_Instance      (AST_Instance*      instance)      override;
-  virtual void Visit_Network       (AST_Network*       network)       override;
-  virtual void Visit_Module        (AST_Module*        module)        override;
-  virtual void Visit_Port          (AST_Port*          port)          override;
-  virtual void Visit_ScanInterface (AST_ScanInterface* scanInterface) override;
-  virtual void Visit_ScanMux       (AST_ScanMux*       scanMux)       override;
-  virtual void Visit_ScanRegister  (AST_ScanRegister*  scanRegister)  override;
-  virtual void Visit_Source        (AST_Source*        source)        override;
-
   // ---------------- Private Methods
   //
   private:
+  std::tuple<std::shared_ptr<mast::SystemModelNode>, const AST_Source*> Generate_Instance (const AST_Instance*     instance, const AST_Module* instanceModule);
+  std::tuple<std::shared_ptr<mast::SystemModelNode>, const AST_Source*> Generate_Register (const AST_ScanRegister* scanRegister);
+
+  std::shared_ptr<mast::SystemModelNode> Generate_Network (const AST_Network* network);
+  void                                   Generate_Module (mast::Chain* chain, const AST_Module* module);
 
   // ---------------- Private Fields
   //
   private:
-  std::shared_ptr<mast::SystemModel>        m_systemModel;                //!< SystemModel currently being built
-  std::unique_ptr<mast::SystemModelBuilder> m_builder;                    //!< Helper to build SystemModel nodes
-  std::shared_ptr<mast::SystemModelNode>    m_parsedTopNode;              //!< SystemModel tree build from ICL file
-  std::shared_ptr<mast::SystemModelNode>    m_lastCreatedNode;            //!< Serves as return value for Visit_xxx
-  const AST_Source*                         m_lastEntitySource = nullptr; //!< Serves as return value for Visit_xxx
-  AST_Network*                              m_network          = nullptr; //!< Test network AST used to generate SystemModel tree
+  std::shared_ptr<mast::SystemModel>        m_systemModel;       //!< SystemModel currently being built
+  std::unique_ptr<mast::SystemModelBuilder> m_builder;           //!< Helper to build SystemModel nodes
+  std::shared_ptr<mast::SystemModelNode>    m_parsedTopNode;     //!< SystemModel tree build from ICL file
+  AST_Network*                              m_network = nullptr; //!< Test network AST used to generate SystemModel tree
 };
 //
 //  End of AST_SystemModelGenerator class declaration

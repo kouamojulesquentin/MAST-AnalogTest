@@ -42,6 +42,14 @@ class AST_ModuleIdentifier final : public AST_Identifier
   //!
   const std::string& Name() const override;
 
+  //! Returns the namespace part
+  //!
+  const AST_Namespace* Namespace() const { return m_namespace; }
+
+  //! Returns the namespace part
+  //!
+  const AST_ScalarIdentifier* ModuleIdentifier() const { return m_moduleIdentifier; }
+
   // ---------------- Private Methods
   //
   private:
@@ -56,8 +64,8 @@ class AST_ModuleIdentifier final : public AST_Identifier
   // ---------------- Private Fields
   //
   private:
-  const AST_Namespace*        m_namespace  = nullptr; //!< Namespace of module definition
-  const AST_ScalarIdentifier* m_moduleName = nullptr; //!< Module name in the namespace
+  const AST_Namespace*        m_namespace        = nullptr; //!< Namespace of module definition
+  const AST_ScalarIdentifier* m_moduleIdentifier = nullptr; //!< Module name in the namespace
 };
 //
 //  End of AST_ModuleIdentifier class declaration

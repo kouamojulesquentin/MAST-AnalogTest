@@ -13,9 +13,11 @@
 
 #include "AST_Port.hpp"
 #include "AST_Attribute.hpp"
+#include "AST_Signal.hpp"
 #include "AST_Source.hpp"
 #include "AST_Visitor.hpp"
 
+using std::string;
 using namespace Parsers;
 
 
@@ -42,20 +44,17 @@ void AST_Port::DispatchChildren ()
       switch (child->GetKind())
       {
         case Parsers::Kind::Attribute :
-          m_attributes.push_back(static_cast<AST_Attribute*>(child));
-          child = nullptr;
+          AST_ParentNode::AppendChild(child, m_attributes);
           break;
         case Parsers::Kind::Source :
         case Parsers::Kind::InputPortSource :
-          m_source = static_cast<AST_Source*>(child);
-          child = nullptr;
+          AST_ParentNode::SetChild(child, m_source);
           break;
         default:  // Ignore all other for now
           break;
       }
     }
   }
-
 }
 //
 //  End of: AST_Port::DispatchChildren

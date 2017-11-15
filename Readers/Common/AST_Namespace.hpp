@@ -31,7 +31,7 @@ class AST_Namespace final : public AST_SimpleNode
 
   //! Returns namespace name
   //!
-  std::string Name() const { return m_name; }
+  const std::string& Name() const { return m_name; }
 
 
   //! Text representation of value

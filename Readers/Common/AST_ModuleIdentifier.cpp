@@ -27,9 +27,9 @@ using namespace Parsers;
 //! @param moduleName     Module name in the namespace
 //!
 AST_ModuleIdentifier::AST_ModuleIdentifier (const AST_Namespace* namespaceName, const AST_ScalarIdentifier* moduleName)
-  : AST_Identifier (Kind::ModuleIdentifier, ""s)
-  , m_namespace    (CHECK_PARAMETER_NOT_NULL(namespaceName, "Module identifier must have a valid namespace "))
-  , m_moduleName   (CHECK_PARAMETER_NOT_NULL(moduleName,    "Module identifier must have a valid module name"))
+  : AST_Identifier     (Kind::ModuleIdentifier, ""s)
+  , m_namespace        (CHECK_PARAMETER_NOT_NULL(namespaceName, "Module identifier must have a valid namespace "))
+  , m_moduleIdentifier (CHECK_PARAMETER_NOT_NULL(moduleName,    "Module identifier must have a valid module identifier"))
 {
 }
 //
@@ -44,7 +44,7 @@ AST_ModuleIdentifier::AST_ModuleIdentifier (const AST_Namespace* namespaceName, 
 string AST_ModuleIdentifier::AsText () const
 {
   auto asText = m_namespace->AsText();
-  asText.append(m_moduleName->AsText());
+  asText.append(m_moduleIdentifier->AsText());
 
   return asText;
 }
@@ -58,7 +58,7 @@ string AST_ModuleIdentifier::AsText () const
 //!
 const string& AST_ModuleIdentifier::Name () const
 {
-  return m_moduleName->Name();
+  return m_moduleIdentifier->Name();
 }
 //
 //  End of: AST_ModuleIdentifier::Name

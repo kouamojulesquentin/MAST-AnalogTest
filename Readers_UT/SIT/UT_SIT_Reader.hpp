@@ -1,35 +1,29 @@
 //===========================================================================
-//                           UT_reader.hpp
+//                           UT_SIT_Reader.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file UT_reader.hpp
+//! @file UT_SIT_Reader.hpp
 //!
 //! Declares test fixture class for testing SIT_Reader
 //!
 //===========================================================================
 
-
-#ifndef UT_reader_H_INCLUDED_
-  #define UT_reader_H__INCLUDED_
+#ifndef UT_SIT_READER_H__2DBB5164_B335_40CB_5B9F_2D488C53F0F2__INCLUDED_
+  #define UT_SIT_READER_H__2DBB5164_B335_40CB_5B9F_2D488C53F0F2__INCLUDED_
 
 #include <cxxtest/TestSuite.h>
 #include <memory>
 
-namespace mast
-{
-  class SystemModel;
-} // End of namespace mast
-
 //! Unit tests for class SIT_Reader
 //!
-class UT_reader : public CxxTest::TestSuite
+class UT_SIT_Reader : public CxxTest::TestSuite
 {
   public:
-   UT_reader() = default;
-  ~UT_reader() = default;
+   UT_SIT_Reader() = default;
+  ~UT_SIT_Reader() = default;
 
   // ---------------- Register, Chain, MIB, SIB...
   //
@@ -76,10 +70,11 @@ class UT_reader : public CxxTest::TestSuite
   void tearDown(); //!< Cleanups test (called for each test)
 };
 //
-//  End of UT_reader class declaration
+//  End of UT_SIT_Reader class declaration
 //---------------------------------------------------------------------------
 
-#endif
+
+#endif  // not defined UT_SIT_READER_H__2DBB5164_B335_40CB_5B9F_2D488C53F0F2__INCLUDED_
 //===========================================================================
-// End of UT_reader.hpp
+// End of UT_SIT_Reader.hpp
 //===========================================================================

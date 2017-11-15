@@ -1,11 +1,11 @@
 //===========================================================================
-//                           UT_reader.cpp
+//                           UT_SIT_Reader.cpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file UT_reader.cpp
+//! @file UT_SIT_Reader.cpp
 //!
 //! Implements test fixture for testing SIT_Reader
 //!
@@ -19,7 +19,7 @@
 #include "Utility.hpp"
 #include "LoopbackAccessInterfaceProtocol.hpp"
 #include "g3log/g3log.hpp"
-#include "UT_reader.hpp"
+#include "UT_SIT_Reader.hpp"
 
 #include "Mast_Core_Traits.hpp"
 
@@ -67,7 +67,7 @@ void PrependWithTap (shared_ptr<SystemModel> sm, shared_ptr<SystemModelNode> nod
 
 //! Initializes tests (called for each test)
 //!
-void UT_reader::setUp ()
+void UT_SIT_Reader::setUp ()
 {
   CxxTest::setStringResultsOnNewLine(true);
   CxxTest::setCharactersMapping(CxxTest::CharacterMapping::MAP_CHARS_MINIMAL);  // Keep quotes, HT, and new lines unescaped
@@ -76,7 +76,7 @@ void UT_reader::setUp ()
 }
 
 //! Cleanups test (called for each test)
-void UT_reader::tearDown ()
+void UT_SIT_Reader::tearDown ()
 {
 }
 
@@ -84,7 +84,7 @@ void UT_reader::tearDown ()
 
 // Test construction of register nodes from Simplified ICL Tree input when the input is correct
 //
-void UT_reader::test_register_Success ()
+void UT_SIT_Reader::test_register_Success ()
 {
   // ---------------- DDT Setup
   //
@@ -136,7 +136,7 @@ void UT_reader::test_register_Success ()
 
 // Test construction of register nodes from Simplified ICL Tree input when the input is NOT correct
 //
-void UT_reader::test_register_Error ()
+void UT_SIT_Reader::test_register_Error ()
 {
   // ---------------- DDT Setup
   //
@@ -185,7 +185,7 @@ void UT_reader::test_register_Error ()
 
 
 // Test construction of chain nodes from Simplified ICL Tree input
-void UT_reader::test_chain ()
+void UT_SIT_Reader::test_chain ()
 {
   // ---------------- DDT Setup
   //
@@ -266,7 +266,7 @@ void UT_reader::test_chain ()
 }
 
 /*Test construction of MIB macro from Simplified ICL Tree input*/
-void UT_reader::test_MIB ()
+void UT_SIT_Reader::test_MIB ()
 {
   // ---------------- DDT Setup
   //
@@ -828,7 +828,7 @@ make_tuple( "MIB test_MIB POST HIGH REVERSE 4 N_Hot_noidle \
 
 
 /*Test SIB macro from Simplified ICL Tree input*/
-void UT_reader::test_SIB ()
+void UT_SIT_Reader::test_SIB ()
 {
   // ---------------- DDT Setup
   //
@@ -861,39 +861,42 @@ void UT_reader::test_SIB ()
     TS_ASSERT_EMPTY (checkResult.InformativeReport());
   };
 
-  auto data =
-  { /*Exhaustive test of all possible macro parameter combinations*/
-   make_tuple( "SIB test_SIB POST HIGH\
-    (REGISTER test_reg 4 Bypass: \"0b1001\")\n",
+  auto data = // Exhaustive test of all possible macro parameter combinations
+  {
+    // 0
+    make_tuple("SIB test_SIB POST HIGH (REGISTER test_reg 4 Bypass: \"0b1001\")\n",
+               // Expected:
+               "[Chain](1)     \"test_SIB\"\n"
+               " [Linker](2)    \"test_SIB_mux\"\n"
+               "  :Selector:(0)  \"test_SIB_ctrl\", kind: Binary, can_select_none: 1, inverted_bits: 0, reversed_order: 0\n"
+               "  [Register](3)  \"test_reg\", length: 4, bypass: 1001\n"
+               " [Register](0)  \"test_SIB_ctrl\", length: 1, Hold value: true, bypass: 0"),
 
-"[Chain](1)     \"test_SIB\"\n\
- [Linker](2)    \"test_SIB_mux\"\n\
-  :Selector:(0)  \"test_SIB_ctrl\", kind: Binary, can_select_none: 1, inverted_bits: 0, reversed_order: 0\n\
-  [Register](3)  \"test_reg\", length: 4, bypass: 1001\n\
- [Register](0)  \"test_SIB_ctrl\", length: 1, Hold value: true, bypass: 0"),
-   make_tuple( "SIB test_SIB POST LOW\
-    (REGISTER test_reg 4 Bypass: \"0b1001\")\n",
+    // 1
+    make_tuple("SIB test_SIB POST LOW (REGISTER test_reg 4 Bypass: \"0b1001\")\n",
+               // Expected:
+               "[Chain](1)     \"test_SIB\"\n"
+               " [Linker](2)    \"test_SIB_mux\"\n"
+               "  :Selector:(0)  \"test_SIB_ctrl\", kind: Binary, can_select_none: 1, inverted_bits: 1, reversed_order: 0\n"
+               "  [Register](3)  \"test_reg\", length: 4, bypass: 1001\n"
+               " [Register](0)  \"test_SIB_ctrl\", length: 1, Hold value: true, bypass: 0"),
 
-"[Chain](1)     \"test_SIB\"\n\
- [Linker](2)    \"test_SIB_mux\"\n\
-  :Selector:(0)  \"test_SIB_ctrl\", kind: Binary, can_select_none: 1, inverted_bits: 1, reversed_order: 0\n\
-  [Register](3)  \"test_reg\", length: 4, bypass: 1001\n\
- [Register](0)  \"test_SIB_ctrl\", length: 1, Hold value: true, bypass: 0"),
-   make_tuple( "SIB test_SIB PRE HIGH\
-    (REGISTER test_reg 4 Bypass: \"0b1001\")\n",
-"[Chain](1)     \"test_SIB\"\n\
- [Register](0)  \"test_SIB_ctrl\", length: 1, Hold value: true, bypass: 0\n\
- [Linker](2)    \"test_SIB_mux\"\n\
-  :Selector:(0)  \"test_SIB_ctrl\", kind: Binary, can_select_none: 1, inverted_bits: 0, reversed_order: 0\n\
-  [Register](3)  \"test_reg\", length: 4, bypass: 1001"),
-   make_tuple( "SIB test_SIB PRE LOW\
-    (REGISTER test_reg 4 Bypass: \"0b1001\")\n",
-"[Chain](1)     \"test_SIB\"\n\
- [Register](0)  \"test_SIB_ctrl\", length: 1, Hold value: true, bypass: 0\n\
- [Linker](2)    \"test_SIB_mux\"\n\
-  :Selector:(0)  \"test_SIB_ctrl\", kind: Binary, can_select_none: 1, inverted_bits: 1, reversed_order: 0\n\
-  [Register](3)  \"test_reg\", length: 4, bypass: 1001"),
-
+    // 2
+    make_tuple("SIB test_SIB PRE HIGH (REGISTER test_reg 4 Bypass: \"0b1001\")\n",
+               // Expected:
+               "[Chain](1)     \"test_SIB\"\n"
+               " [Register](0)  \"test_SIB_ctrl\", length: 1, Hold value: true, bypass: 0\n"
+               " [Linker](2)    \"test_SIB_mux\"\n"
+               "  :Selector:(0)  \"test_SIB_ctrl\", kind: Binary, can_select_none: 1, inverted_bits: 0, reversed_order: 0\n"
+               "  [Register](3)  \"test_reg\", length: 4, bypass: 1001"),
+    // 3
+    make_tuple("SIB test_SIB PRE LOW (REGISTER test_reg 4 Bypass: \"0b1001\")\n",
+               // Expected:
+               "[Chain](1)     \"test_SIB\"\n"
+               " [Register](0)  \"test_SIB_ctrl\", length: 1, Hold value: true, bypass: 0\n"
+               " [Linker](2)    \"test_SIB_mux\"\n"
+               "  :Selector:(0)  \"test_SIB_ctrl\", kind: Binary, can_select_none: 1, inverted_bits: 1, reversed_order: 0\n"
+               "  [Register](3)  \"test_reg\", length: 4, bypass: 1001"),
   };
 
   // ---------------- DDT Exercise
@@ -903,7 +906,7 @@ void UT_reader::test_SIB ()
 
 //! Test JTAG macro from Simplified ICL Tree input - In cases with success
 //!
-void UT_reader::test_JTAG_TAP_Success ()
+void UT_SIT_Reader::test_JTAG_TAP_Success ()
 {
   // ---------------- DDT Setup
   //
@@ -997,7 +1000,7 @@ void UT_reader::test_JTAG_TAP_Success ()
 
 //! Test JTAG macro from Simplified ICL Tree input - In cases with failure
 //!
-void UT_reader::test_JTAG_TAP_Failure ()
+void UT_SIT_Reader::test_JTAG_TAP_Failure ()
 {
   // ---------------- DDT Setup
   //
@@ -1039,7 +1042,7 @@ void UT_reader::test_JTAG_TAP_Failure ()
 
 //! Test ACCES_INTERFACE from Simplified ICL Tree input - In cases with success
 //!
-void UT_reader::test_ACCES_INTERFACE_Success ()
+void UT_SIT_Reader::test_ACCES_INTERFACE_Success ()
 {
   // ---------------- DDT Setup
   //
@@ -1222,7 +1225,7 @@ void UT_reader::test_ACCES_INTERFACE_Success ()
 
 //! Test ACCES_INTERFACE from Simplified ICL Tree input - In cases with parsing failure
 //!
-void UT_reader::test_ACCES_INTERFACE_Failure ()
+void UT_SIT_Reader::test_ACCES_INTERFACE_Failure ()
 {
   // ---------------- DDT Setup
   //
@@ -1291,7 +1294,7 @@ void UT_reader::test_ACCES_INTERFACE_Failure ()
 
 //! Test 1500 Wrapper macro from Simplified ICL Tree input
 //!
-void UT_reader::test_1500 ()
+void UT_SIT_Reader::test_1500 ()
 {
   // ---------------- Setup
   //
@@ -1353,7 +1356,7 @@ void UT_reader::test_1500 ()
 
 // Test construction of LINKERs macro from Simplified ICL Tree input - in case of success
 //
-void UT_reader::test_LINKER_Success ()
+void UT_SIT_Reader::test_LINKER_Success ()
 {
   // ---------------- DDT Setup
   //
@@ -1417,7 +1420,7 @@ void UT_reader::test_LINKER_Success ()
 
 // Test construction of LINKERs macro from Simplified ICL Tree input - in case of errors
 //
-void UT_reader::test_LINKER_Error ()
+void UT_SIT_Reader::test_LINKER_Error ()
 {
   // ---------------- DDT Setup
   //
@@ -1468,7 +1471,7 @@ void UT_reader::test_LINKER_Error ()
 
 // Test construction of LINKERs macro with selector defined from custom table
 //
-void UT_reader::test_LINKER_CustomTable_Success ()
+void UT_SIT_Reader::test_LINKER_CustomTable_Success ()
 {
   // ---------------- DDT Setup
   //
@@ -1528,7 +1531,7 @@ void UT_reader::test_LINKER_CustomTable_Success ()
 
 // Test construction of PDL statement with 1 PDL algorithm name in case of success
 //
-void UT_reader::test_PDL_Success ()
+void UT_SIT_Reader::test_PDL_Success ()
 {
   // ---------------- DDT Setup
   //
@@ -1595,7 +1598,7 @@ void UT_reader::test_PDL_Success ()
 
 // Test construction of PDL statement with 1 PDL algorithm name in case of failure
 //
-void UT_reader::test_PDL_Failure ()
+void UT_SIT_Reader::test_PDL_Failure ()
 {
   // ---------------- DDT Setup
   //
@@ -1646,7 +1649,7 @@ void UT_reader::test_PDL_Failure ()
 
 // Test of INSTANCE OF statement with 1 INSTANCE OF
 //
-void UT_reader::test_INSTANCE_OF_Single_Success ()
+void UT_SIT_Reader::test_INSTANCE_OF_Single_Success ()
 {
   // ---------------- DDT Setup
   //
@@ -1786,7 +1789,7 @@ void UT_reader::test_INSTANCE_OF_Single_Success ()
 
 // Test of INSTANCE OF statement with multiple INSTANCE OF
 //
-void UT_reader::test_INSTANCE_OF_Multiple_Success ()
+void UT_SIT_Reader::test_INSTANCE_OF_Multiple_Success ()
 {
   // ---------------- Setup
   //
@@ -1854,7 +1857,7 @@ void UT_reader::test_INSTANCE_OF_Multiple_Success ()
 
 // Test of INSTANCE OF statement in case of failure
 //
-void UT_reader::test_INSTANCE_OF_Failure ()
+void UT_SIT_Reader::test_INSTANCE_OF_Failure ()
 {
   // ---------------- DDT Setup
   //
@@ -1963,5 +1966,5 @@ void UT_reader::test_INSTANCE_OF_Failure ()
 }
 
 //===========================================================================
-// End of UT_reader.cpp
+// End of UT_SIT_Reader.cpp
 //===========================================================================

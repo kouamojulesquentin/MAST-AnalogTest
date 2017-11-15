@@ -14,10 +14,10 @@ set(UT_COMMON_SOURCES     "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_PrettyPrinter
                           "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_Checker.cpp")
 
 set(UT_SIT_READER_HEADERS "${CMAKE_CURRENT_LIST_DIR}/SIT/UT_SIT_Printer.hpp"
-                          "${CMAKE_CURRENT_LIST_DIR}/SIT/UT_reader.hpp")
+                          "${CMAKE_CURRENT_LIST_DIR}/SIT/UT_SIT_Reader.hpp")
 
 set(UT_SIT_READER_SOURCES "${CMAKE_CURRENT_LIST_DIR}/SIT/UT_SIT_Printer.cpp"
-                          "${CMAKE_CURRENT_LIST_DIR}/SIT/UT_reader.cpp")
+                          "${CMAKE_CURRENT_LIST_DIR}/SIT/UT_SIT_Reader.cpp")
 
 set(UT_ICL_READER_HEADERS "${CMAKE_CURRENT_LIST_DIR}/ICL/UT_ICL_Reader.hpp"
                           "${CMAKE_CURRENT_LIST_DIR}/ICL/UT_Fragments.hpp"

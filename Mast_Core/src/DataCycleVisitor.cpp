@@ -23,6 +23,7 @@ using std::shared_ptr;
 using std::make_shared;
 
 
+
 //! Updates AccessInterface pending flag
 //!
 
@@ -46,15 +47,22 @@ void DataCycleVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 //  End of: DataCycleVisitor::VisitAccessInterface
 //---------------------------------------------------------------------------
 
-
 //! If Pending, sends a notification to the Raw protocol waiting on the pending queue
 //!
 void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator&accessInterfaceTranslator)
 
 {
+ auto lambda = [this] (AccessInterface accessInterface) {m_manager->DoHierarchicalDataCycle(&accessInterface);};
   VisitChildren(accessInterfaceTranslator);
+  //SystemModelChecker guarantess the only child is an AccessInterface with a Raw protocol
+  auto accessInterface = *std::dynamic_pointer_cast<AccessInterface>(accessInterfaceTranslator.FirstChild());
+  auto protocol =  accessInterface.Protocol();
+  
   if (accessInterfaceTranslator.IsPending())
   {
+   //Launch DoHierarchicalDataCycle as a separate thread
+    std::thread AI_thread(lambda,accessInterface);
+   //Wait on Queue
   }
 }
 //

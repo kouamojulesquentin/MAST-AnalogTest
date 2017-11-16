@@ -46,6 +46,7 @@ class MAST_CORE_EXPORT DataCycleVisitor : public SystemModelVisitor
   //
   private:
   SystemModelManager_impl* m_manager = nullptr; //!< The current system model
+
 };
 //
 //  End of ConfigureVisitor class declaration

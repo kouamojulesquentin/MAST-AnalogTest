@@ -13,6 +13,7 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_AccessLink.cpp
                                   AST_Attribute.hpp
                                   AST_Attribute.cpp
+                                  AST_FileRef.hpp
                                   AST_Instance.hpp
                                   AST_Instance.cpp
                                   AST_Node.hpp
@@ -66,7 +67,8 @@ add_library (Reader_Common SHARED AST.hpp
                                   Parser_PrivateData.hpp
                                   Parser_PrivateData.cpp
                                   Reader.hpp
-                                  Reader.cpp)
+                                  Reader.cpp
+                                  UnresolvedPathSelector.hpp)
 
 target_include_directories (Reader_Common PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_options     (Reader_Common PRIVATE -std=c++14

@@ -14,6 +14,7 @@
 #include "AST.hpp"
 #include "AST_AccessLink.hpp"
 #include "AST_Attribute.hpp"
+#include "AST_FileRef.hpp"
 #include "AST_Instance.hpp"
 #include "AST_ModuleIdentifier.hpp"
 #include "AST_Module.hpp"
@@ -135,6 +136,21 @@ AST_Attribute* AST::Create_Attribute (string&& name, std::vector<AST_SimpleNode*
 //
 //  End of: AST::Create_Attribute
 //---------------------------------------------------------------------------
+
+
+//! Creates or returns existing AST_FileRef node
+//!
+//! @param kind   Kind of file
+//! @param name   File name or path
+//!
+AST_FileRef* AST::Create_FileRef (Kind kind, string&& name)
+{
+  return Create_Node<AST_FileRef>(kind, std::move(name));
+}
+//
+//  End of: AST::Create_FileRef
+//---------------------------------------------------------------------------
+
 
 //! Creates an AST_Instance node
 //!

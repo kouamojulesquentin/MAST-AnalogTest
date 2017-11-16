@@ -16,6 +16,7 @@
 #include "AST_Attribute.hpp"
 #include "AST_Instance.hpp"
 #include "AST_ScanInterface.hpp"
+#include "AST_ScanMux.hpp"
 #include "AST_ScanRegister.hpp"
 #include "AST_Parameter.hpp"
 #include "AST_Port.hpp"
@@ -50,6 +51,7 @@ void AST_Module::DispatchChildren ()
         case Parsers::Kind::ScanInterface:  AST_ParentNode::AppendChild(child, m_scanInterfaces);  break;
         case Parsers::Kind::ScanInPort:     AST_ParentNode::AppendChild(child, m_scanInPorts);     break;
         case Parsers::Kind::ScanOutPort:    AST_ParentNode::AppendChild(child, m_scanOutPorts);    break;
+        case Parsers::Kind::ScanMux:        AST_ParentNode::AppendChild(child, m_scanMuxes);       break;
         case Parsers::Kind::ScanRegister:   AST_ParentNode::AppendChild(child, m_scanRegisters);   break;
         case Parsers::Kind::Instance:       AST_ParentNode::AppendChild(child, m_instances);       break;
 
@@ -66,6 +68,20 @@ void AST_Module::DispatchChildren ()
 //---------------------------------------------------------------------------
 
 
+//! Searches for a ScanMux with specified identifier
+//!
+//! @param identifier   An identifier for ScanMux to find
+//!
+const AST_ScanMux* AST_Module::FindScanMux (const AST_Identifier* identifier) const
+{
+  CHECK_PARAMETER_NOT_NULL(identifier, "Cannot find ScanMux from nullptr identifier");
+
+  return FindNode(m_scanMuxes, identifier);
+}
+//
+//  End of: AST_Module::FindScanMux
+//---------------------------------------------------------------------------
+
 
 //! Searches for a ScanRegister with specified identifier
 //!
@@ -75,18 +91,7 @@ const AST_ScanRegister* AST_Module::FindScanRegister (const AST_Identifier* iden
 {
   CHECK_PARAMETER_NOT_NULL(identifier, "Cannot find ScanRegister from nullptr identifier");
 
-  AST_ScanRegister* foundScanRegister = nullptr;
-
-  for (auto scanRegister : m_scanRegisters)
-  {
-    if (scanRegister->Identifier()->Name() == identifier->Name())
-    {
-      foundScanRegister = scanRegister;
-      break;
-    }
-  }
-
-  return foundScanRegister;
+  return FindNode(m_scanRegisters, identifier);
 }
 //
 //  End of: AST_Module::FindScanRegister
@@ -100,19 +105,7 @@ const AST_ScanRegister* AST_Module::FindScanRegister (const AST_Identifier* iden
 const AST_Instance* AST_Module::FindInstance (const AST_Identifier* identifier) const
 {
   CHECK_PARAMETER_NOT_NULL(identifier, "Cannot find Instance from nullptr identifier");
-
-  AST_Instance* foundInstance = nullptr;
-
-  for (auto instance : m_instances)
-  {
-    if (instance->InstanceIdentifier()->Name() == identifier->Name())
-    {
-      foundInstance = instance;
-      break;
-    }
-  }
-
-  return foundInstance;
+  return FindNode(m_instances, identifier);
 }
 //
 //  End of: AST_Module::FindScanRegister

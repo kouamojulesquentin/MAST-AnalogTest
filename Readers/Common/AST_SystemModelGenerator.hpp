@@ -33,7 +33,7 @@ class AST_Module;
 class AST_Network;
 //+class AST_Port;
 //+class AST_ScanInterface;
-//+class AST_ScanMux;
+class AST_ScanMux;
 class AST_ScanRegister;
 class AST_Source;
 
@@ -56,6 +56,7 @@ class AST_SystemModelGenerator final
   //
   private:
   std::tuple<std::shared_ptr<mast::SystemModelNode>, const AST_Source*> Generate_Instance (const AST_Instance*     instance, const AST_Module* instanceModule);
+  std::tuple<std::shared_ptr<mast::SystemModelNode>, const AST_Source*> Generate_ScanMux  (const AST_ScanMux*      scanMux);
   std::tuple<std::shared_ptr<mast::SystemModelNode>, const AST_Source*> Generate_Register (const AST_ScanRegister* scanRegister);
 
   std::shared_ptr<mast::SystemModelNode> Generate_Network (const AST_Network* network);

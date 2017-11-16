@@ -23,6 +23,7 @@ namespace Parsers
 {
 class AST_AccessLink;
 class AST_Instance;
+class AST_ScanMux;
 class AST_ScanInterface;
 class AST_ScanRegister;
 class AST_Port;
@@ -63,6 +64,10 @@ class AST_Module final : public AST_ParentNode
   //!
   const std::vector<AST_ScanInterface*>& ScanInterfaces() const { return m_scanInterfaces; }
 
+  //! Returns module ScanMuxes
+  //!
+  const std::vector<AST_ScanMux*>& ScanMuxes() const { return m_scanMuxes; }
+
   //! Returns module ScanRegister(s)
   //!
   const std::vector<AST_ScanRegister*>& ScanRegisters() const { return m_scanRegisters; }
@@ -86,6 +91,10 @@ class AST_Module final : public AST_ParentNode
   //! Returns whether module defines an AccessLink
   //!
   bool HasAccessLink() const { return m_accessLink != nullptr; }
+
+  //! Searches for a ScanMux with specified identifier
+  //!
+  const AST_ScanMux* FindScanMux (const AST_Identifier* identifier) const;
 
   //! Searches for a ScanRegister with specified identifier
   //!
@@ -113,6 +122,29 @@ class AST_Module final : public AST_ParentNode
   //!
   void DispatchChildren () override;
 
+  //! Searches for a AST_Node of some kind with specified identifier
+  //!
+  //! @param nodes        Collection of nodes to search into
+  //! @param identifier   An identifier for ScanRegister to find
+  //!
+  template<typename T>
+  const T* FindNode (const std::vector<T*>& nodes, const AST_Identifier* identifier) const
+  {
+    const T* foundNode = nullptr;
+
+    for (auto node : nodes)
+    {
+      if (node->Identifier()->Name() == identifier->Name())
+      {
+        foundNode = node;
+        break;
+      }
+    }
+
+    return foundNode;
+  }
+
+
   // ---------------- Private Fields
   //
   private:
@@ -125,6 +157,7 @@ class AST_Module final : public AST_ParentNode
   std::vector<AST_Port*>          m_scanOutPorts;         //!< Scan output port(s)
   std::vector<AST_Attribute*>     m_attributes;           //!< Module attributes
   std::vector<AST_ScanRegister*>  m_scanRegisters;        //!< Scan registers in module
+  std::vector<AST_ScanMux*>       m_scanMuxes;            //!< Scan muxes in module
   std::vector<AST_Instance*>      m_instances;            //!< Instances in module
 };
 //

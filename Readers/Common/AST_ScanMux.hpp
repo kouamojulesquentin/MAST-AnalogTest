@@ -41,17 +41,25 @@ class AST_ScanMux final : public AST_ParentNode
   //!
   void Accept (AST_Visitor& visitor) override;
 
-  //! Returns ScanMuxt name
+  //! ScanMux identifier
+  //!
+  const AST_VectorIdentifier* Identifier() const { return m_identifier; }
+
+  //! Returns ScanMux name
   //!
   std::string Name() const override { return m_identifier->AsText(); }
+
+  //! ScanMux base name (without indices)
+  //!
+  const std::string& BaseName() const { return m_identifier->BaseName(); }
 
   //! Returns ScanMux selector signals
   //!
   const std::vector<Parsers::AST_Signal*>& Selectors() const { return m_selectors; }
 
-  //! Returns ScanMux selection table
+  //! Returns ScanMux selection info
   //!
-  const std::vector<Parsers::AST_ScanMuxSelection*>& SelectionsTable() const { return m_selections; }
+  const std::vector<Parsers::AST_ScanMuxSelection*>& Selections() const { return m_selections; }
 
 
   // ---------------- Private Methods

@@ -44,7 +44,12 @@ class AST_Instance final : public AST_ParentNode
   //!
   std::string Name() const override;
 
-  //! Returns isntance identifier
+  //! Returns instance identifier
+  //!
+  //! @note This is synonym of InstanceIdentifier
+  const AST_ScalarIdentifier* Identifier() const { return m_instanceIdentifier; };
+
+  //! Returns instance identifier
   //!
   const AST_ScalarIdentifier* InstanceIdentifier() const { return m_instanceIdentifier; };
 

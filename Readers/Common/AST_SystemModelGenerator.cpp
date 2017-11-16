@@ -34,6 +34,7 @@
 #include "AST_Value.hpp"
 #include "AST_VectorIdentifier.hpp"
 
+#include "UnresolvedPathSelector.hpp"
 #include "SystemModel.hpp"
 #include "SystemModelBuilder.hpp"
 #include "Utility.hpp"
@@ -46,6 +47,7 @@ using std::shared_ptr;
 using std::unique_ptr;
 using std::tuple;
 using std::make_unique;
+using std::make_shared;
 using std::make_tuple;
 
 using namespace mast;
@@ -114,6 +116,7 @@ AST_SystemModelGenerator::Generate_Instance (const AST_Instance* instance, const
 
   // ---------------- Instantiate module with instance parameters
   //
+  CHECK_VALUE_EMPTY(instance->Parameters(), "Not Yet Supported: Instance parameters");
   Generate_Module(chain.get(), instanceModule);
 
   return make_tuple(chain, instanceSource);
@@ -181,12 +184,9 @@ void AST_SystemModelGenerator::Generate_Module (mast::Chain* chain, const AST_Mo
   CHECK_VALUE_NOT_EMPTY(scanInPorts,  "Expecting a module to have at least one ScanInPort");
   CHECK_VALUE_NOT_EMPTY(scanOutPorts, "Expecting a module to have at least one ScanOutPort");
 
-  auto scanInPort       = scanInPorts.front();
-  auto scanOutPort      = scanOutPorts.front();
-  auto source           = scanOutPort->Source();
-  auto moduleInPortName = scanInPort->Name();
-
-  stack<shared_ptr<SystemModelNode>> children;
+  auto scanInPort  = scanInPorts.front();
+  auto scanOutPort = scanOutPorts.front();
+  auto source      = scanOutPort->Source();
 
   // Lamba: Tells whether some source match module input port (currently only considering first)
   auto isSourcedByModuleInput = [scanInPort](const AST_Source* source)
@@ -204,6 +204,8 @@ void AST_SystemModelGenerator::Generate_Module (mast::Chain* chain, const AST_Mo
     }
     return identifier->Name() == scanInPort->Name();
   };
+
+  stack<shared_ptr<SystemModelNode>> children;
 
   while (!isSourcedByModuleInput(source))
   {
@@ -225,7 +227,8 @@ void AST_SystemModelGenerator::Generate_Module (mast::Chain* chain, const AST_Mo
       }
       else
       {
-        CHECK_FAILED("ScanMux are not yet supported");
+        auto scanMux = module->FindScanMux(identifier);
+        std::tie(createdNode, source) = Generate_ScanMux(scanMux);
       }
     }
     else   // Instance ?
@@ -258,6 +261,48 @@ void AST_SystemModelGenerator::Generate_Module (mast::Chain* chain, const AST_Mo
 }
 //
 //  End of: AST_SystemModelGenerator::Generate_Module
+//---------------------------------------------------------------------------
+
+
+//! Creates a SystemModel Linker and path selector from an AST_ScanMux
+//!
+//! @param scanMux  ScanMux to be converted to SystemModel Linker
+//!
+//! @return Created Linker and ScanMux AST_Source
+tuple<std::shared_ptr<mast::SystemModelNode>, const AST_Source*>
+AST_SystemModelGenerator::Generate_ScanMux (const AST_ScanMux* scanMux)
+{
+  // ---------------- Collect selector(s) path(s) including bits ranges
+  // Paths are ordered and defined using SystemModel path syntax
+  // Bits ranges are defined as pair of integers
+  //
+  const auto& selectors          = scanMux->Selectors();
+  const auto  selectorsBitsCount = selectors.size();
+//+  auto paths = MakePaths(selectors);
+
+  // ---------------- Prepare table
+  //
+  auto const& selection = scanMux->Selections();
+//+  auto        table     = MakeSelectionTable();
+
+  // ---------------- Create Linker
+  //
+  auto pathSelector = make_shared<UnresolvedPathSelector>();
+
+//+  const auto muxWidth = scanMux->Width();
+  const auto name     = scanMux->BaseName();
+  auto       linker   = m_systemModel->CreateLinker(name, pathSelector);
+
+  // ---------------- Find "source" of linker
+  //
+  AST_Source* source = nullptr;
+
+
+  CHECK_FAILED("Not Yet Supported: ScanMux");
+  return make_tuple(linker, source);
+}
+//
+//  End of: AST_SystemModelGenerator::Generate_Register
 //---------------------------------------------------------------------------
 
 

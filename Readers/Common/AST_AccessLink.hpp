@@ -21,6 +21,7 @@
 namespace Parsers
 {
 class AST_ScalarIdentifier;
+class AST_FileRef;
 
 enum class AccessLinkType
 {
@@ -56,6 +57,14 @@ class AST_AccessLink final : public AST_ParentNode
   //! Returns generic AccessLink identifier (only valid for generic AccessLink)
   //!
   const AST_ScalarIdentifier* GenericIdentifier() const { return m_genericId; };
+
+  //! Returns BSDL reference
+  //!
+  const AST_FileRef* BSDL() const { return m_bsdlFile; }
+
+  //! Returns name/path of referred BSDL
+  //!
+  const std::string& BSDLName() const;
 
   //! Returns AccessLink type
   //!
@@ -116,6 +125,7 @@ class AST_AccessLink final : public AST_ParentNode
   private:
   const AST_ScalarIdentifier* m_identifier = nullptr;                   //!< Access Link name
   const AST_ScalarIdentifier* m_genericId  = nullptr;                   //!< When type is "Generic", identifies the Access Link
+  const AST_FileRef*          m_bsdlFile   = nullptr;                   //!< Referred BSDL file (for register size...)
   const AccessLinkType        m_type       = AccessLinkType::Undefined; //!< Specifies type of Access Link
 };
 //

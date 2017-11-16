@@ -16,6 +16,7 @@
 #include "AST_AccessLink.hpp"
 #include "AST_Attribute.hpp"
 #include "AST_Instance.hpp"
+#include "AST_FileRef.hpp"
 #include "AST_Module.hpp"
 #include "AST_ModuleIdentifier.hpp"
 #include "AST_Namespace.hpp"
@@ -148,6 +149,8 @@ void AST_PrettyPrinter::Visit_AccessLink (AST_AccessLink* accessLink)
 
   HierarchyInserter hierarchyInserter(*this);
 
+  StreamSimpleNode (accessLink->BSDL());
+
   AcceptNodes (accessLink->UndispatchedChildren());
 }
 //
@@ -237,6 +240,7 @@ void AST_PrettyPrinter::Visit_Module (AST_Module* module)
   AcceptNodes (module->ScanOutPorts());
   AcceptNodes (module->UndispatchedChildren());
   AcceptNodes (module->Instances());
+  AcceptNodes (module->ScanMuxes());
   AcceptNodes (module->ScanRegisters());
 }
 //
@@ -337,8 +341,8 @@ void AST_PrettyPrinter::Visit_ScanMux (AST_ScanMux* scanMux)
 
   HierarchyInserter hierarchyInserter(*this);
 
-  const auto& selectionsTable = scanMux->SelectionsTable();
-  for (const auto& selection : selectionsTable)
+  const auto& selections = scanMux->Selections();
+  for (const auto& selection : selections)
   {
     StreamDepth() << selection->AsText() << ";\n";
   }

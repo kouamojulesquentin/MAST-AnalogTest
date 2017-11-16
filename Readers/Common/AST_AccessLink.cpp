@@ -13,6 +13,7 @@
 
 #include "AST_AccessLink.hpp"
 #include "AST_ScalarIdentifier.hpp"
+#include "AST_FileRef.hpp"
 #include "AST_Visitor.hpp"
 
 using std::string;
@@ -28,10 +29,34 @@ void AST_AccessLink::Accept (AST_Visitor& visitor)
 }
 
 
+//! Returns name/path of referred BSDL
+//!
+const string& AST_AccessLink::BSDLName () const
+{
+  return m_bsdlFile->Name();
+}
+//
+//  End of: AST_AccessLink::BSDLName
+//---------------------------------------------------------------------------
+
+
+
 //! Dispatches children to specific member (for ease of use)
 //!
 void AST_AccessLink::DispatchChildren ()
 {
+  for (auto&  child: UndispatchedChildren())
+  {
+    if (child != nullptr)
+    {
+      switch (child->GetKind())
+      {
+        case Parsers::Kind::BSDLEntity : SetChild(child, m_bsdlFile); break;
+        default:  // Ignore all other for now
+          break;
+      }
+    }
+  }
 }
 //
 //  End of: AST_AccessLink::DispatchChildren

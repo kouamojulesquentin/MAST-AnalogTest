@@ -1,9 +1,42 @@
-Running Mast_Readers tests (66 tests)
+Running Mast_Readers tests (67 tests)
 
-...........................................................................
+.........................
+
+In UT_ICL_Reader::test_FromIcl_AccessLink_1149_2001: 
+UT_ICL_Reader.cpp:1372: Error: Expected (actual_AST_String == expected_AST_PrettyPrint), but found (
+NameSpace;
+Module Top
+{
+  AccessLink dot1 Of STD_1149_1_2001
+  {
+    BSDLEntity chip2542;
+  }
+}
+
+ != 
+NameSpace;
+Module Top
+{
+  AccessLink dot1 Of STD_1149_1_2001
+  {
+    BSDLEntity hip2542;
+  }
+}
+
+)
+.......
+
+In UT_ICL_Reader::test_Generate_SIB_mux_pre: 
+UT_ICL_Reader.cpp:1860: Error: Unexpected 'std::exception' exception thrown from test with value: 'std::runtime_error: Not Yet Supported: ScanMux.
+In file:     D:\Projects\Tima\NewMast\Readers\Common\AST_SystemModelGenerator.cpp
+In function: Generate_ScanMux
+At line:     301
+' (After assertion at specified line)
+..........................................
 
 In UT_SIT_Printer::test_Warnings: 
 UT_SIT_Printer.cpp:460: Warning: Table based path selectors checks incomplete (no SIT support yet for tables)
 ...........................................................................................................
 
-OK! (182 tests including 138 'sub' tests from 22 data driven tests)
+Failed 2 and Skipped 0 of 183 tests including 138 'sub' tests from 22 data driven tests
+Success rate: 98%

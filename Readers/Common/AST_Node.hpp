@@ -34,6 +34,7 @@ namespace Parsers
     Enum_def,         //!< For enums definitions
     Enum_item,        //!< For enums items
     Enum_ref,         //!< For enums references
+    BSDLEntity,       //!< For BSDL file referred by AccessLink
     InputPort,        //!< For input of instance input port
     InputPortSource,  //!< For input of instance input port source
     Instance,         //!< For modules instances
@@ -87,6 +88,7 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::Enum_def)
             ENUM_MEMBER(Parsers::Kind::Enum_item)
             ENUM_MEMBER(Parsers::Kind::Enum_ref)
+            ENUM_MEMBER(Parsers::Kind::BSDLEntity)
             ENUM_MEMBER(Parsers::Kind::InputPort)
             ENUM_MEMBER(Parsers::Kind::InputPortSource)
             ENUM_MEMBER(Parsers::Kind::Instance)

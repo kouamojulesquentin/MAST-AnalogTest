@@ -29,33 +29,34 @@ class UT_ICL_Reader : public CxxTest::TestSuite
 
   // ---------------- UpdateAstFromIcl
   //
-  void test_UpdateAstFromIcl_1_ScanRegister ();
-  void test_UpdateAstFromIcl_3_ScanRegister ();
-  void test_UpdateAstFromIcl_parameters_value ();
-  void test_UpdateAstFromIcl_parameters_strings ();
-  void test_UpdateAstFromIcl_parameters_param_ref ();
-  void test_UpdateAstFromIcl_parameters_string_and_param_ref ();
-  void test_UpdateAstFromIcl_parameters_param_ref_and_string ();
-  void test_UpdateAstFromIcl_attributes_no_value ();
-  void test_UpdateAstFromIcl_attributes_value ();
-  void test_UpdateAstFromIcl_attributes_strings ();
-  void test_UpdateAstFromIcl_attributes_param_ref ();
-  void test_UpdateAstFromIcl_ScanInterface_InModuleDef ();
-  void test_UpdateAstFromIcl_ScanMux_SIB ();
-  void test_UpdateAstFromIcl_ScanMux_ValueList ();
-  void test_UpdateAstFromIcl_Instance ();
-  void test_UpdateAstFromIcl_Namespace_Def ();
-  void test_UpdateAstFromIcl_UseNamespace_Def_OutsideModule ();
-  void test_UpdateAstFromIcl_UseNamespace_Def_InsideModule ();
-  void test_UpdateAstFromIcl_AccessLink_1149_2001 ();
+  void test_FromIcl_1_ScanRegister ();
+  void test_FromIcl_3_ScanRegister ();
+  void test_FromIcl_parameters_value ();
+  void test_FromIcl_parameters_strings ();
+  void test_FromIcl_parameters_param_ref ();
+  void test_FromIcl_parameters_string_and_param_ref ();
+  void test_FromIcl_parameters_param_ref_and_string ();
+  void test_FromIcl_attributes_no_value ();
+  void test_FromIcl_attributes_value ();
+  void test_FromIcl_attributes_strings ();
+  void test_FromIcl_attributes_param_ref ();
+  void test_FromIcl_ScanInterface_InModuleDef ();
+  void test_FromIcl_ScanMux_SIB ();
+  void test_FromIcl_ScanMux_ValueList ();
+  void test_FromIcl_Instance ();
+  void test_FromIcl_Namespace_Def ();
+  void test_FromIcl_UseNamespace_Def_OutsideModule ();
+  void test_FromIcl_UseNamespace_Def_InsideModule ();
+  void test_FromIcl_AccessLink_1149_2001 ();
 
   // ---------------- GenerateSystemModelNodes
   //
-  void test_GenerateSystemModelNodes_EmptyModule ();
-  void test_GenerateSystemModelNodes_1_ScanRegister ();
-  void test_GenerateSystemModelNodes_N_ScanRegisters ();
-  void test_GenerateSystemModelNodes_2_Modules ();
-  void test_GenerateSystemModelNodes_N_Modules ();
+  void test_Generate_EmptyModule ();
+  void test_Generate_1_ScanRegister ();
+  void test_Generate_N_ScanRegisters ();
+  void test_Generate_2_Modules ();
+  void test_Generate_N_Modules ();
+  void test_Generate_SIB_mux_pre ();
 
   // ================ Other Methods ================
 

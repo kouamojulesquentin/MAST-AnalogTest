@@ -35,6 +35,7 @@ namespace Parsers
   class AST;
   class AST_AccessLink;
   class AST_Attribute;
+  class AST_FileRef;
   class AST_Identifier;
   class AST_Instance;
   class AST_ModuleIdentifier;
@@ -88,6 +89,7 @@ typedef void* yyscan_t;
 #include "AST.hpp"
 #include "AST_AccessLink.hpp"
 #include "AST_Attribute.hpp"
+#include "AST_FileRef.hpp"
 #include "AST_Instance.hpp"
 #include "AST_ModuleIdentifier.hpp"
 #include "AST_Namespace.hpp"
@@ -198,6 +200,7 @@ namespace
 %type <std::string> attribute_name
 %type <std::string> accessLink_name
 %type <std::string> accessLink_genericID
+%type <std::string> bsdlEntity_name
 
 %type <Parsers::AccessLinkType>        accessLink1149_stds
 
@@ -2230,13 +2233,15 @@ accessLink_genericID : SCALAR_ID
 accessLink1149_def : ACCESSLINK accessLink_name OF accessLink1149_stds LEFT_BRACE BSDLENTITIY bsdlEntity_name SEMICOLON bsdl_instr_refs RIGHT_BRACE
 {
   // accessLink1149_def : ACCESSLINK accessLink_name OF accessLink1149_stds LEFT_BRACE BSDLENTITIY bsdlEntity_name SEMICOLON bsdl_instr_refs RIGHT_BRACE
-  auto& name      = $[accessLink_name];
-  auto  nameId    = ast.Create_ScalarIdentifier(std::move(name));
-  auto  type      = $[accessLink1149_stds];
-  auto  children  = vector<Parsers::AST_Node*>();
-  auto  node      = ast.Create_AccessLink(nameId, type, std::move(children));
+  auto& name         = $[accessLink_name];
+  auto& bsdlFileName = $[bsdlEntity_name];
+  auto  nameId       = ast.Create_ScalarIdentifier(std::move(name));
+  auto  bsdlFile     = ast.Create_FileRef(Parsers::Kind::BSDLEntity, std::move(bsdlFileName));
+  auto  type         = $[accessLink1149_stds];
+  auto  children     = vector<Parsers::AST_Node*>({ bsdlFile });
+  auto  node         = ast.Create_AccessLink(nameId, type, std::move(children));
 
-  // bsdlEntity_name and optional bsdl_instr_refs are ignored!
+  // optional bsdl_instr_refs are ignored!
 
   $$ = node;
 }
@@ -2262,7 +2267,13 @@ accessLink_name : SCALAR_ID
   $$ = std::move(name);
 };
 
-bsdlEntity_name : SCALAR_ID ;
+bsdlEntity_name : SCALAR_ID
+{
+  // bsdlEntity_name: SCALAR_ID
+  auto& name = $[SCALAR_ID];
+  $$ = std::move(name);
+};
+
 bsdl_instr_refs : bsdl_instr_refs bsdl_instr_ref | bsdl_instr_ref ;
 bsdl_instr_ref : bsdl_instr_name LEFT_BRACE bsdl_instr_selected_items RIGHT_BRACE ;
 bsdl_instr_selected_items : bsdl_instr_selected_items bsdl_instr_selected_item | bsdl_instr_selected_item ;

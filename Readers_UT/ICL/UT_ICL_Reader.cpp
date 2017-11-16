@@ -92,7 +92,7 @@ void UT_ICL_Reader::setUp ()
 
 //! Checks ICL_Reader::ParseExcerpt() when parsing a single ScanRegister
 //!
-void UT_ICL_Reader::test_UpdateAstFromIcl_1_ScanRegister ()
+void UT_ICL_Reader::test_FromIcl_1_ScanRegister ()
 {
   // ---------------- Setup
   //
@@ -153,7 +153,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_1_ScanRegister ()
 
 //! Checks ICL_Reader::ParseExcerpt() when parsing a three ScanRegister
 //!
-void UT_ICL_Reader::test_UpdateAstFromIcl_3_ScanRegister ()
+void UT_ICL_Reader::test_FromIcl_3_ScanRegister ()
 {
   // ---------------- Setup
   //
@@ -229,7 +229,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_3_ScanRegister ()
 
 //! Checks ICL_Reader::ParseExcerpt() when parsing a with parameter defined with value (not string)
 //!
-void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_value ()
+void UT_ICL_Reader::test_FromIcl_parameters_value ()
 {
   // ---------------- Setup
   //
@@ -291,7 +291,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_value ()
 
 //! Checks ICL_Reader::ParseExcerpt() when parsing a with parameter defined strings
 //!
-void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_strings ()
+void UT_ICL_Reader::test_FromIcl_parameters_strings ()
 {
   // ---------------- Setup
   //
@@ -348,7 +348,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_strings ()
 
 //! Checks ICL_Reader::ParseExcerpt() when parsing a with parameter defined with a parameter reference
 //!
-void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_param_ref ()
+void UT_ICL_Reader::test_FromIcl_parameters_param_ref ()
 {
   // ---------------- Setup
   //
@@ -402,7 +402,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_param_ref ()
 
 //! Checks ICL_Reader::ParseExcerpt() when parsing a with parameter defined with strings and parameter reference
 //!
-void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_string_and_param_ref ()
+void UT_ICL_Reader::test_FromIcl_parameters_string_and_param_ref ()
 {
   // ---------------- Setup
   //
@@ -453,7 +453,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_string_and_param_ref ()
 
 //! Checks ICL_Reader::ParseExcerpt() when parsing a with parameter defined with parameter reference and strings (in that order)
 //!
-void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_param_ref_and_string ()
+void UT_ICL_Reader::test_FromIcl_parameters_param_ref_and_string ()
 {
   // ---------------- Setup
   //
@@ -507,7 +507,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_parameters_param_ref_and_string ()
 
 //! Checks ICL_Reader::ParseExcerpt() when parsing a with attribute defined with no value at all
 //!
-void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_no_value ()
+void UT_ICL_Reader::test_FromIcl_attributes_no_value ()
 {
   // ---------------- Setup
   //
@@ -561,7 +561,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_no_value ()
 
 //! Checks ICL_Reader::ParseExcerpt() when parsing a with attribute defined with value (not string)
 //!
-void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_value ()
+void UT_ICL_Reader::test_FromIcl_attributes_value ()
 {
   // ---------------- Setup
   //
@@ -614,7 +614,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_value ()
 
 //! Checks ICL_Reader::ParseExcerpt() when parsing a with attribute defined with strings
 //!
-void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_strings ()
+void UT_ICL_Reader::test_FromIcl_attributes_strings ()
 {
   // ---------------- Setup
   //
@@ -670,7 +670,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_strings ()
 
 //! Checks ICL_Reader::ParseExcerpt() when parsing a with attribute defined with a attribute reference
 //!
-void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_param_ref ()
+void UT_ICL_Reader::test_FromIcl_attributes_param_ref ()
 {
   // ---------------- Setup
   //
@@ -723,7 +723,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_attributes_param_ref ()
 
 //! Checks ICL_Reader::ParseExcerpt() when parsing a ScanInterface statement (in a Module statement)
 //!
-void UT_ICL_Reader::test_UpdateAstFromIcl_ScanInterface_InModuleDef ()
+void UT_ICL_Reader::test_FromIcl_ScanInterface_InModuleDef ()
 {
   // ---------------- Setup
   //
@@ -769,7 +769,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_ScanInterface_InModuleDef ()
 
 //! Checks ICL_Reader::ParseExcerpt() when parsing a SIB Scan mux
 //!
-void UT_ICL_Reader::test_UpdateAstFromIcl_ScanMux_SIB ()
+void UT_ICL_Reader::test_FromIcl_ScanMux_SIB ()
 {
   // ---------------- Setup
   //
@@ -836,7 +836,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_ScanMux_SIB ()
 
 //! Checks ICL_Reader::ParseExcerpt() when parsing a Scan muxes defined with values list and vector identifiers
 //!
-void UT_ICL_Reader::test_UpdateAstFromIcl_ScanMux_ValueList ()
+void UT_ICL_Reader::test_FromIcl_ScanMux_ValueList ()
 {
   // ---------------- Setup
   //
@@ -894,7 +894,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_ScanMux_ValueList ()
 
 //! Checks ICL_Reader::ParseExcerpt() when parsing a module instance
 //!
-void UT_ICL_Reader::test_UpdateAstFromIcl_Instance ()
+void UT_ICL_Reader::test_FromIcl_Instance ()
 {
   // ---------------- Setup
   //
@@ -948,7 +948,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_Instance ()
 
 //! Checks ICL_Reader::ParseExcerpt() when setting non "root" namespace
 //!
-void UT_ICL_Reader::test_UpdateAstFromIcl_Namespace_Def ()
+void UT_ICL_Reader::test_FromIcl_Namespace_Def ()
 {
   // ---------------- Setup
   //
@@ -1070,7 +1070,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_Namespace_Def ()
 
 //! Checks ICL_Reader::ParseExcerpt() when explicitly declaring using some namespace (outside of Module definition)
 //!
-void UT_ICL_Reader::test_UpdateAstFromIcl_UseNamespace_Def_OutsideModule ()
+void UT_ICL_Reader::test_FromIcl_UseNamespace_Def_OutsideModule ()
 {
   // ---------------- Setup
   //
@@ -1198,7 +1198,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_UseNamespace_Def_OutsideModule ()
 
 //! Checks ICL_Reader::ParseExcerpt() when explicitly declaring using some namespace (inside of Module definition)
 //!
-void UT_ICL_Reader::test_UpdateAstFromIcl_UseNamespace_Def_InsideModule ()
+void UT_ICL_Reader::test_FromIcl_UseNamespace_Def_InsideModule ()
 {
   // ---------------- Setup
   //
@@ -1324,7 +1324,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_UseNamespace_Def_InsideModule ()
 
 //! Checks ICL_Reader::ParseExcerpt() when parsing a AccessLink statement
 //!
-void UT_ICL_Reader::test_UpdateAstFromIcl_AccessLink_1149_2001 ()
+void UT_ICL_Reader::test_FromIcl_AccessLink_1149_2001 ()
 {
   // ---------------- Setup
   //
@@ -1359,7 +1359,8 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_AccessLink_1149_2001 ()
                                   "{\n"
                                   "  AccessLink dot1 Of STD_1149_1_2001\n"
                                   "  {\n"
-//+ Ignored !                                 "    BSDLEntity chip2542;\n"
+                                  "    BSDLEntity chip2542;\n"
+//+ Ignored !
 //+                                  "    ijtag_en\n"
 //+                                  "    {\n"
 //+                                  "      ScanInterface { InstPath.MyScanInterface; }\n"
@@ -1374,7 +1375,7 @@ void UT_ICL_Reader::test_UpdateAstFromIcl_AccessLink_1149_2001 ()
 
 //! Checks ICL_Reader::GenerateSystemModelNodes() when parsing a single empty top module
 //!
-void UT_ICL_Reader::test_GenerateSystemModelNodes_EmptyModule ()
+void UT_ICL_Reader::test_Generate_EmptyModule ()
 {
   // ---------------- Setup
   //
@@ -1416,7 +1417,7 @@ void UT_ICL_Reader::test_GenerateSystemModelNodes_EmptyModule ()
 
 //! Checks ICL_Reader::GenerateSystemModelNodes() when parsing a single ScanRegister in a single (top module)
 //!
-void UT_ICL_Reader::test_GenerateSystemModelNodes_1_ScanRegister ()
+void UT_ICL_Reader::test_Generate_1_ScanRegister ()
 {
   // ---------------- Setup
   //
@@ -1472,7 +1473,7 @@ void UT_ICL_Reader::test_GenerateSystemModelNodes_1_ScanRegister ()
 
 //! Checks ICL_Reader::GenerateSystemModelNodes() when parsing N ScanRegisters in a single (top module)
 //!
-void UT_ICL_Reader::test_GenerateSystemModelNodes_N_ScanRegisters ()
+void UT_ICL_Reader::test_Generate_N_ScanRegisters ()
 {
   // ---------------- DDT Setup
   //
@@ -1608,7 +1609,7 @@ void UT_ICL_Reader::test_GenerateSystemModelNodes_N_ScanRegisters ()
 
 //! Checks ICL_Reader::GenerateSystemModelNodes() when parsing 2 modules with only ScanRegisters and no parameters
 //!
-void UT_ICL_Reader::test_GenerateSystemModelNodes_2_Modules ()
+void UT_ICL_Reader::test_Generate_2_Modules ()
 {
   // ---------------- Setup
   //
@@ -1693,7 +1694,7 @@ void UT_ICL_Reader::test_GenerateSystemModelNodes_2_Modules ()
 
 //! Checks ICL_Reader::GenerateSystemModelNodes() when parsing N modules with only ScanRegisters and no parameters
 //!
-void UT_ICL_Reader::test_GenerateSystemModelNodes_N_Modules ()
+void UT_ICL_Reader::test_Generate_N_Modules ()
 {
   // ---------------- Setup
   //
@@ -1802,6 +1803,87 @@ void UT_ICL_Reader::test_GenerateSystemModelNodes_N_Modules ()
   auto modelCheckResult = sm->Check();
   TS_ASSERT_EMPTY (modelCheckResult.InformativeReport());
 }
+
+
+//! Checks ICL_Reader::GenerateSystemModelNodes() when parsing a SIB with the mux before the scan register bit
+//!
+void UT_ICL_Reader::test_Generate_SIB_mux_pre ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt(
+                        "Module SIB_mux_pre {\n"
+                        "  ScanInPort     SI;\n"
+                        "  CaptureEnPort  CE;\n"
+                        "  ShiftEnPort    SE;\n"
+                        "  UpdateEnPort   UE;\n"
+                        "  SelectPort     SEL;\n"
+                        "  ResetPort      RST;\n"
+                        "  TCKPort        TCK;\n"
+                        "  ScanOutPort    SO { Source SR; }\n"
+                        "  ScanInterface client {\n"
+                        "    Port SI; Port CE; Port SE; Port UE;\n"
+                        "    Port SEL; Port RST; Port TCK; Port SO;\n"
+                        "  }\n"
+                        "  ScanInPort       fromSO;\n"
+                        "  ToCaptureEnPort  toCE;\n"
+                        "  ToShiftEnPort    toSE;\n"
+                        "  ToUpdateEnPort   toUE;\n"
+                        "  ToSelectPort     toSEL;\n"
+                        "  ToResetPort      toRST;\n"
+                        "  ToTCKPort        toTCK;\n"
+                        "  ScanOutPort      toSI { Source SI; }\n"
+                        "  ScanInterface host {\n"
+                        "    Port fromSO; Port toCE; Port toSE; Port toUE;\n"
+                        "    Port toSEL; Port toRST; Port toTCK; Port toSI;\n"
+                        "  }\n"
+                        "  ScanRegister SR {\n"
+                        "    ScanInSource SIBmux; CaptureSource SR; ResetValue 1'b0;\n"
+                        "  }\n"
+                        "  ScanMux SIBmux SelectedBy SR {\n"
+                        "    1'b0 : SI;\n"
+                        "    1'b1 : fromSO;\n"
+                        "  }\n"
+                        "}\n"s);
+
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  CxxTest::setAbortTestOnFail(true);
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+
+  auto checkResult = AST_Checker::Check(ast->Network());
+
+  TS_ASSERT_FALSE (checkResult.HasIssues());
+
+  // ---------------- Exercise
+  //
+  auto topNode = sut.GenerateSystemModelNodes(ast);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_NOT_NULLPTR (topNode);
+  TS_ASSERT_EQUALS      (topNode->Name(), "SReg");
+
+  // With PrettyPrinter
+  auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode, PrettyPrinterOptions::Parser_debug);
+  auto expected_PrettyPrint = "[Chain](0)     \"SIB_mux_pre\"\n"
+                              " [Linker](2)  \"Mux\", Binary SR 1\n"
+                              " :Selector:(1)  \"SR\", kind: Binary, can_select_none: 1, inverted_bits: 0, reversed_order: 0\n"
+                              " [Register](1)  \"SR\", length: 1, bypass: 0";
+
+  TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
+  // With Checker
+  PrependWithTap(sm, topNode);   // This is to avoid warnings about missing AccessInterface
+  auto modelCheckResult = sm->Check();
+  TS_ASSERT_EMPTY (modelCheckResult.InformativeReport());
+}
+
+
 
 
 //===========================================================================

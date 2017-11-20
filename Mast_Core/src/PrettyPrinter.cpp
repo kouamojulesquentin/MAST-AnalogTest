@@ -31,6 +31,7 @@ using namespace mast;
 PrettyPrinter::PrettyPrinter (PrettyPrinterOptions options)
   : m_useAutoFormat          (IsSet(options, PrettyPrinterOptions::DisplayValueAuto))
   , m_verbose                (IsSet(options, PrettyPrinterOptions::Verbose))
+  , m_showNodeId             (IsSet(options, PrettyPrinterOptions::ShowNodesIdentifier))
   , m_showProtocol           (IsSet(options, PrettyPrinterOptions::ShowProtocol))
   , m_showSelectionState     (IsSet(options, PrettyPrinterOptions::ShowSelectionState))
   , m_showSelectionValue     (IsSet(options, PrettyPrinterOptions::ShowSelectionValue))
@@ -213,7 +214,10 @@ void PrettyPrinter::StreamNodeHeader(string_view type, const SystemModelNode& no
     m_os << ":Selector:";
   }
 
-  m_os << '(' << node.Identifier() << ") ";
+  if (m_showNodeId)
+  {
+    m_os << '(' << node.Identifier() << ") ";
+  }
 
 
   AlignRelativeTo(m_startPos, 15u + m_depth);

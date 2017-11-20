@@ -17,6 +17,7 @@
 #include "TestModelBuilder.hpp"
 #include "DefaultBinaryPathSelector.hpp"
 #include "SystemModel.hpp"
+#include "EnumsUtility.hpp"
 
 #include <cxxtest/ValueTraits.h>
 
@@ -103,7 +104,7 @@ void UT_PrettyPrinter::test_VisitAccessInterface_ShowProtocol ()
   //
   AccessInterface accessInterface("Access interface name", nullptr);
 
-  PrettyPrinter sut(PrettyPrinterOptions::ShowProtocol);
+  PrettyPrinter sut(PrettyPrinterOptions::ShowProtocol | PrettyPrinterOptions::ShowNodesIdentifier);
 
   // ---------------- Exercise
   //
@@ -555,7 +556,7 @@ void UT_PrettyPrinter::test_VisitAccessInterface_AutoFormat ()
   chain->AppendChild(reg_2);
   chain->AppendChild(reg_3);
 
-  PrettyPrinter sut(PrettyPrinterOptions::DisplayValueAuto);
+  PrettyPrinter sut(PrettyPrinterOptions::DisplayValueAuto | PrettyPrinterOptions::ShowNodesIdentifier);
 
   // ---------------- Exercise
   //
@@ -702,7 +703,7 @@ void UT_PrettyPrinter::test_PrettyPrint_Verbose ()
 
   // ---------------- Exercise
   //
-  auto got = PrettyPrinter::PrettyPrint(tap, PrettyPrinterOptions::Verbose);
+  auto got = PrettyPrinter::PrettyPrint(tap, PrettyPrinterOptions::Verbose | PrettyPrinterOptions::ShowNodesIdentifier);
 
   // ---------------- Verify
   //
@@ -755,7 +756,7 @@ void UT_PrettyPrinter::test_PrettyPrint_AutoFormat ()
 
   // ---------------- Exercise
   //
-  auto got = PrettyPrinter::PrettyPrint(tap, PrettyPrinterOptions::DisplayValueAuto);
+  auto got = PrettyPrinter::PrettyPrint(tap, PrettyPrinterOptions::DisplayValueAuto | PrettyPrinterOptions::ShowNodesIdentifier);
 
   // ---------------- Verify
   //
@@ -844,7 +845,7 @@ void UT_PrettyPrinter::test_PrettyPrint_SelectionValue ()
 
   // ---------------- Exercise
   //
-  auto got = PrettyPrinter::PrettyPrint(tap, PrettyPrinterOptions::ShowSelectionValue);
+  auto got = PrettyPrinter::PrettyPrint(tap, PrettyPrinterOptions::ShowSelectionValue | PrettyPrinterOptions::ShowNodesIdentifier);
 
   // ---------------- Verify
   //
@@ -881,7 +882,7 @@ void UT_PrettyPrinter::test_PrettyPrint_SelectionState ()
 
   // ---------------- Exercise
   //
-  auto got = PrettyPrinter::PrettyPrint(tap, PrettyPrinterOptions::ShowSelectionState);
+  auto got = PrettyPrinter::PrettyPrint(tap, PrettyPrinterOptions::ShowSelectionState | PrettyPrinterOptions::ShowNodesIdentifier);
 
   // ---------------- Verify
   //

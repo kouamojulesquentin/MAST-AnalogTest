@@ -127,7 +127,7 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_NoInstance ()
   TS_ASSERT_NOT_NULLPTR (sm);
   TS_ASSERT_EMPTY (sut.ErrorMessage());
 
-  auto prettyPrint = PrettyPrinter::PrettyPrint(*(sm->Root()), PrettyPrinterOptions::DisplayValueAuto);
+  auto prettyPrint = PrettyPrinter::PrettyPrint(*(sm->Root()), PrettyPrinterOptions::DisplayValueAuto  | PrettyPrinterOptions::ShowNodesIdentifier);
   auto expectedPrettyPrint = "[Access_I](0)  \"TAP\"\n"
                              " [Register](1)  \"TAP_IR\", length: 4, Hold value: true, bypass: 0b1111\n"
                              " [Linker](2)    \"TAP_DR_Mux\"\n"
@@ -160,7 +160,7 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_OneInstance ()
   TS_ASSERT_NOT_NULLPTR (sm);
   TS_ASSERT_EMPTY       (sut.ErrorMessage());
 
-  auto prettyPrint         = PrettyPrinter::PrettyPrint(*(sm->Root()), PrettyPrinterOptions::DisplayValueAuto);
+  auto prettyPrint         = PrettyPrinter::PrettyPrint(*(sm->Root()), PrettyPrinterOptions::DisplayValueAuto | PrettyPrinterOptions::ShowNodesIdentifier);
   auto expectedPrettyPrint = "[Access_I](0)  \"TAP\"\n"
                              " [Register](1)  \"TAP_IR\", length: 4, Hold value: true, bypass: 0b1111\n"
                              " [Linker](2)    \"TAP_DR_Mux\"\n"
@@ -196,7 +196,7 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_OneInstance_no_Ext ()
   TS_ASSERT_NOT_NULLPTR (sm);
   TS_ASSERT_EMPTY       (sut.ErrorMessage());
 
-  auto prettyPrint         = PrettyPrinter::PrettyPrint(*(sm->Root()), PrettyPrinterOptions::DisplayValueAuto);
+  auto prettyPrint         = PrettyPrinter::PrettyPrint(*(sm->Root()), PrettyPrinterOptions::DisplayValueAuto | PrettyPrinterOptions::ShowNodesIdentifier);
   auto expectedPrettyPrint = "[Access_I](0)  \"TAP\"\n"
                              " [Register](1)  \"TAP_IR\", length: 4, Hold value: true, bypass: 0b1111\n"
                              " [Linker](2)    \"TAP_DR_Mux\"\n"
@@ -232,7 +232,7 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_TwoInstances ()
   TS_ASSERT_NOT_NULLPTR (sm);
   TS_ASSERT_EMPTY       (sut.ErrorMessage());
 
-  auto prettyPrint         = PrettyPrinter::PrettyPrint(*(sm->Root()), PrettyPrinterOptions::DisplayValueAuto);
+  auto prettyPrint         = PrettyPrinter::PrettyPrint(*(sm->Root()), PrettyPrinterOptions::DisplayValueAuto | PrettyPrinterOptions::ShowNodesIdentifier);
   auto expectedPrettyPrint = "[Access_I](0)  \"TAP\"\n"
                              " [Register](1)  \"TAP_IR\", length: 4, Hold value: true, bypass: 0b1111\n"
                              " [Linker](2)    \"TAP_DR_Mux\"\n"
@@ -277,7 +277,8 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_Hierarchical ()
 
   // Check with pretty print
   auto prettyPrint         = PrettyPrinter::PrettyPrint(*(sm->Root()), PrettyPrinterOptions::DisplayValueAuto
-                                                                     | PrettyPrinterOptions::ShowNodeIsIgnored);
+                                                                     | PrettyPrinterOptions::ShowNodeIsIgnored
+                                                                     | PrettyPrinterOptions::ShowNodesIdentifier);
   auto expectedPrettyPrint = "[Access_I](0)  \"TAP\"\n"
                              " [Register](1)  \"TAP_IR\", length: 6, Hold value: true, bypass: 0b1111_11\n"
                              " [Linker](2)    \"TAP_DR_Mux\"\n"
@@ -327,7 +328,8 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_Hierarchical_SubDir ()
 
   // Check with pretty print
   auto prettyPrint         = PrettyPrinter::PrettyPrint(*(sm->Root()), PrettyPrinterOptions::DisplayValueAuto
-                                                                     | PrettyPrinterOptions::ShowNodeIsIgnored);
+                                                                     | PrettyPrinterOptions::ShowNodeIsIgnored
+                                                                     | PrettyPrinterOptions::ShowNodesIdentifier);
   auto expectedPrettyPrint = "[Access_I](0)  \"TAP\"\n"
                              " [Register](1)  \"TAP_IR\", length: 6, Hold value: true, bypass: 0b1111_11\n"
                              " [Linker](2)    \"TAP_DR_Mux\"\n"
@@ -406,7 +408,7 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_OneFactoryInstance ()
   TS_ASSERT_NOT_NULLPTR (sm);
   TS_ASSERT_EMPTY       (sut.ErrorMessage());
 
-  auto prettyPrint         = PrettyPrinter::PrettyPrint(*(sm->Root()), PrettyPrinterOptions::DisplayValueAuto);
+  auto prettyPrint         = PrettyPrinter::PrettyPrint(*(sm->Root()), PrettyPrinterOptions::DisplayValueAuto | PrettyPrinterOptions::ShowNodesIdentifier);
   auto expectedPrettyPrint = "[Access_I](0)  \"TAP\"\n"
                              " [Register](1)  \"TAP_IR\", length: 4, Hold value: true, bypass: 0b1111\n"
                              " [Linker](2)    \"TAP_DR_Mux\"\n"
@@ -470,7 +472,7 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_MixKindsInstances ()
   TS_ASSERT_NOT_NULLPTR (sm);
   TS_ASSERT_EMPTY       (sut.ErrorMessage());
 
-  auto prettyPrint         = PrettyPrinter::PrettyPrint(*(sm->Root()), PrettyPrinterOptions::DisplayValueAuto);
+  auto prettyPrint         = PrettyPrinter::PrettyPrint(*(sm->Root()), PrettyPrinterOptions::DisplayValueAuto | PrettyPrinterOptions::ShowNodesIdentifier);
   auto expectedPrettyPrint = "[Access_I](0)  \"TAP\"\n"
                              " [Register](1)  \"TAP_IR\", length: 4, Hold value: true, bypass: 0b1111\n"
                              " [Linker](2)    \"TAP_DR_Mux\"\n"

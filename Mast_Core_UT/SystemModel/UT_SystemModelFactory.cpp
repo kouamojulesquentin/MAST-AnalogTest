@@ -226,7 +226,8 @@ void UT_SystemModelFactory::test_Create_Success ()
 
     // Check with pretty printer
     auto prettyPrint = PrettyPrinter::PrettyPrint(*tap, PrettyPrinterOptions::DisplayValueAuto
-                                                      | PrettyPrinterOptions::ShowNodeIsIgnored);
+                                                      | PrettyPrinterOptions::ShowNodeIsIgnored
+                                                      | PrettyPrinterOptions::ShowNodesIdentifier);
     TS_ASSERT_EQUALS (prettyPrint, expectedPrettyPrint);
 
     // Check with checker
@@ -372,7 +373,8 @@ void UT_SystemModelFactory::test_RegisterCreator_Replace_Previous ()
 
   // Check with pretty printer that this is the 2nd creator function that is used
   auto prettyPrint = PrettyPrinter::PrettyPrint(*tap, PrettyPrinterOptions::DisplayValueAuto
-                                                    | PrettyPrinterOptions::ShowNodeIsIgnored);
+                                                    | PrettyPrinterOptions::ShowNodeIsIgnored
+                                                    | PrettyPrinterOptions::ShowNodesIdentifier);
   TS_ASSERT_EQUALS (prettyPrint,
                     "[Access_I](0)  \"Tap\"\n"
                     " [Register](1)  \"Tap_IR\", length: 8, Hold value: true, bypass: 0xFF\n"

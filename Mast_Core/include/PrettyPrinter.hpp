@@ -32,16 +32,18 @@ enum class PrettyPrinterOptions
   None                   = 0,
   Verbose                = 1 << 0,  //!< To report whether a node is pending, has conditioner, its priority, is ignored for path specification, protocol name for access interface, all values for registers
   DisplayValueAuto       = 1 << 1,  //!< To report Register values as binary when small, hexa when large and end of large string as binary when cannot form a plain nibble
-  ShowProtocol           = 1 << 2,  //!< To report Protocol name of an access interface
-  ShowSelectionState     = 1 << 3,  //!< To report whether a node is selected or active
-  ShowSelectionValue     = 1 << 4,  //!< To report which selector value select the nodes
-  ShowSelectorProperties = 1 << 5,  //!< To report selector properties (kind, can_select_none, inverted_bits, reverted_order...)
-  ShowNodeIsIgnored      = 1 << 6,  //!< To report parent node that are ignored when defining a node path
+  ShowNodesIdentifier    = 1 << 2,  //!< To report nodes identifier
+  ShowProtocol           = 1 << 3,  //!< To report Protocol name of an access interface
+  ShowSelectionState     = 1 << 4,  //!< To report whether a node is selected or active
+  ShowSelectionValue     = 1 << 5,  //!< To report which selector value select the nodes
+  ShowSelectorProperties = 1 << 6,  //!< To report selector properties (kind, can_select_none, inverted_bits, reverted_order...)
+  ShowNodeIsIgnored      = 1 << 7,  //!< To report parent node that are ignored when defining a node path
 
-  Default           = None,
-  Std               = Verbose | DisplayValueAuto,
-  Parser_debug      = ShowSelectorProperties | ShowNodeIsIgnored | ShowProtocol,
-  All               = Verbose | DisplayValueAuto | ShowProtocol | ShowSelectionState | ShowSelectionValue | ShowSelectorProperties,
+  Default            = ShowNodesIdentifier,
+  Std                = Verbose | DisplayValueAuto | ShowNodesIdentifier,
+  Parser_debug       = ShowSelectorProperties | ShowProtocol | ShowNodeIsIgnored | ShowProtocol | ShowNodesIdentifier,
+  Parser_debug_no_id = ShowSelectorProperties | ShowProtocol | ShowNodeIsIgnored | ShowProtocol,
+  All                = Verbose | DisplayValueAuto  | ShowNodesIdentifier | ShowProtocol | ShowSelectionState | ShowSelectionValue | ShowSelectorProperties,
 };
 
 //! System model visitors for creation of a text, readable, and hierarchical
@@ -109,6 +111,7 @@ class MAST_CORE_EXPORT PrettyPrinter : public SystemModelVisitor
   pos_type                      m_startPos               = 0;     //!< Position, in stream, of first character of current line
   bool                          m_useAutoFormat          = false; //!< When true, register values are displayed as hexadecimal string if large enough and not complete nibble as binary
   bool                          m_verbose                = false; //!< When true, more information are printed
+  bool                          m_showNodeId             = true;  //!< When true SystemModel nodes identifier are displayed
   bool                          m_showProtocol           = false; //!< When true, protocol kind is displayed for AccessInterface
   bool                          m_showSelectionState     = false; //!< When true, selected/active linker node are reported as so
   bool                          m_showSelectionValue     = false; //!< When true, for all linker children nodes, their selection state is reported

@@ -43,7 +43,7 @@ endif
 
 # ----------------- Defines exe names and paths
 #
-MAST_CORE_UT_EXE_NAME := Mast_CORE_UT$(EXT)
+MAST_CORE_UT_EXE_NAME := Mast_Core_UT$(EXT)
 MAST_API_UT_EXE_NAME  := Mast_API_UT$(EXT)
 OPTIONAL_UT_EXE_NAME  := Optionals_UT$(EXT)
 TESTCASES_EXE_NAME    := TestCasesApp$(EXT)

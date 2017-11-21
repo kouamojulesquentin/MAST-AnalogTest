@@ -61,6 +61,9 @@ class AST_ScanMux final : public AST_ParentNode
   //!
   const std::vector<Parsers::AST_ScanMuxSelection*>& Selections() const { return m_selections; }
 
+  //! Tells whether this ScanMux multiplexes more than one bit
+  //!
+  bool IsBusMux () const;
 
   // ---------------- Private Methods
   //
@@ -73,20 +76,9 @@ class AST_ScanMux final : public AST_ParentNode
 
   //! Initializes AST_ScanMux
   //!
-  //! @param identifier           ScanMux identifier
-  //! @param selectors            Selection signals that are used to drive the ScanMux
-  //! @param scanMuxSelections    Selections definition i.e. which value(s) select which signal(s)
-  //!
   AST_ScanMux(AST_VectorIdentifier*                identifier,
               std::vector<Parsers::AST_Signal*>&&  selectors,
-              std::vector<AST_ScanMuxSelection*>&& scanMuxSelections)
-    : AST_ParentNode (Kind::ScanMux)
-    , m_identifier   (identifier)
-    , m_selectors    (std::move(selectors))
-    , m_selections   (std::move(scanMuxSelections))
-  {
-    DispatchChildren();
-  }
+              std::vector<AST_ScanMuxSelection*>&& scanMuxSelections);
 
 
   //! Dispatches children to specific members

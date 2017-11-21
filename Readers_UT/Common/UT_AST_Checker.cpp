@@ -155,8 +155,8 @@ void UT_AST_Checker::test_Check_Module_NoScanOutPorts ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS   (checkResult.errorsCount, 1u);
-  TS_ASSERT_CONTAINS (checkResult.errors,      "Module \"Test\" has no ScanOutPorts");
+  TS_ASSERT_EQUALS   (checkResult.infosCount,          2u);  // 1 for no ScanOutPorts +1 for modules count
+  TS_ASSERT_CONTAINS (checkResult.InformativeReport(), "Module \"Test\" has no ScanOutPorts");
 }
 
 

@@ -49,7 +49,7 @@ class UnresolvedPathSelector : public PathSelector
   bool IsSelected          (uint32_t /*pathIdentifier*/) const override { CHECK_FAILED(BadUsageMessage); };
   bool IsSelectedAndActive (uint32_t /*pathIdentifier*/) const override { CHECK_FAILED(BadUsageMessage); };
 
-  void Accept              (SystemModelVisitor& /*visitor*/) override   { CHECK_FAILED(BadUsageMessage); };
+  void Accept              (SystemModelVisitor& /*visitor*/) override   { /* Does nothing but be usable by PrettyPrinter */ };
 
   std::shared_ptr<const Register> AssociatedRegister() const override { CHECK_FAILED(BadUsageMessage); };
 

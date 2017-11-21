@@ -1807,81 +1807,195 @@ void UT_ICL_Reader::test_Generate_N_Modules ()
 
 //! Checks ICL_Reader::GenerateSystemModelNodes() when parsing a SIB with the mux before the scan register bit
 //!
-void UT_ICL_Reader::test_Generate_SIB_mux_pre ()
-{
-  // ---------------- Setup
-  //
-  istringstream excerpt(
-                        "Module SIB_mux_pre {\n"
-                        "  ScanInPort     SI;\n"
-                        "  CaptureEnPort  CE;\n"
-                        "  ShiftEnPort    SE;\n"
-                        "  UpdateEnPort   UE;\n"
-                        "  SelectPort     SEL;\n"
-                        "  ResetPort      RST;\n"
-                        "  TCKPort        TCK;\n"
-                        "  ScanOutPort    SO { Source SR; }\n"
-                        "  ScanInterface client {\n"
-                        "    Port SI; Port CE; Port SE; Port UE;\n"
-                        "    Port SEL; Port RST; Port TCK; Port SO;\n"
-                        "  }\n"
-                        "  ScanInPort       fromSO;\n"
-                        "  ToCaptureEnPort  toCE;\n"
-                        "  ToShiftEnPort    toSE;\n"
-                        "  ToUpdateEnPort   toUE;\n"
-                        "  ToSelectPort     toSEL;\n"
-                        "  ToResetPort      toRST;\n"
-                        "  ToTCKPort        toTCK;\n"
-                        "  ScanOutPort      toSI { Source SI; }\n"
-                        "  ScanInterface host {\n"
-                        "    Port fromSO; Port toCE; Port toSE; Port toUE;\n"
-                        "    Port toSEL; Port toRST; Port toTCK; Port toSI;\n"
-                        "  }\n"
-                        "  ScanRegister SR {\n"
-                        "    ScanInSource SIBmux; CaptureSource SR; ResetValue 1'b0;\n"
-                        "  }\n"
-                        "  ScanMux SIBmux SelectedBy SR {\n"
-                        "    1'b0 : SI;\n"
-                        "    1'b1 : fromSO;\n"
-                        "  }\n"
-                        "}\n"s);
+//+void UT_ICL_Reader::test_Generate_SIB_mux_pre ()
+//+{
+//+  // ---------------- Setup
+//+  //
+//+  istringstream excerpt(
+//+                        "Module SIB_mux_pre {\n"
+//+                        "  ScanInPort     SI;\n"
+//+                        "  CaptureEnPort  CE;\n"
+//+                        "  ShiftEnPort    SE;\n"
+//+                        "  UpdateEnPort   UE;\n"
+//+                        "  SelectPort     SEL;\n"
+//+                        "  ResetPort      RST;\n"
+//+                        "  TCKPort        TCK;\n"
+//+                        "  ScanOutPort    SO { Source SR; }\n"
+//+                        "  ScanInterface client {\n"
+//+                        "    Port SI; Port CE; Port SE; Port UE;\n"
+//+                        "    Port SEL; Port RST; Port TCK; Port SO;\n"
+//+                        "  }\n"
+//+                        "  ScanInPort       fromSO;\n"
+//+                        "  ToCaptureEnPort  toCE;\n"
+//+                        "  ToShiftEnPort    toSE;\n"
+//+                        "  ToUpdateEnPort   toUE;\n"
+//+                        "  ToSelectPort     toSEL;\n"
+//+                        "  ToResetPort      toRST;\n"
+//+                        "  ToTCKPort        toTCK;\n"
+//+                        "  ScanOutPort      toSI { Source SI; }\n"
+//+                        "  ScanInterface host {\n"
+//+                        "    Port fromSO; Port toCE; Port toSE; Port toUE;\n"
+//+                        "    Port toSEL; Port toRST; Port toTCK; Port toSI;\n"
+//+                        "  }\n"
+//+                        "  ScanRegister SR {\n"
+//+                        "    ScanInSource SIBmux; CaptureSource SR; ResetValue 1'b0;\n"
+//+                        "  }\n"
+//+                        "  ScanMux SIBmux SelectedBy SR {\n"
+//+                        "    1'b0 : SI;\n"
+//+                        "    1'b1 : fromSO;\n"
+//+                        "  }\n"
+//+                        "}\n"s);
 
 
-  auto           sm = make_shared<SystemModel>();
-  ICL_Reader_TSS sut(sm);
+//+  auto           sm = make_shared<SystemModel>();
+//+  ICL_Reader_TSS sut(sm);
 
-  CxxTest::setAbortTestOnFail(true);
-  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
-  auto ast = sut.AST();
-  TS_ASSERT_NOT_NULLPTR (ast);
+//+  CxxTest::setAbortTestOnFail(true);
+//+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+//+  auto ast = sut.AST();
+//+  TS_ASSERT_NOT_NULLPTR (ast);
 
-  auto checkResult = AST_Checker::Check(ast->Network());
+//+  auto checkResult = AST_Checker::Check(ast->Network());
 
-  TS_ASSERT_FALSE (checkResult.HasIssues());
+//+  TS_ASSERT_FALSE (checkResult.HasIssues());
 
-  // ---------------- Exercise
-  //
-  auto topNode = sut.GenerateSystemModelNodes(ast);
+//+  // ---------------- Exercise
+//+  //
+//+  auto topNode = sut.GenerateSystemModelNodes(ast);
 
-  // ---------------- Verify
-  //
-  TS_ASSERT_NOT_NULLPTR (topNode);
-  TS_ASSERT_EQUALS      (topNode->Name(), "SReg");
+//+  // ---------------- Verify
+//+  //
+//+  TS_ASSERT_NOT_NULLPTR (topNode);
+//+  TS_ASSERT_EQUALS      (topNode->Name(), "SIB_mux_pre");
 
-  // With PrettyPrinter
-  auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode, PrettyPrinterOptions::Parser_debug);
-  auto expected_PrettyPrint = "[Chain](0)     \"SIB_mux_pre\"\n"
-                              " [Linker](2)  \"Mux\", Binary SR 1\n"
-                              " :Selector:(1)  \"SR\", kind: Binary, can_select_none: 1, inverted_bits: 0, reversed_order: 0\n"
-                              " [Register](1)  \"SR\", length: 1, bypass: 0";
+//+  // With PrettyPrinter
+//+  auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode, PrettyPrinterOptions::Parser_debug);
+//+  auto expected_PrettyPrint = "[Chain](0)     \"SIB_mux_pre\"\n"
+//+                              " [Linker](2)    \"SIBmux\"\n"
+//+                              " :Selector:(1)  \"SR\", kind: Table_Based, can_select_none: 1, inverted_bits: 0, reversed_order: 0\n"
+//+                              " [Register](1)  \"SR\", length: 1, bypass: 0";
 
-  TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+//+  TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
 
-  // With Checker
-  PrependWithTap(sm, topNode);   // This is to avoid warnings about missing AccessInterface
-  auto modelCheckResult = sm->Check();
-  TS_ASSERT_EMPTY (modelCheckResult.InformativeReport());
-}
+//+  // With Checker
+//+  PrependWithTap(sm, topNode);   // This is to avoid warnings about missing AccessInterface
+//+  auto modelCheckResult = sm->Check();
+//+  TS_ASSERT_EMPTY (modelCheckResult.InformativeReport());
+//+}
+
+
+
+//! Checks ICL_Reader::GenerateSystemModelNodes() when parsing a module with a single SIB and 3 wrapped instrument instances
+//! @note ICL has been cleaned up to ease understanding (some useless stuffs have been removed)
+//+void UT_ICL_Reader::test_Generate_Single_SIB_3WI ()
+//+{
+//+  // ---------------- Setup
+//+  //
+//+  istringstream excerpt(
+//+                        "Module Single_SIB_3WI {\n"                                          // 01
+//+                        "  ScanInPort SI;\n"                                                 // 02
+//+                        "  ScanOutPort SO { Source SIB1.SO; }\n"                             // 03
+//+                        "\n"                                                                 // 04
+//+                        "  Instance SIB1 Of SIB_mux_pre { InputPort SI = SI;\n"              // 05
+//+                        "                                 InputPort fromSO = WI3.SO; }\n"    // 06
+//+                        "  Instance WI1 Of WrappedInstr { InputPort SI = SIB1.toSI; }\n"     // 07
+//+                        "  Instance WI2 Of WrappedInstr { InputPort SI = WI1.SO; }\n"        // 08
+//+                        "  Instance WI3 Of WrappedInstr { InputPort SI = WI2.SO; }\n"        // 09
+//+                        "}\n"                                                                // 10
+//+                        "\n"                                                                 // 11
+//+                        "Module WrappedInstr {\n"                                            // 12
+//+                        "  ScanInPort    SI;\n"                                              // 13
+//+                        "  ScanOutPort   SO { Source reg8.SO;}\n"                            // 14
+//+                        "  ScanInterface scan_client { Port SI; Port SO; }\n"                // 15
+//+                        "\n"                                                                 // 16
+//+                        "  Instance I1   Of Instrument { InputPort DI = reg8.DO; }\n"        // 17
+//+                        "  Instance reg8 Of SReg       { InputPort SI = SI;      }\n"        // 18
+//+                        "}\n"                                                                // 19
+//+                        "\n"                                                                 // 20
+//+                        "Module SReg\n"                                                      // 21
+//+                        "{\n"                                                                // 22
+//+                        "  ScanInPort    SI;\n"                                              // 23
+//+                        "  ScanOutPort   SO          { Source  SR[0];}\n"                    // 24
+//+                        "  ScanInterface scan_client { Port SI; Port SO; }\n"                // 25
+//+                        "  ScanRegister SR[7:0]      { ScanInSource SI; ResetValue 'b0; }\n" // 26
+//+                        "}\n"                                                                // 27
+//+                        "\n"                                                                 // 28
+//+                        "Module Instrument\n"                                                // 29
+//+                        "{\n"                                                                // 30
+//+                        "  DataInPort DI[7:0];\n"                                            // 31
+//+                        "  DataOutPort DO[7:0];\n"                                           // 32
+//+                        "}\n"                                                                // 33
+//+                        "\n"                                                                 // 34
+//+                        "Module SIB_mux_pre {\n"                                             // 35
+//+                        "  ScanInPort     SI;\n"                                             // 36
+//+                        "  ScanOutPort    SO { Source SR; }\n"                               // 37
+//+                        "  ScanInterface client {\n"                                         // 38
+//+                        "    Port SI;\n"                                                     // 39
+//+                        "    Port SO;\n"                                                     // 40
+//+                        "  }\n"                                                              // 41
+//+                        "  ScanInPort       fromSO;\n"                                       // 42
+//+                        "  ScanOutPort      toSI { Source SI; }\n"                           // 43
+//+                        "  ScanInterface host {\n"                                           // 44
+//+                        "    Port fromSO; \n"                                                // 45
+//+                        "    Port toSI;\n"                                                   // 46
+//+                        "  }\n"                                                              // 47
+//+                        "  ScanRegister SR {\n"                                              // 48
+//+                        "    ScanInSource SIBmux; CaptureSource SR; ResetValue 1'b0;\n"      // 49
+//+                        "  }\n"                                                              // 50
+//+                        "  ScanMux SIBmux SelectedBy SR {\n"                                 // 51
+//+                        "    1'b0 : SI;\n"                                                   // 52
+//+                        "    1'b1 : fromSO;\n"                                               // 53
+//+                        "  }\n"                                                              // 54
+//+                        "}\n"s);                                                             // 55
+
+
+//+  auto           sm = make_shared<SystemModel>();
+//+  ICL_Reader_TSS sut(sm);
+
+//+  CxxTest::setAbortTestOnFail(true);
+//+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+//+  auto ast = sut.AST();
+//+  TS_ASSERT_NOT_NULLPTR (ast);
+
+//+  auto checkResult = AST_Checker::Check(ast->Network());
+
+//+  TS_ASSERT_EMPTY (checkResult.IssuesReport());
+
+//+  // ---------------- Exercise
+//+  //
+//+  auto topNode = sut.GenerateSystemModelNodes(ast);
+
+//+  // ---------------- Verify
+//+  //
+//+  TS_ASSERT_NOT_NULLPTR (topNode);
+//+  TS_ASSERT_EQUALS      (topNode->Name(), "Single_SIB_3WI");
+
+//+  // With PrettyPrinter
+//+  auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode, PrettyPrinterOptions::Parser_debug_no_id);
+//+  auto expected_PrettyPrint = "[Chain]     \"Single_SIB_3WI\"\n"
+//+                              " [Chain]     \"SIB1\"\n"
+//+                              "  [Linker]    \"SIBmux\"\n"
+//+                              "  :Selector:  \"SR\", kind: Table_Based, can_select_none: 1, inverted_bits: 0, reversed_order: 0\n"
+//+                              "   [Chain]     \"generated_1\", ignore_in_path: true\n"
+//+                              "    [Chain]     \"WI1\"\n"
+//+                              "     [Chain]     \"reg8\"\n"
+//+                              "      [Register]  \"SR\", length: 1, bypass: 0\n"
+//+                              "    [Chain]     \"WI2\"\n"
+//+                              "     [Chain]     \"reg8\"\n"
+//+                              "      [Register]  \"SR\", length: 1, bypass: 0\n"
+//+                              "    [Chain]     \"WI3\"\n"
+//+                              "     [Chain]     \"reg8\"\n"
+//+                              "      [Register]  \"SR\", length: 1, bypass: 0\n"
+//+                              "  [Register]  \"SR\", length: 1, bypass: 0";
+
+//+  TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
+//+  // With Checker
+//+  PrependWithTap(sm, topNode);   // This is to avoid warnings about missing AccessInterface
+//+  auto modelCheckResult = sm->Check();
+//+  TS_ASSERT_EMPTY (modelCheckResult.InformativeReport());
+//+}
+
 
 
 

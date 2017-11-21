@@ -14,8 +14,12 @@
 #ifndef AST_SYSTEMMODELGENERATOR_H__4AD33E64_B5F0_44D9_839C_E286323534C__INCLUDED_
   #define AST_SYSTEMMODELGENERATOR_H__4AD33E64_B5F0_44D9_839C_E286323534C__INCLUDED_
 
+#include "BinaryVector.hpp"
+
 #include <memory>
+#include <vector>
 #include <tuple>
+#include <functional>
 
 namespace mast
 {
@@ -33,7 +37,9 @@ class AST_Module;
 class AST_Network;
 //+class AST_Port;
 //+class AST_ScanInterface;
+class AST_Signal;
 class AST_ScanMux;
+class AST_ScanMuxSelection;
 class AST_ScanRegister;
 class AST_Source;
 
@@ -55,12 +61,18 @@ class AST_SystemModelGenerator final
   // ---------------- Private Methods
   //
   private:
+//+  AST_Source* FindSourceOfSignals (const std::vector<Parsers::AST_Signal*>& signals) const;
+
   std::tuple<std::shared_ptr<mast::SystemModelNode>, const AST_Source*> Generate_Instance (const AST_Instance*     instance, const AST_Module* instanceModule);
-  std::tuple<std::shared_ptr<mast::SystemModelNode>, const AST_Source*> Generate_ScanMux  (const AST_ScanMux*      scanMux);
   std::tuple<std::shared_ptr<mast::SystemModelNode>, const AST_Source*> Generate_Register (const AST_ScanRegister* scanRegister);
+
+  std::tuple<std::shared_ptr<mast::SystemModelNode>, std::reference_wrapper<const std::vector<AST_Signal*>>>
+  Generate_ScanMux (const AST_ScanMux* scanMux);
 
   std::shared_ptr<mast::SystemModelNode> Generate_Network (const AST_Network* network);
   void                                   Generate_Module (mast::Chain* chain, const AST_Module* module);
+
+  std::vector<mast::BinaryVector> MakeSelectionTable (const std::vector<AST_ScanMuxSelection*>&) const;
 
   // ---------------- Private Fields
   //

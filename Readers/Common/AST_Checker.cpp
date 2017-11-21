@@ -129,7 +129,7 @@ void AST_Checker::Visit_Network (AST_Network* network)
     }
   }
 
-  ReportInfo("Network has "s.append(to_string(modulesCount)).append(" defined in ").append(to_string(namespaces.size())).append(" namespace(s)"));
+  ReportInfo("Network has "s.append(to_string(modulesCount)).append(" module(s) defined in ").append(to_string(namespaces.size())).append(" namespace(s)"));
 }
 //
 //  End of: AST_Checker::Visit_Network
@@ -145,18 +145,15 @@ void AST_Checker::Visit_Module (AST_Module* module)
   auto scanInPorts = module->ScanInPorts();
   auto msgPrefix   = "Module \""s.append(module->Name()).append("\" ");
 
-//+  #define SET_MSG_PREFIX(expr)  { ostringstream os; os << expr; msgPrefix = os.str(); }
-//+  SET_MSG_PREFIX("Module \"" << module->Name() << "\" ")
-
   if (scanInPorts.empty())
   {
-    ostringstream os; os << msgPrefix << "has no ScanInPorts - It should have at least one";
-    ReportError(os.str());
+    ostringstream os; os << msgPrefix << "has no ScanInPorts";
+    ReportInfo(os.str());
   }
   else if ((scanInPorts.size() != 1u) && module->ScanInterfaces().empty())
   {
     ostringstream os; os << msgPrefix << "has " << scanInPorts.size() << " ScanInPorts - but has no ScanInterfaces";
-    ReportError(os.str());
+    ReportWarning(os.str());
   }
 
   // ---------------- ScanOutPorts
@@ -165,13 +162,13 @@ void AST_Checker::Visit_Module (AST_Module* module)
 
   if (scanOutPorts.empty())
   {
-    ostringstream os; os << msgPrefix << "has no ScanOutPorts - It should have at least one";
-    ReportError(os.str());
+    ostringstream os; os << msgPrefix << "has no ScanOutPorts";
+    ReportInfo(os.str());
   }
   else if ((scanOutPorts.size() != 1u) && module->ScanInterfaces().empty())
   {
     ostringstream os; os << msgPrefix << "has " << scanOutPorts.size() << " ScanOutPorts - but has no ScanInterfaces";
-    ReportError(os.str());
+    ReportWarning(os.str());
   }
   else
   {

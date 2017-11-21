@@ -41,8 +41,10 @@
 #include "g3log/g3log.hpp"
 
 #include <stack>
+#include <functional>
 
 using std::stack;
+using std::vector;
 using std::shared_ptr;
 using std::unique_ptr;
 using std::tuple;
@@ -73,6 +75,25 @@ AST_SystemModelGenerator::AST_SystemModelGenerator (shared_ptr<mast::SystemModel
 //  End of: AST_SystemModelGenerator::AST_SystemModelGenerator
 //---------------------------------------------------------------------------
 
+
+
+//! Returns source of signal(s)
+//!
+//! @param signals  Set of "associated" signal
+//!
+//! @note Only supports a single signal
+//+AST_Source* AST_SystemModelGenerator::FindSourceOfSignals () const
+//+{
+//+  CHECK_VALUE_EQ(signals.size(), 1u, "Not Yet Supported: giving single source for more than one signals");
+
+//+  const auto signal      = signals.front();
+//+  const auto portScope   = signal->PortScope();
+//+  const auto identifier  = signal->PortName();
+
+//+}
+//
+//  End of: AST_SystemModelGenerator::FindSourceOfSignals
+//---------------------------------------------------------------------------
 
 
 //! Generates a SystemModel (sub-)tree from AST_Network
@@ -109,10 +130,16 @@ AST_SystemModelGenerator::Generate_Instance (const AST_Instance* instance, const
   auto instanceInputPort = instance->FindInputPort(moduleInputPortId);
   auto instanceSource    = instanceInputPort->Source();
 
+  //! @todo [JFC]-[November/17/2017]: In Generate_Instance(): Return all instance source!
+  //!
+
   // ---------------- Create Chain to "encapsulate" instance sub-nodes
   //
   auto name  = instance->Name();
   auto chain = m_systemModel->CreateChain(name);
+
+  //! @todo [JFC]-[November/17/2017]: In Generate_Instance(): Create chain only when there is effectively children !
+  //! ==> Have module return children (in order)
 
   // ---------------- Instantiate module with instance parameters
   //
@@ -189,11 +216,9 @@ void AST_SystemModelGenerator::Generate_Module (mast::Chain* chain, const AST_Mo
   auto source      = scanOutPort->Source();
 
   // Lamba: Tells whether some source match module input port (currently only considering first)
-  auto isSourcedByModuleInput = [scanInPort](const AST_Source* source)
+  auto isSourcedByModuleInput = [scanInPort](const vector<AST_Signal*>& signals)
   {
-    const auto& signals = source->Signals();
-
-    CHECK_VALUE_EQ(signals.size(), 1u, "Expecting ScanOutPort source to be driven by exactly one signal");
+    CHECK_VALUE_EQ(signals.size(), 1u, "Expecting source to be driven by exactly one signal");
     const auto signal      = signals.front();
     const auto portScope   = signal->PortScope();
     const auto identifier  = signal->PortName();
@@ -206,8 +231,12 @@ void AST_SystemModelGenerator::Generate_Module (mast::Chain* chain, const AST_Mo
   };
 
   stack<shared_ptr<SystemModelNode>> children;
+  auto sourceSignals = std::cref(source->Signals());
 
-  while (!isSourcedByModuleInput(source))
+  //! @todo [JFC]-[November/17/2017]: Create a stack of source signals poping it once following it
+  //!                                 leads to one of module input
+  //! i.e. while (!sourceStack.empty() || !isSourcedByModuleInput(sourceSignals))
+  while (!isSourcedByModuleInput(sourceSignals))
   {
     const auto& signals = source->Signals();
 
@@ -218,17 +247,18 @@ void AST_SystemModelGenerator::Generate_Module (mast::Chain* chain, const AST_Mo
 
     std::shared_ptr<mast::SystemModelNode> createdNode;
 
-    if (portScope.empty())  // scanRegister or ScanMux ?
+    if (portScope.empty())  // ScanRegister or ScanMux ?
     {
       auto scanRegister = module->FindScanRegister(identifier);
       if (scanRegister != nullptr)
       {
         std::tie(createdNode, source) = Generate_Register(scanRegister);
+        sourceSignals = std::cref(source->Signals());
       }
-      else
+      else  // ScanMux
       {
         auto scanMux = module->FindScanMux(identifier);
-        std::tie(createdNode, source) = Generate_ScanMux(scanMux);
+        std::tie(createdNode, sourceSignals) = Generate_ScanMux(scanMux);
       }
     }
     else   // Instance ?
@@ -241,6 +271,10 @@ void AST_SystemModelGenerator::Generate_Module (mast::Chain* chain, const AST_Mo
       auto instanceModule = m_network->Module(moduleId);
 
       std::tie(createdNode, source) = Generate_Instance(instance, instanceModule);
+      //! @todo [JFC]-[November/17/2017]: In Generate_Module(): get back all instance source
+      //!
+
+      sourceSignals = std::cref(source->Signals());
     }
 
     if (createdNode)
@@ -269,37 +303,39 @@ void AST_SystemModelGenerator::Generate_Module (mast::Chain* chain, const AST_Mo
 //! @param scanMux  ScanMux to be converted to SystemModel Linker
 //!
 //! @return Created Linker and ScanMux AST_Source
-tuple<std::shared_ptr<mast::SystemModelNode>, const AST_Source*>
+tuple<shared_ptr<mast::SystemModelNode>, std::reference_wrapper<const vector<AST_Signal*>>>
 AST_SystemModelGenerator::Generate_ScanMux (const AST_ScanMux* scanMux)
 {
+  CHECK_FALSE(scanMux->IsBusMux(), "Not Yet Supported: ScanMux for buses");
+
   // ---------------- Collect selector(s) path(s) including bits ranges
   // Paths are ordered and defined using SystemModel path syntax
   // Bits ranges are defined as pair of integers
   //
-  const auto& selectors          = scanMux->Selectors();
-  const auto  selectorsBitsCount = selectors.size();
+//+  const auto& selectors          = scanMux->Selectors();
+//+  const auto  selectorsBitsCount = selectors.size();
 //+  auto paths = MakePaths(selectors);
 
   // ---------------- Prepare table
   //
-  auto const& selection = scanMux->Selections();
-//+  auto        table     = MakeSelectionTable();
+  auto const& selections = scanMux->Selections();
+  auto        table      = MakeSelectionTable(selections);
 
   // ---------------- Create Linker
   //
   auto pathSelector = make_shared<UnresolvedPathSelector>();
 
-//+  const auto muxWidth = scanMux->Width();
   const auto name     = scanMux->BaseName();
   auto       linker   = m_systemModel->CreateLinker(name, pathSelector);
 
-  // ---------------- Find "source" of linker
+  // ---------------- Define "source" of linker
   //
-  AST_Source* source = nullptr;
+  const auto  firstSelection  = selections.front();
+  const auto& selectedSignals = firstSelection->SelectedSignals();
 
 
-  CHECK_FAILED("Not Yet Supported: ScanMux");
-  return make_tuple(linker, source);
+//+  CHECK_FAILED("Not Yet Supported: ScanMux");
+  return make_tuple(linker, std::cref(selectedSignals));
 }
 //
 //  End of: AST_SystemModelGenerator::Generate_Register
@@ -338,6 +374,26 @@ AST_SystemModelGenerator::Generate_Register (const AST_ScanRegister* scanRegiste
 //
 //  End of: AST_SystemModelGenerator::Generate_Register
 //---------------------------------------------------------------------------
+
+
+
+//! Creates selection table for table based PathSelector
+//!
+//! @param selections   ScanMux selection values
+//!
+vector<BinaryVector>  AST_SystemModelGenerator::MakeSelectionTable (const vector<AST_ScanMuxSelection*>& selections) const
+{
+  vector<BinaryVector> table;
+
+  //! @todo [JFC]-[November/17/2017]: Implement AST_SystemModelGenerator::MakeSelectionTable()
+  //!
+
+  return table;
+}
+//
+//  End of: AST_SystemModelGenerator::MakeSelectionTable
+//---------------------------------------------------------------------------
+
 
 
 

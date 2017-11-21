@@ -13,13 +13,35 @@
 
 #include "AST_ScanMuxSelection.hpp"
 #include "AST_Signal.hpp"
+#include "Utility.hpp"
 
 #include <sstream>
 
 using std::ostringstream;
 using std::string;
+using std::vector;
 
 using namespace Parsers;
+
+
+
+//! Initializes AST_ScanMuxSelection with selection values and selected signals
+//!
+//! @param selectionValues  Selection values
+//! @param selectedSignals  Selected signal when multiplex selector has one of selection values
+//!
+AST_ScanMuxSelection::AST_ScanMuxSelection (vector<string>&& selectionValues, vector<Parsers::AST_Signal*>&& selectedSignals)
+  : AST_SimpleNode    (Kind::ScanMuxSelection)
+  , m_selectionValues (selectionValues)
+  , m_selectedSignals (selectedSignals)
+{
+  CHECK_PARAMETER_NOT_EMPTY(m_selectionValues, "ScanMux Selection must have a value");
+  CHECK_PARAMETER_NOT_EMPTY(m_selectedSignals, "ScanMux Selection must select at least one signal");
+}
+//
+//  End of: AST_ScanMuxSelection::AST_ScanMuxSelection
+//---------------------------------------------------------------------------
+
 
 
 

@@ -35,6 +35,16 @@ class AST_ScanMuxSelection final : public AST_SimpleNode
 
   std::string AsText() const override; //!< Text representation of value
 
+  //! Returns set of values for that selection
+  //!
+  //! @note several different values can select the same set of signals
+  //!
+  const std::vector<std::string>& SelectionsValues() const { return m_selectionValues; }
+
+  //! Selected signal(s) when multiplexer selector has one of selection values
+  //!
+  const std::vector<Parsers::AST_Signal*>& SelectedSignals() const { return m_selectedSignals; }
+
   // ---------------- Private Methods
   //
   private:
@@ -45,22 +55,13 @@ class AST_ScanMuxSelection final : public AST_SimpleNode
 
   //! Initializes AST_ScanMuxSelection with selection values and selected signals
   //!
-  //! @param selectionValues  Selection values
-  //! @param selectedSignals  Selected signal when multiplex selector has one of selection values
-  //!
-  AST_ScanMuxSelection(std::vector<std::string>&& selectionValues, std::vector<Parsers::AST_Signal*>&& selectedSignals)
-    : AST_SimpleNode    (Kind::ScanMuxSelection)
-    , m_selectionValues (selectionValues)
-    , m_selectedSignals (selectedSignals)
-  {
-  }
-
+  AST_ScanMuxSelection(std::vector<std::string>&& selectionValues, std::vector<Parsers::AST_Signal*>&& selectedSignals);
 
   // ---------------- Private Fields
   //
   private:
   std::vector<std::string>          m_selectionValues; //!< Selection values
-  std::vector<Parsers::AST_Signal*> m_selectedSignals; //!< Selected signal when multiplex selector has one of selection values
+  std::vector<Parsers::AST_Signal*> m_selectedSignals; //!< Selected signal when multiplexer selector has one of selection values
 };
 //
 //  End of AST_ScanMuxSelection class declaration

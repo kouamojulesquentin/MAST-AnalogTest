@@ -84,7 +84,7 @@ CheckResult AST_Checker::Check ()
 //---------------------------------------------------------------------------
 
 
-//! Generates SystemModel node from AST_AccessLink node
+//! Checks nothing for AST_AccessLink
 //!
 void AST_Checker::Visit_AccessLink (AST_AccessLink* accessLink)
 {
@@ -94,7 +94,7 @@ void AST_Checker::Visit_AccessLink (AST_AccessLink* accessLink)
 //---------------------------------------------------------------------------
 
 
-//! Generates SystemModel node from AST_Instance node
+//! Checks nothing for AST_Instance
 //!
 void AST_Checker::Visit_Instance (AST_Instance* instance)
 {
@@ -104,7 +104,7 @@ void AST_Checker::Visit_Instance (AST_Instance* instance)
 //---------------------------------------------------------------------------
 
 
-//! Generates SystemModel node from AST_Network node
+//! Checks and collects basic statistics of AST_Network
 //!
 void AST_Checker::Visit_Network (AST_Network* network)
 {
@@ -136,7 +136,9 @@ void AST_Checker::Visit_Network (AST_Network* network)
 //---------------------------------------------------------------------------
 
 
-//! Generates SystemModel node from AST_Module node
+
+
+//! Checks AST_Module
 //!
 void AST_Checker::Visit_Module (AST_Module* module)
 {
@@ -209,7 +211,7 @@ void AST_Checker::Visit_Module (AST_Module* module)
 //---------------------------------------------------------------------------
 
 
-//! Generates SystemModel node from AST_Port node
+//! Checks nothing for AST_Port
 //!
 void AST_Checker::Visit_Port (AST_Port* port)
 {
@@ -220,7 +222,7 @@ void AST_Checker::Visit_Port (AST_Port* port)
 
 
 
-//! Generates SystemModel node from AST_ScanInterface node
+//! Checks nothing for AST_ScanInterface
 //!
 void AST_Checker::Visit_ScanInterface (AST_ScanInterface* scanInterface)
 {
@@ -230,7 +232,7 @@ void AST_Checker::Visit_ScanInterface (AST_ScanInterface* scanInterface)
 //---------------------------------------------------------------------------
 
 
-//! Generates SystemModel node from AST_ScanMux node
+//! Checks nothing for AST_ScanMux
 //!
 void AST_Checker::Visit_ScanMux (AST_ScanMux* scanMux)
 {
@@ -240,7 +242,7 @@ void AST_Checker::Visit_ScanMux (AST_ScanMux* scanMux)
 //---------------------------------------------------------------------------
 
 
-//! Generates SystemModel node from AST_ScanRegister node
+//! Checks nothing for AST_ScanRegister
 //!
 void AST_Checker::Visit_ScanRegister (AST_ScanRegister* scanRegister)
 {
@@ -250,7 +252,7 @@ void AST_Checker::Visit_ScanRegister (AST_ScanRegister* scanRegister)
 //---------------------------------------------------------------------------
 
 
-//! Generates SystemModel node from AST_Source node
+//! Checks nothing for AST_Source
 //!
 void AST_Checker::Visit_Source (AST_Source* source)
 {

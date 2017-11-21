@@ -42,21 +42,26 @@ get_filename_component(Gxx_PATH ${CMAKE_CXX_COMPILER} DIRECTORY)
 
 
 if (EXISTS ${LOCAL_GCC_PATH})
- set (STD_LIBS_PATH ${LOCAL_GCC_PATH}/../lib64/)
  message(STATUS "Export_ATE: Setting local STD_LIBS_PATH")
-install(FILES   ${STD_LIBS_PATH}libgcc_s.so.1 ${STD_LIBS_PATH}libstdc++.so.6 ${STD_LIBS_PATH}libstdc++.so.6.0.20
+ set (STD_LIBS_PATH ${LOCAL_GCC_PATH}/../lib64/)
+ install(FILES   ${STD_LIBS_PATH}libgcc_s.so.1 ${STD_LIBS_PATH}libstdc++.so.6  ${STD_LIBS_PATH}libstdc++.so.6.0.20
         COMPONENT   ATE_Build
         DESTINATION ${ATE_Build_EXPORT}/Std_libs)
 else()
- message(STATUS "Export_ATE: using global GCC/G++, no libraries are exported")
+ message(STATUS "Export_ATE: Setting global STD_LIBS_PATH")
+ set (STD_LIBS_PATH /usr/lib/x86_64-linux-gnu/)
+install(FILES   /lib/x86_64-linux-gnu/libgcc_s.so.1 ${STD_LIBS_PATH}libstdc++.so.6 ${STD_LIBS_PATH}libstdc++.so.6.0.21
+        COMPONENT   ATE_Build
+        DESTINATION ${ATE_Build_EXPORT}/Std_libs)
+endif()
+ 
 # install(FILES   ${STD_LIBS_PATH}libgcc_s.so.1 ${STD_LIBS_PATH}libm.so.6
 #        COMPONENT   ATE_Build
 #        DESTINATION ${ATE_Build_EXPORT}/Std_libs)
 # install(FILES   /usr/lib/x86_64-linux-gnu/libstdc++.so.6
 #        COMPONENT   ATE_Build
 #        DESTINATION ${ATE_Build_EXPORT}/Std_libs)
-endif()
-#message(STATUS "Export_ATE: STD_LIBS_PATH:          ${STD_LIBS_PATH}")
+message(STATUS "Export_ATE: STD_LIBS_PATH:          ${STD_LIBS_PATH}")
 message("================================================================================")
 message("")
 

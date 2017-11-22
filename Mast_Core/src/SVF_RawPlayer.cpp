@@ -32,12 +32,14 @@ using std::ostringstream;
 
 BinaryVector SVF_RawPlayer::DoCallback (uint32_t endpointId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
+  BinaryVector result;
   
   auto request = new CallbackRequest(CallbackId(endpointId),toSutData);
   ParentInterface()->PushRequest(*request);
   
-  /*NB: this is a BLOCKING call*/
-  auto result = ParentInterface()->PopfromSut();
+  if (endpointId != 0) //check for result only if not reset
+                       /*NB: this is a BLOCKING call*/
+     result = ParentInterface()->PopfromSut();
   
   return result;
 }
@@ -48,7 +50,8 @@ BinaryVector SVF_RawPlayer::DoCallback (uint32_t endpointId, void* /* interfaceD
 //!
 void SVF_RawPlayer::DoReset(bool doSynchronousReset)
 {
- // LogCommands(CreateResetSVFCommand(doSynchronousReset));
+  auto request = new CallbackRequest(CallbackId(0));
+  ParentInterface()->PushRequest(*request);
 }
 
 //

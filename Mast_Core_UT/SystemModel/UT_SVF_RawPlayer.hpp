@@ -35,6 +35,10 @@ class UT_SVF_RawPlayer : public CxxTest::TestSuite
 
   void test_CallbackIds ();
 
+  void test_doReset ();
+  void test_Callbacks ();
+  void test_Callbacks_multithread ();
+
   // ================ Other Methods ================
 
   void setUp(); //!< Initializes test (called for each test)

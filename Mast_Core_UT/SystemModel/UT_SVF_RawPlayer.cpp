@@ -105,6 +105,116 @@ void UT_SVF_RawPlayer::test_CallbackIds ()
   TS_ASSERT_EQUALS(sut.CallbackId(3),UNDEFINED);
 }
 
+//! Checks SVF_RawPlayer reset request
+//!
+void UT_SVF_RawPlayer::test_doReset ()
+{
+  // ---------------- Setup
+  //
+ auto Interface = make_shared<AccessInterfaceTranslator> ("Test");
+  TS_ASSERT_THROWS_NOTHING (SVF_RawPlayer sut());
+  SVF_RawPlayer sut;
+  sut.SetParentInterface(Interface);
+
+  // ---------------- Exercise & Verify
+  //
+  
+  //Direct call to reset
+ sut.DoReset(true);
+ auto result = Interface->PopRequest();
+  TS_ASSERT_EQUALS(result.CallbackId(),TRSRT);
+
+}
+
+
+//! Checks SVF_RawPlayer callback requests
+//!
+void UT_SVF_RawPlayer::test_Callbacks ()
+{
+  // ---------------- Setup
+  //
+ auto Interface = make_shared<AccessInterfaceTranslator> ("Test");
+  TS_ASSERT_THROWS_NOTHING (SVF_RawPlayer sut());
+  SVF_RawPlayer sut;
+  sut.SetParentInterface(Interface);
+
+  // ---------------- Exercise & Verify
+  //
+  //Put a result value to avoid callback getting stuck on result queue
+  auto  test = BinaryVector::CreateFromBinaryString("01");
+
+  //Reset as Callback 0 : does not need a fromSUT value
+ sut.DoCallback(0,nullptr,test);
+ auto result = Interface->PopRequest();
+ TS_ASSERT_EQUALS(result.CallbackId(),TRSRT);
+
+  //Callback 1 : SIR
+  Interface->PushfromSut(test);
+ sut.DoCallback(1,nullptr,test);
+ result = Interface->PopRequest();
+ TS_ASSERT_EQUALS(result.CallbackId(),SIR);
+
+  //Callback 2 : SDR
+  Interface->PushfromSut(test);
+ sut.DoCallback(2,nullptr,test);
+ result = Interface->PopRequest();
+ TS_ASSERT_EQUALS(result.CallbackId(),SDR);
+
+  //Callback 3 : UNDEFINED
+  Interface->PushfromSut(test);
+ sut.DoCallback(3,nullptr,test);
+ result = Interface->PopRequest();
+ TS_ASSERT_EQUALS(result.CallbackId(),UNDEFINED);
+
+}
+
+//! Checks SVF_RawPlayer callback requests as multithread implementation
+//!
+void UT_SVF_RawPlayer::test_Callbacks_multithread ()
+{
+  // ---------------- Setup
+  //
+ auto Interface = make_shared<AccessInterfaceTranslator> ("Test");
+  TS_ASSERT_THROWS_NOTHING (SVF_RawPlayer sut());
+  SVF_RawPlayer sut;
+  sut.SetParentInterface(Interface);
+
+  // ---------------- Exercise & Verify
+  //
+  //Put a result value to avoid callback getting stuck on result queue
+  auto  test = BinaryVector::CreateFromBinaryString("01");
+
+ auto callback_thread = [this] (SVF_RawPlayer sut,int EndpointId,BinaryVector  test) 
+   { sut.DoCallback(EndpointId,nullptr,test);};
+
+  //Reset as Callback 0 : does not need a fromSUT value
+    std::thread AI_thread(callback_thread,sut,0,test);
+ auto result = Interface->PopRequest();
+ TS_ASSERT_EQUALS(result.CallbackId(),TRSRT);
+ AI_thread.join();
+
+  //Callback 1 : SIR
+  Interface->PushfromSut(test);
+ std::thread AI_thread_1(callback_thread,sut,1,test);
+ result = Interface->PopRequest();
+ TS_ASSERT_EQUALS(result.CallbackId(),SIR);
+ AI_thread_1.join();
+
+  //Callback 2 : SDR
+  Interface->PushfromSut(test);
+ std::thread AI_thread_2(callback_thread,sut,2,test);
+ result = Interface->PopRequest();
+ TS_ASSERT_EQUALS(result.CallbackId(),SDR);
+ AI_thread_2.join();
+
+  //Callback 3 : UNDEFINED
+  Interface->PushfromSut(test);
+ std::thread AI_thread_3(callback_thread,sut,3,test);
+ result = Interface->PopRequest();
+ TS_ASSERT_EQUALS(result.CallbackId(),UNDEFINED);
+ AI_thread_3.join();
+
+}
 
 //===========================================================================
 // End of UT_SVF_RawPlayer.cpp

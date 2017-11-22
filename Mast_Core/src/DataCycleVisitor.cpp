@@ -63,6 +63,8 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
    //Launch DoHierarchicalDataCycle as a separate thread
     std::thread AI_thread(lambda,accessInterface);
    //Wait on Queue
+   
+   AI_thread.join();
   }
 }
 //

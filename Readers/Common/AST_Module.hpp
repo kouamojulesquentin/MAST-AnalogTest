@@ -29,6 +29,7 @@ class AST_ScanRegister;
 class AST_Port;
 class AST_Parameter;
 class AST_Attribute;
+class AST_Builder;
 
 //! Represents a Module
 //!
@@ -40,9 +41,24 @@ class AST_Module final : public AST_ParentNode
   ~AST_Module() = default;
   AST_Module()  = delete;
 
+
   //! Visited part of the Visitor pattern
   //!
   void Accept (AST_Visitor& visitor) override;
+
+  //! Returns module identifier
+  //!
+  const AST_ScalarIdentifier* Identifier() const { return m_identifier; };
+
+  //! Changes identifier
+  //!
+  //! @note   This operation is intended to be used during unification process
+  void  ChangeIdentifier (const AST_ScalarIdentifier* newIdentifier)
+  {
+    m_originalIdentifier = m_identifier;
+    m_identifier         = newIdentifier;
+  };
+
 
   //! Returns module name
   //!
@@ -104,11 +120,20 @@ class AST_Module final : public AST_ParentNode
   //!
   const AST_Instance* FindInstance (const AST_Identifier* identifier) const ;
 
+  //! Uniquifies module using parameters overrides
+  //!
+  AST_Module* Uniquify (AST_Builder& astBuilder, const std::vector<AST_Parameter*>& parameters);
+
+  //! Uniquifies module instances
+  //!
+  void UniquifyInstances (AST_Builder& astBuilder);
+
   // ---------------- Private Methods
   //
   private:
   friend class AST;   // This is AST that manages construction/destruction of AST nodes (it uses make_unit<T>() to create nodes)
   MAKE_UNIQUE_AS_FRIEND(AST_Module)(const Parsers::AST_ScalarIdentifier*&, std::vector<AST_Node*>&&);
+  MAKE_UNIQUE_AS_FRIEND(AST_Module)(const Parsers::AST_Module&); // For clones
 
   AST_Module(const AST_ScalarIdentifier* identifier, std::vector<AST_Node*>&& children)
     : AST_ParentNode (Kind::Module, std::move(children))
@@ -117,6 +142,8 @@ class AST_Module final : public AST_ParentNode
     DispatchChildren();
     CleanupChildren();
   }
+
+  AST_Module(const AST_Module&) = default;
 
   //! Dispatches children to specific members
   //!
@@ -144,21 +171,23 @@ class AST_Module final : public AST_ParentNode
     return foundNode;
   }
 
+  void Uniquify_impl     (AST_Builder& astBuilder, const std::vector<AST_Parameter*>& parameters);
 
   // ---------------- Private Fields
   //
   private:
-  const AST_ScalarIdentifier*     m_identifier = nullptr; //!< Module name
-  AST_AccessLink*                 m_accessLink = nullptr; //!< AccessLink: for top module (only one per network)
-  std::vector<AST_Parameter*>     m_parameters;           //!< Generic module  parameters
-  std::vector<AST_Parameter*>     m_localParameters;      //!< Module local parameters
-  std::vector<AST_ScanInterface*> m_scanInterfaces;       //!< Scan interfaces
-  std::vector<AST_Port*>          m_scanInPorts;          //!< Scan input port(s)
-  std::vector<AST_Port*>          m_scanOutPorts;         //!< Scan output port(s)
-  std::vector<AST_Attribute*>     m_attributes;           //!< Module attributes
-  std::vector<AST_ScanRegister*>  m_scanRegisters;        //!< Scan registers in module
-  std::vector<AST_ScanMux*>       m_scanMuxes;            //!< Scan muxes in module
-  std::vector<AST_Instance*>      m_instances;            //!< Instances in module
+  const AST_ScalarIdentifier*     m_identifier         = nullptr; //!< Module name (change during unification)
+  const AST_ScalarIdentifier*     m_originalIdentifier = nullptr; //!< Module name prior to unification
+  AST_AccessLink*                 m_accessLink         = nullptr; //!< AccessLink: for top module (only one per network)
+  std::vector<AST_Parameter*>     m_parameters;                   //!< Generic module  parameters
+  std::vector<AST_Parameter*>     m_localParameters;              //!< Module local parameters
+  std::vector<AST_ScanInterface*> m_scanInterfaces;               //!< Scan interfaces
+  std::vector<AST_Port*>          m_scanInPorts;                  //!< Scan input port(s)
+  std::vector<AST_Port*>          m_scanOutPorts;                 //!< Scan output port(s)
+  std::vector<AST_Attribute*>     m_attributes;                   //!< Module attributes
+  std::vector<AST_ScanRegister*>  m_scanRegisters;                //!< Scan registers in module
+  std::vector<AST_ScanMux*>       m_scanMuxes;                    //!< Scan muxes in module
+  std::vector<AST_Instance*>      m_instances;                    //!< Instances in module
 };
 //
 //  End of AST_Module class declaration

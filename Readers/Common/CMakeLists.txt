@@ -55,6 +55,7 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_Value.hpp
                                   AST_Value.cpp
                                   AST_Visitor.hpp
+                                  AST_Builder.hpp
                                   AST_Checker.hpp
                                   AST_Checker.cpp
                                   AST_PrettyPrinter.hpp

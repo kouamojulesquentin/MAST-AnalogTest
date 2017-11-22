@@ -62,6 +62,36 @@ AST::AST ()
 }
 
 
+//! Clones an instance
+//!
+AST_Instance* AST::Clone_Instance (const AST_Instance* instance)
+{
+  return Clone_Node(instance);
+}
+//
+//  End of: AST::Clone_Instance
+//---------------------------------------------------------------------------
+
+
+//! Clones a module
+//!
+AST_Module* AST::Clone_Module (const AST_Module* module)
+{
+  auto node         = make_unique<AST_Module>(*module);
+  auto clonedModule = node.get();
+
+  auto newIdentifier = Create_UniquifiedIdentifier(module->Identifier());
+  clonedModule->ChangeIdentifier(newIdentifier);
+
+  m_modules.emplace_back(std::move(node));
+  m_network.AddModule(m_modulesNamespace, clonedModule);
+  return clonedModule;
+}
+//
+//  End of: AST::Clone_Module
+//---------------------------------------------------------------------------
+
+
 //! Creates a Create_AccessLink node
 //!
 //! @param identifier   Access Link name
@@ -183,18 +213,6 @@ AST_Instance* AST::Create_Instance (const AST_ScalarIdentifier* instanceIdentifi
 //---------------------------------------------------------------------------
 
 
-//! Creates an AST_ModuleIdentifier node
-//!
-//! @param namespaceName  Namespace of module definition
-//! @param moduleName     Module name in the namespace
-//!
-AST_ModuleIdentifier* AST::Create_ModuleIdentifier (const AST_Namespace* namespaceName, const AST_ScalarIdentifier* moduleName)
-{
-  return Create_Node<AST_ModuleIdentifier>(namespaceName, moduleName);
-}
-//
-//  End of: AST::Create_ModuleIdentifier
-//---------------------------------------------------------------------------
 
 
 //! Creates an AST_Parameter node for local parameter
@@ -256,6 +274,19 @@ AST_Module* AST::Create_Module (const AST_ScalarIdentifier* identifier, vector<A
 //  End of: AST::Create_Module
 //---------------------------------------------------------------------------
 
+
+//! Creates an AST_ModuleIdentifier node
+//!
+//! @param namespaceName  Namespace of module definition
+//! @param moduleName     Module name in the namespace
+//!
+AST_ModuleIdentifier* AST::Create_ModuleIdentifier (const AST_Namespace* namespaceName, const AST_ScalarIdentifier* moduleName)
+{
+  return Create_Node<AST_ModuleIdentifier>(namespaceName, moduleName);
+}
+//
+//  End of: AST::Create_ModuleIdentifier
+//---------------------------------------------------------------------------
 
 
 //! Creates or returns existing AST_Namespace node
@@ -536,6 +567,37 @@ AST_String* AST::Create_String (string&& content)
 //---------------------------------------------------------------------------
 
 
+//! Creates an identifier for a uniquified entity
+//!
+AST_ScalarIdentifier* AST::Create_UniquifiedIdentifier (const AST_ScalarIdentifier* identifier)
+{
+  auto newName = identifier->Name();
+
+  newName.append("__uniquified__").append(std::to_string(++m_uniqueIdCounter));
+
+  return Create_ScalarIdentifier(std::move(newName));
+}
+//
+//  End of: AST::Create_UniquifiedIdentifier
+//---------------------------------------------------------------------------
+
+
+//! Creates an module identifier for a uniquified module
+//!
+//! @param module Uniquified module
+//!
+AST_ModuleIdentifier* AST::Create_UniquifiedModuleIdentifier (const AST_Module* module)
+{
+  auto moduleIdentifier = Create_ModuleIdentifier(m_uniquifiedNamespace, module->Identifier());
+  return moduleIdentifier;
+}
+//
+//  End of: AST::Create_UniquifiedModuleIdentifier
+//---------------------------------------------------------------------------
+
+
+
+
 //! Creates an AST_Identifier node
 //!
 //! @param name         Identifier
@@ -590,16 +652,24 @@ void AST::SetNamespace (const AST_Namespace* newNamespace)
 //---------------------------------------------------------------------------
 
 
-//! Returns "top" parsed module
-//!
-//+AST_Module* AST::TopModule ()
-//+{
-//+  CHECK_VALUE_NOT_EMPTY(m_modules, "AST has no module yet");
 
-//+  return m_modules.front().get();
-//+}
+//! Uniquifies network (starting from top module)
+//!
+//! @note Unification consist to have a single object representing each module instance (using their specific parameters)
+//!
+void AST::Uniquify ()
+{
+  m_uniquifiedNamespace = Create_Namespace("UniquifiedModules");
+  SetNamespace(m_uniquifiedNamespace);
+
+  auto topModule = m_network.TopModule();
+
+  CHECK_VALUE_NOT_NULL(topModule, "Network has no \"top\" node");
+
+  topModule->UniquifyInstances(*this);
+}
 //
-//  End of: AST::TopModule
+//  End of: AST::Uniquify
 //---------------------------------------------------------------------------
 
 

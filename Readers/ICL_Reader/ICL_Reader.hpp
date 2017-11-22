@@ -50,6 +50,8 @@ class ICL_Reader : public Parsers::Reader
 
   virtual std::shared_ptr<mast::SystemModelNode> GenerateSystemModelNodes (Parsers::AST* ast);
 
+  void UniquifyAST ();
+
   // ---------------- Private Fields
   //
   private:

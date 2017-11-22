@@ -24,6 +24,7 @@ class AST_Identifier;
 class AST_Port;
 class AST_Parameter;
 class AST_Attribute;
+class AST_Module;
 class AST_ModuleIdentifier;
 
 //! Represents a parsed test network, instiable, module
@@ -74,6 +75,17 @@ class AST_Instance final : public AST_ParentNode
   //!
   const std::vector<AST_Attribute*>& Attributes() const { return m_attributes; }
 
+  //! Returns unique module representing that very instance
+  //!
+  //! @note During unification, all parameters reference down the instantiation hierarchy have been resolved
+  //!
+  const AST_Module* UniquifiedModule() const { return m_uniquifiedModule; }
+
+  //! Sets unique module representing that very instance
+  //!
+  //! @note It must be call only once by the unification process
+  //!
+  void  UniquifiedModule (const AST_Module* uniquifiedModule, const AST_ModuleIdentifier* identifier) ;
 
   // ---------------- Private Methods
   //
@@ -118,7 +130,6 @@ class AST_Instance final : public AST_ParentNode
     CleanupChildren();
   }
 
-
   //! Dispatches children to specific members
   //!
   void DispatchChildren () override;
@@ -128,6 +139,7 @@ class AST_Instance final : public AST_ParentNode
   private:
   const AST_ScalarIdentifier* m_instanceIdentifier = nullptr; //!< Instance name
   const AST_ModuleIdentifier* m_moduleIdentifier   = nullptr; //!< Identifies module to instantiate
+  const AST_Module*           m_uniquifiedModule   = nullptr; //!< During unification process, this is set to unique module for that instance - m_moduleIdentifier still refer to non uniquified (ICL) module -
   std::vector<AST_Parameter*> m_parameters;                   //!< Parameters for module instantiation
   std::vector<AST_Attribute*> m_attributes;                   //!< Instance attributes
   std::vector<AST_Port*>      m_inputPorts;                   //!< Instance input ports (connections in enclosing module)

@@ -31,6 +31,7 @@
 #include <cxxtest/ValueTraits.h>
 #include <experimental/string_view>
 #include <memory>
+#include <fstream>
 
 using std::tuple;
 using std::make_tuple;
@@ -50,6 +51,58 @@ using namespace Parsers;
 
 namespace
 {
+
+//! Returns path of an ICL file accessible by test runner
+//!
+//! @param dirName    Directory name where file should stand
+//! @param fileName   File name (with extension)
+//!
+string GetTestFilePath (string_view dirName, string_view fileName)
+{
+  return test::GetTestFilePath({"Readers"s, "UT_TestFiles"s, "ICL"s, string(dirName), string(fileName)});
+}
+//
+//  End of: GetTestFilePath
+//---------------------------------------------------------------------------
+
+
+//! Returns path of a file for expected AST pretty print
+//!
+//! @param fileName   File name (with extension)
+//!
+string GetExpectedAstPrintFilePath (string_view fileName)
+{
+  return GetTestFilePath("Expected_AstPrint"sv, fileName);
+}
+//
+//  End of: GetTestFilePath
+//---------------------------------------------------------------------------
+
+
+
+//! Gets content of expected AST pretty print from file
+//!
+//! @param fileName   File name (with extension) that contains expected AST pretty print
+//!
+string GetExpectedAstPrint (string_view fileName)
+{
+  auto expectedFilePath = GetExpectedAstPrintFilePath(fileName);
+  std::ifstream ifs(expectedFilePath);
+
+  string content;
+  string line;
+  while (std::getline(ifs, line))
+  {
+    content.append(line).append("\n");
+  }
+
+  return content;
+}
+//
+//  End of: GetExpectedAstPrint
+//---------------------------------------------------------------------------
+
+
 //! Provides access to protected methods (different steps for parsing ICL)
 //!
 class ICL_Reader_TSS : public ICL::ICL_Reader
@@ -58,6 +111,7 @@ class ICL_Reader_TSS : public ICL::ICL_Reader
   ICL_Reader_TSS(std::shared_ptr<mast::SystemModel> sm) : ICL_Reader(sm) {  }
   using ICL_Reader::AST;
   using ICL_Reader::UpdateAstFromIcl;
+  using ICL_Reader::UniquifyAST;
   using ICL_Reader::GenerateSystemModelNodes;
 };
 
@@ -1371,6 +1425,279 @@ void UT_ICL_Reader::test_FromIcl_AccessLink_1149_2001 ()
   auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
 }
+
+
+
+//! Checks AST::Uniquify() with single instance
+//!
+void UT_ICL_Reader::test_Uniquify_1_Instance ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt("Module AsTop\n"                                                     // 01
+                        "{\n"                                                                // 02
+                        "  Instance reg8  Of  SReg {\n"                                      // 03
+                        "  InputPort SI = SI; InputPort DI = I1.DO; Parameter Size = 8;\n"   // 04
+                        "  Attribute Copyright  =  \"Picus\";\n"                             // 05
+                        "  }\n"                                                              // 06
+                        "}\n"                                                                // 07
+                        "\n"                                                                 // 08
+                        "Module SReg\n"                                                      // 09
+                        "{\n"                                                                // 10
+                        "  ScanInPort    SI;\n"                                              // 11
+                        "  ScanOutPort   SO          { Source  SR[0];}\n"                    // 12
+                        "  ScanInterface scan_client { Port SI; Port SO; }\n"                // 13
+                        "  ScanRegister SR[7:0]      { ScanInSource SI; ResetValue 'b0; }\n" // 14
+                        "}"                                                                  // 15
+                        ""s);
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UniquifyAST());
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
+
+  auto expected_AST_PrettyPrint =
+                                  "NameSpace;\n"
+                                  "Module AsTop\n"
+                                  "{\n"
+                                  "  Instance reg8 Of UniquifiedModules::SReg__uniquified__1\n"
+                                  "  {\n"
+                                  "    Attribute Copyright = \"Picus\";\n"
+                                  "    Parameter Size = 8;\n"
+                                  "    InputPort SI = SI;\n"
+                                  "    InputPort DI = I1.DO;\n"
+                                  "  }\n"
+                                  "}\n"
+                                  "Module SReg\n"
+                                  "{\n"
+                                  "  ScanInterface scan_client\n"
+                                  "  {\n"
+                                  "    Port SI;\n"
+                                  "    Port SO;\n"
+                                  "  }\n"
+                                  "  ScanInPort SI;\n"
+                                  "  ScanOutPort SO { Source SR[0]; }\n"
+                                  "  ScanRegister SR[7:0]\n"
+                                  "  {\n"
+                                  "    ScanInSource SI;\n"
+                                  "    ResetValue 'b0;\n"
+                                  "  }\n"
+                                  "}\n"
+                                  "NameSpace UniquifiedModules;\n"
+                                  "Module SReg__uniquified__1\n"
+                                  "{\n"
+                                  "  ScanInterface scan_client\n"
+                                  "  {\n"
+                                  "    Port SI;\n"
+                                  "    Port SO;\n"
+                                  "  }\n"
+                                  "  ScanInPort SI;\n"
+                                  "  ScanOutPort SO { Source SR[0]; }\n"
+                                  "  ScanRegister SR[7:0]\n"
+                                  "  {\n"
+                                  "    ScanInSource SI;\n"
+                                  "    ResetValue 'b0;\n"
+                                  "  }\n"
+                                  "}\n"
+                                  ""sv;
+
+
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
+  TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
+
+
+//! Checks AST::Uniquify() with 2 instances of the same module
+//!
+void UT_ICL_Reader::test_Uniquify_2_Instances ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt("Module AsTop\n"                                                     // 01
+                        "{\n"                                                                // 02
+                        "  ScanInPort    SI;\n"                                              // 03
+                        "  ScanOutPort   SO { Source sreg_b.SO;}\n"                          // 04
+                        "  Instance sreg_a  Of  SReg {\n"                                    // 05
+                        "  InputPort SI = SI;\n"                                             // 06
+                        "  }\n"                                                              // 07
+                        "  Instance sreg_b Of  SReg {\n"                                     // 08
+                        "  InputPort SI = sreg_a.SO;\n"                                      // 09
+                        "  }\n"                                                              // 10
+                        "}\n"                                                                // 11
+                        "\n"                                                                 // 12
+                        "Module SReg\n"                                                      // 13
+                        "{\n"                                                                // 14
+                        "  ScanInPort    SI;\n"                                              // 15
+                        "  ScanOutPort   SO          { Source  SR[0];}\n"                    // 16
+                        "  ScanInterface scan_client { Port SI; Port SO; }\n"                // 17
+                        "  ScanRegister SR[7:0]      { ScanInSource SI; ResetValue 'b0; }\n" // 18
+                        "}"                                                                  // 19
+                        ""s);
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UniquifyAST());
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
+
+  auto expected_AST_PrettyPrint =
+                                  "NameSpace;\n"
+                                  "Module AsTop\n"
+                                  "{\n"
+                                  "  ScanInPort SI;\n"
+                                  "  ScanOutPort SO { Source sreg_b.SO; }\n"
+                                  "  Instance sreg_a Of UniquifiedModules::SReg__uniquified__1\n"
+                                  "  {\n"
+                                  "    InputPort SI = SI;\n"
+                                  "  }\n"
+                                  "  Instance sreg_b Of UniquifiedModules::SReg__uniquified__2\n"
+                                  "  {\n"
+                                  "    InputPort SI = sreg_a.SO;\n"
+                                  "  }\n"
+                                  "}\n"
+                                  "Module SReg\n"
+                                  "{\n"
+                                  "  ScanInterface scan_client\n"
+                                  "  {\n"
+                                  "    Port SI;\n"
+                                  "    Port SO;\n"
+                                  "  }\n"
+                                  "  ScanInPort SI;\n"
+                                  "  ScanOutPort SO { Source SR[0]; }\n"
+                                  "  ScanRegister SR[7:0]\n"
+                                  "  {\n"
+                                  "    ScanInSource SI;\n"
+                                  "    ResetValue 'b0;\n"
+                                  "  }\n"
+                                  "}\n"
+                                  "NameSpace UniquifiedModules;\n"
+                                  "Module SReg__uniquified__1\n"
+                                  "{\n"
+                                  "  ScanInterface scan_client\n"
+                                  "  {\n"
+                                  "    Port SI;\n"
+                                  "    Port SO;\n"
+                                  "  }\n"
+                                  "  ScanInPort SI;\n"
+                                  "  ScanOutPort SO { Source SR[0]; }\n"
+                                  "  ScanRegister SR[7:0]\n"
+                                  "  {\n"
+                                  "    ScanInSource SI;\n"
+                                  "    ResetValue 'b0;\n"
+                                  "  }\n"
+                                  "}\n"
+                                  "Module SReg__uniquified__2\n"
+                                  "{\n"
+                                  "  ScanInterface scan_client\n"
+                                  "  {\n"
+                                  "    Port SI;\n"
+                                  "    Port SO;\n"
+                                  "  }\n"
+                                  "  ScanInPort SI;\n"
+                                  "  ScanOutPort SO { Source SR[0]; }\n"
+                                  "  ScanRegister SR[7:0]\n"
+                                  "  {\n"
+                                  "    ScanInSource SI;\n"
+                                  "    ResetValue 'b0;\n"
+                                  "  }\n"
+                                  "}\n"
+                                  ""sv;
+
+
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
+  TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
+
+
+//! Checks AST::Uniquify() with multiple instances of the N modules
+//!
+void UT_ICL_Reader::test_Uniquify_N_Modules ()
+{
+  // ---------------- Setup
+  //
+  auto           iclFile = GetTestFilePath("", "test_Uniquify_N_Modules.icl");
+  std::ifstream  ifs(iclFile);
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(ifs));
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UniquifyAST());
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
+
+  auto expected_AST_PrettyPrint = GetExpectedAstPrint("test_Uniquify_N_Modules_PrettyPrint.icl");
+  auto actual_AST_PrettyPrint   = Parsers::AST_PrettyPrinter::PrettyPrint(network);
+
+  TS_ASSERT_EQUALS (actual_AST_PrettyPrint, expected_AST_PrettyPrint);
+}
+
+
+//! Checks AST::Uniquify() with Single_SIB_3WI example from standard
+//!
+void UT_ICL_Reader::test_Uniquify_Single_SIB_3WI ()
+{
+  // ---------------- Setup
+  //
+  auto           iclFile = GetTestFilePath("", "Single_SIB_3WI.icl");
+  std::ifstream  ifs(iclFile);
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(ifs));
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UniquifyAST());
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
+
+  auto actual_AST_PrettyPrint   = Parsers::AST_PrettyPrinter::PrettyPrint(network);
+  auto expected_AST_PrettyPrint = GetExpectedAstPrint("test_Uniquify_Single_SIB_3WI_PrettyPrint.icl");
+
+  TS_ASSERT_EQUALS (actual_AST_PrettyPrint, expected_AST_PrettyPrint);
+}
+
+
+
 
 
 //! Checks ICL_Reader::GenerateSystemModelNodes() when parsing a single empty top module

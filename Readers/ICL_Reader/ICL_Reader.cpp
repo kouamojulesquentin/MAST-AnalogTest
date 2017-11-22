@@ -94,6 +94,19 @@ void ICL_Reader::Parse_Impl(std::istream& stream)
 
 
 
+//! Uniquifies all modules in AST network
+//!
+void ICL_Reader::UniquifyAST ()
+{
+//+  CHECK_VALUE_NOT_NULL(m_ast, "An AST must have been created using UpdateAstFromIcl");
+  m_ast->Uniquify();
+}
+//
+//  End of: ICL_Reader::UniquifyAST
+//---------------------------------------------------------------------------
+
+
+
 //! Parses an ICL fragment to update current AST
 //!
 //! @note Supports multiple ICL parsing before converting to SystemModel

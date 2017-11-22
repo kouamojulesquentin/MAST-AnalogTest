@@ -49,6 +49,14 @@ class UT_ICL_Reader : public CxxTest::TestSuite
   void test_FromIcl_UseNamespace_Def_InsideModule ();
   void test_FromIcl_AccessLink_1149_2001 ();
 
+  // ---------------- Unification
+  //
+  void test_Uniquify_1_Instance ();
+  void test_Uniquify_2_Instances ();
+  void test_Uniquify_N_Modules ();
+  void test_Uniquify_Single_SIB_3WI ();
+
+
   // ---------------- GenerateSystemModelNodes
   //
   void test_Generate_EmptyModule ();

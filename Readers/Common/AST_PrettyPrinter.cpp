@@ -167,6 +167,10 @@ void AST_PrettyPrinter::Visit_Instance (AST_Instance* instance)
   StreamNodeHeader(instance, " Of ") << moduleIdentifier->AsText();
 
   HierarchyInserter hierarchyInserter(*this);
+//+  if (instance->UniquifiedModule() != nullptr)
+//+  {
+//+    StreamDepth() << "Uniquified = true;\n";
+//+  }
 
   StreamSimpleNodes (instance->Attributes());
   StreamSimpleNodes (instance->Parameters());

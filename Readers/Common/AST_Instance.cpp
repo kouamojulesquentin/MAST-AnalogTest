@@ -96,6 +96,21 @@ string AST_Instance::Name () const
 //---------------------------------------------------------------------------
 
 
+//! Sets unique module representing that very instance
+//!
+//! @note It must be call only once by the unification process
+//!
+void AST_Instance::UniquifiedModule (const AST_Module* uniquifiedModule, const AST_ModuleIdentifier* identifier)
+{
+  m_uniquifiedModule = uniquifiedModule;
+  m_moduleIdentifier = identifier;
+}
+//
+//  End of: AST_Instance::UniquifiedModule
+//---------------------------------------------------------------------------
+
+
+
 //===========================================================================
 // End of AST_Instance.cpp
 //===========================================================================

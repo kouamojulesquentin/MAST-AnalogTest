@@ -15,7 +15,9 @@
   #define AST_H__C18638A1_3F91_4757_EBB6_C119CFFA82E__INCLUDED_
 
 #include "AST_Node.hpp"
+#include "AST_Builder.hpp"
 #include "AST_Network.hpp"
+
 #include <vector>
 #include <memory>
 #include <experimental/string_view>
@@ -48,7 +50,7 @@ enum class AccessLinkType;
 
 //! Abstract Syntax Tree built when parsing some test network description
 //!
-class AST final
+class AST final : public AST_Builder
 {
   // ---------------- Public Methods
   //
@@ -113,6 +115,18 @@ class AST final
   //!
   const AST_Namespace* InstancesDefaultNamespace() const { return m_instancesDefaultNamespace; }
 
+  //! Uniquifies all modules in network
+  //!
+  void Uniquify();
+
+  // AST_Builder interface implementation
+
+  AST_Instance* Clone_Instance (const AST_Instance* instance) override; //!< Clones an instance
+  AST_Module*   Clone_Module   (const AST_Module*   module) override;   //!< Clones a module
+
+  AST_ScalarIdentifier* Create_UniquifiedIdentifier       (const AST_ScalarIdentifier* identifier) override; //!< Creates an identifier for a uniquified entity
+  AST_ModuleIdentifier* Create_UniquifiedModuleIdentifier (const AST_Module*           module)     override; //!< Creates an module identifier for a uniquified module
+
   // ---------------- Private Methods
   //
   AST_Namespace* Create_Namespace_Impl (std::string&& name);
@@ -127,6 +141,15 @@ class AST final
     return pointer;
   }
 
+  template<typename T> T* Clone_Node (const T* other)
+  {
+    auto node    = std::make_unique<T>(*other);
+    auto pointer = node.get();
+
+    m_nodes.emplace_back(std::move(node));
+    return pointer;
+  }
+
   // ---------------- Private Fields
   //
   private:
@@ -135,9 +158,11 @@ class AST final
   std::vector<std::unique_ptr<AST_Node>>      m_nodes;                                    //!< Managed, not modules nor namespaces, nodes
   std::vector<std::unique_ptr<AST_Namespace>> m_namespaces;                               //!< Managed namespace nodes
   const AST_Namespace*                        m_rootNamespace                  = nullptr; //!< Root namespace
-  const AST_Namespace*                        m_modulesNamespace               = nullptr; //!< Namespace used for following module definitions
+  const AST_Namespace*                        m_modulesNamespace               = nullptr; //!< Namespace used for following modules definitions
+  const AST_Namespace*                        m_uniquifiedNamespace            = nullptr; //!< Namespace used for uniquified modules definitions
   const AST_Namespace*                        m_savedInstancesDefaultNamespace = nullptr; //!< Saved default namespace for instance (to be restored at end of module parsing)
   const AST_Namespace*                        m_instancesDefaultNamespace      = nullptr; //!< Default namespace used for following module instantiations
+  int32_t                                     m_uniqueIdCounter                = 0;       //!< To differentiate uniquified entities (mostly modules)
 };
 //
 //  End of AST class declaration

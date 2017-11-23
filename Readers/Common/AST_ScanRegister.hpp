@@ -22,6 +22,11 @@
 #include <string>
 #include <experimental/string_view>
 
+namespace mast
+{
+class Register;
+}
+
 namespace Parsers
 {
 class AST_Value;
@@ -67,6 +72,12 @@ class AST_ScanRegister final : public AST_ParentNode
   const AST_Source* ScanInSource() const { return m_scanInSource; } //!< Scan register input source
   const AST_Value*  ResetValue()   const { return m_resetValue;   } //!< Scan register reset value
 
+  std::shared_ptr<mast::Register> AssociatedRegister() { return m_associatedModelRegister; }  //!< Mast SystemModel associated register (when not null)
+
+  //! Sets Mast SystemModel associated register (when creating SystemModel)
+  //!
+  void  AssociatedRegister (std::shared_ptr<mast::Register> associatedRegister) { m_associatedModelRegister = associatedRegister; };
+
 
   // ---------------- Private Methods
   //
@@ -74,7 +85,8 @@ class AST_ScanRegister final : public AST_ParentNode
 
   friend class AST;                                                         // This is AST that manages construction/destruction of AST nodes
   MAKE_UNIQUE_AS_FRIEND(AST_ScanRegister)(Parsers::AST_VectorIdentifier*&,
-                                          std::vector<AST_Node*>&&);        // AST currently uses make_unit<T>() to create nodes
+                                          std::vector<AST_Node*>&&);         // AST currently uses make_unit<T>() to create nodes
+  MAKE_UNIQUE_AS_FRIEND(AST_ScanRegister)(const Parsers::AST_ScanRegister&); // For clones
 
   AST_ScanRegister(AST_VectorIdentifier* identifier, std::vector<AST_Node*>&& children)
     : AST_ParentNode (Kind::ScanRegister, std::move(children))
@@ -84,6 +96,9 @@ class AST_ScanRegister final : public AST_ParentNode
     CleanupChildren();
   }
 
+  AST_ScanRegister(const AST_ScanRegister&) = default;
+
+
   //! Dispatches children to specific members
   //!
   void DispatchChildren () override;
@@ -91,10 +106,11 @@ class AST_ScanRegister final : public AST_ParentNode
   // ---------------- Private Fields
   //
   private:
-  const AST_VectorIdentifier* m_identifier       = nullptr; //!< Scan register name
-  const AST_Value*            m_resetValue       = nullptr; //!< Scan register reset value expression
-  const AST_Value*            m_defaultLoadValue = nullptr; //!< Scan register default load value expression
-  const AST_Source*           m_scanInSource     = nullptr; //!< Scan register input source
+  const AST_VectorIdentifier*     m_identifier       = nullptr; //!< Scan register name
+  const AST_Value*                m_resetValue       = nullptr; //!< Scan register reset value expression
+  const AST_Value*                m_defaultLoadValue = nullptr; //!< Scan register default load value expression
+  const AST_Source*               m_scanInSource     = nullptr; //!< Scan register input source
+  std::shared_ptr<mast::Register> m_associatedModelRegister;    //!< Associated register once mast model is created (this is used mainly to ScanMux processing context during SystemModel creation)
 };
 //
 //  End of AST_ScanRegister class declaration

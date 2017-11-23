@@ -24,6 +24,7 @@
 namespace mast
 {
 class Chain;
+class UnresolvedPathSelector;
 class SystemModel;
 class SystemModelNode;
 class SystemModelBuilder;
@@ -63,24 +64,30 @@ class AST_SystemModelGenerator final
   private:
 //+  AST_Source* FindSourceOfSignals (const std::vector<Parsers::AST_Signal*>& signals) const;
 
-  std::tuple<std::shared_ptr<mast::SystemModelNode>, const AST_Source*> Generate_Instance (const AST_Instance*     instance, const AST_Module* instanceModule);
-  std::tuple<std::shared_ptr<mast::SystemModelNode>, const AST_Source*> Generate_Register (const AST_ScanRegister* scanRegister);
+  std::tuple<std::shared_ptr<mast::SystemModelNode>, const AST_Source*> Generate_Instance     (AST_Instance*     instance, AST_Module* instanceModule);
+  std::tuple<std::shared_ptr<mast::SystemModelNode>, const AST_Source*> Generate_ScanRegister (AST_ScanRegister* scanRegister);
 
-  std::tuple<std::shared_ptr<mast::SystemModelNode>, std::reference_wrapper<const std::vector<AST_Signal*>>>
-  Generate_ScanMux (const AST_ScanMux* scanMux);
 
-  std::shared_ptr<mast::SystemModelNode> Generate_Network (const AST_Network* network);
-  void                                   Generate_Module (mast::Chain* chain, const AST_Module* module);
+  using Generate_ScanMux_Result_t = std::tuple<std::shared_ptr<mast::SystemModelNode>, std::reference_wrapper<const std::vector<AST_Signal*>>>;
 
-  std::vector<mast::BinaryVector> MakeSelectionTable (const std::vector<AST_ScanMuxSelection*>&) const;
+  Generate_ScanMux_Result_t Generate_ScanMux (AST_ScanMux* scanMux, AST_Module* module);
+
+  std::shared_ptr<mast::SystemModelNode> Generate_Network (AST_Network* network);
+  void                                   Generate_Module  (mast::Chain* chain, AST_Module* module);
+
+  std::vector<AST_ScanRegister*>  FindSelectorRegisters (const std::vector<Parsers::AST_Signal*>&,  AST_Module* module) const;
+
+  using SelectionTables_t = std::tuple<std::vector<mast::BinaryVector>, std::vector<mast::BinaryVector>>;
+  SelectionTables_t MakeSelectionTable (const std::vector<AST_ScanMuxSelection*>&, size_t expectedBitsCount) const;
 
   // ---------------- Private Fields
   //
   private:
-  std::shared_ptr<mast::SystemModel>        m_systemModel;       //!< SystemModel currently being built
-  std::unique_ptr<mast::SystemModelBuilder> m_builder;           //!< Helper to build SystemModel nodes
-  std::shared_ptr<mast::SystemModelNode>    m_parsedTopNode;     //!< SystemModel tree build from ICL file
-  AST_Network*                              m_network = nullptr; //!< Test network AST used to generate SystemModel tree
+  std::shared_ptr<mast::SystemModel>                         m_systemModel;             //!< SystemModel currently being built
+  std::unique_ptr<mast::SystemModelBuilder>                  m_builder;                 //!< Helper to build SystemModel nodes
+  std::shared_ptr<mast::SystemModelNode>                     m_parsedTopNode;           //!< SystemModel tree build from ICL file
+  std::vector<std::shared_ptr<mast::UnresolvedPathSelector>> m_unresolvedPathSelectors; //!< Unresolved Linkers (those for which selector Register(s) where not yet created when Linkers were)
+  AST_Network*                                               m_network = nullptr;       //!< Test network AST used to generate SystemModel tree
 };
 //
 //  End of AST_SystemModelGenerator class declaration

@@ -110,15 +110,15 @@ class AST_Module final : public AST_ParentNode
 
   //! Searches for a ScanMux with specified identifier
   //!
-  const AST_ScanMux* FindScanMux (const AST_Identifier* identifier) const;
+  AST_ScanMux* FindScanMux (const AST_Identifier* identifier);
 
   //! Searches for a ScanRegister with specified identifier
   //!
-  const AST_ScanRegister* FindScanRegister (const AST_Identifier* identifier) const;
+  AST_ScanRegister* FindScanRegister (const AST_Identifier* identifier);
 
   //! Searches for a Instance with specified identifier
   //!
-  const AST_Instance* FindInstance (const AST_Identifier* identifier) const ;
+  AST_Instance* FindInstance (const AST_Identifier* identifier);
 
   //! Uniquifies module using parameters overrides
   //!
@@ -127,6 +127,7 @@ class AST_Module final : public AST_ParentNode
   //! Uniquifies module instances
   //!
   void UniquifyInstances (AST_Builder& astBuilder);
+
 
   // ---------------- Private Methods
   //
@@ -155,9 +156,9 @@ class AST_Module final : public AST_ParentNode
   //! @param identifier   An identifier for ScanRegister to find
   //!
   template<typename T>
-  const T* FindNode (const std::vector<T*>& nodes, const AST_Identifier* identifier) const
+  T* FindNode (const std::vector<T*>& nodes, const AST_Identifier* identifier) const
   {
-    const T* foundNode = nullptr;
+    T* foundNode = nullptr;
 
     for (auto node : nodes)
     {
@@ -167,11 +168,11 @@ class AST_Module final : public AST_ParentNode
         break;
       }
     }
-
     return foundNode;
   }
 
-  void Uniquify_impl     (AST_Builder& astBuilder, const std::vector<AST_Parameter*>& parameters);
+  void Uniquify_impl         (AST_Builder& astBuilder, const std::vector<AST_Parameter*>& parameters);
+  void UniquifyScanRegisters (AST_Builder& astBuilder);
 
   // ---------------- Private Fields
   //

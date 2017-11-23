@@ -75,7 +75,7 @@ void AST_Module::DispatchChildren ()
 //!
 //! @param identifier   An identifier for ScanMux to find
 //!
-const AST_ScanMux* AST_Module::FindScanMux (const AST_Identifier* identifier) const
+AST_ScanMux* AST_Module::FindScanMux (const AST_Identifier* identifier)
 {
   CHECK_PARAMETER_NOT_NULL(identifier, "Cannot find ScanMux from nullptr identifier");
 
@@ -90,7 +90,7 @@ const AST_ScanMux* AST_Module::FindScanMux (const AST_Identifier* identifier) co
 //!
 //! @param identifier   An identifier for ScanRegister to find
 //!
-const AST_ScanRegister* AST_Module::FindScanRegister (const AST_Identifier* identifier) const
+AST_ScanRegister* AST_Module::FindScanRegister (const AST_Identifier* identifier)
 {
   CHECK_PARAMETER_NOT_NULL(identifier, "Cannot find ScanRegister from nullptr identifier");
 
@@ -105,7 +105,7 @@ const AST_ScanRegister* AST_Module::FindScanRegister (const AST_Identifier* iden
 //!
 //! @param identifier   An identifier for Instance to find
 //!
-const AST_Instance* AST_Module::FindInstance (const AST_Identifier* identifier) const
+AST_Instance* AST_Module::FindInstance (const AST_Identifier* identifier)
 {
   CHECK_PARAMETER_NOT_NULL(identifier, "Cannot find Instance from nullptr identifier");
   return FindNode(m_instances, identifier);
@@ -177,7 +177,7 @@ void AST_Module::Uniquify_impl (AST_Builder& astBuilder, const std::vector<AST_P
     }
   }
 
-//+  UniquifyScanRegisters(astBuilder);
+  UniquifyScanRegisters(astBuilder);
 //+  UniquifyScanMuxs(astBuilder);
   UniquifyInstances(astBuilder);
 }
@@ -187,7 +187,7 @@ void AST_Module::Uniquify_impl (AST_Builder& astBuilder, const std::vector<AST_P
 
 
 
-//! Uniquifies instances
+//! Uniquifies module instances
 //!
 //! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
 //!
@@ -214,6 +214,24 @@ void AST_Module::UniquifyInstances (AST_Builder& astBuilder)
 //  End of: AST_Module::UniquifyInstances
 //---------------------------------------------------------------------------
 
+
+//! Uniquifies module scan registers
+//!
+//! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
+//!
+void AST_Module::UniquifyScanRegisters (AST_Builder& astBuilder)
+{
+  for (auto& scanRegister : m_scanRegisters)
+  {
+    auto clonedScanRegister = astBuilder.Clone_ScanRegister(scanRegister);
+    scanRegister = clonedScanRegister;  // Replace current (shared) by cloned (unique)
+
+    //! @todo [JFC]-[November/23/2017]: In UniquifyScanRegisters(): Replace parameter reference(s) of ScanRegister
+  }
+}
+//
+//  End of: AST_Module::UniquifyScanRegisters
+//---------------------------------------------------------------------------
 
 
 //===========================================================================

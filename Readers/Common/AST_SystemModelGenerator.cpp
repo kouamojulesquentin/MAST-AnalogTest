@@ -34,6 +34,7 @@
 #include "AST_Value.hpp"
 #include "AST_VectorIdentifier.hpp"
 
+#include "DefaultTableBasedPathSelector.hpp"
 #include "UnresolvedPathSelector.hpp"
 #include "SystemModel.hpp"
 #include "SystemModelBuilder.hpp"
@@ -96,6 +97,37 @@ AST_SystemModelGenerator::AST_SystemModelGenerator (shared_ptr<mast::SystemModel
 //---------------------------------------------------------------------------
 
 
+//! Follows ScanMux selector signals to find driving ScanRegister(s)
+//!
+//! @param selectors  ScanMux selector signals
+//! @param module     ScanMux parent module
+//!
+vector<AST_ScanRegister*>
+AST_SystemModelGenerator::FindSelectorRegisters (const std::vector<Parsers::AST_Signal*>& selectors,
+                                                 AST_Module*                              module) const
+{
+  vector<AST_ScanRegister*> scanRegisters;
+
+  for (const auto& selector : selectors)
+  {
+    const auto portScope   = selector->PortScope();
+    const auto identifier  = selector->PortName();
+
+    CHECK_VALUE_EMPTY(portScope, "Not Yet Supported: Selector in different module (for ScanMux)");
+
+    auto scanRegister = module->FindScanRegister(identifier);
+    CHECK_PARAMETER_NOT_NULL(scanRegister, "Failed to find selector ScanRegister in module \""s.append(module->Name()).append("\""));
+
+    scanRegisters.push_back(scanRegister);
+  }
+
+  return scanRegisters;
+}
+//
+//  End of: AST_SystemModelGenerator::FindSelectorRegisters
+//---------------------------------------------------------------------------
+
+
 //! Generates a SystemModel (sub-)tree from AST_Network
 //!
 shared_ptr<mast::SystemModelNode> AST_SystemModelGenerator::Generate (AST_Network* network)
@@ -104,6 +136,12 @@ shared_ptr<mast::SystemModelNode> AST_SystemModelGenerator::Generate (AST_Networ
 
   m_parsedTopNode = Generate_Network(network);
 
+  //! @todo [JFC]-[November/23/2017]: In Generate(): Resolve linkers
+  //!
+  CHECK_VALUE_EMPTY(m_unresolvedPathSelectors, "Not Yet Supported: Unresolved path selector");
+//+  for (const auto& linker : m_unresolvedPathSelectors)
+//+  {
+//+  }
   return m_parsedTopNode;
 }
 //
@@ -117,7 +155,7 @@ shared_ptr<mast::SystemModelNode> AST_SystemModelGenerator::Generate (AST_Networ
 //!
 //! @return Created SystemModel sub-tree and Instance AST_Source
 tuple<shared_ptr<mast::SystemModelNode>, const AST_Source*>
-AST_SystemModelGenerator::Generate_Instance (const AST_Instance* instance, const AST_Module* instanceModule)
+AST_SystemModelGenerator::Generate_Instance (AST_Instance* instance, AST_Module* instanceModule)
 {
   const auto& moduleInputPorts = instanceModule->ScanInPorts();
 
@@ -158,7 +196,7 @@ AST_SystemModelGenerator::Generate_Instance (const AST_Instance* instance, const
 //! @param network  Network description
 //!
 //! @return Created SystemModel sub-tree
-shared_ptr<mast::SystemModelNode> AST_SystemModelGenerator::Generate_Network (const AST_Network* network)
+shared_ptr<mast::SystemModelNode> AST_SystemModelGenerator::Generate_Network (AST_Network* network)
 {
   auto topModule = network->TopModule();
   CHECK_VALUE_NOT_NULL(topModule, "Cannot generate SystemModel nodes when network has no modules");
@@ -203,7 +241,7 @@ shared_ptr<mast::SystemModelNode> AST_SystemModelGenerator::Generate_Network (co
 //! @param chain  Chain in which SystemModel notes are created
 //! @param module Module to be converted to SystemModel nodes
 //!
-void AST_SystemModelGenerator::Generate_Module (mast::Chain* chain, const AST_Module* module)
+void AST_SystemModelGenerator::Generate_Module (mast::Chain* chain, AST_Module* module)
 {
   const auto& scanInPorts  = module->ScanInPorts();
   const auto& scanOutPorts = module->ScanOutPorts();
@@ -252,13 +290,13 @@ void AST_SystemModelGenerator::Generate_Module (mast::Chain* chain, const AST_Mo
       auto scanRegister = module->FindScanRegister(identifier);
       if (scanRegister != nullptr)
       {
-        std::tie(createdNode, source) = Generate_Register(scanRegister);
+        std::tie(createdNode, source) = Generate_ScanRegister(scanRegister);
         sourceSignals = std::cref(source->Signals());
       }
       else  // ScanMux
       {
         auto scanMux = module->FindScanMux(identifier);
-        std::tie(createdNode, sourceSignals) = Generate_ScanMux(scanMux);
+        std::tie(createdNode, sourceSignals) = Generate_ScanMux(scanMux, module);
       }
     }
     else   // Instance ?
@@ -301,10 +339,11 @@ void AST_SystemModelGenerator::Generate_Module (mast::Chain* chain, const AST_Mo
 //! Creates a SystemModel Linker and path selector from an AST_ScanMux
 //!
 //! @param scanMux  ScanMux to be converted to SystemModel Linker
+//! @param module   ScanMux parent module
 //!
 //! @return Created Linker and ScanMux AST_Source
-tuple<shared_ptr<mast::SystemModelNode>, std::reference_wrapper<const vector<AST_Signal*>>>
-AST_SystemModelGenerator::Generate_ScanMux (const AST_ScanMux* scanMux)
+AST_SystemModelGenerator::Generate_ScanMux_Result_t
+AST_SystemModelGenerator::Generate_ScanMux (AST_ScanMux* scanMux, AST_Module* module)
 {
   CHECK_FALSE(scanMux->IsBusMux(), "Not Yet Supported: ScanMux for buses");
 
@@ -312,19 +351,45 @@ AST_SystemModelGenerator::Generate_ScanMux (const AST_ScanMux* scanMux)
   // Paths are ordered and defined using SystemModel path syntax
   // Bits ranges are defined as pair of integers
   //
-//+  const auto& selectors          = scanMux->Selectors();
-//+  const auto  selectorsBitsCount = selectors.size();
-//+  auto paths = MakePaths(selectors);
+  const auto& selectors          = scanMux->Selectors();
+  const auto  selectorsBitsCount = selectors.size();
 
-  // ---------------- Prepare table
+  auto selectorRegisters = FindSelectorRegisters(selectors, module);
+  CHECK_VALUE_EQ(selectorRegisters.size(), 1u, "Only support single ScanRegister as ScanMux selector");
+
+  // ---------------- Prepare selection/deselection tables
   //
+  vector<BinaryVector> selectTable;
+  vector<BinaryVector> deselectTable;
+
   auto const& selections = scanMux->Selections();
-  auto        table      = MakeSelectionTable(selections);
+  std::tie(selectTable, deselectTable) = MakeSelectionTable(selections, selectorsBitsCount);
+
+  // ---------------- Prepare path selector
+  //
+  auto selectorProperties = SelectorProperty::Std;
+  auto selectorRegister   = selectorRegisters.front(); //! @todo [JFC]-[November/23/2017]: Support multiple selector registers
+  auto modelRegister      = selectorRegister->AssociatedRegister();
+  bool unresolved         = modelRegister ? false : true;
+
+  shared_ptr<PathSelector> pathSelector;
+  if (unresolved)
+  {
+    auto unresolvedPathSelector = make_shared<UnresolvedPathSelector>();
+//+    unresolvedPathSelector->SelectorRegister(selectorRegister);
+    unresolvedPathSelector->SelectionTables(std::move(selectTable), std::move(deselectTable));
+    m_unresolvedPathSelectors.emplace_back(unresolvedPathSelector);
+
+    pathSelector = unresolvedPathSelector;
+  }
+  else
+  {
+    auto pathsCount = selectTable.size() - 1u;
+    pathSelector    = make_shared<DefaultTableBasedPathSelector>(modelRegister, pathsCount, selectTable, deselectTable, selectorProperties);
+  }
 
   // ---------------- Create Linker
   //
-  auto pathSelector = make_shared<UnresolvedPathSelector>();
-
   const auto name     = scanMux->BaseName();
   auto       linker   = m_systemModel->CreateLinker(name, pathSelector);
 
@@ -333,13 +398,12 @@ AST_SystemModelGenerator::Generate_ScanMux (const AST_ScanMux* scanMux)
   const auto  firstSelection  = selections.front();
   const auto& selectedSignals = firstSelection->SelectedSignals();
 
-
-//+  CHECK_FAILED("Not Yet Supported: ScanMux");
   return make_tuple(linker, std::cref(selectedSignals));
 }
 //
-//  End of: AST_SystemModelGenerator::Generate_Register
+//  End of: AST_SystemModelGenerator::Generate_ScanMux
 //---------------------------------------------------------------------------
+
 
 
 //! Creates a SystemModel Register from an AST_ScanRegister
@@ -348,7 +412,7 @@ AST_SystemModelGenerator::Generate_ScanMux (const AST_ScanMux* scanMux)
 //!
 //! @return Created Register and ScanRegister AST_Source
 tuple<std::shared_ptr<mast::SystemModelNode>, const AST_Source*>
-AST_SystemModelGenerator::Generate_Register (const AST_ScanRegister* scanRegister)
+AST_SystemModelGenerator::Generate_ScanRegister (AST_ScanRegister* scanRegister)
 {
   auto registerSource = scanRegister->ScanInSource();
   auto name           = scanRegister->BaseName();
@@ -369,26 +433,47 @@ AST_SystemModelGenerator::Generate_Register (const AST_ScanRegister* scanRegiste
   auto holdValue    = false;
   auto registerNode = m_systemModel->CreateRegister(name, bypassValue, holdValue);
 
+  scanRegister->AssociatedRegister(registerNode);
+
   return make_tuple(registerNode, registerSource);
 }
 //
-//  End of: AST_SystemModelGenerator::Generate_Register
+//  End of: AST_SystemModelGenerator::Generate_ScanRegister
 //---------------------------------------------------------------------------
 
 
 
-//! Creates selection table for table based PathSelector
+//! Creates selection/deselection tables for ScanMux (for table based PathSelector)
 //!
-//! @param selections   ScanMux selection values
+//! @param selections         ScanMux selection values
+//! @param expectedBitsCount  Bits count of selector register(s) - this is used only for value width check
 //!
-vector<BinaryVector>  AST_SystemModelGenerator::MakeSelectionTable (const vector<AST_ScanMuxSelection*>& selections) const
+AST_SystemModelGenerator::SelectionTables_t AST_SystemModelGenerator::MakeSelectionTable (const vector<AST_ScanMuxSelection*>& selections, size_t expectedBitsCount) const
 {
-  vector<BinaryVector> table;
+  vector<BinaryVector> selectTable;
+  selectTable.emplace_back(expectedBitsCount); // Dummy entry for not used path identifier zero
 
-  //! @todo [JFC]-[November/17/2017]: Implement AST_SystemModelGenerator::MakeSelectionTable()
-  //!
+  for (const auto& selection : selections)
+  {
+    const auto& values = selection->SelectionsValues();
+    CHECK_VALUE_NOT_EMPTY(values, "Must have at least one value");
+    CHECK_VALUE_EQ(values.size(), 1u, "Not Yet Supported: Concat number list (for ScanMux Selection)");
 
-  return table;
+    const auto& value               = values.front();
+    auto        valueAsBinaryVector = BinaryVector::CreateFromString(value);
+    CHECK_PARAMETER_EQ(valueAsBinaryVector.BitsCount(), expectedBitsCount, "Unexpected selection bits count");
+    selectTable.emplace_back(std::move(valueAsBinaryVector));
+  }
+
+  //! @todo [JFC]-[November/17/2017]: Support Concat number list in AST_SystemModelGenerator::MakeSelectionTable()
+
+  vector<BinaryVector> deselectTable = selectTable;
+  for (auto& deselectValue : deselectTable)
+  {
+    deselectValue.ToggleBits();
+  }
+
+  return make_tuple(selectTable, deselectTable);
 }
 //
 //  End of: AST_SystemModelGenerator::MakeSelectionTable

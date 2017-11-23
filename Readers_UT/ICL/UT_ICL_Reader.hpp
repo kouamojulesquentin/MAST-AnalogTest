@@ -54,7 +54,7 @@ class UT_ICL_Reader : public CxxTest::TestSuite
   void test_Uniquify_1_Instance ();
   void test_Uniquify_2_Instances ();
   void test_Uniquify_N_Modules ();
-  void test_Uniquify_Single_SIB_3WI ();
+  void test_Uniquify_Examples ();
 
 
   // ---------------- GenerateSystemModelNodes
@@ -64,7 +64,7 @@ class UT_ICL_Reader : public CxxTest::TestSuite
   void test_Generate_N_ScanRegisters ();
   void test_Generate_2_Modules ();
   void test_Generate_N_Modules ();
-//+  void test_Generate_SIB_mux_pre ();
+  void test_Generate_SIB_mux_pre ();
 //+  void test_Generate_Single_SIB_3WI ();
 
   // ================ Other Methods ================

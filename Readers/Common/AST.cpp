@@ -92,6 +92,17 @@ AST_Module* AST::Clone_Module (const AST_Module* module)
 //---------------------------------------------------------------------------
 
 
+//! Clones a scan register
+//!
+AST_ScanRegister* AST::Clone_ScanRegister (const AST_ScanRegister* scanRegister)
+{
+  return Clone_Node(scanRegister);
+}
+//
+//  End of: AST::Clone_ScanRegister
+//---------------------------------------------------------------------------
+
+
 //! Creates a Create_AccessLink node
 //!
 //! @param identifier   Access Link name

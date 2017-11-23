@@ -20,6 +20,7 @@ class AST_Instance;
 class AST_Module;
 class AST_Network;
 class AST_ScalarIdentifier;
+class AST_ScanRegister;
 class AST_ModuleIdentifier;
 
 //! Interfaces for cloning AST nodes
@@ -30,8 +31,9 @@ class AST_Builder
   // ---------------- Public Methods
   //
   public:
-  virtual AST_Instance* Clone_Instance (const AST_Instance* instance) = 0; //!< Clones an instance
-  virtual AST_Module*   Clone_Module   (const AST_Module*   module) = 0;   //!< Clones a module
+  virtual AST_Instance*     Clone_Instance     (const AST_Instance*     instance) = 0;     //!< Clones an instance
+  virtual AST_Module*       Clone_Module       (const AST_Module*       module) = 0;       //!< Clones a module
+  virtual AST_ScanRegister* Clone_ScanRegister (const AST_ScanRegister* scanRegister) = 0; //!< Clones a scan register
 
   virtual AST_ScalarIdentifier* Create_UniquifiedIdentifier       (const AST_ScalarIdentifier* identifier) = 0; //!< Creates an identifier for a uniquified entity
   virtual AST_ModuleIdentifier* Create_UniquifiedModuleIdentifier (const AST_Module*           module) = 0;     //!< Creates an module identifier for a uniquified module

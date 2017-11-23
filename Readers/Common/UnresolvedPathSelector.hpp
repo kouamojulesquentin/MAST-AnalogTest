@@ -58,10 +58,31 @@ class UnresolvedPathSelector : public PathSelector
   void Select   (uint32_t /*pathIdentifier*/) override { CHECK_FAILED(BadUsageMessage); };
   void Deselect (uint32_t /*pathIdentifier*/) override { CHECK_FAILED(BadUsageMessage); };
 
+  //! Returns selection table
+  //!
+  const std::vector<BinaryVector>& SelectTable() const { return m_selectTable; }
+
+  //! Returns deselection table
+  //!
+  const std::vector<BinaryVector>& DeselectTable() const { return m_deselectTable; }
+
+  //! Sets selection table
+  //!
+  void  SelectionTables (std::vector<BinaryVector>&& selectTable,
+                         std::vector<BinaryVector>&& deselectTable)
+  {
+    m_selectTable   = std::move(selectTable);
+    m_deselectTable = std::move(deselectTable);
+  }
+
   // ---------------- Private Fields
   //
   private:
   static constexpr auto BadUsageMessage = "UnresolvedPathSelector is only a place holder that must be replaced during SystemModel construction";
+
+  SelectorProperty          m_selectorProperties = SelectorProperty::Std; //!< Final selector properties
+  std::vector<BinaryVector> m_selectTable;                                //!< For table based path selector
+  std::vector<BinaryVector> m_deselectTable;                              //!< For table based path selector
 };
 //
 //  End of UnresolvedPathSelector class declaration

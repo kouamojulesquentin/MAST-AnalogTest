@@ -54,6 +54,19 @@ namespace
 
 //! Returns path of an ICL file accessible by test runner
 //!
+//! @param fileName   File name (with extension)
+//!
+string GetTestFilePath (string_view fileName)
+{
+  return test::GetTestFilePath({"Readers"s, "UT_TestFiles"s, "ICL"s, string(fileName)});
+}
+//
+//  End of: GetTestFilePath
+//---------------------------------------------------------------------------
+
+
+//! Returns path of an ICL file accessible by test runner
+//!
 //! @param dirName    Directory name where file should stand
 //! @param fileName   File name (with extension)
 //!
@@ -1638,7 +1651,7 @@ void UT_ICL_Reader::test_Uniquify_N_Modules ()
 {
   // ---------------- Setup
   //
-  auto           iclFile = GetTestFilePath("", "test_Uniquify_N_Modules.icl");
+  auto           iclFile = GetTestFilePath("test_Uniquify_N_Modules.icl");
   std::ifstream  ifs(iclFile);
 
   auto           sm = make_shared<SystemModel>();
@@ -1665,35 +1678,53 @@ void UT_ICL_Reader::test_Uniquify_N_Modules ()
 }
 
 
-//! Checks AST::Uniquify() with Single_SIB_3WI example from standard
+//! Checks AST::Uniquify() with examples from standard
 //!
-void UT_ICL_Reader::test_Uniquify_Single_SIB_3WI ()
+void UT_ICL_Reader::test_Uniquify_Examples ()
 {
-  // ---------------- Setup
+  // ---------------- DDT Setup
   //
-  auto           iclFile = GetTestFilePath("", "Single_SIB_3WI.icl");
-  std::ifstream  ifs(iclFile);
-  auto           sm = make_shared<SystemModel>();
-  ICL_Reader_TSS sut(sm);
-  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(ifs));
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto iclFileName      = std::get<0>(data);
+    auto expectedFileName = std::get<1>(data);
 
-  // ---------------- Exercise
+    auto           iclFilePath = GetTestFilePath(iclFileName);
+    std::ifstream  ifs(iclFilePath);
+    auto           sm = make_shared<SystemModel>();
+    ICL_Reader_TSS sut(sm);
+    TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(ifs));
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.UniquifyAST());
+
+    // ---------------- Verify
+    //
+    CxxTest::setAbortTestOnFail(true);
+
+    auto ast = sut.AST();
+    TS_ASSERT_NOT_NULLPTR (ast);
+    auto network = ast->Network();
+    TS_ASSERT_NOT_NULLPTR (network);
+
+    auto actual_AST_PrettyPrint   = Parsers::AST_PrettyPrinter::PrettyPrint(network);
+    auto expected_AST_PrettyPrint = GetExpectedAstPrint(expectedFileName);
+
+    TS_ASSERT_EQUALS (actual_AST_PrettyPrint, expected_AST_PrettyPrint);
+  };
+
+  auto data =
+  {
+    make_tuple("SIB_mux_pre.icl",    "Uniquified_SIB_mux_pre_PrettyPrint.icl"),
+    make_tuple("Single_SIB_3WI.icl", "Uniquified_Single_SIB_3WI_PrettyPrint.icl"),
+  };
+
+  // ---------------- DDT Exercise
   //
-  TS_ASSERT_THROWS_NOTHING (sut.UniquifyAST());
-
-  // ---------------- Verify
-  //
-  CxxTest::setAbortTestOnFail(true);
-
-  auto ast = sut.AST();
-  TS_ASSERT_NOT_NULLPTR (ast);
-  auto network = ast->Network();
-  TS_ASSERT_NOT_NULLPTR (network);
-
-  auto actual_AST_PrettyPrint   = Parsers::AST_PrettyPrinter::PrettyPrint(network);
-  auto expected_AST_PrettyPrint = GetExpectedAstPrint("test_Uniquify_Single_SIB_3WI_PrettyPrint.icl");
-
-  TS_ASSERT_EQUALS (actual_AST_PrettyPrint, expected_AST_PrettyPrint);
+  TS_DATA_DRIVEN_TEST(checker, data);
 }
 
 
@@ -2134,81 +2165,50 @@ void UT_ICL_Reader::test_Generate_N_Modules ()
 
 //! Checks ICL_Reader::GenerateSystemModelNodes() when parsing a SIB with the mux before the scan register bit
 //!
-//+void UT_ICL_Reader::test_Generate_SIB_mux_pre ()
-//+{
-//+  // ---------------- Setup
-//+  //
-//+  istringstream excerpt(
-//+                        "Module SIB_mux_pre {\n"
-//+                        "  ScanInPort     SI;\n"
-//+                        "  CaptureEnPort  CE;\n"
-//+                        "  ShiftEnPort    SE;\n"
-//+                        "  UpdateEnPort   UE;\n"
-//+                        "  SelectPort     SEL;\n"
-//+                        "  ResetPort      RST;\n"
-//+                        "  TCKPort        TCK;\n"
-//+                        "  ScanOutPort    SO { Source SR; }\n"
-//+                        "  ScanInterface client {\n"
-//+                        "    Port SI; Port CE; Port SE; Port UE;\n"
-//+                        "    Port SEL; Port RST; Port TCK; Port SO;\n"
-//+                        "  }\n"
-//+                        "  ScanInPort       fromSO;\n"
-//+                        "  ToCaptureEnPort  toCE;\n"
-//+                        "  ToShiftEnPort    toSE;\n"
-//+                        "  ToUpdateEnPort   toUE;\n"
-//+                        "  ToSelectPort     toSEL;\n"
-//+                        "  ToResetPort      toRST;\n"
-//+                        "  ToTCKPort        toTCK;\n"
-//+                        "  ScanOutPort      toSI { Source SI; }\n"
-//+                        "  ScanInterface host {\n"
-//+                        "    Port fromSO; Port toCE; Port toSE; Port toUE;\n"
-//+                        "    Port toSEL; Port toRST; Port toTCK; Port toSI;\n"
-//+                        "  }\n"
-//+                        "  ScanRegister SR {\n"
-//+                        "    ScanInSource SIBmux; CaptureSource SR; ResetValue 1'b0;\n"
-//+                        "  }\n"
-//+                        "  ScanMux SIBmux SelectedBy SR {\n"
-//+                        "    1'b0 : SI;\n"
-//+                        "    1'b1 : fromSO;\n"
-//+                        "  }\n"
-//+                        "}\n"s);
+//! @note Use SIB_mux_pre module that should be connected to something.
+//!       This is why there is a warning about Linker with no child
+//!
+void UT_ICL_Reader::test_Generate_SIB_mux_pre ()
+{
+  // ---------------- Setup
+  //
+  auto           iclFile = GetTestFilePath("SIB_mux_pre.icl");
+  std::ifstream  ifs(iclFile);
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
 
+  CxxTest::setAbortTestOnFail(true);
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(ifs));
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
 
-//+  auto           sm = make_shared<SystemModel>();
-//+  ICL_Reader_TSS sut(sm);
+  auto checkResult = AST_Checker::Check(ast->Network());
 
-//+  CxxTest::setAbortTestOnFail(true);
-//+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
-//+  auto ast = sut.AST();
-//+  TS_ASSERT_NOT_NULLPTR (ast);
+  TS_ASSERT_FALSE (checkResult.HasIssues());
 
-//+  auto checkResult = AST_Checker::Check(ast->Network());
+  // ---------------- Exercise
+  //
+  auto topNode = sut.GenerateSystemModelNodes(ast);
 
-//+  TS_ASSERT_FALSE (checkResult.HasIssues());
+  // ---------------- Verify
+  //
+  TS_ASSERT_NOT_NULLPTR (topNode);
+  TS_ASSERT_EQUALS      (topNode->Name(), "SIB_mux_pre");
 
-//+  // ---------------- Exercise
-//+  //
-//+  auto topNode = sut.GenerateSystemModelNodes(ast);
+  // With PrettyPrinter
+  auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode, PrettyPrinterOptions::Parser_debug);
+  auto expected_PrettyPrint = "[Chain](0)     \"SIB_mux_pre\"\n"
+                              " [Linker](2)    \"SIBmux\"\n"
+                              "  :Selector:(1)  \"SR\", kind: Table_Based, can_select_none: 0, inverted_bits: 0, reversed_order: 0\n"
+                              " [Register](1)  \"SR\", length: 1, bypass: 0";
 
-//+  // ---------------- Verify
-//+  //
-//+  TS_ASSERT_NOT_NULLPTR (topNode);
-//+  TS_ASSERT_EQUALS      (topNode->Name(), "SIB_mux_pre");
+  TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
 
-//+  // With PrettyPrinter
-//+  auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode, PrettyPrinterOptions::Parser_debug);
-//+  auto expected_PrettyPrint = "[Chain](0)     \"SIB_mux_pre\"\n"
-//+                              " [Linker](2)    \"SIBmux\"\n"
-//+                              " :Selector:(1)  \"SR\", kind: Table_Based, can_select_none: 1, inverted_bits: 0, reversed_order: 0\n"
-//+                              " [Register](1)  \"SR\", length: 1, bypass: 0";
-
-//+  TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
-
-//+  // With Checker
-//+  PrependWithTap(sm, topNode);   // This is to avoid warnings about missing AccessInterface
-//+  auto modelCheckResult = sm->Check();
-//+  TS_ASSERT_EMPTY (modelCheckResult.InformativeReport());
-//+}
+  // With Checker
+  PrependWithTap(sm, topNode);   // This is to avoid warnings about missing AccessInterface
+  auto modelCheckResult = sm->Check();
+  TS_ASSERT_CONTAINS (modelCheckResult.InformativeReport(), "Linker 'SIBmux' (id: 2) has no child");
+}
 
 
 

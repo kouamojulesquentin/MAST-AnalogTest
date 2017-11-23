@@ -121,8 +121,9 @@ class AST final : public AST_Builder
 
   // AST_Builder interface implementation
 
-  AST_Instance* Clone_Instance (const AST_Instance* instance) override; //!< Clones an instance
-  AST_Module*   Clone_Module   (const AST_Module*   module) override;   //!< Clones a module
+  AST_Instance*     Clone_Instance     (const AST_Instance*     instance)     override; //!< Clones an instance
+  AST_Module*       Clone_Module       (const AST_Module*       module)       override; //!< Clones a module
+  AST_ScanRegister* Clone_ScanRegister (const AST_ScanRegister* scanRegister) override; //!< Clones a scan register
 
   AST_ScalarIdentifier* Create_UniquifiedIdentifier       (const AST_ScalarIdentifier* identifier) override; //!< Creates an identifier for a uniquified entity
   AST_ModuleIdentifier* Create_UniquifiedModuleIdentifier (const AST_Module*           module)     override; //!< Creates an module identifier for a uniquified module

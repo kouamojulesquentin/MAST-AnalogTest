@@ -29,6 +29,7 @@ class MAST_CORE_EXPORT ParentNode : public SystemModelNode, public std::enable_s
 
   virtual ~ParentNode() = default;
 
+  void PrependChild   (std::shared_ptr<SystemModelNode> node);       //!< Add new child node before current children
   void AppendChild    (std::shared_ptr<SystemModelNode> node);       //!< Appends a new child node
   bool HasDirectChild (std::shared_ptr<SystemModelNode> node) const; //!< Returns true if node is a direct child
 

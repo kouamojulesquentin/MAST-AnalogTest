@@ -30,12 +30,19 @@ class UT_ParentNode : public CxxTest::TestSuite
 
   void test_constructor ();
 
-  // ---------------- Appending
+  // ---------------- Append
   //
-  void test_AppendChild_1 ();
-  void test_AppendChild_2 ();
+  void test_AppendChild_1st ();
+  void test_AppendChild_2nd ();
 
-  void test_SetChildAppender ();
+  // ---------------- Prepend
+  //
+  void test_PrependChild_1st ();
+  void test_PrependChild_2nd ();
+  void test_PrependChild_with_Sibbling ();
+
+  void test_SetChildAppender_with_Append ();
+  void test_SetChildAppender_with_Prepend ();
 
   // ---------------- Disconnection
   //

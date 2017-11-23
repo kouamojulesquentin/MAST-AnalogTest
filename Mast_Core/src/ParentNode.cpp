@@ -410,6 +410,34 @@ shared_ptr<ParentNode> ParentNode::FindParentOfNode (shared_ptr<SystemModelNode>
 //---------------------------------------------------------------------------
 
 
+//! Adds new child node before current children
+//!
+//! @note It forms a singly linked list of children
+//! @note If added child has sibbling, then all of them will be placed before
+//!       current first child
+//!
+//! @param pChild Child to add as the first child
+//!
+void ParentNode::PrependChild (std::shared_ptr<SystemModelNode> pChild)
+{
+  if (m_pOptionalChildAppender)
+  {
+    m_pOptionalChildAppender->PrependChild(pChild);
+  }
+  else if (m_pFirstChild)
+  {
+    pChild->AppendSibling(m_pFirstChild);
+    m_pFirstChild = pChild;
+  }
+  else
+  {
+    m_pFirstChild = pChild;
+  }
+}
+//
+//  End of ParentNode::PrependChild
+//---------------------------------------------------------------------------
+
 //===========================================================================
 // End of ParentNode.cpp
 //===========================================================================

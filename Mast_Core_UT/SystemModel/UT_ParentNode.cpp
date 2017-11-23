@@ -80,9 +80,9 @@ void UT_ParentNode::test_constructor ()
 
 //! Checks ParentNode::AppendChild() when it is the first child
 //!
-//! @note As this is an abstract base class, it uses a Chain to have an instance
+//! @note As this is an abstract base class, it uses a Chain to construct an instance
 //!
-void UT_ParentNode::test_AppendChild_1 ()
+void UT_ParentNode::test_AppendChild_1st ()
 {
   // ---------------- Setup
   //
@@ -101,11 +101,11 @@ void UT_ParentNode::test_AppendChild_1 ()
 }
 
 
-//! Checks ParentNode::AppendChild() when it is the second child
+//! Checks ParentNode::AppendChild() when it is the second added child
 //!
-//! @note As this is an abstract base class, it uses a Chain to have an instance
+//! @note As this is an abstract base class, it uses a Chain to construct an instance
 //!
-void UT_ParentNode::test_AppendChild_2 ()
+void UT_ParentNode::test_AppendChild_2nd ()
 {
   // ---------------- Setup
   //
@@ -126,11 +126,101 @@ void UT_ParentNode::test_AppendChild_2 ()
   TS_ASSERT_EQUALS_PTR (node_1->NextSibling(),     node_2);
 }
 
-//! Checks ParentNode::SetChildAppender()
+
+//! Checks ParentNode::PrependChild() when it is the first child
 //!
-//! @note As this is an abstract base class, it uses a Chain to have an instance
+//! @note As this is an abstract base class, it uses a Chain to construct an instance
 //!
-void UT_ParentNode::test_SetChildAppender ()
+void UT_ParentNode::test_PrependChild_1st ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = Chain("chain");
+  auto node_1 = make_shared<Chain>("node 1");
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.PrependChild(node_1));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS     (sut.DirectChildrenCount(), 1);
+  TS_ASSERT_EQUALS_PTR (sut.FirstChild(),          node_1);
+  TS_ASSERT_NULLPTR    (sut.ChildAppender());
+}
+
+
+
+
+
+//! Checks ParentNode::PrependChild() when it is the second added child
+//!
+//! @note As this is an abstract base class, it uses a Chain to construct an instance
+//!
+void UT_ParentNode::test_PrependChild_2nd ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = Chain("chain");
+  auto node_1 = make_shared<Chain>("node 1");
+  auto node_2 = make_shared<Chain>("node 2");
+
+  sut.PrependChild(node_1);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.PrependChild(node_2));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS     (sut.DirectChildrenCount(), 2);
+  TS_ASSERT_EQUALS_PTR (sut.FirstChild(),          node_2);
+  TS_ASSERT_EQUALS_PTR (node_2->NextSibling(),     node_1);
+}
+
+//! Checks ParentNode::PrependChild() when added child has sibblings
+//!
+//! @note As this is an abstract base class, it uses a Chain to construct an instance
+//!       Chain are also the simpler nodes to construct
+//!
+void UT_ParentNode::test_PrependChild_with_Sibbling ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = Chain("chain");
+  auto node_1 = make_shared<Chain>("node 1");
+  auto node_2 = make_shared<Chain>("node 2");
+  auto node_3 = make_shared<Chain>("node 3");
+  auto node_4 = make_shared<Chain>("node 4");
+  auto node_5 = make_shared<Chain>("node 5");
+
+  node_3->AppendSibling(node_4);
+  node_3->AppendSibling(node_5);
+
+  sut.PrependChild(node_1);
+  sut.PrependChild(node_2);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.PrependChild(node_3));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS     (sut.DirectChildrenCount(), 5);
+  TS_ASSERT_EQUALS_PTR (sut.FirstChild(),          node_3);
+  TS_ASSERT_EQUALS_PTR (node_3->NextSibling(),     node_4);
+  TS_ASSERT_EQUALS_PTR (node_4->NextSibling(),     node_5);
+  TS_ASSERT_EQUALS_PTR (node_5->NextSibling(),     node_2);
+  TS_ASSERT_EQUALS_PTR (node_2->NextSibling(),     node_1);
+  TS_ASSERT_NULLPTR    (node_1->NextSibling());
+  TS_ASSERT_NULLPTR    (sut.ChildAppender());
+}
+
+//! Checks ParentNode::SetChildAppender() checking using ParentNode::Append
+//!
+//! @note As this is an abstract base class, it uses a Chain to construct an instance
+//!
+void UT_ParentNode::test_SetChildAppender_with_Append ()
 {
   // ---------------- Setup
   //
@@ -161,6 +251,49 @@ void UT_ParentNode::test_SetChildAppender ()
   TS_ASSERT_EQUALS_PTR (node_2->NextSibling(),         node_3);
   TS_ASSERT_NULLPTR    (node_3->NextSibling());
 }
+
+
+//! Checks ParentNode::SetChildAppender() checking using ParentNode::Prepend
+//!
+//! @note As this is an abstract base class, it uses a Chain to construct an instance
+//!
+void UT_ParentNode::test_SetChildAppender_with_Prepend ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = Chain("chain");
+  auto node_1 = make_shared<Chain>("node 1");
+  auto node_2 = make_shared<Chain>("node 2");
+  auto node_3 = make_shared<Chain>("node 3");
+  auto node_4 = make_shared<Chain>("node 4");
+  auto node_5 = make_shared<Chain>("node 5");
+
+  sut.AppendChild(node_1);
+  sut.AppendChild(node_2);
+  sut.AppendChild(node_3);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.SetChildAppender(node_2));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS_PTR (sut.ChildAppender(), node_2);
+
+  sut.PrependChild(node_4);
+  sut.PrependChild(node_5);
+
+  TS_ASSERT_EQUALS     (sut.DirectChildrenCount(),     3);
+  TS_ASSERT_EQUALS_PTR (sut.FirstChild(),              node_1);
+  TS_ASSERT_EQUALS_PTR (node_1->NextSibling(),         node_2);
+  TS_ASSERT_EQUALS_PTR (node_2->NextSibling(),         node_3);
+  TS_ASSERT_NULLPTR    (node_3->NextSibling());
+  TS_ASSERT_EQUALS     (node_2->DirectChildrenCount(), 2);
+  TS_ASSERT_EQUALS_PTR (node_2->FirstChild(),          node_5);
+  TS_ASSERT_EQUALS_PTR (node_5->NextSibling(),         node_4);
+  TS_ASSERT_NULLPTR    (node_4->NextSibling());
+}
+
 
 //! Checks ParentNode::DisconnectEndPoint() when first and only one
 //!

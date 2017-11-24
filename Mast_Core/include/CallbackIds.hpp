@@ -15,6 +15,7 @@
 #ifndef CallbackIds_H__B0FE4245_A913_4634_F1BD_725570BFDC80__INCLUDED_
   #define CallbackIds_H__B0FE4245_A913_4634_F1BD_725570BFDC80__INCLUDED_
 
+typedef  uint32_t Callback_t;
 
 #define SVF             "SVF"
 #define TRSRT           "TRSRT"

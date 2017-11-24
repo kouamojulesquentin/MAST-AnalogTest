@@ -52,7 +52,7 @@ void DataCycleVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator&accessInterfaceTranslator)
 
 {
- auto lambda = [this] (AccessInterface accessInterface) {m_manager->DoHierarchicalDataCycle(&accessInterface);};
+ auto AI_data_cycle = [this] (AccessInterface accessInterface) {m_manager->DoHierarchicalDataCycle(&accessInterface);};
   VisitChildren(accessInterfaceTranslator);
   //SystemModelChecker guarantess the only child is an AccessInterface with a Raw protocol
   auto accessInterface = *std::dynamic_pointer_cast<AccessInterface>(accessInterfaceTranslator.FirstChild());
@@ -61,10 +61,18 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
   if (accessInterfaceTranslator.IsPending())
   {
    //Launch DoHierarchicalDataCycle as a separate thread
-    std::thread AI_thread(lambda,accessInterface);
-   //Wait on Queue
-   
-   AI_thread.join();
+    std::thread AI_thread(AI_data_cycle,accessInterface);
+   //Wait on Queue for a CallbackRequest from AI
+   //NB: it is a BLOCKING call
+   auto result = accessInterfaceTranslator.PopRequest();
+      //At this moment, the AI Callback is waiting on the Result queue
+
+  //Execute callback translator
+  
+  //Push fromSut to wake AI_thread up
+    //accessInterfaceTranslator.PushfromSut(test);
+
+   AI_thread.join(); //AI thread is finished, join for a clean exit
   }
 }
 //

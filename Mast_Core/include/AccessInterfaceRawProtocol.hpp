@@ -17,7 +17,7 @@
   #define AccessInterfaceRawProtocol_H__B0FE4245_A913_4634_F1BD_725570BFDC80__INCLUDED_
 
 #include "AccessInterfaceProtocol.hpp"
-#include "AccessInterfaceTranslator.hpp"
+#include "AccessInterfaceTranslator.hpp" //temporary, only to force lone hpp compilation 
 #include "BinaryVector.hpp"
 #include "CallbackIds.hpp"
 #include <experimental/string_view>

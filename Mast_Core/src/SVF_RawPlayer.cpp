@@ -34,7 +34,12 @@ BinaryVector SVF_RawPlayer::DoCallback (uint32_t endpointId, void* /* interfaceD
 {
   BinaryVector result;
   
-  auto request = new CallbackRequest(CallbackId(endpointId),toSutData);
+  //Prepapre formatted SVF data
+  ostringstream os;
+  os << toSutData.BitsCount() << " TDI(" << SVFVector(toSutData).Data() << ");\n";
+  auto svfFormattedData = os.str();
+
+  auto request = new CallbackRequest(CallbackId(endpointId),toSutData,svfFormattedData);
   ParentInterface()->PushRequest(*request);
   
   if (endpointId != 0) //check for result only if not reset
@@ -50,12 +55,14 @@ BinaryVector SVF_RawPlayer::DoCallback (uint32_t endpointId, void* /* interfaceD
 //!
 void SVF_RawPlayer::DoReset(bool doSynchronousReset)
 {
+  if (doSynchronousReset){}; //Null operation, used to silence warning
+
   auto request = new CallbackRequest(CallbackId(0));
   ParentInterface()->PushRequest(*request);
 }
 
 //
-//  End of: SVF_RawPlayer::CreateSVFCommand
+//  End of: SVF_RawPlayer::DoReset
 //---------------------------------------------------------------------------
 
 

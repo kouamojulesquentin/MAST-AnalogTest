@@ -18,6 +18,7 @@
 #include "BinaryVector.hpp"
 #include "CallbackRequest.hpp"
 #include "MTQueue.hpp"
+#include "AccessInterfaceTranslatorProtocol.hpp"
 #include <functional>
 #include <vector>
 #include <queue>          // std::queue
@@ -42,6 +43,8 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
 
   virtual std::experimental::string_view TypeName() const override { return "AccessInterfaceTranslator"; } //!< Returns readable type name
   
+  //Control of message queues 
+
   void PushRequest(CallbackRequest Request) {m_CallbackQueue.Push(Request);}; //!<Queues a new Callback Request
   CallbackRequest PopRequest() {return m_CallbackQueue.Pop();}; //!<returns the oldest request. NB: it is a BLOCKING call
 

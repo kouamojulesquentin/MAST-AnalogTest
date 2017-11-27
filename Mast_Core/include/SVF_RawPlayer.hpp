@@ -49,7 +49,7 @@ class MAST_CORE_EXPORT SVF_RawPlayer final: public AccessInterfaceRawProtocol
   //!
   std::string CallbackId(int EndPoint) const { 
      switch (EndPoint){
-       case 0: return TRSRT; 
+       case 0: return TRST; 
        case 1: return SIR; 
        case 2: return SDR; 
        default: return UNDEFINED;

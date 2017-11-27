@@ -33,13 +33,19 @@ using std::ostringstream;
 BinaryVector SVF_RawPlayer::DoCallback (uint32_t endpointId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   BinaryVector result;
+  string svfFormattedData;
+  BinaryVector callback_toSutData;
   
   //Prepapre formatted SVF data
   ostringstream os;
-  os << toSutData.BitsCount() << " TDI(" << SVFVector(toSutData).Data() << ");\n";
-  auto svfFormattedData = os.str();
+  os << toSutData.BitsCount() << " TDI(" << SVFVector(toSutData).Data() << ");";
+  if (endpointId != 0) //No data in the request dor Reset operation
+      {
+      svfFormattedData = os.str();
+      callback_toSutData = toSutData;
+      }
 
-  auto request = new CallbackRequest(CallbackId(endpointId),toSutData,svfFormattedData);
+  auto request = new CallbackRequest(CallbackId(endpointId),callback_toSutData,svfFormattedData);
   ParentInterface()->PushRequest(*request);
   
   if (endpointId != 0) //check for result only if not reset

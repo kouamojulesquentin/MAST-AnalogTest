@@ -18,7 +18,7 @@
 typedef  uint32_t Callback_t;
 
 #define SVF             "SVF"
-#define TRSRT           "TRSRT"
+#define TRST           "TRST"
 #define SIR             "SIR"
 #define SDR             "SDR"
 #define UNDEFINED       "UNDEFINED"

@@ -99,7 +99,7 @@ void UT_SVF_RawPlayer::test_CallbackIds ()
   //
   SVF_RawPlayer sut;
   TS_ASSERT_EQUALS(sut.MaxSupportedEndPoints(),3u);
-  TS_ASSERT_EQUALS(sut.CallbackId(0),TRSRT);
+  TS_ASSERT_EQUALS(sut.CallbackId(0),TRST);
   TS_ASSERT_EQUALS(sut.CallbackId(1),SIR);
   TS_ASSERT_EQUALS(sut.CallbackId(2),SDR);
   TS_ASSERT_EQUALS(sut.CallbackId(3),UNDEFINED);
@@ -122,7 +122,7 @@ void UT_SVF_RawPlayer::test_doReset ()
   //Direct call to reset
  sut.DoReset(true);
  auto result = Interface->PopRequest();
-  TS_ASSERT_EQUALS(result.CallbackId(),TRSRT);
+  TS_ASSERT_EQUALS(result.CallbackId(),TRST);
 
 }
 
@@ -146,19 +146,22 @@ void UT_SVF_RawPlayer::test_Callbacks ()
   //Reset as Callback 0 : does not need a fromSUT value
  sut.DoCallback(0,nullptr,test);
  auto result = Interface->PopRequest();
- TS_ASSERT_EQUALS(result.CallbackId(),TRSRT);
+ TS_ASSERT_EQUALS(result.CallbackId(),TRST);
+ TS_ASSERT_EQUALS(result.FormattedData(),""); 
 
   //Callback 1 : SIR
   Interface->PushfromSut(test);
  sut.DoCallback(1,nullptr,test);
  result = Interface->PopRequest();
  TS_ASSERT_EQUALS(result.CallbackId(),SIR);
+ TS_ASSERT_EQUALS(result.FormattedData(),"2 TDI(01);");
 
   //Callback 2 : SDR
   Interface->PushfromSut(test);
  sut.DoCallback(2,nullptr,test);
  result = Interface->PopRequest();
  TS_ASSERT_EQUALS(result.CallbackId(),SDR);
+ TS_ASSERT_EQUALS(result.FormattedData(),"2 TDI(01);");
 
   //Callback 3 : UNDEFINED
   Interface->PushfromSut(test);
@@ -190,7 +193,7 @@ void UT_SVF_RawPlayer::test_Callbacks_multithread ()
   //Reset as Callback 0 : does not need a fromSUT value
     std::thread AI_thread(callback_thread,sut,0,test);
  auto result = Interface->PopRequest();
- TS_ASSERT_EQUALS(result.CallbackId(),TRSRT);
+ TS_ASSERT_EQUALS(result.CallbackId(),TRST);
  AI_thread.join();
 
   //Callback 1 : SIR

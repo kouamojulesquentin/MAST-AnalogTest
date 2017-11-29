@@ -86,6 +86,21 @@ AST_ScanMux* AST_Module::FindScanMux (const AST_Identifier* identifier)
 //---------------------------------------------------------------------------
 
 
+//! Searches for a ScanOutputPort with specified identifier
+//!
+//! @param identifier   An identifier for ScanOutputPort to find
+//!
+AST_Port* AST_Module::FindScanOutPort (const AST_Identifier* identifier)
+{
+  CHECK_PARAMETER_NOT_NULL(identifier, "Cannot find ScanOutputPort from nullptr identifier");
+
+  return FindNode(m_scanOutPorts, identifier);
+}
+//
+//  End of: AST_Module::FindScanRegister
+//---------------------------------------------------------------------------
+
+
 //! Searches for a ScanRegister with specified identifier
 //!
 //! @param identifier   An identifier for ScanRegister to find
@@ -207,11 +222,32 @@ void AST_Module::UniquifyInstances (AST_Builder& astBuilder)
     const auto  instanceModule   = network->Module(moduleId);
     auto        newModule        = instanceModule->Uniquify(astBuilder, parameters);
     auto        moduleIdentifier = astBuilder.Create_UniquifiedModuleIdentifier(newModule);
+
+    newModule->m_parentModule = this;
     instance->UniquifiedModule(newModule, moduleIdentifier);
   }
 }
 //
 //  End of: AST_Module::UniquifyInstances
+//---------------------------------------------------------------------------
+
+
+//! Uniquifies module scan multiplexers
+//!
+//! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
+//!
+void AST_Module::UniquifyScanMuxes (AST_Builder& astBuilder)
+{
+  for (auto& scanMux : m_scanMuxes)
+  {
+    auto clonedScanMux = astBuilder.Clone_ScanMux(scanMux);
+    scanMux = clonedScanMux;  // Replace current (shared) by cloned (unique)
+
+    //! @todo [JFC]-[November/23/2017]: In UniquifyScanMuxes(): Replace parameter reference(s) of ScanMux
+  }
+}
+//
+//  End of: AST_Module::UniquifyScanMuxes
 //---------------------------------------------------------------------------
 
 

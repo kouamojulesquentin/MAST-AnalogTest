@@ -106,3 +106,4 @@ Module middle__uniquified__2
     ResetValue 7'b010_0010;
   }
 }
+

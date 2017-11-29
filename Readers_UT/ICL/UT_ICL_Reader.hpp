@@ -65,7 +65,7 @@ class UT_ICL_Reader : public CxxTest::TestSuite
   void test_Generate_2_Modules ();
   void test_Generate_N_Modules ();
   void test_Generate_SIB_mux_pre ();
-//+  void test_Generate_Single_SIB_3WI ();
+  void test_Generate_Single_SIB_3WI ();
 
   // ================ Other Methods ================
 

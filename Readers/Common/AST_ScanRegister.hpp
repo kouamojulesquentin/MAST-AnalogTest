@@ -78,6 +78,9 @@ class AST_ScanRegister final : public AST_ParentNode
   //!
   void  AssociatedRegister (std::shared_ptr<mast::Register> associatedRegister) { m_associatedModelRegister = associatedRegister; };
 
+  //! Tells if ScanRegister is already associated with a SystemModel Register
+  //!
+  bool HasAssociatedRegister() const { return m_associatedModelRegister ? true : false; }
 
   // ---------------- Private Methods
   //
@@ -110,7 +113,7 @@ class AST_ScanRegister final : public AST_ParentNode
   const AST_Value*                m_resetValue       = nullptr; //!< Scan register reset value expression
   const AST_Value*                m_defaultLoadValue = nullptr; //!< Scan register default load value expression
   const AST_Source*               m_scanInSource     = nullptr; //!< Scan register input source
-  std::shared_ptr<mast::Register> m_associatedModelRegister;    //!< Associated register once mast model is created (this is used mainly to ScanMux processing context during SystemModel creation)
+  std::shared_ptr<mast::Register> m_associatedModelRegister;    //!< Associated register once mast model is created (during SystemModel creation)
 };
 //
 //  End of AST_ScanRegister class declaration

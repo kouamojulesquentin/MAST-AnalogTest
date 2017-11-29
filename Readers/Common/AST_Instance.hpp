@@ -18,6 +18,13 @@
 
 #include <string>
 #include <vector>
+
+namespace mast
+{
+class Chain;
+}
+
+
 namespace Parsers
 {
 class AST_Identifier;
@@ -79,13 +86,23 @@ class AST_Instance final : public AST_ParentNode
   //!
   //! @note During unification, all parameters reference down the instantiation hierarchy have been resolved
   //!
-  const AST_Module* UniquifiedModule() const { return m_uniquifiedModule; }
+  AST_Module* UniquifiedModule() const { return m_uniquifiedModule; }
 
   //! Sets unique module representing that very instance
   //!
   //! @note It must be call only once by the unification process
   //!
-  void  UniquifiedModule (const AST_Module* uniquifiedModule, const AST_ModuleIdentifier* identifier) ;
+  void  UniquifiedModule (AST_Module* uniquifiedModule, const AST_ModuleIdentifier* identifier) ;
+
+  std::shared_ptr<mast::Chain> AssociatedChain() { return m_associatedModelChain; }  //!< Mast SystemModel associated chain (when not null)
+
+  //! Sets Mast SystemModel associated chain (when creating SystemModel)
+  //!
+  void  AssociatedChain (std::shared_ptr<mast::Chain> associatedChain) { m_associatedModelChain = associatedChain; };
+
+  //! Tells if ScanChain is already associated with a SystemModel Chain
+  //!
+  bool HasAssociatedChain() const { return m_associatedModelChain ? true : false; }
 
   // ---------------- Private Methods
   //
@@ -137,12 +154,13 @@ class AST_Instance final : public AST_ParentNode
   // ---------------- Private Fields
   //
   private:
-  const AST_ScalarIdentifier* m_instanceIdentifier = nullptr; //!< Instance name
-  const AST_ModuleIdentifier* m_moduleIdentifier   = nullptr; //!< Identifies module to instantiate
-  const AST_Module*           m_uniquifiedModule   = nullptr; //!< During unification process, this is set to unique module for that instance - m_moduleIdentifier still refer to non uniquified (ICL) module -
-  std::vector<AST_Parameter*> m_parameters;                   //!< Parameters for module instantiation
-  std::vector<AST_Attribute*> m_attributes;                   //!< Instance attributes
-  std::vector<AST_Port*>      m_inputPorts;                   //!< Instance input ports (connections in enclosing module)
+  const AST_ScalarIdentifier*  m_instanceIdentifier = nullptr; //!< Instance name
+  const AST_ModuleIdentifier*  m_moduleIdentifier   = nullptr; //!< Identifies module to instantiate
+  AST_Module*                  m_uniquifiedModule   = nullptr; //!< During unification process, this is set to unique module for that instance - m_moduleIdentifier still refer to non uniquified (ICL) module -
+  std::vector<AST_Parameter*>  m_parameters;                   //!< Parameters for module instantiation
+  std::vector<AST_Attribute*>  m_attributes;                   //!< Instance attributes
+  std::vector<AST_Port*>       m_inputPorts;                   //!< Instance input ports (connections in enclosing module)
+  std::shared_ptr<mast::Chain> m_associatedModelChain;         //!< Associated chain once mast model is created (SystemModel creation)
 };
 //
 //  End of AST_Instance class declaration

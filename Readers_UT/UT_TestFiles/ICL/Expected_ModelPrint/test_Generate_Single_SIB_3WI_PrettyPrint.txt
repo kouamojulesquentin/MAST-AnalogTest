@@ -1,0 +1,15 @@
+[Chain]        "Single_SIB_3WI"
+ [Chain]        "SIB1"
+  [Linker]       "SIBmux"
+   :Selector:     "SR", kind: Table_Based, can_select_none: 1, inverted_bits: 0, reversed_order: 0
+   [Chain]        "SIBmux_1", ignore_in_path: true
+    [Chain]        "WI1"
+     [Chain]        "reg8"
+      [Register]     "SR", length: 1, bypass: 0
+    [Chain]        "WI2"
+     [Chain]        "reg8"
+      [Register]     "SR", length: 1, bypass: 0
+    [Chain]        "WI3"
+     [Chain]        "reg8"
+      [Register]     "SR", length: 1, bypass: 0
+  [Register]     "SR", length: 1, bypass: 0

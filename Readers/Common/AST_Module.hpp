@@ -15,7 +15,6 @@
   #define AST_MODULE_H__A9A400A_9537_4176_349E_822BAF7E4956__INCLUDED_
 
 #include "AST_ParentNode.hpp"
-#include "AST_ScalarIdentifier.hpp"
 #include <memory>
 #include <string>
 
@@ -112,6 +111,10 @@ class AST_Module final : public AST_ParentNode
   //!
   AST_ScanMux* FindScanMux (const AST_Identifier* identifier);
 
+  //! Searches for a ScanOutputPort with specified identifier
+  //!
+  AST_Port* FindScanOutPort (const AST_Identifier* identifier);
+
   //! Searches for a ScanRegister with specified identifier
   //!
   AST_ScanRegister* FindScanRegister (const AST_Identifier* identifier);
@@ -150,28 +153,9 @@ class AST_Module final : public AST_ParentNode
   //!
   void DispatchChildren () override;
 
-  //! Searches for a AST_Node of some kind with specified identifier
-  //!
-  //! @param nodes        Collection of nodes to search into
-  //! @param identifier   An identifier for ScanRegister to find
-  //!
-  template<typename T>
-  T* FindNode (const std::vector<T*>& nodes, const AST_Identifier* identifier) const
-  {
-    T* foundNode = nullptr;
-
-    for (auto node : nodes)
-    {
-      if (node->Identifier()->Name() == identifier->Name())
-      {
-        foundNode = node;
-        break;
-      }
-    }
-    return foundNode;
-  }
 
   void Uniquify_impl         (AST_Builder& astBuilder, const std::vector<AST_Parameter*>& parameters);
+  void UniquifyScanMuxes     (AST_Builder& astBuilder);
   void UniquifyScanRegisters (AST_Builder& astBuilder);
 
   // ---------------- Private Fields
@@ -180,6 +164,7 @@ class AST_Module final : public AST_ParentNode
   const AST_ScalarIdentifier*     m_identifier         = nullptr; //!< Module name (change during unification)
   const AST_ScalarIdentifier*     m_originalIdentifier = nullptr; //!< Module name prior to unification
   AST_AccessLink*                 m_accessLink         = nullptr; //!< AccessLink: for top module (only one per network)
+  AST_Module*                     m_parentModule       = nullptr; //!< When uniquified, tells hierarchical, direct, parent module this one is instanciated (using an Instance)
   std::vector<AST_Parameter*>     m_parameters;                   //!< Generic module  parameters
   std::vector<AST_Parameter*>     m_localParameters;              //!< Module local parameters
   std::vector<AST_ScanInterface*> m_scanInterfaces;               //!< Scan interfaces

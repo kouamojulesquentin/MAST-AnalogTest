@@ -92,6 +92,18 @@ AST_Module* AST::Clone_Module (const AST_Module* module)
 //---------------------------------------------------------------------------
 
 
+
+//! Clones a scan multiplexer
+//!
+AST_ScanMux* AST::Clone_ScanMux (const AST_ScanMux* scanMux)
+{
+  return Clone_Node(scanMux);
+}
+//
+//  End of: AST::Clone_ScanMux
+//---------------------------------------------------------------------------
+
+
 //! Clones a scan register
 //!
 AST_ScanRegister* AST::Clone_ScanRegister (const AST_ScanRegister* scanRegister)

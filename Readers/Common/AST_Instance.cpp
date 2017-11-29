@@ -67,18 +67,7 @@ const AST_Port* AST_Instance::FindInputPort (const AST_Identifier* identifier) c
 {
   CHECK_PARAMETER_NOT_NULL(identifier, "Cannot find InputPort from nullptr identifier");
 
-  AST_Port* foundInputPort = nullptr;
-
-  for (auto inputPort : m_inputPorts)
-  {
-    if (inputPort->Identifier()->Name() == identifier->Name())
-    {
-      foundInputPort = inputPort;
-      break;
-    }
-  }
-
-  return foundInputPort;
+  return FindNode(m_inputPorts, identifier);
 }
 //
 //  End of: AST_Instance::FindInputPort
@@ -100,7 +89,7 @@ string AST_Instance::Name () const
 //!
 //! @note It must be call only once by the unification process
 //!
-void AST_Instance::UniquifiedModule (const AST_Module* uniquifiedModule, const AST_ModuleIdentifier* identifier)
+void AST_Instance::UniquifiedModule (AST_Module* uniquifiedModule, const AST_ModuleIdentifier* identifier)
 {
   m_uniquifiedModule = uniquifiedModule;
   m_moduleIdentifier = identifier;

@@ -18,12 +18,16 @@
 
 #include <memory>
 #include <vector>
+#include <stack>
 #include <tuple>
 #include <functional>
 
 namespace mast
 {
 class Chain;
+class Linker;
+class ParentNode;
+class PathSelector;
 class UnresolvedPathSelector;
 class SystemModel;
 class SystemModelNode;
@@ -32,12 +36,10 @@ class SystemModelBuilder;
 
 namespace Parsers
 {
-//+class AST_AccessLink;
 class AST_Instance;
 class AST_Module;
 class AST_Network;
-//+class AST_Port;
-//+class AST_ScanInterface;
+class AST_Port;
 class AST_Signal;
 class AST_ScanMux;
 class AST_ScanMuxSelection;
@@ -57,36 +59,68 @@ class AST_SystemModelGenerator final
 
   //! Generates a SystemModel (sub-)tree from AST_Network
   //!
-  std::shared_ptr<mast::SystemModelNode> Generate(AST_Network* network);
+  std::shared_ptr<mast::ParentNode> Generate(AST_Network* network);
 
   // ---------------- Private Methods
   //
   private:
-//+  AST_Source* FindSourceOfSignals (const std::vector<Parsers::AST_Signal*>& signals) const;
+  using SourceSignals_t     = std::vector<AST_Signal*>;
+  using SourceSignalsRef_t  = std::reference_wrapper<const SourceSignals_t>;
+  using ProcessingContext_t = std::tuple<AST_Module*, SourceSignalsRef_t>;
 
-  std::tuple<std::shared_ptr<mast::SystemModelNode>, const AST_Source*> Generate_Instance     (AST_Instance*     instance, AST_Module* instanceModule);
-  std::tuple<std::shared_ptr<mast::SystemModelNode>, const AST_Source*> Generate_ScanRegister (AST_ScanRegister* scanRegister);
+  std::shared_ptr<mast::PathSelector> Create_PathSelector   (AST_ScanMux* scanMux, AST_Module* module, bool firstSelectionIsEmpty);
+  std::vector<AST_ScanRegister*>      FindSelectorRegisters (const SourceSignals_t&,  AST_Module* module) const;
+  std::shared_ptr<mast::ParentNode>   Generate_Network      (AST_Network* network);
+  void                                Generate_TopModule    (mast::Chain* chain, AST_Module* topModule);
 
 
-  using Generate_ScanMux_Result_t = std::tuple<std::shared_ptr<mast::SystemModelNode>, std::reference_wrapper<const std::vector<AST_Signal*>>>;
+  void FollowTopModulePath (AST_Module* module, const AST_Port* scanOutPort);
 
-  Generate_ScanMux_Result_t Generate_ScanMux (AST_ScanMux* scanMux, AST_Module* module);
+  SourceSignalsRef_t  Process_Instance_Entry (AST_Instance*     instance, AST_Module* instanceModule, const AST_Port* scanOutPort);
+  ProcessingContext_t Process_Instance_Exit  (AST_Port* scanInPort);
+  SourceSignalsRef_t  Process_ScanMux_Entry  (AST_ScanMux*      scanMux,  AST_Module* module);
+  ProcessingContext_t Process_ScanMux_Selection ();
+  SourceSignalsRef_t  Process_ScanRegister   (AST_ScanRegister* scanRegister);
 
-  std::shared_ptr<mast::SystemModelNode> Generate_Network (AST_Network* network);
-  void                                   Generate_Module  (mast::Chain* chain, AST_Module* module);
+  void AppendCreatedNodesToParent (mast::ParentNode* parent, size_t levelThreshold);
 
-  std::vector<AST_ScanRegister*>  FindSelectorRegisters (const std::vector<Parsers::AST_Signal*>&,  AST_Module* module) const;
+
+  std::tuple<bool, AST_Port*> IsSourcedByModuleInput (const AST_Module* module, const SourceSignals_t& signals) const;
 
   using SelectionTables_t = std::tuple<std::vector<mast::BinaryVector>, std::vector<mast::BinaryVector>>;
-  SelectionTables_t MakeSelectionTable (const std::vector<AST_ScanMuxSelection*>&, size_t expectedBitsCount) const;
+  SelectionTables_t MakeSelectionTable (const std::vector<AST_ScanMuxSelection*>&, size_t expectedBitsCount, bool firstSelectionIsEmpty) const;
 
   // ---------------- Private Fields
   //
   private:
+  struct InstanceContext final
+  {
+    AST_Instance*     instance          = nullptr;  //!< Processed instance
+    AST_Module*       parentModule      = nullptr;  //!< Module in which Instance is found
+    mast::ParentNode* parentNode        = nullptr;  //!< Parent node in which children should be appended
+    size_t            createdNodesLevel = 0;        //!< To know how many to consider as children
+    bool              parentIsLinker    = false;    //!< When true, parentNode represents a Linker (only in this context)
+  };
+
+  //! Saves processing context in which a ScanMux is reached an converted to a linker
+  //!
+  struct LinkerContext final
+  {
+    InstanceContext instanceContext;                //!< Processing context of instance in which the ScanMux is found
+    AST_ScanMux*    processedScanMux     = nullptr; //!< Scan mux being processed
+    size_t          processedSelectionId = 0;       //!< Offset in Selection vector (to detect how many children must be associated to the Linker)
+    size_t          linkerNodesLevel     = 0;       //!< To know how many to consider as Linker children
+    mast::Linker*   linker               = nullptr; //!< Created Linker
+  };
+
+
   std::shared_ptr<mast::SystemModel>                         m_systemModel;             //!< SystemModel currently being built
   std::unique_ptr<mast::SystemModelBuilder>                  m_builder;                 //!< Helper to build SystemModel nodes
-  std::shared_ptr<mast::SystemModelNode>                     m_parsedTopNode;           //!< SystemModel tree build from ICL file
+  std::shared_ptr<mast::ParentNode>                          m_parsedTopNode;           //!< SystemModel tree build from ICL file
+  std::stack<std::shared_ptr<mast::SystemModelNode>>         m_createdNodes;            //!< Created children not yet attached to its parent
   std::vector<std::shared_ptr<mast::UnresolvedPathSelector>> m_unresolvedPathSelectors; //!< Unresolved Linkers (those for which selector Register(s) where not yet created when Linkers were)
+  std::stack<InstanceContext>                                m_instancesContext;        //!< Current module/instance contexts (represents current instanciation path)
+  std::stack<LinkerContext>                                  m_linkersContext;          //!< To recover processing context for linkers (need only access to last one)
   AST_Network*                                               m_network = nullptr;       //!< Test network AST used to generate SystemModel tree
 };
 //

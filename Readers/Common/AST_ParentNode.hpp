@@ -16,6 +16,8 @@
   #define AST_PARENTNODE_H__9C01A73E_808_43D6_A6B3_243B7A5440B__INCLUDED_
 
 #include "AST_NamedNode.hpp"
+#include "AST_ScalarIdentifier.hpp"
+
 #include <vector>
 
 namespace Parsers
@@ -80,6 +82,26 @@ class AST_ParentNode : public AST_NamedNode
     child = nullptr;
   };
 
+  //! Searches for a AST_Node of some kind with specified identifier
+  //!
+  //! @param nodes        Collection of nodes to search into
+  //! @param identifier   An identifier for ScanRegister to find
+  //!
+  template<typename T>
+  static T* FindNode (const std::vector<T*>& nodes, const AST_Identifier* identifier)
+  {
+    T* foundNode = nullptr;
+
+    for (auto node : nodes)
+    {
+      if (node->Identifier()->Name() == identifier->Name())
+      {
+        foundNode = node;
+        break;
+      }
+    }
+    return foundNode;
+  }
 
   // ---------------- Protected Fields
   //

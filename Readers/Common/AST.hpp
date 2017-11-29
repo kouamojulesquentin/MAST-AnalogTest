@@ -123,6 +123,7 @@ class AST final : public AST_Builder
 
   AST_Instance*     Clone_Instance     (const AST_Instance*     instance)     override; //!< Clones an instance
   AST_Module*       Clone_Module       (const AST_Module*       module)       override; //!< Clones a module
+  AST_ScanMux*      Clone_ScanMux      (const AST_ScanMux*      scanMux)      override; //!< Clones a scan multiplexer
   AST_ScanRegister* Clone_ScanRegister (const AST_ScanRegister* scanRegister) override; //!< Clones a scan register
 
   AST_ScalarIdentifier* Create_UniquifiedIdentifier       (const AST_ScalarIdentifier* identifier) override; //!< Creates an identifier for a uniquified entity

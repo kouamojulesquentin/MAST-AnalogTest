@@ -23,6 +23,11 @@
 #include <vector>
 #include <queue>          // std::queue
 
+#include "g3log/g3log.hpp"
+
+using namespace std::chrono;
+using namespace std::chrono_literals;
+
 namespace mast
 {
 
@@ -34,22 +39,38 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
   //
   public:
   ~AccessInterfaceTranslator() = default;
-  AccessInterfaceTranslator()  = default;
-  AccessInterfaceTranslator(std::experimental::string_view name)
+  AccessInterfaceTranslator()  = delete;
+  AccessInterfaceTranslator(std::experimental::string_view name,std::shared_ptr<AccessInterfaceTranslatorProtocol> protocol)
     : ParentNode (name)
+    , m_protocol(protocol)
   {}
 
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
 
   virtual std::experimental::string_view TypeName() const override { return "AccessInterfaceTranslator"; } //!< Returns readable type name
   
+  std::shared_ptr<AccessInterfaceTranslatorProtocol> Protocol() {return m_protocol;}
   //Control of message queues 
 
-  void PushRequest(CallbackRequest Request) {m_CallbackQueue.Push(Request);}; //!<Queues a new Callback Request
-  CallbackRequest PopRequest() {return m_CallbackQueue.Pop();}; //!<returns the oldest request. NB: it is a BLOCKING call
+  void PushRequest(CallbackRequest Request) {
+     m_CallbackQueue.Push(Request);
+     LOG(DEBUG) << "Node " << this->Name()<<" : pushed request for Callback "<<Request.CallbackId()<<'\n';
+     }; //!<Queues a new Callback Request
+  CallbackRequest PopRequest() {  
+     std::cv_status   status;
+     CallbackRequest item; 
+      LOG(DEBUG) << "\nNode " << this->Name()<<" : Popping a request ...n";
+  //   status=m_CallbackQueue.Pop(item,m_timeout);
+     m_CallbackQueue.Pop(item);
+      LOG(DEBUG) << "\nNode " << this->Name()<<" : Pop done\n";
+     CHECK_PARAMETER_NEQ (status, std::cv_status::timeout,"Error, timeout on CallbackRequestQueue->Pop");
+     return item;}; //!<returns the oldest request. NB: it is a BLOCKING call
 
-  void PushfromSut(BinaryVector Result) {m_fromSutQueue.Push(std::make_pair(Result,*(new std::string)));};//!< Queues a new callback result
-  BinaryVector PopfromSut() { return  m_fromSutQueue.Pop().first;};//!< returns the oldest callback result. NB: it is a BLOCKING call
+  void PushfromSut(BinaryVector Result) {m_fromSutQueue.Push(std::make_pair(Result,*(new std::string))); 
+                         LOG(DEBUG) << "\nNode " << this->Name()<<" : pushed a fromSut\n";};//!< Queues a new callback result
+  BinaryVector PopfromSut() { auto result=  m_fromSutQueue.Pop().first; 
+                             LOG(DEBUG) << "\nNode " << this->Name()<<" : popped a fromSut\n";
+                              return result;   };//!< returns the oldest callback result. NB: it is a BLOCKING call
   std::string PopFormattedfromSut() { auto tmp=m_fromSutQueue.Pop(); if (!tmp.second.empty()) return tmp.second; 
                                       else return tmp.first.DataAsBinaryString();};//!< returns the Formatted Data of the oldest callback result. NB: it is a BLOCKING call
 
@@ -60,6 +81,9 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
   //
   private:
   uint32_t                                 m_numberOfEndPoints = 0; //!< Number of nodes (endpoints) accessible through the access interface
+  std::shared_ptr<AccessInterfaceTranslatorProtocol> m_protocol;                //!< Protocol to use to manage Callbacktranslations
+  
+  std::chrono::duration<int,std::milli> m_timeout = 15ms;
   
   MTQueue<CallbackRequest> m_CallbackQueue;  //DataCycleThread pushes to_SUT data and CallbackId to this queue
   MTQueue<std::pair<BinaryVector,std::string>> m_fromSutQueue;   //DataCycleThread waits on this queue to update its registers

@@ -15,6 +15,8 @@
 #include "SystemModelNode.hpp"
 #include "DefaultBinaryPathSelector.hpp"
 #include "LoopbackAccessInterfaceProtocol.hpp"
+#include "SVF_RawPlayer.hpp"
+#include "Spy_Emulation_Translator.hpp"
 
 #include "BinaryVector_Traits.hpp"
 
@@ -148,6 +150,33 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_JTAG_TAP (string_view name,
 //  End of: TestModelBuilder::Create_JTAG_TAP
 //---------------------------------------------------------------------------
 
+//! Creates a new Tap node
+//!
+//!  @param name            Name given to the tap
+//!  @param irBitsCount     IR number of bits (at least one)
+//!  @param muxPathsCount   DR number of path (at least two)
+//!
+//!  ______________________________
+//! |                              |
+//! |     (ACCESS_I:Tap)           |
+//! |      /      \                |
+//! |     /       _\__________     |
+//! | [REG:Ir]  /Linker:Dr_Mux\    |
+//! |           ---------------    |
+//! |             /                |
+//! |        [REG:Bypass]          |
+//! |                              |
+//!  ------------------------------
+//!
+
+shared_ptr<AccessInterface> TestModelBuilder::Create_JTAG_TAP (string_view name, uint32_t irBitsCount, uint32_t muxPathsCount,shared_ptr<AccessInterfaceProtocol> protocol)
+{
+  return m_builder.Create_JTAG_TAP(name, irBitsCount, muxPathsCount, protocol);
+}
+//
+//  End of: TestModelBuilder::Create_JTAG_TAP
+//---------------------------------------------------------------------------
+
 
 //! Creates a simple 1149 tap node with two multiplexed registers
 //!
@@ -173,7 +202,45 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_AccessInterface (s
   return tap;
 }
 //
-//  End of: TestModelBuilder::Create_TestCase_1500
+//  End of: TestModelBuilder::Create_TestCase_AccessInterface
+//---------------------------------------------------------------------------
+
+
+//! Creates a simple 1149 tap node with two multiplexed registers, with an Emulation_Translator as top level
+//!
+//! @note - There are multiple "dynamic" registers
+//!       - The control register is composed with multiple bits
+//!
+//! @param name         Name for top node
+//!
+//! @return Top node of system mode
+//!
+shared_ptr<AccessInterfaceTranslator> TestModelBuilder::Create_TestCase_Emulation_Translator (string_view name)
+{
+  uint32_t muxDrPathCount = 3u;
+  
+  auto raw_protocol = make_shared<SVF_RawPlayer>();
+
+  auto tap     = Create_JTAG_TAP    ("Tap",       DEFAULT_IR_LEN, muxDrPathCount,raw_protocol);
+
+  auto chain_1 = m_model.CreateChain    ("sut_1",    tap);
+  auto reg_1   = m_model.CreateRegister ("static_1", BinaryVector(STATIC_TDR_LEN, 0), chain_1);
+
+  auto chain_2 = m_model.CreateChain    ("sut_2",    tap);
+  auto reg_2   = m_model.CreateRegister ("static_2", BinaryVector(STATIC_TDR_LEN, 0), chain_2);
+
+  auto translator     = m_model.CreateAccessInterfaceTranslator    (name, make_shared<Spy_Emulation_Translator>());
+
+  raw_protocol->SetParentTranslator(translator);
+
+  translator->AppendChild(tap);
+
+  m_model.SetRoot(translator);
+  
+  return translator;
+}
+//
+//  End of: TestModelBuilder::Create_TestCase_AccessInterface
 //---------------------------------------------------------------------------
 
 

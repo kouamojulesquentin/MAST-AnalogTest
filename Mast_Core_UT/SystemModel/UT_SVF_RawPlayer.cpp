@@ -14,6 +14,7 @@
 #include "UT_SVF_RawPlayer.hpp"
 #include "SVF_RawPlayer.hpp"
 #include "Fake_SVF_Simulator.hpp"
+#include "Spy_Emulation_Translator.hpp"
 
 #include "BinaryVector_Traits.hpp"
 #include <tuple>
@@ -46,7 +47,7 @@ void UT_SVF_RawPlayer::test_empty_Constructor ()
   //
   TS_ASSERT_THROWS_NOTHING (SVF_RawPlayer sut());
   SVF_RawPlayer sut;
-  TS_ASSERT_NULLPTR(sut.ParentInterface())
+  TS_ASSERT_NULLPTR(sut.ParentTranslator())
   //checks that it is recognized as a Raw protocol
   
 }
@@ -57,13 +58,13 @@ void UT_SVF_RawPlayer::test_not_empty_Constructor ()
 {
   // ---------------- Setup
   //
- auto Interface = make_shared<AccessInterfaceTranslator> ("Test");
+ auto Interface = make_shared<AccessInterfaceTranslator> ("Test",make_shared<Spy_Emulation_Translator>());
 
   // ---------------- Exercise & Verify
   //
   TS_ASSERT_THROWS_NOTHING (SVF_RawPlayer sut(Interface));
   SVF_RawPlayer sut(Interface);
-  TS_ASSERT_EQUALS(sut.ParentInterface(),Interface) 
+  TS_ASSERT_EQUALS(sut.ParentTranslator(),Interface) 
   auto protocol_is_raw =  dynamic_cast<AccessInterfaceRawProtocol*>(&sut);
   TS_ASSERT_TRUE(protocol_is_raw);
 
@@ -75,15 +76,15 @@ void UT_SVF_RawPlayer::test_set_Interface ()
 {
   // ---------------- Setup
   //
- auto Interface = make_shared<AccessInterfaceTranslator> ("Test");
+ auto Interface = make_shared<AccessInterfaceTranslator> ("Test",make_shared<Spy_Emulation_Translator>());
 
   // ---------------- Exercise & Verify
   //
   TS_ASSERT_THROWS_NOTHING (SVF_RawPlayer sut());
   SVF_RawPlayer sut;
-  TS_ASSERT_NULLPTR(sut.ParentInterface())
-  sut.SetParentInterface(Interface);
-  TS_ASSERT_EQUALS(sut.ParentInterface(),Interface)
+  TS_ASSERT_NULLPTR(sut.ParentTranslator())
+  sut.SetParentTranslator(Interface);
+  TS_ASSERT_EQUALS(sut.ParentTranslator(),Interface)
   
 }
 
@@ -111,10 +112,10 @@ void UT_SVF_RawPlayer::test_doReset ()
 {
   // ---------------- Setup
   //
- auto Interface = make_shared<AccessInterfaceTranslator> ("Test");
+ auto Interface = make_shared<AccessInterfaceTranslator> ("Test",make_shared<Spy_Emulation_Translator>());
   TS_ASSERT_THROWS_NOTHING (SVF_RawPlayer sut());
   SVF_RawPlayer sut;
-  sut.SetParentInterface(Interface);
+  sut.SetParentTranslator(Interface);
 
   // ---------------- Exercise & Verify
   //
@@ -133,10 +134,10 @@ void UT_SVF_RawPlayer::test_Callbacks ()
 {
   // ---------------- Setup
   //
- auto Interface = make_shared<AccessInterfaceTranslator> ("Test");
+ auto Interface = make_shared<AccessInterfaceTranslator> ("Test",make_shared<Spy_Emulation_Translator>());
   TS_ASSERT_THROWS_NOTHING (SVF_RawPlayer sut());
   SVF_RawPlayer sut;
-  sut.SetParentInterface(Interface);
+  sut.SetParentTranslator(Interface);
 
   // ---------------- Exercise & Verify
   //
@@ -177,10 +178,10 @@ void UT_SVF_RawPlayer::test_Callbacks_multithread ()
 {
   // ---------------- Setup
   //
- auto Interface = make_shared<AccessInterfaceTranslator> ("Test");
+ auto Interface = make_shared<AccessInterfaceTranslator> ("Test",make_shared<Spy_Emulation_Translator>());
   TS_ASSERT_THROWS_NOTHING (SVF_RawPlayer sut());
   SVF_RawPlayer sut;
-  sut.SetParentInterface(Interface);
+  sut.SetParentTranslator(Interface);
 
   // ---------------- Exercise & Verify
   //

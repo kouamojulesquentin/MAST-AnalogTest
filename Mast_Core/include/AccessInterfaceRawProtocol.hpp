@@ -33,14 +33,14 @@ class MAST_CORE_EXPORT AccessInterfaceRawProtocol : public AccessInterfaceProtoc
   //
   public:
   virtual ~AccessInterfaceRawProtocol() = default;
-  AccessInterfaceRawProtocol() {m_ParentInterface=nullptr;};
-  AccessInterfaceRawProtocol(std::shared_ptr<AccessInterfaceTranslator> ParentInterface) 
-  {m_ParentInterface=ParentInterface;};
+  AccessInterfaceRawProtocol() {m_ParentTranslator=nullptr;};
+  AccessInterfaceRawProtocol(std::shared_ptr<AccessInterfaceTranslator> ParentTranslator) 
+  {m_ParentTranslator=ParentTranslator;};
 
-  std::shared_ptr<AccessInterfaceTranslator> ParentInterface() {return m_ParentInterface;}
-  void SetParentInterface(std::shared_ptr<AccessInterfaceTranslator> ParentInterface) {m_ParentInterface=ParentInterface;}
+  std::shared_ptr<AccessInterfaceTranslator> ParentTranslator() {return m_ParentTranslator;}
+  void SetParentTranslator(std::shared_ptr<AccessInterfaceTranslator> ParentTranslator) {m_ParentTranslator=ParentTranslator;}
   private:
-  std::shared_ptr<AccessInterfaceTranslator> m_ParentInterface;
+  std::shared_ptr<AccessInterfaceTranslator> m_ParentTranslator;
 
   // ---------------- Protected Methods
   //

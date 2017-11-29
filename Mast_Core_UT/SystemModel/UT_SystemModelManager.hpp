@@ -48,6 +48,7 @@ class UT_SystemModelManager : public CxxTest::TestSuite
   void test_DoDataCycles_1500_Generic ();
   void test_DoDataCycles_1500_Greedy ();
   void test_DoDataCycles_1500_Lazy ();
+  void test_DoDataCycles_AccessInterfaceTranslator ();
 
   void test_DoDataCycles_MIB_Multichain_Pre ();
   void test_DoDataCycles_MIB_Multichain_Pre_Greedy ();

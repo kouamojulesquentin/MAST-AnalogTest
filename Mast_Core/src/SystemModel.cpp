@@ -170,9 +170,11 @@ shared_ptr<Register> SystemModel::CreateRegister (string_view            name,
 //! @return Newly created AccessInterfaceTranslator
 //!
 shared_ptr<AccessInterfaceTranslator> SystemModel::CreateAccessInterfaceTranslator (string_view                         name,
-                                                                shared_ptr<ParentNode>              parentNode)
+                                                                std::shared_ptr<AccessInterfaceTranslatorProtocol> protocol,
+                                                                shared_ptr<ParentNode>              parentNode
+                                                                )
 {
-  auto node = make_shared<AccessInterfaceTranslator> (name);
+  auto node = make_shared<AccessInterfaceTranslator> (name,protocol);
 
   RegisterNode(node);
 

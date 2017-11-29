@@ -20,12 +20,15 @@
 #include "Spy_AccessInterfaceProtocols.hpp"
 #include "Spy_SVF_Protocol.hpp"
 #include "Spy_I2C_Protocol.hpp"
+#include "Spy_Emulation_Translator.hpp"
 #include "GmlPrinter.hpp"
 #include "BinaryVector_Traits.hpp"
 #include "DefaultBinaryPathSelector.hpp"
 #include "ConfigureAlgorithm_LastOrDefault_Greedy.hpp"
 #include "ConfigureAlgorithm_Last_Lazy.hpp"
 #include "g3log/g3log.hpp"
+
+//#include "PrettyPrinter.hpp"
 
 #include <memory>
 #include <vector>
@@ -42,6 +45,7 @@ using std::string;
 using std::experimental::string_view;
 using std::ostringstream;
 using std::vector;
+using std::dynamic_pointer_cast;
 
 using namespace std::chrono_literals;
 using namespace std::string_literals;
@@ -698,6 +702,53 @@ void UT_SystemModelManager::test_DoDataCycles_AccessInterface ()
   TS_ASSERT_EQUALS (gotSutVectors, expected);
 }
 
+//! Checks SystemModelManager DoDataCycles when using AccessInterfaceTranslator testcase
+//!
+void UT_SystemModelManager::test_DoDataCycles_AccessInterfaceTranslator ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto at    = builder.Create_TestCase_Emulation_Translator();
+  auto ai =  dynamic_pointer_cast<AccessInterface>(at->FirstChild());
+  auto ir    = sm.RegisterWithId(1u);
+  auto bpy   = sm.RegisterWithId(3u);
+  auto reg_1 = sm.RegisterWithId(5u);
+  auto reg_2 = sm.RegisterWithId(7u);
+
+  reg_1->SetToSut   (BinaryVector(STATIC_TDR_LEN, 0x0A));
+  reg_2->SetToSut   (BinaryVector(STATIC_TDR_LEN, 0xB0));
+  reg_1->SetBypass  (BinaryVector(STATIC_TDR_LEN, 0x41));
+  reg_2->SetBypass  (BinaryVector(STATIC_TDR_LEN, 0x42));
+
+//+  TS_TRACE (GmlPrinter::Graph(ai, "Testcase_AccessInterface"));
+
+  SystemModelManager sut(sm);
+
+//  auto gotPretty      = PrettyPrinter::PrettyPrint(sm.Root(), PrettyPrinterOptions::All);
+//  TS_ASSERT_EQUALS (gotPretty, "");
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.DoDataCycles());
+
+  // ---------------- Verify
+  //
+  auto gotCommands = dynamic_pointer_cast<Spy_Emulation_Translator>(at->Protocol())->Commands();
+
+  std::vector<std::string> expectedCommands
+  {
+    "SIR 8 TDI(02);",   // 00 : IR
+    "SDR 16 TDI(B0B0);", // 01 : DR (reg_2)
+    "SIR 8 TDI(01);",   // 02 : IR
+    "SDR 16 TDI(0A0A);", // 03 : DR (reg_1)
+    "SIR 8 TDI(FF);",   // 04 : IR
+  };
+
+  TS_ASSERT_EQUALS (gotCommands, expectedCommands);
+}
 
 //! Checks SystemModelManager DoDataCycles when using "1500" testcase
 //!

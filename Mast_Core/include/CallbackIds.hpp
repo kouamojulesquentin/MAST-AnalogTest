@@ -23,6 +23,9 @@ typedef  uint32_t Callback_t;
 #define SDR             "SDR"
 #define UNDEFINED       "UNDEFINED"
 
+//Fake request used to release DataCycle
+#define NO_MORE_PENDING  "AI_FINISHED"
+
 #endif
 //===========================================================================
 // End of CallbackIds.hpp

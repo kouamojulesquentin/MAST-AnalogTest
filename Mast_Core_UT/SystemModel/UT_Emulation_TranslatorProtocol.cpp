@@ -129,10 +129,15 @@ void UT_Emulation_TranslatorProtocol::test_SVF_RawPlayer_TransformationCallback 
     auto        toSutVector     = BinaryVector::CreateFromString(std::get<1> (data));
     const auto& expectedCommand = std::get<2> (data);
     CallbackRequest  test;
-     auto Interface = make_shared<AccessInterfaceTranslator> ("Test");
+
+    auto sut = make_shared<Spy_Emulation_Translator>(); 
+    
+   auto Translator = make_shared<AccessInterfaceTranslator>("Test",sut);
+ 
+//   auto Interface = make_shared<AccessInterfaceTranslator> ("Test",sut);
      TS_ASSERT_THROWS_NOTHING (SVF_RawPlayer player());
     SVF_RawPlayer player;
-    player.SetParentInterface(Interface);
+    player.SetParentTranslator(Translator);
 
     string CallbackId;
    switch (n_Callback) {
@@ -150,25 +155,23 @@ void UT_Emulation_TranslatorProtocol::test_SVF_RawPlayer_TransformationCallback 
    }
 
 
-    Spy_Emulation_Translator sut;
-
 
     // ---------------- Exercise
     //
     //Exploit RawPlayer to get request
     if (n_Callback != 0)  
-       Interface->PushfromSut(toSutVector); //Avoid stall if not reset
+       Translator->PushfromSut(toSutVector); //Avoid stall if not reset
     
     player.DoCallback(n_Callback,nullptr,toSutVector);
-    test = Interface->PopRequest();
+    test = Translator->PopRequest();
 
-    auto fromSutVector = sut.TransformationCallback(test);
+    auto fromSutVector = sut->TransformationCallback(test);
 
     // ---------------- Verify
     //
     TS_ASSERT_EQUALS (toSutVector, fromSutVector); // It is a loopback
 
-    const auto& gotCommands = sut.Commands();
+    const auto& gotCommands = sut->Commands();
     TS_ASSERT_EQUALS (gotCommands, expectedCommand);
   };
 

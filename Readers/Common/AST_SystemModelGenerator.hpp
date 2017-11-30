@@ -79,7 +79,7 @@ class AST_SystemModelGenerator final
   SourceSignalsRef_t  Process_Instance_Entry (AST_Instance*     instance, AST_Module* instanceModule, const AST_Port* scanOutPort);
   ProcessingContext_t Process_Instance_Exit  (AST_Port* scanInPort);
   SourceSignalsRef_t  Process_ScanMux_Entry  (AST_ScanMux*      scanMux,  AST_Module* module);
-  ProcessingContext_t Process_ScanMux_Selection ();
+  ProcessingContext_t Process_ScanMux_EndOfSelectionPath ();
   SourceSignalsRef_t  Process_ScanRegister   (AST_ScanRegister* scanRegister);
 
   void AppendCreatedNodesToParent (mast::ParentNode* parent, size_t levelThreshold);
@@ -106,11 +106,12 @@ class AST_SystemModelGenerator final
   //!
   struct LinkerContext final
   {
-    InstanceContext instanceContext;                //!< Processing context of instance in which the ScanMux is found
-    AST_ScanMux*    processedScanMux     = nullptr; //!< Scan mux being processed
-    size_t          processedSelectionId = 0;       //!< Offset in Selection vector (to detect how many children must be associated to the Linker)
-    size_t          linkerNodesLevel     = 0;       //!< To know how many to consider as Linker children
-    mast::Linker*   linker               = nullptr; //!< Created Linker
+    std::stack<InstanceContext> instancesContext;               //!< Processing contexts downto instance in which the ScanMux is found
+    AST_ScanMux*                processedScanMux     = nullptr; //!< Scan mux being processed
+    size_t                      processedSelectionId = 0;       //!< Offset in Selection vector (to detect how many children must be associated to the Linker)
+    size_t                      linkerNodesLevel     = 0;       //!< To know how many to consider as Linker children
+    mast::Linker*               linker               = nullptr; //!< Created Linker
+    mast::ParentNode*           linkerParentNode     = nullptr; //!< Parent node of linker
   };
 
 

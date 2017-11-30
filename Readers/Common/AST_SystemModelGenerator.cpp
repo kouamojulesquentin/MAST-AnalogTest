@@ -212,8 +212,12 @@ void AST_SystemModelGenerator::FollowTopModulePath (AST_Module* topModule, const
     {
       CHECK_VALUE_EQ(m_instancesContext.size(), 1u, "When reaching top module there should be only 1 instance context left, got "s.append(std::to_string(m_instancesContext.size())));
 
-      std::tie(module, sourceSignals) = Process_ScanMux_Selection();
-    }   // End of: if (isSourcedByTopModuleInput)
+      std::tie(module, sourceSignals) = Process_ScanMux_EndOfSelectionPath();
+      if (module == nullptr)
+      {
+        return;
+      }
+    }
     else   // ==> !isSourcedByTopModuleInput
     {
       CHECK_VALUE_EQ(sourceSignals.get().size(), 1u, "Expecting source to be driven by exactly one signal");
@@ -240,13 +244,16 @@ void AST_SystemModelGenerator::FollowTopModulePath (AST_Module* topModule, const
           {
             if (scanRegister->HasAssociatedRegister())       // Have we already gone to this path point ?
             {
-              //! @todo [JFC]-[November/29/2017]: In FollowTopModulePath(): Deal with Linker "common point"
-              //!
-              CHECK_FAILED("Not Yet Supported: Linker \"common point\"");
-              return; // ==> Stop before reaching module input port
+              std::tie(module, sourceSignals) = Process_ScanMux_EndOfSelectionPath();
+              if (module == nullptr)
+              {
+                return;
+              }
             }
-
-            sourceSignals = Process_ScanRegister(scanRegister);
+            else
+            {
+              sourceSignals = Process_ScanRegister(scanRegister);
+            }
           }
           else  // ScanMux
           {
@@ -559,19 +566,22 @@ AST_SystemModelGenerator::Process_ScanMux_Entry (AST_ScanMux* scanMux, AST_Modul
 
   m_createdNodes.push(linker);
 
-  auto& instanceContext = m_instancesContext.top();
+  auto& instanceContext  = m_instancesContext.top();
+  auto  linkerParentNode = instanceContext.parentNode;
+
+  instanceContext.parentNode     = linker.get();
+  instanceContext.parentIsLinker = true;
 
   LinkerContext linkerContext;
 
-  linkerContext.instanceContext      = instanceContext;
+  linkerContext.instancesContext     = m_instancesContext;
   linkerContext.processedScanMux     = scanMux;
   linkerContext.processedSelectionId = 0;
   linkerContext.linkerNodesLevel     = m_createdNodes.size();
   linkerContext.linker               = linker.get();
+  linkerContext.linkerParentNode     = linkerParentNode;
 
-  m_linkersContext.push(linkerContext);
-
-  instanceContext.parentIsLinker = true;
+  m_linkersContext.push(std::move(linkerContext));
 
   const auto& sourceSignals = scanMux->Selections().front()->SelectedSignals();
   return std::cref(sourceSignals);
@@ -585,21 +595,26 @@ AST_SystemModelGenerator::Process_ScanMux_Entry (AST_ScanMux* scanMux, AST_Modul
 //!
 //! @return New processing context
 //!
-AST_SystemModelGenerator::ProcessingContext_t AST_SystemModelGenerator::Process_ScanMux_Selection ()
+AST_SystemModelGenerator::ProcessingContext_t AST_SystemModelGenerator::Process_ScanMux_EndOfSelectionPath ()
 {
+  CHECK_VALUE_NOT_EMPTY(m_linkersContext, "There is no linker context to process");
+
   auto&       linkerContext        = m_linkersContext.top();
   auto        linker               = linkerContext.linker;
   auto        scanMux              = linkerContext.processedScanMux;
   auto        createdNodesLevel    = linkerContext.linkerNodesLevel;
   auto        processedSelectionId = linkerContext.processedSelectionId;
   auto const& selections           = scanMux->Selections();
-  auto        module               = linkerContext.instanceContext.parentModule;
+  auto        module               = linkerContext.instancesContext.top().parentModule;
 
   CHECK_VALUE_GTE(m_createdNodes.size(), createdNodesLevel, "Have appended more nodes than expected");
   auto newCreated = m_createdNodes.size() - createdNodesLevel;
 
   if (processedSelectionId == 0)
   {
+    //+ (begin JFC November/30/2017): for debug purpose
+        newCreated = 0;
+    //+ (end   JFC November/30/2017):
     auto firstSelectionIsEmpty = newCreated == 0;
     auto pathSelector          = Create_PathSelector(scanMux, module, firstSelectionIsEmpty);
     linker->ReplacePathSelector(pathSelector);
@@ -621,38 +636,33 @@ AST_SystemModelGenerator::ProcessingContext_t AST_SystemModelGenerator::Process_
 
   ++processedSelectionId;
 
-  auto        sourceSignals = std::cref(selections[processedSelectionId]->SelectedSignals());
-  ParentNode* parentNode    = linker;
-
-  if (module != m_network->TopModule())
-  {
-    auto context = linkerContext.instanceContext;
-    context.parentIsLinker = true;
-    m_instancesContext.push(context);
-  }
-
+  m_instancesContext = linkerContext.instancesContext;
 
   bool lastLinkerSelection = processedSelectionId >= selections.size();
   if (lastLinkerSelection)
   {
+    auto parentNode = linkerContext.linkerParentNode;
+
+    auto& instanceContext = m_instancesContext.top();
+    instanceContext.parentNode     = parentNode;
+    instanceContext.parentIsLinker = false;
+
+    AppendCreatedNodesToParent(parentNode, instanceContext.createdNodesLevel);
+
+    auto sourceSignals = std::cref(selections.front()->SelectedSignals()); // Will cause detection of instance input port or previously created node that is just before the linker
+
     m_linkersContext.pop();
-    m_instancesContext.top().parentNode = linkerContext.instanceContext.parentNode;
-
-    module        = m_instancesContext.top().parentModule;
-    parentNode    = m_instancesContext.top().parentNode;
-    sourceSignals = std::cref(selections.front()->SelectedSignals()); // Will cause detection of instance input port or previously created node that is just before the linker
-
-    AppendCreatedNodesToParent(parentNode, m_instancesContext.top().createdNodesLevel);
+    module = m_linkersContext.empty() ? nullptr // To report end of path processing
+                                      : instanceContext.parentModule;
+    return make_tuple(module, cref(sourceSignals));
   }
-  else
-  {
-    ++linkerContext.processedSelectionId;
-    sourceSignals = std::cref(selections[processedSelectionId]->SelectedSignals());
-  }
+
+  ++linkerContext.processedSelectionId;
+  auto sourceSignals = std::cref(selections[processedSelectionId]->SelectedSignals());
   return make_tuple(module, cref(sourceSignals));
 }
 //
-//  End of: AST_SystemModelGenerator::Process_ScanMux_Selection
+//  End of: AST_SystemModelGenerator::Process_ScanMux_EndOfSelectionPath
 //---------------------------------------------------------------------------
 
 
@@ -670,15 +680,26 @@ AST_SystemModelGenerator::Process_ScanRegister (AST_ScanRegister* scanRegister)
   auto bitsCount  = scanRegister->BitsCount();
   auto resetValue = scanRegister->ResetValue();
 
-  BinaryVector bypassValue;
+  uint8_t fillPattern = 0;
+  BinaryVector bypassValue(bitsCount, fillPattern, SizeProperty::Fixed);
   if (resetValue != nullptr)
   {
-    bypassValue = resetValue->AsBinaryVector();
-  }
-  else
-  {
-    uint8_t fillPattern = 0;
-    bypassValue = BinaryVector(bitsCount, fillPattern, SizeProperty::Fixed);
+    auto resetValueBv = resetValue->AsBinaryVector();
+    CHECK_VALUE_LTE(resetValueBv.BitsCount(), bitsCount, "Reset value must have no more bits than ScanRegister width ; found "s
+                                                         .append(std::to_string(resetValueBv.BitsCount()))
+                                                         .append(" > ")
+                                                         .append(std::to_string(bitsCount)));
+    auto missingBitsCount = bitsCount - resetValueBv.BitsCount();
+    if (missingBitsCount == 0)
+    {
+      bypassValue = resetValueBv;
+    }
+    else
+    {
+      BinaryVector tmp(missingBitsCount, fillPattern);
+      tmp.Append(resetValueBv) ;
+      bypassValue = std::move(tmp);
+    }
   }
 
   auto holdValue    = false;

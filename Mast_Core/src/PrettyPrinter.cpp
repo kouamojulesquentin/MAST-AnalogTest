@@ -232,9 +232,9 @@ void PrettyPrinter::StreamNodeHeader(string_view type, const SystemModelNode& no
   if (m_showSelectorProperties && m_selector && m_processingSelector)
   {
     m_os << ", kind: "            << m_selector->KindName();
-    m_os << ", can_select_none: " << IsSet(m_selector->Properties(), SelectorProperty::CanSelectNone);
-    m_os << ", inverted_bits: "   << IsSet(m_selector->Properties(), SelectorProperty::InvertedBits);
-    m_os << ", reversed_order: "  << IsSet(m_selector->Properties(), SelectorProperty::ReverseOrder);
+    m_os << ", can_select_none: " << std::boolalpha << IsSet(m_selector->Properties(), SelectorProperty::CanSelectNone);
+    m_os << ", inverted_bits: "   << std::boolalpha << IsSet(m_selector->Properties(), SelectorProperty::InvertedBits);
+    m_os << ", reversed_order: "  << std::boolalpha << IsSet(m_selector->Properties(), SelectorProperty::ReverseOrder);
   }
 
   // ---------------- Display selection/active state(s)

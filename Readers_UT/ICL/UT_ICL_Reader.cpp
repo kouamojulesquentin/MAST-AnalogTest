@@ -2170,7 +2170,7 @@ void UT_ICL_Reader::test_Generate_SIB_mux_pre ()
   auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode, PrettyPrinterOptions::Parser_debug);
   auto expected_PrettyPrint = "[Chain](0)     \"SIB_mux_pre\"\n"
                               " [Linker](2)    \"SIBmux\"\n"
-                              "  :Selector:(1)  \"SR\", kind: Table_Based, can_select_none: 1, inverted_bits: 0, reversed_order: 0\n"
+                              "  :Selector:(1)  \"SR\", kind: Table_Based, can_select_none: true, inverted_bits: false, reversed_order: false\n"
                               " [Register](1)  \"SR\", length: 1, bypass: 0";
 
   TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
@@ -2183,49 +2183,63 @@ void UT_ICL_Reader::test_Generate_SIB_mux_pre ()
 
 
 
-//! Checks ICL_Reader::GenerateSystemModelNodes() when parsing a module with a single SIB and 3 wrapped instrument instances
-//! @note ICL has been cleaned up to ease understanding (some useless stuffs have been removed)
-void UT_ICL_Reader::test_Generate_Single_SIB_3WI ()
+//! Checks ICL_Reader::GenerateSystemModelNodes() when parsing examples (mostly from IEEE 1687-2014 standard)
+//!
+//! @note ICL has been cleaned up to ease understanding (some useless stuffs may have been removed)
+void UT_ICL_Reader::test_Generate_Examples ()
 {
-  // ---------------- Setup
+  // ---------------- DDT Setup
   //
-  auto           iclFilePath = GetTestFilePath("Single_SIB_3WI.icl");
-  std::ifstream  ifs(iclFilePath);
-  auto           sm = make_shared<SystemModel>();
-  ICL_Reader_TSS sut(sm);
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto iclFileName      = std::get<0>(data);
+    auto expectedFileName = std::get<1>(data);
 
-  CxxTest::setAbortTestOnFail(true);
-  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(ifs));
-  auto ast = sut.AST();
-  TS_ASSERT_NOT_NULLPTR (ast);
+    auto           iclFilePath = GetTestFilePath(iclFileName);
+    std::ifstream  ifs(iclFilePath);
+    auto           sm = make_shared<SystemModel>();
+    ICL_Reader_TSS sut(sm);
 
-  auto checkResult = AST_Checker::Check(ast->Network());
+    CxxTest::setAbortTestOnFail(true);
+    TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(ifs));
+    auto ast = sut.AST();
+    TS_ASSERT_NOT_NULLPTR (ast);
 
-  TS_ASSERT_EMPTY          (checkResult.IssuesReport());
-  TS_ASSERT_THROWS_NOTHING (sut.UniquifyAST());
+    auto checkResult = AST_Checker::Check(ast->Network());
 
-  // ---------------- Exercise
+    TS_ASSERT_EMPTY          (checkResult.IssuesReport());
+    TS_ASSERT_THROWS_NOTHING (sut.UniquifyAST());
+
+    // ---------------- Exercise
+    //
+    auto topNode = sut.GenerateSystemModelNodes(ast);
+
+    // ---------------- Verify
+    //
+    // With PrettyPrinter
+    auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode, PrettyPrinterOptions::Parser_debug_no_id);
+    auto expected_PrettyPrint = GetExpectedModelPrettyPrint(expectedFileName);
+
+    TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
+    // With Checker
+    PrependWithTap(sm, topNode);   // This is to avoid warnings about missing AccessInterface
+    auto modelCheckResult = sm->Check();
+    TS_ASSERT_EMPTY (modelCheckResult.InformativeReport());
+  };
+
+  auto data =
+  {
+//+    make_tuple("Multiple_SIB_3WI.icl", "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),
+    make_tuple("Single_SIB_3WI.icl",   "test_Generate_Single_SIB_3WI_PrettyPrint.txt"),
+  };
+
+  // ---------------- DDT Exercise
   //
-  auto topNode = sut.GenerateSystemModelNodes(ast);
-
-  // ---------------- Verify
-  //
-  TS_ASSERT_NOT_NULLPTR (topNode);
-  TS_ASSERT_EQUALS      (topNode->Name(), "Single_SIB_3WI");
-
-  // With PrettyPrinter
-  auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode, PrettyPrinterOptions::Parser_debug_no_id);
-  auto expected_PrettyPrint = GetExpectedModelPrettyPrint("test_Generate_Single_SIB_3WI_PrettyPrint.txt");
-
-  TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
-
-  // With Checker
-  PrependWithTap(sm, topNode);   // This is to avoid warnings about missing AccessInterface
-  auto modelCheckResult = sm->Check();
-  TS_ASSERT_EMPTY (modelCheckResult.InformativeReport());
+  TS_DATA_DRIVEN_TEST(checker, data);
 }
-
-
 
 
 

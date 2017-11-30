@@ -45,7 +45,7 @@ class MAST_CORE_EXPORT Emulation_TranslatorProtocol final : public AccessInterfa
   // ---------------- Protected Methods
   //
 
-  //! Logs SVF commands
+  //! Logs commands
   //!
   void LogCommands(std::experimental::string_view commands);
 };

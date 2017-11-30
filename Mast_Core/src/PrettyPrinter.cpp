@@ -309,6 +309,15 @@ void PrettyPrinter::VisitAccessInterfaceTranslator (AccessInterfaceTranslator& a
  //TODO: specific formatting
  
   StreamParentNode("Access_T", accessInterfaceTranslator, note);
+  if (m_showProtocol)
+  {
+   m_os << " Protocol: ";
+   auto protocol = accessInterfaceTranslator.Protocol();
+   if (protocol == nullptr)
+    m_os << "Not Set";
+   else
+    m_os << protocol->KindName();
+  }
 }
 
 //! Appends content of Chain node in text representation and visits

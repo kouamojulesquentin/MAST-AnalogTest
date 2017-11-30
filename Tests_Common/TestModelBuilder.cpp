@@ -16,8 +16,8 @@
 #include "DefaultBinaryPathSelector.hpp"
 #include "LoopbackAccessInterfaceProtocol.hpp"
 #include "SVF_RawPlayer.hpp"
+#include "I2C_RawPlayer.hpp"
 #include "Spy_Emulation_Translator.hpp"
-
 #include "BinaryVector_Traits.hpp"
 
 using std::string;
@@ -27,6 +27,7 @@ using std::make_shared;
 using std::dynamic_pointer_cast;
 
 using namespace std::string_literals;
+using std::initializer_list;
 using namespace mast;
 using namespace test;
 
@@ -243,6 +244,45 @@ shared_ptr<AccessInterfaceTranslator> TestModelBuilder::Create_TestCase_Emulatio
 //  End of: TestModelBuilder::Create_TestCase_AccessInterface
 //---------------------------------------------------------------------------
 
+//! Creates a simple I2C Access Interface with two registers, with an Emulation_Translator as top level
+//!
+//! @note - There are multiple "dynamic" registers
+//!       - The control register is composed with multiple bits
+//!
+//! @param name         Name for top node
+//!
+//! @return Top node of system mode
+//!
+shared_ptr<AccessInterfaceTranslator> TestModelBuilder::Create_TestCase_I2C_Emulation_Translator (string_view name)
+{
+  uint32_t muxDrPathCount = 3u;
+  
+  auto regsCount = 3;
+  auto regsBitsCount = 4;
+
+    auto I2C_Adresses   = initializer_list<uint32_t>{ 0x30u, 0x31u, 0x32u,0x33u,0x34u  };
+  auto raw_protocol = make_shared<I2C_RawPlayer>(I2C_Adresses);
+  auto ai   = m_model.CreateAccessInterface(name, raw_protocol);
+
+
+  // ---------------- Add Registers
+  //
+  m_builder.AppendRegisters(regsCount, "i2c_register_", BinaryVector(regsBitsCount, 0), ai);
+
+
+  auto translator     = m_model.CreateAccessInterfaceTranslator    (name, make_shared<Spy_Emulation_Translator>());
+
+  raw_protocol->SetParentTranslator(translator);
+
+  translator->AppendChild(ai);
+
+  m_model.SetRoot(translator);
+  
+  return translator;
+}
+//
+//  End of: TestModelBuilder::I2C_Emulation_Translator
+//---------------------------------------------------------------------------
 
 //! Creates a MIB structure (with multiple insertion bits configuration)
 //!

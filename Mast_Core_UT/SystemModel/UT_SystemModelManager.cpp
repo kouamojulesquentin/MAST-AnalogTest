@@ -28,8 +28,6 @@
 #include "ConfigureAlgorithm_Last_Lazy.hpp"
 #include "g3log/g3log.hpp"
 
-//#include "PrettyPrinter.hpp"
-
 #include <memory>
 #include <vector>
 #include <string>
@@ -745,6 +743,55 @@ void UT_SystemModelManager::test_DoDataCycles_AccessInterfaceTranslator ()
     "SIR 8 TDI(01);",   // 02 : IR
     "SDR 16 TDI(0A0A);", // 03 : DR (reg_1)
     "SIR 8 TDI(FF);",   // 04 : IR
+  };
+
+  TS_ASSERT_EQUALS (gotCommands, expectedCommands);
+}
+
+//! Checks SystemModelManager DoDataCycles when using AccessInterfaceTranslator testcase
+//!
+void UT_SystemModelManager::test_DoDataCycles_I2C_AccessInterfaceTranslator ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto at    = builder.Create_TestCase_I2C_Emulation_Translator();
+  auto ai =  dynamic_pointer_cast<AccessInterface>(at->FirstChild());
+
+
+  auto reg_1 = sm.RegisterWithId(1u);
+  auto reg_2 = sm.RegisterWithId(2u);
+  auto reg_3 = sm.RegisterWithId(3u);
+
+  reg_1->SetToSut   (BinaryVector( reg_1->BitsCount(), 0xA0));
+  reg_2->SetToSut   (BinaryVector(reg_2->BitsCount(), 0xB0));
+  reg_3->SetToSut   (BinaryVector(reg_3->BitsCount(), 0xC0));
+  reg_1->SetBypass  (BinaryVector(reg_1->BitsCount(), 0x41));
+  reg_2->SetBypass  (BinaryVector(reg_2->BitsCount(), 0x42));
+  reg_3->SetBypass  (BinaryVector(reg_3->BitsCount(), 0x43));
+
+//+  TS_TRACE (GmlPrinter::Graph(ai, "Testcase_AccessInterface"));
+
+  SystemModelManager sut(sm);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.DoDataCycles());
+
+  // ---------------- Verify
+  //
+  auto gotCommands = dynamic_pointer_cast<Spy_Emulation_Translator>(at->Protocol())->Commands();
+
+  std::vector<std::string> expectedCommands
+  {
+    "I2C_READ (0x31);",
+    "I2C_WRITE (0x31, 0b1010);",
+    "I2C_READ (0x32);",
+    "I2C_WRITE (0x32, 0b1011);",
+    "I2C_READ (0x33);",
+    "I2C_WRITE (0x33, 0b1100);",
   };
 
   TS_ASSERT_EQUALS (gotCommands, expectedCommands);

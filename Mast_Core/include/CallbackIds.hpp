@@ -21,6 +21,11 @@ typedef  uint32_t Callback_t;
 #define TRST           "TRST"
 #define SIR             "SIR"
 #define SDR             "SDR"
+
+#define I2C_RESET       "I2C_RESET"
+#define I2C_READ        "I2C_READ"
+#define I2C_WRITE       "I2C_WRITE"
+
 #define UNDEFINED       "UNDEFINED"
 
 //Fake request used to release DataCycle

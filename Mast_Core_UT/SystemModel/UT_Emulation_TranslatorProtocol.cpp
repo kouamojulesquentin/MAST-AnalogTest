@@ -35,6 +35,7 @@ using namespace std::experimental::literals::string_view_literals;
 using namespace mast;
 using namespace test;
 
+
 //! Checks Emulation_Translator constructor 
 //!
 void UT_Emulation_TranslatorProtocol::test_Constructor ()
@@ -159,7 +160,6 @@ void UT_Emulation_TranslatorProtocol::test_SVF_RawPlayer_TransformationCallback 
     // ---------------- Exercise
     //
     //Exploit RawPlayer to get request
-    if (n_Callback != 0)  
        Translator->PushfromSut(toSutVector); //Avoid stall if not reset
     
     player.DoCallback(n_Callback,nullptr,toSutVector);

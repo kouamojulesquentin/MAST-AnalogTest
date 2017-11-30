@@ -76,7 +76,7 @@ class MAST_CORE_EXPORT SVF_RawPlayer final: public AccessInterfaceRawProtocol
 
   //! Returns readable type of protocol
   //!
-  virtual std::experimental::string_view KindName() const override { return SVF; }
+  virtual std::experimental::string_view KindName() const override { return "SVF_RAW"; }
 
 
   //! Forces the ResetPort to be asserted on the target module

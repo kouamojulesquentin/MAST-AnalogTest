@@ -25,10 +25,7 @@ using std::experimental::string_view;
 using std::ostringstream;
 
 
-//  os << commandType << " " << toSutData.BitsCount() << " TDI(" << SVFVector(toSutData).Data() << ");\n";
-
-//! Loopbacks "to SUT data" logging SVF command(s) that would be issued if it was really an operating protocol
-//! NOT VERIFIED YET!!! CHECK!!!!!!!
+//! sends request for TRST,SIR and SDR callbacks and waits for response
 
 BinaryVector SVF_RawPlayer::DoCallback (uint32_t endpointId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
@@ -48,7 +45,6 @@ BinaryVector SVF_RawPlayer::DoCallback (uint32_t endpointId, void* /* interfaceD
   auto request = new CallbackRequest(CallbackId(endpointId),callback_toSutData,svfFormattedData);
   ParentTranslator()->PushRequest(*request);
   
-  if (endpointId != 0) //check for result only if not reset
                        /*NB: this is a BLOCKING call*/
      result = ParentTranslator()->PopfromSut();
 
@@ -65,6 +61,7 @@ void SVF_RawPlayer::DoReset(bool doSynchronousReset)
 
   auto request = new CallbackRequest(CallbackId(0));
   ParentTranslator()->PushRequest(*request);
+  ParentTranslator()->PopfromSut();
 }
 
 //

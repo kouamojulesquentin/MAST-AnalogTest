@@ -119,8 +119,11 @@ void UT_SVF_RawPlayer::test_doReset ()
 
   // ---------------- Exercise & Verify
   //
+  //Put a result value to avoid callback getting stuck on result queue
+  auto  test = BinaryVector::CreateFromBinaryString("01");
   
   //Direct call to reset
+  Interface->PushfromSut(test);
  sut.DoReset(true);
  auto result = Interface->PopRequest();
   TS_ASSERT_EQUALS(result.CallbackId(),TRST);
@@ -145,6 +148,7 @@ void UT_SVF_RawPlayer::test_Callbacks ()
   auto  test = BinaryVector::CreateFromBinaryString("01");
 
   //Reset as Callback 0 : does not need a fromSUT value
+  Interface->PushfromSut(test);
  sut.DoCallback(0,nullptr,test);
  auto result = Interface->PopRequest();
  TS_ASSERT_EQUALS(result.CallbackId(),TRST);
@@ -191,7 +195,8 @@ void UT_SVF_RawPlayer::test_Callbacks_multithread ()
  auto callback_thread = [this] (SVF_RawPlayer sut,int EndpointId,BinaryVector  test) 
    { sut.DoCallback(EndpointId,nullptr,test);};
 
-  //Reset as Callback 0 : does not need a fromSUT value
+  //Reset as Callback 0 :
+ Interface->PushfromSut(test);
     std::thread AI_thread(callback_thread,sut,0,test);
  auto result = Interface->PopRequest();
  TS_ASSERT_EQUALS(result.CallbackId(),TRST);

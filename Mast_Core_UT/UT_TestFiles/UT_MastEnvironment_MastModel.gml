@@ -11,14 +11,14 @@ Reversed_order:  false
 Inverted_bits:   false
 
 Selection Table:
-[0] 0b1111
-[1] 0b1111
-[2] 0b0001
+  [0] 0b1111
+  [1] 0b1111
+  [2] 0b0001
 
 Deselection Table:
-[0] 0b1111
-[1] 0b1111
-[2] 0b1111" fontSize 13 fontStyle "bold" fontName "Lucida Console"] ]
+  [0] 0b1111
+  [1] 0b1111
+  [2] 0b1111" fontSize 13 fontStyle "bold" fontName "Lucida Console"] ]
    node [ id 3 graphics [ type "rectangle" fill "#59FF20" w 66 h 35 ] LabelGraphics [ text "TAP_BPY" fontSize 13 fontStyle "bold" fontName "Lucida Console"] ]
    node [ id 4 graphics [ type "rectangle" fill "#59FF20" w 50 h 35 ] LabelGraphics [ text "reg" fontSize 13 fontStyle "bold" fontName "Lucida Console"] ]
    edge [ source 0 target 1 label "1" ]

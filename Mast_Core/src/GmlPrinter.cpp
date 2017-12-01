@@ -505,7 +505,14 @@ void GmlPrinter::VisitAccessInterface (AccessInterface& accessInterface)
 //!
 void GmlPrinter::VisitAccessInterfaceTranslator (AccessInterfaceTranslator& accessInterfaceTranslator)
 {
+  auto protocol = accessInterfaceTranslator.Protocol();
   auto note     = string();
+
+  if (m_showProtocol)
+  {
+    note = "Protocol: ";
+    note += protocol ? protocol->KindName() : "Not set";
+  }
 
   AppendParentNode(m_shape_AccessInterface, m_color_AccessInterface, note, accessInterfaceTranslator);
 }

@@ -156,7 +156,7 @@ void UT_PrettyPrinter::test_VisitAccessInterfaceTranslator_ShowProtocol ()
   // ---------------- Verify
   //
   auto got      = sut.PrettyPrint();
-  auto expected = string("[Access_T](0)  \"Access interface translator name\" Protocol: Emulation_Translator");
+  auto expected = string("[Access_T](0)  \"Access interface translator name\", Protocol: Emulation_Translator");
   TS_ASSERT_EQUALS (got, expected);
 
 }

@@ -19,6 +19,7 @@
 #include "AST_Port.hpp"
 #include "AST_ScalarIdentifier.hpp"
 #include "AST_Visitor.hpp"
+#include "AST_Builder.hpp"
 
 using std::string;
 
@@ -82,6 +83,43 @@ string AST_Instance::Name () const
 }
 //
 //  End of: AST_Instance::Name
+//---------------------------------------------------------------------------
+
+
+//! Uniquifies instance
+//!
+//! @note Unification consist to have a single object representing that particular instance.
+//!       The result can be modified without affecting any other Module/Instance
+//!
+//! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
+//!
+//! @return New and unique AST_Instance
+AST_Instance* AST_Instance::Uniquify (AST_Builder& astBuilder)
+{
+  auto clone = astBuilder.Clone_Instance(this);
+
+  clone->UniquifyInputPorts(astBuilder);
+  return clone;
+}
+//
+//  End of: AST_Instance::Uniquify
+//---------------------------------------------------------------------------
+
+
+//! Uniquifies instance InputPorts
+//!
+//! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
+//!
+void AST_Instance::UniquifyInputPorts (AST_Builder& astBuilder)
+{
+  for (auto& inputPort : m_inputPorts)
+  {
+    auto clonedInputPort = astBuilder.Clone_Port(inputPort);
+    inputPort = clonedInputPort;  // Replace current (shared) by cloned (unique)
+  }
+}
+//
+//  End of: AST_Instance::UniquifyInputPorts
 //---------------------------------------------------------------------------
 
 

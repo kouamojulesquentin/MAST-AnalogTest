@@ -41,10 +41,11 @@
 #include "Utility.hpp"
 #include "g3log/g3log.hpp"
 
-#include <stack>
+#include <queue>
 #include <functional>
 
 using std::stack;
+using std::queue;
 using std::vector;
 using std::shared_ptr;
 using std::unique_ptr;
@@ -98,6 +99,152 @@ void AST_SystemModelGenerator::AppendCreatedNodesToParent (ParentNode* parent, s
 }
 //
 //  End of: AST_SystemModelGenerator::AppendCreatedNodesToParent
+//---------------------------------------------------------------------------
+
+
+
+//! Assigns newly created node to its parent unless it is a linker or representing top module.
+//! In the latter case, it is pushed into a stack of not assigned yet nodes.
+//!
+//! @param node A newly created node
+//!
+void AST_SystemModelGenerator::AssignNewNode (shared_ptr<SystemModelNode> node)
+{
+  auto& context        = m_instancesContext.top();
+  auto  parentNode     = context.parentNode;
+  auto  parentIsLinker = context.parentIsLinker;
+
+  auto contextIsTopModule = m_instancesContext.size() == 1u;
+
+  if (parentIsLinker || contextIsTopModule)
+  {
+    m_createdNodes.push(node);
+  }
+  else
+  {
+    parentNode->PrependChild(node);
+  }
+}
+//
+//  End of: AST_SystemModelGenerator::AssignNewNode
+//---------------------------------------------------------------------------
+
+
+//! Appends not yet assigned node to Linker first selection, provided there is some
+//! to assign to Linker selection
+//!
+//! @internal
+//! @note   Supposing that assigned node stack is filled up like:
+//!           [1] [L] [3] [4] [C] [6] [7] [8]
+//!                ^
+//!         where:
+//!           - brackets pair represents a node,
+//!           - [L] is the node for the Linker
+//!           - [C] is the node (most often a Chain) that was reached following all Linker selection paths
+//!           - For SIB, [L] & [C] are next to each other ==> First Linker selection is empty ==> [C] and the following are sibling of the Linker
+//!
+//!         The algorithm purpose is to extract the nodes between [L] and [C]:
+//!           1 - extracts 2nd part into a temporary stack          ==> [8] [7] [6] [C]
+//!           2 - extracts 1st part into another temporary stack    ==> [4] [3]
+//!           3 - Append 1st part Linker 1st selection              ==> [4] [3] - note that they are assign in that order - (inserting a Chain in between in that case)
+//!           4 - Restore 2nd part to not yet assigned nodes stack  ==> [1] [L] [C] [6] [7] [8]
+//!
+//! @endinternal
+//!
+//! @param commonLinkerNode   The first SystemModelNode encounter following all linker selections path
+//!
+//! @return True when first Linker selection is empty, false otherwise
+bool AST_SystemModelGenerator::AssignNodesToLinkerFirstSelection (shared_ptr<SystemModelNode> commonLinkerNode)
+{
+  auto firstSelectionIsEmpty = true;
+
+  auto& linkerContext          = m_linkersContext.top();
+  auto  linker                 = linkerContext.linker;
+  auto  linkerNodesLevel_first = linkerContext.linkerNodesLevel_first;
+
+  CHECK_VALUE_GTE(m_createdNodes.size(), linkerNodesLevel_first, "Have appended more nodes than expected (for 1st Linker selection)");
+  auto createdForFirst = m_createdNodes.size() - linkerNodesLevel_first;
+
+  // Adjust real child count for 1st selection (dealing with common node on paths)
+  //
+  if (createdForFirst != 0)
+  {
+    // 2nd part extraction
+    stack<shared_ptr<SystemModelNode>>  nodesAsLinkerSiblings;
+    while (m_createdNodes.size() > linkerNodesLevel_first)
+    {
+      auto node = m_createdNodes.top();
+      nodesAsLinkerSiblings.push(node);
+      m_createdNodes.pop();
+
+      if (node == commonLinkerNode)
+      {
+        break;
+      }
+    }
+
+    // 1st part extraction
+    stack<shared_ptr<SystemModelNode>>  nodesForFirstSelection;
+    while (m_createdNodes.size() > linkerNodesLevel_first)
+    {
+      auto node = m_createdNodes.top();
+      nodesForFirstSelection.push(node);
+      m_createdNodes.pop();
+    }
+
+    // Append 1st part Linker 1st selection (inserting a Chain when there is more than a single node)
+    createdForFirst = nodesForFirstSelection.size();
+    if (createdForFirst != 0)
+    {
+      firstSelectionIsEmpty = false;
+      if (createdForFirst == 1)
+      {
+        linker->PrependChild(nodesForFirstSelection.top());
+      }
+      else
+      {
+        auto chain = Create_ChainForLinker(linker, 0);
+        linker->PrependChild(chain);
+        while (!nodesForFirstSelection.empty())
+        {
+          chain->PrependChild(nodesForFirstSelection.top());
+          nodesForFirstSelection.pop();
+        }
+      }
+    }
+
+    // Restore 2nd part to not yet assigned nodes stack
+    while (!nodesAsLinkerSiblings.empty())
+    {
+      auto node = nodesAsLinkerSiblings.top();
+      m_createdNodes.push(node);
+      nodesAsLinkerSiblings.pop();
+    }
+  }
+
+  return firstSelectionIsEmpty;
+}
+//
+//  End of: AST_SystemModelGenerator::AssignNodesToLinkerFirstSelection
+//---------------------------------------------------------------------------
+
+
+
+//! Creates a "generated" chain to force a single child for Linker selection
+//!
+//! @param linker         Linker to create a chain for
+//! @param selectionId    Selection id for which the Chain is created
+//!
+shared_ptr<mast::Chain> AST_SystemModelGenerator::Create_ChainForLinker (const Linker* linker, size_t selectionId)
+{
+  auto name  = linker->Name();
+  name.append("_").append(std::to_string(selectionId));
+  auto chain = m_systemModel->CreateChain(name);
+  chain->IgnoreForNodePath(true);
+  return chain;
+}
+//
+//  End of: AST_SystemModelGenerator::Create_ChainForLinker
 //---------------------------------------------------------------------------
 
 
@@ -159,6 +306,7 @@ shared_ptr<PathSelector> AST_SystemModelGenerator::Create_PathSelector (AST_Scan
 //---------------------------------------------------------------------------
 
 
+
 //! Follows ScanMux selector signals to find driving ScanRegister(s)
 //!
 //! @param selectors  ScanMux selector signals
@@ -206,13 +354,14 @@ void AST_SystemModelGenerator::FollowTopModulePath (AST_Module* topModule, const
 
   std::tie(isSourcedByTopModuleInput, scanInPort) = IsSourcedByModuleInput(topModule, sourceSignals);
 
-  while (!isSourcedByTopModuleInput || !m_linkersContext.empty())
+  while (   (module != nullptr)
+         && (!isSourcedByTopModuleInput || !m_linkersContext.empty()))
   {
     if (isSourcedByTopModuleInput)  // ==> !m_linkersContext.empty()
     {
       CHECK_VALUE_EQ(m_instancesContext.size(), 1u, "When reaching top module there should be only 1 instance context left, got "s.append(std::to_string(m_instancesContext.size())));
 
-      std::tie(module, sourceSignals) = Process_ScanMux_EndOfSelectionPath();
+      std::tie(module, sourceSignals) = Process_ScanMux_EndOfSelectionPath(nullptr);
       if (module == nullptr)
       {
         return;
@@ -244,11 +393,7 @@ void AST_SystemModelGenerator::FollowTopModulePath (AST_Module* topModule, const
           {
             if (scanRegister->HasAssociatedRegister())       // Have we already gone to this path point ?
             {
-              std::tie(module, sourceSignals) = Process_ScanMux_EndOfSelectionPath();
-              if (module == nullptr)
-              {
-                return;
-              }
+              std::tie(module, sourceSignals) = Process_ScanMux_EndOfSelectionPath(scanRegister->AssociatedRegister());
             }
             else
             {
@@ -259,7 +404,7 @@ void AST_SystemModelGenerator::FollowTopModulePath (AST_Module* topModule, const
           {
             auto scanMux  = module->FindScanMux(identifier);
             CHECK_VALUE_NOT_NULL(scanMux, "Failed to find source entity (not a ScanMux)");
-            sourceSignals = Process_ScanMux_Entry(scanMux, module);
+            std::tie(module, sourceSignals) = Process_ScanMux_Entry(scanMux, module);
           }
         }
         else   // Instance ?
@@ -274,8 +419,12 @@ void AST_SystemModelGenerator::FollowTopModulePath (AST_Module* topModule, const
           auto instanceModule   = m_network->Module(moduleIdentifier);
           auto scanOutPort      = instanceModule->FindScanOutPort(identifier);
 
-          sourceSignals = Process_Instance_Entry(instance, instanceModule, scanOutPort);
-          module        = instanceModule;
+          std::tie(module, sourceSignals) = Process_Instance_Entry(instance, instanceModule, scanOutPort);
+        }
+
+        if (module == nullptr)
+        {
+          return;
         }
 
         std::tie(isSourcedByModuleInput, scanInPort) = IsSourcedByModuleInput(module, sourceSignals);
@@ -452,9 +601,9 @@ tuple<bool, AST_Port*> AST_SystemModelGenerator::IsSourcedByModuleInput (const A
 //! @param instanceModule   Module that defines the instance
 //! @param scanOutPort      Port by which scan path is followed (backward)
 //!
-//! @return Signals to follow to reach previous entity in test network
+//! @return New processing context
 //!
-AST_SystemModelGenerator::SourceSignalsRef_t
+AST_SystemModelGenerator::ProcessingContext_t
 AST_SystemModelGenerator::Process_Instance_Entry (AST_Instance* instance, AST_Module* instanceModule, const AST_Port* scanOutPort)
 {
   const auto& moduleInputPorts = instanceModule->ScanInPorts();
@@ -479,9 +628,17 @@ AST_SystemModelGenerator::Process_Instance_Entry (AST_Instance* instance, AST_Mo
     chain     = m_systemModel->CreateChain(name);
 
     instance->AssociatedChain(chain);   // To detect already created Chain for the instance
-    m_createdNodes.push(chain);
+    AssignNewNode(chain);
     context.parentNode = chain.get();
   }
+  else if (instanceModule->IsScanOutPortMarked(scanOutPort))
+  {
+    CHECK_VALUE_NOT_EMPTY(m_linkersContext, "Unexpected path again through instance output port outside of Linker context");
+
+    return Process_ScanMux_EndOfSelectionPath(instance->AssociatedChain());
+  }
+
+  instanceModule->MarkScanOutPort(scanOutPort);
 
   context.createdNodesLevel = m_createdNodes.size();
 
@@ -489,10 +646,10 @@ AST_SystemModelGenerator::Process_Instance_Entry (AST_Instance* instance, AST_Mo
 
   // ---------------- Return signal to follow to reach first instance entity
   //
-  auto source        = scanOutPort->Source();
-  auto sourceSignals = std::cref(source->Signals());
+  auto        source        = scanOutPort->Source();
+  const auto& sourceSignals = source->Signals();
 
-  return sourceSignals;
+  return make_tuple(instanceModule, cref(sourceSignals));
 }
 //
 //  End of: AST_SystemModelGenerator::Process_Instance
@@ -506,35 +663,24 @@ AST_SystemModelGenerator::Process_Instance_Entry (AST_Instance* instance, AST_Mo
 //! @param scanInPort   Port by which the instance input was reached
 //!
 //! @return New processing context
-AST_SystemModelGenerator::ProcessingContext_t AST_SystemModelGenerator::Process_Instance_Exit (AST_Port* scanInPort)
+AST_SystemModelGenerator::ProcessingContext_t
+AST_SystemModelGenerator::Process_Instance_Exit (AST_Port* scanInPort)
 {
   CHECK_VALUE_NOT_EMPTY(m_instancesContext, "Houps not balanced push/pop on instance context");
 
   auto&       context           = m_instancesContext.top();
-  auto        parentNode        = context.parentNode;
-  auto        parentIsLinker    = context.parentIsLinker;
   auto        instance          = context.instance;
   auto        portIdentifier    = scanInPort->Identifier();
   auto        instanceInputPort = instance->FindInputPort(portIdentifier);
   auto        instanceSource    = instanceInputPort->Source();
   const auto& sourceSignals     = instanceSource->Signals();
 
-  if (parentNode && !parentIsLinker)
-  {
-    AppendCreatedNodesToParent(parentNode, context.createdNodesLevel);
-  }
-
   // ---------------- Restore previous context
   //
   m_instancesContext.pop();
   CHECK_VALUE_NOT_EMPTY(m_instancesContext, "Must have at least an (implicit) instance context for top module");
 
-  auto& parentContext = m_instancesContext.top();
-  auto  module        = parentContext.parentModule;
-  if (!parentIsLinker)
-  {
-    parentNode = parentContext.parentNode;
-  }
+  auto module = m_instancesContext.top().parentModule;
 
   return make_tuple(module, cref(sourceSignals));
 }
@@ -553,7 +699,7 @@ AST_SystemModelGenerator::ProcessingContext_t AST_SystemModelGenerator::Process_
 //!
 //! @return ScanMux source signals for 1st selection
 //!
-AST_SystemModelGenerator::SourceSignalsRef_t
+AST_SystemModelGenerator::ProcessingContext_t
 AST_SystemModelGenerator::Process_ScanMux_Entry (AST_ScanMux* scanMux, AST_Module* module)
 {
   CHECK_FALSE(scanMux->IsBusMux(), "Not Yet Supported: ScanMux for buses");
@@ -564,7 +710,7 @@ AST_SystemModelGenerator::Process_ScanMux_Entry (AST_ScanMux* scanMux, AST_Modul
   const auto& name                   = scanMux->BaseName();
   auto        linker                 = m_systemModel->CreateLinker(name, unresolvedPathSelector);
 
-  m_createdNodes.push(linker);
+  AssignNewNode(linker);
 
   auto& instanceContext  = m_instancesContext.top();
   auto  linkerParentNode = instanceContext.parentNode;
@@ -574,28 +720,34 @@ AST_SystemModelGenerator::Process_ScanMux_Entry (AST_ScanMux* scanMux, AST_Modul
 
   LinkerContext linkerContext;
 
-  linkerContext.instancesContext     = m_instancesContext;
-  linkerContext.processedScanMux     = scanMux;
-  linkerContext.processedSelectionId = 0;
-  linkerContext.linkerNodesLevel     = m_createdNodes.size();
-  linkerContext.linker               = linker.get();
-  linkerContext.linkerParentNode     = linkerParentNode;
+  linkerContext.instancesContext       = m_instancesContext;
+  linkerContext.processedScanMux       = scanMux;
+  linkerContext.processedSelectionId   = 0;
+  linkerContext.linkerNodesLevel_first = m_createdNodes.size();
+  linkerContext.linkerNodesLevel       = m_createdNodes.size();
+  linkerContext.linker                 = linker.get();
+  linkerContext.linkerParentNode       = linkerParentNode;
 
   m_linkersContext.push(std::move(linkerContext));
 
   const auto& sourceSignals = scanMux->Selections().front()->SelectedSignals();
-  return std::cref(sourceSignals);
+  return make_tuple(module, cref(sourceSignals));
 }
 //
 //  End of: AST_SystemModelGenerator::Process_ScanMux_Entry
 //---------------------------------------------------------------------------
 
 
+
+
+
+
 //! Does what is needed to process when we reached end of ScanMux selection
 //!
 //! @return New processing context
 //!
-AST_SystemModelGenerator::ProcessingContext_t AST_SystemModelGenerator::Process_ScanMux_EndOfSelectionPath ()
+AST_SystemModelGenerator::ProcessingContext_t
+AST_SystemModelGenerator::Process_ScanMux_EndOfSelectionPath (shared_ptr<mast::SystemModelNode> commonLinkerNode)
 {
   CHECK_VALUE_NOT_EMPTY(m_linkersContext, "There is no linker context to process");
 
@@ -612,20 +764,11 @@ AST_SystemModelGenerator::ProcessingContext_t AST_SystemModelGenerator::Process_
 
   if (processedSelectionId == 0)
   {
-    //+ (begin JFC November/30/2017): for debug purpose
-        newCreated = 0;
-    //+ (end   JFC November/30/2017):
-    auto firstSelectionIsEmpty = newCreated == 0;
-    auto pathSelector          = Create_PathSelector(scanMux, module, firstSelectionIsEmpty);
-    linker->ReplacePathSelector(pathSelector);
+    linkerContext.linkerNodesLevel = m_createdNodes.size();
   }
-
-  if (newCreated > 1u)
+  else if (newCreated > 1u)
   {
-    auto name  = linker->Name();
-    name.append("_").append(std::to_string(processedSelectionId));
-    auto chain = m_systemModel->CreateChain(name);
-    chain->IgnoreForNodePath(true);
+    auto chain = Create_ChainForLinker(linker, processedSelectionId);
     linker->AppendChild(chain);
     AppendCreatedNodesToParent(chain.get(), createdNodesLevel);
   }
@@ -641,20 +784,30 @@ AST_SystemModelGenerator::ProcessingContext_t AST_SystemModelGenerator::Process_
   bool lastLinkerSelection = processedSelectionId >= selections.size();
   if (lastLinkerSelection)
   {
+    auto firstSelectionIsEmpty = AssignNodesToLinkerFirstSelection(commonLinkerNode);
+
+    // ---------------- Assign proper PathSelector
+    //
+    auto pathSelector = Create_PathSelector(scanMux, module, firstSelectionIsEmpty);
+    linker->ReplacePathSelector(pathSelector);
+
+    // ---------------- Deal with parent nodes
+    //
     auto parentNode = linkerContext.linkerParentNode;
 
     auto& instanceContext = m_instancesContext.top();
     instanceContext.parentNode     = parentNode;
     instanceContext.parentIsLinker = false;
 
-    AppendCreatedNodesToParent(parentNode, instanceContext.createdNodesLevel);
-
     auto sourceSignals = std::cref(selections.front()->SelectedSignals()); // Will cause detection of instance input port or previously created node that is just before the linker
 
     m_linkersContext.pop();
-    module = m_linkersContext.empty() ? nullptr // To report end of path processing
-                                      : instanceContext.parentModule;
-    return make_tuple(module, cref(sourceSignals));
+    if (m_linkersContext.empty())
+    {
+      return make_tuple(nullptr, cref(sourceSignals));  // To report end of path processing
+    }
+
+    return Process_ScanMux_EndOfSelectionPath(nullptr);
   }
 
   ++linkerContext.processedSelectionId;
@@ -684,6 +837,8 @@ AST_SystemModelGenerator::Process_ScanRegister (AST_ScanRegister* scanRegister)
   BinaryVector bypassValue(bitsCount, fillPattern, SizeProperty::Fixed);
   if (resetValue != nullptr)
   {
+    //! @todo [JFC]-[December/01/2017]: In Process_ScanRegister(): Move processing of reset value width directly in AST_Value (with some not specific parts in BinaryVector)
+    //!
     auto resetValueBv = resetValue->AsBinaryVector();
     CHECK_VALUE_LTE(resetValueBv.BitsCount(), bitsCount, "Reset value must have no more bits than ScanRegister width ; found "s
                                                          .append(std::to_string(resetValueBv.BitsCount()))
@@ -707,7 +862,7 @@ AST_SystemModelGenerator::Process_ScanRegister (AST_ScanRegister* scanRegister)
 
   scanRegister->AssociatedRegister(registerNode);
 
-  m_createdNodes.push(registerNode);
+  AssignNewNode(registerNode);
 
   return std::cref(source->Signals());
 }

@@ -121,6 +121,7 @@ class AST final : public AST_Builder
 
   // AST_Builder interface implementation
 
+  AST_Port*         Clone_Port         (const AST_Port*         port)         override; //!< Clones a Port
   AST_Instance*     Clone_Instance     (const AST_Instance*     instance)     override; //!< Clones an instance
   AST_Module*       Clone_Module       (const AST_Module*       module)       override; //!< Clones a module
   AST_ScanMux*      Clone_ScanMux      (const AST_ScanMux*      scanMux)      override; //!< Clones a scan multiplexer

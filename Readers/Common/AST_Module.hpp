@@ -17,6 +17,7 @@
 #include "AST_ParentNode.hpp"
 #include <memory>
 #include <string>
+#include <set>
 
 namespace Parsers
 {
@@ -131,6 +132,17 @@ class AST_Module final : public AST_ParentNode
   //!
   void UniquifyInstances (AST_Builder& astBuilder);
 
+  //! Marks an ScanOutPort
+  //!
+  //! @note Marking is caller responsibility for any kind of usage
+  void  MarkScanOutPort (const AST_Port* port) { m_markedScanOutPorts.insert(port); };
+
+  //! Tells whether an ScanOutPort is marked
+  //!
+  //! @note Marking is caller responsibility for any kind of usage
+  bool IsScanOutPortMarked (const AST_Port* port) { return m_markedScanOutPorts.find(port) != m_markedScanOutPorts.cend(); };
+
+
 
   // ---------------- Private Methods
   //
@@ -155,6 +167,7 @@ class AST_Module final : public AST_ParentNode
 
 
   void Uniquify_impl         (AST_Builder& astBuilder, const std::vector<AST_Parameter*>& parameters);
+  void UniquifyScanOutPorts  (AST_Builder& astBuilder);
   void UniquifyScanMuxes     (AST_Builder& astBuilder);
   void UniquifyScanRegisters (AST_Builder& astBuilder);
 
@@ -170,6 +183,7 @@ class AST_Module final : public AST_ParentNode
   std::vector<AST_ScanInterface*> m_scanInterfaces;               //!< Scan interfaces
   std::vector<AST_Port*>          m_scanInPorts;                  //!< Scan input port(s)
   std::vector<AST_Port*>          m_scanOutPorts;                 //!< Scan output port(s)
+  std::set<const AST_Port*>       m_markedScanOutPorts;           //!< Set of "marked" ScanOutPort
   std::vector<AST_Attribute*>     m_attributes;                   //!< Module attributes
   std::vector<AST_ScanRegister*>  m_scanRegisters;                //!< Scan registers in module
   std::vector<AST_ScanMux*>       m_scanMuxes;                    //!< Scan muxes in module

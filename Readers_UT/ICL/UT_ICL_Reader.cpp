@@ -2232,8 +2232,8 @@ void UT_ICL_Reader::test_Generate_Examples ()
 
   auto data =
   {
-//+    make_tuple("Multiple_SIB_3WI.icl", "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),
     make_tuple("Single_SIB_3WI.icl",   "test_Generate_Single_SIB_3WI_PrettyPrint.txt"),
+    make_tuple("Multiple_SIB_3WI.icl", "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),
   };
 
   // ---------------- DDT Exercise

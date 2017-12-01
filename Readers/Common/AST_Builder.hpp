@@ -19,6 +19,7 @@ namespace Parsers
 class AST_Instance;
 class AST_Module;
 class AST_Network;
+class AST_Port;
 class AST_ScalarIdentifier;
 class AST_ScanMux;
 class AST_ScanRegister;
@@ -32,6 +33,7 @@ class AST_Builder
   // ---------------- Public Methods
   //
   public:
+  virtual AST_Port*         Clone_Port         (const AST_Port*         port) = 0;         //!< Clones a Port
   virtual AST_Instance*     Clone_Instance     (const AST_Instance*     instance) = 0;     //!< Clones an instance
   virtual AST_Module*       Clone_Module       (const AST_Module*       module) = 0;       //!< Clones a module
   virtual AST_ScanMux*      Clone_ScanMux      (const AST_ScanMux*      scanMux) = 0;      //!< Clones a scan multiplexer

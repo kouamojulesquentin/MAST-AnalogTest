@@ -92,6 +92,16 @@ AST_Module* AST::Clone_Module (const AST_Module* module)
 //---------------------------------------------------------------------------
 
 
+//! Clones a Port
+//!
+AST_Port* AST::Clone_Port (const AST_Port* port)
+{
+  return Clone_Node(port);
+}
+//
+//  End of: AST::Clone_Port
+//---------------------------------------------------------------------------
+
 
 //! Clones a scan multiplexer
 //!

@@ -27,6 +27,7 @@ class Chain;
 
 namespace Parsers
 {
+class AST_Builder;
 class AST_Identifier;
 class AST_Port;
 class AST_Parameter;
@@ -104,6 +105,11 @@ class AST_Instance final : public AST_ParentNode
   //!
   bool HasAssociatedChain() const { return m_associatedModelChain ? true : false; }
 
+
+  //! Uniquifies instance
+  //!
+  AST_Instance* Uniquify (AST_Builder& astBuilder);
+
   // ---------------- Private Methods
   //
   private:
@@ -147,9 +153,8 @@ class AST_Instance final : public AST_ParentNode
     CleanupChildren();
   }
 
-  //! Dispatches children to specific members
-  //!
   void DispatchChildren () override;
+  void UniquifyInputPorts (AST_Builder& astBuilder);
 
   // ---------------- Private Fields
   //

@@ -192,6 +192,8 @@ void AST_Module::Uniquify_impl (AST_Builder& astBuilder, const std::vector<AST_P
     }
   }
 
+
+  UniquifyScanOutPorts(astBuilder);
   UniquifyScanRegisters(astBuilder);
 //+  UniquifyScanMuxs(astBuilder);
   UniquifyInstances(astBuilder);
@@ -231,6 +233,22 @@ void AST_Module::UniquifyInstances (AST_Builder& astBuilder)
 //  End of: AST_Module::UniquifyInstances
 //---------------------------------------------------------------------------
 
+
+//! Uniquifies module ScanOutPorts
+//!
+//! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
+//!
+void AST_Module::UniquifyScanOutPorts (AST_Builder& astBuilder)
+{
+  for (auto& scanOutPort : m_scanOutPorts)
+  {
+    auto cloned = astBuilder.Clone_Port(scanOutPort);
+    scanOutPort = cloned;  // Replace current (shared) by cloned (unique)
+  }
+}
+//
+//  End of: AST_Module::UniquifyScanRegisters
+//---------------------------------------------------------------------------
 
 //! Uniquifies module scan multiplexers
 //!

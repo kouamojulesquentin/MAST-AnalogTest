@@ -76,19 +76,23 @@ class AST_SystemModelGenerator final
 
   void FollowTopModulePath (AST_Module* module, const AST_Port* scanOutPort);
 
-  SourceSignalsRef_t  Process_Instance_Entry (AST_Instance*     instance, AST_Module* instanceModule, const AST_Port* scanOutPort);
-  ProcessingContext_t Process_Instance_Exit  (AST_Port* scanInPort);
-  SourceSignalsRef_t  Process_ScanMux_Entry  (AST_ScanMux*      scanMux,  AST_Module* module);
-  ProcessingContext_t Process_ScanMux_EndOfSelectionPath ();
   SourceSignalsRef_t  Process_ScanRegister   (AST_ScanRegister* scanRegister);
+  ProcessingContext_t Process_Instance_Entry (AST_Instance*     instance, AST_Module* instanceModule, const AST_Port* scanOutPort);
+  ProcessingContext_t Process_Instance_Exit  (AST_Port*         scanInPort);
+  ProcessingContext_t Process_ScanMux_Entry  (AST_ScanMux*      scanMux,  AST_Module* module);
+  ProcessingContext_t Process_ScanMux_EndOfSelectionPath (std::shared_ptr<mast::SystemModelNode> commonLinkerNode);
 
   void AppendCreatedNodesToParent (mast::ParentNode* parent, size_t levelThreshold);
-
 
   std::tuple<bool, AST_Port*> IsSourcedByModuleInput (const AST_Module* module, const SourceSignals_t& signals) const;
 
   using SelectionTables_t = std::tuple<std::vector<mast::BinaryVector>, std::vector<mast::BinaryVector>>;
   SelectionTables_t MakeSelectionTable (const std::vector<AST_ScanMuxSelection*>&, size_t expectedBitsCount, bool firstSelectionIsEmpty) const;
+
+  std::shared_ptr<mast::Chain> Create_ChainForLinker (const mast::Linker* linker, size_t selectionId);
+
+  void AssignNewNode                     (std::shared_ptr<mast::SystemModelNode> node);
+  bool AssignNodesToLinkerFirstSelection (std::shared_ptr<mast::SystemModelNode> commonLinkerNode);
 
   // ---------------- Private Fields
   //
@@ -106,12 +110,13 @@ class AST_SystemModelGenerator final
   //!
   struct LinkerContext final
   {
-    std::stack<InstanceContext> instancesContext;               //!< Processing contexts downto instance in which the ScanMux is found
-    AST_ScanMux*                processedScanMux     = nullptr; //!< Scan mux being processed
-    size_t                      processedSelectionId = 0;       //!< Offset in Selection vector (to detect how many children must be associated to the Linker)
-    size_t                      linkerNodesLevel     = 0;       //!< To know how many to consider as Linker children
-    mast::Linker*               linker               = nullptr; //!< Created Linker
-    mast::ParentNode*           linkerParentNode     = nullptr; //!< Parent node of linker
+    std::stack<InstanceContext> instancesContext;                 //!< Processing contexts downto instance in which the ScanMux is found
+    AST_ScanMux*                processedScanMux       = nullptr; //!< Scan mux being processed
+    size_t                      processedSelectionId   = 0;       //!< Offset in Selection vector (to detect how many children must be associated to the Linker)
+    size_t                      linkerNodesLevel_first = 0;       //!< To know how many children to assign to Linker first selection
+    size_t                      linkerNodesLevel       = 0;       //!< To know how many children to assign to Linker selections
+    mast::Linker*               linker                 = nullptr; //!< Created Linker
+    mast::ParentNode*           linkerParentNode       = nullptr; //!< Parent node of linker
   };
 
 

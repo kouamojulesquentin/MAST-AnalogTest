@@ -906,10 +906,18 @@ AST_SystemModelGenerator::SelectionTables_t AST_SystemModelGenerator::MakeSelect
 
   //! @todo [JFC]-[November/17/2017]: Support Concat number list in AST_SystemModelGenerator::MakeSelectionTable()
 
+  auto isFirst = true;
   vector<BinaryVector> deselectTable = selectTable;
   for (auto& deselectValue : deselectTable)
   {
-    deselectValue.ToggleBits();
+    if (isFirst)
+    {
+      isFirst = false;
+    }
+    else
+    {
+      deselectValue.ToggleBits();
+    }
   }
 
   return make_tuple(selectTable, deselectTable);

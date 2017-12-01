@@ -2,6 +2,12 @@
  [Chain]        "SIB1"
   [Linker]       "SIBmux"
    :Selector:     "SR", kind: Table_Based, can_select_none: true, inverted_bits: false, reversed_order: false
+   Selection Table:
+     [0] 0b0
+     [1] 0b1
+   Deselection Table:
+     [0] 0b0
+     [1] 0b0
    [Chain]        "SIBmux_1", ignore_in_path: true
     [Chain]        "WI1"
      [Chain]        "reg8"

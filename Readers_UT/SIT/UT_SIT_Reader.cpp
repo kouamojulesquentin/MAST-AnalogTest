@@ -16,8 +16,9 @@
 #include "ParserException.hpp"
 #include "PrettyPrinter.hpp"
 #include "SystemModelBuilder.hpp"
-#include "Utility.hpp"
 #include "LoopbackAccessInterfaceProtocol.hpp"
+#include "Utility.hpp"
+#include "EnumsUtility.hpp"
 #include "g3log/g3log.hpp"
 #include "UT_SIT_Reader.hpp"
 
@@ -852,7 +853,8 @@ void UT_SIT_Reader::test_SIB ()
     TS_ASSERT_EMPTY (sut.PlaceHolders());
 
     // With PrettyPrinter
-    auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(parsedModel, PrettyPrinterOptions::Parser_debug);
+    auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(parsedModel,   PrettyPrinterOptions::Parser_debug
+                                                                      | PrettyPrinterOptions::ShowSelectorTables);
     TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
 
     // With Checker
@@ -869,6 +871,12 @@ void UT_SIT_Reader::test_SIB ()
                "[Chain](1)     \"test_SIB\"\n"
                " [Linker](2)    \"test_SIB_mux\"\n"
                "  :Selector:(0)  \"test_SIB_ctrl\", kind: Binary, can_select_none: true, inverted_bits: false, reversed_order: false\n"
+               "  Selection Table:\n"
+               "    [0] 0b0\n"
+               "    [1] 0b1\n"
+               "  Deselection Table:\n"
+               "    [0] 0b0\n"
+               "    [1] 0b0\n"
                "  [Register](3)  \"test_reg\", length: 4, bypass: 1001\n"
                " [Register](0)  \"test_SIB_ctrl\", length: 1, Hold value: true, bypass: 0"),
 
@@ -878,6 +886,12 @@ void UT_SIT_Reader::test_SIB ()
                "[Chain](1)     \"test_SIB\"\n"
                " [Linker](2)    \"test_SIB_mux\"\n"
                "  :Selector:(0)  \"test_SIB_ctrl\", kind: Binary, can_select_none: true, inverted_bits: true, reversed_order: false\n"
+               "  Selection Table:\n"
+               "    [0] 0b1\n"
+               "    [1] 0b0\n"
+               "  Deselection Table:\n"
+               "    [0] 0b1\n"
+               "    [1] 0b1\n"
                "  [Register](3)  \"test_reg\", length: 4, bypass: 1001\n"
                " [Register](0)  \"test_SIB_ctrl\", length: 1, Hold value: true, bypass: 0"),
 
@@ -888,6 +902,12 @@ void UT_SIT_Reader::test_SIB ()
                " [Register](0)  \"test_SIB_ctrl\", length: 1, Hold value: true, bypass: 0\n"
                " [Linker](2)    \"test_SIB_mux\"\n"
                "  :Selector:(0)  \"test_SIB_ctrl\", kind: Binary, can_select_none: true, inverted_bits: false, reversed_order: false\n"
+               "  Selection Table:\n"
+               "    [0] 0b0\n"
+               "    [1] 0b1\n"
+               "  Deselection Table:\n"
+               "    [0] 0b0\n"
+               "    [1] 0b0\n"
                "  [Register](3)  \"test_reg\", length: 4, bypass: 1001"),
     // 3
     make_tuple("SIB test_SIB PRE LOW (REGISTER test_reg 4 Bypass: \"0b1001\")\n",
@@ -896,6 +916,12 @@ void UT_SIT_Reader::test_SIB ()
                " [Register](0)  \"test_SIB_ctrl\", length: 1, Hold value: true, bypass: 0\n"
                " [Linker](2)    \"test_SIB_mux\"\n"
                "  :Selector:(0)  \"test_SIB_ctrl\", kind: Binary, can_select_none: true, inverted_bits: true, reversed_order: false\n"
+               "  Selection Table:\n"
+               "    [0] 0b1\n"
+               "    [1] 0b0\n"
+               "  Deselection Table:\n"
+               "    [0] 0b1\n"
+               "    [1] 0b1\n"
                "  [Register](3)  \"test_reg\", length: 4, bypass: 1001"),
   };
 

@@ -2167,10 +2167,17 @@ void UT_ICL_Reader::test_Generate_SIB_mux_pre ()
   TS_ASSERT_EQUALS      (topNode->Name(), "SIB_mux_pre");
 
   // With PrettyPrinter
-  auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode, PrettyPrinterOptions::Parser_debug);
+  auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode,   PrettyPrinterOptions::Parser_debug
+                                                                  | PrettyPrinterOptions::ShowSelectorTables);
   auto expected_PrettyPrint = "[Chain](0)     \"SIB_mux_pre\"\n"
                               " [Linker](2)    \"SIBmux\"\n"
                               "  :Selector:(1)  \"SR\", kind: Table_Based, can_select_none: true, inverted_bits: false, reversed_order: false\n"
+                              "  Selection Table:\n"
+                              "    [0] 0b0\n"
+                              "    [1] 0b1\n"
+                              "  Deselection Table:\n"
+                              "    [0] 0b0\n"
+                              "    [1] 0b0\n"
                               " [Register](1)  \"SR\", length: 1, bypass: 0";
 
   TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
@@ -2219,7 +2226,8 @@ void UT_ICL_Reader::test_Generate_Examples ()
     // ---------------- Verify
     //
     // With PrettyPrinter
-    auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode, PrettyPrinterOptions::Parser_debug_no_id);
+    auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode,   PrettyPrinterOptions::Parser_debug_no_id
+                                                                    | PrettyPrinterOptions::ShowSelectorTables);
     auto expected_PrettyPrint = GetExpectedModelPrettyPrint(expectedFileName);
 
     TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);

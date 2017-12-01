@@ -30,20 +30,28 @@ class PathSelector;
 enum class PrettyPrinterOptions
 {
   None                   = 0,
-  Verbose                = 1 << 0,  //!< To report whether a node is pending, has conditioner, its priority, is ignored for path specification, protocol name for access interface, all values for registers
-  DisplayValueAuto       = 1 << 1,  //!< To report Register values as binary when small, hexa when large and end of large string as binary when cannot form a plain nibble
-  ShowNodesIdentifier    = 1 << 2,  //!< To report nodes identifier
-  ShowProtocol           = 1 << 3,  //!< To report Protocol name of an access interface
-  ShowSelectionState     = 1 << 4,  //!< To report whether a node is selected or active
-  ShowSelectionValue     = 1 << 5,  //!< To report which selector value select the nodes
-  ShowSelectorProperties = 1 << 6,  //!< To report selector properties (kind, can_select_none, inverted_bits, reverted_order...)
-  ShowNodeIsIgnored      = 1 << 7,  //!< To report parent node that are ignored when defining a node path
+  Verbose                = 1 << 0, //!< To report whether a node is pending, has conditioner, its priority, is ignored for path specification, protocol name for access interface, all values for registers
+  DisplayValueAuto       = 1 << 1, //!< To report Register values as binary when small, hexa when large and end of large string as binary when cannot form a plain nibble
+  ShowNodesIdentifier    = 1 << 2, //!< To report nodes identifier
+  ShowProtocol           = 1 << 3, //!< To report Protocol name of an access interface
+  ShowSelectionState     = 1 << 4, //!< To report whether a node is selected or active
+  ShowSelectionValue     = 1 << 5, //!< To report which selector value select the nodes
+  ShowSelectorProperties = 1 << 6, //!< To report selector properties (kind, can_select_none, inverted_bits, reverted_order...)
+  ShowSelectorTables     = 1 << 7, //!< To report path selector select/deselect tables (when table based) ==> Need ShowSelectorProperties
+  ShowNodeIsIgnored      = 1 << 8, //!< To report parent node that are ignored when defining a node path
 
   Default            = ShowNodesIdentifier,
   Std                = Verbose | DisplayValueAuto | ShowNodesIdentifier,
   Parser_debug       = ShowSelectorProperties | ShowProtocol | ShowNodeIsIgnored | ShowProtocol | ShowNodesIdentifier,
   Parser_debug_no_id = ShowSelectorProperties | ShowProtocol | ShowNodeIsIgnored | ShowProtocol,
-  All                = Verbose | DisplayValueAuto  | ShowNodesIdentifier | ShowProtocol | ShowSelectionState | ShowSelectionValue | ShowSelectorProperties,
+  All                =   Verbose
+                       | DisplayValueAuto
+                       | ShowNodesIdentifier
+                       | ShowProtocol
+                       | ShowSelectionState
+                       | ShowSelectionValue
+                       | ShowSelectorProperties
+                       | ShowSelectorTables,
 };
 
 //! System model visitors for creation of a text, readable, and hierarchical
@@ -116,7 +124,8 @@ class MAST_CORE_EXPORT PrettyPrinter : public SystemModelVisitor
   bool                          m_showSelectionState     = false; //!< When true, selected/active linker node are reported as so
   bool                          m_showSelectionValue     = false; //!< When true, for all linker children nodes, their selection state is reported
   bool                          m_showSelectorProperties = false; //!< When true, selector options are reported
-  bool                          m_ShowNodeIsIgnored      = false; //!< When true, it is reported if node name is ignored in path composition
+  bool                          m_showNodeIsIgnored      = false; //!< When true, it is reported if node name is ignored in path composition
+  bool                          m_showSelectorTables     = false; //!< When true, Select/Deselect tables of tables based PathSelector are reported
   bool                          m_first                  = true;  //!< True when nothing as been streamed yet (useful to add first new line)
 };
 //

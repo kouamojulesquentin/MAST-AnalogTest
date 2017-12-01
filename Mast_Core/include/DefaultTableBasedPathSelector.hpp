@@ -21,6 +21,7 @@
 #include <vector>
 #include <memory>
 #include <experimental/string_view>
+#include <ostream>
 
 namespace mast
 {
@@ -82,6 +83,14 @@ class MAST_CORE_EXPORT DefaultTableBasedPathSelector : public PathSelector
   //!
   virtual const BinaryVector& SelectionValue (uint32_t pathIdentifier) const override;
 
+  //! Returns table use for path selection
+  //!
+  const TablesType& SelectTable() const { return m_selectTable; }
+
+  //! Returns table use for path deselection
+  //!
+  const TablesType& DeselectTable() const { return m_deselectTable; }
+
   static TablesType& InvertTable (TablesType& table);  //!< Inverts table bits
   static TablesType& FixTable    (TablesType& table);  //!< Makes table entry fix (cannot modify size)
 
@@ -92,6 +101,13 @@ class MAST_CORE_EXPORT DefaultTableBasedPathSelector : public PathSelector
   //! Returns debug information about selector
   //!
   virtual std::string DebugSelectorInfo(bool onlyProperties) const override;
+
+  //! Streams content of a table into a text stream
+  //!
+  static void StreamTable (std::ostream&            os,
+                           std::experimental::string_view prefix,
+                           std::experimental::string_view title,
+                           const TablesType&              table);
 
   // ---------------- Protected Methods
   //

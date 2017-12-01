@@ -900,6 +900,59 @@ void UT_PrettyPrinter::test_PrettyPrint_SelectionState ()
 }
 
 
+//! Checks PrettyPrinter::PrettyPrint() with "Show Selection State and tables" option
+//!
+void UT_PrettyPrinter::test_PrettyPrint_SelectionTables ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto tap    = builder.Create_JTAG_TAP ("", 5u, 4u);
+  auto linker = sm.LinkerWithId(2u);
+  auto chain  = sm.CreateChain    ("Chain name", tap);
+  auto reg_1  = sm.CreateRegister ("Reg_1", BinaryVector::CreateFromBinaryString("1010_0110:110"), tap);
+  auto reg_2  = sm.CreateRegister ("Reg_2", BinaryVector::CreateFromBinaryString("1010_10"),       tap);
+
+  linker->IgnoreForNodePath(true);
+
+  // ---------------- Exercise
+  //
+  auto got = PrettyPrinter::PrettyPrint(tap,  PrettyPrinterOptions::ShowSelectionState
+                                            | PrettyPrinterOptions::ShowSelectorProperties
+                                            | PrettyPrinterOptions::ShowSelectorTables
+                                            | PrettyPrinterOptions::ShowNodesIdentifier);
+
+  // ---------------- Verify
+  //
+  auto expected = string(
+                          "[Access_I](0)  \"1149_1_TAP\"\n"
+                          " [Register](1)  \"TAP_IR\", length: 5, Hold value: true, bypass: 1111_1\n"
+                          " [Linker](2)    \"TAP_DR_Mux\"\n"
+                          "  :Selector:(1)  \"TAP_IR\", kind: Table_Based, can_select_none: false, inverted_bits: false, reversed_order: false\n"
+                          "  Selection Table:\n"
+                          "    [0] 0b1111_1\n"
+                          "    [1] 0b1111_1\n"
+                          "    [2] 0b0000_1\n"
+                          "    [3] 0b0001_0\n"
+                          "    [4] 0b0001_1\n"
+                          "  Deselection Table:\n"
+                          "    [0] 0b1111_1\n"
+                          "    [1] 0b1111_1\n"
+                          "    [2] 0b1111_1\n"
+                          "    [3] 0b1111_1\n"
+                          "    [4] 0b1111_1\n"
+                          "  [Register](3)  \"TAP_BPY\",     :S:A:, length: 1, bypass: 1\n"
+                          "  [Chain](4)     \"Chain name\"\n"
+                          "  [Register](5)  \"Reg_1\", length: 11, bypass: 1010_0110:110\n"
+                          "  [Register](6)  \"Reg_2\", length: 6, bypass: 1010_10"
+                        );
+  TS_ASSERT_EQUALS (got, expected);
+}
+
+
+
 //! Checks PrettyPrinter::PrettyPrint() with all options
 //!
 void UT_PrettyPrinter::test_PrettyPrint_AllOptions ()
@@ -933,6 +986,18 @@ void UT_PrettyPrinter::test_PrettyPrint_AllOptions ()
                          "                                                     , pending: false, has_conditioner: false, priority: 0\n"
                          " [Linker](2)    \"TAP_DR_Mux\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
                          "  :Selector:(1)  \"TAP_IR\", kind: Table_Based, can_select_none: false, inverted_bits: false, reversed_order: false\n"
+                         "  Selection Table:\n"
+                         "    [0] 0b1111_1\n"
+                         "    [1] 0b1111_1\n"
+                         "    [2] 0b0000_1\n"
+                         "    [3] 0b0001_0\n"
+                         "    [4] 0b0001_1\n"
+                         "  Deselection Table:\n"
+                         "    [0] 0b1111_1\n"
+                         "    [1] 0b1111_1\n"
+                         "    [2] 0b1111_1\n"
+                         "    [3] 0b1111_1\n"
+                         "    [4] 0b1111_1\n"
                          "  [Register](3)  \"TAP_BPY\",     :0b11111:S:A:, length: 1, bypass:            0b1\n"
                          "                                                        , next_to_sut:       0b1\n"
                          "                                                        , last_to_sut:       0b1\n"

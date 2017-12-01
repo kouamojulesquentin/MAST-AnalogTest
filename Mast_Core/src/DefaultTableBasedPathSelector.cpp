@@ -26,6 +26,35 @@ using std::shared_ptr;
 
 using namespace mast;
 
+
+//! Streams content of a selector table
+//!
+//! @param os       Output stream
+//! @param prefix   What is inserted before each line
+//! @param title    Title that is streamed just before table content
+//! @param table    Table to stream content
+//!
+void DefaultTableBasedPathSelector::StreamTable (std::ostream& os, string_view prefix, string_view title, const TablesType& table)
+{
+  os << std::endl;
+
+  if (!title.empty())
+  {
+    os << prefix << title;
+  }
+
+  uint32_t pathID = 0;
+  for (const auto& bv : table)
+  {
+    os << std::endl << prefix;
+    os << "  [" << pathID++ << "] " << bv.DataAsMixString();
+  }
+}
+//
+//  End of: DefaultTableBasedPathSelector::StreamTable
+//---------------------------------------------------------------------------
+
+
 //! Returns readable information about selector (ex: select and deselect tables)
 //!
 //! @param onlyProperties When true, only properties are return, otherwise content
@@ -35,25 +64,13 @@ string DefaultTableBasedPathSelector::DebugSelectorInfo (bool onlyProperties) co
 {
   auto debugInfo = PathSelector::DebugSelectorInfo(onlyProperties);
 
-  ostringstream os;
 
   if (!onlyProperties)
   {
-    auto streamTable = [](string_view title, auto& os, auto& table)
-    {
-      os << std::endl << std::endl;
-      os << title;
+    ostringstream os;
 
-      uint32_t pathID = 0;
-      for (const auto& bv : table)
-      {
-        os << std::endl;
-        os << "[" << pathID++ << "] " << bv.DataAsMixString();
-      }
-    };
-
-    streamTable("Selection Table:",   os, m_selectTable);
-    streamTable("Deselection Table:", os, m_deselectTable);
+    StreamTable(os, "", "\nSelection Table:",   m_selectTable);
+    StreamTable(os, "", "\nDeselection Table:", m_deselectTable);
 
     debugInfo.append(os.str());
   }

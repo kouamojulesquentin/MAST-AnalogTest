@@ -66,6 +66,7 @@ class UT_PrettyPrinter : public CxxTest::TestSuite
   void test_PrettyPrint_Std ();
   void test_PrettyPrint_SelectionValue ();
   void test_PrettyPrint_SelectionState ();
+  void test_PrettyPrint_SelectionTables ();
   void test_PrettyPrint_AllOptions ();
 
   // ---------------- Private  Methods

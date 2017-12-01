@@ -330,14 +330,14 @@ void UT_DefaultTableBasedPathSelector::test_DebugSelectorInfo ()
                   "Inverted_bits:   false\n"
                   "\n"
                   "Selection Table:\n"
-                  "[0] 0b000\n"
-                  "[1] 0b001\n"
-                  "[2] 0b010\n"
+                  "  [0] 0b000\n"
+                  "  [1] 0b001\n"
+                  "  [2] 0b010\n"
                   "\n"
                   "Deselection Table:\n"
-                  "[0] 0b000\n"
-                  "[1] 0b110\n"
-                  "[2] 0b101"sv;
+                  "  [0] 0b000\n"
+                  "  [1] 0b110\n"
+                  "  [2] 0b101"sv;
 
   TS_ASSERT_EQUALS (debugInfo, expected);
 }

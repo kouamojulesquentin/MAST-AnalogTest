@@ -14,6 +14,7 @@
 #include "PrettyPrinter.hpp"
 #include "SystemModelNodes.hpp"
 #include "PathSelector.hpp"
+#include "DefaultTableBasedPathSelector.hpp"
 #include "AccessInterfaceProtocol.hpp"
 #include "Utility.hpp"
 #include "EnumsUtility.hpp"
@@ -36,7 +37,8 @@ PrettyPrinter::PrettyPrinter (PrettyPrinterOptions options)
   , m_showSelectionState     (IsSet(options, PrettyPrinterOptions::ShowSelectionState))
   , m_showSelectionValue     (IsSet(options, PrettyPrinterOptions::ShowSelectionValue))
   , m_showSelectorProperties (IsSet(options, PrettyPrinterOptions::ShowSelectorProperties))
-  , m_ShowNodeIsIgnored      (IsSet(options, PrettyPrinterOptions::ShowNodeIsIgnored))
+  , m_showNodeIsIgnored      (IsSet(options, PrettyPrinterOptions::ShowNodeIsIgnored))
+  , m_showSelectorTables     (IsSet(options, PrettyPrinterOptions::ShowSelectorTables))
 {
 }
 //
@@ -235,6 +237,17 @@ void PrettyPrinter::StreamNodeHeader(string_view type, const SystemModelNode& no
     m_os << ", can_select_none: " << std::boolalpha << IsSet(m_selector->Properties(), SelectorProperty::CanSelectNone);
     m_os << ", inverted_bits: "   << std::boolalpha << IsSet(m_selector->Properties(), SelectorProperty::InvertedBits);
     m_os << ", reversed_order: "  << std::boolalpha << IsSet(m_selector->Properties(), SelectorProperty::ReverseOrder);
+
+    if (m_showSelectorTables)
+    {
+      auto selector = std::dynamic_pointer_cast<DefaultTableBasedPathSelector>(m_selector);
+      if (selector)
+      {
+        auto indent = string(m_depth, ' ');
+        selector->StreamTable(m_os, indent, "Selection Table:",   selector->SelectTable());
+        selector->StreamTable(m_os, indent, "Deselection Table:", selector->DeselectTable());
+      }
+    }
   }
 
   // ---------------- Display selection/active state(s)
@@ -268,7 +281,7 @@ void PrettyPrinter::StreamParentNode (std::experimental::string_view type, const
 {
   StreamNodeHeader(type, parentNode, notes);
 
-  if (m_verbose || m_ShowNodeIsIgnored)
+  if (m_verbose || m_showNodeIsIgnored)
   {
     if (parentNode.IgnoreForNodePath())
     {
@@ -352,8 +365,6 @@ void PrettyPrinter::VisitLinker (Linker& linker)
     {
       m_os << ", ERROR: LINKER HAS NO SELECTOR !!!";
     }
-
-
   }
 
   PrintChildren(linker);

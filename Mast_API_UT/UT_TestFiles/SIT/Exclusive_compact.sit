@@ -1,0 +1,9 @@
+CHAIN Exclusive
+{
+  MIB MIB_Exclusive POST HIGH 3 Binary
+  (
+    INSTANCE WI1 OF WrappedInstr.sit
+    INSTANCE WI2 OF WrappedInstr.sit
+    INSTANCE WI3 OF WrappedInstr.sit
+  )
+}

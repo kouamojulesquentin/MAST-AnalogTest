@@ -1,0 +1,30 @@
+[Chain]        "Exclusive"
+ [Chain]        "MIB_Exclusive"
+  [Linker]       "MIB_Exclusive_mux"
+   :Selector:     "MIB_Exclusive_ctrl", kind: Binary, can_select_none: true, inverted_bits: false, reversed_order: false
+   Selection Table:
+     [0] 0b00
+     [1] 0b01
+     [2] 0b10
+     [3] 0b11
+   Deselection Table:
+     [0] 0b00
+     [1] 0b00
+     [2] 0b00
+     [3] 0b00
+   [Chain]        "WI1"
+    [Chain]        "WrappedInstr"
+     [Chain]        "reg8"
+      [Chain]        "SReg"
+       [Register]     "SR", length: 8, bypass: 0000_0000
+   [Chain]        "WI2"
+    [Chain]        "WrappedInstr"
+     [Chain]        "reg8"
+      [Chain]        "SReg"
+       [Register]     "SR", length: 8, bypass: 0000_0000
+   [Chain]        "WI3"
+    [Chain]        "WrappedInstr"
+     [Chain]        "reg8"
+      [Chain]        "SReg"
+       [Register]     "SR", length: 8, bypass: 0000_0000
+  [Register]     "MIB_Exclusive_ctrl", length: 2, Hold value: true, bypass: 00

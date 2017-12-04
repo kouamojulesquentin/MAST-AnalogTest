@@ -1,0 +1,12 @@
+CHAIN Single_SIB_3WI
+{
+  SIB SIB1 POST HIGH
+  (
+    CHAIN SIBMux_1 NOT_IN_PATH
+    {
+      INSTANCE WI1 OF WrappedInstr.sit
+      INSTANCE WI2 OF WrappedInstr.sit
+      INSTANCE WI3 OF WrappedInstr.sit
+    }
+  )
+}

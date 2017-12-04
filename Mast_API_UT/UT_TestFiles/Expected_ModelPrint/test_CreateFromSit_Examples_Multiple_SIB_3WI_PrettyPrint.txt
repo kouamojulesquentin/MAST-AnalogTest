@@ -1,7 +1,7 @@
 [Chain]        "Multiple_SIB_3WI"
  [Chain]        "SIB1"
-  [Linker]       "SIBmux"
-   :Selector:     "SR", kind: Table_Based, can_select_none: true, inverted_bits: false, reversed_order: false
+  [Linker]       "SIB1_mux"
+   :Selector:     "SIB1_ctrl", kind: Binary, can_select_none: true, inverted_bits: false, reversed_order: false
    Selection Table:
      [0] 0b0
      [1] 0b1
@@ -9,12 +9,14 @@
      [0] 0b0
      [1] 0b0
    [Chain]        "WI1"
-    [Chain]        "reg8"
-     [Register]     "SR", length: 8, bypass: 0000_0000
-  [Register]     "SR", length: 1, bypass: 0
+    [Chain]        "WrappedInstr"
+     [Chain]        "reg8"
+      [Chain]        "SReg"
+       [Register]     "SR", length: 8, bypass: 0000_0000
+  [Register]     "SIB1_ctrl", length: 1, Hold value: true, bypass: 0
  [Chain]        "SIB2"
-  [Linker]       "SIBmux"
-   :Selector:     "SR", kind: Table_Based, can_select_none: true, inverted_bits: false, reversed_order: false
+  [Linker]       "SIB2_mux"
+   :Selector:     "SIB2_ctrl", kind: Binary, can_select_none: true, inverted_bits: false, reversed_order: false
    Selection Table:
      [0] 0b0
      [1] 0b1
@@ -22,12 +24,14 @@
      [0] 0b0
      [1] 0b0
    [Chain]        "WI2"
-    [Chain]        "reg8"
-     [Register]     "SR", length: 8, bypass: 0000_0000
-  [Register]     "SR", length: 1, bypass: 0
+    [Chain]        "WrappedInstr"
+     [Chain]        "reg8"
+      [Chain]        "SReg"
+       [Register]     "SR", length: 8, bypass: 0000_0000
+  [Register]     "SIB2_ctrl", length: 1, Hold value: true, bypass: 0
  [Chain]        "SIB3"
-  [Linker]       "SIBmux"
-   :Selector:     "SR", kind: Table_Based, can_select_none: true, inverted_bits: false, reversed_order: false
+  [Linker]       "SIB3_mux"
+   :Selector:     "SIB3_ctrl", kind: Binary, can_select_none: true, inverted_bits: false, reversed_order: false
    Selection Table:
      [0] 0b0
      [1] 0b1
@@ -35,6 +39,8 @@
      [0] 0b0
      [1] 0b0
    [Chain]        "WI3"
-    [Chain]        "reg8"
-     [Register]     "SR", length: 8, bypass: 0000_0000
-  [Register]     "SR", length: 1, bypass: 0
+    [Chain]        "WrappedInstr"
+     [Chain]        "reg8"
+      [Chain]        "SReg"
+       [Register]     "SR", length: 8, bypass: 0000_0000
+  [Register]     "SIB3_ctrl", length: 1, Hold value: true, bypass: 0

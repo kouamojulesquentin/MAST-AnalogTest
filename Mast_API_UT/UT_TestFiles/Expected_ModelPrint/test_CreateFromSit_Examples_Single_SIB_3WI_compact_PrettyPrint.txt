@@ -1,7 +1,7 @@
 [Chain]        "Single_SIB_3WI"
  [Chain]        "SIB1"
-  [Linker]       "SIBMux"
-   :Selector:     "SR", kind: Binary, can_select_none: true, inverted_bits: false, reversed_order: false
+  [Linker]       "SIB1_mux"
+   :Selector:     "SIB1_ctrl", kind: Binary, can_select_none: true, inverted_bits: false, reversed_order: false
    Selection Table:
      [0] 0b0
      [1] 0b1
@@ -24,4 +24,4 @@
       [Chain]        "reg8"
        [Chain]        "SReg"
         [Register]     "SR", length: 8, bypass: 0000_0000
-  [Register]     "SR", length: 1, bypass: 0
+  [Register]     "SIB1_ctrl", length: 1, Hold value: true, bypass: 0

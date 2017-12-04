@@ -590,13 +590,15 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_Examples ()
 
   auto data =
   {
-    make_tuple("SReg.sit"sv,         "test_CreateFromSit_Examples_SReg_PrettyPrint.txt"sv),
-    make_tuple("WrappedInstr.sit"sv, "test_CreateFromSit_Examples_WrappedInstr_PrettyPrint.txt"sv),
-    make_tuple("Daisy_3WI.sit"sv,    "test_CreateFromSit_Examples_Daisy_3WI_PrettyPrint.txt"sv),
-    make_tuple("SIB_mux_pre.sit"sv,  "test_CreateFromSit_Examples_SIB_mux_pre_PrettyPrint.txt"sv),
-//+    make_tuple("Single_SIB_3WI.sit",   "test_Generate_Single_SIB_3WI_PrettyPrint.txt"),
-//+    make_tuple("Multiple_SIB_3WI.sit", "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),
-//+    make_tuple("Nested_SIB_3WI.sit",   "test_Generate_Nested_SIB_3WI_PrettyPrint.txt"),
+    make_tuple("SReg.sit"sv,                   "test_CreateFromSit_Examples_SReg_PrettyPrint.txt"sv),
+    make_tuple("WrappedInstr.sit"sv,           "test_CreateFromSit_Examples_WrappedInstr_PrettyPrint.txt"sv),
+    make_tuple("Daisy_3WI.sit"sv,              "test_CreateFromSit_Examples_Daisy_3WI_PrettyPrint.txt"sv),
+    make_tuple("SIB_mux_pre.sit"sv,            "test_CreateFromSit_Examples_SIB_mux_pre_PrettyPrint.txt"sv),
+    make_tuple("Single_SIB_3WI.sit"sv,         "test_CreateFromSit_Examples_Single_SIB_3WI_PrettyPrint.txt"sv),
+    make_tuple("Single_SIB_3WI_compact.sit"sv, "test_CreateFromSit_Examples_Single_SIB_3WI_compact_PrettyPrint.txt"sv),
+    make_tuple("Multiple_SIB_3WI.sit"sv,       "test_CreateFromSit_Examples_Multiple_SIB_3WI_PrettyPrint.txt"sv),
+    make_tuple("Nested_SIB_3WI.sit"sv,         "test_CreateFromSit_Examples_Nested_SIB_3WI_PrettyPrint.txt"sv),
+    make_tuple("Exclusive_compact.sit"sv,      "test_CreateFromSit_Examples_Exclusive_PrettyPrint.txt"sv),
   };
 
   // ---------------- DDT Exercise

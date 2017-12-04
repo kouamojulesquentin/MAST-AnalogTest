@@ -391,13 +391,17 @@ void AST_SystemModelGenerator::FollowTopModulePath (AST_Module* topModule, const
           auto scanRegister = module->FindScanRegister(identifier);
           if (scanRegister != nullptr)
           {
-            if (scanRegister->HasAssociatedRegister())       // Have we already gone to this path point ?
+            if (!scanRegister->HasAssociatedRegister())       // Have we already gone to this path point ?
+            {
+              sourceSignals = Process_ScanRegister(scanRegister);
+            }
+            else if (!m_linkersContext.empty())
             {
               std::tie(module, sourceSignals) = Process_ScanMux_EndOfSelectionPath(scanRegister->AssociatedRegister());
             }
             else
             {
-              sourceSignals = Process_ScanRegister(scanRegister);
+              return;
             }
           }
           else  // ScanMux

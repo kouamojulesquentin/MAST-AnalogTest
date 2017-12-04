@@ -47,6 +47,8 @@ class UT_ModelBuildDriver : public CxxTest::TestSuite
   void test_CreateModelFromSitFile_MixKindsInstances ();
   void test_CreateModelFromSitFile_MissingFactory ();
 
+  void test_CreateModelFromSitFile_Examples ();
+
   // ================ Other Methods ================
 
   void setUp(); //!< Initializes test (called for each test)

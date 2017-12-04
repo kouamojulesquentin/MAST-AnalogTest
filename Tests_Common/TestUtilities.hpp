@@ -30,6 +30,10 @@ namespace test
   //!
   extern std::string GetTestFilePath(const std::initializer_list<std::string>& subPathsToFile, bool checkExists = true);
 
+  //! Gets full content of some text file
+  //!
+  extern std::string GetTextFileContent (const std::string& filePath);
+
   //! Returns directory path of currently running test runner
   //!
   extern const std::string& GetRunnerDirectoryPath();

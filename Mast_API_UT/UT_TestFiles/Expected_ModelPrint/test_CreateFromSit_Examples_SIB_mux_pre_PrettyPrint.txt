@@ -1,0 +1,10 @@
+[Chain]        "SIB_mux_pre"
+ [Linker]       "SIBmux"
+  :Selector:     "SR", kind: Binary, can_select_none: true, inverted_bits: false, reversed_order: false
+  Selection Table:
+    [0] 0b0
+    [1] 0b1
+  Deselection Table:
+    [0] 0b0
+    [1] 0b0
+ [Register]     "SR", length: 1, bypass: 0

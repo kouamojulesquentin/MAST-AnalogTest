@@ -1,0 +1,7 @@
+CHAIN Daisy_3WI
+{
+  INSTANCE WI1 OF WrappedInstr.sit
+  INSTANCE WI2 OF WrappedInstr.sit
+  INSTANCE WI3 OF WrappedInstr.sit
+}
+

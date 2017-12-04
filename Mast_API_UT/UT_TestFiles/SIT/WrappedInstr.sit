@@ -1,0 +1,4 @@
+CHAIN WrappedInstr
+{
+  INSTANCE reg8 OF SReg.sit
+}

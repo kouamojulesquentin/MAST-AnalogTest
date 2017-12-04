@@ -1,0 +1,8 @@
+CHAIN SIB_mux_pre
+{
+  LINKER SIBmux Binary SR 1
+  (
+  )
+  REGISTER SR 1 Bypass: "0b0"
+}
+

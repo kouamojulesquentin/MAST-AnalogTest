@@ -1,0 +1,4 @@
+[Chain]        "WrappedInstr"
+ [Chain]        "reg8"
+  [Chain]        "SReg"
+   [Register]     "SR", length: 8, bypass: 0000_0000

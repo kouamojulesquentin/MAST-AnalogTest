@@ -33,8 +33,11 @@
 using std::string;
 using std::experimental::string_view;
 using std::shared_ptr;
+using std::make_shared;
+using std::make_tuple;
 
 using namespace std::string_literals;
+using namespace std::experimental::literals::string_view_literals;
 using namespace mast;
 
 namespace
@@ -42,15 +45,36 @@ namespace
 
 //! Returns path of a file accessible by test runner
 //!
+//! @param dirName    Directory name where file should stand
+//! @param fileName   File name (with extension)
+//!
+string GetTestFilePath (string_view dirName, string_view fileName, bool checkExists = true)
+{
+  return test::GetTestFilePath({"Mast_API"s, "UT_TestFiles"s, string(dirName), string(fileName)}, checkExists);
+}
+
+//! Returns path of a file accessible by test runner
+//!
 //! @param fileName   File name used by test
 //!
 string GetTestFilePath (string_view fileName, bool checkExists = true)
 {
-  return test::GetTestFilePath({"Mast_API"s, "UT_TestFiles"s, string(fileName)}, checkExists);
+  return GetTestFilePath("", fileName, checkExists);
 }
 //
 //  End of: GetTestFilePath
 //---------------------------------------------------------------------------
+
+
+//! Gets content of expected AST pretty print from file
+//!
+//! @param fileName   File name (with extension) that contains expected AST pretty print
+//!
+string GetExpectedModelPrettyPrint (string_view fileName)
+{
+  auto expectedFilePath = GetTestFilePath("Expected_ModelPrint", fileName);
+  return test::GetTextFileContent(expectedFilePath);
+}
 
 } // End of unnamed namespace
 
@@ -518,6 +542,66 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_MissingFactory ()
   // ---------------- Exercise & Verify
   //
   TS_ASSERT_THROWS (sm = sut.CreateModelFromSitFile(sitFile), std::exception);
+}
+
+
+//! Checks ModelBuildDriver::CreateModelFromSitFile() with various examples
+//!
+void UT_ModelBuildDriver::test_CreateModelFromSitFile_Examples ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto sitFileName      = std::get<0>(data);
+    auto expectedFileName = std::get<1>(data);    // Expected pretty print
+
+    auto             sitFilePath = GetTestFilePath("SIT"sv, sitFileName);
+    auto             sm          = make_shared<SystemModel>();
+    ModelBuildDriver sut;
+
+    CxxTest::setAbortTestOnFail(true);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sm = sut.CreateModelFromSitFile(sitFilePath));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_NOT_NULLPTR (sm);
+    TS_ASSERT_EMPTY       (sut.ErrorMessage());
+
+    auto topNode = sm->Root();
+
+    // With PrettyPrinter
+    auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode,   PrettyPrinterOptions::Parser_debug_no_id
+                                                                    | PrettyPrinterOptions::ShowSelectorTables);
+    auto expected_PrettyPrint = GetExpectedModelPrettyPrint(expectedFileName);
+
+    TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
+    // With Checker
+    test::PrependWithTap(sm, topNode);   // This is to avoid warnings about missing AccessInterface
+    auto modelCheckResult = sm->Check();
+    TS_ASSERT_EMPTY (modelCheckResult.errors);
+  };
+
+  auto data =
+  {
+    make_tuple("SReg.sit"sv,         "test_CreateFromSit_Examples_SReg_PrettyPrint.txt"sv),
+    make_tuple("WrappedInstr.sit"sv, "test_CreateFromSit_Examples_WrappedInstr_PrettyPrint.txt"sv),
+    make_tuple("Daisy_3WI.sit"sv,    "test_CreateFromSit_Examples_Daisy_3WI_PrettyPrint.txt"sv),
+    make_tuple("SIB_mux_pre.sit"sv,  "test_CreateFromSit_Examples_SIB_mux_pre_PrettyPrint.txt"sv),
+//+    make_tuple("Single_SIB_3WI.sit",   "test_Generate_Single_SIB_3WI_PrettyPrint.txt"),
+//+    make_tuple("Multiple_SIB_3WI.sit", "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),
+//+    make_tuple("Nested_SIB_3WI.sit",   "test_Generate_Nested_SIB_3WI_PrettyPrint.txt"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
 }
 
 //===========================================================================

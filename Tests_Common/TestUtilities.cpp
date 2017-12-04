@@ -19,6 +19,7 @@
 #include "LoopbackAccessInterfaceProtocol.hpp"
 
 #include <cxxtest/TestSuite.h>
+#include <fstream>
 
 using std::string;
 using std::initializer_list;
@@ -54,6 +55,34 @@ string test::GetTestFilePath(const initializer_list<std::string>& subPathsToFile
     TS_ASSERT_FILE_EXISTS (filePath);
   }
   return filePath;
+}
+
+//! Gets full content of some text file
+//!
+//! @param filePath   Text file path to read
+//!
+string test::GetTextFileContent (const string& filePath)
+{
+  std::ifstream ifs(filePath);
+
+  string content;
+  string line;
+
+  auto first = true;
+  while (std::getline(ifs, line))
+  {
+    if (!first)
+    {
+      content.append("\n");
+    }
+    else
+    {
+      first = false;
+    }
+    content.append(line);
+  }
+
+  return content;
 }
 
 //! Returns directory path of currently running test runner

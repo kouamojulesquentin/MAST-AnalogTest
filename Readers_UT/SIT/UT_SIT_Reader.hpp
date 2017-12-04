@@ -64,6 +64,10 @@ class UT_SIT_Reader : public CxxTest::TestSuite
   void test_INSTANCE_OF_Multiple_Success ();
   void test_INSTANCE_OF_Failure ();
 
+  // ---------------- Parse with "complex" examples
+  //
+  void test_Parse_Examples ();
+
   // ---------------- Other methods
   //
   void setUp();    //!< Initializes test (called for each test)

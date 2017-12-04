@@ -249,19 +249,23 @@ children_list:
   |
   t_LeftParenthesis node_list t_RightParenthesis
   { $$ = std::make_pair($2,false);}
+  |
+  t_LeftParenthesis t_RightParenthesis
+  { // children_list: t_LeftParenthesis t_RightParenthesis
+
+    $$ = std::make_pair(node_list_type(), false);
+  }
   ;
 
 node_list:
     node
     {
       $$.name    = $[node]->Name();
-      $$.n_nodes = 1;
       $$.nodes.emplace_back($[node]);
     }
   | node_list[left] node
     {
       $$.name    = $[left].name + ' ' + $[node]->Name();
-      $$.n_nodes = $[left].n_nodes++;
 
       $[left].nodes.emplace_back($[node]);
       $$.nodes = std::move($[left].nodes);

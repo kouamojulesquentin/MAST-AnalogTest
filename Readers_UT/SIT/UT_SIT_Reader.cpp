@@ -1991,6 +1991,70 @@ void UT_SIT_Reader::test_INSTANCE_OF_Failure ()
   TS_DATA_DRIVEN_TEST (checker, data);
 }
 
+
+
+//! Checks SIT_Reader::Parse() with various examples
+//!
+void UT_SIT_Reader::test_Parse_Examples ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [&](auto data)
+  {
+    // ---------------- Setup
+    //
+    stringstream    sit(std::get<0>(data));
+    auto            expected_PrettyPrint = std::get<1> (data);
+    auto            sm                   = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
+
+    CxxTest::setAbortTestOnFail(true);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.ParseExcerpt(sit));
+
+    // ---------------- Verify
+    //
+    auto parsedModel = sut.ParsedSystemModel();
+
+    TS_ASSERT_EMPTY (sut.PlaceHolders());
+
+    // With PrettyPrinter
+    auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(parsedModel,   PrettyPrinterOptions::Parser_debug_no_id
+                                                                      | PrettyPrinterOptions::ShowSelectorTables);
+    TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+  };
+
+  auto data =
+  {
+    // 0 : SIB_mux_pre
+    make_tuple("CHAIN SIB_mux_pre\n"                   // 1
+               "{\n"                                   // 2
+               "  LINKER SIBmux Binary SR 1\n"         // 3
+               "  (\n"                                 // 4
+               "  )\n"                                 // 5
+               "  REGISTER SR 1 Bypass: \"0b0\"\n"     // 6
+               "}\n",                                  // 7
+               // Expected:
+               "[Chain]        \"SIB_mux_pre\"\n"
+               " [Linker]       \"SIBmux\"\n"
+               "  :Selector:     \"SR\", kind: Binary, can_select_none: true, inverted_bits: false, reversed_order: false\n"
+               "  Selection Table:\n"
+               "    [0] 0b0\n"
+               "    [1] 0b1\n"
+               "  Deselection Table:\n"
+               "    [0] 0b0\n"
+               "    [1] 0b0\n"
+               " [Register]     \"SR\", length: 1, bypass: 0"
+              ),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
 //===========================================================================
 // End of UT_SIT_Reader.cpp
 //===========================================================================

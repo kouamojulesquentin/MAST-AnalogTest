@@ -35,8 +35,7 @@ struct name_type
 
 struct node_list_type
 {
-  std::uint32_t n_nodes = 0;
-  std::string   name;
+  std::string                                         name;
   std::vector<std::shared_ptr<mast::SystemModelNode>> nodes;
 };
 

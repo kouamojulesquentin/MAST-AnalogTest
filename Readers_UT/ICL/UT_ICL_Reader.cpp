@@ -73,33 +73,6 @@ string GetTestFilePath (string_view dirName, string_view fileName)
 }
 
 
-//! Gets content of some text file
-//!
-//! @param filePath   Text file path to read
-//!
-string GetTextFileContent (const string& filePath)
-{
-  std::ifstream ifs(filePath);
-
-  string content;
-  string line;
-
-  auto first = true;
-  while (std::getline(ifs, line))
-  {
-    if (!first)
-    {
-      content.append("\n");
-    }
-    else
-    {
-      first = false;
-    }
-    content.append(line);
-  }
-
-  return content;
-}
 
 
 //! Returns path of a file for expected AST pretty print
@@ -120,7 +93,7 @@ string GetExpectedAstPrintFilePath (string_view fileName)
 string GetExpectedAstPrint (string_view fileName)
 {
   auto expectedFilePath = GetExpectedAstPrintFilePath(fileName);
-  return GetTextFileContent(expectedFilePath);
+  return test::GetTextFileContent(expectedFilePath);
 }
 
 
@@ -131,7 +104,7 @@ string GetExpectedAstPrint (string_view fileName)
 string GetExpectedModelPrettyPrint (string_view fileName)
 {
   auto expectedFilePath = GetTestFilePath("Expected_ModelPrint", fileName);
-  return GetTextFileContent(expectedFilePath);
+  return test::GetTextFileContent(expectedFilePath);
 }
 
 
@@ -2242,6 +2215,7 @@ void UT_ICL_Reader::test_Generate_Examples ()
   {
     make_tuple("Single_SIB_3WI.icl",   "test_Generate_Single_SIB_3WI_PrettyPrint.txt"),
     make_tuple("Multiple_SIB_3WI.icl", "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),
+    make_tuple("Nested_SIB_3WI.icl",   "test_Generate_Nested_SIB_3WI_PrettyPrint.txt"),
   };
 
   // ---------------- DDT Exercise

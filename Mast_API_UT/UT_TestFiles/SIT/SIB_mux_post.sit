@@ -1,0 +1,7 @@
+CHAIN SIB_mux_post
+{
+  REGISTER SR 1 Bypass: "0b0"
+  LINKER SIBmux Binary SR 1
+  (
+  )
+}

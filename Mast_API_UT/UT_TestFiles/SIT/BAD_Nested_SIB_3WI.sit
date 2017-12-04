@@ -1,0 +1,22 @@
+CHAIN BAD_Nested_SIB_3WI
+{
+  SIB SIB1 PRE HIGH
+  (
+    CHAIN SIB1_1 NOT_IN_PATH
+    {
+      INSTANCE WI1 OF WrappedInstr.sit
+      SIB SIB2 PRE HIGH
+      (
+        CHAIN SIB1_2 NOT_IN_PATH
+        {
+          INSTANCE WI2 OF WrappedInstr.sit
+          SIB SIB3 PRE HIGH
+          (
+            INSTANCE WI3 OF WrappedInstr.sit
+          )
+        }
+      )
+    }
+  )
+}
+

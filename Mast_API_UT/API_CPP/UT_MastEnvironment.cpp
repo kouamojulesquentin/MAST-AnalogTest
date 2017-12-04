@@ -53,7 +53,7 @@ uint32_t g_Fake_PDL_AlgorithmCallCount = 0;
 //!
 string GetTestFilePath (string_view fileName, bool checkExists = true)
 {
-  return test::GetTestFilePath({"Mast_Core"s, "UT_TestFiles"s, string(fileName)}, checkExists);
+  return test::GetTestFilePath({"Mast_API"s, "UT_TestFiles"s, string(fileName)}, checkExists);
 }
 //
 //  End of: GetTestFilePath

@@ -46,7 +46,7 @@ namespace
 //!
 string GetTestFilePath (string_view fileName, bool checkExists = true)
 {
-  return test::GetTestFilePath({"Mast_Core"s, "UT_TestFiles"s, string(fileName)}, checkExists);
+  return test::GetTestFilePath({"Mast_API"s, "UT_TestFiles"s, string(fileName)}, checkExists);
 }
 //
 //  End of: GetTestFilePath

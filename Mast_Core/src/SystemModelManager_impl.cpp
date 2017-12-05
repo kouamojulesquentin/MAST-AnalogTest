@@ -242,7 +242,7 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
    if (raw_protocol)
     { //We need to release DataCycleVisitor::VisitAccessInterfaceTranslator
     CallbackRequest request(NO_MORE_PENDING);
-    raw_protocol->ParentTranslator()->PushRequest(request);
+    raw_protocol->PushRequest(request);
     }
 }
 //

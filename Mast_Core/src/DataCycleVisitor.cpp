@@ -54,31 +54,39 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
  auto AI_data_cycle = [this] (AccessInterface accessInterface) {m_manager->DoHierarchicalDataCycle(&accessInterface);};
   VisitChildren(accessInterfaceTranslator);
   //SystemModelChecker guarantess the only child is an AccessInterface with a Raw protocol
-  auto accessInterface = *std::dynamic_pointer_cast<AccessInterface>(accessInterfaceTranslator.FirstChild());
-  auto protocol =  accessInterface.Protocol();
+  auto cur_node = accessInterfaceTranslator.FirstChild();
+  uint32_t cur_interface = 0;
+  std::shared_ptr<mast::AccessInterface> accessInterface;
   bool cycle_AI = true;
   
   if (accessInterfaceTranslator.IsPending())
   {
+  do
+   {
+   accessInterface=std::dynamic_pointer_cast<AccessInterface>(cur_node);
+    auto protocol =  accessInterface->Protocol();
    //Launch DoHierarchicalDataCycle as a separate thread
-    std::thread AI_thread(AI_data_cycle,accessInterface);
-  AI_thread.detach(); //Detach AI thread for a clean exit
+    std::thread AI_thread(AI_data_cycle,*accessInterface);
+   AI_thread.detach(); //Detach AI thread for a clean exit
    //Wait on Queue for a CallbackRequest from AI
    //NB: it is a BLOCKING call
-  while(cycle_AI)
-  {
-   auto request = accessInterfaceTranslator.PopRequest();
+   while(cycle_AI)
+   {
+   auto request = accessInterfaceTranslator.PopRequest(cur_interface);
       //At this moment, the AI Callback is waiting on the Result queue
 
   //Execute callback translator
   //Push fromSut to wake AI_thread up
    cycle_AI = (request.CallbackId() != NO_MORE_PENDING);
-   if (cycle_AI)
-    {
-    auto fromSutVector = accessInterfaceTranslator.Protocol()->TransformationCallback(request);
-    accessInterfaceTranslator.PushfromSut(fromSutVector);
+    if (cycle_AI)
+     {
+     auto fromSutVector = accessInterfaceTranslator.Protocol()->TransformationCallback(request);
+     accessInterfaceTranslator.PushfromSut(fromSutVector,cur_interface);
+     }
     }
-   }
+   cur_node =  cur_node->NextSibling();
+   cur_interface++;
+  }while (cur_node);
   }
 }
 //

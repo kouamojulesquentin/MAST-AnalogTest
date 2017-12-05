@@ -33,14 +33,27 @@ class MAST_CORE_EXPORT AccessInterfaceRawProtocol : public AccessInterfaceProtoc
   //
   public:
   virtual ~AccessInterfaceRawProtocol() = default;
-  AccessInterfaceRawProtocol() {m_ParentTranslator=nullptr;};
-  AccessInterfaceRawProtocol(std::shared_ptr<AccessInterfaceTranslator> ParentTranslator) 
-  {m_ParentTranslator=ParentTranslator;};
+  AccessInterfaceRawProtocol() {};
 
-  std::shared_ptr<AccessInterfaceTranslator> ParentTranslator() {return m_ParentTranslator;}
-  void SetParentTranslator(std::shared_ptr<AccessInterfaceTranslator> ParentTranslator) {m_ParentTranslator=ParentTranslator;}
+  bool ParentTranslator_is_set() {return ((m_CallbackQueue!=nullptr) && (m_fromSutQueue!=nullptr));}
+
+  void SetCallbackQueue(std::shared_ptr<MTQueue<CallbackRequest>> CallbackQueue) {m_CallbackQueue=CallbackQueue;}
+   void SetfromSutQueue(std::shared_ptr<MTQueue<std::pair<BinaryVector,std::string>>> fromSutQueue) {m_fromSutQueue=fromSutQueue;}
+ 
+    void PushRequest(CallbackRequest Request) {
+     m_CallbackQueue->Push(Request);
+     LOG(DEBUG) << "Protocol " << this->KindName()<<" : pushed request for Callback "<<Request.CallbackId()<<'\n';
+     }; //!<Queues a new Callback Request
+
+  BinaryVector PopfromSut() { auto result=  m_fromSutQueue->Pop().first; 
+                             LOG(DEBUG) << "\nNode " << this->KindName()<<" : popped a fromSut\n";
+                              return result;   };//!< returns the oldest callback result. NB: it is a BLOCKING call
+  std::string PopFormattedfromSut() { auto tmp=m_fromSutQueue->Pop(); if (!tmp.second.empty()) return tmp.second; 
+                                      else return tmp.first.DataAsBinaryString();};//!< returns the Formatted Data of the oldest callback result. NB: it is a BLOCKING call
+
   private:
-  std::shared_ptr<AccessInterfaceTranslator> m_ParentTranslator;
+  std::shared_ptr<MTQueue<CallbackRequest>> m_CallbackQueue; 
+  std::shared_ptr<MTQueue<std::pair<BinaryVector,std::string>>> m_fromSutQueue;   //DataCycleThread waits on this queue to update its registers
 
   // ---------------- Protected Methods
   //

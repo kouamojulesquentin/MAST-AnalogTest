@@ -135,10 +135,9 @@ void UT_Emulation_TranslatorProtocol::test_SVF_RawPlayer_TransformationCallback 
     
    auto Translator = make_shared<AccessInterfaceTranslator>("Test",sut);
  
-//   auto Interface = make_shared<AccessInterfaceTranslator> ("Test",sut);
-     TS_ASSERT_THROWS_NOTHING (SVF_RawPlayer player());
-    SVF_RawPlayer player;
-    player.SetParentTranslator(Translator);
+   auto player = make_shared<SVF_RawPlayer>() ;
+   auto Interface = make_shared<AccessInterface> ("dummy",player);
+    Translator->RegisterInterface(Interface);
 
     string CallbackId;
    switch (n_Callback) {
@@ -160,10 +159,10 @@ void UT_Emulation_TranslatorProtocol::test_SVF_RawPlayer_TransformationCallback 
     // ---------------- Exercise
     //
     //Exploit RawPlayer to get request
-       Translator->PushfromSut(toSutVector); //Avoid stall if not reset
+       Translator->PushfromSut(toSutVector,0); //Avoid stall if not reset
     
-    player.DoCallback(n_Callback,nullptr,toSutVector);
-    test = Translator->PopRequest();
+    player->DoCallback(n_Callback,nullptr,toSutVector);
+    test = Translator->PopRequest(0);
 
     auto fromSutVector = sut->TransformationCallback(test);
 

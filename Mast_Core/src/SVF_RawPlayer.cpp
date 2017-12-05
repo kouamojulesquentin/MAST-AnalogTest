@@ -43,10 +43,10 @@ BinaryVector SVF_RawPlayer::DoCallback (uint32_t endpointId, void* /* interfaceD
       }
 
   auto request = new CallbackRequest(CallbackId(endpointId),callback_toSutData,svfFormattedData);
-  ParentTranslator()->PushRequest(*request);
+  PushRequest(*request);
   
                        /*NB: this is a BLOCKING call*/
-     result = ParentTranslator()->PopfromSut();
+     result = PopfromSut();
 
   return result;
 }
@@ -60,8 +60,8 @@ void SVF_RawPlayer::DoReset(bool doSynchronousReset)
   if (doSynchronousReset){}; //Null operation, used to silence warning
 
   auto request = new CallbackRequest(CallbackId(0));
-  ParentTranslator()->PushRequest(*request);
-  ParentTranslator()->PopfromSut();
+  PushRequest(*request);
+  PopfromSut();
 }
 
 //

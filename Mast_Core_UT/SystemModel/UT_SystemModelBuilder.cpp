@@ -1172,14 +1172,14 @@ void UT_SystemModelBuilder::test_Create_Brocade_Emulator_1xTAP ()
 
   auto expectedPretty = string(
 "[Access_T](7)  \"Brocade\", Protocol: Emulation_Translator, pending: false, has_conditioner: false, priority: 0\n"
-" [Access_I](8)  \"Master_AI\", Protocol: I2C_RAW, ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
+" [Access_I](8)  \"Master_AI\", Protocol: I2C_RAW->Set, ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
 "  [Register](10) \"Brocade_CTRL\", length: 8, Hold value: true, bypass:            0x00\n"
 "                                                            , next_to_sut:       0x00\n"
 "                                                            , last_to_sut:       0x00\n"
 "                                                            , last_from_sut:     0x00\n"
 "                                                            , expected_from_sut: 0x00\n"
 "                                                            , pending: false, has_conditioner: false, priority: 0\n"
-" [Access_I](9)  \"Slave_AI\", Protocol: SVF_RAW, ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
+" [Access_I](9)  \"Slave_AI\", Protocol: SVF_RAW->Set, ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
 "  [Chain](11)    \"IR\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
 "   [Linker](13)   \"IR_Mux\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
 "    :Selector:(10) \"Brocade_CTRL\", kind: Brocade, can_select_none: true, inverted_bits: false, reversed_order: true\n"

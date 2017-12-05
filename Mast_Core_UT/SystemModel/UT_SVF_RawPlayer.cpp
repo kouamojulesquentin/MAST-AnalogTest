@@ -47,47 +47,10 @@ void UT_SVF_RawPlayer::test_empty_Constructor ()
   //
   TS_ASSERT_THROWS_NOTHING (SVF_RawPlayer sut());
   SVF_RawPlayer sut;
-  TS_ASSERT_NULLPTR(sut.ParentTranslator())
+  TS_ASSERT_FALSE(sut.ParentTranslator_is_set())
   //checks that it is recognized as a Raw protocol
   
 }
-
-//! Checks SVF_RawPlayer constructor with parameter
-//!
-void UT_SVF_RawPlayer::test_not_empty_Constructor ()
-{
-  // ---------------- Setup
-  //
- auto Interface = make_shared<AccessInterfaceTranslator> ("Test",make_shared<Spy_Emulation_Translator>());
-
-  // ---------------- Exercise & Verify
-  //
-  TS_ASSERT_THROWS_NOTHING (SVF_RawPlayer sut(Interface));
-  SVF_RawPlayer sut(Interface);
-  TS_ASSERT_EQUALS(sut.ParentTranslator(),Interface) 
-  auto protocol_is_raw =  dynamic_cast<AccessInterfaceRawProtocol*>(&sut);
-  TS_ASSERT_TRUE(protocol_is_raw);
-
-}
-
-//! Checks SVF_RawPlayer can set the Parent interface
-//!
-void UT_SVF_RawPlayer::test_set_Interface ()
-{
-  // ---------------- Setup
-  //
- auto Interface = make_shared<AccessInterfaceTranslator> ("Test",make_shared<Spy_Emulation_Translator>());
-
-  // ---------------- Exercise & Verify
-  //
-  TS_ASSERT_THROWS_NOTHING (SVF_RawPlayer sut());
-  SVF_RawPlayer sut;
-  TS_ASSERT_NULLPTR(sut.ParentTranslator())
-  sut.SetParentTranslator(Interface);
-  TS_ASSERT_EQUALS(sut.ParentTranslator(),Interface)
-  
-}
-
 
 //! Checks SVF_RawPlayer callback ids
 //!
@@ -114,8 +77,9 @@ void UT_SVF_RawPlayer::test_doReset ()
   //
  auto Interface = make_shared<AccessInterfaceTranslator> ("Test",make_shared<Spy_Emulation_Translator>());
   TS_ASSERT_THROWS_NOTHING (SVF_RawPlayer sut());
-  SVF_RawPlayer sut;
-  sut.SetParentTranslator(Interface);
+   auto sut=make_shared<SVF_RawPlayer>();
+   auto ai = make_shared<AccessInterface> ("dummy",sut);
+   Interface->RegisterInterface(ai);
 
   // ---------------- Exercise & Verify
   //
@@ -123,9 +87,9 @@ void UT_SVF_RawPlayer::test_doReset ()
   auto  test = BinaryVector::CreateFromBinaryString("01");
   
   //Direct call to reset
-  Interface->PushfromSut(test);
- sut.DoReset(true);
- auto result = Interface->PopRequest();
+  Interface->PushfromSut(test,0);
+ sut->DoReset(true);
+ auto result = Interface->PopRequest(0);
   TS_ASSERT_EQUALS(result.CallbackId(),TRST);
 
 }
@@ -139,8 +103,9 @@ void UT_SVF_RawPlayer::test_Callbacks ()
   //
  auto Interface = make_shared<AccessInterfaceTranslator> ("Test",make_shared<Spy_Emulation_Translator>());
   TS_ASSERT_THROWS_NOTHING (SVF_RawPlayer sut());
-  SVF_RawPlayer sut;
-  sut.SetParentTranslator(Interface);
+     auto sut=make_shared<SVF_RawPlayer>();
+   auto ai = make_shared<AccessInterface> ("dummy",sut);
+   Interface->RegisterInterface(ai);
 
   // ---------------- Exercise & Verify
   //
@@ -148,30 +113,30 @@ void UT_SVF_RawPlayer::test_Callbacks ()
   auto  test = BinaryVector::CreateFromBinaryString("01");
 
   //Reset as Callback 0 : does not need a fromSUT value
-  Interface->PushfromSut(test);
- sut.DoCallback(0,nullptr,test);
- auto result = Interface->PopRequest();
+  Interface->PushfromSut(test,0);
+ sut->DoCallback(0,nullptr,test);
+ auto result = Interface->PopRequest(0);
  TS_ASSERT_EQUALS(result.CallbackId(),TRST);
  TS_ASSERT_EQUALS(result.FormattedData(),""); 
 
   //Callback 1 : SIR
-  Interface->PushfromSut(test);
- sut.DoCallback(1,nullptr,test);
- result = Interface->PopRequest();
+  Interface->PushfromSut(test,0);
+ sut->DoCallback(1,nullptr,test);
+ result = Interface->PopRequest(0);
  TS_ASSERT_EQUALS(result.CallbackId(),SIR);
  TS_ASSERT_EQUALS(result.FormattedData(),"2 TDI(01);");
 
   //Callback 2 : SDR
-  Interface->PushfromSut(test);
- sut.DoCallback(2,nullptr,test);
- result = Interface->PopRequest();
+  Interface->PushfromSut(test,0);
+ sut->DoCallback(2,nullptr,test);
+ result = Interface->PopRequest(0);
  TS_ASSERT_EQUALS(result.CallbackId(),SDR);
  TS_ASSERT_EQUALS(result.FormattedData(),"2 TDI(01);");
 
   //Callback 3 : UNDEFINED
-  Interface->PushfromSut(test);
- sut.DoCallback(3,nullptr,test);
- result = Interface->PopRequest();
+  Interface->PushfromSut(test,0);
+ sut->DoCallback(3,nullptr,test);
+ result = Interface->PopRequest(0);
  TS_ASSERT_EQUALS(result.CallbackId(),UNDEFINED);
 
 }
@@ -184,42 +149,44 @@ void UT_SVF_RawPlayer::test_Callbacks_multithread ()
   //
  auto Interface = make_shared<AccessInterfaceTranslator> ("Test",make_shared<Spy_Emulation_Translator>());
   TS_ASSERT_THROWS_NOTHING (SVF_RawPlayer sut());
-  SVF_RawPlayer sut;
-  sut.SetParentTranslator(Interface);
+   auto sut=make_shared<SVF_RawPlayer>();
+     auto ai = make_shared<AccessInterface> ("dummy",sut);
+   Interface->RegisterInterface(ai);
+
 
   // ---------------- Exercise & Verify
   //
   //Put a result value to avoid callback getting stuck on result queue
   auto  test = BinaryVector::CreateFromBinaryString("01");
 
- auto callback_thread = [this] (SVF_RawPlayer sut,int EndpointId,BinaryVector  test) 
-   { sut.DoCallback(EndpointId,nullptr,test);};
+ auto callback_thread = [this] (std::shared_ptr<SVF_RawPlayer> sut,int EndpointId,BinaryVector  test) 
+   { sut->DoCallback(EndpointId,nullptr,test);};
 
   //Reset as Callback 0 :
- Interface->PushfromSut(test);
+ Interface->PushfromSut(test,0);
     std::thread AI_thread(callback_thread,sut,0,test);
- auto result = Interface->PopRequest();
+ auto result = Interface->PopRequest(0);
  TS_ASSERT_EQUALS(result.CallbackId(),TRST);
  AI_thread.join();
 
   //Callback 1 : SIR
-  Interface->PushfromSut(test);
+  Interface->PushfromSut(test,0);
  std::thread AI_thread_1(callback_thread,sut,1,test);
- result = Interface->PopRequest();
+ result = Interface->PopRequest(0);
  TS_ASSERT_EQUALS(result.CallbackId(),SIR);
  AI_thread_1.join();
 
   //Callback 2 : SDR
-  Interface->PushfromSut(test);
+  Interface->PushfromSut(test,0);
  std::thread AI_thread_2(callback_thread,sut,2,test);
- result = Interface->PopRequest();
+ result = Interface->PopRequest(0);
  TS_ASSERT_EQUALS(result.CallbackId(),SDR);
  AI_thread_2.join();
 
   //Callback 3 : UNDEFINED
-  Interface->PushfromSut(test);
+  Interface->PushfromSut(test,0);
  std::thread AI_thread_3(callback_thread,sut,3,test);
- result = Interface->PopRequest();
+ result = Interface->PopRequest(0);
  TS_ASSERT_EQUALS(result.CallbackId(),UNDEFINED);
  AI_thread_3.join();
 

@@ -421,6 +421,13 @@ void SystemModelChecker::VisitAccessInterface (AccessInterface& accessInterface)
   {
     ReportWarning(accessInterface, " has no associated AccessInterfaceProtocol");
   }
+  
+  auto protocol_is_raw = std::dynamic_pointer_cast<AccessInterfaceRawProtocol>(protocol);
+  if (protocol_is_raw)
+   {
+   if (!protocol_is_raw->ParentTranslator_is_set())
+    ReportError(accessInterface, " has a Raw protocol but no Parent Translator is set");
+   }
 }
 //
 //  End of: SystemModelChecker::VisitAccessInterface

@@ -27,6 +27,13 @@
 #include "ConfigureAlgorithm_LastOrDefault_Greedy.hpp"
 #include "ConfigureAlgorithm_Last_Lazy.hpp"
 #include "g3log/g3log.hpp"
+#include "Emulation_TranslatorProtocol.hpp"
+#include "I2C_RawPlayer.hpp"
+#include "SVF_RawPlayer.hpp"
+#include <initializer_list>
+#include "SystemModelChecker.hpp"
+
+#include "PrettyPrinter.hpp"
 
 #include <memory>
 #include <vector>
@@ -263,7 +270,66 @@ std::shared_ptr<Chain> Create_TestCase_Brocade (SystemModel&                    
 
   if (reportGml)
   {
-    TS_TRACE (GmlPrinter::Graph(root, "MIB_Multichain_Post"));
+    TS_TRACE (GmlPrinter::Graph(root, "Brocade"));
+  }
+
+  return root;
+}
+//
+//  End of: Create_TestCase_Brocade
+//---------------------------------------------------------------------------
+
+//! Creates test case "Brocade"
+//!
+std::shared_ptr<AccessInterfaceTranslator> Create_TestCase_Brocade (SystemModel&                        sm,
+                                                shared_ptr<AccessInterfaceTranslatorProtocol>  TopProtocol,
+                                                shared_ptr<AccessInterfaceProtocol> masterProtocol,
+                                                shared_ptr<AccessInterfaceProtocol> slaveProtocol,
+                                                bool                                reportGml = false)
+{
+  SystemModelBuilder builder(sm);
+
+  auto tap1 = builder.Create_JTAG_TAP("Zybo", 6u, 2u, slaveProtocol);
+  auto tap2 = builder.Create_JTAG_TAP("Tap",  6u, 3u, slaveProtocol);
+  auto tap3 = builder.Create_JTAG_TAP("TAP3", 6u, 4u, slaveProtocol);
+  auto tap4 = builder.Create_JTAG_TAP("",     6u, 2u, slaveProtocol);
+
+  builder.AppendRegisters(1u, "reg_", BinaryVector::CreateFromString("0x123"), tap1);
+  builder.AppendRegisters(2u, "R_",   BinaryVector::CreateFromString("0x45"),  tap2);
+  builder.AppendRegisters(3u, "reg_", BinaryVector::CreateFromString("0x678"), tap3);
+  builder.AppendRegisters(1u, "reg_", BinaryVector::CreateFromString("0x9A"),  tap4);
+
+  auto taps = { tap1, tap2, tap3, tap4 };
+  auto root = builder.Create_Brocade(TopProtocol,masterProtocol, slaveProtocol, taps);
+
+
+  auto reg_16 = sm.RegisterWithId(16u);  // tap1
+  auto reg_17 = sm.RegisterWithId(17u);  // tap2
+  auto reg_18 = sm.RegisterWithId(18u);  // tap2
+  auto reg_19 = sm.RegisterWithId(19u);  // tap3
+  auto reg_20 = sm.RegisterWithId(20u);  // tap3
+  auto reg_21 = sm.RegisterWithId(21u);  // tap3
+  auto reg_22 = sm.RegisterWithId(22u);  // tap4
+
+  reg_16->SetToSut (BinaryVector::CreateFromString("0x040")); // tap1
+  reg_17->SetToSut (BinaryVector::CreateFromString("0x90"));  // tap2
+  reg_18->SetToSut (BinaryVector::CreateFromString("0x91"));  // tap2
+  reg_19->SetToSut (BinaryVector::CreateFromString("0x671")); // tap3
+  reg_20->SetToSut (BinaryVector::CreateFromString("0x672")); // tap3
+  reg_21->SetToSut (BinaryVector::CreateFromString("0x673")); // tap3
+  reg_22->SetToSut (BinaryVector::CreateFromString("0x9B"));  // tap4
+
+  reg_16->SetBypass (BinaryVector::CreateFromString("0x111")); // tap1
+  reg_17->SetBypass (BinaryVector::CreateFromString("0x22"));  // tap2
+  reg_18->SetBypass (BinaryVector::CreateFromString("0x23"));  // tap2
+  reg_19->SetBypass (BinaryVector::CreateFromString("0x331")); // tap3
+  reg_20->SetBypass (BinaryVector::CreateFromString("0x332")); // tap3
+  reg_21->SetBypass (BinaryVector::CreateFromString("0x333")); // tap3
+  reg_22->SetBypass (BinaryVector::CreateFromString("0xAA"));  // tap4
+
+  if (reportGml)
+  {
+    TS_TRACE (GmlPrinter::Graph(root, "Brocade"));
   }
 
   return root;
@@ -795,6 +861,66 @@ void UT_SystemModelManager::test_DoDataCycles_I2C_AccessInterfaceTranslator ()
   };
 
   TS_ASSERT_EQUALS (gotCommands, expectedCommands);
+}
+
+//! Checks SystemModelManager DoDataCycles when using Brocade testcase with two Raw Protocols and one translator
+//!
+void UT_SystemModelManager::test_DoDataCycles_BrocadeTranslator ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto addresses = { 0x00u, 0x41u, 0x42u };
+  auto topProtocol = make_shared<Spy_Emulation_Translator>();
+  auto masterProtocol = make_shared<I2C_RawPlayer>(addresses);
+  auto slaveProtocol  = make_shared<SVF_RawPlayer>();
+
+
+  auto root = Create_TestCase_Brocade(sm, topProtocol,masterProtocol, slaveProtocol);
+
+  SystemModelManager sut(sm);
+
+  // ---------------- Exercise
+  //
+  //TS_ASSERT_THROWS_NOTHING (sut.DoDataCycles());
+
+  // ---------------- Verify
+  //
+
+  // ---------------- Verify
+  //
+  auto gotCommands = topProtocol->Commands();
+
+  vector<string> expected
+  {
+   "S2R I2C_READ(0x41)",
+   "S2R I2C_WRITE(0x41, 0x0F)",
+   "SIR 24 TDI(0420C1);",
+   "SDR 40 TDI(040916739B);",
+   "S2R I2C_READ(0x41)",
+   "S2R I2C_WRITE(0x41, 0x00)",
+   "S2R I2C_READ(0x41)",
+   "S2R I2C_WRITE(0x41, 0x0F)",
+   "SIR 24 TDI(FC10BF);",
+   "SDR 22 TDI(320CE5);",
+   "S2R I2C_READ(0x41)",
+   "S2R I2C_WRITE(0x41, 0x00)",
+   "S2R I2C_READ(0x41)",
+   "S2R I2C_WRITE(0x41, 0x06)",
+   "SIR 12 TDI(0FC1);",
+   "SDR 13 TDI(1671);",
+   "S2R I2C_READ(0x41)",
+   "S2R I2C_WRITE(0x41, 0x00)",
+   "S2R I2C_READ(0x41)",
+   "S2R I2C_WRITE(0x41, 0x04)",
+   "SIR 6 TDI(3F);",
+   "S2R I2C_READ(0x41)",
+   "S2R I2C_WRITE(0x41, 0x00)",
+  };
+
+//  TS_ASSERT_EQUALS (gotCommands, expected);
 }
 
 //! Checks SystemModelManager DoDataCycles when using "1500" testcase

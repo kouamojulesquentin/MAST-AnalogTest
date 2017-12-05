@@ -34,7 +34,6 @@ class MAST_CORE_EXPORT SVF_RawPlayer final: public AccessInterfaceRawProtocol
   public:
   ~SVF_RawPlayer() = default;
   SVF_RawPlayer()  = default;
-  SVF_RawPlayer(std::shared_ptr<AccessInterfaceTranslator> ParentTranslator) {SetParentTranslator(ParentTranslator);};
 
   //! Returns true when TRST JTAG port is supported
   //!

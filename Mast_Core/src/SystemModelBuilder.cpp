@@ -223,7 +223,7 @@ shared_ptr<Chain> SystemModelBuilder::Create_Brocade (shared_ptr<AccessInterface
   for (auto tap : taps)
   {
     auto aiType = AssessAccessInterfaceType(tap);
-    CHECK_TRUE(aiType == AccessInterfaceAssessment::JTAG_TAP, "Cannot handle none JTAG TAP slaves");
+    CHECK_TRUE(aiType == AccessInterfaceAssessment::JTAG_TAP, "Cannot handle non JTAG TAP slaves");
   }
 
   // ---------------- Prepare Brocade mux
@@ -308,6 +308,7 @@ shared_ptr<AccessInterfaceTranslator> SystemModelBuilder::Create_Brocade (shared
 {
   // ---------------- Check parameters
   //
+  CHECK_PARAMETER_NOT_NULL(TopProtocol, "Expect a valid AccessInterfaceProtocol for the 'TopProtocol' AccessInterfaceTranslator");
   CHECK_PARAMETER_NOT_NULL(masterProtocol, "Expect a valid AccessInterfaceProtocol for the 'Master' AccessInterface");
   CHECK_PARAMETER_NOT_NULL(slaveProtocol,  "Expect a valid AccessInterfaceProtocol for the 'Slave' AccessInterface");  
   CHECK_PARAMETER_RANGE(taps.size(), 1u, 5u, "Brocade support only from 1 to 5 'slave' TAPs");
@@ -315,18 +316,23 @@ shared_ptr<AccessInterfaceTranslator> SystemModelBuilder::Create_Brocade (shared
   CHECK_PARAMETER_NOT_NULL(master_is_raw,  "Expect a Raw  AccessInterfaceProtocol for the 'Master' AccessInterface");  
   auto slave_is_raw = std::dynamic_pointer_cast<AccessInterfaceRawProtocol>(slaveProtocol);
   CHECK_PARAMETER_NOT_NULL(slave_is_raw,  "Expect a Raw  AccessInterfaceProtocol for the 'Slave' AccessInterface");  
+auto top_is_translator = std::dynamic_pointer_cast<AccessInterfaceTranslatorProtocol>(TopProtocol);
+  CHECK_PARAMETER_NOT_NULL(top_is_translator,  "Expect an AccessInterfaceTranslatorProtocol for the 'top' Protocol");  
+
 
   for (auto tap : taps)
   {
     auto aiType = AssessAccessInterfaceType(tap);
-    CHECK_TRUE(aiType == AccessInterfaceAssessment::JTAG_TAP, "Cannot handle none JTAG TAP slaves");
+    CHECK_TRUE(aiType == AccessInterfaceAssessment::JTAG_TAP, "Cannot handle non JTAG TAP slaves");
   }
 
   // ---------------- Prepare Brocade mux
   //
   auto brocadeTop  = m_model.CreateAccessInterfaceTranslator("Brocade",TopProtocol);
   auto masterAi      = m_model.CreateAccessInterface("Master_AI", masterProtocol, brocadeTop);
+  brocadeTop->RegisterInterface(masterAi);
   auto slaveAi       = m_model.CreateAccessInterface("Slave_AI",  slaveProtocol,  brocadeTop);
+  brocadeTop->RegisterInterface(slaveAi);
   auto masterCtrlReg = m_model.CreateRegister("Brocade_CTRL", BinaryVector(8u), true, masterAi);
   auto irChain       = m_model.CreateChain  ("IR",     slaveAi);
   auto drChain       = m_model.CreateChain  ("DR",     slaveAi);

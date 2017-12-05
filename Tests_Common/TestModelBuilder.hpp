@@ -95,6 +95,10 @@ class TestModelBuilder final
   std::shared_ptr<mast::Chain>           Create_Default_SIB (string_view name);
   std::shared_ptr<mast::Chain>           Create_Default_MIB (string_view name,  uint32_t maxEndPoints);
   std::shared_ptr<mast::Chain>           Create_Simple_MIB  (string_view rootName = "Sut");
+  std::shared_ptr<mast::AccessInterfaceTranslator> Create_Brocade (std::shared_ptr<mast::AccessInterfaceTranslatorProtocol>  TopProtocol,
+                                                      std::shared_ptr<mast::AccessInterfaceProtocol>           masterProtocol,
+                                                      std::shared_ptr<mast::AccessInterfaceProtocol>           slaveProtocol,
+                                                      std::initializer_list<std::shared_ptr<mast::AccessInterface>> taps);
 
   // ---------------- Private  Fields
   //

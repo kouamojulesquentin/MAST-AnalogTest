@@ -29,10 +29,7 @@ class UT_SVF_RawPlayer : public CxxTest::TestSuite
   // ================ Test Methods ================
 
   void test_empty_Constructor ();
-  void test_not_empty_Constructor ();
-  
-  void test_set_Interface ();
-
+ 
   void test_CallbackIds ();
 
   void test_doReset ();

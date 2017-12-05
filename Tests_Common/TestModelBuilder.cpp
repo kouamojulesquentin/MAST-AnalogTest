@@ -232,7 +232,7 @@ shared_ptr<AccessInterfaceTranslator> TestModelBuilder::Create_TestCase_Emulatio
 
   auto translator     = m_model.CreateAccessInterfaceTranslator    (name, make_shared<Spy_Emulation_Translator>());
 
-  raw_protocol->SetParentTranslator(translator);
+  translator->RegisterInterface(tap);
 
   translator->AppendChild(tap);
 
@@ -272,7 +272,9 @@ shared_ptr<AccessInterfaceTranslator> TestModelBuilder::Create_TestCase_I2C_Emul
 
   auto translator     = m_model.CreateAccessInterfaceTranslator    (name, make_shared<Spy_Emulation_Translator>());
 
-  raw_protocol->SetParentTranslator(translator);
+//  raw_protocol->SetParentTranslator(translator);
+   translator->RegisterInterface(ai);
+
 
   translator->AppendChild(ai);
 
@@ -533,6 +535,13 @@ shared_ptr<mast::Chain> TestModelBuilder::Create_Simple_MIB (std::experimental::
 //---------------------------------------------------------------------------
 
 
+shared_ptr<AccessInterfaceTranslator> TestModelBuilder::Create_Brocade (std::shared_ptr<AccessInterfaceTranslatorProtocol>  TopProtocol,
+                                                      std::shared_ptr<AccessInterfaceProtocol>           masterProtocol,
+                                                      std::shared_ptr<AccessInterfaceProtocol>           slaveProtocol,
+                                                      std::initializer_list<std::shared_ptr<AccessInterface>> taps)
+{
+ return m_builder.Create_Brocade(TopProtocol,masterProtocol,slaveProtocol,taps);
+}
 
 
 //===========================================================================

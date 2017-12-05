@@ -15,6 +15,7 @@
 #include "SystemModelNodes.hpp"
 #include "PathSelector.hpp"
 #include "AccessInterfaceProtocol.hpp"
+#include "AccessInterfaceRawProtocol.hpp"
 #include "Utility.hpp"
 #include "EnumsUtility.hpp"
 
@@ -293,7 +294,19 @@ void PrettyPrinter::VisitAccessInterface (AccessInterface& accessInterface)
   {
     auto protocol = accessInterface.Protocol();
     note = "Protocol: ";
-    note += protocol ? protocol->KindName() : "Not set";
+    if (!protocol) note += "Not set";
+    else 
+     {
+     note += protocol->KindName();
+     auto protocol_is_raw=std::dynamic_pointer_cast<AccessInterfaceRawProtocol>(protocol);
+     if (protocol_is_raw) 
+      {
+      note += "->" ;
+      if (protocol_is_raw->ParentTranslator_is_set())
+       note += "Set";
+      else note += "Not set";
+      }
+     }
   }
 
   StreamParentNode("Access_I", accessInterface, note);

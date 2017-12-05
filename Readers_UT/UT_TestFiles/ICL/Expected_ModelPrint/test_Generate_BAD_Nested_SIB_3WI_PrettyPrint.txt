@@ -40,4 +40,3 @@
          [Chain]        "WI3"
           [Chain]        "reg8"
            [Register]     "SR", length: 8, bypass: 0000_0000
-

@@ -91,7 +91,7 @@ void AST_SystemModelGenerator::AppendCreatedNodesToParent (ParentNode* parent, s
   //
   while (m_createdNodes.size() > levelThreshold)
   {
-    auto child = m_createdNodes.top();
+    auto child = std::get<0>(m_createdNodes.top());
 
     parent->AppendChild(child);
     m_createdNodes.pop();
@@ -110,15 +110,16 @@ void AST_SystemModelGenerator::AppendCreatedNodesToParent (ParentNode* parent, s
 //!
 void AST_SystemModelGenerator::AssignNewNode (shared_ptr<SystemModelNode> node)
 {
-  auto& context        = m_instancesContext.top();
-  auto  parentNode     = context.parentNode;
-  auto  parentIsLinker = context.parentIsLinker;
+  auto& context           = m_instancesContext.top();
+  auto  parentNode        = context.parentNode;
+  auto  linkerNode        = context.linkerNode;
+  auto  parentMayBeLinker = linkerNode != nullptr;
 
   auto contextIsTopModule = m_instancesContext.size() == 1u;
 
-  if (parentIsLinker || contextIsTopModule)
+  if (parentMayBeLinker || contextIsTopModule)
   {
-    m_createdNodes.push(node);
+    m_createdNodes.emplace(node, parentNode);
   }
   else
   {
@@ -147,7 +148,7 @@ void AST_SystemModelGenerator::AssignNewNode (shared_ptr<SystemModelNode> node)
 //!           1 - extracts 2nd part into a temporary stack          ==> [8] [7] [6] [C]
 //!           2 - extracts 1st part into another temporary stack    ==> [4] [3]
 //!           3 - Append 1st part Linker 1st selection              ==> [4] [3] - note that they are assign in that order - (inserting a Chain in between in that case)
-//!           4 - Restore 2nd part to not yet assigned nodes stack  ==> [1] [L] [C] [6] [7] [8]
+//!           4 - Restore 2nd part to not yet assigned nodes stack  ==> [1] [L] [C] [6] [7] [8] (assign linker previous sibling to their, common, parent)
 //!
 //! @endinternal
 //!
@@ -170,13 +171,14 @@ bool AST_SystemModelGenerator::AssignNodesToLinkerFirstSelection (shared_ptr<Sys
   if (createdForFirst != 0)
   {
     // 2nd part extraction
-    stack<shared_ptr<SystemModelNode>>  nodesAsLinkerSiblings;
+    stack<CreatedNodes_t>  nodesAsLinkerSiblings;
     while (m_createdNodes.size() > linkerNodesLevel_first)
     {
-      auto node = m_createdNodes.top();
-      nodesAsLinkerSiblings.push(node);
+      auto nodeAndParent = m_createdNodes.top();
+      nodesAsLinkerSiblings.push(nodeAndParent);
       m_createdNodes.pop();
 
+      auto node = std::get<0>(nodeAndParent);
       if (node == commonLinkerNode)
       {
         break;
@@ -187,7 +189,7 @@ bool AST_SystemModelGenerator::AssignNodesToLinkerFirstSelection (shared_ptr<Sys
     stack<shared_ptr<SystemModelNode>>  nodesForFirstSelection;
     while (m_createdNodes.size() > linkerNodesLevel_first)
     {
-      auto node = m_createdNodes.top();
+      auto node = std::get<0>(m_createdNodes.top());  // Get rid of "alternate" parent node (this is in fact resolved as the Linker)
       nodesForFirstSelection.push(node);
       m_createdNodes.pop();
     }
@@ -214,10 +216,24 @@ bool AST_SystemModelGenerator::AssignNodesToLinkerFirstSelection (shared_ptr<Sys
     }
 
     // Restore 2nd part to not yet assigned nodes stack
+    // or prepend it as linker, previous, sibbling
+    auto linkerParentNode = linkerContext.linkerParentNode;
     while (!nodesAsLinkerSiblings.empty())
     {
-      auto node = nodesAsLinkerSiblings.top();
-      m_createdNodes.push(node);
+      auto& nodeAndParent = nodesAsLinkerSiblings.top();
+
+      auto node       = std::get<0>(nodeAndParent);
+      auto parentNode = std::get<1>(nodeAndParent);
+      CHECK_VALUE_NOT_NULL(parentNode, "Parent node must always be set in m_createdNodes stack");
+
+      if (parentNode == linkerParentNode)
+      {
+        parentNode->PrependChild(node);
+      }
+      else
+      {
+        m_createdNodes.push(nodeAndParent);
+      }
       nodesAsLinkerSiblings.pop();
     }
   }
@@ -719,8 +735,7 @@ AST_SystemModelGenerator::Process_ScanMux_Entry (AST_ScanMux* scanMux, AST_Modul
   auto& instanceContext  = m_instancesContext.top();
   auto  linkerParentNode = instanceContext.parentNode;
 
-  instanceContext.parentNode     = linker.get();
-  instanceContext.parentIsLinker = true;
+  instanceContext.linkerNode = linker.get();
 
   LinkerContext linkerContext;
 
@@ -800,8 +815,8 @@ AST_SystemModelGenerator::Process_ScanMux_EndOfSelectionPath (shared_ptr<mast::S
     auto parentNode = linkerContext.linkerParentNode;
 
     auto& instanceContext = m_instancesContext.top();
-    instanceContext.parentNode     = parentNode;
-    instanceContext.parentIsLinker = false;
+    instanceContext.parentNode = parentNode;
+    instanceContext.linkerNode = nullptr;
 
     auto sourceSignals = std::cref(selections.front()->SelectedSignals()); // Will cause detection of instance input port or previously created node that is just before the linker
 

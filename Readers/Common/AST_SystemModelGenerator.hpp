@@ -102,8 +102,8 @@ class AST_SystemModelGenerator final
     AST_Instance*     instance          = nullptr;  //!< Processed instance
     AST_Module*       parentModule      = nullptr;  //!< Module in which Instance is found
     mast::ParentNode* parentNode        = nullptr;  //!< Parent node in which children should be appended
+    mast::ParentNode* linkerNode        = nullptr;  //!< Not nullptr when processing element that can potentially be children of a Linker
     size_t            createdNodesLevel = 0;        //!< To know how many to consider as children
-    bool              parentIsLinker    = false;    //!< When true, parentNode represents a Linker (only in this context)
   };
 
   //! Saves processing context in which a ScanMux is reached an converted to a linker
@@ -119,11 +119,12 @@ class AST_SystemModelGenerator final
     mast::ParentNode*           linkerParentNode       = nullptr; //!< Parent node of linker
   };
 
+  using CreatedNodes_t = std::tuple<std::shared_ptr<mast::SystemModelNode>, mast::ParentNode*>; // Created node and its parent node if not linker a linker child
 
   std::shared_ptr<mast::SystemModel>                         m_systemModel;             //!< SystemModel currently being built
   std::unique_ptr<mast::SystemModelBuilder>                  m_builder;                 //!< Helper to build SystemModel nodes
   std::shared_ptr<mast::ParentNode>                          m_parsedTopNode;           //!< SystemModel tree build from ICL file
-  std::stack<std::shared_ptr<mast::SystemModelNode>>         m_createdNodes;            //!< Created children not yet attached to its parent
+  std::stack<CreatedNodes_t>                                 m_createdNodes;            //!< Created children and their default parent not yet attached to its parent (in Linker processing context)
   std::vector<std::shared_ptr<mast::UnresolvedPathSelector>> m_unresolvedPathSelectors; //!< Unresolved Linkers (those for which selector Register(s) where not yet created when Linkers were)
   std::stack<InstanceContext>                                m_instancesContext;        //!< Current module/instance contexts (represents current instanciation path)
   std::stack<LinkerContext>                                  m_linkersContext;          //!< To recover processing context for linkers (need only access to last one)

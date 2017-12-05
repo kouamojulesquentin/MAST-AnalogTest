@@ -2213,12 +2213,12 @@ void UT_ICL_Reader::test_Generate_Examples ()
 
   auto data =
   {
-//+    make_tuple("BAD_Nested_SIB_3WI.icl", "test_Generate_BAD_Nested_SIB_3WI_PrettyPrint.txt"),
     make_tuple("SIB_mux_post.icl",       "test_Generate_SIB_mux_post_PrettyPrint.txt"),
     make_tuple("Daisy_3WI.icl",          "test_Generate_Daisy_3WI_PrettyPrint.txt"),
     make_tuple("Single_SIB_3WI.icl",     "test_Generate_Single_SIB_3WI_PrettyPrint.txt"),
     make_tuple("Multiple_SIB_3WI.icl",   "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),
     make_tuple("Nested_SIB_3WI.icl",     "test_Generate_Nested_SIB_3WI_PrettyPrint.txt"),
+    make_tuple("BAD_Nested_SIB_3WI.icl", "test_Generate_BAD_Nested_SIB_3WI_PrettyPrint.txt"),
   };
 
   // ---------------- DDT Exercise

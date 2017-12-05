@@ -814,6 +814,79 @@ void UT_SystemModelManager::test_DoDataCycles_AccessInterfaceTranslator ()
   TS_ASSERT_EQUALS (gotCommands, expectedCommands);
 }
 
+
+//! Checks SystemModelManager DoDataCycles when using AccessInterfaceTranslator 
+//! and two AccessInterfaces
+//!
+void UT_SystemModelManager::test_DoDataCycles_DoubleAccessInterfaceTranslator ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto at    = builder.Create_TestCase_Emulation_Translator();
+  auto ai =  dynamic_pointer_cast<AccessInterface>(at->FirstChild());
+  auto ir    = sm.RegisterWithId(1u);
+  auto bpy   = sm.RegisterWithId(3u);
+  auto reg_1 = sm.RegisterWithId(5u);
+  auto reg_2 = sm.RegisterWithId(7u);
+
+  reg_1->SetToSut   (BinaryVector(STATIC_TDR_LEN, 0x0A));
+  reg_2->SetToSut   (BinaryVector(STATIC_TDR_LEN, 0xB0));
+  reg_1->SetBypass  (BinaryVector(STATIC_TDR_LEN, 0x41));
+  reg_2->SetBypass  (BinaryVector(STATIC_TDR_LEN, 0x42));
+
+
+  auto second_tap     = builder.Create_JTAG_TAP    ("second_Tap",       DEFAULT_IR_LEN, 3u,make_shared<SVF_RawPlayer>());
+
+  auto second_chain_1 = sm.CreateChain    ("second_sut_1",    second_tap);
+  auto second_reg_1   = sm.CreateRegister ("second_static_1", BinaryVector(STATIC_TDR_LEN, 0), second_chain_1);
+
+  auto second_chain_2 = sm.CreateChain    ("second_sut_2",    second_tap);
+  auto second_reg_2   = sm.CreateRegister ("second_static_2", BinaryVector(STATIC_TDR_LEN, 0), second_chain_2);
+
+  second_reg_1->SetToSut   (BinaryVector(STATIC_TDR_LEN, 0x0A));
+  second_reg_2->SetToSut   (BinaryVector(STATIC_TDR_LEN, 0xB0));
+  second_reg_1->SetBypass  (BinaryVector(STATIC_TDR_LEN, 0x41));
+  second_reg_2->SetBypass  (BinaryVector(STATIC_TDR_LEN, 0x42));
+
+  at->RegisterInterface(second_tap);
+
+  at->AppendChild(second_tap);
+
+//+  TS_TRACE (GmlPrinter::Graph(ai, "Testcase_AccessInterface"));
+
+  SystemModelManager sut(sm);
+
+//  auto gotPretty      = PrettyPrinter::PrettyPrint(sm.Root(), PrettyPrinterOptions::All);
+//  TS_ASSERT_EQUALS (gotPretty, "");
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.DoDataCycles());
+
+  // ---------------- Verify
+  //
+  auto gotCommands = dynamic_pointer_cast<Spy_Emulation_Translator>(at->Protocol())->Commands();
+ 
+  //NB: Commands from the two taps are mixed together
+  std::vector<std::string> expectedCommands
+  {
+    "SIR 8 TDI(02);",   // 00 : IR
+    "SDR 16 TDI(B0B0);", // 01 : DR (reg_2)
+    "SIR 8 TDI(02);",   // 00 : second_IR
+    "SDR 16 TDI(B0B0);", // 01 : second_DR (reg_2)
+    "SIR 8 TDI(01);",   // 02 : IR
+    "SDR 16 TDI(0A0A);", // 03 : DR (reg_1)
+    "SIR 8 TDI(01);",   // 02 : second_IR
+    "SDR 16 TDI(0A0A);", // 03 : second_DR (reg_1)
+    "SIR 8 TDI(FF);",   // 04 : IR
+    "SIR 8 TDI(FF);",   // 04 : second_IR
+  };
+
+  TS_ASSERT_EQUALS (gotCommands, expectedCommands);
+}
 //! Checks SystemModelManager DoDataCycles when using AccessInterfaceTranslator testcase
 //!
 void UT_SystemModelManager::test_DoDataCycles_I2C_AccessInterfaceTranslator ()
@@ -884,7 +957,7 @@ void UT_SystemModelManager::test_DoDataCycles_BrocadeTranslator ()
 
   // ---------------- Exercise
   //
-  //TS_ASSERT_THROWS_NOTHING (sut.DoDataCycles());
+  TS_ASSERT_THROWS_NOTHING (sut.DoDataCycles());
 
   // ---------------- Verify
   //

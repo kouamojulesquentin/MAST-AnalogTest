@@ -57,8 +57,7 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
   auto cur_node = accessInterfaceTranslator.FirstChild();
   uint32_t cur_interface = 0;
   std::shared_ptr<mast::AccessInterface> accessInterface;
-  bool cycle_AI = true;
-  
+    
   if (accessInterfaceTranslator.IsPending())
   {
   do
@@ -70,6 +69,7 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
    AI_thread.detach(); //Detach AI thread for a clean exit
    //Wait on Queue for a CallbackRequest from AI
    //NB: it is a BLOCKING call
+   bool cycle_AI = true;
    while(cycle_AI)
    {
    auto request = accessInterfaceTranslator.PopRequest(cur_interface);

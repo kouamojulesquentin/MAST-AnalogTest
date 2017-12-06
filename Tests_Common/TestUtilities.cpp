@@ -83,12 +83,18 @@ string test::GetTextFileContent (const string& filePath)
       first = false;
     }
 
-    if (!line.empty())
+    if (!line.empty() && (line.back() == '\xa'))
     {
       line.pop_back();        // Remove platform EOL terminating character
-      content.append(line);
-      line.clear();
     }
+    if (!line.empty() && (line.back() == '\xd'))
+    {
+      line.pop_back();        // Remove platform EOL terminating character
+    }
+
+
+    content.append(line);
+    line.clear();
   }
 
   return content;

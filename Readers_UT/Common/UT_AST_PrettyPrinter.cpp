@@ -55,7 +55,7 @@ void UT_AST_PrettyPrinter::test_Visit_Module_empty ()
   auto got      = sut.PrettyPrint();
   auto expected = "Module Dibona\n"
                   "{\n"
-                  "}\n";
+                  "}";
 
   TS_ASSERT_EQUALS (got, expected);
 }
@@ -88,7 +88,7 @@ void UT_AST_PrettyPrinter::test_Visit_ScanRegister_empty ()
   auto expected = "ScanRegister Ecrin\n"
                   "{\n"
                   "  ScanInSource SI;\n"
-                  "}\n";
+                  "}";
 
   TS_ASSERT_EQUALS (got, expected);
 }

@@ -203,7 +203,7 @@ void UT_ICL_Reader::test_FromIcl_1_ScanRegister ()
                                   "    ScanInSource SI;\n"
                                   "    ResetValue 8'b00000000;\n"
                                   "  }\n"
-                                  "}\n";
+                                  "}";
 
   auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
@@ -279,7 +279,7 @@ void UT_ICL_Reader::test_FromIcl_3_ScanRegister ()
                                   "    ScanInSource SR_1[0];\n"
                                   "    ResetValue 8'b0000010;\n"
                                   "  }\n"
-                                  "}\n"s;
+                                  "}"s;
 
   auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
@@ -341,7 +341,7 @@ void UT_ICL_Reader::test_FromIcl_parameters_value ()
                                   "    ScanInSource SI;\n"
                                   "    ResetValue 'b0;\n"
                                   "  }\n"
-                                  "}\n";
+                                  "}";
 
   auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
@@ -398,7 +398,7 @@ void UT_ICL_Reader::test_FromIcl_parameters_strings ()
                                   "    ScanInSource SI;\n"
                                   "    ResetValue 'b0;\n"
                                   "  }\n"
-                                  "}\n";
+                                  "}";
 
   auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
@@ -449,7 +449,7 @@ void UT_ICL_Reader::test_FromIcl_parameters_param_ref ()
                                   "    ScanInSource SI;\n"
                                   "    ResetValue 'b0;\n"
                                   "  }\n"
-                                  "}\n";
+                                  "}";
 
   auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
@@ -503,7 +503,7 @@ void UT_ICL_Reader::test_FromIcl_parameters_string_and_param_ref ()
                                   "    ScanInSource SI;\n"
                                   "    ResetValue 'b0;\n"
                                   "  }\n"
-                                  "}\n";
+                                  "}";
 
   auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
@@ -557,7 +557,7 @@ void UT_ICL_Reader::test_FromIcl_parameters_param_ref_and_string ()
                                   "    ScanInSource SI;\n"
                                   "    ResetValue 'b0;\n"
                                   "  }\n"
-                                  "}\n";
+                                  "}";
 
   auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
@@ -611,7 +611,7 @@ void UT_ICL_Reader::test_FromIcl_attributes_no_value ()
                                   "    ScanInSource SI;\n"
                                   "    ResetValue 'b0;\n"
                                   "  }\n"
-                                  "}\n";
+                                  "}";
 
   auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
@@ -664,7 +664,7 @@ void UT_ICL_Reader::test_FromIcl_attributes_value ()
                                   "    ScanInSource SI;\n"
                                   "    ResetValue 'b0;\n"
                                   "  }\n"
-                                  "}\n";
+                                  "}";
 
   auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
@@ -721,7 +721,7 @@ void UT_ICL_Reader::test_FromIcl_attributes_strings ()
                                   "    ScanInSource SI;\n"
                                   "    ResetValue 'b0;\n"
                                   "  }\n"
-                                  "}\n";
+                                  "}";
 
   auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
@@ -773,7 +773,7 @@ void UT_ICL_Reader::test_FromIcl_attributes_param_ref ()
                                   "    ScanInSource SI;\n"
                                   "    ResetValue 'b0;\n"
                                   "  }\n"
-                                  "}\n";
+                                  "}";
 
   auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
@@ -819,7 +819,7 @@ void UT_ICL_Reader::test_FromIcl_ScanInterface_InModuleDef ()
                                   "    Port SO;\n"
                                   "    Port SEL;\n"
                                   "  }\n"
-                                  "}\n";
+                                  "}";
 
   auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
@@ -885,7 +885,7 @@ void UT_ICL_Reader::test_FromIcl_ScanMux_SIB ()
                                   "    ScanInSource SIBmux;\n"
                                   "    ResetValue 1'b0;\n"
                                   "  }\n"
-                                  "}\n";
+                                  "}";
 
 
   auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
@@ -943,7 +943,7 @@ void UT_ICL_Reader::test_FromIcl_ScanMux_ValueList ()
                                   "    1'b0, 1'b1 | 1'b1, 1'b0 : sr.different;\n"
                                   "    1'b1, 1'b1 | 1'b0, 1'b0 : sr.same;\n"
                                   "  }\n"
-                                  "}\n"sv;
+                                  "}"sv;
 
 
   auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
@@ -997,7 +997,7 @@ void UT_ICL_Reader::test_FromIcl_Instance ()
                                   "    InputPort SI = SI;\n"
                                   "    InputPort DI = I1.DO;\n"
                                   "  }\n"
-                                  "}\n"sv;
+                                  "}"sv;
 
 
   auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
@@ -1042,7 +1042,7 @@ void UT_ICL_Reader::test_FromIcl_Namespace_Def ()
                         "{\n"                                                               // 28
                         "  Instance A Of Instrument { InputPort DI = reg8; }\n"             // 29
                         "  Instance B Of ::Instrument { InputPort DI = reg9; }\n"           // 30
-                        "}\n"s                                                              // 31
+                        "}"s                                                              // 31
                         );
 
   auto           sm = make_shared<SystemModel>();
@@ -1120,7 +1120,7 @@ void UT_ICL_Reader::test_FromIcl_Namespace_Def ()
                                   "  {\n"
                                   "    InputPort DI = reg9;\n"
                                   "  }\n"
-                                  "}\n"s;
+                                  "}"s;
 
   const auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
@@ -1166,7 +1166,7 @@ void UT_ICL_Reader::test_FromIcl_UseNamespace_Def_OutsideModule ()
                         "{\n"                                                               // 30
                         "  Instance A Of Instrument { InputPort DI = reg8; }\n"             // 31
                         "  Instance B Of ::Instrument { InputPort DI = reg9; }\n"           // 32
-                        "}\n"s                                                              // 33
+                        "}"s                                                              // 33
                         );
 
   auto           sm = make_shared<SystemModel>();
@@ -1248,7 +1248,7 @@ void UT_ICL_Reader::test_FromIcl_UseNamespace_Def_OutsideModule ()
                                   "  {\n"
                                   "    InputPort DI = reg9;\n"
                                   "  }\n"
-                                  "}\n"s;
+                                  "}"s;
 
   const auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
@@ -1293,7 +1293,7 @@ void UT_ICL_Reader::test_FromIcl_UseNamespace_Def_InsideModule ()
                         "{\n"                                                               // 28
                         "  Instance A Of Instrument { InputPort DI = reg8; }\n"             // 29
                         "  Instance B Of ::Instrument { InputPort DI = reg9; }\n"           // 30
-                        "}\n"s                                                              // 31
+                        "}"s                                                              // 31
                         );
 
   auto           sm = make_shared<SystemModel>();
@@ -1374,7 +1374,7 @@ void UT_ICL_Reader::test_FromIcl_UseNamespace_Def_InsideModule ()
                                   "  {\n"
                                   "    InputPort DI = reg9;\n"
                                   "  }\n"
-                                  "}\n"s;
+                                  "}"s;
 
   const auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
@@ -1425,7 +1425,7 @@ void UT_ICL_Reader::test_FromIcl_AccessLink_1149_2001 ()
 //+                                  "      ScanInterface { InstPath.MyScanInterface; }\n"
 //+                                  "    }\n"
                                   "  }\n"
-                                  "}\n";
+                                  "}";
 
   auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
   TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
@@ -1515,7 +1515,7 @@ void UT_ICL_Reader::test_Uniquify_1_Instance ()
                                   "    ScanInSource SI;\n"
                                   "    ResetValue 'b0;\n"
                                   "  }\n"
-                                  "}\n"
+                                  "}"
                                   ""sv;
 
 
@@ -1628,7 +1628,7 @@ void UT_ICL_Reader::test_Uniquify_2_Instances ()
                                   "    ScanInSource SI;\n"
                                   "    ResetValue 'b0;\n"
                                   "  }\n"
-                                  "}\n"
+                                  "}"
                                   ""sv;
 
 

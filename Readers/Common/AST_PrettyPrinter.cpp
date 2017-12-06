@@ -55,12 +55,13 @@ namespace Parsers
     {
       if (m_simpleHierarchy)
       {
-        m_printer.m_os << " }\n";
+        m_printer.m_os << " }";
       }
       else
       {
         --m_printer.m_depth;
-        m_printer.StreamDepth() << "}\n";
+        m_printer.m_os << "\n";
+        m_printer.StreamDepth() << "}";
       }
     }
 
@@ -75,7 +76,7 @@ namespace Parsers
       else
       {
         m_printer.m_os << "\n";
-        m_printer.StreamDepth() << "{\n";
+        m_printer.StreamDepth() << "{";
         ++m_printer.m_depth;
       }
     }
@@ -112,6 +113,11 @@ string AST_PrettyPrinter::PrettyPrint (AST_Node* topNode)
 //!
 std::ostringstream& AST_PrettyPrinter::StreamNodeHeader(const AST_NamedNode* node, string_view notes)
 {
+  if (m_os.tellp() != 0)
+  {
+    m_os << "\n";
+  }
+
   StreamDepth() << node->KindName() << " " << node->Name();
 
   if (!notes.empty())
@@ -133,7 +139,11 @@ void AST_PrettyPrinter::StreamSimpleNode(const AST_SimpleNode* node)
 {
   if (node != nullptr)
   {
-    StreamDepth() << node->KindName() << " " << node->AsText() << ";\n";
+    if (m_os.tellp() != 0)
+    {
+      m_os << "\n";
+    }
+    StreamDepth() << node->KindName() << " " << node->AsText() << ";";
   }
 }
 //
@@ -167,10 +177,6 @@ void AST_PrettyPrinter::Visit_Instance (AST_Instance* instance)
   StreamNodeHeader(instance, " Of ") << moduleIdentifier->AsText();
 
   HierarchyInserter hierarchyInserter(*this);
-//+  if (instance->UniquifiedModule() != nullptr)
-//+  {
-//+    StreamDepth() << "Uniquified = true;\n";
-//+  }
 
   StreamSimpleNodes (instance->Attributes());
   StreamSimpleNodes (instance->Parameters());
@@ -198,13 +204,17 @@ void AST_PrettyPrinter::Visit_Network (AST_Network* network)
   //
   for (const auto namespaceNode : namespaces)
   {
+    if (m_os.tellp() != 0)
+    {
+      m_os << "\n";
+    }
     StreamDepth() << namespaceNode->KindName();
     const auto name = namespaceNode->Name();
     if (!name.empty())
     {
       m_os << " " << name;
     }
-    m_os << ";\n";
+    m_os << ";";
 
     // ---------------- Get sorted modules
     //
@@ -266,7 +276,7 @@ void AST_PrettyPrinter::Visit_Port (AST_Port* port)
   {
     CHECK_PARAMETER_NOT_NULL(portSource, "InputPort is expected to have valid port source");
 
-    m_os << " = " << portSource->AsText() << ";\n";
+    m_os << " = " << portSource->AsText() << ";";
   }
   else if ((portSource != nullptr) || !attributes.empty() || !undispatched.empty())
   {
@@ -308,7 +318,7 @@ void AST_PrettyPrinter::Visit_Port (AST_Port* port)
   }
   else
   {
-    m_os << ";\n";
+    m_os << ";";
   }
 }
 //
@@ -348,7 +358,8 @@ void AST_PrettyPrinter::Visit_ScanMux (AST_ScanMux* scanMux)
   const auto& selections = scanMux->Selections();
   for (const auto& selection : selections)
   {
-    StreamDepth() << selection->AsText() << ";\n";
+    m_os << "\n";
+    StreamDepth() << selection->AsText() << ";";
   }
 }
 //

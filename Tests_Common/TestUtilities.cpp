@@ -20,6 +20,7 @@
 
 #include <cxxtest/TestSuite.h>
 #include <fstream>
+#include <iostream>
 
 using std::string;
 using std::initializer_list;
@@ -57,7 +58,7 @@ string test::GetTestFilePath(const initializer_list<std::string>& subPathsToFile
   return filePath;
 }
 
-//! Gets full content of some text file
+//! Gets full content of some text file except last new line
 //!
 //! @param filePath   Text file path to read
 //!
@@ -66,9 +67,11 @@ string test::GetTextFileContent (const string& filePath)
   std::ifstream ifs(filePath);
 
   string content;
-  string line;
+  content.reserve(1000);  // Limit number of reallocations
 
-  auto first = true;
+  string line;
+  auto   first = true;
+
   while (std::getline(ifs, line))
   {
     if (!first)
@@ -79,7 +82,13 @@ string test::GetTextFileContent (const string& filePath)
     {
       first = false;
     }
-    content.append(line);
+
+    if (!line.empty())
+    {
+      line.pop_back();        // Remove platform EOL terminating character
+      content.append(line);
+      line.clear();
+    }
   }
 
   return content;

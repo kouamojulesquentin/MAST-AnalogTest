@@ -99,6 +99,8 @@ class MAST_CORE_EXPORT MastConfiguration final
 
   // ---------------- Options getters
   //
+  bool                            RequestHelp()                       const { return m_requestHelp;                 } //!< When true, help has been requested at command line
+  const std::string&              IclFilePath()                       const { return m_iclFilePath;                 } //!< ICL file used by the project
   const std::string&              SitFilePath()                       const { return m_sitFilePath;                 } //!< SIT file used by the project
   const std::string&              ConfigurationAlgorithm()            const { return m_configurationAlgorithm;      } //!< One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a [plugin])
   const std::string&              AccessInterfaceProtocolName()       const { return m_aiProtocolName;              } //!< When different to "SIT", it override the one define in [SIT] file
@@ -158,12 +160,13 @@ class MAST_CORE_EXPORT MastConfiguration final
   //
   private:
 
-
-
+  bool                      m_requestHelp                 = false;                                  //!< When true, only command line help is displayed
   std::chrono::milliseconds m_minTimeBetweenCycles;                                                 //!< Minimal time between two I/O cycles
   std::chrono::milliseconds m_maxTimeBetweenCycles;                                                 //!< Maximal time between I/O cycles. It corresponds to the maximal delay between an iApply assertion and its execution
   std::string               m_applicationDirectoryPath;                                             //!< Application directory path (extracted from argv[0])
-  std::string               m_sitFilePath;                                                          //!< SIT file used by the project
+  std::string               m_iclFilePath;                                                          //!< ICL top file used by the project
+  std::string               m_sitFilePath;                                                          //!< SIT top file used by the project
+  std::string               m_projectListFilePath;                                                  //!< Files that defines list of SIT or ICL files used to build SUT model
   std::string               m_configurationAlgorithm;                                               //!< One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a [plugin])
   std::string               m_aiProtocolName;                                                       //!< When not empty, it overrides the one defined in [SIT] file
   std::string               m_aiProtocolParameters;                                                 //!< Optional access interface protocol parameters (in case the one in [SIT] file is overriden)

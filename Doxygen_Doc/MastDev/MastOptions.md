@@ -7,6 +7,7 @@ Mast Options  {#MastOptions}
 [MAST]:  Acronyms.html "MAnager for SoC Test"
 [PDL]:   Acronyms.html "Procedure Description Language"
 [SUT]:   Acronyms.html "System Under Test"
+[ICL]:   Acronyms.html "Instrument Connectivity Language"
 
 [SIT]:     SIT_Files.html
 [plugin]:  Plugins.html
@@ -26,7 +27,9 @@ Configuration file follows [YAML](https://fr.wikipedia.org/wiki/YAML) syntax.
 Default configuration file looks like this:
 
     Mast_Options:
-      SIT_file_path:                                          # [SIT] file used by the project
+      ICL_file_path:                                          # [ICL] file used by the project to represent top module
+      SIT_file_path:                                          # [SIT] file used by the project to represent top module
+      Modules_list_file_path:                                 # List of [SIT] or [ICL] files to represent project system model
       Access_interface_protocol:
         Name:                                                 # When defined, it overrides the one defined in [SIT] file
         Parameters:                                           # Optional access interface protocol parameters (in case the one in [SIT] file is overriden)
@@ -79,82 +82,92 @@ Command line follows the Linux [Program Argument Syntax Conventions](https://www
 Command line switches override same value in configuration file.
 
 Usage is:
-      Mast.exe  [-c=<File path>]
-                [-s=<File path>]
-                [--plugin_dir=<Directory path>] ...
-                [--plugin=<File path>] ...
-                [-l]
-                [--log_file=<File path>]
-                [--log_show=<all|date|file_name|function_name|level|line_number|microseconds|std|std_less|std_more|thread_id|time>] ...
-                [--log_level=<debug|error|info|warning>] ...
-                [--log_kind=<cout|file|only_errors_on_cerr>] ...
-                [--check]
-                [--check_file=<File path>]
-                [-a=<last_lazy|last_or_default|last_or_default_greedy| "name defined by a plugin">]
-                [--max_cycle=<Positive integer with 'ms' or 's' suffix>]
-                [--min_cycle=<Positive integer with 'ms' or 's' suffix>]
-                [--protocol_parameters=<Protocol parameter(s)>]
-                [--protocol_name=<Protocol name>]
-                [--]
+
+  Mast.exe  [-s=<File path>|-i=<File path>|-m=<File path>]
+            [-c=<File path>]
+            [--plugin_dir=<Directory path>] ...
+            [--plugin=<File path>] ...
+            [-l]
+            [--log_file=<File path>]
+            [--log_show=<all|date|file_name|function_name|level|line_number|microseconds|std|std_less|std_more|thread_id|time>] ...
+            [--log_level=<debug|error|info|warning>] ...
+            [--log_kind=<cout|file|only_errors_on_cerr>] ...
+            [--check]
+            [--check_file=<File path>]
+            [-a=<last_lazy|last_or_default|last_or_default_greedy| "name defined by a plugin">]
+            [--max_cycle=<Positive integer with 'ms' or 's' suffix>]
+            [--min_cycle=<Positive integer with 'ms' or 's' suffix>]
+            [--protocol_parameters=<Protocol parameter(s)>]
+            [--protocol_name=<Protocol name>]
+            [-h]
+            [--]
 
 
-    Where:
+Where:
 
-      Mast: Manager for System On Chip Tests
+  Mast: Manager for System On Chip Tests
 
-      -c=<File path>,  --conf=<File path>
-        Defines configuration file
+  -s=<File path>,  --sit=<File path>
+    Defines SIT that specified SUT model (top)
+         -- OR --
+  -i=<File path>,  --icl=<File path>
+    Defines ICL that specified SUT model (top)
+         -- OR --
+  -m=<File path>,  --modules=<File path>
+    Defines file with list of files that specified SUT model
 
-      -s=<File path>,  --sit=<File path>
-        Defines SIT that specified SUT model
 
-      --plugin_dir=<Directory path>  (accepted multiple times)
-        Defines a plugin directory (all plugins in it are loaded)
+  -c=<File path>,  --conf=<File path>
+    Defines configuration file
 
-      --plugin=<File path>  (accepted multiple times)
-        Defines a plugin file to load
+  --plugin_dir=<Directory path>  (accepted multiple times)
+    Defines a plugin directory (all plugins in it are loaded)
 
-      -l,  --log
-        Enables logger
+  --plugin=<File path>  (accepted multiple times)
+    Defines a plugin file to load
 
-      --log_file=<File path>
-        Defines logger file path
+  -l,  --log
+    Enables logger
 
-      --log_show=<all|date|file_name|function_name|level|line_number|microseconds|std|std_less|std_more|thread_id|time>  (accepted multiple times)
-        Defines log shown items
+  --log_file=<File path>
+    Defines logger file path
 
-      --log_level=<debug|error|info|warning>  (accepted multiple times)
-        Defines log level
+  --log_show=<all|date|file_name|function_name|level|line_number|microseconds|std|std_less|std_more|thread_id|time>  (accepted multiple times)
+    Defines log shown items
 
-      --log_kind=<cout|file|only_errors_on_cerr>  (accepted multiple times)
-        Defines logger kind
+  --log_level=<debug|error|info|warning>  (accepted multiple times)
+    Defines log level
 
-      --check
-        Enables model checking (resulting from parsing SIT file)
+  --log_kind=<cout|file|only_errors_on_cerr>  (accepted multiple times)
+    Defines logger kind
 
-      --check_file=<File path>
-        Defines result of model checking (it is always logged when logger is enabled)
+  --check
+    Enables model checking (resulting from parsing SIT file)
 
-      -a=<last_lazy|last_or_default|last_or_default_greedy| "name defined by a plugin">,
-      --config_algo=<last_lazy|last_or_default|last_or_default_greedy| "name defined by a plugin">
-        Name of configuration algorithm used to select linker  (mux) path
+  --check_file=<File path>
+    Defines result of model checking (it is always logged when logger is enabled)
 
-      --max_cycle=<Positive integer with 'ms' or 's' suffix>
-        Maximal time to take into account an iApplyMaximal time between I/O cycles.
-        It corresponds to the maximal delay between an iApply assertion and its execution
+  -a=<last_lazy|last_or_default|last_or_default_greedy| "name defined by a plugin">,
+  --config_algo=<last_lazy|last_or_default|last_or_default_greedy| "name defined by a plugin">
+    Name of configuration algorithm used to select linker  (mux) path
 
-      --min_cycle=<Positive integer with 'ms' or 's' suffix>
-        Minimal time between two I/O cycles
+  --max_cycle=<Positive integer with 'ms' or 's' suffix>
+    Maximal time between I/O cycles. It corresponds to the maximal delay between an iApply assertion and its execution
 
-      --protocol_parameters=<Protocol parameter(s)>
-        Optional access interface protocol parameters
+  --min_cycle=<Positive integer with 'ms' or 's' suffix>
+    Minimal time between two I/O cycles
 
-      --protocol_name=<Protocol name>
-        Overrides access interface protocol defined in SIT file
+  --protocol_parameters=<Protocol parameter(s)>
+    Optional access interface protocol parameters
 
-      --,  --ignore_rest
-        Ignores the rest of the labeled arguments following this flag.
+  --protocol_name=<Protocol name>
+    Overrides access interface protocol defined in SIT file
 
+  -h,  --help
+    Displays usage information and exits
+
+  --,  --ignore_rest
+    Ignores the rest of the labeled arguments following this flag.
 
 If there is a `mast.cfg` file in current working directory, it will be used as the configuration file.
 

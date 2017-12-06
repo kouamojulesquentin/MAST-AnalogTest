@@ -346,20 +346,23 @@ void MastEnvironment_impl::CreateSystemModel ()
 
   CHECK_VALUE_NOT_ZERO(algos.RegisteredAlgorithmCount(), "A plugin must be loaded with at least one registered PDL algorithm function");
 
-  auto sitFile = m_configuration->SitFilePath();
-  CHECK_VALUE_NOT_EMPTY(sitFile, "A valid (non empty) SIT file path must be provided");
+  shared_ptr<SystemModel> systemModel;
 
-  sitFile = GetActualSitFilePath(sitFile);
-  CHECK_FILE_EXISTS_EX(sitFile, "SIT file: ");
-  LOG(INFO) << "Using SIT file: " << sitFile;
-  LOG(INFO) << "Creating System Model";
+  if (!m_configuration->SitFilePath().empty())
+  {
+    systemModel = CreateSystemModelFromSitFile(m_configuration->SitFilePath());
+  }
+  else if (!m_configuration->IclFilePath().empty())
+  {
+    CHECK_FAILED("Not Yet Supported: Parsing of, single, ICL file");
+//+    systemModel = CreateSystemModel_FromIclFile(m_configuration->IclFilePath());
+  }
+  else
+  {
+    CHECK_FAILED("Only support single SIT or ICL source file yet");
+  }
 
-  ModelBuildDriver buildDriver;
-  auto systemModel = buildDriver.CreateModelFromSitFile(sitFile);
-  auto topNode     = dynamic_pointer_cast<ParentNode>(systemModel->Root());
-
-  CHECK_VALUE_NOT_NULL(topNode, "Failed to parse file: "s + sitFile);
-  LOG(INFO) << "SIT file has been parsed successfully";
+  CHECK_VALUE_NOT_NULL(systemModel, "Faile to create SystemModel");
 
   // ---------------- Checks
   //
@@ -369,8 +372,6 @@ void MastEnvironment_impl::CreateSystemModel ()
   }
   Startup::sm_systemModel = systemModel;
 
-
-  m_algoNamesAssociatedToNodes = buildDriver.PDLAlgorithmNameToNodeAssociation();
 
   if (!m_configuration->AccessInterfaceProtocolName().empty())
   {
@@ -383,6 +384,35 @@ void MastEnvironment_impl::CreateSystemModel ()
 }
 //
 //  End of: MastEnvironment_impl::CreateSystemModel
+//---------------------------------------------------------------------------
+
+
+//! Builds SystemModel from "Top" SIT file
+//!
+//! @param sitFile  SIT file name that represent SUT top
+//!
+shared_ptr<SystemModel> MastEnvironment_impl::CreateSystemModelFromSitFile (const string& sitFile)
+{
+  CHECK_PARAMETER_NOT_EMPTY(sitFile, "A valid (non empty) SIT file path must be provided");
+
+  auto sitFilePath = GetActualSitFilePath(sitFile);
+  CHECK_FILE_EXISTS_EX(sitFilePath, "SIT file: ");
+  LOG(INFO) << "Using SIT file: " << sitFilePath;
+  LOG(INFO) << "Creating System Model";
+
+  ModelBuildDriver buildDriver;
+  auto systemModel = buildDriver.CreateModelFromSitFile(sitFilePath);
+  auto topNode     = dynamic_pointer_cast<ParentNode>(systemModel->Root());
+
+  CHECK_VALUE_NOT_NULL(topNode, "Failed to parse file: "s + sitFilePath);
+
+  m_algoNamesAssociatedToNodes = buildDriver.PDLAlgorithmNameToNodeAssociation();
+
+  LOG(INFO) << "SIT file has been parsed successfully";
+  return systemModel;
+}
+//
+//  End of: MastEnvironment_impl::CreateSystemModelFromSitFile
 //---------------------------------------------------------------------------
 
 
@@ -663,7 +693,8 @@ shared_ptr<SystemModelManagerMonitor> MastEnvironment_impl::MakeManagerMonitor (
 //!
 //! @param arguments  Command line arguments (first one is application name)
 //!
-void MastEnvironment_impl::ParseOptions (vector<string> arguments)
+//! @return True when parsing is successful, false when help is requested (and nothing more)
+bool MastEnvironment_impl::ParseOptions (vector<string> arguments)
 {
   LOG(INFO) << "Parsing MAST options";
   if (!m_configuration)
@@ -680,6 +711,10 @@ void MastEnvironment_impl::ParseOptions (vector<string> arguments)
 
   if (m_configuration->ShouldExit())
   {
+    if (m_configuration->RequestHelp())
+    {
+      return false;
+    }
     throw std::runtime_error("Failed to parse user options");
   }
 
@@ -689,6 +724,7 @@ void MastEnvironment_impl::ParseOptions (vector<string> arguments)
     LOG(DEBUG) << "Logger (re)configured";
   }
   LOG(INFO) << "MAST options parsed";
+  return true;
 }
 //
 //  End of: MastEnvironment_impl::ParseOptions
@@ -769,12 +805,14 @@ void MastEnvironment_impl::Start ()
 //!
 void MastEnvironment_impl::Start (std::vector<std::string> arguments)
 {
-  ParseOptions(arguments);
-  LoadPlugins();
-  CreateSystemModel();
-  CreateManager();
-  CreateApplications();
-  Start();
+  if (ParseOptions(arguments))
+  {
+    LoadPlugins();
+    CreateSystemModel();
+    CreateManager();
+    CreateApplications();
+    Start();
+  }
 }
 //
 //  End of: MastEnvironment_impl::Start

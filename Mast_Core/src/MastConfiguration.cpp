@@ -144,7 +144,9 @@ static const map<string, mast::ReportMoments> reportMomentsMapping
 MastConfiguration::MastConfiguration ()
   : m_minTimeBetweenCycles        (10ms)
   , m_maxTimeBetweenCycles        (1s)
+  , m_iclFilePath                 ("")
   , m_sitFilePath                 ("")
+  , m_projectListFilePath         ("")
   , m_configurationAlgorithm      ("last_or_default")
   , m_aiProtocolName              ("")
   , m_aiProtocolParameters        ("")
@@ -331,7 +333,9 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
     };
 
 
+    updateString (m_iclFilePath,                 {"ICL_file_path"});
     updateString (m_sitFilePath,                 {"SIT_file_path"});
+    updateString (m_projectListFilePath,         {"Modules_list_file_path"});
     updateString (m_aiProtocolName,              {"Access_interface_protocol", "Name"});
     updateString (m_aiProtocolParameters,        {"Access_interface_protocol", "Parameters"});
     updateString (m_configurationAlgorithm,      {"Configuration_algorithm"});
@@ -433,12 +437,13 @@ void MastConfiguration::Update (vector<string> arguments)
     TCLAP::ValuesConstraint<string> logShowConstraint (makeAllowedSet(loggerShownItemMapping));
 
     // Insert in reverse order of the USAGE print()
-    TCLAP::ValueArg<std::string> aiProtocolNameArg       ("",  "protocol_name",       "Overrides access interface protocol defined in SIT file",                       false,   "", "Protocol name",         cmdLine);
-    TCLAP::ValueArg<std::string> aiProtocolParametersArg ("",  "protocol_parameters", "Optional access interface protocol parameters",                                 false,   "", "Protocol parameter(s)", cmdLine);
+    TCLAP::SwitchArg             helpArg                 ("h", "help",                "Displays usage information and exits",                                           cmdLine, false);
+    TCLAP::ValueArg<std::string> aiProtocolNameArg       ("",  "protocol_name",       "Overrides access interface protocol defined in SIT file",                        false,   "", "Protocol name",         cmdLine);
+    TCLAP::ValueArg<std::string> aiProtocolParametersArg ("",  "protocol_parameters", "Optional access interface protocol parameters",                                  false,   "", "Protocol parameter(s)", cmdLine);
     TCLAP::ValueArg<std::string> minCycleArg             ("",  "min_cycle",           "Minimal time between two I/O cycles",                                                                                                                  false,   "1ms", "Positive integer with 'ms' or 's' suffix", cmdLine);
     TCLAP::ValueArg<std::string> maxCycleArg             ("",  "max_cycle",           "Maximal time between I/O cycles. It corresponds to the maximal delay between an iApply assertion and its execution",                                   false,   "1s",  "Positive integer with 'ms' or 's' suffix", cmdLine);
-    TCLAP::ValueArg<std::string> configurationAlgoArg    ("a", "config_algo",         "Name of configuration algorithm used to select linker  (mux) path",             false,   "last_or_default",   "last_lazy|last_or_default|last_or_default_greedy| \"name defined by a plugin\"", cmdLine);
-    TCLAP::ValueArg<std::string> checkModelFileArg       ("",  "check_file",          "Defines result of model checking (it is always logged when logger is enabled)", false,   "mast_check.txt",    "File path", cmdLine);
+    TCLAP::ValueArg<std::string> configurationAlgoArg    ("a", "config_algo",         "Name of configuration algorithm used to select linker  (mux) path",              false,   "last_or_default",   "last_lazy|last_or_default|last_or_default_greedy| \"name defined by a plugin\"", cmdLine);
+    TCLAP::ValueArg<std::string> checkModelFileArg       ("",  "check_file",          "Defines result of model checking (it is always logged when logger is enabled)",  false,   "mast_check.txt",    "File path", cmdLine);
     TCLAP::SwitchArg             checkModelArg           ("",  "check",               "Enables model checking (resulting from parsing SIT file)",                       cmdLine, false);
     TCLAP::MultiArg<std::string> logKindArg              ("",  "log_kind",            "Defines logger kind",                                                            false,   &logKindConstraint,  cmdLine);
     TCLAP::MultiArg<std::string> logLevelArg             ("",  "log_level",           "Defines log level",                                                              false,   &logLevelConstraint, cmdLine);
@@ -447,14 +452,25 @@ void MastConfiguration::Update (vector<string> arguments)
     TCLAP::SwitchArg             logEnabledArg           ("l", "log",                 "Enables logger",                                                                 cmdLine, false);
     TCLAP::MultiArg<std::string> pluginFilesArg          ("",  "plugin",              "Defines a plugin file to load",                                                  false,   "File path",         cmdLine);
     TCLAP::MultiArg<std::string> pluginDirsArg           ("",  "plugin_dir",          "Defines a plugin directory (all plugins in it are loaded)",                      false,   "Directory path",    cmdLine);
-    TCLAP::ValueArg<std::string> sitFilePathArg          ("s", "sit",                 "Defines SIT that specified SUT model",                                           false,   "project.sit",       "File path", cmdLine);
+    TCLAP::ValueArg<std::string> sitFilePathArg          ("s", "sit",                 "Defines SIT that specified SUT model (top)",                                     false,   "project.sit",       "File path");
+    TCLAP::ValueArg<std::string> iclFilePathArg          ("i", "icl",                 "Defines ICL that specified SUT model (top)",                                     false,   "top.icl",           "File path");
+    TCLAP::ValueArg<std::string> modulesListFilePathArg  ("m", "modules",             "Defines file with list of files that specified SUT model",                       false,   "project.txt",       "File path");
     TCLAP::ValueArg<std::string> configurationFileArg    ("c", "conf",                "Defines configuration file",                                                     false,   "mast.cfg",          "File path", cmdLine);
+
+    cmdLine.exclusiveOptionalAdd({&sitFilePathArg, &iclFilePathArg, &modulesListFilePathArg});
 
     // ---------------- Do parse command line arguments
     //
     cmdLine.parse(arguments);
 
     m_shouldExit = cmdLine.shouldExit();
+
+    if (helpArg.isSet())   // This is currently necessary to make the difference between help and error exit (built-in help is not complete)
+    {
+      m_shouldExit  = true;
+      m_requestHelp = true;
+      m_cmdLineOutput->usage(cmdLine);
+    }
 
     if (!m_shouldExit)
     {
@@ -510,7 +526,9 @@ void MastConfiguration::Update (vector<string> arguments)
         ParseConfigurationFile(configurationFile);
       }
 
+      setOption(m_iclFilePath,            iclFilePathArg);
       setOption(m_sitFilePath,            sitFilePathArg);
+      setOption(m_projectListFilePath,    modulesListFilePathArg);
       setOption(m_configurationAlgorithm, configurationAlgoArg);
       setOption(m_pluginDLLs,             pluginFilesArg);
       setOption(m_pluginDirectories,      pluginDirsArg);
@@ -528,6 +546,8 @@ void MastConfiguration::Update (vector<string> arguments)
       setMappedOptionFlags(m_loggerLevel,      logLevelArg, loggerLevelMapping);
       setMappedOptionFlags(m_loggerShownItems, logShowArg,  loggerShownItemMapping);
     }
+
+    CHECK_TRUE(m_iclFilePath.empty() || m_sitFilePath.empty(), "Model top must be defined by either ICL or SIT file, not both");
   }
   catch(TCLAP::CmdLineParseException& exc)
   {

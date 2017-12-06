@@ -549,8 +549,8 @@ void UT_MastConfiguration::test_Update_BadArguments ()
   auto stdMessage = stdStream.str();
   auto errMessage = errStream.str();
 
-  TS_ASSERT_CONTAINS (stdMessage, "USAGE:")
-  TS_ASSERT_CONTAINS (errMessage, "PARSE ERROR: Argument:")
+  TS_ASSERT_CONTAINS (stdMessage, "Usage is:")
+  TS_ASSERT_CONTAINS (errMessage, "Parsing ERROR: Argument:")
 }
 
 
@@ -583,8 +583,8 @@ void UT_MastConfiguration::test_Update_UnsupportedFlags ()
   auto stdMessage = stdStream.str();
   auto errMessage = errStream.str();
 
-  TS_ASSERT_CONTAINS (stdMessage, "USAGE:")
-  TS_ASSERT_CONTAINS (errMessage, "PARSE ERROR: Argument:")
+  TS_ASSERT_CONTAINS (stdMessage, "Usage is:")
+  TS_ASSERT_CONTAINS (errMessage, "Parsing ERROR: Argument:")
 }
 
 

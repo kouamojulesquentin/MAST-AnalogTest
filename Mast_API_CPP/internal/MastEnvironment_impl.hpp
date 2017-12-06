@@ -60,10 +60,10 @@ class MastEnvironment_impl final
 
   // ---------------- Optional API (this is what Start call)
   //
-  void ParseOptions(std::vector<std::string> arguments); //!< Parses options - from list of command line arguments
-  void ParseOptions(int argc, const char* argv[])        //!< Parses options - from C-Style command line arguments
+  bool ParseOptions(std::vector<std::string> arguments); //!< Parses options - from list of command line arguments
+  bool ParseOptions(int argc, const char* argv[])        //!< Parses options - from C-Style command line arguments
   {
-    ParseOptions(MakeArgumentsVector(argc, argv));
+    return ParseOptions(MakeArgumentsVector(argc, argv));
   }
 
   void LoadPlugins();         //!< Loads plugin(s) defined by parsed options
@@ -84,6 +84,8 @@ class MastEnvironment_impl final
   void ConfigureLogger ();
   void InitializeLogger ();
   std::string GetActualSitFilePath (const std::string& sitFile) const;
+
+  std::shared_ptr<SystemModel> CreateSystemModelFromSitFile (const std::string& sitFile);
 
   std::shared_ptr<SystemModelManagerMonitor> MakeManagerMonitor ();
   static std::vector<std::string>            MakeArgumentsVector (int argc, const char* argv[]);

@@ -55,15 +55,15 @@ void MastEnvironment::LoadPlugins ()
   m_impl->LoadPlugins();
 }
 
-void MastEnvironment::ParseOptions (int argc, const char* argv[])
+bool MastEnvironment::ParseOptions (int argc, const char* argv[])
 {
-  m_impl->ParseOptions(argc, argv);
+  return m_impl->ParseOptions(argc, argv);
 }
 
 
-void MastEnvironment::ParseOptions (vector<string> arguments)
+bool MastEnvironment::ParseOptions (vector<string> arguments)
 {
-  m_impl->ParseOptions(arguments);
+  return m_impl->ParseOptions(arguments);
 }
 
 

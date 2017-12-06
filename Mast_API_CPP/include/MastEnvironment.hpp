@@ -45,8 +45,8 @@ class CPP_API_EXPORT MastEnvironment final
   void Start(std::vector<std::string> arguments);        //!< Starts MAST using options from list of command line arguments
   void Start(int argc, const char* argv[]);              //!< Starts MAST using options from C-Style command line arguments
 
-  void ParseOptions(int argc, const char* argv[]);       //!< Parses options - from C-Style command line arguments
-  void ParseOptions(std::vector<std::string> arguments); //!< Parses options - from list of command line arguments
+  bool ParseOptions(int argc, const char* argv[]);       //!< Parses options - from C-Style command line arguments
+  bool ParseOptions(std::vector<std::string> arguments); //!< Parses options - from list of command line arguments
   void LoadPlugins();                                    //!< Loads plugin(s) defined by parsed options
   void CreateSystemModel();                              //!< Creates system model using parsed options and loaded plugins
   void CreateManager();                                  //!< Creates system model manager

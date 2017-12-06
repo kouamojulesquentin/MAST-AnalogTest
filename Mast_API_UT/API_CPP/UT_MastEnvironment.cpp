@@ -231,23 +231,32 @@ void UT_MastEnvironment::test_ParseOptions_with_Yaml ()
 //!
 void UT_MastEnvironment::test_ParseOptions_Argc_Argv ()
 {
-  // ---------------- Setup
+  // ---------------- DDT Setup
   //
-  MastEnvironment sut(true);
+  auto checker = [](const auto& arg)
+  {
+    // ---------------- Setup
+    //
+    const char* argv[] = { "Mast.exe", arg.c_str() };
+    auto argc = std::extent<decltype(argv)>::value;
 
-  auto sitArg        = "--sit="        + GetTestFilePath("UT_MastEnvironment.sit");
-  const char* argv[] = {
-                         "Mast.exe",
-                         "--sit=not_exists.sit"
-                       };
-  auto argc = std::extent<decltype(argv)>::value;
+    MastEnvironment sut(true);
 
-  // ---------------- Exercise & Verify
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.ParseOptions(argc, argv));
+  };
+
+  auto data =
+  {
+    "--sit="s.append(GetTestFilePath("UT_MastEnvironment.sit")),
+    "--icl="s.append(GetTestFilePath("UT_MastEnvironment.icl")),
+  };
+
+  // ---------------- DDT Exercise
   //
-  TS_ASSERT_THROWS_NOTHING (sut.ParseOptions(argc, argv));
+  TS_DATA_DRIVEN_TEST(checker, data);
 }
-
-
 
 
 //! Checks MastEnvironment::LoadPlugins() before requesting to parse options

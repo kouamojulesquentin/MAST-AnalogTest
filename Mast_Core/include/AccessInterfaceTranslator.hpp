@@ -54,6 +54,7 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
   //Control of message queues 
 
  uint32_t RegisterInterface(std::shared_ptr<mast::AccessInterface> interface);
+ uint32_t RegisterTranslator(std::shared_ptr<mast::AccessInterfaceTranslator> translator);
 
   CallbackRequest PopRequest(uint32_t n_interface) {  
      std::cv_status   status;

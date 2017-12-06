@@ -52,6 +52,8 @@ class UT_SystemModelManager : public CxxTest::TestSuite
   void test_DoDataCycles_I2C_AccessInterfaceTranslator ();
   void test_DoDataCycles_DoubleAccessInterfaceTranslator ();
   void test_DoDataCycles_BrocadeTranslator ();
+  void test_DoDataCycles_JTAG_to_I2C_Translator ();
+
 
   void test_DoDataCycles_MIB_Multichain_Pre ();
   void test_DoDataCycles_MIB_Multichain_Pre_Greedy ();

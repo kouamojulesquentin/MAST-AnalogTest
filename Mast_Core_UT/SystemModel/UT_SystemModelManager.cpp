@@ -32,6 +32,7 @@
 #include "SVF_RawPlayer.hpp"
 #include <initializer_list>
 #include "SystemModelChecker.hpp"
+#include "JTAG_to_I2C_TranslatorProtocol.hpp"
 
 #include "PrettyPrinter.hpp"
 
@@ -776,7 +777,6 @@ void UT_SystemModelManager::test_DoDataCycles_AccessInterfaceTranslator ()
   TestModelBuilder builder(sm);
 
   auto at    = builder.Create_TestCase_Emulation_Translator();
-  auto ai =  dynamic_pointer_cast<AccessInterface>(at->FirstChild());
   auto ir    = sm.RegisterWithId(1u);
   auto bpy   = sm.RegisterWithId(3u);
   auto reg_1 = sm.RegisterWithId(5u);
@@ -826,7 +826,6 @@ void UT_SystemModelManager::test_DoDataCycles_DoubleAccessInterfaceTranslator ()
   TestModelBuilder builder(sm);
 
   auto at    = builder.Create_TestCase_Emulation_Translator();
-  auto ai =  dynamic_pointer_cast<AccessInterface>(at->FirstChild());
   auto ir    = sm.RegisterWithId(1u);
   auto bpy   = sm.RegisterWithId(3u);
   auto reg_1 = sm.RegisterWithId(5u);
@@ -887,6 +886,7 @@ void UT_SystemModelManager::test_DoDataCycles_DoubleAccessInterfaceTranslator ()
 
   TS_ASSERT_EQUALS (gotCommands, expectedCommands);
 }
+
 //! Checks SystemModelManager DoDataCycles when using AccessInterfaceTranslator testcase
 //!
 void UT_SystemModelManager::test_DoDataCycles_I2C_AccessInterfaceTranslator ()
@@ -897,7 +897,6 @@ void UT_SystemModelManager::test_DoDataCycles_I2C_AccessInterfaceTranslator ()
   TestModelBuilder builder(sm);
 
   auto at    = builder.Create_TestCase_I2C_Emulation_Translator();
-  auto ai =  dynamic_pointer_cast<AccessInterface>(at->FirstChild());
 
 
   auto reg_1 = sm.RegisterWithId(1u);
@@ -994,6 +993,54 @@ void UT_SystemModelManager::test_DoDataCycles_BrocadeTranslator ()
   };
 
 //  TS_ASSERT_EQUALS (gotCommands, expected);
+}
+
+
+//! Checks SystemModelManager DoDataCycles when using a JTAG_to_I2C_Translator
+//!
+void UT_SystemModelManager::test_DoDataCycles_JTAG_to_I2C_Translator ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  auto at    = builder.Create_TestCase_JTAG_to_I2C_Translator();
+  auto ir    = sm.RegisterWithId(1u);
+  auto bpy   = sm.RegisterWithId(3u);
+  auto reg_1 = sm.RegisterWithId(5u);
+  auto reg_2 = sm.RegisterWithId(7u);
+
+  reg_1->SetToSut   (BinaryVector(STATIC_TDR_LEN, 0x0A));
+  reg_2->SetToSut   (BinaryVector(STATIC_TDR_LEN, 0xB0));
+  reg_1->SetBypass  (BinaryVector(STATIC_TDR_LEN, 0x41));
+  reg_2->SetBypass  (BinaryVector(STATIC_TDR_LEN, 0x42));
+
+//+  TS_TRACE (GmlPrinter::Graph(ai, "Testcase_AccessInterface"));
+
+  SystemModelManager sut(sm);
+
+//  auto gotPretty      = PrettyPrinter::PrettyPrint(sm.Root(), PrettyPrinterOptions::All);
+//  TS_ASSERT_EQUALS (gotPretty, "");
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.DoDataCycles());
+
+  // ---------------- Verify
+  //
+  auto gotCommands = dynamic_pointer_cast<Spy_Emulation_Translator>(at->Protocol())->Commands();
+
+  std::vector<std::string> expectedCommands
+  {
+    "SIR 8 TDI(02);",   // 00 : IR
+    "SDR 16 TDI(B0B0);", // 01 : DR (reg_2)
+    "SIR 8 TDI(01);",   // 02 : IR
+    "SDR 16 TDI(0A0A);", // 03 : DR (reg_1)
+    "SIR 8 TDI(FF);",   // 04 : IR
+  };
+
+  TS_ASSERT_EQUALS (gotCommands, expectedCommands);
 }
 
 //! Checks SystemModelManager DoDataCycles when using "1500" testcase

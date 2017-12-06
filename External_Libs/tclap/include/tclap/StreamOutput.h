@@ -128,7 +128,7 @@ inline void StreamOutput::version(CmdLineInterface& _cmd)
 
 inline void StreamOutput::usage(CmdLineInterface& _cmd)
 {
-  m_stdStream << std::endl << "USAGE: " << std::endl << std::endl;
+  m_stdStream << std::endl << "Usage is: " << std::endl << std::endl;
 
   _shortUsage(_cmd, m_stdStream);
 
@@ -142,14 +142,14 @@ inline void StreamOutput::usage(CmdLineInterface& _cmd)
 inline void StreamOutput::failure(CmdLineInterface& _cmd,
                         ArgException& e)
 {
-  std::string progName = _cmd.getProgramName();
+  auto& progName = _cmd.getProgramName();
 
-  m_errStream << "PARSE ERROR: " << e.argId() << std::endl
-              << "             " << e.error() << std::endl << std::endl;
+  m_errStream << "Parsing ERROR: " << e.argId() << std::endl
+              << "               " << e.error() << std::endl << std::endl;
 
   if (_cmd.hasHelpAndVersion())
   {
-    m_errStream << "Brief USAGE: " << std::endl;
+    m_errStream << "Brief usage: " << std::endl;
 
     _shortUsage(_cmd, m_stdStream);
 
@@ -187,7 +187,7 @@ inline void StreamOutput::_shortUsage(CmdLineInterface& _cmd, std::ostream& os) 
   for (const auto& exclusiveSet : xorList)
   {
     auto areOptional = !exclusiveSet.front()->isRequired();
-    s += areOptional ? " [" : " {";
+    s += areOptional ? "[" : "{";
 
     for (const auto& arg : exclusiveSet)
     {

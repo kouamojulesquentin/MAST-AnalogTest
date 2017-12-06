@@ -270,17 +270,17 @@ private:
     /**
      *
      */
-    std::string& getVersion();
+    virtual const std::string& getVersion() const override;
 
     /**
      *
      */
-    std::string& getProgramName();
+    virtual const std::string& getProgramName() const override;
 
     /**
      *
      */
-    std::list<Arg*>& getArgList();
+    virtual const std::list<Arg*>& getArgList() const override;
 
     /**
      *
@@ -292,7 +292,7 @@ private:
      */
     char getDelimiter();
 
-    std::string& getMessage();
+    virtual const std::string& getMessage() const override;
 
     bool hasHelpAndVersion();
 
@@ -480,8 +480,16 @@ inline void CmdLine::parse(std::vector<std::string>& args)
 
   int estat = 0;
 
-  try {
+  try
+  {
+    // ---------------- Extract programm name (without its path)
+    //
     _progName = args.front();
+    auto pos = _progName.find_last_of("/\\");
+    if (pos != std::string::npos)
+    {
+      _progName = _progName.substr(pos + 1u);
+    }
     args.erase(args.begin());
 
     int requiredCount = 0;
@@ -610,17 +618,17 @@ inline void CmdLine::setOutput(CmdLineOutput* co)
   _output = co;
 }
 
-inline std::string& CmdLine::getVersion()
+inline const std::string& CmdLine::getVersion() const
 {
   return _version;
 }
 
-inline std::string& CmdLine::getProgramName()
+inline const std::string& CmdLine::getProgramName() const
 {
   return _progName;
 }
 
-inline std::list<Arg*>& CmdLine::getArgList()
+inline const std::list<Arg*>& CmdLine::getArgList() const
 {
   return _argList;
 }
@@ -635,7 +643,7 @@ inline char CmdLine::getDelimiter()
   return _delimiter;
 }
 
-inline std::string& CmdLine::getMessage()
+inline const std::string& CmdLine::getMessage() const
 {
   return _message;
 }

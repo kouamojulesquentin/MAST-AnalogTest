@@ -1,11 +1,12 @@
 
-@set Build=%1
-@set Options=%2
+@set Project=%1
+@set Build=%2
+@set Options=%3
 
+@if "%Project%"=="" goto Syntax
 @if "%Build%"=="" goto Syntax
 
-@REM @set originalPath=%path%
-@set DestFile=Mast_Core_UT\UT_Results\UT_Result.txt
+@set DestFile=%Project%\UT_Results\UT_Result.txt
 
 @set Build_Dir=cmake_%Build%
 @set targetDir=".\%Build_Dir%\Bin\"
@@ -14,18 +15,17 @@
 @echo ===== Target dir: %targetDir%
 @pushd %targetDir%
 
-@if not exist Mast_Core_UT.exe goto No_exe
+@if not exist %Project%.exe goto No_exe
 @REM @echo Dir:             %cd%
 @REM @echo DestFileFromExe: %DestFileFromExe%
 
 
-@if     "%Options%"=="--display_success"  Mast_Core_UT.exe %Options% >      %DestFileFromExe%
-@if not "%Options%"=="--display_success"  Mast_Core_UT.exe %Options% | mtee %DestFileFromExe%
+@if     "%Options%"=="--display_success"  %Project%.exe %Options% >      %DestFileFromExe%
+@if not "%Options%"=="--display_success"  %Project%.exe %Options% | mtee %DestFileFromExe%
 
 
 @set Build=
 @set Options=
-@REM @set Path=%originalPath%
 @popd
 @echo.
 @echo Results have been saved into: "%DestFile%"
@@ -33,11 +33,11 @@
 @goto :EOF
 :No_exe
 @echo.
-@echo. ---- file %CD%\Mast_Core_UT.exe does not exist! ----
+@echo. ---- file %CD%\%Project%.exe does not exist! ----
 @echo.
 @goto :EOF
 :Syntax
 @echo.
-@echo. Syntax is: "UT_Run Debug|Release [Options]"
+@echo. Syntax is: "UT_Run ut_project_name Debug|Release [Options]"
 @echo.
 @goto :EOF

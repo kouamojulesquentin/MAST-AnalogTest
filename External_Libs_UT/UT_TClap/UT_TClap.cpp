@@ -199,7 +199,7 @@ void UT_TClap::test_CmdLine_parse_Help ()
   //
   TS_ASSERT_TRUE (sut.shouldExit());
 
-  TS_ASSERT_CONTAINS (stdStream.str(), "USAGE: ");
+  TS_ASSERT_CONTAINS (stdStream.str(), "Usage is: ");
   TS_ASSERT_EMPTY    (errStream.str());
 }
 
@@ -258,7 +258,7 @@ void UT_TClap::test_CmdLine_parse_UnregisteredSwitch ()
 
   TS_ASSERT_CONTAINS(stdMessage, "MyApp");
   TS_ASSERT_CONTAINS(stdMessage, "[--version]");
-  TS_ASSERT_CONTAINS(errMessage, "PARSE ERROR: Argument: --foo");
+  TS_ASSERT_CONTAINS(errMessage, "Parsing ERROR: Argument: --foo");
 }
 
 
@@ -289,7 +289,7 @@ void UT_TClap::test_CmdLine_parse_UnregisteredParam ()
 
   TS_ASSERT_CONTAINS(stdMessage, "MyApp");
   TS_ASSERT_CONTAINS(stdMessage, "[--version]");
-  TS_ASSERT_CONTAINS(errMessage, "PARSE ERROR: Argument: foo");
+  TS_ASSERT_CONTAINS(errMessage, "Parsing ERROR: Argument: foo");
 }
 
 
@@ -388,8 +388,8 @@ void UT_TClap::test_CmdLine_parse_conflicting_ExclusiveOptional ()
   auto stdMessage = stdStream.str();
   auto errMessage = errStream.str();
 
-  TS_ASSERT_CONTAINS (stdMessage, "MyApp   [-f=<foo count>|-b=<bar level>]");
-  TS_ASSERT_CONTAINS (errMessage, "PARSE ERROR: Argument: -b (--bar)");
+  TS_ASSERT_CONTAINS (stdMessage, "MyApp  [-f=<foo count>|-b=<bar level>]");
+  TS_ASSERT_CONTAINS (errMessage, "Parsing ERROR: Argument: -b (--bar)");
   TS_ASSERT_CONTAINS (errMessage, "Mutually exclusive argument already set!");
 }
 

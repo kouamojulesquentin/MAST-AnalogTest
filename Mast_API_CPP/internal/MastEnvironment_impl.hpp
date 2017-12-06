@@ -20,6 +20,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <experimental/string_view>
 
 namespace g3
 {
@@ -83,9 +84,10 @@ class MastEnvironment_impl final
   void CheckModel (std::shared_ptr<SystemModel> systemModel);
   void ConfigureLogger ();
   void InitializeLogger ();
-  std::string GetActualSitFilePath (const std::string& sitFile) const;
+  std::string GetActualProjectFilePath (const std::string& sitFile, std::experimental::string_view defaultFileExtension) const;
 
-  std::shared_ptr<SystemModel> CreateSystemModelFromSitFile (const std::string& sitFile);
+  std::shared_ptr<SystemModel> CreateSystemModel_FromSitFile (const std::string& sitFile);
+  std::shared_ptr<SystemModel> CreateSystemModel_FromIclFile (const std::string& iclFile);
 
   std::shared_ptr<SystemModelManagerMonitor> MakeManagerMonitor ();
   static std::vector<std::string>            MakeArgumentsVector (int argc, const char* argv[]);

@@ -608,6 +608,69 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_Examples ()
   TS_DATA_DRIVEN_TEST(checker, data);
 }
 
+
+//! Checks ModelBuildDriver::CreateModelFromIclFile() with various examples
+//!
+void UT_ModelBuildDriver::test_CreateModelFromIclFile_Examples ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto iclFileName      = std::get<0>(data);
+    auto expectedFileName = std::get<1>(data);    // Expected pretty print
+
+    auto             iclFilePath = GetTestFilePath("ICL"sv, iclFileName);
+    auto             sm          = make_shared<SystemModel>();
+    ModelBuildDriver sut;
+
+    CxxTest::setAbortTestOnFail(true);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sm = sut.CreateModelFromIclFile(iclFilePath));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_NOT_NULLPTR (sm);
+    TS_ASSERT_EMPTY       (sut.ErrorMessage());
+
+    auto topNode = sm->Root();
+
+    // With PrettyPrinter
+    auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode,   PrettyPrinterOptions::Parser_debug_no_id
+                                                                    | PrettyPrinterOptions::ShowSelectorTables);
+    auto expected_PrettyPrint = GetExpectedModelPrettyPrint(expectedFileName);
+
+    TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
+    // With Checker
+    test::PrependWithTap(sm, topNode);   // This is to avoid warnings about missing AccessInterface
+    auto modelCheckResult = sm->Check();
+    TS_ASSERT_EMPTY (modelCheckResult.errors);
+  };
+
+  auto data =
+  {
+    make_tuple("SReg.icl"sv,               "test_CreateFromIcl_Examples_SReg_PrettyPrint.txt"sv),
+    make_tuple("WrappedInstr.icl"sv,       "test_CreateFromIcl_Examples_WrappedInstr_PrettyPrint.txt"sv),
+    make_tuple("Daisy_3WI.icl"sv,          "test_CreateFromIcl_Examples_Daisy_3WI_PrettyPrint.txt"sv),
+    make_tuple("SIB_mux_pre.icl"sv,        "test_CreateFromIcl_Examples_SIB_mux_pre_PrettyPrint.txt"sv),
+    make_tuple("SIB_mux_post.icl"sv,       "test_CreateFromIcl_Examples_SIB_mux_post_PrettyPrint.txt"sv),
+    make_tuple("Single_SIB_3WI.icl"sv,     "test_CreateFromIcl_Examples_Single_SIB_3WI_PrettyPrint.txt"sv),
+    make_tuple("Multiple_SIB_3WI.icl"sv,   "test_CreateFromIcl_Examples_Multiple_SIB_3WI_PrettyPrint.txt"sv),
+    make_tuple("Nested_SIB_3WI.icl"sv,     "test_CreateFromIcl_Examples_Nested_SIB_3WI_PrettyPrint.txt"sv),
+    make_tuple("BAD_Nested_SIB_3WI.icl"sv, "test_CreateFromIcl_Examples_BAD_Nested_SIB_3WI_PrettyPrint.txt"sv),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
 //===========================================================================
 // End of UT_ModelBuildDriver.cpp
 //===========================================================================

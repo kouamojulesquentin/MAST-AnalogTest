@@ -39,7 +39,7 @@ struct Parser_PublicData final
 {
   std::shared_ptr<mast::SystemModel>                     systemModel;        //!< SystemModel currently being built
   std::shared_ptr<mast::SystemModelNode>                 parsedTopNode;      //!< SystemModel tree build by parser
-  std::vector<mast::AppFunctionNameAndNode>              namesAndNodes;      //!< Associations of algorithms name a node
+  std::vector<mast::AppFunctionNameAndNode>              namesAndNodes;      //!< Associations of algorithms name to nodes
   std::vector<mast::SubModelPlaceHolder>                 placeHolders;       //!< Represents sub-model to instantiate and splice in this build top node
   std::map<std::string, std::shared_ptr<mast::Register>> declared_registers; //!< Created registers - kept to potentially associate to PathSelector (at end of parsing)
   std::queue<linker_information>                         unresolved_linkers; //!< Informations to create PathSelector associated with linker (register driving the selector may be yet unknown when the linker is created)

@@ -39,6 +39,7 @@ int main (int argc, char* argv[])
     auto systemModel = std::make_shared<mast::SystemModel>();
 
     ICL::ICL_Reader reader(systemModel);
+    reader.ParseOnlyCheckGrammar(true);    // Do not try to check AST nor create a model for it (ICL files are not always complete)
 
     reader.Parse(iclFile);
     return 0;

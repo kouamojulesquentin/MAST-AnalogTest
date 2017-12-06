@@ -40,6 +40,16 @@ class ICL_Reader : public Parsers::Reader
   ICL_Reader() = delete;
   ICL_Reader(std::shared_ptr<mast::SystemModel> sm);
 
+
+  //! Gets whether parsing only ICL without any attempt to convert it to SystemModel
+  //!
+  bool  ParseOnlyCheckGrammar() const { return m_parseOnlyCheckGrammar; }
+
+  //! Enables/Disables parsing only ICL without any attempt to convert it to SystemModel
+  //!
+  void  ParseOnlyCheckGrammar (bool onlyGrammarCheck) { m_parseOnlyCheckGrammar = onlyGrammarCheck; }
+
+
   // ---------------- Protected Methods
   //
   protected:
@@ -55,7 +65,8 @@ class ICL_Reader : public Parsers::Reader
   // ---------------- Private Fields
   //
   private:
-  std::unique_ptr<Parsers::AST>  m_ast;  //!< Instance member to be visible by unit tests (for debug purpose)
+  std::unique_ptr<Parsers::AST> m_ast;                           //!< Instance member to be visible by unit tests (for debug purpose)
+  bool                          m_parseOnlyCheckGrammar = false; //!< When true, parsing stops after conversion to AST (no more check nor conversion to SystemModel is done)
 };
 } // End of: namespace ICL
 

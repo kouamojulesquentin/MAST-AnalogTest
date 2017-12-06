@@ -86,6 +86,16 @@ void ICL_Reader::Parse_Impl(std::istream& stream)
 
   UpdateAstFromIcl(stream);
 
+  if (!m_parseOnlyCheckGrammar)
+  {
+    UniquifyAST();
+
+//+    auto checkResult = AST_Checker::Check(ast->Network());
+
+    auto& data = PublicData();
+    data.parsedTopNode = GenerateSystemModelNodes(m_ast.get());
+  }
+
   LOG(INFO) << "ICL has been parsed successfully";
 }
 //

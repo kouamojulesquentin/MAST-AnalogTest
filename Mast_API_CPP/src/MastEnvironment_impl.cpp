@@ -40,6 +40,7 @@
 
 using std::vector;
 using std::string;
+using std::experimental::string_view;
 using std::shared_ptr;
 using std::make_shared;
 using std::dynamic_pointer_cast;
@@ -350,12 +351,12 @@ void MastEnvironment_impl::CreateSystemModel ()
 
   if (!m_configuration->SitFilePath().empty())
   {
-    systemModel = CreateSystemModelFromSitFile(m_configuration->SitFilePath());
+    systemModel = CreateSystemModel_FromSitFile(m_configuration->SitFilePath());
   }
   else if (!m_configuration->IclFilePath().empty())
   {
     CHECK_FAILED("Not Yet Supported: Parsing of, single, ICL file");
-//+    systemModel = CreateSystemModel_FromIclFile(m_configuration->IclFilePath());
+    systemModel = CreateSystemModel_FromIclFile(m_configuration->IclFilePath());
   }
   else
   {
@@ -387,15 +388,44 @@ void MastEnvironment_impl::CreateSystemModel ()
 //---------------------------------------------------------------------------
 
 
+//! Builds SystemModel from "Top" ICL file
+//!
+//! @param iclFile  ICL file name that represent SUT top
+//!
+shared_ptr<SystemModel> MastEnvironment_impl::CreateSystemModel_FromIclFile (const string& iclFile)
+{
+  CHECK_PARAMETER_NOT_EMPTY(iclFile, "A valid (non empty) ICL file path must be provided");
+
+  auto iclFilePath = GetActualProjectFilePath(iclFile, ".icl");
+  CHECK_FILE_EXISTS_EX(iclFilePath, "ICL file: ");
+  LOG(INFO) << "Using ICL file: " << iclFilePath;
+  LOG(INFO) << "Creating System Model";
+
+  ModelBuildDriver buildDriver;
+  auto systemModel = buildDriver.CreateModelFromIclFile(iclFilePath);
+  auto topNode     = dynamic_pointer_cast<ParentNode>(systemModel->Root());
+
+  CHECK_VALUE_NOT_NULL(topNode, "Failed to parse file: "s + iclFilePath);
+
+  m_algoNamesAssociatedToNodes = buildDriver.PDLAlgorithmNameToNodeAssociation();
+
+  LOG(INFO) << "ICL file has been parsed successfully";
+  return systemModel;
+}
+//
+//  End of: MastEnvironment_impl::CreateSystemModel_FromIclFile
+//---------------------------------------------------------------------------
+
+
 //! Builds SystemModel from "Top" SIT file
 //!
 //! @param sitFile  SIT file name that represent SUT top
 //!
-shared_ptr<SystemModel> MastEnvironment_impl::CreateSystemModelFromSitFile (const string& sitFile)
+shared_ptr<SystemModel> MastEnvironment_impl::CreateSystemModel_FromSitFile (const string& sitFile)
 {
   CHECK_PARAMETER_NOT_EMPTY(sitFile, "A valid (non empty) SIT file path must be provided");
 
-  auto sitFilePath = GetActualSitFilePath(sitFile);
+  auto sitFilePath = GetActualProjectFilePath(sitFile, ".sit");
   CHECK_FILE_EXISTS_EX(sitFilePath, "SIT file: ");
   LOG(INFO) << "Using SIT file: " << sitFilePath;
   LOG(INFO) << "Creating System Model";
@@ -412,21 +442,23 @@ shared_ptr<SystemModel> MastEnvironment_impl::CreateSystemModelFromSitFile (cons
   return systemModel;
 }
 //
-//  End of: MastEnvironment_impl::CreateSystemModelFromSitFile
+//  End of: MastEnvironment_impl::CreateSystemModel_FromSitFile
 //---------------------------------------------------------------------------
 
 
 
-//! Tries to find actual SIT file path from its name
+//! Tries to find actual project file path from its name
 //!
-//! @param sitFile  A SIT file name (or path)
+//! @param projectFile            A project file name (or path)
+//! @param defaultFileExtension   Default extension to consider for project file
 //!
-//! @return sitFile if it represents a file that can be open from current working directory, first found actual path otherwise
-string MastEnvironment_impl::GetActualSitFilePath (const string& sitFile) const
+//! @return projectFile if it represents a file that can be open from current working directory, first found actual path otherwise
+//!
+string MastEnvironment_impl::GetActualProjectFilePath (const string& projectFile, string_view defaultFileExtension) const
 {
-  if (Utility::FileExists(sitFile))
+  if (Utility::FileExists(projectFile))
   {
-    return sitFile;
+    return projectFile;
   }
 
   // ---------------- Extract directories paths of loaded plugins (at least one should be associated with PDL algorithms)
@@ -449,8 +481,8 @@ string MastEnvironment_impl::GetActualSitFilePath (const string& sitFile) const
 
   for (const auto& hintDir : candidateDirs)
   {
-    auto dirPath = hintDir.empty() ? sitFile
-                                   : hintDir + DIRECTORY_SEPARATOR + sitFile;
+    auto dirPath = hintDir.empty() ? projectFile
+                                   : hintDir + DIRECTORY_SEPARATOR + projectFile;
     // Try with hint directory path
     if (Utility::FileExists(dirPath))
     {
@@ -458,17 +490,17 @@ string MastEnvironment_impl::GetActualSitFilePath (const string& sitFile) const
     }
 
     // Try with default extension
-    dirPath.append(".sit");
+    dirPath.append(defaultFileExtension.cbegin(), defaultFileExtension.cend());
     if (Utility::FileExists(dirPath))
     {
       return dirPath;
     }
   }
 
-  return sitFile;
+  return projectFile;
 }
 //
-//  End of: MastEnvironment_impl::GetActualSitFilePath
+//  End of: MastEnvironment_impl::GetActualProjectFilePath
 //---------------------------------------------------------------------------
 
 

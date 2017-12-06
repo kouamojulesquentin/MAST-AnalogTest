@@ -16,6 +16,7 @@
   #define MODELBUILDDRIVER_H__8EE800A3_78A6_4A80_FF94_BA88795AA232__INCLUDED_
 
 #include <string>
+#include <experimental/string_view>
 #include <vector>
 #include <memory>
 
@@ -37,6 +38,10 @@ class ModelBuildDriver final
   ~ModelBuildDriver();
   ModelBuildDriver();
 
+  //! Create MAST system model starting from a ICL file
+  //!
+  std::shared_ptr<SystemModel> CreateModelFromIclFile(const std::string& iclFilePath);
+
   //! Create MAST system model starting from a SIT file
   //!
   std::shared_ptr<SystemModel> CreateModelFromSitFile(const std::string& sitFilePath);
@@ -53,9 +58,10 @@ class ModelBuildDriver final
   //
   private:
 
-  void                        AppendToSearchPath      (const std::string& filePath);
-  std::string                 AssessActualSitFilePath (const std::string& sitFileName);
-  std::shared_ptr<ParentNode> ParseSitFile            (const std::string& sitFilePath);
+  void                        AppendToSearchPath          (const std::string& filePath);
+  std::string                 AssessActualProjectFilePath (const std::string& projectFileName, std::experimental::string_view defaultFileExtension);
+  std::shared_ptr<ParentNode> ParseIclFile                (const std::string& iclFilePath);
+  std::shared_ptr<ParentNode> ParseSitFile                (const std::string& sitFilePath);
 
   // ---------------- Private Fields
   //

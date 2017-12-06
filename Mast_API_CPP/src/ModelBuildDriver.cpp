@@ -15,6 +15,7 @@
 #include "SystemModel.hpp"
 #include "SystemModelFactory.hpp"
 #include "ParentNode.hpp"
+#include "ICL_Reader.hpp"
 #include "SIT_Reader.hpp"
 #include "Utility.hpp"
 #include "MastConfig.hpp"
@@ -23,6 +24,7 @@
 #include "g3log/g3log.hpp"
 
 using std::string;
+using std::experimental::string_view;
 using std::vector;
 using std::shared_ptr;
 
@@ -76,24 +78,25 @@ void ModelBuildDriver::AppendToSearchPath (const string& filePath)
 //---------------------------------------------------------------------------
 
 
-//! Tries to find actual SIT file path from its name
+//! Tries to find actual project file path from its name
 //!
-//! @param sitFileName  A SIT file name (or path)
+//! @param projectFileName  A project file name (or path)
 //!
-//! @return sitFile if it represents a file that can be open from current working directory,
+//! @return projectFileName if it represents a file that can be open from current working directory,
 //!         first found existing path otherwise
-string ModelBuildDriver::AssessActualSitFilePath (const string& sitFileName)
+//!
+string ModelBuildDriver::AssessActualProjectFilePath (const string& projectFileName, string_view defaultFileExtension)
 {
-  AppendToSearchPath(sitFileName);
-  if (Utility::FileExists(sitFileName))
+  AppendToSearchPath(projectFileName);
+  if (Utility::FileExists(projectFileName))
   {
-    return sitFileName;
+    return projectFileName;
   }
 
   for (const auto& hintDir : m_sitSearchPaths)
   {
-    auto dirPath = hintDir.empty() ? sitFileName
-                                   : hintDir + DIRECTORY_SEPARATOR + sitFileName;
+    auto dirPath = hintDir.empty() ? projectFileName
+                                   : hintDir + DIRECTORY_SEPARATOR + projectFileName;
     // Try with hint directory path
     if (Utility::FileExists(dirPath))
     {
@@ -102,7 +105,7 @@ string ModelBuildDriver::AssessActualSitFilePath (const string& sitFileName)
     }
 
     // Try with default extension
-    dirPath.append(".sit");
+    dirPath.append(defaultFileExtension.cbegin(), defaultFileExtension.cend());
     if (Utility::FileExists(dirPath))
     {
       AppendToSearchPath(dirPath);
@@ -110,10 +113,33 @@ string ModelBuildDriver::AssessActualSitFilePath (const string& sitFileName)
     }
   }
 
-  return sitFileName;
+  return projectFileName;
 }
 //
-//  End of: ModelBuildDriver::AssessActualSitFilePath
+//  End of: ModelBuildDriver::AssessActualProjectFilePath
+//---------------------------------------------------------------------------
+
+
+//! Create MAST system model starting from a ICL file
+//!
+//! @param iclFilePath  ICL file path
+//!
+//! @return Build MAST system model
+//!
+shared_ptr<SystemModel> ModelBuildDriver::CreateModelFromIclFile (const string& iclFilePath)
+{
+  CHECK_PARAMETER_NOT_EMPTY(iclFilePath, "Must specify a valid ICL file path");
+
+  m_systemModel = make_shared<SystemModel>();
+
+  auto topNode = ParseIclFile(AssessActualProjectFilePath(iclFilePath, ".icl"));
+
+  m_systemModel->ReplaceRoot(topNode, false);
+
+  return m_systemModel;
+}
+//
+//  End of: ModelBuildDriver::CreateModelFromIclFile
 //---------------------------------------------------------------------------
 
 
@@ -130,7 +156,7 @@ shared_ptr<SystemModel> ModelBuildDriver::CreateModelFromSitFile (const string& 
 
   m_systemModel = make_shared<SystemModel>();
 
-  auto topNode = ParseSitFile(AssessActualSitFilePath(sitFilePath));
+  auto topNode = ParseSitFile(AssessActualProjectFilePath(sitFilePath, ".sit"));
 
   m_systemModel->ReplaceRoot(topNode, false);
 
@@ -140,6 +166,47 @@ shared_ptr<SystemModel> ModelBuildDriver::CreateModelFromSitFile (const string& 
 //  End of: ModelBuildDriver::CreateModelFromSitFile
 //---------------------------------------------------------------------------
 
+
+//! Create MAST sub-model from a ICL file
+//!
+//! @param iclFilePath  ICL file path
+//!
+//! @return top node of build sub-model
+//!
+shared_ptr<ParentNode> ModelBuildDriver::ParseIclFile (const string& iclFilePath)
+{
+  CHECK_PARAMETER_NOT_EMPTY(iclFilePath, "ICL file path must not be empty");
+  ICL::ICL_Reader reader(m_systemModel);
+
+  try
+  {
+    reader.Parse(iclFilePath);
+  }
+  catch(ParserException&)
+  {
+    m_errorMessage = reader.ErrorMessage();
+    LOG(ERROR_LVL) << "Failed to create model from ICL file \"" << iclFilePath << "\". " << m_errorMessage;
+    throw;
+  }
+
+  auto topNode = dynamic_pointer_cast<ParentNode>(reader.ParsedSystemModel());
+
+  CHECK_VALUE_NOT_NULL(topNode, "Failed to parse file: "s.append(iclFilePath).append(" (no top node)"));
+  LOG(INFO) << "ICL file \"" << iclFilePath << "\" has been parsed successfully";
+
+  // ---------------- Save PDL algorithm associations with nodes
+  //
+  const auto& associations = reader.PDLAlgorithmNameToNodeAssociation();
+
+  m_algoNamesAssociatedToNodes.insert(m_algoNamesAssociatedToNodes.end(),
+                                      associations.begin(),
+                                      associations.end());
+
+  return topNode;
+}
+//
+//  End of: ModelBuildDriver::ParseIclFile
+//---------------------------------------------------------------------------
 
 
 
@@ -191,7 +258,7 @@ shared_ptr<ParentNode> ModelBuildDriver::ParseSitFile (const string& sitFilePath
 
     if (placeHolder.Kind() == PlaceHolderKind::SIT)
     {
-      subTop = ParseSitFile(AssessActualSitFilePath(identifier));
+      subTop = ParseSitFile(AssessActualProjectFilePath(identifier, ".sit"));
     }
     else
     {

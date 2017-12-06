@@ -93,6 +93,7 @@ void UT_IEEE_P1687::test_Parse_Annex_E_Examples ()
     auto sm       = make_shared<SystemModel>();
 
     ICL::ICL_Reader sut(sm);
+    sut.ParseOnlyCheckGrammar(true);
 
     // ---------------- Exercise & Verify
     //
@@ -144,6 +145,7 @@ void UT_IEEE_P1687::test_Parse_Annex_F_Design_Guidance ()
     auto sm       = make_shared<SystemModel>();
 
     ICL::ICL_Reader sut(sm);
+    sut.ParseOnlyCheckGrammar(true);
 
     // ---------------- Exercise & Verify
     //

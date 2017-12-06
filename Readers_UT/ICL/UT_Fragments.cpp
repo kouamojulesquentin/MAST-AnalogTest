@@ -82,6 +82,7 @@ void UT_Fragments::test_Parse_Parser_Fragments ()
     auto sm       = make_shared<SystemModel>();
 
     ICL::ICL_Reader sut(sm);
+    sut.ParseOnlyCheckGrammar(true);
 
     // ---------------- Exercise & Verify
     //
@@ -115,6 +116,7 @@ void UT_Fragments::test_Parse_Parser_Fragments_with_SyntaxErrors ()
     auto sm       = make_shared<SystemModel>();
 
     ICL::ICL_Reader sut(sm);
+    sut.ParseOnlyCheckGrammar(true);
 
     // ---------------- Exercise & Verify
     //

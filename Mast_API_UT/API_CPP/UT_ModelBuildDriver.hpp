@@ -48,6 +48,7 @@ class UT_ModelBuildDriver : public CxxTest::TestSuite
   void test_CreateModelFromSitFile_MissingFactory ();
 
   void test_CreateModelFromSitFile_Examples ();
+  void test_CreateModelFromIclFile_Examples ();
 
   // ================ Other Methods ================
 

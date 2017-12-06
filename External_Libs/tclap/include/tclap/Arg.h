@@ -292,10 +292,11 @@ class Arg
 		virtual bool isRequired() const;
 
 		/**
-		 * Sets _required to true. This is used by the XorHandler.
-		 * You really have no reason to ever use it.
+     * Sets _required to true (default) or false.
+     * @note  This is used by the XorHandler.
+     *        You really have no reason to ever use it.
 		 */
-		void forceRequired();
+    void forceRequired(bool required = true);
 
 		/**
 		 * Sets the _alreadySet value to true.  This is used by the XorHandler.
@@ -338,8 +339,17 @@ class Arg
 		/**
 		 * Returns a short ID for the usage.
 		 * \param valueId - The value used in the id.
+     *
+     * @param showOptionalBrackets  To enable/disable square brackets to show that value is optional
 		 */
-		virtual std::string shortID( const std::string& valueId = "val" ) const;
+    virtual std::string shortID( const std::string& valueId = "val", bool showOptionalBrackets = true) const;
+
+    /**
+     * Returns a short ID for the usage.
+     *
+     * @param showOptionalBrackets  To enable/disable square brackets to show that value is optional
+     */
+    virtual std::string shortID(bool showOptionalBrackets) const;
 
 		/**
 		 * Returns a long ID for the usage.
@@ -505,7 +515,12 @@ inline Arg::Arg(const std::string& flag,
 
 inline Arg::~Arg() { }
 
-inline std::string Arg::shortID( const std::string& valueId ) const
+inline std::string Arg::shortID(bool showOptionalBrackets) const
+{
+  return shortID("val", showOptionalBrackets);
+}
+
+inline std::string Arg::shortID(const std::string& valueId, bool showOptionalBrackets) const
 {
 	std::string id = "";
 
@@ -517,7 +532,7 @@ inline std::string Arg::shortID( const std::string& valueId ) const
 	if ( _valueRequired )
 		id += std::string( 1, Arg::delimiter() ) + "<" + valueId  + ">";
 
-	if ( !_required )
+  if (!_required && showOptionalBrackets)
 		id = "[" + id + "]";
 
 	return id;
@@ -650,9 +665,9 @@ inline bool Arg::_hasBlanks( const std::string& s ) const
 	return false;
 }
 
-inline void Arg::forceRequired()
+inline void Arg::forceRequired(bool required)
 {
-	_required = true;
+  _required = required;
 }
 
 inline void Arg::xorSet()

@@ -57,6 +57,12 @@ class XorHandler
 		 */
 		void add( std::vector<Arg*>& ors );
 
+    //! Adds list of of exclusive Arg
+    //!
+    //! @param args   List of Args* that are exclusive
+    //!
+    void add(std::initializer_list<Arg*> args);
+
 		/**
 		 * Checks whether the specified Arg is in one of the xor lists and
 		 * if it does match one, returns the size of the xor list that the
@@ -97,20 +103,28 @@ inline void XorHandler::add( std::vector<Arg*>& ors )
 	_orList.push_back( ors );
 }
 
+
+inline void XorHandler::add(std::initializer_list<Arg*> args)
+{
+  _orList.push_back(args);
+}
+
 inline int XorHandler::check( const Arg* a )
 {
 	// iterate over each XOR list
 	for ( int i = 0; static_cast<unsigned int>(i) < _orList.size(); i++ )
 	{
+    const auto& exclusiveSet = _orList[i];
+
 		// if the XOR list contains the arg..
-		ArgVectorIterator ait = std::find( _orList[i].begin(),
-		                                   _orList[i].end(), a );
-		if ( ait != _orList[i].end() )
+    auto ait = std::find( exclusiveSet.cbegin(), exclusiveSet.cend(), a);
+
+    if ( ait != exclusiveSet.end() )
 		{
 			// first check to see if a mutually exclusive switch
 			// has not already been set
-			for ( ArgVectorIterator it = _orList[i].begin();
-				  it != _orList[i].end();
+      for ( auto it = exclusiveSet.begin();
+          it != exclusiveSet.end();
 				  it++ )
 				if ( a != (*it) && (*it)->isSet() )
 					throw(CmdLineParseException(
@@ -118,17 +132,18 @@ inline int XorHandler::check( const Arg* a )
 					      (*it)->toString()));
 
 			// go through and set each arg that is not a
-			for ( ArgVectorIterator it = _orList[i].begin();
-				  it != _orList[i].end();
+      for ( auto it = exclusiveSet.begin();
+          it != exclusiveSet.end();
 				  it++ )
 				if ( a != (*it) )
 					(*it)->xorSet();
 
 			// return the number of required args that have now been set
-			if ( (*ait)->allowMore() )
+      if (   (*ait)->allowMore()
+          || !exclusiveSet.front()->isRequired())
 				return 0;
 			else
-				return static_cast<int>(_orList[i].size());
+        return static_cast<int>(exclusiveSet.size());
 		}
 	}
 

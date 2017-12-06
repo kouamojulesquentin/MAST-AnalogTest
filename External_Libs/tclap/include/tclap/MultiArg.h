@@ -203,7 +203,7 @@ public:
 	 * Returns the a short id string.  Used in the usage.
 	 * \param val - value to be used.
 	 */
-	virtual std::string shortID(const std::string& val="val") const;
+  virtual std::string shortID(const std::string& val="val", bool showOptionalBrackets = true) const;
 
 	/**
 	 * Returns the a long id string.  Used in the usage.
@@ -359,10 +359,10 @@ bool MultiArg<T>::processArg(int *i, std::vector<std::string>& args)
  *
  */
 template<class T>
-std::string MultiArg<T>::shortID(const std::string& val) const
+std::string MultiArg<T>::shortID(const std::string& val, bool showOptionalBrackets) const
 {
 	static_cast<void>(val); // Ignore input, don't warn
-	return Arg::shortID(_typeDesc) + " ... ";
+  return Arg::shortID(_typeDesc, showOptionalBrackets) + " ... ";
 }
 
 /**

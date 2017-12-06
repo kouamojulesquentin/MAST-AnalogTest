@@ -46,6 +46,7 @@
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
+#include <initializer_list>
 #include <stdlib.h> // Needed for exit(), which isn't defined in some envs.
 
 namespace TCLAP {
@@ -238,6 +239,10 @@ private:
      */
     void xorAdd(std::vector<Arg*>& xors);
 
+    //! Adds a list of Arg that are optional but exclusive (only one can be set)
+    //!
+    void exclusiveOptionalAdd(std::initializer_list<Arg*> args);
+
     /**
      * Parses the command line.
      * \param argc - Number of arguments.
@@ -401,6 +406,20 @@ inline void CmdLine::_constructor()
   deleteOnExit(ignore);
   deleteOnExit(v);
 }
+
+
+inline void CmdLine::exclusiveOptionalAdd(std::initializer_list<Arg*> args)
+{
+  _xorHandler.add(args);
+
+  for (auto& arg : args)
+  {
+    arg->forceRequired(false);
+    arg->setRequireLabel("OR optional");
+    add(arg);
+  }
+}
+
 
 inline void CmdLine::xorAdd(std::vector<Arg*>& ors)
 {

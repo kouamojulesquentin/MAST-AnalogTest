@@ -113,7 +113,7 @@ class MultiSwitchArg : public SwitchArg
 		/**
 		 * Returns the shortID for this Arg.
 		 */
-		std::string shortID(const std::string& val) const;
+    virtual std::string shortID(const std::string& val, bool showOptionalBrackets = true) const override;
 
 		/**
 		 * Returns the longID for this Arg.
@@ -190,9 +190,9 @@ inline bool MultiSwitchArg::processArg(int *i, std::vector<std::string>& args)
 }
 
 inline std::string
-MultiSwitchArg::shortID(const std::string& val) const
+MultiSwitchArg::shortID(const std::string& val, bool showOptionalBrackets) const
 {
-	return Arg::shortID(val) + " ... ";
+  return Arg::shortID(val, showOptionalBrackets) + " ... ";
 }
 
 inline std::string

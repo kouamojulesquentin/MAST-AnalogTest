@@ -358,6 +358,43 @@ void UT_TClap::test_CmdLine_parse_missing_Required ()
 }
 
 
+//! Checks CmdLine::parse() with a optional but exclusive parameter
+//!
+void UT_TClap::test_CmdLine_parse_conflicting_ExclusiveOptional ()
+{
+  // ---------------- Setup
+  //
+  vector<string>      parameters {"MyApp", "--foo=7", "--bar=9"};
+  ostringstream       stdStream;
+  ostringstream       errStream;
+  TCLAP::StreamOutput streamOutput(stdStream, errStream);
+  TCLAP::CmdLine      sut("", '=', "0.9.x");
+  sut.setOutput(&streamOutput);
+  sut.automaticExit(false); // Prevent exit of unit tests
+
+  TCLAP::ValueArg<int>   fooArg("f", "foo", "Description for foo", false, 12,  "foo count");
+  TCLAP::ValueArg<float> barArg("b", "bar", "Description for bar", false, 1.2, "bar level");
+
+  sut.exclusiveOptionalAdd({&fooArg, &barArg});
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.parse(parameters));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE (sut.shouldExit());
+
+  auto stdMessage = stdStream.str();
+  auto errMessage = errStream.str();
+
+  TS_ASSERT_CONTAINS (stdMessage, "MyApp   [-f=<foo count>|-b=<bar level>]");
+  TS_ASSERT_CONTAINS (errMessage, "PARSE ERROR: Argument: -b (--bar)");
+  TS_ASSERT_CONTAINS (errMessage, "Mutually exclusive argument already set!");
+}
+
+
+
 //===========================================================================
 // End of UT_TClap.cpp
 //===========================================================================

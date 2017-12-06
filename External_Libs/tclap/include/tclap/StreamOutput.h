@@ -164,10 +164,10 @@ inline void StreamOutput::failure(CmdLineInterface& _cmd,
 
 inline void StreamOutput::_shortUsage(CmdLineInterface& _cmd, std::ostream& os) const
 {
-  std::list<Arg*> argList                = _cmd.getArgList();
-  std::string progName                   = _cmd.getProgramName();
-  XorHandler xorHandler                  = _cmd.getXorHandler();
-  std::vector<std::vector<Arg*>> xorList = xorHandler.getXorList();
+  std::list<Arg*>                       argList    = _cmd.getArgList();
+  std::string                           progName   = _cmd.getProgramName();
+  XorHandler                            xorHandler = _cmd.getXorHandler();
+  const std::vector<std::vector<Arg*>>& xorList    = xorHandler.getXorList();
 
   os << std::string(m_stdIndent, ' ') << progName;
 
@@ -184,13 +184,17 @@ inline void StreamOutput::_shortUsage(CmdLineInterface& _cmd, std::ostream& os) 
 
   // first the xor
   std::string s;
-  for (int i = 0; static_cast<unsigned int>(i) < xorList.size(); i++)
+  for (const auto& exclusiveSet : xorList)
   {
-    s += " {";
-    for (ArgVectorIterator it = xorList[i].begin(); it != xorList[i].end(); it++)
-      s += (*it)->shortID() + "|";
+    auto areOptional = !exclusiveSet.front()->isRequired();
+    s += areOptional ? " [" : " {";
 
-    s[s.length()-1] = '}';
+    for (const auto& arg : exclusiveSet)
+    {
+      s.append(arg->shortID(false)).append("|");
+    }
+
+    s.back() = areOptional ? ']' : '}'; // Replace last '|'
   }
 
   if (!s.empty())

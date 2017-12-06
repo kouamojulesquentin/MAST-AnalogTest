@@ -50,6 +50,7 @@ class UT_TClap : public CxxTest::TestSuite
 
   void test_CmdLine_parse_all_Parameters ();
   void test_CmdLine_parse_missing_Required ();
+  void test_CmdLine_parse_conflicting_ExclusiveOptional ();
 };
 //
 //  End of UT_TClap class declaration

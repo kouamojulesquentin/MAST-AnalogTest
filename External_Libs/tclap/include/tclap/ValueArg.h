@@ -226,7 +226,7 @@ class ValueArg : public Arg
          * Specialization of shortID.
          * \param val - value to be used.
          */
-        virtual std::string shortID(const std::string& val = "val") const;
+        virtual std::string shortID(const std::string& val = "val", bool showOptionalBrackets = true) const override;
 
         /**
          * Specialization of longID.
@@ -380,10 +380,10 @@ bool ValueArg<T>::processArg(int *i, std::vector<std::string>& args)
  * Implementation of shortID.
  */
 template<class T>
-std::string ValueArg<T>::shortID(const std::string& val) const
+std::string ValueArg<T>::shortID(const std::string& val, bool showOptionalBrackets) const
 {
 	static_cast<void>(val); // Ignore input, don't warn
-	return Arg::shortID( _typeDesc );
+  return Arg::shortID(_typeDesc, showOptionalBrackets);
 }
 
 /**

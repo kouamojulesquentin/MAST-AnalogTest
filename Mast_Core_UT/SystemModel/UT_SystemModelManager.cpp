@@ -776,7 +776,7 @@ void UT_SystemModelManager::test_DoDataCycles_AccessInterfaceTranslator ()
   SystemModel sm;
   TestModelBuilder builder(sm);
 
-  auto at    = builder.Create_TestCase_Emulation_Translator();
+  auto at    = builder.Create_TestCase_Emulation_Translator("Emulator");
   auto ir    = sm.RegisterWithId(1u);
   auto bpy   = sm.RegisterWithId(3u);
   auto reg_1 = sm.RegisterWithId(5u);
@@ -791,6 +791,12 @@ void UT_SystemModelManager::test_DoDataCycles_AccessInterfaceTranslator ()
 
   SystemModelManager sut(sm);
 
+
+  auto result = SystemModelChecker::Check(sm);
+//  TS_TRACE (result.MakeReport());
+TS_ASSERT_FALSE (result.HasIssues());
+
+  CxxTest::setAbortTestOnFail(true);
 //  auto gotPretty      = PrettyPrinter::PrettyPrint(sm.Root(), PrettyPrinterOptions::All);
 //  TS_ASSERT_EQUALS (gotPretty, "");
 
@@ -995,7 +1001,6 @@ void UT_SystemModelManager::test_DoDataCycles_BrocadeTranslator ()
 //  TS_ASSERT_EQUALS (gotCommands, expected);
 }
 
-
 //! Checks SystemModelManager DoDataCycles when using a JTAG_to_I2C_Translator
 //!
 void UT_SystemModelManager::test_DoDataCycles_JTAG_to_I2C_Translator ()
@@ -1006,6 +1011,21 @@ void UT_SystemModelManager::test_DoDataCycles_JTAG_to_I2C_Translator ()
   TestModelBuilder builder(sm);
 
   auto at    = builder.Create_TestCase_JTAG_to_I2C_Translator();
+
+  CxxTest::setAbortTestOnFail(true);
+
+  TS_ASSERT_NOT_NULLPTR (at);
+
+  // Model coherency
+  auto result = SystemModelChecker::Check(sm);
+//  TS_TRACE (result.MakeReport());
+TS_ASSERT_FALSE (result.HasIssues());
+  
+  
+//  auto gotPretty      = PrettyPrinter::PrettyPrint(sm.Root(), PrettyPrinterOptions::All);
+//  auto expectedPretty = string("");
+//  TS_ASSERT_EQUALS (gotPretty, expectedPretty);
+
   auto ir    = sm.RegisterWithId(1u);
   auto bpy   = sm.RegisterWithId(3u);
   auto reg_1 = sm.RegisterWithId(5u);
@@ -1016,12 +1036,9 @@ void UT_SystemModelManager::test_DoDataCycles_JTAG_to_I2C_Translator ()
   reg_1->SetBypass  (BinaryVector(STATIC_TDR_LEN, 0x41));
   reg_2->SetBypass  (BinaryVector(STATIC_TDR_LEN, 0x42));
 
-//+  TS_TRACE (GmlPrinter::Graph(ai, "Testcase_AccessInterface"));
 
   SystemModelManager sut(sm);
 
-//  auto gotPretty      = PrettyPrinter::PrettyPrint(sm.Root(), PrettyPrinterOptions::All);
-//  TS_ASSERT_EQUALS (gotPretty, "");
 
   // ---------------- Exercise
   //
@@ -1033,11 +1050,16 @@ void UT_SystemModelManager::test_DoDataCycles_JTAG_to_I2C_Translator ()
 
   std::vector<std::string> expectedCommands
   {
-    "SIR 8 TDI(02);",   // 00 : IR
-    "SDR 16 TDI(B0B0);", // 01 : DR (reg_2)
-    "SIR 8 TDI(01);",   // 02 : IR
-    "SDR 16 TDI(0A0A);", // 03 : DR (reg_1)
-    "SIR 8 TDI(FF);",   // 04 : IR
+    "I2C_READ (0x31);",   // 00 : IR
+    "I2C_WRITE (0x31, 0x02);",   // 00 : IR
+    "I2C_READ (0x32);", // 01 : DR (reg_2)
+    "I2C_WRITE (0x32, 0xB0B0);", // 01 : DR (reg_2)
+    "I2C_READ (0x31);",   // 02 : IR
+    "I2C_WRITE (0x31, 0x01);",   // 02 : IR
+    "I2C_READ (0x32);", // 03 : DR (reg_1)
+    "I2C_WRITE (0x32, 0x0A0A);", // 03 : DR (reg_1)
+    "I2C_READ (0x31);",   // 04 : IR
+    "I2C_WRITE (0x31, 0xFF);",   // 04 : IR
   };
 
   TS_ASSERT_EQUALS (gotCommands, expectedCommands);

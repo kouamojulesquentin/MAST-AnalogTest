@@ -46,7 +46,7 @@ class MAST_CORE_EXPORT JTAG_to_I2C_TranslatorProtocol final : public T_2_T_Trans
 
   //! Returns readable type of protocol
   //!
-  virtual std::experimental::string_view KindName() const override { return "JTAG_to_I2C_TranslatorProtocol"; }
+  virtual std::experimental::string_view KindName() const override { return "JTAG_to_I2C"; }
 
 
   // ---------------- Protected Methods

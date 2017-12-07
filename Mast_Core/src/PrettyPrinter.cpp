@@ -16,6 +16,7 @@
 #include "PathSelector.hpp"
 #include "AccessInterfaceProtocol.hpp"
 #include "AccessInterfaceRawProtocol.hpp"
+#include "T_2_T_TranslatorProtocol.hpp"
 #include "Utility.hpp"
 #include "EnumsUtility.hpp"
 
@@ -303,7 +304,7 @@ void PrettyPrinter::VisitAccessInterface (AccessInterface& accessInterface)
       {
       note += "->" ;
       if (protocol_is_raw->ParentTranslator_is_set())
-       note += "Set";
+       note += protocol_is_raw->ParentTranslatorName();
       else note += "Not set";
       }
      }
@@ -323,7 +324,19 @@ void PrettyPrinter::VisitAccessInterfaceTranslator (AccessInterfaceTranslator& a
   {
     auto protocol = accessInterfaceTranslator.Protocol();
     note = "Protocol: ";
-    note += protocol ? protocol->KindName() : "Not set";
+    if (!protocol) note += "Not set";
+    else 
+     {
+     note += protocol->KindName();
+     auto protocol_is_t2t=std::dynamic_pointer_cast<T_2_T_TranslatorProtocol>(protocol);
+     if (protocol_is_t2t) 
+      {
+      note += "->" ;
+      if (protocol_is_t2t->ParentTranslator_is_set())
+       note += protocol_is_t2t->ParentTranslatorName();
+      else note += "Not set";
+      }
+    }
   }
  
   StreamParentNode("Access_T", accessInterfaceTranslator, note);

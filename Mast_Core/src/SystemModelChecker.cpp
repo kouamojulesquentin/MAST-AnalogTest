@@ -15,6 +15,7 @@
 #include "PathSelector.hpp"
 #include "AccessInterfaceProtocol.hpp"
 #include "AccessInterfaceRawProtocol.hpp"
+#include "T_2_T_TranslatorProtocol.hpp"
 #include "NamesChecker.hpp"
 
 using namespace mast;
@@ -441,16 +442,26 @@ void SystemModelChecker::VisitAccessInterfaceTranslator (AccessInterfaceTranslat
 
  auto node = accessInterfaceTranslator.FirstChild();
  auto accessInterface = std::dynamic_pointer_cast<AccessInterface>(node);
+ auto translator =  std::dynamic_pointer_cast<AccessInterfaceTranslator>(node);
+ 
+ if (!node)
+  {
+      ostringstream os;
+      Stream(os, accessInterfaceTranslator) << " must have at least one child";
+      ReportError(os.str());
+      return;
+  }
 
- if ((!node) ||(!accessInterface))
+ if ((! accessInterface)&& (!translator))
   {
       ostringstream os;
       Stream(os, accessInterfaceTranslator) << " must have a child of type AccessInterface ";
-      ReportError(os.str());
+      ReportError(os.str()); 
       return;
    }
   
-
+if (accessInterface)
+ {
  auto protocol = accessInterface->Protocol();
  auto protocol_is_raw =  std::dynamic_pointer_cast<AccessInterfaceRawProtocol>(protocol);
  if (!protocol_is_raw)
@@ -460,6 +471,20 @@ void SystemModelChecker::VisitAccessInterfaceTranslator (AccessInterfaceTranslat
       os << node->Name() << " has a non-raw protocol";
       ReportError(os.str());
    }
+  } 
+
+if (translator)
+ {
+ auto protocol = translator->Protocol();
+ auto protocol_is_T_2_T =  std::dynamic_pointer_cast<T_2_T_TranslatorProtocol>(protocol);
+ if (!protocol_is_T_2_T)
+  {
+      ostringstream os;
+      Stream(os, accessInterfaceTranslator) << " Must be associated with a T-2-T protocol, while AccessInterface ";
+      os << node->Name() << " has a non T-2-T protocol";
+      ReportError(os.str());
+   }
+  } 
 
 
 return;

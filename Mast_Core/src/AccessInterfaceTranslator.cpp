@@ -40,6 +40,7 @@ uint32_t AccessInterfaceTranslator::RegisterInterface(std::shared_ptr<mast::Acce
  CHECK_PARAMETER_NOT_NULL(raw_protocol,"Expecting a Raw Protocol");
  raw_protocol->SetCallbackQueue(new_CallbackQueue);
  raw_protocol->SetfromSutQueue(new_fromSutQueue);
+ raw_protocol->SetParentTranslatorName(this->Name());
  return n_interfaces+1;
 }
 
@@ -54,11 +55,10 @@ uint32_t AccessInterfaceTranslator::RegisterTranslator(std::shared_ptr<mast::Acc
  CHECK_PARAMETER_NOT_NULL(t_2_t_protocol,"Expecting a Transaction-to-Transaction Transformation Protocol");
  t_2_t_protocol->SetCallbackQueue(new_CallbackQueue);
  t_2_t_protocol->SetfromSutQueue(new_fromSutQueue);
+ t_2_t_protocol->SetParentTranslatorName(this->Name());
  return n_interfaces+1;
 }
 
-//
-//  End of ParentNode::AppendChild
 //---------------------------------------------------------------------------
 
 //===========================================================================

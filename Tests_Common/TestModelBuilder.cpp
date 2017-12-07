@@ -223,7 +223,7 @@ shared_ptr<AccessInterfaceTranslator> TestModelBuilder::Create_TestCase_Emulatio
   
   auto raw_protocol = make_shared<SVF_RawPlayer>();
 
-  auto tap     = Create_JTAG_TAP    ("Tap",       DEFAULT_IR_LEN, muxDrPathCount,raw_protocol);
+  auto tap     = m_builder.Create_JTAG_TAP    ("Tap",       DEFAULT_IR_LEN, muxDrPathCount,raw_protocol);
 
   auto chain_1 = m_model.CreateChain    ("sut_1",    tap);
   auto reg_1   = m_model.CreateRegister ("static_1", BinaryVector(STATIC_TDR_LEN, 0), chain_1);
@@ -237,7 +237,7 @@ shared_ptr<AccessInterfaceTranslator> TestModelBuilder::Create_TestCase_Emulatio
 
   translator->AppendChild(tap);
 
-  m_model.SetRoot(translator);
+  m_model.ReplaceRoot(translator,false);
   
   return translator;
 }
@@ -259,7 +259,6 @@ shared_ptr<AccessInterfaceTranslator> TestModelBuilder::Create_TestCase_JTAG_to_
 {
   uint32_t muxDrPathCount = 3u;
   auto I2C_Adresses   = initializer_list<uint32_t>{ 0x30u, 0x31u, 0x32u,0x33u,0x34u  };
-//  auto _protocol = make_shared<I2C_RawPlayer>(I2C_Adresses);
 
   auto raw_protocol = make_shared<SVF_RawPlayer>();
 
@@ -271,17 +270,17 @@ shared_ptr<AccessInterfaceTranslator> TestModelBuilder::Create_TestCase_JTAG_to_
   auto chain_2 = m_model.CreateChain    ("sut_2",    tap);
   auto reg_2   = m_model.CreateRegister ("static_2", BinaryVector(STATIC_TDR_LEN, 0), chain_2);
 
-  auto top_translator     = m_model.CreateAccessInterfaceTranslator    (name, make_shared<Spy_Emulation_Translator>());
+  auto top_translator     = m_model.CreateAccessInterfaceTranslator    ("Emulation", make_shared<Spy_Emulation_Translator>());
   auto jtag_2_i2c_translator     = m_model.CreateAccessInterfaceTranslator    (name, make_shared<JTAG_to_I2C_TranslatorProtocol>(I2C_Adresses));
 
-  top_translator->RegisterTranslator(jtag_2_i2c_translator);
+  m_model.ReplaceRoot(top_translator,false);
   top_translator->AppendChild(jtag_2_i2c_translator);
-
-  jtag_2_i2c_translator->RegisterInterface(tap);
   jtag_2_i2c_translator->AppendChild(tap);
 
-  m_model.SetRoot(top_translator);
-  
+  top_translator->RegisterTranslator(jtag_2_i2c_translator);
+
+  jtag_2_i2c_translator->RegisterInterface(tap);
+
   return top_translator;
 }
 //

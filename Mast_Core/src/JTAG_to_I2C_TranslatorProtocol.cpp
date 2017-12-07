@@ -152,6 +152,13 @@ BinaryVector JTAG_to_I2C_TranslatorProtocol::TransformationCallback(CallbackRequ
     endpointId = 1;
   if (current_request.CallbackId()==SDR)
     endpointId = 2;
+  if (current_request.CallbackId()==NO_MORE_PENDING)
+   {
+    //Finished, release parent Translator
+    CallbackRequest request(NO_MORE_PENDING);
+    PushRequest(request);
+    return result;
+   }
   CHECK_PARAMETER_GTE(endpointId,0,"Error: unsupported Callback "+current_request.CallbackId());
   
   auto address = GetAddress(endpointId);

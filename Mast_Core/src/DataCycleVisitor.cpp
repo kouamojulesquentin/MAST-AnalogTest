@@ -17,6 +17,7 @@
 #include "AccessInterfaceRawProtocol.hpp"
 #include "Utility.hpp"
 
+
 using namespace mast;
 
 using std::shared_ptr;
@@ -52,23 +53,44 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
 
 {
  auto AI_data_cycle = [this] (AccessInterface accessInterface) {m_manager->DoHierarchicalDataCycle(&accessInterface);};
-  VisitChildren(accessInterfaceTranslator);
+ auto TR_data_cycle = [this] (AccessInterfaceTranslator& translator) {VisitAccessInterfaceTranslator(translator);
+    //Release parent Transmator
+    CallbackRequest request(NO_MORE_PENDING);
+    translator.Protocol()->TransformationCallback(request);
+};
+ 
+  //Is this really needed?
+  //VisitChildren(accessInterfaceTranslator);
+  
   //SystemModelChecker guarantess the only child is an AccessInterface with a Raw protocol
   auto cur_node = accessInterfaceTranslator.FirstChild();
   uint32_t cur_interface = 0;
   std::shared_ptr<mast::AccessInterface> accessInterface;
-    
+  std::shared_ptr<AccessInterfaceTranslator> slaveTranslator;  
+  
   if (accessInterfaceTranslator.IsPending())
   {
   do
    {
    accessInterface=std::dynamic_pointer_cast<AccessInterface>(cur_node);
+   slaveTranslator=std::dynamic_pointer_cast<AccessInterfaceTranslator>(cur_node);
+   if (accessInterface)
+    {  
+     //Launch Thread executing Data Cycle on the child Access Interface
     auto protocol =  accessInterface->Protocol();
    //Launch DoHierarchicalDataCycle as a separate thread
     std::thread AI_thread(AI_data_cycle,*accessInterface);
    AI_thread.detach(); //Detach AI thread for a clean exit
-   //Wait on Queue for a CallbackRequest from AI
-   //NB: it is a BLOCKING call
+   }
+   if (slaveTranslator)
+    {  
+     //Launch Thread executing this Visitors on the child Access Interface Translator
+    auto protocol =  accessInterfaceTranslator.Protocol();
+   //Launch DoHierarchicalDataCycle as a separate thread
+    std::thread TR_thread(TR_data_cycle,std::ref(*slaveTranslator));
+   TR_thread.detach(); //Detach AI thread for a clean exit
+    }
+   
    bool cycle_AI = true;
    while(cycle_AI)
    {

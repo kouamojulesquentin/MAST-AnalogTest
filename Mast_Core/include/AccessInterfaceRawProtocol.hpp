@@ -39,7 +39,10 @@ class MAST_CORE_EXPORT AccessInterfaceRawProtocol : public AccessInterfaceProtoc
 
   void SetCallbackQueue(std::shared_ptr<MTQueue<CallbackRequest>> CallbackQueue) {m_CallbackQueue=CallbackQueue;}
    void SetfromSutQueue(std::shared_ptr<MTQueue<std::pair<BinaryVector,std::string>>> fromSutQueue) {m_fromSutQueue=fromSutQueue;}
- 
+
+  void SetParentTranslatorName( std::string ParentTranslatorName){m_ParentTranslatorName=ParentTranslatorName;}
+  std::string ParentTranslatorName (){return m_ParentTranslatorName;}
+
     void PushRequest(CallbackRequest Request) {
      m_CallbackQueue->Push(Request);
      LOG(DEBUG) << "Protocol " << this->KindName()<<" : pushed request for Callback "<<Request.CallbackId()<<'\n';
@@ -52,6 +55,7 @@ class MAST_CORE_EXPORT AccessInterfaceRawProtocol : public AccessInterfaceProtoc
                                       else return tmp.first.DataAsBinaryString();};//!< returns the Formatted Data of the oldest callback result. NB: it is a BLOCKING call
 
   private:
+  std::string m_ParentTranslatorName;
   std::shared_ptr<MTQueue<CallbackRequest>> m_CallbackQueue; 
   std::shared_ptr<MTQueue<std::pair<BinaryVector,std::string>>> m_fromSutQueue;   //DataCycleThread waits on this queue to update its registers
 

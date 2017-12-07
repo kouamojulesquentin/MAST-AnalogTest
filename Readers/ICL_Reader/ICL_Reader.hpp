@@ -47,6 +47,7 @@ class ICL_Reader : public Parsers::Reader
 
   //! Enables/Disables parsing only ICL without any attempt to convert it to SystemModel
   //!
+  //! @note This is mainly intended for tests purpose but can be used also at application level
   void  ParseOnlyCheckGrammar (bool onlyGrammarCheck) { m_parseOnlyCheckGrammar = onlyGrammarCheck; }
 
 

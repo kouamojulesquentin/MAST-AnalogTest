@@ -34,6 +34,7 @@ using std::dynamic_pointer_cast;
 using namespace std::string_literals;
 using namespace mast;
 
+
 //! Releases resources
 //!
 ModelBuildDriver::~ModelBuildDriver ()
@@ -176,15 +177,20 @@ shared_ptr<SystemModel> ModelBuildDriver::CreateModelFromSitFile (const string& 
 shared_ptr<ParentNode> ModelBuildDriver::ParseIclFile (const string& iclFilePath)
 {
   CHECK_PARAMETER_NOT_EMPTY(iclFilePath, "ICL file path must not be empty");
+
   ICL::ICL_Reader reader(m_systemModel);
 
   try
   {
     reader.Parse(iclFilePath);
   }
-  catch(ParserException&)
+  catch(mast::ParserException& exc)
   {
     m_errorMessage = reader.ErrorMessage();
+    if (m_errorMessage.empty())
+    {
+      m_errorMessage = exc.Message();
+    }
     LOG(ERROR_LVL) << "Failed to create model from ICL file \"" << iclFilePath << "\". " << m_errorMessage;
     throw;
   }

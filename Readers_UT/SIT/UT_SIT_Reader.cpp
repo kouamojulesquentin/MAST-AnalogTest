@@ -1588,7 +1588,7 @@ void UT_SIT_Reader::test_PDL_Success ()
     for (const auto& association : nameNodesAssociations)
     {
       gotAlgoNames.emplace_back (association.appName);
-      gotLineNumbers.push_back  (association.SIT_line);
+      gotLineNumbers.push_back  (association.line);
     }
 
     TS_ASSERT_EQUALS (gotAlgoNames, expectedAlgoNames);

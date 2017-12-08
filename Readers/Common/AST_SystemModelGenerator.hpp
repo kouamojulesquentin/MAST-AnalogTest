@@ -15,6 +15,7 @@
   #define AST_SYSTEMMODELGENERATOR_H__4AD33E64_B5F0_44D9_839C_E286323534C__INCLUDED_
 
 #include "BinaryVector.hpp"
+#include "AppFunctionNameAndNode.hpp"
 
 #include <memory>
 #include <vector>
@@ -61,6 +62,14 @@ class AST_SystemModelGenerator final
   //!
   std::shared_ptr<mast::ParentNode> Generate(AST_Network* network);
 
+  //! Returns PDL algorithms (iProc) associated to Chains (created from Instance/Module PDL attribute)
+  //!
+  const std::vector<mast::AppFunctionNameAndNode>& AlgorithmAssociations() const { return m_algorithmAssociations; }
+
+  //! Returns PDL algorithms (iProc) associated to Chains (created from Instance/Module PDL attribute)
+  //!
+  std::vector<mast::AppFunctionNameAndNode>&& Moveable_AlgorithmAssociations() { return std::move(m_algorithmAssociations); }
+
   // ---------------- Private Methods
   //
   private:
@@ -94,6 +103,8 @@ class AST_SystemModelGenerator final
   void AssignNewNode                     (std::shared_ptr<mast::SystemModelNode> node);
   bool AssignNodesToLinkerFirstSelection (std::shared_ptr<mast::SystemModelNode> commonLinkerNode);
 
+  void SavePDLAssociations (AST_Instance* instance, AST_Module* instanceModule, std::shared_ptr<mast::Chain> chain);
+
   // ---------------- Private Fields
   //
   private:
@@ -121,6 +132,7 @@ class AST_SystemModelGenerator final
 
   using CreatedNodes_t = std::tuple<std::shared_ptr<mast::SystemModelNode>, mast::ParentNode*>; // Created node and its parent node if not linker a linker child
 
+
   std::shared_ptr<mast::SystemModel>                         m_systemModel;             //!< SystemModel currently being built
   std::unique_ptr<mast::SystemModelBuilder>                  m_builder;                 //!< Helper to build SystemModel nodes
   std::shared_ptr<mast::ParentNode>                          m_parsedTopNode;           //!< SystemModel tree build from ICL file
@@ -129,6 +141,7 @@ class AST_SystemModelGenerator final
   std::stack<InstanceContext>                                m_instancesContext;        //!< Current module/instance contexts (represents current instanciation path)
   std::stack<LinkerContext>                                  m_linkersContext;          //!< To recover processing context for linkers (need only access to last one)
   AST_Network*                                               m_network = nullptr;       //!< Test network AST used to generate SystemModel tree
+  std::vector<mast::AppFunctionNameAndNode>                  m_algorithmAssociations;   //!< Associates a PDL algorithm identifier to a SystemModelNode
 };
 //
 //  End of AST_SystemModelGenerator class declaration

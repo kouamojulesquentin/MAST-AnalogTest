@@ -1,6 +1,8 @@
 NameSpace;
 Module bottom
 {
+  Attribute PDL = "Bat";
+  Attribute PDL = "Boot";
   ScanInPort bsi;
   ScanOutPort bso { Source reg_2[0]; }
   ScanRegister reg_1[7:0]
@@ -16,6 +18,8 @@ Module bottom
 }
 Module middle
 {
+  Attribute PDL = "Mast";
+  Attribute PDL = "Picus";
   ScanInPort midin;
   ScanOutPort midout { Source mreg_2[0]; }
   Instance inst Of ::bottom
@@ -35,14 +39,18 @@ Module middle
 }
 Module top
 {
+  Attribute PDL = "Topless";
   ScanInPort SI;
   ScanOutPort SO { Source SR_2[0]; }
   Instance inst_1 Of UniquifiedModules::bottom__uniquified__1
   {
+    Attribute PDL = "Bool";
     InputPort bsi = SR_1[0];
   }
   Instance inst_2 Of UniquifiedModules::middle__uniquified__2
   {
+    Attribute PDL = "Picus";
+    Attribute PDL = "Logica";
     InputPort midin = SI;
   }
   ScanRegister SR_2[7:0]
@@ -59,6 +67,8 @@ Module top
 NameSpace UniquifiedModules;
 Module bottom__uniquified__1
 {
+  Attribute PDL = "Bat";
+  Attribute PDL = "Boot";
   ScanInPort bsi;
   ScanOutPort bso { Source reg_2[0]; }
   ScanRegister reg_1[7:0]
@@ -74,6 +84,8 @@ Module bottom__uniquified__1
 }
 Module bottom__uniquified__3
 {
+  Attribute PDL = "Bat";
+  Attribute PDL = "Boot";
   ScanInPort bsi;
   ScanOutPort bso { Source reg_2[0]; }
   ScanRegister reg_1[7:0]
@@ -89,6 +101,8 @@ Module bottom__uniquified__3
 }
 Module middle__uniquified__2
 {
+  Attribute PDL = "Mast";
+  Attribute PDL = "Picus";
   ScanInPort midin;
   ScanOutPort midout { Source mreg_2[0]; }
   Instance inst Of UniquifiedModules::bottom__uniquified__3

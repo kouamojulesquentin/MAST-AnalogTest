@@ -69,6 +69,7 @@ shared_ptr<mast::SystemModelNode> ICL_Reader::GenerateSystemModelNodes (Parsers:
   auto network = ast->Network();
   auto topNode = generator.Generate(network);
 
+  PublicData().namesAndNodes = std::move(generator.Moveable_AlgorithmAssociations());
   return topNode;
 }
 //

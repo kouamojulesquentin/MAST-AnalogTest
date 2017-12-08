@@ -39,6 +39,10 @@ class AST_Attribute final : public AST_SimpleNode
   //!
   std::string AsText() const override;
 
+  //! Text representation of attribute value
+  //!
+  std::string ValueAsText() const;
+
   // ---------------- Private Methods
   //
   private:

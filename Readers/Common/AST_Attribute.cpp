@@ -12,7 +12,11 @@
 //===========================================================================
 
 #include "AST_Attribute.hpp"
+#include "AST_String.hpp"
+#include "AST_ParameterRef.hpp"
+
 #include "Utility.hpp"
+#include "EnumsUtility.hpp"
 
 #include <sstream>
 
@@ -48,6 +52,49 @@ string AST_Attribute::AsText () const
 //---------------------------------------------------------------------------
 
 
+//! Text representation of attribute value
+//!
+string AST_Attribute::ValueAsText () const
+{
+  if (!m_numbersValue.empty())
+  {
+    return m_numbersValue;
+  }
+
+  if (!m_stringsValue.empty())
+  {
+    ostringstream os;
+    auto          first = true;
+
+    for (const auto node : m_stringsValue)
+    {
+      if   (!first) { os << "\n"; }
+      else { first = false; }
+
+      if      (node->IsKind(Kind::String))
+      {
+        auto asAST_String = dynamic_cast<const AST_String*>(node);
+        os << asAST_String->Value();
+      }
+      else if (node->IsKind(Kind::Parameter_ref))
+      {
+        auto asAST_ParameterRef = dynamic_cast<const AST_ParameterRef*>(node);
+        os << "$" << asAST_ParameterRef->Name();
+      }
+      else
+      {
+        CHECK_FAILED("Only support String and Parameter_Ref for attribute, got: "s.append(::ScopedNameString(node->GetKind())));
+      }
+
+    }
+    return os.str();
+  }
+
+  return string();
+}
+//
+//  End of: AST_Attribute::AsText
+//---------------------------------------------------------------------------
 
 
 //===========================================================================

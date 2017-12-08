@@ -109,7 +109,11 @@ vector<AppFunctionAndNode> CPP_API_IMPL::GetFunctionsAndNodes (const vector<AppF
 //---------------------------------------------------------------------------
 
 
-//! Associates a function and an node from association from function and a name an association from a name to a node
+//! Associates a function and a node.
+//!
+//! @note Association is done from
+//!   1 - Association from function and an identifier
+//!   2 - Association from a function identifier to a node
 //!
 //! @param appFunctionsAndNames     List associations of function and their name
 //! @param appFunctionNameAndNodes  List associations of function name and a node
@@ -135,7 +139,7 @@ vector<AppFunctionAndNode> CPP_API_IMPL::GetFunctionsAndNodes (const vector<AppF
     else
     {
       LOG(WARNING) << "Found no registered function for name: '" << functionNameAndNode.appName
-                   << "' found in SIT file at line: "            << functionNameAndNode.SIT_line
+                   << "' found in SIT file at line: "            << functionNameAndNode.line
                    << " (be aware that the association is case sensitive)";
     }
   }

@@ -26,17 +26,33 @@ namespace mast
   //!
   struct AppFunctionNameAndNode final
   {
-    std::string                 appName;  //!< PDL algorithm name
+    std::string                 appName;  //!< PDL algorithm identifier
     std::shared_ptr<ParentNode> node;     //!< Associated node
-    uint32_t                    SIT_line; //!< SIT file line number where the PDL declaration was
+    uint32_t                    line = 0; //!< file line number where the PDL declaration was
 
     //! Initializes instance with parameters
     //!
-    AppFunctionNameAndNode(std::string p_appName, std::shared_ptr<ParentNode> p_node, int p_SIT_line)
-      : appName  (std::move(p_appName))
-      , node     (p_node)
-      , SIT_line (p_SIT_line)
+    AppFunctionNameAndNode(std::string p_appName, std::shared_ptr<ParentNode> p_node, int p_line)
+      : appName (std::move(p_appName))
+      , node    (p_node)
+      , line    (p_line)
     {}
+
+    //! Returns true if compares equal to another AppFunctionNameAndNode
+    //!
+    bool operator==(const AppFunctionNameAndNode& rhs) const
+    {
+      return   (appName == rhs.appName)
+            && (node == rhs.node)
+            && (line == rhs.line);
+    }
+
+    //! Returns true if compares not equal to another AppFunctionNameAndNode
+    //!
+    bool operator!=(const AppFunctionNameAndNode& rhs) const
+    {
+      return !(*this == rhs);
+    }
   };
   //
   //  End of AppFunctionNameAndNode struct declaration

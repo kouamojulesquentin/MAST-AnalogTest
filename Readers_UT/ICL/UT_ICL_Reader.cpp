@@ -40,6 +40,7 @@ using std::stringstream;
 using std::istringstream;
 using std::experimental::string_view;
 using std::shared_ptr;
+using std::dynamic_pointer_cast;
 using std::make_shared;
 
 using namespace std::string_literals;
@@ -2103,6 +2104,29 @@ void UT_ICL_Reader::test_Generate_N_Modules ()
   PrependWithTap(sm, topNode);   // This is to avoid warnings about missing AccessInterface
   auto modelCheckResult = sm->Check();
   TS_ASSERT_EMPTY (modelCheckResult.InformativeReport());
+
+  // PDL algorithm associations
+  auto topAsParentNode = dynamic_pointer_cast<ParentNode>(topNode);
+
+  const auto& associations = sut.PDLAlgorithmNameToNodeAssociation();
+  TS_ASSERT_NOT_EMPTY (associations);
+
+  auto findNode = [topAsParentNode](string_view path)
+  {
+    return dynamic_pointer_cast<ParentNode>(topAsParentNode->FindNode(path));
+  };
+
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Topless"s, topAsParentNode,         0u)); // Line in ICL is not yet supported!
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Bat"s,     findNode("inst_1"),      0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Bool"s,    findNode("inst_1"),      0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Boot"s,    findNode("inst_1"),      0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Mast"s,    findNode("inst_2"),      0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Picus"s,   findNode("inst_2"),      0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Logica"s,  findNode("inst_2"),      0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Bat"s,     findNode("inst_2.inst"), 0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Boot"s,    findNode("inst_2.inst"), 0u));
+
+  TS_ASSERT_EQUALS   (associations.size(), 9u);
 }
 
 

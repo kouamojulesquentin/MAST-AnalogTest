@@ -34,6 +34,10 @@ class AST_String final : public AST_SimpleNode
   //!
   std::string AsText() const override;
 
+  //! Value (without quotes)
+  //!
+  const std::string& Value() const { return m_content; }
+
   // ---------------- Private Methods
   //
   private:

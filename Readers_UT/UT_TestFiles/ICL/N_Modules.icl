@@ -1,5 +1,6 @@
 Module top
 {
+  Attribute PDL = "Topless";
   ScanInPort    SI;
   ScanOutPort   SO { Source SR_2[0];}
   ScanRegister  SR_2[7:0]
@@ -14,16 +15,22 @@ Module top
   }
   Instance inst_1 Of bottom
   {
+    Attribute PDL = "Bool";
     InputPort bsi = SR_1[0];
   }
   Instance inst_2 Of middle
   {
+    Attribute PDL = "Picus";
+    Attribute PDL = "Logica";
     InputPort midin = SI;
   }
 }
 
 Module bottom
 {
+  Attribute PDL = "Bat";
+  Attribute PDL = "Boot";
+
   ScanInPort    bsi;
   ScanOutPort   bso { Source reg_2[0];}
   ScanRegister  reg_1[7:0]
@@ -40,6 +47,9 @@ Module bottom
 
 Module middle
 {
+  Attribute PDL = "Mast";
+  Attribute PDL = "Picus";
+
   ScanInPort    midin;
   ScanOutPort   midout { Source mreg_2[0];}
   Instance inst Of bottom

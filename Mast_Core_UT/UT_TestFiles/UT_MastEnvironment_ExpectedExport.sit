@@ -1,9 +1,0 @@
-ACCESS_INTERFACE TAP Loopback
-(
-  REGISTER TAP_IR 4 Hold_value Bypass: "0b1111"
-  LINKER TAP_DR_Mux Table_Based TAP_IR 2 NOT_IN_PATH
-  (
-    REGISTER TAP_BPY 1 Bypass: "0b1"
-    REGISTER reg 12 Bypass: "0xABC"
-  )
-)

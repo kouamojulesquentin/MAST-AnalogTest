@@ -43,21 +43,21 @@ class Reader
   Reader(std::shared_ptr<mast::SystemModel> sm);
 
 
-  //! Parses a ICL file to construct a SystemModel
+  //! Parses a file to construct a SystemModel
   //!
-  //! @param filename  ICL file path
+  //! @param filename  File path
   //!
   void Parse(std::experimental::string_view filename);
 
-  //! Parses a SIT formatted excerpt to construct a SystemModel
+  //! Parses an excerpt to construct a SystemModel
   //!
   void ParseExcerpt(std::istream& stream);
 
-  //! Parses a SIT formatted excerpt to construct a SystemModel
+  //! Parses a formatted excerpt to construct a SystemModel
   //!
   void ParseExcerpt(const std::string& excerpt);
 
-  //! Returns SystemModelNode build from ICL
+  //! Returns SystemModelNode build from parsed file or excerpt
   //!
   std::shared_ptr<mast::SystemModelNode> ParsedSystemModel() { return m_publicData.parsedTopNode; }
 
@@ -80,8 +80,8 @@ class Reader
   virtual void       Parse_Impl(std::istream& stream) = 0;
 
   private:
-  std::string m_errorMessage; //!< Error message build while parsing ICL (empty when successful)
-  Parser_PublicData  m_publicData;
+  std::string       m_errorMessage; //!< Error message build while parsing file or excerpt (empty when successful)
+  Parser_PublicData m_publicData;   //!< Data useful for caller
 };
 
 } // End of: namespace Parsers

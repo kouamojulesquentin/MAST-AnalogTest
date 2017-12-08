@@ -2151,7 +2151,7 @@ void UT_ICL_Reader::test_Generate_SIB_mux_pre ()
                               "  Deselection Table:\n"
                               "    [0] 0b0\n"
                               "    [1] 0b0\n"
-                              " [Register](1)  \"SR\", length: 1, bypass: 0";
+                              " [Register](1)  \"SR\", length: 1, Hold value: true, bypass: 0";
 
   TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
 
@@ -2226,6 +2226,62 @@ void UT_ICL_Reader::test_Generate_Examples ()
   TS_DATA_DRIVEN_TEST(checker, data);
 }
 
+
+//! Checks ICL_Reader::Parse() when parsing examples (mostly from IEEE 1687-2014 standard)
+//!
+//! @note ICL has been cleaned up to ease understanding (some useless stuffs may have been removed)
+void UT_ICL_Reader::test_Parse_Examples ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto iclFileName      = std::get<0>(data);
+    auto expectedFileName = std::get<1>(data);
+
+    auto       iclFilePath = GetTestFilePath(iclFileName);
+    auto       sm          = make_shared<SystemModel>();
+    ICL_Reader sut(sm);
+
+    CxxTest::setAbortTestOnFail(true);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.Parse(iclFilePath));
+
+    // ---------------- Verify
+    //
+    auto topNode = std::dynamic_pointer_cast<ParentNode>(sut.ParsedSystemModel());
+
+    // With PrettyPrinter
+    auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode,   PrettyPrinterOptions::Parser_debug_no_id
+                                                                    | PrettyPrinterOptions::ShowSelectorTables);
+    auto expected_PrettyPrint = GetExpectedModelPrettyPrint(expectedFileName);
+
+    TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
+    // With Checker
+    PrependWithTap(sm, topNode);   // This is to avoid warnings about missing AccessInterface
+    auto modelCheckResult = sm->Check();
+    TS_ASSERT_EMPTY (modelCheckResult.errors);
+  };
+
+  auto data =
+  {
+    make_tuple("SIB_mux_post.icl",       "test_Generate_SIB_mux_post_PrettyPrint.txt"),
+    make_tuple("Daisy_3WI.icl",          "test_Generate_Daisy_3WI_PrettyPrint.txt"),
+    make_tuple("Single_SIB_3WI.icl",     "test_Generate_Single_SIB_3WI_PrettyPrint.txt"),
+    make_tuple("Multiple_SIB_3WI.icl",   "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),
+    make_tuple("Nested_SIB_3WI.icl",     "test_Generate_Nested_SIB_3WI_PrettyPrint.txt"),
+    make_tuple("BAD_Nested_SIB_3WI.icl", "test_Generate_BAD_Nested_SIB_3WI_PrettyPrint.txt"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
 
 
 //===========================================================================

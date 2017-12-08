@@ -67,8 +67,6 @@ target_include_directories (Mast_API_UT PRIVATE  ${CMAKE_CURRENT_SOURCE_DIR}/API
                                                  ${LIBMAST_C_API_INTERNAL_DIRS}
                                                  )
 
-target_link_libraries(Mast_API_UT Tests_Common Mast_API_CPP Mast_API_C ${PLATFORM_LIBS})
-
 install(DIRECTORY UT_TestFiles DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Mast_API)
 
 include(CTest)

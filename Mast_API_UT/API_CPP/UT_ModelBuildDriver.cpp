@@ -11,7 +11,6 @@
 //!
 //===========================================================================
 
-
 #include "UT_ModelBuildDriver.hpp"
 #include "ModelBuildDriver.hpp"
 #include "SystemModel.hpp"
@@ -21,14 +20,13 @@
 #include "PrettyPrinter.hpp"
 #include "EnumsUtility.hpp"
 #include "Utility.hpp"
-#include "SIT_Reader.hpp"
 #include "ParserException.hpp"
 
 #include "TestModelBuilder.hpp"
 #include "TestUtilities.hpp"
 
 #include <experimental/string_view>
-#include <cxxtest/ValueTraits.h>
+#include "Mast_Core_Traits.hpp"
 
 using std::string;
 using std::experimental::string_view;
@@ -39,6 +37,14 @@ using std::make_tuple;
 using namespace std::string_literals;
 using namespace std::experimental::literals::string_view_literals;
 using namespace mast;
+
+//+ (begin JFC December/07/2017): for debug purpose ==> It is useful to avoid corrupted istream while ICL_Lexer operate (right at the start of parsing
+//+                               I've not found the real cause of the problem, so there is a high risk that it will blew up again
+//+                               I've only seen the problem for Linux but I'm not using the same gcc version (4.9.3 on Windows, 5.4 on Linux)
+#include "ICL_Reader.hpp"
+shared_ptr<SystemModel> sm_not_used;
+ICL::ICL_Reader         not_used(sm_not_used);
+//+ (end   JFC December/07/2017):
 
 namespace
 {
@@ -622,9 +628,9 @@ void UT_ModelBuildDriver::test_CreateModelFromIclFile_Examples ()
     auto iclFileName      = std::get<0>(data);
     auto expectedFileName = std::get<1>(data);    // Expected pretty print
 
-    auto             iclFilePath = GetTestFilePath("ICL"sv, iclFileName);
-    auto             sm          = make_shared<SystemModel>();
-    ModelBuildDriver sut;
+    auto                    iclFilePath = GetTestFilePath("ICL"sv, iclFileName);
+    shared_ptr<SystemModel> sm;
+    ModelBuildDriver        sut;
 
     CxxTest::setAbortTestOnFail(true);
 

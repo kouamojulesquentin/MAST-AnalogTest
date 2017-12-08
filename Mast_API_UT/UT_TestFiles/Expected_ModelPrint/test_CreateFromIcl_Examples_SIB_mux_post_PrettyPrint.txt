@@ -1,5 +1,5 @@
 [Chain]        "SIB_mux_post"
- [Register]     "SR", length: 1, bypass: 0
+ [Register]     "SR", length: 1, Hold value: true, bypass: 0
  [Linker]       "SIBmux"
   :Selector:     "SR", kind: Table_Based, can_select_none: true, inverted_bits: false, reversed_order: false
   Selection Table:

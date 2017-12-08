@@ -67,6 +67,10 @@ class UT_ICL_Reader : public CxxTest::TestSuite
   void test_Generate_SIB_mux_pre ();
   void test_Generate_Examples ();
 
+  // ---------------- Parse
+  //
+  void test_Parse_Examples ();
+
   // ================ Other Methods ================
 
   void setUp(); //!< Initializes test (called for each test)

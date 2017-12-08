@@ -22,11 +22,13 @@
 #include "Parser_PrivateData.hpp"
 #include "Utility.hpp"
 #include "AST.hpp"
+#include "AST_Checker.hpp"
 #include "AST_SystemModelGenerator.hpp"
 
 #include "g3log/g3log.hpp"
 
 using ICL::ICL_Reader;
+using Parsers::AST_Checker;
 using Parsers::AST_SystemModelGenerator;
 
 using std::experimental::string_view;
@@ -88,11 +90,12 @@ void ICL_Reader::Parse_Impl(std::istream& stream)
 
   if (!m_parseOnlyCheckGrammar)
   {
+    auto checkResult = AST_Checker::Check(m_ast->Network());
+
+    CHECK_VALUE_EMPTY(checkResult.IssuesReport(), "Errors have been detected while parsing ICL stream");
+
     UniquifyAST();
-
-//+    auto checkResult = AST_Checker::Check(ast->Network());
-
-    auto& data = PublicData();
+    auto& data = Reader::PublicData();
     data.parsedTopNode = GenerateSystemModelNodes(m_ast.get());
   }
 

@@ -324,6 +324,21 @@ parent_node_with_children:
         driver.namesAndNodes.emplace_back(this_function, asParentNode, $[PDL_declaration].second);
       }
     }
+    auto asTranslator = dynamic_pointer_cast <AccessInterfaceTranslator>($[parent_node].first);
+    if (asTranslator)
+     { //Need to regsiter Raw protocol with translator
+      auto interface = dynamic_pointer_cast <AccessInterface>(asTranslator->FirstChild());
+      auto slave_translator = dynamic_pointer_cast <AccessInterfaceTranslator>(asTranslator->FirstChild());
+      if (!interface) 
+       if (!slave_translator) 
+        {
+         std::ostringstream msg;
+         msg << "Node " << $[parent_node].first->Name() << " must have a child of type AccessInterface or AccessInterfaceTranslator"  ;
+         THROW_SYNTAX_ERROR(msg);
+        }
+      if (interface)         asTranslator->RegisterInterface(interface); 
+      if (slave_translator)  asTranslator->RegisterTranslator(slave_translator); 
+     }
   }
 ;
 
@@ -529,6 +544,7 @@ t_TRANSLATOR  node_name TR_identifier AI_protocol_parameters
       else
       {
         auto node = driver.systemModel->CreateAccessInterfaceTranslator(nodeName, shared_ptr<AccessInterfaceTranslatorProtocol>(std::move(protocol)));
+//        node->RegisterInterface(tap);
         $$ = std::make_pair(node,false);
       }
     }
@@ -542,6 +558,7 @@ t_TRANSLATOR  node_name TR_identifier AI_protocol_parameters
 
 JTAG_protocol: t_WORD
    {$$ =$1;}
+  | %empty { $$ = "JTAG"; }
    ;
 
 path_selector_kind: t_WORD

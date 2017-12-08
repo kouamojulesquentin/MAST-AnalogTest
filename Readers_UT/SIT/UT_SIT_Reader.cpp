@@ -1378,7 +1378,7 @@ void UT_SIT_Reader::test_ACCES_INTERFACE_Failure ()
 }
 
 
-//! Test ACCES_INTERFACE from Simplified ICL Tree input - In cases with success
+//! Test TRANSLATOR from Simplified ICL Tree input - In cases with success
 //!
 void UT_SIT_Reader::test_TRANSLATOR_Success ()
 {
@@ -1413,14 +1413,7 @@ void UT_SIT_Reader::test_TRANSLATOR_Success ()
     // With Checker
     PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
-  std::string expected_check_error =
-  {
-        "Errors   (1):\n"
-        "  - AccessInterfaceTranslator 'my_tap' (id: 0) must have a child of type AccessInterface \n"
-        "Warnings (0):\n"
-        "Infos    (0):\n"
-        };
-    TS_ASSERT_EQUALS (checkResult.InformativeReport(),expected_check_error);
+    TS_ASSERT_EMPTY (checkResult.InformativeReport());
   };
 
 
@@ -1428,27 +1421,54 @@ void UT_SIT_Reader::test_TRANSLATOR_Success ()
   {
     make_tuple("TRANSLATOR my_tap Emulation\n"
                "(\n"
-               "  REGISTER test_reg 4 Bypass: \"0b1100\"\n"
+               " ACCESS_INTERFACE my_tap  I2C \"0x40, 0x41, 0x42\" \n"
+               " (\n"
+               "   REGISTER r1 1 Bypass: \"0b1\"\n"
+               "   REGISTER r2 2 Bypass: \"0b11\"\n"
+               " )\n" 
                ")\n",
                "[Access_T](0)  \"my_tap\", Protocol: Emulation_Translator\n"
-               " [Register](1)  \"test_reg\", length: 4, bypass: 1100"),
-    make_tuple("TRANSLATOR my_tap JTAG_to_I2C \"0x40, 0x41, 0x42\"\n"
+               " [Access_I](1)  \"my_tap\", Protocol: I2C_RAW->my_tap\n"
+               "  [Register](2)  \"r1\", length: 1, bypass: 1\n"
+               "  [Register](3)  \"r2\", length: 2, bypass: 11"),
+    make_tuple("TRANSLATOR my_tap Emulation\n"
                "(\n"
-               "  REGISTER test_reg 4 Bypass: \"0b1100\"\n"
+               " JTAG_TAP my_tap 4 1\n"
+               " ("
+               "   REGISTER test_reg 4 Bypass: \"0b1100\"\n"
+               " )\n"
                ")\n",
-               "[Access_T](0)  \"my_tap\", Protocol: JTAG_to_I2C->Not set\n"
-               " [Register](1)  \"test_reg\", length: 4, bypass: 1100"),
-  };
-
-  #ifndef INTEL_EXPERIMENT
-//+  TS_WARN ("No tests for Intel_Packet protocol");
-  #endif
+               "[Access_T](0)  \"my_tap\", Protocol: Emulation_Translator\n"
+               " [Access_I](1)  \"my_tap\", Protocol: SVF_RAW->my_tap\n"
+               "  [Register](2)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n"
+               "  [Linker](3)    \"my_tap_DR_Mux\"\n"
+               "   :Selector:(2)  \"my_tap_IR\", kind: Table_Based, can_select_none: false, inverted_bits: false, reversed_order: false\n"
+               "   [Register](4)  \"my_tap_BPY\", length: 1, bypass: 1\n"
+               "   [Register](5)  \"test_reg\", length: 4, bypass: 1100"),
+     make_tuple("TRANSLATOR top Emulation\n"
+               "(\n"
+               " TRANSLATOR my_trans JTAG_to_I2C \"0x40, 0x41, 0x42\"\n"
+               " (\n"
+               "  JTAG_TAP my_tap 4 1\n"
+               "  ("
+               "    REGISTER test_reg 4 Bypass: \"0b1100\"\n"
+               "  )\n"
+               " )\n"
+               ")\n",
+               "[Access_T](0)  \"top\", Protocol: Emulation_Translator\n"
+               " [Access_T](1)  \"my_trans\", Protocol: JTAG_to_I2C->top\n"
+               "  [Access_I](2)  \"my_tap\", Protocol: SVF_RAW->my_trans\n"
+               "   [Register](3)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n"
+               "   [Linker](4)    \"my_tap_DR_Mux\"\n"
+               "    :Selector:(3)  \"my_tap_IR\", kind: Table_Based, can_select_none: false, inverted_bits: false, reversed_order: false\n"
+               "    [Register](5)  \"my_tap_BPY\", length: 1, bypass: 1\n"
+               "    [Register](6)  \"test_reg\", length: 4, bypass: 1100"),
+ };
 
   // ---------------- DDT Exercise
   //
   TS_DATA_DRIVEN_TEST (checker, data);
 }
-
 
 //! Test 1500 Wrapper macro from Simplified ICL Tree input
 //!

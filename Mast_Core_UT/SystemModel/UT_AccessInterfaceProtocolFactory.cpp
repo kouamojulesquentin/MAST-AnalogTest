@@ -57,7 +57,7 @@ void UT_AccessInterfaceProtocolFactory::test_Instance ()
   CxxTest::setAbortTestOnFail(true);
   TS_ASSERT_NOT_NULLPTR (pInstance);
 
-  TS_ASSERT_EQUALS (pInstance->RegisteredCreatorsCount(), 7u);   // This is to detect when one should consider adding a new test for a new default creation method
+  TS_ASSERT_EQUALS (pInstance->RegisteredCreatorsCount(), 9u);   // This is to detect when one should consider adding a new test for a new default creation method
 }
 
 

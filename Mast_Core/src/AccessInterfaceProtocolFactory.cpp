@@ -22,6 +22,8 @@
 #include "STIL_EmulationProtocol.hpp"
 #include "I2C_EmulationProtocol.hpp"
 #include "Remote_Protocol_Proxy.hpp"
+#include "SVF_RawPlayer.hpp"
+#include "I2C_RawPlayer.hpp"
 
 #include <memory>
 
@@ -81,6 +83,8 @@ void AccessInterfaceProtocolFactory::InitializeWithDefaults ()
   RegisterCreator("STIL_Emulation",      [](const string& nbEndPoints)    { return make_unique<STIL_EmulationProtocol>(nbEndPoints); });
   RegisterCreator("I2C_Emulation",       [](const string& parameters)       { return make_unique<I2C_EmulationProtocol>(parameters);     });
   RegisterCreator("RemoteProxy",         [](const string& parameters)       { return make_unique<Remote_Protocol_Proxy>(parameters);     });
+  RegisterCreator("JTAG",           [](const string& /*parameters*/)       { return make_unique<SVF_RawPlayer>();     });
+  RegisterCreator("I2C",            [](const string& parameters)       { return make_unique<I2C_RawPlayer>(parameters);     });
 }
 //
 //  End of: AccessInterfaceProtocolFactory::InitializeWithDefaults

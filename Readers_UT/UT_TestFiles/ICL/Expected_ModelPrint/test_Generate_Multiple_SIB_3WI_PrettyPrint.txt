@@ -11,7 +11,7 @@
    [Chain]        "WI1"
     [Chain]        "reg8"
      [Register]     "SR", length: 8, bypass: 0000_0000
-  [Register]     "SR", length: 1, bypass: 0
+  [Register]     "SR", length: 1, Hold value: true, bypass: 0
  [Chain]        "SIB2"
   [Linker]       "SIBmux"
    :Selector:     "SR", kind: Table_Based, can_select_none: true, inverted_bits: false, reversed_order: false
@@ -24,7 +24,7 @@
    [Chain]        "WI2"
     [Chain]        "reg8"
      [Register]     "SR", length: 8, bypass: 0000_0000
-  [Register]     "SR", length: 1, bypass: 0
+  [Register]     "SR", length: 1, Hold value: true, bypass: 0
  [Chain]        "SIB3"
   [Linker]       "SIBmux"
    :Selector:     "SR", kind: Table_Based, can_select_none: true, inverted_bits: false, reversed_order: false
@@ -37,4 +37,4 @@
    [Chain]        "WI3"
     [Chain]        "reg8"
      [Register]     "SR", length: 8, bypass: 0000_0000
-  [Register]     "SR", length: 1, bypass: 0
+  [Register]     "SR", length: 1, Hold value: true, bypass: 0

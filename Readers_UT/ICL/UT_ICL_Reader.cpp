@@ -2151,7 +2151,7 @@ void UT_ICL_Reader::test_Generate_SIB_mux_pre ()
                               "  Deselection Table:\n"
                               "    [0] 0b0\n"
                               "    [1] 0b0\n"
-                              " [Register](1)  \"SR\", length: 1, bypass: 0";
+                              " [Register](1)  \"SR\", length: 1, Hold value: true, bypass: 0";
 
   TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
 

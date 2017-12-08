@@ -37,6 +37,6 @@
          [Chain]        "WI3"
           [Chain]        "reg8"
            [Register]     "SR", length: 8, bypass: 0000_0000
-        [Register]     "SR", length: 1, bypass: 0
-     [Register]     "SR", length: 1, bypass: 0
-  [Register]     "SR", length: 1, bypass: 0
+        [Register]     "SR", length: 1, Hold value: true, bypass: 0
+     [Register]     "SR", length: 1, Hold value: true, bypass: 0
+  [Register]     "SR", length: 1, Hold value: true, bypass: 0

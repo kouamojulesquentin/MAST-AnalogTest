@@ -1,6 +1,6 @@
 [Chain]        "BAD_Nested_SIB_3WI"
  [Chain]        "SIB1"
-  [Register]     "SR", length: 1, bypass: 0
+  [Register]     "SR", length: 1, Hold value: true, bypass: 0
   [Linker]       "SIBmux"
    :Selector:     "SR", kind: Table_Based, can_select_none: true, inverted_bits: false, reversed_order: false
    Selection Table:
@@ -14,7 +14,7 @@
      [Chain]        "reg8"
       [Register]     "SR", length: 8, bypass: 0000_0000
     [Chain]        "SIB2"
-     [Register]     "SR", length: 1, bypass: 0
+     [Register]     "SR", length: 1, Hold value: true, bypass: 0
      [Linker]       "SIBmux"
       :Selector:     "SR", kind: Table_Based, can_select_none: true, inverted_bits: false, reversed_order: false
       Selection Table:
@@ -28,7 +28,7 @@
         [Chain]        "reg8"
          [Register]     "SR", length: 8, bypass: 0000_0000
        [Chain]        "SIB3"
-        [Register]     "SR", length: 1, bypass: 0
+        [Register]     "SR", length: 1, Hold value: true, bypass: 0
         [Linker]       "SIBmux"
          :Selector:     "SR", kind: Table_Based, can_select_none: true, inverted_bits: false, reversed_order: false
          Selection Table:

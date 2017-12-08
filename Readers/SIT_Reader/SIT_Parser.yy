@@ -196,7 +196,7 @@ namespace
 %token <std::string>   t_LOW
 %token <std::string>   t_REVERSE
 %token <std::uint32_t> t_DecimalLiteral
-%token <std::uint32_t> t_TRANSLATOR
+%token <std::string>   t_TRANSLATOR
 
 
 %%
@@ -510,10 +510,12 @@ t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_
 |
 t_TRANSLATOR  node_name TR_identifier AI_protocol_parameters
 {
+ 
     const auto& nodeName           = $[node_name].name;
     const auto& protocolName       = $3;
     const auto& protocolParameters = $4;
 
+   
     try
     {
       auto& factory  = AccessInterfaceTranslatorProtocolFactory::Instance();

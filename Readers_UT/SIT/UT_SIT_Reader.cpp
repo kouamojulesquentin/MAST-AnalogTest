@@ -1413,142 +1413,31 @@ void UT_SIT_Reader::test_TRANSLATOR_Success ()
     // With Checker
     PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
     auto checkResult = sm->Check();
-    TS_ASSERT_EMPTY (checkResult.InformativeReport());
+  std::string expected_check_error =
+  {
+        "Errors   (1):\n"
+        "  - AccessInterfaceTranslator 'my_tap' (id: 0) must have a child of type AccessInterface \n"
+        "Warnings (0):\n"
+        "Infos    (0):\n"
+        };
+    TS_ASSERT_EQUALS (checkResult.InformativeReport(),expected_check_error);
   };
 
 
   auto data =
   {
-    // 00: Loopback
-    make_tuple("ACCESS_INTERFACE my_tap Loopback\n"
+    make_tuple("TRANSLATOR my_tap Emulation\n"
                "(\n"
                "  REGISTER test_reg 4 Bypass: \"0b1100\"\n"
                ")\n",
-               "[Access_I](0)  \"my_tap\", Protocol: Loopback\n"
+               "[Access_T](0)  \"my_tap\", Protocol: Emulation_Translator\n"
                " [Register](1)  \"test_reg\", length: 4, bypass: 1100"),
-
-    // 01: SVF Simulation
-    make_tuple("ACCESS_INTERFACE my_tap SVF_Simulation\n"
+    make_tuple("TRANSLATOR my_tap JTAG_to_I2C \"0x40, 0x41, 0x42\"\n"
                "(\n"
-               "  REGISTER reg_1 3 Bypass: \"0b101\"\n"
-               "  REGISTER reg_2 5 Bypass: \"0b11001\"\n"
+               "  REGISTER test_reg 4 Bypass: \"0b1100\"\n"
                ")\n",
-               "[Access_I](0)  \"my_tap\", Protocol: SVF_Simulation\n"
-               " [Register](1)  \"reg_1\", length: 3, bypass: 101\n"
-               " [Register](2)  \"reg_2\", length: 5, bypass: 1100_1"),
-
-    // 02: SVF Emulation
-    make_tuple("ACCESS_INTERFACE my_tap  SVF_Emulation \n"
-               "(\n"
-               "   REGISTER r1 1 Bypass: \"0b1\"\n"
-               "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               ")\n",
-               "[Access_I](0)  \"my_tap\", Protocol: SVF_Emulation\n"
-               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
-               " [Register](2)  \"r2\", length: 2, bypass: 11"),
-
-    // 03: Offline
-    make_tuple("ACCESS_INTERFACE my_tap  Offline  \n"
-               "(\n"
-               "   REGISTER r1 1 Bypass: \"0b1\"\n"
-               "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               ")\n",
-               "[Access_I](0)  \"my_tap\", Protocol: Offline\n"
-               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
-               " [Register](2)  \"r2\", length: 2, bypass: 11"),
-
-    // 04: STIL_Emulation
-    make_tuple("ACCESS_INTERFACE my_tap  STIL_Emulation \"3\" \n"
-               "(\n"
-               "   REGISTER r1 1 Bypass: \"0b1\"\n"
-               "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               ")\n",
-               "[Access_I](0)  \"my_tap\", Protocol: STIL_Emulation\n"
-               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
-               " [Register](2)  \"r2\", length: 2, bypass: 11"),
-
-    // 05: I2C_Emulation
-    make_tuple("ACCESS_INTERFACE my_tap  I2C_Emulation \"0x40, 0x41, 0x42, [I2C]\" \n"
-               "(\n"
-               "   REGISTER r1 1 Bypass: \"0b1\"\n"
-               "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               ")\n",
-               "[Access_I](0)  \"my_tap\", Protocol: I2C_Emulation\n"
-               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
-               " [Register](2)  \"r2\", length: 2, bypass: 11"),
-
-    // 06: Any letter in parameters
-    make_tuple("ACCESS_INTERFACE letters I2C_Emulation \"0x40, 0x41, 0x42, abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ\" \n"
-               "(\n"
-               "   REGISTER r1 1 Bypass: \"0b1\"\n"
-               "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               ")\n",
-               "[Access_I](0)  \"letters\", Protocol: I2C_Emulation\n"
-               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
-               " [Register](2)  \"r2\", length: 2, bypass: 11"),
-
-    // 07: Any digits in parameters
-    make_tuple("ACCESS_INTERFACE digits I2C_Emulation \"0x40, 0x41, 0x42, _0123456789 \" \n"
-               "(\n"
-               "   REGISTER r1 1 Bypass: \"0b1\"\n"
-               "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               ")\n",
-               "[Access_I](0)  \"digits\", Protocol: I2C_Emulation\n"
-               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
-               " [Register](2)  \"r2\", length: 2, bypass: 11"),
-
-    // 08: Any brackets characters in parameters
-    make_tuple("ACCESS_INTERFACE brackets  I2C_Emulation \"0x40, 0x41, 0x42, ([<()>])\" \n"
-               "(\n"
-               "   REGISTER r1 1 Bypass: \"0b1\"\n"
-               "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               ")\n",
-               "[Access_I](0)  \"brackets\", Protocol: I2C_Emulation\n"
-               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
-               " [Register](2)  \"r2\", length: 2, bypass: 11"),
-
-    // 09: Any punctuation characters in parameters
-    make_tuple("ACCESS_INTERFACE punctuation  I2C_Emulation \"0x40, 0x41, 0x42, ?!.:; \" \n"
-               "(\n"
-               "   REGISTER r1 1 Bypass: \"0b1\"\n"
-               "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               ")\n",
-               "[Access_I](0)  \"punctuation\", Protocol: I2C_Emulation\n"
-               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
-               " [Register](2)  \"r2\", length: 2, bypass: 11"),
-
-    // 10: Any operators characters in parameters
-    make_tuple("ACCESS_INTERFACE operators  I2C_Emulation \"0x40, 0x41, 0x42, /*-+~%\" \n"
-               "(\n"
-               "   REGISTER r1 1 Bypass: \"0b1\"\n"
-               "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               ")\n",
-               "[Access_I](0)  \"operators\", Protocol: I2C_Emulation\n"
-               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
-               " [Register](2)  \"r2\", length: 2, bypass: 11"),
-
-    // 11: Any special characters in parameters
-    make_tuple("ACCESS_INTERFACE special  I2C_Emulation \"0x40, 0x41, 0x42, $=@'_|& \" \n"
-               "(\n"
-               "   REGISTER r1 1 Bypass: \"0b1\"\n"
-               "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               ")\n",
-               "[Access_I](0)  \"special\", Protocol: I2C_Emulation\n"
-               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
-               " [Register](2)  \"r2\", length: 2, bypass: 11"),
-
-
-    #ifdef INTEL_EXPERIMENT
-    // 12: Intel_Packet
-    make_tuple("ACCESS_INTERFACE tap  Intel_Packet \"0x41, 0x42\" \n"
-               "(\n"
-               "   REGISTER r1 1 Bypass: \"0b1\"\n"
-               "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               ")\n",
-               "[Access_I](0)  \"tap\", Protocol: Intel_Packet\n"
-               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
-               " [Register](2)  \"r2\", length: 2, bypass: 11"),
-    #endif
+               "[Access_T](0)  \"my_tap\", Protocol: JTAG_to_I2C->Not set\n"
+               " [Register](1)  \"test_reg\", length: 4, bypass: 1100"),
   };
 
   #ifndef INTEL_EXPERIMENT
@@ -1560,74 +1449,6 @@ void UT_SIT_Reader::test_TRANSLATOR_Success ()
   TS_DATA_DRIVEN_TEST (checker, data);
 }
 
-
-//! Test ACCES_INTERFACE from Simplified ICL Tree input - In cases with parsing failure
-//!
-void UT_SIT_Reader::test_TRANSLATOR_Failure ()
-{
-  // ---------------- DDT Setup
-  //
-  auto checker = [&](auto data)
-  {
-    // ---------------- Setup
-    //
-    stringstream    sit(std::get<0>(data));
-    auto            expected_ErrorMsg = std::get<1>(data);
-    auto            sm                = make_shared<SystemModel>();
-    SIT::SIT_Reader sut(sm);
-
-    // ---------------- Exercise & Verify
-    //
-    TS_ASSERT_THROWS (sut.ParseExcerpt(sit), mast::ParserException);
-
-    // ---------------- Verify
-    //
-    CxxTest::setAbortTestOnFail(true);
-
-    const auto gotErrorMessage = sut.ErrorMessage();
-
-    TS_ASSERT_CONTAINS (gotErrorMessage, expected_ErrorMsg);
-  };
-
-
-  auto data =
-  {
-    // 00: Empty integer array
-    make_tuple("ACCESS_INTERFACE Useless_Square_Brackets Loopback []\n"
-               "(\n"
-               "  REGISTER test_reg 4 Bypass: \"0b1100\"\n"
-               ")\n",
-               "Line 1:51-52: syntax error"),
-
-    // 01: Unregistered protocol type
-    make_tuple("ACCESS_INTERFACE Unregistered_Protocol MyProtocol\n"
-               "(\n"
-               "  REGISTER reg_1 3 Bypass: \"0b101\"\n"
-               "  REGISTER reg_2 5 Bypass: \"0b11001\"\n"
-               ")\n",
-               "Line 2:1-2: ACCESS_INTERFACE node \"Unregistered_Protocol\" Cannot create protocol: \"MyProtocol\"; std::invalid_argument: There is no creation method registered with name: MyProtocol."),
-
-    // 02: No AccessInterface name (same as no protocol)
-    make_tuple("ACCESS_INTERFACE Offline  \n"
-               "(\n"
-               "   REGISTER r1 1 Bypass: \"0b1\"\n"
-               "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               ")\n",
-               "Line 2:1-2: syntax error"),
-
-    // 03: Not enough addresses
-    make_tuple("ACCESS_INTERFACE Not_enough_Adresses I2C_Emulation \"0x40, (i2c)\"  \n"
-               "(\n"
-               "   REGISTER r1 1 Bypass: \"0b1\"\n"
-               "   REGISTER r2 2 Bypass: \"0b11\"\n"
-               ")\n",
-               "Line 1:52-65: ACCESS_INTERFACE node \"Not_enough_Adresses\" Cannot create protocol: \"I2C_Emulation\"; std::invalid_argument: I2C Addresses must have at least two entries."),
-  };
-
-  // ---------------- DDT Exercise
-  //
-  TS_DATA_DRIVEN_TEST (checker, data);
-}
 
 //! Test 1500 Wrapper macro from Simplified ICL Tree input
 //!

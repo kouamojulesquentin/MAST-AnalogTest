@@ -33,6 +33,7 @@ class Intel_EmulationProtocol final : public Intel_Packet_Player
   virtual ~Intel_EmulationProtocol() = default;
   Intel_EmulationProtocol() = delete;
   Intel_EmulationProtocol(std::vector<uint32_t> Region_addresses);
+  Intel_EmulationProtocol(std::string initialisation_string);
 
   //! Does any action required to transfer scan data to and from SUT
   //!

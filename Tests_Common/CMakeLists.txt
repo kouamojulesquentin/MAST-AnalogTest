@@ -21,12 +21,14 @@ set(HELPERS_HEADERS  "${CMAKE_CURRENT_LIST_DIR}/SpiedProtocolsCommands.hpp"
                      "${CMAKE_CURRENT_LIST_DIR}/Spy_AccessInterfaceProtocols.hpp"
                      "${CMAKE_CURRENT_LIST_DIR}/Spy_I2C_Protocol.hpp"
                      "${CMAKE_CURRENT_LIST_DIR}/Spy_STIL_Protocol.hpp"
-                     "${CMAKE_CURRENT_LIST_DIR}/Spy_SVF_Protocol.hpp")
+                     "${CMAKE_CURRENT_LIST_DIR}/Spy_SVF_Protocol.hpp"
+                     "${CMAKE_CURRENT_LIST_DIR}/Spy_Emulation_Translator.hpp")
 
 set(HELPERS_SOURCES  "${CMAKE_CURRENT_LIST_DIR}/Spy_AccessInterfaceProtocols.cpp"
                      "${CMAKE_CURRENT_LIST_DIR}/Spy_I2C_Protocol.cpp"
                      "${CMAKE_CURRENT_LIST_DIR}/Spy_STIL_Protocol.cpp"
                      "${CMAKE_CURRENT_LIST_DIR}/Spy_SVF_Protocol.cpp"
+                     "${CMAKE_CURRENT_LIST_DIR}/Spy_Emulation_Translator.cpp"
                      "${CMAKE_CURRENT_LIST_DIR}/TestUtilities.cpp"
                      "${CMAKE_CURRENT_LIST_DIR}/TestModelBuilder.cpp" )
 

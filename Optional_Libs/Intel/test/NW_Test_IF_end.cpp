@@ -15,7 +15,7 @@ int run_NW_TEST_IF_end ( int ring_end_port, int Addr )
   std::bitset<ADDR_WIDTH> Phys_Addr = Addr;
   std::cout << "running Ring endpoint on port "<< ring_end_port<<"....\n";
   std::cout << "With Physical address "<< Phys_Addr<<"....\n";
-  std::ofstream  from_ring_file ("../../packets_from_ring.bin", ios::out | ios::binary);
+  std::ofstream  from_ring_file ("./packets_from_ring.bin", ios::out | ios::binary);
 
   try
     {

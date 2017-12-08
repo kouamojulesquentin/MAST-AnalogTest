@@ -14,6 +14,9 @@
 #include "DataCycleVisitor.hpp"
 #include "SystemModelNodes.hpp"
 #include "SystemModelManager_impl.hpp"
+#include "AccessInterfaceRawProtocol.hpp"
+#include "Utility.hpp"
+
 
 using namespace mast;
 
@@ -28,15 +31,89 @@ void DataCycleVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 {
   VisitChildren(accessInterface);
 
+    auto protocol = accessInterface.Protocol();
+
+    CHECK_VALUE_NOT_NULL(protocol, "All AccessInterface must be associated with a valid protocol");
+
+ auto protocol_is_raw =  std::dynamic_pointer_cast<AccessInterfaceRawProtocol>(protocol);
+
   if (accessInterface.IsPending())
   {
-    m_manager->DoHierarchicalDataCycle(&accessInterface, nullptr);
+   if (!protocol_is_raw)
+     m_manager->DoHierarchicalDataCycle(&accessInterface);
   }
 }
 //
 //  End of: DataCycleVisitor::VisitAccessInterface
 //---------------------------------------------------------------------------
 
+//! If Pending, sends a notification to the Raw protocol waiting on the pending queue
+//!
+void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator&accessInterfaceTranslator)
+
+{
+ auto AI_data_cycle = [this] (AccessInterface accessInterface) {m_manager->DoHierarchicalDataCycle(&accessInterface);};
+ auto TR_data_cycle = [this] (AccessInterfaceTranslator& translator) {VisitAccessInterfaceTranslator(translator);
+    //Release parent Transmator
+    CallbackRequest request(NO_MORE_PENDING);
+    translator.Protocol()->TransformationCallback(request);
+};
+ 
+  //Is this really needed?
+  //VisitChildren(accessInterfaceTranslator);
+  
+  //SystemModelChecker guarantess the only child is an AccessInterface with a Raw protocol
+  auto cur_node = accessInterfaceTranslator.FirstChild();
+  uint32_t cur_interface = 0;
+  std::shared_ptr<mast::AccessInterface> accessInterface;
+  std::shared_ptr<AccessInterfaceTranslator> slaveTranslator;  
+  
+  if (accessInterfaceTranslator.IsPending())
+  {
+  do
+   {
+   accessInterface=std::dynamic_pointer_cast<AccessInterface>(cur_node);
+   slaveTranslator=std::dynamic_pointer_cast<AccessInterfaceTranslator>(cur_node);
+   if (accessInterface)
+    {  
+     //Launch Thread executing Data Cycle on the child Access Interface
+    auto protocol =  accessInterface->Protocol();
+   //Launch DoHierarchicalDataCycle as a separate thread
+    std::thread AI_thread(AI_data_cycle,*accessInterface);
+   AI_thread.detach(); //Detach AI thread for a clean exit
+   }
+   if (slaveTranslator)
+    {  
+     //Launch Thread executing this Visitors on the child Access Interface Translator
+    auto protocol =  accessInterfaceTranslator.Protocol();
+   //Launch DoHierarchicalDataCycle as a separate thread
+    std::thread TR_thread(TR_data_cycle,std::ref(*slaveTranslator));
+   TR_thread.detach(); //Detach AI thread for a clean exit
+    }
+   
+   bool cycle_AI = true;
+   while(cycle_AI)
+   {
+   auto request = accessInterfaceTranslator.PopRequest(cur_interface);
+      //At this moment, the AI Callback is waiting on the Result queue
+
+  //Execute callback translator
+  //Push fromSut to wake AI_thread up
+   cycle_AI = (request.CallbackId() != NO_MORE_PENDING);
+    if (cycle_AI)
+     {
+     auto fromSutVector = accessInterfaceTranslator.Protocol()->TransformationCallback(request);
+     accessInterfaceTranslator.PushfromSut(fromSutVector,cur_interface);
+     }
+    }
+   cur_node =  cur_node->NextSibling();
+   cur_interface++;
+  }while (cur_node);
+  }
+}
+//
+//  End of: DataCycleVisitor::VisitRegister
+//---------------------------------------------------------------------------
 
 
 //! Updates Chain pending flag

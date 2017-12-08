@@ -28,6 +28,16 @@ void PropagatePendingVisitor::VisitAccessInterface (AccessInterface& accessInter
 //  End of: PropagatePendingVisitor::VisitAccessInterface
 //---------------------------------------------------------------------------
 
+//! Updates AccessInterfaceTranslator pending flag
+//!
+void PropagatePendingVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator& accessInterfaceTranslator)
+{
+  auto pendingCount = ChildrenPendings(accessInterfaceTranslator);
+  accessInterfaceTranslator.SetPendingCount(pendingCount);
+}
+//
+//  End of: PropagatePendingVisitor::VisitAccessInterface
+//---------------------------------------------------------------------------
 
 
 //! Updates Chain pending flag

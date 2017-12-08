@@ -1,0 +1,6 @@
+CHAIN Sub3Chain NOT_IN_PATH
+{
+  REGISTER Sub_3_Reg_1 8 Bypass: "0x03"
+  REGISTER Sub_3_Reg_4 6 Bypass: "0b10/x5"
+}
+

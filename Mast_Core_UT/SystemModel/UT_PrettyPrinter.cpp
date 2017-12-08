@@ -18,6 +18,7 @@
 #include "DefaultBinaryPathSelector.hpp"
 #include "SystemModel.hpp"
 #include "EnumsUtility.hpp"
+#include "Emulation_TranslatorProtocol.hpp"
 
 #include <cxxtest/ValueTraits.h>
 
@@ -117,6 +118,49 @@ void UT_PrettyPrinter::test_VisitAccessInterface_ShowProtocol ()
   TS_ASSERT_EQUALS (got, expected);
 }
 
+
+//! Checks PrettyPrinter::VisitAccessInterfaceTranslator()
+//!
+void UT_PrettyPrinter::test_VisitAccessInterfaceTranslator ()
+{
+  // ---------------- Setup
+  //
+   AccessInterfaceTranslator    translator("Access interface translator name", make_shared<Emulation_TranslatorProtocol>());
+
+  PrettyPrinter sut;
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.VisitAccessInterfaceTranslator(translator));
+
+  // ---------------- Verify
+  //
+  auto got      = sut.PrettyPrint();
+  auto expected = string("[Access_T](0)  \"Access interface translator name\"");
+  TS_ASSERT_EQUALS (got, expected);
+}
+
+//! Checks PrettyPrinter::VisitAccessInterfaceTranslator()
+//!
+void UT_PrettyPrinter::test_VisitAccessInterfaceTranslator_ShowProtocol ()
+{
+  // ---------------- Setup
+  //
+   AccessInterfaceTranslator    translator("Access interface translator name", make_shared<Emulation_TranslatorProtocol>());
+
+  PrettyPrinter sut(PrettyPrinterOptions::ShowProtocol);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.VisitAccessInterfaceTranslator(translator));
+
+  // ---------------- Verify
+  //
+  auto got      = sut.PrettyPrint();
+  auto expected = string("[Access_T]     \"Access interface translator name\", Protocol: Emulation_Translator");
+  TS_ASSERT_EQUALS (got, expected);
+
+}
 
 //! Checks PrettyPrinter::VisitChain()
 //!

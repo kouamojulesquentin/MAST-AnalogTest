@@ -37,6 +37,7 @@ class MAST_CORE_EXPORT DataCycleVisitor : public SystemModelVisitor
   }
 
   virtual void VisitAccessInterface (AccessInterface& accessInterface) override;
+  virtual void VisitAccessInterfaceTranslator (AccessInterfaceTranslator&accessInterfaceTranslator) override;
   virtual void VisitChain           (Chain&           chain)           override;
   virtual void VisitLinker          (Linker&          linker)          override;
   virtual void VisitRegister        (Register&        reg)             override;
@@ -45,6 +46,7 @@ class MAST_CORE_EXPORT DataCycleVisitor : public SystemModelVisitor
   //
   private:
   SystemModelManager_impl* m_manager = nullptr; //!< The current system model
+
 };
 //
 //  End of ConfigureVisitor class declaration

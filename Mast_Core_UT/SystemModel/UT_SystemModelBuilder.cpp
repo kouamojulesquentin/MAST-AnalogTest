@@ -22,6 +22,9 @@
 #include "SystemModelChecker.hpp"
 #include "I2C_EmulationProtocol.hpp"
 #include "SVF_EmulationProtocol.hpp"
+#include "Emulation_TranslatorProtocol.hpp"
+#include "I2C_RawPlayer.hpp"
+#include "SVF_RawPlayer.hpp"
 #include "GmlPrinter.hpp"
 #include "PrettyPrinter.hpp"
 #include "Utility.hpp"
@@ -1148,6 +1151,176 @@ void UT_SystemModelBuilder::test_Create_Brocade_5xTAPs ()
   TS_ASSERT_EQUALS (graph, expectedGraph);
 }
 
+//! Checks SystemModel::Create_Brocade when there is just one tap
+//!
+void UT_SystemModelBuilder::test_Create_Brocade_Emulator_1xTAP ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder sut(sm);
+  auto I2C_Adresses   = initializer_list<uint32_t>{ 0x30u, 0x31u };
+  auto topProtocol = make_shared<Emulation_TranslatorProtocol>();
+  auto masterProtocol = make_shared<I2C_RawPlayer>(I2C_Adresses);
+  auto slaveProtocol  = make_shared<SVF_RawPlayer>();
+
+  auto tap1 = sut.Create_JTAG_TAP("TAP1", 6u, 4u, make_shared<LoopbackAccessInterfaceProtocol>());
+
+  sut.AppendRegisters(3u, "reg_", BinaryVector::CreateFromString("0xFDE"), tap1);
+
+  shared_ptr<AccessInterfaceTranslator> brocadeTop;
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (brocadeTop = sut.Create_Brocade(topProtocol,masterProtocol, slaveProtocol, { tap1 }));
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  TS_ASSERT_NOT_NULLPTR (brocadeTop);
+
+  // Model coherency
+  auto result = SystemModelChecker::Check(sm);
+  TS_ASSERT_FALSE (result.HasIssues());
+//+  TS_TRACE (result.MakeReport());
+
+  
+  auto gotPretty      = PrettyPrinter::PrettyPrint(sm.Root(), PrettyPrinterOptions::All);
+
+  auto expectedPretty = string(
+"[Access_T](7)  \"Brocade\", Protocol: Emulation_Translator, pending: false, has_conditioner: false, priority: 0\n"
+" [Access_I](8)  \"Master_AI\", Protocol: I2C_RAW->Brocade, ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
+"  [Register](10) \"Brocade_CTRL\", length: 8, Hold value: true, bypass:            0x00\n"
+"                                                            , next_to_sut:       0x00\n"
+"                                                            , last_to_sut:       0x00\n"
+"                                                            , last_from_sut:     0x00\n"
+"                                                            , expected_from_sut: 0x00\n"
+"                                                            , pending: false, has_conditioner: false, priority: 0\n"
+" [Access_I](9)  \"Slave_AI\", Protocol: SVF_RAW->Brocade, ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
+"  [Chain](11)    \"IR\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
+"   [Linker](13)   \"IR_Mux\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
+"    :Selector:(10) \"Brocade_CTRL\", kind: Brocade, can_select_none: true, inverted_bits: false, reversed_order: true\n"
+"    Selection Table:\n"
+"      [0] 0x00\n"
+"      [1] 0x01\n"
+"    Deselection Table:\n"
+"      [0] 0xFF\n"
+"      [1] 0xFE\n"
+"    [Register](1)  \"TAP1.IR\",     :0x01:, length: 6, Hold value: true, bypass:            0b1111_11\n"
+"                                                                     , next_to_sut:       0b1111_11\n"
+"                                                                     , last_to_sut:       0b1111_11\n"
+"                                                                     , last_from_sut:     0b1111_11\n"
+"                                                                     , expected_from_sut: 0b1111_11\n"
+"                                                                     , pending: false, has_conditioner: false, priority: 0\n"
+"  [Chain](12)    \"DR\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
+"   [Linker](14)   \"DR_Mux\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
+"    :Selector:(10) \"Brocade_CTRL\", kind: Brocade, can_select_none: true, inverted_bits: false, reversed_order: true\n"
+"    Selection Table:\n"
+"      [0] 0x00\n"
+"      [1] 0x01\n"
+"    Deselection Table:\n"
+"      [0] 0xFF\n"
+"      [1] 0xFE\n"
+"    [Linker](2)    \"TAP1\",        :S:A:, pending: false, has_conditioner: false, priority: 0\n"
+"     :Selector:(1)  \"TAP1.IR\", kind: Table_Based, can_select_none: false, inverted_bits: false, reversed_order: false\n"
+"     Selection Table:\n"
+"       [0] 0b1111_11\n"
+"       [1] 0b1111_11\n"
+"       [2] 0b0000_01\n"
+"       [3] 0b0000_10\n"
+"       [4] 0b0000_11\n"
+"     Deselection Table:\n"
+"       [0] 0b1111_11\n"
+"       [1] 0b1111_11\n"
+"       [2] 0b1111_11\n"
+"       [3] 0b1111_11\n"
+"       [4] 0b1111_11\n"
+"     [Register](3)  \"TAP1_BPY\",    :0b111111:S:A:, length: 1, bypass:            0b1\n"
+"                                                            , next_to_sut:       0b1\n"
+"                                                            , last_to_sut:       0b1\n"
+"                                                            , last_from_sut:     0b1\n"
+"                                                            , expected_from_sut: 0b1\n"
+"                                                            , pending: false, has_conditioner: false, priority: 0\n"
+"     [Register](4)  \"reg_0\",       :0b000001:, length: 12, bypass:            0xFDE\n"
+"                                                         , next_to_sut:       0xFDE\n"
+"                                                         , last_to_sut:       0xFDE\n"
+"                                                         , last_from_sut:     0xFDE\n"
+"                                                         , expected_from_sut: 0xFDE\n"
+"                                                         , pending: false, has_conditioner: false, priority: 0\n"
+"     [Register](5)  \"reg_1\",       :0b000010:, length: 12, bypass:            0xFDE\n"
+"                                                         , next_to_sut:       0xFDE\n"
+"                                                         , last_to_sut:       0xFDE\n"
+"                                                         , last_from_sut:     0xFDE\n"
+"                                                         , expected_from_sut: 0xFDE\n"
+"                                                         , pending: false, has_conditioner: false, priority: 0\n"
+"     [Register](6)  \"reg_2\",       :0b000011:, length: 12, bypass:            0xFDE\n"
+"                                                         , next_to_sut:       0xFDE\n"
+"                                                         , last_to_sut:       0xFDE\n"
+"                                                         , last_from_sut:     0xFDE\n"
+"                                                         , expected_from_sut: 0xFDE\n"
+"                                                         , pending: false, has_conditioner: false, priority: 0"
+                             );
+  TS_ASSERT_EQUALS (gotPretty, expectedPretty);
+
+  auto graph         = GmlPrinter::Graph(sm.Root(), "", GmlPrinterOptions::DisplayIdentifiers | GmlPrinterOptions::ShowProtocol);
+
+
+  auto expectedGraph =  "graph\n"
+"[\n"
+"   hierarchic 1 directed 1\n"
+"   node [ id 7 graphics [ type \"octagon\" fill \"#10FFFF\" w 325 h 44 ] LabelGraphics [ text \"(7)\n"
+"Brocade\n"
+"Protocol: Emulation_Translator\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 8 graphics [ type \"octagon\" fill \"#10FFFF\" outlineStyle \"dashed\" w 201 h 44 ] LabelGraphics [ text \"(8)\n"
+"Master_AI\n"
+"Protocol: I2C_RAW\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 10 graphics [ type \"rectangle\" fill \"#59FF20\" w 114 h 35 ] LabelGraphics [ text \"(10)\n"
+"Brocade_CTRL\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 9 graphics [ type \"octagon\" fill \"#10FFFF\" outlineStyle \"dashed\" w 201 h 44 ] LabelGraphics [ text \"(9)\n"
+"Slave_AI\n"
+"Protocol: SVF_RAW\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 11 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 90 h 43 ] LabelGraphics [ text \"(11)\n"
+"IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 13 graphics [ type \"trapezoid\" fill \"#FF3060\" outlineStyle \"dashed\" w 97 h 44 ] LabelGraphics [ text \"(13)\n"
+"IR_Mux\n"
+":10:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 1 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(1)\n"
+"TAP1.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 12 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 90 h 43 ] LabelGraphics [ text \"(12)\n"
+"DR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 14 graphics [ type \"trapezoid\" fill \"#FF3060\" outlineStyle \"dashed\" w 97 h 44 ] LabelGraphics [ text \"(14)\n"
+"DR_Mux\n"
+":10:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(2)\n"
+"TAP1\n"
+":1:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 76 h 35 ] LabelGraphics [ text \"(3)\n"
+"TAP1_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 4 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(4)\n"
+"reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(5)\n"
+"reg_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 6 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(6)\n"
+"reg_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   edge [ source 8 target 10 label \"1\" ]\n"
+"   edge [ source 7 target 8 label \"1\" ]\n"
+"   edge [ source 13 target 1 label \"1\" ]\n"
+"   edge [ source 11 target 13 label \"1\" ]\n"
+"   edge [ source 9 target 11 label \"1\" ]\n"
+"   edge [ source 2 target 3 label \"1\" ]\n"
+"   edge [ source 2 target 4 label \"2\" ]\n"
+"   edge [ source 2 target 5 label \"3\" ]\n"
+"   edge [ source 2 target 6 label \"4\" ]\n"
+"   edge [ source 14 target 2 label \"1\" ]\n"
+"   edge [ source 12 target 14 label \"1\" ]\n"
+"   edge [ source 9 target 12 label \"2\" ]\n"
+"   edge [ source 7 target 9 label \"2\" ]\n"
+"]"
+;
+
+  TS_ASSERT_EQUALS (graph, expectedGraph);
+}
 
 //===========================================================================
 // End of UT_SystemModelBuilder.cpp

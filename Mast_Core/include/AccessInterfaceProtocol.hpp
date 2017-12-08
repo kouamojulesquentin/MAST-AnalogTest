@@ -53,7 +53,7 @@ class AccessInterfaceProtocol
 
   //! readable identifier for given endpoint
   //!
-  std::string CallbackId(int EndPoint) { 
+  std::string CallbackId(int EndPoint) const { 
          return KindName().to_string()+"_"+std::to_string(EndPoint); 
          };
 

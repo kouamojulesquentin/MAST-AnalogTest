@@ -17,6 +17,7 @@
 #include "ParentNode.hpp"
 #include "ICL_Reader.hpp"
 #include "SIT_Reader.hpp"
+#include "SIT_Reader.hpp"
 #include "Utility.hpp"
 #include "MastConfig.hpp"
 #include "ParserException.hpp"

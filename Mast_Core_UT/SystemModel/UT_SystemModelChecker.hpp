@@ -71,6 +71,11 @@ class UT_SystemModelChecker : public CxxTest::TestSuite
 
   void test_Check_NoProtocol ();
 
+
+  void test_Check_AI_Translator_no_children ();
+  void test_Check_AI_Translator_wrong_child ();
+  void test_Check_AI_Translator_no_raw_protocol ();
+
   // ================ Other Methods ================
 
   void setUp(); //!< Initializes test (called for each test)

@@ -15,6 +15,7 @@
   #define TESTMODELBUILDER_H__87ACB445_83CE_49DB_7EBB_7F14B3A1D5D0__INCLUDED_
 
 #include "SystemModelBuilder.hpp"
+#include "AccessInterfaceProtocol.hpp"
 #include <memory>
 #include <experimental/string_view>
 using namespace std::string_literals;
@@ -76,6 +77,9 @@ class TestModelBuilder final
   }
 
   std::shared_ptr<mast::AccessInterface> Create_TestCase_AccessInterface     (string_view name = "TAP");
+  std::shared_ptr<mast::AccessInterfaceTranslator> Create_TestCase_Emulation_Translator   (string_view name = "TAP");
+  std::shared_ptr<mast::AccessInterfaceTranslator> Create_TestCase_I2C_Emulation_Translator (string_view name = "I2C");
+  std::shared_ptr<mast::AccessInterfaceTranslator>  Create_TestCase_JTAG_to_I2C_Translator(string_view name = "JTAG_to_I2C_Traslator");
   std::shared_ptr<mast::AccessInterface> Create_TestCase_1687                (string_view name = "");
   std::shared_ptr<mast::AccessInterface> Create_TestCase_MIB                 (string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES, uint32_t regsBitsCount = DYNAMIC_TDR_LEN);
   std::shared_ptr<mast::AccessInterface> Create_TestCase_MIB_Multichain_Pre  (string_view name = "", uint32_t registersCount = DEFAULT_WRAPPED_CORES, uint32_t regsBitsCount = DYNAMIC_TDR_LEN);
@@ -87,10 +91,15 @@ class TestModelBuilder final
   //! Creates a new Tap sub-tree
   //!
   std::shared_ptr<mast::AccessInterface> Create_JTAG_TAP    (string_view name, uint32_t irBitsCount, uint32_t muxPathsCount);
+  std::shared_ptr<mast::AccessInterface> Create_JTAG_TAP    (string_view name, uint32_t irBitsCount, uint32_t muxPathsCount,std::shared_ptr<mast::AccessInterfaceProtocol> protocol);
   std::shared_ptr<mast::AccessInterface> Create_Default_SUT (string_view name);
   std::shared_ptr<mast::Chain>           Create_Default_SIB (string_view name);
   std::shared_ptr<mast::Chain>           Create_Default_MIB (string_view name,  uint32_t maxEndPoints);
   std::shared_ptr<mast::Chain>           Create_Simple_MIB  (string_view rootName = "Sut");
+  std::shared_ptr<mast::AccessInterfaceTranslator> Create_Brocade (std::shared_ptr<mast::AccessInterfaceTranslatorProtocol>  TopProtocol,
+                                                      std::shared_ptr<mast::AccessInterfaceProtocol>           masterProtocol,
+                                                      std::shared_ptr<mast::AccessInterfaceProtocol>           slaveProtocol,
+                                                      std::initializer_list<std::shared_ptr<mast::AccessInterface>> taps);
 
   // ---------------- Private  Fields
   //

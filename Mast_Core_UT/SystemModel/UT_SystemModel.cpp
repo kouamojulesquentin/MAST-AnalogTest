@@ -17,6 +17,7 @@
 #include "DefaultBinaryPathSelector.hpp"
 #include "TestModelBuilder.hpp"
 #include "BinaryVector_Traits.hpp"
+#include "SVF_RawPlayer.hpp"
 
 using std::string;
 using std::experimental::string_view;
@@ -398,12 +399,12 @@ void UT_SystemModel::test_CreateCallbackRequest ()
   TS_ASSERT_NOT_NULLPTR (test);
   TS_ASSERT_EQUALS      (test->CallbackId(), name);
   TS_ASSERT_NULLPTR (test->interfaceData());
-
-    TS_ASSERT_EQUALS (toSutVector.BitsCount(),  2);
-    TS_ASSERT_EQUALS (toSutVector.BytesCount(), 1);
-    TS_ASSERT_EQUALS (toSutVector.IsEmpty(),    2 == 0);
-    TS_ASSERT_FALSE  (toSutVector.HasFixedSize());
- //Not testing actual content, BinaryVector is tested separately
+  TS_ASSERT_EQUALS      (test->FormattedData(),"01");
+    TS_ASSERT_EQUALS (test->ToSutVector().BitsCount(),  2);
+    TS_ASSERT_EQUALS (test->ToSutVector().BytesCount(), 1);
+    TS_ASSERT_FALSE (test->ToSutVector().IsEmpty());
+    TS_ASSERT_FALSE  (test->ToSutVector().HasFixedSize());
+    
   free(test);
 
   test = new CallbackRequest(name,toSutVector,(void *)&dummy);
@@ -413,14 +414,49 @@ void UT_SystemModel::test_CreateCallbackRequest ()
   TS_ASSERT_EQUALS  (test->interfaceData(),  (void *)&dummy);
   TS_ASSERT_EQUALS  (*(int *)test->interfaceData(),  dummy);
   TS_ASSERT_EQUALS  (test->interfaceData(),  (void *)&dummy);
+  TS_ASSERT_EQUALS      (test->FormattedData(),"01");
+    TS_ASSERT_EQUALS (test->ToSutVector().BitsCount(),  2);
+    TS_ASSERT_EQUALS (test->ToSutVector().BytesCount(), 1);
+    TS_ASSERT_FALSE (test->ToSutVector().IsEmpty());
+    TS_ASSERT_FALSE  (test->ToSutVector().HasFixedSize());
 
-    TS_ASSERT_EQUALS (toSutVector.BitsCount(),  2);
-    TS_ASSERT_EQUALS (toSutVector.BytesCount(), 1);
-    TS_ASSERT_EQUALS (toSutVector.IsEmpty(),    2 == 0);
-    TS_ASSERT_FALSE  (toSutVector.HasFixedSize());
- //Not testing actual content, BinaryVector is tested separately
+  free(test);
+ 
+ //--Named CT with formatted data
+  test = new CallbackRequest(name,toSutVector,"XY");
+  TS_ASSERT_NOT_NULLPTR (test);
+  TS_ASSERT_EQUALS      (test->CallbackId(), name);
+  TS_ASSERT_NULLPTR (test->interfaceData());
+  TS_ASSERT_EQUALS      (test->FormattedData(),"XY");
+    TS_ASSERT_EQUALS (test->ToSutVector().BitsCount(),  2);
+    TS_ASSERT_EQUALS (test->ToSutVector().BytesCount(), 1);
+    TS_ASSERT_FALSE (test->ToSutVector().IsEmpty());
+    TS_ASSERT_FALSE  (test->ToSutVector().HasFixedSize());
+  free(test);
+ 
+  test = new CallbackRequest(name,toSutVector,"SQ",(void *)&dummy);
+  TS_ASSERT_NOT_NULLPTR (test);
+  TS_ASSERT_EQUALS      (test->CallbackId(), name);
+  TS_ASSERT_EQUALS      (test->FormattedData(),"SQ");
+  TS_ASSERT_EQUALS  (test->interfaceData(),  (void *)&dummy);
+  TS_ASSERT_EQUALS  (*(int *)test->interfaceData(),  dummy);
+  TS_ASSERT_EQUALS  (test->interfaceData(),  (void *)&dummy);
+    TS_ASSERT_EQUALS (test->ToSutVector().BitsCount(),  2);
+    TS_ASSERT_EQUALS (test->ToSutVector().BytesCount(), 1);
+    TS_ASSERT_FALSE (test->ToSutVector().IsEmpty());
+    TS_ASSERT_FALSE  (test->ToSutVector().HasFixedSize());
   free(test);
 
+ //--Named CT with only formatted data
+  test = new CallbackRequest(name,"XY");
+  TS_ASSERT_NOT_NULLPTR (test);
+  TS_ASSERT_EQUALS      (test->CallbackId(), name);
+  TS_ASSERT_NULLPTR (test->interfaceData());
+  TS_ASSERT_EQUALS      (test->FormattedData(),"XY");
+    TS_ASSERT_EQUALS (test->ToSutVector().BitsCount(),  0);
+  free(test);
+
+ 
 }
 
 //! Checks SystemModel::CreateAccessInterfaceTranslator() capability
@@ -438,6 +474,9 @@ void UT_SystemModel::test_CreateAccessInterfaceTranslator_Request_Queues_NB ()
   // ---------------- Exercise
   //
   auto node = sut.CreateAccessInterfaceTranslator(name, nullptr);
+   auto protocol=make_shared<SVF_RawPlayer>();
+   auto ai = make_shared<AccessInterface> ("dummy",protocol);
+   node->RegisterInterface(ai);
 
   // ---------------- Verify
   //
@@ -445,16 +484,16 @@ void UT_SystemModel::test_CreateAccessInterfaceTranslator_Request_Queues_NB ()
 
   // One Request
   auto  test = CallbackRequest(Request+"1");
-  node->PushRequest(test);
-  auto result = node->PopRequest();
+  protocol->PushRequest(test);
+  auto result = node->PopRequest(0);
   TS_ASSERT_NOT_NULLPTR (&result);
   TS_ASSERT_EQUALS      (result.CallbackId(), test.CallbackId());
 
 
   // Multiple Request
   test = CallbackRequest(Request+"1");
-  node->PushRequest(test);
-  result = node->PopRequest();
+  protocol->PushRequest(test);
+  result = node->PopRequest(0);
   TS_ASSERT_NOT_NULLPTR (&result);
   TS_ASSERT_EQUALS      (result.CallbackId(), test.CallbackId());
 
@@ -462,15 +501,21 @@ void UT_SystemModel::test_CreateAccessInterfaceTranslator_Request_Queues_NB ()
   for (int i=0;i<10;i++)
      {
      test = CallbackRequest(Request+std::to_string(i));
-      node->PushRequest(test);
+      protocol->PushRequest(test);
      }
 
   for (int i=0;i<10;i++)
      {
-     result = node->PopRequest();
+     result = node->PopRequest(0);
      TS_ASSERT_NOT_NULLPTR (&result);
      TS_ASSERT_EQUALS      (result.CallbackId(), Request+std::to_string(i));
      }
+
+ //Formatted data
+  test = CallbackRequest(Request,"100");
+  TS_ASSERT_NULLPTR(test.interfaceData());
+  TS_ASSERT_EQUALS (test.FormattedData(),"100");
+  TS_ASSERT_EQUALS (test.ToSutVector().BitsCount(),  0);
 
 }
 
@@ -488,6 +533,9 @@ void UT_SystemModel::test_CreateAccessInterfaceTranslator_Result_Queues_NB ()
   // ---------------- Exercise
   //
   auto node = sut.CreateAccessInterfaceTranslator(name, nullptr);
+     auto protocol=make_shared<SVF_RawPlayer>();
+   auto ai = make_shared<AccessInterface> ("dummy",protocol);
+   node->RegisterInterface(ai);
 
   // ---------------- Verify
   //
@@ -495,10 +543,10 @@ void UT_SystemModel::test_CreateAccessInterfaceTranslator_Result_Queues_NB ()
 
   // One Request
   auto  test = BinaryVector::CreateFromBinaryString("01");
-  node->PushResult(test);
-  auto result = node->PopResult();
-  TS_ASSERT_NOT_NULLPTR (&result);
-  TS_ASSERT_TRUE      (result.CompareEqualTo(test));
+  node->PushfromSut(test,0);
+  auto fromSut = protocol->PopfromSut();
+  TS_ASSERT_NOT_NULLPTR (&fromSut);
+  TS_ASSERT_TRUE      (fromSut.CompareEqualTo(test));
 
 
   // Multiple Request
@@ -506,14 +554,57 @@ void UT_SystemModel::test_CreateAccessInterfaceTranslator_Result_Queues_NB ()
   for (int i=0;i<10;i++)
      {
      test = BinaryVector::CreateFromHexString("01"+std::to_string(i));
-      node->PushResult(test);
+      node->PushfromSut(test,0);
      }
 
   for (int i=0;i<10;i++)
      {
-     result = node->PopResult();
-     TS_ASSERT_NOT_NULLPTR (&result);
-    TS_ASSERT_TRUE      (result.CompareEqualTo(BinaryVector::CreateFromHexString("01"+std::to_string(i))));
+     fromSut = protocol->PopfromSut();
+     TS_ASSERT_NOT_NULLPTR (&fromSut);
+    TS_ASSERT_TRUE      (fromSut.CompareEqualTo(BinaryVector::CreateFromHexString("01"+std::to_string(i))));
+     }
+
+}
+
+
+//! Checks SystemModel::CreateAccessInterfaceTranslator() capability
+//! of handling Update queues in Non-blocking situations
+//! Blocking behaviour checked in UT_MTQueue
+//!
+void UT_SystemModel::test_CreateAccessInterfaceTranslator_Pending_Queues_NB ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sut;
+  string_view name = "AT name";
+
+  // ---------------- Exercise
+  //
+  auto node = sut.CreateAccessInterfaceTranslator(name, nullptr);
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  // One Request
+  node->PushPending();
+  auto Pending = node->PopPending();
+  TS_ASSERT_NOT_NULLPTR (&Pending);
+    TS_ASSERT_TRUE      (Pending);
+
+
+  // Multiple Request
+
+  for (int i=0;i<10;i++)
+     {
+       node->PushPending();
+     }
+
+  for (int i=0;i<10;i++)
+     {
+     Pending = node->PopPending();
+     TS_ASSERT_NOT_NULLPTR (&Pending);
+    TS_ASSERT_TRUE      (Pending);
      }
 
 }

@@ -27,7 +27,6 @@
 
 #include <memory>
 
-
 using std::unique_ptr;
 using std::make_unique;
 using std::string;

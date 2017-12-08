@@ -43,6 +43,11 @@ class UT_SIT_Reader : public CxxTest::TestSuite
   void test_ACCES_INTERFACE_Success ();
   void test_ACCES_INTERFACE_Failure ();
 
+  // ---------------- AccessInterfaceTranslator
+  //
+  void test_TRANSLATOR_Success ();
+  void test_TRANSLATOR_Failure ();
+
   // ---------------- 1500
   //
   void test_1500 ();

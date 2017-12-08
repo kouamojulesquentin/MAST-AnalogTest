@@ -59,6 +59,7 @@ namespace
     {"PDL",              token::t_PDL},               // 17
     {"INSTANCE",         token::t_INSTANCE},          // 18
     {"OF",               token::t_OF},                // 19
+    {"TRANSLATOR",       token::t_TRANSLATOR},        // 20
   };
 }
 

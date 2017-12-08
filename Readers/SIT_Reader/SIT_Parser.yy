@@ -49,6 +49,7 @@
 #include "UnresolvedPathSelector.hpp"
 #include "ParserException.hpp"
 #include "g3log/g3log.hpp"
+#include "AccessInterfaceTranslatorProtocolFactory.hpp"
 
 #include <iostream>
 #include <cstdlib>
@@ -140,6 +141,8 @@ namespace
 %type <std::string>                     JTAG_protocol
 %type <std::string>                     AI_identifier
 %type <std::string>                     AI_protocol_parameters
+%type <std::string>                     TR_identifier
+%type <std::string>                     TR_protocol_parameters
 
 %type <std::shared_ptr<mast::SystemModelNode>> root_node
 %type <std::shared_ptr<mast::SystemModelNode>> register_node
@@ -193,6 +196,7 @@ namespace
 %token <std::string>   t_LOW
 %token <std::string>   t_REVERSE
 %token <std::uint32_t> t_DecimalLiteral
+%token <std::uint32_t> t_TRANSLATOR
 
 
 %%
@@ -414,7 +418,7 @@ t_1500_WRAPPER node_name max_derivations
   $$ = std::make_pair(node,false);
 }
 |
-t_ACCESS_INTERFACE  node_name AI_identifier AI_protocol_parameters
+t_ACCESS_INTERFACE  node_name AI_identifier TR_protocol_parameters
 {
     const auto& nodeName           = $[node_name].name;
     const auto& protocolName       = $3;
@@ -503,6 +507,35 @@ t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_
     THROW_SYNTAX_ERROR(msg);
   }
 }
+|
+t_TRANSLATOR  node_name TR_identifier AI_protocol_parameters
+{
+    const auto& nodeName           = $[node_name].name;
+    const auto& protocolName       = $3;
+    const auto& protocolParameters = $4;
+
+    try
+    {
+      auto& factory  = AccessInterfaceTranslatorProtocolFactory::Instance();
+      auto  protocol = factory.Create(protocolName, protocolParameters);
+
+      if (!protocol)
+      {
+        ERROR_MESSAGE(msg) << STREAM_NODE_NAME("TRANSLATOR", $[node_name].name) << "Cannot create protocol: \"" << protocolName << "\"";
+        THROW_SYNTAX_ERROR(msg);
+      }
+      else
+      {
+        auto node = driver.systemModel->CreateAccessInterfaceTranslator(nodeName, shared_ptr<AccessInterfaceTranslatorProtocol>(std::move(protocol)));
+        $$ = std::make_pair(node,false);
+      }
+    }
+    catch(std::invalid_argument exc)  // Catch C++ standard exceptions
+    {
+      ERROR_MESSAGE(msg) << STREAM_NODE_NAME("TRANSLATOR", $[node_name].name) << "Cannot create protocol: \"" << protocolName << "\"; " << exc.what();
+      THROW_SYNTAX_ERROR(msg);
+    }
+}
 ;
 
 JTAG_protocol: t_WORD
@@ -557,6 +590,17 @@ path_selector_parameters: Optional_unquoted_string
 ;
 
 AI_protocol_parameters:
+  t_QUOTED_STRING
+  {
+    $$ = remove_quotes($1);
+  }
+| %empty
+  {
+    $$="";
+  }
+  ;
+
+TR_protocol_parameters:
   t_QUOTED_STRING
   {
     $$ = remove_quotes($1);
@@ -691,6 +735,14 @@ instance_name:
 factory_name:
   t_WORD { $$ = $[t_WORD]; }
   ;
+
+TR_identifier:
+  t_WORD
+  {
+     $$ = $1;
+  }
+;
+
 
 %%
 

@@ -1420,11 +1420,10 @@ void UT_ICL_Reader::test_FromIcl_AccessLink_1149_2001 ()
                                   "  AccessLink dot1 Of STD_1149_1_2001\n"
                                   "  {\n"
                                   "    BSDLEntity chip2542;\n"
-//+ Ignored !
-//+                                  "    ijtag_en\n"
-//+                                  "    {\n"
-//+                                  "      ScanInterface { InstPath.MyScanInterface; }\n"
-//+                                  "    }\n"
+                                  "    ijtag_en\n"
+                                  "    {\n"
+                                  "      ScanInterface { InstPath.MyScanInterface; }\n"
+                                  "    }\n"
                                   "  }\n"
                                   "}";
 
@@ -1690,13 +1689,14 @@ void UT_ICL_Reader::test_Uniquify_Examples ()
     ICL_Reader_TSS sut(sm);
     TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(ifs));
 
+    CxxTest::setAbortTestOnFail(true);
+
     // ---------------- Exercise
     //
     TS_ASSERT_THROWS_NOTHING (sut.UniquifyAST());
 
     // ---------------- Verify
     //
-    CxxTest::setAbortTestOnFail(true);
 
     auto ast = sut.AST();
     TS_ASSERT_NOT_NULLPTR (ast);
@@ -1713,6 +1713,7 @@ void UT_ICL_Reader::test_Uniquify_Examples ()
   {
     make_tuple("SIB_mux_pre.icl",    "Uniquified_SIB_mux_pre_PrettyPrint.icl"),
     make_tuple("Single_SIB_3WI.icl", "Uniquified_Single_SIB_3WI_PrettyPrint.icl"),
+    make_tuple("Top_SReg.icl",       "Uniquified_Top_SReg_PrettyPrint.icl"),
   };
 
   // ---------------- DDT Exercise
@@ -2294,6 +2295,7 @@ void UT_ICL_Reader::test_Parse_Examples ()
 
   auto data =
   {
+//+    make_tuple("Top_SReg.icl",           "test_Generate_Top_SReg_PrettyPrint.txt"),
     make_tuple("SIB_mux_post.icl",       "test_Generate_SIB_mux_post_PrettyPrint.txt"),
     make_tuple("Daisy_3WI.icl",          "test_Generate_Daisy_3WI_PrettyPrint.txt"),
     make_tuple("Single_SIB_3WI.icl",     "test_Generate_Single_SIB_3WI_PrettyPrint.txt"),

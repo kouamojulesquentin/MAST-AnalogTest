@@ -21,6 +21,7 @@
 namespace Parsers
 {
 class AST_ScalarIdentifier;
+class AST_BsdlInstructionRef;
 class AST_FileRef;
 
 enum class AccessLinkType
@@ -66,6 +67,11 @@ class AST_AccessLink final : public AST_ParentNode
   //!
   const std::string& BSDLName() const;
 
+  //! Returns BSDL instructions references
+  //!
+  const std::vector<AST_BsdlInstructionRef*>& BsdlInstructionsRef() const { return m_bsdlInstructionRefs; }
+
+
   //! Returns AccessLink type
   //!
   AccessLinkType Type() const { return m_type; }
@@ -80,20 +86,28 @@ class AST_AccessLink final : public AST_ParentNode
   friend class AST;   // This is AST that manages construction/destruction of AST nodes (it uses make_unit<T>() to create nodes)
   MAKE_UNIQUE_AS_FRIEND(AST_AccessLink)(const Parsers::AST_ScalarIdentifier*&,
                                         Parsers::AccessLinkType&,
-                                        std::vector<Parsers::AST_Node*>&&);
+                                        Parsers::AST_FileRef*&,
+                                        std::vector<Parsers::AST_BsdlInstructionRef*>&&);
+
   MAKE_UNIQUE_AS_FRIEND(AST_AccessLink)(const Parsers::AST_ScalarIdentifier*&,
                                         const Parsers::AST_ScalarIdentifier*&);
 
-  //! Initializes AST_AccessLink with children
+  //! Initializes AST_AccessLink for STD 1149-1 kind tap
   //!
-  //! @param identifier   Access Link name
-  //! @param type         Type of Access Link
-  //! @param children     Access Link children nodes
+  //! @param identifier           Access Link name
+  //! @param type                 Type of Access Link
+  //! @param bsdlFile             Identifies BSDL file
+  //! @param bsdlInstructionRef   Reference to BSDL instructions
   //!
-  AST_AccessLink(const AST_ScalarIdentifier* identifier, AccessLinkType type, std::vector<AST_Node*>&& children)
-    : AST_ParentNode (Kind::AccessLink, std::move(children))
-    , m_identifier   (identifier)
-    , m_type         (type)
+  AST_AccessLink(const AST_ScalarIdentifier*            identifier,
+                 AccessLinkType                         type,
+                 AST_FileRef*                           bsdlFile,
+                 std::vector<AST_BsdlInstructionRef*>&& bsdlInstructionRef)
+    : AST_ParentNode        (Kind::AccessLink)
+    , m_identifier          (identifier)
+    , m_bsdlFile            (bsdlFile)
+    , m_bsdlInstructionRefs (std::move(bsdlInstructionRef))
+    , m_type                (type)
   {
     DispatchChildren();
     CleanupChildren();
@@ -120,13 +134,15 @@ class AST_AccessLink final : public AST_ParentNode
   //!
   void DispatchChildren () override;
 
+
   // ---------------- Private Fields
   //
   private:
-  const AST_ScalarIdentifier* m_identifier = nullptr;                   //!< Access Link name
-  const AST_ScalarIdentifier* m_genericId  = nullptr;                   //!< When type is "Generic", identifies the Access Link
-  const AST_FileRef*          m_bsdlFile   = nullptr;                   //!< Referred BSDL file (for register size...)
-  const AccessLinkType        m_type       = AccessLinkType::Undefined; //!< Specifies type of Access Link
+  const AST_ScalarIdentifier*                m_identifier = nullptr;                   //!< Access Link name
+  const AST_ScalarIdentifier*                m_genericId  = nullptr;                   //!< When type is "Generic", identifies the Access Link
+  const AST_FileRef*                         m_bsdlFile   = nullptr;                   //!< Referred BSDL file (for register size...)
+  const std::vector<AST_BsdlInstructionRef*> m_bsdlInstructionRefs;                    //!< References to BSDL instruction and the associated "selected" scan interface
+  const AccessLinkType                       m_type       = AccessLinkType::Undefined; //!< Specifies type of Access Link
 };
 //
 //  End of AST_AccessLink class declaration

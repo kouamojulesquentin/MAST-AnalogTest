@@ -27,39 +27,41 @@ namespace Parsers
   {
     Undefined,
 
-    AccessLink,       //!< For access link
-    Alias,            //!< For alias definitions
-    Attribute,        //!< For attribute definitions
-    DefaultLoadValue, //!< For registers default load value
-    Enum_def,         //!< For enums definitions
-    Enum_item,        //!< For enums items
-    Enum_ref,         //!< For enums references
-    BSDLEntity,       //!< For BSDL file referred by AccessLink
-    InputPort,        //!< For input of instance input port
-    InputPortSource,  //!< For input of instance input port source
-    Instance,         //!< For modules instances
-    LocalParameter,   //!< For local parameters definitions
-    Module,           //!< For modules
-    ModuleIdentifier, //!< For modules instances indentification
-    NameSpace,        //!< For namespace definitions and references
-    Network,          //!< For complete test network
-    Parameter,        //!< For parameters definitions
-    Parameter_ref,    //!< For parameters references
-    Port,             //!< For ScanInterface Ports
-    ResetValue,       //!< For registers reset value
-    ScalarIdentifier, //!< For identifier with a without scope prefix and no bit nor range identifier
-    ScanInPort,       //!< For modules scan input port
-    ScanInSource,     //!< For input of scan registers
-    ScanInterface,    //!< For scan interfaces
-    ScanMux,          //!< For scan multiplexers
-    ScanMuxSelection, //!< For description of scan multiplexer selection
-    ScanOutPort,      //!< For modules scan output port
-    ScanRegister,     //!< For scan registers
-    Signal,           //!< For signal definitions
-    Source,           //!< For unspecifed source signal(s)
-    String,           //!< For string literals
-    TranslationUnit,  //!< For source files as a all
-    VectorIdentifier, //!< For identifiers with a without scope prefix and bit or range identifier
+    AccessLink,         //!< For access link
+    Alias,              //!< For alias definitions
+    Attribute,          //!< For attribute definitions
+    BsdlInstructionRef, //!< For BSDL instruction referred by AccessLink
+    DefaultLoadValue,   //!< For registers default load value
+    Enum_def,           //!< For enums definitions
+    Enum_item,          //!< For enums items
+    Enum_ref,           //!< For enums references
+    BSDLEntity,         //!< For BSDL file referred by AccessLink
+    InputPort,          //!< For input of instance input port
+    InputPortSource,    //!< For input of instance input port source
+    Instance,           //!< For modules instances
+    LocalParameter,     //!< For local parameters definitions
+    Module,             //!< For modules
+    ModuleIdentifier,   //!< For modules instances indentification
+    NameSpace,          //!< For namespace definitions and references
+    Network,            //!< For complete test network
+    Parameter,          //!< For parameters definitions
+    Parameter_ref,      //!< For parameters references
+    Port,               //!< For ScanInterface Ports
+    ResetValue,         //!< For registers reset value
+    ScalarIdentifier,   //!< For identifier with a without scope prefix and no bit nor range identifier
+    ScanInPort,         //!< For modules scan input port
+    ScanInSource,       //!< For input of scan registers
+    ScanInterface,      //!< For scan interfaces
+    ScanInterfaceRef,   //!< For scan interfaces reference
+    ScanMux,            //!< For scan multiplexers
+    ScanMuxSelection,   //!< For description of scan multiplexer selection
+    ScanOutPort,        //!< For modules scan output port
+    ScanRegister,       //!< For scan registers
+    Signal,             //!< For signal definitions
+    Source,             //!< For unspecifed source signal(s)
+    String,             //!< For string literals
+    TranslationUnit,    //!< For source files as a all
+    VectorIdentifier,   //!< For identifiers with a without scope prefix and bit or range identifier
   };
 
   //! Returns whether one kind is one of specified kind
@@ -84,6 +86,7 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::AccessLink)
             ENUM_MEMBER(Parsers::Kind::Alias)
             ENUM_MEMBER(Parsers::Kind::Attribute)
+            ENUM_MEMBER(Parsers::Kind::BsdlInstructionRef)
             ENUM_MEMBER(Parsers::Kind::DefaultLoadValue)
             ENUM_MEMBER(Parsers::Kind::Enum_def)
             ENUM_MEMBER(Parsers::Kind::Enum_item)
@@ -105,6 +108,7 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::ScanInPort)
             ENUM_MEMBER(Parsers::Kind::ScanInSource)
             ENUM_MEMBER(Parsers::Kind::ScanInterface)
+            ENUM_MEMBER(Parsers::Kind::ScanInterfaceRef)
             ENUM_MEMBER(Parsers::Kind::ScanMux)
             ENUM_MEMBER(Parsers::Kind::ScanMuxSelection)
             ENUM_MEMBER(Parsers::Kind::ScanOutPort)

@@ -355,7 +355,6 @@ void MastEnvironment_impl::CreateSystemModel ()
   }
   else if (!m_configuration->IclFilePath().empty())
   {
-    CHECK_FAILED("Not Yet Supported: Parsing of, single, ICL file");
     systemModel = CreateSystemModel_FromIclFile(m_configuration->IclFilePath());
   }
   else

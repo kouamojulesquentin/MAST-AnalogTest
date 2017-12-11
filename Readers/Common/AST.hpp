@@ -26,6 +26,7 @@ namespace Parsers
 {
 class AST_AccessLink;
 class AST_Attribute;
+class AST_BsdlInstructionRef;
 class AST_FileRef;
 class AST_Identifier;
 class AST_Instance;
@@ -37,6 +38,7 @@ class AST_ParameterRef;
 class AST_Port;
 class AST_ScalarIdentifier;
 class AST_ScanInterface;
+class AST_ScanInterfaceRef;
 class AST_ScanMux;
 class AST_ScanMuxSelection;
 class AST_ScanRegister;
@@ -58,7 +60,10 @@ class AST final : public AST_Builder
   ~AST();
   AST();
 
-  AST_AccessLink*         Create_AccessLink         (const AST_ScalarIdentifier* identifier, AccessLinkType type, std::vector<AST_Node*>&& children);
+  AST_AccessLink*         Create_AccessLink         (const AST_ScalarIdentifier*            identifier,
+                                                     AccessLinkType                         type,
+                                                     AST_FileRef*                           bsdlFile,
+                                                     std::vector<AST_BsdlInstructionRef*>&& bsdlInstructionRef);
   AST_AccessLink*         Create_AccessLink         (const AST_ScalarIdentifier* identifier, const AST_ScalarIdentifier* genericId);
   AST_FileRef*            Create_FileRef            (Kind kind, std::string && name);
   AST_Namespace*          Create_Namespace          (std::string&& name);
@@ -70,6 +75,7 @@ class AST final : public AST_Builder
   AST_Parameter*          Create_Parameter          (std::string&& name, std::string&& numbersValue);
   AST_Parameter*          Create_Parameter          (std::string&& name, std::vector<AST_SimpleNode*>&& stringsOrRefsValue);
   AST_ParameterRef*       Create_ParameterRef       (std::string&& name);
+  AST_BsdlInstructionRef* Create_BsdlInstructionRef (std::string&& instructionName, std::vector<AST_Node*>&& children);
   AST_String*             Create_String             (std::string&& content);
   AST_Signal*             Create_Signal             (std::experimental::string_view number);
   AST_Signal*             Create_Signal             (AST_Identifier* portName);
@@ -90,6 +96,7 @@ class AST final : public AST_Builder
   AST_ModuleIdentifier*   Create_ModuleIdentifier   (const AST_Namespace* namespaceName, const AST_ScalarIdentifier* moduleName);
   AST_Module*             Create_Module             (const AST_ScalarIdentifier* identifier, std::vector<AST_Node*>&& children);
   AST_ScanInterface*      Create_ScanInterface      (const AST_ScalarIdentifier* identifier, std::vector<AST_Node*>&& children);
+  AST_ScanInterfaceRef*   Create_ScanInterfaceRef   (std::vector<std::tuple<AST_ScalarIdentifier*, std::string>>&& scanInterfaceNames);
   AST_ScanRegister*       Create_ScanRegister       (AST_VectorIdentifier* identifier, std::vector<AST_Node*>&& children);
   AST_ScalarIdentifier*   Create_ScalarIdentifier   (std::string&& name);
   AST_VectorIdentifier*   Create_VectorIdentifier   (std::string&& name,

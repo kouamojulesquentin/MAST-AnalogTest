@@ -35,6 +35,7 @@ namespace Parsers
   class AST;
   class AST_AccessLink;
   class AST_Attribute;
+  class AST_BsdlInstructionRef;
   class AST_FileRef;
   class AST_Identifier;
   class AST_Instance;
@@ -47,6 +48,7 @@ namespace Parsers
   class AST_Port;
   class AST_ScalarIdentifier;
   class AST_ScanInterface;
+  class AST_ScanInterfaceRef;
   class AST_ScanMux;
   class AST_ScanMuxSelection;
   class AST_ScanRegister;
@@ -89,6 +91,7 @@ typedef void* yyscan_t;
 #include "AST.hpp"
 #include "AST_AccessLink.hpp"
 #include "AST_Attribute.hpp"
+#include "AST_BsdlInstructionRef.hpp"
 #include "AST_FileRef.hpp"
 #include "AST_Instance.hpp"
 #include "AST_ModuleIdentifier.hpp"
@@ -98,6 +101,7 @@ typedef void* yyscan_t;
 #include "AST_Port.hpp"
 #include "AST_ScalarIdentifier.hpp"
 #include "AST_ScanInterface.hpp"
+#include "AST_ScanInterfaceRef.hpp"
 #include "AST_ScanMux.hpp"
 #include "AST_ScanMuxSelection.hpp"
 #include "AST_ScanRegister.hpp"
@@ -201,6 +205,7 @@ namespace
 %type <std::string> accessLink_name
 %type <std::string> accessLink_genericID
 %type <std::string> bsdlEntity_name
+%type <std::string> bsdl_instr_name
 
 %type <Parsers::AccessLinkType>        accessLink1149_stds
 
@@ -211,8 +216,11 @@ namespace
 
 
 %type <Parsers::AST_ModuleIdentifier*>                                                    module_identifier
+%type <std::vector<Parsers::AST_BsdlInstructionRef*>>                                     bsdl_instr_refs
 %type <std::vector<Parsers::AST_ScalarIdentifier*>>                                       scoped_instance_name
 %type <std::tuple<std::vector<Parsers::AST_ScalarIdentifier*>, Parsers::AST_Identifier*>> scoped_port_name
+%type <std::tuple<Parsers::AST_ScalarIdentifier*,              std::string>>              accessLink1149_ScanInterface_name
+%type <std::vector<std::tuple<Parsers::AST_ScalarIdentifier*,  std::string>>>             accessLink1149_ScanInterface_names
 
 %type <std::string> index
 %type <Parsers::AST_ParameterRef*> parameter_ref
@@ -270,46 +278,50 @@ namespace
 %type <std::vector<Parsers::AST_Signal*>> concat_trst_signal
 %type <std::vector<Parsers::AST_Signal*>> inputPort_source
 
-%type <Parsers::AST_VectorIdentifier*> alias_name           // Name, Left & Right indexes (Right can be empty)
-%type <Parsers::AST_VectorIdentifier*> oneHotScanGroup_name // Name, Left & Right indexes (Left & Right can be empty)
-%type <Parsers::AST_VectorIdentifier*> inputPort_name       // Name, Left & Right indexes (Left & Right can be empty)
-%type <Parsers::AST_VectorIdentifier*> port_name            // Name, Left & Right indexes (Left & Right can be empty)
-%type <Parsers::AST_VectorIdentifier*> reg_port_signal_id   // Name, Left & Right indexes (Left & Right can be empty)
-%type <Parsers::AST_VectorIdentifier*> register_name        // Name, Left & Right indexes (Left & Right can be empty)
-%type <Parsers::AST_VectorIdentifier*> scalar_or_vector_id  // Name, Left & Right indexes (Left & Right can be empty)
-%type <Parsers::AST_VectorIdentifier*> scanInPort_name      // Name, Left & Right indexes (Left & Right can be empty)
-%type <Parsers::AST_VectorIdentifier*> scanMux_name         // Name, Left & Right indexes (Left & Right can be empty)
-%type <Parsers::AST_VectorIdentifier*> scanOutPort_name     // Name, Left & Right indexes (Left & Right can be empty)
-%type <Parsers::AST_VectorIdentifier*> scanRegister_name    // Name, Left & Right indexes (Left & Right can be empty)
-%type <Parsers::AST_VectorIdentifier*> vector_id            // Name, Left & Right indexes (Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> alias_name                       // Name, Left & Right indexes (Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> oneHotScanGroup_name             // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> inputPort_name                   // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> port_name                        // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> reg_port_signal_id               // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> register_name                    // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> scalar_or_vector_id              // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> scanInPort_name                  // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> scanMux_name                     // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> scanOutPort_name                 // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> scanRegister_name                // Name, Left & Right indexes (Left & Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> vector_id                        // Name, Left & Right indexes (Right can be empty)
+%type <Parsers::AST_VectorIdentifier*> accessLink1149_ActiveSignal_name // Name, Left & Right indexes (Left & Right can be empty)
+
+%type <std::vector<Parsers::AST_VectorIdentifier*>> accessLink1149_ActiveSignal_names
 
 %type <Parsers::AST_Value*>            scanRegister_resetValue  // Value expression
 
 
-%type <Parsers::AST_Module*>            MODULE  // Pseudo type for mid-rule support (always set as nullptr)
-%type <Parsers::AST_Module*>            module_def
-%type <Parsers::AST_Module*>            module_body
-%type <Parsers::AST_Instance*>          instance_def
-%type <Parsers::AST_Attribute*>         attribute_def
-%type <Parsers::AST_Parameter*>         localParameter_def
-%type <Parsers::AST_Parameter*>         parameter_def
-%type <Parsers::AST_ScanRegister*>      scanRegister_def
-%type <Parsers::AST_ScanMux*>           scanMux_def
-%type <Parsers::AST_ScanInterface*>     scanInterface_def
-%type <Parsers::AST_AccessLink*>        accessLink_def
-%type <Parsers::AST_AccessLink*>        accessLink1149_def
-%type <Parsers::AST_AccessLink*>        accessLinkGeneric_def
-%type <Parsers::AST_Node*>              alias_def
-%type <Parsers::AST_Node*>              clockMux_def
-%type <Parsers::AST_Node*>              dataMux_def
-%type <Parsers::AST_Node*>              dataRegister_def
-%type <Parsers::AST_Node*>              enum_def
-%type <Parsers::AST_Node*>              logicSignal_def
-%type <Parsers::AST_Node*>              module_item
-%type <Parsers::AST_Node*>              nameSpace_def
-%type <Parsers::AST_Node*>              oneHotDataGroup_def
-%type <Parsers::AST_Node*>              oneHotScanGroup_def
-%type <Parsers::AST_Node*>              useNameSpace_def
+%type <Parsers::AST_Module*>             MODULE // Pseudo type for mid-rule support (always set as nullptr)
+%type <Parsers::AST_Module*>             module_def
+%type <Parsers::AST_Module*>             module_body
+%type <Parsers::AST_Instance*>           instance_def
+%type <Parsers::AST_Attribute*>          attribute_def
+%type <Parsers::AST_BsdlInstructionRef*> bsdl_instr_ref
+%type <Parsers::AST_Parameter*>          localParameter_def
+%type <Parsers::AST_Parameter*>          parameter_def
+%type <Parsers::AST_ScanRegister*>       scanRegister_def
+%type <Parsers::AST_ScanMux*>            scanMux_def
+%type <Parsers::AST_ScanInterface*>      scanInterface_def
+%type <Parsers::AST_AccessLink*>         accessLink_def
+%type <Parsers::AST_AccessLink*>         accessLink1149_def
+%type <Parsers::AST_AccessLink*>         accessLinkGeneric_def
+%type <Parsers::AST_Node*>               alias_def
+%type <Parsers::AST_Node*>               clockMux_def
+%type <Parsers::AST_Node*>               dataMux_def
+%type <Parsers::AST_Node*>               dataRegister_def
+%type <Parsers::AST_Node*>               enum_def
+%type <Parsers::AST_Node*>               logicSignal_def
+%type <Parsers::AST_Node*>               module_item
+%type <Parsers::AST_Node*>               nameSpace_def
+%type <Parsers::AST_Node*>               oneHotDataGroup_def
+%type <Parsers::AST_Node*>               oneHotScanGroup_def
+%type <Parsers::AST_Node*>               useNameSpace_def
 
 %type <Parsers::AST_Port*>              addressPort_def
 %type <Parsers::AST_Port*>              captureEnPort_def
@@ -353,6 +365,7 @@ namespace
 %type <Parsers::AST_Node*>              scanInterface_item
 %type <Parsers::AST_Node*>              scanOutPort_item
 %type <Parsers::AST_Node*>              scanRegister_item
+%type <Parsers::AST_Node*>              bsdl_instr_selected_item
 
 %type <std::vector<Parsers::AST_Node*>> module_items
 %type <std::vector<Parsers::AST_Node*>> scanInterface_items
@@ -360,6 +373,7 @@ namespace
 %type <std::vector<Parsers::AST_Node*>> scanRegister_items
 %type <std::vector<Parsers::AST_Node*>> scanInPort_items
 %type <std::vector<Parsers::AST_Node*>> scanOutPort_items
+%type <std::vector<Parsers::AST_Node*>> bsdl_instr_selected_items
 
 
 
@@ -2233,15 +2247,14 @@ accessLink_genericID : SCALAR_ID
 accessLink1149_def : ACCESSLINK accessLink_name OF accessLink1149_stds LEFT_BRACE BSDLENTITIY bsdlEntity_name SEMICOLON bsdl_instr_refs RIGHT_BRACE
 {
   // accessLink1149_def : ACCESSLINK accessLink_name OF accessLink1149_stds LEFT_BRACE BSDLENTITIY bsdlEntity_name SEMICOLON bsdl_instr_refs RIGHT_BRACE
-  auto& name         = $[accessLink_name];
-  auto& bsdlFileName = $[bsdlEntity_name];
-  auto  nameId       = ast.Create_ScalarIdentifier(std::move(name));
-  auto  bsdlFile     = ast.Create_FileRef(Parsers::Kind::BSDLEntity, std::move(bsdlFileName));
-  auto  type         = $[accessLink1149_stds];
-  auto  children     = vector<Parsers::AST_Node*>({ bsdlFile });
-  auto  node         = ast.Create_AccessLink(nameId, type, std::move(children));
+  auto& name          = $[accessLink_name];
+  auto& bsdlFileName  = $[bsdlEntity_name];
+  auto  nameId        = ast.Create_ScalarIdentifier(std::move(name));
+  auto  bsdlFile      = ast.Create_FileRef(Parsers::Kind::BSDLEntity, std::move(bsdlFileName));
+  auto  type          = $[accessLink1149_stds];
+  auto& bsdlInstrRefs = $[bsdl_instr_refs];
 
-  // optional bsdl_instr_refs are ignored!
+  auto  node          = ast.Create_AccessLink(nameId, type, bsdlFile, std::move(bsdlInstrRefs));
 
   $$ = node;
 }
@@ -2274,19 +2287,178 @@ bsdlEntity_name : SCALAR_ID
   $$ = std::move(name);
 };
 
-bsdl_instr_refs : bsdl_instr_refs bsdl_instr_ref | bsdl_instr_ref ;
-bsdl_instr_ref : bsdl_instr_name LEFT_BRACE bsdl_instr_selected_items RIGHT_BRACE ;
-bsdl_instr_selected_items : bsdl_instr_selected_items bsdl_instr_selected_item | bsdl_instr_selected_item ;
-bsdl_instr_name : SCALAR_ID ;
+bsdl_instr_refs :
+  bsdl_instr_ref
+  {
+    // bsdl_instr_refs : bsdl_instr_ref
+    std::vector<Parsers::AST_BsdlInstructionRef*> bsdlInstrRefs;
+
+    auto bsdlInstrRef = $[bsdl_instr_ref];
+
+    if (bsdlInstrRef != nullptr)
+    {
+      bsdlInstrRefs.push_back(bsdlInstrRef);
+    }
+
+    $$ = std::move(bsdlInstrRefs);
+  }
+| bsdl_instr_refs[lhs] bsdl_instr_ref
+  {
+    // bsdl_instr_refs : bsdl_instr_refs[lhs] bsdl_instr_ref
+    auto& bsdlInstrRefs = $[lhs];
+    auto  bsdlInstrRef  = $[bsdl_instr_ref];
+
+    if (bsdlInstrRef != nullptr)
+    {
+      bsdlInstrRefs.push_back(bsdlInstrRef);
+    }
+
+    $$ = std::move(bsdlInstrRefs);
+  }
+;
+
+bsdl_instr_ref : bsdl_instr_name LEFT_BRACE bsdl_instr_selected_items RIGHT_BRACE
+{
+  // bsdl_instr_ref : bsdl_instr_name LEFT_BRACE bsdl_instr_selected_items RIGHT_BRACE
+  auto& instructionName = $[bsdl_instr_name];
+  auto& selectedItems   = $[bsdl_instr_selected_items];
+
+  auto node = ast.Create_BsdlInstructionRef(std::move(instructionName), std::move(selectedItems));
+
+  $$ = node;
+}
+;
+
+bsdl_instr_name : SCALAR_ID
+{
+  // bsdl_instr_name: SCALAR_ID
+  auto& name = $[SCALAR_ID];
+  $$ = std::move(name);
+}
+;
+
+bsdl_instr_selected_items :
+  bsdl_instr_selected_item
+  {
+    // bsdl_instr_selected_items : bsdl_instr_selected_item
+    std::vector<Parsers::AST_Node*> children;
+
+    auto item = $[bsdl_instr_selected_item];
+    if (item != nullptr)
+    {
+      children.push_back(item);
+    }
+    $$ = std::move(children);
+  }
+| bsdl_instr_selected_items[lhs] bsdl_instr_selected_item
+  {
+    // bsdl_instr_selected_items : bsdl_instr_selected_items bsdl_instr_selected_item
+    auto& children = $[lhs];
+    auto  item     = $[bsdl_instr_selected_item];
+
+    if (item != nullptr)
+    {
+      children.push_back(item);
+    }
+    $$ = std::move(children);
+  }
+;
 
 bsdl_instr_selected_item :
   SCANINTERFACE LEFT_BRACE accessLink1149_ScanInterface_names RIGHT_BRACE
-| ACTIVESIGNALS LEFT_BRACE accessLink1149_ActiveSignal_names RIGHT_BRACE ;
+  {
+    // bsdl_instr_selected_item : SCANINTERFACE LEFT_BRACE accessLink1149_ScanInterface_names RIGHT_BRACE
+    auto& scanInterfaceNames = $[accessLink1149_ScanInterface_names];
+    auto  node               = ast.Create_ScanInterfaceRef(std::move(scanInterfaceNames));
 
-accessLink1149_ScanInterface_names : accessLink1149_ScanInterface_names accessLink1149_ScanInterface_name SEMICOLON | accessLink1149_ScanInterface_name SEMICOLON;
-accessLink1149_ActiveSignal_name : reg_port_signal_id ;
-accessLink1149_ActiveSignal_names : accessLink1149_ActiveSignal_names accessLink1149_ActiveSignal_name SEMICOLON | accessLink1149_ActiveSignal_name SEMICOLON;
-accessLink1149_ScanInterface_name : instance_name | instance_name DOT scanInterface_name ;
+    $$ = node;
+  }
+| ACTIVESIGNALS LEFT_BRACE accessLink1149_ActiveSignal_names RIGHT_BRACE
+  {
+    // bsdl_instr_selected_item : ACTIVESIGNALS LEFT_BRACE accessLink1149_ActiveSignal_names RIGHT_BRACE
+    LOG(WARNING) << "Active signal for AccessLink BSDL instruction is not yet supported";
+    $$ = nullptr;
+  }
+;
+
+accessLink1149_ScanInterface_names :
+  accessLink1149_ScanInterface_name SEMICOLON
+  {
+    // accessLink1149_ScanInterface_names : accessLink1149_ScanInterface_name SEMICOLON
+    std::vector<std::tuple<Parsers::AST_ScalarIdentifier*, std::string>> scanInterfaceNames;
+
+    auto& scanInterfaceName = $[accessLink1149_ScanInterface_name];
+
+    scanInterfaceNames.emplace_back(std::move(scanInterfaceName));
+
+    $$ = std::move(scanInterfaceNames);
+  }
+| accessLink1149_ScanInterface_names[lhs] accessLink1149_ScanInterface_name SEMICOLON
+  {
+    // accessLink1149_ScanInterface_names : accessLink1149_ScanInterface_names[lhs]  accessLink1149_ScanInterface_name SEMICOLON
+    auto& scanInterfaceNames = $[lhs];
+    auto& scanInterfaceName  = $[accessLink1149_ScanInterface_name];
+
+    scanInterfaceNames.emplace_back(std::move(scanInterfaceName));
+
+    $$ = std::move(scanInterfaceNames);
+  }
+;
+
+accessLink1149_ScanInterface_name :
+  instance_name
+  {
+    // accessLink1149_ScanInterface_name : instance_name
+    auto instanceName      = $[instance_name];
+    auto scanInterfaceName = ""s;
+
+    $$ = make_tuple(instanceName, scanInterfaceName);
+  }
+| instance_name DOT scanInterface_name
+  {
+    // accessLink1149_ScanInterface_name : instance_name DOT scanInterface_name
+    auto instanceName      = $[instance_name];
+    auto scanInterfaceName = $[scanInterface_name];
+
+    $$ = make_tuple(instanceName, scanInterfaceName);
+  }
+;
+
+accessLink1149_ActiveSignal_names :
+  accessLink1149_ActiveSignal_name SEMICOLON
+  {
+    // accessLink1149_ActiveSignal_names : accessLink1149_ActiveSignal_name SEMICOLON
+    std::vector<Parsers::AST_VectorIdentifier*> signalNames;
+
+    auto signalName = $[accessLink1149_ActiveSignal_name];
+
+    if (signalName != nullptr)
+    {
+      signalNames.push_back(signalName);
+    }
+    $$ = std::move(signalNames);
+  }
+| accessLink1149_ActiveSignal_names[lhs] accessLink1149_ActiveSignal_name SEMICOLON
+  {
+    // accessLink1149_ActiveSignal_names : accessLink1149_ActiveSignal_names[lhs] accessLink1149_ActiveSignal_name SEMICOLON
+    auto& signalNames = $[lhs];
+    auto  signalName  = $[accessLink1149_ActiveSignal_name];
+
+    if (signalName != nullptr)
+    {
+      signalNames.push_back(signalName);
+    }
+    $$ = std::move(signalNames);
+  }
+;
+
+accessLink1149_ActiveSignal_name : reg_port_signal_id
+{
+  // accessLink1149_ActiveSignal_name : reg_port_signal_id
+  auto signalName = $[reg_port_signal_id];
+  $$ = signalName;
+};
+
 
 // 6.4.17
 scanInterface_def : SCANINTERFACE scanInterface_name LEFT_BRACE scanInterface_items RIGHT_BRACE

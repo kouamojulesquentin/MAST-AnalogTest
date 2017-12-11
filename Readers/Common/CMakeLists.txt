@@ -13,6 +13,8 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_AccessLink.cpp
                                   AST_Attribute.hpp
                                   AST_Attribute.cpp
+                                  AST_BsdlInstructionRef.hpp
+                                  AST_BsdlInstructionRef.cpp
                                   AST_FileRef.hpp
                                   AST_Instance.hpp
                                   AST_Instance.cpp
@@ -42,6 +44,7 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_Source.cpp
                                   AST_ScanInterface.hpp
                                   AST_ScanInterface.cpp
+                                  AST_ScanInterfaceRef.hpp
                                   AST_ScanMux.hpp
                                   AST_ScanMux.cpp
                                   AST_ScanMuxSelection.hpp

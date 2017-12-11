@@ -794,7 +794,7 @@ void UT_MastEnvironment::test_Start_RealPDLAlgo ()
 
 //! Checks MastEnvironment::Start() with arguments and a real PDL algorithm
 //!
-void UT_MastEnvironment::test_Start_Arguments_RealPDLAlgo ()
+void UT_MastEnvironment::test_Start_Arguments_RealPDLAlgo_SIT ()
 {
   // ---------------- Setup
   //
@@ -810,7 +810,7 @@ void UT_MastEnvironment::test_Start_Arguments_RealPDLAlgo ()
                              "Mast.exe",
                              "--config_algo=last_or_default",
                              "--protocol_name=Spy",
-                             "--sit="        + GetTestFilePath("UT_MastEnvironment.sit"),
+                             "--sit="        + GetTestFilePath("test_Start_Arguments_RealPDLAlgo_SIT.sit"),
                              "--check",
                              "--check_file=" + GetTestFilePath("Model_Check.txt", false), // Do not check it exists
                              "--plugin=Fake_Plugin_1",
@@ -835,9 +835,9 @@ void UT_MastEnvironment::test_Start_Arguments_RealPDLAlgo ()
 }
 
 
-//! Checks MastEnvironment::Start() with arc, argv and a real PDL algorithm
+//! Checks MastEnvironment::Start() with arguments and a real PDL algorithm for an ICL define test network
 //!
-void UT_MastEnvironment::test_Start_Argc_Argv_RealPDLAlgo ()
+void UT_MastEnvironment::test_Start_Arguments_RealPDLAlgo_ICL ()
 {
   // ---------------- Setup
   //
@@ -849,7 +849,52 @@ void UT_MastEnvironment::test_Start_Argc_Argv_RealPDLAlgo ()
   auto creator       = [spiedCommands](const string& /*params*/) { return make_unique<test::Spy_SVF_Protocol>(spiedCommands); };
   AccessInterfaceProtocolFactory::Instance().RegisterCreator("Spy", creator);
 
-  auto sitArg       = "--sit="        + GetTestFilePath("UT_MastEnvironment.sit");
+  vector<string> arguments {
+                             "Mast.exe",
+                             "--config_algo=last_or_default",
+                             "--protocol_name=Spy",
+                             "--icl="        + GetTestFilePath("test_Start_Arguments_RealPDLAlgo_ICL.icl"),
+                             "--check",
+                             "--check_file=" + GetTestFilePath("Model_Check.txt", false), // Do not check it exists
+                             "--plugin=Fake_Plugin_1",
+                           };
+
+  MastEnvironment sut(true);
+
+  TS_SKIP ("Test is not yet possible as Access Link is not yet supported !!!!");
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.Start(arguments));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (g_Fake_PDL_AlgorithmCallCount, 0u); // Fake algorithm has not been started (not associated with a node)
+
+  const auto& effectiveCommands = spiedCommands->Commands();
+  auto minimalExpectedCommands  = PDLAlgoExpectedSVFCommands_Lazy();  // Last_or_default algorithm depends on threads scheduling
+  for (const auto& command : minimalExpectedCommands)
+  {
+    TS_ASSERT_CONTAINS (effectiveCommands, command);
+  }
+}
+
+
+//! Checks MastEnvironment::Start() with arc, argv and a real PDL algorithm
+//!
+void UT_MastEnvironment::test_Start_Argc_Argv_RealPDLAlgo_SIT ()
+{
+  // ---------------- Setup
+  //
+  // Fake plugin registation
+  PDL_AlgorithmsRepository::Instance().RegisterAlgorithm("Fake", Fake_PDL_Algorithm);
+  PDL_AlgorithmsRepository::Instance().RegisterAlgorithm("Incr", PDL_Algorithm);
+
+  auto spiedCommands = make_shared<test::SpiedProtocolsCommands>();
+  auto creator       = [spiedCommands](const string& /*params*/) { return make_unique<test::Spy_SVF_Protocol>(spiedCommands); };
+  AccessInterfaceProtocolFactory::Instance().RegisterCreator("Spy", creator);
+
+  auto sitArg       = "--sit="        + GetTestFilePath("test_Start_Arguments_RealPDLAlgo_SIT.sit");
   auto checkFileArg = "--check_file=" + GetTestFilePath("Model_Check.txt", false); // Do not check it exists
 
   const char* argv[] = {
@@ -879,6 +924,7 @@ void UT_MastEnvironment::test_Start_Argc_Argv_RealPDLAlgo ()
     TS_ASSERT_CONTAINS (effectiveCommands, command);
   }
 }
+
 
 
 //===========================================================================

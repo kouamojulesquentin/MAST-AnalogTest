@@ -14,6 +14,7 @@
 #include "AST.hpp"
 #include "AST_AccessLink.hpp"
 #include "AST_Attribute.hpp"
+#include "AST_BsdlInstructionRef.hpp"
 #include "AST_FileRef.hpp"
 #include "AST_Instance.hpp"
 #include "AST_ModuleIdentifier.hpp"
@@ -24,6 +25,7 @@
 #include "AST_Port.hpp"
 #include "AST_ScalarIdentifier.hpp"
 #include "AST_ScanInterface.hpp"
+#include "AST_ScanInterfaceRef.hpp"
 #include "AST_ScanRegister.hpp"
 #include "AST_ScanMux.hpp"
 #include "AST_ScanMuxSelection.hpp"
@@ -37,6 +39,7 @@
 #include <algorithm>
 
 using std::vector;
+using std::tuple;
 using std::string;
 using std::experimental::string_view;
 using std::make_unique;
@@ -127,15 +130,19 @@ AST_ScanRegister* AST::Clone_ScanRegister (const AST_ScanRegister* scanRegister)
 
 //! Creates a Create_AccessLink node
 //!
-//! @param identifier   Access Link name
-//! @param type         Type of Access Link
-//! @param children     Access Link children nodes
+//! @param identifier           Access Link name
+//! @param type                 Type of Access Link
+//! @param bsdlFile             Identifies BSDL file
+//! @param bsdlInstructionRef   Reference to BSDL instructions
 //!
-AST_AccessLink* AST::Create_AccessLink (const AST_ScalarIdentifier* identifier, AccessLinkType type, vector<AST_Node*>&& children)
+AST_AccessLink* AST::Create_AccessLink (const AST_ScalarIdentifier*       identifier,
+                                        AccessLinkType                    type,
+                                        AST_FileRef*                      bsdlFile,
+                                        vector<AST_BsdlInstructionRef*>&& bsdlInstructionRef)
 {
   CHECK_PARAMETER_NOT_NULL(identifier, "Access link identifier must not be nullptr");
 
-  return Create_Node<AST_AccessLink>(identifier, type, std::move(children));
+  return Create_Node<AST_AccessLink>(identifier, type, bsdlFile, std::move(bsdlInstructionRef));
 }
 //
 //  End of: AST::Create_AccessLink
@@ -198,6 +205,20 @@ AST_Attribute* AST::Create_Attribute (string&& name, std::vector<AST_SimpleNode*
 }
 //
 //  End of: AST::Create_Attribute
+//---------------------------------------------------------------------------
+
+
+//! Creates an AST_BsdlInstructionRef node
+//!
+//! @param instructionName  Referred BSDL instruction name
+//! @param children         BSDL instruction reference children nodes (scan interface or active signals references)
+//!
+AST_BsdlInstructionRef* AST::Create_BsdlInstructionRef (std::string&& instructionName, std::vector<AST_Node*>&& children)
+{
+  return Create_Node<AST_BsdlInstructionRef>(std::move(instructionName), std::move(children));
+}
+//
+//  End of: AST::Create_BsdlInstructionRef
 //---------------------------------------------------------------------------
 
 
@@ -481,6 +502,21 @@ AST_ScanInterface* AST::Create_ScanInterface (const AST_ScalarIdentifier* identi
 }
 //
 //  End of: AST::Create_ScanInterface
+//---------------------------------------------------------------------------
+
+
+//! Creates a Create_ScanInterfaceRef node
+//!
+//! @param scanInterfaceNames Identifies at least one scan interface (in top module or a referenced instance)
+//!
+AST_ScanInterfaceRef* AST::Create_ScanInterfaceRef (vector<tuple<AST_ScalarIdentifier*, string>>&& scanInterfaceNames)
+{
+  CHECK_PARAMETER_NOT_EMPTY(scanInterfaceNames, "Scan interface reference must identify at least one scan interface");
+
+  return Create_Node<AST_ScanInterfaceRef>(std::move(scanInterfaceNames));
+}
+//
+//  End of: AST::Create_ScanInterfaceRef
 //---------------------------------------------------------------------------
 
 

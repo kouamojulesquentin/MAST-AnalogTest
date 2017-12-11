@@ -15,6 +15,7 @@
 
 #include "AST_AccessLink.hpp"
 #include "AST_Attribute.hpp"
+#include "AST_BsdlInstructionRef.hpp"
 #include "AST_Instance.hpp"
 #include "AST_FileRef.hpp"
 #include "AST_Module.hpp"
@@ -24,6 +25,7 @@
 #include "AST_Parameter.hpp"
 #include "AST_Port.hpp"
 #include "AST_ScanInterface.hpp"
+#include "AST_ScanInterfaceRef.hpp"
 #include "AST_ScanMux.hpp"
 #include "AST_ScanMuxSelection.hpp"
 #include "AST_ScanRegister.hpp"
@@ -160,6 +162,47 @@ void AST_PrettyPrinter::Visit_AccessLink (AST_AccessLink* accessLink)
   HierarchyInserter hierarchyInserter(*this);
 
   StreamSimpleNode (accessLink->BSDL());
+
+  // ---------------- BSDL Instruction reference
+  //
+  const auto& bsdlInstructionsRef = accessLink->BsdlInstructionsRef();
+  for (const auto bsdlInstruction : bsdlInstructionsRef)
+  {
+    m_os << "\n";
+    StreamDepth() << bsdlInstruction->Name();
+    HierarchyInserter bsdlInstructionHierarchyInserter(*this);
+
+    const auto& scanInterfacesRef = bsdlInstruction->ScanInterfacesRef();
+    for (const auto scanInterfaceRef : scanInterfacesRef)
+    {
+      m_os << "\n";
+      StreamDepth() << "ScanInterface";
+
+      const auto& interfacesNames       = scanInterfaceRef->ScanInterfaceNames();
+      const auto  multipleScanInterface = interfacesNames.size() > 1u;
+
+      HierarchyInserter scanInterfaceHierarchyInserter(*this, !multipleScanInterface);
+
+      for (const auto& interfaceName : interfacesNames)
+      {
+        const auto  instanceRef       = std::get<0>(interfaceName);
+        const auto& scanInterfaceName = std::get<1>(interfaceName);
+
+        if (multipleScanInterface)
+        {
+          m_os << "\n";
+          StreamDepth();
+        }
+
+        if (instanceRef != nullptr)
+        {
+          m_os << instanceRef->AsText() << ".";
+        }
+
+        m_os << scanInterfaceName << ";";
+      }
+    }
+  }
 
   AcceptNodes (accessLink->UndispatchedChildren());
 }

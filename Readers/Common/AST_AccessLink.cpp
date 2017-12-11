@@ -12,6 +12,7 @@
 //===========================================================================
 
 #include "AST_AccessLink.hpp"
+#include "AST_BsdlInstructionRef.hpp"
 #include "AST_ScalarIdentifier.hpp"
 #include "AST_FileRef.hpp"
 #include "AST_Visitor.hpp"
@@ -45,18 +46,6 @@ const string& AST_AccessLink::BSDLName () const
 //!
 void AST_AccessLink::DispatchChildren ()
 {
-  for (auto&  child: UndispatchedChildren())
-  {
-    if (child != nullptr)
-    {
-      switch (child->GetKind())
-      {
-        case Parsers::Kind::BSDLEntity : SetChild(child, m_bsdlFile); break;
-        default:  // Ignore all other for now
-          break;
-      }
-    }
-  }
 }
 //
 //  End of: AST_AccessLink::DispatchChildren

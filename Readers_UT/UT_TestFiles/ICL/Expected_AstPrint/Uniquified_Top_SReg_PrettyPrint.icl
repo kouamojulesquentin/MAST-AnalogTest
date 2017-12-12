@@ -16,6 +16,7 @@ Module SReg
 }
 Module TOP
 {
+  Attribute ACCESS_LINK_PROTOCOL_NAME = "Loopback";
   AccessLink TAP Of STD_1149_1_2001
   {
     BSDLEntity TOP;

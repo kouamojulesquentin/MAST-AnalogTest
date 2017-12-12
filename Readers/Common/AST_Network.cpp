@@ -63,7 +63,9 @@ void AST_Network::AddModule (const AST_Namespace* moduleNamespace, AST_Module* m
 
   if (module->HasAccessLink())
   {
-    CHECK_VALUE_NULL(m_topModule, "Support only a single \"top\" module");
+    CHECK_TRUE (   (m_topModule == nullptr)
+                || !m_topModule->HasAccessLink(), "Must have only one module with an AccessLink");
+
     m_topModule   = module;
     m_firstModule = nullptr;
   }

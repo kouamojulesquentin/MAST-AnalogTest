@@ -15,6 +15,8 @@
 
 #include "AST_AccessLink.hpp"
 #include "AST_Attribute.hpp"
+#include "AST_BsdlInstructionRef.hpp"
+#include "AST_FileRef.hpp"
 #include "AST_Instance.hpp"
 #include "AST_Module.hpp"
 #include "AST_ModuleIdentifier.hpp"
@@ -25,6 +27,7 @@
 #include "AST_Port.hpp"
 #include "AST_ScalarIdentifier.hpp"
 #include "AST_ScanInterface.hpp"
+#include "AST_ScanInterfaceRef.hpp"
 #include "AST_ScanMux.hpp"
 #include "AST_ScanMuxSelection.hpp"
 #include "AST_ScanRegister.hpp"
@@ -34,6 +37,8 @@
 #include "AST_Value.hpp"
 #include "AST_VectorIdentifier.hpp"
 
+#include "AccessInterfaceProtocol.hpp"
+#include "AccessInterfaceProtocolFactory.hpp"
 #include "DefaultTableBasedPathSelector.hpp"
 #include "UnresolvedPathSelector.hpp"
 #include "SystemModel.hpp"
@@ -43,6 +48,7 @@
 
 #include <queue>
 #include <functional>
+#include <experimental/string_view>
 
 using std::stack;
 using std::queue;
@@ -51,12 +57,16 @@ using std::shared_ptr;
 using std::unique_ptr;
 using std::tuple;
 using std::reference_wrapper;
+using std::string;
+using std::experimental::string_view;
 using std::make_unique;
 using std::make_shared;
 using std::make_tuple;
 
 using namespace mast;
 using namespace Parsers;
+
+const std::vector<AST_Signal*> AST_SystemModelGenerator::sm_noSignals;
 
 //! Destructs AST_SystemModelGenerator
 //!
@@ -324,6 +334,110 @@ shared_ptr<PathSelector> AST_SystemModelGenerator::Create_PathSelector (AST_Scan
 
 
 
+//! Creates a AccessInterfaceProtocol for top module TAP
+//!
+//! @param topModule  Network top module with JTAG TAP kind AccessLink
+//!
+std::unique_ptr<AccessInterfaceProtocol> AST_SystemModelGenerator::Create_Protocol (AST_Module* topModule)
+{
+  if (m_protocolName.empty())
+  {
+    const auto protocolNameAttribute       = topModule->Attribute("ACCESS_LINK_PROTOCOL_NAME");
+    const auto protocolParametersAttribute = topModule->Attribute("ACCESS_LINK_PROTOCOL_PARAMETERS");
+
+    CHECK_PARAMETER_NOT_NULL(protocolNameAttribute, "Missing protocol name for tap: \""s.append(topModule->AccessLink()->Name()).append("\""));
+
+    m_protocolName = protocolNameAttribute->ValueAsText();
+    if (protocolParametersAttribute != nullptr)
+    {
+      m_protocolParameters = protocolParametersAttribute->ValueAsText();
+    }
+  }
+
+  LOG(INFO) << "Using JTAG TAP with protocol: " << m_protocolName << " and parameters: " << m_protocolParameters;
+
+  auto& factory  = AccessInterfaceProtocolFactory::Instance();
+  auto  protocol = factory.Create(m_protocolName, m_protocolParameters);
+
+  CHECK_VALUE_NOT_NULL(protocol.get(), "Failed to create a protocol with name \""s.append(m_protocolName).append("\""));
+  return protocol;
+}
+//
+//  End of: AST_SystemModelGenerator::Create_Protocol
+//---------------------------------------------------------------------------
+
+
+
+
+
+
+//! Finds ScanInterface defined by ScanInterface reference in a module
+//!
+//! @param module             Module from which search operates
+//! @param instanceRef        Optional Instance reference (when the ScanInterface is defined in an Instance module)
+//! @param scanInterfaceName  Name of the ScanInterface to look for
+//!
+tuple<AST_Instance*, AST_Module*, AST_ScanInterface*>
+AST_SystemModelGenerator::FindScanInterface (AST_Module*           module,
+                                             AST_ScalarIdentifier* instanceRef,
+                                             const string&         scanInterfaceName)
+{
+  if (instanceRef != nullptr)
+  {
+    auto instance         = module->FindInstance(instanceRef);
+    CHECK_VALUE_NOT_NULL(instance, "Cannot find instance \""s.append(instanceRef->AsText()).append("\""));
+
+    auto moduleIdentifier = instance->ModuleIdentifier();
+    auto instanceModule   = m_network->Module(moduleIdentifier);
+    CHECK_VALUE_NOT_NULL(instanceModule, "Cannot find module instance \""s.append(instanceRef->AsText()).append("\""));
+
+    auto scanInterface = instanceModule->FindScanInterface(scanInterfaceName);
+    CHECK_VALUE_NOT_NULL(scanInterface, "Cannot find ScanInterface \""s.append(scanInterfaceName)
+                                        .append("\" in instance \"").append(instanceRef->AsText()).append("\""));
+
+    return make_tuple(instance, instanceModule, scanInterface);
+  }
+
+  // ==> Scan interface must be in module definition
+  auto scanInterface = module->FindScanInterface(scanInterfaceName);
+
+  CHECK_VALUE_NOT_NULL(scanInterface, "Cannot find ScanInterface \""s.append(scanInterfaceName)
+                                      .append("\" in module\"").append(module->Name()).append("\""));
+
+  return make_tuple(nullptr, module, scanInterface);
+}
+//
+//  End of: AST_SystemModelGenerator::FindScanInterface
+//---------------------------------------------------------------------------
+
+
+
+//! Finds a ScanOutPort defined in a ScanInterface
+//!
+//! @param module         Module in which the ScanInterface is defined
+//! @param scanInterface  ScanInterface defining ScanOutPort
+//!
+const AST_Port* AST_SystemModelGenerator::FindScanOutPort (AST_Module* module, const AST_ScanInterface* scanInterface)
+{
+  const auto& ports = scanInterface->Ports();
+
+  for (const auto& port : ports)
+  {
+    const auto modulePort = module->FindScanOutPort(port->Identifier());
+    if (modulePort != nullptr)
+    {
+      return modulePort;
+    }
+  }
+
+  CHECK_FAILED("Failed to find ScanOutPort defined by ScanInterface \""s.append(scanInterface->Name())
+               .append("\" in module \"").append(module->Name()).append("\""));
+}
+//
+//  End of: AST_SystemModelGenerator::FindScanOutPort
+//---------------------------------------------------------------------------
+
+
 //! Follows ScanMux selector signals to find driving ScanRegister(s)
 //!
 //! @param selectors  ScanMux selector signals
@@ -509,7 +623,7 @@ shared_ptr<mast::ParentNode> AST_SystemModelGenerator::Generate_Network (AST_Net
       case AccessLinkType::STD_1149_1_2001:
       case AccessLinkType::STD_1149_1_2013:
         LOG(INFO) << "Creating STD_1149 AccessLink";
-        CHECK_FAILED("Not Yet Supported: STD_1149 AccessLink");
+        topNode = Generate_JTAGTap(topModule);
         break;
       case AccessLinkType::Generic:
         LOG(INFO) << "Creating Generic" << accessLink->GenericIdentifier()->AsText() << " AccessLink";
@@ -545,6 +659,120 @@ shared_ptr<mast::ParentNode> AST_SystemModelGenerator::Generate_Network (AST_Net
 //  End of: AST_SystemModelGenerator::Generate_Network
 //---------------------------------------------------------------------------
 
+
+//! Creates a SystemModel nodes for network top module
+//!
+//! @param topModule  Network top module with AccessLink to be converted to SystemModel nodes
+//!
+shared_ptr<ParentNode> AST_SystemModelGenerator::Generate_JTAGTap (AST_Module* topModule)
+{
+  CHECK_PARAMETER_NOT_NULL(topModule, "Need a valid \"top\" module");
+  auto accessLink = topModule->AccessLink();
+  CHECK_PARAMETER_NOT_NULL(accessLink, "\"Top\" module must have a valid AccessLink");
+
+  // ---------------- Capture BSDL file name
+  //
+  auto bsdlFileRef = accessLink->BSDL();
+  CHECK_VALUE_NOT_NULL(bsdlFileRef, "AccessLink must refer to a valid BSDL name");
+  auto bsdlFileName = bsdlFileRef->Name();
+
+
+  // ---------------- Capture BSDL instructions names
+  //
+  vector<string_view> instructionsNames;
+
+  const auto& bsdlInstructionsRef = accessLink->BsdlInstructionsRef();
+  for (const auto bsdlInstruction : bsdlInstructionsRef)
+  {
+    instructionsNames.push_back(bsdlInstruction->Name());
+  }
+
+  // ---------------- Parse BSDL
+  //
+//+  BSDL_Reader bsdlReader(bsdlFileName, instructionsNames);
+//+  auto        irBitsCount   = bsdlReader.IrBitsCount;
+//+  const auto& selectTable   = bsdlReader.SelectTable();
+
+  // ---------------- Create TAP node
+  //
+  const auto& tapName       = accessLink->Name();
+  //+ (begin JFC December/12/2017): get value from BSDL !!
+  auto        irBitsCount   = 4u;
+  //+ (end   JFC December/12/2017):
+  auto        muxPathsCount = bsdlInstructionsRef.size() + 1u;  // +1 is for the bypass register
+  auto        protocol      = Create_Protocol(topModule);
+
+  auto tap = m_builder->Create_JTAG_TAP(tapName, irBitsCount, muxPathsCount, std::move(protocol));
+
+  // ---------------- Build nodes below tap
+  //
+  Generate_JTAGTapChildren(tap.get(), topModule, bsdlInstructionsRef);
+
+  return tap;
+}
+//
+//  End of: AST_SystemModelGenerator::Generate_JTAGTap
+//---------------------------------------------------------------------------
+
+
+//! Generates SystemModel sub-tree under JTAG TAP
+//!
+//! @param tap                  Tap AccessInterface
+//! @param topModule            Module in which AccessLink is defined
+//! @param bsdlInstructionsRef  BSDL instruction references (tells which ScanInterface to deal with)
+//!
+void AST_SystemModelGenerator::Generate_JTAGTapChildren (AccessInterface*                            tap,
+                                                         AST_Module*                                 topModule,
+                                                         const std::vector<AST_BsdlInstructionRef*>& bsdlInstructionsRef)
+{
+  InstanceContext context;
+  context.instance          = nullptr;    // Instance is implicit
+  context.parentModule      = topModule;
+  context.parentNode        = tap;
+  context.createdNodesLevel = 0;
+  m_instancesContext.push(context); // Context is popped when path reaches instance input
+
+
+  for (const auto bsdlInstruction : bsdlInstructionsRef)
+  {
+    const auto& scanInterfacesRef = bsdlInstruction->ScanInterfacesRef();
+
+    for (const auto scanInterfaceRef : scanInterfacesRef)
+    {
+      const auto& interfacesNames = scanInterfaceRef->ScanInterfaceNames();
+      CHECK_FALSE(interfacesNames.size() > 1u, "Only support one ScanInteface per BSDL instruction");
+
+      const auto& scopedInterfaceName = interfacesNames.front();
+      const auto  instanceRef         = std::get<0>(scopedInterfaceName);
+      const auto& scanInterfaceName   = std::get<1>(scopedInterfaceName);
+
+      AST_ScanInterface* scanInterface  = nullptr;
+      AST_Module*        instanceModule = nullptr;
+      AST_Instance*      instance       = nullptr;
+
+      std::tie(instance, instanceModule, scanInterface) = FindScanInterface(topModule, instanceRef, scanInterfaceName);
+
+      auto scanOutPort = FindScanOutPort(instanceModule, scanInterface);
+
+      CHECK_VALUE_EMPTY(m_linkersContext, "No linker should be processed when dealing with top node ScanOutPort");
+
+      if (instance != nullptr)
+      {
+        Process_Instance_Entry(instance, instanceModule, scanOutPort);
+
+        FollowTopModulePath(instanceModule, scanOutPort);
+      }
+      else
+      {
+        FollowTopModulePath(topModule, scanOutPort);
+      }
+      AppendCreatedNodesToParent(tap, 0u);
+    }
+  }
+}
+//
+//  End of: AST_SystemModelGenerator::Generate_JTAGTapChildren
+//---------------------------------------------------------------------------
 
 
 //! Creates a SystemModel nodes for network top module
@@ -692,12 +920,21 @@ AST_SystemModelGenerator::Process_Instance_Exit (AST_Port* scanInPort)
 {
   CHECK_VALUE_NOT_EMPTY(m_instancesContext, "Houps not balanced push/pop on instance context");
 
-  auto&       context           = m_instancesContext.top();
-  auto        instance          = context.instance;
-  auto        portIdentifier    = scanInPort->Identifier();
-  auto        instanceInputPort = instance->FindInputPort(portIdentifier);
-  auto        instanceSource    = instanceInputPort->Source();
-  const auto& sourceSignals     = instanceSource->Signals();
+  auto& context           = m_instancesContext.top();
+  auto  instance          = context.instance;
+  auto  portIdentifier    = scanInPort->Identifier();
+  auto  instanceInputPort = instance->FindInputPort(portIdentifier);
+
+  if (instanceInputPort == nullptr)   // Is this special top level instance referred by an AccessLink ?
+  {
+    auto instanceModule = instance->UniquifiedModule();
+    auto scanInPort     = instanceModule->FindScanInPort(portIdentifier);
+    CHECK_PARAMETER_NOT_NULL(scanInPort, "Cannot find instance module Port: \""s.append(portIdentifier->Name()).append("\""));
+    return make_tuple(nullptr, cref(sm_noSignals));   // This is to report end of scan path !
+  }
+
+  auto        instanceSource = instanceInputPort->Source();
+  const auto& sourceSignals  = instanceSource->Signals();
 
   // ---------------- Restore previous context
   //
@@ -711,7 +948,6 @@ AST_SystemModelGenerator::Process_Instance_Exit (AST_Port* scanInPort)
 //
 //  End of: AST_SystemModelGenerator::Process_InstanceExit
 //---------------------------------------------------------------------------
-
 
 
 

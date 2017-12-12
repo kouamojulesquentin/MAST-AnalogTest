@@ -85,7 +85,7 @@ class AST_ParentNode : public AST_NamedNode
   //! Searches for a AST_Node of some kind with specified identifier
   //!
   //! @param nodes        Collection of nodes to search into
-  //! @param identifier   An identifier for ScanRegister to find
+  //! @param identifier   An identifier for AST_Node to find
   //!
   template<typename T>
   static T* FindNode (const std::vector<T*>& nodes, const AST_Identifier* identifier)
@@ -102,6 +102,29 @@ class AST_ParentNode : public AST_NamedNode
     }
     return foundNode;
   }
+
+
+  //! Searches for a AST_Node of some kind with specified name
+  //!
+  //! @param nodes  Collection of nodes to search into
+  //! @param name   Name of named AST_Node to find
+  //!
+  template<typename T>
+  static T* FindNode (const std::vector<T*>& nodes, std::experimental::string_view name)
+  {
+    T* foundNode = nullptr;
+
+    for (auto node : nodes)
+    {
+      if (node->Name() == name)
+      {
+        foundNode = node;
+        break;
+      }
+    }
+    return foundNode;
+  }
+
 
   // ---------------- Protected Fields
   //

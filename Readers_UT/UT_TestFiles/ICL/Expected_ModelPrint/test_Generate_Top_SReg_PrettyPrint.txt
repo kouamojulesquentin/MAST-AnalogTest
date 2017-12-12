@@ -1,10 +1,15 @@
-[Chain]        "SIB_mux_post"
- [Register]     "SR", length: 1, Hold value: true, bypass: 0
- [Linker]       "SIBmux"
-  :Selector:     "SR", kind: Table_Based, can_select_none: true, inverted_bits: false, reversed_order: false
+[Access_I]     "TAP", Protocol: Loopback
+ [Register]     "TAP_IR", length: 4, Hold value: true, bypass: 1111
+ [Linker]       "TAP_DR_Mux"
+  :Selector:     "TAP_IR", kind: Table_Based, can_select_none: false, inverted_bits: false, reversed_order: false
   Selection Table:
-    [0] 0b0
-    [1] 0b1
+    [0] 0b1111
+    [1] 0b1111
+    [2] 0b0001
   Deselection Table:
-    [0] 0b0
-    [1] 0b0
+    [0] 0b1111
+    [1] 0b1111
+    [2] 0b1111
+  [Register]     "TAP_BPY", length: 1, bypass: 1
+  [Chain]        "sreg"
+   [Register]     "SR", length: 8, bypass: 0000_0000

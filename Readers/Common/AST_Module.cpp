@@ -27,6 +27,7 @@
 #include <type_traits>
 #include <algorithm>
 
+using std::experimental::string_view;
 using namespace Parsers;
 
 
@@ -36,6 +37,26 @@ void AST_Module::Accept (AST_Visitor& visitor)
 {
   visitor.Visit_Module(this);
 }
+
+
+
+//! Returns, if exists attribute with specified name
+//!
+//! @param attributeName  Name of attribute to lookup
+//!
+AST_Attribute* AST_Module::Attribute (string_view attributeName)
+{
+  return FindNode(m_attributes, attributeName);
+//+  auto pos = std::find_if(m_attributes.cbegin(),
+//+                          m_attributes.cend(),
+//+                          [attributeName](const auto attribute) { return attribute->Name() == attributeName; });
+
+//+  return (pos != m_attributes.cend()) ? *pos : nullptr;
+}
+//
+//  End of: AST_Module::Attribute
+//---------------------------------------------------------------------------
+
 
 
 //! Dispatches children to specific member (for ease of use)
@@ -86,6 +107,21 @@ AST_ScanMux* AST_Module::FindScanMux (const AST_Identifier* identifier)
 //---------------------------------------------------------------------------
 
 
+//! Searches for a ScanInputPort with specified identifier
+//!
+//! @param identifier   An identifier for ScanInputPort to find
+//!
+AST_Port* AST_Module::FindScanInPort (const AST_Identifier* identifier)
+{
+  CHECK_PARAMETER_NOT_NULL(identifier, "Cannot find ScanInputPort from nullptr identifier");
+
+  return FindNode(m_scanInPorts, identifier);
+}
+//
+//  End of: AST_Module::FindScanRegister
+//---------------------------------------------------------------------------
+
+
 //! Searches for a ScanOutputPort with specified identifier
 //!
 //! @param identifier   An identifier for ScanOutputPort to find
@@ -129,6 +165,32 @@ AST_Instance* AST_Module::FindInstance (const AST_Identifier* identifier)
 //  End of: AST_Module::FindScanRegister
 //---------------------------------------------------------------------------
 
+
+//! Returns module ScanInterface with specified identifier
+//!
+//! @param identifier   An identifier for ScanInterface to find
+//!
+AST_ScanInterface* AST_Module::FindScanInterface (const AST_Identifier* identifier)
+{
+  CHECK_PARAMETER_NOT_NULL(identifier, "Cannot find ScanInterface from nullptr identifier");
+  return FindNode(m_scanInterfaces, identifier);
+}
+//
+//  End of: AST_Module::ScanInterface
+//---------------------------------------------------------------------------
+
+
+//! Returns module ScanInterface with specified identifier
+//!
+//! @param name   Name for ScanInterface to find
+//!
+AST_ScanInterface* AST_Module::FindScanInterface (string_view interfaceName)
+{
+  return FindNode(m_scanInterfaces, interfaceName);
+}
+//
+//  End of: AST_Module::ScanInterface
+//---------------------------------------------------------------------------
 
 
 //! Uniquifies module using parameters overrides

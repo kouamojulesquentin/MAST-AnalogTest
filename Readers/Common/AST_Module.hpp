@@ -76,9 +76,14 @@ class AST_Module final : public AST_ParentNode
   //!
   const std::vector<AST_Attribute*>& Attributes() const { return m_attributes; }
 
+  //! Returns, if exists attribute with specified name
+  //!
+  AST_Attribute* Attribute(std::experimental::string_view attributeName);
+
   //! Returns module ScanInterface(s)
   //!
   const std::vector<AST_ScanInterface*>& ScanInterfaces() const { return m_scanInterfaces; }
+
 
   //! Returns module ScanMuxes
   //!
@@ -108,9 +113,22 @@ class AST_Module final : public AST_ParentNode
   //!
   bool HasAccessLink() const { return m_accessLink != nullptr; }
 
+  //! Returns module ScanInterface with specified identifier
+  //!
+  AST_ScanInterface* FindScanInterface(const AST_Identifier* identifier);
+
+  //! Returns module ScanInterface with specified identifier
+  //!
+  AST_ScanInterface* FindScanInterface(std::experimental::string_view interfaceName);
+
+
   //! Searches for a ScanMux with specified identifier
   //!
   AST_ScanMux* FindScanMux (const AST_Identifier* identifier);
+
+  //! Searches for a ScanInputPort with specified identifier
+  //!
+  AST_Port* FindScanInPort (const AST_Identifier* identifier);
 
   //! Searches for a ScanOutputPort with specified identifier
   //!

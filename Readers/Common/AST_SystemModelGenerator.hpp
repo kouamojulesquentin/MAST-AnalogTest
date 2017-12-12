@@ -29,6 +29,8 @@ class Chain;
 class Linker;
 class ParentNode;
 class PathSelector;
+class AccessInterface;
+class AccessInterfaceProtocol;
 class UnresolvedPathSelector;
 class SystemModel;
 class SystemModelNode;
@@ -38,10 +40,13 @@ class SystemModelBuilder;
 namespace Parsers
 {
 class AST_Instance;
+class AST_BsdlInstructionRef;
 class AST_Module;
 class AST_Network;
 class AST_Port;
 class AST_Signal;
+class AST_ScalarIdentifier;
+class AST_ScanInterface;
 class AST_ScanMux;
 class AST_ScanMuxSelection;
 class AST_ScanRegister;
@@ -57,6 +62,24 @@ class AST_SystemModelGenerator final
   ~AST_SystemModelGenerator();
   AST_SystemModelGenerator() = delete;
   AST_SystemModelGenerator(std::shared_ptr<mast::SystemModel> systemModel);
+
+
+  //! Optional protocol name for JTAG Tap (in case of JTAG TAP style AccessLink)
+  //!
+  const std::string& ProtocolName()       const { return m_protocolName;       }
+
+  //! Optional protocol parameters for JTAG Tap (a protocol name must be defined)
+  //!
+  const std::string& ProtocolParameters() const { return m_protocolParameters; }
+
+  //! Sets optional protocol name for JTAG Tap (in case of JTAG TAP style AccessLink)
+  //!
+  void ProtocolName       (const std::string& protocolName)       { m_protocolName       = protocolName;       }
+
+  //! Sets optional protocol parameters for JTAG Tap (a protocol name must be defined)
+  //!
+  void ProtocolParameters (const std::string& protocolParameters) { m_protocolParameters = protocolParameters; }
+
 
   //! Generates a SystemModel (sub-)tree from AST_Network
   //!
@@ -77,10 +100,24 @@ class AST_SystemModelGenerator final
   using SourceSignalsRef_t  = std::reference_wrapper<const SourceSignals_t>;
   using ProcessingContext_t = std::tuple<AST_Module*, SourceSignalsRef_t>;
 
-  std::shared_ptr<mast::PathSelector> Create_PathSelector   (AST_ScanMux* scanMux, AST_Module* module, bool firstSelectionIsEmpty);
+  std::shared_ptr<mast::Chain>                   Create_ChainForLinker (const mast::Linker* linker, size_t selectionId);
+  std::unique_ptr<mast::AccessInterfaceProtocol> Create_Protocol       (AST_Module* topModule);
+  std::shared_ptr<mast::PathSelector>            Create_PathSelector   (AST_ScanMux* scanMux, AST_Module* module, bool firstSelectionIsEmpty);
+
   std::vector<AST_ScanRegister*>      FindSelectorRegisters (const SourceSignals_t&,  AST_Module* module) const;
   std::shared_ptr<mast::ParentNode>   Generate_Network      (AST_Network* network);
+  std::shared_ptr<mast::ParentNode>   Generate_JTAGTap      (AST_Module*  topModule);
   void                                Generate_TopModule    (mast::Chain* chain, AST_Module* topModule);
+
+  void Generate_JTAGTapChildren (mast::AccessInterface*                      tap,
+                                 AST_Module*                                 topModule,
+                                 const std::vector<AST_BsdlInstructionRef*>& bsdlInstructionsRef);
+
+  const AST_Port* FindScanOutPort (AST_Module* module, const AST_ScanInterface* scanInterface);
+
+  std::tuple<AST_Instance*, AST_Module*, AST_ScanInterface*> FindScanInterface (AST_Module*           module,
+                                                                                AST_ScalarIdentifier* instanceRef,
+                                                                                const std::string&    scanInterfaceName);
 
 
   void FollowTopModulePath (AST_Module* module, const AST_Port* scanOutPort);
@@ -98,7 +135,6 @@ class AST_SystemModelGenerator final
   using SelectionTables_t = std::tuple<std::vector<mast::BinaryVector>, std::vector<mast::BinaryVector>>;
   SelectionTables_t MakeSelectionTable (const std::vector<AST_ScanMuxSelection*>&, size_t expectedBitsCount, bool firstSelectionIsEmpty) const;
 
-  std::shared_ptr<mast::Chain> Create_ChainForLinker (const mast::Linker* linker, size_t selectionId);
 
   void AssignNewNode                     (std::shared_ptr<mast::SystemModelNode> node);
   bool AssignNodesToLinkerFirstSelection (std::shared_ptr<mast::SystemModelNode> commonLinkerNode);
@@ -142,6 +178,10 @@ class AST_SystemModelGenerator final
   std::stack<LinkerContext>                                  m_linkersContext;          //!< To recover processing context for linkers (need only access to last one)
   AST_Network*                                               m_network = nullptr;       //!< Test network AST used to generate SystemModel tree
   std::vector<mast::AppFunctionNameAndNode>                  m_algorithmAssociations;   //!< Associates a PDL algorithm identifier to a SystemModelNode
+  std::string                                                m_protocolName;            //!< Optional protocol name for JTAG Tap (in case of JTAG TAP style AccessLink)
+  std::string                                                m_protocolParameters;      //!< Optional protocol parameters for JTAG Tap (a protocol name must be defined)
+
+  static const std::vector<AST_Signal*>                      sm_noSignals;              //!< This is internal marker for "no source signals"
 };
 //
 //  End of AST_SystemModelGenerator class declaration

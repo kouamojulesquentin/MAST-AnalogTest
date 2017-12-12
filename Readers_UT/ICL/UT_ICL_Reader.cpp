@@ -2295,7 +2295,7 @@ void UT_ICL_Reader::test_Parse_Examples ()
 
   auto data =
   {
-//+    make_tuple("Top_SReg.icl",           "test_Generate_Top_SReg_PrettyPrint.txt"),
+    make_tuple("Top_SReg.icl",           "test_Generate_Top_SReg_PrettyPrint.txt"),
     make_tuple("SIB_mux_post.icl",       "test_Generate_SIB_mux_post_PrettyPrint.txt"),
     make_tuple("Daisy_3WI.icl",          "test_Generate_Daisy_3WI_PrettyPrint.txt"),
     make_tuple("Single_SIB_3WI.icl",     "test_Generate_Single_SIB_3WI_PrettyPrint.txt"),

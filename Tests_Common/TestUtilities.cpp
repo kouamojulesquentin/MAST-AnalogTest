@@ -31,6 +31,29 @@ using namespace mast;
 
 extern string Exe_Dir_Path;
 
+//! Returns directory path given names of relative sub-dir
+//!
+//! @param subPaths Names of directories down to leaf one
+//!
+string test::GetTestDirPath(const initializer_list<std::string>& subPaths)
+{
+  auto makePath = [](string first, initializer_list<string> otherParts)
+  {
+    string dirPath(first);
+    for (const auto& part : otherParts)
+    {
+      if (!part.empty())
+      {
+        dirPath.append(DIRECTORY_SEPARATOR).append(part);
+      }
+    }
+    return dirPath;
+  };
+
+  auto dirPath = makePath(Exe_Dir_Path, subPaths);
+  return dirPath;
+}
+
 //! Returns file path given a test file name and names of sub-dir to it
 //!
 //! @param subPathsToFile Names of directory down to file to used in test
@@ -45,7 +68,10 @@ string test::GetTestFilePath(const initializer_list<std::string>& subPathsToFile
     string filePath(first);
     for (const auto& part : otherParts)
     {
-      filePath.append(DIRECTORY_SEPARATOR).append(part);
+      if (!part.empty())
+      {
+        filePath.append(DIRECTORY_SEPARATOR).append(part);
+      }
     }
     return filePath;
   };

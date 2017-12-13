@@ -26,6 +26,10 @@ namespace mast
 
 namespace test
 {
+  //! Returns directory path given names of relative sub-dir
+  //!
+  extern std::string GetTestDirPath(const std::initializer_list<std::string>& subPaths);
+
   //! Returns file path given a test file name and names of sub-dir to it
   //!
   extern std::string GetTestFilePath(const std::initializer_list<std::string>& subPathsToFile, bool checkExists = true);

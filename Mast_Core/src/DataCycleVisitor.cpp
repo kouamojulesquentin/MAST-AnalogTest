@@ -59,6 +59,8 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
     translator.Protocol()->TransformationCallback(request);
 };
  
+ if (accessInterfaceTranslator.is_Busy()) return; //Node already been served by an T-2-E translator
+
   //Is this really needed?
   //VisitChildren(accessInterfaceTranslator);
   
@@ -72,6 +74,7 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
   {
   do
    {
+    LOG(DEBUG) << "accessInterfaceTranslator.IsPending()";
    accessInterface=std::dynamic_pointer_cast<AccessInterface>(cur_node);
    slaveTranslator=std::dynamic_pointer_cast<AccessInterfaceTranslator>(cur_node);
    if (accessInterface)

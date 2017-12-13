@@ -42,8 +42,8 @@ BinaryVector SVF_RawPlayer::DoCallback (uint32_t endpointId, void* /* interfaceD
       callback_toSutData = toSutData;
       }
 
-  auto request = new CallbackRequest(CallbackId(endpointId),callback_toSutData,svfFormattedData);
-  PushRequest(*request);
+  CallbackRequest request(CallbackId(endpointId),callback_toSutData,svfFormattedData);
+  PushRequest(request);
   
                        /*NB: this is a BLOCKING call*/
      result = PopfromSut();
@@ -59,8 +59,8 @@ void SVF_RawPlayer::DoReset(bool doSynchronousReset)
 {
   if (doSynchronousReset){}; //Null operation, used to silence warning
 
-  auto request = new CallbackRequest(CallbackId(0));
-  PushRequest(*request);
+  CallbackRequest request(CallbackId(0));
+  PushRequest(request);
   PopfromSut();
 }
 

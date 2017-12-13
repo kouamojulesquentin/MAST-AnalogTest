@@ -44,7 +44,7 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
   AccessInterfaceTranslator(std::experimental::string_view name,std::shared_ptr<AccessInterfaceTranslatorProtocol> protocol)
     : ParentNode (name)
     , m_protocol(protocol)
-  { }
+  {m_Busy=false; }
 
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
 
@@ -56,18 +56,22 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
  uint32_t RegisterInterface(std::shared_ptr<mast::AccessInterface> interface);
  uint32_t RegisterTranslator(std::shared_ptr<mast::AccessInterfaceTranslator> translator);
 
+ void set_Busy(){m_Busy=true;};
+ void unset_Busy(){m_Busy=false;};
+ bool is_Busy(){return m_Busy;};
+ 
   CallbackRequest PopRequest(uint32_t n_interface) {  
      std::cv_status   status;
      CallbackRequest item; 
-      LOG(DEBUG) << "\nNode " << this->Name()<<" : Popping a request ...n";
+      LOG(DEBUG) << "Node " << this->Name()<<" : Popping a request ...";
   //   status=m_CallbackQueue->Pop(item,m_timeout);
      m_CallbackQueue[n_interface]->Pop(item);
-      LOG(DEBUG) << "\nNode " << this->Name()<<" : Pop done\n";
+      LOG(DEBUG) << "Node " << this->Name()<<" : Pop done";
      CHECK_PARAMETER_NEQ (status, std::cv_status::timeout,"Error, timeout on CallbackRequestQueue->Pop");
      return item;}; //!<returns the oldest request. NB: it is a BLOCKING call
 
   void PushfromSut(BinaryVector Result,uint32_t n_interface) {m_fromSutQueue[n_interface]->Push(std::make_pair(Result,*(new std::string))); 
-                         LOG(DEBUG) << "\nNode " << this->Name()<<" : pushed a fromSut\n";};//!< Queues a new callback result
+                         LOG(DEBUG) << "Node " << this->Name()<<" : pushed a fromSut";};//!< Queues a new callback result
 
   void PushPending() {m_Pending.Push(true);};//!< Queues a new toSut Update value
   bool PopPending() { return  m_Pending.Pop();};//!< returns the oldest toSut Update value NB: it is a BLOCKING call
@@ -80,9 +84,10 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
   
   std::chrono::duration<int,std::milli> m_timeout = 15ms;
   
-  std::vector<std::shared_ptr<MTQueue<CallbackRequest>>> m_CallbackQueue;  //DataCycleThread pushes to_SUT data and CallbackId to this queue
-  std::vector<std::shared_ptr<MTQueue<std::pair<BinaryVector,std::string>>>> m_fromSutQueue;   //DataCycleThread waits on this queue to update its registers
-  MTQueue<bool> m_Pending;  //DataCycleThread waits on this queue for pending cycles: only used for synchro, data is not important
+  std::vector<std::shared_ptr<MTQueue<CallbackRequest>>> m_CallbackQueue;  //!<DataCycleThread pushes to_SUT data and CallbackId to this queue
+  std::vector<std::shared_ptr<MTQueue<std::pair<BinaryVector,std::string>>>> m_fromSutQueue;   //!<DataCycleThread waits on this queue to update its registers
+  MTQueue<bool> m_Pending;  //!<DataCycleThread waits on this queue for pending cycles: only used for synchro, data is not important
+  bool m_Busy; //!< When TRUE, the sub-tree is being served by a T-2-E translation and must be bypassed by the DataCycle
 };
 //
 //  End of AccessInterface class declaration

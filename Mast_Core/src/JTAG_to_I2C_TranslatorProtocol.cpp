@@ -168,19 +168,19 @@ BinaryVector JTAG_to_I2C_TranslatorProtocol::TransformationCallback(CallbackRequ
 
   if (endpointId == 0) //No data in the request dor Reset operation
       {
-     auto reset_request = new CallbackRequest(I2C_RESET,callback_toSutData,i2c_FormattedData,address_data);
-     PushRequest(*reset_request);
+     CallbackRequest reset_request(I2C_RESET,callback_toSutData,i2c_FormattedData,address_data);
+     PushRequest(reset_request);
      result = PopfromSut();
       }
   else
    {
   callback_toSutData = toSutData;
-  auto read_request = new CallbackRequest(I2C_READ,callback_toSutData,os_read.str(),address_data);
-  PushRequest(*read_request);
+  CallbackRequest read_request(I2C_READ,callback_toSutData,os_read.str(),address_data);
+  PushRequest(read_request);
   result = PopfromSut(); //Need to remove from queue, but return data in not useful
 
-  auto write_request = new CallbackRequest(I2C_WRITE,callback_toSutData,os_write.str(),address_data);
-  PushRequest(*write_request);
+  CallbackRequest write_request(I2C_WRITE,callback_toSutData,os_write.str(),address_data);
+  PushRequest(write_request);
   result = PopfromSut();
   }
   

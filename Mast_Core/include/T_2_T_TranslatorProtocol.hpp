@@ -7,7 +7,7 @@
 //
 //! @file T_2_T_TranslatorProtocol.hpp
 //!
-//! Declares class T_2_T_TranslatorProtocol. A RAW protocol does not directly generate transaction, but relies on a 
+//! Declares class T_2_T_TranslatorProtocol, whose role is to translate between Raw protocols. A Raw protocol does not directly generate transaction, but relies on a 
 //! Parent Interface of type AccessInterfaceTranslator to execute the Callbcaks and provide the results
 //!
 //===========================================================================
@@ -44,19 +44,19 @@ class MAST_CORE_EXPORT T_2_T_TranslatorProtocol : public AccessInterfaceTranslat
  
     void PushRequest(CallbackRequest Request) {
      m_CallbackQueue->Push(Request);
-     LOG(DEBUG) << "Protocol " << this->KindName()<<" : pushed request for Callback "<<Request.CallbackId()<<'\n';
+     LOG(DEBUG) << "Protocol " << this->KindName()<<" : pushed request for Callback "<<Request.CallbackId();
      }; //!<Queues a new Callback Request
 
   BinaryVector PopfromSut() { auto result=  m_fromSutQueue->Pop().first; 
-                             LOG(DEBUG) << "\nNode " << this->KindName()<<" : popped a fromSut\n";
+                             LOG(DEBUG) << "Node " << this->KindName()<<" : popped a fromSut";
                               return result;   };//!< returns the oldest callback result. NB: it is a BLOCKING call
   std::string PopFormattedfromSut() { auto tmp=m_fromSutQueue->Pop(); if (!tmp.second.empty()) return tmp.second; 
                                       else return tmp.first.DataAsBinaryString();};//!< returns the Formatted Data of the oldest callback result. NB: it is a BLOCKING call
 
   private:
   std::string m_ParentTranslatorName;
-  std::shared_ptr<MTQueue<CallbackRequest>> m_CallbackQueue; 
-  std::shared_ptr<MTQueue<std::pair<BinaryVector,std::string>>> m_fromSutQueue;   //DataCycleThread waits on this queue to update its registers
+  std::shared_ptr<MTQueue<CallbackRequest>> m_CallbackQueue;                       //!<Callback requests from underlying Raw protocol 
+  std::shared_ptr<MTQueue<std::pair<BinaryVector,std::string>>> m_fromSutQueue;    //!<fromSut data results from underlying Raw protocol
 
   // ---------------- Protected Methods
   //

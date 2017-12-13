@@ -28,7 +28,7 @@ class ParentNode;
 
 //! Drives the building of a MAST SystemModel
 //!
-//! @note The model can be build from SIT file(s) and optionally factories (registered by plugins)
+//! @note The model can be build from SIT or ICL file(s) and optionally factories (registered by plugins)
 //!
 class ModelBuildDriver final
 {
@@ -67,9 +67,9 @@ class ModelBuildDriver final
   //
   private:
   std::shared_ptr<SystemModel>        m_systemModel;                //!< Build MAST system model
-  std::vector<std::string>            m_sitSearchPaths;             //!< Paths from where to search for SIT files (updated when got relative paths)
+  std::vector<std::string>            m_searchPaths;                //!< Paths from where to search for SIT or ICL files (updated when got relative paths)
   std::vector<AppFunctionNameAndNode> m_algoNamesAssociatedToNodes; //!< Associations of PDL algorithm names to nodes
-  std::string                         m_errorMessage;               //!< Error message build while parsing SIT (empty when successful)
+  std::string                         m_errorMessage;               //!< Error message build while parsing SIT or ICL (empty when successful)
 };
 //
 //  End of ModelBuildDriver class declaration

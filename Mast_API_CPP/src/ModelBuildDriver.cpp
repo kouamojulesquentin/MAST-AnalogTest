@@ -48,7 +48,7 @@ ModelBuildDriver::~ModelBuildDriver ()
 //! Initializes members
 //!
 ModelBuildDriver::ModelBuildDriver ()
-  : m_sitSearchPaths {""} // This is to have opportunity to check file existence just by appending ".sit" to file name
+  : m_searchPaths {""} // This is to have opportunity to check file existence just by appending ".sit" to file name
 {
 }
 //
@@ -67,11 +67,11 @@ void ModelBuildDriver::AppendToSearchPath (const string& filePath)
   }
 
   auto path            = Utility::ExtractDirectoryPath(filePath);
-  auto notInSearchPath = std::find(m_sitSearchPaths.begin(), m_sitSearchPaths.end(), path) == m_sitSearchPaths.end();
+  auto notInSearchPath = std::find(m_searchPaths.begin(), m_searchPaths.end(), path) == m_searchPaths.end();
 
   if (notInSearchPath)
   {
-    m_sitSearchPaths.emplace_back(path);
+    m_searchPaths.emplace_back(path);
   }
 }
 //
@@ -94,7 +94,7 @@ string ModelBuildDriver::AssessActualProjectFilePath (const string& projectFileN
     return projectFileName;
   }
 
-  for (const auto& hintDir : m_sitSearchPaths)
+  for (const auto& hintDir : m_searchPaths)
   {
     auto dirPath = hintDir.empty() ? projectFileName
                                    : hintDir + DIRECTORY_SEPARATOR + projectFileName;
@@ -182,6 +182,8 @@ shared_ptr<ParentNode> ModelBuildDriver::ParseIclFile (const string& iclFilePath
 
   try
   {
+    auto& searchPath = reader.FilesSearchPaths();
+    searchPath.insert(searchPath.end(), m_searchPaths.cbegin(), m_searchPaths.cend());
     reader.Parse(iclFilePath);
   }
   catch(mast::ParserException& exc)

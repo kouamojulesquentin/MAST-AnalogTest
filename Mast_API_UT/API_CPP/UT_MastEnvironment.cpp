@@ -861,8 +861,6 @@ void UT_MastEnvironment::test_Start_Arguments_RealPDLAlgo_ICL ()
 
   MastEnvironment sut(true);
 
-  TS_SKIP ("Test is not yet possible as Access Link is not yet supported !!!!");
-
   // ---------------- Exercise & Verify
   //
   TS_ASSERT_THROWS_NOTHING (sut.Start(arguments));

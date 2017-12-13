@@ -1,0 +1,27 @@
+-- This is an example of BSDL file used to defined parameters to create a JTAG Tap
+
+Entity Top is
+
+-- Specifies the number of bits in the instruction register.
+  attribute INSTRUCTION_LENGTH of Top: entity is 5
+
+-- Specifies the boundary-scan instructions implemented in the
+-- design and their opcodes.
+
+  attribute INSTRUCTION_OPCODE of Top: entity is "EXTEST(00000),"&
+  "SAMPLE(00001),"&
+  "INTEST(00010),"&
+   "ijtag_en(00011),"&
+  "IDCODE(00100),"&
+  --"USRSC(00101),"&
+  "HIGHZ(01110),"&
+  "CLAMP(01111),"&
+  "PROBE(10000),"&
+  "BYPASS(11111)"
+
+  -- Specifies the bit pattern that is loaded into the instruction
+  -- register when the TAP controller passes through the Capture-IR
+  -- state. The standard mandates that the two LSBs must be "01".
+  -- The remaining bits are design specific.
+
+     attribute INSTRUCTION_CAPTURE of top_thunder: entity is "001";

@@ -53,6 +53,15 @@ using namespace Parsers;
 namespace
 {
 
+//! Returns path of an ICL directory accessible by test runner
+//!
+//! @param dirName  Directory name
+//!
+string GetTestDirPath (string_view dirName)
+{
+  return test::GetTestDirPath({"Readers"s, "UT_TestFiles"s, "ICL"s, string(dirName)});
+}
+
 //! Returns path of an ICL file accessible by test runner
 //!
 //! @param fileName   File name (with extension)
@@ -2207,6 +2216,8 @@ void UT_ICL_Reader::test_Generate_Examples ()
     auto           sm = make_shared<SystemModel>();
     ICL_Reader_TSS sut(sm);
 
+    sut.FilesSearchPaths().emplace_back(GetTestDirPath(""));
+
     CxxTest::setAbortTestOnFail(true);
     TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(ifs));
     auto ast = sut.AST();
@@ -2269,6 +2280,8 @@ void UT_ICL_Reader::test_Parse_Examples ()
     auto       iclFilePath = GetTestFilePath(iclFileName);
     auto       sm          = make_shared<SystemModel>();
     ICL_Reader sut(sm);
+
+    sut.FilesSearchPaths().emplace_back(GetTestDirPath(""));
 
     CxxTest::setAbortTestOnFail(true);
 

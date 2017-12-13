@@ -65,6 +65,7 @@ shared_ptr<mast::SystemModelNode> ICL_Reader::GenerateSystemModelNodes (Parsers:
   auto systemModel = PublicData().systemModel;
 
   AST_SystemModelGenerator generator(systemModel);
+  generator.FilesSearchPaths(FilesSearchPaths());
 
   auto network = ast->Network();
   auto topNode = generator.Generate(network);

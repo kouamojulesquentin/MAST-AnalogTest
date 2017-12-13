@@ -63,6 +63,9 @@ class AST_SystemModelGenerator final
   AST_SystemModelGenerator() = delete;
   AST_SystemModelGenerator(std::shared_ptr<mast::SystemModel> systemModel);
 
+  //! Gets currently used search path for needed files
+  //!
+  const std::vector<std::string>& FilesSearchPaths() const { return m_filesSearchPaths; }
 
   //! Optional protocol name for JTAG Tap (in case of JTAG TAP style AccessLink)
   //!
@@ -71,6 +74,10 @@ class AST_SystemModelGenerator final
   //! Optional protocol parameters for JTAG Tap (a protocol name must be defined)
   //!
   const std::string& ProtocolParameters() const { return m_protocolParameters; }
+
+  //! Sets search paths for files (e.g. BSDL)
+  //!
+  void  FilesSearchPaths (const std::vector<std::string>& filesSearchPaths) { m_filesSearchPaths = filesSearchPaths; }
 
   //! Sets optional protocol name for JTAG Tap (in case of JTAG TAP style AccessLink)
   //!
@@ -141,6 +148,8 @@ class AST_SystemModelGenerator final
 
   void SavePDLAssociations (AST_Instance* instance, AST_Module* instanceModule, std::shared_ptr<mast::Chain> chain);
 
+  std::string ResolveBSDL_FilePath (const std::string& bsdlName);
+
   // ---------------- Private Fields
   //
   private:
@@ -180,6 +189,7 @@ class AST_SystemModelGenerator final
   std::vector<mast::AppFunctionNameAndNode>                  m_algorithmAssociations;   //!< Associates a PDL algorithm identifier to a SystemModelNode
   std::string                                                m_protocolName;            //!< Optional protocol name for JTAG Tap (in case of JTAG TAP style AccessLink)
   std::string                                                m_protocolParameters;      //!< Optional protocol parameters for JTAG Tap (a protocol name must be defined)
+  std::vector<std::string>                                   m_filesSearchPaths;        //!< Paths to search files (e.g. BSDL file)
 
   static const std::vector<AST_Signal*>                      sm_noSignals;              //!< This is internal marker for "no source signals"
 };

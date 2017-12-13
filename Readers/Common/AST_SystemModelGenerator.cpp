@@ -43,7 +43,9 @@
 #include "UnresolvedPathSelector.hpp"
 #include "SystemModel.hpp"
 #include "SystemModelBuilder.hpp"
+#include "BSDL_Reader.hpp"
 #include "Utility.hpp"
+#include "MastConfig.hpp"
 #include "g3log/g3log.hpp"
 
 #include <queue>
@@ -676,7 +678,6 @@ shared_ptr<ParentNode> AST_SystemModelGenerator::Generate_JTAGTap (AST_Module* t
   CHECK_VALUE_NOT_NULL(bsdlFileRef, "AccessLink must refer to a valid BSDL name");
   auto bsdlFileName = bsdlFileRef->Name();
 
-
   // ---------------- Capture BSDL instructions names
   //
   vector<string_view> instructionsNames;
@@ -689,20 +690,27 @@ shared_ptr<ParentNode> AST_SystemModelGenerator::Generate_JTAGTap (AST_Module* t
 
   // ---------------- Parse BSDL
   //
-//+  BSDL_Reader bsdlReader(bsdlFileName, instructionsNames);
-//+  auto        irBitsCount   = bsdlReader.IrBitsCount;
-//+  const auto& selectTable   = bsdlReader.SelectTable();
+  auto bsdlFilePath = ResolveBSDL_FilePath(bsdlFileName);
+  auto bsdlContent  = Utility::ReadTextFile(bsdlFilePath);
+
+  BSDL_Reader bsdlReader;
+  bsdlReader.Parse(bsdlContent, instructionsNames);
+  const auto& selectTableValues = bsdlReader.SelectTable();
+
+  vector<BinaryVector> selectTable;
+  for (const auto& selectValue : selectTableValues)
+  {
+    selectTable.push_back(BinaryVector::CreateFromBinaryString(selectValue));
+  }
 
   // ---------------- Create TAP node
   //
   const auto& tapName       = accessLink->Name();
-  //+ (begin JFC December/12/2017): get value from BSDL !!
-  auto        irBitsCount   = 4u;
-  //+ (end   JFC December/12/2017):
+  auto        irBitsCount   = bsdlReader.IrBitsCount();
   auto        muxPathsCount = bsdlInstructionsRef.size() + 1u;  // +1 is for the bypass register
   auto        protocol      = Create_Protocol(topModule);
 
-  auto tap = m_builder->Create_JTAG_TAP(tapName, irBitsCount, muxPathsCount, std::move(protocol));
+  auto tap = m_builder->Create_JTAG_TAP(tapName, irBitsCount, muxPathsCount, std::move(protocol), selectTable);
 
   // ---------------- Build nodes below tap
   //
@@ -1247,6 +1255,45 @@ void AST_SystemModelGenerator::SavePDLAssociations (AST_Instance* instance, AST_
 //  End of: AST_SystemModelGenerator::SavePDLAssociations
 //---------------------------------------------------------------------------
 
+
+
+//! Resolves actual path for BSDL file
+//!
+//! @param bsdlName   Name for BSDL file found in AccessLink
+//!
+string AST_SystemModelGenerator::ResolveBSDL_FilePath (const string& bsdlName)
+{
+  // ---------------- Try with just the name
+  //
+  if (Utility::FileExists(bsdlName))
+  {
+    return bsdlName;
+  }
+
+  // ---------------- Try using search paths (with or without forced .bsd extension)
+  //
+  for (const auto& searchPath : m_filesSearchPaths)
+  {
+    auto filePath = searchPath;
+    filePath.append(DIRECTORY_SEPARATOR).append(bsdlName);
+
+    if (Utility::FileExists(filePath))
+    {
+      return filePath;
+    }
+
+    filePath.append(".bsd");
+    if (Utility::FileExists(filePath))
+    {
+      return filePath;
+    }
+  }
+
+  CHECK_FAILED("Cannot find BSDL file with name: \""s.append(bsdlName).append("\""));
+}
+//
+//  End of: AST_SystemModelGenerator::ResolveBSDL_FilePath
+//---------------------------------------------------------------------------
 
 
 

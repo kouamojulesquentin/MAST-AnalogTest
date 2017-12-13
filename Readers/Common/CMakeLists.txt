@@ -65,6 +65,8 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_PrettyPrinter.cpp
                                   AST_SystemModelGenerator.hpp
                                   AST_SystemModelGenerator.cpp
+                                  BSDL_Reader.hpp
+                                  BSDL_Reader.cpp
                                   ParserException.hpp
                                   Parser_Types.hpp
                                   Parser_PublicData.hpp

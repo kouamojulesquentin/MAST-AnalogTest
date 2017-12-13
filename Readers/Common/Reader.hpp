@@ -42,6 +42,17 @@ class Reader
   Reader() = delete;
   Reader(std::shared_ptr<mast::SystemModel> sm);
 
+  //! Gets currently used search path for needed files
+  //!
+  std::vector<std::string>& FilesSearchPaths() { return m_filesSearchPaths; }
+
+  //! Gets currently used search path for needed files
+  //!
+  const std::vector<std::string>& FilesSearchPaths() const { return m_filesSearchPaths; }
+
+  //! Sets search paths for files (e.g. BSDL)
+  //!
+  void  FilesSearchPaths (const std::vector<std::string>& filesSearchPaths) { m_filesSearchPaths = filesSearchPaths; }
 
   //! Parses a file to construct a SystemModel
   //!
@@ -80,8 +91,9 @@ class Reader
   virtual void       Parse_Impl(std::istream& stream) = 0;
 
   private:
-  std::string       m_errorMessage; //!< Error message build while parsing file or excerpt (empty when successful)
-  Parser_PublicData m_publicData;   //!< Data useful for caller
+  std::string              m_errorMessage;     //!< Error message build while parsing file or excerpt (empty when successful)
+  std::vector<std::string> m_filesSearchPaths; //!< Paths to search files (e.g. BSDL file)
+  Parser_PublicData        m_publicData;       //!< Data useful for caller
 };
 
 } // End of: namespace Parsers

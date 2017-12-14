@@ -44,7 +44,7 @@ int main (int argc, char* argv[])
     reader.Parse(iclFile);
     return 0;
   }
-  catch(mast::ParserException& exc)
+  catch(Parsers::ParserException& exc)
   {
     std::string errorMessage(exc.what());
 

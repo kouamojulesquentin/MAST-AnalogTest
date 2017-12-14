@@ -20,7 +20,7 @@
 #include <string>
 #include <experimental/string_view>
 
-namespace mast
+namespace Parsers
 {
   //! Exception thrown internally by ICL_Parser
   //!

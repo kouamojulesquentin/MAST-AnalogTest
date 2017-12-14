@@ -67,6 +67,7 @@ using std::pair;
 using std::string;
 using std::experimental::string_view;
 
+using Parsers::ParserException;
 using namespace std::experimental::literals::string_view_literals;
 using namespace mast;
 

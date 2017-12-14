@@ -186,7 +186,7 @@ shared_ptr<ParentNode> ModelBuildDriver::ParseIclFile (const string& iclFilePath
     searchPath.insert(searchPath.end(), m_searchPaths.cbegin(), m_searchPaths.cend());
     reader.Parse(iclFilePath);
   }
-  catch(mast::ParserException& exc)
+  catch(Parsers::ParserException& exc)
   {
     m_errorMessage = reader.ErrorMessage();
     if (m_errorMessage.empty())
@@ -233,7 +233,7 @@ shared_ptr<ParentNode> ModelBuildDriver::ParseSitFile (const string& sitFilePath
   {
     reader.Parse(sitFilePath);
   }
-  catch(ParserException&)
+  catch(Parsers::ParserException&)
   {
     m_errorMessage = reader.ErrorMessage();
     LOG(ERROR_LVL) << "Failed to create model from SIT file \"" << sitFilePath << "\". " << m_errorMessage;

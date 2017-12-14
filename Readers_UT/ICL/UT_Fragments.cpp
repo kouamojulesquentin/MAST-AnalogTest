@@ -120,7 +120,7 @@ void UT_Fragments::test_Parse_Parser_Fragments_with_SyntaxErrors ()
 
     // ---------------- Exercise & Verify
     //
-    TS_ASSERT_THROWS (sut.Parse(filePath), ParserException);
+    TS_ASSERT_THROWS (sut.Parse(filePath), Parsers::ParserException);
   };
 
   auto files =

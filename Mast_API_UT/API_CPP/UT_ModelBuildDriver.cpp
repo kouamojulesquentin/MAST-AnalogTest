@@ -397,7 +397,7 @@ void UT_ModelBuildDriver::test_CreateModelFromSitFile_ParsingError ()
 
   // ---------------- Exercise
   //
-  TS_ASSERT_THROWS (sm = sut.CreateModelFromSitFile(sitFile), ParserException);
+  TS_ASSERT_THROWS (sm = sut.CreateModelFromSitFile(sitFile), Parsers::ParserException);
 
   // ---------------- Verify
   //

@@ -138,7 +138,7 @@ using namespace std::experimental::literals::string_view_literals;
 #undef yylex
 #define yylex scanner.yylex
 
-#define THROW_PARSER_ERROR(msg) THROW_IMPL(ParserException, msg)
+#define THROW_PARSER_ERROR(msg) THROW_IMPL(Parsers::ParserException, msg)
 
 extern int                             nlines;
 extern ICL::ICL_Parser::location_type* my_location;
@@ -2750,8 +2750,8 @@ void ICL::ICL_Parser::error(const location_type& loc, const std::string& errorMe
   auto isValidLoc = loc.begin != loc.end;
   if (isValidLoc)
   {
-    throw mast::ParserException("ICL", "", loc.begin.line, loc.begin.column, loc.end.column, errorMessage);
+    throw Parsers::ParserException("ICL", "", loc.begin.line, loc.begin.column, loc.end.column, errorMessage);
   }
 
-  throw mast::ParserException("ICL", "", my_location->begin.line, my_location->begin.column, my_location->end.column, errorMessage);
+  throw Parsers::ParserException("ICL", "", my_location->begin.line, my_location->begin.column, my_location->end.column, errorMessage);
 }

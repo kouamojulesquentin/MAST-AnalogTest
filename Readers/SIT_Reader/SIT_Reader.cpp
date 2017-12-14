@@ -19,8 +19,9 @@
 
 using std::experimental::string_view;
 using std::string;
-
 using std::make_shared;
+
+using Parsers::ParserException;
 
 using namespace std::string_literals;
 using namespace std::experimental::literals::string_view_literals;

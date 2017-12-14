@@ -152,7 +152,7 @@ void UT_SIT_Reader::test_register_Error ()
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS (sut.ParseExcerpt(sit), mast::ParserException);
+    TS_ASSERT_THROWS (sut.ParseExcerpt(sit), Parsers::ParserException);
 
     // ---------------- Verify
     //
@@ -1041,7 +1041,7 @@ void UT_SIT_Reader::test_JTAG_TAP_Failure ()
 
     // ---------------- Exercise & Verify
     //
-    TS_ASSERT_THROWS (sut.ParseExcerpt(sit), mast::ParserException);
+    TS_ASSERT_THROWS (sut.ParseExcerpt(sit), Parsers::ParserException);
 
     // ---------------- Verify
     //
@@ -1266,7 +1266,7 @@ void UT_SIT_Reader::test_ACCES_INTERFACE_Failure ()
 
     // ---------------- Exercise & Verify
     //
-    TS_ASSERT_THROWS (sut.ParseExcerpt(sit), mast::ParserException);
+    TS_ASSERT_THROWS (sut.ParseExcerpt(sit), Parsers::ParserException);
 
     // ---------------- Verify
     //
@@ -1461,7 +1461,7 @@ void UT_SIT_Reader::test_LINKER_Error ()
 
     // ---------------- Exercise & Verify
     //
-    TS_ASSERT_THROWS (sut.ParseExcerpt(sit), mast::ParserException);
+    TS_ASSERT_THROWS (sut.ParseExcerpt(sit), Parsers::ParserException);
 
     // ---------------- Verify
     //
@@ -1639,7 +1639,7 @@ void UT_SIT_Reader::test_PDL_Failure ()
 
     // ---------------- Exercise & Verify
     //
-    TS_ASSERT_THROWS (sut.ParseExcerpt(sit), mast::ParserException);
+    TS_ASSERT_THROWS (sut.ParseExcerpt(sit), Parsers::ParserException);
 
     // ---------------- Verify
     //

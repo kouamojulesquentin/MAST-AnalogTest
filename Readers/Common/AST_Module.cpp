@@ -281,13 +281,12 @@ void AST_Module::UniquifyInstances (AST_Builder& astBuilder)
     const auto  moduleId         = instance->ModuleIdentifier();
     const auto  instanceModule   = network->Module(moduleId);
 
-    { // Do clone, checking that there is no module circular dependencies (otherwise it would result in recursive loop !)
-      bool alreadyCloned = std::find(sm_clonedModules.cbegin(), sm_clonedModules.cend(), instanceModule) != sm_clonedModules.cend();
-      CHECK_FALSE(alreadyCloned, "Detected circular dependency regarding module \""s.append(instanceModule->Name()).append("\""));
-      sm_clonedModules.push_back(instanceModule);
-      auto        newModule        = instanceModule->Uniquify(astBuilder, parameters);
-      sm_clonedModules.pop_back();
-    }
+    // Do clone, checking that there is no module circular dependencies (otherwise it would result in recursive loop !)
+    bool alreadyCloned = std::find(sm_clonedModules.cbegin(), sm_clonedModules.cend(), instanceModule) != sm_clonedModules.cend();
+    CHECK_FALSE(alreadyCloned, "Detected circular dependency regarding module \""s.append(instanceModule->Name()).append("\""));
+    sm_clonedModules.push_back(instanceModule);
+    auto        newModule        = instanceModule->Uniquify(astBuilder, parameters);
+    sm_clonedModules.pop_back();
 
     auto moduleIdentifier = astBuilder.Create_UniquifiedModuleIdentifier(newModule);
 

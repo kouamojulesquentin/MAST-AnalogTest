@@ -160,7 +160,9 @@ class AST_Module final : public AST_ParentNode
   //! @note Marking is caller responsibility for any kind of usage
   bool IsScanOutPortMarked (const AST_Port* port) { return m_markedScanOutPorts.find(port) != m_markedScanOutPorts.cend(); };
 
-
+  //! Clears system that try to detect circular modules dependencies
+  //!
+  static void ResetCircularDependencyTracker() { sm_clonedModules.clear(); }
 
   // ---------------- Private Methods
   //
@@ -206,6 +208,8 @@ class AST_Module final : public AST_ParentNode
   std::vector<AST_ScanRegister*>  m_scanRegisters;                //!< Scan registers in module
   std::vector<AST_ScanMux*>       m_scanMuxes;                    //!< Scan muxes in module
   std::vector<AST_Instance*>      m_instances;                    //!< Instances in module
+
+  static std::vector<const AST_Module*> sm_clonedModules; //!< To detect circular dependencies in module
 };
 //
 //  End of AST_Module class declaration

@@ -592,6 +592,8 @@ shared_ptr<mast::ParentNode> AST_SystemModelGenerator::Generate (AST_Network* ne
 {
   m_network = CHECK_PARAMETER_NOT_NULL(network, "Expect valid, not nullptr AST_Network");
 
+  AST_Module::ResetCircularDependencyTracker();
+
   m_parsedTopNode = Generate_Network(network);
 
   return m_parsedTopNode;

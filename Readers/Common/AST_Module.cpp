@@ -30,6 +30,7 @@
 using std::experimental::string_view;
 using namespace Parsers;
 
+std::vector<const AST_Module*> AST_Module::sm_clonedModules;
 
 //! Visited part of the Visitor pattern
 //!
@@ -47,11 +48,6 @@ void AST_Module::Accept (AST_Visitor& visitor)
 AST_Attribute* AST_Module::Attribute (string_view attributeName)
 {
   return FindNode(m_attributes, attributeName);
-//+  auto pos = std::find_if(m_attributes.cbegin(),
-//+                          m_attributes.cend(),
-//+                          [attributeName](const auto attribute) { return attribute->Name() == attributeName; });
-
-//+  return (pos != m_attributes.cend()) ? *pos : nullptr;
 }
 //
 //  End of: AST_Module::Attribute
@@ -284,8 +280,16 @@ void AST_Module::UniquifyInstances (AST_Builder& astBuilder)
     const auto& parameters       = instance->Parameters();
     const auto  moduleId         = instance->ModuleIdentifier();
     const auto  instanceModule   = network->Module(moduleId);
-    auto        newModule        = instanceModule->Uniquify(astBuilder, parameters);
-    auto        moduleIdentifier = astBuilder.Create_UniquifiedModuleIdentifier(newModule);
+
+    { // Do clone, checking that there is no module circular dependencies (otherwise it would result in recursive loop !)
+      bool alreadyCloned = std::find(sm_clonedModules.cbegin(), sm_clonedModules.cend(), instanceModule) != sm_clonedModules.cend();
+      CHECK_FALSE(alreadyCloned, "Detected circular dependency regarding module \""s.append(instanceModule->Name()).append("\""));
+      sm_clonedModules.push_back(instanceModule);
+      auto        newModule        = instanceModule->Uniquify(astBuilder, parameters);
+      sm_clonedModules.pop_back();
+    }
+
+    auto moduleIdentifier = astBuilder.Create_UniquifiedModuleIdentifier(newModule);
 
     newModule->m_parentModule = this;
     instance->UniquifiedModule(newModule, moduleIdentifier);

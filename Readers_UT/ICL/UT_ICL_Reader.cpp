@@ -1652,7 +1652,9 @@ void UT_ICL_Reader::test_Uniquify_N_Modules ()
 {
   // ---------------- Setup
   //
-  auto           iclFile = GetTestFilePath("N_Modules.icl");
+  CxxTest::setAbortTestOnFail(true);
+
+  auto           iclFile = GetTestFilePath("Bundle_N_Modules.icl");
   std::ifstream  ifs(iclFile);
 
   auto           sm = make_shared<SystemModel>();
@@ -1665,7 +1667,6 @@ void UT_ICL_Reader::test_Uniquify_N_Modules ()
 
   // ---------------- Verify
   //
-  CxxTest::setAbortTestOnFail(true);
 
   auto ast = sut.AST();
   TS_ASSERT_NOT_NULLPTR (ast);
@@ -1720,9 +1721,9 @@ void UT_ICL_Reader::test_Uniquify_Examples ()
 
   auto data =
   {
-    make_tuple("SIB_mux_pre.icl",    "Uniquified_SIB_mux_pre_PrettyPrint.icl"),
-    make_tuple("Single_SIB_3WI.icl", "Uniquified_Single_SIB_3WI_PrettyPrint.icl"),
-    make_tuple("Top_SReg.icl",       "Uniquified_Top_SReg_PrettyPrint.icl"),
+    make_tuple("Bundle_SIB_mux_pre.icl",    "Uniquified_SIB_mux_pre_PrettyPrint.icl"),
+    make_tuple("Bundle_Single_SIB_3WI.icl", "Uniquified_Single_SIB_3WI_PrettyPrint.icl"),
+    make_tuple("Bundle_Top_SReg.icl",       "Uniquified_Top_SReg_PrettyPrint.icl"),
   };
 
   // ---------------- DDT Exercise
@@ -2067,7 +2068,7 @@ void UT_ICL_Reader::test_Generate_N_Modules ()
 {
   // ---------------- Setup
   //
-  auto           iclFile = GetTestFilePath("N_Modules.icl");
+  auto           iclFile = GetTestFilePath("Bundle_N_Modules.icl");
   std::ifstream  ifs(iclFile);
 
   auto           sm = make_shared<SystemModel>();
@@ -2149,7 +2150,7 @@ void UT_ICL_Reader::test_Generate_SIB_mux_pre ()
 {
   // ---------------- Setup
   //
-  auto           iclFile = GetTestFilePath("SIB_mux_pre.icl");
+  auto           iclFile = GetTestFilePath("Bundle_SIB_mux_pre.icl");
   std::ifstream  ifs(iclFile);
   auto           sm = make_shared<SystemModel>();
   ICL_Reader_TSS sut(sm);
@@ -2249,12 +2250,12 @@ void UT_ICL_Reader::test_Generate_Examples ()
 
   auto data =
   {
-    make_tuple("SIB_mux_post.icl",       "test_Generate_SIB_mux_post_PrettyPrint.txt"),
-    make_tuple("Daisy_3WI.icl",          "test_Generate_Daisy_3WI_PrettyPrint.txt"),
-    make_tuple("Single_SIB_3WI.icl",     "test_Generate_Single_SIB_3WI_PrettyPrint.txt"),
-    make_tuple("Multiple_SIB_3WI.icl",   "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),
-    make_tuple("Nested_SIB_3WI.icl",     "test_Generate_Nested_SIB_3WI_PrettyPrint.txt"),
-    make_tuple("BAD_Nested_SIB_3WI.icl", "test_Generate_BAD_Nested_SIB_3WI_PrettyPrint.txt"),
+    make_tuple("Bundle_SIB_mux_post.icl",       "test_Generate_SIB_mux_post_PrettyPrint.txt"),
+    make_tuple("Bundle_Daisy_3WI.icl",          "test_Generate_Daisy_3WI_PrettyPrint.txt"),
+    make_tuple("Bundle_Single_SIB_3WI.icl",     "test_Generate_Single_SIB_3WI_PrettyPrint.txt"),
+    make_tuple("Bundle_Multiple_SIB_3WI.icl",   "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),
+    make_tuple("Bundle_Nested_SIB_3WI.icl",     "test_Generate_Nested_SIB_3WI_PrettyPrint.txt"),
+    make_tuple("Bundle_BAD_Nested_SIB_3WI.icl", "test_Generate_BAD_Nested_SIB_3WI_PrettyPrint.txt"),
   };
 
   // ---------------- DDT Exercise
@@ -2308,13 +2309,13 @@ void UT_ICL_Reader::test_Parse_Examples ()
 
   auto data =
   {
-    make_tuple("Top_SReg.icl",           "test_Generate_Top_SReg_PrettyPrint.txt"),
-    make_tuple("SIB_mux_post.icl",       "test_Generate_SIB_mux_post_PrettyPrint.txt"),
-    make_tuple("Daisy_3WI.icl",          "test_Generate_Daisy_3WI_PrettyPrint.txt"),
-    make_tuple("Single_SIB_3WI.icl",     "test_Generate_Single_SIB_3WI_PrettyPrint.txt"),
-    make_tuple("Multiple_SIB_3WI.icl",   "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),
-    make_tuple("Nested_SIB_3WI.icl",     "test_Generate_Nested_SIB_3WI_PrettyPrint.txt"),
-    make_tuple("BAD_Nested_SIB_3WI.icl", "test_Generate_BAD_Nested_SIB_3WI_PrettyPrint.txt"),
+    make_tuple("Bundle_Top_SReg.icl",           "test_Generate_Top_SReg_PrettyPrint.txt"),
+    make_tuple("Bundle_SIB_mux_post.icl",       "test_Generate_SIB_mux_post_PrettyPrint.txt"),
+    make_tuple("Bundle_Daisy_3WI.icl",          "test_Generate_Daisy_3WI_PrettyPrint.txt"),
+    make_tuple("Bundle_Single_SIB_3WI.icl",     "test_Generate_Single_SIB_3WI_PrettyPrint.txt"),
+    make_tuple("Bundle_Multiple_SIB_3WI.icl",   "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),
+    make_tuple("Bundle_Nested_SIB_3WI.icl",     "test_Generate_Nested_SIB_3WI_PrettyPrint.txt"),
+    make_tuple("Bundle_BAD_Nested_SIB_3WI.icl", "test_Generate_BAD_Nested_SIB_3WI_PrettyPrint.txt"),
   };
 
   // ---------------- DDT Exercise

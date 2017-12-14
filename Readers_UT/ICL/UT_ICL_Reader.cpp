@@ -30,9 +30,11 @@
 
 #include <cxxtest/ValueTraits.h>
 #include <experimental/string_view>
+#include <vector>
 #include <memory>
 #include <fstream>
 
+using std::vector;
 using std::tuple;
 using std::make_tuple;
 using std::string;
@@ -2264,10 +2266,10 @@ void UT_ICL_Reader::test_Generate_Examples ()
 }
 
 
-//! Checks ICL_Reader::Parse() when parsing examples (mostly from IEEE 1687-2014 standard)
+//! Checks ICL_Reader::Parse() when parsing examples bundled in single file (mostly from IEEE 1687-2014 standard)
 //!
-//! @note ICL has been cleaned up to ease understanding (some useless stuffs may have been removed)
-void UT_ICL_Reader::test_Parse_Examples ()
+//! @note ICL files have been cleaned up to ease understanding (some useless stuffs may have been removed)
+void UT_ICL_Reader::test_Parse_Examples_Bundles ()
 {
   // ---------------- DDT Setup
   //
@@ -2322,6 +2324,148 @@ void UT_ICL_Reader::test_Parse_Examples ()
   //
   TS_DATA_DRIVEN_TEST(checker, data);
 }
+
+
+//! Checks ICL_Reader::Parse() when parsing examples from list of files (mostly from IEEE 1687-2014 standard)
+//!
+//! @note ICL files have been cleaned up to ease understanding (some useless stuffs may have been removed)
+void UT_ICL_Reader::test_CreateModelFromFiles ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto& iclFilesNames    = std::get<0>(data);
+    auto        expectedFileName = std::get<1>(data);
+
+    CxxTest::setAbortTestOnFail(true);
+
+    vector<string> iclFilesPaths;
+    for (auto iclFileName : iclFilesNames)
+    {
+      iclFilesPaths.push_back(GetTestFilePath(iclFileName));
+    }
+
+    auto sm = make_shared<SystemModel>();
+    ICL_Reader sut(sm);
+
+    sut.FilesSearchPaths().emplace_back(GetTestDirPath(""));
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.CreateModelFromFiles(iclFilesPaths));
+
+    // ---------------- Verify
+    //
+    auto topNode = std::dynamic_pointer_cast<ParentNode>(sut.ParsedSystemModel());
+
+    // With PrettyPrinter
+    auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode,   PrettyPrinterOptions::Parser_debug_no_id
+                                                                    | PrettyPrinterOptions::ShowSelectorTables);
+    auto expected_PrettyPrint = GetExpectedModelPrettyPrint(expectedFileName);
+
+    TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
+    // With Checker
+    PrependWithTap(sm, topNode);   // This is to avoid warnings about missing AccessInterface
+    auto modelCheckResult = sm->Check();
+    TS_ASSERT_EMPTY (modelCheckResult.errors);
+  };
+
+  using data_t = tuple<vector<string_view>, string_view>;
+  auto data =
+  {
+    // 4 - Same as test 3 but with different files order and a JTAG TAP
+    data_t({
+             "SReg.icl",
+             "Daisy_3WI.icl",
+             "Instrument.icl",
+             "Tap_and_Daisy_3WI.icl",
+             "WrappedInstr.icl",
+            },
+            "Tap_and_Daisy_3WI_PrettyPrint.txt"),
+    // 0
+    data_t({
+            "Tap_and_SReg.icl",
+            "SReg.icl",
+           },
+           "test_Generate_Top_SReg_PrettyPrint.txt"),
+
+    // 1 - Same as test 0 but with files order reversed
+    data_t({
+            "SReg.icl",
+            "Tap_and_SReg.icl",
+           },
+           "test_Generate_Top_SReg_PrettyPrint.txt"),
+
+    // 2
+    data_t({
+             "Daisy_3WI.icl",
+             "WrappedInstr.icl",
+             "Instrument.icl",
+             "SReg.icl",
+            },
+            "test_Generate_Daisy_3WI_PrettyPrint.txt"),
+
+    // 3 - Same as test 2 but with different files order (except to as there is no AccessLink)
+    data_t({
+             "Daisy_3WI.icl",
+             "SReg.icl",
+             "Instrument.icl",
+             "WrappedInstr.icl",
+            },
+            "test_Generate_Daisy_3WI_PrettyPrint.txt"),
+
+
+    // 5
+    data_t({
+             "Top_Single_SIB_3WI.icl",
+             "WrappedInstr.icl",
+             "Instrument.icl",
+             "SIB_mux_pre.icl",
+             "SReg.icl",
+           },
+           "test_Generate_Single_SIB_3WI_PrettyPrint.txt"),
+
+    // 6
+    data_t({
+             "Top_Multiple_SIB_3WI.icl",
+             "WrappedInstr.icl",
+             "Instrument.icl",
+             "SIB_mux_pre.icl",
+             "SReg.icl",
+           },
+           "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),
+
+    // 7
+    data_t({
+             "Top_Nested_SIB_3WI.icl",
+             "WrappedInstr.icl",
+             "Instrument.icl",
+             "SIB_mux_pre.icl",
+             "SReg.icl",
+           },
+           "test_Generate_Nested_SIB_3WI_PrettyPrint.txt"),
+
+    // 8
+    data_t({
+             "Top_BAD_Nested_SIB_3WI.icl",
+             "WrappedInstr.icl",
+             "Instrument.icl",
+             "SIB_mux_post.icl",
+             "SIB_mux_pre.icl", // This one is not used but should have no impact on resulting SystemModel !
+             "SReg.icl",
+           },
+           "test_Generate_BAD_Nested_SIB_3WI_PrettyPrint.txt"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
 
 
 //===========================================================================

@@ -50,6 +50,17 @@ class ICL_Reader : public Parsers::Reader
   //! @note This is mainly intended for tests purpose but can be used also at application level
   void  ParseOnlyCheckGrammar (bool onlyGrammarCheck) { m_parseOnlyCheckGrammar = onlyGrammarCheck; }
 
+  //! Creates a SystemModel sub-tree from list of files
+  //!
+  //! @param filename  File path
+  //!
+  void CreateModelFromFiles(std::experimental::string_view listFilePath);
+
+  //! Creates a SystemModel sub-tree from list of files
+  //!
+  //! @param filename  File path
+  //!
+  void CreateModelFromFiles(const std::vector<std::string>& filesPaths);
 
   // ---------------- Protected Methods
   //

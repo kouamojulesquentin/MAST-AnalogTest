@@ -28,9 +28,11 @@
 #include "g3log/g3log.hpp"
 
 using ICL::ICL_Reader;
+using Parsers::ParserException;
 using Parsers::AST_Checker;
 using Parsers::AST_SystemModelGenerator;
 
+using std::vector;
 using std::experimental::string_view;
 using std::string;
 using std::shared_ptr;
@@ -52,6 +54,73 @@ ICL_Reader::ICL_Reader(std::shared_ptr<mast::SystemModel> sm)
 {
 }
 
+
+
+//! Creates a SystemModel sub-tree from list of files
+//!
+//! @param listFilePath File path for list of ICL files path (one per line)
+//!
+void ICL_Reader::CreateModelFromFiles (std::experimental::string_view listFilePath)
+{
+}
+//
+//  End of: ICL_Reader::CreateModelFromFiles
+//---------------------------------------------------------------------------
+
+
+//! Creates a SystemModel sub-tree from list of files
+//!
+//! @param filesPaths   Paths of ICL files to parse in order to build a SystemModel sub-tree
+//!
+void ICL_Reader::CreateModelFromFiles (const vector<string>& filesPaths)
+{
+  // ---------------- Build an AST from all SIT files
+  //
+  for (const auto& filePath : filesPaths)
+  {
+    CHECK_PARAMETER_NOT_EMPTY(filePath, "Must specify a valid (not empty) file path");
+
+    std::ifstream stream(filePath.data());
+
+    CHECK_TRUE  (stream.good(), "Cannot open file: "s            .append(filePath.cbegin(), filePath.cend()));
+    CHECK_FALSE (stream.eof(),  "Cannot parse empty ICL file: "s .append(filePath.cbegin(), filePath.cend()));
+
+    try
+    {
+      UpdateAstFromIcl(stream);
+    }
+    catch(ParserException& exc)
+    {
+      PublicData().parsedTopNode.reset();
+      if (exc.filePath.empty())
+      {
+        exc.filePath.append(filePath.cbegin(), filePath.cend());
+        throw exc;
+      }
+      throw;
+    }
+
+    LOG(INFO) << "File \"" << filePath << "\" is grammatically correct";
+  }
+
+  // ---------------- Create SystemModel from AST (constructed while parsing files)
+  //
+  if (!m_parseOnlyCheckGrammar)
+  {
+    auto checkResult = AST_Checker::Check(m_ast->Network());
+
+    CHECK_VALUE_EMPTY(checkResult.IssuesReport(), "Errors have been detected while parsing ICL stream");
+
+    UniquifyAST();
+    auto& data = Reader::PublicData();
+    data.parsedTopNode = GenerateSystemModelNodes(m_ast.get());
+  }
+
+  LOG(INFO) << "ICL files have been parsed successfully";
+}
+//
+//  End of: ICL_Reader::CreateModelFromFiles
+//---------------------------------------------------------------------------
 
 
 //! Generates Mast SystemModel from AST

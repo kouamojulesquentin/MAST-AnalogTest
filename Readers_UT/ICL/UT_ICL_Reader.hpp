@@ -69,7 +69,11 @@ class UT_ICL_Reader : public CxxTest::TestSuite
 
   // ---------------- Parse
   //
-  void test_Parse_Examples ();
+  void test_Parse_Examples_Bundles ();
+
+  // ---------------- CreateModelFromFiles
+  //
+  void test_CreateModelFromFiles ();
 
   // ================ Other Methods ================
 

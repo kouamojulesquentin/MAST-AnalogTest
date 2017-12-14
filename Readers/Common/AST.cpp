@@ -731,6 +731,8 @@ void AST::Uniquify ()
   m_uniquifiedNamespace = Create_Namespace("UniquifiedModules");
   SetNamespace(m_uniquifiedNamespace);
 
+  m_network.UniquifiedNamespace(m_uniquifiedNamespace);
+
   auto topModule = m_network.TopModule();
 
   CHECK_VALUE_NOT_NULL(topModule, "Network has no \"top\" node");

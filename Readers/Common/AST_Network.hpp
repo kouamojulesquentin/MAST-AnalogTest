@@ -59,6 +59,15 @@ class AST_Network final : public AST_Node
   //!
   AST_Module* Module(const AST_ModuleIdentifier* identifier) const;
 
+  //! Returns namespace used for uniquified modules
+  //!
+  const AST_Namespace* UniquifiedNamespace() const { return m_uniquifiedNamespace; }
+
+  //! Sets namespace used for uniquified modules
+  //!
+  void  UniquifiedNamespace (const AST_Namespace* uniquifiedNamespace) { m_uniquifiedNamespace = uniquifiedNamespace; }
+
+
   // ---------------- Private Methods
   //
   private:
@@ -74,9 +83,10 @@ class AST_Network final : public AST_Node
   using NameToModuleMapper_t       = std::map<std::string,          AST_Module*>; // String is for module name is usefull for fast search of modules in the namespace
   using NamespaceToModulesMapper_t = std::map<const AST_Namespace*, NameToModuleMapper_t>;
 
-  NamespaceToModulesMapper_t m_modules;               //!< Network modules by namespace they are defined in
-  AST_Module*                m_topModule   = nullptr; //!< Top module (the one with an AccessLink)
-  AST_Module*                m_firstModule = nullptr; //!< In case of there is no module with an AccessLink, it will serve as top module
+  NamespaceToModulesMapper_t m_modules;                       //!< Network modules by namespace they are defined in
+  AST_Module*                m_topModule           = nullptr; //!< Top module (the one with an AccessLink)
+  AST_Module*                m_firstModule         = nullptr; //!< In case of there is no module with an AccessLink, it will serve as top module
+  const AST_Namespace*       m_uniquifiedNamespace = nullptr; //!< Namespace used for uniquified modules definitions (used to differentiate uniquified modules from others)
 };
 //
 //  End of AST_Network class declaration

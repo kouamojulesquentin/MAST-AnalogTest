@@ -61,10 +61,14 @@ void AST_Network::AddModule (const AST_Namespace* moduleNamespace, AST_Module* m
   }
   previous = module;
 
-  if (module->HasAccessLink())
+  auto isUniquified = (moduleNamespace == m_uniquifiedNamespace);
+  if (!isUniquified && module->HasAccessLink())
   {
     CHECK_TRUE (   (m_topModule == nullptr)
-                || !m_topModule->HasAccessLink(), "Must have only one module with an AccessLink");
+                || !m_topModule->HasAccessLink(), "Must have only one module with an AccessLink. Have \""s
+                                                  .append(m_topModule->Name())
+                                                  .append("\" and \"")
+                                                  .append(module->Name()).append("."));
 
     m_topModule   = module;
     m_firstModule = nullptr;

@@ -125,7 +125,11 @@ void ICL_Reader::CreateModelFromFiles (std::experimental::string_view listFilePa
     string_view fileNameView(fileName);
     mast::Utility::TrimBoth(fileNameView);
 
-    if (fileNameView.empty() || (fileNameView.front() == '#'))  // Ignore empty lines and comment only lines
+    if (    fileNameView.empty()
+        || (fileNameView.front() == '#')   // Ignore empty lines and comment only lines
+        || (fileNameView.front() == '\xa') // Ignore eol character that may remain due to not converted files between Windows and Linux
+        || (fileNameView.front() == '\xd') // Ignore eol character that may remain due to not converted files between Windows and Linux
+       )
     {
       continue;
     }

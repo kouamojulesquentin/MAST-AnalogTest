@@ -2377,15 +2377,6 @@ void UT_ICL_Reader::test_CreateModelFromFiles ()
   using data_t = tuple<vector<string_view>, string_view>;
   auto data =
   {
-    // 4 - Same as test 3 but with different files order and a JTAG TAP
-    data_t({
-             "SReg.icl",
-             "Daisy_3WI.icl",
-             "Instrument.icl",
-             "Tap_and_Daisy_3WI.icl",
-             "WrappedInstr.icl",
-            },
-            "Tap_and_Daisy_3WI_PrettyPrint.txt"),
     // 0
     data_t({
             "Tap_and_SReg.icl",
@@ -2418,6 +2409,15 @@ void UT_ICL_Reader::test_CreateModelFromFiles ()
             },
             "test_Generate_Daisy_3WI_PrettyPrint.txt"),
 
+    // 4 - Same as test 3 but with different files order and a JTAG TAP
+    data_t({
+             "SReg.icl",
+             "Daisy_3WI.icl",
+             "Instrument.icl",
+             "Tap_and_Daisy_3WI.icl",
+             "WrappedInstr.icl",
+            },
+            "Tap_and_Daisy_3WI_PrettyPrint.txt"),
 
     // 5
     data_t({
@@ -2465,6 +2465,61 @@ void UT_ICL_Reader::test_CreateModelFromFiles ()
   //
   TS_DATA_DRIVEN_TEST(checker, data);
 }
+
+
+//! Checks ICL_Reader::Parse() when parsing examples from list of files defined in a file (mostly from IEEE 1687-2014 standard)
+//!
+void UT_ICL_Reader::test_CreateModelFromFiles_ListFile ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto& listFileName     = std::get<0>(data);
+    auto        expectedFileName = std::get<1>(data);
+
+    CxxTest::setAbortTestOnFail(true);
+
+    const auto listFilePath = GetTestFilePath(listFileName);
+
+    auto sm = make_shared<SystemModel>();
+    ICL_Reader sut(sm);
+
+    sut.FilesSearchPaths().emplace_back(GetTestDirPath(""));
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.CreateModelFromFiles(listFilePath));
+
+    // ---------------- Verify
+    //
+    auto topNode = std::dynamic_pointer_cast<ParentNode>(sut.ParsedSystemModel());
+
+    // With PrettyPrinter
+    auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode,   PrettyPrinterOptions::Parser_debug_no_id
+                                                                    | PrettyPrinterOptions::ShowSelectorTables);
+    auto expected_PrettyPrint = GetExpectedModelPrettyPrint(expectedFileName);
+
+    TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
+    // With Checker
+    PrependWithTap(sm, topNode);   // This is to avoid warnings about missing AccessInterface
+    auto modelCheckResult = sm->Check();
+    TS_ASSERT_EMPTY (modelCheckResult.errors);
+  };
+
+  auto data =
+  {
+    make_tuple("List_Multiple_SIB_3WI.txt", "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
 
 
 

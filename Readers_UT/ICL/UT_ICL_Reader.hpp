@@ -74,6 +74,7 @@ class UT_ICL_Reader : public CxxTest::TestSuite
   // ---------------- CreateModelFromFiles
   //
   void test_CreateModelFromFiles ();
+  void test_CreateModelFromFiles_ListFile ();
 
   // ================ Other Methods ================
 

@@ -11,6 +11,7 @@
 //!
 //===========================================================================
 
+#include <string>
 #include <experimental/string_view>
 #include <fstream>
 #include <memory>
@@ -24,6 +25,8 @@
 #include "AST.hpp"
 #include "AST_Checker.hpp"
 #include "AST_SystemModelGenerator.hpp"
+#include "Utility.hpp"
+#include "MastConfig.hpp"
 
 #include "g3log/g3log.hpp"
 
@@ -37,6 +40,7 @@ using std::experimental::string_view;
 using std::string;
 using std::shared_ptr;
 
+using namespace mast;
 using namespace std::string_literals;
 using namespace std::experimental::literals::string_view_literals;
 
@@ -55,17 +59,90 @@ ICL_Reader::ICL_Reader(std::shared_ptr<mast::SystemModel> sm)
 }
 
 
-
 //! Creates a SystemModel sub-tree from list of files
+//!
+//! @note List can provide relative or absolute path or just file name (actual paths will be guessed from a set of directory path)
+//! @note When no extension is provided, if a file cannot be found, an attempt will be made with ".icl" extension
 //!
 //! @param listFilePath File path for list of ICL files path (one per line)
 //!
 void ICL_Reader::CreateModelFromFiles (std::experimental::string_view listFilePath)
 {
+  CHECK_FILE_EXISTS(listFilePath.data());
+
+  std::ifstream listStream(listFilePath.data());
+
+  CHECK_TRUE  (listStream.good(), "Cannot open file: "s                  .append(listFilePath.cbegin(), listFilePath.cend()));
+  CHECK_FALSE (listStream.eof(),  "List of ICL file shall not be empty"s .append(listFilePath.cbegin(), listFilePath.cend()));
+
+  const auto& dirPaths = FilesSearchPaths();
+
+  // Lamba: Log path of ICL file that will be parsed
+  auto logParsedFile = [](string&& filePath)
+  {
+    LOG(INFO) << "Will parse ICL file \"" << filePath << "\"";
+    return std::move(filePath);
+  };
+
+  // Lamba: When needed prefix file name with a path (from set of search path) until it can be opened
+  auto resolveFilePath = [&dirPaths, &logParsedFile](string_view fileName) -> string
+  {
+    using namespace mast;
+    if (mast::Utility::FileExists(fileName.data()))
+    {
+      return logParsedFile(string(fileName));
+    }
+
+    for (const auto& dirPath : dirPaths)
+    {
+      auto filePath = dirPath;
+      filePath.append(DIRECTORY_SEPARATOR).append(fileName.cbegin(), fileName.cend());
+
+      if (mast::Utility::FileExists(filePath))
+      {
+        return logParsedFile(std::move(filePath));
+      }
+
+      filePath.append(".icl");
+      if (mast::Utility::FileExists(filePath))
+      {
+        return logParsedFile(std::move(filePath));
+      }
+    }
+
+    CHECK_FAILED("Cannot find file with name \""s.append(fileName.cbegin(), fileName.cend()).append("\""));
+  };
+
+
+  // ---------------- Convert files names to path
+  //
+  vector<string> filesPath;
+  string fileName;
+  while (std::getline(listStream, fileName))
+  {
+    listStream >> fileName;
+
+    string_view fileNameView(fileName);
+    mast::Utility::TrimBoth(fileNameView);
+
+    if (fileNameView.empty() || (fileNameView.front() == '#'))  // Ignore empty lines and comment only lines
+    {
+      continue;
+    }
+
+    filesPath.emplace_back(resolveFilePath(fileNameView));
+
+    fileName.clear();
+  }
+
+  // ---------------- Do create model using files path
+  //
+  CreateModelFromFiles(filesPath);
 }
 //
 //  End of: ICL_Reader::CreateModelFromFiles
 //---------------------------------------------------------------------------
+
 
 
 //! Creates a SystemModel sub-tree from list of files
@@ -100,7 +177,7 @@ void ICL_Reader::CreateModelFromFiles (const vector<string>& filesPaths)
       throw;
     }
 
-    LOG(INFO) << "File \"" << filePath << "\" is grammatically correct";
+    LOG(INFO) << "ICL file \"" << filePath << "\" is grammatically correct";
   }
 
   // ---------------- Create SystemModel from AST (constructed while parsing files)

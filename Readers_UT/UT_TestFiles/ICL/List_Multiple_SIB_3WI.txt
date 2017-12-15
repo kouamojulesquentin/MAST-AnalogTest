@@ -1,5 +1,20 @@
+# This line is a comment (because it starts with '#' character).
+#
+# Empty lines are also valid.
+#
+# Spaces at start and end of lines are ignored.
+  # Even for comments like this one!
+
 Top_Multiple_SIB_3WI.icl
-WrappedInstr.icl
-Instrument.icl
-SIB_mux_pre.icl
-SReg.icl
+
+  WrappedInstr.icl
+    Instrument.icl
+
+# When no extension is provided, mast will try to find path adding ".icl" example
+  SIB_mux_pre
+    SReg.icl
+
+
+
+
+

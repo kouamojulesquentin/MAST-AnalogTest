@@ -74,6 +74,7 @@ class UT_MastEnvironment : public CxxTest::TestSuite
   void test_Start_RealPDLAlgo ();
   void test_Start_Arguments_RealPDLAlgo_SIT ();
   void test_Start_Arguments_RealPDLAlgo_ICL ();
+  void test_Start_Arguments_RealPDLAlgo_ICL_List ();
   void test_Start_Argc_Argv_RealPDLAlgo_SIT ();
 
   // ================ Other Methods ================

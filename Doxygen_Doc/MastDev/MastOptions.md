@@ -28,8 +28,8 @@ Default configuration file looks like this:
 
     Mast_Options:
       ICL_file_path:                                          # [ICL] file used by the project to represent top module
+      ICL_list_file_path:                                     # List of [ICL] files to represent project system model
       SIT_file_path:                                          # [SIT] file used by the project to represent top module
-      Modules_list_file_path:                                 # List of [SIT] or [ICL] files to represent project system model
       Access_interface_protocol:
         Name:                                                 # When defined, it overrides the one defined in [SIT] file
         Parameters:                                           # Optional access interface protocol parameters (in case the one in [SIT] file is overriden)
@@ -83,24 +83,24 @@ Command line switches override same value in configuration file.
 
 Usage is:
 
-  Mast.exe  [-s=<File path>|-i=<File path>|-m=<File path>]
-            [-c=<File path>]
-            [--plugin_dir=<Directory path>] ...
-            [--plugin=<File path>] ...
-            [-l]
-            [--log_file=<File path>]
-            [--log_show=<all|date|file_name|function_name|level|line_number|microseconds|std|std_less|std_more|thread_id|time>] ...
-            [--log_level=<debug|error|info|warning>] ...
-            [--log_kind=<cout|file|only_errors_on_cerr>] ...
-            [--check]
-            [--check_file=<File path>]
-            [-a=<last_lazy|last_or_default|last_or_default_greedy| "name defined by a plugin">]
-            [--max_cycle=<Positive integer with 'ms' or 's' suffix>]
-            [--min_cycle=<Positive integer with 'ms' or 's' suffix>]
-            [--protocol_parameters=<Protocol parameter(s)>]
-            [--protocol_name=<Protocol name>]
-            [-h]
-            [--]
+  mast  [-s=<File path>|-i=<File path>|--icl_list=<File path>]
+        [-c=<File path>]
+        [--plugin_dir=<Directory path>] ...
+        [--plugin=<File path>] ...
+        [-l]
+        [--log_file=<File path>]
+        [--log_show=<all|date|file_name|function_name|level|line_number|microseconds|std|std_less|std_more|thread_id|time>] ...
+        [--log_level=<debug|error|info|warning>] ...
+        [--log_kind=<cout|file|only_errors_on_cerr>] ...
+        [--check]
+        [--check_file=<File path>]
+        [-a=<last_lazy|last_or_default|last_or_default_greedy| "name defined by a plugin">]
+        [--max_cycle=<Positive integer with 'ms' or 's' suffix>]
+        [--min_cycle=<Positive integer with 'ms' or 's' suffix>]
+        [--protocol_parameters=<Protocol parameter(s)>]
+        [--protocol_name=<Protocol name>]
+        [-h]
+        [--]
 
 
 Where:
@@ -113,8 +113,8 @@ Where:
   -i=<File path>,  --icl=<File path>
     Defines ICL that specified SUT model (top)
          -- OR --
-  -m=<File path>,  --modules=<File path>
-    Defines file with list of files that specified SUT model
+  --icl_list=<File path>
+    Defines file with list of ICL files that specified SUT model
 
 
   -c=<File path>,  --conf=<File path>

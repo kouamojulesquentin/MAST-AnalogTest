@@ -42,6 +42,10 @@ class ModelBuildDriver final
   //!
   std::shared_ptr<SystemModel> CreateModelFromIclFile(const std::string& iclFilePath);
 
+  //! Create MAST system model starting from a ICL file
+  //!
+  std::shared_ptr<SystemModel> CreateModelFromIclFileList(const std::string& iclListFilePath);
+
   //! Create MAST system model starting from a SIT file
   //!
   std::shared_ptr<SystemModel> CreateModelFromSitFile(const std::string& sitFilePath);
@@ -61,6 +65,7 @@ class ModelBuildDriver final
   void                        AppendToSearchPath          (const std::string& filePath);
   std::string                 AssessActualProjectFilePath (const std::string& projectFileName, std::experimental::string_view defaultFileExtension);
   std::shared_ptr<ParentNode> ParseIclFile                (const std::string& iclFilePath);
+  std::shared_ptr<ParentNode> ParseIclFiles               (const std::string& iclListFilePath);
   std::shared_ptr<ParentNode> ParseSitFile                (const std::string& sitFilePath);
 
   // ---------------- Private Fields

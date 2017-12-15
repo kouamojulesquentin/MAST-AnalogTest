@@ -121,7 +121,7 @@ string ModelBuildDriver::AssessActualProjectFilePath (const string& projectFileN
 //---------------------------------------------------------------------------
 
 
-//! Create MAST system model starting from a ICL file
+//! Creates MAST system model starting from a ICL file
 //!
 //! @param iclFilePath  ICL file path
 //!
@@ -144,8 +144,30 @@ shared_ptr<SystemModel> ModelBuildDriver::CreateModelFromIclFile (const string& 
 //---------------------------------------------------------------------------
 
 
+//! Creates MAST system model using list of files provided by a file
+//!
+//! @param iclListFilePath  ICL list file path
+//!
+//! @return Build MAST system model
+//!
+shared_ptr<SystemModel> ModelBuildDriver::CreateModelFromIclFileList (const string& iclListFilePath)
+{
+  CHECK_PARAMETER_NOT_EMPTY(iclListFilePath, "Must specify a valid list of ICL file path");
 
-//! Create MAST system model starting from a SIT file
+  m_systemModel = make_shared<SystemModel>();
+
+  auto topNode = ParseIclFiles(AssessActualProjectFilePath(iclListFilePath, ".txt"));
+
+  m_systemModel->ReplaceRoot(topNode, false);
+
+  return m_systemModel;
+}
+//
+//  End of: ModelBuildDriver::CreateModelFromIclFileList
+//---------------------------------------------------------------------------
+
+
+//! Creates MAST system model starting from a SIT file
 //!
 //! @param sitFilePath  SIT file path
 //!
@@ -168,7 +190,7 @@ shared_ptr<SystemModel> ModelBuildDriver::CreateModelFromSitFile (const string& 
 //---------------------------------------------------------------------------
 
 
-//! Create MAST sub-model from a ICL file
+//! Creates MAST sub-model from a ICL file
 //!
 //! @param iclFilePath  ICL file path
 //!
@@ -217,8 +239,57 @@ shared_ptr<ParentNode> ModelBuildDriver::ParseIclFile (const string& iclFilePath
 //---------------------------------------------------------------------------
 
 
+//! Creates MAST sub-model from a ICL file
+//!
+//! @param iclListFilePath  ICL list file path
+//!
+//! @return top node of build sub-model
+//!
+shared_ptr<ParentNode> ModelBuildDriver::ParseIclFiles (const string& iclListFilePath)
+{
+  CHECK_PARAMETER_NOT_EMPTY(iclListFilePath, "ICL list file path must not be empty");
 
-//! Create MAST sub-model from a SIT file
+  ICL::ICL_Reader reader(m_systemModel);
+
+  try
+  {
+    auto& searchPath = reader.FilesSearchPaths();
+    searchPath.insert(searchPath.end(), m_searchPaths.cbegin(), m_searchPaths.cend());
+    reader.CreateModelFromFiles(iclListFilePath);
+  }
+  catch(Parsers::ParserException& exc)
+  {
+    m_errorMessage = reader.ErrorMessage();
+    if (m_errorMessage.empty())
+    {
+      m_errorMessage = exc.Message();
+    }
+    LOG(ERROR_LVL) << "Failed to create model from ICL files list in \"" << iclListFilePath << "\". " << m_errorMessage;
+    throw;
+  }
+
+  auto topNode = dynamic_pointer_cast<ParentNode>(reader.ParsedSystemModel());
+
+  CHECK_VALUE_NOT_NULL(topNode, "Failed to create model from ICL files list in file \""s.append(iclListFilePath).append("\""));
+  LOG(INFO) << "ICL files in list \"" << iclListFilePath << "\" have been parsed successfully";
+
+  // ---------------- Save PDL algorithm associations with nodes
+  //
+  const auto& associations = reader.PDLAlgorithmNameToNodeAssociation();
+
+  m_algoNamesAssociatedToNodes.insert(m_algoNamesAssociatedToNodes.end(),
+                                      associations.begin(),
+                                      associations.end());
+
+  return topNode;
+}
+//
+//  End of: ModelBuildDriver::ParseIclFiles
+//---------------------------------------------------------------------------
+
+
+
+//! Creates MAST sub-model from a SIT file
 //!
 //! @param sitFilePath  SIT file path
 //!

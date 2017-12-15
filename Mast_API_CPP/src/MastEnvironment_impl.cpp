@@ -357,9 +357,13 @@ void MastEnvironment_impl::CreateSystemModel ()
   {
     systemModel = CreateSystemModel_FromIclFile(m_configuration->IclFilePath());
   }
+  else if (!m_configuration->IclListFilePath().empty())
+  {
+    systemModel = CreateSystemModel_FromIclFileList(m_configuration->IclListFilePath());
+  }
   else
   {
-    CHECK_FAILED("Only support single SIT or ICL source file yet");
+    CHECK_FAILED("No SIT nor ICL file or list has been provided");
   }
 
   CHECK_VALUE_NOT_NULL(systemModel, "Faile to create SystemModel");
@@ -415,6 +419,34 @@ shared_ptr<SystemModel> MastEnvironment_impl::CreateSystemModel_FromIclFile (con
 //  End of: MastEnvironment_impl::CreateSystemModel_FromIclFile
 //---------------------------------------------------------------------------
 
+
+//! Builds SystemModel from list of ICL files
+//!
+//! @param listFile  File name or path that provides list of ICL files to process to build SUT SystemModel
+//!
+shared_ptr<SystemModel> MastEnvironment_impl::CreateSystemModel_FromIclFileList (const string& listFile)
+{
+  CHECK_PARAMETER_NOT_EMPTY(listFile, "A valid (non empty) list file path must be provided");
+
+  auto listFilePath = GetActualProjectFilePath(listFile, ".txt");
+  CHECK_FILE_EXISTS_EX(listFilePath, "ICL list file: ");
+  LOG(INFO) << "Using ICL list file: " << listFilePath;
+  LOG(INFO) << "Creating System Model";
+
+  ModelBuildDriver buildDriver;
+  auto systemModel = buildDriver.CreateModelFromIclFileList(listFilePath);
+  auto topNode     = dynamic_pointer_cast<ParentNode>(systemModel->Root());
+
+  CHECK_VALUE_NOT_NULL(topNode, "Failed to parse file: "s + listFilePath);
+
+  m_algoNamesAssociatedToNodes = buildDriver.PDLAlgorithmNameToNodeAssociation();
+
+  LOG(INFO) << "ICL file has been parsed successfully";
+  return systemModel;
+}
+//
+//  End of: MastEnvironment_impl::CreateSystemModel_FromIclFile
+//---------------------------------------------------------------------------
 
 //! Builds SystemModel from "Top" SIT file
 //!

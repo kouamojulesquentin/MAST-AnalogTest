@@ -1,7 +1,7 @@
 Module SReg
 {
   ScanInPort    SI;
-  ScanOutPort   SO          { Source  SR[0];}
+  ScanOutPort   SO          { Source  reg[0];}
   ScanInterface scan_client { Port SI; Port SO; }
-  ScanRegister SR[7:0]      { ScanInSource SI; ResetValue 'b0; }
+  ScanRegister reg[11:0]    { ScanInSource SI; ResetValue 'b0; }
 }

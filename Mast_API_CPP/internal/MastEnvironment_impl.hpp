@@ -74,9 +74,6 @@ class MastEnvironment_impl final
   void ReportParsedModel();   //! Save GML/Text view of parsed SIT model
   void Start();               //! Starts system model manager AND wait till it ends
 
-//+  bool UnitTestsContext() const { return m_unitTestsContext; }
-//+  void UnitTestsContext (bool unitTestsContext) { m_unitTestsContext = unitTestsContext; }
-
   // ---------------- Private Methods
   //
   private:
@@ -86,8 +83,9 @@ class MastEnvironment_impl final
   void InitializeLogger ();
   std::string GetActualProjectFilePath (const std::string& sitFile, std::experimental::string_view defaultFileExtension) const;
 
-  std::shared_ptr<SystemModel> CreateSystemModel_FromSitFile (const std::string& sitFile);
-  std::shared_ptr<SystemModel> CreateSystemModel_FromIclFile (const std::string& iclFile);
+  std::shared_ptr<SystemModel> CreateSystemModel_FromSitFile     (const std::string& sitFile);
+  std::shared_ptr<SystemModel> CreateSystemModel_FromIclFile     (const std::string& iclFile);
+  std::shared_ptr<SystemModel> CreateSystemModel_FromIclFileList (const std::string& listFile);
 
   std::shared_ptr<SystemModelManagerMonitor> MakeManagerMonitor ();
   static std::vector<std::string>            MakeArgumentsVector (int argc, const char* argv[]);

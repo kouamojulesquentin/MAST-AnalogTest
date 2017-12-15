@@ -145,8 +145,8 @@ MastConfiguration::MastConfiguration ()
   : m_minTimeBetweenCycles        (10ms)
   , m_maxTimeBetweenCycles        (1s)
   , m_iclFilePath                 ("")
+  , m_iclListFilePath             ("")
   , m_sitFilePath                 ("")
-  , m_projectListFilePath         ("")
   , m_configurationAlgorithm      ("last_or_default")
   , m_aiProtocolName              ("")
   , m_aiProtocolParameters        ("")
@@ -334,8 +334,8 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
 
 
     updateString (m_iclFilePath,                 {"ICL_file_path"});
+    updateString (m_iclListFilePath,             {"ICL_list_file_path"});
     updateString (m_sitFilePath,                 {"SIT_file_path"});
-    updateString (m_projectListFilePath,         {"Modules_list_file_path"});
     updateString (m_aiProtocolName,              {"Access_interface_protocol", "Name"});
     updateString (m_aiProtocolParameters,        {"Access_interface_protocol", "Parameters"});
     updateString (m_configurationAlgorithm,      {"Configuration_algorithm"});
@@ -454,10 +454,10 @@ void MastConfiguration::Update (vector<string> arguments)
     TCLAP::MultiArg<std::string> pluginDirsArg           ("",  "plugin_dir",          "Defines a plugin directory (all plugins in it are loaded)",                      false,   "Directory path",    cmdLine);
     TCLAP::ValueArg<std::string> sitFilePathArg          ("s", "sit",                 "Defines SIT that specified SUT model (top)",                                     false,   "project.sit",       "File path");
     TCLAP::ValueArg<std::string> iclFilePathArg          ("i", "icl",                 "Defines ICL that specified SUT model (top)",                                     false,   "top.icl",           "File path");
-    TCLAP::ValueArg<std::string> modulesListFilePathArg  ("m", "modules",             "Defines file with list of files that specified SUT model",                       false,   "project.txt",       "File path");
+    TCLAP::ValueArg<std::string> iclListFilePathArg      ("",  "icl_list",            "Defines file with list of ICL files that specified SUT model",                   false,   "icl_list.txt",      "File path");
     TCLAP::ValueArg<std::string> configurationFileArg    ("c", "conf",                "Defines configuration file",                                                     false,   "mast.cfg",          "File path", cmdLine);
 
-    cmdLine.exclusiveOptionalAdd({&sitFilePathArg, &iclFilePathArg, &modulesListFilePathArg});
+    cmdLine.exclusiveOptionalAdd({&sitFilePathArg, &iclFilePathArg, &iclListFilePathArg});
 
     // ---------------- Do parse command line arguments
     //
@@ -528,7 +528,7 @@ void MastConfiguration::Update (vector<string> arguments)
 
       setOption(m_iclFilePath,            iclFilePathArg);
       setOption(m_sitFilePath,            sitFilePathArg);
-      setOption(m_projectListFilePath,    modulesListFilePathArg);
+      setOption(m_iclListFilePath,        iclListFilePathArg);
       setOption(m_configurationAlgorithm, configurationAlgoArg);
       setOption(m_pluginDLLs,             pluginFilesArg);
       setOption(m_pluginDirectories,      pluginDirsArg);

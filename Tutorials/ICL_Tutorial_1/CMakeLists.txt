@@ -1,0 +1,36 @@
+cmake_minimum_required(VERSION 3.5)
+project(Mast_ICL_Tutorial_1)
+
+message("")
+message("================================================================================")
+message(STATUS "Mast_ICL_Tutorial_1: LIBMAST_CORE_INCLUDE_DIRS:       ${LIBMAST_CORE_INCLUDE_DIRS}")
+message("================================================================================")
+message("")
+
+add_definitions(${P_WARNINGS})
+set (P_WARNINGS "-Wall -Wno-sign-compare -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-include-dirs")
+add_definitions(${P_CFLAGS})
+set (P_CFLAGS "${P_WARNINGS} -std=c++14")
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
+include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
+include_directories(${LIBMAST_CPP_API_INCLUDE_DIRS})
+include_directories(${LIBLOGGER_INCLUDE_DIRS})
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ICL_Tutorial_1")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
+add_library           (ICL_Tutorial_1 SHARED ICL_Tutorial_1.cpp)
+set_target_properties (ICL_Tutorial_1 PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+target_link_libraries (ICL_Tutorial_1 Mast_API_CPP ${EXTRA_LIBS})
+
+install(FILES ICL_Tutorial_1.yml DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+install(FILES ICL_Tutorial_1.lst DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+install(FILES Tap_and_SReg.icl   DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+install(FILES SReg.icl           DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+install(FILES TOP.bsd            DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
+include(CTest)
+add_test(NAME Smoke:ICL_Tutorial_1 COMMAND Mast --check --log --log_kind=only_errors_on_cerr --log_level=error --plugin_dir=ICL_Tutorial_1 --icl_list=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ICL_Tutorial_1.lst)
+
+

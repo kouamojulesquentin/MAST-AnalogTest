@@ -66,9 +66,9 @@ class MAST_CORE_EXPORT T_2_E_TranslatorProtocol : public AccessInterfaceTranslat
        auto request = m_CallbackQueue->Pop();
        while (request.CallbackId() != NO_MORE_PENDING)
         {
-         //Loopback for testing
          auto fromSut = PDL_translator(request.CallbackId(),request.ToSutVector());
          m_fromSutQueue->Push(std::make_pair(fromSut,*(new std::string)));
+       request = m_CallbackQueue->Pop();
         } 
        return;};
 

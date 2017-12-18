@@ -323,7 +323,12 @@ shared_ptr<AccessInterfaceTranslator> TestModelBuilder::Create_TestCase_JTAG_Bit
   top_translator->AppendChild(top_tap);
   top_translator->RegisterInterface(top_tap);
   
-  top_tap->AppendChild(jtag_bitbang_translator);
+
+  auto bitbang_chain = m_model.CreateChain    ("BB_chain");
+  auto bitbang_reg   = m_model.CreateRegister ("BB_Reg", BinaryVector(5, 0), bitbang_chain);
+  bitbang_chain->AppendChild(jtag_bitbang_translator);
+
+  top_tap->AppendChild(bitbang_chain);
   jtag_bitbang_translator->AppendChild(etap);
 
 

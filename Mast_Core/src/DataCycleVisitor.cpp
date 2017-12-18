@@ -15,8 +15,9 @@
 #include "SystemModelNodes.hpp"
 #include "SystemModelManager_impl.hpp"
 #include "AccessInterfaceRawProtocol.hpp"
+#include "AccessInterfaceRawProtocol.hpp"
 #include "Utility.hpp"
-
+#include "T_2_E_TranslatorProtocol.hpp"
 
 using namespace mast;
 
@@ -35,11 +36,8 @@ void DataCycleVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 
     CHECK_VALUE_NOT_NULL(protocol, "All AccessInterface must be associated with a valid protocol");
 
- auto protocol_is_raw =  std::dynamic_pointer_cast<AccessInterfaceRawProtocol>(protocol);
-
-  if (accessInterface.IsPending())
+//  if (accessInterface.IsPending()) //Redundant in normal usage, causes hang in multithreaded operation
   {
-   if (!protocol_is_raw)
      m_manager->DoHierarchicalDataCycle(&accessInterface);
   }
 }
@@ -52,9 +50,12 @@ void DataCycleVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator&accessInterfaceTranslator)
 
 {
- auto AI_data_cycle = [this] (AccessInterface accessInterface) {m_manager->DoHierarchicalDataCycle(&accessInterface);};
+ auto AI_data_cycle = [this] (AccessInterface accessInterface) {
+ VisitAccessInterface(accessInterface);
+// m_manager->DoHierarchicalDataCycle(&accessInterface);
+ };
  auto TR_data_cycle = [this] (AccessInterfaceTranslator& translator) {VisitAccessInterfaceTranslator(translator);
-    //Release parent Transmator
+    //Release parent Translator
     CallbackRequest request(NO_MORE_PENDING);
     translator.Protocol()->TransformationCallback(request);
 };
@@ -89,6 +90,8 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
     {  
      //Launch Thread executing this Visitors on the child Access Interface Translator
     auto protocol =  accessInterfaceTranslator.Protocol();
+    auto T_2_E_protocol= std::dynamic_pointer_cast<T_2_E_TranslatorProtocol>(protocol);
+    if (T_2_E_protocol) T_2_E_protocol->Start_Translator();
    //Launch DoHierarchicalDataCycle as a separate thread
     std::thread TR_thread(TR_data_cycle,std::ref(*slaveTranslator));
    TR_thread.detach(); //Detach AI thread for a clean exit
@@ -105,8 +108,10 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
    cycle_AI = (request.CallbackId() != NO_MORE_PENDING);
     if (cycle_AI)
      {
+     accessInterfaceTranslator.set_Busy();
      auto fromSutVector = accessInterfaceTranslator.Protocol()->TransformationCallback(request);
      accessInterfaceTranslator.PushfromSut(fromSutVector,cur_interface);
+     accessInterfaceTranslator.unset_Busy();
      }
     }
    cur_node =  cur_node->NextSibling();

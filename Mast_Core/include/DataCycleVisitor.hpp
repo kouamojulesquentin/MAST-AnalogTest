@@ -42,7 +42,7 @@ class MAST_CORE_EXPORT DataCycleVisitor : public SystemModelVisitor
   virtual void VisitLinker          (Linker&          linker)          override;
   virtual void VisitRegister        (Register&        reg)             override;
 
-  // ---------------- Private  Fields
+ // ---------------- Private  Fields
   //
   private:
   SystemModelManager_impl* m_manager = nullptr; //!< The current system model

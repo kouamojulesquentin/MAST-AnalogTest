@@ -67,11 +67,12 @@ BinaryVector JTAG_BitBang_TranslatorProtocol::TransformationCallback(CallbackReq
   
   //Push request to PDL translator thread
    PushRequest(current_request);
-  
+
   //Wait for result from PDL translator thread
   result = PopfromSut();
   
   return result;
+  
 }
 //
 //  End of: JTAG_BitBang_TranslatorProtocol::TransformationCallback

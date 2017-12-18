@@ -70,6 +70,7 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
   uint32_t cur_interface = 0;
   std::shared_ptr<mast::AccessInterface> accessInterface;
   std::shared_ptr<AccessInterfaceTranslator> slaveTranslator;  
+  std::shared_ptr<T_2_E_TranslatorProtocol> T_2_E_protocol;
   
   if (accessInterfaceTranslator.IsPending())
   {
@@ -78,6 +79,15 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
     LOG(DEBUG) << "accessInterfaceTranslator.IsPending()";
    accessInterface=std::dynamic_pointer_cast<AccessInterface>(cur_node);
    slaveTranslator=std::dynamic_pointer_cast<AccessInterfaceTranslator>(cur_node);
+   T_2_E_protocol= std::dynamic_pointer_cast<T_2_E_TranslatorProtocol>(accessInterfaceTranslator.Protocol());
+   if (T_2_E_protocol) {
+     //T_2_E_protocol->Start_Translator();
+     auto T_2_E_lambda =[T_2_E_protocol] () {T_2_E_protocol->T_2_E_translator();};
+     m_manager->CreateApplicationThread(T_2_E_protocol->EventDomainRootNode(),T_2_E_lambda,"T-2-E Translator");
+     m_manager->StartCreatedApplicationThreads ();
+     T_2_E_protocol->Set_Translator_State(true);
+     }
+   
    if (accessInterface)
     {  
      //Launch Thread executing Data Cycle on the child Access Interface
@@ -90,8 +100,6 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
     {  
      //Launch Thread executing this Visitors on the child Access Interface Translator
     auto protocol =  accessInterfaceTranslator.Protocol();
-    auto T_2_E_protocol= std::dynamic_pointer_cast<T_2_E_TranslatorProtocol>(protocol);
-    if (T_2_E_protocol) T_2_E_protocol->Start_Translator();
    //Launch DoHierarchicalDataCycle as a separate thread
     std::thread TR_thread(TR_data_cycle,std::ref(*slaveTranslator));
    TR_thread.detach(); //Detach AI thread for a clean exit
@@ -118,6 +126,10 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
    cur_interface++;
   }while (cur_node);
   }
+   if (T_2_E_protocol) { //Release and terminate "T-2-E Translator" application thread
+    CallbackRequest request(NO_MORE_PENDING);
+    T_2_E_protocol->TransformationCallback(request);
+   } 
 }
 //
 //  End of: DataCycleVisitor::VisitRegister

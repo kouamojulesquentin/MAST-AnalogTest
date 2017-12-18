@@ -23,6 +23,8 @@
 #include <experimental/string_view>
 #include <memory>
 
+using Application_t = std::function<void()>;
+
 namespace mast
 {
 //! General type to Transaction - to - Transaction transformations
@@ -35,16 +37,18 @@ class MAST_CORE_EXPORT T_2_E_TranslatorProtocol : public AccessInterfaceTranslat
   virtual ~T_2_E_TranslatorProtocol() = default;
   virtual BinaryVector PDL_translator( std::experimental::string_view CallbackId, BinaryVector	   ToSutVector) = 0;
 
-  T_2_E_TranslatorProtocol() {
+  T_2_E_TranslatorProtocol() = delete;
+  T_2_E_TranslatorProtocol(std::shared_ptr<ParentNode> EventDomainRootNode) {
   m_CallbackQueue=std::make_shared<MTQueue<CallbackRequest>>();
   m_fromSutQueue=std::make_shared<MTQueue<std::pair<BinaryVector,std::string>>>();
+  m_EventDomainRootNode=EventDomainRootNode;
   m_Translator_launched=false;
   };
 
 
-  bool ParentTranslator_is_set() {return ((m_CallbackQueue!=nullptr) && (m_fromSutQueue!=nullptr));}
-  void SetParentTranslatorName( std::string ParentTranslatorName){m_ParentTranslatorName=ParentTranslatorName;}
-  std::string ParentTranslatorName (){return m_ParentTranslatorName;}
+  bool EventDomain_is_set() {return (m_EventDomainRootNode!=nullptr) ;}
+  void SetEventDomain( std::shared_ptr<SystemModelNode> EventDomainRootNode){m_EventDomainRootNode=std::dynamic_pointer_cast<ParentNode>(EventDomainRootNode);}
+  std::shared_ptr<ParentNode> EventDomainRootNode (){return m_EventDomainRootNode;}
 
   void SetCallbackQueue(std::shared_ptr<MTQueue<CallbackRequest>> CallbackQueue) {m_CallbackQueue=CallbackQueue;}
    void SetfromSutQueue(std::shared_ptr<MTQueue<std::pair<BinaryVector,std::string>>> fromSutQueue) {m_fromSutQueue=fromSutQueue;}
@@ -71,6 +75,8 @@ class MAST_CORE_EXPORT T_2_E_TranslatorProtocol : public AccessInterfaceTranslat
        request = m_CallbackQueue->Pop();
         } 
        return;};
+       
+     
 
   void Start_Translator(){
     //Using a lamba to encapsulate T_2_E_translator and avoid an "invalid use of nonstatic member function" error
@@ -80,11 +86,12 @@ class MAST_CORE_EXPORT T_2_E_TranslatorProtocol : public AccessInterfaceTranslat
      m_Translator_launched=true;
      }
   bool Translator_Running(){return m_Translator_launched;}
+  void Set_Translator_State(bool new_state){m_Translator_launched=new_state;}
   
   private:
   
 
-  std::string m_ParentTranslatorName;
+  std::shared_ptr<ParentNode> m_EventDomainRootNode;                                 //!>Retargeting domain root node where the events must be generated 
   std::shared_ptr<MTQueue<CallbackRequest>> m_CallbackQueue;                       //!<Callback requests from underlying Raw protocol
   std::shared_ptr<MTQueue<std::pair<BinaryVector,std::string>>> m_fromSutQueue;   //!<fromSut data results for underlying Raw protocol
   

@@ -29,13 +29,14 @@ class MAST_CORE_EXPORT JTAG_BitBang_TranslatorProtocol final : public T_2_E_Tran
   //
   public:
   virtual ~JTAG_BitBang_TranslatorProtocol() = default;
-  JTAG_BitBang_TranslatorProtocol() = default;
+  JTAG_BitBang_TranslatorProtocol() = delete;
+ JTAG_BitBang_TranslatorProtocol(std::shared_ptr<ParentNode> EventDomainRootNode) : T_2_E_TranslatorProtocol(EventDomainRootNode)  {}
 
-  JTAG_BitBang_TranslatorProtocol(std::vector<uint32_t> addresses);
+//  JTAG_BitBang_TranslatorProtocol(std::vector<uint32_t> addresses);
 
   //! Initializes with addresses and optional prefix defined by a string
   //!
-  JTAG_BitBang_TranslatorProtocol(const std::string& parameters);
+//  JTAG_BitBang_TranslatorProtocol(const std::string& parameters);
 
   //! Does any Transformation needed to execute the callback given as a parameter
   //!

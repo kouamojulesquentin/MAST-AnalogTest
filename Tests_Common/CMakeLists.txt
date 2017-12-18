@@ -8,6 +8,7 @@ set(CXXTEST_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../cxxtest")
 message("")
 message("================================================================================")
 message(STATUS "Tests_Common: CXXTEST_INCLUDE_DIR:        ${CXXTEST_INCLUDE_DIR}")
+message(STATUS "Tests_Common: PDL_APPLICATIONS_INCLUDE_DIRS ${PDL_APPLICATIONS_INCLUDE_DIRS}")
 
 
 set(TRAITS            "${CMAKE_CURRENT_LIST_DIR}/CxxTest_Traits/BinaryVector_Traits.hpp"
@@ -52,9 +53,9 @@ target_compile_options      (Tests_Common PUBLIC  -fexceptions -std=c++14)
 target_compile_definitions  (Tests_Common PUBLIC  CXXTEST_HAVE_EH CXXTEST_HAVE_STD CXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION)
 target_include_directories  (Tests_Common PUBLIC  ${CXXTEST_INCLUDE_DIR}
                                                   ${CMAKE_CURRENT_SOURCE_DIR}
+                                                  ${LIB_PDL_APPLICATIONS_INCLUDE_DIRS}
                                                   ${CMAKE_CURRENT_SOURCE_DIR}/CxxTest_Traits)
-
-target_link_libraries (Tests_Common  ${PLATFORM_LIBS} Mast_Core)
+target_link_libraries (Tests_Common  ${PLATFORM_LIBS} Mast_Core PDL_Applications)
 
 # ---------------- Build Runner.cpp
 #

@@ -18,6 +18,7 @@
 #include "AccessInterfaceProtocol.hpp"
 #include "AccessInterfaceRawProtocol.hpp"
 #include "T_2_T_TranslatorProtocol.hpp"
+#include "T_2_E_TranslatorProtocol.hpp"
 #include "Utility.hpp"
 #include "EnumsUtility.hpp"
 
@@ -353,6 +354,17 @@ void PrettyPrinter::VisitAccessInterfaceTranslator (AccessInterfaceTranslator& a
        note += protocol_is_t2t->ParentTranslatorName();
       else note += "Not set";
       }
+     else
+      {
+     auto protocol_is_t2e=std::dynamic_pointer_cast<T_2_E_TranslatorProtocol>(protocol);
+     if (protocol_is_t2e) 
+       {
+       note += "->" ;
+       if (protocol_is_t2e->EventDomain_is_set())
+        note += protocol_is_t2e->EventDomainRootNode()->Name();
+       else note += "Not set";
+       }
+      } 
     }
   }
  

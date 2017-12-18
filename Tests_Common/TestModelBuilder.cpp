@@ -316,7 +316,7 @@ shared_ptr<AccessInterfaceTranslator> TestModelBuilder::Create_TestCase_JTAG_Bit
 
   auto top_translator     = m_model.CreateAccessInterfaceTranslator    ("Emulation", make_shared<Spy_Emulation_Translator>());
 
-  auto jtag_bitbang_translator     = m_model.CreateAccessInterfaceTranslator    (name, make_shared<JTAG_BitBang_TranslatorProtocol>());
+  auto jtag_bitbang_translator     = m_model.CreateAccessInterfaceTranslator    (name, make_shared<JTAG_BitBang_TranslatorProtocol>(top_tap));
 
   m_model.ReplaceRoot(top_translator,false);
 

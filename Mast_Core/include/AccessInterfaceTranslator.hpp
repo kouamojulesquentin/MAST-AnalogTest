@@ -76,6 +76,10 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
   void PushPending() {m_Pending.Push(true);};//!< Queues a new toSut Update value
   bool PopPending() { return  m_Pending.Pop();};//!< returns the oldest toSut Update value NB: it is a BLOCKING call
 
+  //! Sets protocol for streaming register value to/from SUT
+  //!
+  void  SetProtocol (std::shared_ptr<AccessInterfaceTranslatorProtocol> protocol) { m_protocol = protocol; }
+
   // ---------------- Private  Fields
   //
   private:

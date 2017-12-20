@@ -80,7 +80,7 @@ class MastEnvironment_impl final
   // ---------------- Private Methods
   //
   private:
-  void ChangeAccessInterfaceProtocol (const std::string& protocolName, const std::string& parameters);
+  void ChangeTopProtocol (const std::string& protocolName, const std::string& parameters);
   void CheckModel (std::shared_ptr<SystemModel> systemModel);
   void ConfigureLogger ();
   void InitializeLogger ();

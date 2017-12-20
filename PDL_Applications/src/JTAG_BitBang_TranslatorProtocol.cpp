@@ -45,8 +45,8 @@ BinaryVector JTAG_BitBang_TranslatorProtocol::PDL_translator( std::experimental:
   
   uint16_t BB_Value = 0u;
   
-//  iWrite(registerPath, BB_Value);
-//  iApply();
+  iWrite(registerPath, BB_Value);
+  iApply();
 
 
 return ToSutVector;

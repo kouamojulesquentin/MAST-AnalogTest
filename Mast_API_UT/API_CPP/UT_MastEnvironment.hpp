@@ -75,6 +75,10 @@ class UT_MastEnvironment : public CxxTest::TestSuite
   void test_Start_Arguments_RealPDLAlgo ();
   void test_Start_Argc_Argv_RealPDLAlgo ();
 
+  // ---------------- Tests with translators
+  //
+  void test_Start_RealPDLAlgo_JTAG_Emu ();
+
   // ================ Other Methods ================
 
   void setUp(); //!< Initializes test (called for each test)

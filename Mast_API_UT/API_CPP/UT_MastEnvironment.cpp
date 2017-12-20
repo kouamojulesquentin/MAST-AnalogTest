@@ -14,6 +14,7 @@
 #include "UT_MastEnvironment.hpp"
 #include "MastEnvironment.hpp"
 #include "AccessInterfaceProtocolFactory.hpp"
+#include "AccessInterfaceTranslatorProtocolFactory.hpp"
 #include "PDL_AlgorithmsRepository.hpp"
 #include "PDL_Adapter_CPP.hpp"
 #include "Startup.hpp"
@@ -24,7 +25,8 @@
 #include "TestUtilities.hpp"
 #include "SpiedProtocolsCommands.hpp"
 #include "Spy_SVF_Protocol.hpp"
-
+#include "Spy_Emulation_Translator.hpp"
+ 
 #include <cxxtest/ValueTraits.h>
 #include <cxxtest/traits/STL11_Traits.h>
 #include <vector>
@@ -880,6 +882,47 @@ void UT_MastEnvironment::test_Start_Argc_Argv_RealPDLAlgo ()
   }
 }
 
+
+void UT_MastEnvironment::test_Start_RealPDLAlgo_JTAG_Emu ()
+{
+  // ---------------- Setup
+  //
+  // Fake plugin registation
+  PDL_AlgorithmsRepository::Instance().RegisterAlgorithm("Fake", Fake_PDL_Algorithm);
+  PDL_AlgorithmsRepository::Instance().RegisterAlgorithm("Incr", PDL_Algorithm);
+
+  auto spiedCommands = make_shared<test::SpiedProtocolsCommands>();
+  auto creator       = [spiedCommands](const string& /*params*/) { return make_unique<test::Spy_Emulation_Translator>(spiedCommands); };
+  AccessInterfaceTranslatorProtocolFactory::Instance().RegisterCreator("Spy", creator);
+
+  vector<string> arguments {
+                             "Mast.exe",
+                             "--protocol_name=Spy",
+                             "--config_algo=last_lazy",
+                             "--sit="        + GetTestFilePath("UT_MastEnvironment_JTAG_Emu.sit"),
+                             "--check",
+                             "--check_file=" + GetTestFilePath("Model_Check.txt", false), // Do not check it exists
+                             "--plugin=Fake_Plugin_1",
+                           };
+
+  MastEnvironment sut(true);
+  sut.ParseOptions(arguments);
+  sut.LoadPlugins();
+  sut.CreateSystemModel();
+  sut.CreateManager();
+  sut.CreateApplications();
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.Start());
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (g_Fake_PDL_AlgorithmCallCount, 0u); // Fake algorithm has not been started (not associated with a node)
+
+  auto expectedCommands = PDLAlgoExpectedSVFCommands_Lazy();  // Lazy algorithm should not be thread dependent
+  TS_ASSERT_EQUALS (spiedCommands->Commands(), expectedCommands);
+}
 
 //===========================================================================
 // End of UT_MastEnvironment.cpp

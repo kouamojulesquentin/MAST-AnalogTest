@@ -19,6 +19,7 @@
 #include <fstream>
 #include <string>
 #include <experimental/string_view>
+#include "ParentNode.hpp"
 
 namespace mast
 {
@@ -31,6 +32,7 @@ class MAST_CORE_EXPORT JTAG_BitBang_TranslatorProtocol final : public T_2_E_Tran
   virtual ~JTAG_BitBang_TranslatorProtocol() = default;
   JTAG_BitBang_TranslatorProtocol() = delete;
  JTAG_BitBang_TranslatorProtocol(std::shared_ptr<ParentNode> EventDomainRootNode) : T_2_E_TranslatorProtocol(EventDomainRootNode)  {}
+ JTAG_BitBang_TranslatorProtocol(std::experimental::string_view BB_Reg_Name)   : T_2_E_TranslatorProtocol(BB_Reg_Name) {}
 
 //  JTAG_BitBang_TranslatorProtocol(std::vector<uint32_t> addresses);
 

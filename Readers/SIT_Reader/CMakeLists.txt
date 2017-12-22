@@ -60,6 +60,7 @@ add_library(SIT_Reader SHARED  ${LEX_YACC_SRC_DIR}SIT_Reader.cpp
 
 target_include_directories (SIT_Reader PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}
                                                ${CMAKE_CURRENT_SOURCE_DIR}/../Common
+                                               ${LIB_PDL_APPLICATIONS_INCLUDE_DIRS}
                                        PRIVATE $<$<PLATFORM_ID:Windows>:$ENV{FLEX_DIR}>)
 
 target_compile_options     (SIT_Reader PRIVATE -std=c++14

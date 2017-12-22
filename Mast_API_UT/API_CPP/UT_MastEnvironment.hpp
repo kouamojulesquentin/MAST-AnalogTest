@@ -78,6 +78,8 @@ class UT_MastEnvironment : public CxxTest::TestSuite
   // ---------------- Tests with translators
   //
   void test_Start_RealPDLAlgo_JTAG_Emu ();
+  void test_Start_RealPDLAlgo_JTAG_2_I2C_Emu ();
+  void test_Start_RealPDLAlgo_JTAG_BitBang ();
 
   // ================ Other Methods ================
 

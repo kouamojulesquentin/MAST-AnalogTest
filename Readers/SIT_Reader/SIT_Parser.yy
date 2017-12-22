@@ -50,6 +50,7 @@
 #include "ParserException.hpp"
 #include "g3log/g3log.hpp"
 #include "AccessInterfaceTranslatorProtocolFactory.hpp"
+#include "JTAG_BitBang_TranslatorProtocol.hpp"
 
 #include <iostream>
 #include <cstdlib>
@@ -534,6 +535,9 @@ t_TRANSLATOR  node_name TR_identifier AI_protocol_parameters
     try
     {
       auto& factory  = AccessInterfaceTranslatorProtocolFactory::Instance();
+    //  TODO: Push instance in unresolved_translator queue
+   //   factory.RegisterCreator("BitBang",            [](const string& parameters)       { return make_unique<JTAG_BitBang_TranslatorProtocol>();     });
+
       auto  protocol = factory.Create(protocolName, protocolParameters);
 
       if (!protocol)

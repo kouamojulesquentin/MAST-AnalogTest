@@ -23,6 +23,8 @@
 #include <experimental/string_view>
 #include <memory>
 
+#define DEFAULT_BB_REG_NAME "BB_Reg"
+
 using Application_t = std::function<void()>;
 
 namespace mast
@@ -42,9 +44,17 @@ class MAST_CORE_EXPORT T_2_E_TranslatorProtocol : public AccessInterfaceTranslat
   m_CallbackQueue=std::make_shared<MTQueue<CallbackRequest>>();
   m_fromSutQueue=std::make_shared<MTQueue<std::pair<BinaryVector,std::string>>>();
   m_EventDomainRootNode=EventDomainRootNode;
+  n_BB_Reg_Name = DEFAULT_BB_REG_NAME;
   m_Translator_launched=false;
   };
 
+  T_2_E_TranslatorProtocol(std::experimental::string_view BB_Reg_Name) {
+  m_CallbackQueue=std::make_shared<MTQueue<CallbackRequest>>();
+  m_fromSutQueue=std::make_shared<MTQueue<std::pair<BinaryVector,std::string>>>();
+  m_EventDomainRootNode=nullptr;
+  n_BB_Reg_Name =BB_Reg_Name;
+  m_Translator_launched=false;
+  };
 
   bool EventDomain_is_set() {return (m_EventDomainRootNode!=nullptr) ;}
   void SetEventDomain( std::shared_ptr<SystemModelNode> EventDomainRootNode){m_EventDomainRootNode=std::dynamic_pointer_cast<ParentNode>(EventDomainRootNode);}
@@ -91,6 +101,7 @@ class MAST_CORE_EXPORT T_2_E_TranslatorProtocol : public AccessInterfaceTranslat
   private:
   
 
+  std::experimental::string_view n_BB_Reg_Name;
   std::shared_ptr<ParentNode> m_EventDomainRootNode;                                 //!>Retargeting domain root node where the events must be generated 
   std::shared_ptr<MTQueue<CallbackRequest>> m_CallbackQueue;                       //!<Callback requests from underlying Raw protocol
   std::shared_ptr<MTQueue<std::pair<BinaryVector,std::string>>> m_fromSutQueue;   //!<fromSut data results for underlying Raw protocol

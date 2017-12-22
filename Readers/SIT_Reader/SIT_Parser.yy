@@ -107,6 +107,13 @@ namespace
     auto location = SIT::location(locBegin, locEnd);
     return location;
   }
+  SIT::location MakeLocation(const T_2_E_information& translatorInfo)
+  {
+    auto locBegin = SIT::position(nullptr, translatorInfo.line, translatorInfo.beginColumn);
+    auto locEnd   = SIT::position(nullptr, translatorInfo.line, translatorInfo.endColumn);
+    auto location = SIT::location(locBegin, locEnd);
+    return location;
+  }
 } // End of unnamed namespace
 
 } /*end of %code section*/
@@ -244,6 +251,33 @@ root_node:
       linkerNode->ReplacePathSelector(shared_ptr<PathSelector>(std::move(selector)));
       driver.unresolved_linkers.pop();
     }
+    
+    while (!driver.unresolved_translators.empty())
+    {
+      const auto& translatorInfo = driver.unresolved_translators.front();
+
+      // remove resolved translatorInfo
+      const auto& registerIter = driver.declared_registers.find(translatorInfo.translator_reg_name);
+      if (registerIter == driver.declared_registers.end())
+      {
+        ERROR_MESSAGE(msg) << STREAM_NODE_NAME("LINKER", translatorInfo.translator_node->Name())
+                           << "Error, specified T-2-E translator register \"" << translatorInfo.translator_reg_name << "\" does not exist";
+
+        THROW_SYNTAX_ERROR_AT_LOC(msg, MakeLocation(translatorInfo));
+      }
+
+      auto BBNode = registerIter->second;
+      auto asParent = dynamic_pointer_cast<ParentNode>($[node]);
+      auto EventDomainRootNode = asParent->FindParentOfNode(BBNode);
+      CHECK_VALUE_NOT_NULL(EventDomainRootNode, "Cannot find parent of node '"s + BBNode->Name() + "' to intialize the T-2-E protocol of translator  "+ translatorInfo.translator_node->Name());
+      auto t_2_E_protocol = dynamic_pointer_cast<T_2_E_TranslatorProtocol>(translatorInfo.translator_node->Protocol());
+      CHECK_VALUE_NOT_NULL(t_2_E_protocol, "Protocol of Translator node " + translatorInfo.translator_node->Name() + " should be of type T-2-E protocol");
+      t_2_E_protocol->SetEventDomain(EventDomainRootNode);
+
+      driver.unresolved_translators.pop();
+    }
+     
+    
     driver.parsedTopNode = $[node];
   }
   ;
@@ -536,21 +570,35 @@ t_TRANSLATOR  node_name TR_identifier AI_protocol_parameters
     {
       auto& factory  = AccessInterfaceTranslatorProtocolFactory::Instance();
     //  TODO: Push instance in unresolved_translator queue
-   //   factory.RegisterCreator("BitBang",            [](const string& parameters)       { return make_unique<JTAG_BitBang_TranslatorProtocol>();     });
+      factory.RegisterCreator("BitBang",            [](const string& parameters)       { return make_unique<JTAG_BitBang_TranslatorProtocol>(parameters);     });
 
-      auto  protocol = factory.Create(protocolName, protocolParameters);
-
-      if (!protocol)
+      if (protocolName=="BitBang")
       {
-        ERROR_MESSAGE(msg) << STREAM_NODE_NAME("TRANSLATOR", $[node_name].name) << "Cannot create protocol: \"" << protocolName << "\"";
-        THROW_SYNTAX_ERROR(msg);
+         auto node = driver.systemModel->CreateAccessInterfaceTranslator(nodeName, nullptr);
+         $$ = std::make_pair(node,false);
+         T_2_E_information translatorInfo;
+         translatorInfo.translator_node         = node;
+         translatorInfo.line                = my_location->begin.line;
+         translatorInfo.beginColumn         = my_location->begin.column;
+         translatorInfo.endColumn           = my_location->end.column;
+         translatorInfo.translator_reg_name = protocolParameters;
+         driver.unresolved_translators.push(translatorInfo);
       }
       else
       {
-        auto node = driver.systemModel->CreateAccessInterfaceTranslator(nodeName, shared_ptr<AccessInterfaceTranslatorProtocol>(std::move(protocol)));
-//        node->RegisterInterface(tap);
-        $$ = std::make_pair(node,false);
-      }
+       auto  protocol = factory.Create(protocolName, protocolParameters);
+
+       if (!protocol)
+       {
+         ERROR_MESSAGE(msg) << STREAM_NODE_NAME("TRANSLATOR", $[node_name].name) << "Cannot create protocol: \"" << protocolName << "\"";
+         THROW_SYNTAX_ERROR(msg);
+       }
+       else
+       {
+         auto node = driver.systemModel->CreateAccessInterfaceTranslator(nodeName, shared_ptr<AccessInterfaceTranslatorProtocol>(std::move(protocol)));
+         $$ = std::make_pair(node,false);
+       }
+       }
     }
     catch(std::invalid_argument exc)  // Catch C++ standard exceptions
     {

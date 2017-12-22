@@ -23,6 +23,7 @@ namespace mast
 {
   class SystemModelNode;
   class Linker;
+  class AccessInterfaceTranslator;
   enum class SelectorProperty;
 }
 
@@ -62,11 +63,11 @@ struct linker_information
 //!
 struct T_2_E_information
 {
-  std::shared_ptr<mast::SystemModelNode> translator_node; //Translator node
+  std::shared_ptr<mast::AccessInterfaceTranslator> translator_node; //Translator node
   uint32_t                      line              = 0;
   uint32_t                      beginColumn       = 0;
   uint32_t                      endColumn         = 0;
-  std::string                   selector_reg_name;   //!< Name of register associated with the protocol
+  std::string                   translator_reg_name;   //!< Name of register associated with the protocol
 };
 
 

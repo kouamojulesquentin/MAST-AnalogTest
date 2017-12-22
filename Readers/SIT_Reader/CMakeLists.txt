@@ -29,6 +29,7 @@ message(STATUS "SIT_Parser: CODE_COVERAGE:    ${CODE_COVERAGE}")
 message(STATUS "SIT_Parser: CMAKE_CXX_FLAGS:  ${CMAKE_CXX_FLAGS}")
 message(STATUS "SIT_Parser: Flex_Switches:    ${Flex_Switches}")
 message(STATUS "SIT_Parser: Bison_Switches:   ${Bison_Switches}")
+message(STATUS "SIT_Parser: PDL_Applications: ${LIB_PDL_APPLICATIONS_INCLUDE_DIRS}")
 message("================================================================================")
 message("")
 
@@ -73,4 +74,4 @@ target_compile_options     (SIT_Reader PRIVATE -std=c++14
                                                -Wmissing-include-dirs
                                                $<$<NOT:$<PLATFORM_ID:Windows>>:-fPIC>)
 
-target_link_libraries       (SIT_Reader Mast_Core)
+target_link_libraries       (SIT_Reader Mast_Core PDL_Applications)

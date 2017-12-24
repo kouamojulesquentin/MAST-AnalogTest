@@ -456,7 +456,7 @@ ReportFormat = --template="{id}:{file}:{line} [{severity}] --> {message}"
 static_code_analysis: sca
 sca:
 #+> CppCheck -j 4 --check-config --suppressions-list=CppCheck_Ignore.txt $(ReportFormat) --enable=all $(IgnoredPaths) $(IncludePaths) . 2> CppCheck_Results.txt
-> CppCheck -j 4 --suppressions-list=CppCheck_Ignore.txt $(ReportFormat) --enable=all $(IgnoredPaths) $(IncludePaths) . 2> CppCheck_Results.txt
+> cppcheck -j 4 --suppressions-list=CppCheck_Ignore.txt $(ReportFormat) --enable=all $(IgnoredPaths) $(IncludePaths) . 2> CppCheck_Results.txt
 
 
 ################################################################################

@@ -9,6 +9,11 @@
     -
   FLEX_DIR environment variable must point to where flex is intalled (to get access to FlexLexer.h)
   The unitary test interface Needs "python3" and "python3-ply" module
+  For Static Code Analysis, mast uses CppCheck: http://cppcheck.sourceforge.net/
+    - Download
+    - Intall it
+    - Add it to path
+    - Use it using make static_code_analysis (or simply make sca)
   To generate Doxygen documentation, doxygen and graphviz must be installed and dot.exe added to PATH environment variable
 
   Qt build has been tested with Qt 5.5 and QtCreator 3.6.1 but should be compatible with more recent versions

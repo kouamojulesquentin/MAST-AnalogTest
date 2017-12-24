@@ -370,6 +370,100 @@ ifneq ("$(wildcard $(CMAKE_RELEASE_BUILD_DIR)/Makefile)","")
 > cd $(CMAKE_RELEASE_BUILD_DIR) &&  make clean;
 endif
 
+
+################################################################################
+#
+#                           Static Code Analysis
+#
+# Ignored issues are defined in file: CppCheck_Ignore.txt
+# Results are written in file:        CppCheck_Results.txt
+#
+################################################################################
+IncludePaths =
+IncludePaths += -IMast_API_C
+IncludePaths += -IMast_API_CPP
+IncludePaths += -IMast_API_CPP/include
+IncludePaths += -IMast_API_CPP/internal
+IncludePaths += -IMast_API_CPP/src
+IncludePaths += -IMast_API_C/include
+IncludePaths += -IMast_API_C/internal
+IncludePaths += -IMast_API_C/src
+#+IncludePaths += -IMast_API_UT
+#+IncludePaths += -IMast_API_UT/API_C
+#+IncludePaths += -IMast_API_UT/API_CPP
+#+IncludePaths += -IMast_API_UT/CxxTest_Traits
+IncludePaths += -IMast_App
+IncludePaths += -IMast_Core
+IncludePaths += -IMast_Core/include
+IncludePaths += -IMast_Core/internal
+IncludePaths += -IMast_Core/src
+IncludePaths += -IMast_Core/src/Linux
+#+IncludePaths += -IMast_Core/src/Windows
+#+IncludePaths += -IMast_Core_UT
+#+IncludePaths += -IMast_Core_UT/Core
+#+IncludePaths += -IMast_Core_UT/Plugins
+#+IncludePaths += -IMast_Core_UT/SystemModel
+#+IncludePaths += -IMast_Core_UT/UT_Helpers
+#+IncludePaths += -IMast_Core_UT/Utility
+#+IncludePaths += -IMast_Core_UT/Yaml
+IncludePaths += -IReaders/Common
+IncludePaths += -IReaders/ICL_Reader
+IncludePaths += -IReaders/SIT_Reader
+#+IncludePaths += -IReaders_UT/Common
+#+IncludePaths += -IReaders_UT/ICL
+#+IncludePaths += -IReaders_UT/SIT
+IncludePaths += -ITestCasesApp
+IncludePaths += -ITestCasesApp/SIT_Testcases
+IncludePaths += -ITests_Common
+IncludePaths += -ITests_Common/CxxTest_Traits
+#+IncludePaths += -IOptional_Libs/
+IncludePaths += -IOptional_Libs/SPI/include
+IncludePaths += -IOptional_Libs/OpenOCD/include
+#+IncludePaths += -IExternal_Libs
+IncludePaths += -IExternal_Libs/kissfft
+IncludePaths += -IExternal_Libs/tclap/include
+IncludePaths += -IExternal_Libs/Yaml/include
+IncludePaths += -ILogger
+IncludePaths += -ITutorials
+IncludePaths += -ITutorials/ICL_Tutorial_1
+IncludePaths += -ITutorials/SIT_Tutorial_1
+
+IgnoredPaths =
+IgnoredPaths += -icmake_debug
+IgnoredPaths += -icmake_debug_qt
+IgnoredPaths += -icmake_release
+IgnoredPaths += -icmake_code_coverage
+IgnoredPaths += -iMast_Core_UT
+IgnoredPaths += -iCodeCoverage
+IgnoredPaths += -iExternal_Libs
+IgnoredPaths += -iExternal_Libs_UT
+IgnoredPaths += -iOptional_Libs
+IgnoredPaths += -iOptional_Libs_UT
+IgnoredPaths += -iMastExample_CPP
+IgnoredPaths += -iTestCasesApp
+IgnoredPaths += -iLogger
+IgnoredPaths += -icxxtest
+IgnoredPaths += -iReaders_UT
+IgnoredPaths += -iReaders/ICL_Reader/ICL_Lexer.yy.cc
+IgnoredPaths += -iReaders/ICL_Reader/ICL_Parser.tab.cc
+IgnoredPaths += -iReaders/ICL_Reader/ICL_Parser.tab.hh
+IgnoredPaths += -iReaders/SIT_Reader/SIT_Lexer.yy.cc
+IgnoredPaths += -iReaders/SIT_Reader/SIT_Parser.tab.cc
+IgnoredPaths += -iReaders/SIT_Reader/SIT_Parser.tab.hh
+
+ReportFormat = --template="{id}:{file}:{line} [{severity}] --> {message}"
+
+static_code_analysis: sca
+sca:
+#+> CppCheck -j 4 --check-config --suppressions-list=CppCheck_Ignore.txt $(ReportFormat) --enable=all $(IgnoredPaths) $(IncludePaths) . 2> CppCheck_Results.txt
+> CppCheck -j 4 --suppressions-list=CppCheck_Ignore.txt $(ReportFormat) --enable=all $(IgnoredPaths) $(IncludePaths) . 2> CppCheck_Results.txt
+
+
+################################################################################
+#
+#                           Doxygen documentation
+#
+################################################################################
 docs:
 > cmake   -E remove_directory Doxygen_Doc/MastDev/html
 > cmake   -E remove_directory Doxygen_Doc/FULL_API/html
@@ -391,10 +485,13 @@ distclean: code_coverage_clean
 > cmake -E remove -f External_Libs_UT/Generated/Runner.cpp
 > cmake -E remove -f Optional_Libs_UT/Generated/Runner.cpp
 
-# ----------------- Displays list of targets
+################################################################################
+#
+#                           Displays list of targets
 #
 # Usage: make -s targets
 #
+################################################################################
 targets:
 > cmake -E echo List of targets:
 > cmake -E echo all
@@ -438,6 +535,7 @@ targets:
 > cmake -E echo run_readers_ut_release
 > cmake -E echo run_testcases_release
 > cmake -E echo set_compiler
+> cmake -E echo static_code_analysis (or sca)
 > cmake -E echo test
 > cmake -E echo test_debug
 > cmake -E echo test_release

@@ -1,0 +1,75 @@
+// Configuration issues
+
+// Unused
+unusedFunction:*
+
+// Performance
+passedByValue:Mast_API_CPP/*
+passedByValue:Mast_Core/*
+passedByValue:Readers/*
+passedByValue:Tests_Common/*
+
+// False positive
+syntaxError:Mast_Core/include/SystemModelFactory.hpp:27
+uselessAssignmentArg:Mast_Core/src/BinaryVector.cpp:3062
+
+// Style
+knownConditionTrueFalse:License/make_license.cpp:65
+
+// Warning
+
+
+// Cxxtest related
+
+// =================================================== "external" Libraries ===================================================
+
+// Performance
+
+passedByValue:/ lalr1.cc:37:601
+passedByValue:/ lalr1.cc:37:603
+passedByValue:/ lalr1.cc:37:605
+passedByValue:/ lalr1.cc:37:607
+passedByValue:/ lalr1.cc:37:609
+passedByValue:/ lalr1.cc:37:611
+passedByValue:/ lalr1.cc:37:613
+passedByValue:/ lalr1.cc:37:615
+passedByValue:/ lalr1.cc:37:617
+passedByValue:/ lalr1.cc:37:619
+passedByValue:/ lalr1.cc:37:621
+passedByValue:/ lalr1.cc:37:623
+passedByValue:/ lalr1.cc:37:625
+
+passedByValue:External_Libs/*
+passedByValue:Optional_Libs/*
+
+// Style
+
+noExplicitConstructor:Readers/SIT_Reader/SIT_Parser.tab.hh:165
+noExplicitConstructor:Readers/SIT_Reader/SIT_Parser.tab.hh:565
+noExplicitConstructor:Readers/SIT_Reader/SIT_Parser.tab.hh:884
+
+noExplicitConstructor:Readers/SIT_Reader/stack.hh:60
+
+noExplicitConstructor:/ stack.hh:13:14
+noExplicitConstructor:/ lalr1.cc:37:21
+noExplicitConstructor:/ lalr1.cc:37:669
+noExplicitConstructor:/ lalr1.cc:37:1316
+
+unsignedLessThanZero:Readers/ICL_Reader/ICL_Lexer.yy.cc:2121
+unsignedLessThanZero:Readers/ICL_Reader/ICL_Lexer.yy.cc:2134
+
+// Warning
+copyCtorAndEqOperator:Readers/SIT_Reader/SIT_Parser.tab.hh:553
+copyCtorAndEqOperator:Readers/SIT_Reader/SIT_Parser.tab.hh:875
+copyCtorAndEqOperator:/ lalr1.cc:37:1307
+copyCtorAndEqOperator:/ lalr1.cc:37:657
+
+// Information
+
+ConfigurationNotChecked:/ lalr1.cc:37:386
+
+toomanyconfigs:Readers/SIT_Reader/SIT_Parser.tab.cc
+toomanyconfigs:Readers/ICL_Reader/ICL_Lexer.yy.cc
+toomanyconfigs:Readers/ICL_Reader/ICL_Parser.tab.cc
+toomanyconfigs:Readers/SIT_Reader/SIT_Lexer.yy.cc
+toomanyconfigs:Readers/SIT_Reader/SIT_Parser.tab.cc

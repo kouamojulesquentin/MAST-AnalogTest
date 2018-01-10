@@ -109,12 +109,12 @@ add_subdirectory(External_Libs)
 add_subdirectory(External_Libs_UT)
 add_subdirectory(Logger)
 add_subdirectory(Mast_Core)
-add_subdirectory(Readers)
 add_subdirectory(Mast_API_CPP)
 add_subdirectory(Mast_API_C)
 add_subdirectory(Mast_App)
 add_subdirectory(Tutorials)
 add_subdirectory(PDL_Applications)
+add_subdirectory(Readers)
 add_subdirectory(Tests_Common)
 
 

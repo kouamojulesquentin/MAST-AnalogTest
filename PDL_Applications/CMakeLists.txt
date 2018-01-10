@@ -31,6 +31,7 @@ message("=======================================================================
 message("")
 
 add_library           (PDL_Applications SHARED   ${PDL_Application_SOURCES})
-target_link_libraries (PDL_Applications Mast_API_CPP_RAW)
+target_link_libraries (PDL_Applications Mast_API_CPP_PDL)
+# target_link_libraries (PDL_Applications Mast_API_CPP)
 
 

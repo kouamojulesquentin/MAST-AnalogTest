@@ -14,6 +14,7 @@
 #include "GmlPrinter.hpp"
 #include "SystemModelNodes.hpp"
 #include "PathSelector.hpp"
+#include "VirtualRegister.hpp"
 #include "AccessInterfaceProtocol.hpp"
 #include "Utility.hpp"
 #include "EnumsUtility.hpp"
@@ -408,15 +409,21 @@ void GmlPrinter::CreateRoot ()
 //! @return Associated register identifier surrounded with colons
 string GmlPrinter::FormattedAssociateRegisterId (const Linker& linker)
 {
-  auto selector           = linker.Selector();
-  auto associatedRegister = selector->AssociatedRegister();
-  if (!associatedRegister)
+  auto selector            = linker.Selector();
+  auto associatedRegisters = selector->AssociatedRegisters();
+  if (!associatedRegisters)
   {
     return "";
   }
 
   ostringstream os;
-  os << ":" << associatedRegister->Identifier() << ":";
+
+  for (const auto& sliceReg : *associatedRegisters)
+  {
+    os << ":" << sliceReg.reg->Identifier();
+  }
+
+  os << ":";
   return os.str();
 }
 //

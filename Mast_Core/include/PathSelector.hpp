@@ -40,7 +40,7 @@ enum class SelectorProperty
 
 
 class SystemModelVisitor;
-class Register;
+class VirtualRegister;
 class BinaryVector;
 
 //! Extension point interface used by Linker to manage paths selection
@@ -87,9 +87,9 @@ class PathSelector
   //!
   virtual uint32_t SelectablePaths() const = 0;
 
-  //! Returns associated Register or nullptr when there is none
+  //! Returns associated VirtualRegister or nullptr when there is none
   //!
-  virtual std::shared_ptr<const Register> AssociatedRegister() const = 0;
+  virtual const VirtualRegister* AssociatedRegisters() const = 0;
 
   //! Returns some value associated with specified path selection
   //!
@@ -124,6 +124,10 @@ class PathSelector
   //
   virtual ~PathSelector() = default;
   PathSelector()  = default;
+
+  //! Returns associated VirtualRegister or nullptr when there is none
+  //!
+  virtual VirtualRegister* AssociatedRegisters() = 0;
 
   //! Requests activation of the specified path
   //!

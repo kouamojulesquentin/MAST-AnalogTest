@@ -22,7 +22,7 @@
 namespace mast
 {
 class SystemModelNode;
-class Register;
+class VirtualRegister;
 class BinaryVector;
 
 //! Defines an Unresolved default path selector to be used during SystemModel construction when associated register(s) are not yet known
@@ -51,7 +51,7 @@ class UnresolvedPathSelector : public PathSelector
 
   void Accept              (SystemModelVisitor& /*visitor*/) override   { /* Does nothing but be usable by PrettyPrinter */ };
 
-  std::shared_ptr<const Register> AssociatedRegister() const override { CHECK_FAILED(BadUsageMessage); };
+  const VirtualRegister* AssociatedRegisters() const override { CHECK_FAILED(BadUsageMessage); };
 
   const BinaryVector& SelectionValue (uint32_t /*pathIdentifier*/) const  override{ CHECK_FAILED(BadUsageMessage); };
 
@@ -74,6 +74,10 @@ class UnresolvedPathSelector : public PathSelector
     m_selectTable   = std::move(selectTable);
     m_deselectTable = std::move(deselectTable);
   }
+
+  // ---------------- Protected Methods
+  //
+  VirtualRegister* AssociatedRegisters() override { CHECK_FAILED(BadUsageMessage); };
 
   // ---------------- Private Fields
   //

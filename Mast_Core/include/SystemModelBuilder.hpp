@@ -90,8 +90,7 @@ class MAST_CORE_EXPORT SystemModelBuilder final
                                                     uint32_t                                 irBitsCount,
                                                     uint32_t                                 muxPathsCount,
                                                     std::shared_ptr<AccessInterfaceProtocol> protocol,
-                                                    std::vector<BinaryVector>                IR_coding);
-
+                                                    const std::vector<BinaryVector>&         IR_coding);
 
   //! Creates a path selector
   //!

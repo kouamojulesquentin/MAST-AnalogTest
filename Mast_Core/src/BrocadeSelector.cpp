@@ -42,9 +42,9 @@ BrocadeSelector::BrocadeSelector(shared_ptr<Register> associatedRegister, uint32
                                    properties
                                   )
 {
-  CHECK_PARAMETER_NOT_NULL(associatedRegister, "Brocade selector cannot be constructed without a valid associated Register");
+  CHECK_PARAMETER_NOT_NULL(AssociatedRegisters(), "Brocade selector cannot be constructed without valid associated Register(s)");
 
-  CHECK_PARAMETER_EQ(associatedRegister->BitsCount(), REGISTER_BITS_COUNT,
+  CHECK_PARAMETER_EQ(AssociatedRegisters()->BitsCount(), REGISTER_BITS_COUNT,
                      "Register to control Brocade circuit is expected to have exactly " + std::to_string(REGISTER_BITS_COUNT) + " bits");
 }
 //
@@ -106,14 +106,15 @@ void BrocadeSelector::Deselect (uint32_t pathIdentifier)
   CheckPathIdentifier(pathIdentifier);
 
   const auto& deselectMask = m_deselectTable[pathIdentifier];
-  auto        toSut        = m_muxRegister->NextToSut();
+  auto        muxRegisters = AssociatedRegisters();
+  auto        toSut        = muxRegisters->NextToSut();
 
   toSut &= deselectMask;
 
-  if (m_muxRegister->NextToSut() != toSut)
+  if (muxRegisters->NextToSut() != toSut)
   {
-    m_muxRegister->SetToSut(toSut);
-    m_muxRegister->SetPending();
+    muxRegisters->SetToSut(toSut);
+    muxRegisters->SetPending();
   }
 }
 //
@@ -128,8 +129,9 @@ bool BrocadeSelector::IsActive (uint32_t pathIdentifier) const
 {
   CheckPathIdentifier(pathIdentifier);
 
-  const auto& lastToSut  = m_muxRegister->LastToSut();
-  const auto& selectMask = m_selectTable[pathIdentifier];
+  auto        muxRegisters = AssociatedRegisters();
+  const auto& lastToSut    = muxRegisters->LastToSut();
+  const auto& selectMask   = m_selectTable[pathIdentifier];
 
   bool  isActive = (lastToSut & selectMask) == selectMask;
 
@@ -146,8 +148,9 @@ bool BrocadeSelector::IsSelected (uint32_t pathIdentifier) const
 {
   CheckPathIdentifier(pathIdentifier);
 
-  const auto& nextToSut  = m_muxRegister->NextToSut();
-  const auto& selectMask = m_selectTable[pathIdentifier];
+  auto        muxRegisters = AssociatedRegisters();
+  const auto& nextToSut    = muxRegisters->NextToSut();
+  const auto& selectMask   = m_selectTable[pathIdentifier];
 
   bool  isSelected = (nextToSut & selectMask) == selectMask;
 
@@ -164,12 +167,16 @@ bool BrocadeSelector::IsSelectedAndActive (uint32_t pathIdentifier) const
 {
   CheckPathIdentifier(pathIdentifier);
 
-  auto& lastToSut  = m_muxRegister->LastToSut();
-  auto& nextToSut  = m_muxRegister->NextToSut();
-  auto& selectMask = m_selectTable[pathIdentifier];
+  auto& selectMask   = m_selectTable[pathIdentifier];
+  auto  muxRegisters = AssociatedRegisters();
+  auto  nextToSut    = muxRegisters->NextToSut();
+  auto  lastToSut    = muxRegisters->LastToSut();
 
-  bool  isSelected = (nextToSut & selectMask) == selectMask;
-  bool  isActive   = (lastToSut & selectMask) == selectMask;
+  nextToSut &= selectMask;
+  lastToSut &= selectMask;
+
+  bool  isSelected = nextToSut == selectMask;
+  bool  isActive   = lastToSut == selectMask;
 
   return isSelected && isActive;
 }
@@ -187,8 +194,9 @@ void BrocadeSelector::Select (uint32_t pathIdentifier)
 {
   CheckPathIdentifier(pathIdentifier);
 
-  const auto& selectMask = m_selectTable[pathIdentifier];
-  auto        toSut      = m_muxRegister->NextToSut();
+  const auto& selectMask   = m_selectTable[pathIdentifier];
+  auto        muxRegisters = AssociatedRegisters();
+  auto        toSut        = muxRegisters->NextToSut();
 
   if (pathIdentifier == 0)
   {
@@ -199,10 +207,10 @@ void BrocadeSelector::Select (uint32_t pathIdentifier)
     toSut |= selectMask;
   }
 
-  if (m_muxRegister->NextToSut() != toSut)
+  if (muxRegisters->NextToSut() != toSut)
   {
-    m_muxRegister->SetToSut(toSut);
-    m_muxRegister->SetPending();
+    muxRegisters->SetToSut(toSut);
+    muxRegisters->SetPending();
   }
 }
 //

@@ -12,7 +12,7 @@
 //===========================================================================
 
 #include "Linker.hpp"
-#include "Register.hpp"
+#include "VirtualRegister.hpp"
 #include "SystemModelVisitor.hpp"
 #include "PathSelector.hpp"
 #include "BinaryVector.hpp"
@@ -112,8 +112,8 @@ void Linker::Deselect (uint32_t pathIdentifier)
 //! Requests activation of the specified path
 //!
 //! @internal
-//! @note         When pathIdentifier = 0 (unselect all), if the associated Register is currently pending,
-//!               the request is ignored
+//! @note         When pathIdentifier = 0 (unselect all), if at least one of the associated
+//!               Registers is currently pending, the request is ignored
 //! @endinternal
 //!
 //! @param pathIdentifier   Path identifier in range [1..nb_path]
@@ -124,10 +124,13 @@ void Linker::Select   (uint32_t pathIdentifier)
 
   if (pathIdentifier == 0)
   {
-    auto muxRegister = m_pathSelector->AssociatedRegister();
-    if (muxRegister->IsPending())
+    const auto muxRegisters = m_pathSelector->AssociatedRegisters();
+    for (const auto& sliceReg : *muxRegisters)
     {
-      return;
+      if (sliceReg.reg->IsPending())
+      {
+        return;
+      }
     }
   }
 

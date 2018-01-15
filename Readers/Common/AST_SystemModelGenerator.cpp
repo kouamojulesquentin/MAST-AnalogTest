@@ -325,7 +325,11 @@ shared_ptr<PathSelector> AST_SystemModelGenerator::Create_PathSelector (AST_Scan
   {
     modelRegister->SetHoldValue(true);
     auto pathsCount = selectTable.size() - 1u;
-    pathSelector    = make_shared<DefaultTableBasedPathSelector>(modelRegister, pathsCount, selectTable, deselectTable, selectorProperties);
+    pathSelector    = make_shared<DefaultTableBasedPathSelector>(modelRegister,
+                                                                 pathsCount,
+                                                                 std::move(selectTable),
+                                                                 std::move(deselectTable),
+                                                                 selectorProperties);
   }
 
   return pathSelector;

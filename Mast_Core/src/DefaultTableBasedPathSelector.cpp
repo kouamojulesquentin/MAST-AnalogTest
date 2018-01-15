@@ -85,22 +85,22 @@ string DefaultTableBasedPathSelector::DebugSelectorInfo (bool onlyProperties) co
 
 //! Initializes selector for fast selection/deselection of a path
 //!
-//! @param associatedRegister   Register that is used to drive the path multiplexer
+//! @param associatedRegisters  Register(s) that is/are used to drive the path multiplexer
 //! @param pathsCount           Number of managed paths (including, optional, bypass register)
 //! @param selectTable          Table to use for selecting a path
 //! @param deselectTable        Table to use for deselecting a path
 //! @param properties           Properties of the selector (mainly to report that it can select no path or not)
 //!
-DefaultTableBasedPathSelector::DefaultTableBasedPathSelector (shared_ptr<Register> associatedRegister,
-                                                              uint32_t             pathsCount,
-                                                              TablesType           selectTable,
-                                                              TablesType           deselectTable,
-                                                              SelectorProperty     properties)
+DefaultTableBasedPathSelector::DefaultTableBasedPathSelector (const VirtualRegister& associatedRegisters,
+                                                              uint32_t               pathsCount,
+                                                              TablesType&&           selectTable,
+                                                              TablesType&&           deselectTable,
+                                                              SelectorProperty       properties)
   : PathSelector    (properties)
+  , m_selectTable   (std::move(FixTable(selectTable)))
+  , m_deselectTable (std::move(FixTable(deselectTable)))
   , m_pathsCount    (pathsCount)
-  , m_muxRegister   (CHECK_PARAMETER_NOT_NULL (associatedRegister, "associatedRegister must be a valid Register"))
-  , m_selectTable   (FixTable(selectTable))
-  , m_deselectTable (FixTable(deselectTable))
+  , m_muxRegisters  (associatedRegisters)
 {
   if (m_selectTable.size() != m_deselectTable.size())
   {
@@ -116,6 +116,31 @@ DefaultTableBasedPathSelector::DefaultTableBasedPathSelector (shared_ptr<Registe
     os << "Selection and deselection table must have an entry for not used path identifier zero";
     THROW_INVALID_ARGUMENT(os.str());
   }
+}
+//
+//  End of: DefaultTableBasedPathSelector::DefaultTableBasedPathSelector
+//---------------------------------------------------------------------------
+
+
+//! Initializes selector for fast selection/deselection of a path
+//!
+//! @param associatedRegister   Register that is used to drive the path multiplexer
+//! @param pathsCount           Number of managed paths (including, optional, bypass register)
+//! @param selectTable          Table to use for selecting a path
+//! @param deselectTable        Table to use for deselecting a path
+//! @param properties           Properties of the selector (mainly to report that it can select no path or not)
+//!
+DefaultTableBasedPathSelector::DefaultTableBasedPathSelector (shared_ptr<Register> associatedRegister,
+                                                              uint32_t         pathsCount,
+                                                              TablesType&&     selectTable,
+                                                              TablesType&&     deselectTable,
+                                                              SelectorProperty properties)
+  : DefaultTableBasedPathSelector (VirtualRegister(associatedRegister),
+                                   pathsCount,
+                                   std::move(selectTable),
+                                   std::move(deselectTable),
+                                   properties)
+{
 }
 //
 //  End of: DefaultTableBasedPathSelector::DefaultTableBasedPathSelector
@@ -139,7 +164,7 @@ DefaultTableBasedPathSelector::DefaultTableBasedPathSelector (shared_ptr<Registe
                                                               string_view          tables)
   : PathSelector    (properties)
   , m_pathsCount    (pathsCount)
-  , m_muxRegister   (CHECK_PARAMETER_NOT_NULL (associatedRegister, "associatedRegister must be a valid Register"))
+  , m_muxRegisters  (associatedRegister)
 {
   auto vectors     = Utility::Split(tables, ",");
   auto valuesCount = vectors.size();
@@ -176,13 +201,18 @@ DefaultTableBasedPathSelector::DefaultTableBasedPathSelector (shared_ptr<Registe
 //---------------------------------------------------------------------------
 
 
-//! Forwards call to any embedded Register
+//! Forwards call to any driving Register(s)
 //!
 //! @note Visitor should keep track that it is visiting something within a PathSelector
 //!
 void DefaultTableBasedPathSelector::Accept (SystemModelVisitor& visitor)
 {
-  m_muxRegister->Accept(visitor);
+  const auto muxRegisters = AssociatedRegisters();
+
+  for (const auto& sliceReg : *muxRegisters)
+  {
+    sliceReg.reg->Accept(visitor);
+  }
 }
 //
 //  End of: DefaultTableBasedPathSelector::Accept
@@ -264,8 +294,8 @@ bool DefaultTableBasedPathSelector::IsActive (uint32_t pathIdentifier) const
 {
   CheckPathIdentifier(pathIdentifier);
 
-  auto& lastToSut   = m_muxRegister->LastToSut();
   auto& selectValue = m_selectTable[pathIdentifier];
+  auto  lastToSut   = AssociatedRegisters()->LastToSut();
 
   bool  isActive    = lastToSut == selectValue;
 
@@ -282,8 +312,8 @@ bool DefaultTableBasedPathSelector::IsSelected (uint32_t pathIdentifier) const
 {
   CheckPathIdentifier(pathIdentifier);
 
-  auto& nextToSut   = m_muxRegister->NextToSut();
   auto& selectValue = m_selectTable[pathIdentifier];
+  auto  nextToSut   = AssociatedRegisters()->NextToSut();
 
   bool  isSelected  = nextToSut == selectValue;
 
@@ -300,9 +330,10 @@ bool DefaultTableBasedPathSelector::IsSelectedAndActive (uint32_t pathIdentifier
 {
   CheckPathIdentifier(pathIdentifier);
 
-  auto& lastToSut   = m_muxRegister->LastToSut();
-  auto& nextToSut   = m_muxRegister->NextToSut();
-  auto& selectValue = m_selectTable[pathIdentifier];
+  auto&      selectValue  = m_selectTable[pathIdentifier];
+  const auto muxRegisters = AssociatedRegisters();
+  auto       lastToSut    = muxRegisters->LastToSut();
+  auto       nextToSut    = muxRegisters->NextToSut();
 
   bool  isSelected  = nextToSut == selectValue;
   bool  isActive    = lastToSut == selectValue;
@@ -320,11 +351,13 @@ void DefaultTableBasedPathSelector::Deselect (uint32_t pathIdentifier)
 {
   CheckPathIdentifier(pathIdentifier);
 
-  const auto& selectValue = m_deselectTable[pathIdentifier];
-  if (m_muxRegister->NextToSut() != selectValue)
+  const auto& selectValue  = m_deselectTable[pathIdentifier];
+  const auto  muxRegisters = AssociatedRegisters();
+
+  if (muxRegisters->NextToSut() != selectValue)
   {
-    m_muxRegister->SetToSut(selectValue);
-    m_muxRegister->SetPending();
+    muxRegisters->SetToSut(selectValue);
+    muxRegisters->SetPending();
   }
 }
 //
@@ -340,11 +373,13 @@ void DefaultTableBasedPathSelector::Select (uint32_t pathIdentifier)
 {
   CheckPathIdentifier(pathIdentifier);
 
-  const auto& selectValue = m_selectTable[pathIdentifier];
-  if (m_muxRegister->NextToSut() != selectValue)
+  const auto& selectValue  = m_selectTable[pathIdentifier];
+  const auto  muxRegisters = AssociatedRegisters();
+
+  if (muxRegisters->NextToSut() != selectValue)
   {
-    m_muxRegister->SetToSut(selectValue);
-    m_muxRegister->SetPending();
+    muxRegisters->SetToSut(selectValue);
+    muxRegisters->SetPending();
   }
 }
 //

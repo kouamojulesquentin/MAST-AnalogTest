@@ -16,6 +16,7 @@
 
 #include "PathSelector.hpp"
 #include "BinaryVector.hpp"
+#include "VirtualRegister.hpp"
 #include "Mast_Core_export.hpp"
 
 #include <vector>
@@ -48,11 +49,20 @@ class MAST_CORE_EXPORT DefaultTableBasedPathSelector : public PathSelector
 
   //! Constructs from selection and deselection tables with pathCount entries
   //!
+  DefaultTableBasedPathSelector(const VirtualRegister& associatedRegisters,
+                                uint32_t               pathsCount,
+                                TablesType&&           selectTable,
+                                TablesType&&           deselectTable,
+                                SelectorProperty       properties = SelectorProperty::None);
+
+  //! Constructs from selection and deselection tables with pathCount entries
+  //!
   DefaultTableBasedPathSelector(std::shared_ptr<Register> associatedRegister,
                                 uint32_t                  pathsCount,
-                                TablesType                selectTable,
-                                TablesType                deselectTable,
+                                TablesType&&              selectTable,
+                                TablesType&&              deselectTable,
                                 SelectorProperty          properties = SelectorProperty::None);
+
 
   //! Constructs from tables defined as string parameters
   //!
@@ -67,7 +77,7 @@ class MAST_CORE_EXPORT DefaultTableBasedPathSelector : public PathSelector
   virtual void Select              (uint32_t pathIdentifier) override;       //!< Request activation of the specified path
   virtual void Deselect            (uint32_t pathIdentifier) override;       //!< Request deactivation of the specified path
 
-  virtual std::shared_ptr<const Register> AssociatedRegister() const override { return m_muxRegister; }  //!< Returns associated Register
+  virtual const VirtualRegister* AssociatedRegisters() const override { return &m_muxRegisters; }  //!< Returns associated Registers
 
   virtual uint32_t SelectablePaths() const override { return m_pathsCount; };   //!< Returns the maximum number of selectable paths (max value for IsActive, Select and Deselect)
 
@@ -113,15 +123,20 @@ class MAST_CORE_EXPORT DefaultTableBasedPathSelector : public PathSelector
   //
   protected:
 
+  virtual VirtualRegister* AssociatedRegisters() override { return &m_muxRegisters; }  //!< Returns associated Registers
+
   void CheckPathIdentifier (uint32_t pathIdentifier) const;
 
   // ---------------- Protected Fields
   //
   protected:
-  uint32_t                  m_pathsCount;    //!< Number of managed paths
-  std::shared_ptr<Register> m_muxRegister;   //!< Register that drives the paths multiplexer
-  TablesType                m_selectTable;   //!< Selection LUT   (non const because of deferred initialization)
-  TablesType                m_deselectTable; //!< Deselection LUT (non const because of deferred initialization)
+  TablesType      m_selectTable;   //!< Selection LUT   (non const because of deferred initialization)
+  TablesType      m_deselectTable; //!< Deselection LUT (non const because of deferred initialization)
+
+  // ---------------- Private Fields
+  //
+  uint32_t        m_pathsCount;    //!< Number of managed paths
+  VirtualRegister m_muxRegisters;  //!< Register(s) that drive(s) the paths multiplexer
 };
 //
 //  End of DefaultTableBasedPathSelector class declaration

@@ -341,11 +341,11 @@ shared_ptr<AccessInterface> SystemModelBuilder::Create_JTAG_TAP (string_view    
 //! |                              |
 //!  ------------------------------
 //!
-shared_ptr<AccessInterface> SystemModelBuilder::Create_JTAG_TAP (string_view                         name,
-                                                                 uint32_t                            irBitsCount,
-                                                                 uint32_t                            muxPathsCount,
-                                                                 shared_ptr<AccessInterfaceProtocol> protocol,
-                                                                 std::vector<mast::BinaryVector>        IR_coding)
+shared_ptr<AccessInterface> SystemModelBuilder::Create_JTAG_TAP (string_view                            name,
+                                                                 uint32_t                               irBitsCount,
+                                                                 uint32_t                               muxPathsCount,
+                                                                 shared_ptr<AccessInterfaceProtocol>    protocol,
+                                                                 const std::vector<mast::BinaryVector>& IR_coding)
 {
   CHECK_PARAMETER_NOT_ZERO (irBitsCount, "irBitsCount must be != 0");
   CHECK_PARAMETER_GT       (muxPathsCount, 1, "muxPathsCount must be > 1");
@@ -358,40 +358,38 @@ shared_ptr<AccessInterface> SystemModelBuilder::Create_JTAG_TAP (string_view    
 
   auto accessInterface = m_model.CreateAccessInterface(rootName, protocol);
 
-  // ---------------- Create IR
+  // ---------------- Create IR and selection/deselection tables
   //
-   BinaryVector irBypassSequence;
+  BinaryVector irBypassSequence;
   std::vector<BinaryVector> selectTable;
   if (IR_coding.empty())
-   {
-  // Select table is by default binary except for no path and 1st that use the bypass sequence
-   selectTable = DefaultBinaryPathSelector::CreateSelectTable(irBitsCount, muxPathsCount, SelectorProperty::Binary_Default);
-   irBypassSequence = BinaryVector(irBitsCount, 0xFF);
-  selectTable[0] = irBypassSequence;  // Not used (path id zero)
-  selectTable[1] = irBypassSequence;  // Bypass register
-   }
-  else
-   {
-   selectTable = IR_coding;
-   irBypassSequence = IR_coding[0];
-   //Bypass sequence must be used also for 0 in selectTable
-   selectTable.insert(selectTable.begin(),irBypassSequence);
-    }
+  {
+    // Select table is by default binary except for no path and 1st that use the bypass sequence
+    selectTable      = DefaultBinaryPathSelector::CreateSelectTable(irBitsCount, muxPathsCount, SelectorProperty::Binary_Default);
+    irBypassSequence = BinaryVector(irBitsCount, 0xFF);
 
-  auto ir               = m_model.CreateRegister(irName, irBypassSequence, true, accessInterface);
+    selectTable[0] = irBypassSequence;  // Not used (path id zero)
+    selectTable[1] = irBypassSequence;  // Bypass register
+  }
+  else
+  {
+    selectTable      = IR_coding;
+    irBypassSequence = IR_coding[0];
+
+    selectTable.insert(selectTable.begin(), irBypassSequence); // Bypass sequence must be used also for 0 in selectTable
+  }
+
+  auto deselectTable = DefaultTableBasedPathSelector::TablesType(muxPathsCount + 1u, irBypassSequence); // Deselect table is by default all bypass sequence
+
+  auto ir = m_model.CreateRegister(irName, irBypassSequence, true, accessInterface);
 
   // ---------------- Create path selector
-
   //
-
-  // Deselect table is by default all bypass sequence
-  auto deselectTable = DefaultTableBasedPathSelector::TablesType(muxPathsCount + 1u, irBypassSequence);
-
-  auto pathSelector = make_shared<DefaultTableBasedPathSelector>(ir, muxPathsCount, selectTable, deselectTable);
+  auto pathSelector = make_shared<DefaultTableBasedPathSelector>(ir, muxPathsCount, std::move(selectTable), std::move(deselectTable));
 
   // ---------------- Create Linker
   //
-  auto linker       = m_model.CreateLinker(muxName, pathSelector, accessInterface);
+  auto linker = m_model.CreateLinker(muxName, pathSelector, accessInterface);
 
   // ---------------- Create bypass register
   //

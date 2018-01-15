@@ -134,7 +134,8 @@ void DefaultNHotPathSelector::Deselect (uint32_t pathIdentifier)
   CheckPathIdentifier(pathIdentifier);
 
   const auto& deselectMask = m_deselectTable[pathIdentifier];
-  auto        toSut        = m_muxRegister->NextToSut();
+  auto        muxRegisters = AssociatedRegisters();
+  auto        toSut        = muxRegisters->NextToSut();
 
   if (m_invertedBits) // Active low?
   {
@@ -150,10 +151,10 @@ void DefaultNHotPathSelector::Deselect (uint32_t pathIdentifier)
     THROW_LOGIC_ERROR("Try to select no path, even though selector is configured to at least select one");
   }
 
-  if (m_muxRegister->NextToSut() != toSut)
+  if (muxRegisters->NextToSut() != toSut)
   {
-    m_muxRegister->SetToSut(toSut);
-    m_muxRegister->SetPending();
+    muxRegisters->SetToSut(toSut);
+    muxRegisters->SetPending();
   }
 }
 //
@@ -168,8 +169,9 @@ bool DefaultNHotPathSelector::IsActive (uint32_t pathIdentifier) const
 {
   CheckPathIdentifier(pathIdentifier);
 
-  const auto& lastToSut  = m_muxRegister->LastToSut();
-  const auto& selectMask = m_selectTable[pathIdentifier];
+  auto        muxRegisters = AssociatedRegisters();
+  const auto& lastToSut    = muxRegisters->LastToSut();
+  const auto& selectMask   = m_selectTable[pathIdentifier];
 
   bool  isActive = m_invertedBits ? (lastToSut | selectMask) == selectMask
                                   : (lastToSut & selectMask) == selectMask;
@@ -187,11 +189,20 @@ bool DefaultNHotPathSelector::IsSelected (uint32_t pathIdentifier) const
 {
   CheckPathIdentifier(pathIdentifier);
 
-  const auto& nextToSut  = m_muxRegister->NextToSut();
-  const auto& selectMask = m_selectTable[pathIdentifier];
+  auto        muxRegisters = AssociatedRegisters();
+  auto        nextToSut    = muxRegisters->NextToSut();
+  const auto& selectMask   = m_selectTable[pathIdentifier];
 
-  bool  isSelected = m_invertedBits ? (nextToSut | selectMask) == selectMask
-                                    : (nextToSut & selectMask) == selectMask;
+  if (m_invertedBits)
+  {
+    nextToSut |= selectMask;
+  }
+  else
+  {
+    nextToSut &= selectMask;
+  }
+
+  bool  isSelected = nextToSut == selectMask;
 
   return isSelected;
 }
@@ -206,15 +217,24 @@ bool DefaultNHotPathSelector::IsSelectedAndActive (uint32_t pathIdentifier) cons
 {
   CheckPathIdentifier(pathIdentifier);
 
-  auto& lastToSut  = m_muxRegister->LastToSut();
-  auto& nextToSut  = m_muxRegister->NextToSut();
-  auto& selectMask = m_selectTable[pathIdentifier];
+  auto& selectMask   = m_selectTable[pathIdentifier];
+  auto  muxRegisters = AssociatedRegisters();
+  auto  lastToSut    = muxRegisters->LastToSut();
+  auto  nextToSut    = muxRegisters->NextToSut();
 
-  bool  isSelected = m_invertedBits ? (nextToSut | selectMask) == selectMask
-                                    : (nextToSut & selectMask) == selectMask;
+  if (m_invertedBits)
+  {
+    nextToSut |= selectMask;
+    lastToSut |= selectMask;
+  }
+  else
+  {
+    nextToSut &= selectMask;
+    lastToSut &= selectMask;
+  }
 
-  bool  isActive   = m_invertedBits ? (lastToSut | selectMask) == selectMask
-                                    : (lastToSut & selectMask) == selectMask;
+  bool  isSelected = nextToSut == selectMask;
+  bool  isActive   = lastToSut == selectMask;
 
   return isSelected && isActive;
 }
@@ -232,8 +252,9 @@ void DefaultNHotPathSelector::Select (uint32_t pathIdentifier)
 {
   CheckPathIdentifier(pathIdentifier);
 
-  const auto& selectMask = m_selectTable[pathIdentifier];
-  auto        toSut      = m_muxRegister->NextToSut();
+  const auto& selectMask   = m_selectTable[pathIdentifier];
+  auto        muxRegisters = AssociatedRegisters();
+  auto        toSut        = muxRegisters->NextToSut();
 
   if (pathIdentifier == 0)
   {
@@ -248,10 +269,10 @@ void DefaultNHotPathSelector::Select (uint32_t pathIdentifier)
     toSut |= selectMask;
   }
 
-  if (m_muxRegister->NextToSut() != toSut)
+  if (muxRegisters->NextToSut() != toSut)
   {
-    m_muxRegister->SetToSut(toSut);
-    m_muxRegister->SetPending();
+    muxRegisters->SetToSut(toSut);
+    muxRegisters->SetPending();
   }
 }
 //

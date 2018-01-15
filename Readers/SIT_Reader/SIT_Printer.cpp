@@ -14,6 +14,7 @@
 #include "SIT_Printer.hpp"
 #include "SystemModelNodes.hpp"
 #include "PathSelector.hpp"
+#include "VirtualRegister.hpp"
 #include "AccessInterfaceProtocol.hpp"
 #include "Utility.hpp"
 
@@ -201,11 +202,15 @@ void SIT_Printer::VisitLinker (Linker& linker)
   ostringstream os;
   if (selector)
   {
-    auto associatedRegister = selector->AssociatedRegister();
     os << selector->KindName();
-    if (associatedRegister)
+
+    auto associatedRegisters = selector->AssociatedRegisters();
+    if (associatedRegisters)
     {
-      StreamNodeName(os, *associatedRegister);
+      for (const auto& sliceReg : *associatedRegisters)
+      {
+        StreamNodeName(os, *sliceReg.reg);
+      }
     }
     else
     {

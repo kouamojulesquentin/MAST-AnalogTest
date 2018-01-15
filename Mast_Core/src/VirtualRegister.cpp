@@ -12,9 +12,30 @@
 //===========================================================================
 
 #include "VirtualRegister.hpp"
+#include "Register.hpp"
 #include "Utility.hpp"
 
 using namespace mast;
+using std::shared_ptr;
+
+
+//! Constructs from a single Register
+//!
+//! @param reg  Register treated as VirtualRegister
+//!
+VirtualRegister::VirtualRegister (shared_ptr<Register> reg)
+{
+  CHECK_PARAMETER_NOT_NULL(reg,             "Cannot create VirtualRegister from nullptr Register");
+  CHECK_PARAMETER_GTE(reg->BitsCount(), 1u, "Register must have at least one bit");
+
+  IndexedRange range(reg->BitsCount() - 1u, 0);
+
+  m_registers.emplace_back(RegisterSlice{reg, range});
+}
+//
+//  End of: VirtualRegister::VirtualRegister
+//---------------------------------------------------------------------------
+
 
 
 

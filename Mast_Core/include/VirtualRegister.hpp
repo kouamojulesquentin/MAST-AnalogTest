@@ -43,8 +43,19 @@ class MAST_CORE_EXPORT VirtualRegister final
   {
     std::shared_ptr<Register> reg;
     IndexedRange              range;
+    bool operator==(const RegisterSlice& rhs) const
+    {
+      return std::tie(reg, range) == std::tie(rhs.reg, rhs.range);
+    }
+
+    bool operator!=(const RegisterSlice& rhs) const
+    {
+      return !operator==(rhs);
+    }
   };
 //+  VirtualRegister(std::initializer_list<shared_ptr<RegisterSlice>> registers);
+
+  explicit VirtualRegister(std::shared_ptr<Register> reg);
 
   //! Appends a register slice to proxied registers
   //!
@@ -73,6 +84,16 @@ class MAST_CORE_EXPORT VirtualRegister final
   {
     static_assert(std::is_integral<T>::value, "SetToSut requires BinaryVector or integral types");
   }
+
+  // ---------------- Iterators
+  //
+  auto begin()  noexcept       { return m_registers.begin();  } //!< Returns an iterator to the first RegisterSlice
+  auto begin()  const noexcept { return m_registers.begin();  } //!< Returns an iterator to the first RegisterSlice
+  auto cbegin() const noexcept { return m_registers.cbegin(); } //!< Returns an iterator to the first RegisterSlice
+
+  auto end()    noexcept       { return m_registers.end();    } //!< Returns an iterator to the element following the last RegisterSlice
+  auto end()    const noexcept { return m_registers.end();    } //!< Returns an iterator to the element following the last RegisterSlice
+  auto cend()   const noexcept { return m_registers.cend();   } //!< Returns an iterator to the element following the last RegisterSlice
 
   // ---------------- Private Methods
   //

@@ -19,10 +19,12 @@
 #include "Mast_Core_Traits.hpp"
 
 #include <experimental/string_view>
-#include <memory>
 #include <tuple>
+#include <vector>
+#include <memory>
 
 using std::tuple;
+using std::vector;
 using std::shared_ptr;
 using std::make_shared;
 using std::experimental::string_view;
@@ -53,10 +55,52 @@ void UT_VirtualRegister::test_Constructor_Default ()
     TS_ASSERT_EQUALS (sut.BitsOrdering(), BitsOrdering::Undefined);
     TS_ASSERT_EQUALS (sut.TypeName(),     "VirtualRegister");
   );
-
-
 }
 
+
+//! Checks VirtualRegister constructor from single Register
+//!
+void UT_VirtualRegister::test_Constructor_FromSingleRegister ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto regValue      = BinaryVector::CreateFromString(std::get<0>(data));
+    auto bitsOrdering  = std::get<1>(data);
+    auto expectedWidth = std::get<2>(data);
+    auto holdValue     = false;
+
+    auto reg = make_shared<Register>("reg", regValue, holdValue, bitsOrdering);
+
+    // ---------------- Exercise
+    //
+    VirtualRegister sut(reg);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.BitsOrdering(), bitsOrdering);
+    TS_ASSERT_EQUALS (sut.BitsCount(),    expectedWidth);
+  };
+
+  using data_t = tuple<string_view, BitsOrdering, uint32_t>;
+  auto data = // Register value, expected Width
+  {
+    data_t{"/xDEAF",        BitsOrdering::Downto, 16}, // 0
+    data_t{"/xDEAF",        BitsOrdering::Upto,   16}, // 1
+    data_t{"/x1234",        BitsOrdering::Downto, 16}, // 2
+    data_t{"/b0",           BitsOrdering::Downto, 1},  // 3
+    data_t{"/b1",           BitsOrdering::Upto,   1},  // 4
+    data_t{"/b1_0001",      BitsOrdering::Downto, 5},  // 5
+    data_t{"/b1_0111_0001", BitsOrdering::Upto,   9},  // 6
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
 
 //! Checks VirtualRegister::Append() when providing first and valid RegisterSlice
 //!
@@ -68,14 +112,15 @@ void UT_VirtualRegister::test_Append_First ()
   {
     // ---------------- Setup
     //
-    auto regValue          = BinaryVector::CreateFromString(std::get<0>(data));
-    auto bitsOrdering      = std::get<1>(data);
-    auto leftIndex         = std::get<2>(data);
-    auto rightIndex        = std::get<3>(data);
-    auto expectedWidth     = std::get<4>(data);
+    auto regValue      = BinaryVector::CreateFromString(std::get<0>(data));
+    auto bitsOrdering  = std::get<1>(data);
+    auto leftIndex     = std::get<2>(data);
+    auto rightIndex    = std::get<3>(data);
+    auto expectedWidth = std::get<4>(data);
+    auto holdValue     = false;
 
 
-    auto reg        = make_shared<Register>("reg", regValue, false, bitsOrdering);
+    auto reg        = make_shared<Register>("reg", regValue, holdValue, bitsOrdering);
     IndexedRange    range(leftIndex,   rightIndex);
     RegisterSlice   registerSlice{reg, range};
     VirtualRegister sut;
@@ -641,7 +686,7 @@ void UT_VirtualRegister::test_SetToSut_Downto ()
     auto regSlice_1 = RegisterSlice{reg_1, range_1};  // ==> Viewed slice: 0101_1
 
     auto range_2    = IndexedRange(11, 1);
-    auto reg_2      = make_shared<Register>("reg_1", BinaryVector::CreateFromString("/xCAB/b101"), false, BitsOrdering::Downto);
+    auto reg_2      = make_shared<Register>("reg_2", BinaryVector::CreateFromString("/xCAB/b101"), false, BitsOrdering::Downto);
     auto regSlice_2 = RegisterSlice{reg_2, range_2};  // ==> Viewed slice: 0:1010_1011:10
 
     VirtualRegister sut;
@@ -705,6 +750,99 @@ void UT_VirtualRegister::test_SetToSut_when_Empty ()
   //
   TS_ASSERT_THROWS (sut.SetToSut(emptyVector), std::invalid_argument);
 }
+
+
+//! Checks VirtualRegister::begin() and VirtualRegister::end()
+//!
+void UT_VirtualRegister::test_begin_end ()
+{
+  // ---------------- Setup
+  //
+  auto range_1    = IndexedRange(7u, 3u);
+  auto reg_1      = make_shared<Register>("reg_1", BinaryVector::CreateFromString("/xF5C"), false, BitsOrdering::Downto);
+  auto regSlice_1 = RegisterSlice{reg_1, range_1};  // ==> Viewed slice: 0101_1
+
+  auto range_2    = IndexedRange(11, 1);
+  auto reg_2      = make_shared<Register>("reg_2", BinaryVector::CreateFromString("/xCAB/b101"), false, BitsOrdering::Downto);
+  auto regSlice_2 = RegisterSlice{reg_2, range_2};  // ==> Viewed slice: 0:1010_1011:10
+
+  auto range_3    = IndexedRange(7, 4);
+  auto reg_3      = make_shared<Register>("reg_3", BinaryVector::CreateFromString("/xB6D"), false, BitsOrdering::Downto);
+  auto regSlice_3 = RegisterSlice{reg_3, range_3};  // ==> Viewed slice: 0110
+
+  VirtualRegister sut;
+  sut.Append(regSlice_1); // ==> Viewed slice: 1010_1
+  sut.Append(regSlice_2); // ==> Viewed slice: 0101_1:0_1010_1011_10       (0x5AAE)
+  sut.Append(regSlice_3); // ==> Viewed slice: 0101_1:0_1010_1011_10:0110  (0x5AAE6)
+
+  CxxTest::setAbortTestOnFail(true);
+
+  vector<RegisterSlice> capturedSlices;
+
+  // ---------------- Exercise
+  //
+  for (const auto& sliceReg : sut)
+  {
+    capturedSlices.emplace_back(sliceReg);
+  }
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (capturedSlices.size(), 3u);
+
+  vector<RegisterSlice> expectedSlices { regSlice_1, regSlice_2, regSlice_3  };
+
+  TS_ASSERT_EQUALS (capturedSlices, expectedSlices);
+}
+
+
+
+//! Checks VirtualRegister::cbegin() and VirtualRegister::cend()
+//!
+void UT_VirtualRegister::test_cbegin_cend ()
+{
+  // ---------------- Setup
+  //
+  auto range_1    = IndexedRange(7u, 3u);
+  auto reg_1      = make_shared<Register>("reg_1", BinaryVector::CreateFromString("/xF5C"), false, BitsOrdering::Downto);
+  auto regSlice_1 = RegisterSlice{reg_1, range_1};  // ==> Viewed slice: 0101_1
+
+  auto range_2    = IndexedRange(11, 1);
+  auto reg_2      = make_shared<Register>("reg_2", BinaryVector::CreateFromString("/xCAB/b101"), false, BitsOrdering::Downto);
+  auto regSlice_2 = RegisterSlice{reg_2, range_2};  // ==> Viewed slice: 0:1010_1011:10
+
+  auto range_3    = IndexedRange(7, 4);
+  auto reg_3      = make_shared<Register>("reg_3", BinaryVector::CreateFromString("/xB6D"), false, BitsOrdering::Downto);
+  auto regSlice_3 = RegisterSlice{reg_3, range_3};  // ==> Viewed slice: 0110
+
+  VirtualRegister sut;
+  sut.Append(regSlice_1); // ==> Viewed slice: 1010_1
+  sut.Append(regSlice_2); // ==> Viewed slice: 0101_1:0_1010_1011_10       (0x5AAE)
+  sut.Append(regSlice_3); // ==> Viewed slice: 0101_1:0_1010_1011_10:0110  (0x5AAE6)
+
+  CxxTest::setAbortTestOnFail(true);
+
+  vector<RegisterSlice> capturedSlices;
+
+  // ---------------- Exercise
+  //
+  auto pos = sut.cbegin();
+  auto end = sut.cend();
+
+  while (pos != end)
+  {
+    capturedSlices.emplace_back(*pos++);
+  }
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (capturedSlices.size(), 3u);
+
+  vector<RegisterSlice> expectedSlices { regSlice_1, regSlice_2, regSlice_3  };
+
+  TS_ASSERT_EQUALS (capturedSlices, expectedSlices);
+}
+
 
 //===========================================================================
 // End of UT_VirtualRegister.cpp

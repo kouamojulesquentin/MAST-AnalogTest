@@ -30,6 +30,7 @@ class UT_VirtualRegister : public CxxTest::TestSuite
   // ---------------- Constructors
   //
   void test_Constructor_Default ();
+  void test_Constructor_FromSingleRegister ();
 
   // ---------------- Append
   //
@@ -61,6 +62,11 @@ class UT_VirtualRegister : public CxxTest::TestSuite
   void test_SetToSut_when_HasNoRegister ();
   void test_SetToSut_when_Empty ();
 //+  void test_SetToSut_when_InvalidBitsCount ();
+
+  // ---------------- Iterators
+  //
+  void test_begin_end ();
+  void test_cbegin_cend ();
 
 };
 //

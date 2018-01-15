@@ -19,6 +19,7 @@
 #include "Mast_Core_Enums_Traits.hpp"
 #include "BinaryVector_Traits.hpp"
 #include "IndexedRange_Traits.hpp"
+#include "VirtualRegister_Traits.hpp"
 #include "CheckResult_Traits.hpp"
 #include "ParentNode_Traits.hpp"
 #include "AppFunctionNameAndNode_Traits.hpp"

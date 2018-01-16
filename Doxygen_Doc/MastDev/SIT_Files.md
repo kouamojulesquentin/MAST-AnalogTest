@@ -138,12 +138,34 @@ The children of a given node are listed between two parenthesis following it.<br
 The order in the list is respected when applying the selection protocol<br>
 For instance:
 
-    LINKER test_LINKER One_Hot test_reg_1 2
+    LINKER test_LINKER One_Hot <selector> 2
     (
       REGISTER test_register_1 12 Bypass: "0b1001:0110:1100"
       REGISTER test_register_2 12 Bypass: "0b1001:0110:1100"
     )
 
+The folloiwng table identifies the possible syntaxes for <selector>, which can be freely mixed.
+
+<table>
+  <tr><th width = 100>Syntax</th><th>  Meaning </th></tr>
+  <tr>
+    <td> <name> </td>
+    <td>The register identified by the (unique) name is used a the selector for the Linker </td>
+  </tr>
+  <tr>
+    <td> <name>[range] </td>
+    <td> The slice of register identified by the (unique) name and the range is used a the selector for the Linker. Range can either be a single bit (ex: name[0]) or and interval (ex: name [0..2])</td>
+  </tr>
+  <tr>
+    <td> {<parent>}+.<name> </td>
+    <td>Same as per <name>, but <parent> can be used to specify the hierarcy where "name" is defined to avoid ambiguity. For instance: A.B.reg or C.F.G.reg </td>
+  </tr>
+  <tr>
+    <td> <selector>{:<selector>}+ </td>
+    <td> <selector>s are concatenated to obtain the Virtual Register selecting the linker. For instance reg1:reg2 or regA[0]:a.b.regB[0...3] </td>
+  </tr>
+  <tr>
+</table>
 
 Register nodes test_register_1 and test_register_2 are respectively the first and second child of linker node test_linker.<br>
 Due to Lex/Yacc limitations, SIT_Reader does not support empty hierarchies. At least one node must be provided.<br>

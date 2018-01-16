@@ -93,6 +93,14 @@ class AST_Module final : public AST_ParentNode
   //!
   const std::vector<AST_ScanRegister*>& ScanRegisters() const { return m_scanRegisters; }
 
+  //! Returns module DataInPort(s)
+  //!
+  const std::vector<AST_Port*>& DataInPorts() const { return m_dataInPorts; }
+
+  //! Returns module DataOutPort(s)
+  //!
+  const std::vector<AST_Port*>& DataOutPorts() const { return m_dataOutPorts; }
+
   //! Returns module ScanInPort(s)
   //!
   const std::vector<AST_Port*>& ScanInPorts() const { return m_scanInPorts; }
@@ -201,6 +209,8 @@ class AST_Module final : public AST_ParentNode
   std::vector<AST_Parameter*>     m_parameters;                   //!< Generic module  parameters
   std::vector<AST_Parameter*>     m_localParameters;              //!< Module local parameters
   std::vector<AST_ScanInterface*> m_scanInterfaces;               //!< Scan interfaces
+  std::vector<AST_Port*>          m_dataInPorts;                  //!< Data input port(s)
+  std::vector<AST_Port*>          m_dataOutPorts;                 //!< Data output port(s)
   std::vector<AST_Port*>          m_scanInPorts;                  //!< Scan input port(s)
   std::vector<AST_Port*>          m_scanOutPorts;                 //!< Scan output port(s)
   std::set<const AST_Port*>       m_markedScanOutPorts;           //!< Set of "marked" ScanOutPort

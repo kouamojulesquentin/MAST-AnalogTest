@@ -73,6 +73,8 @@ void AST_Module::DispatchChildren ()
         case Parsers::Kind::ScanOutPort:    AST_ParentNode::AppendChild(child, m_scanOutPorts);    break;
         case Parsers::Kind::ScanMux:        AST_ParentNode::AppendChild(child, m_scanMuxes);       break;
         case Parsers::Kind::ScanRegister:   AST_ParentNode::AppendChild(child, m_scanRegisters);   break;
+        case Parsers::Kind::DataInPort:     AST_ParentNode::AppendChild(child, m_dataInPorts);     break;
+        case Parsers::Kind::DataOutPort:    AST_ParentNode::AppendChild(child, m_dataOutPorts);    break;
         case Parsers::Kind::Instance:       AST_ParentNode::AppendChild(child, m_instances);       break;
 
         case Parsers::Kind::AccessLink :    SetChild(child, m_accessLink); break;

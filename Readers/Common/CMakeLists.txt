@@ -15,6 +15,7 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_Attribute.cpp
                                   AST_BsdlInstructionRef.hpp
                                   AST_BsdlInstructionRef.cpp
+                                  AST_EnumRef.hpp
                                   AST_FileRef.hpp
                                   AST_Instance.hpp
                                   AST_Instance.cpp

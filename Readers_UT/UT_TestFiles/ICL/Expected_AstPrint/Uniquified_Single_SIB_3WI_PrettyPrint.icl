@@ -1,6 +1,8 @@
 NameSpace;
 Module Instrument
 {
+  DataInPort DI[7:0];
+  DataOutPort DO[7:0];
 }
 Module SIB_mux_pre
 {
@@ -87,12 +89,18 @@ Module WrappedInstr
 NameSpace UniquifiedModules;
 Module Instrument__uniquified__3
 {
+  DataInPort DI[7:0];
+  DataOutPort DO[7:0];
 }
 Module Instrument__uniquified__6
 {
+  DataInPort DI[7:0];
+  DataOutPort DO[7:0];
 }
 Module Instrument__uniquified__9
 {
+  DataInPort DI[7:0];
+  DataOutPort DO[7:0];
 }
 Module SIB_mux_pre__uniquified__1
 {

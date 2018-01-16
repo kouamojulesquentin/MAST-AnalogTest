@@ -32,6 +32,8 @@ namespace Parsers
     Attribute,          //!< For attribute definitions
     BsdlInstructionRef, //!< For BSDL instruction referred by AccessLink
     DefaultLoadValue,   //!< For registers default load value
+    DataInPort,         //!< For modules data input port
+    DataOutPort,        //!< For modules data output port
     Enum_def,           //!< For enums definitions
     Enum_item,          //!< For enums items
     Enum_ref,           //!< For enums references
@@ -88,6 +90,8 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::Attribute)
             ENUM_MEMBER(Parsers::Kind::BsdlInstructionRef)
             ENUM_MEMBER(Parsers::Kind::DefaultLoadValue)
+            ENUM_MEMBER(Parsers::Kind::DataInPort)
+            ENUM_MEMBER(Parsers::Kind::DataOutPort)
             ENUM_MEMBER(Parsers::Kind::Enum_def)
             ENUM_MEMBER(Parsers::Kind::Enum_item)
             ENUM_MEMBER(Parsers::Kind::Enum_ref)

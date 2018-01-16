@@ -15,6 +15,7 @@
 #include "AST_AccessLink.hpp"
 #include "AST_Attribute.hpp"
 #include "AST_BsdlInstructionRef.hpp"
+#include "AST_EnumRef.hpp"
 #include "AST_FileRef.hpp"
 #include "AST_Instance.hpp"
 #include "AST_ModuleIdentifier.hpp"
@@ -222,7 +223,21 @@ AST_BsdlInstructionRef* AST::Create_BsdlInstructionRef (std::string&& instructio
 //---------------------------------------------------------------------------
 
 
-//! Creates or returns existing AST_FileRef node
+//! Creates an AST_EnumRef node
+//!
+//! @param name   Refereed enum name
+//!
+AST_EnumRef* AST::Create_EnumRef (string&& name)
+{
+  return Create_Node<AST_EnumRef>(std::move(name));
+}
+//
+//  End of: AST::Create_FileRef
+//---------------------------------------------------------------------------
+
+
+
+//! Creates an AST_FileRef node
 //!
 //! @param kind   Kind of file
 //! @param name   File name or path

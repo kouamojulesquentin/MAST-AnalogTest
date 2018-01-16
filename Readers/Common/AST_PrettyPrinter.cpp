@@ -295,6 +295,8 @@ void AST_PrettyPrinter::Visit_Module (AST_Module* module)
   AcceptNodes (module->ScanInterfaces());
   AcceptNodes (module->ScanInPorts());
   AcceptNodes (module->ScanOutPorts());
+  AcceptNodes (module->DataInPorts());
+  AcceptNodes (module->DataOutPorts());
   AcceptNodes (module->UndispatchedChildren());
   AcceptNodes (module->Instances());
   AcceptNodes (module->ScanMuxes());

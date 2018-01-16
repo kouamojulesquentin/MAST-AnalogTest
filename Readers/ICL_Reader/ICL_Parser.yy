@@ -36,6 +36,7 @@ namespace Parsers
   class AST_AccessLink;
   class AST_Attribute;
   class AST_BsdlInstructionRef;
+  class AST_EnumRef;
   class AST_FileRef;
   class AST_Identifier;
   class AST_Instance;
@@ -92,6 +93,7 @@ typedef void* yyscan_t;
 #include "AST_AccessLink.hpp"
 #include "AST_Attribute.hpp"
 #include "AST_BsdlInstructionRef.hpp"
+#include "AST_EnumRef.hpp"
 #include "AST_FileRef.hpp"
 #include "AST_Instance.hpp"
 #include "AST_ModuleIdentifier.hpp"
@@ -311,6 +313,7 @@ namespace
 %type <Parsers::AST_AccessLink*>         accessLink_def
 %type <Parsers::AST_AccessLink*>         accessLink1149_def
 %type <Parsers::AST_AccessLink*>         accessLinkGeneric_def
+%type <Parsers::AST_EnumRef*>            enumRef
 %type <Parsers::AST_Node*>               alias_def
 %type <Parsers::AST_Node*>               clockMux_def
 %type <Parsers::AST_Node*>               dataMux_def
@@ -322,6 +325,7 @@ namespace
 %type <Parsers::AST_Node*>               oneHotDataGroup_def
 %type <Parsers::AST_Node*>               oneHotScanGroup_def
 %type <Parsers::AST_Node*>               useNameSpace_def
+%type <Parsers::AST_Node*>               dataOutPort_enable
 
 %type <Parsers::AST_Port*>              addressPort_def
 %type <Parsers::AST_Port*>              captureEnPort_def
@@ -363,11 +367,15 @@ namespace
 
 
 %type <Parsers::AST_Node*>              scanInterface_item
+%type <Parsers::AST_Node*>              dataInPort_item
+%type <Parsers::AST_Node*>              dataOutPort_item
 %type <Parsers::AST_Node*>              scanOutPort_item
 %type <Parsers::AST_Node*>              scanRegister_item
 %type <Parsers::AST_Node*>              bsdl_instr_selected_item
 
 %type <std::vector<Parsers::AST_Node*>> module_items
+%type <std::vector<Parsers::AST_Node*>> dataInPort_items
+%type <std::vector<Parsers::AST_Node*>> dataOutPort_items
 %type <std::vector<Parsers::AST_Node*>> scanInterface_items
 %type <std::vector<Parsers::AST_Node*>> scanRegister_tail
 %type <std::vector<Parsers::AST_Node*>> scanRegister_items
@@ -1447,38 +1455,171 @@ updateEnPort_tail: SEMICOLON | LEFT_BRACE updateEnPort_items RIGHT_BRACE | LEFT_
 updateEnPort_items: updateEnPort_items attribute_def | attribute_def;
 updateEnPort_name : port_name ;
 
-// 6.4.6.6
-dataInPort_def : DATAINPORT dataInPort_name dataInPort_tail
+enumRef : REFENUM enum_name SEMICOLON
 {
-  // dataInPort_def : DATAINPORT dataInPort_name dataInPort_tail
-  $$ = nullptr;
+  // enumRef : REFENUM enum_name SEMICOLON
+  auto& enumName    = $[enum_name];
+  auto  enumRefNode = ast.Create_EnumRef(std::move(enumName));
+
+  $$ = enumRefNode;
 }
 ;
 
-dataInPort_tail: SEMICOLON | LEFT_BRACE dataInPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
-dataInPort_items: dataInPort_items dataInPort_item | dataInPort_item;
-dataInPort_name : port_name ;
-dataInPort_item : attribute_def | dataInPort_refEnum ;
-dataInPort_refEnum : REFENUM enum_name SEMICOLON ;
+
+// 6.4.6.6
+dataInPort_def :
+  DATAINPORT port_name  SEMICOLON
+  {
+    // dataInPort_def : DATAINPORT port_name SEMICOLON
+    auto& name     = $[port_name];
+    auto  node     = ast.Create_Port(Parsers::Kind::DataInPort, name);
+
+    $$ = node;
+  }
+| DATAINPORT port_name  LEFT_BRACE RIGHT_BRACE
+  {
+    // dataInPort_def : DATAINPORT port_name  LEFT_BRACE RIGHT_BRACE
+    auto& name     = $[port_name];
+    auto  node     = ast.Create_Port(Parsers::Kind::DataInPort, name);
+
+    $$ = node;
+  }
+| DATAINPORT port_name LEFT_BRACE dataInPort_items RIGHT_BRACE
+  {
+    // dataInPort_def : DATAINPORT port_name  LEFT_BRACE dataInPort_items RIGHT_BRACE
+    auto& name     = $[port_name];
+    auto& children = $[dataInPort_items];
+    auto  node     = ast.Create_Port(Parsers::Kind::DataInPort, name, std::move(children));
+
+    $$ = node;
+  }
+;
+
+dataInPort_items:
+  dataInPort_items[lhs] dataInPort_item
+  {
+    // dataInPort_items: dataInPort_items[lhs] dataInPort_item
+    auto& children = $[lhs];
+    auto  item     = $[dataInPort_item];
+
+    if (item != nullptr)
+    {
+      children.push_back(item);
+    }
+    $$ = std::move(children);
+  }
+| dataInPort_item
+  {
+    // dataInPort_items: dataInPort_item
+    std::vector<Parsers::AST_Node*> children;
+
+    auto item = $[dataInPort_item];
+    if (item != nullptr)
+    {
+      children.push_back(item);
+    }
+    $$ = std::move(children);
+  }
+;
+
+dataInPort_item :
+  attribute_def
+  {
+    // dataInPort_item : attribute_def
+    $$ = $[attribute_def];
+  }
+| enumRef
+  {
+    // dataInPort_item : enumRef
+    $$ = $[enumRef];
+  }
+;
 
 // 6.4.6.7
-dataOutPort_def : DATAOUTPORT dataOutPort_name dataOutPort_tail
+dataOutPort_def :
+  DATAOUTPORT port_name  SEMICOLON
+  {
+    // dataOutPort_def : DATAOUTPORT port_name SEMICOLON
+    auto& name     = $[port_name];
+    auto  node     = ast.Create_Port(Parsers::Kind::DataOutPort, name);
+
+    $$ = node;
+  }
+| DATAOUTPORT port_name  LEFT_BRACE RIGHT_BRACE
+  {
+    // dataOutPort_def : DATAOUTPORT port_name  LEFT_BRACE RIGHT_BRACE
+    auto& name     = $[port_name];
+    auto  node     = ast.Create_Port(Parsers::Kind::DataOutPort, name);
+
+    $$ = node;
+  }
+| DATAOUTPORT port_name LEFT_BRACE dataOutPort_items RIGHT_BRACE
+  {
+    // dataOutPort_def : DATAOUTPORT port_name  LEFT_BRACE dataOutPort_items RIGHT_BRACE
+    auto& name     = $[port_name];
+    auto& children = $[dataOutPort_items];
+    auto  node     = ast.Create_Port(Parsers::Kind::DataOutPort, name, std::move(children));
+
+    $$ = node;
+  }
+;
+
+dataOutPort_items:
+  dataOutPort_items[lhs] dataOutPort_item
+  {
+    // dataOutPort_items: dataOutPort_items[lhs] dataOutPort_item
+    auto& children = $[lhs];
+    auto  item     = $[dataOutPort_item];
+
+    if (item != nullptr)
+    {
+      children.push_back(item);
+    }
+    $$ = std::move(children);
+  }
+| dataOutPort_item
+  {
+    // dataOutPort_items: dataOutPort_item
+    std::vector<Parsers::AST_Node*> children;
+
+    auto item = $[dataOutPort_item];
+    if (item != nullptr)
+    {
+      children.push_back(item);
+    }
+    $$ = std::move(children);
+  }
+;
+
+dataOutPort_item :
+  attribute_def
+  {
+    // dataOutPort_item : attribute_def
+    $$ = $[attribute_def];
+  }
+| port_source
+  {
+    // dataOutPort_item : port_source
+    $$ = $[port_source];
+  }
+| dataOutPort_enable
+  {
+    // dataOutPort_item : dataOutPort_enable
+    $$ = $[dataOutPort_enable];
+  }
+| enumRef
+  {
+    // dataOutPort_item : enumRef
+    $$ = $[enumRef];
+  }
+;
+
+dataOutPort_enable : ENABLE data_signal SEMICOLON
 {
-  // dataOutPort_def : DATAOUTPORT dataOutPort_name dataOutPort_tail
+  // dataOutPort_enable : ENABLE data_signal SEMICOLON
   $$ = nullptr;
 }
 ;
-
-dataOutPort_tail: SEMICOLON | LEFT_BRACE dataOutPort_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
-dataOutPort_items: dataOutPort_items dataOutPort_item | dataOutPort_item;
-dataOutPort_name : port_name ;
-dataOutPort_item : attribute_def |
-dataOutPort_source |
-dataOutPort_enable |
-dataOutPort_refEnum ;
-dataOutPort_source : SOURCE concat_data_signal SEMICOLON ;
-dataOutPort_enable : ENABLE data_signal SEMICOLON ;
-dataOutPort_refEnum : REFENUM enum_name SEMICOLON ;
 
 // 6.4.6.8
 toShiftEnPort_def : TOSHIFTENPORT toShiftEnPort_name toShiftEnPort_tail

@@ -27,6 +27,7 @@ namespace Parsers
 class AST_AccessLink;
 class AST_Attribute;
 class AST_BsdlInstructionRef;
+class AST_EnumRef;
 class AST_FileRef;
 class AST_Identifier;
 class AST_Instance;
@@ -65,7 +66,8 @@ class AST final : public AST_Builder
                                                      AST_FileRef*                           bsdlFile,
                                                      std::vector<AST_BsdlInstructionRef*>&& bsdlInstructionRef);
   AST_AccessLink*         Create_AccessLink         (const AST_ScalarIdentifier* identifier, const AST_ScalarIdentifier* genericId);
-  AST_FileRef*            Create_FileRef            (Kind kind, std::string && name);
+  AST_EnumRef*            Create_EnumRef            (std::string&& name);
+  AST_FileRef*            Create_FileRef            (Kind kind, std::string&& name);
   AST_Namespace*          Create_Namespace          (std::string&& name);
   AST_Attribute*          Create_Attribute          (std::string&& name);
   AST_Attribute*          Create_Attribute          (std::string&& name, std::string&& numbersValue);

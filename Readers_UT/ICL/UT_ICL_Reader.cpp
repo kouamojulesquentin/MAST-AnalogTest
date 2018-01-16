@@ -210,6 +210,8 @@ void UT_ICL_Reader::test_FromIcl_1_ScanRegister ()
                                   "{\n"
                                   "  ScanInPort SI;\n"
                                   "  ScanOutPort SO { Source SR[0]; }\n"
+                                  "  DataInPort DI[7:0];\n"
+                                  "  DataOutPort DO[7:0] { Source SR; }\n"
                                   "  ScanRegister SR[7:0]\n"
                                   "  {\n"
                                   "    ScanInSource SI;\n"
@@ -276,6 +278,8 @@ void UT_ICL_Reader::test_FromIcl_3_ScanRegister ()
                                   "{\n"
                                   "  ScanInPort SI;\n"
                                   "  ScanOutPort SO { Source SR_3[0]; }\n"
+                                  "  DataInPort DI[7:0];\n"
+                                  "  DataOutPort DO[7:0] { Source SR_1; }\n"
                                   "  ScanRegister SR_3[7:0]\n"
                                   "  {\n"
                                   "    ScanInSource SR_2[0];\n"
@@ -298,7 +302,7 @@ void UT_ICL_Reader::test_FromIcl_3_ScanRegister ()
 }
 
 
-//! Checks ICL_Reader::ParseExcerpt() when parsing a with parameter defined with value (not string)
+//! Checks ICL_Reader::ParseExcerpt() when parsing a module with parameter defined with value (not string)
 //!
 void UT_ICL_Reader::test_FromIcl_parameters_value ()
 {
@@ -348,6 +352,8 @@ void UT_ICL_Reader::test_FromIcl_parameters_value ()
                                   "  Parameter MSB = 7;\n"
                                   "  ScanInPort SI;\n"
                                   "  ScanOutPort SO { Source SR[0]; }\n"
+                                  "  DataInPort DI[$MSB:0];\n"
+                                  "  DataOutPort DO[$MSB:0] { Source SR; }\n"
                                   "  ScanRegister SR[$MSB:0]\n"
                                   "  {\n"
                                   "    ScanInSource SI;\n"
@@ -1723,9 +1729,9 @@ void UT_ICL_Reader::test_Uniquify_Examples ()
 
   auto data =
   {
-    make_tuple("Bundle_SIB_mux_pre.icl",    "Uniquified_SIB_mux_pre_PrettyPrint.icl"),
-    make_tuple("Bundle_Single_SIB_3WI.icl", "Uniquified_Single_SIB_3WI_PrettyPrint.icl"),
-    make_tuple("Bundle_Top_SReg.icl",       "Uniquified_Top_SReg_PrettyPrint.icl"),
+    make_tuple("Bundle_SIB_mux_pre.icl",    "Uniquified_SIB_mux_pre_PrettyPrint.icl"),      // 0
+    make_tuple("Bundle_Single_SIB_3WI.icl", "Uniquified_Single_SIB_3WI_PrettyPrint.icl"),   // 1
+    make_tuple("Bundle_Top_SReg.icl",       "Uniquified_Top_SReg_PrettyPrint.icl"),         // 2
   };
 
   // ---------------- DDT Exercise
@@ -2512,7 +2518,8 @@ void UT_ICL_Reader::test_CreateModelFromFiles_ListFile ()
 
   auto data =
   {
-    make_tuple("List_Multiple_SIB_3WI.txt", "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),
+//+    make_tuple("List_mux_inline3.txt",      "test_Generate_mux_inline3_PrettyPrint.txt"),      // 1
+    make_tuple("List_Multiple_SIB_3WI.txt", "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"), // 0
   };
 
   // ---------------- DDT Exercise

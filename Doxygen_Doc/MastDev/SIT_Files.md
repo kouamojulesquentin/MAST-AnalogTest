@@ -95,7 +95,7 @@ It is the equivalent of the [PDL] <code>iProcsForModule</code> command.</td></tr
 <tr><td><node information> </td><td>a variable field containing information specific to a given node_type, as explained in the following table. NB: underlined strings depict language token</td></tr>
 </table>
 
-There are two types of possible hierarchies: chained or linked. 
+There are two types of possible hierarchies: chained or linked.
 
 
 ### CHAINED hierarchy
@@ -129,7 +129,7 @@ NB: Trying to provide children to a Register node will cause a syntax error.<br>
 </table>
 
 
-### 
+###
 ### LINKED hierarchy
 
 In a selected hierarchy, not all children are necessary active at the same time: it depends on the internal state of the System, typically expressed, as its names says, by a Linker node. Linker hierarchies also comprise AccessInterfaces and the macro derived from one of more Linkers, like SIBs or MIBs. Linked Hierarchies are identified by Parenthesis
@@ -144,25 +144,25 @@ For instance:
       REGISTER test_register_2 12 Bypass: "0b1001:0110:1100"
     )
 
-The folloiwng table identifies the possible syntaxes for <selector>, which can be freely mixed.
+The following table identifies the possible syntaxes for <selector>, which can be freely mixed.
 
 <table>
   <tr><th width = 100>Syntax</th><th>  Meaning </th></tr>
   <tr>
     <td> <name> </td>
-    <td>The register identified by the (unique) name is used a the selector for the Linker </td>
+    <td>The register identified by the (unique) name is used as the selector for the Linker </td>
   </tr>
   <tr>
     <td> <name>[range] </td>
-    <td> The slice of register identified by the (unique) name and the range is used a the selector for the Linker. Range can either be a single bit (ex: name[0]) or and interval (ex: name [0..2])</td>
+    <td> The slice of register identified by the (unique) name and the range is used as the selector for the Linker. Range can either be a single bit (ex: name[0]) or and interval (ex: name [0:2])</td>
   </tr>
   <tr>
     <td> {<parent>}+.<name> </td>
-    <td>Same as per <name>, but <parent> can be used to specify the hierarcy where "name" is defined to avoid ambiguity. For instance: A.B.reg or C.F.G.reg </td>
+    <td>Same as per <name>, but <parent> can be used to specify the hierarchy where "name" is defined to avoid ambiguity. For instance: A.B.reg or C.F.G.reg </td>
   </tr>
   <tr>
     <td> <selector>{:<selector>}+ </td>
-    <td> <selector>s are concatenated to obtain the Virtual Register selecting the linker. For instance reg1:reg2 or regA[0]:a.b.regB[0...3] </td>
+    <td> <selector>s are concatenated to obtain the Virtual Register selecting the linker. For instance reg1:reg2 or regA[0]:a.b.regB[0:3] </td>
   </tr>
   <tr>
 </table>
@@ -186,7 +186,7 @@ NB: Trying to provide children to a Register node will cause a syntax error.<br>
       <table>
         <tr><td><position>         </td><td>  can be either PRE (the control register precedes the Linker) or POST (the control register follows the Linker)                     </td></tr>
         <tr><td><active>           </td><td>  can be either HIGH ( active-high logic selection) or LOW (active-low logic selection)                                              </td></tr>
-        <tr><td><reverse>         </td><td>  if set to REVERSE, bit mapping in the control register is reversed (i.e. leftmost bit selects rightmost derivation)                </td></tr>
+        <tr><td><reverse>          </td><td>  if set to REVERSE, bit mapping in the control register is reversed (i.e. leftmost bit selects rightmost derivation)                </td></tr>
         <tr><td><max_derivations>  </td><td>  the maximum number of derivations accepted by the MIB, as a decimal number. NB: a MIB can have fewer derivations that its maximum  </td></tr>
         <tr><td><path_selector>    </td><td>  a string selecting the decoding strategy. See "Linker" for this lsit and description of supported selectors                        </td></tr>
       </table>

@@ -53,6 +53,25 @@ DefaultBinaryPathSelector::DefaultBinaryPathSelector(shared_ptr<Register> associ
 //---------------------------------------------------------------------------
 
 
+//! Initializes selector for fast selection/deselection of a path
+//!
+//! @param associatedRegisters  Register(s) ranges that is used to drive the path multiplexer
+//! @param pathsCount           Number of managed paths (including, optional, bypass register)
+//! @param properties           Properties of the selector (bit order can be reverse or it can use negative logic)
+//!
+DefaultBinaryPathSelector::DefaultBinaryPathSelector(const VirtualRegister& associatedRegisters, uint32_t pathsCount, SelectorProperty properties)
+  : DefaultTableBasedPathSelector (associatedRegisters,
+                                   pathsCount,
+                                   CreateSelectTable   (associatedRegisters.BitsCount(), pathsCount, properties),
+                                   CreateDeselectTable (associatedRegisters.BitsCount(), pathsCount, properties),
+                                   properties
+                                  )
+{
+}
+//
+//  End of: DefaultBinaryPathSelector::DefaultBinaryPathSelector
+//---------------------------------------------------------------------------
+
 
 //! Returns the associated register expected initial value for a path count and selector properties
 //!

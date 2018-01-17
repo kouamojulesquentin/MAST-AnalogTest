@@ -162,9 +162,9 @@ void UT_PrettyPrinter::test_VisitChain_Verbose ()
   TS_ASSERT_EQUALS (got, expected);
 }
 
-//! Checks PrettyPrinter::VisitLinker()
+//! Checks PrettyPrinter::VisitLinker() when selector is based upon a single register
 //!
-void UT_PrettyPrinter::test_VisitLinker ()
+void UT_PrettyPrinter::test_VisitLinker_SingleRegSelector ()
 {
   // ---------------- Setup
   //
@@ -190,9 +190,12 @@ void UT_PrettyPrinter::test_VisitLinker ()
 }
 
 
+
+
+
 //! Checks PrettyPrinter::VisitLinker() with verbose mode
 //!
-void UT_PrettyPrinter::test_VisitLinker_Verbose ()
+void UT_PrettyPrinter::test_VisitLinker_SingleRegSelector_Verbose ()
 {
   // ---------------- Setup
   //
@@ -218,6 +221,78 @@ void UT_PrettyPrinter::test_VisitLinker_Verbose ()
                         );
   TS_ASSERT_EQUALS (got, expected);
 }
+
+
+//! Checks PrettyPrinter::VisitLinker() when selector is based upon a multiple registers
+//!
+void UT_PrettyPrinter::test_VisitLinker_MultipleRegSelector ()
+{
+  // ---------------- Setup
+  //
+  auto chain    = make_shared<Chain>    ("Chain");
+  auto muxReg_1 = make_shared<Register> ("MuxReg_1", BinaryVector::CreateFromBinaryString("000"));
+  auto muxReg_2 = make_shared<Register> ("MuxReg_2", BinaryVector::CreateFromBinaryString("11"));
+
+  chain->AppendChild(muxReg_1);
+  chain->AppendChild(muxReg_2);
+  VirtualRegister virtualRegister;
+  virtualRegister.Append(VirtualRegister::RegisterSlice{muxReg_1, IndexedRange(2u, 0u)});
+  virtualRegister.Append(VirtualRegister::RegisterSlice{muxReg_2, IndexedRange(1u, 0u)});
+
+  auto pathSelector = make_shared<DefaultBinaryPathSelector>(virtualRegister, 5u);
+
+  auto linker = Linker("Linker name", pathSelector);
+
+  PrettyPrinter sut;
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.VisitLinker(linker));
+
+  // ---------------- Verify
+  //
+  auto got      = sut.PrettyPrint();
+  auto expected = string("[Linker](3)    \"Linker name\"\n"
+                         " :Selector:     \"MuxReg_1:MuxReg_2\"");
+  TS_ASSERT_EQUALS (got, expected);
+}
+
+
+//! Checks PrettyPrinter::VisitLinker() when selector is based upon multiple, partial, registers
+//!
+void UT_PrettyPrinter::test_VisitLinker_MultiplePartialRegSelector ()
+{
+  // ---------------- Setup
+  //
+  auto chain    = make_shared<Chain>    ("Chain");
+  auto muxReg_1 = make_shared<Register> ("MuxReg_1", BinaryVector::CreateFromBinaryString("000"));
+  auto muxReg_2 = make_shared<Register> ("MuxReg_2", BinaryVector::CreateFromBinaryString("11"));
+
+  chain->AppendChild(muxReg_1);
+  chain->AppendChild(muxReg_2);
+  VirtualRegister virtualRegister;
+  virtualRegister.Append(VirtualRegister::RegisterSlice{muxReg_1, IndexedRange(2u, 1u)});
+  virtualRegister.Append(VirtualRegister::RegisterSlice{muxReg_2, IndexedRange(1u, 1u)});
+  virtualRegister.Append(VirtualRegister::RegisterSlice{muxReg_1, IndexedRange(0u, 0u)});
+
+  auto pathSelector = make_shared<DefaultBinaryPathSelector>(virtualRegister, 5u);
+
+  auto linker = Linker("Linker name", pathSelector);
+
+  PrettyPrinter sut;
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.VisitLinker(linker));
+
+  // ---------------- Verify
+  //
+  auto got      = sut.PrettyPrint();
+  auto expected = string("[Linker](3)    \"Linker name\"\n"
+                         " :Selector:     \"MuxReg_1[2:1]:MuxReg_2[1]:MuxReg_1[0]\"");
+  TS_ASSERT_EQUALS (got, expected);
+}
+
 
 
 //! Checks PrettyPrinter::VisitRegister()
@@ -379,7 +454,7 @@ void UT_PrettyPrinter::test_VisitChain_with_Registers_Verbose ()
 
 //! Checks PrettyPrinter::VisitLinker() when there are several child beneath
 //!
-void UT_PrettyPrinter::test_VisitLinker_with_Child ()
+void UT_PrettyPrinter::test_VisitLinker_with_SingleRegSelector ()
 {
   // ---------------- Setup
   //
@@ -427,7 +502,7 @@ void UT_PrettyPrinter::test_VisitLinker_with_Child ()
 
 //! Checks PrettyPrinter::VisitLinker() when there are several child beneath
 //! and verbose mode
-void UT_PrettyPrinter::test_VisitLinker_with_Child_Verbose ()
+void UT_PrettyPrinter::test_VisitLinker_with_SingleRegSelector_Verbose ()
 {
   // ---------------- Setup
   //

@@ -207,14 +207,7 @@ void PrettyPrinter::StreamNodeHeader(string_view type, const SystemModelNode& no
   m_startPos = m_os.tellp();
   StreamDepth();
 
-  if (!m_processingSelector)
-  {
-    m_os << "[" << type                 << "]";
-  }
-  else
-  {
-    m_os << ":Selector:";
-  }
+  m_os << "[" << type << "]";
 
   if (m_showNodeId)
   {
@@ -231,28 +224,10 @@ void PrettyPrinter::StreamNodeHeader(string_view type, const SystemModelNode& no
     m_os << ", " << notes;
   }
 
-  if (m_showSelectorProperties && m_selector && m_processingSelector)
-  {
-    m_os << ", kind: "            << m_selector->KindName();
-    m_os << ", can_select_none: " << std::boolalpha << IsSet(m_selector->Properties(), SelectorProperty::CanSelectNone);
-    m_os << ", inverted_bits: "   << std::boolalpha << IsSet(m_selector->Properties(), SelectorProperty::InvertedBits);
-    m_os << ", reversed_order: "  << std::boolalpha << IsSet(m_selector->Properties(), SelectorProperty::ReverseOrder);
-
-    if (m_showSelectorTables)
-    {
-      auto selector = std::dynamic_pointer_cast<DefaultTableBasedPathSelector>(m_selector);
-      if (selector)
-      {
-        auto indent = string(m_depth, ' ');
-        selector->StreamTable(m_os, indent, "Selection Table:",   selector->SelectTable());
-        selector->StreamTable(m_os, indent, "Deselection Table:", selector->DeselectTable());
-      }
-    }
-  }
 
   // ---------------- Display selection/active state(s)
   //
-  if (m_selector && !m_processingSelector && (m_showSelectionState || m_showSelectionValue))
+  if (m_selector && (m_showSelectionState || m_showSelectionValue))
   {
     bool isSelected         = m_selector->IsSelected(m_childId);
     bool isActive           = m_selector->IsActive(m_childId);
@@ -268,6 +243,9 @@ void PrettyPrinter::StreamNodeHeader(string_view type, const SystemModelNode& no
 
   m_first = false;
 }
+
+
+
 
 
 //! Appends content of parent node in text representation and visits
@@ -296,6 +274,80 @@ void PrettyPrinter::StreamParentNode (std::experimental::string_view type, const
 //
 //  End of: PrettyPrinter::StreamParentNode
 //---------------------------------------------------------------------------
+
+
+//! Streams PathSelector information
+//!
+//! @param selector   PathSelector to stream information for
+//!
+void PrettyPrinter::StreamSelector(const PathSelector& selector)
+{
+  m_os << std::endl;
+
+  m_startPos = m_os.tellp();
+  StreamDepth();
+
+  m_os << ":Selector:";
+
+  // ---------------- Stream associated VirtualRegister slice(s)
+  //
+  auto associatedRegisters = selector.AssociatedRegisters();
+  if (associatedRegisters != nullptr)
+  {
+    auto first = true;
+    for (const auto& registerSlice : *associatedRegisters)
+    {
+      auto reg    = registerSlice.reg;
+      auto range  = registerSlice.range;
+
+      if (first)
+      {
+        first = false;
+        if (m_showNodeId && (associatedRegisters->SlicesCount() == 1u))  // Only show register id only when there is only one
+        {
+          m_os << '(' << reg->Identifier() << ") ";
+        }
+        AlignRelativeTo(m_startPos, 15u + m_depth);
+        m_os << '"';
+      }
+      else
+      {
+        m_os << ':';    // Separate each register slice
+      }
+
+      m_os << reg->Name();
+      if (reg->BitsCount() != range.Width())
+      {
+        m_os << '['  << range.left;
+        if (!range.IsSingleBit())
+        {
+          m_os << ":" << range.right;
+        }
+        m_os << ']';
+      }
+    }
+    m_os << '"';
+  }
+
+  if (m_showSelectorProperties)
+  {
+    m_os << ", kind: "            << selector.KindName();
+    m_os << ", can_select_none: " << std::boolalpha << IsSet(selector.Properties(), SelectorProperty::CanSelectNone);
+    m_os << ", inverted_bits: "   << std::boolalpha << IsSet(selector.Properties(), SelectorProperty::InvertedBits);
+    m_os << ", reversed_order: "  << std::boolalpha << IsSet(selector.Properties(), SelectorProperty::ReverseOrder);
+
+    if (m_showSelectorTables)
+    {
+      auto selector = std::dynamic_pointer_cast<DefaultTableBasedPathSelector>(m_selector);
+      if (selector)
+      {
+        auto indent = string(m_depth, ' ');
+        selector->StreamTable(m_os, indent, "Selection Table:",   selector->SelectTable());
+        selector->StreamTable(m_os, indent, "Deselection Table:", selector->DeselectTable());
+      }
+    }
+  }
+}
 
 
 
@@ -359,7 +411,7 @@ void PrettyPrinter::VisitLinker (Linker& linker)
     auto selector = linker.Selector();
     if (selector)
     {
-      selector->Accept(*this);
+      StreamSelector(*selector);
     }
     else
     {

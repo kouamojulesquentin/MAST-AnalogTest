@@ -53,7 +53,6 @@ class MAST_CORE_EXPORT VirtualRegister final
       return !operator==(rhs);
     }
   };
-//+  VirtualRegister(std::initializer_list<shared_ptr<RegisterSlice>> registers);
 
   explicit VirtualRegister(std::shared_ptr<Register> reg);
 
@@ -67,6 +66,8 @@ class MAST_CORE_EXPORT VirtualRegister final
 
   // ---------------- Getters
   //
+  uint32_t           SlicesCount()  const { return m_registers.size(); }; //!< Returns VirtualRegister numbers of register slice
+
   uint32_t           BitsCount()    const; //!< Returns VirtualRegister numbers of bits
   mast::BitsOrdering BitsOrdering() const; //!< Returns BitsOrdering
   BinaryVector       LastToSut()    const; //!< Returns last sequence effectively sent to SUT
@@ -74,7 +75,6 @@ class MAST_CORE_EXPORT VirtualRegister final
 
   // ---------------- Setters
   //
-
   void SetPending ();                             //!< Sets number of pending to 1
   void SetToSut   (const BinaryVector& sequence); //!< Sets the bits sequence to send during the next iApply cycle
 

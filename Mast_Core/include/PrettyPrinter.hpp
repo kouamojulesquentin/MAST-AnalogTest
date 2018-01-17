@@ -105,6 +105,7 @@ class MAST_CORE_EXPORT PrettyPrinter : public SystemModelVisitor
 
   void StreamBinaryVector (std::experimental::string_view name, const BinaryVector&    bits);
   void StreamNodeCommon   (const SystemModelNode&         node);
+  void StreamSelector     (const PathSelector&            selector);
   void StreamNodeHeader   (std::experimental::string_view type, const SystemModelNode& node,       std::experimental::string_view notes = "");
   void StreamParentNode   (std::experimental::string_view type, const ParentNode&      parentNode, std::experimental::string_view notes = "");
 

@@ -13,6 +13,7 @@ message(STATUS "Tests_Common: CXXTEST_INCLUDE_DIR:        ${CXXTEST_INCLUDE_DIR}
 set(TRAITS            "${CMAKE_CURRENT_LIST_DIR}/CxxTest_Traits/BinaryVector_Traits.hpp"
                       "${CMAKE_CURRENT_LIST_DIR}/CxxTest_Traits/Cpp_11_Traits.hpp"
                       "${CMAKE_CURRENT_LIST_DIR}/CxxTest_Traits/IndexedRange_Traits.hpp"
+                      "${CMAKE_CURRENT_LIST_DIR}/CxxTest_Traits/VirtualRegister_Traits.hpp"
                       "${CMAKE_CURRENT_LIST_DIR}/CxxTest_Traits/Mast_Core_Enums_Traits.hpp"
                       "${CMAKE_CURRENT_LIST_DIR}/CxxTest_Traits/Mast_Core_Traits.hpp"
                       "${CMAKE_CURRENT_LIST_DIR}/CxxTest_Traits/CheckResult_Traits.hpp")

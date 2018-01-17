@@ -38,7 +38,8 @@ class MAST_CORE_EXPORT DefaultBinaryPathSelector : public DefaultTableBasedPathS
   public:
   ~DefaultBinaryPathSelector() = default;
   DefaultBinaryPathSelector()  = delete;
-  DefaultBinaryPathSelector(std::shared_ptr<Register> associatedRegister, uint32_t pathsCount, SelectorProperty properties = SelectorProperty::Binary_Default);
+  DefaultBinaryPathSelector(std::shared_ptr<Register> associatedRegister,  uint32_t pathsCount, SelectorProperty properties = SelectorProperty::Binary_Default);
+  DefaultBinaryPathSelector(const VirtualRegister&    associatedRegisters, uint32_t pathsCount, SelectorProperty properties = SelectorProperty::Binary_Default);
 
 
   //! Returns minimal bits count a register should have to drive a mux for number of path

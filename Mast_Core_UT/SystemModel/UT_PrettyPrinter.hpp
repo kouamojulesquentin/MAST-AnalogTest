@@ -38,8 +38,10 @@ class UT_PrettyPrinter : public CxxTest::TestSuite
   void test_VisitAccessInterface_ShowProtocol ();
   void test_VisitChain ();
   void test_VisitChain_Verbose ();
-  void test_VisitLinker ();
-  void test_VisitLinker_Verbose ();
+  void test_VisitLinker_SingleRegSelector ();
+  void test_VisitLinker_SingleRegSelector_Verbose ();
+  void test_VisitLinker_MultipleRegSelector ();
+  void test_VisitLinker_MultiplePartialRegSelector ();
   void test_VisitRegister ();
   void test_VisitRegister_Verbose ();
 
@@ -51,8 +53,8 @@ class UT_PrettyPrinter : public CxxTest::TestSuite
   //
   void test_VisitChain_with_Registers ();
   void test_VisitChain_with_Registers_Verbose ();
-  void test_VisitLinker_with_Child ();
-  void test_VisitLinker_with_Child_Verbose ();
+  void test_VisitLinker_with_SingleRegSelector ();
+  void test_VisitLinker_with_SingleRegSelector_Verbose ();
   void test_VisitAccessInterface_with_Child ();
   void test_VisitAccessInterface_AutoFormat ();
   void test_VisitTap ();

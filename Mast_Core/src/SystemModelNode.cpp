@@ -11,8 +11,8 @@
 //!
 //===========================================================================
 
-
 #include "SystemModelNode.hpp"
+#include "Utility.hpp"
 
 using std::string;
 using std::experimental::string_view;
@@ -32,7 +32,9 @@ SystemModelNode::SystemModelNode (string_view name)
 //---------------------------------------------------------------------------
 
 
-//! Appends a new sibling node
+//! Appends a new sibling node at end of sibling list
+//!
+//! @param pSibling Sibling to append
 //!
 void SystemModelNode::AppendSibling (std::shared_ptr<SystemModelNode> pSibling)
 {
@@ -47,6 +49,31 @@ void SystemModelNode::AppendSibling (std::shared_ptr<SystemModelNode> pSibling)
 }
 //
 //  End of: SystemModelNode::AppendSibling
+//---------------------------------------------------------------------------
+
+
+//! Splices a new sibling node just after this node (before next sibling)
+//!
+//! @param pSibling Sibling to insert
+//!
+void SystemModelNode::SpliceSibling (std::shared_ptr<SystemModelNode> pSibling)
+{
+  CHECK_PARAMETER_NOT_NULL(pSibling, "Cannot splice nullptr node");
+
+  if (m_pNextSibling)
+  {
+    CHECK_VALUE_NULL(pSibling->m_pNextSibling, "SpliceSibling only splices a single node");
+
+    pSibling->m_pNextSibling = m_pNextSibling;
+    m_pNextSibling = pSibling;
+  }
+  else
+  {
+    m_pNextSibling = pSibling;
+  }
+}
+//
+//  End of: SystemModelNode::SpliceSibling
 //---------------------------------------------------------------------------
 
 

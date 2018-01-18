@@ -40,7 +40,7 @@ constexpr char DEFAULT_TAP_IR_EXT[]       = "_IR";
 constexpr char DEFAULT_TAP_MUX_EXT[]      = "_DR_Mux";
 constexpr char DEFAULT_TAP_MUX_BPY_EXT[]  = "_BPY";
 
-//! Abstract base for common features of system model nodes
+//! Abstract base class for common features of system model nodes
 //!
 class MAST_CORE_EXPORT SystemModelNode
 {
@@ -56,7 +56,8 @@ class MAST_CORE_EXPORT SystemModelNode
 
   // ---------------- Setters
   //
-  void AppendSibling (std::shared_ptr<SystemModelNode> pSibling);      //!< Appends a new sibling node
+  void AppendSibling      (std::shared_ptr<SystemModelNode> pSibling); //!< Appends a new sibling node
+  void SpliceSibling (std::shared_ptr<SystemModelNode> pSibling); //!< Splices a new sibling node just after this node (before next sibling)
 
   //! Sets application specific data
   //! @note System node does not used this data (this is an optional extension point for applications using the system model)
@@ -68,10 +69,10 @@ class MAST_CORE_EXPORT SystemModelNode
 
   void SetNextSibling (std::shared_ptr<SystemModelNode> nextSibling) { m_pNextSibling = nextSibling; };  //!< Replaces next sibling (caller is responsible to manage formely siblings)
 
-  void SetPendingCount  (uint32_t count)  { m_pendingCount =  count; } //!< Sets number of pending at given level (Must only be 0 or 1 for Registers)
+  void SetPendingCount   (uint32_t count) { m_pendingCount =  count; } //!< Sets number of pending at given level (Must only be 0 or 1 for Registers)
   void IncrementPendings (uint32_t count) { m_pendingCount += count; } //!< Increment the number of pending at given level (prefer SetPending for Registers)
-  void SetPending        ()               { m_pendingCount =  1u; }    //!< Sets number of pending to 1
-  virtual void ResetPending      ()       { m_pendingCount =  0;  }    //!< Resets the number of pending
+  void SetPending ()                      { m_pendingCount =  1u; }    //!< Sets number of pending to 1
+  virtual void ResetPending ()            { m_pendingCount =  0u; }    //!< Resets the number of pending
 
 
   static void ResetNodeIdentifier() { sm_nextIdentifier = 0; } //!< For debug purpose only, reset node identifier (e.g to be able to check construction order, or printers...)

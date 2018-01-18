@@ -16,7 +16,7 @@
 #include "Conditioners.hpp"
 
 #include <memory>
-#include <cxxtest/ValueTraits.h>
+#include "Mast_Core_Traits.hpp"
 
 using std::string;
 using std::shared_ptr;
@@ -110,6 +110,87 @@ void UT_SystemModelNode::test_AppendSibling_2 ()
   TS_ASSERT_EQUALS (sibling_1, node_1);
   TS_ASSERT_EQUALS (sibling_2, node_2);
 }
+
+
+//! Checks SystemModelNode::SpliceSibling() first sibling
+//!
+//! @note As this is an abstract base class, it uses a Chain to have an instance
+//!
+void UT_SystemModelNode::test_SpliceSibling_1st ()
+{
+  // ---------------- Setup
+  //
+  auto sut       = Chain("A Name");
+  auto otherNode = make_shared<Chain>("node");
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.SpliceSibling(otherNode));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (sut.NextSibling(), otherNode);
+}
+
+//! Checks SystemModelNode::SpliceSibling() when it has already a sibbling
+//!
+//! @note As this is an abstract base class, it uses a Chain to have an instance
+//!
+void UT_SystemModelNode::test_SpliceSibling_2nd ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = Chain("A Name");
+  auto node_1 = make_shared<Chain>("node 1");
+  auto node_2 = make_shared<Chain>("node 2");
+
+  sut.AppendSibling(node_1);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.SpliceSibling(node_2));
+
+  // ---------------- Verify
+  //
+  auto sibling_1 = sut.NextSibling();
+  TS_ASSERT_EQUALS (sibling_1, node_2);
+
+  auto sibling_2 = sibling_1->NextSibling();
+  TS_ASSERT_EQUALS (sibling_2, node_1);
+}
+
+
+//! Checks SystemModelNode::SpliceSibling() when sibling to insert has sibling(s)
+//!
+//! @note As this is an abstract base class, it uses a Chain to have an instance
+//!
+void UT_SystemModelNode::test_SpliceSibling_NotSingleSibling ()
+{
+  // ---------------- Setup
+  //
+  auto sut    = Chain("A Name");
+  auto node_1 = make_shared<Chain>("node 1");
+  auto node_2 = make_shared<Chain>("node 2");
+  auto node_3 = make_shared<Chain>("node 3");
+
+  node_2->AppendSibling(node_3);
+  sut.AppendSibling(node_1);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS (sut.SpliceSibling(node_2), std::runtime_error);
+
+  // ---------------- Verify
+  //
+  auto sibling_1 = sut.NextSibling();
+  TS_ASSERT_EQUALS (sibling_1, node_1);
+
+  auto sibling_2 = sibling_1->NextSibling();
+  TS_ASSERT_EQUALS (sibling_2, nullptr);
+}
+
+
+
 
 //! Checks SystemModelNode::SetSibling()
 //!

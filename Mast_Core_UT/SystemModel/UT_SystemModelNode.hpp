@@ -31,6 +31,9 @@ class UT_SystemModelNode : public CxxTest::TestSuite
 
   void test_AppendSibling_1 ();
   void test_AppendSibling_2 ();
+  void test_SpliceSibling_1st ();
+  void test_SpliceSibling_2nd ();
+  void test_SpliceSibling_NotSingleSibling ();
   void test_SetSibling ();
 
   void test_SetPending ();

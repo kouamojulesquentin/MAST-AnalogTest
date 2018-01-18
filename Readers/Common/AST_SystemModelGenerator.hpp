@@ -20,6 +20,7 @@
 #include <memory>
 #include <vector>
 #include <stack>
+#include <unordered_map>
 #include <tuple>
 #include <functional>
 
@@ -111,7 +112,8 @@ class AST_SystemModelGenerator final
   std::unique_ptr<mast::AccessInterfaceProtocol> Create_Protocol       (AST_Module* topModule);
   std::shared_ptr<mast::PathSelector>            Create_PathSelector   (AST_ScanMux* scanMux, AST_Module* module, bool firstSelectionIsEmpty);
 
-  std::vector<AST_ScanRegister*>      FindSelectorRegisters (const SourceSignals_t&,  AST_Module* module) const;
+  std::vector<std::tuple<AST_ScanRegister*, bool, uint32_t, uint32_t>> FindSelectorRegisters (const SourceSignals_t&, AST_Module* module) const;
+
   std::shared_ptr<mast::ParentNode>   Generate_Network      (AST_Network* network);
   std::shared_ptr<mast::ParentNode>   Generate_JTAGTap      (AST_Module*  topModule);
   void                                Generate_TopModule    (mast::Chain* chain, AST_Module* topModule);
@@ -177,19 +179,19 @@ class AST_SystemModelGenerator final
 
   using CreatedNodes_t = std::tuple<std::shared_ptr<mast::SystemModelNode>, mast::ParentNode*>; // Created node and its parent node if not linker a linker child
 
-
-  std::shared_ptr<mast::SystemModel>                         m_systemModel;             //!< SystemModel currently being built
-  std::unique_ptr<mast::SystemModelBuilder>                  m_builder;                 //!< Helper to build SystemModel nodes
-  std::shared_ptr<mast::ParentNode>                          m_parsedTopNode;           //!< SystemModel tree build from ICL file
-  std::stack<CreatedNodes_t>                                 m_createdNodes;            //!< Created children and their default parent not yet attached to its parent (in Linker processing context)
-  std::vector<std::shared_ptr<mast::UnresolvedPathSelector>> m_unresolvedPathSelectors; //!< Unresolved Linkers (those for which selector Register(s) where not yet created when Linkers were)
-  std::stack<InstanceContext>                                m_instancesContext;        //!< Current module/instance contexts (represents current instanciation path)
-  std::stack<LinkerContext>                                  m_linkersContext;          //!< To recover processing context for linkers (need only access to last one)
-  AST_Network*                                               m_network = nullptr;       //!< Test network AST used to generate SystemModel tree
-  std::vector<mast::AppFunctionNameAndNode>                  m_algorithmAssociations;   //!< Associates a PDL algorithm identifier to a SystemModelNode
-  std::string                                                m_protocolName;            //!< Optional protocol name for JTAG Tap (in case of JTAG TAP style AccessLink)
-  std::string                                                m_protocolParameters;      //!< Optional protocol parameters for JTAG Tap (a protocol name must be defined)
-  std::vector<std::string>                                   m_filesSearchPaths;        //!< Paths to search files (e.g. BSDL file)
+  std::shared_ptr<mast::SystemModel>                            m_systemModel;             //!< SystemModel currently being built
+  std::unique_ptr<mast::SystemModelBuilder>                     m_builder;                 //!< Helper to build SystemModel nodes
+  std::shared_ptr<mast::ParentNode>                             m_parsedTopNode;           //!< SystemModel tree build from ICL file
+  std::stack<CreatedNodes_t>                                    m_createdNodes;            //!< Created children and their default parent not yet attached to its parent (in Linker processing context)
+  std::vector<std::shared_ptr<mast::UnresolvedPathSelector>>    m_unresolvedPathSelectors; //!< Unresolved Linkers (those for which selector Register(s) where not yet created when Linkers were)
+  std::stack<InstanceContext>                                   m_instancesContext;        //!< Current module/instance contexts (represents current instanciation path)
+  std::stack<LinkerContext>                                     m_linkersContext;          //!< To recover processing context for linkers (need only access to last one)
+  std::unordered_map<mast::ParentNode*, mast::SystemModelNode*> m_parentsSplicePoint;      //!< Used for splicing nodes before Linkers
+  AST_Network*                                                  m_network = nullptr;       //!< Test network AST used to generate SystemModel tree
+  std::vector<mast::AppFunctionNameAndNode>                     m_algorithmAssociations;   //!< Associates a PDL algorithm identifier to a SystemModelNode
+  std::string                                                   m_protocolName;            //!< Optional protocol name for JTAG Tap (in case of JTAG TAP style AccessLink)
+  std::string                                                   m_protocolParameters;      //!< Optional protocol parameters for JTAG Tap (a protocol name must be defined)
+  std::vector<std::string>                                      m_filesSearchPaths;        //!< Paths to search files (e.g. BSDL file)
 
   static const std::vector<AST_Signal*>                      sm_noSignals;              //!< This is internal marker for "no source signals"
 };

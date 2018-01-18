@@ -48,7 +48,7 @@
 #include "MastConfig.hpp"
 #include "g3log/g3log.hpp"
 
-#include <queue>
+#include <tuple>
 #include <functional>
 #include <experimental/string_view>
 
@@ -99,8 +99,6 @@ AST_SystemModelGenerator::AST_SystemModelGenerator (shared_ptr<mast::SystemModel
 //!
 void AST_SystemModelGenerator::AppendCreatedNodesToParent (ParentNode* parent, size_t levelThreshold)
 {
-  // ---------------- Append m_createdNodes to Chain
-  //
   while (m_createdNodes.size() > levelThreshold)
   {
     auto child = std::get<0>(m_createdNodes.top());
@@ -147,7 +145,7 @@ void AST_SystemModelGenerator::AssignNewNode (shared_ptr<SystemModelNode> node)
 //! to assign to Linker selection
 //!
 //! @internal
-//! @note   Supposing that assigned node stack is filled up like:
+//! @note   Supposing that assigned node stack is filled up like (last one is nearest from scan input):
 //!           [1] [L] [3] [4] [C] [6] [7] [8]
 //!                ^
 //!         where:
@@ -160,8 +158,11 @@ void AST_SystemModelGenerator::AssignNewNode (shared_ptr<SystemModelNode> node)
 //!           1 - extracts 2nd part into a temporary stack          ==> [8] [7] [6] [C]
 //!           2 - extracts 1st part into another temporary stack    ==> [4] [3]
 //!           3 - Append 1st part Linker 1st selection              ==> [4] [3] - note that they are assign in that order - (inserting a Chain in between in that case)
-//!           4 - Restore 2nd part to not yet assigned nodes stack  ==> [1] [L] [C] [6] [7] [8] (assign linker previous sibling to their, common, parent)
-//!
+//!           4 - Restore 2nd part to not yet assigned nodes stack  ==> [1] [L] [C] [6] [7] [8]
+//!               or assign previous siblings to common, parent     ==> e.g. Parent children: [8]->[7]->[6]->[C]
+//!               ==> Candidates must be reversed before being able to "splice" them
+//!               ==> They must also been inserted BEFORE nodes assigned to parent when traversing connectivity backward
+//!               ==> They must also been inserted AFTER nodes assigned when dealing with Linker 1st selection (traversing connectivity forward)
 //! @endinternal
 //!
 //! @param commonLinkerNode   The first SystemModelNode encounter following all linker selections path
@@ -228,7 +229,8 @@ bool AST_SystemModelGenerator::AssignNodesToLinkerFirstSelection (shared_ptr<Sys
     }
 
     // Restore 2nd part to not yet assigned nodes stack
-    // or prepend it as linker, previous, sibbling
+    // or prepend or save for splicing them as linker, previous, sibblings
+    stack<CreatedNodes_t>  nodesToSpliceAsLinkerPreviousSiblings;
     auto linkerParentNode = linkerContext.linkerParentNode;
     while (!nodesAsLinkerSiblings.empty())
     {
@@ -238,15 +240,39 @@ bool AST_SystemModelGenerator::AssignNodesToLinkerFirstSelection (shared_ptr<Sys
       auto parentNode = std::get<1>(nodeAndParent);
       CHECK_VALUE_NOT_NULL(parentNode, "Parent node must always be set in m_createdNodes stack");
 
-      if (parentNode == linkerParentNode)
+      if (parentNode == linkerParentNode)  // Linker sibling ?
       {
-        parentNode->PrependChild(node);
+        auto hasAlreadySplicePoint = m_parentsSplicePoint.find(parentNode) != m_parentsSplicePoint.end();
+        if (hasAlreadySplicePoint)
+        {
+          nodesToSpliceAsLinkerPreviousSiblings.push(nodeAndParent);
+        }
+        else
+        {
+          parentNode->PrependChild(node);                        // Create splice point (can only splice after some node)
+          m_parentsSplicePoint.insert({parentNode, node.get()}); // Save splice point
+        }
       }
       else
       {
         m_createdNodes.push(nodeAndParent);
       }
       nodesAsLinkerSiblings.pop();
+    }
+
+    // Splice, remaining, linker siblings
+    while (!nodesToSpliceAsLinkerPreviousSiblings.empty())
+    {
+      auto& nodeAndParent = nodesToSpliceAsLinkerPreviousSiblings.top();
+
+      auto node       = std::get<0>(nodeAndParent);
+      auto parentNode = std::get<1>(nodeAndParent);
+
+      auto spliceNode = m_parentsSplicePoint[parentNode];
+      CHECK_PARAMETER_NOT_NULL(spliceNode, "Houps, there should be a valid splice point node");
+
+      spliceNode->SpliceSibling(node);
+      nodesToSpliceAsLinkerPreviousSiblings.pop();
     }
   }
 
@@ -292,7 +318,6 @@ shared_ptr<PathSelector> AST_SystemModelGenerator::Create_PathSelector (AST_Scan
   const auto  selectorsBitsCount = selectors.size();
 
   auto selectorRegisters = FindSelectorRegisters(selectors, module);
-  CHECK_VALUE_EQ(selectorRegisters.size(), 1u, "Only support single ScanRegister as ScanMux selector");
 
   // ---------------- Prepare selection/deselection tables
   //
@@ -307,30 +332,36 @@ shared_ptr<PathSelector> AST_SystemModelGenerator::Create_PathSelector (AST_Scan
   auto selectorProperties = firstSelectionIsEmpty ? SelectorProperty::CanSelectNone
                                                   : SelectorProperty::Std;
 
-  auto selectorRegister   = selectorRegisters.front(); //! @todo [JFC]-[November/23/2017]: Support multiple selector registers
-  auto modelRegister      = selectorRegister->AssociatedRegister();
-  bool unresolved         = modelRegister ? false : true;
 
-  shared_ptr<PathSelector> pathSelector;
-  if (unresolved)
-  {
-    auto unresolvedPathSelector = make_shared<UnresolvedPathSelector>();
-//+    unresolvedPathSelector->SelectorRegister(selectorRegister);
-    unresolvedPathSelector->SelectionTables(std::move(selectTable), std::move(deselectTable));
-    m_unresolvedPathSelectors.emplace_back(unresolvedPathSelector);
+  VirtualRegister virtualRegister;
 
-    pathSelector = unresolvedPathSelector;
-  }
-  else
+  for (const auto& selectorItem : selectorRegisters)
   {
+    auto selectorRegister = std::get<0>(selectorItem);
+    auto hasRange         = std::get<1>(selectorItem);
+    auto leftIndex        = std::get<2>(selectorItem);
+    auto rightIndex       = std::get<3>(selectorItem);
+
+    auto modelRegister    = selectorRegister->AssociatedRegister();
+
+    CHECK_VALUE_NOT_NULL(modelRegister, "Not Yet Supported: Unresolved path selector (when mux selector ScanRegister is not yet transformed to Register)");
+
     modelRegister->SetHoldValue(true);
-    auto pathsCount = selectTable.size() - 1u;
-    pathSelector    = make_shared<DefaultTableBasedPathSelector>(modelRegister,
+
+    auto range = hasRange ? IndexedRange{leftIndex, rightIndex}
+                          : IndexedRange{modelRegister->BitsCount() - 1u, 0u};
+
+    VirtualRegister::RegisterSlice registerSlice{modelRegister, range};
+
+    virtualRegister.Append(registerSlice);
+  }
+
+  auto pathsCount   = selectTable.size() - 1u;
+  auto pathSelector = make_shared<DefaultTableBasedPathSelector>(virtualRegister,
                                                                  pathsCount,
                                                                  std::move(selectTable),
                                                                  std::move(deselectTable),
                                                                  selectorProperties);
-  }
 
   return pathSelector;
 }
@@ -449,23 +480,76 @@ const AST_Port* AST_SystemModelGenerator::FindScanOutPort (AST_Module* module, c
 //! @param selectors  ScanMux selector signals
 //! @param module     ScanMux parent module
 //!
-vector<AST_ScanRegister*>
+//! @return Ordered Sets of driving ScanRegisters along with whether it has bits span (left and right)
+//!
+vector<tuple<AST_ScanRegister*, bool, uint32_t, uint32_t>>
 AST_SystemModelGenerator::FindSelectorRegisters (const std::vector<Parsers::AST_Signal*>& selectors,
                                                  AST_Module*                              module) const
 {
-  vector<AST_ScanRegister*> scanRegisters;
+  vector<tuple<AST_ScanRegister*, bool, uint32_t, uint32_t>> scanRegisters;
 
+  // ---------------- Follow each selector signal
+  //
   for (const auto& selector : selectors)
   {
-    const auto portScope   = selector->PortScope();
-    const auto identifier  = selector->PortName();
+    const auto identifier = selector->PortName();
+    const auto portScope  = selector->PortScope();
 
-    CHECK_VALUE_EMPTY(portScope, "Not Yet Supported: Selector in different module (for ScanMux)");
+    AST_ScanRegister* scanRegister = nullptr;
 
-    auto scanRegister = module->FindScanRegister(identifier);
-    CHECK_PARAMETER_NOT_NULL(scanRegister, "Failed to find selector ScanRegister in module \""s.append(module->Name()).append("\""));
+    if (portScope.empty())
+    {
+      scanRegister = module->FindScanRegister(identifier);
+    }
+    else
+    {
+      CHECK_VALUE_LTE(portScope.size(), 1u, "Not Yet Supported: Far away selector ScanRegister");
 
-    scanRegisters.push_back(scanRegister);
+      auto selectorModule = module;
+      for (const auto scopeIdentifier : portScope)
+      {
+        auto foundInstance = selectorModule->FindInstance(scopeIdentifier);
+        if (foundInstance == nullptr)
+        {
+          break;
+        }
+        selectorModule = foundInstance->UniquifiedModule();
+      }
+
+      scanRegister = selectorModule->FindScanRegister(identifier);
+      if (scanRegister == nullptr)  // ==> Probably need to follow DataOutPort source !
+      {
+        auto dataOutPort = selectorModule->FindDataOutPort(identifier);
+        CHECK_VALUE_NOT_NULL(dataOutPort, "Failed to find DataOutPort in module \""s.append(selectorModule->Name()).append("\""));
+
+        auto source = dataOutPort->Source();
+        CHECK_VALUE_NOT_NULL(source, "Failed to find DataOutPort source in module \""s.append(selectorModule->Name()).append("\""));
+
+        auto sourceSignals = source->Signals();
+
+        CHECK_VALUE_EQ(sourceSignals.size(), 1u, "Expecting find DataOutPort source in module \""s.append(selectorModule->Name()).append("\" to be driven by exactly 1 signal"));
+
+        auto portName = sourceSignals.front()->PortName();
+        CHECK_VALUE_NOT_NULL(portName, "Expecting DataOutPort in module \""s.append(selectorModule->Name()).append("\" to have a valid source signal port name"));
+
+        scanRegister = selectorModule->FindScanRegister(portName);
+      }
+    }
+
+    CHECK_VALUE_NOT_NULL(scanRegister, "Failed to find ScanRegister selector for scan_mux in module \""s.append(module->Name()).append("\""));
+
+    bool     hasRange   = false;
+    uint32_t leftIndex  = 0u;
+    uint32_t rightIndex = 0u;
+
+    if (identifier->IsKind(Kind::VectorIdentifier))
+    {
+      auto asVectorIdentifier = static_cast<const AST_VectorIdentifier*>(identifier);
+
+      std::tie(hasRange, leftIndex, rightIndex) = asVectorIdentifier->Range();
+    }
+
+    scanRegisters.emplace_back(scanRegister, hasRange, leftIndex, rightIndex);
   }
 
   return scanRegisters;
@@ -545,7 +629,15 @@ void AST_SystemModelGenerator::FollowTopModulePath (AST_Module* topModule, const
           {
             auto scanMux  = module->FindScanMux(identifier);
             CHECK_VALUE_NOT_NULL(scanMux, "Failed to find source entity (not a ScanMux)");
-            std::tie(module, sourceSignals) = Process_ScanMux_Entry(scanMux, module);
+
+            if (scanMux->HasAssociatedLinker()) // ==> If we already passed onto that linker, we must be in context of another linker processing
+            {
+              std::tie(module, sourceSignals) = Process_ScanMux_EndOfSelectionPath(scanMux->AssociatedLinker());
+            }
+            else
+            {
+              std::tie(module, sourceSignals) = Process_ScanMux_Entry(scanMux, module);
+            }
           }
         }
         else   // Instance ?
@@ -976,13 +1068,16 @@ AST_SystemModelGenerator::Process_Instance_Exit (AST_Port* scanInPort)
 AST_SystemModelGenerator::ProcessingContext_t
 AST_SystemModelGenerator::Process_ScanMux_Entry (AST_ScanMux* scanMux, AST_Module* module)
 {
-  CHECK_FALSE(scanMux->IsBusMux(), "Not Yet Supported: ScanMux for buses");
+  CHECK_FALSE(scanMux->IsBusMux(),            "Not Yet Supported: ScanMux for buses");
+  CHECK_FALSE(scanMux->HasAssociatedLinker(), "Cannot create another linker for ScanMux \""s.append(scanMux->BaseName()).append("\""));
 
   // ---------------- Create Linker
   //
   auto        unresolvedPathSelector = make_shared<UnresolvedPathSelector>();
   const auto& name                   = scanMux->BaseName();
   auto        linker                 = m_systemModel->CreateLinker(name, unresolvedPathSelector);
+
+  scanMux->AssociatedLinker(linker);
 
   AssignNewNode(linker);
 

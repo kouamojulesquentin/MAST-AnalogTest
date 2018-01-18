@@ -129,6 +129,9 @@ class AST_Module final : public AST_ParentNode
   //!
   AST_ScanInterface* FindScanInterface(std::experimental::string_view interfaceName);
 
+  //! Searches for a DataOutputPort with specified identifier
+  //!
+  AST_Port* FindDataOutPort (const AST_Identifier* identifier);
 
   //! Searches for a ScanMux with specified identifier
   //!

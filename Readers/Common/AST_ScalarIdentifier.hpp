@@ -30,6 +30,8 @@ class AST_ScalarIdentifier final : public AST_Identifier
   ~AST_ScalarIdentifier() = default;
   AST_ScalarIdentifier()  = delete;
 
+  uint32_t BitsCount() const { return 1u; }; //!< Returns identified bits count (always 1 for scalar identifier)
+
   // ---------------- Private Methods
   //
   private:

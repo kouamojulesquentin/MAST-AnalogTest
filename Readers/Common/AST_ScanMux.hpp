@@ -22,6 +22,11 @@
 #include <string>
 #include <experimental/string_view>
 
+namespace mast
+{
+class Linker;
+}
+
 namespace Parsers
 {
 class AST_Signal;
@@ -65,6 +70,17 @@ class AST_ScanMux final : public AST_ParentNode
   //!
   bool IsBusMux () const;
 
+  std::shared_ptr<mast::Linker> AssociatedLinker() { return m_associatedModelLinker; }  //!< Mast SystemModel associated Linker (when not null)
+
+  //! Sets Mast SystemModel associated Linker (when creating SystemModel)
+  //!
+  void  AssociatedLinker (std::shared_ptr<mast::Linker> associatedLinker) { m_associatedModelLinker = associatedLinker; };
+
+  //! Tells if ScanMux is already associated with a SystemModel Linker
+  //!
+  bool HasAssociatedLinker() const { return m_associatedModelLinker ? true : false; }
+
+
   // ---------------- Private Methods
   //
   private:
@@ -88,9 +104,10 @@ class AST_ScanMux final : public AST_ParentNode
   // ---------------- Private Fields
   //
   private:
-  const AST_VectorIdentifier*                 m_identifier = nullptr; //!< ScanMux identifier
-  std::vector<Parsers::AST_Signal*>           m_selectors;            //!< Selection signals that are used to drive the ScanMux
-  std::vector<Parsers::AST_ScanMuxSelection*> m_selections;           //!< Selections definition i.e. which value(s) select which signal(s)
+  const AST_VectorIdentifier*                 m_identifier = nullptr;  //!< ScanMux identifier
+  std::vector<Parsers::AST_Signal*>           m_selectors;             //!< Selection signals that are used to drive the ScanMux
+  std::vector<Parsers::AST_ScanMuxSelection*> m_selections;            //!< Selections definition i.e. which value(s) select which signal(s)
+  std::shared_ptr<mast::Linker>               m_associatedModelLinker; //!< Associated Linker once mast model is created (SystemModel creation)
 };
 //
 //  End of AST_ScanMux class declaration

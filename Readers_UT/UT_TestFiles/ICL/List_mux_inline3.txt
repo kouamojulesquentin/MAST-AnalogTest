@@ -1,0 +1,6 @@
+# Files for checking IEEE Std 1687-2014 mux_inline3 examples
+#
+Top_mux_inline3.icl
+WrappedInstr.icl
+Instrument.icl
+SReg.icl

@@ -90,6 +90,21 @@ void AST_Module::DispatchChildren ()
 //---------------------------------------------------------------------------
 
 
+//! Searches for a DataOutputPort with specified identifier
+//!
+//! @param identifier   An identifier for DataOutputPort to find
+//!
+AST_Port* AST_Module::FindDataOutPort (const AST_Identifier* identifier)
+{
+  CHECK_PARAMETER_NOT_NULL(identifier, "Cannot find DataOutputPort from nullptr identifier");
+
+  return FindNode(m_dataOutPorts, identifier);
+}
+//
+//  End of: AST_Module::FindDataOutPort
+//---------------------------------------------------------------------------
+
+
 //! Searches for a ScanMux with specified identifier
 //!
 //! @param identifier   An identifier for ScanMux to find
@@ -116,7 +131,7 @@ AST_Port* AST_Module::FindScanInPort (const AST_Identifier* identifier)
   return FindNode(m_scanInPorts, identifier);
 }
 //
-//  End of: AST_Module::FindScanRegister
+//  End of: AST_Module::FindScanInPort
 //---------------------------------------------------------------------------
 
 
@@ -131,7 +146,7 @@ AST_Port* AST_Module::FindScanOutPort (const AST_Identifier* identifier)
   return FindNode(m_scanOutPorts, identifier);
 }
 //
-//  End of: AST_Module::FindScanRegister
+//  End of: AST_Module::FindScanOutPort
 //---------------------------------------------------------------------------
 
 
@@ -160,7 +175,7 @@ AST_Instance* AST_Module::FindInstance (const AST_Identifier* identifier)
   return FindNode(m_instances, identifier);
 }
 //
-//  End of: AST_Module::FindScanRegister
+//  End of: AST_Module::FindInstance
 //---------------------------------------------------------------------------
 
 
@@ -255,7 +270,7 @@ void AST_Module::Uniquify_impl (AST_Builder& astBuilder, const std::vector<AST_P
 
   UniquifyScanOutPorts(astBuilder);
   UniquifyScanRegisters(astBuilder);
-//+  UniquifyScanMuxs(astBuilder);
+  UniquifyScanMuxes(astBuilder);
   UniquifyInstances(astBuilder);
 }
 //
@@ -287,7 +302,8 @@ void AST_Module::UniquifyInstances (AST_Builder& astBuilder)
     bool alreadyCloned = std::find(sm_clonedModules.cbegin(), sm_clonedModules.cend(), instanceModule) != sm_clonedModules.cend();
     CHECK_FALSE(alreadyCloned, "Detected circular dependency regarding module \""s.append(instanceModule->Name()).append("\""));
     sm_clonedModules.push_back(instanceModule);
-    auto        newModule        = instanceModule->Uniquify(astBuilder, parameters);
+
+    auto newModule = instanceModule->Uniquify(astBuilder, parameters);
     sm_clonedModules.pop_back();
 
     auto moduleIdentifier = astBuilder.Create_UniquifiedModuleIdentifier(newModule);

@@ -2258,12 +2258,12 @@ void UT_ICL_Reader::test_Generate_Examples ()
 
   auto data =
   {
-    make_tuple("Bundle_SIB_mux_post.icl",       "test_Generate_SIB_mux_post_PrettyPrint.txt"),
-    make_tuple("Bundle_Daisy_3WI.icl",          "test_Generate_Daisy_3WI_PrettyPrint.txt"),
-    make_tuple("Bundle_Single_SIB_3WI.icl",     "test_Generate_Single_SIB_3WI_PrettyPrint.txt"),
-    make_tuple("Bundle_Multiple_SIB_3WI.icl",   "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),
-    make_tuple("Bundle_Nested_SIB_3WI.icl",     "test_Generate_Nested_SIB_3WI_PrettyPrint.txt"),
-    make_tuple("Bundle_BAD_Nested_SIB_3WI.icl", "test_Generate_BAD_Nested_SIB_3WI_PrettyPrint.txt"),
+    make_tuple("Bundle_BAD_Nested_SIB_3WI.icl", "test_Generate_BAD_Nested_SIB_3WI_PrettyPrint.txt"),    // 05
+    make_tuple("Bundle_SIB_mux_post.icl",       "test_Generate_SIB_mux_post_PrettyPrint.txt"),          // 00
+    make_tuple("Bundle_Daisy_3WI.icl",          "test_Generate_Daisy_3WI_PrettyPrint.txt"),             // 01
+    make_tuple("Bundle_Single_SIB_3WI.icl",     "test_Generate_Single_SIB_3WI_PrettyPrint.txt"),        // 02
+    make_tuple("Bundle_Multiple_SIB_3WI.icl",   "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),      // 03
+    make_tuple("Bundle_Nested_SIB_3WI.icl",     "test_Generate_Nested_SIB_3WI_PrettyPrint.txt"),        // 04
   };
 
   // ---------------- DDT Exercise
@@ -2317,13 +2317,12 @@ void UT_ICL_Reader::test_Parse_Examples_Bundles ()
 
   auto data =
   {
-    make_tuple("Bundle_Top_SReg.icl",           "test_Generate_Top_SReg_PrettyPrint.txt"),
-    make_tuple("Bundle_SIB_mux_post.icl",       "test_Generate_SIB_mux_post_PrettyPrint.txt"),
-    make_tuple("Bundle_Daisy_3WI.icl",          "test_Generate_Daisy_3WI_PrettyPrint.txt"),
-    make_tuple("Bundle_Single_SIB_3WI.icl",     "test_Generate_Single_SIB_3WI_PrettyPrint.txt"),
-    make_tuple("Bundle_Multiple_SIB_3WI.icl",   "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),
-    make_tuple("Bundle_Nested_SIB_3WI.icl",     "test_Generate_Nested_SIB_3WI_PrettyPrint.txt"),
-    make_tuple("Bundle_BAD_Nested_SIB_3WI.icl", "test_Generate_BAD_Nested_SIB_3WI_PrettyPrint.txt"),
+    make_tuple("Bundle_Top_SReg.icl",           "test_Generate_Top_SReg_PrettyPrint.txt"),              // 00
+    make_tuple("Bundle_SIB_mux_post.icl",       "test_Generate_SIB_mux_post_PrettyPrint.txt"),          // 01
+    make_tuple("Bundle_Daisy_3WI.icl",          "test_Generate_Daisy_3WI_PrettyPrint.txt"),             // 02
+    make_tuple("Bundle_Single_SIB_3WI.icl",     "test_Generate_Single_SIB_3WI_PrettyPrint.txt"),        // 03
+    make_tuple("Bundle_Multiple_SIB_3WI.icl",   "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),      // 04
+    make_tuple("Bundle_Nested_SIB_3WI.icl",     "test_Generate_Nested_SIB_3WI_PrettyPrint.txt"),        // 05
   };
 
   // ---------------- DDT Exercise
@@ -2518,8 +2517,8 @@ void UT_ICL_Reader::test_CreateModelFromFiles_ListFile ()
 
   auto data =
   {
-//+    make_tuple("List_mux_inline3.txt",      "test_Generate_mux_inline3_PrettyPrint.txt"),      // 1
     make_tuple("List_Multiple_SIB_3WI.txt", "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"), // 0
+    make_tuple("List_mux_inline3.txt",      "test_Generate_mux_inline3_PrettyPrint.txt"),      // 1
   };
 
   // ---------------- DDT Exercise

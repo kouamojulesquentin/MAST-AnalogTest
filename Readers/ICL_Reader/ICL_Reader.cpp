@@ -11,11 +11,6 @@
 //!
 //===========================================================================
 
-#include <string>
-#include <experimental/string_view>
-#include <fstream>
-#include <memory>
-
 #include "ICL_Reader.hpp"
 #include "ICL_Parser.tab.hh"
 #include "ICL_Scanner.hpp"
@@ -29,6 +24,10 @@
 #include "MastConfig.hpp"
 
 #include "g3log/g3log.hpp"
+
+#include <experimental/string_view>
+#include <fstream>
+#include <memory>
 
 using ICL::ICL_Reader;
 using Parsers::ParserException;
@@ -59,14 +58,16 @@ ICL_Reader::ICL_Reader(std::shared_ptr<mast::SystemModel> sm)
 }
 
 
-//! Creates a SystemModel sub-tree from list of files
+
+//! Reads list of files from list of files
 //!
 //! @note List can provide relative or absolute path or just file name (actual paths will be guessed from a set of directory path)
-//! @note When no extension is provided, if a file cannot be found, an attempt will be made with ".icl" extension
+//! @note When no extension is provided, and a file cannot be found, an attempt will be made with ".icl" extension
 //!
 //! @param listFilePath File path for list of ICL files path (one per line)
 //!
-void ICL_Reader::CreateModelFromFiles (std::experimental::string_view listFilePath)
+//! @return Resolved files path or throw when a file cannot be opened
+vector<string> ICL_Reader::ReadFilesList (string_view listFilePath) const
 {
   CHECK_FILE_EXISTS(listFilePath.data());
 
@@ -139,8 +140,25 @@ void ICL_Reader::CreateModelFromFiles (std::experimental::string_view listFilePa
     fileName.clear();
   }
 
-  // ---------------- Do create model using files path
-  //
+  return filesPath;
+}
+//
+//  End of: ICL_Reader::ReadFilesList
+//---------------------------------------------------------------------------
+
+
+
+//! Creates a SystemModel sub-tree from list of files
+//!
+//! @note List can provide relative or absolute path or just file name (actual paths will be guessed from a set of directory path)
+//! @note When no extension is provided, and a file cannot be found, an attempt will be made with ".icl" extension
+//!
+//! @param listFilePath File path for list of ICL files path (one per line)
+//!
+void ICL_Reader::CreateModelFromFiles (string_view listFilePath)
+{
+  vector<string> filesPath = ReadFilesList(listFilePath);
+
   CreateModelFromFiles(filesPath);
 }
 //
@@ -155,34 +173,7 @@ void ICL_Reader::CreateModelFromFiles (std::experimental::string_view listFilePa
 //!
 void ICL_Reader::CreateModelFromFiles (const vector<string>& filesPaths)
 {
-  // ---------------- Build an AST from all SIT files
-  //
-  for (const auto& filePath : filesPaths)
-  {
-    CHECK_PARAMETER_NOT_EMPTY(filePath, "Must specify a valid (not empty) file path");
-
-    std::ifstream stream(filePath.data());
-
-    CHECK_TRUE  (stream.good(), "Cannot open file: "s            .append(filePath.cbegin(), filePath.cend()));
-    CHECK_FALSE (stream.eof(),  "Cannot parse empty ICL file: "s .append(filePath.cbegin(), filePath.cend()));
-
-    try
-    {
-      UpdateAstFromIcl(stream);
-    }
-    catch(ParserException& exc)
-    {
-      PublicData().parsedTopNode.reset();
-      if (exc.filePath.empty())
-      {
-        exc.filePath.append(filePath.cbegin(), filePath.cend());
-        throw exc;
-      }
-      throw;
-    }
-
-    LOG(INFO) << "ICL file \"" << filePath << "\" is grammatically correct";
-  }
+  UpdateAstFromFiles(filesPaths);
 
   // ---------------- Create SystemModel from AST (constructed while parsing files)
   //
@@ -270,6 +261,65 @@ void ICL_Reader::UniquifyAST ()
 //  End of: ICL_Reader::UniquifyAST
 //---------------------------------------------------------------------------
 
+
+
+//! Parses an ICL fragments (from files path) to update current AST
+//!
+//! @note Supports multiple ICL parsing before converting to SystemModel
+//!
+//! @param listFilePath File path for list of ICL files path (one per line)
+//!
+void ICL_Reader::UpdateAstFromFiles (string_view listFilePath)
+{
+  vector<string> filesPath = ReadFilesList(listFilePath);
+
+  UpdateAstFromFiles(filesPath);
+}
+//
+//  End of: ICL_Reader::UpdateAstFromFiles
+//---------------------------------------------------------------------------
+
+
+//! Parses an ICL fragments (from files path) to update current AST
+//!
+//! @note Supports multiple ICL parsing before converting to SystemModel
+//!
+//! @param filesPaths   Paths of ICL files to parse
+//!
+void ICL_Reader::UpdateAstFromFiles (const vector<string>& filesPaths)
+{
+  // ---------------- Build an AST from all SIT files
+  //
+  for (const auto& filePath : filesPaths)
+  {
+    CHECK_PARAMETER_NOT_EMPTY(filePath, "Must specify a valid (not empty) file path");
+
+    std::ifstream stream(filePath.data());
+
+    CHECK_TRUE  (stream.good(), "Cannot open file: "s            .append(filePath.cbegin(), filePath.cend()));
+    CHECK_FALSE (stream.eof(),  "Cannot parse empty ICL file: "s .append(filePath.cbegin(), filePath.cend()));
+
+    try
+    {
+      UpdateAstFromIcl(stream);
+    }
+    catch(ParserException& exc)
+    {
+      PublicData().parsedTopNode.reset();
+      if (exc.filePath.empty())
+      {
+        exc.filePath.append(filePath.cbegin(), filePath.cend());
+        throw exc;
+      }
+      throw;
+    }
+
+    LOG(INFO) << "ICL file \"" << filePath << "\" is grammatically correct";
+  }
+}
+//
+//  End of: ICL_Reader::UpdateAstFromFiles
+//---------------------------------------------------------------------------
 
 
 //! Parses an ICL fragment to update current AST

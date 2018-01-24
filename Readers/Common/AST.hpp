@@ -78,7 +78,7 @@ class AST final : public AST_Builder
   AST_Parameter*          Create_Parameter          (std::string&& name, std::vector<AST_SimpleNode*>&& stringsOrRefsValue);
   AST_ParameterRef*       Create_ParameterRef       (std::string&& name);
   AST_BsdlInstructionRef* Create_BsdlInstructionRef (std::string&& instructionName, std::vector<AST_Node*>&& children);
-  AST_String*             Create_String             (std::string&& content);
+  AST_String*             Create_String             (std::string&& content) override;
   AST_Signal*             Create_Signal             (std::experimental::string_view number);
   AST_Signal*             Create_Signal             (AST_Identifier* portName);
   AST_Signal*             Create_Signal             (std::vector<AST_ScalarIdentifier*>&& scope, AST_Identifier* portName);
@@ -130,11 +130,14 @@ class AST final : public AST_Builder
 
   // AST_Builder interface implementation
 
-  AST_Port*         Clone_Port         (const AST_Port*         port)         override; //!< Clones a Port
-  AST_Instance*     Clone_Instance     (const AST_Instance*     instance)     override; //!< Clones an instance
-  AST_Module*       Clone_Module       (const AST_Module*       module)       override; //!< Clones a module
-  AST_ScanMux*      Clone_ScanMux      (const AST_ScanMux*      scanMux)      override; //!< Clones a scan multiplexer
-  AST_ScanRegister* Clone_ScanRegister (const AST_ScanRegister* scanRegister) override; //!< Clones a scan register
+  AST_Attribute*        Clone_Attribute        (const AST_Attribute*        attribute)    override;  //!< Clones an attribute
+  AST_Port*             Clone_Port             (const AST_Port*             port)         override;  //!< Clones a Port
+  AST_Instance*         Clone_Instance         (const AST_Instance*         instance)     override;  //!< Clones an instance
+  AST_Module*           Clone_Module           (const AST_Module*           module)       override;  //!< Clones a module
+  AST_Parameter*        Clone_Parameter        (const AST_Parameter*        parameter)    override;  //!< Clones a parameter definition
+  AST_ScanMux*          Clone_ScanMux          (const AST_ScanMux*          scanMux)      override;  //!< Clones a scan multiplexer
+  AST_ScanRegister*     Clone_ScanRegister     (const AST_ScanRegister*     scanRegister) override;  //!< Clones a scan register
+  AST_VectorIdentifier* Clone_VectorIdentifier (const AST_VectorIdentifier* identifier)   override ; //!< Clones a vector identifier
 
   AST_ScalarIdentifier* Create_UniquifiedIdentifier       (const AST_ScalarIdentifier* identifier) override; //!< Creates an identifier for a uniquified entity
   AST_ModuleIdentifier* Create_UniquifiedModuleIdentifier (const AST_Module*           module)     override; //!< Creates an module identifier for a uniquified module

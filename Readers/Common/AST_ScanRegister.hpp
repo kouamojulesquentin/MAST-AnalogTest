@@ -31,6 +31,8 @@ namespace Parsers
 {
 class AST_Value;
 class AST_Source;
+class AST_Builder;
+class AST_Parameter;
 
 //! Represents a parsed test network, instiable, module
 //!
@@ -82,6 +84,14 @@ class AST_ScanRegister final : public AST_ParentNode
   //!
   bool HasAssociatedRegister() const { return m_associatedModelRegister ? true : false; }
 
+  //! Returns uniquified clone of value or string expression
+  //!
+  AST_ScanRegister* UniquifiedClone (AST_Builder& astBuilder) const;
+
+  //! Replaces parameter references with their actual value, then resolve value expressions
+  //!
+  void Resolve (const std::vector<AST_Parameter*>& parameters);
+
   // ---------------- Private Methods
   //
   private:
@@ -109,10 +119,10 @@ class AST_ScanRegister final : public AST_ParentNode
   // ---------------- Private Fields
   //
   private:
-  const AST_VectorIdentifier*     m_identifier       = nullptr; //!< Scan register name
-  const AST_Value*                m_resetValue       = nullptr; //!< Scan register reset value expression
-  const AST_Value*                m_defaultLoadValue = nullptr; //!< Scan register default load value expression
-  const AST_Source*               m_scanInSource     = nullptr; //!< Scan register input source
+  AST_VectorIdentifier*           m_identifier       = nullptr; //!< Scan register name
+  AST_Value*                      m_resetValue       = nullptr; //!< Scan register reset value expression
+  AST_Value*                      m_defaultLoadValue = nullptr; //!< Scan register default load value expression
+  AST_Source*                     m_scanInSource     = nullptr; //!< Scan register input source
   std::shared_ptr<mast::Register> m_associatedModelRegister;    //!< Associated register once mast model is created (during SystemModel creation)
 };
 //

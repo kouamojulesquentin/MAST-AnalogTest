@@ -11,8 +11,10 @@
 //!
 //===========================================================================
 
+#include "AST_Builder.hpp"
 #include "AST_Attribute.hpp"
 #include "AST_String.hpp"
+#include "AST_Parameter.hpp"
 #include "AST_ParameterRef.hpp"
 
 #include "Utility.hpp"
@@ -49,6 +51,47 @@ string AST_Attribute::AsText () const
 }
 //
 //  End of: AST_Attribute::AsText
+//---------------------------------------------------------------------------
+
+
+
+//! Returns true when Attribute is defined using Parameter reference(s)
+//!
+bool AST_Attribute::HasParameterRef () const
+{
+  return AST_Parameter::HasParameterRef(m_stringsValue);
+}
+//
+//  End of: AST_Attribute::HasParameterRef
+//---------------------------------------------------------------------------
+
+
+
+//! Replaces parameter references with their actual value, then resolve range expressions
+//!
+void AST_Attribute::Resolve (const std::vector<AST_Parameter*>& parameters)
+{
+  AST_Parameter::ReplaceStringParameters(m_stringsValue, parameters);
+}
+//
+//  End of: AST_Attribute::Resolve
+//---------------------------------------------------------------------------
+
+
+//! Uniquifies value or string explicit ression
+//!
+//! @note Only uniquifies parts that can be replaced during Parameter_Ref resolution
+//! @note A Parameter Reference is never modified, when needed, it is replaced as a all by a Parameter Value
+//!
+//! @return Returns cloned AST_Attribute (with not shared members)
+AST_Attribute* AST_Attribute::UniquifiedClone (AST_Builder& astBuilder) const
+{
+  auto newAttribute = astBuilder.Clone_Attribute(this);
+
+  return newAttribute;
+}
+//
+//  End of: AST_Parameter::UniquifiedClone
 //---------------------------------------------------------------------------
 
 

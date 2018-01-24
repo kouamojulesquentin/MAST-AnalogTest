@@ -57,10 +57,21 @@ class AST_Port final : public AST_ParentNode
   //!
   const AST_Source* Source() const { return m_source; }
 
+  //! Returns true when Parameter is defined using Parameter reference(s)
+  //!
+  bool HasParameterRef () const override;
+
+  //! Returns uniquified clone
+  //!
+  AST_Port* UniquifiedClone (AST_Builder& astBuilder) const;
+
+  //! Replaces parameter references with their actual value, then resolve value expressions
+  //!
+  void Resolve (const std::vector<AST_Parameter*>& parameters);
+
   // ---------------- Private Methods
   //
   private:
-
   friend class AST;                                              // This is AST that manages construction/destruction of AST nodes
   MAKE_UNIQUE_AS_FRIEND(AST_Port)(Parsers::Kind&,
                                   Parsers::AST_VectorIdentifier*&);
@@ -89,8 +100,8 @@ class AST_Port final : public AST_ParentNode
   // ---------------- Private Fields
   //
   private:
-  const AST_VectorIdentifier* m_identifier = nullptr; //!< Port identifier
-  const AST_Source*           m_source     = nullptr; //!< Port Source (for output ports)
+  AST_VectorIdentifier*       m_identifier = nullptr; //!< Port identifier
+  AST_Source*                 m_source     = nullptr; //!< Port Source (for output ports)
   std::vector<AST_Attribute*> m_attributes;           //!< Port attributes
 };
 //

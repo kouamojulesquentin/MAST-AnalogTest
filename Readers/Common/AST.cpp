@@ -96,6 +96,28 @@ AST_Module* AST::Clone_Module (const AST_Module* module)
 //---------------------------------------------------------------------------
 
 
+//! Clones a Parameter
+//!
+AST_Parameter* AST::Clone_Parameter (const AST_Parameter* parameter)
+{
+  return Clone_Node(parameter);
+}
+//
+//  End of: AST::Clone_Parameter
+//---------------------------------------------------------------------------
+
+
+//! Clones an attribute
+//!
+AST_Attribute* AST::Clone_Attribute (const AST_Attribute* attribute)
+{
+  return Clone_Node(attribute);
+}
+//
+//  End of: AST::Clone_Port
+//---------------------------------------------------------------------------
+
+
 //! Clones a Port
 //!
 AST_Port* AST::Clone_Port (const AST_Port* port)
@@ -126,6 +148,17 @@ AST_ScanRegister* AST::Clone_ScanRegister (const AST_ScanRegister* scanRegister)
 }
 //
 //  End of: AST::Clone_ScanRegister
+//---------------------------------------------------------------------------
+
+
+//! Clones a vector identifier
+//!
+AST_VectorIdentifier* AST::Clone_VectorIdentifier (const AST_VectorIdentifier* identifier)
+{
+  return Clone_Node(identifier);
+}
+//
+//  End of: AST::Clone_VectorIdentifier
 //---------------------------------------------------------------------------
 
 
@@ -752,7 +785,11 @@ void AST::Uniquify ()
 
   CHECK_VALUE_NOT_NULL(topModule, "Network has no \"top\" node");
 
-  topModule->UniquifyInstances(*this);
+  topModule->UniquifyAsTop(*this);
+//+  vector<AST_Parameter*> parameters;  // There is none for top module
+//+  auto newTopModule = topModule->Uniquify(*this, parameters); // This is to have same parameter replacement algorithm on top as for sub-modules
+//+  newTopModule->ChangeIdentifier(topModule->Identifier());  // Restore its original identifier (was changed by uniquification)
+//+  m_network.SetTopModule(newTopModule); // Replace top module with uniquified one
 }
 //
 //  End of: AST::Uniquify

@@ -16,10 +16,9 @@ Module mux_inline3
 
   Instance reg3 Of SReg
   {
-//+ Not Yet Supported:
-//+    Parameter Size = 3;
-    InputPort SI   = mux3;
-    InputPort DI   = 'b0;
+    Parameter MSB = 2;
+    InputPort SI  = mux3;
+    InputPort DI  = 'b0;
   }
 
   ScanMux mux1 SelectedBy reg3.DO[2]

@@ -242,10 +242,8 @@ namespace
 %type <std::string> integer_expr_arg
 %type <std::string> integer_expr_paren
 %type <std::string> integer_expr_lvl1
-%type <std::string> integer_expr_lvl1_b
 %type <std::string> plus_or_minus
 %type <std::string> integer_expr_lvl2
-%type <std::string> integer_expr_lvl2_b
 %type <std::string> star_or_slash_or_percent
 
 %type <std::string> number
@@ -597,19 +595,16 @@ integer_expr_lvl1 :
     // integer_expr_lvl1 : integer_expr_lvl2
     $$ = std::move($1);
   }
-| integer_expr_lvl2 integer_expr_lvl1_b
+| integer_expr_lvl2 plus_or_minus integer_expr_lvl1[rhs]
   {
-    // integer_expr_lvl1 : integer_expr_lvl2 integer_expr_lvl1_b
-    auto combined = $[integer_expr_lvl2].append($[integer_expr_lvl1]);
+    // integer_expr_lvl1 : integer_expr_lvl2 plus_or_minus integer_expr_lvl1[rhs]
+    auto lhsExpr  = $[integer_expr_lvl2];
+    auto op       = $[plus_or_minus];
+    auto rhsExpr  = $[rhs];
+    auto combined = lhsExpr.append(op).append(rhsExpr);
+
     $$ = std::move(combined);
   }
-;
-integer_expr_lvl1_b : plus_or_minus integer_expr_lvl1
-{
-  // integer_expr_lvl1_b : plus_or_minus integer_expr_lvl1
-  auto combined = $[plus_or_minus].append($[integer_expr_lvl1]);
-  $$ = std::move(combined);
-}
 ;
 
 plus_or_minus :
@@ -623,22 +618,18 @@ integer_expr_lvl2 :
     // integer_expr_lvl2 : integer_expr_arg
     $$ = std::move($1);
   }
-| integer_expr_arg integer_expr_lvl2_b
+| integer_expr_arg star_or_slash_or_percent integer_expr_lvl2[rhs]
   {
-    // integer_expr_lvl2 : integer_expr_arg integer_expr_lvl2_b
-    auto combined = $[integer_expr_arg].append($[integer_expr_lvl2_b]);
+    // integer_expr_lvl2 : integer_expr_arg star_or_slash_or_percent integer_expr_lvl2[rhs]
+    auto lhsExpr  = $[integer_expr_arg];
+    auto op       = $[star_or_slash_or_percent];
+    auto rhsExpr  = $[rhs];
+    auto combined = lhsExpr.append(op).append(rhsExpr);
+
     $$ = std::move(combined);
   }
 ;
 
-integer_expr_lvl2_b : star_or_slash_or_percent integer_expr_lvl2
-{
-  // integer_expr_lvl2_b : star_or_slash_or_percent integer_expr_lvl2
-  auto op   = $[star_or_slash_or_percent];
-  auto expr = $[integer_expr_lvl2];
-  $$ = op.append(expr);
-}
-;
 
 star_or_slash_or_percent :
   STAR    { $$ = " * ";  /* star_or_slash_or_percent : STAR */}
@@ -2215,10 +2206,13 @@ iProc_args :
 | number
 | STRING ;
 
-sub_namespace : SCALAR_ID |
-parameter_ref ;
-ref_module_name : SCALAR_ID |
-parameter_ref ;
+sub_namespace :
+  SCALAR_ID
+| parameter_ref ;
+
+ref_module_name :
+  SCALAR_ID
+| parameter_ref ;
 
 // 6.4.10
 logicSignal_def : LOGICSIGNAL logicSignal_name LEFT_BRACE logic_expr SEMICOLON RIGHT_BRACE

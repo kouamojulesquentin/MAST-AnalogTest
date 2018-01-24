@@ -13,6 +13,7 @@
 
 #include "AST_ScanMux.hpp"
 #include "AST_Visitor.hpp"
+#include "AST_Builder.hpp"
 #include "Utility.hpp"
 
 using std::vector;
@@ -78,6 +79,44 @@ bool AST_ScanMux::IsBusMux () const
 //  End of: AST_ScanMux::IsBusMux
 //---------------------------------------------------------------------------
 
+
+//! Replaces parameter references with their actual value, then resolves value expressions
+//!
+//! @param parameters   Actual parameter values - There should be no parameter reference in their values
+//!
+void AST_ScanMux::Resolve (const vector<AST_Parameter*>& parameters)
+{
+  m_identifier->Resolve(parameters);
+}
+//
+//  End of: AST_ScanMux::Resolve
+//---------------------------------------------------------------------------
+
+
+//! Returns uniquified clone of value or string expression
+//!
+//! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
+//!
+//! @return New cloned and uniquified AST_ScanMux
+AST_ScanMux* AST_ScanMux::UniquifiedClone (AST_Builder& astBuilder) const
+{
+  auto cloned = astBuilder.Clone_ScanMux(this);
+
+  if (m_identifier->HasParameterRef())
+  {
+    cloned->m_identifier = m_identifier->UniquifiedClone(astBuilder);
+  }
+
+  //! @todo [JFC]-[January/22/2018]: In UniquifiedClone(): Complete it
+  //!
+//+  UniquifiedCloneItemsWithParameterRef(clone->m_selectors, astBuilder);
+//+  UniquifiedCloneItemsWithParameterRef(clone->m_selections, astBuilder);
+
+  return cloned;
+}
+//
+//  End of: AST_ScanMux::UniquifiedClone
+//---------------------------------------------------------------------------
 
 //===========================================================================
 // End of AST_ScanMux.cpp

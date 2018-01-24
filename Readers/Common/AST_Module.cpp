@@ -84,6 +84,16 @@ void AST_Module::DispatchChildren ()
       }
     }
   }
+
+  // ---------------- Check that each local parameter have a name different than standard parameters
+  //
+  for (const auto localParameter : m_localParameters)
+  {
+    auto pos = std::find_if(m_parameters.begin(), m_parameters.end(), [localParameter](auto iter) { return iter->Name() == localParameter->Name(); });
+    CHECK_PARAMETER_EQ(pos, m_parameters.end(), "Module \""s.append(Name()).append("\" local parameter name \"")
+                                                            .append(localParameter->Name())
+                                                            .append("\" clashes with overridable module parameter"));
+  }
 }
 //
 //  End of: AST_Module::DispatchChildren
@@ -189,7 +199,7 @@ AST_ScanInterface* AST_Module::FindScanInterface (const AST_Identifier* identifi
   return FindNode(m_scanInterfaces, identifier);
 }
 //
-//  End of: AST_Module::ScanInterface
+//  End of: AST_Module::FindScanInterface
 //---------------------------------------------------------------------------
 
 
@@ -202,8 +212,42 @@ AST_ScanInterface* AST_Module::FindScanInterface (string_view interfaceName)
   return FindNode(m_scanInterfaces, interfaceName);
 }
 //
-//  End of: AST_Module::ScanInterface
+//  End of: AST_Module::FindScanInterface
 //---------------------------------------------------------------------------
+
+
+
+//! Moves local parameter to parameter set
+//!
+//! @note It must be call after instance parameter override
+void AST_Module::JoinParameters ()
+{
+  m_parameters.insert(m_parameters.end(), m_localParameters.begin(), m_localParameters.end());
+
+  m_localParameters.clear();
+}
+//
+//  End of: AST_Module::JoinParameters
+//---------------------------------------------------------------------------
+
+
+
+//! Resolves Parameter Reference in members excepted for Parameters that are dealt with specifically and at different time point
+//!
+void AST_Module::Resolve ()
+{
+  AST_Parameter::ResolveItems(m_dataInPorts,   m_parameters);
+  AST_Parameter::ResolveItems(m_dataOutPorts,  m_parameters);
+  AST_Parameter::ResolveItems(m_scanInPorts,   m_parameters);
+  AST_Parameter::ResolveItems(m_scanOutPorts,  m_parameters);
+  AST_Parameter::ResolveItems(m_scanRegisters, m_parameters);
+  AST_Parameter::ResolveItems(m_scanMuxes,     m_parameters);
+  AST_Parameter::ResolveItems(m_attributes,    m_parameters);
+}
+//
+//  End of: AST_Module::Resolve
+//---------------------------------------------------------------------------
+
 
 
 //! Uniquifies module using parameters overrides
@@ -212,7 +256,7 @@ AST_ScanInterface* AST_Module::FindScanInterface (string_view interfaceName)
 //!       The result can be modified without affecting any other Module/Instance
 //!
 //! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
-//! @param parameters   Actual parameter values - There should be no parameter reference in their values
+//! @param parameters   Actual instance parameter values
 //!
 //! @return New and unique AST_Module
 //!
@@ -229,6 +273,8 @@ AST_Module* AST_Module::Uniquify (AST_Builder& astBuilder, const std::vector<AST
 //---------------------------------------------------------------------------
 
 
+
+
 //! Uniquifies module using parameters overrides
 //!
 //! @note Unification consist to have a single object representing that particular module in some context.
@@ -239,44 +285,48 @@ AST_Module* AST_Module::Uniquify (AST_Builder& astBuilder, const std::vector<AST
 //!
 void AST_Module::Uniquify_impl (AST_Builder& astBuilder, const std::vector<AST_Parameter*>& parameters)
 {
-  // ---------------- Update parameters with their override values
-  //
-  for (const auto& parameter : parameters)
-  {
-    auto pos = std::find_if(m_parameters.begin(), m_parameters.end(), [parameter](auto iter) { return iter->Name() == parameter->Name(); });
-    if (pos != m_parameters.end())
-    {
-      *pos = parameter;   // Substitute parameter with actual value
-    }
-  }
+  UniquifyOrUpdateParameters(astBuilder, parameters);
+  AST_Parameter::ResolveItems(m_parameters, m_parameters, astBuilder);
 
-  // ---------------- Replace remaining parameter references
-  //                  (skip those that have been updated just above)
-  //
-  for (const auto& parameter : m_parameters)
-  {
-    auto pos = std::find(parameters.cbegin(), parameters.cend(), parameter);
-    if (pos == parameters.cend())
-    {
-      //! @todo [JFC]-[November/22/2017]: In Uniquify_impl(): Replace parameter reference ==> May need to create a dependency graph to process them in proper order
-      //!                                                     Replace also for local parameters
-//+      if (parameter->HasParameterRef())
-//+      {
-//+        parameter->ReplaceParameterRef(m_parameters);
-//+      }
-    }
-  }
+  UniquifyItemsWithParameterRef(m_attributes, astBuilder);
 
+  UniquifyItems(m_scanRegisters, astBuilder);
+  UniquifyItems(m_scanMuxes,     astBuilder);
+  UniquifyItems(m_dataInPorts,   astBuilder);
+  UniquifyItems(m_dataOutPorts,  astBuilder);
+  UniquifyItems(m_scanInPorts,   astBuilder);
+  UniquifyItems(m_scanOutPorts,  astBuilder);
 
-  UniquifyScanOutPorts(astBuilder);
-  UniquifyScanRegisters(astBuilder);
-  UniquifyScanMuxes(astBuilder);
   UniquifyInstances(astBuilder);
+
+  Resolve();
 }
 //
 //  End of: AST_Module::Uniquify
 //---------------------------------------------------------------------------
 
+
+
+//! Uniquifies as the top module
+//!
+//! @note Should be called only on top module !
+//! @note Unification consist to have a single object representing that particular module in some context.
+//!       The result can be modified without affecting any other Module/Instance
+//!
+//! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
+//!
+void AST_Module::UniquifyAsTop (AST_Builder& astBuilder)
+{
+  sm_clonedModules.clear(); // Reset circular dependencies detection memo
+
+  JoinParameters();
+  AST_Parameter::ResolveItems(m_parameters, m_parameters, astBuilder);
+  Resolve();
+  UniquifyInstances(astBuilder);
+}
+//
+//  End of: AST_Module::UniquifyAsTop
+//---------------------------------------------------------------------------
 
 
 //! Uniquifies module instances
@@ -289,21 +339,19 @@ void AST_Module::UniquifyInstances (AST_Builder& astBuilder)
 
   for (auto& instance : m_instances)
   {
-    auto clonedInstance = astBuilder.Clone_Instance(instance);
-    instance = clonedInstance;  // Replace current (shared) by cloned (unique)
+    instance = instance->UniquifiedClone(astBuilder);
+    instance->Resolve(astBuilder, m_parameters);
 
-    //! @todo [JFC]-[November/22/2017]: In UniquifyInstances(): Replace parameter reference in instance parameters
-
-    const auto& parameters       = instance->Parameters();
-    const auto  moduleId         = instance->ModuleIdentifier();
-    const auto  instanceModule   = network->Module(moduleId);
+    const auto& instanceParameters = instance->Parameters();
+    const auto  moduleId           = instance->ModuleIdentifier();
+    const auto  instanceModule     = network->Module(moduleId);
 
     // Do clone, checking that there is no module circular dependencies (otherwise it would result in recursive loop !)
     bool alreadyCloned = std::find(sm_clonedModules.cbegin(), sm_clonedModules.cend(), instanceModule) != sm_clonedModules.cend();
     CHECK_FALSE(alreadyCloned, "Detected circular dependency regarding module \""s.append(instanceModule->Name()).append("\""));
     sm_clonedModules.push_back(instanceModule);
 
-    auto newModule = instanceModule->Uniquify(astBuilder, parameters);
+    auto newModule = instanceModule->Uniquify(astBuilder, instanceParameters);
     sm_clonedModules.pop_back();
 
     auto moduleIdentifier = astBuilder.Create_UniquifiedModuleIdentifier(newModule);
@@ -317,59 +365,62 @@ void AST_Module::UniquifyInstances (AST_Builder& astBuilder)
 //---------------------------------------------------------------------------
 
 
-//! Uniquifies module ScanOutPorts
+
+//! Uniquifies parameters except those overriden by instance parameters
 //!
-//! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
+//! @note Parameters that do not refers to other parameters are not cloned either (their is no need as their value will not be changed)
 //!
-void AST_Module::UniquifyScanOutPorts (AST_Builder& astBuilder)
+//! @param astBuilder   Interface to clone parameters (it is responsible for the memory management)
+//! @param parameters   Actual parameter values - There should be no parameter reference in their values
+//!
+void AST_Module::UniquifyOrUpdateParameters (AST_Builder& astBuilder, const std::vector<AST_Parameter*>& instanceParameters)
 {
-  for (auto& scanOutPort : m_scanOutPorts)
+  for (auto& parameter : m_parameters)
   {
-    auto cloned = astBuilder.Clone_Port(scanOutPort);
-    scanOutPort = cloned;  // Replace current (shared) by cloned (unique)
+    auto pos = std::find_if(instanceParameters.begin(), instanceParameters.end(), [parameter](auto iter)
+               {
+                 return iter->Name() == parameter->Name();
+               });
+
+    if (pos != instanceParameters.end())
+    {
+      auto instanceParameter = *pos;
+
+      CHECK_TRUE(RepresentsSameTypes(parameter, instanceParameter), "Instance parameter \""s.append(instanceParameter->Name())
+                                                                                            .append("\" of type \"")
+                                                                                            .append(instanceParameter->IsString() ? "string" : "number")
+                                                                                            .append("\" must override a Module parameter of same type.\n")
+                                                                                            .append("The parameter_def included in a parameter_override "
+                                                                                                    "element shall match both the name and type of a "
+                                                                                                    "parameter_def within the module being instantiated."));
+
+      parameter = instanceParameter;   // Substitute parameter with actual value (from instance)
+    }
+
+    if (parameter->HasParameterRef())
+    {
+      parameter = parameter->UniquifiedClone(astBuilder);
+    }
   }
+
+  // ---------------- Local Parameters
+  //
+  for (auto& parameter : m_localParameters)
+  {
+    if (parameter->HasParameterRef())
+    {
+      parameter = parameter->UniquifiedClone(astBuilder);
+    }
+  }
+
+  // ---------------- Join local instanceParameters with others
+  //                  (this simplifies things and can be done because there will be no more override)
+  //
+  JoinParameters();
 }
 //
-//  End of: AST_Module::UniquifyScanRegisters
+//  End of: AST_Module::UniquifyOrUpdateParameters
 //---------------------------------------------------------------------------
-
-//! Uniquifies module scan multiplexers
-//!
-//! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
-//!
-void AST_Module::UniquifyScanMuxes (AST_Builder& astBuilder)
-{
-  for (auto& scanMux : m_scanMuxes)
-  {
-    auto clonedScanMux = astBuilder.Clone_ScanMux(scanMux);
-    scanMux = clonedScanMux;  // Replace current (shared) by cloned (unique)
-
-    //! @todo [JFC]-[November/23/2017]: In UniquifyScanMuxes(): Replace parameter reference(s) of ScanMux
-  }
-}
-//
-//  End of: AST_Module::UniquifyScanMuxes
-//---------------------------------------------------------------------------
-
-
-//! Uniquifies module scan registers
-//!
-//! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
-//!
-void AST_Module::UniquifyScanRegisters (AST_Builder& astBuilder)
-{
-  for (auto& scanRegister : m_scanRegisters)
-  {
-    auto clonedScanRegister = astBuilder.Clone_ScanRegister(scanRegister);
-    scanRegister = clonedScanRegister;  // Replace current (shared) by cloned (unique)
-
-    //! @todo [JFC]-[November/23/2017]: In UniquifyScanRegisters(): Replace parameter reference(s) of ScanRegister
-  }
-}
-//
-//  End of: AST_Module::UniquifyScanRegisters
-//---------------------------------------------------------------------------
-
 
 //===========================================================================
 // End of AST_Module.cpp

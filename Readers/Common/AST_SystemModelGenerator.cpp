@@ -977,8 +977,6 @@ AST_SystemModelGenerator::Process_Instance_Entry (AST_Instance* instance, AST_Mo
   auto chain = instance->AssociatedChain();
   if (!chain)
   {
-    CHECK_VALUE_EMPTY(instance->Parameters(), "Not Yet Supported: Instance parameters");
-
     // ---------------- Create Chain to "encapsulate" instance sub-nodes
     //
     auto name = instance->Name();

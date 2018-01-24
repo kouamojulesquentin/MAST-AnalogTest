@@ -21,6 +21,9 @@
 
 namespace Parsers
 {
+class AST_Parameter;
+class AST_Builder;
+
 //! Represents an attribute
 //!
 class AST_Attribute final : public AST_SimpleNode
@@ -42,6 +45,18 @@ class AST_Attribute final : public AST_SimpleNode
   //! Text representation of attribute value
   //!
   std::string ValueAsText() const;
+
+  //! Returns true when Attribute is defined using Parameter reference(s)
+  //!
+  bool HasParameterRef () const override;
+
+  //! Replaces parameter references with their actual value, then resolve value expressions
+  //!
+  void Resolve (const std::vector<AST_Parameter*>& parameters);
+
+  //! Returns uniquified clone of value or string expression
+  //!
+  AST_Attribute* UniquifiedClone (AST_Builder& astBuilder) const;
 
   // ---------------- Private Methods
   //

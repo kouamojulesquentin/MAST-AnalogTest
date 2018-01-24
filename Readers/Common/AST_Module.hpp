@@ -153,6 +153,10 @@ class AST_Module final : public AST_ParentNode
   //!
   AST_Instance* FindInstance (const AST_Identifier* identifier);
 
+  //! Uniquifies as the top module
+  //!
+  void UniquifyAsTop (AST_Builder& astBuilder);
+
   //! Uniquifies module using parameters overrides
   //!
   AST_Module* Uniquify (AST_Builder& astBuilder, const std::vector<AST_Parameter*>& parameters);
@@ -196,11 +200,12 @@ class AST_Module final : public AST_ParentNode
   //!
   void DispatchChildren () override;
 
+  void JoinParameters ();
 
-  void Uniquify_impl         (AST_Builder& astBuilder, const std::vector<AST_Parameter*>& parameters);
-  void UniquifyScanOutPorts  (AST_Builder& astBuilder);
-  void UniquifyScanMuxes     (AST_Builder& astBuilder);
-  void UniquifyScanRegisters (AST_Builder& astBuilder);
+  void Resolve ();
+
+  void Uniquify_impl              (AST_Builder& astBuilder, const std::vector<AST_Parameter*>& parameters);
+  void UniquifyOrUpdateParameters (AST_Builder& astBuilder, const std::vector<AST_Parameter*>& parameters);
 
   // ---------------- Private Fields
   //
@@ -209,7 +214,7 @@ class AST_Module final : public AST_ParentNode
   const AST_ScalarIdentifier*     m_originalIdentifier = nullptr; //!< Module name prior to unification
   AST_AccessLink*                 m_accessLink         = nullptr; //!< AccessLink: for top module (only one per network)
   AST_Module*                     m_parentModule       = nullptr; //!< When uniquified, tells hierarchical, direct, parent module this one is instanciated (using an Instance)
-  std::vector<AST_Parameter*>     m_parameters;                   //!< Generic module  parameters
+  std::vector<AST_Parameter*>     m_parameters;                   //!< Generic module parameters
   std::vector<AST_Parameter*>     m_localParameters;              //!< Module local parameters
   std::vector<AST_ScanInterface*> m_scanInterfaces;               //!< Scan interfaces
   std::vector<AST_Port*>          m_dataInPorts;                  //!< Data input port(s)

@@ -55,6 +55,10 @@ class AST_Network final : public AST_Node
   //!
   AST_Module* TopModule() const { return m_topModule ? m_topModule : m_firstModule; }
 
+  //! Sets top module
+  //!
+  void SetTopModule(AST_Module* newTopModule) { m_topModule = newTopModule; }
+
   //! Returns module matching identifier
   //!
   AST_Module* Module(const AST_ModuleIdentifier* identifier) const;

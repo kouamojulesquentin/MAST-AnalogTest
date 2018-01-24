@@ -148,6 +148,10 @@ class AST_Node
 
   bool IsKind(Kind kind) const { return m_kind == kind; } //!< Returns whether node is specified kind
 
+  //! Returns true when a node is defined using Parameter reference(s)
+  //!
+  virtual bool HasParameterRef () const { return false; };
+
 
   // ---------------- Protected Methods
   //

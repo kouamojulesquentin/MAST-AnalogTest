@@ -12,6 +12,9 @@
 //===========================================================================
 
 #include "AST_VectorIdentifier.hpp"
+#include "AST_Parameter.hpp"
+#include "AST_Builder.hpp"
+
 #include <sstream>
 
 using std::string;
@@ -62,6 +65,21 @@ uint32_t AST_VectorIdentifier::BitsCount () const
 //---------------------------------------------------------------------------
 
 
+
+//! Returns true when Parameter is defined using Parameter reference(s)
+//!
+//! @note This is useful to know when it should be uniquified
+bool AST_VectorIdentifier::HasParameterRef () const
+{
+  return    AST_Parameter::HasParameterRef(m_left)
+         || AST_Parameter::HasParameterRef(m_right);
+}
+//
+//  End of: AST_VectorIdentifier::HasParameterRef
+//---------------------------------------------------------------------------
+
+
+
 //! Returns range indexes
 //!
 //! @return [has_range, left_index, right_index]
@@ -106,6 +124,37 @@ string AST_VectorIdentifier::RangeAsText () const
 }
 //
 //  End of: AST_VectorIdentifier::RangeAsText
+//---------------------------------------------------------------------------
+
+
+
+//! Replaces parameter references with their actual value, then resolve range expressions
+//!
+void AST_VectorIdentifier::Resolve (const std::vector<AST_Parameter*>& parameters)
+{
+  if (AST_Parameter::HasParameterRef(m_left))
+  {
+    m_left = AST_Parameter::ReplacedParameters(m_left, parameters);
+  }
+
+  if (AST_Parameter::HasParameterRef(m_right))
+  {
+    m_right = AST_Parameter::ReplacedParameters(m_right, parameters);
+  }
+}
+//
+//  End of: AST_VectorIdentifier::Resolve
+//---------------------------------------------------------------------------
+
+
+//! Returns uniquified clone
+//!
+AST_VectorIdentifier* AST_VectorIdentifier::UniquifiedClone (AST_Builder& astBuilder) const
+{
+  return astBuilder.Clone_VectorIdentifier(this);
+}
+//
+//  End of: AST_VectorIdentifier::UniquifiedClone
 //---------------------------------------------------------------------------
 
 

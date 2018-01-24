@@ -11,13 +11,17 @@
 //!
 //===========================================================================
 
-#include "AST_Port.hpp"
 #include "AST_Attribute.hpp"
+#include "AST_Parameter.hpp"
+#include "AST_Port.hpp"
 #include "AST_Signal.hpp"
 #include "AST_Source.hpp"
 #include "AST_Visitor.hpp"
+#include "AST_Builder.hpp"
 
 using std::string;
+using std::vector;
+
 using namespace Parsers;
 
 
@@ -58,6 +62,77 @@ void AST_Port::DispatchChildren ()
 }
 //
 //  End of: AST_Port::DispatchChildren
+//---------------------------------------------------------------------------
+
+
+//! Returns true when Parameter is defined using Parameter reference(s)
+//!
+//! @note This is useful to know when it should be uniquified
+bool AST_Port::HasParameterRef () const
+{
+  if (m_identifier->HasParameterRef())
+  {
+    return true;
+  }
+
+  if (AST_Parameter::HasParameterRef(m_attributes))
+  {
+    return true;
+  }
+
+  return false;
+}
+//
+//  End of: AST_Port::HasParameterRef
+//---------------------------------------------------------------------------
+
+
+//! Replaces parameter references with their actual value, then resolve value expressions
+//!
+//! @param parameters   Actual parameter values - There should be no parameter reference in their values
+//!
+void AST_Port::Resolve (const vector<AST_Parameter*>& parameters)
+{
+  m_identifier->Resolve(parameters);
+
+  if (m_source)
+  {
+//+    m_source->Resolve(parameters);
+  }
+
+  AST_Parameter::ResolveItems(m_attributes, parameters);
+}
+//
+//  End of: AST_Port::Resolve
+//---------------------------------------------------------------------------
+
+
+
+//! Returns uniquified clone of value or string expression
+//!
+//! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
+//!
+//! @return New cloned and uniquified AST_Port
+AST_Port* AST_Port::UniquifiedClone (AST_Builder& astBuilder) const
+{
+  auto cloned = astBuilder.Clone_Port(this);
+
+  if (m_identifier->HasParameterRef())
+  {
+    cloned->m_identifier = m_identifier->UniquifiedClone(astBuilder);
+  }
+
+  if (m_source && m_source->HasParameterRef())
+  {
+//+    cloned->m_source = m_source->UniquifiedClone();
+  }
+
+  UniquifyItemsWithParameterRef(cloned->m_attributes, astBuilder);
+
+  return cloned;
+}
+//
+//  End of: AST_Port::UniquifiedClone
 //---------------------------------------------------------------------------
 
 

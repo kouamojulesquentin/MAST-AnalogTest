@@ -38,6 +38,10 @@ class AST_ParameterRef final : public AST_SimpleNode
   //!
   std::string AsText() const override { return std::string("$").append(m_name); }
 
+  //! Always returns true as this is a Parameter reference
+  //!
+  virtual bool HasParameterRef () const { return true; };
+
   // ---------------- Private Methods
   //
   private:

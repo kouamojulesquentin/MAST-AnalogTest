@@ -105,10 +105,14 @@ class AST_Instance final : public AST_ParentNode
   //!
   bool HasAssociatedChain() const { return m_associatedModelChain ? true : false; }
 
+  //! Replaces parameter references with their actual value, then resolve value expressions
+  //!
+  void Resolve (AST_Builder& astBuilder, const std::vector<AST_Parameter*>& moduleParameters);
 
   //! Uniquifies instance
   //!
-  AST_Instance* Uniquify (AST_Builder& astBuilder);
+  AST_Instance* UniquifiedClone (AST_Builder& astBuilder) const;
+
 
   // ---------------- Private Methods
   //
@@ -154,7 +158,6 @@ class AST_Instance final : public AST_ParentNode
   }
 
   void DispatchChildren () override;
-  void UniquifyInputPorts (AST_Builder& astBuilder);
 
   // ---------------- Private Fields
   //

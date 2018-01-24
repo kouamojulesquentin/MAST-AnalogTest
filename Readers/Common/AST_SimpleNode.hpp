@@ -46,9 +46,9 @@ class AST_SimpleNode : public AST_Node
   //! @param suffix     Optional text to place after each strings (usually empty)
   //!
   //! @return Built up string
-  static std::string AsText(std::vector<std::string>       strings,
-                            std::experimental::string_view separator,
-                            std::experimental::string_view suffix = "")
+  static std::string AsText(const std::vector<std::string>& strings,
+                            std::experimental::string_view  separator,
+                            std::experimental::string_view  suffix = "")
   {
     std::string result;
 
@@ -81,8 +81,8 @@ class AST_SimpleNode : public AST_Node
   //! @param suffix     Optional text to place after each node (usually empty)
   //!
   //! @return Built up string
-  template<typename T>
-  static std::string AsText(std::vector<T*>                nodes,
+  template<typename Container>
+  static std::string AsText(const Container&               nodes,
                             std::experimental::string_view separator,
                             std::experimental::string_view suffix = "")
   {

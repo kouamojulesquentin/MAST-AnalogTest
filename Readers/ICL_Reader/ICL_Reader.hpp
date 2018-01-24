@@ -17,6 +17,8 @@
 #include "Reader.hpp"
 #include <istream>
 #include <memory>
+#include <vector>
+#include <string>
 
 namespace mast
 {
@@ -65,14 +67,21 @@ class ICL_Reader : public Parsers::Reader
   // ---------------- Protected Methods
   //
   protected:
-  virtual void Parse_Impl       (std::istream& stream) override;
-  virtual void UpdateAstFromIcl (std::istream& stream);
+  virtual void Parse_Impl         (std::istream& stream) override;
+
+  virtual void UpdateAstFromFiles (std::experimental::string_view  listFilePath);
+  virtual void UpdateAstFromFiles (const std::vector<std::string>& filesPaths);
+  virtual void UpdateAstFromIcl   (std::istream&                   stream);
 
   Parsers::AST* AST() const { return m_ast.get(); } //!< Returns current AST (for debug purpose)
 
   virtual std::shared_ptr<mast::SystemModelNode> GenerateSystemModelNodes (Parsers::AST* ast);
 
   void UniquifyAST ();
+
+  // ---------------- Private Methods
+  //
+  std::vector<std::string> ReadFilesList (std::experimental::string_view listFilePath) const;
 
   // ---------------- Private Fields
   //

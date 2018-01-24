@@ -17,12 +17,14 @@
 
 #include "AST_NamedNode.hpp"
 #include "AST_ScalarIdentifier.hpp"
+#include "AST_Builder.hpp"
 
 #include <vector>
 
 namespace Parsers
 {
 class AST_ScalarIdentifier;
+class AST_Parameter;
 
 //! Represents a named AST node that can have children
 //!
@@ -125,6 +127,32 @@ class AST_ParentNode : public AST_NamedNode
     return foundNode;
   }
 
+
+  //! Uniquifies all collection items
+  //!
+  template<typename T>
+  static void UniquifyItems(T& nodes, AST_Builder& astBuilder)
+  {
+    for (auto& node: nodes)
+    {
+      node = node->UniquifiedClone(astBuilder);
+    }
+  }
+
+
+  //! Uniquifies collection items that have reference(s) to Parameter(s)
+  //!
+  template<typename T>
+  static void UniquifyItemsWithParameterRef(T& nodes, AST_Builder& astBuilder)
+  {
+    for (auto& node: nodes)
+    {
+      if (node->HasParameterRef())
+      {
+        node = node->UniquifiedClone(astBuilder);
+      }
+    }
+  }
 
   // ---------------- Protected Fields
   //

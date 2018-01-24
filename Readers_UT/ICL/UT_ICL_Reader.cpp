@@ -128,6 +128,7 @@ class ICL_Reader_TSS : public ICL::ICL_Reader
   ICL_Reader_TSS(std::shared_ptr<mast::SystemModel> sm) : ICL_Reader(sm) {  }
   using ICL_Reader::AST;
   using ICL_Reader::UpdateAstFromIcl;
+  using ICL_Reader::UpdateAstFromFiles;
   using ICL_Reader::UniquifyAST;
   using ICL_Reader::GenerateSystemModelNodes;
 };
@@ -1705,9 +1706,10 @@ void UT_ICL_Reader::test_Uniquify_Examples ()
     std::ifstream  ifs(iclFilePath);
     auto           sm = make_shared<SystemModel>();
     ICL_Reader_TSS sut(sm);
-    TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(ifs));
 
     CxxTest::setAbortTestOnFail(true);
+    TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(ifs));
+
 
     // ---------------- Exercise
     //
@@ -1729,15 +1731,72 @@ void UT_ICL_Reader::test_Uniquify_Examples ()
 
   auto data =
   {
-    make_tuple("Bundle_SIB_mux_pre.icl",    "Uniquified_SIB_mux_pre_PrettyPrint.icl"),      // 0
-    make_tuple("Bundle_Single_SIB_3WI.icl", "Uniquified_Single_SIB_3WI_PrettyPrint.icl"),   // 1
-    make_tuple("Bundle_Top_SReg.icl",       "Uniquified_Top_SReg_PrettyPrint.icl"),         // 2
+    make_tuple("Bundle_Example_With_Parameters.icl", "Uniquified_Example_With_Parameters_PrettyPrint.icl"), // 0
+    make_tuple("Bundle_SIB_mux_pre.icl",             "Uniquified_SIB_mux_pre_PrettyPrint.icl"),             // 1
+    make_tuple("Bundle_Single_SIB_3WI.icl",          "Uniquified_Single_SIB_3WI_PrettyPrint.icl"),          // 2
+    make_tuple("Bundle_Top_SReg.icl",                "Uniquified_Top_SReg_PrettyPrint.icl"),                // 3
   };
 
   // ---------------- DDT Exercise
   //
   TS_DATA_DRIVEN_TEST(checker, data);
 }
+
+
+
+//! Checks AST::Uniquify() when parsing examples from list of files defined in a file (mostly from IEEE 1687-2014 standard)
+//!
+void UT_ICL_Reader::test_Uniquify_Examples_ListFile ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto& listFileName     = std::get<0>(data);
+    auto        expectedFileName = std::get<1>(data);
+
+    const auto  listFilePath     = GetTestFilePath(listFileName);
+
+    CxxTest::setAbortTestOnFail(true);
+
+    auto           sm = make_shared<SystemModel>();
+    ICL_Reader_TSS sut(sm);
+    sut.FilesSearchPaths().emplace_back(GetTestDirPath(""));
+
+    TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromFiles(listFilePath));
+
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.UniquifyAST());
+
+    // ---------------- Verify
+    //
+    auto ast = sut.AST();
+    TS_ASSERT_NOT_NULLPTR (ast);
+    auto network = ast->Network();
+    TS_ASSERT_NOT_NULLPTR (network);
+
+    auto actual_AST_PrettyPrint   = Parsers::AST_PrettyPrinter::PrettyPrint(network);
+    auto expected_AST_PrettyPrint = GetExpectedAstPrint(expectedFileName);
+
+    TS_ASSERT_EQUALS (actual_AST_PrettyPrint, expected_AST_PrettyPrint);
+  };
+
+  auto data =
+  {
+    make_tuple("List_SReg.txt",             "Uniquified_SReg_PrettyPrint.icl"),             // 0
+    make_tuple("List_Multiple_SIB_3WI.txt", "Uniquified_Multiple_SIB_3WI_PrettyPrint.icl"), // 1
+    make_tuple("List_mux_inline3.txt",      "Uniquified_mux_inline3_PrettyPrint.icl"),      // 2
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
 
 
 

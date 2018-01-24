@@ -17,10 +17,13 @@
 #include "AST_Signal.hpp"
 #include "AST_Source.hpp"
 #include "AST_Visitor.hpp"
+#include "AST_Builder.hpp"
 #include "Utility.hpp"
 
+using std::vector;
 using std::string;
 using std::experimental::string_view;
+
 using namespace std::experimental::literals::string_view_literals;
 using namespace std::string_literals;
 using namespace Parsers;
@@ -81,7 +84,7 @@ void AST_ScanRegister::DispatchChildren ()
     }
   }
 
-  CHECK_VALUE_NOT_NULL(m_scanInSource, "The source of the scan input data for a ScanRegister is required");
+  CHECK_VALUE_NOT_NULL(m_scanInSource, "The source of the scan input data for a ScanRegister \""s.append(m_identifier->AsText()).append("\" is required") );
 }
 //
 //  End of: AST_ScanRegister::DispatchChildren
@@ -111,6 +114,19 @@ const string& AST_ScanRegister::RangeRight () const
 
 
 
+//! Replaces parameter references with their actual value, then resolve value expressions
+//!
+//! @param parameters   Actual parameter values - There should be no parameter reference in their values
+//!
+void AST_ScanRegister::Resolve (const vector<AST_Parameter*>& parameters)
+{
+  m_identifier->Resolve(parameters);
+}
+//
+//  End of: AST_ScanRegister::Resolve
+//---------------------------------------------------------------------------
+
+
 //! ScanRegister source base name (without indices)
 //!
 const string& AST_ScanRegister::SourceBaseName () const
@@ -127,6 +143,28 @@ const string& AST_ScanRegister::SourceBaseName () const
 }
 //
 //  End of: AST_ScanRegister::SourceBaseName
+//---------------------------------------------------------------------------
+
+
+
+
+//! Returns uniquified clone of value or string expression
+//!
+//! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
+//!
+//! @return New cloned and uniquified AST_ScanRegister
+AST_ScanRegister* AST_ScanRegister::UniquifiedClone (AST_Builder& astBuilder) const
+{
+  auto cloned = astBuilder.Clone_ScanRegister(this);
+
+  if (m_identifier->HasParameterRef())
+  {
+    cloned->m_identifier = m_identifier->UniquifiedClone(astBuilder);
+  }
+  return cloned;
+}
+//
+//  End of: AST_ScanRegister::UniquifiedClone
 //---------------------------------------------------------------------------
 
 

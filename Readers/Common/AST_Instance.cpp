@@ -22,6 +22,7 @@
 #include "AST_Builder.hpp"
 
 using std::string;
+using std::vector;
 
 using namespace Parsers;
 
@@ -86,6 +87,28 @@ string AST_Instance::Name () const
 //---------------------------------------------------------------------------
 
 
+//! Replaces parameter references with their actual value, then resolve value expressions
+//!
+//! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
+//! @param parameters   Actual parameter values from embedding module - There should be no parameter reference in their values
+//!
+void AST_Instance::Resolve (AST_Builder& astBuilder, const vector<AST_Parameter*>& moduleParameters)
+{
+  // ---------------- For local Parameter Reference, use both instance parameters and "inherited" parameter from embedding module
+  //
+  auto mergedParameters = m_parameters;
+  mergedParameters.insert(mergedParameters.end(), moduleParameters.cbegin(), moduleParameters.cend());
+
+  AST_Parameter::ResolveItems(m_parameters, mergedParameters, astBuilder);
+  AST_Parameter::ResolveItems(m_attributes, mergedParameters); //+, astBuilder);
+  AST_Parameter::ResolveItems(m_inputPorts, mergedParameters);
+}
+//
+//  End of: AST_Instance::Resolve
+//---------------------------------------------------------------------------
+
+
+
 //! Uniquifies instance
 //!
 //! @note Unification consist to have a single object representing that particular instance.
@@ -94,33 +117,20 @@ string AST_Instance::Name () const
 //! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
 //!
 //! @return New and unique AST_Instance
-AST_Instance* AST_Instance::Uniquify (AST_Builder& astBuilder)
+AST_Instance* AST_Instance::UniquifiedClone (AST_Builder& astBuilder) const
 {
   auto clone = astBuilder.Clone_Instance(this);
 
-  clone->UniquifyInputPorts(astBuilder);
+  UniquifyItemsWithParameterRef(clone->m_parameters, astBuilder);
+  UniquifyItemsWithParameterRef(clone->m_attributes, astBuilder);
+  UniquifyItemsWithParameterRef(clone->m_inputPorts, astBuilder);
+
   return clone;
 }
 //
-//  End of: AST_Instance::Uniquify
+//  End of: AST_Instance::UniquifiedClone
 //---------------------------------------------------------------------------
 
-
-//! Uniquifies instance InputPorts
-//!
-//! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
-//!
-void AST_Instance::UniquifyInputPorts (AST_Builder& astBuilder)
-{
-  for (auto& inputPort : m_inputPorts)
-  {
-    auto clonedInputPort = astBuilder.Clone_Port(inputPort);
-    inputPort = clonedInputPort;  // Replace current (shared) by cloned (unique)
-  }
-}
-//
-//  End of: AST_Instance::UniquifyInputPorts
-//---------------------------------------------------------------------------
 
 
 //! Sets unique module representing that very instance

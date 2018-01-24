@@ -14,16 +14,22 @@
 #ifndef AST_CLONER_H__87628D5E_5B7_455A_EE81_2F5FC373AAEF__INCLUDED_
   #define AST_CLONER_H__87628D5E_5B7_455A_EE81_2F5FC373AAEF__INCLUDED_
 
+#include <string>
+
 namespace Parsers
 {
+class AST_Attribute;
 class AST_Instance;
 class AST_Module;
 class AST_Network;
+class AST_Parameter;
 class AST_Port;
 class AST_ScalarIdentifier;
 class AST_ScanMux;
 class AST_ScanRegister;
+class AST_String;
 class AST_ModuleIdentifier;
+class AST_VectorIdentifier;
 
 //! Interfaces for cloning AST nodes
 //!
@@ -33,14 +39,18 @@ class AST_Builder
   // ---------------- Public Methods
   //
   public:
-  virtual AST_Port*         Clone_Port         (const AST_Port*         port) = 0;         //!< Clones a Port
-  virtual AST_Instance*     Clone_Instance     (const AST_Instance*     instance) = 0;     //!< Clones an instance
-  virtual AST_Module*       Clone_Module       (const AST_Module*       module) = 0;       //!< Clones a module
-  virtual AST_ScanMux*      Clone_ScanMux      (const AST_ScanMux*      scanMux) = 0;      //!< Clones a scan multiplexer
-  virtual AST_ScanRegister* Clone_ScanRegister (const AST_ScanRegister* scanRegister) = 0; //!< Clones a scan register
+  virtual AST_Attribute*        Clone_Attribute        (const AST_Attribute*        attribute) = 0;    //!< Clones an attribute
+  virtual AST_Port*             Clone_Port             (const AST_Port*             port) = 0;         //!< Clones a port
+  virtual AST_Instance*         Clone_Instance         (const AST_Instance*         instance) = 0;     //!< Clones an instance
+  virtual AST_Module*           Clone_Module           (const AST_Module*           module) = 0;       //!< Clones a module
+  virtual AST_Parameter*        Clone_Parameter        (const AST_Parameter*        parameter) = 0;    //!< Clones a parameter definition
+  virtual AST_ScanMux*          Clone_ScanMux          (const AST_ScanMux*          scanMux) = 0;      //!< Clones a scan multiplexer
+  virtual AST_ScanRegister*     Clone_ScanRegister     (const AST_ScanRegister*     scanRegister) = 0; //!< Clones a scan register
+  virtual AST_VectorIdentifier* Clone_VectorIdentifier (const AST_VectorIdentifier* identifier) = 0;   //!< Clones a vector identifier
 
+  virtual AST_String*           Create_String                     (std::string&&               content) = 0;    //!< Creates an AST_String node
   virtual AST_ScalarIdentifier* Create_UniquifiedIdentifier       (const AST_ScalarIdentifier* identifier) = 0; //!< Creates an identifier for a uniquified entity
-  virtual AST_ModuleIdentifier* Create_UniquifiedModuleIdentifier (const AST_Module*           module) = 0;     //!< Creates an module identifier for a uniquified module
+  virtual AST_ModuleIdentifier* Create_UniquifiedModuleIdentifier (const AST_Module*           module) = 0;     //!< Creates an identifier for a uniquified module
 
   virtual AST_Network* Network() = 0;  //!< Returns instruments test network
 

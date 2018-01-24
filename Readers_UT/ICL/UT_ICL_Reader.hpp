@@ -55,6 +55,7 @@ class UT_ICL_Reader : public CxxTest::TestSuite
   void test_Uniquify_2_Instances ();
   void test_Uniquify_N_Modules ();
   void test_Uniquify_Examples ();
+  void test_Uniquify_Examples_ListFile ();
 
 
   // ---------------- GenerateSystemModelNodes

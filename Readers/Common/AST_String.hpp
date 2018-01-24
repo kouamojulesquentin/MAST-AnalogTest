@@ -38,6 +38,10 @@ class AST_String final : public AST_SimpleNode
   //!
   const std::string& Value() const { return m_content; }
 
+  //! Replaces value
+  //!
+  void ReplaceValue(const std::string& newValue) { m_content = newValue; }
+
   // ---------------- Private Methods
   //
   private:

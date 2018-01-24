@@ -31,6 +31,7 @@ namespace Parsers
 {
 class AST_Signal;
 class AST_ScanMuxSelection;
+class AST_Parameter;
 
 //! Represents a scan chain multiplexer
 //!
@@ -80,6 +81,13 @@ class AST_ScanMux final : public AST_ParentNode
   //!
   bool HasAssociatedLinker() const { return m_associatedModelLinker ? true : false; }
 
+  //! Replaces parameter references with their actual value, then resolve value expressions
+  //!
+  void Resolve (const std::vector<AST_Parameter*>& parameters);
+
+  //! Returns uniquified clone
+  //!
+  AST_ScanMux* UniquifiedClone (AST_Builder& astBuilder) const;
 
   // ---------------- Private Methods
   //
@@ -104,7 +112,7 @@ class AST_ScanMux final : public AST_ParentNode
   // ---------------- Private Fields
   //
   private:
-  const AST_VectorIdentifier*                 m_identifier = nullptr;  //!< ScanMux identifier
+  AST_VectorIdentifier*                       m_identifier = nullptr;  //!< ScanMux identifier
   std::vector<Parsers::AST_Signal*>           m_selectors;             //!< Selection signals that are used to drive the ScanMux
   std::vector<Parsers::AST_ScanMuxSelection*> m_selections;            //!< Selections definition i.e. which value(s) select which signal(s)
   std::shared_ptr<mast::Linker>               m_associatedModelLinker; //!< Associated Linker once mast model is created (SystemModel creation)

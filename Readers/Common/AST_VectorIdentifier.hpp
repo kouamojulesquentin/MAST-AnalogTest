@@ -21,6 +21,9 @@
 
 namespace Parsers
 {
+class AST_Builder;
+class AST_Parameter;
+
 //! Specifies name with single or range index(es)
 //!
 class AST_VectorIdentifier final : public AST_Identifier
@@ -46,6 +49,19 @@ class AST_VectorIdentifier final : public AST_Identifier
   bool IsMultiBits() const { return !m_right.empty() && (m_left != m_right); } //!< Returns true when it represents a multiple bits
 
   uint32_t BitsCount() const; //!< Returns identified bits count
+
+  //! Returns true when range is defined using Parameter reference(s)
+  //!
+  bool HasParameterRef () const override;
+
+  //! Returns uniquified clone
+  //!
+  AST_VectorIdentifier* UniquifiedClone (AST_Builder& astBuilder) const;
+
+  //! Replaces parameter references with their actual value, then resolve range expressions
+  //!
+  void Resolve (const std::vector<AST_Parameter*>& parameters);
+
 
   // ---------------- Private Methods
   //

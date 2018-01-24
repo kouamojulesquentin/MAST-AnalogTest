@@ -1,0 +1,8 @@
+# Files for checking IEEE Std 1687-2014 mux_remote3 example
+#
+Top_mux_remote3.icl
+mux_remote3.icl
+remote_control.icl
+WrappedInstr.icl
+Instrument.icl
+SReg.icl

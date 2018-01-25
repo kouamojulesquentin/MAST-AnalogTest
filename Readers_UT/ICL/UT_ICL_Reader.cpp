@@ -1146,6 +1146,127 @@ void UT_ICL_Reader::test_FromIcl_Namespace_Def ()
 }
 
 
+//! Checks ICL_Reader::ParseExcerpt() when parsing a module with value expressions
+//!
+void UT_ICL_Reader::test_FromIcl_ValueExpr ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt("Module SReg\n"                                                            // 01
+                        "{\n"                                                                      // 02
+                        "  Parameter Size          = 8;\n"                                         // 03
+                        "  Parameter LSB           = 0;\n"                                         // 04
+                        "  Parameter MSB           = $Size - 1;\n"                                 // 05
+                        "  Parameter MSB_2         = $Size + 1;\n"                                 // 06
+                        "  Parameter Val_1         = 3;\n"                                         // 07
+                        "  Parameter Val_2         = 0 -$Val_1 + 4 * (9 - 5) + 7;\n"               // 08
+                        "  Parameter Val_3         = $Val_1 + $Size * ($MSB_2 - $MSB) + $Val_2;\n" // 09
+                        "  Parameter Val_4         = 1_3_4;\n"                                     // 10 - a valid decimal number (134)
+                        "  Parameter Val_5         = 0235;\n"                                      // 11 - a valid decimal number
+                        "  Parameter Val_6         = 'd 134;\n"                                    // 12 - a valid decimal number
+                        "  Parameter Val_7         = 'h 2_3ff;\n"                                  // 13 - a valid hexadecimal number
+                        "  Parameter Val_8         = 4'b0101;\n"                                   // 14 - a 4-bit binary number
+                        "  Parameter Val_9         = 5'D 3;\n"                                     // 15 - a 5-bit decimal number
+                        "  Parameter Val_10        = 3'b0_1x;\n"                                   // 16 - a 3-bit number with the lsb an unknown number
+                        "  Parameter Val_11        = 7'hx;\n"                                      // 17 - a 7-bit unknown number (same as 7'bxxxxxxx)
+                        "  Parameter Val_22        = $Size'h3;\n"                                  // 18 - Use of a parameter to size a number (which will be 2'b11)
+                        "  Parameter Vector_Val_1  = 5'b10110, 4'hFade;\n"                         // 19
+                        "  Parameter Vector_Val_2  = 5'b10110, ~0, 4'hFade;\n"                     // 20
+                        "  Parameter Vector_Val_3  = ~4'b1000;\n"                                  // 21 - means 4'b0111
+                        "  Parameter Vector_Val_4  = ~8'hAA;\n"                                    // 22 - means 8'h55
+                        "  Parameter Vector_Val_5  = ~42;\n"                                       // 23 - means ~'d42 = ~'b101010 = ‘b010101
+                        "  Parameter Vector_Val_6  = ~$ABC;\n"                                     // 24 - the value of ABC will be bitwise inverted before being used
+                        "\n"                                                                       // 25
+                        "  ScanInPort    SI;\n"                                                    // 26
+                        "  ScanOutPort   SO { Source SR[0];}\n"                                    // 27
+                        "  ScanRegister  SR_1[$MSB + 32 : 3/$Val_1]\n"                             // 28
+                        "  {\n"                                                                    // 29
+                        "    ScanInSource  SI;\n"                                                  // 30
+                        "    ResetValue    'b0, $Vector_Val_1;\n"                                  // 31
+                        "  }\n"                                                                    // 32
+                        "\n"                                                                       // 33
+                        "  ScanRegister  SR_2[$MSB / 2 : $LSB + 1]\n"                              // 34
+                        "  {\n"                                                                    // 35
+                        "    ScanInSource  SI;\n"                                                  // 36
+                        "    ResetValue    8'h21, 3'b011;\n"                                       // 37
+                        "  }\n"                                                                    // 38
+                        "\n"                                                                       // 39
+                        "  ScanMux compare_out SelectedBy check_mismatch[1:0]\n"                   // 40
+                        "  {\n"                                                                    // 41
+                        "    1'b0,1'b1 | 1'b1,1'b0 : different;\n"                                 // 42
+                        "    1'b1,1'b1 | 1'b0,1'b0 : same;\n"                                      // 43
+                        "  }\n"                                                                    // 44
+                        "}\n"s);                                                                   // 45
+
+
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  CxxTest::setAbortTestOnFail(true);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+
+  // ---------------- Verify
+  //
+
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
+
+  auto expected_AST_PrettyPrint =
+                                  "NameSpace;\n"
+                                  "Module SReg\n"
+                                  "{\n"
+                                  "  Parameter Size = 8;\n"
+                                  "  Parameter LSB = 0;\n"
+                                  "  Parameter MSB = $Size - 1;\n"
+                                  "  Parameter MSB_2 = $Size + 1;\n"
+                                  "  Parameter Val_1 = 3;\n"
+                                  "  Parameter Val_2 = 0 - $Val_1 + 4 * (9 - 5) + 7;\n"
+                                  "  Parameter Val_3 = $Val_1 + $Size * ($MSB_2 - $MSB) + $Val_2;\n"
+                                  "  Parameter Val_4 = 1_3_4;\n"
+                                  "  Parameter Val_5 = 0235;\n"
+                                  "  Parameter Val_6 = 'd 134;\n"
+                                  "  Parameter Val_7 = 'h 2_3ff;\n"
+                                  "  Parameter Val_8 = 4'b0101;\n"
+                                  "  Parameter Val_9 = 5 'D 3;\n"
+                                  "  Parameter Val_10 = 3'b0_1x;\n"
+                                  "  Parameter Val_11 = 7'hx;\n"
+                                  "  Parameter Val_22 = $Size'h3;\n"
+                                  "  Parameter Vector_Val_1 = 5'b10110, 4'hFade;\n"
+                                  "  Parameter Vector_Val_2 = 5'b10110, ~0, 4'hFade;\n"
+                                  "  Parameter Vector_Val_3 = ~4'b1000;\n"
+                                  "  Parameter Vector_Val_4 = ~8'hAA;\n"
+                                  "  Parameter Vector_Val_5 = ~42;\n"
+                                  "  Parameter Vector_Val_6 = ~$ABC;\n"
+                                  "  ScanInPort SI;\n"
+                                  "  ScanOutPort SO { Source SR[0]; }\n"
+                                  "  ScanMux compare_out SelectedBy check_mismatch[1:0]\n"
+                                  "  {\n"
+                                  "    1'b0, 1'b1 | 1'b1, 1'b0 : different;\n"
+                                  "    1'b1, 1'b1 | 1'b0, 1'b0 : same;\n"
+                                  "  }\n"
+                                  "  ScanRegister SR_1[$MSB + 32:3 / $Val_1]\n"
+                                  "  {\n"
+                                  "    ScanInSource SI;\n"
+                                  "    ResetValue 'b0, $Vector_Val_1;\n"
+                                  "  }\n"
+                                  "  ScanRegister SR_2[$MSB / 2:$LSB + 1]\n"
+                                  "  {\n"
+                                  "    ScanInSource SI;\n"
+                                  "    ResetValue 8'h21, 3'b011;\n"
+                                  "  }\n"
+                                  "}";
+
+
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
+  TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
+
 //! Checks ICL_Reader::ParseExcerpt() when explicitly declaring using some namespace (outside of Module definition)
 //!
 void UT_ICL_Reader::test_FromIcl_UseNamespace_Def_OutsideModule ()

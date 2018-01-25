@@ -44,6 +44,7 @@ class UT_ICL_Reader : public CxxTest::TestSuite
   void test_FromIcl_ScanMux_SIB ();
   void test_FromIcl_ScanMux_ValueList ();
   void test_FromIcl_Instance ();
+  void test_FromIcl_ValueExpr ();
   void test_FromIcl_Namespace_Def ();
   void test_FromIcl_UseNamespace_Def_OutsideModule ();
   void test_FromIcl_UseNamespace_Def_InsideModule ();

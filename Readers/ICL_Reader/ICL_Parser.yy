@@ -239,12 +239,11 @@ namespace
 %type <std::string> POS_INT
 %type <std::string> pos_int
 %type <std::string> integer_expr
-%type <std::string> integer_expr_arg
-%type <std::string> integer_expr_paren
-%type <std::string> integer_expr_lvl1
-%type <std::string> plus_or_minus
-%type <std::string> integer_expr_lvl2
-%type <std::string> star_or_slash_or_percent
+%type <std::string> integer_arg_expr
+%type <std::string> integer_factor_expr
+%type <std::string> add_operator
+%type <std::string> integer_term_expr
+%type <std::string> mult_operator
 
 %type <std::string> number
 %type <std::string> number_or_enum
@@ -587,19 +586,17 @@ range : index[LEFT] COLON index[RIGHT]
 ;
 
 
-integer_expr : integer_expr_lvl1 { $$ = std::move($1); /* integer_expr : integer_expr_lvl1 */};
-
-integer_expr_lvl1 :
-  integer_expr_lvl2
+integer_expr :
+  integer_term_expr
   {
-    // integer_expr_lvl1 : integer_expr_lvl2
+    // integer_expr : integer_term_expr
     $$ = std::move($1);
   }
-| integer_expr_lvl2 plus_or_minus integer_expr_lvl1[rhs]
+| integer_term_expr add_operator integer_expr[rhs]
   {
-    // integer_expr_lvl1 : integer_expr_lvl2 plus_or_minus integer_expr_lvl1[rhs]
-    auto lhsExpr  = $[integer_expr_lvl2];
-    auto op       = $[plus_or_minus];
+    // integer_expr : integer_term_expr add_operator integer_expr[rhs]
+    auto lhsExpr  = $[integer_term_expr];
+    auto op       = $[add_operator];
     auto rhsExpr  = $[rhs];
     auto combined = lhsExpr.append(op).append(rhsExpr);
 
@@ -607,22 +604,17 @@ integer_expr_lvl1 :
   }
 ;
 
-plus_or_minus :
-  PLUS  { $$ = " + "; /* plus_or_minus: PLUS */}
-| MINUS { $$ = " - "; /* plus_or_minus: MINUS*/}
-;
-
-integer_expr_lvl2 :
-  integer_expr_arg
+integer_term_expr :
+  integer_arg_expr
   {
-    // integer_expr_lvl2 : integer_expr_arg
+    // integer_term_expr : integer_arg_expr
     $$ = std::move($1);
   }
-| integer_expr_arg star_or_slash_or_percent integer_expr_lvl2[rhs]
+| integer_arg_expr mult_operator integer_term_expr[rhs]
   {
-    // integer_expr_lvl2 : integer_expr_arg star_or_slash_or_percent integer_expr_lvl2[rhs]
-    auto lhsExpr  = $[integer_expr_arg];
-    auto op       = $[star_or_slash_or_percent];
+    // integer_term_expr : integer_arg_expr mult_operator integer_term_expr[rhs]
+    auto lhsExpr  = $[integer_arg_expr];
+    auto op       = $[mult_operator];
     auto rhsExpr  = $[rhs];
     auto combined = lhsExpr.append(op).append(rhsExpr);
 
@@ -630,27 +622,31 @@ integer_expr_lvl2 :
   }
 ;
 
-
-star_or_slash_or_percent :
-  STAR    { $$ = " * ";  /* star_or_slash_or_percent : STAR */}
-| SLASH   { $$ = " / "; /* star_or_slash_or_percent : SLASH*/}
-| PERCENT { $$ = " % ";  /* star_or_slash_or_percent : PERCENT*/}
+add_operator :
+  PLUS  { $$ = " + "; /* add_operator: PLUS */}
+| MINUS { $$ = " - "; /* add_operator: MINUS*/}
 ;
 
-integer_expr_paren : LEFT_PAREN integer_expr RIGHT_PAREN
+mult_operator :
+  STAR    { $$ = " * ";  /* mult_operator : STAR */}
+| SLASH   { $$ = " / ";  /* mult_operator : SLASH*/}
+| PERCENT { $$ = " % ";  /* mult_operator : PERCENT*/}
+;
+
+integer_factor_expr : LEFT_PAREN integer_expr RIGHT_PAREN
 {
-  // integer_expr_paren : LEFT_PAREN integer_expr RIGHT_PAREN
+  // integer_factor_expr : LEFT_PAREN integer_expr RIGHT_PAREN
   auto combined = "("s.append($[integer_expr]).append(")");
   $$ = std::move(combined);
 }
 ;
 
-integer_expr_arg :
-  integer_expr_paren { $$ = std::move($1); /* integer_expr_arg : integer_expr_paren */ }
-| pos_int            { $$ = std::move($1); /* integer_expr_arg : pos_int*/ }
+integer_arg_expr :
+  integer_factor_expr { $$ = std::move($1);  /* integer_arg_expr : integer_factor_expr */ }
+| pos_int             { $$ = std::move($1);  /* integer_arg_expr : pos_int*/ }
 | parameter_ref
   {
-    // integer_expr_arg : parameter_ref
+    // integer_arg_expr : parameter_ref
     auto parameterRef = $[parameter_ref];
     auto asString     = "$"s.append(parameterRef->Name());
 

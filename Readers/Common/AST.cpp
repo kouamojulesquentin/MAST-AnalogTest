@@ -18,6 +18,7 @@
 #include "AST_EnumRef.hpp"
 #include "AST_FileRef.hpp"
 #include "AST_IntegerBinaryExpr.hpp"
+#include "AST_IntegerUnaryExpr.hpp"
 #include "AST_IntegerLiteral.hpp"
 #include "AST_Instance.hpp"
 #include "AST_ModuleIdentifier.hpp"
@@ -402,6 +403,17 @@ AST_IntegerBinaryExpr* AST::Create_IntegerBinaryExpr (Kind kind, AST_IntegerExpr
 }
 //
 //  End of: AST::Create_IntegerBinaryExpr
+//---------------------------------------------------------------------------
+
+
+//! Creates an AST_IntegerUnaryExpr node
+//!
+AST_IntegerUnaryExpr* AST::Create_IntegerUnaryExpr (Kind kind, AST_IntegerExpr* operand)
+{
+  return Create_Node<AST_IntegerUnaryExpr>(kind, operand);
+}
+//
+//  End of: AST::Create_IntegerUnaryExpr
 //---------------------------------------------------------------------------
 
 

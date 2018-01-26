@@ -50,6 +50,7 @@ CXXTEST_ENUM_TRAITS(Parsers::Kind,
            CXXTEST_ENUM_MEMBER(Parsers::Kind::Operator_Modulo)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::Parameter)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::Parameter_ref)
+           CXXTEST_ENUM_MEMBER(Parsers::Kind::ParenthesizedExpr)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::Port)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::ResetValue)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::ScalarIdentifier)

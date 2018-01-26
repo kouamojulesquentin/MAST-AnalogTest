@@ -22,26 +22,34 @@ using namespace Parsers;
 
 //! Initializes a binary expression with kind of expression and operands
 //!
-//! @param kind     Kind of binary expression
+//! @param kind     Kind of expression
 //! @param operand  Expression operand
 //!
 AST_IntegerUnaryExpr::AST_IntegerUnaryExpr (Kind kind, AST_IntegerExpr* operand)
   : AST_IntegerExpr (kind)
-  , m_operand       (CHECK_PARAMETER_NOT_NULL(operand, "Unary expression cannot be build with nullptr operaand expression"))
+  , m_operand       (CHECK_PARAMETER_NOT_NULL(operand, "Unary expression cannot be build with nullptr operand expression"))
 {
+  CHECK_PARAMETER_TRUE(Parsers::IsOneOf(kind, {
+                                                Kind::ParenthesizedExpr,
+                                              }),
+                                              string(NameString(kind)).append(" is not valid as an unary expression"));
 }
 //
 //  End of: AST_IntegerUnaryExpr::AST_IntegerUnaryExpr
 //---------------------------------------------------------------------------
 
 
-//! Build text representation of integer expression
+//! Build text representation of unary expression
 //!
 string AST_IntegerUnaryExpr::AsText () const
 {
-  string asText(m_operand->AsText());
+  switch (GetKind())
+  {
+    case Kind::ParenthesizedExpr:  return "("s.append(m_operand->AsText()).append(")");
 
-  return asText;
+    default:
+      CHECK_FAILED("Unsuported kind for unary expression: "s + KindName());
+  }
 }
 //
 //  End of: AST_IntegerUnaryExpr::AsText
@@ -50,7 +58,6 @@ string AST_IntegerUnaryExpr::AsText () const
 
 //! Evaluates expression
 //!
-//! @note Each sub-expressions must evaluate as positive integer
 uint32_t AST_IntegerUnaryExpr::Evaluate () const
 {
   uint32_t result = m_operand->Evaluate();

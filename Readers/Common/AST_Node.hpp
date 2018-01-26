@@ -54,6 +54,7 @@ namespace Parsers
     BsdlInstructionRef, //!< For BSDL instruction referred by AccessLink
     Parameter,          //!< For parameters definitions
     Parameter_ref,      //!< For parameters references
+    ParenthesizedExpr,  //!< For parenthesized integer expressions
     Port,               //!< For ScanInterface Ports
     ResetValue,         //!< For registers reset value
     ScalarIdentifier,   //!< For identifier with a without scope prefix and no bit nor range identifier
@@ -118,6 +119,7 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::Operator_Modulo)
             ENUM_MEMBER(Parsers::Kind::Parameter)
             ENUM_MEMBER(Parsers::Kind::Parameter_ref)
+            ENUM_MEMBER(Parsers::Kind::ParenthesizedExpr)
             ENUM_MEMBER(Parsers::Kind::Port)
             ENUM_MEMBER(Parsers::Kind::ResetValue)
             ENUM_MEMBER(Parsers::Kind::ScalarIdentifier)

@@ -1,9 +1,15 @@
-Running Mast_Readers tests (87 tests)
+Running Mast_Readers tests (92 tests)
 
-..................................................................................................................................................................................
+..............................................................................................
+
+In UT_AST_IntegerExpr::test_IntegerUnaryExpr_AsText: 
+==> In data driven test with id: 9 and input sample: tuple(Parsers::Kind::Operator_Modulo, "144", "13", "(144 % 13")
+UT_AST_IntegerExpr.cpp:493: Error: Expected (result == expectedResult), but found ("(144 % 13)" != "(144 % 13")
+...............................................................................................................
 
 In UT_SIT_Printer::test_Warnings: 
 UT_SIT_Printer.cpp:460: Warning: Table based path selectors checks incomplete (no SIT support yet for tables)
 ............................................................................................................
 
-OK! (286 tests including 233 'sub' tests from 34 data driven tests)
+Failed 1 and Skipped 0 of 314 tests including 260 'sub' tests from 38 data driven tests
+Success rate: 99%

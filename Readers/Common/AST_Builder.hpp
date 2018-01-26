@@ -21,6 +21,7 @@ namespace Parsers
 class AST_Attribute;
 class AST_IntegerExpr;
 class AST_IntegerBinaryExpr;
+class AST_IntegerUnaryExpr;
 class AST_IntegerLiteral;
 class AST_Instance;
 class AST_Module;
@@ -52,6 +53,7 @@ class AST_Builder
   virtual AST_ScanRegister*     Clone_ScanRegister     (const AST_ScanRegister*     scanRegister) = 0; //!< Clones a scan register
   virtual AST_VectorIdentifier* Clone_VectorIdentifier (const AST_VectorIdentifier* identifier) = 0;   //!< Clones a vector identifier
 
+  virtual AST_IntegerUnaryExpr*  Create_IntegerUnaryExpr           (Kind kind, AST_IntegerExpr* operand) = 0;                                    //!< Creates an AST_IntegerUnaryExpr node
   virtual AST_IntegerBinaryExpr* Create_IntegerBinaryExpr          (Kind kind, AST_IntegerExpr* leftOperand, AST_IntegerExpr* rightOperand) = 0; //!< Creates an AST_IntegerBinaryExpr node
   virtual AST_IntegerLiteral*    Create_IntegerLiteral             (std::string&&               integerText) = 0;                                //!< Creates an AST_IntegerLiteral node
   virtual AST_String*            Create_String                     (std::string&&               content) = 0;                                    //!< Creates an AST_String node

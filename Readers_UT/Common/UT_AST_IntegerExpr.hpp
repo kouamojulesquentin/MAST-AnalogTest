@@ -33,11 +33,19 @@ class UT_AST_IntegerExpr : public CxxTest::TestSuite
   void test_IntegerLiteral_Constructor_not_valid ();
   void test_IntegerBinaryExpr_Constructor_valid ();
   void test_IntegerBinaryExpr_Constructor_not_valid ();
+  void test_IntegerUnaryExpr_Constructor_valid ();
+  void test_IntegerUnaryExpr_Constructor_not_valid ();
 
   // ---------------- Evaluate
   //
   void test_IntegerBinaryExpr_Evaluate_valid ();
   void test_IntegerBinaryExpr_Evaluate_not_valid ();
+
+  // ---------------- AsText
+  //
+  void test_IntegerLiteral_AsText ();
+  void test_IntegerBinaryExpr_AsText ();
+  void test_IntegerUnaryExpr_AsText ();
 };
 //
 //  End of UT_AST_IntegerExpr class declaration

@@ -38,7 +38,7 @@ AST_IntegerBinaryExpr::AST_IntegerBinaryExpr (Kind kind, AST_IntegerExpr* leftOp
                                                 Kind::Operator_Divide,
                                                 Kind::Operator_Modulo,
                                               }),
-                                              string(NameString(kind)).append(" is not valid as a binary operator"));
+                                              string(NameString(kind)).append(" is not valid as a binary expression"));
 }
 //
 //  End of: AST_IntegerBinaryExpr::AST_IntegerBinaryExpr
@@ -60,7 +60,7 @@ string AST_IntegerBinaryExpr::AsText () const
     case Kind::Operator_Modulo:    asText.append(" % "); break;
 
     default:
-      CHECK_FAILED("Unsuported kind for binary operator: "s + KindName());
+      CHECK_FAILED("Unsuported kind for binary expression: "s + KindName());
   }
 
   asText.append(m_right->AsText());
@@ -107,7 +107,7 @@ uint32_t AST_IntegerBinaryExpr::Evaluate () const
       result = left % right;
       break;
     default:
-      CHECK_FAILED("Unsuported kind for binary operator: "s + KindName());
+      CHECK_FAILED("Unsuported kind for binary expression: "s + KindName());
   }
 
   return result;

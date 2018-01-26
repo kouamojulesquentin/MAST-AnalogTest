@@ -46,7 +46,9 @@ AST_IntegerLiteral::AST_IntegerLiteral (string&& integerText)
 
   try
   {
-    m_value = std::stoul(text);
+    auto tmpValue = std::stoul(text);
+    CHECK_PARAMETER_LTE(tmpValue, UINT32_MAX, "Integer value \""s.append(text).append("\" is too large (limit is 32 bits)"));
+    m_value = static_cast<uint32_t>(tmpValue);
   }
   catch(std::invalid_argument& exc)
   {

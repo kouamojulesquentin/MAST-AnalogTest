@@ -30,7 +30,6 @@ namespace Parsers
     AccessLink,         //!< For access link
     Alias,              //!< For alias definitions
     Attribute,          //!< For attribute definitions
-    BsdlInstructionRef, //!< For BSDL instruction referred by AccessLink
     DefaultLoadValue,   //!< For registers default load value
     DataInPort,         //!< For modules data input port
     DataOutPort,        //!< For modules data output port
@@ -38,6 +37,7 @@ namespace Parsers
     Enum_item,          //!< For enums items
     Enum_ref,           //!< For enums references
     BSDLEntity,         //!< For BSDL file referred by AccessLink
+    IntegerLiteral,     //!< For a, unsigned, integer literal
     InputPort,          //!< For input of instance input port
     InputPortSource,    //!< For input of instance input port source
     Instance,           //!< For modules instances
@@ -46,6 +46,12 @@ namespace Parsers
     ModuleIdentifier,   //!< For modules instances indentification
     NameSpace,          //!< For namespace definitions and references
     Network,            //!< For complete test network
+    Operator_Add,       //!< For binary add operator
+    Operator_Substract, //!< For binary substract operator
+    Operator_Multiply,  //!< For binary multiply operator
+    Operator_Divide,    //!< For binary divide operator
+    Operator_Modulo,    //!< For binary modulo operator
+    BsdlInstructionRef, //!< For BSDL instruction referred by AccessLink
     Parameter,          //!< For parameters definitions
     Parameter_ref,      //!< For parameters references
     Port,               //!< For ScanInterface Ports
@@ -99,11 +105,17 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::InputPort)
             ENUM_MEMBER(Parsers::Kind::InputPortSource)
             ENUM_MEMBER(Parsers::Kind::Instance)
+            ENUM_MEMBER(Parsers::Kind::IntegerLiteral)
             ENUM_MEMBER(Parsers::Kind::LocalParameter)
             ENUM_MEMBER(Parsers::Kind::Module)
             ENUM_MEMBER(Parsers::Kind::ModuleIdentifier)
             ENUM_MEMBER(Parsers::Kind::NameSpace)
             ENUM_MEMBER(Parsers::Kind::Network)
+            ENUM_MEMBER(Parsers::Kind::Operator_Add)
+            ENUM_MEMBER(Parsers::Kind::Operator_Substract)
+            ENUM_MEMBER(Parsers::Kind::Operator_Multiply)
+            ENUM_MEMBER(Parsers::Kind::Operator_Divide)
+            ENUM_MEMBER(Parsers::Kind::Operator_Modulo)
             ENUM_MEMBER(Parsers::Kind::Parameter)
             ENUM_MEMBER(Parsers::Kind::Parameter_ref)
             ENUM_MEMBER(Parsers::Kind::Port)

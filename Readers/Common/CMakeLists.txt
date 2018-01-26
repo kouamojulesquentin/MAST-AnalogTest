@@ -16,6 +16,13 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_BsdlInstructionRef.hpp
                                   AST_BsdlInstructionRef.cpp
                                   AST_EnumRef.hpp
+                                  AST_IntegerExpr.hpp
+                                  AST_IntegerLiteral.hpp
+                                  AST_IntegerLiteral.cpp
+                                  AST_IntegerBinaryExpr.hpp
+                                  AST_IntegerBinaryExpr.cpp
+                                  AST_IntegerUnaryExpr.hpp
+                                  AST_IntegerUnaryExpr.cpp
                                   AST_FileRef.hpp
                                   AST_Instance.hpp
                                   AST_Instance.cpp

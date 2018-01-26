@@ -31,6 +31,7 @@ class AST_EnumRef;
 class AST_FileRef;
 class AST_Identifier;
 class AST_Instance;
+class AST_IntegerLiteral;
 class AST_ModuleIdentifier;
 class AST_Module;
 class AST_Namespace;
@@ -68,6 +69,8 @@ class AST final : public AST_Builder
   AST_AccessLink*         Create_AccessLink         (const AST_ScalarIdentifier* identifier, const AST_ScalarIdentifier* genericId);
   AST_EnumRef*            Create_EnumRef            (std::string&& name);
   AST_FileRef*            Create_FileRef            (Kind kind, std::string&& name);
+  AST_IntegerBinaryExpr*  Create_IntegerBinaryExpr  (Kind kind, AST_IntegerExpr* leftOperand, AST_IntegerExpr* rightOperand) override; //!< Creates an AST_IntegerBinaryExpr node
+  AST_IntegerLiteral*     Create_IntegerLiteral     (std::string&& integerText) override;                                              //!< Creates an AST_IntegerLiteral node
   AST_Namespace*          Create_Namespace          (std::string&& name);
   AST_Attribute*          Create_Attribute          (std::string&& name);
   AST_Attribute*          Create_Attribute          (std::string&& name, std::string&& numbersValue);

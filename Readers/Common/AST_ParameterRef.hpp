@@ -14,7 +14,7 @@
 #ifndef AST_PARAMETERREF_H__9FB827F9_9F9_4611_D983_8ED086F9B995__INCLUDED_
   #define AST_PARAMETERREF_H__9FB827F9_9F9_4611_D983_8ED086F9B995__INCLUDED_
 
-#include "AST_SimpleNode.hpp"
+#include "AST_IntegerExpr.hpp"
 #include <experimental/string_view>
 #include <string>
 
@@ -22,7 +22,7 @@ namespace Parsers
 {
 //! Represents a parameter reference
 //!
-class AST_ParameterRef final : public AST_SimpleNode
+class AST_ParameterRef final : public AST_IntegerExpr
 {
   // ---------------- Public Methods
   //
@@ -37,6 +37,10 @@ class AST_ParameterRef final : public AST_SimpleNode
   //! Text representation of parameter
   //!
   std::string AsText() const override { return std::string("$").append(m_name); }
+
+  //! Returns referred to parameter integer expression evaluation
+  //!
+  uint32_t    Evaluate() const override { CHECK_FAILED("Houps: Parameter Reference must be replaced by Parameter Expression before evaluation"); };
 
   //! Always returns true as this is a Parameter reference
   //!
@@ -53,15 +57,15 @@ class AST_ParameterRef final : public AST_SimpleNode
   //! @param name  Refered parameter name
   //!
   AST_ParameterRef(std::string&& name)
-    : AST_SimpleNode (Kind::Parameter_ref)
-    , m_name         (std::move(name))
+    : AST_IntegerExpr (Kind::Parameter_ref)
+    , m_name          (std::move(name))
   {
   }
 
   // ---------------- Private Fields
   //
   private:
-  const std::string m_name; //!< Refered parameter name
+  const std::string m_name; //!< Referred parameter name
 };
 //
 //  End of AST_ParameterRef class declaration

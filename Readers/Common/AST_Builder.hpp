@@ -19,6 +19,9 @@
 namespace Parsers
 {
 class AST_Attribute;
+class AST_IntegerExpr;
+class AST_IntegerBinaryExpr;
+class AST_IntegerLiteral;
 class AST_Instance;
 class AST_Module;
 class AST_Network;
@@ -30,6 +33,7 @@ class AST_ScanRegister;
 class AST_String;
 class AST_ModuleIdentifier;
 class AST_VectorIdentifier;
+enum class Kind : uint8_t;
 
 //! Interfaces for cloning AST nodes
 //!
@@ -48,9 +52,11 @@ class AST_Builder
   virtual AST_ScanRegister*     Clone_ScanRegister     (const AST_ScanRegister*     scanRegister) = 0; //!< Clones a scan register
   virtual AST_VectorIdentifier* Clone_VectorIdentifier (const AST_VectorIdentifier* identifier) = 0;   //!< Clones a vector identifier
 
-  virtual AST_String*           Create_String                     (std::string&&               content) = 0;    //!< Creates an AST_String node
-  virtual AST_ScalarIdentifier* Create_UniquifiedIdentifier       (const AST_ScalarIdentifier* identifier) = 0; //!< Creates an identifier for a uniquified entity
-  virtual AST_ModuleIdentifier* Create_UniquifiedModuleIdentifier (const AST_Module*           module) = 0;     //!< Creates an identifier for a uniquified module
+  virtual AST_IntegerBinaryExpr* Create_IntegerBinaryExpr          (Kind kind, AST_IntegerExpr* leftOperand, AST_IntegerExpr* rightOperand) = 0; //!< Creates an AST_IntegerBinaryExpr node
+  virtual AST_IntegerLiteral*    Create_IntegerLiteral             (std::string&&               integerText) = 0;                                //!< Creates an AST_IntegerLiteral node
+  virtual AST_String*            Create_String                     (std::string&&               content) = 0;                                    //!< Creates an AST_String node
+  virtual AST_ScalarIdentifier*  Create_UniquifiedIdentifier       (const AST_ScalarIdentifier* identifier) = 0;                                 //!< Creates an identifier for a uniquified entity
+  virtual AST_ModuleIdentifier*  Create_UniquifiedModuleIdentifier (const AST_Module*           module) = 0;                                     //!< Creates an identifier for a uniquified module
 
   virtual AST_Network* Network() = 0;  //!< Returns instruments test network
 

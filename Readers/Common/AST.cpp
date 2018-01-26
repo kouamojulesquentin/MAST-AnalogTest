@@ -17,6 +17,8 @@
 #include "AST_BsdlInstructionRef.hpp"
 #include "AST_EnumRef.hpp"
 #include "AST_FileRef.hpp"
+#include "AST_IntegerBinaryExpr.hpp"
+#include "AST_IntegerLiteral.hpp"
 #include "AST_Instance.hpp"
 #include "AST_ModuleIdentifier.hpp"
 #include "AST_Module.hpp"
@@ -388,6 +390,31 @@ AST_ModuleIdentifier* AST::Create_ModuleIdentifier (const AST_Namespace* namespa
 }
 //
 //  End of: AST::Create_ModuleIdentifier
+//---------------------------------------------------------------------------
+
+
+
+//! Creates an AST_IntegerBinaryExpr node
+//!
+AST_IntegerBinaryExpr* AST::Create_IntegerBinaryExpr (Kind kind, AST_IntegerExpr* leftOperand, AST_IntegerExpr* rightOperand)
+{
+  return Create_Node<AST_IntegerBinaryExpr>(kind, leftOperand, rightOperand);
+}
+//
+//  End of: AST::Create_IntegerBinaryExpr
+//---------------------------------------------------------------------------
+
+
+//! Creates an AST_IntegerLiteral node
+//!
+//! @param integerText  Text representing the, unsigned, integer value
+//!
+AST_IntegerLiteral* AST::Create_IntegerLiteral (std::string&& integerText)
+{
+  return Create_Node<AST_IntegerLiteral>(std::move(integerText));
+}
+//
+//  End of: AST::Create_IntegerLiteral
 //---------------------------------------------------------------------------
 
 

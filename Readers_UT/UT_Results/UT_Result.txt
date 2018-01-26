@@ -1,9 +1,9 @@
-Running Mast_Readers tests (81 tests)
+Running Mast_Readers tests (87 tests)
 
-.................................................................................................................
+..................................................................................................................................................................................
 
 In UT_SIT_Printer::test_Warnings: 
 UT_SIT_Printer.cpp:460: Warning: Table based path selectors checks incomplete (no SIT support yet for tables)
 ............................................................................................................
 
-OK! (221 tests including 169 'sub' tests from 29 data driven tests)
+OK! (286 tests including 233 'sub' tests from 34 data driven tests)

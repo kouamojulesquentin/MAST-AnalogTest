@@ -7,10 +7,14 @@ message("=======================================================================
 set(UT_RootPath         "${CMAKE_CURRENT_LIST_DIR}")
 set(CXXTEST_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../cxxtest")
 
+set(TRAITS_HEADERS        "${CMAKE_CURRENT_LIST_DIR}/Common/Readers_Common_Enums_Traits.hpp")
+
 set(UT_COMMON_HEADERS     "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_PrettyPrinter.hpp"
+                          "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_IntegerExpr.hpp"
                           "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_Checker.hpp")
 
 set(UT_COMMON_SOURCES     "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_PrettyPrinter.cpp"
+                          "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_IntegerExpr.cpp"
                           "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_Checker.cpp")
 
 set(UT_SIT_READER_HEADERS "${CMAKE_CURRENT_LIST_DIR}/SIT/UT_SIT_Printer.hpp"
@@ -61,7 +65,7 @@ endif()
 
 # ---------------- Runner application
 #
-add_executable             (Readers_UT ${UT_SOURCES} ${UT_HEADERS})
+add_executable             (Readers_UT ${UT_SOURCES} ${UT_HEADERS} ${TRAITS_HEADERS})
 target_compile_options     (Readers_UT PUBLIC  -fexceptions -std=c++14)
 target_compile_definitions (Readers_UT PUBLIC  CXXTEST_HAVE_EH CXXTEST_HAVE_STD CXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION)
 target_link_libraries      (Readers_UT ${PLATFORM_LIBS} Tests_Common ICL_Reader SIT_Reader)

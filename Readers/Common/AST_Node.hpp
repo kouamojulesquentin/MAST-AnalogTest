@@ -46,6 +46,9 @@ namespace Parsers
     ModuleIdentifier,   //!< For modules instances indentification
     NameSpace,          //!< For namespace definitions and references
     Network,            //!< For complete test network
+    Number_Binary,      //!< For number defined with explicit binary base
+    Number_Decimal,     //!< For number defined with explicit decimal base
+    Number_Hexa,        //!< For number defined with explicit hexadecimal base
     Operator_Add,       //!< For binary add operator
     Operator_Substract, //!< For binary substract operator
     Operator_Multiply,  //!< For binary multiply operator
@@ -112,6 +115,9 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::ModuleIdentifier)
             ENUM_MEMBER(Parsers::Kind::NameSpace)
             ENUM_MEMBER(Parsers::Kind::Network)
+            ENUM_MEMBER(Parsers::Kind::Number_Binary)
+            ENUM_MEMBER(Parsers::Kind::Number_Decimal)
+            ENUM_MEMBER(Parsers::Kind::Number_Hexa)
             ENUM_MEMBER(Parsers::Kind::Operator_Add)
             ENUM_MEMBER(Parsers::Kind::Operator_Substract)
             ENUM_MEMBER(Parsers::Kind::Operator_Multiply)

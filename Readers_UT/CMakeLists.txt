@@ -11,10 +11,12 @@ set(TRAITS_HEADERS        "${CMAKE_CURRENT_LIST_DIR}/Common/Readers_Common_Enums
 
 set(UT_COMMON_HEADERS     "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_PrettyPrinter.hpp"
                           "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_IntegerExpr.hpp"
+                          "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_BasedNumber.hpp"
                           "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_Checker.hpp")
 
 set(UT_COMMON_SOURCES     "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_PrettyPrinter.cpp"
                           "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_IntegerExpr.cpp"
+                          "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_BasedNumber.cpp"
                           "${CMAKE_CURRENT_LIST_DIR}/Common/UT_AST_Checker.cpp")
 
 set(UT_SIT_READER_HEADERS "${CMAKE_CURRENT_LIST_DIR}/SIT/UT_SIT_Printer.hpp"

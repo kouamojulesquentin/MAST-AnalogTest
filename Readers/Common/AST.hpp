@@ -25,31 +25,21 @@
 namespace Parsers
 {
 class AST_AccessLink;
-class AST_Attribute;
 class AST_BsdlInstructionRef;
 class AST_EnumRef;
 class AST_FileRef;
 class AST_Identifier;
-class AST_Instance;
 class AST_IntegerLiteral;
-class AST_ModuleIdentifier;
-class AST_Module;
 class AST_Namespace;
-class AST_Parameter;
 class AST_ParameterRef;
-class AST_Port;
-class AST_ScalarIdentifier;
 class AST_ScanInterface;
 class AST_ScanInterfaceRef;
-class AST_ScanMux;
 class AST_ScanMuxSelection;
-class AST_ScanRegister;
 class AST_Signal;
 class AST_SimpleNode;
 class AST_Source;
-class AST_String;
 class AST_Value;
-class AST_VectorIdentifier;
+
 enum class AccessLinkType;
 
 //! Abstract Syntax Tree built when parsing some test network description
@@ -69,7 +59,8 @@ class AST final : public AST_Builder
   AST_AccessLink*         Create_AccessLink         (const AST_ScalarIdentifier* identifier, const AST_ScalarIdentifier* genericId);
   AST_EnumRef*            Create_EnumRef            (std::string&& name);
   AST_FileRef*            Create_FileRef            (Kind kind, std::string&& name);
-  AST_IntegerUnaryExpr*   Create_IntegerUnaryExpr   (Kind kind, AST_IntegerExpr* operand)     override;                                //!< Creates an AST_IntegerUnaryExpr node
+  AST_BasedNumber*        Create_BasedNumber        (Kind kind, std::string&&    baseAndDigits) override;                              //!< Creates an AST_BasedNumber
+  AST_IntegerUnaryExpr*   Create_IntegerUnaryExpr   (Kind kind, AST_IntegerExpr* operand) override;                                    //!< Creates an AST_IntegerUnaryExpr node
   AST_IntegerBinaryExpr*  Create_IntegerBinaryExpr  (Kind kind, AST_IntegerExpr* leftOperand, AST_IntegerExpr* rightOperand) override; //!< Creates an AST_IntegerBinaryExpr node
   AST_IntegerLiteral*     Create_IntegerLiteral     (std::string&& integerText) override;                                              //!< Creates an AST_IntegerLiteral node
   AST_Namespace*          Create_Namespace          (std::string&& name);

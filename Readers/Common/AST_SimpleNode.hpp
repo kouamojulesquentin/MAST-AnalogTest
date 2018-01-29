@@ -32,7 +32,7 @@ class AST_SimpleNode : public AST_Node
   // ---------------- Public Methods
   //
   public:
-  ~AST_SimpleNode() = default;
+  virtual ~AST_SimpleNode() = default;
   AST_SimpleNode()  = delete;
 
   //! Text representation of attribute

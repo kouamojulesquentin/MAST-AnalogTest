@@ -14,6 +14,7 @@
 #include "AST.hpp"
 #include "AST_AccessLink.hpp"
 #include "AST_Attribute.hpp"
+#include "AST_BasedNumber.hpp"
 #include "AST_BsdlInstructionRef.hpp"
 #include "AST_EnumRef.hpp"
 #include "AST_FileRef.hpp"
@@ -404,6 +405,18 @@ AST_IntegerBinaryExpr* AST::Create_IntegerBinaryExpr (Kind kind, AST_IntegerExpr
 //
 //  End of: AST::Create_IntegerBinaryExpr
 //---------------------------------------------------------------------------
+
+
+//! Creates an AST_BasedNumber node
+//!
+AST_BasedNumber* AST::Create_BasedNumber (Kind kind, std::string&& baseAndDigits)
+{
+  return Create_Node<AST_BasedNumber>(kind, std::move(baseAndDigits));
+}
+//
+//  End of: AST::Create_BasedNumber
+//---------------------------------------------------------------------------
+
 
 
 //! Creates an AST_IntegerUnaryExpr node

@@ -13,6 +13,8 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_AccessLink.cpp
                                   AST_Attribute.hpp
                                   AST_Attribute.cpp
+                                  AST_BasedNumber.hpp
+                                  AST_BasedNumber.cpp
                                   AST_BsdlInstructionRef.hpp
                                   AST_BsdlInstructionRef.cpp
                                   AST_EnumRef.hpp
@@ -39,6 +41,7 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_Namespace.cpp
                                   AST_Network.hpp
                                   AST_Network.cpp
+                                  AST_Number.hpp
                                   AST_Parameter.hpp
                                   AST_Parameter.cpp
                                   AST_ParameterRef.hpp

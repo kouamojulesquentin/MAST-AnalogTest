@@ -32,6 +32,7 @@ using mast::Utility;
 using namespace std::string_literals;
 using namespace std::experimental::literals::string_view_literals;
 using namespace std::chrono_literals;
+using namespace mast;
 
 
 //! Initializes test (called for each test)
@@ -658,6 +659,55 @@ void UT_Utility::test_Contains ()
     make_tuple("Hello World"sv,               ' ',  true),  // 14
     make_tuple("Hello\tWorld"sv,              '\t', true),  // 15
     make_tuple("Hello\nWorld"sv,              '\n', true),  // 16
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+//! Checks Utility::IsElementOf()
+//!
+void UT_Utility::test_IsElementOf ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    const auto element    = std::get<0>(data);
+    const auto collection = std::get<1>(data);
+    const auto expected   = std::get<2>(data);
+
+    // ---------------- Exercise
+    //
+    auto isElementOf = IsElementOf(element, collection);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (isElementOf, expected);
+  };
+
+  auto data =
+  {
+    make_tuple(' ',  ""sv,                         false), // 01
+    make_tuple('\t', ""sv,                         false), // 02
+    make_tuple('v',  ""sv,                         false), // 03
+    make_tuple('T',  "element"sv,                  false), // 04
+    make_tuple('\t', "Hello World"sv,              false), // 05
+    make_tuple('!',  "Who is he ?"sv,              false), // 06
+    make_tuple('?',  "Hello World, how are you?"sv,true),  // 07
+    make_tuple('H',  "Hello World"sv,              true),  // 08
+    make_tuple('o',  "Hello World"sv,              true),  // 09
+    make_tuple('W',  "Hello World"sv,              true),  // 10
+    make_tuple('!',  "  One!!Two!!Three!Four  "sv, true),  // 11
+    make_tuple(' ',  " Hello"sv,                   true),  // 12
+    make_tuple(' ',  "Hello "sv,                   true),  // 13
+    make_tuple(' ',  "Hello World"sv,              true),  // 14
+    make_tuple('\t', "Hello\tWorld"sv,             true),  // 15
+    make_tuple('\n', "Hello\nWorld"sv,             true),  // 16
   };
 
   // ---------------- DDT Exercise

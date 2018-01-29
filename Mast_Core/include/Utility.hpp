@@ -23,6 +23,7 @@
 #include <tuple>
 #include <type_traits>    // For enum item manipulation
 #include <chrono>
+#include <algorithm>
 
 using namespace std::string_literals;
 
@@ -147,6 +148,22 @@ inline std::string& operator+=(std::string& lhs, std::experimental::string_view 
 //!
 //! @return A string with the concatenation
 inline std::string operator+(std::experimental::string_view lhs, const std::string& rhs) { return std::string(lhs.cbegin(), lhs.cend()).append(rhs); }
+
+//! Tells whether an element can be compared equal to at least one element of a collection
+//!
+//! @param elem         Element to search for
+//! @param collection   Collection that may contain the element
+//!
+//! @return true when the element is compared equal to at least one element of the collection, false otherwise
+//!
+template<typename T, typename C>
+bool IsElementOf(const T& elem, const C& collection)
+{
+  auto pos   = std::find(collection.cbegin(), collection.cend(), elem);
+  auto found = pos != collection.cend();
+
+  return found;
+}
 
 
 //! Helper class to set a value for current scope and restore it at scope exit

@@ -63,6 +63,11 @@ class UT_Utility : public CxxTest::TestSuite
   //
   void test_Contains ();
 
+  // ---------------- IsElementOf
+  //
+  void test_IsElementOf ();
+
+
   // ---------------- ToUInt32
   //
   void test_ToUInt32_Success ();

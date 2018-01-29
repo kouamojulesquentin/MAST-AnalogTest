@@ -8687,6 +8687,61 @@ void UT_BinaryVector::test_CreateFromRightAlignedBuffer_Moved ()
 }
 
 
+//! Checks BinaryVector::LeadingZeroesCount()
+//!
+void UT_BinaryVector::test_LeadingZeroesCount ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits       = std::get<0>(data);
+    uint32_t    expectedCount = std::get<1>(data);
+
+    auto sut = BinaryVector::CreateFromBinaryString(sutBits);
+
+    // ---------------- Exercise
+    //
+    auto leadingZeroesCount = sut.LeadingZeroesCount();
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (leadingZeroesCount, expectedCount);
+  };
+
+  auto data =
+  {
+    make_tuple("",                                      0u),  // 00
+    make_tuple("1",                                     0u),  // 01
+    make_tuple("11",                                    0u),  // 02
+    make_tuple("10",                                    0u),  // 03
+    make_tuple("1000_0000",                             0u),  // 04
+    make_tuple("0",                                     1u),  // 05
+    make_tuple("010",                                   1u),  // 06
+    make_tuple("00",                                    2u),  // 07
+    make_tuple("001",                                   2u),  // 08
+    make_tuple("000",                                   3u),  // 09
+    make_tuple("0001",                                  3u),  // 10
+    make_tuple("0000",                                  4u),  // 11
+    make_tuple("0000_110",                              4u),  // 12
+    make_tuple("0000_0110_0000",                        5u),  // 13
+    make_tuple("0_0000:0",                              6u),  // 14
+    make_tuple("0000_0001:0111_1",                      7u),  // 15
+    make_tuple("0000_0000:1",                           8u),  // 16
+    make_tuple("0000_0000:101",                         8u),  // 17
+    make_tuple("0000_0000:0",                           9u),  // 18
+    make_tuple("0000_0000:0100_1000:0000",              9u),  // 19
+    make_tuple("0000_0000:0000_0001:1000_1",            15u), // 20
+    make_tuple("0000_0000:0000_0000:1000_1",            16u), // 21
+    make_tuple("0000_0000:0000_0000:0000_0000:0110_1:", 25u), // 22
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
 
 //===========================================================================
 // End of UT_BinaryVector.cpp

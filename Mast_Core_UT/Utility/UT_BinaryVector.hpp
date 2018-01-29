@@ -322,6 +322,10 @@ class UT_BinaryVector : public CxxTest::TestSuite
   void test_CreateFromRightAlignedBuffer ();
   void test_CreateFromRightAlignedBuffer_Moved ();
 
+  // ---------------- LeadingZeroesCount
+  //
+  void test_LeadingZeroesCount ();
+
   // ---------------- Other methods
   //
   void setUp(); //!< Initializes test (called for each test)

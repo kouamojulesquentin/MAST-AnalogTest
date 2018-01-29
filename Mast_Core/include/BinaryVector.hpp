@@ -221,6 +221,7 @@ class MAST_CORE_EXPORT BinaryVector final
   bool                 IsEmpty()          const { return m_data.empty();}                            //!< Returns true when there is no bit in the BinaryVector, false otherwise
   uint32_t             BitsCount()        const { return m_usedBits;    }                            //!< Returns total number of valid bits in the BinaryVector
   uint32_t             BytesCount()       const { return m_data.size(); }                            //!< Returns total number of valid bytes in the BinaryVector (last one may be not complete)
+  uint32_t             LeadingZeroesCount () const;                                                  //!< Returns the number of leading bits that are set to zero
   const uint8_t*       DataLeftAligned()  const { return m_data.data(); }                            //!< Returns pointer on raw bits stream data (only valid as long as content is not modified)
   std::vector<uint8_t> DataRightAligned() const;                                                     //!< Returns data right aligned in a new buffer
 
@@ -242,6 +243,7 @@ class MAST_CORE_EXPORT BinaryVector final
 
   bool FixedSize()  const { return m_sizeProperty == SizeProperty::Fixed; }
   bool IsNegative() const { return (m_data[0] & 0x80) != 0; }
+
 
   //! Computes the minimal number of bytes to hold a number of bits
   //!

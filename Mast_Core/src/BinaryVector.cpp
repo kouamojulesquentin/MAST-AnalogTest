@@ -1872,6 +1872,69 @@ vector<uint8_t> BinaryVector::DataRightAligned () const
 
 
 
+//! Returns the number of leading bits that are set to zero
+//!
+uint32_t BinaryVector::LeadingZeroesCount () const
+{
+  uint32_t count         = 0u;
+  uint32_t remainingBits = m_usedBits;
+
+  for (const auto bits : m_data)
+  {
+    if (bits == 0u)
+    {
+      if (remainingBits >= 8u)
+      {
+        count         += 8u;
+        remainingBits -= 8u;
+      }
+      else
+      {
+        count += remainingBits;
+        break;
+      }
+    }
+    else
+    {
+      constexpr uint32_t lut[16] = {
+                                     4u,   // 0x0
+                                     3u,   // 0x1
+                                     2u,   // 0x2
+                                     2u,   // 0x3
+                                     1u,   // 0x4
+                                     1u,   // 0x5
+                                     1u,   // 0x6
+                                     1u,   // 0x7
+                                     0u,   // 0x8
+                                     0u,   // 0x9
+                                     0u,   // 0xA
+                                     0u,   // 0xB
+                                     0u,   // 0xC
+                                     0u,   // 0xD
+                                     0u,   // 0xE
+                                     0u,   // 0xF
+                                   };
+
+      auto lastCount = lut[bits >> 4];  // Inspect upper nibble
+      if (lastCount == 4u)
+      {
+        lastCount += lut[bits & 0x0F];  // Inspect lower nibble
+      }
+      lastCount = std::min(lastCount, remainingBits);  // Ignore bits that are not part of the BinaryVector
+
+      count += lastCount;
+      break;
+    }
+  }
+
+  return count;
+}
+//
+//  End of: BinaryVector::LeadingZeroesCount
+//---------------------------------------------------------------------------
+
+
+
 //! Defines used based from leading char of number string
 //!
 NumberBase BinaryVector::NumberBaseForValuePrefix (string_view number)
@@ -3009,7 +3072,7 @@ void BinaryVector::ShiftBufferLeft (const vector<uint8_t>& sourceBuffer, vector<
 
 //! Returns a slice from BinaryVector
 //!
-//! @note   This call is not valid if it define a slice that exceed the actual
+//! @note   This call is not valid if it defines a slice that exceed the actual
 //!         bits count
 //!
 //! @param firstBitOffset Zero based offset of first bit of slice
@@ -3072,7 +3135,7 @@ BinaryVector BinaryVector::Slice (uint32_t firstBitOffset, uint32_t bitsCount) c
 
 //! Returns a slice from BinaryVector
 //!
-//! @note   This call is not valid if it define a slice that exceed the actual
+//! @note   This call is not valid if it defines a slice that exceed the actual
 //!         bits count
 //!
 //! @param range          Ranges of bits to returns

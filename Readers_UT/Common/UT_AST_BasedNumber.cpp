@@ -246,6 +246,59 @@ void UT_AST_BasedNumber::test_AsText_sized ()
 }
 
 
+//! Checks AST_BasedNumber::AsText() when number is sized and inverted
+//!
+void UT_AST_BasedNumber::test_AsText_sized_inverted ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto kind           = std::get<0>(data);
+    auto size           = std::get<1>(data);
+    auto numberAsText   = std::get<2>(data);
+    auto expectedAsText = std::get<3>(data);
+
+    AST  builder;
+    auto basedNumber = builder.Create_BasedNumber(kind, std::move(numberAsText));
+    auto sizeExpr    = builder.Create_IntegerLiteral(std::move(size));
+
+    basedNumber->SizeExpr(sizeExpr);
+    basedNumber->IsInverted(true);
+
+    string asText;
+
+    CxxTest::setAbortTestOnFail(true);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (asText = basedNumber->AsText());
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (basedNumber->AsText(), expectedAsText);
+  };
+
+  using data_t = tuple<Parsers::Kind, string, string, string_view>;
+  auto data =
+  {
+    data_t{Kind::Number_Binary,  "11u", "'b001_1100",            "~11'b001_1100"},            // 00
+    data_t{Kind::Number_Binary,  "12u", "'b 001__100",           "~12'b 001__100"},           // 01
+    data_t{Kind::Number_Decimal, "64u", "'d1234567890123456789", "~64'd1234567890123456789"}, // 02
+    data_t{Kind::Number_Decimal, "8u",  "'d 123",                "~8'd 123"},                 // 03
+    data_t{Kind::Number_Hexa,    "32u", "'h1234_567890",         "~32'h1234_567890"},         // 04
+    data_t{Kind::Number_Hexa,    "50u", "'Habcdef_ABCDEF",       "~50'Habcdef_ABCDEF"},       // 05
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+
 //! Checks AST_BasedNumber::AsBinaryVector() when number is unsized
 //!
 void UT_AST_BasedNumber::test_AsBinaryVector_unsized ()
@@ -406,6 +459,59 @@ void UT_AST_BasedNumber::test_AsBinaryVector_target_size ()
   TS_DATA_DRIVEN_TEST(checker, data);
 }
 
+
+
+//! Checks AST_BasedNumber::AsBinaryVector() when giving a target size and is inverted
+//!
+void UT_AST_BasedNumber::test_AsBinaryVector_inverted_target_size ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto kind                 = std::get<0>(data);
+    auto digits               = std::get<1>(data);
+    auto targetSize           = std::get<2>(data);
+    auto expectedBinaryVector = BinaryVector::CreateFromString(std::get<3>(data));
+
+    AST  builder;
+    auto basedNumber = builder.Create_BasedNumber(kind, std::move(digits));
+
+    basedNumber->IsInverted(true);
+
+    CxxTest::setAbortTestOnFail(true);
+
+    BinaryVector asBinaryVector;
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (asBinaryVector = basedNumber->AsBinaryVector(targetSize));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (asBinaryVector, expectedBinaryVector);
+  };
+
+  //                            Kind, digits, target size, expected
+  using data_t = tuple<Parsers::Kind, string, uint32_t, string_view>;
+  auto data =
+  {
+    data_t{Kind::Number_Binary,  "'b001_1100",            8u,  "~'b0001_1100"},            // 00
+    data_t{Kind::Number_Binary,  "'b001_1100",            5u,  "~'b1_1100"},               // 01
+    data_t{Kind::Number_Decimal, "'d1234_567890",         31u, "~'b100, ~'h99602D2"},      // 02
+    data_t{Kind::Number_Decimal, "'d1234567890123456789", 61u, "~'b1,~'h12210F47DE98115"}, // 03
+    data_t{Kind::Number_Decimal, "'d 123",                7u,  "~'b111_1011"},             // 04
+    data_t{Kind::Number_Hexa,    "'h1234_567890",         42u, "0b11, ~'h1234_567890"},    // 05
+    data_t{Kind::Number_Hexa,    "'Habcdef_ABCDEF",       49u, "~'b0, ~'habcdef_ABCDEF"},  // 06
+    data_t{Kind::Number_Hexa,    "'H1bcdef_ABCDEF",       45u, "~'b1, ~'h bcdef_ABCDEF"},  // 07
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
 
 
 //! Checks AST_BasedNumber::AsBinaryVector() when giving a target size

@@ -35,6 +35,22 @@ class AST_Number : public AST_SimpleNode
   virtual ~AST_Number() = default;
   AST_Number()  = delete;
 
+  //! Returns true when a size (bits count) is defined for the number
+  //!
+  virtual bool IsSized() const { return false; }
+
+  //! Returns true when the number representation is inverted
+  //!
+  //! @note Invertion (i.e. bits toggling) can be used in context of convertion to BinaryVector
+  //!
+  bool IsInverted() const { return m_isInverted; }
+
+  //! Set whether the number representation is inverted
+  //!
+  //! @note Invertion (i.e. bits toggling) can be used in context of convertion to BinaryVector
+  //!
+  void IsInverted (bool isInverted) { m_isInverted = isInverted; }
+
   // ---------------- Protected Methods
   //
 
@@ -44,6 +60,10 @@ class AST_Number : public AST_SimpleNode
     : AST_SimpleNode (kind)
   {
   }
+
+  // ---------------- Private Fields
+  //
+  bool m_isInverted = false;  //!< Tells whether the value should be inverted (when converted to BinaryVector)
 };
 //
 //  End of AST_Number class declaration

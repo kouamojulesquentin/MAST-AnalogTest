@@ -53,7 +53,7 @@ class AST_BasedNumber final : public AST_Number
 
   //! Returns true when a size (bits count) is defined for the number
   //!
-  bool  IsSized() const { return m_sizeExpr != nullptr; }
+  bool IsSized() const override { return m_sizeExpr != nullptr; }
 
   //! Returns size expression
   //!

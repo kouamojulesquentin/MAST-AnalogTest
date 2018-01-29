@@ -87,6 +87,12 @@ BinaryVector AST_BasedNumber::AsBinaryVector (uint8_t targetCount) const
       asBinaryVector = std::move(tmp);
     }
   }
+
+  if (IsInverted())
+  {
+    asBinaryVector.ToggleBits();
+  }
+
   return asBinaryVector;
 }
 //
@@ -99,6 +105,11 @@ BinaryVector AST_BasedNumber::AsBinaryVector (uint8_t targetCount) const
 string AST_BasedNumber::AsText () const
 {
   string asText;
+
+  if (IsInverted())
+  {
+    asText.append("~");
+  }
 
   if (m_sizeExpr != nullptr)
   {

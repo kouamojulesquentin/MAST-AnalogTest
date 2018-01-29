@@ -39,12 +39,14 @@ class UT_AST_BasedNumber : public CxxTest::TestSuite
   //
   void test_AsText_unsized ();
   void test_AsText_sized ();
+  void test_AsText_sized_inverted ();
 
   // ---------------- AsBinaryVector
   //
   void test_AsBinaryVector_unsized ();
   void test_AsBinaryVector_sized ();
   void test_AsBinaryVector_target_size ();
+  void test_AsBinaryVector_inverted_target_size ();
   void test_AsBinaryVector_target_size_bad_truncation ();
 };
 //

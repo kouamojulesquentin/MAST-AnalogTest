@@ -54,7 +54,7 @@ AST_BasedNumber::AST_BasedNumber (Kind kind, std::string&& digits)
 //!
 //! @param targetCount  When not zero, gives the number of target bits
 //!
-BinaryVector AST_BasedNumber::AsBinaryVector (uint8_t targetCount) const
+BinaryVector AST_BasedNumber::AsBinaryVector (uint32_t targetCount) const
 {
   auto asBinaryVector = BinaryVector::CreateFromString(m_digits);
 
@@ -66,25 +66,13 @@ BinaryVector AST_BasedNumber::AsBinaryVector (uint8_t targetCount) const
     auto currentBitsCount = asBinaryVector.BitsCount();
     if (targetBitscount > currentBitsCount)
     {
-      auto    missingBitsCount = targetBitscount - currentBitsCount;
-      uint8_t fillPattern      = 0;
-
-      BinaryVector tmp(missingBitsCount, fillPattern);
-      tmp.Append(asBinaryVector) ;
-      asBinaryVector = std::move(tmp);
+      auto missingBitsCount = targetBitscount - currentBitsCount;
+      asBinaryVector.PrependBits(missingBitsCount);
     }
     else if (targetBitscount < currentBitsCount)
     {
       auto excessiveBitsCount = currentBitsCount - targetBitscount;
-
-      CHECK_VALUE_LTE(excessiveBitsCount, asBinaryVector.LeadingZeroesCount(), "Based number digits represents a number with more bits than target causing non zero bits to be truncated. Got: "s
-                                                                               .append(m_digits).append(" ==> Bits count: ")
-                                                                               .append(std::to_string(asBinaryVector.BitsCount()))
-                                                                               .append(" > ")
-                                                                               .append(std::to_string(targetBitscount)));
-      auto tmp = asBinaryVector.Slice(excessiveBitsCount, targetBitscount);
-
-      asBinaryVector = std::move(tmp);
+      asBinaryVector.TruncateLeadingZeroes(excessiveBitsCount);
     }
   }
 

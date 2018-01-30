@@ -49,7 +49,7 @@ class AST_BasedNumber final : public AST_Number
 
   //! Returns number as a BinaryVector
   //!
-  mast::BinaryVector AsBinaryVector(uint8_t targetCount = 0) const;
+  mast::BinaryVector AsBinaryVector(uint32_t targetCount = 0) const override;
 
   //! Returns true when a size (bits count) is defined for the number
   //!

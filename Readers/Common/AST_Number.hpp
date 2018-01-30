@@ -15,6 +15,7 @@
   #define AST_NUMBER_H__9A9DFE82_138C_40D5_A1A1_A14F2F1EE4C5__INCLUDED_
 
 #include "AST_SimpleNode.hpp"
+#include "BinaryVector.hpp"
 
 #include <string>
 
@@ -34,6 +35,10 @@ class AST_Number : public AST_SimpleNode
   public:
   virtual ~AST_Number() = default;
   AST_Number()  = delete;
+
+  //! Returns number as a BinaryVector
+  //!
+  virtual mast::BinaryVector AsBinaryVector(uint32_t targetCount = 0) const = 0;
 
   //! Returns true when a size (bits count) is defined for the number
   //!

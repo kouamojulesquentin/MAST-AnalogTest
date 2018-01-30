@@ -46,6 +46,11 @@ class UT_AST_IntegerExpr : public CxxTest::TestSuite
   void test_IntegerLiteral_AsText ();
   void test_IntegerBinaryExpr_AsText ();
   void test_IntegerUnaryExpr_AsText ();
+
+  // ---------------- AsBinaryVector
+  //
+  void test_AsBinaryVector ();
+  void test_AsBinaryVector_inverted ();
 };
 //
 //  End of UT_AST_IntegerExpr class declaration

@@ -40,6 +40,10 @@ class AST_IntegerExpr : public AST_Number
   virtual ~AST_IntegerExpr() = default;
   AST_IntegerExpr()  = delete;
 
+  //! Returns number as a BinaryVector
+  //!
+  mast::BinaryVector AsBinaryVector(uint32_t targetCount) const override;
+
   //! Evaluates expression
   //!
   virtual uint32_t Evaluate() const = 0;

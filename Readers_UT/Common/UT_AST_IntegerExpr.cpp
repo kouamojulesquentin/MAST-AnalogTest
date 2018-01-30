@@ -27,9 +27,12 @@ using std::tuple;
 using std::string;
 using std::experimental::string_view;
 
+
 using namespace std::string_literals;
 using namespace std::experimental::literals::string_view_literals;
+
 using namespace Parsers;
+using namespace mast;
 
 
 
@@ -514,6 +517,123 @@ void UT_AST_IntegerExpr::test_IntegerUnaryExpr_AsText ()
 }
 
 
+
+//! Checks UT_AST_IntegerExpr::AsBinaryVector() when giving a target size and is not inverted
+//!
+void UT_AST_IntegerExpr::test_AsBinaryVector ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto operatorKind   = std::get<0>(data);
+    auto leftExprText   = std::get<1>(data);
+    auto rightExprText  = std::get<2>(data);
+    auto targetSize     = std::get<3>(data);
+    auto expectedResult = BinaryVector::CreateFromString(std::get<4>(data));
+
+    AST  builder;
+    auto leftExpr   = builder.Create_IntegerLiteral(std::move(leftExprText));
+    auto rightExpr  = builder.Create_IntegerLiteral(std::move(rightExprText));
+    auto binaryExpr = builder.Create_IntegerBinaryExpr(operatorKind, leftExpr, rightExpr);
+
+    binaryExpr->IsInverted(false);
+
+    CxxTest::setAbortTestOnFail(true);
+
+    BinaryVector result;
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (result = binaryExpr->AsBinaryVector(targetSize));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (result, expectedResult);
+  };
+
+  using data_t = tuple<Kind, string, string, uint32_t, string_view>;
+  auto data =
+  {
+    data_t{Kind::Operator_Add,       "0",          "0",    3u,  "'b000"},                       // 00
+    data_t{Kind::Operator_Add,       "1234_0000",  "5678", 24u, "'hBC614E"},                    // 01 ==> 12345678   ==> BC614E
+    data_t{Kind::Operator_Add,       "4294967294", "1",    34u, "'b00, 'hFFFFFFFF"},            // 02 ==> 4294967295 ==> FFFFFFFF
+    data_t{Kind::Operator_Add,       "7",          "6",    66u, "'b00, 'h0000_0000:0000_000D"}, // 03
+    data_t{Kind::Operator_Substract, "1",          "0",    1u,  "'b1"},                         // 04
+    data_t{Kind::Operator_Substract, "1",          "1",    1u,  "'b0"},                         // 05
+    data_t{Kind::Operator_Substract, "23",         "10",   6u,  "'b00_1101"},                   // 06
+    data_t{Kind::Operator_Substract, "1234_5678",  "5678", 24u, "'hBC4B20"},                    // 07 ==> 1234_0000 ==> BC4B20
+    data_t{Kind::Operator_Multiply,  "1234",       "5678", 29u, "'b0_0000, 'h6AE9BC"},          // 08 ==> 7006652   ==> 6AE9BC
+    data_t{Kind::Operator_Divide,    "143",        "13",   5u,  "'b01011"},                     // 09 ==> 11
+    data_t{Kind::Operator_Divide,    "7_006_652",  "5678", 20u, "'h004D2"},                     // 10 ==> 1234 ==> 4D2
+    data_t{Kind::Operator_Modulo,    "144",        "13",   7u,  "'b000_0001"},                  // 11 ==>
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
+
+
+//! Checks UT_AST_IntegerExpr::AsBinaryVector() when giving a target size and is inverted
+//!
+void UT_AST_IntegerExpr::test_AsBinaryVector_inverted ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto operatorKind   = std::get<0>(data);
+    auto leftExprText   = std::get<1>(data);
+    auto rightExprText  = std::get<2>(data);
+    auto targetSize     = std::get<3>(data);
+    auto expectedResult = BinaryVector::CreateFromString(std::get<4>(data));
+
+    AST  builder;
+    auto leftExpr   = builder.Create_IntegerLiteral(std::move(leftExprText));
+    auto rightExpr  = builder.Create_IntegerLiteral(std::move(rightExprText));
+    auto binaryExpr = builder.Create_IntegerBinaryExpr(operatorKind, leftExpr, rightExpr);
+
+    binaryExpr->IsInverted(true);
+
+    CxxTest::setAbortTestOnFail(true);
+
+    BinaryVector result;
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (result = binaryExpr->AsBinaryVector(targetSize));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (result, expectedResult);
+  };
+
+  using data_t = tuple<Kind, string, string, uint32_t, string_view>;
+  auto data =
+  {
+    data_t{Kind::Operator_Add,       "0",          "0",    3u,  "~'b000"},               // 00
+    data_t{Kind::Operator_Add,       "1234_0000",  "5678", 24u, "~'hBC614E"},            // 01 ==> 12345678   ==> BC614E
+    data_t{Kind::Operator_Add,       "4294967294", "1",    34u, "~'b00, ~'hFFFFFFFF"},   // 02 ==> 4294967295 ==> FFFFFFFF
+    data_t{Kind::Operator_Substract, "1",          "0",    1u,  "~'b1"},                 // 03
+    data_t{Kind::Operator_Substract, "1",          "1",    1u,  "~'b0"},                 // 04
+    data_t{Kind::Operator_Substract, "23",         "10",   6u,  "~'b00_1101"},           // 05
+    data_t{Kind::Operator_Substract, "1234_5678",  "5678", 24u, "~'hBC4B20"},            // 06 ==> 1234_0000 ==> BC4B20
+    data_t{Kind::Operator_Multiply,  "1234",       "5678", 29u, "~'b0_0000, ~'h6AE9BC"}, // 07 ==> 7006652   ==> 6AE9BC
+    data_t{Kind::Operator_Divide,    "143",        "13",   5u,  "~'b01011"},             // 08 ==> 11
+    data_t{Kind::Operator_Divide,    "7_006_652",  "5678", 20u, "~'h004D2"},             // 09 ==> 1234 ==> 4D2
+    data_t{Kind::Operator_Modulo,    "144",        "13",   7u,  "~'b000_0001"},          // 10 ==>
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
 
 
 

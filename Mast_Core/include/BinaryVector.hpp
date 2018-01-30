@@ -167,6 +167,10 @@ class MAST_CORE_EXPORT BinaryVector final
 
   BinaryVector& AppendChunks (uint8_t numberOfBits, BitsAlignment alignment, std::initializer_list<uint8_t> chunksList); // Appends from a list of uint8_t ordered from msb to lsb
 
+  BinaryVector& PrependBits (uint32_t bitsCount, uint8_t fillPattern = 0); //!< Insert bits with patern times before current bits
+
+  BinaryVector& TruncateLeadingZeroes (uint32_t numberOfBitsToRemove);  //!< Truncates leading bits, providing they are all zeroes
+
   void          Clear();              //!< Clears all content
 
   void          Get(uint8_t&  value) const; //!< Reads unsigned  8 bits value from BinaryVector

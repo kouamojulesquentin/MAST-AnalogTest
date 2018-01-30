@@ -175,6 +175,15 @@ class UT_BinaryVector : public CxxTest::TestSuite
   void test_Append_Other_When_NotEmpty ();
   void test_Append_Other_When_FixedSize ();
 
+  // ---------------- PrependBits
+  //
+  void test_PrependBits ();
+
+  // ---------------- TruncateLeadingZeroes
+  //
+  void test_TruncateLeadingZeroes ();
+  void test_TruncateLeadingZeroes_failure ();
+
   // ---------------- Set
   //
   void test_Set_uint_8_When_Empty ();

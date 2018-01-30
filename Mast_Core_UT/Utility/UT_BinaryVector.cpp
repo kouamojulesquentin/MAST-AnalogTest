@@ -4486,6 +4486,150 @@ void UT_BinaryVector::test_Append_Other_When_FixedSize ()
   TS_ASSERT_THROWS (sut.Append(other), std::exception);
 }
 
+
+//! Checks BinaryVector::PrependBits
+//!
+void UT_BinaryVector::test_PrependBits ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto initialBits  = std::get<0>(data);
+    auto bitsCount    = std::get<1>(data);
+    auto pattern      = std::get<2>(data);
+    auto expectedBits = std::get<3>(data);
+
+    auto sut = BinaryVector::CreateFromString(initialBits);
+
+    CxxTest::setAbortTestOnFail(true);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.PrependBits(bitsCount, pattern));
+
+    // ---------------- Verify
+    //
+    auto expected = BinaryVector::CreateFromString(expectedBits);
+
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  using data_t = tuple<string_view, uint32_t, uint8_t, string_view>;
+  auto data =
+  {
+    //      initial, count, pattern, expected
+    data_t("0b1",       0,  0,    "0b1"),                            // 00
+    data_t("0b0",       0,  0xFF, "0b0"),                            // 01
+    data_t("0b1",       1,  0xFF, "0b11"),                           // 02
+    data_t("0b01",      3,  0,    "0b000:01"),                       // 03
+    data_t("0b101",     7,  0,    "0b000_0000:101"),                 // 04
+    data_t("0b1011",    12, 0xA5, "0xA5A/b:1011"),                   // 05
+    data_t("0b0110_0",  18, 0x81, "0x8181/b10:0110_0"),              // 06
+    data_t("0b0110_01", 64, 0xC3, "0xC3C3_C3C3:C3C3_C3C3/b0110_01"), // 07
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::TruncateLeadingZeroes
+//!
+void UT_BinaryVector::test_TruncateLeadingZeroes ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto initialBits  = std::get<0>(data);
+    auto discardCount = std::get<1>(data);
+    auto expectedBits = std::get<2>(data);
+
+    auto sut = BinaryVector::CreateFromString(initialBits);
+
+    CxxTest::setAbortTestOnFail(true);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.TruncateLeadingZeroes(discardCount));
+
+    // ---------------- Verify
+    //
+    auto expected = BinaryVector::CreateFromString(expectedBits);
+
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+
+  using data_t = tuple<string_view, uint32_t, string_view>;
+  auto data =
+  {
+    //      initial, count, expected
+    data_t("0b1",             0,  "0b1"),             // 00
+    data_t("0b0",             0,  "0b0"),             // 01
+    data_t("0b0",             1,  ""),                // 02
+    data_t("0b01",            1,  "0b1"),             // 03
+    data_t("0b0000_0101",     4,  "0b0101"),          // 04
+    data_t("0b0000_0101",     5,  "0b101"),           // 05
+    data_t("0x0000:BAD_CAFE", 12, "0x0:BAD_CAFE"),    // 06
+    data_t("0x0000:BAD_CAFE", 13, "0b000/xBAD_CAFE"), // 07
+    data_t("0x0000:BAD_CAFE", 16, "0xBAD_CAFE"),      // 08
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::TruncateLeadingZeroes when requesting too much truncation
+//!
+void UT_BinaryVector::test_TruncateLeadingZeroes_failure ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    auto initialBits  = std::get<0>(data);
+    auto discardCount = std::get<1>(data);
+
+    auto sut = BinaryVector::CreateFromString(initialBits);
+
+    CxxTest::setAbortTestOnFail(true);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS (sut.TruncateLeadingZeroes(discardCount), std::invalid_argument);
+  };
+
+  using data_t = tuple<string_view, uint32_t>;
+  auto data =
+  {
+    //      initial, count, expected
+    data_t("0b1",             1),  // 00
+    data_t("0b0",             2),  // 01
+    data_t("0b01",            2),  // 02
+    data_t("0b0000_0101",     6),  // 03
+    data_t("0b0010_0101",     5),  // 04
+    data_t("0b1000_0001",     5),  // 05
+    data_t("0x0000:BAD_CAFE", 17), // 06
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+
+
 //! Checks BinaryVector::Set() when BinaryVector is empty
 //!
 void UT_BinaryVector::test_Set_uint_8_When_Empty ()

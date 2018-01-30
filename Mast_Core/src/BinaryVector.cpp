@@ -224,6 +224,10 @@ namespace
 
 //! Initializes with constant value for all bits
 //!
+//! @param bitsCount      Number of bits of resulting BinaryVector
+//! @param fillPattern    Filling patern (may be truncated at the end)
+//! @param sizeProperty   Tells whether BinaryVector size (number of bits) can be changed once constructed
+//!
 BinaryVector::BinaryVector (uint32_t bitsCount, uint8_t fillPattern, SizeProperty sizeProperty)
   : m_data         ((bitsCount + 7) / 8, fillPattern)
   , m_usedBits     (bitsCount)
@@ -2457,6 +2461,24 @@ uint8_t BinaryVector::MergeToByte (uint32_t lsbOffset, uint8_t lsbBitsCount, boo
 //---------------------------------------------------------------------------
 
 
+//! Insert bits with patern times before current bits
+//!
+//! @param bitsCount      Number of bits of resulting BinaryVector
+//! @param fillPattern    Filling patern (may be truncated at the end)
+//!
+BinaryVector& BinaryVector::PrependBits (uint32_t bitsCount, uint8_t fillPattern)
+{
+  BinaryVector tmp(bitsCount, fillPattern);
+
+  tmp.Append(*this);
+
+  *this = std::move(tmp);
+  return *this;
+}
+//
+//  End of: BinaryVector::PrependBits
+//---------------------------------------------------------------------------
+
 
 //! Sets from N signed bits
 //!
@@ -3188,6 +3210,36 @@ BinaryVector& BinaryVector::ToggleBits()
 //  End of: BinaryVector::ToggleBits
 //---------------------------------------------------------------------------
 
+
+
+//! Truncates leading bits, providing they are all zeroes
+//!
+//! @param numberOfBitsToRemove   Number of leading zeroes to remove
+//!
+//! @return This BinaryVector or throw runtime_error if number of leading zeroes or total
+//!         bits count is less than requested number of bits to remove
+BinaryVector& BinaryVector::TruncateLeadingZeroes (uint32_t numberOfBitsToRemove)
+{
+  CHECK_PARAMETER_LTE(numberOfBitsToRemove, m_usedBits, "Cannot remove "s
+                                                        .append(std::to_string(numberOfBitsToRemove))
+                                                        .append(" bits when vector has only ")
+                                                        .append(std::to_string(m_usedBits))
+                                                        .append(" bits"));
+
+  CHECK_PARAMETER_LTE(numberOfBitsToRemove, LeadingZeroesCount(), "Cannot remove "s
+                                                                  .append(std::to_string(numberOfBitsToRemove)).append(" leading zeroes from vector that has only ")
+                                                                  .append(std::to_string(LeadingZeroesCount())).append(" leading zeroes"));
+
+  auto remainingCount = m_usedBits - numberOfBitsToRemove;
+
+  auto tmp = Slice(numberOfBitsToRemove, remainingCount);
+
+  *this = std::move(tmp);
+  return *this;
+}
+//
+//  End of: BinaryVector::TruncateLeadingZeroes
+//---------------------------------------------------------------------------
 
 
 //===========================================================================

@@ -27,53 +27,54 @@ namespace Parsers
   {
     Undefined,
 
-    AccessLink,         //!< For access link
-    Alias,              //!< For alias definitions
-    Attribute,          //!< For attribute definitions
-    DefaultLoadValue,   //!< For registers default load value
-    DataInPort,         //!< For modules data input port
-    DataOutPort,        //!< For modules data output port
-    Enum_def,           //!< For enums definitions
-    Enum_item,          //!< For enums items
-    Enum_ref,           //!< For enums references
-    BSDLEntity,         //!< For BSDL file referred by AccessLink
-    IntegerLiteral,     //!< For a, unsigned, integer literal
-    InputPort,          //!< For input of instance input port
-    InputPortSource,    //!< For input of instance input port source
-    Instance,           //!< For modules instances
-    LocalParameter,     //!< For local parameters definitions
-    Module,             //!< For modules
-    ModuleIdentifier,   //!< For modules instances indentification
-    NameSpace,          //!< For namespace definitions and references
-    Network,            //!< For complete test network
-    Number_Binary,      //!< For number defined with explicit binary base
-    Number_Decimal,     //!< For number defined with explicit decimal base
-    Number_Hexa,        //!< For number defined with explicit hexadecimal base
-    Operator_Add,       //!< For binary add operator
-    Operator_Substract, //!< For binary substract operator
-    Operator_Multiply,  //!< For binary multiply operator
-    Operator_Divide,    //!< For binary divide operator
-    Operator_Modulo,    //!< For binary modulo operator
-    BsdlInstructionRef, //!< For BSDL instruction referred by AccessLink
-    Parameter,          //!< For parameters definitions
-    Parameter_ref,      //!< For parameters references
-    ParenthesizedExpr,  //!< For parenthesized integer expressions
-    Port,               //!< For ScanInterface Ports
-    ResetValue,         //!< For registers reset value
-    ScalarIdentifier,   //!< For identifier with a without scope prefix and no bit nor range identifier
-    ScanInPort,         //!< For modules scan input port
-    ScanInSource,       //!< For input of scan registers
-    ScanInterface,      //!< For scan interfaces
-    ScanInterfaceRef,   //!< For scan interfaces reference
-    ScanMux,            //!< For scan multiplexers
-    ScanMuxSelection,   //!< For description of scan multiplexer selection
-    ScanOutPort,        //!< For modules scan output port
-    ScanRegister,       //!< For scan registers
-    Signal,             //!< For signal definitions
-    Source,             //!< For unspecifed source signal(s)
-    String,             //!< For string literals
-    TranslationUnit,    //!< For source files as a all
-    VectorIdentifier,   //!< For identifiers with a without scope prefix and bit or range identifier
+    AccessLink,          //!< For access link
+    Alias,               //!< For alias definitions
+    Attribute,           //!< For attribute definitions
+    ConcatenatedNumbers, //!< For concatenated numbers
+    DefaultLoadValue,    //!< For registers default load value
+    DataInPort,          //!< For modules data input port
+    DataOutPort,         //!< For modules data output port
+    Enum_def,            //!< For enums definitions
+    Enum_item,           //!< For enums items
+    Enum_ref,            //!< For enums references
+    BSDLEntity,          //!< For BSDL file referred by AccessLink
+    IntegerLiteral,      //!< For a, unsigned, integer literal
+    InputPort,           //!< For input of instance input port
+    InputPortSource,     //!< For input of instance input port source
+    Instance,            //!< For modules instances
+    LocalParameter,      //!< For local parameters definitions
+    Module,              //!< For modules
+    ModuleIdentifier,    //!< For modules instances indentification
+    NameSpace,           //!< For namespace definitions and references
+    Network,             //!< For complete test network
+    Number_Binary,       //!< For number defined with explicit binary base
+    Number_Decimal,      //!< For number defined with explicit decimal base
+    Number_Hexa,         //!< For number defined with explicit hexadecimal base
+    Operator_Add,        //!< For binary add operator
+    Operator_Substract,  //!< For binary substract operator
+    Operator_Multiply,   //!< For binary multiply operator
+    Operator_Divide,     //!< For binary divide operator
+    Operator_Modulo,     //!< For binary modulo operator
+    BsdlInstructionRef,  //!< For BSDL instruction referred by AccessLink
+    Parameter,           //!< For parameters definitions
+    Parameter_ref,       //!< For parameters references
+    ParenthesizedExpr,   //!< For parenthesized integer expressions
+    Port,                //!< For ScanInterface Ports
+    ResetValue,          //!< For registers reset value
+    ScalarIdentifier,    //!< For identifier with a without scope prefix and no bit nor range identifier
+    ScanInPort,          //!< For modules scan input port
+    ScanInSource,        //!< For input of scan registers
+    ScanInterface,       //!< For scan interfaces
+    ScanInterfaceRef,    //!< For scan interfaces reference
+    ScanMux,             //!< For scan multiplexers
+    ScanMuxSelection,    //!< For description of scan multiplexer selection
+    ScanOutPort,         //!< For modules scan output port
+    ScanRegister,        //!< For scan registers
+    Signal,              //!< For signal definitions
+    Source,              //!< For unspecifed source signal(s)
+    String,              //!< For string literals
+    TranslationUnit,     //!< For source files as a all
+    VectorIdentifier,    //!< For identifiers with a without scope prefix and bit or range identifier
   };
 
   //! Returns whether one kind is one of specified kind
@@ -99,6 +100,7 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::Alias)
             ENUM_MEMBER(Parsers::Kind::Attribute)
             ENUM_MEMBER(Parsers::Kind::BsdlInstructionRef)
+            ENUM_MEMBER(Parsers::Kind::ConcatenatedNumbers)
             ENUM_MEMBER(Parsers::Kind::DefaultLoadValue)
             ENUM_MEMBER(Parsers::Kind::DataInPort)
             ENUM_MEMBER(Parsers::Kind::DataOutPort)

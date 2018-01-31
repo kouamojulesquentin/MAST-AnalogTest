@@ -26,6 +26,7 @@ namespace Parsers
 {
 class AST_AccessLink;
 class AST_BsdlInstructionRef;
+class AST_ConcatNumber;
 class AST_EnumRef;
 class AST_FileRef;
 class AST_Identifier;
@@ -42,7 +43,9 @@ class AST_Value;
 
 enum class AccessLinkType;
 
-//! Abstract Syntax Tree built when parsing some test network description
+//! Abstract Syntax Tree resulting in parsing some test network description
+//!
+//! @note It serves also as an AST node builder () to have a single place to manage memory allocations
 //!
 class AST final : public AST_Builder
 {
@@ -60,6 +63,7 @@ class AST final : public AST_Builder
   AST_EnumRef*            Create_EnumRef            (std::string&& name);
   AST_FileRef*            Create_FileRef            (Kind kind, std::string&& name);
   AST_BasedNumber*        Create_BasedNumber        (Kind kind, std::string&&    baseAndDigits) override;                              //!< Creates an AST_BasedNumber
+  AST_ConcatNumber*       Create_ConcatNumber       (std::vector<AST_Number*>&& numbers) override;                                     //!< Creates an AST_ConcatNumber
   AST_IntegerUnaryExpr*   Create_IntegerUnaryExpr   (Kind kind, AST_IntegerExpr* operand) override;                                    //!< Creates an AST_IntegerUnaryExpr node
   AST_IntegerBinaryExpr*  Create_IntegerBinaryExpr  (Kind kind, AST_IntegerExpr* leftOperand, AST_IntegerExpr* rightOperand) override; //!< Creates an AST_IntegerBinaryExpr node
   AST_IntegerLiteral*     Create_IntegerLiteral     (std::string&& integerText) override;                                              //!< Creates an AST_IntegerLiteral node

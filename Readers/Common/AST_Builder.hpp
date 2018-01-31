@@ -15,11 +15,13 @@
   #define AST_CLONER_H__87628D5E_5B7_455A_EE81_2F5FC373AAEF__INCLUDED_
 
 #include <string>
+#include <vector>
 
 namespace Parsers
 {
 class AST_Attribute;
 class AST_BasedNumber;
+class AST_ConcatNumber;
 class AST_IntegerExpr;
 class AST_IntegerBinaryExpr;
 class AST_IntegerUnaryExpr;
@@ -27,6 +29,7 @@ class AST_IntegerLiteral;
 class AST_Instance;
 class AST_Module;
 class AST_Network;
+class AST_Number;
 class AST_Parameter;
 class AST_Port;
 class AST_ScalarIdentifier;
@@ -55,6 +58,7 @@ class AST_Builder
   virtual AST_VectorIdentifier* Clone_VectorIdentifier (const AST_VectorIdentifier* identifier) = 0;   //!< Clones a vector identifier
 
   virtual AST_BasedNumber*       Create_BasedNumber                (Kind kind, std::string&&    baseAndDigits) = 0;                              //!< Creates an AST_BasedNumber
+  virtual AST_ConcatNumber*      Create_ConcatNumber               (std::vector<AST_Number*>&&  numbers) = 0;                                    //!< Creates an AST_ConcatNumber
   virtual AST_IntegerUnaryExpr*  Create_IntegerUnaryExpr           (Kind kind, AST_IntegerExpr* operand) = 0;                                    //!< Creates an AST_IntegerUnaryExpr node
   virtual AST_IntegerBinaryExpr* Create_IntegerBinaryExpr          (Kind kind, AST_IntegerExpr* leftOperand, AST_IntegerExpr* rightOperand) = 0; //!< Creates an AST_IntegerBinaryExpr node
   virtual AST_IntegerLiteral*    Create_IntegerLiteral             (std::string&&               integerText) = 0;                                //!< Creates an AST_IntegerLiteral node

@@ -27,6 +27,7 @@ CXXTEST_ENUM_TRAITS(Parsers::Kind,
            CXXTEST_ENUM_MEMBER(Parsers::Kind::Alias)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::Attribute)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::BsdlInstructionRef)
+           CXXTEST_ENUM_MEMBER(Parsers::Kind::ConcatenatedNumbers)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::DefaultLoadValue)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::DataInPort)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::DataOutPort)

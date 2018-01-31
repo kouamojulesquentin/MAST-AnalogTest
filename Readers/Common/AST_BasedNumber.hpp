@@ -65,7 +65,7 @@ class AST_BasedNumber final : public AST_Number
 
   //! Returns size (only when sized)
   //!
-  uint32_t Size() const;
+  uint32_t Size() const override;
 
   // ---------------- Private Methods
   //

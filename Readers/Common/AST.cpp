@@ -16,6 +16,7 @@
 #include "AST_Attribute.hpp"
 #include "AST_BasedNumber.hpp"
 #include "AST_BsdlInstructionRef.hpp"
+#include "AST_ConcatNumber.hpp"
 #include "AST_EnumRef.hpp"
 #include "AST_FileRef.hpp"
 #include "AST_IntegerBinaryExpr.hpp"
@@ -417,6 +418,16 @@ AST_BasedNumber* AST::Create_BasedNumber (Kind kind, std::string&& baseAndDigits
 //  End of: AST::Create_BasedNumber
 //---------------------------------------------------------------------------
 
+
+//! Creates an AST_ConcatNumber node
+//!
+AST_ConcatNumber* AST::Create_ConcatNumber (vector<AST_Number*>&& numbers)
+{
+  return Create_Node<AST_ConcatNumber>(std::move(numbers));
+}
+//
+//  End of: AST::Create_ConcatNumber
+//---------------------------------------------------------------------------
 
 
 //! Creates an AST_IntegerUnaryExpr node

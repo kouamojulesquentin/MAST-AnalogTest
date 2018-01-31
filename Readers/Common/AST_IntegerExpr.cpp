@@ -54,6 +54,17 @@ BinaryVector AST_IntegerExpr::AsBinaryVector (uint32_t targetCount) const
 //---------------------------------------------------------------------------
 
 
+//! Throws because an integer expression is never sized!
+//!
+uint32_t AST_IntegerExpr::Size () const
+{
+  CHECK_FAILED("Integer expression is never sized ==> one cannot request its size");
+}
+//
+//  End of: AST_IntegerExpr::Size
+//---------------------------------------------------------------------------
+
+
 //===========================================================================
 // End of AST_IntegerExpr.cpp
 //===========================================================================

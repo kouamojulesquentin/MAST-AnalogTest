@@ -17,8 +17,6 @@
 #include "AST_SimpleNode.hpp"
 #include "BinaryVector.hpp"
 
-#include <string>
-
 namespace Parsers
 {
 //! Represents a number that is either an integer expression or a "based" number (vector)
@@ -43,6 +41,10 @@ class AST_Number : public AST_SimpleNode
   //! Returns true when a size (bits count) is defined for the number
   //!
   virtual bool IsSized() const { return false; }
+
+  //! Returns number size, provided it has one, otherwise throw runtime_error
+  //!
+  virtual uint32_t Size() const = 0;
 
   //! Returns true when the number representation is inverted
   //!

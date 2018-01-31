@@ -17,6 +17,8 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_BasedNumber.cpp
                                   AST_BsdlInstructionRef.hpp
                                   AST_BsdlInstructionRef.cpp
+                                  AST_ConcatNumber.hpp
+                                  AST_ConcatNumber.cpp
                                   AST_EnumRef.hpp
                                   AST_IntegerExpr.hpp
                                   AST_IntegerExpr.cpp

@@ -48,6 +48,10 @@ class AST_IntegerExpr : public AST_Number
   //!
   virtual uint32_t Evaluate() const = 0;
 
+  //! Throws because an integer expression is never sized!
+  //!
+  uint32_t Size() const override;
+
   // ---------------- Protected Methods
   //
 

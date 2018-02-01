@@ -52,7 +52,6 @@ class AST_ScanRegister final : public AST_ParentNode
   //!
   const AST_VectorIdentifier* Identifier() const { return m_identifier; }
 
-
   //! ScanRegister name
   //!
   std::string Name() const override { return m_identifier->AsText(); }
@@ -61,8 +60,13 @@ class AST_ScanRegister final : public AST_ParentNode
   //!
   const std::string& BaseName() const { return m_identifier->BaseName(); }
 
-  const std::string& RangeLeft()  const;
-  const std::string& RangeRight() const;
+  //! Returns scan register left index (when not defined as a scalar identifier)
+  //!
+  uint32_t RangeLeft()  const;
+
+  //! Returns scan register right index (when not defined as a scalar identifier)
+  //!
+  uint32_t RangeRight() const;
 
   //! ScanRegister source base name (without indices)
   //!

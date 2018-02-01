@@ -13,6 +13,7 @@
 
 #include "AST_BasedNumber.hpp"
 #include "AST_IntegerExpr.hpp"
+#include "AST_Builder.hpp"
 
 #include "Utility.hpp"
 
@@ -114,6 +115,25 @@ string AST_BasedNumber::AsText () const
 
 
 
+//! Replaces parameter references by their actual number
+//!
+//! @note All parameters must have been uniquified and transitive dependencies resolved
+//!
+//! @param parameters   Parameter definitions to use to replace parameter reference(s)
+//!
+void AST_BasedNumber::Resolve (const std::vector<AST_Parameter*>& parameters)
+{
+  if (m_sizeExpr != nullptr)
+  {
+    m_sizeExpr->Resolve(parameters);
+  }
+}
+//
+//  End of: AST_BasedNumber::Resolve
+//---------------------------------------------------------------------------
+
+
+
 //! Returns size (only when sized)
 //!
 //! @return Size expression value or runtime_error when the based number is unsized
@@ -129,6 +149,24 @@ uint32_t AST_BasedNumber::Size () const
 //---------------------------------------------------------------------------
 
 
+//! Returns uniquified clone
+//!
+//! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
+//!
+//! @return New cloned and uniquified AST_BasedNumber
+AST_BasedNumber* AST_BasedNumber::UniquifiedClone (AST_Builder& astBuilder) const
+{
+  auto clone = astBuilder.Clone_BasedNumber(this);
+
+  if (m_sizeExpr != nullptr)
+  {
+    clone->m_sizeExpr->UniquifiedClone(astBuilder);
+  }
+  return clone;
+}
+//
+//  End of: AST_BasedNumber::UniquifiedClone
+//---------------------------------------------------------------------------
 
 //===========================================================================
 // End of AST_BasedNumber.cpp

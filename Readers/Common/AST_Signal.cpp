@@ -13,6 +13,7 @@
 
 #include "AST_Signal.hpp"
 #include "AST_ScalarIdentifier.hpp"
+#include "AST_Number.hpp"
 #include <sstream>
 
 using std::ostringstream;
@@ -33,7 +34,7 @@ string AST_Signal::AsText () const
 
   if (IsNumber())
   {
-    os << m_number;
+    os << m_number->AsText();
   }
   else
   {

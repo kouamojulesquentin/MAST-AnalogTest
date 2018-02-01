@@ -108,8 +108,8 @@ void UT_AST_Checker::test_Check_Module_Ok ()
   // ---------------- Setup
   //
   AST  ast;
-  auto scanInPortId   = ast.Create_VectorIdentifier("SI", "0", "0");
-  auto scanOutPortId  = ast.Create_VectorIdentifier("SO", "0", "0");
+  auto scanInPortId   = ast.Create_VectorIdentifier("SI", nullptr, nullptr);
+  auto scanOutPortId  = ast.Create_VectorIdentifier("SO", nullptr, nullptr);
   auto sourceSignal   = ast.Create_Signal(scanInPortId);
   auto outSource      = ast.Create_Source(Kind::Source, sourceSignal); // Connect input to output;
   auto scanInPort     = ast.Create_Port(Kind::ScanInPort,  scanInPortId);
@@ -141,7 +141,7 @@ void UT_AST_Checker::test_Check_Module_NoScanOutPorts ()
   //
   AST  ast;
   auto moduleId       = ast.Create_ScalarIdentifier("Test");
-  auto scanInPortId   = ast.Create_VectorIdentifier("SI", "0", "0");
+  auto scanInPortId   = ast.Create_VectorIdentifier("SI", nullptr, nullptr);
   auto scanInPort     = ast.Create_Port(Kind::ScanInPort,  scanInPortId);
   auto children       = vector<AST_Node*>({ scanInPort });
   auto module         = ast.Create_Module(moduleId, std::move(children));

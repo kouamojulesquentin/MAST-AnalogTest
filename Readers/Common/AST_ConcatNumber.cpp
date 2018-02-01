@@ -13,6 +13,7 @@
 
 #include "AST_ConcatNumber.hpp"
 #include "AST_Number.hpp"
+#include "AST_Builder.hpp"
 
 using std::string;
 using namespace mast;
@@ -107,6 +108,7 @@ string AST_ConcatNumber::AsText () const
 
   for (auto number : m_numbers)
   {
+    CHECK_VALUE_NOT_NULL(number, "Houps: AST_ConcatNumber has been build with a nullptr number");
     if (first)
     {
       first = false;
@@ -122,6 +124,26 @@ string AST_ConcatNumber::AsText () const
 }
 //
 //  End of: AST_ConcatNumber::AsText
+//---------------------------------------------------------------------------
+
+
+
+//! Returns true when there is a parameter reference in any of concatenated numbers
+//!
+bool AST_ConcatNumber::HasParameterRef () const
+{
+  for (const auto number : m_numbers)
+  {
+    if (number->HasParameterRef())
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+//
+//  End of: AST_ConcatNumber::HasParameterRef
 //---------------------------------------------------------------------------
 
 
@@ -146,6 +168,48 @@ bool AST_ConcatNumber::IsFullySized () const
 //  End of: AST_ConcatNumber::IsFullySized
 //---------------------------------------------------------------------------
 
+
+
+//! Replaces parameter references by its actual number
+//!
+//! @note This must be called after unification pass
+//!
+//! @param parameters   Parameter definitions to use to replace parameter reference(s)
+//!
+void AST_ConcatNumber::Resolve (const std::vector<AST_Parameter*>& parameters)
+{
+  for (auto& number : m_numbers)
+  {
+    if (number->HasParameterRef())
+    {
+      number->Resolve(parameters);
+    }
+  }
+}
+//
+//  End of: AST_ConcatNumber::Resolve
+//---------------------------------------------------------------------------
+
+
+
+//! Returns uniquified clone
+//!
+//! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
+//!
+//! @return New cloned and uniquified AST_ConcatNumber
+AST_ConcatNumber* AST_ConcatNumber::UniquifiedClone (AST_Builder& astBuilder) const
+{
+  auto clone = astBuilder.Clone_ConcatNumber(this);
+
+  for (auto& number : clone->m_numbers)
+  {
+    number = number->UniquifiedClone(astBuilder);
+  }
+  return clone;
+}
+//
+//  End of: AST_ConcatNumber::UniquifiedClone
+//---------------------------------------------------------------------------
 
 
 //===========================================================================

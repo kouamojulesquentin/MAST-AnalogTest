@@ -13,6 +13,7 @@
 
 #include "AST_Builder.hpp"
 #include "AST_Attribute.hpp"
+#include "AST_ConcatNumber.hpp"
 #include "AST_String.hpp"
 #include "AST_Parameter.hpp"
 #include "AST_ParameterRef.hpp"
@@ -37,9 +38,9 @@ string AST_Attribute::AsText () const
 
   os << m_name;
 
-  if      (!m_numbersValue.empty())
+  if      (m_concatNumber != nullptr)
   {
-    os << " = " << m_numbersValue;
+    os << " = " << m_concatNumber->AsText();
   }
   else if (!m_stringsValue.empty())
   {
@@ -99,9 +100,9 @@ AST_Attribute* AST_Attribute::UniquifiedClone (AST_Builder& astBuilder) const
 //!
 string AST_Attribute::ValueAsText () const
 {
-  if (!m_numbersValue.empty())
+  if (m_concatNumber != nullptr)
   {
-    return m_numbersValue;
+    return m_concatNumber->AsText();
   }
 
   if (!m_stringsValue.empty())

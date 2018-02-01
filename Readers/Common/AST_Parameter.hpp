@@ -22,6 +22,7 @@
 namespace Parsers
 {
 class AST_Builder;
+class AST_ConcatNumber;
 
 //! Represents a parameter (for generic modules) or local parameter (for convenience)
 //!
@@ -46,7 +47,7 @@ class AST_Parameter final : public AST_SimpleNode
   //! @note Parameter represents either a number or a string (never both)
   //!
   //! @return true when it represents a number, false when it represents a string
-  bool IsNumber() const { return !m_numbersValue.empty(); }
+  bool IsNumber() const { return m_concatNumber != nullptr; }
 
   //! Tells whether parameter represents a number
   //!
@@ -54,6 +55,11 @@ class AST_Parameter final : public AST_SimpleNode
   //!
   //! @return true when it represents a string, false when it represents a number
   bool IsString() const { return !m_stringsValue.empty(); }
+
+  //! Returns number value of the parameter
+  //!
+  //! @note It is only valid when IsNumber() returns true
+  AST_ConcatNumber* Number() const { return m_concatNumber; }
 
   //! Returns true when Parameter is defined using Parameter reference(s)
   //!
@@ -109,9 +115,7 @@ class AST_Parameter final : public AST_SimpleNode
   //!
   AST_Parameter* UniquifiedClone (AST_Builder& astBuilder) const;
 
-  //! Returns a copy of number expression with parameters references replaces with the actual parameter value
-  //!
-  static std::string ReplacedParameters (const std::string& numberValue, const std::vector<AST_Parameter*>& parameters);
+  static AST_Parameter* LocateParameterDef (std::experimental::string_view name, const std::vector<AST_Parameter*>& parameters);
 
   //! Replaces parameter references nodes with parameter string value
   //!
@@ -122,29 +126,28 @@ class AST_Parameter final : public AST_SimpleNode
   //
   private:
   friend class AST;   // This is AST that manages construction/destruction of AST nodes (it uses make_unit<T>() to create nodes)
-  MAKE_UNIQUE_AS_FRIEND(AST_Parameter)(Parsers::Kind&, std::string&&, std::string&&);
+  MAKE_UNIQUE_AS_FRIEND(AST_Parameter)(Parsers::Kind&, std::string&&, Parsers::AST_ConcatNumber*&);
   MAKE_UNIQUE_AS_FRIEND(AST_Parameter)(Parsers::Kind&, std::string&&, std::vector<AST_SimpleNode*>&&);
 
   //! Initializes AST_Parameter representing a number
   //!
-  AST_Parameter(Kind kind, std::string&& name, std::string&& numbersValue);
+  AST_Parameter(Kind kind, std::string&& name, AST_ConcatNumber* concatNumber);
 
   //! Initializes AST_Parameter representing a string
   //!
   AST_Parameter(Kind kind, std::string&& name, std::vector<AST_SimpleNode*>&& stringsOrRefsValue);
 
-  static AST_Parameter* LocateParameterDef (std::experimental::string_view name, const std::vector<AST_Parameter*>& parameters);
 
   static std::string ReducedStringExpr (const std::vector<AST_SimpleNode*>& stringsValue);
 
-  static void Resolve (AST_Builder& astBuilder, std::string&                  numberValue,  std::vector<AST_Parameter*>& parameters);
   static void Resolve (AST_Builder& astBuilder, std::vector<AST_SimpleNode*>& stringsValue, std::vector<AST_Parameter*>& parameters);
+
 
   // ---------------- Private Fields
   //
   private:
   const std::string            m_name;                                     //!< Parameter name
-  std::string                  m_numbersValue;                             //!< Parameter value when defined as numbers
+  AST_ConcatNumber*            m_concatNumber = nullptr;                   //!< Parameter value when defined as numbers
   std::vector<AST_SimpleNode*> m_stringsValue;                             //!< Parameter value when defined as strings and/or parameter reference
   bool                         m_parameterRefResolutionInProgress = false; //!< This is to detect circular parameter references
 };

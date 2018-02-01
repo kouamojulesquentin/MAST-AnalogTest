@@ -22,6 +22,7 @@
 #include "AST_IntegerBinaryExpr.hpp"
 #include "AST_IntegerUnaryExpr.hpp"
 #include "AST_IntegerLiteral.hpp"
+#include "AST_IntegerExprRef.hpp"
 #include "AST_Instance.hpp"
 #include "AST_ModuleIdentifier.hpp"
 #include "AST_Module.hpp"
@@ -82,6 +83,50 @@ AST_Instance* AST::Clone_Instance (const AST_Instance* instance)
 //---------------------------------------------------------------------------
 
 
+//! Clones an integer expression reference
+//!
+AST_IntegerExprRef* AST::Clone_IntegerExprRef (const AST_IntegerExprRef* integerExprRef)
+{
+  return Clone_Node(integerExprRef);
+}
+//
+//  End of: AST::Clone_IntegerExprRef
+//---------------------------------------------------------------------------
+
+
+//! Clones an integer binary expression
+//!
+AST_IntegerBinaryExpr* AST::Clone_IntegerBinaryExpr (const AST_IntegerBinaryExpr* integerBinaryExpr)
+{
+  return Clone_Node(integerBinaryExpr);
+}
+//
+//  End of: AST::Clone_IntegerBinaryExpr
+//---------------------------------------------------------------------------
+
+
+//! Clones a integer literal
+//!
+AST_IntegerLiteral* AST::Clone_IntegerLiteral (const AST_IntegerLiteral* integerLiteral)
+{
+  return Clone_Node(integerLiteral);
+}
+//
+//  End of: AST::Clone_IntegerLiteral
+//---------------------------------------------------------------------------
+
+
+//! Clones a integer literal
+//!
+AST_IntegerUnaryExpr* AST::Clone_IntegerUnaryExpr (const AST_IntegerUnaryExpr* integerUnaryExpr)
+{
+  return Clone_Node(integerUnaryExpr);
+}
+//
+//  End of: AST::Clone_IntegerUnaryExpr
+//---------------------------------------------------------------------------
+
+
 //! Clones a module
 //!
 AST_Module* AST::Clone_Module (const AST_Module* module)
@@ -120,6 +165,27 @@ AST_Attribute* AST::Clone_Attribute (const AST_Attribute* attribute)
 }
 //
 //  End of: AST::Clone_Port
+//---------------------------------------------------------------------------
+
+//! Clones a "based" number
+//!
+AST_BasedNumber* AST::Clone_BasedNumber (const AST_BasedNumber* basedNumber)
+{
+  return Clone_Node(basedNumber);
+}
+//
+//  End of: AST::Clone_BasedNumber
+//---------------------------------------------------------------------------
+
+
+//! Clones a concatenated number
+//!
+AST_ConcatNumber* AST::Clone_ConcatNumber (const AST_ConcatNumber* concatNumber)
+{
+  return Clone_Node(concatNumber);
+}
+//
+//  End of: AST::Clone_ConcatNumber
 //---------------------------------------------------------------------------
 
 
@@ -221,11 +287,11 @@ AST_Attribute* AST::Create_Attribute (string&& name)
 //! Creates an AST_Attribute node
 //!
 //! @param name           Attribute name
-//! @param numbersValue   Numbers that define parameter value
+//! @param concatNumber   Concatenated numbers
 //!
-AST_Attribute* AST::Create_Attribute (string&& name, std::string&& numbersValue)
+AST_Attribute* AST::Create_Attribute (string&& name, AST_ConcatNumber* concatNumber)
 {
-  return Create_Node<AST_Attribute>(std::move(name), std::move(numbersValue));
+  return Create_Node<AST_Attribute>(std::move(name), concatNumber);
 }
 //
 //  End of: AST::Create_Attribute
@@ -325,12 +391,12 @@ AST_Instance* AST::Create_Instance (const AST_ScalarIdentifier* instanceIdentifi
 //! Creates an AST_Parameter node for local parameter
 //!
 //! @param name           Local parameter name
-//! @param numbersValue   Numbers that define parameter value
+//! @param concatNumber   Numbers that define parameter value
 //!
-AST_Parameter* AST::Create_LocalParameter (string&& name, string&& numbersValue)
+AST_Parameter* AST::Create_LocalParameter (string&& name, AST_ConcatNumber* concatNumber)
 {
   auto kind = Kind::LocalParameter;
-  return Create_Node<AST_Parameter>(kind, std::move(name), std::move(numbersValue));
+  return Create_Node<AST_Parameter>(kind, std::move(name), concatNumber);
 }
 //
 //  End of: AST::Create_LocalParameter
@@ -419,7 +485,20 @@ AST_BasedNumber* AST::Create_BasedNumber (Kind kind, std::string&& baseAndDigits
 //---------------------------------------------------------------------------
 
 
+//! Creates an AST_ConcatNumber node empty
+//!
+AST_ConcatNumber* AST::Create_ConcatNumber ()
+{
+  return Create_Node<AST_ConcatNumber>();
+}
+//
+//  End of: AST::Create_ConcatNumber
+//---------------------------------------------------------------------------
+
+
 //! Creates an AST_ConcatNumber node
+//!
+//! @param numbers  Concatenated numbers
 //!
 AST_ConcatNumber* AST::Create_ConcatNumber (vector<AST_Number*>&& numbers)
 {
@@ -441,6 +520,20 @@ AST_IntegerUnaryExpr* AST::Create_IntegerUnaryExpr (Kind kind, AST_IntegerExpr* 
 //---------------------------------------------------------------------------
 
 
+//! Creates an AST_IntegerExprRef node
+//!
+//! @param parameterRef   Parameter reference to an integer expression
+//!
+AST_IntegerExprRef* AST::Create_IntegerExprRef (AST_ParameterRef* parameterRef)
+{
+  return Create_Node<AST_IntegerExprRef>(parameterRef);
+}
+//
+//  End of: AST::Create_IntegerExprRef
+//---------------------------------------------------------------------------
+
+
+
 //! Creates an AST_IntegerLiteral node
 //!
 //! @param integerText  Text representing the, unsigned, integer value
@@ -448,6 +541,19 @@ AST_IntegerUnaryExpr* AST::Create_IntegerUnaryExpr (Kind kind, AST_IntegerExpr* 
 AST_IntegerLiteral* AST::Create_IntegerLiteral (std::string&& integerText)
 {
   return Create_Node<AST_IntegerLiteral>(std::move(integerText));
+}
+//
+//  End of: AST::Create_IntegerLiteral
+//---------------------------------------------------------------------------
+
+
+//! Creates an AST_IntegerLiteral node
+//!
+//! @param value  Literal value
+//!
+AST_IntegerLiteral* AST::Create_IntegerLiteral (uint32_t value)
+{
+  return Create_Node<AST_IntegerLiteral>(value);
 }
 //
 //  End of: AST::Create_IntegerLiteral
@@ -494,12 +600,12 @@ AST_Namespace* AST::Create_Namespace_Impl (string&& name)
 //! Creates an AST_Parameter node for local parameter
 //!
 //! @param name           Parameter name
-//! @param numbersValue   Numbers that define parameter value
+//! @param concatNumber   Numbers that define parameter value
 //!
-AST_Parameter* AST::Create_Parameter (string&& name, string&& numbersValue)
+AST_Parameter* AST::Create_Parameter (string&& name, AST_ConcatNumber* concatNumber)
 {
   auto kind = Kind::Parameter;
-  return Create_Node<AST_Parameter>(kind, std::move(name), std::move(numbersValue));
+  return Create_Node<AST_Parameter>(kind, std::move(name), concatNumber);
 }
 //
 //  End of: AST::Create_Parameter
@@ -637,7 +743,7 @@ AST_ScanInterfaceRef* AST::Create_ScanInterfaceRef (vector<tuple<AST_ScalarIdent
 //! @param selectionValues  Selection values
 //! @param selectedSignals  Selected signal when multiplex selector has one of selection values
 //!
-AST_ScanMuxSelection* AST::Create_ScanMuxSelection (vector<string>&& selectionValues, vector<Parsers::AST_Signal*>&& selectedSignals)
+AST_ScanMuxSelection* AST::Create_ScanMuxSelection (vector<AST_ConcatNumber*>&& selectionValues, vector<Parsers::AST_Signal*>&& selectedSignals)
 {
   return Create_Node<AST_ScanMuxSelection>(std::move(selectionValues), std::move(selectedSignals));
 }
@@ -666,7 +772,7 @@ AST_ScanRegister* AST::Create_ScanRegister (AST_VectorIdentifier* identifier, ve
 //!
 //! @param number Signal value
 //!
-AST_Signal* AST::Create_Signal (string_view number)
+AST_Signal* AST::Create_Signal (AST_Number* number)
 {
   return Create_Node<AST_Signal>(number);
 }
@@ -786,11 +892,9 @@ AST_ModuleIdentifier* AST::Create_UniquifiedModuleIdentifier (const AST_Module* 
 //!
 //! @return Created AST_VectorIdentifier
 //!
-AST_VectorIdentifier* AST::Create_VectorIdentifier (std::string&& name,
-                                                    std::string&& leftIndex,
-                                                    std::string&& rightIndex)
+AST_VectorIdentifier* AST::Create_VectorIdentifier (std::string&& name, AST_IntegerExpr* leftIndex, AST_IntegerExpr* rightIndex)
 {
-  return Create_Node<AST_VectorIdentifier>(std::move(name), std::move(leftIndex), std::move(rightIndex));
+  return Create_Node<AST_VectorIdentifier>(std::move(name), leftIndex, rightIndex);
 }
 //
 //  End of: AST::Create_VectorIdentifier
@@ -803,14 +907,14 @@ AST_VectorIdentifier* AST::Create_VectorIdentifier (std::string&& name,
 
 //! Creates an AST_Value node
 //!
-//! @param kind             Kind of value
-//! @param valueExpression  Value expression
+//! @param kind         Kind of target
+//! @param concatNumber Value expression
 //!
 //! @return Created AST_Value
 //!
-AST_Value* AST::Create_Value (Kind kind, string_view valueExpression)
+AST_Value* AST::Create_Value (Kind kind, AST_ConcatNumber* concatNumber)
 {
-  return Create_Node<AST_Value>(kind, valueExpression);
+  return Create_Node<AST_Value>(kind, concatNumber);
 }
 //
 //  End of: AST::Create_Value

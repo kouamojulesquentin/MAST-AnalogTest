@@ -13,6 +13,7 @@
 
 #include "AST_ScanMuxSelection.hpp"
 #include "AST_Signal.hpp"
+#include "AST_ConcatNumber.hpp"
 #include "Utility.hpp"
 
 #include <sstream>
@@ -30,7 +31,7 @@ using namespace Parsers;
 //! @param selectionValues  Selection values
 //! @param selectedSignals  Selected signal when multiplex selector has one of selection values
 //!
-AST_ScanMuxSelection::AST_ScanMuxSelection (vector<string>&& selectionValues, vector<Parsers::AST_Signal*>&& selectedSignals)
+AST_ScanMuxSelection::AST_ScanMuxSelection (vector<AST_ConcatNumber*>&& selectionValues, vector<Parsers::AST_Signal*>&& selectedSignals)
   : AST_SimpleNode    (Kind::ScanMuxSelection)
   , m_selectionValues (selectionValues)
   , m_selectedSignals (selectedSignals)

@@ -22,6 +22,8 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_EnumRef.hpp
                                   AST_IntegerExpr.hpp
                                   AST_IntegerExpr.cpp
+                                  AST_IntegerExprRef.hpp
+                                  AST_IntegerExprRef.cpp
                                   AST_IntegerLiteral.hpp
                                   AST_IntegerLiteral.cpp
                                   AST_IntegerBinaryExpr.hpp

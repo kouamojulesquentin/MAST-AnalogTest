@@ -38,6 +38,7 @@ CXXTEST_ENUM_TRAITS(Parsers::Kind,
            CXXTEST_ENUM_MEMBER(Parsers::Kind::InputPort)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::InputPortSource)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::Instance)
+           CXXTEST_ENUM_MEMBER(Parsers::Kind::IntegerExprRef)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::IntegerLiteral)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::LocalParameter)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::Module)

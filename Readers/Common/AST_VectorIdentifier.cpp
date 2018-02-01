@@ -13,6 +13,7 @@
 
 #include "AST_VectorIdentifier.hpp"
 #include "AST_Parameter.hpp"
+#include "AST_IntegerExpr.hpp"
 #include "AST_Builder.hpp"
 
 #include <sstream>
@@ -22,6 +23,26 @@ using std::tuple;
 using std::make_tuple;
 
 using namespace Parsers;
+
+
+//! Constructor...
+AST_VectorIdentifier::AST_VectorIdentifier (std::string&& identifier, AST_IntegerExpr* leftIndex, AST_IntegerExpr* rightIndex)
+  : AST_Identifier (Kind::VectorIdentifier, std::move(identifier))
+  , m_left         (leftIndex)
+  , m_right        (rightIndex)
+{
+  // ---------------- Make sure that left side define the index (or none for scalar identifier)
+  //
+  if ((m_left == nullptr) && (m_right != nullptr))
+  {
+    std::swap(m_left, m_right);
+  }
+}
+//
+//  End of: AST_VectorIdentifier::AST_VectorIdentifier
+//---------------------------------------------------------------------------
+
+
 
 //! Text representation of identifier with its index(es)
 //!
@@ -49,16 +70,16 @@ string AST_VectorIdentifier::AsText () const
 //!
 uint32_t AST_VectorIdentifier::BitsCount () const
 {
-  if (m_right.empty())
+  if (IsMultiBits())
   {
-    return 1u;
+    uint32_t left  = m_left->Evaluate();
+    uint32_t right = m_right->Evaluate();
+
+    return (left > right) ? 1u + (left  - right)
+                          : 1u + (right - left);
   }
 
-  uint32_t left  = static_cast<uint32_t>(std::stoul(m_left));
-  uint32_t right = static_cast<uint32_t>(std::stoul(m_right));
-
-  return (left > right) ? 1u + (left  - right)
-                        : 1u + (right - left);
+  return 1u;
 }
 //
 //  End of: AST_VectorIdentifier::BitsCount
@@ -71,11 +92,51 @@ uint32_t AST_VectorIdentifier::BitsCount () const
 //! @note This is useful to know when it should be uniquified
 bool AST_VectorIdentifier::HasParameterRef () const
 {
-  return    AST_Parameter::HasParameterRef(m_left)
-         || AST_Parameter::HasParameterRef(m_right);
+  if ((m_left != nullptr) && m_left->HasParameterRef())
+  {
+    return true;
+  }
+
+  if ((m_right != nullptr) && m_right->HasParameterRef())
+  {
+    return true;
+  }
+
+  return false;
 }
 //
 //  End of: AST_VectorIdentifier::HasParameterRef
+//---------------------------------------------------------------------------
+
+
+
+//! Returns identifier left index
+//!
+//! @note Do not call when it is a scalar identifier
+//!
+uint32_t AST_VectorIdentifier::LeftIndex () const
+{
+  CHECK_VALUE_NOT_NULL(m_left, "Cannot request left index when none is defined");
+
+  return m_left->Evaluate();
+}
+//
+//  End of: AST_VectorIdentifier::LeftIndex
+//---------------------------------------------------------------------------
+
+
+//! Returns identifier right index
+//!
+//! @note Do not call when it is a scalar identifier
+//!
+uint32_t AST_VectorIdentifier::RightIndex () const
+{
+  CHECK_VALUE_NOT_NULL(m_right, "Cannot request right index when none is defined");
+
+  return m_right->Evaluate();
+}
+//
+//  End of: AST_VectorIdentifier::RightIndex
 //---------------------------------------------------------------------------
 
 
@@ -85,19 +146,19 @@ bool AST_VectorIdentifier::HasParameterRef () const
 //! @return [has_range, left_index, right_index]
 tuple<bool, uint32_t, uint32_t> AST_VectorIdentifier::Range () const
 {
-  if (m_left.empty())
+  if (IsScalar())
   {
     return make_tuple(false, 0u, 0u);
   }
 
-  uint32_t left = static_cast<uint32_t>(std::stoul(m_left));
+  uint32_t left = m_left->Evaluate();
 
-  if (m_right.empty())
+  if (IsSingleBit())
   {
     return make_tuple(true, left, left);
   }
 
-  uint32_t right = static_cast<uint32_t>(std::stoul(m_right));
+  uint32_t right = m_right->Evaluate();
 
   return make_tuple(true, left, right);
 }
@@ -112,11 +173,13 @@ string AST_VectorIdentifier::RangeAsText () const
 {
   std::ostringstream os;
 
-  os << '[' << m_left;
+  CHECK_FALSE(IsScalar(), "Vector identifier must be initialized at least with one index (representing a single bit) to get its range");
 
-  if (!m_right.empty())
+  os << '[' << m_left->AsText();
+
+  if (m_right != nullptr)
   {
-    os << ":" << m_right;
+    os << ":" << m_right->AsText();
   }
 
   os << ']';
@@ -132,14 +195,14 @@ string AST_VectorIdentifier::RangeAsText () const
 //!
 void AST_VectorIdentifier::Resolve (const std::vector<AST_Parameter*>& parameters)
 {
-  if (AST_Parameter::HasParameterRef(m_left))
+  if ((m_left != nullptr) && m_left->HasParameterRef())
   {
-    m_left = AST_Parameter::ReplacedParameters(m_left, parameters);
+    m_left->Resolve(parameters);
   }
 
-  if (AST_Parameter::HasParameterRef(m_right))
+  if ((m_right != nullptr) && m_right->HasParameterRef())
   {
-    m_right = AST_Parameter::ReplacedParameters(m_right, parameters);
+    m_right->Resolve(parameters);
   }
 }
 //
@@ -151,7 +214,19 @@ void AST_VectorIdentifier::Resolve (const std::vector<AST_Parameter*>& parameter
 //!
 AST_VectorIdentifier* AST_VectorIdentifier::UniquifiedClone (AST_Builder& astBuilder) const
 {
-  return astBuilder.Clone_VectorIdentifier(this);
+  auto clone = astBuilder.Clone_VectorIdentifier(this);
+
+  if ((m_left != nullptr) && m_left->HasParameterRef())
+  {
+    clone->m_left = m_left->UniquifiedClone(astBuilder);
+  }
+
+  if ((m_right != nullptr) && m_right->HasParameterRef())
+  {
+    clone->m_right = m_right->UniquifiedClone(astBuilder);
+  }
+
+  return clone;
 }
 //
 //  End of: AST_VectorIdentifier::UniquifiedClone

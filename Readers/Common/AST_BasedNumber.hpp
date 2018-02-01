@@ -67,6 +67,14 @@ class AST_BasedNumber final : public AST_Number
   //!
   uint32_t Size() const override;
 
+  //! Replaces parameter references by their actual number
+  //!
+  void Resolve (const std::vector<AST_Parameter*>& parameters) override;
+
+  //! Returns uniquified clone
+  //!
+  AST_BasedNumber* UniquifiedClone(AST_Builder& astBuilder) const override;
+
   // ---------------- Private Methods
   //
   private:

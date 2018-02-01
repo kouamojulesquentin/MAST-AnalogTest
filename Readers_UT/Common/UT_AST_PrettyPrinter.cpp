@@ -68,8 +68,8 @@ void UT_AST_PrettyPrinter::test_Visit_ScanRegister_empty ()
   // ---------------- Setup
   //
   AST  ast;
-  auto registerIdentifier    = ast.Create_VectorIdentifier("Ecrin", "", "");
-  auto inputSourceIdentifier = ast.Create_VectorIdentifier("SI",    "", "");
+  auto registerIdentifier    = ast.Create_VectorIdentifier("Ecrin", nullptr, nullptr);
+  auto inputSourceIdentifier = ast.Create_VectorIdentifier("SI",    nullptr, nullptr);
   auto sourceSignal          = ast.Create_Signal(inputSourceIdentifier);
   auto source                = ast.Create_Source(Parsers::Kind::ScanInSource, sourceSignal); // An input source is required (and checked)
   auto chidren               = vector<AST_Node*>();

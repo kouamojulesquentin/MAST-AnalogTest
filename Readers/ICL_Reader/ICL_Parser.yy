@@ -35,15 +35,22 @@ namespace Parsers
   class AST;
   class AST_AccessLink;
   class AST_Attribute;
+  class AST_BasedNumber;
   class AST_BsdlInstructionRef;
+  class AST_ConcatNumber;
   class AST_EnumRef;
   class AST_FileRef;
   class AST_Identifier;
   class AST_Instance;
+  class AST_IntegerExpr;
+  class AST_IntegerLiteral;
+  class AST_IntegerBinaryExpr;
+  class AST_IntegerUnaryExpr;
   class AST_ModuleIdentifier;
   class AST_Module;
   class AST_Namespace;
   class AST_Node;
+  class AST_Number;
   class AST_Parameter;
   class AST_ParameterRef;
   class AST_Port;
@@ -59,7 +66,9 @@ namespace Parsers
   class AST_String;
   class AST_Value;
   class AST_VectorIdentifier;
+
   enum class AccessLinkType;
+  enum class Kind : uint8_t;
 }
 
 using std::string;
@@ -92,12 +101,19 @@ typedef void* yyscan_t;
 #include "AST.hpp"
 #include "AST_AccessLink.hpp"
 #include "AST_Attribute.hpp"
+#include "AST_BasedNumber.hpp"
 #include "AST_BsdlInstructionRef.hpp"
+#include "AST_ConcatNumber.hpp"
 #include "AST_EnumRef.hpp"
 #include "AST_FileRef.hpp"
 #include "AST_Instance.hpp"
 #include "AST_ModuleIdentifier.hpp"
 #include "AST_Namespace.hpp"
+#include "AST_IntegerBinaryExpr.hpp"
+#include "AST_IntegerExpr.hpp"
+#include "AST_IntegerExprRef.hpp"
+#include "AST_IntegerLiteral.hpp"
+#include "AST_IntegerUnaryExpr.hpp"
 #include "AST_Parameter.hpp"
 #include "AST_ParameterRef.hpp"
 #include "AST_Port.hpp"
@@ -224,7 +240,6 @@ namespace
 %type <std::tuple<Parsers::AST_ScalarIdentifier*,              std::string>>              accessLink1149_ScanInterface_name
 %type <std::vector<std::tuple<Parsers::AST_ScalarIdentifier*,  std::string>>>             accessLink1149_ScanInterface_names
 
-%type <std::string> index
 %type <Parsers::AST_ParameterRef*> parameter_ref
 
 %type <Parsers::AST_Node*>                     parameter_override
@@ -236,27 +251,35 @@ namespace
 %type <std::string> UNSIZED_BIN_NUM
 %type <std::string> UNSIZED_HEX_NUM
 
-%type <std::string> POS_INT
-%type <std::string> pos_int
-%type <std::string> integer_expr
-%type <std::string> integer_arg_expr
-%type <std::string> integer_factor_expr
-%type <std::string> add_operator
-%type <std::string> integer_term_expr
-%type <std::string> mult_operator
+%type <Parsers::AST_BasedNumber*> unsized_dec_num
+%type <Parsers::AST_BasedNumber*> unsized_bin_num
+%type <Parsers::AST_BasedNumber*> unsized_hex_num
 
-%type <std::string> number
-%type <std::string> number_or_enum
-%type <std::string> concat_number
+%type <Parsers::AST_BasedNumber*> sized_dec_num
+%type <Parsers::AST_BasedNumber*> sized_bin_num
+%type <Parsers::AST_BasedNumber*> sized_hex_num
+
+%type <std::string>                    POS_INT
+%type <Parsers::Kind>                  add_operator
+%type <Parsers::Kind>                  mult_operator
+%type <Parsers::AST_IntegerLiteral*>   pos_int
+%type <Parsers::AST_IntegerExpr*>      integer_arg_expr
+%type <Parsers::AST_IntegerExpr*>      integer_expr
+%type <Parsers::AST_IntegerExpr*>      integer_term_expr
+%type <Parsers::AST_IntegerUnaryExpr*> integer_factor_expr
+%type <Parsers::AST_Number*>           number
+%type <Parsers::AST_ConcatNumber*>     concat_number
+
+%type <std::vector<Parsers::AST_ConcatNumber*>> concat_number_list
+
 %type <std::string> enum_symbol
 %type <std::string> enum_name
-%type <std::string> enum_value
 
 
-%type <std::vector<std::string>> concat_number_list
 
-%type <std::tuple<string, string>> range          // Left & Right indexes
-%type <std::tuple<string, string>> index_or_range // Left & Right indexes (Right can be empty)
+%type <Parsers::AST_IntegerExpr*>                                        index
+%type <std::tuple<Parsers::AST_IntegerExpr*, Parsers::AST_IntegerExpr*>> range          // Left & Right indexes
+%type <std::tuple<Parsers::AST_IntegerExpr*, Parsers::AST_IntegerExpr*>> index_or_range // Left & Right indexes (Right can be empty)
 
 %type <Parsers::AST_Signal*>              signal
 %type <Parsers::AST_Signal*>              signal_or_inverted_signal
@@ -509,52 +532,107 @@ namespace
 
 %%
 
-//size : pos_int | parameter_ref ;
 pos_int :
   POS_INT
   {
     // pos_int : POS_INT
     auto& posInt = $[POS_INT];
-    $$ = std::move(posInt);
+    auto integerLiteral = ast.Create_IntegerLiteral(std::move(posInt));
+    $$ = integerLiteral;
   }
-| ONE  { $$ = "1"; /* pos_int : ONE */ }
-| ZERO { $$ = "0"; /* pos_int : ZERO*/ }
+| ONE
+  {
+    // pos_int : ONE
+    auto integerLiteral = ast.Create_IntegerLiteral(1u);
+    $$ = integerLiteral;
+  }
+| ZERO
+  {
+    // pos_int : ZERO
+    auto integerLiteral = ast.Create_IntegerLiteral(0u);
+    $$ = integerLiteral;
+  }
 ;
 
+unsized_dec_num:
+  UNSIZED_DEC_NUM
+  {
+    // unsized_dec_num : UNSIZED_DEC_NUM
+    auto digits = $[UNSIZED_DEC_NUM];
+    auto node   = ast.Create_BasedNumber(Parsers::Kind::Number_Decimal, std::move(digits));
+
+    $$ = node;
+  }
+;
+
+unsized_bin_num:
+  UNSIZED_BIN_NUM
+  {
+    // unsized_bin_num : UNSIZED_BIN_NUM
+    auto digits = $[UNSIZED_BIN_NUM];
+    auto node   = ast.Create_BasedNumber(Parsers::Kind::Number_Binary, std::move(digits));
+
+    $$ = node;
+  }
+;
+
+unsized_hex_num:
+  UNSIZED_HEX_NUM
+  {
+    // unsized_hex_num : UNSIZED_HEX_NUM
+    auto digits = $[UNSIZED_HEX_NUM];
+    auto node   = ast.Create_BasedNumber(Parsers::Kind::Number_Hexa, std::move(digits));
+
+    $$ = node;
+  }
+;
+
+sized_dec_num:
+  integer_expr unsized_dec_num
+  {
+    // sized_dec_num : integer_expr unsized_dec_num
+    auto sizeExpr    = $[integer_expr];
+    auto basedNumber = $[unsized_dec_num];
+    basedNumber->SizeExpr(sizeExpr);
+
+    $$ = basedNumber;
+  }
+;
+
+sized_bin_num:
+  integer_expr unsized_bin_num
+  {
+    // sized_bin_num : integer_expr unsized_bin_num
+    auto sizeExpr    = $[integer_expr];
+    auto basedNumber = $[unsized_bin_num];
+    basedNumber->SizeExpr(sizeExpr);
+
+    $$ = basedNumber;
+  }
+;
+
+sized_hex_num:
+  integer_expr unsized_hex_num
+  {
+    // sized_hex_num : integer_expr unsized_hex_num
+    //
+    auto sizeExpr    = $[integer_expr];
+    auto basedNumber = $[unsized_hex_num];
+    basedNumber->SizeExpr(sizeExpr);
+
+    $$ = basedNumber;
+  }
+;
+
+
 number :
-  UNSIZED_DEC_NUM   { $$ = std::move($1); /* number : UNSIZED_DEC_NUM */ }
-| UNSIZED_BIN_NUM   { $$ = std::move($1); /* number : UNSIZED_BIN_NUM */ }
-| UNSIZED_HEX_NUM   { $$ = std::move($1); /* number : UNSIZED_HEX_NUM */ }
-| integer_expr UNSIZED_DEC_NUM
-  {
-    // number : integer_expr UNSIZED_DEC_NUM
-    auto expr = std::move($[integer_expr]);
-    expr.append(" ").append($[UNSIZED_DEC_NUM]);
-
-    $$ = std::move(expr);
-  }
-| integer_expr UNSIZED_BIN_NUM
-  {
-    // number : integer_expr UNSIZED_BIN_NUM
-    auto expr = std::move($[integer_expr]);
-    expr.append($[UNSIZED_BIN_NUM]);
-
-    $$ = std::move(expr);
-  }
-| integer_expr UNSIZED_HEX_NUM
-  {
-    // number : integer_expr UNSIZED_HEX_NUM
-    auto expr = std::move($[integer_expr]);
-    expr.append($[UNSIZED_HEX_NUM]);
-
-    $$ = expr;
-  }
-| integer_expr
-  {
-    // number : integer_expr
-    auto& expr = $[integer_expr];
-    $$ = std::move(expr);
-  }
+  unsized_dec_num { $$ = $1; /* number : unsized_dec_num */ }
+| unsized_bin_num { $$ = $1; /* number : unsized_bin_num */ }
+| unsized_hex_num { $$ = $1; /* number : unsized_hex_num */ }
+| sized_dec_num   { $$ = $1; /* number : sized_dec_num */   }
+| sized_bin_num   { $$ = $1; /* number : sized_bin_num */   }
+| sized_hex_num   { $$ = $1; /* number : sized_hex_num */   }
+| integer_expr    { $$ = $1; /* number : integer_expr */    }
 ;
 
 // 6.3.12
@@ -562,26 +640,32 @@ vector_id : SCALAR_ID LEFT_BRACKET index_or_range RIGHT_BRACKET
 {
   // vector_id : SCALAR_ID LEFT_BRACKET index_or_range RIGHT_BRACKET
   auto& baseName   = $[SCALAR_ID];
-  auto& left       = std::get<0>($[index_or_range]);
-  auto& right      = std::get<1>($[index_or_range]);
-  auto  identifier = ast.Create_VectorIdentifier(std::move(baseName), std::move(left), std::move(right));
+  auto  left       = std::get<0>($[index_or_range]);
+  auto  right      = std::get<1>($[index_or_range]);
+  auto  identifier = ast.Create_VectorIdentifier(std::move(baseName), left, right);
 
   $$ = identifier;
 }
 ;
 
 index_or_range :
-  index { $$ = make_tuple(std::move($[index]), ""s); /* index_or_range : index */ }
-| range { $$ = std::move($1);                        /* index_or_range : range */ }
+  index { $$ = make_tuple($[index], nullptr); /* index_or_range : index */ }
+| range { $$ = $1;                            /* index_or_range : range */ }
 ;
 
-index : integer_expr { $$ = std::move($1); };
+index : integer_expr
+{
+  // index : integer_expr
+  $$ = $1;
+};
+
 range : index[LEFT] COLON index[RIGHT]
 {
   // range : index[LEFT] COLON index[RIGHT]
-  auto& left  = $[LEFT];
-  auto& right = $[RIGHT];
-  $$          = make_tuple(std::move(left), std::move(right));
+  auto left  = $[LEFT];
+  auto right = $[RIGHT];
+
+  $$ = make_tuple(left, right);
 }
 ;
 
@@ -590,17 +674,17 @@ integer_expr :
   integer_term_expr
   {
     // integer_expr : integer_term_expr
-    $$ = std::move($1);
+    $$ = $1;
   }
 | integer_term_expr add_operator integer_expr[rhs]
   {
     // integer_expr : integer_term_expr add_operator integer_expr[rhs]
-    auto lhsExpr  = $[integer_term_expr];
-    auto op       = $[add_operator];
-    auto rhsExpr  = $[rhs];
-    auto combined = lhsExpr.append(op).append(rhsExpr);
+    auto lhsExpr    = $[integer_term_expr];
+    auto op         = $[add_operator];
+    auto rhsExpr    = $[rhs];
+    auto binaryExpr = ast.Create_IntegerBinaryExpr(op, lhsExpr, rhsExpr);
 
-    $$ = std::move(combined);
+    $$ = binaryExpr;
   }
 ;
 
@@ -608,51 +692,50 @@ integer_term_expr :
   integer_arg_expr
   {
     // integer_term_expr : integer_arg_expr
-    $$ = std::move($1);
+    $$ = $1;
   }
 | integer_arg_expr mult_operator integer_term_expr[rhs]
   {
     // integer_term_expr : integer_arg_expr mult_operator integer_term_expr[rhs]
-    auto lhsExpr  = $[integer_arg_expr];
-    auto op       = $[mult_operator];
-    auto rhsExpr  = $[rhs];
-    auto combined = lhsExpr.append(op).append(rhsExpr);
+    auto lhsExpr    = $[integer_arg_expr];
+    auto op         = $[mult_operator];
+    auto rhsExpr    = $[rhs];
+    auto binaryExpr = ast.Create_IntegerBinaryExpr(op, lhsExpr, rhsExpr);
 
-    $$ = std::move(combined);
+    $$ = binaryExpr;
   }
 ;
 
 add_operator :
-  PLUS  { $$ = " + "; /* add_operator: PLUS */}
-| MINUS { $$ = " - "; /* add_operator: MINUS*/}
+  PLUS  { $$ = Parsers::Kind::Operator_Add;        /* add_operator: PLUS */}
+| MINUS { $$ = Parsers::Kind::Operator_Substract;  /* add_operator: MINUS*/}
 ;
 
 mult_operator :
-  STAR    { $$ = " * ";  /* mult_operator : STAR */}
-| SLASH   { $$ = " / ";  /* mult_operator : SLASH*/}
-| PERCENT { $$ = " % ";  /* mult_operator : PERCENT*/}
+  STAR    { $$ = Parsers::Kind::Operator_Multiply;  /* mult_operator : STAR */}
+| SLASH   { $$ = Parsers::Kind::Operator_Divide;    /* mult_operator : SLASH*/}
+| PERCENT { $$ = Parsers::Kind::Operator_Modulo;    /* mult_operator : PERCENT*/}
 ;
 
 integer_factor_expr : LEFT_PAREN integer_expr RIGHT_PAREN
 {
   // integer_factor_expr : LEFT_PAREN integer_expr RIGHT_PAREN
-  auto combined = "("s.append($[integer_expr]).append(")");
-  $$ = std::move(combined);
+  auto unaryExpr = ast.Create_IntegerUnaryExpr(Parsers::Kind::ParenthesizedExpr, $[integer_expr]);
+
+  $$ = unaryExpr;
 }
 ;
 
 integer_arg_expr :
-  integer_factor_expr { $$ = std::move($1);  /* integer_arg_expr : integer_factor_expr */ }
-| pos_int             { $$ = std::move($1);  /* integer_arg_expr : pos_int*/ }
+  integer_factor_expr { $$ = $1;  /* integer_arg_expr : integer_factor_expr */ }
+| pos_int             { $$ = $1;  /* integer_arg_expr : pos_int*/ }
 | parameter_ref
   {
     // integer_arg_expr : parameter_ref
-    auto parameterRef = $[parameter_ref];
-    auto asString     = "$"s.append(parameterRef->Name());
+    auto parameterRef   = $[parameter_ref];
+    auto integerExprRef = ast.Create_IntegerExprRef(parameterRef);
 
-    LOG(DEBUG) << "parameter_ref has been downgraded as mere string !!!";
-
-    $$ = std::move(asString);
+    $$ = integerExprRef;
   }
 ;
 
@@ -672,31 +755,44 @@ concat_number :
   number
   {
     // concat_number : number
-    auto& numberValue = $[number];
-    $$ = std::move(numberValue);
+    auto numberNode   = $[number];
+    auto concatNumber = ast.Create_ConcatNumber();
+
+    concatNumber->Append(numberNode);
+
+    $$ = concatNumber;
   }
 | TILDE number
   {
     // concat_number : TILDE number
-    auto expr = "~"s.append($[number]);
+    auto numberNode   = $[number];
+    auto concatNumber = ast.Create_ConcatNumber();
 
-    $$ = std::move(expr);
+    numberNode->IsInverted(true);
+    concatNumber->Append(numberNode);
+
+    $$ = concatNumber;
   }
 | concat_number[lhs_concat_number] COMMA number
   {
     // concat_number : concat_number COMMA number
-    auto expr = std::move($[lhs_concat_number]);
-    expr.append(", ").append($[number]);
+    auto numberNode   = $[number];
+    auto concatNumber = $[lhs_concat_number];
 
-    $$ = std::move(expr);
+    concatNumber->Append(numberNode);
+
+    $$ = concatNumber;
   }
 | concat_number[lhs_concat_number] COMMA TILDE number
   {
     // concat_number : concat_number COMMA TILDE number
-    auto expr = std::move($[lhs_concat_number]);
-    expr.append(", ~").append($[number]);
+    auto numberNode   = $[number];
+    auto concatNumber = $[lhs_concat_number];
 
-    $$ = std::move(expr);
+    numberNode->IsInverted(true);
+    concatNumber->Append(numberNode);
+
+    $$ = concatNumber;
   }
 ;
 
@@ -704,12 +800,13 @@ concat_number_list :
   concat_number
   {
     // concat_number
-    vector<string> concatList;
-    auto&          number = $[concat_number];
+    vector<Parsers::AST_ConcatNumber*> concatList;
 
-    if (!number.empty())
+    auto concatNumber = $[concat_number];
+
+    if (concatNumber != nullptr)
     {
-      concatList.emplace_back(std::move(number));
+      concatList.emplace_back(concatNumber);
     }
 
     $$ = std::move(concatList);
@@ -717,12 +814,12 @@ concat_number_list :
 | concat_number_list[lhs] PIPE concat_number
   {
     // concat_number_list PIPE concat_number
-    auto& concatList = $[lhs];
-    auto& number     = $[concat_number];
+    auto& concatList   = $[lhs];
+    auto& concatNumber = $[concat_number];
 
-    if (!number.empty())
+    if (concatNumber != nullptr)
     {
-      concatList.emplace_back(std::move(number));
+      concatList.emplace_back(concatNumber);
     }
 
     $$ = std::move(concatList);
@@ -734,7 +831,7 @@ scalar_or_vector_id:
   {
     // scalar_or_vector_id : SCALAR_ID
     auto& name       = $[SCALAR_ID];
-    auto  identifier = ast.Create_VectorIdentifier(std::move(name), "", "");
+    auto  identifier = ast.Create_VectorIdentifier(std::move(name), nullptr, nullptr);
 
     $$ = identifier;
   }
@@ -2115,41 +2212,39 @@ signal_or_enum : number | SCALAR_ID | pin_id;
 scanRegister_captureSource    : CAPTURESOURCE    signal_or_enum SEMICOLON { $$ = nullptr; /* scanRegister_captureSource : CAPTURESOURCE signal_or_enum SEMICOLON */};
 
 
-scanRegister_defaultLoadValue : DEFAULTLOADVALUE number_or_enum SEMICOLON
-{
-  // scanRegister_defaultLoadValue : DEFAULTLOADVALUE number_or_enum SEMICOLON
-  auto& valueExpression = $[number_or_enum];
-  auto  node            = ast.Create_Value(Parsers::Kind::DefaultLoadValue, valueExpression);
+scanRegister_defaultLoadValue :
+  DEFAULTLOADVALUE concat_number SEMICOLON
+  {
+    // scanRegister_defaultLoadValue : DEFAULTLOADVALUE concat_number SEMICOLON
+    auto concatNumber = $[concat_number];
+    auto node         = ast.Create_Value(Parsers::Kind::DefaultLoadValue, concatNumber);
 
-  $$ = node;
-};
+    $$ = node;
+  }
+| DEFAULTLOADVALUE enum_symbol SEMICOLON
+  {
+    // scanRegister_defaultLoadValue : DEFAULTLOADVALUE enum_symbol SEMICOLON
+    CHECK_FAILED("Enum symbol is not yet supported for ScanRegister default load value");
+  }
+;
 
-scanRegister_resetValue : RESETVALUE number_or_enum SEMICOLON
-{
-  // scanRegister_resetValue : RESETVALUE number_or_enum SEMICOLON
-  auto& valueExpression = $[number_or_enum];
-  auto  node            = ast.Create_Value(Parsers::Kind::ResetValue, valueExpression);
+scanRegister_resetValue :
+  RESETVALUE concat_number SEMICOLON
+  {
+    // scanRegister_resetValue : RESETVALUE concat_number SEMICOLON
+    auto& concatNumber = $[concat_number];
+    auto  node         = ast.Create_Value(Parsers::Kind::ResetValue, concatNumber);
 
-  $$ = node;
-}
+    $$ = node;
+  }
+| RESETVALUE enum_symbol SEMICOLON
+  {
+    // scanRegister_resetValue : RESETVALUE enum_symbol SEMICOLON
+    CHECK_FAILED("Enum symbol is not yet supported for ScanRegister reset value");
+  }
 ;
 
 scanRegister_refEnum : REFENUM enum_name SEMICOLON { $$ = nullptr; /* scanRegister_refEnum : REFENUM enum_name SEMICOLON */};
-
-number_or_enum :
-  concat_number
-  {
-    // number_or_enum : concat_number
-    auto& numbers = $[concat_number];
-    $$ = std::move(numbers);
-  }
-| enum_symbol
-  {
-    // number_or_enum : enum_symbol
-    auto& enumSymbol = $[enum_symbol];
-    $$ = std::move(enumSymbol);
-  }
-;
 
 // 6.4.9
 dataRegister_def : DATAREGISTER dataRegister_name dataRegister_tail
@@ -2172,8 +2267,14 @@ dataRegister_common : dataRegister_resetValue |
 dataRegister_defaultLoadValue |
 dataRegister_refEnum |
 attribute_def ;
-dataRegister_resetValue : RESETVALUE number_or_enum SEMICOLON;
-dataRegister_defaultLoadValue : DEFAULTLOADVALUE number_or_enum SEMICOLON ;
+dataRegister_resetValue :
+  RESETVALUE concat_number SEMICOLON
+| RESETVALUE enum_symbol SEMICOLON
+;
+dataRegister_defaultLoadValue :
+  DEFAULTLOADVALUE concat_number SEMICOLON
+| DEFAULTLOADVALUE enum_symbol SEMICOLON
+;
 dataRegister_refEnum : REFENUM enum_name SEMICOLON ;
 //For Selectable Data Register:
 dataRegister_selectable : dataRegister_writeEnSource |
@@ -2716,7 +2817,7 @@ enum_name : SCALAR_ID
   $$ = std::move(enumName);
 }
 ;
-enum_item : enum_symbol EQUAL enum_value SEMICOLON ;
+enum_item : enum_symbol EQUAL concat_number SEMICOLON ;
 enum_symbol : SCALAR_ID
 {
   // enum_symbol : SCALAR_ID
@@ -2724,14 +2825,6 @@ enum_symbol : SCALAR_ID
   $$ = std::move(enumSymbol);
 }
 ;
-
-enum_value : concat_number
-{
-  // enum_value : concat_number
-  auto& concatNumber = $[concat_number];
-  $$ = std::move(concatNumber);
-};
-
 
 concat_string :
   STRING
@@ -2849,9 +2942,9 @@ attribute_def :
 | ATTRIBUTE attribute_name EQUAL concat_number SEMICOLON
   {
     // attribute_def : ATTRIBUTE attribute_name EQUAL concat_number SEMICOLON
-    auto& name  = $[attribute_name];
-    auto  value = $[concat_number];
-    auto  node  = ast.Create_Attribute(std::move(name), std::move(value));
+    auto& name        = $[attribute_name];
+    auto  concatNumber= $[concat_number];
+    auto  node        = ast.Create_Attribute(std::move(name), concatNumber);
 
     $$ = node;
   }

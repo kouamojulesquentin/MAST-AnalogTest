@@ -22,7 +22,9 @@
 
 namespace Parsers
 {
-//! Represents some value
+class AST_ConcatNumber;
+
+//! Represents a number and kind of target (to ease member assignment from a bunch of children)
 //!
 class AST_Value final : public AST_SimpleNode
 {
@@ -32,28 +34,28 @@ class AST_Value final : public AST_SimpleNode
   ~AST_Value() = default;
   AST_Value()  = delete;
 
-  std::string AsText() const override { return m_valueExpression; }; //!< Text representation of value
+  std::string AsText() const override; //!< Text representation of value
 
-  mast::BinaryVector AsBinaryVector() const;    //!< Value as a BinaryVector
+  mast::BinaryVector AsBinaryVector(uint32_t targetSize) const;    //!< Value as a BinaryVector
 
   // ---------------- Private Methods
   //
   private:
   friend class AST;                                                             // This is AST that manages construction/destruction of AST nodes
-  MAKE_UNIQUE_AS_FRIEND(AST_Value)(Parsers::Kind& kind, std::experimental::string_view&); // AST currently uses make_unit<T>() to create nodes
+  MAKE_UNIQUE_AS_FRIEND(AST_Value)(Parsers::Kind& kind, Parsers::AST_ConcatNumber*&); // AST currently uses make_unit<T>() to create nodes
 
   //! Initializes the value with specific value kind
   //!
-  AST_Value(Kind kind, std::experimental::string_view valueExpression)
-    : AST_SimpleNode    (kind)
-    , m_valueExpression (valueExpression)
+  AST_Value(Kind kind, AST_ConcatNumber* concatNumber)
+    : AST_SimpleNode (kind)
+    , m_concatNumber (concatNumber)
   {
   }
 
   // ---------------- Private Fields
   //
   private:
-  std::string   m_valueExpression;  //!< Expression representing the value
+  AST_ConcatNumber* m_concatNumber = nullptr; //!< The effective, represented, number
 };
 //
 //  End of AST_Value class declaration

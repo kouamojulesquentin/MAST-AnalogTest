@@ -19,6 +19,9 @@
 
 namespace Parsers
 {
+class AST_Builder;
+class AST_Parameter;
+
 //! Represents a number that is either an integer expression or a "based" number (vector)
 //!
 //! @note In ICL grammar, a number expression (excerpt) is:
@@ -57,6 +60,14 @@ class AST_Number : public AST_SimpleNode
   //! @note Invertion (i.e. bits toggling) can be used in context of convertion to BinaryVector
   //!
   void IsInverted (bool isInverted) { m_isInverted = isInverted; }
+
+  //! Replaces parameter references by its actual number
+  //!
+  virtual void Resolve (const std::vector<AST_Parameter*>& parameters) = 0;
+
+  //! Returns uniquified clone
+  //!
+  virtual AST_Number* UniquifiedClone(AST_Builder& astBuilder) const = 0;
 
   // ---------------- Protected Methods
   //

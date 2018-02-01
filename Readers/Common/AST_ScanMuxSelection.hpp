@@ -22,6 +22,7 @@
 namespace Parsers
 {
 class AST_Signal;
+class AST_ConcatNumber;
 
 //! Represents a scan chain multiplexer
 //!
@@ -39,7 +40,7 @@ class AST_ScanMuxSelection final : public AST_SimpleNode
   //!
   //! @note several different values can select the same set of signals
   //!
-  const std::vector<std::string>& SelectionsValues() const { return m_selectionValues; }
+  const std::vector<AST_ConcatNumber*>& SelectionsValues() const { return m_selectionValues; }
 
   //! Selected signal(s) when multiplexer selector has one of selection values
   //!
@@ -50,17 +51,17 @@ class AST_ScanMuxSelection final : public AST_SimpleNode
   private:
 
   friend class AST;   // This is AST that manages construction/destruction of AST nodes (it uses make_unit<T>() to create nodes)
-  MAKE_UNIQUE_AS_FRIEND(AST_ScanMuxSelection)(std::vector<std::string>&& selectionValues, std::vector<Parsers::AST_Signal*>&& selectedSignals);
+  MAKE_UNIQUE_AS_FRIEND(AST_ScanMuxSelection)(std::vector<Parsers::AST_ConcatNumber*>&& selectionValues, std::vector<Parsers::AST_Signal*>&& selectedSignals);
 
 
   //! Initializes AST_ScanMuxSelection with selection values and selected signals
   //!
-  AST_ScanMuxSelection(std::vector<std::string>&& selectionValues, std::vector<Parsers::AST_Signal*>&& selectedSignals);
+  AST_ScanMuxSelection(std::vector<AST_ConcatNumber*>&& selectionValues, std::vector<Parsers::AST_Signal*>&& selectedSignals);
 
   // ---------------- Private Fields
   //
   private:
-  std::vector<std::string>          m_selectionValues; //!< Selection values
+  std::vector<AST_ConcatNumber*>    m_selectionValues; //!< Selection values
   std::vector<Parsers::AST_Signal*> m_selectedSignals; //!< Selected signal when multiplexer selector has one of selection values
 };
 //

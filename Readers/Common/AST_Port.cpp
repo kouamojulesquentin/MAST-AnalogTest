@@ -25,6 +25,41 @@ using std::vector;
 using namespace Parsers;
 
 
+//! Initializes an AST_Port with just an identifier
+//!
+//! @param kind         Kind of port
+//! @param identifier   Port identifier
+AST_Port::AST_Port (Kind kind, AST_VectorIdentifier* identifier)
+  : AST_ParentNode (kind)
+  , m_identifier   (CHECK_PARAMETER_NOT_NULL(identifier, "Port must be initialized with a valid (not nullptr) identifier"))
+{
+}
+//
+//  End of: AST_Port::AST_Port
+//---------------------------------------------------------------------------
+
+
+
+//! Initializes an AST_Port with identifier and children nodes
+//!
+//! @param kind         Kind of port
+//! @param identifier   Port identifier
+//! @param children     Port children
+//!
+AST_Port::AST_Port (Kind kind, AST_VectorIdentifier* identifier, std::vector<AST_Node*>&& children)
+  : AST_ParentNode (kind, std::move(children))
+  , m_identifier   (CHECK_PARAMETER_NOT_NULL(identifier, "Port must be initialized with a valid (not nullptr) identifier"))
+{
+  DispatchChildren();
+  CleanupChildren();
+}
+//
+//  End of: AST_Port::AST_Port
+//---------------------------------------------------------------------------
+
+
+
+
 
 //! Visited part of the Visitor pattern
 //!

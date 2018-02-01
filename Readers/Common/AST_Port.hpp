@@ -79,19 +79,8 @@ class AST_Port final : public AST_ParentNode
                                   Parsers::AST_VectorIdentifier*&,
                                   std::vector<AST_Node*>&&);
 
-  AST_Port(Kind kind, AST_VectorIdentifier* identifier)
-    : AST_ParentNode (kind)
-    , m_identifier   (identifier)
-  {
-  }
-
-  AST_Port(Kind kind, AST_VectorIdentifier* identifier, std::vector<AST_Node*>&& children)
-    : AST_ParentNode (kind, std::move(children))
-    , m_identifier   (identifier)
-  {
-    DispatchChildren();
-    CleanupChildren();
-  }
+  AST_Port(Kind kind, AST_VectorIdentifier* identifier);
+  AST_Port(Kind kind, AST_VectorIdentifier* identifier, std::vector<AST_Node*>&& children);
 
   //! Dispatches children to specific members
   //!

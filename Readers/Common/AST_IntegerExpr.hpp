@@ -20,6 +20,7 @@
 
 namespace Parsers
 {
+class AST_Builder;
 
 //! Represents an integer expression that resolves to unsigned integer (implicitly always positive)
 //!
@@ -51,6 +52,10 @@ class AST_IntegerExpr : public AST_Number
   //! Throws because an integer expression is never sized!
   //!
   uint32_t Size() const override;
+
+  //! Returns uniquified clone
+  //!
+  virtual AST_IntegerExpr* UniquifiedClone(AST_Builder& astBuilder) const = 0;
 
   // ---------------- Protected Methods
   //

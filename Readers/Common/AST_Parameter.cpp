@@ -14,6 +14,7 @@
 #include "AST_Builder.hpp"
 #include "AST_Parameter.hpp"
 #include "AST_ParameterRef.hpp"
+#include "AST_ConcatNumber.hpp"
 #include "AST_String.hpp"
 #include "Utility.hpp"
 
@@ -38,15 +39,15 @@ using namespace Parsers;
 //!
 //! @param kind         Either Parameter or LocalParameter
 //! @param name         Parameter name
-//! @param numbersValue Numbers that define parameter value
+//! @param concatNumber Numbers that define parameter value
 //!
-AST_Parameter::AST_Parameter (Kind kind, string&& name, string&& numbersValue)
+AST_Parameter::AST_Parameter (Kind kind, string&& name, AST_ConcatNumber* concatNumber)
   : AST_SimpleNode (kind)
   , m_name         (std::move(name))
-  , m_numbersValue (std::move(numbersValue))
+  , m_concatNumber (concatNumber)
 {
-  CHECK_PARAMETER_NOT_EMPTY(m_name,         "Parameter definition must have a valid, not empty, name");
-  CHECK_PARAMETER_NOT_EMPTY(m_numbersValue, "Parameter definition must have a valid, not empty, number or number expression");
+  CHECK_PARAMETER_NOT_EMPTY (m_name,         "Parameter definition must have a valid, not empty, name");
+  CHECK_PARAMETER_NOT_NULL  (m_concatNumber, "Parameter definition must have a valid, not empty, number, number expression or numbers concatenation");
 }
 //
 //  End of: AST_Parameter::AST_Parameter
@@ -82,9 +83,9 @@ string AST_Parameter::AsText () const
 
   os << m_name;
 
-  if      (!m_numbersValue.empty())
+  if      (m_concatNumber != nullptr)
   {
-    os << " = " << m_numbersValue;
+    os << " = " << m_concatNumber->AsText();
   }
   else if (!m_stringsValue.empty())
   {
@@ -120,9 +121,9 @@ bool AST_Parameter::HasParameterRef () const
 {
   // ---------------- When represents a number
   //
-  if (!m_numbersValue.empty())
+  if (m_concatNumber != nullptr)
   {
-    return Utility::Contains(m_numbersValue, '$');
+    return m_concatNumber->HasParameterRef();
   }
 
   // ---------------- When represents a string
@@ -179,65 +180,6 @@ string AST_Parameter::ReducedStringExpr (const vector<AST_SimpleNode*>& stringsV
 
 
 
-//! Returns a copy of number expression with parameters references replaces with the actual parameter value
-//!
-//! @param numberValue  Number expression with some parameter reference(s)
-//! @param parameters   Parameters value (they are supposed to be resolved i.e. do not contain parameter references)
-//!
-string AST_Parameter::ReplacedParameters (const string& numberValue, const vector<AST_Parameter*>& parameters)
-{
-  CHECK_PARAMETER_NOT_EMPTY(numberValue, "Number value must be non empty");
-
-  // Lamba: Creates a string_view from result sub-match
-  auto makeStringView = [](const auto& subMatch)
-  {
-    return string_view(subMatch.first, subMatch.length());
-  };
-
-  auto   newNumberValue = numberValue;
-  regex  paramRefRegex( R"(\$(\w+))");
-  cmatch searchResults;
-
-  size_t searchOffset = 0;
-
-  while (regex_search(&*newNumberValue.cbegin() + searchOffset, &*newNumberValue.cend(), searchResults, paramRefRegex))
-  {
-    CHECK_VALUE_EQ(searchResults.size(), 2u, "Houps successful match of parameter_ref must have exactly 2 sub-matches");
-
-    auto parameterNameSubMatch = searchResults[1u];
-    auto parameterName         = string_view(parameterNameSubMatch.first, parameterNameSubMatch.length());
-    auto parameter             = LocateParameterDef(parameterName, parameters);
-
-    CHECK_PARAMETER_NOT_NULL(parameter, "Houps: LocateParameterDef must return a valid (not nullptr) parameter definition");
-
-    CHECK_TRUE(parameter->IsNumber(), "Parameter reference \""s.append(parameterName.cbegin(), parameterName.cend()).append("\" must refer to a parameter of type number"));
-
-    // ---------------- Replace parameter reference with parameter value
-    //
-    const auto  prefix         = makeStringView(searchResults.prefix());
-    const auto& parameterValue = parameter->m_numbersValue;
-    const auto  suffix         = makeStringView(searchResults.suffix());
-
-    string newValue(newNumberValue.cbegin(), newNumberValue.cbegin() + searchOffset);
-
-    newValue.append(prefix.cbegin(), prefix.cend());
-    newValue.append(parameterValue);
-    newValue.append(suffix.cbegin(), suffix.cend());
-    newNumberValue = newValue;
-
-    // ---------------- Update search range
-    //
-    searchOffset += prefix.length() + parameterValue.length();
-  }
-
-  return newNumberValue;
-}
-//
-//  End of: AST_Parameter::ReplacedParameters
-//---------------------------------------------------------------------------
-
-
-
 //! Replaces parameter references nodes with parameter string value
 //!
 //! @param nodes        Collection with parameter references nodes to replace with string parameter value
@@ -271,8 +213,8 @@ void AST_Parameter::ReplaceStringParameters (vector<AST_SimpleNode*>& nodes, con
 
 //! Replaces parameter references used by this parameter (solving transitive definitions)
 //!
-//! @param           astBuilder Interface to clone some kind of AST nodes (it is responsible for the memory management)
-//! @param [in, out] parameters Parameter definitions to use to replace parameter reference(s)
+//! @param           astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
+//! @param [in, out] parameters   Parameter definitions to use to replace parameter reference(s)
 //!
 void AST_Parameter::Resolve (AST_Builder& astBuilder, vector<AST_Parameter*>& parameters)
 {
@@ -281,10 +223,9 @@ void AST_Parameter::Resolve (AST_Builder& astBuilder, vector<AST_Parameter*>& pa
   AT_SCOPE_EXIT([&]() { m_parameterRefResolutionInProgress = false; });
   m_parameterRefResolutionInProgress = true;
 
-  if (!m_numbersValue.empty())
+  if (m_concatNumber != nullptr)
   {
-    Resolve(astBuilder, m_numbersValue, parameters);
-//+    m_numbersValue = ReducedValueExpr(m_numbersValue);
+    m_concatNumber->Resolve(parameters);
   }
   else if (!m_stringsValue.empty())
   {
@@ -294,71 +235,6 @@ void AST_Parameter::Resolve (AST_Builder& astBuilder, vector<AST_Parameter*>& pa
 
     m_stringsValue.clear();
     m_stringsValue.push_back(stringNode);
-  }
-}
-//
-//  End of: AST_Parameter::Resolve
-//---------------------------------------------------------------------------
-
-
-
-//! Replaces parameter references within string definition with referred parameter value
-//!
-//! @param            astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
-//! @param [in, out]  numberValue  Number expression containing Parameter reference(s)
-//! @param [in, out]  parameters   Parameters actual values
-//!
-void AST_Parameter::Resolve (AST_Builder&            astBuilder,
-                             string&                 numberValue,
-                             vector<AST_Parameter*>& parameters)
-{
-  CHECK_PARAMETER_NOT_EMPTY(numberValue, "Number value must be non empty");
-
-  // Lamba: Creates a string_view from result sub-match
-  auto makeStringView = [](const auto& subMatch)
-  {
-    return string_view(subMatch.first, subMatch.length());
-  };
-
-  regex  paramRefRegex(R"(\$(\w+))");
-  cmatch results;
-  string newValue;  // Will accumulate stuff before Parameter Reference and Parameter actual value
-  size_t searchOffset = 0;
-
-  while (regex_search(&*numberValue.cbegin() + searchOffset, &*numberValue.cend(), results, paramRefRegex) && !results.empty())
-  {
-    CHECK_VALUE_EQ(results.size(), 2u, "Houps successful match of parameter_ref must have exactly 2 sub-matches");
-
-    auto parameterNameSubMatch = results[1u];
-    auto parameterName         = string_view(parameterNameSubMatch.first, parameterNameSubMatch.length());
-    auto parameter             = LocateParameterDef(parameterName, parameters);
-
-    CHECK_PARAMETER_NOT_NULL(parameter, "Houps: LocateParameterDef must return a valid (not nullptr) parameter definition");
-
-    CHECK_TRUE(parameter->IsNumber(), "Parameter reference \""s.append(parameterName.cbegin(), parameterName.cend()).append("\" must refer to a parameter of type number"));
-
-    if (parameter->HasParameterRef())
-    {
-      parameter->Resolve(astBuilder, parameters);
-    }
-
-    // ---------------- Replace parameter reference with parameter value
-    //
-    const auto  prefix         = makeStringView(results.prefix());
-    const auto& parameterValue = parameter->m_numbersValue;
-
-    newValue.append(prefix.cbegin(), prefix.cend());
-    newValue.append(parameterValue);
-
-    searchOffset += prefix.length() + parameterName.length() + 1u;  // +1 is for '$' character
-  }
-
-  // ---------------- Accumulate remaining stuff
-  //
-  if (searchOffset != 0)
-  {
-    newValue.append(numberValue.cbegin() + searchOffset, numberValue.cend());
-    numberValue = newValue;
   }
 }
 //
@@ -420,11 +296,17 @@ void AST_Parameter::Resolve (AST_Builder&             astBuilder,
 //! @note Only uniquifies parts that can be replaced during Parameter_Ref resolution
 //! @note A Parameter Reference is never modified, when needed, it is replaced as a all by a Parameter Value
 //!
+//! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
+//!
 //! @return Returns cloned AST_Parameter (with not shared members)
 AST_Parameter* AST_Parameter::UniquifiedClone (AST_Builder& astBuilder) const
 {
   auto newParameter = astBuilder.Clone_Parameter(this);
 
+  if (m_concatNumber != nullptr)
+  {
+    newParameter->m_concatNumber = m_concatNumber->UniquifiedClone(astBuilder);
+  }
   return newParameter;
 }
 //

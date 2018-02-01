@@ -41,22 +41,7 @@ void AST_ScanRegister::Accept (AST_Visitor& visitor)
 //!
 size_t AST_ScanRegister::BitsCount () const
 {
-  const auto& left  = m_identifier->LeftIndex();
-  const auto& right = m_identifier->RightIndex();
-
-  if (right.empty() || (left == right))
-  {
-    return 1u;
-  }
-
-  auto leftAsInt  = std::stoul(left);
-  auto rightAsInt = std::stoul(right);
-
-  auto count = 1u;
-  count += (rightAsInt > leftAsInt) ? rightAsInt - leftAsInt
-                                    : leftAsInt  - rightAsInt;
-
-  return count;
+  return static_cast<size_t>(m_identifier->BitsCount());
 }
 //
 //  End of: AST_ScanRegister::BitsCount
@@ -91,9 +76,9 @@ void AST_ScanRegister::DispatchChildren ()
 //---------------------------------------------------------------------------
 
 
-//! Returns scan register left index or empty string when defined as a scalar identifier (single bit)
+//! Returns scan register left index (when not defined as a scalar identifier)
 //!
-const string& AST_ScanRegister::RangeLeft () const
+uint32_t AST_ScanRegister::RangeLeft () const
 {
   return m_identifier->LeftIndex();
 }
@@ -102,9 +87,9 @@ const string& AST_ScanRegister::RangeLeft () const
 //---------------------------------------------------------------------------
 
 
-//! Returns scan register right index or empty string when defined as a scalar identifier (single bit)
+//! Returns scan register right index (when not defined as a scalar identifier)
 //!
-const string& AST_ScanRegister::RangeRight () const
+uint32_t AST_ScanRegister::RangeRight () const
 {
   return m_identifier->RightIndex();
 }

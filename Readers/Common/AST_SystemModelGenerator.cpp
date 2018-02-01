@@ -16,6 +16,7 @@
 #include "AST_AccessLink.hpp"
 #include "AST_Attribute.hpp"
 #include "AST_BsdlInstructionRef.hpp"
+#include "AST_ConcatNumber.hpp"
 #include "AST_FileRef.hpp"
 #include "AST_Instance.hpp"
 #include "AST_Module.hpp"
@@ -1199,29 +1200,9 @@ AST_SystemModelGenerator::Process_ScanRegister (AST_ScanRegister* scanRegister)
   auto bitsCount  = scanRegister->BitsCount();
   auto resetValue = scanRegister->ResetValue();
 
-  uint8_t fillPattern = 0;
-  BinaryVector bypassValue(bitsCount, fillPattern, SizeProperty::Fixed);
-  if (resetValue != nullptr)
-  {
-    //! @todo [JFC]-[December/01/2017]: In Process_ScanRegister(): Move processing of reset value width directly in AST_Value (with some not specific parts in BinaryVector)
-    //!
-    auto resetValueBv = resetValue->AsBinaryVector();
-    CHECK_VALUE_LTE(resetValueBv.BitsCount(), bitsCount, "Reset value must have no more bits than ScanRegister width ; found "s
-                                                         .append(std::to_string(resetValueBv.BitsCount()))
-                                                         .append(" > ")
-                                                         .append(std::to_string(bitsCount)));
-    auto missingBitsCount = bitsCount - resetValueBv.BitsCount();
-    if (missingBitsCount == 0)
-    {
-      bypassValue = resetValueBv;
-    }
-    else
-    {
-      BinaryVector tmp(missingBitsCount, fillPattern);
-      tmp.Append(resetValueBv) ;
-      bypassValue = std::move(tmp);
-    }
-  }
+  auto bypassValue = (resetValue != nullptr) ? resetValue->AsBinaryVector(bitsCount)
+                                             : BinaryVector(bitsCount, 0);
+  bypassValue.FixSize(true);
 
   auto holdValue    = false;
   auto registerNode = m_systemModel->CreateRegister(name, bypassValue, holdValue);
@@ -1264,9 +1245,8 @@ AST_SystemModelGenerator::SelectionTables_t AST_SystemModelGenerator::MakeSelect
     CHECK_VALUE_NOT_EMPTY(values, "Must have at least one value");
     CHECK_VALUE_EQ(values.size(), 1u, "Not Yet Supported: Concat number list (for ScanMux Selection)");
 
-    const auto& value               = values.front();
-    auto        valueAsBinaryVector = BinaryVector::CreateFromString(value);
-    CHECK_PARAMETER_EQ(valueAsBinaryVector.BitsCount(), expectedBitsCount, "Unexpected selection bits count");
+    const auto value               = values.front();
+    auto       valueAsBinaryVector = value->AsBinaryVector(expectedBitsCount);
     selectTable.emplace_back(std::move(valueAsBinaryVector));
   }
 

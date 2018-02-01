@@ -12,6 +12,7 @@
 //===========================================================================
 
 #include "AST_IntegerExpr.hpp"
+#include "AST_Builder.hpp"
 
 using namespace Parsers;
 using namespace mast;
@@ -63,6 +64,7 @@ uint32_t AST_IntegerExpr::Size () const
 //
 //  End of: AST_IntegerExpr::Size
 //---------------------------------------------------------------------------
+
 
 
 //===========================================================================

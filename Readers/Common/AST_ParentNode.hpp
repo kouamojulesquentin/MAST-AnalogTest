@@ -55,7 +55,7 @@ class AST_ParentNode : public AST_NamedNode
   //!
   //! @note This is for case when children are optional
   //!
-  AST_ParentNode(Kind kind)
+  explicit AST_ParentNode(Kind kind)
     : AST_NamedNode(kind)
   {
   }

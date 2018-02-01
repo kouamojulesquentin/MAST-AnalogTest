@@ -28,18 +28,35 @@ class AST_IntegerLiteral final : public AST_IntegerExpr
   ~AST_IntegerLiteral() = default;
   AST_IntegerLiteral()  = delete;
 
-  std::string AsText()   const override { return std::to_string(m_value); } //!< Build text representation of integer expression
-  uint32_t    Evaluate() const override { return m_value;                 } //!< Evaluates expression
+  std::string AsText()   const override;                    //!< Build text representation of integer expression
+  uint32_t    Evaluate() const override { return m_value; } //!< Evaluates expression
+
+  //! Returns uniquified clone
+  //!
+  AST_IntegerLiteral* UniquifiedClone(AST_Builder& astBuilder) const override;
+
+  //! No parameter to resolve for literals
+  //!
+  void Resolve (const std::vector<AST_Parameter*>& parameters) override {  };
 
   // ---------------- Private Methods
   //
   private:
-  friend class AST;                                         // This is AST that manages construction/destruction of AST nodes
-  MAKE_UNIQUE_AS_FRIEND(AST_IntegerLiteral)(std::string&&); // AST currently uses make_unit<T>() to create nodes
+  friend class AST;                                           // This is AST that manages construction/destruction of AST nodes
+  MAKE_UNIQUE_AS_FRIEND(AST_IntegerLiteral)(std::string&&);   // AST currently uses make_unit<T>() to create nodes
+  MAKE_UNIQUE_AS_FRIEND(AST_IntegerLiteral)(uint32_t& value); // AST currently uses make_unit<T>() to create nodes
 
-  //! Initializes a literal expression
+  //! Initializes a literal expression text
   //!
-  AST_IntegerLiteral(std::string&& integerText);
+  explicit AST_IntegerLiteral(std::string&& integerText);
+
+  //! Initializes a literal expression text
+  //!
+  explicit AST_IntegerLiteral(uint32_t value)
+    : AST_IntegerExpr (Kind::IntegerLiteral)
+    , m_value         (value)
+  {
+  }
 
   // ---------------- Private Fields
   //

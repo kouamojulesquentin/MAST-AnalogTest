@@ -12,6 +12,7 @@
 //===========================================================================
 
 #include "AST_IntegerLiteral.hpp"
+#include "AST_Builder.hpp"
 #include "Utility.hpp"
 
 
@@ -63,6 +64,41 @@ AST_IntegerLiteral::AST_IntegerLiteral (string&& integerText)
 //  End of: AST_IntegerLiteral::AST_IntegerLiteral
 //---------------------------------------------------------------------------
 
+
+
+//! Build text representation of integer expression
+//!
+string AST_IntegerLiteral::AsText () const
+{
+  string asText;
+
+  if (IsInverted())
+  {
+    asText.append("~");
+  }
+
+  asText.append(std::to_string(m_value));
+
+  return asText;
+}
+//
+//  End of: AST_IntegerLiteral::AsText
+//---------------------------------------------------------------------------
+
+
+
+//! Returns uniquified clone
+//!
+//! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
+//!
+//! @return New cloned and uniquified AST_IntegerLiteral
+AST_IntegerLiteral* AST_IntegerLiteral::UniquifiedClone (AST_Builder& astBuilder) const
+{
+  return astBuilder.Clone_IntegerLiteral(this);
+}
+//
+//  End of: AST_IntegerLiteral::UniquifiedClone
+//---------------------------------------------------------------------------
 
 
 

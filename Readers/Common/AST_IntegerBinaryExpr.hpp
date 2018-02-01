@@ -32,6 +32,18 @@ class AST_IntegerBinaryExpr final : public AST_IntegerExpr
   std::string AsText()   const override; //!< Build text representation of integer expression
   uint32_t    Evaluate() const override; //!< Evaluates expression
 
+  //! Returns true when at least one of operands is defined using Parameter reference(s)
+  //!
+  bool HasParameterRef () const override;
+
+  //! Returns uniquified clone
+  //!
+  AST_IntegerBinaryExpr* UniquifiedClone(AST_Builder& astBuilder) const override;
+
+  //! Replaces parameter references by its actual number
+  //!
+  void Resolve (const std::vector<AST_Parameter*>& parameters) override;
+
   // ---------------- Private Methods
   //
   private:
@@ -45,8 +57,8 @@ class AST_IntegerBinaryExpr final : public AST_IntegerExpr
   // ---------------- Private Fields
   //
   private:
-  AST_IntegerExpr* m_left;  // Left side of the binary expression
-  AST_IntegerExpr* m_right; // Right side of the binary expression
+  AST_IntegerExpr* m_left  = nullptr; // Left side of the binary expression
+  AST_IntegerExpr* m_right = nullptr; // Right side of the binary expression
 };
 //
 //  End of AST_IntegerBinaryExpr class declaration

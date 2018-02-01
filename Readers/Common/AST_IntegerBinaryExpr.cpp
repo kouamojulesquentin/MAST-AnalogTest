@@ -12,6 +12,7 @@
 //===========================================================================
 
 #include "AST_IntegerBinaryExpr.hpp"
+#include "AST_Builder.hpp"
 #include "Utility.hpp"
 
 using std::string;
@@ -116,6 +117,53 @@ uint32_t AST_IntegerBinaryExpr::Evaluate () const
 //  End of: AST_IntegerBinaryExpr::Evaluate
 //---------------------------------------------------------------------------
 
+
+
+//! Returns true when at least one of operands is defined using Parameter reference(s)
+//!
+bool AST_IntegerBinaryExpr::HasParameterRef () const
+{
+  return   m_left->HasParameterRef()
+        || m_right->HasParameterRef();
+}
+//
+//  End of: AST_IntegerBinaryExpr::HasParameterRef
+//---------------------------------------------------------------------------
+
+
+
+//! Replaces parameter references by its actual number
+//!
+//! @param parameters   Parameter definitions to use to replace parameter reference(s)
+//!
+void AST_IntegerBinaryExpr::Resolve (const std::vector<AST_Parameter*>& parameters)
+{
+  m_left->Resolve(parameters);
+  m_right->Resolve(parameters);
+}
+//
+//  End of: AST_IntegerBinaryExpr::Resolve
+//---------------------------------------------------------------------------
+
+
+
+//! Returns uniquified clone
+//!
+//! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
+//!
+//! @return New cloned and uniquified AST_IntegerBinaryExpr
+AST_IntegerBinaryExpr* AST_IntegerBinaryExpr::UniquifiedClone (AST_Builder& astBuilder) const
+{
+  auto binaryExprClone = astBuilder.Clone_IntegerBinaryExpr(this);
+
+  binaryExprClone->m_left  = m_left->UniquifiedClone(astBuilder);
+  binaryExprClone->m_right = m_right->UniquifiedClone(astBuilder);
+
+  return binaryExprClone;
+}
+//
+//  End of: AST_IntegerBinaryExpr::UniquifiedClone
+//---------------------------------------------------------------------------
 
 
 

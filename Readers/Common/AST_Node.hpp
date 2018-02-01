@@ -38,6 +38,7 @@ namespace Parsers
     Enum_item,           //!< For enums items
     Enum_ref,            //!< For enums references
     BSDLEntity,          //!< For BSDL file referred by AccessLink
+    IntegerExprRef,      //!< For an integer expression reference
     IntegerLiteral,      //!< For a, unsigned, integer literal
     InputPort,           //!< For input of instance input port
     InputPortSource,     //!< For input of instance input port source
@@ -111,6 +112,7 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::InputPort)
             ENUM_MEMBER(Parsers::Kind::InputPortSource)
             ENUM_MEMBER(Parsers::Kind::Instance)
+            ENUM_MEMBER(Parsers::Kind::IntegerExprRef)
             ENUM_MEMBER(Parsers::Kind::IntegerLiteral)
             ENUM_MEMBER(Parsers::Kind::LocalParameter)
             ENUM_MEMBER(Parsers::Kind::Module)
@@ -179,7 +181,7 @@ class AST_Node
   //
   protected:
 
-  AST_Node(Kind kind)
+  explicit AST_Node(Kind kind)
     : m_kind (kind)
   {
   }

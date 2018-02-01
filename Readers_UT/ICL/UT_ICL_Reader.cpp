@@ -1228,12 +1228,12 @@ void UT_ICL_Reader::test_FromIcl_ValueExpr ()
                                   "  Parameter Val_1 = 3;\n"
                                   "  Parameter Val_2 = 0 - $Val_1 + 4 * (9 - 5) + 7;\n"
                                   "  Parameter Val_3 = $Val_1 + $Size * ($MSB_2 - $MSB) + $Val_2;\n"
-                                  "  Parameter Val_4 = 1_3_4;\n"
-                                  "  Parameter Val_5 = 0235;\n"
+                                  "  Parameter Val_4 = 134;\n"  // Separator removed
+                                  "  Parameter Val_5 = 235;\n"  // Leading (useless) leading zero removed
                                   "  Parameter Val_6 = 'd 134;\n"
                                   "  Parameter Val_7 = 'h 2_3ff;\n"
                                   "  Parameter Val_8 = 4'b0101;\n"
-                                  "  Parameter Val_9 = 5 'D 3;\n"
+                                  "  Parameter Val_9 = 5'D 3;\n"  // Space removed
                                   "  Parameter Val_10 = 3'b0_1x;\n"
                                   "  Parameter Val_11 = 7'hx;\n"
                                   "  Parameter Val_22 = $Size'h3;\n"

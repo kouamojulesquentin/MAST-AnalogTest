@@ -117,7 +117,7 @@ class AST_SimpleNode : public AST_Node
 
   //! Initializes AST_SimpleNode with specified AST node kind
   //!
-  AST_SimpleNode(Kind kind)
+  explicit AST_SimpleNode(Kind kind)
     : AST_Node (kind)
   {
   }

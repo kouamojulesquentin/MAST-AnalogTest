@@ -22,6 +22,7 @@ namespace Parsers
 {
 class AST_ScalarIdentifier;
 class AST_Identifier;
+class AST_Number;
 
 //! Represents a signal, i.e. a scoped port name or a number
 //!
@@ -39,7 +40,7 @@ class AST_Signal final : public AST_SimpleNode
 
   //! Returns true when signal is a number
   //!
-  bool  IsNumber() const { return !m_number.empty(); }
+  bool  IsNumber() const { return m_number != nullptr; }
 
   //! Returns port path (without the name)
   //!
@@ -66,14 +67,14 @@ class AST_Signal final : public AST_SimpleNode
   private:
 
   friend class AST;   // This is AST that manages construction/destruction of AST nodes (it uses make_unit<T>() to create nodes)
-  MAKE_UNIQUE_AS_FRIEND(AST_Signal)(std::experimental::string_view&);
+  MAKE_UNIQUE_AS_FRIEND(AST_Signal)(Parsers::AST_Number*&);
   MAKE_UNIQUE_AS_FRIEND(AST_Signal)(Parsers::AST_Identifier*&);
   MAKE_UNIQUE_AS_FRIEND(AST_Signal)(std::vector<Parsers::AST_ScalarIdentifier*>&&,
                                     Parsers::AST_Identifier*&);
 
   //! Constructs from sole number
   //!
-  AST_Signal(std::experimental::string_view number)
+  explicit AST_Signal(AST_Number* number)
     : AST_SimpleNode (Kind::Signal)
     , m_number       (number)
   {
@@ -81,7 +82,7 @@ class AST_Signal final : public AST_SimpleNode
 
   //! Constructs from only port name
   //!
-  AST_Signal(AST_Identifier* portName)
+  explicit AST_Signal(AST_Identifier* portName)
     : AST_SimpleNode (Kind::Signal)
     , m_portName     (portName)
   {
@@ -100,7 +101,7 @@ class AST_Signal final : public AST_SimpleNode
   // ---------------- Private Fields
   //
   private:
-  std::string                        m_number;             //!< Non empty when signal is a number
+  AST_Number*                        m_number = nullptr;   //!< Non nullptr when signal is a number
   std::vector<AST_ScalarIdentifier*> m_path;               //!< Port path (dot separated instance names)
   AST_Identifier*                    m_portName = nullptr; //!< Port name (when not a number)
   bool                               m_inverted = false;   //!< When true, each bit in the binary representation of the number or port is complemented.

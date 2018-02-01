@@ -18,6 +18,8 @@
 
 namespace Parsers
 {
+class AST_Builder;
+
 //! Represents an unary integer expression
 //!
 class AST_IntegerUnaryExpr final : public AST_IntegerExpr
@@ -28,9 +30,20 @@ class AST_IntegerUnaryExpr final : public AST_IntegerExpr
   ~AST_IntegerUnaryExpr() = default;
   AST_IntegerUnaryExpr()  = delete;
 
-
   std::string AsText()   const override; //!< Build text representation of integer expression
   uint32_t    Evaluate() const override; //!< Evaluates expression
+
+  //! Returns true when operand is defined using Parameter reference(s)
+  //!
+  bool HasParameterRef () const override;
+
+  //! Returns uniquified clone
+  //!
+  AST_IntegerUnaryExpr* UniquifiedClone(AST_Builder& astBuilder) const override;
+
+  //! Replaces parameter references by their actual number
+  //!
+  void Resolve (const std::vector<AST_Parameter*>& parameters) override;
 
   // ---------------- Private Methods
   //
@@ -45,7 +58,7 @@ class AST_IntegerUnaryExpr final : public AST_IntegerExpr
   // ---------------- Private Fields
   //
   private:
-  AST_IntegerExpr* m_operand;  // Operand expression
+  AST_IntegerExpr* m_operand = nullptr;  // Operand expression
 };
 //
 //  End of AST_IntegerUnaryExpr class declaration

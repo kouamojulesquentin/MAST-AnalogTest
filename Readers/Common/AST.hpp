@@ -31,6 +31,7 @@ class AST_EnumRef;
 class AST_FileRef;
 class AST_Identifier;
 class AST_IntegerLiteral;
+class AST_IntegerExprRef;
 class AST_Namespace;
 class AST_ParameterRef;
 class AST_ScanInterface;
@@ -63,28 +64,31 @@ class AST final : public AST_Builder
   AST_EnumRef*            Create_EnumRef            (std::string&& name);
   AST_FileRef*            Create_FileRef            (Kind kind, std::string&& name);
   AST_BasedNumber*        Create_BasedNumber        (Kind kind, std::string&&    baseAndDigits) override;                              //!< Creates an AST_BasedNumber
+  AST_ConcatNumber*       Create_ConcatNumber       ()                          override;                                              //!< Creates an AST_ConcatNumber empty
   AST_ConcatNumber*       Create_ConcatNumber       (std::vector<AST_Number*>&& numbers) override;                                     //!< Creates an AST_ConcatNumber
-  AST_IntegerUnaryExpr*   Create_IntegerUnaryExpr   (Kind kind, AST_IntegerExpr* operand) override;                                    //!< Creates an AST_IntegerUnaryExpr node
-  AST_IntegerBinaryExpr*  Create_IntegerBinaryExpr  (Kind kind, AST_IntegerExpr* leftOperand, AST_IntegerExpr* rightOperand) override; //!< Creates an AST_IntegerBinaryExpr node
+  AST_IntegerExprRef*     Create_IntegerExprRef     (AST_ParameterRef* parameterRef) override;                                         //!< Creates an AST_IntegerExprRef node
   AST_IntegerLiteral*     Create_IntegerLiteral     (std::string&& integerText) override;                                              //!< Creates an AST_IntegerLiteral node
+  AST_IntegerLiteral*     Create_IntegerLiteral     (uint32_t      value)       override;                                              //!< Creates an AST_IntegerLiteral node
+  AST_IntegerBinaryExpr*  Create_IntegerBinaryExpr  (Kind kind, AST_IntegerExpr* leftOperand, AST_IntegerExpr* rightOperand) override; //!< Creates an AST_IntegerBinaryExpr node
+  AST_IntegerUnaryExpr*   Create_IntegerUnaryExpr   (Kind kind, AST_IntegerExpr* operand) override;                                    //!< Creates an AST_IntegerUnaryExpr node
   AST_Namespace*          Create_Namespace          (std::string&& name);
   AST_Attribute*          Create_Attribute          (std::string&& name);
-  AST_Attribute*          Create_Attribute          (std::string&& name, std::string&& numbersValue);
+  AST_Attribute*          Create_Attribute          (std::string&& name, AST_ConcatNumber* concatNumber);
   AST_Attribute*          Create_Attribute          (std::string&& name, std::vector<AST_SimpleNode*>&& stringsOrRefsValue);
-  AST_Parameter*          Create_LocalParameter     (std::string&& name, std::string&& numbersValue);
+  AST_Parameter*          Create_LocalParameter     (std::string&& name, AST_ConcatNumber* concatNumber);
   AST_Parameter*          Create_LocalParameter     (std::string&& name, std::vector<AST_SimpleNode*>&& stringsOrRefsValue);
-  AST_Parameter*          Create_Parameter          (std::string&& name, std::string&& numbersValue);
+  AST_Parameter*          Create_Parameter          (std::string&& name, AST_ConcatNumber* concatNumber);
   AST_Parameter*          Create_Parameter          (std::string&& name, std::vector<AST_SimpleNode*>&& stringsOrRefsValue);
   AST_ParameterRef*       Create_ParameterRef       (std::string&& name);
   AST_BsdlInstructionRef* Create_BsdlInstructionRef (std::string&& instructionName, std::vector<AST_Node*>&& children);
   AST_String*             Create_String             (std::string&& content) override;
-  AST_Signal*             Create_Signal             (std::experimental::string_view number);
+  AST_Signal*             Create_Signal             (AST_Number* number);
   AST_Signal*             Create_Signal             (AST_Identifier* portName);
   AST_Signal*             Create_Signal             (std::vector<AST_ScalarIdentifier*>&& scope, AST_Identifier* portName);
   AST_ScanMux*            Create_ScanMux            (AST_VectorIdentifier*                identifier,
                                                      std::vector<Parsers::AST_Signal*>&&  selectors,
                                                      std::vector<AST_ScanMuxSelection*>&& scanMuxSelection);
-  AST_ScanMuxSelection*   Create_ScanMuxSelection   (std::vector<std::string>&& selectionValues, std::vector<Parsers::AST_Signal*>&& selectedSignals);
+  AST_ScanMuxSelection*   Create_ScanMuxSelection   (std::vector<AST_ConcatNumber*>&& selectionValues, std::vector<Parsers::AST_Signal*>&& selectedSignals);
   AST_Source*             Create_Source             (Kind kind, AST_Signal* signal);
   AST_Source*             Create_Source             (Kind kind, std::vector<AST_Signal*>&& signals);
   AST_Port*               Create_Port               (Kind kind, AST_VectorIdentifier* identifier);
@@ -100,10 +104,8 @@ class AST final : public AST_Builder
   AST_ScanInterfaceRef*   Create_ScanInterfaceRef   (std::vector<std::tuple<AST_ScalarIdentifier*, std::string>>&& scanInterfaceNames);
   AST_ScanRegister*       Create_ScanRegister       (AST_VectorIdentifier* identifier, std::vector<AST_Node*>&& children);
   AST_ScalarIdentifier*   Create_ScalarIdentifier   (std::string&& name);
-  AST_VectorIdentifier*   Create_VectorIdentifier   (std::string&& name,
-                                                     std::string&& leftIndex,
-                                                     std::string&& rightIndex = "");
-  AST_Value*              Create_Value              (Kind kind, std::experimental::string_view valueExpression);
+  AST_VectorIdentifier*   Create_VectorIdentifier   (std::string&& name, AST_IntegerExpr* leftIndex, AST_IntegerExpr* rightIndex = nullptr);
+  AST_Value*              Create_Value              (Kind kind, AST_ConcatNumber* concatNumber);
 
 
   void SaveInstanceDefaultNamespace ()           { m_savedInstancesDefaultNamespace = m_instancesDefaultNamespace; }  //!< Saves instance default namespace (before parsing new module body)
@@ -127,16 +129,22 @@ class AST final : public AST_Builder
   //!
   void Uniquify();
 
-  // AST_Builder interface implementation
+  // AST_Builder cloning interface implementation
 
-  AST_Attribute*        Clone_Attribute        (const AST_Attribute*        attribute)    override;  //!< Clones an attribute
-  AST_Port*             Clone_Port             (const AST_Port*             port)         override;  //!< Clones a Port
-  AST_Instance*         Clone_Instance         (const AST_Instance*         instance)     override;  //!< Clones an instance
-  AST_Module*           Clone_Module           (const AST_Module*           module)       override;  //!< Clones a module
-  AST_Parameter*        Clone_Parameter        (const AST_Parameter*        parameter)    override;  //!< Clones a parameter definition
-  AST_ScanMux*          Clone_ScanMux          (const AST_ScanMux*          scanMux)      override;  //!< Clones a scan multiplexer
-  AST_ScanRegister*     Clone_ScanRegister     (const AST_ScanRegister*     scanRegister) override;  //!< Clones a scan register
-  AST_VectorIdentifier* Clone_VectorIdentifier (const AST_VectorIdentifier* identifier)   override ; //!< Clones a vector identifier
+  AST_Attribute*         Clone_Attribute         (const AST_Attribute*         attribute)         override;  //!< Clones an attribute
+  AST_BasedNumber*       Clone_BasedNumber       (const AST_BasedNumber*       basedNumber)       override;  //!< Clones a "based" number
+  AST_ConcatNumber*      Clone_ConcatNumber      (const AST_ConcatNumber*      concatNumber)      override;  //!< Clones a concated number
+  AST_Port*              Clone_Port              (const AST_Port*              port)              override;  //!< Clones a Port
+  AST_Instance*          Clone_Instance          (const AST_Instance*          instance)          override;  //!< Clones an instance
+  AST_IntegerExprRef*    Clone_IntegerExprRef    (const AST_IntegerExprRef*    integerExprRef)    override;  //!< Clones an integer expression reference
+  AST_IntegerBinaryExpr* Clone_IntegerBinaryExpr (const AST_IntegerBinaryExpr* integerBinaryExpr) override;  //!< Clones an integer binary expression
+  AST_IntegerLiteral*    Clone_IntegerLiteral    (const AST_IntegerLiteral*    integerLiteral)    override;  //!< Clones a integer literal
+  AST_IntegerUnaryExpr*  Clone_IntegerUnaryExpr  (const AST_IntegerUnaryExpr*  integerUnaryExpr)  override;  //!< Clones an integer unary expression
+  AST_Module*            Clone_Module            (const AST_Module*            module)            override;  //!< Clones a module
+  AST_Parameter*         Clone_Parameter         (const AST_Parameter*         parameter)         override;  //!< Clones a parameter definition
+  AST_ScanMux*           Clone_ScanMux           (const AST_ScanMux*           scanMux)           override;  //!< Clones a scan multiplexer
+  AST_ScanRegister*      Clone_ScanRegister      (const AST_ScanRegister*      scanRegister)      override;  //!< Clones a scan register
+  AST_VectorIdentifier*  Clone_VectorIdentifier  (const AST_VectorIdentifier*  identifier)        override ; //!< Clones a vector identifier
 
   AST_ScalarIdentifier* Create_UniquifiedIdentifier       (const AST_ScalarIdentifier* identifier) override; //!< Creates an identifier for a uniquified entity
   AST_ModuleIdentifier* Create_UniquifiedModuleIdentifier (const AST_Module*           module)     override; //!< Creates an module identifier for a uniquified module

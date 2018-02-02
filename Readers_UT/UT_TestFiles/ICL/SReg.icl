@@ -1,14 +1,14 @@
 Module SReg
 {
-  Parameter MSB = 7;
+  Parameter Size = 8;
 
   ScanInPort  SI;
   ScanOutPort SO      { Source SR[0];}
 
-  DataInPort  DI[$MSB:0];
-  DataOutPort DO[$MSB:0] { Source SR; }
+  DataInPort  DI[$Size - 1:0];
+  DataOutPort DO[$Size - 1:0] { Source SR; }
 
   ScanInterface scan_client { Port SI; Port SO; }
 
-  ScanRegister SR[$MSB:0]      { ScanInSource SI; ResetValue 'b0; }
+  ScanRegister SR[$Size - 1:0]      { ScanInSource SI; ResetValue 'b0; }
 }

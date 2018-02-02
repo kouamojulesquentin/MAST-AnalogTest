@@ -2,7 +2,8 @@ Module TOP
 {
   Instance SReg_I Of SReg
   {
-    Attribute PDL = "Incr";
+    Parameter Size = 12;
+    Attribute PDL  = "Incr";
   }
 
   Attribute ACCESS_LINK_PROTOCOL_NAME = "Loopback";

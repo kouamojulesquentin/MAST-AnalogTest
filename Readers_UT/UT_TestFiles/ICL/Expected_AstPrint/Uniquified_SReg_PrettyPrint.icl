@@ -1,7 +1,7 @@
 NameSpace;
 Module SReg
 {
-  Parameter MSB = 7;
+  Parameter Size = 8;
   ScanInterface scan_client
   {
     Port SI;
@@ -9,9 +9,9 @@ Module SReg
   }
   ScanInPort SI;
   ScanOutPort SO { Source SR[0]; }
-  DataInPort DI[7:0];
-  DataOutPort DO[7:0] { Source SR; }
-  ScanRegister SR[7:0]
+  DataInPort DI[8 - 1:0];
+  DataOutPort DO[8 - 1:0] { Source SR; }
+  ScanRegister SR[8 - 1:0]
   {
     ScanInSource SI;
     ResetValue 'b0;

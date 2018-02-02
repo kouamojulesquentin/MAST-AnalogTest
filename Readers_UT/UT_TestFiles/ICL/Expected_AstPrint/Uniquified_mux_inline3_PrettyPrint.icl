@@ -6,7 +6,7 @@ Module Instrument
 }
 Module SReg
 {
-  Parameter MSB = 7;
+  Parameter Size = 8;
   ScanInterface scan_client
   {
     Port SI;
@@ -14,9 +14,9 @@ Module SReg
   }
   ScanInPort SI;
   ScanOutPort SO { Source SR[0]; }
-  DataInPort DI[$MSB:0];
-  DataOutPort DO[$MSB:0] { Source SR; }
-  ScanRegister SR[$MSB:0]
+  DataInPort DI[$Size - 1:0];
+  DataOutPort DO[$Size - 1:0] { Source SR; }
+  ScanRegister SR[$Size - 1:0]
   {
     ScanInSource SI;
     ResetValue 'b0;
@@ -58,7 +58,7 @@ Module mux_inline3
   }
   Instance reg3 Of UniquifiedModules::SReg__uniquified__10
   {
-    Parameter MSB = 2;
+    Parameter Size = 3;
     InputPort SI = mux3;
     InputPort DI = 'b0;
   }
@@ -96,7 +96,7 @@ Module Instrument__uniquified__8
 }
 Module SReg__uniquified__10
 {
-  Parameter MSB = 2;
+  Parameter Size = 3;
   ScanInterface scan_client
   {
     Port SI;
@@ -104,9 +104,9 @@ Module SReg__uniquified__10
   }
   ScanInPort SI;
   ScanOutPort SO { Source SR[0]; }
-  DataInPort DI[2:0];
-  DataOutPort DO[2:0] { Source SR; }
-  ScanRegister SR[2:0]
+  DataInPort DI[3 - 1:0];
+  DataOutPort DO[3 - 1:0] { Source SR; }
+  ScanRegister SR[3 - 1:0]
   {
     ScanInSource SI;
     ResetValue 'b0;
@@ -114,7 +114,7 @@ Module SReg__uniquified__10
 }
 Module SReg__uniquified__3
 {
-  Parameter MSB = 7;
+  Parameter Size = 8;
   ScanInterface scan_client
   {
     Port SI;
@@ -122,9 +122,9 @@ Module SReg__uniquified__3
   }
   ScanInPort SI;
   ScanOutPort SO { Source SR[0]; }
-  DataInPort DI[7:0];
-  DataOutPort DO[7:0] { Source SR; }
-  ScanRegister SR[7:0]
+  DataInPort DI[8 - 1:0];
+  DataOutPort DO[8 - 1:0] { Source SR; }
+  ScanRegister SR[8 - 1:0]
   {
     ScanInSource SI;
     ResetValue 'b0;
@@ -132,7 +132,7 @@ Module SReg__uniquified__3
 }
 Module SReg__uniquified__6
 {
-  Parameter MSB = 7;
+  Parameter Size = 8;
   ScanInterface scan_client
   {
     Port SI;
@@ -140,9 +140,9 @@ Module SReg__uniquified__6
   }
   ScanInPort SI;
   ScanOutPort SO { Source SR[0]; }
-  DataInPort DI[7:0];
-  DataOutPort DO[7:0] { Source SR; }
-  ScanRegister SR[7:0]
+  DataInPort DI[8 - 1:0];
+  DataOutPort DO[8 - 1:0] { Source SR; }
+  ScanRegister SR[8 - 1:0]
   {
     ScanInSource SI;
     ResetValue 'b0;
@@ -150,7 +150,7 @@ Module SReg__uniquified__6
 }
 Module SReg__uniquified__9
 {
-  Parameter MSB = 7;
+  Parameter Size = 8;
   ScanInterface scan_client
   {
     Port SI;
@@ -158,9 +158,9 @@ Module SReg__uniquified__9
   }
   ScanInPort SI;
   ScanOutPort SO { Source SR[0]; }
-  DataInPort DI[7:0];
-  DataOutPort DO[7:0] { Source SR; }
-  ScanRegister SR[7:0]
+  DataInPort DI[8 - 1:0];
+  DataOutPort DO[8 - 1:0] { Source SR; }
+  ScanRegister SR[8 - 1:0]
   {
     ScanInSource SI;
     ResetValue 'b0;

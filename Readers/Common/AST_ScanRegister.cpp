@@ -13,7 +13,8 @@
 
 #include "AST_ScanRegister.hpp"
 #include "AST_VectorIdentifier.hpp"
-#include "AST_Value.hpp"
+#include "AST_PlaceHolder.hpp"
+#include "AST_ConcatNumber.hpp"
 #include "AST_Signal.hpp"
 #include "AST_Source.hpp"
 #include "AST_Visitor.hpp"
@@ -59,10 +60,22 @@ void AST_ScanRegister::DispatchChildren ()
     {
       switch (child->GetKind())
       {
-        case Parsers::Kind::ResetValue:       SetChild(child, m_resetValue);       break;
-        case Parsers::Kind::DefaultLoadValue: SetChild(child, m_defaultLoadValue); break;
         case Parsers::Kind::ScanInSource:     SetChild(child, m_scanInSource);     break;
+        case Parsers::Kind::PlaceHolder:
+        {
+          auto placeHolder = static_cast<AST_PlaceHolderBase*>(child);
+          auto targetKind  = placeHolder->TargetKind();
 
+          switch (targetKind)
+          {
+            case Parsers::Kind::ResetValue:       SetChild(child, m_resetValue);       break;
+            case Parsers::Kind::DefaultLoadValue: SetChild(child, m_defaultLoadValue); break;
+            default: // Ignore all other for now
+              break;
+          }
+          child = nullptr;  // "Discard" all other place holders
+          break;
+        }
         default:  // Ignore all other for now
           break;
       }

@@ -29,7 +29,7 @@ class Register;
 
 namespace Parsers
 {
-class AST_Value;
+class AST_ConcatNumber;
 class AST_Source;
 class AST_Builder;
 class AST_Parameter;
@@ -75,8 +75,8 @@ class AST_ScanRegister final : public AST_ParentNode
   size_t BitsCount () const;  //!< Returns ScanRegister bits count
 
 
-  const AST_Source* ScanInSource() const { return m_scanInSource; } //!< Scan register input source
-  const AST_Value*  ResetValue()   const { return m_resetValue;   } //!< Scan register reset value
+  const AST_Source*       ScanInSource() const { return m_scanInSource; } //!< Scan register input source
+  const AST_ConcatNumber* ResetValue()   const { return m_resetValue;   } //!< Scan register reset value
 
   std::shared_ptr<mast::Register> AssociatedRegister() { return m_associatedModelRegister; }  //!< Mast SystemModel associated register (when not null)
 
@@ -124,8 +124,8 @@ class AST_ScanRegister final : public AST_ParentNode
   //
   private:
   AST_VectorIdentifier*           m_identifier       = nullptr; //!< Scan register name
-  AST_Value*                      m_resetValue       = nullptr; //!< Scan register reset value expression
-  AST_Value*                      m_defaultLoadValue = nullptr; //!< Scan register default load value expression
+  AST_ConcatNumber*               m_resetValue       = nullptr; //!< Scan register reset value expression
+  AST_ConcatNumber*               m_defaultLoadValue = nullptr; //!< Scan register default load value expression
   AST_Source*                     m_scanInSource     = nullptr; //!< Scan register input source
   std::shared_ptr<mast::Register> m_associatedModelRegister;    //!< Associated register once mast model is created (during SystemModel creation)
 };

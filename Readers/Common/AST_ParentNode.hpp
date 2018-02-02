@@ -16,6 +16,7 @@
   #define AST_PARENTNODE_H__9C01A73E_808_43D6_A6B3_243B7A5440B__INCLUDED_
 
 #include "AST_NamedNode.hpp"
+#include "AST_PlaceHolder.hpp"
 #include "AST_ScalarIdentifier.hpp"
 #include "AST_Builder.hpp"
 
@@ -80,7 +81,19 @@ class AST_ParentNode : public AST_NamedNode
   template<typename T>
   static void SetChild(AST_Node*& child, T*& dest)
   {
-    dest  = static_cast<T*>(child);
+    if (child->IsKind(Parsers::Kind::PlaceHolder))
+    {
+      auto placeHolder = dynamic_cast<AST_PlaceHolder<T>*>(child);
+      CHECK_VALUE_NOT_NULL(placeHolder, "Houps: Attempt to assign a place holder wrapped node to a not compatible target type");
+
+      placeHolder->SetTargetKindToWrappedNode();
+      dest = placeHolder->WrappedNode();
+    }
+    else
+    {
+      dest  = static_cast<T*>(child);
+    }
+
     child = nullptr;
   };
 

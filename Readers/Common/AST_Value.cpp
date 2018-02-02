@@ -12,35 +12,31 @@
 //===========================================================================
 
 #include "AST_Value.hpp"
-#include "AST_ConcatNumber.hpp"
 
 using std::string;
-using mast::BinaryVector;
 using namespace Parsers;
 
 
 //! Text representation of value
 //!
-string AST_Value::AsText () const
-{
-  return m_concatNumber->AsText();
-}
+//+template<> string AST_Value<bool>::AsText () const
+//+{
+//+  return m_value ? "true" : false;
+//+}
 //
 //  End of: AST_Value::AsText
 //---------------------------------------------------------------------------
 
 
-//! Value as a BinaryVector
+//! Text representation of uint32_t value
 //!
-BinaryVector AST_Value::AsBinaryVector (uint32_t targetSize) const
-{
-  return m_concatNumber->AsBinaryVector(targetSize);
-}
+//+template<> string AST_Value<uint32_t>::AsText () const
+//+{
+//+  return std::to_string(m_value);
+//+}
 //
-//  End of: AST_Value::AsBinaryVector
+//  End of: AST_Value::AsText
 //---------------------------------------------------------------------------
-
-
 
 
 //===========================================================================

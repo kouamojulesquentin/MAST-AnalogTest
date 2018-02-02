@@ -24,7 +24,9 @@ CXXTEST_ENUM_TRAITS(Parsers::Kind,
            CXXTEST_ENUM_MEMBER(Parsers::Kind::Undefined)
 
            CXXTEST_ENUM_MEMBER(Parsers::Kind::AccessLink)
+           CXXTEST_ENUM_MEMBER(Parsers::Kind::AccessTogether)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::Alias)
+           CXXTEST_ENUM_MEMBER(Parsers::Kind::ApplyEndState)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::Attribute)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::BsdlInstructionRef)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::ConcatenatedNumbers)
@@ -56,6 +58,7 @@ CXXTEST_ENUM_TRAITS(Parsers::Kind,
            CXXTEST_ENUM_MEMBER(Parsers::Kind::Parameter)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::Parameter_ref)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::ParenthesizedExpr)
+           CXXTEST_ENUM_MEMBER(Parsers::Kind::PlaceHolder)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::Port)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::ResetValue)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::ScalarIdentifier)
@@ -71,6 +74,7 @@ CXXTEST_ENUM_TRAITS(Parsers::Kind,
            CXXTEST_ENUM_MEMBER(Parsers::Kind::Source)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::String)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::TranslationUnit)
+           CXXTEST_ENUM_MEMBER(Parsers::Kind::Value_Bool)
            CXXTEST_ENUM_MEMBER(Parsers::Kind::VectorIdentifier)
           );
 

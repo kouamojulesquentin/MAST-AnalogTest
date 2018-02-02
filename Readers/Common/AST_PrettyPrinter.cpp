@@ -31,7 +31,7 @@
 #include "AST_ScanRegister.hpp"
 #include "AST_Signal.hpp"
 #include "AST_Source.hpp"
-#include "AST_Value.hpp"
+#include "AST_ConcatNumber.hpp"
 
 #include "Utility.hpp"
 

@@ -50,6 +50,7 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_Parameter.hpp
                                   AST_Parameter.cpp
                                   AST_ParameterRef.hpp
+                                  AST_PlaceHolder.hpp
                                   AST_Port.hpp
                                   AST_Port.cpp
                                   AST_ScalarIdentifier.hpp

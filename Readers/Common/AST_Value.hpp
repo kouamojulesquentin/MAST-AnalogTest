@@ -11,12 +11,10 @@
 //!
 //===========================================================================
 
-
 #ifndef AST_VALUE_H__C7D6CDC4_753_49F0_45B7_9FFA68F2FD4C__INCLUDED_
   #define AST_VALUE_H__C7D6CDC4_753_49F0_45B7_9FFA68F2FD4C__INCLUDED_
 
 #include "AST_SimpleNode.hpp"
-#include "BinaryVector.hpp"
 
 #include <string>
 
@@ -24,8 +22,9 @@ namespace Parsers
 {
 class AST_ConcatNumber;
 
-//! Represents a number and kind of target (to ease member assignment from a bunch of children)
+//! Represents a C++ built-in type
 //!
+template<typename T>
 class AST_Value final : public AST_SimpleNode
 {
   // ---------------- Public Methods
@@ -34,35 +33,39 @@ class AST_Value final : public AST_SimpleNode
   ~AST_Value() = default;
   AST_Value()  = delete;
 
-  std::string AsText() const override; //!< Text representation of value
+  std::string AsText() const override { return ToString(m_value); }; //!< Text representation of value
 
-  mast::BinaryVector AsBinaryVector(uint32_t targetSize) const;    //!< Value as a BinaryVector
+  //! Retrieves embedded (C++ built-in type) value
+  //!
+  T Value() const { return m_value; }
 
   // ---------------- Private Methods
   //
   private:
-  friend class AST;                                                             // This is AST that manages construction/destruction of AST nodes
-  MAKE_UNIQUE_AS_FRIEND(AST_Value)(Parsers::Kind& kind, Parsers::AST_ConcatNumber*&); // AST currently uses make_unit<T>() to create nodes
+  friend class AST;                                        // This is AST that manages construction/destruction of AST nodes
+  MAKE_UNIQUE_AS_FRIEND(AST_Value<T>)(Parsers::Kind&, T&); // AST currently uses make_unit<T>() to create nodes
 
   //! Initializes the value with specific value kind
   //!
-  AST_Value(Kind kind, AST_ConcatNumber* concatNumber)
+  AST_Value(Kind kind, T value)
     : AST_SimpleNode (kind)
-    , m_concatNumber (concatNumber)
+    , m_value        (value)
   {
   }
+
+  static std::string ToString(bool value) { return value ? "true" : "false"; }
+  template<typename U>
+  static std::string ToString(U    value) { return std::to_string(value); }
 
   // ---------------- Private Fields
   //
   private:
-  AST_ConcatNumber* m_concatNumber = nullptr; //!< The effective, represented, number
+  T m_value = T(); //!< The effective value
 };
 //
 //  End of AST_Value class declaration
 //---------------------------------------------------------------------------
 } // End of namespace Parsers
-
-
 
 
 #endif  // not defined AST_VALUE_H__C7D6CDC4_753_49F0_45B7_9FFA68F2FD4C__INCLUDED_

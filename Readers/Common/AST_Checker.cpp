@@ -31,7 +31,6 @@
 #include "AST_Signal.hpp"
 #include "AST_Source.hpp"
 #include "AST_String.hpp"
-#include "AST_Value.hpp"
 #include "AST_VectorIdentifier.hpp"
 
 #include "Utility.hpp"

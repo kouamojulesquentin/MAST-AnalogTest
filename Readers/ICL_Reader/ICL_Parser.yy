@@ -64,8 +64,10 @@ namespace Parsers
   class AST_SimpleNode;
   class AST_Source;
   class AST_String;
-  class AST_Value;
   class AST_VectorIdentifier;
+
+  template <typename> class AST_PlaceHolder;
+  template <typename> class AST_Value;
 
   enum class AccessLinkType;
   enum class Kind : uint8_t;
@@ -116,6 +118,7 @@ typedef void* yyscan_t;
 #include "AST_IntegerUnaryExpr.hpp"
 #include "AST_Parameter.hpp"
 #include "AST_ParameterRef.hpp"
+#include "AST_PlaceHolder.hpp"
 #include "AST_Port.hpp"
 #include "AST_ScalarIdentifier.hpp"
 #include "AST_ScanInterface.hpp"
@@ -316,7 +319,8 @@ namespace
 
 %type <std::vector<Parsers::AST_VectorIdentifier*>> accessLink1149_ActiveSignal_names
 
-%type <Parsers::AST_Value*>            scanRegister_resetValue  // Value expression
+%type <Parsers::AST_PlaceHolder<Parsers::AST_ConcatNumber>*> scanRegister_resetValue
+%type <Parsers::AST_PlaceHolder<Parsers::AST_ConcatNumber>*> alias_iApplyEndState
 
 
 %type <Parsers::AST_Module*>             MODULE // Pseudo type for mid-rule support (always set as nullptr)
@@ -392,6 +396,8 @@ namespace
 %type <Parsers::AST_Node*>              scanOutPort_item
 %type <Parsers::AST_Node*>              scanRegister_item
 %type <Parsers::AST_Node*>              bsdl_instr_selected_item
+%type <Parsers::AST_Node*>              alias_item
+%type <Parsers::AST_Node*>              alias_refEnum
 
 %type <std::vector<Parsers::AST_Node*>> module_items
 %type <std::vector<Parsers::AST_Node*>> dataInPort_items
@@ -402,6 +408,9 @@ namespace
 %type <std::vector<Parsers::AST_Node*>> scanInPort_items
 %type <std::vector<Parsers::AST_Node*>> scanOutPort_items
 %type <std::vector<Parsers::AST_Node*>> bsdl_instr_selected_items
+%type <std::vector<Parsers::AST_Node*>> alias_items
+%type <std::vector<Parsers::AST_Node*>> alias_tail
+
 
 
 
@@ -2217,7 +2226,7 @@ scanRegister_defaultLoadValue :
   {
     // scanRegister_defaultLoadValue : DEFAULTLOADVALUE concat_number SEMICOLON
     auto concatNumber = $[concat_number];
-    auto node         = ast.Create_Value(Parsers::Kind::DefaultLoadValue, concatNumber);
+    auto node         = ast.Create_PlaceHolder(Parsers::Kind::DefaultLoadValue, concatNumber);
 
     $$ = node;
   }
@@ -2233,7 +2242,7 @@ scanRegister_resetValue :
   {
     // scanRegister_resetValue : RESETVALUE concat_number SEMICOLON
     auto& concatNumber = $[concat_number];
-    auto  node         = ast.Create_Value(Parsers::Kind::ResetValue, concatNumber);
+    auto  node         = ast.Create_PlaceHolder(Parsers::Kind::ResetValue, concatNumber);
 
     $$ = node;
   }
@@ -2293,8 +2302,12 @@ iProc_arglist : iProc_arglist iProc_args | iProc_args ;
 dataRegister_readDataSource : READDATASOURCE concat_data_signal SEMICOLON ;
 dataRegister_writeCallBack : WRITECALLBACK iProc_namespace iProc_name iProc_arglist SEMICOLON
                            | WRITECALLBACK iProc_namespace iProc_name SEMICOLON;
-iProc_namespace : namespace_name DOUBLE_COLON ref_module_name
- DOUBLE_COLON sub_namespace | namespace_name DOUBLE_COLON ref_module_name | ref_module_name ;
+
+iProc_namespace :
+  namespace_name DOUBLE_COLON ref_module_name DOUBLE_COLON sub_namespace
+| namespace_name DOUBLE_COLON ref_module_name
+| ref_module_name ;
+
 iProc_name : SCALAR_ID | parameter_ref ;
 
 iProc_args :
@@ -2788,15 +2801,110 @@ alias_def : ALIAS alias_name EQUAL concat_hier_data_signal alias_tail
   $$ = nullptr;
 }
 ;
-alias_name : reg_port_signal_id;
-alias_tail: SEMICOLON | LEFT_BRACE alias_items RIGHT_BRACE | LEFT_BRACE RIGHT_BRACE;
-alias_items: alias_items alias_item | alias_item;
-alias_item : attribute_def |
-ACCESSTOGETHER SEMICOLON |
-alias_iApplyEndState |
-alias_refEnum ;
-alias_iApplyEndState : IAPPLYENDSTATE concat_number SEMICOLON ;
-alias_refEnum : REFENUM enum_name SEMICOLON ;
+
+alias_name : reg_port_signal_id
+{
+  // alias_name : reg_port_signal_id
+  $$ = $1;
+}
+;
+
+alias_tail:
+  SEMICOLON
+  {
+    // alias_tail : SEMICOLON
+    $$ = vector<Parsers::AST_Node*>();
+  }
+| LEFT_BRACE RIGHT_BRACE
+  {
+    // alias_tail : LEFT_BRACE RIGHT_BRACE
+    $$ = vector<Parsers::AST_Node*>();
+  }
+| LEFT_BRACE alias_items RIGHT_BRACE
+  {
+    // alias_tail : LEFT_BRACE alias_items RIGHT_BRACE
+    auto& aliasItems = $[alias_items];
+
+    $$ = std::move(aliasItems);
+  }
+;
+
+alias_items:
+  alias_items[lhs] alias_item
+  {
+    // alias_items: alias_items alias_item
+    auto& aliasItems = $[lhs];
+    auto  aliasItem  = $[alias_item];
+
+    if (aliasItem != nullptr)
+    {
+      aliasItems.push_back(aliasItem);
+    }
+
+    $$ = std::move(aliasItems);
+  }
+| alias_item
+  {
+    // alias_items : alias_item
+    vector<Parsers::AST_Node*> aliasItems;
+    auto aliasItem = $[alias_item];
+
+    if (aliasItem != nullptr)
+    {
+      aliasItems.push_back(aliasItem);
+    }
+
+    $$ = std::move(aliasItems);
+  }
+;
+
+alias_item :
+  attribute_def
+  {
+    // alias_item : attribute_def
+    $$ = $1;
+  }
+| ACCESSTOGETHER SEMICOLON
+  {
+    // alias_item : ACCESSTOGETHER SEMICOLON
+    auto node        = ast.Create_Value(true);
+    auto placeHolder = ast.Create_PlaceHolder(Parsers::Kind::AccessTogether, node);
+
+    LOG(ERROR_LVL) << "Alias AccessTogether is not yet supported";
+    $$ = placeHolder;
+  }
+| alias_iApplyEndState
+  {
+    // alias_item : alias_iApplyEndState
+    $$ = $1;
+  }
+| alias_refEnum
+  {
+    // alias_item : alias_refEnum
+    $$ = $1;
+  }
+;
+
+
+alias_iApplyEndState : IAPPLYENDSTATE concat_number SEMICOLON
+{
+  // alias_iApplyEndState : IAPPLYENDSTATE concat_number SEMICOLON
+  auto concatNumber = $[concat_number];
+  auto node         = ast.Create_PlaceHolder(Parsers::Kind::ApplyEndState, concatNumber);
+
+  LOG(ERROR_LVL) << "Alias iApplyEndState is not yet supported";
+  $$ = node;
+}
+;
+
+alias_refEnum : REFENUM enum_name SEMICOLON
+{
+  // alias_refEnum : REFENUM enum_name SEMICOLON
+  LOG(ERROR_LVL) << "Alias refEnum is not yet supported";
+  $$ = nullptr;
+}
+;
+
 concat_hier_data_signal : concat_hier_data_signal COMMA x_hier_data_signal | x_hier_data_signal;
 x_hier_data_signal : TILDE hier_data_signal | hier_data_signal ;
 hier_data_signal : hier_data_signal_instances reg_port_signal_id | reg_port_signal_id ;
@@ -2806,6 +2914,7 @@ hier_data_signal_instances : hier_data_signal_instances instance_name DOT | inst
 enum_def : ENUM enum_name LEFT_BRACE enum_items RIGHT_BRACE
 {
   // enum_def : ENUM enum_name LEFT_BRACE enum_items RIGHT_BRACE
+  LOG(ERROR_LVL) << "Enum definition is not yet supported";
   $$ = nullptr;
 }
 ;
@@ -2846,7 +2955,7 @@ concat_string :
     // concat_string : parameter_ref
     vector<Parsers::AST_SimpleNode*> concatenatedString;
 
-    auto  paramRef = $[parameter_ref];
+    auto paramRef = $[parameter_ref];
 
     concatenatedString.emplace_back(paramRef);
 

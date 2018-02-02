@@ -29,6 +29,8 @@ namespace Parsers
 
     AccessLink,          //!< For access link
     Alias,               //!< For alias definitions
+    ApplyEndState,       //!< For alias iApplyEndState
+    AccessTogether,      //!< For alias  AccessTogether
     Attribute,           //!< For attribute definitions
     ConcatenatedNumbers, //!< For concatenated numbers
     DefaultLoadValue,    //!< For registers default load value
@@ -60,6 +62,7 @@ namespace Parsers
     Parameter,           //!< For parameters definitions
     Parameter_ref,       //!< For parameters references
     ParenthesizedExpr,   //!< For parenthesized integer expressions
+    PlaceHolder,         //!< For a node place holder
     Port,                //!< For ScanInterface Ports
     ResetValue,          //!< For registers reset value
     ScalarIdentifier,    //!< For identifier with a without scope prefix and no bit nor range identifier
@@ -75,6 +78,7 @@ namespace Parsers
     Source,              //!< For unspecifed source signal(s)
     String,              //!< For string literals
     TranslationUnit,     //!< For source files as a all
+    Value_Bool,          //!< For boolean value
     VectorIdentifier,    //!< For identifiers with a without scope prefix and bit or range identifier
   };
 
@@ -98,7 +102,9 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::Undefined)
 
             ENUM_MEMBER(Parsers::Kind::AccessLink)
+            ENUM_MEMBER(Parsers::Kind::AccessTogether)
             ENUM_MEMBER(Parsers::Kind::Alias)
+            ENUM_MEMBER(Parsers::Kind::ApplyEndState)
             ENUM_MEMBER(Parsers::Kind::Attribute)
             ENUM_MEMBER(Parsers::Kind::BsdlInstructionRef)
             ENUM_MEMBER(Parsers::Kind::ConcatenatedNumbers)
@@ -130,6 +136,7 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::Parameter)
             ENUM_MEMBER(Parsers::Kind::Parameter_ref)
             ENUM_MEMBER(Parsers::Kind::ParenthesizedExpr)
+            ENUM_MEMBER(Parsers::Kind::PlaceHolder)
             ENUM_MEMBER(Parsers::Kind::Port)
             ENUM_MEMBER(Parsers::Kind::ResetValue)
             ENUM_MEMBER(Parsers::Kind::ScalarIdentifier)
@@ -145,6 +152,7 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::Source)
             ENUM_MEMBER(Parsers::Kind::String)
             ENUM_MEMBER(Parsers::Kind::TranslationUnit)
+            ENUM_MEMBER(Parsers::Kind::Value_Bool)
             ENUM_MEMBER(Parsers::Kind::VectorIdentifier)
            );
 
@@ -172,6 +180,8 @@ class AST_Node
 
   bool IsKind(Kind kind) const { return m_kind == kind; } //!< Returns whether node is specified kind
 
+  void ChangeKind (Kind newKind) { m_kind = newKind; }; //!< Changes current kind (mainly used for place holder that can assign a new kind once assigned to a "target" variable)
+
   //! Returns true when a node is defined using Parameter reference(s)
   //!
   virtual bool HasParameterRef () const { return false; };
@@ -185,6 +195,7 @@ class AST_Node
     : m_kind (kind)
   {
   }
+
 
   // ---------------- Private Fields
   //

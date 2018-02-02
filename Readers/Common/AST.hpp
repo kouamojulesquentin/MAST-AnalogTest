@@ -40,7 +40,9 @@ class AST_ScanMuxSelection;
 class AST_Signal;
 class AST_SimpleNode;
 class AST_Source;
-class AST_Value;
+
+template <typename> class AST_PlaceHolder;
+template <typename> class AST_Value;
 
 enum class AccessLinkType;
 
@@ -105,8 +107,10 @@ class AST final : public AST_Builder
   AST_ScanRegister*       Create_ScanRegister       (AST_VectorIdentifier* identifier, std::vector<AST_Node*>&& children);
   AST_ScalarIdentifier*   Create_ScalarIdentifier   (std::string&& name);
   AST_VectorIdentifier*   Create_VectorIdentifier   (std::string&& name, AST_IntegerExpr* leftIndex, AST_IntegerExpr* rightIndex = nullptr);
-  AST_Value*              Create_Value              (Kind kind, AST_ConcatNumber* concatNumber);
 
+  AST_Value<bool>*                   Create_Value       (bool value);                                     //!< Creates a value from C++ built-in type
+  AST_PlaceHolder<AST_Value<bool>>*  Create_PlaceHolder (Kind targetKind, AST_Value<bool>*  wrappedNode); //!< Creates a place holder node for AST_Value<bool>
+  AST_PlaceHolder<AST_ConcatNumber>* Create_PlaceHolder (Kind targetKind, AST_ConcatNumber* wrappedNode); //!< Creates a place holder node for AST_ConcatNumber
 
   void SaveInstanceDefaultNamespace ()           { m_savedInstancesDefaultNamespace = m_instancesDefaultNamespace; }  //!< Saves instance default namespace (before parsing new module body)
 

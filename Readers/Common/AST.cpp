@@ -29,6 +29,7 @@
 #include "AST_Namespace.hpp"
 #include "AST_Parameter.hpp"
 #include "AST_ParameterRef.hpp"
+#include "AST_PlaceHolder.hpp"
 #include "AST_Port.hpp"
 #include "AST_ScalarIdentifier.hpp"
 #include "AST_ScanInterface.hpp"
@@ -641,6 +642,24 @@ AST_ParameterRef* AST::Create_ParameterRef (string&& name)
 //---------------------------------------------------------------------------
 
 
+//! Creates a place holder node for some target kind
+//!
+//! @param targetKind   Kind of target wrapped node should be assigned
+//! @param wrappedNode  Node to assign to the defined target
+//!
+//! @return Created AST_PlaceHolder
+//!
+#define CREATE_PLACEHOLDER(TYPE)                                                    \
+AST_PlaceHolder<TYPE>* AST::Create_PlaceHolder (Kind targetKind, TYPE* wrappedNode) \
+{                                                                                   \
+  return Create_Node<AST_PlaceHolder<TYPE>>(targetKind, wrappedNode);               \
+}
+
+CREATE_PLACEHOLDER(AST_Value<bool>)
+CREATE_PLACEHOLDER(AST_ConcatNumber)
+//
+//  End of: AST::AST_PlaceHolder
+//---------------------------------------------------------------------------
 
 
 //! Creates an AST_Port node
@@ -882,6 +901,21 @@ AST_ModuleIdentifier* AST::Create_UniquifiedModuleIdentifier (const AST_Module* 
 //---------------------------------------------------------------------------
 
 
+//! Creates a plain C++ built-in type wrapper
+//!
+//! @param value  Actual built-in type value
+//!
+//! @return Created AST_Value
+//!
+AST_Value<bool>* AST::Create_Value (bool value)
+{
+  auto kind = Parsers::Kind::Value_Bool;
+  return Create_Node<AST_Value<bool>>(kind, value);
+}
+//
+//  End of: AST::Create_Value
+//---------------------------------------------------------------------------
+
 
 
 //! Creates an AST_Identifier node
@@ -899,27 +933,6 @@ AST_VectorIdentifier* AST::Create_VectorIdentifier (std::string&& name, AST_Inte
 //
 //  End of: AST::Create_VectorIdentifier
 //---------------------------------------------------------------------------
-
-
-
-
-
-
-//! Creates an AST_Value node
-//!
-//! @param kind         Kind of target
-//! @param concatNumber Value expression
-//!
-//! @return Created AST_Value
-//!
-AST_Value* AST::Create_Value (Kind kind, AST_ConcatNumber* concatNumber)
-{
-  return Create_Node<AST_Value>(kind, concatNumber);
-}
-//
-//  End of: AST::Create_Value
-//---------------------------------------------------------------------------
-
 
 
 //! Changes namespace in which following modules are created

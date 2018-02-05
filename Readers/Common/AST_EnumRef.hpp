@@ -36,7 +36,7 @@ class AST_EnumRef final : public AST_SimpleNode
 
   //! Text representation of enum
   //!
-  std::string AsText() const override { return std::string("$").append(m_name); }
+  std::string AsText() const override { return m_name; }
 
   // ---------------- Private Methods
   //
@@ -49,7 +49,7 @@ class AST_EnumRef final : public AST_SimpleNode
   //! @param name  Refered enum name
   //!
   AST_EnumRef(std::string&& name)
-    : AST_SimpleNode (Kind::Enum_ref)
+    : AST_SimpleNode (Kind::RefEnum)
     , m_name         (std::move(name))
   {
   }

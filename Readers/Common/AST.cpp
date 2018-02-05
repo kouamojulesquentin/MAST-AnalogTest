@@ -13,6 +13,7 @@
 
 #include "AST.hpp"
 #include "AST_AccessLink.hpp"
+#include "AST_Alias.hpp"
 #include "AST_Attribute.hpp"
 #include "AST_BasedNumber.hpp"
 #include "AST_BsdlInstructionRef.hpp"
@@ -231,6 +232,23 @@ AST_VectorIdentifier* AST::Clone_VectorIdentifier (const AST_VectorIdentifier* i
 }
 //
 //  End of: AST::Clone_VectorIdentifier
+//---------------------------------------------------------------------------
+
+
+//! Creates a Create_Alias node
+//!
+//! @param aliasIdentifier    Alias identifier
+//! @param signals            Aliased signal(s)
+//! @param optionalChildren   Optional parts
+//!
+AST_Alias* AST::Create_Alias (AST_VectorIdentifier* aliasIdentifier,
+                              vector<AST_Signal*>&& signals,
+                              vector<AST_Node*>&&   optionalChildren)
+{
+  return Create_Node<AST_Alias>(aliasIdentifier, std::move(signals), std::move(optionalChildren));
+}
+//
+//  End of: AST::Create_Alias
 //---------------------------------------------------------------------------
 
 
@@ -804,7 +822,7 @@ AST_Signal* AST::Create_Signal (AST_Number* number)
 //!
 //! @param portName   Port name
 //!
-AST_Signal* AST::Create_Signal (AST_Identifier* portName)
+AST_Signal* AST::Create_Signal (AST_VectorIdentifier* portName)
 {
   return Create_Node<AST_Signal>(portName);
 }
@@ -818,7 +836,7 @@ AST_Signal* AST::Create_Signal (AST_Identifier* portName)
 //! @param scope      Port scope (dot separated instances names)
 //! @param portName   Port name
 //!
-AST_Signal* AST::Create_Signal (vector<AST_ScalarIdentifier*>&& scope, AST_Identifier* portName)
+AST_Signal* AST::Create_Signal (vector<AST_ScalarIdentifier*>&& scope, AST_VectorIdentifier* portName)
 {
   return Create_Node<AST_Signal>(std::move(scope), portName);
 }

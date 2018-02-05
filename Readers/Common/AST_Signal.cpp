@@ -12,8 +12,9 @@
 //===========================================================================
 
 #include "AST_Signal.hpp"
-#include "AST_ScalarIdentifier.hpp"
 #include "AST_Number.hpp"
+#include "AST_ScalarIdentifier.hpp"
+#include "AST_VectorIdentifier.hpp"
 #include <sstream>
 
 using std::ostringstream;
@@ -46,6 +47,23 @@ string AST_Signal::AsText () const
 }
 //
 //  End of: AST_Signal::AsText
+//---------------------------------------------------------------------------
+
+
+
+//! Returns signal bits count
+//!
+uint32_t AST_Signal::BitsCount () const
+{
+  if (IsNumber())
+  {
+    return m_number->Size();
+  }
+
+  return m_portName->BitsCount();
+}
+//
+//  End of: AST_Signal::BitsCount
 //---------------------------------------------------------------------------
 
 

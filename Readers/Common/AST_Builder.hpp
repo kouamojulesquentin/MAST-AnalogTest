@@ -19,6 +19,7 @@
 
 namespace Parsers
 {
+class AST_Alias;
 class AST_Attribute;
 class AST_BasedNumber;
 class AST_ConcatNumber;
@@ -30,6 +31,7 @@ class AST_IntegerLiteral;
 class AST_Instance;
 class AST_Module;
 class AST_Network;
+class AST_Node;
 class AST_Number;
 class AST_Parameter;
 class AST_ParameterRef;
@@ -37,6 +39,7 @@ class AST_Port;
 class AST_ScalarIdentifier;
 class AST_ScanMux;
 class AST_ScanRegister;
+class AST_Signal;
 class AST_String;
 class AST_ModuleIdentifier;
 class AST_VectorIdentifier;
@@ -65,6 +68,9 @@ class AST_Builder
   virtual AST_ScanRegister*      Clone_ScanRegister      (const AST_ScanRegister*      scanRegister) = 0;      //!< Clones a scan register
   virtual AST_VectorIdentifier*  Clone_VectorIdentifier  (const AST_VectorIdentifier*  identifier) = 0;        //!< Clones a vector identifier
 
+  virtual AST_Alias*             Create_Alias                      (AST_VectorIdentifier*       aliasIdentifier,
+                                                                    std::vector<AST_Signal*>&&  signals,
+                                                                    std::vector<AST_Node*>&&    optionalChildren) = 0; //!< Creates an AST_Alias
   virtual AST_BasedNumber*       Create_BasedNumber                (Kind                        kind, std::string&&    baseAndDigits) = 0;                              //!< Creates an AST_BasedNumber
   virtual AST_ConcatNumber*      Create_ConcatNumber               () = 0;                                                                                              //!< Creates an AST_ConcatNumber empty
   virtual AST_ConcatNumber*      Create_ConcatNumber               (std::vector<AST_Number*>&&  numbers) = 0;                                                           //!< Creates an AST_ConcatNumber

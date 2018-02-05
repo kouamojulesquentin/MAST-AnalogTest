@@ -58,6 +58,9 @@ class AST final : public AST_Builder
   ~AST();
   AST();
 
+  AST_Alias*              Create_Alias              (AST_VectorIdentifier*      aliasIdentifier,
+                                                     std::vector<AST_Signal*>&& signals,
+                                                     std::vector<AST_Node*>&&   optionalChildren) override; //!< Creates an AST_Alias
   AST_AccessLink*         Create_AccessLink         (const AST_ScalarIdentifier*            identifier,
                                                      AccessLinkType                         type,
                                                      AST_FileRef*                           bsdlFile,
@@ -85,8 +88,8 @@ class AST final : public AST_Builder
   AST_BsdlInstructionRef* Create_BsdlInstructionRef (std::string&& instructionName, std::vector<AST_Node*>&& children);
   AST_String*             Create_String             (std::string&& content) override;
   AST_Signal*             Create_Signal             (AST_Number* number);
-  AST_Signal*             Create_Signal             (AST_Identifier* portName);
-  AST_Signal*             Create_Signal             (std::vector<AST_ScalarIdentifier*>&& scope, AST_Identifier* portName);
+  AST_Signal*             Create_Signal             (AST_VectorIdentifier* portName);
+  AST_Signal*             Create_Signal             (std::vector<AST_ScalarIdentifier*>&& scope, AST_VectorIdentifier* portName);
   AST_ScanMux*            Create_ScanMux            (AST_VectorIdentifier*                identifier,
                                                      std::vector<Parsers::AST_Signal*>&&  selectors,
                                                      std::vector<AST_ScanMuxSelection*>&& scanMuxSelection);

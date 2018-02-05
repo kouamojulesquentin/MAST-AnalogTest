@@ -34,6 +34,7 @@ namespace Parsers
 {
   class AST;
   class AST_AccessLink;
+  class AST_Alias;
   class AST_Attribute;
   class AST_BasedNumber;
   class AST_BsdlInstructionRef;
@@ -102,6 +103,7 @@ typedef void* yyscan_t;
 
 #include "AST.hpp"
 #include "AST_AccessLink.hpp"
+#include "AST_Alias.hpp"
 #include "AST_Attribute.hpp"
 #include "AST_BasedNumber.hpp"
 #include "AST_BsdlInstructionRef.hpp"
@@ -236,10 +238,11 @@ namespace
 
 
 
-%type <Parsers::AST_ModuleIdentifier*>                                                    module_identifier
-%type <std::vector<Parsers::AST_BsdlInstructionRef*>>                                     bsdl_instr_refs
-%type <std::vector<Parsers::AST_ScalarIdentifier*>>                                       scoped_instance_name
-%type <std::tuple<std::vector<Parsers::AST_ScalarIdentifier*>, Parsers::AST_Identifier*>> scoped_port_name
+%type <Parsers::AST_ModuleIdentifier*>                                                          module_identifier
+%type <std::vector<Parsers::AST_BsdlInstructionRef*>>                                           bsdl_instr_refs
+%type <std::vector<Parsers::AST_ScalarIdentifier*>>                                             scoped_instance_name
+%type <std::tuple<std::vector<Parsers::AST_ScalarIdentifier*>, Parsers::AST_VectorIdentifier*>> scoped_port_name
+
 %type <std::tuple<Parsers::AST_ScalarIdentifier*,              std::string>>              accessLink1149_ScanInterface_name
 %type <std::vector<std::tuple<Parsers::AST_ScalarIdentifier*,  std::string>>>             accessLink1149_ScanInterface_names
 
@@ -384,7 +387,6 @@ namespace
 
 %type <Parsers::AST_Node*>              scanRegister_captureSource
 %type <Parsers::AST_Node*>              scanRegister_defaultLoadValue
-%type <Parsers::AST_Node*>              scanRegister_refEnum
 %type <Parsers::AST_Source*>            scanRegister_scanInSource
 %type <Parsers::AST_Source*>            port_source
 %type <Parsers::AST_Source*>            scanOutPort_source
@@ -397,7 +399,6 @@ namespace
 %type <Parsers::AST_Node*>              scanRegister_item
 %type <Parsers::AST_Node*>              bsdl_instr_selected_item
 %type <Parsers::AST_Node*>              alias_item
-%type <Parsers::AST_Node*>              alias_refEnum
 
 %type <std::vector<Parsers::AST_Node*>> module_items
 %type <std::vector<Parsers::AST_Node*>> dataInPort_items
@@ -862,6 +863,7 @@ instance_name : SCALAR_ID
 
   $$ = ast.Create_ScalarIdentifier(std::move(name));
 };
+
 module_name    : SCALAR_ID
 {
   // module_name : SCALAR_ID
@@ -2203,7 +2205,7 @@ scanRegister_item :
 | scanRegister_defaultLoadValue   { $$ = $1; /* scanRegister_item : scanRegister_defaultLoadValue  */ }
 | scanRegister_captureSource      { $$ = $1; /* scanRegister_item : scanRegister_captureSource     */ }
 | scanRegister_resetValue         { $$ = $1; /* scanRegister_item : scanRegister_resetValue        */ }
-| scanRegister_refEnum            { $$ = $1; /* scanRegister_item : scanRegister_refEnum           */ }
+| enumRef                         { $$ = $1; /* scanRegister_item : enumRef */ }
 ;
 
 scanRegister_scanInSource : SCANINSOURCE scan_signal SEMICOLON
@@ -2253,8 +2255,6 @@ scanRegister_resetValue :
   }
 ;
 
-scanRegister_refEnum : REFENUM enum_name SEMICOLON { $$ = nullptr; /* scanRegister_refEnum : REFENUM enum_name SEMICOLON */};
-
 // 6.4.9
 dataRegister_def : DATAREGISTER dataRegister_name dataRegister_tail
 {
@@ -2272,10 +2272,13 @@ dataRegister_addressable |
 dataRegister_readCallBack |
 dataRegister_writeCallBack ;
 // Common to all types:
-dataRegister_common : dataRegister_resetValue |
-dataRegister_defaultLoadValue |
-dataRegister_refEnum |
-attribute_def ;
+dataRegister_common :
+  dataRegister_resetValue
+| dataRegister_defaultLoadValue
+| enumRef
+| attribute_def
+;
+
 dataRegister_resetValue :
   RESETVALUE concat_number SEMICOLON
 | RESETVALUE enum_symbol SEMICOLON
@@ -2284,7 +2287,6 @@ dataRegister_defaultLoadValue :
   DEFAULTLOADVALUE concat_number SEMICOLON
 | DEFAULTLOADVALUE enum_symbol SEMICOLON
 ;
-dataRegister_refEnum : REFENUM enum_name SEMICOLON ;
 //For Selectable Data Register:
 dataRegister_selectable : dataRegister_writeEnSource |
 dataRegister_writeDataSource;
@@ -2795,16 +2797,22 @@ scanInterfaceChain_item : attribute_def | scanInterfacePort_def | defaultLoad_de
 defaultLoad_def : DEFAULTLOADVALUE concat_number SEMICOLON ;
 
 // 6.5.2
-alias_def : ALIAS alias_name EQUAL concat_hier_data_signal alias_tail
+alias_def : ALIAS alias_name EQUAL concat_signal_or_inverted_signal alias_tail
 {
-  // alias_def : ALIAS alias_name EQUAL concat_hier_data_signal alias_tail
-  $$ = nullptr;
+  // alias_def : ALIAS alias_name EQUAL concat_signal_or_inverted_signal alias_tail
+  auto  aliasName        = $[alias_name];
+  auto& signals          = $[concat_signal_or_inverted_signal];
+  auto& optionalChildren = $[alias_tail];
+
+  auto alias = ast.Create_Alias(aliasName, std::move(signals), std::move(optionalChildren));
+
+  $$ = alias;
 }
 ;
 
-alias_name : reg_port_signal_id
+alias_name : scalar_or_vector_id
 {
-  // alias_name : reg_port_signal_id
+  // alias_name : scalar_or_vector_id
   $$ = $1;
 }
 ;
@@ -2878,9 +2886,9 @@ alias_item :
     // alias_item : alias_iApplyEndState
     $$ = $1;
   }
-| alias_refEnum
+| enumRef
   {
-    // alias_item : alias_refEnum
+    // alias_item : enumRef
     $$ = $1;
   }
 ;
@@ -2896,19 +2904,6 @@ alias_iApplyEndState : IAPPLYENDSTATE concat_number SEMICOLON
   $$ = node;
 }
 ;
-
-alias_refEnum : REFENUM enum_name SEMICOLON
-{
-  // alias_refEnum : REFENUM enum_name SEMICOLON
-  LOG(ERROR_LVL) << "Alias refEnum is not yet supported";
-  $$ = nullptr;
-}
-;
-
-concat_hier_data_signal : concat_hier_data_signal COMMA x_hier_data_signal | x_hier_data_signal;
-x_hier_data_signal : TILDE hier_data_signal | hier_data_signal ;
-hier_data_signal : hier_data_signal_instances reg_port_signal_id | reg_port_signal_id ;
-hier_data_signal_instances : hier_data_signal_instances instance_name DOT | instance_name DOT;
 
 // 6.5.3
 enum_def : ENUM enum_name LEFT_BRACE enum_items RIGHT_BRACE

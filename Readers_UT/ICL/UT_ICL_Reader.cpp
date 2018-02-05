@@ -1571,6 +1571,126 @@ void UT_ICL_Reader::test_FromIcl_AccessLink_1149_2001 ()
 }
 
 
+//! Checks ICL_Reader::ParseExcerpt() when parsing aliases statement
+//!
+void UT_ICL_Reader::test_FromIcl_Alias ()
+{
+  // ---------------- Setup
+  //
+  istringstream excerpt(
+                        "Module Top\n"                                                                 // 01
+                        "{\n"                                                                          // 02
+                        "  Parameter size = 8;\n"                                                      // 03
+                        "\n"                                                                           // 04
+                        "  Alias Simple[3:1]  = a, b, c;\n"                                            // 05 ==> a, b & c are supposed to be 1 bit each
+                        "  Alias MyName1[2:0] = a[7:5];\n"                                             // 06
+                        "  Alias MyName2[2:0] = u1.a[2], u2.u3.b[1:0];\n"                              // 07
+                        "  Alias enable       = DI[$size-1];\n"                                        // 08
+                        "  Alias RE           = TDR1[63] ;\n"                                          // 09
+                        "  Alias CNTL[42:0]   = ADDR[7:0], DATA[31:0], CMD[2:0];\n"                    // 10
+                        "  Alias Adr[1:0]     = a[1], C { RefEnum T1; } \n"                            // 11
+                        "  Alias RE_2         = TDR1[63] { iApplyEndState 1'b0;}\n"                    // 12
+                        "  Alias CNTL_2[42:0] = ADDR[7:0], DATA[31:0], CMD[2:0] { AccessTogether; }\n" // 13
+                        "  Alias MyName3[2:0] = u1.a[2], u2.u3.b[1:0]\n"                               // 14
+                        "  {\n"                                                                        // 15
+                        "     AccessTogether;   \n"                                                    // 16
+                        "     iApplyEndState    3'b110; \n"                                            // 17
+                        "     RefEnum           T1; \n"                                                // 18
+                        "     Attribute Cie   = \"Picus Logica\"; \n"                                  // 19
+                        "   }\n"                                                                       // 20
+                        "}\n"s);                                                                       // 21
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  CxxTest::setAbortTestOnFail(true);
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(excerpt));
+
+  // ---------------- Verify
+  //
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+  auto network = ast->Network();
+  TS_ASSERT_NOT_NULLPTR (network);
+
+  auto expected_AST_PrettyPrint = "NameSpace;\n"
+                                  "Module Top\n"
+                                  "{\n"
+                                  "  Parameter size = 8;\n"
+                                  "  Alias Simple[3:1] = a, b, c;\n"
+                                  "  Alias MyName1[2:0] = a[7:5];\n"
+                                  "  Alias MyName2[2:0] = u1.a[2], u2.u3.b[1:0];\n"
+                                  "  Alias enable = DI[$size - 1];\n"
+                                  "  Alias RE = TDR1[63];\n"
+                                  "  Alias CNTL[42:0] = ADDR[7:0], DATA[31:0], CMD[2:0];\n"
+                                  "  Alias Adr[1:0] = a[1], C\n"
+                                  "  {\n"
+                                  "    RefEnum T1;\n"
+                                  "  }\n"
+                                  "  Alias RE_2 = TDR1[63]\n"
+                                  "  {\n"
+                                  "    iApplyEndState 1'b0;\n"
+                                  "  }\n"
+                                  "  Alias CNTL_2[42:0] = ADDR[7:0], DATA[31:0], CMD[2:0]\n"
+                                  "  {\n"
+                                  "    AccessTogether;\n"
+                                  "  }\n"
+                                  "  Alias MyName3[2:0] = u1.a[2], u2.u3.b[1:0]\n"
+                                  "  {\n"
+                                  "    Attribute Cie = \"Picus Logica\";\n"
+                                  "    RefEnum T1;\n"
+                                  "    AccessTogether;\n"
+                                  "    iApplyEndState 3'b110;\n"
+                                  "  }\n"
+                                  "}";
+
+  auto actual_AST_String = Parsers::AST_PrettyPrinter::PrettyPrint(network);
+  TS_ASSERT_EQUALS (actual_AST_String, expected_AST_PrettyPrint);
+}
+
+
+//! Checks ICL_Reader::ParseExcerpt() when parsing aliases statement with errors
+//!
+void UT_ICL_Reader::test_FromIcl_Alias_errors ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& aliasWithError)
+  {
+    // ---------------- Setup
+    //
+    stringstream excerpt;
+    excerpt << "Module Top\n{\n";
+    excerpt << aliasWithError;
+    excerpt << "}\n";
+
+    auto           sm = make_shared<SystemModel>();
+    ICL_Reader_TSS sut(sm);
+
+    // ---------------- Exercise & Verify
+    //
+    TS_ASSERT_THROWS (sut.UpdateAstFromIcl(excerpt), std::exception);
+  };
+
+  auto data =
+  {
+    "  Alias Simple = a, b, c;\n",                                                  // 0 ==> Simple is single bits !
+    "  Alias Simple[15:0] = a, b, c;\n",                                            // 1 ==> a, b & c are supposed to be 1 bit each
+    "  Alias Adr[1:0]     = a[1], C \n"
+    "  {\n"
+    "    RefEnum T1;\n"
+    "    RefEnum T2;\n"
+    "  }\n",                                                                        // 2 ==> Dual RefEnum is not valid
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
+
 
 //! Checks AST::Uniquify() with single instance
 //!

@@ -22,6 +22,7 @@
 namespace Parsers
 {
 class AST_AccessLink;
+class AST_Alias;
 class AST_Instance;
 class AST_ScanMux;
 class AST_ScanInterface;
@@ -79,6 +80,10 @@ class AST_Module final : public AST_ParentNode
   //! Returns, if exists attribute with specified name
   //!
   AST_Attribute* Attribute(std::experimental::string_view attributeName);
+
+  //! Returns module aliases
+  //!
+  const std::vector<AST_Alias*>& Aliases() const { return m_aliases; }
 
   //! Returns module ScanInterface(s)
   //!
@@ -216,6 +221,7 @@ class AST_Module final : public AST_ParentNode
   AST_Module*                     m_parentModule       = nullptr; //!< When uniquified, tells hierarchical, direct, parent module this one is instanciated (using an Instance)
   std::vector<AST_Parameter*>     m_parameters;                   //!< Generic module parameters
   std::vector<AST_Parameter*>     m_localParameters;              //!< Module local parameters
+  std::vector<AST_Alias*>         m_aliases;                      //!< Aliases
   std::vector<AST_ScanInterface*> m_scanInterfaces;               //!< Scan interfaces
   std::vector<AST_Port*>          m_dataInPorts;                  //!< Data input port(s)
   std::vector<AST_Port*>          m_dataOutPorts;                 //!< Data output port(s)

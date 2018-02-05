@@ -14,8 +14,10 @@
 #include "AST_PrettyPrinter.hpp"
 
 #include "AST_AccessLink.hpp"
+#include "AST_Alias.hpp"
 #include "AST_Attribute.hpp"
 #include "AST_BsdlInstructionRef.hpp"
+#include "AST_EnumRef.hpp"
 #include "AST_Instance.hpp"
 #include "AST_FileRef.hpp"
 #include "AST_Module.hpp"
@@ -211,6 +213,59 @@ void AST_PrettyPrinter::Visit_AccessLink (AST_AccessLink* accessLink)
 //---------------------------------------------------------------------------
 
 
+
+//! Appends Alias statement
+//!
+void AST_PrettyPrinter::Visit_Alias (AST_Alias* alias)
+{
+  // ---------------- Name
+  //
+  StreamNodeHeader(alias, " = ");
+
+  // ---------------- Signals
+  //
+  const auto& signals = alias->Signals();
+  m_os << AST_SimpleNode::AsText(signals, ", ");
+
+  // ---------------- Optional parts
+  //
+  const auto  accessTogether = alias->AccessTogether();
+  const auto  applyEndState  = alias->ApplyEndState();
+  const auto  enumRef        = alias->EnumRef();
+  const auto& attributes     = alias->Attributes();
+
+  auto needScope = (enumRef != nullptr) || accessTogether || (applyEndState != nullptr) || !attributes.empty();
+  if (needScope)
+  {
+    HierarchyInserter hierarchyInserter(*this);
+
+    StreamSimpleNodes(attributes);
+
+    if (enumRef != nullptr)
+    {
+      StreamSimpleNode(enumRef);
+    }
+
+    if (accessTogether)
+    {
+      StreamDepth(INSERT_NEW_LINE_BEFORE) << "AccessTogether;";
+    }
+
+    if (applyEndState != nullptr)
+    {
+      StreamDepth(INSERT_NEW_LINE_BEFORE) << "iApplyEndState " << applyEndState->AsText() << ";";
+    }
+  }
+  else
+  {
+    m_os << ";";
+  }
+}
+//
+//  End of: AST_PrettyPrinter::Visit_Aliases
+//---------------------------------------------------------------------------
+
+
 //! Appends content of a Instance node in text representation and visits
 //! sub-nodes
 void AST_PrettyPrinter::Visit_Instance (AST_Instance* instance)
@@ -292,6 +347,7 @@ void AST_PrettyPrinter::Visit_Module (AST_Module* module)
     AcceptNode (module->AccessLink());
   }
 
+  AcceptNodes (module->Aliases());
   AcceptNodes (module->ScanInterfaces());
   AcceptNodes (module->ScanInPorts());
   AcceptNodes (module->ScanOutPorts());

@@ -23,13 +23,13 @@
 
 namespace Parsers
 {
-class AST_AccessLink;
+//+class AST_AccessLink;
 class AST_Node;
-class AST_Instance;
+//+class AST_Instance;
 class AST_SimpleNode;
 class AST_NamedNode;
 class AST_ParentNode;
-class AST_ScanInterface;
+//+class AST_ScanInterface;
 
 //! System model visitors for creation of a text, readable, and hierarchical
 //! representation of the system mode tree
@@ -43,6 +43,7 @@ class AST_PrettyPrinter final : public AST_Visitor
   AST_PrettyPrinter()  = default;
 
   virtual void Visit_AccessLink    (AST_AccessLink*    instance)      override;
+  virtual void Visit_Alias         (AST_Alias*         alias)         override;
   virtual void Visit_Instance      (AST_Instance*      instance)      override;
   virtual void Visit_Network       (AST_Network*       network)       override;
   virtual void Visit_Module        (AST_Module*        module)        override;
@@ -64,8 +65,12 @@ class AST_PrettyPrinter final : public AST_Visitor
   friend class HierarchyInserter; //!< Helper class to insert hierarchy open/close sequences
   using pos_type = std::ostringstream::pos_type;
 
-  std::ostringstream& StreamDepth()
+  std::ostringstream& StreamDepth(bool insertNewLineBefore = false)
   {
+    if (insertNewLineBefore)
+    {
+      m_os << "\n";
+    }
     m_os << std::string(2u * m_depth, ' ');
     return m_os;
   }
@@ -108,6 +113,8 @@ class AST_PrettyPrinter final : public AST_Visitor
   std::ostringstream m_os;           //!< Stream to build up a representation of visited nodes
   uint32_t           m_depth = 0u;   //!< Current nodes tree depth
   bool               m_first = true; //!< True when nothing as been streamed yet (useful to add first new line)
+
+  static constexpr bool INSERT_NEW_LINE_BEFORE = true;
 };
 //
 //  End of AST_PrettyPrinter class declaration

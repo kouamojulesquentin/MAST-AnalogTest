@@ -14,6 +14,7 @@
 #include "AST_Checker.hpp"
 
 #include "AST_AccessLink.hpp"
+#include "AST_Alias.hpp"
 #include "AST_Attribute.hpp"
 #include "AST_Instance.hpp"
 #include "AST_Module.hpp"
@@ -93,6 +94,30 @@ void AST_Checker::Visit_AccessLink (AST_AccessLink* accessLink)
 //---------------------------------------------------------------------------
 
 
+//! Reports not yet supported alias options
+//!
+void AST_Checker::Visit_Alias (AST_Alias* alias)
+{
+  if (alias->EnumRef() != nullptr)
+  {
+    ReportWarning(m_messageContext + "has Alias \"" + alias->Name() + "\" with RefEnum statement ==> that is not yet supported");
+  }
+
+  if (alias->ApplyEndState() != nullptr)
+  {
+    ReportWarning(m_messageContext + "has Alias \"" + alias->Name() + "\" with iApplyEndState statement ==> that is not yet supported");
+  }
+
+  if (alias->AccessTogether())
+  {
+    ReportWarning(m_messageContext + "has Alias \"" + alias->Name() + "\" with AccessTogether statement ==> that is not yet supported");
+  }
+}
+//
+//  End of: AST_Checker::Visit_AccessLink
+//---------------------------------------------------------------------------
+
+
 //! Checks nothing for AST_Instance
 //!
 void AST_Checker::Visit_Instance (AST_Instance* instance)
@@ -144,16 +169,17 @@ void AST_Checker::Visit_Module (AST_Module* module)
   // ---------------- ScanInPorts
   //
   auto scanInPorts = module->ScanInPorts();
-  auto msgPrefix   = "Module \""s.append(module->Name()).append("\" ");
+
+  m_messageContext = "Module \""s.append(module->Name()).append("\" ");
 
   if (scanInPorts.empty())
   {
-    ostringstream os; os << msgPrefix << "has no ScanInPorts";
+    ostringstream os; os << m_messageContext << "has no ScanInPorts";
     ReportInfo(os.str());
   }
   else if ((scanInPorts.size() != 1u) && module->ScanInterfaces().empty())
   {
-    ostringstream os; os << msgPrefix << "has " << scanInPorts.size() << " ScanInPorts - but has no ScanInterfaces";
+    ostringstream os; os << m_messageContext << "has " << scanInPorts.size() << " ScanInPorts - but has no ScanInterfaces";
     ReportWarning(os.str());
   }
 
@@ -163,12 +189,12 @@ void AST_Checker::Visit_Module (AST_Module* module)
 
   if (scanOutPorts.empty())
   {
-    ostringstream os; os << msgPrefix << "has no ScanOutPorts";
+    ostringstream os; os << m_messageContext << "has no ScanOutPorts";
     ReportInfo(os.str());
   }
   else if ((scanOutPorts.size() != 1u) && module->ScanInterfaces().empty())
   {
-    ostringstream os; os << msgPrefix << "has " << scanOutPorts.size() << " ScanOutPorts - but has no ScanInterfaces";
+    ostringstream os; os << m_messageContext << "has " << scanOutPorts.size() << " ScanOutPorts - but has no ScanInterfaces";
     ReportWarning(os.str());
   }
   else
@@ -176,11 +202,11 @@ void AST_Checker::Visit_Module (AST_Module* module)
     auto scanOutPort = scanOutPorts.front();
     auto source      = scanOutPort->Source();
 
-    msgPrefix.append("ScanOutPort \"").append(scanOutPort->Name()).append("\" ");
+    m_messageContext.append("ScanOutPort \"").append(scanOutPort->Name()).append("\" ");
 
     if (source == nullptr)
     {
-      ostringstream os; os << msgPrefix << "has no source";
+      ostringstream os; os << m_messageContext << "has no source";
       ReportError(os.str());
     }
     else
@@ -188,7 +214,7 @@ void AST_Checker::Visit_Module (AST_Module* module)
       auto signals = source->Signals();
       if (signals.size() != 1u)
       {
-        ostringstream os; os << msgPrefix << "has a source with no signal";
+        ostringstream os; os << m_messageContext << "has a source with no signal";
         ReportError(os.str());
       }
       else
@@ -197,13 +223,19 @@ void AST_Checker::Visit_Module (AST_Module* module)
         CHECK_VALUE_NOT_NULL(signal, "Expecting not nullptr signal");
         if (signal->IsNumber())
         {
-          ostringstream os; os << msgPrefix << "source signal is a number instead of connecting to some port";
+          ostringstream os; os << m_messageContext << "source signal is a number instead of connecting to some port";
           ReportError(os.str());
         }
       }
     }
   }
 
+  // ---------------- Aliases
+  //
+  for (auto alias : module->Aliases())
+  {
+    Visit_Alias(alias);
+  }
 }
 //
 //  End of: AST_Checker::Visit_Module

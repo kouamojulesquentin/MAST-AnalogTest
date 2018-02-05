@@ -11,6 +11,8 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST.cpp
                                   AST_AccessLink.hpp
                                   AST_AccessLink.cpp
+                                  AST_Alias.hpp
+                                  AST_Alias.cpp
                                   AST_Attribute.hpp
                                   AST_Attribute.cpp
                                   AST_BasedNumber.hpp

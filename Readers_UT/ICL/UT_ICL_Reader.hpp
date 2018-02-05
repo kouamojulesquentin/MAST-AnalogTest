@@ -49,6 +49,8 @@ class UT_ICL_Reader : public CxxTest::TestSuite
   void test_FromIcl_UseNamespace_Def_OutsideModule ();
   void test_FromIcl_UseNamespace_Def_InsideModule ();
   void test_FromIcl_AccessLink_1149_2001 ();
+  void test_FromIcl_Alias ();
+  void test_FromIcl_Alias_errors ();
 
   // ---------------- Unification
   //

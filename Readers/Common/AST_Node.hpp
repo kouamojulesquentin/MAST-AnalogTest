@@ -38,7 +38,6 @@ namespace Parsers
     DataOutPort,         //!< For modules data output port
     Enum_def,            //!< For enums definitions
     Enum_item,           //!< For enums items
-    Enum_ref,            //!< For enums references
     BSDLEntity,          //!< For BSDL file referred by AccessLink
     IntegerExprRef,      //!< For an integer expression reference
     IntegerLiteral,      //!< For a, unsigned, integer literal
@@ -64,6 +63,7 @@ namespace Parsers
     ParenthesizedExpr,   //!< For parenthesized integer expressions
     PlaceHolder,         //!< For a node place holder
     Port,                //!< For ScanInterface Ports
+    RefEnum,             //!< For enums references
     ResetValue,          //!< For registers reset value
     ScalarIdentifier,    //!< For identifier with a without scope prefix and no bit nor range identifier
     ScanInPort,          //!< For modules scan input port
@@ -113,7 +113,6 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::DataOutPort)
             ENUM_MEMBER(Parsers::Kind::Enum_def)
             ENUM_MEMBER(Parsers::Kind::Enum_item)
-            ENUM_MEMBER(Parsers::Kind::Enum_ref)
             ENUM_MEMBER(Parsers::Kind::BSDLEntity)
             ENUM_MEMBER(Parsers::Kind::InputPort)
             ENUM_MEMBER(Parsers::Kind::InputPortSource)
@@ -138,6 +137,7 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::ParenthesizedExpr)
             ENUM_MEMBER(Parsers::Kind::PlaceHolder)
             ENUM_MEMBER(Parsers::Kind::Port)
+            ENUM_MEMBER(Parsers::Kind::RefEnum)
             ENUM_MEMBER(Parsers::Kind::ResetValue)
             ENUM_MEMBER(Parsers::Kind::ScalarIdentifier)
             ENUM_MEMBER(Parsers::Kind::ScanInPort)

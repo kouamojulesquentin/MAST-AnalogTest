@@ -18,6 +18,7 @@
 #include "Checker.hpp"
 #include "CheckResult.hpp"
 
+#include <string>
 
 namespace Parsers
 {
@@ -35,6 +36,7 @@ class AST_Checker final : public mast::Checker, public AST_Visitor
   AST_Checker(AST_Network* network);
 
   virtual void Visit_AccessLink    (AST_AccessLink*    instance)      override;
+  virtual void Visit_Alias         (AST_Alias*         alias)         override;
   virtual void Visit_Instance      (AST_Instance*      instance)      override;
   virtual void Visit_Network       (AST_Network*       network)       override;
   virtual void Visit_Module        (AST_Module*        module)        override;
@@ -62,6 +64,7 @@ class AST_Checker final : public mast::Checker, public AST_Visitor
   //
   private:
   AST_Network* m_network = nullptr; //!< Test network AST being checked
+  std::string  m_messageContext;    //!< Provides a context to messages
 };
 //
 //  End of AST_Checker class declaration

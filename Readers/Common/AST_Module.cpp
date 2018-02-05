@@ -13,6 +13,7 @@
 
 #include "AST_Module.hpp"
 #include "AST_AccessLink.hpp"
+#include "AST_Alias.hpp"
 #include "AST_Attribute.hpp"
 #include "AST_Instance.hpp"
 #include "AST_Network.hpp"
@@ -76,6 +77,7 @@ void AST_Module::DispatchChildren ()
         case Parsers::Kind::DataInPort:     AST_ParentNode::AppendChild(child, m_dataInPorts);     break;
         case Parsers::Kind::DataOutPort:    AST_ParentNode::AppendChild(child, m_dataOutPorts);    break;
         case Parsers::Kind::Instance:       AST_ParentNode::AppendChild(child, m_instances);       break;
+        case Parsers::Kind::Alias:          AST_ParentNode::AppendChild(child, m_aliases);         break;
 
         case Parsers::Kind::AccessLink :    SetChild(child, m_accessLink); break;
 
@@ -85,7 +87,7 @@ void AST_Module::DispatchChildren ()
     }
   }
 
-  // ---------------- Check that each local parameter have a name different than standard parameters
+  // ---------------- Check that each local parameter have a name different than "standard" (those that can be overridden) parameters
   //
   for (const auto localParameter : m_localParameters)
   {

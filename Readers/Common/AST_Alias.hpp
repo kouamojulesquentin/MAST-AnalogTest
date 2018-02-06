@@ -43,6 +43,10 @@ class AST_Alias final : public AST_ParentNode
   //!
   std::string Name() const override;
 
+  //! Returns alias identifier (name and optional bits range)
+  //!
+  AST_VectorIdentifier* Identifier() const { return m_identifier; }
+
   //! Returns alias attributes
   //!
   const std::vector<AST_Attribute*>& Attributes() const { return m_attributes; }
@@ -65,10 +69,21 @@ class AST_Alias final : public AST_ParentNode
   //!
   bool AccessTogether() const { return m_accessTogether; }
 
-
   //! Visited part of the Visitor pattern
   //!
   void Accept (AST_Visitor& visitor);
+
+  //! Returns true when there is a parameter reference in part of alias
+  //!
+  bool HasParameterRef () const;
+
+  //! Replaces parameter references by its actual value
+  //!
+  void Resolve (const std::vector<AST_Parameter*>& parameters);
+
+  //! Returns uniquified clone
+  //!
+  AST_Alias* UniquifiedClone(AST_Builder& astBuilder) const;
 
   // ---------------- Private Methods
   //

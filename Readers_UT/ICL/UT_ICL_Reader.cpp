@@ -1677,13 +1677,21 @@ void UT_ICL_Reader::test_FromIcl_Alias_errors ()
 
   auto data =
   {
-    "  Alias Simple = a, b, c;\n",                                                  // 0 ==> Simple is single bits !
-    "  Alias Simple[15:0] = a, b, c;\n",                                            // 1 ==> a, b & c are supposed to be 1 bit each
-    "  Alias Adr[1:0]     = a[1], C \n"
+    "  Alias Adr[1:0] = a[1], C[4] \n"
     "  {\n"
     "    RefEnum T1;\n"
     "    RefEnum T2;\n"
-    "  }\n",                                                                        // 2 ==> Dual RefEnum is not valid
+    "  }\n",                      // 0 ==> Dual RefEnum is not valid
+    "  Alias Adr[1:0] = a[1], C \n"
+    "  {\n"
+    "    AccessTogether;\n"
+    "    AccessTogether;\n"
+    "  }\n",                      // 1 ==> Dual AccessTogether is not valid
+    "  Alias Adr[1:0] = a[1], C \n"
+    "  {\n"
+    "    iApplyEndState 3'b110;\n"
+    "    iApplyEndState 3'b010;\n"
+    "  }\n",                      // 2 ==> Dual iApplyEndState is not valid
   };
 
   // ---------------- DDT Exercise
@@ -2029,8 +2037,9 @@ void UT_ICL_Reader::test_Uniquify_Examples_ListFile ()
   auto data =
   {
     make_tuple("List_SReg.txt",             "Uniquified_SReg_PrettyPrint.icl"),             // 0
-    make_tuple("List_Multiple_SIB_3WI.txt", "Uniquified_Multiple_SIB_3WI_PrettyPrint.icl"), // 1
-    make_tuple("List_mux_inline3.txt",      "Uniquified_mux_inline3_PrettyPrint.icl"),      // 2
+    make_tuple("List_WrappedInstr.txt",     "Uniquified_WrappedInstr_PrettyPrint.icl"),     // 1
+    make_tuple("List_Multiple_SIB_3WI.txt", "Uniquified_Multiple_SIB_3WI_PrettyPrint.icl"), // 2
+    make_tuple("List_mux_inline3.txt",      "Uniquified_mux_inline3_PrettyPrint.icl"),      // 3
   };
 
   // ---------------- DDT Exercise

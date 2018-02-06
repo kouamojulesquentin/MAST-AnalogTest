@@ -44,8 +44,10 @@ AST_VectorIdentifier::AST_VectorIdentifier (std::string&& identifier, AST_Intege
 
 
 
-//! Text representation of identifier with its index(es)
+//! Returns text representation of identifier with its index(es)
 //!
+//! @note If it is, still, defined with parameter reference, then they are displayed as in ICL,
+//!       otherwise expression are evaluated for left/right indices
 string AST_VectorIdentifier::AsText () const
 {
   std::ostringstream os;
@@ -54,7 +56,21 @@ string AST_VectorIdentifier::AsText () const
 
   if (!IsScalar())
   {
-    os << RangeAsText();
+    if (HasParameterRef())
+    {
+      os << RangeAsText();
+    }
+    else
+    {
+      os << '[' << std::to_string(m_left->Evaluate());
+
+      if (m_right != nullptr)
+      {
+        os << ":" << std::to_string(m_right->Evaluate());
+      }
+
+      os << ']';
+    }
   }
 
   return os.str();

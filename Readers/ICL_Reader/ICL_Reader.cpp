@@ -179,11 +179,11 @@ void ICL_Reader::CreateModelFromFiles (const vector<string>& filesPaths)
   //
   if (!m_parseOnlyCheckGrammar)
   {
+    UniquifyAST();
     auto checkResult = AST_Checker::Check(m_ast->Network());
 
-    CHECK_VALUE_EMPTY(checkResult.IssuesReport(), "Errors have been detected while parsing ICL stream");
+    CHECK_FALSE(checkResult.HasErrors(), "Errors have been detected while parsing ICL stream:\n" + checkResult.IssuesReport());
 
-    UniquifyAST();
     auto& data = Reader::PublicData();
     data.parsedTopNode = GenerateSystemModelNodes(m_ast.get());
   }

@@ -159,6 +159,17 @@ AST_Parameter* AST::Clone_Parameter (const AST_Parameter* parameter)
 //---------------------------------------------------------------------------
 
 
+//! Clones an alias
+//!
+AST_Alias* AST::Clone_Alias (const AST_Alias* alias)
+{
+  return Clone_Node(alias);
+}
+//
+//  End of: AST::Clone_Port
+//---------------------------------------------------------------------------
+
+
 //! Clones an attribute
 //!
 AST_Attribute* AST::Clone_Attribute (const AST_Attribute* attribute)
@@ -221,6 +232,17 @@ AST_ScanRegister* AST::Clone_ScanRegister (const AST_ScanRegister* scanRegister)
 }
 //
 //  End of: AST::Clone_ScanRegister
+//---------------------------------------------------------------------------
+
+
+//! Clones a signal
+//!
+AST_Signal* AST::Clone_Signal (const AST_Signal* signal)
+{
+  return Clone_Node(signal);
+}
+//
+//  End of: AST::Clone_Signal
 //---------------------------------------------------------------------------
 
 

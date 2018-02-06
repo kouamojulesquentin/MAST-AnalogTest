@@ -20,7 +20,9 @@
 
 namespace Parsers
 {
+class AST_Builder;
 class AST_Number;
+class AST_Parameter;
 class AST_ScalarIdentifier;
 class AST_VectorIdentifier;
 
@@ -63,6 +65,18 @@ class AST_Signal final : public AST_SimpleNode
   //! Sets whether signal bit(s) is/are complemented
   //!
   void  IsInverted (bool isInverted) { m_inverted = isInverted; }
+
+  //! Returns true when there is a parameter reference in any parts of signal
+  //!
+  bool HasParameterRef () const;
+
+  //! Replaces parameter references by its actual value
+  //!
+  void Resolve (const std::vector<AST_Parameter*>& parameters);
+
+  //! Returns uniquified clone
+  //!
+  AST_Signal* UniquifiedClone(AST_Builder& astBuilder) const;
 
   // ---------------- Private Methods
   //

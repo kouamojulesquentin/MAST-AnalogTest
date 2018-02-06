@@ -40,6 +40,7 @@
 using std::shared_ptr;
 using std::unique_ptr;
 using std::ostringstream;
+using std::string;
 using std::make_unique;
 using std::to_string;
 
@@ -98,19 +99,49 @@ void AST_Checker::Visit_AccessLink (AST_AccessLink* accessLink)
 //!
 void AST_Checker::Visit_Alias (AST_Alias* alias)
 {
+  // Lamba: Construct a message with context, alias name and message per se
+  //
+  auto makeMessage = [this, alias](string_view messageSuffix)
+  {
+    string message = m_messageContext + "has Alias \"" + alias->Name() + "\" ";
+    message += messageSuffix;
+
+    return message;
+  };
+
   if (alias->EnumRef() != nullptr)
   {
-    ReportWarning(m_messageContext + "has Alias \"" + alias->Name() + "\" with RefEnum statement ==> that is not yet supported");
+    ReportWarning(makeMessage("with RefEnum statement ==> that is not yet supported"));
   }
 
   if (alias->ApplyEndState() != nullptr)
   {
-    ReportWarning(m_messageContext + "has Alias \"" + alias->Name() + "\" with iApplyEndState statement ==> that is not yet supported");
+    ReportWarning(makeMessage("with iApplyEndState statement ==> that is not yet supported"));
   }
 
   if (alias->AccessTogether())
   {
-    ReportWarning(m_messageContext + "has Alias \"" + alias->Name() + "\" with AccessTogether statement ==> that is not yet supported");
+    ReportWarning(makeMessage("with AccessTogether statement ==> that is not yet supported"));
+  }
+
+  // ---------------- Bits count
+  //
+  const auto& signals = alias->Signals();
+  uint32_t signalsBitsCount = 0;
+  for (auto signal : signals)
+  {
+
+    auto bitsCount    = signal->BitsCount();
+    signalsBitsCount += bitsCount;
+  }
+
+  auto bitsCount = alias->Identifier()->BitsCount();
+
+  if (bitsCount != signalsBitsCount)
+  {
+    ReportWarning("defined with "s.append(std::to_string(bitsCount)).append(" bits, ")
+                                  .append("although aliased signals appeart to represent ")
+                                  .append(std::to_string(signalsBitsCount)).append(" bits"));
   }
 }
 //
@@ -232,9 +263,12 @@ void AST_Checker::Visit_Module (AST_Module* module)
 
   // ---------------- Aliases
   //
-  for (auto alias : module->Aliases())
+  if (module->IsUniquified())
   {
-    Visit_Alias(alias);
+    for (auto alias : module->Aliases())
+    {
+      Visit_Alias(alias);
+    }
   }
 }
 //

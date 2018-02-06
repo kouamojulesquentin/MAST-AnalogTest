@@ -58,7 +58,21 @@ string AST_IntegerExprRef::AsText () const
 
   if (m_integerExpr != nullptr)
   {
-    return m_integerExpr->AsText();
+    string asText;
+    auto   isLiterral = m_integerExpr->IsKind(Kind::IntegerLiteral);
+
+    if (!isLiterral)
+    {
+      asText.append("(");    // Parentheses are used to show that the expression will be computed as a single entity
+    }
+
+    asText.append(m_integerExpr->AsText());
+
+    if (!isLiterral)
+    {
+      asText.append(")");
+    }
+    return asText;
   }
 
   if (m_concatNumber != nullptr)

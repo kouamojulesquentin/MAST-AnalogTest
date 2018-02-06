@@ -138,6 +138,7 @@ class AST final : public AST_Builder
 
   // AST_Builder cloning interface implementation
 
+  AST_Alias*             Clone_Alias             (const AST_Alias*             alias)             override;  //!< Clones an alias
   AST_Attribute*         Clone_Attribute         (const AST_Attribute*         attribute)         override;  //!< Clones an attribute
   AST_BasedNumber*       Clone_BasedNumber       (const AST_BasedNumber*       basedNumber)       override;  //!< Clones a "based" number
   AST_ConcatNumber*      Clone_ConcatNumber      (const AST_ConcatNumber*      concatNumber)      override;  //!< Clones a concated number
@@ -149,6 +150,7 @@ class AST final : public AST_Builder
   AST_IntegerUnaryExpr*  Clone_IntegerUnaryExpr  (const AST_IntegerUnaryExpr*  integerUnaryExpr)  override;  //!< Clones an integer unary expression
   AST_Module*            Clone_Module            (const AST_Module*            module)            override;  //!< Clones a module
   AST_Parameter*         Clone_Parameter         (const AST_Parameter*         parameter)         override;  //!< Clones a parameter definition
+  AST_Signal*            Clone_Signal            (const AST_Signal*            signal)            override;  //!< Clones a signal
   AST_ScanMux*           Clone_ScanMux           (const AST_ScanMux*           scanMux)           override;  //!< Clones a scan multiplexer
   AST_ScanRegister*      Clone_ScanRegister      (const AST_ScanRegister*      scanRegister)      override;  //!< Clones a scan register
   AST_VectorIdentifier*  Clone_VectorIdentifier  (const AST_VectorIdentifier*  identifier)        override ; //!< Clones a vector identifier

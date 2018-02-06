@@ -238,6 +238,7 @@ void AST_Module::JoinParameters ()
 //!
 void AST_Module::Resolve ()
 {
+  AST_Parameter::ResolveItems(m_aliases,       m_parameters);
   AST_Parameter::ResolveItems(m_dataInPorts,   m_parameters);
   AST_Parameter::ResolveItems(m_dataOutPorts,  m_parameters);
   AST_Parameter::ResolveItems(m_scanInPorts,   m_parameters);
@@ -291,6 +292,7 @@ void AST_Module::Uniquify_impl (AST_Builder& astBuilder, const std::vector<AST_P
   AST_Parameter::ResolveItems(m_parameters, m_parameters, astBuilder);
 
   UniquifyItemsWithParameterRef(m_attributes, astBuilder);
+  UniquifyItemsWithParameterRef(m_aliases,    astBuilder);
 
   UniquifyItems(m_scanRegisters, astBuilder);
   UniquifyItems(m_scanMuxes,     astBuilder);

@@ -119,6 +119,16 @@ uint32_t AST_ScanRegister::RangeRight () const
 void AST_ScanRegister::Resolve (const vector<AST_Parameter*>& parameters)
 {
   m_identifier->Resolve(parameters);
+
+  if (m_resetValue != nullptr)
+  {
+    m_resetValue->Resolve(parameters);
+  }
+
+  if (m_defaultLoadValue != nullptr)
+  {
+    m_defaultLoadValue->Resolve(parameters);
+  }
 }
 //
 //  End of: AST_ScanRegister::Resolve
@@ -159,6 +169,17 @@ AST_ScanRegister* AST_ScanRegister::UniquifiedClone (AST_Builder& astBuilder) co
   {
     cloned->m_identifier = m_identifier->UniquifiedClone(astBuilder);
   }
+
+  if ((m_resetValue != nullptr) && m_resetValue->HasParameterRef())
+  {
+    cloned->m_resetValue = m_resetValue->UniquifiedClone(astBuilder);
+  }
+
+  if ((m_defaultLoadValue != nullptr) && m_defaultLoadValue->HasParameterRef())
+  {
+    cloned->m_defaultLoadValue = m_defaultLoadValue->UniquifiedClone(astBuilder);
+  }
+
   return cloned;
 }
 //

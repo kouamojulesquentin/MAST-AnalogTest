@@ -3,6 +3,7 @@ Module my_block
 {
   Attribute att1 = "$myStringParam";
   Attribute att2 = $myStringParam;
+  Parameter Reset_value = 'b0;
   Parameter my = "_";
   Parameter string = "_";
   Parameter myStringParam = "default";
@@ -35,7 +36,7 @@ Module my_block
 Module top
 {
   LocalParameter ABC = 4;
-  LocalParameter Reset_value = 'b0;
+  LocalParameter Reset_value = 'hFFF;
   Instance I1 Of UniquifiedModules::my_block__uniquified__1
   {
     Parameter my = "My";
@@ -50,6 +51,7 @@ Module top
   }
   Instance I2 Of UniquifiedModules::my_block__uniquified__2
   {
+    Parameter Reset_value = 'b0110;
     Parameter my = "MyI2";
     Parameter string = " I2String";
     Parameter myStringParam = "MyI2 I2String";
@@ -67,6 +69,7 @@ Module my_block__uniquified__1
 {
   Attribute att1 = "$myStringParam";
   Attribute att2 = "MyString";
+  Parameter Reset_value = 'b0;
   Parameter my = "My";
   Parameter string = "String";
   Parameter myStringParam = "MyString";
@@ -89,9 +92,9 @@ Module my_block__uniquified__1
   ScanRegister Reg_a[31:0]
   {
     ScanInSource SI;
-    ResetValue $Reset_value;
+    ResetValue 'b0;
   }
-  ScanRegister Reg_b[32 - 1:1]
+  ScanRegister Reg_b[31:1]
   {
     ScanInSource Reg_a;
   }
@@ -100,6 +103,7 @@ Module my_block__uniquified__2
 {
   Attribute att1 = "$myStringParam";
   Attribute att2 = "MyI2 I2String";
+  Parameter Reset_value = 'b0110;
   Parameter my = "MyI2";
   Parameter string = " I2String";
   Parameter myStringParam = "MyI2 I2String";
@@ -122,9 +126,9 @@ Module my_block__uniquified__2
   ScanRegister Reg_a[63:0]
   {
     ScanInSource SI;
-    ResetValue $Reset_value;
+    ResetValue 'b0110;
   }
-  ScanRegister Reg_b[32 - 1:1]
+  ScanRegister Reg_b[31:1]
   {
     ScanInSource Reg_a;
   }

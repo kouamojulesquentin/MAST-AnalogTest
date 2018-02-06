@@ -53,6 +53,7 @@ class AST_Builder
   // ---------------- Public Methods
   //
   public:
+  virtual AST_Alias*             Clone_Alias             (const AST_Alias*             alias) = 0;             //!< Clones an alias
   virtual AST_Attribute*         Clone_Attribute         (const AST_Attribute*         attribute) = 0;         //!< Clones an attribute
   virtual AST_BasedNumber*       Clone_BasedNumber       (const AST_BasedNumber*       basedNumber) = 0;       //!< Clones a "based" number
   virtual AST_ConcatNumber*      Clone_ConcatNumber      (const AST_ConcatNumber*      concatNumber) = 0;      //!< Clones a concated number
@@ -66,6 +67,7 @@ class AST_Builder
   virtual AST_Parameter*         Clone_Parameter         (const AST_Parameter*         parameter) = 0;         //!< Clones a parameter definition
   virtual AST_ScanMux*           Clone_ScanMux           (const AST_ScanMux*           scanMux) = 0;           //!< Clones a scan multiplexer
   virtual AST_ScanRegister*      Clone_ScanRegister      (const AST_ScanRegister*      scanRegister) = 0;      //!< Clones a scan register
+  virtual AST_Signal*            Clone_Signal            (const AST_Signal*            signal) = 0;            //!< Clones a signal
   virtual AST_VectorIdentifier*  Clone_VectorIdentifier  (const AST_VectorIdentifier*  identifier) = 0;        //!< Clones a vector identifier
 
   virtual AST_Alias*             Create_Alias                      (AST_VectorIdentifier*       aliasIdentifier,

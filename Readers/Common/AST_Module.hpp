@@ -60,6 +60,9 @@ class AST_Module final : public AST_ParentNode
     m_identifier         = newIdentifier;
   };
 
+  //! Returns true when the module is the result of uniquification
+  //!
+  bool IsUniquified () const { return m_originalIdentifier != nullptr; }
 
   //! Returns module name
   //!

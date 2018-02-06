@@ -1,7 +1,7 @@
 Module top
 {
   LocalParameter ABC = 4;
-  LocalParameter Reset_value = 'b0;
+  LocalParameter Reset_value = 'hFFF;
   Instance I1 Of my_block
   {
     Parameter my            = "My";
@@ -17,6 +17,7 @@ Module top
 
   Instance I2 Of my_block
   {
+    Parameter Reset_value   = 'b0110;
     Parameter my            = "MyI2";
     Parameter string        = " I2String";
     Parameter myStringParam = "", $my,$string;  // Empty string is to cope with failure to parse parameters correctly!
@@ -32,6 +33,7 @@ Module top
 
 Module my_block
 {
+  Parameter Reset_value   = 'b0;
   Parameter my            = "_";
   Parameter string        = "_";
   Parameter myStringParam = "default";

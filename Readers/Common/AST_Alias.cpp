@@ -13,6 +13,7 @@
 
 #include "AST_Alias.hpp"
 #include "AST_Attribute.hpp"
+#include "AST_Alias.hpp"
 #include "AST_ConcatNumber.hpp"
 #include "AST_EnumRef.hpp"
 #include "AST_Signal.hpp"
@@ -45,22 +46,13 @@ AST_Alias::AST_Alias (AST_VectorIdentifier* aliasIdentifier,
   CHECK_PARAMETER_NOT_NULL(m_identifier, "Alias must be constructed with a valid not nullptr identifier");
   CHECK_PARAMETER_NOT_EMPTY(m_signals,   FoundAliasMessage().append("defined with no signals"));
 
-  // ---------------- Check bits count coherency
+  // ---------------- Check that no signal is nullptr and is not a number
   //
-  uint32_t signalsBitsCount = 0;
-  for (auto signal : m_signals)
+  for (auto signal : signals)
   {
-    CHECK_PARAMETER_NOT_NULL(signal, FoundAliasMessage().append("with a not valid (nullptr) signal"));
-
-    CHECK_PARAMETER_FALSE(signal->IsNumber(), FoundAliasMessage().append("with a signal that is a number (instead to referring to a port)"));
-
-    auto bitsCount    = signal->BitsCount();
-    signalsBitsCount += bitsCount;
+    CHECK_PARAMETER_NOT_NULL (signal,             FoundAliasMessage().append("with a not valid (nullptr) signal"));
+    CHECK_PARAMETER_FALSE    (signal->IsNumber(), FoundAliasMessage().append("with a signal that is a number (instead to referring to a port)"));
   }
-
-  auto bitsCount = m_identifier->BitsCount();
-  CHECK_VALUE_EQ(bitsCount, signalsBitsCount, FoundAliasMessage().append("defined with ").append(std::to_string(bitsCount)).append(" bits, ")
-                                                                 .append("although aliased signals represent ").append(std::to_string(signalsBitsCount)).append(" bits"));
 
   // ---------------- Assign other, recognized, members
   //
@@ -110,10 +102,12 @@ void AST_Alias::DispatchChildren ()
           switch (targetKind)
           {
             case Parsers::Kind::ApplyEndState :
+              CHECK_VALUE_NULL(m_iApplyEndState, FoundAliasMessage().append("with more than one iApplyEndState (there shall be at most one iApplyEndState in a single Alias statement)"));
               SetChild(child, m_iApplyEndState);
               break;
             case Parsers::Kind::AccessTogether :
             {
+              CHECK_FALSE(m_accessTogether, FoundAliasMessage().append("with more than one AccessTogether statement"));
               AST_Value<bool>* accessTogetherNode = nullptr;
               SetChild(child, accessTogetherNode);
               m_accessTogether = accessTogetherNode->Value();
@@ -149,6 +143,49 @@ string AST_Alias::FoundAliasMessage () const
 //---------------------------------------------------------------------------
 
 
+//! Returns true when there is a parameter reference in any part of alias
+//!
+bool AST_Alias::HasParameterRef () const
+{
+  // ---------------- Identifier
+  //
+  if ((m_identifier != nullptr) && m_identifier->HasParameterRef())
+  {
+    return true;
+  }
+
+  // ---------------- iApplyEndState
+  //
+  if ((m_iApplyEndState != nullptr) && m_iApplyEndState->HasParameterRef())
+  {
+    return true;
+  }
+
+  // ---------------- Signals
+  //
+  for (const auto signal : m_signals)
+  {
+    if (signal->HasParameterRef())
+    {
+      return true;
+    }
+  }
+
+  // ---------------- Attributes
+  //
+  for (const auto attribute : m_attributes)
+  {
+    if (attribute->HasParameterRef())
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+//
+//  End of: AST_Alias::HasParameterRef
+//---------------------------------------------------------------------------
 
 
 //! Returns alias identifier as text
@@ -159,6 +196,99 @@ string AST_Alias::Name () const
 }
 //
 //  End of: AST_Alias::Name
+//---------------------------------------------------------------------------
+
+
+//! Replaces parameter references by its actual value
+//!
+//! @note This must be called after unification pass
+//!
+//! @param parameters   Parameter definitions to use to replace parameter reference(s)
+//!
+void AST_Alias::Resolve (const std::vector<AST_Parameter*>& parameters)
+{
+  // ---------------- Identifier
+  //
+  if ((m_identifier != nullptr) && m_identifier->HasParameterRef())
+  {
+    m_identifier->Resolve(parameters);
+  }
+
+  // ---------------- iApplyEndState
+  //
+  if ((m_iApplyEndState != nullptr) && m_iApplyEndState->HasParameterRef())
+  {
+    m_iApplyEndState->Resolve(parameters);
+  }
+
+  // ---------------- Signals
+  //
+  for (auto signal : m_signals)
+  {
+    if (signal->HasParameterRef())
+    {
+      signal->Resolve(parameters);
+    }
+  }
+
+  // ---------------- Attributes
+  //
+  for (auto attribute : m_attributes)
+  {
+    if (attribute->HasParameterRef())
+    {
+      attribute->Resolve(parameters);
+    }
+  }
+
+}
+//
+//  End of: AST_Alias::Resolve
+//---------------------------------------------------------------------------
+
+
+
+//! Returns uniquified clone
+//!
+//! @param astBuilder   Interface to clone some kind of AST nodes (it is responsible for the memory management)
+//!
+//! @return New cloned and uniquified AST_Alias
+AST_Alias* AST_Alias::UniquifiedClone (AST_Builder& astBuilder) const
+{
+  auto clone = astBuilder.Clone_Alias(this);
+
+  // ---------------- Identifier
+  //
+  if (m_identifier != nullptr)
+  {
+    clone->m_identifier = m_identifier->UniquifiedClone(astBuilder);
+  }
+
+  // ---------------- iApplyEndState
+  //
+  if (m_iApplyEndState != nullptr)
+  {
+    clone->m_iApplyEndState = m_iApplyEndState->UniquifiedClone(astBuilder);
+  }
+
+  // ---------------- Signals
+  //
+  for (auto& signal : clone->m_signals)
+  {
+    signal = signal->UniquifiedClone(astBuilder);
+  }
+
+  // ---------------- Attributes
+  //
+  for (auto& attribute : clone->m_attributes)
+  {
+    attribute = attribute->UniquifiedClone(astBuilder);
+  }
+
+  return clone;
+}
+//
+//  End of: AST_Alias::UniquifiedClone
 //---------------------------------------------------------------------------
 
 

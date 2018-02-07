@@ -28,11 +28,8 @@ set(WARNINGS     "-Wall -Wextra -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wm
 set(CLIENT_FLAGS "-fPIC -g ${WARNINGS} -Wno-long-long")
 set(SERVER_FLAGS "${CLIENT_FLAGS}")
 
-
 set(ClientSources XmlRpc_Protocol_Client.cpp)
 set(ServerSources XmlRpc_Protocol_Server.cpp)
-
-include_directories(${LIBXMLRPC_INCLUDE_DIRS})
 
 set(LIBMASTXMLRPC_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/." "${LIBXMLRPC_INCLUDE_DIRS}" PARENT_SCOPE)
 message("")
@@ -48,10 +45,18 @@ message("=======================================================================
 message("")
 
 
-add_library           (Mast_RPC_Client SHARED     "${ClientSources}")
-set_target_properties (Mast_RPC_Client PROPERTIES COMPILE_FLAGS "${CLIENT_FLAGS}" )
-target_link_libraries (Mast_RPC_Client ${LIBXMLRPC_LIBRARIES})
+# ---------------- Client
+#
+add_library                (Mast_RPC_Client SHARED      "${ClientSources}")
+set_target_properties      (Mast_RPC_Client PROPERTIES  COMPILE_FLAGS "${CLIENT_FLAGS}" )
+target_include_directories (Mast_RPC_Client PUBLIC      ${LIBXMLRPC_INCLUDE_DIRS}
+                                            PRIVATE     ${LIBMAST_CORE_INCLUDE_DIRS}) # Necessary because we do not link to Mast_Core
+target_link_libraries      (Mast_RPC_Client ${LIBXMLRPC_LIBRARIES})
 
-add_library           (Mast_RPC_Server SHARED     "${ServerSources}")
-set_target_properties (Mast_RPC_Server PROPERTIES COMPILE_FLAGS "${SERVER_FLAGS}" )
-target_link_libraries (Mast_RPC_Server ${LIBXMLRPC_LIBRARIES})
+# ---------------- Server
+#
+add_library                (Mast_RPC_Server SHARED      "${ServerSources}")
+set_target_properties      (Mast_RPC_Server PROPERTIES  COMPILE_FLAGS "${SERVER_FLAGS}" )
+target_include_directories (Mast_RPC_Server PUBLIC      ${LIBXMLRPC_INCLUDE_DIRS}
+                                            PRIVATE     ${LIBMAST_CORE_INCLUDE_DIRS}) # Necessary because we do not link to Mast_Core
+target_link_libraries      (Mast_RPC_Server ${LIBXMLRPC_LIBRARIES})

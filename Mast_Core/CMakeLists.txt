@@ -4,6 +4,7 @@ include_directories(${LIBLOGGER_INCLUDE_DIRS})
 include_directories(${LIBTCLAP_INCLUDE_DIRS})
 include_directories(${LIBYAML_INCLUDE_DIRS})
 
+set(LIBMAST_CORE_INCLUDE_DIRS  "${CMAKE_CURRENT_SOURCE_DIR}/include/"  PARENT_SCOPE)  # For libs that only use headers (without linking with Mast_Core)
 set(LIBMAST_CORE_INTERNAL_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/internal/" PARENT_SCOPE)  # For other lib of mast project
 
 if (CODE_COVERAGE)
@@ -178,8 +179,8 @@ set(Private_Headers "${CMAKE_CURRENT_SOURCE_DIR}/internal/Dll.hpp"
 set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/internal/MastConfig.hpp" GENERATED)
 
 add_library                (Mast_Core SHARED ${Mast_Core_SOURCES} ${Private_Headers} ${Public_Headers})
-target_include_directories (Mast_Core PUBLIC  include
-                                      PRIVATE internal)
+target_include_directories (Mast_Core PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/include/"
+                                      PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/internal/")
 set_target_properties      (Mast_Core PROPERTIES COMPILE_FLAGS "${CFLAGS}")
 target_compile_definitions (Mast_Core PRIVATE G3_DYNAMIC_LOGGING
                                               __LITTLE_ENDIAN=1

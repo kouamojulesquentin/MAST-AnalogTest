@@ -50,11 +50,9 @@ endif()
 #
 if(${INTEL_EXPERIMENT})
   add_subdirectory (Intel)
-  set(LIBINTEL_INCLUDE_DIRS ${LIBINTEL_INCLUDE_DIRS} PARENT_SCOPE)
   set(INTEL_EXP_LIBRARIES   ${INTEL_EXP_LIBRARIES}   PARENT_SCOPE)
   message("================================================================================")
   message(STATUS "Optional_Libs: INTEL_EXP_LIBRARIES:           ${INTEL_EXP_LIBRARIES}")
-  message(STATUS "Optional_Libs: LIBINTEL_INCLUDE_DIRS:         ${LIBINTEL_INCLUDE_DIRS}")
   message("================================================================================")
 endif()
 

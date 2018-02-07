@@ -11,7 +11,6 @@ if (WIN32)
 endif()
 
 
-include_directories(.)
 
 set(LIBMASTRPC_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/." PARENT_SCOPE)
 
@@ -28,8 +27,10 @@ message(STATUS "MastRpc: FLAGS:                   ${FLAGS}")
 message("================================================================================")
 message("")
 
-add_library           (Mast_RPC SHARED     "${Sources}")
-set_target_properties (Mast_RPC PROPERTIES COMPILE_FLAGS "${FLAGS}" )
-target_link_libraries (Mast_RPC)
+add_library                (Mast_RPC SHARED     "${Sources}")
+set_target_properties      (Mast_RPC PROPERTIES COMPILE_FLAGS "${FLAGS}" )
+target_include_directories (Mast_RPC PUBLIC  ${LIBMASTRPC_INCLUDE_DIRS}
+                                             ${LIBMAST_CORE_INCLUDE_DIRS})   # Necessary because we do not link to Mast_Core - it is public for usage by dependent applications
+target_link_libraries      (Mast_RPC)
 
 

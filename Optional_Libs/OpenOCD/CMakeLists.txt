@@ -9,10 +9,6 @@ message("=======================================================================
 message("")
 
 
-include_directories(./include)
-include_directories(${LIBLOGGER_INCLUDE_DIRS})
-include_directories(${LIBOPEN_OCD_INCLUDE_DIRS})
-
 set(LIBMASTOPEN_OCD_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include" PARENT_SCOPE)
 set(LIBMASTOPEN_OCD_LIBRARIES    Mast_OpenOCD                          PARENT_SCOPE)
 
@@ -23,8 +19,11 @@ set(CPP_FLAGS "${CPP_FLAGS} -Wno-variadic-macros") # GCC: ISO C++ does not permi
 set(CPP_FLAGS "${CPP_FLAGS} -std=c++14")
 
 
-add_library           (Mast_OpenOCD SHARED     "${Sources}")
-set_target_properties (Mast_OpenOCD PROPERTIES COMPILE_FLAGS ${CPP_FLAGS})
-target_link_libraries (Mast_OpenOCD ${OPEN_OCD_LIBRARIES})
+add_library                (Mast_OpenOCD SHARED     "${Sources}")
+set_target_properties      (Mast_OpenOCD PROPERTIES COMPILE_FLAGS ${CPP_FLAGS})
+target_include_directories (Mast_OpenOCD PUBLIC     "${CMAKE_CURRENT_SOURCE_DIR}/include"
+                                         PRIVATE    "${LIBOPEN_OCD_INCLUDE_DIRS}"
+                                                    "${LIBMAST_CORE_INCLUDE_DIRS}") # Necessary because we do not link to Mast_Core
+target_link_libraries      (Mast_OpenOCD ${OPEN_OCD_LIBRARIES} Logger)
 
 

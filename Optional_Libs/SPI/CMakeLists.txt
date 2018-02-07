@@ -10,11 +10,6 @@ if (WIN32)
 endif()
 
 
-include_directories(./include)
-include_directories(${LIBLOGGER_INCLUDE_DIRS})
-include_directories(${LIBMAST_CORE_INTERNAL_DIRS})
-include_directories(${LIBFTDI_SPI_INCLUDE_DIRS})
-
 set(LIBMASTSPI_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include" PARENT_SCOPE)
 set(LIBMASTSPI_LIBRARIES    Mast_SPI PARENT_SCOPE)
 
@@ -25,8 +20,11 @@ message(STATUS "MastSpi: CFLAGS:                    ${CFLAGS}")
 message("================================================================================")
 message("")
 
-add_library           (Mast_SPI SHARED     "${Sources}")
-set_target_properties (Mast_SPI PROPERTIES COMPILE_FLAGS "${CFLAGS}" )
-target_link_libraries (Mast_SPI ftdi_spi)
+add_library                (Mast_SPI SHARED     "${Sources}")
+set_target_properties      (Mast_SPI PROPERTIES COMPILE_FLAGS "${CFLAGS}" )
+target_include_directories (Mast_SPI PUBLIC     "${CMAKE_CURRENT_SOURCE_DIR}/include"
+                                     PRIVATE     ${LIBMAST_CORE_INCLUDE_DIRS}) # Necessary because we do not link to Mast_Core
+
+target_link_libraries      (Mast_SPI ftdi_spi Logger)
 
 

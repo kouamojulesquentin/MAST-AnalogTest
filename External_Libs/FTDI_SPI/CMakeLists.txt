@@ -22,8 +22,9 @@ else()
                      /usr/local/lib)
 
   file(GLOB FTDI_SPI_SOURCES "src/*")
-  add_library           (ftdi_spi SHARED ${FTDI_SPI_SOURCES})
-  set_target_properties (ftdi_spi PROPERTIES COMPILE_FLAGS "-Wall")
-
-  target_link_libraries(ftdi_spi ftdi)
+  add_library                (ftdi_spi SHARED     ${FTDI_SPI_SOURCES})
+  set_target_properties      (ftdi_spi PROPERTIES COMPILE_FLAGS "-Wall")
+  target_include_directories (ftdi_spi PUBLIC     "${CMAKE_CURRENT_SOURCE_DIR}/include"
+                                       PRIVATE    "${LIBFTDI_SPI_INCLUDE_DIRS}")
+  target_link_libraries      (ftdi_spi ftdi)
 endif()

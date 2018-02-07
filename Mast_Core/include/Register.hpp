@@ -17,6 +17,7 @@
 #include "SystemModelNode.hpp"
 #include "BinaryVector.hpp"
 #include "BitsOrdering.hpp"
+#include "RegisterInterface.hpp"
 
 namespace mast
 {
@@ -24,7 +25,7 @@ class SystemModel;
 
 //! Represents a register in the scan chain
 //!
-class MAST_CORE_EXPORT Register : public SystemModelNode
+class Register : public SystemModelNode, public RegisterInterface
 {
   // ---------------- Public  Methods
   //

@@ -14,6 +14,7 @@
 #ifndef VIRTUALREGISTER_H__CFE68D04_B156_4401_9698_1E66847E7E70__INCLUDED_
   #define VIRTUALREGISTER_H__CFE68D04_B156_4401_9698_1E66847E7E70__INCLUDED_
 
+#include "RegisterInterface.hpp"
 #include "Register.hpp"
 #include "IndexedRange.hpp"
 #include "BitsOrdering.hpp"
@@ -31,7 +32,7 @@ class SystemModel;
 //!
 //! @note Register interface is not complete (only required methods are implemented)
 //!
-class MAST_CORE_EXPORT VirtualRegister final
+class VirtualRegister final : public RegisterInterface
 {
   // ---------------- Public  Methods
   //
@@ -69,15 +70,15 @@ class MAST_CORE_EXPORT VirtualRegister final
   bool               Empty()        const { return m_registers.empty(); };  //!< Returns VirtualRegister is empty (refering to no registers at all)
   uint32_t           SlicesCount()  const { return m_registers.size(); };   //!< Returns VirtualRegister numbers of register slice
 
-  uint32_t           BitsCount()    const; //!< Returns VirtualRegister numbers of bits
-  mast::BitsOrdering BitsOrdering() const; //!< Returns BitsOrdering
-  BinaryVector       LastToSut()    const; //!< Returns last sequence effectively sent to SUT
-  BinaryVector       NextToSut()    const; //!< Returns next sequence to send to SUT
+  uint32_t            BitsCount()    const override; //!< Returns VirtualRegister numbers of bits
+  mast::BitsOrdering  BitsOrdering() const override; //!< Returns BitsOrdering
+  const BinaryVector& LastToSut()    const override; //!< Returns last sequence effectively sent to SUT
+  const BinaryVector& NextToSut()    const override; //!< Returns next sequence to send to SUT
 
   // ---------------- Setters
   //
-  void SetPending ();                             //!< Sets number of pending to 1
-  void SetToSut   (const BinaryVector& sequence); //!< Sets the bits sequence to send during the next iApply cycle
+  void SetPending ();                                      //!< Sets number of pending to 1
+  void SetToSut   (const BinaryVector& sequence) override; //!< Sets the bits sequence to send during the next iApply cycle
 
   //! Sets the bits sequence to send during the next iApply cycle from integral value
   //!
@@ -101,15 +102,18 @@ class MAST_CORE_EXPORT VirtualRegister final
   static BinaryVector GetSlice (const IndexedRange& range, mast::BitsOrdering bitsOrdering, const BinaryVector& binaryVector);
   static void         SetSlice (const IndexedRange& range, mast::BitsOrdering bitsOrdering,       BinaryVector& binaryVector, const BinaryVector& value);
 
-  BinaryVector        GetView  (std::function<BinaryVector (const Register&)> getter) const;
-  void                SetView  (std::function<BinaryVector (const Register&)>                      getter,
-                                std::function<void         (      Register&, const BinaryVector&)> setter,
-                                const BinaryVector&                                                value);
+  void                GetView  (BinaryVector& target, std::function<BinaryVector (const Register&)> getter) const;
+
+  void                SetView  (std::function<BinaryVector (const Register&)>                getter,
+                                std::function<void         (Register&, const BinaryVector&)> setter,
+                                const BinaryVector&                                          value);
 
   // ---------------- Private  Fields
   //
   private:
   std::vector<RegisterSlice> m_registers;
+  mutable BinaryVector       m_nextToSut; //!< Last computed "next to sut" - This is a member to return a reference needed by RegisterInterface (this also reduce allocations/deallocations)
+  mutable BinaryVector       m_lastToSut; //!< Last computed "last to sut" - This is a member to return a reference needed by RegisterInterface (this also reduce allocations/deallocations)
 };
 //
 //  End of VirtualRegister class declaration

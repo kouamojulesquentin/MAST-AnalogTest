@@ -131,20 +131,22 @@ BinaryVector VirtualRegister::GetSlice (const IndexedRange& range, mast::BitsOrd
 
 //! Returns "view" of "interfaced" Register using function to get their actual field
 //!
-//! @param getter   Function to get a specific value from the Registers
+//! @note Target is built by chunks, so it is not thread safe to call that method with
+//!       same target from different threads
 //!
-BinaryVector VirtualRegister::GetView (std::function<BinaryVector(const Register&)> getter) const
+//! @param target  Target of result view
+//! @param getter  Function to get a specific value from the Registers
+//!
+void VirtualRegister::GetView (BinaryVector& target, std::function<BinaryVector(const Register&)> getter) const
 {
-  auto         bitsOrdering = m_registers.front().reg->BitsOrdering();
-  BinaryVector result;
+  auto bitsOrdering = m_registers.front().reg->BitsOrdering();
 
+  target.Clear();
   for (const auto& registerSlice : m_registers)
   {
     auto slice = GetSlice(registerSlice.range, bitsOrdering, getter(*registerSlice.reg));
-    result.Append(slice);
+    target.Append(slice);
   }
-
-  return result;
 }
 //
 //  End of: VirtualRegister::GetView
@@ -154,11 +156,12 @@ BinaryVector VirtualRegister::GetView (std::function<BinaryVector(const Register
 
 //! Returns last sequence effectively sent to SUT
 //!
-BinaryVector VirtualRegister::LastToSut () const
+const BinaryVector& VirtualRegister::LastToSut () const
 {
   CHECK_VALUE_NOT_EMPTY(m_registers, "VirtualRegister must be interface to at least one register before calling LastToSut");
 
-  return GetView([](const Register& reg) { return reg.LastToSut(); });
+  GetView(m_lastToSut, [](const Register& reg) { return reg.LastToSut(); });
+  return m_lastToSut;
 }
 //
 //  End of: VirtualRegister::LastToSut
@@ -167,11 +170,12 @@ BinaryVector VirtualRegister::LastToSut () const
 
 //! Returns next sequence to send to SUT
 //!
-BinaryVector VirtualRegister::NextToSut () const
+const BinaryVector& VirtualRegister::NextToSut () const
 {
   CHECK_VALUE_NOT_EMPTY(m_registers, "VirtualRegister must be interface to at least one register before calling NextToSut");
 
-  return GetView([](const Register& reg) { return reg.NextToSut(); });
+  GetView(m_nextToSut, [](const Register& reg) { return reg.NextToSut(); });
+  return m_nextToSut;
 }
 //
 //  End of: VirtualRegister::NextToSut

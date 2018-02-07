@@ -3,7 +3,6 @@ project(Mast_API_C)
 
 include_directories(./include)
 include_directories(./internal)
-include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
 include_directories(${LIBMAST_CORE_INTERNAL_DIRS})
 include_directories(${LIBLOGGER_INCLUDE_DIRS})
 

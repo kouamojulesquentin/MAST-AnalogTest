@@ -12,7 +12,6 @@ set(CXXTEST_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../cxxtest")
 
 include_directories(${CXXTEST_INCLUDE_DIR})
 include_directories(${LIBLOGGER_INCLUDE_DIRS})
-include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
 
 set(UT_GENERATED_RUNNER   "Generated/Runner.cpp")
 

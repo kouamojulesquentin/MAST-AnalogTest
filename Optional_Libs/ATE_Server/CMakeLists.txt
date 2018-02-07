@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 2.6)
 message("")
 message("================================================================================")
 message(STATUS "ATE_Server: USE_XML_RPC:                      ${USE_XML_RPC}")
-message(STATUS "ATE_Server: LIBMAST_CORE_INCLUDE_DIRS         ${LIBMAST_CORE_INCLUDE_DIRS}")
 
 if (USE_XML_RPC)
   if (WIN32)
@@ -24,7 +23,6 @@ endif()
 message(STATUS "ATE_Server: CMAKE_PREFIX_PATH:                ${CMAKE_PREFIX_PATH}")
 message(STATUS "ATE_Server: CMAKE_CXX_COMPILER_ID:            ${CMAKE_CXX_COMPILER_ID}")
 
-include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
 include_directories(${LIBMASTRPC_INCLUDE_DIRS})
 
 set_property(GLOBAL PROPERTY CXX_STANDARD          03)

@@ -3,7 +3,6 @@ project(MastSpi)
 
 message("")
 message("================================================================================")
-message(STATUS "MastSpi: LIBMAST_CORE_INCLUDE_DIRS: ${LIBMAST_CORE_INCLUDE_DIRS}")
 message(STATUS "MastSpi: LIBFTDI_SPI_INCLUDE_DIRS:  ${LIBFTDI_SPI_INCLUDE_DIRS}")
 
 if (WIN32)
@@ -13,7 +12,6 @@ endif()
 
 include_directories(./include)
 include_directories(${LIBLOGGER_INCLUDE_DIRS})
-include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
 include_directories(${LIBMAST_CORE_INTERNAL_DIRS})
 include_directories(${LIBFTDI_SPI_INCLUDE_DIRS})
 

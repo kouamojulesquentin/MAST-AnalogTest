@@ -5,7 +5,6 @@ project(MastExample_CPP)
 
 message("")
 message("================================================================================")
-message(STATUS "MastExample_CPP: LIBMAST_CORE_INCLUDE_DIRS:       ${LIBMAST_CORE_INCLUDE_DIRS}")
 message(STATUS "MastExample_CPP: INTEL_EXPERIMENT                 ${INTEL_EXPERIMENT}")
 message(STATUS "MastExample_CPP: KISSFFT:                         ${KISSFFT}")
 message("================================================================================")
@@ -17,7 +16,6 @@ add_definitions(${P_CFLAGS})
 set (P_CFLAGS "${P_WARNINGS} -std=c++14")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
-include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
 include_directories(${LIBMAST_CPP_API_INCLUDE_DIRS})
 include_directories(${LIBLOGGER_INCLUDE_DIRS})
 
@@ -83,7 +81,6 @@ set(SIT_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SIT)
 
 message("")
 message("================================================================================")
-message(STATUS "MastExample_CPP: LIBMAST_CORE_INCLUDE_DIRS:       ${LIBMAST_CORE_INCLUDE_DIRS}")
 message(STATUS "MastExample_CPP: LIBMAST_CPP_API_INCLUDE_DIRS:    ${LIBMAST_CPP_API_INCLUDE_DIRS}")
 message(STATUS "MastExample_CPP: LIBKISSFFT_INCLUDE_DIRS:         ${LIBKISSFFT_INCLUDE_DIRS}")
 message(STATUS "MastExample_CPP: SIT_PATH:                        ${SIT_PATH}")

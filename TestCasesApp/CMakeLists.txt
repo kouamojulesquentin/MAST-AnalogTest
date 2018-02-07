@@ -12,7 +12,6 @@ set (P_WARNINGS "-Wall -Wno-sign-compare -Wnon-virtual-dtor -Wredundant-decls -W
 add_definitions(${P_CFLAGS})
 set (P_CFLAGS "${P_WARNINGS} -std=c++14")
 
-include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
 include_directories(${LIBMAST_CPP_API_INCLUDE_DIRS})
 include_directories(${LIBMAST_C_API_INCLUDE_DIRS})
 include_directories(${LIBLOGGER_INCLUDE_DIRS})

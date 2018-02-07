@@ -66,7 +66,8 @@ class MAST_CORE_EXPORT VirtualRegister final
 
   // ---------------- Getters
   //
-  uint32_t           SlicesCount()  const { return m_registers.size(); }; //!< Returns VirtualRegister numbers of register slice
+  bool               Empty()        const { return m_registers.empty(); };  //!< Returns VirtualRegister is empty (refering to no registers at all)
+  uint32_t           SlicesCount()  const { return m_registers.size(); };   //!< Returns VirtualRegister numbers of register slice
 
   uint32_t           BitsCount()    const; //!< Returns VirtualRegister numbers of bits
   mast::BitsOrdering BitsOrdering() const; //!< Returns BitsOrdering

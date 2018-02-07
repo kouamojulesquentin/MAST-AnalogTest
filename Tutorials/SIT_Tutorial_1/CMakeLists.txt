@@ -3,7 +3,7 @@ project(Mast_SIT_Tutorial_1)
 
 message("")
 message("================================================================================")
-message(STATUS "Mast_SIT_Tutorial_1: LIBMAST_CORE_INCLUDE_DIRS:       ${LIBMAST_CORE_INCLUDE_DIRS}")
+message(STATUS "Mast_SIT_Tutorial_1: ")
 message("================================================================================")
 message("")
 
@@ -13,7 +13,6 @@ add_definitions(${P_CFLAGS})
 set (P_CFLAGS "${P_WARNINGS} -std=c++14")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
-include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
 include_directories(${LIBMAST_CPP_API_INCLUDE_DIRS})
 include_directories(${LIBLOGGER_INCLUDE_DIRS})
 
@@ -29,5 +28,3 @@ install(FILES SIT_Tutorial_1.yml DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 include(CTest)
 add_test(NAME Smoke:SIT_Tutorial_1 COMMAND Mast --check --log --log_kind=only_errors_on_cerr --log_level=error --plugin_dir=SIT_Tutorial_1 --sit=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SIT_Tutorial_1.sit)
-
-

@@ -4,7 +4,6 @@ project(OptionalExamples)
 message("")
 message("================================================================================")
 message(STATUS "Optionals_Examples: USE_XML_RPC:                      ${USE_XML_RPC}")
-message(STATUS "Optionals_Examples: LIBMAST_CORE_INCLUDE_DIRS         ${LIBMAST_CORE_INCLUDE_DIRS}")
 
 if (USE_XML_RPC)
   if (WIN32)
@@ -23,7 +22,6 @@ if (USE_XML_RPC)
   message(STATUS "Optionals_Examples: CMAKE_CXX_COMPILER_ID:            ${CMAKE_CXX_COMPILER_ID}")
 
   include_directories(${LIBXMLRPC_INCLUDE_DIRS})
-  include_directories(${LIBMAST_CORE_INCLUDE_DIRS})
   include_directories(${LIBMASTRPC_INCLUDE_DIRS})
   include_directories(${LIBMASTXMLRPC_INCLUDE_DIRS})
 

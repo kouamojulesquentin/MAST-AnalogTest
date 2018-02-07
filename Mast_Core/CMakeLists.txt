@@ -166,7 +166,6 @@ set(Public_Headers "${CMAKE_CURRENT_SOURCE_DIR}/include/AccessInterface.hpp"
 set(Private_Headers "${CMAKE_CURRENT_SOURCE_DIR}/internal/Dll.hpp"
                     "${CMAKE_CURRENT_SOURCE_DIR}/internal/FileSystem.hpp"
                     "${CMAKE_CURRENT_SOURCE_DIR}/internal/FromSutUpdater.hpp"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/internal/MastConfig.hpp"
                     "${CMAKE_CURRENT_SOURCE_DIR}/internal/MastConfiguration.hpp"
                     "${CMAKE_CURRENT_SOURCE_DIR}/internal/MismatchesCollector.hpp"
                     "${CMAKE_CURRENT_SOURCE_DIR}/internal/NamesChecker.hpp"
@@ -175,6 +174,8 @@ set(Private_Headers "${CMAKE_CURRENT_SOURCE_DIR}/internal/Dll.hpp"
                     "${CMAKE_CURRENT_SOURCE_DIR}/internal/SystemModelReseter.hpp"
                     "${CMAKE_CURRENT_SOURCE_DIR}/internal/ToSutVisitor.hpp"
                     "${CMAKE_CURRENT_SOURCE_DIR}/internal/YamlNodesCache.hpp")
+
+set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/internal/MastConfig.hpp" GENERATED)
 
 add_library                (Mast_Core SHARED ${Mast_Core_SOURCES} ${Private_Headers} ${Public_Headers})
 target_include_directories (Mast_Core PUBLIC  include

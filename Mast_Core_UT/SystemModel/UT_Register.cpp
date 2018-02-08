@@ -85,7 +85,7 @@ void UT_Register::setUp ()
 //!       This is the minimal memory usage (when it is empty)
 void UT_Register::test_Sizeof ()
 {
-  TS_ASSERT_LESS_THAN_EQUALS (sizeof(Register), 368u);     // On Windows (32 bits), it is 208, even though in both case sizeof(int) is 4!
+  TS_ASSERT_LESS_THAN_EQUALS (sizeof(Register), 392u);     // On Windows (32 bits), it is far less, even though in both case sizeof(int) is 4!
 }
 
 

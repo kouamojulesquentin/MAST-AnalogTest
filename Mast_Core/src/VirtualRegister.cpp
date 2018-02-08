@@ -18,6 +18,17 @@
 using namespace mast;
 using std::shared_ptr;
 
+//! Releases resources
+//!
+//! @note Put in implemetation file to force construction of VTable !
+VirtualRegister::~VirtualRegister ()
+{
+}
+//
+//  End of: VirtualRegister::~VirtualRegister
+//---------------------------------------------------------------------------
+
+
 
 //! Constructs from a single Register
 //!
@@ -31,6 +42,7 @@ VirtualRegister::VirtualRegister (shared_ptr<Register> reg)
   IndexedRange range(reg->BitsCount() - 1u, 0);
 
   m_registers.emplace_back(RegisterSlice{reg, range});
+  m_identifiers.emplace_back(reg->Identifier());
 }
 //
 //  End of: VirtualRegister::VirtualRegister
@@ -45,18 +57,21 @@ VirtualRegister::VirtualRegister (shared_ptr<Register> reg)
 //!
 void VirtualRegister::Append (const RegisterSlice& registerSlice)
 {
-  CHECK_PARAMETER_NOT_NULL (registerSlice.reg,                                                "Cannot append nullptr Register");
-  CHECK_PARAMETER_NOT_ZERO (registerSlice.reg->BitsCount(),                                   "Cannot append Register with width zero");
-  CHECK_PARAMETER_NEQ      (registerSlice.reg->BitsOrdering(), mast::BitsOrdering::Undefined, "Bits ordering must be defined");
-  CHECK_PARAMETER_LTE      (registerSlice.range.Width(),    registerSlice.reg->BitsCount(),   "Range cannot be larger than Register");
-  CHECK_PARAMETER_LT       (registerSlice.range.MaxIndex(), registerSlice.reg->BitsCount(),   "Range cannot extend past the Register width");
+  auto reg = registerSlice.reg;
+
+  CHECK_PARAMETER_NOT_NULL (reg,                                                            "Cannot append nullptr Register");
+  CHECK_PARAMETER_NOT_ZERO (reg->BitsCount(),                                               "Cannot append Register with width zero");
+  CHECK_PARAMETER_NEQ      (reg->BitsOrdering(),            mast::BitsOrdering::Undefined,  "Bits ordering must be defined");
+  CHECK_PARAMETER_LTE      (registerSlice.range.Width(),    registerSlice.reg->BitsCount(), "Range cannot be larger than Register");
+  CHECK_PARAMETER_LT       (registerSlice.range.MaxIndex(), registerSlice.reg->BitsCount(), "Range cannot extend past the Register width");
 
   if (!m_registers.empty())
   {
-    CHECK_PARAMETER_EQ (registerSlice.reg->BitsOrdering(), m_registers.back().reg->BitsOrdering(), "Bits ordering must be the same as previous registers");
+    CHECK_PARAMETER_EQ (reg->BitsOrdering(), m_registers.back().reg->BitsOrdering(), "Bits ordering must be the same as previous registers");
   }
 
   m_registers.emplace_back(registerSlice);
+  m_identifiers.emplace_back(reg->Identifier());
 }
 //
 //  End of: VirtualRegister::Append
@@ -79,6 +94,7 @@ uint32_t VirtualRegister::BitsCount () const
 //
 //  End of: VirtualRegister::BitsCount
 //---------------------------------------------------------------------------
+
 
 //! Returns BitsOrdering
 //!
@@ -139,6 +155,8 @@ BinaryVector VirtualRegister::GetSlice (const IndexedRange& range, mast::BitsOrd
 //!
 void VirtualRegister::GetView (BinaryVector& target, std::function<BinaryVector(const Register&)> getter) const
 {
+  CHECK_VALUE_NOT_EMPTY(m_registers, "VirtualRegister must be interface to at least one register before requesting some values");
+
   auto bitsOrdering = m_registers.front().reg->BitsOrdering();
 
   target.Clear();
@@ -154,12 +172,46 @@ void VirtualRegister::GetView (BinaryVector& target, std::function<BinaryVector(
 
 
 
+//! Returns XOR of the value last read from SUT and the expected value. May contain x-values (for don't care)
+//!
+BinaryVector VirtualRegister::LastCompareResult () const
+{
+  BinaryVector lastCompareResult;
+  GetView(lastCompareResult, [](const Register& reg) { return reg.LastCompareResult(); });
+  return lastCompareResult;
+}
+//
+//  End of: VirtualRegister::LastCompareResult
+//---------------------------------------------------------------------------
+
+
+//! Returns last sequence received from SUT
+//!
+const BinaryVector& VirtualRegister::LastFromSut () const
+{
+
+  GetView(m_lastFromSut, [](const Register& reg) { return reg.LastFromSut(); });
+  return m_lastFromSut;
+}
+//
+//  End of: VirtualRegister::LastFromSut
+//---------------------------------------------------------------------------
+
+
+void VirtualRegister::LastFromSut (BinaryVector& readData) const { GetView(readData, [](const Register& reg) { return reg.LastFromSut(); }); }
+void VirtualRegister::LastFromSut (uint8_t&      readData) const { LastFromSut_impl(readData); }
+void VirtualRegister::LastFromSut (uint16_t&     readData) const { LastFromSut_impl(readData); }
+void VirtualRegister::LastFromSut (uint32_t&     readData) const { LastFromSut_impl(readData); }
+void VirtualRegister::LastFromSut (uint64_t&     readData) const { LastFromSut_impl(readData); }
+void VirtualRegister::LastFromSut (int8_t&       readData) const { LastFromSut_impl(readData); }
+void VirtualRegister::LastFromSut (int16_t&      readData) const { LastFromSut_impl(readData); }
+void VirtualRegister::LastFromSut (int32_t&      readData) const { LastFromSut_impl(readData); }
+void VirtualRegister::LastFromSut (int64_t&      readData) const { LastFromSut_impl(readData); }
+
 //! Returns last sequence effectively sent to SUT
 //!
 const BinaryVector& VirtualRegister::LastToSut () const
 {
-  CHECK_VALUE_NOT_EMPTY(m_registers, "VirtualRegister must be interface to at least one register before calling LastToSut");
-
   GetView(m_lastToSut, [](const Register& reg) { return reg.LastToSut(); });
   return m_lastToSut;
 }
@@ -172,8 +224,6 @@ const BinaryVector& VirtualRegister::LastToSut () const
 //!
 const BinaryVector& VirtualRegister::NextToSut () const
 {
-  CHECK_VALUE_NOT_EMPTY(m_registers, "VirtualRegister must be interface to at least one register before calling NextToSut");
-
   GetView(m_nextToSut, [](const Register& reg) { return reg.NextToSut(); });
   return m_nextToSut;
 }

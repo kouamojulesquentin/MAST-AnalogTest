@@ -60,7 +60,7 @@ void NodePathResolver::ReferenceNode (std::shared_ptr<ParentNode> referenceNode)
 //!
 //! @return Found node or nullptr
 //!
-shared_ptr<SystemModelNode> NodePathResolver::Resolve (string_view path) const
+SystemModelNode* NodePathResolver::Resolve (string_view path) const
 {
   auto pos = m_cache.find(path.to_string());
   if (pos != m_cache.end())
@@ -74,10 +74,10 @@ shared_ptr<SystemModelNode> NodePathResolver::Resolve (string_view path) const
   auto foundNode = m_prefixNode->FindNode(path);
   if (foundNode)
   {
-    m_cache[path.to_string()] = foundNode;
+    m_cache[path.to_string()] = foundNode.get();
   }
 
-  return foundNode;
+  return foundNode.get();
 }
 //
 //  End of: NodePathResolver::Resolve
@@ -91,10 +91,10 @@ shared_ptr<SystemModelNode> NodePathResolver::Resolve (string_view path) const
 //!
 //! @return    Found Register
 //! @exception std::invalid_argument when path do not denote a Register
-shared_ptr<Register> NodePathResolver::ResolveAsRegister (string_view registerPath) const
+RegisterInterface* NodePathResolver::ResolveAsRegister (string_view registerPath) const
 {
   auto node = Resolve(registerPath);
-  auto reg  = dynamic_pointer_cast<Register>(node);
+  auto reg  = dynamic_cast<RegisterInterface*>(node);
 
   if (!reg)
   {

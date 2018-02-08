@@ -43,17 +43,15 @@ class UT_VirtualRegister : public CxxTest::TestSuite
   //
   void test_SetPending ();
 
-  // ---------------- LastToSut
+  // ---------------- Getters after append
   //
-  void test_LastToSut_1_Register ();
-  void test_LastToSut_2_Registers ();
-  void test_LastToSut_when_HasNoRegister ();
-
-  // ---------------- NextToSut
-  //
-  void test_NextToSut_1_Register ();
-  void test_NextToSut_2_Registers ();
-  void test_NextToSut_when_HasNoRegister ();
+  void test_Getters_when_HasNoRegister ();
+  void test_Getters_1_Register ();
+  void test_Getters_2_Registers ();
+  void test_LastFromSut_Unsigned_1_Register ();
+  void test_LastFromSut_Signed_1_Register ();
+  void test_LastFromSut_Unsigned_2_Registers ();
+  void test_LastFromSut_Signed_2_Registers ();
 
   // ---------------- SetToSut
   //
@@ -68,6 +66,8 @@ class UT_VirtualRegister : public CxxTest::TestSuite
   void test_begin_end ();
   void test_cbegin_cend ();
 
+  // ================ Other Methods ================
+  void setUp(); //!< Initializes test (called for each test)
 };
 //
 //  End of UT_VirtualRegister class declaration

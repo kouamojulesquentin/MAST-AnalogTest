@@ -501,7 +501,7 @@ void SystemModelManager_impl::iGetRefresh (string_view registerPath, int64_t&   
 //!
 //! @return The total count of mismatches within the system model
 //!
-uint32_t SystemModelManager_impl::iGetStatus (shared_ptr<SystemModelNode> node, bool clearCounter)
+uint32_t SystemModelManager_impl::iGetStatus (SystemModelNode* node, bool clearCounter)
 {
   CHECK_PARAMETER_NOT_NULL(node, "Cannot get status from undefined node");
 
@@ -551,7 +551,7 @@ uint32_t SystemModelManager_impl::iGetStatus (bool clearCounter)
 {
   MONITOR_PDL_EX("iGetStatus", "SUT Root", ThreadApplicationData());
 
-  return iGetStatus(m_sm.Root(), clearCounter);
+  return iGetStatus(m_sm.Root().get(), clearCounter);
 }
 //
 //  End of: SystemModelManager_impl::iGetStatus
@@ -603,7 +603,10 @@ void SystemModelManager_impl::iRead_impl (string_view registerPath, T expectedVa
 
   MONITOR_PDL_AND_VALUE("iRead - Queuing request", registerPath, expectedAsBV, appData);
 
-  appData->queuedReads.emplace_back(SystemModelManager_impl::QueuedRequest(reg->Identifier(), std::move(expectedAsBV)));
+  for (auto identifier : reg->Identifiers())
+  {
+    appData->queuedReads.emplace_back(SystemModelManager_impl::QueuedRequest(identifier, std::move(expectedAsBV)));
+  }
 
   *appData->currentState = ApplicationData::State::ReadRequest;
 
@@ -636,9 +639,12 @@ void SystemModelManager_impl::iRead_impl (string_view registerPath, T expectedVa
   MONITOR_PDL_AND_VALUE("iRead with don't care - Queuing request", registerPath, expectedAsBV, appData);
 
 
-  appData->queuedReads.emplace_back(SystemModelManager_impl::QueuedRequest(reg->Identifier(),
-                                                                      std::move(expectedAsBV),
-                                                                      std::move(dontCareAsBV)));
+  for (auto identifier : reg->Identifiers())
+  {
+    appData->queuedReads.emplace_back(SystemModelManager_impl::QueuedRequest(identifier,
+                                                                             std::move(expectedAsBV),
+                                                                             std::move(dontCareAsBV)));
+  }
 
   *appData->currentState = ApplicationData::State::ReadRequest;
 
@@ -681,7 +687,10 @@ void SystemModelManager_impl::iRefresh (string_view registerPath)
   auto appData = ThreadApplicationData();
   MONITOR_PDL_EX("iRefresh - Queuing request", registerPath, appData);
 
-  appData->queuedRefreshes.emplace_back(SystemModelManager_impl::QueuedRequest(reg->Identifier()));
+  for (auto identifier : reg->Identifiers())
+  {
+    appData->queuedRefreshes.emplace_back(SystemModelManager_impl::QueuedRequest(identifier));
+  }
 
   *appData->currentState = ApplicationData::State::RefreshRequest;
 
@@ -735,7 +744,10 @@ void SystemModelManager_impl::iWrite_impl (string_view registerPath, T value)
   auto appData = ThreadApplicationData();
 
   MONITOR_PDL_AND_VALUE("iWrite - Queuing request", registerPath, asBinaryVector, appData);
-  appData->queuedWrites.emplace_back(SystemModelManager_impl::QueuedRequest(reg->Identifier(), std::move(asBinaryVector)));
+  for (auto identifier : reg->Identifiers())
+  {
+    appData->queuedWrites.emplace_back(SystemModelManager_impl::QueuedRequest(identifier, std::move(asBinaryVector)));
+  }
 
   *appData->currentState = ApplicationData::State::WriteRequest;
 

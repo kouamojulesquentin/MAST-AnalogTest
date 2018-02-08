@@ -119,6 +119,9 @@ class UT_Register : public CxxTest::TestSuite
   //
   void test_Reset ();
   void test_Reset_NoValue ();
+
+  // ================ Other Methods ================
+  void setUp(); //!< Initializes test (called for each test)
 };
 //
 //  End of UT_Register class declaration

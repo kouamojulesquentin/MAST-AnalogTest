@@ -17,6 +17,8 @@
 #include "BinaryVector.hpp"
 #include "BitsOrdering.hpp"
 
+#include <vector>
+
 namespace mast
 {
 class SystemModel;
@@ -32,18 +34,29 @@ class RegisterInterface
 
   // ---------------- Getters
   //
-  virtual uint32_t            BitsCount()         const = 0; //!< Returns RegisterInterface numbers of bits
-  virtual mast::BitsOrdering  BitsOrdering()      const = 0; //!< Returns BitsOrdering
-  virtual const BinaryVector& LastToSut()         const = 0; //!< Returns last sequence effectively sent to SUT
-  virtual const BinaryVector& NextToSut()         const = 0; //!< Returns next sequence to send to SUT
+  virtual const std::vector<uint32_t>& Identifiers()       const = 0; //!< Returns register(s) unique identifier
+  virtual uint32_t                     BitsCount()         const = 0; //!< Returns RegisterInterface numbers of bits
+  virtual mast::BitsOrdering           BitsOrdering()      const = 0; //!< Returns BitsOrdering
+  virtual const BinaryVector&          LastToSut()         const = 0; //!< Returns last sequence effectively sent to SUT
+  virtual const BinaryVector&          NextToSut()         const = 0; //!< Returns next sequence to send to SUT
+  virtual BinaryVector                 LastCompareResult() const = 0; //!< Returns XOR of the value last read from SUT and the expected value. May contain x-values (for don't care).
+  virtual const BinaryVector&          LastFromSut()       const = 0; //!< Returns last sequence received from SUT
+
+  virtual void LastFromSut (BinaryVector& readData) const = 0; //!< Returns last sequence received from SUT
+  virtual void LastFromSut (uint8_t&      readData) const = 0; //!< Returns last sequence received from SUT
+  virtual void LastFromSut (uint16_t&     readData) const = 0; //!< Returns last sequence received from SUT
+  virtual void LastFromSut (uint32_t&     readData) const = 0; //!< Returns last sequence received from SUT
+  virtual void LastFromSut (uint64_t&     readData) const = 0; //!< Returns last sequence received from SUT
+  virtual void LastFromSut (int8_t&       readData) const = 0; //!< Returns last sequence received from SUT
+  virtual void LastFromSut (int16_t&      readData) const = 0; //!< Returns last sequence received from SUT
+  virtual void LastFromSut (int32_t&      readData) const = 0; //!< Returns last sequence received from SUT
+  virtual void LastFromSut (int64_t&      readData) const = 0; //!< Returns last sequence received from SUT
 
 //+  virtual const BinaryVector& BypassSequence()    const = 0; //!< Returns bypass sequence
 //+  virtual const BinaryVector& ExpectedFromSut()   const = 0; //!< Returns expected sequence
-//+  virtual const BinaryVector& LastFromSut()       const = 0; //!< Returns last sequence received from SUT
 //+  virtual const BinaryVector& LastReadFromSut()   const = 0; //!< Returns last sequence received from SUT when it was in pending read state
 //+  virtual const BinaryVector& DontCareMask()      const = 0; //!< Returns the don't care mask (1 for care, 0 for don't care)
 //+  virtual bool                HoldValue()         const = 0; //!< Returns true when bypass value is maintained equal to nextToSut (The value will not be changed while the register is selected)
-//+  virtual BinaryVector        LastCompareResult() const = 0; //!< Returns XOR of the value last read from SUT and the expected value. May contain x-values (for don't care).
 
   // ---------------- Setters
   //

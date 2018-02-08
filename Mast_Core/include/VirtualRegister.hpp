@@ -37,7 +37,7 @@ class VirtualRegister final : public RegisterInterface
   // ---------------- Public  Methods
   //
   public:
-  ~VirtualRegister() = default;
+  ~VirtualRegister();
   VirtualRegister()  = default;
 
   struct RegisterSlice
@@ -70,10 +70,24 @@ class VirtualRegister final : public RegisterInterface
   bool               Empty()        const { return m_registers.empty(); };  //!< Returns VirtualRegister is empty (refering to no registers at all)
   uint32_t           SlicesCount()  const { return m_registers.size(); };   //!< Returns VirtualRegister numbers of register slice
 
-  uint32_t            BitsCount()    const override; //!< Returns VirtualRegister numbers of bits
-  mast::BitsOrdering  BitsOrdering() const override; //!< Returns BitsOrdering
-  const BinaryVector& LastToSut()    const override; //!< Returns last sequence effectively sent to SUT
-  const BinaryVector& NextToSut()    const override; //!< Returns next sequence to send to SUT
+  const std::vector<uint32_t>& Identifiers() const override { return m_identifiers; } //!< Returns register(s) unique identifier(s)
+
+  uint32_t            BitsCount()         const override; //!< Returns VirtualRegister numbers of bits
+  mast::BitsOrdering  BitsOrdering()      const override; //!< Returns BitsOrdering
+  BinaryVector        LastCompareResult() const override; //!< Returns XOR of the value last read from SUT and the expected value. May contain x-values (for don't care).
+  const BinaryVector& LastToSut()         const override; //!< Returns last sequence effectively sent to SUT
+  const BinaryVector& NextToSut()         const override; //!< Returns next sequence to send to SUT
+  const BinaryVector& LastFromSut()       const override; //!< Returns last sequence received from SUT
+
+  void LastFromSut (BinaryVector& readData) const override; //!< Returns last sequence received from SUT
+  void LastFromSut (uint8_t&      readData) const override; //!< Returns last sequence received from SUT
+  void LastFromSut (uint16_t&     readData) const override; //!< Returns last sequence received from SUT
+  void LastFromSut (uint32_t&     readData) const override; //!< Returns last sequence received from SUT
+  void LastFromSut (uint64_t&     readData) const override; //!< Returns last sequence received from SUT
+  void LastFromSut (int8_t&       readData) const override; //!< Returns last sequence received from SUT
+  void LastFromSut (int16_t&      readData) const override; //!< Returns last sequence received from SUT
+  void LastFromSut (int32_t&      readData) const override; //!< Returns last sequence received from SUT
+  void LastFromSut (int64_t&      readData) const override; //!< Returns last sequence received from SUT
 
   // ---------------- Setters
   //
@@ -108,12 +122,20 @@ class VirtualRegister final : public RegisterInterface
                                 std::function<void         (Register&, const BinaryVector&)> setter,
                                 const BinaryVector&                                          value);
 
+  template<typename T> void LastFromSut_impl (T& readData) const
+  {
+    const auto& lastFromSut = LastFromSut();
+    lastFromSut.Get(readData);
+  }
+
   // ---------------- Private  Fields
   //
   private:
-  std::vector<RegisterSlice> m_registers;
-  mutable BinaryVector       m_nextToSut; //!< Last computed "next to sut" - This is a member to return a reference needed by RegisterInterface (this also reduce allocations/deallocations)
-  mutable BinaryVector       m_lastToSut; //!< Last computed "last to sut" - This is a member to return a reference needed by RegisterInterface (this also reduce allocations/deallocations)
+  std::vector<uint32_t>      m_identifiers; //!< Identifiers of each registers that make up the VirtualRegister
+  std::vector<RegisterSlice> m_registers;   //!< Defines registers chunk that make up the VirtualRegister
+  mutable BinaryVector       m_nextToSut;   //!< Last computed "next to sut"   - This is a member to return a reference needed by RegisterInterface (this also reduce allocations/deallocations)
+  mutable BinaryVector       m_lastToSut;   //!< Last computed "last to sut"   - This is a member to return a reference needed by RegisterInterface (this also reduce allocations/deallocations)
+  mutable BinaryVector       m_lastFromSut; //!< Last computed "last from sut" - This is a member to return a reference needed by RegisterInterface (this also reduce allocations/deallocations)
 };
 //
 //  End of VirtualRegister class declaration

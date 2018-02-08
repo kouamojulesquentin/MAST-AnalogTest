@@ -48,15 +48,13 @@ class Register : public SystemModelNode, public RegisterInterface
   //
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
 
-  virtual std::experimental::string_view TypeName() const override { return "Register"; } //!< Returns readable type name
+  virtual std::experimental::string_view TypeName()    const override { return "Register";    } //!< Returns readable type name
+  const std::vector<uint32_t>&           Identifiers() const override { return m_identifiers; } //!< Returns register unique identifier
 
   // ---------------- Getters
   //
-  uint32_t            BitsCount()         const { return m_bypass.BitsCount(); } //!< Returns Register numbers of bits
-  mast::BitsOrdering  BitsOrdering()      const { return m_bitsOrdering;       } //!< Returns BitsOrdering
   const BinaryVector& BypassSequence()    const { return m_bypass;             } //!< Returns bypass sequence
   const BinaryVector& ExpectedFromSut()   const { return m_expectedFromSut;    } //!< Returns expected sequence
-  const BinaryVector& LastFromSut()       const { return m_lastFromSut;        } //!< Returns last sequence received from SUT
   const BinaryVector& LastReadFromSut()   const { return m_lastReadFromSut;    } //!< Returns last sequence received from SUT when it was in pending read state
   const BinaryVector& NextToSut()         const { return m_nextToSut;          } //!< Returns next sequence to send to SUT
   const BinaryVector& LastToSut()         const { return m_lastToSut;          } //!< Returns last sequence effectively sent to SUT
@@ -66,9 +64,14 @@ class Register : public SystemModelNode, public RegisterInterface
   uint32_t            Mismatches()        const { return m_mismatches;         } //!< Returns current mismatch count
   bool                IsPendingForRead()  const { return m_pendingRead;        } //!< Returns true when there is a pending request to read the Register from SUT
   bool                IsPendingForWrite() const { return SystemModelNode::IsPending(); } //!< Returns true when there is a pending request to write to SUT
-  BinaryVector        LastCompareResult() const;                                 //!< Returns XOR of the value last read from SUT and the expected value. May contain x-values (for don't care).
-  virtual bool        IsPending()         const override;                        //!< Returns true if register is pending for read or for write
-  virtual uint32_t    PendingCount()      const override;                        //!< Returns number of pending registers down the hierarchy
+
+  // RegisterInterface implementation
+  uint32_t            BitsCount()         const override { return m_bypass.BitsCount(); } //!< Returns Register numbers of bits
+  mast::BitsOrdering  BitsOrdering()      const override { return m_bitsOrdering;       } //!< Returns BitsOrdering
+  const BinaryVector& LastFromSut()       const override { return m_lastFromSut;        } //!< Returns last sequence received from SUT
+  BinaryVector        LastCompareResult() const override;                                 //!< Returns XOR of the value last read from SUT and the expected value. May contain x-values (for don't care).
+  virtual bool        IsPending()         const override;                                 //!< Returns true if register is pending for read or for write
+  virtual uint32_t    PendingCount()      const override;                                 //!< Returns number of pending registers down the hierarchy
 
   // ---------------- Setters
   //
@@ -98,7 +101,7 @@ class Register : public SystemModelNode, public RegisterInterface
 
   //! Sets the bits sequence to send during the next iApply cycle
   //!
-  void SetToSut (const BinaryVector& sequence)
+  void SetToSut (const BinaryVector& sequence) override
   {
     if (m_holdValue)
     {
@@ -109,15 +112,17 @@ class Register : public SystemModelNode, public RegisterInterface
 
   //! Returns last sequence received from SUT as integral value
   //!
-  void LastFromSut (BinaryVector& value) const { value = m_lastFromSut; }
+  void LastFromSut (BinaryVector& value) const override { value = m_lastFromSut; }
 
-  //! Returns last sequence received from SUT as integral value
-  //!
-  template<typename T> void LastFromSut (T& value) const
-  {
-    static_assert(std::is_integral<T>::value, "LastFromSut requires integral types");
-    m_lastFromSut.Get(value);
-  }
+
+  void LastFromSut (uint8_t&      readData) const override { return LastFromSut_impl(readData); }//!< Returns last sequence received from SUT
+  void LastFromSut (uint16_t&     readData) const override { return LastFromSut_impl(readData); }//!< Returns last sequence received from SUT
+  void LastFromSut (uint32_t&     readData) const override { return LastFromSut_impl(readData); }//!< Returns last sequence received from SUT
+  void LastFromSut (uint64_t&     readData) const override { return LastFromSut_impl(readData); }//!< Returns last sequence received from SUT
+  void LastFromSut (int8_t&       readData) const override { return LastFromSut_impl(readData); }//!< Returns last sequence received from SUT
+  void LastFromSut (int16_t&      readData) const override { return LastFromSut_impl(readData); }//!< Returns last sequence received from SUT
+  void LastFromSut (int32_t&      readData) const override { return LastFromSut_impl(readData); }//!< Returns last sequence received from SUT
+  void LastFromSut (int64_t&      readData) const override { return LastFromSut_impl(readData); }//!< Returns last sequence received from SUT
 
   //! Returns last sequence received from SUT when it was in pending read state - with output reference
   //!
@@ -182,22 +187,33 @@ class Register : public SystemModelNode, public RegisterInterface
 
   void UpdateLastToSut() { m_lastToSut = m_nextToSut; } //!< Updates "last to sut" field from "next to sut" field (should be called when "next to sut" has effectively been shifted to SUT)
 
+  // ---------------- Private Methods
+  //
+  //! Returns last sequence received from SUT as integral value
+  //!
+  template<typename T> void LastFromSut_impl (T& value) const
+  {
+    static_assert(std::is_integral<T>::value, "LastFromSut requires integral types");
+    m_lastFromSut.Get(value);
+  }
+
   // ---------------- Private  Fields
   //
   private:
-  bool               m_pendingRead       = false;                      //!< True when there is a pending request to read register value from SUT
-  bool               m_holdValue         = false;                      //!< When true, force bypass value to be equal to nextToSut (The value will not be changed while the register is selected)
-  bool               m_mustCheckExpected = false;                      //!< When true, it triggers a check of received vs expected data during the following shift from sut
-  mast::BitsOrdering m_bitsOrdering      = mast::BitsOrdering::Downto; //!< Defines whether MSB are on the left or right hand side
-  uint32_t           m_mismatches        = 0;                          //!< Number of mismatches following IEEE 1687 rules
-  BinaryVector       m_nextToSut;                                      //!< Sequence of bits that should be shifted into SUT (during the next iApply cycle)
-  BinaryVector       m_lastToSut;                                      //!< Last sent sequence of bits: It stores the status of the SUT (SIBs, etc...) after an apply cycle
-  BinaryVector       m_lastFromSut;                                    //!< Last sequence of bits that have been shifted from SUT
-  BinaryVector       m_lastReadFromSut;                                //!< Last sequence of bits that have been shifted from SUT when pending read is true
-  BinaryVector       m_expectedFromSut;                                //!< Sequence of expected bits when scanning from SUT
-  BinaryVector       m_bypass;                                         //!< Sequence to shift into the sut when no iApply cycle has been defined on the register
-  BinaryVector       m_dontCareMask;                                   //!< When not empty, each one bit represent a bit to compare and each zero bit represent a bit we don't care
-  BinaryVector       m_resetValue;                                     //!< When not empty, it is the value used to reflect the register value after a iReset command
+  bool                        m_pendingRead       = false;                      //!< True when there is a pending request to read register value from SUT
+  bool                        m_holdValue         = false;                      //!< When true, force bypass value to be equal to nextToSut (The value will not be changed while the register is selected)
+  bool                        m_mustCheckExpected = false;                      //!< When true, it triggers a check of received vs expected data during the following shift from sut
+  mast::BitsOrdering          m_bitsOrdering      = mast::BitsOrdering::Downto; //!< Defines whether MSB are on the left or right hand side
+  uint32_t                    m_mismatches        = 0;                          //!< Number of mismatches following IEEE 1687 rules
+  BinaryVector                m_nextToSut;                                      //!< Sequence of bits that should be shifted into SUT (during the next iApply cycle)
+  BinaryVector                m_lastToSut;                                      //!< Last sent sequence of bits: It stores the status of the SUT (SIBs, etc...) after an apply cycle
+  BinaryVector                m_lastFromSut;                                    //!< Last sequence of bits that have been shifted from SUT
+  BinaryVector                m_lastReadFromSut;                                //!< Last sequence of bits that have been shifted from SUT when pending read is true
+  BinaryVector                m_expectedFromSut;                                //!< Sequence of expected bits when scanning from SUT
+  BinaryVector                m_bypass;                                         //!< Sequence to shift into the sut when no iApply cycle has been defined on the register
+  BinaryVector                m_dontCareMask;                                   //!< When not empty, each one bit represent a bit to compare and each zero bit represent a bit we don't care
+  BinaryVector                m_resetValue;                                     //!< When not empty, it is the value used to reflect the register value after a iReset command
+  const std::vector<uint32_t> m_identifiers;                                    //!< To implement RegisterInterface that support multiple identifiers
 };
 //
 //  End of Register class declaration

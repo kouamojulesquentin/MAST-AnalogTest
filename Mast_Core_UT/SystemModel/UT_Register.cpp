@@ -71,6 +71,14 @@ void Check_SetExpectedFromSut_DontCare (T expected, T mask)
 } // End of unnamed namespace
 
 
+
+//! Initializes test (called for each test)
+void UT_Register::setUp ()
+{
+  SystemModelNode::ResetNodeIdentifier(); // To start each test with node identifier equal 0
+}
+
+
 //! Pseudo test of sizeof(Register)
 //! @note This is mainly used as an information on real size of Register
 //!       and to detect/validate changes.
@@ -97,21 +105,25 @@ void UT_Register::test_Constructor ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS (sut.TypeName(),          "Register");
+  CxxTest::setAbortTestOnFail(true);
+  TS_ASSERT_EQUALS (sut.TypeName(),            "Register");
+  TS_ASSERT_EQUALS (sut.Identifier(),          0u);                    // ==> First create SystemModelNode
+  TS_ASSERT_EQUALS (sut.Identifiers().size(),  1u);
+  TS_ASSERT_EQUALS (sut.Identifiers().front(), 0u);
   TS_ASSERT_FALSE  (sut.HoldValue());
   TS_ASSERT_FALSE  (sut.MustCheckExpected());
-  TS_ASSERT_EQUALS (sut.Mismatches(),        0U);
-  TS_ASSERT_EQUALS (sut.BitsCount(),         9U);
-  TS_ASSERT_EQUALS (sut.PendingCount(),      0U);
+  TS_ASSERT_EQUALS (sut.Mismatches(),          0U);
+  TS_ASSERT_EQUALS (sut.BitsCount(),           9U);
+  TS_ASSERT_EQUALS (sut.PendingCount(),        0U);
   TS_ASSERT_FALSE  (sut.IsPendingForRead());
   TS_ASSERT_FALSE  (sut.IsPending());
-  TS_ASSERT_EQUALS (sut.BypassSequence(),    bypassSequence);
-  TS_ASSERT_EQUALS (sut.NextToSut(),         bypassSequence);
-  TS_ASSERT_EQUALS (sut.LastToSut(),         bypassSequence);
-  TS_ASSERT_EQUALS (sut.ExpectedFromSut(),   bypassSequence);
-  TS_ASSERT_EQUALS (sut.LastFromSut(),       bypassSequence);
-  TS_ASSERT_EQUALS (sut.LastReadFromSut(),   BinaryVector(9u));
-  TS_ASSERT_EQUALS (sut.LastCompareResult(), sut.ExpectedFromSut());  // No value actually read yet
+  TS_ASSERT_EQUALS (sut.BypassSequence(),      bypassSequence);
+  TS_ASSERT_EQUALS (sut.NextToSut(),           bypassSequence);
+  TS_ASSERT_EQUALS (sut.LastToSut(),           bypassSequence);
+  TS_ASSERT_EQUALS (sut.ExpectedFromSut(),     bypassSequence);
+  TS_ASSERT_EQUALS (sut.LastFromSut(),         bypassSequence);
+  TS_ASSERT_EQUALS (sut.LastReadFromSut(),     BinaryVector(9u));
+  TS_ASSERT_EQUALS (sut.LastCompareResult(),   sut.ExpectedFromSut()); // No value actually read yet
 
   uint8_t  last_uint8  = 0x55;  sut.LastReadFromSut(last_uint8);
   uint16_t last_uint16 = 0x55;  sut.LastReadFromSut(last_uint16);

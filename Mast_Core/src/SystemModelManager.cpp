@@ -131,7 +131,7 @@ BinaryVector SystemModelManager::iGetRefresh (string_view registerPath) { return
 
 //! Returns the number of expected read failure for SystemModel sub-tree
 //!
-uint32_t SystemModelManager::iGetStatus (std::shared_ptr<SystemModelNode> node, bool clearCounter) { return m_impl->iGetStatus(node, clearCounter); }
+uint32_t SystemModelManager::iGetStatus (std::shared_ptr<SystemModelNode> node, bool clearCounter) { return m_impl->iGetStatus(node.get(), clearCounter); }
 
 
 //! Returns the number of expected read failure for the complete system model

@@ -24,7 +24,7 @@
 
 namespace mast
 {
-class Register;
+class RegisterInterface;
 
 //! Associates paths with actual nodes
 //! @note Path are defined relative to a, fix, reference node
@@ -50,12 +50,12 @@ class MAST_CORE_EXPORT NodePathResolver final
 
   //! Finds node with relative path from "prefix" or "reference" node
   //!
-  std::shared_ptr<SystemModelNode> Resolve (std::experimental::string_view path) const;
+  SystemModelNode* Resolve (std::experimental::string_view path) const;
 
 
   //! Finds Register with relative path from "prefix" or "reference" node
   //!
-  std::shared_ptr<Register> ResolveAsRegister (std::experimental::string_view registerPath) const;
+  RegisterInterface* ResolveAsRegister (std::experimental::string_view registerPath) const;
 
   //! Returns current path prefix
   //!
@@ -68,7 +68,7 @@ class MAST_CORE_EXPORT NodePathResolver final
   // ---------------- Private  Fields
   //
   private:
-  using Cache_t = std::map<std::string, std::shared_ptr<SystemModelNode>>;
+  using Cache_t = std::map<std::string, SystemModelNode*>;
 
   std::shared_ptr<ParentNode> m_referenceNode; //!< Reference node for paths
   std::shared_ptr<ParentNode> m_prefixNode;    //!< Node associated with prefix (equals m_rootNode when prefix is empty)

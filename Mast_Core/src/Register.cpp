@@ -45,6 +45,7 @@ Register::Register (string_view        name,
   , m_expectedFromSut (bypassSequence,            SizeProperty::Fixed)
   , m_bypass          (std::move(bypassSequence), SizeProperty::Fixed)
   , m_resetValue      (std::move(resetSequence))
+  , m_identifiers     ({ Identifier() })
 {
   if (!m_resetValue.IsEmpty())
   {

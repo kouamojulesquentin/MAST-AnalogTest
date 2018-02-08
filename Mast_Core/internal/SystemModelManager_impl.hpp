@@ -175,7 +175,7 @@ class SystemModelManager_impl final
 
   //! Returns the number of expected read failure for SystemModel sub-tree
   //!
-  uint32_t iGetStatus (std::shared_ptr<SystemModelNode> node, bool clearCounter);
+  uint32_t iGetStatus (SystemModelNode* node, bool clearCounter);
 
 
   //! Returns the number of expected read failure for the complete system model

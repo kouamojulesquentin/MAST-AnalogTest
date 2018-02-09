@@ -36,8 +36,6 @@ using mast::VirtualRegister;
 using mast::IndexedRange;
 using mast::BitsOrdering;
 
-using RegisterSlice = VirtualRegister::RegisterSlice;
-
 using namespace mast;
 
 //! Checks RegistersAlias constructor

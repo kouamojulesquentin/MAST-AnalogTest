@@ -15,14 +15,18 @@
 #include "Chain.hpp"
 #include "Register.hpp"
 #include "SystemModel.hpp"
+#include "VirtualRegister.hpp"
+#include "RegistersAlias.hpp"
 #include "GmlPrinter.hpp"  // To get a visual representation of testcase
 #include "TestModelBuilder.hpp"
 #include <tuple>
+#include <memory>
 #include <cxxtest/ValueTraits.h>
 
 using std::make_tuple;
 using std::shared_ptr;
 using std::make_shared;
+using std::dynamic_pointer_cast;
 using std::experimental::string_view;
 using namespace mast;
 using namespace test;
@@ -74,7 +78,9 @@ void UT_ParentNode::test_constructor ()
   TS_ASSERT_EQUALS  (sut.DirectChildrenCount(), 0);
   TS_ASSERT_NULLPTR (sut.FirstChild());
   TS_ASSERT_NULLPTR (sut.ChildAppender());
+  TS_ASSERT_NULLPTR (sut.RegistersAliases());
   TS_ASSERT_FALSE   (sut.IgnoreForNodePath());
+  TS_ASSERT_FALSE   (sut.HasAliases());
 }
 
 
@@ -86,7 +92,7 @@ void UT_ParentNode::test_AppendChild_1st ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
 
   // ---------------- Exercise
@@ -109,7 +115,7 @@ void UT_ParentNode::test_AppendChild_2nd ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
 
@@ -135,7 +141,7 @@ void UT_ParentNode::test_PrependChild_1st ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
 
   // ---------------- Exercise
@@ -161,7 +167,7 @@ void UT_ParentNode::test_PrependChild_2nd ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
 
@@ -187,7 +193,7 @@ void UT_ParentNode::test_PrependChild_with_Sibbling ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
   auto node_3 = make_shared<Chain>("node 3");
@@ -224,7 +230,7 @@ void UT_ParentNode::test_SetChildAppender_with_Append ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
   auto node_3 = make_shared<Chain>("node 3");
@@ -261,7 +267,7 @@ void UT_ParentNode::test_SetChildAppender_with_Prepend ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
   auto node_3 = make_shared<Chain>("node 3");
@@ -303,7 +309,7 @@ void UT_ParentNode::test_DisconnectEndPoint_1st_OutOf_1 ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
 
   sut.AppendChild(node_1);
@@ -327,7 +333,7 @@ void UT_ParentNode::test_DisconnectEndPoint_1st_OutOf_2 ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
 
@@ -353,7 +359,7 @@ void UT_ParentNode::test_DisconnectEndPoint_2nd_OutOf_2 ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
 
@@ -380,7 +386,7 @@ void UT_ParentNode::test_DisconnectEndPoint_2nd_OutOf_3 ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
   auto node_3 = make_shared<Chain>("node 3");
@@ -409,7 +415,7 @@ void UT_ParentNode::test_DisconnectEndPoint_3rd_OutOf_2 ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
 
@@ -430,7 +436,7 @@ void UT_ParentNode::test_DisconnectEndPoint_0_OutOf_2 ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
 
@@ -451,7 +457,7 @@ void UT_ParentNode::test_DisconnectEndPoint_0_OutOf_0 ()
 {
   // ---------------- Setup
   //
-  auto sut = Chain("chain");
+  Chain sut("chain");
 
   // ---------------- Exercise & Verify
   //
@@ -466,7 +472,7 @@ void UT_ParentNode::test_DisconnectEndPoint_1_OutOf_0 ()
 {
   // ---------------- Setup
   //
-  auto sut = Chain("chain");
+  Chain sut("chain");
 
   // ---------------- Exercise & Verify
   //
@@ -481,7 +487,7 @@ void UT_ParentNode::test_DisconnectChild_1st_OutOf_1 ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
 
   sut.AppendChild(node_1);
@@ -505,7 +511,7 @@ void UT_ParentNode::test_DisconnectChild_1st_OutOf_2 ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
 
@@ -531,7 +537,7 @@ void UT_ParentNode::test_DisconnectChild_2nd_OutOf_2 ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
 
@@ -558,7 +564,7 @@ void UT_ParentNode::test_DisconnectChild_2nd_OutOf_3 ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
   auto node_3 = make_shared<Chain>("node 3");
@@ -587,7 +593,7 @@ void UT_ParentNode::test_DisconnectChild_NotAChild ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
   auto node_3 = make_shared<Chain>("node 3");
@@ -610,7 +616,7 @@ void UT_ParentNode::test_DisconnectChild_NoChild ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
 
   // ---------------- Exercise & Verify
@@ -626,7 +632,7 @@ void UT_ParentNode::test_DisconnectChild_Nullptr ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
 
@@ -646,7 +652,7 @@ void UT_ParentNode::test_DisconnectAllChildren ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
   auto node_3 = make_shared<Chain>("node 3");
@@ -675,7 +681,7 @@ void UT_ParentNode::test_DisconnectAllChildren_When_None ()
 {
   // ---------------- Setup
   //
-  auto sut = Chain("chain");
+  Chain sut("chain");
 
   // ---------------- Exercise
   //
@@ -699,7 +705,7 @@ void UT_ParentNode::test_HasDirectChild_1st_OutOf_1 ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
 
   sut.AppendChild(node_1);
@@ -722,7 +728,7 @@ void UT_ParentNode::test_HasDirectChild_1st_OutOf_2 ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
 
@@ -747,7 +753,7 @@ void UT_ParentNode::test_HasDirectChild_2nd_OutOf_2 ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
 
@@ -772,7 +778,7 @@ void UT_ParentNode::test_HasDirectChild_2nd_OutOf_3 ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
   auto node_3 = make_shared<Chain>("node 3");
@@ -799,7 +805,7 @@ void UT_ParentNode::test_HasDirectChild_NotAChild ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
   auto node_3 = make_shared<Chain>("node 3");
@@ -824,7 +830,7 @@ void UT_ParentNode::test_HasDirectChild_NoChild ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
 
   // ---------------- Exercise
@@ -844,7 +850,7 @@ void UT_ParentNode::test_HasDirectChild_Nullptr ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
 
@@ -863,7 +869,7 @@ void UT_ParentNode::test_FindParentOfNode_NotAShared_ptr ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("chain");
+  Chain sut("chain");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
 
@@ -1200,6 +1206,190 @@ void UT_ParentNode::test_FindNode_NotValidPaths ()
 }
 
 
+
+//! Checks ParentNode::AddAlias() when it is 1st alias
+//!
+void UT_ParentNode::test_AddAlias_1st ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  auto topNode = CreateSystemModel(sm);   // See that function for details related to verification part
+
+  CxxTest::setAbortTestOnFail(true);
+  auto sut   = dynamic_pointer_cast<ParentNode> (topNode->FindNode("Chain_0"));;
+  auto reg_1 = dynamic_pointer_cast<Register>   (topNode->FindNode("Chain_0.Reg_1"));
+  auto reg_2 = dynamic_pointer_cast<Register>   (topNode->FindNode("Chain_0.Reg_4"));
+
+  TS_ASSERT_NOT_NULLPTR (sut);
+  TS_ASSERT_NOT_NULLPTR (reg_1);
+  TS_ASSERT_NOT_NULLPTR (reg_2);
+
+  // Create first alias
+  VirtualRegister virtualRegister_1;
+  {
+    auto regSlice_1 = RegisterSlice{reg_1, IndexedRange{4, 1}};
+    auto regSlice_2 = RegisterSlice{reg_2, IndexedRange{2, 1}};
+
+    virtualRegister_1.Append(regSlice_1);
+    virtualRegister_1.Append(regSlice_2);
+  }
+  RegistersAlias alias("Foo"s, std::move(virtualRegister_1));
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut->AddAlias(std::move(alias)));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE        (sut->HasAliases());
+  TS_ASSERT_NOT_NULLPTR (sut->RegistersAliases());
+  TS_ASSERT_EQUALS      (sut->RegistersAliases()->size(), 1u);
+}
+
+
+//! Checks ParentNode::AddAlias() when it is 2nd alias
+//!
+void UT_ParentNode::test_AddAlias_2nd ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  auto topNode = CreateSystemModel(sm);   // See that function for details related to verification part
+
+  CxxTest::setAbortTestOnFail(true);
+  auto sut   = dynamic_pointer_cast<ParentNode> (topNode->FindNode("Chain_0"));;
+  auto reg_1 = dynamic_pointer_cast<Register>   (topNode->FindNode("Chain_0.Reg_1"));
+  auto reg_2 = dynamic_pointer_cast<Register>   (topNode->FindNode("Chain_0.Reg_4"));
+
+  TS_ASSERT_NOT_NULLPTR (sut);
+  TS_ASSERT_NOT_NULLPTR (reg_1);
+  TS_ASSERT_NOT_NULLPTR (reg_2);
+
+  // Create 1st alias
+  VirtualRegister virtualRegister_1;
+  {
+    virtualRegister_1.Append({reg_1, IndexedRange{4, 1}});
+    virtualRegister_1.Append({reg_2, IndexedRange{2, 1}});
+  }
+  RegistersAlias alias_1("Foo"s, std::move(virtualRegister_1));
+
+  // Create 2nd alias
+  VirtualRegister virtualRegister_2;
+  {
+    virtualRegister_2.Append({reg_1, IndexedRange{4, 0}});
+    virtualRegister_2.Append({reg_2, IndexedRange{1, 0}});
+  }
+  RegistersAlias alias_2("Bar", std::move(virtualRegister_2));
+
+  TS_ASSERT_THROWS_NOTHING (sut->AddAlias(std::move(alias_1)));
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut->AddAlias(std::move(alias_2)));
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_TRUE        (sut->HasAliases());
+  TS_ASSERT_NOT_NULLPTR (sut->RegistersAliases());
+  TS_ASSERT_EQUALS      (sut->RegistersAliases()->size(), 2u);
+}
+
+
+//! Checks ParentNode::FindRegister() when it is 2nd alias
+//!
+void UT_ParentNode::test_FindRegister ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    // ---------------- Setup
+    //
+    auto registerName      = std::get<0>(data);
+    auto expectedBitsCount = std::get<1>(data);
+
+    SystemModel sm;
+    auto topNode = CreateSystemModel(sm);   // See that function for details related to verification part
+
+    CxxTest::setAbortTestOnFail(true);
+
+    auto sut       = dynamic_pointer_cast<ParentNode> (topNode->FindNode("Chain_0"));;
+    auto chain_1   = dynamic_pointer_cast<ParentNode> (topNode->FindNode("Chain_0.Chain"));;
+    auto chain_2   = dynamic_pointer_cast<ParentNode> (topNode->FindNode("Chain_0.Chain_2"));;
+    auto reg_1     = dynamic_pointer_cast<Register>   (topNode->FindNode("Chain_0.Reg_1"));
+    auto reg_2     = dynamic_pointer_cast<Register>   (topNode->FindNode("Chain_0.Chain.Reg_1"));
+    auto reg_3     = dynamic_pointer_cast<Register>   (topNode->FindNode("Chain_0.Chain.Reg_2"));
+    auto reg_4     = dynamic_pointer_cast<Register>   (topNode->FindNode("Chain_0.Reg_4"));
+    auto reg_lvl_3 = dynamic_pointer_cast<Register>   (topNode->FindNode("Chain_0.Chain_2.Reg_1"));
+
+    TS_ASSERT_NOT_NULLPTR (sut);
+    TS_ASSERT_NOT_NULLPTR (chain_1);
+    TS_ASSERT_NOT_NULLPTR (chain_2);
+    TS_ASSERT_NOT_NULLPTR (reg_1);
+    TS_ASSERT_NOT_NULLPTR (reg_2);
+    TS_ASSERT_NOT_NULLPTR (reg_3);
+    TS_ASSERT_NOT_NULLPTR (reg_4);
+    TS_ASSERT_NOT_NULLPTR (reg_lvl_3);
+
+    // Create 1st alias
+    VirtualRegister virtualRegister_1;
+    virtualRegister_1.Append({reg_1, IndexedRange{4, 1}});
+    virtualRegister_1.Append({reg_4, IndexedRange{2, 1}});
+    sut->AddAlias({"Foo"s, std::move(virtualRegister_1)});
+
+    // Create 2nd alias
+    VirtualRegister virtualRegister_2;
+    virtualRegister_2.Append({reg_1, IndexedRange{4, 0}});
+    virtualRegister_2.Append({reg_4, IndexedRange{1, 0}});
+    sut->AddAlias({"Bar", std::move(virtualRegister_2)});
+
+    // Create 3rd alias
+    VirtualRegister virtualRegister_3({reg_lvl_3, IndexedRange{3, 1}});
+    sut->AddAlias({"Boat", std::move(virtualRegister_3)});
+
+    // Create 4th alias
+    VirtualRegister virtualRegister_4(reg_lvl_3);
+    sut->AddAlias({"Bounty", std::move(virtualRegister_4)});
+
+    // Create 5th alias
+    VirtualRegister virtualRegister_5(reg_lvl_3);
+    virtualRegister_5.Append({reg_2, IndexedRange{3, 0}});
+    virtualRegister_5.Append({reg_3, IndexedRange{3, 0}});
+    chain_1->AddAlias({"Picus", std::move(virtualRegister_5)});
+
+
+    // ---------------- Exercise
+    //
+    auto foundRegister = sut->FindRegister(registerName);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_NOT_NULLPTR (foundRegister);
+    TS_ASSERT_EQUALS      (foundRegister->BitsCount(), expectedBitsCount);
+  };
+
+  auto data =
+  {
+    make_tuple("Reg_1",         5),  //  0 ==> Plain name
+    make_tuple("Reg_4",         4),  //  1 ==> Plain name
+    make_tuple("Foo",           6),  //  2 ==> Alias
+    make_tuple("Bar",           7),  //  3 ==> Alias
+    make_tuple(".Reg_4",        4),  //  4 ==> Single dot is ignored (plain name)
+    make_tuple(".Foo",          6),  //  5 ==> Single dot is ignored (alias)
+    make_tuple("Chain_2.Reg_1", 6),  //  6 ==> Plain name
+    make_tuple("Chain.Reg_1",   5),  //  7 ==> Plain name
+    make_tuple("Chain.Reg_5",   7),  //  8 ==> Plain name
+    make_tuple("Chain.Reg_5",   7),  //  9 ==> Plain name
+    make_tuple("Boat",          3),  // 10 ==> Alias
+    make_tuple("Bounty",        6),  // 11 ==> Alias
+    make_tuple("Chain.Picus",   14), // 12 ==> Alias at 2nd level
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
+}
 
 
 

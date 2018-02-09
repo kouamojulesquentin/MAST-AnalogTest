@@ -89,6 +89,15 @@ class UT_ParentNode : public CxxTest::TestSuite
   void test_FindNode_FromMiddle ();
   void test_FindNode_NotValidPaths ();
 
+  // ---------------- AddAlias
+  //
+  void test_AddAlias_1st ();
+  void test_AddAlias_2nd ();
+
+  // ---------------- FindRegister
+  //
+  void test_FindRegister ();
+
   // ================ Other Methods ================
 
   void setUp(); //!< Initializes test (called for each test)

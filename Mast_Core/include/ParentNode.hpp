@@ -16,10 +16,13 @@
 
 #include "SystemModelNode.hpp"
 #include <memory>
+#include <vector>
 
 namespace mast
 {
 class RegisterInterface;
+class AliasRepository;
+class RegistersAlias;
 
 //! Abstract class to represent nodes that can have children
 //!
@@ -29,7 +32,7 @@ class MAST_CORE_EXPORT ParentNode : public SystemModelNode, public std::enable_s
   //
   public:
 
-  virtual ~ParentNode() = default;
+  virtual ~ParentNode();
 
   void PrependChild   (std::shared_ptr<SystemModelNode> node);       //!< Add new child node before current children
   void AppendChild    (std::shared_ptr<SystemModelNode> node);       //!< Appends a new child node
@@ -60,12 +63,23 @@ class MAST_CORE_EXPORT ParentNode : public SystemModelNode, public std::enable_s
 
   void  SetChildAppender (std::shared_ptr<ParentNode> childAppender) { m_pOptionalChildAppender = childAppender; }
 
+  //! Appends a new "Register" alias to the collection of aliases defined for that ParentNode
+  //!
+  void AddAlias(RegistersAlias&& alias);
+
+  //! Returns true when ParentNode has at least one defined alias
+  //!
+  bool  HasAliases() const;
+
+  //! Returns current aliases for (virtual) registers
+  //!
+  const std::vector<RegistersAlias>* RegistersAliases() const;
 
   // ---------------- Protected Methods
   //
   protected:
   ParentNode() = delete;
-  ParentNode(std::experimental::string_view name) : SystemModelNode(name) {}
+  ParentNode(std::experimental::string_view name);
 
   void DisconnectSibling(std::shared_ptr<SystemModelNode> beforeNode, std::shared_ptr<SystemModelNode> sibling);
 
@@ -74,6 +88,7 @@ class MAST_CORE_EXPORT ParentNode : public SystemModelNode, public std::enable_s
   private:
   std::shared_ptr<SystemModelNode> m_pFirstChild;
   std::shared_ptr<ParentNode>      m_pOptionalChildAppender;    //!< To be used when "logical child" does not include "first child"
+  std::unique_ptr<AliasRepository> m_aliases;
   bool                             m_ignoreForNodePath = false; //!< When true the node name is ignored when search a node by its path
 };
 //

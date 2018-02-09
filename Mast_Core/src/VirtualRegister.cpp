@@ -51,6 +51,7 @@ VirtualRegister::VirtualRegister (shared_ptr<Register> reg)
 
 
 
+
 //! Appends a register slice to proxied registers
 //!
 //! @param registerSlice  Defines which Register and bits range to proxy

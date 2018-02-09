@@ -26,19 +26,19 @@
 namespace CxxTest
 {
   CXXTEST_TEMPLATE_INSTANTIATION
-  class ValueTraits<mast::VirtualRegister::RegisterSlice>
+  class ValueTraits<mast::RegisterSlice>
   {
     public:
     ~ValueTraits() = default;
 
-    ValueTraits(const mast::VirtualRegister::RegisterSlice& instance)
+    ValueTraits(const mast::RegisterSlice& instance)
       : m_asString(ToStdString(instance))
     {
     }
     const char* asString() const { return m_asString.c_str(); }
 
     private:
-    static std::string ToStdString(const mast::VirtualRegister::RegisterSlice& instance)
+    static std::string ToStdString(const mast::RegisterSlice& instance)
     {
       using std::string;
       std::ostringstream os;

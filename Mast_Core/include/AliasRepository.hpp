@@ -32,6 +32,12 @@ class AliasRepository final
   ~AliasRepository() = default;
   AliasRepository()  = default;
 
+  //! Returns true when there is at least one defined alias
+  //!
+  bool  HasAliases() const { return !m_registersAliases.empty(); }
+
+  //! Appends a new alias to the collection of managed aliases
+  //!
   void Append(RegistersAlias&& alias);
 
   //! Returns current aliases for (virtual) registers

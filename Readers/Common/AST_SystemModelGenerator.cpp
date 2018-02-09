@@ -351,7 +351,7 @@ shared_ptr<PathSelector> AST_SystemModelGenerator::Create_PathSelector (AST_Scan
     auto range = hasRange ? IndexedRange{leftIndex, rightIndex}
                           : IndexedRange{modelRegister->BitsCount() - 1u, 0u};
 
-    VirtualRegister::RegisterSlice registerSlice{modelRegister, range};
+    RegisterSlice registerSlice{modelRegister, range};
 
     virtualRegister.Append(registerSlice);
   }

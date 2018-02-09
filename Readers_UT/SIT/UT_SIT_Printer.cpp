@@ -116,7 +116,7 @@ void UT_SIT_Printer::test_VisitLinker ()
   chain->AppendChild(muxReg);
   auto pathSelector   = make_shared<DefaultBinaryPathSelector>(muxReg, 5u);
 
-  auto linker = Linker("Linker name", pathSelector);
+  Linker linker("Linker name", pathSelector);
 
   SIT_Printer sut;
 

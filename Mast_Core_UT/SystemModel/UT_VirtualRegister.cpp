@@ -29,15 +29,7 @@ using std::shared_ptr;
 using std::make_shared;
 using std::experimental::string_view;
 
-using mast::BinaryVector;
-using mast::SystemModelNode;
-using mast::Register;
-using mast::VirtualRegister;
-using mast::IndexedRange;
-using mast::BitsOrdering;
-
-using RegisterSlice = VirtualRegister::RegisterSlice;
-
+using namespace mast;
 
 //! Initializes test (called for each test)
 void UT_VirtualRegister::setUp ()

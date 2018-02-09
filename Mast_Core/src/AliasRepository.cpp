@@ -20,8 +20,12 @@ using std::experimental::string_view;
 
 //! Appends a alias for register(s)
 //!
+//! @param alias  "Register" alias to add to collection of aliases
+//!
 void AliasRepository::Append (RegistersAlias&& alias)
 {
+  CHECK_VALUE_NULL(FindRegisterAlias(alias.Name()), "Have already an alias with name: \""s + alias.Name() + "\"");
+
   m_registersAliases.emplace_back(std::move(alias));
 }
 //

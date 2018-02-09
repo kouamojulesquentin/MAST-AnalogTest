@@ -24,8 +24,6 @@ using std::make_shared;
 using namespace std::experimental::literals::string_view_literals;
 using namespace mast;
 
-using RegisterSlice = VirtualRegister::RegisterSlice;
-
 
 namespace
 {
@@ -80,6 +78,8 @@ void UT_AliasRepository::test_Constructor ()
 
   // ---------------- Verify
   //
+  TS_ASSERT_FALSE (sut.HasAliases());
+
   const auto& aliases = sut.RegistersAliases();
   TS_ASSERT_EMPTY (aliases);
 }
@@ -112,6 +112,8 @@ void UT_AliasRepository::test_Append_first ()
 
   // ---------------- Verify
   //
+  TS_ASSERT_TRUE (sut.HasAliases());
+
   const auto& aliases = sut.RegistersAliases();
 
   TS_ASSERT_EQUALS (aliases.size(), 1u);
@@ -145,6 +147,8 @@ void UT_AliasRepository::test_Append_second ()
 
   // ---------------- Verify
   //
+  TS_ASSERT_TRUE (sut.HasAliases());
+
   const auto& aliases = sut.RegistersAliases();
 
   TS_ASSERT_EQUALS (aliases.size(), 2u);

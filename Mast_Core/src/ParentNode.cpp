@@ -12,16 +12,60 @@
 //===========================================================================
 
 #include "ParentNode.hpp"
+#include "RegistersAlias.hpp"
 #include "Utility.hpp"
 #include "RegisterInterface.hpp"
+#include "AliasRepository.hpp"
+
 #include <deque>
 
 using std::deque;
 using std::shared_ptr;
 using std::dynamic_pointer_cast;
-using std::to_string;
 using std::experimental::string_view;
+using std::to_string;
+using std::make_unique;
+
 using namespace mast;
+
+//! Releases resources
+//!
+//! @note Explicitly defining it in source file is to deal with unique_ptr deleter request for sizeof(T) !
+ParentNode::~ParentNode ()
+{
+}
+//
+//  End of: ParentNode::~ParentNode
+//---------------------------------------------------------------------------
+
+
+//! Constructor...
+ParentNode::ParentNode (string_view name)
+  : SystemModelNode(name)
+{
+}
+//
+//  End of: ParentNode::ParentNode
+//---------------------------------------------------------------------------
+
+
+
+
+//! Appends a new "Register" alias to the collection of aliases defined for that ParentNode
+//!
+void ParentNode::AddAlias (RegistersAlias&& alias)
+{
+  if (!m_aliases)
+  {
+    m_aliases = make_unique<AliasRepository>();
+  }
+
+  m_aliases->Append(std::move(alias));
+}
+//
+//  End of: ParentNode::AddAlias
+//---------------------------------------------------------------------------
+
 
 
 //! Appends a new child node
@@ -460,18 +504,37 @@ RegisterInterface* ParentNode::FindRegister (string_view path)
     return nullptr;
   }
 
+  // ---------------- Search within aliases
+  //
+  if (parentNode->HasAliases())
+  {
+    auto foundRegister = parentNode->m_aliases->FindRegister(registerOrAliasName);
+    if (foundRegister != nullptr)
+    {
+      return foundRegister;
+    }
+  }
+
+  // ---------------- Search within children
+  //
   auto foundNode     = parentNode->FindChild(registerOrAliasName);
   auto foundRegister = dynamic_cast<RegisterInterface*>(foundNode);
 
-  if (foundRegister == nullptr)
-  {
-  //! @todo [JFC]-[February/08/2018]: In FindRegisters(): Manages register aliases
-  //!
-  }
   return foundRegister;
 }
 //
 //  End of ParentNode::FindRegister
+//---------------------------------------------------------------------------
+
+
+//! Returns true when ParentNode has at least one defined alias, false otherwise
+//!
+bool ParentNode::HasAliases () const
+{
+  return m_aliases ?  m_aliases->HasAliases() : false;
+}
+//
+//  End of: ParentNode::HasAliases
 //---------------------------------------------------------------------------
 
 
@@ -532,6 +595,20 @@ void ParentNode::PrependChild (std::shared_ptr<SystemModelNode> pChild)
 //
 //  End of ParentNode::PrependChild
 //---------------------------------------------------------------------------
+
+
+
+//! Returns current aliases for (virtual) registers
+//!
+//! @return Register aliases if any or nullptr if has none
+const std::vector<RegistersAlias>* ParentNode::RegistersAliases () const
+{
+  return m_aliases ? &m_aliases->RegistersAliases() : nullptr;
+}
+//
+//  End of: ParentNode::RegistersAliases
+//---------------------------------------------------------------------------
+
 
 //===========================================================================
 // End of ParentNode.cpp

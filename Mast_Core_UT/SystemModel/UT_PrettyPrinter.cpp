@@ -173,7 +173,7 @@ void UT_PrettyPrinter::test_VisitLinker_SingleRegSelector ()
   chain->AppendChild(muxReg);
   auto pathSelector   = make_shared<DefaultBinaryPathSelector>(muxReg, 5u);
 
-  auto linker = Linker("Linker name", pathSelector);
+  Linker linker("Linker name", pathSelector);
 
   PrettyPrinter sut;
 
@@ -204,7 +204,7 @@ void UT_PrettyPrinter::test_VisitLinker_SingleRegSelector_Verbose ()
   chain->AppendChild(muxReg);
   auto pathSelector   = make_shared<DefaultBinaryPathSelector>(muxReg, 5u);
 
-  auto linker = Linker("Linker name", pathSelector);
+  Linker linker("Linker name", pathSelector);
 
   PrettyPrinter sut;
   sut.SetVerbose(true);
@@ -236,12 +236,12 @@ void UT_PrettyPrinter::test_VisitLinker_MultipleRegSelector ()
   chain->AppendChild(muxReg_1);
   chain->AppendChild(muxReg_2);
   VirtualRegister virtualRegister;
-  virtualRegister.Append(VirtualRegister::RegisterSlice{muxReg_1, IndexedRange(2u, 0u)});
-  virtualRegister.Append(VirtualRegister::RegisterSlice{muxReg_2, IndexedRange(1u, 0u)});
+  virtualRegister.Append(RegisterSlice{muxReg_1, IndexedRange(2u, 0u)});
+  virtualRegister.Append(RegisterSlice{muxReg_2, IndexedRange(1u, 0u)});
 
   auto pathSelector = make_shared<DefaultBinaryPathSelector>(virtualRegister, 5u);
 
-  auto linker = Linker("Linker name", pathSelector);
+  Linker linker("Linker name", pathSelector);
 
   PrettyPrinter sut;
 
@@ -271,13 +271,13 @@ void UT_PrettyPrinter::test_VisitLinker_MultiplePartialRegSelector ()
   chain->AppendChild(muxReg_1);
   chain->AppendChild(muxReg_2);
   VirtualRegister virtualRegister;
-  virtualRegister.Append(VirtualRegister::RegisterSlice{muxReg_1, IndexedRange(2u, 1u)});
-  virtualRegister.Append(VirtualRegister::RegisterSlice{muxReg_2, IndexedRange(1u, 1u)});
-  virtualRegister.Append(VirtualRegister::RegisterSlice{muxReg_1, IndexedRange(0u, 0u)});
+  virtualRegister.Append(RegisterSlice{muxReg_1, IndexedRange(2u, 1u)});
+  virtualRegister.Append(RegisterSlice{muxReg_2, IndexedRange(1u, 1u)});
+  virtualRegister.Append(RegisterSlice{muxReg_1, IndexedRange(0u, 0u)});
 
   auto pathSelector = make_shared<DefaultBinaryPathSelector>(virtualRegister, 5u);
 
-  auto linker = Linker("Linker name", pathSelector);
+  Linker linker("Linker name", pathSelector);
 
   PrettyPrinter sut;
 

@@ -72,7 +72,7 @@ void UT_SystemModelNode::test_AppendSibling_1 ()
 {
   // ---------------- Setup
   //
-  auto sut       = Chain("A Name");
+  Chain sut("A Name");
   auto otherNode = make_shared<Chain>("node");
 
   // ---------------- Exercise
@@ -92,7 +92,7 @@ void UT_SystemModelNode::test_AppendSibling_2 ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("A Name");
+  Chain sut("A Name");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
 
@@ -120,7 +120,7 @@ void UT_SystemModelNode::test_SpliceSibling_1st ()
 {
   // ---------------- Setup
   //
-  auto sut       = Chain("A Name");
+  Chain sut("A Name");
   auto otherNode = make_shared<Chain>("node");
 
   // ---------------- Exercise
@@ -140,7 +140,7 @@ void UT_SystemModelNode::test_SpliceSibling_2nd ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("A Name");
+  Chain sut("A Name");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
 
@@ -168,7 +168,7 @@ void UT_SystemModelNode::test_SpliceSibling_NotSingleSibling ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("A Name");
+  Chain sut("A Name");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
   auto node_3 = make_shared<Chain>("node 3");
@@ -200,7 +200,7 @@ void UT_SystemModelNode::test_SetSibling ()
 {
   // ---------------- Setup
   //
-  auto sut    = Chain("A Name");
+  Chain sut("A Name");
   auto node_1 = make_shared<Chain>("node 1");
   auto node_2 = make_shared<Chain>("node 2");
   auto node_3 = make_shared<Chain>("node 3");
@@ -228,7 +228,7 @@ void UT_SystemModelNode::test_SetPending ()
 {
   // ---------------- Setup
   //
-  auto sut = Chain("A Name");
+  Chain sut("A Name");
 
   // ---------------- Exercise
   //
@@ -245,7 +245,7 @@ void UT_SystemModelNode::test_ResetPending ()
 {
   // ---------------- Setup
   //
-  auto sut = Chain("A Name");
+  Chain sut("A Name");
   sut.SetPending();
 
   // ---------------- Exercise
@@ -264,7 +264,7 @@ void UT_SystemModelNode::test_SetPriority ()
 {
   // ---------------- Setup
   //
-  auto sut = Chain("");
+  Chain sut("");
 
   // ---------------- Exercise
   //
@@ -282,7 +282,7 @@ void UT_SystemModelNode::test_SetName ()
 {
   // ---------------- Setup
   //
-  auto sut = Chain("");
+  Chain sut("");
 
   // ---------------- Exercise
   //
@@ -299,7 +299,7 @@ void UT_SystemModelNode::test_SetApplicationData ()
 {
   // ---------------- Setup
   //
-  auto sut      = Chain("");
+  Chain sut("");
   auto someData = 0x4567;
 
   // ---------------- Exercise
@@ -318,7 +318,7 @@ void UT_SystemModelNode::test_SetConditioners ()
 {
   // ---------------- Setup
   //
-  auto sut         = Chain("");
+  Chain sut("");
   auto conditioner = make_shared<DummyConditioner>();
 
   // ---------------- Exercise
@@ -338,7 +338,7 @@ void UT_SystemModelNode::test_ResetConditioners ()
 {
   // ---------------- Setup
   //
-  auto sut         = Chain("");
+  Chain sut("");
   auto conditioner = make_shared<DummyConditioner>();
 
   sut.SetConditioners(conditioner);

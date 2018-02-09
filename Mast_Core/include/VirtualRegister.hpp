@@ -25,6 +25,24 @@ namespace mast
 {
 class SystemModel;
 
+//! Represents slice of some register
+//!
+struct RegisterSlice
+{
+  std::shared_ptr<Register> reg;    //!< The Register for which a slice is defined
+  IndexedRange              range;  //!< Indices of bits in "sliced" register
+
+  bool operator==(const RegisterSlice& rhs) const
+  {
+    return std::tie(reg, range) == std::tie(rhs.reg, rhs.range);
+  }
+
+  bool operator!=(const RegisterSlice& rhs) const
+  {
+    return !operator==(rhs);
+  }
+};
+
 //! Proxy to a bunch of, ordered, Register Slice, providing Register like interface.
 //!
 //! @note This is firstly intended for PathSelector to select path driving bits of,
@@ -40,22 +58,14 @@ class VirtualRegister final : public RegisterInterface
   ~VirtualRegister();
   VirtualRegister()  = default;
 
-  struct RegisterSlice
-  {
-    std::shared_ptr<Register> reg;
-    IndexedRange              range;
-    bool operator==(const RegisterSlice& rhs) const
-    {
-      return std::tie(reg, range) == std::tie(rhs.reg, rhs.range);
-    }
-
-    bool operator!=(const RegisterSlice& rhs) const
-    {
-      return !operator==(rhs);
-    }
-  };
 
   explicit VirtualRegister(std::shared_ptr<Register> reg);
+
+  //! Constructs with (first) register slice to proxied registers
+  //!
+  //! @param registerSlice  Defines which Register and bits range to proxy
+  //!
+  explicit VirtualRegister (const RegisterSlice& registerSlice) { Append(registerSlice); }
 
   //! Appends a register slice to proxied registers
   //!

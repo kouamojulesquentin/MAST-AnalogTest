@@ -68,12 +68,14 @@ class MAST_CORE_EXPORT NodePathResolver final
   // ---------------- Private  Fields
   //
   private:
-  using Cache_t = std::map<std::string, SystemModelNode*>;
+  using NodeCache_t     = std::map<std::string, SystemModelNode*>;
+  using RegisterCache_t = std::map<std::string, RegisterInterface*>;
 
-  std::shared_ptr<ParentNode> m_referenceNode; //!< Reference node for paths
-  std::shared_ptr<ParentNode> m_prefixNode;    //!< Node associated with prefix (equals m_rootNode when prefix is empty)
-  mutable Cache_t             m_cache;         //!< Cache to speed up resolving recurrent paths
-  std::string                 m_prefix;        //!< Path prefix (relative path from reference node)
+  std::shared_ptr<ParentNode> m_referenceNode;  //!< Reference node for paths
+  std::shared_ptr<ParentNode> m_prefixNode;     //!< Node associated with prefix (equals m_rootNode when prefix is empty)
+  mutable NodeCache_t         m_nodesCache;     //!< Cache to speed up resolving recurrent node paths
+  mutable RegisterCache_t     m_registersCache; //!< Cache to speed up resolving recurrent register paths
+  std::string                 m_prefix;         //!< Path prefix (relative path from reference node)
 };
 //
 //  End of NodePathResolver class declaration

@@ -13,6 +13,7 @@
 
 #include "ParentNode.hpp"
 #include "Utility.hpp"
+#include "RegisterInterface.hpp"
 #include <deque>
 
 using std::deque;
@@ -201,42 +202,58 @@ void ParentNode::DisconnectSibling (shared_ptr<SystemModelNode> beforeNode, shar
 //---------------------------------------------------------------------------
 
 
-//! Tests whether a node is a direct child
+//! Finds a child of current parent node
 //!
-//! @param node The node to see if it is a direct child
+//! @note It searches from direct children then from parent nodes ignored in search path
 //!
-//! @return True if node is a direct child false otherwise
+//! @param childName  Searched child name (without any hierarchy)
 //!
-bool ParentNode::HasDirectChild (std::shared_ptr<SystemModelNode> node) const
+SystemModelNode* ParentNode::FindChild (string_view childName)
 {
-  CHECK_PARAMETER_NOT_NULL (node, "Invalid node: 'nullptr'");
-
+  // ---------------- Direct children
+  //
   auto currentChild = m_pFirstChild;
 
-  while (currentChild)
+  while (currentChild != nullptr)
   {
-    if (currentChild == node)
+    if (currentChild->Name() == childName)
     {
-      return true;
+      return currentChild.get();
     }
-
     currentChild = currentChild->NextSibling();
   }
 
-  return false;
+  // ---------------- Seach from children of parent node ignored in paths
+  //
+  currentChild = m_pFirstChild;
+
+  while (currentChild != nullptr)
+  {
+    auto currentNodeAsParent = dynamic_cast<ParentNode*>(currentChild.get());
+    if ((currentNodeAsParent != nullptr) && currentNodeAsParent->IgnoreForNodePath())
+    {
+      auto foundChild = currentNodeAsParent->FindChild(childName);
+      if (foundChild != nullptr)
+      {
+        return foundChild;
+      }
+    }
+    currentChild = currentChild->NextSibling();
+  }
+
+  return nullptr;
 }
 //
-//  End of: ParentNode::HasDirectChild
+//  End of: ParentNode::FindChild
 //---------------------------------------------------------------------------
 
 
 
-//! Finds node with relative path from a node
+
+
+//! Finds node with path relative to this node
 //!
-//! @note For this method, no prefix is taken into account (search is done from referenceNode)
-//!
-//! @param path           Path of node relative to specified reference node
-//! @param referenceNode  Actual reference node
+//! @param path  Path of node relative to this node
 //!
 //! @return Found node or nullptr
 shared_ptr<SystemModelNode> ParentNode::FindNode (string_view path)
@@ -350,6 +367,7 @@ shared_ptr<SystemModelNode> ParentNode::FindNode (string_view path)
 //---------------------------------------------------------------------------
 
 
+
 //! Searches down the hierarchy, the parent of specified node
 //!
 //! @note DO NOT CALL on instances not managed by a shared_ptr
@@ -407,6 +425,83 @@ shared_ptr<ParentNode> ParentNode::FindParentOfNode (shared_ptr<SystemModelNode>
 }
 //
 //  End of: ParentNode::FindParentOfNode
+//---------------------------------------------------------------------------
+
+
+//! Finds a register or virtual register with relative path from this parent node
+//!
+//! @note For this method, no prefix is taken into account (search is done from current node)
+//! @note Register aliases have higher precedence than direct or indirect children - This avoid
+//!       considering (possibly recursively) children of "ignored in path" children
+//!
+//! @param path   Path of node relative to current node
+//!
+//! @return Found register or virtual register or nullptr when not found
+RegisterInterface* ParentNode::FindRegister (string_view path)
+{
+  // ---------------- Split parent path and register (or alias) name
+  //
+  auto parentPath          = Utility::FrontTokens(path, ".");
+  auto registerOrAliasName = Utility::BackToken(path,   ".");
+
+  if (parentPath.length() == path.length()) // Is this really a hierarchical path ?
+  {
+    parentPath.clear();
+  }
+
+  CHECK_PARAMETER_NOT_EMPTY(registerOrAliasName, "Cannot find register with empty name");
+
+  // ---------------- Search for parent node
+  //
+  auto parentNode = parentPath.empty() ? this : dynamic_cast<ParentNode*>(FindNode(parentPath).get());
+
+  if (parentNode == nullptr)
+  {
+    return nullptr;
+  }
+
+  auto foundNode     = parentNode->FindChild(registerOrAliasName);
+  auto foundRegister = dynamic_cast<RegisterInterface*>(foundNode);
+
+  if (foundRegister == nullptr)
+  {
+  //! @todo [JFC]-[February/08/2018]: In FindRegisters(): Manages register aliases
+  //!
+  }
+  return foundRegister;
+}
+//
+//  End of ParentNode::FindRegister
+//---------------------------------------------------------------------------
+
+
+
+//! Tests whether a node is a direct child
+//!
+//! @param node The node to see if it is a direct child
+//!
+//! @return True if node is a direct child false otherwise
+//!
+bool ParentNode::HasDirectChild (std::shared_ptr<SystemModelNode> node) const
+{
+  CHECK_PARAMETER_NOT_NULL (node, "Invalid node: 'nullptr'");
+
+  auto currentChild = m_pFirstChild;
+
+  while (currentChild)
+  {
+    if (currentChild == node)
+    {
+      return true;
+    }
+
+    currentChild = currentChild->NextSibling();
+  }
+
+  return false;
+}
+//
+//  End of: ParentNode::HasDirectChild
 //---------------------------------------------------------------------------
 
 

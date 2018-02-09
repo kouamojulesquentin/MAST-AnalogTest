@@ -446,7 +446,7 @@ RegisterInterface* ParentNode::FindRegister (string_view path)
 
   if (parentPath.length() == path.length()) // Is this really a hierarchical path ?
   {
-    parentPath.clear();
+    parentPath = string_view();
   }
 
   CHECK_PARAMETER_NOT_EMPTY(registerOrAliasName, "Cannot find register with empty name");

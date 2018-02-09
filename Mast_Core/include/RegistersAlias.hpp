@@ -44,15 +44,11 @@ class RegistersAlias final
 
   //! Returns aliased registers bits as a VirtualRegister
   //!
+  const VirtualRegister& AliasedRegisters() const { return m_virtualRegister; }
+
+  //! Returns aliased registers bits as a VirtualRegister
+  //!
   VirtualRegister& AliasedRegisters() { return m_virtualRegister; }
-
-  // ---------------- Protected Methods
-  //
-  protected:
-
-  // ---------------- Private Methods
-  //
-  private:
 
   // ---------------- Private Fields
   //

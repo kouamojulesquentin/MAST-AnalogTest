@@ -93,6 +93,15 @@ struct IndexedRange final
     return left == right;
   }
 
+
+  //! Returns true when range represents more than one bit
+  //!
+  bool IsMultiBits() const
+  {
+    return left != right;
+  }
+
+
   //! Returns true when left index is greater than right index
   //!
   bool IncreasesTowardLeft() const

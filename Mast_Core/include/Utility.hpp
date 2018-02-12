@@ -19,6 +19,7 @@
 #include <stdexcept>
 #include <vector>
 #include <string>
+#include <sstream>
 #include <experimental/string_view>
 #include <tuple>
 #include <type_traits>    // For enum item manipulation
@@ -223,6 +224,49 @@ ScopeExit<F> MakeScopeExit (F f)
 {
   return ScopeExit<F>(f);
 }
+
+//! Inserts a separator into a stream for each call to Insert() but the first one
+//!
+class SeparatorInserter final
+{
+  public:
+  ~SeparatorInserter() = default;
+  SeparatorInserter()  = delete;
+
+  SeparatorInserter(std::ostringstream& os, std::experimental::string_view separator)
+    : m_os        (os)
+    , m_separator (separator)
+  {
+  }
+
+  //! Inserts the separator when it is not the first call after construction or reset
+  //!
+  //! @return Associated stream (for ease of use)
+  std::ostringstream& Insert()
+  {
+    if (m_first)
+    {
+      m_first = false;
+    }
+    else
+    {
+      m_os << m_separator;
+    }
+    return m_os;
+  }
+
+  //! Forces next call to Insert to not insert the separator
+  //!
+  void Reset() { m_first = true; }
+
+  private:
+  std::ostringstream& m_os;
+  std::string         m_separator;
+  bool                m_first = true;
+};
+//
+//  End of SeparatorInserter class declaration
+//---------------------------------------------------------------------------
 
 } // End of namespace mast
 

@@ -16,6 +16,7 @@
 #include "PathSelector.hpp"
 #include "DefaultTableBasedPathSelector.hpp"
 #include "AccessInterfaceProtocol.hpp"
+#include "RegistersAlias.hpp"
 #include "Utility.hpp"
 #include "EnumsUtility.hpp"
 
@@ -54,7 +55,7 @@ PrettyPrinter::PrettyPrinter (PrettyPrinterOptions options)
 //! @param refPos       Reference position
 //! @param targetPos    Target position relative to refPos
 //!
-void PrettyPrinter::AlignRelativeTo (pos_type refPos, pos_type targetPos)
+std::ostringstream& PrettyPrinter::AlignRelativeTo (pos_type refPos, pos_type targetPos)
 {
   auto curPos      = m_os.tellp();
   auto startLength = curPos - refPos;
@@ -63,6 +64,7 @@ void PrettyPrinter::AlignRelativeTo (pos_type refPos, pos_type targetPos)
   {
     m_os << string(targetPos - startLength, ' ');
   }
+  return m_os;
 }
 //
 //  End of: PrettyPrinter::AlignRelativeTo
@@ -73,10 +75,11 @@ void PrettyPrinter::AlignRelativeTo (pos_type refPos, pos_type targetPos)
 //!
 //! @param targetPos  Position set after adding a new line
 //!
-void PrettyPrinter::AlignOnNewLine (pos_type targetPos)
+std::ostringstream& PrettyPrinter::AlignOnNewLine (pos_type targetPos)
 {
   m_os << std::endl;
   m_os << string(targetPos, ' ');
+  return m_os;
 }
 //
 //  End of: PrettyPrinter::AlignOnNewLine
@@ -114,6 +117,47 @@ string PrettyPrinter::PrettyPrint (shared_ptr<SystemModelNode> topNode, PrettyPr
 //  End of: PrettyPrinter::PrettyPrint
 //---------------------------------------------------------------------------
 
+
+
+//! Prints register aliases of a ParentNode
+//!
+void PrettyPrinter::PrintAliases (const ParentNode& parentNode)
+{
+  if (parentNode.HasAliases())
+  {
+    SeparatorInserter separator(m_os, ", ");
+
+    auto aliases = parentNode.RegistersAliases();
+    for (const auto& alias : *aliases)
+    {
+      AlignOnNewLine(m_depth) << "Alias " << alias.Name() << ": ";
+
+      separator.Reset();
+      const auto& registers = alias.AliasedRegisters();
+
+      for (const auto& slice : registers)
+      {
+        separator.Insert() << slice.reg->Name() << "[";
+
+        const auto& range = slice.range;
+
+        m_os << std::to_string(range.left);
+        if (range.IsMultiBits())
+        {
+          m_os << ":" << std::to_string(range.right);
+        }
+        m_os << "]";
+      }
+    }
+  }
+}
+//
+//  End of: PrettyPrinter::PrintAliases
+//---------------------------------------------------------------------------
+
+
+
+
 //! Pretty print childrens of a parent node
 //!
 void PrettyPrinter::PrintChildren (const ParentNode& parentNode)
@@ -125,6 +169,12 @@ void PrettyPrinter::PrintChildren (const ParentNode& parentNode)
 
   ++m_depth;
 
+  // ---------------- Aliases
+  //
+  PrintAliases(parentNode);
+
+  // ---------------- SystemModelNode children per se
+  //
   auto pLinker  = dynamic_cast<const Linker*>(&parentNode);
   auto selector = pLinker ? pLinker->Selector() : nullptr;
   auto childId  = uint32_t(1u);
@@ -269,6 +319,7 @@ void PrettyPrinter::StreamParentNode (std::experimental::string_view type, const
 
     StreamNodeCommon(parentNode);
   }
+
   PrintChildren(parentNode);
 }
 //

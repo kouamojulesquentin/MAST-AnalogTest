@@ -17,9 +17,11 @@
 #include "TestModelBuilder.hpp"
 #include "DefaultBinaryPathSelector.hpp"
 #include "SystemModel.hpp"
+#include "VirtualRegister.hpp"
+#include "RegistersAlias.hpp"
 #include "EnumsUtility.hpp"
 
-#include <cxxtest/ValueTraits.h>
+#include "Mast_Core_Traits.hpp"
 
 using std::string;
 using std::experimental::string_view;
@@ -451,6 +453,50 @@ void UT_PrettyPrinter::test_VisitChain_with_Registers_Verbose ()
                         );
   TS_ASSERT_EQUALS (got, expected);
 }
+
+
+//! Checks PrettyPrinter::VisitChain() when it has aliases
+//!
+void UT_PrettyPrinter::test_VisitChain_with_Aliases ()
+{
+  // ---------------- Setup
+  //
+  auto chain = make_shared<Chain>     ("Chain");
+  auto reg_1 = make_shared<Register>  ("Reg_1", BinaryVector::CreateFromBinaryString("1010_01"));
+  auto reg_2 = make_shared<Register>  ("Reg_2", BinaryVector::CreateFromBinaryString("1010_10"));
+  chain->AppendChild(reg_1);
+  chain->AppendChild(reg_2);
+
+  // Create 1st alias
+  VirtualRegister virtualRegister_1;
+  virtualRegister_1.Append({reg_1, IndexedRange{4, 1}});
+  virtualRegister_1.Append({reg_2, IndexedRange{2, 1}});
+  chain->AddAlias({"Foo"s, std::move(virtualRegister_1)});
+
+  // Create 2nd alias
+  VirtualRegister virtualRegister_2;
+  virtualRegister_2.Append({reg_1, IndexedRange{5, 5}});
+  virtualRegister_2.Append({reg_2, IndexedRange{1, 0}});
+  chain->AddAlias({"Bar", std::move(virtualRegister_2)});
+
+  PrettyPrinter sut;
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.VisitChain(*chain));
+
+  // ---------------- Verify
+  //
+  auto got      = sut.PrettyPrint();
+  auto expected = string("[Chain](0)     \"Chain\"\n"
+                         " Alias Foo: Reg_1[4:1], Reg_2[2:1]\n"
+                         " Alias Bar: Reg_1[5], Reg_2[1:0]\n"
+                         " [Register](1)  \"Reg_1\", length: 6, bypass: 1010_01\n"
+                         " [Register](2)  \"Reg_2\", length: 6, bypass: 1010_10"
+                        );
+  TS_ASSERT_EQUALS (got, expected);
+}
+
 
 //! Checks PrettyPrinter::VisitLinker() when there are several child beneath
 //!

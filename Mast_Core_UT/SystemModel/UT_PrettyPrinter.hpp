@@ -53,6 +53,7 @@ class UT_PrettyPrinter : public CxxTest::TestSuite
   //
   void test_VisitChain_with_Registers ();
   void test_VisitChain_with_Registers_Verbose ();
+  void test_VisitChain_with_Aliases ();
   void test_VisitLinker_with_SingleRegSelector ();
   void test_VisitLinker_with_SingleRegSelector_Verbose ();
   void test_VisitAccessInterface_with_Child ();

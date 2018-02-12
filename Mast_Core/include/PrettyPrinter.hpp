@@ -93,14 +93,16 @@ class MAST_CORE_EXPORT PrettyPrinter : public SystemModelVisitor
   private:
   using pos_type = std::ostringstream::pos_type;
 
+  void PrintAliases  (const ParentNode& parentNode);
   void PrintChildren (const ParentNode& parentNode);
 
-  void AlignOnNewLine  (pos_type targetPos);
-  void AlignRelativeTo (pos_type refPos, pos_type targetPos);
+  std::ostringstream& AlignOnNewLine  (pos_type targetPos);
+  std::ostringstream& AlignRelativeTo (pos_type refPos, pos_type targetPos);
 
-  void StreamDepth()
+  std::ostringstream& StreamDepth()
   {
     m_os << std::string(m_depth, ' ');
+    return m_os;
   }
 
   void StreamBinaryVector (std::experimental::string_view name, const BinaryVector&    bits);

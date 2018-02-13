@@ -245,13 +245,13 @@ class SystemModelManager_impl final
 
   struct QueuedRequest
   {
-    QueuedRequest(NodeIdentifier p_id, BinaryVector p_value = BinaryVector(), BinaryVector p_mask = BinaryVector())
-      : regId (p_id), value (p_value), mask (p_mask)
+    QueuedRequest(RegisterInterface* p_reg, BinaryVector p_value = BinaryVector(), BinaryVector p_mask = BinaryVector())
+      : reg (p_reg), value (p_value), mask (p_mask)
     {}
 
-    NodeIdentifier regId = 0; //!< Identifies the register for which there is a queued operation
-    BinaryVector   value;     //!< The value associated with the operation
-    BinaryVector   mask;      //!< For read operation, defined whitch bits are ignored (zeros) or not (ones)
+    RegisterInterface* reg = nullptr; //!< Identifies the register(s) for which there is a queued operation
+    BinaryVector       value;         //!< The value associated with the operation
+    BinaryVector       mask;          //!< For read operation, defined whitch bits are ignored (zeros) or not (ones)
   };
 
   struct ApplicationData

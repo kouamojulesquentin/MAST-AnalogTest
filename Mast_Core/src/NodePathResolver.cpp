@@ -93,20 +93,9 @@ SystemModelNode* NodePathResolver::Resolve (string_view path) const
 //! @exception std::invalid_argument when path do not denote a Register
 RegisterInterface* NodePathResolver::ResolveAsRegister (string_view registerPath) const
 {
-  auto pos = m_registersCache.find(registerPath.to_string());
-  if (pos != m_registersCache.end())
-  {
-    auto foundNode = pos->second;
-    return foundNode;
-  }
-
-  CHECK_VALUE_NOT_NULL(m_prefixNode, "Resolver has not been initialized with a reference node");
-
-  auto reg = m_prefixNode->FindRegister(registerPath);
+  auto reg = TryResolveAsRegister(registerPath);
 
   CHECK_PARAMETER_NOT_NULL(reg, "Path: '"s + registerPath.to_string() + "' does not refer to a Register");
-
-  m_registersCache[registerPath.to_string()] = reg;
 
   return reg;
 }
@@ -150,6 +139,34 @@ void NodePathResolver::SetPrefix (string prefix)
 //---------------------------------------------------------------------------
 
 
+//! Tries to finds Register with relative path from "prefix" or "reference" node
+//!
+//! @param path Path of Register relative to "prefix" node or "reference" node when there is no prefix
+//!
+//! @return    Found Register or nullptr
+RegisterInterface* NodePathResolver::TryResolveAsRegister (string_view registerPath) const
+{
+  auto pos = m_registersCache.find(registerPath.to_string());
+  if (pos != m_registersCache.end())
+  {
+    auto foundNode = pos->second;
+    return foundNode;
+  }
+
+  CHECK_VALUE_NOT_NULL(m_prefixNode, "Resolver has not been initialized with a reference node");
+
+  auto reg = m_prefixNode->FindRegister(registerPath);
+
+  if (reg != nullptr)
+  {
+    m_registersCache[registerPath.to_string()] = reg;
+  }
+
+  return reg;
+}
+//
+//  End of: NodePathResolver::ResolveAsRegister
+//---------------------------------------------------------------------------
 
 //===========================================================================
 // End of NodePathResolver.cpp

@@ -25,6 +25,8 @@
 #include "DefaultBinaryPathSelector.hpp"
 #include "ConfigureAlgorithm_LastOrDefault_Greedy.hpp"
 #include "ConfigureAlgorithm_Last_Lazy.hpp"
+#include "VirtualRegister.hpp"
+#include "RegistersAlias.hpp"
 #include "g3log/g3log.hpp"
 
 #include <memory>
@@ -125,10 +127,10 @@ std::shared_ptr<AccessInterface> Create_TestCase_MIB_Multichain_Pre (SystemModel
   regDyn_2->SetBypass  (BinaryVector(regsBitsCount, 0x42));
   regDyn_3->SetBypass  (BinaryVector(regsBitsCount, 0x43));
 
-  regDyn_0->SetPendingForRead(); regDyn_0->SetFromSut  (BinaryVector(regsBitsCount, 0x50));
-  regDyn_1->SetPendingForRead(); regDyn_1->SetFromSut  (BinaryVector(regsBitsCount, 0x51));
-  regDyn_2->SetPendingForRead(); regDyn_2->SetFromSut  (BinaryVector(regsBitsCount, 0x52));
-  regDyn_3->SetPendingForRead(); regDyn_3->SetFromSut  (BinaryVector(regsBitsCount, 0x53));
+  regDyn_0->SetPendingForRead(); regDyn_0->SetFromSut(BinaryVector(regsBitsCount, 0x50));
+  regDyn_1->SetPendingForRead(); regDyn_1->SetFromSut(BinaryVector(regsBitsCount, 0x51));
+  regDyn_2->SetPendingForRead(); regDyn_2->SetFromSut(BinaryVector(regsBitsCount, 0x52));
+  regDyn_3->SetPendingForRead(); regDyn_3->SetFromSut(BinaryVector(regsBitsCount, 0x53));
 
   if (reportGml)
   {
@@ -1595,6 +1597,8 @@ void UT_SystemModelManager::test_iWrite_Thread_is_Known ()
 }
 
 
+
+
 //! Checks SystemModelManager::iWrite() using thread not managed (unknown) by SystemModelManager
 //!
 void UT_SystemModelManager::test_iWrite_Thread_is_Unknown ()
@@ -1622,6 +1626,61 @@ void UT_SystemModelManager::test_iWrite_Thread_is_Unknown ()
   auto unkwnownThread = std::thread(appFunctor);
   unkwnownThread.join();
 }
+
+
+//! Checks SystemModelManager::iWrite() using register alias
+//!
+void UT_SystemModelManager::test_iWrite_Thread_WithAlias ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm);
+
+  auto mux      = sm.LinkerWithId(2u);   // This is Tap mux
+  auto regDyn_0 = sm.RegisterWithId(6u); // 32 bits initialized with 0x60606060
+  auto regDyn_1 = sm.RegisterWithId(7u); // 32 bits initialized with 0x61616161
+  auto regDyn_2 = sm.RegisterWithId(8u); // 32 bits initialized with 0x62626262
+  auto regDyn_3 = sm.RegisterWithId(9u); // 32 bits initialized with 0x63636363
+
+  VirtualRegister virtualRegister;
+  virtualRegister.Append({regDyn_1, IndexedRange{31, 24}});
+  virtualRegister.Append({regDyn_2, IndexedRange{23, 16}});
+  virtualRegister.Append({regDyn_3, IndexedRange{15, 8}});
+  mux->AddAlias({"Foo"s, std::move(virtualRegister)});
+
+//+   ENABLE_LOG_IN_SCOPE;
+  {
+    SystemModelManager sut(sm);
+
+    // Thread functor
+    auto appFunctor = [&sut]()
+    {
+      // ---------------- Setup
+      //
+      auto nextToSut = BinaryVector::CreateFromHexString("FADE_BD");
+
+      // ---------------- Exercise
+      //
+      TS_ASSERT_THROWS_NOTHING (sut.iWrite("Foo", nextToSut));
+      TS_ASSERT_THROWS_NOTHING (sut.iApply());
+    };
+
+    // ---------------- Setup (main thread)
+    //
+    sut.CreateApplicationThread(mux, appFunctor); // Include "Exercise" in created thread
+    sut.StartCreatedApplicationThreads();
+    sut.WaitForApplicationsEnd();  // Make sure application has done its action
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (regDyn_0->NextToSut(), BinaryVector::CreateFromHexString("6060_6060"));
+    TS_ASSERT_EQUALS (regDyn_1->NextToSut(), BinaryVector::CreateFromHexString("FA61_6161"));
+    TS_ASSERT_EQUALS (regDyn_2->NextToSut(), BinaryVector::CreateFromHexString("62DE_6262"));
+    TS_ASSERT_EQUALS (regDyn_3->NextToSut(), BinaryVector::CreateFromHexString("6363_BD63"));
+  }
+}
+
 
 
 //! Checks SystemModelManager::iApply() using same thread as SystemModelManager
@@ -2695,6 +2754,51 @@ void UT_SystemModelManager::test_iRead_int64        () { Check_iRead_SingleThrea
 void UT_SystemModelManager::test_iRead_BinaryVector () { Check_iRead_SingleThread(BinaryVector::CreateFromHexString("0CFF00FF00"),
                                                                                   BinaryVector::CreateFromHexString("0D89ABCDEF"),
                                                                                                                     "0176AB32EF"); }
+
+//! Checks SystemModelManager::iRead()
+//! @note Forces a mismatch by writing a value different from the expected value provided to iRead
+void UT_SystemModelManager::test_iRead_WithAlias ()
+{
+  // ---------------- Setup
+  //
+  auto iReadValue        = BinaryVector::CreateFromHexString("FF00FF");
+  auto iWriteValue       = BinaryVector::CreateFromHexString("89ABCD");
+  auto expectedXorResult = BinaryVector::CreateFromHexString("76AB32");
+
+  SystemModel sm;
+  Create_TestCase_MIB_Multichain_Pre(sm, false, 40u);
+  SystemModelManager sut(sm);
+
+  auto mux      = sm.LinkerWithId(2u);   // This is Tap mux
+  auto regDyn_0 = sm.RegisterWithId(6u); // 32 bits initialized with 0x60606060
+  auto regDyn_1 = sm.RegisterWithId(7u); // 32 bits initialized with 0x61616161
+  auto regDyn_2 = sm.RegisterWithId(8u); // 32 bits initialized with 0x62626262
+  auto regDyn_3 = sm.RegisterWithId(9u); // 32 bits initialized with 0x63636363
+
+  VirtualRegister virtualRegister;
+  virtualRegister.Append({regDyn_1, IndexedRange{31, 24}});
+  virtualRegister.Append({regDyn_2, IndexedRange{23, 16}});
+  virtualRegister.Append({regDyn_3, IndexedRange{15, 8}});
+  mux->AddAlias({"Foo"s, std::move(virtualRegister)});    // ==> 24 bits
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.iRead("Foo", iReadValue));
+
+  // ---------------- Verify
+  //
+  sut.iWrite ("Foo", iWriteValue); // Loopback (default protocol) will force FromSut to be updated
+  sut.iApply();
+
+  BinaryVector xorResult;
+  uint32_t     status = 0;
+
+  TS_ASSERT_THROWS_NOTHING (xorResult = sut.iGetMiscompares ("Foo"));
+  TS_ASSERT_THROWS_NOTHING (status    = sut.iGetStatus      (".", false));   // Must use a single node (that is not "ignored" in paths)
+
+  TS_ASSERT_EQUALS (xorResult, expectedXorResult);
+  TS_ASSERT_EQUALS (status,    3u); // ==> 3 registers detected mismatch
+}
 
 
 //! Checks SystemModelManager::iRead() when there is a don't care value - using same thread as SystemModelManager

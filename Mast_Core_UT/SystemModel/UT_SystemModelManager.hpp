@@ -92,6 +92,7 @@ class UT_SystemModelManager : public CxxTest::TestSuite
 
   void test_iWrite_Thread_is_Known ();
   void test_iWrite_Thread_is_Unknown ();
+  void test_iWrite_Thread_WithAlias ();
 
   // ---------------- iApply
   //
@@ -146,6 +147,7 @@ class UT_SystemModelManager : public CxxTest::TestSuite
   void test_iRead_int32 ();
   void test_iRead_int64 ();
   void test_iRead_BinaryVector ();
+  void test_iRead_WithAlias ();
 
   void test_iRead_DontCare_uint8 ();
   void test_iRead_DontCare_uint16 ();

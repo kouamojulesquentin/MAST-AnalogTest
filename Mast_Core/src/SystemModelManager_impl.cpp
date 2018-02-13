@@ -532,6 +532,16 @@ uint32_t SystemModelManager_impl::iGetStatus (string_view nodePath, bool clearCo
   auto& pathResolver = PATH_RESOLVER("iGetStatus: ");
   auto  node         = pathResolver.Resolve(nodePath);
 
+  if (node == nullptr)
+  {
+    auto asRegisterInterface = pathResolver.TryResolveAsRegister(nodePath);
+    CHECK_VALUE_NOT_NULL(asRegisterInterface, "Cannot get status for node path \""s + nodePath + "\" ==> Cannot reach node");
+
+    node = dynamic_cast<Register*>(asRegisterInterface);
+
+    CHECK_VALUE_NOT_NULL(node, "Cannot get status for node path \""s + nodePath + "\" ==> Path does not lead to single model node");
+  }
+
   MONITOR_PDL_EX("iGetStatus", nodePath, ThreadApplicationData());
 
   return iGetStatus(node, clearCounter);
@@ -603,10 +613,7 @@ void SystemModelManager_impl::iRead_impl (string_view registerPath, T expectedVa
 
   MONITOR_PDL_AND_VALUE("iRead - Queuing request", registerPath, expectedAsBV, appData);
 
-  for (auto identifier : reg->Identifiers())
-  {
-    appData->queuedReads.emplace_back(SystemModelManager_impl::QueuedRequest(identifier, std::move(expectedAsBV)));
-  }
+  appData->queuedReads.emplace_back(SystemModelManager_impl::QueuedRequest(reg, std::move(expectedAsBV)));
 
   *appData->currentState = ApplicationData::State::ReadRequest;
 
@@ -638,13 +645,9 @@ void SystemModelManager_impl::iRead_impl (string_view registerPath, T expectedVa
 
   MONITOR_PDL_AND_VALUE("iRead with don't care - Queuing request", registerPath, expectedAsBV, appData);
 
-
-  for (auto identifier : reg->Identifiers())
-  {
-    appData->queuedReads.emplace_back(SystemModelManager_impl::QueuedRequest(identifier,
-                                                                             std::move(expectedAsBV),
-                                                                             std::move(dontCareAsBV)));
-  }
+  appData->queuedReads.emplace_back(SystemModelManager_impl::QueuedRequest(reg,
+                                                                           std::move(expectedAsBV),
+                                                                           std::move(dontCareAsBV)));
 
   *appData->currentState = ApplicationData::State::ReadRequest;
 
@@ -687,10 +690,7 @@ void SystemModelManager_impl::iRefresh (string_view registerPath)
   auto appData = ThreadApplicationData();
   MONITOR_PDL_EX("iRefresh - Queuing request", registerPath, appData);
 
-  for (auto identifier : reg->Identifiers())
-  {
-    appData->queuedRefreshes.emplace_back(SystemModelManager_impl::QueuedRequest(identifier));
-  }
+  appData->queuedRefreshes.emplace_back(SystemModelManager_impl::QueuedRequest(reg));
 
   *appData->currentState = ApplicationData::State::RefreshRequest;
 
@@ -744,10 +744,7 @@ void SystemModelManager_impl::iWrite_impl (string_view registerPath, T value)
   auto appData = ThreadApplicationData();
 
   MONITOR_PDL_AND_VALUE("iWrite - Queuing request", registerPath, asBinaryVector, appData);
-  for (auto identifier : reg->Identifiers())
-  {
-    appData->queuedWrites.emplace_back(SystemModelManager_impl::QueuedRequest(identifier, std::move(asBinaryVector)));
-  }
+  appData->queuedWrites.emplace_back(SystemModelManager_impl::QueuedRequest(reg, std::move(asBinaryVector)));
 
   *appData->currentState = ApplicationData::State::WriteRequest;
 
@@ -853,13 +850,19 @@ void SystemModelManager_impl::ProcessQueuedRequests (shared_ptr<ApplicationData>
   //
   for (const auto& request : appData->queuedWrites)
   {
-    auto reg = m_sm.RegisterWithId(request.regId);
-    reg->SetToSut(std::move(request.value));
+    auto registers = request.reg;
 
-    bool pendingWrite = reg->NextToSut() != reg->LastToSut();
-    if (pendingWrite)
+    registers->SetToSut(std::move(request.value));
+
+    for (auto identifier : registers->Identifiers())
     {
-      RegisterPendingThread(reg);
+      auto reg          = m_sm.RegisterWithId(identifier);
+      bool pendingWrite = reg->NextToSut() != reg->LastToSut();
+
+      if (pendingWrite)
+      {
+        RegisterPendingThread(reg);
+      }
     }
   }
   appData->queuedWrites.clear();
@@ -868,10 +871,14 @@ void SystemModelManager_impl::ProcessQueuedRequests (shared_ptr<ApplicationData>
   //
   for (const auto& request : appData->queuedRefreshes)
   {
-    auto reg = m_sm.RegisterWithId(request.regId);
-    reg->SetPendingForRead(true);
+    auto registers = request.reg;
+    for (auto identifier : registers->Identifiers())
+    {
+      auto reg = m_sm.RegisterWithId(identifier);
+      reg->SetPendingForRead(true);
 
-    RegisterPendingThread(reg);
+      RegisterPendingThread(reg);
+    }
   }
   appData->queuedRefreshes.clear();
 
@@ -879,12 +886,18 @@ void SystemModelManager_impl::ProcessQueuedRequests (shared_ptr<ApplicationData>
   //
   for (const auto& request : appData->queuedReads)
   {
-    auto reg = m_sm.RegisterWithId(request.regId);
-    reg->SetExpectedFromSut(std::move(request.value), std::move(request.mask));
-    reg->SetCheckExpected(true);
-    reg->SetPendingForRead(true);
+    auto registers = request.reg;
+    registers->SetExpectedFromSut(std::move(request.value), std::move(request.mask));
 
-    RegisterPendingThread(reg);
+    for (auto identifier : registers->Identifiers())
+    {
+      auto reg = m_sm.RegisterWithId(identifier);
+
+      reg->SetCheckExpected(true);
+      reg->SetPendingForRead(true);
+
+      RegisterPendingThread(reg);
+    }
   }
   appData->queuedReads.clear();
 }

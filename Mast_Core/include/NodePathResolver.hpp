@@ -57,6 +57,10 @@ class MAST_CORE_EXPORT NodePathResolver final
   //!
   RegisterInterface* ResolveAsRegister (std::experimental::string_view registerPath) const;
 
+  //! Tries to finds Register with relative path from "prefix" or "reference" node
+  //!
+  RegisterInterface* TryResolveAsRegister (std::experimental::string_view registerPath) const;
+
   //! Returns current path prefix
   //!
   std::string Prefix() const { return m_prefix; }

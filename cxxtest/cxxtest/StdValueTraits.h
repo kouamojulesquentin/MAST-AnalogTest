@@ -304,6 +304,42 @@ public:
 };
 
 
+template<typename _0, typename _1, typename _2, typename _3, typename _4, typename _5>
+class ValueTraits< CXXTEST_STD(tuple)<_0, _1, _2, _3, _4, _5> > : public StdTraitsBase
+{
+public:
+    ValueTraits(const CXXTEST_STD(tuple)<_0, _1, _2, _3, _4, _5> &p)
+    {
+        *this << "tuple(" << TS_AS_STRING(std::get<0>(p))
+              << ", "     << TS_AS_STRING(std::get<1>(p))
+              << ", "     << TS_AS_STRING(std::get<2>(p))
+              << ", "     << TS_AS_STRING(std::get<3>(p))
+              << ", "     << TS_AS_STRING(std::get<4>(p))
+              << ", "     << TS_AS_STRING(std::get<5>(p))
+              << ")";
+    }
+};
+
+template<typename _0, typename _1, typename _2, typename _3, typename _4, typename _5, typename _6>
+class ValueTraits< CXXTEST_STD(tuple)<_0, _1, _2, _3, _4, _5, _6> > : public StdTraitsBase
+{
+public:
+    ValueTraits(const CXXTEST_STD(tuple)<_0, _1, _2, _3, _4, _5, _6> &p)
+    {
+        *this << "tuple(" << TS_AS_STRING(std::get<0>(p))
+              << ", "     << TS_AS_STRING(std::get<1>(p))
+              << ", "     << TS_AS_STRING(std::get<2>(p))
+              << ", "     << TS_AS_STRING(std::get<3>(p))
+              << ", "     << TS_AS_STRING(std::get<4>(p))
+              << ", "     << TS_AS_STRING(std::get<5>(p))
+              << ", "     << TS_AS_STRING(std::get<6>(p))
+              << ")";
+    }
+};
+
+
+
+
 template<typename T>
 class ValueTraits< CXXTEST_STD(initializer_list)<T> > : public StdTraitsBase
 {

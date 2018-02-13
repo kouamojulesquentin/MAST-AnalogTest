@@ -97,6 +97,7 @@ class UT_ParentNode : public CxxTest::TestSuite
   // ---------------- FindRegister
   //
   void test_FindRegister ();
+  void test_FindRegister_deep_alias ();
 
   // ================ Other Methods ================
 

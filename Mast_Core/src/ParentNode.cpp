@@ -504,23 +504,62 @@ RegisterInterface* ParentNode::FindRegister (string_view path)
     return nullptr;
   }
 
-  // ---------------- Search within aliases
+  // ---------------- Search in alias, children and through "transparent for search" nodes
   //
-  if (parentNode->HasAliases())
+  // Lamba: Finds a register or a register alias within ParentNode children, recursively when it has "transparent for search" node children
+  std::function<RegisterInterface*(ParentNode*, string_view)>
+  findRegisterChildByName = [&findRegisterChildByName](ParentNode* parentNode, string_view registerOrAliasName)
   {
-    auto foundRegister = parentNode->m_aliases->FindRegister(registerOrAliasName);
-    if (foundRegister != nullptr)
+    // ---------------- Search within aliases
+    //
+    if (parentNode->HasAliases())
     {
-      return foundRegister;
+      auto foundRegister = parentNode->m_aliases->FindRegister(registerOrAliasName);
+      if (foundRegister != nullptr)
+      {
+        return foundRegister;
+      }
     }
-  }
 
-  // ---------------- Search within children
-  //
-  auto foundNode     = parentNode->FindChild(registerOrAliasName);
-  auto foundRegister = dynamic_cast<RegisterInterface*>(foundNode);
+    // ---------------- Direct children
+    //
+    auto currentChild = parentNode->m_pFirstChild;
 
-  return foundRegister;
+    while (currentChild != nullptr)
+    {
+      if (currentChild->Name() == registerOrAliasName)
+      {
+        auto asRegister = dynamic_cast<RegisterInterface*>(currentChild.get());
+        if (asRegister != nullptr)
+        {
+          return asRegister;
+        }
+      }
+      currentChild = currentChild->NextSibling();
+    }
+
+    // ---------------- Search within children of parent node ignored in search path
+    //
+    currentChild = parentNode->m_pFirstChild;
+
+    while (currentChild != nullptr)
+    {
+      auto currentNodeAsParent = dynamic_cast<ParentNode*>(currentChild.get());
+      if ((currentNodeAsParent != nullptr) && currentNodeAsParent->IgnoreForNodePath())
+      {
+        auto foundRegister = findRegisterChildByName(currentNodeAsParent, registerOrAliasName);
+        if (foundRegister != nullptr)
+        {
+          return foundRegister;
+        }
+      }
+      currentChild = currentChild->NextSibling();
+    }
+
+    return static_cast<RegisterInterface*>(nullptr);
+  };
+
+  return findRegisterChildByName(parentNode, registerOrAliasName);
 }
 //
 //  End of ParentNode::FindRegister

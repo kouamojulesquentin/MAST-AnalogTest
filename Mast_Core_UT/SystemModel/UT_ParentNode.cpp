@@ -1392,6 +1392,47 @@ void UT_ParentNode::test_FindRegister ()
 }
 
 
+//! Checks ParentNode::FindRegister() for an alias found by traversing "transparent" parent nodes
+//!
+void UT_ParentNode::test_FindRegister_deep_alias ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  auto regsBitsCount = 32u;
+
+  TestModelBuilder builder(sm);
+  auto sut = builder.Create_TestCase_MIB_Multichain_Pre("TAP", 4u, regsBitsCount);  // Sut is tap node (first node in the hierarchy)
+
+  auto mux      = sm.LinkerWithId(2u);   TS_ASSERT_NOT_NULLPTR (mux);
+  auto regDyn_0 = sm.RegisterWithId(6u); TS_ASSERT_NOT_NULLPTR (regDyn_0);
+  auto regDyn_1 = sm.RegisterWithId(7u); TS_ASSERT_NOT_NULLPTR (regDyn_1);
+  auto regDyn_2 = sm.RegisterWithId(8u); TS_ASSERT_NOT_NULLPTR (regDyn_2);
+  auto regDyn_3 = sm.RegisterWithId(9u); TS_ASSERT_NOT_NULLPTR (regDyn_3);
+
+  regDyn_0->SetToSut(BinaryVector(regsBitsCount, 0x60));
+  regDyn_1->SetToSut(BinaryVector(regsBitsCount, 0x61));
+  regDyn_2->SetToSut(BinaryVector(regsBitsCount, 0x62));
+  regDyn_3->SetToSut(BinaryVector(regsBitsCount, 0x63));
+
+  VirtualRegister virtualRegister;
+  virtualRegister.Append({regDyn_1, IndexedRange{31, 24}});
+  virtualRegister.Append({regDyn_2, IndexedRange{23, 16}});
+  virtualRegister.Append({regDyn_3, IndexedRange{15, 8}});
+  mux->AddAlias({"Foo"s, std::move(virtualRegister)});    // ==> 24 bits
+
+  // ---------------- Exercise
+  //
+  auto foundRegister = sut->FindRegister("Foo");
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  TS_ASSERT_NOT_NULLPTR (foundRegister);
+  TS_ASSERT_EQUALS      (foundRegister->BitsCount(), 24u);
+}
+
 
 //===========================================================================
 // End of UT_ParentNode.cpp

@@ -78,7 +78,7 @@ class Register : public SystemModelNode, public RegisterInterface
   void SetFromSut         (BinaryVector sequence);                                             //!< Sets last sequence of bits that have been shifted from SUT
   void SetBypass          (BinaryVector sequence) { m_bypass          = std::move(sequence); } //!< Sets sequence to shift into the sut when no iApply cycle has been defined on the register
   void SetExpectedFromSut (BinaryVector sequence) { m_expectedFromSut = std::move(sequence); } //!< Sets expected sequence (when updating from SUT)
-  void SetExpectedFromSut (BinaryVector sequence, BinaryVector dontCareMask);                  //!< Sets expected sequence and don't care mask (when updating from SUT)
+  void SetExpectedFromSut (BinaryVector sequence, BinaryVector dontCareMask) override;         //!< Sets expected sequence and don't care mask (when updating from SUT)
 
 
   void SetHoldValue       (bool holdValue       = true) { m_holdValue   = holdValue;      }                             //!< Set whether bypass value is maintain equal to nextToSut

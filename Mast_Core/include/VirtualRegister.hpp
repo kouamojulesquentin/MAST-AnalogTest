@@ -111,6 +111,8 @@ class VirtualRegister final : public RegisterInterface
     static_assert(std::is_integral<T>::value, "SetToSut requires BinaryVector or integral types");
   }
 
+  void SetExpectedFromSut (BinaryVector sequence, BinaryVector dontCareMask) override;         //!< Sets expected sequence and don't care mask (when updating from SUT)
+
   // ---------------- Iterators
   //
   auto begin()  noexcept       { return m_registers.begin();  } //!< Returns an iterator to the first RegisterSlice
@@ -131,6 +133,8 @@ class VirtualRegister final : public RegisterInterface
   void                SetView  (std::function<BinaryVector (const Register&)>                getter,
                                 std::function<void         (Register&, const BinaryVector&)> setter,
                                 const BinaryVector&                                          value);
+
+  void UpdateRegisters(std::function<void(const RegisterSlice&, const IndexedRange&)>);
 
   template<typename T> void LastFromSut_impl (T& readData) const
   {

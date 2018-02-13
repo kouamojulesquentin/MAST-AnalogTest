@@ -61,14 +61,14 @@ class RegisterInterface
   // ---------------- Setters
   //
 //+  virtual void SetPending () = 0;                             //!< Sets number of pending to 1
-  virtual void SetToSut   (const BinaryVector& sequence) = 0; //!< Sets the bits sequence to send during the next iApply cycle
+  virtual void SetToSut           (const BinaryVector& sequence) = 0;                            //!< Sets the bits sequence to send during the next iApply cycle
+  virtual void SetExpectedFromSut (BinaryVector        sequence, BinaryVector dontCareMask) = 0; //!< Sets expected sequence and don't care mask (when updating from SUT)
 
 //+  virtual template <typename T> void SetToSut (T newValue) = 0; //!< Sets the bits sequence to send during the next iApply cycle from integral value
 
 //+  virtual void SetFromSut         (BinaryVector sequence) = 0;                            //!< Sets last sequence of bits that have been shifted from SUT
 //+  virtual void SetBypass          (BinaryVector sequence) = 0;                            //!< Sets sequence to shift into the sut when no iApply cycle has been defined on the register
 //+  virtual void SetExpectedFromSut (BinaryVector sequence) = 0;                            //!< Sets expected sequence (when updating from SUT)
-//+  virtual void SetExpectedFromSut (BinaryVector sequence, BinaryVector dontCareMask) = 0; //!< Sets expected sequence and don't care mask (when updating from SUT)
 //+  virtual void SetHoldValue       (bool holdValue = true) = 0;                            //!< Set whether bypass value is maintain equal to nextToSut
 
   // ---------------- Protected Methods

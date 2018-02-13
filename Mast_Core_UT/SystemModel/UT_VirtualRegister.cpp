@@ -24,10 +24,12 @@
 #include <memory>
 
 using std::tuple;
+using std::make_tuple;
 using std::vector;
 using std::shared_ptr;
 using std::make_shared;
 using std::experimental::string_view;
+using namespace std::experimental::literals::string_view_literals;
 
 using namespace mast;
 
@@ -832,7 +834,7 @@ void UT_VirtualRegister::test_SetToSut_Upto ()
     auto regSlice_1 = RegisterSlice{reg_1, range_1};  // ==> Viewed slice: 1_0110
 
     auto range_2    = IndexedRange(1, 11);
-    auto reg_2      = make_shared<Register>("reg_1", BinaryVector::CreateFromString("/xCAB/b101"), false, BitsOrdering::Upto);
+    auto reg_2      = make_shared<Register>("reg_2", BinaryVector::CreateFromString("/xCAB/b101"), false, BitsOrdering::Upto);
     auto regSlice_2 = RegisterSlice{reg_2, range_2};  // ==> Viewed slice: 100:1010_1011
 
     VirtualRegister sut;
@@ -945,6 +947,62 @@ void UT_VirtualRegister::test_SetToSut_when_Empty ()
   // ---------------- Exercise & Verify
   //
   TS_ASSERT_THROWS (sut.SetToSut(emptyVector), std::invalid_argument);
+}
+
+
+//! Checks VirtualRegister::SetExpectedFromSut()
+//!
+void UT_VirtualRegister::test_SetExpectedFromSut_Upto ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](const auto& data)
+  {
+    auto expectedFromSut       = BinaryVector::CreateFromString(std::get<0>(data));
+    auto expectedMask          = BinaryVector::CreateFromString(std::get<1>(data));
+    auto expectedFromSut_reg_1 = BinaryVector::CreateFromString(std::get<2>(data));
+    auto expectedFromSut_reg_2 = BinaryVector::CreateFromString(std::get<3>(data));
+    auto expectedMask_reg_1    = BinaryVector::CreateFromString(std::get<4>(data));
+    auto expectedMask_reg_2    = BinaryVector::CreateFromString(std::get<5>(data));
+
+    auto range_1    = IndexedRange(4u, 7u);
+    auto reg_1      = make_shared<Register>("reg_1", BinaryVector::CreateFromString("/xF6C"), false, BitsOrdering::Upto);
+    auto regSlice_1 = RegisterSlice{reg_1, range_1};  // ==> Viewed slice: /x6
+
+    auto range_2    = IndexedRange(0, 11);
+    auto reg_2      = make_shared<Register>("reg_2", BinaryVector::CreateFromString("/xCAB/b101"), false, BitsOrdering::Upto);
+    auto regSlice_2 = RegisterSlice{reg_2, range_2};  // ==> Viewed slice: /xCAB
+
+    VirtualRegister sut;
+    sut.Append(regSlice_1); // ==> Viewed slice: 1_0110
+    sut.Append(regSlice_2); // ==> Viewed slice: 1_0110:100_1010_1011 (0xB4AB)
+
+    CxxTest::setAbortTestOnFail(true);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.SetExpectedFromSut(expectedFromSut, expectedMask));
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (reg_1->ExpectedFromSut(), expectedFromSut_reg_1);
+    TS_ASSERT_EQUALS (reg_2->ExpectedFromSut(), expectedFromSut_reg_2);
+    TS_ASSERT_EQUALS (reg_1->DontCareMask(),    expectedMask_reg_1);
+    TS_ASSERT_EQUALS (reg_2->DontCareMask(),    expectedMask_reg_2);
+  };
+
+  auto data =
+  { // ExpectedFromSut, Mask, Expected_reg_1, Expected_reg_2, ExpectedMask_reg_1, ExpectedMask_reg_2
+    make_tuple("/x1234"sv, ""sv,       "/xF1C"sv, "/x234/b101"sv, ""sv,      ""sv),           // 0
+    make_tuple("/x5678"sv, ""sv,       "/xF5C"sv, "/x678/b101"sv, ""sv,      ""sv),           // 1
+    make_tuple("/x1234"sv, "/x0000"sv, "/xF1C"sv, "/x234/b101"sv, "/x000"sv, "/x000/b000"sv), // 2
+    make_tuple("/x5678"sv, "/xFFFF"sv, "/xF5C"sv, "/x678/b101"sv, "/x0F0"sv, "/xFFF/b000"sv), // 3
+    make_tuple("/x5678"sv, "/x7EFC"sv, "/xF5C"sv, "/x678/b101"sv, "/x070"sv, "/xEFC/b000"sv), // 4
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST(checker, data);
 }
 
 

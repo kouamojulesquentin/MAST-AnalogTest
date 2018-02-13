@@ -234,6 +234,59 @@ const BinaryVector& VirtualRegister::NextToSut () const
 
 
 
+//! Sets expected sequence and don't care mask (when updating from SUT)
+//!
+//! @param sequence     New expected value to read from SUT
+//! @param dontCareMask Don't care mask (relative to expected value).
+//!                     If it is empty, then all bits will be cared-of
+//!
+//! @warning dontCareMask must be either empty or have same size as Register(s)
+//!
+void VirtualRegister::SetExpectedFromSut (BinaryVector sequence, BinaryVector dontCareMask)
+{
+  if (dontCareMask.IsEmpty())
+  {
+    SetView([](const Register& reg) { return reg.ExpectedFromSut(); },
+            [](      Register& reg, const BinaryVector& value) { reg.SetExpectedFromSut(value); },
+            sequence);
+    return;
+  }
+
+  CHECK_PARAMETER_EQ(dontCareMask.BitsCount(), sequence.BitsCount(), "Don't care mask must have same size as Register");
+
+  // Lamba: Update slice of a single register
+  auto registerUpdater = [&](const RegisterSlice& registerSlice, const IndexedRange& valueRange)
+  {
+    auto reg          = registerSlice.reg;
+    auto bitsOrdering = reg->BitsOrdering();
+
+    auto regExpected    = reg->ExpectedFromSut();
+    auto regMask        = reg->DontCareMask();
+
+    // ---------------- Make sure don't care mask has a valid value
+    //
+    if (regMask.IsEmpty())
+    {
+      regMask = BinaryVector(reg->BitsCount(), 0, SizeProperty::Fixed);
+    }
+
+    auto slicedExpected = GetSlice(valueRange, bitsOrdering, sequence);
+    auto slicedMask     = GetSlice(valueRange, bitsOrdering, dontCareMask);
+
+    SetSlice(registerSlice.range, bitsOrdering, regExpected, slicedExpected);
+    SetSlice(registerSlice.range, bitsOrdering, regMask,     slicedMask);
+
+    reg->SetExpectedFromSut(regExpected, regMask);
+  };
+
+  UpdateRegisters(registerUpdater);
+}
+//
+//  End of: VirtualRegister::SetExpectedFromSut
+//---------------------------------------------------------------------------
+
+
+
 //! Sets number of pending to 1 to all registers
 //!
 void VirtualRegister::SetPending ()
@@ -290,42 +343,21 @@ void VirtualRegister::SetView (std::function<BinaryVector (const Register&)>    
                                std::function<void         (      Register&, const BinaryVector&)> setter,
                                const BinaryVector&                                                value)
 {
-  auto bitsOrdering = m_registers.front().reg->BitsOrdering();
-
-  auto updateRegister = [&](const RegisterSlice& registerSlice, const IndexedRange& valueRange)
+  // Lamba: Update slice of a single register
+  auto registerUpdater = [&](const RegisterSlice& registerSlice, const IndexedRange& valueRange)
   {
+    auto reg          = registerSlice.reg;
+    auto bitsOrdering = reg->BitsOrdering();
+
     auto slicedValue = GetSlice(valueRange, bitsOrdering, value);
-    auto regValue    = getter(*registerSlice.reg);    // Current value (to update)
+    auto regValue    = getter(*reg);    // Current value (to update)
 
     SetSlice(registerSlice.range, bitsOrdering, regValue, slicedValue);
 
-    setter(*registerSlice.reg, regValue);
+    setter(*reg, regValue);
   };
 
-  if (bitsOrdering == mast::BitsOrdering::Upto)
-  {
-    auto valueRange = IndexedRange(0);
-    for (const auto& registerSlice : m_registers)
-    {
-      valueRange.right += registerSlice.range.Width() - 1u;
-
-      updateRegister(registerSlice, valueRange);
-
-      valueRange = IndexedRange(valueRange.right + 1u);
-    }
-  }
-  else
-  {
-    auto valueRange = IndexedRange(BitsCount() - 1u);
-    for (const auto& registerSlice : m_registers)
-    {
-      valueRange.right -= registerSlice.range.Width() - 1u;
-
-      updateRegister(registerSlice, valueRange);
-
-      valueRange = IndexedRange(valueRange.right - 1u);
-    }
-  }
+  UpdateRegisters(registerUpdater);
 }
 //
 //  End of: VirtualRegister::SetView
@@ -351,6 +383,42 @@ void VirtualRegister::SetToSut (const BinaryVector& sequence)
 
 
 
+//! Updates registers
+//!
+//! @param registerUpdater   Function that effectivelly update a register (must know or to get/set a single register
+//!
+void VirtualRegister::UpdateRegisters (std::function<void(const RegisterSlice&, const IndexedRange& valueRange)> registerUpdater)
+{
+  auto bitsOrdering = m_registers.front().reg->BitsOrdering();
+
+  if (bitsOrdering == mast::BitsOrdering::Upto)
+  {
+    auto valueRange = IndexedRange(0);
+    for (const auto& registerSlice : m_registers)
+    {
+      valueRange.right += registerSlice.range.Width() - 1u;
+
+      registerUpdater(registerSlice, valueRange);
+
+      valueRange = IndexedRange(valueRange.right + 1u);
+    }
+  }
+  else
+  {
+    auto valueRange = IndexedRange(BitsCount() - 1u);
+    for (const auto& registerSlice : m_registers)
+    {
+      valueRange.right -= registerSlice.range.Width() - 1u;
+
+      registerUpdater(registerSlice, valueRange);
+
+      valueRange = IndexedRange(valueRange.right - 1u);
+    }
+  }
+}
+//
+//  End of: VirtualRegister::SetView
+//---------------------------------------------------------------------------
 
 
 

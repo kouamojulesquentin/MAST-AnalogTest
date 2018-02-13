@@ -61,6 +61,10 @@ class UT_VirtualRegister : public CxxTest::TestSuite
   void test_SetToSut_when_Empty ();
 //+  void test_SetToSut_when_InvalidBitsCount ();
 
+  // ---------------- SetExpectedFromSut
+  //
+  void test_SetExpectedFromSut_Upto ();
+
   // ---------------- Iterators
   //
   void test_begin_end ();

@@ -309,29 +309,44 @@ void AST_SystemModelGenerator::ConvertAliases (AST_Module* module, ParentNode* p
         {
           const auto portScope  = signal->PortScope();
           const auto identifier = signal->PortName();
+          auto       regModule  = module;
 
-          if (portScope.empty())   // ==> Has only identifier for local register
+          if (!portScope.empty())   // ==> Represents a register in sub-instance ?
           {
-            auto scanRegister = module->FindScanRegister(identifier);
-            if (scanRegister == nullptr)
+            auto instanceModule = module;
+            for (const auto scopeIdentifier : portScope)
             {
-              LOG(WARNING) << "Alias \"" << alias->Name() << "\" in module \"" << module->Name() << "\" lead no to a scan register ==> This is not yet supported";
+              auto foundInstance = instanceModule->FindInstance(scopeIdentifier);
+              if (foundInstance == nullptr)
+              {
+                break;
+              }
+              instanceModule = foundInstance->UniquifiedModule();
             }
-            else
-            {
-              auto reg = scanRegister->AssociatedRegister();
+            regModule = instanceModule;
+          }
 
-              CHECK_VALUE_NOT_NULL(reg, "Houps: While converting alias, detected a ScanRegister that has not been converted to SystemModel Register");
-
-              auto leftIndex  = identifier->LeftIndex();
-              auto rightIndex = identifier->RightIndex();
-
-              virtualReg.Append({reg, IndexedRange{leftIndex, rightIndex}});
-            }
+          auto scanRegister = regModule->FindScanRegister(identifier);
+          if (scanRegister == nullptr)
+          {
+            LOG(WARNING) << "Alias \"" << alias->Name() << "\" in regModule \"" << regModule->Name() << "\" does not lead to a scan register ==> This is not yet supported";
           }
           else
           {
-            LOG(WARNING) << "Alias \"" << alias->Name() << "\" in module \"" << module->Name() << "\" refers to sub-instance ==> This is not yet supported";
+            auto reg = scanRegister->AssociatedRegister();
+
+            CHECK_VALUE_NOT_NULL(reg, "Houps: While converting alias, detected a ScanRegister that has not been converted to SystemModel Register");
+
+            uint32_t leftIndex  = reg->BitsCount() - 1u;
+            uint32_t rightIndex = 0u;
+
+            if (!identifier->IsScalar())
+            {
+              leftIndex  = identifier->LeftIndex();
+              rightIndex = identifier->IsMultiBits() ? identifier->RightIndex() : leftIndex;
+            }
+
+            virtualReg.Append({reg, IndexedRange{leftIndex, rightIndex}});
           }
         }
       }
@@ -350,9 +365,8 @@ void AST_SystemModelGenerator::ConvertAliases (AST_Module* module, ParentNode* p
   for (auto instance : instances)
   {
     auto associatedNode = instance->AssociatedChain();
-//+    CHECK_VALUE_NOT_NULL(associatedNode, "Houps: While converting aliases, detected a instance \""s + instance->Name() + "\" that has not been converted to SystemModel Chain");
-
     auto instanceModule = instance->UniquifiedModule();
+
     CHECK_VALUE_NOT_NULL(instanceModule, "Houps: Instance is not associated with an uniquified module");
 
     ConvertAliases(instanceModule, associatedNode.get());

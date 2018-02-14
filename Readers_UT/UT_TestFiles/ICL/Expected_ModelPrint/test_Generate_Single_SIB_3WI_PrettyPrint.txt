@@ -1,4 +1,6 @@
 [Chain]        "Single_SIB_3WI"
+ Alias WI_MSB: SR[7], SR[7], SR[7]
+ Alias Bundle: SR[7:0], SR[7:0], SR[7:0]
  [Chain]        "SIB1"
   [Linker]       "SIBmux"
    :Selector:     "SR", kind: Table_Based, can_select_none: true, inverted_bits: false, reversed_order: false

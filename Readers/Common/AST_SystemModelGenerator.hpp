@@ -108,6 +108,8 @@ class AST_SystemModelGenerator final
   using SourceSignalsRef_t  = std::reference_wrapper<const SourceSignals_t>;
   using ProcessingContext_t = std::tuple<AST_Module*, SourceSignalsRef_t>;
 
+  void ConvertAliases (AST_Module* topModule, mast::ParentNode* parentNode);
+
   std::shared_ptr<mast::Chain>                   Create_ChainForLinker (const mast::Linker* linker, size_t selectionId);
   std::unique_ptr<mast::AccessInterfaceProtocol> Create_Protocol       (AST_Module* topModule);
   std::shared_ptr<mast::PathSelector>            Create_PathSelector   (AST_ScanMux* scanMux, AST_Module* module, bool firstSelectionIsEmpty);

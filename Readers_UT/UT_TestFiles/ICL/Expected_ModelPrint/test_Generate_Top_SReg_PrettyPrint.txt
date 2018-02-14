@@ -12,4 +12,6 @@
     [2] 0b1111_1
   [Register]     "TAP_BPY", length: 1, bypass: 1
   [Chain]        "sreg"
+   Alias SR_H: SR[7:3]
+   Alias SR_L: SR[2:0]
    [Register]     "SR", length: 8, bypass: 0000_0000

@@ -14,6 +14,7 @@
 #include "AST_SystemModelGenerator.hpp"
 
 #include "AST_AccessLink.hpp"
+#include "AST_Alias.hpp"
 #include "AST_Attribute.hpp"
 #include "AST_BsdlInstructionRef.hpp"
 #include "AST_ConcatNumber.hpp"
@@ -41,6 +42,7 @@
 #include "AccessInterfaceProtocolFactory.hpp"
 #include "DefaultTableBasedPathSelector.hpp"
 #include "UnresolvedPathSelector.hpp"
+#include "RegistersAlias.hpp"
 #include "SystemModel.hpp"
 #include "SystemModelBuilder.hpp"
 #include "BSDL_Reader.hpp"
@@ -281,6 +283,85 @@ bool AST_SystemModelGenerator::AssignNodesToLinkerFirstSelection (shared_ptr<Sys
 //
 //  End of: AST_SystemModelGenerator::AssignNodesToLinkerFirstSelection
 //---------------------------------------------------------------------------
+
+
+
+//! Converts register aliases defined in instance module to VirtualRegisters
+//!
+//! @param module       Module for which aliases will be converted
+//! @param parentNode   SystemModelNode associated with processed module
+//!
+void AST_SystemModelGenerator::ConvertAliases (AST_Module* module, ParentNode* parentNode)
+{
+  // ---------------- Local aliases
+  //
+  if (parentNode != nullptr)
+  {
+    const auto& aliases = module->Aliases();
+    for (auto alias : aliases)
+    {
+      VirtualRegister virtualReg;
+
+      const auto& signals = alias->Signals();
+      for (auto signal : signals)
+      {
+        if (!signal->IsNumber())
+        {
+          const auto portScope  = signal->PortScope();
+          const auto identifier = signal->PortName();
+
+          if (portScope.empty())   // ==> Has only identifier for local register
+          {
+            auto scanRegister = module->FindScanRegister(identifier);
+            if (scanRegister == nullptr)
+            {
+              LOG(WARNING) << "Alias \"" << alias->Name() << "\" in module \"" << module->Name() << "\" lead no to a scan register ==> This is not yet supported";
+            }
+            else
+            {
+              auto reg = scanRegister->AssociatedRegister();
+
+              CHECK_VALUE_NOT_NULL(reg, "Houps: While converting alias, detected a ScanRegister that has not been converted to SystemModel Register");
+
+              auto leftIndex  = identifier->LeftIndex();
+              auto rightIndex = identifier->RightIndex();
+
+              virtualReg.Append({reg, IndexedRange{leftIndex, rightIndex}});
+            }
+          }
+          else
+          {
+            LOG(WARNING) << "Alias \"" << alias->Name() << "\" in module \"" << module->Name() << "\" refers to sub-instance ==> This is not yet supported";
+          }
+        }
+      }
+
+      if (!virtualReg.Empty())
+      {
+        RegistersAlias regAlias(alias->Name(), std::move(virtualReg));
+        parentNode->AddAlias(std::move(regAlias));
+      }
+    }
+  }
+
+  // ---------------- Instances aliases
+  //
+  const auto& instances = module->Instances();
+  for (auto instance : instances)
+  {
+    auto associatedNode = instance->AssociatedChain();
+//+    CHECK_VALUE_NOT_NULL(associatedNode, "Houps: While converting aliases, detected a instance \""s + instance->Name() + "\" that has not been converted to SystemModel Chain");
+
+    auto instanceModule = instance->UniquifiedModule();
+    CHECK_VALUE_NOT_NULL(instanceModule, "Houps: Instance is not associated with an uniquified module");
+
+    ConvertAliases(instanceModule, associatedNode.get());
+  }
+}
+//
+//  End of: AST_SystemModelGenerator::ConvertAliases
+//---------------------------------------------------------------------------
+
 
 
 
@@ -752,6 +833,8 @@ shared_ptr<mast::ParentNode> AST_SystemModelGenerator::Generate_Network (AST_Net
 //+  for (const auto& linker : m_unresolvedPathSelectors)
 //+  {
 //+  }
+
+  ConvertAliases(topModule, topNode.get());
 
   return topNode;
 }

@@ -25,6 +25,8 @@
 #include "AccessInterfaceTranslator.hpp"
 
 #include <utility>
+#include <sstream>
+
 using std::shared_ptr;
 using std::make_shared;
 using std::dynamic_pointer_cast;
@@ -39,6 +41,8 @@ using std::unique_lock;
 using std::shared_lock;
 
 using namespace mast;
+using namespace std::string_literals;
+using namespace std::experimental::literals::string_view_literals;
 using namespace std::chrono_literals;
 
 #define MONITOR(fct)                                 if (m_monitor) m_monitor->fct
@@ -88,9 +92,8 @@ SystemModelManager_impl::SystemModelManager_impl(SystemModel&                   
   , m_dataCycleLoopTimeout           (1s)
   , m_sleepTimeBetweenConfigurations (0ms)
 {
-  auto appState       = make_shared<ApplicationData::State>(ApplicationData::State::ApplicationThreadStarted);
   auto pathResolver   = NodePathResolver(sm.Root());
-  m_mainThreadAppData = make_shared<ApplicationData>(std::thread(), appState, pathResolver, "Manager");
+  m_mainThreadAppData = make_shared<ApplicationData>(ApplicationData::State::ApplicationThreadStarted, pathResolver, "Manager");
 
   MONITOR_DEBUG_MANAGER("Constructed SystemModelManager");
 }
@@ -131,7 +134,7 @@ void SystemModelManager_impl::CreateApplicationThread (shared_ptr<ParentNode> ap
 
   MONITOR(CreateApplication(*applicationTopNode, debugName));
 
-  auto wrapper = [this, applicationTopNode, functor](std::shared_ptr<ApplicationData::State> applicationState, string_view debugName)
+  auto wrapper = [this, applicationTopNode, functor](std::shared_ptr<ApplicationData> applicationData, string_view debugName)
   {
     // ---------------- Report that the thread has effectively been started
     //
@@ -146,7 +149,16 @@ void SystemModelManager_impl::CreateApplicationThread (shared_ptr<ParentNode> ap
     m_appStartConditionVar.wait(lock, predicate);
     lock.unlock();
 
-    *applicationState = ApplicationData::State::ApplicationThreadStarted;
+    applicationData->currentState = ApplicationData::State::ApplicationThreadStarted;
+
+    // Lamba: Create context message when an exception is caught from PDL application
+    auto makeMessageContext = [](auto node, string_view applicationName)
+    {
+      std::ostringstream message;
+      message << "From application \"" << applicationName << "\" on node \"" << node->Name();
+      message << ", got uncaught exception";
+      return message.str();
+    };
 
     // ---------------- To actual application job
     //
@@ -154,34 +166,38 @@ void SystemModelManager_impl::CreateApplicationThread (shared_ptr<ParentNode> ap
     try
     {
       functor();
-      *applicationState = ApplicationData::State::Terminated;
+      applicationData->currentState = ApplicationData::State::Terminated;
     }
     catch(std::exception& exc)  // Catch C++ standard exceptions
     {
-      *applicationState = ApplicationData::State::TerminatedWithException;
-      MONITOR_DEBUG_APP_LIFE("Uncaught exception '"s + exc.what() + "' from application", *applicationTopNode, debugName);
+      applicationData->currentState = ApplicationData::State::TerminatedWithException;
+      LOG(INFO) << makeMessageContext(applicationTopNode, debugName) << ": "<< exc.what();
+
+      applicationData->caughtException = std::current_exception();
     }
     catch (...)
     {
-      *applicationState = ApplicationData::State::TerminatedWithException;
-      MONITOR_DEBUG_APP_LIFE("Uncaught unknown exception from application", *applicationTopNode, debugName);
+      applicationData->currentState = ApplicationData::State::TerminatedWithException;
+
+      LOG(INFO) << makeMessageContext(applicationTopNode, debugName) << " of unknown type";
+      applicationData->caughtException = std::current_exception();
     }
     MONITOR_DEBUG_APP_LIFE("Application ends", *applicationTopNode, debugName);
   };
 
-  m_threadStarted   = false;    // This is to detect when the thread begins to run (waiting for start signal)
-  auto appState     = make_shared<ApplicationData::State>(ApplicationData::State::NotInitialized);
-  auto appThread    = std::thread(wrapper, appState, debugName);
-  auto appThreadId  = appThread.get_id();
-  auto pathResolver = NodePathResolver(applicationTopNode);
-  auto data         = make_shared<ApplicationData>(std::move(appThread), appState, pathResolver, debugName);
+  m_threadStarted    = false;    // This is to detect when the thread begins to run (waiting for start signal)
+  auto pathResolver  = NodePathResolver(applicationTopNode);
+  auto data          = make_shared<ApplicationData>(ApplicationData::State::NotInitialized, pathResolver, debugName);
+  auto appThread     = std::thread(wrapper, data, debugName);
+  auto appThreadId   = appThread.get_id();
+  data->appThread    = std::move(appThread);
+  data->currentState = ApplicationData::State::Initialized;
 
-  *data->currentState = ApplicationData::State::Initialized;
   while (!m_threadStarted)
   {
     std::this_thread::sleep_for(100us);
   }
-  *data->currentState = ApplicationData::State::WrapperThreadStarted;
+  data->currentState = ApplicationData::State::WrapperThreadStarted;
   MONITOR_DEBUG_APP("Application thread have reported to be running", data);
 
   m_threadStarted = false;
@@ -354,8 +370,8 @@ shared_ptr<AccessInterface> SystemModelManager_impl::GetFirstAccessInterface (co
 //!
 void SystemModelManager_impl::iApply ()
 {
-  auto appData           = ThreadApplicationData();
-  *appData->currentState = ApplicationData::State::InApply;
+  auto appData          = ThreadApplicationData();
+  appData->currentState = ApplicationData::State::InApply;
 
   MONITOR_PDL("iApply - Processing queued requests", appData);
 
@@ -407,7 +423,7 @@ void SystemModelManager_impl::iApply ()
     }
   }
 
-  *appData->currentState = ApplicationData::State::Running;
+  appData->currentState = ApplicationData::State::Running;
   MONITOR_DEBUG_APP("iApply - Leaving", appData);
 }
 //
@@ -615,7 +631,7 @@ void SystemModelManager_impl::iRead_impl (string_view registerPath, T expectedVa
 
   appData->queuedReads.emplace_back(SystemModelManager_impl::QueuedRequest(reg, std::move(expectedAsBV)));
 
-  *appData->currentState = ApplicationData::State::ReadRequest;
+  appData->currentState = ApplicationData::State::ReadRequest;
 
   MONITOR_DEBUG_APP("iRead - Leaving", appData);
 }
@@ -649,7 +665,7 @@ void SystemModelManager_impl::iRead_impl (string_view registerPath, T expectedVa
                                                                            std::move(expectedAsBV),
                                                                            std::move(dontCareAsBV)));
 
-  *appData->currentState = ApplicationData::State::ReadRequest;
+  appData->currentState = ApplicationData::State::ReadRequest;
 
   MONITOR_DEBUG_APP("iRead - Leaving", appData);
 }
@@ -692,7 +708,7 @@ void SystemModelManager_impl::iRefresh (string_view registerPath)
 
   appData->queuedRefreshes.emplace_back(SystemModelManager_impl::QueuedRequest(reg));
 
-  *appData->currentState = ApplicationData::State::RefreshRequest;
+  appData->currentState = ApplicationData::State::RefreshRequest;
 
   MONITOR_DEBUG_APP("iRefresh - Leaving", appData);
 }
@@ -746,7 +762,7 @@ void SystemModelManager_impl::iWrite_impl (string_view registerPath, T value)
   MONITOR_PDL_AND_VALUE("iWrite - Queuing request", registerPath, asBinaryVector, appData);
   appData->queuedWrites.emplace_back(SystemModelManager_impl::QueuedRequest(reg, std::move(asBinaryVector)));
 
-  *appData->currentState = ApplicationData::State::WriteRequest;
+  appData->currentState = ApplicationData::State::WriteRequest;
 
   MONITOR_DEBUG_APP("iWrite - Leaving", appData);
 }
@@ -1152,8 +1168,13 @@ void SystemModelManager_impl::WaitForApplicationsEnd ()
       MONITOR_DEBUG_APP("Joining application thread", data);
       data->appThread.join();
       MONITOR_DEBUG_APP("Joined  application thread", data);
+      if (data->caughtException)
+      {
+        m_applicationsExceptions.emplace_back(data->caughtException);
+      }
     }
   }
+
   m_threadToAppData.clear();  // There is no more application threads, so the data are useless
 }
 //

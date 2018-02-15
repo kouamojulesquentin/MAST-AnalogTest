@@ -37,6 +37,10 @@ SystemModelManager::SystemModelManager(SystemModel&                          sm,
 //!
 void SystemModelManager::DoDataCycles() { m_impl->DoDataCycles(); }
 
+//! Exceptions thrown by PDL applications (on their own thread)
+//!
+const std::vector<std::exception_ptr>& SystemModelManager::ApplicationsExceptions() const { return m_impl->ApplicationsExceptions(); }
+
 //! Creates an application thread
 //!
 void SystemModelManager::CreateApplicationThread(shared_ptr<ParentNode> applicationTopNode, Application_t functor, string debugName)

@@ -18,6 +18,7 @@
 #include "Mast_Core_export.hpp"
 #include "ConfigureAlgorithm_LastOrDefault.hpp"
 #include <memory>
+#include <vector>
 #include <string>
 #include <experimental/string_view>
 #include <chrono>
@@ -207,6 +208,10 @@ class MAST_CORE_EXPORT SystemModelManager final
   //! Sets instance that monitor manager main actions
   //!
   void  Monitor (std::shared_ptr<SystemModelManagerMonitor> monitor);
+
+  //! Exceptions thrown by PDL applications (on their own thread)
+  //!
+  const std::vector<std::exception_ptr>& ApplicationsExceptions() const;
 
   // ---------------- Private Fields
   //

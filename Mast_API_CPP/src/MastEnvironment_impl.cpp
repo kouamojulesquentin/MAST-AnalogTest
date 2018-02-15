@@ -284,7 +284,8 @@ void MastEnvironment_impl::CreateApplications ()
 
   const auto& algosRepository = PDL_AlgorithmsRepository::Instance();
 
-  LOG(INFO) << "Creating PDL algorithm associated to nodes (from SIT description)";
+  LOG(INFO) << "Creating PDL algorithm associated to nodes (from SIT or ICL description)";
+  uint32_t createdAlgo = 0u;
   for (const auto& association : m_algoNamesAssociatedToNodes)
   {
     CHECK_VALUE_NOT_EMPTY (association.appName, "PDL algorithm name cannot be empty");
@@ -299,6 +300,12 @@ void MastEnvironment_impl::CreateApplications ()
 
     LOG(INFO) << "PDL algorithm \""                              << association.appName
               << "\" has been created and associated to node \"" << association.node->Name() << "\"";
+    ++createdAlgo;
+  }
+
+  if (createdAlgo == 0u)
+  {
+    LOG(WARNING) << "No PDL algorithm has been created";
   }
 }
 //

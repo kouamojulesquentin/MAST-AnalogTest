@@ -22,7 +22,10 @@ using std::string;
 using std::experimental::string_view;
 using std::shared_ptr;
 using std::make_shared;
+using std::make_unique;
 using std::dynamic_pointer_cast;
+
+using namespace std::experimental::literals::string_view_literals;
 using namespace mast;
 using namespace test;
 
@@ -30,9 +33,6 @@ using namespace test;
 //! Initializes test (called for each test)
 void UT_SystemModel::setUp ()
 {
-//+  CxxTest::setStringResultsOnNewLine(true);
-//+  CxxTest::setCharactersMapping(CxxTest::CharacterMapping::MAP_CHARS_MINIMAL);  // Keep quotes, HT, and new lines unescaped
-
   SystemModelNode::ResetNodeIdentifier();
 }
 
@@ -338,89 +338,85 @@ void UT_SystemModel::test_CreateCallbackRequest ()
 {
   // ---------------- Setup
   //
-  SystemModel sut;
-  string_view name = "undefined";//"Callback_name";
+  auto name = "undefined"sv;//"Callback_name";
 
+  //! @todo [JFC]-[February/15/2018]: In test_CreateCallbackRequest(): Move to UT_CallbackRequest and Split those tests into 5 distinct sut method or use data driven test
+  //!                                                                  sut is sut not the SystemModel!
+  //!                                                                  sut can also be created on stack rather than on heap
+  //!
   // ---------------- Exercise
   //
-
-
   //--Undefined Callback
-  auto  test = new CallbackRequest();
+  auto sut = make_unique<CallbackRequest>();
 
   // ---------------- Verify
   //
   CxxTest::setAbortTestOnFail(true);
 
-  TS_ASSERT_NOT_NULLPTR (test);
-  TS_ASSERT_EQUALS      (test->CallbackId(), name);
-  TS_ASSERT_NULLPTR (test->interfaceData());
-  TS_ASSERT_EQUALS  (test->ToSutVector().BitsCount(),  0);
-  TS_ASSERT_EQUALS  (test->ToSutVector().BytesCount(), 0);
-  TS_ASSERT_TRUE    (test->ToSutVector().IsEmpty());
-  TS_ASSERT_FALSE   (test->ToSutVector().HasFixedSize());
-  TS_ASSERT_NULLPTR (test->ToSutVector().DataLeftAligned());
+  TS_ASSERT_NOT_NULLPTR (sut);
+  TS_ASSERT_EQUALS      (sut->CallbackId(), name);
+  TS_ASSERT_NULLPTR     (sut->interfaceData());
+  TS_ASSERT_EQUALS      (sut->ToSutVector().BitsCount(),  0);
+  TS_ASSERT_EQUALS      (sut->ToSutVector().BytesCount(), 0);
+  TS_ASSERT_TRUE        (sut->ToSutVector().IsEmpty());
+  TS_ASSERT_FALSE       (sut->ToSutVector().HasFixedSize());
+  TS_ASSERT_NULLPTR     (sut->ToSutVector().DataLeftAligned());
 
-  free(test);
-  //--Named CT
-  
-    name = "Callback_name";
+  name = "Callback_name";
 
-  test = new CallbackRequest(name);
-  TS_ASSERT_NOT_NULLPTR (test);
-  TS_ASSERT_EQUALS      (test->CallbackId(), name);
-  TS_ASSERT_NULLPTR (test->interfaceData());
-  TS_ASSERT_EQUALS  (test->ToSutVector().BitsCount(),  0);
-  TS_ASSERT_EQUALS  (test->ToSutVector().BytesCount(), 0);
-  TS_ASSERT_TRUE    (test->ToSutVector().IsEmpty());
-  TS_ASSERT_FALSE   (test->ToSutVector().HasFixedSize());
-  TS_ASSERT_NULLPTR (test->ToSutVector().DataLeftAligned());
-  free(test);
+  sut = make_unique<CallbackRequest>(name);
+
+  TS_ASSERT_NOT_NULLPTR (sut);
+  TS_ASSERT_EQUALS      (sut->CallbackId(), name);
+  TS_ASSERT_NULLPTR     (sut->interfaceData());
+  TS_ASSERT_EQUALS      (sut->ToSutVector().BitsCount(),  0);
+  TS_ASSERT_EQUALS      (sut->ToSutVector().BytesCount(), 0);
+  TS_ASSERT_TRUE        (sut->ToSutVector().IsEmpty());
+  TS_ASSERT_FALSE       (sut->ToSutVector().HasFixedSize());
+  TS_ASSERT_NULLPTR     (sut->ToSutVector().DataLeftAligned());
 
   //--Named CT with additional data
   int dummy=3;
-  test = new CallbackRequest(name,(void *)&dummy);
-  TS_ASSERT_NOT_NULLPTR (test);
-  TS_ASSERT_EQUALS      (test->CallbackId(), name);
-  TS_ASSERT_NOT_NULLPTR (test->interfaceData());
-  TS_ASSERT_EQUALS  (test->interfaceData(),  (void *)&dummy);
-  TS_ASSERT_EQUALS  (*(int *)test->interfaceData(),  dummy);
-  TS_ASSERT_EQUALS  (test->interfaceData(),  (void *)&dummy);
-  TS_ASSERT_EQUALS  (test->ToSutVector().BitsCount(),  0);
-  TS_ASSERT_EQUALS  (test->ToSutVector().BytesCount(), 0);
-  TS_ASSERT_TRUE    (test->ToSutVector().IsEmpty());
-  TS_ASSERT_FALSE   (test->ToSutVector().HasFixedSize());
-  TS_ASSERT_NULLPTR (test->ToSutVector().DataLeftAligned());
-  free(test);
+  sut = make_unique<CallbackRequest>(name,(void *)&dummy);
+
+  TS_ASSERT_NOT_NULLPTR (sut);
+  TS_ASSERT_EQUALS      (sut->CallbackId(),               name);
+  TS_ASSERT_NOT_NULLPTR (sut->interfaceData());
+  TS_ASSERT_EQUALS      (sut->interfaceData(),            (void*)&dummy);
+  TS_ASSERT_EQUALS      (*(int*)sut->interfaceData(), dummy);
+  TS_ASSERT_EQUALS      (sut->interfaceData(),            (void*)&dummy);
+  TS_ASSERT_EQUALS      (sut->ToSutVector().BitsCount(),  0);
+  TS_ASSERT_EQUALS      (sut->ToSutVector().BytesCount(), 0);
+  TS_ASSERT_TRUE        (sut->ToSutVector().IsEmpty());
+  TS_ASSERT_FALSE       (sut->ToSutVector().HasFixedSize());
+  TS_ASSERT_NULLPTR     (sut->ToSutVector().DataLeftAligned());
 
   auto toSutVector = BinaryVector::CreateFromBinaryString("01");
-  test = new CallbackRequest(name,toSutVector);
-  TS_ASSERT_NOT_NULLPTR (test);
-  TS_ASSERT_EQUALS      (test->CallbackId(), name);
-  TS_ASSERT_NULLPTR (test->interfaceData());
+  sut = make_unique<CallbackRequest>(name, toSutVector);
 
-    TS_ASSERT_EQUALS (toSutVector.BitsCount(),  2);
-    TS_ASSERT_EQUALS (toSutVector.BytesCount(), 1);
-    TS_ASSERT_EQUALS (toSutVector.IsEmpty(),    2 == 0);
-    TS_ASSERT_FALSE  (toSutVector.HasFixedSize());
+  TS_ASSERT_NOT_NULLPTR (sut);
+  TS_ASSERT_EQUALS      (sut->CallbackId(),       name);
+  TS_ASSERT_NULLPTR     (sut->interfaceData());
+  TS_ASSERT_EQUALS      (toSutVector.BitsCount(),  2);
+  TS_ASSERT_EQUALS      (toSutVector.BytesCount(), 1);
+  TS_ASSERT_FALSE       (toSutVector.IsEmpty());
+  TS_ASSERT_FALSE       (toSutVector.HasFixedSize());
  //Not testing actual content, BinaryVector is tested separately
-  free(test);
 
-  test = new CallbackRequest(name,toSutVector,(void *)&dummy);
-  TS_ASSERT_NOT_NULLPTR (test);
-  TS_ASSERT_EQUALS      (test->CallbackId(), name);
-  TS_ASSERT_NOT_NULLPTR (test->interfaceData());
-  TS_ASSERT_EQUALS  (test->interfaceData(),  (void *)&dummy);
-  TS_ASSERT_EQUALS  (*(int *)test->interfaceData(),  dummy);
-  TS_ASSERT_EQUALS  (test->interfaceData(),  (void *)&dummy);
 
-    TS_ASSERT_EQUALS (toSutVector.BitsCount(),  2);
-    TS_ASSERT_EQUALS (toSutVector.BytesCount(), 1);
-    TS_ASSERT_EQUALS (toSutVector.IsEmpty(),    2 == 0);
-    TS_ASSERT_FALSE  (toSutVector.HasFixedSize());
+  sut = make_unique<CallbackRequest>(name,toSutVector,(void *)&dummy);
+
+  TS_ASSERT_NOT_NULLPTR (sut);
+  TS_ASSERT_EQUALS      (sut->CallbackId(),       name);
+  TS_ASSERT_NOT_NULLPTR (sut->interfaceData());
+  TS_ASSERT_EQUALS      (sut->interfaceData(), (void*)&dummy);
+  TS_ASSERT_EQUALS      (*(int *)sut->interfaceData(), dummy);
+  TS_ASSERT_EQUALS      (sut->interfaceData(), (void*)&dummy);
+  TS_ASSERT_EQUALS      (toSutVector.BitsCount(),  2);
+  TS_ASSERT_EQUALS      (toSutVector.BytesCount(), 1);
+  TS_ASSERT_FALSE       (toSutVector.IsEmpty());
+  TS_ASSERT_FALSE       (toSutVector.HasFixedSize());
  //Not testing actual content, BinaryVector is tested separately
-  free(test);
-
 }
 
 //! Checks SystemModel::CreateAccessInterfaceTranslator() capability

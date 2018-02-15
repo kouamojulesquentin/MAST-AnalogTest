@@ -117,7 +117,7 @@ void UT_AST_Checker::test_Check_Module_Ok ()
   auto moduleId       = ast.Create_ScalarIdentifier("Test");
   auto moduleChildren = vector<AST_Node*>{scanInPort, scanOutPort};
 
-  auto module = ast.Create_Module(moduleId, std::move(moduleChildren));
+  ast.Create_Module(moduleId, std::move(moduleChildren));
 
   auto network = ast.Network();
   AST_Checker sut(network);
@@ -140,11 +140,12 @@ void UT_AST_Checker::test_Check_Module_NoScanOutPorts ()
   // ---------------- Setup
   //
   AST  ast;
-  auto moduleId       = ast.Create_ScalarIdentifier("Test");
-  auto scanInPortId   = ast.Create_VectorIdentifier("SI", nullptr, nullptr);
-  auto scanInPort     = ast.Create_Port(Kind::ScanInPort,  scanInPortId);
-  auto children       = vector<AST_Node*>({ scanInPort });
-  auto module         = ast.Create_Module(moduleId, std::move(children));
+  auto moduleId     = ast.Create_ScalarIdentifier("Test");
+  auto scanInPortId = ast.Create_VectorIdentifier("SI", nullptr, nullptr);
+  auto scanInPort   = ast.Create_Port(Kind::ScanInPort,  scanInPortId);
+  auto children     = vector<AST_Node*>({ scanInPort });
+
+  ast.Create_Module(moduleId, std::move(children));
 
   auto        network = ast.Network();
   AST_Checker sut(network);

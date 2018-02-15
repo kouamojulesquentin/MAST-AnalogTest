@@ -3144,7 +3144,6 @@ BinaryVector BinaryVector::Slice (uint32_t firstBitOffset, uint32_t bitsCount) c
     {
       auto byte = m_data[byteOffset];
       result.Append(byte, bitsCount, BitsAlignment::Left);
-      bitsCount = 0;
     }
   }
 

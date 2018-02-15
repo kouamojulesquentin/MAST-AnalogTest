@@ -144,7 +144,6 @@ BinaryVector SVF_SimulationProtocol::FetchDataFromSut ()
       m_lastPos = ifs.tellg();
       if (nextChar == '\n')
       {
-        keepOnReading = false;
         break;
       }
 

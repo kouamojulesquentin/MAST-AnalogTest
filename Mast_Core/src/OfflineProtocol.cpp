@@ -143,7 +143,6 @@ BinaryVector OfflineProtocol::FetchDataFromSut ()
       m_lastPos = ifs.tellg();
       if (nextChar == '\n')
       {
-        keepOnReading = false;
         break;
       }
 

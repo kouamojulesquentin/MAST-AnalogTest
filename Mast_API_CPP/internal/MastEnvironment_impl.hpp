@@ -90,6 +90,8 @@ class MastEnvironment_impl final
   std::shared_ptr<SystemModelManagerMonitor> MakeManagerMonitor ();
   static std::vector<std::string>            MakeArgumentsVector (int argc, const char* argv[]);
 
+  void RethrowApplicationsExceptions ();
+
   // ---------------- Private Fields
   //
   private:

@@ -852,6 +852,24 @@ void MastEnvironment_impl::ReportParsedModel ()
 
 
 
+//! Rethrows exception from one PDL application that throws an exception on its own thread
+//!
+void MastEnvironment_impl::RethrowApplicationsExceptions ()
+{
+  const auto& applicationExceptions = Startup::sm_manager->ApplicationsExceptions();
+  if (!applicationExceptions.empty())
+  {
+    auto pException = applicationExceptions.front();
+    LOG(DEBUG) << "Rethrowing PDL application exception (1st one in order the application where started)";
+    std::rethrow_exception(pException);
+  }
+}
+//
+//  End of: MastEnvironment_impl::RethrowApplicationsExceptions
+//---------------------------------------------------------------------------
+
+
+
 //! Starts system model manager AND wait till it ends
 //!
 //! @note This is a blocking call, till the end of all the PDL algorithms!
@@ -863,6 +881,8 @@ void MastEnvironment_impl::Start ()
   Startup::sm_manager->StartCreatedApplicationThreads();
   Startup::sm_manager->WaitForApplicationsEnd();
   Startup::sm_manager->Stop();
+
+  RethrowApplicationsExceptions();
 }
 //
 //  End of: MastEnvironment_impl::Start

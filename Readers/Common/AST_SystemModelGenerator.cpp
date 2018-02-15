@@ -353,7 +353,7 @@ void AST_SystemModelGenerator::ConvertAliases (AST_Module* module, ParentNode* p
 
       if (!virtualReg.Empty())
       {
-        RegistersAlias regAlias(alias->Name(), std::move(virtualReg));
+        RegistersAlias regAlias(string(alias->Identifier()->BaseName()), std::move(virtualReg));
         parentNode->AddAlias(std::move(regAlias));
       }
     }
@@ -911,6 +911,8 @@ shared_ptr<ParentNode> AST_SystemModelGenerator::Generate_JTAGTap (AST_Module* t
   //
   Generate_JTAGTapChildren(tap.get(), topModule, bsdlInstructionsRef);
 
+  SavePDLAssociations(nullptr, topModule, tap); // No real instance for top module
+
   return tap;
 }
 //
@@ -1291,13 +1293,27 @@ AST_SystemModelGenerator::Process_ScanMux_EndOfSelectionPath (shared_ptr<mast::S
 AST_SystemModelGenerator::SourceSignalsRef_t
 AST_SystemModelGenerator::Process_ScanRegister (AST_ScanRegister* scanRegister)
 {
-  auto source     = scanRegister->ScanInSource();
-  auto name       = scanRegister->BaseName();
-  auto bitsCount  = scanRegister->BitsCount();
-  auto resetValue = scanRegister->ResetValue();
+  auto source      = scanRegister->ScanInSource();
+  auto name        = scanRegister->BaseName();
+  auto bitsCount   = scanRegister->BitsCount();
+  auto resetValue  = scanRegister->ResetValue();
+  auto bypassValue = BinaryVector(bitsCount, 0);
 
-  auto bypassValue = (resetValue != nullptr) ? resetValue->AsBinaryVector(bitsCount)
-                                             : BinaryVector(bitsCount, 0);
+  if (resetValue != nullptr)
+  {
+    try
+    {
+      bypassValue = resetValue->AsBinaryVector(bitsCount);
+    }
+    catch(std::invalid_argument&)
+    {
+      auto message = "Reset value "s;
+      message += resetValue->IsFullySized() ? resetValue->AsBinaryVector().DataAsICLMixString()
+                                            : resetValue->AsText();
+      message += " is too large for register \"" + name + "\" with " + std::to_string(bitsCount) + " bit(s)";
+      CHECK_FAILED(message);
+    }
+  }
   bypassValue.FixSize(true);
 
   auto holdValue    = false;
@@ -1374,9 +1390,11 @@ AST_SystemModelGenerator::SelectionTables_t AST_SystemModelGenerator::MakeSelect
 //!
 //! @note PDL attributes can be defined at Module and/or Instance levels
 //!
-//! @param instance ICL instance for which a Chain has been created
+//! @param instance     ICL instance for which a Chain has been created (optional)
+//! @param module       Processed module
+//! @param parentNode   Associated node in SystemModel
 //!
-void AST_SystemModelGenerator::SavePDLAssociations (AST_Instance* instance, AST_Module* instanceModule, shared_ptr<Chain> chain)
+void AST_SystemModelGenerator::SavePDLAssociations (AST_Instance* instance, AST_Module* module, shared_ptr<ParentNode> parentNode)
 {
   // ---------------- Local associations
   //
@@ -1399,7 +1417,7 @@ void AST_SystemModelGenerator::SavePDLAssociations (AST_Instance* instance, AST_
         if (!hasAlreadyAssociationFor(algorithmId))
         {
           constexpr uint32_t line = 0;                                      // File line in which the attribute is defined is not yet supported
-          algorithmAssociations.emplace_back(algorithmId, chain, line);
+          algorithmAssociations.emplace_back(algorithmId, parentNode, line);
         }
       }
     }
@@ -1407,9 +1425,9 @@ void AST_SystemModelGenerator::SavePDLAssociations (AST_Instance* instance, AST_
 
   // ---------------- At Module level
   //
-  if (instanceModule)
+  if (module)
   {
-    processAttributes(instanceModule->Attributes());
+    processAttributes(module->Attributes());
   }
 
   // ---------------- At instance level

@@ -150,7 +150,7 @@ class AST_SystemModelGenerator final
   void AssignNewNode                     (std::shared_ptr<mast::SystemModelNode> node);
   bool AssignNodesToLinkerFirstSelection (std::shared_ptr<mast::SystemModelNode> commonLinkerNode);
 
-  void SavePDLAssociations (AST_Instance* instance, AST_Module* instanceModule, std::shared_ptr<mast::Chain> chain);
+  void SavePDLAssociations (AST_Instance* instance, AST_Module* module, std::shared_ptr<mast::ParentNode> parentNode);
 
   std::string ResolveBSDL_FilePath (const std::string& bsdlName);
 

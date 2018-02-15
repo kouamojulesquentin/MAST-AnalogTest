@@ -2909,7 +2909,7 @@ alias_iApplyEndState : IAPPLYENDSTATE concat_number SEMICOLON
 enum_def : ENUM enum_name LEFT_BRACE enum_items RIGHT_BRACE
 {
   // enum_def : ENUM enum_name LEFT_BRACE enum_items RIGHT_BRACE
-  LOG(ERROR_LVL) << "Enum definition is not yet supported";
+  LOG(WARNING) << "Enum definition is not yet supported ==> \"" << $[enum_name] << "\" will be ignored";
   $$ = nullptr;
 }
 ;

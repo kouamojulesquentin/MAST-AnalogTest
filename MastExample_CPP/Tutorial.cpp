@@ -31,21 +31,23 @@ namespace
   //!
   void Algo_Increment ()
   {
-
-    auto     registerPath = "reg";
+    auto     prefix       = "SWIR.WIR";
+    auto     registerPath = "reg_0";
     auto     loopCount    = 5u;
-    auto     i    = 0u;
+    auto     i            = 0u;
     uint16_t initialValue = 1u;
     uint16_t curValue;
 
-    std::cout << "Running " << loopCount << " iWrites on register " <<registerPath << "\n";
-    while (i++<loopCount)
+    std::cout << "Algo_Increment will execute " << loopCount << " iWrites on register " << registerPath << " (prefix: " << prefix << ")\n";
+
+    iPrefix(prefix);
+    while (i++ < loopCount)
     {
       iWrite(registerPath, initialValue);
  //     iGet(registerPath,curValue);
       curValue=iGet<uint16_t>(registerPath);
-     std::cout << "\n Cycle "<< i << ": Wrote " << initialValue ;
-     std::cout << "\n       "<< i << ": Read " << curValue ;
+      std::cout << "\n Cycle "<< i << ": Wrote " << initialValue ;
+      std::cout << "\n       "<< i << ": Read  " << curValue ;
       iApply();
 
       ++initialValue;
@@ -57,14 +59,18 @@ namespace
   //---------------------------------------------------------------------------
 
 
-  //! This algorithm decrement "reg_1" 60 times
+  //! This algorithm decrement "reg_1"
   //!
   void Algo_Decrement ()
   {
-    auto     registerPath = "reg";
+    auto     prefix       = "SWIR.WIR";
+    auto     registerPath = "reg_1";
     auto     loopCount    = 20u;
     uint16_t value = 60u;
 
+    std::cout << "Algo_Decrement will execute " << loopCount << " iWrites on register " << registerPath << " (prefix: " << prefix << ")\n";
+
+    iPrefix(prefix);
     while (loopCount--)
     {
       iWrite(registerPath, value);

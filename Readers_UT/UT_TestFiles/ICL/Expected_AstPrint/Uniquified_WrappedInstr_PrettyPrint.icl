@@ -58,7 +58,9 @@ Module WrappedInstr
   }
   Instance reg8 Of UniquifiedModules::SReg__uniquified__2
   {
+    Parameter Size = 8;
     InputPort SI = SI;
+    InputPort DI = I1.DO;
   }
 }
 NameSpace UniquifiedModules;

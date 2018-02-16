@@ -58,7 +58,9 @@ Module WrappedInstr
   }
   Instance reg8 Of ::SReg
   {
+    Parameter Size = 8;
     InputPort SI = SI;
+    InputPort DI = I1.DO;
   }
 }
 Module mux_inline3
@@ -269,7 +271,9 @@ Module WrappedInstr__uniquified__1
   }
   Instance reg8 Of UniquifiedModules::SReg__uniquified__3
   {
+    Parameter Size = 8;
     InputPort SI = SI;
+    InputPort DI = I1.DO;
   }
 }
 Module WrappedInstr__uniquified__4
@@ -287,7 +291,9 @@ Module WrappedInstr__uniquified__4
   }
   Instance reg8 Of UniquifiedModules::SReg__uniquified__6
   {
+    Parameter Size = 8;
     InputPort SI = SI;
+    InputPort DI = I1.DO;
   }
 }
 Module WrappedInstr__uniquified__7
@@ -305,6 +311,8 @@ Module WrappedInstr__uniquified__7
   }
   Instance reg8 Of UniquifiedModules::SReg__uniquified__9
   {
+    Parameter Size = 8;
     InputPort SI = SI;
+    InputPort DI = I1.DO;
   }
 }

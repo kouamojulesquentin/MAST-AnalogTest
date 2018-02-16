@@ -27,7 +27,7 @@ Module WrappedInstr {
   ScanInterface scan_client { Port SI; Port SO; }
 
   Instance I1   Of Instrument { InputPort DI = reg8.DO; }
-  Instance reg8 Of SReg       { InputPort SI = SI;      }
+  Instance reg8 Of SReg       { InputPort SI = SI; InputPort DI = I1.DO; Parameter Size = 8; }
 }
 
 Module SReg
@@ -39,6 +39,9 @@ Module SReg
   Alias SR_H = SR[$MSB:$Middle];  // Theses aliases are just there to check unification process related to aliases
   Alias SR_L = SR[$Middle - 1:0]; // SR must be at least 2 bits wide !
 
+  DataInPort  DI[$Size - 1:0];
+  DataOutPort DO[$Size - 1:0] { Source SR; }
+
   ScanInPort    SI;
   ScanOutPort   SO          { Source  SR[0];}
   ScanInterface scan_client { Port SI; Port SO; }
@@ -47,6 +50,30 @@ Module SReg
 
 Module Instrument
 {
+  Alias enable    = DI[7]            { RefEnum YesNo; }
+  Alias mode[3:0] = DI[6:5], DI[3:2] { RefEnum Modes; }
+  Alias data[2:0] = DI[4],   DI[1:0];
+  Alias okay      = DO[0]            { RefEnum PassFail; }
+  Alias done      = DO[1]            { RefEnum YesNo; }
+
+  Enum PassFail
+  {
+    Pass = 1'b1;
+    Fail = 1'b0;
+  }
+
+  Enum YesNo
+  {
+    Yes = 1'b1;
+    No  = 1'b0;
+  }
+
+  Enum Modes
+  {
+    red   = 4'b0011;
+    blue  = 4'b1000;
+    green = 4'b0100;
+  }
   DataInPort DI[7:0];
   DataOutPort DO[7:0];
 }

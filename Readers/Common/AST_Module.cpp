@@ -102,6 +102,21 @@ void AST_Module::DispatchChildren ()
 //---------------------------------------------------------------------------
 
 
+//! Searches for a DataInputPort with specified identifier
+//!
+//! @param identifier   An identifier for DataInputPort to find
+//!
+AST_Port* AST_Module::FindDataInPort (const AST_Identifier* identifier)
+{
+  CHECK_PARAMETER_NOT_NULL(identifier, "Cannot find DataInputPort from nullptr identifier");
+
+  return FindNode(m_dataInPorts, identifier);
+}
+//
+//  End of: AST_Module::FindDataInPort
+//---------------------------------------------------------------------------
+
+
 //! Searches for a DataOutputPort with specified identifier
 //!
 //! @param identifier   An identifier for DataOutputPort to find
@@ -361,6 +376,7 @@ void AST_Module::UniquifyInstances (AST_Builder& astBuilder)
     auto moduleIdentifier = astBuilder.Create_UniquifiedModuleIdentifier(newModule);
 
     newModule->m_parentModule = this;
+    newModule->m_fromInstance = instance;
     instance->UniquifiedModule(newModule, moduleIdentifier);
   }
 }

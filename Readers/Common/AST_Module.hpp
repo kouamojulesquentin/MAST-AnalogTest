@@ -68,6 +68,14 @@ class AST_Module final : public AST_ParentNode
   //!
   std::string Name() const override { return m_identifier->AsText(); }
 
+  //! When uniquified, tells from which instance this module was uniquified for
+  //!
+  AST_Instance* FromInstance() const { return m_fromInstance; }
+
+  //! Returns module in which this, uniquified, module is instanciated
+  //!
+  AST_Module* ParentModule() const { return m_parentModule; }
+
   //! Returns (generic) module parameters
   //!
   const std::vector<AST_Parameter*>& Parameters() const { return m_parameters; }
@@ -87,6 +95,11 @@ class AST_Module final : public AST_ParentNode
   //! Returns module aliases
   //!
   const std::vector<AST_Alias*>& Aliases() const { return m_aliases; }
+
+  //! Tells whether some aliases are defined for the module
+  //!
+  bool  HasAliases() const { return !m_aliases.empty(); }
+
 
   //! Returns module ScanInterface(s)
   //!
@@ -136,6 +149,10 @@ class AST_Module final : public AST_ParentNode
   //! Returns module ScanInterface with specified identifier
   //!
   AST_ScanInterface* FindScanInterface(std::experimental::string_view interfaceName);
+
+  //! Searches for a DataInputPort with specified identifier
+  //!
+  AST_Port* FindDataInPort (const AST_Identifier* identifier);
 
   //! Searches for a DataOutputPort with specified identifier
   //!
@@ -215,6 +232,8 @@ class AST_Module final : public AST_ParentNode
   void Uniquify_impl              (AST_Builder& astBuilder, const std::vector<AST_Parameter*>& parameters);
   void UniquifyOrUpdateParameters (AST_Builder& astBuilder, const std::vector<AST_Parameter*>& parameters);
 
+
+
   // ---------------- Private Fields
   //
   private:
@@ -222,6 +241,7 @@ class AST_Module final : public AST_ParentNode
   const AST_ScalarIdentifier*     m_originalIdentifier = nullptr; //!< Module name prior to unification
   AST_AccessLink*                 m_accessLink         = nullptr; //!< AccessLink: for top module (only one per network)
   AST_Module*                     m_parentModule       = nullptr; //!< When uniquified, tells hierarchical, direct, parent module this one is instanciated (using an Instance)
+  AST_Instance*                   m_fromInstance       = nullptr; //!< When uniquified, tells from which instance this module was uniquified for
   std::vector<AST_Parameter*>     m_parameters;                   //!< Generic module parameters
   std::vector<AST_Parameter*>     m_localParameters;              //!< Module local parameters
   std::vector<AST_Alias*>         m_aliases;                      //!< Aliases

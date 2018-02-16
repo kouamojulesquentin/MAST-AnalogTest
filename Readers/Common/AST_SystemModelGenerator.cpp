@@ -293,6 +293,59 @@ bool AST_SystemModelGenerator::AssignNodesToLinkerFirstSelection (shared_ptr<Sys
 //!
 void AST_SystemModelGenerator::ConvertAliases (AST_Module* module, ParentNode* parentNode)
 {
+  // Lamba: Follows a signal until it reaches a ScanRegister
+  auto followSignalTilScanRegister = [](AST_Module* module, AST_Signal* signal)
+  {
+    if (signal->IsNumber())
+    {
+      return static_cast<AST_ScanRegister*>(nullptr);
+    }
+
+    const auto portScope  = signal->PortScope();
+    const auto identifier = signal->PortName();
+    auto       regModule  = module;
+
+    if (!portScope.empty())   // ==> Represents a register in sub-instance ?
+    {
+      auto instanceModule = module;
+      for (const auto scopeIdentifier : portScope)
+      {
+        auto foundInstance = instanceModule->FindInstance(scopeIdentifier);
+        if (foundInstance == nullptr)
+        {
+          break;
+        }
+        instanceModule = foundInstance->UniquifiedModule();
+      }
+      regModule = instanceModule;
+    }
+
+    auto scanRegister = regModule->FindScanRegister(identifier);
+    return scanRegister;
+  };
+
+  // Lamba: Creates a register slice for ScanRegister and signal
+  //
+  auto makeRegisterSlice = [](AST_ScanRegister* scanRegister, AST_Signal* signal)
+  {
+    auto reg = scanRegister->AssociatedRegister();
+
+    CHECK_VALUE_NOT_NULL(reg, "Houps: While converting alias, detected a ScanRegister that has not been converted to SystemModel Register");
+
+    uint32_t leftIndex  = reg->BitsCount() - 1u;
+    uint32_t rightIndex = 0u;
+
+    const auto identifier = signal->PortName();
+    if (!identifier->IsScalar())
+    {
+      leftIndex  = identifier->LeftIndex();
+      rightIndex = identifier->IsMultiBits() ? identifier->RightIndex() : leftIndex;
+    }
+
+    RegisterSlice regSlice{reg, IndexedRange{leftIndex, rightIndex}};
+    return regSlice;
+  };
+
   // ---------------- Local aliases
   //
   if (parentNode != nullptr)
@@ -305,49 +358,14 @@ void AST_SystemModelGenerator::ConvertAliases (AST_Module* module, ParentNode* p
       const auto& signals = alias->Signals();
       for (auto signal : signals)
       {
-        if (!signal->IsNumber())
+        auto scanRegister = followSignalTilScanRegister(module, signal);
+        if (scanRegister == nullptr)
         {
-          const auto portScope  = signal->PortScope();
-          const auto identifier = signal->PortName();
-          auto       regModule  = module;
-
-          if (!portScope.empty())   // ==> Represents a register in sub-instance ?
-          {
-            auto instanceModule = module;
-            for (const auto scopeIdentifier : portScope)
-            {
-              auto foundInstance = instanceModule->FindInstance(scopeIdentifier);
-              if (foundInstance == nullptr)
-              {
-                break;
-              }
-              instanceModule = foundInstance->UniquifiedModule();
-            }
-            regModule = instanceModule;
-          }
-
-          auto scanRegister = regModule->FindScanRegister(identifier);
-          if (scanRegister == nullptr)
-          {
-            LOG(WARNING) << "Alias \"" << alias->Name() << "\" in regModule \"" << regModule->Name() << "\" does not lead to a scan register ==> This is not yet supported";
-          }
-          else
-          {
-            auto reg = scanRegister->AssociatedRegister();
-
-            CHECK_VALUE_NOT_NULL(reg, "Houps: While converting alias, detected a ScanRegister that has not been converted to SystemModel Register");
-
-            uint32_t leftIndex  = reg->BitsCount() - 1u;
-            uint32_t rightIndex = 0u;
-
-            if (!identifier->IsScalar())
-            {
-              leftIndex  = identifier->LeftIndex();
-              rightIndex = identifier->IsMultiBits() ? identifier->RightIndex() : leftIndex;
-            }
-
-            virtualReg.Append({reg, IndexedRange{leftIndex, rightIndex}});
-          }
+          LOG(WARNING) << "Alias \"" << alias->Name() << "\" in module \"" << module->Name() << "\" does not lead to a scan register ==> This is not yet supported";
+        }
+        else
+        {
+          virtualReg.Append(makeRegisterSlice(scanRegister, signal));
         }
       }
 
@@ -361,6 +379,94 @@ void AST_SystemModelGenerator::ConvertAliases (AST_Module* module, ParentNode* p
 
   // ---------------- Instances aliases
   //
+  // Lamba: Follows a signal until it reaches a ScanRegister
+  //
+  // @param module  Module from which signal to follow is defined
+  // @param signal  Signal to follow
+  //
+  // @return  Found ScanRegister in case of success, nullptr otherwise
+  //
+  std::function<AST_ScanRegister*(AST_Module* module, AST_Signal* signal)>
+  followSignalTilScanRegister_2 = [&followSignalTilScanRegister_2](AST_Module* module, AST_Signal* signal)
+  {
+    if (signal->IsNumber())
+    {
+      return static_cast<AST_ScanRegister*>(nullptr);
+    }
+
+    const auto portScope     = signal->PortScope();
+    const auto identifier    = signal->PortName();
+    auto       currentModule = module;
+
+    if (!portScope.empty())   // ==> Represents a register in sub-instance ?
+    {
+      auto instanceModule = module;
+      for (const auto scopeIdentifier : portScope)
+      {
+        auto foundInstance = instanceModule->FindInstance(scopeIdentifier);
+        if (foundInstance == nullptr)
+        {
+          break;
+        }
+        instanceModule = foundInstance->UniquifiedModule();
+      }
+      currentModule = instanceModule;
+    }
+
+    auto scanRegister = currentModule->FindScanRegister(identifier);
+    if (scanRegister != nullptr)
+    {
+      return scanRegister;
+    }
+
+    auto dataInPort = currentModule->FindDataInPort(identifier);
+    if (dataInPort != nullptr)
+    {
+      auto instanceOfModule  = currentModule->FromInstance();
+      if (instanceOfModule == nullptr)
+      {
+        LOG(WARNING) << "While processing alias, cannot follow I/O ports from top module";
+        return static_cast<AST_ScanRegister*>(nullptr);
+      }
+      auto instanceInputPort = instanceOfModule->FindInputPort(identifier);
+      if (instanceInputPort == nullptr)
+      {
+        LOG(WARNING) << "Failed to find input port \"" << identifier->AsText() <<  "\" for instance \"" << instanceOfModule->Name() << "\" ==> alias will be ignored";
+        return static_cast<AST_ScanRegister*>(nullptr);
+      }
+
+      auto source = instanceInputPort->Source();
+      CHECK_VALUE_NOT_NULL(source, "An input port must have a valid source");
+      const auto& sourceSignals = source->Signals();
+      CHECK_VALUE_EQ(sourceSignals.size(), 1u, "While processing alias, can only deal with scalar signals");
+
+      auto parentModule = module->ParentModule();
+      CHECK_PARAMETER_NOT_NULL(parentModule, "Houps: After unification, all module (except top one) must have a \"parent\" module");
+
+      return followSignalTilScanRegister_2(parentModule, sourceSignals.front());
+    }
+
+    auto dataOutPort = currentModule->FindDataOutPort(identifier);
+    if (dataOutPort != nullptr)
+    {
+      auto source = dataOutPort->Source();
+      if (source != nullptr)
+      {
+        const auto& sourceSignals = source->Signals();
+        CHECK_VALUE_EQ(sourceSignals.size(), 1u, "While processing alias, can only deal with scalar signals");
+
+        return followSignalTilScanRegister_2(currentModule, sourceSignals.front());
+      }
+      else
+      {
+//+          CHECK_VALUE_NOT_NULL(source, "Instance \"" + instance->Name() + "\" output port \""s + dataOutPort->Name() + "\" has no source");
+        return static_cast<AST_ScanRegister*>(nullptr);
+      }
+    }
+
+    return static_cast<AST_ScanRegister*>(nullptr);
+  };
+
   const auto& instances = module->Instances();
   for (auto instance : instances)
   {
@@ -369,7 +475,35 @@ void AST_SystemModelGenerator::ConvertAliases (AST_Module* module, ParentNode* p
 
     CHECK_VALUE_NOT_NULL(instanceModule, "Houps: Instance is not associated with an uniquified module");
 
-    ConvertAliases(instanceModule, associatedNode.get());
+    if (associatedNode != nullptr)
+    {
+      ConvertAliases(instanceModule, associatedNode.get());
+    }
+    else if (instanceModule->HasAliases())
+    {
+      LOG(INFO) << "Trying to pull up aliases defined in instance \"" << instance->Name() << "\" into its parent module \"" << module->Name() << "\"" ;
+      const auto& aliases = instanceModule->Aliases();
+      for (const auto& alias : aliases)
+      {
+        VirtualRegister virtualReg;
+
+        const auto& signals = alias->Signals();
+        for (auto signal : signals)
+        {
+          auto scanRegister = followSignalTilScanRegister_2(instanceModule, signal);
+          if (scanRegister != nullptr)
+          {
+            virtualReg.Append(makeRegisterSlice(scanRegister, signal));
+          }
+        }
+
+        if (!virtualReg.Empty())
+        {
+          RegistersAlias regAlias(string(alias->Identifier()->BaseName()), std::move(virtualReg));
+          parentNode->AddAlias(std::move(regAlias));
+        }
+      }
+    }
   }
 }
 //
@@ -1437,7 +1571,7 @@ void AST_SystemModelGenerator::SavePDLAssociations (AST_Instance* instance, AST_
     processAttributes(instance->Attributes());
   }
 
-  // ---------------- Merge with assocations for network
+  // ---------------- Merge with associations for network
   //
   for (auto&& algorithmAssociation : algorithmAssociations)
   {

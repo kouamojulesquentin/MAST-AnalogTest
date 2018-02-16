@@ -1,0 +1,8 @@
+[Chain]        "WrappedInstr"
+ Alias enable: SR[7]
+ Alias mode: SR[6:5], SR[3:2]
+ Alias data: SR[4], SR[1:0]
+ [Chain]        "reg8"
+  Alias SR_H: SR[7:3]
+  Alias SR_L: SR[2:0]
+  [Register]     "SR", length: 8, bypass: 0000_0000

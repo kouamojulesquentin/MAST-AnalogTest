@@ -216,6 +216,7 @@ void UT_ICL_Reader::test_FromIcl_1_ScanRegister ()
                                   "  ScanRegister SR[7:0]\n"
                                   "  {\n"
                                   "    ScanInSource SI;\n"
+                                  "    CaptureSource DI;\n"
                                   "    ResetValue 8'b00000000;\n"
                                   "  }\n"
                                   "}";
@@ -284,16 +285,19 @@ void UT_ICL_Reader::test_FromIcl_3_ScanRegister ()
                                   "  ScanRegister SR_3[7:0]\n"
                                   "  {\n"
                                   "    ScanInSource SR_2[0];\n"
+                                  "    CaptureSource DI;\n"
                                   "    ResetValue 8'b00000011;\n"
                                   "  }\n"
                                   "  ScanRegister SR_1[5:0]\n"
                                   "  {\n"
                                   "    ScanInSource SI;\n"
+                                  "    CaptureSource DI;\n"
                                   "    ResetValue 8'b000001;\n"
                                   "  }\n"
                                   "  ScanRegister SR_2[6:0]\n"
                                   "  {\n"
                                   "    ScanInSource SR_1[0];\n"
+                                  "    CaptureSource DI;\n"
                                   "    ResetValue 8'b0000010;\n"
                                   "  }\n"
                                   "}"s;
@@ -358,6 +362,7 @@ void UT_ICL_Reader::test_FromIcl_parameters_value ()
                                   "  ScanRegister SR[$MSB:0]\n"
                                   "  {\n"
                                   "    ScanInSource SI;\n"
+                                  "    CaptureSource DI;\n"
                                   "    ResetValue 'b0;\n"
                                   "  }\n"
                                   "}";
@@ -1982,8 +1987,7 @@ void UT_ICL_Reader::test_Uniquify_Examples ()
   {
     make_tuple("Bundle_Example_With_Parameters.icl", "Uniquified_Example_With_Parameters_PrettyPrint.icl"), // 0
     make_tuple("Bundle_SIB_mux_pre.icl",             "Uniquified_SIB_mux_pre_PrettyPrint.icl"),             // 1
-    make_tuple("Bundle_Single_SIB_3WI.icl",          "Uniquified_Single_SIB_3WI_PrettyPrint.icl"),          // 2
-    make_tuple("Bundle_Top_SReg.icl",                "Uniquified_Top_SReg_PrettyPrint.icl"),                // 3
+    make_tuple("Bundle_Top_SReg.icl",                "Uniquified_Top_SReg_PrettyPrint.icl"),                // 2
   };
 
   // ---------------- DDT Exercise
@@ -2567,12 +2571,8 @@ void UT_ICL_Reader::test_Generate_Examples ()
 
   auto data =
   {
-    make_tuple("Bundle_Single_SIB_3WI.icl",     "test_Generate_Single_SIB_3WI_PrettyPrint.txt"),        // 02
-    make_tuple("Bundle_SIB_mux_post.icl",       "test_Generate_SIB_mux_post_PrettyPrint.txt"),          // 00
-    make_tuple("Bundle_Daisy_3WI.icl",          "test_Generate_Daisy_3WI_PrettyPrint.txt"),             // 01
-    make_tuple("Bundle_Multiple_SIB_3WI.icl",   "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),      // 03
-    make_tuple("Bundle_Nested_SIB_3WI.icl",     "test_Generate_Nested_SIB_3WI_PrettyPrint.txt"),        // 04
-    make_tuple("Bundle_BAD_Nested_SIB_3WI.icl", "test_Generate_BAD_Nested_SIB_3WI_PrettyPrint.txt"),    // 05
+    make_tuple("Bundle_SIB_mux_post.icl",       "test_Generate_SIB_mux_post_PrettyPrint.txt"),       // 00
+    make_tuple("Bundle_BAD_Nested_SIB_3WI.icl", "test_Generate_BAD_Nested_SIB_3WI_PrettyPrint.txt"), // 01
   };
 
   // ---------------- DDT Exercise
@@ -2626,12 +2626,9 @@ void UT_ICL_Reader::test_Parse_Examples_Bundles ()
 
   auto data =
   {
-    make_tuple("Bundle_Top_SReg.icl",           "test_Generate_Top_SReg_PrettyPrint.txt"),              // 00
-    make_tuple("Bundle_SIB_mux_post.icl",       "test_Generate_SIB_mux_post_PrettyPrint.txt"),          // 01
-    make_tuple("Bundle_Daisy_3WI.icl",          "test_Generate_Daisy_3WI_PrettyPrint.txt"),             // 02
-    make_tuple("Bundle_Single_SIB_3WI.icl",     "test_Generate_Single_SIB_3WI_PrettyPrint.txt"),        // 03
-    make_tuple("Bundle_Multiple_SIB_3WI.icl",   "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),      // 04
-    make_tuple("Bundle_Nested_SIB_3WI.icl",     "test_Generate_Nested_SIB_3WI_PrettyPrint.txt"),        // 05
+    make_tuple("Bundle_Top_SReg.icl",     "test_Generate_Top_SReg_PrettyPrint.txt"),     // 00
+    make_tuple("Bundle_SIB_mux_post.icl", "test_Generate_SIB_mux_post_PrettyPrint.txt"), // 01
+    make_tuple("Bundle_Daisy_3WI.icl",    "test_Generate_Daisy_3WI_PrettyPrint.txt"),    // 02
   };
 
   // ---------------- DDT Exercise

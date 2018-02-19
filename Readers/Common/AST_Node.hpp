@@ -32,6 +32,7 @@ namespace Parsers
     ApplyEndState,       //!< For alias iApplyEndState
     AccessTogether,      //!< For alias  AccessTogether
     Attribute,           //!< For attribute definitions
+    CaptureSource,       //!< For ScanRegister CaptureSource
     ConcatenatedNumbers, //!< For concatenated numbers
     DefaultLoadValue,    //!< For registers default load value
     DataInPort,          //!< For modules data input port
@@ -107,6 +108,7 @@ ENUM_TRAITS(Parsers::Kind,
             ENUM_MEMBER(Parsers::Kind::ApplyEndState)
             ENUM_MEMBER(Parsers::Kind::Attribute)
             ENUM_MEMBER(Parsers::Kind::BsdlInstructionRef)
+            ENUM_MEMBER(Parsers::Kind::CaptureSource)
             ENUM_MEMBER(Parsers::Kind::ConcatenatedNumbers)
             ENUM_MEMBER(Parsers::Kind::DefaultLoadValue)
             ENUM_MEMBER(Parsers::Kind::DataInPort)

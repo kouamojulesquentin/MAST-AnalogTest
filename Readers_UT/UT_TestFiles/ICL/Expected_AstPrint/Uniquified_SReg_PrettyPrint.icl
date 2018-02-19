@@ -18,6 +18,7 @@ Module SReg
   ScanRegister SR[7:0]
   {
     ScanInSource SI;
+    CaptureSource DI;
     ResetValue 'b0;
   }
 }

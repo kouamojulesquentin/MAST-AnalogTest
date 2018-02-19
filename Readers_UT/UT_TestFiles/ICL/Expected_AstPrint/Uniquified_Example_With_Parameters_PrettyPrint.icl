@@ -26,6 +26,7 @@ Module my_block
   ScanRegister Reg_a[$MSB1:0]
   {
     ScanInSource SI;
+    CaptureSource $CS;
     ResetValue $Reset_value;
   }
   ScanRegister Reg_b[$width - 1:$LSB]
@@ -92,6 +93,7 @@ Module my_block__uniquified__1
   ScanRegister Reg_a[31:0]
   {
     ScanInSource SI;
+    CaptureSource $CS;
     ResetValue 'b0;
   }
   ScanRegister Reg_b[31:1]
@@ -126,6 +128,7 @@ Module my_block__uniquified__2
   ScanRegister Reg_a[63:0]
   {
     ScanInSource SI;
+    CaptureSource $CS;
     ResetValue 'b0110;
   }
   ScanRegister Reg_b[31:1]

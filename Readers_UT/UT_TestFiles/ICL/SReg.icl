@@ -15,5 +15,11 @@ Module SReg
 
   ScanInterface scan_client { Port SI; Port SO; }
 
-  ScanRegister SR[$Size - 1:0] { ScanInSource SI; ResetValue 'b0; }
+  ScanRegister SR[$Size - 1:0]
+  {
+    ScanInSource  SI;
+    CaptureSource DI;
+    ResetValue    'b0;
+  }
+
 }

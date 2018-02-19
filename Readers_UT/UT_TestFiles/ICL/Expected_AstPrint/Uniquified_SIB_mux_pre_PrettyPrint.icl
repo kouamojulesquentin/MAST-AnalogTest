@@ -35,6 +35,7 @@ Module SIB_mux_pre
   ScanRegister SR
   {
     ScanInSource SIBmux;
+    CaptureSource SR;
     ResetValue 1'b0;
   }
 }

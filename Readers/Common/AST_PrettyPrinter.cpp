@@ -477,6 +477,7 @@ void AST_PrettyPrinter::Visit_ScanRegister (AST_ScanRegister* scanRegister)
   HierarchyInserter hierarchyInserter(*this);
 
   StreamSimpleNode (scanRegister->ScanInSource());
+  StreamSimpleNode (scanRegister->CaptureSource());
   StreamSimpleNode (scanRegister->ResetValue());
   AcceptNodes      (scanRegister->UndispatchedChildren());
 }

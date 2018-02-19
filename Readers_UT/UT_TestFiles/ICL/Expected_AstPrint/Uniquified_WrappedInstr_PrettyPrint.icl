@@ -40,6 +40,7 @@ Module SReg
   ScanRegister SR[$Size - 1:0]
   {
     ScanInSource SI;
+    CaptureSource DI;
     ResetValue 'b0;
   }
 }
@@ -105,6 +106,7 @@ Module SReg__uniquified__2
   ScanRegister SR[7:0]
   {
     ScanInSource SI;
+    CaptureSource DI;
     ResetValue 'b0;
   }
 }

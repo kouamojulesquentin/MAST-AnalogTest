@@ -40,6 +40,7 @@ Module SReg
   ScanRegister SR[$Size - 1:0]
   {
     ScanInSource SI;
+    CaptureSource DI;
     ResetValue 'b0;
   }
 }
@@ -187,6 +188,7 @@ Module SReg__uniquified__10
   ScanRegister SR[2:0]
   {
     ScanInSource SI;
+    CaptureSource DI;
     ResetValue 'b0;
   }
 }
@@ -209,6 +211,7 @@ Module SReg__uniquified__3
   ScanRegister SR[7:0]
   {
     ScanInSource SI;
+    CaptureSource DI;
     ResetValue 'b0;
   }
 }
@@ -231,6 +234,7 @@ Module SReg__uniquified__6
   ScanRegister SR[7:0]
   {
     ScanInSource SI;
+    CaptureSource DI;
     ResetValue 'b0;
   }
 }
@@ -253,6 +257,7 @@ Module SReg__uniquified__9
   ScanRegister SR[7:0]
   {
     ScanInSource SI;
+    CaptureSource DI;
     ResetValue 'b0;
   }
 }

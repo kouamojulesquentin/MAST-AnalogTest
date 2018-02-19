@@ -2217,10 +2217,21 @@ scanRegister_scanInSource : SCANINSOURCE scan_signal SEMICOLON
   $$ = source;
 };
 
-pin_id : instance_name DOT pin_id | instance_name DOT port_name  ;
-signal_or_enum : number | SCALAR_ID | pin_id;
+scanRegister_captureSource :
+  CAPTURESOURCE concat_data_signal SEMICOLON
+  {
+    // scanRegister_captureSource : CAPTURESOURCE concat_data_signal SEMICOLON
+    auto signals       = $[concat_data_signal];
+    auto captureSource = ast.Create_Source(Parsers::Kind::CaptureSource, std::move(signals));
 
-scanRegister_captureSource    : CAPTURESOURCE    signal_or_enum SEMICOLON { $$ = nullptr; /* scanRegister_captureSource : CAPTURESOURCE signal_or_enum SEMICOLON */};
+    $$ = captureSource;
+  }
+| CAPTURESOURCE  enum_symbol SEMICOLON
+  {
+    // scanRegister_captureSource : CAPTURESOURCE
+    CHECK_FAILED("Enum symbol is not yet supported for ScanRegister CaptureSource");
+  }
+;
 
 
 scanRegister_defaultLoadValue :

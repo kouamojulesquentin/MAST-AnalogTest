@@ -77,6 +77,7 @@ Module SIB_mux_pre
   ScanRegister SR
   {
     ScanInSource SIBmux;
+    CaptureSource SR;
     ResetValue 1'b0;
   }
 }
@@ -99,6 +100,7 @@ Module SReg
   ScanRegister SR[$Size - 1:0]
   {
     ScanInSource SI;
+    CaptureSource DI;
     ResetValue 'b0;
   }
 }
@@ -213,6 +215,7 @@ Module SIB_mux_pre__uniquified__1
   ScanRegister SR
   {
     ScanInSource SIBmux;
+    CaptureSource SR;
     ResetValue 1'b0;
   }
 }
@@ -240,6 +243,7 @@ Module SIB_mux_pre__uniquified__2
   ScanRegister SR
   {
     ScanInSource SIBmux;
+    CaptureSource SR;
     ResetValue 1'b0;
   }
 }
@@ -267,6 +271,7 @@ Module SIB_mux_pre__uniquified__3
   ScanRegister SR
   {
     ScanInSource SIBmux;
+    CaptureSource SR;
     ResetValue 1'b0;
   }
 }
@@ -289,6 +294,7 @@ Module SReg__uniquified__12
   ScanRegister SR[7:0]
   {
     ScanInSource SI;
+    CaptureSource DI;
     ResetValue 'b0;
   }
 }
@@ -311,6 +317,7 @@ Module SReg__uniquified__6
   ScanRegister SR[7:0]
   {
     ScanInSource SI;
+    CaptureSource DI;
     ResetValue 'b0;
   }
 }
@@ -333,6 +340,7 @@ Module SReg__uniquified__9
   ScanRegister SR[7:0]
   {
     ScanInSource SI;
+    CaptureSource DI;
     ResetValue 'b0;
   }
 }

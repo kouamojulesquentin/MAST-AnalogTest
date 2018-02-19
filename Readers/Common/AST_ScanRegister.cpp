@@ -60,7 +60,8 @@ void AST_ScanRegister::DispatchChildren ()
     {
       switch (child->GetKind())
       {
-        case Parsers::Kind::ScanInSource:     SetChild(child, m_scanInSource);     break;
+        case Parsers::Kind::ScanInSource:  SetChild(child, m_scanInSource);  break;
+        case Parsers::Kind::CaptureSource: SetChild(child, m_captureSource); break;
         case Parsers::Kind::PlaceHolder:
         {
           auto placeHolder = static_cast<AST_PlaceHolderBase*>(child);

@@ -26,6 +26,8 @@ namespace Parsers
 class AST_Module;
 class AST_Signal;
 class AST_ScanRegister;
+class AST_ScalarIdentifier;
+class AST_VectorIdentifier;
 
 //! Helper to convert AST aliases to SystemModel aliases
 //!
@@ -47,6 +49,9 @@ class AST_AliasConverter final
   private:
   static mast::RegisterSlice MakeRegisterSlice           (AST_ScanRegister* scanRegister, AST_Signal* signal);
   static AST_ScanRegister*   FollowSignalTilScanRegister (AST_Module*       module,       AST_Signal* signal);
+  static AST_ScanRegister*   ScanRegisterConnectedToInstancePort (const AST_Module*           module,
+                                                                  const AST_ScalarIdentifier* instanceId,
+                                                                  const AST_VectorIdentifier* portId);
 };
 //
 //  End of AST_AliasConverter class declaration

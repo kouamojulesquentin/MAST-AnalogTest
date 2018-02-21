@@ -47,11 +47,8 @@ class AST_AliasConverter final
   // ---------------- Private Methods
   //
   private:
-  static mast::RegisterSlice MakeRegisterSlice           (AST_ScanRegister* scanRegister, AST_Signal* signal);
+  static mast::RegisterSlice MakeRegisterSlice (AST_ScanRegister* scanRegister, AST_Signal* signal);
   static AST_ScanRegister*   FollowSignalTilScanRegister (AST_Module*       module,       AST_Signal* signal);
-  static AST_ScanRegister*   ScanRegisterConnectedToInstancePort (const AST_Module*           module,
-                                                                  const AST_ScalarIdentifier* instanceId,
-                                                                  const AST_VectorIdentifier* portId);
 };
 //
 //  End of AST_AliasConverter class declaration

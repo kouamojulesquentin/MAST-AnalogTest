@@ -24,6 +24,8 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_ConcatNumber.hpp
                                   AST_ConcatNumber.cpp
                                   AST_EnumRef.hpp
+                                  AST_Helper.hpp
+                                  AST_Helper.cpp
                                   AST_IntegerExpr.hpp
                                   AST_IntegerExpr.cpp
                                   AST_IntegerExprRef.hpp

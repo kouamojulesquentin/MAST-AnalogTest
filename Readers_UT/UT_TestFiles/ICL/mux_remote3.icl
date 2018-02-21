@@ -17,13 +17,6 @@ Module mux_remote3
   Instance WI2 Of WrappedInstr { InputPort SI = mux1; }
   Instance WI3 Of WrappedInstr { InputPort SI = mux2; }
 
-  Instance reg3 Of SReg
-  {
-    Parameter MSB = 2;
-    InputPort SI  = mux3;
-    InputPort DI  = 'b0;
-  }
-
   ScanMux mux1 SelectedBy RS[2]
   {
     1'b0 : SI;

@@ -19,7 +19,9 @@ namespace Parsers
 {
 
 class AST_Module;
+class AST_Identifier;
 class AST_Signal;
+class AST_Source;
 class AST_ScanRegister;
 class AST_ScalarIdentifier;
 class AST_VectorIdentifier;
@@ -38,7 +40,7 @@ class AST_Helper final
 
   //! Follows a signal until it reaches a ScanRegister
   //!
-  static AST_ScanRegister* FollowSignalTilScanRegister (AST_Module* module, AST_Signal* signal);
+  static AST_ScanRegister* FollowSignalTilScanRegister (AST_Module* module, const AST_Signal* signal);
 
   //! Searches connection down to ScanRegister, starting from an instance Port
   //!
@@ -46,9 +48,7 @@ class AST_Helper final
                                                                 const AST_ScalarIdentifier* instanceId,
                                                                 const AST_VectorIdentifier* portId);
 
-  // ---------------- Private Methods
-  //
-  private:
+  static const AST_Signal* SourceSignalOfModulePort (const AST_Module* module, const AST_Identifier* portId);
 };
 //
 //  End of AST_Helper class declaration

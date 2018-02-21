@@ -46,7 +46,7 @@ using namespace Parsers;
 //
 // @return  Found ScanRegister in case of success, nullptr otherwise
 //
-AST_ScanRegister* AST_Helper::FollowSignalTilScanRegister (AST_Module* module, AST_Signal* signal)
+AST_ScanRegister* AST_Helper::FollowSignalTilScanRegister (AST_Module* module, const AST_Signal* signal)
 {
   if (signal->IsNumber())
   {
@@ -210,7 +210,7 @@ AST_ScanRegister* AST_Helper::ScanRegisterConnectedToInstancePort (const AST_Mod
       const auto  portSource    = port->Source();
       const auto& sourceSignals = portSource->Signals();
 
-      CHECK_VALUE_EQ(sourceSignals.size(), 1u, "While traversing input port \""s + port->Name() + "\" found a source not driven by a scalar signals ==> this is not yet supported");
+      CHECK_VALUE_EQ(sourceSignals.size(), 1u, "While traversing inputPort_connectiont port \""s + port->Name() + "\" found a source not driven by a scalar signals ==> this is not yet supported");
       const auto signal = sourceSignals.front();
 
       const auto  portName  = signal->PortName();
@@ -245,6 +245,37 @@ AST_ScanRegister* AST_Helper::ScanRegisterConnectedToInstancePort (const AST_Mod
 }
 //
 //  End of: AST_Helper::ScanRegisterConnectedToInstancePort
+//---------------------------------------------------------------------------
+
+
+
+//! Returns signal sourcing a module port
+//!
+//! @param module   Module for which we search source of input port (port can be ScanInSource or a DataInPort)
+//! @param portId   Identifier for the module input port (that is expected to be "sourced" in parent module)
+//!
+//! @note Source, when found, is defined in parent module
+const AST_Signal* AST_Helper::SourceSignalOfModulePort (const AST_Module* module, const AST_Identifier* portId)
+{
+  auto fromInstance = module->FromInstance();
+  auto inputPort    = fromInstance->FindInputPort(portId);
+
+  if (inputPort != nullptr)
+  {
+    auto source = inputPort->Source();
+    if (source != nullptr)
+    {
+      const auto& sourceSignals = source->Signals();
+      CHECK_VALUE_EQ(sourceSignals.size(), 1u, "While traversing from input port \""s + inputPort->Name() + "\" found a source not driven by a scalar signals ==> this is not yet supported");
+
+      auto signal = sourceSignals.front();
+      return signal;
+    }
+  }
+  return nullptr;
+}
+//
+//  End of: AST_Helper::SourceSignalOfModulePort
 //---------------------------------------------------------------------------
 
 

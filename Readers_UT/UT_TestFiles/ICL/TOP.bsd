@@ -11,9 +11,10 @@ Entity Top is
   attribute INSTRUCTION_OPCODE of Top: entity is "EXTEST(00000),"&
   "SAMPLE(00001),"&
   "INTEST(00010),"&
-   "ijtag_en(00011),"&
-  "IDCODE(00100),"&
-  --"USRSC(00101),"&
+  "ijtag_en(00011),"&
+  "ijtag_en_2(00100),"&
+-- "IDCODE(00100),"&
+-- "USRSC(00101),"&
   "HIGHZ(01110),"&
   "CLAMP(01111),"&
   "PROBE(10000),"&

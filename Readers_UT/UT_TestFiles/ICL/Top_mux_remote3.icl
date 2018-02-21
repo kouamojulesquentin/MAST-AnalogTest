@@ -18,6 +18,9 @@ Module TOP_mux_remote3
     ijtag_en  // Instruction Name
     {
       ScanInterface { rc.scan_client; }
+    }
+    ijtag_en_2  // Instruction Name
+    {
       ScanInterface { mr.scan_client; }
     }
   }

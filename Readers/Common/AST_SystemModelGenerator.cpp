@@ -38,6 +38,7 @@
 #include "AST_Source.hpp"
 #include "AST_String.hpp"
 #include "AST_VectorIdentifier.hpp"
+#include "AST_Helper.hpp"
 
 #include "AccessInterfaceProtocol.hpp"
 #include "AccessInterfaceProtocolFactory.hpp"
@@ -427,8 +428,7 @@ AST_SystemModelGenerator::FindScanInterface (AST_Module*           module,
     auto instance         = module->FindInstance(instanceRef);
     CHECK_VALUE_NOT_NULL(instance, "Cannot find instance \""s.append(instanceRef->AsText()).append("\""));
 
-    auto moduleIdentifier = instance->ModuleIdentifier();
-    auto instanceModule   = m_network->Module(moduleIdentifier);
+    auto instanceModule = instance->UniquifiedModule();
     CHECK_VALUE_NOT_NULL(instanceModule, "Cannot find module instance \""s.append(instanceRef->AsText()).append("\""));
 
     auto scanInterface = instanceModule->FindScanInterface(scanInterfaceName);
@@ -503,6 +503,18 @@ AST_SystemModelGenerator::FindSelectorRegisters (const std::vector<Parsers::AST_
     if (portScope.empty())
     {
       scanRegister = module->FindScanRegister(identifier);
+      if (scanRegister == nullptr)  // if nullptr, then it must used DataInPort for connection to a ScanRegisters in another module
+      {
+        auto parentModule = module->ParentModule();
+        auto dataInPort   = module->FindDataInPort(identifier);
+        CHECK_VALUE_NOT_NULL(dataInPort, "Failed to find ScanRegister nor DataInPort for scan_mux in module \""s.append(module->Name()).append("\""));
+
+        auto signal = AST_Helper::SourceSignalOfModulePort(module, identifier);
+        if (signal != nullptr)
+        {
+          scanRegister = AST_Helper::FollowSignalTilScanRegister(parentModule, signal);
+        }
+      }
     }
     else
     {
@@ -647,13 +659,12 @@ void AST_SystemModelGenerator::FollowTopModulePath (AST_Module* topModule, const
         {
           CHECK_VALUE_EQ(portScope.size(), 1u, "Expecting to have single scope depth for instance");
 
-          auto scope            = portScope.front();
-          auto instance         = module->FindInstance(scope);
+          auto scope    = portScope.front();
+          auto instance = module->FindInstance(scope);
           CHECK_VALUE_NOT_NULL(instance, "Failed to find source entity (not an Instance)");
 
-          auto moduleIdentifier = instance->ModuleIdentifier();
-          auto instanceModule   = m_network->Module(moduleIdentifier);
-          auto scanOutPort      = instanceModule->FindScanOutPort(identifier);
+          auto instanceModule = instance->UniquifiedModule();
+          auto scanOutPort    = instanceModule->FindScanOutPort(identifier);
 
           std::tie(module, sourceSignals) = Process_Instance_Entry(instance, instanceModule, scanOutPort);
         }
@@ -853,7 +864,7 @@ void AST_SystemModelGenerator::Generate_JTAGTapChildren (AccessInterface*       
     for (const auto scanInterfaceRef : scanInterfacesRef)
     {
       const auto& interfacesNames = scanInterfaceRef->ScanInterfaceNames();
-      CHECK_FALSE(interfacesNames.size() > 1u, "Only support one ScanInteface per BSDL instruction");
+      CHECK_FALSE(interfacesNames.size() > 1u, "Only support one ScanInterface per BSDL instruction");
 
       const auto& scopedInterfaceName = interfacesNames.front();
       const auto  instanceRef         = std::get<0>(scopedInterfaceName);
@@ -879,6 +890,7 @@ void AST_SystemModelGenerator::Generate_JTAGTapChildren (AccessInterface*       
       {
         FollowTopModulePath(topModule, scanOutPort);
       }
+
       AppendCreatedNodesToParent(tap, 0u);
     }
   }
@@ -1038,9 +1050,16 @@ AST_SystemModelGenerator::Process_Instance_Exit (AST_Port* scanInPort)
 
   if (instanceInputPort == nullptr)   // Is this special top level instance referred by an AccessLink ?
   {
+    if (context.linkerNode != nullptr)
+    {
+      return Process_ScanMux_EndOfSelectionPath(instance->AssociatedChain());
+    }
     auto instanceModule = instance->UniquifiedModule();
     auto scanInPort     = instanceModule->FindScanInPort(portIdentifier);
     CHECK_PARAMETER_NOT_NULL(scanInPort, "Cannot find instance module Port: \""s.append(portIdentifier->Name()).append("\""));
+
+    m_instancesContext.pop();
+    CHECK_VALUE_NOT_EMPTY(m_instancesContext, "Must remain at least one (implicit) instance context for top module");
     return make_tuple(nullptr, cref(sm_noSignals));   // This is to report end of scan path !
   }
 
@@ -1116,6 +1135,8 @@ AST_SystemModelGenerator::Process_ScanMux_Entry (AST_ScanMux* scanMux, AST_Modul
 
 
 //! Does what is needed to process when we reached end of ScanMux selection
+//!
+//! @param commonLinkerNode   The first SystemModelNode encounter following all linker selections path
 //!
 //! @return New processing context
 //!

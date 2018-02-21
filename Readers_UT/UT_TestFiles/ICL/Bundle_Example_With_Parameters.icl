@@ -56,9 +56,14 @@ Module my_block
   Parameter C = "C_", "Test", "_C";
 
   LocalParameter LSB = 1;
+  LocalParameter MSB    = $width - 1;
+  LocalParameter Middle = $MSB / 2;
 
   Attribute att1 = "$myStringParam";  // This is a literal string (not a Parameter_Ref)
   Attribute att2 = "", $myStringParam;  // Empty string is to cope with failure to parse string attributes correctly!
+
+  Alias SR_H = Reg_a[$MSB:$Middle];  // Theses aliases are just there to check unification process related to aliases
+  Alias SR_L = Reg_a[$Middle - 1:0]; // SR must be at least 2 bits wide !
 
   ScanRegister Reg_a[$MSB1:0]
   {

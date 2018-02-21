@@ -84,10 +84,6 @@ Module SIB_mux_pre
 Module SReg
 {
   Parameter Size = 8;
-  LocalParameter MSB = $Size - 1;
-  LocalParameter Middle = $MSB / 2;
-  Alias SR_H = SR[$MSB:$Middle];
-  Alias SR_L = SR[$Middle - 1:0];
   ScanInterface scan_client
   {
     Port SI;
@@ -278,10 +274,6 @@ Module SIB_mux_pre__uniquified__3
 Module SReg__uniquified__12
 {
   Parameter Size = 8;
-  LocalParameter MSB = 8 - 1;
-  LocalParameter Middle = (8 - 1) / 2;
-  Alias SR_H = SR[7:3];
-  Alias SR_L = SR[2:0];
   ScanInterface scan_client
   {
     Port SI;
@@ -301,10 +293,6 @@ Module SReg__uniquified__12
 Module SReg__uniquified__6
 {
   Parameter Size = 8;
-  LocalParameter MSB = 8 - 1;
-  LocalParameter Middle = (8 - 1) / 2;
-  Alias SR_H = SR[7:3];
-  Alias SR_L = SR[2:0];
   ScanInterface scan_client
   {
     Port SI;
@@ -324,10 +312,6 @@ Module SReg__uniquified__6
 Module SReg__uniquified__9
 {
   Parameter Size = 8;
-  LocalParameter MSB = 8 - 1;
-  LocalParameter Middle = (8 - 1) / 2;
-  Alias SR_H = SR[7:3];
-  Alias SR_L = SR[2:0];
   ScanInterface scan_client
   {
     Port SI;

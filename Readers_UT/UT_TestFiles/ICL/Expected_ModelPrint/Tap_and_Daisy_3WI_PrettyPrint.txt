@@ -19,8 +19,6 @@
     Alias okay: SR[0]
     Alias done: SR[1]
     [Chain]        "reg8"
-     Alias SR_H: SR[7:3]
-     Alias SR_L: SR[2:0]
      [Register]     "SR", length: 8, bypass: 0000_0000
    [Chain]        "WI2"
     Alias enable: SR[7]
@@ -29,8 +27,6 @@
     Alias okay: SR[0]
     Alias done: SR[1]
     [Chain]        "reg8"
-     Alias SR_H: SR[7:3]
-     Alias SR_L: SR[2:0]
      [Register]     "SR", length: 8, bypass: 0000_0000
    [Chain]        "WI3"
     Alias enable: SR[7]
@@ -39,6 +35,4 @@
     Alias okay: SR[0]
     Alias done: SR[1]
     [Chain]        "reg8"
-     Alias SR_H: SR[7:3]
-     Alias SR_L: SR[2:0]
      [Register]     "SR", length: 8, bypass: 0000_0000

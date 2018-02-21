@@ -23,6 +23,10 @@ Module my_block
   Parameter D = "D_", $C, "_D";
   Parameter C = "C_Test_C";
   LocalParameter LSB = 1;
+  LocalParameter MSB = $width - 1;
+  LocalParameter Middle = $MSB / 2;
+  Alias SR_H = Reg_a[$MSB:$Middle];
+  Alias SR_L = Reg_a[$Middle - 1:0];
   ScanRegister Reg_a[$MSB1:0]
   {
     ScanInSource SI;
@@ -90,6 +94,10 @@ Module my_block__uniquified__1
   Parameter D = "D_C_Test_C_D";
   Parameter C = "C_Test_C";
   LocalParameter LSB = 1;
+  LocalParameter MSB = 32 - 1;
+  LocalParameter Middle = (32 - 1) / 2;
+  Alias SR_H = Reg_a[31:15];
+  Alias SR_L = Reg_a[14:0];
   ScanRegister Reg_a[31:0]
   {
     ScanInSource SI;
@@ -125,6 +133,10 @@ Module my_block__uniquified__2
   Parameter D = "D_Me_D";
   Parameter C = "Me";
   LocalParameter LSB = 1;
+  LocalParameter MSB = 32 - 1;
+  LocalParameter Middle = (32 - 1) / 2;
+  Alias SR_H = Reg_a[31:15];
+  Alias SR_L = Reg_a[14:0];
   ScanRegister Reg_a[63:0]
   {
     ScanInSource SI;

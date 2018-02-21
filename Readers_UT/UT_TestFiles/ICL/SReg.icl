@@ -1,12 +1,6 @@
 Module SReg
 {
-  Parameter      Size   = 8;
-  LocalParameter MSB    = $Size - 1;
-  LocalParameter Middle = $MSB / 2;
-
-  Alias SR_H = SR[$MSB:$Middle];  // Theses aliases are just there to check unification process related to aliases
-  Alias SR_L = SR[$Middle - 1:0]; // SR must be at least 2 bits wide !
-
+  Parameter   Size   = 8;
   ScanInPort  SI;
   ScanOutPort SO  { Source SR[0];}
 

@@ -24,10 +24,6 @@ Module Instrument
 Module SReg
 {
   Parameter Size = 8;
-  LocalParameter MSB = $Size - 1;
-  LocalParameter Middle = $MSB / 2;
-  Alias SR_H = SR[$MSB:$Middle];
-  Alias SR_L = SR[$Middle - 1:0];
   ScanInterface scan_client
   {
     Port SI;
@@ -172,10 +168,6 @@ Module Instrument__uniquified__8
 Module SReg__uniquified__10
 {
   Parameter Size = 3;
-  LocalParameter MSB = 3 - 1;
-  LocalParameter Middle = (3 - 1) / 2;
-  Alias SR_H = SR[2:1];
-  Alias SR_L = SR[0:0];
   ScanInterface scan_client
   {
     Port SI;
@@ -195,10 +187,6 @@ Module SReg__uniquified__10
 Module SReg__uniquified__3
 {
   Parameter Size = 8;
-  LocalParameter MSB = 8 - 1;
-  LocalParameter Middle = (8 - 1) / 2;
-  Alias SR_H = SR[7:3];
-  Alias SR_L = SR[2:0];
   ScanInterface scan_client
   {
     Port SI;
@@ -218,10 +206,6 @@ Module SReg__uniquified__3
 Module SReg__uniquified__6
 {
   Parameter Size = 8;
-  LocalParameter MSB = 8 - 1;
-  LocalParameter Middle = (8 - 1) / 2;
-  Alias SR_H = SR[7:3];
-  Alias SR_L = SR[2:0];
   ScanInterface scan_client
   {
     Port SI;
@@ -241,10 +225,6 @@ Module SReg__uniquified__6
 Module SReg__uniquified__9
 {
   Parameter Size = 8;
-  LocalParameter MSB = 8 - 1;
-  LocalParameter Middle = (8 - 1) / 2;
-  Alias SR_H = SR[7:3];
-  Alias SR_L = SR[2:0];
   ScanInterface scan_client
   {
     Port SI;

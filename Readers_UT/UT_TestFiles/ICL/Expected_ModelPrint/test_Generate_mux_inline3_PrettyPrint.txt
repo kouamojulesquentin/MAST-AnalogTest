@@ -14,8 +14,6 @@
    Alias okay: SR[0]
    Alias done: SR[1]
    [Chain]        "reg8"
-    Alias SR_H: SR[7:3]
-    Alias SR_L: SR[2:0]
     [Register]     "SR", length: 8, bypass: 0000_0000
  [Linker]       "mux2"
   :Selector:     "SR[1]", kind: Table_Based, can_select_none: true, inverted_bits: false, reversed_order: false
@@ -32,8 +30,6 @@
    Alias okay: SR[0]
    Alias done: SR[1]
    [Chain]        "reg8"
-    Alias SR_H: SR[7:3]
-    Alias SR_L: SR[2:0]
     [Register]     "SR", length: 8, bypass: 0000_0000
  [Linker]       "mux3"
   :Selector:     "SR[0]", kind: Table_Based, can_select_none: true, inverted_bits: false, reversed_order: false
@@ -50,10 +46,6 @@
    Alias okay: SR[0]
    Alias done: SR[1]
    [Chain]        "reg8"
-    Alias SR_H: SR[7:3]
-    Alias SR_L: SR[2:0]
     [Register]     "SR", length: 8, bypass: 0000_0000
  [Chain]        "reg3"
-  Alias SR_H: SR[2:1]
-  Alias SR_L: SR[0]
   [Register]     "SR", length: 3, Hold value: true, bypass: 000

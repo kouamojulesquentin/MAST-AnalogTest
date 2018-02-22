@@ -67,6 +67,10 @@ class AST_BasedNumber final : public AST_Number
   //!
   uint32_t Size() const override;
 
+  //! Returns true when there is a parameter reference in size expression
+  //!
+  bool HasParameterRef () const override;
+
   //! Replaces parameter references by their actual number
   //!
   void Resolve (const std::vector<AST_Parameter*>& parameters) override;

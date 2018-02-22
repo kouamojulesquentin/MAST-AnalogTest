@@ -115,6 +115,18 @@ string AST_BasedNumber::AsText () const
 
 
 
+//! Returns true when there is a parameter reference in size expression
+//!
+bool AST_BasedNumber::HasParameterRef () const
+{
+  return (m_sizeExpr == nullptr) ? false : m_sizeExpr->HasParameterRef();
+}
+//
+//  End of: AST_BasedNumber::HasParameterRef
+//---------------------------------------------------------------------------
+
+
+
 //! Replaces parameter references by their actual number
 //!
 //! @note All parameters must have been uniquified and transitive dependencies resolved

@@ -1,0 +1,6 @@
+# Files for checking IEEE Std 1687-2014 example 14: "Exclusive access: explicit ICL"
+#
+Top_Exclusive_explicit.icl
+WrappedInstr.icl
+Instrument.icl
+SReg.icl

@@ -3223,11 +3223,13 @@ BinaryVector& BinaryVector::TruncateLeadingZeroes (uint32_t numberOfBitsToRemove
                                                         .append(std::to_string(numberOfBitsToRemove))
                                                         .append(" bits when vector has only ")
                                                         .append(std::to_string(m_usedBits))
-                                                        .append(" bits"));
+                                                        .append(" bits.\nCurrent value is: ")
+                                                        .append(DataAsMixString()));
 
   CHECK_PARAMETER_LTE(numberOfBitsToRemove, LeadingZeroesCount(), "Cannot remove "s
                                                                   .append(std::to_string(numberOfBitsToRemove)).append(" leading zeroes from vector that has only ")
-                                                                  .append(std::to_string(LeadingZeroesCount())).append(" leading zeroes"));
+                                                                  .append(std::to_string(LeadingZeroesCount())).append(" leading zeroes.\nCurrent value is: ")
+                                                                  .append(DataAsMixString()));
 
   auto remainingCount = m_usedBits - numberOfBitsToRemove;
 

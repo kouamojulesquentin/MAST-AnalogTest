@@ -1,0 +1,38 @@
+[Chain]        "Exclusive"
+ [Linker]       "M4"
+  :Selector:     "reg2", kind: Table_Based, can_select_none: true, inverted_bits: false, reversed_order: false
+  Selection Table:
+    [0] 0b00
+    [1] 0b01
+    [2] 0b10
+    [3] 0b11
+  Deselection Table:
+    [0] 0b00
+    [1] 0b10
+    [2] 0b01
+    [3] 0b00
+  [Chain]        "WI1"
+   Alias enable: SR[7]
+   Alias mode: SR[6:5], SR[3:2]
+   Alias data: SR[4], SR[1:0]
+   Alias okay: SR[0]
+   Alias done: SR[1]
+   [Chain]        "reg8"
+    [Register]     "SR", length: 8, bypass: 0000_0000
+  [Chain]        "WI2"
+   Alias enable: SR[7]
+   Alias mode: SR[6:5], SR[3:2]
+   Alias data: SR[4], SR[1:0]
+   Alias okay: SR[0]
+   Alias done: SR[1]
+   [Chain]        "reg8"
+    [Register]     "SR", length: 8, bypass: 0000_0000
+  [Chain]        "WI3"
+   Alias enable: SR[7]
+   Alias mode: SR[6:5], SR[3:2]
+   Alias data: SR[4], SR[1:0]
+   Alias okay: SR[0]
+   Alias done: SR[1]
+   [Chain]        "reg8"
+    [Register]     "SR", length: 8, bypass: 0000_0000
+ [Register]     "reg2", length: 2, Hold value: true, bypass: 00

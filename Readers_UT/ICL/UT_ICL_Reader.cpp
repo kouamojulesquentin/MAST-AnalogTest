@@ -2040,11 +2040,12 @@ void UT_ICL_Reader::test_Uniquify_Examples_ListFile ()
 
   auto data =
   {
-    make_tuple("List_SReg.txt",             "Uniquified_SReg_PrettyPrint.icl"),             // 0
-    make_tuple("List_WrappedInstr.txt",     "Uniquified_WrappedInstr_PrettyPrint.icl"),     // 1
-    make_tuple("List_Multiple_SIB_3WI.txt", "Uniquified_Multiple_SIB_3WI_PrettyPrint.icl"), // 2
-    make_tuple("List_mux_inline3.txt",      "Uniquified_mux_inline3_PrettyPrint.icl"),      // 3
-    make_tuple("List_mux_remote3.txt",      "Uniquified_mux_remote3_PrettyPrint.icl"),      // 4
+    make_tuple("List_SReg.txt",               "Uniquified_SReg_PrettyPrint.icl"),               // 0
+    make_tuple("List_WrappedInstr.txt",       "Uniquified_WrappedInstr_PrettyPrint.icl"),       // 1
+    make_tuple("List_Multiple_SIB_3WI.txt",   "Uniquified_Multiple_SIB_3WI_PrettyPrint.icl"),   // 2
+    make_tuple("List_mux_inline3.txt",        "Uniquified_mux_inline3_PrettyPrint.icl"),        // 3
+    make_tuple("List_mux_remote3.txt",        "Uniquified_mux_remote3_PrettyPrint.icl"),        // 4
+    make_tuple("List_Exclusive_implicit.txt", "Uniquified_Exclusive_implicit_PrettyPrint.icl"), // 5
   };
 
   // ---------------- DDT Exercise
@@ -2824,10 +2825,11 @@ void UT_ICL_Reader::test_CreateModelFromFiles_ListFile ()
 
   auto data =
   {
-    make_tuple("List_mux_remote3.txt",      "test_Generate_mux_remote3_PrettyPrint.txt"),      // 3
-    make_tuple("List_WrappedInstr.txt",     "test_Generate_WrappedInstr_PrettyPrint.txt"),     // 0
-    make_tuple("List_Multiple_SIB_3WI.txt", "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"), // 1
-    make_tuple("List_mux_inline3.txt",      "test_Generate_mux_inline3_PrettyPrint.txt"),      // 2
+    make_tuple("List_WrappedInstr.txt",       "test_Generate_WrappedInstr_PrettyPrint.txt"),       // 0
+    make_tuple("List_Multiple_SIB_3WI.txt",   "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),   // 1
+    make_tuple("List_mux_inline3.txt",        "test_Generate_mux_inline3_PrettyPrint.txt"),        // 2
+    make_tuple("List_mux_remote3.txt",        "test_Generate_mux_remote3_PrettyPrint.txt"),        // 3
+    make_tuple("List_Exclusive_implicit.txt", "test_Generate_Exclusive_implicit_PrettyPrint.txt"), // 4
   };
 
   // ---------------- DDT Exercise

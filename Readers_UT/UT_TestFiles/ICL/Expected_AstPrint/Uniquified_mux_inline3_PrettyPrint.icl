@@ -28,6 +28,7 @@ Module SReg
   {
     Port SI;
     Port SO;
+    Port SEL;
   }
   ScanInPort SI;
   ScanOutPort SO { Source SR[0]; }
@@ -37,7 +38,7 @@ Module SReg
   {
     ScanInSource SI;
     CaptureSource DI;
-    ResetValue 'b0;
+    ResetValue 8'b0;
   }
 }
 Module WrappedInstr
@@ -46,6 +47,7 @@ Module WrappedInstr
   {
     Port SI;
     Port SO;
+    Port SEL;
   }
   ScanInPort SI;
   ScanOutPort SO { Source reg8.SO; }
@@ -172,6 +174,7 @@ Module SReg__uniquified__10
   {
     Port SI;
     Port SO;
+    Port SEL;
   }
   ScanInPort SI;
   ScanOutPort SO { Source SR[0]; }
@@ -181,7 +184,7 @@ Module SReg__uniquified__10
   {
     ScanInSource SI;
     CaptureSource DI;
-    ResetValue 'b0;
+    ResetValue 8'b0;
   }
 }
 Module SReg__uniquified__3
@@ -191,6 +194,7 @@ Module SReg__uniquified__3
   {
     Port SI;
     Port SO;
+    Port SEL;
   }
   ScanInPort SI;
   ScanOutPort SO { Source SR[0]; }
@@ -200,7 +204,7 @@ Module SReg__uniquified__3
   {
     ScanInSource SI;
     CaptureSource DI;
-    ResetValue 'b0;
+    ResetValue 8'b0;
   }
 }
 Module SReg__uniquified__6
@@ -210,6 +214,7 @@ Module SReg__uniquified__6
   {
     Port SI;
     Port SO;
+    Port SEL;
   }
   ScanInPort SI;
   ScanOutPort SO { Source SR[0]; }
@@ -219,7 +224,7 @@ Module SReg__uniquified__6
   {
     ScanInSource SI;
     CaptureSource DI;
-    ResetValue 'b0;
+    ResetValue 8'b0;
   }
 }
 Module SReg__uniquified__9
@@ -229,6 +234,7 @@ Module SReg__uniquified__9
   {
     Port SI;
     Port SO;
+    Port SEL;
   }
   ScanInPort SI;
   ScanOutPort SO { Source SR[0]; }
@@ -238,7 +244,7 @@ Module SReg__uniquified__9
   {
     ScanInSource SI;
     CaptureSource DI;
-    ResetValue 'b0;
+    ResetValue 8'b0;
   }
 }
 Module WrappedInstr__uniquified__1
@@ -247,6 +253,7 @@ Module WrappedInstr__uniquified__1
   {
     Port SI;
     Port SO;
+    Port SEL;
   }
   ScanInPort SI;
   ScanOutPort SO { Source reg8.SO; }
@@ -267,6 +274,7 @@ Module WrappedInstr__uniquified__4
   {
     Port SI;
     Port SO;
+    Port SEL;
   }
   ScanInPort SI;
   ScanOutPort SO { Source reg8.SO; }
@@ -287,6 +295,7 @@ Module WrappedInstr__uniquified__7
   {
     Port SI;
     Port SO;
+    Port SEL;
   }
   ScanInPort SI;
   ScanOutPort SO { Source reg8.SO; }

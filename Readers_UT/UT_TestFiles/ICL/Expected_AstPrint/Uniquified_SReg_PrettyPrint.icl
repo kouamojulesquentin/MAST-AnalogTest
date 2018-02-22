@@ -6,6 +6,7 @@ Module SReg
   {
     Port SI;
     Port SO;
+    Port SEL;
   }
   ScanInPort SI;
   ScanOutPort SO { Source SR[0]; }
@@ -15,6 +16,6 @@ Module SReg
   {
     ScanInSource SI;
     CaptureSource DI;
-    ResetValue 'b0;
+    ResetValue 8'b0;
   }
 }

@@ -288,6 +288,43 @@ bool AST_SystemModelGenerator::AssignNodesToLinkerFirstSelection (shared_ptr<Sys
 
 
 
+//! Counts number of bits that will drive a ScanMux
+//!
+//! @param selectorRegisters  Info about each ScanRegisters used to drive the ScanMux
+//!
+//! @return The total number of bits used from selector registers
+uint32_t AST_SystemModelGenerator::CountSelectorRegistersBitsCount (const SelectorRegistersInfo_t& selectorRegisters)
+{
+  uint32_t bitsCount = 0;
+
+  for (const auto& info : selectorRegisters)
+  {
+    auto hasRange = std::get<1>(info);
+
+    if (hasRange)
+    {
+      auto leftIndex  = std::get<2>(info);
+      auto rightIndex = std::get<3>(info);
+      auto rangeWidth = IndexedRange(leftIndex, rightIndex).Width();
+
+      bitsCount += rangeWidth;
+    }
+    else
+    {
+      auto scanRegister = std::get<0>(info);
+
+      bitsCount += scanRegister->BitsCount();
+    }
+  }
+
+  return bitsCount;
+}
+//
+//  End of: AST_SystemModelGenerator::CountSelectorRegistersBitsCount
+//---------------------------------------------------------------------------
+
+
+
 //! Creates a "generated" chain to force a single child for Linker selection
 //!
 //! @param linker         Linker to create a chain for
@@ -318,10 +355,10 @@ shared_ptr<PathSelector> AST_SystemModelGenerator::Create_PathSelector (AST_Scan
   // Paths are ordered and defined using SystemModel path syntax
   // Bits ranges are defined as pair of integers
   //
-  const auto& selectors          = scanMux->Selectors();
-  const auto  selectorsBitsCount = selectors.size();
+  const auto& selectors = scanMux->Selectors();
 
-  auto selectorRegisters = FindSelectorRegisters(selectors, module);
+  const auto selectorRegisters  = FindSelectorRegisters(selectors, module);
+  const auto selectorsBitsCount = CountSelectorRegistersBitsCount(selectorRegisters);
 
   // ---------------- Prepare selection/deselection tables
   //
@@ -487,7 +524,7 @@ const AST_Port* AST_SystemModelGenerator::FindScanOutPort (AST_Module* module, c
 //!
 vector<tuple<AST_ScanRegister*, bool, uint32_t, uint32_t>>
 AST_SystemModelGenerator::FindSelectorRegisters (const std::vector<Parsers::AST_Signal*>& selectors,
-                                                 AST_Module*                              module) const
+                                                 AST_Module*                              module)
 {
   vector<tuple<AST_ScanRegister*, bool, uint32_t, uint32_t>> scanRegisters;
 
@@ -1266,7 +1303,7 @@ AST_SystemModelGenerator::Process_ScanRegister (AST_ScanRegister* scanRegister)
 //! @param firstSelectionIsEmpty  When true, first mux selection is ignored in selection/deselection tables (and the linker must be set with can_select_none = true)
 //!
 AST_SystemModelGenerator::SelectionTables_t AST_SystemModelGenerator::MakeSelectionTable(const vector<AST_ScanMuxSelection*>& selections,
-                                                                                         size_t                               expectedBitsCount,
+                                                                                         uint32_t                             expectedBitsCount,
                                                                                          bool                                 firstSelectionIsEmpty) const
 {
   vector<BinaryVector> selectTable;

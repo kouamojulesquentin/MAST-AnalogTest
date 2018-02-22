@@ -112,7 +112,10 @@ class AST_SystemModelGenerator final
   std::unique_ptr<mast::AccessInterfaceProtocol> Create_Protocol       (AST_Module* topModule);
   std::shared_ptr<mast::PathSelector>            Create_PathSelector   (AST_ScanMux* scanMux, AST_Module* module, bool firstSelectionIsEmpty);
 
-  std::vector<std::tuple<AST_ScanRegister*, bool, uint32_t, uint32_t>> FindSelectorRegisters (const SourceSignals_t&, AST_Module* module) const;
+  using SelectorRegistersInfo_t = std::vector<std::tuple<AST_ScanRegister*, bool, uint32_t, uint32_t>>;
+
+  static SelectorRegistersInfo_t FindSelectorRegisters           (const SourceSignals_t& selectors, AST_Module* module);
+  static uint32_t                CountSelectorRegistersBitsCount (const SelectorRegistersInfo_t& selectorRegisters);
 
   std::shared_ptr<mast::ParentNode>   Generate_Network      (AST_Network* network);
   std::shared_ptr<mast::ParentNode>   Generate_JTAGTap      (AST_Module*  topModule);
@@ -142,7 +145,7 @@ class AST_SystemModelGenerator final
   std::tuple<bool, AST_Port*> IsSourcedByModuleInput (const AST_Module* module, const SourceSignals_t& signals) const;
 
   using SelectionTables_t = std::tuple<std::vector<mast::BinaryVector>, std::vector<mast::BinaryVector>>;
-  SelectionTables_t MakeSelectionTable (const std::vector<AST_ScanMuxSelection*>&, size_t expectedBitsCount, bool firstSelectionIsEmpty) const;
+  SelectionTables_t MakeSelectionTable (const std::vector<AST_ScanMuxSelection*>&, uint32_t expectedBitsCount, bool firstSelectionIsEmpty) const;
 
 
   void AssignNewNode                     (std::shared_ptr<mast::SystemModelNode> node);

@@ -17,6 +17,7 @@
 #include "AST_Alias.hpp"
 #include "AST_AliasConverter.hpp"
 #include "AST_Attribute.hpp"
+#include "AST_AttributesConverter.hpp"
 #include "AST_BsdlInstructionRef.hpp"
 #include "AST_ConcatNumber.hpp"
 #include "AST_FileRef.hpp"
@@ -806,15 +807,21 @@ shared_ptr<mast::ParentNode> AST_SystemModelGenerator::Generate_Network (AST_Net
     auto name  = topModule->Name();
     auto chain = m_systemModel->CreateChain(name);
 
-    SavePDLAssociations(nullptr, topModule, chain); // No real instance for top module
-
     Generate_TopModule(chain.get(), topModule);
 
     topNode = chain;
   }
 
+  // ---------------- Unresolved Path Selector
+  //
   ResolveUnresolvedPathSelectors();
 
+  // ---------------- Algorithm Associations
+  //
+  m_algorithmAssociations = AST_AttributesConverter::CollectAlgorithms(nullptr, topModule, topNode);
+
+  // ---------------- Aliases
+  //
   AST_AliasConverter::ConvertAliases(topModule, topNode.get());
 
   return topNode;
@@ -877,8 +884,6 @@ shared_ptr<ParentNode> AST_SystemModelGenerator::Generate_JTAGTap (AST_Module* t
   // ---------------- Build nodes below tap
   //
   Generate_JTAGTapChildren(tap.get(), topModule, bsdlInstructionsRef);
-
-  SavePDLAssociations(nullptr, topModule, tap); // No real instance for top module
 
   return tap;
 }
@@ -1051,7 +1056,6 @@ AST_SystemModelGenerator::Process_Instance_Entry (AST_Instance* instance, AST_Mo
 
     instance->AssociatedChain(chain);   // To detect already created Chain for the instance
     AssignNewNode(chain);
-    SavePDLAssociations(instance, instanceModule, chain);
     context.parentNode = chain.get();
   }
   else if (instanceModule->IsScanOutPortMarked(scanOutPort))
@@ -1392,70 +1396,6 @@ void AST_SystemModelGenerator::ResolveUnresolvedPathSelectors ()
 }
 //
 //  End of: AST_SystemModelGenerator::ResolveUnresolvedPathSelectors
-//---------------------------------------------------------------------------
-
-
-
-//! For each attribute with name "PDL", associate the algorithm name with the Chain node
-//!
-//! @note PDL attributes can be defined at Module and/or Instance levels
-//!
-//! @param instance     ICL instance for which a Chain has been created (optional)
-//! @param module       Processed module
-//! @param parentNode   Associated node in SystemModel
-//!
-void AST_SystemModelGenerator::SavePDLAssociations (AST_Instance* instance, AST_Module* module, shared_ptr<ParentNode> parentNode)
-{
-  // ---------------- Local associations
-  //
-  vector<AppFunctionNameAndNode> algorithmAssociations; // Use local associations for fast and simple search for override management
-  auto hasAlreadyAssociationFor = [&algorithmAssociations](const auto& algorithmId)
-  {
-    auto sameName = [&algorithmId](const auto& item){return item.appName == algorithmId;};
-
-    return std::find_if(algorithmAssociations.begin(), algorithmAssociations.end(), sameName) != algorithmAssociations.cend();
-  };
-
-
-  auto processAttributes = [&](const auto& attributes)
-  {
-    for (const auto attribute : attributes)
-    {
-      if (attribute->Name() == "PDL")
-      {
-        auto algorithmId = attribute->ValueAsText();
-        if (!hasAlreadyAssociationFor(algorithmId))
-        {
-          constexpr uint32_t line = 0;                                      // File line in which the attribute is defined is not yet supported
-          algorithmAssociations.emplace_back(algorithmId, parentNode, line);
-        }
-      }
-    }
-  };
-
-  // ---------------- At Module level
-  //
-  if (module)
-  {
-    processAttributes(module->Attributes());
-  }
-
-  // ---------------- At instance level
-  //
-  if (instance)
-  {
-    processAttributes(instance->Attributes());
-  }
-
-  // ---------------- Merge with associations for network
-  //
-  for (auto&& algorithmAssociation : algorithmAssociations)
-  {
-    m_algorithmAssociations.emplace_back(std::move(algorithmAssociation));
-  }
-}
-//
-//  End of: AST_SystemModelGenerator::SavePDLAssociations
 //---------------------------------------------------------------------------
 
 

@@ -17,6 +17,8 @@ add_library (Reader_Common SHARED AST.hpp
                                   AST_AliasConverter.cpp
                                   AST_Attribute.hpp
                                   AST_Attribute.cpp
+                                  AST_AttributesConverter.hpp
+                                  AST_AttributesConverter.cpp
                                   AST_BasedNumber.hpp
                                   AST_BasedNumber.cpp
                                   AST_BsdlInstructionRef.hpp

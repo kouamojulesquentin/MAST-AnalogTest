@@ -6,9 +6,12 @@ Module Daisy_3WI {
   ScanInPort SI;
   ScanOutPort SO { Source WI3.SO; }
 
-  Instance WI1 Of WrappedInstr { InputPort SI = SI; }
-  Instance WI2 Of WrappedInstr { InputPort SI = WI1.SO; }
-  Instance WI3 Of WrappedInstr { InputPort SI = WI2.SO; }
+  Attribute PDL = "Algo_top_1";
+  Attribute PDL = "Algo_top_2";
+
+  Instance WI1 Of WrappedInstr { InputPort SI = SI;     Attribute PDL = "Algo_WI1";}
+  Instance WI2 Of WrappedInstr { InputPort SI = WI1.SO; Attribute PDL = "Algo_WI2";}
+  Instance WI3 Of WrappedInstr { InputPort SI = WI2.SO; Attribute PDL = "Algo_WI3";}
 }
 
 Module WrappedInstr {
@@ -16,13 +19,29 @@ Module WrappedInstr {
   ScanOutPort   SO { Source reg8.SO;}
   ScanInterface scan_client { Port SI; Port SO; }
 
-  Instance I1   Of Instrument { InputPort DI = reg8.DO; }
-  Instance reg8 Of SReg       { InputPort SI = SI; InputPort DI = I1.DO; Parameter Size = 8; }
+  Attribute PDL = "Algo_WI";
+
+  Instance I1 Of Instrument
+  {
+    Attribute PDL = "Algo_WI_I1";
+    InputPort DI  = reg8.DO;
+  }
+
+  Instance reg8 Of SReg
+  {
+    Parameter Size = 8;
+    Attribute PDL = "Algo_reg8";
+    InputPort SI   = SI;
+    InputPort DI   = I1.DO;
+  }
+
 }
 
 Module SReg
 {
-  Parameter      Size   = 8;
+  Parameter Size = 8;
+
+  Attribute PDL = "Algo_SReg";
 
   DataInPort  DI[$Size - 1:0];
   DataOutPort DO[$Size - 1:0] { Source SR; }
@@ -40,6 +59,9 @@ Module Instrument
   Alias data[2:0] = DI[4],   DI[1:0];
   Alias okay      = DO[0]            { RefEnum PassFail; }
   Alias done      = DO[1]            { RefEnum YesNo; }
+
+  Attribute PDL = "Algo_Instrument_1";
+  Attribute PDL = "Algo_Instrument_2";
 
   Enum PassFail
   {

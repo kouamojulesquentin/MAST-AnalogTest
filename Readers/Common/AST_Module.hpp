@@ -92,6 +92,10 @@ class AST_Module final : public AST_ParentNode
   //!
   AST_Attribute* Attribute(std::experimental::string_view attributeName);
 
+  //! Tells whether some attributes are defined for the module
+  //!
+  bool  HasAttributes() const { return !m_attributes.empty(); }
+
   //! Returns module aliases
   //!
   const std::vector<AST_Alias*>& Aliases() const { return m_aliases; }

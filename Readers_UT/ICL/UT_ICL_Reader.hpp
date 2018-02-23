@@ -69,6 +69,7 @@ class UT_ICL_Reader : public CxxTest::TestSuite
   void test_Generate_2_Modules ();
   void test_Generate_N_Modules ();
   void test_Generate_SIB_mux_pre ();
+  void test_Generate_Daisy_3WI ();
   void test_Generate_Examples ();
 
   // ---------------- Parse

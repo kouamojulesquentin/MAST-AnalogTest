@@ -2523,6 +2523,89 @@ void UT_ICL_Reader::test_Generate_SIB_mux_pre ()
 
 
 
+//! Checks ICL_Reader::GenerateSystemModelNodes() when parsing Daisy_3WI example
+//!
+void UT_ICL_Reader::test_Generate_Daisy_3WI ()
+{
+  // ---------------- Setup
+  //
+  auto           iclFile = GetTestFilePath("Bundle_Daisy_3WI.icl");
+  std::ifstream  ifs(iclFile);
+
+  auto           sm = make_shared<SystemModel>();
+  ICL_Reader_TSS sut(sm);
+
+  CxxTest::setAbortTestOnFail(true);
+  TS_ASSERT_THROWS_NOTHING (sut.UpdateAstFromIcl(ifs));
+  auto ast = sut.AST();
+  TS_ASSERT_NOT_NULLPTR (ast);
+
+  auto checkResult = AST_Checker::Check(ast->Network());
+
+  TS_ASSERT_FALSE (checkResult.HasIssues());
+  TS_ASSERT_THROWS_NOTHING (sut.UniquifyAST());
+
+  // ---------------- Exercise
+  //
+  auto topNode = sut.GenerateSystemModelNodes(ast);
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_NOT_NULLPTR (topNode);
+  TS_ASSERT_EQUALS      (topNode->Name(), "Daisy_3WI");
+
+  // With PrettyPrinter
+  auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode,   PrettyPrinterOptions::Parser_debug_no_id
+                                                                  | PrettyPrinterOptions::ShowSelectorTables);
+  auto expected_PrettyPrint = GetExpectedModelPrettyPrint("test_Generate_Daisy_3WI_PrettyPrint.txt");
+
+  TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
+  // With Checker
+  PrependWithTap(sm, topNode);   // This is to avoid warnings about missing AccessInterface
+  auto modelCheckResult = sm->Check();
+  TS_ASSERT_EMPTY (modelCheckResult.InformativeReport());
+
+  // PDL algorithm associations
+  auto topAsParentNode = dynamic_pointer_cast<ParentNode>(topNode);
+
+  const auto& associations = sut.PDLAlgorithmNameToNodeAssociation();
+  TS_ASSERT_NOT_EMPTY (associations);
+
+  auto findNode = [topAsParentNode](string_view path)
+  {
+    return dynamic_pointer_cast<ParentNode>(topAsParentNode->FindNode(path));
+  };
+
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_top_1"s, topAsParentNode, 0u)); // Line in ICL is not yet supported!
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_top_2"s, topAsParentNode, 0u)); // Line in ICL is not yet supported!
+
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_WI"s,           findNode("WI1"),      0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_WI_I1"s,        findNode("WI1"),      0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_WI1"s,          findNode("WI1"),      0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_Instrument_1"s, findNode("WI1"),      0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_Instrument_2"s, findNode("WI1"),      0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_SReg"s,         findNode("WI1.reg8"), 0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_reg8"s,         findNode("WI1.reg8"), 0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_WI"s,           findNode("WI2"),      0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_WI_I1"s,        findNode("WI2"),      0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_WI2"s,          findNode("WI2"),      0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_Instrument_1"s, findNode("WI2"),      0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_Instrument_2"s, findNode("WI2"),      0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_SReg"s,         findNode("WI2.reg8"), 0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_reg8"s,         findNode("WI2.reg8"), 0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_WI"s,           findNode("WI3"),      0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_WI_I1"s,        findNode("WI3"),      0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_WI3"s,          findNode("WI3"),      0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_Instrument_1"s, findNode("WI3"),      0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_Instrument_2"s, findNode("WI3"),      0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_SReg"s,         findNode("WI3.reg8"), 0u));
+  TS_ASSERT_CONTAINS (associations, AppFunctionNameAndNode("Algo_reg8"s,         findNode("WI3.reg8"), 0u));
+
+  TS_ASSERT_EQUALS   (associations.size(), 23u);   // Check that there are only those expected !
+}
+
+
 //! Checks ICL_Reader::GenerateSystemModelNodes() when parsing examples (mostly from IEEE 1687-2014 standard)
 //!
 //! @note ICL has been cleaned up to ease understanding (some useless stuffs may have been removed)
@@ -2632,7 +2715,6 @@ void UT_ICL_Reader::test_Parse_Examples_Bundles ()
   {
     make_tuple("Bundle_Top_SReg.icl",     "test_Generate_Top_SReg_PrettyPrint.txt"),     // 00
     make_tuple("Bundle_SIB_mux_post.icl", "test_Generate_SIB_mux_post_PrettyPrint.txt"), // 01
-    make_tuple("Bundle_Daisy_3WI.icl",    "test_Generate_Daisy_3WI_PrettyPrint.txt"),    // 02
   };
 
   // ---------------- DDT Exercise

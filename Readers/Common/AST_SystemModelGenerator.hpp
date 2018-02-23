@@ -15,6 +15,7 @@
   #define AST_SYSTEMMODELGENERATOR_H__4AD33E64_B5F0_44D9_839C_E286323534C__INCLUDED_
 
 #include "BinaryVector.hpp"
+#include "PathSelector.hpp"
 #include "AppFunctionNameAndNode.hpp"
 
 #include <memory>
@@ -108,14 +109,26 @@ class AST_SystemModelGenerator final
   using SourceSignalsRef_t  = std::reference_wrapper<const SourceSignals_t>;
   using ProcessingContext_t = std::tuple<AST_Module*, SourceSignalsRef_t>;
 
+  //! Info about a single selector register
+  //!
+  struct SelectorRegistersInfo final
+  {
+    AST_ScanRegister* scanRegister;
+    bool              hasRange;
+    uint32_t          leftIndex;
+    uint32_t          rightIndex;
+  };
+
   std::shared_ptr<mast::Chain>                   Create_ChainForLinker (const mast::Linker* linker, size_t selectionId);
   std::unique_ptr<mast::AccessInterfaceProtocol> Create_Protocol       (AST_Module* topModule);
   std::shared_ptr<mast::PathSelector>            Create_PathSelector   (AST_ScanMux* scanMux, AST_Module* module, bool firstSelectionIsEmpty);
+  static std::shared_ptr<mast::PathSelector>     Create_PathSelector   (const std::vector<SelectorRegistersInfo>& selectorRegistersInfos,
+                                                                        std::vector<mast::BinaryVector>&&         selectTable,
+                                                                        std::vector<mast::BinaryVector>&&         deselectTable,
+                                                                        mast::SelectorProperty                    selectorProperties);
 
-  using SelectorRegistersInfo_t = std::vector<std::tuple<AST_ScanRegister*, bool, uint32_t, uint32_t>>;
-
-  static SelectorRegistersInfo_t FindSelectorRegisters           (const SourceSignals_t& selectors, AST_Module* module);
-  static uint32_t                CountSelectorRegistersBitsCount (const SelectorRegistersInfo_t& selectorRegisters);
+  static std::vector<SelectorRegistersInfo> FindSelectorRegisters           (const SourceSignals_t& selectors, AST_Module* module);
+  static uint32_t                           CountSelectorRegistersBitsCount (const std::vector<SelectorRegistersInfo>& selectorRegisters);
 
   std::shared_ptr<mast::ParentNode>   Generate_Network      (AST_Network* network);
   std::shared_ptr<mast::ParentNode>   Generate_JTAGTap      (AST_Module*  topModule);
@@ -145,7 +158,7 @@ class AST_SystemModelGenerator final
   std::tuple<bool, AST_Port*> IsSourcedByModuleInput (const AST_Module* module, const SourceSignals_t& signals) const;
 
   using SelectionTables_t = std::tuple<std::vector<mast::BinaryVector>, std::vector<mast::BinaryVector>>;
-  SelectionTables_t MakeSelectionTable (const std::vector<AST_ScanMuxSelection*>&, uint32_t expectedBitsCount, bool firstSelectionIsEmpty) const;
+  static SelectionTables_t MakeSelectionTable (const std::vector<AST_ScanMuxSelection*>&, uint32_t expectedBitsCount, bool firstSelectionIsEmpty);
 
 
   void AssignNewNode                     (std::shared_ptr<mast::SystemModelNode> node);
@@ -154,6 +167,7 @@ class AST_SystemModelGenerator final
   void SavePDLAssociations (AST_Instance* instance, AST_Module* module, std::shared_ptr<mast::ParentNode> parentNode);
 
   std::string ResolveBSDL_FilePath (const std::string& bsdlName);
+  void        ResolveUnresolvedPathSelectors ();
 
   // ---------------- Private Fields
   //
@@ -180,21 +194,33 @@ class AST_SystemModelGenerator final
     mast::ParentNode*           linkerParentNode       = nullptr; //!< Parent node of linker
   };
 
+
+  //! Collects info to resolve unresolved path selector once all the AST has been converted to SystemModel
+  //!
+  struct UnresolvedPathSelectorInfo final
+  {
+    AST_ScanMux*                                  scanMux;
+    std::vector<SelectorRegistersInfo>            selectorRegistersInfos;
+    std::shared_ptr<mast::UnresolvedPathSelector> unresolvedPathSelector;
+  };
+
+
+
   using CreatedNodes_t = std::tuple<std::shared_ptr<mast::SystemModelNode>, mast::ParentNode*>; // Created node and its parent node if not linker a linker child
 
-  std::shared_ptr<mast::SystemModel>                            m_systemModel;             //!< SystemModel currently being built
-  std::unique_ptr<mast::SystemModelBuilder>                     m_builder;                 //!< Helper to build SystemModel nodes
-  std::shared_ptr<mast::ParentNode>                             m_parsedTopNode;           //!< SystemModel tree build from ICL file
-  std::stack<CreatedNodes_t>                                    m_createdNodes;            //!< Created children and their default parent not yet attached to its parent (in Linker processing context)
-  std::vector<std::shared_ptr<mast::UnresolvedPathSelector>>    m_unresolvedPathSelectors; //!< Unresolved Linkers (those for which selector Register(s) where not yet created when Linkers were)
-  std::stack<InstanceContext>                                   m_instancesContext;        //!< Current module/instance contexts (represents current instanciation path)
-  std::stack<LinkerContext>                                     m_linkersContext;          //!< To recover processing context for linkers (need only access to last one)
-  std::unordered_map<mast::ParentNode*, mast::SystemModelNode*> m_parentsSplicePoint;      //!< Used for splicing nodes before Linkers
-  AST_Network*                                                  m_network = nullptr;       //!< Test network AST used to generate SystemModel tree
-  std::vector<mast::AppFunctionNameAndNode>                     m_algorithmAssociations;   //!< Associates a PDL algorithm identifier to a SystemModelNode
-  std::string                                                   m_protocolName;            //!< Optional protocol name for JTAG Tap (in case of JTAG TAP style AccessLink)
-  std::string                                                   m_protocolParameters;      //!< Optional protocol parameters for JTAG Tap (a protocol name must be defined)
-  std::vector<std::string>                                      m_filesSearchPaths;        //!< Paths to search files (e.g. BSDL file)
+  std::shared_ptr<mast::SystemModel>        m_systemModel;                                //!< SystemModel currently being built
+  std::unique_ptr<mast::SystemModelBuilder> m_builder;                                    //!< Helper to build SystemModel nodes
+  std::shared_ptr<mast::ParentNode>         m_parsedTopNode;                              //!< SystemModel tree build from ICL file
+  std::stack<CreatedNodes_t>                m_createdNodes;                               //!< Created children and their default parent not yet attached to its parent (in Linker processing context)
+  std::vector<UnresolvedPathSelectorInfo>   m_unresolvedPathSelectorsInfos;               //!< Info about unresolved path selector for Linkers (those for which selector Register(s) where not yet created when Linkers were)
+  std::stack<InstanceContext>               m_instancesContext;                           //!< Current module/instance contexts (represents current instanciation path)
+  std::stack<LinkerContext>                 m_linkersContext;                             //!< To recover processing context for linkers (need only access to last one)
+  std::unordered_map<mast::ParentNode*,     mast::SystemModelNode*> m_parentsSplicePoint; //!< Used for splicing nodes before Linkers
+  AST_Network*                              m_network               = nullptr;            //!< Test network AST used to generate SystemModel tree
+  std::vector<mast::AppFunctionNameAndNode> m_algorithmAssociations;                      //!< Associates a PDL algorithm identifier to a SystemModelNode
+  std::string                               m_protocolName;                               //!< Optional protocol name for JTAG Tap (in case of JTAG TAP style AccessLink)
+  std::string                               m_protocolParameters;                         //!< Optional protocol parameters for JTAG Tap (a protocol name must be defined)
+  std::vector<std::string>                  m_filesSearchPaths;                           //!< Paths to search files (e.g. BSDL file)
 
   static const std::vector<AST_Signal*>                      sm_noSignals;              //!< This is internal marker for "no source signals"
 };

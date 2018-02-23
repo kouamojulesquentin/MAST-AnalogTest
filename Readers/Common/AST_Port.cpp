@@ -122,6 +122,19 @@ bool AST_Port::HasParameterRef () const
 //---------------------------------------------------------------------------
 
 
+
+//! Returns true when port is sourced by a scalar signal
+//!
+bool AST_Port::IsSourcedByScalarSignal () const
+{
+  return (m_source != nullptr) && (m_source->Signals().size() == 1u);
+}
+//
+//  End of: AST_Port::IsSourcedByScalarSignal
+//---------------------------------------------------------------------------
+
+
+
 //! Replaces parameter references with their actual value, then resolve value expressions
 //!
 //! @param parameters   Actual parameter values - There should be no parameter reference in their values
@@ -140,6 +153,28 @@ void AST_Port::Resolve (const vector<AST_Parameter*>& parameters)
 //
 //  End of: AST_Port::Resolve
 //---------------------------------------------------------------------------
+
+
+
+//! Returns port source signal
+//!
+//! @note This operation is valid only when a source is effectively defined and
+//!       it is driven by a scalar signal
+//!
+//! @return Source signal if one and only one is defined otherwise throws runtime_error
+AST_Signal* AST_Port::SourceSignal () const
+{
+  CHECK_VALUE_NOT_NULL(m_source, "Port \""s + Name() + "\" is expected to have a valid source");
+
+  const auto& sourceSignals = m_source->Signals();
+  CHECK_VALUE_EQ(sourceSignals.size(), 1u, "While traversing port \""s + Name() + "\" found a source not driven by a scalar signals ==> this is not yet supported");
+
+  return sourceSignals.front();
+}
+//
+//  End of: AST_Port::SourceSignal
+//---------------------------------------------------------------------------
+
 
 
 

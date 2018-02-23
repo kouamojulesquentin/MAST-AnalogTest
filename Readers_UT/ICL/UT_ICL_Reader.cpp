@@ -2047,6 +2047,7 @@ void UT_ICL_Reader::test_Uniquify_Examples_ListFile ()
     make_tuple("List_mux_remote3.txt",        "Uniquified_mux_remote3_PrettyPrint.icl"),        // 4
     make_tuple("List_Exclusive_implicit.txt", "Uniquified_Exclusive_implicit_PrettyPrint.icl"), // 5
     make_tuple("List_Exclusive_explicit.txt", "Uniquified_Exclusive_explicit_PrettyPrint.icl"), // 6
+    make_tuple("List_WSP1500_SWIR.txt",       "Uniquified_WSP1500_SWIR_PrettyPrint.icl"),       // 7
   };
 
   // ---------------- DDT Exercise
@@ -2832,6 +2833,7 @@ void UT_ICL_Reader::test_CreateModelFromFiles_ListFile ()
     make_tuple("List_mux_remote3.txt",        "test_Generate_mux_remote3_PrettyPrint.txt"),        // 3
     make_tuple("List_Exclusive_implicit.txt", "test_Generate_Exclusive_implicit_PrettyPrint.txt"), // 4
     make_tuple("List_Exclusive_explicit.txt", "test_Generate_Exclusive_explicit_PrettyPrint.txt"), // 5
+    make_tuple("List_WSP1500_SWIR.txt",       "test_Generate_WSP1500_SWIR_PrettyPrint.txt"),       // 6
   };
 
   // ---------------- DDT Exercise

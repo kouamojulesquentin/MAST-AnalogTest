@@ -66,6 +66,14 @@ class UnresolvedPathSelector : public PathSelector
   //!
   const std::vector<BinaryVector>& DeselectTable() const { return m_deselectTable; }
 
+  //! Returns selection table
+  //! @note There will be no more select table afterward
+  std::vector<BinaryVector>&& MovedSelectTable() { return std::move(m_selectTable); }
+
+  //! Returns deselection table
+  //! @note There will be no more deselect table afterward
+  std::vector<BinaryVector>&& MovedDeselectTable() { return std::move(m_deselectTable); }
+
   //! Sets selection table
   //!
   void  SelectionTables (std::vector<BinaryVector>&& selectTable,
@@ -74,6 +82,14 @@ class UnresolvedPathSelector : public PathSelector
     m_selectTable   = std::move(selectTable);
     m_deselectTable = std::move(deselectTable);
   }
+
+  //! Returns selector properties (when resolved)
+  //!
+  SelectorProperty Properties() const { return m_selectorProperties; }
+
+  //! Sets selector properties (when resolved)
+  //!
+  void  Properties (SelectorProperty properties) { m_selectorProperties = properties; }
 
   // ---------------- Protected Methods
   //

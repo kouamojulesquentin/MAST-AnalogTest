@@ -75,12 +75,49 @@ AST_ScanRegister* AST_Helper::FollowSignalTilScanRegister (AST_Module* module, c
 
   // ---------------- Search locally (current module)
   //
-  const auto identifier   = signal->PortName();
-  const auto scanRegister = currentModule->FindScanRegister(identifier);
+  const auto identifier = signal->PortName();
 
+  auto scanRegister = currentModule->FindScanRegister(identifier);
   if (scanRegister != nullptr)
   {
     return scanRegister;
+  }
+
+  // ---------------- Search through Instances
+  //
+  const auto instance = currentModule->FindInstance(identifier);
+
+  if (instance != nullptr)
+  {
+    auto instanceModule = instance->UniquifiedModule();
+
+    // ---------------- Through ScanOutPort
+    //
+    auto scanOutPorts = instanceModule->ScanOutPorts();
+    for (const auto& port : scanOutPorts)
+    {
+      auto sourceSignal = port->SourceSignal();
+      scanRegister = FollowSignalTilScanRegister(instanceModule, sourceSignal);
+      if (scanRegister != nullptr)
+      {
+        LOG(INFO) << "Using implicit connection to ScanRegister \"" << scanRegister->Name() << "\" from instance \"" << instance->Name() << "\" ScanOutPort \"" << port->Name() << "\"";
+        return scanRegister;
+      }
+    }
+
+    // ---------------- Through DataOutPort
+    //
+    auto dataOutPorts = instanceModule->DataOutPorts();
+    for (const auto& port : dataOutPorts)
+    {
+      auto sourceSignal = port->SourceSignal();
+      scanRegister = FollowSignalTilScanRegister(instanceModule, sourceSignal);
+      if (scanRegister != nullptr)
+      {
+        LOG(INFO) << "Using implicit connection to ScanRegister \"" << scanRegister->Name() << "\" from instance \"" << instance->Name() << "\" DataOutPort \"" << port->Name() << "\"";
+        return scanRegister;
+      }
+    }
   }
 
   // ---------------- Search through DataInPorts
@@ -102,15 +139,12 @@ AST_ScanRegister* AST_Helper::FollowSignalTilScanRegister (AST_Module* module, c
       return nullptr;
     }
 
-    auto source = instanceInputPort->Source();
-    CHECK_VALUE_NOT_NULL(source, "An input port must have a valid source");
-    const auto& sourceSignals = source->Signals();
-    CHECK_VALUE_EQ(sourceSignals.size(), 1u, "While traversing input port \""s + instanceInputPort->Name() + "\" found a source not driven by a scalar signals ==> this is not yet supported");
-
     auto parentModule = module->ParentModule();
     CHECK_PARAMETER_NOT_NULL(parentModule, "Houps: After unification, all modules (except top one) must have a \"parent\" module. Module \""s + module->Name() + "\" has none");
 
-    return FollowSignalTilScanRegister(parentModule, sourceSignals.front());
+    auto sourceSignal = instanceInputPort->SourceSignal();
+
+    return FollowSignalTilScanRegister(parentModule, sourceSignal);
   }
 
   // ---------------- Search through DataOutPorts
@@ -118,13 +152,10 @@ AST_ScanRegister* AST_Helper::FollowSignalTilScanRegister (AST_Module* module, c
   auto dataOutPort = currentModule->FindDataOutPort(identifier);
   if (dataOutPort != nullptr)
   {
-    auto source = dataOutPort->Source();
-    if (source != nullptr)                // Has local source ?
+    if (dataOutPort->HasSource())
     {
-      const auto& sourceSignals = source->Signals();
-      CHECK_VALUE_EQ(sourceSignals.size(), 1u, "While traversing output port \""s + dataOutPort->Name() + "\" found a source not driven by a scalar signals ==> this is not yet supported");
-
-      return FollowSignalTilScanRegister(currentModule, sourceSignals.front());
+      auto sourceSignal = dataOutPort->SourceSignal();
+      return FollowSignalTilScanRegister(currentModule, sourceSignal);
     }
     else  // ==> Try to find connection in module instantiating this instance
     {
@@ -207,14 +238,9 @@ AST_ScanRegister* AST_Helper::ScanRegisterConnectedToInstancePort (const AST_Mod
     //
     for (const auto port : instance->InputPorts())
     {
-      const auto  portSource    = port->Source();
-      const auto& sourceSignals = portSource->Signals();
-
-      CHECK_VALUE_EQ(sourceSignals.size(), 1u, "While traversing inputPort_connectiont port \""s + port->Name() + "\" found a source not driven by a scalar signals ==> this is not yet supported");
-      const auto signal = sourceSignals.front();
-
-      const auto  portName  = signal->PortName();
-      const auto& portScope = signal->PortScope();
+      const auto  sourceSignal = port->SourceSignal();
+      const auto  portName     = sourceSignal->PortName();
+      const auto& portScope    = sourceSignal->PortScope();
 
       if (portName->BaseName() != portId->Name())
       {
@@ -260,17 +286,10 @@ const AST_Signal* AST_Helper::SourceSignalOfModulePort (const AST_Module* module
   auto fromInstance = module->FromInstance();
   auto inputPort    = fromInstance->FindInputPort(portId);
 
-  if (inputPort != nullptr)
+  if ((inputPort != nullptr) && inputPort->HasSource())
   {
-    auto source = inputPort->Source();
-    if (source != nullptr)
-    {
-      const auto& sourceSignals = source->Signals();
-      CHECK_VALUE_EQ(sourceSignals.size(), 1u, "While traversing from input port \""s + inputPort->Name() + "\" found a source not driven by a scalar signals ==> this is not yet supported");
-
-      auto signal = sourceSignals.front();
-      return signal;
-    }
+    const auto sourceSignal = inputPort->SourceSignal();
+    return sourceSignal;
   }
   return nullptr;
 }

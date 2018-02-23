@@ -1,0 +1,6 @@
+# Files for checking IEEE Std 1687-2014 example 20: 1500 WSP
+#
+Top_WSP1500_SWIR.icl
+WrappedInstr.icl
+Instrument.icl
+SReg.icl

@@ -53,9 +53,21 @@ class AST_Port final : public AST_ParentNode
   //!
   const std::vector<AST_Attribute*>& Attributes() const { return m_attributes; }
 
+  //! Returns true when port has a defined source
+  //!
+  bool  HasSource() const { return m_source != nullptr; }
+
   //! Returns port source (if any)
   //!
   const AST_Source* Source() const { return m_source; }
+
+  //! Returns true when port is sourced by a scalar signal
+  //!
+  bool  IsSourcedByScalarSignal() const;
+
+  //! Returns port source signal
+  //!
+  AST_Signal* SourceSignal () const;
 
   //! Returns true when Parameter is defined using Parameter reference(s)
   //!

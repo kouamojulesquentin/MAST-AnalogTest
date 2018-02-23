@@ -293,27 +293,21 @@ bool AST_SystemModelGenerator::AssignNodesToLinkerFirstSelection (shared_ptr<Sys
 //! @param selectorRegisters  Info about each ScanRegisters used to drive the ScanMux
 //!
 //! @return The total number of bits used from selector registers
-uint32_t AST_SystemModelGenerator::CountSelectorRegistersBitsCount (const SelectorRegistersInfo_t& selectorRegisters)
+uint32_t AST_SystemModelGenerator::CountSelectorRegistersBitsCount (const vector<SelectorRegistersInfo>& selectorRegisters)
 {
   uint32_t bitsCount = 0;
 
   for (const auto& info : selectorRegisters)
   {
-    auto hasRange = std::get<1>(info);
-
-    if (hasRange)
+    if (info.hasRange)
     {
-      auto leftIndex  = std::get<2>(info);
-      auto rightIndex = std::get<3>(info);
-      auto rangeWidth = IndexedRange(leftIndex, rightIndex).Width();
+      auto rangeWidth = IndexedRange(info.leftIndex, info.rightIndex).Width();
 
       bitsCount += rangeWidth;
     }
     else
     {
-      auto scanRegister = std::get<0>(info);
-
-      bitsCount += scanRegister->BitsCount();
+      bitsCount += info.scanRegister->BitsCount();
     }
   }
 
@@ -340,6 +334,52 @@ shared_ptr<mast::Chain> AST_SystemModelGenerator::Create_ChainForLinker (const L
 }
 //
 //  End of: AST_SystemModelGenerator::Create_ChainForLinker
+//---------------------------------------------------------------------------
+
+
+//! Creates a path selector for linker
+//!
+//! @note ScanRegister must have already been converted to SystemModel Register
+//!
+//! @param selectorRegistersInfos   Info about ScanMux paths selector
+//! @param selectTable              Select table
+//! @param deselectTable            Deselect table
+//!
+//! @return Created path selector
+shared_ptr<PathSelector> AST_SystemModelGenerator::Create_PathSelector (const vector<SelectorRegistersInfo>& selectorRegistersInfos,
+                                                                        vector<BinaryVector>&&               selectTable,
+                                                                        vector<BinaryVector>&&               deselectTable,
+                                                                        SelectorProperty                     selectorProperties)
+{
+  VirtualRegister virtualRegister;
+
+  for (const auto& selectorItem : selectorRegistersInfos)
+  {
+    auto scanRegister  = selectorItem.scanRegister;
+    auto modelRegister = scanRegister->AssociatedRegister();
+
+    CHECK_VALUE_NOT_NULL(modelRegister, "ScanRegister \""s + scanRegister->Name() + "\" has been found outside any scan chain ==> this is not yet supported");
+
+    modelRegister->SetHoldValue(true);
+
+    auto range = selectorItem.hasRange ? IndexedRange{selectorItem.leftIndex, selectorItem.rightIndex}
+                                       : IndexedRange{modelRegister->BitsCount() - 1u, 0u};
+
+    RegisterSlice registerSlice{modelRegister, range};
+
+    virtualRegister.Append(registerSlice);
+  }
+
+  auto pathsCount   = selectTable.size() - 1u;
+  auto pathSelector = make_shared<DefaultTableBasedPathSelector>(virtualRegister,
+                                                                 pathsCount,
+                                                                 std::move(selectTable),
+                                                                 std::move(deselectTable),
+                                                                 selectorProperties);
+  return pathSelector;
+}
+//
+//  End of: AST_SystemModelGenerator::Create_PathSelector
 //---------------------------------------------------------------------------
 
 
@@ -373,36 +413,37 @@ shared_ptr<PathSelector> AST_SystemModelGenerator::Create_PathSelector (AST_Scan
   auto selectorProperties = firstSelectionIsEmpty ? SelectorProperty::CanSelectNone
                                                   : SelectorProperty::Std;
 
-
-  VirtualRegister virtualRegister;
-
+  // ---------------- Check that all ScanRegisters have been tranformed to SystemModel Register
+  //
+  auto hasNotYetConvertedSelector = false;
   for (const auto& selectorItem : selectorRegisters)
   {
-    auto selectorRegister = std::get<0>(selectorItem);
-    auto hasRange         = std::get<1>(selectorItem);
-    auto leftIndex        = std::get<2>(selectorItem);
-    auto rightIndex       = std::get<3>(selectorItem);
-
-    auto modelRegister    = selectorRegister->AssociatedRegister();
-
-    CHECK_VALUE_NOT_NULL(modelRegister, "Not Yet Supported: Unresolved path selector (when mux selector ScanRegister is not yet transformed to Register)");
-
-    modelRegister->SetHoldValue(true);
-
-    auto range = hasRange ? IndexedRange{leftIndex, rightIndex}
-                          : IndexedRange{modelRegister->BitsCount() - 1u, 0u};
-
-    RegisterSlice registerSlice{modelRegister, range};
-
-    virtualRegister.Append(registerSlice);
+    if (selectorItem.scanRegister->AssociatedRegister() == nullptr)
+    {
+      hasNotYetConvertedSelector = true;
+      break;
+    }
   }
 
-  auto pathsCount   = selectTable.size() - 1u;
-  auto pathSelector = make_shared<DefaultTableBasedPathSelector>(virtualRegister,
-                                                                 pathsCount,
-                                                                 std::move(selectTable),
-                                                                 std::move(deselectTable),
-                                                                 selectorProperties);
+  // ---------------- Create path selector (possibly unresolved yet)
+  //
+  if (hasNotYetConvertedSelector)
+  {
+    auto unresolvedPathSelector = make_shared<UnresolvedPathSelector>();
+    unresolvedPathSelector->SelectionTables(std::move(selectTable), std::move(deselectTable));
+    unresolvedPathSelector->Properties(selectorProperties);
+
+    UnresolvedPathSelectorInfo unresolvedInfo{scanMux, std::move(selectorRegisters), unresolvedPathSelector};
+
+    m_unresolvedPathSelectorsInfos.emplace_back(unresolvedInfo);
+
+    return unresolvedPathSelector;
+  }
+
+  auto pathSelector = Create_PathSelector(selectorRegisters,
+                                          std::move(selectTable),
+                                          std::move(deselectTable),
+                                          selectorProperties);
 
   return pathSelector;
 }
@@ -443,9 +484,6 @@ std::unique_ptr<AccessInterfaceProtocol> AST_SystemModelGenerator::Create_Protoc
 //
 //  End of: AST_SystemModelGenerator::Create_Protocol
 //---------------------------------------------------------------------------
-
-
-
 
 
 
@@ -522,71 +560,17 @@ const AST_Port* AST_SystemModelGenerator::FindScanOutPort (AST_Module* module, c
 //!
 //! @return Ordered Sets of driving ScanRegisters along with whether it has bits span (left and right)
 //!
-vector<tuple<AST_ScanRegister*, bool, uint32_t, uint32_t>>
+vector<AST_SystemModelGenerator::SelectorRegistersInfo>
 AST_SystemModelGenerator::FindSelectorRegisters (const std::vector<Parsers::AST_Signal*>& selectors,
                                                  AST_Module*                              module)
 {
-  vector<tuple<AST_ScanRegister*, bool, uint32_t, uint32_t>> scanRegisters;
+  vector<SelectorRegistersInfo> selectorRegistersInfos;
 
   // ---------------- Follow each selector signal
   //
   for (const auto& selector : selectors)
   {
-    const auto identifier = selector->PortName();
-    const auto portScope  = selector->PortScope();
-
-    AST_ScanRegister* scanRegister = nullptr;
-
-    if (portScope.empty())
-    {
-      scanRegister = module->FindScanRegister(identifier);
-      if (scanRegister == nullptr)  // if nullptr, then it must used DataInPort for connection to a ScanRegisters in another module
-      {
-        auto parentModule = module->ParentModule();
-        auto dataInPort   = module->FindDataInPort(identifier);
-        CHECK_VALUE_NOT_NULL(dataInPort, "Failed to find ScanRegister nor DataInPort for scan_mux in module \""s.append(module->Name()).append("\""));
-
-        auto signal = AST_Helper::SourceSignalOfModulePort(module, identifier);
-        if (signal != nullptr)
-        {
-          scanRegister = AST_Helper::FollowSignalTilScanRegister(parentModule, signal);
-        }
-      }
-    }
-    else
-    {
-      CHECK_VALUE_LTE(portScope.size(), 1u, "Not Yet Supported: Far away selector ScanRegister");
-
-      auto selectorModule = module;
-      for (const auto scopeIdentifier : portScope)
-      {
-        auto foundInstance = selectorModule->FindInstance(scopeIdentifier);
-        if (foundInstance == nullptr)
-        {
-          break;
-        }
-        selectorModule = foundInstance->UniquifiedModule();
-      }
-
-      scanRegister = selectorModule->FindScanRegister(identifier);
-      if (scanRegister == nullptr)  // ==> Probably need to follow DataOutPort source !
-      {
-        auto dataOutPort = selectorModule->FindDataOutPort(identifier);
-        CHECK_VALUE_NOT_NULL(dataOutPort, "Failed to find DataOutPort in module \""s.append(selectorModule->Name()).append("\""));
-
-        auto source = dataOutPort->Source();
-        CHECK_VALUE_NOT_NULL(source, "Failed to find DataOutPort source in module \""s.append(selectorModule->Name()).append("\""));
-
-        auto sourceSignals = source->Signals();
-
-        CHECK_VALUE_EQ(sourceSignals.size(), 1u, "Expecting find DataOutPort source in module \""s.append(selectorModule->Name()).append("\" to be driven by exactly 1 signal"));
-
-        auto portName = sourceSignals.front()->PortName();
-        CHECK_VALUE_NOT_NULL(portName, "Expecting DataOutPort in module \""s.append(selectorModule->Name()).append("\" to have a valid source signal port name"));
-
-        scanRegister = selectorModule->FindScanRegister(portName);
-      }
-    }
+    auto scanRegister = AST_Helper::FollowSignalTilScanRegister(module, selector);
 
     CHECK_VALUE_NOT_NULL(scanRegister, "Failed to find ScanRegister selector for scan_mux in module \""s.append(module->Name()).append("\""));
 
@@ -594,6 +578,7 @@ AST_SystemModelGenerator::FindSelectorRegisters (const std::vector<Parsers::AST_
     uint32_t leftIndex  = 0u;
     uint32_t rightIndex = 0u;
 
+    const auto identifier = selector->PortName();
     if (identifier->IsKind(Kind::VectorIdentifier))
     {
       auto asVectorIdentifier = static_cast<const AST_VectorIdentifier*>(identifier);
@@ -601,10 +586,11 @@ AST_SystemModelGenerator::FindSelectorRegisters (const std::vector<Parsers::AST_
       std::tie(hasRange, leftIndex, rightIndex) = asVectorIdentifier->Range();
     }
 
-    scanRegisters.emplace_back(scanRegister, hasRange, leftIndex, rightIndex);
+    SelectorRegistersInfo info{ scanRegister, hasRange, leftIndex, rightIndex };
+    selectorRegistersInfos.emplace_back(info);
   }
 
-  return scanRegisters;
+  return selectorRegistersInfos;
 }
 //
 //  End of: AST_SystemModelGenerator::FindSelectorRegisters
@@ -677,18 +663,48 @@ void AST_SystemModelGenerator::FollowTopModulePath (AST_Module* topModule, const
               return;
             }
           }
-          else  // ScanMux
+          else  // ScanMux or instance with implicit connection ?
           {
             auto scanMux  = module->FindScanMux(identifier);
-            CHECK_VALUE_NOT_NULL(scanMux, "Failed to find source entity (not a ScanMux)");
 
-            if (scanMux->HasAssociatedLinker()) // ==> If we already passed onto that linker, we must be in context of another linker processing
+            if (scanMux != nullptr)
             {
-              std::tie(module, sourceSignals) = Process_ScanMux_EndOfSelectionPath(scanMux->AssociatedLinker());
+              if (scanMux->HasAssociatedLinker()) // ==> If we already passed onto that linker, we must be in context of another linker processing
+              {
+                std::tie(module, sourceSignals) = Process_ScanMux_EndOfSelectionPath(scanMux->AssociatedLinker());
+              }
+              else
+              {
+                std::tie(module, sourceSignals) = Process_ScanMux_Entry(scanMux, module);
+              }
             }
-            else
+            else   // ==> Instance with implicit connection
             {
-              std::tie(module, sourceSignals) = Process_ScanMux_Entry(scanMux, module);
+              auto instance = module->FindInstance(identifier);
+              CHECK_VALUE_NOT_NULL(instance, "Failed to find source entity \"" + signal->AsText() + "\" (not a ScanRegister, ScanMux nor Instance with implicit connection)");
+
+              auto      instanceModule = instance->UniquifiedModule();
+              AST_Port* port           = nullptr;
+
+              const auto& scanOutPorts = instanceModule->ScanOutPorts();
+              if (!scanOutPorts.empty())
+              {
+                CHECK_VALUE_EQ(scanOutPorts.size(), 1u, "Found usage of implicit connection of \"" + signal->AsText() + "\" with more than one ScanOutPort ==> this is not yet supported");
+                port = scanOutPorts.front();
+              }
+              else
+              {
+                const auto& dataOutPorts = instanceModule->DataOutPorts();
+                if (dataOutPorts.empty())
+                {
+                  CHECK_VALUE_NOT_NULL(instance, "Failed to find ScanOutPort or DataOutPort for instance identified by signal \"" + signal->AsText() + "\"");
+                }
+
+                CHECK_VALUE_EQ(scanOutPorts.size(), 1u, "Found usage of implicit connection of \"" + signal->AsText() + "\" with more than one DataOutPort ==> this is not yet supported");
+                port = dataOutPorts.front();
+              }
+
+              std::tie(module, sourceSignals) = Process_Instance_Entry(instance, instanceModule, port);
             }
           }
         }
@@ -797,12 +813,7 @@ shared_ptr<mast::ParentNode> AST_SystemModelGenerator::Generate_Network (AST_Net
     topNode = chain;
   }
 
-  //! @todo [JFC]-[November/23/2017]: In Generate(): Resolve linkers
-  //!
-  CHECK_VALUE_EMPTY(m_unresolvedPathSelectors, "Not Yet Supported: Unresolved path selector");
-//+  for (const auto& linker : m_unresolvedPathSelectors)
-//+  {
-//+  }
+  ResolveUnresolvedPathSelectors();
 
   AST_AliasConverter::ConvertAliases(topModule, topNode.get());
 
@@ -1304,7 +1315,7 @@ AST_SystemModelGenerator::Process_ScanRegister (AST_ScanRegister* scanRegister)
 //!
 AST_SystemModelGenerator::SelectionTables_t AST_SystemModelGenerator::MakeSelectionTable(const vector<AST_ScanMuxSelection*>& selections,
                                                                                          uint32_t                             expectedBitsCount,
-                                                                                         bool                                 firstSelectionIsEmpty) const
+                                                                                         bool                                 firstSelectionIsEmpty)
 {
   vector<BinaryVector> selectTable;
   selectTable.emplace_back(expectedBitsCount); // Dummy entry for not used path identifier zero
@@ -1348,6 +1359,39 @@ AST_SystemModelGenerator::SelectionTables_t AST_SystemModelGenerator::MakeSelect
 }
 //
 //  End of: AST_SystemModelGenerator::MakeSelectionTable
+//---------------------------------------------------------------------------
+
+
+
+//! Resolves yet unresolved path selector (those for which no SystemModel Register was not not create from ScanRegister
+//!
+void AST_SystemModelGenerator::ResolveUnresolvedPathSelectors ()
+{
+  for (const auto& info : m_unresolvedPathSelectorsInfos)
+  {
+    CHECK_PARAMETER_NOT_NULL(info.scanMux, "Houps: UnresolvedPathSelectorInfo has been badly initialized");
+
+    auto linker = info.scanMux->AssociatedLinker();
+    CHECK_VALUE_NOT_NULL(linker, "Houps: Cannot resolve a path selector when no Linker is associated with ScanMux \"" + info.scanMux->Name() + "\"");
+
+    // ---------------- Create a proper PathSelector
+    //
+    const auto& selectorRegistersInfos = info.selectorRegistersInfos;
+    auto        unresolvedPathSelector = info.unresolvedPathSelector;
+    auto        properties             = unresolvedPathSelector->Properties();
+
+    auto pathSelector = Create_PathSelector(selectorRegistersInfos,
+                                            unresolvedPathSelector->MovedSelectTable(),
+                                            unresolvedPathSelector->MovedDeselectTable(),
+                                            properties);
+
+    // ---------------- Replace Linker temporary (unresolved) PathSelector
+    //
+    linker->ReplacePathSelector(pathSelector);
+  }
+}
+//
+//  End of: AST_SystemModelGenerator::ResolveUnresolvedPathSelectors
 //---------------------------------------------------------------------------
 
 

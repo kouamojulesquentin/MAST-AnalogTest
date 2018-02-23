@@ -29,11 +29,12 @@ namespace
 {
 //! Sets mode register chunk successively to red, green and blue values
 //!
-void DoTest_Modes (string_view registerPath)
+void DoTest_Modes ()
 {
   auto red           = "4'b0011"sv;
   auto green         = "4'b0100"sv;
   auto blue          = "4'b1000"sv;
+  auto registerPath  = "mode"sv;
 
   for (const auto& color : {red, green, blue})
   {
@@ -126,9 +127,8 @@ bool RegisterAlgorithms ()
 
   // ---------------- Do register algorithm(s) with a name
   //
-  repo.RegisterAlgorithm("Test_Modes_1", []() { DoTest_Modes("Daisy.WI1.mode"sv); });
-  repo.RegisterAlgorithm("Test_Modes_2", []() { DoTest_Modes("Daisy.WI2.mode"sv); });
-  repo.RegisterAlgorithm("Test_Data",    []() { DoTest_Data ("Daisy.WI2"sv); });
+  repo.RegisterAlgorithm("Test_Modes", []() { DoTest_Modes(); });
+  repo.RegisterAlgorithm("Test_Data",  []() { DoTest_Data ("Daisy.WI2"sv); });
 
   return true;
 }

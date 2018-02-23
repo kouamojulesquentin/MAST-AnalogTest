@@ -17,8 +17,6 @@ Module Tap_and_Daisy_3WI
   ScanInPort SI;
   ScanOutPort SO { Source WI3.SO; }
 
-  Attribute PDL = "Test_Modes_1";
-  Attribute PDL = "Test_Modes_2";
   Attribute PDL = "Test_Data";
   Instance Daisy Of Daisy_3WI {  }
 }

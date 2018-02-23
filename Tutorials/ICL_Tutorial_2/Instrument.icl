@@ -6,6 +6,8 @@ Module Instrument
   Alias okay      = DO[0]            { RefEnum PassFail; }
   Alias done      = DO[1]            { RefEnum YesNo; }
 
+  Attribute PDL = "Test_Modes";
+
   Enum PassFail
   {
     Pass = 1'b1;

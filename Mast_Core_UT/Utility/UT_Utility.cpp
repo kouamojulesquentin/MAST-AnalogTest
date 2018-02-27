@@ -1035,6 +1035,52 @@ void UT_Utility::test_ToMilliseconds_SupportedStr ()
 }
 
 
+#include "StaticTestSpy.hpp"
+
+
+//! Checks Utility::CHECK_VALUE_EQ() when assertion succeeds
+//!
+void UT_Utility::test_CHECK_VALUE_EQ_Success ()
+{
+  // ---------------- Setup
+  //
+  auto value = 10;
+  StaticTestSpy::ResetAll();
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS_NOTHING (CHECK_VALUE_EQ(value, 10, StaticTestSpy("Message")));
+
+  // ---------------- Verify
+  //
+//+  TS_ASSERT_EQUALS (StaticTestSpy::GetNbAnyConstructorsCall(),  0u);
+//+  TS_ASSERT_EQUALS (StaticTestSpy::GetNbStringViewConvertion(), 0u);
+}
+
+
+//! Checks Utility::CHECK_VALUE_EQ() when assertion fails
+//!
+void UT_Utility::test_CHECK_VALUE_EQ_Failure ()
+{
+  // ---------------- Setup
+  //
+  auto value = 10;
+  StaticTestSpy::ResetAll();
+
+  // ---------------- Exercise & Verify
+  //
+  TS_ASSERT_THROWS_ASSERT (CHECK_VALUE_EQ(value, 12, StaticTestSpy("Message for CHECK_VALUE_EQ")),
+                           std::runtime_error exc,
+                           TS_ASSERT_CONTAINS(exc.what(), "Message for CHECK_VALUE_EQ")
+                          );
+
+  // ---------------- Verify
+  //
+  TS_ASSERT_EQUALS (StaticTestSpy::GetNbAnyConstructorsCall(),  1u);
+  TS_ASSERT_EQUALS (StaticTestSpy::GetNbStringViewConvertion(), 1u);
+}
+
+
 
 //===========================================================================
 // End of UT_Utility.cpp

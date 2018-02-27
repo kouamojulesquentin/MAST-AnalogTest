@@ -11,12 +11,11 @@
 //!
 //===========================================================================
 
-
-
 #ifndef STATICTESTSPY_H__6C0C2CC4_7AA7_4E43_EEA7_DD8560B6EB75__INCLUDED_
   #define STATICTESTSPY_H__6C0C2CC4_7AA7_4E43_EEA7_DD8560B6EB75__INCLUDED_
 
 #include <string>
+#include <experimental/string_view>
 #include <sstream>
 #include <atomic>
 #include <cxxtest/ValueTraits.h>
@@ -31,9 +30,19 @@ class StaticTestSpy
   public:
            StaticTestSpy() noexcept;
   explicit StaticTestSpy(int value) noexcept;
+  explicit StaticTestSpy(std::string stringValue) noexcept;
            StaticTestSpy(const StaticTestSpy& other) noexcept;
            StaticTestSpy(StaticTestSpy&&      other) noexcept;
   virtual ~StaticTestSpy() noexcept;
+
+  //! "Converts" spy to a c-style string (e.g. to form a messsage)
+  //!
+  operator const char*() const { ++sm_nbCStringConvertionCall; return m_stringValue.c_str(); }
+
+
+  //! "Converts" spy to a string_view (e.g. to form a messsage)
+  //!
+  operator std::experimental::string_view () const { ++sm_nbStringViewConvertionCall; return m_stringValue; }
 
   //! Returns current value
   //!
@@ -170,6 +179,14 @@ class StaticTestSpy
   //!
   static size_t GetNbSetValueCall() noexcept;
 
+  //! Returns the number of times operator string_view() has been called
+  //!
+  static size_t GetNbStringViewConvertion () noexcept;
+
+  //! Returns the number of times operator const char*() has been called
+  //!
+  static size_t GetNbCStringConvertion () noexcept;
+
   //! Returns the number of times operator=(size_t) has been called
   //!
   static size_t GetNbValueAssignmentCall () noexcept;
@@ -189,24 +206,27 @@ class StaticTestSpy
   // ---------------- Private  Fields
   //
   private:
-  int m_value;  //!< Instance inner value
+  int         m_value;       //!< Instance inner value
+  std::string m_stringValue; //!< Value when initialized with a string (e.g. a message)
 
   static const int sm_defaultValue; //!< Instances default (inner) value
 
-  static std::atomic<size_t> sm_nbAnyConstructorsCall;     //!< Counts the number of call to StaticTestSpy constructorS (any one of them)
-  static std::atomic<size_t> sm_nbCopyAssignmentCall;      //!< Counts the number of call to operator=(StaticTestSpy&)
-  static std::atomic<size_t> sm_nbMoveAssignmentCall;      //!< Counts the number of call to operator=(StaticTestSpy&&)
-  static std::atomic<size_t> sm_nbCopyConstructorCall;     //!< Counts the number of call to StaticTestSpy copy constructor
-  static std::atomic<size_t> sm_nbMoveConstructorCall;     //!< Counts the number of call to StaticTestSpy move constructor
-  static std::atomic<size_t> sm_nbDefaultConstructorsCall; //!< Counts the number of call to StaticTestSpy default constructor
-  static std::atomic<size_t> sm_nbDestructorCall;          //!< Counts the number of call to StaticTestSpy destructor
-  static std::atomic<size_t> sm_nbEqualToOperatorCall;     //!< Counts the number of call to operator==(StaticTestSpy)
-  static std::atomic<size_t> sm_nbGetValueCall;            //!< Counts the number of call to GetValue
-  static std::atomic<size_t> sm_nbNotEqualToOperatorCall;  //!< Counts the number of call to operator!=(StaticTestSpy)
-  static std::atomic<size_t> sm_nbResetCall;               //!< Counts the number of call to Reset
-  static std::atomic<size_t> sm_nbSetValueCall;            //!< Counts the number of call to SetValue
-  static std::atomic<size_t> sm_nbValueAssignmentCall;     //!< Counts the number of call to operator=(int)
-  static std::atomic<size_t> sm_nbValueConstructorCall;    //!< Counts the number of call to StaticTestSpy constructor with a value parameter
+  static std::atomic<size_t> sm_nbAnyConstructorsCall;      //!< Counts the number of call to StaticTestSpy constructorS (any one of them)
+  static std::atomic<size_t> sm_nbCopyAssignmentCall;       //!< Counts the number of call to operator=(StaticTestSpy&)
+  static std::atomic<size_t> sm_nbMoveAssignmentCall;       //!< Counts the number of call to operator=(StaticTestSpy&&)
+  static std::atomic<size_t> sm_nbCopyConstructorCall;      //!< Counts the number of call to StaticTestSpy copy constructor
+  static std::atomic<size_t> sm_nbMoveConstructorCall;      //!< Counts the number of call to StaticTestSpy move constructor
+  static std::atomic<size_t> sm_nbDefaultConstructorsCall;  //!< Counts the number of call to StaticTestSpy default constructor
+  static std::atomic<size_t> sm_nbDestructorCall;           //!< Counts the number of call to StaticTestSpy destructor
+  static std::atomic<size_t> sm_nbEqualToOperatorCall;      //!< Counts the number of call to operator==(StaticTestSpy)
+  static std::atomic<size_t> sm_nbGetValueCall;             //!< Counts the number of call to GetValue
+  static std::atomic<size_t> sm_nbNotEqualToOperatorCall;   //!< Counts the number of call to operator!=(StaticTestSpy)
+  static std::atomic<size_t> sm_nbResetCall;                //!< Counts the number of call to Reset
+  static std::atomic<size_t> sm_nbStringViewConvertionCall; //!< Counts the number of call to operator string_view()
+  static std::atomic<size_t> sm_nbCStringConvertionCall;    //!< Counts the number of call to operator const char*()
+  static std::atomic<size_t> sm_nbSetValueCall;             //!< Counts the number of call to SetValue
+  static std::atomic<size_t> sm_nbValueAssignmentCall;      //!< Counts the number of call to operator=(int)
+  static std::atomic<size_t> sm_nbValueConstructorCall;     //!< Counts the number of call to StaticTestSpy constructor with a value parameter
 
   static const  StaticTestSpy sm_default;     //!< Singleton that holds the default value
 };

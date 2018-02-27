@@ -16,20 +16,22 @@
 
 const int StaticTestSpy::sm_defaultValue = 0xFF55AA00;
 
-std::atomic<size_t>    StaticTestSpy::sm_nbAnyConstructorsCall     (0);
-std::atomic<size_t>    StaticTestSpy::sm_nbCopyAssignmentCall      (0);
-std::atomic<size_t>    StaticTestSpy::sm_nbMoveAssignmentCall      (0);
-std::atomic<size_t>    StaticTestSpy::sm_nbCopyConstructorCall     (0);
-std::atomic<size_t>    StaticTestSpy::sm_nbMoveConstructorCall     (0);
-std::atomic<size_t>    StaticTestSpy::sm_nbDefaultConstructorsCall (0);
-std::atomic<size_t>    StaticTestSpy::sm_nbValueConstructorCall    (0);
-std::atomic<size_t>    StaticTestSpy::sm_nbDestructorCall          (0);
-std::atomic<size_t>    StaticTestSpy::sm_nbEqualToOperatorCall     (0);
-std::atomic<size_t>    StaticTestSpy::sm_nbGetValueCall            (0);
-std::atomic<size_t>    StaticTestSpy::sm_nbNotEqualToOperatorCall  (0);
-std::atomic<size_t>    StaticTestSpy::sm_nbResetCall               (0);
-std::atomic<size_t>    StaticTestSpy::sm_nbSetValueCall            (0);
-std::atomic<size_t>    StaticTestSpy::sm_nbValueAssignmentCall     (0);
+std::atomic<size_t> StaticTestSpy::sm_nbAnyConstructorsCall      (0);
+std::atomic<size_t> StaticTestSpy::sm_nbCopyAssignmentCall       (0);
+std::atomic<size_t> StaticTestSpy::sm_nbMoveAssignmentCall       (0);
+std::atomic<size_t> StaticTestSpy::sm_nbCopyConstructorCall      (0);
+std::atomic<size_t> StaticTestSpy::sm_nbMoveConstructorCall      (0);
+std::atomic<size_t> StaticTestSpy::sm_nbDefaultConstructorsCall  (0);
+std::atomic<size_t> StaticTestSpy::sm_nbValueConstructorCall     (0);
+std::atomic<size_t> StaticTestSpy::sm_nbDestructorCall           (0);
+std::atomic<size_t> StaticTestSpy::sm_nbEqualToOperatorCall      (0);
+std::atomic<size_t> StaticTestSpy::sm_nbGetValueCall             (0);
+std::atomic<size_t> StaticTestSpy::sm_nbNotEqualToOperatorCall   (0);
+std::atomic<size_t> StaticTestSpy::sm_nbResetCall                (0);
+std::atomic<size_t> StaticTestSpy::sm_nbStringViewConvertionCall (0);
+std::atomic<size_t> StaticTestSpy::sm_nbCStringConvertionCall    (0);
+std::atomic<size_t> StaticTestSpy::sm_nbSetValueCall             (0);
+std::atomic<size_t> StaticTestSpy::sm_nbValueAssignmentCall      (0);
 
 const StaticTestSpy StaticTestSpy::sm_default(StaticTestSpy::sm_defaultValue);
 
@@ -47,6 +49,14 @@ StaticTestSpy::StaticTestSpy (int value) noexcept
   ++sm_nbAnyConstructorsCall;
   ++sm_nbValueConstructorCall;
 }
+
+StaticTestSpy::StaticTestSpy (std::string stringValue) noexcept
+: m_stringValue (stringValue)
+{
+  ++sm_nbAnyConstructorsCall;
+  ++sm_nbValueConstructorCall;
+}
+
 
 StaticTestSpy::StaticTestSpy (const StaticTestSpy& other) noexcept
 : m_value (other.m_value)
@@ -186,6 +196,21 @@ size_t StaticTestSpy::GetNbSetValueCall () noexcept
 }
 
 
+//! Returns the number of times operator string_view() has been called
+//!
+size_t StaticTestSpy::GetNbStringViewConvertion () noexcept
+{
+  return sm_nbStringViewConvertionCall;
+}
+
+
+//! Returns the number of times operator const char*() has been called
+//!
+size_t StaticTestSpy::GetNbCStringConvertion () noexcept
+{
+  return sm_nbCStringConvertionCall;
+}
+
 
 //! Returns the number of times operator=(size_t) has been called
 //!
@@ -292,20 +317,22 @@ void StaticTestSpy::Reset () noexcept
 //!
 void StaticTestSpy::ResetAll () noexcept
 {
-  sm_nbAnyConstructorsCall     = 0;
-  sm_nbDefaultConstructorsCall = 0;
-  sm_nbValueConstructorCall    = 0;
-  sm_nbCopyAssignmentCall      = 0;
-  sm_nbMoveAssignmentCall      = 0;
-  sm_nbCopyConstructorCall     = 0;
-  sm_nbMoveConstructorCall     = 0;
-  sm_nbDestructorCall          = 0;
-  sm_nbEqualToOperatorCall     = 0;
-  sm_nbGetValueCall            = 0;
-  sm_nbNotEqualToOperatorCall  = 0;
-  sm_nbResetCall               = 0;
-  sm_nbSetValueCall            = 0;
-  sm_nbValueAssignmentCall     = 0;
+  sm_nbAnyConstructorsCall      = 0;
+  sm_nbDefaultConstructorsCall  = 0;
+  sm_nbValueConstructorCall     = 0;
+  sm_nbCopyAssignmentCall       = 0;
+  sm_nbMoveAssignmentCall       = 0;
+  sm_nbCopyConstructorCall      = 0;
+  sm_nbMoveConstructorCall      = 0;
+  sm_nbDestructorCall           = 0;
+  sm_nbEqualToOperatorCall      = 0;
+  sm_nbGetValueCall             = 0;
+  sm_nbNotEqualToOperatorCall   = 0;
+  sm_nbResetCall                = 0;
+  sm_nbSetValueCall             = 0;
+  sm_nbStringViewConvertionCall = 0;
+  sm_nbCStringConvertionCall    = 0;
+  sm_nbValueAssignmentCall      = 0;
 }
 
 

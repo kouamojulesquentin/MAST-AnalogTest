@@ -91,6 +91,11 @@ class UT_Utility : public CxxTest::TestSuite
   void test_ToMilliseconds_BadStr ();
   void test_ToMilliseconds_SupportedStr ();
 
+  // ---------------- Assertion Macros
+  //
+  void test_CHECK_VALUE_EQ_Success ();
+  void test_CHECK_VALUE_EQ_Failure ();
+
   // ================ Other Methods ================
 
   void setUp(); //!< Initializes test (called for each test)

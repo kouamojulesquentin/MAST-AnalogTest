@@ -162,7 +162,7 @@ class AST_SystemModelGenerator final
 
 
   void AssignNewNode                     (std::shared_ptr<mast::SystemModelNode> node);
-  bool AssignNodesToLinkerFirstSelection (std::shared_ptr<mast::SystemModelNode> commonLinkerNode);
+  bool AssignNodesToLinkerFirstSelection ();
 
   std::string ResolveBSDL_FilePath (const std::string& bsdlName);
   void        ResolveUnresolvedPathSelectors ();
@@ -186,10 +186,11 @@ class AST_SystemModelGenerator final
     std::stack<InstanceContext> instancesContext;                 //!< Processing contexts downto instance in which the ScanMux is found
     AST_ScanMux*                processedScanMux       = nullptr; //!< Scan mux being processed
     size_t                      processedSelectionId   = 0;       //!< Offset in Selection vector (to detect how many children must be associated to the Linker)
-    size_t                      linkerNodesLevel_first = 0;       //!< To know how many children to assign to Linker first selection
-    size_t                      linkerNodesLevel       = 0;       //!< To know how many children to assign to Linker selections
+    size_t                      nodesLevelAfterCreate  = 0;       //!< To know how many children to assign to Linker first selection
+    size_t                      nodesLevelAfter1stPath = 0;       //!< To know how many children to assign to Linker selections
     mast::Linker*               linker                 = nullptr; //!< Created Linker
     mast::ParentNode*           linkerParentNode       = nullptr; //!< Parent node of linker
+    mast::SystemModelNode*      commonLinkerNode       = nullptr; //!< This is the node that comes just before a Linker (will not be considered for Linker path 0)
   };
 
 
@@ -204,15 +205,22 @@ class AST_SystemModelGenerator final
 
 
 
-  using CreatedNodes_t = std::tuple<std::shared_ptr<mast::SystemModelNode>, mast::ParentNode*>; // Created node and its parent node if not linker a linker child
+  //! To stack created nodes and relation to their parent node
+  //!
+  struct CreatedNodes final
+  {
+    std::shared_ptr<mast::SystemModelNode> node;       //!< Created node
+    mast::ParentNode*                      parentNode; //!< Parent node if not linker a linker child
+  };
+
 
   std::shared_ptr<mast::SystemModel>        m_systemModel;                                //!< SystemModel currently being built
   std::unique_ptr<mast::SystemModelBuilder> m_builder;                                    //!< Helper to build SystemModel nodes
   std::shared_ptr<mast::ParentNode>         m_parsedTopNode;                              //!< SystemModel tree build from ICL file
-  std::stack<CreatedNodes_t>                m_createdNodes;                               //!< Created children and their default parent not yet attached to its parent (in Linker processing context)
+  std::vector<CreatedNodes>                 m_createdNodes;                               //!< Created children and their default parent not yet attached to its parent (in Linker processing context)
   std::vector<UnresolvedPathSelectorInfo>   m_unresolvedPathSelectorsInfos;               //!< Info about unresolved path selector for Linkers (those for which selector Register(s) where not yet created when Linkers were)
   std::stack<InstanceContext>               m_instancesContext;                           //!< Current module/instance contexts (represents current instanciation path)
-  std::stack<LinkerContext>                 m_linkersContext;                             //!< To recover processing context for linkers (need only access to last one)
+  std::vector<LinkerContext>                m_linkersContext;                             //!< To recover processing context for linkers (need only access to last one)
   std::unordered_map<mast::ParentNode*,     mast::SystemModelNode*> m_parentsSplicePoint; //!< Used for splicing nodes before Linkers
   AST_Network*                              m_network               = nullptr;            //!< Test network AST used to generate SystemModel tree
   std::vector<mast::AppFunctionNameAndNode> m_algorithmAssociations;                      //!< Associates a PDL algorithm identifier to a SystemModelNode
@@ -220,7 +228,7 @@ class AST_SystemModelGenerator final
   std::string                               m_protocolParameters;                         //!< Optional protocol parameters for JTAG Tap (a protocol name must be defined)
   std::vector<std::string>                  m_filesSearchPaths;                           //!< Paths to search files (e.g. BSDL file)
 
-  static const std::vector<AST_Signal*>                      sm_noSignals;              //!< This is internal marker for "no source signals"
+  static const std::vector<AST_Signal*>     sm_noSignals;                                 //!< This is internal marker for "no source signals"
 };
 //
 //  End of AST_SystemModelGenerator class declaration

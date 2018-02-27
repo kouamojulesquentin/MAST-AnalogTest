@@ -106,10 +106,10 @@ void AST_SystemModelGenerator::AppendCreatedNodesToParent (ParentNode* parent, s
 {
   while (m_createdNodes.size() > levelThreshold)
   {
-    auto child = std::get<0>(m_createdNodes.top());
+    auto child = m_createdNodes.back().node;
 
     parent->AppendChild(child);
-    m_createdNodes.pop();
+    m_createdNodes.pop_back();
   }
 }
 //
@@ -134,7 +134,7 @@ void AST_SystemModelGenerator::AssignNewNode (shared_ptr<SystemModelNode> node)
 
   if (parentMayBeLinker || contextIsTopModule)
   {
-    m_createdNodes.emplace(node, parentNode);
+    m_createdNodes.push_back({node, parentNode});
   }
   else
   {
@@ -170,117 +170,137 @@ void AST_SystemModelGenerator::AssignNewNode (shared_ptr<SystemModelNode> node)
 //!               ==> They must also been inserted AFTER nodes assigned when dealing with Linker 1st selection (traversing connectivity forward)
 //! @endinternal
 //!
-//! @param commonLinkerNode   The first SystemModelNode encounter following all linker selections path
-//!
 //! @return True when first Linker selection is empty, false otherwise
-bool AST_SystemModelGenerator::AssignNodesToLinkerFirstSelection (shared_ptr<SystemModelNode> commonLinkerNode)
+bool AST_SystemModelGenerator::AssignNodesToLinkerFirstSelection ()
 {
   auto firstSelectionIsEmpty = true;
 
-  auto& linkerContext          = m_linkersContext.top();
+  auto& linkerContext          = m_linkersContext.back();
   auto  linker                 = linkerContext.linker;
-  auto  linkerNodesLevel_first = linkerContext.linkerNodesLevel_first;
+  auto  nodesLevelAfterCreate  = linkerContext.nodesLevelAfterCreate;
+  auto  nodesLevelAfter1stPath = linkerContext.nodesLevelAfter1stPath;
+  auto  commonLinkerNode       = linkerContext.commonLinkerNode;
 
-  CHECK_VALUE_GTE(m_createdNodes.size(), linkerNodesLevel_first, "Have appended more nodes than expected (for 1st Linker selection)");
-  auto createdForFirst = m_createdNodes.size() - linkerNodesLevel_first;
+  CHECK_VALUE_GTE(m_createdNodes.size(), nodesLevelAfterCreate, "Have appended more nodes than expected (for 1st Linker selection)");
+  auto maxCreateForFirst = nodesLevelAfter1stPath - nodesLevelAfterCreate;
 
   // Adjust real child count for 1st selection (dealing with common node on paths)
   //
-  if (createdForFirst != 0)
+  if (maxCreateForFirst == 0)
   {
-    // 2nd part extraction
-    stack<CreatedNodes_t>  nodesAsLinkerSiblings;
-    while (m_createdNodes.size() > linkerNodesLevel_first)
-    {
-      auto nodeAndParent = m_createdNodes.top();
-      nodesAsLinkerSiblings.push(nodeAndParent);
-      m_createdNodes.pop();
+    return firstSelectionIsEmpty;
+  }
 
-      auto node = std::get<0>(nodeAndParent);
-      if (node == commonLinkerNode)
+  // 2nd part extraction
+  stack<CreatedNodes>  nodesAsLinkerSiblings;
+  auto createdAfterFirst = m_createdNodes.size() - nodesLevelAfter1stPath;
+  CHECK_VALUE_EQ(createdAfterFirst, 0, "Houps: Some created nodes have not being assigned to Linker derivations (after 1st)");
+
+  auto foundCommonNode =    (commonLinkerNode != nullptr)
+                            && (std::find_if(m_createdNodes.cbegin(),
+                                             m_createdNodes.cend(),
+                                             [commonLinkerNode](const auto& item) { return item.node.get() == commonLinkerNode; })
+                                != m_createdNodes.cend());
+
+  // Extracts linker previous siblings
+  //
+  if (foundCommonNode)
+  {
+    while (m_createdNodes.size() > nodesLevelAfterCreate)
+    {
+      auto nodeAndParent = m_createdNodes.back();
+      nodesAsLinkerSiblings.push(nodeAndParent);
+      m_createdNodes.pop_back();
+
+      if (nodeAndParent.node.get() == commonLinkerNode)
       {
         break;
       }
     }
+  }
 
-    // 1st part extraction
-    stack<shared_ptr<SystemModelNode>>  nodesForFirstSelection;
-    while (m_createdNodes.size() > linkerNodesLevel_first)
+  // 1st part extraction (nodes for 1st selection)
+  stack<shared_ptr<SystemModelNode>>  nodesForFirstSelection;
+  while (m_createdNodes.size() > nodesLevelAfterCreate)
+  {
+    auto node = m_createdNodes.back().node;  // Get rid of "alternate" parent node (this is in fact resolved as the Linker)
+    if (node.get() == commonLinkerNode)
     {
-      auto node = std::get<0>(m_createdNodes.top());  // Get rid of "alternate" parent node (this is in fact resolved as the Linker)
+      nodesAsLinkerSiblings.push(m_createdNodes.back());
+    }
+    else
+    {
       nodesForFirstSelection.push(node);
-      m_createdNodes.pop();
     }
+    m_createdNodes.pop_back();
+  }
 
-    // Append 1st part Linker 1st selection (inserting a Chain when there is more than a single node)
-    createdForFirst = nodesForFirstSelection.size();
-    if (createdForFirst != 0)
+  // Append 1st part Linker 1st selection (inserting a Chain when there is more than a single node)
+  auto createdForFirst = nodesForFirstSelection.size();
+  if (createdForFirst != 0)
+  {
+    firstSelectionIsEmpty = false;
+    if (createdForFirst == 1)
     {
-      firstSelectionIsEmpty = false;
-      if (createdForFirst == 1)
-      {
-        linker->PrependChild(nodesForFirstSelection.top());
-      }
-      else
-      {
-        auto chain = Create_ChainForLinker(linker, 0);
-        linker->PrependChild(chain);
-        while (!nodesForFirstSelection.empty())
-        {
-          chain->PrependChild(nodesForFirstSelection.top());
-          nodesForFirstSelection.pop();
-        }
-      }
+      linker->PrependChild(nodesForFirstSelection.top());
     }
-
-    // Restore 2nd part to not yet assigned nodes stack
-    // or prepend or save for splicing them as linker, previous, sibblings
-    stack<CreatedNodes_t>  nodesToSpliceAsLinkerPreviousSiblings;
-    auto linkerParentNode = linkerContext.linkerParentNode;
-    while (!nodesAsLinkerSiblings.empty())
+    else
     {
-      auto& nodeAndParent = nodesAsLinkerSiblings.top();
-
-      auto node       = std::get<0>(nodeAndParent);
-      auto parentNode = std::get<1>(nodeAndParent);
-      CHECK_VALUE_NOT_NULL(parentNode, "Parent node must always be set in m_createdNodes stack");
-
-      if (parentNode == linkerParentNode)  // Linker sibling ?
+      auto chain = Create_ChainForLinker(linker, 0);
+      linker->PrependChild(chain);
+      while (!nodesForFirstSelection.empty())
       {
-        auto hasAlreadySplicePoint = m_parentsSplicePoint.find(parentNode) != m_parentsSplicePoint.end();
-        if (hasAlreadySplicePoint)
-        {
-          nodesToSpliceAsLinkerPreviousSiblings.push(nodeAndParent);
-        }
-        else
-        {
-          parentNode->PrependChild(node);                        // Create splice point (can only splice after some node)
-          m_parentsSplicePoint.insert({parentNode, node.get()}); // Save splice point
-        }
+        chain->PrependChild(nodesForFirstSelection.top());
+        nodesForFirstSelection.pop();
       }
-      else
-      {
-        m_createdNodes.push(nodeAndParent);
-      }
-      nodesAsLinkerSiblings.pop();
-    }
-
-    // Splice, remaining, linker siblings
-    while (!nodesToSpliceAsLinkerPreviousSiblings.empty())
-    {
-      auto& nodeAndParent = nodesToSpliceAsLinkerPreviousSiblings.top();
-
-      auto node       = std::get<0>(nodeAndParent);
-      auto parentNode = std::get<1>(nodeAndParent);
-
-      auto spliceNode = m_parentsSplicePoint[parentNode];
-      CHECK_PARAMETER_NOT_NULL(spliceNode, "Houps, there should be a valid splice point node");
-
-      spliceNode->SpliceSibling(node);
-      nodesToSpliceAsLinkerPreviousSiblings.pop();
     }
   }
 
+  // Restore 2nd part to not yet assigned nodes stack
+  // or prepend or save for splicing them as linker, previous, siblings (sharing same parent node)
+  stack<CreatedNodes>  nodesToSpliceAsLinkerPreviousSiblings;
+  auto linkerParentNode = linkerContext.linkerParentNode;
+  auto processingSibblings = true;
+  while (!nodesAsLinkerSiblings.empty())
+  {
+    auto& nodeAndParent = nodesAsLinkerSiblings.top();
+
+    auto node       = nodeAndParent.node;
+    auto parentNode = nodeAndParent.parentNode;
+    CHECK_VALUE_NOT_NULL(parentNode, "Parent node must always be set in m_createdNodes stack");
+
+    if (processingSibblings && (parentNode == linkerParentNode))  // Linker sibling with same parent node must be contiguous
+    {
+      auto hasAlreadySplicePoint = m_parentsSplicePoint.find(parentNode) != m_parentsSplicePoint.end();
+      if (hasAlreadySplicePoint)
+      {
+        nodesToSpliceAsLinkerPreviousSiblings.push(nodeAndParent);
+      }
+      else
+      {
+        parentNode->PrependChild(node);                        // Create splice point (can only splice after some node)
+        m_parentsSplicePoint.insert({parentNode, node.get()}); // Save splice point
+      }
+    }
+    else
+    {
+      processingSibblings = false;   // From now on, there will be no more linker (previous) siblings
+      m_createdNodes.push_back(nodeAndParent);
+    }
+    nodesAsLinkerSiblings.pop();
+  }
+
+  // Splice, remaining, linker siblings
+  while (!nodesToSpliceAsLinkerPreviousSiblings.empty())
+  {
+    auto& nodeAndParent = nodesToSpliceAsLinkerPreviousSiblings.top();
+
+    auto spliceNode = m_parentsSplicePoint[nodeAndParent.parentNode];
+    CHECK_PARAMETER_NOT_NULL(spliceNode, "Houps, there should be a valid splice point node");
+
+    spliceNode->SpliceSibling(nodeAndParent.node);
+    nodesToSpliceAsLinkerPreviousSiblings.pop();
+  }
   return firstSelectionIsEmpty;
 }
 //
@@ -1159,6 +1179,8 @@ AST_SystemModelGenerator::Process_ScanMux_Entry (AST_ScanMux* scanMux, AST_Modul
 
   auto& instanceContext  = m_instancesContext.top();
   auto  linkerParentNode = instanceContext.parentNode;
+//+  auto  linkerParentNode = (instanceContext.linkerNode != nullptr) ? instanceContext.linkerNode
+//+                                                                   : instanceContext.parentNode;
 
   instanceContext.linkerNode = linker.get();
 
@@ -1167,12 +1189,12 @@ AST_SystemModelGenerator::Process_ScanMux_Entry (AST_ScanMux* scanMux, AST_Modul
   linkerContext.instancesContext       = m_instancesContext;
   linkerContext.processedScanMux       = scanMux;
   linkerContext.processedSelectionId   = 0;
-  linkerContext.linkerNodesLevel_first = m_createdNodes.size();
-  linkerContext.linkerNodesLevel       = m_createdNodes.size();
+  linkerContext.nodesLevelAfterCreate  = m_createdNodes.size();
+  linkerContext.nodesLevelAfter1stPath = 0u;
   linkerContext.linker                 = linker.get();
   linkerContext.linkerParentNode       = linkerParentNode;
 
-  m_linkersContext.push(std::move(linkerContext));
+  m_linkersContext.push_back(std::move(linkerContext));
 
   const auto& sourceSignals = scanMux->Selections().front()->SelectedSignals();
   return make_tuple(module, cref(sourceSignals));
@@ -1188,7 +1210,7 @@ AST_SystemModelGenerator::Process_ScanMux_Entry (AST_ScanMux* scanMux, AST_Modul
 
 //! Does what is needed to process when we reached end of ScanMux selection
 //!
-//! @param commonLinkerNode   The first SystemModelNode encounter following all linker selections path
+//! @param commonLinkerNode   The first, common, SystemModelNode encounter following all linker selections path
 //!
 //! @return New processing context
 //!
@@ -1197,30 +1219,49 @@ AST_SystemModelGenerator::Process_ScanMux_EndOfSelectionPath (shared_ptr<mast::S
 {
   CHECK_VALUE_NOT_EMPTY(m_linkersContext, "There is no linker context to process");
 
-  auto&       linkerContext        = m_linkersContext.top();
-  auto        linker               = linkerContext.linker;
-  auto        scanMux              = linkerContext.processedScanMux;
-  auto        createdNodesLevel    = linkerContext.linkerNodesLevel;
-  auto        processedSelectionId = linkerContext.processedSelectionId;
-  auto const& selections           = scanMux->Selections();
-  auto        module               = linkerContext.instancesContext.top().parentModule;
+  auto&       linkerContext          = m_linkersContext.back();
+  auto        linker                 = linkerContext.linker;
+  auto        scanMux                = linkerContext.processedScanMux;
+  auto        nodesLevelAfter1stPath = linkerContext.nodesLevelAfter1stPath;
+  auto        processedSelectionId   = linkerContext.processedSelectionId;
+  auto const& selections             = scanMux->Selections();
+  auto        module                 = linkerContext.instancesContext.top().parentModule;
 
-  CHECK_VALUE_GTE(m_createdNodes.size(), createdNodesLevel, "Have appended more nodes than expected");
-  auto newCreated = m_createdNodes.size() - createdNodesLevel;
+  // ---------------- Save Common Linker Node in proper context (most recent Linker processing id 1)
+  //
+  if (commonLinkerNode != nullptr)
+  {
+    auto contextPos = std::find_if(m_linkersContext.rbegin(), m_linkersContext.rend(), [](const auto& context) { return context.processedSelectionId == 1u; });
+    if (contextPos != m_linkersContext.rend())
+    {
+      if (contextPos->commonLinkerNode == nullptr)
+      {
+        contextPos->commonLinkerNode = commonLinkerNode.get();
+      }
+      else
+      {
+        CHECK_VALUE_EQ(contextPos->commonLinkerNode, commonLinkerNode.get(), "Houps, expecting same Linker \"common node\" ");
+      }
+    }
+  }
+
+
+  CHECK_VALUE_GTE(m_createdNodes.size(), nodesLevelAfter1stPath, "Have appended more nodes than expected");
+  auto newCreated = m_createdNodes.size() - nodesLevelAfter1stPath;
 
   if (processedSelectionId == 0)
   {
-    linkerContext.linkerNodesLevel = m_createdNodes.size();
+    linkerContext.nodesLevelAfter1stPath = m_createdNodes.size();
   }
   else if (newCreated > 1u)
   {
     auto chain = Create_ChainForLinker(linker, processedSelectionId);
     linker->AppendChild(chain);
-    AppendCreatedNodesToParent(chain.get(), createdNodesLevel);
+    AppendCreatedNodesToParent(chain.get(), nodesLevelAfter1stPath);
   }
   else if (newCreated != 0)
   {
-    AppendCreatedNodesToParent(linker, createdNodesLevel);
+    AppendCreatedNodesToParent(linker, nodesLevelAfter1stPath);
   }
 
   ++processedSelectionId;
@@ -1230,7 +1271,7 @@ AST_SystemModelGenerator::Process_ScanMux_EndOfSelectionPath (shared_ptr<mast::S
   bool lastLinkerSelection = processedSelectionId >= selections.size();
   if (lastLinkerSelection)
   {
-    auto firstSelectionIsEmpty = AssignNodesToLinkerFirstSelection(commonLinkerNode);
+    auto firstSelectionIsEmpty = AssignNodesToLinkerFirstSelection();
 
     // ---------------- Assign proper PathSelector
     //
@@ -1247,13 +1288,13 @@ AST_SystemModelGenerator::Process_ScanMux_EndOfSelectionPath (shared_ptr<mast::S
 
     auto sourceSignals = std::cref(selections.front()->SelectedSignals()); // Will cause detection of instance input port or previously created node that is just before the linker
 
-    m_linkersContext.pop();
+    m_linkersContext.pop_back();
     if (m_linkersContext.empty())
     {
       return make_tuple(nullptr, cref(sourceSignals));  // To report end of path processing
     }
 
-    return Process_ScanMux_EndOfSelectionPath(nullptr);
+    return Process_ScanMux_EndOfSelectionPath(nullptr); // Recursion point !
   }
 
   ++linkerContext.processedSelectionId;

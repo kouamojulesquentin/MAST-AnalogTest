@@ -1,51 +1,53 @@
 [Chain]        "WSP1500_SWIR"
  [Register]     "SWIR", length: 1, Hold value: true, bypass: 1
- [Linker]       "DR_MUX"
-  :Selector:     "SR", kind: Table_Based, can_select_none: false, inverted_bits: false, reversed_order: false
-  Selection Table:
-    [0] 0b00
-    [1] 0b00
-    [2] 0b01
-    [3] 0b10
-    [4] 0b11
-  Deselection Table:
-    [0] 0b00
-    [1] 0b11
-    [2] 0b10
-    [3] 0b01
-    [4] 0b00
-  [Register]     "WBY", length: 1, bypass: 1
-  [Chain]        "WI1"
-   Alias enable: SR[7]
-   Alias mode: SR[6:5], SR[3:2]
-   Alias data: SR[4], SR[1:0]
-   Alias okay: SR[0]
-   Alias done: SR[1]
-   [Chain]        "reg8"
-    [Register]     "SR", length: 8, bypass: 0000_0000
-  [Chain]        "WI2"
-   Alias enable: SR[7]
-   Alias mode: SR[6:5], SR[3:2]
-   Alias data: SR[4], SR[1:0]
-   Alias okay: SR[0]
-   Alias done: SR[1]
-   [Chain]        "reg8"
-    [Register]     "SR", length: 8, bypass: 0000_0000
-  [Chain]        "WI3"
-   Alias enable: SR[7]
-   Alias mode: SR[6:5], SR[3:2]
-   Alias data: SR[4], SR[1:0]
-   Alias okay: SR[0]
-   Alias done: SR[1]
-   [Chain]        "reg8"
-    [Register]     "SR", length: 8, bypass: 0000_0000
  [Linker]       "IR_MUX"
-  :Selector:     "SWIR", kind: Table_Based, can_select_none: true, inverted_bits: false, reversed_order: false
+  :Selector:     "SWIR", kind: Table_Based, can_select_none: false, inverted_bits: false, reversed_order: false
   Selection Table:
-    [0] 0b0
-    [1] 0b1
-  Deselection Table:
     [0] 0b0
     [1] 0b0
+    [2] 0b1
+  Deselection Table:
+    [0] 0b0
+    [1] 0b1
+    [2] 0b0
+  [Linker]       "DR_MUX"
+   :Selector:     "SR", kind: Table_Based, can_select_none: false, inverted_bits: false, reversed_order: false
+   Selection Table:
+     [0] 0b00
+     [1] 0b00
+     [2] 0b01
+     [3] 0b10
+     [4] 0b11
+   Deselection Table:
+     [0] 0b00
+     [1] 0b11
+     [2] 0b10
+     [3] 0b01
+     [4] 0b00
+   [Register]     "WBY", length: 1, bypass: 1
+   [Chain]        "WI1"
+    Alias enable: SR[7]
+    Alias mode: SR[6:5], SR[3:2]
+    Alias data: SR[4], SR[1:0]
+    Alias okay: SR[0]
+    Alias done: SR[1]
+    [Chain]        "reg8"
+     [Register]     "SR", length: 8, bypass: 0000_0000
+   [Chain]        "WI2"
+    Alias enable: SR[7]
+    Alias mode: SR[6:5], SR[3:2]
+    Alias data: SR[4], SR[1:0]
+    Alias okay: SR[0]
+    Alias done: SR[1]
+    [Chain]        "reg8"
+     [Register]     "SR", length: 8, bypass: 0000_0000
+   [Chain]        "WI3"
+    Alias enable: SR[7]
+    Alias mode: SR[6:5], SR[3:2]
+    Alias data: SR[4], SR[1:0]
+    Alias okay: SR[0]
+    Alias done: SR[1]
+    [Chain]        "reg8"
+     [Register]     "SR", length: 8, bypass: 0000_0000
   [Chain]        "WIR"
    [Register]     "SR", length: 2, Hold value: true, bypass: 00

@@ -1,3 +1,32 @@
+Module Top
+{
+  ScanInPort  SI;
+  ScanOutPort SO
+  {
+    Source SIB.SO;
+  }
+
+  Instance SIB Of SIB_mux_post
+  {
+    InputPort SI     = SI;
+    InputPort fromSO = SHUNT.SO;
+  }
+
+  Instance SHUNT Of Shunt
+  {
+    InputPort SI = SIB.toSI;
+  }
+}
+
+Module Shunt
+{
+  ScanInPort  SI;
+  ScanOutPort SO
+  {
+    Source SI;
+  }
+}
+
 Module SIB_mux_post
 {
   CaptureEnPort CE;
@@ -42,4 +71,6 @@ Module SIB_mux_post
     1'b0 : SR;
     1'b1 : fromSO;
   }
+
 }
+

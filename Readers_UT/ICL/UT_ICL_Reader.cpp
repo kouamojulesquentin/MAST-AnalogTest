@@ -24,7 +24,9 @@
 #include "SystemModelBuilder.hpp"
 #include "LoopbackAccessInterfaceProtocol.hpp"
 #include "PrettyPrinter.hpp"
+#include "GmlPrinter.hpp"
 
+#include "Utility.hpp"
 #include "TestUtilities.hpp"
 #include "Mast_Core_Traits.hpp"
 
@@ -47,10 +49,11 @@ using std::make_shared;
 
 using namespace std::string_literals;
 using namespace std::experimental::literals::string_view_literals;
+
+using namespace Parsers;
 using namespace mast;
 
 using ICL::ICL_Reader;
-using namespace Parsers;
 
 namespace
 {
@@ -2832,30 +2835,10 @@ void UT_ICL_Reader::test_CreateModelFromFiles ()
              "WrappedInstr.icl",
              "Instrument.icl",
              "SIB_mux_pre.icl",
+             "SIB_mux_post.icl",  // This one is not used but should have no impact on resulting SystemModel !
              "SReg.icl",
            },
            "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),
-
-    // 7
-    data_t({
-             "Top_Nested_SIB_3WI.icl",
-             "WrappedInstr.icl",
-             "Instrument.icl",
-             "SIB_mux_pre.icl",
-             "SReg.icl",
-           },
-           "test_Generate_Nested_SIB_3WI_PrettyPrint.txt"),
-
-    // 8
-    data_t({
-             "Top_BAD_Nested_SIB_3WI.icl",
-             "WrappedInstr.icl",
-             "Instrument.icl",
-             "SIB_mux_post.icl",
-             "SIB_mux_pre.icl", // This one is not used but should have no impact on resulting SystemModel !
-             "SReg.icl",
-           },
-           "test_Generate_BAD_Nested_SIB_3WI_PrettyPrint.txt"),
   };
 
   // ---------------- DDT Exercise
@@ -2894,12 +2877,23 @@ void UT_ICL_Reader::test_CreateModelFromFiles_ListFile ()
     //
     auto topNode = std::dynamic_pointer_cast<ParentNode>(sut.ParsedSystemModel());
 
+    //+ (begin JFC February/23/2018): for debug purpose
+    {
+      auto graph    = GmlPrinter::Graph(topNode);
+      auto filePath = test::GetTestFilePath({"Readers"s, "UT_TestFiles"s, "ICL"s, expectedFileName + ".gml"sv}, false);
+      std::ofstream os(filePath);
+      os << graph;
+      os.flush();
+    }
+    //+ (end   JFC February/23/2018):
+
     // With PrettyPrinter
     auto actual_PrettyPrint   = PrettyPrinter::PrettyPrint(topNode,   PrettyPrinterOptions::Parser_debug_no_id
                                                                     | PrettyPrinterOptions::ShowSelectorTables);
     auto expected_PrettyPrint = GetExpectedModelPrettyPrint(expectedFileName);
 
     TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
 
     // With Checker
     PrependWithTap(sm, topNode);   // This is to avoid warnings about missing AccessInterface
@@ -2909,6 +2903,8 @@ void UT_ICL_Reader::test_CreateModelFromFiles_ListFile ()
 
   auto data =
   {
+    make_tuple("List_BAD_Nested_SIB_3WI.txt", "test_Generate_BAD_Nested_SIB_3WI_PrettyPrint.txt"), // 8
+    make_tuple("List_Nested_SIB_3WI.txt",     "test_Generate_Nested_SIB_3WI_PrettyPrint.txt"),     // 7
     make_tuple("List_WrappedInstr.txt",       "test_Generate_WrappedInstr_PrettyPrint.txt"),       // 0
     make_tuple("List_Multiple_SIB_3WI.txt",   "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),   // 1
     make_tuple("List_mux_inline3.txt",        "test_Generate_mux_inline3_PrettyPrint.txt"),        // 2

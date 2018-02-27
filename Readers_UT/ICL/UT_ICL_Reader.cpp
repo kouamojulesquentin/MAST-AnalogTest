@@ -2877,14 +2877,14 @@ void UT_ICL_Reader::test_CreateModelFromFiles_ListFile ()
     //
     auto topNode = std::dynamic_pointer_cast<ParentNode>(sut.ParsedSystemModel());
 
-    //+ (begin JFC February/23/2018): for debug purpose
-    {
-      auto graph    = GmlPrinter::Graph(topNode);
-      auto filePath = test::GetTestFilePath({"Readers"s, "UT_TestFiles"s, "ICL"s, expectedFileName + ".gml"sv}, false);
-      std::ofstream os(filePath);
-      os << graph;
-      os.flush();
-    }
+//+    //+ (begin JFC February/23/2018): for debug purpose
+//+    {
+//+      auto graph    = GmlPrinter::Graph(topNode);
+//+      auto filePath = test::GetTestFilePath({"Readers"s, "UT_TestFiles"s, "ICL"s, expectedFileName + ".gml"sv}, false);
+//+      std::ofstream os(filePath);
+//+      os << graph;
+//+      os.flush();
+//+    }
     //+ (end   JFC February/23/2018):
 
     // With PrettyPrinter
@@ -2903,8 +2903,6 @@ void UT_ICL_Reader::test_CreateModelFromFiles_ListFile ()
 
   auto data =
   {
-    make_tuple("List_BAD_Nested_SIB_3WI.txt", "test_Generate_BAD_Nested_SIB_3WI_PrettyPrint.txt"), // 8
-    make_tuple("List_Nested_SIB_3WI.txt",     "test_Generate_Nested_SIB_3WI_PrettyPrint.txt"),     // 7
     make_tuple("List_WrappedInstr.txt",       "test_Generate_WrappedInstr_PrettyPrint.txt"),       // 0
     make_tuple("List_Multiple_SIB_3WI.txt",   "test_Generate_Multiple_SIB_3WI_PrettyPrint.txt"),   // 1
     make_tuple("List_mux_inline3.txt",        "test_Generate_mux_inline3_PrettyPrint.txt"),        // 2
@@ -2912,6 +2910,8 @@ void UT_ICL_Reader::test_CreateModelFromFiles_ListFile ()
     make_tuple("List_Exclusive_implicit.txt", "test_Generate_Exclusive_implicit_PrettyPrint.txt"), // 4
     make_tuple("List_Exclusive_explicit.txt", "test_Generate_Exclusive_explicit_PrettyPrint.txt"), // 5
     make_tuple("List_WSP1500_SWIR.txt",       "test_Generate_WSP1500_SWIR_PrettyPrint.txt"),       // 6
+    make_tuple("List_Nested_SIB_3WI.txt",     "test_Generate_Nested_SIB_3WI_PrettyPrint.txt"),     // 7
+    make_tuple("List_BAD_Nested_SIB_3WI.txt", "test_Generate_BAD_Nested_SIB_3WI_PrettyPrint.txt"), // 8
   };
 
   // ---------------- DDT Exercise

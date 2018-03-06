@@ -32,6 +32,16 @@ void ToSutVisitor::VisitAccessInterface (AccessInterface& /* accessInterface */)
 //---------------------------------------------------------------------------
 
 
+//! Visits AccessInterfaceTranslator pending children
+//!
+void ToSutVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator& accessInterfaceTranslator)
+{
+  VisitChildren(accessInterfaceTranslator);
+}
+//
+//  End of: ToSutVisitor::VisitChain
+//---------------------------------------------------------------------------
+
 
 //! Visits Chain pending children
 //!

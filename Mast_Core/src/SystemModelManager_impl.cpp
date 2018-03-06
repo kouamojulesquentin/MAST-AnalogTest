@@ -15,6 +15,7 @@
 #include "SystemModel.hpp"
 #include "AccessInterface.hpp"
 #include "AccessInterfaceProtocol.hpp"
+#include "AccessInterfaceRawProtocol.hpp"
 #include "Chain.hpp"
 #include "Utility.hpp"
 #include "SystemModelManagerMonitor.hpp"
@@ -78,7 +79,7 @@ SystemModelManager_impl::SystemModelManager_impl(SystemModel&                   
                                                  shared_ptr<ConfigurationAlgorithm>    configurationAlgorithm,
                                                  shared_ptr<SystemModelManagerMonitor> monitor)
   : m_sm                             (sm)
-  , m_firstAccessInterface           ()
+  , m_firstAccessNode           ()
   , m_configurator                   (configurationAlgorithm)
   , m_propagator                     ()
   , m_fromSutUpdater                 (sm)
@@ -213,10 +214,11 @@ void SystemModelManager_impl::CreateApplicationThread (shared_ptr<ParentNode> ap
 //!
 //! @note It does the data cycle only on the target AccessInterface, fromSUTVector and toSUTVector are locally defined
 //!
-void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentAccessInterface, AccessInterface* interfaceTranslator)
+void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentAccessInterface)
 {
   CHECK_PARAMETER_NOT_NULL(currentAccessInterface, "Houps can only operate on valid AccessInterface");
 
+    auto protocol = currentAccessInterface->Protocol();
   if (currentAccessInterface->IsPending())
   {
     auto protocol = currentAccessInterface->Protocol();
@@ -240,20 +242,8 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
           const auto& activeRegs = local_toSutVisitor.ActiveRegistersIdentifiers();
 
           BinaryVector fromSutVector;
-
-          if (interfaceTranslator == nullptr) // Standard case ==> use built-in Callbacks
-          {
-            fromSutVector = protocol->DoCallback(endpointId, nextEndPoint->ApplicationData(), toSutVector);
-          }
-          else
-          {
-            auto CallbackId = protocol->CallbackId(endpointId);
-
-            // dummy callback to prevent breakdown while developing
-            // Here we should have something like :
-            // fromSutVector = xxxx->DoTranslationCallback(CallbackId, nextEndPoint->ApplicationData(), toSutVector);
-            fromSutVector = protocol->DoCallback(endpointId, nextEndPoint->ApplicationData(), toSutVector);
-          }
+          
+          fromSutVector = protocol->DoCallback(endpointId, nextEndPoint->ApplicationData(), toSutVector);
 
           m_fromSutUpdater.UpdateRegisters(activeRegs, fromSutVector);
           ReportServedRegisters(activeRegs);
@@ -264,6 +254,12 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
       ++endpointId;
     }
   }
+   auto raw_protocol =  std::dynamic_pointer_cast<AccessInterfaceRawProtocol>(protocol);
+   if (raw_protocol)
+    { //We need to release DataCycleVisitor::VisitAccessInterfaceTranslator
+    CallbackRequest request(NO_MORE_PENDING);
+    raw_protocol->PushRequest(request);
+    }
 }
 //
 //  End of: SystemModelManager_impl::DoHierarchicalDataCycle
@@ -281,9 +277,9 @@ void SystemModelManager_impl::DoDataCycles ()
     THROW_RUNTIME_ERROR("DoDataCycles shall be called only on SystemModelManager thread");
   }
 
-  if (!m_firstAccessInterface)
+  if (!m_firstAccessNode)
   {
-    m_firstAccessInterface = GetFirstAccessInterface(m_sm);
+    m_firstAccessNode = GetFirstAccessNode(m_sm);
   }
 
   DoDataCycles_Impl();
@@ -339,7 +335,7 @@ void SystemModelManager_impl::DoDataCycles_Impl ()
 //! @note SystemModel root node must be the only AccessInterface or a chain for which all children
 //!       are AccessInterface
 //!
-shared_ptr<AccessInterface> SystemModelManager_impl::GetFirstAccessInterface (const SystemModel& sm)
+shared_ptr<ParentNode> SystemModelManager_impl::GetFirstAccessNode (const SystemModel& sm)
 {
   auto root = sm.Root();
 
@@ -348,17 +344,25 @@ shared_ptr<AccessInterface> SystemModelManager_impl::GetFirstAccessInterface (co
   auto accessInterface = dynamic_pointer_cast<AccessInterface>(root);
   if (!accessInterface)
   {
+  auto accessInterfaceTranslator = dynamic_pointer_cast<AccessInterfaceTranslator>(root);
+  if (!accessInterfaceTranslator)
+   {
     auto asChain = dynamic_pointer_cast<Chain>(root);
-    CHECK_VALUE_NOT_NULL(asChain, "SystemModel root must be an AccessInterface or a Chain (for which chidren are AccessInterface)");
+    CHECK_VALUE_NOT_NULL(asChain, "SystemModel root must be an AccessInterfaceTranslator, AccessInterface or a Chain (for which chidren are AccessInterface or AccessInterfaceTranslator)");
 
     accessInterface = dynamic_pointer_cast<AccessInterface>(asChain->FirstChild());
-    CHECK_VALUE_NOT_NULL(accessInterface, "Root (a Chain) must have only AccessInterface children");
+    if (!accessInterface)
+     {
+     accessInterfaceTranslator = dynamic_pointer_cast<AccessInterfaceTranslator>(asChain->FirstChild());
+     CHECK_VALUE_NOT_NULL(accessInterfaceTranslator, "Root (a Chain) must have only AccessInterface or AccessInterfaceTranslator children");
+     }
+    }
   }
 
-  return accessInterface;
+  return root;
 }
 //
-//  End of: SystemModelManager_impl::GetFirstAccessInterface
+//  End of: SystemModelManager_impl::GetFirstAccessNode
 //---------------------------------------------------------------------------
 
 
@@ -934,9 +938,9 @@ void SystemModelManager_impl::Start ()
     THROW_RUNTIME_ERROR("There is already a background thread for data cycle loop");
   }
 
-  if (!m_firstAccessInterface)
+  if (!m_firstAccessNode)
   {
-    m_firstAccessInterface = GetFirstAccessInterface(m_sm);
+    m_firstAccessNode = GetFirstAccessNode(m_sm);
   }
 
   MONITOR_DEBUG_MANAGER("Starting data cycle loop background thread");
@@ -1042,7 +1046,8 @@ void SystemModelManager_impl::Stop ()
 //!
 void SystemModelManager_impl::ReleaseServedThreads ()
 {
-  unique_lock<recursive_mutex> lock(m_dataMutex);
+  // Not compatible with multithread DataCycle
+  //unique_lock<recursive_mutex> lock(m_dataMutex);
 
   for (auto it = m_pendingThreads.begin() ; it != m_pendingThreads.end() ; )
   {
@@ -1111,7 +1116,8 @@ void SystemModelManager_impl::RegisterPendingThread (shared_ptr<Register> reg)
 //!
 void SystemModelManager_impl::ReportServedRegisters (const vector<NodeIdentifier>& activeRegisters)
 {
-  unique_lock<recursive_mutex> lock(m_dataMutex);
+// Not compatible with multithread DataCycle
+//  unique_lock<recursive_mutex> lock(m_dataMutex);
 
   for (const auto& regId : activeRegisters)
   {
@@ -1192,9 +1198,6 @@ void SystemModelManager_impl::WakeupDataCycles ()
 //
 //  End of: SystemModelManager_impl::WakeupDataCycles
 //---------------------------------------------------------------------------
-
-
-
 
 
 //===========================================================================

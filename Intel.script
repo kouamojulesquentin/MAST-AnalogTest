@@ -1,6 +1,7 @@
-rm ../../packets_to_ring.bin
-touch ../../packets_to_ring.bin
-xterm -e ./NW_Test_IF_end 30001 1&
+rm ./packets_to_ring.bin
+touch ./packets_to_ring.bin
+xterm -e .
+/NW_Test_IF_end 30001 1&
 sleep 1
 xterm -e ./NW_Region 30000 2&
 sleep 1

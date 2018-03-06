@@ -1,13 +1,13 @@
 //===========================================================================
-//                           AccessInterfaceProtocol.hpp
+//                           CallbackRequest.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file AccessInterfaceProtocol.hpp
+//! @file CallbackRequest.hpp
 //!
-//! Declares class AccessInterfaceProtocol
+//! Declares class CallbackRequest
 //!
 //===========================================================================
 
@@ -55,19 +55,49 @@ class CallbackRequest
    , m_ToSutVector(ToSutVector)
   {}
 
+  CallbackRequest( std::experimental::string_view CallbackId,
+                   BinaryVector	   ToSutVector,
+                   std::string FormattedData,
+		   void* interfaceData
+                  ) 
+   : m_CallbackId(CallbackId)
+   , m_ToSutVector(ToSutVector)
+   , m_FormattedData(FormattedData)
+   , m_interfaceData(interfaceData)
+  {}
+
+  CallbackRequest( std::experimental::string_view CallbackId,
+                   BinaryVector	   ToSutVector,
+                   std::string FormattedData
+                  ) 
+   : m_CallbackId(CallbackId)
+   , m_ToSutVector(ToSutVector)
+   , m_FormattedData(FormattedData)
+  {}
+
+  CallbackRequest( std::experimental::string_view CallbackId,
+                   std::string FormattedData
+                  ) 
+   : m_CallbackId(CallbackId)
+   , m_FormattedData(FormattedData)
+  {}
+
   std::experimental::string_view CallbackId() {return m_CallbackId;};
   BinaryVector	ToSutVector() {return m_ToSutVector;}	;
   void* interfaceData() { return m_interfaceData;};
+  std::string FormattedData(){if (!m_FormattedData.empty()) return m_FormattedData ;
+                              else return m_ToSutVector.DataAsBinaryString();};
 
   private:
   std::string m_CallbackId;
   BinaryVector  m_ToSutVector;
+  std::string m_FormattedData;
   void* m_interfaceData=nullptr;
   
   
 };
 //
-//  End of AccessInterfaceProtocol class declaration
+//  End of CallbackRequest class declaration
 //---------------------------------------------------------------------------
 } // End of namespace mast
 

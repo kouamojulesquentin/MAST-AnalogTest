@@ -53,15 +53,12 @@ class MAST_CORE_EXPORT AccessInterfaceProtocolFactory final : public Factory<Acc
   //! Fills up with default AccessInterfaceProtocol
   //!
   //! @note Default AccessInterfaceProtocol are:
-  //!         - LoopbackAccessInterfaceProtocol
-  //!         - SVF_SimulationProtocol
-  //!         - SVF_EmulationProtocol
-  //!         - STIL_Emulation
-  //!         - OfflineProtocol
-  //!         - I2C_EmulationProtocol
-  //!         - RemoteProxy
+  //!         - Emulation
+  //!         - JTAG_to_I2C
+  //!         - Spy
   //!
   virtual void InitializeWithDefaults() override;
+
 
 
   // ---------------- Protected Methods

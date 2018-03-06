@@ -183,6 +183,17 @@ void SIT_Printer::VisitAccessInterface (AccessInterface& accessInterface)
   StreamParentNode("ACCESS_INTERFACE", accessInterface, note);
 }
 
+//! Appends content of AccessInterface node in text representation and visits
+//! sub-nodes
+//!
+void SIT_Printer::VisitAccessInterfaceTranslator (AccessInterfaceTranslator& accessInterfaceTranslator)
+{
+  auto protocol = accessInterfaceTranslator.Protocol();
+  auto note     = protocol ? protocol->KindName() : "PROTOCOL_NOT_SET";
+
+  StreamParentNode("ACCESS_INTERFACE_TRANSLATOR", accessInterfaceTranslator, note);
+}
+
 //! Appends content of Chain node in text representation and visits
 //! sub-nodes
 //!

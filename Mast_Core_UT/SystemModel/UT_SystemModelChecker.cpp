@@ -19,6 +19,7 @@
 #include "Spy_AccessInterfaceProtocols.hpp"
 #include "TestModelBuilder.hpp"
 #include "GmlPrinter.hpp"
+#include "PrettyPrinter.hpp"
 #include "CheckResult_Traits.hpp"
 
 
@@ -935,6 +936,98 @@ void UT_SystemModelChecker::test_Check_NoProtocol ()
   TS_ASSERT_FALSE     (result.HasErrors());
   TS_ASSERT_EQUALS    (result.infosCount,    0u);
   TS_ASSERT_EQUALS    (result.warningsCount, 1u);
+  TS_ASSERT_NOT_EMPTY (result.warnings);
+  TS_ASSERT_NOT_EMPTY (result.MakeReport());
+}
+
+
+//! Checks SystemModelChecker::CheckTree() when an access interface translator has no child
+//!
+void UT_SystemModelChecker::test_Check_AI_Translator_no_children ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  string name = "AT name";
+
+  auto node = sm.CreateAccessInterfaceTranslator(name, nullptr);
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelChecker::Check(sm);
+
+
+  // ---------------- Verify
+  //
+
+  TS_ASSERT_TRUE      (result.HasWarnings());
+  TS_ASSERT_TRUE     (result.HasErrors());
+  TS_ASSERT_EQUALS    (result.infosCount,    0u);
+  TS_ASSERT_EQUALS    (result.errorsCount, 1u);
+  TS_ASSERT_NOT_EMPTY (result.warnings);
+  TS_ASSERT_NOT_EMPTY (result.MakeReport());
+  }
+
+//! Checks SystemModelChecker::CheckTree() when an access interface translator has a non- AI child
+//!
+void UT_SystemModelChecker::test_Check_AI_Translator_wrong_child ()
+{
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  string name = "AT name";
+
+  // ---------------- Exercise
+  //
+  auto node = sm.CreateAccessInterfaceTranslator(name, nullptr);
+  auto reg = sm.CreateRegister("reg", BinaryVector::CreateFromBinaryString("10"),  node);
+
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelChecker::Check(sm);
+
+  // ---------------- Verify
+  //
+
+  TS_ASSERT_TRUE     (result.HasErrors());
+  TS_ASSERT_EQUALS    (result.infosCount,    0u);
+  TS_ASSERT_EQUALS    (result.errorsCount, 1u);
+  TS_ASSERT_NOT_EMPTY (result.MakeReport());
+  }
+
+//! Checks SystemModelChecker::CheckTree() when an access interface translator does not refer to a Raw protocol
+//!
+void UT_SystemModelChecker::test_Check_AI_Translator_no_raw_protocol ()
+{
+
+  // ---------------- Setup
+  //
+  SystemModel sm;
+  TestModelBuilder builder(sm);
+
+  string name = "AT name";
+
+  auto node = sm.CreateAccessInterfaceTranslator(name, nullptr);
+  auto tap = builder.Create_JTAG_TAP("", 6u, 2u);
+  node->AppendChild(tap);
+
+  // ---------------- Exercise
+  //
+  auto result = SystemModelChecker::Check(sm);
+
+
+  // ---------------- Verify
+  //
+
+  TS_ASSERT_TRUE      (result.HasWarnings());
+  TS_ASSERT_TRUE     (result.HasErrors());
+  TS_ASSERT_EQUALS    (result.infosCount,    0u);
+  TS_ASSERT_EQUALS    (result.errorsCount, 1u);
   TS_ASSERT_NOT_EMPTY (result.warnings);
   TS_ASSERT_NOT_EMPTY (result.MakeReport());
 }

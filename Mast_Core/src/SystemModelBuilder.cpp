@@ -18,6 +18,7 @@
 #include "DefaultOneHotPathSelector.hpp"
 #include "DefaultNHotPathSelector.hpp"
 #include "AccessInterfaceProtocol.hpp"
+#include "AccessInterfaceRawProtocol.hpp"
 #include "BrocadeSelector.hpp"
 #include "Utility.hpp"
 #include "EnumsUtility.hpp"
@@ -216,12 +217,13 @@ shared_ptr<Chain> SystemModelBuilder::Create_Brocade (shared_ptr<AccessInterface
   // ---------------- Check parameters
   //
   CHECK_PARAMETER_NOT_NULL(masterProtocol, "Expect a valid AccessInterfaceProtocol for the 'Master' AccessInterface");
-  CHECK_PARAMETER_NOT_NULL(slaveProtocol,  "Expect a valid AccessInterfaceProtocol for the 'Slave' AccessInterface");
+  CHECK_PARAMETER_NOT_NULL(slaveProtocol,  "Expect a valid AccessInterfaceProtocol for the 'Slave' AccessInterface");  
   CHECK_PARAMETER_RANGE(taps.size(), 1u, 5u, "Brocade support only from 1 to 5 'slave' TAPs");
+  
   for (auto tap : taps)
   {
     auto aiType = AssessAccessInterfaceType(tap);
-    CHECK_TRUE(aiType == AccessInterfaceAssessment::JTAG_TAP, "Cannot handle none JTAG TAP slaves");
+    CHECK_TRUE(aiType == AccessInterfaceAssessment::JTAG_TAP, "Cannot handle non JTAG TAP slaves");
   }
 
   // ---------------- Prepare Brocade mux
@@ -292,6 +294,104 @@ shared_ptr<Chain> SystemModelBuilder::Create_Brocade (shared_ptr<AccessInterface
 //---------------------------------------------------------------------------
 
 
+//! Moves up to 5 TAPs under a "Master" TAP that provides dynamic selection of the "Slave" TAPs
+//!
+//! @param TranslatorProtocol the top-level access interface translator protocol (ex; Emulation)
+//! @param masterProtocol An access interface protocol for the "Master" TAP
+//! @param slaveProtocol  An access interface protocol for the "Slave" TAP
+//! @param taps           "Slave" TAPs
+//!
+shared_ptr<AccessInterfaceTranslator> SystemModelBuilder::Create_Brocade (shared_ptr<AccessInterfaceTranslatorProtocol>  TopProtocol,
+                                                      shared_ptr<AccessInterfaceProtocol>           masterProtocol,
+                                                      shared_ptr<AccessInterfaceProtocol>           slaveProtocol,
+                                                      initializer_list<shared_ptr<AccessInterface>> taps)
+{
+  // ---------------- Check parameters
+  //
+  CHECK_PARAMETER_NOT_NULL(TopProtocol, "Expect a valid AccessInterfaceProtocol for the 'TopProtocol' AccessInterfaceTranslator");
+  CHECK_PARAMETER_NOT_NULL(masterProtocol, "Expect a valid AccessInterfaceProtocol for the 'Master' AccessInterface");
+  CHECK_PARAMETER_NOT_NULL(slaveProtocol,  "Expect a valid AccessInterfaceProtocol for the 'Slave' AccessInterface");  
+  CHECK_PARAMETER_RANGE(taps.size(), 1u, 5u, "Brocade support only from 1 to 5 'slave' TAPs");
+  auto master_is_raw = std::dynamic_pointer_cast<AccessInterfaceRawProtocol>(masterProtocol);
+  CHECK_PARAMETER_NOT_NULL(master_is_raw,  "Expect a Raw  AccessInterfaceProtocol for the 'Master' AccessInterface");  
+  auto slave_is_raw = std::dynamic_pointer_cast<AccessInterfaceRawProtocol>(slaveProtocol);
+  CHECK_PARAMETER_NOT_NULL(slave_is_raw,  "Expect a Raw  AccessInterfaceProtocol for the 'Slave' AccessInterface");  
+auto top_is_translator = std::dynamic_pointer_cast<AccessInterfaceTranslatorProtocol>(TopProtocol);
+  CHECK_PARAMETER_NOT_NULL(top_is_translator,  "Expect an AccessInterfaceTranslatorProtocol for the 'top' Protocol");  
+
+
+  for (auto tap : taps)
+  {
+    auto aiType = AssessAccessInterfaceType(tap);
+    CHECK_TRUE(aiType == AccessInterfaceAssessment::JTAG_TAP, "Cannot handle non JTAG TAP slaves");
+  }
+
+  // ---------------- Prepare Brocade mux
+  //
+  auto brocadeTop  = m_model.CreateAccessInterfaceTranslator("Brocade",TopProtocol);
+  auto masterAi      = m_model.CreateAccessInterface("Master_AI", masterProtocol, brocadeTop);
+  brocadeTop->RegisterInterface(masterAi);
+  auto slaveAi       = m_model.CreateAccessInterface("Slave_AI",  slaveProtocol,  brocadeTop);
+  brocadeTop->RegisterInterface(slaveAi);
+  auto masterCtrlReg = m_model.CreateRegister("Brocade_CTRL", BinaryVector(8u), true, masterAi);
+  auto irChain       = m_model.CreateChain  ("IR",     slaveAi);
+  auto drChain       = m_model.CreateChain  ("DR",     slaveAi);
+  auto selector      = make_shared<BrocadeSelector>(masterCtrlReg, taps.size());
+  auto irLinker      = m_model.CreateLinker ("IR_Mux", selector, irChain);
+  auto drLinker      = m_model.CreateLinker ("DR_Mux", selector, drChain);
+
+  masterAi->IgnoreForNodePath(true);
+  slaveAi->IgnoreForNodePath(true);
+  irChain->IgnoreForNodePath(true);
+  irChain->SetChildAppender(irLinker);
+
+  drChain->IgnoreForNodePath(true);
+  drChain->SetChildAppender(drLinker);
+
+  // ---------------- Connect slave TAPs
+  //
+  auto renameNodes = [](shared_ptr<AccessInterface> tap, shared_ptr<Register> ir, shared_ptr<Linker> drMux, uint32_t tapOrder)
+  {
+    auto setTapName =     tap->Name().empty()
+                      || (tap->Name() == "TAP")
+                      || (tap->Name() == "Tap")
+                      || (tap->Name() == "tap")
+                      || (tap->Name() == "1149_1_TAP");
+    //! @todo [JFC]-[September/30/2016]: In Create_Brocade(): Compare case insensitive ==> Need utility
+    //!
+    auto tapName = setTapName ? "TAP"s + std::to_string(tapOrder) : tap->Name();
+
+    ir    ->SetName(tapName + ".IR");
+    drMux ->SetName(tapName);
+  };
+
+  uint32_t tapNum = 1u;
+  for (auto tap : taps)
+  {
+    // ---------------- Diconnect pieces from AccessInterface
+    //
+    auto mux = dynamic_pointer_cast<Linker>   (tap->DisconnectEndPoint(2u));
+    auto ir  = dynamic_pointer_cast<Register> (tap->DisconnectEndPoint(1u));
+
+    // ---------------- Reconnect to Brocade muxes
+    //
+    irLinker->AppendChild(ir);
+    drLinker->AppendChild(mux);
+
+    // ---------------- Adjust names for paths
+    //
+    mux->IgnoreForNodePath(false);
+    renameNodes(tap, ir, mux, tapNum++);
+
+    // ---------------- Get rid of AccessInterface
+    //
+    m_model.RemoveNodeFromModel(tap);
+  }
+
+  m_model.ReplaceRoot(brocadeTop, false);
+  return brocadeTop;
+
+}
 
 //! Creates a new Tap node using implicit binary coding
 //!

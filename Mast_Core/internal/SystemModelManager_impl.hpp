@@ -233,7 +233,7 @@ class SystemModelManager_impl final
   // ---------------- Private  Methods
   //
   private:
-  static std::shared_ptr<AccessInterface> GetFirstAccessInterface(const SystemModel& sm);
+  static std::shared_ptr<ParentNode> GetFirstAccessNode(const SystemModel& sm);
 
   template<typename T> uint32_t iGetStatus (T you_should_call_iStatus_with_path_and_clear_counter_parameters); //!< Non implemented version to avoid implicit conversion from char* to bool
 
@@ -312,7 +312,7 @@ class SystemModelManager_impl final
 
   //! Triggers a data cycle on the Endpoints of the currentAccessInterface
   //!
-  void DoHierarchicalDataCycle (AccessInterface* currentAccessInterface, AccessInterface* interfaceTranslator = nullptr);
+  void DoHierarchicalDataCycle (AccessInterface* currentAccessInterface);
   void RegisterPendingThread (std::shared_ptr<Register> reg);
   void ReleaseServedThreads ();
   void ReportServedRegisters (const std::vector<NodeIdentifier>& activeRegisters);
@@ -323,7 +323,7 @@ class SystemModelManager_impl final
   private:
   // Data cycle support
   SystemModel&                               m_sm;                   //!< The system model to manage
-  std::shared_ptr<AccessInterface>           m_firstAccessInterface; //!< The first AccessInterface of the system
+  std::shared_ptr<ParentNode>           m_firstAccessNode; //!< The first AccessInterface of the system
   ConfigureVisitor                           m_configurator;         //!< In charge of configuration
   PropagatePendingVisitor                    m_propagator;           //!< In charge of propagating pending status bottom up
   FromSutUpdater                             m_fromSutUpdater;       //!< In charge of updating SystemModel from bitstream from SUT

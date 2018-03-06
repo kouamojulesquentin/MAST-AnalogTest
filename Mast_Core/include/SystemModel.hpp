@@ -88,7 +88,9 @@ class MAST_CORE_EXPORT SystemModel
   //! Creates a new AccessInterfaceTranslator node
   //!
   std::shared_ptr<AccessInterfaceTranslator> CreateAccessInterfaceTranslator (std::experimental::string_view           name,
-                                                          std::shared_ptr<ParentNode>              parentNode = nullptr);
+                                                          std::shared_ptr<AccessInterfaceTranslatorProtocol> protocol,
+                                                          std::shared_ptr<ParentNode>              parentNode = nullptr
+                                                          );
 
   //! Sets root node
   //!

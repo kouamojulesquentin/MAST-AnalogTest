@@ -89,7 +89,13 @@ set(Mast_Core_SOURCES ${Mast_Core_Platform_SOURCES}
                       "${CMAKE_CURRENT_SOURCE_DIR}/src/Utility.cpp"
                       "${CMAKE_CURRENT_SOURCE_DIR}/src/VirtualRegister.cpp"
                       "${CMAKE_CURRENT_SOURCE_DIR}/src/YamlFile.cpp"
-                      "${CMAKE_CURRENT_SOURCE_DIR}/src/YamlNodesCache.cpp")
+                      "${CMAKE_CURRENT_SOURCE_DIR}/src/YamlNodesCache.cpp"
+                      "${CMAKE_CURRENT_SOURCE_DIR}/src/AccessInterfaceTranslatorProtocolFactory.cpp"
+                      "${CMAKE_CURRENT_SOURCE_DIR}/src/Emulation_TranslationProtocol.cpp"
+                      "${CMAKE_CURRENT_SOURCE_DIR}/src/I2C_RawPlayer.cpp"
+                      "${CMAKE_CURRENT_SOURCE_DIR}/src/JTAG_to_I2C_TranslatorProtocol.cpp"
+                      "${CMAKE_CURRENT_SOURCE_DIR}/src/SVF_RawPlayer.cpp"
+                      )
 
 set(Public_Headers "${CMAKE_CURRENT_SOURCE_DIR}/include/AccessInterface.hpp"
                    "${CMAKE_CURRENT_SOURCE_DIR}/include/AccessInterfaceProtocol.hpp"
@@ -165,7 +171,14 @@ set(Public_Headers "${CMAKE_CURRENT_SOURCE_DIR}/include/AccessInterface.hpp"
                    "${CMAKE_CURRENT_SOURCE_DIR}/include/SystemModelVisitor.hpp"
                    "${CMAKE_CURRENT_SOURCE_DIR}/include/Utility.hpp"
                    "${CMAKE_CURRENT_SOURCE_DIR}/include/VirtualRegister.hpp"
-                   "${CMAKE_CURRENT_SOURCE_DIR}/include/YamlFile.hpp")
+                   "${CMAKE_CURRENT_SOURCE_DIR}/include/YamlFile.hpp"
+                   "${CMAKE_CURRENT_SOURCE_DIR}/include/Emulation_TranslatorProtocol.hpp"
+                   "${CMAKE_CURRENT_SOURCE_DIR}/include/I2C_RawPlayer.hpp"
+                   "${CMAKE_CURRENT_SOURCE_DIR}/include/JTAG_to_I2C_TranslatorProtocol.hpp"
+                   "${CMAKE_CURRENT_SOURCE_DIR}/include/SVF_RawPlayer.hpp"
+                   "${CMAKE_CURRENT_SOURCE_DIR}/include/T_2_E_TranslatorProtocol.hpp"
+                   "${CMAKE_CURRENT_SOURCE_DIR}/include/T_2_T_TranslatorProtocol.hpp"
+                  )
 
 set(Private_Headers "${CMAKE_CURRENT_SOURCE_DIR}/internal/Dll.hpp"
                     "${CMAKE_CURRENT_SOURCE_DIR}/internal/FileSystem.hpp"

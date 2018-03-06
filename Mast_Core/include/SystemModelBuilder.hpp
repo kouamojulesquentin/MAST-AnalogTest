@@ -142,6 +142,10 @@ class MAST_CORE_EXPORT SystemModelBuilder final
   std::shared_ptr<Chain> Create_Brocade(std::shared_ptr<AccessInterfaceProtocol>                masterProtocol,
                                         std::shared_ptr<AccessInterfaceProtocol>                slaveProtocol,
                                         std::initializer_list<std::shared_ptr<AccessInterface>> taps);
+  std::shared_ptr<AccessInterfaceTranslator> Create_Brocade (std::shared_ptr<AccessInterfaceTranslatorProtocol>  TopProtocol,
+                                                      std::shared_ptr<AccessInterfaceProtocol>           masterProtocol,
+                                                      std::shared_ptr<AccessInterfaceProtocol>           slaveProtocol,
+                                                      std::initializer_list<std::shared_ptr<AccessInterface>> taps);
 
   // ---------------- Private  Fields
   //

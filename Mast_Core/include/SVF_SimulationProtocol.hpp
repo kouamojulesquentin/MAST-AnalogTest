@@ -69,7 +69,7 @@ class MAST_CORE_EXPORT SVF_SimulationProtocol final : public SVF_Player
 
   //! readable identifier for given endpoint
   //!
-  std::string CallbackId(int EndPoint) { 
+  std::string CallbackId(int EndPoint) const { 
      switch (EndPoint){
        case 0: return "TRSRT"; 
        case 1: return "SIR"; 

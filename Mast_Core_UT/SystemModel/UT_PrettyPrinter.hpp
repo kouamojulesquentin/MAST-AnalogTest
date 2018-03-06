@@ -36,6 +36,8 @@ class UT_PrettyPrinter : public CxxTest::TestSuite
   void test_VisitAccessInterface ();
   void test_VisitAccessInterface_Verbose ();
   void test_VisitAccessInterface_ShowProtocol ();
+  void test_VisitAccessInterfaceTranslator ();
+  void test_VisitAccessInterfaceTranslator_ShowProtocol();
   void test_VisitChain ();
   void test_VisitChain_Verbose ();
   void test_VisitLinker_SingleRegSelector ();

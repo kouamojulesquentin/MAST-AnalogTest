@@ -15,8 +15,12 @@
 #include "SystemModelNode.hpp"
 #include "DefaultBinaryPathSelector.hpp"
 #include "LoopbackAccessInterfaceProtocol.hpp"
-
+#include "SVF_RawPlayer.hpp"
+#include "I2C_RawPlayer.hpp"
+#include "Spy_Emulation_Translator.hpp"
 #include "BinaryVector_Traits.hpp"
+#include "JTAG_to_I2C_TranslatorProtocol.hpp"
+#include "JTAG_BitBang_TranslatorProtocol.hpp"
 
 using std::string;
 using std::experimental::string_view;
@@ -25,6 +29,7 @@ using std::make_shared;
 using std::dynamic_pointer_cast;
 
 using namespace std::string_literals;
+using std::initializer_list;
 using namespace mast;
 using namespace test;
 
@@ -148,6 +153,33 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_JTAG_TAP (string_view name,
 //  End of: TestModelBuilder::Create_JTAG_TAP
 //---------------------------------------------------------------------------
 
+//! Creates a new Tap node
+//!
+//!  @param name            Name given to the tap
+//!  @param irBitsCount     IR number of bits (at least one)
+//!  @param muxPathsCount   DR number of path (at least two)
+//!
+//!  ______________________________
+//! |                              |
+//! |     (ACCESS_I:Tap)           |
+//! |      /      \                |
+//! |     /       _\__________     |
+//! | [REG:Ir]  /Linker:Dr_Mux\    |
+//! |           ---------------    |
+//! |             /                |
+//! |        [REG:Bypass]          |
+//! |                              |
+//!  ------------------------------
+//!
+
+shared_ptr<AccessInterface> TestModelBuilder::Create_JTAG_TAP (string_view name, uint32_t irBitsCount, uint32_t muxPathsCount,shared_ptr<AccessInterfaceProtocol> protocol)
+{
+  return m_builder.Create_JTAG_TAP(name, irBitsCount, muxPathsCount, protocol);
+}
+//
+//  End of: TestModelBuilder::Create_JTAG_TAP
+//---------------------------------------------------------------------------
+
 
 //! Creates a simple 1149 tap node with two multiplexed registers
 //!
@@ -173,9 +205,182 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_AccessInterface (s
   return tap;
 }
 //
-//  End of: TestModelBuilder::Create_TestCase_1500
+//  End of: TestModelBuilder::Create_TestCase_AccessInterface
 //---------------------------------------------------------------------------
 
+
+//! Creates a simple 1149 tap node with two multiplexed registers, with an Emulation_Translator as top level
+//!
+//! @note - There are multiple "dynamic" registers
+//!       - The control register is composed with multiple bits
+//!
+//! @param name         Name for top node
+//!
+//! @return Top node of system mode
+//!
+shared_ptr<AccessInterfaceTranslator> TestModelBuilder::Create_TestCase_Emulation_Translator (string_view name)
+{
+  uint32_t muxDrPathCount = 3u;
+  
+  auto raw_protocol = make_shared<SVF_RawPlayer>();
+
+  auto tap     = m_builder.Create_JTAG_TAP    ("Tap",       DEFAULT_IR_LEN, muxDrPathCount,raw_protocol);
+
+  auto chain_1 = m_model.CreateChain    ("sut_1",    tap);
+  auto reg_1   = m_model.CreateRegister ("static_1", BinaryVector(STATIC_TDR_LEN, 0), chain_1);
+
+  auto chain_2 = m_model.CreateChain    ("sut_2",    tap);
+  auto reg_2   = m_model.CreateRegister ("static_2", BinaryVector(STATIC_TDR_LEN, 0), chain_2);
+
+  auto translator     = m_model.CreateAccessInterfaceTranslator    (name, make_shared<Spy_Emulation_Translator>());
+
+  translator->RegisterInterface(tap);
+
+  translator->AppendChild(tap);
+
+  m_model.ReplaceRoot(translator,false);
+  
+  return translator;
+}
+//
+//  End of: TestModelBuilder::Create_TestCase_Emulation_Translator
+//---------------------------------------------------------------------------
+
+//! Creates a simple 1149 tap node with two multiplexed registers, with an Emulation_Translator as top level
+//! but with a JTAG_to_I2C translator in the middle
+//!
+//! @note - There are multiple "dynamic" registers
+//!       - The control register is composed with multiple bits
+//!
+//! @param name         Name for top node
+//!
+//! @return Top node of system mode
+//!
+shared_ptr<AccessInterfaceTranslator> TestModelBuilder::Create_TestCase_JTAG_to_I2C_Translator (string_view name)
+{
+  uint32_t muxDrPathCount = 3u;
+  auto I2C_Adresses   = initializer_list<uint32_t>{ 0x30u, 0x31u, 0x32u,0x33u,0x34u  };
+
+  auto raw_protocol = make_shared<SVF_RawPlayer>();
+
+  auto tap     = Create_JTAG_TAP    ("Tap",       DEFAULT_IR_LEN, muxDrPathCount,raw_protocol);
+
+  auto chain_1 = m_model.CreateChain    ("sut_1",    tap);
+  auto reg_1   = m_model.CreateRegister ("static_1", BinaryVector(STATIC_TDR_LEN, 0), chain_1);
+
+  auto chain_2 = m_model.CreateChain    ("sut_2",    tap);
+  auto reg_2   = m_model.CreateRegister ("static_2", BinaryVector(STATIC_TDR_LEN, 0), chain_2);
+
+  auto top_translator     = m_model.CreateAccessInterfaceTranslator    ("Emulation", make_shared<Spy_Emulation_Translator>());
+  auto jtag_2_i2c_translator     = m_model.CreateAccessInterfaceTranslator    (name, make_shared<JTAG_to_I2C_TranslatorProtocol>(I2C_Adresses));
+
+  m_model.ReplaceRoot(top_translator,false);
+  top_translator->AppendChild(jtag_2_i2c_translator);
+  jtag_2_i2c_translator->AppendChild(tap);
+
+  top_translator->RegisterTranslator(jtag_2_i2c_translator);
+
+  jtag_2_i2c_translator->RegisterInterface(tap);
+
+  return top_translator;
+}
+//
+//  End of: TestModelBuilder::Create_TestCase_AccessInterface
+//---------------------------------------------------------------------------
+
+//! Creates a simple 1149 tap node with two multiplexed registers, with an Emulation_Translator as top level
+//! but with a JTAG_to_I2C translator in the middle
+//!
+//! @note - There are multiple "dynamic" registers
+//!       - The control register is composed with multiple bits
+//!
+//! @param name         Name for top node
+//!
+//! @return Top node of system mode
+//!
+shared_ptr<AccessInterfaceTranslator> TestModelBuilder::Create_TestCase_JTAG_BitBang_Translator (string_view name)
+{
+  uint32_t muxDrPathCount = 3u;
+  auto I2C_Adresses   = initializer_list<uint32_t>{ 0x30u, 0x31u, 0x32u,0x33u,0x34u  };
+
+  auto raw_protocol = make_shared<SVF_RawPlayer>();
+  auto top_tap     = Create_JTAG_TAP    ("Top-Tap",       DEFAULT_IR_LEN, 2u,raw_protocol);
+
+  auto etap     = Create_JTAG_TAP    ("eTap",       DEFAULT_IR_LEN, muxDrPathCount, make_shared<SVF_RawPlayer>());
+
+  auto chain_1 = m_model.CreateChain    ("sut_1",    etap);
+  auto reg_1   = m_model.CreateRegister ("static_1", BinaryVector(STATIC_TDR_LEN, 0), chain_1);
+
+  auto chain_2 = m_model.CreateChain    ("sut_2",    etap);
+  auto reg_2   = m_model.CreateRegister ("static_2", BinaryVector(STATIC_TDR_LEN, 0), chain_2);
+
+  auto top_translator     = m_model.CreateAccessInterfaceTranslator    ("Emulation", make_shared<Spy_Emulation_Translator>());
+
+  auto jtag_bitbang_translator     = m_model.CreateAccessInterfaceTranslator    (name, make_shared<JTAG_BitBang_TranslatorProtocol>(top_tap));
+
+  m_model.ReplaceRoot(top_translator,false);
+
+  top_translator->AppendChild(top_tap);
+  top_translator->RegisterInterface(top_tap);
+  
+
+  auto bitbang_chain = m_model.CreateChain    ("BB_chain");
+  auto bitbang_reg   = m_model.CreateRegister ("BB_Reg", BinaryVector(5, 0), bitbang_chain);
+  bitbang_chain->AppendChild(jtag_bitbang_translator);
+
+  top_tap->AppendChild(bitbang_chain);
+  jtag_bitbang_translator->AppendChild(etap);
+
+
+  jtag_bitbang_translator->RegisterInterface(etap);
+
+  return top_translator;
+}
+//
+//  End of: TestModelBuilder::Create_TestCase_AccessInterface
+//---------------------------------------------------------------------------
+
+//! Creates a simple I2C Access Interface with two registers, with an Emulation_Translator as top level
+//!
+//! @note - There are multiple "dynamic" registers
+//!       - The control register is composed with multiple bits
+//!
+//! @param name         Name for top node
+//!
+//! @return Top node of system mode
+//!
+shared_ptr<AccessInterfaceTranslator> TestModelBuilder::Create_TestCase_I2C_Emulation_Translator (string_view name)
+{
+  uint32_t muxDrPathCount = 3u;
+  
+  auto regsCount = 3;
+  auto regsBitsCount = 4;
+
+    auto I2C_Adresses   = initializer_list<uint32_t>{ 0x30u, 0x31u, 0x32u,0x33u,0x34u  };
+  auto raw_protocol = make_shared<I2C_RawPlayer>(I2C_Adresses);
+  auto ai   = m_model.CreateAccessInterface(name, raw_protocol);
+
+
+  // ---------------- Add Registers
+  //
+  m_builder.AppendRegisters(regsCount, "i2c_register_", BinaryVector(regsBitsCount, 0), ai);
+
+
+  auto translator     = m_model.CreateAccessInterfaceTranslator    (name, make_shared<Spy_Emulation_Translator>());
+
+//  raw_protocol->SetParentTranslator(translator);
+   translator->RegisterInterface(ai);
+
+
+  translator->AppendChild(ai);
+
+  m_model.SetRoot(translator);
+  
+  return translator;
+}
+//
+//  End of: TestModelBuilder::I2C_Emulation_Translator
+//---------------------------------------------------------------------------
 
 //! Creates a MIB structure (with multiple insertion bits configuration)
 //!
@@ -426,6 +631,13 @@ shared_ptr<mast::Chain> TestModelBuilder::Create_Simple_MIB (std::experimental::
 //---------------------------------------------------------------------------
 
 
+shared_ptr<AccessInterfaceTranslator> TestModelBuilder::Create_Brocade (std::shared_ptr<AccessInterfaceTranslatorProtocol>  TopProtocol,
+                                                      std::shared_ptr<AccessInterfaceProtocol>           masterProtocol,
+                                                      std::shared_ptr<AccessInterfaceProtocol>           slaveProtocol,
+                                                      std::initializer_list<std::shared_ptr<AccessInterface>> taps)
+{
+ return m_builder.Create_Brocade(TopProtocol,masterProtocol,slaveProtocol,taps);
+}
 
 
 //===========================================================================

@@ -8,6 +8,7 @@ set(CXXTEST_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../cxxtest")
 message("")
 message("================================================================================")
 message(STATUS "Tests_Common: CXXTEST_INCLUDE_DIR:        ${CXXTEST_INCLUDE_DIR}")
+message(STATUS "Tests_Common: PDL_APPLICATIONS_INCLUDE_DIRS ${PDL_APPLICATIONS_INCLUDE_DIRS}")
 
 
 set(TRAITS            "${CMAKE_CURRENT_LIST_DIR}/CxxTest_Traits/BinaryVector_Traits.hpp"
@@ -22,12 +23,14 @@ set(HELPERS_HEADERS  "${CMAKE_CURRENT_LIST_DIR}/SpiedProtocolsCommands.hpp"
                      "${CMAKE_CURRENT_LIST_DIR}/Spy_AccessInterfaceProtocols.hpp"
                      "${CMAKE_CURRENT_LIST_DIR}/Spy_I2C_Protocol.hpp"
                      "${CMAKE_CURRENT_LIST_DIR}/Spy_STIL_Protocol.hpp"
-                     "${CMAKE_CURRENT_LIST_DIR}/Spy_SVF_Protocol.hpp")
+                     "${CMAKE_CURRENT_LIST_DIR}/Spy_SVF_Protocol.hpp"
+                     "${CMAKE_CURRENT_LIST_DIR}/Spy_Emulation_Translator.hpp")
 
 set(HELPERS_SOURCES  "${CMAKE_CURRENT_LIST_DIR}/Spy_AccessInterfaceProtocols.cpp"
                      "${CMAKE_CURRENT_LIST_DIR}/Spy_I2C_Protocol.cpp"
                      "${CMAKE_CURRENT_LIST_DIR}/Spy_STIL_Protocol.cpp"
                      "${CMAKE_CURRENT_LIST_DIR}/Spy_SVF_Protocol.cpp"
+                     "${CMAKE_CURRENT_LIST_DIR}/Spy_Emulation_Translator.cpp"
                      "${CMAKE_CURRENT_LIST_DIR}/TestUtilities.cpp"
                      "${CMAKE_CURRENT_LIST_DIR}/TestModelBuilder.cpp" )
 
@@ -51,9 +54,9 @@ target_compile_options      (Tests_Common PUBLIC  -fexceptions -std=c++14)
 target_compile_definitions  (Tests_Common PUBLIC  CXXTEST_HAVE_EH CXXTEST_HAVE_STD CXXTEST_PARTIAL_TEMPLATE_SPECIALIZATION)
 target_include_directories  (Tests_Common PUBLIC  ${CXXTEST_INCLUDE_DIR}
                                                   ${CMAKE_CURRENT_SOURCE_DIR}
+                                                  ${LIB_PDL_APPLICATIONS_INCLUDE_DIRS}
                                                   ${CMAKE_CURRENT_SOURCE_DIR}/CxxTest_Traits)
-
-target_link_libraries (Tests_Common  ${PLATFORM_LIBS} Mast_Core)
+target_link_libraries (Tests_Common  ${PLATFORM_LIBS} Mast_Core PDL_Applications)
 
 # ---------------- Build Runner.cpp
 #

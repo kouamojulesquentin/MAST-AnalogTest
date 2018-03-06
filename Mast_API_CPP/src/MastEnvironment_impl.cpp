@@ -29,6 +29,7 @@
 #include "ModelBuildDriver.hpp"
 #include "Utility.hpp"
 #include "EnumsUtility.hpp"
+#include "AccessInterfaceTranslatorProtocolFactory.hpp"
 
 #include "tclap/DiscardOutput.h"
 
@@ -97,7 +98,7 @@ MastEnvironment_impl::MastEnvironment_impl (bool unitTestContext)
 //!                     have been registered by a plugin
 //! @param parameters   Optional parameters to create the protocol
 //!
-void MastEnvironment_impl::ChangeAccessInterfaceProtocol (const string& protocolName, const string& parameters)
+void MastEnvironment_impl::ChangeTopProtocol (const string& protocolName, const string& parameters)
 {
   LOG(DEBUG) << "Force protocol \"" << protocolName << "\" to top level access interface";
 
@@ -106,28 +107,43 @@ void MastEnvironment_impl::ChangeAccessInterfaceProtocol (const string& protocol
 
   auto topNode            = Startup::sm_systemModel->Root();
   auto topAccessInterface = dynamic_pointer_cast<AccessInterface>(topNode);
+  auto topTranslator = dynamic_pointer_cast<AccessInterfaceTranslator>(topNode);
 
   if (!topAccessInterface)
-  {
-    auto topChain = dynamic_pointer_cast<Chain>(topNode);
-    CHECK_VALUE_NOT_NULL (topChain, "Model top node is not an access interface nor a chain");
-    CHECK_TRUE           (HasOnlyChilrenOfType<AccessInterface>(topChain), "Top chain is not composed of only access interface(s)");
-
-    topAccessInterface = dynamic_pointer_cast<AccessInterface>(topChain->FirstChild());;
-
-    if (topAccessInterface->NextSibling())
+   {
+   if (!topTranslator)
     {
+     auto topChain = dynamic_pointer_cast<Chain>(topNode);
+     CHECK_VALUE_NOT_NULL (topChain, "Model top node is not an access interface, a translator nor a chain");
+     CHECK_TRUE           (HasOnlyChilrenOfType<AccessInterface>(topChain), "Top chain is not composed of only access interface(s)");
+
+     topAccessInterface = dynamic_pointer_cast<AccessInterface>(topChain->FirstChild());;
+
+     if (topAccessInterface->NextSibling())
+     {
       LOG(WARNING) << "Changing protocol for multiple AccessInterface is Not Yet Implemented !!!";
+     }
     }
-  }
+    }
 
-  CHECK_VALUE_NOT_NULL(topAccessInterface, "Model top node is not an access interface");
+//  CHECK_VALUE_NOT_NULL(topAccessInterface, "Model top node is not an access interface");
 
-  topAccessInterface->SetProtocol(std::move(protocol));
-  LOG(INFO) << "Have forced protocol \"" << protocolName << "\" on access interface \"" << topAccessInterface->Name() << "\"";
+  if (topAccessInterface)
+   {
+   topAccessInterface->SetProtocol(std::move(protocol));
+   LOG(INFO) << "Have forced protocol \"" << protocolName << "\" on access interface \"" << topAccessInterface->Name() << "\"";
+   }
+
+  if (topTranslator)
+   {
+  auto& tr_factory  = AccessInterfaceTranslatorProtocolFactory::Instance();
+  auto  tr_protocol = tr_factory.Create(protocolName, parameters);
+   topTranslator->SetProtocol(std::move(tr_protocol));
+   LOG(INFO) << "Have forced protocol \"" << protocolName << "\" on access interface translator \"" << topTranslator->Name() << "\"";
+   }
 }
 //
-//  End of: MastEnvironment_impl::ChangeAccessInterfaceProtocol
+//  End of: MastEnvironment_impl::ChangeTopProtocol
 //---------------------------------------------------------------------------
 
 
@@ -386,7 +402,7 @@ void MastEnvironment_impl::CreateSystemModel ()
 
   if (!m_configuration->AccessInterfaceProtocolName().empty())
   {
-    ChangeAccessInterfaceProtocol(m_configuration->AccessInterfaceProtocolName(),
+    ChangeTopProtocol(m_configuration->AccessInterfaceProtocolName(),
                                   m_configuration->AccessInterfaceProtocolParameters());
   }
 

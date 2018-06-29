@@ -1,0 +1,14 @@
+JTAG_TAP TAP Loopback 4 1
+(
+ CHAIN Top_level
+  {
+    LINKER Mux Binary_noidle SR 2
+    PDL Debug_mux
+    (
+      REGISTER reg_1 12 Bypass: "0xABC"
+      REGISTER reg_2 12 Bypass: "0xABC"
+    )
+    REGISTER SR 1 Bypass: "0b0"
+  } 
+)
+

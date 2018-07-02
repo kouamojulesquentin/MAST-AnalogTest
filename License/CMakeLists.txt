@@ -1,6 +1,6 @@
 project(License)
 
-set (WARNINGS "-Wall -Wextra -Wpedantic  -Wredundant-decls -Wundef -Wmissing-include-dirs -Wswitch-enum")
+set (WARNINGS "-Wall -Wextra  -Wredundant-decls -Wundef -Wmissing-include-dirs -Wswitch-enum")
 set (CFLAGS "${WARNINGS}")
 set (CPPFLAGS "${WARNINGS} -std=c++14")
 

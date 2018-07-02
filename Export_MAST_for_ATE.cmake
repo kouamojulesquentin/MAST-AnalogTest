@@ -44,7 +44,7 @@ get_filename_component(Gxx_PATH ${CMAKE_CXX_COMPILER} DIRECTORY)
 if (EXISTS ${LOCAL_GCC_PATH})
  message(STATUS "Export_ATE: Setting local STD_LIBS_PATH")
  set (STD_LIBS_PATH ${LOCAL_GCC_PATH}/../lib64/)
- install(FILES   ${STD_LIBS_PATH}libgcc_s.so.1 ${STD_LIBS_PATH}libstdc++.so.6  ${STD_LIBS_PATH}libstdc++.so.6.0.20
+ install(FILES   ${STD_LIBS_PATH}libgcc_s.so.1 ${STD_LIBS_PATH}libstdc++.so.6  ${STD_LIBS_PATH}libstdc++.so.6.0.21
         COMPONENT   ATE_Build
         DESTINATION ${ATE_Build_EXPORT}/Std_libs)
 else()

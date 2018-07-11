@@ -1,12 +1,13 @@
+#Configuration file ready to be used from MAST_ROOT/vhd for Modelsim cosimulation
 Mast_Options:
-  SIT_file_path: ./Debug_mux/Debug_mux.sit                                         # [SIT] file used by the project
+  SIT_file_path: ./Examples/SIT/MIB_Tutorial.sit          # [SIT] file used by the project
   Access_interface_protocol:
     Name:                                                 # When defined, it overrides the one defined in [SIT] file
     Parameters:                                           # Optional access interface protocol parameters (in case the one in [SIT] file is overriden)
   Configuration_algorithm: last_or_default                # One of [last_lazy, last_or_default, last_or_default_greedy] or one defined by a [plugin])
   Plugins:
     Files: []                                             # List of plugin file(s) path (absolute or relative path)
-    Directories: [./Debug_mux]                                # Directory from where to load plugin files (absolute or relative path)
+    Directories: [./MIB_Tutorial/]                                # Directory from where to load plugin files (absolute or relative path)
   Model_checking:
     Enable:    true                                       # Enable/Disable model checking (provided it has been parsed successfully)
     File_path: ""                                         # Optional file path (logged when no path when logged is enabled)

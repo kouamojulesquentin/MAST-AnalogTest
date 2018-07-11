@@ -143,6 +143,32 @@ component AMS_testcase
    );
 end component;
 
+component DEBUG_MUX_testcase 
+ port  ( clk   : in  std_logic;
+     rst  : in  std_logic;
+     TDI   : in  std_logic;
+     TDO   : out std_logic;
+     mode  : in  std_logic;
+     SH_en : in  std_logic;
+     CA_en : in  std_logic;
+     UP_en : in  std_logic;
+     Sel   : in  std_logic
+   );
+end component;
+
+component MIB_tutorial_testcase 
+ port  ( clk   : in  std_logic;
+     rst  : in  std_logic;
+     TDI   : in  std_logic;
+     TDO   : out std_logic;
+     mode  : in  std_logic;
+     SH_en : in  std_logic;
+     CA_en : in  std_logic;
+     UP_en : in  std_logic;
+     Sel   : in  std_logic
+   );
+end component;
+
 BEGIN
  
 
@@ -235,7 +261,7 @@ DR_Mux : process(IR_value,from_IR,from_DR,Select_DR,Select_IR)
     from_scan_chain <= from_IR;
   elsif(Select_DR = '1') then
    case (IR_value) is 
-    when "11111111" => 
+    when "1111" => 
                select_BYP <= '1';
 	       from_scan_chain <= from_BYP;
     when others =>
@@ -291,6 +317,37 @@ end generate;
 SUT_AMS: if target_SUT = AMS generate
 
 SUT : AMS_testcase  port map 
+   ( clk   => TCK,
+     rst   => reset_chains,
+     TDI   => to_scan_chain,
+     TDO   => from_DR(1),
+     mode  => '1',
+     SH_en => ShiftDR,
+     CA_en => CaptureDR,
+     UP_en => UpdateDR,
+     Sel   => select_DR_chain(1)
+   );
+
+end generate;
+
+SUT_MIB_tutorial: if target_SUT = MIB_tutorial generate
+
+SUT : MIB_tutorial_testcase  port map 
+   ( clk   => TCK,
+     rst   => reset_chains,
+     TDI   => to_scan_chain,
+     TDO   => from_DR(1),
+     mode  => '1',
+     SH_en => ShiftDR,
+     CA_en => CaptureDR,
+     UP_en => UpdateDR,
+     Sel   => select_DR_chain(1)
+   );
+end generate;
+
+SUT_DEBUG_MUX: if target_SUT = DEBUG_MUX generate
+
+SUT : DEBUG_MUX_testcase  port map 
    ( clk   => TCK,
      rst   => reset_chains,
      TDI   => to_scan_chain,

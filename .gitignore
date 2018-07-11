@@ -167,6 +167,13 @@
 /vhdl/data_to_rtl.svf
 /vhdl/transcript
 /vhdl/work/*
+/vhdl/*.do
+/vhdl/*.log
+/vhdl/*.txt
+/vhdl/Debug_mux
+/vhdl/MIB_Tutorial
+/vhdl/Mast
+transcript
 Intel/src/archive/
 License/license.mast
 MastExample_CPP/SIT/*.gml

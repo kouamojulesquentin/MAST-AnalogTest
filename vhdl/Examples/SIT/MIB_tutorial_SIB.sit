@@ -4,7 +4,7 @@ JTAG_TAP TAP SVF_Simulation 4 1
   {
       REGISTER reg_2 8 Hold_value Bypass: "0xAB"
    SIB SIB1 PRE HIGH
-     PDL Debug_mux
+     PDL MIB_Tutorial
      ( REGISTER reg_1 8 Hold_value Bypass: "0xAB")
  } 
 )

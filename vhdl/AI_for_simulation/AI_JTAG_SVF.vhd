@@ -205,7 +205,49 @@ function hex_to_bin(c: character) return bit_vector is
     end case;
    return nibble;
   end hex_to_bin;
-			  
+
+  function vec2str(vec: std_logic_vector) return string is
+    variable stmp: string(vec'left+1 downto 1);
+    begin
+        for i in vec'reverse_range loop
+            if (vec(i) = 'U') then
+                stmp(i+1) := 'U';
+            elsif (vec(i) = 'X') then
+                stmp(i+1) := 'X';
+            elsif (vec(i) = '0') then
+                stmp(i+1) := '0';
+            elsif (vec(i) = '1') then
+                stmp(i+1) := '1';
+            elsif (vec(i) = 'Z') then
+                stmp(i+1) := 'Z';
+            elsif (vec(i) = 'W') then
+                stmp(i+1) := 'W';
+            elsif (vec(i) = 'L') then
+                stmp(i+1) := 'L';
+           elsif (vec(i) = 'H') then
+                stmp(i+1) := 'H';
+           else
+                stmp(i+1) := '-';
+            end if;
+        end loop;
+    return stmp;
+    end vec2str;
+    			  
+  function vec2str(vec: bit_vector) return string is
+    variable stmp: string(vec'left+1 downto 1);
+    begin
+        for i in vec'reverse_range loop
+            if (vec(i) = '0') then
+                stmp(i+1) := '0';
+            elsif (vec(i) = '1') then
+                stmp(i+1) := '1';
+           else
+                stmp(i+1) := '-';
+            end if;
+        end loop;
+    return stmp;
+    end vec2str;			  
+
 begin
 
    --reset
@@ -302,11 +344,13 @@ begin
 		while (i >0) loop
 		  cur_nibble := i;
 		  this_nibble := hex_to_bin(vector_hex_p(cur_nibble));
+--		report to_hstring(this_nibble);
 		  k:=0;
 		  while(k <4) loop
 		  --one bit at a time to check for incomplete nibbles
 		  if (vector_bit < vector_length) then
 		   this_vector_p(vector_bit) := this_nibble(3-k);
+--		   report "Bit "&integer'image(vector_bit)&":"&bit'image(this_nibble(3-k));
 		   vector_bit := vector_bit+1;
 		   end if;
 		  k:=k+1;
@@ -386,6 +430,7 @@ data_logger: process(log_status,toggle) is
  variable cur_bit : integer;
  variable first_execution : integer:=0;
  variable output_vector_p : string_p;
+ variable output_vector_debug : std_logic_vector(1 to 300);
   begin
  if (first_execution=0) then
    init_target(output_SVF_dir&output_SVF_file);
@@ -411,11 +456,13 @@ data_logger: process(log_status,toggle) is
    if (old_state = Shift_IR) or (old_state = Shift_DR) then
 	if (next_vector_length-cur_bit>0) then
 	 output_vector_p(next_vector_length-cur_bit):=chr(TDO);
+	 output_vector_debug(next_vector_length-cur_bit):=TDO;
 	end if;
 	cur_bit := cur_bit+1;
       next_log_status <= active;
      else
-        write_string(output_vector_p(1 to next_vector_length));
+        report "data_logger: received string "&output_vector_p(1 to next_vector_length);
+	write_string(output_vector_p(1 to next_vector_length));
 	flush_string;
         cur_bit := 0;
         next_log_status <= idle;

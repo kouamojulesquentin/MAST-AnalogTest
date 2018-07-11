@@ -3,7 +3,7 @@ project(Mast_Debug_mux)
 
 message("")
 message("================================================================================")
-message(STATUS "Mast_Debug_mux: ")
+message(STATUS "MIB_Tutorial: ")
 message("================================================================================")
 message("")
 
@@ -16,13 +16,12 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
 include_directories(${LIBMAST_CPP_API_INCLUDE_DIRS})
 include_directories(${LIBLOGGER_INCLUDE_DIRS})
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug_mux")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MIB_Tutorial")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
-add_library           (Debug_mux SHARED Debug_mux.cpp)
-set_target_properties (Debug_mux PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
-target_link_libraries (Debug_mux Mast_API_CPP ${EXTRA_LIBS})
+add_library           (MIB_Tutorial SHARED MIB_Tutorial.cpp)
+set_target_properties (MIB_Tutorial PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+target_link_libraries (MIB_Tutorial Mast_API_CPP ${EXTRA_LIBS})
 
-install(FILES Debug_mux.sit DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-install(FILES Debug_mux.yml DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+install(FILES MIB_Tutorial.yml DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 

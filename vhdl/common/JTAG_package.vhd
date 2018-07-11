@@ -118,6 +118,31 @@ component SIB
    );
  end  component;
 
+component MUX_Exclusive 
+ port
+   ( TCK  : in  std_logic;
+     RST  : in  std_logic;
+     SO   : out std_logic;
+     SEL  : in  std_logic;
+     CE   : in  std_logic;
+     UE   : in  std_logic;
+     SE   : in  std_logic;
+     
+     SI_0   : in  std_logic;
+     SEL_0  : out  std_logic;
+     CE_0   : out  std_logic;
+     UE_0   : out  std_logic;
+     SE_0   : out  std_logic;
+     
+     SI_1   : in  std_logic;
+     SEL_1  : out  std_logic;
+     CE_1   : out  std_logic;
+     UE_1   : out  std_logic;
+     SE_1   : out  std_logic
+
+   );
+ end  component;
+
 end;
 
 package body JTAG_package is

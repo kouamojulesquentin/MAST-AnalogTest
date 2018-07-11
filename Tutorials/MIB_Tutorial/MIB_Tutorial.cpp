@@ -67,7 +67,7 @@ void Check_Register (string registerPath, uint16_t registerSize, uint16_t loopCo
   }
 
 
-  void Debug_mux ()
+  void MIB_Tutorial ()
   {
     auto     reg_1 = "reg_1";
     auto     reg_2 = "reg_2";
@@ -97,7 +97,7 @@ bool RegisterAlgorithms ()
 
   // ---------------- Do register algorithm(s) with a name
   //
-  repo.RegisterAlgorithm("Debug_mux", Debug_mux);
+  repo.RegisterAlgorithm("MIB_Tutorial", MIB_Tutorial);
 
   return true;
 }

@@ -73,6 +73,13 @@ int init_log_file (
 }
 
 
+void flush_string (
+)
+{
+    fprintf(outfile,"\n");
+    fflush(outfile);
+}
+
 /* ********** C code for VHDL in_params procedure. ********** */
 void write_string (
   mtiVariableIdT  vhdl_array       /* IN string         */
@@ -88,14 +95,9 @@ void write_string (
     mti_PrintFormatted("Writing string \"%s\" to file\n",string_val);
     fprintf(outfile,"%s",string_val);
     free( string_val );
-}
-
-void flush_string (
-)
-{
-    fprintf(outfile,"\n");
     fflush(outfile);
 }
+
 
 /* ********** C code for VHDL in_params procedure. ********** */
 void write_log_line (

@@ -274,6 +274,7 @@ use IEEE.STD_LOGIC_1164.all;
 use ieee.std_logic_arith.all;
 library work;
 use work.utilities.all;
+use work.types.all;
 
 
 ---------------------------------------------------
@@ -286,7 +287,8 @@ use work.utilities.all;
 ---------------------------------------------------
 entity MIB is
  generic (size :integer := 1;
-          reg_before : boolean := true);
+          reg_before : boolean := true;
+	  selector: coding:= Binary);
  port
    ( TCK   : in  std_logic;
      RST  : in  std_logic;
@@ -297,14 +299,14 @@ entity MIB is
      UE   : in  std_logic;
      SE   : in  std_logic;
      
-     toSI   : out std_logic_vector(size downto 1);
-     fromSO : in  std_logic_vector(size downto 1);
-     toSEL  : out  std_logic_vector(size downto 1);
-     toCE   : out std_logic_vector(size downto 1);
-     toUE   : out std_logic_vector(size downto 1);
-     toSE   : out std_logic_vector(size downto 1);
-     toTCK  : out std_logic_vector(size downto 1);
-     toRST  : out std_logic_vector(size downto 1)
+     toSI   : out std_logic_vector(1 to size);
+     fromSO : in  std_logic_vector(1 to size);
+     toSEL  : out  std_logic_vector(1 to size);
+     toCE   : out std_logic_vector(1 to size);
+     toUE   : out std_logic_vector(1 to size);
+     toSE   : out std_logic_vector(1 to size);
+     toTCK  : out std_logic_vector(1 to size);
+     toRST  : out std_logic_vector(1 to size)
    );
  end  MIB;
   
@@ -367,8 +369,10 @@ component bs_register
    MIB_In <= SI when MIB_selvalue=0 else fromSO(MIB_selvalue);
    SO     <= MIB_Out ;
  end generate;
- 
- sel_process : process(SEL,CE,UE,SE,RST,MIB_selvalue)
+
+
+sel_process_binary: if selector = Binary generate 
+ process(SEL,CE,UE,SE,RST,MIB_selvalue)
  begin
  toSEL  <= (others => '0');
  toCE   <= (others => '0');  
@@ -384,7 +388,28 @@ component bs_register
   toRST (MIB_selvalue)  <= RST;
  end if; 
  end process;
+end generate;
  
+sel_process_binary_noidle: if selector = Binary_noidle generate 
+  --Value 0 has to select Chain 1
+ process(SEL,CE,UE,SE,RST,MIB_selvalue)
+ begin
+ if (MIB_selvalue = 0) then
+  toSEL(1)   <= SEL ;
+  toCE (1)   <= CE ;  
+  toUE (1)   <= UE ;
+  toSE (1)   <= SE ; 
+  toRST (1)  <= RST;
+ else
+  toSEL(MIB_selvalue+1)   <= SEL ;
+  toCE (MIB_selvalue+1)   <= CE ;  
+  toUE (MIB_selvalue+1)   <= UE ;
+  toSE (MIB_selvalue+1)   <= SE ; 
+  toRST (MIB_selvalue+1)  <= RST;
+ end if;
+ end process;
+end generate;
+
 -- toSEL  <= SEL when MIB_select(1) = '1' else '0';
 -- toCE   <= CE  when MIB_select(1) = '1' else '0';  
 -- toUE   <= UE  when MIB_select(1) = '1' else '0';

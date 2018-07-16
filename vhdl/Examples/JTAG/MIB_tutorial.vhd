@@ -30,6 +30,7 @@ use work.slave_TAP_package.all;
 use work.JTAG_package.all;
 use work.MAST_config.all;
 use work.MAST_write.all;
+use work.types.all;
 use work.exchange_registers.all;
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -87,7 +88,8 @@ signal toRST  : std_logic_vector(1 to MUX_SIZE);
 
 component MIB 
  generic (size :integer := 1;
-          reg_before : boolean := true);
+          reg_before : boolean := true;
+	  selector: coding:= Binary);
  port
    ( TCK   : in  std_logic;
      RST  : in  std_logic;
@@ -98,14 +100,14 @@ component MIB
      UE   : in  std_logic;
      SE   : in  std_logic;
      
-     toSI   : out std_logic_vector(size downto 1);
-     fromSO : in  std_logic_vector(size downto 1);
-     toSEL  : out  std_logic_vector(size downto 1);
-     toCE   : out std_logic_vector(size downto 1);
-     toUE   : out std_logic_vector(size downto 1);
-     toSE   : out std_logic_vector(size downto 1);
-     toTCK  : out std_logic_vector(size downto 1);
-     toRST  : out std_logic_vector(size downto 1)
+     toSI   : out std_logic_vector(1 to size);
+     fromSO : in  std_logic_vector(1 to size);
+     toSEL  : out  std_logic_vector(1 to size);
+     toCE   : out std_logic_vector(1 to size);
+     toUE   : out std_logic_vector(1 to size);
+     toSE   : out std_logic_vector(1 to size);
+     toTCK  : out std_logic_vector(1 to size);
+     toRST  : out std_logic_vector(1 to size)
    );
  end  component;
 
@@ -130,7 +132,8 @@ begin
 
 MIB_0 : MIB 
      generic map (size => MUX_SIZE,
-     		  reg_before => false)
+     		  reg_before => false,
+	          selector=> Binary)
      port map(   
      TCK  => clk,
      RST  => rst, 

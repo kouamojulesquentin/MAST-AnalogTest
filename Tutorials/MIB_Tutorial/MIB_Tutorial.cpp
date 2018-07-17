@@ -76,6 +76,7 @@ void Check_Register (string registerPath, uint16_t registerSize, uint16_t loopCo
 
     Check_Register(reg_1,registerSize,loopCount);
     Check_Register(reg_2,registerSize,loopCount);
+    Check_Register("reg_3",registerSize,loopCount);
     
   }  
 

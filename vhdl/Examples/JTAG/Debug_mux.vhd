@@ -31,8 +31,8 @@ use work.JTAG_package.all;
 use work.MAST_config.all;
 use work.MAST_write.all;
 use work.exchange_registers.all;
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
+use work.types.all;
+use work.types.all;
 
 entity DEBUG_MUX_testcase is
  port  ( clk   : in  std_logic;
@@ -49,8 +49,14 @@ end DEBUG_MUX_testcase;
 
 architecture behav of DEBUG_MUX_testcase is
 
+------------------------------------------------------
+-- Configuration Parameters
+-- NB: must be coherent with MIB_Tutorial.sit
 constant REGISTER_SIZE : integer := 8;
-constant MUX_SIZE : integer := 3;
+constant MUX_SIZE : integer := 2;
+constant SELECTOR_CODING : coding:= Binary_noidle;
+constant REGISTER_BEFORE_MUX : boolean := false;
+------------------------------------------------------
 
 --Generic signals used in the configurable SUT
 --signal internal_chain : std_logic;
@@ -88,7 +94,8 @@ signal toRST  : std_logic_vector(1 to MUX_SIZE);
 
 component MIB 
  generic (size :integer := 1;
-          reg_before : boolean := true);
+          reg_before : boolean := true;
+	  selector: coding:= Binary);
  port
    ( TCK   : in  std_logic;
      RST  : in  std_logic;
@@ -99,14 +106,14 @@ component MIB
      UE   : in  std_logic;
      SE   : in  std_logic;
      
-     toSI   : out std_logic_vector(size downto 1);
-     fromSO : in  std_logic_vector(size downto 1);
-     toSEL  : out  std_logic_vector(size downto 1);
-     toCE   : out std_logic_vector(size downto 1);
-     toUE   : out std_logic_vector(size downto 1);
-     toSE   : out std_logic_vector(size downto 1);
-     toTCK  : out std_logic_vector(size downto 1);
-     toRST  : out std_logic_vector(size downto 1)
+     toSI   : out std_logic_vector(1 to size);
+     fromSO : in  std_logic_vector(1 to size);
+     toSEL  : out  std_logic_vector(1 to size);
+     toCE   : out std_logic_vector(1 to size);
+     toUE   : out std_logic_vector(1 to size);
+     toSE   : out std_logic_vector(1 to size);
+     toTCK  : out std_logic_vector(1 to size);
+     toRST  : out std_logic_vector(1 to size)
    );
  end  component;
 
@@ -131,7 +138,8 @@ begin
 
 MIB_0 : MIB 
      generic map (size => MUX_SIZE,
-     		  reg_before => false)
+     		  reg_before => REGISTER_BEFORE_MUX,
+	          selector=> SELECTOR_CODING)
      port map(   
      TCK  => clk,
      RST  => rst, 
@@ -171,37 +179,5 @@ port map
      ); 
 end generate;
 
----------------------------------
---static_reg_log : output_connection generic map (data_size => 64,
---                                        output_file => "static_reg.out")
---  port map
---   (
---     data_in => static_out,
---     Sel => SEL_delay(0),
---     UP_en => UE_delay(0)
---   );
-
---static_reg_in : input_connection generic map (data_size => 64,
---                                        input_file => "static_reg.in")
---  port map
---   (
---     data_out => static_in,
---     Sel =>  Sel,
---     CA_en => CA_en
---   );
----------------------------------
-
-
----------------------------------
---dynamic_reg_log : output_connection generic map (data_size => 128,
---                                        output_file => "dynamic_reg.out")
---  port map
---   (
---     data_in => dynamic_out,
---     Sel => SEL_delay(1),
---     UP_en => UE_delay(1)
---   );
----------------------------------
-
 end;
- 
+

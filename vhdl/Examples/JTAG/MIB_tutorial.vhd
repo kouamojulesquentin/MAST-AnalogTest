@@ -49,8 +49,15 @@ entity MIB_tutorial_testcase is
 end MIB_tutorial_testcase;
 
 architecture behav of MIB_tutorial_testcase is
+
+------------------------------------------------------
+-- Configuration Parameters
+-- NB: must be coherent with MIB_Tutorial.sit
 constant REGISTER_SIZE : integer := 8;
-constant MUX_SIZE : integer := 3;
+constant MUX_SIZE : integer := 4;
+constant SELECTOR_CODING : coding:= Binary_noidle;
+constant REGISTER_BEFORE_MUX : boolean := false;
+------------------------------------------------------
 
 --Generic signals used in the configurable SUT
 --signal internal_chain : std_logic;
@@ -132,8 +139,8 @@ begin
 
 MIB_0 : MIB 
      generic map (size => MUX_SIZE,
-     		  reg_before => false,
-	          selector=> Binary)
+     		  reg_before => REGISTER_BEFORE_MUX,
+	          selector=> SELECTOR_CODING)
      port map(   
      TCK  => clk,
      RST  => rst, 

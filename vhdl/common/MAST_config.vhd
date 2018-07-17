@@ -14,8 +14,8 @@ package MAST_config is
   
   type target_SUT_type is (LOOPBACK,TUTORIAL_1,SIB_TUTORIAL,AMS, DEBUG_MUX, MIB_tutorial);
 
-  constant target_SUT :target_SUT_type :=MIB_tutorial;
---  constant target_SUT :target_SUT_type :=DEBUG_MUX;
+--  constant target_SUT :target_SUT_type :=MIB_tutorial;
+  constant target_SUT :target_SUT_type :=DEBUG_MUX;
 
  constant IR_SIZE : integer := 4; --for DEBUG_MUX
 -- constant IR_SIZE : integer := 8; --common to all other Use cases for simplicity

@@ -312,10 +312,13 @@ entity MIB is
   
 architecture behav of  MIB is
  
- signal MIB_select : std_logic_vector(log2roundup(size) downto 1) := (others => '0');
+ signal MIB_select : std_logic_vector(log2roundup(size+1) downto 1) := (others => '0');
  signal MIB_selvalue : natural range 0 to size;
  signal  MIB_Out : std_logic;
  signal  MIB_In : std_logic;
+ signal  MIB_Out_bypass : std_logic;
+ signal  MUX_out_closed : std_logic;
+ signal  MUX_in_closed : std_logic;
  
 component bs_cell 
  port
@@ -355,23 +358,7 @@ component bs_register
 
  toTCK <= (others => TCK); --no clock gating to avoid timing problems on FPGA
 
- MIB_selvalue <=  conv_integer(unsigned(MIB_select));
-
-
- ctrl_reg_before_mux: if reg_before = true generate
-   toSI <= (others => MIB_Out) ; 
-   MIB_In <= SI;
-    SO     <= MIB_Out when MIB_selvalue=0 else fromSO(MIB_selvalue);
- end generate;
-
- ctrl_reg_after_mux: if reg_before = false generate
-   toSI <= (others => SI) ; 
-   MIB_In <= SI when MIB_selvalue=0 else fromSO(MIB_selvalue);
-   SO     <= MIB_Out ;
- end generate;
-
-
-sel_process_binary: if selector = Binary generate 
+ 
  process(SEL,CE,UE,SE,RST,MIB_selvalue)
  begin
  toSEL  <= (others => '0');
@@ -388,33 +375,59 @@ sel_process_binary: if selector = Binary generate
   toRST (MIB_selvalue)  <= RST;
  end if; 
  end process;
+
+ ctrl_reg_before_chain: if reg_before = true generate
+   toSI <= (others => MIB_Out) ; 
+   MIB_In <= SI;
+   MUX_in_closed <= MIB_Out;
+    SO     <= MUX_out_closed when MIB_selvalue=0 else fromSO(MIB_selvalue);
+ end generate;
+
+ ctrl_reg_after_mux: if reg_before = false generate
+   toSI <= (others => SI) ; 
+--   MIB_In <= SI when MIB_selvalue=0 else fromSO(MIB_selvalue);
+   MIB_In <= MUX_out_closed when MIB_selvalue=0 else fromSO(MIB_selvalue);
+   SO     <= MIB_Out ;
+   MUX_in_closed <= SI;
+ end generate;
+
+  coding_resolution: process(MIB_select)
+  begin
+   if (selector = Binary) then
+     MIB_selvalue <=  conv_integer(unsigned(MIB_select));
+   elsif (selector = Binary_noidle) then
+     MIB_selvalue <=  conv_integer(unsigned(MIB_select))+1;
+   else  
+     MIB_selvalue <=  0;
+   end if;  
+  end process;
+
+sel_process_binary: if selector = Binary generate 
+
+ --Mib can be closed and therefore the MUX bypassed
+ MUX_out_closed  <=MUX_in_closed;
+  
+MIB_ctrl_reg: bs_register 
+    generic map (size => log2roundup(size+1))
+    port map
+   ( clk =>TCK,   
+     rst =>RST,
+     TDI => MIB_in,
+     TDO  => MIB_Out,
+     P_in => MIB_select(log2roundup(size+1) downto 1) ,
+     P_out =>MIB_select(log2roundup(size+1) downto 1),
+     mode =>'1',
+     SH_en =>SE,
+     CA_en =>'0',
+     UP_en =>UE,
+     Sel =>SEL);
 end generate;
  
 sel_process_binary_noidle: if selector = Binary_noidle generate 
-  --Value 0 has to select Chain 1
- process(SEL,CE,UE,SE,RST,MIB_selvalue)
- begin
- if (MIB_selvalue = 0) then
-  toSEL(1)   <= SEL ;
-  toCE (1)   <= CE ;  
-  toUE (1)   <= UE ;
-  toSE (1)   <= SE ; 
-  toRST (1)  <= RST;
- else
-  toSEL(MIB_selvalue+1)   <= SEL ;
-  toCE (MIB_selvalue+1)   <= CE ;  
-  toUE (MIB_selvalue+1)   <= UE ;
-  toSE (MIB_selvalue+1)   <= SE ; 
-  toRST (MIB_selvalue+1)  <= RST;
- end if;
- end process;
-end generate;
 
--- toSEL  <= SEL when MIB_select(1) = '1' else '0';
--- toCE   <= CE  when MIB_select(1) = '1' else '0';  
--- toUE   <= UE  when MIB_select(1) = '1' else '0';
--- toSE   <= SE  when MIB_select(1) = '1' else '0'; 
--- toRST  <= RST when MIB_select(1) = '1' else '0'; 
+ --When the MIB is closed, the first chain is selected
+
+ 
  
 MIB_ctrl_reg: bs_register 
     generic map (size => log2roundup(size))
@@ -423,95 +436,15 @@ MIB_ctrl_reg: bs_register
      rst =>RST,
      TDI => MIB_in,
      TDO  => MIB_Out,
-     P_in => MIB_select ,
-     P_out =>MIB_select,
+     P_in => MIB_select(log2roundup(size) downto 1),
+     P_out =>MIB_select(log2roundup(size) downto 1),
      mode =>'1',
      SH_en =>SE,
      CA_en =>'0',
      UP_en =>UE,
      Sel =>SEL);
 
+end generate;
 
 end;
 
-Library IEEE,STD;
-use IEEE.STD_LOGIC_1164.all;
-
-entity MUX_Exclusive is
- port
-   ( TCK  : in  std_logic;
-     RST  : in  std_logic;
-     SO   : out std_logic;
-     SEL  : in  std_logic;
-     CE   : in  std_logic;
-     UE   : in  std_logic;
-     SE   : in  std_logic;
-     
-     SI_0   : in  std_logic;
-     SEL_0  : out  std_logic;
-     CE_0   : out  std_logic;
-     UE_0   : out  std_logic;
-     SE_0   : out  std_logic;
-     
-     SI_1   : in  std_logic;
-     SEL_1  : out  std_logic;
-     CE_1   : out  std_logic;
-     UE_1   : out  std_logic;
-     SE_1   : out  std_logic
-
-   );
- end  MUX_Exclusive;
-  
-architecture behav of  MUX_Exclusive is
- 
- signal Mux_ctrl : std_logic;
- 
- signal Mux_input : std_logic;
- 
-component bs_cell 
- port
-   ( clk   : in  std_logic;
-     rst  : in  std_logic;
-     TDI   : in  std_logic;
-     TDO   : out std_logic;
-     P_in  : in  std_logic;
-     P_out : out std_logic;
-     mode  : in  std_logic;
-     SH_en : in  std_logic;
-     CA_en : in  std_logic;
-     UP_en : in  std_logic;
-     Sel   : in  std_logic
-   );
- end  component;
-
- begin
-
-
-
- SEL_0  <= SEL when Mux_ctrl = '0' else '0';
- CE_0   <= CE  when Mux_ctrl = '0' else '0';  
- UE_0   <= UE  when Mux_ctrl = '0' else '0';
- SE_0   <= SE  when Mux_ctrl = '0' else '0'; 
-
- SEL_1  <= SEL when Mux_ctrl = '1' else '0';
- CE_1   <= CE  when Mux_ctrl = '1' else '0';  
- UE_1   <= UE  when Mux_ctrl = '1' else '0';
- SE_1   <= SE  when Mux_ctrl = '1' else '0'; 
-
- Mux_input <= SI_1 when Mux_ctrl = '1' else SI_0;
-
-Mux_ctrl_reg: bs_cell port map
-   ( clk =>TCK,   
-     rst =>RST,
-     TDI => Mux_input,
-     TDO  => SO,
-     P_in => Mux_ctrl ,
-     P_out =>Mux_ctrl,
-     mode =>'1',
-     SH_en =>SE,
-     CA_en =>'0',
-     UP_en =>UE,
-     Sel =>SEL);
-     
-     
-end;

@@ -311,6 +311,8 @@ entity MIB is
  end  MIB;
   
 architecture behav of  MIB is
+
+ constant zero_vector : std_logic_vector(size downto 1) := (others => '0');
  
  signal MIB_select : std_logic_vector(size downto 1) := (others => '0');
  signal MIB_selvalue : natural range 0 to size;
@@ -398,11 +400,22 @@ component bs_register
    elsif (selector = Binary_noidle) then
      MIB_selvalue <=  conv_integer(unsigned(MIB_select))+1;
     elsif (selector = One_Hot) then
+     MIB_selvalue <= 0;
     for I in MIB_select'range loop
       if MIB_select(I) = '1' then
         MIB_selvalue <=  size+1-I;
       end if;
     end loop;
+    elsif (selector = One_Hot_noidle)then
+     MIB_selvalue <= 0;
+    for I in MIB_select'range loop
+      if MIB_select(I) = '1' then
+        MIB_selvalue <=  size+1-I;
+      end if;
+    end loop;
+    if MIB_select = zero_vector then
+        MIB_selvalue <=  1;
+    end if;
   else  
      MIB_selvalue <=  0;
    end if;  
@@ -432,7 +445,6 @@ end generate;
 sel_process_binary_noidle: if selector = Binary_noidle generate 
 
  --When the MIB is closed, the first chain is selected
-
  
  
 MIB_ctrl_reg: bs_register 
@@ -457,6 +469,27 @@ sel_process_onehot: if selector = One_Hot generate
  --Mib can be closed and therefore the MUX bypassed
  MUX_out_closed  <=MUX_in_closed;
   
+MIB_ctrl_reg: bs_register 
+    generic map (size => size)
+    port map
+   ( clk =>TCK,   
+     rst =>RST,
+     TDI => MIB_in,
+     TDO  => MIB_Out,
+     P_in => MIB_select(size downto 1) ,
+     P_out =>MIB_select(size downto 1),
+     mode =>'1',
+     SH_en =>SE,
+     CA_en =>'0',
+     UP_en =>UE,
+     Sel =>SEL);
+end generate;
+
+sel_process_onehot_noidle: if selector = One_Hot_noidle generate 
+
+ --Mib can be closed and therefore the MUX bypassed
+ MUX_out_closed  <=MUX_in_closed;
+   
 MIB_ctrl_reg: bs_register 
     generic map (size => size)
     port map

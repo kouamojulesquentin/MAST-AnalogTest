@@ -27,6 +27,44 @@ using namespace std;
 namespace
 {
 
+void Check_Register (string registerPath, uint16_t registerSize, uint16_t loopCount)
+  {
+
+    auto     i    = 1u;
+    uint16_t curValue;
+    uint16_t writtenValue;
+
+   auto seed = chrono::high_resolution_clock::now().time_since_epoch().count();
+   auto word_rand = std::bind(std::uniform_int_distribution<int>(0,1<<registerSize),
+                           mt19937(seed));
+
+
+    std::cout << "\nMaking " << loopCount << " random iWrites on register " <<registerPath << "\n";
+
+    uint16_t initialValue = word_rand();
+    iWrite(registerPath, initialValue);
+    writtenValue = initialValue;
+    iApply();
+    std::cout << "\n Cycle "<< 0 << ": Wrote " <<std::hex<< initialValue ;
+    
+    while (i<loopCount)
+    {
+      initialValue=word_rand();
+     iWrite(registerPath, initialValue);
+     iApply();
+     curValue=iGet<uint16_t>(registerPath);
+
+     std::cout << "\n Cycle "<< i << ": Wrote "<<std::hex << initialValue ;
+     std::cout << "\n       "<< i << ": Read " <<std::hex<< curValue ;
+     if  (writtenValue == curValue)      std::cout << "\n  OK" ; else std::cout << "\n  NOT OK" ;
+     writtenValue = initialValue;
+     i++;
+    }
+     curValue=iGetRefresh<uint16_t>(registerPath);
+    std::cout << "\n       "<< i << ": Read " <<std::hex<< curValue ;
+     if  (writtenValue == curValue)      std::cout << "\n  OK" ; else std::cout << "\n  NOT OK" ;
+     std::cout << "\n" ;
+  }
 
 
   void Debug_mux ()
@@ -46,7 +84,7 @@ namespace
                            mt19937(seed));
 
 
-    std::cout << "\nMaking A random iWrites on registers  " <<register_1 <<" and "<< register_1 << "\n";
+    std::cout << "\nMaking random iWrites on registers  " <<register_1 <<" and "<< register_1 << "\n";
 
     writtenValue_1 = word_rand();
     writtenValue_2 = word_rand();
@@ -54,11 +92,8 @@ namespace
     iWrite(register_2, writtenValue_2);
     iApply();
     
-    iWrite(register_1, word_rand());
-    iWrite(register_2, word_rand());
-     iApply();
-     curValue_1=iGet<uint16_t>(register_1);
-     curValue_2=iGet<uint16_t>(register_2);
+     curValue_1=iGetRefresh<uint16_t>(register_1);
+     curValue_2=iGetRefresh<uint16_t>(register_2);
 
      if  (writtenValue_1 == curValue_1)      std::cout << register_1 << "  OK\n"; else
         { std::cout << register_1 << " ERROR: wrote "<<writtenValue_1<<" read "<<curValue_1<<"\n";mismatch= true;}
@@ -67,8 +102,8 @@ namespace
        
      if (mismatch)
       {
-       if (curValue_1 == writtenValue_2) std::cout << "\tStuck at 1 in Mux\n";
-       if (curValue_2 == writtenValue_1) std::cout << "\tStuck at 0 in Mux\n";
+       if (curValue_1 == writtenValue_2) std::cout << "\tPossible Stuck at 1 in Mux\n";
+       if (curValue_2 == writtenValue_1) std::cout << "\tPossible Stuck at 0 in Mux\n";
       }  
 
   }

@@ -2,7 +2,7 @@ JTAG_TAP TAP SVF_Simulation 4 1
 (
  CHAIN Top_level
   {
-   MIB MIB1 POST HIGH 4 Binary_noidle
+   MIB MIB1 POST HIGH 3 One_Hot
      PDL MIB_Tutorial
      ( 
        REGISTER reg_1 8 Hold_value Bypass: "0xBC"

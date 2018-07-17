@@ -312,7 +312,7 @@ entity MIB is
   
 architecture behav of  MIB is
  
- signal MIB_select : std_logic_vector(log2roundup(size+1) downto 1) := (others => '0');
+ signal MIB_select : std_logic_vector(size downto 1) := (others => '0');
  signal MIB_selvalue : natural range 0 to size;
  signal  MIB_Out : std_logic;
  signal  MIB_In : std_logic;
@@ -397,7 +397,13 @@ component bs_register
      MIB_selvalue <=  conv_integer(unsigned(MIB_select));
    elsif (selector = Binary_noidle) then
      MIB_selvalue <=  conv_integer(unsigned(MIB_select))+1;
-   else  
+    elsif (selector = One_Hot) then
+    for I in MIB_select'range loop
+      if MIB_select(I) = '1' then
+        MIB_selvalue <=  size+1-I;
+      end if;
+    end loop;
+  else  
      MIB_selvalue <=  0;
    end if;  
   end process;
@@ -444,6 +450,27 @@ MIB_ctrl_reg: bs_register
      UP_en =>UE,
      Sel =>SEL);
 
+end generate;
+
+sel_process_onehot: if selector = One_Hot generate 
+
+ --Mib can be closed and therefore the MUX bypassed
+ MUX_out_closed  <=MUX_in_closed;
+  
+MIB_ctrl_reg: bs_register 
+    generic map (size => size)
+    port map
+   ( clk =>TCK,   
+     rst =>RST,
+     TDI => MIB_in,
+     TDO  => MIB_Out,
+     P_in => MIB_select(size downto 1) ,
+     P_out =>MIB_select(size downto 1),
+     mode =>'1',
+     SH_en =>SE,
+     CA_en =>'0',
+     UP_en =>UE,
+     Sel =>SEL);
 end generate;
 
 end;

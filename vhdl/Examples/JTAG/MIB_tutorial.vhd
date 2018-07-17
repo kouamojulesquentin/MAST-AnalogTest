@@ -54,8 +54,8 @@ architecture behav of MIB_tutorial_testcase is
 -- Configuration Parameters
 -- NB: must be coherent with MIB_Tutorial.sit
 constant REGISTER_SIZE : integer := 8;
-constant MUX_SIZE : integer := 4;
-constant SELECTOR_CODING : coding:= Binary_noidle;
+constant MUX_SIZE : integer := 3;
+constant SELECTOR_CODING : coding:= One_Hot;
 constant REGISTER_BEFORE_MUX : boolean := false;
 ------------------------------------------------------
 

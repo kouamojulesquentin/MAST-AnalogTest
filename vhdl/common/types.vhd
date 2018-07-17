@@ -14,7 +14,7 @@ library work;
 
 package types is
 
-type coding is (Binary, Binary_noidle);
+type coding is (Binary, Binary_noidle,One_Hot);
 
 end types;
 

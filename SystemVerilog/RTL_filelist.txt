@@ -11,4 +11,4 @@
 ../vhdl/Examples/JTAG/Debug_mux.vhd 
 ../vhdl/Examples/JTAG/MIB_tutorial.vhd 
 ../vhdl/Examples/JTAG/SUT.vhd 
-./vhd/master_tapfsm.vhd
+../vhdl/AI_for_simulation/master_tapfsm.vhd

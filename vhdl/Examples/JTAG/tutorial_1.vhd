@@ -25,7 +25,6 @@ USE ieee.numeric_std.ALL;
 use STD.textio.all;
 
 library work;
-use work.AI_JTAG_SVF_package.all;
 use work.slave_TAP_package.all;
 use work.JTAG_package.all;
 use work.MAST_config.all;

@@ -25,7 +25,7 @@ USE ieee.numeric_std.ALL;
 use STD.textio.all;
 
 library work;
-use work.AI_JTAG_SVF_package.all;
+use work.SVF_Master_TAP_package.all;
 use work.slave_TAP_package.all;
 use work.JTAG_package.all;
 use work.MAST_config.all;
@@ -133,7 +133,7 @@ BEGIN
  
   Resetn <= '0', '1' after 100 ns;
  
-  main_tap: AI_JTAG_SVF 
+  main_tap: SVF_Master_TAP
     generic map (input_SVF_dir => "./"
                  ,input_SVF_file => "data_to_rtl.svf" 
 		 ,output_SVF_dir => "./"

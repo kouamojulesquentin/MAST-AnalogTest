@@ -104,70 +104,20 @@ signal UE_delay, next_UE_delay   : std_logic_vector(0 to MAX_LEVELS);
 signal SEL_int,next_SEL_int  : std_logic_vector(0 to MAX_LEVELS);
 signal UE_int, next_UE_int   : std_logic_vector(0 to MAX_LEVELS);
 
-component tutorial_1_testcase 
- port  ( clk   : in  std_logic;
-     rst  : in  std_logic;
-     TDI   : in  std_logic;
-     TDO   : out std_logic;
-     mode  : in  std_logic;
-     SH_en : in  std_logic;
-     CA_en : in  std_logic;
-     UP_en : in  std_logic;
-     Sel   : in  std_logic
-   );
-end component;
+ 
+component SUT
+     port ( 
+         --simulation signals
+	 Clk : in std_logic;
+        --TAP interface
+	 TCK: in std_logic;        
+         TMS: in std_logic;        
+         TRSTN: in std_logic;  
+         TDI: in std_logic;        
+         TDO: out std_logic
+	 );        
+END component;
 
-component SIB_tutorial_testcase
- port  ( clk   : in  std_logic;
-     rst  : in  std_logic;
-     TDI   : in  std_logic;
-     TDO   : out std_logic;
-     mode  : in  std_logic;
-     SH_en : in  std_logic;
-     CA_en : in  std_logic;
-     UP_en : in  std_logic;
-     Sel   : in  std_logic
-   );
-end component;
-
-component AMS_testcase 
- port  ( clk   : in  std_logic;
-     rst  : in  std_logic;
-     TDI   : in  std_logic;
-     TDO   : out std_logic;
-     mode  : in  std_logic;
-     SH_en : in  std_logic;
-     CA_en : in  std_logic;
-     UP_en : in  std_logic;
-     Sel   : in  std_logic
-   );
-end component;
-
-component DEBUG_MUX_testcase 
- port  ( clk   : in  std_logic;
-     rst  : in  std_logic;
-     TDI   : in  std_logic;
-     TDO   : out std_logic;
-     mode  : in  std_logic;
-     SH_en : in  std_logic;
-     CA_en : in  std_logic;
-     UP_en : in  std_logic;
-     Sel   : in  std_logic
-   );
-end component;
-
-component MIB_tutorial_testcase 
- port  ( clk   : in  std_logic;
-     rst  : in  std_logic;
-     TDI   : in  std_logic;
-     TDO   : out std_logic;
-     mode  : in  std_logic;
-     SH_en : in  std_logic;
-     CA_en : in  std_logic;
-     UP_en : in  std_logic;
-     Sel   : in  std_logic
-   );
-end component;
 
 BEGIN
  
@@ -198,167 +148,16 @@ BEGIN
 	   );   
 
 
-
- slave_TAP_0 : slave_TAP 
-    port  map ( 
-	        --TAP Signalq
-			  TCK => TCK,
-           TMS  => TMS,
-           TRSTN  => TRSTN,
-           TDI => TDI, --NB!
-           TDO => TDO, --NB!
-			   --debug signals
-           IS_SHIFTING  => IS_SHIFTING,
-           IS_IDLE => IS_IDLE,
-        --Scan chain control signals
-	   reset => reset_chains,
- 	   Select_IR  => Select_IR,
- 	   Select_DR  => Select_DR,
-	   ClockIR  => ClockIR,
-	   ShiftIR  => ShiftIR,
-	   UpdateIR  => UpdateIR,
-	   ClockDR  => ClockDR,
-	   ShiftDR  => ShiftDR,
-	   UpdateDR  => UpdateDR,
-	   CaptureDR => CaptureDR,
-	   to_scan_chain => to_scan_chain,
-	  from_scan_chain =>from_scan_chain
-
-	   );       
-IR_reg : bs_register_nocapture generic map (size => IR_SIZE)
- port map
-   ( clk   => TCK, --ClockIR,
-     rst   => reset_chains, 
-     TDI   => to_scan_chain,
-     TDO   => from_IR,
-     SH_en => ShiftIR,
-     UP_en => UpdateIR,
-     Sel   => select_IR,
-     P_out => IR_value
-     );
-
-BYP_reg : bs_cell port map
-    ( clk  => TCK, --ClockDR,
-     rst   => reset_chains,
-     TDI   => to_scan_chain,
-     TDO   => from_BYP,
-     P_in  => '0',
-     P_out => open,
-     mode  => '0',
-     SH_en => ShiftDR,
-     CA_en => '0',
-     UP_en => UpdateIR,
-     Sel   => select_BYP
+  SUT_top : SUT 
+   port map (
+         --simulation signals
+	 Clk => Clk,
+        --TAP interface
+       	  TDI => TDI,
+	  TCK => TCK,
+	  TMS => TMS,
+          TRSTN => TRSTN,
+	  TDO => TDO
    );
-
-
-
-DR_Mux : process(IR_value,from_IR,from_DR,Select_DR,Select_IR)
- begin
-  select_BYP <= '0';
-  select_DR_chain <= (others=> '0');
-  if (Select_IR = '1') then
-    from_scan_chain <= from_IR;
-  elsif(Select_DR = '1') then
-   case (IR_value) is 
-    when "1111" => 
-               select_BYP <= '1';
-	       from_scan_chain <= from_BYP;
-    when others =>
-        select_DR_chain(to_integer(unsigned(IR_value)))<='1';  
-        from_scan_chain <= from_DR(to_integer(unsigned(IR_value)));
-   end case; 
-  end if;  	 
-    
- end process;
-
---Generating SUT based on the configuration in MAST_config
---from
-
-DR_loopback: if target_SUT = LOOPBACK generate
- chain_loop: for n in 1 to MAX_DR_CHAINS generate
-    from_DR(n) <= to_scan_chain;
-  end generate;
-end generate;
-
-
-SUT_TUTORIAL_1: if target_SUT = TUTORIAL_1 generate
-
-SUT : tutorial_1_testcase  port map 
-   ( clk   => TCK,
-     rst   => reset_chains,
-     TDI   => to_scan_chain,
-     TDO   => from_DR(1),
-     mode  => '1',
-     SH_en => ShiftDR,
-     CA_en => CaptureDR,
-     UP_en => UpdateDR,
-     Sel   => select_DR_chain(1)
-   );
-end generate;
-
-
-SUT_IEE1687: if target_SUT = SIB_tutorial generate
-
-SUT : SIB_tutorial_testcase  port map 
-   ( clk   => TCK,
-     rst   => reset_chains,
-     TDI   => to_scan_chain,
-     TDO   => from_DR(1),
-     mode  => '1',
-     SH_en => ShiftDR,
-     CA_en => CaptureDR,
-     UP_en => UpdateDR,
-     Sel   => select_DR_chain(1)
-   );
-
-end generate;
-
-SUT_AMS: if target_SUT = AMS generate
-
-SUT : AMS_testcase  port map 
-   ( clk   => TCK,
-     rst   => reset_chains,
-     TDI   => to_scan_chain,
-     TDO   => from_DR(1),
-     mode  => '1',
-     SH_en => ShiftDR,
-     CA_en => CaptureDR,
-     UP_en => UpdateDR,
-     Sel   => select_DR_chain(1)
-   );
-
-end generate;
-
-SUT_MIB_tutorial: if target_SUT = MIB_tutorial generate
-
-SUT : MIB_tutorial_testcase  port map 
-   ( clk   => TCK,
-     rst   => reset_chains,
-     TDI   => to_scan_chain,
-     TDO   => from_DR(1),
-     mode  => '1',
-     SH_en => ShiftDR,
-     CA_en => CaptureDR,
-     UP_en => UpdateDR,
-     Sel   => select_DR_chain(1)
-   );
-end generate;
-
-SUT_DEBUG_MUX: if target_SUT = DEBUG_MUX generate
-
-SUT : DEBUG_MUX_testcase  port map 
-   ( clk   => TCK,
-     rst   => reset_chains,
-     TDI   => to_scan_chain,
-     TDO   => from_DR(1),
-     mode  => '1',
-     SH_en => ShiftDR,
-     CA_en => CaptureDR,
-     UP_en => UpdateDR,
-     Sel   => select_DR_chain(1)
-   );
-
-end generate;
 
 END;

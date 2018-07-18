@@ -1,0 +1,59 @@
+
+CC_OPTION= -g -m32 -Wall -ansi -pedantic -I. -I/softl3/modelsim10_1d/modeltech/include
+CPP_OPTION= -g -m32 -Wall
+CPP=g++ 
+LD_OPTION=-shared -lm -m32 -Wl,-Bsymbolic -Wl,-export-dynamic
+LD=g++
+OBJ_DIR=./Objs
+EXE_DIR=./Bin
+
+OPT_DIR=./Optional_Libs
+RPC_DIR=$(OPT_DIR)/MastRpc
+XMLRPC_DIR=$(OPT_DIR)/MastXmlRpc/
+MAST_H=./Mast_Headers/
+XMLRPC_INSTALL=./External_Libs/xmlrpc-c/build
+XMLRPC_INSTALL32=./External_Libs/xmlrpc-c/build32
+XMLRPC_H=$(XMLRPC_INSTALL)/include
+XMLRPC_LIB=$(XMLRPC_INSTALL)/lib
+XMLRPC_LIB32=$(XMLRPC_INSTALL32)/lib
+
+PLI_LB_OBJS=$(OBJ_DIR)/Remote_Loopback_Protocol.o \
+            $(OBJ_DIR)/XmlRpc_Protocol_Server.o \
+	    $(OBJ_DIR)/XmlRpc_Protocol_Client.o \
+	    $(OBJ_DIR)/PLI_Loopback_Server.o
+
+INCLUDE_LIBS=-lxmlrpc++ -lxmlrpc -lxmlrpc_abyss++ -lxmlrpc_abyss -lxmlrpc_client++ -lxmlrpc_client -lxmlrpc_cpp -lxmlrpc_packetsocket -lxmlrpc_server++ -lxmlrpc_server -lxmlrpc_server_abyss++ -lxmlrpc_server_abyss -lxmlrpc_server_cgi++ -lxmlrpc_server_cgi -lxmlrpc_server_pstream++ -lxmlrpc_util++ -lxmlrpc_util -lxmlrpc_xmlparse -lxmlrpc_xmltok 
+
+
+PLI_DIR=$(OPT_DIR)/PLI_Server
+
+INCLUDES=-I$(RPC_DIR) -I$(XMLRPC_DIR) -I$(MAST_H)
+
+all: PLI_Loopback_Server MAST_WRITE PLI_Server
+	$(CPP) $(CPP_OPTION) -o $(EXE_DIR)/PLI_Loopback_Server $(INCLUDE_LIBS) -L$(XMLRPC_LIB32) $(INCLUDES) $(PLI_LB_OBJS)
+
+PLI_Loopback_Server: XmlRpC RpC $(PLI_DIR)/PLI_Loopback_Server.cpp
+	$(CPP) $(CPP_OPTION) -c -o $(OBJ_DIR)/PLI_Loopback_Server.o $(INCLUDES) $(PLI_DIR)/PLI_Loopback_Server.cpp
+	
+XmlRpC: $(XMLRPC_DIR)/XmlRpc_Protocol_Client.cpp $(XMLRPC_DIR)/XmlRpc_Protocol_Server.cpp
+	$(CPP) $(CPP_OPTION) -c -o $(OBJ_DIR)/XmlRpc_Protocol_Client.o -I$(XMLRPC_H) $(INCLUDES) $(XMLRPC_DIR)/XmlRpc_Protocol_Client.cpp
+	$(CPP) $(CPP_OPTION) -c -o $(OBJ_DIR)/XmlRpc_Protocol_Server.o -I$(XMLRPC_H) $(INCLUDES) $(XMLRPC_DIR)/XmlRpc_Protocol_Server.cpp
+
+RpC: $(RPC_DIR)/Remote_Loopback_Protocol.cpp
+	$(CPP) $(CPP_OPTION) -c -o $(OBJ_DIR)/Remote_Loopback_Protocol.o -I$(XMLRPC_H) $(INCLUDES) $(RPC_DIR)/Remote_Loopback_Protocol.cpp
+
+PLI_Server: $(PLI_DIR)/PLI_Server.cpp
+	$(CPP) $(CC_OPTION) $(INCLUDES) -c -o $(OBJ_DIR)/PLI_Server.o $(PLI_DIR)/PLI_Server.cpp 
+#	$(LD) $(LD_OPTION) -o PLI_Server.so MAST_write.o $(MTIPLILIB)
+
+MAST_WRITE: 
+	$(CC) $(CC_OPTION) -c ./MAST_write.c
+	$(LD) $(LD_OPTION) -o MAST_write.so MAST_write.o $(MTIPLILIB)
+		
+#echo $LD MAST_write.so MAST_write.o $MTIPLILIB
+#eval $LD MAST_write.so MAST_write.o $MTIPLILIB
+
+clean:
+	rm -rf $(OBJ_DIR)/* $(EXE_DIR)/* *.so *.o
+	
+

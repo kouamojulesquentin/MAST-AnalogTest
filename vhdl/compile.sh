@@ -23,6 +23,7 @@ vcom Examples/JTAG/tutorial_1.vhd
 vcom Examples/JTAG/SIB_tutorial.vhd 
 vcom Examples/JTAG/Debug_mux.vhd 
 vcom Examples/JTAG/MIB_tutorial.vhd 
+vcom Examples/JTAG/SUT.vhd 
 vcom Examples/JTAG/SVF_Simuation_top.vhd 
 
 

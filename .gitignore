@@ -184,3 +184,4 @@ build
 /Readers/SIT_Reader/SIT_Parser.tab.hh
 /CppCheck_Results.txt
 /External_Libs/Yaml/.travis.yml
+/SystemVerilog/.v*

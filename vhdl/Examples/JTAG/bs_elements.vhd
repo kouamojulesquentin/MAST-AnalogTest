@@ -29,14 +29,23 @@ architecture behav of  bs_cell is
  P_out <= Update_reg when mode = '1' else P_in;
  TDO  <= Shift_reg;
  
- seq: process(clk,rst)
+ seq_shift: process(clk,rst)
   begin
    if rising_edge(clk) then
     if rst = '1' then
      Shift_reg <= '0';
-     Update_reg<= '0';
     else
      Shift_reg <= next_Shift_reg;
+    end if;
+   end if;
+  end process;
+
+ seq_update: process(clk,rst)
+  begin
+   if falling_edge(clk) then
+    if rst = '1' then
+     Update_reg<= '0';
+    else
      Update_reg<= next_Update_reg;
     end if;
    end if;

@@ -29,20 +29,25 @@ if (${USE_XML_RPC})
   message(STATUS "Optional_Libs_UT: XmlRpcInstall:              ${XmlRpcInstall}")
   message(STATUS "Optional_Libs_UT: LIBMASTRPC_INCLUDE_DIRS     ${LIBMASTRPC_INCLUDE_DIRS}")
   message(STATUS "Optional_Libs_UT: LIBMASTXMLRPC_INCLUDE_DIRS: ${LIBMASTXMLRPC_INCLUDE_DIRS}")
+  message(STATUS "Optional_Libs_UT: LIBMASTRPC_TRANS_INCLUDE_DIRS ${LIBMASTRPC_TRANS_INCLUDE_DIRS}")
   find_package(LibXmlRpc  REQUIRED)
 
   include_directories(${LIBMASTRPC_INCLUDE_DIRS})
   include_directories(${LIBMASTXMLRPC_INCLUDE_DIRS})
+  include_directories(${LIBMASTRPC_TRANS_INCLUDE_DIRS})
+  include_directories(${HELPERS_HEADERS})
 
   file(GLOB UT_MAST_RPC_HEADERS "UT_MastRpc/UT_*.hpp")
   file(GLOB UT_MAST_RPC         "UT_MastRpc/*")
   file(GLOB UT_XML_RPC_HEADERS  "UT_XmlRpc/UT_*.hpp")
   file(GLOB UT_XML_RPC          "UT_XmlRpc/*")
+  file(GLOB UT_MAST_RPC_TRANS  "UT_MastRpcTranslator/*")
+  file(GLOB UT_MAST_RPC_TRANS_HEADERS  "UT_MastRpcTranslator/UT_*.hpp")
 
-  set(UT_HEADERS ${UT_HEADERS} ${UT_MAST_RPC_HEADERS} ${UT_XML_RPC_HEADERS})
-  set(UT_SOURCES ${UT_SOURCES} ${UT_MAST_RPC}         ${UT_XML_RPC})
+  set(UT_HEADERS ${UT_HEADERS} ${UT_MAST_RPC_HEADERS} ${UT_XML_RPC_HEADERS} ${UT_MAST_RPC_TRANS_HEADERS})
+  set(UT_SOURCES ${UT_SOURCES} ${UT_MAST_RPC}         ${UT_XML_RPC} ${UT_MAST_RPC_TRANS})
 
-  set(EXTRA_LIBS ${EXTRA_LIBS} Mast_RPC Mast_RPC_Client Mast_RPC_Server)
+  set(EXTRA_LIBS ${EXTRA_LIBS} Mast_RPC Mast_RPC_Client Mast_RPC_Server Mast_RPCTranslator Tests_Common)
 endif()
 
 # ---------------- Runner

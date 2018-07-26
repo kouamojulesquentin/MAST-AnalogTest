@@ -1,35 +1,34 @@
 //===========================================================================
-//                           Emulation_TranslatorProtocol.hpp
+//                           Remote_Loopback_TranslatorProtocol.hpp
 //===========================================================================
 // Copyright (C) 2017 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file Emulation_TranslatorProtocol.hpp
+//! @file Remote_Loopback_TranslatorProtocol.hpp
 //!
-//! Declares Emulation_TranslatorProtocol class
+//! Declares Remote_Loopback_TranslatorProtocol class
 //!
 //===========================================================================
 
 
-#ifndef EMULATIONTRANSLATIONPROTOCOL_H__6829475D_EA0B_4F3E_9991_492038F295A0__INCLUDED_
-  #define EMULATIONTRANSLATIONPROTOCOL_H__6829475D_EA0B_4F3E_9991_492038F295A0__INCLUDED_
+#ifndef REMOTE_LOOPBACK_TRANSLATORPROTOCOL_H__8F7FF1F5_9EBA_4A17_E8B6_20B6A814A9B__INCLUDED_
+  #define REMOTE_LOOPBACK_TRANSLATORPROTOCOL_H__8F7FF1F5_9EBA_4A17_E8B6_20B6A814A9B__INCLUDED_
 
 #include "AccessInterfaceTranslatorProtocol.hpp"
-#include <fstream>
-#include <string>
-#include <experimental/string_view>
 
 namespace mast
 {
-//! Implement loopback while logging callbacks that
-class MAST_CORE_EXPORT Emulation_TranslatorProtocol final : public AccessInterfaceTranslatorProtocol
+//! Acts as a Remote_Protocol by just looping back SUT data vector and doing nothing for reset
+//!
+class Remote_Loopback_TranslatorProtocol final : public AccessInterfaceTranslatorProtocol
 {
   // ---------------- Public  Methods
   //
   public:
-  virtual ~Emulation_TranslatorProtocol() = default;
-  Emulation_TranslatorProtocol() = default;
+  virtual ~Remote_Loopback_TranslatorProtocol() = default;
+
+  Remote_Loopback_TranslatorProtocol() = default;
 
   //! Does any Transformation needed to execute the callback given as a parameter
   //!
@@ -40,23 +39,19 @@ class MAST_CORE_EXPORT Emulation_TranslatorProtocol final : public AccessInterfa
 
   //! Returns readable type of protocol
   //!
-  virtual std::experimental::string_view KindName() const override { return "Emulation_Translator"; }
+  virtual std::experimental::string_view KindName() const override { return "Remote_LoopbackTranslator"; }
 
-  // ---------------- Protected Methods
-  //
-
-  //! Logs commands
-  //!
-  void LogCommands(std::experimental::string_view commands);
 };
 //
-//  End of SVF_EmulationProtocol class declaration
+//  End of Remote_Loopback_TranslatorProtocol class declaration
 //---------------------------------------------------------------------------
 } // End of namespace mast
 
 
 
-#endif  // not defined EMULATIONTRANSLATIONPROTOCOL_H__6829475D_EA0B_4F3E_9991_492038F295A0__INCLUDED_
+
+#endif  // not defined REMOTE_LOOPBACK_TRANSLATORPROTOCOL_H__8F7FF1F5_9EBA_4A17_E8B6_20B6A814A9B__INCLUDED_
+
 //===========================================================================
-// End of Emulation_TranslationProtocol.hpp
+// End of Remote_Loopback_TranslatorProtocol.hpp
 //===========================================================================

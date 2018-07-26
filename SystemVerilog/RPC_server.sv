@@ -29,6 +29,10 @@ module top();
      typedef enum bit {FALSE,TRUE} boolean;
   boolean  backend_active;      // To use boolean as variable-type, use typedef.
   
+ bit [`N_COMMANDS-1:0] cmd_queue[$] = {};
+ event handshake,cmd_end;
+  bit [`N_COMMANDS-1:0] current_command;
+
  bit start_scan;
  bit [`N_COMMANDS-1:0] tap_command;
  bit   scan_finished ;
@@ -120,6 +124,35 @@ module top();
      end
     end
    
+initial
+begin
+ while (1)
+ begin
+   $display("SV : Handshake listener"); 
+      @(handshake)
+      begin
+       current_command=cmd_queue.pop_back();
+       case (current_command)
+	  `SDR_command:$display("START SDR"); 
+	  `SIR_command:$display("START SIR"); 
+       endcase 
+    tap_command = current_command;
+    start_scan=1;
+    backend_active = TRUE;
+    #`CLKPERIOD start_scan = 0;
+    $display("SV : wait for scan"); 
+    @(negedge scan_finished);
+    $display("SV finished"); 
+    backend_active = FALSE;
+   
+    $display("from_SUT: %d bits over %d bytes",scanbits,scanbytes); 
+   for (int i = 0; i<scanbytes  ; i++) 
+    $display("Vlog: %d %x",i, SV_data_from_SUT[i] ); 
+   send_data_from_SUT(scanbits,SV_data_from_SUT);
+      end 
+    end
+ end
+   
   export "DPI-C" task runtest;
   task runtest(int runcycles);
    remaining_cycles = runcycles;
@@ -180,14 +213,19 @@ module top();
     tap_command = `SIR_command;
     start_scan=1;
     backend_active = TRUE;
-      $display("SIR ..1..."); 
-    #`CLKPERIOD start_scan = 0;
-    $display("SIR : wait for scan"); 
-    @(negedge scan_finished);
-    $display("SIR finished"); 
-    backend_active = FALSE;
+      $display("SIR ..Using queue..."); 
+    cmd_queue.push_front(tap_command);
+    ->handshake;
+//    @(cmd_end);
+    
+//      $display("SIR ..1..."); 
+//    #`CLKPERIOD start_scan = 0;
+//    $display("SIR : wait for scan"); 
+//    @(negedge scan_finished);
+//    $display("SIR finished"); 
+//    backend_active = FALSE;
    
-   send_data_from_SUT(scanbits,SV_data_from_SUT);
+//   send_data_from_SUT(scanbits,SV_data_from_SUT);
     
   endtask
 

@@ -118,7 +118,8 @@ DPI_Protocol::DoAction (const string&           commandName ,
   }
   */
   
-  return make_pair(bitsCount, fromSutScanVector);
+  return make_pair(bitsCount, toSutScanVector);  //False loopback
+  //return make_pair(bitsCount, fromSutScanVector);
 }
 
 

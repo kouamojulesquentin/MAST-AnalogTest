@@ -16,6 +16,7 @@
   #define DPI_PROTOCOL_H__8F7FF1F5_9EBA_4A17_E8B6_20B6A814A9B__INCLUDED_
 
 #include "Remote_Protocol.hpp"
+#include "MTQueue.hpp"
 #include <map>
 using std::string;
 using std::vector;

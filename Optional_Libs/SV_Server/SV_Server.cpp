@@ -24,13 +24,14 @@ using mast::XmlRpc_Protocol_Server;
 using mast::DPI_Protocol;
 using namespace std;
 
+DPI_Protocol protocol;
 
 int start_server ()
 {
   try
   {
     Remote_Loopback_Protocol test_protocol;
-    DPI_Protocol protocol;
+//    DPI_Protocol protocol;
     XmlRpc_Protocol_Server   server(8080, &protocol);
  
     std::cout  << "DPI: starting RPC server\n";

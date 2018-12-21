@@ -21,6 +21,14 @@
 #  endif
 # endif
 
+/*#ifndef YYINITDEPTH
+#define YYINITDEPTH 15000
+#endif
+
+#ifndef YYMAXDEPTH
+#define YYMAXDEPTH  YYINITDEPTH+1000
+#endif
+*/
 #include "Parser_Types.hpp"
 #include "BinaryVector.hpp"
 #include "SystemModelBuilder.hpp"
@@ -733,9 +741,14 @@ register_node:
      auto bin_value = BinaryVector::CreateFromString(remove_quotes($[bypass]));
      if (bin_value.BitsCount() != $[size])
      {
+//      std::string bastion_value = "0b";
+//      bastion_value.append($[size],'0');
+//     bin_value = BinaryVector::CreateFromString(bastion_value);
+
        ERROR_MESSAGE(msg) << STREAM_NODE_NAME("REGISTER", $[node_name].name)
                           << "size (" << $[size] << ") does not match Bypass value bit count (" << bin_value.BitsCount() << ")";
        THROW_SYNTAX_ERROR(msg);
+     
      }
 
      auto registerNode = driver.systemModel->CreateRegister ($[node_name].name, bin_value, nullptr);

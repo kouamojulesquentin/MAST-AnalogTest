@@ -202,6 +202,10 @@ class SystemModelManager_impl final
   void iWrite (string_view registerPath, int32_t      value);
   void iWrite (string_view registerPath, int64_t      value);
 
+  //! Waits for all threads to be pendingbefore  triggering a DataCycle (default is false)
+  //!
+  void setwaitFullPending (bool waitFullPending) { m_waitFullPending = waitFullPending; }
+
   //! Returns current maximum time between an iApply and the next data cycle
   //!
   std::chrono::milliseconds DataCycleLoopTimeout() const { return m_dataCycleLoopTimeout; }
@@ -351,6 +355,8 @@ class SystemModelManager_impl final
   ThreadToAppDataMapper_t          m_threadToAppData;                //!< Associates a thread id with application data for that thread
   std::shared_ptr<ApplicationData> m_mainThreadAppData;              //!< For single thread model, this is the associated application data
   std::vector<std::exception_ptr>  m_applicationsExceptions;         //!< Collects exceptions thrown by PDL applications (on their own thread)
+  uint32_t                         m_activeThreads;                  //!< Counts Applications Threads currently active 
+  bool                          m_waitFullPending;        //!< Waits for all threads to be pending before triggering a data cycle  
 };
 //
 //  End of SystemModelManager_impl class declaration

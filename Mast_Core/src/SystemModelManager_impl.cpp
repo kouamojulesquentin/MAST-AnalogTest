@@ -92,6 +92,8 @@ SystemModelManager_impl::SystemModelManager_impl(SystemModel&                   
   , m_loopStarted                    (false)
   , m_dataCycleLoopTimeout           (1s)
   , m_sleepTimeBetweenConfigurations (0ms)
+  , m_activeThreads (0)
+  , m_waitFullPending (false)
 {
   auto pathResolver   = NodePathResolver(sm.Root());
   m_mainThreadAppData = make_shared<ApplicationData>(ApplicationData::State::ApplicationThreadStarted, pathResolver, "Manager");
@@ -166,19 +168,24 @@ void SystemModelManager_impl::CreateApplicationThread (shared_ptr<ParentNode> ap
     MONITOR_DEBUG_APP_LIFE("Application start", *applicationTopNode, debugName);
     try
     {
+      m_activeThreads++;
       functor();
       applicationData->currentState = ApplicationData::State::Terminated;
+      m_activeThreads--;
     }
     catch(std::exception& exc)  // Catch C++ standard exceptions
     {
       applicationData->currentState = ApplicationData::State::TerminatedWithException;
       LOG(INFO) << makeMessageContext(applicationTopNode, debugName) << ": "<< exc.what();
+      m_activeThreads--;
+
 
       applicationData->caughtException = std::current_exception();
     }
     catch (...)
     {
       applicationData->currentState = ApplicationData::State::TerminatedWithException;
+      m_activeThreads--;
 
       LOG(INFO) << makeMessageContext(applicationTopNode, debugName) << " of unknown type";
       applicationData->caughtException = std::current_exception();
@@ -801,7 +808,9 @@ void SystemModelManager_impl::LoopOnDataCycle ()
     auto needDataCycle = false;
     {
       unique_lock<recursive_mutex> lock(m_dataMutex);
-      needDataCycle = m_pendingThreads.size() != 0;
+      if (! m_waitFullPending)  needDataCycle = m_pendingThreads.size() != 0;
+      else needDataCycle = m_pendingThreads.size() == m_activeThreads; //Wait for all threads to have reached an iApply
+
     } // Really need to unlock the mutex because DoDataCycles_Impl need to release it to blocked application threads
 
     if (needDataCycle)

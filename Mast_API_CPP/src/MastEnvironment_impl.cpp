@@ -354,6 +354,8 @@ void MastEnvironment_impl::CreateManager ()
   Startup::sm_manager->SleepTimeBetweenConfigurations (m_configuration->MinTimeBetweenCycles());
   Startup::sm_manager->DataCycleLoopTimeout           (m_configuration->MaxTimeBetweenCycles());
 
+  if (m_configuration->waitFullPending())  Startup::sm_manager->setwaitFullPending(true);
+
   LOG(DEBUG) << "Created system model manager";
 }
 //

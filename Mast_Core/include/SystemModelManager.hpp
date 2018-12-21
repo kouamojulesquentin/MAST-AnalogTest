@@ -78,6 +78,10 @@ class MAST_CORE_EXPORT SystemModelManager final
   //!
   void StartCreatedApplicationThreads ();
 
+  //! Waits for all threads to be pendingbefore  triggering a DataCycle (default is false)
+  //!
+  void setwaitFullPending (bool waitFullPending) ;
+
   //! Starts periodical (or on iApply) loop of complete data cycles on a new thread
   //!
   void Start ();

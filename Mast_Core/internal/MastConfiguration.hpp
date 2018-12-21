@@ -132,7 +132,7 @@ class MAST_CORE_EXPORT MastConfiguration final
   bool                            ReportManagerActivity()             const { return m_reportManagerActivity;       } //!< Enable/Disable logging and optionally reporting model state at specific point of manager activity
   const std::string&              ManagerActivityFileBasePath()       const { return m_managerActivityFileBasePath; } //!< Base file path where pretty print and/or GML files are saved
   ManagerMonitorOptions           ManagerActivityOptions()            const { return m_managerActivityOptions;      } //!< Defines what Mast manager main activities are reported in the log
-
+  bool                            waitFullPending()                   const { return m_waitFullPending;             } //!< Enable/Disable wait for all thread to be pending before a data cycle to minimize transactions
   //! Sets command line parser object in charge for output messages
   //!
   //! @note This is useful for unit tests purpose
@@ -194,6 +194,7 @@ class MAST_CORE_EXPORT MastConfiguration final
   bool                      m_reportManagerActivity       = false;                                  //!< Enable/Disable logging and optionally reporting model state at specific point of manager activity
   std::string               m_managerActivityFileBasePath;                                          //!< Base file path where pretty print and/or GML files are saved
   ManagerMonitorOptions     m_managerActivityOptions      = ManagerMonitorOptions::Std;             //!< Defines what Mast manager main activities are reported in the log
+  bool                      m_waitFullPending = false;                                              //!< Enable/Disable wait for all thread to be pending before a data cycle to minimize transactions
 
   std::shared_ptr<TCLAP::CmdLineOutput> m_cmdLineOutput;         //!< Useful for unit tests (to catch command line parse output)
   bool                                  m_automaticExit = true;  //!< For unit tests context (to prevent unit tests exit)

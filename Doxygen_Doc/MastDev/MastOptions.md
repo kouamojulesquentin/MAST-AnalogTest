@@ -43,7 +43,11 @@ Default configuration file looks like this:
       Manager:
         Min_time_between_cycles: 10ms                         # Minimal time between two I/O cycles
         Max_time_between_cycles: 1s                           # Maximal time between I/O cycles. It corresponds to the maximal delay between an iApply assertion and its execution
-      Debug:
+        WaitFullPending:  false                               # When set, the Manager waits for all threads to be pending before triggering a data
+                                                              # cycle. This may results in big gains in terms of number of operations/pattern size
+                                                              # but reduces reactivity in interactive setups and might cause deadlocks in case of
+                                                              # inter-thread dependencies
+       Debug:
         Logging:
           Enable: false                                       # Enable/Disable general logging
           Kind:   [file]                                      # One of [file, cout, only_errors_on_cerr]

@@ -54,6 +54,10 @@ void SystemModelManager::WaitForApplicationsEnd() { m_impl->WaitForApplicationsE
 //!
 void SystemModelManager::StartCreatedApplicationThreads() { m_impl->StartCreatedApplicationThreads(); }
 
+//! Waits for all threads to be pendingbefore  triggering a DataCycle (default is false)
+//!
+void SystemModelManager::setwaitFullPending (bool waitFullPending) { m_impl->setwaitFullPending(waitFullPending);}
+  
 //! Starts periodical (or on iApply) loop of complete data cycles on a new thread
 //!
 void SystemModelManager::Start() { m_impl->Start(); }

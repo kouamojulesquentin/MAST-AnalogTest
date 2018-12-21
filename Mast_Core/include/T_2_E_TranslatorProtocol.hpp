@@ -20,6 +20,7 @@
 #include "AccessInterfaceTranslator.hpp" //temporary, only to force lone hpp compilation 
 #include "BinaryVector.hpp"
 #include "CallbackIds.hpp"
+#include "PDL_AlgorithmsRepository.hpp"
 #include <experimental/string_view>
 #include <memory>
 
@@ -86,18 +87,38 @@ class MAST_CORE_EXPORT T_2_E_TranslatorProtocol : public AccessInterfaceTranslat
         } 
        return;};
        
-     
-
-  void Start_Translator(){
-    //Using a lamba to encapsulate T_2_E_translator and avoid an "invalid use of nonstatic member function" error
-     auto my_lamba =[this] () {T_2_E_translator();};
-     T_2_E_thread=std::thread(my_lamba);
-     T_2_E_thread.detach();
-     m_Translator_launched=true;
-     }
   bool Translator_Running(){return m_Translator_launched;}
   void Set_Translator_State(bool new_state){m_Translator_launched=new_state;}
   
+
+//! Registers the translator algorithm functions in this file
+//!
+//! @note Names used from registration must be the same as found in SIT file
+bool RegisterAlgorithms ()
+{
+  // ---------------- Get an handle on PDL algorithm repository
+  //
+  auto& repo = PDL_AlgorithmsRepository::Instance();
+  auto T_2_E_translator_lambda =[this] () {T_2_E_translator();};
+
+  // ---------------- Do register algorithm(s) with a name
+  //
+  repo.RegisterAlgorithm("T_2_E_translator", T_2_E_translator_lambda);
+   //Compiles, but is it correct?
+
+  return true;
+}
+//
+//  End of: RegisterAlgorithms
+//---------------------------------------------------------------------------
+
+
+//! Make PDL algorithm functions in this file to be registered
+//!
+//! @note As a "static" variable, it is initialized once when the corresponding DLL is loaded
+//!
+bool registrated = RegisterAlgorithms();
+
   private:
   
 
@@ -107,7 +128,7 @@ class MAST_CORE_EXPORT T_2_E_TranslatorProtocol : public AccessInterfaceTranslat
   std::shared_ptr<MTQueue<std::pair<BinaryVector,std::string>>> m_fromSutQueue;   //!<fromSut data results for underlying Raw protocol
   
   
-  bool m_Translator_launched;
+  bool m_Translator_launched=true;
   std::thread T_2_E_thread;
 
   // ---------------- Protected Methods

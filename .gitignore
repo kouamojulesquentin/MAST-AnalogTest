@@ -185,3 +185,5 @@ build
 /CppCheck_Results.txt
 /External_Libs/Yaml/.travis.yml
 /SystemVerilog/.v*
+/Applications/Debug_mux/ETS/
+/Applications/Debug_mux/tmp/

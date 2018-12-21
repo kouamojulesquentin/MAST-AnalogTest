@@ -15,7 +15,6 @@
 #include "Utility.hpp"
 #include "CallbackRequest.hpp"
 #include "CPP_API.hpp"
-#include "PDL_AlgorithmsRepository.hpp"
 
 #include <experimental/string_view>
 #include <sstream>
@@ -90,33 +89,6 @@ BinaryVector JTAG_BitBang_TranslatorProtocol::TransformationCallback(CallbackReq
 //
 //  End of: JTAG_BitBang_TranslatorProtocol::TransformationCallback
 //---------------------------------------------------------------------------
-
-//! Registers PDL algorithm functions in this file
-//!
-//! @note Names used from registration must be the same as found in SIT file
-bool RegisterAlgorithms ()
-{
-  // ---------------- Get an handle on PDL algorithm repository
-  //
-  auto& repo = PDL_AlgorithmsRepository::Instance();
-
-  // ---------------- Do register algorithm(s) with a name
-  //
- //Commented to avoid compilation error
-//  repo.RegisterAlgorithm("BB_PDL_translator", JTAG_BitBang_TranslatorProtocol::PDL_translator);
-
-  return true;
-}
-//
-//  End of: RegisterAlgorithms
-//---------------------------------------------------------------------------
-
-
-//! Make PDL algorithm functions in this file to be registered
-//!
-//! @note As a "static" variable, it is initialized once when the corresponding DLL is loaded
-//!
-bool registrated = RegisterAlgorithms();
 
 //===========================================================================
 // End of JTAG_BitBang_TranslatorProtocol.cpp

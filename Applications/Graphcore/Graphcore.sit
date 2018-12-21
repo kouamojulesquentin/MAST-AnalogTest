@@ -1,0 +1,6 @@
+JTAG_TAP TAP SVF_Emulation 4 1
+ PDL graphcore_8
+(
+       REGISTER reg_8 8 Hold_value Bypass: "0x00"
+)
+

@@ -1,0 +1,12 @@
+JTAG_TAP TAP SVF_Emulation 4 1
+(
+ CHAIN main
+ PDL TC_paper_4,TC_paper_3,TC_paper_2,TC_paper_1
+ {
+       REGISTER reg_1 8 Hold_value Bypass: "0x00"
+       REGISTER reg_2 8 Hold_value Bypass: "0x00"
+       REGISTER reg_3 8 Hold_value Bypass: "0x00"
+       REGISTER reg_4 8 Hold_value Bypass: "0x00"
+ }
+)
+

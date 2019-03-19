@@ -1470,6 +1470,88 @@ void UT_SIT_Reader::test_TRANSLATOR_Success ()
   TS_DATA_DRIVEN_TEST (checker, data);
 }
 
+
+//! Test T_2_E_TRANSLATOR from Simplified ICL Tree input - In cases with success
+//!
+void UT_SIT_Reader::test_T_2_E_TRANSLATOR_Success ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [&](auto data)
+  {
+    // ---------------- Setup
+    //
+    stringstream    sit(std::get<0>(data));
+    auto            expected_PrettyPrint = std::get<1> (data);
+    auto            sm                   = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.ParseExcerpt(sit));
+
+    // ---------------- Verify
+    //
+    CxxTest::setAbortTestOnFail(true);
+
+    TS_ASSERT_EMPTY (sut.ErrorMessage());
+    TS_ASSERT_EMPTY (sut.PlaceHolders());
+
+    auto parsedModel = sut.ParsedSystemModel();
+
+    // With PrettyPrinter
+    auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(parsedModel, PrettyPrinterOptions::Parser_debug);
+    TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
+    // With Checker
+    PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
+    auto checkResult = sm->Check();
+    TS_ASSERT_EMPTY (checkResult.InformativeReport());
+  };
+
+  auto data =
+  {
+     make_tuple("TRANSLATOR top Emulation\n"
+               "(\n"
+               "  JTAG_TAP my_tap 4 1\n"
+               "  (\n"
+               "   CHAIN Internal{\n"
+               "    REGISTER BB_reg 4 Bypass: \"0b1100\"\n"
+               "    TRANSLATOR BB_Tap BitBang \"BB_reg\"\n"
+               "     (\n"      
+               "       JTAG_TAP eTap 4 1\n"
+               "       (\n"
+               "         REGISTER Test_reg 4 Bypass: \"0b1100\"\n"
+               "       )\n"
+               "     )\n"      
+               "   }\n"
+               "  )\n"
+               ")\n",
+               "[Access_T](0)  \"top\", Protocol: Emulation_Translator\n"
+               " [Access_I](1)  \"my_tap\", Protocol: SVF_RAW->top\n"
+               "  [Register](2)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n"
+               "  [Linker](3)    \"my_tap_DR_Mux\"\n"
+               "   :Selector:(2)  \"my_tap_IR\", kind: Table_Based, can_select_none: false, inverted_bits: false, reversed_order: false\n"
+               "   [Register](4)  \"my_tap_BPY\", length: 1, bypass: 1\n"
+               "   [Chain](5)     \"Internal\"\n"
+               "    [Register](6)  \"BB_reg\", length: 4, bypass: 1100\n"
+               "    [Access_T](7)  \"BB_Tap\", Protocol: JTAG_BitBang\n"
+               "     [Access_I](8)  \"eTap\", Protocol: SVF_RAW->BB_Tap\n"
+               "      [Register](9)  \"eTap_IR\", length: 4, Hold value: true, bypass: 1111\n"
+               "      [Linker](10)   \"eTap_DR_Mux\"\n"
+               "       :Selector:(9)  \"eTap_IR\", kind: Table_Based, can_select_none: false, inverted_bits: false, reversed_order: false\n"
+               "       [Register](11) \"eTap_BPY\", length: 1, bypass: 1\n"
+               "       [Register](12) \"Test_reg\", length: 4, bypass: 1100"),
+
+ };
+
+
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
 //! Test 1500 Wrapper macro from Simplified ICL Tree input
 //!
 void UT_SIT_Reader::test_1500 ()

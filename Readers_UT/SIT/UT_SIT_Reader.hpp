@@ -47,6 +47,7 @@ class UT_SIT_Reader : public CxxTest::TestSuite
   //
   void test_TRANSLATOR_Success ();
 //  void test_TRANSLATOR_examples ();
+  void test_T_2_E_TRANSLATOR_Success ();
 
   // ---------------- 1500
   //

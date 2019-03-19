@@ -219,6 +219,10 @@ namespace
 
 %%
 root_node:
+{
+      auto& factory  = AccessInterfaceTranslatorProtocolFactory::Instance();
+      factory.RegisterCreator("BitBang",            [](const string& parameters)       { return make_unique<JTAG_BitBang_TranslatorProtocol>(parameters);     });
+}
   node END
   {
     const auto& selectorFactory = PathSelectorFactory::Instance();
@@ -589,12 +593,11 @@ t_TRANSLATOR  node_name TR_identifier AI_protocol_parameters
     try
     {
       auto& factory  = AccessInterfaceTranslatorProtocolFactory::Instance();
-    //  TODO: Push instance in unresolved_translator queue
-      factory.RegisterCreator("BitBang",            [](const string& parameters)       { return make_unique<JTAG_BitBang_TranslatorProtocol>(parameters);     });
+       auto  protocol = factory.Create(protocolName, protocolParameters);
 
       if (protocolName=="BitBang")
       {
-         auto node = driver.systemModel->CreateAccessInterfaceTranslator(nodeName, nullptr);
+        auto node = driver.systemModel->CreateAccessInterfaceTranslator(nodeName, shared_ptr<AccessInterfaceTranslatorProtocol>(std::move(protocol)));
          $$ = std::make_pair(node,false);
          T_2_E_information translatorInfo;
          translatorInfo.translator_node         = node;
@@ -606,7 +609,6 @@ t_TRANSLATOR  node_name TR_identifier AI_protocol_parameters
       }
       else
       {
-       auto  protocol = factory.Create(protocolName, protocolParameters);
 
        if (!protocol)
        {

@@ -1071,72 +1071,7 @@ TS_ASSERT_FALSE (result.HasIssues());
 //!
 void UT_SystemModelManager::test_DoDataCycles_JTAG_BitBang_Translator ()
 {
-  // ---------------- Setup
-  //
-  SystemModel sm;
-  TestModelBuilder builder(sm);
-
-  auto at    = builder.Create_TestCase_JTAG_BitBang_Translator();
-
-  CxxTest::setAbortTestOnFail(true);
-
-  TS_ASSERT_NOT_NULLPTR (at);
-
-  // Model coherency
-  auto result = SystemModelChecker::Check(sm);
-  if (result.HasIssues())
-  {
-    TS_FAIL (result.MakeReport());
-  }
-  
-  
-  auto gotPretty      = PrettyPrinter::PrettyPrint(sm.Root(), PrettyPrinterOptions::All);
-  auto expectedPretty = string("");
-  //TS_ASSERT_EQUALS (gotPretty, expectedPretty);
-
-
-  auto reg_1 = sm.RegisterWithId(9u);
-  auto reg_2 = sm.RegisterWithId(11u);
-
-  reg_1->SetToSut   (BinaryVector(STATIC_TDR_LEN, 0x0A));
-  reg_2->SetToSut   (BinaryVector(STATIC_TDR_LEN, 0xB0));
-  reg_1->SetBypass  (BinaryVector(STATIC_TDR_LEN, 0x41));
-  reg_2->SetBypass  (BinaryVector(STATIC_TDR_LEN, 0x42));
-
-
-  SystemModelManager sut(sm);
-
-
-  // ---------------- Exercise
-  //
-//  TS_ASSERT_THROWS_NOTHING (sut.DoDataCycles());
-
-  // ---------------- Verify
-  //
-  auto gotCommands = dynamic_pointer_cast<Spy_Emulation_Translator>(at->Protocol())->Commands();
-
-  std::vector<std::string> expectedCommands
-  {
-/*    "I2C_READ (0x31);",   // 00 : IR
-    "I2C_WRITE (0x31, 0x02);",   // 00 : IR
-    "I2C_READ (0x32);", // 01 : DR (reg_2)
-    "I2C_WRITE (0x32, 0xB0B0);", // 01 : DR (reg_2)
-    "I2C_READ (0x31);",   // 02 : IR
-    "I2C_WRITE (0x31, 0x01);",   // 02 : IR
-    "I2C_READ (0x32);", // 03 : DR (reg_1)
-    "I2C_WRITE (0x32, 0x0A0A);", // 03 : DR (reg_1)
-    "I2C_READ (0x31);",   // 04 : IR
-    "I2C_WRITE (0x31, 0xFF);",   // 04 : IR*/
-    "SIR 8 TDI(01);",  //SVF operation not treated by bit-bang yet
-    "SDR 5 TDI(00);",
-    "SDR 5 TDI(00);",
-    "SDR 5 TDI(00);",
-    "SIR 8 TDI(FF);",
-
- };
-
-  //TS_ASSERT_EQUALS (gotCommands, expectedCommands);
-}
+ }
 
 //! Checks SystemModelManager DoDataCycles when using "1500" testcase
 //!

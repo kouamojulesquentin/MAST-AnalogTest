@@ -80,7 +80,7 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
    accessInterface=std::dynamic_pointer_cast<AccessInterface>(cur_node);
    slaveTranslator=std::dynamic_pointer_cast<AccessInterfaceTranslator>(cur_node);
    T_2_E_protocol= std::dynamic_pointer_cast<T_2_E_TranslatorProtocol>(accessInterfaceTranslator.Protocol());
-   if (T_2_E_protocol) {
+   if (T_2_E_protocol) { //This "if" should become useless?
 //     T_2_E_protocol->Start_Translator();
 //     auto T_2_E_lambda =[T_2_E_protocol] () {T_2_E_protocol->T_2_E_translator();};
 //     m_manager->CreateApplicationThread(T_2_E_protocol->EventDomainRootNode(),T_2_E_lambda,"T-2-E Translator");

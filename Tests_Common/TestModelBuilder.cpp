@@ -288,58 +288,6 @@ shared_ptr<AccessInterfaceTranslator> TestModelBuilder::Create_TestCase_JTAG_to_
 //  End of: TestModelBuilder::Create_TestCase_AccessInterface
 //---------------------------------------------------------------------------
 
-//! Creates a simple 1149 tap node with two multiplexed registers, with an Emulation_Translator as top level
-//! but with a JTAG_to_I2C translator in the middle
-//!
-//! @note - There are multiple "dynamic" registers
-//!       - The control register is composed with multiple bits
-//!
-//! @param name         Name for top node
-//!
-//! @return Top node of system mode
-//!
-shared_ptr<AccessInterfaceTranslator> TestModelBuilder::Create_TestCase_JTAG_BitBang_Translator (string_view name)
-{
-  uint32_t muxDrPathCount = 3u;
-  auto I2C_Adresses   = initializer_list<uint32_t>{ 0x30u, 0x31u, 0x32u,0x33u,0x34u  };
-
-  auto raw_protocol = make_shared<SVF_RawPlayer>();
-  auto top_tap     = Create_JTAG_TAP    ("Top-Tap",       DEFAULT_IR_LEN, 2u,raw_protocol);
-
-  auto etap     = Create_JTAG_TAP    ("eTap",       DEFAULT_IR_LEN, muxDrPathCount, make_shared<SVF_RawPlayer>());
-
-  auto chain_1 = m_model.CreateChain    ("sut_1",    etap);
-  auto reg_1   = m_model.CreateRegister ("static_1", BinaryVector(STATIC_TDR_LEN, 0), chain_1);
-
-  auto chain_2 = m_model.CreateChain    ("sut_2",    etap);
-  auto reg_2   = m_model.CreateRegister ("static_2", BinaryVector(STATIC_TDR_LEN, 0), chain_2);
-
-  auto top_translator     = m_model.CreateAccessInterfaceTranslator    ("Emulation", make_shared<Spy_Emulation_Translator>());
-
-  auto jtag_bitbang_translator     = m_model.CreateAccessInterfaceTranslator    (name, make_shared<JTAG_BitBang_TranslatorProtocol>(top_tap));
-
-  m_model.ReplaceRoot(top_translator,false);
-
-  top_translator->AppendChild(top_tap);
-  top_translator->RegisterInterface(top_tap);
-  
-
-  auto bitbang_chain = m_model.CreateChain    ("BB_chain");
-  auto bitbang_reg   = m_model.CreateRegister ("BB_Reg", BinaryVector(5, 0), bitbang_chain);
-  bitbang_chain->AppendChild(jtag_bitbang_translator);
-
-  top_tap->AppendChild(bitbang_chain);
-  jtag_bitbang_translator->AppendChild(etap);
-
-
-  jtag_bitbang_translator->RegisterInterface(etap);
-
-  return top_translator;
-}
-//
-//  End of: TestModelBuilder::Create_TestCase_AccessInterface
-//---------------------------------------------------------------------------
-
 //! Creates a simple I2C Access Interface with two registers, with an Emulation_Translator as top level
 //!
 //! @note - There are multiple "dynamic" registers

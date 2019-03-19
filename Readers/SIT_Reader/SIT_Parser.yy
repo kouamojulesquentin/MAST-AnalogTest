@@ -59,6 +59,7 @@
 #include "g3log/g3log.hpp"
 #include "AccessInterfaceTranslatorProtocolFactory.hpp"
 #include "JTAG_BitBang_TranslatorProtocol.hpp"
+#include "PDL_AlgorithmsRepository.hpp"
 
 #include <iostream>
 #include <cstdlib>
@@ -281,7 +282,17 @@ root_node:
       CHECK_VALUE_NOT_NULL(EventDomainRootNode, "Cannot find parent of node '"s + BBNode->Name() + "' to intialize the T-2-E protocol of translator  "+ translatorInfo.translator_node->Name());
       auto t_2_E_protocol = dynamic_pointer_cast<T_2_E_TranslatorProtocol>(translatorInfo.translator_node->Protocol());
       CHECK_VALUE_NOT_NULL(t_2_E_protocol, "Protocol of Translator node " + translatorInfo.translator_node->Name() + " should be of type T-2-E protocol");
-      t_2_E_protocol->SetEventDomain(EventDomainRootNode);
+      
+      /*Register T_2_E_translator as a PDL application with an unique name derived from the UID of the translator */
+      auto Unique_PDL_name = t_2_E_protocol->GetTranslatorBaseName()+"_"+std::to_string(translatorInfo.translator_node->Identifier());
+      auto& repo = PDL_AlgorithmsRepository::Instance();
+      auto T_2_E_translator_lambda =[t_2_E_protocol] () {t_2_E_protocol->T_2_E_translator();};
+
+     // ---------------- Do register algorithm(s) with a name
+     repo.RegisterAlgorithm(Unique_PDL_name, T_2_E_translator_lambda);
+     // ---------------- Create a thread generation request attached to the EvenDomainRootNode
+      driver.namesAndNodes.emplace_back(Unique_PDL_name, EventDomainRootNode, nlines);
+
 
       driver.unresolved_translators.pop();
     }

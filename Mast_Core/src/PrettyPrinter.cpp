@@ -460,13 +460,6 @@ void PrettyPrinter::VisitAccessInterfaceTranslator (AccessInterfaceTranslator& a
      else
       {
      auto protocol_is_t2e=std::dynamic_pointer_cast<T_2_E_TranslatorProtocol>(protocol);
-     if (protocol_is_t2e) 
-       {
-       note += "->" ;
-       if (protocol_is_t2e->EventDomain_is_set())
-        note += protocol_is_t2e->EventDomainRootNode()->Name();
-       else note += "Not set";
-       }
       } 
     }
   }

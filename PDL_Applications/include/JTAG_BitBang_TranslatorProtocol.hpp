@@ -5,9 +5,9 @@
 //
 // Project : Mast
 //
-//! @file Emulation_TranslatorProtocol.hpp
+//! @file JTAG_BitBang_TranslatorProtocol.hpp
 //!
-//! Declares Emulation_TranslatorProtocol class
+//! Declares JTAG_BitBang_TranslatorProtocol class
 //!
 //===========================================================================
 
@@ -23,7 +23,7 @@
 
 namespace mast
 {
-//! Implement loopback while logging callbacks that
+//! Implements a Big-Bang T-2-E translator
 class MAST_CORE_EXPORT JTAG_BitBang_TranslatorProtocol final : public T_2_E_TranslatorProtocol
 {
   // ---------------- Public  Methods
@@ -31,7 +31,6 @@ class MAST_CORE_EXPORT JTAG_BitBang_TranslatorProtocol final : public T_2_E_Tran
   public:
   virtual ~JTAG_BitBang_TranslatorProtocol() = default;
   JTAG_BitBang_TranslatorProtocol() = delete;
- JTAG_BitBang_TranslatorProtocol(std::shared_ptr<ParentNode> EventDomainRootNode) : T_2_E_TranslatorProtocol(EventDomainRootNode)  {}
  JTAG_BitBang_TranslatorProtocol(std::experimental::string_view BB_Reg_Name)   : T_2_E_TranslatorProtocol(BB_Reg_Name) {}
 
 //  JTAG_BitBang_TranslatorProtocol(std::vector<uint32_t> addresses);

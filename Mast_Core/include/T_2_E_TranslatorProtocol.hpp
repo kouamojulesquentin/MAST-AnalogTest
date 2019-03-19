@@ -41,29 +41,19 @@ class MAST_CORE_EXPORT T_2_E_TranslatorProtocol : public AccessInterfaceTranslat
   virtual BinaryVector PDL_translator( std::experimental::string_view CallbackId, BinaryVector	   ToSutVector) = 0;
 
   T_2_E_TranslatorProtocol() = delete;
-  T_2_E_TranslatorProtocol(std::shared_ptr<ParentNode> EventDomainRootNode) {
-  m_CallbackQueue=std::make_shared<MTQueue<CallbackRequest>>();
-  m_fromSutQueue=std::make_shared<MTQueue<std::pair<BinaryVector,std::string>>>();
-  m_EventDomainRootNode=EventDomainRootNode;
-  n_BB_Reg_Name = DEFAULT_BB_REG_NAME;
-  m_Translator_launched=false;
-  };
 
   T_2_E_TranslatorProtocol(std::experimental::string_view BB_Reg_Name) {
   m_CallbackQueue=std::make_shared<MTQueue<CallbackRequest>>();
   m_fromSutQueue=std::make_shared<MTQueue<std::pair<BinaryVector,std::string>>>();
-  m_EventDomainRootNode=nullptr;
-  n_BB_Reg_Name =BB_Reg_Name;
+  m_BB_Reg_Name =BB_Reg_Name;
   m_Translator_launched=false;
   };
-
-  bool EventDomain_is_set() {return (m_EventDomainRootNode!=nullptr) ;}
-  void SetEventDomain( std::shared_ptr<SystemModelNode> EventDomainRootNode){m_EventDomainRootNode=std::dynamic_pointer_cast<ParentNode>(EventDomainRootNode);}
-  std::shared_ptr<ParentNode> EventDomainRootNode (){return m_EventDomainRootNode;}
 
   void SetCallbackQueue(std::shared_ptr<MTQueue<CallbackRequest>> CallbackQueue) {m_CallbackQueue=CallbackQueue;}
    void SetfromSutQueue(std::shared_ptr<MTQueue<std::pair<BinaryVector,std::string>>> fromSutQueue) {m_fromSutQueue=fromSutQueue;}
  
+   std::string GetTranslatorBaseName() {return m_Translator_base_name;};
+
     void PushRequest(CallbackRequest Request) {
      m_CallbackQueue->Push(Request);
      LOG(DEBUG) << "Protocol " << this->KindName()<<" : pushed request for Callback "<<Request.CallbackId();
@@ -91,39 +81,11 @@ class MAST_CORE_EXPORT T_2_E_TranslatorProtocol : public AccessInterfaceTranslat
   void Set_Translator_State(bool new_state){m_Translator_launched=new_state;}
   
 
-//! Registers the translator algorithm functions in this file
-//!
-//! @note Names used from registration must be the same as found in SIT file
-bool RegisterAlgorithms ()
-{
-  // ---------------- Get an handle on PDL algorithm repository
-  //
-  auto& repo = PDL_AlgorithmsRepository::Instance();
-  auto T_2_E_translator_lambda =[this] () {T_2_E_translator();};
-
-  // ---------------- Do register algorithm(s) with a name
-  //
-  repo.RegisterAlgorithm("T_2_E_translator", T_2_E_translator_lambda);
-   //Compiles, but is it correct?
-
-  return true;
-}
-//
-//  End of: RegisterAlgorithms
-//---------------------------------------------------------------------------
-
-
-//! Make PDL algorithm functions in this file to be registered
-//!
-//! @note As a "static" variable, it is initialized once when the corresponding DLL is loaded
-//!
-bool registrated = RegisterAlgorithms();
-
   private:
   
 
-  std::experimental::string_view n_BB_Reg_Name;
-  std::shared_ptr<ParentNode> m_EventDomainRootNode;                                 //!>Retargeting domain root node where the events must be generated 
+  std::experimental::string_view m_BB_Reg_Name;
+  std::string m_Translator_base_name= "T_2_E_translator";
   std::shared_ptr<MTQueue<CallbackRequest>> m_CallbackQueue;                       //!<Callback requests from underlying Raw protocol
   std::shared_ptr<MTQueue<std::pair<BinaryVector,std::string>>> m_fromSutQueue;   //!<fromSut data results for underlying Raw protocol
   

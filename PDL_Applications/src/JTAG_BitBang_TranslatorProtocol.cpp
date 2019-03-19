@@ -40,6 +40,8 @@ BinaryVector JTAG_BitBang_TranslatorProtocol::PDL_translator( std::experimental:
     TDO|TDI|TMS|TCK
   */
   
+   LOG(DEBUG) << "JTAG_BitBang_TranslatorProtocol::PDL_translator : Started";
+
   auto     loopCount    = ToSutVector.BitsCount();
   BinaryVector	  fromSutVector(loopCount);
   
@@ -48,6 +50,7 @@ BinaryVector JTAG_BitBang_TranslatorProtocol::PDL_translator( std::experimental:
   iWrite(registerPath, BB_Value);
   iApply();
 
+   LOG(DEBUG) << "JTAG_BitBang_TranslatorProtocol::PDL_translator : finished";
 
 return ToSutVector;
 }                   

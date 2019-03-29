@@ -22,6 +22,7 @@
 #include <string>
 #include <experimental/string_view>
 #include <chrono>
+#include <functional>
 
 namespace mast
 {

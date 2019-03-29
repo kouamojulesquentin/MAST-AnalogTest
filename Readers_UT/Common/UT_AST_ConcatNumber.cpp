@@ -98,12 +98,12 @@ void UT_AST_ConcatNumber::test_Constructor ()
   auto data =
   {
     // 0
-    data_t
+   /* data_t
     {
       {
       },
       false
-    },
+    },*/
 
     // 1
     data_t
@@ -179,13 +179,13 @@ void UT_AST_ConcatNumber::test_AsText ()
   auto data =
   {
     // 0
-    data_t
+/*    data_t
     {
       {
       },
       ""
     },
-
+*/
     // 1
     data_t
     {
@@ -396,13 +396,13 @@ void UT_AST_ConcatNumber::test_AsBinaryVector_not_valid ()
   auto data =
   {
     // 0 ==> No numbers at all
-    data_t
+ /*   data_t
     {
       {
       },
       0u,
     },
-
+*/
     // 1 ==> Two unsized
     data_t
     {

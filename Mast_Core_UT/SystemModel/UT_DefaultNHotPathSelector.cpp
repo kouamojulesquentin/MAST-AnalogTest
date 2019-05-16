@@ -952,7 +952,10 @@ void UT_DefaultNHotPathSelector::test_Deselect_CannotSelectNone_LastOne ()
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (sut.Deselect(4u), std::exception);
+//  TS_ASSERT_THROWS (sut.Deselect(4u), std::exception);
+  sut.Deselect(4u);
+   //Deselection results in selection of first path
+  TS_ASSERT_TRUE   (sut.IsSelected(1u));
 }
 
 

@@ -147,7 +147,11 @@ void DefaultNHotPathSelector::Deselect (uint32_t pathIdentifier)
   }
 
   if (!CanSelectNone() && (toSut == m_selectTable[0]))
+      toSut = m_selectTable[1]; //As selector cannot be closed, select first path
+
+  if (!CanSelectNone() && (toSut == m_selectTable[0]))
   {
+    //Proactive check, should never come here
     THROW_LOGIC_ERROR("Try to select no path, even though selector is configured to at least select one");
   }
 

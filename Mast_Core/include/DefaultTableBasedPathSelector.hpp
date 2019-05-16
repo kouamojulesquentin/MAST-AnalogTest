@@ -18,6 +18,7 @@
 #include "BinaryVector.hpp"
 #include "VirtualRegister.hpp"
 #include "Mast_Core_export.hpp"
+#include "EnumsUtility.hpp"
 
 #include <vector>
 #include <memory>

@@ -419,7 +419,8 @@ void UT_DefaultOneHotPathSelector::test_Select_Path_Zero_when_CannotSelectNone (
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (sut.Select(0u), std::exception);
+  sut.Select(0u);
+  TS_ASSERT_TRUE  (sut.IsSelected(1u));
 }
 
 //! Checks DefaultOneHotPathSelector::Select() when path identifier is out of range

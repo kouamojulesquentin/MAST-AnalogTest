@@ -179,7 +179,8 @@ void DefaultOneHotPathSelector::Select (uint32_t pathIdentifier)
 {
   if (!CanSelectNone() && (pathIdentifier == 0))
   {
-    THROW_INVALID_ARGUMENT("Try to select no path, even though selector is configured to at least select one");
+    pathIdentifier = 1; //As selector cannot be closed, select first path instead of throwing
+    //THROW_INVALID_ARGUMENT("Try to select no path, even though selector is configured to at least select one");
   }
 
   DefaultTableBasedPathSelector::Select(pathIdentifier);

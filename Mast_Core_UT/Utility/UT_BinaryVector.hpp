@@ -305,6 +305,12 @@ class UT_BinaryVector : public CxxTest::TestSuite
   void test_Slice_with_Range ();
   void test_Slice_When_Exceeding_Capacity ();
 
+  // ---------------- ReverseSlice
+  //
+  void test_ReverseSlice ();
+//  void test_Slice_with_Range ();
+//  void test_Slice_When_Exceeding_Capacity ();
+
   // ---------------- SetSlice
   //
   void test_SetSlice_BinaryVector ();

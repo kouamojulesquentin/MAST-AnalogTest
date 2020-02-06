@@ -111,7 +111,6 @@ add_subdirectory(Logger)
 add_subdirectory(Mast_Core)
 add_subdirectory(Mast_API_CPP)
 add_subdirectory(Mast_API_C)
-add_subdirectory(Mast_App)
 add_subdirectory(Tutorials)
 add_subdirectory(Applications)
 add_subdirectory(PDL_Applications)
@@ -129,6 +128,8 @@ if (${KISSFFT})
   add_subdirectory(TestCasesApp)
 endif()
 
+add_subdirectory(Mast_App)
+
 add_subdirectory(MastExample_CPP)
 add_subdirectory(Mast_Core_UT)
 add_subdirectory(Mast_API_UT)
@@ -144,9 +145,11 @@ if (${INSTALL_ARM})
  include(Export_MAST_for_arm.cmake)
 endif()
 
+include(Export_MAST_for_eval.cmake)
+
 set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY  OFF)
 set(CPACK_COMPONENTS_GROUPING         ONE_PER_GROUP)
-set(CPACK_COMPONENTS_ALL              ATE_Server ATE_Build ARM_Build) #SIT_Files
+set(CPACK_COMPONENTS_ALL              ATE_Server ATE_Build ARM_Build Eval_Build) #SIT_Files
 
 set(CPACK_PACKAGE_VENDOR              "OWL")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY   "${CMAKE_BINARY_DIR}/${EXPORT_DIR}")

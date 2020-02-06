@@ -6,6 +6,8 @@ set (CPPFLAGS "${WARNINGS} -std=c++14")
 
 include_directories(./)
 
+set(LIBLICENSE_INCLUDE_DIRS  "${CMAKE_CURRENT_SOURCE_DIR}/"  PARENT_SCOPE)
+
 add_library 	(aes	STATIC 	aes.c )
 add_executable 	(make_license 	make_license.cpp )
 add_executable 	(check_license 	check_license.cpp)

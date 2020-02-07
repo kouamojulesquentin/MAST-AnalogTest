@@ -51,6 +51,7 @@ BinaryVector Emulation_TranslatorProtocol::TransformationCallback(CallbackReques
     command.pop_back();
   }
   LOG(INFO) << command;
+  LOG(DEBUG) << "Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data";
 
  //Implement loopback behaviour
 return current_request.ToSutVector();

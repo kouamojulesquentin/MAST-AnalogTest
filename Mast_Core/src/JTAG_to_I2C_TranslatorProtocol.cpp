@@ -145,7 +145,7 @@ BinaryVector JTAG_to_I2C_TranslatorProtocol::TransformationCallback(CallbackRequ
 
   void *address_data=static_cast<void *>(m_addresses.data());
   
-  
+  LOG(DEBUG) << "TransformationCallback: recevied a Request for a "<< current_request.CallbackId()<<" operation";
   if (current_request.CallbackId()==TRST)
     endpointId = 0;
   if (current_request.CallbackId()==SIR)
@@ -174,14 +174,18 @@ BinaryVector JTAG_to_I2C_TranslatorProtocol::TransformationCallback(CallbackRequ
       }
   else
    {
+  LOG(DEBUG) << "TransformationCallback: Issue an I2C_READ operation";
   callback_toSutData = toSutData;
   CallbackRequest read_request(I2C_READ,callback_toSutData,os_read.str(),address_data);
   PushRequest(read_request);
   result = PopfromSut(); //Need to remove from queue, but return data in not useful
+  LOG(DEBUG) << "TransformationCallback: I2C_READ finished: drop return data";
 
+  LOG(DEBUG) << "TransformationCallback: Issue an I2C_WRITE operation";
   CallbackRequest write_request(I2C_WRITE,callback_toSutData,os_write.str(),address_data);
   PushRequest(write_request);
   result = PopfromSut();
+  LOG(DEBUG) << "TransformationCallback: Issue an I2C_WRITE operation";
   }
   
   return result;

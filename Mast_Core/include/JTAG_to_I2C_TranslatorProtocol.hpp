@@ -1,13 +1,13 @@
 //===========================================================================
-//                           Emulation_TranslatorProtocol.hpp
+//                           JTAG_to_I2C_TranslatorProtocol.hpp
 //===========================================================================
 // Copyright (C) 2017 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file Emulation_TranslatorProtocol.hpp
+//! @file JTAG_to_I2C_TranslatorProtocol.hpp
 //!
-//! Declares Emulation_TranslatorProtocol class
+//! Declares JTAG_to_I2C_TranslatorProtocol class
 //!
 //===========================================================================
 

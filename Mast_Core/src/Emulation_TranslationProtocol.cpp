@@ -29,6 +29,17 @@ using std::ostringstream;
 
 //  os << commandType << " " << toSutData.BitsCount() << " TDI(" << SVFVector(toSutData).Data() << ");\n";
 
+/*Command formatting functions:*/
+
+  auto FormatSVFData = [] (BinaryVector RawData)
+  {
+  //Prepare formatted SVF data
+  ostringstream os;
+  os << RawData.BitsCount() << " TDI(" << SVFVector(RawData).Data() << ");";
+  return os.str();
+  };
+
+
 //! Loopbacks "to SUT data" logging SVF command(s) that would be issued if it was really an operating protocol
 //! NOT VERIFIED YET!!! CHECK!!!!!!!
 
@@ -38,10 +49,17 @@ BinaryVector Emulation_TranslatorProtocol::TransformationCallback(CallbackReques
   ostringstream os;
   string toSutData;
   
-  if (current_request.FormattedData().empty())
+  //Check for known commands to format
+  if ((current_request.CallbackId()=="SDR") || (current_request.CallbackId()=="SIR"))
+     toSutData = FormatSVFData(current_request.ToSutVector());
+  else
+   {
+    //Unkown format: log it as bynary
+   if (current_request.FormattedData().empty())
     toSutData = current_request.ToSutVector().DataAsBinaryString("", "");
-  else  
+   else  
     toSutData = current_request.FormattedData();
+   } 
   os << current_request.CallbackId() << " " << toSutData <<"\n";
 
   auto command = os.str();

@@ -33,12 +33,21 @@ BinaryVector SVF_RawPlayer::DoCallback (uint32_t endpointId, void* /* interfaceD
   string svfFormattedData;
   BinaryVector callback_toSutData;
   
-  //Prepapre formatted SVF data
+  auto FormatSVFData = [] (BinaryVector RawData)
+  {
+  //Prepare formatted SVF data
   ostringstream os;
-  os << toSutData.BitsCount() << " TDI(" << SVFVector(toSutData).Data() << ");";
+  os << RawData.BitsCount() << " TDI(" << SVFVector(RawData).Data() << ");";
+  return os.str();
+  };
+  //Prepare formatted SVF data
+//  ostringstream os;
+//  os << toSutData.BitsCount() << " TDI(" << SVFVector(toSutData).Data() << ");";
+
   if (endpointId != 0) //No data in the request dor Reset operation
       {
-      svfFormattedData = os.str();
+//      svfFormattedData = os.str();
+      svfFormattedData = FormatSVFData(toSutData);
       callback_toSutData = toSutData;
       }
 

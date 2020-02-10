@@ -20,6 +20,18 @@
 
 namespace mast
 {
+
+//  std::string FormatData(BinaryVector raw_data){(void)raw_data;return "UNSET";};
+class DataFormatter_Functor
+{
+ public: 
+  std::string operator()(BinaryVector raw_data)
+   {
+    (void)raw_data;return "UNSET";
+   }
+ 
+};
+
 //! Defines Callbacks for AccessInterface Requests
 //!
 class CallbackRequest 
@@ -88,9 +100,12 @@ class CallbackRequest
   std::string FormattedData(){if (!m_FormattedData.empty()) return m_FormattedData ;
                               else return m_ToSutVector.DataAsBinaryString();};
 
+
   private:
   std::string m_CallbackId;
   BinaryVector  m_ToSutVector;
+  
+  //NB: This should be removed now!!!!
   std::string m_FormattedData;
   void* m_interfaceData=nullptr;
   

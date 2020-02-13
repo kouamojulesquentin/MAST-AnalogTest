@@ -16,6 +16,7 @@
 
 // For default AccessInterfaceTranslatorProtocol
 #include "Emulation_TranslatorProtocol.hpp"
+#include "Simulation_TranslatorProtocol.hpp"
 #include "JTAG_to_I2C_TranslatorProtocol.hpp"
 #include "Dummy_TranslatorProtocol.hpp"
 
@@ -72,6 +73,7 @@ unique_ptr<AccessInterfaceTranslatorProtocol> AccessInterfaceTranslatorProtocolF
 void AccessInterfaceTranslatorProtocolFactory::InitializeWithDefaults ()
 {
   RegisterCreator("Emulation",       [](const string& /* parameters */) { return make_unique<Emulation_TranslatorProtocol>();     });
+  RegisterCreator("Simulation",       [](const string /*& parameters*/) { return make_unique<Simulation_TranslatorProtocol>();     });
   RegisterCreator("JTAG_to_I2C",            [](const string& parameters)       { return make_unique<JTAG_to_I2C_TranslatorProtocol>(parameters);     });
   RegisterCreator("Dummy",       [](const string&  parameters ) { return make_unique<Dummy_TranslatorProtocol>(parameters);     });
 }

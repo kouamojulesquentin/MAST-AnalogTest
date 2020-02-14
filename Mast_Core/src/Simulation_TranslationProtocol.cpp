@@ -225,7 +225,7 @@ void Simulation_TranslatorProtocol::SendCommand (string_view command)
     THROW_RUNTIME_ERROR("Cannot open output file: "s + m_toSutFilePath);
   }
 
-  ofs << command; // Command already include '\n'
+  ofs << command <<'\n'; // Command already include '\n'
   ofs.flush();
   ofs.close();
 }

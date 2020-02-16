@@ -22,6 +22,7 @@
 #include "g3log/g3log.hpp"
 
 using namespace mast;
+using std::ofstream;
 using std::string;
 using std::experimental::string_view;
 using std::ostringstream;
@@ -69,6 +70,9 @@ BinaryVector Emulation_TranslatorProtocol::TransformationCallback(CallbackReques
     command.pop_back();
   }
   LOG(INFO) << command;
+  m_ofs << command << '\n'; //Log command into Emulation log
+  m_ofs.flush();
+
   LOG(DEBUG) << "Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data";
 
  //Implement loopback behaviour

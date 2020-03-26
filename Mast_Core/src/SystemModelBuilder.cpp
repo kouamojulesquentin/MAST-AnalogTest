@@ -266,7 +266,7 @@ shared_ptr<Chain> SystemModelBuilder::Create_Brocade (shared_ptr<AccessInterface
   uint32_t tapNum = 1u;
   for (auto tap : taps)
   {
-    // ---------------- Diconnect pieces from AccessInterface
+    // ---------------- Disconnect pieces from AccessInterface
     //
     auto mux = dynamic_pointer_cast<Linker>   (tap->DisconnectEndPoint(2u));
     auto ir  = dynamic_pointer_cast<Register> (tap->DisconnectEndPoint(1u));

@@ -225,6 +225,7 @@ root_node:
 }
   node END
   {
+    LOG(DEBUG)<<"Checking Unresolved Nodes : there are " <<driver.unresolved_linkers.size() << " linkers and " << driver.unresolved_translators.size() << " translators" ;
     const auto& selectorFactory = PathSelectorFactory::Instance();
     unique_ptr<PathSelector> selector;
 
@@ -271,6 +272,7 @@ root_node:
       const auto& translatorInfo = driver.unresolved_translators.front();
 
       // remove resolved translatorInfo
+      LOG(INFO)<<"Resolving Translator "<< translatorInfo.translator_reg_name;
       const auto& registerIter = driver.declared_registers.find(translatorInfo.translator_reg_name);
       if (registerIter == driver.declared_registers.end())
       {
@@ -386,17 +388,23 @@ parent_node_with_children:
     auto asTranslator = dynamic_pointer_cast <AccessInterfaceTranslator>($[parent_node].first);
     if (asTranslator)
      { //Need to regsiter Raw protocol with translator
-      auto interface = dynamic_pointer_cast <AccessInterface>(asTranslator->FirstChild());
-      auto slave_translator = dynamic_pointer_cast <AccessInterfaceTranslator>(asTranslator->FirstChild());
-      if (!interface) 
-       if (!slave_translator) 
+     LOG(DEBUG)<<"Registering Raw protocols for node " << asTranslator->Name();
+      auto current_Child= asTranslator->FirstChild();
+      while (current_Child != nullptr)
+      {
+       auto interface = dynamic_pointer_cast <AccessInterface>(current_Child);
+       auto slave_translator = dynamic_pointer_cast <AccessInterfaceTranslator>(current_Child);
+       if (!interface) 
+        if (!slave_translator) 
         {
          std::ostringstream msg;
          msg << "Node " << $[parent_node].first->Name() << " must have a child of type AccessInterface or AccessInterfaceTranslator"  ;
          THROW_SYNTAX_ERROR(msg);
         }
-      if (interface)         asTranslator->RegisterInterface(interface); 
-      if (slave_translator)  asTranslator->RegisterTranslator(slave_translator); 
+       if (interface)         asTranslator->RegisterInterface(interface); 
+       if (slave_translator)  asTranslator->RegisterTranslator(slave_translator); 
+      current_Child = current_Child->NextSibling();
+      }
      }
   }
 ;
@@ -538,6 +546,7 @@ t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_
 
   try
   {
+    LOG(DEBUG)<<"Creating JTAG TAP " << $[node_name].name;
     auto& factory  = AccessInterfaceProtocolFactory::Instance();
     auto  protocol = factory.Create(creatorId, protocolParameters);
 

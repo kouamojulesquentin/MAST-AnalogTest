@@ -310,7 +310,8 @@ void MastEnvironment_impl::CreateApplications ()
     auto algo = algosRepository.GetAlgorithm(association.appName);
 
     LOG(DEBUG) << "Try to create PDL algorithm \"" << association.appName      << "\""
-               << " associated to node \""         << association.node->Name() << "\"";
+               << " associated to node \""         << association.node->Name() << "\""
+               << " which has "         << association.node->DirectChildrenCount() << " children";
 
     Startup::sm_manager->CreateApplicationThread(association.node, algo, association.appName);
 

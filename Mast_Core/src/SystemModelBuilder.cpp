@@ -22,6 +22,7 @@
 #include "BrocadeSelector.hpp"
 #include "Utility.hpp"
 #include "EnumsUtility.hpp"
+#include "Dummy_TranslatorProtocol.hpp"
 
 
 using std::string;
@@ -210,7 +211,7 @@ std::shared_ptr<Chain> SystemModelBuilder::Create_1500_Wrapper (string_view name
 //! @param slaveProtocol  An access interface protocol for the "Slave" TAP
 //! @param taps           "Slave" TAPs
 //!
-shared_ptr<Chain> SystemModelBuilder::Create_Brocade (shared_ptr<AccessInterfaceProtocol>           masterProtocol,
+shared_ptr<AccessInterfaceTranslator> SystemModelBuilder::Create_Brocade (shared_ptr<AccessInterfaceProtocol>           masterProtocol,
                                                       shared_ptr<AccessInterfaceProtocol>           slaveProtocol,
                                                       initializer_list<shared_ptr<AccessInterface>> taps)
 {
@@ -228,7 +229,7 @@ shared_ptr<Chain> SystemModelBuilder::Create_Brocade (shared_ptr<AccessInterface
 
   // ---------------- Prepare Brocade mux
   //
-  auto brocadeChain  = m_model.CreateChain("Brocade");
+  auto brocadeChain  = m_model.CreateAccessInterfaceTranslator ("Brocade",std::make_unique<Dummy_TranslatorProtocol>(""),nullptr);
   auto masterAi      = m_model.CreateAccessInterface("Master_AI", masterProtocol, brocadeChain);
   auto slaveAi       = m_model.CreateAccessInterface("Slave_AI",  slaveProtocol,  brocadeChain);
   auto masterCtrlReg = m_model.CreateRegister("Brocade_CTRL", BinaryVector(8u), true, masterAi);
@@ -237,6 +238,10 @@ shared_ptr<Chain> SystemModelBuilder::Create_Brocade (shared_ptr<AccessInterface
   auto selector      = make_shared<BrocadeSelector>(masterCtrlReg, taps.size());
   auto irLinker      = m_model.CreateLinker ("IR_Mux", selector, irChain);
   auto drLinker      = m_model.CreateLinker ("DR_Mux", selector, drChain);
+
+
+  brocadeChain->RegisterInterface(masterAi);
+  brocadeChain->RegisterInterface(slaveAi);
 
   masterAi->IgnoreForNodePath(true);
   slaveAi->IgnoreForNodePath(true);
@@ -286,7 +291,7 @@ shared_ptr<Chain> SystemModelBuilder::Create_Brocade (shared_ptr<AccessInterface
     m_model.RemoveNodeFromModel(tap);
   }
 
-  m_model.ReplaceRoot(brocadeChain, false);
+//  m_model.ReplaceRoot(brocadeChain, false);
   return brocadeChain;
 }
 //
@@ -388,7 +393,128 @@ auto top_is_translator = std::dynamic_pointer_cast<AccessInterfaceTranslatorProt
     m_model.RemoveNodeFromModel(tap);
   }
 
-  m_model.ReplaceRoot(brocadeTop, false);
+//  m_model.ReplaceRoot(brocadeTop, false);
+  return brocadeTop;
+
+}
+
+//! Moves up to 5 TAPs under a "Master" TAP that provides dynamic selection of the "Slave" TAPs
+//! NB: this version also looks for PDL Functions registred with the TAPs and 
+//!     changes their assignement to the new System Model 
+//!
+//! @param TranslatorProtocol the top-level access interface translator protocol (ex; Emulation)
+//! @param masterProtocol An access interface protocol for the "Master" TAP
+//! @param slaveProtocol  An access interface protocol for the "Slave" TAP
+//! @param taps           Vector of "Slave" TAPs
+//!
+shared_ptr<AccessInterfaceTranslator> SystemModelBuilder::Create_Brocade (shared_ptr<AccessInterfaceTranslatorProtocol>  TopProtocol,
+                                                      shared_ptr<AccessInterfaceProtocol>           masterProtocol,
+                                                      shared_ptr<AccessInterfaceProtocol>           slaveProtocol,
+                                                      std::vector<shared_ptr<AccessInterface>> taps,
+						      std::vector<mast::AppFunctionNameAndNode>& namesAndNodes )
+{
+  // ---------------- Check parameters
+  //
+  CHECK_PARAMETER_NOT_NULL(TopProtocol, "Expect a valid AccessInterfaceProtocol for the 'TopProtocol' AccessInterfaceTranslator");
+  CHECK_PARAMETER_NOT_NULL(masterProtocol, "Expect a valid AccessInterfaceProtocol for the 'Master' AccessInterface");
+  CHECK_PARAMETER_NOT_NULL(slaveProtocol,  "Expect a valid AccessInterfaceProtocol for the 'Slave' AccessInterface");  
+  CHECK_PARAMETER_RANGE(taps.size(), 1u, 5u, "Brocade support only from 1 to 5 'slave' TAPs");
+  auto master_is_raw = std::dynamic_pointer_cast<AccessInterfaceRawProtocol>(masterProtocol);
+  CHECK_PARAMETER_NOT_NULL(master_is_raw,  "Expect a Raw  AccessInterfaceProtocol for the 'Master' AccessInterface");  
+  auto slave_is_raw = std::dynamic_pointer_cast<AccessInterfaceRawProtocol>(slaveProtocol);
+  CHECK_PARAMETER_NOT_NULL(slave_is_raw,  "Expect a Raw  AccessInterfaceProtocol for the 'Slave' AccessInterface");  
+auto top_is_translator = std::dynamic_pointer_cast<AccessInterfaceTranslatorProtocol>(TopProtocol);
+  CHECK_PARAMETER_NOT_NULL(top_is_translator,  "Expect an AccessInterfaceTranslatorProtocol for the 'top' Protocol");  
+
+
+  for (auto tap : taps)
+  {
+    auto aiType = AssessAccessInterfaceType(tap);
+    CHECK_TRUE(aiType == AccessInterfaceAssessment::JTAG_TAP, "Cannot handle non JTAG TAP slaves");
+  }
+
+  // ---------------- Prepare Brocade mux
+  //
+  auto brocadeTop  = m_model.CreateAccessInterfaceTranslator("Brocade",TopProtocol);
+  auto masterAi      = m_model.CreateAccessInterface("Master_AI", masterProtocol, brocadeTop);
+  brocadeTop->RegisterInterface(masterAi);
+  auto slaveAi       = m_model.CreateAccessInterface("Slave_AI",  slaveProtocol,  brocadeTop);
+  brocadeTop->RegisterInterface(slaveAi);
+  auto masterCtrlReg = m_model.CreateRegister("Brocade_CTRL", BinaryVector(8u), true, masterAi);
+  auto irChain       = m_model.CreateChain  ("IR",     slaveAi);
+  auto drChain       = m_model.CreateChain  ("DR",     slaveAi);
+  auto selector      = make_shared<BrocadeSelector>(masterCtrlReg, taps.size());
+  auto irLinker      = m_model.CreateLinker ("IR_Mux", selector, irChain);
+  auto drLinker      = m_model.CreateLinker ("DR_Mux", selector, drChain);
+
+  masterAi->IgnoreForNodePath(true);
+  slaveAi->IgnoreForNodePath(true);
+  irChain->IgnoreForNodePath(true);
+  irChain->SetChildAppender(irLinker);
+
+  drChain->IgnoreForNodePath(true);
+  drChain->SetChildAppender(drLinker);
+
+  // ---------------- Connect slave TAPs
+  //
+  auto renameNodes = [](shared_ptr<AccessInterface> tap, shared_ptr<Register> ir, shared_ptr<Linker> drMux, uint32_t tapOrder)
+  {
+    auto setTapName =     tap->Name().empty()
+                      || (tap->Name() == "TAP")
+                      || (tap->Name() == "Tap")
+                      || (tap->Name() == "tap")
+                      || (tap->Name() == "1149_1_TAP");
+    //! @todo [JFC]-[September/30/2016]: In Create_Brocade(): Compare case insensitive ==> Need utility
+    //!
+    auto tapName = setTapName ? "TAP"s + std::to_string(tapOrder) : tap->Name();
+
+    ir    ->SetName(tapName + ".IR");
+    drMux ->SetName(tapName);
+  };
+
+  uint32_t tapNum = 1u;
+  for (auto tap : taps)
+  {
+    // ---------------- Diconnect pieces from AccessInterface
+    //
+    auto mux = dynamic_pointer_cast<Linker>   (tap->DisconnectEndPoint(2u));
+    auto ir  = dynamic_pointer_cast<Register> (tap->DisconnectEndPoint(1u));
+
+    // ---------------- Reconnect to Brocade muxes
+    //
+    irLinker->AppendChild(ir);
+    drLinker->AppendChild(mux);
+
+    // ---------------- Adjust names for paths
+    //
+    mux->IgnoreForNodePath(false);
+    renameNodes(tap, ir, mux, tapNum++);
+    
+    //--if tap has any PDL function registred, change the reference to the new Mux representing this tap
+ //  for (auto registred_node : namesAndNodes)
+   for (size_t pos=0;pos<namesAndNodes.size();pos++)
+     {
+     
+ //      if (registred_node.node->Name()==tap->Name())
+       if (namesAndNodes[pos].node->Name()==tap->Name())
+        {
+	  auto asParentNode = dynamic_pointer_cast <ParentNode>(mux);
+       
+    //   registred_node.node = asParentNode;
+       namesAndNodes[pos].node= asParentNode;
+//	LOG(DEBUG)<<"Registred Node " <<registred_node.node->Name()<< "[" << registred_node.node->Identifier() << "]" 
+//	<<" has " << registred_node.node->DirectChildrenCount() <<" children";
+
+    
+	}
+     }
+
+    // ---------------- Get rid of AccessInterface
+    //
+    m_model.RemoveNodeFromModel(tap);
+  }
+
+//  m_model.ReplaceRoot(brocadeTop, false);
   return brocadeTop;
 
 }

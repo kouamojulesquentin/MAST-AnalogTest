@@ -16,6 +16,7 @@
 
 #include "SystemModel.hpp"
 #include "PathSelector.hpp"
+#include "AppFunctionNameAndNode.hpp"
 
 #include <memory>
 #include <initializer_list>
@@ -139,13 +140,18 @@ class MAST_CORE_EXPORT SystemModelBuilder final
 
   //! Moves up to 4 TAPs under a "Master" TAP that provides dynamic selection of the "Slave" TAPs
   //!
-  std::shared_ptr<Chain> Create_Brocade(std::shared_ptr<AccessInterfaceProtocol>                masterProtocol,
+  std::shared_ptr<AccessInterfaceTranslator> Create_Brocade(std::shared_ptr<AccessInterfaceProtocol>                masterProtocol,
                                         std::shared_ptr<AccessInterfaceProtocol>                slaveProtocol,
                                         std::initializer_list<std::shared_ptr<AccessInterface>> taps);
   std::shared_ptr<AccessInterfaceTranslator> Create_Brocade (std::shared_ptr<AccessInterfaceTranslatorProtocol>  TopProtocol,
                                                       std::shared_ptr<AccessInterfaceProtocol>           masterProtocol,
                                                       std::shared_ptr<AccessInterfaceProtocol>           slaveProtocol,
                                                       std::initializer_list<std::shared_ptr<AccessInterface>> taps);
+  std::shared_ptr<AccessInterfaceTranslator> Create_Brocade (std::shared_ptr<AccessInterfaceTranslatorProtocol>  TopProtocol,
+                                                      std::shared_ptr<AccessInterfaceProtocol>           masterProtocol,
+                                                      std::shared_ptr<AccessInterfaceProtocol>           slaveProtocol,
+                                                      std::vector<std::shared_ptr<AccessInterface>> taps,
+						      std::vector<mast::AppFunctionNameAndNode>& namesAndNodes);
 
   // ---------------- Private  Fields
   //

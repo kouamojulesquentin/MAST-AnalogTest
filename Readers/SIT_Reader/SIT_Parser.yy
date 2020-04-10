@@ -60,6 +60,10 @@
 #include "AccessInterfaceTranslatorProtocolFactory.hpp"
 #include "JTAG_BitBang_TranslatorProtocol.hpp"
 #include "PDL_AlgorithmsRepository.hpp"
+#include "Emulation_TranslatorProtocol.hpp"
+#include "Dummy_TranslatorProtocol.hpp"
+#include "I2C_RawPlayer.hpp"
+#include "SVF_RawPlayer.hpp"
 
 #include <iostream>
 #include <cstdlib>
@@ -125,6 +129,9 @@ namespace
     return location;
   }
 } // End of unnamed namespace
+
+
+#define BROCADE_TAG "tmp_BROCADE"
 
 } /*end of %code section*/
 
@@ -215,6 +222,7 @@ namespace
 %token <std::string>   t_REVERSE
 %token <std::uint32_t> t_DecimalLiteral
 %token <std::string>   t_TRANSLATOR
+%token <std::string>   t_BROCADE
 
 
 %%
@@ -372,40 +380,76 @@ parent_node_with_children:
 
     auto asParentNode = dynamic_pointer_cast <ParentNode>($[parent_node].first);
 
-    for (auto this_child : $[children_list].first.nodes)
-    {
-      asParentNode->AppendChild(this_child);
-    }
-    $$ = $[parent_node].first;
-
-    if (!$[PDL_declaration].first.empty())
-    {
-      for (auto this_function : $[PDL_declaration].first)
+    auto isBrocade = $[parent_node].first->Name().find(BROCADE_TAG);
+    if (isBrocade==std::string::npos)
+     { /*Normal case*/
+      for (auto this_child : $[children_list].first.nodes)
       {
-        driver.namesAndNodes.emplace_back(this_function, asParentNode, $[PDL_declaration].second);
+        asParentNode->AppendChild(this_child);
       }
-    }
-    auto asTranslator = dynamic_pointer_cast <AccessInterfaceTranslator>($[parent_node].first);
-    if (asTranslator)
-     { //Need to regsiter Raw protocol with translator
-     LOG(DEBUG)<<"Registering Raw protocols for node " << asTranslator->Name();
-      auto current_Child= asTranslator->FirstChild();
-      while (current_Child != nullptr)
+      $$ = $[parent_node].first;
+  
+      if (!$[PDL_declaration].first.empty())
       {
-       auto interface = dynamic_pointer_cast <AccessInterface>(current_Child);
-       auto slave_translator = dynamic_pointer_cast <AccessInterfaceTranslator>(current_Child);
-       if (!interface) 
-        if (!slave_translator) 
+        for (auto this_function : $[PDL_declaration].first)
         {
-         std::ostringstream msg;
-         msg << "Node " << $[parent_node].first->Name() << " must have a child of type AccessInterface or AccessInterfaceTranslator"  ;
-         THROW_SYNTAX_ERROR(msg);
+          driver.namesAndNodes.emplace_back(this_function, asParentNode, $[PDL_declaration].second);
         }
-       if (interface)         asTranslator->RegisterInterface(interface); 
-       if (slave_translator)  asTranslator->RegisterTranslator(slave_translator); 
-      current_Child = current_Child->NextSibling();
       }
-     }
+      auto asTranslator = dynamic_pointer_cast <AccessInterfaceTranslator>($[parent_node].first);
+      if (asTranslator)
+       { //Need to regsiter Raw protocol with translator
+       LOG(DEBUG)<<"Registering Raw protocols for node " << asTranslator->Name();
+        auto current_Child= asTranslator->FirstChild();
+        while (current_Child != nullptr)
+        {
+         auto interface = dynamic_pointer_cast <AccessInterface>(current_Child);
+         auto slave_translator = dynamic_pointer_cast <AccessInterfaceTranslator>(current_Child);
+         if (!interface) 
+          if (!slave_translator) 
+          {
+           std::ostringstream msg;
+           msg << "Node " << $[parent_node].first->Name() << " must have a child of type AccessInterface or AccessInterfaceTranslator"  ;
+           THROW_SYNTAX_ERROR(msg);
+          }
+         if (interface)         asTranslator->RegisterInterface(interface); 
+         if (slave_translator)  asTranslator->RegisterTranslator(slave_translator); 
+        current_Child = current_Child->NextSibling();
+        }
+       }
+      }
+      else
+     { /*Building a Brocade Mux*/
+     auto nTaps = $[children_list].first.nodes.size();
+     if  ((nTaps <1) || (nTaps>4))
+       {
+       std::ostringstream msg;
+       msg << "Brocade Mux " << $[parent_node].first->Name() << " must have between 1 and 4 Slave Taps"  ;
+       THROW_SYNTAX_ERROR(msg);
+       }
+      std::vector<shared_ptr<AccessInterface>> tap_list; 
+      for (auto this_child : $[children_list].first.nodes)
+      {
+       auto tap = dynamic_pointer_cast <AccessInterface>(this_child);
+       tap_list.emplace_back(tap);
+      }
+      auto I2C_Adresses   = std::initializer_list<uint32_t>{ 0x30u, 0x31u };
+      
+      //We use a temp variable because passing by reference driver.namesAndNodes does not work
+      auto tmp= driver.namesAndNodes;
+      auto node = driver.builder->Create_Brocade(make_shared<Dummy_TranslatorProtocol>(""),
+                                                     make_shared<I2C_RawPlayer>(I2C_Adresses), 
+						     make_shared<SVF_RawPlayer>(),
+						     tap_list,
+						     tmp);
+						     //driver.namesAndNodes);
+     driver.namesAndNodes=tmp;
+
+      // ---------------- Get rid of temporary Brocade Chain node
+      //
+       driver.systemModel->RemoveNodeFromModel($[parent_node].first);
+       $$=node;
+       }
   }
 ;
 
@@ -440,6 +484,13 @@ t_CHAIN  node_name
   auto chain = driver.systemModel->CreateChain($[node_name].name);
   chain->IgnoreForNodePath($[node_name].is_transparent);
   $$ = std::make_pair(chain,true);
+}
+|
+t_BROCADE  node_name
+{
+  auto chain = driver.systemModel->CreateChain($[node_name].name+BROCADE_TAG);
+  chain->IgnoreForNodePath($[node_name].is_transparent);
+  $$ = std::make_pair(chain,false);
 }
 |
 t_LINKER  node_name path_selector_kind selector_register_name max_derivations path_selector_parameters

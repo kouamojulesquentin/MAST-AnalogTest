@@ -67,10 +67,35 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
   //   status=m_CallbackQueue->Pop(item,m_timeout);
      m_CallbackQueue[n_interface]->Pop(item);
       LOG(DEBUG) << "Node " << this->Name()<<" : Pop done";
+     try
+      {
      CHECK_PARAMETER_NEQ (status, std::cv_status::timeout,"Error, timeout on CallbackRequestQueue->Pop");
+      }
+      catch(...)
+       {
+       THROW_RUNTIME_ERROR("");
+       }
      return item;}; //!<returns the oldest request. NB: it is a BLOCKING call
 
-  void PushfromSut(BinaryVector Result,uint32_t n_interface) {m_fromSutQueue[n_interface]->Push(std::make_pair(Result,*(new std::string))); 
+   CallbackRequest PopAllRequests() {  
+     constexpr auto timeout = 2ms;
+     std::cv_status   status;
+     CallbackRequest item; 
+     uint32_t n_interface=0;
+     while (1) //Infinite loop on all Callaback queues
+      {
+      LOG(DEBUG) << "Node " << this->Name()<<" : Popping a request on interface "<<n_interface<< " of "<<m_CallbackQueue.size() ;
+      status=m_CallbackQueue[n_interface]->Pop(item,timeout);
+      LOG(DEBUG) << "Node " << this->Name()<<" : Pop done";
+      if (status!=std::cv_status::timeout) break; //if timeout, go to next interface
+      n_interface++;
+      n_interface%=m_CallbackQueue.size();
+      }
+     
+     return item;
+     }; //!<returns the oldest request. NB: it is a BLOCKING call
+
+ void PushfromSut(BinaryVector Result,uint32_t n_interface) {m_fromSutQueue[n_interface]->Push(std::make_pair(Result,*(new std::string))); 
                          LOG(DEBUG) << "Node " << this->Name()<<" : pushed a fromSut";};//!< Queues a new callback result
 
   void PushPending() {m_Pending.Push(true);};//!< Queues a new toSut Update value

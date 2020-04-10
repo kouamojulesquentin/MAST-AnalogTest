@@ -15,6 +15,7 @@
 #include "DefaultNHotPathSelector.hpp"
 #include "Register.hpp"
 #include "Utility.hpp"
+#include "g3log/g3log.hpp"
 
 #include <stdexcept>
 #include <limits>
@@ -111,6 +112,7 @@ void BrocadeSelector::Deselect (uint32_t pathIdentifier)
 
   toSut &= deselectMask;
 
+   LOG(DEBUG) << "Setting Pending : from "<< " to " <<muxRegisters->NextToSut().DataAsHexString();
   if (muxRegisters->NextToSut() != toSut)
   {
     muxRegisters->SetToSut(toSut);
@@ -207,10 +209,12 @@ void BrocadeSelector::Select (uint32_t pathIdentifier)
     toSut |= selectMask;
   }
 
+   LOG(DEBUG) << "Setting Pending : from "<< " to " <<muxRegisters->NextToSut().DataAsHexString();
   if (muxRegisters->NextToSut() != toSut)
   {
     muxRegisters->SetToSut(toSut);
-    muxRegisters->SetPending();
+    if (toSut!= muxRegisters->LastToSut())
+      muxRegisters->SetPending();
   }
 }
 //

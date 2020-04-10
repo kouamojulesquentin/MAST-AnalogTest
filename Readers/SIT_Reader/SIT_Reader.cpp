@@ -65,6 +65,9 @@ void SIT::SIT_Reader::Parse(string_view filePath)
   try
   {
     Parse_Impl(sitFileStream);
+   for (auto registred_node : namesAndNodes)
+	LOG(DEBUG)<<"Registred Node " <<registred_node.node->Name()<< "[" << registred_node.node->Identifier() << "]" 
+	<<" has " << registred_node.node->DirectChildrenCount() <<" children";
   }
   catch(ParserException& exc)
   {

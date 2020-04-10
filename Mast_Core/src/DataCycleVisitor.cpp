@@ -46,18 +46,26 @@ void DataCycleVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 //---------------------------------------------------------------------------
 
 //! If Pending, sends a notification to the Raw protocol waiting on the pending queue
+//! A Translator needs to call the underlyng node using a separate thread
 //!
 void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator&accessInterfaceTranslator)
 
 {
  auto AI_data_cycle = [this] (std::shared_ptr<mast::AccessInterface> accessInterface) {
- VisitAccessInterface(*accessInterface);
+   LOG(DEBUG) << "Starting Thread for accessInterface"<<accessInterface->Name() ;
+  VisitAccessInterface(*accessInterface);
+   LOG(DEBUG) << "Finished Thread for accessInterface"<<accessInterface->Name() ;
 // m_manager->DoHierarchicalDataCycle(&accessInterface);
  };
- auto TR_data_cycle = [this] (AccessInterfaceTranslator& translator) {VisitAccessInterfaceTranslator(translator);
+ auto TR_data_cycle = [this] (AccessInterfaceTranslator& translator) {
+ 
+    LOG(DEBUG) << "Starting Thread for accessInterfaceTranslator"<<translator.Name() ;
+ 
+    VisitAccessInterfaceTranslator(translator);
     //Release parent Translator
     CallbackRequest request(NO_MORE_PENDING);
     translator.Protocol()->TransformationCallback(request);
+    LOG(DEBUG) << "Finished Thread for accessInterfaceTranslator"<<translator.Name() ;
 };
  
  if (accessInterfaceTranslator.is_Busy()) return; //Node already been served by an T-2-E translator
@@ -69,16 +77,17 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
   auto cur_node = accessInterfaceTranslator.FirstChild();
   uint32_t cur_interface = 0;
   std::shared_ptr<mast::AccessInterface> accessInterface;
-  std::shared_ptr<AccessInterfaceTranslator> slaveTranslator;  
+  std::shared_ptr<AccessInterfaceTranslator> interfaceTranslator;  
   std::shared_ptr<T_2_E_TranslatorProtocol> T_2_E_protocol;
   
+
   if (accessInterfaceTranslator.IsPending())
   {
   do
    {
-    LOG(DEBUG) << "accessInterfaceTranslator.IsPending()";
+    LOG(DEBUG) << "accessInterfaceTranslator"<<accessInterfaceTranslator.Name() <<" IsPending()";
    accessInterface=std::dynamic_pointer_cast<AccessInterface>(cur_node);
-   slaveTranslator=std::dynamic_pointer_cast<AccessInterfaceTranslator>(cur_node);
+   interfaceTranslator=std::dynamic_pointer_cast<AccessInterfaceTranslator>(cur_node);
    T_2_E_protocol= std::dynamic_pointer_cast<T_2_E_TranslatorProtocol>(accessInterfaceTranslator.Protocol());
    if (T_2_E_protocol) { //This "if" should become useless?
 //     T_2_E_protocol->Start_Translator();
@@ -90,26 +99,38 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
    
    if (accessInterface)
     {  
-     //Launch Thread executing Data Cycle on the child Access Interface
+   //Launches Thread Visting the child Access Interface in parallel
+   
     auto protocol =  accessInterface->Protocol();
-   //Launch DoHierarchicalDataCycle as a separate thread
+   LOG(DEBUG) << "accessInterfaceTranslator"<<accessInterfaceTranslator.Name() << " launching Thread for protocol "<< protocol->KindName();
+   //Launches visit (and DoHierarchicalDataCycle) as a separate thread
     std::thread AI_thread(AI_data_cycle,accessInterface);
    AI_thread.detach(); //Detach AI thread for a clean exit
    }
-   if (slaveTranslator)
+   
+   if (interfaceTranslator)
     {  
-     //Launch Thread executing this Visitors on the child Access Interface Translator
+     //Launches a Thread visiting the child in parallel
+     // and handles Request and Result transfer
+ 
     auto protocol =  accessInterfaceTranslator.Protocol();
-   //Launch DoHierarchicalDataCycle as a separate thread
-    std::thread TR_thread(TR_data_cycle,std::ref(*slaveTranslator));
+   //Launches visit (and DoHierarchicalDataCycle) as a separate thread
+    LOG(DEBUG) << "accessInterfaceTranslator"<<accessInterfaceTranslator.Name() << " launching Thread for protocol "<< protocol->KindName();
+    std::thread TR_thread(TR_data_cycle,std::ref(*interfaceTranslator));
    TR_thread.detach(); //Detach AI thread for a clean exit
     }
    
-   bool cycle_AI = true;
+   
+    //resets cur_node
+   // auto cur_node = accessInterfaceTranslator.FirstChild();
+    bool cycle_AI = true;
    while(cycle_AI)
    {
-   auto request = accessInterfaceTranslator.PopRequest(cur_interface);
+   //auto request = accessInterfaceTranslator.PopRequest(cur_interface);
+   auto request = accessInterfaceTranslator.PopAllRequests();
       //At this moment, the AI Callback is waiting on the Result queue
+    LOG(DEBUG) << "accessInterfaceTranslator.PopAllRequest() done";
+    LOG(DEBUG) << "Request is " << request.CallbackId();
 
   //Execute callback translator
   //Push fromSut to wake AI_thread up
@@ -124,7 +145,9 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
     }
    cur_node =  cur_node->NextSibling();
    cur_interface++;
-  }while (cur_node);
+   }
+  while (cur_node);
+  
   }
    if (T_2_E_protocol) { //Release and terminate "T-2-E Translator" application thread
     CallbackRequest request(NO_MORE_PENDING);

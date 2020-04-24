@@ -24,6 +24,7 @@ class Chain;
 class Linker;
 class Register;
 class AccessInterfaceTranslator;
+class BlackBox;
 
 //! System model visitors interface
 //!
@@ -39,6 +40,7 @@ class MAST_CORE_EXPORT SystemModelVisitor
   virtual void VisitChain           (Chain&           chain)           = 0;
   virtual void VisitLinker          (Linker&          linker)          = 0;
   virtual void VisitRegister        (Register&        reg)             = 0;
+  virtual void VisitBlackBox        (BlackBox&        bbox)            = 0;
 
   //! Helper to visit only active children of a Linker node
   //!

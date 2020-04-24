@@ -155,7 +155,7 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
    } 
 }
 //
-//  End of: DataCycleVisitor::VisitRegister
+//  End of: DataCycleVisitor::VisitAccessInterfaceTranslator
 //---------------------------------------------------------------------------
 
 
@@ -179,6 +179,14 @@ void DataCycleVisitor::VisitRegister (Register&)
 //  End of: DataCycleVisitor::VisitRegister
 //---------------------------------------------------------------------------
 
+//! Ignores BlackBox
+//!
+void DataCycleVisitor::VisitBlackBox (BlackBox&)
+{
+}
+//
+//  End of: DataCycleVisitor::VisitBlackBox
+//---------------------------------------------------------------------------
 
 //! Updates Linker pending flag while selecting a pending register
 //!

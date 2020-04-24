@@ -61,11 +61,18 @@ void SystemModelReseter::VisitParent (ParentNode& parent)
 //---------------------------------------------------------------------------
 
 
-//! Collects mismatches of a Register
+//! Resets a Register
 //!
 void SystemModelReseter::VisitRegister (Register& reg)
 {
   reg.Reset();
+}
+
+//! Resets a BlackBox
+//!
+void SystemModelReseter::VisitBlackBox (BlackBox& bbox)
+{
+  bbox.Reset();
 }
 
 

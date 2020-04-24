@@ -253,6 +253,23 @@ void SIT_Printer::VisitRegister (Register& reg)
   m_os << " Bypass: \"" << reg.BypassSequence().DataAsMixString(8u, "_", ":") << "\"";
 }
 
+//! Appends content of BlackBox node in text representation and visits
+//! sub-nodes
+//!
+void SIT_Printer::VisitBlackBox (BlackBox& bbox)
+{
+  StreamNodeHeader("BLACK_BLOCK", bbox);
+
+  m_os << " " << bbox.BypassSequence().BitsCount();
+
+  if (bbox.HoldValue())
+  {
+    m_os << " Hold_value";
+  }
+
+  m_os << " Bypass: \"" << bbox.BypassSequence().DataAsMixString(8u, "_", ":") << "\"";
+}
+
 //===========================================================================
 // End of SIT_Printer.cpp
 //===========================================================================

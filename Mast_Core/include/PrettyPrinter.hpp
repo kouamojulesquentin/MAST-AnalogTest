@@ -71,6 +71,7 @@ class MAST_CORE_EXPORT PrettyPrinter : public SystemModelVisitor
   virtual void VisitChain           (Chain&           chain)           override;
   virtual void VisitLinker          (Linker&          linker)          override;
   virtual void VisitRegister        (Register&        reg)             override;
+  virtual void VisitBlackBox        (BlackBox&        bbox)            override;
 
   std::string PrettyPrint()   const { return m_os.str();      } //!< Returns currently visited nodes representation
   bool        IsVerbose()     const { return m_verbose;       } //!< Returns whether verbose mode is active

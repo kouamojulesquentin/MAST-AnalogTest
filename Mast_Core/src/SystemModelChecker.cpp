@@ -574,6 +574,16 @@ void SystemModelChecker::VisitRegister (Register& )
 //  End of: SystemModelChecker::VisitRegister
 //---------------------------------------------------------------------------
 
+//! Checks consistency specific to BlackBox nodes
+//!
+void SystemModelChecker::VisitBlackBox (BlackBox& )
+{
+  // Nothing to do yet
+  //TODO: BlackBox should not have any siblings or being used to reference a Linker
+}
+//
+//  End of: SystemModelChecker::VisitRegister
+//---------------------------------------------------------------------------
 
 //===========================================================================
 // End of SystemModelChecker.cpp

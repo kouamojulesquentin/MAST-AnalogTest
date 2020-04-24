@@ -39,6 +39,7 @@ class MAST_CORE_EXPORT ToSutVisitor : public SystemModelVisitor
   virtual void VisitChain           (Chain&           chain)           override;
   virtual void VisitLinker          (Linker&          linker)          override;
   virtual void VisitRegister        (Register&        reg)             override;
+  virtual void VisitBlackBox        (BlackBox&        bbox)            override;
 
   using NodeIdentifier = SystemModelNode::NodeIdentifier;
 

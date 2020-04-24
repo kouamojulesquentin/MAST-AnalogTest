@@ -601,6 +601,39 @@ void GmlPrinter::VisitRegister (Register& reg)
   }
 }
 
+//! Appends BlackBox node to GML graph
+//!
+void GmlPrinter::VisitBlackBox (BlackBox& bbox)
+{
+  // ---------------- Deal with path selector associated with Linker nodes
+  //
+    if (m_displayRegisterValue)
+    {
+      ostringstream os;
+
+      auto regValue = [this](auto& regValue) { return m_displayRegValueAuto ? regValue.DataAsMixString() : regValue.DataAsBinaryString(); };
+
+      os << "Width: "     << bbox.BypassSequence().BitsCount() << std::endl;
+
+      if (bbox.HoldValue())
+      {
+        os << "Hold value: true" << std::endl;
+      }
+
+      os << "Bypass:    " << regValue(bbox.BypassSequence())  << std::endl;
+      os << "Next to:   " << regValue(bbox.NextToSut())       << std::endl;
+      os << "Last to:   " << regValue(bbox.LastToSut())       << std::endl;
+      os << "Last from: " << regValue(bbox.LastFromSut())     << std::endl;
+      os << "Expected:  " << regValue(bbox.ExpectedFromSut());
+
+      AppendNode(m_shape_Register, "", m_color_Register, os.str(), bbox);
+    }
+    else
+    {
+      AppendNode(m_shape_Register, "", m_color_Register, "", bbox);
+    }
+}
+
 //===========================================================================
 // End of GmlPrinter.cpp
 //===========================================================================

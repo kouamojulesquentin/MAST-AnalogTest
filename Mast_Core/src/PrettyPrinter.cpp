@@ -559,6 +559,37 @@ void PrettyPrinter::VisitRegister (Register& reg)
   }
 }
 
+//! Appends content of BlackBox node in text representation and visits
+//! sub-nodes
+//!
+void PrettyPrinter::VisitBlackBox (BlackBox& bbox)
+{
+    StreamNodeHeader("BlackBox", bbox);
+
+    m_os << ", length: " << bbox.BypassSequence().BitsCount();
+
+    if (bbox.HoldValue())
+    {
+      m_os << ", Hold value: true";
+    }
+
+    if (!m_verbose)
+    {
+      StreamBinaryVector("bypass: ", bbox.BypassSequence());
+    }
+    else
+    {
+      auto targetPosInLine = m_os.tellp() - m_startPos;
+
+                                       StreamBinaryVector("bypass:            ", bbox.BypassSequence());
+      AlignOnNewLine(targetPosInLine); StreamBinaryVector("next_to_sut:       ", bbox.NextToSut());
+      AlignOnNewLine(targetPosInLine); StreamBinaryVector("last_to_sut:       ", bbox.LastToSut());
+      AlignOnNewLine(targetPosInLine); StreamBinaryVector("last_from_sut:     ", bbox.LastFromSut());
+      AlignOnNewLine(targetPosInLine); StreamBinaryVector("expected_from_sut: ", bbox.ExpectedFromSut());
+      AlignOnNewLine(targetPosInLine); StreamNodeCommon(bbox);
+    }
+}
+
 //===========================================================================
 // End of PrettyPrinter.cpp
 //===========================================================================

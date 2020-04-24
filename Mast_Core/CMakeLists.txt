@@ -98,6 +98,7 @@ set(Mast_Core_SOURCES ${Mast_Core_Platform_SOURCES}
                       "${CMAKE_CURRENT_SOURCE_DIR}/src/Remote_TranslatorProtocol.cpp"
                       "${CMAKE_CURRENT_SOURCE_DIR}/src/SVF_RawPlayer.cpp"
                       "${CMAKE_CURRENT_SOURCE_DIR}/src/Dummy_TranslatorProtocol.cpp"
+                      "${CMAKE_CURRENT_SOURCE_DIR}/src/BlackBox.cpp"
                      )
 
 set(Public_Headers "${CMAKE_CURRENT_SOURCE_DIR}/include/AccessInterface.hpp"
@@ -184,6 +185,7 @@ set(Public_Headers "${CMAKE_CURRENT_SOURCE_DIR}/include/AccessInterface.hpp"
                    "${CMAKE_CURRENT_SOURCE_DIR}/include/T_2_E_TranslatorProtocol.hpp"
                    "${CMAKE_CURRENT_SOURCE_DIR}/include/T_2_T_TranslatorProtocol.hpp"
                    "${CMAKE_CURRENT_SOURCE_DIR}/include/Dummy_TranslatorProtocol.hpp"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/include/BlackBox.hpp"
                   )
 
 set(Private_Headers "${CMAKE_CURRENT_SOURCE_DIR}/internal/Dll.hpp"

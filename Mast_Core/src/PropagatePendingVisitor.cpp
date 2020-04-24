@@ -98,7 +98,18 @@ void PropagatePendingVisitor::VisitRegister (Register& reg)
   }
 }
 //
-//  End of: PropagatePendingVisitor::VisitRegister
+//! Updates BlackBox pending flag
+//!
+void PropagatePendingVisitor::VisitBlackBox (BlackBox& bbox)
+{
+  auto isPending = bbox.NextToSut() != bbox.LastToSut();
+  if (isPending)
+  {
+    bbox.SetPending();
+  }
+}
+//
+//  End of: PropagatePendingVisitor::VisitBlackBox
 //---------------------------------------------------------------------------
 
 

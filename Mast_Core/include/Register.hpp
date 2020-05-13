@@ -44,6 +44,8 @@ class Register : public SystemModelNode, public RegisterInterface
            mast::BitsOrdering             bitsOrdering = mast::BitsOrdering::Downto);
   friend SystemModel;
 
+  void SetAsBlackBox       () { m_isBlackBox   = true;      }   //!< allows BlackBox behaviour
+
   // ---------------- Miscellaneous
   //
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
@@ -203,6 +205,7 @@ class Register : public SystemModelNode, public RegisterInterface
   bool                        m_pendingRead       = false;                      //!< True when there is a pending request to read register value from SUT
   bool                        m_holdValue         = false;                      //!< When true, force bypass value to be equal to nextToSut (The value will not be changed while the register is selected)
   bool                        m_mustCheckExpected = false;                      //!< When true, it triggers a check of received vs expected data during the following shift from sut
+  bool                        m_isBlackBox       = false;                      //!< When true, this register can be used as a Black-Box (size can change)
   mast::BitsOrdering          m_bitsOrdering      = mast::BitsOrdering::Downto; //!< Defines whether MSB are on the left or right hand side
   uint32_t                    m_mismatches        = 0;                          //!< Number of mismatches following IEEE 1687 rules
   BinaryVector                m_nextToSut;                                      //!< Sequence of bits that should be shifted into SUT (during the next iApply cycle)

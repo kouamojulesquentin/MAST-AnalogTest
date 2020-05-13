@@ -161,14 +161,7 @@ void ConfigureVisitor::VisitRegister (Register& reg)
   reg.SetPendingForWrite(reg.NextToSut() != reg.LastToSut());
 }
 //
-//! Updates Register pending flag
-//!
-void ConfigureVisitor::VisitBlackBox (BlackBox& bbox)
-{
-  bbox.SetPendingForWrite(bbox.NextToSut() != bbox.LastToSut());
-}
-//
-//  End of: ConfigureVisitor::VisitBlackBox
+//  End of: ConfigureVisitor::VisitRegister
 //---------------------------------------------------------------------------
 
 

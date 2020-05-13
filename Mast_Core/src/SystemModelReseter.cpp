@@ -68,13 +68,6 @@ void SystemModelReseter::VisitRegister (Register& reg)
   reg.Reset();
 }
 
-//! Resets a BlackBox
-//!
-void SystemModelReseter::VisitBlackBox (BlackBox& bbox)
-{
-  bbox.Reset();
-}
-
 
 
 //===========================================================================

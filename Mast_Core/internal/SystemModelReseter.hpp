@@ -37,7 +37,6 @@ class SystemModelReseter final : public SystemModelVisitor
   virtual void VisitChain           (Chain&           chain)           override;
   virtual void VisitLinker          (Linker&          linker)          override;
   virtual void VisitRegister        (Register&        reg)             override;
-  virtual void VisitBlackBox        (BlackBox&        bbox)            override;
 
   // ---------------- Private  Methods
   //

@@ -17,7 +17,6 @@
 #include "Chain.hpp"
 #include "Linker.hpp"
 #include "Register.hpp"
-#include "BlackBox.hpp"
 
 using namespace mast;
 
@@ -59,17 +58,6 @@ void MismatchesCollector::VisitRegister (Register& reg)
   if (m_clearCounter)
   {
     reg.ResetMismatches();
-  }
-}
-
-//! Collects mismatches of a BlackBox
-//!
-void MismatchesCollector::VisitBlackBox (BlackBox& bbox)
-{
-  m_mismatchesCount += bbox.Mismatches();
-  if (m_clearCounter)
-  {
-    bbox.ResetMismatches();
   }
 }
 

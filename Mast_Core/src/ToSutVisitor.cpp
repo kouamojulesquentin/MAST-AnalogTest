@@ -88,27 +88,6 @@ void ToSutVisitor::VisitRegister (Register& reg)
 //  End of: ToSutVisitor::VisitRegister
 //---------------------------------------------------------------------------
 
-//! BBox is treated like it was a register with a size fixed for this cycle
-//! Appends BlackBox value to send to SUT while saving the fact that it was active
-//!
-//! @note __Should be only used (indirectly called) for active (currently selected) BlackBox__
-//!
-void ToSutVisitor::VisitBlackBox (BlackBox& bbox)
-{
-  if (m_ignorePendingState || bbox.IsPendingForWrite())
-  {
-    m_toSutVector.Append(bbox.NextToSut());
-  }
-  else
-  {
-    m_toSutVector.Append(bbox.BypassSequence());
-  }
-  m_activeRegisters.emplace_back(bbox.Identifier());
-}
-//
-//  End of: ToSutVisitor::VisitRegister
-//---------------------------------------------------------------------------
-
 
 //===========================================================================
 // End of ToSutVisitor.cpp

@@ -48,7 +48,6 @@ class SystemModelChecker final : public SystemModelCheckerBase, public SystemMod
   virtual void VisitChain           (Chain&           chain)           override;
   virtual void VisitLinker          (Linker&          linker)          override;
   virtual void VisitRegister        (Register&        reg)             override;
-  virtual void VisitBlackBox        (BlackBox&        bbox)            override;
 
   //! Checks SystemModel consistency
   //!

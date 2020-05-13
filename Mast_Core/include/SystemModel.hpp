@@ -85,6 +85,17 @@ class MAST_CORE_EXPORT SystemModel
     return reg;
   }
 
+  //! Creates a new Black box Register node
+  //!
+  std::shared_ptr<Register> CreateBlackBox (std::experimental::string_view name,
+                                            BinaryVector                   bypassSequence,
+                                            std::shared_ptr<ParentNode>    parentNode = nullptr)
+  {
+    auto reg = CreateRegister(name, bypassSequence, parentNode);
+    reg->SetAsBlackBox();
+    return reg;
+  }
+
   //! Creates a new AccessInterfaceTranslator node
   //!
   std::shared_ptr<AccessInterfaceTranslator> CreateAccessInterfaceTranslator (std::experimental::string_view           name,

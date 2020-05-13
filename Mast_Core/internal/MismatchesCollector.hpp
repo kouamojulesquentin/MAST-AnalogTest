@@ -37,7 +37,6 @@ class MismatchesCollector final : public SystemModelVisitor
   virtual void VisitChain           (Chain&           chain)           override;
   virtual void VisitLinker          (Linker&          linker)          override;
   virtual void VisitRegister        (Register&        reg)             override;
-  virtual void VisitBlackBox        (BlackBox&        bbox)            override;
 
   // Getters
   uint32_t MismatchesCount() const { return m_mismatchesCount; }  //!< Returns cumulated mismatches count

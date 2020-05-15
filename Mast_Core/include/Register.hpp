@@ -45,7 +45,6 @@ class Register : public SystemModelNode, public RegisterInterface
   friend SystemModel;
 
   void SetAsBlackBox       () { m_isBlackBox   = true;      }   //!< allows BlackBox behaviour
-
   // ---------------- Miscellaneous
   //
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
@@ -74,7 +73,8 @@ class Register : public SystemModelNode, public RegisterInterface
   BinaryVector        LastCompareResult() const override;                                 //!< Returns XOR of the value last read from SUT and the expected value. May contain x-values (for don't care).
   virtual bool        IsPending()         const override;                                 //!< Returns true if register is pending for read or for write
   virtual uint32_t    PendingCount()      const override;                                 //!< Returns number of pending registers down the hierarchy
-
+  bool isBlackBox()                       const override   { return m_isBlackBox; } //!< returns True if register is a Black Box
+  
   // ---------------- Setters
   //
   void SetFromSut         (BinaryVector sequence);                                             //!< Sets last sequence of bits that have been shifted from SUT

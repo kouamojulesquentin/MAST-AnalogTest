@@ -41,6 +41,7 @@ class RegisterInterface
   virtual const BinaryVector&          NextToSut()         const = 0; //!< Returns next sequence to send to SUT
   virtual BinaryVector                 LastCompareResult() const = 0; //!< Returns XOR of the value last read from SUT and the expected value. May contain x-values (for don't care).
   virtual const BinaryVector&          LastFromSut()       const = 0; //!< Returns last sequence received from SUT
+  virtual bool isBlackBox()        const = 0; //!< Returns true if register is a BlackBox
 
   virtual void LastFromSut (BinaryVector& readData) const = 0; //!< Returns last sequence received from SUT
   virtual void LastFromSut (uint8_t&      readData) const = 0; //!< Returns last sequence received from SUT

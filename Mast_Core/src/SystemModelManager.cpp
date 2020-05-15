@@ -167,6 +167,10 @@ void SystemModelManager::iWrite (string_view registerPath, int16_t      value) {
 void SystemModelManager::iWrite (string_view registerPath, int32_t      value) { m_impl->iWrite(registerPath, value); }
 void SystemModelManager::iWrite (string_view registerPath, int64_t      value) { m_impl->iWrite(registerPath, value); }
 
+//! Sets next Register value to sent to SUT for BlackBox
+//!
+void SystemModelManager::iScan (string_view registerPath, BinaryVector value) { m_impl->iScan(registerPath, value); }
+
 //! Returns current maximum time between an iApply and the next data cycle
 //!
 std::chrono::milliseconds SystemModelManager::DataCycleLoopTimeout() const { return m_impl->DataCycleLoopTimeout(); }

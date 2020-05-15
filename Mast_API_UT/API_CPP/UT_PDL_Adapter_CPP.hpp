@@ -145,6 +145,9 @@ class UT_PDL_Adapter_CPP : public CxxTest::TestSuite
   void test_iReset_SupportTRST ();
   void test_iReset_Sync ();
 
+  // ---------------- iScan_xx
+  //
+  void test_iScan_notBlackBox ();
   // ================ Other Methods ================
 
   void setUp(); //!< Initializes test (called for each test)

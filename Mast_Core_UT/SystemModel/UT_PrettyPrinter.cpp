@@ -363,6 +363,30 @@ void UT_PrettyPrinter::test_VisitRegister ()
   TS_ASSERT_EQUALS (got, expected);
 }
 
+//! Checks PrettyPrinter::VisitRegisterBlackBox()
+//!
+void UT_PrettyPrinter::test_VisitRegisterBlackBox ()
+{
+  // ---------------- Setup
+  //
+
+  Register reg("A register name", BinaryVector::CreateFromBinaryString("1111_1111:0"));
+  
+  reg.SetAsBlackBox();
+
+  PrettyPrinter sut;
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (sut.VisitRegister(reg));
+
+  // ---------------- Verify
+  //
+  auto got      = sut.PrettyPrint();
+  auto expected = string("[Register](0)  \"A register name\", length: 9, BlackBox, bypass: 1111_1111:0");
+  TS_ASSERT_EQUALS (got, expected);
+}
+
 
 //! Checks PrettyPrinter::VisitRegister() with verbose mode
 //!

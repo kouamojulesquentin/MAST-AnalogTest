@@ -540,6 +540,10 @@ void PrettyPrinter::VisitRegister (Register& reg)
     {
       m_os << ", Hold value: true";
     }
+    if (reg.isBlackBox())
+    {
+      m_os << ", BlackBox";
+    }
 
     if (!m_verbose)
     {

@@ -88,6 +88,7 @@ class VirtualRegister final : public RegisterInterface
   const BinaryVector& LastToSut()         const override; //!< Returns last sequence effectively sent to SUT
   const BinaryVector& NextToSut()         const override; //!< Returns next sequence to send to SUT
   const BinaryVector& LastFromSut()       const override; //!< Returns last sequence received from SUT
+  bool isBlackBox()        const override {return false;}; //!< Virtual register cannot be a BlackBox
 
   void LastFromSut (BinaryVector& readData) const override; //!< Returns last sequence received from SUT
   void LastFromSut (uint8_t&      readData) const override; //!< Returns last sequence received from SUT

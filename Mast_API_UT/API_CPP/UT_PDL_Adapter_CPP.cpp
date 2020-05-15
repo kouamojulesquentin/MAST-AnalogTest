@@ -497,6 +497,33 @@ void UT_PDL_Adapter_CPP::test_iWrite_int16  () { Check_iWrite_SingleThread<int16
 void UT_PDL_Adapter_CPP::test_iWrite_int32  () { Check_iWrite_SingleThread<int32_t>  (int32_t(-1234567L),    "FFED_2979"); }
 void UT_PDL_Adapter_CPP::test_iWrite_int64  () { Check_iWrite_SingleThread<int64_t>  (int64_t(-123456789LL), "F8A4_32EB"); }
 
+//! Checks SystemModelManager::iWrite_xxx() using same thread as SystemModelManager
+//!
+
+void UT_PDL_Adapter_CPP::test_iScan_notBlackBox ()
+{
+ string_view value = "0b1010:1011_1100:1101|0100:0101_0110:0111"; 
+ string_view expected="0000_007B";
+ 
+  // ---------------- Setup
+  //
+  Session session;
+
+  Create_TestCase_MIB_Multichain_Pre();
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS (iScan("dynamic_1", value), std::exception);
+
+
+//  auto reg               = Startup::GetSystemModel()->RegisterWithId(7u);
+//  auto expectedNextToSut = BinaryVector::CreateFromHexString(expected);
+//  TS_ASSERT_EQUALS (reg->NextToSut(), expectedNextToSut);
+}
+//
+//  End of: Check_iWrite_SingleThread
+//---------------------------------------------------------------------------
+
 
 //+void UT_PDL_Adapter_CPP::test_iWrite_BinaryVector_InvalidValue () { Check_iWrite_SingleThread<const char*>(iWrite_BinaryVector, "ABCD_4567",           "ABCD_4567"); }
 

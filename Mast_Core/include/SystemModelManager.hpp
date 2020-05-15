@@ -190,6 +190,10 @@ class MAST_CORE_EXPORT SystemModelManager final
   void iWrite (string_view registerPath, int32_t      value);
   void iWrite (string_view registerPath, int64_t      value);
 
+  //! Sets next Register value to sent to SUT for a BlackBox
+  //!
+  void iScan (string_view registerPath, BinaryVector value);
+
   //! Returns current maximum time between an iApply and the next data cycle
   //!
   std::chrono::milliseconds DataCycleLoopTimeout() const;

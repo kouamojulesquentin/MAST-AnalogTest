@@ -666,6 +666,26 @@ void UT_Register::test_HoldValue ()
 
 //! Checks Register::SetToSut() with a proper value from uint8_t
 //!
+void UT_Register::test_BlackBox ()
+{
+  // ---------------- DDT Setup
+  //
+  const auto initial  = BinaryVector::CreateFromBinaryString("1111_1111:0");
+    Register sut("Reg", initial, true);
+
+    TS_ASSERT_EQUALS (sut.isBlackBox(), false);
+    // ---------------- Exercise
+    //
+    sut.SetAsBlackBox();
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.isBlackBox(), true);
+
+}
+
+
+//! Checks Register::SetToSut() with a proper value from uint8_t
+//!
 void UT_Register::test_SetToSut_uint8 ()
 {
   // ---------------- DDT Setup

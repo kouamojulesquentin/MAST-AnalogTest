@@ -117,8 +117,17 @@ template<typename T> void iWrite_impl(string_view registerPath, T value)
   auto manager = GetAndCheckManager();
   manager->iWrite(registerPath, std::move(value));
 }
-} // End of unnamed namespace
 
+
+template<typename T> void iScan_impl(string_view registerPath, T value)
+{
+  CHECK_REGISTER_PATH(registerPath);
+
+  auto manager = GetAndCheckManager();
+  manager->iScan(registerPath, std::move(value));
+}
+
+} // End of unnamed namespace
 
 
 //! Waits for all queued operations to be executed
@@ -272,6 +281,9 @@ void mast::iWrite (string_view registerPath, int16_t     value) { iWrite_impl(re
 void mast::iWrite (string_view registerPath, int32_t     value) { iWrite_impl(registerPath, value); }
 void mast::iWrite (string_view registerPath, int64_t     value) { iWrite_impl(registerPath, value); }
 void mast::iWrite (string_view registerPath, string_view value) { iWrite_impl(registerPath, BinaryVector::CreateFromString(value)); }
+
+//! iScan is like an iWrite+iRead, but can only be executed on a BlackBox
+void mast::iScan (string_view registerPath, string_view value) { iScan_impl(registerPath, BinaryVector::CreateFromString(value)); }
 
 //===========================================================================
 // End of PDL_Adapter_CPP.cpp

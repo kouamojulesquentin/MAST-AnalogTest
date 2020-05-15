@@ -46,7 +46,8 @@ class UT_PrettyPrinter : public CxxTest::TestSuite
   void test_VisitLinker_MultiplePartialRegSelector ();
   void test_VisitRegister ();
   void test_VisitRegister_Verbose ();
-
+  void test_VisitRegisterBlackBox ();
+ 
   // ---------------- Visit - Two nodes
   //
   void test_VisitChain_with_Register ();

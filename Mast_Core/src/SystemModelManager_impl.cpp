@@ -795,6 +795,37 @@ void SystemModelManager_impl::iWrite (string_view registerPath, int16_t  value) 
 void SystemModelManager_impl::iWrite (string_view registerPath, int32_t  value) { iWrite_impl(registerPath, value); }
 void SystemModelManager_impl::iWrite (string_view registerPath, int64_t  value) { iWrite_impl(registerPath, value); }
 
+//! Sets next Register value to sent to SUT for a Black Box
+//!
+template<typename T>
+void SystemModelManager_impl::iScan_impl (string_view registerPath, T value)
+{
+  auto& pathResolver  = PATH_RESOLVER("iWrite: ");
+  auto  reg           = pathResolver.ResolveAsRegister(registerPath);
+  auto asBinaryVector = BinaryVector(reg->BitsCount(), 0u, SizeProperty::Fixed);
+  asBinaryVector.Set(std::move(value));
+  
+  CHECK_PARAMETER_EQ(reg->isBlackBox(),true,"iScan can be applied only to Black Boxes");
+
+  auto appData = ThreadApplicationData();
+
+  MONITOR_PDL_AND_VALUE("iScan - Queuing request", registerPath, asBinaryVector, appData);
+  appData->queuedWrites.emplace_back(SystemModelManager_impl::QueuedRequest(reg, std::move(asBinaryVector)));
+
+  appData->currentState = ApplicationData::State::WriteRequest;
+
+  MONITOR_DEBUG_APP("iScan - Leaving", appData);
+}
+//
+//  End of: SystemModelManager_impl::iScan_impl
+//---------------------------------------------------------------------------
+
+//! Sets next Register value to sent to SUT for a BlackBox
+//!
+void SystemModelManager_impl::iScan (string_view registerPath, BinaryVector value) { iScan_impl(registerPath, std::move(value)); }
+
+
+
 //! Runs data cyles when some application thread(s) are pending (in iApply)
 //!
 //! @note Returns when Stop is called

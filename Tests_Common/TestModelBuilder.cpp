@@ -555,6 +555,24 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_UnitTestCase_6_Levels ()
 //  End of: TestModelBuilder::Create_UnitTestCase_6_Levels
 //---------------------------------------------------------------------------
 
+//! Creates a Tap with a BlackBox attached to it
+//!
+//! @param name           Name for top node
+//!
+//! @return Top node of created sub-tree
+shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_BlackBox (string_view name)
+{
+
+  auto tap         = Create_JTAG_TAP(name, 8u, 3u);
+
+  auto bbox         = m_model.CreateBlackBox("BBox", BinaryVector::CreateFromBinaryString("1000"), tap);
+
+  return tap;
+}
+//
+//  End of: TestModelBuilder::Create_TestCase_BlackBox
+//---------------------------------------------------------------------------
+
 
 //! Creates very simple MIB structure
 //!

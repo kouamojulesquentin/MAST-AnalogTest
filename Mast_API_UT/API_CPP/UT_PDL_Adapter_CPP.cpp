@@ -93,6 +93,29 @@ shared_ptr<AccessInterface> Create_TestCase_MIB_Multichain_Pre (bool reportGml =
 //---------------------------------------------------------------------------
 
 
+//! Creates a test case for testing 'C' interface on Black Boxes
+//!
+//! @note Mast library must be initialized prior to calling this function
+//!
+shared_ptr<AccessInterface> Create_TestCase_BlackBox (bool reportGml = false, uint32_t regsBitsCount = DYNAMIC_TDR_LEN)
+{
+  auto sm = Startup::GetSystemModel();
+
+  TestModelBuilder builder(*sm);
+
+  auto tap = builder.Create_TestCase_BlackBox("TAP");
+
+  if (reportGml)
+  {
+    TS_TRACE (GmlPrinter::Graph(tap, "BlackBox"));
+  }
+
+  return tap;
+}
+//
+//  End of: Create_TestCase_BlackBox
+//---------------------------------------------------------------------------
+
 
 //! Checks SystemModelManager::iGet() when Mast library is not yet initialized
 //!
@@ -500,6 +523,7 @@ void UT_PDL_Adapter_CPP::test_iWrite_int64  () { Check_iWrite_SingleThread<int64
 //! Checks SystemModelManager::iWrite_xxx() using same thread as SystemModelManager
 //!
 
+//! Checks that iScan can only targert a blackbox
 void UT_PDL_Adapter_CPP::test_iScan_notBlackBox ()
 {
  string_view value = "0b1010:1011_1100:1101|0100:0101_0110:0111"; 
@@ -516,12 +540,42 @@ void UT_PDL_Adapter_CPP::test_iScan_notBlackBox ()
   TS_ASSERT_THROWS (iScan("dynamic_1", value), std::exception);
 
 
-//  auto reg               = Startup::GetSystemModel()->RegisterWithId(7u);
-//  auto expectedNextToSut = BinaryVector::CreateFromHexString(expected);
-//  TS_ASSERT_EQUALS (reg->NextToSut(), expectedNextToSut);
 }
 //
-//  End of: Check_iWrite_SingleThread
+//  End of: test_iScan_notBlackBox
+//---------------------------------------------------------------------------
+
+//! Checks iScan with various value sizes but with actually executing it
+void UT_PDL_Adapter_CPP::test_iScan_VariableSize()
+{
+ string_view value = "0b1010"; 
+ string_view expected="0000_007B";
+ 
+  // ---------------- Setup
+  //
+  Session session;
+
+  Create_TestCase_BlackBox();
+
+  // ---------------- Exercise
+  //
+  
+  //iScan with same length as default (4 for Create_TestCase_BlackBox)
+  TS_ASSERT_THROWS_NOTHING (iScan("BBox", value)); 
+  
+  value = "0b1010:1011_1100:1101|0100:0101_0110:0111"; 
+
+
+  //iScan with bigger length then default (32 instead of 4)
+  TS_ASSERT_THROWS_NOTHING (iScan("BBox", value));
+   
+  value = "0b1010:1011_1100:1101|0100:0101_0110"; 
+  //iScan with smaller length then last one (28 instead of 32)
+  TS_ASSERT_THROWS_NOTHING (iScan("BBox", value));
+
+}
+//
+//  End of: test_iScan_notBlackBox
 //---------------------------------------------------------------------------
 
 

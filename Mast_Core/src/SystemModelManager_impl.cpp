@@ -802,7 +802,7 @@ void SystemModelManager_impl::iScan_impl (string_view registerPath, T value)
 {
   auto& pathResolver  = PATH_RESOLVER("iWrite: ");
   auto  reg           = pathResolver.ResolveAsRegister(registerPath);
-  auto asBinaryVector = BinaryVector(reg->BitsCount(), 0u, SizeProperty::Fixed);
+  auto asBinaryVector = BinaryVector(reg->BitsCount(), 0u, SizeProperty::NotFixed);
   asBinaryVector.Set(std::move(value));
   
   CHECK_PARAMETER_EQ(reg->isBlackBox(),true,"iScan can be applied only to Black Boxes");

@@ -148,6 +148,7 @@ class UT_PDL_Adapter_CPP : public CxxTest::TestSuite
   // ---------------- iScan_xx
   //
   void test_iScan_notBlackBox ();
+  void test_iScan_VariableSize();
   // ================ Other Methods ================
 
   void setUp(); //!< Initializes test (called for each test)

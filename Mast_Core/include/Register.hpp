@@ -44,7 +44,18 @@ class Register : public SystemModelNode, public RegisterInterface
            mast::BitsOrdering             bitsOrdering = mast::BitsOrdering::Downto);
   friend SystemModel;
 
-  void SetAsBlackBox       () { m_isBlackBox   = true;      }   //!< allows BlackBox behaviour
+  void SetAsBlackBox       () { 
+      m_isBlackBox   = true;      
+      m_nextToSut.FixSize(false);
+      m_lastToSut.FixSize(false);
+      m_lastFromSut.FixSize(false);
+      m_lastReadFromSut.FixSize(false);
+      m_expectedFromSut.FixSize(false);
+      m_bypass.FixSize(false);
+      m_dontCareMask.FixSize(false);
+      m_resetValue.FixSize(false);
+      }   //!< allows BlackBox behaviour
+
   // ---------------- Miscellaneous
   //
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern

@@ -206,6 +206,10 @@ class SystemModelManager_impl final
   //!
   void iScan (string_view registerPath, BinaryVector value);
 
+  //! Sets next Register and Expected values to SUT for a BlackBox
+  //!
+  void iScan (string_view registerPath, BinaryVector value, BinaryVector expectedValue);
+
   //! Waits for all threads to be pendingbefore  triggering a DataCycle (default is false)
   //!
   void setwaitFullPending (bool waitFullPending) { m_waitFullPending = waitFullPending; }
@@ -253,6 +257,7 @@ class SystemModelManager_impl final
   template<typename T> void iRead_impl       (string_view registerPath, T  expectedValue, T dontCareMask);
   template<typename T> void iWrite_impl      (string_view registerPath, T  value);
   template<typename T> void iScan_impl      (string_view registerPath, T  value);
+  template<typename T> void iScan_impl      (string_view registerPath, T  value, T  expectedValue);
 
   struct QueuedRequest
   {

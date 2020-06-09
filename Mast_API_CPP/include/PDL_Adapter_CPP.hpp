@@ -142,6 +142,7 @@ namespace mast
 
 
  CPP_API_EXPORT void iScan (std::experimental::string_view registerPath, std::experimental::string_view value); //!< Queues write request to a Black Box
+ CPP_API_EXPORT void iScan (std::experimental::string_view registerPath, std::experimental::string_view value, std::experimental::string_view expectedValue); //!< Sets next Register and Expected values to SUT for a BlackBox
 }
 
 #endif  // not defined PDL_ADAPTER_CPP_H__287AC6DE_2B0_4C1D_90A1_4BF822B1DC85__INCLUDED_

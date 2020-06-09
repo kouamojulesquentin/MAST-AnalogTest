@@ -578,7 +578,7 @@ void UT_PDL_Adapter_CPP::test_iScan_VariableSize()
 //---------------------------------------------------------------------------
 
 //! Checks iScan behaviour for writing values
-void UT_PDL_Adapter_CPP::test_iScan_write()
+void UT_PDL_Adapter_CPP::test_iScan_Write()
 {
  string_view value = "0b1010"; 
  string_view expected="A";
@@ -621,7 +621,78 @@ void UT_PDL_Adapter_CPP::test_iScan_write()
 
 }
 //
-//  End of: test_iScan
+//  End of: test_iScan_Write
+//---------------------------------------------------------------------------
+
+//! Checks iScan behaviour for reading and writing values
+void UT_PDL_Adapter_CPP::test_iScan_ReadWrite()
+{
+ string_view iReadValue = "0xF"; 
+ string_view iWriteValue="0xA";
+ string_view expectedMismatch="0x5" ;
+  // ---------------- Setup
+  //
+  Session session;
+
+  Create_TestCase_BlackBox();
+
+  auto regPath = "BBox";
+  // ---------------- Exercise : same length as default (4 for Create_TestCase_BlackBox)
+  //
+   TS_ASSERT_THROWS_NOTHING (iScan (regPath, iWriteValue,iReadValue)); // Loopback (default protocol) will force FromSut to be updated
+  TS_ASSERT_THROWS_NOTHING (iApply());
+
+ //Check iRead behaviour
+  auto xorResult = iGetMiscompares    (regPath, StringType::Hex);
+  auto status    = iGetStatus (regPath, false);
+  TS_ASSERT_EQUALS (status,    1u);
+  TS_ASSERT_EQUALS (xorResult, expectedMismatch);   
+ //Check iWrite behaviour
+  auto reg               = Startup::GetSystemModel()->RegisterWithId(4u);
+  auto expectedNextToSut = BinaryVector::CreateFromHexString(iWriteValue);
+  TS_ASSERT_EQUALS (reg->NextToSut(), expectedNextToSut);
+
+ iReadValue = "0x89ABCDEF"; 
+ iWriteValue= "0xFF00FF00";
+ expectedMismatch="0x76AB32EF" ;
+ 
+  // ---------------- Exercise : with bigger length than last (32 instead of 4)
+  //
+   TS_ASSERT_THROWS_NOTHING (iScan (regPath, iWriteValue,iReadValue)); // Loopback (default protocol) will force FromSut to be updated
+  TS_ASSERT_THROWS_NOTHING (iApply());
+
+ //Check iRead behaviour
+   xorResult = iGetMiscompares    (regPath, StringType::Hex);
+   status    = iGetStatus (regPath, false);
+  TS_ASSERT_EQUALS (status,    2u);
+  TS_ASSERT_EQUALS (xorResult, expectedMismatch);   
+ //Check iWrite behaviour
+   reg               = Startup::GetSystemModel()->RegisterWithId(4u);
+   expectedNextToSut = BinaryVector::CreateFromHexString(iWriteValue);
+  TS_ASSERT_EQUALS (reg->NextToSut(), expectedNextToSut);
+
+ iReadValue      = "0x3CDE"; 
+ iWriteValue     = "0x0FF0";
+ expectedMismatch= "0x332E" ;
+
+  // ---------------- Exercise : with shorter length than last (16 instead of 32)
+  //
+   TS_ASSERT_THROWS_NOTHING (iScan (regPath, iWriteValue,iReadValue)); // Loopback (default protocol) will force FromSut to be updated
+  TS_ASSERT_THROWS_NOTHING (iApply());
+
+ //Check iRead behaviour
+   xorResult = iGetMiscompares    (regPath, StringType::Hex);
+   status    = iGetStatus (regPath, false);
+  TS_ASSERT_EQUALS (status,    3u);
+  TS_ASSERT_EQUALS (xorResult, expectedMismatch);   
+ //Check iWrite behaviour
+   reg               = Startup::GetSystemModel()->RegisterWithId(4u);
+   expectedNextToSut = BinaryVector::CreateFromHexString(iWriteValue);
+  TS_ASSERT_EQUALS (reg->NextToSut(), expectedNextToSut);
+
+}
+//
+//  End of: test_iScan_ReadWrite
 //---------------------------------------------------------------------------
 
 

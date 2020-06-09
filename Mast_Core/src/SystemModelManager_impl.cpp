@@ -834,6 +834,47 @@ void SystemModelManager_impl::iScan_impl (string_view registerPath, T value)
 void SystemModelManager_impl::iScan (string_view registerPath, BinaryVector value) { iScan_impl(registerPath, std::move(value)); }
 
 
+//! Sets next Register and Expected values to SUT for a BlackBox
+ //!
+template<typename T>
+void SystemModelManager_impl::iScan_impl (string_view registerPath, T value,  T expectedValue)
+{
+  auto& pathResolver  = PATH_RESOLVER("iScan: ");
+  auto  reg           = pathResolver.ResolveAsRegister(registerPath);
+  auto newValueSize= value.BitsCount();
+//  auto asBinaryVector = BinaryVector(reg->BitsCount(), 0u, SizeProperty::NotFixed);
+  auto asBinaryVector = BinaryVector(newValueSize, 0u, SizeProperty::NotFixed);
+  asBinaryVector.Set(std::move(value));
+  auto expectedAsBV  = BinaryVector(newValueSize, 0u, SizeProperty::NotFixed);
+  expectedAsBV.Set(std::move(expectedValue));
+  
+  CHECK_PARAMETER_EQ(reg->isBlackBox(),true,"iScan can be applied only to Black Boxes");
+  
+  if (newValueSize!= reg->BitsCount())
+    //BlackBox has changed size: need to redefine Register fields to match it
+    {
+      reg->ResetSize(newValueSize);
+    }
+
+  auto appData = ThreadApplicationData();
+
+  MONITOR_PDL_AND_VALUE("iScan - Queuing read/write request", registerPath, asBinaryVector, appData);
+  appData->queuedWrites.emplace_back(SystemModelManager_impl::QueuedRequest(reg, std::move(asBinaryVector)));
+  appData->queuedReads.emplace_back(SystemModelManager_impl::QueuedRequest(reg, std::move(expectedAsBV)));
+
+  appData->currentState = ApplicationData::State::WriteRequest;
+//  appData->currentState = ApplicationData::State::ReadRequest;
+
+  MONITOR_DEBUG_APP("iRead - Leaving", appData);
+
+}
+//
+//  End of: SystemModelManager_impl::iScan_impl
+//---------------------------------------------------------------------------
+
+//! Sets next Register and Expected values to SUT for a BlackBox
+//!
+void SystemModelManager_impl::iScan (string_view registerPath, BinaryVector value,  BinaryVector expectedValue) { iScan_impl(registerPath, std::move(value), std::move(expectedValue)); }
 
 //! Runs data cyles when some application thread(s) are pending (in iApply)
 //!

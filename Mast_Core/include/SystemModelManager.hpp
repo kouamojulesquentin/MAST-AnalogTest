@@ -193,6 +193,9 @@ class MAST_CORE_EXPORT SystemModelManager final
   //! Sets next Register value to sent to SUT for a BlackBox
   //!
   void iScan (string_view registerPath, BinaryVector value);
+  //! Sets next Register and Expected values to SUT for a BlackBox
+  //!
+  void iScan (string_view registerPath, BinaryVector value, BinaryVector expectedValue);
 
   //! Returns current maximum time between an iApply and the next data cycle
   //!

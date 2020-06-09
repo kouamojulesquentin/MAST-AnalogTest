@@ -170,6 +170,9 @@ void SystemModelManager::iWrite (string_view registerPath, int64_t      value) {
 //! Sets next Register value to sent to SUT for BlackBox
 //!
 void SystemModelManager::iScan (string_view registerPath, BinaryVector value) { m_impl->iScan(registerPath, value); }
+//! Sets next Register and Expected values to SUT for a BlackBox
+//!
+void SystemModelManager::iScan (string_view registerPath, BinaryVector value, BinaryVector expectedValue){ m_impl->iScan(registerPath, value,expectedValue); }
 
 //! Returns current maximum time between an iApply and the next data cycle
 //!

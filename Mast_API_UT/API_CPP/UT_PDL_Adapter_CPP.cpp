@@ -572,10 +572,56 @@ void UT_PDL_Adapter_CPP::test_iScan_VariableSize()
   value = "0b1010:1011_1100:1101|0100:0101_0110"; 
   //iScan with smaller length then last one (28 instead of 32)
   TS_ASSERT_THROWS_NOTHING (iScan("BBox", value));
+}
+//
+//  End of: test_iScan_VariableSize
+//---------------------------------------------------------------------------
+
+//! Checks iScan behaviour for writing values
+void UT_PDL_Adapter_CPP::test_iScan_write()
+{
+ string_view value = "0b1010"; 
+ string_view expected="A";
+ 
+  // ---------------- Setup
+  //
+  Session session;
+
+  Create_TestCase_BlackBox();
+
+  // ---------------- Exercise
+  //
+  
+  //iScan with same length as default (4 for Create_TestCase_BlackBox)
+  TS_ASSERT_THROWS_NOTHING (iScan("BBox", value)); 
+  TS_ASSERT_THROWS_NOTHING (iApply()); // iWrite does nothing visible without iApply
+  auto reg               = Startup::GetSystemModel()->RegisterWithId(4u);
+  auto expectedNextToSut = BinaryVector::CreateFromHexString(expected);
+  TS_ASSERT_EQUALS (reg->NextToSut(), expectedNextToSut);
+
+  value    = "0b1010:1011_1100:1101|0100:0101_0110:0111"; 
+  expected = "ABCD_4567";
+
+  //iScan with bigger length than last (32 instead of 4)
+  TS_ASSERT_THROWS_NOTHING (iScan("BBox", value)); 
+  TS_ASSERT_THROWS_NOTHING (iApply()); // iWrite does nothing visible without iApply
+  reg               = Startup::GetSystemModel()->RegisterWithId(4u);
+  expectedNextToSut = BinaryVector::CreateFromHexString(expected);
+  TS_ASSERT_EQUALS (reg->NextToSut(), expectedNextToSut);
+
+  value    = "0b1010:1011_1100:1101|0100"; 
+  expected = "ABCD_4";
+
+  //iScan with shorter length than last (20 instead of 32)
+  TS_ASSERT_THROWS_NOTHING (iScan("BBox", value)); 
+  TS_ASSERT_THROWS_NOTHING (iApply()); // iWrite does nothing visible without iApply
+  reg               = Startup::GetSystemModel()->RegisterWithId(4u);
+  expectedNextToSut = BinaryVector::CreateFromHexString(expected);
+  TS_ASSERT_EQUALS (reg->NextToSut(), expectedNextToSut);
 
 }
 //
-//  End of: test_iScan_notBlackBox
+//  End of: test_iScan
 //---------------------------------------------------------------------------
 
 

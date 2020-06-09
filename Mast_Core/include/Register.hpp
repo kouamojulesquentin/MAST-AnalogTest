@@ -157,6 +157,12 @@ class Register : public SystemModelNode, public RegisterInterface
     return m_lastReadFromSut.Get<T>();
   }
 
+  virtual void ResetSize   (uint32_t newSize) override {
+        auto dummy_sequence = BinaryVector(newSize, 0u, SizeProperty::NotFixed);
+        m_bypass = std::move(dummy_sequence);
+	
+	return;
+	};                            //!< changes size of Register for BlackBox usage
 
   //! Sets expected sequence (when updating from SUT) from integral value
   //!

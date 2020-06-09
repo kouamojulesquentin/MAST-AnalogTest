@@ -72,6 +72,8 @@ class RegisterInterface
 //+  virtual void SetExpectedFromSut (BinaryVector sequence) = 0;                            //!< Sets expected sequence (when updating from SUT)
 //+  virtual void SetHoldValue       (bool holdValue = true) = 0;                            //!< Set whether bypass value is maintain equal to nextToSut
 
+  virtual void ResetSize  (uint32_t newSize) = 0;                            //!< changes size of Register for BlackBox usage
+
   // ---------------- Protected Methods
   //
   RegisterInterface() = default;

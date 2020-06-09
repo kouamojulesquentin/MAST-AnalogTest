@@ -114,7 +114,9 @@ class VirtualRegister final : public RegisterInterface
 
   void SetExpectedFromSut (BinaryVector sequence, BinaryVector dontCareMask) override;         //!< Sets expected sequence and don't care mask (when updating from SUT)
 
-  // ---------------- Iterators
+   void ResetSize         (uint32_t newSize) override;                            //!< changes size of Register for BlackBox usage
+
+ // ---------------- Iterators
   //
   auto begin()  noexcept       { return m_registers.begin();  } //!< Returns an iterator to the first RegisterSlice
   auto begin()  const noexcept { return m_registers.begin();  } //!< Returns an iterator to the first RegisterSlice

@@ -382,6 +382,18 @@ void VirtualRegister::SetToSut (const BinaryVector& sequence)
 //---------------------------------------------------------------------------
 
 
+//!< changes size of Register for BlackBox usage
+//!
+//! @param sequence Sequence of bits to set to proxied registers slices
+//!
+void VirtualRegister::ResetSize         (uint32_t newSize)
+{
+  CHECK_PARAMETER_FALSE(newSize==newSize, "Virtual Registers cannot be used as Black Boxes");
+}
+//
+//  End of: VirtualRegister::ResetSize
+//---------------------------------------------------------------------------
+
 
 //! Updates registers
 //!

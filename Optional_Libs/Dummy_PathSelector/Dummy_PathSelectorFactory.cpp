@@ -1,18 +1,18 @@
 //===========================================================================
-//                           Empty_ProtocolFactory.cpp
+//                           Dummy_PathSelectorFactory.cpp
 //===========================================================================
 // Copyright (C) 2020 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file Empty_ProtocolFactory.cpp
+//! @file Dummy_PathSelectorFactory.cpp
 //!
-//! Implements class Empty_EmulationProtocol
+//! Implements class Dummy_PathSelectorFactory
 //!
 //===========================================================================
 
-#include "Empty_TranslatorProtocol.hpp"
-#include "AccessInterfaceTranslatorProtocolFactory.hpp" 
+#include "Dummy_PathSelector.hpp"
+#include "PathSelectorFactory.hpp" 
 #include "g3log/g3log.hpp"
 
 #include "Utility.hpp"
@@ -32,24 +32,27 @@ namespace
   //! Registers the AccessInterface protocol
   //!
   //! @note Names used from registration must be the same as found in SIT file
-  bool AccessInterfaceTranslatorProtocolFactory ()
+  bool PathSelectorFactory ()
   {
-    auto& repo     = AccessInterfaceTranslatorProtocolFactory::Instance();
-    auto  factory  = [](const string& /* parameters */)  { return std::make_unique<Empty_TranslatorProtocol>(); };
+  
+    auto& repo     = PathSelectorFactory::Instance();
+    auto  factory  = [](uint32_t pathsCount, 
+  					const std::string& parameters, 
+					std::shared_ptr<Register> associatedRegister)
+    { return std::make_unique<Dummy_PathSelector>(associatedRegister, pathsCount, parameters); };
 
-
-   repo.RegisterCreator("Empty", factory);
+   repo.RegisterCreator("Dummy", factory);
 
     return true;
   }
 
-  //! Make the AccessInterface protocol effectivelly registered
+  //! Make the PathSelector effectivelly registered
   //!
   //! @note As a "static" variable, it is initialized once when the corresponding DLL is loaded
   //!
-  static bool registered = AccessInterfaceTranslatorProtocolFactory();
+  static bool registered = PathSelectorFactory();
 } // End of unnamed namespace
 
 //===========================================================================
-// End of EmptyProtocolFactory.cpp
+// End of PathSelectorFactory.cpp
 //===========================================================================

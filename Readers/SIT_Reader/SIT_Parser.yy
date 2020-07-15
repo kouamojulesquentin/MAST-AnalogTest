@@ -157,7 +157,7 @@ namespace
 %type <std::uint32_t>                   max_derivations
 %type <std::string>                     path_selector_kind
 %type <std::string>                     path_selector_parameters
-%type <std::string>                     selector_register_name
+%type <std::vector<std::string>>        selector_register_name_list
 %type <std::uint32_t>                   IR_size
 %type <std::uint32_t>                   size
 %type <std::uint32_t>                   n_DR_chains
@@ -244,23 +244,36 @@ root_node:
       const auto& linkerInfo = driver.unresolved_linkers.front();
 
       // remove resolved linkerInfo
-      const auto& registerIter = driver.declared_registers.find(linkerInfo.selector_reg_name);
+      std::vector<std::shared_ptr<Register>> linkerRegisters;
+      std::shared_ptr<Register> registerNode;
+      
+ for (const auto& selector_reg_name : linkerInfo.selector_reg_name_list)
+     {
+     const auto& registerIter = driver.declared_registers.find(selector_reg_name);
       if (registerIter == driver.declared_registers.end())
       {
         ERROR_MESSAGE(msg) << STREAM_NODE_NAME("LINKER", linkerInfo.linker_node->Name())
-                           << "Error, specified selector register \"" << linkerInfo.selector_reg_name << "\" does not exist";
+                           << "Error, specified selector register \"" << selector_reg_name << "\" does not exist";
 
         THROW_SYNTAX_ERROR_AT_LOC(msg, MakeLocation(linkerInfo));
       }
-
-      auto registerNode = registerIter->second;
+      linkerRegisters.emplace_back(registerIter->second);
+      }
+      registerNode=linkerRegisters.front();
+      
 
       if (!linkerInfo.selector_parameters.empty())
       {
-        selector = selectorFactory.Create(linkerInfo.selector_kind_name,
+        if (linkerInfo.selector_reg_name_list.size()==1)
+         selector = selectorFactory.Create(linkerInfo.selector_kind_name,
                                           linkerInfo.max_derivations,
                                           linkerInfo.selector_parameters,
                                           registerNode);
+         else					  
+         selector = selectorFactory.Create(linkerInfo.selector_kind_name,
+                                          linkerInfo.max_derivations,
+                                          linkerInfo.selector_parameters,
+                                          linkerRegisters);
       }
       else
       {
@@ -493,9 +506,9 @@ t_BROCADE  node_name
   $$ = std::make_pair(chain,false);
 }
 |
-t_LINKER  node_name path_selector_kind selector_register_name max_derivations path_selector_parameters
+t_LINKER  node_name path_selector_kind selector_register_name_list max_derivations path_selector_parameters
 {
-  if ($[selector_register_name] == "")
+  if ($[selector_register_name_list].front()=="")
   {
     ERROR_MESSAGE(msg) << STREAM_NODE_NAME("LINKER", $[node_name].name) << "Must specify a control node (Register) for its path selector";
     THROW_SYNTAX_ERROR(msg);
@@ -510,7 +523,7 @@ t_LINKER  node_name path_selector_kind selector_register_name max_derivations pa
   linkerInfo.beginColumn         = my_location->begin.column;
   linkerInfo.endColumn           = my_location->end.column;
   linkerInfo.selector_property   = SelectorProperty::None;
-  linkerInfo.selector_reg_name   = $[selector_register_name];
+  linkerInfo.selector_reg_name_list   = $[selector_register_name_list];
   linkerInfo.selector_kind_name  = $[path_selector_kind];
   linkerInfo.selector_parameters = $[path_selector_parameters];
   linkerInfo.max_derivations     = $[max_derivations];
@@ -699,10 +712,21 @@ path_selector_kind: t_WORD
    { $$ =$1;}
    ;
 
-selector_register_name:
-    t_WORD { $$ = $1; }
-  | %empty { $$ = ""; }
-  ;
+
+selector_register_name_list:
+  t_WORD
+  {
+    $$.push_back($[t_WORD]);
+  }
+  |
+  selector_register_name_list[left] t_Comma t_WORD
+  {
+    $$ = $[left];
+    $$.push_back($[t_WORD]);
+  }
+  | %empty { $$.push_back(""); }
+  
+;
 
 IR_size :
  t_DecimalLiteral { $$ = $1;}

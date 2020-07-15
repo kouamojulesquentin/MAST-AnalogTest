@@ -38,8 +38,8 @@ namespace
     auto& repo     = PathSelectorFactory::Instance();
     auto  factory  = [](uint32_t pathsCount, 
   					const std::string& parameters, 
-					std::shared_ptr<Register> associatedRegister)
-    { return std::make_unique<SSAK_PathSelector>(associatedRegister, pathsCount, parameters); };
+					std::vector<std::shared_ptr<Register>> associatedRegisters)
+    { return std::make_unique<SSAK_PathSelector>(associatedRegisters, pathsCount, parameters); };
 
    repo.RegisterCreator("SSAK", factory);
 

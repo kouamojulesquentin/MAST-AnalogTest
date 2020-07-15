@@ -49,10 +49,13 @@ class MAST_CORE_EXPORT SSAK_PathSelector : public PathSelector
 
   using TablesType = std::vector<BinaryVector> ; //!< Selection/deselection LUT types
 
-  //! Example Constructor with pathCount entries
-  //! Compatible with FullCustom factory creator
+/*  SSAK_PathSelector(std::shared_ptr<Register> associatedRegister,
+                                uint32_t               pathsCount,
+				const std::string& parameters);
+*/
+  //! Constructor Compatible with Hybrid factory creator (multiple registers)
   //!
-  SSAK_PathSelector(std::shared_ptr<Register> associatedRegister,
+  SSAK_PathSelector(std::vector<std::shared_ptr<Register>> associatedRegisters,
                                 uint32_t               pathsCount,
 				const std::string& parameters);
 
@@ -111,8 +114,9 @@ class MAST_CORE_EXPORT SSAK_PathSelector : public PathSelector
 
   // ---------------- Private Fields
   //
-  uint32_t        m_pathsCount;    //!< Number of managed paths
-  VirtualRegister m_muxRegisters;  //!< Register(s) that drive(s) the paths multiplexer
+  uint32_t        m_pathsCount;                 //!< Number of managed paths
+  VirtualRegister m_muxRegisters; 	        //!< SSAK control Register
+  std::shared_ptr<Register> m_S2IB_Register;   //!< S2B control Register
 
   std::shared_ptr<cryptoProc>     m_CryptoProcesseur ;
   std::shared_ptr<SSAKplugin>      m_SSAKdriver;    //!< Instantiation of the SSAK authentication processor

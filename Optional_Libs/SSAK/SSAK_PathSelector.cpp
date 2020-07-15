@@ -19,15 +19,18 @@
 #include "microAES.h"
 #include "SSAKplugin.h"
 #include "g3log/g3log.hpp"
+#include "SystemModel.hpp"
 #include <stdexcept>
 #include <limits>
 #include <sstream>
+#include <iterator>
 
 using std::ostringstream;
 using std::string;
 using std::experimental::string_view;
 using std::shared_ptr;
 using std::make_shared;
+using std::dynamic_pointer_cast;
 
 using namespace mast;
 
@@ -68,20 +71,44 @@ string SSAK_PathSelector::DebugSelectorInfo (bool onlyProperties) const
 //! @param deselectTable        Table to use for deselecting a path
 //! @param properties           Properties of the selector (mainly to report that it can select no path or not)
 //!
-SSAK_PathSelector::SSAK_PathSelector (std::shared_ptr<Register> associatedRegister,
+SSAK_PathSelector::SSAK_PathSelector (std::vector<std::shared_ptr<Register>> associatedRegisters,
                                                               uint32_t               pathsCount,
                                                               const std::string& parameters)
   : PathSelector    (SelectorProperty::CanSelectNone)
   , m_pathsCount    (pathsCount)
-  , m_muxRegisters  (associatedRegister)
+  , m_muxRegisters  (associatedRegisters.front())
 {
- (void) parameters; //Useless line to avoid Unused Parameter warning
- 
+  try{
+ //  m_S2IB_Register
+   
+   if (associatedRegisters.size()!= 2)
+     {
+      ostringstream os; os << "SSAK needs 2 registers, " << associatedRegisters.size() << " given ";
+      throw std::logic_error(os.str());
+     }
+   std::shared_ptr<Register> associatedRegister = associatedRegisters.front();
+   m_S2IB_Register = associatedRegisters.back();
+
  /* Example Senario:
   Crypto-processeir : AES128
   Amount of Secure SIB : 13;
   NB: this information should come from parsing the Parameters string
 */
+LOG(INFO)<<"SSAK Parameter string: " << parameters;
+
+std::istringstream iss(parameters);
+std::vector<std::string> results(std::istream_iterator<std::string>{iss},
+                                 std::istream_iterator<std::string>());
+//Parse and Check Parameters
+int paramcount=0;
+for (const auto& param_n : results)
+   LOG(INFO)<<"SSAK Parameter "<< paramcount++ << " : " << param_n;
+
+ auto asSMNode = dynamic_pointer_cast <SystemModelNode>(associatedRegister);
+ auto asParentNode = dynamic_pointer_cast <ParentNode>(asSMNode);
+// auto parNode=asSMNode->FindParentOfNode(associatedRegister);
+ if (asParentNode == nullptr) LOG(INFO)<<"SSAK error in dynamic pinter cast";
+
 #define NUM_OF_S2IB 0x0D // 13
 
   auto S2SIB_count =  NUM_OF_S2IB;
@@ -89,7 +116,6 @@ SSAK_PathSelector::SSAK_PathSelector (std::shared_ptr<Register> associatedRegist
   auto local_microaes = make_shared<microAES>();
   // casting back to base class cryptoProc
   m_CryptoProcesseur= std::dynamic_pointer_cast<cryptoProc>(local_microaes);
-  try{
     
     m_SSAKdriver = make_shared<SSAKplugin>(*m_CryptoProcesseur,S2SIB_count);
     m_interfaceSize = m_SSAKdriver->getInterfaceSize();
@@ -241,6 +267,7 @@ void SSAK_PathSelector::Deselect (uint32_t pathIdentifier)
   
   //SSAK closes all S2IB at once
   m_SSAKdriver->deselect();
+  m_S2IB_Register->SetToSut(BinaryVector::CreateFromBinaryString("0"));
   m_SelectorState = SSAK_SelectorState::CLOSED;
   
   return; //Paths can never be deselected
@@ -318,8 +345,8 @@ void SSAK_PathSelector::Select (uint32_t pathIdentifier)
 	    if (AuthenticationResult == m_SSAKAuthenticationSuccess)
 	     {
 	      //Challenge Successfull, open S2IB
-               //TODO: set controlling register to 1
-              m_SelectorState=OPEN;
+	        m_S2IB_Register->SetToSut(BinaryVector::CreateFromBinaryString("1"));
+               m_SelectorState=OPEN;
 	      break;
 	     }
 	     else if (AuthenticationResult == m_SSAKAuthenticationFailure)

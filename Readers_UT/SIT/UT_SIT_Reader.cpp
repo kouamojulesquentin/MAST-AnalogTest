@@ -1655,8 +1655,36 @@ void UT_SIT_Reader::test_LINKER_Success ()
 
   auto data =
   {
-    // 00 ==> correct syntax
+    // 00 ==> correct syntax one register
     make_tuple("LINKER test_LINKER One_Hot test_reg_1 4\n"
+               "(\n"
+               "  REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
+               "  REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
+               "  REGISTER test_reg_3 2 Bypass: \"0b10\"\n"
+               "  REGISTER test_reg_4 5 Bypass: \"0b11001\"\n"
+               ")"s,
+               "[Linker](0)    \"test_LINKER\"\n"
+               " :Selector:(1)  \"test_reg_1\", kind: One_Hot, can_select_none: true, inverted_bits: false, reversed_order: false\n"
+               " [Register](1)  \"test_reg_1\", length: 4, bypass: 1001\n"
+               " [Register](2)  \"test_reg_2\", length: 4, bypass: 1100\n"
+               " [Register](3)  \"test_reg_3\", length: 2, bypass: 10\n"
+               " [Register](4)  \"test_reg_4\", length: 5, bypass: 1100_1"s),
+    // 01 ==> correct syntax two registers
+    make_tuple("LINKER test_LINKER One_Hot test_reg_1,test_reg_1 4\n"
+               "(\n"
+               "  REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
+               "  REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
+               "  REGISTER test_reg_3 2 Bypass: \"0b10\"\n"
+               "  REGISTER test_reg_4 5 Bypass: \"0b11001\"\n"
+               ")"s,
+               "[Linker](0)    \"test_LINKER\"\n"
+               " :Selector:(1)  \"test_reg_1\", kind: One_Hot, can_select_none: true, inverted_bits: false, reversed_order: false\n"
+               " [Register](1)  \"test_reg_1\", length: 4, bypass: 1001\n"
+               " [Register](2)  \"test_reg_2\", length: 4, bypass: 1100\n"
+               " [Register](3)  \"test_reg_3\", length: 2, bypass: 10\n"
+               " [Register](4)  \"test_reg_4\", length: 5, bypass: 1100_1"s),
+    // 02 ==> correct syntax three registers
+    make_tuple("LINKER test_LINKER One_Hot test_reg_1,test_reg_1,test_reg_1 4\n"
                "(\n"
                "  REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
                "  REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
@@ -1722,6 +1750,16 @@ void UT_SIT_Reader::test_LINKER_Error ()
                "  REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
                ")"s,
                "SIT Parsing error: Line 2:1-2: LINKER node \"test_LINKER\" Error, specified selector register \"selector_reg\" does not exist"),
+    // 02 ==> Error : one selector register followed by a comme 
+    make_tuple("LINKER test_LINKER One_Hot test_reg_1, 4\n"
+               "(\n"
+               "  REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
+               "  REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
+               "  REGISTER test_reg_3 2 Bypass: \"0b10\"\n"
+               "  REGISTER test_reg_4 5 Bypass: \"0b11001\"\n"
+               ")"s,
+               "SIT Parsing error: Line 1:40-41: syntax error"),
+
   };
 
   // ---------------- DDT Exercise

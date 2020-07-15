@@ -52,7 +52,7 @@ struct linker_information
   uint32_t                      endColumn         = 0;
   uint32_t                      max_derivations   = 0;
   std::string                   selector_kind_name;
-  std::string                   selector_reg_name;   //!< Name of register associated with the selector (driving the mux)
+  std::vector<std::string>      selector_reg_name_list;   //!< Name of registers associated with the selector (driving the mux)
   std::string                   selector_parameters; //!< Optional parameters (for custom PathSelector)
   mast::SelectorProperty        selector_property = static_cast<mast::SelectorProperty>(0);
 };

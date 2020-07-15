@@ -183,6 +183,8 @@ class MAST_CORE_EXPORT BinaryVector final
   void          Get(int32_t& value) const; //!< Reads signed 32 bits value from BinaryVector
   void          Get(int64_t& value) const; //!< Reads signed 64 bits value from BinaryVector
 
+  std::vector<uint8_t> Get_DataVector () const; //!< Return data from BinaryVector as uint8 vector : NB no checks are done
+
   //! Reads value from BinaryVector with specified type
   //!
   template<typename T> T Get() const

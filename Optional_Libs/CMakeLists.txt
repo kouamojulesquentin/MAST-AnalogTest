@@ -70,4 +70,5 @@ endif()
 add_subdirectory(Trivium)
 add_subdirectory(Empty_TranslatorProtocol)
 add_subdirectory(Dummy_PathSelector)
+add_subdirectory(SSAK)
 

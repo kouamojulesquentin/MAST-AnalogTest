@@ -2118,6 +2118,17 @@ BinaryVector BinaryVector::operator+ (const BinaryVector& rhs) const
 //  End of: BinaryVector::operator~
 //---------------------------------------------------------------------------
 
+//! Return data from BinaryVector as uint8 vector : NB no checks are done
+//!
+//! @param value  Variable to update with current value
+//!
+std::vector<uint8_t> BinaryVector::Get_DataVector () const
+{
+  return m_data;
+}
+//
+//  End of: BinaryVector::Get
+//---------------------------------------------------------------------------
 
 //! Reads 8 bits value from BinaryVector
 //!

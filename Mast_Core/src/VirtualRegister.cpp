@@ -300,7 +300,35 @@ void VirtualRegister::SetPending ()
 //  End of: VirtualRegister::SetPending
 //---------------------------------------------------------------------------
 
+//! Returns true if at least one register is pending for read
+//!
+bool VirtualRegister::IsPendingForRead () const
+{
+ bool isPending = false;
+  for (const auto& regSlice : m_registers)
+  {
+    isPending = regSlice.reg->IsPendingForRead();
+    if (isPending==true) break;
+  }
+ return isPending; 
+}
+//
+//  End of: VirtualRegister::IsPendingForRead
+//---------------------------------------------------------------------------
 
+//! Set whether there is a pending request or not for read value from 
+//!
+void VirtualRegister::SetPendingForRead (bool pendingForRead) 
+{
+  for (const auto& regSlice : m_registers)
+     regSlice.reg->SetPendingForRead(pendingForRead);
+ return; 
+}
+//
+//  End of: VirtualRegister::SetPendingForRead
+//---------------------------------------------------------------------------
+
+  
 //! Sets BinaryVector slice respecting bits ordering
 //!
 //! @note Must adapt to design numbering of register bits to BinaryVector bits ordering

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
-project(Empty_Translator)
+project(Dummy_PathSelector)
 
 include_directories(${LIBLOGGER_INCLUDE_DIRS})
 

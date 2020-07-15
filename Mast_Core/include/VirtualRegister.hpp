@@ -99,7 +99,8 @@ class VirtualRegister final : public RegisterInterface
   void LastFromSut (int16_t&      readData) const override; //!< Returns last sequence received from SUT
   void LastFromSut (int32_t&      readData) const override; //!< Returns last sequence received from SUT
   void LastFromSut (int64_t&      readData) const override; //!< Returns last sequence received from SUT
-
+  bool IsPendingForRead()  const ; //!< Returns true when there is a pending request to read the Register from SUT
+  void SetPendingForRead  (bool pendingForRead  = true) ; //!< Set whether there is a pending request or not for read value from SUT                             //!< 
   // ---------------- Setters
   //
   void SetPending ();                                      //!< Sets number of pending to 1

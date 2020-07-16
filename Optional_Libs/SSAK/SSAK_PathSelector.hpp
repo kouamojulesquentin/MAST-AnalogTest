@@ -91,7 +91,6 @@ class MAST_CORE_EXPORT SSAK_PathSelector : public PathSelector
 
   enum SSAK_SelectorState{CLOSED,
                           CONFIG_SENT,
-			  READ_CHALLENGE,
 			  AUTHENTICATION_CHECK,
 			  OPEN
 			  };
@@ -122,7 +121,9 @@ class MAST_CORE_EXPORT SSAK_PathSelector : public PathSelector
   std::shared_ptr<SSAKplugin>      m_SSAKdriver;    //!< Instantiation of the SSAK authentication processor
   uint32_t        m_interfaceSize;    //!< Maximal Number of managed paths
   
-const u8 m_SSAK_bits[16]={0,0,0,0,0,0,0,0,0,0,0,0x7C,0x10,0xD4,0xDB}; //!<SSAK private key : to be loaded from SIT
+const u8 m_SSAK_bits[16]={0x72 ,0xc4 ,0x35 ,0x8f ,0x5a ,0x8a ,0x07 ,0xaf ,0x3d ,0x0f ,0x7d ,0x56 ,0x0a ,0x87 ,0x2a ,0x2b};
+//!<SSAK private key : to be loaded from SIT
+
   SSAK_SelectorState m_SelectorState;
     uint32_t        m_attempts;//!< Authentication Timeout Watchdog
 };

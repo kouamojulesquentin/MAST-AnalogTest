@@ -79,7 +79,6 @@ SSAK_PathSelector::SSAK_PathSelector (std::vector<std::shared_ptr<Register>> ass
   , m_muxRegisters  (associatedRegisters.front())
 {
   try{
- //  m_S2IB_Register
    
    if (associatedRegisters.size()!= 2)
      {
@@ -222,18 +221,20 @@ bool SSAK_PathSelector::IsSelected (uint32_t pathIdentifier) const
   switch (m_SelectorState)
    {
     case CLOSED: isSelected   = false;
+    	  LOG(DEBUG)<<"SSAK state is CLOSED";
 	  break;
     case CONFIG_SENT: isSelected   = false;
+    	  LOG(DEBUG)<<"SSAK state is CONFIG_SENT";
 	  break;
-    case READ_CHALLENGE: isSelected   = false;
-	  break;
-    case AUTHENTICATION_CHECK: isSelected   = false;
+     case AUTHENTICATION_CHECK: isSelected   = false;
+    	  LOG(DEBUG)<<"SSAK state is AUTHENTICATION_CHECK";
 	  break;
     case OPEN: isSelected   = true;
+    	  LOG(DEBUG)<<"SSAK state is OPEN";
 	  break;
     default : isSelected   = true; //All paths are always selected
   }
-   LOG(DEBUG)<<"SSAK state is "<<m_SelectorState;
+   
  
   
   return isSelected;
@@ -307,34 +308,25 @@ void SSAK_PathSelector::Select (uint32_t pathIdentifier)
 	  if (pendingWrite==false)
 	   {
 	    //Config has been received, read SSAK challenge
-	    m_SelectorState=READ_CHALLENGE;
 	    //Challenge is given in the same CSU cycle, so no need to set a read request
-//	    AssociatedRegisters()->SetPendingForRead(true);
-	   }
-	  break;
-    case READ_CHALLENGE: 
-	  if (AssociatedRegisters()->IsPendingForRead()==true)
-	   {
-	    //Challenge has not been read yet
-	    m_SelectorState=READ_CHALLENGE;
-	   }
-	   else
-	    {
 	     //System Model is blocked during configuration, no need to protect read access 
 	    BinaryVector challenge_BV;
 	    AssociatedRegisters()->LastFromSut(challenge_BV);
-	    //Compute response from challenge and write it back to the register
-	    const u8* Response=m_SSAKdriver->computeResponse(m_SSAK_bits,challenge_BV.Get_DataVector().data());
+	    LOG(INFO)<<"SSAK received challenge: : "<< challenge_BV.DataAsHexString();
+	    	    //Compute response from challenge and write it back to the register
+	    const u8* Response=m_SSAKdriver->computeResponse
+	    				(m_SSAK_bits,challenge_BV.Get_DataVector().data());
 	    std::vector<u8> Response_V (Response,Response+m_interfaceSize/8);
-	    auto Response_BV = BinaryVector::CreateFromRightAlignedBuffer(Response_V,m_interfaceSize);
+	    auto Response_BV
+	     = BinaryVector::CreateFromRightAlignedBuffer(Response_V,m_interfaceSize);
  	    AssociatedRegisters()->SetToSut(std::move(Response_BV));
             m_SelectorState=AUTHENTICATION_CHECK;
 	    AssociatedRegisters()->SetPendingForRead(true);
 	    m_attempts = 0;
-	    }
+	   }
 	  break;
    case AUTHENTICATION_CHECK: 
-	  if (AssociatedRegisters()->IsPendingForRead()==true)
+	  if (false)//(AssociatedRegisters()->IsPendingForRead()==true)
 	   {
 	    //Authentication answer has not been read yet
 	    m_SelectorState=AUTHENTICATION_CHECK;
@@ -342,6 +334,7 @@ void SSAK_PathSelector::Select (uint32_t pathIdentifier)
 	   else
 	   {
 	    AssociatedRegisters()->LastFromSut(AuthenticationResult);
+	    LOG(INFO)<<"SSAK authentication result: "<< AuthenticationResult.DataAsHexString();
 	    if (AuthenticationResult == m_SSAKAuthenticationSuccess)
 	     {
 	      //Challenge Successfull, open S2IB

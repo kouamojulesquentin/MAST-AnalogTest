@@ -27,6 +27,12 @@
 
 #include <utility>
 #include <sstream>
+#include <iostream>
+
+#ifdef __linux__
+#include <pthread.h>
+#include <cxxabi.h>
+#endif
 
 using std::shared_ptr;
 using std::make_shared;
@@ -182,6 +188,12 @@ void SystemModelManager_impl::CreateApplicationThread (shared_ptr<ParentNode> ap
 
       applicationData->caughtException = std::current_exception();
     }
+#ifdef __linux__
+    catch (abi::__forced_unwind&) {
+        LOG(INFO) <<"Catching exception thrown by pthread_exit";
+        throw;
+	}
+#endif
     catch (...)
     {
       applicationData->currentState = ApplicationData::State::TerminatedWithException;
@@ -434,7 +446,16 @@ void SystemModelManager_impl::iApply ()
     }
   }
 
-  appData->currentState = ApplicationData::State::Running;
+    if (m_KillAllThreads==true)
+            {
+	    auto myThreadId = std::this_thread::get_id();
+	    LOG(DEBUG)<<"Trying to kill Application thread "<< myThreadId << " Native Handle: "<< myThreadId;
+#ifdef __linux__
+	    pthread_exit(NULL);
+#endif
+	    }
+    else 
+      appData->currentState = ApplicationData::State::Running;
   MONITOR_DEBUG_APP("iApply - Leaving", appData);
 }
 //
@@ -1046,6 +1067,10 @@ void SystemModelManager_impl::Start ()
     catch(std::exception& exc)  // Catch C++ standard exceptions
     {
       LOG(ERROR_LVL) << "SystemModelManager background thread caught std::exception: " << exc.what();
+      std::cerr << "SystemModelManager background thread caught std::exception: " << exc.what();
+      std::cerr << "Terminating Execution\n";
+
+      m_KillAllThreads = true; //Asks for forceful thread termination
       {
         std::lock_guard<std::mutex> lock(m_loopMutex);
         m_runLoop = false;

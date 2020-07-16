@@ -367,6 +367,7 @@ class SystemModelManager_impl final
   std::vector<std::exception_ptr>  m_applicationsExceptions;         //!< Collects exceptions thrown by PDL applications (on their own thread)
   uint32_t                         m_activeThreads;                  //!< Counts Applications Threads currently active 
   bool                          m_waitFullPending;        //!< Waits for all threads to be pending before triggering a data cycle  
+  bool                          m_KillAllThreads=false;  //!<When closing Manager, forcefully kill all application threads
 };
 //
 //  End of SystemModelManager_impl class declaration

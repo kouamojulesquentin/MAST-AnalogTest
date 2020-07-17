@@ -22,7 +22,6 @@
 #include "SystemModel.hpp"
 #include <stdexcept>
 #include <limits>
-#include <sstream>
 #include <iterator>
 
 using std::ostringstream;
@@ -95,18 +94,11 @@ SSAK_PathSelector::SSAK_PathSelector (std::vector<std::shared_ptr<Register>> ass
 */
 LOG(INFO)<<"SSAK Parameter string: " << parameters;
 
-std::istringstream iss(parameters);
-std::vector<std::string> results(std::istream_iterator<std::string>{iss},
-                                 std::istream_iterator<std::string>());
+   auto results     = Utility::Split(parameters, " ");
 //Parse and Check Parameters
 int paramcount=0;
 for (const auto& param_n : results)
    LOG(INFO)<<"SSAK Parameter "<< paramcount++ << " : " << param_n;
-
- auto asSMNode = dynamic_pointer_cast <SystemModelNode>(associatedRegister);
- auto asParentNode = dynamic_pointer_cast <ParentNode>(asSMNode);
-// auto parNode=asSMNode->FindParentOfNode(associatedRegister);
- if (asParentNode == nullptr) LOG(INFO)<<"SSAK error in dynamic pinter cast";
 
 #define NUM_OF_S2IB 0x0D // 13
 

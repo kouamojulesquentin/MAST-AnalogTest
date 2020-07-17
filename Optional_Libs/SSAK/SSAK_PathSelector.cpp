@@ -8,8 +8,10 @@
 //! @file SSAK_PathSelector.cpp
 //!
 //! Implements class SSAK_PathSelector
-//!It is a model to build a custom PathSelector which implements all virtual
-//! functions but does nothing: its behavior is the same as a chain node
+//! While the Linker itself is a pass-through, the PathSelector instantiates
+//! and configures the SSAK controller. It also exports methods to trigger
+//! authentication and close the controller, to be used by an S2IB Path 
+//! Selector
 //! 
 //===========================================================================
 
@@ -146,19 +148,12 @@ void SSAK_PathSelector::Accept (SystemModelVisitor& visitor)
 
 
 
-//! Returns the number of paths that are currently active
+//! Linker is always selected
 //!
 uint32_t SSAK_PathSelector::ActiveCount () const
 {
-  uint32_t activeCount = 0u;
+  uint32_t activeCount = 1u;
 
-  for (uint32_t pathId = 1u ; pathId < m_pathsCount; ++pathId)
-  {
-    if (IsActive(pathId))
-    {
-      ++activeCount;
-    }
-  }
   return activeCount;
 }
 //
@@ -196,38 +191,13 @@ bool SSAK_PathSelector::IsActive (uint32_t pathIdentifier) const
 //---------------------------------------------------------------------------
 
 
-//! Returns true when the specified path is already selected
+//! Linker is always selected
 //!
 bool SSAK_PathSelector::IsSelected (uint32_t pathIdentifier) const
 {
   CheckPathIdentifier(pathIdentifier);
 
-  LOG(DEBUG)<<"SSAK isSelected starting";
-  //NB: SSAK counts paths starting from 0
-  bool  isSelected = m_SSAKdriver->isSelected(pathIdentifier-1);
-
-  LOG(DEBUG)<<"SSAK isSelected returns "<<isSelected;
-  
-  //Force Select to unroll FSM
-  
-  switch (m_SelectorState)
-   {
-    case CLOSED: isSelected   = false;
-    	  LOG(DEBUG)<<"SSAK state is CLOSED";
-	  break;
-    case CONFIG_SENT: isSelected   = false;
-    	  LOG(DEBUG)<<"SSAK state is CONFIG_SENT";
-	  break;
-     case AUTHENTICATION_CHECK: isSelected   = false;
-    	  LOG(DEBUG)<<"SSAK state is AUTHENTICATION_CHECK";
-	  break;
-    case OPEN: isSelected   = true;
-    	  LOG(DEBUG)<<"SSAK state is OPEN";
-	  break;
-    default : isSelected   = true; //All paths are always selected
-  }
-   
- 
+  bool  isSelected = true;
   
   return isSelected;
 }
@@ -258,11 +228,6 @@ void SSAK_PathSelector::Deselect (uint32_t pathIdentifier)
 {
   CheckPathIdentifier(pathIdentifier);
   
-  //SSAK closes all S2IB at once
-  m_SSAKdriver->deselect();
-  m_S2IB_Register->SetToSut(BinaryVector::CreateFromBinaryString("0"));
-  m_SelectorState = SSAK_SelectorState::CLOSED;
-  
   return; //Paths can never be deselected
 }
 //
@@ -279,12 +244,23 @@ void SSAK_PathSelector::Deselect (uint32_t pathIdentifier)
 //! @note Also report that a selection is pending and this is now the default value for the mux register
 void SSAK_PathSelector::Select (uint32_t pathIdentifier)
 {
-  CheckPathIdentifier(pathIdentifier);
+ (void)pathIdentifier; //Dummy instruction to avoid warning
+  return; //Paths Is always selected
+}
+//
+//  End of: SSAK_PathSelector::Select
+//---------------------------------------------------------------------------
+
+
+//! Triggers an authentication for given Configuration
+//!
+//! SSAK is a multi-step process: this method will be called multiple times
+//! so states are used to trace the authentication steps and act accordingly
+//!
+//! @note Also report that a selection is pending and this is now the default value for the mux register
+SSAK_PathSelector::SSAK_SelectorState SSAK_PathSelector::DoAuthentication (BinaryVector config)
+{
   
-  //BinaryVector config(m_interfaceSize);
-  //Example;=: in reality should be computed from S2IB cardinality (position)
-  // pathIdentifier is useless because each S2IB has 1 derivation
-  auto config = BinaryVector::CreateFromHexString("0x00000000000000000000000000000001");
   bool pendingWrite = AssociatedRegisters()->NextToSut() != AssociatedRegisters()->LastToSut();
   BinaryVector AuthenticationResult;
 
@@ -354,13 +330,12 @@ void SSAK_PathSelector::Select (uint32_t pathIdentifier)
    case OPEN: break; 
    default : THROW_RUNTIME_ERROR("SSAK Selector in unknown state"); break;
    }
-  return; //Paths are always selected
+  return m_SelectorState; 
 
 }
 //
-//  End of: SSAK_PathSelector::Select
+//  End of: SSAK_PathSelector::DoAuthentication
 //---------------------------------------------------------------------------
-
 
 
 //! Returns some value associated with specified path selection

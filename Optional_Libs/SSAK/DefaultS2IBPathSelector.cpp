@@ -9,6 +9,12 @@
 //!
 //! Implements class DefaultS2IBPathSelector
 //!
+//! It is based on a simplified version of the DefaultTableBased with just one
+//! bit, but with a connection to an SSAK controller PathLinker:
+//!
+//! Constructor makes the link with the SSAK controller
+//! Select() triggers an authentication before opening the SIB
+//! Deselect() Closes the SSAK 
 //===========================================================================
 
 #include "DefaultS2IBPathSelector.hpp"
@@ -78,7 +84,7 @@ DefaultS2IBPathSelector::DefaultS2IBPathSelector (std::vector<std::shared_ptr<Sy
    CHECK_PARAMETER_NOT_NULL(m_S2IB_SSAK_PathSelector,"S2IB must reference an SSAK Path Selector");
    
    m_muxRegisters = VirtualRegister(associatedRegister);
-
+   m_pathsCount = 1;
    m_SelectValue = BinaryVector::CreateFromBinaryString("1");
    m_DeSelectValue = BinaryVector::CreateFromBinaryString("0");
 
@@ -142,11 +148,7 @@ void DefaultS2IBPathSelector::Accept (SystemModelVisitor& visitor)
 //!
 void DefaultS2IBPathSelector::CheckPathIdentifier (uint32_t pathIdentifier) const
 {
-  if (pathIdentifier >= m_pathsCount)
-  {
-    ostringstream os; os << "pathIdentifier must be < " << m_pathsCount << ", got: " << pathIdentifier;
-    THROW_OUT_OF_RANGE(os.str());
-  }
+  (void) pathIdentifier; //Dummy instruction to avoid warning
 }
 //
 //  End of: DefaultS2IBPathSelector::CheckPathIdentifier
@@ -205,6 +207,7 @@ void DefaultS2IBPathSelector::Deselect (uint32_t pathIdentifier)
   {
     muxRegisters->SetToSut(selectValue);
     muxRegisters->SetPending();
+    m_S2IB_SSAK_PathSelector->CloseSSAK();
   }
 }
 //
@@ -220,14 +223,29 @@ void DefaultS2IBPathSelector::Select (uint32_t pathIdentifier)
 {
   CheckPathIdentifier(pathIdentifier);
 
-  const auto selectValue  = BinaryVector::CreateFromBinaryString("1");
-  const auto  muxRegisters = AssociatedRegisters();
+    //BinaryVector config(m_interfaceSize);
+  //Example;=: in reality should be computed from S2IB cardinality (position)
+  // pathIdentifier is useless because each S2IB has 1 derivation
+  auto config = BinaryVector::CreateFromHexString("0x00000000000000000000000000000001");
 
-  if (muxRegisters->NextToSut() != selectValue)
-  {
-    muxRegisters->SetToSut(selectValue);
-    muxRegisters->SetPending();
-  }
+  if (! IsSelected(1u)) //S2IB not selected yet
+    {
+     auto SSAK_State=  m_S2IB_SSAK_PathSelector->DoAuthentication(config);
+     if (SSAK_State==SSAK_PathSelector::SSAK_SelectorState::OPEN)
+      //Authentication successfull, open S2IB
+       {
+        //---Control of Selection Bit ---start
+        const auto selectValue  = BinaryVector::CreateFromBinaryString("1");
+        const auto  muxRegisters = AssociatedRegisters();
+
+        if (muxRegisters->NextToSut() != selectValue)
+        {
+          muxRegisters->SetToSut(selectValue);
+          muxRegisters->SetPending();
+        }
+        //---Control of Selection Bit ---end
+      }
+}
 }
 //
 //  End of: DefaultS2IBPathSelector::Select

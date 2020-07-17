@@ -94,8 +94,13 @@ class MAST_CORE_EXPORT SSAK_PathSelector : public PathSelector
 			  AUTHENTICATION_CHECK,
 			  OPEN
 			  };
-		  
-  // ---------------- Protected Methods
+
+   // ----------Methods used by S2IB to instantiate SSAK and drive authentication	
+   
+    SSAK_SelectorState DoAuthentication (BinaryVector config);
+    void CloseSSAK() {m_SSAKdriver->deselect();};
+
+ // ---------------- Protected Methods
   //
   protected:
 
@@ -121,7 +126,7 @@ class MAST_CORE_EXPORT SSAK_PathSelector : public PathSelector
   std::shared_ptr<SSAKplugin>      m_SSAKdriver;    //!< Instantiation of the SSAK authentication processor
   uint32_t        m_interfaceSize;    //!< Maximal Number of managed paths
   
-const u8 m_SSAK_bits[16]={0x72 ,0xc4 ,0x35 ,0x8f ,0x5a ,0x8a ,0x07 ,0xaf ,0x3d ,0x0f ,0x7d ,0x56 ,0x0a ,0x87 ,0x2a ,0x2b};
+  u8 m_SSAK_bits[16]={0x72 ,0xc4 ,0x35 ,0x8f ,0x5a ,0x8a ,0x07 ,0xaf ,0x3d ,0x0f ,0x7d ,0x56 ,0x0a ,0x87 ,0x2a ,0x2b};
 //!<SSAK private key : to be loaded from SIT
 
   SSAK_SelectorState m_SelectorState;

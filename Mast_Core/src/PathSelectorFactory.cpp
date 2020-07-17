@@ -166,6 +166,30 @@ unique_ptr<PathSelector> PathSelectorFactory::Create (const std::string& creator
 //  End of: PathSelectorFactory::Create
 //---------------------------------------------------------------------------
 
+//! Creates an PathSelector using registered creation function
+//!
+//! @param creatorId            A name that identified registered creation function
+//! @param pathsCount           Number of managed paths (including, optional, bypass register)
+//! @param properties           Properties of the selector (bit order can be reverse or it can use negative logic)
+//! @param associatedRegisters  Registers that are used to drive the path multiplexer
+//!
+unique_ptr<PathSelector> PathSelectorFactory::Create (const std::string& creatorId, 
+						      uint32_t pathsCount, 
+						      const std::string& parameters, 
+						      std::vector<std::shared_ptr<SystemModelNode>> associatedNodes
+) const
+{
+  auto instance = CreateImpl(m_GenericCustomCreators, creatorId, pathsCount, parameters, associatedNodes);
+  if (!instance)
+  {
+    THROW_INVALID_ARGUMENT("There is no \"Generic\" creation method registered with name: "sv + creatorId);
+  }
+
+  return instance;
+}
+//
+//  End of: PathSelectorFactory::Create
+//---------------------------------------------------------------------------
 
 //! Fills up with default PathSelector
 //!

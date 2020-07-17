@@ -245,19 +245,33 @@ root_node:
 
       // remove resolved linkerInfo
       std::vector<std::shared_ptr<Register>> linkerRegisters;
+      std::vector<std::shared_ptr<SystemModelNode>> linkerNodes;
       std::shared_ptr<Register> registerNode;
-      
+     bool Only_Registers = true;
  for (const auto& selector_reg_name : linkerInfo.selector_reg_name_list)
      {
      const auto& registerIter = driver.declared_registers.find(selector_reg_name);
       if (registerIter == driver.declared_registers.end())
       {
+       const auto& nodeIter = driver.declared_nodes.find(selector_reg_name);
+       if (nodeIter == driver.declared_nodes.end())
+        {
         ERROR_MESSAGE(msg) << STREAM_NODE_NAME("LINKER", linkerInfo.linker_node->Name())
-                           << "Error, specified selector register \"" << selector_reg_name << "\" does not exist";
+                           << "Error, specified selector node \"" << selector_reg_name << "\" does not exist";
 
         THROW_SYNTAX_ERROR_AT_LOC(msg, MakeLocation(linkerInfo));
+	}
+	else
+	 {
+	  Only_Registers = false;
+	  linkerNodes.emplace_back(nodeIter->second);
+	 }
       }
-      linkerRegisters.emplace_back(registerIter->second);
+      else
+      {
+       linkerRegisters.emplace_back(registerIter->second);
+       linkerNodes.emplace_back(std::dynamic_pointer_cast<SystemModelNode>(registerIter->second));
+       }
       }
       registerNode=linkerRegisters.front();
       
@@ -269,11 +283,18 @@ root_node:
                                           linkerInfo.max_derivations,
                                           linkerInfo.selector_parameters,
                                           registerNode);
-         else					  
-         selector = selectorFactory.Create(linkerInfo.selector_kind_name,
+         else
+	 if (Only_Registers==true)					  
+           selector = selectorFactory.Create(linkerInfo.selector_kind_name,
                                           linkerInfo.max_derivations,
                                           linkerInfo.selector_parameters,
                                           linkerRegisters);
+         else
+           selector = selectorFactory.Create(linkerInfo.selector_kind_name,
+                                          linkerInfo.max_derivations,
+                                          linkerInfo.selector_parameters,
+                                          linkerNodes);
+	 					  
       }
       else
       {
@@ -359,8 +380,8 @@ node_list:
 ;
 
 node:
-   parent_node_with_children { $$ = $1; }
- | leaf_node                 { $$ = $1; }
+   parent_node_with_children { $$ = $1; driver.declared_nodes.insert (make_pair($1->Name(), $1));}
+ | leaf_node                 { $$ = $1; driver.declared_nodes.insert (make_pair($1->Name(), $1));}
 ;
 
 is_transparent:

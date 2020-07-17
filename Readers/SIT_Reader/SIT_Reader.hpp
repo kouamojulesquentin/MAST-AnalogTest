@@ -88,6 +88,7 @@ private:  // Part used by SIT_Parser
   std::map<std::string, std::shared_ptr<mast::Register>> declared_registers; //!< Created registers - kept to potentially associate to PathSelector (at end of parsing)
   std::queue<linker_information>                         unresolved_linkers; //!< Informations to create PathSelector associated with linker (register driving the selector may be yet unknown when the linker is created)
   std::queue<T_2_E_information>                          unresolved_translators; //!< Informations to create Translators associated with a register driving 
+  std::map<std::string, std::shared_ptr<mast::SystemModelNode>> declared_nodes; //!< Created Nodes - kept to potentially associate to PathSelector (at end of parsing)
 
   std::shared_ptr<mast::SystemModelNode>    parsedTopNode;    //!< SystemModel tree build from SIT file
   std::shared_ptr<mast::SystemModel>        systemModel;

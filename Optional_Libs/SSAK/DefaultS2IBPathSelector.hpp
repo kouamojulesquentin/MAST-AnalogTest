@@ -88,6 +88,7 @@ class MAST_CORE_EXPORT DefaultS2IBPathSelector : public PathSelector
   uint32_t        m_pathsCount;    //!< Number of managed paths
   VirtualRegister  m_muxRegisters;  //!< Register(s) that drive(s) the paths multiplexer
   std::shared_ptr<SSAK_PathSelector> m_S2IB_SSAK_PathSelector;
+  uint32_t        m_cardinality;    //!< Position in the S2IB chain, used for configuration
 
 };
 //

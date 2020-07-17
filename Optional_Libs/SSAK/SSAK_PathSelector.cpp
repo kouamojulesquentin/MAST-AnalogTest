@@ -94,6 +94,17 @@ SSAK_PathSelector::SSAK_PathSelector (std::vector<std::shared_ptr<Register>> ass
   Amount of Secure SIB : 13;
   NB: this information should come from parsing the Parameters string
 */
+
+ m_KeySize = 128;
+
+  std::string tmp_string(m_KeySize, '0');
+  tmp_string[m_KeySize-1]='1';
+  m_SSAKAuthenticationSuccess = BinaryVector::CreateFromBinaryString(tmp_string);
+  tmp_string[m_KeySize-1]='0';
+  tmp_string[m_KeySize-2]='1';
+  m_SSAKAuthenticationFailure = BinaryVector::CreateFromBinaryString(tmp_string);
+
+ 
 LOG(INFO)<<"SSAK Parameter string: " << parameters;
 
    auto results     = Utility::Split(parameters, " ");
@@ -258,12 +269,16 @@ void SSAK_PathSelector::Select (uint32_t pathIdentifier)
 //! so states are used to trace the authentication steps and act accordingly
 //!
 //! @note Also report that a selection is pending and this is now the default value for the mux register
-SSAK_PathSelector::SSAK_SelectorState SSAK_PathSelector::DoAuthentication (BinaryVector config)
+SSAK_PathSelector::SSAK_SelectorState SSAK_PathSelector::DoAuthentication (uint32_t Cardinality)
 {
   
   bool pendingWrite = AssociatedRegisters()->NextToSut() != AssociatedRegisters()->LastToSut();
   BinaryVector AuthenticationResult;
+  
+  std::string config_string(m_KeySize, '0');
+  config_string[m_KeySize-Cardinality]='1';
 
+ auto config = BinaryVector::CreateFromBinaryString(config_string);
 
   switch (m_SelectorState)
    {

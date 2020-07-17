@@ -60,6 +60,8 @@ DefaultS2IBPathSelector::DefaultS2IBPathSelector (std::vector<std::shared_ptr<Sy
    int paramcount=0;
    for (const auto& param_n : results)
     LOG(INFO)<<"S2IB Parameter "<< paramcount++ << " : " << param_n;
+   
+   m_cardinality = std::stoull(std::string(results.front()));
 
    if (associatedNodes.size()!= 2)
      {
@@ -226,11 +228,10 @@ void DefaultS2IBPathSelector::Select (uint32_t pathIdentifier)
     //BinaryVector config(m_interfaceSize);
   //Example;=: in reality should be computed from S2IB cardinality (position)
   // pathIdentifier is useless because each S2IB has 1 derivation
-  auto config = BinaryVector::CreateFromHexString("0x00000000000000000000000000000001");
 
   if (! IsSelected(1u)) //S2IB not selected yet
     {
-     auto SSAK_State=  m_S2IB_SSAK_PathSelector->DoAuthentication(config);
+     auto SSAK_State=  m_S2IB_SSAK_PathSelector->DoAuthentication(m_cardinality);
      if (SSAK_State==SSAK_PathSelector::SSAK_SelectorState::OPEN)
       //Authentication successfull, open S2IB
        {

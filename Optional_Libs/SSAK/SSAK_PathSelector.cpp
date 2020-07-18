@@ -72,22 +72,15 @@ string SSAK_PathSelector::DebugSelectorInfo (bool onlyProperties) const
 //! @param deselectTable        Table to use for deselecting a path
 //! @param properties           Properties of the selector (mainly to report that it can select no path or not)
 //!
-SSAK_PathSelector::SSAK_PathSelector (std::vector<std::shared_ptr<Register>> associatedRegisters,
+SSAK_PathSelector::SSAK_PathSelector (std::shared_ptr<Register> associatedRegister,
                                                               uint32_t               pathsCount,
                                                               const std::string& parameters)
   : PathSelector    (SelectorProperty::CanSelectNone)
   , m_pathsCount    (pathsCount)
-  , m_muxRegisters  (associatedRegisters.front())
+  , m_muxRegisters  (associatedRegister)
 {
   try{
    
-   if (associatedRegisters.size()!= 2)
-     {
-      ostringstream os; os << "SSAK needs 2 registers, " << associatedRegisters.size() << " given ";
-      throw std::logic_error(os.str());
-     }
-   std::shared_ptr<Register> associatedRegister = associatedRegisters.front();
-   m_S2IB_Register = associatedRegisters.back();
 
  /* Example Senario:
   Crypto-processeir : AES128
@@ -95,34 +88,36 @@ SSAK_PathSelector::SSAK_PathSelector (std::vector<std::shared_ptr<Register>> ass
   NB: this information should come from parsing the Parameters string
 */
 
- m_KeySize = 128;
-
-  std::string tmp_string(m_KeySize, '0');
-  tmp_string[m_KeySize-1]='1';
-  m_SSAKAuthenticationSuccess = BinaryVector::CreateFromBinaryString(tmp_string);
-  tmp_string[m_KeySize-1]='0';
-  tmp_string[m_KeySize-2]='1';
-  m_SSAKAuthenticationFailure = BinaryVector::CreateFromBinaryString(tmp_string);
-
- 
 LOG(INFO)<<"SSAK Parameter string: " << parameters;
 
    auto results     = Utility::Split(parameters, " ");
-//Parse and Check Parameters
-int paramcount=0;
-for (const auto& param_n : results)
-   LOG(INFO)<<"SSAK Parameter "<< paramcount++ << " : " << param_n;
+   
+LOG(INFO)<<"Found "<< results.size()<< " Parameters";
 
-#define NUM_OF_S2IB 0x0D // 13
+  CHECK_PARAMETER_EQ(results.size(),2,"SSAK needs two parameters: Key (in hexadecimal) and max suppported S2IB");
 
-  auto S2SIB_count =  NUM_OF_S2IB;
+  m_SSAK_Key = BinaryVector::CreateFromHexString(results.at(0));
+  m_max_S2SIB =   std::stoull(std::string(results.at(1)));
+
+  LOG(INFO)<<"SSAK Key:  "<<m_SSAK_Key.DataAsHexString();
+  LOG(INFO)<<"Max_S2SIB "<< m_max_S2SIB; 
+
   //Instantiating sahed pointer to derived class microAES
   auto local_microaes = make_shared<microAES>();
   // casting back to base class cryptoProc
   m_CryptoProcesseur= std::dynamic_pointer_cast<cryptoProc>(local_microaes);
     
-    m_SSAKdriver = make_shared<SSAKplugin>(*m_CryptoProcesseur,S2SIB_count);
+    m_SSAKdriver = make_shared<SSAKplugin>(*m_CryptoProcesseur,m_max_S2SIB);
     m_interfaceSize = m_SSAKdriver->getInterfaceSize();
+
+    LOG(INFO)<<"InterfaceSize :"<< m_interfaceSize;
+
+   std::string tmp_string(m_interfaceSize, '0');
+   tmp_string[m_interfaceSize-1]='1';
+   m_SSAKAuthenticationSuccess = BinaryVector::CreateFromBinaryString(tmp_string);
+   tmp_string[m_interfaceSize-1]='0';
+   tmp_string[m_interfaceSize-2]='1';
+   m_SSAKAuthenticationFailure = BinaryVector::CreateFromBinaryString(tmp_string);
     
     m_SelectorState = SSAK_SelectorState::CLOSED;
     
@@ -275,8 +270,8 @@ SSAK_PathSelector::SSAK_SelectorState SSAK_PathSelector::DoAuthentication (uint3
   bool pendingWrite = AssociatedRegisters()->NextToSut() != AssociatedRegisters()->LastToSut();
   BinaryVector AuthenticationResult;
   
-  std::string config_string(m_KeySize, '0');
-  config_string[m_KeySize-Cardinality]='1';
+  std::string config_string(m_interfaceSize, '0');
+  config_string[m_interfaceSize-Cardinality]='1';
 
  auto config = BinaryVector::CreateFromBinaryString(config_string);
 
@@ -298,7 +293,9 @@ SSAK_PathSelector::SSAK_SelectorState SSAK_PathSelector::DoAuthentication (uint3
 	    LOG(INFO)<<"SSAK received challenge: : "<< challenge_BV.DataAsHexString();
 	    	    //Compute response from challenge and write it back to the register
 	    const u8* Response=m_SSAKdriver->computeResponse
-	    				(m_SSAK_bits,challenge_BV.Get_DataVector().data());
+	    				(m_SSAK_Key.Get_DataVector().data(),
+					//m_SSAK_bits,
+					challenge_BV.Get_DataVector().data());
 	    std::vector<u8> Response_V (Response,Response+m_interfaceSize/8);
 	    auto Response_BV
 	     = BinaryVector::CreateFromRightAlignedBuffer(Response_V,m_interfaceSize);
@@ -306,6 +303,7 @@ SSAK_PathSelector::SSAK_SelectorState SSAK_PathSelector::DoAuthentication (uint3
             m_SelectorState=AUTHENTICATION_CHECK;
 	    AssociatedRegisters()->SetPendingForRead(true);
 	    m_attempts = 0;
+	    
 	   }
 	  break;
    case AUTHENTICATION_CHECK: 
@@ -320,8 +318,7 @@ SSAK_PathSelector::SSAK_SelectorState SSAK_PathSelector::DoAuthentication (uint3
 	    LOG(INFO)<<"SSAK authentication result: "<< AuthenticationResult.DataAsHexString();
 	    if (AuthenticationResult == m_SSAKAuthenticationSuccess)
 	     {
-	      //Challenge Successfull, open S2IB
-	        m_S2IB_Register->SetToSut(BinaryVector::CreateFromBinaryString("1"));
+	      //Challenge Successfull
                m_SelectorState=OPEN;
 	      break;
 	     }

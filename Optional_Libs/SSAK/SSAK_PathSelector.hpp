@@ -55,7 +55,7 @@ class MAST_CORE_EXPORT SSAK_PathSelector : public PathSelector
 */
   //! Constructor Compatible with Hybrid factory creator (multiple registers)
   //!
-  SSAK_PathSelector(std::vector<std::shared_ptr<Register>> associatedRegisters,
+  SSAK_PathSelector(std::shared_ptr<Register> associatedRegister,
                                 uint32_t               pathsCount,
 				const std::string& parameters);
 
@@ -120,14 +120,15 @@ class MAST_CORE_EXPORT SSAK_PathSelector : public PathSelector
   //
   uint32_t        m_pathsCount;                 //!< Number of managed paths
   VirtualRegister m_muxRegisters; 	        //!< SSAK control Register
-  std::shared_ptr<Register> m_S2IB_Register;   //!< S2B control Register
 
   std::shared_ptr<cryptoProc>     m_CryptoProcesseur ;
   std::shared_ptr<SSAKplugin>      m_SSAKdriver;    //!< Instantiation of the SSAK authentication processor
-  uint32_t        m_interfaceSize;    //!< Maximal Number of managed paths
+  uint32_t        m_max_S2SIB ;    //!<Maximal Number of managed paths
+
+  uint32_t        m_interfaceSize; //! Word size for the Criptoprocessor
   
-  uint32_t  m_KeySize ; 
-  u8 m_SSAK_bits[16]={0x72 ,0xc4 ,0x35 ,0x8f ,0x5a ,0x8a ,0x07 ,0xaf ,0x3d ,0x0f ,0x7d ,0x56 ,0x0a ,0x87 ,0x2a ,0x2b};
+  BinaryVector m_SSAK_Key; 
+//  u8 m_SSAK_bits[16]={0x72 ,0xc4 ,0x35 ,0x8f ,0x5a ,0x8a ,0x07 ,0xaf ,0x3d ,0x0f ,0x7d ,0x56 ,0x0a ,0x87 ,0x2a ,0x2b};
 //!<SSAK private key : to be loaded from SIT
 
   SSAK_SelectorState m_SelectorState;

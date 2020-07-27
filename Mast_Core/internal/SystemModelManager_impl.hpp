@@ -368,6 +368,7 @@ class SystemModelManager_impl final
   uint32_t                         m_activeThreads;                  //!< Counts Applications Threads currently active 
   bool                          m_waitFullPending;        //!< Waits for all threads to be pending before triggering a data cycle  
   bool                          m_KillAllThreads=false;  //!<When closing Manager, forcefully kill all application threads
+  std::string			m_OriginalExceptionMessage;      //!<Exception generating forced halt during Data Cycle
 };
 //
 //  End of SystemModelManager_impl class declaration

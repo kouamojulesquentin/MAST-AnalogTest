@@ -30,6 +30,7 @@ typedef  uint32_t Callback_t;
 
 //Fake request used to release DataCycle
 #define NO_MORE_PENDING  "AI_FINISHED"
+#define HALT_REQUEST     "HALT_REQUEST"
 
 #endif
 //===========================================================================

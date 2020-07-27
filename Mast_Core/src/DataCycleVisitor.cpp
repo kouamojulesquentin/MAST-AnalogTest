@@ -37,9 +37,19 @@ void DataCycleVisitor::VisitAccessInterface (AccessInterface& accessInterface)
     CHECK_VALUE_NOT_NULL(protocol, "All AccessInterface must be associated with a valid protocol");
 
 //  if (accessInterface.IsPending()) //Redundant in normal usage, causes hang in multithreaded operation
+  try
   {
      m_manager->DoHierarchicalDataCycle(&accessInterface);
   }
+  catch(std::exception& exc)  // Catch C++ standard exceptions
+    {
+     LOG(INFO) <<"Catching exception thrown by DoHierarchicalDataCycle";
+     m_manager->m_KillAllThreads = true; //Asks for forceful thread termination
+     m_manager->m_OriginalExceptionMessage = exc.what();
+     m_manager->Stop(); //Asks for forceful Manager termination
+     LOG(INFO) <<"Should not come here";
+  }
+
 }
 //
 //  End of: DataCycleVisitor::VisitAccessInterface
@@ -51,10 +61,12 @@ void DataCycleVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator&accessInterfaceTranslator)
 
 {
+ if (m_manager->m_runLoop == true)
+ {
  auto AI_data_cycle = [this] (std::shared_ptr<mast::AccessInterface> accessInterface) {
-   LOG(DEBUG) << "Starting Thread for accessInterface"<<accessInterface->Name() ;
+   LOG(DEBUG) << "Starting Thread for accessInterface "<<accessInterface->Name() ;
   VisitAccessInterface(*accessInterface);
-   LOG(DEBUG) << "Finished Thread for accessInterface"<<accessInterface->Name() ;
+   LOG(DEBUG) << "Finished Thread for accessInterface "<<accessInterface->Name() ;
 // m_manager->DoHierarchicalDataCycle(&accessInterface);
  };
  auto TR_data_cycle = [this] (AccessInterfaceTranslator& translator) {
@@ -127,10 +139,13 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
    while(cycle_AI)
    {
    //auto request = accessInterfaceTranslator.PopRequest(cur_interface);
-   auto request = accessInterfaceTranslator.PopAllRequests();
+   auto request = accessInterfaceTranslator.PopAllRequests(&(m_manager->m_runLoop));
+   
       //At this moment, the AI Callback is waiting on the Result queue
     LOG(DEBUG) << "accessInterfaceTranslator.PopAllRequest() done";
     LOG(DEBUG) << "Request is " << request.CallbackId();
+   if (request.CallbackId() == HALT_REQUEST)
+       THROW_LOGIC_ERROR(m_manager->m_OriginalExceptionMessage);
 
   //Execute callback translator
   //Push fromSut to wake AI_thread up
@@ -153,6 +168,8 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
     CallbackRequest request(NO_MORE_PENDING);
     T_2_E_protocol->TransformationCallback(request);
    } 
+   
+  }
 }
 //
 //  End of: DataCycleVisitor::VisitAccessInterfaceTranslator

@@ -17,6 +17,7 @@
 #include "ParentNode.hpp"
 #include "BinaryVector.hpp"
 #include "CallbackRequest.hpp"
+#include "CallbackIds.hpp"
 #include "MTQueue.hpp"
 #include "AccessInterfaceTranslatorProtocol.hpp"
 #include <functional>
@@ -77,12 +78,12 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
        }
      return item;}; //!<returns the oldest request. NB: it is a BLOCKING call
 
-   CallbackRequest PopAllRequests() {  
+   CallbackRequest PopAllRequests(bool *runLoop) {  
      constexpr auto timeout = 2ms;
      std::cv_status   status;
      CallbackRequest item; 
      uint32_t n_interface=0;
-     while (1) //Infinite loop on all Callaback queues
+     while (*runLoop) //Infinite loop on all Callaback queues
       {
       LOG(DEBUG) << "Node " << this->Name()<<" : Popping a request on interface "<<n_interface<< " of "<<m_CallbackQueue.size() ;
       status=m_CallbackQueue[n_interface]->Pop(item,timeout);
@@ -91,6 +92,8 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
       n_interface++;
       n_interface%=m_CallbackQueue.size();
       }
+      
+     if (*runLoop==false) item = CallbackRequest(HALT_REQUEST); //If Manager is stopped, release interface
      
      return item;
      }; //!<returns the oldest request. NB: it is a BLOCKING call

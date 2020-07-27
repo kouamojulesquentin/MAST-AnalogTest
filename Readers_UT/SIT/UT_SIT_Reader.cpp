@@ -1749,7 +1749,7 @@ void UT_SIT_Reader::test_LINKER_Error ()
                "  REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
                "  REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
                ")"s,
-               "SIT Parsing error: Line 2:1-2: LINKER node \"test_LINKER\" Error, specified selector register \"selector_reg\" does not exist"),
+               "SIT Parsing error: Line 2:1-2: LINKER node \"test_LINKER\" Error, specified selector node \"selector_reg\" does not exist"),
     // 02 ==> Error : one selector register followed by a comme 
     make_tuple("LINKER test_LINKER One_Hot test_reg_1, 4\n"
                "(\n"

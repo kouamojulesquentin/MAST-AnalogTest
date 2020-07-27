@@ -50,7 +50,7 @@ namespace
 DefaultS2IBPathSelector::DefaultS2IBPathSelector (std::vector<std::shared_ptr<SystemModelNode>> associatedNodes,
                                 uint32_t               pathsCount,
 				const std::string& parameters)
-  : PathSelector    (SelectorProperty::Binary_Default)
+  : PathSelector    (SelectorProperty::CanSelectNone)
 {
 
    LOG(INFO)<<"S2IB Parameter string: " << parameters;
@@ -87,9 +87,12 @@ DefaultS2IBPathSelector::DefaultS2IBPathSelector (std::vector<std::shared_ptr<Sy
    
    m_muxRegisters = VirtualRegister(associatedRegister);
    m_pathsCount = 1;
-   m_SelectValue = BinaryVector::CreateFromBinaryString("1");
-   m_DeSelectValue = BinaryVector::CreateFromBinaryString("0");
-
+   m_SelectValue = BinaryVector::CreateFromBinaryString("/b1");
+   m_DeSelectValue = BinaryVector::CreateFromBinaryString("/b0");
+   
+   LOG(DEBUG) << "Select Value set to  " << m_SelectValue.DataAsBinaryString();
+   LOG(DEBUG) << "DeSelect Value set to  " << m_DeSelectValue.DataAsBinaryString();
+   
 }
 
 //
@@ -166,6 +169,11 @@ bool DefaultS2IBPathSelector::IsSelected (uint32_t pathIdentifier) const
   auto  nextToSut   = AssociatedRegisters()->NextToSut();
 
   bool  isSelected  = nextToSut == selectValue;
+  
+  LOG(DEBUG) << "Comparing SelectValue  " << m_SelectValue.DataAsBinaryString() << " and nextToSut " << nextToSut.DataAsBinaryString();
+
+  
+  LOG(DEBUG)<< isSelected;
 
   return isSelected;
 }
@@ -202,7 +210,7 @@ void DefaultS2IBPathSelector::Deselect (uint32_t pathIdentifier)
   CheckPathIdentifier(pathIdentifier);
   
 
-   auto& selectValue  = m_SelectValue;
+   auto& selectValue  = m_DeSelectValue;
   const auto  muxRegisters = AssociatedRegisters();
 
   if (muxRegisters->NextToSut() != selectValue)
@@ -236,13 +244,15 @@ void DefaultS2IBPathSelector::Select (uint32_t pathIdentifier)
       //Authentication successfull, open S2IB
        {
         //---Control of Selection Bit ---start
-        const auto selectValue  = BinaryVector::CreateFromBinaryString("1");
+        const auto selectValue  = m_SelectValue;
         const auto  muxRegisters = AssociatedRegisters();
 
         if (muxRegisters->NextToSut() != selectValue)
         {
           muxRegisters->SetToSut(selectValue);
           muxRegisters->SetPending();
+	  LOG(DEBUG) << "Setting S2IB to " << selectValue.DataAsBinaryString();
+	  LOG(DEBUG) << "NextToSut: " << muxRegisters->NextToSut().DataAsBinaryString();
         }
         //---Control of Selection Bit ---end
       }

@@ -11,7 +11,7 @@ TRANSLATOR top Simulation
      REGISTER SSAK_CONTROL_REG 128 Bypass: "0x00000000000000000000000000000000"
      )
     ) 
-  REGISTER S2IB_1_ctrl 1 Bypass: "0b0"
+  REGISTER S2IB_1_ctrl 1 Hold_value Bypass: "0b0"
   LINKER S2IB_1 S2IB SSAK_Controller,S2IB_1_ctrl  1 "1"
   PDL Console_Incr
    (

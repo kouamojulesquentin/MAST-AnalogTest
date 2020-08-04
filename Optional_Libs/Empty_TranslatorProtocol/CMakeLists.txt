@@ -27,7 +27,6 @@ message("")
 add_library                (EmptyTranslator SHARED     "${Sources}")
 set_target_properties      (EmptyTranslator PROPERTIES COMPILE_FLAGS "${FLAGS}" )
 target_include_directories (EmptyTranslator PUBLIC  ${LIBMAST_CORE_INCLUDE_DIRS})   # Necessary because we do not link to Mast_Core - it is public for usage by dependent applications
-target_link_libraries      (Trivium ${PYTHON_LIBRARIES})
 
 
 

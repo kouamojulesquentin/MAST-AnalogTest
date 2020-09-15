@@ -316,8 +316,11 @@ SSAK_PathSelector::SSAK_SelectorState SSAK_PathSelector::DoAuthentication (uint3
 	   {
 	    AssociatedRegisters()->LastFromSut(AuthenticationResult);
 	    LOG(INFO)<<"SSAK authentication result: "<< AuthenticationResult.DataAsHexString();
+	    LOG(INFO)<<"Success is : "<< m_SSAKAuthenticationSuccess.DataAsHexString();
+	    LOG(INFO)<<"Failure is : "<< m_SSAKAuthenticationFailure.DataAsHexString();
 	    if (AuthenticationResult == m_SSAKAuthenticationSuccess)
 	     {
+   	      LOG(INFO)<<"SSAK authentication SUCCESS";
 	      //Challenge Successfull
                m_SelectorState=OPEN;
 	      break;
@@ -331,6 +334,7 @@ SSAK_PathSelector::SSAK_SelectorState SSAK_PathSelector::DoAuthentication (uint3
 	      { 
 	      //Authentication has not finished yet
 	      m_attempts++;
+      	     LOG(INFO)<<"Attempt "<< m_attempts <<" out of a maximum of " << SSAK_CONNECTION_WATCHDOG;
 	      if (m_attempts==SSAK_CONNECTION_WATCHDOG)
 	       THROW_RUNTIME_ERROR("SSAK Selector : Authentication Timeout"); break;  
 	      

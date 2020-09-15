@@ -233,12 +233,14 @@ void DefaultS2IBPathSelector::Select (uint32_t pathIdentifier)
 {
   CheckPathIdentifier(pathIdentifier);
 
+  LOG(INFO) << "Entering Select for S2IB ";
     //BinaryVector config(m_interfaceSize);
   //Example;=: in reality should be computed from S2IB cardinality (position)
   // pathIdentifier is useless because each S2IB has 1 derivation
 
   if (! IsSelected(1u)) //S2IB not selected yet
     {
+      LOG(INFO) << "Triggering SSAK Authentication";
      auto SSAK_State=  m_S2IB_SSAK_PathSelector->DoAuthentication(m_cardinality);
      if (SSAK_State==SSAK_PathSelector::SSAK_SelectorState::OPEN)
       //Authentication successfull, open S2IB

@@ -97,6 +97,7 @@ LOG(INFO)<<"Found "<< results.size()<< " Parameters";
   CHECK_PARAMETER_EQ(results.size(),2,"SSAK needs two parameters: Key (in hexadecimal) and max suppported S2IB");
 
   m_SSAK_Key = BinaryVector::CreateFromHexString(results.at(0));
+  
   m_max_S2SIB =   std::stoull(std::string(results.at(1)));
 
   LOG(INFO)<<"SSAK Key:  "<<m_SSAK_Key.DataAsHexString();
@@ -280,6 +281,7 @@ SSAK_PathSelector::SSAK_SelectorState SSAK_PathSelector::DoAuthentication (uint3
     case CLOSED: 
           //Write configuration to control register
 	  AssociatedRegisters()->SetToSut(std::move(config));
+         LOG(INFO)<<"SSAK sent Config : "<< AssociatedRegisters()->NextToSut().DataAsHexString();
 	  m_SelectorState=CONFIG_SENT;
 	  break;
     case CONFIG_SENT: 
@@ -296,9 +298,11 @@ SSAK_PathSelector::SSAK_SelectorState SSAK_PathSelector::DoAuthentication (uint3
 	    				(m_SSAK_Key.Get_DataVector().data(),
 					//m_SSAK_bits,
 					challenge_BV.Get_DataVector().data());
+					
 	    std::vector<u8> Response_V (Response,Response+m_interfaceSize/8);
 	    auto Response_BV
 	     = BinaryVector::CreateFromRightAlignedBuffer(Response_V,m_interfaceSize);
+	    LOG(INFO)<<"SSAK challenge response : "	     << Response_BV.DataAsHexString();
  	    AssociatedRegisters()->SetToSut(std::move(Response_BV));
             m_SelectorState=AUTHENTICATION_CHECK;
 	    AssociatedRegisters()->SetPendingForRead(true);

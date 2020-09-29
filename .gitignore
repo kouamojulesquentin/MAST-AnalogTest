@@ -188,3 +188,7 @@ build
 /SystemVerilog/.v*
 /Applications/Debug_mux/ETS/
 /Applications/Debug_mux/tmp/
+/RTL/vhdl/work/*
+/RTL/vhdl/*.do
+/RTL/vhdl/*.log
+/RTL/vhdl/*.txt

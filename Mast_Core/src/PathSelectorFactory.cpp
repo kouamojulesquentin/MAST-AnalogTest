@@ -50,6 +50,8 @@ void PathSelectorFactory::Clear ()
   m_stdCreators.clear();
   m_customCreators.clear();
   m_fullCustomCreators.clear();
+  m_HybridCustomCreators.clear();
+  m_GenericCustomCreators.clear();
 }
 //
 //  End of: PathSelectorFactory::Clear

@@ -235,6 +235,65 @@ void SystemModelManager_impl::CreateApplicationThread (shared_ptr<ParentNode> ap
 //!
 void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentAccessInterface)
 {
+  auto ApplyStreamer = [this](uint32_t before_bits,uint32_t EndOfProtectedBits,NodeIdentifier StreamerId, BinaryVector& Vector,bool NewMask)
+	   {
+	     BinaryVector mask_protected, mask_in_after,mask_out_after;
+	     BinaryVector Vector_Chyper;
+	     BinaryVector mask;
+	    
+	    CHECK_PARAMETER_GT(EndOfProtectedBits,before_bits,"Protected Segment must have a positive size");
+	     
+	    std::shared_ptr<Streamer> streamer = std::dynamic_pointer_cast<Streamer>(m_sm.NodeWithId(StreamerId));
+	    LOG(DEBUG)<<"TOSUT: Applying a streamer transformation of protocol " << streamer->Protocol()->KindName() << " between bits " << before_bits<< " and "<<EndOfProtectedBits;
+            auto protectedBits = EndOfProtectedBits - before_bits;
+	    auto after_bits = Vector.BitsCount() -EndOfProtectedBits;
+	     
+	    LOG(DEBUG)<<"ApplyStreamer: Bits before streamer: " << before_bits << " inside " << protectedBits<< " and after "<<after_bits;
+	     
+	    if (NewMask)  mask = streamer->Protocol()->NewMask(Vector.BitsCount());
+	      else
+	         mask = streamer->Protocol()->CurrentMask();
+		
+	       LOG(DEBUG)<<"ApplyStreamer: Mask_in_before: ( 0 to "<< (EndOfProtectedBits-1) << ") for " << after_bits << " Bits";
+	     LOG(DEBUG)<<"ApplyStreamer: Mask_protected: ( " << before_bits <<" to "<< (EndOfProtectedBits-1) << ") for " << protectedBits << " Bits";
+	     LOG(DEBUG)<<"ApplyStreamer: Mask_in_after: ( "<< mask.BitsCount()-after_bits << " to "<< mask.BitsCount() << ")";
+	     
+	     LOG(DEBUG)<< "mask_protected, size " << protectedBits;
+	     mask_protected = mask.Slice(after_bits,protectedBits);
+ 
+	    	     if (after_bits> 0)
+	     {
+	     LOG(DEBUG)<< "mask_in_after";
+	     mask_in_after     = mask.Slice(0,after_bits);
+	     LOG(DEBUG)<< "vector_after";
+	     auto vector_after = Vector.Slice(0,after_bits);
+	     LOG(DEBUG)<< "mask_out_after";
+	     mask_out_after = mask.Slice(mask.BitsCount()-after_bits,after_bits);
+	     LOG(DEBUG)<< "Slices done";
+	     	     
+	     //Bits for segments AFTER the streamer (i.e. closer to TDO) must be encrypted twice with masks slices coming from the two ends of the total mask
+	     auto AfterVector = streamer->Protocol()->ApplyMask(vector_after,mask_in_after);
+	     AfterVector = streamer->Protocol()->ApplyMask(AfterVector,mask_out_after);
+	     
+	     Vector_Chyper.Append(AfterVector);
+	     
+	     }
+
+            	    //The protected part is crypted only once 	
+	    LOG(DEBUG)<< "vector_protected, size " << protectedBits;
+	    auto vector_protected = Vector.Slice(after_bits,protectedBits);
+
+	    auto ProtectedVector = streamer->Protocol()->ApplyMask(vector_protected,mask_protected);
+	    Vector_Chyper.Append(ProtectedVector);
+	    
+	    //bits for segments BEFORE the Streamer ( i.e. closer to TDI) are not encrypted
+ 	    LOG(DEBUG)<< "Before slice starts at "<< mask.BitsCount()-before_bits<<" for a size of "<<before_bits;
+	    if (before_bits > 0)
+	      Vector_Chyper.Append(Vector.Slice(mask.BitsCount()-before_bits,before_bits));
+	     
+            return Vector_Chyper;
+	    };
+
   CHECK_PARAMETER_NOT_NULL(currentAccessInterface, "Houps can only operate on valid AccessInterface");
 
     auto protocol = currentAccessInterface->Protocol();
@@ -254,15 +313,32 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
 
         nextEndPoint->Accept(local_toSutVisitor);
 
-        const auto& toSutVector = local_toSutVisitor.ToSutVector();
+        auto& toSutVector = local_toSutVisitor.ToSutVector();
+	m_ActiveStreamers = local_toSutVisitor.ActiveStreamers();
+	LOG(DEBUG)<<" Streamers encountered in active path: "<<m_ActiveStreamers.size();
 
         if (!toSutVector.IsEmpty()) // This can be empty when actual SUT state prevent from serving pending Registers
         {
+	  //Apply Streamer transformation to toSutVector before sending it
+	 for (auto Level : m_ActiveStreamers)
+	    toSutVector = ApplyStreamer(std::get<0>(Level),std::get<1>(Level),std::get<2>(Level),toSutVector,true); //Setting encrypted vector as current toSut
+
           const auto& activeRegs = local_toSutVisitor.ActiveRegistersIdentifiers();
 
           BinaryVector fromSutVector;
           
           fromSutVector = protocol->DoCallback(endpointId, nextEndPoint->ApplicationData(), toSutVector);
+
+	  //Apply Streamer transformation to fromSutVector before processing it
+	  while (!m_ActiveStreamers.empty())
+	   {
+	    auto Level = m_ActiveStreamers.back();
+	    std::shared_ptr<Streamer> streamer = std::dynamic_pointer_cast<Streamer>(m_sm.NodeWithId(std::get<2>(Level)));
+	    LOG(DEBUG)<<"FROMSUT: Applying a streamer transformation of protocol " << streamer->Protocol()->KindName() << " between bits " << std::get<1>(Level)<< " and "<<std::get<0>(Level);
+	    fromSutVector = ApplyStreamer(fromSutVector.BitsCount()-std::get<1>(Level),fromSutVector.BitsCount()-std::get<0>(Level),std::get<2>(Level),fromSutVector,false); //Setting encrypted vector as current toSut
+ 
+	    m_ActiveStreamers.pop_back();
+	   }
 
           m_fromSutUpdater.UpdateRegisters(activeRegs, fromSutVector);
           ReportServedRegisters(activeRegs);

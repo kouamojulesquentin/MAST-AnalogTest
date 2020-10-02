@@ -315,7 +315,6 @@ class SystemModelManager_impl final
   std::shared_ptr<ApplicationData> ApplicationDataForThreadId (std::thread::id threadId) const;
   std::shared_ptr<ApplicationData> ThreadApplicationData() const { return ApplicationDataForThreadId(std::this_thread::get_id()); }
 
-
   const NodePathResolver& PathResolver(const char* file, const char* fct, uint32_t line, std::experimental::string_view msg);
 
   void ProcessQueuedRequests (std::shared_ptr<ApplicationData> appData);
@@ -369,6 +368,9 @@ class SystemModelManager_impl final
   bool                          m_waitFullPending;        //!< Waits for all threads to be pending before triggering a data cycle  
   bool                          m_KillAllThreads=false;  //!<When closing Manager, forcefully kill all application threads
   std::string			m_OriginalExceptionMessage;      //!<Exception generating forced halt during Data Cycle
+
+  typedef std::tuple <uint32_t,uint32_t,NodeIdentifier> Streamer_Level;
+  std::vector <Streamer_Level>  m_ActiveStreamers;    //!>Streamers on the active scan path
 };
 //
 //  End of SystemModelManager_impl class declaration

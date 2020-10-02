@@ -531,6 +531,13 @@ void GmlPrinter::VisitChain (Chain& chain)
   AppendParentNode(m_shape_Chain, m_color_Chain, "", chain);
 }
 
+//! Appends Streamer node to GML graph
+//!
+void GmlPrinter::VisitStreamer (Streamer& streamer)
+{
+  AppendParentNode(m_shape_Chain, m_color_Chain, "", streamer);
+}
+
 //! Appends Linker node to GML graph
 //!
 //! @note Supposes that path selector associated with linker will be made of SystemModelNode too

@@ -504,6 +504,16 @@ void SystemModelChecker::VisitChain (Chain& )
 //  End of: SystemModelChecker::VisitChain
 //---------------------------------------------------------------------------
 
+//! Checks consistency specific to Streamer nodes
+//!
+void SystemModelChecker::VisitStreamer (Streamer& )
+{
+  // Nothing to do yet
+}
+//
+//  End of: SystemModelChecker::VisitStreamer
+//---------------------------------------------------------------------------
+
 
 //! Checks consistency specific to Linker nodes
 //!

@@ -52,6 +52,7 @@ set(SYSTEM_MODEL_HEADERS "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_AccessInterfa
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_SystemModelChecker.hpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_SystemModelFactory.hpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_SystemModelManager.hpp"
+                         "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_Streamer.hpp"
                          )
 
 set(SYSTEM_MODEL_SOURCES "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_AccessInterfaceProtocolFactory.cpp"
@@ -88,7 +89,8 @@ set(SYSTEM_MODEL_SOURCES "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_AccessInterfa
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_SystemModelNode.cpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_ToSutVisitor.cpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_VirtualRegister.cpp"
-                         "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_VirtualRegister.hpp")
+                         "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_VirtualRegister.hpp"
+                         "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_Streamer.cpp")
 
 set(UTILITY_HEADERS "${CMAKE_CURRENT_LIST_DIR}/Utility/UT_BinaryVector.cpp"
                     "${CMAKE_CURRENT_LIST_DIR}/Utility/UT_BinaryVector.hpp"

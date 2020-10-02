@@ -475,6 +475,15 @@ void PrettyPrinter::VisitChain (Chain& chain)
   StreamParentNode("Chain", chain);
 }
 
+//! Appends content of Streamer node in text representation and visits
+//! sub-nodes
+//!
+void PrettyPrinter::VisitStreamer (Streamer& streamer)
+{
+  StreamParentNode("Streamer", streamer);
+}
+
+
 //! Appends content of Linker node in text representation and visits
 //! sub-nodes
 //!

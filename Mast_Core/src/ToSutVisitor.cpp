@@ -39,7 +39,7 @@ void ToSutVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator& ac
   VisitChildren(accessInterfaceTranslator);
 }
 //
-//  End of: ToSutVisitor::VisitChain
+//  End of: ToSutVisitor::VisitAccessInterfaceTranslator
 //---------------------------------------------------------------------------
 
 
@@ -53,6 +53,22 @@ void ToSutVisitor::VisitChain (Chain& chain)
 //  End of: ToSutVisitor::VisitChain
 //---------------------------------------------------------------------------
 
+//! Visits Streamer pending children
+//!
+void ToSutVisitor::VisitStreamer (Streamer& streamer)
+{
+  Streamer_Level Current_Level;
+  std::get<0>(Current_Level) = m_toSutVector.BitsCount(); //Save position of streamer INPUT
+  
+  VisitChildren(streamer);
+  
+  std::get<1>(Current_Level) = m_toSutVector.BitsCount(); //Save position of streamer OUTPUT
+  std::get<2>(Current_Level) = streamer.Identifier(); //Save reference to streamer node
+  m_ActiveStreamers.emplace_back(Current_Level);
+}
+//
+//  End of: ToSutVisitor::VisitStreamer
+//---------------------------------------------------------------------------
 
 
 

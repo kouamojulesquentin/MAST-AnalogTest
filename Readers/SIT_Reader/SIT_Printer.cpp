@@ -202,6 +202,14 @@ void SIT_Printer::VisitChain (Chain& chain)
   StreamParentNode("CHAIN", chain);
 }
 
+//! Appends content of Streamer node in text representation and visits
+//! sub-nodes
+//!
+void SIT_Printer::VisitStreamer (Streamer& streamer)
+{
+  StreamParentNode("STREAMER", streamer);
+}
+
 //! Appends content of Linker node in text representation and visits
 //! sub-nodes
 //!

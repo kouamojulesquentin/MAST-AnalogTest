@@ -38,7 +38,8 @@ class SIT_Printer final: public SystemModelVisitor
   virtual void VisitLinker          (Linker&          linker)          override;
   virtual void VisitRegister        (Register&        reg)             override;
   virtual void VisitAccessInterfaceTranslator (AccessInterfaceTranslator&accessInterfaceTranslator) override;
-  
+   virtual void VisitStreamer          (Streamer&          streamer)          override;
+ 
   std::string SIT_Text() const { return m_os.str(); } //!< Returns currently visited nodes representation using SIT files syntax
 
 

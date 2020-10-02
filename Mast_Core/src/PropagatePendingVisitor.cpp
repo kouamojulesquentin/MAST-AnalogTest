@@ -51,6 +51,17 @@ void PropagatePendingVisitor::VisitChain (Chain& chain)
 //  End of: PropagatePendingVisitor::VisitChain
 //---------------------------------------------------------------------------
 
+//! Updates Streamer pending flag
+//!
+void PropagatePendingVisitor::VisitStreamer (Streamer& streamer)
+{
+  auto pendingCount = ChildrenPendings(streamer);
+  streamer.SetPendingCount(pendingCount);
+}
+//
+//  End of: PropagatePendingVisitor::VisitChain
+//---------------------------------------------------------------------------
+
 
 //! Visits direct children of a parent node, returning true if at least one is pending
 //!

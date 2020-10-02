@@ -40,6 +40,13 @@ void SystemModelReseter::VisitChain (Chain& chain)
   VisitParent(chain);
 }
 
+//! Resets Streamer and all its children nodes
+//!
+void SystemModelReseter::VisitStreamer (Streamer& streamer)
+{
+  VisitParent(streamer);
+}
+
 //! Resets Linker and all its children nodes
 //!
 void SystemModelReseter::VisitLinker (Linker& linker)

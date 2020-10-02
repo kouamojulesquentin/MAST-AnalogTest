@@ -52,6 +52,17 @@ void ConfigureVisitor::VisitChain (Chain& chain)
 //  End of: ConfigureVisitor::VisitChain
 //---------------------------------------------------------------------------
 
+//! Updates Streamer pending flag
+//!
+void ConfigureVisitor::VisitStreamer (Streamer& streamer)
+{
+  auto pendingCount = ConfigureChildren(streamer);
+  streamer.SetPendingCount(pendingCount);
+}
+//
+//  End of: ConfigureVisitor::VisitStreamer
+//---------------------------------------------------------------------------
+
 
 //! Visits direct children of a parent node, returning true if at least one is pending
 //!

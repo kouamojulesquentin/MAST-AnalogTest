@@ -103,6 +103,11 @@ class MAST_CORE_EXPORT SystemModel
                                                           std::shared_ptr<ParentNode>              parentNode = nullptr
                                                           );
 
+  // ---------------- Creates a new Streamer node
+  //
+  std::shared_ptr<Streamer>    CreateStreamer    (std::experimental::string_view name,
+                                            std::shared_ptr<ParentNode>    parentNode = nullptr);
+
   //! Sets root node
   //!
   void SetRoot(std::shared_ptr<ParentNode> newRoot) { ReplaceRoot(newRoot, true); };

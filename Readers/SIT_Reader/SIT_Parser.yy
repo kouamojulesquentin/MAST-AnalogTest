@@ -223,6 +223,7 @@ namespace
 %token <std::uint32_t> t_DecimalLiteral
 %token <std::string>   t_TRANSLATOR
 %token <std::string>   t_BROCADE
+%token <std::string>   t_STREAMER
 
 
 %%
@@ -721,6 +722,13 @@ t_TRANSLATOR  node_name TR_identifier AI_protocol_parameters
       ERROR_MESSAGE(msg) << STREAM_NODE_NAME("TRANSLATOR", $[node_name].name) << "Cannot create protocol: \"" << protocolName << "\"; " << exc.what();
       THROW_SYNTAX_ERROR(msg);
     }
+}
+|
+t_STREAMER  node_name TR_identifier AI_protocol_parameters
+{
+  auto chain = driver.systemModel->CreateStreamer($[node_name].name);
+//  Streamer->IgnoreForNodePath($[node_name].is_transparent);
+  $$ = std::make_pair(chain,true);
 }
 ;
 

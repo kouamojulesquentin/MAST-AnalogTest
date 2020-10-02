@@ -17,9 +17,11 @@
 #include "Chain.hpp"
 #include "Linker.hpp"
 #include "Register.hpp"
+#include "Streamer.hpp"
 
 using namespace mast;
 
+using std::dynamic_pointer_cast;
 
 
 //! Collects mismatches of a AccessInterface sub-nodes
@@ -41,6 +43,13 @@ void MismatchesCollector::VisitAccessInterfaceTranslator (AccessInterfaceTransla
 void MismatchesCollector::VisitChain (Chain& chain)
 {
   VisitChildren(chain);
+}
+
+//! Collects mismatches of a Streamer sub-nodes
+//!
+void MismatchesCollector::VisitStreamer (Streamer &streamer)
+{
+  VisitChildren(streamer);
 }
 
 //! Collects mismatches of a Linker sub-nodes

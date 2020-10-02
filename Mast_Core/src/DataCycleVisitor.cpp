@@ -187,6 +187,16 @@ void DataCycleVisitor::VisitChain (Chain& chain)
 //---------------------------------------------------------------------------
 
 
+//! Updates Streamer 
+//!
+void DataCycleVisitor::VisitStreamer (Streamer&  streamer)
+{
+  VisitChildren(streamer);
+}
+//
+//  End of: DataCycleVisitor::VisitStreamer
+//---------------------------------------------------------------------------
+
 //! Ignores Register
 //!
 void DataCycleVisitor::VisitRegister (Register&)

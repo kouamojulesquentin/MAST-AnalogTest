@@ -1,17 +1,17 @@
 //===========================================================================
-//                           TransparentStreamerProtocol.cpp
+//                           DummyStreamerProtocol.cpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file TransparentStreamerProtocol.cpp
+//! @file DummyStreamerProtocol.cpp
 //!
-//! Implements class TransparentStreamerProtocol
+//! Implements class DummyStreamerProtocol
 //!
 //===========================================================================
 
-#include "TransparentStreamerProtocol.hpp"
+#include "DummyStreamerProtocol.hpp"
 #include "Register.hpp"
 #include "Utility.hpp"
 
@@ -26,7 +26,7 @@ using std::shared_ptr;
 
 using namespace mast;
 
- TransparentStreamerProtocol::TransparentStreamerProtocol(const std::string& parameters)
+ DummyStreamerProtocol::DummyStreamerProtocol(const std::string& parameters)
   {
   }
 
@@ -34,25 +34,25 @@ using namespace mast;
    //! Creates a new Mask composed of only Zeros
   //!
   //!
-  BinaryVector& TransparentStreamerProtocol::NewMask (uint32_t MaskBits) 
+  BinaryVector& DummyStreamerProtocol::NewMask (uint32_t MaskBits) 
 {
  BinaryVector tmp(MaskBits,0b00000000);
   m_CurrentMask.Set(std::move(tmp));
   return m_CurrentMask;
 }
 //
-//  End of: TransparentStreamerProtocol::SelectionValue
+//  End of: DummyStreamerProtocol::SelectionValue
 //---------------------------------------------------------------------------
 
 //! Makes an OR with the zeo mask: no effect
 //!
 //!
-const BinaryVector TransparentStreamerProtocol::ApplyMask (BinaryVector PlainText,BinaryVector Mask) const
+const BinaryVector DummyStreamerProtocol::ApplyMask (BinaryVector PlainText,BinaryVector Mask) const
  {
   CHECK_PARAMETER_EQ(PlainText.BitsCount(),Mask.BitsCount(),"Vectors must have the same size");
   return PlainText|Mask;
  }
 
 //===========================================================================
-// End of TransparentStreamerProtocol.cpp
+// End of DummyStreamerProtocol.cpp
 //===========================================================================

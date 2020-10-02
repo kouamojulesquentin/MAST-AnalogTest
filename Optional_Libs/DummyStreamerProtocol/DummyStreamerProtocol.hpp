@@ -1,19 +1,19 @@
 //===========================================================================
-//                           TransparentStreamerProtocol.hpp
+//                           DummyStreamerProtocol.hpp
 //===========================================================================
 // Copyright (C) 2016 G-INP/Tima. All rights reserved.
 //
 // Project : Mast
 //
-//! @file TransparentStreamerProtocol.hpp
+//! @file DummyStreamerProtocol.hpp
 //!
-//! Declares class TransparentStreamerProtocol, which does nothing but can be used to 
+//! Declares class DummyStreamerProtocol, which does nothing but can be used to 
 //! experiment with StreamProtocols
 //!
 //===========================================================================
 
-#ifndef TRANSPARENTSTREAMER_H__5A3B6A4C_E465_423E_768A_56FFA405CB8B__INCLUDED_
-  #define TRANSPARENTSTREAMER_H__5A3B6A4C_E465_423E_768A_56FFA405CB8B__INCLUDED_
+#ifndef DUMMYSTREAMER_H__5A3B6A4C_E465_423E_768A_56FFA405CB8B__INCLUDED_
+  #define DUMMYSTREAMER_H__5A3B6A4C_E465_423E_768A_56FFA405CB8B__INCLUDED_
 
 #include "PathSelector.hpp"
 #include "BinaryVector.hpp"
@@ -29,19 +29,19 @@
 
 namespace mast
 {
-class MAST_CORE_EXPORT TransparentStreamerProtocol : public StreamerProtocol
+class MAST_CORE_EXPORT DummyStreamerProtocol : public StreamerProtocol
 {
   // ---------------- Public  Methods
   //
   public:
-  ~TransparentStreamerProtocol() = default;
-  TransparentStreamerProtocol()  = delete;
+  ~DummyStreamerProtocol() = default;
+  DummyStreamerProtocol()  = delete;
 
-  TransparentStreamerProtocol(const std::string& parameters);
+  DummyStreamerProtocol(const std::string& parameters);
 
   //! Returns readable type of selector
   //!
-  virtual std::experimental::string_view KindName() const override { return "TransparentStreamer"; };
+  virtual std::experimental::string_view KindName() const override { return "DummyStreamer"; };
 
   //! Creates a new Mask of MaskBits and returns it.
   //! It represents the Mask that will be applied to a stream of MaskBits
@@ -57,12 +57,12 @@ class MAST_CORE_EXPORT TransparentStreamerProtocol : public StreamerProtocol
 
 };
 //
-//  End of TransparentStreamerProtocol class declaration
+//  End of DummyStreamerProtocol class declaration
 //---------------------------------------------------------------------------
 } // End of namespace mast
 
-#endif  // not defined TRANSPARENTSTREAMER_H__5A3B6A4C_E465_423E_768A_56FFA405CB8B__INCLUDED_
+#endif  // not defined DummySTREAMER_H__5A3B6A4C_E465_423E_768A_56FFA405CB8B__INCLUDED_
 
 //===========================================================================
-// End of TransparentStreamerProtocol.hpp
+// End of DummyStreamerProtocol.hpp
 //===========================================================================

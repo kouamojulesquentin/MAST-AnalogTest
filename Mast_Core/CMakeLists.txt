@@ -100,6 +100,7 @@ set(Mast_Core_SOURCES ${Mast_Core_Platform_SOURCES}
                       "${CMAKE_CURRENT_SOURCE_DIR}/src/Dummy_TranslatorProtocol.cpp"
                       "${CMAKE_CURRENT_SOURCE_DIR}/src/Streamer.cpp"
                       "${CMAKE_CURRENT_SOURCE_DIR}/src/TransparentStreamerProtocol.cpp"
+                      "${CMAKE_CURRENT_SOURCE_DIR}/src/StreamerProtocolFactory.cpp"
                     )
 
 set(Public_Headers "${CMAKE_CURRENT_SOURCE_DIR}/include/AccessInterface.hpp"
@@ -187,7 +188,9 @@ set(Public_Headers "${CMAKE_CURRENT_SOURCE_DIR}/include/AccessInterface.hpp"
                    "${CMAKE_CURRENT_SOURCE_DIR}/include/T_2_T_TranslatorProtocol.hpp"
                    "${CMAKE_CURRENT_SOURCE_DIR}/include/Dummy_TranslatorProtocol.hpp"
                    "${CMAKE_CURRENT_SOURCE_DIR}/include/Streamer.hpp"
+                   "${CMAKE_CURRENT_SOURCE_DIR}/include/StreamerProtocol.hpp"
                    "${CMAKE_CURRENT_SOURCE_DIR}/include/TransparentStreamerProtocol.hpp"
+                   "${CMAKE_CURRENT_SOURCE_DIR}/include/StreamerProtocolFactory.hpp"
                  )
 
 set(Private_Headers "${CMAKE_CURRENT_SOURCE_DIR}/internal/Dll.hpp"

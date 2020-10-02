@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <memory>
 #include <experimental/string_view>
+#include "BinaryVector.hpp"
 
 namespace mast
 {
@@ -53,6 +54,7 @@ class StreamerProtocol
   //
   virtual ~StreamerProtocol() = default;
   StreamerProtocol()  = default;
+  StreamerProtocol(const std::string& parameters);
 
 
   //! Returns readable type of StreamerProtocol 

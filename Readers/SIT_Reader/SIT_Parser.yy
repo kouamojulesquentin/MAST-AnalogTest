@@ -64,6 +64,7 @@
 #include "Dummy_TranslatorProtocol.hpp"
 #include "I2C_RawPlayer.hpp"
 #include "SVF_RawPlayer.hpp"
+#include "StreamerProtocolFactory.hpp"
 
 #include <iostream>
 #include <cstdlib>
@@ -726,6 +727,9 @@ t_TRANSLATOR  node_name TR_identifier AI_protocol_parameters
 |
 t_STREAMER  node_name TR_identifier AI_protocol_parameters
 {
+  const auto& streamerFactory = StreamerProtocolFactory::Instance();
+  auto protocol = streamerFactory.Create($[TR_identifier],$[AI_protocol_parameters]);
+
   auto chain = driver.systemModel->CreateStreamer($[node_name].name);
 //  Streamer->IgnoreForNodePath($[node_name].is_transparent);
   $$ = std::make_pair(chain,true);

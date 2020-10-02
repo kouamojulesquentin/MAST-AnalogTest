@@ -5,8 +5,8 @@ include_directories(${LIBLOGGER_INCLUDE_DIRS})
 
 message("")
 message("================================================================================")
-message(STATUS "Empty_Translator: CMAKE_PREFIX_PATH:         ${CMAKE_PREFIX_PATH}")
-message(STATUS "Empty_Translator: CMAKE_CXX_COMPILER_ID:     ${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "Dummy_PathSelector: CMAKE_PREFIX_PATH:         ${CMAKE_PREFIX_PATH}")
+message(STATUS "Dummy_PathSelector: CMAKE_CXX_COMPILER_ID:     ${CMAKE_CXX_COMPILER_ID}")
 
 
 set_property(GLOBAL PROPERTY CXX_STANDARD          03)

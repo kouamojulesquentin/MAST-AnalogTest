@@ -280,10 +280,12 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
 	     }
 
             	    //The protected part is crypted only once 	
-	    LOG(DEBUG)<< "vector_protected, size " << protectedBits;
 	    auto vector_protected = Vector.Slice(after_bits,protectedBits);
+	    LOG(DEBUG)<< "vector_protected, size " << protectedBits << " Plain Data : "<<vector_protected.DataAsHexString();
+	    LOG(DEBUG)<< "mask_protected, size " << mask_protected.BitsCount() << " Plain Data : "<<mask_protected.DataAsHexString();
 
 	    auto ProtectedVector = streamer->Protocol()->ApplyMask(vector_protected,mask_protected);
+	    LOG(DEBUG)<< "Chyper Data : "<<ProtectedVector.DataAsHexString();
 	    Vector_Chyper.Append(ProtectedVector);
 	    
 	    //bits for segments BEFORE the Streamer ( i.e. closer to TDI) are not encrypted
@@ -291,6 +293,7 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
 	    if (before_bits > 0)
 	      Vector_Chyper.Append(Vector.Slice(mask.BitsCount()-before_bits,before_bits));
 	     
+	    LOG(DEBUG)<< "Chyper Vector : "<<Vector_Chyper.DataAsHexString();
             return Vector_Chyper;
 	    };
 

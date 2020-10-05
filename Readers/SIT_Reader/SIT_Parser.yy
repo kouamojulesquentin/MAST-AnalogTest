@@ -730,7 +730,7 @@ t_STREAMER  node_name TR_identifier AI_protocol_parameters
   const auto& streamerFactory = StreamerProtocolFactory::Instance();
   auto protocol = streamerFactory.Create($[TR_identifier],$[AI_protocol_parameters]);
 
-  auto chain = driver.systemModel->CreateStreamer($[node_name].name);
+  auto chain = driver.systemModel->CreateStreamer($[node_name].name,std::move(protocol));
 //  Streamer->IgnoreForNodePath($[node_name].is_transparent);
   $$ = std::make_pair(chain,true);
 }

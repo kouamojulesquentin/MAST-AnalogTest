@@ -116,12 +116,37 @@ shared_ptr<Chain> SystemModel::CreateChain (string_view name, shared_ptr<ParentN
 //  End of: SystemModel::CreateChain
 //---------------------------------------------------------------------------
 
-//! Creates a new Streamer node
+//! Creates a new default (transparent) Streamer node
 //!
 //! @note A Streamer is the root node if it is the first node to be created
 shared_ptr<Streamer> SystemModel::CreateStreamer (string_view name, shared_ptr<ParentNode> parentNode)
 {
   auto node = make_shared<Streamer> (name);
+
+  RegisterNode(node);
+
+  if (!m_root && m_autoRootNode)
+  {
+    m_root = node;
+  }
+
+  if (parentNode)
+  {
+    parentNode->AppendChild(node);
+  }
+
+  return node;
+}
+//
+//  End of: SystemModel::CreateStreamer
+//---------------------------------------------------------------------------
+
+//! Creates a new Streamer node with given protocol
+//!
+//! @note A Streamer is the root node if it is the first node to be created
+shared_ptr<Streamer> SystemModel::CreateStreamer (string_view name,std::shared_ptr<StreamerProtocol> protocol, shared_ptr<ParentNode> parentNode)
+{
+  auto node = make_shared<Streamer> (name,protocol);
 
   RegisterNode(node);
 

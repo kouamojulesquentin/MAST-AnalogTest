@@ -49,6 +49,9 @@ class MAST_CORE_EXPORT Streamer : public ParentNode
   Streamer(std::experimental::string_view name) : ParentNode(name) {
   m_Protocol = make_shared<TransparentStreamerProtocol>("");
   }
+  Streamer(std::experimental::string_view name,std::shared_ptr<StreamerProtocol> protocol) : ParentNode(name) {
+  m_Protocol = protocol;
+  }
 
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
 

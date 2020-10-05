@@ -184,7 +184,7 @@ Trivium_TranslatorProtocol::~Trivium_TranslatorProtocol ()
   Py_Finalize();
 }
 //
-//  End of: Trivium_TranslatorProtocol::Trivium_TranslatorProtocol
+//  End of: Trivium_TranslatorProtocol::~Trivium_TranslatorProtocol
 //---------------------------------------------------------------------------
 
 

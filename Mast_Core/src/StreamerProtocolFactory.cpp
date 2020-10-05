@@ -77,7 +77,11 @@ unique_ptr<StreamerProtocol> StreamerProtocolFactory::Create (const string&     
   auto instance = CreateImpl(m_stdCreators, creatorId, parameters);
   if (!instance)
   {
-    THROW_INVALID_ARGUMENT("There is no Streamer protocol registered with name: "sv + creatorId);
+   auto error_message = "There is no Streamer protocol registered with name: "sv + creatorId;
+   error_message.append("\n Available protocols are:");
+   for (auto protocol : m_stdCreators)
+     error_message.append("\n    "+protocol.first);
+    THROW_INVALID_ARGUMENT(error_message);
   }
 
   return instance;

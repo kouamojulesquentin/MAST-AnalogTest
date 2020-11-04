@@ -9,7 +9,9 @@ vcom common/exchange_registers.vhd
 vcom Examples/JTAG/slave_tap.vhd  
 vcom Examples/JTAG/MIB_tutorial.vhd 
 vcom Examples/JTAG/tutorial_1.vhd
+
 vcom scan_encryption/trivium.vhd
+vcom scan_encryption/trivium_streamer.vhd
 
 vcom scan_authentication/Example/cSIB.vhd
 vcom scan_authentication/SSAK/data_types.vhd

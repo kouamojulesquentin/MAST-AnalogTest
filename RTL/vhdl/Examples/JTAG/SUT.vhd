@@ -35,8 +35,10 @@ use work.exchange_registers.all;
  
 ENTITY SUT IS
      port ( 
-         --simulation signals
-	 Clk : in std_logic;
+         --Environment signals
+	 Clk : in std_logic; --Free Running system clock
+	 SysResetn: in std_logic; --System Level Reset
+	 SUT_ready : out std_logic; --Synchronization signal to IP initialization
         --TAP interface
 	 TCK: in std_logic;        
          TMS: in std_logic;        
@@ -141,6 +143,21 @@ component topTestDesing
 --		KS : out std_logic;
 --		KSV : out std_logic
 	);
+end component;
+
+component trivium_testcase
+ port  ( clk   : in  std_logic;
+     rst  : in  std_logic;
+     SysResetn: in std_logic; --System Level Reset for Trivium Initialization
+     Trivium_ready : out std_logic;
+     TDI   : in  std_logic;
+     TDO   : out std_logic;
+     mode  : in  std_logic;
+     SH_en : in  std_logic;
+     CA_en : in  std_logic;
+     UP_en : in  std_logic;
+     Sel   : in  std_logic
+   );
 end component;
 
 signal rstn : std_logic;
@@ -249,6 +266,7 @@ SUT : tutorial_1_testcase  port map
      UP_en => UpdateDR,
      Sel   => select_DR_chain(1)
    );
+SUT_ready <= '1'; --No internal initilization
 end generate;
 
 
@@ -265,6 +283,7 @@ SUT : MIB_tutorial_testcase  port map
      UP_en => UpdateDR,
      Sel   => select_DR_chain(1)
    );
+SUT_ready <= '1'; --No internal initilization
 end generate;
 
 SUT_SSAK_EXAMPLE: if target_SUT = SSAK_Example generate
@@ -284,6 +303,27 @@ SUT : topTestDesing port map
 	TDO => from_DR(1)
 		
        ); 
+SUT_ready <= '1'; --No internal initilization
 end generate;
+
+SUT_TRIVIUM_STREAMER_EXAMPLE: if target_SUT = Trivium_Streamer generate
+
+rstn <= not reset_chains;
+SUT : trivium_testcase port map
+   (	
+ clk   => Clk, --Free Running clock for Trivium Initialization
+     rst   =>  reset_chains,
+     SysResetn => SysResetn, --System Level Reset for Trivium Initialization
+     Trivium_ready => SUT_ready,
+     TDI   => to_scan_chain,
+     TDO   => from_DR(1),
+     mode  => '1',
+     SH_en => ShiftDR,
+     CA_en => CaptureDR,
+     UP_en => UpdateDR,
+     Sel   => select_DR_chain(1)
+   );
+end generate;
+
 
 END;

@@ -122,11 +122,14 @@ signal TM:  std_logic;
 
 signal Shifting:  std_logic;
 
+signal SUT_ready : std_logic;
  
 component SUT
      port ( 
          --simulation signals
-	 Clk : in std_logic;
+	 Clk : in std_logic; --Free Running system clock
+	 SysResetn: in std_logic; --System Level Reset
+	 SUT_ready : out std_logic; --Synchronization signal to IP initialization
         --TAP interface
 	 TCK: in std_logic;        
          TMS: in std_logic;        
@@ -226,6 +229,8 @@ BEGIN
    port map (
          --simulation signals
 	 Clk => Clk,
+	 SysResetn =>Resetn,
+	 SUT_ready =>SUT_ready,
         --TAP interface
        	  TDI => TDI_plain,
 	  TCK => TCK,

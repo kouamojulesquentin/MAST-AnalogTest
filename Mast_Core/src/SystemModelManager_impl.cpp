@@ -238,75 +238,103 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
   auto ApplyStreamer = [this](uint32_t before_bits,uint32_t EndOfProtectedBits,NodeIdentifier StreamerId, BinaryVector& Vector,bool isToSut)
 	   {
 	     BinaryVector mask_protected;  //Mask for segment protected by the streamer
-	     BinaryVector mask_after_1,mask_after_2; //Masks for segment after the streamer
-	     BinaryVector mask_before_1,mask_before_2; //Masks for segment before the streamer
+	     BinaryVector mask_after,mask_after_1,mask_after_2; //Masks for segment after the streamer
+	     BinaryVector mask_before,mask_before_1,mask_before_2; //Masks for segment before the streamer
 	     
+             auto protectedBits = EndOfProtectedBits - before_bits;
+ 	     auto after_bits = Vector.BitsCount() -EndOfProtectedBits;
+
 	     BinaryVector Vector_Chyper;
 	     BinaryVector mask;
+	     BinaryVector BeforeVector;
+	     auto vector_protected = Vector.Slice(before_bits,protectedBits);
 	     BinaryVector AfterVector;
-	    
+	      
 	    CHECK_PARAMETER_GT(EndOfProtectedBits,before_bits,"Protected Segment must have a positive size");
 	     
 	    std::shared_ptr<Streamer> streamer = std::dynamic_pointer_cast<Streamer>(m_sm.NodeWithId(StreamerId));
 	    LOG(DEBUG)<<"Applying a streamer transformation of protocol " << streamer->Protocol()->KindName() << " between bits " << before_bits<< " and "<<EndOfProtectedBits;
+	    LOG(DEBUG)<<"ApplyStreamer: Bits [ before : " << before_bits << " inside :" << protectedBits<< "  after :"<<after_bits << "]";
 	    LOG(DEBUG)<<"Plain Text Vector: " << Vector.DataAsHexString();
-            auto protectedBits = EndOfProtectedBits - before_bits;
-	    auto after_bits = Vector.BitsCount() -EndOfProtectedBits;
 	    
-	    //ToSut is computed first, so a new mask is needed 
-	    if (isToSut)  mask = streamer->Protocol()->NewMask(Vector.BitsCount());
-	      else
+	    
+	     
+	    if (isToSut)  
+	      {
+	      //ToSut is computed first, so a new mask is needed
+	      mask = streamer->Protocol()->NewMask(Vector.BitsCount());
+	      //In this direction, masks are taken at the beginning of the vector (last to be generated)
+	      mask_protected = mask.Slice(0,protectedBits);
+	     
+	      //bits for segments BEFORE the Streamer ( i.e. closer to TDI) are not encrypted
+ 	      LOG(DEBUG)<< "Before slice starts at 0 for a size of "<<before_bits;
+	      if (before_bits > 0)
+	        BeforeVector= Vector.Slice(0,before_bits);
+	           
+	     if (after_bits> 0)
 	         {
+	          //going toSUT, bits AFTER the streamer  must be encrypted twice with masks slices coming from the two ends of the total mask
+        	       AfterVector = Vector.Slice(EndOfProtectedBits,after_bits);
+	          mask_after_1     = mask.Slice(0,after_bits);
+	              LOG(DEBUG)<< "mask_after_1: " <<mask_after_1.DataAsHexString();
+	          mask_after_2 = mask.Slice(protectedBits,after_bits);
+	              LOG(DEBUG)<< "mask_after22: "  <<mask_after_2.DataAsHexString();
+    	              LOG(DEBUG)<< "Slices done";
+        	  AfterVector = streamer->Protocol()->ApplyMask(AfterVector,mask_after_1);
+	              LOG(DEBUG)<< "Chyper after input mask: "<< AfterVector.DataAsHexString();;
+	          AfterVector = streamer->Protocol()->ApplyMask(AfterVector,mask_after_2);
+    	              LOG(DEBUG)<< "Chyper after output mask: "<< AfterVector.DataAsHexString();;
+	              LOG(DEBUG)<< "Slices done";
+                }
+	      }
+	      else
+	       {
+	        LOG(DEBUG)<< "Decoding FromSUT: " <<Vector.DataAsHexString();
 		 //fromSut is decoded second, so it uses the same mask 
 	         mask = streamer->Protocol()->CurrentMask();
-	        // Vector = Vector.ReverseSlice(0,streamer->Protocol()->CurrentMask().BitsCount());
-		 }
+		 //In this direction, masks are taken at the end of the vector (first to be generated)
+		 mask_protected = mask.Slice(mask.BitsCount()-protectedBits,protectedBits);
+	      //bits for segments AFTER the Streamer ( i.e. closer to TDI) are not encrypted
+ 	      if ( after_bits> 0)
+	        AfterVector= Vector.Slice(EndOfProtectedBits,after_bits);
+		LOG(DEBUG)<< "After Bits: "<< AfterVector.DataAsHexString();
+	           
+	     if (before_bits> 0)
+	         {
+	          //coming fromSUT, bits BEFORE the streamer  must be encrypted twice with masks slices coming from the two ends of the total mask
+        	LOG(DEBUG)<< "Before Bits: " << EndOfProtectedBits << " " <<before_bits;
+		       BeforeVector = Vector.Slice(0,before_bits);
+	        LOG(DEBUG)<< "Before Mask";
+		  mask_before_1     = mask.Slice(mask.BitsCount()-before_bits,before_bits);
+	              LOG(DEBUG)<< "mask_Before_1: " <<mask_before_1.DataAsHexString();
+	          mask_before_2 = mask.Slice(mask.BitsCount()-before_bits-protectedBits,before_bits);
+	              LOG(DEBUG)<< "mask_Before22: "  <<mask_before_2.DataAsHexString();
+    	              LOG(DEBUG)<< "Slices done";
+        	  BeforeVector = streamer->Protocol()->ApplyMask(BeforeVector,mask_before_1);
+	              LOG(DEBUG)<< "Chyper Before input mask: "<< BeforeVector.DataAsHexString();;
+	          BeforeVector = streamer->Protocol()->ApplyMask(BeforeVector,mask_before_2);
+    	              LOG(DEBUG)<< "Chyper Before output mask: "<< BeforeVector.DataAsHexString();;
+	              LOG(DEBUG)<< "Slices done";
+                 }
+		}
 
-	     LOG(DEBUG)<<"ApplyStreamer: Mask_protected: ( 0 to "<< protectedBits << ") for " << protectedBits << " Bits";
-
-             LOG(DEBUG)<<"ApplyStreamer: Mask_after_1: ( 0 to "<< after_bits << ") for " << after_bits << " Bits";
-	     LOG(DEBUG)<<"ApplyStreamer: Mask_after_2: ( "<<  protectedBits<< " to "<< protectedBits + after_bits << ")";
-	    LOG(DEBUG)<<"ApplyStreamer: Bits [ before : " << before_bits << " inside :" << protectedBits<< "  after :"<<after_bits << "]";
 	     
-	    //bits for segments BEFORE the Streamer ( i.e. closer to TDI) are not encrypted
- 	    LOG(DEBUG)<< "Before slice starts at 0 for a size of "<<before_bits;
-	    if (before_bits > 0)
-	      {
-	      Vector_Chyper.Append(Vector.Slice(0,before_bits));
-	      }
- 	    LOG(DEBUG)<< "Before slice : "<< Vector_Chyper.DataAsHexString();
+	    
 
     
          	    //The protected part is crypted only once 	
 	    LOG(DEBUG)<< "mask_protected, size " << protectedBits;
-	    mask_protected = mask.Slice(0,protectedBits);
-	    auto vector_protected = Vector.Slice(before_bits,protectedBits);
 	    LOG(DEBUG)<< "vector_protected, size " << protectedBits << " Plain Data : "<<vector_protected.DataAsHexString()<< " b"<<vector_protected.DataAsBinaryString();
 	    LOG(DEBUG)<< "mask_protected, size " << mask_protected.BitsCount() << " Maks is : "<<mask_protected.DataAsHexString()<< " b"<<mask_protected.DataAsBinaryString();
 
 	    auto ProtectedVector = streamer->Protocol()->ApplyMask(vector_protected,mask_protected);
 	    LOG(DEBUG)<< "Chyper Data : "<<ProtectedVector.DataAsHexString();
-	    Vector_Chyper.Append(ProtectedVector);
 	    
-	     if (after_bits> 0)
-	     {
-	      //going toSUT, bits AFTER the streamer  must be encrypted twice with masks slices coming from the two ends of the total mask
-	      mask_after_1     = mask.Slice(0,after_bits);
-	      LOG(DEBUG)<< "mask_after_1: " <<mask_after_1.DataAsHexString();
-	      auto vector_after = Vector.Slice(EndOfProtectedBits,after_bits);
-	      LOG(DEBUG)<< "vector_after: " <<vector_after.DataAsHexString();
-	      mask_after_2 = mask.Slice(protectedBits,after_bits);
-	      LOG(DEBUG)<< "mask_after22: "  <<mask_after_2.DataAsHexString();
-	      LOG(DEBUG)<< "Slices done";
-	      AfterVector = streamer->Protocol()->ApplyMask(vector_after,mask_after_1);
-	      LOG(DEBUG)<< "Chyper after input mask: "<< AfterVector.DataAsHexString();;
-	      AfterVector = streamer->Protocol()->ApplyMask(AfterVector,mask_after_2);
-	      LOG(DEBUG)<< "Chyper after output mask: "<< AfterVector.DataAsHexString();;
-	      LOG(DEBUG)<< "Slices done";
-
-	     Vector_Chyper.Append(AfterVector);
-	     }
-
+	    Vector_Chyper.Append(BeforeVector);
+	    Vector_Chyper.Append(ProtectedVector);
+	    Vector_Chyper.Append(AfterVector);
+	    
+	
 	    LOG(DEBUG)<< "Chyper Vector : "<<Vector_Chyper.DataAsHexString();
             return Vector_Chyper;
 	    };

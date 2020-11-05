@@ -107,17 +107,17 @@ BinaryVector  TriviumStreamerProtocol::TRIVIUM_XOR_MASK(long int xor_bits)
  char methodName[]="get_keystream";
  char methodFormat[]="(i)";
  
-//  printf("Calling Python Trivium\n");
+// LOG(DEBUG)<<"Calling Python Trivium";
   pValue=PyObject_CallMethod(pObject, methodName, methodFormat,xor_bits);
 	    /*Return values must be converted from Python to C data representation, depending on their type*/
 	    /*In this case, it is a conversion between strings*/
-//  printf("Python Trivium returned\n");
+// LOG(DEBUG)<<"Python Trivium returned";
 
   keystream=PyString_AsString(pValue);
 //  printf("Python Trivium returned this string: %s\n",keystream);
  BinaryVector m_Trinvium_Xor_Mask = BinaryVector::CreateFromHexString(keystream);
 
-//  printf("Python Trivium Finished\n");
+ LOG(DEBUG)<< "Python Trivium Finished";
  return m_Trinvium_Xor_Mask;
 }
 
@@ -164,8 +164,10 @@ BinaryVector& TriviumStreamerProtocol::NewMask (uint32_t MaskBits)
   //NB: trivium's MSB (left) is the first to be generated, so it must be xors wth the first bit to be scanned
   // which is BinaryVector's LSB (right)
   m_CurrentMask= m_Trinvium_Xor_Mask.ReverseSlice(0,MaskBits);
+ // m_CurrentMask= m_Trinvium_Xor_Mask;
 
- LOG(DEBUG) << "New mask : " << m_CurrentMask.DataAsHexString();
+ LOG(DEBUG) << "New mask (Hex): " << m_CurrentMask.DataAsHexString();
+ LOG(DEBUG) << "New mask (Bin): " << m_CurrentMask.DataAsBinaryString();
  return m_CurrentMask;
 }
 

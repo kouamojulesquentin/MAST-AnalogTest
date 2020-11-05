@@ -235,69 +235,83 @@ void SystemModelManager_impl::CreateApplicationThread (shared_ptr<ParentNode> ap
 //!
 void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentAccessInterface)
 {
-  auto ApplyStreamer = [this](uint32_t before_bits,uint32_t EndOfProtectedBits,NodeIdentifier StreamerId, BinaryVector& Vector,bool NewMask)
+  auto ApplyStreamer = [this](uint32_t before_bits,uint32_t EndOfProtectedBits,NodeIdentifier StreamerId, BinaryVector& Vector,bool isToSut)
 	   {
-	     BinaryVector mask_protected, mask_in_after,mask_out_after;
+	     BinaryVector mask_protected;  //Mask for segment protected by the streamer
+	     BinaryVector mask_after_1,mask_after_2; //Masks for segment after the streamer
+	     BinaryVector mask_before_1,mask_before_2; //Masks for segment before the streamer
+	     
 	     BinaryVector Vector_Chyper;
 	     BinaryVector mask;
+	     BinaryVector AfterVector;
 	    
 	    CHECK_PARAMETER_GT(EndOfProtectedBits,before_bits,"Protected Segment must have a positive size");
 	     
 	    std::shared_ptr<Streamer> streamer = std::dynamic_pointer_cast<Streamer>(m_sm.NodeWithId(StreamerId));
-	    LOG(DEBUG)<<"TOSUT: Applying a streamer transformation of protocol " << streamer->Protocol()->KindName() << " between bits " << before_bits<< " and "<<EndOfProtectedBits;
+	    LOG(DEBUG)<<"Applying a streamer transformation of protocol " << streamer->Protocol()->KindName() << " between bits " << before_bits<< " and "<<EndOfProtectedBits;
+	    LOG(DEBUG)<<"Plain Text Vector: " << Vector.DataAsHexString();
             auto protectedBits = EndOfProtectedBits - before_bits;
 	    auto after_bits = Vector.BitsCount() -EndOfProtectedBits;
-	     
-	    LOG(DEBUG)<<"ApplyStreamer: Bits before streamer: " << before_bits << " inside " << protectedBits<< " and after "<<after_bits;
-	     
-	    if (NewMask)  mask = streamer->Protocol()->NewMask(Vector.BitsCount());
+	    
+	    //ToSut is computed first, so a new mask is needed 
+	    if (isToSut)  mask = streamer->Protocol()->NewMask(Vector.BitsCount());
 	      else
+	         {
+		 //fromSut is decoded second, so it uses the same mask 
 	         mask = streamer->Protocol()->CurrentMask();
-		
-	       LOG(DEBUG)<<"ApplyStreamer: Mask_in_before: ( 0 to "<< (EndOfProtectedBits-1) << ") for " << after_bits << " Bits";
-	     LOG(DEBUG)<<"ApplyStreamer: Mask_protected: ( " << before_bits <<" to "<< (EndOfProtectedBits-1) << ") for " << protectedBits << " Bits";
-	     LOG(DEBUG)<<"ApplyStreamer: Mask_in_after: ( "<< mask.BitsCount()-after_bits << " to "<< mask.BitsCount() << ")";
-	     
-	     LOG(DEBUG)<< "mask_protected, size " << protectedBits;
-	     mask_protected = mask.Slice(after_bits,protectedBits);
- 
-	    	     if (after_bits> 0)
-	     {
-	     LOG(DEBUG)<< "mask_in_after";
-	     mask_in_after     = mask.Slice(0,after_bits);
-	     LOG(DEBUG)<< "vector_after";
-	     auto vector_after = Vector.Slice(0,after_bits);
-	     LOG(DEBUG)<< "mask_out_after";
-	     mask_out_after = mask.Slice(mask.BitsCount()-after_bits,after_bits);
-	     LOG(DEBUG)<< "Slices done";
-	     	     
-	     //Bits for segments AFTER the streamer (i.e. closer to TDO) must be encrypted twice with masks slices coming from the two ends of the total mask
-	     auto AfterVector = streamer->Protocol()->ApplyMask(vector_after,mask_in_after);
-	     AfterVector = streamer->Protocol()->ApplyMask(AfterVector,mask_out_after);
-	     
-	     Vector_Chyper.Append(AfterVector);
-	     
-	     }
+	        // Vector = Vector.ReverseSlice(0,streamer->Protocol()->CurrentMask().BitsCount());
+		 }
 
-            	    //The protected part is crypted only once 	
-	    auto vector_protected = Vector.Slice(after_bits,protectedBits);
-	    LOG(DEBUG)<< "vector_protected, size " << protectedBits << " Plain Data : "<<vector_protected.DataAsHexString();
-	    LOG(DEBUG)<< "mask_protected, size " << mask_protected.BitsCount() << " Plain Data : "<<mask_protected.DataAsHexString();
+	     LOG(DEBUG)<<"ApplyStreamer: Mask_protected: ( 0 to "<< protectedBits << ") for " << protectedBits << " Bits";
+
+             LOG(DEBUG)<<"ApplyStreamer: Mask_after_1: ( 0 to "<< after_bits << ") for " << after_bits << " Bits";
+	     LOG(DEBUG)<<"ApplyStreamer: Mask_after_2: ( "<<  protectedBits<< " to "<< protectedBits + after_bits << ")";
+	    LOG(DEBUG)<<"ApplyStreamer: Bits [ before : " << before_bits << " inside :" << protectedBits<< "  after :"<<after_bits << "]";
+	     
+	    //bits for segments BEFORE the Streamer ( i.e. closer to TDI) are not encrypted
+ 	    LOG(DEBUG)<< "Before slice starts at 0 for a size of "<<before_bits;
+	    if (before_bits > 0)
+	      {
+	      Vector_Chyper.Append(Vector.Slice(0,before_bits));
+	      }
+ 	    LOG(DEBUG)<< "Before slice : "<< Vector_Chyper.DataAsHexString();
+
+    
+         	    //The protected part is crypted only once 	
+	    LOG(DEBUG)<< "mask_protected, size " << protectedBits;
+	    mask_protected = mask.Slice(0,protectedBits);
+	    auto vector_protected = Vector.Slice(before_bits,protectedBits);
+	    LOG(DEBUG)<< "vector_protected, size " << protectedBits << " Plain Data : "<<vector_protected.DataAsHexString()<< " b"<<vector_protected.DataAsBinaryString();
+	    LOG(DEBUG)<< "mask_protected, size " << mask_protected.BitsCount() << " Maks is : "<<mask_protected.DataAsHexString()<< " b"<<mask_protected.DataAsBinaryString();
 
 	    auto ProtectedVector = streamer->Protocol()->ApplyMask(vector_protected,mask_protected);
 	    LOG(DEBUG)<< "Chyper Data : "<<ProtectedVector.DataAsHexString();
 	    Vector_Chyper.Append(ProtectedVector);
 	    
-	    //bits for segments BEFORE the Streamer ( i.e. closer to TDI) are not encrypted
- 	    LOG(DEBUG)<< "Before slice starts at "<< mask.BitsCount()-before_bits<<" for a size of "<<before_bits;
-	    if (before_bits > 0)
-	      Vector_Chyper.Append(Vector.Slice(mask.BitsCount()-before_bits,before_bits));
-	     
+	     if (after_bits> 0)
+	     {
+	      //going toSUT, bits AFTER the streamer  must be encrypted twice with masks slices coming from the two ends of the total mask
+	      mask_after_1     = mask.Slice(0,after_bits);
+	      LOG(DEBUG)<< "mask_after_1: " <<mask_after_1.DataAsHexString();
+	      auto vector_after = Vector.Slice(EndOfProtectedBits,after_bits);
+	      LOG(DEBUG)<< "vector_after: " <<vector_after.DataAsHexString();
+	      mask_after_2 = mask.Slice(protectedBits,after_bits);
+	      LOG(DEBUG)<< "mask_after22: "  <<mask_after_2.DataAsHexString();
+	      LOG(DEBUG)<< "Slices done";
+	      AfterVector = streamer->Protocol()->ApplyMask(vector_after,mask_after_1);
+	      LOG(DEBUG)<< "Chyper after input mask: "<< AfterVector.DataAsHexString();;
+	      AfterVector = streamer->Protocol()->ApplyMask(AfterVector,mask_after_2);
+	      LOG(DEBUG)<< "Chyper after output mask: "<< AfterVector.DataAsHexString();;
+	      LOG(DEBUG)<< "Slices done";
+
+	     Vector_Chyper.Append(AfterVector);
+	     }
+
 	    LOG(DEBUG)<< "Chyper Vector : "<<Vector_Chyper.DataAsHexString();
             return Vector_Chyper;
 	    };
 
-  CHECK_PARAMETER_NOT_NULL(currentAccessInterface, "Houps can only operate on valid AccessInterface");
+  CHECK_PARAMETER_NOT_NULL(currentAccessInterface, "Whoups can only operate on valid AccessInterface");
 
     auto protocol = currentAccessInterface->Protocol();
   if (currentAccessInterface->IsPending())
@@ -338,8 +352,7 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
 	    auto Level = m_ActiveStreamers.back();
 	    std::shared_ptr<Streamer> streamer = std::dynamic_pointer_cast<Streamer>(m_sm.NodeWithId(std::get<2>(Level)));
 	    LOG(DEBUG)<<"FROMSUT: Applying a streamer transformation of protocol " << streamer->Protocol()->KindName() << " between bits " << std::get<1>(Level)<< " and "<<std::get<0>(Level);
-	    fromSutVector = ApplyStreamer(fromSutVector.BitsCount()-std::get<1>(Level),fromSutVector.BitsCount()-std::get<0>(Level),std::get<2>(Level),fromSutVector,false); //Setting encrypted vector as current toSut
- 
+	    fromSutVector = ApplyStreamer(std::get<0>(Level),std::get<1>(Level),std::get<2>(Level),fromSutVector,false); 
 	    m_ActiveStreamers.pop_back();
 	   }
 

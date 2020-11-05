@@ -63,7 +63,9 @@ class StreamerProtocol
 
   // ---------------- Private  Fields
   //
-  BinaryVector m_CurrentMask;       //!< Defines selector properies
+  BinaryVector m_CurrentMask;       //!< Current Streamer Mask: for coherence with MAST bit ordering in toSUT and fromSUT, 
+  				    //!< the LSB (rightmost) is the mask bit applied to the first bit scanned in
+				    //!< While the MSB (leftmost) is the one applied to the last scanned bit 
 };
 //
 //  End of StreamerProtocol class declaration

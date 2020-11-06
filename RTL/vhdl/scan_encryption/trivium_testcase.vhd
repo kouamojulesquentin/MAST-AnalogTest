@@ -89,6 +89,10 @@ signal after_TDI, after_TDO : std_logic;
 signal before_TDI, before_TDO : std_logic;
 
 component trivium_streamer 
+ generic( 
+    KEY    : std_logic_vector(79 downto 0) := X"0F62B5085BAE0154A7FA";
+   IV     : std_logic_vector(79 downto 0) :=X"288FF65DC42B92F960C7"
+ );
  port  ( clk   : in  std_logic;
      rst  : in  std_logic; --Chain Reset
      SysResetn: in std_logic; --System Level Reset for Trivium Initialization
@@ -157,6 +161,10 @@ before_in <= x"123";
 --Streamer instatiation
 
 Streamer : trivium_streamer 
+ generic map( 
+    KEY    =>  X"0F62B5085BAE0154A7FA",
+   IV     => X"288FF65DC42B92F960C7"
+    )
  port map ( 
      clk => clk,
      rst => rst,

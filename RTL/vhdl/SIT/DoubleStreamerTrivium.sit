@@ -1,0 +1,23 @@
+TRANSLATOR top Simulation
+ (
+ JTAG_TAP TAP 4 1
+  (
+  CHAIN main_chain
+  {
+   REGISTER before 12 Bypass: "0xABC"
+   STREAMER first Trivium ""
+    {
+     REGISTER protected 16 Bypass: "0x1234"
+    }
+   REGISTER regHI 8 Bypass: "0x56" 
+
+   STREAMER second Trivium ""
+   PDL Console_Incr
+    {
+     REGISTER regHI 16 Bypass: "0x1234"
+    }
+   REGISTER second_regHI 8 Bypass: "0x56" 
+   }
+  )
+ ) 
+

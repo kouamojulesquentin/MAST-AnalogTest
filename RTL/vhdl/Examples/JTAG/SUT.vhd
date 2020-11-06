@@ -160,6 +160,36 @@ component trivium_testcase
    );
 end component;
 
+component double_trivium_testcase
+ port  ( clk   : in  std_logic;
+     rst  : in  std_logic; --Chain Reset
+     SysResetn: in std_logic; --System Level Reset for Trivium Initialization
+     Trivium_ready : out std_logic;
+     TDI   : in  std_logic;
+     TDO   : out std_logic;
+     mode  : in  std_logic;
+     SH_en : in  std_logic;
+     CA_en : in  std_logic;
+     UP_en : in  std_logic;
+     Sel   : in  std_logic
+   );
+end component;
+
+component nested_trivium_testcase
+ port  ( clk   : in  std_logic;
+     rst  : in  std_logic; --Chain Reset
+     SysResetn: in std_logic; --System Level Reset for Trivium Initialization
+     Trivium_ready : out std_logic;
+     TDI   : in  std_logic;
+     TDO   : out std_logic;
+     mode  : in  std_logic;
+     SH_en : in  std_logic;
+     CA_en : in  std_logic;
+     UP_en : in  std_logic;
+     Sel   : in  std_logic
+   );
+end component;
+
 signal rstn : std_logic;
 
 BEGIN
@@ -325,5 +355,42 @@ SUT : trivium_testcase port map
    );
 end generate;
 
+SUT_TRIVIUM_DOUBLESTREAMER_EXAMPLE: if target_SUT = Double_Trivium_Streamer generate
+
+rstn <= not reset_chains;
+SUT : double_trivium_testcase port map
+   (	
+ clk   => Clk, --Free Running clock for Trivium Initialization
+     rst   =>  reset_chains,
+     SysResetn => SysResetn, --System Level Reset for Trivium Initialization
+     Trivium_ready => SUT_ready,
+     TDI   => to_scan_chain,
+     TDO   => from_DR(1),
+     mode  => '1',
+     SH_en => ShiftDR,
+     CA_en => CaptureDR,
+     UP_en => UpdateDR,
+     Sel   => select_DR_chain(1)
+   );
+end generate;
+
+SUT_TRIVIUM_NESTEDSTREAMER_EXAMPLE: if target_SUT = Nested_Trivium_Streamer generate
+
+rstn <= not reset_chains;
+SUT : nested_trivium_testcase port map
+   (	
+ clk   => Clk, --Free Running clock for Trivium Initialization
+     rst   =>  reset_chains,
+     SysResetn => SysResetn, --System Level Reset for Trivium Initialization
+     Trivium_ready => SUT_ready,
+     TDI   => to_scan_chain,
+     TDO   => from_DR(1),
+     mode  => '1',
+     SH_en => ShiftDR,
+     CA_en => CaptureDR,
+     UP_en => UpdateDR,
+     Sel   => select_DR_chain(1)
+   );
+end generate;
 
 END;

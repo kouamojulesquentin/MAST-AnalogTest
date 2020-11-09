@@ -89,15 +89,14 @@ signal after_TDI, after_TDO : std_logic;
 signal before_TDI, before_TDO : std_logic;
 
 component trivium_streamer 
- generic( 
-    KEY    : std_logic_vector(79 downto 0) := X"0F62B5085BAE0154A7FA";
-   IV     : std_logic_vector(79 downto 0) :=X"288FF65DC42B92F960C7"
- );
  port  ( clk   : in  std_logic;
      rst  : in  std_logic; --Chain Reset
      SysResetn: in std_logic; --System Level Reset for Trivium Initialization
      Trivium_ready : out std_logic;
 
+     KEY    : in  std_logic_vector(79 downto 0);
+     IV     : in std_logic_vector(79 downto 0);
+    
      --External connections
      TDI_before_streamer   : in  std_logic;
      TDO_after_streamer   : out std_logic;
@@ -117,6 +116,11 @@ signal second_after_TDI: std_logic;
 signal second_protected_TDI: std_logic;
 signal second_protected_TDO: std_logic;
 signal second_after_TDO: std_logic;
+
+signal    KEY    : std_logic_vector(79 downto 0) ;
+signal   IV     : std_logic_vector(79 downto 0) ;
+
+signal Trivium_ready_1,Trivium_ready_2 : std_logic;
 
 begin
 ------------------------------------------------------------------
@@ -167,18 +171,22 @@ before_in <= x"123";
 
 --Streamer instatiation
 
+KEY <= X"0F62B5085BAE0154A7FA";
+IV  <=X"288FF65DC42B92F960C7";
+
+Trivium_ready <= Trivium_ready_1 and Trivium_ready_2;
+
 Streamer : trivium_streamer 
- generic map( 
-    KEY    =>  X"0F62B5085BAE0154A7FA",
-   IV     => X"288FF65DC42B92F960C7"
-    )
  port map ( 
      clk => clk,
      rst => rst,
      SysResetn => SysResetn,
-     Trivium_ready => Trivium_ready,
+     Trivium_ready => Trivium_ready_1,
 
-     --External connections
+     KEY    =>  KEY,
+     IV     => IV,
+  
+       --External connections
      TDI_before_streamer => before_TDO,
      TDO_after_streamer  => after_TDI,
 
@@ -228,15 +236,15 @@ after_in <= x"78";
 
 --------------Second Streamer
 second_Streamer : trivium_streamer 
- generic map( 
-    KEY    =>  X"0F62B5085BAE0154A7FA",
-   IV     => X"288FF65DC42B92F960C7"
-    )
  port map ( 
      clk => clk,
      rst => rst,
      SysResetn => SysResetn,
-     Trivium_ready => Trivium_ready,
+     Trivium_ready => Trivium_ready_2,
+
+
+     KEY    =>  KEY,
+     IV     => IV,
 
      --External connections
      TDI_before_streamer => after_TDO,

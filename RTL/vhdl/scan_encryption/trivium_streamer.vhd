@@ -33,14 +33,14 @@ use work.exchange_registers.all;
 -- arithmetic functions with Signed or Unsigned values
 
 entity trivium_streamer is
- generic( 
-    KEY    : std_logic_vector(79 downto 0) := X"0F62B5085BAE0154A7FA";
-   IV     : std_logic_vector(79 downto 0) :=X"288FF65DC42B92F960C7"
- );
  port  ( clk   : in  std_logic;
      rst  : in  std_logic; --Chain Reset
      SysResetn: in std_logic; --System Level Reset for Trivium Initialization
      Trivium_ready : out std_logic;
+     
+     KEY    : in  std_logic_vector(79 downto 0);
+     IV     : in std_logic_vector(79 downto 0);
+     
 
      --External connections
      TDI_before_streamer   : in  std_logic;
@@ -65,8 +65,6 @@ signal after_TDI, after_TDO : std_logic;
 -- Input signals for the Trivium
 signal init_cntrl: std_logic_vector(1 downto 0);
 signal CNTRL  : std_logic_vector(1 downto 0);
-signal KEY_s    : std_logic_vector(79 downto 0);
-signal IV_s     : std_logic_vector(79 downto 0);
 
 signal keystream_s : std_logic;
 
@@ -109,8 +107,6 @@ trivium_counter: process(clk)
   init_proc: process(trivum_rst_count)
   begin
     next_trivum_rst_count <= trivum_rst_count+1;
-    KEY_s <= KEY;
-    IV_s  <= IV;
     init_cntrl <= "00";
     TM     <= '0';
     Trivium_ready <= '0';
@@ -170,8 +166,8 @@ trivium_counter: process(clk)
     
     SYS_CLK => Clk,
     CNTRL   => cntrl,
-    KEY     => KEY_s,
-    IV      => IV_s,
+    KEY     => KEY,
+    IV      => IV,
     KEY_OUT => keystream_s
 
   );

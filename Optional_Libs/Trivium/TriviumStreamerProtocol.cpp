@@ -53,29 +53,23 @@ using namespace mast;
 
 
   LOG(INFO)<<"Trivium Parameter string: " << parameters;
-
    auto results     = Utility::Split(parameters, " ");
-   
   LOG(INFO)<<"Found "<< results.size()<< " Parameters";
-
   CHECK_PARAMETER_EQ(results.size(),2,"Trivium needs two parameters: Key and IV (both in hexadecimal)");
 
   auto m_KEY = results.at(0);
   auto m_IV = results.at(1);
-
   LOG(INFO)<<"Trivium Key:  "<<m_KEY;
   LOG(INFO)<<"Trivium IV :  "<<m_IV;
   
-  const char key[33]=REF_KEY;
-  const char iv[33]=REF_IV;
+//  const char key[33]=REF_KEY;
+//  const char iv[33]=REF_IV;
   
   auto s_KEY = std::string(m_KEY);
   auto s_IV = std::string(m_IV);
 
 
- /*MB SHOULD BE ARGUMENTS!!!!*/
  /*Preparing argument for Python Class contructor*/
-// CPyObject pKey = PyUnicode_FromString("0F62B5085BAE0154A7FA");
 
   //Creating key from string
 // CPyObject pKey = PyUnicode_FromString(key);
@@ -84,7 +78,7 @@ using namespace mast;
 
 //  CPyObject pIV = PyUnicode_FromString(iv);
    CPyObject pIV = PyUnicode_FromStringAndSize(s_IV.c_str(),m_IV.size());
-   LOG(DEBUG) << "Created Python Iv string " << PyString_AsString(pIV);
+   LOG(DEBUG) << "Created Python IV string " << PyString_AsString(pIV);
 
 pConstructorArgs = PyTuple_New(2);
 /* pKey and pIV reference stolen here: pKey and pIV become nullptr*/

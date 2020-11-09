@@ -51,3 +51,4 @@ vcom scan_encryption/SVF_Simuation_top_encryption.vhd
 
 vcom scan_authentication/Example/bench/benchTopDemo.vhd
 vcom Examples/JTAG/SVF_Simuation_top.vhd
+

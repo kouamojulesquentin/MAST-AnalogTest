@@ -128,6 +128,8 @@ component scan_secure
 	Port (
 		tclk : in std_logic;
 		rstn : in std_logic;
+               SysResetn: in std_logic; --System Level Reset for Trivium Initialization
+              Trivium_ready : out std_logic;
 		
 		CSU_SE : in  std_logic;
 		CSU_CE : in  std_logic;

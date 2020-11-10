@@ -308,10 +308,12 @@ end generate;
 SUT_SECURE_SCAN: if target_SUT = Secure_Scan generate
 
 rstn <= not reset_chains;
-SUT : topTestDesing port map
+SUT : scan_secure port map
 	(
 	tclk =>Clk, --Free Running clock for AES computation
 	rstn =>rstn,
+     SysResetn => SysResetn, --System Level Reset for Trivium Initialization
+     Trivium_ready => SUT_ready,
 	
 	CSU_SE => ShiftDR,
 	CSU_CE => CaptureDR,
@@ -322,7 +324,6 @@ SUT : topTestDesing port map
 	TDO => from_DR(1)
 		
        ); 
-SUT_ready <= '1'; --No internal initilization
 end generate;
 
 END;

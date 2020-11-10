@@ -47,6 +47,9 @@ vhd_files=(
         "scan_authentication/Example/PRNG_gest.vhd"
         "scan_authentication/Example/topTestDesing.vhd"
 
+        "scan_secure/scan_secure.vhd"
+
+        "Examples/JTAG/SUT_Package.vhd" 
         "Examples/JTAG/SUT.vhd" 
         "AI_for_simulation/master_tapfsm.vhd"
         "AI_for_simulation/SVF_Master_TAP.vhd"  

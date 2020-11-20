@@ -50,6 +50,11 @@ class StreamerProtocol
   //!
   virtual const BinaryVector ApplyMask (BinaryVector PlainText,BinaryVector Mask) const =0;
   
+  //! Resets the streamer with the passed parameters
+  //!
+  //!
+  void ResetProtocol (const std::string& parameters) {std::ignore = parameters;};
+  
   // ---------------- Protected Methods
   //
   virtual ~StreamerProtocol() = default;

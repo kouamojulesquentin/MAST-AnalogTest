@@ -63,11 +63,12 @@ DefaultS2IBPathSelector::DefaultS2IBPathSelector (std::vector<std::shared_ptr<Sy
    
    m_cardinality = std::stoull(std::string(results.front()));
 
-   if (associatedNodes.size()!= 2)
+   if ((associatedNodes.size()< 2) ||(associatedNodes.size()> 3))
      {
-      ostringstream os; os << "S2IB needs 2 registers, " << associatedNodes.size() << " given ";
+      ostringstream os; os << "S2IB needs 2 or 3 registers, " << associatedNodes.size() << " given ";
       throw std::logic_error(os.str());
      }
+     
    if (  pathsCount!=1)
     {
       ostringstream os; os << "S2IB can only support 1 segment";

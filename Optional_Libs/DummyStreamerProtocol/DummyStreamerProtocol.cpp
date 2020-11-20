@@ -27,7 +27,7 @@ using std::shared_ptr;
 using namespace mast;
 
  DummyStreamerProtocol::DummyStreamerProtocol(const std::string& parameters)
-  {
+  {std::ignore = parameters;
   }
 
 

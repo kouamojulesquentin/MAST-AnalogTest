@@ -28,6 +28,7 @@ using namespace mast;
 
  TransparentStreamerProtocol::TransparentStreamerProtocol(const std::string& parameters)
   {
+  std::ignore = parameters;
   }
 
 

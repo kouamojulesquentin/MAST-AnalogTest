@@ -19,7 +19,8 @@ component SVF_Master_TAP
 
         Clk : in std_logic;
         Resetn: in std_logic;
-        TDI		: out std_logic;
+        SUT_Busy : in std_logic;
+         TDI		: out std_logic;
 			  TCK : out std_logic;
 			  TMS    : out std_logic;
            TRSTN  : out std_logic;
@@ -49,7 +50,8 @@ Entity SVF_Master_TAP is
 
         Clk : in std_logic;
         Resetn: in std_logic;
-        TDI		: out std_logic;
+         SUT_Busy : in std_logic;
+       TDI		: out std_logic;
 			  TCK : out std_logic;
 			  TMS    : out std_logic;
            TRSTN  : out std_logic;
@@ -245,6 +247,12 @@ begin
 	          --wait for a new SVF instruction
 		  wait for polling_interval;
 	         end loop;
+		 
+	  busy_loop: while (SUT_Busy = '1') loop
+	          ---Wait for SUT to be available
+		  wait for polling_interval;
+	         end loop;
+		 
       
                 readline(gen_file,input_line);
 		line_size := input_line'high;

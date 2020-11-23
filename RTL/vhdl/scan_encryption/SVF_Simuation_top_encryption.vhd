@@ -130,7 +130,8 @@ component SUT
 	 Clk : in std_logic; --Free Running system clock
 	 SysResetn: in std_logic; --System Level Reset
 	 SUT_ready : out std_logic; --Synchronization signal to IP initialization
-        --TAP interface
+	 SUT_busy : out std_logic; --Synchronization signal for IP internal computation
+         --TAP interface
 	 TCK: in std_logic;        
          TMS: in std_logic;        
          TRSTN: in std_logic;  
@@ -215,6 +216,7 @@ BEGIN
 
         Clk => Clk,
         Resetn => rstn_master,
+	SUT_busy => '0',
        	  TDI => TDI_cipher,
 			  TCK => TCK,
 			  TMS => TMS,

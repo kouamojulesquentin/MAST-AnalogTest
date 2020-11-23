@@ -36,7 +36,8 @@ entity trivium_streamer is
  port  ( clk   : in  std_logic;
      rst  : in  std_logic; --Chain Reset
      SysResetn: in std_logic; --System Level Reset for Trivium Initialization
-     Trivium_ready : out std_logic;
+     Trivium_ready : out std_logic;--'1' when the Chyper has been reset at least once
+     Trivium_busy : out std_logic; --'1' when resetting the Chyper
      
      KEY    : in  std_logic_vector(79 downto 0);
      IV     : in std_logic_vector(79 downto 0);
@@ -60,8 +61,6 @@ architecture behav of trivium_streamer is
 
 signal streamer_input, streamer_output : std_logic;
 
-signal after_TDI, after_TDO : std_logic;
-
 -- Input signals for the Trivium
 signal init_cntrl: std_logic_vector(1 downto 0);
 signal CNTRL  : std_logic_vector(1 downto 0);
@@ -71,10 +70,12 @@ signal keystream_s : std_logic;
 signal TM:  std_logic;
 
 signal nbit: integer := 0;
-signal current_keystream: std_logic_vector(79 downto 0);
-signal current_plaintext: std_logic_vector(79 downto 0);
-signal current_chypertext: std_logic_vector(79 downto 0);
-signal current_fromSUT: std_logic_vector(79 downto 0);
+constant dump_size : integer := 400;
+signal current_keystream: std_logic_vector(dump_size downto 0);
+signal current_plaintext_toSUT: std_logic_vector(dump_size downto 0);
+signal current_chypertext_toSUT: std_logic_vector(dump_size downto 0);
+signal current_plaintext_fromSUT: std_logic_vector(dump_size downto 0);
+signal current_chypertext_fromSUT: std_logic_vector(dump_size downto 0);
 
 component trivium is
     Port ( SYS_CLK : in  STD_LOGIC; --System or User clock
@@ -110,18 +111,22 @@ trivium_counter: process(clk)
     init_cntrl <= "00";
     TM     <= '0';
     Trivium_ready <= '0';
+    Trivium_busy <= '0';
   
    if (trivum_rst_count = 1) then
        init_cntrl <= "10";
+       Trivium_busy <= '1';
    end if;    
    if (trivum_rst_count > 1) and (trivum_rst_count < 1154)then
       init_cntrl <= "11";
+       Trivium_busy <= '1';
    end if;    
 
    if (trivum_rst_count >= 1300) then
        TM     <= '1';
        next_trivum_rst_count <= trivum_rst_count; --stop incrementing counter 
       Trivium_ready <= '1'; --Trivium chyper ready for usage
+      Trivium_busy <= '0';
    end if;    
 
   
@@ -147,15 +152,18 @@ trivium_counter: process(clk)
     if SH_en = '0' then
       nbit <= 0;
       current_keystream <= (others => '0');
-      current_plaintext <= (others => '0');
-      current_chypertext<= (others => '0');
-      current_fromSUT<= (others => '0');
-    else
-      current_keystream(nbit) <=   keystream_s;
-      current_plaintext(nbit) <=   streamer_input;
-      current_chypertext(nbit) <=   TDI_before_streamer;
-      current_fromSUT(nbit) <=   after_TDO;
-      nbit <= nbit+1;
+      current_plaintext_toSUT<= (others => '0');
+      current_chypertext_toSUT<= (others => '0');
+      current_plaintext_fromSUT<= (others => '0');
+      current_chypertext_fromSUT<= (others => '0');
+   else
+      current_keystream(nbit) <= keystream_s;
+      current_plaintext_toSUT(nbit) <=   TDI_before_streamer;
+      current_chypertext_toSUT(nbit)<=  streamer_input;
+      current_plaintext_fromSUT(nbit)<= protected_TDO;
+      current_chypertext_fromSUT(nbit) <=   streamer_output;
+
+     nbit <= nbit+1;
     end if;
    end if;
   end process;

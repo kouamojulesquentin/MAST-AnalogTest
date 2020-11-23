@@ -105,6 +105,8 @@ signal UE_int, next_UE_int   : std_logic_vector(0 to MAX_LEVELS);
 
 signal Shifting:  std_logic;
 signal SUT_ready : std_logic;
+signal SUT_busy : std_logic;
+
 
 signal TAP_Resetn : std_logic;
  
@@ -113,7 +115,8 @@ component SUT
          --Environment signals
 	 Clk : in std_logic; --Free Running system clock
 	 SysResetn: in std_logic; --System Level Reset
-	 SUT_ready : out std_logic; --Synchronization signal to IP initialization
+	 SUT_ready : out std_logic; --Synchronization signal for IP initialization
+	 SUT_busy : out std_logic; --Synchronization signal for IP internal computation
          --TAP interface
 	 TCK: in std_logic;        
          TMS: in std_logic;        
@@ -147,7 +150,8 @@ BEGIN
     port map (
        Clk => Clk,
         Resetn => TAP_Resetn, --Resetn
-  	  TCK => TCK,
+  	 SUT_Busy =>SUT_busy,
+	  TCK => TCK,
       	  TDI => TDI,
 	  TMS => TMS,
            TRSTN => TRSTN,
@@ -162,6 +166,7 @@ BEGIN
 	 Clk => Clk,
 	 SysResetn =>Resetn,
 	 SUT_ready =>SUT_ready,
+	 SUT_Busy =>SUT_busy,
         --TAP interface
        	  TDI => TDI,
 	  TCK => TCK,
@@ -170,7 +175,8 @@ BEGIN
 	  TDO => TDO
    );
 
-TAP_Resetn <= Resetn and SUT_ready; --Wait for SUT initialization before starting Master TAP
+TAP_Resetn <= Resetn;
+--TAP_Resetn <= Resetn and SUT_ready; --Wait for SUT initialization before starting Master TAP
 
 
 END;

@@ -36,7 +36,8 @@ entity scan_secure is
 		tclk : in std_logic;
 		rstn : in std_logic;
                SysResetn: in std_logic; --System Level Reset for Trivium Initialization
-              Trivium_ready : out std_logic;
+               Trivium_ready : out std_logic;
+               Trivium_busy : out std_logic;
 		
 		CSU_SE : in  std_logic;
 		CSU_CE : in  std_logic;
@@ -87,8 +88,49 @@ constant size : integer :=128;
 	-- signal plain_TDI         : std_logic;
 	-- signal plain_TDO         : std_logic;
 	-- signal KeySTR            : std_logic;
+		--Ports for using random challenge as IV
+	signal	Challenge_Ready : std_logic; 
+	signal	Trivium_Resetn  : std_logic; 
+	signal	Challenge  :  std_logic_vector(size-1 downto 0);
+
+component trivium_streamer 
+port  ( clk   : in  std_logic;
+     rst  : in  std_logic; --Chain Reset
+     SysResetn: in std_logic; --System Level Reset for Trivium Initialization
+     Trivium_ready : out std_logic;
+     Trivium_busy : out std_logic; --'1' when resetting the Chyper
+
+     KEY    : in  std_logic_vector(79 downto 0);
+     IV     : in std_logic_vector(79 downto 0);
+    
+       --External connections
+     TDI_before_streamer   : in  std_logic;
+     TDO_after_streamer   : out std_logic;
+
+     --Protected segment
+     protected_TDI   : out  std_logic;
+     protected_TDO   : in std_logic;
+
+     --ShiftEnable is needed to count shifted bits for keystream generation
+     SH_en : in  std_logic 
+   );
+end component;
+
+constant TRIVIUM_size : integer := 80;
+signal    KEY    : std_logic_vector(TRIVIUM_size-1 downto 0);
+signal   IV     : std_logic_vector(TRIVIUM_size-1 downto 0) ;
+signal protected_TDI, protected_TDO : std_logic;
+signal rst : std_logic;
+signal Streamer_Ready : std_logic;
+
+signal streamer_TDI, streamer_TDO : std_logic;
+signal protected_value : std_logic_vector(15 downto 0);
+signal trivum_SE : std_logic;
+signal trivum_reset_done,next_trivum_reset_done : std_logic;
+
+constant IV_dump :  std_logic_vector(TRIVIUM_size-1 downto 0) :=X"297B57467ED5A9FD3DCC"; -- IV from challenge dumped from simulation 
+
 begin
- Trivium_ready <= '1';
  
     PDI <= x"0123";
     
@@ -138,8 +180,10 @@ begin
         CRY_PLAIN_AXIS_TDATA           => PLAIN_AXIS_TDATA,
         CRY_ENC_AXIS_TVALID            => ENCR_AXIS_TVALID,
         CRY_ENC_AXIS_TREADY            => ENCR_AXIS_TREADY,
-        CRY_ENC_AXIS_TDATA             => ENCR_AXIS_TDATA);
-    
+        CRY_ENC_AXIS_TDATA             => ENCR_AXIS_TDATA,
+        Challenge_Ready => Challenge_Ready,
+	Challenge =>Challenge
+	);    
     AESnSTR : entity work.AES128_AXIS_Wrapper generic map(
         id_size          => 1,
         defaut_key_behav => '0')
@@ -175,6 +219,74 @@ begin
         SEC_CSU_UE => SEC_UE,
         SEC_CSU_SE => SEC_SE,
         SEC_TDI    => SEC_TDI);
+
+--Trivium Streamer added after the aSIB, and initialized with the SSAK Challenge as IV	
+-- it also does a reset cycle with Resetn to provide a "ready" signal
+
+challenge_detect: process(tclk,rst)
+begin
+
+ if rising_edge(tclk) then
+  if (rst='1') then
+    trivum_reset_done <= '0';
+  else
+    trivum_reset_done <= next_trivum_reset_done;
+  end if;
+ end if;   
+end process;
+
+next_trivum_reset_done <= trivum_reset_done when Challenge_Ready = '0' else '1';
+--Trivium_Resetn	<=  SysResetn when Challenge_Ready = '0' else '0';
+
+Trivium_Resetn <= '1' when trivum_reset_done ='0' and Challenge_Ready = '0' else 
+                  '0' when trivum_reset_done ='0' and Challenge_Ready = '1' else
+		  '1';
+
+
+--Trivium_Resetn	<=  not  Challenge_Ready;
+--Trivium_Resetn	<=  SysResetn;
+
+--Streamer instatiation
+
+KEY <= X"0F62B5085BAE0154A7FA";
+--IV  <=X"288FF65DC42B92F960C7"; --Default IV
+
+--IV  <=X"297B57467ED5A9FD3DCC"; -- IV from challenge dumped from simulation 
+IV  <=Challenge(TRIVIUM_size-1 downto 0);
+
+rst <= not rstn;
+
+--Trivium_ready <= Streamer_Ready;
+Trivium_ready <= '1';
+
+streamer_TDI <= a_TDI;
+--a_TDO <= streamer_TDO;
+ a_TDO <=  streamer_TDO;
+
+trivum_SE <= CSU_SE and a_CSU_Select;
+
+Streamer : trivium_streamer 
+ port map ( 
+     clk => tclk,
+     rst => rst,
+     SysResetn => Trivium_Resetn,
+     Trivium_ready => Streamer_Ready,
+     Trivium_busy => Trivium_busy,
+     KEY    =>  KEY,
+     IV     => IV,
+     
+     --External connections
+     TDI_before_streamer => streamer_TDI, 
+     TDO_after_streamer  => streamer_TDO,
+
+     --Protected segment
+     protected_TDI  =>  protected_TDI,
+     protected_TDO  =>  protected_TDO,
+
+     --ShiftEnable is needed to count shifted bits for keystream generation
+     SH_en => trivum_SE
+   );
+   
     
     A : entity work.ScanSegment generic map(
         size   => 16)
@@ -185,9 +297,15 @@ begin
         CSU_UE => CSU_UE,
         CSU_CE => CSU_CE,
         CSU_Select    => a_CSU_Select,
-        TDI    => a_TDI,
-        TDO    => a_TDO,
-        PDI    => PDI);
+
+        TDI    => protected_TDI,
+        TDO    => protected_TDO,
+--        TDI    => a_TDI,
+--        TDO    => a_TDO,
+ --       PDI    => protected_value,
+       PDI    => PDI,
+	PDO => protected_value);
+
     
     TRNG : entity work.PRNG_gest port map(
         clk     => tclk,

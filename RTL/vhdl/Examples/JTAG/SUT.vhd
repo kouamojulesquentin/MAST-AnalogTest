@@ -40,6 +40,7 @@ ENTITY SUT IS
 	 Clk : in std_logic; --Free Running system clock
 	 SysResetn: in std_logic; --System Level Reset
 	 SUT_ready : out std_logic; --Synchronization signal to IP initialization
+	 SUT_busy : out std_logic; --Synchronization signal for IP internal computation
         --TAP interface
 	 TCK: in std_logic;        
          TMS: in std_logic;        
@@ -209,6 +210,7 @@ SUT : tutorial_1_testcase  port map
      Sel   => select_DR_chain(1)
    );
 SUT_ready <= '1'; --No internal initilization
+SUT_busy <= '0'; --SUT alway active
 end generate;
 
 
@@ -226,6 +228,7 @@ SUT : MIB_tutorial_testcase  port map
      Sel   => select_DR_chain(1)
    );
 SUT_ready <= '1'; --No internal initilization
+SUT_busy <= '0'; --SUT alway active
 end generate;
 
 SUT_SSAK_EXAMPLE: if target_SUT = SSAK_Example generate
@@ -246,6 +249,7 @@ SUT : topTestDesing port map
 		
        ); 
 SUT_ready <= '1'; --No internal initilization
+SUT_busy <= '0'; --SUT alway active
 end generate;
 
 SUT_TRIVIUM_STREAMER_EXAMPLE: if target_SUT = Trivium_Streamer generate
@@ -265,6 +269,7 @@ SUT : trivium_testcase port map
      UP_en => UpdateDR,
      Sel   => select_DR_chain(1)
    );
+SUT_busy <= '0'; --SUT alway active   
 end generate;
 
 SUT_TRIVIUM_DOUBLESTREAMER_EXAMPLE: if target_SUT = Double_Trivium_Streamer generate
@@ -284,6 +289,7 @@ SUT : double_trivium_testcase port map
      UP_en => UpdateDR,
      Sel   => select_DR_chain(1)
    );
+SUT_busy <= '0'; --SUT alway active   
 end generate;
 
 SUT_TRIVIUM_NESTEDSTREAMER_EXAMPLE: if target_SUT = Nested_Trivium_Streamer generate
@@ -303,6 +309,7 @@ SUT : nested_trivium_testcase port map
      UP_en => UpdateDR,
      Sel   => select_DR_chain(1)
    );
+SUT_busy <= '0'; --SUT alway active
 end generate;
 
 SUT_SECURE_SCAN: if target_SUT = Secure_Scan generate
@@ -314,6 +321,7 @@ SUT : scan_secure port map
 	rstn =>rstn,
      SysResetn => SysResetn, --System Level Reset for Trivium Initialization
      Trivium_ready => SUT_ready,
+     Trivium_busy => SUT_busy, --Stop operation during Trivium reconfiguration
 	
 	CSU_SE => ShiftDR,
 	CSU_CE => CaptureDR,

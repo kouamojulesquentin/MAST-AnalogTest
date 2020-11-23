@@ -93,6 +93,7 @@ component trivium_streamer
      rst  : in  std_logic; --Chain Reset
      SysResetn: in std_logic; --System Level Reset for Trivium Initialization
      Trivium_ready : out std_logic;
+     Trivium_busy : out std_logic; --'1' when resetting the Chyper
 
      KEY    : in  std_logic_vector(79 downto 0);
      IV     : in std_logic_vector(79 downto 0);
@@ -176,6 +177,7 @@ Streamer : trivium_streamer
      rst => rst,
      SysResetn => SysResetn,
      Trivium_ready => Trivium_ready_1,
+     Trivium_busy => open,
 
      KEY    =>  KEY,
      IV     => IV,
@@ -199,6 +201,7 @@ nested_Streamer : trivium_streamer
      rst => rst,
      SysResetn => SysResetn,
      Trivium_ready => Trivium_ready_2,
+     Trivium_busy => open,
 
       KEY    =>  KEY,
      IV     => IV,

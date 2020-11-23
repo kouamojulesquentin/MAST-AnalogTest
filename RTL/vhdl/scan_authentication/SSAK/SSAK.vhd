@@ -85,13 +85,17 @@ entity SSAK is
 		--
 		CRY_IV_AXIS_TVALID : out  std_logic;
 		CRY_IV_AXIS_TREADY : in   std_logic:='0';
-		CRY_IV_AXIS_TDATA  : out  std_logic_vector(s_Interface-1 downto 0)
+		CRY_IV_AXIS_TDATA  : out  std_logic_vector(s_Interface-1 downto 0);
 		--
 --		BL_id : in  STD_LOGIC_VECTOR(s_cdeUser-1 downto 0);
 --		BL_iv : in  STD_LOGIC;
 --		BL_od : out STD_LOGIC_VECTOR(s_cdeUser-1 downto 0);
 --		BL_ov : out STD_LOGIC;
 --		BL_oa : out STD_LOGIC_VECTOR(addrBL - 1 downto 0)--(log2(s_UcdeMem)-1 downto 0)
+
+		--Ports for using random challenge as IV
+		Challenge_Ready : out std_logic; 
+		Challenge  : out  std_logic_vector(s_Interface-1 downto 0)
 		);
 end SSAK;
 
@@ -281,6 +285,9 @@ SSO_TMS <= SI_TMS;
         M_AXIS_TVALID  => Mux1V,
         M_AXIS_TREADY  => Mux1R,
         M_AXIS_TDATA   => Mux1D);
+
+       Challenge_Ready <= DefiR; --DefiR has a pulse to 1 when challenge is used
+       Challenge  <= DefiD; 
 
   -- Connection for external crypto function
 	NO_IV_GEN : IF not enableScanEncryptionManagement GENERATE

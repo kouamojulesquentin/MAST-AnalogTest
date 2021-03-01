@@ -20,11 +20,15 @@ package MAST_config is
 -- constant target_SUT :target_SUT_type :=MIB_tutorial;
 --  constant target_SUT :target_SUT_type :=TUTORIAL_1;
 --  constant target_SUT :target_SUT_type :=LOOPBACK;
---  constant target_SUT :target_SUT_type :=SSAK_Example;
---  constant target_SUT :target_SUT_type :=Trivium_Streamer;
---  constant target_SUT :target_SUT_type :=Double_Trivium_Streamer;
---  constant target_SUT :target_SUT_type := Nested_Trivium_Streamer;
-  constant target_SUT :target_SUT_type := Secure_Scan;
+  constant target_SUT :target_SUT_type :=SSAK_Example;
+   --Use SIT/SSAK.sit with SVF_Simulation_Top
+   -- or SIT/Trivium_SSAK.sitS with VF_Simuation_top_encryption
+   
+--  constant target_SUT :target_SUT_type :=Trivium_Streamer; --Use SIT/StreamerTrivium.sit
+--  constant target_SUT :target_SUT_type :=Double_Trivium_Streamer;  --Use SIT/DoubleStreamerTrivium.sit
+--  constant target_SUT :target_SUT_type := Nested_Trivium_Streamer; --Use SIT/NestedStreamerTrivium.sit
+--  constant target_SUT :target_SUT_type := Secure_Scan; 
+
 
  constant IR_SIZE : integer := 4;
   

@@ -5,9 +5,9 @@ TRANSLATOR top Simulation
   CHAIN main_chain
   {
    REGISTER before 12 Bypass: "0xABC"
-   STREAMER online Trivium ""
+   STREAMER online Trivium "0F62B5085BAE0154A7FA 297B57467ED5A9DF3DCC"
     {
-     STREAMER nested Trivium ""
+     STREAMER nested Trivium "0F62B5085BAE0154A7FA 297B57467ED5A9DF3DCC"
      PDL Console_Incr
     {
       REGISTER regHI 16 Bypass: "0x1234"

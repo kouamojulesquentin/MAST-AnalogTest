@@ -52,11 +52,12 @@ BinaryVector SVF_RawPlayer::DoCallback (uint32_t endpointId, void* /* interfaceD
       }
 
   CallbackRequest request(CallbackId(endpointId),callback_toSutData,svfFormattedData);
+
   PushRequest(request);
   
                        /*NB: this is a BLOCKING call*/
      result = PopfromSut();
-
+   
   return result;
 }
 

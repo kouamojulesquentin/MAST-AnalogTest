@@ -76,6 +76,7 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
        {
        THROW_RUNTIME_ERROR("");
        }
+      LOG(DEBUG) << "Node " << this->Name()<<" : RVF Request is id: " << item.CallbackId() << " data: "<< item.ToSutVector().DataAsHexString();
      return item;}; //!<returns the oldest request. NB: it is a BLOCKING call
 
    CallbackRequest PopAllRequests(bool *runLoop) {  
@@ -95,11 +96,13 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
       
      if (*runLoop==false) item = CallbackRequest(HALT_REQUEST); //If Manager is stopped, release interface
      
+     
+     LOG(DEBUG) << "Node " << this->Name()<<" : RVF Request is id: " << item.CallbackId() << " data: "<< item.ToSutVector().DataAsHexString();
      return item;
      }; //!<returns the oldest request. NB: it is a BLOCKING call
 
  void PushfromSut(BinaryVector Result,uint32_t n_interface) {m_fromSutQueue[n_interface]->Push(std::make_pair(Result,*(new std::string))); 
-                         LOG(DEBUG) << "Node " << this->Name()<<" : pushed a fromSut";};//!< Queues a new callback result
+                         LOG(DEBUG) << "Node " << this->Name()<<" : pushed a RVF Result. Data: "<< Result.DataAsHexString();};//!< Queues a new callback result
 
   void PushPending() {m_Pending.Push(true);};//!< Queues a new toSut Update value
   bool PopPending() { return  m_Pending.Pop();};//!< returns the oldest toSut Update value NB: it is a BLOCKING call

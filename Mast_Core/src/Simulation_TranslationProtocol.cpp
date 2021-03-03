@@ -54,7 +54,7 @@ BinaryVector Simulation_TranslatorProtocol::TransformationCallback(CallbackReque
   ostringstream os;
   string toSutData;
   
-  //Check for known commands to format
+   //Check for known commands to format
   if ((current_request.CallbackId()=="SDR") || (current_request.CallbackId()=="SIR"))
      toSutData = FormatSVFData(current_request.ToSutVector());
   else
@@ -79,6 +79,7 @@ BinaryVector Simulation_TranslatorProtocol::TransformationCallback(CallbackReque
 
   LOG(DEBUG) << "Simulation_TranslatorProtocol: Fetching data from exchange file " << m_fromSutFilePath;
   auto fromSutData = FetchDataFromSut();
+
   return fromSutData;
 
  //Implement loopback behaviour

@@ -45,11 +45,11 @@ class MAST_CORE_EXPORT AccessInterfaceRawProtocol : public AccessInterfaceProtoc
 
     void PushRequest(CallbackRequest Request) {
      m_CallbackQueue->Push(Request);
-     LOG(DEBUG) << "Protocol " << this->KindName()<<" : pushed request for Callback "<<Request.CallbackId();
+     LOG(DEBUG) << "Protocol " << this->KindName()<<" : pushed RVF Request for Callback id: "<<Request.CallbackId() << " data: " << Request.ToSutVector().DataAsHexString();
      }; //!<Queues a new Callback Request
 
   BinaryVector PopfromSut() { auto result=  m_fromSutQueue->Pop().first; 
-                             LOG(DEBUG) << "Node " << this->KindName()<<" : popped a fromSut";
+                             LOG(DEBUG) << "Node " << this->KindName()<<" : popped a RVF Result. Data: "<< result.DataAsHexString();
                               return result;   };//!< returns the oldest callback result. NB: it is a BLOCKING call
   std::string PopFormattedfromSut() { auto tmp=m_fromSutQueue->Pop(); if (!tmp.second.empty()) return tmp.second; 
                                       else return tmp.first.DataAsBinaryString();};//!< returns the Formatted Data of the oldest callback result. NB: it is a BLOCKING call

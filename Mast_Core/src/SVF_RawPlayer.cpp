@@ -14,7 +14,7 @@
 #include "SVF_RawPlayer.hpp"
 #include "SVFVector.hpp"
 #include "Utility.hpp"
-#include "CallbackRequest.hpp"
+#include "RVFRequest.hpp"
 
 #include <experimental/string_view>
 #include <sstream>
@@ -51,7 +51,7 @@ BinaryVector SVF_RawPlayer::DoCallback (uint32_t endpointId, void* /* interfaceD
       callback_toSutData = toSutData;
       }
 
-  CallbackRequest request(CallbackId(endpointId),callback_toSutData,svfFormattedData);
+  RVFRequest request(CallbackId(endpointId),callback_toSutData,svfFormattedData);
 
   PushRequest(request);
   
@@ -69,7 +69,7 @@ void SVF_RawPlayer::DoReset(bool doSynchronousReset)
 {
   if (doSynchronousReset){}; //Null operation, used to silence warning
 
-  CallbackRequest request(CallbackId(0));
+  RVFRequest request(CallbackId(0));
   PushRequest(request);
   PopfromSut();
 }

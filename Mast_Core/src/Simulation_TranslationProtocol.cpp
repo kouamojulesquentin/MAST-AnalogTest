@@ -14,7 +14,7 @@
 #include "Simulation_TranslatorProtocol.hpp"
 #include "SVFVector.hpp"
 #include "Utility.hpp"
-#include "CallbackRequest.hpp"
+#include "RVFRequest.hpp"
 
 #include <experimental/string_view>
 #include <sstream>
@@ -48,7 +48,7 @@ using namespace std::string_literals;
 //! Loopbacks "to SUT data" logging SVF command(s) that would be issued if it was really an operating protocol
 //! NOT VERIFIED YET!!! CHECK!!!!!!!
 
-BinaryVector Simulation_TranslatorProtocol::TransformationCallback(CallbackRequest current_request) 
+BinaryVector Simulation_TranslatorProtocol::TransformationCallback(RVFRequest current_request) 
 {
 
   ostringstream os;

@@ -37,13 +37,13 @@ class MAST_CORE_EXPORT AccessInterfaceRawProtocol : public AccessInterfaceProtoc
 
   bool ParentTranslator_is_set() {return ((m_CallbackQueue!=nullptr) && (m_fromSutQueue!=nullptr));}
 
-  void SetCallbackQueue(std::shared_ptr<MTQueue<CallbackRequest>> CallbackQueue) {m_CallbackQueue=CallbackQueue;}
+  void SetCallbackQueue(std::shared_ptr<MTQueue<RVFRequest>> CallbackQueue) {m_CallbackQueue=CallbackQueue;}
    void SetfromSutQueue(std::shared_ptr<MTQueue<std::pair<BinaryVector,std::string>>> fromSutQueue) {m_fromSutQueue=fromSutQueue;}
 
   void SetParentTranslatorName( std::string ParentTranslatorName){m_ParentTranslatorName=ParentTranslatorName;}
   std::string ParentTranslatorName (){return m_ParentTranslatorName;}
 
-    void PushRequest(CallbackRequest Request) {
+    void PushRequest(RVFRequest Request) {
      m_CallbackQueue->Push(Request);
      LOG(DEBUG) << "Protocol " << this->KindName()<<" : pushed RVF Request for Callback id: "<<Request.CallbackId() << " data: " << Request.ToSutVector().DataAsHexString();
      }; //!<Queues a new Callback Request
@@ -56,7 +56,7 @@ class MAST_CORE_EXPORT AccessInterfaceRawProtocol : public AccessInterfaceProtoc
 
   private:
   std::string m_ParentTranslatorName;
-  std::shared_ptr<MTQueue<CallbackRequest>> m_CallbackQueue; 
+  std::shared_ptr<MTQueue<RVFRequest>> m_CallbackQueue; 
   std::shared_ptr<MTQueue<std::pair<BinaryVector,std::string>>> m_fromSutQueue;   //DataCycleThread waits on this queue to update its registers
 
   // ---------------- Protected Methods

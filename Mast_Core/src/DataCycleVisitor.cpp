@@ -75,7 +75,7 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
  
     VisitAccessInterfaceTranslator(translator);
     //Release parent Translator
-    CallbackRequest request(NO_MORE_PENDING);
+    RVFRequest request(NO_MORE_PENDING);
     translator.Protocol()->TransformationCallback(request);
     LOG(DEBUG) << "Finished Thread for accessInterfaceTranslator"<<translator.Name() ;
 };
@@ -165,7 +165,7 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
   
   }
    if (T_2_E_protocol) { //Release and terminate "T-2-E Translator" application thread
-    CallbackRequest request(NO_MORE_PENDING);
+    RVFRequest request(NO_MORE_PENDING);
     T_2_E_protocol->TransformationCallback(request);
    } 
    

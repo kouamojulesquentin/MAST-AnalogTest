@@ -42,7 +42,7 @@ class MAST_CORE_EXPORT JTAG_to_I2C_TranslatorProtocol final : public T_2_T_Trans
   //! @param current_request    the callback request to translate
   //!
   //! @return Bits stream retrieved from SUT as result of the transformation
-  virtual BinaryVector TransformationCallback(CallbackRequest current_request) override;
+  virtual BinaryVector TransformationCallback(RVFRequest current_request) override;
 
   //! Returns readable type of protocol
   //!

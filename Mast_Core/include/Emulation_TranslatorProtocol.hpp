@@ -53,7 +53,7 @@ class MAST_CORE_EXPORT Emulation_TranslatorProtocol final : public AccessInterfa
   //! @param current_request    the callback request to translate
   //!
   //! @return Bits stream retrieved from SUT as result of the transformation
-  virtual BinaryVector TransformationCallback(CallbackRequest current_request) override;
+  virtual BinaryVector TransformationCallback(RVFRequest current_request) override;
 
   //! Returns readable type of protocol
   //!

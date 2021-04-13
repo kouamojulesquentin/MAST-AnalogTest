@@ -18,7 +18,7 @@
 #include "SVF_RawPlayer.hpp"
 #include "SpiedProtocolsCommands.hpp"
 #include "BinaryVector.hpp"
-#include "CallbackRequest.hpp"
+#include "RVFRequest.hpp"
 
 #include <memory>
 #include <string>
@@ -42,7 +42,7 @@ class Spy_Emulation_Translator final : public mast::AccessInterfaceTranslatorPro
 
   //! Spies content how callback to SUT is emulated while returning the BinaryVector unchanged
   //!
-  virtual mast::BinaryVector TransformationCallback(CallbackRequest current_request) override;
+  virtual mast::BinaryVector TransformationCallback(RVFRequest current_request) override;
 
   const std::vector<std::string>& Commands() const { return m_spiedCommands->Commands(); }
 

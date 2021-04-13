@@ -39,10 +39,10 @@ class MAST_CORE_EXPORT T_2_T_TranslatorProtocol : public AccessInterfaceTranslat
   void SetParentTranslatorName( std::string ParentTranslatorName){m_ParentTranslatorName=ParentTranslatorName;}
   std::string ParentTranslatorName (){return m_ParentTranslatorName;}
 
-  void SetCallbackQueue(std::shared_ptr<MTQueue<CallbackRequest>> CallbackQueue) {m_CallbackQueue=CallbackQueue;}
+  void SetCallbackQueue(std::shared_ptr<MTQueue<RVFRequest>> CallbackQueue) {m_CallbackQueue=CallbackQueue;}
    void SetfromSutQueue(std::shared_ptr<MTQueue<std::pair<BinaryVector,std::string>>> fromSutQueue) {m_fromSutQueue=fromSutQueue;}
  
-    void PushRequest(CallbackRequest Request) {
+    void PushRequest(RVFRequest Request) {
      m_CallbackQueue->Push(Request);
      LOG(DEBUG) << "Protocol " << this->KindName()<<" : pushed request for Callback "<<Request.CallbackId();
      }; //!<Queues a new Callback Request
@@ -55,7 +55,7 @@ class MAST_CORE_EXPORT T_2_T_TranslatorProtocol : public AccessInterfaceTranslat
 
   private:
   std::string m_ParentTranslatorName;
-  std::shared_ptr<MTQueue<CallbackRequest>> m_CallbackQueue;                       //!<Callback requests from underlying Raw protocol 
+  std::shared_ptr<MTQueue<RVFRequest>> m_CallbackQueue;                       //!<Callback requests from underlying Raw protocol 
   std::shared_ptr<MTQueue<std::pair<BinaryVector,std::string>>> m_fromSutQueue;    //!<fromSut data results from underlying Raw protocol
 
   // ---------------- Protected Methods

@@ -14,7 +14,7 @@
 
 #include "Trivium_TranslatorProtocol.hpp"
 #include "Utility.hpp"
-#include "CallbackRequest.hpp"
+#include "RVFRequest.hpp"
 #include "Trivium_Reference_Runs.hpp"
 
 #include <experimental/string_view>
@@ -204,20 +204,20 @@ Trivium_TranslatorProtocol::~Trivium_TranslatorProtocol ()
 //---------------------------------------------------------------------------
 
 
-BinaryVector Trivium_TranslatorProtocol::TransformationCallback(CallbackRequest current_request) 
+BinaryVector Trivium_TranslatorProtocol::TransformationCallback(RVFRequest current_request) 
 {
-  // This callback is called each time a CallbackRequest arrived
+  // This callback is called each time a RVFRequest arrived
   
   BinaryVector higher_level_result;
   BinaryVector chipertext_for_higher_level;
   BinaryVector plaintext_for_higher_level;
-  CallbackRequest higher_level_request;
+  RVFRequest higher_level_request;
   
    //Syncrhonisation
    if (current_request.CallbackId()==NO_MORE_PENDING)
    {
     //Finished, release parent Translator
-    CallbackRequest request(NO_MORE_PENDING);
+    RVFRequest request(NO_MORE_PENDING);
     PushRequest(request);
     return higher_level_result;
    }
@@ -232,7 +232,7 @@ BinaryVector Trivium_TranslatorProtocol::TransformationCallback(CallbackRequest 
   LOG(DEBUG) << "Chipertext toSUT: " << chipertext_for_higher_level.DataAsMixString();
   
                                         
-  higher_level_request = CallbackRequest(current_request.CallbackId(),
+  higher_level_request = RVFRequest(current_request.CallbackId(),
                                             chipertext_for_higher_level,
                                             current_request.interfaceData()
                                             );                                       

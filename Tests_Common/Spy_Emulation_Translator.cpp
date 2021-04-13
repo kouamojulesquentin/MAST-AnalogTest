@@ -14,7 +14,7 @@
 #include "Spy_Emulation_Translator.hpp"
 #include "SVFVector.hpp"
 #include "Utility.hpp"
-#include "CallbackRequest.hpp"
+#include "RVFRequest.hpp"
 #include <sstream>
 
 using std::experimental::string_view;
@@ -26,7 +26,7 @@ using namespace test;
 
 //! Spies content how binary vector to SUT is transformed to SVF command while returning the BinaryVector unchanged
 //!
-BinaryVector Spy_Emulation_Translator::TransformationCallback(CallbackRequest current_request) 
+BinaryVector Spy_Emulation_Translator::TransformationCallback(RVFRequest current_request) 
  {
   ostringstream os;
   string toSutData;

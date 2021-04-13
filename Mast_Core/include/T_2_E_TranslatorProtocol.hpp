@@ -43,18 +43,18 @@ class MAST_CORE_EXPORT T_2_E_TranslatorProtocol : public AccessInterfaceTranslat
   T_2_E_TranslatorProtocol() = delete;
 
   T_2_E_TranslatorProtocol(std::experimental::string_view BB_Reg_Name) {
-  m_CallbackQueue=std::make_shared<MTQueue<CallbackRequest>>();
+  m_CallbackQueue=std::make_shared<MTQueue<RVFRequest>>();
   m_fromSutQueue=std::make_shared<MTQueue<std::pair<BinaryVector,std::string>>>();
   m_BB_Reg_Name =BB_Reg_Name;
   m_Translator_launched=false;
   };
 
-  void SetCallbackQueue(std::shared_ptr<MTQueue<CallbackRequest>> CallbackQueue) {m_CallbackQueue=CallbackQueue;}
+  void SetCallbackQueue(std::shared_ptr<MTQueue<RVFRequest>> CallbackQueue) {m_CallbackQueue=CallbackQueue;}
    void SetfromSutQueue(std::shared_ptr<MTQueue<std::pair<BinaryVector,std::string>>> fromSutQueue) {m_fromSutQueue=fromSutQueue;}
  
    std::string GetTranslatorBaseName() {return m_Translator_base_name;};
 
-    void PushRequest(CallbackRequest Request) {
+    void PushRequest(RVFRequest Request) {
      m_CallbackQueue->Push(Request);
      LOG(DEBUG) << "Protocol " << this->KindName()<<" : pushed request for Callback "<<Request.CallbackId();
      }; //!<Queues a new Callback Request
@@ -86,7 +86,7 @@ class MAST_CORE_EXPORT T_2_E_TranslatorProtocol : public AccessInterfaceTranslat
 
   std::experimental::string_view m_BB_Reg_Name;
   std::string m_Translator_base_name= "T_2_E_translator";
-  std::shared_ptr<MTQueue<CallbackRequest>> m_CallbackQueue;                       //!<Callback requests from underlying Raw protocol
+  std::shared_ptr<MTQueue<RVFRequest>> m_CallbackQueue;                       //!<Callback requests from underlying Raw protocol
   std::shared_ptr<MTQueue<std::pair<BinaryVector,std::string>>> m_fromSutQueue;   //!<fromSut data results for underlying Raw protocol
   
   

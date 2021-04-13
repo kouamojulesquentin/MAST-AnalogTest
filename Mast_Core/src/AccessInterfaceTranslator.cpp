@@ -32,7 +32,7 @@ void AccessInterfaceTranslator::Accept (SystemModelVisitor& visitor)
 uint32_t AccessInterfaceTranslator::RegisterInterface(std::shared_ptr<mast::AccessInterface> interface)
 {
  int n_interfaces=m_CallbackQueue.size();
- auto new_CallbackQueue=std::make_shared<MTQueue<CallbackRequest>>();
+ auto new_CallbackQueue=std::make_shared<MTQueue<RVFRequest>>();
  m_CallbackQueue.push_back(new_CallbackQueue);
  auto new_fromSutQueue=std::make_shared<MTQueue<std::pair<BinaryVector,std::string>>>();
  m_fromSutQueue.push_back(new_fromSutQueue);
@@ -47,7 +47,7 @@ uint32_t AccessInterfaceTranslator::RegisterInterface(std::shared_ptr<mast::Acce
 uint32_t AccessInterfaceTranslator::RegisterTranslator(std::shared_ptr<mast::AccessInterfaceTranslator> translator)
 {
  int n_interfaces=m_CallbackQueue.size();
- auto new_CallbackQueue=std::make_shared<MTQueue<CallbackRequest>>();
+ auto new_CallbackQueue=std::make_shared<MTQueue<RVFRequest>>();
  m_CallbackQueue.push_back(new_CallbackQueue);
  auto new_fromSutQueue=std::make_shared<MTQueue<std::pair<BinaryVector,std::string>>>();
  m_fromSutQueue.push_back(new_fromSutQueue);

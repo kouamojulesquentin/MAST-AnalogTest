@@ -333,22 +333,22 @@ void UT_SystemModel::test_CreateAccessInterfaceTranslator ()
   TS_ASSERT_EQUALS_PTR  (sut.Root(), sut.NodeWithId(id));
 }
 
-//! Checks SystemModel::CreateCallbackRequest()
+//! Checks SystemModel::CreateRVFRequest()
 //!
-void UT_SystemModel::test_CreateCallbackRequest ()
+void UT_SystemModel::test_CreateRVFRequest ()
 {
   // ---------------- Setup
   //
   auto name = "undefined"sv;//"Callback_name";
 
-  //! @todo [JFC]-[February/15/2018]: In test_CreateCallbackRequest(): Move to UT_CallbackRequest and Split those tests into 5 distinct sut method or use data driven test
+  //! @todo [JFC]-[February/15/2018]: In test_CreateRVFRequest(): Move to UT_RVFRequest and Split those tests into 5 distinct sut method or use data driven test
   //!                                                                  sut is sut not the SystemModel!
   //!                                                                  sut can also be created on stack rather than on heap
   //!
   // ---------------- Exercise
   //
   //--Undefined Callback
-  auto sut = make_unique<CallbackRequest>();
+  auto sut = make_unique<RVFRequest>();
 
   // ---------------- Verify
   //
@@ -365,7 +365,7 @@ void UT_SystemModel::test_CreateCallbackRequest ()
 
   name = "Callback_name";
 
-  sut = make_unique<CallbackRequest>(name);
+  sut = make_unique<RVFRequest>(name);
 
   TS_ASSERT_NOT_NULLPTR (sut);
   TS_ASSERT_EQUALS      (sut->CallbackId(), name);
@@ -378,7 +378,7 @@ void UT_SystemModel::test_CreateCallbackRequest ()
 
   //--Named CT with additional data
   int dummy=3;
-  sut = make_unique<CallbackRequest>(name,(void *)&dummy);
+  sut = make_unique<RVFRequest>(name,(void *)&dummy);
 
   TS_ASSERT_NOT_NULLPTR (sut);
   TS_ASSERT_EQUALS      (sut->CallbackId(),               name);
@@ -393,7 +393,7 @@ void UT_SystemModel::test_CreateCallbackRequest ()
   TS_ASSERT_NULLPTR     (sut->ToSutVector().DataLeftAligned());
 
   auto toSutVector = BinaryVector::CreateFromBinaryString("01");
-  sut = make_unique<CallbackRequest>(name, toSutVector);
+  sut = make_unique<RVFRequest>(name, toSutVector);
   TS_ASSERT_EQUALS      (sut->FormattedData(),"01");
     TS_ASSERT_EQUALS (sut->ToSutVector().BitsCount(),  2);
     TS_ASSERT_EQUALS (sut->ToSutVector().BytesCount(), 1);
@@ -414,7 +414,7 @@ void UT_SystemModel::test_CreateCallbackRequest ()
     TS_ASSERT_FALSE (sut->ToSutVector().IsEmpty());
     TS_ASSERT_FALSE  (sut->ToSutVector().HasFixedSize());
 
-  sut = make_unique<CallbackRequest>(name,toSutVector,(void *)&dummy);
+  sut = make_unique<RVFRequest>(name,toSutVector,(void *)&dummy);
 
   TS_ASSERT_NOT_NULLPTR (sut);
   TS_ASSERT_EQUALS      (sut->CallbackId(),       name);
@@ -427,7 +427,7 @@ void UT_SystemModel::test_CreateCallbackRequest ()
   TS_ASSERT_FALSE       (toSutVector.IsEmpty());
   TS_ASSERT_FALSE       (toSutVector.HasFixedSize());
  //--Named CT with formatted data
-  sut = make_unique<CallbackRequest>(name,toSutVector,"XY");
+  sut = make_unique<RVFRequest>(name,toSutVector,"XY");
   TS_ASSERT_NOT_NULLPTR (sut);
   TS_ASSERT_EQUALS      (sut->CallbackId(), name);
   TS_ASSERT_NULLPTR (sut->interfaceData());
@@ -437,7 +437,7 @@ void UT_SystemModel::test_CreateCallbackRequest ()
     TS_ASSERT_FALSE (sut->ToSutVector().IsEmpty());
     TS_ASSERT_FALSE  (sut->ToSutVector().HasFixedSize());
  
-  sut = make_unique<CallbackRequest>(name,toSutVector,"SQ",(void *)&dummy);
+  sut = make_unique<RVFRequest>(name,toSutVector,"SQ",(void *)&dummy);
   TS_ASSERT_NOT_NULLPTR (sut);
   TS_ASSERT_EQUALS      (sut->CallbackId(), name);
   TS_ASSERT_EQUALS      (sut->FormattedData(),"SQ");
@@ -450,7 +450,7 @@ void UT_SystemModel::test_CreateCallbackRequest ()
     TS_ASSERT_FALSE  (sut->ToSutVector().HasFixedSize());
 
  //--Named CT with only formatted data
-  sut = make_unique<CallbackRequest>(name,"XY");
+  sut = make_unique<RVFRequest>(name,"XY");
   TS_ASSERT_NOT_NULLPTR (sut);
   TS_ASSERT_EQUALS      (sut->CallbackId(), name);
   TS_ASSERT_NULLPTR (sut->interfaceData());
@@ -484,7 +484,7 @@ void UT_SystemModel::test_CreateAccessInterfaceTranslator_Request_Queues_NB ()
   CxxTest::setAbortTestOnFail(true);
 
   // One Request
-  auto  test = CallbackRequest(Request+"1");
+  auto  test = RVFRequest(Request+"1");
   protocol->PushRequest(test);
   auto result = node->PopRequest(0);
   TS_ASSERT_NOT_NULLPTR (&result);
@@ -492,7 +492,7 @@ void UT_SystemModel::test_CreateAccessInterfaceTranslator_Request_Queues_NB ()
 
 
   // Multiple Request
-  test = CallbackRequest(Request+"1");
+  test = RVFRequest(Request+"1");
   protocol->PushRequest(test);
   result = node->PopRequest(0);
   TS_ASSERT_NOT_NULLPTR (&result);
@@ -501,7 +501,7 @@ void UT_SystemModel::test_CreateAccessInterfaceTranslator_Request_Queues_NB ()
 
   for (int i=0;i<10;i++)
      {
-     test = CallbackRequest(Request+std::to_string(i));
+     test = RVFRequest(Request+std::to_string(i));
       protocol->PushRequest(test);
      }
 
@@ -513,7 +513,7 @@ void UT_SystemModel::test_CreateAccessInterfaceTranslator_Request_Queues_NB ()
      }
 
  //Formatted data
-  test = CallbackRequest(Request,"100");
+  test = RVFRequest(Request,"100");
   TS_ASSERT_NULLPTR(test.interfaceData());
   TS_ASSERT_EQUALS (test.FormattedData(),"100");
   TS_ASSERT_EQUALS (test.ToSutVector().BitsCount(),  0);

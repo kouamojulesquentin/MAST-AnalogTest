@@ -16,7 +16,7 @@
 
 #include "ParentNode.hpp"
 #include "BinaryVector.hpp"
-#include "CallbackRequest.hpp"
+#include "RVFRequest.hpp"
 #include "CallbackIds.hpp"
 #include "MTQueue.hpp"
 #include "AccessInterfaceTranslatorProtocol.hpp"
@@ -61,16 +61,16 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
  void unset_Busy(){m_Busy=false;};
  bool is_Busy(){return m_Busy;};
  
-  CallbackRequest PopRequest(uint32_t n_interface) {  
+  RVFRequest PopRequest(uint32_t n_interface) {  
      std::cv_status   status;
-     CallbackRequest item; 
+     RVFRequest item; 
       LOG(DEBUG) << "Node " << this->Name()<<" : Popping a request ...";
   //   status=m_CallbackQueue->Pop(item,m_timeout);
      m_CallbackQueue[n_interface]->Pop(item);
       LOG(DEBUG) << "Node " << this->Name()<<" : Pop done";
      try
       {
-     CHECK_PARAMETER_NEQ (status, std::cv_status::timeout,"Error, timeout on CallbackRequestQueue->Pop");
+     CHECK_PARAMETER_NEQ (status, std::cv_status::timeout,"Error, timeout on RVFRequestQueue->Pop");
       }
       catch(...)
        {
@@ -79,10 +79,10 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
       LOG(DEBUG) << "Node " << this->Name()<<" : RVF Request is id: " << item.CallbackId() << " data: "<< item.ToSutVector().DataAsHexString();
      return item;}; //!<returns the oldest request. NB: it is a BLOCKING call
 
-   CallbackRequest PopAllRequests(bool *runLoop) {  
+   RVFRequest PopAllRequests(bool *runLoop) {  
      constexpr auto timeout = 2ms;
      std::cv_status   status;
-     CallbackRequest item; 
+     RVFRequest item; 
      uint32_t n_interface=0;
      while (*runLoop) //Infinite loop on all Callaback queues
       {
@@ -94,7 +94,7 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
       n_interface%=m_CallbackQueue.size();
       }
       
-     if (*runLoop==false) item = CallbackRequest(HALT_REQUEST); //If Manager is stopped, release interface
+     if (*runLoop==false) item = RVFRequest(HALT_REQUEST); //If Manager is stopped, release interface
      
      
      LOG(DEBUG) << "Node " << this->Name()<<" : RVF Request is id: " << item.CallbackId() << " data: "<< item.ToSutVector().DataAsHexString();
@@ -119,7 +119,7 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
   
   std::chrono::duration<int,std::milli> m_timeout = 15ms;
   
-  std::vector<std::shared_ptr<MTQueue<CallbackRequest>>> m_CallbackQueue;  //!<DataCycleThread pushes to_SUT data and CallbackId to this queue
+  std::vector<std::shared_ptr<MTQueue<RVFRequest>>> m_CallbackQueue;  //!<DataCycleThread pushes to_SUT data and CallbackId to this queue
   std::vector<std::shared_ptr<MTQueue<std::pair<BinaryVector,std::string>>>> m_fromSutQueue;   //!<DataCycleThread waits on this queue to update its registers
   MTQueue<bool> m_Pending;  //!<DataCycleThread waits on this queue for pending cycles: only used for synchro, data is not important
   bool m_Busy; //!< When TRUE, the sub-tree is being served by a T-2-E translation and must be bypassed by the DataCycle

@@ -396,7 +396,7 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
    auto raw_protocol =  std::dynamic_pointer_cast<AccessInterfaceRawProtocol>(protocol);
    if (raw_protocol)
     { //We need to release DataCycleVisitor::VisitAccessInterfaceTranslator
-    CallbackRequest request(NO_MORE_PENDING);
+    RVFRequest request(NO_MORE_PENDING);
     raw_protocol->PushRequest(request);
     }
 }

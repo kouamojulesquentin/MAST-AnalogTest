@@ -14,7 +14,7 @@
 
 #include "Dummy_TranslatorProtocol.hpp"
 #include "Utility.hpp"
-#include "CallbackRequest.hpp"
+#include "RVFRequest.hpp"
 
 #include <experimental/string_view>
 #include <sstream>
@@ -42,9 +42,9 @@ Dummy_TranslatorProtocol::Dummy_TranslatorProtocol (const std::string& parameter
 //---------------------------------------------------------------------------
 
 
-BinaryVector Dummy_TranslatorProtocol::TransformationCallback(CallbackRequest current_request) 
+BinaryVector Dummy_TranslatorProtocol::TransformationCallback(RVFRequest current_request) 
 {
-  // This callback is called each time a CallbackRequest arrived
+  // This callback is called each time a RVFRequest arrived
   
   BinaryVector higher_level_result;
   
@@ -52,7 +52,7 @@ BinaryVector Dummy_TranslatorProtocol::TransformationCallback(CallbackRequest cu
    if (current_request.CallbackId()==NO_MORE_PENDING)
    {
     //Finished, release parent Translator
-    CallbackRequest request(NO_MORE_PENDING);
+    RVFRequest request(NO_MORE_PENDING);
     PushRequest(request);
     return higher_level_result;
    }
@@ -61,7 +61,7 @@ BinaryVector Dummy_TranslatorProtocol::TransformationCallback(CallbackRequest cu
   // Prepare a request to the higher-level interface: 
  
   //Just pass request without modifying it
-  CallbackRequest higher_level_request=current_request;
+  RVFRequest higher_level_request=current_request;
   
   //Push request to higher level
   PushRequest(higher_level_request);

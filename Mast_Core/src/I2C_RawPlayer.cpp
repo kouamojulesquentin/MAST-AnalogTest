@@ -182,18 +182,18 @@ BinaryVector I2C_RawPlayer::DoCallback (uint32_t endpointId, void* /* interfaceD
 
   if (endpointId == 0) //No data in the request dor Reset operation
       {
-     CallbackRequest reset_request(I2C_RESET,callback_toSutData,i2c_FormattedData,address_data);
+     RVFRequest reset_request(I2C_RESET,callback_toSutData,i2c_FormattedData,address_data);
      PushRequest(reset_request);
      result = PopfromSut();
       }
   else
    {
   callback_toSutData = toSutData;
-  CallbackRequest  read_request(I2C_READ,callback_toSutData,os_read.str(),address_data);
+  RVFRequest  read_request(I2C_READ,callback_toSutData,os_read.str(),address_data);
   PushRequest(read_request);
   result = PopfromSut(); //Need to remove from queue, but return data in not useful
 
-  CallbackRequest write_request(I2C_WRITE,callback_toSutData,os_write.str(),address_data);
+  RVFRequest write_request(I2C_WRITE,callback_toSutData,os_write.str(),address_data);
   PushRequest(write_request);
   result = PopfromSut();
   }
@@ -209,7 +209,7 @@ void I2C_RawPlayer::DoReset(bool doSynchronousReset)
 {
   if (doSynchronousReset){}; //Null operation, used to silence warning
 
-  CallbackRequest request(I2C_RESET);
+  RVFRequest request(I2C_RESET);
   PushRequest(request);
   PopfromSut();
 }

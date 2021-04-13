@@ -13,7 +13,7 @@
 
 #include "JTAG_to_I2C_TranslatorProtocol.hpp"
 #include "Utility.hpp"
-#include "CallbackRequest.hpp"
+#include "RVFRequest.hpp"
 
 #include <experimental/string_view>
 #include <sstream>
@@ -132,7 +132,7 @@ uint32_t JTAG_to_I2C_TranslatorProtocol::GetAddress (uint32_t endpointId) const
 //  End of: JTAG_to_I2C_TranslatorProtocol::GetAddress
 //---------------------------------------------------------------------------
 
-BinaryVector JTAG_to_I2C_TranslatorProtocol::TransformationCallback(CallbackRequest current_request) 
+BinaryVector JTAG_to_I2C_TranslatorProtocol::TransformationCallback(RVFRequest current_request) 
 {
   BinaryVector result;
   string i2c_FormattedData;
@@ -155,7 +155,7 @@ BinaryVector JTAG_to_I2C_TranslatorProtocol::TransformationCallback(CallbackRequ
   if (current_request.CallbackId()==NO_MORE_PENDING)
    {
     //Finished, release parent Translator
-    CallbackRequest request(NO_MORE_PENDING);
+    RVFRequest request(NO_MORE_PENDING);
     PushRequest(request);
     return result;
    }
@@ -168,7 +168,7 @@ BinaryVector JTAG_to_I2C_TranslatorProtocol::TransformationCallback(CallbackRequ
 
   if (endpointId == 0) //No data in the request dor Reset operation
       {
-     CallbackRequest reset_request(I2C_RESET,callback_toSutData,i2c_FormattedData,address_data);
+     RVFRequest reset_request(I2C_RESET,callback_toSutData,i2c_FormattedData,address_data);
      PushRequest(reset_request);
      result = PopfromSut();
       }
@@ -176,13 +176,13 @@ BinaryVector JTAG_to_I2C_TranslatorProtocol::TransformationCallback(CallbackRequ
    {
   LOG(DEBUG) << "TransformationCallback: Issue an I2C_READ operation";
   callback_toSutData = toSutData;
-  CallbackRequest read_request(I2C_READ,callback_toSutData,os_read.str(),address_data);
+  RVFRequest read_request(I2C_READ,callback_toSutData,os_read.str(),address_data);
   PushRequest(read_request);
   result = PopfromSut(); //Need to remove from queue, but return data in not useful
   LOG(DEBUG) << "TransformationCallback: I2C_READ finished: drop return data";
 
   LOG(DEBUG) << "TransformationCallback: Issue an I2C_WRITE operation";
-  CallbackRequest write_request(I2C_WRITE,callback_toSutData,os_write.str(),address_data);
+  RVFRequest write_request(I2C_WRITE,callback_toSutData,os_write.str(),address_data);
   PushRequest(write_request);
   result = PopfromSut();
   LOG(DEBUG) << "TransformationCallback: Issue an I2C_WRITE operation";

@@ -70,14 +70,14 @@ void UT_Emulation_TranslatorProtocol::test_TransformationCallback ()
     auto        toSutVector     = BinaryVector::CreateFromString(std::get<1> (data));
     auto        formatted_Data     = std::get<2> (data);
     const auto& expectedCommand = std::get<3> (data);
-    CallbackRequest  test;
+    RVFRequest  test;
 
     Spy_Emulation_Translator sut;
 
     if (strlen(formatted_Data)>0)
-      test = *( new CallbackRequest(CallbackId,toSutVector,formatted_Data));
+      test = *( new RVFRequest(CallbackId,toSutVector,formatted_Data));
     else
-     test = *(new CallbackRequest(CallbackId,toSutVector));
+     test = *(new RVFRequest(CallbackId,toSutVector));
     //Check Callback
     // ---------------- Exercise
     //
@@ -129,7 +129,7 @@ void UT_Emulation_TranslatorProtocol::test_SVF_RawPlayer_TransformationCallback 
     auto        n_Callback    = std::get<0> (data);
     auto        toSutVector     = BinaryVector::CreateFromString(std::get<1> (data));
     const auto& expectedCommand = std::get<2> (data);
-    CallbackRequest  test;
+    RVFRequest  test;
 
     auto sut = make_shared<Spy_Emulation_Translator>(); 
     

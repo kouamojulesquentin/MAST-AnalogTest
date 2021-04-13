@@ -13,7 +13,7 @@
 
 #include "JTAG_BitBang_TranslatorProtocol.hpp"
 #include "Utility.hpp"
-#include "CallbackRequest.hpp"
+#include "RVFRequest.hpp"
 #include "CPP_API.hpp"
 
 #include <experimental/string_view>
@@ -55,7 +55,7 @@ BinaryVector JTAG_BitBang_TranslatorProtocol::PDL_translator( std::experimental:
 return ToSutVector;
 }                   
 
-BinaryVector JTAG_BitBang_TranslatorProtocol::TransformationCallback(CallbackRequest current_request) 
+BinaryVector JTAG_BitBang_TranslatorProtocol::TransformationCallback(RVFRequest current_request) 
 {
   BinaryVector result;
   string i2c_FormattedData;
@@ -74,7 +74,7 @@ BinaryVector JTAG_BitBang_TranslatorProtocol::TransformationCallback(CallbackReq
   if (current_request.CallbackId()==NO_MORE_PENDING)
    {
     //Finished, terminate T-2-E translator thread
-    CallbackRequest request(NO_MORE_PENDING);
+    RVFRequest request(NO_MORE_PENDING);
     PushRequest(request);
     return result;
    }

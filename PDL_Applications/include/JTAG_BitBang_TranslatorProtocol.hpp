@@ -44,7 +44,7 @@ class MAST_CORE_EXPORT JTAG_BitBang_TranslatorProtocol final : public T_2_E_Tran
   //! @param current_request    the callback request to translate
   //!
   //! @return Bits stream retrieved from SUT as result of the transformation
-  virtual BinaryVector TransformationCallback(CallbackRequest current_request) override;
+  virtual BinaryVector TransformationCallback(RVFRequest current_request) override;
   
   virtual BinaryVector PDL_translator( std::experimental::string_view CallbackId, BinaryVector	   ToSutVector) override;
 

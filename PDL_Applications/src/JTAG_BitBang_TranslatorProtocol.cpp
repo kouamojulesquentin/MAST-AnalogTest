@@ -13,7 +13,7 @@
 
 #include "JTAG_BitBang_TranslatorProtocol.hpp"
 #include "Utility.hpp"
-#include "RVFRequest.hpp"
+#include "RVF.hpp"
 #include "CPP_API.hpp"
 
 #include <experimental/string_view>

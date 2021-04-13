@@ -18,7 +18,7 @@
 #include "SVF_RawPlayer.hpp"
 #include "SpiedProtocolsCommands.hpp"
 #include "BinaryVector.hpp"
-#include "RVFRequest.hpp"
+#include "RVF.hpp"
 
 #include <memory>
 #include <string>

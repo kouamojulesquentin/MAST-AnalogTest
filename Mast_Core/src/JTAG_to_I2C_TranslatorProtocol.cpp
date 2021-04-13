@@ -13,7 +13,7 @@
 
 #include "JTAG_to_I2C_TranslatorProtocol.hpp"
 #include "Utility.hpp"
-#include "RVFRequest.hpp"
+#include "RVF.hpp"
 
 #include <experimental/string_view>
 #include <sstream>

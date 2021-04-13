@@ -17,7 +17,7 @@
 
 #include "BinaryVector.hpp"
 #include "CallbackIds.hpp"
-#include "RVFRequest.hpp"
+#include "RVF.hpp"
 #include <experimental/string_view>
 
 namespace mast
@@ -36,7 +36,7 @@ class AccessInterfaceTranslatorProtocol
   //! @param current_request    the callback request to translate
   //!
   //! @return Bits stream retrieved from SUT as result of the transformation
-  virtual BinaryVector TransformationCallback(RVFRequest current_request) = 0;
+  virtual RVFResponse TransformationCallback(RVFRequest current_request) = 0;
 
   //! Returns readable type of Transformationprotocol (Emulation, JTAG_to_I2C, ...)
   //!

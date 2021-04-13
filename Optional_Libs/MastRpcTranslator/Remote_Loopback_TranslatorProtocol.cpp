@@ -14,7 +14,7 @@
 #include "Remote_Loopback_TranslatorProtocol.hpp"
 #include "SVFVector.hpp"
 #include "Utility.hpp"
-#include "RVFRequest.hpp"
+#include "RVF.hpp"
 
 #include "g3log/g3log.hpp"
 

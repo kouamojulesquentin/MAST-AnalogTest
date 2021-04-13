@@ -16,7 +16,7 @@
 
 #include "ParentNode.hpp"
 #include "BinaryVector.hpp"
-#include "RVFRequest.hpp"
+#include "RVF.hpp"
 #include "CallbackIds.hpp"
 #include "MTQueue.hpp"
 #include "AccessInterfaceTranslatorProtocol.hpp"

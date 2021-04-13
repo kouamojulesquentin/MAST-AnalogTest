@@ -14,7 +14,7 @@
 #include "Spy_Emulation_Translator.hpp"
 #include "SVFVector.hpp"
 #include "Utility.hpp"
-#include "RVFRequest.hpp"
+#include "RVF.hpp"
 #include <sstream>
 
 using std::experimental::string_view;

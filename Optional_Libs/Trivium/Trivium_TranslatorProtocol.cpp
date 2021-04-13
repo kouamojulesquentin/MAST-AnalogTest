@@ -14,7 +14,7 @@
 
 #include "Trivium_TranslatorProtocol.hpp"
 #include "Utility.hpp"
-#include "RVFRequest.hpp"
+#include "RVF.hpp"
 #include "Trivium_Reference_Runs.hpp"
 
 #include <experimental/string_view>

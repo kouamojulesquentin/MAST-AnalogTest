@@ -16,6 +16,7 @@
   #define ACCESSINTERFACEPROTOCOL_H__B0FE4245_A913_4634_F1BD_725570BFDC80__INCLUDED_
 
 #include "BinaryVector.hpp"
+#include "RVF.hpp"
 #include <experimental/string_view>
 
 namespace mast
@@ -37,7 +38,7 @@ class AccessInterfaceProtocol
   //! @param toSutData      Bits stream to transfer to SUT
   //!
   //! @return Bits stream retrieved from SUT
-  virtual BinaryVector DoCallback(uint32_t endpointId, void* interfaceData, const BinaryVector& toSutData) = 0;
+  virtual RVFResponse DoCallback(uint32_t endpointId, void* interfaceData, const BinaryVector& toSutData) = 0;
 
   //! Gets the number of endpoints supported by the specific protocol
   //!

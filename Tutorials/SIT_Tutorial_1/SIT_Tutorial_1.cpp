@@ -60,7 +60,8 @@ void Increment ()
     uint16_t curValue;
 
    curValue=iGetRefresh<uint16_t>(registerPath);
-    std::cout << "\nINCREMENTRunning " << loopCount << " iWrites on register " <<registerPath << "\n";
+    std::cout << "\nINCREMENT Running " << loopCount << " iWrites on register " <<registerPath << "\n";
+    iNote(iNoteType::Comment,"Let's go!");
     while (i++<loopCount)
     {
       iWrite(registerPath, initialValue);

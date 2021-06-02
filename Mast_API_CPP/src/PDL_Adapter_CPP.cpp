@@ -34,6 +34,7 @@ using namespace mast;
 
 namespace
 {
+
 //! Copies binary vector bits as a C-Style string
 //!
 //! @param binVector  A BinaryVector to "export" to C-Style string
@@ -147,7 +148,10 @@ void mast::iApply ()
   manager->iApply();
 }
 
-
+void mast::iNote_impl (iNoteType severity, string_view message) {
+  auto manager = GetAndCheckManager();
+  manager->iNote (severity,message);
+}
 
 void mast::iGet (string_view registerPath, uint8_t&  readData) { iGet_impl(registerPath, readData); }
 void mast::iGet (string_view registerPath, uint16_t& readData) { iGet_impl(registerPath, readData); }
@@ -294,6 +298,11 @@ void mast::iWrite (string_view registerPath, string_view value) { iWrite_impl(re
 //! iScan is like an iWrite+iRead, but can only be executed on a BlackBox
 void mast::iScan (string_view registerPath, string_view value) { iScan_impl(registerPath, BinaryVector::CreateFromString(value)); }
 void mast::iScan (string_view registerPath, string_view value,string_view expectedValue) { iScan_impl(registerPath, BinaryVector::CreateFromString(value), BinaryVector::CreateFromString(expectedValue)); }
+
+
+//! iNote is implemented as a wrapper for the logger
+void mast::iNote (iNoteType severity, string_view message) { iNote_impl(severity, message);}
+
 
 //===========================================================================
 // End of PDL_Adapter_CPP.cpp

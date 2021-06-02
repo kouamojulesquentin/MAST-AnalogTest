@@ -43,6 +43,11 @@ class SystemModelManagerMonitor;
 class SystemModelManager_impl;
 class ConfigurationAlgorithm;
 class BinaryVector;
+enum class iNoteType
+    {
+    Status,
+    Comment
+    };
 
 //! Implements actual SystemModelManager.
 //!
@@ -210,8 +215,12 @@ class SystemModelManager_impl final
   //!
   void iScan (string_view registerPath, BinaryVector value, BinaryVector expectedValue);
 
-  //! Waits for all threads to be pendingbefore  triggering a DataCycle (default is false)
+  //! Logs messages following IEEE 1687-2014
   //!
+  void iNote (iNoteType severity,string_view message);
+
+  //! Waits for all threads to be pendingbefore  triggering a DataCycle (default is false)
+  //
   void setwaitFullPending (bool waitFullPending) { m_waitFullPending = waitFullPending; }
 
   //! Returns current maximum time between an iApply and the next data cycle

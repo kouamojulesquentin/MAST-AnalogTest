@@ -974,6 +974,14 @@ void SystemModelManager_impl::iScan_impl (string_view registerPath, T value)
 //!
 void SystemModelManager_impl::iScan (string_view registerPath, BinaryVector value) { iScan_impl(registerPath, std::move(value)); }
 
+void SystemModelManager_impl::iNote (iNoteType severity, string_view message) {
+ switch (severity)
+  {
+   case iNoteType::Status : LOG(INFO) << "iNote Status: " << message ;break;
+   case iNoteType::Comment:LOG(INFO)  << "iNote Comment: " << message ; break;
+   default : THROW_RUNTIME_ERROR("iNote severity can only be Status or Comment");
+  }
+ }
 
 //! Sets next Register and Expected values to SUT for a BlackBox
  //!

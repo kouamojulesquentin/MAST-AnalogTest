@@ -34,6 +34,7 @@ class SystemModelManagerMonitor;
 class SystemModelManager_impl;
 class ConfigurationAlgorithm;
 class BinaryVector;
+enum class iNoteType;
 
 //! Coordinates the dynamic aspects of the system model
 //!
@@ -196,6 +197,10 @@ class MAST_CORE_EXPORT SystemModelManager final
   //! Sets next Register and Expected values to SUT for a BlackBox
   //!
   void iScan (string_view registerPath, BinaryVector value, BinaryVector expectedValue);
+
+  //! Logs messages following IEEE 1687-2014
+  //!
+  void iNote (iNoteType severity,string_view message);
 
   //! Returns current maximum time between an iApply and the next data cycle
   //!

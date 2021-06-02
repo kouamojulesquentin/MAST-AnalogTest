@@ -174,6 +174,8 @@ void SystemModelManager::iScan (string_view registerPath, BinaryVector value) { 
 //!
 void SystemModelManager::iScan (string_view registerPath, BinaryVector value, BinaryVector expectedValue){ m_impl->iScan(registerPath, value,expectedValue); }
 
+void SystemModelManager::iNote (iNoteType severity,string_view message) { m_impl->iNote(severity, message); }
+
 //! Returns current maximum time between an iApply and the next data cycle
 //!
 std::chrono::milliseconds SystemModelManager::DataCycleLoopTimeout() const { return m_impl->DataCycleLoopTimeout(); }

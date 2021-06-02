@@ -47,30 +47,30 @@ class MAST_CORE_EXPORT SVF_SimulationProtocol final : public SVF_Player
 
   //! Does any callback required to transfer scan data to and from SUT
   //!
-  //! @param endpointId   Identifies the endpoint to act for (zero based)
+  //! @param channelId   Identifies the Channel to act for (zero based)
   //! @param interfaceData  Application data stored in the AccessInterface
   //! @param toSutData      Bits stream to transfer to SUT
   //!
   //! @return Bitstream retrieved from SUT
   //!
-  virtual BinaryVector DoCallback(uint32_t endpointId, void* interfaceData, const BinaryVector& toSutData) override;
+  virtual BinaryVector DoCallback(uint32_t channelId, void* interfaceData, const BinaryVector& toSutData) override;
 
-  //! Gets the number of endpoints supported by the specific protocol
+  //! Gets the number of Channel supported by the specific protocol
   //!
-  //! @note EndPoint id 0 is reserved for reset operation, so protocol must support a least two endpoints
+  //! @note Channel id 0 is reserved for reset operation, so protocol must support a least two Channels
   //!
-  //! @return The number of supported endpoint (including pseudo endpoint 0 for reset)
+  //! @return The number of supported Channels (including pseudo Channel 0 for reset)
   //!
-  virtual uint32_t MaxSupportedEndPoints() const override { return 3u; }
+  virtual uint32_t MaxSupportedChannels() const override { return 3u; }
 
   //! Returns readable type of protocol
   //!
   virtual std::experimental::string_view KindName() const override { return "SVF_Simulation"; }
 
-  //! readable identifier for given endpoint
+  //! readable identifier for given Channel
   //!
-  std::string CallbackId(int EndPoint) const { 
-     switch (EndPoint){
+  std::string CallbackId(int Channel) const { 
+     switch (Channel){
        case 0: return "TRSRT"; 
        case 1: return "SIR"; 
        case 2: return "SRD"; 

@@ -62,7 +62,7 @@ void UT_SVF_RawPlayer::test_CallbackIds ()
   // ---------------- Exercise & Verify
   //
   SVF_RawPlayer sut;
-  TS_ASSERT_EQUALS(sut.MaxSupportedEndPoints(),3u);
+  TS_ASSERT_EQUALS(sut.MaxSupportedChannels(),3u);
   TS_ASSERT_EQUALS(sut.CallbackId(0),TRST);
   TS_ASSERT_EQUALS(sut.CallbackId(1),SIR);
   TS_ASSERT_EQUALS(sut.CallbackId(2),SDR);

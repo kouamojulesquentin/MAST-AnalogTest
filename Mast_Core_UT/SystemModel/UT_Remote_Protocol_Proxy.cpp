@@ -143,7 +143,7 @@ void UT_Remote_Protocol_Proxy::test_Constructor_RemoteClient ()
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS (proxy->MaxSupportedEndPoints(), 3u);
+  TS_ASSERT_EQUALS (proxy->MaxSupportedChannels(), 3u);
   TS_ASSERT_EQUALS (proxy->KindName(),                "Remote_Spy"sv);
   TS_ASSERT_EQUALS (pSpy->syncReset,                  0);
   TS_ASSERT_EQUALS (pSpy->asyncReset,                 0);
@@ -180,7 +180,7 @@ void UT_Remote_Protocol_Proxy::test_Constructor_StringParameters_Success ()
     // ---------------- Verify
     //
     TS_ASSERT_NOT_NULLPTR (proxy);
-    TS_ASSERT_EQUALS      (proxy->MaxSupportedEndPoints(), 3u);
+    TS_ASSERT_EQUALS      (proxy->MaxSupportedChannels(), 3u);
     TS_ASSERT_EQUALS      (proxy->KindName(),                expectedKind);
 
     // Check a Client Protocol has been created and use as appropriate
@@ -310,7 +310,7 @@ void UT_Remote_Protocol_Proxy::test_DoCallback ()
   {
     // ---------------- Setup
     //
-    auto         endpointId    = std::get<0>(data);
+    auto         channelId    = std::get<0>(data);
     const auto&  toSutData       = BinaryVector::CreateFromString(std::get<1>(data));
     auto         expectedCommand = std::get<2>(data);
     const auto&  expectedBinary  = std::get<3>(data);
@@ -323,7 +323,7 @@ void UT_Remote_Protocol_Proxy::test_DoCallback ()
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS_NOTHING (fromSutData = sut.DoCallback(endpointId, nullptr, toSutData));
+    TS_ASSERT_THROWS_NOTHING (fromSutData = sut.DoCallback(channelId, nullptr, toSutData));
 
     // ---------------- Verify
     //
@@ -358,9 +358,9 @@ void UT_Remote_Protocol_Proxy::test_DoCallback ()
 }
 
 
-//! Checks Remote_Protocol_Proxy::DoCallback() with invalid endpoint id
+//! Checks Remote_Protocol_Proxy::DoCallback() with invalid channel id
 //!
-void UT_Remote_Protocol_Proxy::test_DoCallback_invalid_EndPointId ()
+void UT_Remote_Protocol_Proxy::test_DoCallback_invalid_ChannelId ()
 {
   // ---------------- Setup
   //

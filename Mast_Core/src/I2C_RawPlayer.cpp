@@ -30,7 +30,7 @@ using namespace std::experimental::literals::string_view_literals;
 
 //! Constructor from vector
 //!
-//! @param addresses        Array of I2C addresses for managed endpoints (value at offset 0 is reserved for reset)
+//! @param addresses        Array of I2C addresses for managed channels (value at offset 0 is reserved for reset)
 //!
 I2C_RawPlayer::I2C_RawPlayer (vector<uint32_t> addresses)
   : m_addresses     (std::move(addresses))
@@ -45,7 +45,7 @@ I2C_RawPlayer::I2C_RawPlayer (vector<uint32_t> addresses)
 //! Initializes with addresses defined by a string
 //!
 //! @note Expected (comma separated) parameters are:
-//!   - addresses        Array of I2C addresses for managed endpoints (value at offset 0 is reserved for reset)
+//!   - addresses        Array of I2C addresses for managed channels (value at offset 0 is reserved for reset)
 //!
 //! @note Example of parameter:
 //!    0x30, 0x31, 0x32
@@ -113,22 +113,22 @@ I2C_RawPlayer::I2C_RawPlayer (const std::string& parameters)
 
 
 
-//! Creates an I2C command associated to endpoint identifier and BinaryVector to send to SUT
+//! Creates an I2C command associated to channel identifier and BinaryVector to send to SUT
 //!
-//! @param addresses        Array of I2C addresses for managed endpoints (value at offset 0 is reserved)
+//! @param addresses        Array of I2C addresses for managed channels (value at offset 0 is reserved)
 //!
-string I2C_RawPlayer::CreateI2CCommand (uint32_t endpointId, const BinaryVector& toSutData)
+string I2C_RawPlayer::CreateI2CCommand (uint32_t channelId, const BinaryVector& toSutData)
 {
   ostringstream os;
   string_view commandType;
 
-  if (endpointId == 0)
+  if (channelId == 0)
   {
     os << "I2C_RESET()\n";
   }
   else
   {
-    auto address = GetAddress(endpointId);
+    auto address = GetAddress(channelId);
 
     os  << "I2C_READ(0x"  << std::hex << address << ")\n";
     os  << "I2C_WRITE(0x" << std::hex << address << ", " << toSutData.DataAsMixString() << ")\n";
@@ -143,18 +143,18 @@ string I2C_RawPlayer::CreateI2CCommand (uint32_t endpointId, const BinaryVector&
 //---------------------------------------------------------------------------
 
 
-//! Returns address for specified endpoint
+//! Returns address for specified channel
 //!
-//! @param endpointId   EndPoint identifier [1..N]
+//! @param channelId   Channel identifier [1..N]
 //!
-uint32_t I2C_RawPlayer::GetAddress (uint32_t endpointId) const
+uint32_t I2C_RawPlayer::GetAddress (uint32_t channelId) const
 {
-  if (endpointId >= m_addresses.size())
+  if (channelId >= m_addresses.size())
   {
-    THROW_INVALID_ARGUMENT("EndPointId must be '0' for Reset or '1' to "s + std::to_string(m_addresses.size() - 1));
+    THROW_INVALID_ARGUMENT("ChannelId must be '0' for Reset or '1' to "s + std::to_string(m_addresses.size() - 1));
   }
 
-  auto address = m_addresses[endpointId];
+  auto address = m_addresses[channelId];
   return address;
 }
 //
@@ -164,7 +164,7 @@ uint32_t I2C_RawPlayer::GetAddress (uint32_t endpointId) const
 
 //! sends request for I2C_READ and I2C_WRITE callbacks and waits for response
 
-BinaryVector I2C_RawPlayer::DoCallback (uint32_t endpointId, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector I2C_RawPlayer::DoCallback (uint32_t channelId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   BinaryVector result;
   string i2c_FormattedData;
@@ -175,12 +175,12 @@ BinaryVector I2C_RawPlayer::DoCallback (uint32_t endpointId, void* /* interfaceD
 
   void *address_data=static_cast<void *>(m_addresses.data());
   
-  auto address = GetAddress(endpointId);
+  auto address = GetAddress(channelId);
 
   os_read   << "(0x"  << std::hex << address << ");\n";
   os_write  << "(0x" << std::hex << address << ", " << toSutData.DataAsMixString() << ");\n";
 
-  if (endpointId == 0) //No data in the request dor Reset operation
+  if (channelId == 0) //No data in the request dor Reset operation
       {
      RVFRequest reset_request(I2C_RESET,callback_toSutData,i2c_FormattedData,address_data);
      PushRequest(reset_request);

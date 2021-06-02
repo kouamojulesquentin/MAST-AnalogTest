@@ -46,14 +46,14 @@ class UT_ParentNode : public CxxTest::TestSuite
 
   // ---------------- Disconnection
   //
-  void test_DisconnectEndPoint_1st_OutOf_1 ();
-  void test_DisconnectEndPoint_1st_OutOf_2 ();
-  void test_DisconnectEndPoint_2nd_OutOf_2 ();
-  void test_DisconnectEndPoint_2nd_OutOf_3 ();
-  void test_DisconnectEndPoint_3rd_OutOf_2 ();
-  void test_DisconnectEndPoint_0_OutOf_2 ();
-  void test_DisconnectEndPoint_0_OutOf_0 ();
-  void test_DisconnectEndPoint_1_OutOf_0 ();
+  void test_DisconnectChannel_1st_OutOf_1 ();
+  void test_DisconnectChannel_1st_OutOf_2 ();
+  void test_DisconnectChannel_2nd_OutOf_2 ();
+  void test_DisconnectChannel_2nd_OutOf_3 ();
+  void test_DisconnectChannel_3rd_OutOf_2 ();
+  void test_DisconnectChannel_0_OutOf_2 ();
+  void test_DisconnectChannel_0_OutOf_0 ();
+  void test_DisconnectChannel_1_OutOf_0 ();
 
   void test_DisconnectChild_1st_OutOf_1 ();
   void test_DisconnectChild_1st_OutOf_2 ();

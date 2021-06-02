@@ -45,21 +45,21 @@ class MAST_CORE_EXPORT Remote_Protocol_Proxy : public AccessInterfaceProtocol
 
   //! Does any action required to transfer scan data to and from SUT
   //!
-  //! @param endpointId   Identifies the endpoint to act for (zero based)
-  //!                       EndPoint 0 is reserved for reset operation
+  //! @param channelId   Identifies the channel to act for (zero based)
+  //!                       Channel 0 is reserved for reset operation
   //! @param interfaceData  Application data stored in the AccessInterface
   //! @param toSutData      Bits stream to transfer to SUT
   //!
   //! @return Bits stream retrieved from SUT
-  virtual BinaryVector DoCallback(uint32_t endpointId, void* interfaceData, const BinaryVector& toSutData);
+  virtual BinaryVector DoCallback(uint32_t channelId, void* interfaceData, const BinaryVector& toSutData);
 
-  //! Gets the number of endpoints supported by the specific protocol
+  //! Gets the number of channels supported by the specific protocol
   //!
-  //! @note EndPoint id 0 is reserved for reset operation, so protocol must support a least two endpoints
+  //! @note Channel id 0 is reserved for reset operation, so protocol must support a least two channels
   //!
-  //! @return The number of supported endpoint (including pseudo endpoint 0 for reset)
+  //! @return The number of supported channel (including pseudo channel 0 for reset)
   //!
-  virtual uint32_t MaxSupportedEndPoints() const { return m_commands.size(); };
+  virtual uint32_t MaxSupportedChannels() const { return m_commands.size(); };
 
   //! Returns readable type of protocol (I2C, SVF_Simu, OpenOCD, SPI...)
   //!
@@ -75,7 +75,7 @@ class MAST_CORE_EXPORT Remote_Protocol_Proxy : public AccessInterfaceProtocol
   //
   private:
   std::unique_ptr<Remote_Protocol_Client> m_remoteProtocol; //!< Wrapped Remote_Protocol_Client
-  std::vector<std::string>                m_commands;       //!< Commands associated with each endpoint
+  std::vector<std::string>                m_commands;       //!< Commands associated with each channel
   mutable std::string                     m_kindName;       //!< Mutable because value will be provided (once) by wrapped Remote_Protocol_Client
 };
 //

@@ -40,8 +40,8 @@ class UT_SystemModelBuilder : public CxxTest::TestSuite
 
   // ---------------- Create_MIB
   //
-  void test_Create_MIB_1_EndPoint ();
-  void test_Create_MIB_4_EndPoints ();
+  void test_Create_MIB_1_Channel ();
+  void test_Create_MIB_4_Channels ();
 
   // ---------------- DaisyChain_JTAG_TAPS
   //

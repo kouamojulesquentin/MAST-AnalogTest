@@ -55,19 +55,19 @@ class MAST_CORE_EXPORT Remote_TranslatorProtocol final : public T_2_T_Translator
 
   protected:
 
-  //! Returns address for specified endpoint
+  //! Returns address for specified channel
   //!
-  uint32_t GetAddress(uint32_t endpointId) const;
+  uint32_t GetAddress(uint32_t channelId) const;
 
-  //! Creates an I2C command associated to endpoint identifier and BinaryVector to send to SUT
+  //! Creates an I2C command associated to channel identifier and BinaryVector to send to SUT
   //!
-  std::string CreateI2CCommand(uint32_t endpointId, const BinaryVector& toSutData);
+  std::string CreateI2CCommand(uint32_t channelId, const BinaryVector& toSutData);
 
 
   // ---------------- Private  Fields
   //
   std::string           m_commandPrefix; //!< Text leading I2C command (mainly used for logs in order to ease grep regex)
-  std::vector<uint32_t> m_addresses;     //!< Addresses associated with endpoint ids (at offset 1 for endpoint 1)
+  std::vector<uint32_t> m_addresses;     //!< Addresses associated with channel ids (at offset 1 for channel 1)
 };
 //
 //  End of SVF_EmulationProtocol class declaration

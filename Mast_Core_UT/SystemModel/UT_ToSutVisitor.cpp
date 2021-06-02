@@ -209,7 +209,7 @@ void UT_ToSutVisitor::test_Accept_Testcase_1500_Nothing_Pending ()
   SystemModel      sm;
   TestModelBuilder builder(sm);
   auto             tap      = builder.Create_TestCase_1500("TAP", 3u);
-  auto             endpoint = tap->FirstChild();
+  auto             channel = tap->FirstChild();
 
   ConfigureVisitor configurator;
   tap->Accept(configurator);
@@ -218,7 +218,7 @@ void UT_ToSutVisitor::test_Accept_Testcase_1500_Nothing_Pending ()
   // ---------------- Exercise
   //
   //IR
-  TS_ASSERT_THROWS_NOTHING (endpoint->Accept(sut));
+  TS_ASSERT_THROWS_NOTHING (channel->Accept(sut));
 
   // ---------------- Verify
   //
@@ -233,11 +233,11 @@ void UT_ToSutVisitor::test_Accept_Testcase_1500_Nothing_Pending ()
   TS_ASSERT_EQUALS (sutVector.BitsCount(), expectedBitsCount);
   TS_ASSERT_EQUALS (sutVector,             expectedVector);
 
-  endpoint = endpoint->NextSibling();
+  channel = channel->NextSibling();
 
   //BPY
   ToSutVisitor bpy_sut;
-  TS_ASSERT_THROWS_NOTHING (endpoint->Accept(bpy_sut));
+  TS_ASSERT_THROWS_NOTHING (channel->Accept(bpy_sut));
   const auto& bpy_identifiers = bpy_sut.ActiveRegistersIdentifiers();
   const auto& bpy_sutVector   = bpy_sut.ToSutVector();
 
@@ -260,14 +260,14 @@ void UT_ToSutVisitor::test_Accept_Testcase_1500_BypassMode_IgnorePending ()
   SystemModel      sm;
   TestModelBuilder builder(sm);
   auto             tap      = builder.Create_TestCase_1500("TAP", 3u);
-  auto             endpoint = tap->FirstChild();
+  auto             channel = tap->FirstChild();
 
   ToSutVisitor sut;
   sut.IgnorePendingState(true);
 
   // ---------------- Exercise
   //
-  TS_ASSERT_THROWS_NOTHING (endpoint->Accept(sut));
+  TS_ASSERT_THROWS_NOTHING (channel->Accept(sut));
 
   // ---------------- Verify
   //
@@ -284,10 +284,10 @@ void UT_ToSutVisitor::test_Accept_Testcase_1500_BypassMode_IgnorePending ()
   TS_ASSERT_EQUALS (sutVector.BitsCount(), expectedBitsCount);
   TS_ASSERT_EQUALS (sutVector,             expectedVector);
 
-  endpoint = endpoint->NextSibling();
+  channel = channel->NextSibling();
   sut.Reset();
   sut.IgnorePendingState(true);
-  TS_ASSERT_THROWS_NOTHING (endpoint->Accept(sut));
+  TS_ASSERT_THROWS_NOTHING (channel->Accept(sut));
 
   const auto& bpy_identifiers = sut.ActiveRegistersIdentifiers();
   const auto& bpy_sutVector   = sut.ToSutVector();

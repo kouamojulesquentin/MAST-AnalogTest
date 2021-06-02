@@ -39,7 +39,7 @@ void ConfigureAlgorithm_LastOrDefault_Greedy::ProcessPending (Linker& linker, ui
 
 
 //! Selects path 0 when linker is not pending, otherwise if there is just one
-//! pending, select path 0 if currently selected endpoint is already active
+//! pending, select path 0 if currently selected channel is already active
 //!
 //! @note Must be called after linker pending count has been updated//! @note Post-condition: a selection choice must have been done (by this method
 //!       or by one call of ProcessPending for current linker)

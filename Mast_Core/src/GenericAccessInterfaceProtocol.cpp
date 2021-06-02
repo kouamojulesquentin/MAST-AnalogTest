@@ -68,21 +68,21 @@ GenericAccessInterfaceProtocol::GenericAccessInterfaceProtocol (vector<Action> c
 //---------------------------------------------------------------------------
 
 
-//! Calls callback associated with AccessInterface endpoint
+//! Calls callback associated with AccessInterface Channel
 //!
-//! @param endpointId   Identifies the endpoint to act for (zero based)
+//! @param channelId   Identifies the Channel to act for (zero based)
 //! @param interfaceData  Application data stored in the AccessInterface
 //! @param toSutData      Bits stream to transfer to SUT
 //!
 //! @return Bits stream retrieved from SUT
-BinaryVector GenericAccessInterfaceProtocol::DoCallback (uint32_t endpointId, void* interfaceData, const BinaryVector& toSutData)
+BinaryVector GenericAccessInterfaceProtocol::DoCallback (uint32_t channelId, void* interfaceData, const BinaryVector& toSutData)
 {
-  if (endpointId >= m_callbacks.size())
+  if (channelId >= m_callbacks.size())
   {
-    THROW_INVALID_ARGUMENT("Only have callbacks for "s + std::to_string(m_callbacks.size() - 1) + " endpoints");
+    THROW_INVALID_ARGUMENT("Only have callbacks for "s + std::to_string(m_callbacks.size() - 1) + " channels");
   }
 
-  auto& callback       = m_callbacks[endpointId];
+  auto& callback       = m_callbacks[channelId];
   auto fromSutVector = callback(m_primitives, interfaceData, toSutData);
 
   return fromSutVector;

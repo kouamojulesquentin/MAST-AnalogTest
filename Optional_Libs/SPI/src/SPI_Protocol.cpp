@@ -43,11 +43,11 @@ SPI_Protocol::~SPI_Protocol()
 
 //! Initializes ftdi spi library
 //!
-//! @note AccessInterface endpoints ids start from 1 (0 is reserved for reset command)
+//! @note AccessInterface channels ids start from 1 (0 is reserved for reset command)
 //!
-//! @param chipSelectCommands   SPI chip select addresses for each endpoint id
-//! @param readCommands         SPI read addresses for each endpoint id
-//! @param writeCommands        SPI write addresses for each endpoint id
+//! @param chipSelectCommands   SPI chip select addresses for each channel id
+//! @param readCommands         SPI read addresses for each channel id
+//! @param writeCommands        SPI write addresses for each channel id
 //! @param commandsPrefix       Optional text that will be prepended to actual SPI command
 //! @param usbDeviceID          Optional (machine specific) USB device identifier
 //!
@@ -101,9 +101,9 @@ SPI_Protocol::SPI_Protocol (vector<uint32_t> chipSelectCommands,
 
 //! Loopbacks "to SUT data" logging SPI command(s) that would have been issued if libFTDIspi was installed.
 //!
-BinaryVector SPI_Protocol::DoCallback (uint32_t endpointId, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector SPI_Protocol::DoCallback (uint32_t channelId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
-  auto command = CreateSPICommand(endpointId, toSutData);
+  auto command = CreateSPICommand(channelId, toSutData);
 
   // ---------------- Split command to be more "compatible" with logger
   //

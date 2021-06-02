@@ -34,19 +34,19 @@ class MAST_CORE_EXPORT STIL_EmulationProtocol final : public STIL_Player
   STIL_EmulationProtocol() = delete;
   STIL_EmulationProtocol(uint32_t n_chains);
 
-  //! Initializes a with number of endpoints defined by a string
+  //! Initializes a with number of channels defined by a string
   //!
   STIL_EmulationProtocol(const std::string& nbChains);
 
   //! Does any callback required to transfer scan data to and from SUT
   //!
-  //! @param endpointId   Identifies the endpoint to act for (zero based)
+  //! @param channelId   Identifies the channel to act for (zero based)
   //! @param interfaceData  Application data stored in the AccessInterface
   //! @param toSutData      Bits stream to transfer to SUT
   //!
   //! @return Bitstream retrieved from SUT
   //!
-  virtual BinaryVector DoCallback(uint32_t endpointId, void* interfaceData, const BinaryVector& toSutData) override;
+  virtual BinaryVector DoCallback(uint32_t channelId, void* interfaceData, const BinaryVector& toSutData) override;
 
 
   //! Returns readable type of protocol

@@ -821,9 +821,9 @@ void UT_SystemModelChecker::test_Check_When_RootIsChainWithMixKindChildren ()
 //+}
 
 
-//! Checks SystemModelChecker::CheckTree() when root is and AccessInterface but has 1 too much endpoint
+//! Checks SystemModelChecker::CheckTree() when root is and AccessInterface but has 1 too much channel
 //!
-void UT_SystemModelChecker::test_Check_When_AccessInterface_has_MoreEndPoints ()
+void UT_SystemModelChecker::test_Check_When_AccessInterface_has_MoreChannels ()
 {
   // ---------------- Setup
   //
@@ -849,9 +849,9 @@ void UT_SystemModelChecker::test_Check_When_AccessInterface_has_MoreEndPoints ()
 
 
 //! Checks SystemModelChecker::CheckTree() when root is and AccessInterface but has fewer
-//! endpoints than supported by its endpoint
+//! channels than supported by its channel
 //!
-void UT_SystemModelChecker::test_Check_When_AccessInterface_has_LessEndPoints ()
+void UT_SystemModelChecker::test_Check_When_AccessInterface_has_LessChannels ()
 {
   // ---------------- Setup
   //

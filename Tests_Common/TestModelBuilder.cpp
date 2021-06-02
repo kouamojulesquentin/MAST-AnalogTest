@@ -55,13 +55,13 @@ void TestModelBuilder::AppendChains (uint32_t                     count,
 
 //! Creates a MIB with a default (binary) selector
 //!
-std::shared_ptr<Chain> TestModelBuilder::Create_Default_MIB (string_view name, uint32_t maxEndPoints)
+std::shared_ptr<Chain> TestModelBuilder::Create_Default_MIB (string_view name, uint32_t maxChannels)
 {
   // ---------------- Prepare default selector
   //
   auto selectorRegName = name.empty() ? string(DEFAULT_MIB_NAME) + MIB_CTRL_EXT : string(name) + MIB_CTRL_EXT;
 
-  auto res         = m_builder.Create_PathSelector(SelectorKind::Binary, selectorRegName, maxEndPoints);
+  auto res         = m_builder.Create_PathSelector(SelectorKind::Binary, selectorRegName, maxChannels);
   auto selectorReg = res.first;
   auto selector    = res.second;
 
@@ -89,7 +89,7 @@ std::shared_ptr<Chain> TestModelBuilder::Create_Default_SIB (string_view name)
   auto selectorReg     = res.first;
   auto selector        = res.second;
 
-  // ---------------- Create the sib (a mib with only one possible endpoint)
+  // ---------------- Create the sib (a mib with only one possible channel)
   //
   auto sib = m_builder.Create_MIB(sibName, selector, selectorReg, MuxRegPlacement::BeforeMux);
 
@@ -336,7 +336,7 @@ shared_ptr<AccessInterfaceTranslator> TestModelBuilder::Create_TestCase_I2C_Emul
 //!       - The control register is composed with multiple bits
 //!
 //! @param name           Name for top node
-//! @param regsCount      Number of MIB mux endpoints
+//! @param regsCount      Number of MIB mux channels
 //! @param regsBitsCount  Number of bits of each registers
 //!
 //! @return Top node of created sub-tree
@@ -404,7 +404,7 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_1687 (string_view 
 //!       - The control register is composed with multiple bits
 //!
 //! @param name           Name for top node
-//! @param regsCount      Number of MIB mux endpoints
+//! @param regsCount      Number of MIB mux channels
 //! @param regsBitsCount  Number of bits of each registers
 //!
 //! @return Top node of created sub-tree
@@ -440,7 +440,7 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_MIB_Multichain_Pre
 //!       - The control register is composed with multiple bits
 //!
 //! @param name           Name for top node
-//! @param regsCount      Number of MIB mux endpoints
+//! @param regsCount      Number of MIB mux channels
 //! @param regsBitsCount  Number of bits of each registers
 //!
 //! @return Top node of created sub-tree
@@ -476,7 +476,7 @@ shared_ptr<AccessInterface> TestModelBuilder::Create_TestCase_MIB_Multichain_Pos
 //!       - The control register is composed with multiple bits
 //!
 //! @param name           Name for top node
-//! @param regsCount      Number of mux endpoints (excluding bypass register)
+//! @param regsCount      Number of mux channels (excluding bypass register)
 //! @param regsBitsCount  Number of bits of each registers
 //!
 //! @return Top node of created sub-tree

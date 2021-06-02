@@ -33,7 +33,7 @@ using namespace std::experimental::literals::string_view_literals;
 
 //! Constructor from vector
 //!
-//! @param addresses        Array of I2C addresses for managed endpoints (value at offset 0 is reserved for reset)
+//! @param addresses        Array of I2C addresses for managed channels (value at offset 0 is reserved for reset)
 //!
 Remote_TranslatorProtocol::Remote_TranslatorProtocol (vector<uint32_t> addresses)
   : m_addresses     (std::move(addresses))
@@ -48,7 +48,7 @@ Remote_TranslatorProtocol::Remote_TranslatorProtocol (vector<uint32_t> addresses
 //! Initializes with addresses defined by a string
 //!
 //! @note Expected (comma separated) parameters are:
-//!   - addresses        Array of I2C addresses for managed endpoints (value at offset 0 is reserved for reset)
+//!   - addresses        Array of I2C addresses for managed channels (value at offset 0 is reserved for reset)
 //!
 //! @note Example of parameter:
 //!    0x30, 0x31, 0x32
@@ -114,18 +114,18 @@ Remote_TranslatorProtocol::Remote_TranslatorProtocol (const std::string& paramet
 //---------------------------------------------------------------------------
 
 
-//! Returns address for specified endpoint
+//! Returns address for specified channel
 //!
-//! @param endpointId   EndPoint identifier [1..N]
+//! @param channelId   Channel identifier [1..N]
 //!
-uint32_t Remote_TranslatorProtocol::GetAddress (uint32_t endpointId) const
+uint32_t Remote_TranslatorProtocol::GetAddress (uint32_t channelId) const
 {
-  if (endpointId >= m_addresses.size())
+  if (channelId >= m_addresses.size())
   {
-    THROW_INVALID_ARGUMENT("EndPointId must be '0' for Reset or '1' to "s + std::to_string(m_addresses.size() - 1));
+    THROW_INVALID_ARGUMENT("ChannelId must be '0' for Reset or '1' to "s + std::to_string(m_addresses.size() - 1));
   }
 
-  auto address = m_addresses[endpointId];
+  auto address = m_addresses[channelId];
   return address;
 }
 //
@@ -138,7 +138,7 @@ BinaryVector Remote_TranslatorProtocol::TransformationCallback(RVFRequest curren
   string i2c_FormattedData;
   BinaryVector callback_toSutData;
   auto toSutData = current_request.ToSutVector();
-  int32_t endpointId=-1;
+  int32_t channelId=-1;
   
   //Prepapre formatted SVF data
   ostringstream os_read,os_write;
@@ -147,11 +147,11 @@ BinaryVector Remote_TranslatorProtocol::TransformationCallback(RVFRequest curren
   
   
   if (current_request.CallbackId()==TRST)
-    endpointId = 0;
+    channelId = 0;
   if (current_request.CallbackId()==SIR)
-    endpointId = 1;
+    channelId = 1;
   if (current_request.CallbackId()==SDR)
-    endpointId = 2;
+    channelId = 2;
   if (current_request.CallbackId()==NO_MORE_PENDING)
    {
     //Finished, release parent Translator
@@ -159,14 +159,14 @@ BinaryVector Remote_TranslatorProtocol::TransformationCallback(RVFRequest curren
     PushRequest(request);
     return result;
    }
-  CHECK_PARAMETER_GTE(endpointId,0,"Error: unsupported Callback "+current_request.CallbackId());
+  CHECK_PARAMETER_GTE(channelId,0,"Error: unsupported Callback "+current_request.CallbackId());
   
-  auto address = GetAddress(endpointId);
+  auto address = GetAddress(channelId);
 
   os_read   << "(0x"  << std::hex << address << ");\n";
   os_write  << "(0x" << std::hex << address << ", " << toSutData.DataAsMixString() << ");\n";
 
-  if (endpointId == 0) //No data in the request dor Reset operation
+  if (channelId == 0) //No data in the request dor Reset operation
       {
      RVFRequest reset_request(I2C_RESET,callback_toSutData,i2c_FormattedData,address_data);
      PushRequest(reset_request);

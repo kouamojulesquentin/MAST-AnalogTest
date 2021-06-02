@@ -60,7 +60,7 @@ void SystemModelChecker::CheckAccessInterface ()
 
   if (rootAsAI)
   {
-    CheckNumberOfEndPoints(rootAsAI);
+    CheckNumberOfChannels(rootAsAI);
 //+    CheckNoAccessInterfaceBellow(rootAsAI);
   }
   else if (rootAsAT){}
@@ -76,7 +76,7 @@ void SystemModelChecker::CheckAccessInterface ()
       if (childAsAi)
       {
         ++aiCount;
-        CheckNumberOfEndPoints(childAsAi);
+        CheckNumberOfChannels(childAsAi);
 //+        CheckNoAccessInterfaceBellow(childAsAi);
       }
       if (childAsAT)
@@ -218,40 +218,40 @@ bool SystemModelChecker::CheckChildNode (shared_ptr<const ParentNode> parent, sh
 //---------------------------------------------------------------------------
 
 
-//! Checks the an interface has no more endpoint than is supported by its protocol
+//! Checks the an interface has no more channel than is supported by its protocol
 //!
 //! @note Does no check when there is no protocol (this is checked everywhere)
 //!
-void SystemModelChecker::CheckNumberOfEndPoints (shared_ptr<AccessInterface> accessInterface)
+void SystemModelChecker::CheckNumberOfChannels (shared_ptr<AccessInterface> accessInterface)
 {
   auto protocol = accessInterface->Protocol();
 
   if (protocol)
   {
-    auto maxEndPoints = protocol->MaxSupportedEndPoints();
+    auto maxChannels = protocol->MaxSupportedChannels();
     auto childrenCount  = accessInterface->DirectChildrenCount();
 
-    if (childrenCount >= maxEndPoints) // Max endpoints includes pseudo endpoint reserved to do "Reset" action
+    if (childrenCount >= maxChannels) // Max channels includes pseudo channel reserved to do "Reset" action
     {
       auto message =   " has too many children ("                + to_string(childrenCount)
-                     + ") ; its protocol supports a maximum of " + to_string(maxEndPoints)
-                     + " endpoints (including one 'pseudo endpoint' reserved for reset action)";
+                     + ") ; its protocol supports a maximum of " + to_string(maxChannels)
+                     + " channels (including one 'pseudo channel' reserved for reset action)";
       ReportError(*accessInterface, message);
     }
-    else if (maxEndPoints > (childrenCount + 1u))
+    else if (maxChannels > (childrenCount + 1u))
     {
-      auto diff = maxEndPoints - childrenCount;
-      if (diff < 100u)  // Do not report for virtually unlimited maxEndPoints
+      auto diff = maxChannels - childrenCount;
+      if (diff < 100u)  // Do not report for virtually unlimited maxChannels
       {
         ReportInfo(*accessInterface,   " has only "                                                + to_string(childrenCount)
-                                     + " children even though its protocol supports a maximum of " + to_string(maxEndPoints)
-                                     + " endpoints (including one 'pseudo endpoint' reserved for reset action)");
+                                     + " children even though its protocol supports a maximum of " + to_string(maxChannels)
+                                     + " channels (including one 'pseudo channel' reserved for reset action)");
       }
     }
   }
 }
 //
-//  End of: SystemModelChecker::CheckNumberOfEndPoints
+//  End of: SystemModelChecker::CheckNumberOfChannels
 //---------------------------------------------------------------------------
 
 

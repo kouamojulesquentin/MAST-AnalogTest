@@ -95,7 +95,7 @@ class TestModelBuilder final
   std::shared_ptr<mast::AccessInterface> Create_JTAG_TAP    (string_view name, uint32_t irBitsCount, uint32_t muxPathsCount,std::shared_ptr<mast::AccessInterfaceProtocol> protocol);
   std::shared_ptr<mast::AccessInterface> Create_Default_SUT (string_view name);
   std::shared_ptr<mast::Chain>           Create_Default_SIB (string_view name);
-  std::shared_ptr<mast::Chain>           Create_Default_MIB (string_view name,  uint32_t maxEndPoints);
+  std::shared_ptr<mast::Chain>           Create_Default_MIB (string_view name,  uint32_t maxChannels);
   std::shared_ptr<mast::Chain>           Create_Simple_MIB  (string_view rootName = "Sut");
   std::shared_ptr<mast::AccessInterfaceTranslator> Create_Brocade (std::shared_ptr<mast::AccessInterfaceTranslatorProtocol>  TopProtocol,
                                                       std::shared_ptr<mast::AccessInterfaceProtocol>           masterProtocol,

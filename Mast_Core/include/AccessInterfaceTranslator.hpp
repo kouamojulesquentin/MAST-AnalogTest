@@ -114,7 +114,7 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
   // ---------------- Private  Fields
   //
   private:
-  uint32_t                                 m_numberOfEndPoints = 0; //!< Number of nodes (endpoints) accessible through the access interface
+  uint32_t                                 m_numberOfChannels = 0; //!< Number of nodes (Channels) accessible through the access interface //NB: seems unused!
   std::shared_ptr<AccessInterfaceTranslatorProtocol> m_protocol;                //!< Protocol to use to manage Callbacktranslations
   
   std::chrono::duration<int,std::milli> m_timeout = 15ms;

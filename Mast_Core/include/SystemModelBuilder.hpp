@@ -128,7 +128,7 @@ class MAST_CORE_EXPORT SystemModelBuilder final
 
   //! Creates a "1500" style wrapper
   //!
-  std::shared_ptr<mast::Chain> Create_1500_Wrapper (string_view name, uint32_t maxEndPoints);
+  std::shared_ptr<mast::Chain> Create_1500_Wrapper (string_view name, uint32_t maxChannels);
 
   //! Chains (merges) a 1149.1 AccessInterface into another 1149.1 AccessInterface.
   //!

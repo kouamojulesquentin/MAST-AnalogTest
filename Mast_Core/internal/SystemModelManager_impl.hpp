@@ -323,7 +323,7 @@ class SystemModelManager_impl final
 
   friend class DataCycleVisitor;
 
-  //! Triggers a data cycle on the Endpoints of the currentAccessInterface
+  //! Triggers a data cycle on the Channels of the currentAccessInterface
   //!
   void DoHierarchicalDataCycle (AccessInterface* currentAccessInterface);
   void RegisterPendingThread (std::shared_ptr<Register> reg);

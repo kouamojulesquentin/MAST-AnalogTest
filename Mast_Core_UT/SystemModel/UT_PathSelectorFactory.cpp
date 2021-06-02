@@ -235,8 +235,8 @@ void UT_PathSelectorFactory::test_Create_Std_Param_Error ()
   auto invalidRegister = shared_ptr<Register>();
   auto data =
   {
-    make_tuple("Binary",        9u, make_shared<Register>("Ctrl", BinaryVector::CreateFromBinaryString("0b00"), true)), // 00: too much endpoints
-    make_tuple("One_Hot",       4u, make_shared<Register>("Ctrl", BinaryVector::CreateFromBinaryString("0b00"), true)), // 01: too much endpoints
+    make_tuple("Binary",        9u, make_shared<Register>("Ctrl", BinaryVector::CreateFromBinaryString("0b00"), true)), // 00: too much channels
+    make_tuple("One_Hot",       4u, make_shared<Register>("Ctrl", BinaryVector::CreateFromBinaryString("0b00"), true)), // 01: too much channels
     make_tuple("Binary_noidle", 2u, invalidRegister),                                                            // 02: nullptr associated register
   };
 

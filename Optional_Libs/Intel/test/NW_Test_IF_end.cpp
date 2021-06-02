@@ -13,7 +13,7 @@ namespace
 int run_NW_TEST_IF_end ( int ring_end_port, int Addr )
 {
   std::bitset<ADDR_WIDTH> Phys_Addr = Addr;
-  std::cout << "running Ring endpoint on port "<< ring_end_port<<"....\n";
+  std::cout << "running Ring channel on port "<< ring_end_port<<"....\n";
   std::cout << "With Physical address "<< Phys_Addr<<"....\n";
   std::ofstream  from_ring_file ("./packets_from_ring.bin", ios::out | ios::binary);
 
@@ -22,7 +22,7 @@ int run_NW_TEST_IF_end ( int ring_end_port, int Addr )
       // Create the socket
       ServerSocket in_server ( ring_end_port );
 
-               std::cout << "Ring endpoint received:\n";
+               std::cout << "Ring channel received:\n";
       while ( true )
   {
 

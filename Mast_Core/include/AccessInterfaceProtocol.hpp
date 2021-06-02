@@ -32,30 +32,30 @@ class AccessInterfaceProtocol
 
   //! Does any callback required to transfer scan data to and from SUT
   //!
-  //! @param endpointId   Identifies the endpoint to act for (zero based)
-  //!                       EndPoint 0 is reserved for reset operation
+  //! @param channelId   Identifies the channel to act for (zero based)
+  //!                       Channel 0 is reserved for reset operation
   //! @param interfaceData  Application data stored in the AccessInterface
   //! @param toSutData      Bits stream to transfer to SUT
   //!
   //! @return Bits stream retrieved from SUT
-  virtual RVFResponse DoCallback(uint32_t endpointId, void* interfaceData, const BinaryVector& toSutData) = 0;
+  virtual RVFResponse DoCallback(uint32_t channelId, void* interfaceData, const BinaryVector& toSutData) = 0;
 
-  //! Gets the number of endpoints supported by the specific protocol
+  //! Gets the number of channels supported by the specific protocol
   //!
-  //! @note EndPoint id 0 is reserved for reset operation, so protocol must support a least two endpoints
+  //! @note Channel id 0 is reserved for reset operation, so protocol must support a least two channels
   //!
-  //! @return The number of supported endpoint (including pseudo endpoint 0 for reset)
+  //! @return The number of supported channel (including pseudo channel 0 for reset)
   //!
-  virtual uint32_t MaxSupportedEndPoints() const = 0;
+  virtual uint32_t MaxSupportedChannels() const = 0;
 
   //! Returns readable type of protocol (I2C, SVF_Simu, OpenOCD, SPI...)
   //!
   virtual std::experimental::string_view KindName() const = 0;
 
-  //! readable identifier for given endpoint
+  //! readable identifier for given channel
   //!
-  std::string CallbackId(int EndPoint) const { 
-         return KindName().to_string()+"_"+std::to_string(EndPoint); 
+  std::string CallbackId(int Channel) const { 
+         return KindName().to_string()+"_"+std::to_string(Channel); 
          };
 
 

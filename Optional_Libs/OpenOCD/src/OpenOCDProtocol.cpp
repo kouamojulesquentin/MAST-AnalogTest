@@ -159,13 +159,13 @@ OpenOCDProtocol::~OpenOCDProtocol()
 
 //! Does any action required to transfer scan data to and from SUT
 //!
-//! @param endpointId   Identifies the endpoint to act for (zero based)
+//! @param channelId   Identifies the channel to act for (zero based)
 //! @param interfaceData  Application data stored in the AccessInterface
 //! @param toSutData      Bits stream to transfer to SUT
 //!
 //! @return Bitstream retrieved from SUT
 //!
-BinaryVector OpenOCDProtocol::DoCallback (uint32_t endpointId, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector OpenOCDProtocol::DoCallback (uint32_t channelId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   auto bitsCount         = toSutData.BitsCount();
   auto fromSutDataBuffer = vector<uint8_t>(toSutData.BytesCount());
@@ -175,7 +175,7 @@ BinaryVector OpenOCDProtocol::DoCallback (uint32_t endpointId, void* /* interfac
   - 'The values to be latched in upcoming DRUPDATE or IRUPDATE states may not be as expected.', hence the use of dr/ir scan requires stable end-states. This is why, to get a register update, you must select TAP_IDLE rather than TAP_PAUSE.
   */
 
-  switch (endpointId)
+  switch (channelId)
   {
     case 0u:
       DoReset(false);
@@ -197,7 +197,7 @@ BinaryVector OpenOCDProtocol::DoCallback (uint32_t endpointId, void* /* interfac
       break;
     }
     default:
-      THROW_INVALID_ARGUMENT("EndPointId must be '0' (for Reset), '1' (for SIR) or '2' (for SDR)");
+      THROW_INVALID_ARGUMENT("ChannelId must be '0' (for Reset), '1' (for SIR) or '2' (for SDR)");
       break;
   }
 
@@ -205,7 +205,7 @@ BinaryVector OpenOCDProtocol::DoCallback (uint32_t endpointId, void* /* interfac
 
   CHECK_TRUE(ir == ERROR_OK, "[OpenOCD] jtag_execute_queue has failed.");
 
-  vector<uint8_t> v_openocd_out = fromSutDataBuffer;                // Inverse of what is done in 1u and 2u endpointId. We set incoming data in the MAST-supported format.
+  vector<uint8_t> v_openocd_out = fromSutDataBuffer;                // Inverse of what is done in 1u and 2u channelId. We set incoming data in the MAST-supported format.
   reverse(v_openocd_out.begin(), v_openocd_out.end());
 
   auto   fromSutData = BinaryVector::CreateFromRightAlignedBuffer(v_openocd_out, bitsCount);

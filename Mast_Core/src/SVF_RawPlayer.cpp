@@ -27,7 +27,7 @@ using std::ostringstream;
 
 //! sends request for TRST,SIR and SDR callbacks and waits for response
 
-BinaryVector SVF_RawPlayer::DoCallback (uint32_t endpointId, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector SVF_RawPlayer::DoCallback (uint32_t channelId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   BinaryVector result;
   string svfFormattedData;
@@ -44,14 +44,14 @@ BinaryVector SVF_RawPlayer::DoCallback (uint32_t endpointId, void* /* interfaceD
 //  ostringstream os;
 //  os << toSutData.BitsCount() << " TDI(" << SVFVector(toSutData).Data() << ");";
 
-  if (endpointId != 0) //No data in the request dor Reset operation
+  if (channelId != 0) //No data in the request dor Reset operation
       {
 //      svfFormattedData = os.str();
       svfFormattedData = FormatSVFData(toSutData);
       callback_toSutData = toSutData;
       }
 
-  RVFRequest request(CallbackId(endpointId),callback_toSutData,svfFormattedData);
+  RVFRequest request(CallbackId(channelId),callback_toSutData,svfFormattedData);
 
   PushRequest(request);
   

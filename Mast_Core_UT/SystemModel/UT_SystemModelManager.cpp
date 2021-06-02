@@ -390,24 +390,24 @@ std::shared_ptr<GenericAccessInterfaceProtocol> CreateGenericAccessInterfaceProt
     return BinaryVector();
   };
 
-  auto endpointAction = [](const std::vector<Primitive>& primitives, uint32_t endpointId, void* /* data */, const BinaryVector& toSutData)
+  auto channelAction = [](const std::vector<Primitive>& primitives, uint32_t channelId, void* /* data */, const BinaryVector& toSutData)
   {
     BinaryVector   fromSutData;
     PrimitiveParam param(toSutData, fromSutData);
 
-    primitives[endpointId](&param);
+    primitives[channelId](&param);
 
     return param.fromSutData;
   };
 
-  auto action_1 = [endpointAction](const std::vector<Primitive>& primitives, void* data, const BinaryVector& toSutData)
+  auto action_1 = [channelAction](const std::vector<Primitive>& primitives, void* data, const BinaryVector& toSutData)
   {
-    return endpointAction(primitives, 1u, data, toSutData);
+    return channelAction(primitives, 1u, data, toSutData);
   };
 
-  auto action_2 = [endpointAction](const std::vector<Primitive>& primitives, void* data, const BinaryVector& toSutData)
+  auto action_2 = [channelAction](const std::vector<Primitive>& primitives, void* data, const BinaryVector& toSutData)
   {
-    return endpointAction(primitives, 2u, data, toSutData);
+    return channelAction(primitives, 2u, data, toSutData);
   };
 
   vector<Primitive> primitives = {primitive_0, primitive_1, primitive_2};

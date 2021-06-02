@@ -32,7 +32,7 @@ using namespace mast;
 using namespace test;
 
 
-//! Checks STIL_EmulationProtocol constructor given max endpoint as an integer
+//! Checks STIL_EmulationProtocol constructor given max channel as an integer
 //!
 void UT_STIL_EmulationProtocol::test_Constructor_Integer ()
 {
@@ -48,7 +48,7 @@ void UT_STIL_EmulationProtocol::test_Constructor_Integer ()
 
 
 
-void UT_STIL_EmulationProtocol::test_MaxSupportedEndPoints ()
+void UT_STIL_EmulationProtocol::test_MaxSupportedChannels ()
 {
   // ---------------- Setup
   //
@@ -56,14 +56,14 @@ void UT_STIL_EmulationProtocol::test_MaxSupportedEndPoints ()
 
   // ---------------- Exercise
   //
-  auto maxSupportedEndPoints = sut.MaxSupportedEndPoints();
+  auto maxSupportedChannels = sut.MaxSupportedChannels();
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS (maxSupportedEndPoints, 3u);
+  TS_ASSERT_EQUALS (maxSupportedChannels, 3u);
 }
 
-//! Checks STIL_EmulationProtocol constructor given max endpoint as a string
+//! Checks STIL_EmulationProtocol constructor given max channel as a string
 //!
 void UT_STIL_EmulationProtocol::test_Constructor_String ()
 {
@@ -73,17 +73,17 @@ void UT_STIL_EmulationProtocol::test_Constructor_String ()
   {
     // ---------------- Setup
     //
-    auto maxEndPointsString   = string(std::get<0>(data));
-    auto expectedMaxEndPoints = std::get<1>(data);
+    auto maxChannelsString   = string(std::get<0>(data));
+    auto expectedMaxChannels = std::get<1>(data);
 
     // ---------------- Exercise
     //
-    auto sut = STIL_EmulationProtocol(maxEndPointsString);
+    auto sut = STIL_EmulationProtocol(maxChannelsString);
 
     // ---------------- Verify
     //
-    auto maxSupportedEndPoints = sut.MaxSupportedEndPoints();
-    TS_ASSERT_EQUALS (maxSupportedEndPoints, expectedMaxEndPoints);
+    auto maxSupportedChannels = sut.MaxSupportedChannels();
+    TS_ASSERT_EQUALS (maxSupportedChannels, expectedMaxChannels);
   };
 
   auto data =
@@ -105,7 +105,7 @@ void UT_STIL_EmulationProtocol::test_Constructor_String ()
 }
 
 
-//! Checks STIL_EmulationProtocol constructor given max endpoint as a string but with not valid numbers
+//! Checks STIL_EmulationProtocol constructor given max channel as a string but with not valid numbers
 //!
 void UT_STIL_EmulationProtocol::test_Constructor_String_Error ()
 {
@@ -115,11 +115,11 @@ void UT_STIL_EmulationProtocol::test_Constructor_String_Error ()
   {
     // ---------------- Setup
     //
-    string maxSupportedEndPoints(data);
+    string maxSupportedChannels(data);
 
     // ---------------- Exercise & Verify
     //
-    TS_ASSERT_THROWS (auto sut = STIL_EmulationProtocol(maxSupportedEndPoints), std::exception);
+    TS_ASSERT_THROWS (auto sut = STIL_EmulationProtocol(maxSupportedChannels), std::exception);
   };
 
   auto data =
@@ -154,7 +154,7 @@ void UT_STIL_EmulationProtocol::test_SPY_Constructor()
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS (sut.MaxSupportedEndPoints(), n_chains);
+  TS_ASSERT_EQUALS (sut.MaxSupportedChannels(), n_chains);
 }
 
 
@@ -167,7 +167,7 @@ void UT_STIL_EmulationProtocol::test_DoCallback ()
   // ---------------- Exercise & Verify
   //
   Spy_STIL_Protocol sut(n_chains);
-  TS_ASSERT_EQUALS (sut.MaxSupportedEndPoints(), n_chains);
+  TS_ASSERT_EQUALS (sut.MaxSupportedChannels(), n_chains);
 
   auto checker = [&](auto data)
   {

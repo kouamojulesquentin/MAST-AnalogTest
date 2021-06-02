@@ -32,12 +32,8 @@ using std::make_shared;
 namespace mast
 {
 
-//! Represents a (fix) chain of registers, allowing nodes to be concatenated to replicate a scan chain composed of TDRs.
-//! This node represents the concatenation of elements (register, ScanMuxes etc..) in the SUT through the cardinality
-//! of children nodes: node(i+1) follows node (i).
-//!
-//! @note note that a CHAIN node with only one endpoint has no functional effect on the execution, but it can be
-//! used to package some sub-system and exploit the "append" method to assure correct construction.
+//! Represents a Stremear node, which is structurally is similar to a chain, but which applies a 
+//! transformation on the bitstreams transversing it
 //!
 class MAST_CORE_EXPORT Streamer : public ParentNode
 {

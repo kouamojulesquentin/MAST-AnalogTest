@@ -347,16 +347,16 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
     auto protocol = currentAccessInterface->Protocol();
     CHECK_VALUE_NOT_NULL(protocol, "All AccessInterface must be associated with a valid protocol");
 
-    uint32_t endpointId = 1u;
-    auto nextEndPoint = currentAccessInterface->FirstChild();
+    uint32_t channelId = 1u;
+    auto nextChannel = currentAccessInterface->FirstChild();
 
-    while (nextEndPoint)
+    while (nextChannel)
     {
-      if (nextEndPoint->IsPending())
+      if (nextChannel->IsPending())
       {
         ToSutVisitor local_toSutVisitor;
 
-        nextEndPoint->Accept(local_toSutVisitor);
+        nextChannel->Accept(local_toSutVisitor);
 
         auto& toSutVector = local_toSutVisitor.ToSutVector();
 	m_ActiveStreamers = local_toSutVisitor.ActiveStreamers();
@@ -372,7 +372,7 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
 
           BinaryVector fromSutVector;
           
-          fromSutVector = protocol->DoCallback(endpointId, nextEndPoint->ApplicationData(), toSutVector);
+          fromSutVector = protocol->DoCallback(channelId, nextChannel->ApplicationData(), toSutVector);
 
 	  //Apply Streamer transformation to fromSutVector before processing it
 	  while (!m_ActiveStreamers.empty())
@@ -389,8 +389,8 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
           ReleaseServedThreads();
         }
       }
-      nextEndPoint = nextEndPoint->NextSibling();
-      ++endpointId;
+      nextChannel = nextChannel->NextSibling();
+      ++channelId;
     }
   }
    auto raw_protocol =  std::dynamic_pointer_cast<AccessInterfaceRawProtocol>(protocol);

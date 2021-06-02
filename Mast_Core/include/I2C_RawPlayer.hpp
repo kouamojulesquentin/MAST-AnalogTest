@@ -41,23 +41,23 @@ class MAST_CORE_EXPORT I2C_RawPlayer final : public AccessInterfaceRawProtocol
   //!
   I2C_RawPlayer(const std::string& parameters);
 
-  //! Gets the number of endpoints supported by the specific protocol
+  //! Gets the number of channels supported by the specific protocol
   //!
-  //! @note EndPoint id 0 is reserved for reset operation, so protocol must support a least two endpoints
+  //! @note Channel id 0 is reserved for reset operation, so protocol must support a least two channels
   //!
-  //! @return The number of supported endpoint (including pseudo endpoint 0 for reset)
+  //! @return The number of supported channel (including pseudo channel 0 for reset)
   //!
-  virtual uint32_t MaxSupportedEndPoints() const override { return m_addresses.size(); }
+  virtual uint32_t MaxSupportedChannels() const override { return m_addresses.size(); }
 
    //! Does any callback required to transfer scan data to and from SUT
   //!
-  //! @param endpointId   Identifies the endpoint to act for (zero based)
+  //! @param channelId   Identifies the channel to act for (zero based)
   //! @param interfaceData  Application data stored in the AccessInterface
   //! @param toSutData      Bits stream to transfer to SUT
   //!
   //! @return Bitstream retrieved from SUT
   //!
-  virtual BinaryVector DoCallback(uint32_t endpointId, void* interfaceData, const BinaryVector& toSutData) override;
+  virtual BinaryVector DoCallback(uint32_t channelId, void* interfaceData, const BinaryVector& toSutData) override;
 
   //! Returns readable type of protocol
   //!
@@ -71,17 +71,17 @@ class MAST_CORE_EXPORT I2C_RawPlayer final : public AccessInterfaceRawProtocol
   //
   protected:
 
-  //! Creates an I2C command associated to endpoint identifier and BinaryVector to send to SUT
+  //! Creates an I2C command associated to channel identifier and BinaryVector to send to SUT
   //!
-  std::string CreateI2CCommand(uint32_t endpointId, const BinaryVector& toSutData);
+  std::string CreateI2CCommand(uint32_t channelId, const BinaryVector& toSutData);
 
-  //! Returns address for specified endpoint
+  //! Returns address for specified channel
   //!
-  uint32_t GetAddress(uint32_t endpointId) const;
+  uint32_t GetAddress(uint32_t channelId) const;
 
   // ---------------- Private  Fields
   //
-  std::vector<uint32_t> m_addresses;     //!< Addresses associated with endpoint ids (at offset 1 for endpoint 1)
+  std::vector<uint32_t> m_addresses;     //!< Addresses associated with channel ids (at offset 1 for channel 1)
 };
 //
 //  End of I2C_RawPlayer class declaration

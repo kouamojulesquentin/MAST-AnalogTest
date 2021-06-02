@@ -120,7 +120,7 @@ void GmlPrinter::AppendParentNode (string_view       shapeName,
         if (selector->IsActive(childId))
         {
           os << ":A";
-          edgeStyle = ""; // Use plain line for active endpoint
+          edgeStyle = ""; // Use plain line for active channel
         }
 
         os << "]";

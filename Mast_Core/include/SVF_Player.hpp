@@ -42,9 +42,9 @@ class MAST_CORE_EXPORT SVF_Player : public AccessInterfaceProtocol
   void  SupportTRST (bool supportTRST) { m_supportTRST = supportTRST; }
 
 
-  //! Creates an SVF command associated to endpoint identifier and BinaryVector to send to SUT
+  //! Creates an SVF command associated to channel identifier and BinaryVector to send to SUT
   //!
-  std::string CreateSVFCommand(uint32_t endpointId, const BinaryVector& toSutData) const;
+  std::string CreateSVFCommand(uint32_t channelId, const BinaryVector& toSutData) const;
 
   //! Creates an SVF reset command
   //!

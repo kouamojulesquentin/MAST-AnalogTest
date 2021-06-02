@@ -19,12 +19,12 @@ using namespace mast;
 
 //! Does any callback required to transfer scan data to and from SUT
 //!
-//! @param endpointId   Identifies the endpoint to act for (zero based)
+//! @param Channeld   Identifies the Channel to act for (zero based)
 //! @param interfaceData  Application data stored in the AccessInterface
 //! @param toSutData      Bits stream to transfer to SUT
 //!
 //! @return Bits stream retrieved from SUT
-BinaryVector LoopbackAccessInterfaceProtocol::DoCallback (uint32_t /* endpointId */, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector LoopbackAccessInterfaceProtocol::DoCallback (uint32_t /* ChannelId */, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   auto fromSut = toSutData;
 

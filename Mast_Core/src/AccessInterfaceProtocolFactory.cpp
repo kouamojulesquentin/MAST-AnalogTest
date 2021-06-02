@@ -79,7 +79,7 @@ void AccessInterfaceProtocolFactory::InitializeWithDefaults ()
   RegisterCreator("SVF_Simulation", [](const string& /* parameters */) { return make_unique<SVF_SimulationProtocol>();              });
   RegisterCreator("SVF_Emulation",  [](const string& /* parameters */) { return make_unique<SVF_EmulationProtocol>();               });
   RegisterCreator("Offline",             [](const string& /* parameters */) { return make_unique<OfflineProtocol>();                     });
-  RegisterCreator("STIL_Emulation",      [](const string& nbEndPoints)    { return make_unique<STIL_EmulationProtocol>(nbEndPoints); });
+  RegisterCreator("STIL_Emulation",      [](const string& nbChannels)    { return make_unique<STIL_EmulationProtocol>(nbChannels); });
   RegisterCreator("I2C_Emulation",       [](const string& parameters)       { return make_unique<I2C_EmulationProtocol>(parameters);     });
   RegisterCreator("RemoteProxy",         [](const string& parameters)       { return make_unique<Remote_Protocol_Proxy>(parameters);     });
   RegisterCreator("JTAG",           [](const string& /*parameters*/)       { return make_unique<SVF_RawPlayer>();     });

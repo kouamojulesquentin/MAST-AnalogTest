@@ -103,7 +103,7 @@ SystemModelManager_impl::SystemModelManager_impl(SystemModel&                   
 {
   auto pathResolver   = NodePathResolver(sm.Root());
   m_mainThreadAppData = make_shared<ApplicationData>(ApplicationData::State::ApplicationThreadStarted, pathResolver, "Manager");
-
+  
   MONITOR_DEBUG_MANAGER("Constructed SystemModelManager");
 }
 
@@ -256,8 +256,6 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
 	    LOG(DEBUG)<<"Applying a streamer transformation of protocol " << streamer->Protocol()->KindName() << " between bits " << before_bits<< " and "<<EndOfProtectedBits;
 	    LOG(DEBUG)<<"ApplyStreamer: Bits [ before : " << before_bits << " inside :" << protectedBits<< "  after :"<<after_bits << "]";
 	    LOG(DEBUG)<<"Plain Text Vector: " << Vector.DataAsHexString();
-	    
-	    
 	     
 	    if (isToSut)  
 	      {
@@ -318,10 +316,6 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
                  }
 		}
 
-	     
-	    
-
-    
          	    //The protected part is crypted only once 	
 	    LOG(DEBUG)<< "mask_protected, size " << protectedBits;
 	    LOG(DEBUG)<< "vector_protected, size " << protectedBits << " Plain Data : "<<vector_protected.DataAsHexString()<< " b"<<vector_protected.DataAsBinaryString();
@@ -372,7 +366,14 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
 
           BinaryVector fromSutVector;
           
+         LOG(INFO) << "Node " << currentAccessInterface->Name() << " Protocol " << protocol->KindName() 
+	          <<  ":RVF Request for channel "<< channelId <<" sent at internal cycle " << protocol->getElapsedCycles();
+
           fromSutVector = protocol->DoCallback(channelId, nextChannel->ApplicationData(), toSutVector);
+
+ 
+         LOG(INFO) << "Node " << currentAccessInterface->Name() << " Protocol " << protocol->KindName() 
+	          <<  ":RVF Request for channel "<< channelId <<" finished at cycle " << protocol->getElapsedCycles();
 
 	  //Apply Streamer transformation to fromSutVector before processing it
 	  while (!m_ActiveStreamers.empty())

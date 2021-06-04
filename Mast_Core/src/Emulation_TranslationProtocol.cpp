@@ -49,6 +49,7 @@ BinaryVector Emulation_TranslatorProtocol::TransformationCallback(RVFRequest cur
 
   ostringstream os;
   string toSutData;
+  BinaryVector Emulated_FromSUT=current_request.ToSutVector();
   
   //Check for known commands to format
   if ((current_request.CallbackId()=="SDR") || (current_request.CallbackId()=="SIR"))
@@ -75,8 +76,11 @@ BinaryVector Emulation_TranslatorProtocol::TransformationCallback(RVFRequest cur
 
   LOG(DEBUG) << "Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data";
 
+  if (current_request.CallbackId()=="TPSP_CYCLE")
+    //TPSP_CYCLE is assymmetric: it sends 2 bits (TDI and TMS) but receives only one
+    Emulated_FromSUT=Emulated_FromSUT.Slice(0,1);
  //Implement loopback behaviour
-return current_request.ToSutVector();
+return Emulated_FromSUT;
 }
 
 //

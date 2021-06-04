@@ -57,7 +57,15 @@ class AccessInterfaceProtocol
   std::string CallbackId(int Channel) const { 
          return KindName().to_string()+"_"+std::to_string(Channel); 
          };
+  
+  //! Cycles used so far by the interface to process all toVectors received so far
+  uint64_t getElapsedCycles() {return m_InternalCycles;};
 
+  //! Modify Elapsed Cycles to account for Interface activity (used by Callabacks)
+  void setElapsedCycles(uint64_t newElapsedCycles) {m_InternalCycles=newElapsedCycles;};
+ 
+  //! Increase Elapsed Cycles to account for Interface activity (used by Callabacks)
+  void increaseElapsedCycles(uint64_t ElapsedCyclesIncrease) {m_InternalCycles+=ElapsedCyclesIncrease;};
 
   //! Forces the ResetPort to be asserted on the target module
   //!
@@ -69,6 +77,8 @@ class AccessInterfaceProtocol
   //
   protected:
   AccessInterfaceProtocol()          = default;
+  uint64_t 			m_InternalCycles=0;   //! Cycles used by the interface to process all toVectors received so far
+
 };
 //
 //  End of AccessInterfaceProtocol class declaration

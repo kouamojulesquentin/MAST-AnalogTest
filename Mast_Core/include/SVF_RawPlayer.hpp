@@ -25,6 +25,10 @@
 
 namespace mast
 {
+#define SIR_OVERHEAD_CYCLES 		6
+#define SDR_OVERHEAD_CYCLES 		5
+#define nTRST_OVERHEAD_CYCLES 		3
+
 //! Constructs SVF commands for SVF related AccessInterfaceProtocol
 //!
 class MAST_CORE_EXPORT SVF_RawPlayer final: public AccessInterfaceRawProtocol

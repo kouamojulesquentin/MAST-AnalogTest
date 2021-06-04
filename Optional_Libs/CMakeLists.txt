@@ -73,4 +73,5 @@ add_subdirectory(Dummy_PathSelector)
 add_subdirectory(SSAK)
 add_subdirectory(DummyStreamerProtocol)
 #add_subdirectory(NXP)
+add_subdirectory(Low_Pin)
 

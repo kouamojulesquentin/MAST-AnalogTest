@@ -153,7 +153,9 @@ void DataCycleVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator
     if (cycle_AI)
      {
      accessInterfaceTranslator.set_Busy();
+
      auto fromSutVector = accessInterfaceTranslator.Protocol()->TransformationCallback(request);
+
      accessInterfaceTranslator.PushfromSut(fromSutVector,cur_interface);
      accessInterfaceTranslator.unset_Busy();
      }

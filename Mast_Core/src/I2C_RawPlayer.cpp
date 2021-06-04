@@ -193,9 +193,15 @@ BinaryVector I2C_RawPlayer::DoCallback (uint32_t channelId, void* /* interfaceDa
   PushRequest(read_request);
   result = PopfromSut(); //Need to remove from queue, but return data in not useful
 
+ //Update Cycle count for I2CWrite
+   this->increaseElapsedCycles(I2C_ADDRESSFRAME_CYCLES+I2C_DATAFRAME_CYCLES*toSutData.BytesCount()+I2C_STOP_CYCLES);
+
   RVFRequest write_request(I2C_WRITE,callback_toSutData,os_write.str(),address_data);
   PushRequest(write_request);
   result = PopfromSut();
+ //Update Cycle count for I2Read
+   this->increaseElapsedCycles(I2C_ADDRESSFRAME_CYCLES+I2C_DATAFRAME_CYCLES*toSutData.BytesCount()+I2C_STOP_CYCLES);
+
   }
   
   return result;

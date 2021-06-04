@@ -32,7 +32,7 @@ BinaryVector SVF_RawPlayer::DoCallback (uint32_t channelId, void* /* interfaceDa
   BinaryVector result;
   string svfFormattedData;
   BinaryVector callback_toSutData;
-  
+
   auto FormatSVFData = [] (BinaryVector RawData)
   {
   //Prepare formatted SVF data
@@ -58,6 +58,15 @@ BinaryVector SVF_RawPlayer::DoCallback (uint32_t channelId, void* /* interfaceDa
                        /*NB: this is a BLOCKING call*/
      result = PopfromSut();
    
+
+ //Update Cycle count
+      switch (channelId){
+       case 0: this->increaseElapsedCycles(nTRST_OVERHEAD_CYCLES); break; 
+       case 1: this->increaseElapsedCycles(SIR_OVERHEAD_CYCLES+toSutData.BitsCount()); break;
+       case 2: this->increaseElapsedCycles(SDR_OVERHEAD_CYCLES+toSutData.BitsCount()); break;
+       default: ; //Should never arrive here, a runtime error would have been thrown before by "CallbackId"
+      }
+
   return result;
 }
 

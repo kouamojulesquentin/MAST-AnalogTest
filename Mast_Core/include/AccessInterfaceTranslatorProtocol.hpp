@@ -42,10 +42,20 @@ class AccessInterfaceTranslatorProtocol
   //!
   virtual std::experimental::string_view KindName() const = 0;
 
+  //! Cycles used so far by the interface to process all toVectors received so far
+  uint64_t getElapsedCycles() {return m_InternalCycles;};
+
+  //! Modify Elapsed Cycles to account for Interface activity (used by Callabacks)
+  void setElapsedCycles(uint64_t newElapsedCycles) {m_InternalCycles=newElapsedCycles;};
+ 
+  //! Increase Elapsed Cycles to account for Interface activity (used by Callabacks)
+  void increaseElapsedCycles(uint64_t ElapsedCyclesIncrease) {m_InternalCycles+=ElapsedCyclesIncrease;};
+
   // ---------------- Protected Methods
   //
   protected:
   AccessInterfaceTranslatorProtocol()          = default;
+  uint64_t 			m_InternalCycles=0;   //! Cycles used by the interface to process all toVectors received so far
 };
 //
 //  End of AccessInterfaceTranslatorProtocol class declaration

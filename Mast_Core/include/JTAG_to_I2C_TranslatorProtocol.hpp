@@ -25,7 +25,10 @@ namespace mast
 //! Implement loopback while logging callbacks that
 class MAST_CORE_EXPORT JTAG_to_I2C_TranslatorProtocol final : public T_2_T_TranslatorProtocol
 {
-  // ---------------- Public  Methods
+ #define I2C_ADDRESSFRAME_CYCLES 	9
+ #define I2C_DATAFRAME_CYCLES 		9
+ #define I2C_STOP_CYCLES 		1
+   // ---------------- Public  Methods
   //
   public:
   virtual ~JTAG_to_I2C_TranslatorProtocol() = default;

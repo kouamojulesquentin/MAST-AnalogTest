@@ -29,6 +29,10 @@ namespace mast
 //!
 class MAST_CORE_EXPORT I2C_RawPlayer final : public AccessInterfaceRawProtocol
 {
+ #define I2C_ADDRESSFRAME_CYCLES 	9
+ #define I2C_DATAFRAME_CYCLES 		9
+ #define I2C_STOP_CYCLES 		1
+ 
   // ---------------- Public  Methods
   //
   public:

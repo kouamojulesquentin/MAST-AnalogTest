@@ -51,6 +51,7 @@ BinaryVector SVF_RawPlayer::DoCallback (uint32_t channelId, void* /* interfaceDa
       callback_toSutData = toSutData;
       }
 
+  //Many Unit Test depend on FormattedData
   RVFRequest request(CallbackId(channelId),callback_toSutData,svfFormattedData);
 
   PushRequest(request);

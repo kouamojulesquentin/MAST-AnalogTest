@@ -48,7 +48,6 @@ BinaryVector TPSP_TranslatorProtocol::TransformationCallback(RVFRequest current_
   // This callback is called each time a RVFRequest arrived
   BinaryVector result;
   BinaryVector tpsp_tdo_bit;
-  string TPSP_FormattedData;
   auto toSutData = current_request.ToSutVector();
   
   

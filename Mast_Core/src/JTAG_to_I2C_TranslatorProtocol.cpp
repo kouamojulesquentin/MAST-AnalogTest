@@ -184,7 +184,7 @@ BinaryVector JTAG_to_I2C_TranslatorProtocol::TransformationCallback(RVFRequest c
   LOG(DEBUG) << "TransformationCallback: Issue an I2C_WRITE operation";
   RVFRequest write_request(I2C_WRITE,callback_toSutData,os_write.str(),address_data);
   PushRequest(write_request);
-  result = PopfromSut();
+  auto drop_result = PopfromSut(); //Need to remove from queue, but return data in not useful
   LOG(DEBUG) << "TransformationCallback: Issue an I2C_WRITE operation";
   }
   

@@ -60,10 +60,7 @@ BinaryVector Simulation_TranslatorProtocol::TransformationCallback(RVFRequest cu
   else
    {
     //Unkown format: log it as bynary
-   if (current_request.FormattedData().empty())
     toSutData = current_request.ToSutVector().DataAsBinaryString("", "");
-   else  
-    toSutData = current_request.FormattedData();
    } 
   os << current_request.CallbackId() << " " << toSutData <<"\n";
 

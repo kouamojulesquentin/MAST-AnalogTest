@@ -84,6 +84,7 @@ void AccessInterfaceProtocolFactory::InitializeWithDefaults ()
   RegisterCreator("RemoteProxy",         [](const string& parameters)       { return make_unique<Remote_Protocol_Proxy>(parameters);     });
   RegisterCreator("JTAG",           [](const string& /*parameters*/)       { return make_unique<SVF_RawPlayer>();     });
   RegisterCreator("I2C",            [](const string& parameters)       { return make_unique<I2C_RawPlayer>(parameters);     });
+  RegisterCreator("SVF_openOCD",  [](const string& /* parameters */) { return make_unique<SVF_EmulationProtocol>();               });
 }
 //
 //  End of: AccessInterfaceProtocolFactory::InitializeWithDefaults

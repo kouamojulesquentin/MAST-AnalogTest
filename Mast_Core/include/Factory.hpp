@@ -80,7 +80,16 @@ class MAST_CORE_EXPORT Factory
     auto pos = m_creators.find(creatorId);
     return pos != m_creators.end();
   }
-
+  
+  //! Returns list of registerd creators
+  std::string get_RegistredCreators()
+   {
+    std::string retvalue;
+     for (auto itr : m_creators)
+       retvalue.append(itr.first+" ");
+   
+    return retvalue;
+   }
 
 
   //! Creates a BuildType instance using registered creation method and optional parameters

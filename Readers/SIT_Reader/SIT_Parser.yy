@@ -597,10 +597,11 @@ t_ACCESS_INTERFACE  node_name AI_identifier TR_protocol_parameters
     {
       auto& factory  = AccessInterfaceProtocolFactory::Instance();
       auto  protocol = factory.Create(protocolName, protocolParameters);
-
+     
       if (!protocol)
       {
-        ERROR_MESSAGE(msg) << STREAM_NODE_NAME("ACCESS_INTERFACE", $[node_name].name) << "Cannot create protocol: \"" << protocolName << "\"";
+        ERROR_MESSAGE(msg) << STREAM_NODE_NAME("ACCESS_INTERFACE", $[node_name].name) << "Cannot create protocol: \"" << protocolName << "\"" << " Registred creators are: " << factory.get_RegistredCreators();
+       
         THROW_SYNTAX_ERROR(msg);
       }
       else
@@ -636,11 +637,11 @@ t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_
     LOG(DEBUG)<<"Creating JTAG TAP " << $[node_name].name;
     auto& factory  = AccessInterfaceProtocolFactory::Instance();
     auto  protocol = factory.Create(creatorId, protocolParameters);
-
-    if (!protocol)
+    
+        if (!protocol)
     {
       ERROR_MESSAGE(msg) << STREAM_NODE_NAME("JTAG_TAP", $[node_name].name)
-                         << "Cannot create protocol: \"" << protocolName << "\"";
+                         << "Cannot create protocol: \"" << protocolName << "\"" << " Registred creators are: " << factory.get_RegistredCreators();
       THROW_SYNTAX_ERROR(msg);
     }
     else
@@ -673,7 +674,7 @@ t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_
   catch(std::invalid_argument exc)  // Catch C++ standard exceptions
   {
     ERROR_MESSAGE(msg) << STREAM_NODE_NAME("JTAG_TAP", $[node_name].name)
-                       << "Cannot create protocol: \"" << protocolName << "\"; " << exc.what();
+                       << "XXCannot create protocol: \"" << protocolName << "\"; " << exc.what();
     THROW_SYNTAX_ERROR(msg);
   }
 }

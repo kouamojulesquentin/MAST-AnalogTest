@@ -27,6 +27,10 @@
 #include "Zybo.hpp"
 #include "SystemModelManagerMonitor.hpp"
 
+#define USE_KISS_FFT
+#define USE_OPEN_OCD
+
+
 #if defined(USE_OPEN_OCD)
   #include "OpenOCDProtocol.hpp"
 #endif

@@ -674,7 +674,7 @@ t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_
   catch(std::invalid_argument exc)  // Catch C++ standard exceptions
   {
     ERROR_MESSAGE(msg) << STREAM_NODE_NAME("JTAG_TAP", $[node_name].name)
-                       << "XXCannot create protocol: \"" << protocolName << "\"; " << exc.what();
+                       << "Cannot create protocol: \"" << protocolName << "\"; " << exc.what();
     THROW_SYNTAX_ERROR(msg);
   }
 }

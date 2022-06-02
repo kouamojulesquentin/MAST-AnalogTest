@@ -100,7 +100,11 @@ I2C_RawPlayer::I2C_RawPlayer (const std::string& parameters)
   }
 
   CHECK_PARAMETER_GTE(m_addresses.size(), 2u, "I2C Addresses must have at least two entries");
-
+  string table_add;
+  for (const auto add : m_addresses)
+    table_add.append("").append(std::to_string(add).append(" "));
+  LOG(DEBUG)<<"Created an Adress table of " <<m_addresses.size() << " entries : "<<table_add;
+    
   if (parts.size() > afterAddressIndex)
   {
     THROW_INVALID_ARGUMENT(makeParameterMessage(afterAddressIndex).append(", is not a number (for address) or not the last one (for a prefix)"));
@@ -173,9 +177,12 @@ BinaryVector I2C_RawPlayer::DoCallback (uint32_t channelId, void* /* interfaceDa
   //Prepapre formatted SVF data
   ostringstream os_read,os_write;
 
-  void *address_data=static_cast<void *>(m_addresses.data());
+//  void *address_data=static_cast<void *>(m_addresses.data());
   
   auto address = GetAddress(channelId);
+
+  //Get pointer to Channel address data
+  void *address_data=(void *) &(m_addresses[channelId]);
 
   os_read   << "(0x"  << std::hex << address << ");\n";
   os_write  << "(0x" << std::hex << address << ", " << toSutData.DataAsMixString() << ");\n";

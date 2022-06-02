@@ -40,6 +40,14 @@ using std::ostringstream;
   return os.str();
   };
 
+  auto FormatI2CCommand = [] (RVFRequest current_request)
+  {
+  //Prepare formatted SVF data
+  ostringstream os;
+  os << "(0x" << std::hex<< *(uint32_t *) current_request.interfaceData()<<",0x"<< current_request.ToSutVector().DataAsHexString() << ");";
+  return os.str();
+  };
+
 
 //! Loopbacks "to SUT data" logging SVF command(s) that would be issued if it was really an operating protocol
 //! NOT VERIFIED YET!!! CHECK!!!!!!!
@@ -55,10 +63,13 @@ BinaryVector Emulation_TranslatorProtocol::TransformationCallback(RVFRequest cur
   if ((current_request.CallbackId()=="SDR") || (current_request.CallbackId()=="SIR"))
      toSutData = FormatSVFData(current_request.ToSutVector());
   else
-   {
-    //Unkown format: log it as bynary
-    toSutData = current_request.ToSutVector().DataAsBinaryString("", "");
-   } 
+   if ((current_request.CallbackId()=="I2C_READ") || (current_request.CallbackId()=="I2C_WRITE"))
+     toSutData = FormatI2CCommand(current_request);
+   else
+    {
+     //Unkown format: log it as bynary
+     toSutData = current_request.ToSutVector().DataAsBinaryString("", "");
+    } 
   os << current_request.CallbackId() << " " << toSutData <<"\n";
 
   auto command = os.str();

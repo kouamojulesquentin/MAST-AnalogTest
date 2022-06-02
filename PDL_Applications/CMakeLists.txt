@@ -16,7 +16,8 @@ include_directories(${LIBLOGGER_INCLUDE_DIRS})
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/PDL_Applications")
 #set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
-file(GLOB PDL_Application_SOURCES "src/*")
+file(GLOB PDL_Application_SOURCES "src/JTAG_BitBang_TranslatorProtocol.*")
+set (LDO_Application_SOURCES "src/LDO.cpp")
 
 set(PDL_APPLICATIONS_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 set(LIB_PDL_APPLICATIONS_INCLUDE_DIRS  "${CMAKE_CURRENT_SOURCE_DIR}/include/" CACHE INTERNAL "" FORCE )
@@ -34,4 +35,6 @@ add_library           (PDL_Applications SHARED   ${PDL_Application_SOURCES})
 target_link_libraries (PDL_Applications Mast_API_CPP_PDL)
 # target_link_libraries (PDL_Applications Mast_API_CPP)
 
+add_library           (LDO SHARED   ${LDO_Application_SOURCES})
+target_link_libraries (LDO Mast_API_CPP_PDL)
 

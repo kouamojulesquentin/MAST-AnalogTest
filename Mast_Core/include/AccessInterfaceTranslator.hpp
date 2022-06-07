@@ -94,7 +94,9 @@ class MAST_CORE_EXPORT AccessInterfaceTranslator : public ParentNode
       n_interface%=m_CallbackQueue.size();
       }
       
-     if (*runLoop==false) item = RVFRequest(HALT_REQUEST); //If Manager is stopped, release interface
+//     if (*runLoop==false) item = RVFRequest(HALT_REQUEST); //If Manager is stopped, release interface
+  //HALT_REQUEST signals unsual behaviour, NO_MORE_PENDING allows for a clear stop
+     if (*runLoop==false) item = RVFRequest(NO_MORE_PENDING); //If Manager is stopped, release interface
      
      
      LOG(DEBUG) << "Node " << this->Name()<<" : RVF Request is id: " << item.CallbackId() << " data: "<< item.ToSutVector().DataAsHexString();

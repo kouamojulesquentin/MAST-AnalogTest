@@ -608,6 +608,7 @@ t_ACCESS_INTERFACE  node_name AI_identifier TR_protocol_parameters
       {
         auto node = driver.systemModel->CreateAccessInterface(nodeName, shared_ptr<AccessInterfaceProtocol>(std::move(protocol)));
         $$ = std::make_pair(node,false);
+        node->IgnoreForNodePath($[node_name].is_transparent);
       }
     }
     catch(std::invalid_argument exc)  // Catch C++ standard exceptions

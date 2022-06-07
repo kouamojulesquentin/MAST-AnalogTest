@@ -26,6 +26,9 @@ typedef  uint32_t Callback_t;
 #define I2C_READ        "I2C_READ"
 #define I2C_WRITE       "I2C_WRITE"
 
+//Experimental P1687.2-like callbacks
+#define IMEASUREVOLTAGE "iMeasureVoltage"
+
 #define UNDEFINED       "UNDEFINED"
 
 //Fake request used to release DataCycle

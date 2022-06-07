@@ -33,15 +33,25 @@ namespace
   {
 
     auto     registerPath = "LDO1_CTRL";
+    auto     AnalogPort = "vout_s";
     auto     loopCount    = 5u;
     auto     i    = 0u;
     uint16_t initialValue = 1u;
     uint16_t curValue;
 
+    uint8_t regvalue=0x0;
+    
+    regvalue = en_off+pden_on;
+    
     std::cout << "\nStarting LDO Test\n";
     std::cout << "LDO off, Pullup on\n";
     iNote(iNoteType::Comment,"LDO off, Pullup on");
-    iWrite("LDO1_CTRL", en_on&&pden_on);
+    iWrite("LDO1_CTRL", regvalue);
+    iApply();
+
+    std::cout << "ReadData from Analog Port\n";
+    iNote(iNoteType::Comment,"ReadData from Analog Port");
+    auto PortValue = iGetRefresh<uint8_t>(AnalogPort);
     iApply();
 
 

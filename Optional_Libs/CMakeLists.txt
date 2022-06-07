@@ -69,9 +69,11 @@ endif()
 
 #add_subdirectory(Trivium)
 add_subdirectory(Empty_TranslatorProtocol)
+add_subdirectory(MPSG_TranslatorProtocol)
 add_subdirectory(Dummy_PathSelector)
 add_subdirectory(SSAK)
 add_subdirectory(DummyStreamerProtocol)
 #add_subdirectory(NXP)
 add_subdirectory(Low_Pin)
+add_subdirectory(AnalogPort)
 

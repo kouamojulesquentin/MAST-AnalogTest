@@ -27,8 +27,6 @@ namespace
 #define en_off 		0x00 
 #define pden_off 	0x00 
 
-  //! This algorithm increment "reg"
-  //!
   void LDO_Demo ()
   {
 
@@ -55,10 +53,15 @@ namespace
     iApply();
 
 
+    std::cout << "ReadData from GPIO\n";
+    iNote(iNoteType::Comment,"ReadData from GPIO");
+    iRead("ldo1_startup", 0x0);
+    iApply();
+
      std::cout << "LDO Test Finished\n" ;
   }
   //
-  //  End of: Algo_Increment
+  //  End of: LDO
   //---------------------------------------------------------------------------
 
 

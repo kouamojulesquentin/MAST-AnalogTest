@@ -28,6 +28,7 @@ typedef  uint32_t Callback_t;
 
 //Experimental P1687.2-like callbacks
 #define IMEASUREVOLTAGE "iMeasureVoltage"
+#define DATAPORTREAD    "DataPortRead"
 
 #define UNDEFINED       "UNDEFINED"
 

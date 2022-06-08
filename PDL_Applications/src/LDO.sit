@@ -1,0 +1,30 @@
+TRANSLATOR top MSPG
+  PDL LDO_PDL
+ (
+  ACCESS_INTERFACE LDO_Top NOT_IN_PATH I2C "0x00, 0x10, 0x20, 0xF2" 
+  (
+    REGISTER GPIO_CTRL 8 Bypass: "0x00"
+    REGISTER LDO1_CTRL 8 Bypass: "0x00"
+    REGISTER DMUX_CTRL 8 Bypass: "0x00"
+  )
+  ACCESS_INTERFACE ATB1  NOT_IN_PATH AnalogPort "ATB0" 
+  (
+   LINKER ATB1_ACCESS Table_Based LDO1_CTRL 1 "0b01000000, 0b10000000, 0b01000000, 0b01000000"
+       (
+       REGISTER vout_s 8 Bypass: "0x00"
+       )
+   )
+  ACCESS_INTERFACE GPIO1  NOT_IN_PATH DataPort "GPIO1" 
+  (
+   LINKER GPIO1_Mux Table_Based GPIO_CTRL 5 "0b00000000, 0b10000000, 0b10000001, 0b10000101, 0b10000110, 0b10000111,               0b00000000, 0b00000000, 0b00000001, 0b00000101, 0b00000110, 0b00000111 "
+       (
+       REGISTER zero 1 Bypass: "0b0"
+       REGISTER one  1 Bypass: "0b1"
+       REGISTER ldo1_startup  1 Bypass: "0b0"
+       REGISTER ldo1_ilimit  1 Bypass: "0b0"
+       REGISTER ldo1_ov  1 Bypass: "0b0"
+       )
+   )
+
+  ) 
+

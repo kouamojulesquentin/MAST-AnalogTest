@@ -17,6 +17,7 @@
 
 #include "BinaryVector.hpp"
 #include <experimental/string_view>
+#include <experimental/any>
 
 namespace mast
 {
@@ -65,7 +66,19 @@ class RVFRequest
                   ) 
    : m_CallbackId(CallbackId)
    , m_ToSutVector(ToSutVector)
+
   {}
+
+/* Might cause ambiguity with FormattedData constructore
+  RVFRequest( std::experimental::string_view CallbackId,
+                   BinaryVector	   ToSutVector,
+		    std::experimental::any optionalData
+                  ) 
+   : m_CallbackId(CallbackId)
+   , m_ToSutVector(ToSutVector)
+   , m_optionalData(optionalData)
+  {}
+*/
 
   RVFRequest( std::experimental::string_view CallbackId,
                    BinaryVector	   ToSutVector,
@@ -101,14 +114,19 @@ class RVFRequest
                               else return m_ToSutVector.DataAsBinaryString();};
 
 
+ 
   private:
   std::string m_CallbackId;
   BinaryVector  m_ToSutVector;
   
   //NB: This should be removed now!!!!
   std::string m_FormattedData;
-  void* m_interfaceData=nullptr;
   
+  void* m_interfaceData=nullptr;
+
+  public: 
+  //std::any requires speficif casting that can be done only by the interface, so it must be accessible
+  std::experimental::any m_optionalData; 
   
 };
 //

@@ -19,6 +19,7 @@
 
 #include <experimental/string_view>
 #include <sstream>
+#include <experimental/any>
 
 #include "g3log/g3log.hpp"
 
@@ -49,7 +50,18 @@ using namespace std::experimental::literals::string_view_literals;
   {
   //Prepare formatted SVF data
   ostringstream os;
-  os << "(0x" << std::hex<< *(uint32_t *) current_request.interfaceData()<<",0x"<< current_request.ToSutVector().DataAsHexString() << ");";
+  uint32_t transaction_address;
+  try {
+    
+    transaction_address = std::experimental::any_cast<uint32_t>(current_request.m_optionalData);
+  } 
+    catch(std::exception &exc)
+    {
+      LOG(ERROR_LVL) << "Exception Raised when Converting Optional data: " << exc.what();
+      if (current_request.m_optionalData.empty()) THROW_RUNTIME_ERROR("MPSG: I2C address is empty");
+      else THROW_RUNTIME_ERROR("MPSG: error when converting I2C address"); 
+    }
+  os << "(0x" << std::hex<< transaction_address <<",0x"<< current_request.ToSutVector().DataAsHexString() << ");";
   LOG(DEBUG)<<"I2C data is : " << os.str();
   return os.str();
   };

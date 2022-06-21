@@ -16,6 +16,7 @@
 #include "g3log/g3log.hpp"
 
 #include <sstream>
+#include <experimental/any>
 
 using std::string;
 using std::experimental::string_view;
@@ -195,8 +196,12 @@ BinaryVector I2C_RawPlayer::DoCallback (uint32_t channelId, void* /* interfaceDa
       }
   else
    {
+    
   callback_toSutData = toSutData;
   RVFRequest  read_request(I2C_READ,callback_toSutData,os_read.str(),address_data);
+  
+  read_request.m_optionalData = (m_addresses[channelId]);
+
   PushRequest(read_request);
   result = PopfromSut(); //Need to remove from queue, but return data in not useful
 
@@ -204,6 +209,8 @@ BinaryVector I2C_RawPlayer::DoCallback (uint32_t channelId, void* /* interfaceDa
    this->increaseElapsedCycles(I2C_ADDRESSFRAME_CYCLES+I2C_DATAFRAME_CYCLES*toSutData.BytesCount()+I2C_STOP_CYCLES);
 
   RVFRequest write_request(I2C_WRITE,callback_toSutData,os_write.str(),address_data);
+  write_request.m_optionalData = (m_addresses[channelId]);
+
   PushRequest(write_request);
   result = PopfromSut();
  //Update Cycle count for I2Read

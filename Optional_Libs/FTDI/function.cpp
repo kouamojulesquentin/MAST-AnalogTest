@@ -5,6 +5,10 @@
 ////////////////////////////////////////////////////////////
 #include "function.h"
 
+#include <experimental/string_view>
+#include <sstream>
+#include "g3log/g3log.hpp"
+
 
 #define TCK 0x01
 #define TDI 0x02
@@ -32,7 +36,7 @@ void shift_char(unsigned char * buf, int n, int c){
         tmp = carry;
     }
 }
-
+/*
 //Allows to print a unsigned char
 void print_char(unsigned char * buf, int n){
     int i;
@@ -43,6 +47,7 @@ void print_char(unsigned char * buf, int n){
     }
     printf("\n");
 }
+*/
 
 //TMS takes the high value
 void my_ftdi_TMS_high(unsigned char * buf){
@@ -134,12 +139,14 @@ for ( i = 0; i < n; i++)
     my_ftdi_clk(jtag->buf);
     f = ftdi_write_data(ftdi, jtag->buf, 1);
     if (f < 0){
-        fprintf(stderr,"write failed for 0x%x, error %d (%s)\n",jtag->buf[0],f, ftdi_get_error_string(ftdi));
-        return -1;
+        //fprintf(stderr,"write failed for 0x%x, error %d (%s)\n",jtag->buf[0],f, ftdi_get_error_string(ftdi));
+        LOG(ERROR_LVL)<<"write failed for 0x"+std::to_string(jtag->buf[0])+", error "+std::to_string(f)+" ("+ftdi_get_error_string(ftdi)+")";
+	return -1;
     }
     f = ftdi_read_pins(ftdi,buf_pins);
     if (f < 0){
-        fprintf(stderr,"read failed for 0x%x, error %d (%s)\n",jtag->buf[0],f, ftdi_get_error_string(ftdi));
+        //fprintf(stderr,"read failed for 0x%x, error %d (%s)\n",jtag->buf[0],f, ftdi_get_error_string(ftdi));
+        LOG(ERROR_LVL)<<"read failed for 0x"+std::to_string(jtag->buf[0])+", error "+std::to_string(f)+" ("+ftdi_get_error_string(ftdi)+")";
         return -1;
     }
     carry = buf_pins[0] & TDO ? 1 : 0;
@@ -151,13 +158,14 @@ for ( i = 0; i < n; i++)
     jtag->buf[0] = buf_data[i/8] % 2 ? jtag->buf[0] | TDI : jtag->buf[0] & ~TDI;
     f = ftdi_write_data(ftdi,jtag->buf, 1);
     if (f < 0){
-        fprintf(stderr,"write failed for 0x%x, error %d (%s)\n",jtag->buf[0],f, ftdi_get_error_string(ftdi));
-        return -1;
+        //fprintf(stderr,"write failed for 0x%x, error %d (%s)\n",jtag->buf[0],f, ftdi_get_error_string(ftdi));
+        LOG(ERROR_LVL)<<"write failed for 0x"+std::to_string(jtag->buf[0])+", error "+std::to_string(f)+" ("+ftdi_get_error_string(ftdi)+")";
+	return -1;
     }
     usleep(jtag->clock);
     buf_data[i/8] = buf_data[i/8] >> 1;
 }
-print_char(buf_read,n);
+//print_char(buf_read,n);
 
 //--------6+n cycle-------------
 my_ftdi_clk(jtag->buf);
@@ -240,12 +248,14 @@ for ( i = 0; i < n; i++)
     my_ftdi_clk(jtag->buf);
     f = ftdi_write_data(ftdi,jtag->buf, 1);
     if (f < 0){
-        fprintf(stderr,"write failed for 0x%x, error %d (%s)\n",jtag->buf[0],f, ftdi_get_error_string(ftdi));
+        //fprintf(stderr,"write failed for 0x%x, error %d (%s)\n",jtag->buf[0],f, ftdi_get_error_string(ftdi));
+        LOG(ERROR_LVL)<<"write failed for 0x"+std::to_string(jtag->buf[0])+", error "+std::to_string(f)+" ("+ftdi_get_error_string(ftdi)+")";
         return -1;
     }
     f = ftdi_read_pins(ftdi,buf_pins);
     if (f < 0){
-        fprintf(stderr,"read failed for 0x%x, error %d (%s)\n",jtag->buf[0],f, ftdi_get_error_string(ftdi));
+        //fprintf(stderr,"read failed for 0x%x, error %d (%s)\n",jtag->buf[0],f, ftdi_get_error_string(ftdi));
+        LOG(ERROR_LVL)<<"read failed for 0x"+std::to_string(jtag->buf[0])+", error "+std::to_string(f)+" ("+ftdi_get_error_string(ftdi)+")";
         return -1;
     }
     carry = buf_pins[0] & TDO ? 1 : 0;
@@ -257,13 +267,14 @@ for ( i = 0; i < n; i++)
     jtag->buf[0] = buf_data[i/8] % 2 ?jtag->buf[0] | TDI :jtag->buf[0] & ~TDI;
     f = ftdi_write_data(ftdi,jtag->buf, 1);
     if (f < 0){
-        fprintf(stderr,"write failed for 0x%x, error %d (%s)\n",jtag->buf[0],f, ftdi_get_error_string(ftdi));
+        //fprintf(stderr,"write failed for 0x%x, error %d (%s)\n",jtag->buf[0],f, ftdi_get_error_string(ftdi));
+        LOG(ERROR_LVL)<<"write failed for 0x"+std::to_string(jtag->buf[0])+", error "+std::to_string(f)+" ("+ftdi_get_error_string(ftdi)+")";
         return -1;
     }
     usleep(jtag->clock);
     buf_data[i/8] = buf_data[i/8] >> 1;
 }
-print_char(buf_read,n);
+//print_char(buf_read,n);
 
 //--------5+n cycle-------------
 my_ftdi_clk(jtag->buf);
@@ -313,7 +324,8 @@ struct ftdi_context * my_ftdi_start(int * err_ftdi){
     int f;
      if ((ftdi = ftdi_new()) == 0)
     {
-        fprintf(stderr, "ftdi_new failed\n");
+        //fprintf(stderr, "ftdi_new failed\n");
+	LOG(ERROR_LVL)<<"ftdi_new failed";
         *err_ftdi = -1;
         return NULL;
     }
@@ -321,10 +333,13 @@ struct ftdi_context * my_ftdi_start(int * err_ftdi){
     if (f < 0 && f != -5)
     {
         fprintf(stderr, "unable to open ftdi device: %d (%s)\n", f, ftdi_get_error_string(ftdi));
+        LOG(ERROR_LVL)<<"unable to open ftdi device: "+std::to_string(f)+" ("+ftdi_get_error_string(ftdi)+")";
         *err_ftdi = 1;
     }
-    printf("ftdi open succeeded: %d\n",f);
-    printf("enabling bitbang mode\n");
+//    printf("ftdi open succeeded: %d\n",f);
+//    printf("enabling bitbang mode\n");
+    LOG(DEBUG)<<"ftdi open succeeded: "+std::to_string(f);
+    LOG(DEBUG)<<"enabling bitbang mode";
     ftdi_set_bitmode(ftdi, 0xFF, BITMODE_BITBANG);
     usleep(5 * 100000);
     return ftdi;
@@ -332,8 +347,9 @@ struct ftdi_context * my_ftdi_start(int * err_ftdi){
 
 //Allows to end the comunication with the FTDI
 void my_ftdi_free(struct ftdi_context *ftdi){
-    printf("\n");
-    printf("disabling bitbang mode\n");
+    //printf("\n");
+    //printf("disabling bitbang mode\n");
+    LOG(DEBUG)<<"disabling bitbang mode";
     ftdi_disable_bitbang(ftdi);
     ftdi_usb_close(ftdi);
     ftdi_free(ftdi);

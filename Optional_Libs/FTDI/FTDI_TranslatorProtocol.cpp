@@ -45,13 +45,39 @@ using std::initializer_list;
 using namespace std::string_literals;
 using namespace std::experimental::literals::string_view_literals;
 
-//! Initializeation with no parameters
+//! Initialization with no parameters
 //!
 FTDI_TranslatorProtocol::FTDI_TranslatorProtocol ()
-{
+{ 
+ int retval = 0;
+ //Allocate and initialise FTDI context
+ jtag = (jtag_context_t*) calloc(1,sizeof(*jtag));
+ ftdi = my_ftdi_start(&retval);
+ if(retval != 0) 
+   {
+    LOG(ERROR_LVL)<<"Error in initializing libftdi : my_ftdi_start returned " <<retval;
+    THROW_RUNTIME_ERROR("Error in initializing libftdi : my_ftdi_start returned " + retval);
+    }
+ //Set Default TCK speed
+    jtag->buf[0] = 0x00;
+    jtag->clock = 0.5 * 100000;
+
 }
 //
 //  End of: FTDI_TranslatorProtocol::FTDI_TranslatorProtocol
+//---------------------------------------------------------------------------
+
+//! Clean up FTDI descriptors
+//!
+FTDI_TranslatorProtocol::~FTDI_TranslatorProtocol ()
+{ 
+  LOG(DEBUG)<<"Cleaning up FTDI Descriptors";
+   my_ftdi_free(ftdi);
+   free(jtag);
+
+}
+//
+//  End of: FTDI_TranslatorProtocol::~FTDI_TranslatorProtocol
 //---------------------------------------------------------------------------
 
 

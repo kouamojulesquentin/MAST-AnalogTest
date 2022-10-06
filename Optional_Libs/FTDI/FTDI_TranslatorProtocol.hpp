@@ -19,6 +19,7 @@
 #include <fstream>
 #include <string>
 #include <experimental/string_view>
+#include "function.h"
 
 namespace mast
 {
@@ -28,8 +29,7 @@ class MAST_CORE_EXPORT FTDI_TranslatorProtocol final : public T_2_T_TranslatorPr
   // ---------------- Public  Methods
   //
   public:
-  virtual ~FTDI_TranslatorProtocol() = default;
-  
+ 
   
   //! Constructor with no parameters
   //!
@@ -38,6 +38,10 @@ class MAST_CORE_EXPORT FTDI_TranslatorProtocol final : public T_2_T_TranslatorPr
   // Constructor with parameters defined by a string
   //
   //FTDI_TranslatorProtocol(const std::string& parameters);
+
+  //! Destructor
+  //!
+   ~FTDI_TranslatorProtocol() override;
 
   //! Does any Transformation needed to execute the callback given as a parameter
   //!
@@ -63,6 +67,10 @@ class MAST_CORE_EXPORT FTDI_TranslatorProtocol final : public T_2_T_TranslatorPr
 
   // ---------------- Private  Fields for internal uses
   //
+  //libFTDI fields
+  struct ftdi_context *ftdi;  
+  jtag_context jtag;
+
 };
 //
 //  End of FTDI_TranslatorProtocol class declaration

@@ -3,12 +3,15 @@
 //  Author      : Clément TARDY                           //
 //  Status      : Intern at TIMA in summer 2022           //
 ////////////////////////////////////////////////////////////
+#ifndef FTDI_JTAG_FUNCTIONS
+#define FTDI_JTAG_FUNCTIONS
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <ftdi.h>
 
-typedef struct
+typedef struct jtag_context_t
 {
     int clock;
     unsigned char buf[1];
@@ -40,3 +43,5 @@ void my_ftdi_clk_n_cycle(jtag_context jtag, int cycle, struct ftdi_context *ftdi
 struct ftdi_context * my_ftdi_start(int * err_ftdi);
 
 void my_ftdi_free(struct ftdi_context *ftdi);
+
+#endif //FTDI_JTAG_FUNCTIONS

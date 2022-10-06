@@ -19,6 +19,8 @@ include_directories(${LIBLOGGER_INCLUDE_DIRS})
 file(GLOB PDL_Application_SOURCES "src/JTAG_BitBang_TranslatorProtocol.*")
 set (LDO_Application_SOURCES "src/LDO.cpp")
 
+set (ml505_kissfft_SOURCES "src/ml505_kissfft.cpp")
+
 set(PDL_APPLICATIONS_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 set(LIB_PDL_APPLICATIONS_INCLUDE_DIRS  "${CMAKE_CURRENT_SOURCE_DIR}/include/" CACHE INTERNAL "" FORCE )
 include_directories(${PDL_APPLICATIONS_INCLUDE_DIRS})
@@ -28,6 +30,16 @@ message("=======================================================================
 message(STATUS "PDL_Applications: LIBMAST_CORE_INCLUDE_DIRS:       ${LIBMAST_CORE_INCLUDE_DIRS}")
 message(STATUS "PDL_Applications: PDL_APPLICATIONS_INCLUDE_DIRS:       ${PDL_APPLICATIONS_INCLUDE_DIRS}")
 message(STATUS "PDL_Applications: LIB_PDL_APPLICATIONS_INCLUDE_DIRS:     ${LIB_PDL_APPLICATIONS_INCLUDE_DIRS}") 
+
+if (WIN32)
+  message(STATUS "PDL_Applications: kissfft not used on Windows!!!")
+  message("================================================================================")
+else()
+  include_directories(${LIBKISSFFT_INCLUDE_DIRS})
+  set(EXTRA_LIBS ${EXTRA_LIBS} ${KISS_FFT_LIBRARIES})
+endif()
+message("================================================================================")
+
 message("================================================================================")
 message("")
 
@@ -38,3 +50,5 @@ target_link_libraries (PDL_Applications Mast_API_CPP_PDL)
 add_library           (LDO SHARED   ${LDO_Application_SOURCES})
 target_link_libraries (LDO Mast_API_CPP_PDL)
 
+add_library           (ML505_KISSFFT SHARED   ${ml505_kissfft_SOURCES})
+target_link_libraries (ML505_KISSFFT Mast_API_CPP_PDL  ${KISS_FFT_LIBRARIES})

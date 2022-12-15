@@ -37,7 +37,9 @@ OPTION 2: you CANNOT see your WSL distro from Windows Admin Prompt:
 
 The command usbipd wsl attach --busid <busid> won't work since my regular user don't have admin rights, and my Admin account doesn't see the WSL distro. The solution is to split this command in two:
 
-In CommandPrompt or PowerShell with Admin rights run the following command: usbipd bind --busid <busid> --force. If you don't use --force the next step will fail with a "Device busy" error.
+In CommandPrompt or PowerShell with Admin rights run the following command: 
+usbipd bind --busid <busid> --force. 
+If you don't use --force the next step will fail with a "Device busy" error.
 
 
 Then execute OPTION 1

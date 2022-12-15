@@ -28,6 +28,7 @@
 
 #include <experimental/string_view>
 #include <sstream>
+#include <string.h>
 
 #include "g3log/g3log.hpp"
 
@@ -80,39 +81,93 @@ FTDI_TranslatorProtocol::~FTDI_TranslatorProtocol ()
 //  End of: FTDI_TranslatorProtocol::~FTDI_TranslatorProtocol
 //---------------------------------------------------------------------------
 
+//Allows to print a unsigned char
+void string_print_char(char *out_string,unsigned char * buf, int nbytes){
+    int i;
+    int position;
+    position=sprintf(out_string,"0x");
+    for(i = 0;i< nbytes; i++){
+        position+=sprintf(out_string+position,"%02x.",buf[i]);
+    }
+    printf("\n");
+}
 
 BinaryVector FTDI_TranslatorProtocol::TransformationCallback(RVFRequest current_request) 
 {
   // This callback is called each time a RVFRequest arrived
+  unsigned char * buf_read, *buf_write;
+   
+  BinaryVector from_SUT;
   
-  BinaryVector higher_level_result;
-  
-   //Syncrhonisation
-   if (current_request.CallbackId()==NO_MORE_PENDING)
+  LOG(DEBUG) << "FTDI TransformationCallback: received a Request for a "<<     current_request.CallbackId()<<" operation of " <<
+       current_request.ToSutVector().BitsCount() << "bits ("<<current_request.ToSutVector().BytesCount() <<" bytes)"  ;
+
+   if (current_request.CallbackId()==TRST)
+    {THROW_RUNTIME_ERROR("TRST unimplemented yet");
+     }
+
+   else if ((current_request.CallbackId()==SIR) || (current_request.CallbackId()==SDR))
+     {//THROW_RUNTIME_ERROR("SIR unimplemented yet");
+        auto bytesCount = current_request.ToSutVector().BytesCount() ; 
+
+        buf_read = (unsigned char *) calloc(bytesCount,sizeof(unsigned char));
+         buf_write = (unsigned char *) calloc(bytesCount,sizeof(unsigned char));
+	 
+
+	memcpy(buf_write,(unsigned char *)current_request.ToSutVector().DataLeftAligned(),bytesCount);
+	char PROVA[200];
+	string_print_char(PROVA,buf_write,bytesCount);
+	//string_print_char(PROVA,(unsigned char *)current_request.ToSutVector().DataLeftAligned(),bytesCount);
+	
+          if (current_request.CallbackId()==SIR)
+           {
+                LOG(DEBUG) << "FTDI TransformationCallback: Preparing to run my_ftdi_sir";
+                my_ftdi_sir(jtag,
+                           buf_write, //(unsigned char *)current_request.ToSutVector().DataLeftAligned(),
+                           buf_read, 
+          		 current_request.ToSutVector().BitsCount(),
+                           ftdi);
+               LOG(DEBUG) << "FTDI TransformationCallback: my_ftdi_sir finished";
+               }
+     
+          if (current_request.CallbackId()==SDR)
+           {
+                LOG(DEBUG) << "FTDI TransformationCallback: Preparing to run my_ftdi_sdr";
+                my_ftdi_sdr(jtag,
+                           buf_write, //(unsigned char *)current_request.ToSutVector().DataLeftAligned(),
+                           buf_read, 
+		           current_request.ToSutVector().BitsCount(),
+                           ftdi);
+               LOG(DEBUG) << "FTDI TransformationCallback: my_ftdi_sdr finished";
+               }
+
+     //Convert C buffer to C++ vector to call a constructor
+
+/*    auto bytesCount = (current_request.ToSutVector().BitsCount()%8==0)? 
+    			current_request.ToSutVector().BitsCount()/8 : 
+			current_request.ToSutVector().BitsCount()/8+1;*/
+      vector<uint8_t> C_Data;
+      for (auto i=0;i<bytesCount;i++)
+       C_Data.push_back(buf_read[i]);
+      from_SUT = BinaryVector(C_Data, current_request.ToSutVector().BitsCount());
+    free(buf_read);	 
+       }
+   else if (current_request.CallbackId()==NO_MORE_PENDING)
    {
+    //Syncrhonisation
     //Finished, release parent Translator
     RVFRequest request(NO_MORE_PENDING);
     PushRequest(request);
-    return higher_level_result;
+    return from_SUT;
    }
+    else
+      THROW_RUNTIME_ERROR("FTDI : unknown primitive "+current_request.CallbackId());
 
-   //Process "current_request"
-  // Prepare a request to the higher-level interface: 
- 
-  //Just pass request without modifying it
-  RVFRequest higher_level_request=current_request;
+
   
-  //Push request to higher level
-  PushRequest(higher_level_request);
-  
-//wait for Result from higher level; it is a BLOCKING call
-   higher_level_result = PopfromSut(); 
-  
-  //Process "result"
-  auto lower_level_result=higher_level_result;
-  
+    LOG(DEBUG) << "FTDI TransformationCallback: returning a vector of size "<<from_SUT.BitsCount();
   //Return Callback result to lower level
-  return lower_level_result;
+  return from_SUT;
 }
 //
 //  End of: FTDI_TranslatorProtocol::TransformationCallback

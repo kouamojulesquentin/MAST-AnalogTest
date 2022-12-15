@@ -2700,6 +2700,70 @@ void UT_BinaryVector::test_Constructor_FromRawDataVector_Moved ()
   TS_DATA_DRIVEN_TEST (checker, data);
 }
 
+//! Checks BinaryVector constructor from data in a C array (uint8_t)
+//!
+//! @note Suppose that operator== is working properly
+void UT_BinaryVector::test_Constructor_FromR_C_Array ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    
+    uint32_t bitsCount = std::get<0>(data);
+    string_view expected_string = std::get<1>(data);
+    uint8_t* C_buffer = std::get<2>(data);
+    // ---------------- Setup
+    //
+
+    
+    auto expected  = BinaryVector::CreateFromString(expected_string);
+    
+    auto bytesCount = (bitsCount%8==0)? bitsCount/8 : bitsCount/8+1;
+    
+
+    vector<uint8_t> C_Data;
+    for (auto i=0;i<bytesCount;i++)
+       C_Data.push_back(C_buffer[i]);
+    
+    // ---------------- Exercise
+    //
+    BinaryVector sut(C_Data, bitsCount);
+    
+    
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+  
+  int n_tests = 2;
+
+  uint8_t  C_Data_zeros[] = {0x00, 0x00, 0x00,0x00,0x00,0xFF};
+  uint8_t  C_Data_ones[12]; 
+  memset(C_Data_ones,0xFF, 12);
+		       
+  uint8_t  C_Data_arbitrary[] = {0x61, 0x23, 0x45,0x67,0x90,0xFF};
+    
+  using data_t = tuple< uint32_t, string_view,uint8_t*>;
+  auto  data =
+  {
+    data_t(1,     "0b0",C_Data_zeros),                 // 01
+    data_t(13,    "0b0000_0000:0000_0",C_Data_zeros ), // 02
+    data_t(1,     "0b1",C_Data_ones),                  // 03
+    data_t(2,     "0b01",C_Data_arbitrary),            // 04
+    data_t(4,     "0x6",C_Data_arbitrary),             // 05
+    data_t(8,     "0x61",C_Data_arbitrary),            // 06
+    data_t(12,    "0x612",C_Data_arbitrary),           // 07
+    data_t(13,    "0x612/b0",C_Data_arbitrary),        // 08
+    data_t(6*8,   "0x6123456790FF",C_Data_arbitrary),  // 09
+};
+
+  // ---------------- DDT Exercise
+  //
+  
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
 
 //! Checks Append when sut is empty and adding 8 bits from  int8_t
 //!

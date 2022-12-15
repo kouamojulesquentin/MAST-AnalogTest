@@ -36,18 +36,7 @@ void shift_char(unsigned char * buf, int n, int c){
         tmp = carry;
     }
 }
-/*
-//Allows to print a unsigned char
-void print_char(unsigned char * buf, int n){
-    int i;
-    int k = n % 8 ? n/8 : n/8 -1 ;
-    printf("0x");
-    for(i = k;i>= 0; i--){
-        printf("%x.",buf[i]);
-    }
-    printf("\n");
-}
-*/
+
 
 //TMS takes the high value
 void my_ftdi_TMS_high(unsigned char * buf){
@@ -95,6 +84,8 @@ int i;
 int f = 0;
 unsigned char buf_pins[1];
 int carry;
+int cur_byte, cur_bit;
+LOG(DEBUG)<<"FTDI: performing a SIR operation for "<< n <<" bits";
 //--------1 cycle-------------
 my_ftdi_clk(jtag->buf);
 my_ftdi_TRSTN_high(jtag->buf);
@@ -134,6 +125,8 @@ my_ftdi_clk(jtag->buf);
 ftdi_write_data(ftdi, jtag->buf, 1);
 usleep(jtag->clock);
 //--------5 cycle-------------
+cur_byte =  n/8;
+cur_bit = 8-n%8;
 for ( i = 0; i < n; i++)
 {
     my_ftdi_clk(jtag->buf);
@@ -155,7 +148,10 @@ for ( i = 0; i < n; i++)
     }
     usleep(jtag->clock);
     my_ftdi_clk(jtag->buf);
-    jtag->buf[0] = buf_data[i/8] % 2 ? jtag->buf[0] | TDI : jtag->buf[0] & ~TDI;
+//    jtag->buf[0] = buf_data[i/8] % 2 ? jtag->buf[0] | TDI : jtag->buf[0] & ~TDI;
+//    jtag->buf[0] = (buf_data[i/8] & BITMASK) ? jtag->buf[0] | TDI : jtag->buf[0] & ~TDI;
+     jtag->buf[0] = (buf_data[cur_byte] & 1<<cur_bit) ? jtag->buf[0] | TDI : jtag->buf[0] & ~TDI;
+
     f = ftdi_write_data(ftdi,jtag->buf, 1);
     if (f < 0){
         //fprintf(stderr,"write failed for 0x%x, error %d (%s)\n",jtag->buf[0],f, ftdi_get_error_string(ftdi));
@@ -163,7 +159,14 @@ for ( i = 0; i < n; i++)
 	return -1;
     }
     usleep(jtag->clock);
-    buf_data[i/8] = buf_data[i/8] >> 1;
+//    buf_data[i/8] = buf_data[i/8] >> 1;
+//    buf_data[i/8] = buf_data[i/8] << 1;
+   if (cur_bit<8) cur_bit++;
+     else
+       {//move to next byte
+         cur_byte--;
+	 cur_bit=0;
+       }
 }
 //print_char(buf_read,n);
 
@@ -211,6 +214,9 @@ int i;
 int f = 0;
 unsigned char buf_pins[1];
 int carry;
+int cur_byte, cur_bit;
+LOG(DEBUG)<<"FTDI: performing a SDR operation for "<< n <<" bits";
+
 //--------1 cycle-------------
 my_ftdi_clk(jtag->buf);
 my_ftdi_TRSTN_high(jtag->buf); // Resetn high !!
@@ -243,6 +249,8 @@ my_ftdi_clk(jtag->buf);
 ftdi_write_data(ftdi,jtag->buf, 1);
 usleep(jtag->clock);
 //--------5 cycle-------------
+cur_byte =  n/8;
+cur_bit = 8-n%8;
 for ( i = 0; i < n; i++)
 {
     my_ftdi_clk(jtag->buf);
@@ -264,7 +272,8 @@ for ( i = 0; i < n; i++)
     }
     usleep(jtag->clock);
     my_ftdi_clk(jtag->buf);
-    jtag->buf[0] = buf_data[i/8] % 2 ?jtag->buf[0] | TDI :jtag->buf[0] & ~TDI;
+//    jtag->buf[0] = buf_data[i/8] % 2 ?jtag->buf[0] | TDI :jtag->buf[0] & ~TDI;
+    jtag->buf[0] = (buf_data[cur_byte] & 1<<cur_bit) ? jtag->buf[0] | TDI : jtag->buf[0] & ~TDI;
     f = ftdi_write_data(ftdi,jtag->buf, 1);
     if (f < 0){
         //fprintf(stderr,"write failed for 0x%x, error %d (%s)\n",jtag->buf[0],f, ftdi_get_error_string(ftdi));
@@ -272,7 +281,14 @@ for ( i = 0; i < n; i++)
         return -1;
     }
     usleep(jtag->clock);
-    buf_data[i/8] = buf_data[i/8] >> 1;
+//    buf_data[i/8] = buf_data[i/8] >> 1;
+    if (cur_bit<8) cur_bit++;
+     else
+       {//move to next byte
+         cur_byte--;
+	 cur_bit=0;
+       }
+    
 }
 //print_char(buf_read,n);
 
@@ -332,7 +348,7 @@ struct ftdi_context * my_ftdi_start(int * err_ftdi){
     f = ftdi_usb_open(ftdi, 0x0403, 0x6011);
     if (f < 0 && f != -5)
     {
-        fprintf(stderr, "unable to open ftdi device: %d (%s)\n", f, ftdi_get_error_string(ftdi));
+        //fprintf(stderr, "unable to open ftdi device: %d (%s)\n", f, ftdi_get_error_string(ftdi));
         LOG(ERROR_LVL)<<"unable to open ftdi device: "+std::to_string(f)+" ("+ftdi_get_error_string(ftdi)+")";
         *err_ftdi = 1;
     }

@@ -11,6 +11,8 @@
 #include <unistd.h>
 #include <ftdi.h>
 
+#define BITMASK 0x80
+
 typedef struct jtag_context_t
 {
     int clock;

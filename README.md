@@ -8,53 +8,81 @@ It does not have the vocation to be a complete reference implementation: as such
 MAST uses Cmake >= 3.82 for both compilation and Unit Testing. 
 
 ### Configuration 
-MAST is a modular software, based on a Core and several Optional and External libraries their compilation and inclusion is defined by the UserOption.cmake file, not included in the distribution to avoid excessive versioning: you can build your own based on the  UserOption.model.cmake
+MAST is a modular software, based on a Core and several Optional and External libraries their compilation and inclusion is defined by the *UserOption.cmake* file, not included in the distribution to avoid excessive versioning: you can build your own based on the  *UserOption.model.cmake*
 
+Platform-specific compilation instructions can be found in *README.Linux.txt* and *README.Windows.txt* respectively
 ### Compilation
 To compile, simply type
 
 ```bash
 make
 ```
-This will configure, compile and install the "debug" build in the subdirectory ./cmake_debug. 
+This will configure, compile and install the "debug" build in the subdirectory ./cmake_debug
 
-
+Other useful commands: 
 ### Unitary Tests
 
-Unitary Test can be launched with 
-
 ```bash
+#Unitary Test can be launched with 
 make test
-```
 
-Details of tests of the Mast_Core can be launched separately: 
-
-```bash
+#Details of tests of the Mast_Core can be launched separately: 
 make run_debug
+
+#To clean current build : 
+make clean
+
+#To completely delete current build 
+make distclean
+
+#To install files in the build tree (useful when adding new files)
+make install
 ```
 
+### External Libraries
+Some external libraries like *OpenOCD* might require independent configuration and building. Please refer to their own README
 ## Usage
 
-```python
-import foobar
+By defaut, all files are compiled in the build directory (ex: cmake_debug). The main executable is **./Bin/MAST**. For execution, it references the Dynamic Libraries (.so files) in the **./Lib/** directory. 
 
-# returns 'words'
-foobar.pluralize('word')
+### Documentation
 
-# returns 'geese'
-foobar.pluralize('goose')
-
-# returns 'phenomenon'
-foobar.singularize('phenomena')
+Doxygen documentation can be generated with 
+```bash
+make docs
 ```
+Documentation is generated as HTML files in the *./Doxygen_Docs/* subdirectory. 
+This will generate 4 versions: 
++ ./MastDev/html/index.html  : the Full Documentation
++ ./FULL_API/html/index.html : Documentation for the internal MAST Cpre
++ ./CPP_API/html/index.html  : Documentation for the C++ external interfaces (PDL and environment/startup)
++ ./C_API/html/index.html    : Documentation for the C PDL external interfaces 
 
-## Contributing
 
-Pull requests are welcome. For major changes, please open an issue first
-to discuss what you would like to change.
+## Directory Organization
+-----------------------------------------------------------------------
+New mast project is organized into sub-projects.
 
-Please make sure to update tests as appropriate.
+  - Mast_Core is mast building blocks per se
+  - Mast provide C/C++ API
+  - Mast_UT is for unit testing Mast_Core and Mast libraries
+  - Logger is an asynchronous logging library
+  - SIT_reader is a library for parsing "SIT" formatted file in order to build a SystemModel tree
+  - SIT_reader_UT is for unit testing SIT_reader
+  - openocd is a library to use JTAG/SPI USB adapters
+  - TestCasesApp is an application for testing integration of the different libraries with different kind of testcases
+  - MastExample_CPP give some MAST simple usages examples
+  - Licence manages the licencing right to use MAST
 
+
+Dependencies are as follow:
+```
+                     Lib_UT--\
+                              \
+                               -->Lib-->Logger
+  SIT_parser_UT-->SIT_parser--/
+```
+All, non-generated, files are under source control using GIT
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)

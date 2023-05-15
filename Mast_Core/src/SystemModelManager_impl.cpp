@@ -385,6 +385,7 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
 	    m_ActiveStreamers.pop_back();
 	   }
 
+         LOG(INFO) <<"RVF : Retargeter received this vector to SUT: "<<fromSutVector.DataAsHexString();
           m_fromSutUpdater.UpdateRegisters(activeRegs, fromSutVector);
           ReportServedRegisters(activeRegs);
           ReleaseServedThreads();

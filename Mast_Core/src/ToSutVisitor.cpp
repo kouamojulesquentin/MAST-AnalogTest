@@ -26,6 +26,7 @@ using namespace mast;
 //!
 void ToSutVisitor::VisitAccessInterface (AccessInterface& /* accessInterface */)
 {
+ LOG(INFO) <<"RVF : Retargeter needs to push this vector to SUT: "<<m_toSutVector.DataAsHexString();
 }
 //
 //  End of: ToSutVisitor::VisitAccessInterface

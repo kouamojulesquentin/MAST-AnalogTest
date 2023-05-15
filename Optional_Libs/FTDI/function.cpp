@@ -85,6 +85,7 @@ int f = 0;
 unsigned char buf_pins[1];
 int carry;
 int cur_byte, cur_bit;
+int read_byte, read_bit;
 LOG(DEBUG)<<"FTDI: performing a SIR operation for "<< n <<" bits";
 //--------1 cycle-------------
 my_ftdi_clk(jtag->buf);
@@ -127,6 +128,10 @@ usleep(jtag->clock);
 //--------5 cycle-------------
 cur_byte =  n/8;
 cur_bit = 8-n%8;
+
+read_byte = 0; 
+read_bit = 0;
+
 for ( i = 0; i < n; i++)
 {
     my_ftdi_clk(jtag->buf);
@@ -167,6 +172,12 @@ for ( i = 0; i < n; i++)
          cur_byte--;
 	 cur_bit=0;
        }
+   if (read_bit<8) cur_bit++;
+    else
+     {
+      read_bit=0;
+      read_byte++;
+     }
 }
 //print_char(buf_read,n);
 
@@ -215,6 +226,7 @@ int f = 0;
 unsigned char buf_pins[1];
 int carry;
 int cur_byte, cur_bit;
+int read_byte, read_bit;
 LOG(DEBUG)<<"FTDI: performing a SDR operation for "<< n <<" bits";
 
 //--------1 cycle-------------
@@ -251,6 +263,9 @@ usleep(jtag->clock);
 //--------5 cycle-------------
 cur_byte =  n/8;
 cur_bit = 8-n%8;
+
+read_byte = 0; 
+read_bit = 0;
 for ( i = 0; i < n; i++)
 {
     my_ftdi_clk(jtag->buf);
@@ -267,9 +282,14 @@ for ( i = 0; i < n; i++)
         return -1;
     }
     carry = buf_pins[0] & TDO ? 1 : 0;
-    if(i != n){
+/*    if(i != n){
         shift_char(buf_read,n,carry);
-    }
+    }*/
+    if (carry) //Set bit to 1  
+       buf_read[read_byte] |= 0x1<<(7-read_bit);
+    else //Set bit to 1
+       buf_read[read_byte] &= ~(0x1<<(7-read_bit));
+   
     usleep(jtag->clock);
     my_ftdi_clk(jtag->buf);
 //    jtag->buf[0] = buf_data[i/8] % 2 ?jtag->buf[0] | TDI :jtag->buf[0] & ~TDI;
@@ -288,6 +308,13 @@ for ( i = 0; i < n; i++)
          cur_byte--;
 	 cur_bit=0;
        }
+   if (read_bit<8) cur_bit++;
+    else
+     {
+      read_bit=0;
+      read_byte++;
+     }
+
     
 }
 //print_char(buf_read,n);

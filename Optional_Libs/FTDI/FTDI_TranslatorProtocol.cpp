@@ -61,7 +61,7 @@ FTDI_TranslatorProtocol::FTDI_TranslatorProtocol ()
     }
  //Set Default TCK speed
     jtag->buf[0] = 0x00;
-    jtag->clock = 0.5 * 100000;
+    jtag->clock = 0.5 * 100;
 
 }
 //
@@ -140,6 +140,9 @@ BinaryVector FTDI_TranslatorProtocol::TransformationCallback(RVFRequest current_
                            ftdi);
                LOG(DEBUG) << "FTDI TransformationCallback: my_ftdi_sdr finished";
                }
+
+       string_print_char(PROVA,buf_read,bytesCount);
+       LOG(DEBUG) << "FTDI TransformationCallback: from_SUT: " <<PROVA;
 
      //Convert C buffer to C++ vector to call a constructor
 

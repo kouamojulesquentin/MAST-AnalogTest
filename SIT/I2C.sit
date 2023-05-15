@@ -1,0 +1,9 @@
+TRANSLATOR top Emulation
+ (
+  ACCESS_INTERFACE TAP I2C "0x40, 0x41, 0x42"
+  PDL Console_Incr
+  (
+    REGISTER regHI 12 Bypass: "0xABC"
+  )
+ ) 
+

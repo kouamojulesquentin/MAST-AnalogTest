@@ -147,6 +147,13 @@ endif()
 
 include(Export_MAST_for_eval.cmake)
 
+set(EXAMPLE_DIRECTORY         "SIT")
+message("================================================================================")
+message(" Copying Examples from directory ${CMAKE_CURRENT_SOURCE_DIR}/${EXAMPLE_DIRECTORY} file in install directory ${CMAKE_INSTALL_PREFIX}")
+INSTALL (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${EXAMPLE_DIRECTORY} DESTINATION ${CMAKE_INSTALL_PREFIX})
+message("================================================================================")
+message("")
+
 set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY  OFF)
 set(CPACK_COMPONENTS_GROUPING         ONE_PER_GROUP)
 set(CPACK_COMPONENTS_ALL              ATE_Server ATE_Build ARM_Build Eval_Build) #SIT_Files

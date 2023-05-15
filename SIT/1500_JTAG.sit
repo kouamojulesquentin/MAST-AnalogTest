@@ -1,0 +1,13 @@
+TRANSLATOR top Emulation
+ (
+ JTAG_TAP TAP 4 1
+  (
+  WRAPPER_1500 W_1500 4
+   (
+    INSTANCE Wrapped_chain OF Module_12.sit
+    REGISTER reg_1 12 Bypass: "0b0010:0110:1100"
+    REGISTER reg_2 12 Bypass: "0b0011:0110:1100"
+    REGISTER reg_3 12 Bypass: "0b0100:0110:1100"
+   )
+  )
+ ) 

@@ -1,0 +1,13 @@
+TRANSLATOR top Emulation
+ (
+ JTAG_TAP TAP 4 1
+  (
+  WRAPPER_1500 W_1500 4
+   (
+    INSTANCE Wrapped_chain_1 OF Module_12.sit
+    INSTANCE Wrapped_chain_2 OF Module_12.sit
+    INSTANCE Wrapped_chain_3 OF Module_12.sit
+    INSTANCE Wrapped_chain_4 OF Module_12.sit
+   )
+  )
+ ) 

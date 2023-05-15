@@ -1,0 +1,14 @@
+JTAG_TAP TAP SVF_Emulation 4 1
+(
+ CHAIN Top_level
+  {
+   MIB MIB1 POST HIGH 3 One_Hot_noidle
+     PDL Console_Incr
+     ( 
+       REGISTER reg_1 8 Hold_value Bypass: "0xBC"
+       REGISTER regHI 8 Hold_value Bypass: "0xBC"
+       REGISTER reg_3 8 Hold_value Bypass: "0xBC"
+       )
+ } 
+)
+

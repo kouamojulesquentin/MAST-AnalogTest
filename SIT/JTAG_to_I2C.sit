@@ -1,0 +1,12 @@
+TRANSLATOR top Emulation
+(
+ TRANSLATOR my_trans JTAG_to_I2C "0x40, 0x41, 0x42"
+ (
+ JTAG_TAP TAP 4 1
+  PDL Console_Incr
+  (
+  REGISTER regHI 12 Bypass: "0xABC"
+  )
+ ) 
+)
+

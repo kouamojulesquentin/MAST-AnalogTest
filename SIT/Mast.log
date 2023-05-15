@@ -1,0 +1,1500 @@
+[MastEnvironment_impl.cpp        ][ParseOptions                    ] : Logger (re)configured
+[MastEnvironment_impl.cpp        ][ParseOptions                    ] : MAST options parsed
+[MastEnvironment_impl.cpp        ][LoadPlugins                     ] : Will try to load plugin: ../../libSIT_Tutorial_1.so - Trying in directory "" -
+[PDL_AlgorithmsRepository.cpp    ][RegisterAlgorithm               ] : Registering PDL algorithm with the name: Incr
+[PDL_AlgorithmsRepository.cpp    ][RegisterAlgorithm               ] : 1 PDL algorithm(s) have been registered so far
+[PDL_AlgorithmsRepository.cpp    ][RegisterAlgorithm               ] : Registering PDL algorithm with the name: Console_Incr
+[PDL_AlgorithmsRepository.cpp    ][RegisterAlgorithm               ] : 2 PDL algorithm(s) have been registered so far
+[PDL_AlgorithmsRepository.cpp    ][RegisterAlgorithm               ] : Registering PDL algorithm with the name: Console_Decr
+[PDL_AlgorithmsRepository.cpp    ][RegisterAlgorithm               ] : 3 PDL algorithm(s) have been registered so far
+[MastEnvironment_impl.cpp        ][LoadPlugins                     ] : Loaded plugin: ../../libSIT_Tutorial_1.so
+[MastEnvironment_impl.cpp        ][LoadPlugins                     ] : Will try to load plugin(s) from directory: ../../Lib
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libAnalogPort_Protocol.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libDummy_PathSelector.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libMast_API_C.so
+[PDL_AlgorithmsRepository.cpp    ][RegisterAlgorithm               ] : Registering PDL algorithm with the name: LDO_PDL
+[PDL_AlgorithmsRepository.cpp    ][RegisterAlgorithm               ] : 4 PDL algorithm(s) have been registered so far
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libLDO.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libMast_SPI.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libLowPin_Translators.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libMast_Core.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libSSAK.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libopenocd.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libMast_API_CPP_PDL.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libReader_Common.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libftdi_spi.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libMast_API_CPP.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libPDL_Applications.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libMast_UT_Helpers.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libyaml-cpp.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libS2IB.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libDummyStreamerProtocol.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libFTDITranslator.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libEmptyTranslator.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libkiss_fft.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libICL_Reader.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libMPSGTranslator.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libDataPort_Protocol.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libSIT_Reader.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libLogger.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libMast_OpenOCD.so
+[PDL_AlgorithmsRepository.cpp    ][RegisterAlgorithm               ] : Registering PDL algorithm with the name: kissfft
+[PDL_AlgorithmsRepository.cpp    ][RegisterAlgorithm               ] : 5 PDL algorithm(s) have been registered so far
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libML505_KISSFFT.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded plugin: ../../Lib/libMSPGTranslator.so
+[Plugins.cpp                     ][LoadPluginsExcept               ] : Have loaded 29 plugin(s) from directory: ../../Lib
+[MastEnvironment_impl.cpp        ][LoadPlugins                     ] : Have loaded 29 plugin(s) from directory: ../../Lib
+[MastEnvironment_impl.cpp        ][CreateSystemModel_FromSitFile   ] : Using SIT file: ./TPSP.sit
+[MastEnvironment_impl.cpp        ][CreateSystemModel_FromSitFile   ] : Creating System Model
+[SIT_Parser.tab.cc               ][parse                           ] : Creating JTAG TAP TAP
+[SIT_Parser.tab.cc               ][parse                           ] : Registering Raw protocols for node my_trans
+[SIT_Parser.tab.cc               ][parse                           ] : Registering Raw protocols for node top
+[SIT_Parser.tab.cc               ][parse                           ] : Checking Unresolved Nodes : there are 0 linkers and 0 translators
+[SIT_Reader.cpp                  ][Parse_Impl                      ] : SIT has been parsed successfully
+[SIT_Reader.cpp                  ][Parse                           ] : Registred Node TAP[2] has 2 children
+[ModelBuildDriver.cpp            ][ParseSitFile                    ] : SIT file "./TPSP.sit" has been parsed successfully
+[MastEnvironment_impl.cpp        ][CreateSystemModel_FromSitFile   ] : SIT file has been parsed successfully
+[MastEnvironment_impl.cpp        ][CheckModel                      ] : No issue found in model
+[MastEnvironment_impl.cpp        ][CreateSystemModel               ] : Created System Model
+[MastEnvironment_impl.cpp        ][CreateManager                   ] : Creating system model manager
+[MastEnvironment_impl.cpp        ][CreateManager                   ] : Using configuration algorithm: "last_lazy"
+[MastEnvironment_impl.cpp        ][MakeManagerMonitor              ] : No manager monitoring
+[MastEnvironment_impl.cpp        ][CreateManager                   ] : Created system model manager
+[MastEnvironment_impl.cpp        ][CreateApplications              ] : Creating PDL algorithm associated to nodes (from SIT or ICL description)
+[MastEnvironment_impl.cpp        ][CreateApplications              ] : Try to create PDL algorithm "Console_Incr" associated to node "TAP" which has 2 children
+[MastEnvironment_impl.cpp        ][CreateApplications              ] : PDL algorithm "Console_Incr" has been created and associated to node "TAP"
+[MastEnvironment_impl.cpp        ][Start                           ] : Starting MAST scheduler and PDL algorithm(s)
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatortop IsPending()
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatortop launching Thread for protocol Emulation_Translator
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[DataCycleVisitor.cpp            ][operator()                      ] : Starting Thread for accessInterfaceTranslatormy_trans
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatormy_trans IsPending()
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatormy_trans launching Thread for protocol SVF_RAW
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Popping a request on interface 0 of 1
+[DataCycleVisitor.cpp            ][operator()                      ] : Starting Thread for accessInterface TAP
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] :  Streamers encountered in active path: 0
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] : Node TAP Protocol SVF_RAW:RVF Request for channel 1 sent at internal cycle 0
+[AccessInterfaceRawProtocol.hpp  ][PushRequest                     ] : Protocol SVF_RAW : pushed RVF Request for Callback id: SIR data: 1
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : RVF Request is id: SIR data: 1
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is SIR
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] :  Protocol TPSP:RVF Request SIR received at internal cycle 0
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] : TPSP data string is 0001
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 8
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 10
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 8
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] :  Protocol TPSP:RVF Request SIR finished at internal cycle 3
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node my_trans : pushed a RVF Result. Data: 1
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Popping a request on interface 0 of 1
+[AccessInterfaceRawProtocol.hpp  ][PopfromSut                      ] : Node SVF_RAW : popped a RVF Result. Data: 1
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] : Node TAP Protocol SVF_RAW:RVF Request for channel 1 finished at cycle 10
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] : RVF : Retargeter received this vector to SUT: 1
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] :  Streamers encountered in active path: 0
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] : Node TAP Protocol SVF_RAW:RVF Request for channel 2 sent at internal cycle 10
+[AccessInterfaceRawProtocol.hpp  ][PushRequest                     ] : Protocol SVF_RAW : pushed RVF Request for Callback id: SDR data: ABC
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : RVF Request is id: SDR data: ABC
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is SDR
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] :  Protocol TPSP:RVF Request SDR received at internal cycle 3
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] : TPSP data string is 1010_1011:1100
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 8
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 10
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 8
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 8
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 10
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 8
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 8
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 10
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 8
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 8
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 10
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 8
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 8
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 10
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 8
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 8
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 10
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 8
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 8
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 10
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 8
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] :  Protocol TPSP:RVF Request SDR finished at internal cycle 6
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node my_trans : pushed a RVF Result. Data: ABC
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Popping a request on interface 0 of 1
+[AccessInterfaceRawProtocol.hpp  ][PopfromSut                      ] : Node SVF_RAW : popped a RVF Result. Data: ABC
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] : Node TAP Protocol SVF_RAW:RVF Request for channel 2 finished at cycle 27
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] : RVF : Retargeter received this vector to SUT: ABC
+[AccessInterfaceRawProtocol.hpp  ][PushRequest                     ] : Protocol SVF_RAW : pushed RVF Request for Callback id: AI_FINISHED data: 
+[DataCycleVisitor.cpp            ][operator()                      ] : Finished Thread for accessInterface TAP
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : RVF Request is id: AI_FINISHED data: 
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is AI_FINISHED
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] :  Protocol TPSP:RVF Request AI_FINISHED received at internal cycle 6
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] : TPSP Callback: closing down
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback AI_FINISHED
+[DataCycleVisitor.cpp            ][operator()                      ] : Finished Thread for accessInterfaceTranslatormy_trans
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: AI_FINISHED data: 
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is AI_FINISHED
+[SystemModelManager_impl.cpp     ][iNote                           ] : iNote Comment: Let's go!
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatortop IsPending()
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatortop launching Thread for protocol Emulation_Translator
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[DataCycleVisitor.cpp            ][operator()                      ] : Starting Thread for accessInterfaceTranslatormy_trans
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatormy_trans IsPending()
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatormy_trans launching Thread for protocol SVF_RAW
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Popping a request on interface 0 of 1
+[DataCycleVisitor.cpp            ][operator()                      ] : Starting Thread for accessInterface TAP
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] :  Streamers encountered in active path: 0
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] : Node TAP Protocol SVF_RAW:RVF Request for channel 2 sent at internal cycle 27
+[AccessInterfaceRawProtocol.hpp  ][PushRequest                     ] : Protocol SVF_RAW : pushed RVF Request for Callback id: SDR data: 001
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : RVF Request is id: SDR data: 001
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is SDR
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] :  Protocol TPSP:RVF Request SDR received at internal cycle 6
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] : TPSP data string is 0000_0000:0001
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 8
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 10
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 8
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] :  Protocol TPSP:RVF Request SDR finished at internal cycle 9
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node my_trans : pushed a RVF Result. Data: 001
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Popping a request on interface 0 of 1
+[AccessInterfaceRawProtocol.hpp  ][PopfromSut                      ] : Node SVF_RAW : popped a RVF Result. Data: 001
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] : Node TAP Protocol SVF_RAW:RVF Request for channel 2 finished at cycle 44
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] : RVF : Retargeter received this vector to SUT: 001
+[AccessInterfaceRawProtocol.hpp  ][PushRequest                     ] : Protocol SVF_RAW : pushed RVF Request for Callback id: AI_FINISHED data: 
+[DataCycleVisitor.cpp            ][operator()                      ] : Finished Thread for accessInterface TAP
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : RVF Request is id: AI_FINISHED data: 
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is AI_FINISHED
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] :  Protocol TPSP:RVF Request AI_FINISHED received at internal cycle 9
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] : TPSP Callback: closing down
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback AI_FINISHED
+[DataCycleVisitor.cpp            ][operator()                      ] : Finished Thread for accessInterfaceTranslatormy_trans
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: AI_FINISHED data: 
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is AI_FINISHED
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatortop IsPending()
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatortop launching Thread for protocol Emulation_Translator
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[DataCycleVisitor.cpp            ][operator()                      ] : Starting Thread for accessInterfaceTranslatormy_trans
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatormy_trans IsPending()
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatormy_trans launching Thread for protocol SVF_RAW
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Popping a request on interface 0 of 1
+[DataCycleVisitor.cpp            ][operator()                      ] : Starting Thread for accessInterface TAP
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] :  Streamers encountered in active path: 0
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] : Node TAP Protocol SVF_RAW:RVF Request for channel 2 sent at internal cycle 44
+[AccessInterfaceRawProtocol.hpp  ][PushRequest                     ] : Protocol SVF_RAW : pushed RVF Request for Callback id: SDR data: 002
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : RVF Request is id: SDR data: 002
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is SDR
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] :  Protocol TPSP:RVF Request SDR received at internal cycle 9
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] : TPSP data string is 0000_0000:0010
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 8
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 10
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 8
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] :  Protocol TPSP:RVF Request SDR finished at internal cycle 12
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node my_trans : pushed a RVF Result. Data: 002
+[AccessInterfaceRawProtocol.hpp  ][PopfromSut                      ] : Node SVF_RAW : popped a RVF Result. Data: 002
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] : Node TAP Protocol SVF_RAW:RVF Request for channel 2 finished at cycle 61
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Popping a request on interface 0 of 1
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] : RVF : Retargeter received this vector to SUT: 002
+[AccessInterfaceRawProtocol.hpp  ][PushRequest                     ] : Protocol SVF_RAW : pushed RVF Request for Callback id: AI_FINISHED data: 
+[DataCycleVisitor.cpp            ][operator()                      ] : Finished Thread for accessInterface TAP
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : RVF Request is id: AI_FINISHED data: 
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is AI_FINISHED
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] :  Protocol TPSP:RVF Request AI_FINISHED received at internal cycle 12
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] : TPSP Callback: closing down
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback AI_FINISHED
+[DataCycleVisitor.cpp            ][operator()                      ] : Finished Thread for accessInterfaceTranslatormy_trans
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: AI_FINISHED data: 
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is AI_FINISHED
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatortop IsPending()
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatortop launching Thread for protocol Emulation_Translator
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[DataCycleVisitor.cpp            ][operator()                      ] : Starting Thread for accessInterfaceTranslatormy_trans
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatormy_trans IsPending()
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatormy_trans launching Thread for protocol SVF_RAW
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Popping a request on interface 0 of 1
+[DataCycleVisitor.cpp            ][operator()                      ] : Starting Thread for accessInterface TAP
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] :  Streamers encountered in active path: 0
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] : Node TAP Protocol SVF_RAW:RVF Request for channel 2 sent at internal cycle 61
+[AccessInterfaceRawProtocol.hpp  ][PushRequest                     ] : Protocol SVF_RAW : pushed RVF Request for Callback id: SDR data: 003
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : RVF Request is id: SDR data: 003
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is SDR
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] :  Protocol TPSP:RVF Request SDR received at internal cycle 12
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] : TPSP data string is 0000_0000:0011
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 8
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 10
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 8
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 8
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 10
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 8
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] :  Protocol TPSP:RVF Request SDR finished at internal cycle 15
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node my_trans : pushed a RVF Result. Data: 003
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Popping a request on interface 0 of 1
+[AccessInterfaceRawProtocol.hpp  ][PopfromSut                      ] : Node SVF_RAW : popped a RVF Result. Data: 003
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] : Node TAP Protocol SVF_RAW:RVF Request for channel 2 finished at cycle 78
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] : RVF : Retargeter received this vector to SUT: 003
+[AccessInterfaceRawProtocol.hpp  ][PushRequest                     ] : Protocol SVF_RAW : pushed RVF Request for Callback id: AI_FINISHED data: 
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : RVF Request is id: AI_FINISHED data: 
+[DataCycleVisitor.cpp            ][operator()                      ] : Finished Thread for accessInterface TAP
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is AI_FINISHED
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] :  Protocol TPSP:RVF Request AI_FINISHED received at internal cycle 15
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] : TPSP Callback: closing down
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback AI_FINISHED
+[DataCycleVisitor.cpp            ][operator()                      ] : Finished Thread for accessInterfaceTranslatormy_trans
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: AI_FINISHED data: 
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is AI_FINISHED
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatortop IsPending()
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatortop launching Thread for protocol Emulation_Translator
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[DataCycleVisitor.cpp            ][operator()                      ] : Starting Thread for accessInterfaceTranslatormy_trans
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatormy_trans IsPending()
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatormy_trans launching Thread for protocol SVF_RAW
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Popping a request on interface 0 of 1
+[DataCycleVisitor.cpp            ][operator()                      ] : Starting Thread for accessInterface TAP
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] :  Streamers encountered in active path: 0
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] : Node TAP Protocol SVF_RAW:RVF Request for channel 2 sent at internal cycle 78
+[AccessInterfaceRawProtocol.hpp  ][PushRequest                     ] : Protocol SVF_RAW : pushed RVF Request for Callback id: SDR data: 004
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : RVF Request is id: SDR data: 004
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is SDR
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] :  Protocol TPSP:RVF Request SDR received at internal cycle 15
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] : TPSP data string is 0000_0000:0100
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 8
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 10
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 8
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] :  Protocol TPSP:RVF Request SDR finished at internal cycle 18
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node my_trans : pushed a RVF Result. Data: 004
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Popping a request on interface 0 of 1
+[AccessInterfaceRawProtocol.hpp  ][PopfromSut                      ] : Node SVF_RAW : popped a RVF Result. Data: 004
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] : Node TAP Protocol SVF_RAW:RVF Request for channel 2 finished at cycle 95
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] : RVF : Retargeter received this vector to SUT: 004
+[AccessInterfaceRawProtocol.hpp  ][PushRequest                     ] : Protocol SVF_RAW : pushed RVF Request for Callback id: AI_FINISHED data: 
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Pop done
+[DataCycleVisitor.cpp            ][operator()                      ] : Finished Thread for accessInterface TAP
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : RVF Request is id: AI_FINISHED data: 
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is AI_FINISHED
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] :  Protocol TPSP:RVF Request AI_FINISHED received at internal cycle 18
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] : TPSP Callback: closing down
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback AI_FINISHED
+[DataCycleVisitor.cpp            ][operator()                      ] : Finished Thread for accessInterfaceTranslatormy_trans
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: AI_FINISHED data: 
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is AI_FINISHED
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatortop IsPending()
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatortop launching Thread for protocol Emulation_Translator
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[DataCycleVisitor.cpp            ][operator()                      ] : Starting Thread for accessInterfaceTranslatormy_trans
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatormy_trans IsPending()
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslatormy_trans launching Thread for protocol SVF_RAW
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Popping a request on interface 0 of 1
+[DataCycleVisitor.cpp            ][operator()                      ] : Starting Thread for accessInterface TAP
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] :  Streamers encountered in active path: 0
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] : Node TAP Protocol SVF_RAW:RVF Request for channel 2 sent at internal cycle 95
+[AccessInterfaceRawProtocol.hpp  ][PushRequest                     ] : Protocol SVF_RAW : pushed RVF Request for Callback id: SDR data: 005
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : RVF Request is id: SDR data: 005
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is SDR
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] :  Protocol TPSP:RVF Request SDR received at internal cycle 18
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] : TPSP data string is 0000_0000:0101
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 8
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 10
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 8
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 8
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 10
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 8
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 4
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 01
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback TPSP_CYCLE
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: TPSP_CYCLE data: 0
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is TPSP_CYCLE
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : TPSP_CYCLE 00
+[Emulation_TranslationProtocol.cpp][TransformationCallback          ] : Emulation_TranslatorProtocol: Emulating loopback behaviour by returning input data
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node top : pushed a RVF Result. Data: 0
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Popping a request on interface 0 of 1
+[T_2_T_TranslatorProtocol.hpp    ][PopfromSut                      ] : Node TPSP : popped a fromSut
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] :  Protocol TPSP:RVF Request SDR finished at internal cycle 21
+[AccessInterfaceTranslator.hpp   ][PushfromSut                     ] : Node my_trans : pushed a RVF Result. Data: 005
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Popping a request on interface 0 of 1
+[AccessInterfaceRawProtocol.hpp  ][PopfromSut                      ] : Node SVF_RAW : popped a RVF Result. Data: 005
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] : Node TAP Protocol SVF_RAW:RVF Request for channel 2 finished at cycle 112
+[SystemModelManager_impl.cpp     ][DoHierarchicalDataCycle         ] : RVF : Retargeter received this vector to SUT: 005
+[AccessInterfaceRawProtocol.hpp  ][PushRequest                     ] : Protocol SVF_RAW : pushed RVF Request for Callback id: AI_FINISHED data: 
+[DataCycleVisitor.cpp            ][operator()                      ] : Finished Thread for accessInterface TAP
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node my_trans : RVF Request is id: AI_FINISHED data: 
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is AI_FINISHED
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] :  Protocol TPSP:RVF Request AI_FINISHED received at internal cycle 21
+[TPSP_TranslatorProtocol.cpp     ][TransformationCallback          ] : TPSP Callback: closing down
+[T_2_T_TranslatorProtocol.hpp    ][PushRequest                     ] : Protocol TPSP : pushed request for Callback AI_FINISHED
+[DataCycleVisitor.cpp            ][operator()                      ] : Finished Thread for accessInterfaceTranslatormy_trans
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : Pop done
+[AccessInterfaceTranslator.hpp   ][PopAllRequests                  ] : Node top : RVF Request is id: AI_FINISHED data: 
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : accessInterfaceTranslator.PopAllRequest() done
+[DataCycleVisitor.cpp            ][VisitAccessInterfaceTranslator  ] : Request is AI_FINISHED
+[SystemModelManager_impl.cpp     ][operator()                      ] : Exiting SystemModelManager background thread
+[MastEnvironment_impl.cpp        ][~MastEnvironment_impl           ] : Cleaning up MAST environment
+[Startup.cpp                     ][ForgetSystemModel               ] : Get rid of SystemModel
+[Startup.cpp                     ][ForgetManager                   ] : Stopping and getting rid of manager
+[MastEnvironment_impl.cpp        ][~MastEnvironment_impl           ] : MAST Stopped
+[Startup.cpp                     ][StopLogger                      ] : Stopping logger

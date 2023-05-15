@@ -1,0 +1,21 @@
+TRANSLATOR top Emulation
+ (
+ JTAG_TAP TAP 4 1
+ (
+ CHAIN SSAK_Demo
+ {
+  SIB SSAK_SIB PRE HIGH
+     (
+     REGISTER SSAK_CONTROL_REG 128 Bypass: "0x00000000000000000000000000000000"
+     )
+  REGISTER S2IB_1_ctrl 1 Bypass: "0b0"
+  LINKER S2IB_1 SSAK SSAK_CONTROL_REG,S2IB_1_ctrl  1 "1"
+  PDL Console_Incr
+   (
+   REGISTER regHI 12 Bypass: "0xABC"
+   )
+ }
+ )
+) 
+
+ 

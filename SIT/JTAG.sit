@@ -1,0 +1,9 @@
+TRANSLATOR top Emulation
+ (
+ JTAG_TAP TAP 4 1
+ PDL Console_Incr
+  (
+  REGISTER regHI 12 Bypass: "0x000"
+  )
+ ) 
+

@@ -1,6 +1,6 @@
 CHAIN example NOT_IN_PATH
   PDL Console_Incr
 {
-  REGISTER regHI 12 Bypass: "0xABC"
+  REGISTER reg 12 Bypass: "0xABC"
 }
 

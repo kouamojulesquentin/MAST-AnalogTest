@@ -12,7 +12,7 @@ TRANSLATOR top Emulation
   LINKER S2IB_1 SSAK SSAK_CONTROL_REG,S2IB_1_ctrl  1 "1"
   PDL Console_Incr
    (
-   REGISTER regHI 12 Bypass: "0xABC"
+   REGISTER reg 12 Bypass: "0xABC"
    )
  }
  )

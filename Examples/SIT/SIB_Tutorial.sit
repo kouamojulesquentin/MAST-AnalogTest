@@ -1,11 +1,13 @@
-JTAG_TAP TAP SVF_Emulation 4 1
+TRANSLATOR top Emulation
 (
+ JTAG_TAP TAP 4 1
+ (
  CHAIN Top_level
   {
       REGISTER reg_2 8 Hold_value Bypass: "0xAB"
    SIB SIB1 PRE HIGH
      PDL Console_Incr
-     ( REGISTER regHI 8 Hold_value Bypass: "0xAB")
- } 
+     ( REGISTER reg 8 Hold_value Bypass: "0xAB")
+  } 
+ )
 )
-

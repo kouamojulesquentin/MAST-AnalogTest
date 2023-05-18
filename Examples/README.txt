@@ -3,19 +3,19 @@ In the provided Cmakefile, they are installed in ./cmake_debug/Install when runn
 
 ------------------------------------
 QUICKSTART
- - go to the installation directory ./cmake_debug/Install/SIT
+ - go to the installation directory ./cmake_debug/Install/Examples
   - run the default example (JTAG.sit):
-   ../../Bin/Mast -c=Demo.yml
-  - This runs the PDL-1 routine "Console_Incr", defined in <root>/Tutorials/SIT_Tutorial_1/SIT_Tutorial_1.cpp
+   ./Mast -c=Examples.yml
+  - This runs the PDL-1 routine "Console_Incr", defined in <root>/Examples/PDL/Examples.cpp
   
     - A full execution trace can be found in the Mast.log file
     - The Emulation.log file contains the commands for the top-level Interface computed by MAST
  
  - to run the PDL against another Network, you can either 
-       - edit Demo.yml to point to the desired file 
+       - edit Examples.yml to point to the desired file 
        		(a detailed information on the configuration file is given in the Documentation) 
        - override the configuration using a command-line option. Ex: 
-       		 ../../Bin/Mast -c=Demo.yml -s=./1500_JTAG.sit
+       		 ./Mast -c=Examples.yml -s=./SIT/1500_JTAG.sit
 	  --Command line options be found either in the Documention or 
 	        by using the --help flag	 
 

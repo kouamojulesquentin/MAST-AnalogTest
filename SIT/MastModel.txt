@@ -1,8 +1,0 @@
-[Access_T](0)  "top"
- [Access_T](1)  "my_trans"
-  [Access_I](2)  "TAP"
-   [Register](3)  "TAP_IR", length: 4, Hold value: true, bypass: 1111
-   [Linker](4)    "TAP_DR_Mux"
-    :Selector:(3)  "TAP_IR"
-    [Register](5)  "TAP_BPY", length: 1, bypass: 1
-    [Register](6)  "regHI", length: 12, bypass: 1010_1011:1100

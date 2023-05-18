@@ -3,7 +3,7 @@ TRANSLATOR top FTDI
  JTAG_TAP ml505 11 2
  PDL Console_Incr
   (
-  REGISTER regHI 16 Bypass: "0x0000"
+  REGISTER reg 16 Bypass: "0x0000"
   )
 )  
 

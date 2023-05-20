@@ -8,7 +8,8 @@ message("=======================================================================
 message("")
 
 set(EXAMPLE_DIRECTORY         "Examples")
-set(TOPOLOGY_DIRECTORY         "SIT")
+set(SIT_DIRECTORY         "SIT")
+set(ICL_DIRECTORY         "ICL")
 set(PDL_DIRECTORY         	"PDL")
 
 message("================================================================================")
@@ -16,10 +17,12 @@ message(" Copying Examples from directory ${CMAKE_CURRENT_SOURCE_DIR}/${EXAMPLE_
 message("================================================================================")
 message("")
 
-#Install Example files
-INSTALL (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${TOPOLOGY_DIRECTORY} DESTINATION ${CMAKE_INSTALL_PREFIX}/${EXAMPLE_DIRECTORY})
+#Install SIT Example files
+INSTALL (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${SIT_DIRECTORY} DESTINATION ${CMAKE_INSTALL_PREFIX}/${EXAMPLE_DIRECTORY})
+#Install ICL Example files
+INSTALL (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${ICL_DIRECTORY} DESTINATION ${CMAKE_INSTALL_PREFIX}/${EXAMPLE_DIRECTORY})
 #Install Example configuration file
-INSTALL (FILES ${CMAKE_CURRENT_SOURCE_DIR}/Examples.yml ${CMAKE_CURRENT_SOURCE_DIR}/README.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/${EXAMPLE_DIRECTORY})
+INSTALL (FILES ${CMAKE_CURRENT_SOURCE_DIR}/Examples.yml ${CMAKE_CURRENT_SOURCE_DIR}/ICL_Leds.yml ${CMAKE_CURRENT_SOURCE_DIR}/README.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/${EXAMPLE_DIRECTORY})
 
 #Install link to Mast executable for easier usage
 INSTALL(CODE "execute_process( \
@@ -43,3 +46,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${EXAMPLE_DIRECTORY})
 add_library           (Examples SHARED ${PDL_DIRECTORY}/Examples.cpp)
 set_target_properties (Examples PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 target_link_libraries (Examples Mast_API_CPP ${EXTRA_LIBS})
+
+add_library           (ICL_Leds SHARED ${PDL_DIRECTORY}/ICL_Leds.cpp)
+set_target_properties (ICL_Leds PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+target_link_libraries (ICL_Leds Mast_API_CPP ${EXTRA_LIBS})

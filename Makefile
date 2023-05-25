@@ -43,6 +43,9 @@ endif
 
 # ----------------- Defines exe names and paths
 #
+USER_OPTIONS = UserOptions.cmake
+DEFAULT_OPTIONS = UserOptions.model.cmake
+
 MAST_CORE_UT_EXE_NAME := Mast_Core_UT$(EXT)
 MAST_API_UT_EXE_NAME  := Mast_API_UT$(EXT)
 EXTERNAL_UT_EXE_NAME  := Externals_UT$(EXT)
@@ -99,9 +102,19 @@ else
   DO_RELEASE_INSTALL = FALSE
 endif
 
-all:     debug
+
+
+all: user debug
 install: install_debug
 pack:    pack_debug
+
+user:
+ifeq ("$(wildcard $(USER_OPTIONS))","")
+> @echo "Generating default "$(USER_OPTIONS)" file";
+> cp $(DEFAULT_OPTIONS) $(USER_OPTIONS);
+else
+> @echo "Loading "$(USER_OPTIONS)" file";
+endif
 
 ifneq ($(LOCAL_GCC_PATH),)
 set_compiler:

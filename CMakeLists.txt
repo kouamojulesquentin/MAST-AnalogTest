@@ -139,6 +139,12 @@ add_subdirectory(Optional_Libs_UT)
 
 if (${INSTALL_ARM})
  include(Export_MAST_for_arm.cmake)
+ set(CPACK_COMPONENTS_ALL              ARM_Build) 
+endif()
+
+if (${INSTALL_RISCV})
+ include(Export_MAST_for_riscV.cmake)
+ set(CPACK_COMPONENTS_ALL              RISCV_Build) 
 endif()
 
 #if (${USE_XML_RPC})
@@ -152,7 +158,7 @@ add_subdirectory(Examples)
 
 set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY  OFF)
 set(CPACK_COMPONENTS_GROUPING         ONE_PER_GROUP)
-set(CPACK_COMPONENTS_ALL              ATE_Server ATE_Build ARM_Build Eval_Build) #SIT_Files
+#set(CPACK_COMPONENTS_ALL              ATE_Server ATE_Build ARM_Build Eval_Build) 
 
 set(CPACK_PACKAGE_VENDOR              "OWL")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY   "${CMAKE_BINARY_DIR}/${EXPORT_DIR}")

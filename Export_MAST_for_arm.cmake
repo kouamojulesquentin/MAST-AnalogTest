@@ -1,5 +1,5 @@
 # This files describes what should be, minimally exported to execute MAST on an ARM
-# running on RHEL5
+
 
 set(ARM_Build_EXPORT ${EXPORT_DIR}/ARM_Build)
 
@@ -24,22 +24,22 @@ install(DIRECTORY   ${CMAKE_BINARY_DIR}/Bin/
 		    WORLD_READ WORLD_EXECUTE
 	)
 
-install(FILES   ${CMAKE_SOURCE_DIR}/Run.sh
-        COMPONENT   ARM_Build
-	PERMISSIONS OWNER_WRITE OWNER_READ  OWNER_EXECUTE
-	            GROUP_READ GROUP_EXECUTE
-		    WORLD_READ WORLD_EXECUTE
-        DESTINATION ${ARM_Build_EXPORT})
 
-install(DIRECTORY   ${CMAKE_SOURCE_DIR}/MastExample_CPP/SIT/
+install(DIRECTORY   ${CMAKE_SOURCE_DIR}/Examples/
         COMPONENT   ARM_Build
-        DESTINATION ${ARM_Build_EXPORT}/SIT/)
+        DESTINATION ${ARM_Build_EXPORT}/Examples/)
  
 
 get_filename_component(Gxx_PATH ${CMAKE_CXX_COMPILER} DIRECTORY)
 
 #These commands can be used to add specific local libraries to the Installation
-#it is useful when the target system libc is older than the one used when cross-compiling
+#They can be useful when the target system libc is older than the one used when cross-compiling
+#install(FILES   ${CMAKE_SOURCE_DIR}/Run.sh
+#        COMPONENT   ARM_Build
+#	PERMISSIONS OWNER_WRITE OWNER_READ  OWNER_EXECUTE
+#	            GROUP_READ GROUP_EXECUTE
+#		    WORLD_READ WORLD_EXECUTE
+#        DESTINATION ${ARM_Build_EXPORT})
 #SET(CMAKE_ROOT_PATH /opt/Xilinx/petalinux/tools/linux-i386/gcc-arm-linux-gnueabi/bin)
 #set (STD_LIBS_PATH "${CMAKE_ROOT_PATH}/../arm-linux-gnueabihf/libc/lib/")
 #message(STATUS "Export_ARM: CMAKE_ROOT_PATH  set to ${CMAKE_ROOT_PATH}")

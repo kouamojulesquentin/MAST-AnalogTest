@@ -5,7 +5,7 @@ In the provided Cmakefile, they are installed in ./cmake_debug/Install when runn
 QUICKSTART
  - go to the installation directory ./cmake_debug/Install/Examples
   - run the default example (JTAG.sit):
-   ./Mast -c=Examples.yml
+   ./Mast -c=Examples.yml -s=./SIT/JTAG.sit
   - This runs the PDL-1 routine "Console_Incr", defined in <root>/Examples/PDL/Examples.cpp
   
     - A full execution trace can be found in the Mast.log file

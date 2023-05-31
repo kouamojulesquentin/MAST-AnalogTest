@@ -143,6 +143,8 @@
 /cmake_code_coverage
 /cmake_debug
 /cmake_release
+/cmake_arm
+/cmake_riscV
 /cxxtest/*.hgignore
 /cxxtest/.hg
 /cxxtest/cxxtest/*.TAG
@@ -192,3 +194,4 @@ build
 /RTL/vhdl/*.do
 /RTL/vhdl/*.log
 /RTL/vhdl/*.txt
+/RTL/vhdl/*.so

@@ -11,8 +11,10 @@ SET(CMAKE_SYSTEM_NAME Linux)
 SET(CMAKE_SYSTEM_VERSION 1)
 
 # specify the cross compiler
-SET(CMAKE_C_COMPILER   riscv32-unknown-elf-gcc)
-SET(CMAKE_CXX_COMPILER riscv32-unknown-elf-g++)
+#SET(CMAKE_C_COMPILER   riscv32-unknown-elf-gcc)
+#SET(CMAKE_CXX_COMPILER riscv32-unknown-elf-g++)
+SET(CMAKE_C_COMPILER   riscv64-linux-gnu-gcc)
+SET(CMAKE_CXX_COMPILER riscv64-linux-gnu-g++)
 
 # where is the target environment 
 SET(CMAKE_FIND_ROOT_PATH  /usr/bin/)
@@ -27,6 +29,6 @@ INCLUDE(CMakeForceCompiler)
 
 
 # specify the cross compiler
-CMAKE_FORCE_C_COMPILER(riscv32-unknown-elf-gcc GNU)
-CMAKE_FORCE_CXX_COMPILER(riscv32-unknown-elf-g++ GNU)
+#CMAKE_FORCE_C_COMPILER(riscv32-unknown-elf-gcc GNU)
+#CMAKE_FORCE_CXX_COMPILER(riscv32-unknown-elf-g++ GNU)
 

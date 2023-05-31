@@ -5,7 +5,7 @@ CMAKE_RELEASE_BUILD_DIR       = cmake_release
 CMAKE_DEBUG_BUILD_DIR         = cmake_debug
 CMAKE_CODE_COVERAGE_BUILD_DIR = cmake_code_coverage
 CMAKE_ARM_BUILD_DIR           = cmake_arm
-CMAKE_RISCV32_BUILD_DIR       = cmake_riscV32
+CMAKE_RISCV_BUILD_DIR       = cmake_riscV
 
 #+CMAKE_DEBUG_BUILD_MAKEFILE =$(CMAKE_DEBUG_BUILD_DIR)/Makefile
 
@@ -82,8 +82,8 @@ CMAKE_CENTOS_FLAGS += -DUSE_OPEN_OCD:BOOL=OFF
 CMAKE_ARM_FLAGS  = -D CMAKE_TOOLCHAIN_FILE=Toolchain-arm.cmake -DINSTALL_ARM:BOOL=ON
 CMAKE_ARM_FLAGS += -DUSE_OPEN_OCD:BOOL=OFF
 
-CMAKE_RISCV32_FLAGS  = -D CMAKE_TOOLCHAIN_FILE=Toolchain-riscV32.cmake
-CMAKE_RISCV32_FLAGS += -DUSE_OPEN_OCD:BOOL=OFF
+CMAKE_RISCV_FLAGS  = -D CMAKE_TOOLCHAIN_FILE=Toolchain-riscV.cmake
+CMAKE_RISCV_FLAGS += -DUSE_OPEN_OCD:BOOL=OFF
 
 MAKE_FLAGS= -j4
 
@@ -382,12 +382,12 @@ ifeq ($(DO_RELEASE_INSTALL),TRUE)
 endif
 
 
-riscV32:
-ifeq ("$(wildcard $(CMAKE_RISCV32_BUILD_DIR))","")
-> $(MKDIR) $(CMAKE_RISCV32_BUILD_DIR)
-> cd $(CMAKE_RISCV32_BUILD_DIR) && cmake  $(CMAKE_RISCV32_FLAGS)  ..
+riscV:
+ifeq ("$(wildcard $(CMAKE_RISCV_BUILD_DIR))","")
+> $(MKDIR) $(CMAKE_RISCV_BUILD_DIR)
+> cd $(CMAKE_RISCV_BUILD_DIR) && cmake  $(CMAKE_RISCV_FLAGS)  ..
 endif
-> cd $(CMAKE_RISCV32_BUILD_DIR) && make  $(MAKE_FLAGS)
+> cd $(CMAKE_RISCV_BUILD_DIR) && make  $(MAKE_FLAGS)
 
 clean:
 ifneq ("$(wildcard $(CMAKE_DEBUG_BUILD_DIR)/Makefile)","")
@@ -505,7 +505,7 @@ distclean: code_coverage_clean
 > cmake -E remove_directory $(CMAKE_DEBUG_BUILD_DIR)
 > cmake -E remove_directory $(CMAKE_RELEASE_BUILD_DIR)
 > cmake -E remove_directory $(CMAKE_ARM_BUILD_DIR)
-> cmake -E remove_directory $(CMAKE_RISCV32_BUILD_DIR)
+> cmake -E remove_directory $(CMAKE_RISCV_BUILD_DIR)
 > cmake -E remove -f Mast_Core_UT/Generated/Runner.cpp
 > cmake -E remove -f Mast_API_UT/Generated/Runner.cpp
 > cmake -E remove -f Readers_UT/Generated/Runner.cpp
@@ -542,7 +542,7 @@ targets:
 > cmake -E echo pack
 > cmake -E echo pack_debug
 > cmake -E echo release
-> cmake -E echo riscV32
+> cmake -E echo riscV
 > cmake -E echo run_all
 > cmake -E echo run_all_debug
 > cmake -E echo run_api_debug

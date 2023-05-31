@@ -136,16 +136,17 @@ add_subdirectory(Mast_API_UT)
 add_subdirectory(Readers_UT)
 add_subdirectory(Optional_Libs_UT)
 
-if (${USE_XML_RPC})
-  include(Export_ATE_Server.cmake)
-  include(Export_MAST_for_ATE.cmake)
-endif()
 
 if (${INSTALL_ARM})
  include(Export_MAST_for_arm.cmake)
 endif()
 
-include(Export_MAST_for_eval.cmake)
+#if (${USE_XML_RPC})
+#  include(Export_ATE_Server.cmake)
+#  include(Export_MAST_for_ATE.cmake)
+#endif()
+
+#include(Export_MAST_for_eval.cmake)
 
 add_subdirectory(Examples)
 

@@ -11,6 +11,7 @@ set(EXAMPLE_DIRECTORY         "Examples")
 set(SIT_DIRECTORY         "SIT")
 set(ICL_DIRECTORY         "ICL")
 set(PDL_DIRECTORY         	"PDL")
+set(CONCURRENT_DIRECTORY         	"Concurrent")
 
 message("================================================================================")
 message(" Copying Examples from directory ${CMAKE_CURRENT_SOURCE_DIR}/${EXAMPLE_DIRECTORY} file in install directory ${CMAKE_INSTALL_PREFIX}")
@@ -21,8 +22,10 @@ message("")
 INSTALL (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${SIT_DIRECTORY} DESTINATION ${CMAKE_INSTALL_PREFIX}/${EXAMPLE_DIRECTORY})
 #Install ICL Example files
 INSTALL (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${ICL_DIRECTORY} DESTINATION ${CMAKE_INSTALL_PREFIX}/${EXAMPLE_DIRECTORY})
+#Install Concurrent Example files
+INSTALL (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${CONCURRENT_DIRECTORY} DESTINATION ${CMAKE_INSTALL_PREFIX}/${EXAMPLE_DIRECTORY})
 #Install Example configuration file
-INSTALL (FILES ${CMAKE_CURRENT_SOURCE_DIR}/Examples.yml ${CMAKE_CURRENT_SOURCE_DIR}/ICL_Leds.yml ${CMAKE_CURRENT_SOURCE_DIR}/README.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/${EXAMPLE_DIRECTORY})
+INSTALL (FILES ${CMAKE_CURRENT_SOURCE_DIR}/Examples.yml ${CMAKE_CURRENT_SOURCE_DIR}/ICL_Leds.yml ${CMAKE_CURRENT_SOURCE_DIR}/Concurrent.yml ${CMAKE_CURRENT_SOURCE_DIR}/README.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/${EXAMPLE_DIRECTORY})
 
 #Install link to Mast executable for easier usage
 INSTALL(CODE "execute_process( \
@@ -50,3 +53,7 @@ target_link_libraries (Examples Mast_API_CPP ${EXTRA_LIBS})
 add_library           (ICL_Leds SHARED ${PDL_DIRECTORY}/ICL_Leds.cpp)
 set_target_properties (ICL_Leds PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 target_link_libraries (ICL_Leds Mast_API_CPP ${EXTRA_LIBS})
+
+add_library           (Random SHARED ${PDL_DIRECTORY}/Random.cpp)
+set_target_properties (Random PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+target_link_libraries (Random Mast_API_CPP ${EXTRA_LIBS})

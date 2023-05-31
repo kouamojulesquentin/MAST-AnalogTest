@@ -31,14 +31,3 @@ endif()
 
 target_link_libraries(Mast Mast_API_CPP Mast_API_C SIT_Reader ${EXTRA_LIBS})
 
-#Version with License control
-
-include_directories(${LIBLICENSE_INCLUDE_DIRS})
-message(STATUS "Mast_APP: LIBLICENSE_INCLUDE_DIRS: ${LIBLICENSE_INCLUDE_DIRS}")
-message("================================================================================")
-message("")
-
-add_executable        (Mast_protected Mast_App_License.cpp)
-set_target_properties (Mast_protected PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
-
-target_link_libraries(Mast_protected Mast_license Mast_API_CPP Mast_API_C SIT_Reader ${EXTRA_LIBS})

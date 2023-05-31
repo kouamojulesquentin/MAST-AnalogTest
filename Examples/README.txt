@@ -52,6 +52,16 @@ Streamer.sit
 StreamerTrivium.sit
 Trivium.sit
 
+--Examples of concurrent execution of PDL-1 algorithms
+./Concurrent/Module_8.sit
+./Concurrent/Random.sit
+./Concurrent/Random_hierarchical.sit
+./Concurrent/Random_hierarchical_deep.sit
+./Concurrent/Random_hierarchical_stress.sit
+./Concurrent/Random_horizontal.sit
+./Concurrent/Random_horizontal_stress.sit
+./Concurrent/Replica_100x8.sit
+
 --Dynamic authentication with SSAK as in paper [3]
 SSAK.sit
 SSAK_pre.sit

@@ -1,0 +1,9 @@
+TRANSLATOR top Emulation
+ (
+ JTAG_TAP TAP 4 1
+   PDL random_8
+  (
+       REGISTER reg_8 8 Hold_value Bypass: "0x00"
+  )
+)
+

@@ -111,7 +111,6 @@ add_subdirectory(Logger)
 add_subdirectory(Mast_Core)
 add_subdirectory(Mast_API_CPP)
 add_subdirectory(Mast_API_C)
-add_subdirectory(Tutorials)
 add_subdirectory(Applications)
 add_subdirectory(PDL_Applications)
 add_subdirectory(Readers)
@@ -120,9 +119,6 @@ add_subdirectory(Tests_Common)
 
 add_subdirectory(Optional_Libs)
 
-if (NOT WIN32)
-add_subdirectory(License)
-endif()
 
 if (${KISSFFT})
   add_subdirectory(TestCasesApp)

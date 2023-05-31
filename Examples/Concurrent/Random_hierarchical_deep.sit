@@ -1,0 +1,37 @@
+TRANSLATOR top Emulation
+ (
+ JTAG_TAP TAP 4 1
+ (
+ SIB test_SIB POST HIGH 
+ ( 
+  SIB test_SIB POST HIGH 
+  ( 
+   SIB test_SIB POST HIGH 
+   ( 
+    SIB test_SIB POST HIGH 
+    ( 
+     SIB test_SIB POST HIGH 
+     ( 
+      SIB test_SIB POST HIGH 
+      ( 
+       SIB test_SIB POST HIGH 
+       ( 
+        SIB test_SIB POST HIGH 
+        ( 
+         SIB test_SIB POST HIGH 
+          ( 
+          SIB test_SIB POST HIGH 
+           ( 
+             INSTANCE Replica_1 OF Module_8.sit
+           )
+          )
+         )
+        )
+       )
+      )
+     )
+    )
+   )
+  )
+ )
+)

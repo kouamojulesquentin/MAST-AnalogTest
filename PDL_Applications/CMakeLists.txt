@@ -19,7 +19,6 @@ include_directories(${LIBLOGGER_INCLUDE_DIRS})
 file(GLOB PDL_Application_SOURCES "src/JTAG_BitBang_TranslatorProtocol.*")
 set (LDO_Application_SOURCES "src/LDO.cpp")
 
-set (ml505_kissfft_SOURCES "src/ml505_kissfft.cpp")
 
 set(PDL_APPLICATIONS_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 set(LIB_PDL_APPLICATIONS_INCLUDE_DIRS  "${CMAKE_CURRENT_SOURCE_DIR}/include/" CACHE INTERNAL "" FORCE )
@@ -50,5 +49,8 @@ target_link_libraries (PDL_Applications Mast_API_CPP_PDL)
 add_library           (LDO SHARED   ${LDO_Application_SOURCES})
 target_link_libraries (LDO Mast_API_CPP_PDL)
 
-add_library           (ML505_KISSFFT SHARED   ${ml505_kissfft_SOURCES})
-target_link_libraries (ML505_KISSFFT Mast_API_CPP_PDL  ${KISS_FFT_LIBRARIES})
+if(${KISSFFT})
+  set (ml505_kissfft_SOURCES "src/ml505_kissfft.cpp")
+  add_library           (ML505_KISSFFT SHARED   ${ml505_kissfft_SOURCES})
+  target_link_libraries (ML505_KISSFFT Mast_API_CPP_PDL  ${KISS_FFT_LIBRARIES})
+endif()

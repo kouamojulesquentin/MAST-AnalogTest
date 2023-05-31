@@ -105,7 +105,7 @@ void UT_SVF_SimulationProtocol::test_DoCallback_Sync ()
   {
     // ---------------- Setup
     //
-    auto endpointId = std::get<0>(data);
+    auto channelId = std::get<0>(data);
     auto toSutData    = std::get<1>(data);
 
     auto toSutVector = BinaryVector::CreateFromString(toSutData);
@@ -115,7 +115,7 @@ void UT_SVF_SimulationProtocol::test_DoCallback_Sync ()
 
     // ---------------- Exercise
     //
-    auto fromSutVector = sut.DoCallback(endpointId, nullptr, toSutVector);
+    auto fromSutVector = sut.DoCallback(channelId, nullptr, toSutVector);
 
     // ---------------- Verify
     //
@@ -203,7 +203,7 @@ void UT_SVF_SimulationProtocol::test_DoCallback_ASync ()
   {
     // ---------------- Setup
     //
-    auto endpointId = std::get<0>(data);
+    auto channelId = std::get<0>(data);
     auto toSutData    = std::get<1>(data);
 
     auto toSutVector = BinaryVector::CreateFromString(toSutData);
@@ -211,7 +211,7 @@ void UT_SVF_SimulationProtocol::test_DoCallback_ASync ()
 
     // ---------------- Exercise
     //
-    auto fromSutVector = sut.DoCallback(endpointId, nullptr, toSutVector);
+    auto fromSutVector = sut.DoCallback(channelId, nullptr, toSutVector);
 
     // ---------------- Verify
     //

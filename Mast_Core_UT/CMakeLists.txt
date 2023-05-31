@@ -33,6 +33,7 @@ set(SYSTEM_MODEL_HEADERS "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_AccessInterfa
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_DefaultOneHotPathSelector.hpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_DefaultTableBasedPathSelector.hpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_FromSutUpdater.hpp"
+                         "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_Emulation_TranslatorProtocol.hpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_NamesChecker.hpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_PrettyPrinter.hpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_GmlPrinter.hpp"
@@ -43,6 +44,7 @@ set(SYSTEM_MODEL_HEADERS "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_AccessInterfa
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_STIL_EmulationProtocol.hpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_SVF_SimulationProtocol.hpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_Remote_Protocol_Proxy.hpp"
+                         "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_SVF_RawPlayer.hpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_DataCycle.hpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_ToSutVisitor.hpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_SystemModel.hpp"
@@ -50,6 +52,7 @@ set(SYSTEM_MODEL_HEADERS "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_AccessInterfa
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_SystemModelChecker.hpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_SystemModelFactory.hpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_SystemModelManager.hpp"
+                         "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_Streamer.hpp"
                          )
 
 set(SYSTEM_MODEL_SOURCES "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_AccessInterfaceProtocolFactory.cpp"
@@ -65,6 +68,7 @@ set(SYSTEM_MODEL_SOURCES "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_AccessInterfa
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_GenericAccessInterfaceProtocol.cpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_GmlPrinter.cpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_I2C_EmulationProtocol.cpp"
+                         "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_Emulation_TranslatorProtocol.cpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_NamesChecker.cpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_NodePathResolver.cpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_ParentNode.cpp"
@@ -76,6 +80,7 @@ set(SYSTEM_MODEL_SOURCES "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_AccessInterfa
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_Remote_Protocol_Proxy.cpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_STIL_EmulationProtocol.cpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_SVF_SimulationProtocol.cpp"
+                         "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_SVF_RawPlayer.cpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_SystemModel.cpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_SystemModelBuilder.cpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_SystemModelChecker.cpp"
@@ -84,7 +89,8 @@ set(SYSTEM_MODEL_SOURCES "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_AccessInterfa
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_SystemModelNode.cpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_ToSutVisitor.cpp"
                          "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_VirtualRegister.cpp"
-                         "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_VirtualRegister.hpp")
+                         "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_VirtualRegister.hpp"
+                         "${CMAKE_CURRENT_LIST_DIR}/SystemModel/UT_Streamer.cpp")
 
 set(UTILITY_HEADERS "${CMAKE_CURRENT_LIST_DIR}/Utility/UT_BinaryVector.cpp"
                     "${CMAKE_CURRENT_LIST_DIR}/Utility/UT_BinaryVector.hpp"

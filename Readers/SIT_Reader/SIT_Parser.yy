@@ -21,6 +21,14 @@
 #  endif
 # endif
 
+/*#ifndef YYINITDEPTH
+#define YYINITDEPTH 15000
+#endif
+
+#ifndef YYMAXDEPTH
+#define YYMAXDEPTH  YYINITDEPTH+1000
+#endif
+*/
 #include "Parser_Types.hpp"
 #include "BinaryVector.hpp"
 #include "SystemModelBuilder.hpp"
@@ -49,6 +57,14 @@
 #include "UnresolvedPathSelector.hpp"
 #include "ParserException.hpp"
 #include "g3log/g3log.hpp"
+#include "AccessInterfaceTranslatorProtocolFactory.hpp"
+#include "JTAG_BitBang_TranslatorProtocol.hpp"
+#include "PDL_AlgorithmsRepository.hpp"
+#include "Emulation_TranslatorProtocol.hpp"
+#include "Dummy_TranslatorProtocol.hpp"
+#include "I2C_RawPlayer.hpp"
+#include "SVF_RawPlayer.hpp"
+#include "StreamerProtocolFactory.hpp"
 
 #include <iostream>
 #include <cstdlib>
@@ -106,7 +122,17 @@ namespace
     auto location = SIT::location(locBegin, locEnd);
     return location;
   }
+  SIT::location MakeLocation(const T_2_E_information& translatorInfo)
+  {
+    auto locBegin = SIT::position(nullptr, translatorInfo.line, translatorInfo.beginColumn);
+    auto locEnd   = SIT::position(nullptr, translatorInfo.line, translatorInfo.endColumn);
+    auto location = SIT::location(locBegin, locEnd);
+    return location;
+  }
 } // End of unnamed namespace
+
+
+#define BROCADE_TAG "tmp_BROCADE"
 
 } /*end of %code section*/
 
@@ -132,7 +158,7 @@ namespace
 %type <std::uint32_t>                   max_derivations
 %type <std::string>                     path_selector_kind
 %type <std::string>                     path_selector_parameters
-%type <std::string>                     selector_register_name
+%type <std::vector<std::string>>        selector_register_name_list
 %type <std::uint32_t>                   IR_size
 %type <std::uint32_t>                   size
 %type <std::uint32_t>                   n_DR_chains
@@ -141,6 +167,8 @@ namespace
 %type <std::string>                     JTAG_protocol
 %type <std::string>                     AI_identifier
 %type <std::string>                     AI_protocol_parameters
+%type <std::string>                     TR_identifier
+%type <std::string>                     TR_protocol_parameters
 
 %type <std::shared_ptr<mast::SystemModelNode>> root_node
 %type <std::shared_ptr<mast::SystemModelNode>> register_node
@@ -194,12 +222,20 @@ namespace
 %token <std::string>   t_LOW
 %token <std::string>   t_REVERSE
 %token <std::uint32_t> t_DecimalLiteral
+%token <std::string>   t_TRANSLATOR
+%token <std::string>   t_BROCADE
+%token <std::string>   t_STREAMER
 
 
 %%
 root_node:
+{
+      auto& factory  = AccessInterfaceTranslatorProtocolFactory::Instance();
+      factory.RegisterCreator("BitBang",            [](const string& parameters)       { return make_unique<JTAG_BitBang_TranslatorProtocol>(parameters);     });
+}
   node END
   {
+    LOG(DEBUG)<<"Checking Unresolved Nodes : there are " <<driver.unresolved_linkers.size() << " linkers and " << driver.unresolved_translators.size() << " translators" ;
     const auto& selectorFactory = PathSelectorFactory::Instance();
     unique_ptr<PathSelector> selector;
 
@@ -210,23 +246,57 @@ root_node:
       const auto& linkerInfo = driver.unresolved_linkers.front();
 
       // remove resolved linkerInfo
-      const auto& registerIter = driver.declared_registers.find(linkerInfo.selector_reg_name);
+      std::vector<std::shared_ptr<Register>> linkerRegisters;
+      std::vector<std::shared_ptr<SystemModelNode>> linkerNodes;
+      std::shared_ptr<Register> registerNode;
+     bool Only_Registers = true;
+ for (const auto& selector_reg_name : linkerInfo.selector_reg_name_list)
+     {
+     const auto& registerIter = driver.declared_registers.find(selector_reg_name);
       if (registerIter == driver.declared_registers.end())
       {
+       const auto& nodeIter = driver.declared_nodes.find(selector_reg_name);
+       if (nodeIter == driver.declared_nodes.end())
+        {
         ERROR_MESSAGE(msg) << STREAM_NODE_NAME("LINKER", linkerInfo.linker_node->Name())
-                           << "Error, specified selector register \"" << linkerInfo.selector_reg_name << "\" does not exist";
+                           << "Error, specified selector node \"" << selector_reg_name << "\" does not exist";
 
         THROW_SYNTAX_ERROR_AT_LOC(msg, MakeLocation(linkerInfo));
+	}
+	else
+	 {
+	  Only_Registers = false;
+	  linkerNodes.emplace_back(nodeIter->second);
+	 }
       }
-
-      auto registerNode = registerIter->second;
+      else
+      {
+       linkerRegisters.emplace_back(registerIter->second);
+       linkerNodes.emplace_back(std::dynamic_pointer_cast<SystemModelNode>(registerIter->second));
+       }
+      }
+      registerNode=linkerRegisters.front();
+      
 
       if (!linkerInfo.selector_parameters.empty())
       {
-        selector = selectorFactory.Create(linkerInfo.selector_kind_name,
+        if (linkerInfo.selector_reg_name_list.size()==1)
+         selector = selectorFactory.Create(linkerInfo.selector_kind_name,
                                           linkerInfo.max_derivations,
                                           linkerInfo.selector_parameters,
                                           registerNode);
+         else
+	 if (Only_Registers==true)					  
+           selector = selectorFactory.Create(linkerInfo.selector_kind_name,
+                                          linkerInfo.max_derivations,
+                                          linkerInfo.selector_parameters,
+                                          linkerRegisters);
+         else
+           selector = selectorFactory.Create(linkerInfo.selector_kind_name,
+                                          linkerInfo.max_derivations,
+                                          linkerInfo.selector_parameters,
+                                          linkerNodes);
+	 					  
       }
       else
       {
@@ -240,6 +310,44 @@ root_node:
       linkerNode->ReplacePathSelector(shared_ptr<PathSelector>(std::move(selector)));
       driver.unresolved_linkers.pop();
     }
+    
+    while (!driver.unresolved_translators.empty())
+    {
+      const auto& translatorInfo = driver.unresolved_translators.front();
+
+      // remove resolved translatorInfo
+      LOG(INFO)<<"Resolving Translator "<< translatorInfo.translator_reg_name;
+      const auto& registerIter = driver.declared_registers.find(translatorInfo.translator_reg_name);
+      if (registerIter == driver.declared_registers.end())
+      {
+        ERROR_MESSAGE(msg) << STREAM_NODE_NAME("LINKER", translatorInfo.translator_node->Name())
+                           << "Error, specified T-2-E translator register \"" << translatorInfo.translator_reg_name << "\" does not exist";
+
+        THROW_SYNTAX_ERROR_AT_LOC(msg, MakeLocation(translatorInfo));
+      }
+
+      auto BBNode = registerIter->second;
+      auto asParent = dynamic_pointer_cast<ParentNode>($[node]);
+      auto EventDomainRootNode = asParent->FindParentOfNode(BBNode);
+      CHECK_VALUE_NOT_NULL(EventDomainRootNode, "Cannot find parent of node '"s + BBNode->Name() + "' to intialize the T-2-E protocol of translator  "+ translatorInfo.translator_node->Name());
+      auto t_2_E_protocol = dynamic_pointer_cast<T_2_E_TranslatorProtocol>(translatorInfo.translator_node->Protocol());
+      CHECK_VALUE_NOT_NULL(t_2_E_protocol, "Protocol of Translator node " + translatorInfo.translator_node->Name() + " should be of type T-2-E protocol");
+      
+      /*Register T_2_E_translator as a PDL application with an unique name derived from the UID of the translator */
+      auto Unique_PDL_name = t_2_E_protocol->GetTranslatorBaseName()+"_"+std::to_string(translatorInfo.translator_node->Identifier());
+      auto& repo = PDL_AlgorithmsRepository::Instance();
+      auto T_2_E_translator_lambda =[t_2_E_protocol] () {t_2_E_protocol->T_2_E_translator();};
+
+     // ---------------- Do register algorithm(s) with a name
+     repo.RegisterAlgorithm(Unique_PDL_name, T_2_E_translator_lambda);
+     // ---------------- Create a thread generation request attached to the EvenDomainRootNode
+      driver.namesAndNodes.emplace_back(Unique_PDL_name, EventDomainRootNode, nlines);
+
+
+      driver.unresolved_translators.pop();
+    }
+     
+    
     driver.parsedTopNode = $[node];
   }
   ;
@@ -274,8 +382,8 @@ node_list:
 ;
 
 node:
-   parent_node_with_children { $$ = $1; }
- | leaf_node                 { $$ = $1; }
+   parent_node_with_children { $$ = $1; driver.declared_nodes.insert (make_pair($1->Name(), $1));}
+ | leaf_node                 { $$ = $1; driver.declared_nodes.insert (make_pair($1->Name(), $1));}
 ;
 
 is_transparent:
@@ -308,19 +416,76 @@ parent_node_with_children:
 
     auto asParentNode = dynamic_pointer_cast <ParentNode>($[parent_node].first);
 
-    for (auto this_child : $[children_list].first.nodes)
-    {
-      asParentNode->AppendChild(this_child);
-    }
-    $$ = $[parent_node].first;
-
-    if (!$[PDL_declaration].first.empty())
-    {
-      for (auto this_function : $[PDL_declaration].first)
+    auto isBrocade = $[parent_node].first->Name().find(BROCADE_TAG);
+    if (isBrocade==std::string::npos)
+     { /*Normal case*/
+      for (auto this_child : $[children_list].first.nodes)
       {
-        driver.namesAndNodes.emplace_back(this_function, asParentNode, $[PDL_declaration].second);
+        asParentNode->AppendChild(this_child);
       }
-    }
+      $$ = $[parent_node].first;
+  
+      if (!$[PDL_declaration].first.empty())
+      {
+        for (auto this_function : $[PDL_declaration].first)
+        {
+          driver.namesAndNodes.emplace_back(this_function, asParentNode, $[PDL_declaration].second);
+        }
+      }
+      auto asTranslator = dynamic_pointer_cast <AccessInterfaceTranslator>($[parent_node].first);
+      if (asTranslator)
+       { //Need to regsiter Raw protocol with translator
+       LOG(DEBUG)<<"Registering Raw protocols for node " << asTranslator->Name();
+        auto current_Child= asTranslator->FirstChild();
+        while (current_Child != nullptr)
+        {
+         auto interface = dynamic_pointer_cast <AccessInterface>(current_Child);
+         auto slave_translator = dynamic_pointer_cast <AccessInterfaceTranslator>(current_Child);
+         if (!interface) 
+          if (!slave_translator) 
+          {
+           std::ostringstream msg;
+           msg << "Node " << $[parent_node].first->Name() << " must have a child of type AccessInterface or AccessInterfaceTranslator"  ;
+           THROW_SYNTAX_ERROR(msg);
+          }
+         if (interface)         asTranslator->RegisterInterface(interface); 
+         if (slave_translator)  asTranslator->RegisterTranslator(slave_translator); 
+        current_Child = current_Child->NextSibling();
+        }
+       }
+      }
+      else
+     { /*Building a Brocade Mux*/
+     auto nTaps = $[children_list].first.nodes.size();
+     if  ((nTaps <1) || (nTaps>4))
+       {
+       std::ostringstream msg;
+       msg << "Brocade Mux " << $[parent_node].first->Name() << " must have between 1 and 4 Slave Taps"  ;
+       THROW_SYNTAX_ERROR(msg);
+       }
+      std::vector<shared_ptr<AccessInterface>> tap_list; 
+      for (auto this_child : $[children_list].first.nodes)
+      {
+       auto tap = dynamic_pointer_cast <AccessInterface>(this_child);
+       tap_list.emplace_back(tap);
+      }
+      auto I2C_Adresses   = std::initializer_list<uint32_t>{ 0x30u, 0x31u };
+      
+      //We use a temp variable because passing by reference driver.namesAndNodes does not work
+      auto tmp= driver.namesAndNodes;
+      auto node = driver.builder->Create_Brocade(make_shared<Dummy_TranslatorProtocol>(""),
+                                                     make_shared<I2C_RawPlayer>(I2C_Adresses), 
+						     make_shared<SVF_RawPlayer>(),
+						     tap_list,
+						     tmp);
+						     //driver.namesAndNodes);
+     driver.namesAndNodes=tmp;
+
+      // ---------------- Get rid of temporary Brocade Chain node
+      //
+       driver.systemModel->RemoveNodeFromModel($[parent_node].first);
+       $$=node;
+       }
   }
 ;
 
@@ -357,9 +522,16 @@ t_CHAIN  node_name
   $$ = std::make_pair(chain,true);
 }
 |
-t_LINKER  node_name path_selector_kind selector_register_name max_derivations path_selector_parameters
+t_BROCADE  node_name
 {
-  if ($[selector_register_name] == "")
+  auto chain = driver.systemModel->CreateChain($[node_name].name+BROCADE_TAG);
+  chain->IgnoreForNodePath($[node_name].is_transparent);
+  $$ = std::make_pair(chain,false);
+}
+|
+t_LINKER  node_name path_selector_kind selector_register_name_list max_derivations path_selector_parameters
+{
+  if ($[selector_register_name_list].front()=="")
   {
     ERROR_MESSAGE(msg) << STREAM_NODE_NAME("LINKER", $[node_name].name) << "Must specify a control node (Register) for its path selector";
     THROW_SYNTAX_ERROR(msg);
@@ -374,7 +546,7 @@ t_LINKER  node_name path_selector_kind selector_register_name max_derivations pa
   linkerInfo.beginColumn         = my_location->begin.column;
   linkerInfo.endColumn           = my_location->end.column;
   linkerInfo.selector_property   = SelectorProperty::None;
-  linkerInfo.selector_reg_name   = $[selector_register_name];
+  linkerInfo.selector_reg_name_list   = $[selector_register_name_list];
   linkerInfo.selector_kind_name  = $[path_selector_kind];
   linkerInfo.selector_parameters = $[path_selector_parameters];
   linkerInfo.max_derivations     = $[max_derivations];
@@ -415,7 +587,7 @@ t_1500_WRAPPER node_name max_derivations
   $$ = std::make_pair(node,false);
 }
 |
-t_ACCESS_INTERFACE  node_name AI_identifier AI_protocol_parameters
+t_ACCESS_INTERFACE  node_name AI_identifier TR_protocol_parameters
 {
     const auto& nodeName           = $[node_name].name;
     const auto& protocolName       = $3;
@@ -425,16 +597,18 @@ t_ACCESS_INTERFACE  node_name AI_identifier AI_protocol_parameters
     {
       auto& factory  = AccessInterfaceProtocolFactory::Instance();
       auto  protocol = factory.Create(protocolName, protocolParameters);
-
+     
       if (!protocol)
       {
-        ERROR_MESSAGE(msg) << STREAM_NODE_NAME("ACCESS_INTERFACE", $[node_name].name) << "Cannot create protocol: \"" << protocolName << "\"";
+        ERROR_MESSAGE(msg) << STREAM_NODE_NAME("ACCESS_INTERFACE", $[node_name].name) << "Cannot create protocol: \"" << protocolName << "\"" << " Registred creators are: " << factory.get_RegistredCreators();
+       
         THROW_SYNTAX_ERROR(msg);
       }
       else
       {
         auto node = driver.systemModel->CreateAccessInterface(nodeName, shared_ptr<AccessInterfaceProtocol>(std::move(protocol)));
         $$ = std::make_pair(node,false);
+        node->IgnoreForNodePath($[node_name].is_transparent);
       }
     }
     catch(std::invalid_argument exc)  // Catch C++ standard exceptions
@@ -461,13 +635,14 @@ t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_
 
   try
   {
+    LOG(DEBUG)<<"Creating JTAG TAP " << $[node_name].name;
     auto& factory  = AccessInterfaceProtocolFactory::Instance();
     auto  protocol = factory.Create(creatorId, protocolParameters);
-
-    if (!protocol)
+    
+        if (!protocol)
     {
       ERROR_MESSAGE(msg) << STREAM_NODE_NAME("JTAG_TAP", $[node_name].name)
-                         << "Cannot create protocol: \"" << protocolName << "\"";
+                         << "Cannot create protocol: \"" << protocolName << "\"" << " Registred creators are: " << factory.get_RegistredCreators();
       THROW_SYNTAX_ERROR(msg);
     }
     else
@@ -504,20 +679,89 @@ t_JTAG_TAP node_name JTAG_protocol AI_protocol_parameters IR_size IR_TABLE n_DR_
     THROW_SYNTAX_ERROR(msg);
   }
 }
+|
+t_TRANSLATOR  node_name TR_identifier AI_protocol_parameters
+{
+ 
+    const auto& nodeName           = $[node_name].name;
+    const auto& protocolName       = $3;
+    const auto& protocolParameters = $4;
+
+   
+    try
+    {
+      auto& factory  = AccessInterfaceTranslatorProtocolFactory::Instance();
+       auto  protocol = factory.Create(protocolName, protocolParameters);
+
+      if (protocolName=="BitBang")
+      {
+        auto node = driver.systemModel->CreateAccessInterfaceTranslator(nodeName, shared_ptr<AccessInterfaceTranslatorProtocol>(std::move(protocol)));
+         $$ = std::make_pair(node,false);
+         T_2_E_information translatorInfo;
+         translatorInfo.translator_node         = node;
+         translatorInfo.line                = my_location->begin.line;
+         translatorInfo.beginColumn         = my_location->begin.column;
+         translatorInfo.endColumn           = my_location->end.column;
+         translatorInfo.translator_reg_name = protocolParameters;
+         driver.unresolved_translators.push(translatorInfo);
+      }
+      else
+      {
+
+       if (!protocol)
+       {
+         ERROR_MESSAGE(msg) << STREAM_NODE_NAME("TRANSLATOR", $[node_name].name) << "Cannot create protocol: \"" << protocolName << "\"";
+         THROW_SYNTAX_ERROR(msg);
+       }
+       else
+       {
+         auto node = driver.systemModel->CreateAccessInterfaceTranslator(nodeName, shared_ptr<AccessInterfaceTranslatorProtocol>(std::move(protocol)));
+         $$ = std::make_pair(node,false);
+       }
+       }
+    }
+    catch(std::invalid_argument exc)  // Catch C++ standard exceptions
+    {
+      ERROR_MESSAGE(msg) << STREAM_NODE_NAME("TRANSLATOR", $[node_name].name) << "Cannot create protocol: \"" << protocolName << "\"; " << exc.what();
+      THROW_SYNTAX_ERROR(msg);
+    }
+}
+|
+t_STREAMER  node_name TR_identifier AI_protocol_parameters
+{
+  const auto& streamerFactory = StreamerProtocolFactory::Instance();
+  auto protocol = streamerFactory.Create($[TR_identifier],$[AI_protocol_parameters]);
+
+  auto chain = driver.systemModel->CreateStreamer($[node_name].name,std::move(protocol));
+//  Streamer->IgnoreForNodePath($[node_name].is_transparent);
+  $$ = std::make_pair(chain,true);
+}
 ;
 
 JTAG_protocol: t_WORD
    {$$ =$1;}
+  | %empty { $$ = "JTAG"; }
    ;
 
 path_selector_kind: t_WORD
    { $$ =$1;}
    ;
 
-selector_register_name:
-    t_WORD { $$ = $1; }
-  | %empty { $$ = ""; }
-  ;
+
+selector_register_name_list:
+  t_WORD
+  {
+    $$.push_back($[t_WORD]);
+  }
+  |
+  selector_register_name_list[left] t_Comma t_WORD
+  {
+    $$ = $[left];
+    $$.push_back($[t_WORD]);
+  }
+  | %empty { $$.push_back(""); }
+  
+;
 
 IR_size :
  t_DecimalLiteral { $$ = $1;}
@@ -558,6 +802,17 @@ path_selector_parameters: Optional_unquoted_string
 ;
 
 AI_protocol_parameters:
+  t_QUOTED_STRING
+  {
+    $$ = remove_quotes($1);
+  }
+| %empty
+  {
+    $$="";
+  }
+  ;
+
+TR_protocol_parameters:
   t_QUOTED_STRING
   {
     $$ = remove_quotes($1);
@@ -618,9 +873,14 @@ register_node:
      auto bin_value = BinaryVector::CreateFromString(remove_quotes($[bypass]));
      if (bin_value.BitsCount() != $[size])
      {
+//      std::string bastion_value = "0b";
+//      bastion_value.append($[size],'0');
+//     bin_value = BinaryVector::CreateFromString(bastion_value);
+
        ERROR_MESSAGE(msg) << STREAM_NODE_NAME("REGISTER", $[node_name].name)
                           << "size (" << $[size] << ") does not match Bypass value bit count (" << bin_value.BitsCount() << ")";
        THROW_SYNTAX_ERROR(msg);
+     
      }
 
      auto registerNode = driver.systemModel->CreateRegister ($[node_name].name, bin_value, nullptr);
@@ -692,6 +952,14 @@ instance_name:
 factory_name:
   t_WORD { $$ = $[t_WORD]; }
   ;
+
+TR_identifier:
+  t_WORD
+  {
+     $$ = $1;
+  }
+;
+
 
 %%
 

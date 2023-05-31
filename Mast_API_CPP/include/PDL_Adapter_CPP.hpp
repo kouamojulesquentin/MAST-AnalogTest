@@ -30,6 +30,12 @@ namespace mast
     Decimal //!< Decimal format
   };
 
+  enum class iNoteType 
+    {
+    Status,
+    Comment
+    };
+
   // ---------------- iApply
   //
   CPP_API_EXPORT void iApply (); //!< Waits for all queued operations to be executed
@@ -139,6 +145,17 @@ namespace mast
   CPP_API_EXPORT void iWrite (std::experimental::string_view registerPath, int32_t     value); //!< Queues write request to register from int32_t
   CPP_API_EXPORT void iWrite (std::experimental::string_view registerPath, int64_t     value); //!< Queues write request to register from int64_t
   CPP_API_EXPORT void iWrite (std::experimental::string_view registerPath, std::experimental::string_view value); //!< Queues write request to register from binary string
+
+
+ CPP_API_EXPORT void iScan (std::experimental::string_view registerPath, std::experimental::string_view value); //!< Queues write request to a Black Box
+ CPP_API_EXPORT void iScan (std::experimental::string_view registerPath, std::experimental::string_view value, std::experimental::string_view expectedValue); //!< Sets next Register and Expected values to SUT for a BlackBox
+
+
+
+CPP_API_EXPORT void iNote (iNoteType severity, std::experimental::string_view message); //! Logs messages following IEEE 1687-2014
+
+void iNote_impl (iNoteType severity, std::experimental::string_view message);
+
 }
 
 #endif  // not defined PDL_ADAPTER_CPP_H__287AC6DE_2B0_4C1D_90A1_4BF822B1DC85__INCLUDED_

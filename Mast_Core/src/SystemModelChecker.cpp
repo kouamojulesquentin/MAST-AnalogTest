@@ -14,6 +14,8 @@
 #include "SystemModelChecker.hpp"
 #include "PathSelector.hpp"
 #include "AccessInterfaceProtocol.hpp"
+#include "AccessInterfaceRawProtocol.hpp"
+#include "T_2_T_TranslatorProtocol.hpp"
 #include "NamesChecker.hpp"
 
 using namespace mast;
@@ -53,36 +55,42 @@ CheckResult SystemModelChecker::Check ()
 void SystemModelChecker::CheckAccessInterface ()
 {
   auto rootAsAI    = dynamic_pointer_cast<AccessInterface > (m_root);
+  auto rootAsAT    = dynamic_pointer_cast<AccessInterfaceTranslator > (m_root);
   auto rootAsChain = dynamic_pointer_cast<Chain>(m_root);
 
   if (rootAsAI)
   {
-    CheckNumberOfEndPoints(rootAsAI);
+    CheckNumberOfChannels(rootAsAI);
 //+    CheckNoAccessInterfaceBellow(rootAsAI);
   }
+  else if (rootAsAT){}
   else if (rootAsChain)
   {
     auto aiCount = 0u;
+    auto aTCount = 0u;
     auto child = rootAsChain->FirstChild();
     while (child)
     {
       auto childAsAi = dynamic_pointer_cast<AccessInterface>(child);
+      auto childAsAT = dynamic_pointer_cast<AccessInterfaceTranslator>(child);
       if (childAsAi)
       {
         ++aiCount;
-        CheckNumberOfEndPoints(childAsAi);
+        CheckNumberOfChannels(childAsAi);
 //+        CheckNoAccessInterfaceBellow(childAsAi);
       }
-      else
-      {
-        ReportError(*child, ", children of Chain root node is not an AccessInterface");
-      }
+      if (childAsAT)
+        ++aTCount;
+        
+      if (!childAsAi)
+        if (!childAsAT)
+         ReportError(*child, ", children of Chain root node must be either AccessInterface or AccessInterfaceTranslator");
       child = child->NextSibling();
     }
 
-    if (aiCount == 0)
+    if (aiCount+aTCount == 0)
     {
-      ReportError(*rootAsChain, " has no AccessInterface child");
+      ReportError(*rootAsChain, " has no AccessInterface or AccessInterfaceTranslator child");
     }
   }
   else
@@ -210,40 +218,40 @@ bool SystemModelChecker::CheckChildNode (shared_ptr<const ParentNode> parent, sh
 //---------------------------------------------------------------------------
 
 
-//! Checks the an interface has no more endpoint than is supported by its protocol
+//! Checks the an interface has no more channel than is supported by its protocol
 //!
 //! @note Does no check when there is no protocol (this is checked everywhere)
 //!
-void SystemModelChecker::CheckNumberOfEndPoints (shared_ptr<AccessInterface> accessInterface)
+void SystemModelChecker::CheckNumberOfChannels (shared_ptr<AccessInterface> accessInterface)
 {
   auto protocol = accessInterface->Protocol();
 
   if (protocol)
   {
-    auto maxEndPoints = protocol->MaxSupportedEndPoints();
+    auto maxChannels = protocol->MaxSupportedChannels();
     auto childrenCount  = accessInterface->DirectChildrenCount();
 
-    if (childrenCount >= maxEndPoints) // Max endpoints includes pseudo endpoint reserved to do "Reset" action
+    if (childrenCount >= maxChannels) // Max channels includes pseudo channel reserved to do "Reset" action
     {
       auto message =   " has too many children ("                + to_string(childrenCount)
-                     + ") ; its protocol supports a maximum of " + to_string(maxEndPoints)
-                     + " endpoints (including one 'pseudo endpoint' reserved for reset action)";
+                     + ") ; its protocol supports a maximum of " + to_string(maxChannels)
+                     + " channels (including one 'pseudo channel' reserved for reset action)";
       ReportError(*accessInterface, message);
     }
-    else if (maxEndPoints > (childrenCount + 1u))
+    else if (maxChannels > (childrenCount + 1u))
     {
-      auto diff = maxEndPoints - childrenCount;
-      if (diff < 100u)  // Do not report for virtually unlimited maxEndPoints
+      auto diff = maxChannels - childrenCount;
+      if (diff < 100u)  // Do not report for virtually unlimited maxChannels
       {
         ReportInfo(*accessInterface,   " has only "                                                + to_string(childrenCount)
-                                     + " children even though its protocol supports a maximum of " + to_string(maxEndPoints)
-                                     + " endpoints (including one 'pseudo endpoint' reserved for reset action)");
+                                     + " children even though its protocol supports a maximum of " + to_string(maxChannels)
+                                     + " channels (including one 'pseudo channel' reserved for reset action)");
       }
     }
   }
 }
 //
-//  End of: SystemModelChecker::CheckNumberOfEndPoints
+//  End of: SystemModelChecker::CheckNumberOfChannels
 //---------------------------------------------------------------------------
 
 
@@ -414,9 +422,75 @@ void SystemModelChecker::VisitAccessInterface (AccessInterface& accessInterface)
   {
     ReportWarning(accessInterface, " has no associated AccessInterfaceProtocol");
   }
+  
+  auto protocol_is_raw = std::dynamic_pointer_cast<AccessInterfaceRawProtocol>(protocol);
+  if (protocol_is_raw)
+   {
+   if (!protocol_is_raw->ParentTranslator_is_set())
+    ReportError(accessInterface, " has a Raw protocol but no Parent Translator is set");
+   }
 }
 //
 //  End of: SystemModelChecker::VisitAccessInterface
+//---------------------------------------------------------------------------
+
+
+//! Checks consistency specific to AccessInterfaceTranslator nodes
+//!
+void SystemModelChecker::VisitAccessInterfaceTranslator (AccessInterfaceTranslator& accessInterfaceTranslator)
+{
+
+ auto node = accessInterfaceTranslator.FirstChild();
+ auto accessInterface = std::dynamic_pointer_cast<AccessInterface>(node);
+ auto translator =  std::dynamic_pointer_cast<AccessInterfaceTranslator>(node);
+ 
+ if (!node)
+  {
+      ostringstream os;
+      Stream(os, accessInterfaceTranslator) << " must have at least one child";
+      ReportError(os.str());
+      return;
+  }
+
+ if ((! accessInterface)&& (!translator))
+  {
+      ostringstream os;
+      Stream(os, accessInterfaceTranslator) << " must have a child of type AccessInterface ";
+      ReportError(os.str()); 
+      return;
+   }
+  
+if (accessInterface)
+ {
+ auto protocol = accessInterface->Protocol();
+ auto protocol_is_raw =  std::dynamic_pointer_cast<AccessInterfaceRawProtocol>(protocol);
+ if (!protocol_is_raw)
+  {
+      ostringstream os;
+      Stream(os, accessInterfaceTranslator) << " Must be associated with a Raw protocol, while AccessInterface ";
+      os << node->Name() << " has a non-raw protocol";
+      ReportError(os.str());
+   }
+  } 
+
+if (translator)
+ {
+ auto protocol = translator->Protocol();
+ auto protocol_is_T_2_T =  std::dynamic_pointer_cast<T_2_T_TranslatorProtocol>(protocol);
+ if (!protocol_is_T_2_T)
+  {
+      ostringstream os;
+      Stream(os, accessInterfaceTranslator) << " Must be associated with a T-2-T protocol, while AccessInterface ";
+      os << node->Name() << " has a non T-2-T protocol";
+      ReportError(os.str());
+   }
+  } 
+
+
+return;
+}
+//
+//  End of: SystemModelChecker::VisitAccessInterfaceTranslator
 //---------------------------------------------------------------------------
 
 
@@ -428,6 +502,16 @@ void SystemModelChecker::VisitChain (Chain& )
 }
 //
 //  End of: SystemModelChecker::VisitChain
+//---------------------------------------------------------------------------
+
+//! Checks consistency specific to Streamer nodes
+//!
+void SystemModelChecker::VisitStreamer (Streamer& )
+{
+  // Nothing to do yet
+}
+//
+//  End of: SystemModelChecker::VisitStreamer
 //---------------------------------------------------------------------------
 
 
@@ -499,7 +583,6 @@ void SystemModelChecker::VisitRegister (Register& )
 //
 //  End of: SystemModelChecker::VisitRegister
 //---------------------------------------------------------------------------
-
 
 //===========================================================================
 // End of SystemModelChecker.cpp

@@ -71,6 +71,7 @@ class UT_Register : public CxxTest::TestSuite
 
   void test_HoldValue ();
 
+  void test_BlackBox ();
   // ---------------- Other setters
   //
   void test_SetToSut_uint8 ();

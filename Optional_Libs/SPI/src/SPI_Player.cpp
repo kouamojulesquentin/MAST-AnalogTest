@@ -47,24 +47,24 @@ SPI_Player::SPI_Player(vector<uint32_t> chipSelectCommands,
 
 
 
-//! Creates an SPI command associated to endpoint identifier and BinaryVector to send to SUT
+//! Creates an SPI command associated to channel identifier and BinaryVector to send to SUT
 //!
-//! @param addresses        Array of SPI commands for managed endpoints (value at offset 0 is reserved)
+//! @param addresses        Array of SPI commands for managed channels (value at offset 0 is reserved)
 //! @param commandsPrefix   Optional text that will be prepended to actual SPI command
 //!
-string SPI_Player::CreateSPICommand (uint32_t endpointId, const BinaryVector& toSutData)
+string SPI_Player::CreateSPICommand (uint32_t channelId, const BinaryVector& toSutData)
 {
   ostringstream os;
 
-  if (endpointId == 0)
+  if (channelId == 0)
   {
     os << m_commandPrefix << "SPI_RESET()\n";
   }
   else
   {
-    auto chipSelectCommand = GetChipSelectCommand(endpointId);
-    auto readCommand       = GetReadCommand(endpointId);
-    auto writeCommand      = GetWriteCommand(endpointId);
+    auto chipSelectCommand = GetChipSelectCommand(channelId);
+    auto readCommand       = GetReadCommand(channelId);
+    auto writeCommand      = GetWriteCommand(channelId);
 
     os << m_commandPrefix << "SPI_READ(0x"  << std::hex << readCommand  << ", " << std::hex << chipSelectCommand << ")\n";
     os << m_commandPrefix << "SPI_WRITE(0x" << std::hex << writeCommand << ", " << toSutData.DataAsMixString() << ", " << std::hex << chipSelectCommand << ")\n";
@@ -78,34 +78,34 @@ string SPI_Player::CreateSPICommand (uint32_t endpointId, const BinaryVector& to
 //  End of: SPI_Player::CreateSPICommand
 //---------------------------------------------------------------------------
 
-//! Returns Chip Select command for a specified endpoint
+//! Returns Chip Select command for a specified channel
 //!
-//! @param endpointId   EndPoint identifier [1..N]
+//! @param channelId   Channel identifier [1..N]
 //!
-uint32_t SPI_Player::GetChipSelectCommand (uint32_t endpointId) const
+uint32_t SPI_Player::GetChipSelectCommand (uint32_t channelId) const
 {
-  if (endpointId >= m_chipSelectCommands.size())
+  if (channelId >= m_chipSelectCommands.size())
   {
-    THROW_INVALID_ARGUMENT("EndPointId must be '0' for Reset or '1' to "s + std::to_string(m_chipSelectCommands.size() - 1));
+    THROW_INVALID_ARGUMENT("ChannelId must be '0' for Reset or '1' to "s + std::to_string(m_chipSelectCommands.size() - 1));
   }
 
-  auto command = m_chipSelectCommands[endpointId];
+  auto command = m_chipSelectCommands[channelId];
   return command;
 }
 
 
-//! Returns read command for a specified endpoint
+//! Returns read command for a specified channel
 //!
-//! @param endpointId   EndPoint identifier [1..N]
+//! @param channelId   Channel identifier [1..N]
 //!
-uint32_t SPI_Player::GetReadCommand (uint32_t endpointId) const
+uint32_t SPI_Player::GetReadCommand (uint32_t channelId) const
 {
-  if (endpointId >= m_readCommands.size())
+  if (channelId >= m_readCommands.size())
   {
-    THROW_INVALID_ARGUMENT("EndPointId must be '0' for Reset or '1' to "s + std::to_string(m_readCommands.size() - 1));
+    THROW_INVALID_ARGUMENT("ChannelId must be '0' for Reset or '1' to "s + std::to_string(m_readCommands.size() - 1));
   }
 
-  auto command = m_readCommands[endpointId];
+  auto command = m_readCommands[channelId];
   return command;
 }
 //
@@ -113,18 +113,18 @@ uint32_t SPI_Player::GetReadCommand (uint32_t endpointId) const
 //---------------------------------------------------------------------------
 
 
-//! Returns write command for a specified endpoint
+//! Returns write command for a specified channel
 //!
-//! @param endpointId   EndPoint identifier [1..N]
+//! @param channelId   Channel identifier [1..N]
 //!
-uint32_t SPI_Player::GetWriteCommand (uint32_t endpointId) const
+uint32_t SPI_Player::GetWriteCommand (uint32_t channelId) const
 {
-  if (endpointId >= m_writeCommands.size())
+  if (channelId >= m_writeCommands.size())
   {
-    THROW_INVALID_ARGUMENT("EndPointId must be '0' for Reset or '1' to "s + std::to_string(m_writeCommands.size() - 1));
+    THROW_INVALID_ARGUMENT("ChannelId must be '0' for Reset or '1' to "s + std::to_string(m_writeCommands.size() - 1));
   }
 
-  auto command = m_writeCommands[endpointId];
+  auto command = m_writeCommands[channelId];
   return command;
 }
 //

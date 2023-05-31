@@ -29,6 +29,16 @@ void ConfigureVisitor::VisitAccessInterface (AccessInterface& accessInterface)
 //  End of: ConfigureVisitor::VisitAccessInterface
 //---------------------------------------------------------------------------
 
+//! Updates AccessInterfaceTranslator pending flag
+//!
+void ConfigureVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator& accessInterfaceTranslator)
+{
+  auto pendingCount = ConfigureChildren(accessInterfaceTranslator);
+  accessInterfaceTranslator.SetPendingCount(pendingCount);
+}
+//
+//  End of: ConfigureVisitor::VisitAccessInterfaceTranslator
+//---------------------------------------------------------------------------
 
 
 //! Updates Chain pending flag
@@ -40,6 +50,17 @@ void ConfigureVisitor::VisitChain (Chain& chain)
 }
 //
 //  End of: ConfigureVisitor::VisitChain
+//---------------------------------------------------------------------------
+
+//! Updates Streamer pending flag
+//!
+void ConfigureVisitor::VisitStreamer (Streamer& streamer)
+{
+  auto pendingCount = ConfigureChildren(streamer);
+  streamer.SetPendingCount(pendingCount);
+}
+//
+//  End of: ConfigureVisitor::VisitStreamer
 //---------------------------------------------------------------------------
 
 

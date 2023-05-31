@@ -183,6 +183,8 @@ class MAST_CORE_EXPORT BinaryVector final
   void          Get(int32_t& value) const; //!< Reads signed 32 bits value from BinaryVector
   void          Get(int64_t& value) const; //!< Reads signed 64 bits value from BinaryVector
 
+  std::vector<uint8_t> Get_DataVector () const; //!< Return data from BinaryVector as uint8 vector : NB no checks are done
+
   //! Reads value from BinaryVector with specified type
   //!
   template<typename T> T Get() const
@@ -230,6 +232,7 @@ class MAST_CORE_EXPORT BinaryVector final
   std::vector<uint8_t> DataRightAligned() const;                                                     //!< Returns data right aligned in a new buffer
 
   BinaryVector    Slice    (uint32_t firstBitOffset, uint32_t bitsCount) const; //!< Returns a slice from BinaryVector
+  BinaryVector    ReverseSlice    (uint32_t firstBitOffset, uint32_t bitsCount) const; //!< Returns a slice from BinaryVector with reversed bit order
   BinaryVector    Slice    (IndexedRange range) const;                          //!< Returns a slice from BinaryVector
 
   static NumberBase NumberBaseForValuePrefix (string_view number); //!< Defines used based from leading char of number string

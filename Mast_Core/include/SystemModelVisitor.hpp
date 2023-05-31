@@ -24,6 +24,7 @@ class Chain;
 class Linker;
 class Register;
 class AccessInterfaceTranslator;
+class Streamer;
 
 //! System model visitors interface
 //!
@@ -34,10 +35,12 @@ class MAST_CORE_EXPORT SystemModelVisitor
   // ---------------- Public  Methods
   //
   public:
+  virtual void VisitAccessInterfaceTranslator (AccessInterfaceTranslator&accessInterfaceTranslator) = 0;
   virtual void VisitAccessInterface (AccessInterface& accessInterface) = 0;
   virtual void VisitChain           (Chain&           chain)           = 0;
   virtual void VisitLinker          (Linker&          linker)          = 0;
   virtual void VisitRegister        (Register&        reg)             = 0;
+  virtual void VisitStreamer        (Streamer&        streamer)        = 0;
 
   //! Helper to visit only active children of a Linker node
   //!

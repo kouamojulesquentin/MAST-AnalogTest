@@ -18,11 +18,16 @@ endif()
 
 file(GLOB Mast_SOURCES_CPP_API "src/*")
 
+set(Mast_SOURCES_CPP_API_PDL "${CMAKE_CURRENT_LIST_DIR}/src/PDL_Adapter_CPP.cpp"
+)
+
 set (Mast_SOURCES ${Mast_SOURCES_CPP_API})
 
 add_library           (Mast_API_CPP SHARED   ${Mast_SOURCES})
 set_target_properties (Mast_API_CPP PROPERTIES COMPILE_FLAGS "${CFLAGS}")
 
+add_library           (Mast_API_CPP_PDL SHARED   ${Mast_SOURCES_CPP_API_PDL})
+set_target_properties (Mast_API_CPP_PDL PROPERTIES COMPILE_FLAGS "${CFLAGS}")
 
 
 if (WIN32)
@@ -42,4 +47,5 @@ message("=======================================================================
 message("")
 
 target_link_libraries(Mast_API_CPP Mast_Core SIT_Reader ICL_Reader Logger ${EXTRA_LIBS})
+target_link_libraries(Mast_API_CPP_PDL Mast_Core Logger ${EXTRA_LIBS})
 target_include_directories(Mast_API_CPP PUBLIC include)

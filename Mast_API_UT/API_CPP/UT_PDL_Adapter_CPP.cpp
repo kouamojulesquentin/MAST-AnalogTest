@@ -93,6 +93,29 @@ shared_ptr<AccessInterface> Create_TestCase_MIB_Multichain_Pre (bool reportGml =
 //---------------------------------------------------------------------------
 
 
+//! Creates a test case for testing 'C' interface on Black Boxes
+//!
+//! @note Mast library must be initialized prior to calling this function
+//!
+shared_ptr<AccessInterface> Create_TestCase_BlackBox (bool reportGml = false, uint32_t regsBitsCount = DYNAMIC_TDR_LEN)
+{
+  auto sm = Startup::GetSystemModel();
+
+  TestModelBuilder builder(*sm);
+
+  auto tap = builder.Create_TestCase_BlackBox("TAP");
+
+  if (reportGml)
+  {
+    TS_TRACE (GmlPrinter::Graph(tap, "BlackBox"));
+  }
+
+  return tap;
+}
+//
+//  End of: Create_TestCase_BlackBox
+//---------------------------------------------------------------------------
+
 
 //! Checks SystemModelManager::iGet() when Mast library is not yet initialized
 //!
@@ -496,6 +519,181 @@ void UT_PDL_Adapter_CPP::test_iWrite_int8   () { Check_iWrite_SingleThread<int8_
 void UT_PDL_Adapter_CPP::test_iWrite_int16  () { Check_iWrite_SingleThread<int16_t>  (int16_t(-12345),       "FFFF_CFC7"); }
 void UT_PDL_Adapter_CPP::test_iWrite_int32  () { Check_iWrite_SingleThread<int32_t>  (int32_t(-1234567L),    "FFED_2979"); }
 void UT_PDL_Adapter_CPP::test_iWrite_int64  () { Check_iWrite_SingleThread<int64_t>  (int64_t(-123456789LL), "F8A4_32EB"); }
+
+//! Checks SystemModelManager::iWrite_xxx() using same thread as SystemModelManager
+//!
+
+//! Checks that iScan can only targert a blackbox
+void UT_PDL_Adapter_CPP::test_iScan_notBlackBox ()
+{
+ string_view value = "0b1010:1011_1100:1101|0100:0101_0110:0111"; 
+ string_view expected="0000_007B";
+ 
+  // ---------------- Setup
+  //
+  Session session;
+
+  Create_TestCase_MIB_Multichain_Pre();
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS (iScan("dynamic_1", value), std::exception);
+
+
+}
+//
+//  End of: test_iScan_notBlackBox
+//---------------------------------------------------------------------------
+
+//! Checks iScan with various value sizes but with actually executing it
+void UT_PDL_Adapter_CPP::test_iScan_VariableSize()
+{
+ string_view value = "0b1010"; 
+ string_view expected="0000_007B";
+ 
+  // ---------------- Setup
+  //
+  Session session;
+
+  Create_TestCase_BlackBox();
+
+  // ---------------- Exercise
+  //
+  
+  //iScan with same length as default (4 for Create_TestCase_BlackBox)
+  TS_ASSERT_THROWS_NOTHING (iScan("BBox", value)); 
+  
+  value = "0b1010:1011_1100:1101|0100:0101_0110:0111"; 
+
+
+  //iScan with bigger length then default (32 instead of 4)
+  TS_ASSERT_THROWS_NOTHING (iScan("BBox", value));
+   
+  value = "0b1010:1011_1100:1101|0100:0101_0110"; 
+  //iScan with smaller length then last one (28 instead of 32)
+  TS_ASSERT_THROWS_NOTHING (iScan("BBox", value));
+}
+//
+//  End of: test_iScan_VariableSize
+//---------------------------------------------------------------------------
+
+//! Checks iScan behaviour for writing values
+void UT_PDL_Adapter_CPP::test_iScan_Write()
+{
+ string_view value = "0b1010"; 
+ string_view expected="A";
+ 
+  // ---------------- Setup
+  //
+  Session session;
+
+  Create_TestCase_BlackBox();
+
+  // ---------------- Exercise
+  //
+  
+  //iScan with same length as default (4 for Create_TestCase_BlackBox)
+  TS_ASSERT_THROWS_NOTHING (iScan("BBox", value)); 
+  TS_ASSERT_THROWS_NOTHING (iApply()); // iWrite does nothing visible without iApply
+  auto reg               = Startup::GetSystemModel()->RegisterWithId(4u);
+  auto expectedNextToSut = BinaryVector::CreateFromHexString(expected);
+  TS_ASSERT_EQUALS (reg->NextToSut(), expectedNextToSut);
+
+  value    = "0b1010:1011_1100:1101|0100:0101_0110:0111"; 
+  expected = "ABCD_4567";
+
+  //iScan with bigger length than last (32 instead of 4)
+  TS_ASSERT_THROWS_NOTHING (iScan("BBox", value)); 
+  TS_ASSERT_THROWS_NOTHING (iApply()); // iWrite does nothing visible without iApply
+  reg               = Startup::GetSystemModel()->RegisterWithId(4u);
+  expectedNextToSut = BinaryVector::CreateFromHexString(expected);
+  TS_ASSERT_EQUALS (reg->NextToSut(), expectedNextToSut);
+
+  value    = "0b1010:1011_1100:1101|0100"; 
+  expected = "ABCD_4";
+
+  //iScan with shorter length than last (20 instead of 32)
+  TS_ASSERT_THROWS_NOTHING (iScan("BBox", value)); 
+  TS_ASSERT_THROWS_NOTHING (iApply()); // iWrite does nothing visible without iApply
+  reg               = Startup::GetSystemModel()->RegisterWithId(4u);
+  expectedNextToSut = BinaryVector::CreateFromHexString(expected);
+  TS_ASSERT_EQUALS (reg->NextToSut(), expectedNextToSut);
+
+}
+//
+//  End of: test_iScan_Write
+//---------------------------------------------------------------------------
+
+//! Checks iScan behaviour for reading and writing values
+void UT_PDL_Adapter_CPP::test_iScan_ReadWrite()
+{
+ string_view iReadValue = "0xF"; 
+ string_view iWriteValue="0xA";
+ string_view expectedMismatch="0x5" ;
+  // ---------------- Setup
+  //
+  Session session;
+
+  Create_TestCase_BlackBox();
+
+  auto regPath = "BBox";
+  // ---------------- Exercise : same length as default (4 for Create_TestCase_BlackBox)
+  //
+   TS_ASSERT_THROWS_NOTHING (iScan (regPath, iWriteValue,iReadValue)); // Loopback (default protocol) will force FromSut to be updated
+  TS_ASSERT_THROWS_NOTHING (iApply());
+
+ //Check iRead behaviour
+  auto xorResult = iGetMiscompares    (regPath, StringType::Hex);
+  auto status    = iGetStatus (regPath, false);
+  TS_ASSERT_EQUALS (status,    1u);
+  TS_ASSERT_EQUALS (xorResult, expectedMismatch);   
+ //Check iWrite behaviour
+  auto reg               = Startup::GetSystemModel()->RegisterWithId(4u);
+  auto expectedNextToSut = BinaryVector::CreateFromHexString(iWriteValue);
+  TS_ASSERT_EQUALS (reg->NextToSut(), expectedNextToSut);
+
+ iReadValue = "0x89ABCDEF"; 
+ iWriteValue= "0xFF00FF00";
+ expectedMismatch="0x76AB32EF" ;
+ 
+  // ---------------- Exercise : with bigger length than last (32 instead of 4)
+  //
+   TS_ASSERT_THROWS_NOTHING (iScan (regPath, iWriteValue,iReadValue)); // Loopback (default protocol) will force FromSut to be updated
+  TS_ASSERT_THROWS_NOTHING (iApply());
+
+ //Check iRead behaviour
+   xorResult = iGetMiscompares    (regPath, StringType::Hex);
+   status    = iGetStatus (regPath, false);
+  TS_ASSERT_EQUALS (status,    2u);
+  TS_ASSERT_EQUALS (xorResult, expectedMismatch);   
+ //Check iWrite behaviour
+   reg               = Startup::GetSystemModel()->RegisterWithId(4u);
+   expectedNextToSut = BinaryVector::CreateFromHexString(iWriteValue);
+  TS_ASSERT_EQUALS (reg->NextToSut(), expectedNextToSut);
+
+ iReadValue      = "0x3CDE"; 
+ iWriteValue     = "0x0FF0";
+ expectedMismatch= "0x332E" ;
+
+  // ---------------- Exercise : with shorter length than last (16 instead of 32)
+  //
+   TS_ASSERT_THROWS_NOTHING (iScan (regPath, iWriteValue,iReadValue)); // Loopback (default protocol) will force FromSut to be updated
+  TS_ASSERT_THROWS_NOTHING (iApply());
+
+ //Check iRead behaviour
+   xorResult = iGetMiscompares    (regPath, StringType::Hex);
+   status    = iGetStatus (regPath, false);
+  TS_ASSERT_EQUALS (status,    3u);
+  TS_ASSERT_EQUALS (xorResult, expectedMismatch);   
+ //Check iWrite behaviour
+   reg               = Startup::GetSystemModel()->RegisterWithId(4u);
+   expectedNextToSut = BinaryVector::CreateFromHexString(iWriteValue);
+  TS_ASSERT_EQUALS (reg->NextToSut(), expectedNextToSut);
+
+}
+//
+//  End of: test_iScan_ReadWrite
+//---------------------------------------------------------------------------
 
 
 //+void UT_PDL_Adapter_CPP::test_iWrite_BinaryVector_InvalidValue () { Check_iWrite_SingleThread<const char*>(iWrite_BinaryVector, "ABCD_4567",           "ABCD_4567"); }

@@ -82,25 +82,25 @@ GenericAccessInterfaceProtocol CreateSut (string& loggedActions)
     return BinaryVector();
   };
 
-  auto endpointAction = [](const std::vector<Primitive>& primitives, uint32_t endpointId, void* data, const BinaryVector& toSutData)
+  auto channelAction = [](const std::vector<Primitive>& primitives, uint32_t channelId, void* data, const BinaryVector& toSutData)
   {
     const string&  context = *reinterpret_cast<const string*>(data);
     BinaryVector   fromSutData;
     PrimitiveParam param(context, toSutData, fromSutData);
 
-    primitives[endpointId](&param);
+    primitives[channelId](&param);
 
     return param.fromSutData;
   };
 
-  auto action_1 = [endpointAction](const std::vector<Primitive>& primitives, void* data, const BinaryVector& toSutData)
+  auto action_1 = [channelAction](const std::vector<Primitive>& primitives, void* data, const BinaryVector& toSutData)
   {
-    return endpointAction(primitives, 1u, data, toSutData);
+    return channelAction(primitives, 1u, data, toSutData);
   };
 
-  auto action_2 = [endpointAction](const std::vector<Primitive>& primitives, void* data, const BinaryVector& toSutData)
+  auto action_2 = [channelAction](const std::vector<Primitive>& primitives, void* data, const BinaryVector& toSutData)
   {
-    return endpointAction(primitives, 2u, data, toSutData);
+    return channelAction(primitives, 2u, data, toSutData);
   };
 
   vector<Primitive> primitives = {primitive_0, primitive_1, primitive_2};
@@ -252,7 +252,7 @@ void UT_GenericAccessInterfaceProtocol::test_Constructor_Vector_TooFew_Actions (
 
 
 
-//! Checks GenericAccessInterfaceProtocol::DoCallback with endpoint identifier 0
+//! Checks GenericAccessInterfaceProtocol::DoCallback with channel identifier 0
 //!
 void UT_GenericAccessInterfaceProtocol::test_DoCallback_0 ()
 {
@@ -274,7 +274,7 @@ void UT_GenericAccessInterfaceProtocol::test_DoCallback_0 ()
 }
 
 
-//! Checks GenericAccessInterfaceProtocol::DoCallback with endpoint identifier 1
+//! Checks GenericAccessInterfaceProtocol::DoCallback with channel identifier 1
 //!
 void UT_GenericAccessInterfaceProtocol::test_DoCallback_1 ()
 {
@@ -296,7 +296,7 @@ void UT_GenericAccessInterfaceProtocol::test_DoCallback_1 ()
 }
 
 
-//! Checks GenericAccessInterfaceProtocol::DoCallback with endpoint identifier 2
+//! Checks GenericAccessInterfaceProtocol::DoCallback with channel identifier 2
 //!
 void UT_GenericAccessInterfaceProtocol::test_DoCallback_2 ()
 {
@@ -318,7 +318,7 @@ void UT_GenericAccessInterfaceProtocol::test_DoCallback_2 ()
 }
 
 
-//! Checks GenericAccessInterfaceProtocol::DoCallback with endpoint identifier 3
+//! Checks GenericAccessInterfaceProtocol::DoCallback with channel identifier 3
 //!
 void UT_GenericAccessInterfaceProtocol::test_DoCallback_3 ()
 {

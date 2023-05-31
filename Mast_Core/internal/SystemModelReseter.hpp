@@ -33,9 +33,11 @@ class SystemModelReseter final : public SystemModelVisitor
   // Implement SystemModelVisitor interface
   //
   virtual void VisitAccessInterface (AccessInterface& accessInterface) override;
-  virtual void VisitChain           (Chain&           chain)           override;
-  virtual void VisitLinker          (Linker&          linker)          override;
-  virtual void VisitRegister        (Register&        reg)             override;
+  virtual void VisitAccessInterfaceTranslator (AccessInterfaceTranslator&accessInterfaceTranslator) override;
+  virtual void VisitChain          (Chain&           chain)           override;
+  virtual void VisitLinker         (Linker&          linker)          override;
+  virtual void VisitRegister       (Register&        reg)             override;
+  virtual void VisitStreamer       (Streamer&        streamer)             override;
 
   // ---------------- Private  Methods
   //

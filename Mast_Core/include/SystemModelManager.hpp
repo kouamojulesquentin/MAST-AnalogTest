@@ -34,6 +34,7 @@ class SystemModelManagerMonitor;
 class SystemModelManager_impl;
 class ConfigurationAlgorithm;
 class BinaryVector;
+enum class iNoteType;
 
 //! Coordinates the dynamic aspects of the system model
 //!
@@ -78,6 +79,10 @@ class MAST_CORE_EXPORT SystemModelManager final
   //! Starts all created application threads
   //!
   void StartCreatedApplicationThreads ();
+
+  //! Waits for all threads to be pendingbefore  triggering a DataCycle (default is false)
+  //!
+  void setwaitFullPending (bool waitFullPending) ;
 
   //! Starts periodical (or on iApply) loop of complete data cycles on a new thread
   //!
@@ -185,6 +190,17 @@ class MAST_CORE_EXPORT SystemModelManager final
   void iWrite (string_view registerPath, int16_t      value);
   void iWrite (string_view registerPath, int32_t      value);
   void iWrite (string_view registerPath, int64_t      value);
+
+  //! Sets next Register value to sent to SUT for a BlackBox
+  //!
+  void iScan (string_view registerPath, BinaryVector value);
+  //! Sets next Register and Expected values to SUT for a BlackBox
+  //!
+  void iScan (string_view registerPath, BinaryVector value, BinaryVector expectedValue);
+
+  //! Logs messages following IEEE 1687-2014
+  //!
+  void iNote (iNoteType severity,string_view message);
 
   //! Returns current maximum time between an iApply and the next data cycle
   //!

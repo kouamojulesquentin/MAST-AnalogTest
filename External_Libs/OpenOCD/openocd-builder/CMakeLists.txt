@@ -22,7 +22,7 @@ ExternalProject_Add(OpenOCD
    #DOWNLOAD_DIR ${CMAKE_CURRENT_SOURCE_DIR/openocd_mast.tar.gz}
    UPDATE_COMMAND ""
    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/openocd
-   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/openocd/configure --prefix=${OPENOCD_BUILD_DIR}/openocd/build CFLAGS=-fPIC
+   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/openocd/configure --disable-werror --prefix=${OPENOCD_BUILD_DIR}/openocd/build CFLAGS=-fPIC
    BUILD_COMMAND make
    INSTALL_COMMAND make install
    )

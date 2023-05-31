@@ -1,0 +1,11 @@
+TRANSLATOR top Emulation
+(
+ JTAG_TAP TAP 4 1
+ (
+ CHAIN Top_level
+  {
+  INSTANCE First_Register OF Module_12.sit
+  INSTANCE SECOND_Register OF Module_12.sit
+  } 
+ )
+)

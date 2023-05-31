@@ -32,17 +32,17 @@ class Spy_AccessInterfaceProtocols final : public mast::AccessInterfaceProtocol
 
   //! Spies content of parameter toSutData and return it unchanged
   //!
-  virtual mast::BinaryVector DoCallback(uint32_t endpointId, void* interfaceData, const mast::BinaryVector& toSutData) override;
+  virtual mast::BinaryVector DoCallback(uint32_t channelId, void* interfaceData, const mast::BinaryVector& toSutData) override;
 
   const std::vector<mast::BinaryVector>& ToSutVectors() const { return m_toSutVectors; }
 
-  //! Gets the number of endpoints supported by the specific protocol
+  //! Gets the number of channels supported by the specific protocol
   //!
-  //! @note EndPoint id 0 is reserved for reset operation, so protocol must support a least two endpoints
+  //! @note Channel id 0 is reserved for reset operation, so protocol must support a least two channels
   //!
-  //! @return The number of supported endpoint (including pseudo endpoint 0 for reset)
+  //! @return The number of supported channel (including pseudo channel 0 for reset)
   //!
-  virtual uint32_t MaxSupportedEndPoints() const override { return 10u; }  // 10 is just used to be able to report that an AccessInterface as fewer endpoint than is supported by its interface
+  virtual uint32_t MaxSupportedChannels() const override { return 10u; }  // 10 is just used to be able to report that an AccessInterface as fewer channel than is supported by its interface
 
   //! Returns readable type of protocol
   //!

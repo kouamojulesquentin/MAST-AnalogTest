@@ -15,6 +15,7 @@
 #include "SystemModel.hpp"
 #include "AccessInterface.hpp"
 #include "AccessInterfaceProtocol.hpp"
+#include "AccessInterfaceRawProtocol.hpp"
 #include "Chain.hpp"
 #include "Utility.hpp"
 #include "SystemModelManagerMonitor.hpp"
@@ -26,6 +27,12 @@
 
 #include <utility>
 #include <sstream>
+#include <iostream>
+
+#ifdef __linux__
+#include <pthread.h>
+#include <cxxabi.h>
+#endif
 
 using std::shared_ptr;
 using std::make_shared;
@@ -78,7 +85,7 @@ SystemModelManager_impl::SystemModelManager_impl(SystemModel&                   
                                                  shared_ptr<ConfigurationAlgorithm>    configurationAlgorithm,
                                                  shared_ptr<SystemModelManagerMonitor> monitor)
   : m_sm                             (sm)
-  , m_firstAccessInterface           ()
+  , m_firstAccessNode           ()
   , m_configurator                   (configurationAlgorithm)
   , m_propagator                     ()
   , m_fromSutUpdater                 (sm)
@@ -91,10 +98,12 @@ SystemModelManager_impl::SystemModelManager_impl(SystemModel&                   
   , m_loopStarted                    (false)
   , m_dataCycleLoopTimeout           (1s)
   , m_sleepTimeBetweenConfigurations (0ms)
+  , m_activeThreads (0)
+  , m_waitFullPending (false)
 {
   auto pathResolver   = NodePathResolver(sm.Root());
   m_mainThreadAppData = make_shared<ApplicationData>(ApplicationData::State::ApplicationThreadStarted, pathResolver, "Manager");
-
+  
   MONITOR_DEBUG_MANAGER("Constructed SystemModelManager");
 }
 
@@ -165,19 +174,30 @@ void SystemModelManager_impl::CreateApplicationThread (shared_ptr<ParentNode> ap
     MONITOR_DEBUG_APP_LIFE("Application start", *applicationTopNode, debugName);
     try
     {
+      m_activeThreads++;
       functor();
       applicationData->currentState = ApplicationData::State::Terminated;
+      m_activeThreads--;
     }
     catch(std::exception& exc)  // Catch C++ standard exceptions
     {
       applicationData->currentState = ApplicationData::State::TerminatedWithException;
       LOG(INFO) << makeMessageContext(applicationTopNode, debugName) << ": "<< exc.what();
+      m_activeThreads--;
+
 
       applicationData->caughtException = std::current_exception();
     }
+#ifdef __linux__
+    catch (abi::__forced_unwind&) {
+        LOG(INFO) <<"Catching exception thrown by pthread_exit";
+        throw;
+	}
+#endif
     catch (...)
     {
       applicationData->currentState = ApplicationData::State::TerminatedWithException;
+      m_activeThreads--;
 
       LOG(INFO) << makeMessageContext(applicationTopNode, debugName) << " of unknown type";
       applicationData->caughtException = std::current_exception();
@@ -213,57 +233,174 @@ void SystemModelManager_impl::CreateApplicationThread (shared_ptr<ParentNode> ap
 //!
 //! @note It does the data cycle only on the target AccessInterface, fromSUTVector and toSUTVector are locally defined
 //!
-void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentAccessInterface, AccessInterface* interfaceTranslator)
+void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentAccessInterface)
 {
-  CHECK_PARAMETER_NOT_NULL(currentAccessInterface, "Houps can only operate on valid AccessInterface");
+  auto ApplyStreamer = [this](uint32_t before_bits,uint32_t EndOfProtectedBits,NodeIdentifier StreamerId, BinaryVector& Vector,bool isToSut)
+	   {
+	     BinaryVector mask_protected;  //Mask for segment protected by the streamer
+	     BinaryVector mask_after,mask_after_1,mask_after_2; //Masks for segment after the streamer
+	     BinaryVector mask_before,mask_before_1,mask_before_2; //Masks for segment before the streamer
+	     
+             auto protectedBits = EndOfProtectedBits - before_bits;
+ 	     auto after_bits = Vector.BitsCount() -EndOfProtectedBits;
 
+	     BinaryVector Vector_Chyper;
+	     BinaryVector mask;
+	     BinaryVector BeforeVector;
+	     auto vector_protected = Vector.Slice(before_bits,protectedBits);
+	     BinaryVector AfterVector;
+	      
+	    CHECK_PARAMETER_GT(EndOfProtectedBits,before_bits,"Protected Segment must have a positive size");
+	     
+	    std::shared_ptr<Streamer> streamer = std::dynamic_pointer_cast<Streamer>(m_sm.NodeWithId(StreamerId));
+	    LOG(DEBUG)<<"Applying a streamer transformation of protocol " << streamer->Protocol()->KindName() << " between bits " << before_bits<< " and "<<EndOfProtectedBits;
+	    LOG(DEBUG)<<"ApplyStreamer: Bits [ before : " << before_bits << " inside :" << protectedBits<< "  after :"<<after_bits << "]";
+	    LOG(DEBUG)<<"Plain Text Vector: " << Vector.DataAsHexString();
+	     
+	    if (isToSut)  
+	      {
+	      //ToSut is computed first, so a new mask is needed
+	      mask = streamer->Protocol()->NewMask(Vector.BitsCount());
+	      //In this direction, masks are taken at the beginning of the vector (last to be generated)
+	      mask_protected = mask.Slice(0,protectedBits);
+	     
+	      //bits for segments BEFORE the Streamer ( i.e. closer to TDI) are not encrypted
+ 	      LOG(DEBUG)<< "Before slice starts at 0 for a size of "<<before_bits;
+	      if (before_bits > 0)
+	        BeforeVector= Vector.Slice(0,before_bits);
+	           
+	     if (after_bits> 0)
+	         {
+	          //going toSUT, bits AFTER the streamer  must be encrypted twice with masks slices coming from the two ends of the total mask
+        	       AfterVector = Vector.Slice(EndOfProtectedBits,after_bits);
+	          mask_after_1     = mask.Slice(0,after_bits);
+	              LOG(DEBUG)<< "mask_after_1: " <<mask_after_1.DataAsHexString();
+	          mask_after_2 = mask.Slice(protectedBits,after_bits);
+	              LOG(DEBUG)<< "mask_after22: "  <<mask_after_2.DataAsHexString();
+    	              LOG(DEBUG)<< "Slices done";
+        	  AfterVector = streamer->Protocol()->ApplyMask(AfterVector,mask_after_1);
+	              LOG(DEBUG)<< "Chyper after input mask: "<< AfterVector.DataAsHexString();;
+	          AfterVector = streamer->Protocol()->ApplyMask(AfterVector,mask_after_2);
+    	              LOG(DEBUG)<< "Chyper after output mask: "<< AfterVector.DataAsHexString();;
+	              LOG(DEBUG)<< "Slices done";
+                }
+	      }
+	      else
+	       {
+	        LOG(DEBUG)<< "Decoding FromSUT: " <<Vector.DataAsHexString();
+		 //fromSut is decoded second, so it uses the same mask 
+	         mask = streamer->Protocol()->CurrentMask();
+		 //In this direction, masks are taken at the end of the vector (first to be generated)
+		 mask_protected = mask.Slice(mask.BitsCount()-protectedBits,protectedBits);
+	      //bits for segments AFTER the Streamer ( i.e. closer to TDI) are not encrypted
+ 	      if ( after_bits> 0)
+	        AfterVector= Vector.Slice(EndOfProtectedBits,after_bits);
+		LOG(DEBUG)<< "After Bits: "<< AfterVector.DataAsHexString();
+	           
+	     if (before_bits> 0)
+	         {
+	          //coming fromSUT, bits BEFORE the streamer  must be encrypted twice with masks slices coming from the two ends of the total mask
+        	LOG(DEBUG)<< "Before Bits: " << EndOfProtectedBits << " " <<before_bits;
+		       BeforeVector = Vector.Slice(0,before_bits);
+	        LOG(DEBUG)<< "Before Mask";
+		  mask_before_1     = mask.Slice(mask.BitsCount()-before_bits,before_bits);
+	              LOG(DEBUG)<< "mask_Before_1: " <<mask_before_1.DataAsHexString();
+	          mask_before_2 = mask.Slice(mask.BitsCount()-before_bits-protectedBits,before_bits);
+	              LOG(DEBUG)<< "mask_Before22: "  <<mask_before_2.DataAsHexString();
+    	              LOG(DEBUG)<< "Slices done";
+        	  BeforeVector = streamer->Protocol()->ApplyMask(BeforeVector,mask_before_1);
+	              LOG(DEBUG)<< "Chyper Before input mask: "<< BeforeVector.DataAsHexString();;
+	          BeforeVector = streamer->Protocol()->ApplyMask(BeforeVector,mask_before_2);
+    	              LOG(DEBUG)<< "Chyper Before output mask: "<< BeforeVector.DataAsHexString();;
+	              LOG(DEBUG)<< "Slices done";
+                 }
+		}
+
+         	    //The protected part is crypted only once 	
+	    LOG(DEBUG)<< "mask_protected, size " << protectedBits;
+	    LOG(DEBUG)<< "vector_protected, size " << protectedBits << " Plain Data : "<<vector_protected.DataAsHexString()<< " b"<<vector_protected.DataAsBinaryString();
+	    LOG(DEBUG)<< "mask_protected, size " << mask_protected.BitsCount() << " Maks is : "<<mask_protected.DataAsHexString()<< " b"<<mask_protected.DataAsBinaryString();
+
+	    auto ProtectedVector = streamer->Protocol()->ApplyMask(vector_protected,mask_protected);
+	    LOG(DEBUG)<< "Chyper Data : "<<ProtectedVector.DataAsHexString();
+	    
+	    Vector_Chyper.Append(BeforeVector);
+	    Vector_Chyper.Append(ProtectedVector);
+	    Vector_Chyper.Append(AfterVector);
+	    
+	
+	    LOG(DEBUG)<< "Chyper Vector : "<<Vector_Chyper.DataAsHexString();
+            return Vector_Chyper;
+	    };
+
+  CHECK_PARAMETER_NOT_NULL(currentAccessInterface, "Whoups can only operate on valid AccessInterface");
+
+    auto protocol = currentAccessInterface->Protocol();
   if (currentAccessInterface->IsPending())
   {
     auto protocol = currentAccessInterface->Protocol();
     CHECK_VALUE_NOT_NULL(protocol, "All AccessInterface must be associated with a valid protocol");
 
-    uint32_t endpointId = 1u;
-    auto nextEndPoint = currentAccessInterface->FirstChild();
+    uint32_t channelId = 1u;
+    auto nextChannel = currentAccessInterface->FirstChild();
 
-    while (nextEndPoint)
+    while (nextChannel)
     {
-      if (nextEndPoint->IsPending())
+      if (nextChannel->IsPending())
       {
         ToSutVisitor local_toSutVisitor;
 
-        nextEndPoint->Accept(local_toSutVisitor);
+        nextChannel->Accept(local_toSutVisitor);
 
-        const auto& toSutVector = local_toSutVisitor.ToSutVector();
+        auto& toSutVector = local_toSutVisitor.ToSutVector();
+	m_ActiveStreamers = local_toSutVisitor.ActiveStreamers();
+	LOG(DEBUG)<<" Streamers encountered in active path: "<<m_ActiveStreamers.size();
 
         if (!toSutVector.IsEmpty()) // This can be empty when actual SUT state prevent from serving pending Registers
         {
+	  //Apply Streamer transformation to toSutVector before sending it
+	 for (auto Level : m_ActiveStreamers)
+	    toSutVector = ApplyStreamer(std::get<0>(Level),std::get<1>(Level),std::get<2>(Level),toSutVector,true); //Setting encrypted vector as current toSut
+
           const auto& activeRegs = local_toSutVisitor.ActiveRegistersIdentifiers();
 
           BinaryVector fromSutVector;
+          
+         LOG(INFO) << "Node " << currentAccessInterface->Name() << " Protocol " << protocol->KindName() 
+	          <<  ":RVF Request for channel "<< channelId <<" sent at internal cycle " << protocol->getElapsedCycles();
 
-          if (interfaceTranslator == nullptr) // Standard case ==> use built-in Callbacks
-          {
-            fromSutVector = protocol->DoCallback(endpointId, nextEndPoint->ApplicationData(), toSutVector);
-          }
-          else
-          {
-            auto CallbackId = protocol->CallbackId(endpointId);
+          fromSutVector = protocol->DoCallback(channelId, nextChannel->ApplicationData(), toSutVector);
 
-            // dummy callback to prevent breakdown while developing
-            // Here we should have something like :
-            // fromSutVector = xxxx->DoTranslationCallback(CallbackId, nextEndPoint->ApplicationData(), toSutVector);
-            fromSutVector = protocol->DoCallback(endpointId, nextEndPoint->ApplicationData(), toSutVector);
-          }
+ 
+         LOG(INFO) << "Node " << currentAccessInterface->Name() << " Protocol " << protocol->KindName() 
+	          <<  ":RVF Request for channel "<< channelId <<" finished at cycle " << protocol->getElapsedCycles();
 
+	  //Apply Streamer transformation to fromSutVector before processing it
+	  while (!m_ActiveStreamers.empty())
+	   {
+	    auto Level = m_ActiveStreamers.back();
+	    std::shared_ptr<Streamer> streamer = std::dynamic_pointer_cast<Streamer>(m_sm.NodeWithId(std::get<2>(Level)));
+	    LOG(DEBUG)<<"FROMSUT: Applying a streamer transformation of protocol " << streamer->Protocol()->KindName() << " between bits " << std::get<1>(Level)<< " and "<<std::get<0>(Level);
+	    fromSutVector = ApplyStreamer(std::get<0>(Level),std::get<1>(Level),std::get<2>(Level),fromSutVector,false); 
+	    m_ActiveStreamers.pop_back();
+	   }
+
+         LOG(INFO) <<"RVF : Retargeter received this vector to SUT: "<<fromSutVector.DataAsHexString();
           m_fromSutUpdater.UpdateRegisters(activeRegs, fromSutVector);
           ReportServedRegisters(activeRegs);
           ReleaseServedThreads();
         }
       }
-      nextEndPoint = nextEndPoint->NextSibling();
-      ++endpointId;
+      nextChannel = nextChannel->NextSibling();
+      ++channelId;
     }
   }
+   auto raw_protocol =  std::dynamic_pointer_cast<AccessInterfaceRawProtocol>(protocol);
+   if (raw_protocol)
+    { //We need to release DataCycleVisitor::VisitAccessInterfaceTranslator
+    RVFRequest request(NO_MORE_PENDING);
+    raw_protocol->PushRequest(request);
+    }
 }
 //
 //  End of: SystemModelManager_impl::DoHierarchicalDataCycle
@@ -281,9 +418,9 @@ void SystemModelManager_impl::DoDataCycles ()
     THROW_RUNTIME_ERROR("DoDataCycles shall be called only on SystemModelManager thread");
   }
 
-  if (!m_firstAccessInterface)
+  if (!m_firstAccessNode)
   {
-    m_firstAccessInterface = GetFirstAccessInterface(m_sm);
+    m_firstAccessNode = GetFirstAccessNode(m_sm);
   }
 
   DoDataCycles_Impl();
@@ -339,7 +476,7 @@ void SystemModelManager_impl::DoDataCycles_Impl ()
 //! @note SystemModel root node must be the only AccessInterface or a chain for which all children
 //!       are AccessInterface
 //!
-shared_ptr<AccessInterface> SystemModelManager_impl::GetFirstAccessInterface (const SystemModel& sm)
+shared_ptr<ParentNode> SystemModelManager_impl::GetFirstAccessNode (const SystemModel& sm)
 {
   auto root = sm.Root();
 
@@ -348,17 +485,25 @@ shared_ptr<AccessInterface> SystemModelManager_impl::GetFirstAccessInterface (co
   auto accessInterface = dynamic_pointer_cast<AccessInterface>(root);
   if (!accessInterface)
   {
+  auto accessInterfaceTranslator = dynamic_pointer_cast<AccessInterfaceTranslator>(root);
+  if (!accessInterfaceTranslator)
+   {
     auto asChain = dynamic_pointer_cast<Chain>(root);
-    CHECK_VALUE_NOT_NULL(asChain, "SystemModel root must be an AccessInterface or a Chain (for which chidren are AccessInterface)");
+    CHECK_VALUE_NOT_NULL(asChain, "SystemModel root must be an AccessInterfaceTranslator, AccessInterface or a Chain (for which chidren are AccessInterface or AccessInterfaceTranslator)");
 
     accessInterface = dynamic_pointer_cast<AccessInterface>(asChain->FirstChild());
-    CHECK_VALUE_NOT_NULL(accessInterface, "Root (a Chain) must have only AccessInterface children");
+    if (!accessInterface)
+     {
+     accessInterfaceTranslator = dynamic_pointer_cast<AccessInterfaceTranslator>(asChain->FirstChild());
+     CHECK_VALUE_NOT_NULL(accessInterfaceTranslator, "Root (a Chain) must have only AccessInterface or AccessInterfaceTranslator children");
+     }
+    }
   }
 
-  return accessInterface;
+  return root;
 }
 //
-//  End of: SystemModelManager_impl::GetFirstAccessInterface
+//  End of: SystemModelManager_impl::GetFirstAccessNode
 //---------------------------------------------------------------------------
 
 
@@ -423,7 +568,16 @@ void SystemModelManager_impl::iApply ()
     }
   }
 
-  appData->currentState = ApplicationData::State::Running;
+    if (m_KillAllThreads==true)
+            {
+	    auto myThreadId = std::this_thread::get_id();
+	    LOG(DEBUG)<<"Trying to kill Application thread "<< myThreadId << " Native Handle: "<< myThreadId;
+#ifdef __linux__
+	    pthread_exit(NULL);
+#endif
+	    }
+    else 
+      appData->currentState = ApplicationData::State::Running;
   MONITOR_DEBUG_APP("iApply - Leaving", appData);
 }
 //
@@ -784,6 +938,95 @@ void SystemModelManager_impl::iWrite (string_view registerPath, int16_t  value) 
 void SystemModelManager_impl::iWrite (string_view registerPath, int32_t  value) { iWrite_impl(registerPath, value); }
 void SystemModelManager_impl::iWrite (string_view registerPath, int64_t  value) { iWrite_impl(registerPath, value); }
 
+//! Sets next Register value to sent to SUT for a Black Box
+//!
+template<typename T>
+void SystemModelManager_impl::iScan_impl (string_view registerPath, T value)
+{
+  auto& pathResolver  = PATH_RESOLVER("iScan: ");
+  auto  reg           = pathResolver.ResolveAsRegister(registerPath);
+//  Register  *asRegister           = pathResolver.ResolveAsRegister(registerPath);
+  auto newValueSize= value.BitsCount();
+//  auto asBinaryVector = BinaryVector(reg->BitsCount(), 0u, SizeProperty::NotFixed);
+  auto asBinaryVector = BinaryVector(newValueSize, 0u, SizeProperty::NotFixed);
+  asBinaryVector.Set(std::move(value));
+  
+  CHECK_PARAMETER_EQ(reg->isBlackBox(),true,"iScan can be applied only to Black Boxes");
+  
+  if (newValueSize!= reg->BitsCount())
+    //BlackBox has changed size: need to redefine Register fields to match it
+    {
+      reg->ResetSize(newValueSize);
+    }
+
+  auto appData = ThreadApplicationData();
+
+  MONITOR_PDL_AND_VALUE("iScan - Queuing request", registerPath, asBinaryVector, appData);
+  appData->queuedWrites.emplace_back(SystemModelManager_impl::QueuedRequest(reg, std::move(asBinaryVector)));
+
+  appData->currentState = ApplicationData::State::WriteRequest;
+
+  MONITOR_DEBUG_APP("iScan - Leaving", appData);
+}
+//
+//  End of: SystemModelManager_impl::iScan_impl
+//---------------------------------------------------------------------------
+
+//! Sets next Register value to sent to SUT for a BlackBox
+//!
+void SystemModelManager_impl::iScan (string_view registerPath, BinaryVector value) { iScan_impl(registerPath, std::move(value)); }
+
+void SystemModelManager_impl::iNote (iNoteType severity, string_view message) {
+ switch (severity)
+  {
+   case iNoteType::Status : LOG(INFO) << "iNote Status: " << message ;break;
+   case iNoteType::Comment:LOG(INFO)  << "iNote Comment: " << message ; break;
+   default : THROW_RUNTIME_ERROR("iNote severity can only be Status or Comment");
+  }
+ }
+
+//! Sets next Register and Expected values to SUT for a BlackBox
+ //!
+template<typename T>
+void SystemModelManager_impl::iScan_impl (string_view registerPath, T value,  T expectedValue)
+{
+  auto& pathResolver  = PATH_RESOLVER("iScan: ");
+  auto  reg           = pathResolver.ResolveAsRegister(registerPath);
+  auto newValueSize= value.BitsCount();
+//  auto asBinaryVector = BinaryVector(reg->BitsCount(), 0u, SizeProperty::NotFixed);
+  auto asBinaryVector = BinaryVector(newValueSize, 0u, SizeProperty::NotFixed);
+  asBinaryVector.Set(std::move(value));
+  auto expectedAsBV  = BinaryVector(newValueSize, 0u, SizeProperty::NotFixed);
+  expectedAsBV.Set(std::move(expectedValue));
+  
+  CHECK_PARAMETER_EQ(reg->isBlackBox(),true,"iScan can be applied only to Black Boxes");
+  
+  if (newValueSize!= reg->BitsCount())
+    //BlackBox has changed size: need to redefine Register fields to match it
+    {
+      reg->ResetSize(newValueSize);
+    }
+
+  auto appData = ThreadApplicationData();
+
+  MONITOR_PDL_AND_VALUE("iScan - Queuing read/write request", registerPath, asBinaryVector, appData);
+  appData->queuedWrites.emplace_back(SystemModelManager_impl::QueuedRequest(reg, std::move(asBinaryVector)));
+  appData->queuedReads.emplace_back(SystemModelManager_impl::QueuedRequest(reg, std::move(expectedAsBV)));
+
+  appData->currentState = ApplicationData::State::WriteRequest;
+//  appData->currentState = ApplicationData::State::ReadRequest;
+
+  MONITOR_DEBUG_APP("iRead - Leaving", appData);
+
+}
+//
+//  End of: SystemModelManager_impl::iScan_impl
+//---------------------------------------------------------------------------
+
+//! Sets next Register and Expected values to SUT for a BlackBox
+//!
+void SystemModelManager_impl::iScan (string_view registerPath, BinaryVector value,  BinaryVector expectedValue) { iScan_impl(registerPath, std::move(value), std::move(expectedValue)); }
+
 //! Runs data cyles when some application thread(s) are pending (in iApply)
 //!
 //! @note Returns when Stop is called
@@ -797,7 +1040,9 @@ void SystemModelManager_impl::LoopOnDataCycle ()
     auto needDataCycle = false;
     {
       unique_lock<recursive_mutex> lock(m_dataMutex);
-      needDataCycle = m_pendingThreads.size() != 0;
+      if (! m_waitFullPending)  needDataCycle = m_pendingThreads.size() != 0;
+      else needDataCycle = m_pendingThreads.size() == m_activeThreads; //Wait for all threads to have reached an iApply
+
     } // Really need to unlock the mutex because DoDataCycles_Impl need to release it to blocked application threads
 
     if (needDataCycle)
@@ -934,9 +1179,9 @@ void SystemModelManager_impl::Start ()
     THROW_RUNTIME_ERROR("There is already a background thread for data cycle loop");
   }
 
-  if (!m_firstAccessInterface)
+  if (!m_firstAccessNode)
   {
-    m_firstAccessInterface = GetFirstAccessInterface(m_sm);
+    m_firstAccessNode = GetFirstAccessNode(m_sm);
   }
 
   MONITOR_DEBUG_MANAGER("Starting data cycle loop background thread");
@@ -952,6 +1197,10 @@ void SystemModelManager_impl::Start ()
     catch(std::exception& exc)  // Catch C++ standard exceptions
     {
       LOG(ERROR_LVL) << "SystemModelManager background thread caught std::exception: " << exc.what();
+      std::cerr << "SystemModelManager background thread caught std::exception: " << exc.what();
+      std::cerr << "Terminating Execution\n";
+
+      m_KillAllThreads = true; //Asks for forceful thread termination
       {
         std::lock_guard<std::mutex> lock(m_loopMutex);
         m_runLoop = false;
@@ -1042,7 +1291,8 @@ void SystemModelManager_impl::Stop ()
 //!
 void SystemModelManager_impl::ReleaseServedThreads ()
 {
-  unique_lock<recursive_mutex> lock(m_dataMutex);
+  // Not compatible with multithread DataCycle
+  //unique_lock<recursive_mutex> lock(m_dataMutex);
 
   for (auto it = m_pendingThreads.begin() ; it != m_pendingThreads.end() ; )
   {
@@ -1111,7 +1361,8 @@ void SystemModelManager_impl::RegisterPendingThread (shared_ptr<Register> reg)
 //!
 void SystemModelManager_impl::ReportServedRegisters (const vector<NodeIdentifier>& activeRegisters)
 {
-  unique_lock<recursive_mutex> lock(m_dataMutex);
+// Not compatible with multithread DataCycle
+//  unique_lock<recursive_mutex> lock(m_dataMutex);
 
   for (const auto& regId : activeRegisters)
   {
@@ -1192,9 +1443,6 @@ void SystemModelManager_impl::WakeupDataCycles ()
 //
 //  End of: SystemModelManager_impl::WakeupDataCycles
 //---------------------------------------------------------------------------
-
-
-
 
 
 //===========================================================================

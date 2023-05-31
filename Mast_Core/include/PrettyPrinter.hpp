@@ -66,10 +66,12 @@ class MAST_CORE_EXPORT PrettyPrinter : public SystemModelVisitor
   PrettyPrinter()  = default;
   PrettyPrinter(PrettyPrinterOptions options);
 
+  virtual void VisitAccessInterfaceTranslator (AccessInterfaceTranslator&accessInterfaceTranslator) override;
   virtual void VisitAccessInterface (AccessInterface& accessInterface) override;
   virtual void VisitChain           (Chain&           chain)           override;
   virtual void VisitLinker          (Linker&          linker)          override;
   virtual void VisitRegister        (Register&        reg)             override;
+  virtual void VisitStreamer        (Streamer&        streamer)        override;
 
   std::string PrettyPrint()   const { return m_os.str();      } //!< Returns currently visited nodes representation
   bool        IsVerbose()     const { return m_verbose;       } //!< Returns whether verbose mode is active

@@ -28,6 +28,16 @@ void PropagatePendingVisitor::VisitAccessInterface (AccessInterface& accessInter
 //  End of: PropagatePendingVisitor::VisitAccessInterface
 //---------------------------------------------------------------------------
 
+//! Updates AccessInterfaceTranslator pending flag
+//!
+void PropagatePendingVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator& accessInterfaceTranslator)
+{
+  auto pendingCount = ChildrenPendings(accessInterfaceTranslator);
+  accessInterfaceTranslator.SetPendingCount(pendingCount);
+}
+//
+//  End of: PropagatePendingVisitor::VisitAccessInterface
+//---------------------------------------------------------------------------
 
 
 //! Updates Chain pending flag
@@ -36,6 +46,17 @@ void PropagatePendingVisitor::VisitChain (Chain& chain)
 {
   auto pendingCount = ChildrenPendings(chain);
   chain.SetPendingCount(pendingCount);
+}
+//
+//  End of: PropagatePendingVisitor::VisitChain
+//---------------------------------------------------------------------------
+
+//! Updates Streamer pending flag
+//!
+void PropagatePendingVisitor::VisitStreamer (Streamer& streamer)
+{
+  auto pendingCount = ChildrenPendings(streamer);
+  streamer.SetPendingCount(pendingCount);
 }
 //
 //  End of: PropagatePendingVisitor::VisitChain

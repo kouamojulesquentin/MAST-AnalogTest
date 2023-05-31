@@ -165,6 +165,7 @@ DefaultTableBasedPathSelector::DefaultTableBasedPathSelector (shared_ptr<Registe
   : PathSelector    (properties)
   , m_pathsCount    (pathsCount)
   , m_muxRegisters  (associatedRegister)
+
 {
   auto vectors     = Utility::Split(tables, ",");
   auto valuesCount = vectors.size();
@@ -350,9 +351,13 @@ bool DefaultTableBasedPathSelector::IsSelectedAndActive (uint32_t pathIdentifier
 void DefaultTableBasedPathSelector::Deselect (uint32_t pathIdentifier)
 {
   CheckPathIdentifier(pathIdentifier);
+  
 
-  const auto& selectValue  = m_deselectTable[pathIdentifier];
+   auto& selectValue  = m_deselectTable[pathIdentifier];
   const auto  muxRegisters = AssociatedRegisters();
+
+  if (!CanSelectNone() && (selectValue == m_selectTable[0]))
+      selectValue = m_selectTable[1]; //As selector cannot be closed, select first path
 
   if (muxRegisters->NextToSut() != selectValue)
   {

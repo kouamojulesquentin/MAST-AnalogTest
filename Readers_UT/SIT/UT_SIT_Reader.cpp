@@ -1104,6 +1104,44 @@ void UT_SIT_Reader::test_ACCES_INTERFACE_Success ()
     TS_ASSERT_EMPTY (checkResult.InformativeReport());
   };
 
+  auto checker_raw = [&](auto data)
+  {
+    // ---------------- Setup
+    //
+    stringstream    sit(std::get<0>(data));
+    auto            expected_PrettyPrint = std::get<1> (data);
+    auto            sm                   = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.ParseExcerpt(sit));
+
+    // ---------------- Verify
+    //
+    CxxTest::setAbortTestOnFail(true);
+
+    TS_ASSERT_EMPTY (sut.ErrorMessage());
+    TS_ASSERT_EMPTY (sut.PlaceHolders());
+
+    auto parsedModel = sut.ParsedSystemModel();
+
+    // With PrettyPrinter
+    auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(parsedModel, PrettyPrinterOptions::Parser_debug);
+    TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
+    // With Checker
+    PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
+    auto checkResult = sm->Check();
+  std::string expected_raw_check_error =
+  {
+        "Errors   (1):\n"
+        "  - AccessInterface 'my_tap' (id: 0) has a Raw protocol but no Parent Translator is set\n"
+        "Warnings (0):\n"
+        "Infos    (0):\n"
+        };
+    TS_ASSERT_EQUALS (checkResult.InformativeReport(),expected_raw_check_error);
+  };
 
   auto data =
   {
@@ -1225,7 +1263,6 @@ void UT_SIT_Reader::test_ACCES_INTERFACE_Success ()
                " [Register](1)  \"r1\", length: 1, bypass: 1\n"
                " [Register](2)  \"r2\", length: 2, bypass: 11"),
 
-
     #ifdef INTEL_EXPERIMENT
     // 12: Intel_Packet
     make_tuple("ACCESS_INTERFACE tap  Intel_Packet \"0x41, 0x42\" \n"
@@ -1243,9 +1280,32 @@ void UT_SIT_Reader::test_ACCES_INTERFACE_Success ()
 //+  TS_WARN ("No tests for Intel_Packet protocol");
   #endif
 
+   auto data_raw =
+  {
+   // 0: SVF Raw protocol (JTAG in sit)
+    make_tuple("ACCESS_INTERFACE my_tap  JTAG \n"
+               "(\n"
+               "   REGISTER r1 1 Bypass: \"0b1\"\n"
+               "   REGISTER r2 2 Bypass: \"0b11\"\n"
+               ")\n",
+               "[Access_I](0)  \"my_tap\", Protocol: SVF_RAW->Not set\n"
+               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
+               " [Register](2)  \"r2\", length: 2, bypass: 11"),
+    // 1: I2C Raw Protocol (I2C in sit)
+    make_tuple("ACCESS_INTERFACE my_tap  I2C \"0x40, 0x41, 0x42\" \n"
+               "(\n"
+               "   REGISTER r1 1 Bypass: \"0b1\"\n"
+               "   REGISTER r2 2 Bypass: \"0b11\"\n"
+               ")\n",
+               "[Access_I](0)  \"my_tap\", Protocol: I2C_RAW->Not set\n"
+               " [Register](1)  \"r1\", length: 1, bypass: 1\n"
+               " [Register](2)  \"r2\", length: 2, bypass: 11"),
+  };
+
   // ---------------- DDT Exercise
   //
   TS_DATA_DRIVEN_TEST (checker, data);
+  TS_DATA_DRIVEN_TEST (checker_raw, data_raw);
 }
 
 
@@ -1317,6 +1377,180 @@ void UT_SIT_Reader::test_ACCES_INTERFACE_Failure ()
   TS_DATA_DRIVEN_TEST (checker, data);
 }
 
+
+//! Test TRANSLATOR from Simplified ICL Tree input - In cases with success
+//!
+void UT_SIT_Reader::test_TRANSLATOR_Success ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [&](auto data)
+  {
+    // ---------------- Setup
+    //
+    stringstream    sit(std::get<0>(data));
+    auto            expected_PrettyPrint = std::get<1> (data);
+    auto            sm                   = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.ParseExcerpt(sit));
+
+    // ---------------- Verify
+    //
+    CxxTest::setAbortTestOnFail(true);
+
+    TS_ASSERT_EMPTY (sut.ErrorMessage());
+    TS_ASSERT_EMPTY (sut.PlaceHolders());
+
+    auto parsedModel = sut.ParsedSystemModel();
+
+    // With PrettyPrinter
+    auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(parsedModel, PrettyPrinterOptions::Parser_debug);
+    TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
+    // With Checker
+    PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
+    auto checkResult = sm->Check();
+    TS_ASSERT_EMPTY (checkResult.InformativeReport());
+  };
+
+
+  auto data =
+  {
+    make_tuple("TRANSLATOR my_tap Emulation\n"
+               "(\n"
+               " ACCESS_INTERFACE my_tap  I2C \"0x40, 0x41, 0x42\" \n"
+               " (\n"
+               "   REGISTER r1 1 Bypass: \"0b1\"\n"
+               "   REGISTER r2 2 Bypass: \"0b11\"\n"
+               " )\n" 
+               ")\n",
+               "[Access_T](0)  \"my_tap\", Protocol: Emulation_Translator\n"
+               " [Access_I](1)  \"my_tap\", Protocol: I2C_RAW->my_tap\n"
+               "  [Register](2)  \"r1\", length: 1, bypass: 1\n"
+               "  [Register](3)  \"r2\", length: 2, bypass: 11"),
+    make_tuple("TRANSLATOR my_tap Emulation\n"
+               "(\n"
+               " JTAG_TAP my_tap 4 1\n"
+               " ("
+               "   REGISTER test_reg 4 Bypass: \"0b1100\"\n"
+               " )\n"
+               ")\n",
+               "[Access_T](0)  \"my_tap\", Protocol: Emulation_Translator\n"
+               " [Access_I](1)  \"my_tap\", Protocol: SVF_RAW->my_tap\n"
+               "  [Register](2)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n"
+               "  [Linker](3)    \"my_tap_DR_Mux\"\n"
+               "   :Selector:(2)  \"my_tap_IR\", kind: Table_Based, can_select_none: false, inverted_bits: false, reversed_order: false\n"
+               "   [Register](4)  \"my_tap_BPY\", length: 1, bypass: 1\n"
+               "   [Register](5)  \"test_reg\", length: 4, bypass: 1100"),
+     make_tuple("TRANSLATOR top Emulation\n"
+               "(\n"
+               " TRANSLATOR my_trans JTAG_to_I2C \"0x40, 0x41, 0x42\"\n"
+               " (\n"
+               "  JTAG_TAP my_tap 4 1\n"
+               "  ("
+               "    REGISTER test_reg 4 Bypass: \"0b1100\"\n"
+               "  )\n"
+               " )\n"
+               ")\n",
+               "[Access_T](0)  \"top\", Protocol: Emulation_Translator\n"
+               " [Access_T](1)  \"my_trans\", Protocol: JTAG_to_I2C->top\n"
+               "  [Access_I](2)  \"my_tap\", Protocol: SVF_RAW->my_trans\n"
+               "   [Register](3)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n"
+               "   [Linker](4)    \"my_tap_DR_Mux\"\n"
+               "    :Selector:(3)  \"my_tap_IR\", kind: Table_Based, can_select_none: false, inverted_bits: false, reversed_order: false\n"
+               "    [Register](5)  \"my_tap_BPY\", length: 1, bypass: 1\n"
+               "    [Register](6)  \"test_reg\", length: 4, bypass: 1100"),
+ };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Test T_2_E_TRANSLATOR from Simplified ICL Tree input - In cases with success
+//!
+void UT_SIT_Reader::test_T_2_E_TRANSLATOR_Success ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [&](auto data)
+  {
+    // ---------------- Setup
+    //
+    stringstream    sit(std::get<0>(data));
+    auto            expected_PrettyPrint = std::get<1> (data);
+    auto            sm                   = make_shared<SystemModel>();
+    SIT::SIT_Reader sut(sm);
+
+    // ---------------- Exercise
+    //
+    TS_ASSERT_THROWS_NOTHING (sut.ParseExcerpt(sit));
+
+    // ---------------- Verify
+    //
+    CxxTest::setAbortTestOnFail(true);
+
+    TS_ASSERT_EMPTY (sut.ErrorMessage());
+    TS_ASSERT_EMPTY (sut.PlaceHolders());
+
+    auto parsedModel = sut.ParsedSystemModel();
+
+    // With PrettyPrinter
+    auto actual_PrettyPrint = PrettyPrinter::PrettyPrint(parsedModel, PrettyPrinterOptions::Parser_debug);
+    TS_ASSERT_EQUALS (actual_PrettyPrint, expected_PrettyPrint);
+
+    // With Checker
+    PrependWithTap(sm, parsedModel);   // This is to avoid warnings about missing AccessInterface
+    auto checkResult = sm->Check();
+    TS_ASSERT_EMPTY (checkResult.InformativeReport());
+  };
+
+  auto data =
+  {
+     make_tuple("TRANSLATOR top Emulation\n"
+               "(\n"
+               "  JTAG_TAP my_tap 4 1\n"
+               "  (\n"
+               "   CHAIN Internal{\n"
+               "    REGISTER BB_reg 4 Bypass: \"0b1100\"\n"
+               "    TRANSLATOR BB_Tap BitBang \"BB_reg\"\n"
+               "     (\n"      
+               "       JTAG_TAP eTap 4 1\n"
+               "       (\n"
+               "         REGISTER Test_reg 4 Bypass: \"0b1100\"\n"
+               "       )\n"
+               "     )\n"      
+               "   }\n"
+               "  )\n"
+               ")\n",
+               "[Access_T](0)  \"top\", Protocol: Emulation_Translator\n"
+               " [Access_I](1)  \"my_tap\", Protocol: SVF_RAW->top\n"
+               "  [Register](2)  \"my_tap_IR\", length: 4, Hold value: true, bypass: 1111\n"
+               "  [Linker](3)    \"my_tap_DR_Mux\"\n"
+               "   :Selector:(2)  \"my_tap_IR\", kind: Table_Based, can_select_none: false, inverted_bits: false, reversed_order: false\n"
+               "   [Register](4)  \"my_tap_BPY\", length: 1, bypass: 1\n"
+               "   [Chain](5)     \"Internal\"\n"
+               "    [Register](6)  \"BB_reg\", length: 4, bypass: 1100\n"
+               "    [Access_T](7)  \"BB_Tap\", Protocol: JTAG_BitBang\n"
+               "     [Access_I](8)  \"eTap\", Protocol: SVF_RAW->BB_Tap\n"
+               "      [Register](9)  \"eTap_IR\", length: 4, Hold value: true, bypass: 1111\n"
+               "      [Linker](10)   \"eTap_DR_Mux\"\n"
+               "       :Selector:(9)  \"eTap_IR\", kind: Table_Based, can_select_none: false, inverted_bits: false, reversed_order: false\n"
+               "       [Register](11) \"eTap_BPY\", length: 1, bypass: 1\n"
+               "       [Register](12) \"Test_reg\", length: 4, bypass: 1100"),
+
+ };
+
+
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
 
 //! Test 1500 Wrapper macro from Simplified ICL Tree input
 //!
@@ -1421,8 +1655,36 @@ void UT_SIT_Reader::test_LINKER_Success ()
 
   auto data =
   {
-    // 00 ==> correct syntax
+    // 00 ==> correct syntax one register
     make_tuple("LINKER test_LINKER One_Hot test_reg_1 4\n"
+               "(\n"
+               "  REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
+               "  REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
+               "  REGISTER test_reg_3 2 Bypass: \"0b10\"\n"
+               "  REGISTER test_reg_4 5 Bypass: \"0b11001\"\n"
+               ")"s,
+               "[Linker](0)    \"test_LINKER\"\n"
+               " :Selector:(1)  \"test_reg_1\", kind: One_Hot, can_select_none: true, inverted_bits: false, reversed_order: false\n"
+               " [Register](1)  \"test_reg_1\", length: 4, bypass: 1001\n"
+               " [Register](2)  \"test_reg_2\", length: 4, bypass: 1100\n"
+               " [Register](3)  \"test_reg_3\", length: 2, bypass: 10\n"
+               " [Register](4)  \"test_reg_4\", length: 5, bypass: 1100_1"s),
+    // 01 ==> correct syntax two registers
+    make_tuple("LINKER test_LINKER One_Hot test_reg_1,test_reg_1 4\n"
+               "(\n"
+               "  REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
+               "  REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
+               "  REGISTER test_reg_3 2 Bypass: \"0b10\"\n"
+               "  REGISTER test_reg_4 5 Bypass: \"0b11001\"\n"
+               ")"s,
+               "[Linker](0)    \"test_LINKER\"\n"
+               " :Selector:(1)  \"test_reg_1\", kind: One_Hot, can_select_none: true, inverted_bits: false, reversed_order: false\n"
+               " [Register](1)  \"test_reg_1\", length: 4, bypass: 1001\n"
+               " [Register](2)  \"test_reg_2\", length: 4, bypass: 1100\n"
+               " [Register](3)  \"test_reg_3\", length: 2, bypass: 10\n"
+               " [Register](4)  \"test_reg_4\", length: 5, bypass: 1100_1"s),
+    // 02 ==> correct syntax three registers
+    make_tuple("LINKER test_LINKER One_Hot test_reg_1,test_reg_1,test_reg_1 4\n"
                "(\n"
                "  REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
                "  REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
@@ -1487,7 +1749,17 @@ void UT_SIT_Reader::test_LINKER_Error ()
                "  REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
                "  REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
                ")"s,
-               "SIT Parsing error: Line 2:1-2: LINKER node \"test_LINKER\" Error, specified selector register \"selector_reg\" does not exist"),
+               "SIT Parsing error: Line 2:1-2: LINKER node \"test_LINKER\" Error, specified selector node \"selector_reg\" does not exist"),
+    // 02 ==> Error : one selector register followed by a comme 
+    make_tuple("LINKER test_LINKER One_Hot test_reg_1, 4\n"
+               "(\n"
+               "  REGISTER test_reg_1 4 Bypass: \"0b1001\"\n"
+               "  REGISTER test_reg_2 4 Bypass: \"0b1100\"\n"
+               "  REGISTER test_reg_3 2 Bypass: \"0b10\"\n"
+               "  REGISTER test_reg_4 5 Bypass: \"0b11001\"\n"
+               ")"s,
+               "SIT Parsing error: Line 1:40-41: syntax error"),
+
   };
 
   // ---------------- DDT Exercise

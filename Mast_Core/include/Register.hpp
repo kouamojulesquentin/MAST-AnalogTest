@@ -44,6 +44,18 @@ class Register : public SystemModelNode, public RegisterInterface
            mast::BitsOrdering             bitsOrdering = mast::BitsOrdering::Downto);
   friend SystemModel;
 
+  void SetAsBlackBox       () { 
+      m_isBlackBox   = true;      
+      m_nextToSut.FixSize(false);
+      m_lastToSut.FixSize(false);
+      m_lastFromSut.FixSize(false);
+      m_lastReadFromSut.FixSize(false);
+      m_expectedFromSut.FixSize(false);
+      m_bypass.FixSize(false);
+      m_dontCareMask.FixSize(false);
+      m_resetValue.FixSize(false);
+      }   //!< allows BlackBox behaviour
+
   // ---------------- Miscellaneous
   //
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
@@ -72,7 +84,8 @@ class Register : public SystemModelNode, public RegisterInterface
   BinaryVector        LastCompareResult() const override;                                 //!< Returns XOR of the value last read from SUT and the expected value. May contain x-values (for don't care).
   virtual bool        IsPending()         const override;                                 //!< Returns true if register is pending for read or for write
   virtual uint32_t    PendingCount()      const override;                                 //!< Returns number of pending registers down the hierarchy
-
+  bool isBlackBox()                       const override   { return m_isBlackBox; } //!< returns True if register is a Black Box
+  
   // ---------------- Setters
   //
   void SetFromSut         (BinaryVector sequence);                                             //!< Sets last sequence of bits that have been shifted from SUT
@@ -144,6 +157,12 @@ class Register : public SystemModelNode, public RegisterInterface
     return m_lastReadFromSut.Get<T>();
   }
 
+  virtual void ResetSize   (uint32_t newSize) override {
+        auto dummy_sequence = BinaryVector(newSize, 0u, SizeProperty::NotFixed);
+        m_bypass = std::move(dummy_sequence);
+	
+	return;
+	};                            //!< changes size of Register for BlackBox usage
 
   //! Sets expected sequence (when updating from SUT) from integral value
   //!
@@ -203,6 +222,7 @@ class Register : public SystemModelNode, public RegisterInterface
   bool                        m_pendingRead       = false;                      //!< True when there is a pending request to read register value from SUT
   bool                        m_holdValue         = false;                      //!< When true, force bypass value to be equal to nextToSut (The value will not be changed while the register is selected)
   bool                        m_mustCheckExpected = false;                      //!< When true, it triggers a check of received vs expected data during the following shift from sut
+  bool                        m_isBlackBox       = false;                      //!< When true, this register can be used as a Black-Box (size can change)
   mast::BitsOrdering          m_bitsOrdering      = mast::BitsOrdering::Downto; //!< Defines whether MSB are on the left or right hand side
   uint32_t                    m_mismatches        = 0;                          //!< Number of mismatches following IEEE 1687 rules
   BinaryVector                m_nextToSut;                                      //!< Sequence of bits that should be shifted into SUT (during the next iApply cycle)

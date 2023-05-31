@@ -34,6 +34,7 @@
 /Doxygen_Doc/html
 /Doxygen_Doc/html/index.html
 /Doxygen_Doc/index.html.lnk
+/Doxygen_Doc/index - MastDev.lnk
 /External_Libs/OpenOCD/*
 /External_Libs/OpenOCD/bin/*
 /External_Libs/OpenOCD/include/*
@@ -142,6 +143,8 @@
 /cmake_code_coverage
 /cmake_debug
 /cmake_release
+/cmake_arm
+/cmake_riscV
 /cxxtest/*.hgignore
 /cxxtest/.hg
 /cxxtest/cxxtest/*.TAG
@@ -167,6 +170,13 @@
 /vhdl/data_to_rtl.svf
 /vhdl/transcript
 /vhdl/work/*
+/vhdl/*.do
+/vhdl/*.log
+/vhdl/*.txt
+/vhdl/Debug_mux
+/vhdl/MIB_Tutorial
+/vhdl/Mast
+transcript
 Intel/src/archive/
 License/license.mast
 MastExample_CPP/SIT/*.gml
@@ -177,3 +187,11 @@ build
 /Readers/SIT_Reader/SIT_Parser.tab.hh
 /CppCheck_Results.txt
 /External_Libs/Yaml/.travis.yml
+/SystemVerilog/.v*
+/Applications/Debug_mux/ETS/
+/Applications/Debug_mux/tmp/
+/RTL/vhdl/work/*
+/RTL/vhdl/*.do
+/RTL/vhdl/*.log
+/RTL/vhdl/*.txt
+/RTL/vhdl/*.so

@@ -70,7 +70,7 @@ void UT_I2C_EmulationProtocol::test_Constructor_Integer_Error ()
 
 
 
-void UT_I2C_EmulationProtocol::test_MaxSupportedEndPoints ()
+void UT_I2C_EmulationProtocol::test_MaxSupportedChannels ()
 {
   // ---------------- Setup
   //
@@ -78,14 +78,14 @@ void UT_I2C_EmulationProtocol::test_MaxSupportedEndPoints ()
 
   // ---------------- Exercise
   //
-  auto maxSupportedEndPoints = sut.MaxSupportedEndPoints();
+  auto maxSupportedChannels = sut.MaxSupportedChannels();
 
   // ---------------- Verify
   //
-  TS_ASSERT_EQUALS (maxSupportedEndPoints, 2u);
+  TS_ASSERT_EQUALS (maxSupportedChannels, 2u);
 }
 
-//! Checks I2C_EmulationProtocol constructor given max endpoint as a string
+//! Checks I2C_EmulationProtocol constructor given max channel as a string
 //!
 void UT_I2C_EmulationProtocol::test_Constructor_String ()
 {
@@ -96,7 +96,7 @@ void UT_I2C_EmulationProtocol::test_Constructor_String ()
     // ---------------- Setup
     //
     auto parameters             = string(std::get<0>(data));
-    auto expectedMaxEndPoints = std::get<1>(data);
+    auto expectedMaxChannels = std::get<1>(data);
 
     // ---------------- Exercise
     //
@@ -104,8 +104,8 @@ void UT_I2C_EmulationProtocol::test_Constructor_String ()
 
     // ---------------- Verify
     //
-    auto maxSupportedEndPoints = sut.MaxSupportedEndPoints();
-    TS_ASSERT_EQUALS (maxSupportedEndPoints, expectedMaxEndPoints);
+    auto maxSupportedChannels = sut.MaxSupportedChannels();
+    TS_ASSERT_EQUALS (maxSupportedChannels, expectedMaxChannels);
   };
 
   auto data =
@@ -122,7 +122,7 @@ void UT_I2C_EmulationProtocol::test_Constructor_String ()
 }
 
 
-//! Checks I2C_EmulationProtocol constructor given max endpoint as a string but with not valid numbers
+//! Checks I2C_EmulationProtocol constructor given max channel as a string but with not valid numbers
 //!
 void UT_I2C_EmulationProtocol::test_Constructor_String_Error ()
 {
@@ -163,7 +163,7 @@ void UT_I2C_EmulationProtocol::test_DoCallback ()
   {
     // ---------------- Setup
     //
-    auto        endpointId    = std::get<0> (data);
+    auto        channelId    = std::get<0> (data);
     auto        toSutVector     = BinaryVector::CreateFromString(std::get<1> (data));
     const auto& expectedCommand = std::get<2> (data);
 
@@ -172,7 +172,7 @@ void UT_I2C_EmulationProtocol::test_DoCallback ()
 
     // ---------------- Exercise
     //
-    auto fromSutVector = sut.DoCallback(endpointId, nullptr, toSutVector);
+    auto fromSutVector = sut.DoCallback(channelId, nullptr, toSutVector);
 
     // ---------------- Verify
     //
@@ -215,7 +215,7 @@ void UT_I2C_EmulationProtocol::test_DoCallback_String()
   {
     // ---------------- Setup
     //
-    auto        endpointId    = std::get<0> (data);
+    auto        channelId    = std::get<0> (data);
     auto        toSutVector     = BinaryVector::CreateFromString(std::get<1> (data));
     const auto& expectedCommand = std::get<2> (data);
 
@@ -223,7 +223,7 @@ void UT_I2C_EmulationProtocol::test_DoCallback_String()
 
     // ---------------- Exercise
     //
-    auto fromSutVector = sut.DoCallback(endpointId, nullptr, toSutVector);
+    auto fromSutVector = sut.DoCallback(channelId, nullptr, toSutVector);
 
     // ---------------- Verify
     //

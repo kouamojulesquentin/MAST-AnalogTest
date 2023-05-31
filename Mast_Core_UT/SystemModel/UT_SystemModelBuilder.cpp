@@ -22,6 +22,9 @@
 #include "SystemModelChecker.hpp"
 #include "I2C_EmulationProtocol.hpp"
 #include "SVF_EmulationProtocol.hpp"
+#include "Emulation_TranslatorProtocol.hpp"
+#include "I2C_RawPlayer.hpp"
+#include "SVF_RawPlayer.hpp"
 #include "GmlPrinter.hpp"
 #include "PrettyPrinter.hpp"
 #include "Utility.hpp"
@@ -329,9 +332,9 @@ void UT_SystemModelBuilder::test_Create_PathSelector_NHot_CanSelectNone ()
 }
 
 
-//! Checks TestModelBuilder::Create_MIB() with 1 EndPoint
+//! Checks TestModelBuilder::Create_MIB() with 1 Channel
 //!
-void UT_SystemModelBuilder::test_Create_MIB_1_EndPoint ()
+void UT_SystemModelBuilder::test_Create_MIB_1_Channel ()
 {
   // ---------------- Setup
   //
@@ -409,7 +412,7 @@ void UT_SystemModelBuilder::test_Create_MIB_1_EndPoint ()
 
 //! Checks TestModelBuilder::Create_MIB() with 4 chains
 //!
-void UT_SystemModelBuilder::test_Create_MIB_4_EndPoints ()
+void UT_SystemModelBuilder::test_Create_MIB_4_Channels ()
 {
   // ---------------- Setup
   //
@@ -872,14 +875,14 @@ void UT_SystemModelBuilder::test_Create_Brocade_1xTAP ()
   SystemModel        sm;
   SystemModelBuilder sut(sm);
   auto I2C_Adresses   = initializer_list<uint32_t>{ 0x30u, 0x31u };
-  auto masterProtocol = make_shared<I2C_EmulationProtocol>(I2C_Adresses);
-  auto slaveProtocol  = make_shared<SVF_EmulationProtocol>();
+  auto masterProtocol = make_shared<I2C_RawPlayer>(I2C_Adresses);
+  auto slaveProtocol  = make_shared<SVF_RawPlayer>();
 
   auto tap1 = sut.Create_JTAG_TAP("TAP1", 6u, 4u, make_shared<LoopbackAccessInterfaceProtocol>());
 
   sut.AppendRegisters(3u, "reg_", BinaryVector::CreateFromString("0xFDE"), tap1);
 
-  shared_ptr<Chain> brocadeChain;
+  shared_ptr<AccessInterfaceTranslator> brocadeChain;
 
   // ---------------- Exercise
   //
@@ -890,6 +893,7 @@ void UT_SystemModelBuilder::test_Create_Brocade_1xTAP ()
   CxxTest::setAbortTestOnFail(true);
 
   TS_ASSERT_NOT_NULLPTR (brocadeChain);
+  sm.ReplaceRoot(brocadeChain, false);
 
   // Model coherency
   auto result = SystemModelChecker::Check(sm);
@@ -897,56 +901,58 @@ void UT_SystemModelBuilder::test_Create_Brocade_1xTAP ()
 //+  TS_TRACE (result.MakeReport());
 
   auto graph         = GmlPrinter::Graph(sm.Root(), "", GmlPrinterOptions::DisplayIdentifiers | GmlPrinterOptions::ShowProtocol);
-  auto expectedGraph =  "graph\n"
-                        "[\n"
-                        "   hierarchic 1 directed 1\n"
-                        "   node [ id 7 graphics [ type \"ellipse\" fill \"#FFCC20\" w 106 h 43 ] LabelGraphics [ text \"(7)\n"
-                        "Brocade\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                        "   node [ id 8 graphics [ type \"octagon\" fill \"#10FFFF\" outlineStyle \"dashed\" w 258 h 44 ] LabelGraphics [ text \"(8)\n"
-                        "Master_AI\n"
-                        "Protocol: I2C_Emulation\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                        "   node [ id 10 graphics [ type \"rectangle\" fill \"#59FF20\" w 114 h 35 ] LabelGraphics [ text \"(10)\n"
-                        "Brocade_CTRL\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                        "   node [ id 9 graphics [ type \"octagon\" fill \"#10FFFF\" outlineStyle \"dashed\" w 258 h 44 ] LabelGraphics [ text \"(9)\n"
-                        "Slave_AI\n"
-                        "Protocol: SVF_Emulation\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                        "   node [ id 11 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 90 h 43 ] LabelGraphics [ text \"(11)\n"
-                        "IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                        "   node [ id 13 graphics [ type \"trapezoid\" fill \"#FF3060\" outlineStyle \"dashed\" w 97 h 44 ] LabelGraphics [ text \"(13)\n"
-                        "IR_Mux\n"
-                        ":10:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                        "   node [ id 1 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(1)\n"
-                        "TAP1.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                        "   node [ id 12 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 90 h 43 ] LabelGraphics [ text \"(12)\n"
-                        "DR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                        "   node [ id 14 graphics [ type \"trapezoid\" fill \"#FF3060\" outlineStyle \"dashed\" w 97 h 44 ] LabelGraphics [ text \"(14)\n"
-                        "DR_Mux\n"
-                        ":10:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                        "   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(2)\n"
-                        "TAP1\n"
-                        ":1:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                        "   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 76 h 35 ] LabelGraphics [ text \"(3)\n"
-                        "TAP1_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                        "   node [ id 4 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(4)\n"
-                        "reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                        "   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(5)\n"
-                        "reg_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                        "   node [ id 6 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(6)\n"
-                        "reg_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                        "   edge [ source 8 target 10 label \"1\" ]\n"
-                        "   edge [ source 7 target 8 label \"1\" ]\n"
-                        "   edge [ source 13 target 1 label \"1\" ]\n"
-                        "   edge [ source 11 target 13 label \"1\" ]\n"
-                        "   edge [ source 9 target 11 label \"1\" ]\n"
-                        "   edge [ source 2 target 3 label \"1\" ]\n"
-                        "   edge [ source 2 target 4 label \"2\" ]\n"
-                        "   edge [ source 2 target 5 label \"3\" ]\n"
-                        "   edge [ source 2 target 6 label \"4\" ]\n"
-                        "   edge [ source 14 target 2 label \"1\" ]\n"
-                        "   edge [ source 12 target 14 label \"1\" ]\n"
-                        "   edge [ source 9 target 12 label \"2\" ]\n"
-                        "   edge [ source 7 target 9 label \"2\" ]\n"
-                        "]";
+  auto expectedGraph =  
+"graph\n"
+"[\n"
+"   hierarchic 1 directed 1\n"
+"   node [ id 7 graphics [ type \"octagon\" fill \"#10FFFF\" w 182 h 44 ] LabelGraphics [ text \"(7)\n"
+"Brocade\n"
+"Protocol: Dummy\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 8 graphics [ type \"octagon\" fill \"#10FFFF\" outlineStyle \"dashed\" w 201 h 44 ] LabelGraphics [ text \"(8)\n"
+"Master_AI\n"
+"Protocol: I2C_RAW\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 10 graphics [ type \"rectangle\" fill \"#59FF20\" w 114 h 35 ] LabelGraphics [ text \"(10)\n"
+"Brocade_CTRL\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 9 graphics [ type \"octagon\" fill \"#10FFFF\" outlineStyle \"dashed\" w 201 h 44 ] LabelGraphics [ text \"(9)\n"
+"Slave_AI\n"
+"Protocol: SVF_RAW\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 11 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 90 h 43 ] LabelGraphics [ text \"(11)\n"
+"IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 13 graphics [ type \"trapezoid\" fill \"#FF3060\" outlineStyle \"dashed\" w 97 h 44 ] LabelGraphics [ text \"(13)\n"
+"IR_Mux\n"
+":10:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 1 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(1)\n"
+"TAP1.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 12 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 90 h 43 ] LabelGraphics [ text \"(12)\n"
+"DR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 14 graphics [ type \"trapezoid\" fill \"#FF3060\" outlineStyle \"dashed\" w 97 h 44 ] LabelGraphics [ text \"(14)\n"
+"DR_Mux\n"
+":10:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(2)\n"
+"TAP1\n"
+":1:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 76 h 35 ] LabelGraphics [ text \"(3)\n"
+"TAP1_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 4 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(4)\n"
+"reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(5)\n"
+"reg_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 6 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(6)\n"
+"reg_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   edge [ source 8 target 10 label \"1\" ]\n"
+"   edge [ source 7 target 8 label \"1\" ]\n"
+"   edge [ source 13 target 1 label \"1\" ]\n"
+"   edge [ source 11 target 13 label \"1\" ]\n"
+"   edge [ source 9 target 11 label \"1\" ]\n"
+"   edge [ source 2 target 3 label \"1\" ]\n"
+"   edge [ source 2 target 4 label \"2\" ]\n"
+"   edge [ source 2 target 5 label \"3\" ]\n"
+"   edge [ source 2 target 6 label \"4\" ]\n"
+"   edge [ source 14 target 2 label \"1\" ]\n"
+"   edge [ source 12 target 14 label \"1\" ]\n"
+"   edge [ source 9 target 12 label \"2\" ]\n"
+"   edge [ source 7 target 9 label \"2\" ]\n"
+"]";
 
   TS_ASSERT_EQUALS (graph, expectedGraph);
 }
@@ -961,8 +967,8 @@ void UT_SystemModelBuilder::test_Create_Brocade_5xTAPs ()
   SystemModel        sm;
   SystemModelBuilder sut(sm);
   auto I2C_Adresses   = initializer_list<uint32_t>{ 0x30u, 0x31u };
-  auto masterProtocol = make_shared<I2C_EmulationProtocol>(I2C_Adresses);
-  auto slaveProtocol  = make_shared<SVF_EmulationProtocol>();
+  auto masterProtocol = make_shared<I2C_RawPlayer>(I2C_Adresses);
+  auto slaveProtocol  = make_shared<SVF_RawPlayer>();
 
   auto tap1 = sut.Create_JTAG_TAP("Zybo", 6u, 2u, make_shared<LoopbackAccessInterfaceProtocol>());
   auto tap2 = sut.Create_JTAG_TAP("Tap",  6u, 3u, make_shared<LoopbackAccessInterfaceProtocol>());
@@ -977,11 +983,12 @@ void UT_SystemModelBuilder::test_Create_Brocade_5xTAPs ()
   sut.AppendRegisters(2u, "reg_", BinaryVector::CreateFromString("0xFDE"), tap5);
 
   auto taps = { tap1, tap2, tap3, tap4, tap5 };
-  shared_ptr<Chain> brocadeChain;
+  shared_ptr<AccessInterfaceTranslator> brocadeChain;
 
   // ---------------- Exercise
   //
   TS_ASSERT_THROWS_NOTHING (brocadeChain = sut.Create_Brocade(masterProtocol, slaveProtocol, taps));
+  sm.ReplaceRoot(brocadeChain, false);
 
   // ---------------- Verify
   //
@@ -997,157 +1004,329 @@ void UT_SystemModelBuilder::test_Create_Brocade_5xTAPs ()
   auto graph         = GmlPrinter::Graph(sm.Root(), "",   GmlPrinterOptions::DisplayIdentifiers
                                                         | GmlPrinterOptions::ShowProtocol
                                                         | GmlPrinterOptions::ShowSelectionValues
-                                                        | GmlPrinterOptions::ShowSelectorProperties);
+                               | GmlPrinterOptions::ShowSelectorProperties);
   auto expectedGraph =
-                       "graph\n"
-                       "[\n"
-                       "   hierarchic 1 directed 1\n"
-                       "   node [ id 29 graphics [ type \"ellipse\" fill \"#FFCC20\" w 106 h 43 ] LabelGraphics [ text \"(29)\n"
-                       "Brocade\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 30 graphics [ type \"octagon\" fill \"#10FFFF\" outlineStyle \"dashed\" w 258 h 44 ] LabelGraphics [ text \"(30)\n"
-                       "Master_AI\n"
-                       "Protocol: I2C_Emulation\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 32 graphics [ type \"rectangle\" fill \"#59FF20\" w 114 h 35 ] LabelGraphics [ text \"(32)\n"
-                       "Brocade_CTRL\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 31 graphics [ type \"octagon\" fill \"#10FFFF\" outlineStyle \"dashed\" w 258 h 44 ] LabelGraphics [ text \"(31)\n"
-                       "Slave_AI\n"
-                       "Protocol: SVF_Emulation\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 33 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 90 h 43 ] LabelGraphics [ text \"(33)\n"
-                       "IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 35 graphics [ type \"trapezoid\" fill \"#FF3060\" outlineStyle \"dashed\" w 97 h 44 ] LabelGraphics [ text \"(35)\n"
-                       "IR_Mux\n"
-                       ":32:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 2147483647 graphics [ type \"rectangle\" fill \"#E8E8E8\" w 199 h 90 ] LabelGraphics [ text \"Selector :32:\n"
-                       "Kind: Brocade\n"
-                       "Can_select_none: true\n"
-                       "Reversed_order:  true\n"
-                       "Inverted_bits:   false\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 1 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(1)\n"
-                       "Zybo.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(5)\n"
-                       "TAP2.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 9 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(9)\n"
-                       "TAP3.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 13 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(13)\n"
-                       "TAP4.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 17 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(17)\n"
-                       "TAP5.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 34 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 90 h 43 ] LabelGraphics [ text \"(34)\n"
-                       "DR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 36 graphics [ type \"trapezoid\" fill \"#FF3060\" outlineStyle \"dashed\" w 97 h 44 ] LabelGraphics [ text \"(36)\n"
-                       "DR_Mux\n"
-                       ":32:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(2)\n"
-                       "Zybo\n"
-                       ":1:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 2147483646 graphics [ type \"rectangle\" fill \"#E8E8E8\" w 209 h 90 ] LabelGraphics [ text \"Selector :1:\n"
-                       "Kind: Table_Based\n"
-                       "Can_select_none: false\n"
-                       "Reversed_order:  false\n"
-                       "Inverted_bits:   false\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 76 h 35 ] LabelGraphics [ text \"(3)\n"
-                       "Zybo_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 20 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(20)\n"
-                       "reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 6 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(6)\n"
-                       "TAP2\n"
-                       ":5:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 2147483645 graphics [ type \"rectangle\" fill \"#E8E8E8\" w 209 h 90 ] LabelGraphics [ text \"Selector :5:\n"
-                       "Kind: Table_Based\n"
-                       "Can_select_none: false\n"
-                       "Reversed_order:  false\n"
-                       "Inverted_bits:   false\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 7 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(7)\n"
-                       "Tap_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 21 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(21)\n"
-                       "R_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 22 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(22)\n"
-                       "R_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 10 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(10)\n"
-                       "TAP3\n"
-                       ":9:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 2147483644 graphics [ type \"rectangle\" fill \"#E8E8E8\" w 209 h 90 ] LabelGraphics [ text \"Selector :9:\n"
-                       "Kind: Table_Based\n"
-                       "Can_select_none: false\n"
-                       "Reversed_order:  false\n"
-                       "Inverted_bits:   false\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 11 graphics [ type \"rectangle\" fill \"#59FF20\" w 76 h 35 ] LabelGraphics [ text \"(11)\n"
-                       "TAP3_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 23 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(23)\n"
-                       "reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 24 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(24)\n"
-                       "reg_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 25 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(25)\n"
-                       "reg_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 14 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(14)\n"
-                       "TAP4\n"
-                       ":13:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 2147483643 graphics [ type \"rectangle\" fill \"#E8E8E8\" w 209 h 90 ] LabelGraphics [ text \"Selector :13:\n"
-                       "Kind: Table_Based\n"
-                       "Can_select_none: false\n"
-                       "Reversed_order:  false\n"
-                       "Inverted_bits:   false\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 15 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(15)\n"
-                       "TAP_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 26 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(26)\n"
-                       "reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 18 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(18)\n"
-                       "TAP5\n"
-                       ":17:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 2147483642 graphics [ type \"rectangle\" fill \"#E8E8E8\" w 209 h 90 ] LabelGraphics [ text \"Selector :17:\n"
-                       "Kind: Table_Based\n"
-                       "Can_select_none: false\n"
-                       "Reversed_order:  false\n"
-                       "Inverted_bits:   false\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 19 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(19)\n"
-                       "TAP_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 27 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(27)\n"
-                       "reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   node [ id 28 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(28)\n"
-                       "reg_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
-                       "   edge [ source 30 target 32 label \"1\" ]\n"
-                       "   edge [ source 29 target 30 label \"1\" ]\n"
-                       "   edge [ source 2147483647 target 35 graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 35 target 1 label \"1/[0x01]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 35 target 5 label \"2/[0x02]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 35 target 9 label \"3/[0x04]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 35 target 13 label \"4/[0x08]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 35 target 17 label \"5/[0x10]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 33 target 35 label \"1\" ]\n"
-                       "   edge [ source 31 target 33 label \"1\" ]\n"
-                       "   edge [ source 2147483647 target 36 graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 2147483646 target 2 graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 2 target 3 label \"1/[0b111111:S:A]\" ]\n"
-                       "   edge [ source 2 target 20 label \"2/[0b000001]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 36 target 2 label \"1/[0x01]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 2147483645 target 6 graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 6 target 7 label \"1/[0b111111:S:A]\" ]\n"
-                       "   edge [ source 6 target 21 label \"2/[0b000001]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 6 target 22 label \"3/[0b000010]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 36 target 6 label \"2/[0x02]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 2147483644 target 10 graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 10 target 11 label \"1/[0b111111:S:A]\" ]\n"
-                       "   edge [ source 10 target 23 label \"2/[0b000001]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 10 target 24 label \"3/[0b000010]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 10 target 25 label \"4/[0b000011]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 36 target 10 label \"3/[0x04]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 2147483643 target 14 graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 14 target 15 label \"1/[0b111111:S:A]\" ]\n"
-                       "   edge [ source 14 target 26 label \"2/[0b000001]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 36 target 14 label \"4/[0x08]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 2147483642 target 18 graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 18 target 19 label \"1/[0b111111:S:A]\" ]\n"
-                       "   edge [ source 18 target 27 label \"2/[0b000001]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 18 target 28 label \"3/[0b000010]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 36 target 18 label \"5/[0x10]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
-                       "   edge [ source 34 target 36 label \"1\" ]\n"
-                       "   edge [ source 31 target 34 label \"2\" ]\n"
-                       "   edge [ source 29 target 31 label \"2\" ]\n"
-                       "]";
+"graph\n"
+"[\n"
+"   hierarchic 1 directed 1\n"
+"   node [ id 29 graphics [ type \"octagon\" fill \"#10FFFF\" w 182 h 44 ] LabelGraphics [ text \"(29)\n"
+"Brocade\n"
+"Protocol: Dummy\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 30 graphics [ type \"octagon\" fill \"#10FFFF\" outlineStyle \"dashed\" w 201 h 44 ] LabelGraphics [ text \"(30)\n"
+"Master_AI\n"
+"Protocol: I2C_RAW\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 32 graphics [ type \"rectangle\" fill \"#59FF20\" w 114 h 35 ] LabelGraphics [ text \"(32)\n"
+"Brocade_CTRL\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 31 graphics [ type \"octagon\" fill \"#10FFFF\" outlineStyle \"dashed\" w 201 h 44 ] LabelGraphics [ text \"(31)\n"
+"Slave_AI\n"
+"Protocol: SVF_RAW\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 33 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 90 h 43 ] LabelGraphics [ text \"(33)\n"
+"IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 35 graphics [ type \"trapezoid\" fill \"#FF3060\" outlineStyle \"dashed\" w 97 h 44 ] LabelGraphics [ text \"(35)\n"
+"IR_Mux\n"
+":32:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 2147483647 graphics [ type \"rectangle\" fill \"#E8E8E8\" w 199 h 90 ] LabelGraphics [ text \"Selector :32:\n"
+"Kind: Brocade\n"
+"Can_select_none: true\n"
+"Reversed_order:  true\n"
+"Inverted_bits:   false\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 1 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(1)\n"
+"Zybo.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(5)\n"
+"TAP2.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 9 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(9)\n"
+"TAP3.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 13 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(13)\n"
+"TAP4.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 17 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(17)\n"
+"TAP5.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 34 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 90 h 43 ] LabelGraphics [ text \"(34)\n"
+"DR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 36 graphics [ type \"trapezoid\" fill \"#FF3060\" outlineStyle \"dashed\" w 97 h 44 ] LabelGraphics [ text \"(36)\n"
+"DR_Mux\n"
+":32:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(2)\n"
+"Zybo\n"
+":1:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 2147483646 graphics [ type \"rectangle\" fill \"#E8E8E8\" w 209 h 90 ] LabelGraphics [ text \"Selector :1:\n"
+"Kind: Table_Based\n"
+"Can_select_none: false\n"
+"Reversed_order:  false\n"
+"Inverted_bits:   false\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 76 h 35 ] LabelGraphics [ text \"(3)\n"
+"Zybo_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 20 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(20)\n"
+"reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 6 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(6)\n"
+"TAP2\n"
+":5:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 2147483645 graphics [ type \"rectangle\" fill \"#E8E8E8\" w 209 h 90 ] LabelGraphics [ text \"Selector :5:\n"
+"Kind: Table_Based\n"
+"Can_select_none: false\n"
+"Reversed_order:  false\n"
+"Inverted_bits:   false\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 7 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(7)\n"
+"Tap_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 21 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(21)\n"
+"R_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 22 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(22)\n"
+"R_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 10 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(10)\n"
+"TAP3\n"
+":9:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 2147483644 graphics [ type \"rectangle\" fill \"#E8E8E8\" w 209 h 90 ] LabelGraphics [ text \"Selector :9:\n"
+"Kind: Table_Based\n"
+"Can_select_none: false\n"
+"Reversed_order:  false\n"
+"Inverted_bits:   false\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 11 graphics [ type \"rectangle\" fill \"#59FF20\" w 76 h 35 ] LabelGraphics [ text \"(11)\n"
+"TAP3_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 23 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(23)\n"
+"reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 24 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(24)\n"
+"reg_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 25 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(25)\n"
+"reg_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 14 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(14)\n"
+"TAP4\n"
+":13:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 2147483643 graphics [ type \"rectangle\" fill \"#E8E8E8\" w 209 h 90 ] LabelGraphics [ text \"Selector :13:\n"
+"Kind: Table_Based\n"
+"Can_select_none: false\n"
+"Reversed_order:  false\n"
+"Inverted_bits:   false\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 15 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(15)\n"
+"TAP_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 26 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(26)\n"
+"reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 18 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(18)\n"
+"TAP5\n"
+":17:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 2147483642 graphics [ type \"rectangle\" fill \"#E8E8E8\" w 209 h 90 ] LabelGraphics [ text \"Selector :17:\n"
+"Kind: Table_Based\n"
+"Can_select_none: false\n"
+"Reversed_order:  false\n"
+"Inverted_bits:   false\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 19 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(19)\n"
+"TAP_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 27 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(27)\n"
+"reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 28 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(28)\n"
+"reg_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   edge [ source 30 target 32 label \"1\" ]\n"
+"   edge [ source 29 target 30 label \"1\" ]\n"
+"   edge [ source 2147483647 target 35 graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 35 target 1 label \"1/[0x01]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 35 target 5 label \"2/[0x02]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 35 target 9 label \"3/[0x04]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 35 target 13 label \"4/[0x08]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 35 target 17 label \"5/[0x10]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 33 target 35 label \"1\" ]\n"
+"   edge [ source 31 target 33 label \"1\" ]\n"
+"   edge [ source 2147483647 target 36 graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 2147483646 target 2 graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 2 target 3 label \"1/[0b111111:S:A]\" ]\n"
+"   edge [ source 2 target 20 label \"2/[0b000001]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 36 target 2 label \"1/[0x01]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 2147483645 target 6 graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 6 target 7 label \"1/[0b111111:S:A]\" ]\n"
+"   edge [ source 6 target 21 label \"2/[0b000001]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 6 target 22 label \"3/[0b000010]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 36 target 6 label \"2/[0x02]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 2147483644 target 10 graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 10 target 11 label \"1/[0b111111:S:A]\" ]\n"
+"   edge [ source 10 target 23 label \"2/[0b000001]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 10 target 24 label \"3/[0b000010]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 10 target 25 label \"4/[0b000011]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 36 target 10 label \"3/[0x04]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 2147483643 target 14 graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 14 target 15 label \"1/[0b111111:S:A]\" ]\n"
+"   edge [ source 14 target 26 label \"2/[0b000001]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 36 target 14 label \"4/[0x08]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 2147483642 target 18 graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 18 target 19 label \"1/[0b111111:S:A]\" ]\n"
+"   edge [ source 18 target 27 label \"2/[0b000001]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 18 target 28 label \"3/[0b000010]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 36 target 18 label \"5/[0x10]\" graphics [ width 1 style \"dotted\" targetArrow \"standard\" ] ]\n"
+"   edge [ source 34 target 36 label \"1\" ]\n"
+"   edge [ source 31 target 34 label \"2\" ]\n"
+"   edge [ source 29 target 31 label \"2\" ]\n"
+"]";
 
   TS_ASSERT_EQUALS (graph, expectedGraph);
 }
 
+//! Checks SystemModel::Create_Brocade when there is just one tap
+//!
+void UT_SystemModelBuilder::test_Create_Brocade_Emulator_1xTAP ()
+{
+  // ---------------- Setup
+  //
+  SystemModel        sm;
+  SystemModelBuilder sut(sm);
+  auto I2C_Adresses   = initializer_list<uint32_t>{ 0x30u, 0x31u };
+  auto topProtocol = make_shared<Emulation_TranslatorProtocol>();
+  auto masterProtocol = make_shared<I2C_RawPlayer>(I2C_Adresses);
+  auto slaveProtocol  = make_shared<SVF_RawPlayer>();
+
+  auto tap1 = sut.Create_JTAG_TAP("TAP1", 6u, 4u, make_shared<LoopbackAccessInterfaceProtocol>());
+
+  sut.AppendRegisters(3u, "reg_", BinaryVector::CreateFromString("0xFDE"), tap1);
+
+  shared_ptr<AccessInterfaceTranslator> brocadeTop;
+
+  // ---------------- Exercise
+  //
+  TS_ASSERT_THROWS_NOTHING (brocadeTop = sut.Create_Brocade(topProtocol,masterProtocol, slaveProtocol, { tap1 }));
+   sm.ReplaceRoot(brocadeTop, false);
+
+  // ---------------- Verify
+  //
+  CxxTest::setAbortTestOnFail(true);
+
+  TS_ASSERT_NOT_NULLPTR (brocadeTop);
+
+  // Model coherency
+  auto result = SystemModelChecker::Check(sm);
+  TS_ASSERT_FALSE (result.HasIssues());
+//+  TS_TRACE (result.MakeReport());
+
+  
+  auto gotPretty      = PrettyPrinter::PrettyPrint(sm.Root(), PrettyPrinterOptions::All);
+
+  auto expectedPretty = string(
+"[Access_T](7)  \"Brocade\", Protocol: Emulation_Translator, pending: false, has_conditioner: false, priority: 0\n"
+" [Access_I](8)  \"Master_AI\", Protocol: I2C_RAW->Brocade, ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
+"  [Register](10) \"Brocade_CTRL\", length: 8, Hold value: true, bypass:            0x00\n"
+"                                                            , next_to_sut:       0x00\n"
+"                                                            , last_to_sut:       0x00\n"
+"                                                            , last_from_sut:     0x00\n"
+"                                                            , expected_from_sut: 0x00\n"
+"                                                            , pending: false, has_conditioner: false, priority: 0\n"
+" [Access_I](9)  \"Slave_AI\", Protocol: SVF_RAW->Brocade, ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
+"  [Chain](11)    \"IR\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
+"   [Linker](13)   \"IR_Mux\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
+"    :Selector:(10) \"Brocade_CTRL\", kind: Brocade, can_select_none: true, inverted_bits: false, reversed_order: true\n"
+"    Selection Table:\n"
+"      [0] 0x00\n"
+"      [1] 0x01\n"
+"    Deselection Table:\n"
+"      [0] 0xFF\n"
+"      [1] 0xFE\n"
+"    [Register](1)  \"TAP1.IR\",     :0x01:, length: 6, Hold value: true, bypass:            0b1111_11\n"
+"                                                                     , next_to_sut:       0b1111_11\n"
+"                                                                     , last_to_sut:       0b1111_11\n"
+"                                                                     , last_from_sut:     0b1111_11\n"
+"                                                                     , expected_from_sut: 0b1111_11\n"
+"                                                                     , pending: false, has_conditioner: false, priority: 0\n"
+"  [Chain](12)    \"DR\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
+"   [Linker](14)   \"DR_Mux\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
+"    :Selector:(10) \"Brocade_CTRL\", kind: Brocade, can_select_none: true, inverted_bits: false, reversed_order: true\n"
+"    Selection Table:\n"
+"      [0] 0x00\n"
+"      [1] 0x01\n"
+"    Deselection Table:\n"
+"      [0] 0xFF\n"
+"      [1] 0xFE\n"
+"    [Linker](2)    \"TAP1\",        :S:A:, pending: false, has_conditioner: false, priority: 0\n"
+"     :Selector:(1)  \"TAP1.IR\", kind: Table_Based, can_select_none: false, inverted_bits: false, reversed_order: false\n"
+"     Selection Table:\n"
+"       [0] 0b1111_11\n"
+"       [1] 0b1111_11\n"
+"       [2] 0b0000_01\n"
+"       [3] 0b0000_10\n"
+"       [4] 0b0000_11\n"
+"     Deselection Table:\n"
+"       [0] 0b1111_11\n"
+"       [1] 0b1111_11\n"
+"       [2] 0b1111_11\n"
+"       [3] 0b1111_11\n"
+"       [4] 0b1111_11\n"
+"     [Register](3)  \"TAP1_BPY\",    :0b111111:S:A:, length: 1, bypass:            0b1\n"
+"                                                            , next_to_sut:       0b1\n"
+"                                                            , last_to_sut:       0b1\n"
+"                                                            , last_from_sut:     0b1\n"
+"                                                            , expected_from_sut: 0b1\n"
+"                                                            , pending: false, has_conditioner: false, priority: 0\n"
+"     [Register](4)  \"reg_0\",       :0b000001:, length: 12, bypass:            0xFDE\n"
+"                                                         , next_to_sut:       0xFDE\n"
+"                                                         , last_to_sut:       0xFDE\n"
+"                                                         , last_from_sut:     0xFDE\n"
+"                                                         , expected_from_sut: 0xFDE\n"
+"                                                         , pending: false, has_conditioner: false, priority: 0\n"
+"     [Register](5)  \"reg_1\",       :0b000010:, length: 12, bypass:            0xFDE\n"
+"                                                         , next_to_sut:       0xFDE\n"
+"                                                         , last_to_sut:       0xFDE\n"
+"                                                         , last_from_sut:     0xFDE\n"
+"                                                         , expected_from_sut: 0xFDE\n"
+"                                                         , pending: false, has_conditioner: false, priority: 0\n"
+"     [Register](6)  \"reg_2\",       :0b000011:, length: 12, bypass:            0xFDE\n"
+"                                                         , next_to_sut:       0xFDE\n"
+"                                                         , last_to_sut:       0xFDE\n"
+"                                                         , last_from_sut:     0xFDE\n"
+"                                                         , expected_from_sut: 0xFDE\n"
+"                                                         , pending: false, has_conditioner: false, priority: 0"
+                             );
+  TS_ASSERT_EQUALS (gotPretty, expectedPretty);
+
+  auto graph         = GmlPrinter::Graph(sm.Root(), "", GmlPrinterOptions::DisplayIdentifiers | GmlPrinterOptions::ShowProtocol);
+
+
+  auto expectedGraph =  "graph\n"
+"[\n"
+"   hierarchic 1 directed 1\n"
+"   node [ id 7 graphics [ type \"octagon\" fill \"#10FFFF\" w 325 h 44 ] LabelGraphics [ text \"(7)\n"
+"Brocade\n"
+"Protocol: Emulation_Translator\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 8 graphics [ type \"octagon\" fill \"#10FFFF\" outlineStyle \"dashed\" w 201 h 44 ] LabelGraphics [ text \"(8)\n"
+"Master_AI\n"
+"Protocol: I2C_RAW\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 10 graphics [ type \"rectangle\" fill \"#59FF20\" w 114 h 35 ] LabelGraphics [ text \"(10)\n"
+"Brocade_CTRL\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 9 graphics [ type \"octagon\" fill \"#10FFFF\" outlineStyle \"dashed\" w 201 h 44 ] LabelGraphics [ text \"(9)\n"
+"Slave_AI\n"
+"Protocol: SVF_RAW\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 11 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 90 h 43 ] LabelGraphics [ text \"(11)\n"
+"IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 13 graphics [ type \"trapezoid\" fill \"#FF3060\" outlineStyle \"dashed\" w 97 h 44 ] LabelGraphics [ text \"(13)\n"
+"IR_Mux\n"
+":10:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 1 graphics [ type \"rectangle\" fill \"#59FF20\" w 66 h 35 ] LabelGraphics [ text \"(1)\n"
+"TAP1.IR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 12 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 90 h 43 ] LabelGraphics [ text \"(12)\n"
+"DR\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 14 graphics [ type \"trapezoid\" fill \"#FF3060\" outlineStyle \"dashed\" w 97 h 44 ] LabelGraphics [ text \"(14)\n"
+"DR_Mux\n"
+":10:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" w 90 h 44 ] LabelGraphics [ text \"(2)\n"
+"TAP1\n"
+":1:\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 3 graphics [ type \"rectangle\" fill \"#59FF20\" w 76 h 35 ] LabelGraphics [ text \"(3)\n"
+"TAP1_BPY\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 4 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(4)\n"
+"reg_0\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 5 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(5)\n"
+"reg_1\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   node [ id 6 graphics [ type \"rectangle\" fill \"#59FF20\" w 50 h 35 ] LabelGraphics [ text \"(6)\n"
+"reg_2\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
+"   edge [ source 8 target 10 label \"1\" ]\n"
+"   edge [ source 7 target 8 label \"1\" ]\n"
+"   edge [ source 13 target 1 label \"1\" ]\n"
+"   edge [ source 11 target 13 label \"1\" ]\n"
+"   edge [ source 9 target 11 label \"1\" ]\n"
+"   edge [ source 2 target 3 label \"1\" ]\n"
+"   edge [ source 2 target 4 label \"2\" ]\n"
+"   edge [ source 2 target 5 label \"3\" ]\n"
+"   edge [ source 2 target 6 label \"4\" ]\n"
+"   edge [ source 14 target 2 label \"1\" ]\n"
+"   edge [ source 12 target 14 label \"1\" ]\n"
+"   edge [ source 9 target 12 label \"2\" ]\n"
+"   edge [ source 7 target 9 label \"2\" ]\n"
+"]"
+;
+
+  TS_ASSERT_EQUALS (graph, expectedGraph);
+}
 
 //===========================================================================
 // End of UT_SystemModelBuilder.cpp

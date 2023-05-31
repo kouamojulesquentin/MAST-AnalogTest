@@ -84,6 +84,7 @@ message(STATUS "Master: INTEL_EXPERIMENT:       ${INTEL_EXPERIMENT}")
 message(STATUS "Master: KISSFFT:                ${KISSFFT}")
 message(STATUS "Master: C++ compiler:           ${CMAKE_CXX_COMPILER}")
 message(STATUS "Master: C   compiler:           ${CMAKE_C_COMPILER}")
+message(STATUS "Master: INSTALL_ARM:           ${INSTALL_ARM}")
 
 configure_file      ("${PROJECT_SOURCE_DIR}/MastConfig.hpp.in" "${PROJECT_BINARY_DIR}/MastConfig.hpp" @ONLY)
 include_directories ("${PROJECT_BINARY_DIR}")
@@ -108,12 +109,14 @@ add_subdirectory(External_Libs)
 add_subdirectory(External_Libs_UT)
 add_subdirectory(Logger)
 add_subdirectory(Mast_Core)
-add_subdirectory(Tests_Common)
-add_subdirectory(Readers)
 add_subdirectory(Mast_API_CPP)
 add_subdirectory(Mast_API_C)
-add_subdirectory(Mast_App)
 add_subdirectory(Tutorials)
+add_subdirectory(Applications)
+add_subdirectory(PDL_Applications)
+add_subdirectory(Readers)
+add_subdirectory(Tests_Common)
+
 
 add_subdirectory(Optional_Libs)
 
@@ -125,20 +128,37 @@ if (${KISSFFT})
   add_subdirectory(TestCasesApp)
 endif()
 
+add_subdirectory(Mast_App)
+
 add_subdirectory(MastExample_CPP)
 add_subdirectory(Mast_Core_UT)
 add_subdirectory(Mast_API_UT)
 add_subdirectory(Readers_UT)
 add_subdirectory(Optional_Libs_UT)
 
-if (USE_XML_RPC)
-  include(Export_ATE_Server.cmake)
-  include(Export_MAST_for_ATE.cmake)
+
+if (${INSTALL_ARM})
+ include(Export_MAST_for_arm.cmake)
+ set(CPACK_COMPONENTS_ALL              ARM_Build) 
 endif()
+
+if (${INSTALL_RISCV})
+ include(Export_MAST_for_riscV.cmake)
+ set(CPACK_COMPONENTS_ALL              RISCV_Build) 
+endif()
+
+#if (${USE_XML_RPC})
+#  include(Export_ATE_Server.cmake)
+#  include(Export_MAST_for_ATE.cmake)
+#endif()
+
+#include(Export_MAST_for_eval.cmake)
+
+add_subdirectory(Examples)
 
 set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY  OFF)
 set(CPACK_COMPONENTS_GROUPING         ONE_PER_GROUP)
-set(CPACK_COMPONENTS_ALL              ATE_Server ATE_Build) #SIT_Files
+#set(CPACK_COMPONENTS_ALL              ATE_Server ATE_Build ARM_Build Eval_Build) 
 
 set(CPACK_PACKAGE_VENDOR              "OWL")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY   "${CMAKE_BINARY_DIR}/${EXPORT_DIR}")

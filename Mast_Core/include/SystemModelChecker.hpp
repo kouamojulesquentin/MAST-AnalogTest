@@ -44,9 +44,11 @@ class SystemModelChecker final : public SystemModelCheckerBase, public SystemMod
 
 
   virtual void VisitAccessInterface (AccessInterface& accessInterface) override;
+  virtual void VisitAccessInterfaceTranslator (AccessInterfaceTranslator&accessInterfaceTranslator) override;
   virtual void VisitChain           (Chain&           chain)           override;
   virtual void VisitLinker          (Linker&          linker)          override;
   virtual void VisitRegister        (Register&        reg)             override;
+  virtual void VisitStreamer        (Streamer&        streamer)        override;
 
   //! Checks SystemModel consistency
   //!
@@ -88,7 +90,7 @@ class SystemModelChecker final : public SystemModelCheckerBase, public SystemMod
   void CheckAccessInterface     ();
   void CheckParentNode          (std::shared_ptr<const ParentNode> parent);
   bool CheckChildNode           (std::shared_ptr<const ParentNode> parent, std::shared_ptr<const SystemModelNode> child);
-  void CheckNumberOfEndPoints (std::shared_ptr<AccessInterface>  accessInterface);
+  void CheckNumberOfChannels (std::shared_ptr<AccessInterface>  accessInterface);
   void CheckSiblingName         (std::shared_ptr<SystemModelNode>, std::set<string_view>& childNames, std::set<string_view>& ignoredNames);
 
   // ---------------- Private  Fields

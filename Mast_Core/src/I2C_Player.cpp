@@ -30,7 +30,7 @@ using namespace std::experimental::literals::string_view_literals;
 
 //! Constructor from vector
 //!
-//! @param addresses        Array of I2C addresses for managed endpoints (value at offset 0 is reserved for reset)
+//! @param addresses        Array of I2C addresses for managed channels (value at offset 0 is reserved for reset)
 //! @param commandsPrefix   Optional text that will be prepended to actual I2C command
 //!
 I2C_Player::I2C_Player (vector<uint32_t> addresses, string commandsPrefix)
@@ -47,7 +47,7 @@ I2C_Player::I2C_Player (vector<uint32_t> addresses, string commandsPrefix)
 //! Initializes with addresses and optional prefix defined by a string
 //!
 //! @note Expected (comma separated) parameters are:
-//!   - addresses        Array of I2C addresses for managed endpoints (value at offset 0 is reserved for reset)
+//!   - addresses        Array of I2C addresses for managed channels (value at offset 0 is reserved for reset)
 //!   - commandsPrefix   Optional text that will be prepended to actual I2C command ; MUST NOT BEEN A VALID NUMBER!
 //!
 //! @note Example of parameter:
@@ -123,23 +123,23 @@ I2C_Player::I2C_Player (const std::string& parameters)
 
 
 
-//! Creates an I2C command associated to endpoint identifier and BinaryVector to send to SUT
+//! Creates an I2C command associated to channel identifier and BinaryVector to send to SUT
 //!
-//! @param addresses        Array of I2C addresses for managed endpoints (value at offset 0 is reserved)
+//! @param addresses        Array of I2C addresses for managed channels (value at offset 0 is reserved)
 //! @param commandsPrefix   Optional text that will be prepended to actual I2C command
 //!
-string I2C_Player::CreateI2CCommand (uint32_t endpointId, const BinaryVector& toSutData)
+string I2C_Player::CreateI2CCommand (uint32_t channelId, const BinaryVector& toSutData)
 {
   ostringstream os;
   string_view commandType;
 
-  if (endpointId == 0)
+  if (channelId == 0)
   {
     os << m_commandPrefix << "I2C_RESET()\n";
   }
   else
   {
-    auto address = GetAddress(endpointId);
+    auto address = GetAddress(channelId);
 
     os << m_commandPrefix << "I2C_READ(0x"  << std::hex << address << ")\n";
     os << m_commandPrefix << "I2C_WRITE(0x" << std::hex << address << ", " << toSutData.DataAsMixString() << ")\n";
@@ -154,18 +154,18 @@ string I2C_Player::CreateI2CCommand (uint32_t endpointId, const BinaryVector& to
 //---------------------------------------------------------------------------
 
 
-//! Returns address for specified endpoint
+//! Returns address for specified channel
 //!
-//! @param endpointId   EndPoint identifier [1..N]
+//! @param channelId   Channel identifier [1..N]
 //!
-uint32_t I2C_Player::GetAddress (uint32_t endpointId) const
+uint32_t I2C_Player::GetAddress (uint32_t channelId) const
 {
-  if (endpointId >= m_addresses.size())
+  if (channelId >= m_addresses.size())
   {
-    THROW_INVALID_ARGUMENT("EndPointId must be '0' for Reset or '1' to "s + std::to_string(m_addresses.size() - 1));
+    THROW_INVALID_ARGUMENT("ChannelId must be '0' for Reset or '1' to "s + std::to_string(m_addresses.size() - 1));
   }
 
-  auto address = m_addresses[endpointId];
+  auto address = m_addresses[channelId];
   return address;
 }
 //

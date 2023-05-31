@@ -1,0 +1,94 @@
+//===========================================================================
+//                           SVF_RawPlayer.cpp
+//===========================================================================
+// Copyright (C) 2016 G-INP/Tima. All rights reserved.
+//
+// Project : Mast
+//
+//! @file SVF_RawPlayer.cpp
+//!
+//! Implements class SVF_RawPlayer
+//!
+//===========================================================================
+
+#include "SVF_RawPlayer.hpp"
+#include "SVFVector.hpp"
+#include "Utility.hpp"
+#include "RVF.hpp"
+
+#include <experimental/string_view>
+#include <sstream>
+
+using namespace mast;
+using std::string;
+using std::experimental::string_view;
+using std::ostringstream;
+
+
+//! sends request for TRST,SIR and SDR callbacks and waits for response
+
+BinaryVector SVF_RawPlayer::DoCallback (uint32_t channelId, void* /* interfaceData */, const BinaryVector& toSutData)
+{
+  BinaryVector result;
+  string svfFormattedData;
+  BinaryVector callback_toSutData;
+
+  auto FormatSVFData = [] (BinaryVector RawData)
+  {
+  //Prepare formatted SVF data
+  ostringstream os;
+  os << RawData.BitsCount() << " TDI(" << SVFVector(RawData).Data() << ");";
+  return os.str();
+  };
+  //Prepare formatted SVF data
+//  ostringstream os;
+//  os << toSutData.BitsCount() << " TDI(" << SVFVector(toSutData).Data() << ");";
+
+  if (channelId != 0) //No data in the request dor Reset operation
+      {
+//      svfFormattedData = os.str();
+      svfFormattedData = FormatSVFData(toSutData);
+      callback_toSutData = toSutData;
+      }
+
+  //Many Unit Test depend on FormattedData
+  RVFRequest request(CallbackId(channelId),callback_toSutData,svfFormattedData);
+
+  PushRequest(request);
+  
+                       /*NB: this is a BLOCKING call*/
+     result = PopfromSut();
+   
+
+ //Update Cycle count
+      switch (channelId){
+       case 0: this->increaseElapsedCycles(nTRST_OVERHEAD_CYCLES); break; 
+       case 1: this->increaseElapsedCycles(SIR_OVERHEAD_CYCLES+toSutData.BitsCount()); break;
+       case 2: this->increaseElapsedCycles(SDR_OVERHEAD_CYCLES+toSutData.BitsCount()); break;
+       default: ; //Should never arrive here, a runtime error would have been thrown before by "CallbackId"
+      }
+
+  return result;
+}
+
+//! Forces the ResetPort to be asserted on the target module
+//!
+//! @param doSynchronousReset   When true, reset shall be done by issuing a synchronous reset sequence
+//!
+void SVF_RawPlayer::DoReset(bool doSynchronousReset)
+{
+  if (doSynchronousReset){}; //Null operation, used to silence warning
+
+  RVFRequest request(CallbackId(0));
+  PushRequest(request);
+  PopfromSut();
+}
+
+//
+//  End of: SVF_RawPlayer::DoReset
+//---------------------------------------------------------------------------
+
+
+//===========================================================================
+// End of SVF_RawPlayer.cpp
+//===========================================================================

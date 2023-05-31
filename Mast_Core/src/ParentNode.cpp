@@ -184,28 +184,28 @@ void ParentNode::DisconnectChild (shared_ptr<SystemModelNode> child)
 //---------------------------------------------------------------------------
 
 
-//! Disconnects a endpoint from the parent
+//! Disconnects a channel from the parent
 //!
-//! @param endpointId Identifies the endpoint to disconnect
+//! @param channelId Identifies the channel to disconnect
 //!
-//! @return Disconnected endpoint
+//! @return Disconnected channel
 //!
-shared_ptr<SystemModelNode> ParentNode::DisconnectEndPoint (uint32_t endpointId)
+shared_ptr<SystemModelNode> ParentNode::DisconnectChannel (uint32_t channelId)
 {
-  CHECK_PARAMETER_NOT_ZERO (endpointId,  "Cannot remove endpoint '0'");
-  CHECK_VALUE_NOT_NULL     (m_pFirstChild, "Cannot disconnect a endpoint when there is no child");
+  CHECK_PARAMETER_NOT_ZERO (channelId,  "Cannot remove channel '0'");
+  CHECK_VALUE_NOT_NULL     (m_pFirstChild, "Cannot disconnect a channel when there is no child");
 
   uint32_t currentId       = 1u;
   auto     currentChild    = m_pFirstChild;
   auto     previousSibling = shared_ptr<SystemModelNode>();
 
-  while (currentId != endpointId)
+  while (currentId != channelId)
   {
     previousSibling = currentChild;
     currentChild    = currentChild->NextSibling();
 
-    CHECK_VALUE_NOT_NULL (currentChild, "Cannot disconnect endpoint "s + to_string(endpointId) +
-                                        " when there is/are only "       + to_string(currentId) + " endpoint(s)");
+    CHECK_VALUE_NOT_NULL (currentChild, "Cannot disconnect channel "s + to_string(channelId) +
+                                        " when there is/are only "       + to_string(currentId) + " channel(s)");
     ++currentId;
   }
 
@@ -214,7 +214,7 @@ shared_ptr<SystemModelNode> ParentNode::DisconnectEndPoint (uint32_t endpointId)
   return currentChild;
 }
 //
-//  End of: ParentNode::DisconnectEndPoint
+//  End of: ParentNode::DisconnectChannel
 //---------------------------------------------------------------------------
 
 

@@ -2700,6 +2700,70 @@ void UT_BinaryVector::test_Constructor_FromRawDataVector_Moved ()
   TS_DATA_DRIVEN_TEST (checker, data);
 }
 
+//! Checks BinaryVector constructor from data in a C array (uint8_t)
+//!
+//! @note Suppose that operator== is working properly
+void UT_BinaryVector::test_Constructor_FromR_C_Array ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    
+    uint32_t bitsCount = std::get<0>(data);
+    string_view expected_string = std::get<1>(data);
+    uint8_t* C_buffer = std::get<2>(data);
+    // ---------------- Setup
+    //
+
+    
+    auto expected  = BinaryVector::CreateFromString(expected_string);
+    
+    auto bytesCount = (bitsCount%8==0)? bitsCount/8 : bitsCount/8+1;
+    
+
+    vector<uint8_t> C_Data;
+    for (auto i=0;i<bytesCount;i++)
+       C_Data.push_back(C_buffer[i]);
+    
+    // ---------------- Exercise
+    //
+    BinaryVector sut(C_Data, bitsCount);
+    
+    
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut, expected);
+  };
+  
+  int n_tests = 2;
+
+  uint8_t  C_Data_zeros[] = {0x00, 0x00, 0x00,0x00,0x00,0xFF};
+  uint8_t  C_Data_ones[12]; 
+  memset(C_Data_ones,0xFF, 12);
+		       
+  uint8_t  C_Data_arbitrary[] = {0x61, 0x23, 0x45,0x67,0x90,0xFF};
+    
+  using data_t = tuple< uint32_t, string_view,uint8_t*>;
+  auto  data =
+  {
+    data_t(1,     "0b0",C_Data_zeros),                 // 01
+    data_t(13,    "0b0000_0000:0000_0",C_Data_zeros ), // 02
+    data_t(1,     "0b1",C_Data_ones),                  // 03
+    data_t(2,     "0b01",C_Data_arbitrary),            // 04
+    data_t(4,     "0x6",C_Data_arbitrary),             // 05
+    data_t(8,     "0x61",C_Data_arbitrary),            // 06
+    data_t(12,    "0x612",C_Data_arbitrary),           // 07
+    data_t(13,    "0x612/b0",C_Data_arbitrary),        // 08
+    data_t(6*8,   "0x6123456790FF",C_Data_arbitrary),  // 09
+};
+
+  // ---------------- DDT Exercise
+  //
+  
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
 
 //! Checks Append when sut is empty and adding 8 bits from  int8_t
 //!
@@ -7927,6 +7991,75 @@ void UT_BinaryVector::test_Slice_When_Exceeding_Capacity ()
     make_tuple("1001",   4, 1), // 05
     make_tuple("1011_1", 0, 6), // 06
     make_tuple("1011",   1, 5), // 07
+  };
+
+  // ---------------- DDT Exercise
+  //
+  TS_DATA_DRIVEN_TEST (checker, data);
+}
+
+
+//! Checks BinaryVector::Slice()
+//!
+void UT_BinaryVector::test_ReverseSlice ()
+{
+  // ---------------- DDT Setup
+  //
+  auto checker = [](auto data)
+  {
+    // ---------------- Setup
+    //
+    string_view sutBits      = std::get<0>(data);
+    uint32_t    firstBit     = std::get<1>(data);
+    uint32_t    bitsCount    = std::get<2>(data);
+    string_view expectedBits = std::get<3>(data);
+
+    auto sut      = BinaryVector::CreateFromBinaryString(sutBits);
+    auto expected = BinaryVector::CreateFromBinaryString(expectedBits);
+
+    // ---------------- Exercise
+    //
+    auto result = sut.ReverseSlice(firstBit, bitsCount);
+
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (result, expected);
+  };
+
+  auto data =
+  {
+    //   Bits: sut,                              firstBit, bitsCount, expected
+    make_tuple("",                                            0,  0,  ""),                       // 00
+    make_tuple("",                                            1,  0,  ""),                       // 01
+    make_tuple("0",                                           0,  1,  "0"),                      // 02
+    make_tuple("1",                                           0,  1,  "1"),                      // 03
+    make_tuple("10",                                          0,  1,  "1"),                      // 04
+    make_tuple("10",                                          0,  2,  "01"),                     // 05
+    make_tuple("1011",                                        1,  1,  "0"),                      // 06
+    make_tuple("1001",                                        1,  2,  "00"),                     // 07
+    make_tuple("1011_0",                                      1,  3,  "110"),                    // 08
+    make_tuple("1011_1",                                      1,  4,  "1110"),                   // 09
+    make_tuple("1011_1101:101",                               1,  5,  "111_10"),                 // 10
+    make_tuple("1011_1101:101",                               1,  6,  "0111_10"),                // 11
+    make_tuple("1011_1101:101",                               1,  7,  "101_111_0"),              // 12
+    make_tuple("1011_1101:101",                               1,  8,  "1_101_111_0"),            // 13
+    make_tuple("1011_0101:101",                               2,  3,  "011"),                    // 14
+    make_tuple("1011_1101:101",                               2,  5,  "0_1111"),                 // 15
+    make_tuple("1011_1101:101",                               2,  6,  "10_1111"),                // 16
+    make_tuple("1011_1101:101",                               2,  7,  "110_1111"),               // 17
+    make_tuple("1011_1101:101",                               2,  8,  "0110_1111"),              // 18
+    make_tuple("1011_1101:101",                               2,  9,  "1:0110_1111"),            // 19
+    make_tuple("1011_1101:1011_1110:0101",                    3,  10, "11:1011_0111"),           // 20 
+    make_tuple("1011_1101:1011_1110:0101",                    4,  10, "11:1101_1011"),           // 21
+    make_tuple("1011_1101:1011_1110:0101",                    5,  11, "011:1110_1101"),          // 22
+    make_tuple("1011_1101:1011_1110:0101",                    6,  12, "1001:1111_0110"),         // 23 
+    make_tuple("1011_1101:1011_1110:0101",                    7,  12, "0100_1111:1011"),         // 24
+    make_tuple("1011_1101:1011_1110:0101_1001",               8,  13, "1_1010:0111_1101"),       // 25
+    make_tuple("1001_1010:1011_1100:1101_1110",               9,  14, "11_1101:1001_1110"),      // 26
+    make_tuple("1011_1101:1011_1110:0101_1001:0101_1010:11",  14, 15, "110_1010:0110_1001"),     // 27
+    make_tuple("1011_1101:1011_1110:0101_1001:0101_1010:11",  15, 16, "1011_0101:0011_0100"),    // 28
+    make_tuple("1011_1101:1011_1110:0101_1001:0101_1010:11",  16, 17, "1:0101_1010:1001_1010"),  // 29
+    make_tuple("1011_1101:1011_1110:0101_1001:0101_1010:110", 17, 18, "01:1010_1101:0100_1101"), // 30
   };
 
   // ---------------- DDT Exercise

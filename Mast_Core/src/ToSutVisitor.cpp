@@ -22,15 +22,26 @@ using namespace mast;
 //! Stops recursing down the model hierarchy
 //!
 //! @note ToSutVisitor must stop at AccessInterface boundary in order to manage hierarchical processing of the model
-//!       By CONSEQUENCE it MUST NOT initially be started on an AccessInterface BUT successively on its endpoints (children)
+//!       By CONSEQUENCE it MUST NOT initially be started on an AccessInterface BUT successively on its channels (children)
 //!
 void ToSutVisitor::VisitAccessInterface (AccessInterface& /* accessInterface */)
 {
+ LOG(INFO) <<"RVF : Retargeter needs to push this vector to SUT: "<<m_toSutVector.DataAsHexString();
 }
 //
 //  End of: ToSutVisitor::VisitAccessInterface
 //---------------------------------------------------------------------------
 
+
+//! Visits AccessInterfaceTranslator pending children
+//!
+void ToSutVisitor::VisitAccessInterfaceTranslator (AccessInterfaceTranslator& accessInterfaceTranslator)
+{
+  VisitChildren(accessInterfaceTranslator);
+}
+//
+//  End of: ToSutVisitor::VisitAccessInterfaceTranslator
+//---------------------------------------------------------------------------
 
 
 //! Visits Chain pending children
@@ -43,6 +54,22 @@ void ToSutVisitor::VisitChain (Chain& chain)
 //  End of: ToSutVisitor::VisitChain
 //---------------------------------------------------------------------------
 
+//! Visits Streamer pending children
+//!
+void ToSutVisitor::VisitStreamer (Streamer& streamer)
+{
+  Streamer_Level Current_Level;
+  std::get<0>(Current_Level) = m_toSutVector.BitsCount(); //Save position of streamer INPUT
+  
+  VisitChildren(streamer);
+  
+  std::get<1>(Current_Level) = m_toSutVector.BitsCount(); //Save position of streamer OUTPUT
+  std::get<2>(Current_Level) = streamer.Identifier(); //Save reference to streamer node
+  m_ActiveStreamers.emplace_back(Current_Level);
+}
+//
+//  End of: ToSutVisitor::VisitStreamer
+//---------------------------------------------------------------------------
 
 
 
@@ -77,7 +104,6 @@ void ToSutVisitor::VisitRegister (Register& reg)
 //
 //  End of: ToSutVisitor::VisitRegister
 //---------------------------------------------------------------------------
-
 
 
 //===========================================================================

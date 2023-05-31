@@ -16,12 +16,14 @@
 
 #include "PathSelector.hpp"
 #include "Mast_Core_export.hpp"
+#include "SystemModel.hpp"
 
 #include <functional>
 #include <memory>
 #include <map>
 #include <string>
 #include <experimental/string_view>
+#include <vector>
 
 namespace mast
 {
@@ -43,6 +45,8 @@ class MAST_CORE_EXPORT PathSelectorFactory
   using Creator_Std_t        = std::function<std::unique_ptr<PathSelector>(uint32_t pathsCount, SelectorProperty   properties, std::shared_ptr<Register> associatedRegister)>; //!< Creators to create a "standard" path selector
   using Creator_Custom_t     = std::function<std::unique_ptr<PathSelector>(uint32_t pathsCount, const std::string& parameters, std::shared_ptr<Register> associatedRegister)>; //!< Creators to create "custom" path selector driven by a Register in model
   using Creator_FullCustom_t = std::function<std::unique_ptr<PathSelector>(uint32_t pathsCount, const std::string& parameters)>;                                               //!< Creators to create "custom" path selector NOT DRIVEN by a Register in model
+  using Creator_HybridCustom_t     = std::function<std::unique_ptr<PathSelector>(uint32_t pathsCount, const std::string& parameters, std::vector<std::shared_ptr<Register>> associatedRegister)>; //!< Creators to create "custom" path selector driven by a multiple Registers in model
+  using Creator_GenericCustom_t     = std::function<std::unique_ptr<PathSelector>(uint32_t pathsCount, const std::string& parameters, std::vector<std::shared_ptr<SystemModelNode>> associatedNodes)>; //!< Creators to create "custom" path selector driven by a multiple Registers in model
 
   //! Returns the number of factories currently registered (associated with a name)
   //!
@@ -73,7 +77,32 @@ class MAST_CORE_EXPORT PathSelectorFactory
     m_customCreators[creatorId] = creator;
   }
 
-  //! Register an instance creation method for "custom" path selector that DO NOT USE Register described by the SystemModel
+  //! Register an instance creation method for "hybrid" path selector that DO NOT USE Register described by the SystemModel
+  //!
+  //! @note If a factory already exists with the same factory name, it is replaced with the new one
+  //!
+  //! @param creatorId  Name associated with the creation function (typically named after the actual type to create)
+  //! @param creator    Function that can create an instance of type associated with the concrete factory
+  //!
+  void RegisterCreator(const std::string& creatorId, Creator_HybridCustom_t creator)
+  {
+    m_HybridCustomCreators[creatorId] = creator;
+  }
+
+  //! Register an instance creation method for "Generic" path selector that DO NOT USE Register described by the SystemModel
+  //!
+  //! @note If a factory already exists with the same factory name, it is replaced with the new one
+  //!
+  //! @param creatorId  Name associated with the creation function (typically named after the actual type to create)
+  //! @param creator    Function that can create an instance of type associated with the concrete factory
+  //!
+  void RegisterCreator(const std::string& creatorId, Creator_GenericCustom_t creator)
+  {
+    m_GenericCustomCreators[creatorId] = creator;
+  }
+
+
+  //! Register an instance creation method for "custom" path selector that used two Registers described by the SystemModel
   //!
   //! @note If a factory already exists with the same factory name, it is replaced with the new one
   //!
@@ -84,7 +113,6 @@ class MAST_CORE_EXPORT PathSelectorFactory
   {
     m_fullCustomCreators[creatorId] = creator;
   }
-
   //! Removes any, registered, factory
   //!
   void Clear();
@@ -116,6 +144,23 @@ class MAST_CORE_EXPORT PathSelectorFactory
   //!
   virtual std::unique_ptr<PathSelector> Create(const std::string& creatorId, uint32_t pathsCount, const std::string& parameters, std::shared_ptr<Register> associatedRegister) const;
 
+  //! Creates an PathSelector using registered creation function
+  //!
+  //! @param creatorId           A name that identified registered creation function
+  //! @param pathsCount          Number of managed paths (including, optional, bypass register)
+  //! @param parameters          String of (optional) parameters
+  //! @param associatedRegisters  Registers that are used to drive the path multiplexer
+  //!
+  virtual std::unique_ptr<PathSelector> Create(const std::string& creatorId, uint32_t pathsCount, const std::string& parameters, std::vector<std::shared_ptr<Register>> associatedRegisters) const;
+ 
+  //! Creates an PathSelector using registered creation function
+  //!
+  //! @param creatorId           A name that identified registered creation function
+  //! @param pathsCount          Number of managed paths (including, optional, bypass register)
+  //! @param parameters          String of (optional) parameters
+  //! @param associatedNodes     Nodes that are used to drive the path multiplexer
+  //!
+  virtual std::unique_ptr<PathSelector> Create(const std::string& creatorId, uint32_t pathsCount, const std::string& parameters, std::vector<std::shared_ptr<SystemModelNode>> associatedNodes) const;
 
   //! Fills up with default PathSelector
   //!
@@ -166,6 +211,8 @@ class MAST_CORE_EXPORT PathSelectorFactory
   std::map<std::string, Creator_Std_t>        m_stdCreators;        //!< Creators function to create "standard" PathSelector
   std::map<std::string, Creator_Custom_t>     m_customCreators;     //!< Creators function to create "Custom" PathSelector
   std::map<std::string, Creator_FullCustom_t> m_fullCustomCreators; //!< Creators function to create "Full Custom" PathSelector
+  std::map<std::string, Creator_HybridCustom_t> m_HybridCustomCreators; //!< Creators function to create "Hybrid" PathSelector
+  std::map<std::string, Creator_GenericCustom_t> m_GenericCustomCreators; //!< Creators function to create "Generic" PathSelector
 };
 //
 //  End of PathSelectorFactory class declaration

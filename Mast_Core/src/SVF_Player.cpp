@@ -24,13 +24,13 @@ using std::experimental::string_view;
 using std::ostringstream;
 
 
-//! Creates an SVF command associated to endpoint identifier and BinaryVector to send to SUT
+//! Creates an SVF command associated to Channel identifier and BinaryVector to send to SUT
 //!
-string SVF_Player::CreateSVFCommand (uint32_t endpointId, const BinaryVector& toSutData) const
+string SVF_Player::CreateSVFCommand (uint32_t channelId, const BinaryVector& toSutData) const
 {
   string_view commandType;
 
-  switch (endpointId)
+  switch (channelId)
   {
     case 0u:
       return CreateResetSVFCommand(false);
@@ -41,7 +41,7 @@ string SVF_Player::CreateSVFCommand (uint32_t endpointId, const BinaryVector& to
       commandType = "SDR";
       break;
     default:
-      THROW_INVALID_ARGUMENT("EndPointId must be '0' (for Reset), '1' (for SIR) or '2' (for SDR)");
+      THROW_INVALID_ARGUMENT("ChannelId must be '0' (for Reset), '1' (for SIR) or '2' (for SDR)");
       break;
   }
 

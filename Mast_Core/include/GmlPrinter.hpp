@@ -65,9 +65,11 @@ class MAST_CORE_EXPORT GmlPrinter : public SystemModelVisitor
   GmlPrinter(string_view graphName, GmlPrinterOptions options = GmlPrinterOptions::Default);
 
   virtual void VisitAccessInterface (AccessInterface& accessInterface) override;
+  virtual void VisitAccessInterfaceTranslator (AccessInterfaceTranslator&accessInterfaceTranslator) override;
   virtual void VisitChain           (Chain&           chain)           override;
   virtual void VisitLinker          (Linker&          linker)          override;
   virtual void VisitRegister        (Register&        reg)             override;
+  virtual void VisitStreamer        (Streamer&        streamer)        override;
 
   std::string  Graph();  //!< Returns currently visited nodes graph representation
 

@@ -13,6 +13,8 @@
 
 #ifndef H_MAST_CHECK_LICENSE
 #define H_MAST_CHECK_LICENSE
+
+#include "mast_license.hpp"
 using std::pair;
 
 //! returns TRUE if license check succeeds, FALSE otherwise

@@ -85,7 +85,8 @@ void UT_Register::setUp ()
 //!       This is the minimal memory usage (when it is empty)
 void UT_Register::test_Sizeof ()
 {
-  TS_ASSERT_LESS_THAN_EQUALS (sizeof(Register), 392u);     // On Windows (32 bits), it is far less, even though in both case sizeof(int) is 4!
+//  TS_ASSERT_LESS_THAN_EQUALS (sizeof(Register), 392u);     // On Windows (32 bits), it is far less, even though in both case sizeof(int) is 4!
+  TS_ASSERT_LESS_THAN_EQUALS (sizeof(Register), 400u);     // m_isBlackBox adds 8 additional bits
 }
 
 
@@ -662,6 +663,26 @@ void UT_Register::test_HoldValue ()
   TS_ASSERT_EQUALS (sut.NextToSut(),      newValue);
   TS_ASSERT_EQUALS (sut.BypassSequence(), newValue);
 }
+
+//! Checks Register::SetToSut() with a proper value from uint8_t
+//!
+void UT_Register::test_BlackBox ()
+{
+  // ---------------- DDT Setup
+  //
+  const auto initial  = BinaryVector::CreateFromBinaryString("1111_1111:0");
+    Register sut("Reg", initial, true);
+
+    TS_ASSERT_EQUALS (sut.isBlackBox(), false);
+    // ---------------- Exercise
+    //
+    sut.SetAsBlackBox();
+    // ---------------- Verify
+    //
+    TS_ASSERT_EQUALS (sut.isBlackBox(), true);
+
+}
+
 
 //! Checks Register::SetToSut() with a proper value from uint8_t
 //!

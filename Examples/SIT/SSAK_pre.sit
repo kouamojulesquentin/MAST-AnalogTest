@@ -1,0 +1,24 @@
+TRANSLATOR top Simulation
+ (
+ JTAG_TAP TAP 4 1
+ (
+ CHAIN SSAK_Demo
+ {
+  SIB SSAK_SIB PRE HIGH
+   (
+    LINKER SSAK_Controller SSAK SSAK_CONTROL_REG  1 "0x72c4358f5a8a07af3d0f7d560a872a2b 13"
+     (
+     REGISTER SSAK_CONTROL_REG 128 Bypass: "0x00000000000000000000000000000000"
+     )
+    ) 
+  REGISTER S2IB_1_ctrl 1 Hold_value Bypass: "0b0"
+  LINKER S2IB_1 S2IB SSAK_Controller,S2IB_1_ctrl  1 "1"
+  PDL Console_Incr
+   (
+   REGISTER reg 12 Bypass: "0xABC"
+   )
+ }
+ )
+) 
+
+ 

@@ -43,6 +43,11 @@ class SystemModelManagerMonitor;
 class SystemModelManager_impl;
 class ConfigurationAlgorithm;
 class BinaryVector;
+enum class iNoteType
+    {
+    Status,
+    Comment
+    };
 
 //! Implements actual SystemModelManager.
 //!
@@ -202,6 +207,22 @@ class SystemModelManager_impl final
   void iWrite (string_view registerPath, int32_t      value);
   void iWrite (string_view registerPath, int64_t      value);
 
+  //! Sets next Register value to sent to SUT for a BlackBox
+  //!
+  void iScan (string_view registerPath, BinaryVector value);
+
+  //! Sets next Register and Expected values to SUT for a BlackBox
+  //!
+  void iScan (string_view registerPath, BinaryVector value, BinaryVector expectedValue);
+
+  //! Logs messages following IEEE 1687-2014
+  //!
+  void iNote (iNoteType severity,string_view message);
+
+  //! Waits for all threads to be pendingbefore  triggering a DataCycle (default is false)
+  //
+  void setwaitFullPending (bool waitFullPending) { m_waitFullPending = waitFullPending; }
+
   //! Returns current maximum time between an iApply and the next data cycle
   //!
   std::chrono::milliseconds DataCycleLoopTimeout() const { return m_dataCycleLoopTimeout; }
@@ -233,7 +254,7 @@ class SystemModelManager_impl final
   // ---------------- Private  Methods
   //
   private:
-  static std::shared_ptr<AccessInterface> GetFirstAccessInterface(const SystemModel& sm);
+  static std::shared_ptr<ParentNode> GetFirstAccessNode(const SystemModel& sm);
 
   template<typename T> uint32_t iGetStatus (T you_should_call_iStatus_with_path_and_clear_counter_parameters); //!< Non implemented version to avoid implicit conversion from char* to bool
 
@@ -244,6 +265,8 @@ class SystemModelManager_impl final
   template<typename T> void iRead_impl       (string_view registerPath, T  expectedValue);
   template<typename T> void iRead_impl       (string_view registerPath, T  expectedValue, T dontCareMask);
   template<typename T> void iWrite_impl      (string_view registerPath, T  value);
+  template<typename T> void iScan_impl      (string_view registerPath, T  value);
+  template<typename T> void iScan_impl      (string_view registerPath, T  value, T  expectedValue);
 
   struct QueuedRequest
   {
@@ -301,7 +324,6 @@ class SystemModelManager_impl final
   std::shared_ptr<ApplicationData> ApplicationDataForThreadId (std::thread::id threadId) const;
   std::shared_ptr<ApplicationData> ThreadApplicationData() const { return ApplicationDataForThreadId(std::this_thread::get_id()); }
 
-
   const NodePathResolver& PathResolver(const char* file, const char* fct, uint32_t line, std::experimental::string_view msg);
 
   void ProcessQueuedRequests (std::shared_ptr<ApplicationData> appData);
@@ -310,9 +332,9 @@ class SystemModelManager_impl final
 
   friend class DataCycleVisitor;
 
-  //! Triggers a data cycle on the Endpoints of the currentAccessInterface
+  //! Triggers a data cycle on the Channels of the currentAccessInterface
   //!
-  void DoHierarchicalDataCycle (AccessInterface* currentAccessInterface, AccessInterface* interfaceTranslator = nullptr);
+  void DoHierarchicalDataCycle (AccessInterface* currentAccessInterface);
   void RegisterPendingThread (std::shared_ptr<Register> reg);
   void ReleaseServedThreads ();
   void ReportServedRegisters (const std::vector<NodeIdentifier>& activeRegisters);
@@ -323,7 +345,7 @@ class SystemModelManager_impl final
   private:
   // Data cycle support
   SystemModel&                               m_sm;                   //!< The system model to manage
-  std::shared_ptr<AccessInterface>           m_firstAccessInterface; //!< The first AccessInterface of the system
+  std::shared_ptr<ParentNode>           m_firstAccessNode; //!< The first AccessInterface of the system
   ConfigureVisitor                           m_configurator;         //!< In charge of configuration
   PropagatePendingVisitor                    m_propagator;           //!< In charge of propagating pending status bottom up
   FromSutUpdater                             m_fromSutUpdater;       //!< In charge of updating SystemModel from bitstream from SUT
@@ -351,6 +373,13 @@ class SystemModelManager_impl final
   ThreadToAppDataMapper_t          m_threadToAppData;                //!< Associates a thread id with application data for that thread
   std::shared_ptr<ApplicationData> m_mainThreadAppData;              //!< For single thread model, this is the associated application data
   std::vector<std::exception_ptr>  m_applicationsExceptions;         //!< Collects exceptions thrown by PDL applications (on their own thread)
+  uint32_t                         m_activeThreads;                  //!< Counts Applications Threads currently active 
+  bool                          m_waitFullPending;        //!< Waits for all threads to be pending before triggering a data cycle  
+  bool                          m_KillAllThreads=false;  //!<When closing Manager, forcefully kill all application threads
+  std::string			m_OriginalExceptionMessage;      //!<Exception generating forced halt during Data Cycle
+
+  typedef std::tuple <uint32_t,uint32_t,NodeIdentifier> Streamer_Level;
+  std::vector <Streamer_Level>  m_ActiveStreamers;    //!>Streamers on the active scan path
 };
 //
 //  End of SystemModelManager_impl class declaration

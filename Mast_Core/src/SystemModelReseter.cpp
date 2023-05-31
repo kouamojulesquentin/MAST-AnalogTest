@@ -18,6 +18,12 @@
 using namespace mast;
 
 
+//! TODO: still empty, needs to clear up chains!
+//!
+void SystemModelReseter::VisitAccessInterfaceTranslator (AccessInterfaceTranslator& accessInterfaceTranslator)
+{
+  VisitParent(accessInterfaceTranslator);
+}
 
 //! Resets Linker and all its children nodes then issue a reset sequence at the AccessInterface level
 //!
@@ -32,6 +38,13 @@ void SystemModelReseter::VisitAccessInterface (AccessInterface& accessInterface)
 void SystemModelReseter::VisitChain (Chain& chain)
 {
   VisitParent(chain);
+}
+
+//! Resets Streamer and all its children nodes
+//!
+void SystemModelReseter::VisitStreamer (Streamer& streamer)
+{
+  VisitParent(streamer);
 }
 
 //! Resets Linker and all its children nodes
@@ -55,7 +68,7 @@ void SystemModelReseter::VisitParent (ParentNode& parent)
 //---------------------------------------------------------------------------
 
 
-//! Collects mismatches of a Register
+//! Resets a Register
 //!
 void SystemModelReseter::VisitRegister (Register& reg)
 {

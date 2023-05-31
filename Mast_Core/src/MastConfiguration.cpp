@@ -157,6 +157,7 @@ MastConfiguration::MastConfiguration ()
   , m_gmlGraphName                ("DUT")
   , m_prettyPrintingFilePath      ("MastModel.txt")
   , m_managerActivityFileBasePath ("DUT")
+  , m_waitFullPending             (false)
 {
 }
 //
@@ -367,6 +368,7 @@ void MastConfiguration::ParseYamlConfiguration (const string& yamlConfiguration)
 
     updateDuration (m_minTimeBetweenCycles, {"Manager", "Min_time_between_cycles"});
     updateDuration (m_maxTimeBetweenCycles, {"Manager", "Max_time_between_cycles"});
+    updateBool     (m_waitFullPending,      {"Manager", "WaitFullPending"});
   }
 }
 //

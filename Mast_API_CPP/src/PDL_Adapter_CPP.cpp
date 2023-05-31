@@ -34,6 +34,7 @@ using namespace mast;
 
 namespace
 {
+
 //! Copies binary vector bits as a C-Style string
 //!
 //! @param binVector  A BinaryVector to "export" to C-Style string
@@ -117,8 +118,26 @@ template<typename T> void iWrite_impl(string_view registerPath, T value)
   auto manager = GetAndCheckManager();
   manager->iWrite(registerPath, std::move(value));
 }
-} // End of unnamed namespace
 
+
+template<typename T> void iScan_impl(string_view registerPath, T value)
+{
+  CHECK_REGISTER_PATH(registerPath);
+
+  auto manager = GetAndCheckManager();
+  manager->iScan(registerPath, std::move(value));
+}
+
+
+template<typename T> void iScan_impl(string_view registerPath, T value, T expectedValue)
+{
+  CHECK_REGISTER_PATH(registerPath);
+
+  auto manager = GetAndCheckManager();
+  manager->iScan(registerPath, std::move(value),std::move(expectedValue));
+}
+
+} // End of unnamed namespace
 
 
 //! Waits for all queued operations to be executed
@@ -129,7 +148,10 @@ void mast::iApply ()
   manager->iApply();
 }
 
-
+void mast::iNote_impl (iNoteType severity, string_view message) {
+  auto manager = GetAndCheckManager();
+  manager->iNote (severity,message);
+}
 
 void mast::iGet (string_view registerPath, uint8_t&  readData) { iGet_impl(registerPath, readData); }
 void mast::iGet (string_view registerPath, uint16_t& readData) { iGet_impl(registerPath, readData); }
@@ -272,6 +294,15 @@ void mast::iWrite (string_view registerPath, int16_t     value) { iWrite_impl(re
 void mast::iWrite (string_view registerPath, int32_t     value) { iWrite_impl(registerPath, value); }
 void mast::iWrite (string_view registerPath, int64_t     value) { iWrite_impl(registerPath, value); }
 void mast::iWrite (string_view registerPath, string_view value) { iWrite_impl(registerPath, BinaryVector::CreateFromString(value)); }
+
+//! iScan is like an iWrite+iRead, but can only be executed on a BlackBox
+void mast::iScan (string_view registerPath, string_view value) { iScan_impl(registerPath, BinaryVector::CreateFromString(value)); }
+void mast::iScan (string_view registerPath, string_view value,string_view expectedValue) { iScan_impl(registerPath, BinaryVector::CreateFromString(value), BinaryVector::CreateFromString(expectedValue)); }
+
+
+//! iNote is implemented as a wrapper for the logger
+void mast::iNote (iNoteType severity, string_view message) { iNote_impl(severity, message);}
+
 
 //===========================================================================
 // End of PDL_Adapter_CPP.cpp

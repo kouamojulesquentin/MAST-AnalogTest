@@ -88,6 +88,7 @@ class VirtualRegister final : public RegisterInterface
   const BinaryVector& LastToSut()         const override; //!< Returns last sequence effectively sent to SUT
   const BinaryVector& NextToSut()         const override; //!< Returns next sequence to send to SUT
   const BinaryVector& LastFromSut()       const override; //!< Returns last sequence received from SUT
+  bool isBlackBox()        const override {return false;}; //!< Virtual register cannot be a BlackBox
 
   void LastFromSut (BinaryVector& readData) const override; //!< Returns last sequence received from SUT
   void LastFromSut (uint8_t&      readData) const override; //!< Returns last sequence received from SUT
@@ -98,7 +99,8 @@ class VirtualRegister final : public RegisterInterface
   void LastFromSut (int16_t&      readData) const override; //!< Returns last sequence received from SUT
   void LastFromSut (int32_t&      readData) const override; //!< Returns last sequence received from SUT
   void LastFromSut (int64_t&      readData) const override; //!< Returns last sequence received from SUT
-
+  bool IsPendingForRead()  const ; //!< Returns true when there is a pending request to read the Register from SUT
+  void SetPendingForRead  (bool pendingForRead  = true) ; //!< Set whether there is a pending request or not for read value from SUT                             //!< 
   // ---------------- Setters
   //
   void SetPending ();                                      //!< Sets number of pending to 1
@@ -113,7 +115,9 @@ class VirtualRegister final : public RegisterInterface
 
   void SetExpectedFromSut (BinaryVector sequence, BinaryVector dontCareMask) override;         //!< Sets expected sequence and don't care mask (when updating from SUT)
 
-  // ---------------- Iterators
+   void ResetSize         (uint32_t newSize) override;                            //!< changes size of Register for BlackBox usage
+
+ // ---------------- Iterators
   //
   auto begin()  noexcept       { return m_registers.begin();  } //!< Returns an iterator to the first RegisterSlice
   auto begin()  const noexcept { return m_registers.begin();  } //!< Returns an iterator to the first RegisterSlice

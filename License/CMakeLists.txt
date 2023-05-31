@@ -1,10 +1,12 @@
 project(License)
 
-set (WARNINGS "-Wall -Wextra -Wpedantic  -Wredundant-decls -Wundef -Wmissing-include-dirs -Wswitch-enum")
+set (WARNINGS "-Wall -Wextra  -Wredundant-decls -Wundef -Wmissing-include-dirs -Wswitch-enum")
 set (CFLAGS "${WARNINGS}")
 set (CPPFLAGS "${WARNINGS} -std=c++14")
 
 include_directories(./)
+
+set(LIBLICENSE_INCLUDE_DIRS  "${CMAKE_CURRENT_SOURCE_DIR}/"  PARENT_SCOPE)
 
 add_library 	(aes	STATIC 	aes.c )
 add_executable 	(make_license 	make_license.cpp )

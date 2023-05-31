@@ -54,6 +54,10 @@ void SystemModelManager::WaitForApplicationsEnd() { m_impl->WaitForApplicationsE
 //!
 void SystemModelManager::StartCreatedApplicationThreads() { m_impl->StartCreatedApplicationThreads(); }
 
+//! Waits for all threads to be pendingbefore  triggering a DataCycle (default is false)
+//!
+void SystemModelManager::setwaitFullPending (bool waitFullPending) { m_impl->setwaitFullPending(waitFullPending);}
+  
 //! Starts periodical (or on iApply) loop of complete data cycles on a new thread
 //!
 void SystemModelManager::Start() { m_impl->Start(); }
@@ -162,6 +166,15 @@ void SystemModelManager::iWrite (string_view registerPath, int8_t       value) {
 void SystemModelManager::iWrite (string_view registerPath, int16_t      value) { m_impl->iWrite(registerPath, value); }
 void SystemModelManager::iWrite (string_view registerPath, int32_t      value) { m_impl->iWrite(registerPath, value); }
 void SystemModelManager::iWrite (string_view registerPath, int64_t      value) { m_impl->iWrite(registerPath, value); }
+
+//! Sets next Register value to sent to SUT for BlackBox
+//!
+void SystemModelManager::iScan (string_view registerPath, BinaryVector value) { m_impl->iScan(registerPath, value); }
+//! Sets next Register and Expected values to SUT for a BlackBox
+//!
+void SystemModelManager::iScan (string_view registerPath, BinaryVector value, BinaryVector expectedValue){ m_impl->iScan(registerPath, value,expectedValue); }
+
+void SystemModelManager::iNote (iNoteType severity,string_view message) { m_impl->iNote(severity, message); }
 
 //! Returns current maximum time between an iApply and the next data cycle
 //!

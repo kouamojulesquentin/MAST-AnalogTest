@@ -33,24 +33,25 @@ class Intel_EmulationProtocol final : public Intel_Packet_Player
   virtual ~Intel_EmulationProtocol() = default;
   Intel_EmulationProtocol() = delete;
   Intel_EmulationProtocol(std::vector<uint32_t> Region_addresses);
+  Intel_EmulationProtocol(std::string initialisation_string);
 
   //! Does any action required to transfer scan data to and from SUT
   //!
-  //! @param endpointId   Identifies the endpoint to act for (zero based)
+  //! @param channelId   Identifies the channel to act for (zero based)
   //! @param interfaceData  Application data stored in the AccessInterface
   //! @param toSutData      Bits stream to transfer to SUT
   //!
   //! @return Bitstream retrieved from SUT
   //!
-  virtual BinaryVector DoCallback(uint32_t endpointId, void* interfaceData, const BinaryVector& toSutData) override;
+  virtual BinaryVector DoCallback(uint32_t channelId, void* interfaceData, const BinaryVector& toSutData) override;
 
-  //! Gets the number of endpoints supported by the specific protocol
+  //! Gets the number of channels supported by the specific protocol
   //!
-  //! @note EndPoint id 0 is reserved for reset operation, so protocol must support a least two endpoints
+  //! @note Channel id 0 is reserved for reset operation, so protocol must support a least two channels
   //!
-  //! @return The number of supported endpoint (including pseudo endpoint 0 for reset)
+  //! @return The number of supported channel (including pseudo channel 0 for reset)
   //!
-  virtual uint32_t MaxSupportedEndPoints() const override { return m_n_chains; }
+  virtual uint32_t MaxSupportedChannels() const override { return m_n_chains; }
 
   //! Returns readable type of protocol
   //!

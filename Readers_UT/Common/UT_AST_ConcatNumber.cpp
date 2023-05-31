@@ -99,11 +99,16 @@ void UT_AST_ConcatNumber::test_Constructor ()
   {
     // 0
    /* data_t
+  /* Testcase generates compilation error on gcc 8.1 
+  data_t
     {
       {
       },
       false
-    },*/
+    },
+
+    },
+   */
 
     // 1
     data_t
@@ -180,6 +185,8 @@ void UT_AST_ConcatNumber::test_AsText ()
   {
     // 0
 /*    data_t
+   Testcase generates compilation error on gcc 8.1
+     data_t
     {
       {
       },
@@ -397,6 +404,8 @@ void UT_AST_ConcatNumber::test_AsBinaryVector_not_valid ()
   {
     // 0 ==> No numbers at all
  /*   data_t
+  Testcase generates compilation error on gcc 8.1
+    data_t
     {
       {
       },

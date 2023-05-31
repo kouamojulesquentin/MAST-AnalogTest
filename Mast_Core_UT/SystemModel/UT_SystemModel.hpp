@@ -38,9 +38,10 @@ class UT_SystemModel : public CxxTest::TestSuite
   void test_CreateLinker_Without_ParentNode ();
   void test_CreateLinker_With_ParentNode ();
   void test_CreateAccessInterfaceTranslator ();
-  void test_CreateCallbackRequest ();
+  void test_CreateRVFRequest ();
   void test_CreateAccessInterfaceTranslator_Request_Queues_NB ();
   void test_CreateAccessInterfaceTranslator_Result_Queues_NB ();
+  void test_CreateAccessInterfaceTranslator_Pending_Queues_NB ();
 
   void test_NotAutoRoot ();
   void test_SetRoot ();

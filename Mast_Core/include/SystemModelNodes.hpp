@@ -20,6 +20,7 @@
 #include "Register.hpp"
 #include "Chain.hpp"
 #include "Linker.hpp"
+#include "Streamer.hpp"
 //+#include "AiTranslator.hpp"
 
 #endif  // not defined SYSTEMMODELNODES_H__AE0093C8_7CE7_463E_49B4_F6D79633F6FD__INCLUDED_

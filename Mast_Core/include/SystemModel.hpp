@@ -85,10 +85,33 @@ class MAST_CORE_EXPORT SystemModel
     return reg;
   }
 
+  //! Creates a new Black box Register node
+  //!
+  std::shared_ptr<Register> CreateBlackBox (std::experimental::string_view name,
+                                            BinaryVector                   bypassSequence,
+                                            std::shared_ptr<ParentNode>    parentNode = nullptr)
+  {
+    auto reg = CreateRegister(name, bypassSequence, parentNode);
+    reg->SetAsBlackBox();
+    return reg;
+  }
+
   //! Creates a new AccessInterfaceTranslator node
   //!
   std::shared_ptr<AccessInterfaceTranslator> CreateAccessInterfaceTranslator (std::experimental::string_view           name,
-                                                          std::shared_ptr<ParentNode>              parentNode = nullptr);
+                                                          std::shared_ptr<AccessInterfaceTranslatorProtocol> protocol,
+                                                          std::shared_ptr<ParentNode>              parentNode = nullptr
+                                                          );
+
+  // ---------------- Creates a new default (transparent) Streamer node
+  //
+  std::shared_ptr<Streamer>    CreateStreamer    (std::experimental::string_view name,
+                                            std::shared_ptr<ParentNode>    parentNode = nullptr);
+  // ---------------- Creates a new Streamer node
+  //
+  std::shared_ptr<Streamer>    CreateStreamer    (std::experimental::string_view name,
+                                            std::shared_ptr<StreamerProtocol> protocol,
+                                            std::shared_ptr<ParentNode>    parentNode = nullptr);
 
   //! Sets root node
   //!

@@ -2118,6 +2118,17 @@ BinaryVector BinaryVector::operator+ (const BinaryVector& rhs) const
 //  End of: BinaryVector::operator~
 //---------------------------------------------------------------------------
 
+//! Return data from BinaryVector as uint8 vector : NB no checks are done
+//!
+//! @param value  Variable to update with current value
+//!
+std::vector<uint8_t> BinaryVector::Get_DataVector () const
+{
+  return m_data;
+}
+//
+//  End of: BinaryVector::Get
+//---------------------------------------------------------------------------
 
 //! Reads 8 bits value from BinaryVector
 //!
@@ -3153,6 +3164,72 @@ BinaryVector BinaryVector::Slice (uint32_t firstBitOffset, uint32_t bitsCount) c
 //  End of: BinaryVector::Slice
 //---------------------------------------------------------------------------
 
+
+
+//! Returns a slice from BinaryVector with reversed bit order
+//!
+//! @note   This call is not valid if it defines a slice that exceed the actual
+//!         bits count
+//!
+//! @param firstBitOffset Zero based offset of first bit of slice
+//! @param bitsCount      Number of bits
+//!
+//! @return A new BinaryVector containing a copy of defined slice
+BinaryVector BinaryVector::ReverseSlice (uint32_t firstBitOffset, uint32_t bitsCount) const
+{
+{
+  BinaryVector result;
+
+  if (bitsCount != 0)
+  {
+ // auto originalSliceBuffer= original.Slice(firstBitOffset,bitsCount).DataLeftAligned();
+  auto originalSlice= this->Slice(firstBitOffset,bitsCount);
+  auto originalSliceBuffer= originalSlice.DataLeftAligned();
+  
+   std::vector< uint8_t > ReverseSliceBuffer ;
+   auto reverse = [](uint8_t n)
+   {
+    static unsigned char lookup[16] = {
+        0x0, 0x8, 0x4, 0xc, 0x2, 0xa, 0x6, 0xe,
+        0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf, };
+        //Index 1==0b0001 => 0b1000
+        //Index 7==0b0111 => 0b1110
+        //etc
+
+        // Detailed breakdown of the math
+        //  + lookup reverse of bottom nibble
+        //  |       + grab bottom nibble
+        //  |       |        + move bottom result into top nibble
+        //  |       |        |     + combine the bottom and top results 
+        //  |       |        |     | + lookup reverse of top nibble
+        //  |       |        |     | |       + grab top nibble
+        //  V       V        V     V V       V
+        // (lookup[n&0b1111] << 4) | lookup[n>>4]
+
+      // Reverse the top and bottom nibble then swap them.
+   return (lookup[n&0b1111] << 4) | lookup[n>>4];
+   };
+  
+   
+   // Swap bytes while reversing them
+  
+   int32_t index_hi= originalSlice.BytesCount()-1;
+   while (index_hi>=0)
+    {
+    ReverseSliceBuffer.push_back(reverse(originalSliceBuffer[index_hi]));
+    index_hi--;
+     }
+    result = BinaryVector::CreateFromRightAlignedBuffer(ReverseSliceBuffer,originalSlice.BitsCount());
+   }
+  
+  
+  return result ;
+}
+
+}
+//
+//  End of: BinaryVector::ReverseSlice
+//---------------------------------------------------------------------------
 
 //! Returns a slice from BinaryVector
 //!

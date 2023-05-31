@@ -1,0 +1,17 @@
+TRANSLATOR top Emulation
+ (
+ JTAG_TAP TAP 4 1
+  (
+  CHAIN main_chain
+   PDL Console_Incr
+  {
+   REGISTER regHI 12 Bypass: "0xABC"
+   STREAMER online Trivium "0F62B5085BAE0154A7FA 288FF65DC42B92F960C7"
+    {
+     REGISTER protected 16 Bypass: "0x1234"
+    }
+   REGISTER after 8 Bypass: "0x56" 
+   }
+  )
+ ) 
+

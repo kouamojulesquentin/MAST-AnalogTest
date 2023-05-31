@@ -52,7 +52,7 @@ int main()
       std::time_t result = std::time(NULL);
     std::time_t expiration;
     std::cout << std::ctime(&result);
-    expiration = result+YEAR;
+    expiration = result+MONTH+MONTH;
    std::cout << std::ctime(&expiration);
 
   new_license.expiration = expiration;
@@ -74,6 +74,6 @@ int main()
 //     file.write ((char *)&new_license, sizeof(mast_license_type));
      file.write ((char *)buf, 32);
      file.close (); 
-     std::cout << "Wrote license file of size " << 32 << "\n"; 
+     std::cout << "Wrote license file of size 0x" << 32 << "\n"; 
     }
 }

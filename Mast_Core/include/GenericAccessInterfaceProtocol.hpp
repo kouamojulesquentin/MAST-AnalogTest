@@ -40,11 +40,11 @@ class MAST_CORE_EXPORT GenericAccessInterfaceProtocol : public AccessInterfacePr
   //!
   using Primitive = std::function<void(void*)>;
 
-  //! Prototype of the commands used to access a endpoint
+  //! Prototype of the commands used to access a Channel
   //! Parameters:
   //!  - The protocol table of available functions
   //!  - The optional data the AI might requite
-  //!  - The total number of the endpoints
+  //!  - The total number the Channels
   //!  - The vector to push into the SUT (obtained from the current System Model)
   //!
   //! Return
@@ -53,25 +53,25 @@ class MAST_CORE_EXPORT GenericAccessInterfaceProtocol : public AccessInterfacePr
   //!
   using Action  = std::function<BinaryVector(const std::vector<Primitive>&, void*, const BinaryVector&)>;
 
-  //! Gets the number of endpoints supported by the specific protocol
+  //! Gets the number of Channels supported by the specific protocol
   //!
-  //! @note EndPoint id 0 is reserved for reset operation, so protocol must support a least two endpoints
+  //! @note Channel id 0 is reserved for reset operation, so protocol must support a least two Channels
   //!
-  //! @return The number of supported endpoint (including pseudo endpoint 0 for reset)
+  //! @return The number of supported Channels (including pseudo Channel 0 for reset)
   //!
-  virtual uint32_t MaxSupportedEndPoints() const override { return m_callbacks.size(); }
+  virtual uint32_t MaxSupportedChannels() const override { return m_callbacks.size(); }
 
   GenericAccessInterfaceProtocol(std::initializer_list<Action> callbacks, std::initializer_list<Primitive> primitives);
   GenericAccessInterfaceProtocol(std::vector<Action>           callbacks, std::vector<Primitive>           primitives);
 
-  //! Calls callback associated with AccessInterface endpoint
+  //! Calls callback associated with AccessInterface Channel
   //!
-  //! @param endpointId   Identifies the endpoint to act for (zero based)
+  //! @param ChannelId   Identifies the Channel to act for (zero based)
   //! @param interfaceData  Application data stored in the AccessInterface
   //! @param toSutData      Bits stream to transfer to SUT
   //!
   //! @return Bits stream retrieved from SUT
-  virtual BinaryVector DoCallback(uint32_t endpointId, void* interfaceData, const BinaryVector& toSutData) override;
+  virtual BinaryVector DoCallback(uint32_t channelId, void* interfaceData, const BinaryVector& toSutData) override;
 
   //! Returns readable type of protocol
   //!
@@ -86,7 +86,7 @@ class MAST_CORE_EXPORT GenericAccessInterfaceProtocol : public AccessInterfacePr
 
   // ---------------- Private  Fields
   //
-  std::vector<Action>    m_callbacks;    //!< Provide Actions to access the endpoints based on the set of primitives
+  std::vector<Action>    m_callbacks;    //!< Provide Actions to access the Channels based on the set of primitives
   std::vector<Primitive> m_primitives; //!< Primitives composing the protocol
 };
 //

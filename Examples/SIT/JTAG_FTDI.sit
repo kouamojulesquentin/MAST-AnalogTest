@@ -1,0 +1,9 @@
+TRANSLATOR top FTDI
+ (
+ JTAG_TAP TAP 4 1
+ PDL Console_Incr
+  (
+  REGISTER reg 12 Bypass: "0x000"
+  )
+ ) 
+

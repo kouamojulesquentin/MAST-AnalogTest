@@ -58,7 +58,7 @@ class MAST_CORE_EXPORT ParentNode : public SystemModelNode, public std::enable_s
 
   virtual void DisconnectChild(std::shared_ptr<SystemModelNode> child); //!< Disconnects specified child from its parent
 
-  virtual std::shared_ptr<SystemModelNode> DisconnectEndPoint(uint32_t endpointId); //!< Disconnects a endpoint from the parent
+  virtual std::shared_ptr<SystemModelNode> DisconnectChannel(uint32_t channelId); //!< Disconnects a channel from the parent
   virtual std::shared_ptr<SystemModelNode> DisconnectAllChildren();                     //!< Disconnects all direct children
 
   void  SetChildAppender (std::shared_ptr<ParentNode> childAppender) { m_pOptionalChildAppender = childAppender; }

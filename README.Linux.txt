@@ -36,6 +36,8 @@ Xml RPC may be needed for optional features.
         - make
         - make install
         - That should be all
+        NB: with older g++, you might have to set CXXFLAGS to enable C++14: 
+          export CXXFLAGS="-std=c++14"
     - MastXmlRpc Mast libraries related to XmlRpc (in Optional_Libs directory)
 
 [Build-Qt]

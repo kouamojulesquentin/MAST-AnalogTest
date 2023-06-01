@@ -12,23 +12,14 @@ package MAST_config is
  constant MAX_REGISTERS : integer := 20;
  constant MAX_LEVELS : integer := 10;
   
-  type target_SUT_type is (LOOPBACK,TUTORIAL_1, MIB_tutorial,SSAK_Example, Trivium_Streamer, Double_Trivium_Streamer, Nested_Trivium_Streamer,Secure_Scan);
+  type target_SUT_type is (LOOPBACK,TUTORIAL_1, MIB_tutorial);
 
  -- To select a target System Under Test, uncomment the related line and comment
  -- all others
 
+  constant target_SUT :target_SUT_type :=TUTORIAL_1;
 -- constant target_SUT :target_SUT_type :=MIB_tutorial;
---  constant target_SUT :target_SUT_type :=TUTORIAL_1;
 --  constant target_SUT :target_SUT_type :=LOOPBACK;
-  constant target_SUT :target_SUT_type :=SSAK_Example;
-   --Use SIT/SSAK.sit with SVF_Simulation_Top
-   -- or SIT/Trivium_SSAK.sitS with VF_Simuation_top_encryption
-   
---  constant target_SUT :target_SUT_type :=Trivium_Streamer; --Use SIT/StreamerTrivium.sit
---  constant target_SUT :target_SUT_type :=Double_Trivium_Streamer;  --Use SIT/DoubleStreamerTrivium.sit
---  constant target_SUT :target_SUT_type := Nested_Trivium_Streamer; --Use SIT/NestedStreamerTrivium.sit
---  constant target_SUT :target_SUT_type := Secure_Scan; 
-
 
  constant IR_SIZE : integer := 4;
   

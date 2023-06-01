@@ -57,3 +57,7 @@ target_link_libraries (ICL_Leds Mast_API_CPP ${EXTRA_LIBS})
 add_library           (Random SHARED ${PDL_DIRECTORY}/Random.cpp)
 set_target_properties (Random PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 target_link_libraries (Random Mast_API_CPP ${EXTRA_LIBS})
+
+add_library           (LDO SHARED ${PDL_DIRECTORY}/LDO.cpp)
+set_target_properties (LDO PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
+target_link_libraries (LDO Mast_API_CPP ${EXTRA_LIBS})

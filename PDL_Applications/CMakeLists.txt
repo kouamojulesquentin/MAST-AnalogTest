@@ -46,8 +46,8 @@ add_library           (PDL_Applications SHARED   ${PDL_Application_SOURCES})
 target_link_libraries (PDL_Applications Mast_API_CPP_PDL)
 # target_link_libraries (PDL_Applications Mast_API_CPP)
 
-add_library           (LDO SHARED   ${LDO_Application_SOURCES})
-target_link_libraries (LDO Mast_API_CPP_PDL)
+add_library           (LDO_App SHARED   ${LDO_Application_SOURCES})
+target_link_libraries (LDO_App Mast_API_CPP_PDL)
 
 if(${KISSFFT})
   set (ml505_kissfft_SOURCES "src/ml505_kissfft.cpp")

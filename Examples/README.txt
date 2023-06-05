@@ -47,10 +47,6 @@ I2C.sit
 STIL.sit
 TPSP.sit
 
---Scan encryption as in paper [2]
-Streamer.sit
-StreamerTrivium.sit
-Trivium.sit
 
 --Examples of concurrent execution of PDL-1 algorithms
 ./Concurrent/Module_8.sit
@@ -62,22 +58,11 @@ Trivium.sit
 ./Concurrent/Random_horizontal_stress.sit
 ./Concurrent/Replica_100x8.sit
 
---Dynamic authentication with SSAK as in paper [3]
-SSAK.sit
-SSAK_pre.sit
-SSAK_simple.sit
-	--Reference files for a co-simulation with SSAK
-	Reference_SSAK.txt
-	Reference_SSAK_PRE.txt
-	Reference_SSAK_simple.txt
-	data_from_rtl.dat.SSAK
-	data_to_rtl.svf.SSAK
-
 
 - Topology example with no PDL
 1500_Wrapper_4xRegs_12xBits.sit
 
-- Example of a P1687.2-like system expressed using P1687.1
+- Example of a P1687.2-like system expressed using P1687.1 (please see dedicated Documentation)
 LDO.sit
 
 - Interactive demo (FFT on audio signal)
@@ -88,6 +73,3 @@ ml505_kissfft.sit
 Reference papers:
 [1] Portolan M., "Automated Test Flow: the Present and the Future", IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems (IEEE-TCAD), December 2019,  DOI:10.1109/TCAD.2019.2961328
 
-[2] M. Portolan, E. Valea, P. Maistri, G. Di Natale, "Flexible and Portable Management of Secure Scan Implementations Exploiting P1687.1 Extensions", IEEE Design & Test on 30/9.2021, DOI : 10.1109/MDAT.2021.3117875 
-
-[3] M. Portolan, V. Reynaud, P.Maistri, R. Leveugle, G. Di Natale  "Security EDA Extension through P1687.1 and 1687 Callbacks", , 2021 International Test Conference (ITC21), November 2021, ISBN: 978-1-6654-1695-5, ISSN: 2378-2250

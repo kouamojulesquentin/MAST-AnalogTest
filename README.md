@@ -88,26 +88,18 @@ Detailed User Manuals and other documentation can be found in the ./Docs directo
 -----------------------------------------------------------------------
 New mast project is organized into sub-projects.
 
+  - Docs provides detailes documentation
   - Mast_Core is mast building blocks per se
   - Mast provide C/C++ API
   - Mast_UT is for unit testing Mast_Core and Mast libraries
   - Logger is an asynchronous logging library
   - SIT_reader is a library for parsing "SIT" formatted file in order to build a SystemModel tree
-  - SIT_reader_UT is for unit testing SIT_reader
-  - openocd is a library to use JTAG/SPI USB adapters
-  - TestCasesApp is an application for testing integration of the different libraries with different kind of testcases
-  - MastExample_CPP give some MAST simple usages examples
-  - Licence manages the licencing right to use MAST
+  - ICL_reader is a library for parsing "ICL" formatted file in order to build a SystemModel tree
+  - Examples give some MAST simple usages examples
 
 
-Dependencies are as follow:
 ```
-                     Lib_UT--\
-                              \
-                               -->Lib-->Logger
-  SIT_parser_UT-->SIT_parser--/
-```
-All, non-generated, files are under source control using GIT
+All non-generated files are under source control using GIT
 
 ## License
 

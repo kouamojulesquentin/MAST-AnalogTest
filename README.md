@@ -103,4 +103,4 @@ All non-generated files are under source control using GIT
 
 ## License
 
-[MIT](https://choosealicense.com/licenses/mit/)
+GNU Lesser General Public License v2.1 only.

@@ -74,6 +74,7 @@ add_subdirectory(DummyStreamerProtocol)
 add_subdirectory(Low_Pin)
 add_subdirectory(AnalogPort)
 add_subdirectory(DataPort)
+add_subdirectory(Trivium)
 
 if (${INSTALL_ARM}==OFF)
   if (${INSTALL_RISCV}==OFF)

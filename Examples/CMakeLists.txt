@@ -34,6 +34,21 @@ INSTALL(CODE "execute_process( \
     ${CMAKE_INSTALL_PREFIX}/${EXAMPLE_DIRECTORY}/Mast   \
     )"
 )
+
+#create links for Trivium Example
+INSTALL(CODE "execute_process( \
+    COMMAND ${CMAKE_COMMAND} -E create_symlink \
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/trivium.py \
+    ${CMAKE_INSTALL_PREFIX}/${EXAMPLE_DIRECTORY}/trivium.py   \
+    )"
+)
+INSTALL(CODE "execute_process( \
+    COMMAND ${CMAKE_COMMAND} -E create_symlink \
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/setupTrivium.sh\
+    ${CMAKE_INSTALL_PREFIX}/${EXAMPLE_DIRECTORY}/setupTrivium.sh   \
+    )"
+)
+
 add_definitions(${P_WARNINGS})
 set (P_WARNINGS "-Wall -Wno-sign-compare -Wnon-virtual-dtor -Wredundant-decls -Wundef -Wmissing-include-dirs")
 add_definitions(${P_CFLAGS})

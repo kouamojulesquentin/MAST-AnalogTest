@@ -47,6 +47,8 @@ I2C.sit
 STIL.sit
 TPSP.sit
 
+--Scan encryption as in paper [2]
+Trivium.sit
 
 --Examples of concurrent execution of PDL-1 algorithms
 ./Concurrent/Module_8.sit
@@ -72,4 +74,7 @@ ml505_kissfft.sit
 ------------------------------------
 Reference papers:
 [1] Portolan M., "Automated Test Flow: the Present and the Future", IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems (IEEE-TCAD), December 2019,  DOI:10.1109/TCAD.2019.2961328
+
+
+[2] M. Portolan, E. Valea, P. Maistri, G. Di Natale, "Flexible and Portable Management of Secure Scan Implementations Exploiting P1687.1 Extensions", IEEE Design & Test on 30/9.2021, DOI : 10.1109/MDAT.2021.3117875 
 

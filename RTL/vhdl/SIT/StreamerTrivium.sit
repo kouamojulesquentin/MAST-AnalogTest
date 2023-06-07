@@ -10,7 +10,7 @@ TRANSLATOR top Simulation
     {
      REGISTER protected 16 Bypass: "0x1234"
     }
-   REGISTER regHI 8 Bypass: "0x56" 
+   REGISTER reg 8 Bypass: "0x56" 
    }
   )
  ) 

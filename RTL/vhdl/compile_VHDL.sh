@@ -24,6 +24,11 @@ vhd_files=(
         "AI_for_simulation/SVF_Master_TAP.vhd"  
 
         "SUT_Examples/JTAG/SVF_Simuation_top.vhd"
+
+
+        "scan_encryption/trivium.vhd"
+        "scan_encryption/SVF_Simuation_top_encryption.vhd"
+
 )
 
 for file in "${vhd_files[@]}"

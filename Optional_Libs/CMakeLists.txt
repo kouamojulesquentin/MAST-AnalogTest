@@ -75,6 +75,7 @@ add_subdirectory(Low_Pin)
 add_subdirectory(AnalogPort)
 add_subdirectory(DataPort)
 add_subdirectory(Trivium)
+add_subdirectory(SSAK)
 
 if (${INSTALL_ARM}==OFF)
   if (${INSTALL_RISCV}==OFF)

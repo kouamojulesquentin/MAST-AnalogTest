@@ -1,5 +1,5 @@
 [Chain]        "Multiple_SIB_3WI"
- [Chain]        "SIB1"
+ [Chain]        "SIB1", ignore_in_path: true
   [Linker]       "SIB1_mux"
    :Selector:     "SIB1_ctrl", kind: Binary, can_select_none: true, inverted_bits: false, reversed_order: false
    Selection Table:
@@ -14,7 +14,7 @@
       [Chain]        "SReg"
        [Register]     "SR", length: 8, bypass: 0000_0000
   [Register]     "SIB1_ctrl", length: 1, Hold value: true, bypass: 0
- [Chain]        "SIB2"
+ [Chain]        "SIB2", ignore_in_path: true
   [Linker]       "SIB2_mux"
    :Selector:     "SIB2_ctrl", kind: Binary, can_select_none: true, inverted_bits: false, reversed_order: false
    Selection Table:
@@ -29,7 +29,7 @@
       [Chain]        "SReg"
        [Register]     "SR", length: 8, bypass: 0000_0000
   [Register]     "SIB2_ctrl", length: 1, Hold value: true, bypass: 0
- [Chain]        "SIB3"
+ [Chain]        "SIB3", ignore_in_path: true
   [Linker]       "SIB3_mux"
    :Selector:     "SIB3_ctrl", kind: Binary, can_select_none: true, inverted_bits: false, reversed_order: false
    Selection Table:

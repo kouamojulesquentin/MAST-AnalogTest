@@ -1,5 +1,5 @@
 [Chain]        "Exclusive"
- [Chain]        "MIB_Exclusive"
+ [Chain]        "MIB_Exclusive", ignore_in_path: true
   [Linker]       "MIB_Exclusive_mux"
    :Selector:     "MIB_Exclusive_ctrl", kind: Binary, can_select_none: true, inverted_bits: false, reversed_order: false
    Selection Table:

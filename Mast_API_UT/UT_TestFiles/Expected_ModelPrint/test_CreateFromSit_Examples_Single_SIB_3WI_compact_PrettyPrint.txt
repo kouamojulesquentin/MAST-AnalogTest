@@ -1,5 +1,5 @@
 [Chain]        "Single_SIB_3WI"
- [Chain]        "SIB1"
+ [Chain]        "SIB1", ignore_in_path: true
   [Linker]       "SIB1_mux"
    :Selector:     "SIB1_ctrl", kind: Binary, can_select_none: true, inverted_bits: false, reversed_order: false
    Selection Table:

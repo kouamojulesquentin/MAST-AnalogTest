@@ -366,7 +366,7 @@ void UT_SystemModelBuilder::test_Create_MIB_1_Channel ()
                          "graph\n"
                          "[\n"
                          "   hierarchic 1 directed 1\n"
-                         "   node [ id 1 graphics [ type \"ellipse\" fill \"#FFCC20\" w 116 h 43 ] LabelGraphics [ text \"(1)\n"
+                         "   node [ id 1 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 116 h 43 ] LabelGraphics [ text \"(1)\n"
                          "MIB_name\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 2 graphics [ type \"trapezoid\" fill \"#FF3060\" outlineStyle \"dashed\" w 154 h 44 ] LabelGraphics [ text \"(2)\n"
                          "MIB_name_mux\n"
@@ -390,7 +390,7 @@ void UT_SystemModelBuilder::test_Create_MIB_1_Channel ()
 
   auto gotPretty      = PrettyPrinter::PrettyPrint(sm.Root(), PrettyPrinterOptions::All);
   auto expectedPretty = string(
-                               "[Chain](1)     \"MIB_name\", pending: false, has_conditioner: false, priority: 0\n"
+                               "[Chain](1)     \"MIB_name\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
                                " [Linker](2)    \"MIB_name_mux\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
                                "  :Selector:(0)  \"Reg_name\", kind: Binary, can_select_none: true, inverted_bits: false, reversed_order: false\n"
                                "  Selection Table:\n"
@@ -444,7 +444,7 @@ void UT_SystemModelBuilder::test_Create_MIB_4_Channels ()
                          "graph\n"
                          "[\n"
                          "   hierarchic 1 directed 1\n"
-                         "   node [ id 1 graphics [ type \"ellipse\" fill \"#FFCC20\" w 116 h 43 ] LabelGraphics [ text \"(1)\n"
+                         "   node [ id 1 graphics [ type \"ellipse\" fill \"#FFCC20\" outlineStyle \"dashed\" w 116 h 43 ] LabelGraphics [ text \"(1)\n"
                          "MIB_name\" fontSize 13 fontStyle \"bold\" fontName \"Lucida Console\"] ]\n"
                          "   node [ id 0 graphics [ type \"rectangle\" fill \"#59FF20\" w 152 h 144 ] LabelGraphics [ text \"(0)\n"
                          "Reg_name\n"
@@ -467,7 +467,7 @@ void UT_SystemModelBuilder::test_Create_MIB_4_Channels ()
   // With "Pretty" printer
 
   auto gotPretty      = PrettyPrinter::PrettyPrint(sm.Root(), PrettyPrinterOptions::All);
-  auto expectedPretty = string("[Chain](1)     \"MIB_name\", pending: false, has_conditioner: false, priority: 0\n"
+  auto expectedPretty = string("[Chain](1)     \"MIB_name\", ignore_in_path: true, pending: false, has_conditioner: false, priority: 0\n"
                                " [Register](0)  \"Reg_name\", length: 2, Hold value: true, bypass:            0b00\n"
                                "                                                       , next_to_sut:       0b00\n"
                                "                                                       , last_to_sut:       0b00\n"

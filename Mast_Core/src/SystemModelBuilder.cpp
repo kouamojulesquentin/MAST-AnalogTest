@@ -655,7 +655,9 @@ shared_ptr<Chain> SystemModelBuilder::Create_MIB (string_view              name,
 
   auto mibName = string(name);
   auto mib     = m_model.CreateChain(mibName);
-
+  
+  mib->IgnoreForNodePath(true); //In ICL, the Chain does not exist
+  
   // ---------------- Create linker
   //
   auto linker = m_model.CreateLinker(mibName + MIB_MUX_EXT, selector);

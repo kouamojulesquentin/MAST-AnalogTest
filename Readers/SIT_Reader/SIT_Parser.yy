@@ -155,6 +155,7 @@ namespace
 
 %type <mast::SelectorProperty>          active
 %type <mast::SelectorProperty>          reverse
+%type <mast::SelectorProperty>          startAtZero
 %type <std::uint32_t>                   max_derivations
 %type <std::string>                     path_selector_kind
 %type <std::string>                     path_selector_parameters
@@ -221,6 +222,7 @@ namespace
 %token <std::string>   t_HIGH
 %token <std::string>   t_LOW
 %token <std::string>   t_REVERSE
+%token <std::string>   t_STARTATZERO
 %token <std::uint32_t> t_DecimalLiteral
 %token <std::string>   t_TRANSLATOR
 %token <std::string>   t_BROCADE
@@ -561,7 +563,7 @@ t_SIB node_name mux_register_position active
   $$ = std::make_pair(node,false);
 }
 |
-t_MIB node_name mux_register_position active reverse max_derivations path_selector_kind
+t_MIB node_name mux_register_position active reverse startAtZero max_derivations path_selector_kind
 {
   auto iter = driver.selector_register_creator.find($[path_selector_kind]);
   if (iter == driver.selector_register_creator.end())
@@ -572,7 +574,7 @@ t_MIB node_name mux_register_position active reverse max_derivations path_select
 
   const auto&      creator          = iter->second;
   auto             selectorRegName  = $[node_name].name + MIB_CTRL_EXT;
-  SelectorProperty selectorProperty = $[active] | $[reverse];
+  SelectorProperty selectorProperty = $[active] | $[reverse] | $[startAtZero];
   auto             selectorRegister = creator(selectorRegName, $[max_derivations], selectorProperty);
   const auto&      selectorFactory  = PathSelectorFactory::Instance();
   auto             selector         = selectorFactory.Create($[path_selector_kind], $[max_derivations], selectorProperty, selectorRegister);
@@ -853,6 +855,11 @@ active :
 
 reverse :
  t_REVERSE { $$ = SelectorProperty::ReverseOrder; }
+ | %empty  { $$ = SelectorProperty::None; }
+ ;
+
+startAtZero :
+ t_STARTATZERO { $$ = SelectorProperty::StartAtZero; }
  | %empty  { $$ = SelectorProperty::None; }
  ;
 

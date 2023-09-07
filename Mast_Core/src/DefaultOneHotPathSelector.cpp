@@ -64,8 +64,13 @@ BinaryVector DefaultOneHotPathSelector::AssociatedRegisterInitialValue (uint32_t
   auto canSelectNone = IsSet(properties, SelectorProperty::CanSelectNone);
   auto invertedBits  = IsSet(properties, SelectorProperty::InvertedBits);
   auto reverseOrder  = IsSet(properties, SelectorProperty::ReverseOrder);
+  auto StartAtZero = IsSet(properties, SelectorProperty::StartAtZero);
+  
   auto value         = invertedBits ? BinaryVector(pathsCount, 0xFF, SizeProperty::Fixed)
                                     : BinaryVector(pathsCount, 0x00, SizeProperty::Fixed);
+  
+  if (StartAtZero) return value;
+  
   if (!canSelectNone)
   {
     uint32_t bitOffset = reverseOrder ? pathsCount - 1 : 0u;
@@ -109,15 +114,24 @@ DefaultOneHotPathSelector::TablesType DefaultOneHotPathSelector::CreateSelectTab
                                                                                     uint32_t         pathsCount,
                                                                                     SelectorProperty properties)
 {
-  CheckRegisterLength(registerLength, pathsCount);
+  bool     StartAtZero = IsSet(properties, SelectorProperty::StartAtZero);
 
+  if (!StartAtZero)
+    CheckRegisterLength(registerLength, pathsCount);
+  else  
+    CheckRegisterLength(registerLength, pathsCount-1);//One of the paths is selected by the Zeo value
+    
   TablesType table;
 
   table.emplace_back(registerLength, 0, SizeProperty::FixedOnCopy); // Dummy entry for no selection and for path identifier starting from 1
 
+
   bool     reverseOrder = IsSet(properties, SelectorProperty::ReverseOrder);
   uint32_t selectionBit = reverseOrder ? registerLength - 1u : 0;
 
+  if (StartAtZero)
+    table.emplace_back(registerLength, 0, SizeProperty::FixedOnCopy); // Additional First Selection Value is 0
+    
   BinaryVector temp(registerLength);
   for (uint32_t pathId = 1u ; pathId <= pathsCount ; ++pathId)
   {
@@ -128,7 +142,7 @@ DefaultOneHotPathSelector::TablesType DefaultOneHotPathSelector::CreateSelectTab
     selectionBit = reverseOrder ? selectionBit - 1u
                                 : selectionBit + 1u;
   }
-
+  
   if (IsSet(properties, SelectorProperty::InvertedBits))
   {
     InvertTable(table);
@@ -154,9 +168,20 @@ DefaultOneHotPathSelector::TablesType DefaultOneHotPathSelector::CreateDeselectT
                                                                                       uint32_t         pathsCount,
                                                                                       SelectorProperty properties)
 {
-  CheckRegisterLength(registerLength, pathsCount);
+  bool     StartAtZero = IsSet(properties, SelectorProperty::StartAtZero);
+  auto   TableSizeModifier = 1;
+  if (!StartAtZero)
+     {
+      CheckRegisterLength(registerLength, pathsCount);
+     }
+  else  
+     {
+      CheckRegisterLength(registerLength, pathsCount-1); //One of the paths is selected by the Zeo value
+      TableSizeModifier = 2; // Additional First Selection Value is 0
+     }
 
-  TablesType table(pathsCount + 1, BinaryVector(registerLength, 0, SizeProperty::FixedOnCopy));
+      TablesType table(pathsCount + TableSizeModifier, BinaryVector(registerLength, 0, SizeProperty::FixedOnCopy));
+
 
   if (IsSet(properties, SelectorProperty::InvertedBits))
   {

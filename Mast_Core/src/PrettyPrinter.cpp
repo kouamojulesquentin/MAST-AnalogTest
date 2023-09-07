@@ -389,7 +389,9 @@ void PrettyPrinter::StreamSelector(const PathSelector& selector)
     m_os << ", can_select_none: " << std::boolalpha << IsSet(selector.Properties(), SelectorProperty::CanSelectNone);
     m_os << ", inverted_bits: "   << std::boolalpha << IsSet(selector.Properties(), SelectorProperty::InvertedBits);
     m_os << ", reversed_order: "  << std::boolalpha << IsSet(selector.Properties(), SelectorProperty::ReverseOrder);
-
+//    m_os << ", StartAtZero: "  << std::boolalpha << IsSet(selector.Properties(), SelectorProperty::StartAtZero);
+ //Not yet in Unit Tests
+ 
     if (m_showSelectorTables)
     {
       auto selector = std::dynamic_pointer_cast<DefaultTableBasedPathSelector>(m_selector);

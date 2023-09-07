@@ -29,6 +29,7 @@ enum class SelectorProperty
   CanSelectNone    = 0b0001, //!< Tells whether one can select no path using path id 0 (mainly for binary encoding)
   InvertedBits     = 0b0010, //!< Tells whether a '0' select a endpoint (low level activation in hardware)
   ReverseOrder     = 0b0100, //!< Tells whether bits order is reversed (e.g. in 1_Hot encoding last bit select first endpoint)
+  StartAtZero      = 0b1000, //!< Tells whether the first path is selected by a zero value)
 
   // Helpers for common usage
   Std             = None,                         //!< Default property for any type

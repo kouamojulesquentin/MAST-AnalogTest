@@ -103,6 +103,10 @@ class SystemModelManager_impl final
   //!
   void iApply();
 
+  //! Issues clock cycles request
+  //!
+  void iRunLoop();
+
   //! Returns current path prefix for current thread
   //!
   std::string iPrefix();

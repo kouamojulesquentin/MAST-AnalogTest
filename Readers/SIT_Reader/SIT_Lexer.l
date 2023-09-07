@@ -60,8 +60,10 @@ namespace
     {"INSTANCE",         token::t_INSTANCE},          // 18
     {"OF",               token::t_OF},                // 19
     {"TRANSLATOR",       token::t_TRANSLATOR},        // 20
-    {"BROCADE_Mux",      token::t_BROCADE},        // 21
-    {"STREAMER",         token::t_STREAMER},        // 22
+    {"BROCADE_Mux",      token::t_BROCADE},           // 21
+    {"STREAMER",         token::t_STREAMER},          // 22
+    {"STARTATZERO",      token::t_STARTATZERO},           // 23
+    
   };
 }
 

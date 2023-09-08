@@ -44,7 +44,7 @@ class MAST_CORE_EXPORT DataPort_Protocol final: public AccessInterfaceRawProtoco
   //!
   //! @return Bitstream retrieved from SUT
   //!
-  virtual BinaryVector DoCallback(uint32_t channelId, void* interfaceData, const BinaryVector& toSutData) override;
+  virtual BinaryVector DoCallback(std::string CallbackId,uint32_t channelId, void* interfaceData, const BinaryVector& toSutData) override;
 
   //! Gets the number of channels supported by the specific protocol
   //!

@@ -50,7 +50,7 @@ class MAST_CORE_EXPORT SVF_RawPlayer final: public AccessInterfaceRawProtocol
 
   //! readable identifier for given channel
   //!
-  std::string CallbackId(int Channel) const { 
+  std::string CallbackForChannel(int Channel) const { 
      switch (Channel){
        case 0: return TRST; 
        case 1: return SIR; 
@@ -67,7 +67,7 @@ class MAST_CORE_EXPORT SVF_RawPlayer final: public AccessInterfaceRawProtocol
   //!
   //! @return Bitstream retrieved from SUT
   //!
-  virtual BinaryVector DoCallback(uint32_t channelId, void* interfaceData, const BinaryVector& toSutData) override;
+  virtual BinaryVector DoCallback(std::string /*CallbackId*/, uint32_t channelId, void* interfaceData, const BinaryVector& toSutData) override;
 
   //! Gets the number of channels supported by the specific protocol
   //!

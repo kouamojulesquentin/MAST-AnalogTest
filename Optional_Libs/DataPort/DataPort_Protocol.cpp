@@ -34,7 +34,7 @@ DataPort_Protocol::DataPort_Protocol(std::string portname)
 //! This callback only causes a "strobe" to be issued for reading value on the Port
 //! Only Loopback data is returned 
 //!
-BinaryVector DataPort_Protocol::DoCallback (uint32_t /*channelId*/, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector DataPort_Protocol::DoCallback (std::string /*CallbackId*/, uint32_t /*channelId*/, void* /* interfaceData */, const BinaryVector& toSutData)
 {
  auto c_portname = m_portname.c_str();
   RVFRequest request(DATAPORTREAD,(void *)c_portname);

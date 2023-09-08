@@ -34,7 +34,7 @@ using namespace std::experimental::literals::string_view_literals;
 
 //! Initializes with addresses defined by a string to be parsed
 //!
-Dummy_TranslatorProtocol::Dummy_TranslatorProtocol (const std::string& parameters)
+Dummy_TranslatorProtocol::Dummy_TranslatorProtocol (const std::string& /*parameters*/)
 {
 }
 //

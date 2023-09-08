@@ -101,6 +101,7 @@ set(Mast_Core_SOURCES ${Mast_Core_Platform_SOURCES}
                       "${CMAKE_CURRENT_SOURCE_DIR}/src/Streamer.cpp"
                       "${CMAKE_CURRENT_SOURCE_DIR}/src/TransparentStreamerProtocol.cpp"
                       "${CMAKE_CURRENT_SOURCE_DIR}/src/StreamerProtocolFactory.cpp"
+                      "${CMAKE_CURRENT_SOURCE_DIR}/src/ResetiRunLoopVisitor.cpp"
                     )
 
 set(Public_Headers "${CMAKE_CURRENT_SOURCE_DIR}/include/AccessInterface.hpp"
@@ -203,7 +204,8 @@ set(Private_Headers "${CMAKE_CURRENT_SOURCE_DIR}/internal/Dll.hpp"
                     "${CMAKE_CURRENT_SOURCE_DIR}/internal/SystemModelManager_impl.hpp"
                     "${CMAKE_CURRENT_SOURCE_DIR}/internal/SystemModelReseter.hpp"
                     "${CMAKE_CURRENT_SOURCE_DIR}/internal/ToSutVisitor.hpp"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/internal/YamlNodesCache.hpp")
+                    "${CMAKE_CURRENT_SOURCE_DIR}/internal/YamlNodesCache.hpp"
+		    "${CMAKE_CURRENT_SOURCE_DIR}/internal/ResetiRunLoopVisitor.hpp")
 
 set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/internal/MastConfig.hpp" GENERATED)
 

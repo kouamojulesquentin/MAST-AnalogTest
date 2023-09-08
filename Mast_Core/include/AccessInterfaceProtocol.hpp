@@ -38,7 +38,7 @@ class AccessInterfaceProtocol
   //! @param toSutData      Bits stream to transfer to SUT
   //!
   //! @return Bits stream retrieved from SUT
-  virtual RVFResponse DoCallback(uint32_t channelId, void* interfaceData, const BinaryVector& toSutData) = 0;
+  virtual RVFResponse DoCallback(std::string CallbackId, uint32_t channelId, void* interfaceData, const BinaryVector& toSutData) = 0;
 
   //! Gets the number of channels supported by the specific protocol
   //!

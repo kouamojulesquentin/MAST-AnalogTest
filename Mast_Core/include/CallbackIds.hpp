@@ -7,7 +7,7 @@
 //
 //! @file CallbackIds.hpp
 //!
-//! Defines symbols for CallbackId strings
+//! Defines symbols for standard CallbackId strings
 //!
 //===========================================================================
 
@@ -17,11 +17,19 @@
 
 typedef  uint32_t Callback_t;
 
+//1687 CALLBACKS
+#define CSU             "CSU"
+#define RUNLOOP         "RUNLOOP"
+
+
+//JTAG CALLBACKS
 #define SVF             "SVF"
 #define TRST           "TRST"
 #define SIR             "SIR"
 #define SDR             "SDR"
+#define RUNTEST         "RUNTEST"
 
+//I2C_CALLBACS
 #define I2C_RESET       "I2C_RESET"
 #define I2C_READ        "I2C_READ"
 #define I2C_WRITE       "I2C_WRITE"

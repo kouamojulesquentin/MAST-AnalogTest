@@ -105,7 +105,7 @@ class SystemModelManager_impl final
 
   //! Issues clock cycles request
   //!
-  void iRunLoop();
+  void iRunLoop(uint64_t value);
 
   //! Returns current path prefix for current thread
   //!
@@ -320,6 +320,7 @@ class SystemModelManager_impl final
     std::deque<QueuedRequest> queuedRefreshes;                      //!< Identifiers for registers queued for a refresh operation
     std::string               debugName;                            //!< Name associated to application thread to ease identification in debug
     std::exception_ptr        caughtException;                      //!< In case of exception thrown from application thread
+    
   };
 
   using ThreadToAppDataMapper_t = std::map<std::thread::id,     std::shared_ptr<ApplicationData>>;

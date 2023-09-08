@@ -49,7 +49,7 @@ BinaryVector Spy_Emulation_Translator::TransformationCallback(RVFRequest current
   return current_request.ToSutVector();
 }
 //
-//  End of: Spy_Emulation_Translator::DoCallback
+//  End of: Spy_Emulation_Translator::TransformationCallback
 //---------------------------------------------------------------------------
 
 

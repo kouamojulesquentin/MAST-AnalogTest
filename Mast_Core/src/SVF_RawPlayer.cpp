@@ -27,7 +27,7 @@ using std::ostringstream;
 
 //! sends request for TRST,SIR and SDR callbacks and waits for response
 
-BinaryVector SVF_RawPlayer::DoCallback (uint32_t channelId, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector SVF_RawPlayer::DoCallback (std::string CallbackId, uint32_t channelId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   BinaryVector result;
   string svfFormattedData;
@@ -52,7 +52,7 @@ BinaryVector SVF_RawPlayer::DoCallback (uint32_t channelId, void* /* interfaceDa
       }
 
   //Many Unit Test depend on FormattedData
-  RVFRequest request(CallbackId(channelId),callback_toSutData,svfFormattedData);
+  RVFRequest request(CallbackForChannel(channelId),callback_toSutData,svfFormattedData);
 
   PushRequest(request);
   
@@ -79,7 +79,7 @@ void SVF_RawPlayer::DoReset(bool doSynchronousReset)
 {
   if (doSynchronousReset){}; //Null operation, used to silence warning
 
-  RVFRequest request(CallbackId(0));
+  RVFRequest request(CallbackForChannel(0));
   PushRequest(request);
   PopfromSut();
 }

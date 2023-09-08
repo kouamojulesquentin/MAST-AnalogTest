@@ -24,6 +24,7 @@
 #include "g3log/g3log.hpp"
 #include "DataCycleVisitor.hpp"
 #include "AccessInterfaceTranslator.hpp"
+#include "ResetiRunLoopVisitor.hpp"
 
 #include <utility>
 #include <sstream>
@@ -369,7 +370,20 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
          LOG(INFO) << "Node " << currentAccessInterface->Name() << " Protocol " << protocol->KindName() 
 	          <<  ":RVF Request for channel "<< channelId <<" sent at internal cycle " << protocol->getElapsedCycles();
 
-          fromSutVector = protocol->DoCallback(channelId, nextChannel->ApplicationData(), toSutVector);
+          
+	  auto iRunLoopcount = nextChannel->iRunLoopCount();
+	  
+	  auto Cur_callback = CSU ; 
+
+	  if (iRunLoopcount>0)
+	    {
+	     LOG(DEBUG) << "Found an iRunLoop request for " << iRunLoopcount << " cycles";
+	     LOG(DEBUG) << "Clearing iRunLoop request for " << nextChannel->Name();
+	       ResetiRunLoopVisitor local_ResetiRunLoopVisitor;
+               nextChannel->Accept(local_ResetiRunLoopVisitor);
+	     }
+	    
+	  fromSutVector = protocol->DoCallback(Cur_callback,channelId, nextChannel->ApplicationData(), toSutVector);
 
  
          LOG(INFO) << "Node " << currentAccessInterface->Name() << " Protocol " << protocol->KindName() 
@@ -584,6 +598,33 @@ void SystemModelManager_impl::iApply ()
 //  End of: SystemModelManager_impl::iApply
 //---------------------------------------------------------------------------
 
+
+//! Issues clock cycles request
+//!
+//! @note: for now it is only a copy of iApply
+//! @note It triggers a data cycles and wait for all its pending registers being served
+//!
+void SystemModelManager_impl::iRunLoop (uint64_t value)
+{
+
+  auto& pathResolver = PATH_RESOLVER("iRunLoop: ");
+  auto reg           = pathResolver.ReferenceNode();
+  
+  auto appData = ThreadApplicationData();
+
+  MONITOR_DEBUG_APP("iRunLoop - Queuing request", appData);
+    
+  //LOG(DEBUG)<<"IRunLoop : setting a request for "<<value<<" clock cycles on node " << reg->Name();
+
+  reg->SetiRunLoop(value); 
+  
+  //LOG(DEBUG)<<"IRunLoop : new value is " << reg->iRunLoopCount();
+
+  MONITOR_DEBUG_APP("iRunLoop - Leaving", appData);
+}
+//
+//  End of: SystemModelManager_impl::iRunLoop
+//---------------------------------------------------------------------------
 
 
 //! Returns last read value from specified register
@@ -1312,7 +1353,7 @@ void SystemModelManager_impl::ReleaseServedThreads ()
       ++it;
       m_pendingThreads.erase(toErasePos);
 
-      MONITOR_DEBUG_APP("iApply - Notified from data cycle internal", appData);
+      MONITOR_DEBUG_APP("ReleaseServedThreads - Notified from data cycle internal", appData);
       appData->releaseCv.notify_one();
     }
     else

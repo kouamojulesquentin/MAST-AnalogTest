@@ -18,6 +18,7 @@
 #include "SystemModelVisitor.hpp"
 #include "Mast_Core_export.hpp"
 #include <cstdint>
+#include <utility> 
 
 namespace mast
 {
@@ -46,7 +47,7 @@ class MAST_CORE_EXPORT PropagatePendingVisitor final : public SystemModelVisitor
   // ---------------- Protected Methods
   //
   protected:
-  virtual uint32_t ChildrenPendings (const ParentNode& parentNode);
+  virtual std::pair<uint32_t,uint32_t>  ChildrenPendings (const ParentNode& parentNode);
 };
 //
 //  End of PropagatePendingVisitor class declaration

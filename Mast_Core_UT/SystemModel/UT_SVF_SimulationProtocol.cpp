@@ -110,12 +110,13 @@ void UT_SVF_SimulationProtocol::test_DoCallback_Sync ()
 
     auto toSutVector = BinaryVector::CreateFromString(toSutData);
     auto fromSutData = toSutVector.DataAsBinaryString("", "");
+    auto Primitive     = "Primitive"s;
 
     fakeSimulator.Produce(fromSutData);
 
     // ---------------- Exercise
     //
-    auto fromSutVector = sut.DoCallback(channelId, nullptr, toSutVector);
+    auto fromSutVector = sut.DoCallback(Primitive,channelId, nullptr, toSutVector);
 
     // ---------------- Verify
     //
@@ -208,10 +209,11 @@ void UT_SVF_SimulationProtocol::test_DoCallback_ASync ()
 
     auto toSutVector = BinaryVector::CreateFromString(toSutData);
     auto fromSutData = toSutVector.DataAsBinaryString("", "");
+    auto Primitive     = "Primitive"s;
 
     // ---------------- Exercise
     //
-    auto fromSutVector = sut.DoCallback(channelId, nullptr, toSutVector);
+    auto fromSutVector = sut.DoCallback(Primitive,channelId, nullptr, toSutVector);
 
     // ---------------- Verify
     //

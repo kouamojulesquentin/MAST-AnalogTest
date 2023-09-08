@@ -134,6 +134,10 @@ namespace mast
   //!
   CPP_API_EXPORT void iReset(bool doSynchronousReset = false);
 
+  //! Asks for a minimum Clock Cycles to be issued after iApply
+  //!
+  CPP_API_EXPORT void iRunLoop(uint64_t value);
+
   // ---------------- iWrite
   //
   CPP_API_EXPORT void iWrite (std::experimental::string_view registerPath, uint8_t     value); //!< Queues write request to register from uint8_t

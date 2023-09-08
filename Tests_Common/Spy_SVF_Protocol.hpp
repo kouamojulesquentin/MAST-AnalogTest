@@ -39,7 +39,7 @@ class Spy_SVF_Protocol final : public mast::SVF_Player
 
   //! Spies content how binary vector to SUT is transformed to SVF command while returning the BinaryVector unchanged
   //!
-  virtual mast::BinaryVector DoCallback(uint32_t channelId, void* interfaceData, const mast::BinaryVector& toSutData) override;
+  virtual mast::BinaryVector DoCallback(std::string CallbackId, uint32_t channelId, void* interfaceData, const mast::BinaryVector& toSutData) override;
 
   const std::vector<std::string>& SVFCommands() const { return m_spiedCommands->Commands(); }
 

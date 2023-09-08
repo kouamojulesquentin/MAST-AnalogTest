@@ -154,6 +154,10 @@ uint32_t SystemModelManager::iGetStatus(string_view nodePath, bool clearCounter)
 //!
 void SystemModelManager::iReset(bool doSynchronousReset) { m_impl->iReset(doSynchronousReset); }
 
+//! Asks for a minimum Clock Cycles to be issued after iApply
+//!
+void SystemModelManager::iRunLoop(uint64_t value)  { m_impl->iRunLoop(value); }
+
 
 //! Sets next Register value to sent to SUT
 //!

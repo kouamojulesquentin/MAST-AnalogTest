@@ -61,7 +61,7 @@ class MAST_CORE_EXPORT I2C_RawPlayer final : public AccessInterfaceRawProtocol
   //!
   //! @return Bitstream retrieved from SUT
   //!
-  virtual BinaryVector DoCallback(uint32_t channelId, void* interfaceData, const BinaryVector& toSutData) override;
+  virtual BinaryVector DoCallback(std::string CallbackId, uint32_t channelId, void* interfaceData, const BinaryVector& toSutData) override;
 
   //! Returns readable type of protocol
   //!

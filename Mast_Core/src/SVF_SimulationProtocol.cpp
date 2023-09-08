@@ -28,7 +28,7 @@ using namespace mast;
 
 //! Spies content of parameter toSutData and return it unchanged
 //!
-BinaryVector SVF_SimulationProtocol::DoCallback (uint32_t channelId, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector SVF_SimulationProtocol::DoCallback (std::string /*CallbackId*/, uint32_t channelId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   auto command = CreateSVFCommand(channelId, toSutData);
   SendCommand(command);

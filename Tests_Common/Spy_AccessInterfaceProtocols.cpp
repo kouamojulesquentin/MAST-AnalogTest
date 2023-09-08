@@ -18,7 +18,7 @@ using namespace test;
 
 
 //! Spies content of parameter toSutData and return it unchanged
-BinaryVector Spy_AccessInterfaceProtocols::DoCallback (uint32_t /* endpointId */, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector Spy_AccessInterfaceProtocols::DoCallback (std::string /*CallbackId*/, uint32_t /* endpointId */, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   m_toSutVectors.emplace_back(toSutData);
   return toSutData;

@@ -169,7 +169,7 @@ uint32_t I2C_RawPlayer::GetAddress (uint32_t channelId) const
 
 //! sends request for I2C_READ and I2C_WRITE callbacks and waits for response
 
-BinaryVector I2C_RawPlayer::DoCallback (uint32_t channelId, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector I2C_RawPlayer::DoCallback (std::string /*CallbackId*/, uint32_t channelId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   BinaryVector result;
   string i2c_FormattedData;

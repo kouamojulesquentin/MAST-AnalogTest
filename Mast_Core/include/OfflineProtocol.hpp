@@ -53,7 +53,7 @@ class MAST_CORE_EXPORT OfflineProtocol final : public AccessInterfaceProtocol
   //!
   //! @return Bitstream retrieved from SUT
   //!
-  virtual BinaryVector DoCallback(uint32_t channelId, void* interfaceData, const BinaryVector& toSutData) override;
+  virtual BinaryVector DoCallback(std::string CallbackId,uint32_t channelId, void* interfaceData, const BinaryVector& toSutData) override;
 
   //! Gets the number of Channel supported by the specific protocol
   //!

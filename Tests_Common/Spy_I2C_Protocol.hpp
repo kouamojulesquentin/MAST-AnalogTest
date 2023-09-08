@@ -54,7 +54,7 @@ class Spy_I2C_Protocol final : public mast::I2C_Player
 
   //! Spies content how binary vector to SUT is transformed to I2C command while returning the BinaryVector unchanged
   //!
-  virtual mast::BinaryVector DoCallback(uint32_t channelId, void* interfaceData, const mast::BinaryVector& toSutData) override;
+  virtual mast::BinaryVector DoCallback(std::string CallbackId, uint32_t channelId, void* interfaceData, const mast::BinaryVector& toSutData) override;
 
   //! Gets the number of channels supported by the specific protocol
   //!

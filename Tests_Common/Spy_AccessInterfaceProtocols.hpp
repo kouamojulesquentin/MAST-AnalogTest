@@ -32,7 +32,7 @@ class Spy_AccessInterfaceProtocols final : public mast::AccessInterfaceProtocol
 
   //! Spies content of parameter toSutData and return it unchanged
   //!
-  virtual mast::BinaryVector DoCallback(uint32_t channelId, void* interfaceData, const mast::BinaryVector& toSutData) override;
+  virtual mast::BinaryVector DoCallback(std::string CallbackId, uint32_t channelId, void* interfaceData, const mast::BinaryVector& toSutData) override;
 
   const std::vector<mast::BinaryVector>& ToSutVectors() const { return m_toSutVectors; }
 

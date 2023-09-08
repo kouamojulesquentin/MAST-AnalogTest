@@ -24,7 +24,7 @@ using namespace mast;
 //! @param toSutData      Bits stream to transfer to SUT
 //!
 //! @return Bits stream retrieved from SUT
-BinaryVector LoopbackAccessInterfaceProtocol::DoCallback (uint32_t /* ChannelId */, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector LoopbackAccessInterfaceProtocol::DoCallback (std::string /*CallbackId*/, uint32_t /* ChannelId */, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   auto fromSut = toSutData;
 

@@ -51,7 +51,7 @@ class MAST_CORE_EXPORT Remote_Protocol_Proxy : public AccessInterfaceProtocol
   //! @param toSutData      Bits stream to transfer to SUT
   //!
   //! @return Bits stream retrieved from SUT
-  virtual BinaryVector DoCallback(uint32_t channelId, void* interfaceData, const BinaryVector& toSutData);
+  virtual BinaryVector DoCallback(std::string CallbackId, uint32_t channelId, void* interfaceData, const BinaryVector& toSutData);
 
   //! Gets the number of channels supported by the specific protocol
   //!

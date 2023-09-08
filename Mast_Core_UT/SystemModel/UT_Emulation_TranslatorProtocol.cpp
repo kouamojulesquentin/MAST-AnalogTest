@@ -130,6 +130,7 @@ void UT_Emulation_TranslatorProtocol::test_SVF_RawPlayer_TransformationCallback 
     auto        toSutVector     = BinaryVector::CreateFromString(std::get<1> (data));
     const auto& expectedCommand = std::get<2> (data);
     RVFRequest  test;
+    auto Primitive     = "Primitive"s;
 
     auto sut = make_shared<Spy_Emulation_Translator>(); 
     
@@ -161,7 +162,7 @@ void UT_Emulation_TranslatorProtocol::test_SVF_RawPlayer_TransformationCallback 
     //Exploit RawPlayer to get request
        Translator->PushfromSut(toSutVector,0); //Avoid stall if not reset
     
-    player->DoCallback(n_Callback,nullptr,toSutVector);
+    player->DoCallback(Primitive,n_Callback,nullptr,toSutVector);
     test = Translator->PopRequest(0);
 
     auto fromSutVector = sut->TransformationCallback(test);

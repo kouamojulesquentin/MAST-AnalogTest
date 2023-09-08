@@ -75,7 +75,7 @@ GenericAccessInterfaceProtocol::GenericAccessInterfaceProtocol (vector<Action> c
 //! @param toSutData      Bits stream to transfer to SUT
 //!
 //! @return Bits stream retrieved from SUT
-BinaryVector GenericAccessInterfaceProtocol::DoCallback (uint32_t channelId, void* interfaceData, const BinaryVector& toSutData)
+BinaryVector GenericAccessInterfaceProtocol::DoCallback (std::string /*CallbackId*/, uint32_t channelId, void* interfaceData, const BinaryVector& toSutData)
 {
   if (channelId >= m_callbacks.size())
   {

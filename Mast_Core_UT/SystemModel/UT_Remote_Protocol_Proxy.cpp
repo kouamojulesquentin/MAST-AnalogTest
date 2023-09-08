@@ -318,12 +318,13 @@ void UT_Remote_Protocol_Proxy::test_DoCallback ()
     auto         clientProtocol  = make_unique<Spy_ClientProtocol>();
     auto         pSpy            = clientProtocol.get(); // This is to retrieve spied data
     auto         commands        = vector<string>{"RST"s, "SIR"s, "SDR"s};
+    auto Primitive     = "Primitive"s;
 
     Remote_Protocol_Proxy sut(std::move(clientProtocol), std::move(commands));
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS_NOTHING (fromSutData = sut.DoCallback(channelId, nullptr, toSutData));
+    TS_ASSERT_THROWS_NOTHING (fromSutData = sut.DoCallback(Primitive,channelId, nullptr, toSutData));
 
     // ---------------- Verify
     //
@@ -367,10 +368,11 @@ void UT_Remote_Protocol_Proxy::test_DoCallback_invalid_ChannelId ()
   Remote_Protocol_Proxy sut(make_unique<Spy_ClientProtocol>(), vector<string>{"RST"s, "SIR"s, "SDR"s});
 
   const auto toSutData = BinaryVector::CreateFromString("/x01234FACE");
+  auto Primitive     = "Primitive"s;
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (sut.DoCallback(3, nullptr, toSutData), std::exception);
+  TS_ASSERT_THROWS (sut.DoCallback(Primitive,3, nullptr, toSutData), std::exception);
 }
 
 
@@ -387,10 +389,11 @@ void UT_Remote_Protocol_Proxy::test_DoCallback_invalid_InterfaceData ()
   const auto toSutData     = BinaryVector::CreateFromString("/x01234FACE");
   auto       myData        = { 0x01, 0x02 };      // There is no meaning in those data
   auto       interfaceData = reinterpret_cast<void*>(&myData);
+  auto Primitive     = "Primitive"s;
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (sut.DoCallback(2, interfaceData, toSutData), std::exception);
+  TS_ASSERT_THROWS (sut.DoCallback(Primitive,2, interfaceData, toSutData), std::exception);
 }
 
 

@@ -176,10 +176,11 @@ void UT_STIL_EmulationProtocol::test_DoCallback ()
     auto n_chain  = std::get<0> (data);
     auto toSutVector  = BinaryVector::CreateFromString(std::get<1> (data));
     auto expected = std::get<2> (data);
+    auto Primitive     = "Primitive"s;
 
     sut.resetCommands();
 
-    auto fromSutVector = sut.DoCallback(n_chain,nullptr,toSutVector);
+    auto fromSutVector = sut.DoCallback(Primitive,n_chain,nullptr,toSutVector);
     TS_ASSERT_EQUALS (toSutVector,fromSutVector); //It is a loopback
 
     auto gotSTILCommands=sut.STILCommands();

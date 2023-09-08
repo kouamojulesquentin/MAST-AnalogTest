@@ -144,7 +144,7 @@ Remote_Protocol_Proxy::Remote_Protocol_Proxy (const string& parameters)
 
 //! Loopbacks "to SUT data" logging SVF command(s) that would be issued if it was really an operating protocol
 //!
-BinaryVector Remote_Protocol_Proxy::DoCallback (uint32_t channelId, void* interfaceData, const BinaryVector& toSutData)
+BinaryVector Remote_Protocol_Proxy::DoCallback (std::string /*CallbackId*/, uint32_t channelId, void* interfaceData, const BinaryVector& toSutData)
 {
   CHECK_PARAMETER_NULL (interfaceData, "Interface data is not supported by remote protocols (there is no sharing of address space)");
   CHECK_PARAMETER_LT   (channelId, m_commands.size(), "EndPoint id must not be greater than supported commands");

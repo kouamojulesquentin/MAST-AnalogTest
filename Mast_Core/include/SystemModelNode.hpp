@@ -74,6 +74,8 @@ class MAST_CORE_EXPORT SystemModelNode
   void SetPending ()                      { m_pendingCount =  1u; }    //!< Sets number of pending to 1
   virtual void ResetPending ()            { m_pendingCount =  0u; }    //!< Resets the number of pending
 
+  void SetiRunLoop   (uint32_t count) { m_iRunloopCount =  count; } //!< Sets number of iRunLoop cycles
+
 
   static void ResetNodeIdentifier() { sm_nextIdentifier = 0; } //!< For debug purpose only, reset node identifier (e.g to be able to check construction order, or printers...)
 
@@ -89,7 +91,8 @@ class MAST_CORE_EXPORT SystemModelNode
   virtual uint32_t                    PendingCount()    const { return m_pendingCount; }                  //!< Returns number of pending registers down the hierarchy
   virtual bool                        IsPending()       const { return m_pendingCount  != 0;    }         //!< Returns true if at least one node in the hierarchy is pending (need an update cycle)
 
-  // ---------------- Protected Methods
+  virtual uint32_t                    iRunLoopCount()    const { return m_iRunloopCount; }      //!< Returns number of iRunLoop cycles request
+    // ---------------- Protected Methods
   //
   protected:
   virtual ~SystemModelNode() = default;
@@ -115,7 +118,8 @@ class MAST_CORE_EXPORT SystemModelNode
   std::shared_ptr<mast::Conditioners> m_conditioners;              //!< Optional conditioner(s)
   std::shared_ptr<SystemModelNode>    m_pNextSibling;              //!< Points to next node at same level (forming a singly linked list)
   void*                               m_applicationData = nullptr; //!< Application specific data (semantic managed by the application)
-};
+  uint32_t                  m_iRunloopCount = 0;		   //!< If > 0, an iRunLoop command must be issued before an iApply cycle
+ };
 //
 //  End of SystemModelNode class declaration
 //---------------------------------------------------------------------------

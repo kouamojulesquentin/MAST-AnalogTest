@@ -284,6 +284,20 @@ void mast::iReset (bool doSynchronousReset)
 
 
 
+//! Asks for a minimum Clock Cycles to be issued after iApply
+//!
+//! @param clock cycles to be issues
+//!
+void mast::iRunLoop (uint64_t value)
+{
+  auto manager = GetAndCheckManager();
+  manager->iRunLoop(value);
+}
+//
+//  End of: mast::iRunLoop
+//---------------------------------------------------------------------------
+
+
 
 void mast::iWrite (string_view registerPath, uint8_t     value) { iWrite_impl(registerPath, value); }
 void mast::iWrite (string_view registerPath, uint16_t    value) { iWrite_impl(registerPath, value); }

@@ -51,7 +51,7 @@ STIL_EmulationProtocol::STIL_EmulationProtocol (const string& nbChannels)
 
 //! Loopbacks "to SUT data" logging STIL command(s) that would be issued if it was really an operating protocol
 //!
-BinaryVector STIL_EmulationProtocol::DoCallback (uint32_t channelId, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector STIL_EmulationProtocol::DoCallback (std::string /*CallbackId*/, uint32_t channelId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   for (auto command : CreateSTILCommand(channelId, toSutData) )
  {

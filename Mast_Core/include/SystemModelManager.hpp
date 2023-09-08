@@ -178,6 +178,10 @@ class MAST_CORE_EXPORT SystemModelManager final
   //!
   void iReset(bool doSynchronousReset = false);
 
+  //! Asks for a minimum Clock Cycles to be issued after iApply
+  //!
+  void iRunLoop(uint64_t value);
+
 
   //! Sets next Register value to sent to SUT
   //!

@@ -72,7 +72,7 @@ I2C_EmulationProtocol::I2C_EmulationProtocol (const string& parameters)
 
 //! Loopbacks "to SUT data" logging I2C command(s) that would be issued if it was really an operating protocol
 //!
-BinaryVector I2C_EmulationProtocol::DoCallback (uint32_t channelId, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector I2C_EmulationProtocol::DoCallback (std::string /*CallbackId*/, uint32_t channelId, void* /* interfaceData */, const BinaryVector& toSutData)
 {
   auto command = CreateI2CCommand(channelId, toSutData);
 

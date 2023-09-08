@@ -262,10 +262,11 @@ void UT_GenericAccessInterfaceProtocol::test_DoCallback_0 ()
   auto sut           = CreateSut(loggedActions);
   auto text          = "Hello"s;
   auto toSutData     = BinaryVector();
+  auto Primitive     = "Primitive"s;
 
   // ---------------- Exercise
   //
-  auto gotVector = sut.DoCallback(0u, &text, toSutData);
+  auto gotVector = sut.DoCallback(Primitive,0u, &text, toSutData);
 
   // ---------------- Verify
   //
@@ -284,10 +285,11 @@ void UT_GenericAccessInterfaceProtocol::test_DoCallback_1 ()
   auto sut           = CreateSut(loggedActions);
   auto context       = "SIR"s;
   auto toSutData     = BinaryVector::CreateFromString("0x01");
+  auto Primitive     = "Primitive"s;
 
   // ---------------- Exercise
   //
-  auto gotVector = sut.DoCallback(1u, &context, toSutData);
+  auto gotVector = sut.DoCallback(Primitive,1u, &context, toSutData);
 
   // ---------------- Verify
   //
@@ -306,10 +308,11 @@ void UT_GenericAccessInterfaceProtocol::test_DoCallback_2 ()
   auto sut           = CreateSut(loggedActions);
   auto context       = "SDR"s;
   auto toSutData     = BinaryVector::CreateFromString("/x3636/b1/xC0C0_C0C0");
+  auto Primitive     = "Primitive"s;
 
   // ---------------- Exercise
   //
-  auto gotVector = sut.DoCallback(2u, &context, toSutData);
+  auto gotVector = sut.DoCallback(Primitive,2u, &context, toSutData);
 
   // ---------------- Verify
   //
@@ -328,10 +331,11 @@ void UT_GenericAccessInterfaceProtocol::test_DoCallback_3 ()
   auto sut           = CreateSut(loggedActions);
   auto context       = "SDR"s;
   auto toSutData     = BinaryVector::CreateFromString("/x3636/b1/xC0C0_C0C0");
+  auto Primitive     = "Primitive"s;
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (sut.DoCallback(3u, &context, toSutData), std::exception);
+  TS_ASSERT_THROWS (sut.DoCallback(Primitive,3u, &context, toSutData), std::exception);
 }
 
 //===========================================================================

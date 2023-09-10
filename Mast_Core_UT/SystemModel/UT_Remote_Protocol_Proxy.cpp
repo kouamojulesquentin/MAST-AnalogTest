@@ -16,6 +16,7 @@
 #include "Remote_Protocol_Proxy.hpp"
 #include "Remote_Protocol_Client.hpp"
 #include "RemoteProtocolFactory.hpp"
+#include "RVF.hpp"
 
 #include <memory>
 #include <tuple>
@@ -38,6 +39,7 @@ using mast::RemoteProtocolFactory;
 using mast::Remote_Protocol_Proxy;
 using mast::Remote_Protocol_Client;
 using mast::BinaryVector;
+using mast::RVFRequest;
 
 using namespace std::string_literals;
 using namespace std::experimental::literals::string_view_literals;
@@ -319,12 +321,14 @@ void UT_Remote_Protocol_Proxy::test_DoCallback ()
     auto         pSpy            = clientProtocol.get(); // This is to retrieve spied data
     auto         commands        = vector<string>{"RST"s, "SIR"s, "SDR"s};
     auto Primitive     = "Primitive"s;
-
+  
     Remote_Protocol_Proxy sut(std::move(clientProtocol), std::move(commands));
 
     // ---------------- Exercise
     //
-    TS_ASSERT_THROWS_NOTHING (fromSutData = sut.DoCallback(Primitive,channelId, nullptr, toSutData));
+    RVFRequest Test(Primitive, toSutData, nullptr);
+//  TS_ASSERT_THROWS_NOTHING (fromSutData = sut.DoCallback(Primitive,channelId, nullptr, toSutData));
+  TS_ASSERT_THROWS_NOTHING (fromSutData = sut.DoCallback(Test,channelId));
 
     // ---------------- Verify
     //
@@ -369,10 +373,12 @@ void UT_Remote_Protocol_Proxy::test_DoCallback_invalid_ChannelId ()
 
   const auto toSutData = BinaryVector::CreateFromString("/x01234FACE");
   auto Primitive     = "Primitive"s;
+    RVFRequest Test(Primitive, toSutData, nullptr);
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (sut.DoCallback(Primitive,3, nullptr, toSutData), std::exception);
+//  TS_ASSERT_THROWS (sut.DoCallback(Primitive,3, nullptr, toSutData), std::exception);
+  TS_ASSERT_THROWS (sut.DoCallback(Test,3), std::exception);
 }
 
 
@@ -390,10 +396,12 @@ void UT_Remote_Protocol_Proxy::test_DoCallback_invalid_InterfaceData ()
   auto       myData        = { 0x01, 0x02 };      // There is no meaning in those data
   auto       interfaceData = reinterpret_cast<void*>(&myData);
   auto Primitive     = "Primitive"s;
+    RVFRequest Test(Primitive, toSutData, interfaceData);
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (sut.DoCallback(Primitive,2, interfaceData, toSutData), std::exception);
+//  TS_ASSERT_THROWS (sut.DoCallback(Primitive,2, interfaceData, toSutData), std::exception);
+  TS_ASSERT_THROWS (sut.DoCallback(Test,2), std::exception);
 }
 
 

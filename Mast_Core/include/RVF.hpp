@@ -107,13 +107,15 @@ class RVFRequest
    , m_FormattedData(FormattedData)
   {}
 
-  std::experimental::string_view CallbackId() {return m_CallbackId;};
+  /* Getters*/
+  std::string CallbackId() {return m_CallbackId;};
   BinaryVector	ToSutVector() {return m_ToSutVector;}	;
   void* interfaceData() { return m_interfaceData;};
   std::string FormattedData(){if (!m_FormattedData.empty()) return m_FormattedData ;
                               else return m_ToSutVector.DataAsBinaryString();};
 
-
+  /* Setters -- mostly for UT purposes*/
+  void setCallbackId(std::string CallbackId) {m_CallbackId= CallbackId;}
  
   private:
   std::string m_CallbackId;

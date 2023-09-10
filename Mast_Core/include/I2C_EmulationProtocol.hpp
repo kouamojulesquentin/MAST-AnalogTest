@@ -47,7 +47,7 @@ class MAST_CORE_EXPORT I2C_EmulationProtocol final : public I2C_Player
   //!
   //! @return Bitstream retrieved from SUT
   //!
-  virtual BinaryVector DoCallback(std::string CallbackId, uint32_t channelId, void* interfaceData, const BinaryVector& toSutData) override;
+  virtual BinaryVector DoCallback(RVFRequest Request, uint32_t channelId) override;
 
   //! Returns readable type of protocol
   //!

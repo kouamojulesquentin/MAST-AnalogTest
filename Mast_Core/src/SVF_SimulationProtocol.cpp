@@ -28,13 +28,13 @@ using namespace mast;
 
 //! Spies content of parameter toSutData and return it unchanged
 //!
-BinaryVector SVF_SimulationProtocol::DoCallback (std::string /*CallbackId*/, uint32_t channelId, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector SVF_SimulationProtocol::DoCallback (RVFRequest Request, uint32_t channelId)
 {
-  auto command = CreateSVFCommand(channelId, toSutData);
+  auto command = CreateSVFCommand(channelId, Request.ToSutVector());
   SendCommand(command);
 
   auto fromSutData = FetchDataFromSut();
-  return fromSutData;
+  return Request.ToSutVector();
 }
 //
 //  End of: Spy_AccessInterfaceProtocols::DoCallback

@@ -14,6 +14,7 @@
 #include "UT_SVF_SimulationProtocol.hpp"
 #include "SVF_SimulationProtocol.hpp"
 #include "Fake_SVF_Simulator.hpp"
+#include "RVF.hpp"
 
 #include "BinaryVector_Traits.hpp"
 #include <tuple>
@@ -111,12 +112,13 @@ void UT_SVF_SimulationProtocol::test_DoCallback_Sync ()
     auto toSutVector = BinaryVector::CreateFromString(toSutData);
     auto fromSutData = toSutVector.DataAsBinaryString("", "");
     auto Primitive     = "Primitive"s;
+    RVFRequest Test(Primitive, toSutVector, nullptr);
 
     fakeSimulator.Produce(fromSutData);
 
     // ---------------- Exercise
     //
-    auto fromSutVector = sut.DoCallback(Primitive,channelId, nullptr, toSutVector);
+    auto fromSutVector = sut.DoCallback(Test,channelId);
 
     // ---------------- Verify
     //
@@ -210,10 +212,11 @@ void UT_SVF_SimulationProtocol::test_DoCallback_ASync ()
     auto toSutVector = BinaryVector::CreateFromString(toSutData);
     auto fromSutData = toSutVector.DataAsBinaryString("", "");
     auto Primitive     = "Primitive"s;
+    RVFRequest Test(Primitive, toSutVector, nullptr);
 
     // ---------------- Exercise
     //
-    auto fromSutVector = sut.DoCallback(Primitive,channelId, nullptr, toSutVector);
+    auto fromSutVector = sut.DoCallback(Test,channelId);
 
     // ---------------- Verify
     //

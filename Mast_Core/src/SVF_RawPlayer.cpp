@@ -15,6 +15,7 @@
 #include "SVFVector.hpp"
 #include "Utility.hpp"
 #include "RVF.hpp"
+#include "g3log/g3log.hpp"
 
 #include <experimental/string_view>
 #include <sstream>
@@ -27,11 +28,13 @@ using std::ostringstream;
 
 //! sends request for TRST,SIR and SDR callbacks and waits for response
 
-BinaryVector SVF_RawPlayer::DoCallback (std::string CallbackId, uint32_t channelId, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector SVF_RawPlayer::DoCallback (RVFRequest Request, uint32_t channelId)
 {
   BinaryVector result;
   string svfFormattedData;
   BinaryVector callback_toSutData;
+  
+  std::string SVFCallback(UNDEFINED);
 
   auto FormatSVFData = [] (BinaryVector RawData)
   {
@@ -44,17 +47,30 @@ BinaryVector SVF_RawPlayer::DoCallback (std::string CallbackId, uint32_t channel
 //  ostringstream os;
 //  os << toSutData.BitsCount() << " TDI(" << SVFVector(toSutData).Data() << ");";
 
+ //Identify supported callbacks
+  if (Request.CallbackId() == CSU) 
+   SVFCallback = CallbackForChannel(channelId);
+  if (Request.CallbackId() == RUNLOOP) 
+   SVFCallback = RUNTEST;
+  if (Request.CallbackId() == TRST) 
+   SVFCallback = TRST;
+  if (IS_SERVICE_CALLBACK(Request.CallbackId())) 
+    SVFCallback = Request.CallbackId();
+  
+  if (SVFCallback == UNDEFINED)
+  LOG(ERROR_LVL)<<"Callback "<< Request.CallbackId() <<" is not supported by this AccessInterface"; 
+   
   if (channelId != 0) //No data in the request dor Reset operation
       {
 //      svfFormattedData = os.str();
-      svfFormattedData = FormatSVFData(toSutData);
-      callback_toSutData = toSutData;
+      svfFormattedData = FormatSVFData(Request.ToSutVector());
+      callback_toSutData = Request.ToSutVector();
       }
 
   //Many Unit Test depend on FormattedData
-  RVFRequest request(CallbackForChannel(channelId),callback_toSutData,svfFormattedData);
+  RVFRequest up_request(SVFCallback,callback_toSutData,svfFormattedData);
 
-  PushRequest(request);
+  PushRequest(up_request);
   
                        /*NB: this is a BLOCKING call*/
      result = PopfromSut();
@@ -63,8 +79,8 @@ BinaryVector SVF_RawPlayer::DoCallback (std::string CallbackId, uint32_t channel
  //Update Cycle count
       switch (channelId){
        case 0: this->increaseElapsedCycles(nTRST_OVERHEAD_CYCLES); break; 
-       case 1: this->increaseElapsedCycles(SIR_OVERHEAD_CYCLES+toSutData.BitsCount()); break;
-       case 2: this->increaseElapsedCycles(SDR_OVERHEAD_CYCLES+toSutData.BitsCount()); break;
+       case 1: this->increaseElapsedCycles(SIR_OVERHEAD_CYCLES+Request.ToSutVector().BitsCount()); break;
+       case 2: this->increaseElapsedCycles(SDR_OVERHEAD_CYCLES+Request.ToSutVector().BitsCount()); break;
        default: ; //Should never arrive here, a runtime error would have been thrown before by "CallbackId"
       }
 

@@ -169,7 +169,7 @@ uint32_t I2C_RawPlayer::GetAddress (uint32_t channelId) const
 
 //! sends request for I2C_READ and I2C_WRITE callbacks and waits for response
 
-BinaryVector I2C_RawPlayer::DoCallback (std::string /*CallbackId*/, uint32_t channelId, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector I2C_RawPlayer::DoCallback (RVFRequest Request, uint32_t channelId)
 {
   BinaryVector result;
   string i2c_FormattedData;
@@ -186,7 +186,7 @@ BinaryVector I2C_RawPlayer::DoCallback (std::string /*CallbackId*/, uint32_t cha
   void *address_data=(void *) &(m_addresses[channelId]);
 
   os_read   << "(0x"  << std::hex << address << ");\n";
-  os_write  << "(0x" << std::hex << address << ", " << toSutData.DataAsMixString() << ");\n";
+  os_write  << "(0x" << std::hex << address << ", " << Request.ToSutVector().DataAsMixString() << ");\n";
 
   if (channelId == 0) //No data in the request dor Reset operation
       {
@@ -197,7 +197,7 @@ BinaryVector I2C_RawPlayer::DoCallback (std::string /*CallbackId*/, uint32_t cha
   else
    {
     
-  callback_toSutData = toSutData;
+  callback_toSutData = Request.ToSutVector();
   RVFRequest  read_request(I2C_READ,callback_toSutData,os_read.str(),address_data);
   
   read_request.m_optionalData = (m_addresses[channelId]);
@@ -206,7 +206,7 @@ BinaryVector I2C_RawPlayer::DoCallback (std::string /*CallbackId*/, uint32_t cha
   result = PopfromSut(); //Need to remove from queue, but return data in not useful
 
  //Update Cycle count for I2CWrite
-   this->increaseElapsedCycles(I2C_ADDRESSFRAME_CYCLES+I2C_DATAFRAME_CYCLES*toSutData.BytesCount()+I2C_STOP_CYCLES);
+   this->increaseElapsedCycles(I2C_ADDRESSFRAME_CYCLES+I2C_DATAFRAME_CYCLES*Request.ToSutVector().BytesCount()+I2C_STOP_CYCLES);
 
   RVFRequest write_request(I2C_WRITE,callback_toSutData,os_write.str(),address_data);
   write_request.m_optionalData = (m_addresses[channelId]);
@@ -214,7 +214,7 @@ BinaryVector I2C_RawPlayer::DoCallback (std::string /*CallbackId*/, uint32_t cha
   PushRequest(write_request);
   result = PopfromSut();
  //Update Cycle count for I2Read
-   this->increaseElapsedCycles(I2C_ADDRESSFRAME_CYCLES+I2C_DATAFRAME_CYCLES*toSutData.BytesCount()+I2C_STOP_CYCLES);
+   this->increaseElapsedCycles(I2C_ADDRESSFRAME_CYCLES+I2C_DATAFRAME_CYCLES*Request.ToSutVector().BytesCount()+I2C_STOP_CYCLES);
 
   }
   

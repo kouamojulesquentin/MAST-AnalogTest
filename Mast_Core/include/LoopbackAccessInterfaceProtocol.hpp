@@ -38,7 +38,7 @@ class MAST_CORE_EXPORT LoopbackAccessInterfaceProtocol : public AccessInterfaceP
   //! @param toSutData      Bits stream to transfer to SUT
   //!
   //! @return Bits stream retrieved from SUT
-  virtual BinaryVector DoCallback(std::string CallbackId, uint32_t channelId, void* interfaceData, const BinaryVector& toSutData) override;
+  virtual BinaryVector DoCallback(RVFRequest Request, uint32_t channelId) override;
 
   //! Gets the number of Channels supported by the specific protocol
   //!

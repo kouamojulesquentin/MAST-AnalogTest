@@ -44,6 +44,8 @@ typedef  uint32_t Callback_t;
 #define NO_MORE_PENDING  "AI_FINISHED"
 #define HALT_REQUEST     "HALT_REQUEST"
 
+#define IS_SERVICE_CALLBACK(X) (((X == NO_MORE_PENDING) || (X == HALT_REQUEST)) ? (true) : (false))
+ 
 #endif
 //===========================================================================
 // End of CallbackIds.hpp

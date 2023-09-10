@@ -15,7 +15,7 @@
 #include "SVF_RawPlayer.hpp"
 #include "Fake_SVF_Simulator.hpp"
 #include "Spy_Emulation_Translator.hpp"
-
+#include "RVF.hpp"
 #include "BinaryVector_Traits.hpp"
 #include <tuple>
 #include <experimental/string_view>
@@ -111,32 +111,38 @@ void UT_SVF_RawPlayer::test_Callbacks ()
   //
   //Put a result value to avoid callback getting stuck on result queue
   auto  test = BinaryVector::CreateFromBinaryString("01");
-  auto Primitive     = "Primitive"s;
+
+  RVFRequest SVFTest(TRST, test, nullptr);
 
   //Reset as Callback 0 : does not need a fromSUT value
   Interface->PushfromSut(test,0);
- sut->DoCallback(Primitive,0,nullptr,test);
+// sut->DoCallback(TRST,0,nullptr,test);
+ sut->DoCallback(SVFTest,0);
  auto result = Interface->PopRequest(0);
  TS_ASSERT_EQUALS(result.CallbackId(),TRST);
  TS_ASSERT_EQUALS(result.FormattedData(),""); 
 
   //Callback 1 : SIR
   Interface->PushfromSut(test,0);
- sut->DoCallback(Primitive,1,nullptr,test);
+  SVFTest.setCallbackId(CSU);
+// sut->DoCallback(CSU,1,nullptr,test);
+ sut->DoCallback(SVFTest,1);
  result = Interface->PopRequest(0);
  TS_ASSERT_EQUALS(result.CallbackId(),SIR);
  TS_ASSERT_EQUALS(result.FormattedData(),"2 TDI(01);");
 
   //Callback 2 : SDR
   Interface->PushfromSut(test,0);
- sut->DoCallback(Primitive,2,nullptr,test);
- result = Interface->PopRequest(0);
+// sut->DoCallback(CSU,2,nullptr,test);
+ sut->DoCallback(SVFTest,2);
+  result = Interface->PopRequest(0);
  TS_ASSERT_EQUALS(result.CallbackId(),SDR);
  TS_ASSERT_EQUALS(result.FormattedData(),"2 TDI(01);");
 
   //Callback 3 : UNDEFINED
   Interface->PushfromSut(test,0);
- sut->DoCallback(Primitive,3,nullptr,test);
+// sut->DoCallback(CSU,3,nullptr,test);
+ sut->DoCallback(SVFTest,3);
  result = Interface->PopRequest(0);
  TS_ASSERT_EQUALS(result.CallbackId(),UNDEFINED);
 
@@ -153,7 +159,6 @@ void UT_SVF_RawPlayer::test_Callbacks_multithread ()
    auto sut=make_shared<SVF_RawPlayer>();
      auto ai = make_shared<AccessInterface> ("dummy",sut);
    Interface->RegisterInterface(ai);
-  auto Primitive     = "Primitive"s;
 
 
   // ---------------- Exercise & Verify
@@ -161,33 +166,37 @@ void UT_SVF_RawPlayer::test_Callbacks_multithread ()
   //Put a result value to avoid callback getting stuck on result queue
   auto  test = BinaryVector::CreateFromBinaryString("01");
 
- auto callback_thread = [this,Primitive] (std::shared_ptr<SVF_RawPlayer> sut,int EndpointId,BinaryVector  test) 
-   { sut->DoCallback(Primitive,EndpointId,nullptr,test);};
+ auto callback_thread = [this] (std::shared_ptr<SVF_RawPlayer> sut,std::string retargetingCallback, int EndpointId,BinaryVector  test) 
+   { 
+       RVFRequest SVFTest(retargetingCallback, test, nullptr);
+     sut->DoCallback(SVFTest,EndpointId);
+//     sut->DoCallback(retargetingCallback,EndpointId,nullptr,test);
+   };
 
   //Reset as Callback 0 :
  Interface->PushfromSut(test,0);
-    std::thread AI_thread(callback_thread,sut,0,test);
+    std::thread AI_thread(callback_thread,sut,TRST,0,test);
  auto result = Interface->PopRequest(0);
  TS_ASSERT_EQUALS(result.CallbackId(),TRST);
  AI_thread.join();
 
   //Callback 1 : SIR
   Interface->PushfromSut(test,0);
- std::thread AI_thread_1(callback_thread,sut,1,test);
+ std::thread AI_thread_1(callback_thread,sut,CSU,1,test);
  result = Interface->PopRequest(0);
  TS_ASSERT_EQUALS(result.CallbackId(),SIR);
  AI_thread_1.join();
 
   //Callback 2 : SDR
   Interface->PushfromSut(test,0);
- std::thread AI_thread_2(callback_thread,sut,2,test);
+ std::thread AI_thread_2(callback_thread,sut,CSU,2,test);
  result = Interface->PopRequest(0);
  TS_ASSERT_EQUALS(result.CallbackId(),SDR);
  AI_thread_2.join();
 
   //Callback 3 : UNDEFINED
   Interface->PushfromSut(test,0);
- std::thread AI_thread_3(callback_thread,sut,3,test);
+ std::thread AI_thread_3(callback_thread,sut,CSU,3,test);
  result = Interface->PopRequest(0);
  TS_ASSERT_EQUALS(result.CallbackId(),UNDEFINED);
  AI_thread_3.join();

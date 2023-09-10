@@ -170,10 +170,11 @@ void UT_I2C_EmulationProtocol::test_DoCallback ()
     auto addresses = { 0x00u, 0x41u, 0x42u };
     Spy_I2C_Protocol sut(addresses, "S2R "s);
     auto Primitive     = "Primitive"s;
+    RVFRequest Test(Primitive, toSutVector, nullptr);
 
     // ---------------- Exercise
     //
-    auto fromSutVector = sut.DoCallback(Primitive, channelId, nullptr, toSutVector);
+    auto fromSutVector = sut.DoCallback(Test, channelId);
 
     // ---------------- Verify
     //
@@ -220,12 +221,13 @@ void UT_I2C_EmulationProtocol::test_DoCallback_String()
     auto        toSutVector     = BinaryVector::CreateFromString(std::get<1> (data));
     const auto& expectedCommand = std::get<2> (data);
   auto Primitive     = "Primitive"s;
+    RVFRequest Test(Primitive, toSutVector, nullptr);
 
     Spy_I2C_Protocol sut("0x00u, 0x41u, 0x42u,S2R "s);
 
     // ---------------- Exercise
     //
-    auto fromSutVector = sut.DoCallback(Primitive,channelId, nullptr, toSutVector);
+    auto fromSutVector = sut.DoCallback(Test,channelId);
 
     // ---------------- Verify
     //

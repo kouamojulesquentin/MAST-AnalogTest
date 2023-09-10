@@ -179,8 +179,12 @@ void UT_STIL_EmulationProtocol::test_DoCallback ()
     auto Primitive     = "Primitive"s;
 
     sut.resetCommands();
+  
+    RVFRequest Test(Primitive, toSutVector, nullptr);
 
-    auto fromSutVector = sut.DoCallback(Primitive,n_chain,nullptr,toSutVector);
+//    auto fromSutVector = sut.DoCallback(Primitive,n_chain,nullptr,toSutVector);
+    auto fromSutVector = sut.DoCallback(Test,n_chain);
+
     TS_ASSERT_EQUALS (toSutVector,fromSutVector); //It is a loopback
 
     auto gotSTILCommands=sut.STILCommands();

@@ -144,23 +144,23 @@ Remote_Protocol_Proxy::Remote_Protocol_Proxy (const string& parameters)
 
 //! Loopbacks "to SUT data" logging SVF command(s) that would be issued if it was really an operating protocol
 //!
-BinaryVector Remote_Protocol_Proxy::DoCallback (std::string /*CallbackId*/, uint32_t channelId, void* interfaceData, const BinaryVector& toSutData)
+BinaryVector Remote_Protocol_Proxy::DoCallback (RVFRequest Request, uint32_t channelId)
 {
-  CHECK_PARAMETER_NULL (interfaceData, "Interface data is not supported by remote protocols (there is no sharing of address space)");
+  CHECK_PARAMETER_NULL (Request.interfaceData(), "Interface data is not supported by remote protocols (there is no sharing of address space)");
   CHECK_PARAMETER_LT   (channelId, m_commands.size(), "EndPoint id must not be greater than supported commands");
 
   auto command       = m_commands[channelId];
-  auto binaryToSut   = toSutData.DataRightAligned();
+  auto binaryToSut   = Request.ToSutVector().DataRightAligned();
 
-  auto sendResult    = m_remoteProtocol->SendScanVector(command, toSutData.BitsCount(), binaryToSut);
+  auto sendResult    = m_remoteProtocol->SendScanVector(command, Request.ToSutVector().BitsCount(), binaryToSut);
 
   auto  fromSutBitsCount = sendResult.first;
   auto& fromSutBinary    = sendResult.second;
 
-  if (fromSutBitsCount != toSutData.BitsCount())
+  if (fromSutBitsCount != Request.ToSutVector().BitsCount())
   {
     std::ostringstream os;
-    os << "Got " << fromSutBitsCount << " bits from SUT while expecting " << toSutData.BitsCount();
+    os << "Got " << fromSutBitsCount << " bits from SUT while expecting " << Request.ToSutVector().BitsCount();
     CHECK_FAILED(os.str());
   }
 

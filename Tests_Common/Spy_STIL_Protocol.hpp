@@ -18,6 +18,8 @@
 #include "STIL_Player.hpp"
 #include "SpiedProtocolsCommands.hpp"
 #include "BinaryVector.hpp"
+#include "RVF.hpp"
+using namespace mast;
 
 #include <memory>
 #include <string>
@@ -39,7 +41,7 @@ class Spy_STIL_Protocol final : public mast::STIL_Player
 
   //! Spies content how binary vector to SUT is transformed to STIL command while returning the BinaryVector unchanged
   //!
-  virtual mast::BinaryVector DoCallback(std::string CallbackId, uint32_t endpointId, void* interfaceData, const mast::BinaryVector& toSutData) override;
+  virtual mast::BinaryVector DoCallback(RVFRequest Request, uint32_t channelId) override;
 
   const std::vector<std::string>& STILCommands() const { return m_spiedCommands->Commands(); }
 

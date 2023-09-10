@@ -378,12 +378,17 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
 	  if (iRunLoopcount>0)
 	    {
 	     LOG(DEBUG) << "Found an iRunLoop request for " << iRunLoopcount << " cycles";
+	     //Issue a iRunLoop command
+	     RVFRequest runloop(RUNLOOP, toSutVector,nextChannel->ApplicationData());
+	     protocol->DoCallback(runloop,channelId);
 	     LOG(DEBUG) << "Clearing iRunLoop request for " << nextChannel->Name();
 	       ResetiRunLoopVisitor local_ResetiRunLoopVisitor;
                nextChannel->Accept(local_ResetiRunLoopVisitor);
 	     }
-	    
-	  fromSutVector = protocol->DoCallback(Cur_callback,channelId, nextChannel->ApplicationData(), toSutVector);
+	  
+	  RVFRequest cur_request(Cur_callback, toSutVector,nextChannel->ApplicationData());
+	       
+	  fromSutVector = protocol->DoCallback(cur_request,channelId);
 
  
          LOG(INFO) << "Node " << currentAccessInterface->Name() << " Protocol " << protocol->KindName() 

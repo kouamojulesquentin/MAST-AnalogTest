@@ -126,12 +126,12 @@ void UT_Emulation_TranslatorProtocol::test_SVF_RawPlayer_TransformationCallback 
   {
     // ---------------- Setup
     //
-    auto        n_Callback    = std::get<0> (data);
-    auto        toSutVector     = BinaryVector::CreateFromString(std::get<1> (data));
-    const auto& expectedCommand = std::get<2> (data);
+    auto        originCallback = std::get<0> (data);
+    auto        n_Callback    = std::get<1> (data);
+    auto        toSutVector     = BinaryVector::CreateFromString(std::get<2> (data));
+    const auto& expectedCommand = std::get<3> (data);
     RVFRequest  test;
-    auto Primitive     = "Primitive"s;
-
+    
     auto sut = make_shared<Spy_Emulation_Translator>(); 
     
    auto Translator = make_shared<AccessInterfaceTranslator>("Test",sut);
@@ -162,7 +162,10 @@ void UT_Emulation_TranslatorProtocol::test_SVF_RawPlayer_TransformationCallback 
     //Exploit RawPlayer to get request
        Translator->PushfromSut(toSutVector,0); //Avoid stall if not reset
     
-    player->DoCallback(Primitive,n_Callback,nullptr,toSutVector);
+    RVFRequest TestRVF(originCallback, toSutVector, nullptr);
+    
+//    player->DoCallback(originCallback,n_Callback,nullptr,toSutVector);
+    player->DoCallback(TestRVF,n_Callback);
     test = Translator->PopRequest(0);
 
     auto fromSutVector = sut->TransformationCallback(test);
@@ -177,17 +180,17 @@ void UT_Emulation_TranslatorProtocol::test_SVF_RawPlayer_TransformationCallback 
 
   auto data =
   {
-    make_tuple(0u, "",
+    make_tuple(TRST,0u, "",
                vector<std::string> (
                {
                  TRST" ", //Test adds a space
                })),
-    make_tuple(1u, "/b01",
+    make_tuple(CSU,1u, "/b01",
                vector<std::string> (
                {
                  SIR" 2 TDI(01);",
                })),
-    make_tuple(2u, "/b101",
+    make_tuple(CSU,2u, "/b101",
                vector<std::string> (
                {
                  SDR " 3 TDI(05);",

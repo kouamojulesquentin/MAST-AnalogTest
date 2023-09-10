@@ -34,18 +34,18 @@ AnalogPort_Protocol::AnalogPort_Protocol(std::string portname)
 //! This callback only causes a "strobe" to be issued for reading value on the Port
 //! Only Loopback data is returned 
 //!
-BinaryVector AnalogPort_Protocol::DoCallback (std::string /*CallbackId*/, uint32_t /*channelId*/, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector AnalogPort_Protocol::DoCallback (RVFRequest Request, uint32_t /*channelId*/)
 {
  auto c_portname = m_portname.c_str();
-  RVFRequest request(IMEASUREVOLTAGE,(void *)c_portname);
+  RVFRequest up_request(IMEASUREVOLTAGE,(void *)c_portname);
 
-  PushRequest(request);
+  PushRequest(up_request);
   
                        /*NB: this is a BLOCKING call*/
   PopfromSut();
 
 
-  return toSutData;
+  return  Request.ToSutVector();
 }
 
 

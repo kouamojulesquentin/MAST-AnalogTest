@@ -26,11 +26,11 @@ using namespace test;
 
 //! Spies content how binary vector to SUT is transformed to I2C command while returning the BinaryVector unchanged
 //!
-BinaryVector Spy_I2C_Protocol::DoCallback (std::string /*CallbackId*/, uint32_t endpointId, void* /* interfaceData */, const BinaryVector& toSutData)
+BinaryVector Spy_I2C_Protocol::DoCallback (RVFRequest Request, uint32_t channelId)
 {
-  auto commands = CreateI2CCommand(endpointId, toSutData);
+  auto commands = CreateI2CCommand(channelId, Request.ToSutVector());
   SaveCommands(commands);
-  return toSutData;
+  return Request.ToSutVector();
 }
 //
 //  End of: Spy_I2C_Protocol::DoCallback

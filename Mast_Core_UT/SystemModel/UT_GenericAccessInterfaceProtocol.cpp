@@ -14,6 +14,7 @@
 #include "UT_GenericAccessInterfaceProtocol.hpp"
 #include "GenericAccessInterfaceProtocol.hpp"
 #include "BinaryVector_Traits.hpp"
+#include "RVF.hpp"
 
 #include <cxxtest/ValueTraits.h>
 #include <string>
@@ -263,10 +264,12 @@ void UT_GenericAccessInterfaceProtocol::test_DoCallback_0 ()
   auto text          = "Hello"s;
   auto toSutData     = BinaryVector();
   auto Primitive     = "Primitive"s;
+  RVFRequest Test(Primitive, toSutData, &text);
 
   // ---------------- Exercise
   //
-  auto gotVector = sut.DoCallback(Primitive,0u, &text, toSutData);
+//  auto gotVector = sut.DoCallback(Primitive,0u, &text, toSutData);
+  auto gotVector = sut.DoCallback(Test,0u);
 
   // ---------------- Verify
   //
@@ -286,10 +289,12 @@ void UT_GenericAccessInterfaceProtocol::test_DoCallback_1 ()
   auto context       = "SIR"s;
   auto toSutData     = BinaryVector::CreateFromString("0x01");
   auto Primitive     = "Primitive"s;
-
+  RVFRequest Test(Primitive, toSutData, &context);
+	     
   // ---------------- Exercise
   //
-  auto gotVector = sut.DoCallback(Primitive,1u, &context, toSutData);
+//  auto gotVector = sut.DoCallback(Primitive,1u, &context, toSutData);
+  auto gotVector = sut.DoCallback(Test,1u);
 
   // ---------------- Verify
   //
@@ -309,10 +314,12 @@ void UT_GenericAccessInterfaceProtocol::test_DoCallback_2 ()
   auto context       = "SDR"s;
   auto toSutData     = BinaryVector::CreateFromString("/x3636/b1/xC0C0_C0C0");
   auto Primitive     = "Primitive"s;
+  RVFRequest Test(Primitive, toSutData, &context);
 
   // ---------------- Exercise
   //
-  auto gotVector = sut.DoCallback(Primitive,2u, &context, toSutData);
+//  auto gotVector = sut.DoCallback(Primitive,2u, &context, toSutData);
+  auto gotVector = sut.DoCallback(Test,2u);
 
   // ---------------- Verify
   //
@@ -332,10 +339,12 @@ void UT_GenericAccessInterfaceProtocol::test_DoCallback_3 ()
   auto context       = "SDR"s;
   auto toSutData     = BinaryVector::CreateFromString("/x3636/b1/xC0C0_C0C0");
   auto Primitive     = "Primitive"s;
+  RVFRequest Test(Primitive, toSutData, &context);
 
   // ---------------- Exercise & Verify
   //
-  TS_ASSERT_THROWS (sut.DoCallback(Primitive,3u, &context, toSutData), std::exception);
+//  TS_ASSERT_THROWS (sut.DoCallback(Primitive,3u, &context, toSutData), std::exception);
+  TS_ASSERT_THROWS (sut.DoCallback(Test,3u), std::exception);
 }
 
 //===========================================================================

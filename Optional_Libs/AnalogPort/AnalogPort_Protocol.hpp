@@ -44,7 +44,7 @@ class MAST_CORE_EXPORT AnalogPort_Protocol final: public AccessInterfaceRawProto
   //!
   //! @return Bitstream retrieved from SUT
   //!
-  virtual BinaryVector DoCallback(std::string CallbackId, uint32_t channelId, void* interfaceData, const BinaryVector& toSutData) override;
+  virtual BinaryVector DoCallback(RVFRequest Request, uint32_t channelId) override;
 
   //! Gets the number of channels supported by the specific protocol
   //!

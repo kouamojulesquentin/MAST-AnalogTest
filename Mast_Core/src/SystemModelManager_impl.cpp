@@ -29,6 +29,7 @@
 #include <utility>
 #include <sstream>
 #include <iostream>
+#include <experimental/any>
 
 #ifdef __linux__
 #include <pthread.h>
@@ -47,6 +48,7 @@ using std::shared_timed_mutex;
 using std::lock_guard;
 using std::unique_lock;
 using std::shared_lock;
+using std::experimental::any;
 
 using namespace mast;
 using namespace std::string_literals;
@@ -379,11 +381,20 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
 	    {
 	     LOG(DEBUG) << "Found an iRunLoop request for " << iRunLoopcount << " cycles";
 	     //Issue a iRunLoop command
+
+
 	     RVFRequest runloop(RUNLOOP, toSutVector,nextChannel->ApplicationData());
+             //Sending an RVF REquest with iRunLoopCount as Optional Data
+
+	     std::experimental::any count_any(iRunLoopcount);
+	     runloop.m_optionalData = count_any;
+ 
 	     protocol->DoCallback(runloop,channelId);
+	     
 	     LOG(DEBUG) << "Clearing iRunLoop request for " << nextChannel->Name();
 	       ResetiRunLoopVisitor local_ResetiRunLoopVisitor;
                nextChannel->Accept(local_ResetiRunLoopVisitor);
+	     
 	     }
 	  
 	  RVFRequest cur_request(Cur_callback, toSutVector,nextChannel->ApplicationData());

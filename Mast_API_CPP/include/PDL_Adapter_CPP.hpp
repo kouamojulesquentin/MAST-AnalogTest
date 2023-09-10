@@ -136,7 +136,7 @@ namespace mast
 
   //! Asks for a minimum Clock Cycles to be issued after iApply
   //!
-  CPP_API_EXPORT void iRunLoop(uint64_t value);
+  CPP_API_EXPORT void iRunLoop(uint32_t value);
 
   // ---------------- iWrite
   //

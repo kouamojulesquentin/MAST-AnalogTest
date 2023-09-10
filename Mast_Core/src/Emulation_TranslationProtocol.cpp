@@ -63,6 +63,14 @@ BinaryVector Emulation_TranslatorProtocol::TransformationCallback(RVFRequest cur
   if ((current_request.CallbackId()=="SDR") || (current_request.CallbackId()=="SIR"))
      toSutData = FormatSVFData(current_request.ToSutVector());
   else
+   if (current_request.CallbackId()==RUNTEST)
+      {
+       //Collect iRunloop count
+       uint32_t loopcount;
+       loopcount = std::experimental::any_cast<uint32_t>(current_request.m_optionalData);
+       toSutData = std::to_string(loopcount);
+      }
+     else
    if ((current_request.CallbackId()=="I2C_READ") || (current_request.CallbackId()=="I2C_WRITE"))
      toSutData = FormatI2CCommand(current_request);
    else

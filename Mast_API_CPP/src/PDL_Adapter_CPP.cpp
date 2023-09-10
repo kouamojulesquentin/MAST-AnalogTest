@@ -288,7 +288,7 @@ void mast::iReset (bool doSynchronousReset)
 //!
 //! @param clock cycles to be issues
 //!
-void mast::iRunLoop (uint64_t value)
+void mast::iRunLoop (uint32_t value)
 {
   auto manager = GetAndCheckManager();
   manager->iRunLoop(value);

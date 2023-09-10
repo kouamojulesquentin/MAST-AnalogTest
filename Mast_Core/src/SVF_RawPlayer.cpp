@@ -70,6 +70,8 @@ BinaryVector SVF_RawPlayer::DoCallback (RVFRequest Request, uint32_t channelId)
   //Many Unit Test depend on FormattedData
   RVFRequest up_request(SVFCallback,callback_toSutData,svfFormattedData);
 
+  up_request.m_optionalData = Request.m_optionalData;
+  
   PushRequest(up_request);
   
                        /*NB: this is a BLOCKING call*/

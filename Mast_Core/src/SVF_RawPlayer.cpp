@@ -43,9 +43,14 @@ BinaryVector SVF_RawPlayer::DoCallback (RVFRequest Request, uint32_t channelId)
   os << RawData.BitsCount() << " TDI(" << SVFVector(RawData).Data() << ");";
   return os.str();
   };
+
+  auto FormatSVFExpectAndMask = [] (BinaryVector ExpectedData,BinaryVector ExpectedMask)
+  {
   //Prepare formatted SVF data
-//  ostringstream os;
-//  os << toSutData.BitsCount() << " TDI(" << SVFVector(toSutData).Data() << ");";
+  ostringstream os;
+  os << ExpectedData.BitsCount() << " TDO(" << SVFVector(ExpectedData).Data() <<  " MASK(" << SVFVector(ExpectedMask).Data() <<");";
+  return os.str();
+  };
 
  //Identify supported callbacks
   if (Request.CallbackId() == CSU) 
@@ -64,12 +69,21 @@ BinaryVector SVF_RawPlayer::DoCallback (RVFRequest Request, uint32_t channelId)
       {
 //      svfFormattedData = os.str();
       svfFormattedData = FormatSVFData(Request.ToSutVector());
+      if (!Request.ExpectedData().IsEmpty())
+       svfFormattedData.append(FormatSVFExpectAndMask(Request.ExpectedData(),Request.ExpectedMask()));
       callback_toSutData = Request.ToSutVector();
       }
 
   //Many Unit Test depend on FormattedData
   RVFRequest up_request(SVFCallback,callback_toSutData,svfFormattedData);
+      if (!Request.ExpectedData().IsEmpty())
+        { 
+	 LOG(DEBUG)<<"SVF Player: RVF request has Expected data check"; 
 
+	    up_request.SetExpectedData(Request.ExpectedData());
+	    up_request.SetExpectedMask(Request.ExpectedMask());
+	
+	}
   up_request.m_optionalData = Request.m_optionalData;
   
   PushRequest(up_request);

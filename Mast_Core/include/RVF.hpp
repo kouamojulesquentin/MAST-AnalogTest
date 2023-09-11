@@ -113,13 +113,19 @@ class RVFRequest
   void* interfaceData() { return m_interfaceData;};
   std::string FormattedData(){if (!m_FormattedData.empty()) return m_FormattedData ;
                               else return m_ToSutVector.DataAsBinaryString();};
+  BinaryVector	ExpectedData() {return m_ExpectedData;}	;
+  BinaryVector	ExpectedMask() {return m_ExpectedMask;}	;
 
-  /* Setters -- mostly for UT purposes*/
+  /* Setters*/
   void setCallbackId(std::string CallbackId) {m_CallbackId= CallbackId;}
- 
+  void SetExpectedData (BinaryVector sequence) { m_ExpectedData          = sequence; } //!< Sets Expected Data from SUT
+  void SetExpectedMask (BinaryVector sequence) { m_ExpectedMask         = sequence; } //!< Sets Mask for Expected Data from SUT
+
   private:
-  std::string m_CallbackId;
-  BinaryVector  m_ToSutVector;
+  std::string m_CallbackId;      //!> Callback Primitive to be executed
+  BinaryVector  m_ToSutVector;  //!< Data to be sent to SUT
+  BinaryVector  m_ExpectedData; //!<  Expected Data from SUT
+  BinaryVector  m_ExpectedMask; //!< Mask for Expected Data from SUT
   
   //NB: This should be removed now!!!!
   std::string m_FormattedData;

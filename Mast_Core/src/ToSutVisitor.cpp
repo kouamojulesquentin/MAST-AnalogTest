@@ -99,6 +99,27 @@ void ToSutVisitor::VisitRegister (Register& reg)
   {
     m_toSutVector.Append(reg.BypassSequence());
   }
+  
+  if (reg.MustCheckExpected())
+   { 
+   m_CheckExpected = true; //Set to true if not already done
+   //Prepare Expected value and Mask
+   m_expectedFromSut.Append(reg.ExpectedFromSut());
+   if (!reg.DontCareMask().IsEmpty())
+     m_dontCareMask.Append(reg.DontCareMask());
+   else 
+    { 
+     auto full_mask = BinaryVector(reg.BitsCount(), 0u, SizeProperty::Fixed);
+     full_mask.ToggleBits();
+     m_dontCareMask.Append(full_mask);
+     }
+   }
+  else 
+   { //Put all-zero bitstreams
+   m_expectedFromSut.Append(BinaryVector(reg.BitsCount(), 0u, SizeProperty::Fixed));//(reg.BypassSequence());
+   m_dontCareMask.Append(BinaryVector(reg.BitsCount(), 0u, SizeProperty::Fixed));
+   }
+  
   m_activeRegisters.emplace_back(reg.Identifier());
 }
 //

@@ -1,5 +1,5 @@
 //===========================================================================
-//                           Emulation_TranslationProtocol.cpp
+//                           Empty_TranslationProtocol.cpp
 //===========================================================================
 // Copyright (C) 2020 G-INP/Tima. All rights reserved.
 //

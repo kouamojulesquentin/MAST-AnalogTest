@@ -76,6 +76,7 @@ add_subdirectory(AnalogPort)
 add_subdirectory(DataPort)
 add_subdirectory(Trivium)
 add_subdirectory(SSAK)
+add_subdirectory(PDL_Player)
 
 if (${INSTALL_ARM}==OFF)
   if (${INSTALL_RISCV}==OFF)

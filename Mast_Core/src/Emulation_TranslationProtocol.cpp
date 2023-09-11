@@ -36,7 +36,15 @@ using std::ostringstream;
   {
   //Prepare formatted SVF data
   ostringstream os;
-  os << RawData.BitsCount() << " TDI(" << SVFVector(RawData).Data() << ");";
+  os << RawData.BitsCount() << " TDI(" << SVFVector(RawData).Data() ;
+  return os.str();
+  };
+
+   auto FormatSVFExpectAndMask = [] (BinaryVector ExpectedData,BinaryVector ExpectedMask)
+  {
+  //Prepare formatted SVF data
+  ostringstream os;
+  os << ") TDO(" << SVFVector(ExpectedData).Data() <<  ") MASK(" << SVFVector(ExpectedMask).Data();
   return os.str();
   };
 
@@ -61,14 +69,27 @@ BinaryVector Emulation_TranslatorProtocol::TransformationCallback(RVFRequest cur
   
   //Check for known commands to format
   if ((current_request.CallbackId()=="SDR") || (current_request.CallbackId()=="SIR"))
+    {
      toSutData = FormatSVFData(current_request.ToSutVector());
+    if (!current_request.ExpectedData().IsEmpty())
+      {
+      LOG(DEBUG) << "Emulation_TranslatorProtocol:found expected data of "<< current_request.ExpectedData().BitsCount() << "bits";
+      auto tmp_string = FormatSVFExpectAndMask(current_request.ExpectedData(),current_request.ExpectedMask());
+       LOG(DEBUG) << "Emulation_TranslatorProtocol: mask is "<< current_request.ExpectedMask().DataAsBinaryString();
+      toSutData.append(tmp_string);
+      }
+    toSutData.append(");"); //Terminate SDR/SIR string
+     }
   else
    if (current_request.CallbackId()==RUNTEST)
       {
        //Collect iRunloop count
        uint32_t loopcount;
+       ostringstream os;
        loopcount = std::experimental::any_cast<uint32_t>(current_request.m_optionalData);
-       toSutData = std::to_string(loopcount);
+       os << loopcount << " TCK;";
+       toSutData = os.str();
+
       }
      else
    if ((current_request.CallbackId()=="I2C_READ") || (current_request.CallbackId()=="I2C_WRITE"))

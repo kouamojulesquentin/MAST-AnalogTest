@@ -358,6 +358,8 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
         auto& toSutVector = local_toSutVisitor.ToSutVector();
 	m_ActiveStreamers = local_toSutVisitor.ActiveStreamers();
 	LOG(DEBUG)<<" Streamers encountered in active path: "<<m_ActiveStreamers.size();
+        if ((m_ActiveStreamers.size() > 0) && (local_toSutVisitor.CheckExpected() == true))
+         LOG(INFO)<<"Expected Values not implemented yet for Streamer Nodes. Ignoring it";
 
         if (!toSutVector.IsEmpty()) // This can be empty when actual SUT state prevent from serving pending Registers
         {
@@ -398,6 +400,14 @@ void SystemModelManager_impl::DoHierarchicalDataCycle (AccessInterface* currentA
 	     }
 	  
 	  RVFRequest cur_request(Cur_callback, toSutVector,nextChannel->ApplicationData());
+	  if (local_toSutVisitor.CheckExpected() == true)
+	   { //There is as least one expected value to be checked in this operation
+	     LOG(DEBUG) << "Found a request for expected value check";
+	    LOG(DEBUG) << "Expected Bitstream : "<<local_toSutVisitor.ExpectedFromSut().DataAsBinaryString();
+	    LOG(DEBUG) << "Expected      Mask : "<<local_toSutVisitor.DontCareMask().DataAsBinaryString();
+	    cur_request.SetExpectedData(local_toSutVisitor.ExpectedFromSut());
+	    cur_request.SetExpectedMask(local_toSutVisitor.DontCareMask());
+	   }
 	       
 	  fromSutVector = protocol->DoCallback(cur_request,channelId);
 
@@ -841,6 +851,7 @@ void SystemModelManager_impl::iRead_impl (string_view registerPath, T expectedVa
   MONITOR_PDL_AND_VALUE("iRead - Queuing request", registerPath, expectedAsBV, appData);
 
   appData->queuedReads.emplace_back(SystemModelManager_impl::QueuedRequest(reg, std::move(expectedAsBV)));
+
 
   appData->currentState = ApplicationData::State::ReadRequest;
 

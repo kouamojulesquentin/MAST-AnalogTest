@@ -289,7 +289,7 @@ DefaultTableBasedPathSelector::TablesType& DefaultTableBasedPathSelector::FixTab
 //---------------------------------------------------------------------------
 
 
-//! Returns true when the specified path is already selected
+//! Returns true when the specified path is already active
 //!
 bool DefaultTableBasedPathSelector::IsActive (uint32_t pathIdentifier) const
 {

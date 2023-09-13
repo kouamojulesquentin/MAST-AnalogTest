@@ -56,6 +56,8 @@ class MAST_CORE_EXPORT Linker : public ParentNode
   bool IsSelectedAndActive (uint32_t pathIdentifier) const;  //!< Returns true when the specified path is selected and active
   void Deselect            (uint32_t pathIdentifier);        //!< Requests deactivation of the specified path
   void Select              (uint32_t pathIdentifier);        //!< Requests activation of the specified path
+  bool KeepOpen() {return m_KeepOpen;}
+  void SetKeepOpen(bool value) {m_KeepOpen=value;}
 
   virtual void Accept (SystemModelVisitor& visitor) override; //!< Visited part of the Visitor pattern
 
@@ -76,6 +78,7 @@ class MAST_CORE_EXPORT Linker : public ParentNode
   //
   private:
   std::shared_ptr<PathSelector> m_pathSelector;   //!< Provides genericity of how to manage path(s) selection
+  bool m_KeepOpen=false; //!< Tells the configuration algorithm to keep this Linker open if possible
 };
 //
 //  End of Linker class declaration

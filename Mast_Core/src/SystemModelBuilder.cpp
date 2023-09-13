@@ -616,6 +616,7 @@ shared_ptr<AccessInterface> SystemModelBuilder::Create_JTAG_TAP (string_view    
   // ---------------- Create Linker
   //
   auto linker = m_model.CreateLinker(muxName, pathSelector, accessInterface);
+  linker->SetKeepOpen(true);
 
   // ---------------- Create bypass register
   //

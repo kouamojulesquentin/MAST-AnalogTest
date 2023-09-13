@@ -1040,7 +1040,7 @@ void UT_SystemModelManager::test_DoDataCycles_1500_Lazy ()
   auto gotSutVectors = spy->ToSutVectors();
 
   std::vector<mast::BinaryVector> expected
-  {
+/*{//Set for Configuration Visitor which keeps non-pending children selected
     BinaryVector::CreateFromString("/x01"),                 // 00 : IR
     BinaryVector::CreateFromString("/x0505/b10"),           // 01 : DR
     BinaryVector::CreateFromString("/x3636/b0:100"),        // 02 : DR
@@ -1051,6 +1051,21 @@ void UT_SystemModelManager::test_DoDataCycles_1500_Lazy ()
     BinaryVector::CreateFromString("/x3636/b1/x0A0A_0A0A"), // 07 : DR
     BinaryVector::CreateFromString("/x3636/b0:001"),        // 08 : DR
     BinaryVector::CreateFromString("/x3636/b0/x0909_0909"), // 09 : DR
+  };*/
+{//Set for Configuration Visitor  which closes non-pending children
+    BinaryVector::CreateFromString("/x01"),                 // 00 : IR
+    BinaryVector::CreateFromString("/x0505/b10"),           // 01 : DR
+    BinaryVector::CreateFromString("/x3636/b0:100"),        // 02 : DR
+    BinaryVector::CreateFromString("/x3636/b1/xC0C0_C0C0"), // 03 : DR
+    BinaryVector::CreateFromString("/x3636/b0:011"),        // 04 : DR
+    BinaryVector::CreateFromString("/x3636/b1/xB0B0_B0B0"), // 05 : DR
+    BinaryVector::CreateFromString("/x3636/b0:010"),        // 06 : DR
+    BinaryVector::CreateFromString("/x3636/b1/x0A0A_0A0A"), // 07 : DR
+    BinaryVector::CreateFromString("/x3636/b0:001"),        // 08 : DR
+    BinaryVector::CreateFromString("/x3636/b0/x0909_0909"), // 09 : DR
+    BinaryVector::CreateFromString("/x3636/xA020_2020/b0"), // 09 : DR
+    BinaryVector::CreateFromString("/x3636/b1:000"),       // 10 : DR
+    BinaryVector::CreateFromString("/x3636/b0:000"),        // 11 : DR
   };
 
   TS_ASSERT_EQUALS (gotSutVectors, expected);
@@ -1188,7 +1203,7 @@ void UT_SystemModelManager::test_DoDataCycles_MIB_Multichain_Pre_Lazy ()
   auto gotSutVectors = spy->ToSutVectors();
 
   std::vector<mast::BinaryVector> expected
-  {
+/*  {//Set for Configuration Visitor which keeps non-pending children selected
     BinaryVector::CreateFromString("0x02"),        // 00 : IR
     BinaryVector::CreateFromString("0x6060_6060"), // 01 : DR
     BinaryVector::CreateFromString("0x01"),        // 02 : IR
@@ -1203,6 +1218,25 @@ void UT_SystemModelManager::test_DoDataCycles_MIB_Multichain_Pre_Lazy ()
     BinaryVector::CreateFromString("0b01"),        // 11 : DR
     BinaryVector::CreateFromString("0x02"),        // 12 : IR
     BinaryVector::CreateFromString("0x6161_6161"), // 13 : DR
+  };*/
+  {//Set for Configuration Visitor  which closes non-pending children
+    BinaryVector::CreateFromString("0x02"),        // 00 : IR
+    BinaryVector::CreateFromString("0x6060_6060"), // 01 : DR
+    BinaryVector::CreateFromString("0x01"),        // 02 : IR
+    BinaryVector::CreateFromString("0b11"),        // 03 : DR
+    BinaryVector::CreateFromString("0x02"),        // 04 : IR
+    BinaryVector::CreateFromString("0x6363_6363"), // 05 : DR
+    BinaryVector::CreateFromString("0x01"),        // 06 : IR
+    BinaryVector::CreateFromString("0b10"),        // 07 : DR
+    BinaryVector::CreateFromString("0x02"),        // 08 : IR
+    BinaryVector::CreateFromString("0x6262_6262"), // 09 : DR
+    BinaryVector::CreateFromString("0x01"),        // 10 : IR
+    BinaryVector::CreateFromString("0b01"),        // 11 : DR
+    BinaryVector::CreateFromString("0x02"),        // 12 : IR
+    BinaryVector::CreateFromString("0x6161_6161"), // 13 : DR
+    BinaryVector::CreateFromString("0x4141_4141"), 
+    BinaryVector::CreateFromString("0x01"),        
+    BinaryVector::CreateFromString("0b00"),        
   };
 
   TS_ASSERT_EQUALS (gotSutVectors, expected);

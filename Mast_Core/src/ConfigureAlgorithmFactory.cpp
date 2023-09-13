@@ -15,6 +15,7 @@
 #include "ConfigureAlgorithm_LastOrDefault.hpp"
 #include "ConfigureAlgorithm_LastOrDefault_Greedy.hpp"
 #include "ConfigureAlgorithm_Last_Lazy.hpp"
+#include "ConfigureAlgorithm_CloseAll.hpp"
 #include "Utility.hpp"
 
 using std::unique_ptr;
@@ -69,6 +70,7 @@ void ConfigureAlgorithmFactory::InitializeWithDefaults ()
   RegisterCreator("last_or_default",        [](const string& /* parameters */) { return make_unique<ConfigureAlgorithm_LastOrDefault>();        });
   RegisterCreator("last_or_default_greedy", [](const string& /* parameters */) { return make_unique<ConfigureAlgorithm_LastOrDefault_Greedy>(); });
   RegisterCreator("last_lazy",              [](const string& /* parameters */) { return make_unique<ConfigureAlgorithm_Last_Lazy>();            });
+  RegisterCreator("close_all",              [](const string& /* parameters */) { return make_unique<ConfigureAlgorithm_CloseAll>();            });
 }
 //
 //  End of: ConfigureAlgorithmFactory::InitializeWithDefaults

@@ -53,7 +53,7 @@ void UT_ConfigureAlgorithmFactory::test_Instance ()
   CxxTest::setAbortTestOnFail(true);
   TS_ASSERT_NOT_NULLPTR (pInstance);
 
-  TS_ASSERT_EQUALS (pInstance->RegisteredCreatorsCount(), 3u);   // This is to detect when one should consider adding a new test for a new default creation method
+  TS_ASSERT_EQUALS (pInstance->RegisteredCreatorsCount(), 4u);   // This is to detect when one should consider adding a new test for a new default creation method
 }
 
 

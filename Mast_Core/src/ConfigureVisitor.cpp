@@ -132,6 +132,11 @@ void ConfigureVisitor::VisitLinker (Linker& linker)
         linker.Select(pathIdentifier);
       }
     }
+    else if (linker.IsSelected(pathIdentifier)) //Close paths that are still selected but have no more pending
+      if (!linker.KeepOpen())
+       linker.Deselect(pathIdentifier); 
+      
+    
 
     child = child->NextSibling();
     ++pathIdentifier;

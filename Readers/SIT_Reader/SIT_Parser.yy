@@ -170,6 +170,7 @@ namespace
 %type <std::string>                     AI_protocol_parameters
 %type <std::string>                     TR_identifier
 %type <std::string>                     TR_protocol_parameters
+%type <bool>                            KeepOpen
 
 %type <std::shared_ptr<mast::SystemModelNode>> root_node
 %type <std::shared_ptr<mast::SystemModelNode>> register_node
@@ -227,7 +228,7 @@ namespace
 %token <std::string>   t_TRANSLATOR
 %token <std::string>   t_BROCADE
 %token <std::string>   t_STREAMER
-
+%token <std::string>   t_KEEPOPEN
 
 %%
 root_node:
@@ -531,7 +532,7 @@ t_BROCADE  node_name
   $$ = std::make_pair(chain,false);
 }
 |
-t_LINKER  node_name path_selector_kind selector_register_name_list max_derivations path_selector_parameters
+t_LINKER  node_name path_selector_kind KeepOpen selector_register_name_list max_derivations path_selector_parameters
 {
   if ($[selector_register_name_list].front()=="")
   {
@@ -553,6 +554,9 @@ t_LINKER  node_name path_selector_kind selector_register_name_list max_derivatio
   linkerInfo.selector_parameters = $[path_selector_parameters];
   linkerInfo.max_derivations     = $[max_derivations];
   driver.unresolved_linkers.push(linkerInfo);
+  
+   if ($[KeepOpen])   
+      linker->SetKeepOpen(true);
 
   $$ = std::make_pair(linker,false);
 }
@@ -861,6 +865,11 @@ reverse :
 startAtZero :
  t_STARTATZERO { $$ = SelectorProperty::StartAtZero; }
  | %empty  { $$ = SelectorProperty::None; }
+ ;
+
+KeepOpen :
+ t_KEEPOPEN { $$ = true; }
+ | %empty  { $$ = false; }
  ;
 
 leaf_node:

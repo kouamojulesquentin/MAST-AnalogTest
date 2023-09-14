@@ -62,7 +62,8 @@ namespace
     {"TRANSLATOR",       token::t_TRANSLATOR},        // 20
     {"BROCADE_Mux",      token::t_BROCADE},           // 21
     {"STREAMER",         token::t_STREAMER},          // 22
-    {"STARTATZERO",      token::t_STARTATZERO},           // 23
+    {"STARTATZERO",      token::t_STARTATZERO},       // 23
+    {"KeepOpen",         token::t_KEEPOPEN},          // 24
     
   };
 }

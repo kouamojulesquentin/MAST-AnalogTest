@@ -979,11 +979,31 @@ TR_identifier:
 
 %%
 
+namespace SIT {
+  //some later Bison versions fail to define the == and != operators
+  //so we define them as function to be compatible with all versions 
+  
+  inline bool cmp(position const& p1, position const& p2)
+  {
+    if (&p1 != &p2) {
+      if (p1.column != p2.column) return false;
+      if (p1.line != p2.line) return false;
+      if (p1.filename != p2.filename) return false;
+    }
+    return true;
+  }
+
+  inline bool n_cmp(position const& p1, position const& p2)
+  {
+    return ! cmp(p1,p2);
+  }
+}
+
 void SIT::SIT_Parser::error(const location_type& loc, const std::string& errorMessage)
 {
   driver.parsedTopNode.reset();
 
-  auto isValidLoc = loc.begin != loc.end;
+  auto isValidLoc = n_cmp(loc.begin,loc.end);
   if (isValidLoc)
   {
     throw ParserException("SIT", "", loc.begin.line, loc.begin.column, loc.end.column, errorMessage);

@@ -291,12 +291,14 @@ void UT_BinaryVector::test_CreateFromBinaryString_DontCare_as_Zero ()
     // ---------------- Verify
     //
     TS_ASSERT_EQUALS    (sut.BitsCount(),       expectedBitsCount);
+//    TS_ASSERT_SAME_DATA (sut.DataLeftAligned(), expectedBytes.data(), expectedBytes.size());
     TS_ASSERT_SAME_DATA (sut.DataLeftAligned(), expectedBytes.data(), expectedBytes.size());
   };
 
-  using data_t = tuple<string_view, uint32_t, initializer_list<uint8_t>>;
+//  using data_t = tuple<string_view, uint32_t, vector<uint8_t>>;
+  using data_t = tuple<string_view, uint32_t, vector<uint8_t>>;
 
-  initializer_list<data_t> data =  // Input, bits count, bytes
+  vector<data_t> data =  // Input, bits count, bytes
   {
     data_t("x1",              2,  {0b01000000}),             // 00
     data_t("1x",              2,  {0b10000000}),             // 01
@@ -338,9 +340,9 @@ void UT_BinaryVector::test_CreateFromBinaryString_DontCare_as_One ()
     TS_ASSERT_SAME_DATA (sut.DataLeftAligned(), expectedBytes.data(), expectedBytes.size());
   };
 
-  using data_t = tuple<string_view, uint32_t, initializer_list<uint8_t>>;
+  using data_t = tuple<string_view, uint32_t, vector<uint8_t>>;
 
-  initializer_list<data_t> data =  // Input, bits count, bytes
+  vector<data_t> data =  // Input, bits count, bytes
   {
     data_t("x1",              2,  {0b11000000}),             // 00
     data_t("x0",              2,  {0b10000000}),             // 01
@@ -534,9 +536,9 @@ void UT_BinaryVector::test_CreateFromHexString_DontCare_as_Zero ()
     TS_ASSERT_SAME_DATA (sut.DataLeftAligned(), expectedBytes.data(), expectedBytes.size());
   };
 
-  using data_t = tuple<string_view, uint32_t, initializer_list<uint8_t>>;
+  using data_t = tuple<string_view, uint32_t, vector<uint8_t>>;
 
-  initializer_list<data_t> data =  // Input, bits count, bytes
+  vector<data_t> data =  // Input, bits count, bytes
   {
     data_t("5",      4,  {0x50}),             // 00
     data_t("x",      4,  {0x00}),             // 01
@@ -579,9 +581,9 @@ void UT_BinaryVector::test_CreateFromHexString_DontCare_as_One ()
     TS_ASSERT_SAME_DATA (sut.DataLeftAligned(), expectedBytes.data(), expectedBytes.size());
   };
 
-  using data_t = tuple<string_view, uint32_t, initializer_list<uint8_t>>;
+  using data_t = tuple<string_view, uint32_t, vector<uint8_t>>;
 
-  initializer_list<data_t> data =  // Input, bits count, bytes
+  vector<data_t> data =  // Input, bits count, bytes
   {
     data_t("5",      4,  {0x50}),             // 00
     data_t("x",      4,  {0xF0}),             // 01
@@ -1026,9 +1028,9 @@ void UT_BinaryVector::test_CreateFromString_DontCare_as_Zero ()
     TS_ASSERT_SAME_DATA (sut.DataLeftAligned(), expectedBytes.data(), expectedBytes.size());
   };
 
-  using data_t = tuple<string_view, uint32_t, initializer_list<uint8_t>>;
+  using data_t = tuple<string_view, uint32_t, vector<uint8_t>>;
 
-  initializer_list<data_t> data =  // Input, bits count, bytes
+  vector<data_t> data =  // Input, bits count, bytes
   {
     data_t("0x5",               4,  {0x50}),                          // 00
     data_t("0xx",               4,  {0x00}),                          // 01
@@ -1080,9 +1082,9 @@ void UT_BinaryVector::test_CreateFromString_DontCare_as_One ()
     TS_ASSERT_SAME_DATA (sut.DataLeftAligned(), expectedBytes.data(), expectedBytes.size());
   };
 
-  using data_t = tuple<string_view, uint32_t, initializer_list<uint8_t>>;
+  using data_t = tuple<string_view, uint32_t, vector<uint8_t>>;
 
-  initializer_list<data_t> data =  // Input, bits count, bytes
+  vector<data_t> data =  // Input, bits count, bytes
   {
     data_t("0x5",              4,  {0x50}),                                            // 00
     data_t("0xx",              4,  {0xF0}),                                            // 01
@@ -2619,7 +2621,7 @@ void UT_BinaryVector::test_Constructor_FromRawDataVector ()
     TS_ASSERT_EQUALS (sut, expected);
   };
 
-  using data_t = tuple<initializer_list<uint8_t>, uint32_t, string_view>;
+  using data_t = tuple<vector<uint8_t>, uint32_t, string_view>;
   auto  data =
   {
     data_t({},                 0,     ""),                    // 00
@@ -2672,7 +2674,7 @@ void UT_BinaryVector::test_Constructor_FromRawDataVector_Moved ()
     TS_ASSERT_EQUALS (sut, expected);
   };
 
-  using data_t = tuple<initializer_list<uint8_t>, uint32_t, string_view>;
+  using data_t = tuple<vector<uint8_t>, uint32_t, string_view>;
   auto  data =
   {
     data_t({},                 0,     ""),                    // 00
@@ -8802,7 +8804,7 @@ void UT_BinaryVector::test_DataRightAligned ()
     TS_ASSERT_EQUALS (rightAligned, expected);
   };
 
-  using data_t = tuple<string_view, initializer_list<uint8_t>> ;
+  using data_t = tuple<string_view, vector<uint8_t>> ;
   auto data =
   {
     data_t("",                                  {}),                       // 00
@@ -8868,8 +8870,8 @@ void UT_BinaryVector::test_CreateFromRightAlignedBuffer ()
     TS_ASSERT_EQUALS (rightAligned, expected);
   };
 
-  using data_t = tuple<initializer_list<uint8_t>, string_view> ;
-  initializer_list<data_t> data =
+  using data_t = tuple<vector<uint8_t>, string_view> ;
+  vector<data_t> data =
   {
     data_t({0x00},                      "0x00"),                              // 00
     data_t({0xA5},                      "0xA5"),                              // 01
@@ -8935,8 +8937,8 @@ void UT_BinaryVector::test_CreateFromRightAlignedBuffer_Moved ()
     TS_ASSERT_EQUALS (rightAligned, expected);
   };
 
-  using data_t = tuple<initializer_list<uint8_t>, string_view> ;
-  initializer_list<data_t> data =
+  using data_t = tuple<vector<uint8_t>, string_view> ;
+  vector<data_t> data =
   {
     data_t({0x00},                      "0x00"),                              // 00
     data_t({0xA5},                      "0xA5"),                              // 01

@@ -776,6 +776,7 @@ bool BinaryVector::CompareEqualTo (const BinaryVector& rhs, const BinaryVector& 
 //! @param dontCare     Tells how to handle "dont't care" special characters 'x' and 'X'
 //!
 //! @return A new BinaryVector initialized as defined by bits text
+#include <iostream>
 BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_view bits, SizeProperty sizeProperty, DontCare dontCare)
 {
   CHECK_PARAMETER_NOT_NULL(bits.data(), "BinaryVector cannot be created from nullptr");
@@ -783,6 +784,7 @@ BinaryVector BinaryVector::CreateFromBinaryString (std::experimental::string_vie
 
   uint8_t nextByte = 0;
   auto    bitCount = 0;
+
 
   // ---------------- Skip leading blank chars
   //

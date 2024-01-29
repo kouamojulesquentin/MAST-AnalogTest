@@ -74,7 +74,7 @@ add_subdirectory(DummyStreamerProtocol)
 add_subdirectory(Low_Pin)
 add_subdirectory(AnalogPort)
 add_subdirectory(DataPort)
-add_subdirectory(Trivium)
+#add_subdirectory(Trivium)
 add_subdirectory(SSAK)
 add_subdirectory(PDL_Player)
 

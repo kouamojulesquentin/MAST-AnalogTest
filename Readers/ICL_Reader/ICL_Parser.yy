@@ -25,6 +25,7 @@ SUCH DAMAGE.
 
 %code requires
 {
+#include <cstdint>
 #include <tuple>
 namespace ICL
 {
@@ -73,8 +74,6 @@ namespace Parsers
   enum class AccessLinkType;
   enum class Kind : uint8_t;
 }
-
-using std::string;
 
 #ifndef YY_TYPEDEF_YY_SCANNER_T
 #define YY_TYPEDEF_YY_SCANNER_T
@@ -147,6 +146,8 @@ using std::experimental::string_view;
 
 using std::make_unique;
 using std::make_tuple;
+
+using std::string;
 
 using namespace std::experimental::literals::string_view_literals;
 
@@ -3086,7 +3087,20 @@ attribute_name : SCALAR_ID
 
 void ICL::ICL_Parser::error(const location_type& loc, const std::string& errorMessage)
 {
-  auto isValidLoc = loc.begin != loc.end;
+   auto n_cmp = [] (position const& p1, position const& p2)
+  {
+   bool tmp = true;
+    if (&p1 != &p2) {
+      if (p1.column != p2.column) tmp=false;
+      if (p1.line != p2.line) tmp=false;
+      if (p1.filename != p2.filename) tmp=false;
+    }
+    return !tmp;
+  };
+
+   
+  auto isValidLoc = n_cmp(loc.begin,loc.end);
+  
   if (isValidLoc)
   {
     throw Parsers::ParserException("ICL", "", loc.begin.line, loc.begin.column, loc.end.column, errorMessage);

@@ -31,6 +31,7 @@ using std::ostringstream;
 //  os << commandType << " " << toSutData.BitsCount() << " TDI(" << SVFVector(toSutData).Data() << ");\n";
 
 /*Command formatting functions:*/
+namespace {
 
   auto FormatSVFData = [] (BinaryVector RawData)
   {
@@ -56,7 +57,7 @@ using std::ostringstream;
   return os.str();
   };
 
-
+}
 //! Loopbacks "to SUT data" logging SVF command(s) that would be issued if it was really an operating protocol
 //! NOT VERIFIED YET!!! CHECK!!!!!!!
 

@@ -980,7 +980,7 @@ TR_identifier:
 %%
 
 namespace SIT {
-  //some later Bison versions fail to define the == and != operators
+  //some recent Bison versions fail to define the == and != operators
   //so we define them as function to be compatible with all versions 
   
   inline bool cmp(position const& p1, position const& p2)

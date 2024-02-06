@@ -1,4 +1,17 @@
 -----------------------------------------------------------------------
+----- QUICKSTART ------------------------------
+ - Compile Mast in default directory:
+   >make
+ - Go to the Installed Examples: 
+   > cd cmake_debug/Install/Examples
+ - Run Mast on a basic 12-bit JTAG chain: 
+   > ./Mast -c=Examples.yml -s=./SIT/JTAG.sit
+   
+ - Details on the provided examples are given in the Readme.txt of the Examples directory
+       
+-----------------------------------------------------------------------
+
+-----------------------------------------------------------------------
 New mast project is organized into sub-projects.
 
   - Mast_Core is mast building blocks per se

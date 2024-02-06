@@ -20,11 +20,27 @@ QUICKSTART
 	        by using the --help flag	 
 
          
+------------------------------------------------------------------------------------------------------------
+ The C++Wrapped PDL 1 files are found in the mastopensource/Examples/PDL directory
+ in particular, Console_Incr is defined in Examples.cpp
  
-------------------------------------
-DETAILS of the provided files
+ These files are compiled together with MAST and are provided in the .so shared files of the Install Directory
+ 
+------------------------------------------------------------------------
+DETAILS of the provided Hardware Description files
 
-- Examples referencing the "Console_Incr" PDL-1 routine : 
+- Examples using ICL: 
+
+- This ICL example is equivalent to JTAG.sit (Referencing the "Console_Incr" PDL-1 routine) : 
+./Mast -c=Examples.yml --icl_list=ICL/JTAG/JTAG.lst
+
+- ICL example emulating the usage of Leds (source file mastopensource/Examples/PDL/ICL_Leds.cpp)
+./Mast -c=ICL_Leds.yml --icl_list=ICL/ICL_Leds/ICL_Leds.lst
+ 
+
+- Examples using SIT: 
+ 
+- Examples referencing the "Console_Incr" PDL-1 routine (source file mastopensource/Examples/PDL/Examples.cpp): 
 JTAG.sit
 JTAG_Double.sit
 MIB_Example.sit

@@ -61,7 +61,7 @@ include_directories(${LIBLOGGER_INCLUDE_DIRS})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${EXAMPLE_DIRECTORY}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${EXAMPLE_DIRECTORY})
 
-add_library           (Examples SHARED ${PDL_DIRECTORY}/Examples.cpp)
+add_library           (Examples SHARED ${PDL_DIRECTORY}/Classifier.cpp)
 set_target_properties (Examples PROPERTIES COMPILE_FLAGS "${P_CFLAGS}" )
 target_link_libraries (Examples Mast_API_CPP ${EXTRA_LIBS})
 

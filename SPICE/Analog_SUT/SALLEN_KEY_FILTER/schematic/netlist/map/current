@@ -1,0 +1,18 @@
+( ( nil
+  version "2.1"
+  mapType "incremental"
+  blockName "rlc"
+  repList "spectre cmos_sch schematic"
+  stopList "spectre"
+  globalList "gnd!"
+  hierDelim "."
+  netlistDir "/tima/kouamoj/Documents/vituoso/MAST/Sim/rlc/spectre/schematic/netlist"
+ )
+( net
+( "gnd!" "0" )
+ )
+( model
+( "mastlib2/rlc/schematic" "rlc" )
+ )
+( "rlc" "ihnl/cds0/map" )
+ )

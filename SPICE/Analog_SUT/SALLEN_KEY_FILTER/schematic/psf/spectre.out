@@ -1,0 +1,223 @@
+
+Spectre (R) Circuit Simulator
+Version 18.1.0.235.isr3 64bit -- 8 Jan 2019
+Copyright (C) 1989-2019 Cadence Design Systems, Inc. All rights reserved worldwide. Cadence and Spectre are registered trademarks of Cadence Design Systems, Inc. All others are the property of their respective holders.
+
+Includes RSA BSAFE(R) Cryptographic or Security Protocol Software from RSA Security, Inc.
+
+User: kouamoj   Host: cimepe36   HostID: AB932422   PID: 19370
+Memory  available: 35.5293 GB  physical: 50.7071 GB
+Linux   : Debian GNU/Linux 7.11 (wheezy)
+CPU Type: Intel(R) Xeon(R) CPU E5-2609 0 @ 2.40GHz
+All processors running at 2399.9 MHz
+        Socket: Processors
+        0:       0,  1,  2,  3
+        
+System load averages (1min, 5min, 15min) : 10.2 %, 2.8 %, 1.0 %
+
+
+Simulating `input.scs' on cimepe36 at 11:19:31 PM, Thur Oct 16, 2025 (process id: 19370).
+Current working directory: /calcul/kouamoj/mast-opensource-master/SPICE/schematic/netlist
+Command line:
+    /softslin/cdsspectre18_10_235/tools/bin/spectre -64 input.scs  \
+        +escchars +log ../psf/spectre.out +inter=mpsc  \
+        +mpssession=spectre0_18979_1 -format psfxl -raw ../psf  \
+        +lqtimeout 900 -maxw 5 -maxn 5
+spectre pid = 19370
+
+Loading /softslin/cdsspectre18_10_235/tools.lnx86/cmi/lib/64bit/5.0/libinfineon_sh.so ...
+Loading /softslin/cdsspectre18_10_235/tools.lnx86/cmi/lib/64bit/5.0/libphilips_o_sh.so ...
+Loading /softslin/cdsspectre18_10_235/tools.lnx86/cmi/lib/64bit/5.0/libphilips_sh.so ...
+Loading /softslin/cdsspectre18_10_235/tools.lnx86/cmi/lib/64bit/5.0/libsparam_sh.so ...
+Loading /softslin/cdsspectre18_10_235/tools.lnx86/cmi/lib/64bit/5.0/libstmodels_sh.so ...
+Reading file:  /calcul/kouamoj/mast-opensource-master/SPICE/schematic/netlist/input.scs
+Reading link:  /softslin/cdsspectre18_10_235
+Reading file:  /softl1/cdsspectre18_10_235/tools.lnx86/spectre/etc/configs/mapsubckt.cfg
+Reading file:  /softl1/cdsspectre18_10_235/tools.lnx86/spectre/etc/configs/spectre.cfg
+Time for NDB Parsing: CPU = 164.01 ms, elapsed = 312.133 ms.
+Time accumulated: CPU = 212.012 ms, elapsed = 312.143 ms.
+Peak resident memory used = 48.2 Mbytes.
+
+Time for Elaboration: CPU = 40.003 ms, elapsed = 39.355 ms.
+Time accumulated: CPU = 252.015 ms, elapsed = 351.773 ms.
+Peak resident memory used = 54.3 Mbytes.
+
+
+Warning from spectre during hierarchy flattening.
+    WARNING (SPECTRE-17101): The value 'psf' specified using the 'checklimitdest' option will no longer be supported in future releases.
+
+
+Time for EDB Visiting: CPU = 0 s, elapsed = 1.45411 ms.
+Time accumulated: CPU = 252.015 ms, elapsed = 353.527 ms.
+Peak resident memory used = 54.9 Mbytes.
+
+
+Global user options:
+         psfversion = 1.1.0
+            vabstol = 1e-06
+            iabstol = 1e-12
+               temp = 27
+               gmin = 1e-12
+             rforce = 1
+           maxnotes = 5
+           maxwarns = 5
+             digits = 5
+               cols = 80
+             pivrel = 0.001
+           sensfile = ../psf/sens.output
+     checklimitdest = psf
+               save = allpub
+             reltol = 0.001
+               tnom = 27
+             scalem = 1
+              scale = 1
+
+Scoped user options:
+
+Circuit inventory:
+              nodes 3
+          capacitor 1     
+           inductor 1     
+           resistor 1     
+            vsource 1     
+
+Analysis and control statement inventory:
+               info 7     
+               tran 1     
+
+Output statements:
+             .probe 0     
+           .measure 0     
+               save 0     
+
+Time for parsing: CPU = 4 ms, elapsed = 4.45604 ms.
+Time accumulated: CPU = 256.015 ms, elapsed = 358.229 ms.
+Peak resident memory used = 56.2 Mbytes.
+
+~~~~~~~~~~~~~~~~~~~~~~
+Pre-Simulation Summary
+~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+Entering remote command mode using MPSC service (spectre, ipi, v0.0, spectre0_18979_1, ).
+
+*************************************************
+Transient Analysis `tran': time = (0 s -> 200 ns)
+*************************************************
+DC simulation time: CPU = 4 ms, elapsed = 494.003 us.
+
+Opening the PSFXL file ../psf/tran.tran.tran ...
+Important parameter values:
+    start = 0 s
+    outputstart = 0 s
+    stop = 200 ns
+    step = 200 ps
+    maxstep = 4 ns
+    ic = all
+    useprevic = no
+    skipdc = no
+    reltol = 1e-03
+    abstol(V) = 1 uV
+    abstol(I) = 1 pA
+    temp = 27 C
+    tnom = 27 C
+    tempeffects = all
+    errpreset = moderate
+    method = traponly
+    lteratio = 3.5
+    relref = sigglobal
+    cmin = 0 F
+    gmin = 1 pS
+
+
+Output and IC/nodeset summary:
+                 save   2       (current)
+                 save   3       (voltage)
+
+    tran: time = 6.984 ns    (3.49 %), step = 3.116 ns     (1.56 %)
+    tran: time = 16.4 ns      (8.2 %), step = 3.2 ns        (1.6 %)
+    tran: time = 26.3 ns     (13.2 %), step = 3.2 ns        (1.6 %)
+    tran: time = 36.4 ns     (18.2 %), step = 3.2 ns        (1.6 %)
+    tran: time = 46.3 ns     (23.2 %), step = 3.2 ns        (1.6 %)
+    tran: time = 56.4 ns     (28.2 %), step = 3.2 ns        (1.6 %)
+    tran: time = 66.3 ns     (33.1 %), step = 3.2 ns        (1.6 %)
+    tran: time = 76.4 ns     (38.2 %), step = 3.2 ns        (1.6 %)
+    tran: time = 86.3 ns     (43.1 %), step = 3.2 ns        (1.6 %)
+    tran: time = 96.4 ns     (48.2 %), step = 3.2 ns        (1.6 %)
+    tran: time = 106.3 ns    (53.1 %), step = 3.2 ns        (1.6 %)
+    tran: time = 116.4 ns    (58.2 %), step = 3.2 ns        (1.6 %)
+    tran: time = 126.3 ns    (63.2 %), step = 3.2 ns        (1.6 %)
+    tran: time = 136.4 ns    (68.2 %), step = 3.2 ns        (1.6 %)
+    tran: time = 146.3 ns    (73.2 %), step = 3.2 ns        (1.6 %)
+    tran: time = 156.4 ns    (78.2 %), step = 3.2 ns        (1.6 %)
+    tran: time = 166.3 ns    (83.2 %), step = 3.2 ns        (1.6 %)
+    tran: time = 176.4 ns    (88.2 %), step = 3.2 ns        (1.6 %)
+    tran: time = 186.3 ns    (93.2 %), step = 3.2 ns        (1.6 %)
+    tran: time = 196.4 ns    (98.2 %), step = 3.2 ns        (1.6 %)
+Number of accepted tran steps =             153
+
+Maximum value achieved for any signal of each quantity: 
+V: V(net2) = 1 V
+I: I(V0:p) = 6.726 uA
+If your circuit contains signals of the same quantity that are vastly different in size (such as high voltage circuitry combined with low voltage control circuitry), you should consider specifying global option `bin_relref=yes'.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Post-Transient Simulation Summary
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   -   To further speed up simulation, consider
+          add ++aps on command line
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+During simulation, the CPU load for active processors is :
+        Spectre  0 (12.4 %)      1 (12.8 %)      3 (1.1 %)      
+        Other   
+Initial condition solution time: CPU = 4 ms, elapsed = 599.861 us.
+Intrinsic tran analysis time:    CPU = 20.002 ms, elapsed = 26.5069 ms.
+Total time required for tran analysis `tran': CPU = 28.002 ms, elapsed = 31.004 ms.
+Time accumulated: CPU = 292.018 ms, elapsed = 1.01769 s.
+Peak resident memory used = 58.6 Mbytes.
+
+finalTimeOP: writing operating point information to rawfile.
+
+Opening the PSF file ../psf/finalTimeOP.info ...
+modelParameter: writing model parameter values to rawfile.
+
+Opening the PSF file ../psf/modelParameter.info ...
+element: writing instance parameter values to rawfile.
+
+Opening the PSF file ../psf/element.info ...
+outputParameter: writing output parameter values to rawfile.
+
+Opening the PSF file ../psf/outputParameter.info ...
+designParamVals: writing netlist parameters to rawfile.
+
+Opening the PSFASCII file ../psf/designParamVals.info ...
+primitives: writing primitives to rawfile.
+
+Opening the PSFASCII file ../psf/primitives.info.primitives ...
+subckts: writing subcircuits to rawfile.
+
+Opening the PSFASCII file ../psf/subckts.info.subckts ...
+
+Spectre received SIGTERM sent from PID: 19339 with UID: 90004.
+Process hierarchy of PID 19339 :
+    PID        COMMAND
+    19339      /softslin/cdsic617_823/tools/bin/32bit/cdsServIpc -c 38678 -n 3 -r 0 -x cd /calcul/kouamoj/mast-opensource-master/SPICE/schematic/netlist ; ./runSimulation 
+    19338      sh -c /softslin/cdsic617_823/tools/bin/cdsServIpc -c 38678 -n 3 -r 0 -x "cd /calcul/kouamoj/mast-opensource-master/SPICE/schematic/netlist ; ./runSimulation" 
+    18979      /softslin/cdsic617_823/tools.lnx86/dfII/bin/64bit/virtuoso -ocean 
+    18110      -bash 
+    18109      sshd: kouamoj@pts/0
+    18107      sshd: kouamoj [priv]
+    3091       /usr/sbin/sshd 
+
+Error found by spectre.
+    ERROR (SPECTRE-25): Killed by user.
+
+
+Aggregate audit (11:19:49 PM, Thur Oct 16, 2025):
+Time used: CPU = 312 ms, elapsed = 17.9 s, util. = 1.74%.
+Time spent in licensing: elapsed = 27.3 ms.
+Peak memory used = 59 Mbytes.
+Simulation started at: 11:19:31 PM, Thur Oct 16, 2025, ended at: 11:19:49 PM, Thur Oct 16, 2025, with elapsed time (wall clock): 17.9 s.
+spectre completes with 1 error, 1 warning, and 0 notices.
+spectre terminated prematurely due to fatal error.

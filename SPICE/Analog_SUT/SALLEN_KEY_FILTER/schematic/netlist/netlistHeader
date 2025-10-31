@@ -1,0 +1,7 @@
+// Generated for: spectre
+// Generated on: Oct 16 12:23:33 2025
+// Design library name: mastlib2
+// Design cell name: rlc
+// Design view name: schematic
+simulator lang=spectre
+global 0

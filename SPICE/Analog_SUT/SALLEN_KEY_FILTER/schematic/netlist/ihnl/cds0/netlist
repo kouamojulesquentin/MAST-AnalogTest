@@ -1,0 +1,8 @@
+
+// Library name: mastlib2
+// Cell name: rlc
+// View name: schematic
+C0 (net4 net3) capacitor c=95u
+R0 (net3 0) resistor r=89 c=0
+L0 (net2 net4) inductor l=15m
+V0 (net2 0) vsource type=pulse val0=0 val1=1 period=20n width=10n

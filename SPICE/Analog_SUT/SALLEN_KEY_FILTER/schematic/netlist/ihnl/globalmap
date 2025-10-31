@@ -1,0 +1,9 @@
+CADENCE IHNL11140
+$model
+mastlib2/rlc/schematic rlc
+$endmodel
+$net
+gnd! 0
+$endnet
+$param
+$endparam

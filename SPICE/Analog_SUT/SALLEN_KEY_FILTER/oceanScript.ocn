@@ -1,0 +1,16 @@
+simulator( 'spectre )
+design(	 "./schematic/netlist/netlist")
+
+analysis('tran ?stop "200n"  )
+envOption(
+	'analysisOrder  list("tran") 
+)
+saveOption( ?outputParamInfo t )
+saveOption( ?elementInfo t )
+saveOption( ?modelParamInfo t )
+temp( 27 ) 
+run()
+selectResult( 'tran )
+plot(getData("/net2") getData("/net3") )
+ocnPrint(getData("/net2") ?output "V_in1.txt")
+ocnPrint(getData("/net3") ?output "V_out1.txt")

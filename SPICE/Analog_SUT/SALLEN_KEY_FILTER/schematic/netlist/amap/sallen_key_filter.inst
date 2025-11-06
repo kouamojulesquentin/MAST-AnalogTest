@@ -1,0 +1,5 @@
+HEADER
+"PSFversion" "1.00"
+"R5n R4n R3n R2n R1n R0n" "analogLib_presistor_spectre"
+"C1n C0n" "analogLib_pcapacitor_spectre"
+"V0n" "analogLib_vpwlf_spectre"

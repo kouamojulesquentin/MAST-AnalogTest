@@ -26,7 +26,7 @@ constant log2x : log2arr := (1,1,2,2,3,3,3,3,4,4,4,4,4,4,4,4,
 --PIPPO configuration options and values
 --------------------------------------------------------
 
-constant SRAM_WORD_SIZE : integer := 8;
+constant SRAM_WORD_SIZE : integer := 16;
 
 constant word_size : natural := 32;
 constant word_nbytes : natural := word_size / 8;

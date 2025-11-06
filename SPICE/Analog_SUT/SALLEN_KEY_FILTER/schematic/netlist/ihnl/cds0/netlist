@@ -1,8 +1,13 @@
 
-// Library name: mastlib2
-// Cell name: rlc
+// Library name: sallen_key_filter
+// Cell name: sallen_key_filter
 // View name: schematic
-C0 (net4 net3) capacitor c=95u
-R0 (net3 0) resistor r=89 c=0
-L0 (net2 net4) inductor l=15m
-V0 (net2 0) vsource type=pulse val0=0 val1=1 period=20n width=10n
+R5 (net1 0) resistor r=R3 c=0
+R4 (net7 0) resistor r=R4 c=0
+R3 (net7 V_out) resistor r=R5 c=0
+R2 (net4 V_out) resistor r=R2 c=0
+R1 (V_out 0) resistor r=10k c=0
+R0 (V_in net4) resistor r=R1 c=0
+C1 (net1 net4) capacitor c=C1
+C0 (net4 0) capacitor c=C2
+V0 (V_in 0) vsource type=pwl file="input_amprbs"

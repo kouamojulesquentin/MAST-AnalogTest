@@ -1,0 +1,8 @@
+TRANSLATOR top Emulation
+ (
+ JTAG_TAP TAP 4 1
+ PDL Classifier
+  (
+  REGISTER reg1 33 Bypass: "0b000000000000000000000000000000000"
+  )
+ )

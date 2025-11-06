@@ -1,1 +1,1 @@
-infoDpl = `(nil simulator "spectre" libName nil cellName nil viewName nil cdslib "cds.lib" extractedViewPresent nil)
+infoDpl = `(nil simulator "spectre" libName "sallen_key_filter" cellName "sallen_key_filter" viewName "schematic" cdslib "cds.lib" extractedViewPresent nil)

@@ -58,8 +58,8 @@ signal toTCK  : std_logic_vector(1 to MAX_LEVELS);
 --------------------------
  --signal for PO capture
 
-signal static_out : std_logic_vector(11 downto 0);
-signal static_in : std_logic_vector(11 downto 0);
+signal static_out : std_logic_vector(32 downto 0);
+signal static_in : std_logic_vector(32 downto 0);
 
 signal SEL_delay,next_SEL_delay  : std_logic_vector(0 to MAX_LEVELS);
 signal UE_delay, next_UE_delay   : std_logic_vector(0 to MAX_LEVELS);
@@ -96,9 +96,9 @@ begin
 ------------------------------------------------------------------
 
 
- --one 12-bit "reg" register
+ --one 32-bit "reg" register
   
-static_reg: bs_register generic map (size => 12)
+static_reg: bs_register generic map (size => 33)
  port map
    ( clk   => clk, 
      rst   => rst, 
@@ -115,7 +115,7 @@ static_reg: bs_register generic map (size => 12)
 
 ---------------------------------
     
-static_reg_log : output_connection generic map (data_size => 12,
+static_reg_log : output_connection generic map (data_size => 33,
                 output_dir => "./Simulation_exchange_files/tutorial_1/",
                 output_file => "reg.out")
   port map
@@ -127,7 +127,7 @@ static_reg_log : output_connection generic map (data_size => 12,
      UP_en => UP_en
    );
 
-static_reg_in : input_connection generic map (data_size => 12,
+static_reg_in : input_connection generic map (data_size => 33,
                   input_dir => "./Simulation_exchange_files/tutorial_1/",
                   input_file => "reg.in")
   port map

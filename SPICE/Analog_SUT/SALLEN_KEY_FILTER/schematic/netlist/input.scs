@@ -1,24 +1,39 @@
 // Generated for: spectre
-// Generated on: Oct 16 12:23:33 2025
-// Design library name: mastlib2
-// Design cell name: rlc
+// Generated on: Nov  4 15:08:28 2025
+// Design library name: sallen_key_filter
+// Design cell name: sallen_key_filter
 // Design view name: schematic
 simulator lang=spectre
 global 0
+include "/softslin/AMS_410_ISR15/spectre/c35/soac/soac.scs"
+parameters R5=4000 R4=4000 R3=2000 R2=1000 R1=5180.0 C2=5e-09 C1=5e-09
+include "/softslin/AMS_410_ISR15/spectre/c35/soac/processOption.scs"
+include "/softslin/AMS_410_ISR15/spectre/c35/soac/cmos53.scs" section=cmostm
+include "/softslin/AMS_410_ISR15/spectre/c35/soac/res.scs" section=restm
+include "/softslin/AMS_410_ISR15/spectre/c35/soac/cap.scs" section=captm
+include "/softslin/AMS_410_ISR15/spectre/c35/soac/bip.scs" section=biptm
+include "/softslin/AMS_410_ISR15/spectre/c35/soac/ind.scs" section=indtm
+include "/softslin/AMS_410_ISR15/spectre/c35/soac/esddiode.scs" section=esddiodetm
 
-// Library name: mastlib2
-// Cell name: rlc
+// Library name: sallen_key_filter
+// Cell name: sallen_key_filter
 // View name: schematic
-C0 (net4 net3) capacitor c=95u
-R0 (net3 0) resistor r=89 c=0
-L0 (net2 net4) inductor l=15m
-V0 (net2 0) vsource type=pulse val0=0 val1=1 period=20n width=10n
-simulatorOptions options psfversion="1.1.0" reltol=1e-3 vabstol=1e-6 \
-    iabstol=1e-12 temp=27 tnom=27 scalem=1.0 scale=1.0 gmin=1e-12 rforce=1 \
-    maxnotes=5 maxwarns=5 digits=5 cols=80 pivrel=1e-3 \
-    sensfile="../psf/sens.output" checklimitdest=psf 
-tran tran stop=200n write="spectre.ic" writefinal="spectre.fc" \
-    annotate=status maxiters=5 
+R5 (net1 0) resistor r=R3 c=0
+R4 (net7 0) resistor r=R4 c=0
+R3 (net7 V_out) resistor r=R5 c=0
+R2 (net4 V_out) resistor r=R2 c=0
+R1 (V_out 0) resistor r=10k c=0
+R0 (V_in net4) resistor r=R1 c=0
+C1 (net1 net4) capacitor c=C1
+C0 (net4 0) capacitor c=C2
+V0 (V_in 0) vsource type=pwl file="input_amprbs"
+simulatorOptions options psfversion="1.1.0" reltol=100e-6 vabstol=1e-6 \
+    iabstol=1e-12 temp=27 tnom=27 homotopy=all limit=delta scalem=1.0 \
+    scale=1.0 compatible=spice2 gmin=1e-12 rforce=1 maxnotes=5 maxwarns=5 \
+    digits=5 cols=80 pivrel=1e-3 sensfile="../psf/sens.output" \
+    checklimitdest=psf enable_pre_ver=yes ignorezerovar=yes 
+tran tran stop=100m errpreset=conservative write="spectre.ic" \
+    writefinal="spectre.fc" annotate=status maxiters=5 
 finalTimeOP info what=oppoint where=rawfile
 modelParameter info what=models where=rawfile
 element info what=inst where=rawfile

@@ -33,7 +33,7 @@ use work.SUT_Package.all;
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
 --USE ieee.numeric_std.ALL;
- 
+
 ENTITY SUT IS
      port ( 
          --Environment signals

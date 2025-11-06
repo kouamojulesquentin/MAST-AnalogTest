@@ -1,16 +1,19 @@
 simulator( 'spectre )
-design(	 "./schematic/netlist/netlist")
+design(	 "schematic/netlist/netlist")
 
-analysis('tran ?stop "200n"  )
-envOption(
-	'analysisOrder  list("tran") 
+analysis('tran ?stop "100m"  )
+desVar(	  "C1" 5n	)
+desVar(	  "C2" 5n	)
+desVar(	  "R1" 5.18k	)
+desVar(	  "R2" 1k	)
+desVar(	  "R3" 2k	)
+desVar(	  "R4" 4k	)
+desVar(	  "R5" 4k	)
+
+option( ?categ 'turboOpts
+	'uniMode  "Spectre" 
 )
-saveOption( ?outputParamInfo t )
-saveOption( ?elementInfo t )
-saveOption( ?modelParamInfo t )
-temp( 27 ) 
+
 run()
 selectResult( 'tran )
-plot(getData("/net2") getData("/net3") )
-ocnPrint(getData("/net2") ?output "V_in1.txt")
-ocnPrint(getData("/net3") ?output "V_out1.txt")
+ocnPrint(getData("/V_out") ?output "data/V_out.txt" ?from 0 ?to 0.1 ?step 0.00006)

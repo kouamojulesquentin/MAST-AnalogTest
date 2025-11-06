@@ -1,6 +1,0 @@
-HEADER
-"PSFversion" "1.00"
-"C0n" "analogLib_pcapacitor_spectre"
-"R0n" "analogLib_presistor_spectre"
-"L0n" "analogLib_pinductor_spectre"
-"V0n" "analogLib_vpulse_spectre"

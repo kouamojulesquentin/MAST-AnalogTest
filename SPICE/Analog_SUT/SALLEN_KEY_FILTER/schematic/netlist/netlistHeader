@@ -1,7 +1,7 @@
 // Generated for: spectre
-// Generated on: Oct 16 12:23:33 2025
-// Design library name: mastlib2
-// Design cell name: rlc
+// Generated on: Nov  4 15:08:28 2025
+// Design library name: sallen_key_filter
+// Design cell name: sallen_key_filter
 // Design view name: schematic
 simulator lang=spectre
 global 0

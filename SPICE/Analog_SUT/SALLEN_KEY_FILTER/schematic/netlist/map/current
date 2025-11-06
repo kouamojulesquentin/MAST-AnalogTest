@@ -1,18 +1,18 @@
 ( ( nil
   version "2.1"
   mapType "incremental"
-  blockName "rlc"
-  repList "spectre cmos_sch schematic"
+  blockName "sallen_key_filter"
+  repList "spectre cmos_sch schematic symbol"
   stopList "spectre"
   globalList "gnd!"
   hierDelim "."
-  netlistDir "/tima/kouamoj/Documents/vituoso/MAST/Sim/rlc/spectre/schematic/netlist"
+  netlistDir "/tima/kouamoj/Documents/vituoso/sallen_key_filter/Sim/sallen_key_filter/spectre/schematic/netlist"
  )
 ( net
 ( "gnd!" "0" )
  )
 ( model
-( "mastlib2/rlc/schematic" "rlc" )
+( "sallen_key_filter/sallen_key_filter/schematic" "sallen_key_filter" )
  )
-( "rlc" "ihnl/cds0/map" )
+( "sallen_key_filter" "ihnl/cds0/map" )
  )

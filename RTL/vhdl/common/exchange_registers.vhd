@@ -24,7 +24,7 @@ package exchange_registers is
 component output_connection 
     generic ( output_dir : string := "./Matlab_exchange/";
               output_file : string := "cal_measure_1.txt";
-	      data_size : integer := 8);
+	      data_size : integer := 16);
     port ( 
 	  data_in : in std_logic_vector(data_size-1 downto 0);
 	  Sel  : in  std_logic;
@@ -35,7 +35,7 @@ end component;
 component input_connection 
     generic ( input_dir : string := "./Matlab_exchange/";
               input_file : string := "cal_value_1.txt";
-	      data_size : integer := 8);
+	      data_size : integer := 16);
     port ( 
 	  data_out : out std_logic_vector(data_size-1 downto 0);
 	  Sel  : in  std_logic;
@@ -57,7 +57,7 @@ use work.MAST_config.all;
 Entity output_connection is
     generic ( output_dir : string := "./Matlab_exchange/";
               output_file : string := "cal_measure_1.txt";
-	      data_size : integer := 8);
+	      data_size : integer := 16);
     port ( 
 	  data_in : in std_logic_vector(data_size-1 downto 0);
 	  Sel  : in  std_logic;
@@ -112,7 +112,7 @@ use work.MAST_config.all;
 Entity input_connection is
     generic ( input_dir : string := "./Matlab_exchange/";
               input_file : string := "cal_value_1.txt";
-	      data_size : integer := 8);
+	      data_size : integer := 16);
     port ( 
 	  data_out : out std_logic_vector(data_size-1 downto 0);
 	  Sel  : in  std_logic;

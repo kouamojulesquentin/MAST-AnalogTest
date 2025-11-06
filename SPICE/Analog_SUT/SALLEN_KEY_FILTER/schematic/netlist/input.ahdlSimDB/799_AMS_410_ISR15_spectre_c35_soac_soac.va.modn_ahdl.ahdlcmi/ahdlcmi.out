@@ -1,0 +1,57 @@
+ahdlcmicompile: Compiling ahdlcmi in input.ahdlSimDB//799_AMS_410_ISR15_spectre_c35_soac_soac.va.modn_ahdl.ahdlcmi/Linux-64/ for Linux-64 with optimize using gcc on Mon Oct 13 10:19:20 CEST 2025 [5.0]
+ahdlcmicompile: Generating makefile
+PATH:  /softslin/cdsmmsim14_10_921_isr17/tools.lnx86/cdsgcc/gcc/4.1-x86_64/install/bin:/softslin/cdsmmsim14_10_921_isr17/bin:/softslin/cdsmmsim14_10_921_isr17/tools/bin/64bit:/softslin/cdsmmsim14_10_921_isr17/tools/bin:/softslin/cdsic616_500_140/bin:/softslin/cdsic616_500_140/tools/bin:/softslin/cdsic616_500_140/tools/bin/64bit:/softslin/cdsic616_500_140/share/oa/bin:/softslin/cdsincisiv15_20_035/tools/bin:/softslin/cdsic616_500_140/tools/dfII/bin:/softslin/cdsinnovus17_11_000_isr1/bin:/softslin/cdsinnovus17_11_000_isr1/tools/bin:/softslin/cdsext15_26_s603/tools/bin:/softslin/cdsassura4_13_102_615/tools/bin:/softslin/cdsassura4_13_102_615/tools/assura/bin:/tima/kouamoj/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/tima/kouamoj/bin:/softslin/hspicevK2015_06_sp2_2/hspice/bin:/softslin/synthesisvJ2014_09_sp2_64b/bin:/softslin/AMS_410_ISR15/programs/bin:/softslin/AMS_410_ISR15/cds/bin
+LD_LIBRARY_PATH:  /softslin/cdsmmsim14_10_921_isr17/tools.lnx86/cdsgcc/gcc/4.1-x86_64/install/lib:/softslin/cdsmmsim14_10_921_isr17/tools/giganta/lib/64bit:/softslin/cdsmmsim14_10_921_isr17/tools/mdl/lib/64bit:/softslin/cdsmmsim14_10_921_isr17/tools/mmsim/lib/64bit:/softslin/cdsmmsim14_10_921_isr17/tools/inca/lib/64bit:/softslin/cdsmmsim14_10_921_isr17/tools/spectre/lib/64bit:/softslin/cdsmmsim14_10_921_isr17/tools/dfII/lib/64bit:/softslin/cdsmmsim14_10_921_isr17/tools/lib/64bit:/softslin/cdsmmsim14_10_921_isr17/tools/lib:/softslin/cdsic616_500_140/tools/lib:/softslin/cdsic616_500_140/share/oa/lib/linux_rhel50_gcc44x_64/opt:/softslin/cdsic616_500_140/tools/Qt/64bit/lib:/softslin/cdsic616_500_140/tools/dfII/lib/64bit:/softslin/cdsic616_500_140/tools/sev/lib/64bit:/softslin/cdsic616_500_140/tools/lib/64bit:/softslin/cdsincisiv15_20_035/tools.lnx86/lib/64bit
+/softslin/cdsmmsim14_10_921_isr17/tools.lnx86/spectre/ahdlcmi/bin/gnumake -l 4.000000 -j4 -f GNUmakefile
+Cleaning ./obj/optimize/5.0
+rm -f -rf ./obj/optimize/5.0
+Compiling C file modn_ahdl_func.c (optimize) with -O0
+/softslin/cdsmmsim14_10_921_isr17/tools.lnx86/cdsgcc/gcc/4.4/bin/gcc  -march=k8 -ffast-math -O0 -m64 -DSYSV -DSVR4 -D_REENTRANT -fPIC   -DconfigSPECTRE -I. -I/softslin/cdsmmsim14_10_921_isr17/tools.lnx86/spectre/ahdlcmi/include -c modn_ahdl_func.c -o obj/optimize/5.0/modn_ahdl_func.o || rm -f -f obj/optimize/5.0/modn_ahdl_func.o
+Compiling C file modn_ahdl_DcFuncDerLoad.c (optimize)
+Compiling C file modn_ahdl_DcFuncLoad.c (optimize)
+/softslin/cdsmmsim14_10_921_isr17/tools.lnx86/cdsgcc/gcc/4.4/bin/gcc  -march=k8 -ffast-math -O3 -m64 -DSYSV -DSVR4 -D_REENTRANT -fPIC   -DconfigSPECTRE -I. -I/softslin/cdsmmsim14_10_921_isr17/tools.lnx86/spectre/ahdlcmi/include -c modn_ahdl_DcFuncDerLoad.c -o obj/optimize/5.0/modn_ahdl_DcFuncDerLoad.o || rm -f -f obj/optimize/5.0/modn_ahdl_DcFuncDerLoad.o
+/softslin/cdsmmsim14_10_921_isr17/tools.lnx86/cdsgcc/gcc/4.4/bin/gcc  -march=k8 -ffast-math -O3 -m64 -DSYSV -DSVR4 -D_REENTRANT -fPIC   -DconfigSPECTRE -I. -I/softslin/cdsmmsim14_10_921_isr17/tools.lnx86/spectre/ahdlcmi/include -c modn_ahdl_DcFuncLoad.c -o obj/optimize/5.0/modn_ahdl_DcFuncLoad.o || rm -f -f obj/optimize/5.0/modn_ahdl_DcFuncLoad.o
+Compiling C file modn_ahdl_TranFuncDerLoad.c (optimize)
+/softslin/cdsmmsim14_10_921_isr17/tools.lnx86/cdsgcc/gcc/4.4/bin/gcc  -march=k8 -ffast-math -O3 -m64 -DSYSV -DSVR4 -D_REENTRANT -fPIC   -DconfigSPECTRE -I. -I/softslin/cdsmmsim14_10_921_isr17/tools.lnx86/spectre/ahdlcmi/include -c modn_ahdl_TranFuncDerLoad.c -o obj/optimize/5.0/modn_ahdl_TranFuncDerLoad.o || rm -f -f obj/optimize/5.0/modn_ahdl_TranFuncDerLoad.o
+modn_ahdl_func.c: In function 'modn_ahdl_ParamInit':
+modn_ahdl_func.c:720: warning: floating constant exceeds range of 'double'
+modn_ahdl_func.c:721: warning: floating constant exceeds range of 'double'
+rm -f -rf modn_ahdl_DcFuncLoad.c
+Compiling C file modn_ahdl_TranFuncLoad.c (optimize)
+/softslin/cdsmmsim14_10_921_isr17/tools.lnx86/cdsgcc/gcc/4.4/bin/gcc  -march=k8 -ffast-math -O3 -m64 -DSYSV -DSVR4 -D_REENTRANT -fPIC   -DconfigSPECTRE -I. -I/softslin/cdsmmsim14_10_921_isr17/tools.lnx86/spectre/ahdlcmi/include -c modn_ahdl_TranFuncLoad.c -o obj/optimize/5.0/modn_ahdl_TranFuncLoad.o || rm -f -f obj/optimize/5.0/modn_ahdl_TranFuncLoad.o
+rm -f -rf modn_ahdl_func.c
+Compiling C file modn_ahdl_cmi_c.c (optimize) with -O0
+/softslin/cdsmmsim14_10_921_isr17/tools.lnx86/cdsgcc/gcc/4.4/bin/gcc  -march=k8 -ffast-math -O0 -m64 -DSYSV -DSVR4 -D_REENTRANT -fPIC   -DconfigSPECTRE -I. -I/softslin/cdsmmsim14_10_921_isr17/tools.lnx86/spectre/ahdlcmi/include -I/softslin/cdsmmsim14_10_921_isr17/tools.lnx86/cmi/include -c modn_ahdl_cmi_c.c -o obj/optimize/5.0/modn_ahdl_cmi_c.o || rm -f -f obj/optimize/5.0/modn_ahdl_cmi_c.o
+rm -f -rf modn_ahdl_DcFuncDerLoad.c
+modn_ahdl_cmi_c.c: In function 'modn_ahdl_pDC_Load':
+modn_ahdl_cmi_c.c:1033: warning: passing argument 1 of 'aslDevFillZeorDiagonalElemet' makes pointer from integer without a cast
+/softslin/cdsmmsim14_10_921_isr17/tools.lnx86/spectre/ahdlcmi/include/ahdlDevLibGlobal.h:1955: note: expected 'void *' but argument is of type 'long int'
+modn_ahdl_cmi_c.c: In function 'modn_ahdl_pCompare':
+modn_ahdl_cmi_c.c:1086: warning: assignment makes integer from pointer without a cast
+modn_ahdl_cmi_c.c:1086: warning: passing argument 1 of 'memcpy' makes pointer from integer without a cast
+/usr/include/string.h:44: note: expected 'void * __restrict__' but argument is of type 'long int'
+modn_ahdl_cmi_c.c:1086: warning: passing argument 2 of 'memcpy' makes pointer from integer without a cast
+/usr/include/string.h:44: note: expected 'const void * __restrict__' but argument is of type 'long int'
+modn_ahdl_cmi_c.c:1086: warning: assignment makes integer from pointer without a cast
+modn_ahdl_cmi_c.c: In function 'modn_ahdl_pGetMatrixPointers':
+modn_ahdl_cmi_c.c:1092: warning: assignment makes integer from pointer without a cast
+modn_ahdl_cmi_c.c: In function 'modn_ahdl_pAnalTranLoad':
+modn_ahdl_cmi_c.c:1134: warning: passing argument 1 of 'aslDevFillZeorDiagonalElemet' makes pointer from integer without a cast
+/softslin/cdsmmsim14_10_921_isr17/tools.lnx86/spectre/ahdlcmi/include/ahdlDevLibGlobal.h:1955: note: expected 'void *' but argument is of type 'long int'
+modn_ahdl_cmi_c.c: In function 'modn_ahdl_pSaveRestart':
+modn_ahdl_cmi_c.c:1160: warning: passing argument 2 of 'aslDevAvarSR' from incompatible pointer type
+/softslin/cdsmmsim14_10_921_isr17/tools.lnx86/spectre/ahdlcmi/include/ahdlDevLibGlobal.h:1166: note: expected 'struct ahdlAnalogVar *' but argument is of type 'char *'
+modn_ahdl_cmi_c.c: In function 'modn_ahdl_pSaveRestartInst':
+modn_ahdl_cmi_c.c:1163: warning: passing argument 2 of 'aslDevAvarSR' from incompatible pointer type
+/softslin/cdsmmsim14_10_921_isr17/tools.lnx86/spectre/ahdlcmi/include/ahdlDevLibGlobal.h:1166: note: expected 'struct ahdlAnalogVar *' but argument is of type 'char *'
+rm -f -rf modn_ahdl_TranFuncDerLoad.c
+rm -f -rf modn_ahdl_TranFuncLoad.c
+rm -f -rf modn_ahdl_cmi_c.c
+/softslin/cdsmmsim14_10_921_isr17/tools.lnx86/cdsgcc/gcc/4.4/bin/gcc -shared -O3 -m64 -fPIC -o obj/optimize/5.0/libahdlcmi_modn_ahdl.so ./obj/optimize/5.0/modn_ahdl_func.o ./obj/optimize/5.0/modn_ahdl_DcFuncDerLoad.o ./obj/optimize/5.0/modn_ahdl_DcFuncLoad.o ./obj/optimize/5.0/modn_ahdl_TranFuncDerLoad.o ./obj/optimize/5.0/modn_ahdl_TranFuncLoad.o ./obj/optimize/5.0/modn_ahdl_cmi_c.o  -Wl,-rpath,/usr/lib -Wl,-rpath,/lib -s 
+ld: crti.o: No such file: No such file or directory
+collect2: ld returned 1 exit status
+gnumake: *** [obj/optimize/5.0/libahdlcmi_modn_ahdl.so] Error 1
+/softslin/cdsmmsim14_10_921_isr17/tools.lnx86/cdsgcc/gcc/4.4/bin/gcc -shared -O3 -m64 -fPIC -o obj/optimize/5.0/libahdlcmi_modn_ahdl.so ./obj/optimize/5.0/modn_ahdl_func.o ./obj/optimize/5.0/modn_ahdl_DcFuncDerLoad.o ./obj/optimize/5.0/modn_ahdl_DcFuncLoad.o ./obj/optimize/5.0/modn_ahdl_TranFuncDerLoad.o ./obj/optimize/5.0/modn_ahdl_TranFuncLoad.o ./obj/optimize/5.0/modn_ahdl_cmi_c.o  -Wl,-rpath,/usr/lib -Wl,-rpath,/lib -s 
+ld: crti.o: No such file: No such file or directory
+collect2: ld returned 1 exit status
+gnumake: *** [obj/optimize/5.0/libahdlcmi_modn_ahdl.so] Error 1

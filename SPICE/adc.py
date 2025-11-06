@@ -3,9 +3,9 @@
 """
 adc.py — simple ADC emulator for MAST co-simulation
 --------------------------------------------------
-Reads a two-column Spectre-like text file (time, voltage), converts the
-voltage column to binary codes and writes them to reg.in for consumption
-by the MAST/VHDL exchange interface.
+
+
+Author:  Jules KOUAMO, 2025-10-22
 """
 
 from __future__ import annotations
@@ -18,12 +18,10 @@ from typing import List, Optional
 # -------------------------
 # Default configuration
 # -------------------------
-# DEFAULT_INPUT = "Analog_SUT/SALLEN_KEY_FILTER/DATA/V_out.txt"
-# DEFAULT_OUTPUT = "../RTL/vhdl/Simulation_exchange_files/reg.in"
-DEFAULT_INPUT = "V_out.txt"
-DEFAULT_OUTPUT = "reg.in"
+DEFAULT_INPUT = "Analog_SUT/SALLEN_KEY_FILTER/data/V_out.txt"
+DEFAULT_OUTPUT = "../RTL/vhdl/Simulation_exchange_files/tutorial_1/reg.in"
 DEFAULT_BITS = 32
-DEFAULT_VREF = None     # auto-scale when None
+DEFAULT_VREF = None
 DEFAULT_GAIN = 1.0
 
 # -------------------------
@@ -47,7 +45,6 @@ def parse_value(token: str) -> Optional[float]:
 
     m = FLOAT_TOKEN_RE.match(token)
     if not m:
-        # Fallback: remove non-numeric characters and try to float() it
         cleaned = re.sub(r"[^\d\.\+\-eE]", "", token)
         try:
             return float(cleaned)
@@ -76,10 +73,8 @@ def read_voltage_column(path: str) -> List[float]:
             parts = line.split()
             if len(parts) < 2:
                 continue
-            # prefer last token as voltage (robust to extra columns)
             v = parse_value(parts[-1])
             if v is None:
-                # fallback try second token
                 v = parse_value(parts[1] if len(parts) > 1 else "")
             if v is None:
                 continue
@@ -90,16 +85,14 @@ def read_voltage_column(path: str) -> List[float]:
 def quantize_voltage(v: float, vref: float, bits: int, gain: float = 1.0) -> int:
     """Quantize a single voltage into an integer code (unipolar 0..(2^bits-1))."""
     v_scaled = gain * v
-    # clamp into [0, vref]
     v_clamped = max(0.0, min(vref, v_scaled))
     max_code = (1 << bits) - 1
-    # round to nearest integer
     code = int(round((v_clamped / vref) * max_code))
-    # protect boundaries
     if code < 0:
         code = 0
     if code > max_code:
         code = max_code
+   
     return code
 
 
@@ -126,7 +119,6 @@ def main(argv=None):
         print("[ERROR] No voltages found in input file.", file=sys.stderr)
         sys.exit(3)
 
-    # choose Vref if needed
     vref = args.vref
     if vref is None:
         vmax = max(abs(x) for x in voltages)
@@ -140,26 +132,30 @@ def main(argv=None):
     max_code = (1 << bits) - 1
     lsb = vref / max_code
 
-    print(f"[INFO] Input: {args.input}")
-    print(f"[INFO] Samples: {len(voltages)}, bits={bits}, Vref={vref:.12g}, LSB={lsb:.12g}, gain={args.gain}")
-    print(f"[INFO] Output (binary): {args.output}")
-    
 
-    # ensure output directory exists
     outdir = os.path.dirname(args.output)
     if outdir:
         os.makedirs(outdir, exist_ok=True)
 
-    # Write outputs
+    
+    bin_lines = []
+    neg_positions = []
+
+    for i, v in enumerate(voltages):
+        is_negative = v < 0
+        if is_negative:
+            neg_positions.append(i)
+            v = abs(v)
+        code = quantize_voltage(v, vref, bits, args.gain)
+        binstr = format(code, f"0{bits}b")
+        bin_lines.append(binstr)
+
+   
     with open(args.output, "w", encoding="utf-8") as fout_bin:
-        
+        for i, line in enumerate(bin_lines):
+            sign_bit = "1" if i in neg_positions else "0"
+            fout_bin.write(sign_bit + line + "\n")
 
-        for i, v in enumerate(voltages):
-            code = quantize_voltage(v, vref, bits, args.gain)
-            binstr = format(code, f"0{bits}b")
-            fout_bin.write(binstr + "\n")
-
-            
     print("[OK] Conversion finished.")
 
 

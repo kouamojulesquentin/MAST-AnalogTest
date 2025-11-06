@@ -1,3 +1,25 @@
+# MAST-AnalogTest
+
+
+**MAST-AnalogTest** is an official extension of the [MAST](https://gricad-gitlab.univ-grenoble-alpes.fr/portolam/mast-opensource) project, focused on **analog and mixed-signal simulation**.  
+It enhances the standard MAST environment by integrating **Cadence/Spectre-based analog simulation** into the IJTAG (IEEE 1687 / P1687.1) test flow.
+
+This extension enables:
+- **Co-simulation between analog (Spectre) and digital (ModelSim/QuestaSim)** domains  
+- **Analog signal quantization and Machine Learning (ML) classification pipelines**  
+- **A unified IJTAG-compatible mixed-signal test environment**
+
+In addition to the standard MAST execution flow (described below),  
+you will find a **dedicated analog co-simulation workflow** in the directory:
+
+ [`SPICE/`](./SPICE/) — contains a detailed explanation of the analog flow.
+
+--
+
+
+
+
+
 -------------------------------------------------------------------------------------------------
 # MAST : Manager for SOC Test
 

@@ -15,7 +15,7 @@ component SVF_Master_TAP
               input_SVF_file : string := "data_to_shift.svf";
              output_SVF_dir : string := "./outputs/";
              output_SVF_file : string := "data_from_SUT.dat");
-    port ( 
+    port (
 
         Clk : in std_logic;
         Resetn: in std_logic;

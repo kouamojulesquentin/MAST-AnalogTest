@@ -1,14 +1,14 @@
 HEADER
 "PSFversion" "1.00"
 "simulator" "spectre"
-"version" "18.1.0.235.isr3"
-"date" "11:19:31 PM, Thur Oct 16, 2025"
+"version" "16.1.0.673.isr14"
+"date" "3:38:11 PM, Tue Nov 4, 2025"
 "design" "// Generated for: spectre"
 "analysis type" "info.primitives"
 "analysis name" "primitives"
 "analysis description" "Circuit Information"
 "xVecSorted" "unknown"
-"tolerance.relative" 0.00100000
+"tolerance.relative" 0.000100000
 TYPE
 "primitive" STRUCT(
 "model" STRING *
@@ -21,19 +21,19 @@ TYPE
 "key" "prim"
 )
 VALUE
+"assert" "primitive" (
+""
+""
+""
+"sub subs mod dev primitive expr modelparam param max min duration message level info values boolean anal_types check_windows maxvio_perinst maxvio_all group "
+""
+""
+)
 "capacitor" "primitive" (
 "c trise tnom w l etch cj cjsw scalec rforce di thick coeffs symmetric min max tc1 tc2 shrink shrink2 bv_max bv_min "
 "cap "
 "tempeff meff leff weff ceff "
 "c w l m scale trise tc1 tc2 ic area perim coeffs symmetric bv_max scalec bv_min "
-""
-"1 2 "
-)
-"inductor" "primitive" (
-"l r tc1 tc2 trise tnom rforce coeffs symmetric scalei mode q fq rdc kf af "
-"ind i pwr "
-"tempeff meff indeff "
-"l r m trise ic isnoisy coeffs symmetric tc1 tc2 scalei mode q fq rdc "
 ""
 "1 2 "
 )

@@ -199,5 +199,6 @@ build
 /RTL/vhdl/Lib
 /RTL/vhdl/Mast
 /RTL/vhdl/Simulation_exchange_files/*
-
+/SPICE/.DS_Store
+.DS_Store
 
